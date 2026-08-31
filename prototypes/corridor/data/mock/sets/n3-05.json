@@ -108,94 +108,94 @@
      "sid": 19821
     },
     {
-     "type": "orthography",
-     "q": "イギリスのロンドンで専業【しゅふ】を続けていた。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "イギリスのロンドンで専業【主婦】を続けていた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "容器",
-      "予算",
-      "主婦",
-      "通過"
+      "しゅふ",
+      "しゅよう",
+      "おもに",
+      "しゅぎ"
      ],
-     "right": 2,
-     "why": "「しゅふ」は【主婦】。housewife",
+     "right": 0,
+     "why": "【主婦】は「しゅふ」。housewife",
      "subject": "word:主婦",
      "sid": 35502
     },
     {
-     "type": "orthography",
-     "q": "【たたかい】は終わった。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "今日の試合は天下分け目の【戦い】だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "戦い",
-      "印刷",
-      "内容",
-      "患者"
+      "たたかい",
+      "いわい",
+      "よい",
+      "たたかう"
      ],
      "right": 0,
-     "why": "「たたかい」は【戦い】。battle, fight",
+     "why": "【戦い】は「たたかい」。battle, fight",
      "subject": "word:戦い",
-     "sid": 1606
+     "sid": 23129
     },
     {
      "type": "orthography",
-     "q": "彼女は【まずしい】境遇で暮らしている。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "その大富豪は【まずしい】少年として生涯を始めた。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "罰する",
       "貧しい",
-      "片付け",
-      "揃える",
-      "支払う"
+      "片付く",
+      "命じる"
      ],
-     "right": 0,
+     "right": 1,
      "why": "「まずしい」は【貧しい】。poor, needy",
      "subject": "word:貧しい",
-     "sid": 17990
+     "sid": 29389
     },
     {
-     "type": "context",
-     "q": "悪友を（　　）ように努めなさい。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "悪友は【さける】べきだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "量る",
-      "隠れる",
-      "断つ",
-      "避ける"
+      "眺める",
+      "避ける",
+      "対する",
+      "暮らす"
      ],
-     "right": 3,
-     "why": "避ける（さける）— to avoid (physical contact); to ",
+     "right": 1,
+     "why": "「さける」は【避ける】。to avoid (physical contact); to ",
      "subject": "word:避ける",
-     "sid": 13815
+     "sid": 4129
     },
     {
-     "type": "context",
-     "q": "（　　）を感じない。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "老婦人は子供たちに【あいじょう】のこもった手を差し伸べた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "農業",
       "愛情",
-      "苦労",
-      "収入",
-      "休暇"
+      "特長",
+      "衝突"
      ],
-     "right": 0,
-     "why": "愛情（あいじょう）— love, affection",
+     "right": 1,
+     "why": "「あいじょう」は【愛情】。love, affection",
      "subject": "word:愛情",
-     "sid": 1485
+     "sid": 30608
     },
     {
-     "type": "context",
-     "q": "我々は家族の（　　）の中で育った。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼の葉巻から煙の【わ】が空中に漂っていた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "裸",
-      "国家",
+      "他",
       "輪",
-      "課"
+      "田",
+      "異"
      ],
-     "right": 2,
-     "why": "輪（わ）— ring, hoop",
+     "right": 1,
+     "why": "「わ」は【輪】。ring, hoop",
      "subject": "word:輪",
-     "sid": 22342
+     "sid": 30083
     }
    ]
   },
@@ -209,30 +209,30 @@
    "items": [
     {
      "type": "form",
-     "q": "官邸で情報収集に（　　）べきだった。\n（　　）に入る形はどれか。",
+     "q": "矢は的に（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "当たっ",
-      "当たれ",
-      "当たり",
-      "当たる"
+      "当たら",
+      "当たる",
+      "当たり"
      ],
-     "right": 3,
-     "why": "辞書形は「当たる」。この文では「当たる」。",
+     "right": 0,
+     "why": "辞書形は「当たる」。この文では「当たっ」。",
      "subject": "word:当たる",
-     "sid": 35243
+     "sid": 6139
     },
     {
      "type": "form",
      "q": "この物質は水と（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "混ざり",
       "混ざる",
-      "混ざら",
-      "混ざっ"
+      "混ざり",
+      "混ざっ",
+      "混ざら"
      ],
-     "right": 1,
+     "right": 0,
      "why": "辞書形は「混ざる」。この文では「混ざる」。",
      "subject": "word:混ざる",
      "sid": 7735
@@ -242,75 +242,75 @@
      "q": "英語を話せる人を（　　）ます。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "雇い",
       "雇わ",
       "雇っ",
-      "雇う"
+      "雇い",
+      "雇おう"
      ],
-     "right": 0,
+     "right": 2,
      "why": "辞書形は「雇う」。この文では「雇い」。",
      "subject": "word:雇う",
      "sid": 12244
     },
     {
      "type": "form",
-     "q": "お手紙を（　　）ました。\n（　　）に入る形はどれか。",
+     "q": "私は鉛筆書きの手紙を（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "受け取る",
       "受け取っ",
-      "受け取り",
-      "受け取ら",
-      "受け取ろう"
+      "受け取ろう",
+      "受け取り"
      ],
      "right": 1,
-     "why": "辞書形は「受け取る」。この文では「受け取り」。",
+     "why": "辞書形は「受け取る」。この文では「受け取っ」。",
      "subject": "word:受け取る",
-     "sid": 8927
+     "sid": 20844
     },
     {
      "type": "form",
-     "q": "彼女は双子を（　　）だ。\n（　　）に入る形はどれか。",
+     "q": "鳥は卵を（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "産ま",
       "産み",
-      "産ん",
       "産む",
-      "産ま"
+      "産ん"
      ],
-     "right": 1,
-     "why": "辞書形は「産む」。この文では「産ん」。",
+     "right": 2,
+     "why": "辞書形は「産む」。この文では「産む」。",
      "subject": "word:産む",
-     "sid": 6839
+     "sid": 2798
     },
     {
      "type": "form",
-     "q": "設定料金に労務費用は（　　）ません。\n（　　）に入る形はどれか。",
+     "q": "その値段は税金を（　　）ます。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "含ま",
-      "含み",
       "含む",
-      "含ん"
-     ],
-     "right": 1,
-     "why": "辞書形は「含む」。この文では「含み」。",
-     "subject": "word:含む",
-     "sid": 20886
-    },
-    {
-     "type": "form",
-     "q": "彼はスーパーマーケットのコマーシャルを（　　）ている。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "扱う",
-      "扱い",
-      "扱わ",
-      "扱っ"
+      "含ま",
+      "含ん",
+      "含み"
      ],
      "right": 3,
-     "why": "辞書形は「扱う」。この文では「扱っ」。",
+     "why": "辞書形は「含む」。この文では「含み」。",
+     "subject": "word:含む",
+     "sid": 12478
+    },
+    {
+     "type": "form",
+     "q": "顧客の（　　）方をお話しした。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "扱い",
+      "扱う",
+      "扱っ",
+      "扱わ"
+     ],
+     "right": 0,
+     "why": "辞書形は「扱う」。この文では「扱い」。",
      "subject": "word:扱う",
-     "sid": 22150
+     "sid": 18951
     }
    ]
   }

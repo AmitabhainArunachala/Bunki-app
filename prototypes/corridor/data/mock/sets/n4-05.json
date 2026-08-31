@@ -108,94 +108,94 @@
      "sid": 16045
     },
     {
-     "type": "orthography",
-     "q": "【たいふう】で本土との通信が絶えた。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "【台風】で本土との通信が絶えた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "生活",
-      "台風",
-      "親切",
-      "心配"
+      "あいさつ",
+      "いない",
+      "かよう",
+      "たいふう"
      ],
-     "right": 1,
-     "why": "「たいふう」は【台風】。typhoon",
+     "right": 3,
+     "why": "【台風】は「たいふう」。typhoon",
      "subject": "word:台風",
      "sid": 19642
     },
     {
-     "type": "orthography",
-     "q": "これがアメリカ風の【せいかつ】様式だ。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "彼は若い頃惨めな【生活】を送った。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "喜ぶ",
-      "生活",
-      "冷房",
-      "郊外"
+      "せいかつ",
+      "ねだん",
+      "いきる",
+      "せいさん"
      ],
-     "right": 1,
-     "why": "「せいかつ」は【生活】。living, life; to live",
+     "right": 0,
+     "why": "【生活】は「せいかつ」。living, life; to live",
      "subject": "word:生活",
-     "sid": 17183
+     "sid": 22521
     },
     {
      "type": "orthography",
-     "q": "彼はメアリーの指に【ゆびわ】をはめた。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "その【ゆびわ】を手放すな。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "日記",
-      "指輪",
-      "眠い",
-      "苦い"
+      "用意",
+      "試験",
+      "動く",
+      "指輪"
      ],
-     "right": 1,
+     "right": 3,
      "why": "「ゆびわ」は【指輪】。(finger) ring",
      "subject": "word:指輪",
-     "sid": 23249
+     "sid": 4423
     },
     {
-     "type": "context",
-     "q": "彼は自国の立場からものを（　　）。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼はなんでも金本位に【かんがえる】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "考える",
-      "塗る",
-      "負ける",
-      "払う"
+      "贈り物",
+      "止める",
+      "受ける",
+      "考える"
      ],
-     "right": 0,
-     "why": "考える（かんがえる）— to think (about); to consider",
+     "right": 3,
+     "why": "「かんがえる」は【考える】。to think (about); to consider",
      "subject": "word:考える",
-     "sid": 20954
+     "sid": 19470
     },
     {
-     "type": "context",
-     "q": "忍耐は（　　）美しい美徳だ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼女は世界で【もっとも】優れたバレリーナのひとりです。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "最も",
-      "決して",
-      "十分",
-      "是非"
+      "途中",
+      "失礼",
+      "一杯",
+      "最も"
      ],
-     "right": 0,
-     "why": "最も（もっとも）— most",
+     "right": 3,
+     "why": "「もっとも」は【最も】。most",
      "subject": "word:最も",
-     "sid": 8735
+     "sid": 27052
     },
     {
-     "type": "context",
-     "q": "（　　）に座っていたので足が痛い。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "もう【たたみ】の上に座るのには慣れました。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "指輪",
-      "息子",
+      "力",
+      "林",
       "畳",
-      "暖房"
+      "心"
      ],
      "right": 2,
-     "why": "畳（たたみ）— tatami mat (Japanese straw mat)",
+     "why": "「たたみ」は【畳】。tatami mat (Japanese straw mat)",
      "subject": "word:畳",
-     "sid": 24990
+     "sid": 27288
     }
    ]
   },
@@ -209,108 +209,108 @@
    "items": [
     {
      "type": "form",
-     "q": "彼はピューマを慣らすのに大いに骨を（　　）た。\n（　　）に入る形はどれか。",
+     "q": "禎子はこれまで６４４羽の鶴を（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "折り",
+      "折る",
       "折ら",
-      "折っ",
-      "折る"
+      "折り",
+      "折っ"
      ],
-     "right": 2,
+     "right": 3,
      "why": "辞書形は「折る」。この文では「折っ」。",
      "subject": "word:折る",
-     "sid": 28309
+     "sid": 25959
     },
     {
      "type": "form",
-     "q": "すごく（　　）のです。\n（　　）に入る形はどれか。",
+     "q": "（　　）くせに。素直に喜びなよ。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "嬉しい",
-      "嬉しかっ",
+      "嬉し",
       "嬉しく",
-      "嬉し"
+      "嬉しかっ"
      ],
      "right": 0,
      "why": "辞書形は「嬉しい」。この文では「嬉しい」。",
      "subject": "word:嬉しい",
-     "sid": 2448
+     "sid": 20165
     },
     {
      "type": "form",
-     "q": "何とか収支が（　　）ばいいんだが。\n（　　）に入る形はどれか。",
+     "q": "このデザインは私の趣味に（　　）ない。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "合っ",
       "合わ",
+      "合っ",
       "合え",
       "合う"
      ],
-     "right": 2,
-     "why": "辞書形は「合う」。この文では「合え」。",
+     "right": 0,
+     "why": "辞書形は「合う」。この文では「合わ」。",
      "subject": "word:合う",
-     "sid": 25039
+     "sid": 21210
     },
     {
      "type": "form",
-     "q": "脇へ（　　）てくださいませんか。\n（　　）に入る形はどれか。",
+     "q": "ちょっと（　　）てかない？\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "寄れ",
       "寄る",
       "寄っ",
-      "寄ら",
-      "寄れ"
+      "寄ろう"
      ],
-     "right": 1,
+     "right": 2,
      "why": "辞書形は「寄る」。この文では「寄っ」。",
      "subject": "word:寄る",
-     "sid": 16635
+     "sid": 2515
     },
     {
      "type": "form",
-     "q": "もちろん、（　　）で。\n（　　）に入る形はどれか。",
+     "q": "選手はその勝利を（　　）だ。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "喜ば",
       "喜び",
       "喜ぶ",
-      "喜ん",
-      "喜ば"
+      "喜ん"
      ],
-     "right": 2,
+     "right": 3,
      "why": "辞書形は「喜ぶ」。この文では「喜ん」。",
      "subject": "word:喜ぶ",
-     "sid": 2011
+     "sid": 11917
     },
     {
      "type": "form",
-     "q": "陸奥親方は「（　　）ても謝りきれない。\n（　　）に入る形はどれか。",
+     "q": "彼女は（　　）べきだった。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "謝り",
       "謝る",
-      "謝ら",
       "謝っ",
-      "謝り"
+      "謝ら"
      ],
-     "right": 2,
-     "why": "辞書形は「謝る」。この文では「謝っ」。",
+     "right": 1,
+     "why": "辞書形は「謝る」。この文では「謝る」。",
      "subject": "word:謝る",
-     "sid": 35319
+     "sid": 7396
     },
     {
      "type": "form",
-     "q": "書架の本は１冊（　　）ず全部読みました。\n（　　）に入る形はどれか。",
+     "q": "塩は（　　）ていない。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "残ら",
-      "残っ",
       "残り",
+      "残っ",
+      "残ら",
       "残る"
      ],
-     "right": 0,
-     "why": "辞書形は「残る」。この文では「残ら」。",
+     "right": 1,
+     "why": "辞書形は「残る」。この文では「残っ」。",
      "subject": "word:残る",
-     "sid": 27516
+     "sid": 6221
     }
    ]
   }

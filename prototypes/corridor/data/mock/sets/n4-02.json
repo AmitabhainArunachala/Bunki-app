@@ -114,94 +114,94 @@
      "sid": 29366
     },
     {
-     "type": "orthography",
-     "q": "彼は新しい電灯を【やめる】のに針金を使った。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "彼は新しい電灯を【止める】のに針金を使った。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "揺れる",
-      "育てる",
-      "汚れる",
-      "止める"
+      "とまる",
+      "やめる",
+      "すてる",
+      "まいる"
      ],
-     "right": 3,
-     "why": "「やめる」は【止める】。to end, to stop",
+     "right": 1,
+     "why": "【止める】は「やめる」。to end, to stop",
      "subject": "word:止める",
      "sid": 27959
     },
     {
-     "type": "orthography",
-     "q": "この部屋の【すみ】に観賞植物を置きたいんです。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "この部屋の【隅】に観賞植物を置きたいんです。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "線",
-      "喉",
-      "夢",
-      "隅"
+      "すみ",
+      "かがく",
+      "わかす",
+      "わけ"
      ],
-     "right": 3,
-     "why": "「すみ」は【隅】。corner",
+     "right": 0,
+     "why": "【隅】は「すみ」。corner",
      "subject": "word:隅",
      "sid": 28160
     },
     {
      "type": "orthography",
-     "q": "彼は天文学の【せんもん】家だ。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "【せんもん】ガッコのタメだよ。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "水道",
+      "失敗",
       "専門",
-      "全然",
-      "大抵",
-      "暖房"
-     ],
-     "right": 0,
-     "why": "「せんもん」は【専門】。major; speciality",
-     "subject": "word:専門",
-     "sid": 14535
-    },
-    {
-     "type": "context",
-     "q": "（　　）部屋で琴欧洲に「緊張した。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "通り",
-      "畳",
-      "研究",
-      "支度"
-     ],
-     "right": 3,
-     "why": "支度（したく）— preparation",
-     "subject": "word:支度",
-     "sid": 35281
-    },
-    {
-     "type": "context",
-     "q": "（　　）はひどく酔っ払った。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "君",
-      "彼",
-      "彼女",
-      "僕"
-     ],
-     "right": 1,
-     "why": "彼（かれ）— he, boyfriend",
-     "subject": "word:彼",
-     "sid": 5030
-    },
-    {
-     "type": "context",
-     "q": "あんた（　　）だよ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "都合",
-      "田舎",
-      "変",
-      "内"
+      "最近"
      ],
      "right": 2,
-     "why": "変（へん）— strange, odd",
+     "why": "「せんもん」は【専門】。major; speciality",
+     "subject": "word:専門",
+     "sid": 7781
+    },
+    {
+     "type": "orthography",
+     "q": "夕飯の【したく】が出来ました。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "支度",
+      "花見",
+      "特に",
+      "怖い"
+     ],
+     "right": 0,
+     "why": "「したく」は【支度】。preparation",
+     "subject": "word:支度",
+     "sid": 11327
+    },
+    {
+     "type": "orthography",
+     "q": "【かれ】は耳が早い。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "様",
+      "彼",
+      "首",
+      "妻"
+     ],
+     "right": 1,
+     "why": "「かれ」は【彼】。he, boyfriend",
+     "subject": "word:彼",
+     "sid": 2813
+    },
+    {
+     "type": "orthography",
+     "q": "【へん】な帽子かぶってるな。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "変",
+      "坂",
+      "絹",
+      "皆"
+     ],
+     "right": 0,
+     "why": "「へん」は【変】。strange, odd",
      "subject": "word:変",
-     "sid": 1289
+     "sid": 7769
     }
    ]
   },
@@ -215,108 +215,108 @@
    "items": [
     {
      "type": "form",
-     "q": "今晩（　　）たいのですが。\n（　　）に入る形はどれか。",
+     "q": "私達は、町外れの小さなホテルに（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "泊まっ",
       "泊まろう",
       "泊まり",
+      "泊まっ",
       "泊まる"
      ],
      "right": 2,
-     "why": "辞書形は「泊まる」。この文では「泊まり」。",
+     "why": "辞書形は「泊まる」。この文では「泊まっ」。",
      "subject": "word:泊まる",
-     "sid": 8342
+     "sid": 26571
     },
     {
      "type": "form",
-     "q": "気合いを入れて（　　）。\n（　　）に入る形はどれか。",
+     "q": "しっかり（　　）てこい。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "頑張り",
       "頑張っ",
       "頑張ら",
-      "頑張り",
       "頑張れ"
      ],
-     "right": 3,
-     "why": "辞書形は「頑張る」。この文では「頑張れ」。",
+     "right": 1,
+     "why": "辞書形は「頑張る」。この文では「頑張っ」。",
      "subject": "word:頑張る",
-     "sid": 4919
+     "sid": 2568
     },
     {
      "type": "form",
-     "q": "（　　）て兜の緒を締めよ。\n（　　）に入る形はどれか。",
+     "q": "際どいところで（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "勝つ",
       "勝ち",
       "勝て",
-      "勝っ"
-     ],
-     "right": 3,
-     "why": "辞書形は「勝つ」。この文では「勝っ」。",
-     "subject": "word:勝つ",
-     "sid": 10974
-    },
-    {
-     "type": "form",
-     "q": "この学校のカリキュラムは広く（　　）。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "浅い",
-      "浅く",
-      "浅",
-      "浅かっ"
+      "勝とう"
      ],
      "right": 0,
-     "why": "辞書形は「浅い」。この文では「浅い」。",
-     "subject": "word:浅い",
-     "sid": 14236
+     "why": "辞書形は「勝つ」。この文では「勝つ」。",
+     "subject": "word:勝つ",
+     "sid": 2407
     },
     {
      "type": "form",
-     "q": "ねずみはペスト菌を（　　）。\n（　　）に入る形はどれか。",
+     "q": "少しずつ水が（　　）なる。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "運べ",
-      "運ぶ",
-      "運ん",
-      "運ば"
+      "浅かっ",
+      "浅く",
+      "浅い",
+      "浅"
      ],
      "right": 1,
-     "why": "辞書形は「運ぶ」。この文では「運ぶ」。",
-     "subject": "word:運ぶ",
-     "sid": 8846
+     "why": "辞書形は「浅い」。この文では「浅く」。",
+     "subject": "word:浅い",
+     "sid": 7958
     },
     {
      "type": "form",
-     "q": "あの橋は大変（　　）。\n（　　）に入る形はどれか。",
+     "q": "これを（　　）でください。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "美しかっ",
+      "運び",
+      "運べ",
+      "運ば",
+      "運ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「運ぶ」。この文では「運ん」。",
+     "subject": "word:運ぶ",
+     "sid": 4730
+    },
+    {
+     "type": "form",
+     "q": "朝日はなんと（　　）のだろう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
       "美しい",
       "美し",
+      "美しかっ",
       "美しく"
      ],
-     "right": 1,
+     "right": 0,
      "why": "辞書形は「美しい」。この文では「美しい」。",
      "subject": "word:美しい",
-     "sid": 4256
+     "sid": 13267
     },
     {
      "type": "form",
-     "q": "彼は（　　）で受話器を置いた。\n（　　）に入る形はどれか。",
+     "q": "（　　）ば間に合います。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "急が",
       "急げ",
+      "急ぎ",
       "急い",
-      "急ぐ"
+      "急が"
      ],
-     "right": 2,
-     "why": "辞書形は「急ぐ」。この文では「急い」。",
+     "right": 0,
+     "why": "辞書形は「急ぐ」。この文では「急げ」。",
      "subject": "word:急ぐ",
-     "sid": 19166
+     "sid": 2258
     }
    ]
   },
@@ -341,27 +341,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
       "野ばら",
-      "遺族基礎年金",
-      "体験談をどう受け取るか",
-      "医療保険"
+      "知らない町を歩く",
+      "五箇条の御誓文"
      ],
-     "right": 0,
+     "right": 1,
      "why": "青空文庫 · 小川未明（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から（　　）、国境であります。そこには両方の国から、ただ一人ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。",
+     "q": "本文の（　　）に入る言葉はどれか。\n大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ（　　）ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "曇り",
-      "細い",
-      "七つ",
-      "遠い"
+      "時々",
+      "一人",
+      "豚肉",
+      "毎晩"
      ],
-     "right": 3,
-     "why": "本文のとおり「遠い（とおい）」。far (away), distant",
-     "subject": "word:遠い"
+     "right": 1,
+     "why": "本文のとおり「一人（ひとり）」。one person",
+     "subject": "word:一人"
     }
    ]
   }

@@ -1750,8 +1750,14 @@ verified('stale-tab-storage-event-freezes-this-context', () => {
   assert.match(storeContext.S.storeError, /another tab/);
   const alert = document.getElementById('store-alert');
   assert.equal(alert.hidden, false);
-  // the crossing stood down without a record change: the freeze lifts,
-  // the alert clears, writes land again
+  // ANOTHER crossing's stand-down is not this freeze's business (round 8):
+  // two tabs can both start before either beacon lands, and an unscoped
+  // abort would hand one of them permission to commit mid-swap
+  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x9-aborted' });
+  assert.equal(storeApi.saveStore(), false, 'a foreign abort must not thaw this freeze');
+  assert.match(storeContext.S.storeError, /another tab/);
+  // the crossing that DID freeze this tab stood down without a record
+  // change: the freeze lifts, the alert clears, writes land again
   windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x1-aborted' });
   assert.equal(storeContext.S.storeError, null);
   assert.equal(alert.hidden, true);

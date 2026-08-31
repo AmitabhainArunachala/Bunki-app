@@ -114,94 +114,94 @@
      "sid": 4252
     },
     {
-     "type": "orthography",
-     "q": "ＵＦＯとは未確認飛行【ぶったい】を表す。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "ＵＦＯとは未確認飛行【物体】を表す。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "促進",
-      "連帯",
-      "大水",
-      "物体"
+      "ぶったい",
+      "たいけん",
+      "ぶっし",
+      "にくたい"
      ],
-     "right": 3,
-     "why": "「ぶったい」は【物体】。object",
+     "right": 0,
+     "why": "【物体】は「ぶったい」。object",
      "subject": "word:物体",
      "sid": 21118
     },
     {
-     "type": "orthography",
-     "q": "AUはダルフールに6,000人からなる停戦【かんし】部隊を派遣している。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "BBC特派員ジョナー・フィッシャーによれば、AU停戦【監視】部隊員への攻撃と挑発はありふれたことになってきている。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "監視",
-      "砂利",
-      "未開",
-      "移行"
+      "かんし",
+      "しさつ",
+      "もうれつ",
+      "しや"
      ],
      "right": 0,
-     "why": "「かんし」は【監視】。observation, guarding",
+     "why": "【監視】は「かんし」。observation, guarding",
      "subject": "word:監視",
-     "sid": 37161
+     "sid": 41042
     },
     {
      "type": "orthography",
-     "q": "今日の為替【そうば】はいくらですか。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "為替【そうば】は１ドル１４５円だ。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "予言",
-      "繊維",
-      "固定",
-      "相場"
+      "弾む",
+      "相場",
+      "助け",
+      "喜劇"
      ],
-     "right": 3,
+     "right": 1,
      "why": "「そうば」は【相場】。market price, speculation",
      "subject": "word:相場",
-     "sid": 17401
+     "sid": 16843
     },
     {
-     "type": "context",
-     "q": "（　　）限り砂ばかりだった。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【みわたす】限り、野原は真っ白だった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
       "見渡す",
-      "嘆く",
-      "即する",
-      "遂げる"
+      "報じる",
+      "味わい",
+      "連ねる"
      ],
      "right": 0,
-     "why": "見渡す（みわたす）— to look out over, to survey (sce",
+     "why": "「みわたす」は【見渡す】。to look out over, to survey (sce",
      "subject": "word:見渡す",
-     "sid": 9105
+     "sid": 17803
     },
     {
-     "type": "context",
-     "q": "スコットランドは毛（　　）で有名だ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "我々は絹【おりもの】を商っている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "代用",
+      "正解",
       "織物",
-      "滞納",
-      "最善"
+      "推進",
+      "独創"
      ],
      "right": 1,
-     "why": "織物（おりもの）— textile, fabric",
+     "why": "「おりもの」は【織物】。textile, fabric",
      "subject": "word:織物",
-     "sid": 13999
+     "sid": 15779
     },
     {
-     "type": "context",
-     "q": "米国（　　）準備銀行は金利を引き下げました。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "社会・政治的影響この射殺事件は、アメリカ国内での移民政策への不満や【れんぽう】法執行機関への不信を象徴する出来事となった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "立法",
       "連邦",
-      "初版",
-      "無口"
+      "適性",
+      "慣例",
+      "前提"
      ],
-     "right": 1,
-     "why": "連邦（れんぽう）— commonwealth, federation of stat",
+     "right": 0,
+     "why": "「れんぽう」は【連邦】。commonwealth, federation of stat",
      "subject": "word:連邦",
-     "sid": 24661
+     "sid": 42020
     }
    ]
   },
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "印鑑登録証",
-      "介護",
-      "手で書くということ",
-      "「中今」は時間論になり得るか"
+      "『古事記』編纂と権力の物語",
+      "天・地・祈りをつなぐ「むすひ」",
+      "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "介護"
      ],
-     "right": 1,
+     "right": 3,
      "why": "やさしい日本語 用語集 · 検収前（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、毎日の生活（（　　）こと、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、（　　）の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "勤める",
-      "食べる",
-      "日曜日",
-      "冷たい"
+      "先週",
+      "結婚",
+      "毎日",
+      "本当"
      ],
-     "right": 1,
-     "why": "本文のとおり「食べる（たべる）」。to eat",
-     "subject": "word:食べる"
+     "right": 2,
+     "why": "本文のとおり「毎日（まいにち）」。every day",
+     "subject": "word:毎日"
     }
    ]
   }

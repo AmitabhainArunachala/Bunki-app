@@ -114,94 +114,94 @@
      "sid": 14036
     },
     {
-     "type": "orthography",
-     "q": "この材質は弾力性に【かける】。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "ここだけの話だが彼の考え方は深みに【欠ける】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "対する",
-      "欠ける",
-      "似合う",
-      "延ばす"
+      "ふれる",
+      "かける",
+      "ふるえる",
+      "ちる"
      ],
      "right": 1,
-     "why": "「かける」は【欠ける】。to be lacking",
+     "why": "【欠ける】は「かける」。to be lacking",
      "subject": "word:欠ける",
-     "sid": 12504
+     "sid": 30262
     },
     {
-     "type": "orthography",
-     "q": "銃を私に【むける】な。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "銃を私に【向ける】な。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "向ける",
-      "終える",
-      "傷める",
-      "揃える"
+      "たまる",
+      "はかる",
+      "ささえる",
+      "むける"
      ],
-     "right": 0,
-     "why": "「むける」は【向ける】。to turn towards, to point",
+     "right": 3,
+     "why": "【向ける】は「むける」。to turn towards, to point",
      "subject": "word:向ける",
      "sid": 6239
     },
     {
      "type": "orthography",
-     "q": "「ムサウィ被告は【こうせい】な裁判を受けた。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "王は自分の王国を【こうせい】に治めた。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "報告",
+      "全身",
       "公正",
-      "従う",
-      "禁煙",
-      "宝石"
+      "有能"
      ],
-     "right": 0,
+     "right": 2,
      "why": "「こうせい」は【公正】。justice, fairness",
      "subject": "word:公正",
-     "sid": 35435
+     "sid": 22603
     },
     {
-     "type": "context",
-     "q": "仕事を（　　）べき時間だ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "仕事を【やめる】べき時間だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "攻める",
+      "裂ける",
       "辞める",
-      "飽きる",
-      "至る",
-      "閉じる"
+      "売れる"
      ],
-     "right": 0,
-     "why": "辞める（やめる）— to retire",
+     "right": 2,
+     "why": "「やめる」は【辞める】。to retire",
      "subject": "word:辞める",
      "sid": 8465
     },
     {
-     "type": "context",
-     "q": "委員会が（　　）召集された。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【ただちに】大阪へ行ってもらいたい。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "遂に",
-      "恐らく",
-      "直ちに",
-      "偶"
+      "重ねる",
+      "親しい",
+      "雰囲気",
+      "直ちに"
      ],
-     "right": 2,
-     "why": "直ちに（ただちに）— at once, immediately",
+     "right": 3,
+     "why": "「ただちに」は【直ちに】。at once, immediately",
      "subject": "word:直ちに",
-     "sid": 16042
+     "sid": 13604
     },
     {
-     "type": "context",
-     "q": "１９９０（　　）は湾岸紛争で始まった。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼女は１９５０【ねんだい】の生まれです。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "女優",
-      "講演",
+      "独特",
+      "抵抗",
       "年代",
-      "大戦"
+      "進行"
      ],
      "right": 2,
-     "why": "年代（ねんだい）— age, era",
+     "why": "「ねんだい」は【年代】。age, era",
      "subject": "word:年代",
-     "sid": 18348
+     "sid": 14066
     }
    ]
   },
@@ -215,108 +215,108 @@
    "items": [
     {
      "type": "form",
-     "q": "優先度と緊急度の（　　）計画。\n（　　）に入る形はどれか。",
+     "q": "彼女はフランス語の駆使能力においては誰にも（　　）ない。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "劣ら",
       "劣る",
-      "劣り",
-      "劣っ"
+      "劣っ",
+      "劣り"
      ],
-     "right": 1,
-     "why": "辞書形は「劣る」。この文では「劣る」。",
+     "right": 0,
+     "why": "辞書形は「劣る」。この文では「劣ら」。",
      "subject": "word:劣る",
-     "sid": 15699
+     "sid": 31949
     },
     {
      "type": "form",
-     "q": "ジャックは放火で（　　）た。\n（　　）に入る形はどれか。",
+     "q": "ロープにしっかり（　　）なさい。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "捕まっ",
-      "捕まら",
+      "捕まり",
       "捕まる",
-      "捕まり"
+      "捕まら"
      ],
-     "right": 0,
-     "why": "辞書形は「捕まる」。この文では「捕まっ」。",
+     "right": 1,
+     "why": "辞書形は「捕まる」。この文では「捕まり」。",
      "subject": "word:捕まる",
-     "sid": 9332
+     "sid": 5669
     },
     {
      "type": "form",
-     "q": "これを書留でお（　　）します。\n（　　）に入る形はどれか。",
+     "q": "予約係をお（　　）します。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "願う",
       "願っ",
-      "願わ",
       "願い",
-      "願う"
+      "願わ"
      ],
      "right": 2,
      "why": "辞書形は「願う」。この文では「願い」。",
      "subject": "word:願う",
-     "sid": 16289
+     "sid": 10582
     },
     {
      "type": "form",
-     "q": "他方でその経験から（　　）だものも大きかった。\n（　　）に入る形はどれか。",
+     "q": "彼は新式の穀物生産方法を（　　）にアメリカへ渡った。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "学ぶ",
+      "学び",
       "学ぼう",
       "学べ",
-      "学ん"
+      "学ぶ"
      ],
-     "right": 3,
-     "why": "辞書形は「学ぶ」。この文では「学ん」。",
+     "right": 0,
+     "why": "辞書形は「学ぶ」。この文では「学び」。",
      "subject": "word:学ぶ",
-     "sid": 26721
+     "sid": 30566
     },
     {
      "type": "form",
-     "q": "その犬は危険に（　　）た。\n（　　）に入る形はどれか。",
+     "q": "騒音の増加に（　　）なかった。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "気付く",
-      "気付か",
+      "気付い",
       "気付き",
-      "気付い"
+      "気付か",
+      "気付く"
      ],
-     "right": 3,
-     "why": "辞書形は「気付く」。この文では「気付い」。",
+     "right": 2,
+     "why": "辞書形は「気付く」。この文では「気付か」。",
      "subject": "word:気付く",
-     "sid": 11453
+     "sid": 13364
     },
     {
      "type": "form",
      "q": "（　　）には君本人が行く必要がある。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "申し込む",
+      "申し込もう",
       "申し込ん",
-      "申し込ま",
-      "申し込み"
+      "申し込み",
+      "申し込む"
      ],
-     "right": 0,
+     "right": 3,
      "why": "辞書形は「申し込む」。この文では「申し込む」。",
      "subject": "word:申し込む",
      "sid": 23949
     },
     {
      "type": "form",
-     "q": "転職後、彼の収入は（　　）た。\n（　　）に入る形はどれか。",
+     "q": "会員は５人に（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "減っ",
       "減ら",
-      "減る",
-      "減り"
+      "減り",
+      "減る"
      ],
      "right": 0,
      "why": "辞書形は「減る」。この文では「減っ」。",
      "subject": "word:減る",
-     "sid": 18948
+     "sid": 10187
     }
    ]
   },
@@ -341,12 +341,12 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
+      "中道改革連合新代表選挙 小川淳也氏が新代表に",
+      "三柱の神を一つの働きとして読む",
       "マリナーズ・イチロー選手 現役通算2500安打達成",
-      "知らない町を歩く",
-      "『古事記』は神話か、歴史か",
-      "方丈記 · 冒頭"
+      "朝の市場"
      ],
-     "right": 0,
+     "right": 2,
      "why": "ウィキニュース（2006-06-17）の見出し。"
     },
     {
@@ -354,12 +354,12 @@
      "q": "本文の（　　）に入る言葉はどれか。\nサンケイスポーツによると、アメリカ大リーグシアトルマリナーズのイチロー選手が6月7日（UTC-7、日本（　　）8日）、シアトルで開かれたミネソタツインズとの対戦で現役通算2,500安打を達成した。イチローがこの試合の6回の攻撃で、ツインズのウィリアム・エアー投手からの5球目を打ったセンター前ヒットが、2,500本目の安打となった。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "丈夫",
+      "台所",
+      "葉書",
       "時間",
-      "学生",
-      "赤い"
+      "英語"
      ],
-     "right": 1,
+     "right": 2,
      "why": "本文のとおり「時間（じかん）」。time",
      "subject": "word:時間"
     }

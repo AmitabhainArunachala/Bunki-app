@@ -114,94 +114,94 @@
      "sid": 9235
     },
     {
-     "type": "orthography",
-     "q": "卵がかえる前にひよこの数を【かぞえる】な。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "卵がかえる前にひよこの数を【数える】な。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "横切る",
-      "思い出",
-      "悲しむ",
-      "数える"
+      "かぞえる",
+      "たまる",
+      "さける",
+      "うったえる"
      ],
-     "right": 3,
-     "why": "「かぞえる」は【数える】。to count",
+     "right": 0,
+     "why": "【数える】は「かぞえる」。to count",
      "subject": "word:数える",
      "sid": 25789
     },
     {
-     "type": "orthography",
-     "q": "赤丸で【かこむ】。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "赤丸で【囲む】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "敬意",
-      "囲む",
-      "女史",
-      "現場"
+      "くむ",
+      "このむ",
+      "かこむ",
+      "ほほえむ"
      ],
-     "right": 1,
-     "why": "「かこむ」は【囲む】。to surround, to encircle",
+     "right": 2,
+     "why": "【囲む】は「かこむ」。to surround, to encircle",
      "subject": "word:囲む",
      "sid": 424
     },
     {
      "type": "orthography",
-     "q": "軍隊の規律は【もじ】通り厳しいものだ。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "＆のマークはａｎｄの【もじ】を表す。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "行き",
-      "得る",
-      "貸し",
+      "焚く",
+      "文明",
+      "真似",
       "文字"
      ],
      "right": 3,
      "why": "「もじ」は【文字】。letter (of alphabet), character",
      "subject": "word:文字",
-     "sid": 21295
+     "sid": 21123
     },
     {
-     "type": "context",
-     "q": "テルミン：一九二〇年、ロシアの（　　）学者レフ・セルゲイヴィッチ・テルミンが作った世界初の電子楽器。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【ぶつり】なんてまっぴらだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "裁判",
-      "性質",
-      "物理",
-      "蚊"
-     ],
-     "right": 2,
-     "why": "物理（ぶつり）— physics",
-     "subject": "word:物理",
-     "sid": 33910
-    },
-    {
-     "type": "context",
-     "q": "私のアノラックは（　　）なものでしたが大いに役に立ちました。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "急速",
-      "無事",
-      "自然",
-      "粗末"
+      "下り",
+      "覆う",
+      "事実",
+      "物理"
      ],
      "right": 3,
-     "why": "粗末（そまつ）— humble, miserable",
-     "subject": "word:粗末",
-     "sid": 32054
+     "why": "「ぶつり」は【物理】。physics",
+     "subject": "word:物理",
+     "sid": 2553
     },
     {
-     "type": "context",
-     "q": "君は彼目当てにして（　　）。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "私の車はとてもお【そまつ】な物です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "良い",
-      "臭い",
-      "賢い",
-      "貧しい"
+      "粗末",
+      "委員",
+      "火災",
+      "機嫌"
      ],
      "right": 0,
-     "why": "良い（よい）— good, nice",
+     "why": "「そまつ」は【粗末】。humble, miserable",
+     "subject": "word:粗末",
+     "sid": 22617
+    },
+    {
+     "type": "orthography",
+     "q": "【よい】考えが浮かんだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "空き",
+      "幸い",
+      "良い",
+      "笑い"
+     ],
+     "right": 2,
+     "why": "「よい」は【良い】。good, nice",
      "subject": "word:良い",
-     "sid": 14717
+     "sid": 4609
     }
    ]
   },
@@ -230,93 +230,93 @@
     },
     {
      "type": "form",
-     "q": "彼女は（　　）ながら、ナイフを振り回しました。\n（　　）に入る形はどれか。",
+     "q": "その芸術家は（　　）だ。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "叫び",
       "叫ん",
+      "叫び",
       "叫ば",
-      "叫ぶ"
+      "叫べ"
      ],
      "right": 0,
-     "why": "辞書形は「叫ぶ」。この文では「叫び」。",
+     "why": "辞書形は「叫ぶ」。この文では「叫ん」。",
      "subject": "word:叫ぶ",
-     "sid": 24748
+     "sid": 7322
     },
     {
      "type": "form",
-     "q": "絶望した彼は自殺を（　　）た。\n（　　）に入る形はどれか。",
+     "q": "彼らと協力して世界平和を（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "図ろう",
-      "図っ",
       "図り",
-      "図ら"
+      "図ら",
+      "図る"
      ],
-     "right": 1,
-     "why": "辞書形は「図る」。この文では「図っ」。",
+     "right": 3,
+     "why": "辞書形は「図る」。この文では「図る」。",
      "subject": "word:図る",
-     "sid": 19240
+     "sid": 22795
     },
     {
      "type": "form",
-     "q": "テーブルを（　　）ば争いはやむ。\n（　　）に入る形はどれか。",
+     "q": "彼は研究の対象を（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "広げれ",
-      "広げる",
       "広げ",
-      "広げよう"
-     ],
-     "right": 0,
-     "why": "辞書形は「広げる」。この文では「広げれ」。",
-     "subject": "word:広げる",
-     "sid": 13693
-    },
-    {
-     "type": "form",
-     "q": "彼に助けを（　　）。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "求める",
-      "求めよ",
-      "求め",
-      "求めよう"
-     ],
-     "right": 3,
-     "why": "辞書形は「求める」。この文では「求めよう」。",
-     "subject": "word:求める",
-     "sid": 4495
-    },
-    {
-     "type": "form",
-     "q": "靴の紐を（　　）なさい。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "結ん",
-      "結び",
-      "結ぶ",
-      "結ば"
+      "広げよう",
+      "広げる"
      ],
      "right": 1,
-     "why": "辞書形は「結ぶ」。この文では「結び」。",
-     "subject": "word:結ぶ",
-     "sid": 6939
+     "why": "辞書形は「広げる」。この文では「広げ」。",
+     "subject": "word:広げる",
+     "sid": 15241
     },
     {
      "type": "form",
-     "q": "最終的な判断は主権者たる国民に（　　）たい。\n（　　）に入る形はどれか。",
+     "q": "ライオンは餌を（　　）て相争った。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "求め",
+      "求めよう",
+      "求めよ",
+      "求める"
+     ],
+     "right": 0,
+     "why": "辞書形は「求める」。この文では「求め」。",
+     "subject": "word:求める",
+     "sid": 20362
+    },
+    {
+     "type": "form",
+     "q": "両国は互いに同盟を（　　）でいた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "結ば",
+      "結ぶ",
+      "結ん",
+      "結び"
+     ],
+     "right": 2,
+     "why": "辞書形は「結ぶ」。この文では「結ん」。",
+     "subject": "word:結ぶ",
+     "sid": 22838
+    },
+    {
+     "type": "form",
+     "q": "私は家計を妻に（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "任せ",
-      "任せろ",
+      "任せる",
       "任せよう",
-      "任せる"
+      "任せろ"
      ],
      "right": 0,
      "why": "辞書形は「任せる」。この文では「任せ」。",
      "subject": "word:任せる",
-     "sid": 35635
+     "sid": 14572
     }
    ]
   },
@@ -341,27 +341,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "『古事記』編纂と権力の物語",
+      "駅で待つ時間",
       "野ばら",
-      "原初神を「最高神」と呼ぶときの問題",
-      "引き出しの中の手紙"
+      "世界のはじまりに現れた三柱",
+      "世界自然遺産に7箇所を追加 知床半島も"
      ],
      "right": 1,
      "why": "青空文庫 · 小川未明（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ一人ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。大きな国の兵士は（　　）でありました。そうして、小さな国の兵士は青年でありました。",
+     "q": "本文の（　　）に入る言葉はどれか。\n大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ（　　）ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。大きな国の兵士は老人でありました。そうして、小さな国の兵士は青年でありました。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "乾燥",
-      "相手",
-      "鉄道",
-      "老人"
+      "電話",
+      "紅茶",
+      "一人",
+      "段々"
      ],
-     "right": 3,
-     "why": "本文のとおり「老人（ろうじん）」。the aged, old person",
-     "subject": "word:老人"
+     "right": 2,
+     "why": "本文のとおり「一人（ひとり）」。one person",
+     "subject": "word:一人"
     }
    ]
   }

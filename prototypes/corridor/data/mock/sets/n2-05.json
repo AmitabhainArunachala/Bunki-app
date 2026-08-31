@@ -114,92 +114,92 @@
      "sid": 31741
     },
     {
-     "type": "orthography",
-     "q": "ラマダーンの初日と最終日は多くのイスラム諸国で国家の【しゅくじつ】となっている。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "ラマダーンの初日と最終日は多くのイスラム諸国で国家の【祝日】となっている。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "率直",
-      "祝日",
-      "消耗",
-      "電力"
+      "しゅくじつ",
+      "ひあたり",
+      "にちじ",
+      "がんじつ"
      ],
-     "right": 1,
-     "why": "「しゅくじつ」は【祝日】。national holiday",
+     "right": 0,
+     "why": "【祝日】は「しゅくじつ」。national holiday",
      "subject": "word:祝日",
      "sid": 37470
     },
     {
-     "type": "orthography",
-     "q": "なおこの4試合の生放送は系列のBS日テレで行い、地上波では【しんや】に録画ハイライトで対応する。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "私はよく【深夜】にラジオを聞いたものだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "毛糸",
-      "浴衣",
-      "深夜",
-      "毎度"
-     ],
-     "right": 2,
-     "why": "「しんや」は【深夜】。late at night",
-     "subject": "word:深夜",
-     "sid": 39555
-    },
-    {
-     "type": "orthography",
-     "q": "エジソンは【ふくしゃ】の装置を発明した。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "学会",
-      "速達",
-      "複写",
-      "特殊"
-     ],
-     "right": 2,
-     "why": "「ふくしゃ」は【複写】。copy, duplicate",
-     "subject": "word:複写",
-     "sid": 21101
-    },
-    {
-     "type": "context",
-     "q": "日本でも日本物理（　　）などをはじめ記念講演などが企画されている。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "再三",
-      "鉢",
-      "学会",
-      "実用"
-     ],
-     "right": 2,
-     "why": "学会（がっかい）— academic conference",
-     "subject": "word:学会",
-     "sid": 37107
-    },
-    {
-     "type": "context",
-     "q": "読売新聞によると、川村官房長官は、「実質的には新たな決議と同等の（　　）を有する」と語った。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "虹",
-      "効力",
-      "割引",
-      "脱線"
+      "やかん",
+      "しんや",
+      "えのぐ",
+      "やこう"
      ],
      "right": 1,
-     "why": "効力（こうりょく）— effect, efficacy",
-     "subject": "word:効力",
-     "sid": 40295
+     "why": "【深夜】は「しんや」。late at night",
+     "subject": "word:深夜",
+     "sid": 25740
     },
     {
-     "type": "context",
-     "q": "間髪を入れず、迅速かつ（　　）な応対、畏れ入ります。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【ふくしゃ】機の紙を切らしたよ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "的確",
-      "真っ白",
-      "率直",
-      "真っ黒"
+      "複写",
+      "薬品",
+      "断水",
+      "改正"
      ],
      "right": 0,
-     "why": "的確（てきかく）— precise, accurate",
+     "why": "「ふくしゃ」は【複写】。copy, duplicate",
+     "subject": "word:複写",
+     "sid": 14901
+    },
+    {
+     "type": "orthography",
+     "q": "盛田教授は化学【がっかい】で司会を務めた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "略す",
+      "集会",
+      "学会",
+      "解答"
+     ],
+     "right": 2,
+     "why": "「がっかい」は【学会】。academic conference",
+     "subject": "word:学会",
+     "sid": 23673
+    },
+    {
+     "type": "orthography",
+     "q": "その法律は【こうりょく】が無くなっている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "分量",
+      "効力",
+      "集合",
+      "大小"
+     ],
+     "right": 1,
+     "why": "「こうりょく」は【効力】。effect, efficacy",
+     "subject": "word:効力",
+     "sid": 18039
+    },
+    {
+     "type": "orthography",
+     "q": "間髪を入れず、迅速かつ【てきかく】な応対、畏れ入ります。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "役所",
+      "的確",
+      "看板",
+      "過剰"
+     ],
+     "right": 1,
+     "why": "「てきかく」は【的確】。precise, accurate",
      "subject": "word:的確",
      "sid": 29763
     }
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
+      "手で書くということ",
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
       "山を歩きながら考えたこと",
-      "過去・現在・未来と「中今」",
-      "駅で待つ時間",
-      "神さまを「一柱」と数えるわけ"
+      "中道改革連合新代表選挙 小川淳也氏が新代表に"
      ],
-     "right": 0,
+     "right": 2,
      "why": "随筆 · Bunki（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の（　　）間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの判断を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
+     "q": "本文の（　　）に入る言葉はどれか。\n山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの（　　）を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "郵便",
-      "一時",
-      "指揮",
-      "作業"
+      "証明",
+      "判断",
+      "生長",
+      "願い"
      ],
      "right": 1,
-     "why": "本文のとおり「一時（いちじ）」。for a time, temporarily",
-     "subject": "word:一時"
+     "why": "本文のとおり「判断（はんだん）」。judgment, decision",
+     "subject": "word:判断"
     }
    ]
   }

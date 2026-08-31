@@ -114,94 +114,94 @@
      "sid": 24260
     },
     {
-     "type": "orthography",
-     "q": "これに対しローカライズ作業者達は、ニュースグループや不具合【ついせき】サイトで、作業計画の不備と情報提供の不足に不満を表明している。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "これに対しローカライズ作業者達は、ニュースグループや不具合【追跡】サイトで、作業計画の不備と情報提供の不足に不満を表明している。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "類推",
-      "要請",
-      "民族",
-      "追跡"
+      "おいこむ",
+      "ついせき",
+      "ついきゅう",
+      "ついほう"
      ],
-     "right": 3,
-     "why": "「ついせき」は【追跡】。pursuit",
+     "right": 1,
+     "why": "【追跡】は「ついせき」。pursuit",
      "subject": "word:追跡",
      "sid": 41844
     },
     {
-     "type": "orthography",
-     "q": "概してエリート達は批判に対して【どんかん】である。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "概してエリート達は批判に対して【鈍感】である。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "一連",
-      "許容",
-      "伝来",
-      "鈍感"
+      "どんかん",
+      "はんかん",
+      "つうかん",
+      "かんせん"
      ],
-     "right": 3,
-     "why": "「どんかん」は【鈍感】。thickheadedness, stolidity",
+     "right": 0,
+     "why": "【鈍感】は「どんかん」。thickheadedness, stolidity",
      "subject": "word:鈍感",
      "sid": 26785
     },
     {
      "type": "orthography",
-     "q": "近頃は地震が【ひんぱん】で不気味だ。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "日本は【ひんぱん】に地震に襲われる。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
       "頻繁",
-      "発育",
-      "会見",
-      "政権"
+      "立体",
+      "送金",
+      "主催"
      ],
      "right": 0,
      "why": "「ひんぱん」は【頻繁】。frequency",
      "subject": "word:頻繁",
-     "sid": 19531
+     "sid": 16842
     },
     {
-     "type": "context",
-     "q": "（　　）をお持ちになりましたか。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "忘れずに【あまぐ】をもってきてください。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "青春",
+      "募る",
+      "阻む",
       "雨具",
-      "指図",
-      "不評"
+      "模型"
      ],
-     "right": 1,
-     "why": "雨具（あまぐ）— rain gear",
+     "right": 2,
+     "why": "「あまぐ」は【雨具】。rain gear",
      "subject": "word:雨具",
-     "sid": 19353
+     "sid": 23455
     },
     {
-     "type": "context",
-     "q": "彼の（　　）は、機密情報は一切漏らしていないと明言した。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【ひしょ】はいつも声の届くところに待機しています。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "内蔵",
-      "決算",
+      "暴露",
+      "決議",
       "秘書",
-      "入手"
+      "偽造"
      ],
      "right": 2,
-     "why": "秘書（ひしょ）— (private) secretary",
+     "why": "「ひしょ」は【秘書】。(private) secretary",
      "subject": "word:秘書",
-     "sid": 32311
+     "sid": 30268
     },
     {
-     "type": "context",
-     "q": "デンマークの新聞がムハンマドを風刺する漫画を掲載したことに対する、イスラム諸国の反発に対応した（　　）という。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "IAEAは原子力の平和利用を促進し、軍事転用されないための保障【そち】の実施をする国際機関である。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "小柄",
-      "年長",
-      "措置",
-      "庶民"
+      "部下",
+      "意図",
+      "詫び",
+      "措置"
      ],
-     "right": 2,
-     "why": "措置（そち）— measure, step",
+     "right": 3,
+     "why": "「そち」は【措置】。measure, step",
      "subject": "word:措置",
-     "sid": 40210
+     "sid": 40129
     }
    ]
   },
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
-      "川沿いの道",
-      "都市の匿名性と言語",
-      "AI時代の知識と判断"
+      "原初神を「最高神」と呼ぶときの問題",
+      "沈黙する神と不在の神学",
+      "AI時代の知識と判断",
+      "映像の中で祈りはどう見えるか"
      ],
-     "right": 3,
+     "right": 2,
      "why": "随筆 · Bunki（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの違いに気づき、どの問いを次に立てるかという（　　）は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
+     "q": "本文の（　　）に入る言葉はどれか。\n生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの違いに気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。（　　）を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "挿す",
-      "澄む",
-      "判断",
-      "読書"
+      "文脈",
+      "恨み",
+      "実用",
+      "寺院"
      ],
-     "right": 2,
-     "why": "本文のとおり「判断（はんだん）」。judgment, decision",
-     "subject": "word:判断"
+     "right": 0,
+     "why": "本文のとおり「文脈（ぶんみゃく）」。context",
+     "subject": "word:文脈"
     }
    ]
   }

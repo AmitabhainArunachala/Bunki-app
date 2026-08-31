@@ -114,92 +114,92 @@
      "sid": 23813
     },
     {
-     "type": "orthography",
-     "q": "尾瀬では、近年の観光客減少が目立ってきており、名前をアピールすることで観光客の回帰を目指すのが【ねらい】。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "尾瀬では、近年の観光客減少が目立ってきており、名前をアピールすることで観光客の回帰を目指すのが【狙い】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "加速",
-      "挟む",
-      "狙い",
-      "戸棚"
+      "ねらい",
+      "なつかしい",
+      "すききらい",
+      "わかわかしい"
      ],
-     "right": 2,
-     "why": "「ねらい」は【狙い】。aim",
+     "right": 0,
+     "why": "【狙い】は「ねらい」。aim",
      "subject": "word:狙い",
      "sid": 40945
     },
     {
-     "type": "orthography",
-     "q": "銅像の完成はその【ちょうこく】家に名誉となった。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "その【彫刻】家は木で仏像を刻んだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "彫刻",
-      "直前",
-      "全集",
-      "公共"
+      "ちょうこく",
+      "ほる",
+      "えんげき",
+      "きざむ"
      ],
      "right": 0,
-     "why": "「ちょうこく」は【彫刻】。carving, engraving",
+     "why": "【彫刻】は「ちょうこく」。carving, engraving",
      "subject": "word:彫刻",
-     "sid": 27798
+     "sid": 22859
     },
     {
      "type": "orthography",
-     "q": "私は自分でドレスが作れるよう【さいほう】を習っている。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "彼女は【さいほう】が上手です。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "農薬",
       "裁縫",
-      "足元",
-      "超過",
-      "送別"
-     ],
-     "right": 0,
-     "why": "「さいほう」は【裁縫】。sewing",
-     "subject": "word:裁縫",
-     "sid": 29682
-    },
-    {
-     "type": "context",
-     "q": "引用した問題ではありませんが、関係代名詞と関係（　　）の使い分けを問う問題がリーディングセクションにはあります。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "編集",
-      "副詞",
-      "肘",
-      "親指"
+      "文芸",
+      "公式"
      ],
      "right": 1,
-     "why": "副詞（ふくし）— adverb",
+     "why": "「さいほう」は【裁縫】。sewing",
+     "subject": "word:裁縫",
+     "sid": 7563
+    },
+    {
+     "type": "orthography",
+     "q": "引用した問題ではありませんが、関係代名詞と関係【ふくし】の使い分けを問う問題がリーディングセクションにはあります。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "白髪",
+      "副詞",
+      "役目",
+      "通路"
+     ],
+     "right": 1,
+     "why": "「ふくし」は【副詞】。adverb",
      "subject": "word:副詞",
      "sid": 34637
     },
     {
-     "type": "context",
-     "q": "その（　　）は１０エーカーの広さだ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "「競優【ぼくじょう】」からはタケシバオーやマイネルフロストといった活躍馬を生産した実績がある。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "学級",
       "牧場",
-      "住居",
-      "形式",
-      "農薬"
+      "送料",
+      "月給"
      ],
-     "right": 0,
-     "why": "牧場（ぼくじょう）— farm (livestock); pasture land",
+     "right": 1,
+     "why": "「ぼくじょう」は【牧場】。farm (livestock); pasture land",
      "subject": "word:牧場",
-     "sid": 20741
+     "sid": 38940
     },
     {
-     "type": "context",
-     "q": "彼らは（　　）的な推論に興味を持っている。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼らは【ちゅうしょう】的な推論に興味を持っている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "私鉄",
-      "会館",
+      "上級",
+      "重量",
       "抽象",
-      "肯定"
+      "標準"
      ],
      "right": 2,
-     "why": "抽象（ちゅうしょう）— abstract",
+     "why": "「ちゅうしょう」は【抽象】。abstract",
      "subject": "word:抽象",
      "sid": 28968
     }
@@ -226,9 +226,9 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "駅で待つ時間",
-      "「創造神」という言葉はどこまで正しいか",
-      "過去・現在・未来と「中今」",
+      "映像が伝える「むすひ」",
+      "沈黙する神と不在の神学",
+      "中道改革連合新代表選挙 小川淳也氏が新代表に",
       "介護"
      ],
      "right": 3,
@@ -236,17 +236,17 @@
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、毎日の生活（食べること、（　　）に入ることなど）をすることがむずかしい人を手伝うこと。",
+     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、（　　）の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "地下鉄",
-      "～か月",
-      "二十日",
-      "お風呂"
+      "晴れ",
+      "英語",
+      "毎日",
+      "地図"
      ],
-     "right": 3,
-     "why": "本文のとおり「お風呂（おふろ）」。a bath",
-     "subject": "word:お風呂"
+     "right": 2,
+     "why": "本文のとおり「毎日（まいにち）」。every day",
+     "subject": "word:毎日"
     }
    ]
   }

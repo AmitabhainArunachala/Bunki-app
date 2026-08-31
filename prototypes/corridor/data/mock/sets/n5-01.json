@@ -114,92 +114,92 @@
      "sid": 10375
     },
     {
-     "type": "orthography",
-     "q": "彼は公立【がっこう】で教育を受けた。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "彼は公立【学校】で教育を受けた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "建物",
-      "作文",
-      "沢山",
-      "学校"
+      "がくせい",
+      "がっこう",
+      "だいがく",
+      "だんだん"
      ],
-     "right": 3,
-     "why": "「がっこう」は【学校】。a school",
+     "right": 1,
+     "why": "【学校】は「がっこう」。a school",
      "subject": "word:学校",
      "sid": 19283
     },
     {
-     "type": "orthography",
-     "q": "結婚は重大な【もんだい】だ。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "それは別【問題】だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "電車",
-      "問題",
-      "会社",
-      "今晩"
+      "もんだい",
+      "とおい",
+      "しゅくだい",
+      "しつもん"
      ],
-     "right": 1,
-     "why": "「もんだい」は【問題】。a problem",
+     "right": 0,
+     "why": "【問題】は「もんだい」。a problem",
      "subject": "word:問題",
-     "sid": 6996
+     "sid": 3286
     },
     {
      "type": "orthography",
-     "q": "星は【そら】高く輝く。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "【そら】が晴れた。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
       "空",
-      "青",
-      "塩",
-      "角"
+      "角",
+      "海",
+      "万"
      ],
      "right": 0,
      "why": "「そら」は【空】。sky",
      "subject": "word:空",
-     "sid": 3191
+     "sid": 957
     },
     {
-     "type": "context",
-     "q": "電車は（　　）出たところだ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "電車は【ちょうど】出たところだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "一番",
+      "写真",
+      "入口",
       "丁度",
-      "多分",
-      "余り"
+      "一緒"
      ],
-     "right": 1,
-     "why": "丁度（ちょうど）— just, right",
+     "right": 2,
+     "why": "「ちょうど」は【丁度】。just, right",
      "subject": "word:丁度",
      "sid": 11357
     },
     {
-     "type": "context",
-     "q": "今朝は特に（　　）。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "恐ろしく今日は【さむい】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
       "寒い",
-      "暑い",
-      "遅い",
-      "狭い"
+      "砂糖",
+      "切符",
+      "安い"
      ],
      "right": 0,
-     "why": "寒い（さむい）— cold (in reference to weather)",
+     "why": "「さむい」は【寒い】。cold (in reference to weather)",
      "subject": "word:寒い",
-     "sid": 1683
+     "sid": 2321
     },
     {
-     "type": "context",
-     "q": "消極的な（　　）は嫌いだ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "消極的な【おとこ】は嫌いだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
       "男",
-      "休み",
-      "机",
-      "国"
+      "魚",
+      "話",
+      "車"
      ],
      "right": 0,
-     "why": "男（おとこ）— man, male",
+     "why": "「おとこ」は【男】。man, male",
      "subject": "word:男",
      "sid": 10106
     }
@@ -215,108 +215,108 @@
    "items": [
     {
      "type": "form",
-     "q": "行間を（　　）べきなんだよ。\n（　　）に入る形はどれか。",
+     "q": "漢字は（　　）のが難しい。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "読ん",
+      "読む",
       "読み",
-      "読ま",
-      "読む"
-     ],
-     "right": 3,
-     "why": "辞書形は「読む」。この文では「読む」。",
-     "subject": "word:読む",
-     "sid": 15083
-    },
-    {
-     "type": "form",
-     "q": "彼は独房に（　　）られた。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "入れれ",
-      "入れる",
-      "入れ",
-      "入れよう"
-     ],
-     "right": 2,
-     "why": "辞書形は「入れる」。この文では「入れ」。",
-     "subject": "word:入れる",
-     "sid": 11127
-    },
-    {
-     "type": "form",
-     "q": "彼らは昼間だけ（　　）ます。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "働き",
-      "働い",
-      "働く",
-      "働け"
+      "読もう",
+      "読ま"
      ],
      "right": 0,
-     "why": "辞書形は「働く」。この文では「働き」。",
-     "subject": "word:働く",
-     "sid": 11532
+     "why": "辞書形は「読む」。この文では「読む」。",
+     "subject": "word:読む",
+     "sid": 7582
     },
     {
      "type": "form",
-     "q": "この本は（　　）。\n（　　）に入る形はどれか。",
+     "q": "家を抵当に（　　）ました。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "重かっ",
+      "入れよう",
+      "入れる",
+      "入れよ",
+      "入れ"
+     ],
+     "right": 3,
+     "why": "辞書形は「入れる」。この文では「入れ」。",
+     "subject": "word:入れる",
+     "sid": 10585
+    },
+    {
+     "type": "form",
+     "q": "彼は病院で（　　）たい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "働け",
+      "働く",
+      "働か",
+      "働き"
+     ],
+     "right": 3,
+     "why": "辞書形は「働く」。この文では「働き」。",
+     "subject": "word:働く",
+     "sid": 6532
+    },
+    {
+     "type": "form",
+     "q": "頭が（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
       "重",
+      "重く",
       "重い",
-      "重く"
+      "重かっ"
      ],
      "right": 2,
      "why": "辞書形は「重い」。この文では「重い」。",
      "subject": "word:重い",
-     "sid": 1185
+     "sid": 204
     },
     {
      "type": "form",
-     "q": "薄い砂糖水を（　　）た。\n（　　）に入る形はどれか。",
+     "q": "ガラスは砂から（　　）れる。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "作る",
-      "作れ",
+      "作ろう",
       "作ら",
+      "作れ",
       "作っ"
      ],
-     "right": 3,
-     "why": "辞書形は「作る」。この文では「作っ」。",
+     "right": 1,
+     "why": "辞書形は「作る」。この文では「作ら」。",
      "subject": "word:作る",
-     "sid": 7356
+     "sid": 8922
     },
     {
      "type": "form",
-     "q": "（　　）必要がある。\n（　　）に入る形はどれか。",
+     "q": "食器を（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "洗う",
-      "洗っ",
+      "洗い",
       "洗おう",
-      "洗い"
+      "洗う",
+      "洗っ"
      ],
-     "right": 0,
-     "why": "辞書形は「洗う」。この文では「洗う」。",
+     "right": 1,
+     "why": "辞書形は「洗う」。この文では「洗おう」。",
      "subject": "word:洗う",
-     "sid": 1529
+     "sid": 547
     },
     {
      "type": "form",
-     "q": "ここを（　　）ましょう。\n（　　）に入る形はどれか。",
+     "q": "道を（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "渡れ",
       "渡っ",
       "渡ろう",
+      "渡る",
       "渡り"
      ],
-     "right": 3,
-     "why": "辞書形は「渡る」。この文では「渡り」。",
+     "right": 1,
+     "why": "辞書形は「渡る」。この文では「渡ろう」。",
      "subject": "word:渡る",
-     "sid": 2367
+     "sid": 320
     }
    ]
   },
@@ -341,27 +341,13 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "朝の市場",
-      "「中今」を感じる一日",
       "ごん狐",
-      "訳せない言葉について"
+      "JRおおさか東線部分開業",
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "『古事記』は神話か、歴史か"
      ],
-     "right": 2,
+     "right": 0,
      "why": "青空文庫 · 新美南吉（「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号）の見出し。"
-    },
-    {
-     "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n一これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。むかしは、私たちの村のちかくの、中山というところに（　　）お城があって、中山さまというおとのさまが、おられたそうです。その中山から、少しはなれた山の中に、「ごん狐」という狐がいました。",
-     "qEn": "Which word belongs in the blank in the passage?",
-     "opts": [
-      "忘れる",
-      "小さな",
-      "自動車",
-      "疲れる"
-     ],
-     "right": 1,
-     "why": "本文のとおり「小さな（ちいさな）」。small, little",
-     "subject": "word:小さな"
     }
    ]
   }

@@ -114,44 +114,44 @@
      "sid": 33398
     },
     {
-     "type": "orthography",
-     "q": "【けつあつ】は健康のバロメーターとして重要である。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "【血圧】計の数値は？\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "血圧",
-      "全般",
-      "実感",
-      "半島"
+      "ゆけつ",
+      "けつあつ",
+      "きあつ",
+      "あっしゅく"
      ],
-     "right": 0,
-     "why": "「けつあつ」は【血圧】。blood pressure",
+     "right": 1,
+     "why": "【血圧】は「けつあつ」。blood pressure",
      "subject": "word:血圧",
-     "sid": 26734
+     "sid": 3125
     },
     {
-     "type": "orthography",
-     "q": "任期満了前に議会を【かいさん】する唯一の方法は、連邦首相が連邦議会の信任を失うことである。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "あの人気グループが【解散】するそうだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "解散",
-      "三角",
-      "改造",
-      "国立"
+      "ちらかす",
+      "かいとう",
+      "かいさん",
+      "かいほう"
      ],
-     "right": 0,
-     "why": "「かいさん」は【解散】。breakup, dissolution",
+     "right": 2,
+     "why": "【解散】は「かいさん」。breakup, dissolution",
      "subject": "word:解散",
-     "sid": 39181
+     "sid": 18144
     },
     {
      "type": "orthography",
      "q": "水分は温められると【じょうはつ】する。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "発売",
+      "重役",
       "順序",
       "蒸発",
-      "勝敗"
+      "電力"
      ],
      "right": 2,
      "why": "「じょうはつ」は【蒸発】。evaporation; unexplained disappe",
@@ -159,49 +159,49 @@
      "sid": 13353
     },
     {
-     "type": "context",
-     "q": "喫煙による（　　）的な影響の方が分かり易いと思う人もいる。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "景気の減退が始まると、【たんき】契約社員達は次々に一時解雇を言い渡された。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "能率",
-      "客席",
-      "診断",
-      "短期"
+      "原理",
+      "短期",
+      "匂う",
+      "娯楽"
      ],
-     "right": 3,
-     "why": "短期（たんき）— short term",
+     "right": 1,
+     "why": "「たんき」は【短期】。short term",
      "subject": "word:短期",
-     "sid": 32351
+     "sid": 33417
     },
     {
-     "type": "context",
-     "q": "まさかリアルに借金の（　　）だったの？\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "まさかリアルに借金の【さいそく】だったの？\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "相互",
-      "神話",
-      "初級",
-      "催促"
+      "学会",
+      "催促",
+      "羊毛",
+      "解放"
      ],
-     "right": 3,
-     "why": "催促（さいそく）— demand, urge (action)",
+     "right": 1,
+     "why": "「さいそく」は【催促】。demand, urge (action)",
      "subject": "word:催促",
      "sid": 21202
     },
     {
-     "type": "context",
-     "q": "（　　）的に予測した歳入見込み額ならお知らせできます。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "また、発砲事件も12月23日時点で1353件となり、1994年の【とうけい】開始以降最少となる見込みである。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
       "統計",
-      "通用",
-      "輸血",
-      "算数"
+      "体操",
+      "製作",
+      "公害"
      ],
      "right": 0,
-     "why": "統計（とうけい）— statistics",
+     "why": "「とうけい」は【統計】。statistics",
      "subject": "word:統計",
-     "sid": 30663
+     "sid": 40169
     }
    ]
   },
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "遺族基礎年金",
-      "知らない町を歩く",
-      "徒然草 · 序段",
-      "AI時代の知識と判断"
+      "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "『古事記』は神話か、歴史か",
+      "神さまを「一柱」と数えるわけ",
+      "知らない町を歩く"
      ],
-     "right": 1,
+     "right": 3,
      "why": "段階別読み物 · Bunki（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に（　　）。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
+     "q": "本文の（　　）に入る言葉はどれか。\n旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に残る。先月、山の（　　）の町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "残る",
-      "背中",
-      "放送",
-      "床屋"
+      "階段",
+      "牛肉",
+      "大勢",
+      "近く"
      ],
-     "right": 0,
-     "why": "本文のとおり「残る（のこる）」。to remain (v.i.), to be left",
-     "subject": "word:残る"
+     "right": 3,
+     "why": "本文のとおり「近く（ちかく）」。nearby; in the neighborhood",
+     "subject": "word:近く"
     }
    ]
   }

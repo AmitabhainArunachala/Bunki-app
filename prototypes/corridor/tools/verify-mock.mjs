@@ -73,14 +73,14 @@ const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 /* ------------------------------------------------- half one: the papers */
 const LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1'];
 const SECTION_TYPES = new Set(['moji-goi', 'bunpou', 'dokkai']);
-const ITEM_TYPES = new Set([
-  'kanji-reading',
-  'orthography',
-  'context',
-  'form',
-  'gist',
-  'passage-cloze',
-]);
+/** The shapes that can prove exactly one answer. 'context' and 'particle'
+ * were built, shipped, convicted and removed (rounds 7-8): both chose
+ * distractors that fit the slot without failing the sentence, and both
+ * shipped items with several correct answers. Naming them here as FORBIDDEN
+ * rather than merely absent means a future regeneration cannot quietly
+ * bring the class back. */
+const ITEM_TYPES = new Set(['kanji-reading', 'orthography', 'form', 'gist', 'passage-cloze']);
+const RETIRED_TYPES = new Set(['context', 'particle']);
 /** Every phrasing the room must never produce: a pass PREDICTION. The
  * disclaimer names the same act in order to refuse it — 「受かるかどうかは
  * ここでは分からない」 / "whether you would pass … is not knowable from
@@ -136,7 +136,9 @@ function verifyPapers() {
       for (const item of section.items || []) {
         count += 1;
         items += 1;
-        if (!ITEM_TYPES.has(item.type)) problems.push(`${where}: item type ${item.type}`);
+        if (RETIRED_TYPES.has(item.type)) {
+          problems.push(`${where}: ${item.type} items were retired for admitting several right answers`);
+        } else if (!ITEM_TYPES.has(item.type)) problems.push(`${where}: item type ${item.type}`);
         if (typeof item.q !== 'string' || item.q.length < 4) problems.push(`${where}: question text`);
         if (!Array.isArray(item.opts) || item.opts.length !== 4) problems.push(`${where}: not four options`);
         else {

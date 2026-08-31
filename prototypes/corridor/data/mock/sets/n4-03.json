@@ -114,94 +114,94 @@
      "sid": 29311
     },
     {
-     "type": "orthography",
-     "q": "昨年は【ゆにゅう】が輸出を超えた。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "昨年は【輸入】が輸出を超えた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "輸入",
-      "警察",
-      "最初",
-      "驚く"
+      "ゆしゅつ",
+      "にゅういん",
+      "ゆにゅう",
+      "にゅうがく"
      ],
-     "right": 0,
-     "why": "「ゆにゅう」は【輸入】。import",
+     "right": 2,
+     "why": "【輸入】は「ゆにゅう」。import",
      "subject": "word:輸入",
      "sid": 15640
     },
     {
-     "type": "orthography",
-     "q": "長い【こうぎ】がやっと終わった。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "長い【講義】がやっと終わった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "直る",
-      "講義",
-      "気分",
-      "直す"
+      "ほうそう",
+      "かみ",
+      "こうどう",
+      "こうぎ"
      ],
-     "right": 1,
-     "why": "「こうぎ」は【講義】。a lecture",
+     "right": 3,
+     "why": "【講義】は「こうぎ」。a lecture",
      "subject": "word:講義",
      "sid": 9030
     },
     {
      "type": "orthography",
-     "q": "コンピューターは【ふくざつ】な機械だ。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "この機械のメカニズムは【ふくざつ】です。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "文学",
+      "水道",
       "複雑",
-      "承知",
-      "生産",
-      "運動"
+      "放送"
      ],
-     "right": 0,
+     "right": 2,
      "why": "「ふくざつ」は【複雑】。complexity, complication",
      "subject": "word:複雑",
-     "sid": 9741
+     "sid": 14126
     },
     {
-     "type": "context",
-     "q": "マークは１９９１年にハーバードを（　　）しました。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "笹井氏は、京都大学【そつぎょう】後、同大学教授を経て理研に入所。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
       "卒業",
-      "戦争",
-      "押し入れ",
-      "力"
+      "教育",
+      "入学",
+      "会場"
      ],
      "right": 0,
-     "why": "卒業（そつぎょう）— graduation",
+     "why": "「そつぎょう」は【卒業】。graduation",
      "subject": "word:卒業",
-     "sid": 27057
+     "sid": 36958
     },
     {
-     "type": "context",
-     "q": "価格はコストと需要で（　　）。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "価格はコストと需要で【きまる】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "通る",
+      "投げる",
       "決まる",
-      "見つける",
-      "起こす"
+      "真面目",
+      "続ける"
      ],
      "right": 1,
-     "why": "決まる（きまる）— to be set; fixed (v.i.)",
+     "why": "「きまる」は【決まる】。to be set; fixed (v.i.)",
      "subject": "word:決まる",
      "sid": 13311
     },
     {
-     "type": "context",
-     "q": "（　　）はアップルパイが大好きなんだ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【かない】のパートの仕事で少々余分な金が入る。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
       "家内",
-      "時代",
-      "湖",
-      "技術"
+      "会話",
+      "送る",
+      "案内"
      ],
      "right": 0,
-     "why": "家内（かない）— (one's own) wife",
+     "why": "「かない」は【家内】。(one's own) wife",
      "subject": "word:家内",
-     "sid": 21523
+     "sid": 28015
     }
    ]
   },
@@ -215,108 +215,108 @@
    "items": [
     {
      "type": "form",
-     "q": "部屋を花で（　　）た。\n（　　）に入る形はどれか。",
+     "q": "彼女はドレスを花で（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "飾り",
+      "飾る",
       "飾っ",
-      "飾ら",
-      "飾る"
-     ],
-     "right": 1,
-     "why": "辞書形は「飾る」。この文では「飾っ」。",
-     "subject": "word:飾る",
-     "sid": 6019
-    },
-    {
-     "type": "form",
-     "q": "明日の晩までに（　　）。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "集まっ",
-      "集まろう",
-      "集まり",
-      "集まる"
-     ],
-     "right": 1,
-     "why": "辞書形は「集まる」。この文では「集まろう」。",
-     "subject": "word:集まる",
-     "sid": 8492
-    },
-    {
-     "type": "form",
-     "q": "路面電車は電気で（　　）。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "動い",
-      "動か",
-      "動き",
-      "動く"
-     ],
-     "right": 3,
-     "why": "辞書形は「動く」。この文では「動く」。",
-     "subject": "word:動く",
-     "sid": 7773
-    },
-    {
-     "type": "form",
-     "q": "彼は二の足を（　　）でいる。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "踏ま",
-      "踏む",
-      "踏ん",
-      "踏め"
+      "飾ら"
      ],
      "right": 2,
+     "why": "辞書形は「飾る」。この文では「飾っ」。",
+     "subject": "word:飾る",
+     "sid": 15426
+    },
+    {
+     "type": "form",
+     "q": "来年もまた（　　）ましょう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "集まり",
+      "集まる",
+      "集まっ",
+      "集まろう"
+     ],
+     "right": 0,
+     "why": "辞書形は「集まる」。この文では「集まり」。",
+     "subject": "word:集まる",
+     "sid": 5481
+    },
+    {
+     "type": "form",
+     "q": "その機械は自動的に（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "動く",
+      "動き",
+      "動い",
+      "動か"
+     ],
+     "right": 0,
+     "why": "辞書形は「動く」。この文では「動く」。",
+     "subject": "word:動く",
+     "sid": 11353
+    },
+    {
+     "type": "form",
+     "q": "君に会い損ねて地団駄を（　　）だよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "踏め",
+      "踏む",
+      "踏み",
+      "踏ん"
+     ],
+     "right": 3,
      "why": "辞書形は「踏む」。この文では「踏ん」。",
      "subject": "word:踏む",
-     "sid": 12028
+     "sid": 23075
     },
     {
      "type": "form",
      "q": "私は（　　）て階段から転げ落ちた。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "滑ら",
       "滑る",
-      "滑り",
-      "滑っ"
+      "滑っ",
+      "滑ら",
+      "滑り"
      ],
-     "right": 3,
+     "right": 1,
      "why": "辞書形は「滑る」。この文では「滑っ」。",
      "subject": "word:滑る",
      "sid": 17301
     },
     {
      "type": "form",
-     "q": "私は助手を（　　）ている。\n（　　）に入る形はどれか。",
+     "q": "メガネを（　　）ている。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "探さ",
       "探す",
+      "探し",
       "探せ",
-      "探し"
+      "探さ"
      ],
-     "right": 3,
+     "right": 1,
      "why": "辞書形は「探す」。この文では「探し」。",
      "subject": "word:探す",
-     "sid": 10479
+     "sid": 4357
     },
     {
      "type": "form",
-     "q": "エリオットさんの姪は女子大学に（　　）ている。\n（　　）に入る形はどれか。",
+     "q": "あの子を無理に塾に（　　）せるのは反対だね。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "通っ",
       "通わ",
-      "通い",
-      "通う"
+      "通っ",
+      "通う",
+      "通い"
      ],
      "right": 0,
-     "why": "辞書形は「通う」。この文では「通っ」。",
+     "why": "辞書形は「通う」。この文では「通わ」。",
      "subject": "word:通う",
-     "sid": 26876
+     "sid": 30097
     }
    ]
   },
@@ -341,27 +341,13 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "大谷翔平 史上6人目の40盗塁40本塁打達成",
+      "育児休業給付金",
       "ごん狐",
-      "造化三神を宇宙論として読む誘惑",
-      "自転車をなくした日"
+      "原初神を「最高神」と呼ぶときの問題",
+      "神さまを「一柱」と数えるわけ"
      ],
      "right": 1,
      "why": "青空文庫 · 新美南吉（「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号）の見出し。"
-    },
-    {
-     "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n一これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。むかしは、私たちの村のちかくの、中山というところに（　　）お城があって、中山さまというおとのさまが、おられたそうです。その中山から、少しはなれた山の中に、「ごん狐」という狐がいました。",
-     "qEn": "Which word belongs in the blank in the passage?",
-     "opts": [
-      "飲み物",
-      "小さな",
-      "勤める",
-      "起きる"
-     ],
-     "right": 1,
-     "why": "本文のとおり「小さな（ちいさな）」。small, little",
-     "subject": "word:小さな"
     }
    ]
   }

@@ -108,94 +108,94 @@
      "sid": 10512
     },
     {
-     "type": "orthography",
-     "q": "【かさ】忘れないでね。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "【傘】を無くしてしまった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "雨",
-      "傘",
-      "辺",
-      "兄"
-     ],
-     "right": 1,
-     "why": "「かさ」は【傘】。umbrella, parasol",
-     "subject": "word:傘",
-     "sid": 3092
-    },
-    {
-     "type": "orthography",
-     "q": "歩くと【とおい】ですか。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "休む",
-      "手紙",
-      "遠い",
-      "背広"
+      "くに",
+      "おく",
+      "かさ",
+      "だれ"
      ],
      "right": 2,
-     "why": "「とおい」は【遠い】。far (away), distant",
+     "why": "【傘】は「かさ」。umbrella, parasol",
+     "subject": "word:傘",
+     "sid": 7901
+    },
+    {
+     "type": "kanji-reading",
+     "q": "歩くと【遠い】ですか。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あつい",
+      "わるい",
+      "とおい",
+      "あまい"
+     ],
+     "right": 2,
+     "why": "【遠い】は「とおい」。far (away), distant",
      "subject": "word:遠い",
      "sid": 3415
     },
     {
      "type": "orthography",
-     "q": "雨上がりは【すずしい】。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "今日は【すずしい】です。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "忘れる",
-      "涼しい",
-      "大好き",
-      "並べる"
+      "明後日",
+      "始まる",
+      "大きい",
+      "涼しい"
      ],
-     "right": 1,
+     "right": 3,
      "why": "「すずしい」は【涼しい】。cool, refreshing (in reference t",
      "subject": "word:涼しい",
-     "sid": 847
+     "sid": 2036
     },
     {
-     "type": "context",
-     "q": "彼は口数が（　　）男だ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼は口数が【すくない】男だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "大きい",
-      "黄色い",
+      "買い物",
       "少ない",
-      "若い"
+      "楽しい",
+      "暖かい"
      ],
-     "right": 2,
-     "why": "少ない（すくない）— a little; a few",
+     "right": 1,
+     "why": "「すくない」は【少ない】。a little; a few",
      "subject": "word:少ない",
      "sid": 10410
     },
     {
-     "type": "context",
-     "q": "（　　）で三千円です。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "信号は【ぜんぶ】赤だった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "お腹",
+      "出口",
       "全部",
-      "窓",
-      "公園",
-      "父"
+      "古い"
      ],
-     "right": 0,
-     "why": "全部（ぜんぶ）— all, entire",
+     "right": 2,
+     "why": "「ぜんぶ」は【全部】。all, entire",
      "subject": "word:全部",
-     "sid": 4017
+     "sid": 6496
     },
     {
-     "type": "context",
-     "q": "彼は運転が（　　）だ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼は字が【へた】だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "卵",
       "下手",
-      "庭",
-      "町"
+      "切る",
+      "切手",
+      "脱ぐ"
      ],
-     "right": 1,
-     "why": "下手（へた）— unskillful, poor",
+     "right": 0,
+     "why": "「へた」は【下手】。unskillful, poor",
      "subject": "word:下手",
-     "sid": 6056
+     "sid": 5802
     }
    ]
   },
@@ -209,63 +209,63 @@
    "items": [
     {
      "type": "form",
-     "q": "構内で昨日彼女に（　　）たよ。\n（　　）に入る形はどれか。",
+     "q": "来週また（　　）たい。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "会え",
       "会い",
+      "会おう",
       "会わ",
-      "会っ"
+      "会え"
      ],
-     "right": 3,
-     "why": "辞書形は「会う」。この文では「会っ」。",
+     "right": 0,
+     "why": "辞書形は「会う」。この文では「会い」。",
      "subject": "word:会う",
-     "sid": 15872
+     "sid": 2015
     },
     {
      "type": "form",
-     "q": "（　　）ていけ。\n（　　）に入る形はどれか。",
+     "q": "鼻水が（　　）ます。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "出ろ",
-      "出る",
       "出よう",
-      "出"
+      "出",
+      "出ろ",
+      "出る"
      ],
-     "right": 3,
+     "right": 1,
      "why": "辞書形は「出る」。この文では「出」。",
      "subject": "word:出る",
-     "sid": 178
+     "sid": 1406
     },
     {
      "type": "form",
-     "q": "彼が断然一番速く（　　）た。\n（　　）に入る形はどれか。",
+     "q": "交代に（　　）ましょう。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "走ら",
-      "走る",
-      "走っ",
-      "走り"
+      "走れ",
+      "走り",
+      "走っ"
      ],
      "right": 2,
-     "why": "辞書形は「走る」。この文では「走っ」。",
+     "why": "辞書形は「走る」。この文では「走り」。",
      "subject": "word:走る",
-     "sid": 11972
+     "sid": 2380
     },
     {
      "type": "form",
-     "q": "ギリシャ語は（　　）にくい。\n（　　）に入る形はどれか。",
+     "q": "（　　）ている？\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "覚える",
       "覚えれ",
       "覚えよう",
-      "覚え"
+      "覚え",
+      "覚える"
      ],
-     "right": 3,
+     "right": 2,
      "why": "辞書形は「覚える」。この文では「覚え」。",
      "subject": "word:覚える",
-     "sid": 5422
+     "sid": 268
     },
     {
      "type": "form",
@@ -274,7 +274,7 @@
      "opts": [
       "売ろう",
       "売り",
-      "売っ",
+      "売ら",
       "売る"
      ],
      "right": 1,
@@ -284,33 +284,33 @@
     },
     {
      "type": "form",
-     "q": "彼は彼女より地位が（　　）。\n（　　）に入る形はどれか。",
+     "q": "私は血圧が（　　）です。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "低い",
       "低",
-      "低かっ",
       "低く",
-      "低い"
+      "低かっ"
      ],
-     "right": 3,
+     "right": 0,
      "why": "辞書形は「低い」。この文では「低い」。",
      "subject": "word:低い",
-     "sid": 11595
+     "sid": 6938
     },
     {
      "type": "form",
-     "q": "鼻血が（　　）ません。\n（　　）に入る形はどれか。",
+     "q": "時計が（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "止まっ",
-      "止まら",
+      "止まる",
       "止まり",
-      "止まる"
+      "止まれ",
+      "止まっ"
      ],
-     "right": 2,
-     "why": "辞書形は「止まる」。この文では「止まり」。",
+     "right": 3,
+     "why": "辞書形は「止まる」。この文では「止まっ」。",
      "subject": "word:止まる",
-     "sid": 4591
+     "sid": 1707
     }
    ]
   }

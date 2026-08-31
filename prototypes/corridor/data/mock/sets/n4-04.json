@@ -114,94 +114,94 @@
      "sid": 22196
     },
     {
-     "type": "orthography",
-     "q": "脱水症状を【おこす】のではないかと心配です。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "脱水症状を【起こす】のではないかと心配です。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "受ける",
-      "止める",
-      "起こす",
-      "下りる"
+      "さがす",
+      "おこす",
+      "わかす",
+      "このごろ"
      ],
-     "right": 2,
-     "why": "「おこす」は【起こす】。to wake (someone) up",
+     "right": 1,
+     "why": "【起こす】は「おこす」。to wake (someone) up",
      "subject": "word:起こす",
      "sid": 27929
     },
     {
-     "type": "orthography",
-     "q": "床が【ゆれる】のを感じた。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "私たちは大地が【揺れる】のを感じた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "考える",
-      "真面目",
-      "揺れる",
-      "足りる"
-     ],
-     "right": 2,
-     "why": "「ゆれる」は【揺れる】。to shake, to sway",
-     "subject": "word:揺れる",
-     "sid": 10530
-    },
-    {
-     "type": "orthography",
-     "q": "日本は１９９１年、【せかい】最大の政府援助供与国だった。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "致す",
-      "包む",
-      "場所",
-      "世界"
-     ],
-     "right": 3,
-     "why": "「せかい」は【世界】。world",
-     "subject": "word:世界",
-     "sid": 30704
-    },
-    {
-     "type": "context",
-     "q": "そのことは（　　）な筋から聞いた。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "確か",
-      "特別",
-      "丁寧",
-      "盛ん"
+      "ゆれる",
+      "ふとる",
+      "そだてる",
+      "あつめる"
      ],
      "right": 0,
-     "why": "確か（たしか）— if I remember correctly; certain",
+     "why": "【揺れる】は「ゆれる」。to shake, to sway",
+     "subject": "word:揺れる",
+     "sid": 23140
+    },
+    {
+     "type": "orthography",
+     "q": "【せかい】は昔とは違う。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "世界",
+      "選ぶ",
+      "下着",
+      "浅い"
+     ],
+     "right": 0,
+     "why": "「せかい」は【世界】。world",
+     "subject": "word:世界",
+     "sid": 5875
+    },
+    {
+     "type": "orthography",
+     "q": "そのことは【たしか】な筋から聞いた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "田舎",
+      "移る",
+      "不便",
+      "確か"
+     ],
+     "right": 3,
+     "why": "「たしか」は【確か】。if I remember correctly; certain",
      "subject": "word:確か",
      "sid": 20146
     },
     {
-     "type": "context",
-     "q": "（　　）必要はありません。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【つつむ】必要はありません。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "止む",
-      "包む",
-      "飾る",
-      "引っ越す"
+      "急ぐ",
+      "光る",
+      "花見",
+      "包む"
      ],
-     "right": 1,
-     "why": "包む（つつむ）— to wrap, to cover",
+     "right": 3,
+     "why": "「つつむ」は【包む】。to wrap, to cover",
      "subject": "word:包む",
      "sid": 8122
     },
     {
-     "type": "context",
-     "q": "（　　）の方が女性より肌が脂っぽいって本当ですか？\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "あの【だんせい】は誰ですか。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "医学",
-      "絹",
-      "意見",
+      "全然",
+      "社会",
+      "課長",
       "男性"
      ],
      "right": 3,
-     "why": "男性（だんせい）— man; male",
+     "why": "「だんせい」は【男性】。man; male",
      "subject": "word:男性",
-     "sid": 30512
+     "sid": 6594
     }
    ]
   },
@@ -215,108 +215,108 @@
    "items": [
     {
      "type": "form",
-     "q": "コンサートに（　　）でしょうか。\n（　　）に入る形はどれか。",
+     "q": "これで当分は（　　）でしょう。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "間に合っ",
-      "間に合う",
       "間に合わ",
-      "間に合い"
+      "間に合い",
+      "間に合う",
+      "間に合っ"
      ],
-     "right": 1,
+     "right": 2,
      "why": "辞書形は「間に合う」。この文では「間に合う」。",
      "subject": "word:間に合う",
-     "sid": 5683
+     "sid": 9639
     },
     {
      "type": "form",
-     "q": "彼の帰りは遅いと（　　）。\n（　　）に入る形はどれか。",
+     "q": "受信異常があったのだと（　　）ます。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "思え",
       "思う",
-      "思わ",
-      "思い"
-     ],
-     "right": 1,
-     "why": "辞書形は「思う」。この文では「思う」。",
-     "subject": "word:思う",
-     "sid": 10403
-    },
-    {
-     "type": "form",
-     "q": "人の陰口を叩くのは（　　）ない。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "正しい",
-      "正しかっ",
-      "正しく",
-      "正しけれ"
+      "思い",
+      "思わ"
      ],
      "right": 2,
-     "why": "辞書形は「正しい」。この文では「正しく」。",
-     "subject": "word:正しい",
-     "sid": 20272
+     "why": "辞書形は「思う」。この文では「思い」。",
+     "subject": "word:思う",
+     "sid": 23175
     },
     {
      "type": "form",
-     "q": "小さいことを大げさに（　　）。\n（　　）に入る形はどれか。",
+     "q": "その手紙の宛名は（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "騒が",
-      "騒ぐ",
+      "正しく",
+      "正しかっ",
+      "正しけれ",
+      "正しい"
+     ],
+     "right": 1,
+     "why": "辞書形は「正しい」。この文では「正しかっ」。",
+     "subject": "word:正しい",
+     "sid": 13510
+    },
+    {
+     "type": "form",
+     "q": "そんなに（　　）ないで。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
       "騒い",
+      "騒ぐ",
+      "騒が",
       "騒ぎ"
      ],
-     "right": 1,
-     "why": "辞書形は「騒ぐ」。この文では「騒ぐ」。",
-     "subject": "word:騒ぐ",
-     "sid": 9203
-    },
-    {
-     "type": "form",
-     "q": "ベッドを（　　）てください。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "直せ",
-      "直す",
-      "直し",
-      "直さ"
-     ],
      "right": 2,
-     "why": "辞書形は「直す」。この文では「直し」。",
-     "subject": "word:直す",
-     "sid": 5214
+     "why": "辞書形は「騒ぐ」。この文では「騒が」。",
+     "subject": "word:騒ぐ",
+     "sid": 4633
     },
     {
      "type": "form",
-     "q": "彼はバットでボールを（　　）た。\n（　　）に入る形はどれか。",
+     "q": "（　　）ていただけますか。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "打た",
-      "打ち",
-      "打つ",
-      "打っ"
+      "直す",
+      "直さ",
+      "直せ",
+      "直し"
      ],
      "right": 3,
-     "why": "辞書形は「打つ」。この文では「打っ」。",
-     "subject": "word:打つ",
-     "sid": 16871
+     "why": "辞書形は「直す」。この文では「直し」。",
+     "subject": "word:直す",
+     "sid": 4750
     },
     {
      "type": "form",
-     "q": "３０分間走り（　　）なさい。\n（　　）に入る形はどれか。",
+     "q": "クッキーは寝返りを（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "打っ",
+      "打ち",
+      "打つ",
+      "打た"
+     ],
+     "right": 0,
+     "why": "辞書形は「打つ」。この文では「打っ」。",
+     "subject": "word:打つ",
+     "sid": 9348
+    },
+    {
+     "type": "form",
+     "q": "議論を（　　）ましょう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "続けろ",
       "続ける",
       "続けれ",
-      "続けろ",
       "続け"
      ],
      "right": 3,
      "why": "辞書形は「続ける」。この文では「続け」。",
      "subject": "word:続ける",
-     "sid": 5246
+     "sid": 2251
     }
    ]
   },
@@ -341,27 +341,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "一週間、感謝の言葉を唱えてみた",
+      "天之御中主神――語られない神をどう読むか",
+      "雨の日の古本屋",
       "やまなし",
-      "徒然草 · 序段",
-      "奇跡の体験談と認識の責任"
+      "川沿いの道"
      ],
-     "right": 1,
+     "right": 2,
      "why": "青空文庫 · 宮沢賢治（「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n（　　）谷川の底を写した二枚の青い幻燈です。一、五月二疋の蟹の子供らが青じろい水の底で話していました。『クラムボンはわらったよ。』『クラムボンはかぷかぷわらったよ。』『クラムボンは跳ねてわらったよ。』『クラムボンはかぷかぷわらったよ。",
+     "q": "本文の（　　）に入る言葉はどれか。\n小さな谷川の底を写した二枚の青い幻燈です。一、五月二疋の蟹の（　　）らが青じろい水の底で話していました。『クラムボンはわらったよ。』『クラムボンはかぷかぷわらったよ。』『クラムボンは跳ねてわらったよ。』『クラムボンはかぷかぷわらったよ。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "小さな",
-      "女の子",
-      "答える",
-      "片仮名"
+      "背広",
+      "友達",
+      "子供",
+      "映画"
      ],
-     "right": 0,
-     "why": "本文のとおり「小さな（ちいさな）」。small, little",
-     "subject": "word:小さな"
+     "right": 2,
+     "why": "本文のとおり「子供（こども）」。child(ren)",
+     "subject": "word:子供"
     }
    ]
   }

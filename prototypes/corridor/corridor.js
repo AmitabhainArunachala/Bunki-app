@@ -1298,10 +1298,14 @@ window.addEventListener('storage', (e) => {
     return;
   }
   if (e.key !== CROSSING_KEY || staleTab === 'record') return;
-  if (String(e.newValue || '').endsWith('-aborted')) {
-    if (staleTab === 'crossing') {
-      // the crossing stood down without a record change: this tab's memory
-      // is still true, so the freeze it caused lifts with it
+  const beacon = String(e.newValue || '');
+  if (beacon.endsWith('-aborted')) {
+    // ONLY the crossing that froze this tab may thaw it (review round 8).
+    // Two tabs can both start a crossing before either beacon lands; an
+    // unscoped abort would then let one tab treat the OTHER's stand-down as
+    // permission to commit, pairing its record with an archive still being
+    // swapped. The freeze remembers its author, and answers to no one else.
+    if (staleTab === `crossing:${beacon.slice(0, -'-aborted'.length)}`) {
       staleTab = false;
       S.storeError = null;
       safelySyncStoreAlert();
@@ -1309,7 +1313,7 @@ window.addEventListener('storage', (e) => {
     return;
   }
   if (!staleTab) {
-    staleTab = 'crossing';
+    staleTab = `crossing:${beacon}`;
     S.storeError = tx(
       '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
       'The record changed in another tab. This tab stops writing to protect it — reload to continue.',

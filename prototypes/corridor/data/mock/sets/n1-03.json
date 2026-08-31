@@ -108,92 +108,92 @@
      "sid": 42427
     },
     {
-     "type": "orthography",
-     "q": "しかし、【きんこう】にtotoを取り扱う店がない地域や、利便性などを考慮に入れて、イーバンク銀行（インターネット専用銀行）でtotoのオンライン発売を始める。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "しかし、【近郊】にtotoを取り扱う店がない地域や、利便性などを考慮に入れて、イーバンク銀行（インターネット専用銀行）でtotoのオンライン発売を始める。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "前提",
-      "華奢",
-      "著名",
-      "近郊"
+      "みぢか",
+      "せっちゅう",
+      "きんこう",
+      "きんがん"
      ],
-     "right": 3,
-     "why": "「きんこう」は【近郊】。suburbs, outskirts",
+     "right": 2,
+     "why": "【近郊】は「きんこう」。suburbs, outskirts",
      "subject": "word:近郊",
      "sid": 42784
     },
     {
-     "type": "orthography",
-     "q": "読売によると、藤田さん側は、「妻が無断で【いんかん】を押した。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "読売によると、藤田さん側は、「妻が無断で【印鑑】を押した。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "返答",
-      "油絵",
-      "残酷",
-      "印鑑"
+      "さんがく",
+      "いんかん",
+      "ぶんぎょう",
+      "ちょういん"
      ],
-     "right": 3,
-     "why": "「いんかん」は【印鑑】。stamp, seal",
+     "right": 1,
+     "why": "【印鑑】は「いんかん」。stamp, seal",
      "subject": "word:印鑑",
      "sid": 37233
     },
     {
      "type": "orthography",
-     "q": "【よくぼう】は夢に抱かれる。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "すなわち、毎日、日の出から日没の間、飲食、喫煙などを一切断ち、暴力や【よくぼう】を抑えてイスラム教の教えをより一層深める。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
+      "勧告",
       "欲望",
-      "存続",
-      "前提",
-      "貫く"
-     ],
-     "right": 0,
-     "why": "「よくぼう」は【欲望】。desire, appetite",
-     "subject": "word:欲望",
-     "sid": 6902
-    },
-    {
-     "type": "context",
-     "q": "（　　）の全てはひく。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "様式",
-      "役場",
-      "潮",
-      "決意"
-     ],
-     "right": 2,
-     "why": "潮（しお）— tide",
-     "subject": "word:潮",
-     "sid": 3255
-    },
-    {
-     "type": "context",
-     "q": "（　　）しています。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "体裁",
-      "妊娠",
-      "関税",
-      "荷造り"
+      "給仕",
+      "国交"
      ],
      "right": 1,
-     "why": "妊娠（にんしん）— conception, pregnancy",
-     "subject": "word:妊娠",
-     "sid": 3000
+     "why": "「よくぼう」は【欲望】。desire, appetite",
+     "subject": "word:欲望",
+     "sid": 41303
     },
     {
-     "type": "context",
-     "q": "同記事は患者の症状について「病院関係者の話によると、患者は（　　）後、体がどんどん溶けていったという。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【しお】を吹いたぞ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "捕虜",
-      "本体",
-      "発病",
-      "審議"
+      "欲",
+      "封",
+      "闇",
+      "潮"
      ],
-     "right": 2,
-     "why": "発病（はつびょう）— attack, to become sick",
+     "right": 3,
+     "why": "「しお」は【潮】。tide",
+     "subject": "word:潮",
+     "sid": 2795
+    },
+    {
+     "type": "orthography",
+     "q": "群衆は【にんしん】中絶に抗議した。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "本館",
+      "回送",
+      "戦闘",
+      "妊娠"
+     ],
+     "right": 3,
+     "why": "「にんしん」は【妊娠】。conception, pregnancy",
+     "subject": "word:妊娠",
+     "sid": 15804
+    },
+    {
+     "type": "orthography",
+     "q": "同記事は患者の症状について「病院関係者の話によると、患者は【はつびょう】後、体がどんどん溶けていったという。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "海流",
+      "発病",
+      "口述",
+      "先着"
+     ],
+     "right": 1,
+     "why": "「はつびょう」は【発病】。attack, to become sick",
      "subject": "word:発病",
      "sid": 41403
     }
@@ -209,108 +209,108 @@
    "items": [
     {
      "type": "form",
-     "q": "己も生き他も（　　）。\n（　　）に入る形はどれか。",
+     "q": "その魚は（　　）ておこう。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "生かせ",
       "生かし",
-      "生かす",
-      "生かさ"
+      "生かさ",
+      "生かす"
      ],
-     "right": 0,
-     "why": "辞書形は「生かす」。この文では「生かせ」。",
+     "right": 1,
+     "why": "辞書形は「生かす」。この文では「生かし」。",
      "subject": "word:生かす",
-     "sid": 6612
+     "sid": 8391
     },
     {
      "type": "form",
-     "q": "これに（　　）武蔵野ステークスは次の週の日曜日（11月14日）に移る。\n（　　）に入る形はどれか。",
+     "q": "この承認は、8日のユリア・ティモシェンコ（前）首相の解任に（　　）もの。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "伴っ",
+      "伴わ",
       "伴う",
       "伴い",
-      "伴わ"
+      "伴っ"
      ],
-     "right": 2,
-     "why": "辞書形は「伴う」。この文では「伴い」。",
+     "right": 1,
+     "why": "辞書形は「伴う」。この文では「伴う」。",
      "subject": "word:伴う",
-     "sid": 37681
+     "sid": 37446
     },
     {
      "type": "form",
      "q": "去年のヒットした音楽は、みんな人気ドラマが（　　）でいる。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "絡み",
       "絡ま",
-      "絡ん",
-      "絡む"
+      "絡む",
+      "絡み",
+      "絡ん"
      ],
-     "right": 2,
+     "right": 3,
      "why": "辞書形は「絡む」。この文では「絡ん」。",
      "subject": "word:絡む",
      "sid": 31475
     },
     {
      "type": "form",
-     "q": "小道から雪を（　　）た。\n（　　）に入る形はどれか。",
+     "q": "その会社は古い機器類を（　　）ことを決めた。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "取り除か",
-      "取り除い",
       "取り除く",
-      "取り除き"
-     ],
-     "right": 1,
-     "why": "辞書形は「取り除く」。この文では「取り除い」。",
-     "subject": "word:取り除く",
-     "sid": 8579
-    },
-    {
-     "type": "form",
-     "q": "また、上司らの事後対応についても、「原告を厄介者として退職に（　　）とする露骨な取り扱い」と断じた。\n（　　）に入る形はどれか。",
-     "qEn": "Which form belongs in the blank?",
-     "opts": [
-      "追い込もう",
-      "追い込ま",
-      "追い込ん",
-      "追い込み"
+      "取り除か",
+      "取り除き",
+      "取り除い"
      ],
      "right": 0,
-     "why": "辞書形は「追い込む」。この文では「追い込もう」。",
-     "subject": "word:追い込む",
-     "sid": 41198
+     "why": "辞書形は「取り除く」。この文では「取り除く」。",
+     "subject": "word:取り除く",
+     "sid": 28407
     },
     {
      "type": "form",
-     "q": "設備投資のために高利回りの出資を広く（　　）たが、契約者数が伸びず資金繰りが悪化した。\n（　　）に入る形はどれか。",
+     "q": "とうとう土壇場に（　　）れた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "追い込ま",
+      "追い込もう",
+      "追い込む",
+      "追い込ん"
+     ],
+     "right": 0,
+     "why": "辞書形は「追い込む」。この文では「追い込ま」。",
+     "subject": "word:追い込む",
+     "sid": 9718
+    },
+    {
+     "type": "form",
+     "q": "橋の建設の入札が（　　）れた。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "募っ",
-      "募る",
+      "募ら",
       "募り",
-      "募ら"
+      "募る"
      ],
-     "right": 0,
-     "why": "辞書形は「募る」。この文では「募っ」。",
+     "right": 1,
+     "why": "辞書形は「募る」。この文では「募ら」。",
      "subject": "word:募る",
-     "sid": 39717
+     "sid": 19052
     },
     {
      "type": "form",
-     "q": "君は胆力を（　　）必要がある。\n（　　）に入る形はどれか。",
+     "q": "その「牝馬資源」を活かし、門別競馬場を特徴付ける形でイベント構想・企画が（　　）れたものである。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "練り",
-      "練る",
+      "練ら",
+      "練っ",
       "練ろう",
-      "練っ"
+      "練る"
      ],
-     "right": 1,
-     "why": "辞書形は「練る」。この文では「練る」。",
+     "right": 0,
+     "why": "辞書形は「練る」。この文では「練ら」。",
      "subject": "word:練る",
-     "sid": 15728
+     "sid": 39842
     }
    ]
   }

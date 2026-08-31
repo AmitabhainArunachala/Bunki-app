@@ -114,92 +114,92 @@
      "sid": 2194
     },
     {
-     "type": "orthography",
-     "q": "徒歩５分【いない】に着くはずです。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "徒歩５分【以内】に着くはずです。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "以内",
-      "通る",
-      "下着",
-      "直る"
+      "いない",
+      "いがい",
+      "うち",
+      "いか"
      ],
      "right": 0,
-     "why": "「いない」は【以内】。within, less (no more) than",
+     "why": "【以内】は「いない」。within, less (no more) than",
      "subject": "word:以内",
      "sid": 16383
     },
     {
-     "type": "orthography",
-     "q": "【きぬ】は手触りが柔らかい。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "【絹】は手触りが柔らかい。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "嘘",
-      "絹",
-      "席",
-      "音"
+      "もうす",
+      "きぬ",
+      "はなみ",
+      "ようじ"
      ],
      "right": 1,
-     "why": "「きぬ」は【絹】。silk",
+     "why": "【絹】は「きぬ」。silk",
      "subject": "word:絹",
      "sid": 4885
     },
     {
      "type": "orthography",
-     "q": "潮の干満は月と太陽の影響を【うける】。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "彼は入学試験を【うける】だろう。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "増える",
-      "植える",
+      "変わる",
+      "見える",
       "受ける",
-      "調べる"
+      "始める"
      ],
      "right": 2,
      "why": "「うける」は【受ける】。to take (an examination, intervi",
      "subject": "word:受ける",
-     "sid": 25499
+     "sid": 13046
     },
     {
-     "type": "context",
-     "q": "色っぽい（　　）。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "彼女は非常に上品な【じょせい】です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "退院",
-      "程",
       "女性",
-      "火"
+      "専門",
+      "課長",
+      "品物"
      ],
-     "right": 2,
-     "why": "女性（じょせい）— woman",
+     "right": 0,
+     "why": "「じょせい」は【女性】。woman",
      "subject": "word:女性",
-     "sid": 624
+     "sid": 16508
     },
     {
-     "type": "context",
-     "q": "（　　）な旅を。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "君は【あんぜん】な場所にいる。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "受付",
-      "故障",
+      "課長",
+      "暖房",
       "安全",
-      "乗り物"
+      "空港"
      ],
      "right": 2,
-     "why": "安全（あんぜん）— safety, security",
+     "why": "「あんぜん」は【安全】。safety, security",
      "subject": "word:安全",
-     "sid": 1045
+     "sid": 10588
     },
     {
-     "type": "context",
-     "q": "幸運を（　　）よ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "幸運を【いのる】よ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "思い出す",
-      "似る",
       "祈る",
-      "続ける"
+      "特に",
+      "払う",
+      "触る"
      ],
-     "right": 2,
-     "why": "祈る（いのる）— to pray; to wish",
+     "right": 0,
+     "why": "「いのる」は【祈る】。to pray; to wish",
      "subject": "word:祈る",
      "sid": 1429
     }
@@ -215,108 +215,108 @@
    "items": [
     {
      "type": "form",
-     "q": "有り金全部（　　）てしまった。\n（　　）に入る形はどれか。",
+     "q": "夜は人通りが（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "無くなれ",
-      "無くなる",
+      "無くなっ",
       "無くなり",
-      "無くなっ"
+      "無くなる",
+      "無くなれ"
      ],
-     "right": 3,
+     "right": 0,
      "why": "辞書形は「無くなる」。この文では「無くなっ」。",
      "subject": "word:無くなる",
-     "sid": 9631
+     "sid": 8582
     },
     {
      "type": "form",
-     "q": "老人は今朝（　　）た。\n（　　）に入る形はどれか。",
+     "q": "彼は老衰で二年前に（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "亡くなる",
+      "亡くなり",
       "亡くなっ",
       "亡くなら",
-      "亡くなり"
+      "亡くなる"
      ],
      "right": 1,
      "why": "辞書形は「亡くなる」。この文では「亡くなっ」。",
      "subject": "word:亡くなる",
-     "sid": 4836
+     "sid": 22486
     },
     {
      "type": "form",
-     "q": "２時間以内に（　　）ます。\n（　　）に入る形はどれか。",
+     "q": "すぐ（　　）ます。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "戻ろう",
-      "戻ら",
       "戻り",
-      "戻っ"
+      "戻ら",
+      "戻れ",
+      "戻る"
      ],
-     "right": 2,
+     "right": 0,
      "why": "辞書形は「戻る」。この文では「戻り」。",
      "subject": "word:戻る",
-     "sid": 7653
+     "sid": 589
     },
     {
      "type": "form",
-     "q": "彼はそれを意図的に（　　）たらしい。\n（　　）に入る形はどれか。",
+     "q": "原始社会では、物々交換が（　　）れた。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "行おう",
-      "行い",
+      "行っ",
       "行わ",
-      "行っ"
+      "行う",
+      "行おう"
      ],
-     "right": 3,
-     "why": "辞書形は「行う」。この文では「行っ」。",
+     "right": 1,
+     "why": "辞書形は「行う」。この文では「行わ」。",
      "subject": "word:行う",
-     "sid": 22907
+     "sid": 25514
     },
     {
      "type": "form",
-     "q": "物価が（　　）た。\n（　　）に入る形はどれか。",
+     "q": "歓声が（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "上がっ",
-      "上がれ",
-      "上がる",
-      "上がら"
+      "上がろう",
+      "上がら",
+      "上がる"
      ],
      "right": 0,
      "why": "辞書形は「上がる」。この文では「上がっ」。",
      "subject": "word:上がる",
-     "sid": 1842
+     "sid": 1745
     },
     {
      "type": "form",
-     "q": "行列が学校の側を（　　）た。\n（　　）に入る形はどれか。",
+     "q": "時々彼に（　　）出会います。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
+      "通り",
+      "通ら",
       "通っ",
-      "通る",
-      "通れ",
-      "通ら"
+      "通る"
      ],
      "right": 0,
-     "why": "辞書形は「通る」。この文では「通っ」。",
+     "why": "辞書形は「通る」。この文では「通り」。",
      "subject": "word:通る",
-     "sid": 15084
+     "sid": 8448
     },
     {
      "type": "form",
-     "q": "彼はもろくも誘惑に（　　）た。\n（　　）に入る形はどれか。",
+     "q": "弱者は（　　）。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "負けよう",
-      "負ける",
       "負け",
-      "負けれ"
+      "負ける",
+      "負けれ",
+      "負けよう"
      ],
-     "right": 2,
-     "why": "辞書形は「負ける」。この文では「負け」。",
+     "right": 1,
+     "why": "辞書形は「負ける」。この文では「負ける」。",
      "subject": "word:負ける",
-     "sid": 16071
+     "sid": 597
     }
    ]
   },
@@ -341,27 +341,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "映像の中で祈りはどう見えるか",
+      "都市の匿名性と言語",
       "マリナーズ・イチロー選手 現役通算2500安打達成",
-      "引き出しの中の手紙",
-      "天・地・祈りをつなぐ「むすひ」"
+      "川沿いの道",
+      "五箇条の御誓文"
      ],
      "right": 1,
      "why": "ウィキニュース（2006-06-17）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\nサンケイスポーツによると、アメリカ大リーグシアトルマリナーズのイチロー選手が6月7日（UTC-7、（　　）時間8日）、シアトルで開かれたミネソタツインズとの対戦で現役通算2,500安打を達成した。イチローがこの試合の6回の攻撃で、ツインズのウィリアム・エアー投手からの5球目を打ったセンター前ヒットが、2,500本目の安打となった。",
+     "q": "本文の（　　）に入る言葉はどれか。\nサンケイスポーツによると、アメリカ大リーグシアトルマリナーズのイチロー（　　）が6月7日（UTC-7、日本時間8日）、シアトルで開かれたミネソタツインズとの対戦で現役通算2,500安打を達成した。イチローがこの試合の6回の攻撃で、ツインズのウィリアム・エアー投手からの5球目を打ったセンター前ヒットが、2,500本目の安打となった。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "丘陵",
-      "実に",
-      "哀れ",
-      "日本"
+      "酸性",
+      "選手",
+      "事情",
+      "絵画"
      ],
-     "right": 3,
-     "why": "本文のとおり「日本（にっぽん）」。Japan",
-     "subject": "word:日本"
+     "right": 1,
+     "why": "本文のとおり「選手（せんしゅ）」。player selected for a team (usua",
+     "subject": "word:選手"
     }
    ]
   }

@@ -5,7 +5,7 @@
  * The operator's word (2026-08-31): at least five traditional mock papers per
  * JLPT level, plus the scaffold for custom ones. Real JLPT papers are
  * copyrighted and none are copied here: what is traditional is the SHAPE —
- * 漢字読み · 表記 · 文脈規定 · 文法形式の判断 · 読解 — and every item's
+ * 漢字読み · 表記 · 文法形式の判断 · 読解 — and every item's
  * substance is drawn from this repo's own rights-clean assets:
  *
  *   · data/share_alike/words.json   — the graded word list (JLPT levels)
@@ -25,17 +25,30 @@
  *
  * Sets ship 検収前 (approved: false) — the operator's eye is the last gate.
  *
- * Usage: node build-mock-sets.mjs [--out <dir>]
+ * Usage: node build-mock-sets.mjs [--out <dir>]   (default: data/mock)
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
 const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
-const OUT_DIR = resolve(DATA_DIR, 'mock');
+/** --out honours its own documentation (review round 8): a promised flag that
+ * silently writes the repo's data instead is worse than no flag at all. */
+function outDirFromArgs(argv) {
+  const at = argv.indexOf('--out');
+  if (at < 0) return resolve(DATA_DIR, 'mock');
+  const value = argv[at + 1];
+  if (!value || value.startsWith('--')) {
+    console.error('--out needs a directory');
+    process.exit(2);
+  }
+  return resolve(process.cwd(), value);
+}
+const OUT_DIR = outDirFromArgs(process.argv.slice(2));
 const SETS_DIR = resolve(OUT_DIR, 'sets');
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
@@ -134,6 +147,15 @@ for (let sid = 0; sid < sentences.length; sid += 1) {
       forms.set(t[TOK_SURFACE], (forms.get(t[TOK_SURFACE]) || 0) + 1);
     }
   }
+}
+
+/** does the corpus use this lemma as a noun? one attested sentence answers it */
+function isNoun(lemma) {
+  const ids = byLemma.get(lemma);
+  if (!ids || !ids.length) return false;
+  const row = sentences[ids[0]];
+  const token = row && row[0].find((t) => t[TOK_LEMMA] === lemma);
+  return !!token && token[TOK_POS] === '名詞';
 }
 
 const HAS_KANJI = /[一-鿿]/u;
@@ -259,42 +281,15 @@ function itemOrthography(word, cfg, rng, pool, used) {
   };
 }
 
-/** 文脈規定 — which word belongs in this sentence. */
-function itemContext(word, cfg, rng, pool, used) {
-  const carrier = carrierFor(word, cfg, rng, used);
-  if (!carrier) return null;
-  const targetPos = carrier.tokens[carrier.at][TOK_POS];
-  const present = new Set(carrier.tokens.map((t) => t[TOK_SURFACE]));
-  const same = shuffled(
-    pool.filter((w) => {
-      if (w.w === word.w || present.has(w.w)) return false;
-      const forms = byLemma.get(w.w);
-      if (!forms || !forms.length) return false;
-      const sample = sentences[forms[0]];
-      const tok = sample && sample[0].find((t) => t[TOK_LEMMA] === w.w);
-      return tok ? tok[TOK_POS] === targetPos : false;
-    }),
-    rng,
-  ).slice(0, 3);
-  if (same.length < 3) return null;
-  used.add(carrier.sid);
-  const shown = carrier.tokens.map((t, i) => (i === carrier.at ? BLANK : t[TOK_SURFACE])).join('');
-  const { opts, right } = options(
-    word.w,
-    same.map((w) => w.w),
-    rng,
-  );
-  return {
-    type: 'context',
-    q: `${shown}\n（　　）に入るのはどれか。`,
-    qEn: 'Which word belongs in the blank?',
-    opts,
-    right,
-    why: `${word.w}（${word.r}）— ${word.g}`,
-    subject: `word:${word.w}`,
-    sid: carrier.sid,
-  };
-}
+/* 文脈規定 (context cloze) was built here and then removed, by the same law
+ * that removed particle cloze one round earlier: an item with more than one
+ * defensible answer is a broken item. Choosing distractors by part of speech
+ * proves they fit the SLOT, never that they fail the SENTENCE — and the
+ * shipped proof was 「（　　）はひどく酔っ払った。」 offering 君・彼・彼女・僕,
+ * where all four are correct Japanese. Semantic incompatibility is what the
+ * type needs and the corpus cannot supply it, so 漢字読み and 表記 carry
+ * 文字・語彙 between them: a reading is THE reading the tokenizer recorded,
+ * and behind a given reading stands THE spelling the dictionary holds. */
 
 /** 文法形式の判断 · form — which form of this word the sentence takes. */
 function itemForm(word, cfg, rng, used) {
@@ -388,10 +383,16 @@ function passageSection(article, cfg, rng, allTitles) {
   // backwards and admits every harder word in the language (review round 7 —
   // it shipped 達成 and 写し, both N1, onto N4 papers). One rank above the
   // paper is the allowance: a reading passage may stretch, not tower.
+  // NOUNS on both sides (review round 8). A blank an adjective or a verb can
+  // fill is a blank several of them can fill — 「私が（小さい）ときに」 would
+  // take 楽しい just as well — and that is the ambiguity that ended 文脈規定.
+  // A noun in a passage the learner can see is a retrieval question: the text
+  // around it decides, not taste.
   const candidates = Object.values(words).filter((w) => {
     if (!w.jlpt || RANK[w.jlpt] > RANK[cfg.jlpt] + 1 || !HAS_KANJI.test(w.w) || w.w.length < 2) {
       return false;
     }
+    if (!isNoun(w.w)) return false;
     const first = text.indexOf(w.w);
     return first >= 0 && text.indexOf(w.w, first + 1) < 0;
   });
@@ -404,6 +405,7 @@ function passageSection(article, cfg, rng, allTitles) {
           w.w !== target.w &&
           w.w.length === target.w.length &&
           HAS_KANJI.test(w.w) &&
+          isNoun(w.w) &&
           !text.includes(w.w),
       ),
       rng,
@@ -465,15 +467,15 @@ function buildSet(cfg, n, pool, articlePool, allTitles, levelWordsUsed) {
     }
     return items;
   };
-  const reading = pick(itemKanjiReading, 4, 'r');
-  const orth = pick(itemOrthography, 3, 'o');
-  const context = pick(itemContext, 3, 'c');
+  // the two provable vocabulary shapes carry 文字・語彙 between them
+  const reading = pick(itemKanjiReading, 6, 'r');
+  const orth = pick(itemOrthography, 4, 'o');
   const form = pick((w, c, r, p, u) => itemForm(w, c, r, u), 7, 'f');
   const article = articlePool[n % articlePool.length];
   const dokkai = article ? passageSection(article, cfg, rng, allTitles) : null;
 
   const sections = [];
-  const goi = [...reading, ...orth, ...context];
+  const goi = [...reading, ...orth];
   if (goi.length) {
     sections.push({
       type: 'moji-goi',
@@ -570,7 +572,7 @@ function main() {
     sets: catalog,
   };
   writeFileSync(resolve(OUT_DIR, 'index.json'), `${JSON.stringify(index, null, 1)}\n`);
-  console.log(`\n${catalog.length} sets · ${catalog.reduce((n, s) => n + s.items, 0)} items → data/mock/`);
+  console.log(`\n${catalog.length} sets · ${catalog.reduce((n, s) => n + s.items, 0)} items → ${OUT_DIR}`);
 }
 
 if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });

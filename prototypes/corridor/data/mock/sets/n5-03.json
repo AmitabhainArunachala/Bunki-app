@@ -108,32 +108,32 @@
      "sid": 7622
     },
     {
-     "type": "orthography",
-     "q": "【おおぜい】の人出ですよ。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "【大勢】の人出ですよ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "茶色",
-      "石鹸",
-      "旅行",
-      "大勢"
+      "おおぜい",
+      "おとな",
+      "だいがく",
+      "おおきな"
      ],
-     "right": 3,
-     "why": "「おおぜい」は【大勢】。great number of people",
+     "right": 0,
+     "why": "【大勢】は「おおぜい」。great number of people",
      "subject": "word:大勢",
      "sid": 3913
     },
     {
-     "type": "orthography",
-     "q": "【やさしい】英語で言ってください。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "kanji-reading",
+     "q": "【易しい】英語で言ってください。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
      "opts": [
-      "並べる",
-      "易しい",
-      "明後日",
-      "初めて"
+      "いそがしい",
+      "やさしい",
+      "すこし",
+      "しろい"
      ],
      "right": 1,
-     "why": "「やさしい」は【易しい】。easy, plain",
+     "why": "【易しい】は「やさしい」。easy, plain",
      "subject": "word:易しい",
      "sid": 9392
     },
@@ -142,60 +142,60 @@
      "q": "芝生に【はいる】な。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "財布",
-      "入る",
-      "家族",
-      "遊ぶ"
+      "生徒",
+      "厚い",
+      "切手",
+      "入る"
      ],
-     "right": 1,
+     "right": 3,
      "why": "「はいる」は【入る】。to enter, to contain",
      "subject": "word:入る",
      "sid": 1218
     },
     {
-     "type": "context",
-     "q": "（　　）お空きですか。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【こんばん】泊まりたいのですが。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "目",
-      "今晩",
-      "父",
-      "切符"
+      "問題",
+      "毎朝",
+      "銀行",
+      "今晩"
+     ],
+     "right": 3,
+     "why": "「こんばん」は【今晩】。tonight, this evening",
+     "subject": "word:今晩",
+     "sid": 8342
+    },
+    {
+     "type": "orthography",
+     "q": "よい【しつもん】だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "果物",
+      "質問",
+      "鶏肉",
+      "豚肉"
      ],
      "right": 1,
-     "why": "今晩（こんばん）— tonight, this evening",
-     "subject": "word:今晩",
-     "sid": 3617
-    },
-    {
-     "type": "context",
-     "q": "（　　）に答えなさい。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "質問",
-      "旅行",
-      "夕飯",
-      "父"
-     ],
-     "right": 0,
-     "why": "質問（しつもん）— question, inquiry",
+     "why": "「しつもん」は【質問】。question, inquiry",
      "subject": "word:質問",
-     "sid": 1955
+     "sid": 466
     },
     {
-     "type": "context",
-     "q": "（　　）なら遊びにおいでよ。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "【ひま】なやつだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "黄色",
-      "背",
+      "春",
+      "横",
       "暇",
-      "鳥"
+      "冬"
      ],
      "right": 2,
-     "why": "暇（ひま）— free time, leisure",
+     "why": "「ひま」は【暇】。free time, leisure",
      "subject": "word:暇",
-     "sid": 10402
+     "sid": 950
     }
    ]
   },
@@ -209,105 +209,105 @@
    "items": [
     {
      "type": "form",
-     "q": "地震は明けがたに（　　）た。\n（　　）に入る形はどれか。",
+     "q": "ハイウエイで事故が（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "起き",
+      "起きれ",
       "起きる",
-      "起きろ",
-      "起きれ"
+      "起きろ"
      ],
      "right": 0,
      "why": "辞書形は「起きる」。この文では「起き」。",
      "subject": "word:起きる",
-     "sid": 8603
+     "sid": 8998
     },
     {
      "type": "form",
-     "q": "小鳥達は楽しそうに（　　）。\n（　　）に入る形はどれか。",
+     "q": "いいえ、（　　）ません。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "歌う",
-      "歌おう",
       "歌わ",
+      "歌っ",
+      "歌おう",
       "歌い"
      ],
-     "right": 0,
-     "why": "辞書形は「歌う」。この文では「歌う」。",
+     "right": 3,
+     "why": "辞書形は「歌う」。この文では「歌い」。",
      "subject": "word:歌う",
-     "sid": 11875
+     "sid": 4237
     },
     {
      "type": "form",
-     "q": "（　　）にこいよ。\n（　　）に入る形はどれか。",
+     "q": "子供たちは浜で（　　）のが大好きです。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "遊び",
-      "遊ぶ",
       "遊ば",
-      "遊ぼう"
+      "遊ん",
+      "遊ぶ"
      ],
-     "right": 0,
-     "why": "辞書形は「遊ぶ」。この文では「遊び」。",
+     "right": 3,
+     "why": "辞書形は「遊ぶ」。この文では「遊ぶ」。",
      "subject": "word:遊ぶ",
-     "sid": 1415
+     "sid": 23629
     },
     {
      "type": "form",
      "q": "風は激しく（　　）た。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "吹い",
+      "吹く",
       "吹か",
-      "吹き",
-      "吹け"
+      "吹け",
+      "吹い"
      ],
-     "right": 0,
+     "right": 3,
      "why": "辞書形は「吹く」。この文では「吹い」。",
      "subject": "word:吹く",
      "sid": 3594
     },
     {
      "type": "form",
-     "q": "（　　）風が吹き込んだ。\n（　　）に入る形はどれか。",
+     "q": "もう手が（　　）って。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
       "冷たい",
       "冷たかっ",
-      "冷た",
-      "冷たく"
+      "冷たく",
+      "冷た"
      ],
-     "right": 0,
-     "why": "辞書形は「冷たい」。この文では「冷たい」。",
+     "right": 2,
+     "why": "辞書形は「冷たい」。この文では「冷たく」。",
      "subject": "word:冷たい",
-     "sid": 5058
+     "sid": 4079
     },
     {
      "type": "form",
-     "q": "指を（　　）ないでよ。\n（　　）に入る形はどれか。",
+     "q": "投げた小石は水を（　　）て飛んだ。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "切り",
-      "切ら",
       "切っ",
+      "切ら",
+      "切り",
       "切る"
      ],
-     "right": 1,
-     "why": "辞書形は「切る」。この文では「切ら」。",
+     "right": 0,
+     "why": "辞書形は「切る」。この文では「切っ」。",
      "subject": "word:切る",
-     "sid": 5955
+     "sid": 22719
     },
     {
      "type": "form",
      "q": "私と（　　）で歩きなさい。\n（　　）に入る形はどれか。",
      "qEn": "Which form belongs in the blank?",
      "opts": [
-      "並ば",
       "並ん",
-      "並び",
-      "並ぶ"
+      "並ぶ",
+      "並ば",
+      "並び"
      ],
-     "right": 1,
+     "right": 0,
      "why": "辞書形は「並ぶ」。この文では「並ん」。",
      "subject": "word:並ぶ",
      "sid": 7502
