@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-04",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 4",
+  "en": "N1 mock paper 4"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "yasashii:10",
+    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+    "url": "https://www.moj.go.jp/isa/content/930006077.pdf"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "彼女の肌は【滑らか】です。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ひそか",
+      "ねかせる",
+      "ひやかす",
+      "なめらか"
+     ],
+     "right": 3,
+     "why": "【滑らか】は「なめらか」。smoothness, glassiness",
+     "subject": "word:滑らか",
+     "sid": 8089
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼の【勢力】は国中に及んでいる。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ぶりょく",
+      "ゆうせい",
+      "ぼうりょく",
+      "せいりょく"
+     ],
+     "right": 3,
+     "why": "【勢力】は「せいりょく」。influence, power",
+     "subject": "word:勢力",
+     "sid": 22399
+    },
+    {
+     "type": "kanji-reading",
+     "q": "加盟国のうち、経済力の弱い4国、バングラデシュ、ブータン、モルディブ、ネパールについては、関税引き下げを【緩やか】に設定している。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ゆるめる",
+      "ゆるやか",
+      "かんわ",
+      "なめらか"
+     ],
+     "right": 1,
+     "why": "【緩やか】は「ゆるやか」。lenient",
+     "subject": "word:緩やか",
+     "sid": 41616
+    },
+    {
+     "type": "kanji-reading",
+     "q": "そのことは【確信】する。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しんじゃ",
+      "かくしん",
+      "かくほ",
+      "かくてい"
+     ],
+     "right": 1,
+     "why": "【確信】は「かくしん」。conviction, confidence",
+     "subject": "word:確信",
+     "sid": 4252
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ＵＦＯとは未確認飛行【物体】を表す。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ぶったい",
+      "たいけん",
+      "ぶっし",
+      "にくたい"
+     ],
+     "right": 0,
+     "why": "【物体】は「ぶったい」。object",
+     "subject": "word:物体",
+     "sid": 21118
+    },
+    {
+     "type": "kanji-reading",
+     "q": "BBC特派員ジョナー・フィッシャーによれば、AU停戦【監視】部隊員への攻撃と挑発はありふれたことになってきている。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かんし",
+      "しさつ",
+      "もうれつ",
+      "しや"
+     ],
+     "right": 0,
+     "why": "【監視】は「かんし」。observation, guarding",
+     "subject": "word:監視",
+     "sid": 41042
+    },
+    {
+     "type": "orthography",
+     "q": "為替【そうば】は１ドル１４５円だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "弾む",
+      "相場",
+      "助け",
+      "喜劇"
+     ],
+     "right": 1,
+     "why": "「そうば」は【相場】。market price, speculation",
+     "subject": "word:相場",
+     "sid": 16843
+    },
+    {
+     "type": "orthography",
+     "q": "【みわたす】限り、野原は真っ白だった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "見渡す",
+      "報じる",
+      "味わい",
+      "連ねる"
+     ],
+     "right": 0,
+     "why": "「みわたす」は【見渡す】。to look out over, to survey (sce",
+     "subject": "word:見渡す",
+     "sid": 17803
+    },
+    {
+     "type": "orthography",
+     "q": "我々は絹【おりもの】を商っている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "正解",
+      "織物",
+      "推進",
+      "独創"
+     ],
+     "right": 1,
+     "why": "「おりもの」は【織物】。textile, fabric",
+     "subject": "word:織物",
+     "sid": 15779
+    },
+    {
+     "type": "orthography",
+     "q": "社会・政治的影響この射殺事件は、アメリカ国内での移民政策への不満や【れんぽう】法執行機関への不信を象徴する出来事となった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "連邦",
+      "適性",
+      "慣例",
+      "前提"
+     ],
+     "right": 0,
+     "why": "「れんぽう」は【連邦】。commonwealth, federation of stat",
+     "subject": "word:連邦",
+     "sid": 42020
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "年をとったり、特別な病気になったりして、毎日の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+    "source": "やさしい日本語 用語集 · 検収前",
+    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+    "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
+    "articleId": "yasashii:10"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "『古事記』編纂と権力の物語",
+      "天・地・祈りをつなぐ「むすひ」",
+      "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "介護"
+     ],
+     "right": 3,
+     "why": "やさしい日本語 用語集 · 検収前（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、（　　）の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "先週",
+      "結婚",
+      "毎日",
+      "本当"
+     ],
+     "right": 2,
+     "why": "本文のとおり「毎日（まいにち）」。every day",
+     "subject": "word:毎日"
+    }
+   ]
+  }
+ ]
+}

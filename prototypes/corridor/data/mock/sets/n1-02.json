@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-02",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 2",
+  "en": "N1 mock paper 2"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:20090",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E4%BF%A1%E6%A5%BD%E9%AB%98%E5%8E%9F%E9%90%B5%E9%81%93%E5%88%97%E8%BB%8A%E8%A1%9D%E7%AA%81%E4%BA%8B%E6%95%85%E3%80%81JR%E8%A5%BF%E6%97%A5%E6%9C%AC%E3%81%AE%E9%81%8E%E5%A4%B1%E3%81%AF3%E5%89%B2_-_%E5%A4%A7%E9%98%AA%E5%9C%B0%E8%A3%81%E3%81%8C%E8%AA%8D%E5%AE%9A"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "この世がいつ【出現】したのかわかってない。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しんしゅつ",
+      "にげだす",
+      "しゅつげん",
+      "しゅつどう"
+     ],
+     "right": 2,
+     "why": "【出現】は「しゅつげん」。appearance, arrival",
+     "subject": "word:出現",
+     "sid": 26109
+    },
+    {
+     "type": "kanji-reading",
+     "q": "これにより、【不在】所有者側の敗訴が確定した。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ふじゅん",
+      "じざい",
+      "ざいこ",
+      "ふざい"
+     ],
+     "right": 3,
+     "why": "【不在】は「ふざい」。absence",
+     "subject": "word:不在",
+     "sid": 35957
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼女は２度のフライングで【失格】した。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しっきゃく",
+      "しっかく",
+      "ふんしつ",
+      "たいかく"
+     ],
+     "right": 1,
+     "why": "【失格】は「しっかく」。disqualification, elimination",
+     "subject": "word:失格",
+     "sid": 23765
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼女は先月本社から支社へ【転勤】させられた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "つとめさき",
+      "てんきん",
+      "てんかん",
+      "きんろう"
+     ],
+     "right": 1,
+     "why": "【転勤】は「てんきん」。transfer (to another office of a",
+     "subject": "word:転勤",
+     "sid": 27973
+    },
+    {
+     "type": "kanji-reading",
+     "q": "シンと静まった部室。響くのは、クロッキー帳に【擦れる】鉛筆の音だけ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "すれる",
+      "ほうずる",
+      "のがれる",
+      "まじえる"
+     ],
+     "right": 0,
+     "why": "【擦れる】は「すれる」。to rub, to chafe",
+     "subject": "word:擦れる",
+     "sid": 32891
+    },
+    {
+     "type": "kanji-reading",
+     "q": "そういう事故は【再発】するおそれがある。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "さいげん",
+      "さいはつ",
+      "はつが",
+      "しはつ"
+     ],
+     "right": 1,
+     "why": "【再発】は「さいはつ」。return, relapse",
+     "subject": "word:再発",
+     "sid": 21757
+    },
+    {
+     "type": "orthography",
+     "q": "【れんあい】は理性では抑えられない。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "畜産",
+      "元年",
+      "幽霊",
+      "恋愛"
+     ],
+     "right": 3,
+     "why": "「れんあい」は【恋愛】。love, romance",
+     "subject": "word:恋愛",
+     "sid": 16970
+    },
+    {
+     "type": "orthography",
+     "q": "彼の言葉は何を【あんじ】しているのか。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "雑木",
+      "暗示",
+      "背く",
+      "差額"
+     ],
+     "right": 1,
+     "why": "「あんじ」は【暗示】。hint, suggestion",
+     "subject": "word:暗示",
+     "sid": 27201
+    },
+    {
+     "type": "orthography",
+     "q": "総務省では地デジ対策への早期【たいおう】や地デジコールセンターの相談利用を呼びかけている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "長々",
+      "応急",
+      "対応",
+      "お袋"
+     ],
+     "right": 2,
+     "why": "「たいおう」は【対応】。dealing with",
+     "subject": "word:対応",
+     "sid": 38099
+    },
+    {
+     "type": "orthography",
+     "q": "彼は前途【ゆうぼう】です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "繁栄",
+      "有望",
+      "旅券",
+      "冷酷"
+     ],
+     "right": 1,
+     "why": "「ゆうぼう」は【有望】。good prospects, full of hope",
+     "subject": "word:有望",
+     "sid": 3725
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "電話で（　　）と思いました。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "済まさ",
+      "済まそう",
+      "済ます",
+      "済まし"
+     ],
+     "right": 1,
+     "why": "辞書形は「済ます」。この文では「済まそう」。",
+     "subject": "word:済ます",
+     "sid": 13472
+    },
+    {
+     "type": "form",
+     "q": "2021年8月8日、17日間に（　　）東京2020オリンピック競技大会が閉幕した。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "及ん",
+      "及ば",
+      "及び",
+      "及ぶ"
+     ],
+     "right": 3,
+     "why": "辞書形は「及ぶ」。この文では「及ぶ」。",
+     "subject": "word:及ぶ",
+     "sid": 37818
+    },
+    {
+     "type": "form",
+     "q": "彼らは定期旅客船に（　　）だ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "乗り込み",
+      "乗り込む",
+      "乗り込ん",
+      "乗り込もう"
+     ],
+     "right": 2,
+     "why": "辞書形は「乗り込む」。この文では「乗り込ん」。",
+     "subject": "word:乗り込む",
+     "sid": 20388
+    },
+    {
+     "type": "form",
+     "q": "残された期間、全身全霊で国民の求めている課題に（　　）ので、何とぞ御理解を賜りますよう、心よりお願いを申し上げます」と述べた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "取り組み",
+      "取り組ま",
+      "取り組む",
+      "取り組ん"
+     ],
+     "right": 2,
+     "why": "辞書形は「取り組む」。この文では「取り組む」。",
+     "subject": "word:取り組む",
+     "sid": 42714
+    },
+    {
+     "type": "form",
+     "q": "近代医学の進歩は長い道程を（　　）だ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "歩み",
+      "歩ま",
+      "歩む",
+      "歩ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「歩む」。この文では「歩ん」。",
+     "subject": "word:歩む",
+     "sid": 23592
+    },
+    {
+     "type": "form",
+     "q": "歯を食い縛る、喉元までせりあがった感情を強引に（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "飲み込ん",
+      "飲み込み",
+      "飲み込む",
+      "飲み込ま"
+     ],
+     "right": 2,
+     "why": "辞書形は「飲み込む」。この文では「飲み込む」。",
+     "subject": "word:飲み込む",
+     "sid": 30021
+    },
+    {
+     "type": "form",
+     "q": "私には（　　）べきものが何もない。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "誇っ",
+      "誇る",
+      "誇ら",
+      "誇り"
+     ],
+     "right": 1,
+     "why": "辞書形は「誇る」。この文では「誇る」。",
+     "subject": "word:誇る",
+     "sid": 22749
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "読売新聞・朝日新聞によると、1991年5月に、信楽高原鐵道（以下、「SKR」）の列車と、同鉄道に相互乗り入れしていたJR西日本の列車とが正面衝突し、42人が死亡した事故（信楽高原鐵道列車衝突事故）で、JR西日本がSKRなどに対し、遺族らへの補償金などをそれぞれの過失割合に応じ精算するとして、約25億3,000万円を請求した訴訟の判決公判が、4月27日（UTC+9）に大阪地裁であった。読売新聞によると、同地裁の田中敦裁判長は、過失割合について、SKRが7割、JR西日本が3割であるとし、SKRに対し約11億1,000万円の支払いを命じる判決を言い渡した。",
+    "source": "ウィキニュース",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E4%BF%A1%E6%A5%BD%E9%AB%98%E5%8E%9F%E9%90%B5%E9%81%93%E5%88%97%E8%BB%8A%E8%A1%9D%E7%AA%81%E4%BA%8B%E6%95%85%E3%80%81JR%E8%A5%BF%E6%97%A5%E6%9C%AC%E3%81%AE%E9%81%8E%E5%A4%B1%E3%81%AF3%E5%89%B2_-_%E5%A4%A7%E9%98%AA%E5%9C%B0%E8%A3%81%E3%81%8C%E8%AA%8D%E5%AE%9A",
+    "articleId": "wikinews:20090"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+      "駅で待つ時間",
+      "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "川沿いの道"
+     ],
+     "right": 0,
+     "why": "ウィキニュース（2011-04-28）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n読売新聞・朝日新聞によると、1991年5月に、信楽高原鐵道（以下、「SKR」）の列車と、同鉄道に相互乗り入れしていたJR西日本の列車とが正面衝突し、42人が死亡した事故（信楽高原鐵道列車衝突事故）で、JR西日本がSKRなどに対し、遺族らへの補償金などをそれぞれの過失割合に応じ精算するとして、約25億3,000万円を請求した訴訟の判決公判が、4月27日（UTC+9）に大阪地裁であった。読売新聞によると、同地裁の田中敦裁判長は、過失割合について、SKRが7割、JR西日本が3割であるとし、SKRに対し約11億1,000万円の（　　）いを命じる判決を言い渡した。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "順番",
+      "筋肉",
+      "支払",
+      "話題"
+     ],
+     "right": 2,
+     "why": "本文のとおり「支払（しはらい）」。payment",
+     "subject": "word:支払"
+    }
+   ]
+  }
+ ]
+}

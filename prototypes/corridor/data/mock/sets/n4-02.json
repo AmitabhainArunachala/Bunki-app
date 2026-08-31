@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n4-02",
+ "kind": "jlpt",
+ "level": "N4",
+ "title": {
+  "ja": "N4 模擬試験 2",
+  "en": "N4 mock paper 2"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:051034",
+    "attribution": "青空文庫 小川未明「野ばら」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/001475/card51034.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "私は重い荷物を【空港】まで引きずって行った。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "みなと",
+      "あく",
+      "くうこう",
+      "くうき"
+     ],
+     "right": 2,
+     "why": "【空港】は「くうこう」。airport",
+     "subject": "word:空港",
+     "sid": 26528
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【港】を見下ろす墓に墓碑を立てた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "うれしい",
+      "みなと",
+      "くうこう",
+      "ふべん"
+     ],
+     "right": 1,
+     "why": "【港】は「みなと」。harbor, port",
+     "subject": "word:港",
+     "sid": 20200
+    },
+    {
+     "type": "kanji-reading",
+     "q": "私は翌朝パリに【向かう】予定だった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "むかう",
+      "こまかい",
+      "ひろう",
+      "まにあう"
+     ],
+     "right": 0,
+     "why": "【向かう】は「むかう」。to face, to go towards",
+     "subject": "word:向かう",
+     "sid": 20543
+    },
+    {
+     "type": "kanji-reading",
+     "q": "目の届く限り、麦畑【以外】は何も見えなかった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いじょう",
+      "こうがい",
+      "いか",
+      "いがい"
+     ],
+     "right": 3,
+     "why": "【以外】は「いがい」。other than, with the exception o",
+     "subject": "word:以外",
+     "sid": 29366
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は新しい電灯を【止める】のに針金を使った。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "とまる",
+      "やめる",
+      "すてる",
+      "まいる"
+     ],
+     "right": 1,
+     "why": "【止める】は「やめる」。to end, to stop",
+     "subject": "word:止める",
+     "sid": 27959
+    },
+    {
+     "type": "kanji-reading",
+     "q": "この部屋の【隅】に観賞植物を置きたいんです。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "すみ",
+      "かがく",
+      "わかす",
+      "わけ"
+     ],
+     "right": 0,
+     "why": "【隅】は「すみ」。corner",
+     "subject": "word:隅",
+     "sid": 28160
+    },
+    {
+     "type": "orthography",
+     "q": "【せんもん】ガッコのタメだよ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "水道",
+      "失敗",
+      "専門",
+      "最近"
+     ],
+     "right": 2,
+     "why": "「せんもん」は【専門】。major; speciality",
+     "subject": "word:専門",
+     "sid": 7781
+    },
+    {
+     "type": "orthography",
+     "q": "夕飯の【したく】が出来ました。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "支度",
+      "花見",
+      "特に",
+      "怖い"
+     ],
+     "right": 0,
+     "why": "「したく」は【支度】。preparation",
+     "subject": "word:支度",
+     "sid": 11327
+    },
+    {
+     "type": "orthography",
+     "q": "【かれ】は耳が早い。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "様",
+      "彼",
+      "首",
+      "妻"
+     ],
+     "right": 1,
+     "why": "「かれ」は【彼】。he, boyfriend",
+     "subject": "word:彼",
+     "sid": 2813
+    },
+    {
+     "type": "orthography",
+     "q": "【へん】な帽子かぶってるな。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "変",
+      "坂",
+      "絹",
+      "皆"
+     ],
+     "right": 0,
+     "why": "「へん」は【変】。strange, odd",
+     "subject": "word:変",
+     "sid": 7769
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "私達は、町外れの小さなホテルに（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "泊まろう",
+      "泊まり",
+      "泊まっ",
+      "泊まる"
+     ],
+     "right": 2,
+     "why": "辞書形は「泊まる」。この文では「泊まっ」。",
+     "subject": "word:泊まる",
+     "sid": 26571
+    },
+    {
+     "type": "form",
+     "q": "しっかり（　　）てこい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "頑張り",
+      "頑張っ",
+      "頑張ら",
+      "頑張れ"
+     ],
+     "right": 1,
+     "why": "辞書形は「頑張る」。この文では「頑張っ」。",
+     "subject": "word:頑張る",
+     "sid": 2568
+    },
+    {
+     "type": "form",
+     "q": "際どいところで（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "勝つ",
+      "勝ち",
+      "勝て",
+      "勝とう"
+     ],
+     "right": 0,
+     "why": "辞書形は「勝つ」。この文では「勝つ」。",
+     "subject": "word:勝つ",
+     "sid": 2407
+    },
+    {
+     "type": "form",
+     "q": "少しずつ水が（　　）なる。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "浅かっ",
+      "浅く",
+      "浅い",
+      "浅"
+     ],
+     "right": 1,
+     "why": "辞書形は「浅い」。この文では「浅く」。",
+     "subject": "word:浅い",
+     "sid": 7958
+    },
+    {
+     "type": "form",
+     "q": "これを（　　）でください。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "運び",
+      "運べ",
+      "運ば",
+      "運ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「運ぶ」。この文では「運ん」。",
+     "subject": "word:運ぶ",
+     "sid": 4730
+    },
+    {
+     "type": "form",
+     "q": "朝日はなんと（　　）のだろう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "美しい",
+      "美し",
+      "美しかっ",
+      "美しく"
+     ],
+     "right": 0,
+     "why": "辞書形は「美しい」。この文では「美しい」。",
+     "subject": "word:美しい",
+     "sid": 13267
+    },
+    {
+     "type": "form",
+     "q": "（　　）ば間に合います。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "急げ",
+      "急ぎ",
+      "急い",
+      "急が"
+     ],
+     "right": 0,
+     "why": "辞書形は「急ぐ」。この文では「急げ」。",
+     "subject": "word:急ぐ",
+     "sid": 2258
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ一人ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。",
+    "source": "青空文庫 · 小川未明",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 小川未明「野ばら」",
+    "url": "https://www.aozora.gr.jp/cards/001475/card51034.html",
+    "articleId": "aozora:051034"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "野ばら",
+      "知らない町を歩く",
+      "五箇条の御誓文"
+     ],
+     "right": 1,
+     "why": "青空文庫 · 小川未明（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ（　　）ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "時々",
+      "一人",
+      "豚肉",
+      "毎晩"
+     ],
+     "right": 1,
+     "why": "本文のとおり「一人（ひとり）」。one person",
+     "subject": "word:一人"
+    }
+   ]
+  }
+ ]
+}

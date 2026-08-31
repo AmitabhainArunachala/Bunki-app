@@ -8,7 +8,7 @@
   "count": 5,
   "callers": [
     {
-      "lineAfterPatch": 1286,
+      "lineAfterPatch": 1419,
       "surface": "observation debounce flush",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "obslog"
@@ -21,7 +21,7 @@
       "dispositionNote": "The flush persists rows already published to the session ledger; the 1.2s debounce (+ pagehide/visibility flush) is the documented session-ahead-of-durability window for burst-arriving observations. A rollback would DROP evidence; instead a failed save surfaces the storage alert and the rows remain in S.obslog for the next flush or any envelope write to carry."
     },
     {
-      "lineAfterPatch": 2441,
+      "lineAfterPatch": 2574,
       "surface": "reader scroll debounce",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -34,7 +34,7 @@
       "dispositionNote": "readerPos is a reading-position bookmark, not learner evidence; a lost write costs one scroll offset."
     },
     {
-      "lineAfterPatch": 2564,
+      "lineAfterPatch": 2703,
       "surface": "app Back from reader",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -45,7 +45,7 @@
       "dispositionNote": "Same bookmark root as the scroll debounce, written at the exact line being left."
     },
     {
-      "lineAfterPatch": 3360,
+      "lineAfterPatch": 3510,
       "surface": "reader display dials",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "dials"
@@ -58,7 +58,7 @@
       "dispositionNote": "Display dials (kanji/furigana/spacing) are presentation preferences; the session keeps working unpersisted and the alert names any failure."
     },
     {
-      "lineAfterPatch": 14286,
+      "lineAfterPatch": 14994,
       "surface": "lists tray door bookmark",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -94,14 +94,14 @@
   },
   "directLearnerStoreBypasses": [
     {
-      "lineAfterPatch": 5047,
+      "lineAfterPatch": 5197,
       "surface": "learner-record export",
       "operation": "getItem",
       "keyExpression": "STORE_KEY",
       "risk": "Direct read is outside quarantine and can throw before export feedback."
     },
     {
-      "lineAfterPatch": 5199,
+      "lineAfterPatch": 5436,
       "surface": "learner-record import",
       "operation": "setItem",
       "keyExpression": "STORE_KEY",

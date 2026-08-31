@@ -6,7 +6,7 @@
  *
  * Usage: node build-standalone.mjs [outfile]
  */
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -43,6 +43,19 @@ for (const file of readdirSync(articlesDir).sort()) {
   if (file === 'archive-index.json') continue;
   const key = file === 'index.json' ? 'articles/index' : `articles/${file.replace(/\.json$/, '')}`;
   bundle[key] = JSON.parse(read(`data/articles/${file}`));
+}
+
+// 模試 — the papers travel with the single file (~500 KB against 43 MB): a
+// mock room that could not open in the handoff build would be a door onto
+// nothing, and the sets are exactly the kind of thing a frozen artifact
+// should still be able to sit
+const mockDir = resolve(CORRIDOR, 'data/mock');
+if (existsSync(mockDir)) {
+  bundle['mock/index'] = JSON.parse(read('data/mock/index.json'));
+  for (const file of readdirSync(resolve(mockDir, 'sets')).sort()) {
+    if (!file.endsWith('.json')) continue;
+    bundle[`mock/sets/${file.replace(/\.json$/, '')}`] = JSON.parse(read(`data/mock/sets/${file}`));
+  }
 }
 
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
