@@ -177,7 +177,13 @@ function verifyPapers() {
   check('most items carry a subject, so a sitting leaves real evidence', withSubject / items > 0.8, `${withSubject}/${items}`);
   check('no shipped string predicts a pass', claims.length === 0, claims.slice(0, 3).join(' | ') || 'clean');
   const source = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
-  check('the room writes mock rows and nothing else at grading time', source.includes("rows.push([now, 'mock', subject,") && source.includes('if (rows.length) patch.obslog'), 'the one commit is score + typed rows');
+  check(
+    'the room writes mock rows and nothing else at grading time, each naming its question kind',
+    source.includes("'mock',") &&
+      source.includes('`${set.setId}#${f.item.type}`') &&
+      source.includes('if (rows.length) patch.obslog'),
+    'the one commit is score + typed rows carrying setId#type',
+  );
   check('the room speaks the honesty constraint aloud', /受かるかどうかは、ここでは分からない/u.test(source) && /not knowable from here/u.test(source));
   return items;
 }
@@ -274,7 +280,7 @@ async function main() {
     const rows = (s.obslog || []).filter((r) => r[1] === 'mock');
     return {
       rows: rows.length,
-      shaped: rows.every((r) => r.length === 5 && typeof r[2] === 'string' && r[2].includes(':') && [1, 3].includes(r[3]) && r[4] === 'n5-01'),
+      shaped: rows.every((r) => r.length === 5 && typeof r[2] === 'string' && r[2].includes(':') && [1, 3].includes(r[3]) && String(r[4]).startsWith('n5-01#')),
       done: s.mockDone?.['n5-01'] || null,
       taken: (s.taken || []).length,
       srs: Object.keys(s.srs || {}).length,
@@ -282,7 +288,7 @@ async function main() {
       text: document.querySelector('main')?.textContent || '',
     };
   })()`);
-  check('a sat paper writes typed mock rows for every dictionary-confirmed item', graded.rows >= 10 && graded.shaped === true, `${graded.rows} rows`);
+  check('a sat paper writes typed mock rows naming the paper AND the kind of question', graded.rows >= 10 && graded.shaped === true, `${graded.rows} rows`);
   check('the score is kept, and it is the score of THIS paper', !!graded.done && graded.done.total >= 12, JSON.stringify(graded.done));
   check('sitting a paper moves NO schedule: no deck row, no FSRS card, no review row', graded.taken === before.taken && graded.srs === before.srs && graded.revlog === before.revlog, `${JSON.stringify(before)} → taken ${graded.taken} srs ${graded.srs} revlog ${graded.revlog}`);
   check(
