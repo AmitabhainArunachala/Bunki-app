@@ -40,6 +40,9 @@ fi
 if [ -f prototypes/corridor/tools/verify-mock.mjs ]; then
   run mock          node prototypes/corridor/tools/verify-mock.mjs
 fi
+if [ -f prototypes/corridor/tools/verify-kagami.mjs ]; then
+  run kagami        node prototypes/corridor/tools/verify-kagami.mjs
+fi
 run native-readings node prototypes/corridor/tools/verify-native-readings.mjs
 run replay          npm run test:replay
 run export          npm run verify:export
