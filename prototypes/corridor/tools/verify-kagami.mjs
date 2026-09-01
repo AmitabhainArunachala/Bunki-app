@@ -171,7 +171,7 @@ function seedUndoneDrill() {
 
 function seedGrammarReviews() {
   const revlog = [];
-  for (let n = 0; n < 6; n += 1) revlog.push([T0 + n, 'grammar:n5-teiru', n === 0 ? 1 : 3, 2, null, null, null, null, 1, 1, 0, T0]);
+  for (let n = 0; n < 6; n += 1) revlog.push([T0 + n, 'grammar:teiru', n === 0 ? 1 : 3, 2, null, null, null, null, 1, 1, 0, T0]);
   return { v: 1, taken: [], srs: {}, revlog };
 }
 
@@ -480,6 +480,20 @@ async function main() {
     'a reviewed grammar card lands in sentence form and never inflates vocabulary',
     routed.syntax === 6 && routed.lexis === 0,
     JSON.stringify(routed),
+  );
+  const grammarLevel = await gpage.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return {
+      cell: m.bands.syntax.levels.N5,
+      oov: m.bands.syntax.levels.oov || null,
+      edge: m.bands.syntax.edge,
+    };
+  })()`);
+  check(
+    'a grammar point carries its own level, so sentence form can actually clear one',
+    grammarLevel.cell && grammarLevel.cell.seen === 6 && grammarLevel.cell.right === 5 &&
+      grammarLevel.edge === 'N5' && !grammarLevel.oov,
+    JSON.stringify(grammarLevel),
   );
   await grammar.close();
 

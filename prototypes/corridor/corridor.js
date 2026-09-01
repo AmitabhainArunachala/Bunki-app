@@ -6367,12 +6367,23 @@ const kagamiMockBand = (setField, key) => {
   return KAGAMI_MOCK_BAND[String(setField).slice(cut + 1)] || kagamiBandFor(key);
 };
 
-const kagamiLevelOf = (key) => {
-  if (!key.startsWith('word:')) return null;
-  const raw = lookup(key.slice(5))?.jlpt;
+const kagamiLevel = (raw) => {
   if (raw === null || raw === undefined || raw === '') return null;
   const level = `N${String(raw).replace(/^N/iu, '')}`;
   return KAGAMI_LEVELS.includes(level) ? level : null;
+};
+const kagamiLevelOf = (key) => {
+  const cut = key.indexOf(':');
+  const t = key.slice(0, cut);
+  const id = key.slice(cut + 1);
+  if (t === 'word') return kagamiLevel(lookup(id)?.jlpt);
+  // grammar points carry their own level (review round 11): routing them to
+  // 文の形 and then dropping them from every cell left that band unable to
+  // clear anything it had actually answered
+  if (t === 'grammar') return kagamiLevel(GRAMMARS().find((g) => g.id === id)?.lv);
+  // kanji, radicals, idioms and particles carry no JLPT tag in the pinned
+  // data; their answers count in the totals and sit in 級外, deliberately
+  return null;
 };
 
 function kagamiBand() {
