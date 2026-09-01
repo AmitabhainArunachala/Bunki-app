@@ -495,6 +495,35 @@ async function main() {
       grammarLevel.edge === 'N5' && !grammarLevel.oov,
     JSON.stringify(grammarLevel),
   );
+  // round 12 (caught on the phone, not by a probe): every deck type's id is
+  // the Japanese itself except a grammar point, whose id is an ascii handle.
+  // The frontier printed it raw — "te / teiru" where 〜ている belongs. The
+  // door must still navigate by the id: a display name is not an address.
+  const grammarRow = await gpage.evaluate(`(() => {
+    const row = document.querySelector('[data-kagami-frontier="grammar:teiru"]');
+    if (!row) return null;
+    return {
+      glyph: row.querySelector('.row-glyph').textContent,
+      main: row.querySelector('.row-main').textContent,
+    };
+  })()`);
+  check(
+    'a grammar point on the frontier reads as its pattern, never as its ascii id',
+    grammarRow && grammarRow.main.startsWith('〜ている') && !/teiru/u.test(grammarRow.main) &&
+      !/teiru|^te$/u.test(grammarRow.glyph),
+    JSON.stringify(grammarRow),
+  );
+  await gpage.click('[data-kagami-frontier="grammar:teiru"]');
+  await gpage.waitForTimeout(400);
+  const landed = await gpage.evaluate(`(() => {
+    const t = document.body.innerText;
+    return { grammarShown: t.includes('〜ている'), view: document.body.dataset.view || '' };
+  })()`);
+  check(
+    'and its door still opens the grammar point the key names',
+    landed.grammarShown,
+    JSON.stringify(landed),
+  );
   await grammar.close();
 
   // round 10: confusions with no judged answers are still a record

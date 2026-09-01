@@ -6739,7 +6739,17 @@ function renderKagami(main) {
     main.append(block);
   }
 
-  const label = (key) => key.slice(key.indexOf(':') + 1);
+  // what a key is CALLED on the page. Every deck type's id is already the
+  // Japanese itself except a grammar point, whose id is an ascii handle
+  // ('teiru') — printing it raw put "te / teiru" on the frontier where
+  // 〜ている belongs. The id itself stays separate: the doors below navigate
+  // by it, and a display name is not an address.
+  const label = (key) => {
+    const id = key.slice(key.indexOf(':') + 1);
+    if (!key.startsWith('grammar:')) return id;
+    return GRAMMARS().find((g) => g.id === id)?.p || id;
+  };
+  const glyph = (name) => name.replace(/^[〜~]/u, '').slice(0, 2);
   if (model.edges.length) {
     main.append(withEn(el('p', 'eyebrow list-head', '迷い'), 'pairs that trade places', 'en-inline'));
     const list = el('div', 'kagami-edges');
@@ -6764,12 +6774,15 @@ function renderKagami(main) {
     );
     const list = el('div', 'kagami-frontier');
     for (const item of model.frontier) {
-      const [t, id] = [item.key.slice(0, item.key.indexOf(':')), label(item.key)];
+      const cut = item.key.indexOf(':');
+      const t = item.key.slice(0, cut);
+      const id = item.key.slice(cut + 1);
+      const name = label(item.key);
       const row = el('button', 'entry-row kagami-row');
       row.type = 'button';
       row.dataset.kagamiFrontier = item.key;
-      row.append(el('span', 'row-glyph', id.slice(0, 2)));
-      row.append(el('span', 'row-main', `${id}　${item.right}/${item.seen}`));
+      row.append(el('span', 'row-glyph', glyph(name)));
+      row.append(el('span', 'row-main', `${name}　${item.right}/${item.seen}`));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t, id }));
       list.append(row);
@@ -6781,12 +6794,15 @@ function renderKagami(main) {
     main.append(withEn(el('p', 'eyebrow list-head', '手こずり'), 'the ones that keep slipping', 'en-inline'));
     const list = el('div', 'kagami-frontier');
     for (const key of model.leeches.slice(0, 12)) {
-      const [t, id] = [key.slice(0, key.indexOf(':')), label(key)];
+      const cut = key.indexOf(':');
+      const t = key.slice(0, cut);
+      const id = key.slice(cut + 1);
+      const name = label(key);
       const row = el('button', 'entry-row kagami-row');
       row.type = 'button';
       row.dataset.kagamiLeech = key;
-      row.append(el('span', 'row-glyph', id.slice(0, 2)));
-      row.append(el('span', 'row-main', id));
+      row.append(el('span', 'row-glyph', glyph(name)));
+      row.append(el('span', 'row-main', name));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t, id }));
       list.append(row);
