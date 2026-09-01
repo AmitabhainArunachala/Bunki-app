@@ -6140,7 +6140,19 @@ function renderMockItem(main, set, flat, run) {
     flat.forEach((f, i) => {
       const subject = mockSubjectKey(f.item.subject);
       if (!subject) return;
-      rows.push([now, 'mock', subject, run.answers[i] === f.item.right ? 3 : 1, set.setId]);
+      // the row's fifth field names the paper AND the kind of question
+      // (review round 11): a form question about 読む is sentence form, not
+      // vocabulary, and the row is the only thing the mirror will ever see.
+      // It rides inside the existing string — the validator asks for a
+      // non-empty string and nothing more — so no shipped build is broken
+      // and no record written before today becomes unreadable.
+      rows.push([
+        now,
+        'mock',
+        subject,
+        run.answers[i] === f.item.right ? 3 : 1,
+        `${set.setId}#${f.item.type}`,
+      ]);
     });
     const mockDone = { ...S.mockDone, [set.setId]: { score: right, total: flat.length, ts: now } };
     const patch = { mockDone, mockRun: { ...run, ix: flat.length, done: now } };
@@ -6304,6 +6316,8 @@ function renderMockResult(main, set, flat, run) {
  * friction, not a verdict — it lands on the node and stays off the bands. */
 const KAGAMI_MODEL_VERSION = 1;
 const KAGAMI_LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1'];
+/** answers on words the graded lists do not tag — shown, never a level */
+const KAGAMI_OOV = 'oov';
 /** how many judged answers a level needs before the model will speak of it */
 const KAGAMI_MIN_SEEN = 4;
 const KAGAMI_CLEAR = 0.6;
@@ -6336,6 +6350,23 @@ const KAGAMI_KEY_BAND = {
 };
 const kagamiBandFor = (key) => KAGAMI_KEY_BAND[key.slice(0, key.indexOf(':'))] || null;
 
+/** A mock row names its paper and the kind of question ("n4-01#form"). The
+ * kind decides the band, because the same word can be asked about as a
+ * reading, a spelling or a form. Rows written before the suffix existed
+ * carry no '#' and fall back to the key's own band. */
+const KAGAMI_MOCK_BAND = {
+  'kanji-reading': 'readings',
+  orthography: 'lexis',
+  form: 'syntax',
+  'passage-cloze': 'lexis',
+  gist: 'lexis',
+};
+const kagamiMockBand = (setField, key) => {
+  const cut = String(setField || '').indexOf('#');
+  if (cut < 0) return kagamiBandFor(key);
+  return KAGAMI_MOCK_BAND[String(setField).slice(cut + 1)] || kagamiBandFor(key);
+};
+
 const kagamiLevelOf = (key) => {
   if (!key.startsWith('word:')) return null;
   const raw = lookup(key.slice(5))?.jlpt;
@@ -6359,9 +6390,13 @@ function kagamiNote(band, level, right, measured) {
   band.evidence += 1;
   if (measured) band.measured += 1;
   else band.observed += 1;
-  if (!level) return;
-  const cell =
-    band.levels[level] || (band.levels[level] = { seen: 0, right: 0, obsSeen: 0, obsRight: 0 });
+  // a judged answer on a word the graded lists never tagged is still an
+  // answer (review round 11): counting it in the totals and then dropping it
+  // from every cell left the page reporting evidence it could not show.
+  // 級外 is a cell like any other — it simply clears nothing, since it
+  // names no level.
+  const at = level || KAGAMI_OOV;
+  const cell = band.levels[at] || (band.levels[at] = { seen: 0, right: 0, obsSeen: 0, obsRight: 0 });
   if (measured) {
     cell.seen += 1;
     if (right) cell.right += 1;
@@ -6468,7 +6503,7 @@ function learnerModel() {
       // and read the same either way.
       const right = row[3] >= 2;
       touch(key, right, true, kind);
-      const band = bands[kagamiBandFor(key)];
+      const band = bands[kind === 'mock' ? kagamiMockBand(row[4], key) : kagamiBandFor(key)];
       if (band) kagamiNote(band, level, right, true);
     } else if (kind === 'sensei') {
       const right = row[3] === 3;
@@ -6630,12 +6665,12 @@ function renderKagami(main) {
       continue;
     }
     const cells = el('div', 'kagami-levels');
-    for (const level of KAGAMI_LEVELS) {
+    for (const level of [...KAGAMI_LEVELS, KAGAMI_OOV]) {
       const cell = band.levels[level];
       if (!cell || (!cell.seen && !cell.obsSeen)) continue;
       const box = el('div', 'kagami-cell' + (cell.seen < KAGAMI_MIN_SEEN ? ' thin' : ''));
       box.dataset.kagamiCell = `${id}:${level}`;
-      box.append(el('span', 'kagami-level', level));
+      box.append(el('span', 'kagami-level', level === KAGAMI_OOV ? tx('級外', 'untagged') : level));
       // the measured count is the claim; what was merely observed sits
       // beside it, visible and powerless
       box.append(el('span', 'kagami-count', cell.seen ? `${cell.right}/${cell.seen}` : '—'));

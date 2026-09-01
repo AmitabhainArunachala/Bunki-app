@@ -224,6 +224,34 @@ function seedSampledButFailing() {
   };
 }
 
+/** Round 11: the same word asked three ways on one paper. A form question
+ * is sentence form even when its subject is a word — the row's own suffix
+ * is the only thing that can say so. */
+function seedMockModalities() {
+  const obslog = [];
+  for (let n = 0; n < 5; n += 1) {
+    obslog.push([T0 + n, 'mock', 'word:学校', 3, 'n5-01#form']);
+    obslog.push([T0 + 100 + n, 'mock', 'word:電話', 3, 'n5-01#kanji-reading']);
+    obslog.push([T0 + 200 + n, 'mock', 'word:先生', 3, 'n5-01#orthography']);
+    obslog.push([T0 + 300 + n, 'mock', 'word:時間', 1, 'n5-02']);
+  }
+  return {
+    v: 1,
+    taken: N5.map((w, i) => ({ t: 'word', id: w, label: w, ts: T0 + i })),
+    srs: {},
+    obslog,
+  };
+}
+
+/** Round 11: a judged answer on a word the graded lists never tagged. */
+function seedUntagged() {
+  const obslog = [];
+  for (let n = 0; n < 6; n += 1) {
+    obslog.push([T0 + n, 'lesson', 'word:ゾロメ', n === 0 ? 1 : 3, 'N5-1']);
+  }
+  return { v: 1, taken: [{ t: 'word', id: 'ゾロメ', label: 'ゾロメ', ts: T0 }], srs: {}, obslog };
+}
+
 function seedConfusionsOnly() {
   return {
     v: 1,
@@ -540,6 +568,42 @@ async function main() {
     wording.read.trim(),
   );
   await failedLevel.close();
+
+  // round 11: a paper's question kind decides its band, not its subject
+  const modal = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await modal.addInitScript(initScript(seedMockModalities()));
+  const mp = await openMirror(modal, base);
+  const byKind = await mp.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return { syntax: m.bands.syntax.measured, readings: m.bands.readings.measured, lexis: m.bands.lexis.measured };
+  })()`);
+  check(
+    'a form question is sentence form, a reading question is readings — even about the same word',
+    byKind.syntax === 5 && byKind.readings === 5 && byKind.lexis === 10,
+    JSON.stringify(byKind),
+  );
+  await modal.close();
+
+  // round 11: an answer on an untagged word is still an answer
+  const untagged = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await untagged.addInitScript(initScript(seedUntagged()));
+  const up = await openMirror(untagged, base);
+  const oov = await up.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return {
+      cell: m.bands.lexis.levels.oov,
+      edge: m.bands.lexis.edge,
+      evidence: m.bands.lexis.evidence,
+      shown: [...document.querySelectorAll('[data-kagami-cell]')].map((n) => n.dataset.kagamiCell),
+    };
+  })()`);
+  check(
+    'a judged answer on an untagged word is counted, shown as 級外, and clears no level',
+    oov.evidence === 6 && oov.cell.seen === 6 && oov.cell.right === 5 && oov.edge === null &&
+      oov.shown.includes('lexis:oov'),
+    JSON.stringify({ cell: oov.cell, edge: oov.edge }),
+  );
+  await untagged.close();
 
   const empty = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await empty.addInitScript(initScript({ v: 1, taken: [], srs: {} }));
