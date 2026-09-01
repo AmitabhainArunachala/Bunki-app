@@ -68,12 +68,17 @@ per-level counts with its own provenance line (measured vs observed) — a band
 resting only on mined rows says so. `KAGAMI_MIN_SEEN` (4) is the floor below
 which the model declines to speak of a level at all.
 
-Two representation traps, both hit and both fixed here: the boot dictionary
-writes a word's level as `"N5"` while the graded word list the papers are built
-from writes `5`, so `kagamiLevelOf` normalizes both (otherwise every cell is
-empty); and "disagreement" means an easier level FAILING under a harder one
+Three traps, all hit and all fixed here. A level is spelled three ways in this
+repo — the boot dictionary writes `"N5"`, the graded word list the papers are
+built from writes `5`, and a grammar point writes its own again — so
+`kagamiLevel` normalizes all three and `kagamiLevelOf` resolves grammar keys
+through `GRAMMARS()` (without either, cells come out empty and the band cannot
+form an edge). "Disagreement" means an easier level FAILING under a harder one
 PASSING — flagging the ordinary shape (clear N5, miss N4) was a bug the phone
-screenshot caught, and verify-kagami now pins both sides.
+screenshot caught. And a subject with no JLPT tag at all — kanji, radicals,
+idioms, particles — lands in a `級外` cell that counts but clears nothing,
+rather than being credited to a level the record cannot support.
+verify-kagami pins every one of these.
 
 Still to come: movement 三 retires `aiLevelGuess()` at its nine call sites in
 favour of model queries, and 模試 PR 二's custom composer reads the frontier.
