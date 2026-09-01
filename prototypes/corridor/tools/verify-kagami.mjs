@@ -175,6 +175,55 @@ function seedGrammarReviews() {
   return { v: 1, taken: [], srs: {}, revlog };
 }
 
+/** Round 11: four mined successes at one level. The campaign's law says
+ * observed evidence is never sufficient alone, so this must clear nothing. */
+function seedMinedSuccess() {
+  const obslog = [];
+  N5.forEach((w, i) =>
+    obslog.push([T0 + i, 'sensei', `word:${w}`, 3, 'sense-miss', `x${i}`]),
+  );
+  return {
+    v: 1,
+    taken: N5.map((w, i) => ({ t: 'word', id: w, label: w, ts: T0 + i })),
+    srs: {},
+    obslog,
+  };
+}
+
+/** Round 11: every review rated Hard — reachable only after the learner
+ * declared 思い出した, so every one of them is a recall. */
+function seedHardRecalls() {
+  const revlog = [];
+  N5.forEach((w, i) => {
+    for (let n = 0; n < 5; n += 1) {
+      revlog.push([T0 + i * 10 + n, `word:${w}`, 2, 2, null, null, null, null, 1, 1, 0, T0]);
+    }
+  });
+  return {
+    v: 1,
+    taken: N5.map((w, i) => ({ t: 'word', id: w, label: w, ts: T0 + i })),
+    srs: {},
+    revlog,
+  };
+}
+
+/** Round 11: a level answered plenty and cleared by none. The sentence must
+ * say the levels did not come through — not that nothing was answered. */
+function seedSampledButFailing() {
+  const obslog = [];
+  N5.forEach((w, i) => {
+    for (let n = 0; n < 5; n += 1) {
+      obslog.push([T0 + i * 10 + n, 'lesson', `word:${w}`, n === 0 ? 3 : 1, 'N5-1']);
+    }
+  });
+  return {
+    v: 1,
+    taken: N5.map((w, i) => ({ t: 'word', id: w, label: w, ts: T0 + i })),
+    srs: {},
+    obslog,
+  };
+}
+
 function seedConfusionsOnly() {
   return {
     v: 1,
@@ -426,6 +475,71 @@ async function main() {
     `${shown.edges} pairs shown`,
   );
   await pairsOnly.close();
+
+  // round 11: mined successes are shown and are powerless
+  const minedWin = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await minedWin.addInitScript(initScript(seedMinedSuccess()));
+  const mw = await openMirror(minedWin, base);
+  const mwState = await mw.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return {
+      edge: m.bands.lexis.edge,
+      sampled: m.bands.lexis.sampled,
+      cell: m.bands.lexis.levels.N5,
+      read: document.querySelector('[data-band="lexis"] .kagami-read').textContent,
+    };
+  })()`);
+  check(
+    'four mined successes clear nothing — observed evidence is never sufficient alone',
+    mwState.edge === null && mwState.sampled === false && mwState.cell.seen === 0 && mwState.cell.obsSeen === 5,
+    JSON.stringify({ edge: mwState.edge, cell: mwState.cell }),
+  );
+  check(
+    'and the sentence says the MEASURED evidence is short, not that nothing was answered',
+    /測定/u.test(mwState.read) || /measured answers/iu.test(mwState.read),
+    mwState.read.trim(),
+  );
+  await minedWin.close();
+
+  // round 11: Hard is a recall, not a miss
+  const hard = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await hard.addInitScript(initScript(seedHardRecalls()));
+  const hp = await openMirror(hard, base);
+  const hardState = await hp.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return { cell: m.bands.lexis.levels.N5, edge: m.bands.lexis.edge, frontier: m.frontier.length };
+  })()`);
+  check(
+    'a card recalled the hard way is a recall — Again alone is the miss',
+    hardState.cell.right === 25 && hardState.cell.seen === 25 && hardState.edge === 'N5' && hardState.frontier === 0,
+    JSON.stringify(hardState),
+  );
+  await hard.close();
+
+  // round 11: a level that was answered and failed is not an unsampled level
+  const failedLevel = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await failedLevel.addInitScript(initScript(seedSampledButFailing()));
+  const fl = await openMirror(failedLevel, base);
+  const wording = await fl.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return {
+      edge: m.bands.lexis.edge,
+      sampled: m.bands.lexis.sampled,
+      cell: m.bands.lexis.levels.N5,
+      read: document.querySelector('[data-band="lexis"] .kagami-read').textContent,
+    };
+  })()`);
+  check(
+    'a level answered 25 times and cleared by none reads as failing, never as unsampled',
+    wording.edge === null &&
+      wording.sampled === true &&
+      wording.cell.seen === 25 &&
+      !/届かない/u.test(wording.read) &&
+      !/has reached/iu.test(wording.read) &&
+      (/通っていない/u.test(wording.read) || /none is coming through/iu.test(wording.read)),
+    wording.read.trim(),
+  );
+  await failedLevel.close();
 
   const empty = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await empty.addInitScript(initScript({ v: 1, taken: [], srs: {} }));

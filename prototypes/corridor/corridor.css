@@ -4434,6 +4434,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   font-size: 15px;
 }
 
+.kagami-obs {
+  font-size: 10px;
+  color: var(--ink-2);
+  opacity: 0.8;
+}
+
 .kagami-read {
   font-family: var(--serif);
   line-height: 1.7;

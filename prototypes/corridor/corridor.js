@@ -6345,18 +6345,30 @@ const kagamiLevelOf = (key) => {
 };
 
 function kagamiBand() {
-  return { levels: {}, edge: null, evidence: 0, measured: 0, observed: 0, disagreement: false };
+  return { levels: {}, edge: null, evidence: 0, measured: 0, observed: 0, disagreement: false, sampled: false };
 }
 
-/** One judged answer, filed where it belongs. */
+/** One judged answer, filed where it belongs. A level's cell keeps measured
+ * and observed apart (review round 11): the campaign's law is that mined
+ * observations are lower-weight and never sufficient alone, and a single
+ * numerator quietly broke it — four mined successes could clear a level, and
+ * mined misses could dilute measured ones at full weight. seen/right are
+ * MEASURED; what the sensei observed rides beside them and is shown, but
+ * never decides. */
 function kagamiNote(band, level, right, measured) {
   band.evidence += 1;
   if (measured) band.measured += 1;
   else band.observed += 1;
   if (!level) return;
-  const cell = band.levels[level] || (band.levels[level] = { seen: 0, right: 0 });
-  cell.seen += 1;
-  if (right) cell.right += 1;
+  const cell =
+    band.levels[level] || (band.levels[level] = { seen: 0, right: 0, obsSeen: 0, obsRight: 0 });
+  if (measured) {
+    cell.seen += 1;
+    if (right) cell.right += 1;
+  } else {
+    cell.obsSeen += 1;
+    if (right) cell.obsRight += 1;
+  }
 }
 
 /** The hardest level the evidence actually clears — and a flag when the
@@ -6366,9 +6378,11 @@ function kagamiNote(band, level, right, measured) {
 function kagamiEdge(band) {
   let edge = null;
   let failedAt = -1;
+  band.sampled = false;
   KAGAMI_LEVELS.forEach((level, ix) => {
     const cell = band.levels[level];
     if (!cell || cell.seen < KAGAMI_MIN_SEEN) return;
+    band.sampled = true;
     if (cell.right / cell.seen >= KAGAMI_CLEAR) {
       edge = level;
       // clearing something HARDER than a level already failed is the only
@@ -6448,7 +6462,11 @@ function learnerModel() {
       touch(key, row[3] === 3, true, kind);
       kagamiNote(bands.readings, level, row[3] === 3, true);
     } else if (kind === 'lesson' || kind === 'dojo' || kind === 'mock') {
-      const right = row[3] >= 3;
+      // Again alone is the miss. In the review room Hard is reachable ONLY
+      // after the learner declares 思い出した (ADR-002 T-06), so a hard-won
+      // recall is a recall (review round 11); lesson and mock rows use 1|3
+      // and read the same either way.
+      const right = row[3] >= 2;
       touch(key, right, true, kind);
       const band = bands[kagamiBandFor(key)];
       if (band) kagamiNote(band, level, right, true);
@@ -6480,7 +6498,7 @@ function learnerModel() {
     if (!Array.isArray(row) || row[2] === 0 || revoked.has(ix)) return;
     const key = row[1];
     if (!nonEmptyString(key)) return;
-    const right = row[2] >= 3;
+    const right = row[2] >= 2;
     touch(key, right, true, 'review');
     const band = bands[kagamiBandFor(key)];
     if (band) kagamiNote(band, kagamiLevelOf(key), right, true);
@@ -6614,11 +6632,16 @@ function renderKagami(main) {
     const cells = el('div', 'kagami-levels');
     for (const level of KAGAMI_LEVELS) {
       const cell = band.levels[level];
-      if (!cell) continue;
+      if (!cell || (!cell.seen && !cell.obsSeen)) continue;
       const box = el('div', 'kagami-cell' + (cell.seen < KAGAMI_MIN_SEEN ? ' thin' : ''));
       box.dataset.kagamiCell = `${id}:${level}`;
       box.append(el('span', 'kagami-level', level));
-      box.append(el('span', 'kagami-count', `${cell.right}/${cell.seen}`));
+      // the measured count is the claim; what was merely observed sits
+      // beside it, visible and powerless
+      box.append(el('span', 'kagami-count', cell.seen ? `${cell.right}/${cell.seen}` : '—'));
+      if (cell.obsSeen) {
+        box.append(el('span', 'kagami-obs', `${cell.obsRight}/${cell.obsSeen}${tx('観', ' obs')}`));
+      }
       cells.append(box);
     }
     if (cells.children.length) block.append(cells);
@@ -6632,10 +6655,15 @@ function renderKagami(main) {
               `${band.edge} の問題は通っている。その上はまだ足りない。`,
               `${band.edge} material is coming through; above it, not yet.`,
             )
-          : tx(
-              `どの級もまだ ${KAGAMI_MIN_SEEN} 件に届かない — 判断はしない。`,
-              `no level has reached ${KAGAMI_MIN_SEEN} answers yet — so nothing is claimed.`,
-            ),
+          : band.sampled
+            ? tx(
+                '答えた級はあるが、どれもまだ通っていない。',
+                'levels have been answered, and none is coming through yet.',
+              )
+            : tx(
+                `どの級もまだ測定 ${KAGAMI_MIN_SEEN} 件に届かない — 判断はしない。`,
+                `no level has reached ${KAGAMI_MIN_SEEN} measured answers yet — so nothing is claimed.`,
+              ),
       ),
     );
     const tag = el('p', 'kagami-prov');
