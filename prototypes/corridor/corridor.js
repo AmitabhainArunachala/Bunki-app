@@ -6322,6 +6322,20 @@ const KAGAMI_CODE_BAND = {
  * it as a label ("N5"), the graded word list the mock papers are built from
  * writes it as a number (5 = N5). Both are read here, so the mirror and the
  * papers cannot come to different conclusions about the same word. */
+/** Which band a key's judged answers belong to. A grammar or particle card
+ * is sentence form, not vocabulary (review round 10): filing every scheduled
+ * review under 語彙 inflated it while 文の形 stayed empty. Radicals are
+ * structural knowledge and claim no band at all — they still land on their
+ * node as encounters. */
+const KAGAMI_KEY_BAND = {
+  word: 'lexis',
+  idiom: 'lexis',
+  kanji: 'readings',
+  grammar: 'syntax',
+  particle: 'syntax',
+};
+const kagamiBandFor = (key) => KAGAMI_KEY_BAND[key.slice(0, key.indexOf(':'))] || null;
+
 const kagamiLevelOf = (key) => {
   if (!key.startsWith('word:')) return null;
   const raw = lookup(key.slice(5))?.jlpt;
@@ -6368,15 +6382,21 @@ function kagamiEdge(band) {
 
 let kagamiCache = null;
 /** The model is recomputed on demand and memoized only for the life of one
- * unchanged ledger — never written to the record. The signature is the
- * three lengths that can move it plus the deck's size; anything that
- * changes a band changes one of them. */
-function learnerModel(state = S) {
+ * unchanged ledger — never written to the record. It reads the live record
+ * directly: taking a state parameter would have implied a purity isLeech
+ * (which consults S.suspended) does not have, and a half-honest signature
+ * is worse than none. The memo key names EVERY input that can move an
+ * output — the four ledger sizes and the rested set, which the leech list
+ * depends on (review round 10: resting a card left the mirror showing its
+ * old struggle). */
+function learnerModel() {
+  const state = S;
   const signature = [
     (state.obslog || []).length,
     (state.revlog || []).length,
     (state.taken || []).length,
     Object.keys(state.srs || {}).length,
+    Object.keys(state.suspended || {}).length,
   ].join('/');
   if (kagamiCache && kagamiCache.signature === signature) return kagamiCache.model;
 
@@ -6398,11 +6418,31 @@ function learnerModel(state = S) {
     else node.observed += 1;
   };
 
-  for (const row of state.obslog || []) {
-    if (!Array.isArray(row)) continue;
+  // A drill undo is a bare [t,'dojo',key,0] row that revokes the most recent
+  // standing dojo grade for that key (review round 10). Counting it as a
+  // failure AND keeping the grade it withdrew made undoing practice lower the
+  // mirror twice over. Both rows are struck here, in append order, so
+  // repeated grades and repeated undos unwind the way they were made.
+  const obslog = state.obslog || [];
+  const struck = new Set();
+  const standing = new Map();
+  obslog.forEach((row, ix) => {
+    if (!Array.isArray(row) || row[1] !== 'dojo' || !nonEmptyString(row[2])) return;
+    const stack = standing.get(row[2]) || [];
+    if (row[3] === 0) {
+      struck.add(ix);
+      if (stack.length) struck.add(stack.pop());
+    } else {
+      stack.push(ix);
+    }
+    standing.set(row[2], stack);
+  });
+
+  obslog.forEach((row, ix) => {
+    if (!Array.isArray(row) || struck.has(ix)) return;
     const kind = row[1];
     const key = row[2];
-    if (kind === 'note' || !nonEmptyString(key)) continue;
+    if (kind === 'note' || !nonEmptyString(key)) return;
     const level = kagamiLevelOf(key);
     if (kind === 'probe') {
       touch(key, row[3] === 3, true, kind);
@@ -6410,7 +6450,8 @@ function learnerModel(state = S) {
     } else if (kind === 'lesson' || kind === 'dojo' || kind === 'mock') {
       const right = row[3] >= 3;
       touch(key, right, true, kind);
-      kagamiNote(bands.lexis, level, right, true);
+      const band = bands[kagamiBandFor(key)];
+      if (band) kagamiNote(band, level, right, true);
     } else if (kind === 'sensei') {
       const right = row[3] === 3;
       const band = bands[KAGAMI_CODE_BAND[row[4]]];
@@ -6418,7 +6459,7 @@ function learnerModel(state = S) {
       if (band) kagamiNote(band, level, right, false);
     } else if (kind === 'confuse') {
       const other = row[3];
-      if (!nonEmptyString(other) || other === key) continue;
+      if (!nonEmptyString(other) || other === key) return;
       touch(key, null, false, kind);
       touch(other, null, false, kind);
       const pair = key < other ? `${key} ${other}` : `${other} ${key}`;
@@ -6427,7 +6468,7 @@ function learnerModel(state = S) {
       // tap · reveal · drift — encounters and friction, never a verdict
       touch(key, null, true, kind);
     }
-  }
+  });
 
   // Real reviews are the heaviest measured evidence there is. A revocation
   // names the row it undoes ([t, key, 0, revokedIndex]), so an undone grade
@@ -6441,7 +6482,8 @@ function learnerModel(state = S) {
     if (!nonEmptyString(key)) return;
     const right = row[2] >= 3;
     touch(key, right, true, 'review');
-    kagamiNote(bands.lexis, kagamiLevelOf(key), right, true);
+    const band = bands[kagamiBandFor(key)];
+    if (band) kagamiNote(band, kagamiLevelOf(key), right, true);
   });
 
   for (const band of Object.values(bands)) band.edge = kagamiEdge(band);
@@ -6521,7 +6563,13 @@ function renderKagami(main) {
       ),
     ),
   );
-  if (!model.totals.rows) {
+  // Bands need judged answers; confusions, the frontier and the leeches do
+  // not. Treating an empty band set as an empty ledger hid pairs the sensei
+  // had actually recorded (review round 10) — only a record with nothing at
+  // all in it gets the bare line.
+  const anything =
+    model.totals.rows || model.edges.length || model.frontier.length || model.leeches.length;
+  if (!anything) {
     main.append(
       el(
         'p',
@@ -6538,14 +6586,19 @@ function renderKagami(main) {
     el(
       'p',
       'card-kind',
-      tx(
-        `記録 ${model.totals.rows} 件 — 測定 ${model.totals.measured} · 観察 ${model.totals.observed}`,
-        `${model.totals.rows} judged answers — ${model.totals.measured} measured · ${model.totals.observed} observed`,
-      ),
+      model.totals.rows
+        ? tx(
+            `記録 ${model.totals.rows} 件 — 測定 ${model.totals.measured} · 観察 ${model.totals.observed}`,
+            `${model.totals.rows} judged answers — ${model.totals.measured} measured · ${model.totals.observed} observed`,
+          )
+        : tx(
+            '採点のついた記録はまだない。下は、それ以外に残ったもの。',
+            'No judged answers yet — what follows is what the record holds besides them.',
+          ),
     ),
   );
 
-  for (const [id, band] of Object.entries(model.bands)) {
+  for (const [id, band] of Object.entries(model.totals.rows ? model.bands : {})) {
     const [ja, en] = KAGAMI_BAND_NAMES[id];
     const block = el('div', 'kagami-band');
     block.dataset.band = id;

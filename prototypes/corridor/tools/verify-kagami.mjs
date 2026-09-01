@@ -147,6 +147,46 @@ function seedContradiction() {
   };
 }
 
+/** Round 10's four shapes, each its own ledger:
+ *  · a drill graded then undone — the undo revokes the grade and counts as
+ *    nothing itself, so practice withdrawn cannot lower the mirror;
+ *  · a grammar card reviewed — sentence form, not vocabulary;
+ *  · a rested card — the leech list must notice;
+ *  · confusions with no judged answer at all — still a record worth showing. */
+function seedUndoneDrill() {
+  const obslog = [];
+  // 天気: graded wrong four times, then all four undone — nothing may stand
+  for (let n = 0; n < 4; n += 1) obslog.push([T0 + n, 'dojo', 'word:天気', 1, 'due']);
+  for (let n = 0; n < 4; n += 1) obslog.push([T0 + 100 + n, 'dojo', 'word:天気', 0]);
+  // 学校: four right, one undone — three stand
+  for (let n = 0; n < 4; n += 1) obslog.push([T0 + 200 + n, 'dojo', 'word:学校', 3, 'due']);
+  obslog.push([T0 + 300, 'dojo', 'word:学校', 0]);
+  return {
+    v: 1,
+    taken: ['天気', '学校'].map((w, i) => ({ t: 'word', id: w, label: w, ts: T0 + i })),
+    srs: {},
+    obslog,
+  };
+}
+
+function seedGrammarReviews() {
+  const revlog = [];
+  for (let n = 0; n < 6; n += 1) revlog.push([T0 + n, 'grammar:n5-teiru', n === 0 ? 1 : 3, 2, null, null, null, null, 1, 1, 0, T0]);
+  return { v: 1, taken: [], srs: {}, revlog };
+}
+
+function seedConfusionsOnly() {
+  return {
+    v: 1,
+    taken: [],
+    srs: {},
+    obslog: [
+      [T0, 'confuse', 'word:学校', 'word:天気'],
+      [T0 + 1, 'confuse', 'word:先生', 'word:時間'],
+    ],
+  };
+}
+
 const initScript = (envelope) => `try {
   if (!localStorage.getItem('__kagami_seeded')) {
     localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(JSON.stringify(envelope))});
@@ -326,6 +366,66 @@ async function main() {
     JSON.stringify({ edge: flagged.edge, disagreement: flagged.disagreement }),
   );
   await odd.close();
+
+  // round 10: a withdrawn drill withdraws its grade, and counts as nothing
+  const undone = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await undone.addInitScript(initScript(seedUndoneDrill()));
+  const drills = await openMirror(undone, base);
+  const afterUndo = await drills.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return { cell: m.bands.lexis.levels.N5, tenki: m.nodes['word:天気'] || null, gakko: m.nodes['word:学校'] };
+  })()`);
+  check(
+    'an undone drill withdraws its grade and counts as nothing itself',
+    afterUndo.cell.seen === 3 && afterUndo.cell.right === 3 && afterUndo.gakko.seen === 3,
+    JSON.stringify(afterUndo.cell),
+  );
+  check(
+    'a word whose every drill was undone leaves no judged evidence at all',
+    !afterUndo.tenki || afterUndo.tenki.seen === 0,
+    JSON.stringify(afterUndo.tenki),
+  );
+  await undone.close();
+
+  // round 10: a grammar review is sentence form, not vocabulary
+  const grammar = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await grammar.addInitScript(initScript(seedGrammarReviews()));
+  const gpage = await grammar.newPage();
+  await gpage.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+  await gpage.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  await gpage.click('#kagami-link');
+  await gpage.waitForSelector('[data-band="syntax"]', { timeout: 15000 });
+  const routed = await gpage.evaluate(`(() => {
+    const m = window.__KAIRO_KAGAMI__.model();
+    return { syntax: m.bands.syntax.evidence, lexis: m.bands.lexis.evidence };
+  })()`);
+  check(
+    'a reviewed grammar card lands in sentence form and never inflates vocabulary',
+    routed.syntax === 6 && routed.lexis === 0,
+    JSON.stringify(routed),
+  );
+  await grammar.close();
+
+  // round 10: confusions with no judged answers are still a record
+  const pairsOnly = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await pairsOnly.addInitScript(initScript(seedConfusionsOnly()));
+  const ponly = await pairsOnly.newPage();
+  await ponly.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+  await ponly.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  await ponly.click('#kagami-link');
+  await ponly.waitForSelector('[data-kagami-edge]', { timeout: 15000 });
+  const shown = await ponly.evaluate(`(() => ({
+    edges: document.querySelectorAll('[data-kagami-edge]').length,
+    text: document.querySelector('main').textContent,
+  }))()`);
+  check(
+    'a ledger of confusions and no grades still shows them, and says the grades are missing',
+    shown.edges === 2 &&
+      (/採点のついた記録はまだない/u.test(shown.text) || /No judged answers yet/iu.test(shown.text)) &&
+      !/まだ何も映っていない/u.test(shown.text),
+    `${shown.edges} pairs shown`,
+  );
+  await pairsOnly.close();
 
   const empty = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await empty.addInitScript(initScript({ v: 1, taken: [], srs: {} }));
