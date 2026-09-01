@@ -2694,7 +2694,7 @@ function back() {
     render();
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
@@ -3301,6 +3301,17 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(mock);
+  const mirror = el('button', 'grammar-link');
+  mirror.type = 'button';
+  mirror.id = 'kagami-link';
+  mirror.append(el('span', 'l-ja', '鏡'), el('span', 'en-sub', bi() ? 'the mirror' : ''));
+  mirror.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'kagami';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(mirror);
   const gram = el('button', 'grammar-link');
   gram.type = 'button';
   gram.id = 'grammar-link';
@@ -6264,6 +6275,397 @@ function renderMockResult(main, set, flat, run) {
   back.id = 'mock-done';
   back.addEventListener('click', dropMockRun);
   main.append(back);
+}
+
+/* ------------------------------------------------------------------ 鏡
+ * KAGAMI movement 二 — the mirror. Every room has been writing evidence and
+ * no one has been reading it whole: chat mines sensei rows, a sat paper
+ * writes mock rows, the dojo and the lessons and the reader write theirs,
+ * and each surface still guesses the learner's level privately from the
+ * deck's tags. learnerModel(S) is the one reading.
+ *
+ * Four laws hold it, and they are the campaign's, not this function's:
+ *
+ *   1. It is PURE and DERIVED. Same store ⇒ byte-same model, no clock, no
+ *      randomness, nothing persisted. ADR-004: any surface state is derived
+ *      or an observation, and this is derived — an imported record yields
+ *      the same mirror on any device, because the envelope is all it reads.
+ *   2. It READS. FSRS-6 with the learner's fitted weights stays the only
+ *      scheduler; nothing here grades, schedules, mints or suspends.
+ *   3. A band is a VECTOR, never a number (the shelf's no-averaging law
+ *      extended to the learner). "N3 の語彙は 2/9" is a description of
+ *      evidence; "you are N3" is a claim about a person, and this app does
+ *      not make it. No output predicts a JLPT pass.
+ *   4. Provenance is weighted and shown: measured (a probe, a lesson, a
+ *      drill, a sat paper, a real review) outranks observed (mined from a
+ *      conversation), and a band says which it rests on.
+ *
+ * Only rows carrying an explicit right/wrong judgment move a band. A tap is
+ * friction, not a verdict — it lands on the node and stays off the bands. */
+const KAGAMI_MODEL_VERSION = 1;
+const KAGAMI_LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1'];
+/** how many judged answers a level needs before the model will speak of it */
+const KAGAMI_MIN_SEEN = 4;
+const KAGAMI_CLEAR = 0.6;
+/** the sensei's own codes name the band they belong to — the taxonomy of
+ * PR 一 was written for exactly this reading */
+const KAGAMI_CODE_BAND = {
+  misread: 'readings',
+  'sense-miss': 'lexis',
+  collocation: 'lexis',
+  'particle-drop': 'syntax',
+  'form-miss': 'syntax',
+  'prod-gap': 'production',
+};
+
+/** The repo keeps a word's level in two hands: the boot dictionary writes
+ * it as a label ("N5"), the graded word list the mock papers are built from
+ * writes it as a number (5 = N5). Both are read here, so the mirror and the
+ * papers cannot come to different conclusions about the same word. */
+const kagamiLevelOf = (key) => {
+  if (!key.startsWith('word:')) return null;
+  const raw = lookup(key.slice(5))?.jlpt;
+  if (raw === null || raw === undefined || raw === '') return null;
+  const level = `N${String(raw).replace(/^N/iu, '')}`;
+  return KAGAMI_LEVELS.includes(level) ? level : null;
+};
+
+function kagamiBand() {
+  return { levels: {}, edge: null, evidence: 0, measured: 0, observed: 0, disagreement: false };
+}
+
+/** One judged answer, filed where it belongs. */
+function kagamiNote(band, level, right, measured) {
+  band.evidence += 1;
+  if (measured) band.measured += 1;
+  else band.observed += 1;
+  if (!level) return;
+  const cell = band.levels[level] || (band.levels[level] = { seen: 0, right: 0 });
+  cell.seen += 1;
+  if (right) cell.right += 1;
+}
+
+/** The hardest level the evidence actually clears — and a flag when the
+ * levels disagree (an easier band failing under a harder one passing means
+ * the sample is telling two stories, and the page says so rather than
+ * smoothing it). */
+function kagamiEdge(band) {
+  let edge = null;
+  let failedAt = -1;
+  KAGAMI_LEVELS.forEach((level, ix) => {
+    const cell = band.levels[level];
+    if (!cell || cell.seen < KAGAMI_MIN_SEEN) return;
+    if (cell.right / cell.seen >= KAGAMI_CLEAR) {
+      edge = level;
+      // clearing something HARDER than a level already failed is the only
+      // real contradiction. Failing the harder level after clearing the
+      // easier one is not disagreement — it is what learning looks like.
+      if (failedAt >= 0 && ix > failedAt) band.disagreement = true;
+    } else if (failedAt < 0) failedAt = ix;
+  });
+  return edge;
+}
+
+let kagamiCache = null;
+/** The model is recomputed on demand and memoized only for the life of one
+ * unchanged ledger — never written to the record. The signature is the
+ * three lengths that can move it plus the deck's size; anything that
+ * changes a band changes one of them. */
+function learnerModel(state = S) {
+  const signature = [
+    (state.obslog || []).length,
+    (state.revlog || []).length,
+    (state.taken || []).length,
+    Object.keys(state.srs || {}).length,
+  ].join('/');
+  if (kagamiCache && kagamiCache.signature === signature) return kagamiCache.model;
+
+  const bands = {
+    lexis: kagamiBand(),
+    readings: kagamiBand(),
+    syntax: kagamiBand(),
+    production: kagamiBand(),
+  };
+  const nodes = {};
+  const pairs = new Map();
+  const touch = (key, right, measured, kind) => {
+    const node = nodes[key] || (nodes[key] = { seen: 0, right: 0, measured: 0, observed: 0, kinds: {} });
+    node.kinds[kind] = (node.kinds[kind] || 0) + 1;
+    if (right === null) return;
+    node.seen += 1;
+    if (right) node.right += 1;
+    if (measured) node.measured += 1;
+    else node.observed += 1;
+  };
+
+  for (const row of state.obslog || []) {
+    if (!Array.isArray(row)) continue;
+    const kind = row[1];
+    const key = row[2];
+    if (kind === 'note' || !nonEmptyString(key)) continue;
+    const level = kagamiLevelOf(key);
+    if (kind === 'probe') {
+      touch(key, row[3] === 3, true, kind);
+      kagamiNote(bands.readings, level, row[3] === 3, true);
+    } else if (kind === 'lesson' || kind === 'dojo' || kind === 'mock') {
+      const right = row[3] >= 3;
+      touch(key, right, true, kind);
+      kagamiNote(bands.lexis, level, right, true);
+    } else if (kind === 'sensei') {
+      const right = row[3] === 3;
+      const band = bands[KAGAMI_CODE_BAND[row[4]]];
+      touch(key, right, false, kind);
+      if (band) kagamiNote(band, level, right, false);
+    } else if (kind === 'confuse') {
+      const other = row[3];
+      if (!nonEmptyString(other) || other === key) continue;
+      touch(key, null, false, kind);
+      touch(other, null, false, kind);
+      const pair = key < other ? `${key} ${other}` : `${other} ${key}`;
+      pairs.set(pair, (pairs.get(pair) || 0) + 1);
+    } else {
+      // tap · reveal · drift — encounters and friction, never a verdict
+      touch(key, null, true, kind);
+    }
+  }
+
+  // Real reviews are the heaviest measured evidence there is. A revocation
+  // names the row it undoes ([t, key, 0, revokedIndex]), so an undone grade
+  // is not counted — the mirror shows what stands, not what was withdrawn.
+  const revlog = state.revlog || [];
+  const revoked = new Set();
+  for (const row of revlog) if (Array.isArray(row) && row[2] === 0) revoked.add(row[3]);
+  revlog.forEach((row, ix) => {
+    if (!Array.isArray(row) || row[2] === 0 || revoked.has(ix)) return;
+    const key = row[1];
+    if (!nonEmptyString(key)) return;
+    const right = row[2] >= 3;
+    touch(key, right, true, 'review');
+    kagamiNote(bands.lexis, kagamiLevelOf(key), right, true);
+  });
+
+  for (const band of Object.values(bands)) band.edge = kagamiEdge(band);
+
+  const edges = [...pairs.entries()]
+    .map(([pair, n]) => {
+      const [a, b] = pair.split(' ');
+      return { a, b, n };
+    })
+    .sort((x, y) => y.n - x.n || (x.a < y.a ? -1 : x.a > y.a ? 1 : 0))
+    .slice(0, 12);
+
+  // the frontier: nodes the learner has met and not yet settled — mixed or
+  // failing evidence, hardest-looking first. These are the doors the drift
+  // and the custom papers will pull from; here they are only shown.
+  const frontier = Object.entries(nodes)
+    .filter(([, node]) => node.seen >= 2 && node.right < node.seen)
+    .map(([key, node]) => ({ key, seen: node.seen, right: node.right }))
+    .sort(
+      (x, y) =>
+        x.right / x.seen - y.right / y.seen ||
+        y.seen - x.seen ||
+        (x.key < y.key ? -1 : x.key > y.key ? 1 : 0),
+    )
+    .slice(0, 12);
+
+  const leeches = (state.taken || [])
+    .filter((item) => isLeech(item))
+    .map((item) => srsKey(item.t, item.id))
+    .sort();
+
+  const totals = Object.values(bands).reduce(
+    (acc, band) => ({
+      rows: acc.rows + band.evidence,
+      measured: acc.measured + band.measured,
+      observed: acc.observed + band.observed,
+    }),
+    { rows: 0, measured: 0, observed: 0 },
+  );
+
+  const model = { modelVersion: KAGAMI_MODEL_VERSION, bands, nodes, edges, frontier, leeches, totals };
+  kagamiCache = { signature, model };
+  return model;
+}
+
+/* An instrument handle for the verification suites (the __KAIRO_* idiom):
+ * the model itself, so a determinism check exercises the real function
+ * rather than a re-implementation of it. Read-only by construction — the
+ * model is derived, and nothing here can write. */
+window.__KAIRO_KAGAMI__ = Object.freeze({
+  model: () => learnerModel(),
+  version: KAGAMI_MODEL_VERSION,
+});
+
+const KAGAMI_BAND_NAMES = {
+  lexis: ['語彙', 'vocabulary'],
+  readings: ['読み', 'readings'],
+  syntax: ['文の形', 'sentence form'],
+  production: ['自分で使う', 'producing it yourself'],
+};
+
+/** The mirror. Nothing on this page grades, schedules or mints — it reads
+ * the ledger back to the learner, and every line it prints stands on rows
+ * that exist. Where the evidence is thin it says so; it never fills a gap
+ * with a guess, and it never says what level the learner IS. */
+function renderKagami(main) {
+  const model = learnerModel();
+  main.append(withEn(el('p', 'eyebrow', '鏡'), 'the mirror', 'en-inline'));
+  main.append(el('h1', 'view-title', tx('今の手ざわり', 'Where the evidence stands')));
+  main.append(
+    el(
+      'p',
+      'gloss',
+      tx(
+        'ここに出るのは、これまでの記録そのもの。級を言い当てるのではなく、どの級の問題をどれだけ通したかを並べる — 合否は、ここでは分からない。',
+        'What follows is the record itself. It does not name your level; it lays out how much of each level’s material you have actually cleared — and whether you would pass is not knowable from here.',
+      ),
+    ),
+  );
+  if (!model.totals.rows) {
+    main.append(
+      el(
+        'p',
+        'card-kind',
+        tx(
+          'まだ何も映っていない。読んで、答えて、模試を一枚受ければ、ここに出る。',
+          'Nothing is reflected yet. Read, answer, sit one mock paper — and it will appear here.',
+        ),
+      ),
+    );
+    return;
+  }
+  main.append(
+    el(
+      'p',
+      'card-kind',
+      tx(
+        `記録 ${model.totals.rows} 件 — 測定 ${model.totals.measured} · 観察 ${model.totals.observed}`,
+        `${model.totals.rows} judged answers — ${model.totals.measured} measured · ${model.totals.observed} observed`,
+      ),
+    ),
+  );
+
+  for (const [id, band] of Object.entries(model.bands)) {
+    const [ja, en] = KAGAMI_BAND_NAMES[id];
+    const block = el('div', 'kagami-band');
+    block.dataset.band = id;
+    const head = el('p', 'eyebrow list-head');
+    head.append(document.createTextNode(ja));
+    if (bi()) head.append(el('span', 'en-inline', en));
+    block.append(head);
+    if (!band.evidence) {
+      block.append(el('p', 'kagami-thin', tx('まだ記録がない。', 'no evidence yet')));
+      main.append(block);
+      continue;
+    }
+    const cells = el('div', 'kagami-levels');
+    for (const level of KAGAMI_LEVELS) {
+      const cell = band.levels[level];
+      if (!cell) continue;
+      const box = el('div', 'kagami-cell' + (cell.seen < KAGAMI_MIN_SEEN ? ' thin' : ''));
+      box.dataset.kagamiCell = `${id}:${level}`;
+      box.append(el('span', 'kagami-level', level));
+      box.append(el('span', 'kagami-count', `${cell.right}/${cell.seen}`));
+      cells.append(box);
+    }
+    if (cells.children.length) block.append(cells);
+    // the one sentence about this band — a description of rows, never a verdict
+    block.append(
+      el(
+        'p',
+        'kagami-read',
+        band.edge
+          ? tx(
+              `${band.edge} の問題は通っている。その上はまだ足りない。`,
+              `${band.edge} material is coming through; above it, not yet.`,
+            )
+          : tx(
+              `どの級もまだ ${KAGAMI_MIN_SEEN} 件に届かない — 判断はしない。`,
+              `no level has reached ${KAGAMI_MIN_SEEN} answers yet — so nothing is claimed.`,
+            ),
+      ),
+    );
+    const tag = el('p', 'kagami-prov');
+    tag.append(
+      document.createTextNode(
+        tx(
+          `測定 ${band.measured} · 観察 ${band.observed}`,
+          `${band.measured} measured · ${band.observed} observed`,
+        ),
+      ),
+    );
+    if (band.measured === 0) {
+      tag.append(
+        el(
+          'span',
+          'kagami-warn',
+          tx('（会話からの観察だけ）', '(mined from conversation only)'),
+        ),
+      );
+    }
+    if (band.disagreement) {
+      tag.append(
+        el('span', 'kagami-warn', tx('（級ごとに食い違いあり）', '(the levels disagree)')),
+      );
+    }
+    block.append(tag);
+    main.append(block);
+  }
+
+  const label = (key) => key.slice(key.indexOf(':') + 1);
+  if (model.edges.length) {
+    main.append(withEn(el('p', 'eyebrow list-head', '迷い'), 'pairs that trade places', 'en-inline'));
+    const list = el('div', 'kagami-edges');
+    for (const edge of model.edges) {
+      const row = el('div', 'kagami-edge-row');
+      row.dataset.kagamiEdge = `${edge.a}|${edge.b}`;
+      row.append(el('span', 'kagami-pair', `${label(edge.a)} ↔ ${label(edge.b)}`));
+      row.append(el('span', 'kagami-count', `${edge.n}`));
+      list.append(row);
+    }
+    main.append(list);
+  }
+
+  if (model.frontier.length) {
+    main.append(withEn(el('p', 'eyebrow list-head', '際'), 'the edge you are working', 'en-inline'));
+    main.append(
+      el(
+        'p',
+        'kagami-thin',
+        tx('会って、まだ落ち着いていない言葉。', 'Met, and not yet settled.'),
+      ),
+    );
+    const list = el('div', 'kagami-frontier');
+    for (const item of model.frontier) {
+      const [t, id] = [item.key.slice(0, item.key.indexOf(':')), label(item.key)];
+      const row = el('button', 'entry-row kagami-row');
+      row.type = 'button';
+      row.dataset.kagamiFrontier = item.key;
+      row.append(el('span', 'row-glyph', id.slice(0, 2)));
+      row.append(el('span', 'row-main', `${id}　${item.right}/${item.seen}`));
+      row.append(el('span', 'row-go', '›'));
+      row.addEventListener('click', () => go({ t, id }));
+      list.append(row);
+    }
+    main.append(list);
+  }
+
+  if (model.leeches.length) {
+    main.append(withEn(el('p', 'eyebrow list-head', '手こずり'), 'the ones that keep slipping', 'en-inline'));
+    const list = el('div', 'kagami-frontier');
+    for (const key of model.leeches.slice(0, 12)) {
+      const [t, id] = [key.slice(0, key.indexOf(':')), label(key)];
+      const row = el('button', 'entry-row kagami-row');
+      row.type = 'button';
+      row.dataset.kagamiLeech = key;
+      row.append(el('span', 'row-glyph', id.slice(0, 2)));
+      row.append(el('span', 'row-main', id));
+      row.append(el('span', 'row-go', '›'));
+      row.addEventListener('click', () => go({ t, id }));
+      list.append(row);
+    }
+    main.append(list);
+  }
 }
 
 /* The one place the app asks for a key — once, plainly, stored on-device. */
@@ -14883,6 +15285,7 @@ function render() {
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
   if (S.view === 'mock') parts.push(tx('模試', 'mock papers'));
+  if (S.view === 'kagami') parts.push(tx('鏡', 'the mirror'));
   if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
   if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
@@ -15070,6 +15473,7 @@ function render() {
   else if (S.view === 'ai') renderAiSetup(main);
   else if (S.view === 'lessons') renderLessons(main);
   else if (S.view === 'mock') renderMock(main);
+  else if (S.view === 'kagami') renderKagami(main);
   else if (S.view === 'thesaurus') renderThesaurus(main);
   else if (S.view === 'airead') renderAiReading(main);
   else if (S.view === 'kanjidex') renderKanjidex(main);

@@ -8,9 +8,9 @@
 | PR  | Movement                                  | State  |
 | --- | ----------------------------------------- | ------ |
 | 一  | 台帳 — ledger taxonomy + sensei-writes    | MERGED (`8504cea4`, #86) |
-| 一補 | 台帳の後始末 — review rounds 4–6 aftercare | **IN BUILD** |
-| 七  | 模試 — the mock room + 25 papers          | **IN BUILD** (with 一補) |
-| 二  | 鏡 — the model + mirror page              | queued |
+| 一補 | 台帳の後始末 — review rounds 4–9 aftercare | MERGED (`f4cf1b88`, #88) |
+| 七  | 模試 — the mock room + 25 papers          | MERGED (`f4cf1b88`, #88) |
+| 二  | 鏡 — the model + mirror page              | **IN BUILD** |
 | 三  | 先生の目 — sensei-reads + placement       | queued |
 | 四  | 潮 — drift 自                             | queued |
 | 五  | 札の文 — multi-sentence cards + mining    | queued |
@@ -53,6 +53,30 @@ Still to come (模試 PR 二): the custom composer — sets drafted from the
 learner model's weak edges, a scenario prompt, the learner's own read
 articles, or a pasted transcript. It needs 鏡 (movement 二) to know the gaps,
 so the mirror comes first.
+
+## 二 鏡 — what the mirror is and is not
+
+`learnerModel(S)` is pure, versioned and derived: same store ⇒ byte-same model,
+nothing persisted, nothing scheduled. It reads only rows carrying an explicit
+right/wrong judgment — probe · lesson · dojo · mock · sensei · real reviews (a
+revocation names the row it undoes, so an undone grade is not counted). Taps and
+reveals land on nodes as encounters and stay off the bands: friction is not a
+verdict.
+
+Four bands, never averaged: 語彙 · 読み · 文の形 · 自分で使う. Each renders as
+per-level counts with its own provenance line (measured vs observed) — a band
+resting only on mined rows says so. `KAGAMI_MIN_SEEN` (4) is the floor below
+which the model declines to speak of a level at all.
+
+Two representation traps, both hit and both fixed here: the boot dictionary
+writes a word's level as `"N5"` while the graded word list the papers are built
+from writes `5`, so `kagamiLevelOf` normalizes both (otherwise every cell is
+empty); and "disagreement" means an easier level FAILING under a harder one
+PASSING — flagging the ordinary shape (clear N5, miss N4) was a bug the phone
+screenshot caught, and verify-kagami now pins both sides.
+
+Still to come: movement 三 retires `aiLevelGuess()` at its nine call sites in
+favour of model queries, and 模試 PR 二's custom composer reads the frontier.
 
 ## Notes for the resuming session
 
