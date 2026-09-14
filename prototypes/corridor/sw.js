@@ -13,7 +13,7 @@
  * localStorage/IndexedDB, outside HTTP caching entirely. */
 
 // v2: dict-v2 went schema 3 (sense tags) — the cache-first shards must drop
-const VERSION = 'kairo-v2';
+const VERSION = 'kairo-v3-skip';
 const SHELL = [
   '.',
   'index.html',
@@ -21,6 +21,10 @@ const SHELL = [
   'corridor.js',
   'corridor-ink.js',
   'dictionary-worker.js',
+  'skip-core.js',
+  'skip-ui.js',
+  'skip-ui.css',
+  'data/share_alike/skip.json',
   'drift-layer.css',
   'drift-layer.js',
   'manifest.webmanifest',
