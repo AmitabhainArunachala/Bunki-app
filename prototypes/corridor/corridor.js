@@ -8941,6 +8941,10 @@ function catalogMatch(by, value) {
 }
 /** A tappable chip that opens the catalog for its category. */
 function catalogChip(ja, en, by, value, from) {
+  // Level categories share one exhaustive collection; other categories
+  // retain their existing canonical catalog (for example stroke count).
+  if (by === 'kanken') return referenceCollectionChip(ja, `kanken:${value}`);
+  if (by === 'jlpt') return referenceCollectionChip(ja, `jlpt-kanji:${value}`);
   const chip = el('button', 'pool-tag cat-chip', bi() && en ? en : ja);
   chip.type = 'button';
   chip.setAttribute('aria-label', tx(`${ja} の漢字をすべて見る`, `see every ${en} kanji`));
@@ -12665,7 +12669,7 @@ function confusablesFor(c) {
 }
 
 function renderKanjiNode(sheet, node) {
-  const k = kanjiDisplayRecord(node.id, node.referenceEntry);
+  const k = D.kanji[node.id];
   if (!k) {
     sheet.append(el('div', 'sem-empty', tx('この字はこの層にない。', 'This kanji is not in this layer.')));
     return;
@@ -12673,23 +12677,24 @@ function renderKanjiNode(sheet, node) {
   const hero = el('div', 'hero');
   hero.append(el('div', 'hero-glyph', k.c));
   const meta = el('div', 'hero-meta');
-  meta.append(el('div', 'hero-mean', k.m));
+  const display = kanjiDisplayRecord(node.id, node.referenceEntry) || k;
+  meta.append(el('div', 'hero-mean', display.m));
   const chips = el('div', 'shelf-meta');
   chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk)
-    chips.append(referenceCollectionChip(`漢検 ${D.kanken[k.c].kk}`, `kanken:${D.kanken[k.c].kk}`));
+    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `漢検 ${D.kanken[k.c].kk}`, 'kanken', D.kanken[k.c].kk, node.from));
   if (D.kmeta?.[k.c]?.jlpt)
-    chips.append(referenceCollectionChip(`JLPT ${D.kmeta[k.c].jlpt}`, `jlpt-kanji:${D.kmeta[k.c].jlpt}`));
+    chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
 
   const kv = el('dl', 'kv');
   const on = el('dd');
-  on.append(el('span', 'on', k.on.join('・') || '—'));
+  on.append(el('span', 'on', display.on.join('・') || '—'));
   kv.append(withEn(el('dt', null, '音'), 'on'), on);
   const kun = el('dd');
-  kun.append(el('span', 'on', k.kun.join('・') || '—'));
+  kun.append(el('span', 'on', display.kun.join('・') || '—'));
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
@@ -15396,6 +15401,18 @@ function renderSearchPage(main) {
   main.append(withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
   const wrap = el('div', 'search-page');
   const input = el('input', 'nav-search-input search-page-input');
+  // Guard native Enter before the result-specific listener below. Keeping
+  // activation separate lets optional search result types use that listener
+  // without reintroducing a click on the newly focused sheet's Back button.
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter') return;
+    if (ev.isComposing) {
+      ev.stopImmediatePropagation();
+      return;
+    }
+    ev.preventDefault();
+    ev.stopPropagation();
+  });
   input.type = 'search';
   input.id = 'nav-search-input';
   input.placeholder = tx('ことばをさがす', 'kanji · kana · romaji · English');
@@ -15467,11 +15484,7 @@ function renderSearchPage(main) {
     paint();
   });
   input.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter' && !ev.isComposing) {
-      // The result focuses a new sheet synchronously. Cancel the original
-      // key's native activation, or it can also press that sheet's Back.
-      ev.preventDefault();
-      ev.stopPropagation();
+    if (ev.key === 'Enter') {
       const first = results.querySelector('.nav-search-row');
       if (first) first.click();
     }
