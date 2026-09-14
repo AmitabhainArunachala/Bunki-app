@@ -48,6 +48,9 @@ jobs:
           node --check prototypes/corridor/corridor.js
           node --check prototypes/corridor/corridor-ink.js
           node --check prototypes/corridor/dictionary-worker.js
+          node --check prototypes/corridor/skip-core.js
+          node --check prototypes/corridor/skip-ui.js
+          node prototypes/corridor/tools/test-skip-core.mjs
           node --check prototypes/corridor/sw.js
           node --check prototypes/corridor/reference-core.js
           node --check prototypes/corridor/reference-ui.js
@@ -66,6 +69,9 @@ jobs:
                 prototypes/corridor/corridor.js \
                 prototypes/corridor/corridor-ink.js \
                 prototypes/corridor/dictionary-worker.js \
+                prototypes/corridor/skip-core.js \
+                prototypes/corridor/skip-ui.js \
+                prototypes/corridor/skip-ui.css \
                 prototypes/corridor/drift-layer.css \
                 prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
@@ -98,6 +104,7 @@ jobs:
           # "assert(!this.paused)" AFTER every path had already printed 200)
           for path in '' 'apple-touch-icon.png' 'corridor.css' 'fonts.css' 'corridor.js' \
                       'corridor-ink.js' 'dictionary-worker.js' \
+                      'skip-core.js' 'skip-ui.js' 'skip-ui.css' 'data/share_alike/skip.json' \
                       'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
                       'data/manifest.json' 'data/articles/index.json' \

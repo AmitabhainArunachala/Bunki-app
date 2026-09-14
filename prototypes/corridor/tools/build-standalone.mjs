@@ -23,6 +23,7 @@ const BUNDLES = {
   'share_alike/dict': 'data/share_alike/dict.json',
   'share_alike/strokes': 'data/share_alike/strokes.json',
   'share_alike/radicals214': 'data/share_alike/radicals214.json',
+  'share_alike/skip': 'data/share_alike/skip.json',
   'original/grammar-v11': 'data/original/grammar-v11.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
@@ -91,6 +92,10 @@ ${dictionaryScripts}
 <script>
 ${read('drift-layer.js')}
 </script>
+<script>
+${read('skip-core.js')}
+${read('skip-ui.js')}
+</script>
 <script type="module">
 ${tsfsrs}
 window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
@@ -108,6 +113,7 @@ const fragmentHtml = `<title>回廊 KAIRO — corridor prototype</title>
 ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
+${read('skip-ui.css')}
 </style>
 ${BODY}
 `;
@@ -126,6 +132,7 @@ const html = `<!doctype html>
 ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
+${read('skip-ui.css')}
 </style>
 </head>
 <body>

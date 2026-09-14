@@ -407,6 +407,9 @@ const S = {
    * query, the rows, and the row that was left. Back out of the room ends
    * the session. Session-only, never persisted. */
   navQ: '',
+  /** SKIP is a session-only dictionary lens, never a learner-state ledger.
+   * Its index loads on first use, independently of the boot corpus. */
+  skipUi: null,
   /** 検索の間 — the search page (operator, 2026-08-20): search is a room of
    * its own, not a strip squeezed into the bar. searchFrom remembers the
    * view the door was opened from so Back returns there. Session-only. */
@@ -7471,6 +7474,7 @@ function renderKanjidex(main) {
   // opens the same kanji entry as everywhere else.
   const LENSES = [
     ['parts', '部品', 'by its parts'],
+    ['skip', 'SKIP', 'by its shape'],
     ['draw', '手書き', 'draw it'],
     ['reading', '音訓', 'by reading'],
     ['meaning', '意味', 'by meaning'],
@@ -7495,11 +7499,31 @@ function renderKanjidex(main) {
   }
   main.append(lensRow);
 
-  if (S.kdx.mode === 'draw') renderKdxDraw(main);
+  if (S.kdx.mode === 'skip') renderSkipLookup(main, { sessionKey: 'kanjidex' });
+  else if (S.kdx.mode === 'draw') renderKdxDraw(main);
   else if (S.kdx.mode === 'reading') renderKdxText(main, 'reading');
   else if (S.kdx.mode === 'meaning') renderKdxText(main, 'meaning');
   else if (S.kdx.mode === 'strokes') renderKdxStrokes(main);
   else renderKdxParts(main);
+}
+
+/** Shared SKIP grid + wheels. Search, 字引 and entry-code doors all use the
+ * ordinary kanji sheet, including the sidecar's wider KANJIDIC2 metadata. */
+function skipState() {
+  return (S.skipUi ||= window.BunkiSkipUI?.makeState() || { sessions: {} });
+}
+function renderSkipLookup(host, options = {}) {
+  if (!window.BunkiSkipUI) {
+    host.append(el('p', 'sem-empty', tx('SKIP を読み込めません。再読込してください。', 'SKIP is unavailable. Reload to try again.')));
+    return;
+  }
+  const lookupHost = el('div', 'skip-lookup-host');
+  host.append(lookupHost);
+  window.BunkiSkipUI.mount(lookupHost, {
+    state: skipState(), bilingual: bi(), radicals: D.radInfo,
+    ...options,
+    onOpen: (c, invoker) => go({ t: 'kanji', id: c, from: options.from }, { invoker }),
+  });
 }
 
 /** The shared results grid — every hit opens the same kanji entry. */
@@ -8817,6 +8841,7 @@ function renderGrammarNode(sheet, node) {
 
 /* ---------------------------------------------------------------- nodes */
 function nodeTitle(node) {
+  if (node.t === 'skip') return `SKIP ${node.id}`;
   if (node.t === 'word') return node.id;
   if (node.t === 'kanji') return node.id;
   if (node.t === 'radical') return node.id;
@@ -12669,8 +12694,31 @@ function confusablesFor(c) {
 }
 
 function renderKanjiNode(sheet, node) {
-  const k = D.kanji[node.id];
+  const k = D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
   if (!k) {
+    // A wider SKIP entry can survive in the learner's existing list across
+    // reloads. Reopen through this same sheet after lazy metadata resolves,
+    // not a dead-end just because the optional index has not been used yet.
+    if (window.BunkiSkipUI && !skipState().data) {
+      const pending = el('div', 'skip-entry-pending');
+      sheet.append(pending);
+      const load = () => {
+        pending.replaceChildren(el('p', 'skip-status', tx('漢字の項目を読み込み中…', 'Loading this kanji entry…')));
+        window.BunkiSkipUI.ensureData(skipState()).then(() => {
+          if (!pending.isConnected) return;
+          pending.replaceChildren();
+          renderKanjiNode(pending, node);
+        }).catch(() => {
+          if (!pending.isConnected) return;
+          const retry = el('button', 'skip-retry', tx('漢字の項目を再読込', 'Retry this kanji entry'));
+          retry.type = 'button';
+          retry.addEventListener('click', load);
+          pending.replaceChildren(el('p', 'skip-error', tx('項目を読み込めませんでした。', 'This entry could not load.')), retry);
+        });
+      };
+      load();
+      return;
+    }
     sheet.append(el('div', 'sem-empty', tx('この字はこの層にない。', 'This kanji is not in this layer.')));
     return;
   }
@@ -12685,9 +12733,19 @@ function renderKanjiNode(sheet, node) {
     chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `漢検 ${D.kanken[k.c].kk}`, 'kanken', D.kanken[k.c].kk, node.from));
   if (D.kmeta?.[k.c]?.jlpt)
     chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
+  window.BunkiSkipUI?.codeDoor(chips, {
+    state: skipState(), literal: k.c, bilingual: bi(),
+    // A nested lookup sheet preserves the originating sheet, reader context
+    // and Back discipline rather than discarding the walk for another room.
+    onLookup: (code, invoker) => go({ t: 'skip', id: code, from: node.from }, { invoker }),
+  });
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
+  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', tx(
+    'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
+    'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
+  )));
 
   const kv = el('dl', 'kv');
   const on = el('dd');
@@ -14526,6 +14584,11 @@ function renderSheet(root) {
   }
 
   if (node.t === 'word') renderWordNode(sheet, node);
+  else if (node.t === 'skip') {
+    const lookupHost = el('div', 'skip-sheet-lookup');
+    sheet.append(lookupHost);
+    renderSkipLookup(lookupHost, { query: node.id, sessionKey: `code:${node.id}`, from: node.from });
+  }
   else if (node.t === 'kanji') renderKanjiNode(sheet, node);
   else if (node.t === 'radical') renderRadicalNode(sheet, node);
   else if (node.t === 'idiom') renderIdiomNode(sheet, node);
@@ -15415,15 +15478,21 @@ function renderSearchPage(main) {
   });
   input.type = 'search';
   input.id = 'nav-search-input';
-  input.placeholder = tx('ことばをさがす', 'kanji · kana · romaji · English');
+  input.placeholder = tx('ことば・SKIP 1-3-8', 'kanji · kana · English · SKIP 1-3-8');
   input.setAttribute('aria-label', tx('検索', 'search'));
   input.autocomplete = 'off';
   const hint = el(
     'p',
     'search-page-hint',
-    tx('漢字・かな・ローマ字・英語 — 四つの戸、一つの箱。', 'One box, four doors — kanji, kana, romaji, or English.'),
+    tx('漢字・かな・ローマ字・英語、または SKIP コード（1-3-8、1-3、1-*-8）。', 'Kanji, kana, romaji or English — or a SKIP code: 1-3-8, 1-3, 1-*-8.'),
   );
   const results = el('div', 'search-page-results');
+  const skipOpener = el('button', 'skip-search-opener', tx('形から探す · SKIP ホイール', 'Find by shape · open SKIP wheel'));
+  skipOpener.type = 'button';
+  skipOpener.id = 'search-skip-opener';
+  skipOpener.dataset.entry = 'skip';
+  skipOpener.setAttribute('aria-controls', 'search-skip-results');
+  results.id = 'search-skip-results';
   const paint = () => {
     // the deep tier repaints these rows when its worker batch settles; if a
     // row holds focus at that moment (a restored session, or a keyboard
@@ -15432,7 +15501,25 @@ function renderSearchPage(main) {
     const focusIx = focusedRow && results.contains(focusedRow) ? focusedRow.dataset.ix : null;
     results.textContent = '';
     const q = input.value.trim();
+    const skipQuery = window.BunkiSkipUI?.parse(q);
+    const isSkip = skipQuery && skipQuery.kind !== 'text';
+    const showSkip = isSkip || (!!S.skipUi?.searchOpen && !q);
+    skipOpener.setAttribute('aria-expanded', String(!!showSkip));
+    skipOpener.textContent = showSkip
+      ? tx('SKIP を閉じる · ことばを探す', 'Close SKIP · search words')
+      : tx('形から探す · SKIP ホイール', 'Find by shape · open SKIP wheel');
     hint.hidden = !!q;
+    if (showSkip) {
+      renderSkipLookup(results, {
+        sessionKey: 'search', query: isSkip ? q : 'skip:1-*-*',
+        onQuery: (code) => {
+          input.value = code;
+          S.navQ = code;
+          hint.hidden = true;
+        },
+      });
+      return;
+    }
     if (!q) return;
     const hits = searchResults(q).slice(0, 24);
     if (!hits.length) {
@@ -15467,6 +15554,15 @@ function renderSearchPage(main) {
       (again || input).focus({ preventScroll: true });
     }
   };
+  skipOpener.addEventListener('click', () => {
+    const state = skipState();
+    const showing = skipOpener.getAttribute('aria-expanded') === 'true';
+    state.searchOpen = !showing;
+    input.value = showing ? '' : (state.sessions.search?.query || 'skip:1-*-*');
+    S.navQ = input.value;
+    paint();
+    if (showing) input.focus({ preventScroll: true });
+  });
   // The deep tier answers here too: the first touch opens the 70k index, and
   // when the worker's batch for the visible query settles, the same rows
   // repaint once — the field itself never loses focus.
@@ -15480,22 +15576,26 @@ function renderSearchPage(main) {
   input.addEventListener('focus', () => ensureDictionaryIndex().catch(() => {}), { once: true });
   input.addEventListener('input', () => {
     S.navQ = input.value; // the input node dies with every render; S carries it
-    if (input.value.trim()) ensureDictionaryIndex().catch(() => {});
+    if (input.value.trim() && window.BunkiSkipUI?.parse(input.value).kind !== 'text') skipState().searchOpen = true;
+    else {
+      if (S.skipUi) S.skipUi.searchOpen = false;
+      if (input.value.trim()) ensureDictionaryIndex().catch(() => {});
+    }
     paint();
   });
   input.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') {
-      const first = results.querySelector('.nav-search-row');
+      const first = results.querySelector('.nav-search-row, .skip-hit');
       if (first) first.click();
     }
   });
-  wrap.append(input, hint, results);
+  wrap.append(input, hint, skipOpener, results);
   // a surviving session repaints in place — same query, same rows
   if (S.navQ) {
     input.value = S.navQ;
-    if (S.navQ.trim()) ensureDictionaryIndex().catch(() => {});
+    if (S.navQ.trim() && (!window.BunkiSkipUI || window.BunkiSkipUI.parse(S.navQ).kind === 'text')) ensureDictionaryIndex().catch(() => {});
     paint();
-  }
+  } else paint();
   main.append(wrap);
   // an empty room hands over the pen — but never steals a focus the
   // re-render's own restore (or the sheet's manager) has already placed

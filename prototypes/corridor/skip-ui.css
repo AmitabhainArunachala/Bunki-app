@@ -1,0 +1,74 @@
+/* The same paper, ink and typography in all ten worlds. SKIP has no mastery
+ * palette. Its one band marks the current selection, never learner status. */
+.skip-ui {
+  width: 100%;
+  min-width: 0;
+  margin: 16px 0;
+  color: var(--ink);
+  font-family: var(--sans);
+}
+.skip-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.skip-title h2 { margin: 0; font: 400 19px/1.5 var(--serif); letter-spacing: .03em; }
+.skip-code { font: 500 20px/1.5 var(--sans); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+.skip-help, .skip-wheel-help { margin: 8px 0 12px; font-size: var(--t-chrome); color: var(--ink-2); line-height: 1.6; }
+.skip-result-count { margin: 0; font-size: var(--t-chrome); font-variant-numeric: tabular-nums; }
+.skip-alternates { display: flex; align-items: center; gap: 8px; min-height: var(--tap); font-size: var(--t-label); cursor: pointer; line-height: 1.5; }
+.skip-alternates input { width: 18px; height: 18px; accent-color: var(--ink); flex: 0 0 auto; }
+.skip-grid-viewport { height: 220px; overflow-y: auto; overscroll-behavior: contain; border-block: 1px solid var(--line); scrollbar-width: thin; }
+.skip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 0; padding-block: 4px; }
+.skip-hit { position: relative; display: flex; align-items: center; justify-content: center; flex-direction: column; min-width: 0; min-height: 54px; padding: 3px 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.skip-hit:hover { background: var(--ground-2); }
+.skip-hit-glyph { font: 29px/1.4 var(--serif); }
+.skip-hit-alt { font: var(--t-label)/1.1 var(--sans); color: var(--ink-2); }
+.skip-ui button:focus-visible, .skip-wheel:focus-visible, .skip-rules summary:focus-visible, .skip-code-door:focus-visible, .skip-search-opener:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.skip-more, .skip-retry, .skip-search-opener, .skip-code-door { min-height: var(--tap); border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-size: var(--t-chrome); padding: 8px 12px; cursor: pointer; border-radius: 4px; }
+.skip-more { width: 100%; border-inline: 0; border-bottom: 0; }
+.skip-search-opener { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; }
+.skip-search-opener[aria-expanded='true'] { background: var(--ground-2); }
+.skip-code-door { min-height: 32px; padding: 4px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.skip-code-door-wrap { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.skip-code-unavailable { color: var(--ink-2); font-size: var(--t-label); }
+.skip-wheels { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); margin-top: 16px; }
+.skip-wheel-column { min-width: 0; }
+.skip-wheel-column + .skip-wheel-column { border-left: 1px solid var(--line-soft); }
+.skip-wheel-label { height: 48px; display: flex; align-items: center; justify-content: center; padding: 4px; font-size: var(--t-label); text-align: center; color: var(--ink-2); line-height: 1.3; overflow-wrap: anywhere; }
+.skip-wheel { height: 220px; overflow-y: auto; overflow-x: hidden; padding-block: 88px; scroll-snap-type: y mandatory; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-y; position: relative; z-index: 1; }
+.skip-wheel::-webkit-scrollbar { display: none; }
+.skip-wheel-option { height: 44px; min-height: 44px; scroll-snap-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; color: var(--ink-2); font-variant-numeric: tabular-nums; font-size: 19px; user-select: none; }
+.skip-wheel-option[aria-selected='true'] { color: var(--ink); font-weight: 700; }
+.skip-wheel-option:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.skip-option-sub { font-size: var(--t-label); line-height: 1.15; max-width: 65px; }
+.skip-selection-band { position: absolute; inset-inline: 0; top: 136px; height: 44px; border-block: 1px solid var(--ink-2); background: color-mix(in srgb, var(--ink) 7%, transparent); pointer-events: none; z-index: 0; }
+.skip-symbol { position: relative; display: inline-flex; width: 22px; height: 22px; gap: 3px; flex: 0 0 22px; vertical-align: middle; }
+.skip-symbol i { display: block; border: 1.5px solid currentColor; }
+.skip-symbol-1 i { width: 10px; height: 22px; }
+.skip-symbol-2 { flex-direction: column; }
+.skip-symbol-2 i { width: 22px; height: 10px; }
+.skip-symbol-3 { border: 1.5px solid currentColor; padding: 4px; }
+.skip-symbol-3 i:first-child { width: 11px; height: 11px; }
+.skip-symbol-3 i:last-child { display: none; }
+.skip-symbol-4 { border: 1.5px solid currentColor; background: currentColor; }
+.skip-symbol-4 i { display: none; }
+.skip-rules { border-top: 1px solid var(--line); margin-top: 20px; font-size: var(--t-chrome); }
+.skip-rules summary { padding: 12px 0; min-height: var(--tap); cursor: pointer; color: var(--ink); }
+.skip-rules-body { line-height: 1.8; }
+.skip-rules-body p { margin: 8px 0 16px; }
+.skip-rule-patterns { list-style: none; padding: 0; margin: 8px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; }
+.skip-rule-patterns strong { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.skip-credits { font-size: var(--t-label); color: var(--ink-2); }
+.skip-credits a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.skip-error, .skip-empty, .skip-status { font-size: var(--t-chrome); color: var(--ink-2); padding: 16px 0; margin: 0; }
+.skip-fallback-note { font-size: var(--t-chrome); color: var(--ink-2); margin: 12px 0; }
+@media (max-width: 440px) {
+  /* Keep the full five-row wheel legible on a phone; the kanji grid has its
+   * own scroll and explicit paging, so it need not push the controls away. */
+  .skip-grid-viewport { height: 176px; }
+  .skip-wheel-option { gap: 4px; font-size: 17px; }
+  .skip-wheel-option:has(.skip-option-sub) { flex-wrap: wrap; align-content: center; row-gap: 0; }
+  .skip-option-sub { max-width: none; width: 100%; text-align: center; }
+  .skip-rule-patterns { grid-template-columns: 1fr; gap: 8px; }
+  .skip-title h2 { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skip-ui * { scroll-behavior: auto; }
+}
