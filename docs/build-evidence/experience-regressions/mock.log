@@ -1,0 +1,30 @@
+— 模試: the papers as data
+  ok   the catalog is schema 1 and names its law
+  ok   five papers per JLPT level ship, 25 in all  — 25 files
+  ok   every paper validates: schema, four distinct options, one right answer, rights carried  — 423 items
+  ok   no paper tests vocabulary above its own level (review round 7: the graded list numbers N5 as 5, so a raw comparison reads backwards)  — every subject within one rank of its paper
+  ok   every item subject resolves in the pinned dictionary — the fail-closed law holds in the data
+  ok   most items carry a subject, so a sitting leaves real evidence  — 404/423
+  ok   no shipped string predicts a pass  — clean
+  ok   the room writes mock rows and nothing else at grading time, each naming its question kind  — the one commit is score + typed rows carrying setId#type
+  ok   the room speaks the honesty constraint aloud
+
+— 模試の間: the room, in a real browser
+  ok   the room lists all 25 papers, each marked 検収前  — {"rows":25,"pending":25}
+  ok   the run persists the learner’s place, not the questions  — {"hasRun":true,"ix":0,"hasQuestions":69}
+  ok   mid-paper, no answer is marked right or wrong — the traditional posture
+  ok   the door re-enters the open paper, not the list
+  ok   a reload mid-paper resumes at the same question, unquarantined  — {"ix":1,"quarantined":false}
+  ok   a sat paper writes typed mock rows naming the paper AND the kind of question  — 17 rows
+  ok   the score is kept, and it is the score of THIS paper  — {"score":7,"total":18,"ts":1789375527689}
+  ok   sitting a paper moves NO schedule: no deck row, no FSRS card, no review row  — {"taken":0,"srs":0,"revlog":0} → taken 0 srs 0 revlog 0
+  ok   the result screen refuses to predict a pass — and says so in as many words  — disclaimer present, no claim
+  ok   the missed words are offered, never taken  — 間違えた言葉をぜんぶ覚える — 11 件memorize all 11 missed
+  ok   one press mints the missed words as ordinary started cards — and only then  — 0 → 11
+  ok   even adoption schedules nothing itself — FSRS stays the only scheduler
+  ok   mock rows and scores cross a reload whole — the validator admits them  — {"rows":17,"done":true,"quarantined":false}
+  ok   an unreachable catalog settles after one attempt instead of spinning  — 1 requests in the first seconds
+  ok   もう一度 is a deliberate second attempt — and only one  — 2 after one press
+  ok   no console or page errors across the 模試 walk  — clean
+
+25/25 checks passed · 423 items across 25 papers

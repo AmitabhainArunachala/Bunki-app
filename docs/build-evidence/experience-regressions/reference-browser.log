@@ -1,0 +1,51 @@
+PASS the reference door boots without console exceptions
+PASS jlpt:N5: complete count, first page, final page, correct final entry
+PASS jlpt:N4: complete count, first page, final page, correct final entry
+PASS jlpt:N3: complete count, first page, final page, correct final entry
+PASS jlpt:N2: complete count, first page, final page, correct final entry
+PASS jlpt:N1: complete count, first page, final page, correct final entry
+PASS jlpt:unknown: complete count, first page, final page, correct final entry
+PASS jlpt-kanji:N5: complete count, first page, final page, correct final entry
+PASS jlpt-kanji:N4: complete count, first page, final page, correct final entry
+PASS jlpt-kanji:N3: complete count, first page, final page, correct final entry
+PASS jlpt-kanji:N2: complete count, first page, final page, correct final entry
+PASS jlpt-kanji:N1: complete count, first page, final page, correct final entry
+PASS jlpt-kanji:unknown: complete count, first page, final page, correct final entry
+PASS kanken:10級: complete count, first page, final page, correct final entry
+PASS kanken:9級: complete count, first page, final page, correct final entry
+PASS kanken:8級: complete count, first page, final page, correct final entry
+PASS kanken:7級: complete count, first page, final page, correct final entry
+PASS kanken:6級: complete count, first page, final page, correct final entry
+PASS kanken:5級: complete count, first page, final page, correct final entry
+PASS kanken:4級: complete count, first page, final page, correct final entry
+PASS kanken:3級: complete count, first page, final page, correct final entry
+PASS kanken:準2級: complete count, first page, final page, correct final entry
+PASS kanken:2級: complete count, first page, final page, correct final entry
+PASS kanken:準1級: complete count, first page, final page, correct final entry
+PASS kanken:1/準1級: complete count, first page, final page, correct final entry
+PASS kanken:1級: complete count, first page, final page, correct final entry
+PASS kanken:配当外: complete count, first page, final page, correct final entry
+PASS kanken:unknown: complete count, first page, final page, correct final entry
+PASS N1 intermediate paging, jump, and bottom controls reach exact records
+PASS full-corpus search agrees with engine for "我"
+PASS full-corpus search agrees with engine for "water"
+PASS full-corpus search agrees with engine for "ｺﾝﾄﾛｰﾙ"
+PASS full-corpus search agrees with engine for "コントロール"
+PASS full-corpus search agrees with engine for "こんとろーる"
+PASS full-corpus search agrees with engine for "  "
+PASS full-corpus search agrees with engine for "<img src=x onerror=alert(1)>"
+PASS empty search state can clear and return keyboard focus
+PASS canonical entry close restores search, page, row focus, and scroll
+PASS supplemental and glyphless records open honest read-only source sheets
+PASS browse and detail navigation leave all personal-study evidence unchanged
+PASS 320px overview and N1 list have no horizontal overflow
+PASS 390px overview and N1 list have no horizontal overflow
+PASS 1280px overview and N1 list have no horizontal overflow
+PASS dark-world styling preserves the reference view and its controls
+PASS library Back, Mock papers, and My Study remain distinct destinations
+PASS missing reference module fails visibly without breaking the reading shelf
+PASS missing reference data can be retried without reloading or mutating study
+PASS standalone reference browsing works with every network request blocked
+PASS no uncaught application exceptions occurred
+
+49/49 reference browser checks passed.

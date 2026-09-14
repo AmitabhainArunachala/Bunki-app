@@ -1,0 +1,21 @@
+PASS library names the current room, exposes dictionary search, and starts without study debt
+PASS paged/sorted collection → canonical sheet → row restores page, sort, scroll and focus
+PASS word → kanji → component → family kanji walks back to the exact doors
+PASS expanded compounds survive recursion with their position and focus
+PASS canonical level chips open complete reference collections and return through browser Back
+PASS kanji Kentei and JLPT doors return to the same canonical kanji and filtered origin
+PASS sheet search → result → nested search returns in order to query, sheet and original collection
+PASS empty collection search can widen to dictionary and return without losing its filter
+PASS source sentence → real article → return restores sentence, word, library and focus
+PASS My Study and Mock papers return to the exact collection instead of the reading shelf
+PASS attested missing kanji readings display with provenance and continue into the writing room
+PASS read-only source records expose attested related forms and return without enrollment
+PASS language choice has group semantics and individually pressed buttons
+PASS all passive recursive browsing leaves enrollment and learning evidence unchanged
+PASS explicit Memorize updates shared My Study once, with no retrieval credit
+PASS 320px library, word and source-tag disclosure fit their viewport
+PASS 390px library, word and source-tag disclosure fit their viewport
+PASS 1280px library, word and source-tag disclosure fit their viewport
+PASS no uncaught application exceptions
+
+19/19 recursive connection checks passed.
