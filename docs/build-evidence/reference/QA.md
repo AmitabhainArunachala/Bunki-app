@@ -67,6 +67,23 @@ records, not proof of full official coverage ([official grade overview](https://
 Screenshots and machine-readable browser results are under `screenshots/`.
 Coverage and exact source counts are in `coverage.json`.
 
+## SKIP integration dry run
+
+The initial dry run identified adjacent insertion conflicts in the shared
+entry-title dispatcher, script/style links, and standalone styles. Reference
+insertions were moved without changing behavior; no SKIP code was copied into
+this feature branch.
+
+`git merge-tree --write-tree` then produced a conflict-free prospective tree
+with SKIP head `66e5a378`. A separate disposable worktree tested that tree:
+
+- Reference: 14/14 core, 49/49 browser, and 4/4 packaging checks.
+- SKIP: 19/19 core checks including pinned-archive parity, 41/41 browser
+  checks, and 3/3 packaging checks.
+
+This was a synthetic integration test only. Neither feature branch nor main
+was merged. Later changes to either branch can alter merge compatibility.
+
 ## Environment and limitations
 
 Local execution used Node 20.20.1 and real Chromium through Playwright. The

@@ -155,5 +155,6 @@ material. Physical iPhone Safari, native Japanese IME, and VoiceOver are not
 verified by the Chromium automation.
 
 The feature is prepared for review without merging. SKIP lookup remains a
-separate feature branch; shared packaging files may need integration when both
-are merged.
+separate feature branch. A conflict-free synthetic integration tree passed
+both features' browser, core, and packaging checks; neither branch nor main
+was merged.
