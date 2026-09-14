@@ -27,6 +27,10 @@ const SHELL = [
   'apple-touch-icon.png',
   'icon-192.png',
   'icon-512.png',
+  'reference-core.js',
+  'reference-ui.js',
+  'reference-ui.css',
+  'data/share_alike/reference-extra.json',
 ];
 
 self.addEventListener('install', (event) => {

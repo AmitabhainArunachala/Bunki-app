@@ -411,6 +411,9 @@ const S = {
    * its own, not a strip squeezed into the bar. searchFrom remembers the
    * view the door was opened from so Back returns there. Session-only. */
   searchFrom: null,
+  // Disposable detours, never learner evidence or scheduler state.
+  navigationReturns: [],
+  sheetReturnFocus: null,
   fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
    * survive the session, and the baseline is bare kanji with readings on
@@ -2221,7 +2224,7 @@ async function boot() {
     if (!res.ok) throw new Error(`data/articles/index.json → ${res.status}`);
     return res.json();
   };
-  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin] =
+  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin, referenceExtra] =
     await Promise.all([
       loadArticleIndex(),
       ...DATA.safe.map((n) => load('proprietary_safe', n)),
@@ -2229,6 +2232,12 @@ async function boot() {
       ...DATA.orig.map((n) => load('original', n)),
       bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
       bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
+      // Reference-only data never changes the teaching or study populations.
+      // A missing optional asset must not prevent the other rooms booting.
+      load('share_alike', 'reference-extra').catch((error) => {
+        referenceExtraError = error;
+        return null;
+      }),
     ]);
 
   // The shelf boots from a light index; each article's text + tokens live in
@@ -2255,6 +2264,7 @@ async function boot() {
   D.dictionarySearchErrors = new Map();
   D.strokes = strokes.strokes;
   D.kmeta = strokes.meta;
+  D.referenceExtra = referenceExtra;
   // the official radical (部首) table, keyed by Kangxi number 1–214; each kanji
   // record carries its `rad` number and looks its identity up here. A reverse
   // map (canonical glyph and positional variant → the row) lets a component
@@ -2546,6 +2556,7 @@ function keepScroll() {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
   else if (S.view === 'shelf') S.shelfScroll = window.scrollY;
   else if (S.view === 'archive') S.archiveScroll = window.scrollY;
+  else if (S.view === 'levels' && !S.stack.length) referenceLibrary?.keepScroll();
 }
 
 /** Hand the current view back the offset it walked away from. */
@@ -2553,6 +2564,7 @@ function returnScroll() {
   if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
   else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
   else if (S.view === 'archive') window.scrollTo(0, S.archiveScroll);
+  else if (S.view === 'levels') referenceLibrary?.returnScroll();
 }
 
 /* The reader remembers your place per article, surviving reloads — the
@@ -2577,8 +2589,75 @@ addEventListener(
   { passive: true },
 );
 
-function go(node, { invoker = null } = {}) {
+/** A sheet is rebuilt on each recursive step. Remember the actual door,
+ * not a DOM reference (nor a row number that async dictionary senses shift). */
+function sheetDoorKey(target, sheet = $('.sheet')) {
+  if (!target || !sheet?.contains(target)) return null;
+  if (target.id) return { id: target.id };
+  const signature = (item) => `${item.tagName}|${item.className}|${item.textContent}`;
+  const value = signature(target);
+  const matches = [...sheet.querySelectorAll('button, a, input, summary')].filter((item) => signature(item) === value);
+  return { value, index: matches.indexOf(target) };
+}
+function findSheetDoor(sheet, key) {
+  if (!key) return null;
+  if (key.id) return sheet.querySelector(`#${CSS.escape(key.id)}`);
+  return [...sheet.querySelectorAll('button, a, input, summary')].filter(
+    (item) => `${item.tagName}|${item.className}|${item.textContent}` === key.value,
+  )[key.index];
+}
+function rememberSheet(invoker = document.activeElement) {
+  const parent = S.stack.at(-1);
+  const sheet = $('.sheet');
+  if (!parent || !sheet) return;
+  parent.sheetScroll = sheet.scrollTop;
+  parent.returnFocus = sheetDoorKey(invoker, sheet);
+}
+
+/** Search and source reading are detours, not destructive replacements.
+ * A frame holds the same canonical nodes, with their exact place and origin. */
+function keepNavigationReturn(destination, invoker = document.activeElement) {
   keepScroll();
+  rememberSheet(invoker);
+  S.navigationReturns.push({
+    destination, view: S.view, stack: S.stack, dialogInvoker: S.dialogInvoker,
+    focus: invokerKey(invoker), scroll: window.scrollY,
+    passageId: S.passageId, readerScroll: S.readerScroll,
+    searchFrom: S.searchFrom, navQ: S.navQ,
+    referenceState: referenceLibrary ? { ...referenceLibrary.state } : null,
+  });
+  S.stack = [];
+  S.dialogInvoker = null;
+}
+function returnFromNavigation() {
+  const home = S.navigationReturns.at(-1);
+  if (!home || home.destination !== S.view) return false;
+  S.navigationReturns.pop();
+  if (home.referenceState && referenceLibrary) Object.assign(referenceLibrary.state, home.referenceState);
+  if (S.view === 'reader' && S.passageId) {
+    clearTimeout(readerPosTimer);
+    S.readerPos[S.passageId] = Math.round(window.scrollY);
+    saveStore(); // bookmark only; never retrieval evidence
+  }
+  Object.assign(S, {
+    view: home.view, stack: home.stack, dialogInvoker: home.dialogInvoker,
+    passageId: home.passageId, readerScroll: home.readerScroll,
+    searchFrom: home.searchFrom, navQ: home.navQ,
+    sheetReturnFocus: home.stack.at(-1)?.returnFocus || null,
+  });
+  render();
+  window.scrollTo(0, home.scroll);
+  if (!home.stack.length) {
+    S.dialogInvoker = home.focus;
+    restoreDialogInvoker();
+  }
+  return true;
+}
+
+function go(node, { invoker = null } = {}) {
+  if (node.t === 'kanji' && !node.referenceEntry) node.referenceEntry = referenceLibrary?.entry('kanji', node.id) || null;
+  keepScroll();
+  rememberSheet(invoker || document.activeElement);
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
@@ -2615,6 +2694,7 @@ function back() {
   }
   if (S.stack.length) {
     S.stack.pop();
+    S.sheetReturnFocus = S.stack.at(-1)?.returnFocus || null;
     render();
     if (!S.stack.length) {
       returnScroll();
@@ -2622,6 +2702,7 @@ function back() {
     }
     return;
   }
+  if (returnFromNavigation()) return;
   // inside a drift dive, back means SURFACE one level of the water first —
   // the same walk whether it arrives from the nav arrow or the device Back
   if (S.view === 'drift' && S.driftDepth > 0 && window.bunkiDriftSurface) {
@@ -2684,7 +2765,7 @@ function back() {
     S.navQ = '';
     S.view = typeof home === 'string' && home && home !== 'search' ? home : 'drift';
     render();
-    if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
+    returnScroll();
     return;
   }
   // a list page is only reachable from the tray (the リスト name-door), so
@@ -2694,6 +2775,8 @@ function back() {
     render();
     return;
   }
+  // Device Back and the chrome arrow walk list → overview → reading shelf.
+  if (S.view === 'levels' && referenceLibrary?.back()) return;
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
@@ -2753,6 +2836,7 @@ function dismissSheet() {
   }
   S.sheetScrollRestore = null;
   S.sheetFocus = null;
+  S.sheetReturnFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
   render();
@@ -3266,14 +3350,14 @@ function renderShelfBody() {
     : tx(`${curated.length} 本。触れてひらく。`, `${curated.length} real texts. Tap one to read it.`);
   main.append(sub);
 
-  // door order is the learner's order, not the build order: the lanes
-  // that teach first, then the reference books, then the tutor
+  // Reference is separate from lessons, mock papers, and My Study.
   const lanes = el('button', 'grammar-link');
   lanes.type = 'button';
   lanes.id = 'levels-link';
-  lanes.append(el('span', 'l-ja', '級で学ぶ'), el('span', 'en-sub', bi() ? 'JLPT · 漢検 lanes' : ''));
+  lanes.append(el('span', 'l-ja', '参考書庫'), el('span', 'en-sub', bi() ? 'Reference library · JLPT & Kanji Kentei' : 'JLPT・漢検'));
   lanes.addEventListener('click', () => {
     keepScroll();
+    referenceLibrary?.reset();
     S.view = 'levels';
     render();
     window.scrollTo(0, 0);
@@ -4219,6 +4303,14 @@ function renderReader(main) {
   if (!p) {
     S.view = 'shelf';
     return renderShelf(main);
+  }
+  const sourceReturn = S.navigationReturns.at(-1);
+  if (sourceReturn?.destination === 'reader' && sourceReturn.stack.length) {
+    const door = el('button', 'chip reference-source-return', tx('← 元の項目へ', '← Return to entry'));
+    door.type = 'button';
+    door.id = 'source-entry-return';
+    door.addEventListener('click', back);
+    main.append(door);
   }
   main.append(el('p', 'eyebrow', p.sourceLabel));
   // the reader was the one view in bi mode that dropped the English title —
@@ -5515,13 +5607,10 @@ function renderNoteDoor(main) {
   }
 }
 
-/* --------------------------------------------------- JLPT · 漢検 lanes
- * Training lanes over the layers the corridor already carries: JLPT words
- * from the dictionary's own levels, 漢検 kanji from the kanken table. Each
- * lane knows how much of it is already being memorized, opens its members
- * as ordinary entry sheets, and can hand the next twenty unmemorized items
- * to the tray — capture that becomes cards without labor.
- * N1 words are not in this layer yet; the lane says so instead of hiding. */
+/* --------------------------------------------------------- lesson lanes
+ * Keep lesson selection on its original dictionary-only population.
+ * The reference-only union (including N1 from D.words) lives in the
+ * reference controller below and must never expand these teaching lanes. */
 const JLPT_LANES = ['N5', 'N4', 'N3', 'N2', 'N1'];
 const KANKEN_LANES = ['10級', '9級', '8級', '7級', '6級', '5級', '4級', '3級', '準2級', '2級', '準1級', '1級'];
 let LANE_CACHE = null;
@@ -5535,63 +5624,6 @@ function laneMembers() {
   for (const l of KANKEN_LANES) kanken[l].sort();
   LANE_CACHE = { jlpt, kanken };
   return LANE_CACHE;
-}
-function renderLane(main, title, en, ids, t) {
-  const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
-  const mem = ids.filter((id) => takenSet.has(srsKey(t, id))).length;
-  const head = el('p', 'eyebrow list-head');
-  head.append(document.createTextNode(`${title} — ${ids.length}`));
-  if (bi()) head.append(el('span', 'en-inline', en));
-  main.append(head);
-  if (!ids.length) {
-    main.append(el('div', 'sem-empty', tx('この級の語はこの層にまだない。', 'Not in this layer yet.')));
-    return;
-  }
-  main.append(
-    el('p', 'card-kind', tx(`覚えている ${mem} / ${ids.length}`, `memorizing ${mem} of ${ids.length}`)),
-  );
-  // paper-dictionary chips: a kanji headword shows its reading; a kana
-  // headword would just repeat itself, so it shows its first sense instead
-  const hasKanji = (s) => [...s].some((c) => c >= '一' && c <= '鿿');
-  const label = (id) => {
-    if (t !== 'word') return D.kanji[id]?.m || '';
-    const rec = lookup(id);
-    if (!rec) return '';
-    return hasKanji(id) ? rec.r || '' : (rec.m && rec.m[0]) || '';
-  };
-  main.append(
-    chipsFor(
-      ids.slice(0, 18).map((id) => ({ label: id, sub: label(id) })),
-      (item) => go({ t, id: item.label }),
-      null,
-      t,
-    ),
-  );
-  if (ids.length > 18)
-    main.append(el('p', 'card-kind', tx(`ほか ${ids.length - 18} 件はページから`, `${ids.length - 18} more open from their pages`)));
-  const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));
-  if (fresh.length) {
-    const btn = biLabel(
-      'button',
-      'take',
-      `この級から ${Math.min(20, fresh.length)} 件を覚える`,
-      `memorize the next ${Math.min(20, fresh.length)}`,
-    );
-    btn.type = 'button';
-    btn.addEventListener('click', () => {
-      const kindRow = NODE_KIND[t];
-      // the twenty mint as ONE committed batch — the copy persists before
-      // the live deck sees any of them (P0-4)
-      const taken = [
-        ...S.taken,
-        ...fresh
-          .slice(0, 20)
-          .map((id) => ({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now(), started: Date.now() })),
-      ];
-      if (commitStorePatch({ taken })) render();
-    });
-    main.append(btn);
-  }
 }
 /* --------------------------------------------------------------- lessons
  * The Duolingo-class lane: small lessons cut from the JLPT word levels and
@@ -7145,14 +7177,218 @@ function renderAiSetup(main) {
   }
 }
 
+// This controller is deliberately outside S and saveStore's schema. Reload
+// returns to the normal front door; paging and searches never become evidence.
+let referenceLibrary = null;
+let referenceExtraError = null;
+let referenceExtraPending = false;
+
 function renderLevels(main) {
-  main.append(withEn(el('p', 'eyebrow', '級で学ぶ'), 'study by level', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('JLPT と 漢検', 'JLPT and 漢検 lanes')));
-  const lanes = laneMembers();
-  main.append(withEn(el('p', 'eyebrow', 'JLPT'), 'the five levels', 'en-inline'));
-  for (const l of JLPT_LANES) renderLane(main, l, `JLPT ${l}`, lanes.jlpt[l], 'word');
-  main.append(withEn(el('p', 'eyebrow', '漢検'), 'kanji kentei, 10級 → 1級', 'en-inline'));
-  for (const l of KANKEN_LANES) renderLane(main, `漢検 ${l}`, l, lanes.kanken[l], 'kanji');
+  if (!window.BunkiReferenceCore?.createCatalog || !window.BunkiReferenceUI?.create || !D.referenceExtra) {
+    main.append(el('h1', 'view-title', tx('参考書庫', 'Reference library')));
+    const message = el('p', 'sem-empty', tx(
+      '参考資料をひらけませんでした。他の部屋は引き続き使えます。再読み込みしてお試しください。',
+      'The reference library could not be opened. Other rooms still work. Reload to try again.',
+    ));
+    message.id = 'reference-unavailable';
+    message.setAttribute('role', 'status');
+    main.append(message);
+    const retry = biLabel('button', 'chip', '再試行', referenceExtraPending ? 'loading…' : 'try again');
+    retry.id = 'reference-retry';
+    retry.type = 'button';
+    retry.disabled = referenceExtraPending;
+    retry.addEventListener('click', async () => {
+      if (!window.BunkiReferenceCore?.createCatalog || !window.BunkiReferenceUI?.create) {
+        location.reload();
+        return;
+      }
+      referenceExtraPending = true;
+      render();
+      try {
+        const bundled = window.__CORRIDOR_BUNDLE__;
+        if (bundled) D.referenceExtra = bundled['share_alike/reference-extra'];
+        else {
+          const response = await fetch('data/share_alike/reference-extra.json');
+          if (!response.ok) throw new Error(`Reference data: ${response.status}`);
+          D.referenceExtra = await response.json();
+        }
+        referenceExtraError = null;
+      } catch (error) {
+        referenceExtraError = error;
+      } finally {
+        referenceExtraPending = false;
+        if (S.view === 'levels') render();
+      }
+    });
+    main.append(retry);
+    const exit = biLabel('button', 'chip', '← 本棚', '← Reading shelf');
+    exit.id = 'reference-back';
+    exit.type = 'button';
+    exit.addEventListener('click', back);
+    main.append(exit);
+    if (referenceExtraError) message.dataset.reason = 'reference-data-unavailable';
+    return;
+  }
+  if (!referenceLibrary) {
+    const catalog = window.BunkiReferenceCore.createCatalog({
+      dict: D.dict, words: D.words, kanji: D.kanji, kanken: D.kanken, kmeta: D.kmeta,
+      extra: D.referenceExtra,
+    });
+    referenceLibrary = window.BunkiReferenceUI.create({
+      catalog,
+      tx,
+      getTaken: () => S.taken,
+      onChange: render,
+      onExit: back,
+      getReturnLabel: () => {
+        const home = S.navigationReturns.at(-1);
+        return home?.destination === 'levels' && home.stack.length
+          ? `← ${nodeTitle(home.stack.at(-1))}` : null;
+      },
+      onStudy: () => {
+        keepNavigationReturn('tray');
+        S.view = 'tray';
+        render();
+        window.scrollTo(0, 0);
+      },
+      onSearch: (query) => {
+        openSearchPage();
+        S.navQ = query || '';
+        const input = document.getElementById('nav-search-input');
+        if (input) {
+          input.value = S.navQ;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      },
+      onMock: () => {
+        keepNavigationReturn('mock');
+        S.view = 'mock';
+        render();
+        window.scrollTo(0, 0);
+      },
+      onOpen: openReferenceEntry,
+    });
+  }
+  referenceLibrary.render(main);
+}
+
+/** Extended source records can be consulted without inventing missing study
+ * metadata. They use the same accessible sheet, but no misleading capture.
+ * Canonical word/kanji records still use their full existing entry sheets. */
+function openReferenceEntry(entry, invoker) {
+  const canonical = entry.type === 'word'
+    ? !!(D.dict[entry.id] || D.words[entry.id]) : !!D.kanji[entry.id];
+  go({ t: canonical ? entry.type : 'reference', id: entry.id, referenceEntry: entry }, { invoker });
+}
+
+/** Display-only enrichment. Canonical facts and scheduling records are never
+ * overwritten; only an empty display field can borrow attested source data. */
+function kanjiDisplayRecord(id, reference = null) {
+  const canonical = D.kanji[id];
+  if (!canonical) return canonical;
+  const entry = reference || referenceLibrary?.entry('kanji', id);
+  if (!entry) return canonical;
+  return {
+    ...canonical,
+    on: canonical.on?.length ? canonical.on : entry.on || [],
+    kun: canonical.kun?.length ? canonical.kun : entry.kun || [],
+    m: canonical.m || entry.meanings?.join('; ') || '',
+    st: canonical.st ?? entry.strokeCount,
+  };
+}
+function renderReferenceMetadata(container, entry) {
+  const grouped = new Map();
+  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), strokeCount: tx('画数', 'stroke count') };
+  for (const [field, credit] of Object.entries(entry.metadataSources || {})) {
+    if (credit.source === 'kanji' || credit.source === 'kmeta') continue;
+    const source = `${credit.source} · ${credit.sourceId}`;
+    if (!grouped.has(source)) grouped.set(source, []);
+    grouped.get(source).push(labels[field] || field);
+  }
+  for (const [source, fields] of grouped) container.append(el('p', 'sense-pos', `${fields.join('・')} · ${source}`));
+}
+
+function renderReferenceConnections(sheet, entry) {
+  const doors = [];
+  for (const link of entry.kanjiLinks || []) {
+    const target = referenceLibrary?.entry('kanji', link.id);
+    if (target && target.id !== entry.id) doors.push({ target, label: link.id, sub: tx('この語の漢字', 'kanji in this word') });
+  }
+  for (const link of entry.relatedForms || []) {
+    const target = referenceLibrary?.entry('kanji', link.id);
+    if (target && target.id !== entry.id) doors.push({ target, label: link.glyph || link.sourceId, sub: `${link.form || ''} · ${link.sourceId}` });
+  }
+  if (!doors.length) return;
+  if (entry.identityCollision) sheet.append(el('p', 'note', tx('この字形には複数の資料上のグループがあります。下の字形は資料の関連記録で、互換性を意味しません。', 'This glyph belongs to multiple source groups. Related forms below are recorded source relationships, not a claim that the characters are interchangeable.')));
+  sheet.append(withEn(el('p', 'eyebrow', '資料内のつながり'), 'source-backed connections', 'en-inline'));
+  const rows = el('div', 'entry-rows reference-related');
+  const seen = new Set();
+  for (const { target, label, sub } of doors) {
+    if (seen.has(target.id)) continue;
+    seen.add(target.id);
+    const row = el('button', 'entry-row');
+    row.type = 'button';
+    row.dataset.referenceRelated = target.id;
+    row.append(el('span', 'row-glyph', label), el('span', 'row-main', sub), el('span', 'row-go', '›'));
+    row.addEventListener('click', () => openReferenceEntry(target, row));
+    rows.append(row);
+  }
+  sheet.append(rows);
+}
+
+function openReferenceCollection(collectionId) {
+  keepNavigationReturn('levels');
+  S.view = 'levels';
+  render(); // initialize the shared controller, or show its honest retry state
+  if (!referenceLibrary?.open(collectionId)) window.scrollTo(0, 0);
+}
+function referenceCollectionChip(label, collectionId) {
+  const chip = el('button', 'pool-tag cat-chip', label);
+  chip.type = 'button';
+  chip.dataset.referenceDoor = collectionId;
+  chip.setAttribute('aria-label', tx(`${label} の参考書庫をひらく`, `open ${label} in the reference library`));
+  chip.addEventListener('click', () => openReferenceCollection(collectionId));
+  return chip;
+}
+
+function renderReferenceNode(sheet, node) {
+  const entry = node.referenceEntry;
+  sheet.append(withEn(el('p', 'eyebrow', '収録資料の項目'), 'reference-only source record', 'en-inline'));
+  sheet.append(el('h2', 'headword', entry.missingGlyph
+    ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`)
+    : entry.text || entry.id));
+  sheet.append(el('p', 'reading', entry.readings?.length
+    ? entry.readings.join('・')
+    : entry.reading || tx('読み未収録', 'Reading not supplied')));
+  sheet.append(el('p', 'gloss', entry.meanings?.length
+    ? entry.meanings.join('; ')
+    : tx('意味未収録', 'Meaning not supplied')));
+  if (entry.type === 'kanji') {
+    const readings = el('dl', 'kv');
+    readings.append(el('dt', null, '音読み'), el('dd', null, entry.on?.join('・') || tx('未収録', 'Not supplied')), el('dt', null, '訓読み'), el('dd', null, entry.kun?.join('・') || tx('未収録', 'Not supplied')));
+    sheet.append(readings);
+    if (entry.strokeCount != null) sheet.append(el('p', 'sense-pos', tx(`${entry.strokeCount} 画`, `${entry.strokeCount} strokes`)));
+  }
+  renderReferenceMetadata(sheet, entry);
+  renderReferenceConnections(sheet, entry);
+  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${source.level}`).join(' · ')));
+  for (const source of entry.sourceRecords || []) {
+    const info = el('p', 'sense-pos', `${source.sourceId} · ${source.form || ''} · ${source.level || ''}`);
+    // Consult the source only on an explicit link. No glyph images or
+    // dictionaries are fetched in the reference browsing path.
+    if (source.url && /^https:\/\//.test(source.url)) {
+      const link = el('a', null, tx(' 出典の項目を開く', ' Open source record'));
+      link.href = source.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      info.append(link);
+    }
+    sheet.append(info);
+  }
+  sheet.append(el('p', 'note', tx(
+    'この項目は参考資料にはありますが、学習用の項目データは未収録です。My Study への登録はまだできません。読み・意味などの未収録情報は推測で補っていません。',
+    'This source record is available for reference, but its study-entry data is not bundled. It cannot yet be added to My Study. Missing readings or meanings have not been guessed.',
+  )));
 }
 
 /* ------------------------------------------------------------ 四字熟語
@@ -8588,6 +8824,7 @@ function nodeTitle(node) {
   if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'catalog') return catalogLabel(node.by, node.value);
+  if (node.t === 'reference') return node.referenceEntry?.text || node.id;
   // the crumb idiom for a content-shaped node: 日本語 first, english beside
   // it — never a stray lowercase 'sentence' standing alone mid-crumb
   if (node.t === 'sent') return tx('文', '文 sentence');
@@ -8626,8 +8863,20 @@ function renderSentenceNode(sheet, node) {
     door.type = 'button';
     door.id = 'sent-home';
     door.addEventListener('click', () => {
-      dismissSheet();
+      const article = D.passages.find((p) => p.id === home);
+      const tokenIndex = article?.tokens?.indexOf(node.tokens.find((token) => token.c)) ?? -1;
+      keepNavigationReturn('reader', door);
       openPassage(home);
+      // Only a real token identity supplies a position; bank examples and
+      // missing positions never acquire a guessed source anchor.
+      if (tokenIndex >= 0) requestAnimationFrame(() => {
+        if (S.view !== 'reader' || S.passageId !== home) return;
+        const token = document.querySelector(`#reader .tok[data-index="${tokenIndex}"]`);
+        token?.scrollIntoView({ block: 'center' });
+        const reader = document.getElementById('reader');
+        if (reader) { reader.tabIndex = -1; reader.focus({ preventScroll: true }); }
+        S.readerScroll = window.scrollY;
+      });
     });
     doorRow.append(door);
     sheet.append(doorRow);
@@ -8692,6 +8941,10 @@ function catalogMatch(by, value) {
 }
 /** A tappable chip that opens the catalog for its category. */
 function catalogChip(ja, en, by, value, from) {
+  // Level categories share one exhaustive collection; other categories
+  // retain their existing canonical catalog (for example stroke count).
+  if (by === 'kanken') return referenceCollectionChip(ja, `kanken:${value}`);
+  if (by === 'jlpt') return referenceCollectionChip(ja, `jlpt-kanji:${value}`);
   const chip = el('button', 'pool-tag cat-chip', bi() && en ? en : ja);
   chip.type = 'button';
   chip.setAttribute('aria-label', tx(`${ja} の漢字をすべて見る`, `see every ${en} kanji`));
@@ -12194,7 +12447,8 @@ function renderWordNode(sheet, node) {
   const jlpt = rec?.jlpt || (legacy?.jlpt ? `N${legacy.jlpt}` : null);
   if (jlpt) {
     const meta = el('div', 'shelf-meta');
-    meta.append(el('span', 'pool-tag', `JLPT ${String(jlpt).replace(/^N?/, 'N')}`));
+    const level = String(jlpt).replace(/^N?/, 'N');
+    meta.append(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
     sheet.append(meta);
   }
   renderConjugation(sheet, node.id, rec?.p);
@@ -12423,7 +12677,8 @@ function renderKanjiNode(sheet, node) {
   const hero = el('div', 'hero');
   hero.append(el('div', 'hero-glyph', k.c));
   const meta = el('div', 'hero-meta');
-  meta.append(el('div', 'hero-mean', k.m));
+  const display = kanjiDisplayRecord(node.id, node.referenceEntry) || k;
+  meta.append(el('div', 'hero-mean', display.m));
   const chips = el('div', 'shelf-meta');
   chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk)
@@ -12436,10 +12691,10 @@ function renderKanjiNode(sheet, node) {
 
   const kv = el('dl', 'kv');
   const on = el('dd');
-  on.append(el('span', 'on', k.on.join('・') || '—'));
+  on.append(el('span', 'on', display.on.join('・') || '—'));
   kv.append(withEn(el('dt', null, '音'), 'on'), on);
   const kun = el('dd');
-  kun.append(el('span', 'on', k.kun.join('・') || '—'));
+  kun.append(el('span', 'on', display.kun.join('・') || '—'));
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
@@ -12496,6 +12751,7 @@ function renderKanjiNode(sheet, node) {
       const row = el('button', 'entry-row');
       row.type = 'button';
       row.append(el('span', 'row-glyph', c));
+      row.dataset.component = c;
       row.append(el('span', 'row-main', componentLabel(c)));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }));
@@ -12528,14 +12784,15 @@ function renderKanjiNode(sheet, node) {
       return row;
     };
     const FIRST = 24;
-    for (const w of words.slice(0, FIRST)) rows.append(makeRow(w));
+    for (const w of (node.compoundsExpanded ? words : words.slice(0, FIRST))) rows.append(makeRow(w));
     sheet.append(rows);
-    if (words.length > FIRST) {
+    if (words.length > FIRST && !node.compoundsExpanded) {
       const more = el('button', 'more-row');
       more.type = 'button';
       const remain = words.length - FIRST;
       more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${words.length} — ${remain} more`);
       more.addEventListener('click', () => {
+        node.compoundsExpanded = true;
         for (const w of words.slice(FIRST)) rows.append(makeRow(w));
         more.remove();
       });
@@ -13535,7 +13792,7 @@ function renderStrokePage(root) {
     stopInkRoom(); // the page is gone however it left — never orphan an engine
     return;
   }
-  const k = D.kanji[st.id];
+  const k = kanjiDisplayRecord(st.id, S.stack.findLast((node) => node.t === 'kanji' && node.id === st.id)?.referenceEntry);
   const paths = strokePathsFor(st.id);
   const reduced = strokeReduced();
 
@@ -14207,16 +14464,8 @@ function renderSheet(root) {
   sheetSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
   sheetSearch.innerHTML =
     SEARCH_SVG;
-  sheetSearch.addEventListener('click', () => {
-    // this door leaves THROUGH the search room: there is no invoker to
-    // restore to. Without the null, dismissSheet's restoreDialogInvoker
-    // rAF fires a frame after openSearchPage's synchronous input focus and
-    // hands focus to the stale result row — iOS drops the just-raised
-    // keyboard, and the one-tap-to-type door needs a second tap
-    S.dialogInvoker = null;
-    dismissSheet();
-    openSearchPage();
-  });
+  sheetSearch.addEventListener('click', () => openSearchPage());
+
   bar.append(sheetSearch);
   // 覚 top-right on EVERY capturable sheet (operator directive §3: one
   // button, top right corner, on every screen). The sentence page captures
@@ -14266,6 +14515,15 @@ function renderSheet(root) {
   });
   bar.append(closeBtn);
   sheet.append(bar);
+  if (S.view === 'levels' && referenceLibrary) {
+    const path = el('div', 'reference-sheet-context');
+    const returnDoor = el('button', 'reference-sheet-return', `← ${referenceLibrary.locationName()}`);
+    returnDoor.type = 'button';
+    returnDoor.id = 'sheet-reference-return';
+    returnDoor.addEventListener('click', dismissSheet);
+    path.append(returnDoor);
+    sheet.append(path);
+  }
 
   if (node.t === 'word') renderWordNode(sheet, node);
   else if (node.t === 'kanji') renderKanjiNode(sheet, node);
@@ -14275,6 +14533,21 @@ function renderSheet(root) {
   else if (node.t === 'particle') renderParticleNode(sheet, node);
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
+  else if (node.t === 'reference') renderReferenceNode(sheet, node);
+  if (node.t !== 'reference' && node.referenceEntry?.levelSources?.length) {
+    const notes = el('details', 'reference-entry-provenance');
+    const summary = el('summary', null, tx('この項目の資料・級タグ', 'Sources & level tags for this entry'));
+    notes.append(summary);
+    for (const source of node.referenceEntry.levelSources) {
+      notes.append(el('p', null, `${source.source}: ${source.level}`));
+    }
+    renderReferenceMetadata(notes, node.referenceEntry);
+    notes.append(el('p', null, tx('収録資料によるタグです。公式の出題一覧や習得状況ではありません。', 'Bundled-source tags, not an official exam syllabus or mastery evidence.')));
+    notes.open = !!node.referenceNotesOpen;
+    notes.addEventListener('toggle', () => { if (notes.isConnected) node.referenceNotesOpen = notes.open; });
+    sheet.append(notes);
+  }
+  if (node.t === 'kanji' && node.referenceEntry) renderReferenceConnections(sheet, node.referenceEntry);
   renderEncounterTrail(sheet, node);
   // reading position survives the doors: the sheet remembers where each
   // stack entry was scrolled and restores it when that entry returns —
@@ -14287,7 +14560,10 @@ function renderSheet(root) {
     },
     { passive: true },
   );
-  if (node.sheetScroll) requestAnimationFrame(() => (sheet.scrollTop = node.sheetScroll));
+  const savedSheetScroll = node.sheetScroll || 0;
+  if (savedSheetScroll) requestAnimationFrame(() => {
+    if (sheet.isConnected) sheet.scrollTop = savedSheetScroll;
+  });
   sheet.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -14325,9 +14601,11 @@ function renderSheet(root) {
 
   if (S.strokes) return; // the stroke page above owns focus
   const focusId = S.sheetFocus;
+  const returnFocus = S.sheetReturnFocus;
   S.sheetFocus = null;
+  S.sheetReturnFocus = null;
   queueMicrotask(() => {
-    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || backBtn;
+    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || findSheetDoor(sheet, returnFocus) || backBtn;
     target.focus({ preventScroll: true });
   });
 }
@@ -15097,11 +15375,18 @@ function buildLangSlider() {
  * (which would drop focus), and S.navQ carries the session so a result
  * round-trip returns to the query, the rows, and the row that was left. */
 function openSearchPage() {
-  S.searchFrom = S.view;
+  if (S.view === 'search' && !S.stack.length) {
+    document.getElementById('nav-search-input')?.focus();
+    return;
+  }
+  const from = S.view;
+  keepNavigationReturn('search');
+  S.searchFrom = from;
   S.navOpen = false;
   keepScroll();
   S.view = 'search';
   render();
+  window.scrollTo(0, 0);
   // Focus SYNCHRONOUSLY, inside the tap's own call stack: iOS only raises
   // the keyboard for a focus it can trace to the finger. The rAF fallback
   // below (renderSearchPage) keeps covering restored sessions.
@@ -15116,6 +15401,18 @@ function renderSearchPage(main) {
   main.append(withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
   const wrap = el('div', 'search-page');
   const input = el('input', 'nav-search-input search-page-input');
+  // Guard native Enter before the result-specific listener below. Keeping
+  // activation separate lets optional search result types use that listener
+  // without reintroducing a click on the newly focused sheet's Back button.
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter') return;
+    if (ev.isComposing) {
+      ev.stopImmediatePropagation();
+      return;
+    }
+    ev.preventDefault();
+    ev.stopPropagation();
+  });
   input.type = 'search';
   input.id = 'nav-search-input';
   input.placeholder = tx('ことばをさがす', 'kanji · kana · romaji · English');
@@ -15424,7 +15721,7 @@ function render() {
   if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読み探査', 'yomi probe'));
   if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
-  if (S.view === 'levels') parts.push(tx('級', 'levels'));
+  if (S.view === 'levels') parts.push(tx('参考書庫', 'reference library'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
   if (S.view === 'mock') parts.push(tx('模試', 'mock papers'));
@@ -15435,7 +15732,10 @@ function render() {
   if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
   for (const node of S.stack) parts.push(nodeTitle(node));
-  crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
+  crumb.title = parts.join(' › ');
+  crumb.setAttribute('aria-label', crumb.title);
+  crumb.append(el('b', null, parts.at(-1) || ''));
+  crumb.dataset.currentRoom = S.view;
   chrome.append(crumb);
 
   // the search door — on EVERY surface, one tap from hearing a word to
@@ -15448,7 +15748,6 @@ function render() {
     quickSearch.innerHTML =
       SEARCH_SVG;
     quickSearch.addEventListener('click', () => {
-      S.stack = [];
       openSearchPage();
     });
     chrome.append(quickSearch);
@@ -15464,7 +15763,8 @@ function render() {
 
   const langSeg = el('div', 'lang-seg');
   langSeg.id = 'lang';
-  langSeg.setAttribute('aria-pressed', String(bi()));
+  langSeg.setAttribute('role', 'group');
+  langSeg.setAttribute('aria-label', tx('表示言語', 'Interface language'));
   for (const [id, label] of [
     ['bi', 'EN'],
     ['ja', '日本語'],

@@ -1,0 +1,36 @@
+{
+  "environment": {
+    "node": "v20.20.1",
+    "platform": "linux",
+    "architecture": "x64",
+    "method": "Same sandbox, separate VM contexts, 1 cold build + 7 warm builds; explicit GC before each measured build. Parsing separate. Not a mobile/browser benchmark."
+  },
+  "before": {
+    "rawBytes": 939004,
+    "gzipBytes": 163065,
+    "coldCatalogMs": 1458.47,
+    "medianWarmCatalogMs": 1617.2,
+    "maxWarmCatalogMs": 1669.41,
+    "medianSidecarParseMs": 6.94,
+    "lastRetainedHeapBytes": 42155176,
+    "referenceNodes": 31361
+  },
+  "after": {
+    "rawBytes": 3032827,
+    "gzipBytes": 792278,
+    "coldCatalogMs": 1207.67,
+    "medianWarmCatalogMs": 838.04,
+    "maxWarmCatalogMs": 1146.53,
+    "medianSidecarParseMs": 21.27,
+    "lastRetainedHeapBytes": 70263344,
+    "referenceNodes": 31361
+  },
+  "graph": {
+    "rawBytes": 10400660,
+    "deployment": "Build evidence under docs only, not a runtime asset."
+  },
+  "delta": {
+    "rawBytes": 2093823,
+    "gzipBytes": 629213
+  }
+}

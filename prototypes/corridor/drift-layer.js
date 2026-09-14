@@ -2094,9 +2094,9 @@ function cueRetire(){
 }
 
 // ---- radical explainer ----
-const radoc=document.getElementById("radoc");radoc.inert=true;
-function openRadoc(){ radoc.inert=false; radoc.classList.add("open"); }
-function closeRadoc(){ radoc.classList.remove("open"); radoc.inert=true; }
+const radoc=document.getElementById("radoc");let radocReturnFocus=null;radoc.inert=true;radoc.hidden=true;radoc.setAttribute("aria-hidden","true");radoc.setAttribute("role","dialog");radoc.setAttribute("aria-label","部首 — radicals");radoc.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeRadoc();}});
+function openRadoc(){ radocReturnFocus=document.activeElement;radoc.hidden=false;radoc.inert=false;radoc.setAttribute("aria-hidden","false");radoc.classList.add("open");document.getElementById("radocX").focus(); }
+function closeRadoc(){ radoc.classList.remove("open");radoc.inert=true;radoc.hidden=true;radoc.setAttribute("aria-hidden","true");if(radocReturnFocus?.isConnected)radocReturnFocus.focus();radocReturnFocus=null; }
 document.getElementById("radocX").addEventListener("click",closeRadoc);
 radoc.addEventListener("click",e=>{ if(e.target===radoc) closeRadoc(); });
 addEventListener("keydown",e=>{ if(DRIFT_ON&&e.key==="Escape") closeRadoc(); });
@@ -3074,10 +3074,6 @@ window.__DRIFT__ = {
   },
   hide() {
     DRIFT_ON = false;
-    // a long-press armed before the layer sleeps must not fire into the
-    // dark: pointerup early-returns while !DRIFT_ON, so nothing else
-    // clears the timer and constellationLock would run on a hidden layer
-    clearTimeout(lpTimer);
     document.getElementById('drift-layer').classList.remove('active');
   },
   // the corridor drives the shared nihonga world from its chrome seal; the

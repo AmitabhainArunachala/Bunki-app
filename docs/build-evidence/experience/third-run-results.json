@@ -1,0 +1,860 @@
+{
+  "started": "2026-09-14T08:39:27.845Z",
+  "root": "/home/user/workspace/Bunki-reference/prototypes/corridor",
+  "method": "One clean primary context; normal Playwright input only. Read-only evaluate for evidence. No state staging. No fake HTTP responses.",
+  "checks": [
+    {
+      "id": "E01-clean",
+      "status": "pass",
+      "expected": "Primary starts with zero saved, scheduled or reviewed items",
+      "observed": "Clean actual app, no init scripts or staged store"
+    },
+    {
+      "id": "E02-neighbor",
+      "status": "pass",
+      "expected": "Semantic-neighbor result opens full entry",
+      "observed": "見解"
+    },
+    {
+      "id": "E02-literal",
+      "status": "pass",
+      "expected": "Search treats markup-looking text literally",
+      "observed": "戻る\nback\nbookshelf\n藍\nEN\n日本語\n覚 0\nlists\n\n回廊 · 図書館kairo · the library\n\nNothing found for that yet."
+    },
+    {
+      "id": "E03-browse-no-debt",
+      "status": "pass",
+      "expected": "Recursive browsing does not enroll or grade",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E04-writing",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('.stroke-chrome-trigger').first()\n    - locator resolved to <button type=\"button\" aria-expanded=\"false\" aria-label=\"show controls\" class=\"stroke-chrome-trigger\" aria-controls=\"stroke-awake-field\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n    - performing click action\n"
+    },
+    {
+      "id": "E06-pre-capture-no-debt",
+      "status": "pass",
+      "expected": "Passive reading/lookups create no review debt",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E06-explicit-enrollment-label",
+      "status": "pass",
+      "expected": "The chosen take control explicitly says memorize, not an innocent save",
+      "observed": "User explicitly chose memorize. Current app has no separate save-only door on this sheet."
+    },
+    {
+      "id": "E06-enrollment",
+      "status": "pass",
+      "expected": "Only explicit memorize adds one learning item; no retrieval grade is fabricated",
+      "observed": "One explicitly memorized item: 朝; started=true; no FSRS grade yet"
+    },
+    {
+      "id": "E07-study-visible",
+      "status": "pass",
+      "expected": "Study reflects exactly the chosen item",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-list-empty-validation",
+      "status": "pass",
+      "expected": "Empty list name rejected without creating a list",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-list-create",
+      "status": "pass",
+      "expected": "Normal typed list creation persists an empty named list",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-list-cancel",
+      "status": "pass",
+      "expected": "Escape cancels rename without saving typed draft",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-study-review",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('.review-summary') to be visible\n"
+    },
+    {
+      "id": "E08-lesson",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#lessons-link').first()\n"
+    },
+    {
+      "id": "E09-mock",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#mock-link').first()\n"
+    },
+    {
+      "id": "E10-reference",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#levels-link').first()\n"
+    },
+    {
+      "id": "E11-additional-rooms",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#grammar-link').first()\n"
+    },
+    {
+      "id": "E16-settings",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#theme-seal').first()\n"
+    },
+    {
+      "id": "E17-tutor-offline",
+      "status": "fail",
+      "expected": "Journey segment completes through actual UI",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#ai-link').first()\n"
+    },
+    {
+      "id": "E20-no-page-errors",
+      "status": "pass",
+      "expected": "No uncaught JavaScript errors during whole journey",
+      "observed": "No uncaught page exceptions"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "screenshots/20260914083927-01-drift-clean.png",
+      "name": "drift-clean",
+      "expected": "Fresh default landing with discoverable navigation",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "drift",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-02-drift-navigation.png",
+      "name": "drift-navigation",
+      "expected": "Expanded normal navigation reveals shelf door",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "drift",
+      "focus": {
+        "id": "ginga-symbol",
+        "tag": "BUTTON",
+        "text": ""
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-03-shelf-mobile.png",
+      "name": "shelf-mobile",
+      "expected": "Bilingual shelf doors and real texts are legible at 390px",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-04-search-synonyms.png",
+      "name": "search-synonyms",
+      "expected": "Word hits plus semantic neighbors",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "search",
+        "tag": "INPUT",
+        "text": ""
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-05-search-literal-empty.png",
+      "name": "search-literal-empty",
+      "expected": "Malformed-looking input is harmless literal text with honest no-results feedback",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "search",
+        "tag": "INPUT",
+        "text": ""
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-06-word-entry.png",
+      "name": "word-entry",
+      "expected": "Correct 森林 full entry, readings, kanji and semantic/provenance content",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-07-kanji-mori.png",
+      "name": "kanji-mori",
+      "expected": "森 kanji detail includes readings, components and compounds",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-08-component-hayashi.png",
+      "name": "component-hayashi",
+      "expected": "A component is a traversable node, not a dead label",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-09-component-to-kanji.png",
+      "name": "component-to-kanji",
+      "expected": "Containing-kanji door returns to canonical kanji detail",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-10-kanji-to-compound.png",
+      "name": "kanji-to-compound",
+      "expected": "A compound reopens full word entry through the same sheet",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-11-writing-dormant.png",
+      "name": "writing-dormant",
+      "expected": "Current writing room, live glyph, usable return; constitutional/control policy mismatch recorded separately",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "stroke-page",
+        "tag": "DIV",
+        "text": "Use the browser or device Back command to leave the writing "
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-12-failure-E04-writing.png",
+      "name": "failure-E04-writing",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('.stroke-chrome-trigger').first()\n    - locator resolved to <button type=\"button\" aria-expanded=\"false\" aria-label=\"show controls\" class=\"stroke-chrome-trigger\" aria-controls=\"stroke-awake-field\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n    - performing click action\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": ""
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-13-shelf-source-details.png",
+      "name": "shelf-source-details",
+      "expected": "Source and difficulty detail disclosure stays distinct from mastery",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 25,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-14-reader-initial.png",
+      "name": "reader-initial",
+      "expected": "Actual Japanese text, reading controls, and clear return",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-15-reader-settings.png",
+      "name": "reader-settings",
+      "expected": "Independent kanji, furigana and spacing settings all accept deliberate input",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-16-reader-reading-rung.png",
+      "name": "reader-reading-rung",
+      "expected": "First activation reveals reading without opening full entry",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "朝あさ"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-17-reader-gloss-rung.png",
+      "name": "reader-gloss-rung",
+      "expected": "Second activation reveals meaning without taking over the reading",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "朝あさmorning"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-18-reader-explicit-memorize.png",
+      "name": "reader-explicit-memorize",
+      "expected": "Chosen word is visibly marked memorizing and offers list filing",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-19-reader-resumed.png",
+      "name": "reader-resumed",
+      "expected": "Reader context and learner mark remain after entry close",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 350,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "朝あさmorning"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-20-my-study-enrolled.png",
+      "name": "my-study-enrolled",
+      "expected": "My Study shows the one explicitly memorized item and review availability",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "tray",
+      "focus": {
+        "id": "tray",
+        "tag": "BUTTON",
+        "text": "覚 1lists"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-21-my-study-list-created.png",
+      "name": "my-study-list-created",
+      "expected": "Named list created, rename canceled safely",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "tray",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-22-review-recall.png",
+      "name": "review-recall",
+      "expected": "Review asks learner for honest recall before revealing the answer",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-23-review-revealed-grade.png",
+      "name": "review-revealed-grade",
+      "expected": "Answer and explicit grade control precede FSRS scheduling",
+      "observed": "Captured actual visible state; visual review pending",
+      "status": "recorded",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-24-failure-E07-study-review.png",
+      "name": "failure-E07-study-review",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('.review-summary') to be visible\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-25-failure-E08-lesson.png",
+      "name": "failure-E08-lesson",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#lessons-link').first()\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-26-failure-E09-mock.png",
+      "name": "failure-E09-mock",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#mock-link').first()\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-27-failure-E10-reference.png",
+      "name": "failure-E10-reference",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#levels-link').first()\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-28-failure-E11-additional-rooms.png",
+      "name": "failure-E11-additional-rooms",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#grammar-link').first()\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-29-failure-E16-settings.png",
+      "name": "failure-E16-settings",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#theme-seal').first()\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    },
+    {
+      "file": "screenshots/20260914083927-30-failure-E17-tutor-offline.png",
+      "name": "failure-E17-tutor-offline",
+      "expected": "Usable intended segment",
+      "observed": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('#ai-link').first()\n",
+      "status": "failure",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      }
+    }
+  ],
+  "pageErrors": [],
+  "observations": [
+    {
+      "type": "writing-room-governance",
+      "note": "Constitution §6 kanji+ellipsis differs from later inline operator redirects dated 2026-08-15 and 2026-08-24: visible back, world seal and corner controls. Main directs testing usability, not declaring a definitive bug from older constitution.",
+      "controls": [
+        "← 戻るback",
+        "藍",
+        "",
+        "筆順の番号stroke order numbers",
+        "ゆっくりslowly"
+      ]
+    }
+  ],
+  "requiredSkip": false,
+  "revision": "d14d18f3b94713c98c6ac8333f546e18998098b5",
+  "dirty": " M ../../docs/build-evidence/reference/coverage.json\n M ../../docs/operator/REFERENCE_LIBRARIES_2026-09-14.md\n M corridor-standalone.html\n M corridor.css\n M corridor.js\n M data/share_alike/reference-extra.json\n M reference-core.js\n M reference-ui.css\n M reference-ui.js\n M tools/verify-journey.mjs\n M ../../tools/build-reference-data.mjs\n M ../../tools/test-reference-core.mjs\n?? ../../docs/build-evidence/experience-regressions/\n?? ../../docs/build-evidence/experience/\n?? ../../docs/build-evidence/reference/relationships.json\n?? tools/verify-experience.mjs\n?? tools/verify-reference-connections.mjs\n",
+  "assetHashes": {
+    "index.html": "a2aee935b605ef9dbf058e8399396a4c6deee9e9742c14a2a74234610cac526a",
+    "corridor.js": "2b69337c3af6690891538af565b1b60e57cea95af4051be9501f989fb39c5b58",
+    "corridor.css": "25cd046e82e288474793f17eb2617765de73b72749946906960b51bf0ba82eae",
+    "reference-ui.js": "f17bc1494ce3eb1d1fc4fafddb8dc40e8b94d4a53469536766a588adecd48a10",
+    "reference-core.js": "22c6512a5f0676f0fe5055b121a76a0529fa8d4e02e352cc7205bfdbfe50daea"
+  },
+  "url": "http://127.0.0.1:41569/",
+  "finalState": {
+    "taken": [
+      {
+        "t": "word",
+        "id": "朝",
+        "label": "朝",
+        "kind": "語",
+        "kindEn": "word",
+        "from": {
+          "passage": "bunki-graded-n5-morning",
+          "index": 0
+        },
+        "ts": 1789375251336,
+        "started": 1789375251336
+      }
+    ],
+    "srs": {
+      "word:朝": {
+        "due": "2026-09-14T08:50:57.736Z",
+        "stability": 2.3065,
+        "difficulty": 2.11810397,
+        "elapsed_days": 0,
+        "scheduled_days": 0,
+        "reps": 1,
+        "lapses": 0,
+        "learning_steps": 1,
+        "state": 1,
+        "last_review": "2026-09-14T08:40:57.736Z"
+      }
+    },
+    "revlog": [
+      [
+        1789375257736,
+        "word:朝",
+        3,
+        0,
+        null,
+        null,
+        null,
+        null,
+        2.3065,
+        2.1181,
+        0,
+        1789375857736
+      ]
+    ],
+    "obslog": [
+      [
+        1789375247055,
+        "tap",
+        "word:朝",
+        1,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789375247504,
+        "tap",
+        "word:朝",
+        2,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789375248380,
+        "tap",
+        "word:朝",
+        2,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789375250050,
+        "tap",
+        "word:朝",
+        3,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789375257734,
+        "reveal",
+        "word:朝",
+        1
+      ]
+    ],
+    "lessonsDone": {},
+    "mockDone": {},
+    "lists": {
+      "Evening Japanese": []
+    },
+    "suspended": {}
+  },
+  "providerRequests": [],
+  "finished": "2026-09-14T08:43:19.674Z",
+  "summary": {
+    "passed": 12,
+    "failed": 8,
+    "skipped": 0,
+    "screenshots": 30
+  },
+  "assetHashesAtEnd": {
+    "index.html": "a2aee935b605ef9dbf058e8399396a4c6deee9e9742c14a2a74234610cac526a",
+    "corridor.js": "28fa481e3c09b2d81b4442ef9e8eae5206928655124296c3cb463498b938565d",
+    "corridor.css": "25cd046e82e288474793f17eb2617765de73b72749946906960b51bf0ba82eae",
+    "reference-ui.js": "f17bc1494ce3eb1d1fc4fafddb8dc40e8b94d4a53469536766a588adecd48a10",
+    "reference-core.js": "22c6512a5f0676f0fe5055b121a76a0529fa8d4e02e352cc7205bfdbfe50daea"
+  },
+  "assetsChangedDuringRun": true,
+  "updated": "2026-09-14T08:43:19.677Z"
+}

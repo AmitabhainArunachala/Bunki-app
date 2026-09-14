@@ -1,0 +1,197 @@
+- button "戻る back"
+- text: 静かな朝
+- button "search — look up a word"
+- button "choose a world": 藍
+- button "EN" [pressed]
+- button "日本語"
+- button "memorize 朝": 覚える memorize
+- button "覚 0 lists"
+- main:
+  - paragraph: 段階別読み物 · Bunki
+  - heading "静かな朝" [level=1]
+  - paragraph: A Quiet Morning
+  - text: Upper beginner 初級後半 · ~1 in 4 words beyond JLPT vocab
+  - button "▸ text settings 文字設定"
+  - button "聞く listen"
+  - text: read by Koharune Ami
+  - combobox "choose the word voice":
+    - option "小春音アミ" [selected]
+    - option "F1"
+    - option "四国めたん"
+    - option "ずんだもん"
+    - option "玄野武宏"
+  - paragraph: tap for the reading, again for English, a third time to clear — hold for the dictionary
+  - button "朝 · word · a third activation clears; hold for the full entry; focus for more actions": 朝 あさ
+  - text: 、
+  - button "七 なな"
+  - button "時 · word · a third activation clears; hold for the full entry; focus for more actions": 時 じ
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "起き · word · a third activation clears; hold for the full entry; focus for more actions": 起 お き
+  - text: ました。
+  - button "窓 · word · a third activation clears; hold for the full entry; focus for more actions": 窓 まど
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "開ける · word · a third activation clears; hold for the full entry; focus for more actions": 開 あ ける
+  - button "と, particle; ordinary activation is inert; focus for its full entry": と
+  - text: 、
+  - button "空 · word · a third activation clears; hold for the full entry; focus for more actions": 空 そら
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - button "青く · word · a third activation clears; hold for the full entry; focus for more actions": 青 あお く
+  - text: て、
+  - button "風 · word · a third activation clears; hold for the full entry; focus for more actions": 風 かぜ
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - button "少し · word · a third activation clears; hold for the full entry; focus for more actions": 少 すこ し
+  - button "冷たかっ · word · a third activation clears; hold for the full entry; focus for more actions": 冷 つめ たかっ
+  - text: たです。
+  - button "私 · word · a third activation clears; hold for the full entry; focus for more actions": 私 わたくし
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - button "水 · word · a third activation clears; hold for the full entry; focus for more actions": 水 みず
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "飲ん · word · a third activation clears; hold for the full entry; focus for more actions": 飲 の ん
+  - button "で, particle; ordinary activation is inert; focus for its full entry": で
+  - text: 、
+  - button "近く · word · a third activation clears; hold for the full entry; focus for more actions": 近 ちか く
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "パン · word · a third activation clears; hold for the full entry; focus for more actions": パン
+  - button "屋 や"
+  - button "へ, particle; ordinary activation is inert; focus for its full entry": へ
+  - button "歩き · word · a third activation clears; hold for the full entry; focus for more actions": 歩 ある き
+  - text: ました。
+  - button "パン · word · a third activation clears; hold for the full entry; focus for more actions": パン
+  - button "屋 や"
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - text: 、
+  - button "焼きたて · word · a third activation clears; hold for the full entry; focus for more actions": 焼 や きたて
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "パン · word · a third activation clears; hold for the full entry; focus for more actions": パン
+  - button "が, particle; ordinary activation is inert; focus for its full entry": が
+  - button "たくさん · word · a third activation clears; hold for the full entry; focus for more actions": たくさん
+  - button "あり · word · a third activation clears; hold for the full entry; focus for more actions": あり
+  - text: ました。
+  - button "店 · word · a third activation clears; hold for the full entry; focus for more actions": 店 みせ
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "人 · word · a third activation clears; hold for the full entry; focus for more actions": 人 ひと
+  - button "が, particle; ordinary activation is inert; focus for its full entry": が
+  - text: 「
+  - button "おはよう · word · a third activation clears; hold for the full entry; focus for more actions": おはよう
+  - button "ござい · word · a third activation clears; hold for the full entry; focus for more actions": ござい
+  - text: ます」
+  - button "と, particle; ordinary activation is inert; focus for its full entry": と
+  - button "言い · word · a third activation clears; hold for the full entry; focus for more actions": 言 い い
+  - text: ました。
+  - button "私 · word · a third activation clears; hold for the full entry; focus for more actions": 私 わたくし
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - text: 「
+  - button "この · word · a third activation clears; hold for the full entry; focus for more actions": この
+  - button "丸い · word · a third activation clears; hold for the full entry; focus for more actions": 丸 まる い
+  - button "パン · word · a third activation clears; hold for the full entry; focus for more actions": パン
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "一 ひと"
+  - text: つ
+  - button "ください · word · a third activation clears; hold for the full entry; focus for more actions": ください
+  - text: 」
+  - button "と, particle; ordinary activation is inert; focus for its full entry": と
+  - button "言い · word · a third activation clears; hold for the full entry; focus for more actions": 言 い い
+  - text: ました。
+  - button "公園 · word · a third activation clears; hold for the full entry; focus for more actions": 公園 こうえん
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "ベンチ · word · a third activation clears; hold for the full entry; focus for more actions": ベンチ
+  - button "で, particle; ordinary activation is inert; focus for its full entry": で
+  - button "パン · word · a third activation clears; hold for the full entry; focus for more actions": パン
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "食べ · word · a third activation clears; hold for the full entry; focus for more actions": 食 た べ
+  - text: ました。
+  - button "鳥 · word · a third activation clears; hold for the full entry; focus for more actions": 鳥 とり
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "声 · word · a third activation clears; hold for the full entry; focus for more actions": 声 こえ
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "聞き · word · a third activation clears; hold for the full entry; focus for more actions": 聞 き き
+  - text: ながら、
+  - button "今日 · word · a third activation clears; hold for the full entry; focus for more actions": 今日 きょう
+  - button "し · word · a third activation clears; hold for the full entry; focus for more actions": し
+  - text: たい
+  - button "こと · word · a third activation clears; hold for the full entry; focus for more actions": こと
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "ノート · word · a third activation clears; hold for the full entry; focus for more actions": ノート
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "書き · word · a third activation clears; hold for the full entry; focus for more actions": 書 か き
+  - text: ました。
+  - button "短い · word · a third activation clears; hold for the full entry; focus for more actions": 短 みじか い
+  - button "時間 · word · a third activation clears; hold for the full entry; focus for more actions": 時間 じかん
+  - text: でした
+  - button "が, particle; ordinary activation is inert; focus for its full entry": が
+  - text: 、
+  - button "静か · word · a third activation clears; hold for the full entry; focus for more actions": 静 しず か
+  - text: な
+  - button "朝 · word · a third activation clears; hold for the full entry; focus for more actions": 朝 あさ
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "なり · word · a third activation clears; hold for the full entry; focus for more actions": なり
+  - text: ました。
+  - button "家 · word · a third activation clears; hold for the full entry; focus for more actions": 家 いえ
+  - button "へ, particle; ordinary activation is inert; focus for its full entry": へ
+  - button "帰る · word · a third activation clears; hold for the full entry; focus for more actions": 帰 かえ る
+  - button "道 · word · a third activation clears; hold for the full entry; focus for more actions": 道 みち
+  - button "で, particle; ordinary activation is inert; focus for its full entry": で
+  - text: 、
+  - button "昨日 · word · a third activation clears; hold for the full entry; focus for more actions": 昨日 きのう
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - button "分から · word · a third activation clears; hold for the full entry; focus for more actions": 分 わ から
+  - text: なかった
+  - button "日本 にっぽん"
+  - button "語 · word · a third activation clears; hold for the full entry; focus for more actions": 語 ご
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "言葉 · word · a third activation clears; hold for the full entry; focus for more actions": 言葉 ことば
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "思い出し · word · a third activation clears; hold for the full entry; focus for more actions": 思 おも い 出 だ し
+  - text: ました。
+  - button "意味 · word · a third activation clears; hold for the full entry; focus for more actions": 意味 いみ
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "全部 · word · a third activation clears; hold for the full entry; focus for more actions": 全部 ぜんぶ
+  - button "覚え · word · a third activation clears; hold for the full entry; focus for more actions": 覚 おぼ え
+  - text: て
+  - button "は, particle; ordinary activation is inert; focus for its full entry": は
+  - button "い · word · a third activation clears; hold for the full entry; focus for more actions": い
+  - text: ません。
+  - button "で, particle; ordinary activation is inert; focus for its full entry": で
+  - button "も, particle; ordinary activation is inert; focus for its full entry": も
+  - text: 、
+  - button "パン · word · a third activation clears; hold for the full entry; focus for more actions": パン
+  - button "屋 や"
+  - button "で, particle; ordinary activation is inert; focus for its full entry": で
+  - button "その · word · a third activation clears; hold for the full entry; focus for more actions": その
+  - button "言葉 · word · a third activation clears; hold for the full entry; focus for more actions": 言葉 ことば
+  - button "を, particle; ordinary activation is inert; focus for its full entry": を
+  - button "もう · word · a third activation clears; hold for the full entry; focus for more actions": もう
+  - button "一 いち"
+  - button "度 · word · a third activation clears; hold for the full entry; focus for more actions": 度 ど
+  - button "見 · word · a third activation clears; hold for the full entry; focus for more actions": 見 み
+  - text: ました。
+  - button "知っ · word · a third activation clears; hold for the full entry; focus for more actions": 知 し っ
+  - text: て
+  - button "いる · word · a third activation clears; hold for the full entry; focus for more actions": いる
+  - button "場所 · word · a third activation clears; hold for the full entry; focus for more actions": 場所 ばしょ
+  - button "で, particle; ordinary activation is inert; focus for its full entry": で
+  - button "言葉 · word · a third activation clears; hold for the full entry; focus for more actions": 言葉 ことば
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "再会 · word · a third activation clears; hold for the full entry; focus for more actions": 再会 さいかい
+  - button "する · word · a third activation clears; hold for the full entry; focus for more actions": する
+  - button "と, particle; ordinary activation is inert; focus for its full entry": と
+  - text: 、
+  - button "少し · word · a third activation clears; hold for the full entry; focus for more actions": 少 すこ し
+  - button "自分 · word · a third activation clears; hold for the full entry; focus for more actions": 自分 じぶん
+  - button "の, particle; ordinary activation is inert; focus for its full entry": の
+  - button "言葉 · word · a third activation clears; hold for the full entry; focus for more actions": 言葉 ことば
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "なっ · word · a third activation clears; hold for the full entry; focus for more actions": なっ
+  - text: た
+  - button "よう · word · a third activation clears; hold for the full entry; focus for more actions": よう
+  - button "に, particle; ordinary activation is inert; focus for its full entry": に
+  - button "感じ · word · a third activation clears; hold for the full entry; focus for more actions": 感 かん じ
+  - text: ました。
+  - button "読み終えた mark as finished"
+  - text: Bunki original text
+- dialog "朝 quick look":
+  - text: 朝
+  - button "memorize 朝": 覚
+  - text: あさ morning open the complete entry
+  - button "全項目 full entry"

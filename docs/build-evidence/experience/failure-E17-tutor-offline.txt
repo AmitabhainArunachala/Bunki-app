@@ -1,0 +1,103 @@
+- main:
+  - button "leave the session": ×
+  - button "more": …
+  - paragraph:
+    - button "今回 · word · a third activation clears; hold for the full entry": 今回
+    - text: の
+    - button "部分 · word · a third activation clears; hold for the full entry": 部分
+    - button "開業 · word · a third activation clears; hold for the full entry": 開業
+    - text: に
+    - button "より · word · a third activation clears; hold for the full entry": より
+    - text: 、
+    - button "JR · word · a third activation clears; hold for the full entry": JR
+    - button "西 · word · a third activation clears; hold for the full entry": 西
+    - text: 日本は「奈良から大阪梅田
+    - button "方面 · word · a third activation clears; hold for the full entry": 方面
+    - text: の
+    - button "アクセス · word · a third activation clears; hold for the full entry": アクセス
+    - text: が
+    - button "便利 · word · a third activation clears; hold for the full entry": 便利
+    - text: に
+    - button "なる · word · a third activation clears; hold for the full entry": なる
+    - text: 」と
+    - button "期待 · word · a third activation clears; hold for the full entry": 期待
+    - button "し · word · a third activation clears; hold for the full entry": し
+    - text: て
+    - button "おり · word · a third activation clears; hold for the full entry": おり
+    - text: 、
+    - button "特に · word · a third activation clears; hold for the full entry": 特に
+    - button "今回 · word · a third activation clears; hold for the full entry": 今回
+    - text: の
+    - button "開業 · word · a third activation clears; hold for the full entry": 開業
+    - text: で＿＿＿・
+    - button "夕 · word · a third activation clears; hold for the full entry": 夕
+    - text: の
+    - button "ラッシュ · word · a third activation clears; hold for the full entry": ラッシュ
+    - button "時 · word · a third activation clears; hold for the full entry": 時
+    - text: に大和
+    - button "路線 · word · a third activation clears; hold for the full entry": 路線
+    - text: ・奈良
+    - button "駅 · word · a third activation clears; hold for the full entry": 駅
+    - text: から当
+    - button "路線 · word · a third activation clears; hold for the full entry": 路線
+    - text: ～
+    - button "学研 · word · a third activation clears; hold for the full entry": 学研
+    - button "都市 · word · a third activation clears; hold for the full entry": 都市
+    - text: ・
+    - button "東西 · word · a third activation clears; hold for the full entry": 東西
+    - text: 線
+    - button "経由 · word · a third activation clears; hold for the full entry": 経由
+    - text: で尼崎
+    - button "駅 · word · a third activation clears; hold for the full entry": 駅
+    - text: を
+    - button "結ぶ · word · a third activation clears; hold for the full entry": 結ぶ
+    - button "直通 · word · a third activation clears; hold for the full entry": 直通
+    - button "快速 · word · a third activation clears; hold for the full entry": 快速
+    - button "列車 · word · a third activation clears; hold for the full entry": 列車
+    - text: を1日当たり4
+    - button "往復 · word · a third activation clears; hold for the full entry": 往復
+    - button "する · word · a third activation clears; hold for the full entry": する
+    - button "こと · word · a third activation clears; hold for the full entry": こと
+    - text: に
+    - button "なっ · word · a third activation clears; hold for the full entry": なっ
+    - text: て
+    - button "いる · word · a third activation clears; hold for the full entry": いる
+    - text: （中国
+    - button "新聞 · word · a third activation clears; hold for the full entry": 新聞
+    - text: に
+    - button "よる · word · a third activation clears; hold for the full entry": よる
+    - text: と、
+    - button "この · word · a third activation clears; hold for the full entry": この
+    - button "他 · word · a third activation clears; hold for the full entry": 他
+    - button "区間 · word · a third activation clears; hold for the full entry": 区間
+    - button "運転 · word · a third activation clears; hold for the full entry": 運転
+    - text: の
+    - button "普通 · word · a third activation clears; hold for the full entry": 普通
+    - button "電車 · word · a third activation clears; hold for the full entry": 電車
+    - text: が1日67
+    - button "往復 · word · a third activation clears; hold for the full entry": 往復
+    - button "運転 · word · a third activation clears; hold for the full entry": 運転
+    - button "さ · word · a third activation clears; hold for the full entry": さ
+    - text: れる）が、奈良
+    - button "市 · word · a third activation clears; hold for the full entry": 市
+    - text: の
+    - button "都市 · word · a third activation clears; hold for the full entry": 都市
+    - button "計画 · word · a third activation clears; hold for the full entry": 計画
+    - button "課 · word · a third activation clears; hold for the full entry": 課
+    - text: は「4
+    - button "往復 · word · a third activation clears; hold for the full entry": 往復
+    - text: だけでは
+    - button "メリット · word · a third activation clears; hold for the full entry": メリット
+    - text: と
+    - button "いえる · word · a third activation clears; hold for the full entry": いえる
+    - text: か
+    - button "どう · word · a third activation clears; hold for the full entry": どう
+    - text: か」と
+    - button "不安 · word · a third activation clears; hold for the full entry": 不安
+    - text: 視
+    - button "し · word · a third activation clears; hold for the full entry": し
+    - text: て
+    - button "いる · word · a third activation clears; hold for the full entry": いる
+    - text: 。
+  - button "まだ not yet"
+  - button "思い出した I recalled it"
