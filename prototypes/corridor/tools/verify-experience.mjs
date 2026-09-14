@@ -127,7 +127,31 @@ try{
   await click('#review-start');await page.locator('#declare-recalled').waitFor();await shot('review-recall','Review asks learner for honest recall before revealing the answer');
   await click('#declare-recalled');await page.locator('.grade.g-good').waitFor();await sleep(1600);await shot('review-revealed-grade','Answer and explicit grade control precede FSRS scheduling');await click('.grade.g-good');let gradeActions=1;
   for(let i=0;i<12&&!await visible('.review-summary');i++){await page.locator('#declare-recalled').waitFor();await click('#declare-recalled');await click('.grade.g-good');gradeActions++;}
-  await page.locator('.review-summary').waitFor();await shot('review-summary','Explicit review produces visible completion summary');
+  await page.locator('.review-summary').waitFor();
+  await check('E07-summary-surface','Completion restores matching day/night paper and readable heading',async()=>{
+   const measured=await page.evaluate(async()=>{
+    const rgb=value=>(value.match(/[\d.]+/g)||[]).slice(0,3).map(Number);
+    const ground=rgb(getComputedStyle(document.body).backgroundColor);
+    const ink=rgb(getComputedStyle(document.querySelector('main .view-title')).color);
+    const luminance=color=>color.map(x=>x/255).map(x=>x<=0.04045?x/12.92:((x+0.055)/1.055)**2.4).reduce((sum,x,i)=>sum+x*[0.2126,0.7152,0.0722][i],0);
+    const paper=getComputedStyle(document.documentElement).getPropertyValue('--paper-url').trim();
+    let pixel=ground;
+    const match=paper.match(/^url\(["']?(.*?)["']?\)$/);
+    if(match){
+     const image=new Image();image.src=match[1];await image.decode();
+     const canvas=document.createElement('canvas');canvas.width=1;canvas.height=1;
+     const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0,1,1);
+     pixel=Array.from(ctx.getImageData(0,0,1,1).data).slice(0,3);
+    }
+    const a=luminance(ink),b=luminance(pixel);
+    return {ground,paperAverage:pixel,ink,contrast:(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05),zen:document.body.classList.contains('zen')};
+   });
+   assert.equal(measured.zen,false);
+   assert.ok(measured.ground.every((v,i)=>Math.abs(v-measured.paperAverage[i])<32),JSON.stringify(measured));
+   assert.ok(measured.contrast>=4.5,JSON.stringify(measured));
+   return JSON.stringify(measured);
+  });
+  await shot('review-summary','Explicit review produces visible completion summary on correctly restored paper');
   afterReview=await state();await check('E07-review-record','Every explicit grade produces a durable outcome; only the chosen item is scheduled',()=>{assert.equal(afterReview.revlog.length,gradeActions);assert.equal(Object.keys(afterReview.srs).length,1);return `${gradeActions} deliberate grades, including short-learning repeats, on one explicitly enrolled word`;});
   await role(/back to lists|リストへ/);await check('E07-review-trace','Return to study displays review trace',async()=>{assert.ok(await visible('.srs-trace'));return await page.locator('.srs-trace').innerText();});
   const dlPromise=page.waitForEvent('download');await click('#export-store');const dl=await dlPromise;const path=resolve(OUT,'learner-export.json');await dl.saveAs(path);const exported=JSON.parse(readFileSync(path,'utf8'));result.export={filename:dl.suggestedFilename(),file:'learner-export.json',keys:Object.keys(exported)};
