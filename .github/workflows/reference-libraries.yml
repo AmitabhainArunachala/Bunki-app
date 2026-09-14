@@ -43,9 +43,23 @@ jobs:
         run: node prototypes/corridor/tools/verify-reference.mjs --shots "$RUNNER_TEMP/reference-shots"
       - name: Verify existing mock-paper boundary
         run: node prototypes/corridor/tools/verify-mock.mjs
+      - name: Verify recursive connections and return context
+        run: node prototypes/corridor/tools/verify-reference-connections.mjs --shots "$RUNNER_TEMP/connection-shots"
+      - name: Walk the complete learner experience with screenshots
+        env:
+          EXPERIENCE_OUT: ${{ runner.temp }}/experience-shots
+        run: |
+          if test -f prototypes/corridor/skip-core.js; then
+            node prototypes/corridor/tools/verify-experience.mjs --require-skip
+          else
+            node prototypes/corridor/tools/verify-experience.mjs
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: reference-library-browser-evidence
-          path: ${{ runner.temp }}/reference-shots
+          path: |
+            ${{ runner.temp }}/reference-shots
+            ${{ runner.temp }}/connection-shots
+            ${{ runner.temp }}/experience-shots
           if-no-files-found: ignore

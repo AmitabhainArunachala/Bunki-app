@@ -1,0 +1,11 @@
+- dialog "森 — stroke order":
+  - paragraph: Use the browser or device Back command to leave the writing room.
+  - button "← 戻る"
+  - button "choose a world": 藍
+  - img "森 stroke order"
+  - status: stroke 10 of 12
+  - region "readings":
+    - group "readings": 音読み on シン 訓読み kun もり
+  - button "hide controls" [expanded]
+  - button "筆順の番号 stroke order numbers"
+  - button "ゆっくり slowly"

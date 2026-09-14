@@ -1,0 +1,22 @@
+- dialog "林 full entry":
+  - button "← 戻る back"
+  - text: 森林 › 森 › 林
+  - button "search — look up a word"
+  - button "memorize": 覚
+  - button "close full entry": ✕
+  - text: 林 (a part with no name in the 漢検 radical table) 11 kanji The family of characters containing this part — a shape component, not one of the Kangxi radicals.
+  - button "林 view as a kanji"
+  - paragraph: この部品を含む字 — 11 字kanji that contain this part
+  - button "麻 準2級"
+  - button "森 10級"
+  - button "禁 6級"
+  - button "暦 4級"
+  - button "歴 6級"
+  - button "摩 準2級"
+  - button "磨 準2級"
+  - button "礎 3級"
+  - button "襟 準2級"
+  - button "麓 2級"
+  - button "魔 3級"
+  - button "覚える memorize"
+  - button "study progress no history yet ▸"

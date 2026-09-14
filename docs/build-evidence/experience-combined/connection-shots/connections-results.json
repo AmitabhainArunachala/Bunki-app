@@ -1,0 +1,78 @@
+[
+  {
+    "name": "library names the current room, exposes dictionary search, and starts without study debt",
+    "pass": true
+  },
+  {
+    "name": "paged/sorted collection → canonical sheet → row restores page, sort, scroll and focus",
+    "pass": true
+  },
+  {
+    "name": "word → kanji → component → family kanji walks back to the exact doors",
+    "pass": true
+  },
+  {
+    "name": "expanded compounds survive recursion with their position and focus",
+    "pass": true
+  },
+  {
+    "name": "canonical level chips open complete reference collections and return through browser Back",
+    "pass": true
+  },
+  {
+    "name": "kanji Kentei and JLPT doors return to the same canonical kanji and filtered origin",
+    "pass": true
+  },
+  {
+    "name": "sheet search → result → nested search returns in order to query, sheet and original collection",
+    "pass": true
+  },
+  {
+    "name": "empty collection search can widen to dictionary and return without losing its filter",
+    "pass": true
+  },
+  {
+    "name": "source sentence → real article → return restores sentence, word, library and focus",
+    "pass": true
+  },
+  {
+    "name": "My Study and Mock papers return to the exact collection instead of the reading shelf",
+    "pass": true
+  },
+  {
+    "name": "attested missing kanji readings display with provenance and continue into the writing room",
+    "pass": true
+  },
+  {
+    "name": "read-only source records expose attested related forms and return without enrollment",
+    "pass": true
+  },
+  {
+    "name": "language choice has group semantics and individually pressed buttons",
+    "pass": true
+  },
+  {
+    "name": "all passive recursive browsing leaves enrollment and learning evidence unchanged",
+    "pass": true
+  },
+  {
+    "name": "explicit Memorize updates shared My Study once, with no retrieval credit",
+    "pass": true
+  },
+  {
+    "name": "320px library, word and source-tag disclosure fit their viewport",
+    "pass": true
+  },
+  {
+    "name": "390px library, word and source-tag disclosure fit their viewport",
+    "pass": true
+  },
+  {
+    "name": "1280px library, word and source-tag disclosure fit their viewport",
+    "pass": true
+  },
+  {
+    "name": "no uncaught application exceptions",
+    "pass": true
+  }
+]

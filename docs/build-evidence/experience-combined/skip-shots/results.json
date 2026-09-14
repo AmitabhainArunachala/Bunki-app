@@ -1,0 +1,217 @@
+{
+  "checks": [
+    {
+      "name": "JSON sidecar absent at boot",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "lens preserves heading and old lenses",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "typed fullwidth normalization",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "exact canonical query",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "explicit whitespace prefix",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "partial/wildcard 1-3",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "partial/wildcard 1-*-8",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "partial/wildcard *-3-8",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "partial/wildcard skip:*",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid 4-5-5",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid 5-2-3",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid 1-3-x",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid 1-2-3-4",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "ordinary English search remains word search",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "solid switch clears third field",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "solid subtype list and labels",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "keyboard End chooses subtype 4",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Home and arrow selection",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "click row updates code",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mouse wheel updates code",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "all wheel selections align to center band",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "radical 64 independent filter",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "hand variant is visible",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no clipping at 320px",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no clipping at 390px",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no clipping at 1280px",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "explicit first page size",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "show more without hidden result cap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "alternate excluded initially",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "alternate explicitly labeled",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "canonical before alternate",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Back preserves query and focus",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "fallback opens ordinary kanji sheet",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "code chip opens nested lookup",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "nested Back returns to same fallback entry",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "dark world and reduced motion",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "saved fallback reopens after cold reload through lazy metadata",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no normal-flow console errors",
+      "pass": true,
+      "detail": "{\"errors\":[],\"consoleErrors\":[]}"
+    },
+    {
+      "name": "fresh-context load failure is recoverable",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "retry loads real index",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no runtime exceptions including recovery",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  ],
+  "exclusions": [
+    "Physical iOS Safari momentum/VoiceOver; full ten-theme matrix; standalone build is tested by main agent.",
+    "Intentional 503 recovery produces one expected network console error."
+  ]
+}
