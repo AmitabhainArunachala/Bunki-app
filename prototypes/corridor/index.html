@@ -37,16 +37,16 @@
       window.__KAIRO_AUDIO__ = 1;
     </script>
     <link rel="stylesheet" href="corridor.css" />
-    <link rel="stylesheet" href="drift-layer.css" />
     <link rel="stylesheet" href="reference-ui.css" />
+    <link rel="stylesheet" href="drift-layer.css" />
   </head>
   <body>
     <div id="app"></div>
+    <script defer src="reference-core.js"></script>
+    <script defer src="reference-ui.js"></script>
     <!-- the Drift universe (Phase 2): self-mounts #drift-layer, sleeps until
          the corridor's drift entry view wakes it via window.__DRIFT__ -->
     <script defer src="drift-layer.js"></script>
-    <script defer src="reference-core.js"></script>
-    <script defer src="reference-ui.js"></script>
     <script type="module" src="corridor.js"></script>
     <!-- the https guard is deliberate: the verification suites drive the app
          over http://127.0.0.1 and must never inherit a worker's cache -->

@@ -8641,7 +8641,6 @@ function renderGrammarNode(sheet, node) {
 
 /* ---------------------------------------------------------------- nodes */
 function nodeTitle(node) {
-  if (node.t === 'reference') return node.referenceEntry?.text || node.id;
   if (node.t === 'word') return node.id;
   if (node.t === 'kanji') return node.id;
   if (node.t === 'radical') return node.id;
@@ -8649,6 +8648,7 @@ function nodeTitle(node) {
   if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'catalog') return catalogLabel(node.by, node.value);
+  if (node.t === 'reference') return node.referenceEntry?.text || node.id;
   // the crumb idiom for a content-shaped node: 日本語 first, english beside
   // it — never a stray lowercase 'sentence' standing alone mid-crumb
   if (node.t === 'sent') return tx('文', '文 sentence');

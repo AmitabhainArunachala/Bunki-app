@@ -106,8 +106,8 @@ ${read('corridor.js')}
 const fragmentHtml = `<title>回廊 KAIRO — corridor prototype</title>
 <style>
 ${read('corridor.css')}
-${read('drift-layer.css')}
 ${read('reference-ui.css')}
+${read('drift-layer.css')}
 </style>
 ${BODY}
 `;
@@ -124,8 +124,8 @@ const html = `<!doctype html>
 <title>回廊 KAIRO — corridor prototype</title>
 <style>
 ${read('corridor.css')}
-${read('drift-layer.css')}
 ${read('reference-ui.css')}
+${read('drift-layer.css')}
 </style>
 </head>
 <body>
