@@ -15645,7 +15645,6 @@ function render() {
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
   document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
-  syncPaper();
   // F/G ride across to the Drift layer, which owns the tap ladder itself. Sent
   // on every render (not only on a click) so the layer carries the strip's
   // reading whenever it finishes loading, and unknown values are ignored there.
@@ -15680,6 +15679,9 @@ function render() {
   // the probe room keeps the same glass: word up → world recedes
   const zenProbe = S.ready && S.view === 'probe' && !!S.probe && S.probe.ix < S.probe.queue.length;
   document.body.classList.toggle('zen', !!zenReview || !!zenProbe);
+  // Grow the paper only AFTER the night/day class has settled. Otherwise
+  // finishing review reveals a cached night canvas under daytime text.
+  syncPaper();
   if (!zenReview) S.reviewMore = false;
 
   const chrome = el('div', 'chrome');
