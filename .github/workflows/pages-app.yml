@@ -49,6 +49,10 @@ jobs:
           node --check prototypes/corridor/corridor-ink.js
           node --check prototypes/corridor/dictionary-worker.js
           node --check prototypes/corridor/sw.js
+          node --check prototypes/corridor/reference-core.js
+          node --check prototypes/corridor/reference-ui.js
+          node tools/test-reference-core.mjs
+          node tools/build-reference-data.mjs --check
 
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/apple-touch-icon.png \
@@ -67,6 +71,9 @@ jobs:
                 prototypes/corridor/data \
                 prototypes/corridor/vendor \
                 prototypes/corridor/design \
+                prototypes/corridor/reference-core.js \
+                prototypes/corridor/reference-ui.js \
+                prototypes/corridor/reference-ui.css \
                 "$SITE"/
 
           # the recorded voices ride along when the branch carries them
@@ -101,6 +108,8 @@ jobs:
                       'data/share_alike/animcjk/00.json' \
                       'data/share_alike/animcjk/equivalence.json' \
                       'data/share_alike/dict-v2/00.json' \
+                      'reference-core.js' 'reference-ui.js' 'reference-ui.css' \
+                      'data/share_alike/reference-extra.json' \
                       'data/share_alike/dict-v2/0f.json'; do
             code=""
             for attempt in 1 2 3 4 5; do

@@ -1,0 +1,51 @@
+name: Reference libraries
+
+on:
+  pull_request:
+    paths:
+      - 'prototypes/corridor/**'
+      - 'tools/*reference*.mjs'
+      - 'corpus/datasets/kanji/kanken.jsonl'
+      - '.github/workflows/reference-libraries.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'prototypes/corridor/**'
+      - 'tools/*reference*.mjs'
+      - 'corpus/datasets/kanji/kanken.jsonl'
+      - '.github/workflows/reference-libraries.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Verify complete source coverage and packaging
+        run: |
+          node --check prototypes/corridor/reference-core.js
+          node --check prototypes/corridor/reference-ui.js
+          node --check prototypes/corridor/corridor.js
+          node tools/test-reference-core.mjs
+          node tools/build-reference-data.mjs --check
+          node prototypes/corridor/tools/test-reference-packaging.mjs
+      - name: Verify reference browsing and personal-study isolation
+        run: node prototypes/corridor/tools/verify-reference.mjs --shots "$RUNNER_TEMP/reference-shots"
+      - name: Verify existing mock-paper boundary
+        run: node prototypes/corridor/tools/verify-mock.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reference-library-browser-evidence
+          path: ${{ runner.temp }}/reference-shots
+          if-no-files-found: ignore

@@ -26,6 +26,7 @@ const BUNDLES = {
   'original/grammar-v11': 'data/original/grammar-v11.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
+  'share_alike/reference-extra': 'data/share_alike/reference-extra.json',
 };
 
 const bundle = {};
@@ -81,6 +82,10 @@ const dictionaryScripts = readdirSync(dictionaryDir)
 // the drift layer self-mounts and sleeps until the corridor wakes it; its
 // emitter asserts the file carries no "</script" sequence, so inlining is safe
 const BODY = `<div id="app"></div>
+<script>
+${read('reference-core.js')}
+${read('reference-ui.js')}
+</script>
 <script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
 ${dictionaryScripts}
 <script>
@@ -102,6 +107,7 @@ const fragmentHtml = `<title>回廊 KAIRO — corridor prototype</title>
 <style>
 ${read('corridor.css')}
 ${read('drift-layer.css')}
+${read('reference-ui.css')}
 </style>
 ${BODY}
 `;
@@ -119,6 +125,7 @@ const html = `<!doctype html>
 <style>
 ${read('corridor.css')}
 ${read('drift-layer.css')}
+${read('reference-ui.css')}
 </style>
 </head>
 <body>

@@ -2221,7 +2221,7 @@ async function boot() {
     if (!res.ok) throw new Error(`data/articles/index.json → ${res.status}`);
     return res.json();
   };
-  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin] =
+  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin, referenceExtra] =
     await Promise.all([
       loadArticleIndex(),
       ...DATA.safe.map((n) => load('proprietary_safe', n)),
@@ -2229,6 +2229,12 @@ async function boot() {
       ...DATA.orig.map((n) => load('original', n)),
       bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
       bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
+      // Reference-only data never changes the teaching or study populations.
+      // A missing optional asset must not prevent the other rooms booting.
+      load('share_alike', 'reference-extra').catch((error) => {
+        referenceExtraError = error;
+        return null;
+      }),
     ]);
 
   // The shelf boots from a light index; each article's text + tokens live in
@@ -2255,6 +2261,7 @@ async function boot() {
   D.dictionarySearchErrors = new Map();
   D.strokes = strokes.strokes;
   D.kmeta = strokes.meta;
+  D.referenceExtra = referenceExtra;
   // the official radical (部首) table, keyed by Kangxi number 1–214; each kanji
   // record carries its `rad` number and looks its identity up here. A reverse
   // map (canonical glyph and positional variant → the row) lets a component
@@ -2546,6 +2553,7 @@ function keepScroll() {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
   else if (S.view === 'shelf') S.shelfScroll = window.scrollY;
   else if (S.view === 'archive') S.archiveScroll = window.scrollY;
+  else if (S.view === 'levels' && !S.stack.length) referenceLibrary?.keepScroll();
 }
 
 /** Hand the current view back the offset it walked away from. */
@@ -2553,6 +2561,7 @@ function returnScroll() {
   if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
   else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
   else if (S.view === 'archive') window.scrollTo(0, S.archiveScroll);
+  else if (S.view === 'levels') referenceLibrary?.returnScroll();
 }
 
 /* The reader remembers your place per article, surviving reloads — the
@@ -2694,6 +2703,8 @@ function back() {
     render();
     return;
   }
+  // Device Back and the chrome arrow walk list → overview → reading shelf.
+  if (S.view === 'levels' && referenceLibrary?.back()) return;
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
@@ -3266,14 +3277,14 @@ function renderShelfBody() {
     : tx(`${curated.length} 本。触れてひらく。`, `${curated.length} real texts. Tap one to read it.`);
   main.append(sub);
 
-  // door order is the learner's order, not the build order: the lanes
-  // that teach first, then the reference books, then the tutor
+  // Reference is separate from lessons, mock papers, and My Study.
   const lanes = el('button', 'grammar-link');
   lanes.type = 'button';
   lanes.id = 'levels-link';
-  lanes.append(el('span', 'l-ja', '級で学ぶ'), el('span', 'en-sub', bi() ? 'JLPT · 漢検 lanes' : ''));
+  lanes.append(el('span', 'l-ja', '参考書庫'), el('span', 'en-sub', bi() ? 'Reference library · JLPT & Kanji Kentei' : 'JLPT・漢検'));
   lanes.addEventListener('click', () => {
     keepScroll();
+    referenceLibrary?.reset();
     S.view = 'levels';
     render();
     window.scrollTo(0, 0);
@@ -5515,13 +5526,10 @@ function renderNoteDoor(main) {
   }
 }
 
-/* --------------------------------------------------- JLPT · 漢検 lanes
- * Training lanes over the layers the corridor already carries: JLPT words
- * from the dictionary's own levels, 漢検 kanji from the kanken table. Each
- * lane knows how much of it is already being memorized, opens its members
- * as ordinary entry sheets, and can hand the next twenty unmemorized items
- * to the tray — capture that becomes cards without labor.
- * N1 words are not in this layer yet; the lane says so instead of hiding. */
+/* --------------------------------------------------------- lesson lanes
+ * Keep lesson selection on its original dictionary-only population.
+ * The reference-only union (including N1 from D.words) lives in the
+ * reference controller below and must never expand these teaching lanes. */
 const JLPT_LANES = ['N5', 'N4', 'N3', 'N2', 'N1'];
 const KANKEN_LANES = ['10級', '9級', '8級', '7級', '6級', '5級', '4級', '3級', '準2級', '2級', '準1級', '1級'];
 let LANE_CACHE = null;
@@ -5535,63 +5543,6 @@ function laneMembers() {
   for (const l of KANKEN_LANES) kanken[l].sort();
   LANE_CACHE = { jlpt, kanken };
   return LANE_CACHE;
-}
-function renderLane(main, title, en, ids, t) {
-  const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
-  const mem = ids.filter((id) => takenSet.has(srsKey(t, id))).length;
-  const head = el('p', 'eyebrow list-head');
-  head.append(document.createTextNode(`${title} — ${ids.length}`));
-  if (bi()) head.append(el('span', 'en-inline', en));
-  main.append(head);
-  if (!ids.length) {
-    main.append(el('div', 'sem-empty', tx('この級の語はこの層にまだない。', 'Not in this layer yet.')));
-    return;
-  }
-  main.append(
-    el('p', 'card-kind', tx(`覚えている ${mem} / ${ids.length}`, `memorizing ${mem} of ${ids.length}`)),
-  );
-  // paper-dictionary chips: a kanji headword shows its reading; a kana
-  // headword would just repeat itself, so it shows its first sense instead
-  const hasKanji = (s) => [...s].some((c) => c >= '一' && c <= '鿿');
-  const label = (id) => {
-    if (t !== 'word') return D.kanji[id]?.m || '';
-    const rec = lookup(id);
-    if (!rec) return '';
-    return hasKanji(id) ? rec.r || '' : (rec.m && rec.m[0]) || '';
-  };
-  main.append(
-    chipsFor(
-      ids.slice(0, 18).map((id) => ({ label: id, sub: label(id) })),
-      (item) => go({ t, id: item.label }),
-      null,
-      t,
-    ),
-  );
-  if (ids.length > 18)
-    main.append(el('p', 'card-kind', tx(`ほか ${ids.length - 18} 件はページから`, `${ids.length - 18} more open from their pages`)));
-  const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));
-  if (fresh.length) {
-    const btn = biLabel(
-      'button',
-      'take',
-      `この級から ${Math.min(20, fresh.length)} 件を覚える`,
-      `memorize the next ${Math.min(20, fresh.length)}`,
-    );
-    btn.type = 'button';
-    btn.addEventListener('click', () => {
-      const kindRow = NODE_KIND[t];
-      // the twenty mint as ONE committed batch — the copy persists before
-      // the live deck sees any of them (P0-4)
-      const taken = [
-        ...S.taken,
-        ...fresh
-          .slice(0, 20)
-          .map((id) => ({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now(), started: Date.now() })),
-      ];
-      if (commitStorePatch({ taken })) render();
-    });
-    main.append(btn);
-  }
 }
 /* --------------------------------------------------------------- lessons
  * The Duolingo-class lane: small lessons cut from the JLPT word levels and
@@ -7145,14 +7096,123 @@ function renderAiSetup(main) {
   }
 }
 
+// This controller is deliberately outside S and saveStore's schema. Reload
+// returns to the normal front door; paging and searches never become evidence.
+let referenceLibrary = null;
+let referenceExtraError = null;
+let referenceExtraPending = false;
+
 function renderLevels(main) {
-  main.append(withEn(el('p', 'eyebrow', '級で学ぶ'), 'study by level', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('JLPT と 漢検', 'JLPT and 漢検 lanes')));
-  const lanes = laneMembers();
-  main.append(withEn(el('p', 'eyebrow', 'JLPT'), 'the five levels', 'en-inline'));
-  for (const l of JLPT_LANES) renderLane(main, l, `JLPT ${l}`, lanes.jlpt[l], 'word');
-  main.append(withEn(el('p', 'eyebrow', '漢検'), 'kanji kentei, 10級 → 1級', 'en-inline'));
-  for (const l of KANKEN_LANES) renderLane(main, `漢検 ${l}`, l, lanes.kanken[l], 'kanji');
+  if (!window.BunkiReferenceCore?.createCatalog || !window.BunkiReferenceUI?.create || !D.referenceExtra) {
+    main.append(el('h1', 'view-title', tx('参考書庫', 'Reference library')));
+    const message = el('p', 'sem-empty', tx(
+      '参考資料をひらけませんでした。他の部屋は引き続き使えます。再読み込みしてお試しください。',
+      'The reference library could not be opened. Other rooms still work. Reload to try again.',
+    ));
+    message.id = 'reference-unavailable';
+    message.setAttribute('role', 'status');
+    main.append(message);
+    const retry = biLabel('button', 'chip', '再試行', referenceExtraPending ? 'loading…' : 'try again');
+    retry.id = 'reference-retry';
+    retry.type = 'button';
+    retry.disabled = referenceExtraPending;
+    retry.addEventListener('click', async () => {
+      if (!window.BunkiReferenceCore?.createCatalog || !window.BunkiReferenceUI?.create) {
+        location.reload();
+        return;
+      }
+      referenceExtraPending = true;
+      render();
+      try {
+        const bundled = window.__CORRIDOR_BUNDLE__;
+        if (bundled) D.referenceExtra = bundled['share_alike/reference-extra'];
+        else {
+          const response = await fetch('data/share_alike/reference-extra.json');
+          if (!response.ok) throw new Error(`Reference data: ${response.status}`);
+          D.referenceExtra = await response.json();
+        }
+        referenceExtraError = null;
+      } catch (error) {
+        referenceExtraError = error;
+      } finally {
+        referenceExtraPending = false;
+        if (S.view === 'levels') render();
+      }
+    });
+    main.append(retry);
+    const exit = biLabel('button', 'chip', '← 本棚', '← Reading shelf');
+    exit.id = 'reference-back';
+    exit.type = 'button';
+    exit.addEventListener('click', back);
+    main.append(exit);
+    if (referenceExtraError) message.dataset.reason = 'reference-data-unavailable';
+    return;
+  }
+  if (!referenceLibrary) {
+    const catalog = window.BunkiReferenceCore.createCatalog({
+      dict: D.dict, words: D.words, kanji: D.kanji, kanken: D.kanken, kmeta: D.kmeta,
+      extra: D.referenceExtra,
+    });
+    referenceLibrary = window.BunkiReferenceUI.create({
+      catalog,
+      tx,
+      getTaken: () => S.taken,
+      onChange: render,
+      onExit: back,
+      onStudy: () => document.getElementById('tray')?.click(),
+      onMock: () => {
+        keepScroll();
+        S.view = 'mock';
+        render();
+        window.scrollTo(0, 0);
+      },
+      onOpen: (entry, invoker) => {
+        const canonical = entry.type === 'word'
+          ? !!(D.dict[entry.id] || D.words[entry.id])
+          : !!D.kanji[entry.id];
+        go(canonical
+          ? { t: entry.type, id: entry.id }
+          : { t: 'reference', id: entry.id, referenceEntry: entry },
+        { invoker });
+      },
+    });
+  }
+  referenceLibrary.render(main);
+}
+
+/** Extended source records can be consulted without inventing missing study
+ * metadata. They use the same accessible sheet, but no misleading capture.
+ * Canonical word/kanji records still use their full existing entry sheets. */
+function renderReferenceNode(sheet, node) {
+  const entry = node.referenceEntry;
+  sheet.append(withEn(el('p', 'eyebrow', '収録資料の項目'), 'reference-only source record', 'en-inline'));
+  sheet.append(el('h2', 'headword', entry.missingGlyph
+    ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`)
+    : entry.text || entry.id));
+  sheet.append(el('p', 'reading', entry.readings?.length
+    ? entry.readings.join('・')
+    : entry.reading || tx('読み未収録', 'Reading not supplied')));
+  sheet.append(el('p', 'gloss', entry.meanings?.length
+    ? entry.meanings.join('; ')
+    : tx('意味未収録', 'Meaning not supplied')));
+  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${source.level}`).join(' · ')));
+  for (const source of entry.sourceRecords || []) {
+    const info = el('p', 'sense-pos', `${source.sourceId} · ${source.form || ''} · ${source.level || ''}`);
+    // Consult the source only on an explicit link. No glyph images or
+    // dictionaries are fetched in the reference browsing path.
+    if (source.url && /^https:\/\//.test(source.url)) {
+      const link = el('a', null, tx(' 出典の項目を開く', ' Open source record'));
+      link.href = source.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      info.append(link);
+    }
+    sheet.append(info);
+  }
+  sheet.append(el('p', 'note', tx(
+    'この項目は参考資料にはありますが、学習用の項目データは未収録です。My Study への登録はまだできません。読み・意味などの未収録情報は推測で補っていません。',
+    'This source record is available for reference, but its study-entry data is not bundled. It cannot yet be added to My Study. Missing readings or meanings have not been guessed.',
+  )));
 }
 
 /* ------------------------------------------------------------ 四字熟語
@@ -8581,6 +8641,7 @@ function renderGrammarNode(sheet, node) {
 
 /* ---------------------------------------------------------------- nodes */
 function nodeTitle(node) {
+  if (node.t === 'reference') return node.referenceEntry?.text || node.id;
   if (node.t === 'word') return node.id;
   if (node.t === 'kanji') return node.id;
   if (node.t === 'radical') return node.id;
@@ -14275,6 +14336,7 @@ function renderSheet(root) {
   else if (node.t === 'particle') renderParticleNode(sheet, node);
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
+  else if (node.t === 'reference') renderReferenceNode(sheet, node);
   renderEncounterTrail(sheet, node);
   // reading position survives the doors: the sheet remembers where each
   // stack entry was scrolled and restores it when that entry returns —
@@ -15424,7 +15486,7 @@ function render() {
   if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読み探査', 'yomi probe'));
   if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
-  if (S.view === 'levels') parts.push(tx('級', 'levels'));
+  if (S.view === 'levels') parts.push(tx('参考書庫', 'reference library'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
   if (S.view === 'mock') parts.push(tx('模試', 'mock papers'));

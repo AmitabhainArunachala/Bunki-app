@@ -67,6 +67,23 @@ Rebuild the dictionary assets with `node tools/build_dictionary.mjs`.
 
 ## Running it locally
 
+### Reference library
+
+The shelf's **Reference library** opens complete searchable JLPT and Kanji
+Kentei collections, separate from lessons, My Study, and Mock papers. All
+classified committed vocabulary and Kentei source rows are accessible,
+including N1, advanced grades, ambiguous assignments, and explicit unknown
+bins. Counts describe the bundled corpus, not an official exhaustive syllabus.
+
+Browse without enrollment; use existing entry sheets for deliberate saving
+where canonical study data exists. Supplementary source-only records remain
+read-only. Reference paging and search are transient, not learning evidence.
+
+Run `node tools/test-reference-core.mjs` and
+`node prototypes/corridor/tools/verify-reference.mjs` from the repository root.
+See `docs/operator/REFERENCE_LIBRARIES_2026-09-14.md` for coverage, source
+licenses, reproducible generation, and limitations.
+
 ```sh
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
   node prototypes/corridor/tools/verify-corridor.mjs   # 91 checks + screenshots
