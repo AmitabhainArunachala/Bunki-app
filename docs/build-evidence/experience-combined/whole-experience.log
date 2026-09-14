@@ -1,0 +1,94 @@
+PASS E01-clean: Clean actual app, no init scripts or staged store
+PASS E01-closed-radoc: Observed expected outcome
+PASS E02-neighbor: 見解
+PASS E02-literal: 戻る
+back
+bookshelf
+藍
+EN
+日本語
+覚 0
+lists
+
+回廊 · 図書館kairo · the library
+
+Nothing found for that yet.
+PASS E03-browse-no-debt: Observed expected outcome
+PASS E04-palette-roster: 墨 朱 柿 漆 金 藍 赤 浪 板 雷
+PASS E04-return: Observed expected outcome
+PASS E06-pre-capture-no-debt: Observed expected outcome
+PASS E06-explicit-enrollment-label: User explicitly chose memorize. Current app has no separate save-only door on this sheet.
+PASS E06-enrollment: One explicitly memorized item: 朝; started=true; no FSRS grade yet
+PASS E07-study-visible: Observed expected outcome
+PASS E07-list-empty-validation: Observed expected outcome
+PASS E07-list-create: Observed expected outcome
+PASS E07-list-cancel: Observed expected outcome
+PASS E07-summary-surface: {"ground":[233,223,194],"paperAverage":[228,218,189],"ink":[28,47,66],"contrast":9.814728943138514,"zen":false}
+PASS E07-review-record: 2 deliberate grades, including short-learning repeats, on one explicitly enrolled word
+PASS E07-review-trace: last 7 days 0 · 0 · 0 · 0 · 0 · 0 · 2 | all time 2
+PASS E15-export: {"filename":"kairo-2026-09-14.json","file":"learner-export.json","keys":["v","taken","lists","srs","revlog","obslog","deepWords","lessonsDone","mockDone","mockRun","aiReading","aiReadings","suspended","aiChat","ai","aiQuiz","stats","srsPrefs","readDone","readerPos","dials"]}
+PASS E08-no-auto-enrollment: Deck=1; lessons=1; no enrollment button clicked
+PASS E09-requires-answer: Observed expected outcome
+PASS E09-answer-persists-back: Observed expected outcome
+PASS E09-no-auto-enrollment: Deck remains 1; completed papers 1
+PASS E10-reference-return: Observed expected outcome
+PASS E19-reference-320: {"w":320,"sw":320}
+PASS E19-reference-1280: {"w":1280,"sw":1280}
+PASS E10-browse-no-enrollment: Observed expected outcome
+PASS E13-current-shape-flow: Legacy journey omitted the by-strokes lens; selector exists there. Returned to parts for actual combined filter.
+PASS E13-skip-context: Observed expected outcome
+PASS E14-mirror: 鏡the mirror
+
+Where the evidence stands
+
+What follows is the record itself. It does not name your level; it lays out how much of each level’s material you have actually cleared — and whether you would pass is not knowable from here.
+
+29 judged answers — 29 measured · 0 observed
+
+語彙
+vocabulary
+
+N5
+7/16
+
+levels have been answered, and none is coming through yet.
+
+16 measured · 0 observed
+
+読み
+readings
+
+N5
+2/6
+
+levels have been answered, and none is coming through yet.
+
+6 measured · 0 observed
+
+文の形
+sentence form
+
+N5
+1/7
+
+levels have been answered, and none is coming through yet.
+
+7 measured · 0 observed
+
+自分で使う
+producing it yourself
+
+no evidence yet
+PASS E16-language-cycle: Observed expected outcome
+PASS E19-shelf-desktop: {"w":1280,"sw":1280}
+PASS E18-palette-reload: Observed expected outcome
+PASS E18-state-reload: 1 chosen item, 2 review, 1 lesson, 1 mock
+PASS E17-empty-key: Empty save deliberately returns to shelf; key remains absent, no provider request or fabricated response
+PASS E17-offline-safe: Observed expected outcome
+PASS E18-warm-offline: Observed expected outcome
+PASS E19-shelf-320: {"w":320,"sw":320}
+PASS E19-header-44: [{"text":"EN","h":44,"whiteSpace":"nowrap"},{"text":"日本語","h":44,"whiteSpace":"nowrap"}]
+PASS E18-home: Observed expected outcome
+PASS E20-no-page-errors: No uncaught page exceptions
+PASS E20-frozen-assets: Nine runtime/data hashes identical before and after journey
+{"passed":41,"failed":0,"skipped":0,"screenshots":63}

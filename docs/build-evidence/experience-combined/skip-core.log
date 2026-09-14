@@ -1,0 +1,107 @@
+Verified 10383 canonical and 939 alternate memberships across 982 query modes.
+All raw SKIP values/categories and fallback text match; stripped allowlist is intact.
+TAP version 13
+# Subtest: UMD exposes exactly the same public API in a browser without dependencies
+ok 1 - UMD exposes exactly the same public API in a browser without dependencies
+  ---
+  duration_ms: 8.461509
+  ...
+# Subtest: normalizes fullwidth ASCII, case, whitespace and common hyphens
+ok 2 - normalizes fullwidth ASCII, case, whitespace and common hyphens
+  ---
+  duration_ms: 1.011091
+  ...
+# Subtest: partial fields and whole-field wildcards are unambiguous
+ok 3 - partial fields and whole-field wildcards are unambiguous
+  ---
+  duration_ms: 0.338393
+  ...
+# Subtest: ordinary text is not hijacked, including kana prolonged-sound marks
+ok 4 - ordinary text is not hijacked, including kana prolonged-sound marks
+  ---
+  duration_ms: 0.36295
+  ...
+# Subtest: SKIP intent with malformed syntax produces invalid rather than text
+ok 5 - SKIP intent with malformed syntax produces invalid rather than text
+  ---
+  duration_ms: 0.464409
+  ...
+# Subtest: solid second field is total strokes and third is subtype 1–4
+ok 6 - solid second field is total strokes and third is subtype 1–4
+  ---
+  duration_ms: 0.585675
+  ...
+# Subtest: all four patterns return fixture matches
+ok 7 - all four patterns return fixture matches
+  ---
+  duration_ms: 0.417126
+  ...
+# Subtest: alternates are opt-in, marked, deduped and ordered after canonical hits
+ok 8 - alternates are opt-in, marked, deduped and ordered after canonical hits
+  ---
+  duration_ms: 0.390661
+  ...
+# Subtest: later duplicate canonical record outranks earlier alternate and multiple codes dedupe
+ok 9 - later duplicate canonical record outranks earlier alternate and multiple codes dedupe
+  ---
+  duration_ms: 0.290191
+  ...
+# Subtest: all four alternate categories are independently preserved
+ok 10 - all four alternate categories are independently preserved
+  ---
+  duration_ms: 1.22556
+  ...
+# Subtest: radical is an independent optional number filter, not a SKIP fourth field
+ok 11 - radical is an independent optional number filter, not a SKIP fourth field
+  ---
+  duration_ms: 4.024917
+  ...
+# Subtest: invalid parsed objects, missing data and malformed records fail safely
+ok 12 - invalid parsed objects, missing data and malformed records fail safely
+  ---
+  duration_ms: 0.269813
+  ...
+# Subtest: search is pure and does not mutate frozen inputs, options, or parsed query
+ok 13 - search is pure and does not mutate frozen inputs, options, or parsed query
+  ---
+  duration_ms: 0.34327
+  ...
+# Subtest: actual sidecar includes every pinned entry and all categories with explicit provenance
+ok 14 - actual sidecar includes every pinned entry and all categories with explicit provenance
+  ---
+  duration_ms: 0.258039
+  ...
+# Subtest: actual known codes verify pattern meanings and solid subtype precedence
+ok 15 - actual known codes verify pattern meanings and solid subtype precedence
+  ---
+  duration_ms: 230.921056
+  ...
+# Subtest: actual fallback coverage is independent of the limited Corridor catalog
+ok 16 - actual fallback coverage is independent of the limited Corridor catalog
+  ---
+  duration_ms: 52.105956
+  ...
+# Subtest: source anomalies are retained but never passed off as valid classifications
+ok 17 - source anomalies are retained but never passed off as valid classifications
+  ---
+  duration_ms: 33.675037
+  ...
+# Subtest: every valid actual canonical and alternate code is reachable, deduped, and correctly ordered
+ok 18 - every valid actual canonical and alternate code is reachable, deduped, and correctly ordered
+  ---
+  duration_ms: 12216.004381
+  ...
+# Subtest: optional raw pinned archive reproduces byte-for-byte sidecar and preserves stripped corpus output
+ok 19 - optional raw pinned archive reproduces byte-for-byte sidecar and preserves stripped corpus output
+  ---
+  duration_ms: 2097.171269
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14693.380387

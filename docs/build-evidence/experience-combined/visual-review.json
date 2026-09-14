@@ -1,45 +1,65 @@
 {
-  "runStarted": "2026-09-14T08:57:41.101Z",
+  "runStarted": "2026-09-14T09:11:25.401Z",
   "root": "/home/user/workspace/Bunki-experience-combined/prototypes/corridor",
   "summary": {
     "reviewed": 63,
+    "reviewedAt": "2026-09-14T12:07:43.989164+00:00",
+    "runStarted": "2026-09-14T09:11:25.401Z",
     "fullResolutionFinalShots": [
-      7,
-      25,
-      50,
+      26,
       51,
-      59,
       62
     ],
     "contactSheets": [
-      "/home/user/workspace/experience-combined-review-1.jpg",
-      "/home/user/workspace/experience-combined-review-2.jpg",
-      "/home/user/workspace/experience-combined-review-3.jpg",
-      "/home/user/workspace/experience-combined-review-4.jpg",
-      "/home/user/workspace/experience-combined-review-5.jpg",
-      "/home/user/workspace/experience-combined-review-6.jpg"
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-01.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-02.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-03.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-04.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-05.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-06.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-07.jpg",
+      "/home/user/workspace/Bunki-experience-evidence/combined-with-SKIP-contact-08.jpg"
     ],
-    "outcome": "All 63 combined-run screenshots inspected; no visually observed blocking layout regression. New SKIP badges, lens and typed-code search integrate into shared navigation and visual hierarchy. Functional 40/40 result was produced by main; this lane adds visual observations only.",
+    "outcome": "All final-run screenshots inspected. Previously missed review-summary surface/contrast defect is visibly resolved and independently covered by the recorded E07-summary-surface check. No additional blocking composition issue identified in this saved-image review; this is not a complete contrast/accessibility certification.",
+    "resolvedFindings": [
+      {
+        "id": "review-summary-night-paper",
+        "status": "resolved-in-latest-evidence",
+        "priorReviewMiss": "Prior review missed a real review-summary contrast defect and incorrectly described the nearly invisible heading as an intentionally sparse seal-only presentation. That judgment is withdrawn. Main identified stale night-paper canvas after zen class removal and reports moving syncPaper() after the zen toggle. Latest full-resolution screenshot 26 shows the restored light surface, visible heading and count; E07-summary-surface passes in both replacement runs. Contact sheets alone did not establish contrast and must not be treated as a comprehensive contrast audit.",
+        "image": "screenshots/20260914091125-26-review-summary.png",
+        "automatedEvidence": {
+          "id": "E07-summary-surface",
+          "status": "pass",
+          "expected": "Completion restores matching day/night paper and readable heading",
+          "observed": "{\"ground\":[233,223,194],\"paperAverage\":[228,218,189],\"ink\":[28,47,66],\"contrast\":9.814728943138514,\"zen\":false}"
+        },
+        "visualEvidence": "Light paper, dark completion heading, numeric grade count and distinct return/undo controls are clearly visible in both full-resolution final summary captures."
+      }
+    ],
     "limitations": [
-      "Living-ink images 11–13 are animation states, not completed glyph proof.",
-      "Shot 15 cuts off expanded source details; later palette/Japanese screenshots show those details.",
-      "Shot 20 shows memorize selection, not list-filing options.",
-      "No-key tutor online/offline looks identical and has no explicit offline warning.",
-      "Picker lower rows and dense content require scrolling; screenshot review is not whole-page or physical-device usability proof.",
-      "This visual review covers the 63 primary combined journey images only, not the separate skip-shots or standalone-offline suite assets."
+      "Contact sheets were used to inspect all transitions but cannot establish text contrast; the prior missed defect demonstrates this limit.",
+      "Only listed fullResolutionFinalShots were additionally inspected at native image resolution in this final review.",
+      "Living-ink screenshots 11–13 are animation frames, not completed-glyph proof.",
+      "Shot 15 cuts off expanded source details below the viewport.",
+      "Shot 20 shows selected memorize, not list filing.",
+      "No-key tutor online/offline remains visually identical with no explicit offline warning.",
+      "Long placeholder truncates inside the 320px input; shelf doors and dense content wrap vertically.",
+      "The journey records warm HTTP offline behavior; this visual annotation adds no cold-offline, native or live-provider claim.",
+      "Separate main SKIP and standalone suite assets are outside this 61/63-image review."
     ],
     "usabilityFindings": [
-      "New SKIP metadata badges remain separate from difficulty labels on kanji entries; no overlap observed in the 390px sheet.",
-      "Six shape-finder lenses form a four-plus-two grid with SKIP clearly selected.",
-      "Typed-code screen shows code, canonical count and visible-result cap explicitly. Four-column picker is information-dense but aligned; bottom options are below fold.",
-      "Reference and combined retain a sparse review-completion seal, small secondary dark labels and many equal-weight shelf doors.",
-      "320px shelf top controls stay single-line; long search placeholder truncates within its field and content doors wrap vertically."
-    ],
-    "coverageBoundary": "No extra offline/live tutor/native claims added by this saved-image review. Combined SKIP is exercised by this run; other non-SKIP journey coverage limits remain those of the harness."
+      "Corrected review completion now communicates Session done and grade count rather than appearing as a sparse unexplained seal.",
+      "Shelf has many equally weighted doors; Drift navigation requires exploration.",
+      "Dark secondary labels and disabled controls are faint; no blanket contrast judgment from thumbnails.",
+      "Reading and recursive entry sheets maintain a consistent paper/ink hierarchy.",
+      "Narrow headers remain single-line while shelf doors wrap into a longer page.",
+      "SKIP badge remains separate from stroke/difficulty chips; six lenses fit four-plus-two rows.",
+      "Typed 1-3-8 query, code heading, canonical/shown counts and selected picker row agree visibly; lower picker options require scrolling."
+    ]
   },
   "screenshots": [
     {
-      "file": "screenshots/20260914085741-01-drift-clean.png",
+      "file": "screenshots/20260914091125-01-drift-clean.png",
       "name": "drift-clean",
       "expected": "Fresh default landing with discoverable navigation",
       "observed": "Quiet map-like Drift with a small top navigation seal and unobstructed artwork; discoverability depends on exploration.",
@@ -60,11 +80,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-02-drift-navigation.png",
+      "file": "screenshots/20260914091125-02-drift-navigation.png",
       "name": "drift-navigation",
       "expected": "Expanded normal navigation reveals shelf door",
       "observed": "Expanded navigation exposes a shelf bubble and tutor bubble without replacing Drift.",
@@ -85,11 +106,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-03-shelf-mobile.png",
+      "file": "screenshots/20260914091125-03-shelf-mobile.png",
       "name": "shelf-mobile",
       "expected": "Bilingual shelf doors and real texts are legible at 390px",
       "observed": "All major shelf doors fit at 390px; warm paper hierarchy is coherent, but many equally weighted choices compete.",
@@ -110,11 +132,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-04-search-synonyms.png",
+      "file": "screenshots/20260914091125-04-search-synonyms.png",
       "name": "search-synonyms",
       "expected": "Word hits plus semantic neighbors",
       "observed": "Word results and semantic neighbors are visibly separate, with a clearable query.",
@@ -135,11 +158,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-05-search-literal-empty.png",
+      "file": "screenshots/20260914091125-05-search-literal-empty.png",
       "name": "search-literal-empty",
       "expected": "Malformed-looking input is harmless literal text with honest no-results feedback",
       "observed": "Markup-looking input remains text; the honest no-results message leaves a clear recovery affordance.",
@@ -160,11 +184,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-06-word-entry.png",
+      "file": "screenshots/20260914091125-06-word-entry.png",
       "name": "word-entry",
       "expected": "Correct 森林 full entry, readings, kanji and semantic/provenance content",
       "observed": "森林 entry opens as a readable sheet over retained search context, with reading, meaning and kanji doors.",
@@ -185,11 +210,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-07-kanji-mori.png",
+      "file": "screenshots/20260914091125-07-kanji-mori.png",
       "name": "kanji-mori",
       "expected": "森 kanji detail includes readings, components and compounds",
       "observed": "森 detail combines Forest, 12 strokes, Kentei/JLPT chips and a separate SKIP 2-4-8 badge without overlap. Readings, radical, strokes door and 林 component retain clear hierarchy at 390px.",
@@ -208,13 +234,14 @@
         "text": "← 戻るback"
       },
       "visualReview": {
-        "method": "contact-sheet + full-resolution",
+        "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-08-component-hayashi.png",
+      "file": "screenshots/20260914091125-08-component-hayashi.png",
       "name": "component-hayashi",
       "expected": "A component is a traversable node, not a dead label",
       "observed": "林 component explicitly distinguishes shape component from dictionary radical and offers view-as-kanji.",
@@ -235,11 +262,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-09-component-to-kanji.png",
+      "file": "screenshots/20260914091125-09-component-to-kanji.png",
       "name": "component-to-kanji",
       "expected": "Containing-kanji door returns to canonical kanji detail",
       "observed": "林 kanji detail shows Grove, level/stroke metadata and SKIP 1-4-4; the new badge does not displace the shared navigation or radical/stroke doors out of their logical order.",
@@ -260,11 +288,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-10-kanji-to-compound.png",
+      "file": "screenshots/20260914091125-10-kanji-to-compound.png",
       "name": "kanji-to-compound",
       "expected": "A compound reopens full word entry through the same sheet",
       "observed": "Compound entry shows 林 readings and multiple senses, with visible return and close controls.",
@@ -285,11 +314,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-11-writing-dormant.png",
+      "file": "screenshots/20260914091125-11-writing-dormant.png",
       "name": "writing-dormant",
       "expected": "Current writing room, live glyph, usable return; constitutional/control policy mismatch recorded separately",
       "observed": "Dormant writing room is captured mid-stroke, not as a completed 森; faint corner controls remain under later operator direction.",
@@ -310,11 +340,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-12-writing-awake.png",
+      "file": "screenshots/20260914091125-12-writing-awake.png",
       "name": "writing-awake",
       "expected": "Awake room exposes complete readings and controls",
       "observed": "Awake writing room shows reading cards and corner controls while ink animates; this is a transition view, not completed calligraphy proof.",
@@ -335,11 +366,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-13-writing-dark-numbers.png",
+      "file": "screenshots/20260914091125-13-writing-dark-numbers.png",
       "name": "writing-dark-numbers",
       "expected": "Dark world, readable glyph and working number control",
       "observed": "Dark room shows lit stroke numbers and selected numbering control; glyph is still being drawn.",
@@ -360,11 +392,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-14-writing-return-context.png",
+      "file": "screenshots/20260914091125-14-writing-return-context.png",
       "name": "writing-return-context",
       "expected": "Original kanji restored rather than generic home",
       "observed": "Escape restores the original 森 sheet in dark palette, now including its SKIP 2-4-8 badge; this is preserved entry context, not generic home.",
@@ -385,11 +418,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-15-shelf-source-details.png",
+      "file": "screenshots/20260914091125-15-shelf-source-details.png",
       "name": "shelf-source-details",
       "expected": "Source and difficulty detail disclosure stays distinct from mastery",
       "observed": "Shelf article and details affordance are visible, but expanded detail content lies below this viewport; image alone does not prove full disclosure readability.",
@@ -410,11 +444,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-16-reader-initial.png",
+      "file": "screenshots/20260914091125-16-reader-initial.png",
       "name": "reader-initial",
       "expected": "Actual Japanese text, reading controls, and clear return",
       "observed": "Reader presents title, difficulty, voice controls and comfortable Japanese text in a clear paper panel.",
@@ -435,11 +470,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-17-reader-settings.png",
+      "file": "screenshots/20260914091125-17-reader-settings.png",
       "name": "reader-settings",
       "expected": "Independent kanji, furigana and spacing settings all accept deliberate input",
       "observed": "Independent reading dials are open and selected states are visible; text representation changes beneath them.",
@@ -460,11 +496,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-18-reader-reading-rung.png",
+      "file": "screenshots/20260914091125-18-reader-reading-rung.png",
       "name": "reader-reading-rung",
       "expected": "First activation reveals reading without opening full entry",
       "observed": "First token activation adds the reading above 朝 without opening a sheet.",
@@ -485,11 +522,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-19-reader-gloss-rung.png",
+      "file": "screenshots/20260914091125-19-reader-gloss-rung.png",
       "name": "reader-gloss-rung",
       "expected": "Second activation reveals meaning without taking over the reading",
       "observed": "Second token activation adds the meaning while the same reader remains visible.",
@@ -510,11 +548,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-20-reader-explicit-memorize.png",
+      "file": "screenshots/20260914091125-20-reader-explicit-memorize.png",
       "name": "reader-explicit-memorize",
       "expected": "Chosen word is visibly marked memorizing and offers list filing",
       "observed": "朝 sheet and selected memorize control are visible; list-filing options are not visible in this viewport, so this image proves selection rather than filing.",
@@ -535,11 +574,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-21-reader-resumed.png",
+      "file": "screenshots/20260914091125-21-reader-resumed.png",
       "name": "reader-resumed",
       "expected": "Reader context and learner mark remain after entry close",
       "observed": "Reader resumes lower in the same article; a small quick-look/full-entry affordance remains near a token without covering the whole page.",
@@ -560,11 +600,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-22-my-study-enrolled.png",
+      "file": "screenshots/20260914091125-22-my-study-enrolled.png",
       "name": "my-study-enrolled",
       "expected": "My Study shows the one explicitly memorized item and review availability",
       "observed": "My Study explicitly says Memorizing 1 item, lists 朝 and offers the review action.",
@@ -585,11 +626,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-23-my-study-list-created.png",
+      "file": "screenshots/20260914091125-23-my-study-list-created.png",
       "name": "my-study-list-created",
       "expected": "Named list created, rename canceled safely",
       "observed": "Evening Japanese list is visible and the discarded rename draft is absent; current list remains empty.",
@@ -610,11 +652,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-24-review-recall.png",
+      "file": "screenshots/20260914091125-24-review-recall.png",
       "name": "review-recall",
       "expected": "Review asks learner for honest recall before revealing the answer",
       "observed": "Review initially conceals the answer and presents not-yet/recalled choices below a large 朝 card.",
@@ -635,11 +678,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-25-review-revealed-grade.png",
+      "file": "screenshots/20260914091125-25-review-revealed-grade.png",
       "name": "review-revealed-grade",
       "expected": "Answer and explicit grade control precede FSRS scheduling",
       "observed": "After animation settles, reading, meaning and four explicit grade seals with intervals are readable and fully inside 390px viewport.",
@@ -658,17 +702,18 @@
         "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
       },
       "visualReview": {
-        "method": "contact-sheet + full-resolution",
+        "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-26-review-summary.png",
+      "file": "screenshots/20260914091125-26-review-summary.png",
       "name": "review-summary",
-      "expected": "Explicit review produces visible completion summary",
-      "observed": "Review completion uses a very sparse seal-and-return presentation; it is navigable but provides little narrative confirmation by itself.",
-      "status": "reviewed",
+      "expected": "Explicit review produces visible completion summary on correctly restored paper",
+      "observed": "Corrected light paper now visibly carries “Session done — 2 cards”, the Good seal with count 2, Back to lists and Undo last grade. Full-resolution review confirms the previously invisible heading/count are readable. E07-summary-surface records matched day-paper surface and title contrast 9.81:1; this measurement applies to that tested title/surface, not every label.",
+      "status": "reviewed-resolved-defect",
       "viewport": {
         "width": 390,
         "height": 844
@@ -683,13 +728,14 @@
         "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
       },
       "visualReview": {
-        "method": "contact-sheet",
+        "method": "contact-sheet + full-resolution",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-27-study-export-trace.png",
+      "file": "screenshots/20260914091125-27-study-export-trace.png",
       "name": "study-export-trace",
       "expected": "Study after real export: durable trace and export control",
       "observed": "Study shows all-time review trace 2 and a due interval on 朝; export/import controls remain visible after actual download.",
@@ -710,11 +756,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-28-lesson-catalog.png",
+      "file": "screenshots/20260914091125-28-lesson-catalog.png",
       "name": "lesson-catalog",
       "expected": "Lessons are separate from reference catalog and personal study",
       "observed": "Lesson catalog is long and consistently grouped by level; repeated row weight makes scanning deliberate rather than guided.",
@@ -735,11 +782,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-29-lesson-learning.png",
+      "file": "screenshots/20260914091125-29-lesson-learning.png",
       "name": "lesson-learning",
       "expected": "Lesson teaches one word at a time",
       "observed": "Lesson teaches a single large word with a clear Next action and ample whitespace.",
@@ -760,11 +808,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-30-lesson-quiz.png",
+      "file": "screenshots/20260914091125-30-lesson-quiz.png",
       "name": "lesson-quiz",
       "expected": "Quiz requires an explicit answer",
       "observed": "Lesson quiz exposes explicit choices beneath the prompt; it does not reveal a preselected answer.",
@@ -785,14 +834,15 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-31-lesson-complete-not-enrolled.png",
+      "file": "screenshots/20260914091125-31-lesson-complete-not-enrolled.png",
       "name": "lesson-complete-not-enrolled",
       "expected": "Completion honestly reports practice and offers optional enrollment",
-      "observed": "Lesson completion shows 2 of 10 and individual memorize options; copy explicitly says choosing nothing adds nothing.",
+      "observed": "Lesson completion shows 2 of 10 and optional individual memorize controls. The visible explanation states choosing nothing adds nothing; completion evidence remains distinct from enrollment.",
       "status": "reviewed",
       "viewport": {
         "width": 390,
@@ -810,11 +860,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-32-mock-catalog.png",
+      "file": "screenshots/20260914091125-32-mock-catalog.png",
       "name": "mock-catalog",
       "expected": "Bundled mock papers clearly separate score evidence from scheduling",
       "observed": "Mock catalog distinguishes practice score evidence from scheduling and lists bundled papers by level.",
@@ -835,11 +886,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-33-mock-question.png",
+      "file": "screenshots/20260914091125-33-mock-question.png",
       "name": "mock-question",
       "expected": "Paper starts with unselected answer and next disabled",
       "observed": "Mock starts with unselected choices and visually muted Next; navigation and quit controls remain accessible.",
@@ -860,11 +912,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-34-mock-selected-answer.png",
+      "file": "screenshots/20260914091125-34-mock-selected-answer.png",
       "name": "mock-selected-answer",
       "expected": "Selection is visible and still editable; no instant correctness",
       "observed": "Chosen mock answer has a clear outlined state and Next is enabled; correctness is not prematurely shown.",
@@ -885,11 +938,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-35-mock-results.png",
+      "file": "screenshots/20260914091125-35-mock-results.png",
       "name": "mock-results",
       "expected": "Submitted paper has score, explanations and deliberate optional enrollment",
       "observed": "Mock results show 7 of 18, explanations and optional memorize actions; explanatory copy avoids claiming a predicted pass.",
@@ -910,11 +964,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-36-reference-overview.png",
+      "file": "screenshots/20260914091125-36-reference-overview.png",
       "name": "reference-overview",
       "expected": "Reference includes complete bundled level collections independently of lessons",
       "observed": "Reference overview separates JLPT vocabulary/kanji and displays collection counts, not assumed learner mastery.",
@@ -935,11 +990,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-37-reference-n1.png",
+      "file": "screenshots/20260914091125-37-reference-n1.png",
       "name": "reference-n1",
       "expected": "N1 vocabulary is reachable from reference even when lesson inventory differs",
       "observed": "N1 collection has source-scope note, search, paging and count; first rows fit while more continue below.",
@@ -960,11 +1016,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-38-reference-detail.png",
+      "file": "screenshots/20260914091125-38-reference-detail.png",
       "name": "reference-detail",
       "expected": "Canonical reference entry opens without enrollment",
       "observed": "Reference detail opens over the paged list using the same sheet language as dictionary entries.",
@@ -985,11 +1042,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-39-reference-empty.png",
+      "file": "screenshots/20260914091125-39-reference-empty.png",
       "name": "reference-empty",
       "expected": "Reference empty search explains recovery",
       "observed": "Empty reference search explicitly says No matching entries and offers clear/search-whole-dictionary recovery.",
@@ -1010,11 +1068,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-40-reference-n3.png",
+      "file": "screenshots/20260914091125-40-reference-n3.png",
       "name": "reference-n3",
       "expected": "N3 remains independently reachable",
       "observed": "N3 has its own collection count and visible entries, independent of lesson catalogs.",
@@ -1035,11 +1094,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-41-reference-kentei-advanced.png",
+      "file": "screenshots/20260914091125-41-reference-kentei-advanced.png",
       "name": "reference-kentei-advanced",
       "expected": "Advanced Kentei is an honest reference collection, not a personal-study level",
       "observed": "Advanced Kentei 1級 has source-scope note and large collection paging rather than implying complete study coverage.",
@@ -1060,11 +1120,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-42-advanced-reference-detail.png",
+      "file": "screenshots/20260914091125-42-advanced-reference-detail.png",
       "name": "advanced-reference-detail",
       "expected": "Supplementary source entry exposes honest detail or canonical sheet without invented mastery",
       "observed": "Advanced source-only entry exposes a source record and explicitly says study-entry data is not bundled; no invented study action is presented.",
@@ -1085,11 +1146,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-43-reference-320.png",
+      "file": "screenshots/20260914091125-43-reference-320.png",
       "name": "reference-320",
       "expected": "Dense reference remains readable and operable at 320px",
       "observed": "At 320px reference controls wrap vertically without document overflow; input placeholder is naturally clipped within its field.",
@@ -1110,11 +1172,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-44-reference-1280.png",
+      "file": "screenshots/20260914091125-44-reference-1280.png",
       "name": "reference-1280",
       "expected": "Desktop reference respects line length and hierarchy",
       "observed": "At 1280px reference uses a constrained reading column, preserving line length with substantial surrounding whitespace.",
@@ -1135,11 +1198,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-45-grammar-index.png",
+      "file": "screenshots/20260914091125-45-grammar-index.png",
       "name": "grammar-index",
       "expected": "Grammar is reachable with useful named entries",
       "observed": "Grammar index has level chips and named entries in a consistent list hierarchy.",
@@ -1160,11 +1224,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-46-grammar-entry.png",
+      "file": "screenshots/20260914091125-46-grammar-entry.png",
       "name": "grammar-entry",
       "expected": "Grammar detail has explanation, examples and same close/back model",
       "observed": "Grammar detail presents level, explanation, examples and source note in the shared sheet pattern.",
@@ -1185,11 +1250,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-47-thesaurus.png",
+      "file": "screenshots/20260914091125-47-thesaurus.png",
       "name": "thesaurus",
       "expected": "Semantic differences can be compared side by side",
       "observed": "Thesaurus groups near-synonyms with short English distinctions; this is a comparison index, not a mastery score.",
@@ -1210,11 +1276,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-48-idiom-entry.png",
+      "file": "screenshots/20260914091125-48-idiom-entry.png",
       "name": "idiom-entry",
       "expected": "Four-character idiom has a real recursive detail door",
       "observed": "Idiom detail contains meaning, component glyph doors and deliberate memorize action.",
@@ -1235,11 +1302,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-49-shape-wood-eight.png",
+      "file": "screenshots/20260914091125-49-shape-wood-eight.png",
       "name": "shape-wood-eight",
       "expected": "Current parts+strokes flow finds 林 without relying on stale controls",
       "observed": "Shape finder shows 木 and eight-stroke constraints with 林 among candidates. Adding SKIP causes the six lens buttons to use a four-plus-two layout, still readable at 390px.",
@@ -1260,11 +1328,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-50-skip-integrated.png",
+      "file": "screenshots/20260914091125-50-skip-integrated.png",
       "name": "skip-integrated",
       "expected": "SKIP is a normal shape-finder lens within the same journey",
       "observed": "SKIP is visibly selected as an ordinary shape-finder lens. Shape code 1-*-*, canonical/shown counts, alternate-record checkbox, candidate grid and four-column picker are legible. Picker extends below the viewport; lower options require scrolling. Instructions say shape/counts/radical are lookup filters, not difficulty.",
@@ -1283,13 +1352,14 @@
         "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
       },
       "visualReview": {
-        "method": "contact-sheet + full-resolution",
+        "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-51-skip-code-search.png",
+      "file": "screenshots/20260914091125-51-skip-code-search.png",
       "name": "skip-code-search",
       "expected": "Typed SKIP code gives real candidates",
       "observed": "Typed 1-3-8 is retained in the search field and SKIP heading. The selected picker row visibly matches pattern 1, left 3, right 8; 271 canonical matches and 72 shown are distinguished. Close SKIP/search words provides an explicit exit, and no enrollment action is presented here.",
@@ -1310,14 +1380,15 @@
       "visualReview": {
         "method": "contact-sheet + full-resolution",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-52-learner-mirror.png",
+      "file": "screenshots/20260914091125-52-learner-mirror.png",
       "name": "learner-mirror",
       "expected": "Mirror reflects honest practice/retrieval dimensions without assigning false level",
-      "observed": "Mirror labels evidence dimensions and explicitly refuses to infer a level or pass likelihood; ratios require careful reading rather than a single score.",
+      "observed": "Mirror separates vocabulary, reading and sentence-form evidence and explicitly avoids assigning a level/pass prediction. This run shows 7/16 for vocabulary; fractional evidence and prose require careful reading, rather than implying mastery from one score.",
       "status": "reviewed",
       "viewport": {
         "width": 390,
@@ -1335,14 +1406,15 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-53-world-picker.png",
+      "file": "screenshots/20260914091125-53-world-picker.png",
       "name": "world-picker",
       "expected": "Exactly ten public worlds in consistent order",
-      "observed": "Ten palette seals appear above the shelf; the article disclosure remains open below, with provenance/difficulty bars visibly separated from the source excerpt.",
+      "observed": "Ten named palette seals form a compact floating chooser over the shelf. The first article and its source/difficulty badge remain visible below; expanded detail bars are not visible in this image.",
       "status": "reviewed",
       "viewport": {
         "width": 390,
@@ -1360,11 +1432,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-54-shelf-dark.png",
+      "file": "screenshots/20260914091125-54-shelf-dark.png",
       "name": "shelf-dark",
       "expected": "Dark world changes the whole shelf with legible controls",
       "observed": "Dark shelf retains readable hierarchy and a clearly selected English segment; fine secondary labels are small and deserve physical-device review.",
@@ -1385,11 +1458,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-55-shelf-japanese.png",
+      "file": "screenshots/20260914091125-55-shelf-japanese.png",
       "name": "shelf-japanese",
       "expected": "Japanese-only chrome is deliberate and reversible",
       "observed": "Japanese mode changes shelf chrome and selected language segment; Japanese doors reflow rather than compress into unreadable mixed labels.",
@@ -1410,11 +1484,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-56-keyboard-focus-dark.png",
+      "file": "screenshots/20260914091125-56-keyboard-focus-dark.png",
       "name": "keyboard-focus-dark",
       "expected": "Keyboard focus remains perceivable in dark palette",
       "observed": "Keyboard focus outline is visible around the Back control in the dark palette.",
@@ -1435,14 +1510,15 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-57-shelf-desktop-dark.png",
+      "file": "screenshots/20260914091125-57-shelf-desktop-dark.png",
       "name": "shelf-desktop-dark",
       "expected": "Desktop dark shelf has coherent hierarchy",
-      "observed": "Dark desktop shelf remains a constrained reading column; expanded article detail bars and subsequent article content use the same hierarchy rather than stretching across the screen.",
+      "observed": "Dark desktop shelf retains a narrow reading column and large surrounding space. Expanded article detail bars appear below the first source excerpt; this thumbnail establishes overall layout, not small-label contrast.",
       "status": "reviewed",
       "viewport": {
         "width": 1280,
@@ -1460,14 +1536,15 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-58-study-reloaded.png",
+      "file": "screenshots/20260914091125-58-study-reloaded.png",
       "name": "study-reloaded",
       "expected": "Personal evidence and cards survive normal reload",
-      "observed": "Reloaded dark My Study retains one memorized word, review trace and named list, consistent with persistence assertions.",
+      "observed": "Reloaded dark My Study clearly shows Memorizing 1 item, all-time review trace 2, Evening Japanese list and 朝 due in 2 days. Fine secondary labels and faint disabled controls remain less prominent than the heading; no exhaustive contrast claim is made.",
       "status": "reviewed",
       "viewport": {
         "width": 390,
@@ -1485,11 +1562,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-59-tutor-unconfigured.png",
+      "file": "screenshots/20260914091125-59-tutor-unconfigured.png",
       "name": "tutor-unconfigured",
       "expected": "No key means honest setup, not a fabricated conversation",
       "observed": "No-key tutor is an honest API-key setup screen with storage/provider explanation; blank Save is available but does not enable a conversation.",
@@ -1508,13 +1586,14 @@
         "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
       },
       "visualReview": {
-        "method": "contact-sheet + full-resolution",
+        "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-60-tutor-offline-no-key.png",
+      "file": "screenshots/20260914091125-60-tutor-offline-no-key.png",
       "name": "tutor-offline-no-key",
       "expected": "Offline/unconfigured tutor stays safe; no provider reliability claim",
       "observed": "Offline no-key tutor intentionally looks identical to unconfigured online setup; no offline-specific warning is displayed, and no provider response is claimed.",
@@ -1535,11 +1614,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-61-offline-reference-warm.png",
+      "file": "screenshots/20260914091125-61-offline-reference-warm.png",
       "name": "offline-reference-warm",
       "expected": "Warm loaded reference remains usable while network is disabled",
       "observed": "Warm offline N3 search shows water matches with query and count; this does not demonstrate cold offline startup.",
@@ -1560,11 +1640,12 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-62-shelf-narrow-final.png",
+      "file": "screenshots/20260914091125-62-shelf-narrow-final.png",
       "name": "shelf-narrow-final",
       "expected": "Narrow header retains 44px controls and unwrapped language labels",
       "observed": "At 320px top controls remain single-line and 44px high; shelf doors wrap into a longer layout. Long search placeholder truncates within the input, not beyond the viewport.",
@@ -1585,11 +1666,12 @@
       "visualReview": {
         "method": "contact-sheet + full-resolution",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     },
     {
-      "file": "screenshots/20260914085741-63-home-return.png",
+      "file": "screenshots/20260914091125-63-home-return.png",
       "name": "home-return",
       "expected": "Whole continuous journey closes at Drift with personal state retained",
       "observed": "Final return restores quiet Drift; first-visit invitation is no longer shown, consistent with a completed journey rather than a fresh landing.",
@@ -1610,7 +1692,8 @@
       "visualReview": {
         "method": "contact-sheet",
         "reviewer": "experience-QA subagent",
-        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+        "reviewedRunStarted": "2026-09-14T09:11:25.401Z",
+        "scope": "Saved final-run images only. No browser, runtime or harness changes. Composition review does not certify all text contrast or accessibility."
       }
     }
   ]

@@ -1,0 +1,25 @@
+
+— dormant room
+  ok   minimal room opens asleep — {"minimal":"on","chrome":"sleeping"}
+  ok   sleeping controls are the four corners and the ensō mark, nothing else — [{"id":"strokes-back","cls":"stroke-back","inField":false,"isTrigger":false,"label":"← 戻るback"},{"id":"stroke-world-seal","cls":"theme-seal stroke-seal","inField":false,"isTrigger":false,"label":"choose a world"},{"id":"","cls":"stroke-chrome-trigger","inField":false,"isTrigger":true,"label":"show controls"},{"id":"stroke-numbers","cls":"stroke-btn stroke-corner stroke-corner-br","inField":false,"isTrigger":false,"label":"筆順の番号stroke order numbers"},{"id":"stroke-speed","cls":"stroke-btn stroke-corner stroke-corner-bl","inField":false,"isTrigger":false,"label":"ゆっくりslowly"}]
+  ok   the trigger names a real dormant field and reports collapsed — {"trigger":{"text":"","mark":true,"controls":"stroke-awake-field","expanded":"false","label":"show controls","visible":true},"field":{"inert":true,"hidden":"true","visible":false,"rect":{"top":730.203125,"right":378,"bottom":802,"left":12}}}
+  ok   the dormant field is absent from sight and the accessibility tree — {"inert":true,"hidden":"true","visible":false,"rect":{"top":730.203125,"right":378,"bottom":802,"left":12}}
+  ok   quiet entry adds one same-URL Back sentinel and preserves host state — {"historyBase":{"length":3,"url":"http://127.0.0.1:39767/index.html?entry=shelf&ui=bi"},"historyOpen":{"length":4,"url":"http://127.0.0.1:39767/index.html?entry=shelf&ui=bi","kept":"kept","marker":{"token":"bunki-stroke-mu101a4p-1","id":"永","sheetScroll":393,"invoker":"strokes-door"}}}
+  ok   the dialog names the invisible platform Back exit — {"describedBy":"stroke-exit-description","text":"Use the browser or device Back command to leave the writing room."}
+  ok   the quiet 戻る sheds its English sub-caption — {"subPresent":true,"subDisplay":"none","text":"← 戻るback"}
+
+— awake field
+  ok   one press wakes the allowed field without leaving the room — {"chrome":"awake","trigger":{"text":"","mark":true,"controls":"stroke-awake-field","expanded":"true","label":"hide controls","visible":true},"field":{"inert":false,"hidden":null,"visible":true,"rect":{"top":714.203125,"right":378,"bottom":786,"left":12}}}
+  ok   every visible control belongs to the awake field or is its trigger — [{"id":"strokes-back","cls":"stroke-back","inField":false,"isTrigger":false,"label":"← 戻るback"},{"id":"stroke-world-seal","cls":"theme-seal stroke-seal","inField":false,"isTrigger":false,"label":"choose a world"},{"id":"","cls":"stroke-chrome-trigger","inField":false,"isTrigger":true,"label":"hide controls"},{"id":"stroke-numbers","cls":"stroke-btn stroke-corner stroke-corner-br","inField":false,"isTrigger":false,"label":"筆順の番号stroke order numbers"},{"id":"stroke-speed","cls":"stroke-btn stroke-corner stroke-corner-bl","inField":false,"isTrigger":false,"label":"ゆっくりslowly"}]
+  ok   the awake control field does not overlap the glyph or its numerals — {"glyph":{"top":238.703125,"bottom":605.296875,"left":11.703125,"right":378.296875},"field":{"top":714.203125,"right":378,"bottom":786,"left":12}}
+  ok   the seal opens the public ten 墨 朱 柿 漆 金 藍 赤 浪 板 雷 in order — ["墨","朱","柿","漆","金","藍","赤","浪","板","雷"]
+  ok   the world stones form one named dialog — {"role":"dialog","label":"choose a world"}
+  ok   shu palette applies, persists, and keeps one live sheet — {"stored":"shu","chrome":"awake","pressed":1,"canvases":1}
+page.waitForSelector: Timeout 8000ms exceeded.
+Call log:
+  - waiting for locator('.world-picker') to be visible
+    - locator resolved to visible <div role="dialog" class="world-picker" aria-label="choose a world">…</div>
+
+    at main (/home/user/workspace/Bunki-reference/prototypes/corridor/tools/verify-writing-room.mjs:430:18) {
+  name: 'TimeoutError'
+}
