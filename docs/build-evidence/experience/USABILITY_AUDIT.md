@@ -1,12 +1,18 @@
 # Bunki whole-experience usability audit
 
-Date: 2026-09-14. Scope: the integrated Corridor browser prototype, reference-library cleanup, and a prospective combination with the separately reviewed SKIP feature. Neither feature is merged by this work. This is an agent-operated real-browser evaluation, not a study with recruited human participants or a physical iPhone acceptance test.
+Date: 2026-09-14. Scope: the integrated Corridor browser prototype, reference-library cleanup, and its combination with SKIP. This is an agent-operated real-browser evaluation, not a study with recruited human participants or a physical iPhone acceptance test. The agent did not merge either feature.
 
 ## Result
 
 The reference branch's clean-context journey passed **40 checks**, with one expected SKIP-absence marker, and produced **61 final screenshots**. The disposable combined build passed **41 checks with SKIP required**, with no failures or skips, and produced **63 final screenshots**. The two final walkthroughs therefore provide **124 manifest-declared full-resolution captures**, separately from focused regression screenshots and earlier diagnostics.
 
-The implementation revisions tested are reference `06406e3ea3cd47a8dff2709f7862207b8bcee41a` and SKIP `66e5a3785b15f0281bffb5c80aaa0b6b5a97dc29`. Git's three-way merge-tree computation was conflict-free; detached verification snapshot `d8981b6b4c4237f7c58a15e189125f99d6b30864` was used only for testing, with its standalone artifact rebuilt. The reference and SKIP PRs remain independent and unmerged.
+The implementation revisions tested are reference `06406e3ea3cd47a8dff2709f7862207b8bcee41a` and SKIP `66e5a3785b15f0281bffb5c80aaa0b6b5a97dc29`. Git's three-way merge-tree computation was conflict-free; detached verification snapshot `d8981b6b4c4237f7c58a15e189125f99d6b30864` was used only for testing, with its standalone artifact rebuilt. The original feature PRs were still separate during these walkthroughs.
+
+## Delivery after the operator's merges
+
+The operator subsequently merged [reference PR #92](https://github.com/AmitabhainArunachala/Bunki-app/pull/92) at its earlier `493a0ae8` head and [SKIP PR #91](https://github.com/AmitabhainArunachala/Bunki-app/pull/91). The final review-surface repair and refreshed evidence were therefore moved to `feat/experience-final-signoff`, based on merged main `0da923191246346a04656002a9c380b5de644bc3`, rather than being represented as updates to a closed PR.
+
+The follow-up preserves the already-tested combined source and rebuilds the standalone artifact so both merged features are included. Every tracked Corridor file other than the regenerated standalone matches the tested integration tree; the rebuilt standalone is byte-identical to the separately rebuilt and tested combined artifact. The nine explicit runtime/data hashes also pass against the recorded walkthrough manifest, as captured in [followup-runtime-parity.log](../experience-combined/followup-runtime-parity.log). Only the remaining follow-up is offered for review; the agent does not exercise merge authority.
 
 | Verification layer | Result | Evidence |
 |---|---:|---|

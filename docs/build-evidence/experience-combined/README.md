@@ -2,6 +2,8 @@
 
 This is evidence from a disposable integration tree, not a merged branch. Merge authority remains with the operator.
 
+After these walkthroughs, the operator merged PRs #92 and #91. The remaining review-surface repair and final evidence are carried on `feat/experience-final-signoff`, based on that merged main. The follow-up's Corridor sources match this tested tree, and its regenerated standalone matches the tested rebuilt artifact byte for byte; see [followup-runtime-parity.log](followup-runtime-parity.log).
+
 - Reference implementation: `06406e3ea3cd47a8dff2709f7862207b8bcee41a`.
 - SKIP implementation: `66e5a3785b15f0281bffb5c80aaa0b6b5a97dc29`.
 - Conflict-free merge-tree result: `49987fb0acc4bc16fdb1dff21c826bd152c6aa7b`.
