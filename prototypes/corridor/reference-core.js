@@ -46,6 +46,8 @@
     'kanken-corpus': 'corpus/datasets/kanji/kanken.jsonl',
     kotobako: 'prototypes/bunki-sites-v11/public/kotobako-static.json',
     'drift-words': 'apps/app/src/data/generated/drift-words.json',
+    wbig: 'prototypes/drift/data/wbig.json',
+    'dictionary-index': 'prototypes/corridor/data/share_alike/dict-v2/index.json',
     'kanjidic-sample': 'corpus/samples/jmdict/kanjidic_sample.jsonl',
     'kanjidic-pinned': 'https://github.com/scriptin/jmdict-simplified/releases/tag/3.6.2%2B20260803141815',
   });
@@ -56,6 +58,7 @@
     scope: 'Complete indexed committed corpus, not official or exam-complete lists. Kentei collections are assigned-grade bins, not cumulative test scope.',
     jlptKanji: 'Bundled editorial JLPT tags retained verbatim; N3 has no tagged kanji. Historical pre-2010 KANJIDIC levels are not mapped to modern JLPT levels.',
     unknown: 'No attested label, or an unrecognized label kept verbatim; never infer a level from school grade or rank.',
+    relationships: 'Kentei related forms share an attested species ID, not necessarily a glyph or grade. Dictionary candidates require exact form/reading and reading restrictions; they do not classify every sense or authorize a canonical redirect.',
   });
 
   function text(value) {
@@ -102,7 +105,13 @@
   }
 
   function sortEntries(entries) {
-    return [...entries].sort(compareEntries);
+    // Normalize once per entry, not on every comparison. This is a local
+    // decoration, never a persistent cache or a write onto caller-owned rows.
+    return entries.map((entry) => ({
+      entry, reading: normalizeQuery(entry.reading), id: text(entry.id), type: text(entry.type),
+    })).sort((a, b) => Number(!a.reading) - Number(!b.reading)
+      || compareText(a.reading, b.reading) || compareText(a.id, b.id)
+      || compareText(a.type, b.type)).map(({ entry }) => entry);
   }
 
   function searchEntries(entries, query) {
@@ -161,6 +170,8 @@
         id, text: id, type, reading: '', readings: [], meanings: [],
         on: [], kun: [], aliases: [], sources: [], levelSources: [],
         sourceRecords: [], variants: [], conflict: false, missingGlyph: false,
+        metadataSources: {}, dictionaryLinks: [], relatedForms: [],
+        kanjiLinks: [], canonicalTarget: null,
       });
       return map.get(id);
     }
@@ -169,14 +180,16 @@
       if (!entry.sources.includes(source)) entry.sources.push(source);
     }
 
-    function addLevel(entry, source, value, family, sourceId) {
+    function addLevel(entry, source, value, family, sourceId, reading) {
       addSource(entry, source);
       const level = normalizeLevel(value, family);
       if (level == null) return;
       if (!entry.levelSources.some((item) =>
-        item.source === source && item.level === level && item.sourceId === sourceId)) {
+        item.source === source && item.level === level && item.sourceId === sourceId
+          && item.family === family && item.rawLevel === value && item.reading === reading)) {
         const record = { source, level, rawLevel: value, family };
         if (sourceId != null) record.sourceId = sourceId;
+        if (reading != null) record.reading = reading;
         entry.levelSources.push(record);
       }
     }
@@ -185,22 +198,42 @@
       const entry = getEntry(wordEntries, id, 'word');
       const reading = text(row.r);
       const meanings = strings(row.m == null ? row.g : row.m);
-      if (!entry.reading) entry.reading = reading;
-      if (!entry.meanings.length) entry.meanings = meanings;
+      if (!entry.reading && reading) {
+        entry.reading = reading;
+        entry.metadataSources.reading = { source, sourceId: sourceId ?? id };
+      }
+      if (!entry.meanings.length && meanings.length) {
+        entry.meanings = meanings;
+        entry.metadataSources.meanings = { source, sourceId: sourceId ?? id };
+      }
       entry.readings = unique([...entry.readings, ...strings(reading)]);
       entry.aliases = unique([...entry.aliases, ...strings(row.alt)]);
       const variant = { source, reading, meanings: [...meanings] };
       if (sourceId != null) variant.sourceId = sourceId;
       entry.variants.push(variant);
-      addLevel(entry, source, row.jlpt, 'jlpt', sourceId);
+      for (const glyph of strings(row.k)) {
+        entry.kanjiLinks.push({
+          id: glyph, source, sourceId: sourceId ?? id,
+          canonicalTarget: Object.hasOwn(kanji, glyph) ? { type: 'kanji', id: glyph } : null,
+        });
+      }
+      addLevel(entry, source, row.jlpt, 'jlpt', sourceId, reading);
       return entry;
     }
 
     for (const [id, row] of Object.entries(dict)) addWord(id, row || {}, 'dict');
     for (const [id, row] of Object.entries(words)) addWord(id, row || {}, 'words');
     if (committed) {
-      for (const [id, reading, meanings, level, sourceId, source = 'kotobako'] of extra.extraWords || []) {
-        addWord(id, { r: reading, m: meanings, jlpt: level }, source, sourceId);
+      for (const [id, reading, meanings, level, sourceId, source = 'kotobako', glyphs] of extra.extraWords || []) {
+        addWord(id, { r: reading, m: meanings, jlpt: level, k: glyphs }, source, sourceId);
+      }
+      for (const [id, reading, candidates] of extra.wordLinks || []) {
+        const entry = wordEntries.get(id);
+        if (!entry) continue;
+        entry.dictionaryLinks.push({
+          reading, candidates: [...candidates], source: 'dictionary-index',
+          match: 'exact-form-reading-with-restrictions',
+        });
       }
     }
 
@@ -213,6 +246,11 @@
       entry.reading = entry.readings[0] || '';
       entry.meanings = strings(row.m);
       if (row.st != null) entry.strokeCount = row.st;
+      for (const field of ['on', 'kun', 'meanings', 'strokeCount']) {
+        if (Array.isArray(entry[field]) ? entry[field].length : entry[field] != null) {
+          entry.metadataSources[field] = { source: 'kanji', sourceId: id };
+        }
+      }
       if (Object.hasOwn(kanji, id)) {
         addLevel(entry, 'kanji', row.kk, 'kanken');
         addLevel(entry, 'kanji', row.jlpt, 'jlpt-kanji');
@@ -220,26 +258,56 @@
       if (Object.hasOwn(kanken, id)) addLevel(entry, 'kanken', kanken[id]?.kk, 'kanken');
       if (Object.hasOwn(kmeta, id)) {
         addLevel(entry, 'kmeta', kmeta[id]?.jlpt, 'jlpt-kanji');
-        if (kmeta[id]?.g != null) entry.schoolGrade = kmeta[id].g;
+        if (kmeta[id]?.g != null) {
+          entry.schoolGrade = kmeta[id].g;
+          entry.metadataSources.schoolGrade = { source: 'kmeta', sourceId: id };
+        }
       }
     }
 
     if (committed) {
-      for (const [sourceId, glyph, level, form, url, imageUrl] of extra.kanken || []) {
+      for (const [id, family, level, source, sourceId] of extra.kanjiLevels || []) {
+        const entry = getEntry(kanjiEntries, id, 'kanji');
+        addLevel(entry, source, level, family, sourceId);
+      }
+      const species = new Map();
+      for (const [sourceId, glyph, level, form, url, imageUrl, speciesId] of extra.kanken || []) {
         const id = glyph || sourceId;
         const entry = getEntry(kanjiEntries, id, 'kanji');
         entry.missingGlyph = !glyph;
         entry.text = glyph || `字形未収録 (${sourceId})`;
-        entry.sourceRecords.push({ source: 'kanken-corpus', sourceId, glyph, level, form, url, imageUrl });
+        const record = { source: 'kanken-corpus', sourceId, glyph, level, form, url, imageUrl };
+        if (speciesId) {
+          record.speciesId = speciesId;
+          if (!species.has(speciesId)) species.set(speciesId, []);
+          species.get(speciesId).push({ id, sourceId, glyph, level, form, speciesId });
+        }
+        entry.sourceRecords.push(record);
         addLevel(entry, 'kanken-corpus', level, 'kanken', sourceId);
       }
-      for (const [id, on, kun, meanings, strokeCount, source] of extra.kanjiMetadata || []) {
+      for (const entry of kanjiEntries.values()) {
+        const ids = unique(entry.sourceRecords.map((record) => record.speciesId).filter(Boolean));
+        const ownRecords = new Set(entry.sourceRecords.map((record) => record.sourceId));
+        // The printed-glyph index can contain two different source species
+        // (notably 芸). Expose that collision; do not merge their related groups.
+        entry.speciesIds = ids;
+        entry.identityCollision = ids.length > 1;
+        entry.relatedForms = ids.flatMap((id) => (species.get(id) || [])
+          .filter((record) => !ownRecords.has(record.sourceId)).map((record) => ({ ...record })));
+      }
+      for (const [id, on, kun, meanings, strokeCount, source, sourceId = id] of extra.kanjiMetadata || []) {
         const entry = kanjiEntries.get(id);
         if (!entry) continue;
-        if (!entry.on.length) entry.on = [...on];
-        if (!entry.kun.length) entry.kun = [...kun];
-        if (!entry.meanings.length) entry.meanings = [...meanings];
-        if (entry.strokeCount == null) entry.strokeCount = strokeCount;
+        for (const [field, values] of [['on', on], ['kun', kun], ['meanings', meanings]]) {
+          if (!entry[field].length && values.length) {
+            entry[field] = [...values];
+            entry.metadataSources[field] = { source, sourceId };
+          }
+        }
+        if (entry.strokeCount == null && strokeCount != null) {
+          entry.strokeCount = strokeCount;
+          entry.metadataSources.strokeCount = { source, sourceId };
+        }
         entry.readings = unique([...entry.on, ...entry.kun]);
         entry.reading = entry.readings[0] || '';
         addSource(entry, source);
@@ -267,6 +335,15 @@
     }
 
     function indexEntry(entry, families) {
+      const canonical = entry.type === 'word'
+        ? Object.hasOwn(dict, entry.id) || Object.hasOwn(words, entry.id)
+        : !entry.missingGlyph && Object.hasOwn(kanji, entry.id);
+      entry.canonicalTarget = canonical ? { type: entry.type, id: entry.id } : null;
+      for (const link of entry.kanjiLinks) {
+        link.referenceId = kanjiEntries.has(link.id) ? link.id : null;
+        link.status = link.canonicalTarget ? 'bundled'
+          : link.referenceId ? 'reference-only' : 'absent-target';
+      }
       entry.metadataMissing = !entry.reading || !entry.meanings.length;
       entry.missingReading = !entry.reading;
       entry.missingMeanings = !entry.meanings.length;
@@ -302,6 +379,8 @@
       uniqueKanji: kanjiEntries.size,
       glyphKanji: [...kanjiEntries.values()].filter((entry) => !entry.missingGlyph).length,
       missingGlyphRecords: [...kanjiEntries.values()].filter((entry) => entry.missingGlyph).length,
+      identityCollisions: [...kanjiEntries.values()].filter((entry) => entry.identityCollision).length,
+      kanjiWithRelatedForms: [...kanjiEntries.values()].filter((entry) => entry.relatedForms.length).length,
       counts: Object.fromEntries(result.map((collection) => [collection.id, collection.count])),
       families: {},
       committedAudit: committed && extra.audit ? JSON.parse(JSON.stringify(extra.audit)) : null,

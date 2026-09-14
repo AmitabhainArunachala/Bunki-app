@@ -36,6 +36,7 @@ export const sourcePaths = {
   driftWords: 'apps/app/src/data/generated/drift-words.json',
   driftKanji: 'apps/app/src/data/generated/drift-kanji.json',
   kanjidicSample: 'corpus/samples/jmdict/kanjidic_sample.jsonl',
+  dictionaryIndex: 'prototypes/corridor/data/share_alike/dict-v2/index.json',
 };
 const read = (path) => readFileSync(resolve(ROOT, path), 'utf8');
 const json = (path) => JSON.parse(read(path));
@@ -55,36 +56,147 @@ const histogram = (rows, fn) => {
 };
 export const serialize = (data) => `${JSON.stringify(data)}\n`;
 
+// Exact forms/readings only. Search normalization, punctuation splitting and
+// first-match selection would turn homographs into false canonical identities.
+// These are dictionary candidates, not evidence that a level applies to every
+// sense of the JMdict entry. Reading restrictions must allow the written form.
+export function dictionaryCandidates(entries) {
+  const pairs = new Map();
+  const add = (head, reading, seq) => {
+    const key = JSON.stringify([head, reading]);
+    if (!pairs.has(key)) pairs.set(key, new Set());
+    pairs.get(key).add(seq);
+  };
+  for (const row of entries) {
+    const [seq, , , , written, kana] = row;
+    assert(/^\d+$/.test(seq), 'Expected stable JMdict sequence ID');
+    assert.equal(row[11].length, kana.length, 'Reading scope alignment');
+    kana.forEach((reading, i) => {
+      add(reading, reading, seq);
+      const scope = row[11][i];
+      const forms =
+        scope === 0
+          ? written
+          : scope === 1
+            ? []
+            : scope.map((j) => {
+                assert(Number.isInteger(j) && written[j] != null, 'Invalid written-form scope');
+                return written[j];
+              });
+      for (const head of forms) add(head, reading, seq);
+    });
+  }
+  return (head, reading) => [...(pairs.get(JSON.stringify([head, reading])) || [])];
+}
+
 export function buildReferenceData({ archive, prior } = {}) {
   const dict = json(sourcePaths.dict).words;
   const words = json(sourcePaths.words).words;
   const kanji = json(sourcePaths.kanji).kanji;
   const kmeta = json(sourcePaths.kmeta).meta;
   const corpus = jsonl(sourcePaths.kankenCorpus);
+  assert.equal(
+    new Set(corpus.map((row) => row.entry_id)).size,
+    corpus.length,
+    'Duplicate Kentei source identity',
+  );
+  for (const row of corpus) {
+    assert(
+      /^CE-\d+$/.test(row.entry_id) && /^CT-\d+$/.test(row.species_id),
+      'Invalid Kentei source identity',
+    );
+  }
   const kotobako = json(sourcePaths.kotobako).datasets;
   const sample = jsonl(sourcePaths.kanjidicSample);
   const driftWords = json(sourcePaths.driftWords);
+  const kotobakoKanji = new Map(kotobako.kanji.map((row) => [row.id, row.char]));
+  const wbig = json(sourcePaths.wbig);
+  const kanken = json(sourcePaths.kanken).levels;
   const indexedGlyphs = new Set([
     ...Object.keys(kanji),
     ...Object.keys(kmeta),
+    ...Object.keys(kanken),
+    ...kotobako.kanji.filter((row) => row.jlpt).map((row) => row.char),
     ...corpus.filter((row) => row.glyph).map((row) => row.glyph),
   ]);
   const missing = (id) =>
-    !kanji[id] || !kanji[id].m || (!kanji[id].on.length && !kanji[id].kun.length);
+    !kanji[id] ||
+    !kanji[id].m ||
+    !kanji[id].on?.length ||
+    !kanji[id].kun?.length ||
+    kanji[id].st == null;
+  const usefulMetadata = ([id, on, kun]) => {
+    const base = kanji[id];
+    // Preserve the original missing-record projection (including empty source
+    // fields), but do not add hundreds of complete records whose absent kun/on
+    // is also absent upstream. Only genuine partial-field fills are new.
+    return (
+      !base ||
+      !base.m ||
+      (!base.on?.length && !base.kun?.length) ||
+      base.st == null ||
+      (!base.on?.length && on.length > 0) ||
+      (!base.kun?.length && kun.length > 0)
+    );
+  };
   const extraWords = [
     ...kotobako.vocab
-      .filter((row) => row.jlpt && dict[row.word]?.jlpt !== row.jlpt)
-      .map((row) => [row.word, row.reading, row.meanings, row.jlpt, row.id, 'kotobako']),
+      .filter((row) => row.jlpt)
+      .map((row) => [
+        row.word,
+        row.reading,
+        row.meanings,
+        row.jlpt,
+        row.id,
+        'kotobako',
+        (row.containsKanji || []).map((id) => {
+          assert(kotobakoKanji.has(id), `Unresolved kotobako kanji identity: ${id}`);
+          return kotobakoKanji.get(id);
+        }),
+      ]),
     ...driftWords.flatMap(([id, reading, meaning, level], index) =>
-      level && words[id]?.jlpt !== level
-        ? [[id, reading, [meaning], level, `row:${index + 1}`, 'drift-words']]
-        : [],
+      level ? [[id, reading, [meaning], level, `row:${index + 1}`, 'drift-words']] : [],
+    ),
+    ...wbig.flatMap(([id, reading, meaning, level], index) =>
+      level ? [[id, reading, [meaning], level, `row:${index + 1}`, 'wbig']] : [],
     ),
   ];
+  const classifiedIds = new Set([
+    ...Object.entries(dict)
+      .filter(([, row]) => row.jlpt)
+      .map(([id]) => id),
+    ...Object.entries(words)
+      .filter(([, row]) => row.jlpt)
+      .map(([id]) => id),
+    ...extraWords.map(([id]) => id),
+  ]);
+  const wordPairs = new Map();
+  for (const [id, reading] of [
+    ...Object.entries(dict).map(([id, row]) => [id, row.r]),
+    ...Object.entries(words).map(([id, row]) => [id, row.r]),
+    ...extraWords,
+  ]) {
+    if (classifiedIds.has(id) && reading)
+      wordPairs.set(JSON.stringify([id, reading]), [id, reading]);
+  }
+  const candidates = dictionaryCandidates(json(sourcePaths.dictionaryIndex).entries);
+  const wordLinks = [...wordPairs.values()].map(([id, reading]) => [
+    id,
+    reading,
+    candidates(id, reading),
+  ]);
   const kanjiMetadata = [
     ...kotobako.kanji
       .filter((row) => indexedGlyphs.has(row.char) && missing(row.char))
-      .map((row) => [row.char, row.onyomi, row.kunyomi, row.meanings, row.strokeCount, 'kotobako']),
+      .map((row) => [
+        row.char,
+        row.onyomi,
+        row.kunyomi,
+        row.meanings,
+        row.strokeCount,
+        'kotobako',
+        row.id,
+      ]),
     ...sample
       .filter((row) => indexedGlyphs.has(row.literal) && missing(row.literal))
       .map((row) => [
@@ -95,7 +207,7 @@ export function buildReferenceData({ archive, prior } = {}) {
         row.stroke_count,
         'kanjidic-sample',
       ]),
-  ];
+  ].filter(usefulMetadata);
   let pinnedRows;
   if (archive) {
     assert.equal(hash(readFileSync(archive)), ARCHIVE_SHA, 'KANJIDIC archive pin mismatch');
@@ -127,7 +239,8 @@ export function buildReferenceData({ archive, prior } = {}) {
           row.misc?.strokeCounts?.[0] ?? null,
           'kanjidic-pinned',
         ];
-      });
+      })
+      .filter(usefulMetadata);
   } else {
     assert(
       prior,
@@ -135,16 +248,23 @@ export function buildReferenceData({ archive, prior } = {}) {
     );
     assert.equal(prior.audit?.kanjidicArchive?.sha256, ARCHIVE_SHA);
     pinnedRows = prior.kanjiMetadata.filter((row) => row[5] === 'kanjidic-pinned');
+    assert.equal(
+      prior.audit.kanjidicArchive.projectedSha256,
+      hash(serialize(pinnedRows)),
+      'Pinned projection integrity mismatch; use the pinned archive to rebuild',
+    );
     assert.equal(new Set(pinnedRows.map((row) => row[0])).size, pinnedRows.length);
     for (const row of pinnedRows) {
-      assert(row.length === 6 && indexedGlyphs.has(row[0]) && missing(row[0]));
+      assert(
+        row.length === 6 && indexedGlyphs.has(row[0]) && missing(row[0]) && usefulMetadata(row),
+      );
       for (const values of row.slice(1, 4))
         assert(values.every((value) => typeof value === 'string'));
     }
   }
   kanjiMetadata.push(...pinnedRows);
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     pool: 'share_alike',
     sources: [
       {
@@ -173,9 +293,19 @@ export function buildReferenceData({ archive, prior } = {}) {
       },
     ],
     layout: {
-      kanken: ['sourceId', 'glyph', 'level', 'form', 'url', 'imageUrl'],
-      extraWords: ['id', 'reading', 'meanings', 'level', 'sourceId', 'source'],
-      kanjiMetadata: ['glyph', 'on', 'kun', 'meanings', 'strokeCount', 'source'],
+      kanken: ['sourceId', 'glyph', 'level', 'form', 'url', 'imageUrl', 'speciesId'],
+      extraWords: [
+        'id',
+        'reading',
+        'meanings',
+        'level',
+        'sourceId',
+        'source',
+        'sourceKanjiGlyphs?',
+      ],
+      kanjiMetadata: ['glyph', 'on', 'kun', 'meanings', 'strokeCount', 'source', 'sourceId?'],
+      kanjiLevels: ['glyph', 'family', 'level', 'source', 'sourceId'],
+      wordLinks: ['id', 'exactReading', 'candidateJmdictSequences'],
     },
     kanken: corpus.map((row) => [
       row.entry_id,
@@ -184,9 +314,14 @@ export function buildReferenceData({ archive, prior } = {}) {
       row.form,
       row.kanjipedia_url,
       row.glyph_image_url,
+      row.species_id,
     ]),
     extraWords,
     kanjiMetadata,
+    kanjiLevels: kotobako.kanji
+      .filter((row) => row.jlpt)
+      .map((row) => [row.char, 'jlpt-kanji', row.jlpt, 'kotobako', row.id]),
+    wordLinks,
     audit: {
       schemaVersion: 1,
       sourceHashes: Object.fromEntries(
@@ -197,6 +332,7 @@ export function buildReferenceData({ archive, prior } = {}) {
         sha256: ARCHIVE_SHA,
         records: 10384,
         projectedRows: pinnedRows.length,
+        projectedSha256: hash(serialize(pinnedRows)),
         fields: ['literal', 'ja_on', 'ja_kun', 'English meanings', 'first stroke count'],
         excludedFields: [
           'JLPT historical level',
@@ -216,9 +352,22 @@ export function buildReferenceData({ archive, prior } = {}) {
         kotobako.vocab.filter((row) => row.jlpt),
         (row) => row.jlpt,
       ),
-      wbigRows: json(sourcePaths.wbig).length,
+      wbigRows: wbig.length,
       driftWordsRows: driftWords.length,
       extraWordSources: histogram(extraWords, (row) => row[5]),
+      identity: {
+        dictionaryRule:
+          'Exact printed form and reading, respecting JMdict readingWrittenScopes. All candidates retained; no sense-level classification or automatic canonical redirect.',
+        dictionaryLinkScope:
+          'Every attested reading on a classified vocabulary printed key; unassigned words retain runtime targets but are not matched to JMdict here.',
+        wordPairs: wordLinks.length,
+        wordPairsUniqueCandidate: wordLinks.filter((row) => row[2].length === 1).length,
+        wordPairsAmbiguous: wordLinks.filter((row) => row[2].length > 1).length,
+        wordPairsUnmatched: wordLinks.filter((row) => !row[2].length).length,
+        kankenSpecies: new Set(corpus.map((row) => row.species_id)).size,
+        kankenRelationshipRule:
+          'Shared source species_id only. Retain each entry_id, glyph and grade; never inherit metadata or grades across related forms.',
+      },
       auditedExclusions: [
         [
           'prototypes/corridor/data/share_alike/dict-v2/index.json',

@@ -146,6 +146,39 @@ body::before {
   font-weight: 400;
 }
 
+/* At phone widths, prioritize usable controls over a one-letter breadcrumb.
+ * The room title remains in the page; the full path stays available to
+ * assistive technology without squeezing bilingual labels into vertical text. */
+@media (max-width: 440px) {
+  .chrome {
+    justify-content: space-between;
+    gap: 4px;
+    padding-inline: 8px;
+  }
+  .chrome .crumb {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .chrome > button {
+    flex: 0 0 auto;
+    padding-inline: 6px;
+  }
+  .chrome .l-ja {
+    white-space: nowrap;
+  }
+  .chrome .lang-seg {
+    flex: 0 0 auto;
+  }
+  .chrome .lang-seg button {
+    padding-inline: 6px;
+    white-space: nowrap;
+  }
+}
+
 /* THE READING MEASURE. A line of 21px mincho wants ~35–40 characters; a
  * 1280px window gives it 60+, which is not a book, it is a spreadsheet. The
  * column stops at 820px and centres.
@@ -1472,6 +1505,21 @@ button.tok::before {
   color: var(--red);
 }
 
+/* Interactive category labels are navigation, not provenance fine print.
+ * Keep passive source badges compact, but give every recursive category
+ * door a readable label and a full touch target on phone-sized sheets. */
+button.pool-tag.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+}
+
 .note {
   font-size: 12px;
   color: var(--faint);
@@ -2216,7 +2264,7 @@ button .l-ja {
   margin-left: 5px;
 }
 
-#lang[aria-pressed='true'] {
+button#lang[aria-pressed='true'] {
   background: var(--ink);
   color: var(--ground);
   border-color: var(--ink);
@@ -2384,7 +2432,7 @@ body.v-depth-layered .inline-link {
 
 .lang-seg button {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   border: 0;
   background: transparent;

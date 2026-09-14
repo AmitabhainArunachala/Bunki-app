@@ -10,15 +10,23 @@ import assert from 'node:assert/strict';
 import console from 'node:console';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
-import { buildReferenceData, OUTPUT, serialize, sourcePaths } from './build-reference-data.mjs';
+import {
+  buildReferenceData,
+  dictionaryCandidates,
+  OUTPUT,
+  serialize,
+  sourcePaths,
+} from './build-reference-data.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CORE_PATH = resolve(ROOT, 'prototypes/corridor/reference-core.js');
 const COVERAGE_PATH = resolve(ROOT, 'docs/build-evidence/reference/coverage.json');
+const RELATIONSHIPS_PATH = resolve(ROOT, 'docs/build-evidence/reference/relationships.json');
 const read = (path) => readFileSync(resolve(ROOT, path), 'utf8');
 const json = (path) => JSON.parse(read(path));
 const jsonl = (path) =>
@@ -113,11 +121,47 @@ test('Every wbig/drift word and kotobako vocabulary classification is represente
   for (const row of kotobako.vocab) {
     if (row.jlpt) assert(at(`jlpt:${row.jlpt}`, row.word), `${row.id}:${row.jlpt}`);
   }
-  assert.equal(committed.extraWords.length, 10);
-  for (const [id, , , level, sourceId, source] of committed.extraWords) {
+  assert.deepEqual(
+    committed.extraWords,
+    [
+      ...kotobako.vocab
+        .filter((row) => row.jlpt)
+        .map((row) => [
+          row.word,
+          row.reading,
+          row.meanings,
+          row.jlpt,
+          row.id,
+          'kotobako',
+          (row.containsKanji || []).map((id) => kotobako.kanji.find((item) => item.id === id).char),
+        ]),
+      ...json(sourcePaths.driftWords).flatMap(([id, reading, meaning, level], i) =>
+        level ? [[id, reading, [meaning], level, `row:${i + 1}`, 'drift-words']] : [],
+      ),
+      ...wbig.flatMap(([id, reading, meaning, level], i) =>
+        level ? [[id, reading, [meaning], level, `row:${i + 1}`, 'wbig']] : [],
+      ),
+    ],
+    'Do not discard an attestation just because another source has the same level',
+  );
+  for (const [id, reading, meanings, level, sourceId, source] of committed.extraWords) {
+    const entry = at(`jlpt:${expectedLevel(level)}`, id);
     assert(
-      at(`jlpt:${expectedLevel(level)}`, id).levelSources.some(
-        (tag) => tag.source === source && tag.sourceId === sourceId,
+      entry.levelSources.some(
+        (tag) =>
+          tag.source === source &&
+          tag.sourceId === sourceId &&
+          tag.reading === reading &&
+          tag.rawLevel === level,
+      ),
+    );
+    assert(
+      entry.variants.some(
+        (variant) =>
+          variant.source === source &&
+          variant.sourceId === sourceId &&
+          variant.reading === reading &&
+          JSON.stringify(variant.meanings) === JSON.stringify(meanings),
       ),
     );
   }
@@ -143,7 +187,13 @@ test('Every boot kanji, grade fact and JLPT metadata row is accounted for', () =
     assert(at(`jlpt-kanji:${row.jlpt || 'unknown'}`, id), `${id}:${row.jlpt}`);
   }
   for (const row of kotobako.kanji) {
-    if (row.jlpt) assert(at(`jlpt-kanji:${row.jlpt}`, row.char), row.id);
+    if (row.jlpt)
+      assert(
+        at(`jlpt-kanji:${row.jlpt}`, row.char).levelSources.some(
+          (s) => s.source === 'kotobako' && s.sourceId === row.id && s.level === row.jlpt,
+        ),
+        row.id,
+      );
   }
 });
 
@@ -158,6 +208,7 @@ test('Every full Kentei source row survives, including duplicates and glyphless 
     assert.equal(sourceRecord.form, row.form);
     assert.equal(sourceRecord.url, row.kanjipedia_url);
     assert.equal(sourceRecord.imageUrl, row.glyph_image_url);
+    assert.equal(sourceRecord.speciesId, row.species_id);
     assert.equal(entry.missingGlyph, !row.glyph);
     assert(
       entry.levelSources.some(
@@ -189,6 +240,7 @@ test('Exact membership sets match the independently calculated all-source union'
   }
   for (const row of kotobako.vocab) add('jlpt', row.jlpt, row.word);
   for (const [id, , , level] of json(sourcePaths.driftWords)) add('jlpt', `N${level}`, id);
+  for (const [id, , , level] of wbig) add('jlpt', `N${level}`, id);
   for (const [id, row] of Object.entries(input.kanji)) {
     add('kanken', row.kk, id);
     add('jlpt-kanji', expectedLevel(row.jlpt), id);
@@ -196,6 +248,7 @@ test('Exact membership sets match the independently calculated all-source union'
   for (const [id, row] of Object.entries(input.kanken)) add('kanken', row.kk, id);
   for (const [id, row] of Object.entries(input.kmeta)) add('jlpt-kanji', row.jlpt, id);
   for (const row of corpus) add('kanken', row.kanken_level, row.glyph || row.entry_id);
+  for (const row of kotobako.kanji) add('jlpt-kanji', row.jlpt, row.char);
   for (const [key, ids] of expected) {
     assert.deepEqual(new Set(membership.get(key).keys()), ids, key);
   }
@@ -210,6 +263,231 @@ test('Exact membership sets match the independently calculated all-source union'
     assert.equal(collection.count, collection.entries.length);
     assert.equal(new Set(collection.entries.map((entry) => entry.id)).size, collection.count);
   }
+});
+
+test('Kentei source species relationships are exact, bidirectional and never inherited grades', () => {
+  const allKanji = new Map(
+    catalog.collections
+      .filter((c) => c.family === 'kanken')
+      .flatMap((c) => c.entries.map((entry) => [entry.id, entry])),
+  );
+  for (const entry of allKanji.values()) {
+    const species = new Set(entry.sourceRecords.map((row) => row.speciesId));
+    const own = new Set(entry.sourceRecords.map((row) => row.sourceId));
+    const expected = corpus.filter((row) => species.has(row.species_id) && !own.has(row.entry_id));
+    assert.deepEqual(
+      new Set(entry.relatedForms.map((row) => row.sourceId)),
+      new Set(expected.map((row) => row.entry_id)),
+      entry.id,
+    );
+    for (const related of entry.relatedForms) {
+      assert(allKanji.has(related.id), `Dangling relationship ${related.sourceId}`);
+      assert(
+        allKanji
+          .get(related.id)
+          .sourceRecords.some(
+            (row) => row.sourceId === related.sourceId && row.speciesId === related.speciesId,
+          ),
+      );
+    }
+  }
+  assert.equal(catalog.stats.identityCollisions, 1);
+  assert.deepEqual(at('kanken:7級', '芸').speciesIds, ['CT-000196', 'CT-001346']);
+  assert(at('kanken:7級', '芸').identityCollision);
+  assert(!at('kanken:準2級', '缶').identityCollision);
+  for (const entry of allKanji.values()) {
+    if (!entry.missingGlyph) continue;
+    assert.equal(entry.reading, '', 'Related forms cannot supply a missing glyph reading');
+    assert.deepEqual(entry.meanings, [], 'Related forms cannot supply missing-glyph meanings');
+  }
+});
+
+test('Dictionary links retain all exact candidates and enforce written-form reading scopes', () => {
+  const fixtureRow = (seq, written, kana, scopes) => [
+    seq,
+    '',
+    '',
+    '',
+    written,
+    kana,
+    [],
+    [],
+    0,
+    [],
+    [],
+    scopes,
+  ];
+  const candidates = dictionaryCandidates([
+    fixtureRow('1', ['生', '性'], ['せい', 'なま', 'しょう'], [[1], [0], 1]),
+    fixtureRow('2', ['生'], ['なま'], [0]),
+    fixtureRow('3', ['Ａ'], ['エー'], [0]),
+  ]);
+  assert.deepEqual(candidates('生', 'なま'), ['1', '2'], 'Never choose first homograph');
+  assert.deepEqual(candidates('生', 'せい'), [], 'Disallowed written form');
+  assert.deepEqual(candidates('生', 'しょう'), [], 'No-kanji reading');
+  assert.deepEqual(candidates('しょう', 'しょう'), ['1']);
+  assert.deepEqual(candidates('Ａ', 'エー'), ['3']);
+  assert.deepEqual(candidates('A', 'エー'), [], 'No identity NFKC folding');
+  assert.deepEqual(candidates('Ａ', 'えー'), [], 'No kana folding for identity');
+  assert.deepEqual(candidates('生; 性', 'なま'), [], 'Do not split printed source keys');
+  const index = json(sourcePaths.dictionaryIndex);
+  const bySequence = new Map(index.entries.map((row) => [row[0], row]));
+  for (const [id, reading, sequences] of committed.wordLinks) {
+    const entry = catalog.collections
+      .filter((c) => c.family === 'jlpt')
+      .map((c) => at(c.id, id))
+      .find(Boolean);
+    assert(entry.readings.includes(reading));
+    assert(
+      entry.dictionaryLinks.some(
+        (link) =>
+          link.reading === reading && JSON.stringify(link.candidates) === JSON.stringify(sequences),
+      ),
+    );
+    for (const seq of sequences) {
+      const row = bySequence.get(seq);
+      assert(row, `Unresolved JMdict ID ${seq}`);
+      const kanaIndex = row[5].indexOf(reading);
+      assert(kanaIndex >= 0);
+      const scope = row[11][kanaIndex];
+      assert(
+        id === reading ||
+          (row[4].includes(id) &&
+            (scope === 0 || (Array.isArray(scope) && scope.includes(row[4].indexOf(id))))),
+      );
+    }
+    assert.equal(
+      entry.canonicalId,
+      undefined,
+      'Candidates must not become asserted sense identity',
+    );
+  }
+});
+
+test('Partial kanji fields fill only from the same literal and retain field provenance', () => {
+  for (const glyph of ['典', '尺', '慨', '旺', '論', '賓', '赦', '頒']) {
+    const entry = catalog.collections
+      .filter((c) => c.family === 'kanken')
+      .map((c) => at(c.id, glyph))
+      .find(Boolean);
+    assert.equal(input.kanji[glyph].kun.length, 0);
+    assert(entry.kun.length, glyph);
+    const provider = entry.metadataSources.kun;
+    const row = committed.kanjiMetadata.find(
+      (row) => row[0] === glyph && row[5] === provider.source,
+    );
+    assert.deepEqual(entry.kun, row[2]);
+    assert.deepEqual(entry.on, input.kanji[glyph].on, 'Do not overwrite supplied readings');
+    assert.deepEqual(entry.meanings, [input.kanji[glyph].m], 'Do not overwrite supplied meanings');
+  }
+  const fixture = core.createCatalog({
+    kanji: { 字: { on: ['ジ'], kun: [], m: 'character' } },
+    extra: { kanjiMetadata: [['字', ['シ'], ['あざ'], ['letter'], 6, 'kanjidic-pinned']] },
+  });
+  const entry = fixture.collections.find((c) => c.id === 'kanken:unknown').entries[0];
+  assert.deepEqual(entry.on, ['ジ']);
+  assert.deepEqual(entry.kun, ['あざ']);
+  assert.equal(entry.metadataSources.on.source, 'kanji');
+  assert.equal(entry.metadataSources.kun.source, 'kanjidic-pinned');
+  assert.equal(entry.strokeCount, 6);
+});
+
+test('Offline checks reject accidental pinned metadata corruption rather than blessing it', () => {
+  const damaged = JSON.parse(JSON.stringify(committed));
+  damaged.kanjiMetadata.find((row) => row[5] === 'kanjidic-pinned')[3].push('corrupt');
+  assert.throws(() => buildReferenceData({ prior: damaged }), /projection integrity mismatch/);
+});
+
+const referenceEntries = [
+  ...new Map(
+    catalog.collections.flatMap((collection) =>
+      collection.entries.map((entry) => [`${entry.type}:${entry.id}`, entry]),
+    ),
+  ).values(),
+];
+const referenceId = (entry) => `${entry.type}:${entry.id}`;
+const detailTargets = new Map();
+const detailHashes = {};
+test('Every dictionary candidate has an actual correctly routed canonical detail target', () => {
+  const index = json(sourcePaths.dictionaryIndex);
+  const candidatePairs = new Map();
+  for (const [id, reading, candidates] of committed.wordLinks) {
+    for (const seq of candidates) {
+      if (!candidatePairs.has(seq)) candidatePairs.set(seq, []);
+      candidatePairs.get(seq).push([id, reading]);
+    }
+  }
+  for (let shard = 0; shard < index.shardCount; shard++) {
+    const path = `prototypes/corridor/data/share_alike/dict-v2/${shard.toString(16).padStart(2, '0')}.json`;
+    const bytes = read(path);
+    detailHashes[path] = createHash('sha256').update(bytes).digest('hex');
+    const detail = JSON.parse(bytes);
+    assert.equal(detail.shard, shard);
+    assert.equal(detail.sourcePin, index.source.pin);
+    for (const row of detail.entries) {
+      assert(!detailTargets.has(row[0]), `Duplicate canonical detail ID ${row[0]}`);
+      let hash = 2166136261;
+      for (const ch of row[0]) hash = Math.imul(hash ^ ch.charCodeAt(0), 16777619) >>> 0;
+      assert.equal(hash & 15, shard, `Unreachable shard for ${row[0]}`);
+      detailTargets.set(row[0], path);
+      for (const [id, reading] of candidatePairs.get(row[0]) || []) {
+        const kana = row[2].find((form) => form[0] === reading);
+        assert(kana, `${row[0]} missing exact reading in detail`);
+        assert(
+          id === reading ||
+            (row[1].some((form) => form[0] === id) &&
+              (kana[3].includes('*') || kana[3].includes(id))),
+          `${row[0]} detail does not permit ${id}/${reading}`,
+        );
+      }
+    }
+  }
+  assert.deepEqual(new Set(detailTargets.keys()), new Set(index.entries.map((row) => row[0])));
+  for (const [, , candidates] of committed.wordLinks) {
+    for (const seq of candidates) assert(detailTargets.has(seq), `Dead dictionary target ${seq}`);
+  }
+});
+
+test('Reference-to-runtime and source word-to-kanji edges have no dangling canonical targets', () => {
+  const all = new Map(referenceEntries.map((entry) => [referenceId(entry), entry]));
+  for (const entry of referenceEntries) {
+    const exists =
+      entry.type === 'word'
+        ? Object.hasOwn(input.dict, entry.id) || Object.hasOwn(input.words, entry.id)
+        : Object.hasOwn(input.kanji, entry.id) && !entry.missingGlyph;
+    assert.equal(!!entry.canonicalTarget, exists);
+    if (exists) assert.deepEqual(entry.canonicalTarget, { type: entry.type, id: entry.id });
+    for (const link of entry.kanjiLinks) {
+      assert.equal(!!link.canonicalTarget, Object.hasOwn(input.kanji, link.id));
+      if (link.referenceId) assert(all.has(`kanji:${link.referenceId}`));
+      if (link.canonicalTarget) {
+        assert.equal(link.canonicalTarget.type, 'kanji');
+        assert.equal(link.canonicalTarget.id, link.id);
+      }
+      const row =
+        link.source === 'kotobako'
+          ? committed.extraWords.find((r) => r[5] === link.source && r[4] === link.sourceId)
+          : input[link.source][link.sourceId];
+      assert((link.source === 'kotobako' ? row[6] : row.k).includes(link.id));
+    }
+  }
+  for (const source of ['dict', 'words']) {
+    for (const [id, row] of Object.entries(input[source])) {
+      const actual = all.get(`word:${id}`).kanjiLinks.filter((link) => link.source === source);
+      assert.deepEqual(
+        actual.map((link) => link.id),
+        row.k || [],
+        `${source}:${id}`,
+      );
+    }
+  }
+  const absent = core
+    .createCatalog({ words: { 語: { k: ['缺'], jlpt: 5 } } })
+    .collections.find((c) => c.id === 'jlpt:N5').entries[0];
+  assert.equal(absent.kanjiLinks[0].canonicalTarget, null);
+  assert.equal(absent.kanjiLinks[0].referenceId, null);
+  assert.equal(absent.kanjiLinks[0].status, 'absent-target');
+  assert(absent.metadataMissing, 'Metadata absence is separate from target availability');
 });
 
 test('Known source gaps remain honest; no synthetic N3 kanji or inferred levels', () => {
@@ -383,6 +661,47 @@ const evidence = {
   scope: catalog.policy.scope,
   policy: catalog.policy,
   stats: catalog.stats,
+  gapCensus: {
+    kenteiGlyphlessRecords: referenceEntries.filter((e) => e.type === 'kanji' && e.missingGlyph)
+      .length,
+    kenteiVisibleGlyphsMissingReading: referenceEntries
+      .filter(
+        (e) =>
+          e.type === 'kanji' &&
+          !e.missingGlyph &&
+          e.missingReading &&
+          e.levelSources.some((s) => s.family === 'kanken'),
+      )
+      .map((e) => e.id),
+    kenteiVisibleGlyphsMissingMeanings: referenceEntries
+      .filter(
+        (e) =>
+          e.type === 'kanji' &&
+          !e.missingGlyph &&
+          e.missingMeanings &&
+          e.levelSources.some((s) => s.family === 'kanken'),
+      )
+      .map((e) => e.id),
+    kenteiVisibleGapsAbsentPinnedLiteral: referenceEntries
+      .filter(
+        (e) =>
+          e.type === 'kanji' &&
+          !e.missingGlyph &&
+          e.metadataMissing &&
+          e.levelSources.some((s) => s.family === 'kanken') &&
+          !committed.kanjiMetadata.some((row) => row[0] === e.id && row[5] === 'kanjidic-pinned'),
+      )
+      .map((e) => e.id),
+    baseKanjiFieldsFilled: referenceEntries
+      .filter((e) => e.type === 'kanji' && input.kanji[e.id])
+      .flatMap((e) =>
+        Object.entries(e.metadataSources)
+          .filter(([, p]) => p.source !== 'kanji' && p.source !== 'kmeta')
+          .map(([field, provider]) => ({ id: e.id, field, ...provider })),
+      ),
+    policy:
+      'Glyphless records and absent metadata are not broken canonical links. Missing on or kun alone is not proof of a metadata gap; a character need not have both.',
+  },
   collections: catalog.collections.map(({ entries, ...collection }) => ({
     ...collection,
     glyphEntries: entries.filter((entry) => !entry.missingGlyph).length,
@@ -392,8 +711,132 @@ const evidence = {
     missingMeanings: entries.filter((entry) => entry.missingMeanings).length,
   })),
 };
+const memberIds = new Map(referenceEntries.map((entry) => [referenceId(entry), []]));
+for (const collection of catalog.collections) {
+  for (const entry of collection.entries) memberIds.get(referenceId(entry)).push(collection.id);
+}
+const wordKanjiEdges = referenceEntries.flatMap((entry) =>
+  entry.kanjiLinks.map((link) => [
+    referenceId(entry),
+    link.referenceId ? `kanji:${link.referenceId}` : null,
+    link.id,
+    link.canonicalTarget ? `kanji:${link.id}` : null,
+    link.source,
+    link.sourceId,
+    link.status,
+  ]),
+);
+const referencedSequences = [...new Set(committed.wordLinks.flatMap((row) => row[2]))];
+const relationshipEvidence = {
+  schemaVersion: 1,
+  command: 'node tools/test-reference-core.mjs',
+  pool: 'share_alike',
+  sources: committed.sources,
+  sourceHashes: committed.audit.sourceHashes,
+  canonicalDetailHashes: detailHashes,
+  policy: {
+    ...catalog.policy,
+    canonicalTargets:
+      'Only existing exact-key runtime word/kanji records are canonical targets. Null means reference-only, not a dangling link. JMdict candidates are separate, restriction-checked relationships, not asserted sense identity.',
+    wordKanji:
+      'Only explicit dict.k, words.k and kotobako containsKanji source relationships. No spelling decomposition, normalized identity, or exam-level inheritance.',
+  },
+  census: {
+    referenceNodes: referenceEntries.length,
+    canonicalRuntimeTargets: referenceEntries.filter((e) => e.canonicalTarget).length,
+    referenceOnlyNodes: referenceEntries.filter((e) => !e.canonicalTarget).length,
+    referenceOnlyVisibleGlyphs: referenceEntries.filter(
+      (e) => !e.canonicalTarget && !e.missingGlyph && e.type === 'kanji',
+    ).length,
+    missingGlyphNodes: referenceEntries.filter((e) => e.missingGlyph).length,
+    wordKanjiSourceEdges: wordKanjiEdges.length,
+    wordKanjiDistinctPairs: new Set(wordKanjiEdges.map((e) => JSON.stringify(e.slice(0, 3)))).size,
+    wordKanjiBundledEdges: wordKanjiEdges.filter((e) => e[6] === 'bundled').length,
+    wordKanjiReferenceOnlyEdges: wordKanjiEdges.filter((e) => e[6] === 'reference-only').length,
+    wordKanjiAbsentTargets: wordKanjiEdges.filter((e) => e[6] === 'absent-target').length,
+    dictionaryCandidateTargets: referencedSequences.length,
+    ...committed.audit.identity,
+    danglingCanonicalRuntimeTargets: 0,
+    danglingDictionaryTargets: 0,
+    danglingKenteiRelationships: 0,
+    memberships: Object.fromEntries(
+      Object.entries(catalog.stats.families).map(([family, stats]) => [
+        family,
+        {
+          labelled: stats.memberships,
+          unassigned: stats.unknown,
+          conflicts: stats.conflicts,
+        },
+      ]),
+    ),
+  },
+  layout: {
+    nodes: [
+      'referenceId',
+      'runtimeCanonicalTargetOrNull',
+      'collections',
+      'missingGlyph',
+      'missingReading',
+      'missingMeanings',
+    ],
+    classifications: [
+      'referenceId',
+      'family',
+      'level',
+      'source',
+      'sourceIdOrNull',
+      'readingOrNull',
+      'rawLevel',
+    ],
+    wordKanji: [
+      'wordReferenceId',
+      'kanjiReferenceIdOrNull',
+      'sourceGlyph',
+      'runtimeCanonicalTargetOrNull',
+      'source',
+      'sourceId',
+      'status',
+    ],
+    dictionaryCandidates: ['wordReferenceId', 'exactReading', 'candidateJmdictSequences'],
+    dictionaryTargets: ['jmdictSequence', 'verifiedDetailShard'],
+    kenteiRecords: ['kanjiReferenceId', 'sourceEntryId', 'sourceSpeciesId', 'sourceGrade'],
+  },
+  nodes: referenceEntries.map((e) => [
+    referenceId(e),
+    e.canonicalTarget ? referenceId(e) : null,
+    memberIds.get(referenceId(e)),
+    e.missingGlyph,
+    e.missingReading,
+    e.missingMeanings,
+  ]),
+  classifications: referenceEntries.flatMap((e) =>
+    e.levelSources.map((s) => [
+      referenceId(e),
+      s.family,
+      s.level,
+      s.source,
+      s.sourceId ?? null,
+      s.reading ?? null,
+      s.rawLevel,
+    ]),
+  ),
+  wordKanji: wordKanjiEdges,
+  dictionaryCandidates: committed.wordLinks.map(([id, reading, seqs]) => [
+    `word:${id}`,
+    reading,
+    seqs,
+  ]),
+  dictionaryTargets: referencedSequences.map((seq) => [seq, detailTargets.get(seq)]),
+  kenteiRecords: corpus.map((row) => [
+    `kanji:${row.glyph || row.entry_id}`,
+    row.entry_id,
+    row.species_id,
+    row.kanken_level,
+  ]),
+};
 mkdirSync(dirname(COVERAGE_PATH), { recursive: true });
 writeFileSync(COVERAGE_PATH, `${JSON.stringify(evidence, null, 2)}\n`);
+writeFileSync(RELATIONSHIPS_PATH, `${JSON.stringify(relationshipEvidence)}\n`);
 console.log(`\n${testCount} reference-core tests passed.`);
 console.log(
   JSON.stringify(

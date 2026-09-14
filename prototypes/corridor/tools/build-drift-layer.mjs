@@ -194,21 +194,23 @@ patch(
 // + pointer-events:none, which hides it from fingers but NOT from the Tab
 // key — in the fused document its 閉じる × was the drift home's FIRST tab
 // stop, an invisible control before any real one (R3-B hunt). `inert` while
-// closed removes the whole modal from the tab order and the accessibility
-// tree; opening lifts it. Presentation and gestures untouched.
+// closed removes focusability. Explicit hidden/aria-hidden also keep the
+// closed prose out of accessibility snapshots; opening restores visibility
+// and close/Escape return focus to the invoking control. The original
+// preserved artwork remains byte-untouched.
 patch(
   'const radoc=document.getElementById("radoc");',
-  'const radoc=document.getElementById("radoc");radoc.inert=true;',
+  'const radoc=document.getElementById("radoc");let radocReturnFocus=null;radoc.inert=true;radoc.hidden=true;radoc.setAttribute("aria-hidden","true");radoc.setAttribute("role","dialog");radoc.setAttribute("aria-label","部首 — radicals");radoc.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeRadoc();}});',
   'radoc rests inert',
 );
 patch(
   'function openRadoc(){ radoc.classList.add("open"); }',
-  'function openRadoc(){ radoc.inert=false; radoc.classList.add("open"); }',
+  'function openRadoc(){ radocReturnFocus=document.activeElement;radoc.hidden=false;radoc.inert=false;radoc.setAttribute("aria-hidden","false");radoc.classList.add("open");document.getElementById("radocX").focus(); }',
   'radoc wakes focusable',
 );
 patch(
   'function closeRadoc(){ radoc.classList.remove("open"); }',
-  'function closeRadoc(){ radoc.classList.remove("open"); radoc.inert=true; }',
+  'function closeRadoc(){ radoc.classList.remove("open");radoc.inert=true;radoc.hidden=true;radoc.setAttribute("aria-hidden","true");if(radocReturnFocus?.isConnected)radocReturnFocus.focus();radocReturnFocus=null; }',
   'radoc close returns inert',
 );
 

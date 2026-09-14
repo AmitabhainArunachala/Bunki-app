@@ -44,7 +44,9 @@ old reference view's bulk “memorize next twenty” action.
 
 There are **7,677 distinct classified words** and 7,688 level memberships.
 Eleven words have conflicting source classifications, so they occur in each
-attested level with a visible disagreement note. N1 retains all 2,274 entries
+attested level with a visible disagreement note. These are printed-key
+collisions, not a judgment that different readings or senses are the same
+lexeme. N1 retains all 2,274 entries
 from the secondary word table plus five additional committed classifications.
 
 The sources contain 1,979 JLPT-tagged kanji. The empty N3 bin is disclosed
@@ -87,6 +89,33 @@ Pinned KANJIDIC metadata fills advanced characters absent from the original
 still lack readings and 621 lack meanings, including the 537 glyphless records.
 The library does not fabricate those fields.
 
+The cleanup also restores eight previously omitted kun-reading fields:
+**典、尺、慨、旺、論、賓、赦、頒**. All eight are already attested in
+committed kotobako metadata and corroborated by the pinned KANJIDIC archive.
+The old projection selected a row only when _both_ on and kun were absent,
+so these partial records were skipped. Existing nonempty readings and meanings
+are unchanged; field-level `metadataSources` identify the actual provider.
+Absence of on or kun alone is not evidence that a character must have that
+reading type.
+
+### Remaining gap census after cleanup
+
+| Gap                                                                           |      Count | Disposition                                                                     |
+| ----------------------------------------------------------------------------- | ---------: | ------------------------------------------------------------------------------- |
+| Modern N3 kanji classifications                                               | 0 attested | No licensed committed modern N3 list; no legacy-level splitting                 |
+| Kentei records without a Unicode glyph                                        |        537 | Keep source ID, grade and species relationship; no borrowed glyph or metadata   |
+| Visible Kentei glyphs without Japanese readings                               |         93 | 84 literals absent from the pinned archive; 9 present without Japanese readings |
+| Visible Kentei glyphs without English meanings                                |         84 | Exact literals absent from the pinned archive                                   |
+| Kentei grade-unassigned bundled glyphs                                        |        129 | No grade inferred                                                               |
+| Classified vocabulary exact form/reading pairs without a bundled JMdict match |        683 | Retain original runtime reference; not a broken canonical target                |
+| Classified vocabulary exact form/reading pairs with multiple JMdict matches   |        112 | Preserve every candidate; never select the first homograph                      |
+
+The nine reading gaps with a pinned literal are **檔、歷、毗、沪、欄、廊、殺、類、隆**.
+Neither Unicode normalization nor a related form supplies authority to copy
+readings, meanings or grades into these records. The complete gap lists and
+eight field-level repairs are emitted in `coverage.json`; no external corpus
+was added during this cleanup.
+
 Counts above are **assigned-grade bins**, not cumulative examination targets.
 The official advanced scope is approximately 3,000 characters for 準1級 and
 6,000 for 1級; neither source-row totals nor variant-form counts establish
@@ -99,6 +128,11 @@ official exam completeness ([official grade overview](https://www.kanken.or.jp/k
 from application code and preserves source/license attribution. Every
 classification can be traced back to its source record.
 
+- The supplement now preserves all **18,548 classified vocabulary source
+  rows**: 5,169 kotobako, 6,692 Drift and 6,687 wbig. Matching an existing level
+  is no longer a reason to discard a source ID, alternate reading or gloss.
+  It also preserves all 1,979 kotobako kanji JLPT attestations. Membership
+  totals above do not change.
 - Kentei facts come from the committed CC0
   [mimneko/kanji-data](https://github.com/mimneko/kanji-data) projection, pinned
   at `0be3577f7939ec85d2b4e373a7a94262e7449e13`. Dictionary page-order fields
@@ -114,6 +148,41 @@ classification can be traced back to its source record.
   classifications. No new JLPT or Kentei classification is inferred from
   dictionary frequency, school grade, or legacy numbering.
 
+### Relationship integrity map
+
+`docs/build-evidence/reference/relationships.json` is a generated, source-hashed
+map, not an additional runtime dictionary. It covers:
+
+- **31,361 namespaced reference nodes** (`word:` and `kanji:`), their
+  collection memberships, source-level attestations and metadata gaps.
+- **27,033 exact-key runtime canonical targets**, each verified to exist.
+  The other **4,328 nodes** are deliberately reference-only: 3,791 visible
+  glyphs and 537 glyphless source records. Reference-only is not a dead link.
+- **53,388 source-attested word-to-kanji edges** (35,409 distinct pairs) from
+  `dict.k`, `words.k` and kotobako `containsKanji`; every target is bundled.
+  No character decomposition or level inheritance creates new edges.
+- **7,848 exact form/reading pairs** on classified vocabulary keys: 7,053
+  have one bundled JMdict candidate, 112 have multiple candidates and 683
+  have none. Their 6,998 distinct JMdict candidate IDs are verified against
+  the index and actual detail shards, including reading restrictions and
+  shard routing. Candidates are not automatic redirects or sense-level
+  classification claims. Unassigned words have runtime-target checks but
+  are outside this additional JMdict matching scope.
+- All **6,787 Kentei entry IDs** and **5,637 source species IDs**. Shared
+  species IDs form reversible relationships without merging glyphs or
+  transferring grades. Six repeated printed glyphs retain their original
+  source rows; **芸** additionally spans two different species IDs and is
+  explicitly flagged as an identity collision.
+
+The verified census has **zero dangling runtime canonical targets, JMdict
+candidate targets, source word-to-kanji targets or Kentei relationships**.
+The map separates target absence, absent metadata, ambiguous candidates and
+unassigned classification instead of conflating them as “incomplete links.”
+New core fields (`canonicalTarget`, `dictionaryLinks`, `kanjiLinks`,
+`speciesIds`, `relatedForms`, `identityCollision`, `metadataSources`) are
+additive and read-only; this cleanup does not change UI navigation or study
+enrollment.
+
 The controller's page, query, sort, and scroll state are transient, outside the
 learner store. Existing canonical entry sheets retain explicit enrollment;
 supplementary source-only sheets expose no enrollment control. Existing lesson
@@ -125,6 +194,7 @@ From the repository root:
 
 ```sh
 node tools/test-reference-core.mjs
+node tools/test-reference-core.mjs --archive /path/to/kanjidic2-en-3.6.2+20260803141815.json.zip
 node tools/build-reference-data.mjs --check
 node tools/build-reference-data.mjs --check --archive /path/to/kanjidic2-en-3.6.2+20260803141815.json.zip
 node prototypes/corridor/tools/test-reference-packaging.mjs
@@ -133,9 +203,14 @@ node prototypes/corridor/tools/verify-mock.mjs
 ```
 
 The archive-free projection check independently rebuilds corpus
-classifications while retaining the pinned metadata projection. The
+classifications and exact dictionary candidates while retaining the pinned
+metadata projection with an accidental-corruption checksum. It is not an
+independent raw-metadata verification. The
 archive-backed check independently verifies raw metadata and byte-identical
 output. Neither command downloads data or changes exam classifications.
+The 20 core regression tests regenerate both coverage and relationship
+evidence, verify every edge target, preserve source collisions and exercise
+independent restriction, normalization and missing-target fixtures.
 
 The feature includes service-worker cache entries, standalone and fragment
 embedding, Pages asset copying and smoke checks, and a dedicated reference

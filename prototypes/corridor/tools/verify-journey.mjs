@@ -250,6 +250,10 @@ await step('10 levels · grammar(100+) · thesaurus · 字引', async () => {
   await page.waitForSelector('.kdx-row', { timeout: 5000 });
   await page.click('[data-kdx-part="木"]');
   await page.waitForTimeout(400);
+  // Stroke counts live behind their visible lens; selecting a component
+  // does not open that lens. Walk the current UI before choosing a count.
+  await page.getByRole('button', { name: /by strokes/ }).click();
+  await page.waitForSelector('[data-kdx-st="8"]');
   await page.click('[data-kdx-st="8"]');
   await page.waitForTimeout(400);
   const hits = await page.evaluate(() => [...document.querySelectorAll('[data-kdx-hit]')].map((b) => b.dataset.kdxHit));

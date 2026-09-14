@@ -588,3 +588,25 @@ body[data-view='levels'] main {
     transition: none;
   }
 }
+
+/* Recursive doors borrow the sheet's paper and ink, not a new visual layer. */
+.reference-other-rooms { flex-wrap: wrap; gap: 0 16px; }
+.reference-sheet-context { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+.reference-sheet-return {
+  border: 0; background: none; color: var(--ink-2); font: inherit;
+  font-size: var(--t-chrome); min-height: var(--tap, 44px);
+  padding: 8px 0; text-align: left; cursor: pointer;
+}
+.reference-sheet-return:hover { color: var(--red); }
+.reference-entry-provenance {
+  margin-top: 24px; padding: 12px 0; border-top: 1px solid var(--line);
+  color: var(--ink-2); font-size: var(--t-chrome); overflow-wrap: anywhere;
+}
+.reference-entry-provenance summary { min-height: var(--tap, 44px); cursor: pointer; }
+.reference-sheet-return:focus-visible, .reference-entry-provenance summary:focus-visible {
+  outline: 2px solid var(--red); outline-offset: 3px;
+}
+.reference-empty .reference-button { margin: 6px 8px 6px 0; }
+
+.sheet [data-reference-door] { background: transparent; }
+.reference-related .row-glyph { overflow-wrap: anywhere; }

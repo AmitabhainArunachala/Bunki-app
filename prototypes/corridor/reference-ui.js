@@ -22,7 +22,7 @@
     return element;
   };
 
-  function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, getTaken }) {
+  function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, onSearch, getReturnLabel, getTaken }) {
     const state = {
       collectionId: null,
       jlptKind: 'word',
@@ -35,6 +35,10 @@
       provenanceOpen: false,
     };
     const collections = catalog.collections;
+    const entriesByKey = new Map();
+    for (const collection of collections) {
+      for (const entry of collection.entries) entriesByKey.set(`${entry.type || collection.kind}:${entry.id}`, entry);
+    }
     const headwordOrder = new Map();
     const current = () => collections.find((item) => item.id === state.collectionId);
     const entryType = (entry, collection) => entry.type || collection.kind;
@@ -135,13 +139,12 @@
     function navigation() {
       const nav = node('nav', 'reference-navigation');
       nav.setAttribute('aria-label', tx('参考書庫の移動', 'Reference navigation'));
-      nav.append(button('reference-back', state.collectionId
+      nav.append(button('reference-back', getReturnLabel?.() || (state.collectionId
         ? tx('← 参考書庫', '← Library')
-        : tx('← 本棚', '← Reading shelf'), () => {
-        if (!back()) onExit();
-      }, 'reference-text-button'));
+        : tx('← 本棚', '← Reading shelf')), onExit, 'reference-text-button'));
       const others = node('div', 'reference-other-rooms');
       others.append(
+        button('reference-global-search', tx('辞書で検索 →', 'Dictionary search →'), () => onSearch(state.query), 'reference-text-button'),
         button('reference-study', tx('My Study →', 'My Study →'), onStudy, 'reference-text-button'),
         button('reference-mock', tx('模試 →', 'Mock papers →'), onMock, 'reference-text-button'),
       );
@@ -420,7 +423,10 @@
             'Searched the entire collection. Try another headword, kana reading, or English meaning.',
           ) : tx('資料の区分は残していますが、項目を推測で補うことはしません。', 'The source bin is preserved; missing records are not invented.')),
         );
-        if (state.query) empty.append(button('reference-empty-clear', tx('検索をクリア', 'Clear search'), clearSearch));
+        if (state.query) {
+          empty.append(button('reference-empty-clear', tx('検索をクリア', 'Clear search'), clearSearch));
+          empty.append(button('reference-empty-global-search', tx('辞書全体で検索 →', 'Search the whole dictionary →'), () => onSearch(state.query)));
+        }
         list.append(empty);
       }
       wrap.append(list);
@@ -479,6 +485,20 @@
     return {
       state,
       back,
+      entry: (type, id) => entriesByKey.get(`${type}:${id}`) || null,
+      locationName: () => current() ? collectionName(current()) : tx('参考書庫', 'Reference library'),
+      open(id) {
+        const collection = collections.find((item) => item.id === id);
+        if (!collection) return false;
+        state.collectionId = id;
+        state.query = '';
+        state.page = 1;
+        state.scroll = 0;
+        onChange();
+        window.scrollTo(0, 0);
+        focus('reference-title');
+        return true;
+      },
       reset() {
         state.collectionId = null;
         state.query = '';
