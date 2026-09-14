@@ -71,15 +71,15 @@ The builder reads the existing repository pin directly from
 `corpus/src/corpus/sources/jmdict/fetch.py`, without calling its network fetcher
 or writing its corpus outputs.
 
-| Field | Value |
-| --- | --- |
-| Upstream repository | `scriptin/jmdict-simplified` |
-| Pinned release | `3.6.2+20260803141815` |
-| Asset | `kanjidic2-en-3.6.2+20260803141815.json.zip` |
-| ZIP SHA-256 | `5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6` |
-| Dictionary date | `2026-08-03` |
-| Database version | `2026-215` |
-| Generated sidecar size | `2,360,706` bytes |
+| Field                     | Value                                                              |
+| ------------------------- | ------------------------------------------------------------------ |
+| Upstream repository       | `scriptin/jmdict-simplified`                                       |
+| Pinned release            | `3.6.2+20260803141815`                                             |
+| Asset                     | `kanjidic2-en-3.6.2+20260803141815.json.zip`                       |
+| ZIP SHA-256               | `5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6` |
+| Dictionary date           | `2026-08-03`                                                       |
+| Database version          | `2026-215`                                                         |
+| Generated sidecar size    | `2,360,706` bytes                                                  |
 | Generated sidecar SHA-256 | `9605a24687dc8a24179089670e7ffa95cefa1a887b19ee7d951cb77dbc61aa74` |
 
 Upstream release:
@@ -112,23 +112,23 @@ a changed upstream release pass.
 
 Counts below are computed from the pinned release and stored in `skip.json`.
 
-| Coverage | Count |
-| --- | ---: |
-| Source characters / sidecar entries | 10,384 |
-| Canonical codes | 10,384 |
-| Alternate codes | 942 |
-| `posn` — position/division | 421 |
-| `stroke_count` — stroke count | 211 |
-| `stroke_and_posn` — count and position | 24 |
-| `stroke_diff` — differing stroke-count opinions | 286 |
-| Pattern 1 canonical codes | 6,763 |
-| Pattern 2 canonical codes | 2,489 |
-| Pattern 3 canonical codes | 848 |
-| Pattern 4 source-reported canonical codes | 284 |
-| Classical radical available | 10,384 |
-| English meanings available | 10,384 |
-| No Japanese on/kun reading supplied upstream | 277 |
-| Sidecar literals outside the current 2,582-record Corridor catalog | 7,808 |
+| Coverage                                                           |  Count |
+| ------------------------------------------------------------------ | -----: |
+| Source characters / sidecar entries                                | 10,384 |
+| Canonical codes                                                    | 10,384 |
+| Alternate codes                                                    |    942 |
+| `posn` — position/division                                         |    421 |
+| `stroke_count` — stroke count                                      |    211 |
+| `stroke_and_posn` — count and position                             |     24 |
+| `stroke_diff` — differing stroke-count opinions                    |    286 |
+| Pattern 1 canonical codes                                          |  6,763 |
+| Pattern 2 canonical codes                                          |  2,489 |
+| Pattern 3 canonical codes                                          |    848 |
+| Pattern 4 source-reported canonical codes                          |    284 |
+| Classical radical available                                        | 10,384 |
+| English meanings available                                         | 10,384 |
+| No Japanese on/kun reading supplied upstream                       |    277 |
+| Sidecar literals outside the current 2,582-record Corridor catalog |  7,808 |
 
 The four original misclassification labels and their meanings are retained from
 [KANJIDIC's format documentation](http://www.edrdg.org/wiki/KANJIDIC_Project.html).
@@ -138,13 +138,13 @@ pronunciations.
 
 ### Explicit upstream anomalies
 
-| Literal | Source value | Kind | Handling |
-| --- | --- | --- | --- |
-| 㡀 | `4-2-5` | canonical | Preserve verbatim; subtype 5 is invalid. |
-| 口 | `3-3-0` | `posn` alternate | Preserve verbatim; inside stroke count is zero. |
-| 囗 | `3-3-0` | `posn` alternate | Preserve verbatim; inside stroke count is zero. |
-| 門 | `3-8-0` | `posn` alternate | Preserve verbatim; inside stroke count is zero. |
-| 搔 | `1-3-09` | canonical numeric spelling | Normalize to `1-3-9`; retain original spelling in `sourceNormalizations`. |
+| Literal | Source value | Kind                       | Handling                                                                  |
+| ------- | ------------ | -------------------------- | ------------------------------------------------------------------------- |
+| 㡀      | `4-2-5`      | canonical                  | Preserve verbatim; subtype 5 is invalid.                                  |
+| 口      | `3-3-0`      | `posn` alternate           | Preserve verbatim; inside stroke count is zero.                           |
+| 囗      | `3-3-0`      | `posn` alternate           | Preserve verbatim; inside stroke count is zero.                           |
+| 門      | `3-8-0`      | `posn` alternate           | Preserve verbatim; inside stroke count is zero.                           |
+| 搔      | `1-3-09`     | canonical numeric spelling | Normalize to `1-3-9`; retain original spelling in `sourceNormalizations`. |
 
 The four rule-invalid codes carry `sourceIssues` on their records and do not
 participate in strict matching, including wildcard searches. Thus strict
@@ -192,7 +192,7 @@ const results = BunkiSkipCore.search(skipData, query, {
   literal. Source order is stable within each group. There is no hidden limit
   or frequency ranking.
 - An alternate result retains `canonical`, plus `matchedCode`, `matchType:
-  "alternate"`, and its original `misclass` label.
+"alternate"`, and its original `misclass` label.
 - `radical` optionally filters the classical/Kangxi number 1–214; an integer or
   numeric string is accepted. `undefined`, `null`, and `""` mean no filter.
   It is separate from the SKIP code; the UI may use the existing radical table
