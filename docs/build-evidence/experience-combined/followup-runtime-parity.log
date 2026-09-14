@@ -1,0 +1,11 @@
+index.html: OK
+corridor.js: OK
+corridor.css: OK
+drift-layer.js: OK
+drift-layer.css: OK
+reference-ui.js: OK
+reference-ui.css: OK
+reference-core.js: OK
+data/share_alike/reference-extra.json: OK
+All tracked Corridor source matches tested integration tree: PASS
+Rebuilt standalone byte parity with tested combined artifact: PASS

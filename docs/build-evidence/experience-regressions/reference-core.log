@@ -1,0 +1,89 @@
+PASS Frozen inputs remain byte-identical; generated core is pure
+PASS Every dictionary and graded-word row reaches a labelled or unknown collection
+PASS Every wbig/drift word and kotobako vocabulary classification is represented
+PASS Every boot kanji, grade fact and JLPT metadata row is accounted for
+PASS Every full Kentei source row survives, including duplicates and glyphless records
+PASS Exact membership sets match the independently calculated all-source union
+PASS Kentei source species relationships are exact, bidirectional and never inherited grades
+PASS Dictionary links retain all exact candidates and enforce written-form reading scopes
+PASS Partial kanji fields fill only from the same literal and retain field provenance
+PASS Offline checks reject accidental pinned metadata corruption rather than blessing it
+PASS Every dictionary candidate has an actual correctly routed canonical detail target
+PASS Reference-to-runtime and source word-to-kanji edges have no dangling canonical targets
+PASS Known source gaps remain honest; no synthetic N3 kanji or inferred levels
+PASS All collection pages concatenate to every entry with no cap or duplicate
+PASS Each collection is deterministically reading-sorted; no sort mutates its input
+PASS Source disagreements, unknown/special levels and metadata gaps in independent fixtures
+PASS Query normalization, kana variants, token AND, whitespace, English and literal symbols
+PASS Pagination handles empty results, late pages, fractional and invalid options without caps
+PASS Output edits cannot mutate runtime sources or the licensed source sidecar
+PASS Browser global and CommonJS exports have the same contract
+
+20 reference-core tests passed.
+{
+  "sourceRows": {
+    "dict": 22934,
+    "words": 8407,
+    "kanji": 2582,
+    "kanken": 2453,
+    "kmeta": 2136,
+    "kanken-corpus": 6787,
+    "vocabulary-extra": 18548
+  },
+  "families": {
+    "jlpt": {
+      "uniqueLabelled": 7677,
+      "memberships": 7688,
+      "conflicts": 11,
+      "unknown": 16774,
+      "missingReading": 0,
+      "missingMeanings": 0
+    },
+    "jlpt-kanji": {
+      "uniqueLabelled": 1979,
+      "memberships": 1979,
+      "conflicts": 0,
+      "unknown": 4931,
+      "missingReading": 0,
+      "missingMeanings": 0
+    },
+    "kanken": {
+      "uniqueLabelled": 6781,
+      "memberships": 6787,
+      "conflicts": 6,
+      "unknown": 129,
+      "missingReading": 630,
+      "missingMeanings": 621
+    }
+  },
+  "counts": {
+    "jlpt:N5": 743,
+    "jlpt:N4": 681,
+    "jlpt:N3": 2122,
+    "jlpt:N2": 1863,
+    "jlpt:N1": 2279,
+    "jlpt:unknown": 16774,
+    "jlpt-kanji:N5": 103,
+    "jlpt-kanji:N4": 181,
+    "jlpt-kanji:N3": 0,
+    "jlpt-kanji:N2": 739,
+    "jlpt-kanji:N1": 956,
+    "jlpt-kanji:unknown": 4931,
+    "kanken:10級": 80,
+    "kanken:9級": 160,
+    "kanken:8級": 200,
+    "kanken:7級": 202,
+    "kanken:6級": 193,
+    "kanken:5級": 191,
+    "kanken:4級": 313,
+    "kanken:3級": 284,
+    "kanken:準2級": 328,
+    "kanken:2級": 185,
+    "kanken:準1級": 858,
+    "kanken:1/準1級": 644,
+    "kanken:1級": 2675,
+    "kanken:配当外": 474,
+    "kanken:unknown": 129
+  }
+}
+Coverage evidence: /home/user/workspace/Bunki-reference/docs/build-evidence/reference/coverage.json

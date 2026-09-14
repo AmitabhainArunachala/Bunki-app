@@ -1,0 +1,2252 @@
+{
+  "started": "2026-09-14T08:57:41.101Z",
+  "root": "/home/user/workspace/Bunki-experience-combined/prototypes/corridor",
+  "method": "One clean primary context; normal Playwright input only. Read-only evaluate for evidence. No state staging. No fake HTTP responses.",
+  "checks": [
+    {
+      "id": "E01-clean",
+      "status": "pass",
+      "expected": "Primary starts with zero saved, scheduled or reviewed items",
+      "observed": "Clean actual app, no init scripts or staged store"
+    },
+    {
+      "id": "E01-closed-radoc",
+      "status": "pass",
+      "expected": "Closed radical explanation is absent from the accessibility tree",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E02-neighbor",
+      "status": "pass",
+      "expected": "Semantic-neighbor result opens full entry",
+      "observed": "見解"
+    },
+    {
+      "id": "E02-literal",
+      "status": "pass",
+      "expected": "Search treats markup-looking text literally",
+      "observed": "戻る\nback\nbookshelf\n藍\nEN\n日本語\n覚 0\nlists\n\n回廊 · 図書館kairo · the library\n\nNothing found for that yet."
+    },
+    {
+      "id": "E03-browse-no-debt",
+      "status": "pass",
+      "expected": "Recursive browsing does not enroll or grade",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E04-palette-roster",
+      "status": "pass",
+      "expected": "Ten public palettes in constitution order",
+      "observed": "墨 朱 柿 漆 金 藍 赤 浪 板 雷"
+    },
+    {
+      "id": "E04-return",
+      "status": "pass",
+      "expected": "Two Escapes return from awake room to originating 森 sheet",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E06-pre-capture-no-debt",
+      "status": "pass",
+      "expected": "Passive reading/lookups create no review debt",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E06-explicit-enrollment-label",
+      "status": "pass",
+      "expected": "The chosen take control explicitly says memorize, not an innocent save",
+      "observed": "User explicitly chose memorize. Current app has no separate save-only door on this sheet."
+    },
+    {
+      "id": "E06-enrollment",
+      "status": "pass",
+      "expected": "Only explicit memorize adds one learning item; no retrieval grade is fabricated",
+      "observed": "One explicitly memorized item: 朝; started=true; no FSRS grade yet"
+    },
+    {
+      "id": "E07-study-visible",
+      "status": "pass",
+      "expected": "Study reflects exactly the chosen item",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-list-empty-validation",
+      "status": "pass",
+      "expected": "Empty list name rejected without creating a list",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-list-create",
+      "status": "pass",
+      "expected": "Normal typed list creation persists an empty named list",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-list-cancel",
+      "status": "pass",
+      "expected": "Escape cancels rename without saving typed draft",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E07-review-record",
+      "status": "pass",
+      "expected": "Every explicit grade produces a durable outcome; only the chosen item is scheduled",
+      "observed": "2 deliberate grades, including short-learning repeats, on one explicitly enrolled word"
+    },
+    {
+      "id": "E07-review-trace",
+      "status": "pass",
+      "expected": "Return to study displays review trace",
+      "observed": "last 7 days 0 · 0 · 0 · 0 · 0 · 0 · 2 | all time 2"
+    },
+    {
+      "id": "E15-export",
+      "status": "pass",
+      "expected": "Export downloads parseable real learner envelope",
+      "observed": "{\"filename\":\"kairo-2026-09-14.json\",\"file\":\"learner-export.json\",\"keys\":[\"v\",\"taken\",\"lists\",\"srs\",\"revlog\",\"obslog\",\"deepWords\",\"lessonsDone\",\"mockDone\",\"mockRun\",\"aiReading\",\"aiReadings\",\"suspended\",\"aiChat\",\"ai\",\"aiQuiz\",\"stats\",\"srsPrefs\",\"readDone\",\"readerPos\",\"dials\"]}"
+    },
+    {
+      "id": "E08-no-auto-enrollment",
+      "status": "pass",
+      "expected": "Completing a real lesson changes practice evidence, not deck/schedule",
+      "observed": "Deck=1; lessons=1; no enrollment button clicked"
+    },
+    {
+      "id": "E09-requires-answer",
+      "status": "pass",
+      "expected": "Cannot advance without choosing an answer",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E09-answer-persists-back",
+      "status": "pass",
+      "expected": "Previous returns to original chosen answer",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E09-no-auto-enrollment",
+      "status": "pass",
+      "expected": "Paper submission records score without altering deck or scheduler",
+      "observed": "Deck remains 1; completed papers 1"
+    },
+    {
+      "id": "E10-reference-return",
+      "status": "pass",
+      "expected": "Detail close preserves reference page",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E19-reference-320",
+      "status": "pass",
+      "expected": "No horizontal document overflow",
+      "observed": "{\"w\":320,\"sw\":320}"
+    },
+    {
+      "id": "E19-reference-1280",
+      "status": "pass",
+      "expected": "No horizontal document overflow",
+      "observed": "{\"w\":1280,\"sw\":1280}"
+    },
+    {
+      "id": "E10-browse-no-enrollment",
+      "status": "pass",
+      "expected": "Reference browsing changes no deck, FSRS or review record",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E13-current-shape-flow",
+      "status": "pass",
+      "expected": "木 and eight total strokes find 林 through actual lenses",
+      "observed": "Legacy journey omitted the by-strokes lens; selector exists there. Returned to parts for actual combined filter."
+    },
+    {
+      "id": "E13-skip-context",
+      "status": "pass",
+      "expected": "SKIP detail Back retains typed code and no learning side effects",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E14-mirror",
+      "status": "pass",
+      "expected": "Mirror explicitly distinguishes evidence from qualification",
+      "observed": "鏡the mirror\n\nWhere the evidence stands\n\nWhat follows is the record itself. It does not name your level; it lays out how much of each level’s material you have actually cleared — and whether you would pass is not knowable from here.\n\n29 judged answers — 29 measured · 0 observed\n\n語彙\nvocabulary\n\nN5\n7/16\n\nlevels have been answered, and none is coming through yet.\n\n16 measured · 0 observed\n\n読み\nreadings\n\nN5\n2/6\n\nlevels have been answered, and none is coming through yet.\n\n6 measured · 0 observed\n\n文の形\nsentence form\n\nN5\n1/7\n\nlevels have been answered, and none is coming through yet.\n\n7 measured · 0 observed\n\n自分で使う\nproducing it yourself\n\nno evidence yet"
+    },
+    {
+      "id": "E16-language-cycle",
+      "status": "pass",
+      "expected": "EN → 日本語 → EN preserves usable shelf",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E19-shelf-desktop",
+      "status": "pass",
+      "expected": "No horizontal document overflow",
+      "observed": "{\"w\":1280,\"sw\":1280}"
+    },
+    {
+      "id": "E18-palette-reload",
+      "status": "pass",
+      "expected": "Chosen dark world survives reload",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E18-state-reload",
+      "status": "pass",
+      "expected": "Review, lesson, mock and chosen card persist",
+      "observed": "1 chosen item, 2 review, 1 lesson, 1 mock"
+    },
+    {
+      "id": "E17-empty-key",
+      "status": "pass",
+      "expected": "Empty tutor-key action cannot enable AI or alter learning state",
+      "observed": "Empty save deliberately returns to shelf; key remains absent, no provider request or fabricated response"
+    },
+    {
+      "id": "E17-offline-safe",
+      "status": "pass",
+      "expected": "No-key offline tutor action leaves canonical state unchanged",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E18-warm-offline",
+      "status": "pass",
+      "expected": "Reference search works offline from already loaded assets",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E19-shelf-320",
+      "status": "pass",
+      "expected": "No horizontal document overflow",
+      "observed": "{\"w\":320,\"sw\":320}"
+    },
+    {
+      "id": "E19-header-44",
+      "status": "pass",
+      "expected": "At 320px each language segment has a 44px touch height and a single line",
+      "observed": "[{\"text\":\"EN\",\"h\":44,\"whiteSpace\":\"nowrap\"},{\"text\":\"日本語\",\"h\":44,\"whiteSpace\":\"nowrap\"}]"
+    },
+    {
+      "id": "E18-home",
+      "status": "pass",
+      "expected": "Return home succeeds after learning/reference/settings/offline work",
+      "observed": "Observed expected outcome"
+    },
+    {
+      "id": "E20-no-page-errors",
+      "status": "pass",
+      "expected": "No uncaught JavaScript errors during whole journey",
+      "observed": "No uncaught page exceptions"
+    },
+    {
+      "id": "E20-frozen-assets",
+      "status": "pass",
+      "expected": "All nine tracked runtime/data assets stay unchanged throughout signoff",
+      "observed": "Nine runtime/data hashes identical before and after journey"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "screenshots/20260914085741-01-drift-clean.png",
+      "name": "drift-clean",
+      "expected": "Fresh default landing with discoverable navigation",
+      "observed": "Quiet map-like Drift with a small top navigation seal and unobstructed artwork; discoverability depends on exploration.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "drift",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-02-drift-navigation.png",
+      "name": "drift-navigation",
+      "expected": "Expanded normal navigation reveals shelf door",
+      "observed": "Expanded navigation exposes a shelf bubble and tutor bubble without replacing Drift.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "drift",
+      "focus": {
+        "id": "ginga-symbol",
+        "tag": "BUTTON",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-03-shelf-mobile.png",
+      "name": "shelf-mobile",
+      "expected": "Bilingual shelf doors and real texts are legible at 390px",
+      "observed": "All major shelf doors fit at 390px; warm paper hierarchy is coherent, but many equally weighted choices compete.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-04-search-synonyms.png",
+      "name": "search-synonyms",
+      "expected": "Word hits plus semantic neighbors",
+      "observed": "Word results and semantic neighbors are visibly separate, with a clearable query.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "search",
+        "tag": "INPUT",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-05-search-literal-empty.png",
+      "name": "search-literal-empty",
+      "expected": "Malformed-looking input is harmless literal text with honest no-results feedback",
+      "observed": "Markup-looking input remains text; the honest no-results message leaves a clear recovery affordance.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "search",
+        "tag": "INPUT",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-06-word-entry.png",
+      "name": "word-entry",
+      "expected": "Correct 森林 full entry, readings, kanji and semantic/provenance content",
+      "observed": "森林 entry opens as a readable sheet over retained search context, with reading, meaning and kanji doors.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-07-kanji-mori.png",
+      "name": "kanji-mori",
+      "expected": "森 kanji detail includes readings, components and compounds",
+      "observed": "森 detail combines Forest, 12 strokes, Kentei/JLPT chips and a separate SKIP 2-4-8 badge without overlap. Readings, radical, strokes door and 林 component retain clear hierarchy at 390px.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet + full-resolution",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-08-component-hayashi.png",
+      "name": "component-hayashi",
+      "expected": "A component is a traversable node, not a dead label",
+      "observed": "林 component explicitly distinguishes shape component from dictionary radical and offers view-as-kanji.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-09-component-to-kanji.png",
+      "name": "component-to-kanji",
+      "expected": "Containing-kanji door returns to canonical kanji detail",
+      "observed": "林 kanji detail shows Grove, level/stroke metadata and SKIP 1-4-4; the new badge does not displace the shared navigation or radical/stroke doors out of their logical order.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-10-kanji-to-compound.png",
+      "name": "kanji-to-compound",
+      "expected": "A compound reopens full word entry through the same sheet",
+      "observed": "Compound entry shows 林 readings and multiple senses, with visible return and close controls.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-11-writing-dormant.png",
+      "name": "writing-dormant",
+      "expected": "Current writing room, live glyph, usable return; constitutional/control policy mismatch recorded separately",
+      "observed": "Dormant writing room is captured mid-stroke, not as a completed 森; faint corner controls remain under later operator direction.",
+      "status": "reviewed-with-limit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "stroke-page",
+        "tag": "DIV",
+        "text": "Use the browser or device Back command to leave the writing "
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-12-writing-awake.png",
+      "name": "writing-awake",
+      "expected": "Awake room exposes complete readings and controls",
+      "observed": "Awake writing room shows reading cards and corner controls while ink animates; this is a transition view, not completed calligraphy proof.",
+      "status": "reviewed-with-limit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-13-writing-dark-numbers.png",
+      "name": "writing-dark-numbers",
+      "expected": "Dark world, readable glyph and working number control",
+      "observed": "Dark room shows lit stroke numbers and selected numbering control; glyph is still being drawn.",
+      "status": "reviewed-with-limit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "shelf",
+      "focus": {
+        "id": "stroke-numbers",
+        "tag": "BUTTON",
+        "text": "筆順の番号stroke order numbers"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-14-writing-return-context.png",
+      "name": "writing-return-context",
+      "expected": "Original kanji restored rather than generic home",
+      "observed": "Escape restores the original 森 sheet in dark palette, now including its SKIP 2-4-8 badge; this is preserved entry context, not generic home.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "shelf",
+      "focus": {
+        "id": "strokes-door",
+        "tag": "BUTTON",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-15-shelf-source-details.png",
+      "name": "shelf-source-details",
+      "expected": "Source and difficulty detail disclosure stays distinct from mastery",
+      "observed": "Shelf article and details affordance are visible, but expanded detail content lies below this viewport; image alone does not prove full disclosure readability.",
+      "status": "reviewed-with-limit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 25,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-16-reader-initial.png",
+      "name": "reader-initial",
+      "expected": "Actual Japanese text, reading controls, and clear return",
+      "observed": "Reader presents title, difficulty, voice controls and comfortable Japanese text in a clear paper panel.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-17-reader-settings.png",
+      "name": "reader-settings",
+      "expected": "Independent kanji, furigana and spacing settings all accept deliberate input",
+      "observed": "Independent reading dials are open and selected states are visible; text representation changes beneath them.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-18-reader-reading-rung.png",
+      "name": "reader-reading-rung",
+      "expected": "First activation reveals reading without opening full entry",
+      "observed": "First token activation adds the reading above 朝 without opening a sheet.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "朝あさ"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-19-reader-gloss-rung.png",
+      "name": "reader-gloss-rung",
+      "expected": "Second activation reveals meaning without taking over the reading",
+      "observed": "Second token activation adds the meaning while the same reader remains visible.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "朝あさmorning"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-20-reader-explicit-memorize.png",
+      "name": "reader-explicit-memorize",
+      "expected": "Chosen word is visibly marked memorizing and offers list filing",
+      "observed": "朝 sheet and selected memorize control are visible; list-filing options are not visible in this viewport, so this image proves selection rather than filing.",
+      "status": "reviewed-with-limit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-21-reader-resumed.png",
+      "name": "reader-resumed",
+      "expected": "Reader context and learner mark remain after entry close",
+      "observed": "Reader resumes lower in the same article; a small quick-look/full-entry affordance remains near a token without covering the whole page.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 350,
+      "theme": "hokusai",
+      "view": "reader",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "朝あさmorning"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-22-my-study-enrolled.png",
+      "name": "my-study-enrolled",
+      "expected": "My Study shows the one explicitly memorized item and review availability",
+      "observed": "My Study explicitly says Memorizing 1 item, lists 朝 and offers the review action.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "tray",
+      "focus": {
+        "id": "tray",
+        "tag": "BUTTON",
+        "text": "覚 1lists"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-23-my-study-list-created.png",
+      "name": "my-study-list-created",
+      "expected": "Named list created, rename canceled safely",
+      "observed": "Evening Japanese list is visible and the discarded rename draft is absent; current list remains empty.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "tray",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-24-review-recall.png",
+      "name": "review-recall",
+      "expected": "Review asks learner for honest recall before revealing the answer",
+      "observed": "Review initially conceals the answer and presents not-yet/recalled choices below a large 朝 card.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-25-review-revealed-grade.png",
+      "name": "review-revealed-grade",
+      "expected": "Answer and explicit grade control precede FSRS scheduling",
+      "observed": "After animation settles, reading, meaning and four explicit grade seals with intervals are readable and fully inside 390px viewport.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet + full-resolution",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-26-review-summary.png",
+      "name": "review-summary",
+      "expected": "Explicit review produces visible completion summary",
+      "observed": "Review completion uses a very sparse seal-and-return presentation; it is navigable but provides little narrative confirmation by itself.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "review",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-27-study-export-trace.png",
+      "name": "study-export-trace",
+      "expected": "Study after real export: durable trace and export control",
+      "observed": "Study shows all-time review trace 2 and a due interval on 朝; export/import controls remain visible after actual download.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "tray",
+      "focus": {
+        "id": "export-store",
+        "tag": "BUTTON",
+        "text": "書き出すexport your record"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-28-lesson-catalog.png",
+      "name": "lesson-catalog",
+      "expected": "Lessons are separate from reference catalog and personal study",
+      "observed": "Lesson catalog is long and consistently grouped by level; repeated row weight makes scanning deliberate rather than guided.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "lessons",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-29-lesson-learning.png",
+      "name": "lesson-learning",
+      "expected": "Lesson teaches one word at a time",
+      "observed": "Lesson teaches a single large word with a clear Next action and ample whitespace.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "lessons",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-30-lesson-quiz.png",
+      "name": "lesson-quiz",
+      "expected": "Quiz requires an explicit answer",
+      "observed": "Lesson quiz exposes explicit choices beneath the prompt; it does not reveal a preselected answer.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "lessons",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-31-lesson-complete-not-enrolled.png",
+      "name": "lesson-complete-not-enrolled",
+      "expected": "Completion honestly reports practice and offers optional enrollment",
+      "observed": "Lesson completion shows 2 of 10 and individual memorize options; copy explicitly says choosing nothing adds nothing.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "lessons",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-32-mock-catalog.png",
+      "name": "mock-catalog",
+      "expected": "Bundled mock papers clearly separate score evidence from scheduling",
+      "observed": "Mock catalog distinguishes practice score evidence from scheduling and lists bundled papers by level.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "mock",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-33-mock-question.png",
+      "name": "mock-question",
+      "expected": "Paper starts with unselected answer and next disabled",
+      "observed": "Mock starts with unselected choices and visually muted Next; navigation and quit controls remain accessible.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "mock",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-34-mock-selected-answer.png",
+      "name": "mock-selected-answer",
+      "expected": "Selection is visible and still editable; no instant correctness",
+      "observed": "Chosen mock answer has a clear outlined state and Next is enabled; correctness is not prematurely shown.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "mock",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-35-mock-results.png",
+      "name": "mock-results",
+      "expected": "Submitted paper has score, explanations and deliberate optional enrollment",
+      "observed": "Mock results show 7 of 18, explanations and optional memorize actions; explanatory copy avoids claiming a predicted pass.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "mock",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-36-reference-overview.png",
+      "name": "reference-overview",
+      "expected": "Reference includes complete bundled level collections independently of lessons",
+      "observed": "Reference overview separates JLPT vocabulary/kanji and displays collection counts, not assumed learner mastery.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-37-reference-n1.png",
+      "name": "reference-n1",
+      "expected": "N1 vocabulary is reachable from reference even when lesson inventory differs",
+      "observed": "N1 collection has source-scope note, search, paging and count; first rows fit while more continue below.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "reference-title",
+        "tag": "H1",
+        "text": "JLPT · N1 · Vocabulary"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-38-reference-detail.png",
+      "name": "reference-detail",
+      "expected": "Canonical reference entry opens without enrollment",
+      "observed": "Reference detail opens over the paged list using the same sheet language as dictionary entries.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 1035,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-39-reference-empty.png",
+      "name": "reference-empty",
+      "expected": "Reference empty search explains recovery",
+      "observed": "Empty reference search explicitly says No matching entries and offers clear/search-whole-dictionary recovery.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 194,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "reference-search",
+        "tag": "INPUT",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-40-reference-n3.png",
+      "name": "reference-n3",
+      "expected": "N3 remains independently reachable",
+      "observed": "N3 has its own collection count and visible entries, independent of lesson catalogs.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "reference-title",
+        "tag": "H1",
+        "text": "JLPT · N3 · Vocabulary"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-41-reference-kentei-advanced.png",
+      "name": "reference-kentei-advanced",
+      "expected": "Advanced Kentei is an honest reference collection, not a personal-study level",
+      "observed": "Advanced Kentei 1級 has source-scope note and large collection paging rather than implying complete study coverage.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "reference-title",
+        "tag": "H1",
+        "text": "Kanji Kentei · 1級"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-42-advanced-reference-detail.png",
+      "name": "advanced-reference-detail",
+      "expected": "Supplementary source entry exposes honest detail or canonical sheet without invented mastery",
+      "observed": "Advanced source-only entry exposes a source record and explicitly says study-entry data is not bundled; no invented study action is presented.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-43-reference-320.png",
+      "name": "reference-320",
+      "expected": "Dense reference remains readable and operable at 320px",
+      "observed": "At 320px reference controls wrap vertically without document overflow; input placeholder is naturally clipped within its field.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "documentWidth": 320,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "reference-entry-kanken%3A1%E7%B4%9A-%E4%B8%AB",
+        "tag": "BUTTON",
+        "text": "1丫ア・ヤ・ふたまた・あげまきbifurcation; fork›"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-44-reference-1280.png",
+      "name": "reference-1280",
+      "expected": "Desktop reference respects line length and hierarchy",
+      "observed": "At 1280px reference uses a constrained reading column, preserving line length with substantial surrounding whitespace.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "documentWidth": 1280,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "levels",
+      "focus": {
+        "id": "reference-entry-kanken%3A1%E7%B4%9A-%E4%B8%AB",
+        "tag": "BUTTON",
+        "text": "1丫ア・ヤ・ふたまた・あげまきbifurcation; fork›"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-45-grammar-index.png",
+      "name": "grammar-index",
+      "expected": "Grammar is reachable with useful named entries",
+      "observed": "Grammar index has level chips and named entries in a consistent list hierarchy.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "grammar",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-46-grammar-entry.png",
+      "name": "grammar-entry",
+      "expected": "Grammar detail has explanation, examples and same close/back model",
+      "observed": "Grammar detail presents level, explanation, examples and source note in the shared sheet pattern.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "grammar",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-47-thesaurus.png",
+      "name": "thesaurus",
+      "expected": "Semantic differences can be compared side by side",
+      "observed": "Thesaurus groups near-synonyms with short English distinctions; this is a comparison index, not a mastery score.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 497,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "thesaurus",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-48-idiom-entry.png",
+      "name": "idiom-entry",
+      "expected": "Four-character idiom has a real recursive detail door",
+      "observed": "Idiom detail contains meaning, component glyph doors and deliberate memorize action.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "yoji",
+      "focus": {
+        "id": "sheet-back",
+        "tag": "BUTTON",
+        "text": "← 戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-49-shape-wood-eight.png",
+      "name": "shape-wood-eight",
+      "expected": "Current parts+strokes flow finds 林 without relying on stale controls",
+      "observed": "Shape finder shows 木 and eight-stroke constraints with 林 among candidates. Adding SKIP causes the six lens buttons to use a four-plus-two layout, still readable at 390px.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "kanjidex",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-50-skip-integrated.png",
+      "name": "skip-integrated",
+      "expected": "SKIP is a normal shape-finder lens within the same journey",
+      "observed": "SKIP is visibly selected as an ordinary shape-finder lens. Shape code 1-*-*, canonical/shown counts, alternate-record checkbox, candidate grid and four-column picker are legible. Picker extends below the viewport; lower options require scrolling. Instructions say shape/counts/radical are lookup filters, not difficulty.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "kanjidex",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet + full-resolution",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-51-skip-code-search.png",
+      "name": "skip-code-search",
+      "expected": "Typed SKIP code gives real candidates",
+      "observed": "Typed 1-3-8 is retained in the search field and SKIP heading. The selected picker row visibly matches pattern 1, left 3, right 8; 271 canonical matches and 72 shown are distinguished. Close SKIP/search words provides an explicit exit, and no enrollment action is presented here.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "search",
+      "focus": {
+        "id": "nav-search-input",
+        "tag": "INPUT",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet + full-resolution",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-52-learner-mirror.png",
+      "name": "learner-mirror",
+      "expected": "Mirror reflects honest practice/retrieval dimensions without assigning false level",
+      "observed": "Mirror labels evidence dimensions and explicitly refuses to infer a level or pass likelihood; ratios require careful reading rather than a single score.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "kagami",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-53-world-picker.png",
+      "name": "world-picker",
+      "expected": "Exactly ten public worlds in consistent order",
+      "observed": "Ten palette seals appear above the shelf; the article disclosure remains open below, with provenance/difficulty bars visibly separated from the source excerpt.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BUTTON",
+        "text": "藍"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-54-shelf-dark.png",
+      "name": "shelf-dark",
+      "expected": "Dark world changes the whole shelf with legible controls",
+      "observed": "Dark shelf retains readable hierarchy and a clearly selected English segment; fine secondary labels are small and deserve physical-device review.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "shelf",
+      "focus": {
+        "id": "theme-seal",
+        "tag": "BUTTON",
+        "text": "金"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-55-shelf-japanese.png",
+      "name": "shelf-japanese",
+      "expected": "Japanese-only chrome is deliberate and reversible",
+      "observed": "Japanese mode changes shelf chrome and selected language segment; Japanese doors reflow rather than compress into unreadable mixed labels.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "shelf",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-56-keyboard-focus-dark.png",
+      "name": "keyboard-focus-dark",
+      "expected": "Keyboard focus remains perceivable in dark palette",
+      "observed": "Keyboard focus outline is visible around the Back control in the dark palette.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "shelf",
+      "focus": {
+        "id": "back",
+        "tag": "BUTTON",
+        "text": "戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-57-shelf-desktop-dark.png",
+      "name": "shelf-desktop-dark",
+      "expected": "Desktop dark shelf has coherent hierarchy",
+      "observed": "Dark desktop shelf remains a constrained reading column; expanded article detail bars and subsequent article content use the same hierarchy rather than stretching across the screen.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "documentWidth": 1280,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "shelf",
+      "focus": {
+        "id": "back",
+        "tag": "BUTTON",
+        "text": "戻るback"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-58-study-reloaded.png",
+      "name": "study-reloaded",
+      "expected": "Personal evidence and cards survive normal reload",
+      "observed": "Reloaded dark My Study retains one memorized word, review trace and named list, consistent with persistence assertions.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "tray",
+      "focus": {
+        "id": "tray",
+        "tag": "BUTTON",
+        "text": "覚 1lists"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-59-tutor-unconfigured.png",
+      "name": "tutor-unconfigured",
+      "expected": "No key means honest setup, not a fabricated conversation",
+      "observed": "No-key tutor is an honest API-key setup screen with storage/provider explanation; blank Save is available but does not enable a conversation.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "ai",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet + full-resolution",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-60-tutor-offline-no-key.png",
+      "name": "tutor-offline-no-key",
+      "expected": "Offline/unconfigured tutor stays safe; no provider reliability claim",
+      "observed": "Offline no-key tutor intentionally looks identical to unconfigured online setup; no offline-specific warning is displayed, and no provider response is claimed.",
+      "status": "reviewed-with-limit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "ai",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-61-offline-reference-warm.png",
+      "name": "offline-reference-warm",
+      "expected": "Warm loaded reference remains usable while network is disabled",
+      "observed": "Warm offline N3 search shows water matches with query and count; this does not demonstrate cold offline startup.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "yoru",
+      "view": "levels",
+      "focus": {
+        "id": "reference-search",
+        "tag": "INPUT",
+        "text": ""
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-62-shelf-narrow-final.png",
+      "name": "shelf-narrow-final",
+      "expected": "Narrow header retains 44px controls and unwrapped language labels",
+      "observed": "At 320px top controls remain single-line and 44px high; shelf doors wrap into a longer layout. Long search placeholder truncates within the input, not beyond the viewport.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "documentWidth": 320,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "shelf",
+      "focus": {
+        "id": "theme-seal",
+        "tag": "BUTTON",
+        "text": "藍"
+      },
+      "visualReview": {
+        "method": "contact-sheet + full-resolution",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    },
+    {
+      "file": "screenshots/20260914085741-63-home-return.png",
+      "name": "home-return",
+      "expected": "Whole continuous journey closes at Drift with personal state retained",
+      "observed": "Final return restores quiet Drift; first-visit invitation is no longer shown, consistent with a completed journey rather than a fresh landing.",
+      "status": "reviewed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scrollY": 0,
+      "theme": "hokusai",
+      "view": "drift",
+      "focus": {
+        "id": "",
+        "tag": "BODY",
+        "text": "\n\n\n\nで出outflow, coming (going) outたく炊くto boil, to cookたんなる単なる"
+      },
+      "visualReview": {
+        "method": "contact-sheet",
+        "reviewer": "experience-QA subagent",
+        "scope": "Independent inspection of saved combined-run images; no browser rerun or runtime changes; visible-state judgment, not a blanket contrast/accessibility certification"
+      }
+    }
+  ],
+  "pageErrors": [],
+  "observations": [
+    {
+      "type": "writing-room-governance",
+      "note": "Constitution §6 kanji+ellipsis differs from later inline operator redirects dated 2026-08-15 and 2026-08-24: visible back, world seal and corner controls. Main directs testing usability, not declaring a definitive bug from older constitution.",
+      "controls": [
+        "← 戻るback",
+        "藍",
+        "",
+        "筆順の番号stroke order numbers",
+        "ゆっくりslowly"
+      ]
+    },
+    {
+      "type": "writing-wake-latency",
+      "milliseconds": 4378,
+      "note": "Headless software-rendered living ink; diagnostic, not physical-device latency signoff"
+    }
+  ],
+  "requiredSkip": true,
+  "revision": "3040f8faccf503d6c2bca7d27114e4510cef0119",
+  "dirty": " M corridor-standalone.html\n",
+  "assetHashes": {
+    "index.html": "baf10599cbcf6d49bd2dcfda08e398a2632c4a7d9e9881cd20285f488e9a6916",
+    "corridor.js": "ecd85ded110878f9de67b888a6670c435aa417ef32c32a376d90563efd7c7e1f",
+    "corridor.css": "25cd046e82e288474793f17eb2617765de73b72749946906960b51bf0ba82eae",
+    "drift-layer.js": "a50058ce5603d55a14e8aec4beba6a74fac5d3d15319887138fdd787698bd9b9",
+    "drift-layer.css": "8bdbc726bfc5d58a9f318d8e4183e45e505aa45aee75077fcc89e79d7eb94387",
+    "reference-ui.js": "f17bc1494ce3eb1d1fc4fafddb8dc40e8b94d4a53469536766a588adecd48a10",
+    "reference-ui.css": "a2fd736bf3ce4315ba86a0236a9be2a6773decbbda553a7a4609ba2d2d476815",
+    "reference-core.js": "22c6512a5f0676f0fe5055b121a76a0529fa8d4e02e352cc7205bfdbfe50daea",
+    "data/share_alike/reference-extra.json": "190a886cf6da6b0f49c35c057edfd79b59446b8bb79e17cfbfaf5f1b85f945ee"
+  },
+  "url": "http://127.0.0.1:36271/",
+  "export": {
+    "filename": "kairo-2026-09-14.json",
+    "file": "learner-export.json",
+    "keys": [
+      "v",
+      "taken",
+      "lists",
+      "srs",
+      "revlog",
+      "obslog",
+      "deepWords",
+      "lessonsDone",
+      "mockDone",
+      "mockRun",
+      "aiReading",
+      "aiReadings",
+      "suspended",
+      "aiChat",
+      "ai",
+      "aiQuiz",
+      "stats",
+      "srsPrefs",
+      "readDone",
+      "readerPos",
+      "dials"
+    ]
+  },
+  "finalState": {
+    "taken": [
+      {
+        "t": "word",
+        "id": "朝",
+        "label": "朝",
+        "kind": "語",
+        "kindEn": "word",
+        "from": {
+          "passage": "bunki-graded-n5-morning",
+          "index": 0
+        },
+        "ts": 1789376332079,
+        "started": 1789376332079
+      }
+    ],
+    "srs": {
+      "word:朝": {
+        "due": "2026-09-16T08:59:00.828Z",
+        "stability": 2.3065,
+        "difficulty": 2.11121424,
+        "elapsed_days": 0,
+        "scheduled_days": 2,
+        "reps": 2,
+        "lapses": 0,
+        "learning_steps": 0,
+        "state": 2,
+        "last_review": "2026-09-14T08:59:00.828Z"
+      }
+    },
+    "revlog": [
+      [
+        1789376338375,
+        "word:朝",
+        3,
+        0,
+        null,
+        null,
+        null,
+        null,
+        2.3065,
+        2.1181,
+        0,
+        1789376938375
+      ],
+      [
+        1789376340828,
+        "word:朝",
+        3,
+        1,
+        0,
+        1,
+        2.3065,
+        2.1181,
+        2.3065,
+        2.1112,
+        2,
+        1789549140828
+      ]
+    ],
+    "obslog": [
+      [
+        1789376327797,
+        "tap",
+        "word:朝",
+        1,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789376328244,
+        "tap",
+        "word:朝",
+        2,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789376329120,
+        "tap",
+        "word:朝",
+        2,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789376330790,
+        "tap",
+        "word:朝",
+        3,
+        "bunki-graded-n5-morning"
+      ],
+      [
+        1789376338374,
+        "reveal",
+        "word:朝",
+        1
+      ],
+      [
+        1789376340826,
+        "reveal",
+        "word:朝",
+        1
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:ああ",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あそこ",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あちら",
+        3,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あっち",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あなた",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あの",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あまり",
+        3,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:あれ",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:いい; よい",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376352290,
+        "lesson",
+        "word:いいえ",
+        1,
+        "N5-1"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:番号",
+        1,
+        "n5-01#kanji-reading"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:黒い",
+        1,
+        "n5-01#kanji-reading"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:頼む",
+        1,
+        "n5-01#kanji-reading"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:誰",
+        3,
+        "n5-01#kanji-reading"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:学校",
+        1,
+        "n5-01#kanji-reading"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:問題",
+        3,
+        "n5-01#kanji-reading"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:空",
+        3,
+        "n5-01#orthography"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:丁度",
+        1,
+        "n5-01#orthography"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:寒い",
+        3,
+        "n5-01#orthography"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:男",
+        3,
+        "n5-01#orthography"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:読む",
+        3,
+        "n5-01#form"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:入れる",
+        1,
+        "n5-01#form"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:働く",
+        1,
+        "n5-01#form"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:重い",
+        1,
+        "n5-01#form"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:作る",
+        1,
+        "n5-01#form"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:洗う",
+        1,
+        "n5-01#form"
+      ],
+      [
+        1789376365639,
+        "mock",
+        "word:渡る",
+        1,
+        "n5-01#form"
+      ]
+    ],
+    "lessonsDone": {
+      "N5-1": {
+        "score": 2,
+        "total": 10,
+        "ts": 1789376352290
+      }
+    },
+    "mockDone": {
+      "n5-01": {
+        "score": 7,
+        "total": 18,
+        "ts": 1789376365639
+      }
+    },
+    "lists": {
+      "Evening Japanese": []
+    },
+    "suspended": {}
+  },
+  "providerRequests": [],
+  "assetHashesAtEnd": {
+    "index.html": "baf10599cbcf6d49bd2dcfda08e398a2632c4a7d9e9881cd20285f488e9a6916",
+    "corridor.js": "ecd85ded110878f9de67b888a6670c435aa417ef32c32a376d90563efd7c7e1f",
+    "corridor.css": "25cd046e82e288474793f17eb2617765de73b72749946906960b51bf0ba82eae",
+    "drift-layer.js": "a50058ce5603d55a14e8aec4beba6a74fac5d3d15319887138fdd787698bd9b9",
+    "drift-layer.css": "8bdbc726bfc5d58a9f318d8e4183e45e505aa45aee75077fcc89e79d7eb94387",
+    "reference-ui.js": "f17bc1494ce3eb1d1fc4fafddb8dc40e8b94d4a53469536766a588adecd48a10",
+    "reference-ui.css": "a2fd736bf3ce4315ba86a0236a9be2a6773decbbda553a7a4609ba2d2d476815",
+    "reference-core.js": "22c6512a5f0676f0fe5055b121a76a0529fa8d4e02e352cc7205bfdbfe50daea",
+    "data/share_alike/reference-extra.json": "190a886cf6da6b0f49c35c057edfd79b59446b8bb79e17cfbfaf5f1b85f945ee"
+  },
+  "assetsChangedDuringRun": false,
+  "finished": "2026-09-14T09:00:05.174Z",
+  "summary": {
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "screenshots": 63
+  },
+  "updated": "2026-09-14T09:00:05.174Z",
+  "visualReview": {
+    "reviewed": 63,
+    "fullResolutionFinalShots": [
+      7,
+      25,
+      50,
+      51,
+      59,
+      62
+    ],
+    "contactSheets": [
+      "/home/user/workspace/experience-combined-review-1.jpg",
+      "/home/user/workspace/experience-combined-review-2.jpg",
+      "/home/user/workspace/experience-combined-review-3.jpg",
+      "/home/user/workspace/experience-combined-review-4.jpg",
+      "/home/user/workspace/experience-combined-review-5.jpg",
+      "/home/user/workspace/experience-combined-review-6.jpg"
+    ],
+    "outcome": "All 63 combined-run screenshots inspected; no visually observed blocking layout regression. New SKIP badges, lens and typed-code search integrate into shared navigation and visual hierarchy. Functional 40/40 result was produced by main; this lane adds visual observations only.",
+    "limitations": [
+      "Living-ink images 11–13 are animation states, not completed glyph proof.",
+      "Shot 15 cuts off expanded source details; later palette/Japanese screenshots show those details.",
+      "Shot 20 shows memorize selection, not list-filing options.",
+      "No-key tutor online/offline looks identical and has no explicit offline warning.",
+      "Picker lower rows and dense content require scrolling; screenshot review is not whole-page or physical-device usability proof.",
+      "This visual review covers the 63 primary combined journey images only, not the separate skip-shots or standalone-offline suite assets."
+    ],
+    "usabilityFindings": [
+      "New SKIP metadata badges remain separate from difficulty labels on kanji entries; no overlap observed in the 390px sheet.",
+      "Six shape-finder lenses form a four-plus-two grid with SKIP clearly selected.",
+      "Typed-code screen shows code, canonical count and visible-result cap explicitly. Four-column picker is information-dense but aligned; bottom options are below fold.",
+      "Reference and combined retain a sparse review-completion seal, small secondary dark labels and many equal-weight shelf doors.",
+      "320px shelf top controls stay single-line; long search placeholder truncates within its field and content doors wrap vertically."
+    ],
+    "coverageBoundary": "No extra offline/live tutor/native claims added by this saved-image review. Combined SKIP is exercised by this run; other non-SKIP journey coverage limits remain those of the harness."
+  }
+}
