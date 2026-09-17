@@ -6898,11 +6898,49 @@ function stopReadAloud() {
  * that belongs to the hardware rather than the learner. */
 const VOICE_PREF_KEY = 'kairo-voice-pref-v1';
 
+/* The device voices a learner may pick from (operator, 2026-09-17: "the basic
+ * computer voice needs to NOT BE AN OPTION AT ALL"). Apple's novelty and
+ * Eloquence voices announce themselves as ja-JP but read Japanese as noise;
+ * they never appear. The compact default (Kyoko compact) appears only when
+ * the device holds nothing better. */
+const NOVELTY_VOICE_NAMES = new Set([
+  'albert', 'bad news', 'bahh', 'bells', 'boing', 'bubbles', 'cellos', 'eddy', 'flo', 'fred',
+  'good news', 'grandma', 'grandpa', 'jester', 'junior', 'kathy', 'organ', 'ralph', 'reed', 'rocko',
+  'sandy', 'shelley', 'superstar', 'trinoids', 'whisper', 'wobble', 'zarvox',
+]);
+function isNoveltyVoice(v) {
+  const uri = String(v.voiceURI || '').toLowerCase();
+  const name = String(v.name || '').toLowerCase().replace(/\s*\(.*\)$/, '').trim();
+  return uri.includes('eloquence') || uri.includes('novelty') || NOVELTY_VOICE_NAMES.has(name);
+}
+function isCompactVoice(v) {
+  const uri = String(v.voiceURI || '').toLowerCase();
+  return uri.includes('.compact.') || /\bcompact\b/i.test(String(v.name || ''));
+}
 function jaVoices() {
   try {
-    return speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja'));
+    const ja = speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja') && !isNoveltyVoice(v));
+    const better = ja.filter((v) => !isCompactVoice(v));
+    return better.length ? better : ja;
   } catch {
     return [];
+  }
+}
+
+/** A short audible proof that the picked voice is the one that reads — the
+ * operator heard no change when switching voices (2026-09-17). */
+function previewDeviceVoice(voice) {
+  try {
+    if (!('speechSynthesis' in window) || !voice) return false;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance('この声で読みます。');
+    u.lang = 'ja-JP';
+    u.voice = voice;
+    u.rate = 0.92;
+    speechSynthesis.speak(u);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -7283,8 +7321,25 @@ function renderReader(main) {
         try {
           localStorage.setItem(VOICE_PREF_KEY, pick.value);
         } catch { /* Keep the current voice for this session if preferences cannot save. */ }
+        // the change must be heard, not trusted: a one-line preview in the
+        // picked voice, and the running read-aloud restarts with it
+        const chosen = jaVoices().find((v) => v.voiceURI === pick.value) || null;
+        if (readAloud.on) {
+          stopReadAloud();
+          readAloud.on = true;
+          speakPassage(p, () => {
+            if (S.view === 'reader') render();
+          });
+        } else {
+          previewDeviceVoice(chosen);
+        }
+        listenNote.textContent = chosen
+          ? tx(`端末の声：${chosen.name}`, `device voice: ${chosen.name}`)
+          : tx('仮の声 — 検収前', 'interim device voice, for now');
       });
       listenRow.append(pick);
+    } else if (voiceChoices.length === 1) {
+      listenNote.textContent = tx(`端末の声：${voiceChoices[0].name}`, `device voice: ${voiceChoices[0].name}`);
     }
   }
   main.append(listenRow);
@@ -22507,6 +22562,34 @@ function render() {
       openSearchPage();
     });
     chrome.append(quickSearch);
+  }
+
+  // the dojo door — on EVERY surface (operator, 2026-09-17: "THE DOJO, or
+  // study room, needs to be accessible from ANY LOCATION WHATSOEVER"). It
+  // used to live only behind the galaxy's tap-to-open nav; now it stands in
+  // the ordinary chrome beside the search door. Inside the dojo family it is
+  // the current room, so it shows as such and does nothing.
+  {
+    const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
+    const dojoDoor = biLabel('button', 'chrome-dojo', '道場', 'dojo');
+    dojoDoor.type = 'button';
+    dojoDoor.id = 'chrome-dojo';
+    dojoDoor.setAttribute('aria-label', tx('集中道場へ', 'go to the focus dojo'));
+    if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
+    dojoDoor.addEventListener('click', () => {
+      if (inDojo) return;
+      if (S.view === 'reader' && S.passageId) {
+        clearTimeout(readerPosTimer);
+        void saveReaderPosition(S.passageId, Math.round(window.scrollY));
+      }
+      keepScroll();
+      S.navOpen = false;
+      S.stack = [];
+      S.view = 'dojo';
+      render();
+      window.scrollTo(0, 0);
+    });
+    chrome.append(dojoDoor);
   }
 
   // EN | 日本語 — two visible states, the active one lit

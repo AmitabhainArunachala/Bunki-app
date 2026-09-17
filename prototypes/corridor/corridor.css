@@ -129,6 +129,21 @@ body::before {
   opacity: 0.35;
 }
 
+/* the dojo door stands in every chrome (operator, 2026-09-17); inside the
+ * dojo family it is the current room and reads as such */
+.chrome button.chrome-dojo {
+  padding-inline: 10px;
+  white-space: nowrap;
+}
+.chrome button.chrome-dojo[aria-current='page'] {
+  color: var(--ink);
+  border-color: var(--ink);
+  cursor: default;
+}
+.chrome button.chrome-dojo .en-sub {
+  display: none;
+}
+
 .crumb {
   flex: 1;
   min-width: 0;
