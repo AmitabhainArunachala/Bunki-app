@@ -371,12 +371,16 @@
         session.parts[2] = value;
         updateQuery();
       }));
-      columns.push(makeWheel(3, text('部首 · 任意', 'Radical · optional', bi), radicalOptions, session.radical, (value) => {
+      columns.push(makeWheel(3, text('部首で絞る · コード外', 'Radical filter · not part of the code', bi), radicalOptions, session.radical, (value) => {
         session.radical = value;
         session.visible = PAGE;
         session.gridScroll = 0;
         paintResults();
       }));
+      // the radical wheel is a filter beside the three-number code, never a
+      // fourth number (Halpern's SKIP has no radical step); it is marked so
+      columns[3].element.classList.add('skip-wheel-filter');
+      columns[3].element.dataset.role = 'filter';
       for (const column of columns) wheels.append(column.element);
       wheelHost.append(wheels, node('p', 'skip-wheel-help', text(
         '上下にスクロール・行をタップ。キーボード：↑↓、Home / End。部首はコードに含まれません。',
