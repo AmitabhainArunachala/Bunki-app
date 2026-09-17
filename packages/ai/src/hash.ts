@@ -34,7 +34,7 @@
  * on every runtime this project claims.
  */
 
-import { canonicalJson } from '@bunki/domain';
+import { canonicalJson } from '@bunki/domain/canonical-json';
 
 /**
  * UTF-8 bytes of a string.

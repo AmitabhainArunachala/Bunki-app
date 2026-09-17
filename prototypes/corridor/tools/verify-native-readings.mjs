@@ -35,16 +35,15 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR = resolve(HERE, '..');
-const REPO = resolve(CORRIDOR, '..', '..');
+const CORRIDOR = resolveCorridorSite();
+const REPO = resolve(HERE, '..', '..', '..');
 const VIEWPORT = { width: 390, height: 844 };
 const SOURCE = resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.jsonl');
-const DEFAULT_EVIDENCE = resolve(
-  REPO,
-  'docs/build-evidence/kairo-feel-lock/native-readings',
-);
+const DEFAULT_EVIDENCE = resolveCorridorEvidence();
 const REFERENCE_SHELF = resolve(REPO, 'docs/prototype/screenshots/14-phase1-shelf-v11.png');
 const REFERENCE_READER = resolve(REPO, 'docs/prototype/screenshots/16-phase1-v11-article.png');
 const MIME = {
@@ -147,17 +146,47 @@ async function settleReader(page) {
   await page.waitForSelector('#reader .tok', { timeout: 20_000 });
   await page.evaluate(() => {
     window.__nativeReadingTokenCount = -1;
+    window.__nativeReadingReader = null;
   });
   await page.waitForFunction(
     () => {
-      const count = document.querySelectorAll('#reader .tok').length;
-      if (count > 0 && count === window.__nativeReadingTokenCount) return true;
+      const reader = document.getElementById('reader');
+      const count = reader?.querySelectorAll('.tok').length ?? 0;
+      if (count > 0 && reader === window.__nativeReadingReader &&
+          count === window.__nativeReadingTokenCount) return true;
+      window.__nativeReadingReader = reader;
       window.__nativeReadingTokenCount = count;
       return false;
     },
     null,
     { polling: 180, timeout: 15_000 },
   );
+}
+
+async function setReaderDial(page, key, index) {
+  const selector = `[data-dial="${key}:${index}"]`;
+  const clicked = await page.locator(selector).elementHandle();
+  if (!clicked) throw new Error(`Reader dial is missing: ${key}:${index}`);
+  try {
+    // An already-selected dial still commits asynchronously. Its old
+    // aria-pressed value cannot acknowledge this tap. The actual clicked
+    // button leaves the DOM only when the successful save renders the reader.
+    await touchAt(page, clicked);
+    await page.waitForFunction((node) => !node.isConnected, clicked, { timeout: 10_000 });
+    const record = await waitForAppRecord(page, (value) => value.dials?.[key] === index,
+      { description: `committed reader dial ${key}:${index}` });
+    await settleReader(page);
+    return {
+      key,
+      requested: index,
+      persisted: record.dials[key],
+      acknowledgedReplacement: true,
+      selected: await page.locator(selector).getAttribute('aria-pressed') === 'true',
+      enabled: await page.locator(selector).isEnabled(),
+    };
+  } finally {
+    await clicked.dispose();
+  }
 }
 
 async function openQuickLook(page, preferredIndex = 0) {
@@ -562,9 +591,15 @@ const sequenceSites = (tokens, entries) => {
 
 const executablePath = process.env.CHROMIUM_PATH || undefined;
 const { server, base } = await startServer(CORRIDOR);
+const articleResults = [];
+const noise = [];
 let browser;
+let browserVersion = null;
+let activeArticleId = null;
+let journeyCompleted = false;
 try {
   browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
+  browserVersion = await browser.version();
   const context = await browser.newContext({
     viewport: VIEWPORT,
     screen: VIEWPORT,
@@ -575,7 +610,6 @@ try {
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
   });
   const page = await context.newPage();
-  const noise = [];
   const responses = new Map();
   page.on('console', (message) => {
     if (message.type() === 'error' || message.type() === 'warning') {
@@ -643,11 +677,10 @@ try {
   await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-first-added.png') });
 
-  const articleResults = [];
-  for (const [position, id] of IDS.entries()) {
+  for (const id of IDS) {
+    activeArticleId = id;
     const row = rows.get(id);
     const body = bodies.get(id);
-    const authoredRecord = authored[position];
     const beforeNoise = noise.length;
     const item = page.locator(`[data-passage="${id}"]`);
     const shelfState = await item.evaluate((node) => {
@@ -712,9 +745,8 @@ try {
       await touchAt(page, page.locator('#dials-toggle'));
     }
     const dialCount = await page.locator('.dials [data-dial]').count();
-    await touchAt(page, page.locator('[data-dial="furigana:2"]'));
-    const settingsChanged =
-      (await page.locator('[data-dial="furigana:2"]').getAttribute('aria-pressed')) === 'true';
+    const dialCommit = await setReaderDial(page, 'furigana', 2);
+    const settingsChanged = dialCommit.selected && dialCommit.enabled;
 
     // R3-A — the flagship's rendered ruby IS the lexicon reading at every
     // override site: 神 wears かみ in deity-name positions, しん never.
@@ -788,13 +820,13 @@ try {
     await touchAt(page, page.locator('#back'));
     await page.waitForSelector(`[data-passage="${id}"]`);
     const returnedShelfY = await page.evaluate(() => window.scrollY);
-    const persisted = await page.evaluate((articleId) => {
-      const state = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
-      return {
-        position: state.readerPos?.[articleId] ?? null,
-        done: !!state.readDone?.[articleId],
-      };
-    }, id);
+    const state = await waitForAppRecord(page,
+      (record) => record.readDone?.[id] && record.readerPos?.[id] === intendedPosition,
+      { description: `native completion and exact bookmark for ${id}` });
+    const persisted = {
+      position: state.readerPos?.[id] ?? null,
+      done: !!state.readDone?.[id],
+    };
     const completionTag = await page
       .locator(`[data-passage="${id}"] .read-tag`)
       .textContent()
@@ -851,6 +883,7 @@ try {
       pass,
       shelfState,
       readerShape,
+      dialCommit,
       quick,
       fullEntry,
       ownFileLoaded,
@@ -865,6 +898,7 @@ try {
     await touchAt(page, page.locator('#back'));
     await page.waitForSelector(`[data-passage="${id}"]`);
   }
+  activeArticleId = null;
 
   check(
     'all 30 article files were served independently',
@@ -875,17 +909,10 @@ try {
     noise.length === 0,
     noise.slice(0, 8).map((entry) => `${entry.kind}: ${entry.text}`).join(' | '),
   );
+  const savedRecord = await readAppRecord(page);
   check(
-    'all completion and bookmark state survives localStorage',
-    await page.evaluate(
-      (ids) => {
-        const state = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
-        return ids.every(
-          (id) => state.readDone?.[id] && Number.isFinite(state.readerPos?.[id]),
-        );
-      },
-      IDS,
-    ),
+    'all completion and bookmark state persists in the native learner record',
+    IDS.every((id) => savedRecord.readDone?.[id] && Number.isFinite(savedRecord.readerPos?.[id])),
   );
 
   // B3 — the shelf's English titles come from the record itself, and the
@@ -928,6 +955,12 @@ try {
     CURATED_COUNT,
     { timeout: 30_000 },
   );
+  const reloadedRecord = await readAppRecord(page);
+  check(
+    'all 30 native completions and exact bookmarks survive a real page reload',
+    IDS.every((id) => reloadedRecord.readDone?.[id] === savedRecord.readDone?.[id] &&
+      reloadedRecord.readerPos?.[id] === savedRecord.readerPos?.[id]),
+  );
   const biCards = await readShelfCards();
   const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
   check(
@@ -952,76 +985,94 @@ try {
       .join(' | '),
   );
 
-  writeFileSync(
-    reportPath,
-    `${JSON.stringify(
-      {
-        schemaVersion: 1,
-        kind: 'native-bunki-readings-browser-verification',
-        viewport: VIEWPORT,
-        touchEmulation: true,
-        browser: await browser.version(),
-        completedAt: new Date().toISOString(),
-        artifactHashes: {
-          source: fileSha256(SOURCE),
-          editorial: fileSha256(
-            resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.editorial.json'),
-          ),
-          index: fileSha256(resolve(CORRIDOR, 'data/articles/index.json')),
-          manifest: fileSha256(resolve(CORRIDOR, 'data/manifest.json')),
-          corridorJs: fileSha256(resolve(CORRIDOR, 'corridor.js')),
-          corridorCss: fileSha256(resolve(CORRIDOR, 'corridor.css')),
-          standalone: fileSha256(resolve(CORRIDOR, 'corridor-standalone.html')),
-          words: fileSha256(resolve(CORRIDOR, 'data/share_alike/words.json')),
-          idioms: fileSha256(resolve(CORRIDOR, 'data/share_alike/idioms.json')),
-          sem: fileSha256(resolve(CORRIDOR, 'data/proprietary_safe/sem.json')),
-          articleFiles: Object.fromEntries(
-            IDS.map((id) => [id, fileSha256(resolve(CORRIDOR, 'data/articles', rows.get(id).file))]),
-          ),
-        },
-        visualReferenceEvidence: {
-          method: 'native computed-style equality plus retained comparison screenshots; manual visual inspection remains non-pixel-diff',
-          references: {
-            shelf: { path: 'docs/prototype/screenshots/14-phase1-shelf-v11.png', sha256: fileSha256(REFERENCE_SHELF) },
-            reader: { path: 'docs/prototype/screenshots/16-phase1-v11-article.png', sha256: fileSha256(REFERENCE_READER) },
-          },
-          captures: {
-            shelf: { path: 'screenshots/shelf-first-added.png', sha256: fileSha256(join(shotsDir, 'shelf-first-added.png')) },
-            biShelf: {
-              path: 'screenshots/shelf-bilingual-titles.png',
-              sha256: fileSha256(join(shotsDir, 'shelf-bilingual-titles.png')),
-            },
-            n3Reader: {
-              path: 'screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png',
-              sha256: fileSha256(join(shotsDir, 'bunki-graded-n3-zoka-sanjin-morning-reader.png')),
-            },
-            n2Reader: {
-              path: 'screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png',
-              sha256: fileSha256(join(shotsDir, 'bunki-essay-n2-silent-amenominakanushi-reader.png')),
-            },
-            n1Reader: {
-              path: 'screenshots/bunki-essay-n1-prayer-reality-reader.png',
-              sha256: fileSha256(join(shotsDir, 'bunki-essay-n1-prayer-reality-reader.png')),
-            },
-          },
-        },
-        articles: articleResults,
-        noise,
-        results,
-        failures: failures.map((row) => row.name),
-      },
-      null,
-      2,
-    )}\n`,
-  );
+  journeyCompleted = true;
   await context.close();
 } catch (error) {
-  failures.push({ name: 'browser harness', pass: false, detail: String(error) });
+  check('browser harness', false, error.stack || String(error), activeArticleId);
   console.error(error);
 } finally {
   if (browser) await browser.close();
   server.close();
 }
+
+// A failed journey still emits its completed rows and marks absent captures
+// with null hashes; the printed report path must identify a real receipt.
+function screenshotSha256(path) {
+  return existsSync(path) ? fileSha256(path) : null;
+}
+
+writeFileSync(
+  reportPath,
+  `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      kind: 'native-bunki-readings-browser-verification',
+      viewport: VIEWPORT,
+      touchEmulation: true,
+      browser: browserVersion,
+      completed: journeyCompleted,
+      pass: journeyCompleted && failures.length === 0,
+      completedAt: new Date().toISOString(),
+      artifact: {
+        path: CORRIDOR,
+        artifactSha256: JSON.parse(readFileSync(resolve(CORRIDOR, 'build-identity.json'), 'utf8')).artifactSha256,
+      },
+      verificationSources: {
+        verifier: fileSha256(fileURLToPath(import.meta.url)),
+        nativeRecordHelper: fileSha256(resolve(HERE, 'record-test-support.mjs')),
+      },
+      artifactHashes: {
+        source: fileSha256(SOURCE),
+        editorial: fileSha256(
+          resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.editorial.json'),
+        ),
+        index: fileSha256(resolve(CORRIDOR, 'data/articles/index.json')),
+        manifest: fileSha256(resolve(CORRIDOR, 'data/manifest.json')),
+        corridorJs: fileSha256(resolve(CORRIDOR, 'corridor.js')),
+        corridorCss: fileSha256(resolve(CORRIDOR, 'corridor.css')),
+        standalone: fileSha256(resolve(HERE, '..', 'corridor-standalone.html')),
+        words: fileSha256(resolve(CORRIDOR, 'data/share_alike/words.json')),
+        idioms: fileSha256(resolve(CORRIDOR, 'data/share_alike/idioms.json')),
+        sem: fileSha256(resolve(CORRIDOR, 'data/proprietary_safe/sem.json')),
+        articleFiles: Object.fromEntries(
+          IDS.map((id) => [id, fileSha256(resolve(CORRIDOR, 'data/articles', rows.get(id).file))]),
+        ),
+      },
+      visualReferenceEvidence: {
+        method: 'native computed-style equality plus retained comparison screenshots; manual visual inspection remains non-pixel-diff',
+        references: {
+          shelf: { path: 'docs/prototype/screenshots/14-phase1-shelf-v11.png', sha256: fileSha256(REFERENCE_SHELF) },
+          reader: { path: 'docs/prototype/screenshots/16-phase1-v11-article.png', sha256: fileSha256(REFERENCE_READER) },
+        },
+        captures: {
+          shelf: { path: 'screenshots/shelf-first-added.png', sha256: screenshotSha256(join(shotsDir, 'shelf-first-added.png')) },
+          biShelf: {
+            path: 'screenshots/shelf-bilingual-titles.png',
+            sha256: screenshotSha256(join(shotsDir, 'shelf-bilingual-titles.png')),
+          },
+          n3Reader: {
+            path: 'screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png',
+            sha256: screenshotSha256(join(shotsDir, 'bunki-graded-n3-zoka-sanjin-morning-reader.png')),
+          },
+          n2Reader: {
+            path: 'screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png',
+            sha256: screenshotSha256(join(shotsDir, 'bunki-essay-n2-silent-amenominakanushi-reader.png')),
+          },
+          n1Reader: {
+            path: 'screenshots/bunki-essay-n1-prayer-reality-reader.png',
+            sha256: screenshotSha256(join(shotsDir, 'bunki-essay-n1-prayer-reality-reader.png')),
+          },
+        },
+      },
+      articles: articleResults,
+      noise,
+      results,
+      failures: failures.map((row) => row.name),
+    },
+    null,
+    2,
+  )}\n`,
+);
 
 console.log(`\n${results.length - failures.length}/${results.length} browser checks passed`);
 console.log(`screenshots → ${shotsDir}`);

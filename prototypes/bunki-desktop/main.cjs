@@ -1,301 +1,315 @@
 'use strict';
 
-/**
- * Bunki desktop shell — serves the current integrated prototype, the
- * Corridor (掌 TENOHIRA line), exactly as GitHub Pages does: the corridor IS
- * the site. One static server on 127.0.0.1:5198, one window, no children.
- *
- * Source resolution order:
- *   1. BUNKI_SRC_DIR override
- *   2. the workspace checkout on main — ~/Bunki-app/prototypes/corridor
- *   3. the bundled snapshot of origin/main — site/corridor beside this file
- * A corridor is "current era" only if it ships sw.js (the TENOHIRA PWA
- * marker); stale checkouts without it are skipped.
- */
-
-const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
-const http = require('node:http');
+const { app, BrowserWindow, Menu, dialog, ipcMain, shell, systemPreferences } = require('electron');
+const console = require('node:console');
 const fs = require('node:fs');
-const fsp = require('node:fs/promises');
 const path = require('node:path');
+const { setTimeout, clearTimeout } = require('node:timers');
+const { pathToFileURL, URL } = require('node:url');
+const { startStaticHost } = require('./lib/static-host.cjs');
+const { verifyBundledArtifact } = require('./lib/artifact.cjs');
+const { runtimeOptions } = require('./lib/paths.cjs');
+const { isAppURL, publisherURL, mayRequestMicrophone } = require('./lib/navigation-policy.cjs');
+const { createFeedService } = require('./lib/feed-service.cjs');
+const { installFeedIPC } = require('./lib/feed-ipc.cjs');
+const { createPublisherReader } = require('./lib/publisher-reader.cjs');
+const { readNativeCloudConfiguration } = require('./lib/native-cloud-sync.cjs');
+const { createNativeFileSaver } = require('./lib/native-files.cjs');
+const { createNativeIntake } = require('./lib/native-intake.cjs');
 
-const PORT = Number(process.env.BUNKI_PORT || 5198);
-
-// Live mode (default on): watch the corridor source and auto-reload the
-// window on every save — the co-editing loop. BUNKI_LIVE=0 for faithful mode.
-const LIVE = process.env.BUNKI_LIVE !== '0';
-const LIVE_IGNORE = /\/(data|vendor|design|evidence|tools|audio|fonts|node_modules|\.git)\//;
-const liveClients = new Set();
-
-function broadcastReload() {
-  for (const res of liveClients) {
-    try {
-      res.write('data: reload\n\n');
-    } catch {
-      liveClients.delete(res);
-    }
+let options;
+try {
+  options = runtimeOptions({ isPackaged: app.isPackaged, resourcesPath: process.resourcesPath, appDirectory: __dirname });
+  if (options.profile) {
+    fs.mkdirSync(options.profile, { recursive: true });
+    app.setPath('userData', options.profile);
   }
-}
-
-function watchSource(src) {
-  let timer = null;
-  try {
-    fs.watch(src, { recursive: true }, (_event, name) => {
-      const rel = '/' + String(name || '').replace(/\\/g, '/') + '/';
-      if (LIVE_IGNORE.test(rel) || rel.includes('/.')) return;
-      clearTimeout(timer);
-      timer = setTimeout(broadcastReload, 250);
-    });
-  } catch {
-    /* watching is best-effort; manual reload still works */
-  }
-}
-
-const LIVE_CLIENT =
-  '<script>(function(){var s=new EventSource("/__live");' +
-  's.onmessage=function(){location.reload()};})()</script>';
-
-const SNAPSHOT_DIR = app.isPackaged
-  ? '/Users/dhyana/Bunki-app/prototypes/bunki-desktop/site/corridor'
-  : path.join(__dirname, 'site', 'corridor');
-
-function isCurrentCorridor(dir) {
-  return fs.existsSync(path.join(dir, 'index.html')) && fs.existsSync(path.join(dir, 'sw.js'));
-}
-
-function resolveSrc() {
-  const candidates = [
-    process.env.BUNKI_SRC_DIR,
-    '/Users/dhyana/Bunki-app/prototypes/corridor',
-    SNAPSHOT_DIR,
-  ].filter(Boolean);
-  return candidates.find(isCurrentCorridor) || null;
-}
-
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.mjs': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.webmanifest': 'application/manifest+json',
-  '.map': 'application/json',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
-  '.ico': 'image/x-icon',
-  '.woff': 'font/woff',
-  '.woff2': 'font/woff2',
-  '.ttf': 'font/ttf',
-  '.otf': 'font/otf',
-  '.wasm': 'application/wasm',
-  '.mp3': 'audio/mpeg',
-  '.m4a': 'audio/mp4',
-  '.aac': 'audio/aac',
-  '.ogg': 'audio/ogg',
-  '.wav': 'audio/wav',
-  '.txt': 'text/plain; charset=utf-8',
-};
-
-function contentType(file) {
-  return MIME[path.extname(file).toLowerCase()] || 'application/octet-stream';
-}
-
-// The recorded voices need seekable audio; honor simple byte ranges.
-function sendRange(res, file, size, range) {
-  const m = /^bytes=(\d*)-(\d*)$/.exec(range);
-  if (!m) return false;
-  let start = m[1] === '' ? NaN : Number(m[1]);
-  let end = m[2] === '' ? size - 1 : Number(m[2]);
-  if (Number.isNaN(start)) {
-    // Suffix range (bytes=-N): the last N bytes. RFC 7233 §2.1 — when N
-    // exceeds the representation length, the entire representation is used;
-    // clamp instead of letting start go negative (createReadStream throws
-    // ERR_OUT_OF_RANGE on start < 0 and the request dies as a 500).
-    start = Math.max(0, size - Number(m[2]));
-    end = size - 1;
-  }
-  if (Number.isNaN(start) || Number.isNaN(end) || start > end || end >= size) return false;
-  res.writeHead(206, {
-    'content-type': contentType(file),
-    'content-range': `bytes ${start}-${end}/${size}`,
-    'accept-ranges': 'bytes',
-    'content-length': end - start + 1,
-  });
-  fs.createReadStream(file, { start, end }).pipe(res);
-  return true;
-}
-
-async function handle(req, res, src) {
-  const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-
-  if (LIVE && pathname === '/__live') {
-    res.writeHead(200, {
-      'content-type': 'text/event-stream',
-      'cache-control': 'no-store',
-      connection: 'keep-alive',
-    });
-    res.write(': live\n\n');
-    liveClients.add(res);
-    const beat = setInterval(() => {
-      try {
-        res.write(': beat\n\n');
-      } catch {
-        /* closed */
-      }
-    }, 25_000);
-    req.on('close', () => {
-      clearInterval(beat);
-      liveClients.delete(res);
-    });
-    return;
-  }
-
-  const rel = pathname.replace(/^\/+/, '') || 'index.html';
-  let file = path.normalize(path.join(src, rel));
-  if (file !== src && !file.startsWith(src + path.sep)) file = path.join(src, 'index.html');
-
-  let st = await fsp.stat(file).catch(() => null);
-  if (st && st.isDirectory()) {
-    file = path.join(file, 'index.html');
-    st = await fsp.stat(file).catch(() => null);
-  }
-  if (!st || !st.isFile()) {
-    // One app means one landing: any missed path returns to the front door.
-    file = path.join(src, 'index.html');
-    st = await fsp.stat(file).catch(() => null);
-    if (!st) {
-      res.writeHead(500, { 'content-type': 'text/plain' });
-      return res.end(`corridor missing at ${src}`);
-    }
-  }
-
-  const type = contentType(file);
-
-  // Shell files revalidate every load so saved edits always land; the big
-  // immutable shards (data/vendor/fonts/audio) keep default caching.
-  const revalidate = /^text\/html|^text\/css|^text\/javascript|manifest/.test(type);
-
-  if (LIVE && type.startsWith('text/html')) {
-    let doc = await fsp.readFile(file, 'utf8');
-    doc = doc.includes('</body>') ? doc.replace('</body>', LIVE_CLIENT + '</body>') : doc + LIVE_CLIENT;
-    const body = Buffer.from(doc);
-    res.writeHead(200, {
-      'content-type': type,
-      'content-length': body.length,
-      'cache-control': 'no-cache',
-    });
-    if (req.method === 'HEAD') return res.end();
-    return res.end(body);
-  }
-
-  if (req.headers.range && sendRange(res, file, st.size, req.headers.range)) return;
-
-  res.writeHead(200, {
-    'content-type': type,
-    'content-length': st.size,
-    'accept-ranges': 'bytes',
-    ...(revalidate ? { 'cache-control': 'no-cache' } : {}),
-  });
-  if (req.method === 'HEAD') return res.end();
-  fs.createReadStream(file).pipe(res);
-}
-
-function startServer(src) {
-  const server = http.createServer((req, res) => {
-    handle(req, res, src).catch((err) => {
-      try {
-        res.writeHead(500, { 'content-type': 'text/plain' });
-        res.end(String(err));
-      } catch {
-        /* response already closed */
-      }
-    });
-  });
-  return new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(PORT, '127.0.0.1', () => resolve(server));
-  });
+  if (options.evidence) fs.mkdirSync(options.evidence, { recursive: true });
+} catch (error) {
+  console.error(`Bunki could not start: ${error.message}`);
+  app.exit(1);
 }
 
 let mainWindow = null;
+let host = null;
+let watcher = null;
+let quitting = false;
+let trustedAt = -Infinity;
+let microphoneGranted = false;
+let identity = null;
+let feeds = null;
+let publisherReader = null;
+let nativeSessionOwner = null;
+let recordSyncHost = null;
+let nativeCloudConfiguration = null;
+let nativeCloudConfigurationCode = 'setup-required';
+const canChooseFile = () => !options.testing && mainWindow?.isFocused() && Date.now() >= trustedAt && Date.now() - trustedAt <= 30000;
+const captureFileDocument = () => {
+    const window = mainWindow;
+    const contents = window?.webContents;
+    const frame = contents?.mainFrame;
+    const token = frame?.frameToken;
+    // Consume the trusted input once; backup preparation can take time before
+    // opening the native dialog, but it cannot silently initiate another save.
+    trustedAt = -Infinity;
+    return { window, assertCurrent: () => mainWindow === window && window && !window.isDestroyed()
+      && !contents.isDestroyed() && !contents.isLoadingMainFrame() && contents.mainFrame === frame
+      && !frame.detached && frame.frameToken === token && frame.origin === host.origin
+      && isAppURL(frame.url, host.origin) && isAppURL(contents.getURL(), host.origin) };
+};
+const saveNativeFile = createNativeFileSaver({ dialog, canSave: canChooseFile, captureDocument: captureFileDocument });
+const nativeIntake = createNativeIntake({ dialog, canChoose: canChooseFile, captureDocument: captureFileDocument,
+  contracts: () => require('./lib/native-rpc-session.cjs'),
+  executable: path.join(process.resourcesPath, 'native/kairo-text-intake-host'),
+  cacheDirectory: path.join(app.getPath('cache'), 'kairo-source-copies'), openPath: filename => shell.openPath(filename) });
 
-async function launch() {
-  const src = resolveSrc();
-  if (!src) {
-    dialog.showErrorBox(
-      'Bunki could not start',
-      'No current corridor found. Checkout main in ~/Bunki-app or set BUNKI_SRC_DIR.',
-    );
-    app.quit();
-    return;
-  }
-
-  try {
-    await startServer(src);
-    if (LIVE) watchSource(src);
-  } catch (err) {
-    dialog.showErrorBox(
-      'Bunki could not start',
-      `Port ${PORT} is unavailable: ${String((err && err.message) || err)}`,
-    );
-    app.quit();
-    return;
-  }
-
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate([
-      {
-        label: 'Bunki',
-        submenu: [{ role: 'about' }, { type: 'separator' }, { role: 'hide' }, { role: 'quit' }],
-      },
-      { role: 'editMenu' },
-      { role: 'viewMenu' },
-      { role: 'windowMenu' },
-    ]),
-  );
-
-  // 掌 — the corridor is a phone-first surface (390×844 design frame).
-  mainWindow = new BrowserWindow({
-    width: 440,
-    height: 956,
-    minWidth: 390,
-    minHeight: 700,
-    show: false,
-    backgroundColor: '#F4EFE6',
-    webPreferences: { contextIsolation: true, nodeIntegration: false },
-  });
-
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:\/\//.test(url) && !url.startsWith('http://localhost:')) {
-      shell.openExternal(url);
-      return { action: 'deny' };
-    }
-    return { action: 'allow' };
-  });
-
-  mainWindow.once('ready-to-show', () => mainWindow.show());
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  await mainWindow.loadURL(`http://localhost:${PORT}/`);
+function audit(event, details = {}) {
+  if (options?.testing) fs.appendFileSync(path.join(options.evidence, 'events.jsonl'), JSON.stringify({ event, ...details }) + '\n');
 }
 
-if (!app.requestSingleInstanceLock()) {
-  app.quit();
-} else {
-  app.on('second-instance', () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-  });
+function fail(error) {
+  const message = error.code === 'EADDRINUSE'
+    ? `Port ${options.port} is already in use. Close the other process and reopen Bunki. Your records remain in this app's existing profile; no other server was opened.`
+    : `The bundled app could not be opened. ${error.message}`;
+  audit('startup-failed', { code: error.code || 'STARTUP_FAILED', message });
+  if (!options.testing) dialog.showErrorBox('Bunki could not start', message);
+  else console.error(message);
+  app.exit(1);
+}
 
+function fromApp(event) {
+  return mainWindow && event.sender === mainWindow.webContents
+    && !mainWindow.webContents.isLoadingMainFrame()
+    && event.senderFrame === mainWindow.webContents.mainFrame
+    && isAppURL(event.senderFrame.url, host.origin);
+}
+
+ipcMain.on('bunki:trusted-input', (event) => {
+  if (fromApp(event)) trustedAt = Date.now();
+});
+ipcMain.handle('bunki:files:available', (event) => fromApp(event) && !options.testing);
+ipcMain.handle('bunki:files:save', (event, ...args) => {
+  if (!fromApp(event) || args.length !== 1) throw new Error('file-export-unavailable');
+  return saveNativeFile(args[0]);
+});
+ipcMain.handle('bunki:intake:available', event => fromApp(event) && !options.testing && nativeIntake.available());
+for (const method of ['choose', 'extract', 'openOriginal']) ipcMain.handle('bunki:intake:' + method, (event, ...args) => {
+  if (!fromApp(event) || args.length !== 1) return { status: 'failed', code: 'file-intake-unavailable' };
+  return nativeIntake[method](args[0]);
+});
+ipcMain.on('bunki:navigate', (event, url) => {
+  if (fromApp(event) && isAppURL(url, host.origin)) void mainWindow.loadURL(url).catch(fail);
+});
+ipcMain.on('bunki:publisher', (event, value) => {
+  if (!fromApp(event)) return;
+  const url = publisherURL(value, host.origin);
+  if (!url) return audit('publisher-denied');
+  if (options.testing) return audit('publisher-open-simulated', { url });
+  void shell.openExternal(url).catch(() => dialog.showErrorBox('Link could not open', 'Your browser could not open this publisher link.'));
+});
+
+function installPermissions(contents) {
+  const session = contents.session;
+  if (options.testing) {
+    // The isolated QA app is offline before its first page load, including
+    // service-worker requests. Publisher clicks are recorded, never opened.
+    session.webRequest.onBeforeRequest({ urls: ['<all_urls>'] }, (request, callback) => {
+      const protocol = new URL(request.url).protocol;
+      const cancel = ['http:', 'https:', 'ws:', 'wss:'].includes(protocol) && !isAppURL(request.url, host.origin);
+      if (cancel) audit('network-blocked', { url: request.url });
+      callback({ cancel });
+    });
+  }
+  session.setPermissionCheckHandler((requester, permission, requestingOrigin, details) => {
+    return requester === mainWindow?.webContents && microphoneGranted
+      && isAppURL(requestingOrigin, host.origin)
+      && mayRequestMicrophone({ permission, requestingUrl: details.requestingUrl || requestingOrigin,
+        isMainFrame: details.isMainFrame, mediaTypes: [details.mediaType], origin: host.origin,
+        trustedAt, now: Date.now() });
+  });
+  session.setPermissionRequestHandler((requester, permission, callback, details) => {
+    const allowed = requester === mainWindow?.webContents && mainWindow.isFocused()
+      && mayRequestMicrophone({ permission, ...details, origin: host.origin, trustedAt, now: Date.now() });
+    if (!allowed) {
+      audit('permission-denied', { permission });
+      callback(false);
+      return;
+    }
+    // QA uses a generated fake device and never requests the real microphone.
+    const window = mainWindow;
+    const frame = requester.mainFrame;
+    const token = frame.frameToken;
+    const consent = options.testing
+      ? Promise.resolve(app.commandLine.hasSwitch('use-fake-device-for-media-stream'))
+      : process.platform === 'darwin' ? systemPreferences.askForMediaAccess('microphone') : Promise.resolve(true);
+    void consent.then((granted) => {
+      if (mainWindow !== window || window.isDestroyed() || requester.isDestroyed()
+        || requester.isLoadingMainFrame() || requester.mainFrame !== frame
+        || frame.detached || frame.frameToken !== token || frame.origin !== host.origin
+        || !isAppURL(requester.getURL(), host.origin)) {
+        callback(false);
+        return;
+      }
+      microphoneGranted = granted;
+      audit('microphone-decision', { granted });
+      callback(granted);
+    }).catch(() => callback(false));
+  });
+}
+
+async function createWindow() {
+  trustedAt = -Infinity;
+  const window = new BrowserWindow({
+    width: 1180, height: 860, minWidth: 390, minHeight: 600, show: false,
+    backgroundColor: '#F4EFE6',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true,
+      nodeIntegration: false, nodeIntegrationInWorker: false, nodeIntegrationInSubFrames: false,
+      webviewTag: false, webSecurity: true, allowRunningInsecureContent: false,
+      devTools: !app.isPackaged || options.testing,
+    },
+  });
+  mainWindow = window;
+  // The compiled native session is staged with the host. Keep loading lazy so
+  // launch has already validated the canonical site before this dependency.
+  const { createNativeSessionOwner } = require('./lib/native-session-owner.cjs');
+  const owner = createNativeSessionOwner({ window, app, origin: host.origin });
+  nativeSessionOwner = owner;
+  const { createRecordSyncHost } = require('./lib/record-sync-ipc.cjs');
+  const sync = createRecordSyncHost({ window, owner, origin: host.origin,
+    configuration: nativeCloudConfiguration, configurationCode: nativeCloudConfigurationCode,
+    canConnect: () => !options.testing && mainWindow === window && window.isFocused()
+      && Date.now() >= trustedAt && Date.now() - trustedAt <= 5000 });
+  recordSyncHost = sync;
+  const contents = window.webContents;
+  // A gesture belongs to the document that observed it. Reloading must not
+  // let replacement page code use an earlier click to open a native dialog.
+  const clearDocumentTrust = () => {
+    if (mainWindow !== window) return;
+    trustedAt = -Infinity;
+    nativeIntake.clear();
+    microphoneGranted = false;
+  };
+  contents.on('did-start-navigation', (details) => {
+    if (details.isMainFrame && !details.isSameDocument) clearDocumentTrust();
+  });
+  contents.on('render-process-gone', clearDocumentTrust);
+  contents.on('destroyed', clearDocumentTrust);
+  contents.setWindowOpenHandler(() => { audit('child-window-denied'); return { action: 'deny' }; });
+  for (const eventName of ['will-navigate', 'will-frame-navigate', 'will-redirect']) {
+    contents.on(eventName, (event) => {
+      if (!isAppURL(event.url, host.origin)) {
+        event.preventDefault();
+        audit('navigation-denied');
+      }
+    });
+  }
+  contents.on('will-attach-webview', (event) => event.preventDefault());
+  installPermissions(contents);
+  window.once('ready-to-show', () => { if (!window.isDestroyed()) window.show(); });
+  window.on('closed', () => {
+    sync.close();
+    if (recordSyncHost === sync) recordSyncHost = null;
+    owner.close();
+    if (nativeSessionOwner === owner) nativeSessionOwner = null;
+    if (mainWindow === window) mainWindow = null;
+  });
+  await window.loadURL(host.origin + '/');
+  audit('window-ready', { origin: host.origin, site: options.site, profile: app.getPath('userData'), packaged: app.isPackaged,
+    artifactSha256: identity?.artifactSha256 || null, live: options.live, versions: process.versions });
+}
+
+async function exportPairingCandidate() {
+  if (!mainWindow || !recordSyncHost || options.testing) return;
+  const window = mainWindow;
+  let capture;
+  try { capture = recordSyncHost.capturePairingCandidate(); }
+  catch {
+    await dialog.showMessageBox(window, { type: 'info', title: 'Pair another device',
+      message: 'Connect personal note sync first.',
+      detail: 'Open Saved notes and connect to iCloud before creating a pairing file.' });
+    return;
+  }
+  const result = await dialog.showSaveDialog(window, { title: 'Save a pairing file for your other device',
+    defaultPath: 'kairo-pairing.json', filters: [{ name: 'Kairo pairing file', extensions: ['json'] }],
+    message: 'Open this file in Kairo on your new device, then confirm the same learner with your iCloud account.' });
+  if (result.canceled || !result.filePath) return;
+  if (mainWindow !== window || window.isDestroyed() || !capture.assertCurrent()) {
+    if (!window.isDestroyed()) await dialog.showMessageBox(window, { type: 'info',
+      message: 'The sync connection changed. Connect again before saving a pairing file.' });
+    return;
+  }
+  try { fs.writeFileSync(result.filePath, capture.bytes, { mode: 0o600 }); }
+  catch { if (!window.isDestroyed()) dialog.showErrorBox('Pairing file could not be saved', 'Choose another location and try again.'); }
+}
+
+function menu() {
+  Menu.setApplicationMenu(Menu.buildFromTemplate([
+    { label: 'Bunki', submenu: [{ role: 'about' }, { type: 'separator' }, { role: 'services' }, { type: 'separator' }, { role: 'hide' }, { role: 'hideOthers' }, { role: 'unhide' }, { type: 'separator' }, { role: 'quit' }] },
+    { role: 'editMenu' },
+    { label: 'View', submenu: [{ role: 'reload' }, { type: 'separator' }, { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }, { type: 'separator' }, { role: 'togglefullscreen' }] },
+    { label: 'Navigate', submenu: [
+      { label: 'Back', accelerator: 'CmdOrCtrl+[', click: () => { if (mainWindow?.webContents.navigationHistory.canGoBack()) mainWindow.webContents.navigationHistory.goBack(); } },
+      { label: 'Forward', accelerator: 'CmdOrCtrl+]', click: () => { if (mainWindow?.webContents.navigationHistory.canGoForward()) mainWindow.webContents.navigationHistory.goForward(); } },
+    ] },
+    { label: 'Sync', submenu: [{ label: 'Pair another device…', click: () => {
+      void exportPairingCandidate().catch(() => dialog.showErrorBox('Pairing file could not be saved', 'Open Kairo and try again.'));
+    } }] },
+    { role: 'windowMenu' },
+  ]));
+}
+
+async function launch() {
+  if (app.isPackaged) identity = verifyBundledArtifact(options.site);
+  else {
+    if (!fs.existsSync(path.join(options.site, 'modules/reading-core.mjs'))) {
+      throw new Error('Development requires a compiled canonical site. Run npm start in prototypes/bunki-desktop, or set BUNKI_SRC_DIR to a prepared artifact.');
+    }
+    identity = verifyBundledArtifact(options.site);
+  }
+  host = await startStaticHost({ site: options.site, port: options.port });
+  const feedCore = await import(pathToFileURL(path.join(options.site, 'modules/feed-core.mjs')).href);
+  feeds = createFeedService({ core: feedCore, profile: app.getPath('userData') });
+  publisherReader = createPublisherReader({ core: feedCore, resolveEntry: feeds.resolveEntry,
+    enabled: () => !options.testing });
+  installFeedIPC({ ipcMain, fromApp, service: feeds, reader: publisherReader });
+  // Packaged configuration is a fixed native resource. Neither renderer
+  // requests nor imported records can select a helper, container or account.
+  if (app.isPackaged && !options.testing) {
+    try { nativeCloudConfiguration = readNativeCloudConfiguration(process.resourcesPath); }
+    catch { nativeCloudConfigurationCode = 'configuration-invalid'; }
+  }
+  const { installRecordSyncIPC } = require('./lib/record-sync-ipc.cjs');
+  installRecordSyncIPC({ ipcMain, fromApp, active: () => recordSyncHost });
+  menu();
+  if (options.live) {
+    let timer;
+    watcher = fs.watch(options.site, { recursive: true }, () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => mainWindow?.webContents.reload(), 250);
+    });
+  }
+  await createWindow();
+}
+
+// Keep the original Bunki single-instance/name sequence and default userData
+// identity for packaged upgrades. Only development and explicit QA set a path.
+if (options && !app.requestSingleInstanceLock()) app.quit();
+else if (options) {
   app.setName('Bunki');
-  app.whenReady().then(launch);
-  app.on('window-all-closed', () => app.quit());
+  app.on('second-instance', () => {
+    if (mainWindow) { if (mainWindow.isMinimized()) mainWindow.restore(); mainWindow.focus(); }
+    else if (host) void createWindow().catch(fail);
+  });
+  app.whenReady().then(launch).catch(fail);
+  app.on('activate', () => { if (!mainWindow && host) void createWindow().catch(fail); });
+  app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+  app.on('before-quit', (event) => {
+    if (quitting || !host) return;
+    event.preventDefault();
+    quitting = true;
+    recordSyncHost?.close();
+    watcher?.close();
+    void Promise.allSettled([host.close(), feeds?.close(), publisherReader?.close(), nativeIntake.dispose()]).finally(() => app.quit());
+  });
 }

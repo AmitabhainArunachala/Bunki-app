@@ -1,0 +1,56 @@
+name: SKIP lookup
+
+on:
+  pull_request:
+    paths:
+      - 'prototypes/corridor/skip-*'
+      - 'prototypes/corridor/corridor.js'
+      - 'prototypes/corridor/index.html'
+      - 'prototypes/corridor/sw.js'
+      - 'prototypes/corridor/data/share_alike/skip.json'
+      - 'prototypes/corridor/tools/*skip*'
+      - 'prototypes/corridor/tools/build-standalone.mjs'
+      - '.github/workflows/skip-lookup.yml'
+      - '.github/workflows/pages-app.yml'
+      - '.github/workflows/ci.yml'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'prototypes/corridor/tools/reference-packaging-support.mjs'
+      - 'prototypes/corridor/tools/test-kanji-capture.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Prepare the canonical runtime
+        run: |
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/skip-site" >> "$GITHUB_ENV"
+          echo "KAIRO_EVIDENCE_DIR=$RUNNER_TEMP/skip-evidence" >> "$GITHUB_ENV"
+          node scripts/build-corridor-site.mjs --out "$RUNNER_TEMP/skip-site"
+      - name: Verify SKIP engine and packaging
+        run: |
+          node --check prototypes/corridor/corridor.js
+          node --check prototypes/corridor/skip-core.js
+          node --check prototypes/corridor/skip-ui.js
+          node prototypes/corridor/tools/test-skip-core.mjs
+          node --test prototypes/corridor/tools/test-skip-ui.mjs prototypes/corridor/tools/test-kanji-capture.mjs
+          node prototypes/corridor/tools/test-skip-packaging.mjs
+      - name: Verify standalone build
+        run: node prototypes/corridor/tools/build-standalone.mjs "$RUNNER_TEMP/bunki-standalone.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skip-local-verification-evidence
+          path: ${{ runner.temp }}/skip-evidence
+          if-no-files-found: warn

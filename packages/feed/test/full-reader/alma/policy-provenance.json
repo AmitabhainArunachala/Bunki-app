@@ -1,0 +1,16 @@
+{
+  "format": "kairo-alma-reviewed-policy-fixture",
+  "v": 1,
+  "fixtureKind": "Exact retained rights-section HTML serialization inside an otherwise synthetic policy page; original synthetic article prose",
+  "authoritativeUrl": "https://alma-telescope.jp/policy/",
+  "retrievedAt": "2026-09-10T05:39:23.410Z",
+  "finalUrl": "https://alma-telescope.jp/policy/",
+  "httpStatus": 200,
+  "rawPolicyResponseSha256": "e395534f64268675035070673a44d0759992bd81ab203652e0e07fd3ef3b7128",
+  "rawPolicyResponseBytes": 85611,
+  "fixtureSha256": "aa7ce534bd25a10152331bd13917f7114ab552111ecc6dda1e0d5a495878f43d",
+  "reviewedRightsTextSha256": "13cd5a92ed941819781c6cf93937295dc62c791196b11c4202949141a4409818",
+  "reviewBasis": "Explicit text default at alma-telescope.jp only; provide National Astronomical Observatory of Japan credit unless article says otherwise. Marked third-party works and logos excluded. No inherited authority for www.nao.ac.jp.",
+  "testNetwork": "No live requests. Native synthetic article/policy responses use isolated loopback TLS.",
+  "limits": "Fixture proves parser/transport behavior against a reviewed policy version. It does not verify the live policy remains unchanged or establish rights for arbitrary publisher content."
+}

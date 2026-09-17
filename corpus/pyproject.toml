@@ -24,6 +24,7 @@ yasashii = ["pdfplumber>=0.11"]
 where = ["src"]
 
 [tool.setuptools.package-data]
+"*" = ["PROVENANCE.yml"]
 "corpus.grading" = ["*.json"]
 "corpus.grading.ninjal" = ["PROVENANCE.yml"]
 

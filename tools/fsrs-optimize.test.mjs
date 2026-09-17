@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -17,6 +18,7 @@ import {
   initialState,
   nextState,
   optimizeExport,
+  parseExportedStore,
   reconstructReviewSequences,
   regularizationPenalty,
 } from './fsrs-optimize.mjs';
@@ -25,6 +27,37 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const fixture = async (name) =>
   JSON.parse(await readFile(resolve(HERE, 'fixtures', 'fsrs', name), 'utf8'));
 const Rating = Object.freeze({ Again: 1, Hard: 2, Good: 3, Easy: 4 });
+
+function fullBackup(record, turns = []) {
+  const sort = (value) =>
+    Array.isArray(value)
+      ? value.map(sort)
+      : value !== null && typeof value === 'object'
+        ? Object.fromEntries(
+            Object.keys(value)
+              .sort()
+              .map((key) => [key, sort(value[key])]),
+          )
+        : value;
+  const digest = (value) =>
+    createHash('sha256')
+      .update(JSON.stringify(sort(value)))
+      .digest('hex');
+  const archive = { version: 1, turns };
+  return {
+    format: 'kairo-backup',
+    version: 1,
+    completeness: record.aiEvidenceIncomplete ? 'incomplete' : 'complete',
+    record,
+    archive,
+    counts: {
+      archiveTurns: turns.length,
+      chatTurns: record.aiChat?.length || 0,
+      readingVersions: (record.aiReadings?.length || 0) + (record.aiReading ? 1 : 0),
+    },
+    sha256: { record: digest(record), archive: digest(archive) },
+  };
+}
 
 function vendoredOracle(request) {
   const run = spawnSync(
@@ -37,6 +70,101 @@ function vendoredOracle(request) {
 }
 
 describe('fsrs-optimize', () => {
+  it('fits exactly the same learner from legacy and full backups without treating chat as reviews', async () => {
+    const record = await fixture('synthetic-retention-085.json');
+    const backup = fullBackup(record, [
+      {
+        id: 1,
+        ts: 1,
+        surface: 'chat',
+        role: 'assistant',
+        content: 'A teaching explanation, never a recall grade.',
+      },
+    ]);
+    backup.revlog = [[1, 'word:not-learner-evidence', 4]];
+    expect(parseExportedStore(backup)).toBe(record);
+    expect(reconstructReviewSequences(backup)).toEqual(reconstructReviewSequences(record));
+    expect(optimizeExport(backup, { epochs: 55 })).toEqual(optimizeExport(record, { epochs: 55 }));
+  });
+
+  it('preserves declared historical chat loss without discarding genuine review rows', async () => {
+    const record = { ...(await fixture('revocation.json')), aiEvidenceIncomplete: true };
+    const backup = fullBackup(record);
+    expect(backup.completeness).toBe('incomplete');
+    expect(reconstructReviewSequences(backup)).toEqual(reconstructReviewSequences(record));
+    expect(parseExportedStore(backup).aiEvidenceIncomplete).toBe(true);
+  });
+
+  it.each([
+    [
+      'unknown format',
+      (backup) => {
+        backup.format = 'unrecognized';
+      },
+    ],
+    [
+      'future backup version',
+      (backup) => {
+        backup.version = 2;
+      },
+    ],
+    [
+      'missing nested record',
+      (backup) => {
+        delete backup.record;
+      },
+    ],
+    [
+      'changed record bytes',
+      (backup) => {
+        backup.record.revlog.pop();
+      },
+    ],
+    [
+      'changed archive bytes',
+      (backup) => {
+        backup.archive.turns.push({ content: 'unrecorded' });
+      },
+    ],
+    [
+      'mismatched counts',
+      (backup) => {
+        backup.counts.chatTurns += 1;
+      },
+    ],
+    [
+      'false completeness',
+      (backup) => {
+        backup.completeness = 'incomplete';
+      },
+    ],
+    [
+      'missing digest',
+      (backup) => {
+        delete backup.sha256;
+      },
+    ],
+  ])('refuses a full backup with %s before optimization', async (_name, mutate) => {
+    const backup = fullBackup(await fixture('revocation.json'));
+    mutate(backup);
+    expect(() => optimizeExport(backup, { epochs: 1 })).toThrow(FsrsOptimizeError);
+  });
+
+  it('validates nested review rows and version even when the backup hashes match', async () => {
+    const record = await fixture('revocation.json');
+    const invalidRow = fullBackup({ ...record, revlog: [[1, 'word:school', 9]] });
+    expect(() => reconstructReviewSequences(invalidRow)).toThrowError(
+      expect.objectContaining({ code: 'INVALID_REVLOG_ROW' }),
+    );
+    const futureRecord = fullBackup({ ...record, v: 2 });
+    expect(() => reconstructReviewSequences(futureRecord)).toThrowError(
+      expect.objectContaining({ code: 'UNSUPPORTED_EXPORT_VERSION' }),
+    );
+    expect(() =>
+      parseExportedStore({ ...record, archive: { version: 1, turns: [] } }),
+    ).toThrowError(expect.objectContaining({ code: 'INVALID_EXPORT' }));
+  });
+
   it('honors append-only revocations and re-grades the restored card history', async () => {
     const reconstructed = reconstructReviewSequences(await fixture('revocation.json'));
     expect(reconstructed.stats).toMatchObject({

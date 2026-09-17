@@ -23,14 +23,19 @@
  *   pointercancel  → next gesture still clean (C6)
  */
 import { createServer } from 'node:http';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { evaluateAppRecord } from './record-fixture-support.mjs';
+import { readAppRecordSnapshot } from './record-test-support.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR = resolve(TOOL_DIR, '..');
+const CORRIDOR = resolveCorridorSite();
 const argv = process.argv.slice(2);
 const arg = (name, fallback) => {
   const i = argv.indexOf(name);
@@ -57,14 +62,16 @@ const FUZZ_SEEDS = String(arg('--fuzz-seeds', MODE === 'full' ? '1729,2718,3141'
   .filter(Boolean)
   .map((seed) => Number(seed));
 if (FUZZ_SEEDS.some((seed) => !Number.isSafeInteger(seed))) throw new Error('--fuzz-seeds must be comma-separated integers');
-const SHOTS = resolve(arg('--shots', join(TOOL_DIR, '..', '..', '..', 'docs', 'audits', 'drift-consistency-shots')));
-const OUT = resolve(arg('--out', join(TOOL_DIR, '..', '..', '..', 'docs', 'audits', 'drift-consistency-report.json')));
+const SHOTS = resolve(arg('--shots', join(resolveCorridorEvidence(), 'screenshots')));
+const OUT = resolve(arg('--out', join(resolveCorridorEvidence(), 'drift-consistency-report.json')));
 mkdirSync(SHOTS, { recursive: true });
 mkdirSync(dirname(OUT), { recursive: true });
 
 const startedAt = new Date().toISOString();
+const sourceSha256 = createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex');
 const cases = [];
 const pageErrors = [];
+let currentTheme = '北斎';
 let fatalError = null;
 let matrixWordsTested = 0;
 let chainCompleted = 0;
@@ -104,7 +111,6 @@ try {
   hasTouch: true,
 });
 await ctx.addInitScript(`(() => {
-  try { localStorage.clear(); } catch (error) {}
   const raw = new URL(location.href).searchParams.get('__fuzzSeed');
   if (raw == null) return;
   let state = (Number(raw) >>> 0) || 0x9e3779b9;
@@ -149,7 +155,6 @@ const pinchAt = async (cx, cy, r0, r1, ms = 320, steps = 8) => {
   await touch('touchEnd', []);
 };
 
-let currentTheme = '北斎';
 let shotN = 0;
 const file = async (word, gesture, expected, outcome, detail, extra = {}) => {
   const bad = outcome !== 'ok';
@@ -184,6 +189,7 @@ const boot = async (theme = '北斎', fuzzSeed = null) => {
   const seedQuery = Number.isSafeInteger(fuzzSeed) ? `&__fuzzSeed=${fuzzSeed}` : '';
   await page.goto(`${base}/index.html?entry=drift${seedQuery}`);
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  await page.waitForSelector('#drift-layer[data-record-state="active"]');
   await page.waitForTimeout(2100);
   for (let attempts = 0; attempts < 5; attempts++) {
     const observed = await page.locator('#theme').textContent();
@@ -204,7 +210,7 @@ await boot();
 
 /* ------------------- the level tide (operator ruling, said twice — law) */
 {
-  const WBIG = JSON.parse(readFileSync(resolve(CORRIDOR, '..', 'drift', 'data', 'wbig.json'), 'utf8'));
+  const WBIG = JSON.parse(readFileSync(resolve(TOOL_DIR, '..', '..', 'drift', 'data', 'wbig.json'), 'utf8'));
   const LVL = new Map(WBIG.map((e) => [e[0], e[3]]));
   const lvlBox = await page.evaluate(
     `(() => { const r = document.getElementById('lvl').getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, w: r.width, h: r.height }; })()`,
@@ -334,28 +340,6 @@ const pickOne = (exclude) => page.evaluate(`(() => {
   return cands[0];
 })()`);
 
-const pickWords = (want) => page.evaluate(`(() => {
-  const K = ${KANJI_RE};
-  const seen = new Set();
-  const out = [];
-  for (const el of document.querySelectorAll('#drift-layer .word')) {
-    const base = el.querySelector('.base')?.textContent ?? '';
-    const r = el.getBoundingClientRect();
-    if (!base || seen.has(base) || !r.width) continue;
-    if (r.left < 46 || r.right > 344 || r.top < 170 || r.bottom > 700) continue;
-    const kanji = (base.match(/[\\u4e00-\\u9fff]/g) ?? []).length;
-    const op = parseFloat(el.style.opacity || '1');
-    if (op < 0.12) continue;
-    seen.add(base);
-    out.push({ w: base, kanji, opacity: op });
-  }
-  // stratify: kana-only first (rarest on screen), then 1-kanji, then rest
-  const kana = out.filter((o) => o.kanji === 0);
-  const one = out.filter((o) => o.kanji === 1);
-  const multi = out.filter((o) => o.kanji >= 2);
-  return [...kana, ...one, ...multi].slice(0, ${want});
-})()`);
-
 /* ------------------------------------------------------------- battery */
 const waterPoint = () =>
   page.evaluate(`(() => {
@@ -433,8 +417,8 @@ await boot();
 // between batteries then costs coverage variety, never false "vanished" rows
 const tested = new Set();
 for (let round = 0; round < N_WORDS; round++) {
-  // every battery is hermetic: a fresh boot on a virgin store, so no case
-  // inherits the camera, grades, or blooms of the one before it
+  // Reload resets the camera and blooms while preserving the installation
+  // binding, migration fences, and any judgments already committed in this run.
   if (round > 0) await boot();
   let word = await pickOne(tested);
   if (!word) {
@@ -945,9 +929,8 @@ for (const zone of EDGE_ZONES) {
 /* ----------------------- the front door's one first-touch cue (POL-1) */
 // A fresh visitor at the 銀河 front door must be invited exactly once: the
 // drift's own hint plaque shows until the FIRST successful touch of a word,
-// which persists the seen-flag in the drift's own store (bunki-drift-v1) so
-// a reload never resurrects the cue. This context deliberately carries NO
-// storage-clearing init script — the persistence claim must be real.
+// which persists the seen-flag in the hosted native record so a reload never
+// resurrects the cue. This context preserves the same installation throughout.
 {
   const cueCtx = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -968,8 +951,7 @@ for (const zone of EDGE_ZONES) {
     const el = document.querySelector('#drift-layer #hint');
     if (!el) return null;
     const cs = getComputedStyle(el);
-    let flag = null;
-    try { flag = JSON.parse(localStorage.getItem('bunki-drift-v1') ?? 'null')?.cue ?? null; } catch (error) { flag = 'unreadable'; }
+    const flag = record.driftState?.store?.cue ?? null;
     return {
       firstCue: el.classList.contains('first-cue'),
       display: cs.display,
@@ -983,13 +965,15 @@ for (const zone of EDGE_ZONES) {
   const cueBoot = async () => {
     await cuePage.goto(`${base}/index.html?entry=drift`);
     await cuePage.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await cuePage.waitForSelector('#drift-layer[data-record-state="active"]');
     await cuePage.waitForTimeout(600); // read the cue promptly: it fades on its own after ~7s
   };
   const mainPage = page;
   page = cuePage; // failure screenshots from these cases must show THIS page
   try {
     await cueBoot();
-    const fresh = await cuePage.evaluate(cueState);
+    const freshRecord = await readAppRecordSnapshot(cuePage);
+    const fresh = await evaluateAppRecord(cuePage, cueState);
     const freshOk =
       !!fresh && fresh.ginga && fresh.firstCue && fresh.display === 'block' &&
       fresh.visibility === 'visible' && fresh.opacity >= 0.5 && fresh.text.length > 0 && !fresh.flag;
@@ -1025,30 +1009,40 @@ for (const zone of EDGE_ZONES) {
     } else {
       await cueTap(cuePick.x, cuePick.y);
       await cuePage.waitForTimeout(900);
-      const touched = await cuePage.evaluate(cueState);
+      const touchedRecord = await readAppRecordSnapshot(cuePage);
+      const expectedRecord = structuredClone(freshRecord.record);
+      expectedRecord.driftState.store.cue = 1;
+      const onlyCueChanged = isDeepStrictEqual(touchedRecord.record, expectedRecord) &&
+        isDeepStrictEqual(touchedRecord.archive, freshRecord.archive) &&
+        isDeepStrictEqual(touchedRecord.installation, freshRecord.installation);
+      const touched = await evaluateAppRecord(cuePage, cueState);
       const answered = await cuePage.evaluate(`(() => ({
         bloom: !!document.querySelector('#drift-layer .word.bctr'),
         unfolded: !!document.querySelector('#drift-layer .word.unfolded'),
       }))()`);
       const retireOk =
         !!touched && !touched.firstCue && touched.display === 'none' &&
-        touched.flag === 1 && (answered.bloom || answered.unfolded);
+        touched.flag === 1 && (answered.bloom || answered.unfolded) && onlyCueChanged;
       await file(
         { w: cuePick.w, kanji: (cuePick.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
         'cue-retire',
-        'the first successful word-touch retires the cue and persists the flag in bunki-drift-v1',
+        'the first successful word-touch retires the cue and persists the flag in the native record',
         retireOk ? 'ok' : 'misfired',
-        `state=${JSON.stringify(touched)}; answered=${JSON.stringify(answered)}`,
+        `state=${JSON.stringify(touched)}; answered=${JSON.stringify(answered)}; onlyCueChanged=${onlyCueChanged}`,
         { state: 'front-door' },
       );
       await cueBoot(); // a real reload on the SAME profile — the flag must hold
-      const reloaded = await cuePage.evaluate(cueState);
+      const reloadedRecord = await readAppRecordSnapshot(cuePage);
+      const reloaded = await evaluateAppRecord(cuePage, cueState);
       const stayOk =
-        !!reloaded && !reloaded.firstCue && reloaded.display === 'none' && reloaded.flag === 1;
+        !!reloaded && !reloaded.firstCue && reloaded.display === 'none' && reloaded.flag === 1 &&
+        isDeepStrictEqual(reloadedRecord.record, touchedRecord.record) &&
+        isDeepStrictEqual(reloadedRecord.archive, touchedRecord.archive) &&
+        isDeepStrictEqual(reloadedRecord.installation, touchedRecord.installation);
       await file(
         { w: 'first-touch cue', kanji: null },
         'cue-stays-retired',
-        'a reload does not resurrect the cue: the seen-flag survives in the drift store',
+        'a reload does not resurrect the cue: the seen-flag survives in the native record',
         stayOk ? 'ok' : 'misfired',
         JSON.stringify(reloaded),
         { state: 'front-door' },
@@ -1316,7 +1310,7 @@ if (SOAK_MS > 0) {
     FUZZ_GESTURES >= 400 &&
     FUZZ_SEEDS.every((seed) => (fuzzCompleted.get(seed) ?? 0) >= 400) &&
     fuzzViolations === 0;
-  const primaryWords = JSON.parse(readFileSync(resolve(CORRIDOR, '..', 'drift', 'data', 'wbig.json'), 'utf8'));
+  const primaryWords = JSON.parse(readFileSync(resolve(TOOL_DIR, '..', '..', 'drift', 'data', 'wbig.json'), 'utf8'));
   const primaryKana = primaryWords.filter((entry) => !/[\u4e00-\u9fff]/.test(entry[0])).length;
   const encodedGestures = [...new Set(cases.map((entry) => entry.gesture))].sort();
   const fullMatrixGaps = [
@@ -1334,6 +1328,8 @@ if (SOAK_MS > 0) {
     startedAt,
     finishedAt: new Date().toISOString(),
     sourceSha: process.env.GITHUB_SHA ?? null,
+    sourceSha256,
+    artifact: { path: CORRIDOR, sha256: JSON.parse(readFileSync(resolve(CORRIDOR, 'build-identity.json'), 'utf8')).artifactSha256 },
     mode: MODE,
     configuration: {
       words: N_WORDS,
