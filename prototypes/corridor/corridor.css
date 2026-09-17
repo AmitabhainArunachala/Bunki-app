@@ -129,6 +129,12 @@ body::before {
   opacity: 0.35;
 }
 
+/* the search room's lens row — the same lenses as 字引, in the room the
+ * learner actually opens (operator, 2026-09-17) */
+.search-lenses { margin: 10px 0 6px; }
+.search-finder { margin-top: 8px; }
+.search-finder .kdx-row { margin-bottom: 8px; }
+
 /* the dojo door stands in every chrome (operator, 2026-09-17); inside the
  * dojo family it is the current room and reads as such */
 .chrome button.chrome-dojo {

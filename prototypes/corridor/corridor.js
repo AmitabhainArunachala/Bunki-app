@@ -3520,6 +3520,9 @@ async function boot() {
   D.kmeta = strokes.meta;
   // Optional reference data settles independently of the core rooms.
   void loadReferenceExtra();
+  // the Kodansha numbers (168 KB) — fetched once so a kanji sheet can name
+  // its entry in the operator's paper dictionary without a wait
+  void ensureKkld();
   // the official radical (部首) table, keyed by Kangxi number 1–214; each kanji
   // record carries its `rad` number and looks its identity up here. A reverse
   // map (canonical glyph and positional variant → the row) lets a component
@@ -12429,6 +12432,10 @@ function renderKanjidex(main) {
     ['reading', '音訓', 'by reading'],
     ['meaning', '意味', 'by meaning'],
     ['strokes', '画数', 'by strokes'],
+    ['radical', '部首', 'by radical'],
+    ['freq', '頻度', 'by frequency'],
+    ['level', '漢検', 'by level'],
+    ['kkld', 'Kodansha', 'by KKLD number'],
   ];
   const lensRow = el('div', 'kdx-lenses');
   for (const [id, ja, en] of LENSES) {
@@ -12454,6 +12461,10 @@ function renderKanjidex(main) {
   else if (S.kdx.mode === 'reading') renderKdxText(main, 'reading');
   else if (S.kdx.mode === 'meaning') renderKdxText(main, 'meaning');
   else if (S.kdx.mode === 'strokes') renderKdxStrokes(main);
+  else if (S.kdx.mode === 'radical') renderKdxRadical(main);
+  else if (S.kdx.mode === 'freq') renderKdxFrequency(main);
+  else if (S.kdx.mode === 'level') renderKdxLevel(main);
+  else if (S.kdx.mode === 'kkld') renderKdxKkld(main);
   else renderKdxParts(main);
 }
 
@@ -12629,6 +12640,239 @@ function renderKdxStrokes(main) {
       .sort((a, b) => (a < b ? -1 : 1));
     renderKdxGrid(main, chars, 300);
   }
+}
+
+/* 部首 — the 214 Kangxi radicals as an index (operator, 2026-09-17: "radical
+ * search" as its own mode). A radical is the one part a kanji is filed
+ * under; the 部品 lens is the wider component search. */
+function renderKdxRadical(main) {
+  main.append(withEn(el('p', 'eyebrow', '部首'), 'the radical a kanji is filed under — 214', 'en-inline'));
+  const row = el('div', 'kdx-row');
+  for (let n = 1; n <= 214; n++) {
+    const r = D.radInfo?.[n];
+    const glyph = r?.var && [...r.var].length === 1 ? r.var : r?.c || String.fromCodePoint(0x2eff + n);
+    const on = S.kdx.rad === n;
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', glyph);
+    b.type = 'button';
+    b.dataset.kdxRad = String(n);
+    b.setAttribute('aria-label', `${n} ${r?.c || ''} ${r?.name || ''}`.trim());
+    b.title = `${n}${r?.name ? ' · ' + r.name : ''}`;
+    b.addEventListener('click', () => {
+      S.kdx.rad = on ? null : n;
+      render();
+      window.scrollTo(0, 0);
+    });
+    row.append(b);
+  }
+  main.append(row);
+  if (S.kdx.rad) {
+    const chars = Object.keys(D.kanji)
+      .filter((c) => D.kanji[c].rad === S.kdx.rad)
+      .sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
+    renderKdxGrid(main, chars, 300);
+    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.rad = String(S.kdx.rad);
+  }
+}
+
+/* 頻度 — newspaper frequency rank (KANJIDIC2's 2,501 most used, carried by
+ * the SKIP sidecar). Loaded once, on first use. */
+let kanjiFreqPromise = null;
+function ensureKanjiFrequency() {
+  if (D.kanjiFreq) return Promise.resolve(D.kanjiFreq);
+  if (!kanjiFreqPromise) {
+    kanjiFreqPromise = fetch('data/share_alike/skip.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const map = {};
+        for (const e of (data && data.entries) || []) if (e.frequency != null) map[e.literal] = e.frequency;
+        D.kanjiFreq = map;
+        return map;
+      })
+      .catch(() => {
+        D.kanjiFreq = {};
+        return D.kanjiFreq;
+      });
+  }
+  return kanjiFreqPromise;
+}
+const FREQ_BANDS = [
+  [1, 100],
+  [101, 500],
+  [501, 1000],
+  [1001, 2501],
+];
+function renderKdxFrequency(main) {
+  main.append(withEn(el('p', 'eyebrow', '頻度'), 'by how often it appears in newspapers — rank 1 is the commonest', 'en-inline'));
+  if (!D.kanjiFreq) {
+    main.append(el('p', 'sem-empty', tx('頻度表を読み込み中…', 'loading the frequency table…')));
+    ensureKanjiFrequency().then(() => {
+      if (S.view === 'search' || S.view === 'kanjidex') render();
+    });
+    return;
+  }
+  const row = el('div', 'kdx-row');
+  for (const [lo, hi] of FREQ_BANDS) {
+    const on = S.kdx.freqLo === lo;
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', `${lo}–${hi}`);
+    b.type = 'button';
+    b.dataset.kdxFreq = String(lo);
+    b.addEventListener('click', () => {
+      S.kdx.freqLo = on ? null : lo;
+      S.kdx.freqHi = on ? null : hi;
+      render();
+      window.scrollTo(0, 0);
+    });
+    row.append(b);
+  }
+  main.append(row);
+  if (S.kdx.freqLo) {
+    const chars = Object.keys(D.kanjiFreq)
+      .filter((c) => D.kanji[c] && D.kanjiFreq[c] >= S.kdx.freqLo && D.kanjiFreq[c] <= S.kdx.freqHi)
+      .sort((a, b) => D.kanjiFreq[a] - D.kanjiFreq[b]);
+    renderKdxGrid(main, chars, 500);
+    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.freq = String(D.kanjiFreq[g.dataset.kdxHit]);
+  }
+}
+
+/* 漢検 — by Kanji Kentei level, the graded ladder the data already carries
+ * (operator, 2026-09-17: "by grade search"). 10級 is the first school year;
+ * 1級 the summit. */
+function kankenLevels() {
+  const seen = new Set();
+  for (const c of Object.keys(D.kanji)) if (D.kanji[c].kk) seen.add(D.kanji[c].kk);
+  const order = (s) => {
+    const m = String(s).match(/(準)?(\d+)級/);
+    if (!m) return 0;
+    return Number(m[2]) * 2 + (m[1] ? 1 : 0);
+  };
+  return [...seen].sort((a, b) => order(b) - order(a));
+}
+function renderKdxLevel(main) {
+  main.append(withEn(el('p', 'eyebrow', '漢検'), 'by Kanji Kentei level — 10級 first, 1級 last', 'en-inline'));
+  const row = el('div', 'kdx-row');
+  for (const lv of kankenLevels()) {
+    const on = S.kdx.kk === lv;
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', lv);
+    b.type = 'button';
+    b.dataset.kdxKk = lv;
+    b.addEventListener('click', () => {
+      S.kdx.kk = on ? null : lv;
+      render();
+      window.scrollTo(0, 0);
+    });
+    row.append(b);
+  }
+  main.append(row);
+  if (S.kdx.kk) {
+    const chars = Object.keys(D.kanji)
+      .filter((c) => D.kanji[c].kk === S.kdx.kk)
+      .sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
+    renderKdxGrid(main, chars, 400);
+    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.kk = S.kdx.kk;
+  }
+}
+
+/* Kodansha — the Kanji Learner's Dictionary entry number (operator, 2026-09-17:
+ * "the Kodansha Kanji Learners dictionary NUMBER (latest edition) search
+ * capacity for every kanji listed" — his main paper book). Numbers come from
+ * KANJIDIC2 (data/share_alike/kkld.json): the 2013 Revised and Expanded
+ * edition for 2,904 kanji, the 1999 first edition for 2,230. Every number
+ * says its edition; the 2022 printing has no public mapping yet. */
+let kkldPromise = null;
+function ensureKkld() {
+  if (D.kkld) return Promise.resolve(D.kkld);
+  if (!kkldPromise) {
+    kkldPromise = fetch('data/share_alike/kkld.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        D.kkld = data && data.entries ? data : { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
+        return D.kkld;
+      })
+      .catch(() => {
+        D.kkld = { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
+        return D.kkld;
+      });
+  }
+  return kkldPromise;
+}
+function kkldOf(c) {
+  return D.kkld?.entries?.[c] || null;
+}
+function kkldLine(c) {
+  const k = kkldOf(c);
+  if (!k) return '';
+  const parts = [];
+  if (k.ed2013) parts.push(tx(`2013年版 #${k.ed2013}`, `2013 ed. #${k.ed2013}`));
+  if (k.ed1999) parts.push(tx(`1999年版 #${k.ed1999}`, `1999 ed. #${k.ed1999}`));
+  return parts.join(' · ');
+}
+function renderKdxKkld(main) {
+  main.append(withEn(el('p', 'eyebrow', 'Kodansha 番号'), "Kodansha Kanji Learner's Dictionary entry number", 'en-inline'));
+  if (!D.kkld) {
+    main.append(el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…')));
+    ensureKkld().then(() => {
+      if (S.view === 'search' || S.view === 'kanjidex') render();
+    });
+    return;
+  }
+  const edRow = el('div', 'kdx-row');
+  for (const [id, ja, en] of [
+    ['ed2013', '2013年版（改訂増補）', '2013 Revised & Expanded'],
+    ['ed1999', '1999年版', '1999 first edition'],
+  ]) {
+    const on = (S.kdx.kkldEd || 'ed2013') === id;
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', tx(ja, en));
+    b.type = 'button';
+    b.dataset.kdxKkldEd = id;
+    b.setAttribute('aria-pressed', String(on));
+    b.addEventListener('click', () => {
+      S.kdx.kkldEd = id;
+      render();
+    });
+    edRow.append(b);
+  }
+  main.append(edRow);
+  const inp = el('input', 'kdx-field');
+  inp.type = 'search';
+  inp.id = 'kdx-kkld';
+  inp.inputMode = 'numeric';
+  inp.autocomplete = 'off';
+  inp.placeholder = tx('番号（1〜3002）か漢字', 'a number 1–3002, or a kanji');
+  inp.value = S.kdx.kkldQ || '';
+  const out = el('div');
+  out.id = 'kdx-kkld-results';
+  const paintKkld = () => {
+    out.textContent = '';
+    const q = (S.kdx.kkldQ || '').trim();
+    if (!q) {
+      out.append(el('p', 'fine', tx(
+        `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の対応表は未確認。`,
+        `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} kanji carry a 2013 number, ${(D.kkld.counts?.ed1999 || 0).toLocaleString()} a 1999 number. The 2022 printing's numbering is unverified.`,
+      )));
+      return;
+    }
+    const ed = S.kdx.kkldEd || 'ed2013';
+    const table = ed === 'ed1999' ? D.kkld.byNumber1999 : D.kkld.byNumber2013;
+    if (/^\d+$/.test(q)) {
+      const chars = (table[String(Number(q))] || []).filter((c) => D.kanji[c]);
+      renderKdxGrid(out, chars, 20);
+      for (const g of out.querySelectorAll('.kdx-glyph')) g.dataset.kkld = q;
+      if (!chars.length) out.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
+      return;
+    }
+    const chars = [...q].filter((c) => D.kanji[c]);
+    renderKdxGrid(out, chars, 20);
+    for (const c of chars) {
+      const line = kkldLine(c);
+      out.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
+    }
+  };
+  inp.addEventListener('input', () => {
+    S.kdx.kkldQ = inp.value;
+    paintKkld();
+  });
+  main.append(inp, out);
+  paintKkld();
 }
 
 /* 音訓 / 意味 — reading (kana or romaji) and English-meaning lookup, straight
@@ -19411,6 +19655,14 @@ function renderKanjiNode(sheet, node) {
     chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `漢検 ${D.kanken[k.c].kk}`, 'kanken', D.kanken[k.c].kk, node.from));
   if (D.kmeta?.[k.c]?.jlpt)
     chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
+  // the entry number in the operator's paper dictionary (Kodansha KKLD),
+  // named by edition — the book on the desk and the sheet on the screen agree
+  if (kkldOf(k.c)) {
+    const kchip = el('span', 'pool-tag kkld-chip', `Kodansha ${kkldLine(k.c)}`);
+    kchip.id = 'kanji-kkld';
+    kchip.title = tx('講談社 漢字学習字典の番号（版ごと）', "Kodansha Kanji Learner's Dictionary entry number, by edition");
+    chips.append(kchip);
+  }
   if (window.BunkiSkipUI) {
     const shapeDoor = el('button', 'chip', tx('形と画数で引く', 'look up by shape and strokes'));
     shapeDoor.id = 'kanji-shape-lookup'; shapeDoor.type = 'button';
@@ -22190,7 +22442,84 @@ function renderSearchPage(main) {
   skipOpener.dataset.entry = 'skip';
   skipOpener.setAttribute('aria-controls', 'search-skip-results');
   results.id = 'search-skip-results';
+
+  // 字を引く — every way of finding a kanji, each an explicit lens in the
+  // search room itself (operator, 2026-09-17: "we need the option for skip,
+  // for regular word search, radical search, frequency of use search, by
+  // grade search…"). The lenses are the 字引 finder's own, plus radical,
+  // frequency and 漢検 level; ことば (words) is the ordinary search field.
+  S.kdx ||= {};
+  if (!Array.isArray(S.kdx.parts)) S.kdx.parts = [];
+  if (typeof S.searchLens !== 'string') S.searchLens = 'words';
+  const SEARCH_LENSES = [
+    ['words', 'ことば', 'words'],
+    ['skip', 'SKIP', 'shape code'],
+    ['parts', '部品', 'parts'],
+    ['radical', '部首', 'radical'],
+    ['draw', '手書き', 'draw'],
+    ['reading', '音訓', 'reading'],
+    ['meaning', '意味', 'meaning'],
+    ['strokes', '画数', 'strokes'],
+    ['freq', '頻度', 'frequency'],
+    ['level', '漢検', 'level'],
+    ['kkld', 'Kodansha', 'KKLD number'],
+  ];
+  const lensRow = el('div', 'kdx-lenses search-lenses');
+  lensRow.id = 'search-lenses';
+  lensRow.setAttribute('role', 'group');
+  lensRow.setAttribute('aria-label', tx('字を引く方法', 'ways to find a kanji'));
+  for (const [id, ja, en] of SEARCH_LENSES) {
+    const b = el('button', S.searchLens === id ? 'kdx-lens on' : 'kdx-lens');
+    b.type = 'button';
+    b.dataset.searchLens = id;
+    b.setAttribute('aria-pressed', String(S.searchLens === id));
+    b.append(el('span', 'l-ja', ja));
+    if (bi()) b.append(el('span', 'en-sub', en));
+    b.addEventListener('click', () => {
+      S.searchLens = id;
+      if (id === 'skip') {
+        skipState().searchOpen = true;
+        if (!input.value.trim() || window.BunkiSkipUI?.parse(input.value).kind === 'text') {
+          input.value = skipState().sessions.search?.query || 'skip:1-*-*';
+          S.navQ = input.value;
+        }
+      } else if (id === 'words') {
+        if (S.skipUi) S.skipUi.searchOpen = false;
+        if (input.value.trim() && window.BunkiSkipUI?.parse(input.value).kind !== 'text') {
+          input.value = '';
+          S.navQ = '';
+        }
+      }
+      render();
+      window.scrollTo(0, 0);
+      if (id === 'words') document.getElementById('nav-search-input')?.focus({ preventScroll: true });
+    });
+    lensRow.append(b);
+  }
+  const FINDER_LENSES = {
+    parts: (host) => renderKdxParts(host),
+    radical: (host) => renderKdxRadical(host),
+    draw: (host) => renderKdxDraw(host),
+    reading: (host) => renderKdxText(host, 'reading'),
+    meaning: (host) => renderKdxText(host, 'meaning'),
+    strokes: (host) => renderKdxStrokes(host),
+    freq: (host) => renderKdxFrequency(host),
+    level: (host) => renderKdxLevel(host),
+    kkld: (host) => renderKdxKkld(host),
+  };
   const paint = () => {
+    if (FINDER_LENSES[S.searchLens]) {
+      results.textContent = '';
+      skipOpener.hidden = true;
+      hint.hidden = true;
+      const finder = el('div', 'search-finder');
+      finder.id = 'search-finder';
+      finder.dataset.lens = S.searchLens;
+      FINDER_LENSES[S.searchLens](finder);
+      results.append(finder);
+      return;
+    }
+    skipOpener.hidden = false;
     // the deep tier repaints these rows when its worker batch settles; if a
     // row holds focus at that moment (a restored session, or a keyboard
     // walk), the rebuild must hand focus back instead of dropping it on body
@@ -22287,7 +22616,7 @@ function renderSearchPage(main) {
       if (first) first.click();
     }
   });
-  wrap.append(input, hint, skipOpener, results);
+  wrap.append(input, lensRow, hint, skipOpener, results);
   // a surviving session repaints in place — same query, same rows
   if (S.navQ) {
     input.value = S.navQ;
