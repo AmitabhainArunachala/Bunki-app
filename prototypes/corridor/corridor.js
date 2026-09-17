@@ -12468,6 +12468,21 @@ function renderKanjidex(main) {
   else renderKdxParts(main);
 }
 
+/* Stroke counts for the positional variants and fragments the component
+ * table lists without a count (the stroke-order data covers whole kanji, not
+ * variants). Counted the way Japanese dictionaries count them: 氵 and 忄 are
+ * 3, 亻 and 刂 are 2, 辶 is 3, 飠 is 8. Used only to place a part on the SKIP
+ * wheel's parts column; never shown as a kanji's own stroke count. */
+const VARIANT_STROKES = {
+  '亻': 2, '氵': 3, '扌': 3, '艹': 3, '乂': 2, '𠂉': 2, '辶': 3, '⻌': 3, '灬': 4, '彑': 3, '阝': 3, '⺕': 3,
+  '刂': 2, '攵': 4, '王': 4, '三': 3, '𠂊': 2, '⻖': 3, '忄': 3, '廿': 4, '中': 4, '⺤': 4, '䒑': 3, '罒': 5,
+  '千': 3, '丁': 2, '天': 4, 'マ': 2, '龶': 4, '龰': 4, '旦': 5, '古': 5, 'つ': 1, '西': 6, '九': 2, '⺌': 3,
+  '氺': 5, '耂': 4, '戸': 4, '七': 2, '夫': 4, '由': 5, '⻏': 3, '吉': 6, '⺨': 3, '业': 5, '早': 6, '兄': 5,
+  '少': 4, '礻': 4, '可': 5, '共': 6, '覀': 6, '未': 5, '各': 6, '林': 8, '了': 2, '勿': 4, '衤': 5, '且': 5,
+  '甫': 7, '川': 3, '云': 4, '母': 5, '正': 5, '戌': 6, '戍': 6, '者': 8, '反': 4, '冊': 5, '从': 4, '曲': 6,
+  '氷': 5, '束': 7, '莫': 10, '亡': 3, '飠': 8,
+};
+
 /** Shared SKIP grid + wheels. Search, 字引 and entry-code doors all use the
  * ordinary kanji sheet, including the sidecar's wider KANJIDIC2 metadata. */
 function skipState() {
@@ -12482,6 +12497,19 @@ function renderSkipLookup(host, options = {}) {
   host.append(lookupHost);
   window.BunkiSkipUI.mount(lookupHost, {
     state: skipState(), bilingual: bi(), radicals: D.radInfo,
+    // the component layer, so the wheel can list the parts that match the
+    // chosen left stroke count and narrow the hits to those that carry one
+    // (operator, 2026-09-17: "see and scroll through the left side particles
+    // … that CORRELATE WITH THE left stroke order number")
+    partsOf: (c) => D.kanji[c]?.parts || [],
+    partInfo: (p) => {
+      const r = D.radicals[p] || null;
+      if (r && Number.isInteger(r.st)) return r;
+      const st = VARIANT_STROKES[p];
+      if (!st) return r;
+      const row = Object.values(D.radInfo || {}).find((x) => x.var === p);
+      return { ...(r || {}), st, name: r?.name || row?.name || '' };
+    },
     ...options,
     onOpen: (c, invoker) => go({ t: 'kanji', id: c, from: options.from }, { invoker }),
   });
