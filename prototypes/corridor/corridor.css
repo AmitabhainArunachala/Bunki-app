@@ -129,6 +129,49 @@ body::before {
   opacity: 0.35;
 }
 
+/* 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18) */
+.study-hall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 6px 0 4px;
+}
+.study-door {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: var(--tap);
+  padding: 14px;
+  text-align: left;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.study-door:hover { border-color: var(--ink-2); }
+.study-door-t { font-family: var(--serif); font-size: 18px; }
+.study-door-sub { font-size: var(--t-chrome); color: var(--ink-2); }
+.study-hall-note { margin: 4px 0 18px; }
+
+/* 今日の棚 — six readings that change with the date (operator, 2026-09-18) */
+.shelf-today-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.shelf-today-strip .shelf-item { margin: 0; }
+@media (max-width: 640px) {
+  .shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* the writing-speed slider beside ゆっくり (operator, 2026-09-18) */
+.stroke-speed-wrap { display: inline-flex; align-items: center; gap: 8px; }
+.stroke-speed-range { width: 96px; accent-color: var(--ink); }
+.stroke-speed-readout { font-size: var(--t-chrome); color: var(--ink-2); min-width: 3ch; font-variant-numeric: tabular-nums; }
+
 /* the search room's lens row — the same lenses as 字引, in the room the
  * learner actually opens (operator, 2026-09-17) */
 .search-lenses { margin: 10px 0 6px; }

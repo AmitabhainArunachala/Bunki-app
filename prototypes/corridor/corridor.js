@@ -4812,6 +4812,36 @@ function renderShelfBody() {
     main.append(aread);
   }
 
+  // 今日の棚 — six readings that change every day (operator, 2026-09-18: "I
+  // keep seeing the same articles all the time and it does not seem to
+  // change, refresh, or renew"). A day's six are drawn from the curated shelf
+  // by the date alone, so today's shelf is the same on every device and
+  // different tomorrow; the full shelf still stands below in its own order.
+  if (curated.length > 6) {
+    let dayOverride = null;
+    try { dayOverride = localStorage.getItem('kairo-shelf-day'); } catch { /* the verifier's seam only */ }
+    const day = (/^\d{4}-\d{2}-\d{2}$/.test(dayOverride || '') && dayOverride) || new Date().toISOString().slice(0, 10);
+    let seed = 0;
+    for (const ch of day) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+    const pool = curated.filter((p) => p.source !== 'isa-yasashii-glossary');
+    const picks = [];
+    const taken = new Set();
+    let x = seed || 1;
+    while (picks.length < Math.min(6, pool.length)) {
+      x = (x * 1103515245 + 12345) >>> 0;
+      const ix = x % pool.length;
+      if (taken.has(ix)) continue;
+      taken.add(ix);
+      picks.push(pool[ix]);
+    }
+    main.append(withEn(el('p', 'eyebrow shelf-section shelf-today', '今日の棚'), `today's six · ${day}`, 'en-inline'));
+    const strip = el('div', 'shelf-today-strip');
+    strip.id = 'shelf-today';
+    strip.dataset.day = day;
+    for (const p of picks) strip.append(shelfCard(p));
+    main.append(strip);
+  }
+
   // one shelf, quiet sections: cards keep the index's own order inside each
   // section, and sections stand in the order the index first names them —
   // the categories gather without anything being reshuffled
@@ -7277,7 +7307,22 @@ function renderReader(main) {
   // when better ones are installed, the hand picks; the choice is a device
   // preference (its own key, never the learner store), and the next
   // sentence already speaks with it because speakPassage re-resolves
-  if (recManifest) {
+  //
+  // The roster picker belongs only to a passage that HAS recordings (the 77
+  // curated readings). A news or archive article has none and reads in the
+  // device voice — the picker must say so instead of offering アミ and then
+  // playing Kyoko (operator, 2026-09-18: "no matter what voice i click on it
+  // is the exact same mechanical female voice").
+  const passageRecorded = !!(recManifest?.sentences?.[p.id]?.have?.length);
+  if (recManifest && !passageRecorded) {
+    listenNote.textContent = readAloud.on
+      ? tx('この記事に収録音声はまだない — 端末の声で読んでいます', 'no recorded voice for this article yet — reading in the device voice')
+      : readAloud.failed
+        ? tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet')
+        : tx('この記事に収録音声はまだない — 端末の声で読む', 'no recorded voice for this article yet — the device voice reads it');
+    listenNote.dataset.recorded = 'false';
+  } else if (recManifest) listenNote.dataset.recorded = 'true';
+  if (recManifest && passageRecorded) {
     // the roster: which recorded voice speaks the WORDS (sentences are
     // always アミ, the primary — the one voice that recorded the shelf)
     const names = { ami: '小春音アミ', f1: 'F1', metan: '四国めたん', zundamon: 'ずんだもん', takehiro: '玄野武宏' };
@@ -7306,6 +7351,8 @@ function renderReader(main) {
         : tx('合成音声：小春音アミ', 'synthetic voice: Koharune Ami');
     }
   } else {
+    // no recording for this passage (or no manifest at all): the device
+    // voices, filtered, with a preview on change
     const voiceChoices = jaVoices();
     if (voiceChoices.length > 1) {
       const pick = document.createElement('select');
@@ -16945,9 +16992,62 @@ function renderFocusHud(root) {
   root.append(hud);
 }
 
+/** 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18:
+ * "we should have a whole corpus of test from JLPT levels and others, as well
+ * as SRS cards. and other options to study here. not sure where they are…
+ * please check"). Every study room the app has, behind one door each, with
+ * an honest count; what is NOT in the app yet is named, not implied. */
+function renderStudyHall(main) {
+  main.append(withEn(el('p', 'eyebrow', '稽古の間'), 'the study hall — everything you can practise, in one place', 'en-inline'));
+  const hall = el('div', 'study-hall');
+  hall.id = 'study-hall';
+  const forecast = srsForecast();
+  const due = forecast.today + forecast.fresh;
+  const mockCount = Array.isArray(D.mock) ? D.mock.length : null;
+  if (mockCount === null) ensureMockIndex().then(() => { if (S.view === 'dojo') render(); }).catch(() => {});
+  const doors = [
+    ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} cards waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
+      keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
+    }],
+    ['mock', 'JLPT の練習', 'JLPT practice sets', mockCount === null
+      ? tx('読み込み中…', 'loading…')
+      : tx(`${mockCount} 組 · 検収前 · 全問はまだない`, `${mockCount} short sets · unreviewed · no full-length forms in the app yet`), () => {
+      keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
+    }],
+    ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
+      keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
+    }],
+    ['sentence', '文の練習', 'sentence practice', tx('保存した文で作る', 'from the sentences you saved'), () => {
+      keepScroll(); S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
+    }],
+    ['probe', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took'), () => {
+      S.focusMode = 'yomi'; render(); window.scrollTo(0, 0);
+    }],
+    ['levels', '参考書庫', 'reference library', tx('JLPT・漢検の一覧', 'JLPT and Kanji Kentei lists'), () => {
+      keepScroll(); pendingReferenceCollection = null; referenceLibrary?.reset(); S.view = 'levels'; render(); window.scrollTo(0, 0);
+    }],
+  ];
+  for (const [id, ja, en, sub, go] of doors) {
+    const b = el('button', 'study-door');
+    b.type = 'button';
+    b.dataset.studyDoor = id;
+    b.append(withEn(el('span', 'study-door-t', ja), en, 'en-inline'));
+    b.append(el('span', 'study-door-sub', sub));
+    b.addEventListener('click', go);
+    hall.append(b);
+  }
+  main.append(hall);
+  main.append(el('p', 'fine study-hall-note', tx(
+    '本試験と同じ長さの JLPT 模擬（N5〜N1 各5組）は審査中で、まだこのアプリに入っていない。ここにある練習は短い組で、検収前。',
+    'Full-length JLPT forms (five per level, N5–N1) are drafts under review and are not in the app yet. The sets here are short, and unreviewed until you approve them.',
+  )));
+}
+
 /** The dojo lobby: choose a length and what to drill. */
 function renderFocus(main) {
   main.append(withEn(el('h1', 'view-title', '集中道場'), 'the focus dojo', 'en-inline'));
+  renderStudyHall(main);
+  main.append(withEn(el('p', 'eyebrow', '集中'), 'a focus block', 'en-inline'));
   main.append(
     el(
       'p',
@@ -20151,16 +20251,42 @@ function strokeAwakeField(page, k) {
 /** ゆっくり — the speed corner (bottom-left). The stored slow preference
  * used to apply silently with no way to see or undo it (P1, review). */
 function strokeSpeedControl(page) {
+  const wrap = el('div', 'stroke-speed-wrap');
   const speed = strokeControl('stroke-speed', 'ゆっくり', 'slowly');
+  const current = strokeSpeed();
+  S.strokeSlow = current <= STROKE_SPEED_SLOW;
   speed.setAttribute('aria-pressed', String(!!S.strokeSlow));
-  speed.addEventListener('click', () => {
-    S.strokeSlow = !S.strokeSlow;
+  const range = el('input', 'stroke-speed-range');
+  range.type = 'range';
+  range.id = 'stroke-speed-range';
+  range.min = '0.4';
+  range.max = '1.8';
+  range.step = '0.1';
+  range.value = String(current);
+  range.setAttribute('aria-label', tx('書く速さ', 'writing speed'));
+  const readout = el('output', 'stroke-speed-readout', `${current.toFixed(1)}×`);
+  readout.id = 'stroke-speed-readout';
+  readout.setAttribute('for', 'stroke-speed-range');
+  const rewrite = () => {
+    if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite(strokeRewriteOptions());
+  };
+  const paint = () => {
+    range.value = String(S.strokeSpeed);
+    readout.textContent = `${S.strokeSpeed.toFixed(1)}×`;
     speed.setAttribute('aria-pressed', String(!!S.strokeSlow));
-    if (page.dataset.living === 'on' && inkRoom?.handle) {
-      inkRoom.handle.rewrite(strokeRewriteOptions());
-    }
+  };
+  range.addEventListener('input', () => {
+    setStrokeSpeed(parseFloat(range.value));
+    paint();
   });
-  return speed;
+  range.addEventListener('change', rewrite);
+  speed.addEventListener('click', () => {
+    setStrokeSpeed(S.strokeSlow ? STROKE_SPEED_DEFAULT : STROKE_SPEED_SLOW);
+    paint();
+    rewrite();
+  });
+  wrap.append(speed, range, readout);
+  return wrap;
 }
 
 /** The honest room: a character we can show but whose order we do not know. */
@@ -20361,7 +20487,28 @@ function scalePathData(d, frac, centre = 512) {
   );
 }
 let inkRoom = null; // { handle, canvas, page, stage, lift, syncLift, unsync } — one sheet
-const strokeRewriteOptions = () => ({ speed: S.strokeSlow ? 0.7 : 1.1 });
+/* the writing speed: a slider from 0.4× to 1.8× (operator, 2026-09-18: "here
+ * i want a sliding scale for speed of the drawings please"); ゆっくり still
+ * drops to the slow mark in one tap. A device preference, never learner
+ * state. */
+const STROKE_SPEED_KEY = 'kairo-stroke-speed-v1';
+const STROKE_SPEED_DEFAULT = 1.1;
+const STROKE_SPEED_SLOW = 0.7;
+function strokeSpeed() {
+  if (typeof S.strokeSpeed !== 'number') {
+    let v = NaN;
+    try { v = parseFloat(localStorage.getItem(STROKE_SPEED_KEY)); } catch { /* no device preference */ }
+    S.strokeSpeed = Number.isFinite(v) && v >= 0.4 && v <= 1.8 ? v : STROKE_SPEED_DEFAULT;
+  }
+  return S.strokeSpeed;
+}
+function setStrokeSpeed(v) {
+  S.strokeSpeed = Math.max(0.4, Math.min(1.8, Math.round(v * 10) / 10));
+  S.strokeSlow = S.strokeSpeed <= STROKE_SPEED_SLOW;
+  try { localStorage.setItem(STROKE_SPEED_KEY, String(S.strokeSpeed)); } catch { /* keep for this session */ }
+  return S.strokeSpeed;
+}
+const strokeRewriteOptions = () => ({ speed: strokeSpeed() });
 function stopInkRoom() {
   if (!inkRoom) return;
   try {

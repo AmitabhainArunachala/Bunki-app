@@ -108,6 +108,90 @@ else {
 }
 await browser.close();
 server.close();
+
+// Scenario 2 — the real manifest is served: a news/archive article (no
+// recording) must show the device picker and say so; a curated reading with
+// clips must show the roster (operator, 2026-09-18: "no matter what voice i
+// click on it is the exact same mechanical female voice").
+const manifestPath = join(CORRIDOR, 'audio/manifest.json');
+if (existsSync(manifestPath)) {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  const recordedIds = Object.keys(manifest.sentences || {}).filter((id) => (manifest.sentences[id].have || []).length);
+  const { server: s2, base: base2 } = await new Promise((ok, fail) => {
+    const s = createServer((req, res) => {
+      const p = decodeURIComponent((req.url ?? '/').split('?')[0]);
+      const rel = p === '/' ? 'index.html' : p.replace(/^\/+/, '');
+      const f = resolve(CORRIDOR, rel);
+      if (!f.startsWith(CORRIDOR) || !existsSync(f)) { res.writeHead(404).end(); return; }
+      res.writeHead(200, { 'content-type': MIME[extname(f)] ?? 'application/octet-stream' });
+      res.end(readFileSync(f));
+    });
+    s.once('error', fail);
+    s.listen(0, '127.0.0.1', () => ok({ server: s, base: `http://127.0.0.1:${s.address().port}` }));
+  });
+  const b2 = await chromium.launch();
+  const c2 = await b2.newContext({ viewport: { width: 1280, height: 820 } });
+  await silenceBrowserAudio(c2);
+  await c2.addInitScript(STUB);
+  const p2 = await c2.newPage();
+  await p2.goto(`${base2}/?entry=shelf`);
+  await p2.waitForSelector('#tray', { timeout: 30000 });
+  const cards = await p2.$$eval('#shelf-body [data-passage]', (els) => els.map((e) => e.dataset.passage));
+  const recorded = cards.find((id) => recordedIds.includes(id));
+  // the unrecorded case lives in the newspaper archive (686 articles, no clips)
+  let unrecorded = cards.find((id) => !recordedIds.includes(id)) || null;
+  let unrecordedVia = unrecorded ? 'shelf' : null;
+  if (!unrecorded) {
+    const arc = await p2.$('#archive-link');
+    if (arc) {
+      await arc.click();
+      await p2.waitForSelector('.archive-year', { timeout: 15000 }).catch(() => {});
+      const yr = await p2.$('.archive-year');
+      if (yr) { await yr.click(); await p2.waitForTimeout(500); }
+      const row = await p2.$('.archive-row[data-passage]');
+      if (row) { unrecorded = await row.evaluate((e) => e.dataset.passage); unrecordedVia = 'archive'; }
+    }
+  }
+  receipt.scenario2 = { unrecorded, unrecordedVia, recorded };
+  const openAndRead = async (id) => {
+    await p2.goto(`${base2}/?entry=shelf`);
+    await p2.waitForSelector('#tray', { timeout: 30000 });
+    if (unrecordedVia === 'archive' && id === unrecorded) {
+      await p2.click('#archive-link');
+      await p2.waitForSelector('.archive-year', { timeout: 15000 });
+      await p2.click('.archive-year');
+      await p2.waitForTimeout(400);
+      await p2.click(`.archive-row[data-passage="${id}"]`);
+    } else await p2.click(`#shelf-body [data-passage="${id}"]`);
+    await p2.waitForSelector('#reader', { timeout: 30000 });
+    await p2.waitForFunction(`!!document.querySelector('#listen-note')`, null, { timeout: 15000 }).catch(() => {});
+    await p2.waitForTimeout(700);
+    return p2.evaluate(`(() => {
+      const note = document.querySelector('#listen-note');
+      const pick = document.querySelector('#listen-voice');
+      return { note: note ? note.textContent : null, recorded: note ? note.dataset.recorded : null,
+        options: pick ? [...pick.options].map((o) => o.textContent) : null };
+    })()`);
+  };
+  if (unrecorded) {
+    const r = await openAndRead(unrecorded);
+    receipt.unrecordedReader = r;
+    if (r.recorded !== 'false') failures.push(`unrecorded ${unrecorded}: note does not say it has no recording (data-recorded=${r.recorded})`);
+    if (!/no recorded voice|収録音声はまだない/.test(r.note || '')) failures.push(`unrecorded ${unrecorded}: note "${r.note}"`);
+    if (r.options && r.options.includes('小春音アミ')) failures.push(`unrecorded ${unrecorded}: the recorded roster is offered although nothing is recorded`);
+    await p2.screenshot({ path: join(OUT, 'unrecorded.png') });
+  } else failures.push('scenario 2: no unrecorded article on the shelf to test');
+  if (recorded) {
+    const r = await openAndRead(recorded);
+    receipt.recordedReader = r;
+    if (r.recorded !== 'true') failures.push(`recorded ${recorded}: note not marked recorded (data-recorded=${r.recorded})`);
+    if (!r.options || !r.options.includes('小春音アミ')) failures.push(`recorded ${recorded}: roster picker missing`);
+    await p2.screenshot({ path: join(OUT, 'recorded.png') });
+  } else failures.push('scenario 2: no recorded reading on the shelf to test');
+  await b2.close();
+  s2.close();
+}
+
 receipt.failures = failures;
 receipt.status = failures.length ? 'failed' : 'passed';
 writeFileSync(join(OUT, 'voice-picker.json'), JSON.stringify(receipt, null, 2) + '\n');
