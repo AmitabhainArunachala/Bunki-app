@@ -7320,3 +7320,82 @@ body[data-view='review'] .teacher-actions { justify-content: center; flex-wrap: 
   .sentence-practice .take { max-width: 100%; white-space: normal; }
   .sentence-response { font-size: 1rem; }
 }
+
+/* -------------------------------------------------- relief (operator, 2026-09-18)
+ * "make the border of these windows something that has some more pop and
+ * contrast … it can be very subtle" · "this all blends together too much …
+ * needs to have more depth and texture" · "it is all too monotonous and makes
+ * it hard to see what the sections are for". The layered variant is already
+ * on; it was not enough. So: every panel the hand works in gets one edge in
+ * ink at a third strength, a hairline of light along its top like a cut
+ * sheet of paper, and a shadow that lifts it a finger's width off the ground.
+ * Section eyebrows carry a short rule in the world's own accent. No glow,
+ * no gradient, nothing that is not paper, ink and light. */
+body.v-depth-layered {
+  --edge: color-mix(in srgb, var(--ink) 30%, transparent);
+  --edge-strong: color-mix(in srgb, var(--ink) 44%, transparent);
+  --lift: 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent), 0 6px 18px color-mix(in srgb, var(--ink) 8%, transparent);
+  --sheen: inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent);
+}
+body.v-depth-layered .search-page,
+body.v-depth-layered .skip-ui,
+body.v-depth-layered .search-finder,
+body.v-depth-layered .kdx-lenses,
+body.v-depth-layered .study-door,
+body.v-depth-layered .focus-mode,
+body.v-depth-layered .grammar-link,
+body.v-depth-layered .listen-row,
+body.v-depth-layered .record-note,
+body.v-depth-layered .record-note-editor,
+body.v-depth-layered .list-page-ops,
+body.v-depth-layered .list-maker,
+body.v-depth-layered .archive-row,
+body.v-depth-layered .nav-search-row {
+  background: var(--ground-0);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  box-shadow: var(--sheen), var(--lift);
+}
+body.v-depth-layered .search-page,
+body.v-depth-layered .skip-ui,
+body.v-depth-layered .search-finder { padding: 12px; }
+body.v-depth-layered .kdx-lenses { padding: 6px; gap: 6px; }
+body.v-depth-layered .shelf-item,
+body.v-depth-layered #reader,
+body.v-depth-layered .dials,
+body.v-depth-layered .sheet {
+  border-color: var(--edge);
+  box-shadow: var(--sheen), var(--lift);
+}
+body.v-depth-layered .shelf-item:hover,
+body.v-depth-layered .grammar-link:hover,
+body.v-depth-layered .study-door:hover,
+body.v-depth-layered .focus-mode:hover { border-color: var(--edge-strong); }
+body.v-depth-layered .grammar-link {
+  margin: 6px 0;
+  padding: 12px 14px;
+}
+body.v-depth-layered .chrome {
+  border-bottom: 1px solid var(--edge);
+  box-shadow: 0 1px 0 color-mix(in srgb, #fff 30%, transparent), 0 4px 14px color-mix(in srgb, var(--ink) 7%, transparent);
+}
+body.v-depth-layered .eyebrow.shelf-section,
+body.v-depth-layered main > .eyebrow {
+  position: relative;
+  padding-top: 10px;
+  margin-top: 22px;
+}
+body.v-depth-layered .eyebrow.shelf-section::before,
+body.v-depth-layered main > .eyebrow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 2px;
+  background: var(--red, #b03a2e);
+  opacity: 0.85;
+}
+body.v-depth-layered .skip-wheels { border-bottom-color: var(--edge); }
+body.v-depth-layered .skip-wheel-column + .skip-wheel-column { border-left-color: var(--edge); }
+body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
