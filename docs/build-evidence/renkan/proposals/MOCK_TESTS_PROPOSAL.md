@@ -1,5 +1,11 @@
 # Mock JLPT tests — what exists, what one honestly costs (proposal)
 
+**Status as of 2026-09-21:** superseded in part by the operator's word of 2026-08-31 —
+the 模試の間 and 25 traditional papers were built from rights-cleared repo assets (#88;
+`docs/build-evidence/kagami/RUN_STATE.md` §七), every set 検収前. The Stage 1
+DIAGNOSTIC below remains queued as KAGAMI movement 七b. The line that follows is
+history and is left as written.
+
 **For:** operator decision sheet, from R4-D · **Status:** PROPOSAL — nothing here was built.
 The directive asks for "several mock JLPT tests at multiple levels" and AI-conversation assessment
 as the first aptitude probe (`docs/briefs/KAIRO_FULL_INSTRUMENT_DIRECTIVE_2026-08-15.md:96`). The
