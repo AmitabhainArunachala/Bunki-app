@@ -4,11 +4,11 @@
   "authorityTreeAtCut": "8a2636c7a47c1e3ba43c333921b818bed38c405a",
   "source": "prototypes/corridor/corridor.js",
   "classification": "DOCUMENTED_RESIDUAL_DIRECT_SAVE_CALLERS",
-  "schemaNote": "schemaVersion 3 (RENKAN R3-C, P0-4 sweep): every remaining direct saveStore() caller now carries an explicit disposition. The 14 learner-state-mutating callers of schemaVersion 2 were converted to commitStorePatch (copy, validate, persist, then publish — rollback is free because the live roots are never touched before the durability boundary). What remains is UI preference state and the observation debounce flush, each documented at the call site. lineAfterPatch values are a line-pin against the CURRENT corridor.js and are recomputed by verify-corridor-storage-integrity.mjs on every landing.",
-  "count": 5,
+  "schemaNote": "schemaVersion 3 (RENKAN R3-C, P0-4 sweep): every remaining direct saveStore() caller now carries an explicit disposition. The 14 learner-state-mutating callers of schemaVersion 2 were converted to commitStorePatch (copy, validate, persist, then publish — rollback is free because the live roots are never touched before the durability boundary). What remains is UI preference state and the observation debounce flush, each documented at the call site. lineAfterPatch values are a line-pin against the CURRENT corridor.js and are recomputed by verify-corridor-storage-integrity.mjs on every landing. Recomputed 2026-09-21 (KAGAMI 二補) against main @ 11594593; the sixth caller (reference return bookmark) arrived with #92.",
+  "count": 6,
   "callers": [
     {
-      "lineAfterPatch": 1419,
+      "lineAfterPatch": 1425,
       "surface": "observation debounce flush",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "obslog"
@@ -21,7 +21,7 @@
       "dispositionNote": "The flush persists rows already published to the session ledger; the 1.2s debounce (+ pagehide/visibility flush) is the documented session-ahead-of-durability window for burst-arriving observations. A rollback would DROP evidence; instead a failed save surfaces the storage alert and the rows remain in S.obslog for the next flush or any envelope write to carry."
     },
     {
-      "lineAfterPatch": 2574,
+      "lineAfterPatch": 2589,
       "surface": "reader scroll debounce",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -34,7 +34,21 @@
       "dispositionNote": "readerPos is a reading-position bookmark, not learner evidence; a lost write costs one scroll offset."
     },
     {
-      "lineAfterPatch": 2703,
+      "lineAfterPatch": 2643,
+      "surface": "reference return bookmark",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "readerPos"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "navigationReturns",
+        "readerPosTimer"
+      ],
+      "saveResultConsumed": false,
+      "disposition": "retained-ui-preference",
+      "dispositionNote": "Same bookmark root, written when a transient navigation return frame (reference library / search detour, #92) lands back on the article at the exact line being left. Added to the ledger by KAGAMI 二補 (2026-09-21): #92 introduced the caller without recomputing this pin, and the suite went red on main unseen."
+    },
+    {
+      "lineAfterPatch": 2789,
       "surface": "app Back from reader",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -45,7 +59,7 @@
       "dispositionNote": "Same bookmark root as the scroll debounce, written at the exact line being left."
     },
     {
-      "lineAfterPatch": 3521,
+      "lineAfterPatch": 3608,
       "surface": "reader display dials",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "dials"
@@ -58,7 +72,7 @@
       "dispositionNote": "Display dials (kanji/furigana/spacing) are presentation preferences; the session keeps working unpersisted and the alert names any failure."
     },
     {
-      "lineAfterPatch": 15540,
+      "lineAfterPatch": 15942,
       "surface": "lists tray door bookmark",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -94,14 +108,14 @@
   },
   "directLearnerStoreBypasses": [
     {
-      "lineAfterPatch": 5208,
+      "lineAfterPatch": 5303,
       "surface": "learner-record export",
       "operation": "getItem",
       "keyExpression": "STORE_KEY",
       "risk": "Direct read is outside quarantine and can throw before export feedback."
     },
     {
-      "lineAfterPatch": 5447,
+      "lineAfterPatch": 5542,
       "surface": "learner-record import",
       "operation": "setItem",
       "keyExpression": "STORE_KEY",
@@ -112,5 +126,5 @@
     "AI_KEY_STORE",
     "THEME_STORE"
   ],
-  "claimBoundary": "Only deep learner-store read quarantine, exact-byte candidate self-validation, reserved-name-safe record production and round-trip, write-before-publish helper semantics with post-setItem UI isolation, reader finish, entry capture, standard/focus-drill grade, one stable visible storage alert with dynamic sheet description, and article-load retry are closed by the original donor. The R3-C sweep extends the write-before-publish boundary to every learner-state mutating caller listed in sweepP04.convertedSurfaces; the five retained callers are documented dispositions, not open debt."
+  "claimBoundary": "Only deep learner-store read quarantine, exact-byte candidate self-validation, reserved-name-safe record production and round-trip, write-before-publish helper semantics with post-setItem UI isolation, reader finish, entry capture, standard/focus-drill grade, one stable visible storage alert with dynamic sheet description, and article-load retry are closed by the original donor. The R3-C sweep extends the write-before-publish boundary to every learner-state mutating caller listed in sweepP04.convertedSurfaces; the six retained callers are documented dispositions, not open debt."
 }

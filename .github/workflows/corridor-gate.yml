@@ -1,0 +1,56 @@
+# 回廊 corridor gate — the whole-corridor verifier (verify-corridor.mjs) as a
+# workflow of its own.
+#
+# Until 2026-09-21 this suite ran only inside docs/build-evidence/renkan/battery.sh,
+# never on a pull request, and two of its breadcrumb assertions had gone stale
+# on main after the 2026-09-14 header repair without anyone seeing red. It gets
+# its own job rather than a step in reference-libraries.yml because it walks the
+# entire corridor in a real browser (224 checks with screenshots) and would not
+# fit that workflow's fifteen-minute budget beside the suites already there.
+#
+# The verifier writes docs/prototype/verification-report.json into the checkout
+# on every run; here that file is an artefact, not a commit.
+name: Corridor gate
+
+on:
+  pull_request:
+    paths:
+      - 'prototypes/corridor/**'
+      - '.github/workflows/corridor-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'prototypes/corridor/**'
+      - '.github/workflows/corridor-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: corridor-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-corridor:
+    name: whole-corridor walk (verify-corridor.mjs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Walk the corridor
+        run: node prototypes/corridor/tools/verify-corridor.mjs --shots "$RUNNER_TEMP/corridor-shots"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: corridor-gate-evidence
+          path: |
+            ${{ runner.temp }}/corridor-shots
+            docs/prototype/verification-report.json
+          if-no-files-found: ignore

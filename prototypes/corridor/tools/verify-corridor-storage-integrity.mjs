@@ -1549,10 +1549,13 @@ verified('dojo-refill-second-lap-is-practice', () => {
 });
 
 verified('every-in-app-mint-carries-the-started-mark', () => {
-  // capture (覚える), lane bulk memorize, lesson enroll choice, probe miss mint
+  // capture (覚える), lesson enroll choice, probe miss mint. The lane's bulk
+  // "memorize the next twenty" mint is gone on the operator's ruling (#92,
+  // docs/operator/REFERENCE_LIBRARIES_2026-09-14.md: the reference library
+  // browses without enrolling), so the source no longer holds it — and a
+  // probe that demanded it back would be protecting a repealed assumption.
   assert.match(captureActionBlock, /started: now/);
-  const laneMint = between('const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));', '/* --------------------------------------------------------------- lessons');
-  assert.match(laneMint, /started: Date\.now\(\)/);
+  assert.doesNotMatch(source, /const fresh = ids\.filter\(\(id\) => !takenSet\.has\(srsKey\(t, id\)\)\);/);
   // lesson completion writes EVIDENCE only (PR70-P0-1): the score and one
   // obslog row per word ride ONE commit — no deck rows, no promotion mark
   const lessonFinish = between('const lessonsDone = { ...S.lessonsDone,', 'run.phase =');
@@ -1792,8 +1795,11 @@ verified('residual-and-direct-bypass-ledger-is-exact', () => {
   // caller carries an explicit disposition.
   assert.equal(residual.schemaVersion, 3);
   assert.equal(residual.authorityHeadAtCut, BASE);
-  assert.equal(residual.count, 5);
-  assert.equal(residual.callers.length, 5);
+  // six since #92: the reference library's transient return frame writes the
+  // readerPos bookmark on its way back to the article (KAGAMI 二補 recomputed
+  // the ledger; the caller itself touches no learner-evidence root)
+  assert.equal(residual.count, 6);
+  assert.equal(residual.callers.length, 6);
   assert.ok(residual.callers.every((entry) => entry.saveResultConsumed === false));
   assert.ok(
     residual.callers.every(
@@ -1805,6 +1811,7 @@ verified('residual-and-direct-bypass-ledger-is-exact', () => {
     [
       'observation debounce flush',
       'reader scroll debounce',
+      'reference return bookmark',
       'app Back from reader',
       'reader display dials',
       'lists tray door bookmark',
@@ -1893,7 +1900,7 @@ console.log(
         'dojo-second-lap-practice',
         'persisted-quiz-run',
       ],
-      residualUnsafeSaveCallers: 5,
+      residualUnsafeSaveCallers: 6,
       browserAndDevice: 'NOT_RUN',
     },
     null,
