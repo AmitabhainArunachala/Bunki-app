@@ -43,6 +43,13 @@ jobs:
         run: node prototypes/corridor/tools/verify-reference.mjs --shots "$RUNNER_TEMP/reference-shots"
       - name: Verify existing mock-paper boundary
         run: node prototypes/corridor/tools/verify-mock.mjs
+      # 鏡 KAGAMI 二補 — these two gates ran only in battery.sh until 2026-09-21,
+      # and the storage-integrity suite had gone red on main unnoticed. Any
+      # corridor change now proves the learner model and the store envelope here.
+      - name: Verify the learner model (鏡) is derived, deterministic and honest
+        run: node prototypes/corridor/tools/verify-kagami.mjs
+      - name: Verify the learner-store envelope and transactional writes
+        run: node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs
       - name: Verify recursive connections and return context
         run: node prototypes/corridor/tools/verify-reference-connections.mjs --shots "$RUNNER_TEMP/connection-shots"
       - name: Walk the complete learner experience with screenshots
