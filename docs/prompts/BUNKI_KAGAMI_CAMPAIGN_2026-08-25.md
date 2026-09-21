@@ -177,3 +177,11 @@ only on the operator's word; Pages deploys from main only.
 Commit this plan as `docs/prompts/BUNKI_KAGAMI_CAMPAIGN_2026-08-25.md` +
 `docs/build-evidence/kagami/RUN_STATE.md` (position: PR 一 next), add the ground-truth
 reading pointer to the TENOHIRA RUN_STATE, then open PR 一 on a fresh branch from main.
+
+## Amendments
+
+- **一 · 道場の門 (2026-09-21)** — `docs/prompts/BUNKI_KAGAMI_AMENDMENT_2026-09-21.md`. The
+  whole-repository review of learner testing; movements 八 (the dojo lobby as the gateway),
+  九 (the next-move planner) and 十 (external evidence rows) join the ladder after 三; laws
+  8–12 bind them; decisions D1 (the N1 lane's source) and D2 (the papers' 検収) are the
+  operator's. The 二補 truth pass that accompanied it is recorded in `RUN_STATE.md`.
