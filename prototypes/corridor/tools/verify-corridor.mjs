@@ -1728,8 +1728,13 @@ async function main() {
     archiveTok > 40 && /CC BY 2.5/.test(archiveAttr),
     `${archiveTok} tokens · "${archiveAttr}"`);
   // R3-E crumb truth: the trail names the stack the back door actually
-  // reopens — bookshelf › archive › title, never bookshelf › title
-  const archiveCrumb = await page.evaluate(`document.querySelector('.crumb')?.textContent ?? ''`);
+  // reopens — bookshelf › archive › title, never bookshelf › title. Since the
+  // 2026-09-14 header repair the page names only its room in visible text and
+  // carries the whole trail in aria-label/title, so the trail is read there
+  // (the idiom verify-reference-connections already uses).
+  const archiveCrumb = await page.evaluate(
+    `document.querySelector('.crumb')?.getAttribute('aria-label') ?? ''`,
+  );
   const archiveReaderTitle = await page.evaluate(
     `document.querySelector('.view-title')?.textContent ?? ''`,
   );
@@ -2627,13 +2632,16 @@ async function main() {
   await page.waitForTimeout(300);
   await page.tap('.nav-dojo');
   await page.waitForTimeout(400);
+  // the visible crumb names the room; the trail rides aria-label/title
+  // (2026-09-14 header repair) — both are read, and both must agree
   const dojoProbe = await page.evaluate(`({
-    crumb: document.querySelector('.crumb')?.textContent ?? '',
+    crumb: document.querySelector('.crumb')?.getAttribute('aria-label') ?? '',
+    room: document.querySelector('.crumb b')?.textContent ?? '',
     view: document.body.dataset.view,
   })`);
   check('R3-E · the dojo entered from the galaxy wears a galaxy crumb',
-    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'galaxy › focus',
-    `crumb "${dojoProbe.crumb}"`);
+    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'galaxy › focus' && dojoProbe.room === 'focus',
+    `crumb "${dojoProbe.crumb}" · room "${dojoProbe.room}"`);
   await page.tap('#back');
   await page.waitForTimeout(600);
   const dojoBack = await page.evaluate(`({
