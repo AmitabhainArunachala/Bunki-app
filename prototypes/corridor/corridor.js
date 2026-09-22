@@ -19803,12 +19803,6 @@ function renderKanjiNode(sheet, node) {
     shapeDoor.addEventListener('click', () => go({ t: 'skip', id: 'skip:*', from: node.from }, { invoker: shapeDoor }));
     chips.append(shapeDoor);
   }
-  window.BunkiSkipUI?.codeDoor(chips, {
-    state: skipState(), literal: k.c, bilingual: bi(),
-    // A nested lookup sheet preserves the originating sheet, reader context
-    // and Back discipline rather than discarding the walk for another room.
-    onLookup: (code, invoker) => go({ t: 'skip', id: code, from: node.from }, { invoker }),
-  });
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);

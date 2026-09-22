@@ -25,9 +25,14 @@
     sessions: {}, searchOpen: false,
   });
   function parse(raw) {
+    const normalized = String(raw ?? '').normalize('NFKC').trim();
+    // Admit the numeric/wildcard shorthand without claiming ordinary English
+    // words such as "skip" or "skip meaning" for this lookup lens.
+    const shorthand = normalized.match(/^skip\s+([\d*?][\d*?\s\-‐‑‒–—―−﹘﹣]*)$/i);
+    const query = shorthand ? `skip:${shorthand[1]}` : normalized;
     // Script failures must never prevent ordinary dictionary search.
-    if (core()) return core().parseQuery(String(raw).replace(/^\s*skip(?:\s+|$)/i, 'skip:'));
-    return { kind: /^\s*skip\b/i.test(raw) || /^\s*[\d*?]+[-－–—]/.test(raw) ? 'invalid' : 'text',
+    if (core()) return core().parseQuery(query);
+    return { kind: /^skip\s*:/i.test(query) || /^[\d*?]+\s*[-‐‑‒–—―−﹘﹣]/.test(query) ? 'invalid' : 'text',
       error: 'SKIP lookup is unavailable. Reload the page to try again.' };
   }
   async function ensureData(state) {
@@ -66,10 +71,21 @@
   }
   function getKanji(state, literal) {
     const e = state?.byChar?.get(literal);
-    if (!e) return null;
-    return { c: e.literal, m: e.meanings?.join('; ') || 'No English meaning in KANJIDIC2',
-      on: e.readings?.on || [], kun: e.readings?.kun || [],
-      st: e.strokeCounts?.[0] || null, rad: e.radical, parts: [], skipFallback: true };
+    if (!e || e.literal !== literal || [...literal].length !== 1) return null;
+    const meanings = Array.isArray(e.meanings) ? [...e.meanings] : [];
+    const archive = state.data?.sources?.find((source) => source.release && source.sha256);
+    const provenance = state.data?.provenance;
+    const sourceVersion = archive && provenance ? {
+      schemaVersion: state.data.schemaVersion,
+      release: archive.release,
+      archiveSha256: archive.sha256,
+      dictionaryDate: provenance.dictionaryDate,
+      databaseVersion: provenance.databaseVersion,
+    } : null;
+    return { c: e.literal, m: meanings.join('; '), meanings,
+      on: [...(e.readings?.on || [])], kun: [...(e.readings?.kun || [])],
+      st: e.strokeCounts?.[0] || null, rad: e.radical, parts: [], skipFallback: true,
+      sourceVersion };
   }
   function symbol(pattern) {
     const mark = node('span', `skip-symbol skip-symbol-${pattern}`);
