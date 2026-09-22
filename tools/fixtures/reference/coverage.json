@@ -141,13 +141,7 @@
         "records": 10384,
         "projectedRows": 3715,
         "projectedSha256": "43b4eaffeeaa655fae72eead033a7ef578679af7543aafba7245e49fa93e884c",
-        "fields": [
-          "literal",
-          "ja_on",
-          "ja_kun",
-          "English meanings",
-          "first stroke count"
-        ],
+        "fields": ["literal", "ja_on", "ja_kun", "English meanings", "first stroke count"],
         "excludedFields": [
           "JLPT historical level",
           "school grade",
@@ -209,18 +203,12 @@
           "corpus/samples/jmdict/kanjidic_sample.jsonl",
           "Historical jlpt_pre2010_editorial levels are not modern N1–N5; metadata only."
         ],
-        [
-          "packages/seed/data/lexemes.json",
-          "Hand-assembled seed without JLPT classifications."
-        ],
+        ["packages/seed/data/lexemes.json", "Hand-assembled seed without JLPT classifications."],
         [
           "packages/seed/data/kanji.json",
           "Hand-assembled seed without JLPT/Kentei classifications."
         ],
-        [
-          "corpus/datasets/jmdict_idioms/idioms.jsonl",
-          "No JLPT/Kentei classifications."
-        ]
+        ["corpus/datasets/jmdict_idioms/idioms.jsonl", "No JLPT/Kentei classifications."]
       ],
       "rebuild": "node tools/build-reference-data.mjs --archive /path/to/kanjidic2-en-3.6.2+20260803141815.json.zip",
       "offlineCheck": "node tools/build-reference-data.mjs --check"

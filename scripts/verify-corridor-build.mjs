@@ -17,7 +17,10 @@ import { tmpdir } from 'node:os';
 import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath, pathToFileURL, URL } from 'node:url';
 import { chromium } from 'playwright-core';
-import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from '../prototypes/corridor/tools/browser-audio-silence.mjs';
+import {
+  silenceBrowserAudio,
+  TEST_AUDIO_OUTPUT,
+} from '../prototypes/corridor/tools/browser-audio-silence.mjs';
 import { resolveCorridorEvidence } from './resolve-corridor-site.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -397,8 +400,9 @@ try {
         schemaVersion: 1,
         site,
         testAudioOutput: TEST_AUDIO_OUTPUT,
-        audioSilenceHelperSha256: createHash('sha256').update(readFileSync(
-          join(ROOT, 'prototypes/corridor/tools/browser-audio-silence.mjs'))).digest('hex'),
+        audioSilenceHelperSha256: createHash('sha256')
+          .update(readFileSync(join(ROOT, 'prototypes/corridor/tools/browser-audio-silence.mjs')))
+          .digest('hex'),
         summary: {
           total: results.length,
           failed:

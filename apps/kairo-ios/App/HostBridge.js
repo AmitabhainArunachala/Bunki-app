@@ -3,10 +3,14 @@
   'use strict';
   if (window !== top || location.origin !== 'http://localhost:43187') return;
   const intakeRequest = async (method, input, keys) => {
-    if (!input || Object.getPrototypeOf(input) !== Object.prototype) throw new Error('invalid-input');
+    if (!input || Object.getPrototypeOf(input) !== Object.prototype)
+      throw new Error('invalid-input');
     const descriptors = Object.getOwnPropertyDescriptors(input);
     const names = Reflect.ownKeys(descriptors);
-    if (names.length !== keys.length || names.some(name => !keys.includes(name) || !('value' in descriptors[name]))) {
+    if (
+      names.length !== keys.length ||
+      names.some((name) => !keys.includes(name) || !('value' in descriptors[name]))
+    ) {
       throw new Error('invalid-input');
     }
     const request = { method };
@@ -15,10 +19,13 @@
   };
   Object.defineProperty(window, 'kairoIntake', {
     value: Object.freeze({
-      available: () => intakeRequest('available', {}, []).then(value => value === true).catch(() => false),
-      choose: input => intakeRequest('choose', input, ['expected']),
-      extract: input => intakeRequest('extract', input, ['token', 'firstPage', 'lastPage']),
-      openOriginal: input => intakeRequest('openOriginal', input, ['file']),
+      available: () =>
+        intakeRequest('available', {}, [])
+          .then((value) => value === true)
+          .catch(() => false),
+      choose: (input) => intakeRequest('choose', input, ['expected']),
+      extract: (input) => intakeRequest('extract', input, ['token', 'firstPage', 'lastPage']),
+      openOriginal: (input) => intakeRequest('openOriginal', input, ['file']),
     }),
     configurable: false,
     writable: false,

@@ -8,4 +8,8 @@ export { readExamAttemptViews } from '../packages/sync/src/exam-attempt-views.ts
 export { recordOperationSchema } from '../packages/sync/src/operations.ts';
 export { inputHashOf } from '../packages/ai/src/hash.ts';
 export { parseSourceReferencePayload } from '../packages/sync/src/operations.ts';
-export { createSyncOperation, operationReference, parseReadingAnchor } from '../packages/sync/src/operations.ts';
+export {
+  createSyncOperation,
+  operationReference,
+  parseReadingAnchor,
+} from '../packages/sync/src/operations.ts';

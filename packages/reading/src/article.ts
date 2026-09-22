@@ -165,7 +165,12 @@ export const articlePayloadSchema = z.discriminatedUnion('kind', [
     kind: z.literal('full-reader-article'),
     body: articleBodySchema,
   }),
-  z.strictObject({ ...articleFields, kind: z.literal('local-file-reference'), body: z.null(), fileReference: fileReferenceSchema }),
+  z.strictObject({
+    ...articleFields,
+    kind: z.literal('local-file-reference'),
+    body: z.null(),
+    fileReference: fileReferenceSchema,
+  }),
 ]);
 const articleVersionSchema = z.discriminatedUnion('kind', [
   articlePayloadSchema.options[0].extend({ versionId: idSchema }),
@@ -207,8 +212,11 @@ export function assertExactSpan(
 function assertPayload(payload: ArticlePayload): void {
   for (const operation of ARTICLE_OPERATIONS) {
     const decision = payload.capabilities[operation];
-    if (decision.status === 'allowed' && decision.basis.kind === 'user-action' &&
-        !['discover-metadata', 'display-body', 'retain-offline', 'quote-extract'].includes(operation)) {
+    if (
+      decision.status === 'allowed' &&
+      decision.basis.kind === 'user-action' &&
+      !['discover-metadata', 'display-body', 'retain-offline', 'quote-extract'].includes(operation)
+    ) {
       throw new ReadingValidationError('operation-not-permitted', [operation]);
     }
   }
@@ -222,7 +230,10 @@ function assertPayload(payload: ArticlePayload): void {
     if (payload.kind === 'publisher-site-link' && payload.canonicalUrl === null) {
       throw new ReadingValidationError('invalid-input', ['canonicalUrl']);
     }
-    if (payload.kind === 'local-file-reference' && (payload.canonicalUrl !== null || payload.lineage.kind !== 'user-supplied')) {
+    if (
+      payload.kind === 'local-file-reference' &&
+      (payload.canonicalUrl !== null || payload.lineage.kind !== 'user-supplied')
+    ) {
       throw new ReadingValidationError('invalid-input', ['fileReference']);
     }
     for (const operation of ARTICLE_OPERATIONS) {

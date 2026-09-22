@@ -231,7 +231,10 @@ export function batteryGates(out, env = process.env) {
       [],
       report('corridor-build', 'checks'),
     ),
-    node('reference-core', 'tools/test-reference-core.mjs', ['--evidence-out', join(out, 'reference-core')]),
+    node('reference-core', 'tools/test-reference-core.mjs', [
+      '--evidence-out',
+      join(out, 'reference-core'),
+    ]),
     node('reference-data', 'tools/build-reference-data.mjs', ['--check']),
     node('reference-ui-contracts', tool('test-reference-ui')),
     node('skip-core', tool('test-skip-core')),
@@ -301,7 +304,15 @@ export function batteryGates(out, env = process.env) {
     {
       name: 'source-inbox-contract',
       command: process.execPath,
-      args: ['--test', tool('source-inbox.test'), tool('listening-intake.test'), tool('timed-transcript.test'), tool('file-intake.test'), tool('sentence-practice.test'), join(ROOT, 'apps/kairo-ios/Tests/HostBridge.test.mjs')],
+      args: [
+        '--test',
+        tool('source-inbox.test'),
+        tool('listening-intake.test'),
+        tool('timed-transcript.test'),
+        tool('file-intake.test'),
+        tool('sentence-practice.test'),
+        join(ROOT, 'apps/kairo-ios/Tests/HostBridge.test.mjs'),
+      ],
       requiredPath: tool('source-inbox.test'),
     },
     node('source-inbox-integration', tool('verify-source-inbox')),
@@ -477,21 +488,36 @@ export function batteryGates(out, env = process.env) {
       report('drift-hunt', 'drift-hunt', 'drift-hunt-report.json'),
     ),
     node('corridor-ai', tool('verify-corridor-ai')),
-    node('teaching-context', tool('test-teaching-context'), [
-      '--evidence-out', join(out, 'teaching-context'),
-    ], report('teaching-context', 'teaching-context', 'result.json')),
-    node('ai-adaptation', tool('verify-ai-adaptation'), [
-      '--case', 'all', '--evidence-out', join(out, 'ai-adaptation'),
-    ], report('ai-adaptation', 'ai-adaptation', 'receipt.json')),
-    node('search-fallback-core', tool('test-search-fallback'), [
-      '--evidence-out', join(out, 'search-fallback-core'),
-    ], report('search-fallback-core', 'search-fallback-core', 'receipt.json')),
-    node('search-fallback-ui', tool('verify-search-fallback'), [
-      '--case', 'all', '--evidence-out', join(out, 'search-fallback-ui'),
-    ], report('search-fallback-ui', 'search-fallback-ui', 'receipt.json')),
-    node('standalone-journey', tool('verify-journey'), [
-      '--evidence-out', join(out, 'standalone-journey'),
-    ], report('standalone-journey', 'standalone-journey', 'results.json')),
+    node(
+      'teaching-context',
+      tool('test-teaching-context'),
+      ['--evidence-out', join(out, 'teaching-context')],
+      report('teaching-context', 'teaching-context', 'result.json'),
+    ),
+    node(
+      'ai-adaptation',
+      tool('verify-ai-adaptation'),
+      ['--case', 'all', '--evidence-out', join(out, 'ai-adaptation')],
+      report('ai-adaptation', 'ai-adaptation', 'receipt.json'),
+    ),
+    node(
+      'search-fallback-core',
+      tool('test-search-fallback'),
+      ['--evidence-out', join(out, 'search-fallback-core')],
+      report('search-fallback-core', 'search-fallback-core', 'receipt.json'),
+    ),
+    node(
+      'search-fallback-ui',
+      tool('verify-search-fallback'),
+      ['--case', 'all', '--evidence-out', join(out, 'search-fallback-ui')],
+      report('search-fallback-ui', 'search-fallback-ui', 'receipt.json'),
+    ),
+    node(
+      'standalone-journey',
+      tool('verify-journey'),
+      ['--evidence-out', join(out, 'standalone-journey')],
+      report('standalone-journey', 'standalone-journey', 'results.json'),
+    ),
     node('import-provider', tool('verify-import-provider')),
     node('playback', tool('verify-playback')),
     node('reading-candidates', tool('verify-reading-candidates')),
@@ -1070,11 +1096,20 @@ function practiceGateSourceMetadata(site, artifactSha256) {
   const host = runtime.get('record-host.mjs').toString();
   const finalizeStart = host.indexOf('  async #finalizePractice(');
   const finalizeEnd = host.indexOf('\n  async #', finalizeStart + 1);
-  assert(finalizeStart > 0 && finalizeEnd > finalizeStart, 'Practice controls require the named finalization method');
+  assert(
+    finalizeStart > 0 && finalizeEnd > finalizeStart,
+    'Practice controls require the named finalization method',
+  );
   const finalize = host.slice(finalizeStart, finalizeEnd);
   const mutateFinalize = (needle, replacement) => {
-    assert.equal(finalize.split(needle).length, 2, 'Practice mutation must target one exact finalization boundary');
-    return host.slice(0, finalizeStart) + finalize.replace(needle, replacement) + host.slice(finalizeEnd);
+    assert.equal(
+      finalize.split(needle).length,
+      2,
+      'Practice mutation must target one exact finalization boundary',
+    );
+    return (
+      host.slice(0, finalizeStart) + finalize.replace(needle, replacement) + host.slice(finalizeEnd)
+    );
   };
   const needle = 'const outcome = await this.#controller.commitLocal(request);';
   assert.equal(
@@ -1366,25 +1401,25 @@ const NATIVE_GATE_CASES = [
 const nativeCaseIdentity = ({ name, articleId }) => JSON.stringify({ name, articleId });
 
 const SEARCH_FALLBACK_CASES = [
-  "every graded words-only entry is indexed exactly once with its complete fallback reading and gloss",
-  "existing dictionary entries keep their identity, reading, primary gloss and index order without shadows",
-  "graded numeric JLPT values keep their intended search tie ranks",
-  "fallback entries with no deep written counterpart remain present without loading the optional dictionary",
-  "written, kana, romaji and whole glossary searches return the exact fallback while deep data is unavailable",
-  "current deep counterpart selection keeps both 生物 homographs and prefers compatible seq entries",
-  "fallback without a deep counterpart survives the ready deep tier with unchanged identity",
-  "actual search leaves the input corpus unchanged and repeated immediate indexing stable"
+  'every graded words-only entry is indexed exactly once with its complete fallback reading and gloss',
+  'existing dictionary entries keep their identity, reading, primary gloss and index order without shadows',
+  'graded numeric JLPT values keep their intended search tie ranks',
+  'fallback entries with no deep written counterpart remain present without loading the optional dictionary',
+  'written, kana, romaji and whole glossary searches return the exact fallback while deep data is unavailable',
+  'current deep counterpart selection keeps both 生物 homographs and prefers compatible seq entries',
+  'fallback without a deep counterpart survives the ready deep tier with unchanged identity',
+  'actual search leaves the input corpus unchanged and repeated immediate indexing stable',
 ];
 const SEARCH_UI_CASES = ['pending', 'queries', 'missing', 'homographs', 'lifecycle'];
 const SEARCH_UI_CHECKS = [
-  "the exact immediate fallback opens through keyboard Enter before the deep index resolves",
-  "a completed deep-index load does not replace the no-counterpart fallback identity",
-  "written, kana, romaji and glossary queries each activate the exact fallback form and reading",
-  "a failed optional index still leaves the correct fallback search and full immediate gloss available",
-  "existing deep homographs keep exact sequence, reading and sense while switching through normal controls",
-  "ordinary capture commits one exact fallback identity without a fabricated sequence or recall grade",
-  "the exact captured fallback reopens from Lists after a cold reload with the deep index unavailable",
-  "real recall controls grade the fallback answer and schedule only its exact word key"
+  'the exact immediate fallback opens through keyboard Enter before the deep index resolves',
+  'a completed deep-index load does not replace the no-counterpart fallback identity',
+  'written, kana, romaji and glossary queries each activate the exact fallback form and reading',
+  'a failed optional index still leaves the correct fallback search and full immediate gloss available',
+  'existing deep homographs keep exact sequence, reading and sense while switching through normal controls',
+  'ordinary capture commits one exact fallback identity without a fabricated sequence or recall grade',
+  'the exact captured fallback reopens from Lists after a cold reload with the deep index unavailable',
+  'real recall controls grade the fallback answer and schedule only its exact word key',
 ];
 
 const TEACHING_CONTEXT_CASES = [
@@ -1406,8 +1441,14 @@ const TEACHING_CONTEXT_CASES = [
   'Shared public band export validates dimensions and excludes extra payload fields',
 ];
 const AI_ADAPTATION_CASES = [
-  'surfaces', 'privacy', 'freshness', 'undo', 'failed-write',
-  'provider-change', 'import-epoch', 'source-context',
+  'surfaces',
+  'privacy',
+  'freshness',
+  'undo',
+  'failed-write',
+  'provider-change',
+  'import-epoch',
+  'source-context',
 ];
 
 const STANDALONE_JOURNEY_STATIONS = [
@@ -1425,8 +1466,11 @@ const STANDALONE_JOURNEY_STATIONS = [
   '12 same-file offline reload retains the exact learner record',
 ];
 const STANDALONE_RECORD_MODULES = [
-  './record-controller.mjs', './record-binding.mjs', './record-app.mjs',
-  './record-sync.mjs', './modules/record-core.mjs',
+  './record-controller.mjs',
+  './record-binding.mjs',
+  './record-app.mjs',
+  './record-sync.mjs',
+  './modules/record-core.mjs',
 ];
 
 function requireNamedCases(rows, names, field = 'pass', accepted = true) {
@@ -1488,8 +1532,12 @@ function requireCompleteReport({
     );
     assert.equal(value.summary?.failed, 0, 'Receipt reports failures');
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
-    assert.equal(value.suite, type === 'teaching-context'
-      ? 'actual-teaching-context-exports' : 'actual-request-teaching-context');
+    assert.equal(
+      value.suite,
+      type === 'teaching-context'
+        ? 'actual-teaching-context-exports'
+        : 'actual-request-teaching-context',
+    );
     assert.equal(value.pass, true);
     assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u);
     assert.equal(value.artifactSha256, artifactSha256);
@@ -1500,7 +1548,11 @@ function requireCompleteReport({
       assert.equal(value.browsers, 0);
       assert.equal(value.providerRequests, 0);
     } else {
-      assert.equal(value.selectedCase, 'all', 'The required adaptation gate cannot select a subset');
+      assert.equal(
+        value.selectedCase,
+        'all',
+        'The required adaptation gate cannot select a subset',
+      );
       requireNamedCases(value.results, AI_ADAPTATION_CASES);
       assert.equal(value.timedOut, false);
       assert.deepEqual(value.externalRequests, []);
@@ -1512,11 +1564,19 @@ function requireCompleteReport({
       assert.equal(value.handles?.browserClosed, true);
       assert.equal(value.handles?.serverClosed, true);
       assert(Array.isArray(value.checks) && value.checks.every((row) => row.pass === true));
-      assert.equal(value.checks.filter((row) => row.name === 'all six teaching request surfaces were actually observed').length, 1);
+      assert.equal(
+        value.checks.filter(
+          (row) => row.name === 'all six teaching request surfaces were actually observed',
+        ).length,
+        1,
+      );
     }
   } else if (type === 'search-fallback-core' || type === 'search-fallback-ui') {
     const browser = type === 'search-fallback-ui';
-    assert.equal(value.suite, browser ? 'actual-ui-search-fallback' : 'actual-source-search-fallback');
+    assert.equal(
+      value.suite,
+      browser ? 'actual-ui-search-fallback' : 'actual-source-search-fallback',
+    );
     assert.equal(value.pass, true);
     assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u);
     assert.equal(value.artifactSha256, artifactSha256);
@@ -1534,9 +1594,16 @@ function requireCompleteReport({
       assert.deepEqual(value.routeErrors, []);
       assert(Array.isArray(value.errors) && Array.isArray(value.expectedFaultErrors));
       assert.deepEqual(value.errors, value.expectedFaultErrors);
-      assert(value.errors.every((entry) => entry.type === 'console' && ['missing', 'lifecycle'].includes(entry.case) &&
-        entry.location?.url === value.origin + '/data/share_alike/dict-v2/index.json' && entry.error.includes('503')),
-      'Only the declared optional-index 503 console faults may be accepted');
+      assert(
+        value.errors.every(
+          (entry) =>
+            entry.type === 'console' &&
+            ['missing', 'lifecycle'].includes(entry.case) &&
+            entry.location?.url === value.origin + '/data/share_alike/dict-v2/index.json' &&
+            entry.error.includes('503'),
+        ),
+        'Only the declared optional-index 503 console faults may be accepted',
+      );
       assert.equal(value.handles?.contextsCreated, 1);
       assert.equal(value.handles?.contextsClosed, 1);
       assert.equal(value.handles?.browserClosed, true);
@@ -1544,7 +1611,10 @@ function requireCompleteReport({
     }
   } else if (type === 'standalone-journey') {
     const receiptStat = lstatSync(path);
-    assert(receiptStat.isFile() && !receiptStat.isSymbolicLink(), 'Journey receipt must be a real file');
+    assert(
+      receiptStat.isFile() && !receiptStat.isSymbolicLink(),
+      'Journey receipt must be a real file',
+    );
     assert.equal(value.schemaVersion, 1);
     assert.equal(value.pass, true);
     assert.equal(value.status, 'passed');
@@ -1562,8 +1632,17 @@ function requireCompleteReport({
     assert.equal(value.site, siteDir);
     assert.deepEqual(value.expectedStations, STANDALONE_JOURNEY_STATIONS);
     assert.deepEqual(value.passed, STANDALONE_JOURNEY_STATIONS);
-    for (const field of ['failures', 'skipped', 'startupErrors', 'cleanupErrors', 'stationErrors',
-      'identityErrors', 'pageErrors', 'blockedRequests']) assert.deepEqual(value[field], [], field);
+    for (const field of [
+      'failures',
+      'skipped',
+      'startupErrors',
+      'cleanupErrors',
+      'stationErrors',
+      'identityErrors',
+      'pageErrors',
+      'blockedRequests',
+    ])
+      assert.deepEqual(value[field], [], field);
     assert.equal(value.timedOut, false);
     assert.equal(value.audioOutput?.mode, 'test-silenced');
     assert.equal(value.browser?.engine, 'chromium');
@@ -1573,8 +1652,15 @@ function requireCompleteReport({
     assert(isAbsolute(value.browser.executablePath), 'Actual browser executable is missing');
     const handles = value.handles;
     assert(Number.isSafeInteger(handles?.processId) && handles.processId > 0);
-    for (const field of ['browserCreated', 'contextCloseAttempted', 'contextClosed',
-      'browserCloseAttempted', 'browserClosed', 'finalPageClosed']) assert.equal(handles[field], true, field);
+    for (const field of [
+      'browserCreated',
+      'contextCloseAttempted',
+      'contextClosed',
+      'browserCloseAttempted',
+      'browserClosed',
+      'finalPageClosed',
+    ])
+      assert.equal(handles[field], true, field);
     assert.equal(handles.contextsCreated, 1);
     assert.equal(handles.finalBrowserConnected, false);
     assert.equal(handles.finalContextCount, 0);
@@ -1598,19 +1684,36 @@ function requireCompleteReport({
       assert(stat.isFile() && !stat.isSymbolicLink(), 'Journey output must be a real file');
     }
     const outputBytes = readFileSync(output);
-    assert.equal(createHash('sha256').update(outputBytes).digest('hex'), standalone.standaloneSha256);
+    assert.equal(
+      createHash('sha256').update(outputBytes).digest('hex'),
+      standalone.standaloneSha256,
+    );
     const html = outputBytes.toString('utf8');
     for (const [field, pattern] of [
-      ['recordRuntimeSha256', /<script type="application\/octet-stream" id="standalone-record-module">([A-Za-z0-9+/]+={0,2})<\/script>/gu],
-      ['inkModuleSha256', /^window\.__KAIRO_INK_URL__ = standaloneModuleUrl\("([A-Za-z0-9+/]+={0,2})"\);$/gmu],
+      [
+        'recordRuntimeSha256',
+        /<script type="application\/octet-stream" id="standalone-record-module">([A-Za-z0-9+/]+={0,2})<\/script>/gu,
+      ],
+      [
+        'inkModuleSha256',
+        /^window\.__KAIRO_INK_URL__ = standaloneModuleUrl\("([A-Za-z0-9+/]+={0,2})"\);$/gmu,
+      ],
     ]) {
       const matches = [...html.matchAll(pattern)];
       assert.equal(matches.length, 1, `Exactly one emitted ${field} payload is required`);
       const bytes = Buffer.from(matches[0][1], 'base64');
-      assert.equal(bytes.toString('base64'), matches[0][1], 'Embedded module encoding must be canonical');
+      assert.equal(
+        bytes.toString('base64'),
+        matches[0][1],
+        'Embedded module encoding must be canonical',
+      );
       assert.equal(createHash('sha256').update(bytes).digest('hex'), standalone[field], field);
     }
-    assert.deepEqual(json(`${output}.build.json`), standalone, 'Embedded and saved build receipts disagree');
+    assert.deepEqual(
+      json(`${output}.build.json`),
+      standalone,
+      'Embedded and saved build receipts disagree',
+    );
   } else if (type === 'native') {
     assert.equal(engine, 'chromium', 'Native reading gate requires the Chromium touch verifier');
     assert.equal(value.schemaVersion, 1);
@@ -2146,9 +2249,19 @@ async function verifyRunner(out) {
   );
 
   const requiredNames = [
-    'reference-core', 'reference-data', 'reference-ui-contracts', 'skip-core', 'skip-ui-contracts',
-    'kanji-capture', 'navigation-returns', 'reference-packaging', 'skip-packaging', 'reference-browser',
-    'reference-connections', 'skip-browser', 'skip-standalone',
+    'reference-core',
+    'reference-data',
+    'reference-ui-contracts',
+    'skip-core',
+    'skip-ui-contracts',
+    'kanji-capture',
+    'navigation-returns',
+    'reference-packaging',
+    'skip-packaging',
+    'reference-browser',
+    'reference-connections',
+    'skip-browser',
+    'skip-standalone',
     'corridor-build',
     'corridor-lint',
     'desktop-host',
@@ -3894,19 +4007,39 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
 function verifyTeachingReports(out) {
   const directory = join(out, 'teaching-report-controls');
   mkdirSync(directory);
-  const artifactSha256 = 'a'.repeat(64), sourceSha256 = 'b'.repeat(64);
+  const artifactSha256 = 'a'.repeat(64),
+    sourceSha256 = 'b'.repeat(64);
   const controls = [];
   for (const type of ['teaching-context', 'ai-adaptation']) {
     const browser = type === 'ai-adaptation';
     const fixture = {
       suite: browser ? 'actual-request-teaching-context' : 'actual-teaching-context-exports',
-      pass: true, artifactSha256, verifierSha256: sourceSha256,
-      results: (browser ? AI_ADAPTATION_CASES : TEACHING_CONTEXT_CASES).map((name) => ({ name, pass: true })),
-      ...(browser ? {
-        selectedCase: 'all', timedOut: false, externalRequests: [], routeErrors: [], browserErrors: [], expectedAbortErrors: [],
-        handles: { browserContextsCreated: 1, browserContextsClosed: 1, browserClosed: true, serverClosed: true },
-        checks: [{ name: 'all six teaching request surfaces were actually observed', pass: true }],
-      } : { browsers: 0, providerRequests: 0 }),
+      pass: true,
+      artifactSha256,
+      verifierSha256: sourceSha256,
+      results: (browser ? AI_ADAPTATION_CASES : TEACHING_CONTEXT_CASES).map((name) => ({
+        name,
+        pass: true,
+      })),
+      ...(browser
+        ? {
+            selectedCase: 'all',
+            timedOut: false,
+            externalRequests: [],
+            routeErrors: [],
+            browserErrors: [],
+            expectedAbortErrors: [],
+            handles: {
+              browserContextsCreated: 1,
+              browserContextsClosed: 1,
+              browserClosed: true,
+              serverClosed: true,
+            },
+            checks: [
+              { name: 'all six teaching request surfaces were actually observed', pass: true },
+            ],
+          }
+        : { browsers: 0, providerRequests: 0 }),
     };
     const path = join(directory, `${type}.json`);
     const report = { path, type, artifactSha256, sourceSha256 };
@@ -3915,23 +4048,28 @@ function verifyTeachingReports(out) {
     const cases = [
       ['missing-case', { results: fixture.results.slice(1) }],
       ['duplicate-case', { results: [...fixture.results.slice(1), fixture.results[1]] }],
-      ['failed-case', { results: fixture.results.map((row, index) => index ? row : { ...row, pass: false }) }],
+      [
+        'failed-case',
+        { results: fixture.results.map((row, index) => (index ? row : { ...row, pass: false })) },
+      ],
       ['wrong-artifact', { artifactSha256: 'c'.repeat(64) }],
       ['wrong-verifier', { verifierSha256: 'c'.repeat(64) }],
       ['failed', { pass: false }],
-      ...(browser ? [
-        ['subset', { selectedCase: 'privacy' }],
-        ['timed-out', { timedOut: true }],
-        ['external-request', { externalRequests: ['unexpected'] }],
-        ['route-error', { routeErrors: ['unexpected'] }],
-        ['browser-error', { browserErrors: ['unexpected'] }],
-        ['open-context', { handles: { ...fixture.handles, browserContextsClosed: 0 } }],
-        ['open-server', { handles: { ...fixture.handles, serverClosed: false } }],
-        ['missing-surface-coverage', { checks: [] }],
-      ] : [
-        ['provider-request', { providerRequests: 1 }],
-        ['unexpected-browser', { browsers: 1 }],
-      ]),
+      ...(browser
+        ? [
+            ['subset', { selectedCase: 'privacy' }],
+            ['timed-out', { timedOut: true }],
+            ['external-request', { externalRequests: ['unexpected'] }],
+            ['route-error', { routeErrors: ['unexpected'] }],
+            ['browser-error', { browserErrors: ['unexpected'] }],
+            ['open-context', { handles: { ...fixture.handles, browserContextsClosed: 0 } }],
+            ['open-server', { handles: { ...fixture.handles, serverClosed: false } }],
+            ['missing-surface-coverage', { checks: [] }],
+          ]
+        : [
+            ['provider-request', { providerRequests: 1 }],
+            ['unexpected-browser', { browsers: 1 }],
+          ]),
     ];
     for (const [name, changed] of cases) {
       writeJson(path, { ...fixture, ...changed });
@@ -3943,42 +4081,84 @@ function verifyTeachingReports(out) {
     assert.throws(() => requireCompleteReport({ ...report, sourceSha256: null }));
   }
   writeJson(join(directory, 'controls.json'), controls);
-  return ['teaching receipts require pinned artifacts and verifiers, complete named coverage and closed browser resources'];
+  return [
+    'teaching receipts require pinned artifacts and verifiers, complete named coverage and closed browser resources',
+  ];
 }
 
 function verifySearchReports(out) {
-  const directory = join(out, 'search-report-controls'); mkdirSync(directory);
-  const artifactSha256 = 'a'.repeat(64), sourceSha256 = 'b'.repeat(64), controls = [];
+  const directory = join(out, 'search-report-controls');
+  mkdirSync(directory);
+  const artifactSha256 = 'a'.repeat(64),
+    sourceSha256 = 'b'.repeat(64),
+    controls = [];
   for (const type of ['search-fallback-core', 'search-fallback-ui']) {
     const browser = type === 'search-fallback-ui';
     const fixture = {
       suite: browser ? 'actual-ui-search-fallback' : 'actual-source-search-fallback',
-      pass: true, artifactSha256, verifierSha256: sourceSha256,
-      checks: (browser ? SEARCH_UI_CHECKS : SEARCH_FALLBACK_CASES).map((name) => ({ name, pass: true })),
-      ...(browser ? { results: SEARCH_UI_CASES.map((name) => ({ name, pass: true })),
-        selectedCase: 'all', timedOut: false, externalRequests: [], routeErrors: [], errors: [], expectedFaultErrors: [],
-        origin: 'http://127.0.0.1:43187',
-        handles: { contextsCreated: 1, contextsClosed: 1, browserClosed: true, serverClosed: true },
-      } : { baseline: null }),
+      pass: true,
+      artifactSha256,
+      verifierSha256: sourceSha256,
+      checks: (browser ? SEARCH_UI_CHECKS : SEARCH_FALLBACK_CASES).map((name) => ({
+        name,
+        pass: true,
+      })),
+      ...(browser
+        ? {
+            results: SEARCH_UI_CASES.map((name) => ({ name, pass: true })),
+            selectedCase: 'all',
+            timedOut: false,
+            externalRequests: [],
+            routeErrors: [],
+            errors: [],
+            expectedFaultErrors: [],
+            origin: 'http://127.0.0.1:43187',
+            handles: {
+              contextsCreated: 1,
+              contextsClosed: 1,
+              browserClosed: true,
+              serverClosed: true,
+            },
+          }
+        : { baseline: null }),
     };
-    const path = join(directory, `${type}.json`), report = { path, type, artifactSha256, sourceSha256 };
-    writeJson(path, fixture); requireCompleteReport(report);
+    const path = join(directory, `${type}.json`),
+      report = { path, type, artifactSha256, sourceSha256 };
+    writeJson(path, fixture);
+    requireCompleteReport(report);
     const cases = [
       ['missing-check', { checks: fixture.checks.slice(1) }],
       ['duplicate-check', { checks: [...fixture.checks.slice(1), fixture.checks[1]] }],
-      ['failed-check', { checks: fixture.checks.map((row, i) => i ? row : { ...row, pass: false }) }],
-      ['wrong-artifact', { artifactSha256: 'c'.repeat(64) }], ['wrong-verifier', { verifierSha256: 'c'.repeat(64) }],
+      [
+        'failed-check',
+        { checks: fixture.checks.map((row, i) => (i ? row : { ...row, pass: false })) },
+      ],
+      ['wrong-artifact', { artifactSha256: 'c'.repeat(64) }],
+      ['wrong-verifier', { verifierSha256: 'c'.repeat(64) }],
       ['failed', { pass: false }],
-      ...(browser ? [
-        ['subset', { selectedCase: 'pending' }], ['missing-case', { results: fixture.results.slice(1) }],
-        ['duplicate-case', { results: [...fixture.results.slice(1), fixture.results[1]] }],
-        ['failed-case', { results: fixture.results.map((row, i) => i ? row : { ...row, pass: false }) }],
-        ['timed-out', { timedOut: true }], ['external-request', { externalRequests: ['unexpected'] }],
-        ['route-error', { routeErrors: ['unexpected'] }], ['browser-error', { errors: ['unexpected'] }],
-        ['self-declared-page-error', { errors: [{ type: 'pageerror' }], expectedFaultErrors: [{ type: 'pageerror' }] }],
-        ...['contextsCreated', 'contextsClosed', 'browserClosed', 'serverClosed'].map((key) =>
-          [key, { handles: { ...fixture.handles, [key]: key === 'contextsCreated' ? 2 : 0 } }]),
-      ] : [['historical-substitution', { baseline: { artifactSha256: 'c'.repeat(64) } }]]),
+      ...(browser
+        ? [
+            ['subset', { selectedCase: 'pending' }],
+            ['missing-case', { results: fixture.results.slice(1) }],
+            ['duplicate-case', { results: [...fixture.results.slice(1), fixture.results[1]] }],
+            [
+              'failed-case',
+              { results: fixture.results.map((row, i) => (i ? row : { ...row, pass: false })) },
+            ],
+            ['timed-out', { timedOut: true }],
+            ['external-request', { externalRequests: ['unexpected'] }],
+            ['route-error', { routeErrors: ['unexpected'] }],
+            ['browser-error', { errors: ['unexpected'] }],
+            [
+              'self-declared-page-error',
+              { errors: [{ type: 'pageerror' }], expectedFaultErrors: [{ type: 'pageerror' }] },
+            ],
+            ...['contextsCreated', 'contextsClosed', 'browserClosed', 'serverClosed'].map((key) => [
+              key,
+              { handles: { ...fixture.handles, [key]: key === 'contextsCreated' ? 2 : 0 } },
+            ]),
+          ]
+        : [['historical-substitution', { baseline: { artifactSha256: 'c'.repeat(64) } }]]),
     ];
     for (const [name, changed] of cases) {
       writeJson(path, { ...fixture, ...changed });
@@ -3989,8 +4169,14 @@ function verifySearchReports(out) {
     assert.throws(() => requireCompleteReport({ ...report, artifactSha256: null }));
     assert.throws(() => requireCompleteReport({ ...report, sourceSha256: null }));
     if (browser) {
-      const error = { type: 'console', case: 'missing', location: { url: fixture.origin + '/data/share_alike/dict-v2/index.json' }, error: 'Failed to load resource: 503' };
-      writeJson(path, { ...fixture, errors: [error], expectedFaultErrors: [error] }); requireCompleteReport(report);
+      const error = {
+        type: 'console',
+        case: 'missing',
+        location: { url: fixture.origin + '/data/share_alike/dict-v2/index.json' },
+        error: 'Failed to load resource: 503',
+      };
+      writeJson(path, { ...fixture, errors: [error], expectedFaultErrors: [error] });
+      requireCompleteReport(report);
       const wrong = { ...error, location: { url: fixture.origin + '/corridor.js' } };
       writeJson(path, { ...fixture, errors: [wrong], expectedFaultErrors: [wrong] });
       assert.throws(() => requireCompleteReport(report));
@@ -3998,13 +4184,19 @@ function verifySearchReports(out) {
     }
   }
   writeJson(join(directory, 'controls.json'), controls);
-  return ['search receipts require current artifact/verifier pins, complete named coverage, scoped faults and closed resources'];
+  return [
+    'search receipts require current artifact/verifier pins, complete named coverage, scoped faults and closed resources',
+  ];
 }
 
 function verifyStandaloneJourneyReports(out) {
-  const directory = join(out, 'standalone-journey-report-controls'); mkdirSync(directory);
-  const path = join(directory, 'results.json'), output = join(directory, 'corridor-standalone.html');
-  const artifactSha256 = 'a'.repeat(64), sourceSha256 = 'b'.repeat(64), builderSha256 = 'c'.repeat(64);
+  const directory = join(out, 'standalone-journey-report-controls');
+  mkdirSync(directory);
+  const path = join(directory, 'results.json'),
+    output = join(directory, 'corridor-standalone.html');
+  const artifactSha256 = 'a'.repeat(64),
+    sourceSha256 = 'b'.repeat(64),
+    builderSha256 = 'c'.repeat(64);
   const sourceAssetSha256 = 'd'.repeat(64);
   const siteDir = join(directory, 'pinned-site');
   const recordBytes = Buffer.from('export const record = "receiver fixture only";');
@@ -4016,132 +4208,473 @@ window.__KAIRO_INK_URL__ = standaloneModuleUrl("${inkBytes.toString('base64')}")
 </script>`);
   writeFileSync(output, bytes);
   const fixture = {
-    schemaVersion: 1, pass: true, status: 'passed', site: siteDir,
-    expectedArtifactSha256: artifactSha256, artifactSha256, sourceAssetSha256,
-    verifier: { sha256: sourceSha256 }, finalVerifierSha256: sourceSha256,
-    builder: { sha256: builderSha256 }, finalBuilderSha256: builderSha256,
-    expectedStations: STANDALONE_JOURNEY_STATIONS, passed: STANDALONE_JOURNEY_STATIONS,
-    failures: [], skipped: [], startupErrors: [], cleanupErrors: [], stationErrors: [],
-    identityErrors: [], pageErrors: [], blockedRequests: [], timedOut: false,
+    schemaVersion: 1,
+    pass: true,
+    status: 'passed',
+    site: siteDir,
+    expectedArtifactSha256: artifactSha256,
+    artifactSha256,
+    sourceAssetSha256,
+    verifier: { sha256: sourceSha256 },
+    finalVerifierSha256: sourceSha256,
+    builder: { sha256: builderSha256 },
+    finalBuilderSha256: builderSha256,
+    expectedStations: STANDALONE_JOURNEY_STATIONS,
+    passed: STANDALONE_JOURNEY_STATIONS,
+    failures: [],
+    skipped: [],
+    startupErrors: [],
+    cleanupErrors: [],
+    stationErrors: [],
+    identityErrors: [],
+    pageErrors: [],
+    blockedRequests: [],
+    timedOut: false,
     audioOutput: { mode: 'test-silenced' },
     browser: { engine: 'chromium', version: 'fixture-only', executablePath: process.execPath },
-    handles: { processId: 1, browserCreated: true, contextsCreated: 1, contextCloseAttempted: true,
-      contextClosed: true, browserCloseAttempted: true, browserClosed: true,
-      finalBrowserConnected: false, finalContextCount: 0, finalPageClosed: true },
+    handles: {
+      processId: 1,
+      browserCreated: true,
+      contextsCreated: 1,
+      contextCloseAttempted: true,
+      contextClosed: true,
+      browserCloseAttempted: true,
+      browserClosed: true,
+      finalBrowserConnected: false,
+      finalContextCount: 0,
+      finalPageClosed: true,
+    },
     recoveredRecordSha256: 'e'.repeat(64),
-    standalone: { status: 'passed', site: siteDir, artifactSha256, output, builderSha256,
+    standalone: {
+      status: 'passed',
+      site: siteDir,
+      artifactSha256,
+      output,
+      builderSha256,
       standaloneSha256: createHash('sha256').update(bytes).digest('hex'),
-      selfContainedController: true, recordModuleTransport: 'blob', inlinedModuleTransport: 'blob',
-      driftSharesRecordRuntime: true, inlinedRecordModules: STANDALONE_RECORD_MODULES,
+      selfContainedController: true,
+      recordModuleTransport: 'blob',
+      inlinedModuleTransport: 'blob',
+      driftSharesRecordRuntime: true,
+      inlinedRecordModules: STANDALONE_RECORD_MODULES,
       recordRuntimeSha256: createHash('sha256').update(recordBytes).digest('hex'),
-      inkModuleSha256: createHash('sha256').update(inkBytes).digest('hex') },
+      inkModuleSha256: createHash('sha256').update(inkBytes).digest('hex'),
+    },
   };
-  const report = { path, type: 'standalone-journey', artifactSha256, sourceAssetSha256, sourceSha256, builderSha256, siteDir };
-  const save = (value) => { writeJson(path, value); writeJson(`${output}.build.json`, value.standalone); };
-  save(fixture); requireCompleteReport(report);
+  const report = {
+    path,
+    type: 'standalone-journey',
+    artifactSha256,
+    sourceAssetSha256,
+    sourceSha256,
+    builderSha256,
+    siteDir,
+  };
+  const save = (value) => {
+    writeJson(path, value);
+    writeJson(`${output}.build.json`, value.standalone);
+  };
+  save(fixture);
+  requireCompleteReport(report);
   const controls = [];
   const mutations = [
-    ['missing-station', (v) => { v.passed.pop(); }],
-    ['duplicate-station', (v) => { v.passed[0] = v.passed[1]; }],
-    ['reordered-stations', (v) => { v.passed.reverse(); }],
-    ['self-declared-subset', (v) => { v.passed.pop(); v.expectedStations.pop(); }],
-    ['wrong-schema', (v) => { v.schemaVersion = 2; }],
-    ['false-pass', (v) => { v.pass = false; }],
-    ['failed-status', (v) => { v.status = 'failed'; }],
-    ['wrong-artifact', (v) => { v.artifactSha256 = 'f'.repeat(64); }],
-    ['wrong-expected-artifact', (v) => { v.expectedArtifactSha256 = 'f'.repeat(64); }],
-    ['missing-source-asset', (v) => { delete v.sourceAssetSha256; }],
-    ['wrong-source-asset', (v) => { v.sourceAssetSha256 = 'f'.repeat(64); }],
-    ['wrong-verifier', (v) => { v.verifier.sha256 = 'f'.repeat(64); }],
-    ['changed-final-verifier', (v) => { v.finalVerifierSha256 = 'f'.repeat(64); }],
-    ['wrong-builder', (v) => { v.builder.sha256 = 'f'.repeat(64); }],
-    ['changed-final-builder', (v) => { v.finalBuilderSha256 = 'f'.repeat(64); }],
-    ['wrong-site', (v) => { v.site += '-other'; }],
-    ['timed-out', (v) => { v.timedOut = true; }],
-    ['audible', (v) => { v.audioOutput.mode = 'unmuted'; }],
-    ['wrong-engine', (v) => { v.browser.engine = 'webkit'; }],
-    ['missing-browser-version', (v) => { v.browser.version = ''; }],
-    ['missing-browser-executable', (v) => { v.browser.executablePath = ''; }],
-    ['missing-recovered-record', (v) => { delete v.recoveredRecordSha256; }],
-    ['invalid-process', (v) => { v.handles.processId = 0; }],
-    ['extra-context', (v) => { v.handles.contextsCreated = 2; }],
-    ['connected-browser', (v) => { v.handles.finalBrowserConnected = true; }],
-    ['remaining-context', (v) => { v.handles.finalContextCount = 1; }],
-    ...['browserCreated', 'contextCloseAttempted', 'contextClosed', 'browserCloseAttempted',
-      'browserClosed', 'finalPageClosed'].map((key) => [key, (v) => { v.handles[key] = false; }]),
-    ...['failures', 'skipped', 'startupErrors', 'cleanupErrors', 'stationErrors', 'identityErrors',
-      'pageErrors', 'blockedRequests'].map((key) => [key, (v) => { v[key] = ['unexpected']; }]),
-    ['failed-build', (v) => { v.standalone.status = 'failed'; }],
-    ['wrong-build-artifact', (v) => { v.standalone.artifactSha256 = 'f'.repeat(64); }],
-    ['wrong-build-source', (v) => { v.standalone.builderSha256 = 'f'.repeat(64); }],
-    ['wrong-build-site', (v) => { v.standalone.site += '-other'; }],
-    ['foreign-output', (v) => { v.standalone.output += '-other'; }],
-    ['missing-record-module', (v) => { v.standalone.inlinedRecordModules.pop(); }],
-    ['duplicate-record-module', (v) => { v.standalone.inlinedRecordModules[0] = v.standalone.inlinedRecordModules[1]; }],
-    ['missing-record-runtime', (v) => { delete v.standalone.recordRuntimeSha256; }],
-    ['wrong-record-runtime', (v) => { v.standalone.recordRuntimeSha256 = '0'.repeat(64); }],
-    ['missing-ink', (v) => { delete v.standalone.inkModuleSha256; }],
-    ['wrong-ink', (v) => { v.standalone.inkModuleSha256 = '0'.repeat(64); }],
-    ['separate-record-runtime', (v) => { v.standalone.driftSharesRecordRuntime = false; }],
-    ['external-controller', (v) => { v.standalone.selfContainedController = false; }],
-    ['wrong-record-transport', (v) => { v.standalone.recordModuleTransport = 'data'; }],
-    ['wrong-module-transport', (v) => { v.standalone.inlinedModuleTransport = 'data'; }],
-    ['wrong-standalone-digest', (v) => { v.standalone.standaloneSha256 = 'f'.repeat(64); }],
+    [
+      'missing-station',
+      (v) => {
+        v.passed.pop();
+      },
+    ],
+    [
+      'duplicate-station',
+      (v) => {
+        v.passed[0] = v.passed[1];
+      },
+    ],
+    [
+      'reordered-stations',
+      (v) => {
+        v.passed.reverse();
+      },
+    ],
+    [
+      'self-declared-subset',
+      (v) => {
+        v.passed.pop();
+        v.expectedStations.pop();
+      },
+    ],
+    [
+      'wrong-schema',
+      (v) => {
+        v.schemaVersion = 2;
+      },
+    ],
+    [
+      'false-pass',
+      (v) => {
+        v.pass = false;
+      },
+    ],
+    [
+      'failed-status',
+      (v) => {
+        v.status = 'failed';
+      },
+    ],
+    [
+      'wrong-artifact',
+      (v) => {
+        v.artifactSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'wrong-expected-artifact',
+      (v) => {
+        v.expectedArtifactSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'missing-source-asset',
+      (v) => {
+        delete v.sourceAssetSha256;
+      },
+    ],
+    [
+      'wrong-source-asset',
+      (v) => {
+        v.sourceAssetSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'wrong-verifier',
+      (v) => {
+        v.verifier.sha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'changed-final-verifier',
+      (v) => {
+        v.finalVerifierSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'wrong-builder',
+      (v) => {
+        v.builder.sha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'changed-final-builder',
+      (v) => {
+        v.finalBuilderSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'wrong-site',
+      (v) => {
+        v.site += '-other';
+      },
+    ],
+    [
+      'timed-out',
+      (v) => {
+        v.timedOut = true;
+      },
+    ],
+    [
+      'audible',
+      (v) => {
+        v.audioOutput.mode = 'unmuted';
+      },
+    ],
+    [
+      'wrong-engine',
+      (v) => {
+        v.browser.engine = 'webkit';
+      },
+    ],
+    [
+      'missing-browser-version',
+      (v) => {
+        v.browser.version = '';
+      },
+    ],
+    [
+      'missing-browser-executable',
+      (v) => {
+        v.browser.executablePath = '';
+      },
+    ],
+    [
+      'missing-recovered-record',
+      (v) => {
+        delete v.recoveredRecordSha256;
+      },
+    ],
+    [
+      'invalid-process',
+      (v) => {
+        v.handles.processId = 0;
+      },
+    ],
+    [
+      'extra-context',
+      (v) => {
+        v.handles.contextsCreated = 2;
+      },
+    ],
+    [
+      'connected-browser',
+      (v) => {
+        v.handles.finalBrowserConnected = true;
+      },
+    ],
+    [
+      'remaining-context',
+      (v) => {
+        v.handles.finalContextCount = 1;
+      },
+    ],
+    ...[
+      'browserCreated',
+      'contextCloseAttempted',
+      'contextClosed',
+      'browserCloseAttempted',
+      'browserClosed',
+      'finalPageClosed',
+    ].map((key) => [
+      key,
+      (v) => {
+        v.handles[key] = false;
+      },
+    ]),
+    ...[
+      'failures',
+      'skipped',
+      'startupErrors',
+      'cleanupErrors',
+      'stationErrors',
+      'identityErrors',
+      'pageErrors',
+      'blockedRequests',
+    ].map((key) => [
+      key,
+      (v) => {
+        v[key] = ['unexpected'];
+      },
+    ]),
+    [
+      'failed-build',
+      (v) => {
+        v.standalone.status = 'failed';
+      },
+    ],
+    [
+      'wrong-build-artifact',
+      (v) => {
+        v.standalone.artifactSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'wrong-build-source',
+      (v) => {
+        v.standalone.builderSha256 = 'f'.repeat(64);
+      },
+    ],
+    [
+      'wrong-build-site',
+      (v) => {
+        v.standalone.site += '-other';
+      },
+    ],
+    [
+      'foreign-output',
+      (v) => {
+        v.standalone.output += '-other';
+      },
+    ],
+    [
+      'missing-record-module',
+      (v) => {
+        v.standalone.inlinedRecordModules.pop();
+      },
+    ],
+    [
+      'duplicate-record-module',
+      (v) => {
+        v.standalone.inlinedRecordModules[0] = v.standalone.inlinedRecordModules[1];
+      },
+    ],
+    [
+      'missing-record-runtime',
+      (v) => {
+        delete v.standalone.recordRuntimeSha256;
+      },
+    ],
+    [
+      'wrong-record-runtime',
+      (v) => {
+        v.standalone.recordRuntimeSha256 = '0'.repeat(64);
+      },
+    ],
+    [
+      'missing-ink',
+      (v) => {
+        delete v.standalone.inkModuleSha256;
+      },
+    ],
+    [
+      'wrong-ink',
+      (v) => {
+        v.standalone.inkModuleSha256 = '0'.repeat(64);
+      },
+    ],
+    [
+      'separate-record-runtime',
+      (v) => {
+        v.standalone.driftSharesRecordRuntime = false;
+      },
+    ],
+    [
+      'external-controller',
+      (v) => {
+        v.standalone.selfContainedController = false;
+      },
+    ],
+    [
+      'wrong-record-transport',
+      (v) => {
+        v.standalone.recordModuleTransport = 'data';
+      },
+    ],
+    [
+      'wrong-module-transport',
+      (v) => {
+        v.standalone.inlinedModuleTransport = 'data';
+      },
+    ],
+    [
+      'wrong-standalone-digest',
+      (v) => {
+        v.standalone.standaloneSha256 = 'f'.repeat(64);
+      },
+    ],
   ];
   for (const [name, mutate] of mutations) {
-    const value = JSON.parse(JSON.stringify(fixture)); mutate(value); save(value);
+    const value = JSON.parse(JSON.stringify(fixture));
+    mutate(value);
+    save(value);
     assert.throws(() => requireCompleteReport(report), undefined, name);
     controls.push({ name, rejected: true });
   }
   save(fixture);
-  for (const key of ['artifactSha256', 'sourceAssetSha256', 'sourceSha256', 'builderSha256', 'siteDir']) {
+  for (const key of [
+    'artifactSha256',
+    'sourceAssetSha256',
+    'sourceSha256',
+    'builderSha256',
+    'siteDir',
+  ]) {
     assert.throws(() => requireCompleteReport({ ...report, [key]: null }), undefined, key);
     controls.push({ name: `missing-independent-${key}`, rejected: true });
   }
   writeJson(`${output}.build.json`, { ...fixture.standalone, unexpected: true });
   assert.throws(() => requireCompleteReport(report));
   controls.push({ name: 'build-receipt-disagreement', rejected: true });
-  save(fixture); writeFileSync(output, Buffer.concat([bytes, Buffer.from('changed')]));
+  save(fixture);
+  writeFileSync(output, Buffer.concat([bytes, Buffer.from('changed')]));
   assert.throws(() => requireCompleteReport(report));
   controls.push({ name: 'changed-output-bytes', rejected: true });
   // Refresh the outer digest and both receipts so these controls reach the
   // embedded-payload defenses, rather than failing only the whole-file hash.
   for (const [name, changed] of [
-    ['missing-record-payload', bytes.toString().replace('id="standalone-record-module"', 'id="other"')],
-    ['duplicate-record-payload', bytes.toString() + `\n<script type="application/octet-stream" id="standalone-record-module">${recordBytes.toString('base64')}</script>`],
-    ['wrong-record-payload', bytes.toString().replace(recordBytes.toString('base64'), Buffer.from('different record').toString('base64'))],
+    [
+      'missing-record-payload',
+      bytes.toString().replace('id="standalone-record-module"', 'id="other"'),
+    ],
+    [
+      'duplicate-record-payload',
+      bytes.toString() +
+        `\n<script type="application/octet-stream" id="standalone-record-module">${recordBytes.toString('base64')}</script>`,
+    ],
+    [
+      'wrong-record-payload',
+      bytes
+        .toString()
+        .replace(
+          recordBytes.toString('base64'),
+          Buffer.from('different record').toString('base64'),
+        ),
+    ],
     ['missing-ink-payload', bytes.toString().replace('__KAIRO_INK_URL__', '__OTHER_URL__')],
-    ['duplicate-ink-payload', bytes.toString() + `\nwindow.__KAIRO_INK_URL__ = standaloneModuleUrl("${inkBytes.toString('base64')}");`],
-    ['wrong-ink-payload', bytes.toString().replace(inkBytes.toString('base64'), Buffer.from('different ink').toString('base64'))],
+    [
+      'duplicate-ink-payload',
+      bytes.toString() +
+        `\nwindow.__KAIRO_INK_URL__ = standaloneModuleUrl("${inkBytes.toString('base64')}");`,
+    ],
+    [
+      'wrong-ink-payload',
+      bytes
+        .toString()
+        .replace(inkBytes.toString('base64'), Buffer.from('different ink').toString('base64')),
+    ],
   ]) {
     const value = JSON.parse(JSON.stringify(fixture));
     value.standalone.standaloneSha256 = createHash('sha256').update(changed).digest('hex');
-    save(value); writeFileSync(output, changed);
+    save(value);
+    writeFileSync(output, changed);
     assert.throws(() => requireCompleteReport(report), undefined, name);
     controls.push({ name, rejected: true });
   }
   save(fixture);
   writeFileSync(output, bytes);
   for (const file of [path, output, `${output}.build.json`]) {
-    const target = `${file}.saved`; renameSync(file, target);
+    const target = `${file}.saved`;
+    renameSync(file, target);
     assert.throws(() => requireCompleteReport(report));
     symlinkSync(target, file);
     assert.throws(() => requireCompleteReport(report));
-    unlinkSync(file); renameSync(target, file);
+    unlinkSync(file);
+    renameSync(target, file);
     controls.push({ name: `missing-or-symlink-${relative(directory, file)}`, rejected: true });
   }
   requireCompleteReport(report);
-  const gate = batteryGates(out, { KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256 })
-    .find((entry) => entry.name === 'standalone-journey');
-  assert.deepEqual(gate.args, ['prototypes/corridor/tools/verify-journey.mjs', '--evidence-out', join(out, 'standalone-journey')]);
+  const gate = batteryGates(out, { KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256 }).find(
+    (entry) => entry.name === 'standalone-journey',
+  );
+  assert.deepEqual(gate.args, [
+    'prototypes/corridor/tools/verify-journey.mjs',
+    '--evidence-out',
+    join(out, 'standalone-journey'),
+  ]);
   assert.equal(gate.report.artifactSha256, artifactSha256);
-  assert.equal(gate.report.siteDir, null, 'No artifact directory may be inferred when it was not supplied');
-  assert.equal(gate.report.sourceAssetSha256, null, 'No source asset identity may be inferred without a site');
-  for (const [key, file] of [['sourceSha256', 'verify-journey'], ['builderSha256', 'build-standalone']])
-    assert.equal(gate.report[key], createHash('sha256')
-      .update(readFileSync(join(ROOT, `prototypes/corridor/tools/${file}.mjs`))).digest('hex'));
-  writeJson(join(directory, 'controls.json'), { scope: 'Receipt receiver controls only; no browser journey executed', controls });
-  return ['standalone journey requires all twelve stations, pinned build/verifier identities, exact local output and closed silent browser handles'];
+  assert.equal(
+    gate.report.siteDir,
+    null,
+    'No artifact directory may be inferred when it was not supplied',
+  );
+  assert.equal(
+    gate.report.sourceAssetSha256,
+    null,
+    'No source asset identity may be inferred without a site',
+  );
+  for (const [key, file] of [
+    ['sourceSha256', 'verify-journey'],
+    ['builderSha256', 'build-standalone'],
+  ])
+    assert.equal(
+      gate.report[key],
+      createHash('sha256')
+        .update(readFileSync(join(ROOT, `prototypes/corridor/tools/${file}.mjs`)))
+        .digest('hex'),
+    );
+  writeJson(join(directory, 'controls.json'), {
+    scope: 'Receipt receiver controls only; no browser journey executed',
+    controls,
+  });
+  return [
+    'standalone journey requires all twelve stations, pinned build/verifier identities, exact local output and closed silent browser handles',
+  ];
 }
 
 async function main() {

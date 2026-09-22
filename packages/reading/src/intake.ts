@@ -301,7 +301,12 @@ export function normalizeArticleIntake(
     lineage: adapter.lineage,
   };
   const fullReader = selected.body !== null && capabilities['display-body'].status === 'allowed';
-  if (selected.fileReference && (selected.body !== null || selected.canonicalUrl !== null || adapter.lineage.kind !== 'user-supplied')) {
+  if (
+    selected.fileReference &&
+    (selected.body !== null ||
+      selected.canonicalUrl !== null ||
+      adapter.lineage.kind !== 'user-supplied')
+  ) {
     throw new ReadingValidationError('invalid-input', ['fileReference']);
   }
   const article = createArticleVersion(
@@ -320,7 +325,9 @@ export function normalizeArticleIntake(
         }
       : {
           ...base,
-          ...(selected.fileReference ? { kind: 'local-file-reference', fileReference: selected.fileReference } : { kind: 'publisher-site-link' }),
+          ...(selected.fileReference
+            ? { kind: 'local-file-reference', fileReference: selected.fileReference }
+            : { kind: 'publisher-site-link' }),
           capabilities: capabilitiesForLink(capabilities),
           suggestedVocabulary: [],
           body: null,
