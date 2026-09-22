@@ -6,6 +6,17 @@ on:
       - 'prototypes/corridor/**'
       - 'tools/*reference*.mjs'
       - 'corpus/datasets/kanji/kanken.jsonl'
+      - 'prototypes/bunki-sites-v11/public/kotobako-static.json'
+      - 'prototypes/drift/data/wbig.json'
+      - 'apps/app/src/data/generated/drift-words.json'
+      - 'apps/app/src/data/generated/drift-kanji.json'
+      - 'corpus/samples/jmdict/kanjidic_sample.jsonl'
+      - 'tools/fixtures/reference/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/pages-app.yml'
       - '.github/workflows/reference-libraries.yml'
   push:
     branches: [main]
@@ -13,6 +24,17 @@ on:
       - 'prototypes/corridor/**'
       - 'tools/*reference*.mjs'
       - 'corpus/datasets/kanji/kanken.jsonl'
+      - 'prototypes/bunki-sites-v11/public/kotobako-static.json'
+      - 'prototypes/drift/data/wbig.json'
+      - 'apps/app/src/data/generated/drift-words.json'
+      - 'apps/app/src/data/generated/drift-kanji.json'
+      - 'corpus/samples/jmdict/kanjidic_sample.jsonl'
+      - 'tools/fixtures/reference/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/pages-app.yml'
       - '.github/workflows/reference-libraries.yml'
   workflow_dispatch:
 
@@ -34,12 +56,18 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Prepare one canonical artifact for every check
+        run: |
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/reference-site" >> "$GITHUB_ENV"
+          echo "KAIRO_EVIDENCE_DIR=$RUNNER_TEMP/reference-evidence" >> "$GITHUB_ENV"
+          node scripts/build-corridor-site.mjs --out "$RUNNER_TEMP/reference-site"
       - name: Verify complete source coverage and packaging
         run: |
           node --check prototypes/corridor/reference-core.js
           node --check prototypes/corridor/reference-ui.js
           node --check prototypes/corridor/corridor.js
-          node tools/test-reference-core.mjs
+          node tools/test-reference-core.mjs --evidence-out "$RUNNER_TEMP/reference-evidence/core"
+          node --test prototypes/corridor/tools/test-reference-ui.mjs prototypes/corridor/tools/test-skip-ui.mjs prototypes/corridor/tools/test-kanji-capture.mjs prototypes/corridor/tools/test-navigation-returns.mjs
           node tools/build-reference-data.mjs --check
           node prototypes/corridor/tools/test-reference-packaging.mjs
       - name: Verify reference browsing and personal-study isolation
@@ -57,7 +85,7 @@ jobs:
         run: node prototypes/corridor/tools/verify-reference-connections.mjs --shots "$RUNNER_TEMP/connection-shots"
       - name: Walk the complete learner experience with screenshots
         env:
-          EXPERIENCE_OUT: ${{ runner.temp }}/experience-shots
+          KAIRO_EVIDENCE_DIR: ${{ runner.temp }}/experience-shots
         run: |
           if test -f prototypes/corridor/skip-core.js; then
             node prototypes/corridor/tools/verify-experience.mjs --require-skip
@@ -69,6 +97,7 @@ jobs:
         with:
           name: reference-library-browser-evidence
           path: |
+            ${{ runner.temp }}/reference-evidence
             ${{ runner.temp }}/reference-shots
             ${{ runner.temp }}/connection-shots
             ${{ runner.temp }}/experience-shots

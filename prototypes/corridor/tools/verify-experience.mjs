@@ -1,7 +1,7 @@
 /** Whole-user QA: clean context, visible controls, no internal mutators or HTTP mocks.
  * node prototypes/corridor/tools/verify-experience.mjs
- * EXPERIENCE_ROOT=/other/tree/prototypes/corridor EXPERIENCE_OUT=/evidence node ...
- * EXPERIENCE_URL=http://127.0.0.1:3015/ optionally reuses a real server.
+ * KAIRO_SITE_DIR=/verified/site KAIRO_EVIDENCE_DIR=/external/evidence node ...
+ * A bounded regression walk; this is not one of the 36 persistent full-product journeys.
  * --require-skip / EXPERIENCE_REQUIRE_SKIP=1 makes combined SKIP coverage required.
  * Evaluation is READ ONLY: storage/DOM observations, never application interaction.
  */
@@ -9,30 +9,32 @@ import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve, extname, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { resolve, extname, sep } from 'node:path';
 import { createHash } from 'node:crypto';
-const HERE=dirname(fileURLToPath(import.meta.url));
-const ROOT=resolve(process.env.EXPERIENCE_ROOT||resolve(HERE,'..'));
-const OUT=resolve(process.env.EXPERIENCE_OUT||resolve(HERE,'../../../docs/build-evidence/experience'));
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+const ROOT=resolveCorridorSite();
+const OUT=resolveCorridorEvidence();
 const REQUIRE_SKIP=process.argv.includes('--require-skip')||process.env.EXPERIENCE_REQUIRE_SKIP==='1';
 mkdirSync(resolve(OUT,'screenshots'),{recursive:true});
 const started=new Date().toISOString();
 const runId=started.replace(/[^0-9]/g,'').slice(0,14);
 const checks=[],shots=[],errors=[],requests=[],observations=[];
 const result={started,root:ROOT,method:'One clean primary context; normal Playwright input only. Read-only evaluate for evidence. No state staging. No fake HTTP responses.',checks,screenshots:shots,pageErrors:errors,observations,requiredSkip:REQUIRE_SKIP};
-try{result.revision=execFileSync('git',['-C',ROOT,'rev-parse','HEAD'],{encoding:'utf8'}).trim();result.dirty=execFileSync('git',['-C',ROOT,'status','--short'],{encoding:'utf8'});}catch{}
+const identity=JSON.parse(readFileSync(resolve(ROOT,'build-identity.json'),'utf8'));
+Object.assign(result,{revision:identity.gitSha,sourceDirty:identity.sourceDirty,artifactSha256:identity.artifactSha256,sourceAssetSha256:identity.sourceAssetSha256});
 const trackedAssets=['index.html','corridor.js','corridor.css','drift-layer.js','drift-layer.css','reference-ui.js','reference-ui.css','reference-core.js','data/share_alike/reference-extra.json'];
 result.assetHashes=Object.fromEntries(trackedAssets.map(f=>[f,createHash('sha256').update(readFileSync(resolve(ROOT,f))).digest('hex')]));
 let server;
-let base=process.env.EXPERIENCE_URL;
+let base;
 if(!base){const mime={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png'};
 server=createServer((req,res)=>{const clean=decodeURIComponent((req.url||'/').split('?')[0]);const f=resolve(ROOT,'.'+(clean==='/'?'/index.html':clean));if(!f.startsWith(ROOT+sep)||!existsSync(f)){res.writeHead(404).end();return;}res.writeHead(200,{'content-type':mime[extname(f)]||'application/octet-stream'});res.end(readFileSync(f));});await new Promise(r=>server.listen(0,'127.0.0.1',r));base=`http://127.0.0.1:${server.address().port}/`;}
 result.url=base;
 const executablePath=[process.env.CHROMIUM_PATH,'/home/user/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome','/opt/pw-browsers/chromium-1194/chrome-linux/chrome','/usr/bin/chromium'].filter(Boolean).find(existsSync);
 const browser=await chromium.launch({executablePath,args:['--no-sandbox']});
 const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,acceptDownloads:true});
+await silenceBrowserAudio(context);
 const page=await context.newPage();page.setDefaultTimeout(6500);
 page.on('pageerror',e=>errors.push({at:new Date().toISOString(),error:String(e)}));
 page.on('request',r=>{if(/anthropic|openai|generativelanguage/.test(r.url()))requests.push({url:r.url(),method:r.method()});});
@@ -43,7 +45,8 @@ const visible=async s=>await page.locator(s).first().isVisible().catch(()=>false
 const click=async s=>{await page.locator(s).first().click();await sleep(280);};
 const role=async name=>{await page.getByRole('button',{name}).first().click();await sleep(280);};
 const text=()=>page.locator('body').innerText();
-const state=()=>page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('kairo-corridor-v1')||'{}');return Object.fromEntries(['taken','srs','revlog','obslog','lessonsDone','mockDone','lists','suspended'].map(k=>[k,s[k]??(k==='taken'||k.endsWith('log')?[]:{})]));});
+const state=async()=>{const s=await readAppRecord(page);return Object.fromEntries(['taken','srs','revlog','obslog','lessonsDone','mockDone','assessmentLibrary','lists','suspended'].map(k=>[k,s[k]??(k==='taken'||k.endsWith('log')?[]:{})]));};
+const submittedAttempts=s=>(s.assessmentLibrary?.attempts||[]).filter(attempt=>attempt.status==='submitted');
 const debt=s=>JSON.stringify({taken:s.taken,srs:s.srs,revlog:s.revlog,suspended:s.suspended});
 const flush=()=>writeFileSync(resolve(OUT,'results.json'),JSON.stringify({...result,updated:new Date().toISOString()},null,2)+'\n');
 function note(id,status,expected,observed,extra={}){const c={id,status,expected,observed,...extra};checks.push(c);console.log(`${status.toUpperCase()} ${id}: ${observed}`);flush();return c;}
@@ -68,7 +71,7 @@ async function recoverShelf(){
 async function closeSheet(){await sleep(800);await click('#sheet-close');await sleep(350);}
 async function sheetHop(name){await role(name);await sleep(850);}
 async function noOverflow(id){await check(id,'No horizontal document overflow',async()=>{const d=await page.evaluate(()=>({w:innerWidth,sw:document.documentElement.scrollWidth}));assert.ok(d.sw<=d.w+1,JSON.stringify(d));return JSON.stringify(d);});}
-let initial,captured,afterReview,lessonBefore,mockBefore;
+let initial,captured,afterReview,lessonBefore,mockBefore,savedMockAttempt;
 try{
  await page.goto(base,{waitUntil:'load'});await page.waitForSelector('#drift-layer.active',{timeout:30000});await sleep(1600);initial=await state();
  await check('E01-clean','Primary starts with zero saved, scheduled or reviewed items',()=>{assert.equal(initial.taken.length,0);assert.equal(Object.keys(initial.srs).length,0);assert.equal(initial.revlog.length,0);return 'Clean actual app, no init scripts or staged store';});
@@ -173,7 +176,16 @@ try{
   await click('#mock-next');await click('#mock-prev');await check('E09-answer-persists-back','Previous returns to original chosen answer',async()=>assert.equal(await page.locator('[data-mock-opt="0"]').getAttribute('aria-pressed'),'true'));
   for(let i=0;i<40&&!await visible('#mock-done');i++){await click('[data-mock-opt="0"]');await click('#mock-next');}
   await page.locator('#mock-done').waitFor();await shot('mock-results','Submitted paper has score, explanations and deliberate optional enrollment');
-  await check('E09-no-auto-enrollment','Paper submission records score without altering deck or scheduler',async()=>{const s=await state();assert.equal(debt(s),debt(mockBefore));assert.ok(Object.keys(s.mockDone).length>Object.keys(mockBefore.mockDone).length);return `Deck remains ${s.taken.length}; completed papers ${Object.keys(s.mockDone).length}`;});await click('#mock-done');await click('#back');
+  await check('E09-no-auto-enrollment','Paper submission retains a complete unreviewed practice attempt without altering deck or scheduler',async()=>{
+   const s=await waitForAppRecord(page,record=>submittedAttempts(record).length===submittedAttempts(mockBefore).length+1);
+   assert.equal(debt(s),debt(mockBefore));assert.deepEqual(s.mockDone,mockBefore.mockDone,'Legacy score summaries are preserved, not overwritten');
+   savedMockAttempt=submittedAttempts(s).at(-1);assert.ok(savedMockAttempt.answers.length>0);
+   assert.ok(savedMockAttempt.answers.every(answer=>answer.response.kind!=='unanswered'&&answer.lastResponseFactId));
+   const storedForm=s.assessmentLibrary.forms.find(entry=>entry.form.revisionId===savedMockAttempt.form.revisionId)?.form;
+   assert.ok(storedForm);assert.equal(storedForm.sha256,savedMockAttempt.form.sha256);
+   assert.equal(savedMockAttempt.editorialAtStart.status,'unreviewed');
+   return `Deck remains ${s.taken.length}; ${savedMockAttempt.answers.length} responses and exact form retained in ${submittedAttempts(s).length} submitted practice attempt`;
+  });await click('#mock-done');await click('#back');
  });
  await segment('E10-reference',async()=>{
   const before=await state();await click('#levels-link');await page.locator('#reference-library').waitFor();await shot('reference-overview','Reference includes complete bundled level collections independently of lessons');
@@ -206,11 +218,11 @@ try{
   await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.ok((await text()).includes('the bookshelf'));assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
   await page.keyboard.press('Tab');await shot('keyboard-focus-dark','Keyboard focus remains perceivable in dark palette');await page.setViewportSize({width:1280,height:900});await shot('shelf-desktop-dark','Desktop dark shelf has coherent hierarchy');await noOverflow('E19-shelf-desktop');await page.setViewportSize({width:390,height:844});
   await page.reload({waitUntil:'load'});await sleep(1200);await check('E18-palette-reload','Chosen dark world survives reload',async()=>assert.equal(await page.locator('html').getAttribute('data-theme'),'yoru'));await recoverShelf();await click('#tray');await shot('study-reloaded','Personal evidence and cards survive normal reload');
-  await check('E18-state-reload','Review, lesson, mock and chosen card persist',async()=>{const s=await state();assert.equal(s.taken.length,1);assert.equal(s.revlog.length,afterReview.revlog.length);assert.ok(Object.keys(s.lessonsDone).length);assert.ok(Object.keys(s.mockDone).length);return `1 chosen item, ${s.revlog.length} review, ${Object.keys(s.lessonsDone).length} lesson, ${Object.keys(s.mockDone).length} mock`;});await click('#back');
+  await check('E18-state-reload','Review, lesson, exact submitted practice attempt and chosen card persist',async()=>{const s=await state();assert.equal(s.taken.length,1);assert.equal(s.revlog.length,afterReview.revlog.length);assert.ok(Object.keys(s.lessonsDone).length);assert.ok(savedMockAttempt);assert.deepEqual(submittedAttempts(s).find(attempt=>attempt.attemptId===savedMockAttempt.attemptId),savedMockAttempt);return `1 chosen item, ${s.revlog.length} review, ${Object.keys(s.lessonsDone).length} lesson, ${submittedAttempts(s).length} exact submitted practice attempt`;});await click('#back');
  });
  await segment('E17-tutor-offline',async()=>{
-  await click('#ai-link');await shot('tutor-unconfigured','No key means honest setup, not a fabricated conversation');const before=await state();await click('#ai-key-save');await check('E17-empty-key','Empty tutor-key action cannot enable AI or alter learning state',async()=>{assert.equal(debt(await state()),debt(before));assert.ok(await visible('#ai-link'));assert.equal(await page.evaluate(()=>localStorage.getItem('kairo-ai-key')),null);assert.equal(requests.length,0);return 'Empty save deliberately returns to shelf; key remains absent, no provider request or fabricated response';});
-  await click('#ai-link');await context.setOffline(true);await click('#ai-key-save');await click('#ai-link');await shot('tutor-offline-no-key','Offline/unconfigured tutor stays safe; no provider reliability claim');await check('E17-offline-safe','No-key offline tutor action leaves canonical state unchanged',async()=>assert.equal(debt(await state()),debt(before)));await click('#back');
+  await click('#ai-link');await shot('tutor-unconfigured','No key means honest setup, not a fabricated conversation');const before=await state();await click('#ai-key-save');await check('E17-empty-key','Empty tutor-key action cannot enable AI or alter learning state',async()=>{assert.equal(debt(await state()),debt(before));assert.ok(await visible('#ai-key-save'));assert.equal(await page.locator('#ai-key-input').inputValue(),'');assert.equal(await page.locator('#chat-send').isDisabled(),true);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-ai-provider-v1')).credential.key),'');assert.equal(await page.evaluate(()=>localStorage.getItem('kairo-ai-key')),null);assert.equal(requests.length,0);return 'Device settings save returns to the tutor with an empty bound credential; no provider request or fabricated response';});
+  await context.setOffline(true);await click('#ai-key-save');await shot('tutor-offline-no-key','Offline/unconfigured tutor stays safe; no provider reliability claim');await check('E17-offline-safe','No-key offline tutor action leaves canonical state unchanged',async()=>{assert.equal(debt(await state()),debt(before));assert.equal(await page.locator('#ai-key-input').inputValue(),'');assert.equal(await page.locator('#chat-send').isDisabled(),true);assert.equal(requests.length,0);});await click('#back');
   await click('#levels-link');await click('[data-reference-collection="jlpt:N3"]');await page.locator('#reference-search').fill('water');await shot('offline-reference-warm','Warm loaded reference remains usable while network is disabled');await check('E18-warm-offline','Reference search works offline from already loaded assets',async()=>assert.ok(await visible('#reference-results-count')));
   await context.setOffline(false);await click('#reference-back');await click('#back');await click('#theme-seal');await page.locator('.world-picker .world-stone').nth(5).click();await sleep(400);
   await page.setViewportSize({width:320,height:844});await noOverflow('E19-shelf-320');await shot('shelf-narrow-final','Narrow header retains 44px controls and unwrapped language labels');await check('E19-header-44','At 320px each language segment has a 44px touch height and a single line',async()=>{const dims=await page.locator('#lang button').evaluateAll(es=>es.map(e=>({text:e.textContent,h:e.getBoundingClientRect().height,whiteSpace:getComputedStyle(e).whiteSpace})));assert.ok(dims.length===2);for(const d of dims){assert.ok(d.h>=44);assert.equal(d.whiteSpace,'nowrap');}return JSON.stringify(dims);});await page.setViewportSize({width:390,height:844});await click('#back');await page.locator('#drift-layer.active').waitFor();await shot('home-return','Whole continuous journey closes at Drift with personal state retained');await check('E18-home','Return home succeeds after learning/reference/settings/offline work',async()=>assert.ok(await visible('#drift-layer.active')));
