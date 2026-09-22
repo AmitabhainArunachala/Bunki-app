@@ -2,6 +2,8 @@
  * Corpus-exhaustiveness, provenance, purity and query contract tests.
  * Run: node tools/test-reference-core.mjs
  * Optionally verify raw metadata parity with --archive /path/to/archive.zip.
+ * Verification never rewrites committed evidence. --evidence-out /external/dir
+ * emits proposed evidence for review, then still checks the committed files.
  *
  * Uses only committed local sources. No network or inferred classifications.
  * The large JMdict-v2 dictionary has no JLPT field and is not graded here.
@@ -25,8 +27,15 @@ import {
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CORE_PATH = resolve(ROOT, 'prototypes/corridor/reference-core.js');
-const COVERAGE_PATH = resolve(ROOT, 'docs/build-evidence/reference/coverage.json');
-const RELATIONSHIPS_PATH = resolve(ROOT, 'docs/build-evidence/reference/relationships.json');
+const argument = (flag) => {
+  const index = process.argv.indexOf(flag);
+  if (index < 0) return null;
+  assert(process.argv[index + 1] && !process.argv[index + 1].startsWith('--'), `${flag} requires a path`);
+  return process.argv[index + 1];
+};
+const COVERAGE_PATH = resolve(argument('--coverage') || resolve(ROOT, 'tools/fixtures/reference/coverage.json'));
+const RELATIONSHIPS_PATH = resolve(argument('--relationships') || resolve(ROOT, 'tools/fixtures/reference/relationships.json'));
+const EVIDENCE_OUT = argument('--evidence-out');
 const read = (path) => readFileSync(resolve(ROOT, path), 'utf8');
 const json = (path) => JSON.parse(read(path));
 const jsonl = (path) =>
@@ -79,10 +88,12 @@ const byId = new Map(catalog.collections.map((collection) => [collection.id, col
 const membership = new Map(
   catalog.collections.map((collection) => [
     collection.id,
-    new Map(collection.entries.map((entry) => [entry.id, entry])),
+    new Map(collection.entries.map((entry) => [entry.key, entry])),
   ]),
 );
-const at = (collectionId, entryId) => membership.get(collectionId)?.get(entryId);
+const at = (collectionId, entryId, reading) => membership.get(collectionId)?.get(
+  collectionId.startsWith('jlpt:') ? JSON.stringify([entryId, reading ?? '']) : entryId,
+);
 const expectedLevel = (value) =>
   value == null || value === ''
     ? null
@@ -101,25 +112,25 @@ test('Every dictionary and graded-word row reaches a labelled or unknown collect
     for (const [id, row] of Object.entries(input[source])) {
       const level = expectedLevel(row.jlpt);
       const relevant = catalog.collections.filter(
-        (collection) => collection.family === 'jlpt' && at(collection.id, id),
+        (collection) => collection.family === 'jlpt' && at(collection.id, id, row.r),
       );
       assert(relevant.length, `${source}:${id} was dropped`);
       if (level) {
-        const entry = at(`jlpt:${level}`, id);
+        const entry = at(`jlpt:${level}`, id, row.r);
         assert(entry, `${source}:${id}:${level} was dropped`);
         assert(entry.levelSources.some((tag) => tag.source === source && tag.level === level));
       } else {
-        assert(relevant.every((collection) => at(collection.id, id).sources.includes(source)));
+        assert(relevant.every((collection) => at(collection.id, id, row.r).sources.includes(source)));
       }
     }
   }
 });
 
 test('Every wbig/drift word and kotobako vocabulary classification is represented', () => {
-  for (const [id, , , level] of wbig) assert(at(`jlpt:N${level}`, id), id);
-  for (const [id, , , level] of json(sourcePaths.driftWords)) assert(at(`jlpt:N${level}`, id), id);
+  for (const [id, reading, , level] of wbig) assert(at(`jlpt:N${level}`, id, reading), id);
+  for (const [id, reading, , level] of json(sourcePaths.driftWords)) assert(at(`jlpt:N${level}`, id, reading), id);
   for (const row of kotobako.vocab) {
-    if (row.jlpt) assert(at(`jlpt:${row.jlpt}`, row.word), `${row.id}:${row.jlpt}`);
+    if (row.jlpt) assert(at(`jlpt:${row.jlpt}`, row.word, row.reading), `${row.id}:${row.jlpt}`);
   }
   assert.deepEqual(
     committed.extraWords,
@@ -145,7 +156,7 @@ test('Every wbig/drift word and kotobako vocabulary classification is represente
     'Do not discard an attestation just because another source has the same level',
   );
   for (const [id, reading, meanings, level, sourceId, source] of committed.extraWords) {
-    const entry = at(`jlpt:${expectedLevel(level)}`, id);
+    const entry = at(`jlpt:${expectedLevel(level)}`, id, reading);
     assert(
       entry.levelSources.some(
         (tag) =>
@@ -172,7 +183,7 @@ test('Every boot kanji, grade fact and JLPT metadata row is accounted for', () =
     assert(at(`kanken:${row.kk || 'unknown'}`, id), id);
     assert(
       catalog.collections.some(
-        (collection) => collection.family === 'jlpt-kanji' && at(collection.id, id),
+        (collection) => collection.family === 'jlpt-kanji' && at(collection.id, id, row.r),
       ),
     );
   }
@@ -236,11 +247,11 @@ test('Exact membership sets match the independently calculated all-source union'
     expected.get(key).add(id);
   };
   for (const source of ['dict', 'words']) {
-    for (const [id, row] of Object.entries(input[source])) add('jlpt', expectedLevel(row.jlpt), id);
+    for (const [id, row] of Object.entries(input[source])) add('jlpt', expectedLevel(row.jlpt), JSON.stringify([id, row.r ?? '']));
   }
-  for (const row of kotobako.vocab) add('jlpt', row.jlpt, row.word);
-  for (const [id, , , level] of json(sourcePaths.driftWords)) add('jlpt', `N${level}`, id);
-  for (const [id, , , level] of wbig) add('jlpt', `N${level}`, id);
+  for (const row of kotobako.vocab) add('jlpt', row.jlpt, JSON.stringify([row.word, row.reading ?? '']));
+  for (const [id, reading, , level] of json(sourcePaths.driftWords)) add('jlpt', `N${level}`, JSON.stringify([id, reading ?? '']));
+  for (const [id, reading, , level] of wbig) add('jlpt', `N${level}`, JSON.stringify([id, reading ?? '']));
   for (const [id, row] of Object.entries(input.kanji)) {
     add('kanken', row.kk, id);
     add('jlpt-kanji', expectedLevel(row.jlpt), id);
@@ -261,7 +272,7 @@ test('Exact membership sets match the independently calculated all-source union'
       );
     }
     assert.equal(collection.count, collection.entries.length);
-    assert.equal(new Set(collection.entries.map((entry) => entry.id)).size, collection.count);
+    assert.equal(new Set(collection.entries.map((entry) => entry.key)).size, collection.count);
   }
 });
 
@@ -335,7 +346,7 @@ test('Dictionary links retain all exact candidates and enforce written-form read
   for (const [id, reading, sequences] of committed.wordLinks) {
     const entry = catalog.collections
       .filter((c) => c.family === 'jlpt')
-      .map((c) => at(c.id, id))
+      .map((c) => at(c.id, id, reading))
       .find(Boolean);
     assert(entry.readings.includes(reading));
     assert(
@@ -401,11 +412,11 @@ test('Offline checks reject accidental pinned metadata corruption rather than bl
 const referenceEntries = [
   ...new Map(
     catalog.collections.flatMap((collection) =>
-      collection.entries.map((entry) => [`${entry.type}:${entry.id}`, entry]),
+      collection.entries.map((entry) => [`${entry.type}:${entry.key}`, entry]),
     ),
   ).values(),
 ];
-const referenceId = (entry) => `${entry.type}:${entry.id}`;
+const referenceId = (entry) => `${entry.type}:${entry.key}`;
 const detailTargets = new Map();
 const detailHashes = {};
 test('Every dictionary candidate has an actual correctly routed canonical detail target', () => {
@@ -453,10 +464,10 @@ test('Reference-to-runtime and source word-to-kanji edges have no dangling canon
   for (const entry of referenceEntries) {
     const exists =
       entry.type === 'word'
-        ? Object.hasOwn(input.dict, entry.id) || Object.hasOwn(input.words, entry.id)
+        ? !!entry.reading && (input.dict[entry.id] || input.words[entry.id])?.r === entry.reading
         : Object.hasOwn(input.kanji, entry.id) && !entry.missingGlyph;
     assert.equal(!!entry.canonicalTarget, exists);
-    if (exists) assert.deepEqual(entry.canonicalTarget, { type: entry.type, id: entry.id });
+    if (exists) assert.deepEqual(entry.canonicalTarget, { type: entry.type, id: entry.id, ...(entry.type === 'word' ? { reading: entry.reading } : {}) });
     for (const link of entry.kanjiLinks) {
       assert.equal(!!link.canonicalTarget, Object.hasOwn(input.kanji, link.id));
       if (link.referenceId) assert(all.has(`kanji:${link.referenceId}`));
@@ -473,7 +484,7 @@ test('Reference-to-runtime and source word-to-kanji edges have no dangling canon
   }
   for (const source of ['dict', 'words']) {
     for (const [id, row] of Object.entries(input[source])) {
-      const actual = all.get(`word:${id}`).kanjiLinks.filter((link) => link.source === source);
+      const actual = all.get(`word:${JSON.stringify([id, row.r ?? ''])}`).kanjiLinks.filter((link) => link.source === source);
       assert.deepEqual(
         actual.map((link) => link.id),
         row.k || [],
@@ -493,7 +504,7 @@ test('Reference-to-runtime and source word-to-kanji edges have no dangling canon
 test('Known source gaps remain honest; no synthetic N3 kanji or inferred levels', () => {
   assert.equal(Object.values(input.dict).filter((row) => row.jlpt === 'N1').length, 0);
   assert.equal(Object.values(input.words).filter((row) => row.jlpt === 1).length, 2274);
-  assert.equal(byId.get('jlpt:N1').count, 2279);
+  assert.equal(new Set(byId.get('jlpt:N1').entries.map(entry => entry.id)).size, 2279, 'Preserve all original printed forms while separating readings');
   assert.equal(byId.get('jlpt-kanji:N3').count, 0);
   assert(byId.get('kanken:1/準1級').special);
   assert(byId.get('kanken:配当外').special);
@@ -517,7 +528,7 @@ test('All collection pages concatenate to every entry with no cap or duplicate',
     assert.deepEqual(collected, collection.entries, collection.id);
   }
   const n1 = byId.get('jlpt:N1');
-  assert.equal(core.search(n1, '', { pageSize: 100000 }).entries.length, 2279);
+  assert.equal(core.search(n1, '', { pageSize: 100000 }).entries.length, n1.count);
 });
 
 test('Each collection is deterministically reading-sorted; no sort mutates its input', () => {
@@ -543,7 +554,7 @@ test('Source disagreements, unknown/special levels and metadata gaps in independ
       未知: { jlpt: 'N9' },
     },
     words: {
-      会う: { r: 'アウ', g: 'encounter', jlpt: 1 },
+      会う: { r: 'あう', g: 'encounter', jlpt: 1 },
       追加: { r: 'ついか', g: 'added', jlpt: 2 },
     },
     kanji: {
@@ -737,7 +748,7 @@ const relationshipEvidence = {
   policy: {
     ...catalog.policy,
     canonicalTargets:
-      'Only existing exact-key runtime word/kanji records are canonical targets. Null means reference-only, not a dangling link. JMdict candidates are separate, restriction-checked relationships, not asserted sense identity.',
+      'Only runtime-resolved exact form/reading words and exact kanji records are canonical targets. Null means reference-only, not a dangling link. JMdict candidates are separate, restriction-checked relationships, not asserted sense identity.',
     wordKanji:
       'Only explicit dict.k, words.k and kotobako containsKanji source relationships. No spelling decomposition, normalized identity, or exam-level inheritance.',
   },
@@ -803,7 +814,7 @@ const relationshipEvidence = {
   },
   nodes: referenceEntries.map((e) => [
     referenceId(e),
-    e.canonicalTarget ? referenceId(e) : null,
+    e.canonicalTarget ? `${e.type}:${e.id}` : null,
     memberIds.get(referenceId(e)),
     e.missingGlyph,
     e.missingReading,
@@ -822,7 +833,7 @@ const relationshipEvidence = {
   ),
   wordKanji: wordKanjiEdges,
   dictionaryCandidates: committed.wordLinks.map(([id, reading, seqs]) => [
-    `word:${id}`,
+    `word:${JSON.stringify([id, reading])}`,
     reading,
     seqs,
   ]),
@@ -834,9 +845,20 @@ const relationshipEvidence = {
     row.kanken_level,
   ]),
 };
-mkdirSync(dirname(COVERAGE_PATH), { recursive: true });
-writeFileSync(COVERAGE_PATH, `${JSON.stringify(evidence, null, 2)}\n`);
-writeFileSync(RELATIONSHIPS_PATH, `${JSON.stringify(relationshipEvidence)}\n`);
+const evidenceBytes = `${JSON.stringify(evidence, null, 2)}\n`;
+const relationshipBytes = `${JSON.stringify(relationshipEvidence)}\n`;
+if (EVIDENCE_OUT) {
+  const destination = resolve(EVIDENCE_OUT);
+  assert(destination !== ROOT && !destination.startsWith(`${ROOT}/`), 'Evidence output must be outside the repository');
+  mkdirSync(destination, { recursive: true });
+  writeFileSync(resolve(destination, 'coverage.json'), evidenceBytes);
+  writeFileSync(resolve(destination, 'relationships.json'), relationshipBytes);
+  console.log(`Proposed evidence emitted to ${destination}; committed evidence must still match.`);
+}
+for (const [path, expected] of [[COVERAGE_PATH, evidenceBytes], [RELATIONSHIPS_PATH, relationshipBytes]]) {
+  const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
+  assert.equal(digest(readFileSync(path)), digest(expected), `${path} is stale. Review generated evidence and update it deliberately; verification does not rewrite it.`);
+}
 console.log(`\n${testCount} reference-core tests passed.`);
 console.log(
   JSON.stringify(

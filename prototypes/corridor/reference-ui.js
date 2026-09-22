@@ -36,15 +36,31 @@
     };
     const collections = catalog.collections;
     const entriesByKey = new Map();
+    const entriesByPrinted = new Map();
     for (const collection of collections) {
-      for (const entry of collection.entries) entriesByKey.set(`${entry.type || collection.kind}:${entry.id}`, entry);
+      for (const entry of collection.entries) {
+        const type = entry.type || collection.kind;
+        const key = `${type}:${entry.key ?? entry.id}`;
+        entriesByKey.set(key, entry);
+        const printed = `${type}:${entry.id}`;
+        if (!entriesByPrinted.has(printed)) entriesByPrinted.set(printed, new Map());
+        entriesByPrinted.get(printed).set(key, entry);
+      }
     }
     const headwordOrder = new Map();
     const current = () => collections.find((item) => item.id === state.collectionId);
     const entryType = (entry, collection) => entry.type || collection.kind;
-    const studySet = () => new Set(getTaken().map((item) => `${item.t}:${item.id}`));
+    const studySet = () => getTaken();
+    const isInStudy = (entry, taken) => {
+      const target = entry.canonicalTarget;
+      if (!target) return false;
+      return taken.some((item) => item.t === target.type && item.id === target.id
+        && (target.type !== 'word' || ((!item.cueReading || item.cueReading === target.reading)
+          && (!item.entrySeq || (entry.dictionaryLinks || []).some((link) =>
+            link.reading === target.reading && link.candidates.includes(String(item.entrySeq)))))));
+    };
     const inStudy = (collection, taken) =>
-      collection.entries.filter((entry) => taken.has(`${entryType(entry, collection)}:${entry.id}`)).length;
+      collection.entries.filter((entry) => isInStudy(entry, taken)).length;
     const focus = (id) => {
       requestAnimationFrame(() => document.getElementById(id)?.focus({ preventScroll: true }));
     };
@@ -387,11 +403,12 @@
         const type = entryType(entry, collection);
         const item = node('div', 'reference-list-item');
         item.setAttribute('role', 'listitem');
-        const row = button(`reference-entry-${encodeURIComponent(collection.id)}-${encodeURIComponent(entry.id)}`, null, () => {
+        const row = button(`reference-entry-${encodeURIComponent(collection.id)}-${encodeURIComponent(entry.key ?? entry.id)}`, null, () => {
           state.scroll = window.scrollY;
           onOpen({ ...entry, type }, row);
         }, 'reference-entry');
         row.dataset.entryId = entry.id;
+        row.dataset.referenceKey = entry.key ?? entry.id;
         row.dataset.entryType = type;
         row.append(node('span', 'reference-entry-number', number(result.start + index)));
         const content = node('span', 'reference-entry-content');
@@ -405,7 +422,7 @@
         if (entry.conflicts?.[collection.family] || (entry.conflict && !entry.conflicts)) {
           content.append(node('span', 'reference-entry-source', `${tx('級タグに相違', 'Level tags differ')} · ${(entry.levelSources || []).filter((source) => !source.family || source.family === collection.family).map((source) => `${source.source}: ${source.level}`).join(' · ')}`));
         }
-        if (taken.has(`${type}:${entry.id}`)) {
+        if (isInStudy(entry, taken)) {
           content.append(node('span', 'reference-entry-saved', tx('My Study に登録', 'In My Study')));
         }
         const arrow = node('span', 'reference-entry-arrow', '›');
@@ -485,7 +502,12 @@
     return {
       state,
       back,
-      entry: (type, id) => entriesByKey.get(`${type}:${id}`) || null,
+      entry: (type, key) => {
+        const exact = entriesByKey.get(`${type}:${key}`);
+        if (exact) return exact;
+        const matches = entriesByPrinted.get(`${type}:${key}`);
+        return matches?.size === 1 ? matches.values().next().value : null;
+      },
       locationName: () => current() ? collectionName(current()) : tx('参考書庫', 'Reference library'),
       open(id) {
         const collection = collections.find((item) => item.id === id);

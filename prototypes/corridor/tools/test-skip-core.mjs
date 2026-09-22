@@ -300,11 +300,15 @@ test('optional raw pinned archive reproduces byte-for-byte sidecar and preserves
 }, () => {
   const archive = process.argv[archiveIndex + 1];
   assert.ok(archive, '--archive requires a file');
-  const result = spawnSync('python', [
+  const corpusPython = process.env.KAIRO_CORPUS_PYTHON || 'python3';
+  const pythonOptions = { encoding: 'utf8', timeout: 120_000, killSignal: 'SIGKILL' };
+  console.log(`Raw SKIP parity interpreter: ${corpusPython}; timeout: ${pythonOptions.timeout} ms per call.`);
+  const result = spawnSync(corpusPython, [
     resolve(HERE, 'build-skip-data.py'), '--archive', archive, '--check',
-  ], { encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const parity = spawnSync('python', ['-c', `
+  ], pythonOptions);
+  assert.ifError(result.error);
+  assert.equal(result.status, 0, result.stderr || result.stdout || `${corpusPython} ended with signal ${result.signal}`);
+  const parity = spawnSync(corpusPython, ['-c', `
 import sys, json, zipfile
 from pathlib import Path
 root = Path(sys.argv[1])
@@ -330,7 +334,8 @@ for char in source['characters']:
     assert entry['meanings'] == list(dict.fromkeys(stripped['meanings']))
     assert entry['readings']['nanori'] == list(dict.fromkeys(stripped['nanori']))
 print('All raw SKIP values/categories and fallback text match; stripped allowlist is intact.')
-`, resolve(HERE, '../../..'), archive], { encoding: 'utf8' });
-  assert.equal(parity.status, 0, parity.stderr || parity.stdout);
+`, resolve(HERE, '../../..'), archive], pythonOptions);
+  assert.ifError(parity.error);
+  assert.equal(parity.status, 0, parity.stderr || parity.stdout || `${corpusPython} ended with signal ${parity.signal}`);
   console.log(parity.stdout.trim());
 });

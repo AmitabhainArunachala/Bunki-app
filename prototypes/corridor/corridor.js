@@ -3484,7 +3484,7 @@ async function boot() {
     if (!res.ok) throw new Error(`data/articles/index.json → ${res.status}`);
     return res.json();
   };
-  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin, referenceExtra] =
+  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin] =
     await Promise.all([
       loadArticleIndex(),
       ...DATA.safe.map((n) => load('proprietary_safe', n)),
@@ -3492,12 +3492,6 @@ async function boot() {
       ...DATA.orig.map((n) => load('original', n)),
       bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
       bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
-      // Reference-only data never changes the teaching or study populations.
-      // A missing optional asset must not prevent the other rooms booting.
-      load('share_alike', 'reference-extra').catch((error) => {
-        referenceExtraError = error;
-        return null;
-      }),
     ]);
 
   // The shelf boots from a light index; each article's text + tokens live in
