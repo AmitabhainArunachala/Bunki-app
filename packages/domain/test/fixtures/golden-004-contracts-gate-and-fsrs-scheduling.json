@@ -53,7 +53,10 @@
       "skill": "form_to_meaning",
       "cueModality": "text",
       "responseModality": "choice",
-      "acceptedAnswers": ["branching", "a fork in the road"],
+      "acceptedAnswers": [
+        "branching",
+        "a fork in the road"
+      ],
       "hintPolicy": {
         "hintsAllowed": true,
         "maxHints": 1
@@ -126,7 +129,9 @@
       "skill": "orthography_to_reading",
       "cueModality": "text",
       "responseModality": "text",
-      "acceptedAnswers": ["ぶんき"],
+      "acceptedAnswers": [
+        "ぶんき"
+      ],
       "hintPolicy": {
         "hintsAllowed": false,
         "maxHints": 0
@@ -207,7 +212,9 @@
       "occurredAt": "2026-07-27T09:12:00.000Z",
       "idempotencyKey": "exposure:experience-0401",
       "type": "ExposureLogged",
-      "componentIds": ["kc:分岐"],
+      "componentIds": [
+        "kc:分岐"
+      ],
       "experienceId": "experience-0401",
       "tier": "D"
     },
@@ -339,7 +346,9 @@
             "origin": "user"
           }
         ],
-        "encounterIds": ["encounter-0401"],
+        "encounterIds": [
+          "encounter-0401"
+        ],
         "candidateIds": [],
         "acceptedCandidateIds": [],
         "lifecycle": "active",
@@ -493,9 +502,10 @@
         "type": "ReviewGraded",
         "contractId": "contract-bunki-meaning",
         "admitted": false,
-        "reason": "thread_not_promotion_active",
+        "reason": "response_unverified",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:01:00.000Z"
       },
       {
@@ -503,29 +513,32 @@
         "type": "ReviewGraded",
         "contractId": "contract-bunki-meaning",
         "admitted": false,
-        "reason": "thread_not_promotion_active",
+        "reason": "response_unverified",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:03:00.000Z"
       },
       {
         "eventId": "evt-0409",
         "type": "ReviewGraded",
         "contractId": "contract-bunki-meaning",
-        "admitted": true,
-        "reason": null,
-        "effectiveGrade": "good",
+        "admitted": false,
+        "reason": "response_unverified",
+        "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:05:00.000Z"
       },
       {
         "eventId": "evt-0410",
         "type": "ReviewGraded",
         "contractId": "contract-bunki-reading",
-        "admitted": true,
-        "reason": null,
-        "effectiveGrade": "again",
-        "forcedByReveal": true,
+        "admitted": false,
+        "reason": "response_unverified",
+        "effectiveGrade": null,
+        "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:06:00.000Z"
       },
       {
@@ -536,6 +549,7 @@
         "reason": "lookup_is_friction_not_a_grade",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:10:00.000Z"
       },
       {
@@ -546,6 +560,7 @@
         "reason": "exposure_is_never_retrieval",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:12:00.000Z"
       },
       {
@@ -553,9 +568,10 @@
         "type": "ReviewGraded",
         "contractId": "contract-bunki-production",
         "admitted": false,
-        "reason": "skill_not_activated_by_promotion",
+        "reason": "response_unverified",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T09:15:00.000Z"
       },
       {
@@ -563,39 +579,43 @@
         "type": "ReviewGraded",
         "contractId": "contract-bunki-meaning",
         "admitted": false,
-        "reason": "easy_requires_user_confirmation",
+        "reason": "response_unverified",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-28T09:00:00.000Z"
       },
       {
         "eventId": "evt-0415",
         "type": "ReviewGraded",
         "contractId": "contract-bunki-meaning",
-        "admitted": true,
-        "reason": null,
-        "effectiveGrade": "easy",
+        "admitted": false,
+        "reason": "response_unverified",
+        "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-29T09:00:00.000Z"
       },
       {
         "eventId": "evt-0417",
         "type": "ReviewGraded",
         "contractId": "contract-bunki-production",
-        "admitted": true,
-        "reason": null,
-        "effectiveGrade": "good",
+        "admitted": false,
+        "reason": "response_unverified",
+        "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-30T09:05:00.000Z"
       },
       {
         "eventId": "evt-0418",
         "type": "ReviewGraded",
         "contractId": "contract-bunki-reading",
-        "admitted": true,
-        "reason": null,
-        "effectiveGrade": "good",
+        "admitted": false,
+        "reason": "response_unverified",
+        "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-08-01T09:00:00.000Z"
       },
       {
@@ -606,6 +626,7 @@
         "reason": "production_is_not_tier_a",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-08-01T09:10:00.000Z"
       }
     ],
@@ -613,17 +634,17 @@
       {
         "contractId": "contract-bunki-meaning",
         "active": true,
-        "phase": "review",
-        "stability": 18.52175344,
-        "difficulty": 1,
-        "dueAt": "2026-08-17T09:00:00.000Z",
-        "lastReviewedAt": "2026-07-29T09:00:00.000Z",
-        "schedulerAnchorAt": "2026-07-29T09:00:00.000Z",
-        "scheduledDays": 19,
+        "phase": "new",
+        "stability": 0,
+        "difficulty": 0,
+        "dueAt": "2026-07-27T09:04:00.000Z",
+        "lastReviewedAt": null,
+        "schedulerAnchorAt": "2026-07-27T09:04:00.000Z",
+        "scheduledDays": 0,
         "learningStep": 0,
-        "reps": 2,
+        "reps": 0,
         "lapses": 0,
-        "admittedReviewCount": 2,
+        "admittedReviewCount": 0,
         "activatedAt": "2026-07-27T09:04:00.000Z",
         "scheduler": {
           "package": "ts-fsrs",
@@ -636,17 +657,17 @@
       {
         "contractId": "contract-bunki-production",
         "active": true,
-        "phase": "learning",
-        "stability": 2.3065,
-        "difficulty": 2.11810397,
-        "dueAt": "2026-07-30T09:15:00.000Z",
-        "lastReviewedAt": "2026-07-30T09:05:00.000Z",
-        "schedulerAnchorAt": "2026-07-30T09:05:00.000Z",
+        "phase": "new",
+        "stability": 0,
+        "difficulty": 0,
+        "dueAt": "2026-07-30T09:00:00.000Z",
+        "lastReviewedAt": null,
+        "schedulerAnchorAt": "2026-07-30T09:00:00.000Z",
         "scheduledDays": 0,
-        "learningStep": 1,
-        "reps": 1,
+        "learningStep": 0,
+        "reps": 0,
         "lapses": 0,
-        "admittedReviewCount": 1,
+        "admittedReviewCount": 0,
         "activatedAt": "2026-07-30T09:00:00.000Z",
         "scheduler": {
           "package": "ts-fsrs",
@@ -659,17 +680,17 @@
       {
         "contractId": "contract-bunki-reading",
         "active": true,
-        "phase": "learning",
-        "stability": 3.17368654,
-        "difficulty": 6.40211507,
-        "dueAt": "2026-08-01T09:10:00.000Z",
-        "lastReviewedAt": "2026-08-01T09:00:00.000Z",
-        "schedulerAnchorAt": "2026-08-01T09:00:00.000Z",
+        "phase": "new",
+        "stability": 0,
+        "difficulty": 0,
+        "dueAt": "2026-07-27T09:04:10.000Z",
+        "lastReviewedAt": null,
+        "schedulerAnchorAt": "2026-07-27T09:04:10.000Z",
         "scheduledDays": 0,
-        "learningStep": 1,
-        "reps": 2,
+        "learningStep": 0,
+        "reps": 0,
         "lapses": 0,
-        "admittedReviewCount": 2,
+        "admittedReviewCount": 0,
         "activatedAt": "2026-07-27T09:04:10.000Z",
         "scheduler": {
           "package": "ts-fsrs",

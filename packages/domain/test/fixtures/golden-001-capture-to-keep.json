@@ -1,7 +1,13 @@
 {
   "name": "golden-001-capture-to-keep",
   "description": "The smallest real slice of the closed loop: one encounter captured with full provenance, a re-encounter of the same thread three days later, then an explicit promotion to keep. Capture leaves the thread in `captured`; only the explicit ThreadPromotionChanged moves it. Nothing here activates scheduling, which is the WP-02 half of T-02.",
-  "anchors": ["T-03", "REQ-DM-04", "REQ-DM-09", "REQ-SRC-01", "DL-05"],
+  "anchors": [
+    "T-03",
+    "REQ-DM-04",
+    "REQ-DM-09",
+    "REQ-SRC-01",
+    "DL-05"
+  ],
   "events": [
     {
       "eventId": "evt-0001",
@@ -84,7 +90,10 @@
             "origin": "nomination_accepted"
           }
         ],
-        "encounterIds": ["encounter-0001", "encounter-0002"],
+        "encounterIds": [
+          "encounter-0001",
+          "encounter-0002"
+        ],
         "candidateIds": [],
         "acceptedCandidateIds": [],
         "lifecycle": "active",

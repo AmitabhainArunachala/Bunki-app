@@ -69,7 +69,7 @@ describe('the activation table is REQ-DM-09, as data', () => {
 });
 
 describe('the table is reachable through a replayed log', () => {
-  it('a production contract is inert under learn and live under master', () => {
+  it('master activates production without inventing a grader for it', () => {
     const base = [capture(), promote('learn'), productionContract()];
 
     const underLearn = run([
@@ -84,8 +84,12 @@ describe('the table is reachable through a replayed log', () => {
       promote('master', { eventId: 'ev-master', at: T.review2, from: 'learn' }),
       review({ eventId: 'ev-late', at: T.review3, contractId: 'contract-production' }),
     ]);
-    expect(decisionOf(underMaster, 'ev-late')?.admitted).toBe(true);
-    expect(memoryStateOf(underMaster, 'contract-production')?.admittedReviewCount).toBe(1);
+    expect(memoryStateOf(underMaster, 'contract-production')?.active).toBe(true);
+    expect(decisionOf(underMaster, 'ev-late')).toMatchObject({
+      admitted: false,
+      reason: 'response_modality_unverified',
+    });
+    expect(memoryStateOf(underMaster, 'contract-production')?.admittedReviewCount).toBe(0);
   });
 
   it('demoting from master deactivates the production contract without deleting it', () => {
@@ -100,7 +104,7 @@ describe('the table is reachable through a replayed log', () => {
 
     const memory = memoryStateOf(state, 'contract-production');
     expect(memory?.active).toBe(false);
-    expect(memory?.admittedReviewCount).toBe(1);
+    expect(memory?.admittedReviewCount).toBe(0);
   });
 });
 

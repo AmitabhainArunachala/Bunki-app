@@ -131,6 +131,7 @@ function assertGateInvariants(
         forbiddenReason,
       );
       expect(decision.effectiveGrade, `${where}: a rejection carries a grade`).toBeNull();
+      expect(decision.authority, `${where}: a rejection carries scheduler authority`).toBeNull();
       continue;
     }
 
@@ -138,10 +139,16 @@ function assertGateInvariants(
     if (!decision.admitted) {
       expect(decision.effectiveGrade, `${where}: a rejected review carries a grade`).toBeNull();
       expect(decision.reason, `${where}: a rejection has no named reason`).not.toBeNull();
+      expect(decision.authority, `${where}: a rejected claim carries verified authority`).toBeNull();
       continue;
     }
 
     admitted += 1;
+    expect(decision.authority, `${where}: an admitted review lacks verified authority`).toMatchObject({
+      kind: 'verified_retrieval_v2',
+      grader: 'accepted_answers',
+      sourceBinding: 'exact_origin',
+    });
 
     // (2) A retracted observation stays out of the scheduler.
     expect(
@@ -159,8 +166,8 @@ function assertGateInvariants(
       ).toBe('again');
       expect(
         decision.forcedByReveal,
-        `${where}: the reveal override was applied but not reported`,
-      ).toBe(source.grade !== 'again');
+        `${where}: the revealed attempt was not reported`,
+      ).toBe(true);
     } else {
       expect(decision.effectiveGrade, `${where}: an unrevealed review's grade was altered`).toBe(
         source.grade,

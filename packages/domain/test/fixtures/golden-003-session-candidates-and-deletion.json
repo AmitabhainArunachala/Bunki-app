@@ -1,7 +1,15 @@
 {
   "name": "golden-003-session-candidates-and-deletion",
   "description": "A bounded session that reaches an explicit completion state, an AI candidate attached and then accepted by an explicit user action, an export, and the full deletion path — tombstone first (sync-safe), then the purge that cites it. Includes a byte-identical re-append of the capture event, which replay must treat as a no-op: a double-tapped capture produces exactly one thread.",
-  "anchors": ["T-03", "REQ-DM-04", "T-12", "T-13", "controller §7", "controller §9", "ADR-002"],
+  "anchors": [
+    "T-03",
+    "REQ-DM-04",
+    "T-12",
+    "T-13",
+    "controller §7",
+    "controller §9",
+    "ADR-002"
+  ],
   "events": [
     {
       "eventId": "evt-0201",
@@ -118,7 +126,9 @@
       "exportVersion": "1",
       "scope": {
         "kind": "threads",
-        "threadIds": ["thread-0201"]
+        "threadIds": [
+          "thread-0201"
+        ]
       }
     },
     {
@@ -136,7 +146,10 @@
       "occurredAt": "2026-07-29T11:15:04.000Z",
       "idempotencyKey": "purge:thread-0201",
       "type": "ContentPurged",
-      "targetIds": ["thread-0201", "encounter-0201"],
+      "targetIds": [
+        "thread-0201",
+        "encounter-0201"
+      ],
       "tombstoneEventId": "evt-0208"
     }
   ],
@@ -159,9 +172,15 @@
             "origin": "user"
           }
         ],
-        "encounterIds": ["encounter-0201"],
-        "candidateIds": ["candidate-0201"],
-        "acceptedCandidateIds": ["candidate-0201"],
+        "encounterIds": [
+          "encounter-0201"
+        ],
+        "candidateIds": [
+          "candidate-0201"
+        ],
+        "acceptedCandidateIds": [
+          "candidate-0201"
+        ],
         "lifecycle": "purged",
         "tombstoneEventId": "evt-0208",
         "createdAt": "2026-07-27T21:00:00.000Z",
@@ -188,7 +207,9 @@
         "eventId": "evt-0207",
         "exportVersion": "1",
         "scopeKind": "threads",
-        "threadIds": ["thread-0201"],
+        "threadIds": [
+          "thread-0201"
+        ],
         "at": "2026-07-28T06:42:00.000Z"
       }
     ],
@@ -196,7 +217,10 @@
       {
         "eventId": "evt-0209",
         "tombstoneEventId": "evt-0208",
-        "targetIds": ["thread-0201", "encounter-0201"],
+        "targetIds": [
+          "thread-0201",
+          "encounter-0201"
+        ],
         "at": "2026-07-29T11:15:04.000Z"
       }
     ]

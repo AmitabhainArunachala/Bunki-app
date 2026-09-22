@@ -117,7 +117,7 @@ describe('the harness rejects a fixture it cannot trust', () => {
           events: [
             {
               eventId: 'x',
-              v: 2,
+              v: 3,
               occurredAt: '2026-07-27T00:00:00.000Z',
               idempotencyKey: 'k',
               type: 'X',

@@ -100,7 +100,10 @@
       "skill": "form_to_meaning",
       "cueModality": "text",
       "responseModality": "choice",
-      "acceptedAnswers": ["displeased and silent", "sullen"],
+      "acceptedAnswers": [
+        "displeased and silent",
+        "sullen"
+      ],
       "hintPolicy": {
         "hintsAllowed": true,
         "maxHints": 1
@@ -123,7 +126,9 @@
       "skill": "orthography_to_reading",
       "cueModality": "text",
       "responseModality": "text",
-      "acceptedAnswers": ["ぶぜん"],
+      "acceptedAnswers": [
+        "ぶぜん"
+      ],
       "hintPolicy": {
         "hintsAllowed": false,
         "maxHints": 0
@@ -168,7 +173,10 @@
       "occurredAt": "2026-07-28T07:34:00.000Z",
       "idempotencyKey": "exposure:experience-0009",
       "type": "ExposureLogged",
-      "componentIds": ["kc:憮然", "kc:案の定"],
+      "componentIds": [
+        "kc:憮然",
+        "kc:案の定"
+      ],
       "experienceId": "experience-0009",
       "tier": "D"
     },
@@ -262,7 +270,9 @@
             "origin": "user"
           }
         ],
-        "encounterIds": ["encounter-0101"],
+        "encounterIds": [
+          "encounter-0101"
+        ],
         "candidateIds": [],
         "acceptedCandidateIds": [],
         "lifecycle": "active",
@@ -282,7 +292,9 @@
             "origin": "user"
           }
         ],
-        "encounterIds": ["encounter-0102"],
+        "encounterIds": [
+          "encounter-0102"
+        ],
         "candidateIds": [],
         "acceptedCandidateIds": [],
         "lifecycle": "active",
@@ -376,6 +388,7 @@
         "reason": "lookup_is_friction_not_a_grade",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-27T08:10:00.000Z"
       },
       {
@@ -386,16 +399,18 @@
         "reason": "evidence_superseded",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-28T07:30:00.000Z"
       },
       {
         "eventId": "evt-0108",
         "type": "ReviewGraded",
         "contractId": "contract-buzen-reading",
-        "admitted": true,
-        "reason": null,
-        "effectiveGrade": "again",
+        "admitted": false,
+        "reason": "response_unverified",
+        "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-28T07:30:40.000Z"
       },
       {
@@ -406,6 +421,7 @@
         "reason": "exposure_is_never_retrieval",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-28T07:34:00.000Z"
       },
       {
@@ -416,6 +432,7 @@
         "reason": "production_is_not_tier_a",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-28T07:41:00.000Z"
       },
       {
@@ -426,6 +443,7 @@
         "reason": "correction_is_not_an_observation",
         "effectiveGrade": null,
         "forcedByReveal": false,
+        "authority": null,
         "at": "2026-07-28T07:55:00.000Z"
       }
     ],
@@ -456,17 +474,17 @@
       {
         "contractId": "contract-buzen-reading",
         "active": true,
-        "phase": "learning",
-        "stability": 0.212,
-        "difficulty": 6.4133,
-        "dueAt": "2026-07-28T07:31:40.000Z",
-        "lastReviewedAt": "2026-07-28T07:30:40.000Z",
-        "schedulerAnchorAt": "2026-07-28T07:30:40.000Z",
+        "phase": "new",
+        "stability": 0,
+        "difficulty": 0,
+        "dueAt": "2026-07-27T08:11:31.000Z",
+        "lastReviewedAt": null,
+        "schedulerAnchorAt": "2026-07-27T08:11:31.000Z",
         "scheduledDays": 0,
         "learningStep": 0,
-        "reps": 1,
+        "reps": 0,
         "lapses": 0,
-        "admittedReviewCount": 1,
+        "admittedReviewCount": 0,
         "activatedAt": "2026-07-27T08:11:31.000Z",
         "scheduler": {
           "package": "ts-fsrs",

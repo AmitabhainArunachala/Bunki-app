@@ -159,17 +159,34 @@ export interface ReviewSpec {
 }
 
 export function review(spec: ReviewSpec): Raw {
+  const acceptedAnswer = spec.contractId === READING_CONTRACT ? 'ぶんき' : 'a branching point';
+  const response = spec.grade === 'again' ? 'not the accepted answer' : acceptedAnswer;
+  const correct = response === acceptedAnswer;
+  const effort = spec.grade === 'hard' || spec.grade === 'easy' ? spec.grade : 'good';
+  const grade = !correct || spec.revealedBeforeRecall ? 'again' : effort;
   return {
     ...envelope(spec.eventId, spec.at),
+    v: 2,
     type: 'ReviewGraded',
     contractId: spec.contractId,
-    grade: spec.grade,
+    response,
+    effort,
+    grade,
     latencyMs: 3200,
     hintsUsed: 0,
     revealedBeforeRecall: spec.revealedBeforeRecall,
     probeContext: 'standalone',
     tier: 'A',
-    ...(spec.userConfirmedEasy ? { userConfirmedEasy: true } : {}),
+    graderProof: {
+      grader: 'accepted_answers',
+      policyVersion: 'accepted_answers:nfkc_trim@1',
+      contractVersion: 1,
+      responseModality: 'text',
+      normalizedResponse: response,
+      decision: correct ? 'correct' : 'incorrect',
+      acceptedAnswerIndex: correct ? 0 : null,
+    },
+    ...(grade === 'easy' && spec.userConfirmedEasy ? { userConfirmedEasy: true } : {}),
   };
 }
 

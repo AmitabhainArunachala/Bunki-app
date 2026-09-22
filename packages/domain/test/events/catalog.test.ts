@@ -133,12 +133,17 @@ function splitOptionality(entries: readonly string[]): { name: string; optional:
 
 /** What a schema actually accepts, read off its shape: field name → optional?. */
 function acceptedFields(type: DomainEventType): { name: string; optional: boolean }[] {
-  const schema = EVENT_SCHEMAS[type] as unknown as {
+  type InspectableSchema = {
     shape?: Record<string, { isOptional(): boolean }>;
     def?: { shape?: Record<string, { isOptional(): boolean }> };
-    _def?: { shape?: Record<string, { isOptional(): boolean }> };
+    _def?: {
+      shape?: Record<string, { isOptional(): boolean }>;
+      schema?: InspectableSchema;
+    };
   };
-  const shape = schema.shape ?? schema.def?.shape ?? schema._def?.shape;
+  const schema = EVENT_SCHEMAS[type] as unknown as InspectableSchema;
+  const inspected = schema._def?.schema ?? schema;
+  const shape = inspected.shape ?? inspected.def?.shape ?? inspected._def?.shape;
   if (shape === undefined) throw new Error(`cannot inspect ${type} schema shape`);
   return Object.entries(shape)
     .map(([name, field]) => ({ name, optional: field.isOptional() }))

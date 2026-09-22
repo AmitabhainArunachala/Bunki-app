@@ -30,7 +30,7 @@ const validEvent = () =>
   encounterCaptured({ eventId: 'e1', at: AT.t0, encounterId: 'encounter-1', threadId: 'thread-1' });
 
 describe('T-04: unknown event versions fail closed', () => {
-  it.each([2, 0, -1, 1.5, 99])('rejects v=%s with a typed UnknownEventVersionError', (version) => {
+  it.each([3, 0, -1, 1.5, 99])('rejects v=%s with a typed UnknownEventVersionError', (version) => {
     let thrown: unknown;
     try {
       parseEvent({ ...validEvent(), v: version });
@@ -62,19 +62,19 @@ describe('T-04: unknown event versions fail closed', () => {
     expect(() => parseEvent(raw)).toThrow(UnknownEventVersionError);
   });
 
-  it('checks the version before the payload, so a v2 event is diagnosed as a version problem', () => {
-    // A v2 event with fields this build has never seen. If the parser looked at
+  it('checks the version before the payload, so a v3 event is diagnosed as a version problem', () => {
+    // A v3 event with fields this build has never seen. If the parser looked at
     // the payload first it would report "unknown type" or a field error, which
     // invites the wrong fix (add the field) instead of the right one (write a
     // migration).
     let thrown: unknown;
     try {
-      parseEvent({ v: 2, type: 'SomethingFromTheFuture', novelField: 42 });
+      parseEvent({ v: 3, type: 'SomethingFromTheFuture', novelField: 42 });
     } catch (error) {
       thrown = error;
     }
     expect(thrown).toBeInstanceOf(UnknownEventVersionError);
-    expect((thrown as UnknownEventVersionError).observedVersion).toBe(2);
+    expect((thrown as UnknownEventVersionError).observedVersion).toBe(3);
   });
 
   it('rejects an unknown type at a known version, distinctly', () => {
