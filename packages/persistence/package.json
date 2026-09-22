@@ -9,14 +9,17 @@
   "exports": {
     ".": "./src/index.ts",
     "./port": "./src/port.ts",
-    "./ci-substitute": "./src/sqlite/node-driver.ts"
+    "./ci-substitute": "./src/sqlite/node-driver.ts",
+    "./replication": "./src/replication/index.ts",
+    "./replication/indexeddb": "./src/replication/browser.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@bunki/domain": "*",
-    "@bunki/export": "*"
+    "@bunki/export": "*",
+    "@bunki/sync": "*"
   },
   "devDependencies": {
     "@types/node": "26.1.1"

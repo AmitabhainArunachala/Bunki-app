@@ -1,152 +1,266 @@
-# Bunki CI (WP-01, extended by WP-10; controller §17.5).
-#
-# Two jobs, because they fail for different reasons and a reader should be able
-# to tell which happened without opening a log:
-#
-#   checks — lint, format, typecheck, and the whole Vitest suite, plus the two
-#            §17.5 lines the controller reports separately (`test:replay`,
-#            `verify:export`). Those two are subsets of `npm run test`; they are
-#            named here anyway because the controller names them, and a check
-#            that only exists inside another check cannot be cited on its own.
-#
-#   e2e    — the controller's build proof (`expo export --platform web`) and the
-#            Playwright suites that drive its output, including the axe
-#            accessibility scan and the §17.2 adversarial matrix. This job is the
-#            one that can fail while every unit test passes, which is precisely
-#            the definition-of-done failure "tests pass but the app doesn't"
-#            (§2 item 1).
-#
-# One Playwright config discovers every lane's specs (`**/*.spec.ts` under
-# apps/app/e2e/), so a lane adds a file and picks this job up with no CI change.
-#
-# Reconciliation note (WP-10 closeout): the E2E lane and the two adversarial
-# lanes each grew a Playwright harness on their own branch. They are now one —
-# a single `apps/app/e2e/playwright.config.ts`, a single `npm run test:e2e`, and
-# this single job — so the T-17 loop, the storms, the accessibility scan and the
-# claim audit all fail the same PR. There is deliberately no per-lane job and no
-# matrix over lanes: a lane that could go red on its own is a lane that can be
-# ignored on its own.
+# One build/test chain: PRs verify locally staged bytes; main calls this same
+# workflow from pages-app and may publish only the artifact it verified.
 name: CI
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  workflow_call:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: kairo-checks-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  checks:
-    name: lint / format / typecheck / test
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+  apple-sync:
+    name: native CloudKit compile and offline contract checks
+    runs-on: macos-26
+    timeout-minutes: 15
     steps:
-      - name: Check out
+      - name: Check out the exact candidate
         uses: actions/checkout@v4
 
-      - name: Set up Node 22
+      - name: Set up Node 22 for cross-language fixture checks
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
 
-      # `npm ci` (not `npm install`) so the exact pinned versions from
-      # package-lock.json are what CI verifies. Controller §14 pins every
-      # dependency exactly; a CI run that silently resolved a different
-      # version would be checking a different project.
-      - name: Install dependencies
-        run: npm ci
+      - name: Install pinned JavaScript contracts without native app setup
+        run: npm ci --ignore-scripts
 
-      - name: Lint (includes controller §5 boundary rules)
-        run: npm run lint
+      - name: Compile the CloudKit backend and run network-free fixtures
+        id: apple-sync
+        run: KAIRO_EVIDENCE_DIR="$RUNNER_TEMP/kairo-apple-sync" node packages/apple-sync/tools/verify.mjs
 
-      - name: Format check
-        run: npm run format:check
+      - name: Compile and exercise the TypeScript client over real Swift OS pipes
+        id: native-rpc
+        run: KAIRO_RPC_EVIDENCE_DIR="$RUNNER_TEMP/kairo-native-rpc" node packages/persistence/tools/native-rpc/verify.mjs
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm run test
-
-      - name: Replay (T-03)
-        run: npm run test:replay
-
-      - name: Export round trip (T-14)
-        run: npm run verify:export
-
-  e2e:
-    name: web build proof / e2e / accessibility / adversarial matrix
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - name: Check out
-        uses: actions/checkout@v4
-
-      - name: Set up Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      # The browser build is pinned by `@playwright/test`'s exact version in
-      # package-lock.json, so the engine under test is as pinned as every other
-      # dependency (controller §14). `--with-deps` installs the system libraries
-      # Chromium needs on a bare runner. The harness only falls back to a
-      # pre-installed browser when this step has not run (see
-      # `preinstalledChromium`), so CI always drives the version-matched build.
-      - name: Install the pinned browser
-        run: npx playwright install --with-deps chromium
-
-      # A bounded, real-CDP slice of the permanent Drift interaction charter.
-      # This is deliberately named "fast": its JSON receipt says exactly what
-      # it covers and refuses to promote the still-open 200-node/fuzz/soak A0
-      # obligations. Any executed interaction violation, page error, verifier
-      # exception, or incomplete requested sample fails the PR.
-      - name: KAIRO Drift fast interaction gate
-        run: >-
-          npm run verify:drift:fast --
-          --out "${{ runner.temp }}/drift-consistency-fast/report.json"
-          --shots "${{ runner.temp }}/drift-consistency-fast/shots"
-
-      # The operator's current writing-room contract is smaller than the whole
-      # app walk and stricter about what may remain visible. It also proves the
-      # brush/number callback lands on the first real ink sample.
-      - name: Quiet writing-room contract
-        run: npm run verify:writing-room
-
-      # Controller §17.5's build proof, and the artefact the E2E then drives.
-      # It runs here rather than in `checks` because a bundle that fails to
-      # export and a lint rule that fails are not the same news.
-      - name: Build the web export
-        run: npm run test:e2e:build
-
-      # One command, every lane: T-17 closed loop, the E2E halves of T-12 and
-      # T-13, the offline/timeout/restart storms (T-10/T-11/T-16-web), the axe
-      # accessibility scan and the REQ-GATE-03 claim audit.
-      - name: E2E — closed loop (T-17), labelling (T-12), finite session (T-13), storms, accessibility, claim audit
-        run: npm run test:e2e
-
-      # Traces and screenshots for a red run. `retention-days` is short because
-      # these are debugging aids, not evidence: the evidence capsule holds the
-      # recorded results.
-      - name: Upload failure artefacts
-        if: failure()
+      - name: Retain native compiler and test evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-failure-artefacts
+          name: kairo-apple-sync-evidence
+          path: ${{ runner.temp }}/kairo-apple-sync/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Retain native RPC compiler, pipe and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kairo-native-rpc-evidence
+          path: ${{ runner.temp }}/kairo-native-rpc/
+          retention-days: 14
+          if-no-files-found: warn
+
+  checks:
+    name: complete required battery / tested Corridor artifact
+    needs: apple-sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      KAIRO_CORPUS_PYTHON: python3
+
+    steps:
+      - name: Set release artifact and evidence paths
+        run: |
+          mkdir -p "$RUNNER_TEMP/kairo-release"
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/kairo-site" >> "$GITHUB_ENV"
+          echo "KAIRO_EVIDENCE_ROOT=$RUNNER_TEMP/kairo-release" >> "$GITHUB_ENV"
+
+      - name: Check out the exact candidate with source-history fixtures
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned JavaScript dependencies
+        run: npm ci
+
+      - name: Set up corpus Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install corpus test dependencies
+        run: python3 -m pip install './corpus[dev,wikinews,aozora,snow,grading]'
+
+      - name: Install the pinned browser and system libraries
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Assemble the canonical Corridor artifact once
+        run: |
+          mkdir -p "$KAIRO_EVIDENCE_ROOT"
+          node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$KAIRO_EVIDENCE_ROOT/build.json"
+          node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$KAIRO_EVIDENCE_ROOT/artifact-before.json"
+
+      - name: Smoke-test packaged assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          port_file=$(mktemp "$RUNNER_TEMP/corridor-port.XXXXXX")
+          python3 - "$KAIRO_SITE_DIR" "$port_file" >"$RUNNER_TEMP/corridor-smoke.log" 2>&1 <<'PYEOF' &
+          import functools, http.server, pathlib, sys
+          handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=sys.argv[1])
+          with http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler) as server:
+              pathlib.Path(sys.argv[2]).write_text(str(server.server_port))
+              server.serve_forever()
+          PYEOF
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true; rm -f "$port_file"' EXIT
+          for _ in {1..50}; do
+            [ -s "$port_file" ] && break
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              cat "$RUNNER_TEMP/corridor-smoke.log" >&2
+              exit 1
+            fi
+            sleep 0.1
+          done
+          [ -s "$port_file" ] || { echo 'Smoke server did not become ready' >&2; exit 1; }
+          port=$(cat "$port_file")
+
+          # curl, not node fetch: unconsumed keep-alive bodies trip an undici
+          # internal assertion at process exit on some Node lines (seen live:
+          # "assert(!this.paused)" AFTER every path had already printed 200)
+          for path in '' 'apple-touch-icon.png' 'corridor.css' 'fonts.css' 'corridor.js' \
+                      'corridor-ink.js' 'dictionary-worker.js' 'reading-controller.mjs' 'feed-controller.mjs' 'assessment-controller.mjs' 'record-controller.mjs' 'record-host.mjs' 'record-app.mjs' 'record-binding.mjs' 'publisher-controller.mjs' 'modules/reading-core.mjs' 'modules/feed-core.mjs' 'modules/assessment-core.mjs' 'modules/record-core.mjs' \
+                      'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' 'build-identity.json' \
+                      'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
+                      'data/manifest.json' 'data/articles/index.json' \
+                      'data/mock/index.json' 'data/mock/sets/n5-01.json' \
+                      'data/articles/archive-index.json' \
+                      'data/share_alike/dict-v2/index.json' \
+                      'data/share_alike/animcjk/index.json' \
+                      'data/share_alike/animcjk/00.json' \
+                      'data/share_alike/animcjk/equivalence.json' \
+                      'data/share_alike/dict-v2/00.json' \
+                      'data/share_alike/dict-v2/0f.json'; do
+            code=""
+            for _ in 1 2 3 4 5; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$port/$path" || true)
+              [ "$code" = "200" ] && break
+              sleep 0.2
+            done
+            if [ "$code" != "200" ]; then
+              echo "FAIL $code /$path" >&2
+              exit 1
+            fi
+            echo "200 /$path"
+          done
+
+          # the deep dictionary the site ships must be the pinned, sharded one
+          python3 - "$KAIRO_SITE_DIR" <<'PYEOF'
+          import json, sys
+          site = sys.argv[1]
+          index = json.load(open(f"{site}/data/share_alike/dict-v2/index.json"))
+          assert index["schemaVersion"] == 3, "dict-v2 schema (sense tags, DICT_TAGS_CONTRACT_2026-08-12)"
+          assert index["shardCount"] == 16, "dict-v2 shard count"
+          assert index["sharding"]["id"] == "fnv1a32-ascii-seq-mask15", "dict-v2 shard algorithm"
+          assert index["source"]["pin"] == "3.6.2+20260803141815", "dict-v2 source pin"
+          counts = index["sharding"]["entryCounts"]
+          assert len(counts) == 16 and all(c > 0 for c in counts), "dict-v2 entry counts"
+          assert len(index["entries"]) == sum(counts), "dict-v2 index entry total"
+          for shard_id in ("00", "07", "0f"):
+              shard = json.load(open(f"{site}/data/share_alike/dict-v2/{shard_id}.json"))
+              assert shard["sourcePin"] == index["source"]["pin"], f"shard {shard_id} pin"
+              assert len(shard["entries"]) == counts[int(shard_id, 16)], f"shard {shard_id} count"
+          print(f"dict-v2 verified: {len(index['entries'])} entries across 16 shards")
+          PYEOF
+
+          # rights are fail-closed: no shelf item ships without complete,
+          # registry-consistent licence metadata (round-3 review, 2026-08-11 —
+          # this very check would have caught the live CC BY 4.0 mislabel)
+          python3 - "$KAIRO_SITE_DIR" <<'PYEOF'
+          import json, sys
+          site = sys.argv[1]
+          base = f"{site}/data/articles"
+          idx = json.load(open(f"{base}/index.json"))
+          source_by_name = {}
+          for pool, records in idx["sources"].items():
+              for s in records:
+                  for k in ("name", "licence", "attribution"):
+                      assert s.get(k, "").strip(), f"source record missing {k}: {s}"
+                  assert "url" in s, f"source record {s['name']!r} missing url field"
+                  source_by_name[s["name"]] = (pool, s)
+          for a in idx["articles"]:
+              aid = a.get("id", "?")
+              for k in ("pool", "licence", "attribution", "source", "file"):
+                  assert a.get(k, "").strip(), f"{aid}: missing {k}"
+              assert "url" in a, f"{aid}: missing url field"
+              pool, src = source_by_name.get(a["source"], (None, None))
+              assert src is not None, f"{aid}: source {a['source']!r} not in the sources registry"
+              assert pool == a["pool"], f"{aid}: pool {a['pool']!r} != registry pool {pool!r}"
+              if src["url"].strip():
+                  assert a["url"].strip(), f"{aid}: source has a home URL but the item has no per-item url"
+              if a["source"] == "ja.wikinews":
+                  assert a["licence"] == "CC BY 2.5", f"{aid}: ja.wikinews content is CC BY 2.5, labeled {a['licence']!r}"
+                  assert "CC BY 2.5" in a["attribution"], f"{aid}: attribution must state CC BY 2.5"
+              body = json.load(open(f"{base}/{a['file']}"))
+              for k in ("pool", "licence", "attribution", "url", "source"):
+                  assert body.get(k) == a.get(k), f"{aid}: body {k!r} disagrees with the index"
+          print(f"rights verified: {len(idx['articles'])} shelf items — licensed, attributed, pooled, linked where a source home exists")
+
+          # the newspaper archive answers to the same law: every item fully
+          # labeled, registry-consistent, body agreeing with its index row
+          arc = json.load(open(f"{base}/archive-index.json"))
+          seen_ids = {a["id"] for a in idx["articles"]}
+          for a in arc["articles"]:
+              aid = a.get("id", "?")
+              assert aid not in seen_ids, f"{aid}: archive duplicates a shelf item"
+              for k in ("pool", "licence", "attribution", "source", "file", "url", "date"):
+                  assert a.get(k, "").strip(), f"{aid}: archive row missing {k}"
+              pool, src = source_by_name.get(a["source"], (None, None))
+              assert src is not None and pool == a["pool"], f"{aid}: archive source/pool not registry-consistent"
+              assert a["licence"] == "CC BY 2.5" and "CC BY 2.5" in a["attribution"], f"{aid}: archive licence must be CC BY 2.5"
+              assert a["file"].startswith("archive/"), f"{aid}: archive body must live under archive/"
+              body = json.load(open(f"{base}/{a['file']}"))
+              for k in ("pool", "licence", "attribution", "url", "source"):
+                  assert body.get(k) == a.get(k), f"{aid}: archive body {k!r} disagrees with its row"
+              assert body.get("tokens"), f"{aid}: archive body carries no tokens"
+          print(f"rights verified: {len(arc['articles'])} archive items — same law, same gate")
+          PYEOF
+
+      # Children run even after another child fails. The aggregate exit code
+      # blocks every publication step. Browser verifiers serve KAIRO_SITE_DIR;
+      # logs, screenshots and receipts live outside the source checkout.
+      - name: Run every required current-app and domain gate
+        id: battery
+        run: bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"
+
+      - name: Verify tested bytes and source identity have not changed
+        run: node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$KAIRO_EVIDENCE_ROOT/artifact-after.json"
+
+      - name: Retain battery receipts, traces and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kairo-release-evidence
           path: |
-            apps/app/test-results/
-            ${{ runner.temp }}/drift-consistency-fast/
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/
+            ${{ runner.temp }}/corridor-smoke.log
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Attach the tested site for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: kairo-tested-site
+          path: ${{ env.KAIRO_SITE_DIR }}
           retention-days: 7
-          if-no-files-found: ignore
+          if-no-files-found: error
+
+      - name: Upload the tested main artifact for Pages
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: kairo-pages
+          path: ${{ env.KAIRO_SITE_DIR }}

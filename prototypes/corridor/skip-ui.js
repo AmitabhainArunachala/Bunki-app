@@ -147,12 +147,39 @@
     return fold;
   }
   function mount(host, options) {
-    const { state, onOpen, onQuery, radicals = {}, bilingual: bi = true } = options;
+    const { state, onOpen, onQuery, radicals = {}, bilingual: bi = true, partsOf = null, partInfo = null } = options;
     const key = options.sessionKey || 'kanjidex';
     const session = state.sessions[key] ||= {
-      query: 'skip:1-*-*', parts: [1, null, null], radical: null,
+      query: 'skip:1-*-*', parts: [1, null, null], radical: null, leftPart: null,
       includeAlternates: false, visible: PAGE, gridScroll: 0, rulesOpen: false,
     };
+    if (!('leftPart' in session)) session.leftPart = null;
+    // The parts column (operator, 2026-09-17): "see and scroll through the
+    // left side particles … that CORRELATE WITH THE left stroke order
+    // number". The component layer knows each kanji's parts and each part's
+    // stroke count, not its position — so the column lists the parts among the
+    // current hits whose stroke count equals the first count of the code
+    // (left, upper or outer), and picking one narrows the hits to kanji that
+    // carry it. Its label says exactly that.
+    const withParts = typeof partsOf === 'function' && typeof partInfo === 'function';
+    function partOptions(hits) {
+      const count = session.parts[1];
+      const anyOption = { value: null, label: any(bi) };
+      if (!withParts || !count || session.parts[0] === 4) return [anyOption];
+      const tally = new Map();
+      for (const hit of hits) {
+        for (const p of partsOf(hit.literal) || []) {
+          const info = partInfo(p);
+          if (!info || info.st !== count) continue;
+          tally.set(p, (tally.get(p) || 0) + 1);
+        }
+      }
+      const rows = [...tally.entries()].sort((a, b) => b[1] - a[1] || a[0].codePointAt(0) - b[0].codePointAt(0));
+      return [anyOption, ...rows.map(([p, n]) => ({
+        value: p, label: p, sub: String(n),
+        aria: `${p} ${partInfo(p)?.name || ''} · ${count}${text('画', ' strokes', bi)} · ${n}${text('字', ' kanji', bi)}`,
+      }))];
+    }
     if (options.query != null && options.query !== session.query) {
       session.query = options.query;
       session.visible = PAGE;
@@ -212,7 +239,7 @@
           'Try 1-3-8, 1-3 or 1-*-8. Patterns are 1–4; solid codes use 4–total strokes–subtype 1–4.', bi)));
         return;
       }
-      const hits = core().search(state.data, active, {
+      const allHits = core().search(state.data, active, {
         includeAlternates: session.includeAlternates, radical: session.radical,
       }).sort((a, b) => {
         // Useful everyday characters first within each classification; this
@@ -222,6 +249,13 @@
           (a.strokeCounts?.[0] || 0) - (b.strokeCounts?.[0] || 0) ||
           a.literal.codePointAt(0) - b.literal.codePointAt(0);
       });
+      // a chosen part that no current hit carries is dropped, never silently
+      // applied to an empty grid
+      if (session.leftPart && withParts && !allHits.some((h) => (partsOf(h.literal) || []).includes(session.leftPart))) session.leftPart = null;
+      const hits = session.leftPart && withParts
+        ? allHits.filter((h) => (partsOf(h.literal) || []).includes(session.leftPart))
+        : allHits;
+      lastAllHits = allHits;
       const canonical = hits.filter((hit) => hit.matchType === 'canonical').length;
       const shown = Math.min(session.visible, hits.length);
       const summary = node('p', 'skip-result-count', text(
@@ -255,6 +289,7 @@
         entry.dataset.skipHit = hit.literal;
         entry.dataset.matchType = hit.matchType;
         entry.dataset.skipCode = hit.matchedCode;
+        if (withParts) entry.dataset.parts = (partsOf(hit.literal) || []).join('');
         const meaning = hit.meanings?.slice(0, 2).join('; ') || '';
         entry.setAttribute('aria-label', `${hit.literal} · ${meaning} · SKIP ${hit.matchedCode}${alternate ? ` · ${text('別分類', 'alternate', bi)} ${hit.misclass || ''}` : ''}`);
         entry.title = `${hit.literal} · ${hit.matchedCode}${alternate ? ` · alternate: ${hit.misclass || ''}` : ''} · ${meaning}`;
@@ -290,16 +325,31 @@
       }, { passive: true });
       if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
     }
+    let lastAllHits = [];
+    let partColumn = null;
     function updateQuery() {
       session.query = `skip:${session.parts.map((p) => p ?? '*').join('-')}`;
       session.visible = PAGE;
       session.gridScroll = 0;
+      session.leftPart = null;
       code.textContent = session.parts.map((p) => p ?? '*').join('-');
       if (onQuery) onQuery(session.query);
       paintResults();
+      if (partColumn) {
+        partColumn.setOptions(partOptions(lastAllHits), null);
+        partColumn.setLabel(partLabel());
+      }
+    }
+    function partLabel() {
+      const count = session.parts[1];
+      const side = [null, text('左', 'left', bi), text('上', 'upper', bi), text('外', 'outer', bi)][session.parts[0]] || text('前半', 'first', bi);
+      return count && session.parts[0] !== 4
+        ? text(`${side}の部品 · ${count}画`, `${side} parts · ${count} strokes`, bi)
+        : text('部品 · 画数を選ぶと', 'parts · pick a count first', bi);
     }
     function buildWheels() {
       wheelHost.replaceChildren();
+      partColumn = null;
       const labels = [
         [text('形', 'Pattern', bi), text('前半の画数', 'First strokes', bi), text('後半 / 種類', 'Second / subtype', bi)],
         [text('形', 'Pattern', bi), text('左の画数', 'Left strokes', bi), text('右の画数', 'Right strokes', bi)],
@@ -355,12 +405,33 @@
         session.parts[2] = value;
         updateQuery();
       }));
-      columns.push(makeWheel(3, text('部首 · 任意', 'Radical · optional', bi), radicalOptions, session.radical, (value) => {
+      columns.push(makeWheel(3, text('部首で絞る · コード外', 'Radical filter · not part of the code', bi), radicalOptions, session.radical, (value) => {
         session.radical = value;
         session.visible = PAGE;
         session.gridScroll = 0;
         paintResults();
       }));
+      // the radical wheel is a filter beside the three-number code, never a
+      // fourth number (Halpern's SKIP has no radical step); it is marked so
+      columns[3].element.classList.add('skip-wheel-filter');
+      columns[3].element.dataset.role = 'filter';
+      if (withParts) {
+        // the parts column, far right: the parts among the current hits whose
+        // stroke count equals the code's first count; picking one narrows
+        const initialHits = core().search(state.data, parse(session.query), {
+          includeAlternates: session.includeAlternates, radical: session.radical,
+        });
+        partColumn = makeWheel(4, partLabel(), partOptions(initialHits), session.leftPart, (value) => {
+          session.leftPart = value;
+          session.visible = PAGE;
+          session.gridScroll = 0;
+          paintResults();
+        });
+        partColumn.element.classList.add('skip-wheel-filter', 'skip-wheel-parts');
+        partColumn.element.dataset.role = 'left-parts';
+        columns.push(partColumn);
+        wheels.classList.add('has-parts');
+      }
       for (const column of columns) wheels.append(column.element);
       wheelHost.append(wheels, node('p', 'skip-wheel-help', text(
         '上下にスクロール・行をタップ。キーボード：↑↓、Home / End。部首はコードに含まれません。',

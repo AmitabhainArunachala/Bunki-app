@@ -5,11 +5,11 @@
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
-import { chromium } from 'playwright';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-const CORRIDOR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../docs/build-evidence/tenohira/triage-2026-08-20/theme-sweep-shots');
+import { chromium } from 'playwright-core';
+import { restoreAppFixture } from './record-fixture-support.mjs';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+const CORRIDOR = resolveCorridorSite();
+const OUT = resolveCorridorEvidence();
 mkdirSync(OUT, { recursive: true });
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.woff2': 'font/woff2' };
 const { server, base } = await new Promise((ok, fail) => {
@@ -52,13 +52,14 @@ for (const world of WORLDS) {
   };
   await page.goto(`${base}/?entry=shelf`);
   await page.waitForSelector('#tray', { timeout: 30000 });
-  await page.evaluate(`(() => {
+  const fixture = await page.evaluate(`(() => {
     localStorage.setItem('kairo-theme', ${JSON.stringify(world)});
     const T = Date.now(); const iso = (ms) => new Date(ms).toISOString();
     const row = (id) => ({ t: 'word', id, label: id, ts: T - 90000, started: T - 90000 });
     const rec = () => ({ due: iso(T - 60000), last_review: iso(T - 3 * 86400000), stability: 6, difficulty: 5, elapsed_days: 3, scheduled_days: 3, reps: 8, lapses: 0, learning_steps: 0, state: 2 });
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [row('学校'), row('水')], srs: { 'word:学校': rec(), 'word:水': rec() } }));
+    return { v: 1, taken: [row('学校'), row('水')], srs: { 'word:学校': rec(), 'word:水': rec() }, teacherDrafts: { version: 1, entries: [] } };
   })()`);
+  await restoreAppFixture(page, fixture);
   await page.goto(`${base}/?entry=shelf`);
   await page.waitForSelector('#tray', { timeout: 30000 });
   await shoot('1-shelf');

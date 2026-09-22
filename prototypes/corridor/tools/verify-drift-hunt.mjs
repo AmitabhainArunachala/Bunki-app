@@ -5,26 +5,28 @@
  * the matrix forever after.)
  *
  * Usage: node verify-drift-hunt.mjs
-  *
- * KNOWN-STALE STAGINGS (2026-08-10, post meaning-gated families): four
- * hunts below stage their scenarios by walking constellations whose
- * membership assumed the old proximity-padded families — "explainer
- * reachable in a dive", both hub-release hunts, and "a finger the gesture
- * never owned". Their PRODUCT rules may still be right, but their scripted
- * walks no longer reach the staged layouts, so they fail at staging, not
- * at the rule. Rewrite the stagings against the current families before
- * trusting a red result from them.
+ *
+ * Four historical stagings assumed proximity-padded families and Drift's
+ * former dictionary cards. Their product obligations remain unchanged.
+ * Current fixtures use recorded seeds, actual member/body hits, and current
+ * canvas hubs; no stored coordinate is treated as authority after a reload.
 */
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { chromium } from 'playwright-core';
 
-const CORRIDOR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const EVIDENCE = resolve(CORRIDOR, 'evidence', 'a0-drift-hunts-20260808');
+const CORRIDOR = resolveCorridorSite();
+const EVIDENCE = resolveCorridorEvidence();
 const EVIDENCE_PHASE = (process.env.DRIFT_HUNT_EVIDENCE_PHASE || 'current').replace(/[^a-z0-9_-]/gi, '');
+const sourceSha256 = createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex');
+const stagings = [];
+const results = [];
 mkdirSync(EVIDENCE, { recursive: true });
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -52,13 +54,17 @@ const ctx = await browser.newContext({
   hasTouch: true,
 });
 await ctx.addInitScript(() => {
-  try { localStorage.clear(); } catch {}
-
+  const seed = new URL(location.href).searchParams.get('__huntSeed');
+  if (seed !== null) {
+    let state = Number(seed) >>> 0;
+    Math.random = () => { state ^= state << 13; state ^= state >>> 17; state ^= state << 5; return (state >>> 0) / 0x100000000; };
+  }
   // Keep the verifier black-box while still locating the two kinds of ink
   // that have no DOM hit target: faint hub sprites and legacy canvas-only
   // semantic labels. The hooks observe real canvas calls; they do not reach
   // into Drift's closure or mutate its interaction state.
   window.__driftHuntCanvas = { hubs: [], labels: [] };
+  const hubSymbols = new WeakMap();
   window.__driftHuntPointerDowns = [];
   addEventListener('pointerdown', (event) => {
     window.__driftHuntPointerDowns.push({
@@ -71,20 +77,22 @@ await ctx.addInitScript(() => {
       // it aimed at (a moving-target miss), which is the only ground on
       // which re-staging is honest
       word: event.target?.closest?.('.word')?.querySelector?.('.base')?.textContent ?? null,
+      card: !!event.target?.closest?.('#card.open'),
     });
   }, true);
   const cap = (items, item) => {
     items.push(item);
     if (items.length > 1200) items.splice(0, 600);
   };
-  const proto = CanvasRenderingContext2D.prototype;
+  const proto = window.CanvasRenderingContext2D.prototype;
   const drawImage = proto.drawImage;
   proto.drawImage = function (...args) {
     if (
       this.canvas?.id === 'fx' && args.length === 5 &&
-      args[0] instanceof HTMLCanvasElement && args[0].width === 96 && args[0].height === 96
+      args[0] instanceof window.HTMLCanvasElement && args[0].width === 96 && args[0].height === 96
     ) {
       cap(window.__driftHuntCanvas.hubs, {
+        label: hubSymbols.get(args[0]) ?? null,
         x: args[1] + args[3] / 2,
         y: args[2] + args[4] / 2,
         at: performance.now(),
@@ -94,6 +102,7 @@ await ctx.addInitScript(() => {
   };
   const fillText = proto.fillText;
   proto.fillText = function (text, x, y, ...rest) {
+    if (this.canvas.width === 96 && this.canvas.height === 96) hubSymbols.set(this.canvas, String(text));
     if (this.canvas?.id === 'fx') {
       cap(window.__driftHuntCanvas.labels, {
         text: String(text), x, y, at: performance.now(),
@@ -168,9 +177,10 @@ const drag = async (x0, y0, x1, y1, ms, steps = 8) => {
   }
   await T('touchEnd', []);
 };
-const boot = async () => {
-  await page.goto(`${base}/index.html?entry=drift`);
+const boot = async (seed = null) => {
+  await page.goto(`${base}/index.html?entry=drift${seed === null ? '' : `&__huntSeed=${seed}`}`);
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  await page.waitForSelector('#drift-layer[data-record-state="active"]');
   await page.waitForTimeout(2300);
 };
 const wordAt = (label) => `(() => {
@@ -227,11 +237,18 @@ const freshHub = `(() => {
     const key = Math.round(h.x) + ',' + Math.round(h.y);
     if (seen.has(key)) continue;
     seen.add(key);
-    if (h.x < 52 || h.x > 338 || h.y < 170 || h.y > 690) continue;
-    if (nodes.some((n) => Math.hypot(n.x - h.x, n.y - h.y) < 58)) continue;
-    const hit = document.elementFromPoint(h.x, h.y);
-    if (hit?.closest?.('.word,.glyph,.part,#theme,#lvl,.drift-door')) continue;
-    return { x: h.x, y: h.y };
+    // Current meaning families can cover one side of a sun. Sample its
+    // visible body, staying inside the original 34px door radius and outside
+    // member near-miss forgiveness. The later empty-field tap proves the door.
+    for (const [dx, dy] of [[0,0],[24,0],[-24,0],[0,-24],[0,24],[17,-17],[-17,-17],[17,17],[-17,17]]) {
+      const x = h.x + dx, y = h.y + dy;
+      if (x < 52 || x > 338 || y < 170 || y > 690) continue;
+      const memberDistance = Math.min(...nodes.map((n) => Math.hypot(n.x - x, n.y - y)));
+      if (memberDistance < 58) continue;
+      const hit = document.elementFromPoint(x, y);
+      if (hit?.closest?.('.word,.glyph,.part,#theme,#lvl,.drift-door,#ginga-symbol,#ginga-theme-seal')) continue;
+      return { label: h.label, x, y, canvas: { x: h.x, y: h.y }, offset: [dx, dy], memberDistance };
+    }
   }
   return null;
 })()`;
@@ -242,8 +259,90 @@ const shot = (name) => page.screenshot({
 let fails = 0;
 const check = (name, pass, detail = '') => {
   if (!pass) fails += 1;
+  results.push({ name, pass: !!pass, detail });
   console.log(`${pass ? '  ok  ' : ' FAIL '}${name}${detail ? '  — ' + detail : ''}`);
 };
+
+const targetPoint = (selector, label) => page.evaluate(({ selector, label }) => {
+  const candidates = [...document.querySelectorAll(selector)].filter((el) => el.querySelector('.base,.g,.pch')?.textContent === label);
+  return candidates.map((el) => {
+    const r = el.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
+    return { label, x, y, hit: el.contains(document.elementFromPoint(x, y)), classes: el.className };
+  }).find((candidate) => candidate.hit) ?? null;
+}, { selector, label });
+async function tapMember(selector, label, trace) {
+  let point = null, waitedMs = 0;
+  // Orbiters can pass behind other real bodies. Wait for a clear current
+  // hit before delivering any input; never replay a delivered gesture.
+  for (let attempt = 0; attempt < 60 && !point; attempt++) {
+    point = await targetPoint(selector, label);
+    if (!point) { await page.waitForTimeout(100); waitedMs += 100; }
+  }
+  assert(point, `The current family must expose a hit-owned ${label}`);
+  trace.actions.push({ kind: 'tap', selector, ...point, waitedMs });
+  await tap(point.x, point.y);
+  await page.waitForTimeout(1100);
+}
+async function stageMessage(trace) {
+  await boot(1729);
+  const water = await page.evaluate(() => {
+    for (let y = 200; y < 520; y += 20) for (let x = 220; x < 330; x += 20) {
+      if (!document.elementFromPoint(x, y)?.closest('.word,.glyph,.part,#lvl,#theme,#ginga-symbol,#ginga-theme-seal')) return { x, y };
+    }
+    return null;
+  });
+  assert(water, 'The staged subject needs a real open-water camera pan');
+  let x = water.x, y = water.y;
+  const points = [];
+  await T('touchStart', [[x, y]]);
+  for (let step = 0; step < 40; step++) {
+    const subject = await page.evaluate(wordAt('伝言'));
+    assert(subject.exists, 'The rendered message subject must survive the camera pan');
+    const dx = 195 - subject.x, dy = 420 - subject.y;
+    if (Math.hypot(dx, dy) < 4) break;
+    x += Math.max(-12, Math.min(12, dx * 0.35)); y += Math.max(-12, Math.min(12, dy * 0.35));
+    points.push([x, y]);
+    await T('touchMove', [[x, y]]); await page.waitForTimeout(20);
+    await T('touchMove', [[x, y]]); await page.waitForTimeout(90);
+  }
+  await T('touchEnd', []); await page.waitForTimeout(700);
+  trace.actions.push({ kind: 'camera-pan', subject: '伝言', from: water, points });
+  for (let rung = 0; rung < 3; rung++) await tapMember('#drift-layer .word', '伝言', trace);
+  assert.equal((await page.evaluate(world)).depth, '伝言');
+}
+async function stageCard(kind) {
+  const trace = { name: `${kind}-card`, seed: 1729, actions: [] };
+  stagings.push(trace);
+  try {
+    await stageMessage(trace);
+    if (kind === 'radical') {
+      await tapMember('#drift-layer .glyph', '伝', trace);
+      await tapMember('#drift-layer .glyph.comp', '亻', trace);
+      await tapMember('#drift-layer .glyph.center', '亻', trace);
+    } else {
+      await tapMember('#drift-layer .glyph', '言', trace);
+      for (let rung = 0; rung < 3; rung++) await tapMember('#drift-layer .word', '言葉', trace);
+      await tapMember('#drift-layer .part', 'を', trace);
+      await tapMember('#drift-layer .part.center', 'を', trace);
+    }
+    trace.state = await page.evaluate(world);
+    assert(trace.state.card && trace.state.depth, 'The real dive must retain an open Drift card');
+    await shot(`staging-${kind}-card.png`);
+    return true;
+  } catch (error) { trace.error = error.message; return false; }
+}
+async function stageHubBloom(name) {
+  await boot(1729);
+  const trace = { name, seed: 1729, actions: [] };
+  stagings.push(trace);
+  await tapMember('#drift-layer .word', '外出', trace);
+  await page.waitForTimeout(600);
+  trace.state = await page.evaluate(world);
+  trace.hub = await page.evaluate(freshHub);
+  assert.equal(trace.state.ctr, '外出');
+  assert(trace.hub?.label, 'A current canvas hub must be both observed and hit-testable as open water');
+  return trace.hub;
+}
 
 /* 1 · camera hands never judge (P0) — a third finger on a word while two
  * fingers pinch, then a pinch finger lifts: nothing may be graded. */
@@ -273,35 +372,7 @@ await T('touchCancel', []);
 
 /* 2 · the radical explainer is a modal, not a hole (P0) — its taps must not
  * dismantle the dive stack, and its close button must be reachable. */
-await boot();
-w = await page.evaluate(anyWord);
-await tap(w.x, w.y);
-await page.waitForTimeout(500);
-await tap(w.x, w.y);
-await page.waitForTimeout(400);
-await tap(w.x, w.y);
-await page.waitForTimeout(1500); // dive
-let glyph = await page.evaluate(`(() => {
-  const el = document.querySelector('#drift-layer .glyph');
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-})()`);
-if (glyph) {
-  await tap(glyph.x, glyph.y);
-  await page.waitForTimeout(1500);
-}
-// the explainer lives on a radical card: hop into a radical chip
-const part = await page.evaluate(`(() => {
-  const el = document.querySelector('#drift-layer .part, #drift-layer .glyph.comp');
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-})()`);
-if (part) {
-  await tap(part.x, part.y);
-  await page.waitForTimeout(1600);
-}
+await stageCard('radical');
 const depthBefore = (await page.evaluate(world)).depth;
 const radQ = await page.evaluate(`(() => {
   const c = document.getElementById('card');
@@ -562,53 +633,24 @@ check('hunt · a 44px near-miss under a lock forgives instead of razing',
   `true-water=${ctr10?.water ?? false} at ${ctr10?.distance ?? '—'}px; centre "${before10.ctr}" → "${after10.ctr}"`);
 
 /* 11 · a deliberate release is never consumed by the hub-sun door, and no
- * constellation rides into a dive (P1). Six independent blooms, each
- * released on far water — one of them lands on a hub sooner or later. */
-// Find a real hub the only way the DOM allows: hubs have no element, so probe
-// water with nothing held — a point that dives IS a hub centre. The field
-// boots deterministically, so the same screen point is the same hub next boot.
-// The bloom glides the camera, so the hub must be found in the SAME camera
-// state it will be used in: stage the bloom, release it, then probe.
-await boot();
-const wStage = await page.evaluate(anyWord);
-await tap(wStage.x, wStage.y);
-await page.waitForTimeout(1200);
-const clearWater = await page.evaluate(openWaterForLock);
-if (clearWater) { await tap(clearWater.x, clearWater.y); await page.waitForTimeout(500); }
-let hub = null;
-for (let y = 236; y < 728 && !hub; y += 30) {
-  for (let x = 44; x < 350 && !hub; x += 30) {
-    // a hub sun IS a galaxy centre, so words cluster around it — a radial
-    // clearance test excludes exactly where hubs live. Hit-test instead.
-    const clear = await page.evaluate(`(() => {
-      const el = document.elementFromPoint(${x}, ${y});
-      if (!el) return false;
-      return !el.closest('.word,.glyph,.part,#lvl,#theme,#card,#radoc,#drift-tray,.drift-door,header,nav,button,a');
-    })()`);
-    if (!clear) continue;
-    await tap(x, y);
-    await page.waitForTimeout(420);
-    const st = await page.evaluate(lockState);
-    if (st.depth !== '') { hub = { x, y, ch: st.depth }; break; }
-    if (st.ctr !== null) { await tap(x, y); await page.waitForTimeout(300); }  // stray bloom: clear it
-  }
-}
-if (hub) {
-  await boot();
-  const wh = await page.evaluate(anyWord);
-  await tap(wh.x, wh.y);
-  await page.waitForTimeout(1200);   // identical staging to the probe pass
-  const held = await page.evaluate(lockState);
+ * constellation rides into a dive (P1). Observe a clear canvas hub in this
+ * held scene. Its second tap, after release, must prove it is a real door. */
+const hub = await stageHubBloom('hub-release');
+const hubHeld = await page.evaluate(lockState);
+await tap(hub.x, hub.y);
+await page.waitForTimeout(700);
+const hubReleased = await page.evaluate(lockState);
+let hubDoor = null;
+if (hubReleased.depth === '' && hubReleased.ctr === null) {
   await tap(hub.x, hub.y);
-  await page.waitForTimeout(700);
-  const after = await page.evaluate(lockState);
-  check('hunt · a release on a hub sun releases the constellation instead of diving',
-    held.ctr !== null && after.depth === '' && after.ctr === null,
-    `hub "${hub.ch}" at (${hub.x},${hub.y}) · held "${held.ctr}" → ctr ${after.ctr}, depth "${after.depth}"`);
-} else {
-  check('hunt · a release on a hub sun releases the constellation instead of diving', false,
-    'no hub found by probing — the check cannot prove anything, treat as red');
+  await page.waitForTimeout(1100);
+  hubDoor = await page.evaluate(lockState);
 }
+stagings[stagings.length - 1].release = hubReleased;
+stagings[stagings.length - 1].door = hubDoor;
+check('hunt · a release on a hub sun releases the constellation instead of diving',
+  hubHeld.ctr !== null && hubReleased.depth === '' && hubReleased.ctr === null && !!hubDoor?.depth,
+  `canvas hub "${hub.label}" at (${hub.x.toFixed(1)},${hub.y.toFixed(1)}) · held "${hubHeld.ctr}" → ctr ${hubReleased.ctr}, depth "${hubReleased.depth}"; next tap depth="${hubDoor?.depth ?? ''}"`);
 
 /* 12 · a foreign finger cannot carry a held word (pointermove had no
  * ownership check; #card swallows pointerdown and has no pointermove
@@ -616,21 +658,7 @@ if (hub) {
  * touch set while its every move still reached the drag branch, P1).
  * Run inside a dive with the card open: no camera pan, no tide rail, so a
  * raw pixel delta is honest here. */
-await boot();
-w = await page.evaluate(anyWord);
-await tap(w.x, w.y);
-await page.waitForTimeout(500);
-await tap(w.x, w.y);
-await page.waitForTimeout(400);
-await tap(w.x, w.y);
-await page.waitForTimeout(1600); // dive
-const centre = await page.evaluate(`(() => {
-  const el = document.querySelector('#drift-layer .word.center');
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-})()`);
-if (centre) { await tap(centre.x, centre.y); await page.waitForTimeout(700); } // opens the card
+await stageCard('particle');
 const stage = await page.evaluate(`(() => {
   const card = document.getElementById('card');
   const cr = card && card.classList.contains('open') ? card.getBoundingClientRect() : null;
@@ -642,7 +670,7 @@ const stage = await page.evaluate(`(() => {
     return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
     parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
-    (!cr || o.r.bottom < cr.top - 20))
+    (!cr || o.r.bottom < cr.top - 20) && o.el.contains(document.elementFromPoint(o.x, o.y)))
     .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];   // highest and leftmost
   return {
     card: cr ? { x: cr.right - 26, y: cr.top + 20 } : null,   // far corner of the card
@@ -659,6 +687,7 @@ const fieldPos = `(() => Object.fromEntries([...document.querySelectorAll('#drif
   })))()`;
 if (stage.card && stage.orb) {
   const p0 = await page.evaluate(fieldPos);
+  await page.evaluate(() => { window.__driftHuntPointerDowns.length = 0; });
   await TI('touchStart', [{ x: stage.orb.x, y: stage.orb.y, id: 1 }]);
   await page.waitForTimeout(90);
   await TI('touchStart', [{ x: stage.orb.x, y: stage.orb.y, id: 1 }, { x: stage.card.x, y: stage.card.y, id: 2 }]);
@@ -668,6 +697,7 @@ if (stage.card && stage.orb) {
                            { x: stage.card.x - i * 22, y: stage.card.y + i * 6, id: 2 }]);
   }
   const p1 = await page.evaluate(fieldPos);
+  const observedFingers = await page.evaluate(() => window.__driftHuntPointerDowns);
   await TI('touchCancel', []);
   await page.waitForTimeout(300);
   const deltas = Object.keys(p0).filter((k) => p1[k] && k !== stage.orb.w)
@@ -679,10 +709,14 @@ if (stage.card && stage.orb) {
   const median = live.length ? live[Math.floor(live.length / 2)] : 0;
   const target = p0[stage.orb.w] && p1[stage.orb.w]
     ? Math.hypot(p1[stage.orb.w][0] - p0[stage.orb.w][0], p1[stage.orb.w][1] - p0[stage.orb.w][1]) : -1;
+  const ownerFinger = observedFingers.find((finger) => finger.word === stage.orb.w);
+  const cardFinger = observedFingers.find((finger) => finger.card);
+  stagings[stagings.length - 1].fingers = { stage, observedFingers, target, median };
   check('hunt · a finger the gesture never owned cannot carry a held word',
-    target >= 0 && target - median < 30,
+    ownerFinger && cardFinger && ownerFinger.id !== cardFinger.id && target >= 0 && target - median < 30,
     `held ${target.toFixed(1)}px vs orbiter median ${median.toFixed(1)}px of ${live.length} moving ` +
-    `(all-words median ${(deltas[Math.floor(deltas.length / 2)] ?? 0).toFixed(1)}px, max ${(deltas[deltas.length - 1] ?? 0).toFixed(1)}px)`);
+    `(all-words median ${(deltas[Math.floor(deltas.length / 2)] ?? 0).toFixed(1)}px, max ${(deltas[deltas.length - 1] ?? 0).toFixed(1)}px); ` +
+    `owner id=${ownerFinger?.id ?? null}, card id=${cardFinger?.id ?? null}`);
 } else {
   check('hunt · a finger the gesture never owned cannot carry a held word', false,
     `staging failed: card=${!!stage.card} orbiter=${!!stage.orb}`);
@@ -1038,13 +1072,9 @@ check('hunt · node-down/far-up without a delivered move is not a tap, drag, or 
   `word displacement=${nodeAfter.exists ? Math.hypot(nodeAfter.x - nodeBefore.x, nodeAfter.y - nodeBefore.y).toFixed(1) : '∞'}px; ` +
     `tray ${JSON.stringify(nodeTrayBefore)}→${JSON.stringify(nodeWorldAfter.tray)}, ctr=${nodeWorldAfter.ctr}, depth=${JSON.stringify(nodeWorldAfter.depth)}`);
 
-await boot();
-w = await page.evaluate(anyWord);
-await tap(w.x, w.y);
-await page.waitForTimeout(1100);
+const releaseHub = await stageHubBloom('terminal-hub-release');
 const releaseBefore = await page.evaluate(world);
 const releaseWater = await page.evaluate(openWater);
-const releaseHub = await page.evaluate(freshHub);
 if (releaseWater && releaseHub) {
   await M('mousePressed', releaseWater.x, releaseWater.y);
   await page.waitForTimeout(65);
@@ -1052,12 +1082,9 @@ if (releaseWater && releaseHub) {
   await page.waitForTimeout(750);
 }
 const releaseAfter = await page.evaluate(world);
+stagings[stagings.length - 1].terminal = { water: releaseWater, before: releaseBefore, after: releaseAfter };
 
-await boot();
-w = await page.evaluate(anyWord);
-await tap(w.x, w.y);
-await page.waitForTimeout(1100);
-const deliberateHub = await page.evaluate(freshHub);
+const deliberateHub = await stageHubBloom('deliberate-hub-release');
 const deliberateBefore = await page.evaluate(world);
 if (deliberateHub) {
   await tap(deliberateHub.x, deliberateHub.y);
@@ -1069,8 +1096,11 @@ if (deliberateHub && deliberateRelease.depth === '' && deliberateRelease.ctr ===
   await page.waitForTimeout(1100);
 }
 const deliberateDive = await page.evaluate(world);
+const themeBefore = await page.getAttribute('html', 'data-theme');
 if (deliberateDive.depth) {
-  await page.tap('#drift-layer #theme');
+  await page.tap('#ginga-theme-seal');
+  await page.waitForSelector('.world-picker');
+  await page.locator('.world-stone[aria-pressed="false"]').first().tap();
   await page.waitForTimeout(350);
   const diveWater = await page.evaluate(openWater);
   if (diveWater) {
@@ -1079,6 +1109,11 @@ if (deliberateDive.depth) {
   }
 }
 const afterThemeSurface = await page.evaluate(world);
+const themeAfter = await page.getAttribute('html', 'data-theme');
+stagings[stagings.length - 1].release = deliberateRelease;
+stagings[stagings.length - 1].dive = deliberateDive;
+stagings[stagings.length - 1].theme = { before: themeBefore, after: themeAfter };
+stagings[stagings.length - 1].surfaced = afterThemeSurface;
 await shot('10-hub-release-theme-cleanup.png');
 check('hunt · hub release cannot hijack a gesture or leave themed ghost satellites',
   !!releaseWater && !!releaseHub && releaseAfter.depth === '' && releaseAfter.ctr === releaseBefore.ctr &&
@@ -1086,17 +1121,18 @@ check('hunt · hub release cannot hijack a gesture or leave themed ghost satelli
     JSON.stringify(releaseAfter.members) === JSON.stringify(releaseBefore.members) &&
     !!deliberateHub && deliberateBefore.ctr !== null && deliberateRelease.depth === '' &&
     deliberateRelease.ctr === null && deliberateRelease.sats === 0 && deliberateDive.depth !== '' &&
-    afterThemeSurface.depth === '' && afterThemeSurface.ctr === null && afterThemeSurface.sats === 0,
+    themeAfter !== themeBefore && afterThemeSurface.depth === '' && afterThemeSurface.ctr === null && afterThemeSurface.sats === 0,
   `terminal ${Math.hypot((releaseHub?.x ?? 0) - (releaseWater?.x ?? 0), (releaseHub?.y ?? 0) - (releaseWater?.y ?? 0)).toFixed(0)}px: ` +
     `depth="${releaseAfter.depth}", centre="${releaseAfter.ctr}", sats=${releaseBefore.sats}→${releaseAfter.sats}, ` +
     `same identities=${JSON.stringify(releaseAfter.members) === JSON.stringify(releaseBefore.members)}; ` +
     `deliberate release ctr="${deliberateBefore.ctr}"→"${deliberateRelease.ctr}", depth="${deliberateRelease.depth}"; ` +
     `second-tap depth="${deliberateDive.depth}"; ` +
-    `after theme+surface centre="${afterThemeSurface.ctr}", sats=${afterThemeSurface.sats}`);
+    `theme=${JSON.stringify(themeBefore)}→${JSON.stringify(themeAfter)}; after theme+surface centre="${afterThemeSurface.ctr}", sats=${afterThemeSurface.sats}`);
 
 check('hunt · no page errors across the regression battery', errs.length === 0, errs.slice(0, 2).join(' | '));
 
 console.log(`\n${fails === 0 ? 'ALL HUNT REGRESSIONS GREEN' : fails + ' HUNT REGRESSION(S) FAILING'}`);
+writeFileSync(resolve(EVIDENCE, 'drift-hunt-report.json'), JSON.stringify({ schemaVersion: 1, engine: 'chromium', artifact: JSON.parse(readFileSync(resolve(CORRIDOR, 'build-identity.json'))).artifactSha256, site: CORRIDOR, sourceSha256, results, stagings, errors: errs, pass: fails === 0 }, null, 2) + '\n');
 await browser.close();
 server.close();
 process.exit(fails === 0 ? 0 : 1);

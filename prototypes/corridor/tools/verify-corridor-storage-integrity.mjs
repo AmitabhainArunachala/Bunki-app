@@ -1,44 +1,45 @@
 #!/usr/bin/env node
-
+/** Executes legacy input validation and current pure/async application policies.
+ * Native durability, ownership and browser UI acceptance live in the mandatory
+ * RecordApp, record-live, learning-record and drift-record browser suites. */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import ts from 'typescript';
+import * as fsrs from '../vendor/ts-fsrs.mjs';
+import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
-const BASE = 'ac880aff052991b230dfdd9b7f39267ae764a05f';
-const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
-const corridorUrl = new URL('../corridor.js', import.meta.url);
-const corridorPath = fileURLToPath(corridorUrl);
-const cssPath = fileURLToPath(new URL('../corridor.css', import.meta.url));
-const driftCssPath = fileURLToPath(new URL('../drift-layer.css', import.meta.url));
-const residualPath = fileURLToPath(
-  new URL(
-    '../../../docs/build-evidence/reading-r5-learning-loop-r5-20260815/residual-storage-callers.json',
-    import.meta.url,
-  ),
-);
-const driftLayerPath = fileURLToPath(new URL('../drift-layer.js', import.meta.url));
-const driftArtifactPath = fileURLToPath(new URL('../../drift/drift-artifact.html', import.meta.url));
+const corridorPath = fileURLToPath(new URL('../corridor.js', import.meta.url));
 const source = readFileSync(corridorPath, 'utf8');
-const PIN = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../data/fsrs-pin.json', import.meta.url)), 'utf8'),
-);
-const css = readFileSync(cssPath, 'utf8');
-const driftCss = readFileSync(driftCssPath, 'utf8');
-const driftLayerSource = readFileSync(driftLayerPath, 'utf8');
-const driftArtifactSource = readFileSync(driftArtifactPath, 'utf8');
+const PIN = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
+const css = readFileSync(new URL('../corridor.css', import.meta.url), 'utf8');
+const driftCss = readFileSync(new URL('../drift-layer.css', import.meta.url), 'utf8');
 const checks = [];
-
+const failures = [];
+const observations = {};
 function verified(name, body) {
-  body();
-  checks.push(name);
+  try { body(); checks.push(name); }
+  catch (error) { failures.push({ name, reason: error.stack }); console.error('FAIL ' + name + ': ' + error.message); }
+}
+async function verifiedAsync(name, body) {
+  try { await body(); checks.push(name); }
+  catch (error) { failures.push({ name, reason: error.stack }); console.error('FAIL ' + name + ': ' + error.message); }
+}
+const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+function definitions(...names) {
+  const found = ast.statements.filter((statement) => {
+    const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text] :
+      ts.isVariableStatement(statement) ? statement.declarationList.declarations.map((node) => node.name.getText(ast)) : [];
+    return declared.some((name) => names.includes(name));
+  });
+  assert.equal(found.length, names.length, 'Every requested definition comes from the authored application');
+  return found.map((statement) => statement.getText(ast)).join('\n');
 }
 
-async function verifiedAsync(name, body) {
-  await body();
-  checks.push(name);
-}
 
 function betweenIn(text, start, end) {
   const from = text.indexOf(start);
@@ -118,6 +119,7 @@ class FakeElement {
     this.tagName = tag.toUpperCase();
     this.owner = owner;
     this.attributes = new Map();
+    this.dataset = {};
     this.children = [];
     this.hidden = false;
     this.isConnected = false;
@@ -149,7 +151,10 @@ class FakeElement {
     this.attributes.delete(name);
   }
 
+  addEventListener() {}
+
   append(child) {
+    if (typeof child === 'string') return;
     child.isConnected = true;
     this.children.push(child);
     if (child.id) this.owner.byId.set(child.id, child);
@@ -180,31 +185,17 @@ function fakeDocument() {
   return document;
 }
 
-const persistenceBlock = between(
-  "const STORE_KEY = 'kairo-corridor-v1';",
-  '/* ------------------------------------------------ the observation log',
-);
+
+
+// This is the real legacy decoder/hydrator, read-only migration-input work.
+// It deliberately excludes removed saveStore/writeStore and all active host code.
+const legacySchemaBlock = between("const STORE_KEY = 'kairo-corridor-v1';", '// Only acknowledged changed roots') + '\n' + definitions('storeEnvelope');
 const document = fakeDocument();
-// the persistence block registers the cross-tab storage listener at load
-// (PR 一補): the stub captures it so the staleness law is drivable here
-const windowHandlers = {};
-const storeContext = vm.createContext({
-  S: state(),
-  document,
-  localStorage: storage(),
-  tx: (_ja, en) => en,
-  window: {
-    addEventListener: (kind, handler) => {
-      windowHandlers[kind] = handler;
-    },
-  },
-});
-vm.runInContext(
-  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, crossingId, FSRS_WEIGHT_BOUNDS };`,
-  storeContext,
-  { filename: 'corridor-persistence-block.js' },
-);
+const storeContext = vm.createContext({ S: state(), document, localStorage: storage(),
+  tx: (_ja, en) => en, window: {}, recordWritable: () => false });
+vm.runInContext(legacySchemaBlock + '\n;globalThis.__storeApi = { loadStore, hydrateStore, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };', storeContext);
 const storeApi = storeContext.__storeApi;
+
 
 verified('read-exception-quarantine-and-global-alert', () => {
   storeContext.S = state({ view: 'drift' });
@@ -505,6 +496,7 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
   ];
   const rawCanaries = [['non-finite nested number', '{"v":1,"futureField":{"n":1e999}}']];
   for (const [name, envelope] of invalidEnvelopes) rawCanaries.push([name, JSON.stringify(envelope)]);
+  observations.malformedLegacyCanaries = rawCanaries.length;
 
   const learnerRoots = Object.keys(state()).filter(
     (key) => !['storeReadOnly', 'storeError', 'view', 'focus'].includes(key),
@@ -535,9 +527,10 @@ verified('reserved-map-names-round-trip-without-pollution-or-data-loss', () => {
       `{"${name}":{"topLevel":true},"futureField":{"${name}":{"bunkiPolluted":"${name}"}}}`,
     );
 
-    assert.equal(storeApi.saveStore(), true, name);
-    assert.equal(storeContext.localStorage.attempts, 1, name);
-    const durable = JSON.parse(storeContext.localStorage.value);
+    const bytes = JSON.stringify(storeApi.storeEnvelope(storeContext.S));
+    const durable = JSON.parse(bytes);
+    assert.equal(storeApi.validStoreEnvelope(durable), true, name);
+    assert.equal(storeContext.localStorage.attempts, 0, 'Serialization never writes the legacy source');
     assert.equal(Object.hasOwn(durable.lists, name), true, name);
     assert.equal(durable.lists[name][0].id, `reserved-${name}`, name);
     assert.equal(Object.hasOwn(durable, name), true, name);
@@ -549,7 +542,7 @@ verified('reserved-map-names-round-trip-without-pollution-or-data-loss', () => {
       name,
     );
 
-    const roundTripStorage = storeContext.localStorage;
+    const roundTripStorage = storage(bytes);
     storeContext.S = state({ lists: {}, storeExtras: {} });
     storeContext.localStorage = roundTripStorage;
     storeApi.loadStore();
@@ -583,39 +576,18 @@ verified('reserved-map-names-round-trip-without-pollution-or-data-loss', () => {
   assert.equal(Object.prototype.bunkiPolluted, pollutionBefore);
   assert.equal(vm.runInContext('Object.prototype.bunkiPolluted', storeContext), vmPollutionBefore);
 
-  // list creation moved to the guarded transactional path (覚える stage 2):
-  // names are still prototype-safe (owns + setOwnRecordValue on the COPY)
-  // and the commit rides commitStorePatch, never a direct S.lists mutation.
-  const listProducer = between('function renderListPicker(sheet, node, label) {', 'function schedulePreview() {');
-  assert.match(listProducer, /owns\(S\.lists, name\)/);
-  assert.match(listProducer, /setOwnRecordValue\(next, name,/);
-  assert.match(listProducer, /commitStorePatch\(\{ lists: next \}\)/);
-  assert.doesNotMatch(listProducer, /setOwnRecordValue\(S\.lists,/);
-  assert.doesNotMatch(listProducer, /if \(!name \|\| S\.lists\[name\]\)/);
-  assert.doesNotMatch(listProducer, /S\.lists\[name\] = \[/);
 });
 
-verified('invalid-candidate-is-rejected-before-storage', () => {
-  const durable = '{"v":1,"taken":[]}';
-  storeContext.S = state({ lists: { malformed: {} } });
-  storeContext.localStorage = storage(durable);
-  assert.equal(storeApi.saveStore(), false);
-  assert.equal(storeContext.localStorage.attempts, 0);
-  assert.equal(storeContext.localStorage.writes, 0);
-  assert.equal(storeContext.localStorage.value, durable);
-  assert.match(storeContext.S.storeError, /could not save/);
-
-  const writeStore = between('function writeStore(state) {', 'function saveStore() {');
-  assert.match(writeStore, /validStoreEnvelope\(JSON\.parse\(bytes\)\)/);
-  assert.ok(
-    writeStore.indexOf('validStoreEnvelope(JSON.parse(bytes))') <
-      writeStore.indexOf('localStorage.setItem(STORE_KEY, bytes)'),
-  );
+verified('invalid-candidate-fails-the-schema-before-hydration', () => {
+  const candidate = storeApi.storeEnvelope(state({ lists: { malformed: {} } }));
+  assert.equal(storeApi.validStoreEnvelope(JSON.parse(JSON.stringify(candidate))), false);
 });
 
 verified('stable-alert-node-no-repeat-announcement', () => {
   const alert = document.getElementById('store-alert');
   storeContext.S.view = 'tray';
+  storeContext.S.storeError = 'Synthetic repeated warning';
+  storeApi.syncStoreAlert();
   const writesBefore = alert.textWrites;
   assert.strictEqual(storeApi.syncStoreAlert(), alert);
   assert.strictEqual(storeApi.syncStoreAlert(), alert);
@@ -642,76 +614,11 @@ verified('open-sheet-description-tracks-error-without-render', () => {
   assert.equal(sheet.getAttribute('aria-describedby'), null);
 });
 
-verified('read-only-suppresses-writes', () => {
-  storeContext.S = state({ storeReadOnly: true, storeError: 'protected' });
-  storeContext.localStorage = storage('{"durable":"canary"}');
-  const protectedTaken = storeContext.S.taken;
-  assert.equal(storeApi.commitStorePatch({ taken: [{ t: 'word', id: 'new' }] }), false);
-  assert.strictEqual(storeContext.S.taken, protectedTaken);
-  assert.equal(storeContext.localStorage.value, '{"durable":"canary"}');
-  assert.equal(storeContext.localStorage.attempts, 0);
-});
-
-verified('failure-atomic-write-and-retry-cleanup', () => {
-  storeContext.S = state();
-  storeContext.localStorage = storage();
-  assert.equal(storeApi.saveStore(), true);
-  const durableBeforeFailure = storeContext.localStorage.value;
-  const liveTakenBeforeFailure = storeContext.S.taken;
-  const liveReadDoneBeforeFailure = storeContext.S.readDone;
-  storeContext.localStorage.setError = new Error('quota');
-  assert.equal(
-    storeApi.commitStorePatch({
-      taken: [...storeContext.S.taken, { t: 'word', id: 'uncommitted' }],
-      readDone: { article: 1 },
-    }),
-    false,
-  );
-  assert.strictEqual(storeContext.S.taken, liveTakenBeforeFailure);
-  assert.strictEqual(storeContext.S.readDone, liveReadDoneBeforeFailure);
-  assert.equal(storeContext.localStorage.value, durableBeforeFailure);
-  assert.match(storeContext.S.storeError, /could not save/);
-  const alert = document.getElementById('store-alert');
-  assert.equal(alert.hidden, false);
-
-  storeContext.localStorage.setError = null;
-  const oldTaken = storeContext.S.taken;
-  const nextTaken = [...oldTaken, { t: 'word', id: 'committed' }];
-  let liveAtWrite = null;
-  let candidateAtWrite = null;
-  storeContext.localStorage.onSet = (bytes) => {
-    liveAtWrite = storeContext.S.taken;
-    candidateAtWrite = JSON.parse(bytes);
-  };
-  assert.equal(storeApi.commitStorePatch({ taken: nextTaken }), true);
-  assert.strictEqual(liveAtWrite, oldTaken);
-  assert.equal(candidateAtWrite.taken.at(-1).id, 'committed');
-  assert.equal(candidateAtWrite.futureField.keep, true);
-  assert.strictEqual(storeContext.S.taken, nextTaken);
-  assert.equal(alert.hidden, true);
-  assert.equal(alert.textContent, '');
-});
-
-verified('post-setitem-alert-throw-cannot-block-publication', () => {
-  storeContext.S = state({ storeError: 'old warning' });
-  storeContext.localStorage = storage();
-  const oldTaken = storeContext.S.taken;
-  const nextTaken = [...oldTaken, { t: 'word', id: 'durable-despite-layout' }];
-  storeContext.localStorage.onSet = () => {
-    document.throwOnQuery = true;
-  };
-  try {
-    assert.equal(storeApi.commitStorePatch({ taken: nextTaken }), true);
-    assert.equal(storeContext.localStorage.attempts, 1);
-    assert.equal(storeContext.localStorage.writes, 1);
-    assert.equal(JSON.parse(storeContext.localStorage.value).taken.at(-1).id, 'durable-despite-layout');
-    assert.strictEqual(storeContext.S.taken, nextTaken);
-    assert.equal(storeContext.S.storeError, null);
-  } finally {
-    document.throwOnQuery = false;
-  }
-  assert.ok(storeApi.safelySyncStoreAlert());
-  assert.equal(document.getElementById('store-alert').hidden, true);
+verified('alert-layout-failure-stays-isolated-and-retryable', () => {
+  storeContext.S = state({ storeError: 'Synthetic storage failure' }); document.throwOnQuery = true;
+  assert.equal(storeApi.safelySyncStoreAlert(), null);
+  document.throwOnQuery = false; assert(storeApi.safelySyncStoreAlert());
+  assert.equal(document.getElementById('store-alert').hidden, false);
 });
 
 const articleBlock = between(
@@ -743,472 +650,7 @@ await verifiedAsync('article-rejection-http-failure-and-retry', async () => {
   assert.equal(Object.hasOwn(passage, '_loading'), false);
 });
 
-const readerActionBlock = between('function commitReadDone(', 'function renderReader(');
-verified('reader-finish-action-executes-one-boundary', () => {
-  const context = vm.createContext({ S: { readDone: {} }, commitStorePatch: null });
-  vm.runInContext(`${readerActionBlock};globalThis.action = commitReadDone;`, context);
-  let attempts = 0;
-  context.commitStorePatch = () => {
-    attempts += 1;
-    return false;
-  };
-  const before = context.S.readDone;
-  assert.equal(context.action('article', 123), false);
-  assert.equal(attempts, 1);
-  assert.strictEqual(context.S.readDone, before);
-  context.commitStorePatch = (patch) => {
-    attempts += 1;
-    Object.assign(context.S, patch);
-    return true;
-  };
-  assert.equal(context.action('article', 123), true);
-  assert.equal(attempts, 2);
-  assert.equal(context.S.readDone.article, 123);
-});
 
-const captureActionBlock = between('function commitCapture(', 'function takeButton(');
-verified('deep-capture-action-executes-one-boundary', () => {
-  const context = vm.createContext({
-    S: { taken: [], deepWords: {} },
-    D: { dict: {} },
-    NODE_KIND: { word: ['語', 'word'] },
-    lookup: () => ({ r: 'あんど', m: ['relief'], seq: 42, jlpt: 1 }),
-    commitStorePatch: null,
-  });
-  vm.runInContext(`${captureActionBlock};globalThis.action = commitCapture;`, context);
-  const node = { t: 'word', id: '安堵', from: { passage: 'p', index: 2 } };
-  let attempts = 0;
-  context.commitStorePatch = () => {
-    attempts += 1;
-    return false;
-  };
-  const oldTaken = context.S.taken;
-  const oldDeepWords = context.S.deepWords;
-  assert.equal(context.action(node, '安堵', 456), false);
-  assert.equal(attempts, 1);
-  assert.strictEqual(context.S.taken, oldTaken);
-  assert.strictEqual(context.S.deepWords, oldDeepWords);
-  context.commitStorePatch = (patch) => {
-    attempts += 1;
-    Object.assign(context.S, patch);
-    return true;
-  };
-  assert.equal(context.action(node, '安堵', 456), true);
-  assert.equal(attempts, 2);
-  assert.equal(context.S.taken.length, 1);
-  assert.equal(context.S.taken[0].entrySeq, '42');
-  // 覚える is the explicit promotion — the mark rides the capture instant
-  assert.equal(context.S.taken[0].started, 456);
-  assert.equal(context.S.deepWords['安堵'].r, 'あんど');
-});
-
-verified('capture-context-rides-the-guarded-boundary', () => {
-  const context = vm.createContext({
-    S: { taken: [], deepWords: {} },
-    D: { dict: { 海: { r: 'うみ', m: ['sea'] } } },
-    NODE_KIND: { word: ['語', 'word'] },
-    lookup: () => null,
-    commitStorePatch: null,
-  });
-  vm.runInContext(`${captureActionBlock};globalThis.action = commitCapture;`, context);
-  context.commitStorePatch = (patch) => {
-    Object.assign(context.S, patch);
-    return true;
-  };
-  // R2-B: the reader's top-right door and the mini pass ctxScope alongside
-  // provenance — the stored item carries the validator's exact ctx shape
-  assert.equal(
-    context.action({ t: 'word', id: '海', from: { passage: 'p', index: 4 }, ctxScope: 'sent' }, '海', 111),
-    true,
-  );
-  const storedCtx = context.S.taken[0].ctx;
-  assert.equal(storedCtx.p, 'p');
-  assert.equal(storedCtx.i, 4);
-  assert.equal(storedCtx.scope, 'sent');
-  assert.equal(Object.keys(storedCtx).length, 3);
-  assert.equal(context.S.taken[0].from.passage, 'p');
-  // without provenance there is no context to carry — no ctx is minted
-  assert.equal(context.action({ t: 'word', id: '海', ctxScope: 'sent' }, '海', 112), true);
-  assert.equal(Object.hasOwn(context.S.taken[1], 'ctx'), false);
-  // what capture writes, the fail-closed envelope must accept verbatim
-  assert.equal(storeApi.validStoreEnvelope({ v: 1, taken: context.S.taken }), true);
-});
-
-const gradeActionBlock = between('function advanceReviewSession(', '/** Items ready to review:');
-
-function gradeContext() {
-  const context = vm.createContext({
-    S: { obslog: [], revlog: [], srs: {}, stats: {} },
-    commitStorePatch: null,
-    srsReviewLogRow: () => ['review-row'],
-    srsStoredRecord: () => ({ due: 'stored' }),
-  });
-  vm.runInContext(
-    `${gradeActionBlock};globalThis.actions = { commitDrillGrade, commitStandardGrade };`,
-    context,
-  );
-  return context;
-}
-
-function reviewSession() {
-  return { queue: [], history: [], done: { good: 0 }, ix: 0, revealed: true };
-}
-
-verified('drill-grade-action-failure-and-success', () => {
-  const context = gradeContext();
-  const item = { t: 'word', id: '海' };
-  const next = { state: 1, scheduled_days: 0 };
-  let rv = reviewSession();
-  const before = JSON.stringify(rv);
-  let attempts = 0;
-  context.commitStorePatch = () => {
-    attempts += 1;
-    return false;
-  };
-  assert.equal(
-    context.actions.commitDrillGrade({
-      rv,
-      item,
-      next,
-      key: 'good',
-      skey: 'word:海',
-      rating: 3,
-      now: new Date(1000),
-    }),
-    false,
-  );
-  assert.equal(attempts, 1);
-  assert.equal(JSON.stringify(rv), before);
-  assert.equal(context.S.obslog.length, 0);
-
-  rv = reviewSession();
-  context.commitStorePatch = (patch) => {
-    attempts += 1;
-    Object.assign(context.S, patch);
-    return true;
-  };
-  assert.equal(
-    context.actions.commitDrillGrade({
-      rv,
-      item,
-      next,
-      key: 'good',
-      skey: 'word:海',
-      rating: 3,
-      now: new Date(1000),
-    }),
-    true,
-  );
-  assert.equal(attempts, 2);
-  assert.equal(context.S.obslog.length, 1);
-  assert.equal(rv.ix, 1);
-  assert.equal(rv.done.good, 1);
-  assert.equal(rv.history[0].drill, true);
-  assert.equal(rv.queue.length, 1);
-  // a modeless call keeps the legacy four-wide row; naming the drill room
-  // rides it as the trailing mode — never FSRS state, never a revlog row
-  // (rows are vm-realm arrays, so compare their serialized bytes)
-  assert.equal(JSON.stringify(context.S.obslog[0]), JSON.stringify([1000, 'dojo', 'word:海', 3]));
-  rv = reviewSession();
-  assert.equal(
-    context.actions.commitDrillGrade({
-      rv,
-      item,
-      next,
-      key: 'good',
-      skey: 'word:海',
-      rating: 3,
-      mode: 'kanji',
-      now: new Date(2000),
-    }),
-    true,
-  );
-  assert.equal(context.S.obslog.length, 2);
-  assert.equal(
-    JSON.stringify(context.S.obslog[1]),
-    JSON.stringify([2000, 'dojo', 'word:海', 3, 'kanji']),
-  );
-  assert.equal(context.S.revlog.length, 0);
-  assert.equal(Object.keys(context.S.srs).length, 0);
-  assert.equal(Object.keys(context.S.stats).length, 0);
-});
-
-verified('standard-grade-action-failure-and-success', () => {
-  const context = gradeContext();
-  const item = { t: 'word', id: '海' };
-  const next = { state: 2, scheduled_days: 2 };
-  let rv = reviewSession();
-  const before = JSON.stringify(rv);
-  let attempts = 0;
-  context.commitStorePatch = () => {
-    attempts += 1;
-    return false;
-  };
-  const args = {
-    rv,
-    item,
-    card: {},
-    next,
-    key: 'good',
-    skey: 'word:海',
-    rating: 3,
-    now: new Date(1000),
-    day: '1970-01-01',
-    prevRec: undefined,
-  };
-  assert.equal(context.actions.commitStandardGrade(args), false);
-  assert.equal(attempts, 1);
-  assert.equal(JSON.stringify(rv), before);
-  assert.equal(context.S.revlog.length, 0);
-  assert.equal(Object.keys(context.S.srs).length, 0);
-
-  rv = reviewSession();
-  context.commitStorePatch = (patch) => {
-    attempts += 1;
-    Object.assign(context.S, patch);
-    return true;
-  };
-  assert.equal(context.actions.commitStandardGrade({ ...args, rv }), true);
-  assert.equal(attempts, 2);
-  assert.equal(context.S.revlog.length, 1);
-  assert.equal(context.S.srs['word:海'].due, 'stored');
-  assert.equal(context.S.stats['1970-01-01'].n, 1);
-  assert.equal(context.S.stats['1970-01-01'].nnew, 1);
-  assert.equal(rv.ix, 1);
-  assert.equal(rv.done.good, 1);
-  assert.equal(rv.history.length, 1);
-});
-
-/* --------------------------------------------------------- the drift bridge
- * P0 #1: a Drift flick judgment must reach the one learner state as an
- * APPEND-ONLY obslog observation — synchronously, so the ack the water
- * receives is the durability result — and must never mint FSRS state,
- * S.taken rows, or review debt (exposure is not mastery). When the host
- * cannot persist the observation, the water rolls its own store back:
- * the two records never disagree about what the learner said. */
-const observationBlock = between(
-  '/* ------------------------------------------------ the observation log',
-  "addEventListener('pagehide', obsFlush);",
-);
-
-function bridgeContext() {
-  const context = vm.createContext({
-    S: { obslog: [], srs: {}, taken: [], revlog: [], deepWords: {} },
-    window: {},
-    commitStorePatch: null,
-    srsKey: (t, id) => `${t}:${id}`,
-    saveStore: () => true,
-    setTimeout: () => 0,
-    clearTimeout: () => {},
-  });
-  vm.runInContext(observationBlock, context, { filename: 'corridor-observation-block.js' });
-  return context;
-}
-
-verified('drift-judgment-lands-in-obslog-as-one-synchronous-observation', () => {
-  const context = bridgeContext();
-  let attempts = 0;
-  context.commitStorePatch = (patch) => {
-    attempts += 1;
-    Object.assign(context.S, patch);
-    return true;
-  };
-  const before = Date.now();
-  assert.equal(context.window.bunkiDriftJudgment('word', '海', 1), true);
-  assert.equal(attempts, 1, 'the ack must ride one synchronous commit, never the tap debounce');
-  assert.equal(context.S.obslog.length, 1);
-  const [ts, kind, key, judgment] = context.S.obslog[0];
-  assert.ok(ts >= before && ts <= Date.now());
-  assert.equal(kind, 'drift');
-  assert.equal(key, 'word:海');
-  assert.equal(judgment, 3);
-  assert.equal(context.window.bunkiDriftJudgment('glyph', '語', -1), true);
-  assert.equal(context.window.bunkiDriftJudgment('part', 'は', -1), true);
-  assert.deepEqual(
-    // JSON-normalized: the rows were minted inside the vm realm
-    JSON.parse(JSON.stringify(context.S.obslog.map((row) => row.slice(1)))),
-    [
-      ['drift', 'word:海', 3],
-      ['drift', 'kanji:語', 1],
-      ['drift', 'particle:は', 1],
-    ],
-  );
-  // every bridged row round-trips the fail-closed envelope validator
-  assert.equal(
-    storeApi.validStoreEnvelope({ v: 1, obslog: JSON.parse(JSON.stringify(context.S.obslog)) }),
-    true,
-  );
-  // exposure is not mastery: no FSRS card, no capture row, no review debt
-  assert.deepEqual(context.S.srs, {});
-  assert.equal(context.S.taken.length, 0);
-  assert.equal(context.S.revlog.length, 0);
-  const bridge = betweenIn(observationBlock, 'window.bunkiDriftJudgment = (kind, key, dir) => {', '};');
-  assert.match(bridge, /return commitStorePatch\(\{ obslog \}\)/);
-  assert.doesNotMatch(bridge, /obsLog\(|setTimeout|srsStore|S\.srs|S\.taken|S\.revlog/);
-});
-
-verified('drift-judgment-persistence-failure-acks-false-and-appends-nothing', () => {
-  const context = bridgeContext();
-  let attempts = 0;
-  context.commitStorePatch = () => {
-    attempts += 1;
-    return false;
-  };
-  assert.equal(context.window.bunkiDriftJudgment('word', '海', 1), false);
-  assert.equal(attempts, 1);
-  assert.equal(context.S.obslog.length, 0);
-  assert.deepEqual(context.S.srs, {});
-  assert.equal(context.S.taken.length, 0);
-});
-
-const driftGradeBlock = betweenIn(driftLayerSource, 'function grade(n,dir){', 'function updateTray(){');
-
-verified('drift-grade-block-ships-byte-identical-to-its-source-of-truth', () => {
-  assert.equal(
-    driftGradeBlock,
-    betweenIn(driftArtifactSource, 'function grade(n,dir){', 'function updateTray(){'),
-  );
-});
-
-function driftGradeContext() {
-  const calls = [];
-  const context = vm.createContext({
-    stack: [],
-    store: { known: {}, unknown: {}, lk: 0, lu: 0 },
-    settled: 0,
-    gathered: 0,
-    unfolded: null,
-    focusN: null,
-    WALKED: [],
-    deck: [],
-    window: {},
-    saveStore: null,
-    setHint: (txt) => calls.push(['hint', txt]),
-    bloom: () => calls.push(['bloom']),
-    sink: () => calls.push(['sink']),
-    updateTray: () => calls.push(['tray']),
-    clearBloom: () => {},
-    removeNode: () => calls.push(['removeNode']),
-    topUp: () => {},
-    surface: () => {},
-    vh: () => 844,
-    performance: { now: () => 0 },
-    setTimeout: () => 0,
-  });
-  vm.runInContext(`${driftGradeBlock}\n;globalThis.grade = grade;`, context, {
-    filename: 'drift-grade-block.js',
-  });
-  return { context, calls };
-}
-
-const driftWord = () => ({
-  kind: 'word',
-  w: '海',
-  r: 'うみ',
-  g: 'sea',
-  st: 'k',
-  p: '',
-  lvl: 3,
-  gone: false,
-  frozen: false,
-  fromW: true,
-  x: 100,
-  y: 100,
-  s: 1,
-  cr: 0,
-  el: { style: {} },
-});
-
-verified('drift-judgment-reaches-the-host-only-after-its-own-commit', () => {
-  const { context, calls } = driftGradeContext();
-  const order = [];
-  context.saveStore = () => {
-    order.push('drift-save');
-    return true;
-  };
-  context.window.bunkiDriftJudgment = (kind, key, dir) => {
-    order.push(`host:${kind}:${key}:${dir}`);
-    return true;
-  };
-  const n = driftWord();
-  context.grade(n, 1);
-  assert.deepEqual(order, ['drift-save', 'host:word:海:1']);
-  assert.equal(n.gone, true);
-  assert.equal(context.store.known['海'], 1);
-  assert.equal(context.settled, 1);
-  assert.ok(calls.some(([call]) => call === 'bloom'));
-});
-
-verified('drift-store-rolls-back-when-the-host-cannot-persist', () => {
-  const failingHosts = [
-    ['acks false', () => false],
-    ['acks nothing', () => undefined],
-    [
-      'throws',
-      () => {
-        throw new Error('host store quarantined');
-      },
-    ],
-  ];
-  for (const [name, failingHost] of failingHosts) {
-    const { context, calls } = driftGradeContext();
-    const saves = [];
-    context.saveStore = () => {
-      saves.push(JSON.parse(JSON.stringify(context.store)));
-      return true;
-    };
-    context.window.bunkiDriftJudgment = failingHost;
-    const n = driftWord();
-    context.grade(n, -1);
-    // the judgment rode the first (pre-ack) save; the rollback save erased it
-    assert.equal(saves.length, 2, name);
-    assert.equal(saves[0].unknown['海'], 1, name);
-    assert.deepEqual(saves[1], { known: {}, unknown: {}, lk: 0, lu: 0 }, name);
-    assert.deepEqual(context.store, { known: {}, unknown: {}, lk: 0, lu: 0 }, name);
-    // the word stays in the water, the learner is told once, nothing departs
-    assert.equal(n.gone, false, name);
-    assert.equal(context.gathered, 0, name);
-    assert.equal(calls.filter(([call]) => call === 'hint').length, 1, name);
-    assert.ok(
-      !calls.some(([call]) => ['bloom', 'sink', 'removeNode', 'tray'].includes(call)),
-      name,
-    );
-  }
-});
-
-verified('drift-own-save-failure-never-reaches-the-host', () => {
-  const { context } = driftGradeContext();
-  let hostCalls = 0;
-  context.saveStore = () => false;
-  context.window.bunkiDriftJudgment = () => {
-    hostCalls += 1;
-    return true;
-  };
-  const n = driftWord();
-  context.grade(n, 1);
-  assert.equal(hostCalls, 0);
-  assert.deepEqual(context.store, { known: {}, unknown: {}, lk: 0, lu: 0 });
-  assert.equal(n.gone, false);
-});
-
-verified('drift-standalone-keeps-autonomy-without-a-host', () => {
-  const { context } = driftGradeContext();
-  let saves = 0;
-  context.saveStore = () => {
-    saves += 1;
-    return true;
-  };
-  // no window.bunkiDriftJudgment — the standalone water grades on its own
-  const n = driftWord();
-  context.grade(n, 1);
-  assert.equal(saves, 1);
-  assert.equal(n.gone, true);
-  assert.equal(context.store.known['海'], 1);
-});
-
-/* ------------------------------------------------ R2-A · scheduler policy,
- * ordered/bounded review, no-debt migration. These blocks run the REAL
- * extracted corridor code in vm, never a re-implementation. */
 
 verified('scheduler-clock-clamp-and-raw-audit-truth', () => {
   const clampBlock = between(
@@ -1283,7 +725,7 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
     window: { addEventListener: () => {} },
   });
   vm.runInContext(
-    `${persistenceBlock}\n${srsBlock}\n;globalThis.__srsApi = { srsDueItems, srsNewPerDay, srsReviewLimit };`,
+    `${legacySchemaBlock}\n${srsBlock}\n;globalThis.__srsApi = { srsDueItems, srsNewPerDay, srsReviewLimit };`,
     dueContext,
     { filename: 'corridor-due-block.js' },
   );
@@ -1356,33 +798,6 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
   );
 });
 
-verified('one-scheduler-policy-fuzz-off-with-the-pin', () => {
-  const pin = PIN;
-  assert.equal(pin.enableFuzz, false);
-  assert.equal(pin.reviewTimePolicyId, 'append-order-monotonic-clamp-v1');
-  const schedulerInit = between('fsrsApi = window.__TSFSRS__', 'S.ready = true');
-  assert.match(schedulerInit, /enable_fuzz: pin\.enableFuzz/);
-  assert.doesNotMatch(schedulerInit, /fuzzOff/, 'the dead app-level override is gone');
-  // R3-D · the learner's fitted weights enter through the fail-closed gate
-  // and ONLY the weight vector: everything else stays the pin's policy
-  assert.match(schedulerInit, /srsParamsProblem\(fitted\)/);
-  assert.match(schedulerInit, /noteIgnoredSrsParams\(fittedProblem\)/);
-  assert.match(schedulerInit, /w: srsCustom \? fitted\.w\.slice\(\) : pin\.w/);
-  assert.match(schedulerInit, /request_retention: pin\.requestRetention/);
-  // the grade path prices the four previews and the committed grade at the clamp
-  const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
-  assert.match(gradeRegion, /srsSchedulerInstant\(card, now\)/);
-  assert.match(gradeRegion, /scheduler\.repeat\(card, schedNow\)/);
-  assert.doesNotMatch(gradeRegion, /scheduler\.repeat\(card, now\)/);
-});
-
-/* ------------------------------------------- R3-D · learner FSRS parameters
- * The optimizer loop's landing: srsPrefs.fsrs may carry the learner's own
- * fitted weights, gated fail-closed at the scheduler seam. Wrong length,
- * non-finite entries, out-of-bounds values — every one of these must be
- * IGNORED (defaults rule, one quiet obslog note), never a crash and never a
- * quarantine of the whole record. */
-
 await verifiedAsync('learner-fsrs-params-fail-closed-gate', async () => {
   const gate = storeApi.srsParamsProblem;
   const w = () => PIN.w.slice();
@@ -1438,75 +853,15 @@ await verifiedAsync('learner-fsrs-params-fail-closed-gate', async () => {
   assert.equal(storeContext.S.storeReadOnly, false);
   assert.equal(storeContext.S.srsPrefs.newPerDay, 10);
   assert.deepEqual(JSON.parse(JSON.stringify(storeContext.S.srsPrefs.fsrs)), shortSet);
-  assert.equal(storeApi.saveStore(), true);
+  const encoded = JSON.stringify(storeApi.storeEnvelope(storeContext.S));
   assert.deepEqual(
-    JSON.parse(storeContext.localStorage.value).srsPrefs.fsrs,
+    JSON.parse(encoded).srsPrefs.fsrs,
     shortSet,
     'not a byte dropped on the round trip',
   );
 
-  // the import door: a parameter file lands through the SAME gate and the
-  // guarded boundary — never a raw localStorage write, never a started mark
-  const importBlock = between("file.addEventListener('change'", 'port.append(');
-  assert.match(importBlock, /srsParamsProblem\(fitted\)/);
-  assert.match(importBlock, /commitStorePatch\(\{ srsPrefs: \{ \.\.\.S\.srsPrefs, fsrs: fitted \} \}\)/);
-  assert.match(importBlock, /candidatePin/);
-  assert.ok(
-    importBlock.indexOf('srsParamsProblem') < importBlock.indexOf('commitStorePatch'),
-    'validation precedes the commit',
-  );
 });
 
-verified('ignored-params-note-is-one-quiet-deduped-obslog-row', () => {
-  const context = bridgeContext();
-  vm.runInContext('globalThis.__note = noteIgnoredSrsParams;', context);
-  let commits = 0;
-  context.commitStorePatch = (patch) => {
-    commits += 1;
-    Object.assign(context.S, patch);
-    return true;
-  };
-  context.__note('length');
-  context.__note('length');
-  context.__note('length');
-  assert.equal(context.S.obslog.length, 1, 'the same broken field notes once, not per boot');
-  const row = context.S.obslog[0];
-  assert.equal(row[1], 'params');
-  assert.equal(row[2], 'fsrs');
-  assert.equal(row[3], 'length');
-  // a DIFFERENT problem is new evidence and appends
-  context.__note('bounds');
-  assert.equal(context.S.obslog.length, 2);
-  assert.equal(context.S.obslog[1][3], 'bounds');
-  // every note round-trips the fail-closed envelope validator
-  assert.equal(
-    storeApi.validStoreEnvelope({ v: 1, obslog: JSON.parse(JSON.stringify(context.S.obslog)) }),
-    true,
-  );
-  // the note is an observation: no FSRS state, no capture, no review debt
-  assert.deepEqual(context.S.srs, {});
-  assert.equal(context.S.taken.length, 0);
-  assert.equal(context.S.revlog.length, 0);
-  assert.equal(commits, 0, 'the note rides the obslog debounce, never its own commit');
-});
-
-verified('bounded-standard-review-freeze-and-dojo-refill-kept', () => {
-  const startBlock = between('function startReview(scope) {', '/* An instrument handle');
-  assert.match(startBlock, /srsReviewLimit\(\)/);
-  assert.match(startBlock, /queue\.slice\(0, limit\)/);
-  assert.match(startBlock, /deferred/);
-  const refill = between('function refillFocusQueue(rv) {', 'function startFocus(');
-  assert.match(refill, /FOCUS_BATCH/, 'the timed dojo keeps its refill pacing');
-  assert.match(refill, /drillPass: true/, 'the second lap is marked practice (POL-12)');
-  assert.match(refill, /f\.cursor >= f\.pool\.length/);
-});
-
-/* ------------------------------------------------ POL-12 · the refill's
- * second lap. The REAL extracted refill runs in vm: the first walk over the
- * pool hands out the pool's own rows (they take their one honest schedule
- * grade), and every draw after the cursor has passed the pool's length is a
- * COPY marked drillPass — the grade path reads that mark and files practice
- * evidence instead of remutating a schedule that already moved this block. */
 verified('dojo-refill-second-lap-is-practice', () => {
   const batchBlock = between(
     '/** How many pool items a dojo refill draws at once',
@@ -1543,136 +898,6 @@ verified('dojo-refill-second-lap-is-practice', () => {
   // an empty pool refuses the refill
   context.S.focus = { pool: [], cursor: 0 };
   assert.equal(context.__refill({ queue: [] }), false);
-  // and the grade path honours the mark inside the dojo branch alone
-  const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
-  assert.match(gradeRegion, /S\.focus &&\s*\(item\.drillPass === true \|\|/);
-});
-
-verified('every-in-app-mint-carries-the-started-mark', () => {
-  // capture (覚える), lesson enroll choice, probe miss mint. The lane's bulk
-  // "memorize the next twenty" mint is gone on the operator's ruling (#92,
-  // docs/operator/REFERENCE_LIBRARIES_2026-09-14.md: the reference library
-  // browses without enrolling), so the source no longer holds it — and a
-  // probe that demanded it back would be protecting a repealed assumption.
-  assert.match(captureActionBlock, /started: now/);
-  assert.doesNotMatch(source, /const fresh = ids\.filter\(\(id\) => !takenSet\.has\(srsKey\(t, id\)\)\);/);
-  // lesson completion writes EVIDENCE only (PR70-P0-1): the score and one
-  // obslog row per word ride ONE commit — no deck rows, no promotion mark
-  const lessonFinish = between('const lessonsDone = { ...S.lessonsDone,', 'run.phase =');
-  assert.match(lessonFinish, /commitStorePatch\(\{ lessonsDone, obslog \}\)/);
-  assert.doesNotMatch(lessonFinish, /started|taken|saveStore\(/);
-  assert.equal(
-    storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'lesson', 'word:海', 3, 'N5-1']] }),
-    true,
-  );
-  // …and the end screen's explicit enroll door is where the mark is minted —
-  // per word or all at once, each choice one guarded commit built on copies
-  const lessonEnroll = between('const enrollRow = (w) =>', "'レッスン一覧へ'");
-  assert.match(lessonEnroll, /started: Date\.now\(\)/);
-  assert.match(lessonEnroll, /commitStorePatch\(\{ taken: \[\.\.\.S\.taken, enrollRow\(w\)\] \}\)/);
-  assert.match(
-    lessonEnroll,
-    /commitStorePatch\(\{ taken: \[\.\.\.S\.taken, \.\.\.freshWords\.map\(enrollRow\)\] \}\)/,
-  );
-  assert.doesNotMatch(lessonEnroll, /S\.taken\.push|saveStore\(/);
-  // the probe's mint now rides the guarded boundary (R3-C sweep): the
-  // started mark is built on the patch copy, never pushed live
-  const probeMint = between("if (!ok && !S.taken.some((t) => t.t === 'word'", 'commitStorePatch(patch)');
-  assert.match(probeMint, /started: Date\.now\(\)/);
-  assert.match(probeMint, /patch\.taken = \[/);
-  assert.doesNotMatch(probeMint, /S\.taken\.push|saveStore\(|obsLog\(/);
-  // and the queue admits a cardless row only through that mark
-  const dueGate = between('function srsDueItems(now = new Date()) {', '/** Midnight at the start of a date');
-  assert.match(dueGate, /finiteNumber\(item\.started\)/);
-  // the import door writes the file verbatim — it must not fabricate the mark
-  const importBlock = between("file.addEventListener('change'", 'port.append(');
-  assert.doesNotMatch(importBlock, /started/);
-});
-
-verified('bounded-handlers-call-executed-actions', () => {
-  const finishHandler = between("finBtn.id = 'read-fin';", '  fin.append(finBtn);');
-  assert.match(finishHandler, /commitReadDone\(p\.id\)/);
-  assert.doesNotMatch(finishHandler, /saveStore\(|S\.readDone\[/);
-
-  // capture is reversible now (operator directive §3): both directions ride
-  // the guarded transactional path through toggleTaken
-  const captureHandler = between('function toggleTaken(node, label) {', '/** After 覚える:');
-  assert.match(captureHandler, /commitCapture\(node, label\)/);
-  assert.match(captureHandler, /commitStorePatch\(\{ taken:/);
-  assert.doesNotMatch(captureHandler, /saveStore\(|S\.taken\.push|S\.taken\.splice|S\.deepWords\[/);
-
-  const gradeHandler = between(
-    'for (const [rating, key, ja, sealChar] of grades) {',
-    '  main.append(row);',
-  );
-  assert.match(gradeHandler, /commitDrillGrade\(/);
-  assert.match(gradeHandler, /commitStandardGrade\(/);
-  // the drill's evidence row names its room (P0: practice writes evidence only)
-  assert.match(gradeHandler, /mode: S\.focus\?\.mode/);
-  assert.doesNotMatch(gradeHandler, /saveStore\(|obsLog\(|srsStore\(|rv\.history\.push/);
-
-  // R3-C sweep: every review-room writer that touches learner roots rides
-  // the guarded boundary — undo commits its whole take-back as one patch,
-  // the in-session rest commits before the session moves
-  const undoHandler = between('const last = rv.history[rv.history.length - 1];', 'main.append(undo);');
-  assert.match(undoHandler, /commitStorePatch\(patch\)/);
-  assert.match(undoHandler, /rv\.history\.pop\(\)/);
-  assert.doesNotMatch(undoHandler, /saveStore\(|obsLog\(/);
-  assert.ok(
-    undoHandler.indexOf('commitStorePatch(patch)') < undoHandler.indexOf('rv.history.pop()'),
-    'the session moves back only after the take-back is durable',
-  );
-  const restHandler = between("rest2.addEventListener('click', () => {", 'moreRow.append(rest2);');
-  assert.match(restHandler, /commitStorePatch\(\{ suspended \}\)/);
-  assert.doesNotMatch(restHandler, /saveStore\(/);
-});
-
-verified('declared-recall-gate-forces-again-and-logs-the-declaration', () => {
-  // T-06 (ADR-002): the zen room has NO bare reveal — the only two doors
-  // through the front face are the declaration buttons, the dojo keeps its
-  // own single 答えを見る strictly inside the S.focus branch
-  const frontFace = between('if (!rv.revealed) {', 'const now = new Date();');
-  const focusBranch = betweenIn(frontFace, 'if (S.focus) {', 'const declare = (declared) => {');
-  assert.match(focusBranch, /btn\.id = 'reveal'/);
-  assert.doesNotMatch(
-    frontFace.replace(focusBranch, ''),
-    /id = 'reveal'|revealed = true;\s*\n\s*render/,
-    'outside the dojo branch nothing reveals without a declaration',
-  );
-  assert.match(frontFace, /declare-notyet/);
-  assert.match(frontFace, /declare-recalled/);
-  // the declaration is evidence: one obslog row, [t,'reveal',key,declared]
-  assert.match(frontFace, /obsLog\('reveal', srsKey\(item\.t, item\.id\), declared\)/);
-  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 1]] }), true);
-  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 0]] }), true);
-  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 3]] }), false);
-  // まだ narrows the row to the one honest seal AND forces the rating at
-  // the commit — the declaration, never the button, names the grade
-  const gradeRegion = between('const grades = [', '  main.append(row);');
-  assert.match(gradeRegion, /const notRecalled = !S\.focus && rv\.declared === 0;/);
-  assert.match(gradeRegion, /if \(notRecalled && rating !== 'Again'\) continue;/);
-  assert.match(gradeRegion, /const effRating = notRecalled \? 'Again' : rating;/);
-  assert.match(gradeRegion, /rating: fsrsApi\.Rating\[effRating\]/);
-  assert.doesNotMatch(gradeRegion, /rating: fsrsApi\.Rating\[rating\]/);
-  // a graded card clears the declaration for the next card
-  const advance = between('function advanceReviewSession(', 'function commitDrillGrade(');
-  assert.match(advance, /rv\.declared = null;/);
-});
-
-verified('setitem-try-block-excludes-alert-and-publication-code', () => {
-  const writeStore = between('function writeStore(state) {', 'function saveStore() {');
-  const storageTry = writeStore.match(
-    /try\s*\{\s*localStorage\.setItem\(STORE_KEY, bytes\);\s*\}\s*catch/,
-  );
-  assert.ok(storageTry, 'setItem must be the only statement in its durability try block');
-  assert.doesNotMatch(storageTry[0], /syncStoreAlert|storeError|Object\.assign/);
-  assert.ok(
-    writeStore.indexOf('S.storeError = null') > writeStore.indexOf('localStorage.setItem(STORE_KEY, bytes)'),
-  );
-  assert.ok(
-    writeStore.indexOf('safelySyncStoreAlert();', writeStore.indexOf('S.storeError = null')) >
-      writeStore.indexOf('S.storeError = null'),
-  );
 });
 
 function cssRule(text, selector) {
@@ -1688,6 +913,8 @@ function cssProperty(rule, property) {
   return match[1].trim();
 }
 
+
+
 verified('global-alert-css-is-above-every-numeric-layer', () => {
   const alertRule = cssRule(css, '.store-warning-live');
   assert.equal(cssProperty(alertRule, 'position'), 'fixed');
@@ -1700,163 +927,13 @@ verified('global-alert-css-is-above-every-numeric-layer', () => {
   );
   assert.ok(alertZ > Math.max(...otherLayers), `${alertZ} must exceed ${Math.max(...otherLayers)}`);
   assert.match(cssRule(css, '.store-warning-live[hidden]'), /display\s*:\s*none/);
-  assert.match(source, /document\.body\.append\(storeAlertNode\)/);
-  assert.match(source, /setAttribute\('role', 'alert'\)/);
-  const alertSync = between('function syncStoreAlert() {', '/** Storage truth never depends');
-  assert.match(alertSync, /document\.getElementById\('sheet'\)/);
-  assert.match(alertSync, /describedBy\.add\('store-alert'\)/);
-  assert.match(alertSync, /describedBy\.delete\('store-alert'\)/);
-  const sheetRenderer = between('function renderSheet(root) {', 'function licencePanel()');
-  assert.doesNotMatch(sheetRenderer, /aria-describedby/);
 });
 
-verified('live-sticky-grade-row-is-byte-preserved', () => {
-  const base = spawnSync('git', ['show', `${BASE}:prototypes/corridor/corridor.css`], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-  assert.equal(base.status, 0, base.stderr || base.stdout);
-  // The P1 this guard protects is the STICKY posture — the seals riding the
-  // bottom edge on a washi backing within safe-area reach. The zen paper
-  // redesign (TENOHIRA, operator-directed) legitimately widened the row's
-  // measure to the sheet's own 440px, so the one declaration a redesign may
-  // touch is normalized out of the byte comparison — and every load-bearing
-  // property is additionally asserted by name, so this check is stronger,
-  // not looser, than the bare byte-equality it replaces.
-  const withoutMeasure = (rule) => rule.replace(/^\s*max-width:[^;]*;\n/m, '');
+verified('zen-grade-controls-retain-sticky-safe-area-layout', () => {
   const live = cssRule(css, 'body.zen .grade-row');
-  assert.equal(withoutMeasure(live), withoutMeasure(cssRule(base.stdout, 'body.zen .grade-row')));
-  assert.match(live, /position:\s*sticky/);
-  assert.match(live, /bottom:\s*0/);
-  assert.match(live, /z-index:\s*3/);
-  assert.match(live, /env\(safe-area-inset-bottom\)/);
-  assert.match(live, /background:\s*var\(--ground-0/);
-});
-
-verified('crossing-names-separate-two-tabs-of-the-same-millisecond', () => {
-  // review round 9: a name from the clock alone collides between tabs that
-  // began together, and one tab's abort would then lift the freeze guarding
-  // the other tab's swap. Minted in a tight loop, every name is its own.
-  const names = new Set();
-  for (let i = 0; i < 500; i += 1) names.add(storeApi.crossingId());
-  assert.equal(names.size, 500);
-  assert.ok([...names].every((name) => /^x[0-9a-z]+-[0-9a-z]+$/.test(name)), 'a crossing name stays beacon-safe');
-  assert.ok([...names].every((name) => !name.endsWith('-aborted')), 'a name may never read as its own abort');
-});
-
-verified('stale-tab-storage-event-freezes-this-context', () => {
-  // PR 一補 (review rounds 4-6): the storage event fires only in tabs that
-  // did NOT write. A crossing beacon freezes the watcher; the beacon's
-  // -aborted mark thaws exactly the freeze it caused (nothing changed); a
-  // record write freezes permanently — reload is the only way back.
-  storeContext.S = state();
-  storeContext.localStorage = storage();
-  assert.equal(storeApi.saveStore(), true);
-  // a foreign KEY changes nothing
-  windowHandlers.storage({ key: 'kairo-ai-key' });
-  assert.equal(storeApi.saveStore(), true);
-  // a crossing beacon from another tab: frozen, alert up, writes refused
-  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x1' });
-  const writesBefore = storeContext.localStorage.writes;
-  assert.equal(storeApi.saveStore(), false);
-  assert.equal(storeApi.commitStorePatch({ taken: [] }), false);
-  assert.equal(storeContext.localStorage.writes, writesBefore);
-  assert.match(storeContext.S.storeError, /another tab/);
-  const alert = document.getElementById('store-alert');
-  assert.equal(alert.hidden, false);
-  // ANOTHER crossing's stand-down is not this freeze's business (round 8):
-  // two tabs can both start before either beacon lands, and an unscoped
-  // abort would hand one of them permission to commit mid-swap
-  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x9-aborted' });
-  assert.equal(storeApi.saveStore(), false, 'a foreign abort must not thaw this freeze');
-  assert.match(storeContext.S.storeError, /another tab/);
-  // the crossing that DID freeze this tab stood down without a record
-  // change: the freeze lifts, the alert clears, writes land again
-  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x1-aborted' });
-  assert.equal(storeContext.S.storeError, null);
-  assert.equal(alert.hidden, true);
-  assert.equal(storeApi.saveStore(), true);
-  // the record key from another tab: frozen for good — a later abort mark
-  // walks nothing back, because the record really did change
-  windowHandlers.storage({ key: 'kairo-corridor-v1' });
-  assert.equal(storeApi.saveStore(), false);
-  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x2-aborted' });
-  assert.equal(storeApi.saveStore(), false);
-  assert.match(storeContext.S.storeError, /another tab/);
-  // record staleness has no unseal — only a reload ends it, so this probe
-  // runs LAST among the write probes: the context stays frozen by design
-});
-
-verified('residual-and-direct-bypass-ledger-is-exact', () => {
-  const residual = JSON.parse(readFileSync(residualPath, 'utf8'));
-  // schemaVersion 3 (R3-C, P0-4 sweep): the ledger shrank from 19 to 5 by
-  // CONVERSION, not by relabeling — the 14 learner-state mutating callers
-  // now ride commitStorePatch and are asserted gone below; each remaining
-  // caller carries an explicit disposition.
-  assert.equal(residual.schemaVersion, 3);
-  assert.equal(residual.authorityHeadAtCut, BASE);
-  // six since #92: the reference library's transient return frame writes the
-  // readerPos bookmark on its way back to the article (KAGAMI 二補 recomputed
-  // the ledger; the caller itself touches no learner-evidence root)
-  assert.equal(residual.count, 6);
-  assert.equal(residual.callers.length, 6);
-  assert.ok(residual.callers.every((entry) => entry.saveResultConsumed === false));
-  assert.ok(
-    residual.callers.every(
-      (entry) => typeof entry.disposition === 'string' && entry.disposition.startsWith('retained-'),
-    ),
-  );
-  assert.deepEqual(
-    residual.callers.map((entry) => entry.surface),
-    [
-      'observation debounce flush',
-      'reader scroll debounce',
-      'reference return bookmark',
-      'app Back from reader',
-      'reader display dials',
-      'lists tray door bookmark',
-    ],
-  );
-  // no retained caller touches deck, schedule, or evidence-graded roots —
-  // only the debounced observation flush (obslog) and UI preferences
-  const allowedRoots = new Set(['obslog', 'readerPos', 'dials']);
-  for (const entry of residual.callers) {
-    for (const root of entry.learnerRootsMutatedBeforeUncheckedSave) {
-      assert.ok(allowedRoots.has(root), `${entry.surface}: ${root}`);
-    }
-  }
-  assert.equal(residual.sweepP04.converted, 14);
-  assert.equal(residual.sweepP04.convertedSurfaces.length, 14);
-  for (const surface of residual.sweepP04.convertedSurfaces) {
-    assert.ok(
-      !residual.callers.some((entry) => entry.surface === surface),
-      `converted surface must not remain a caller: ${surface}`,
-    );
-  }
-
-  const lines = source.split(/\r?\n/);
-  const saveLines = lines
-    .map((line, index) => (/\bsaveStore\s*\(\s*\)\s*;/.test(line) ? index + 1 : null))
-    .filter(Boolean);
-  assert.deepEqual(
-    residual.callers.map((entry) => entry.lineAfterPatch),
-    saveLines,
-  );
-
-  const persistenceEndLine = source.slice(0, source.indexOf('/* ------------------------------------------------ the observation log')).split(/\r?\n/)
-    .length;
-  const bypasses = [];
-  lines.forEach((line, index) => {
-    const match = line.match(/localStorage\.(getItem|setItem)\(STORE_KEY/);
-    if (match && index + 1 > persistenceEndLine) bypasses.push({ lineAfterPatch: index + 1, operation: match[1] });
-  });
-  assert.deepEqual(
-    residual.directLearnerStoreBypasses.map(({ lineAfterPatch, operation }) => ({
-      lineAfterPatch,
-      operation,
-    })),
-    bypasses,
-  );
+  assert.equal(cssProperty(live, 'position'), 'sticky'); assert.equal(cssProperty(live, 'bottom'), '0');
+  assert.equal(cssProperty(live, 'z-index'), '3'); assert(live.includes('env(safe-area-inset-bottom)'));
+  assert(cssProperty(live, 'background').startsWith('var(--ground-0'));
 });
 
 verified('javascript-syntax', () => {
@@ -1864,46 +941,174 @@ verified('javascript-syntax', () => {
   assert.equal(syntax.status, 0, syntax.stderr || syntax.stdout);
 });
 
-console.log(
-  JSON.stringify(
-    {
-      status: 'PASS',
-      checks: checks.length,
-      checkNames: checks,
-      boundedFlows: [
-        'learner-store-read-quarantine',
-        'deep-known-root-validation',
-        'reserved-map-name-round-trip',
-        'exact-byte-candidate-self-validation',
-        'write-before-publish-helper',
-        'post-setitem-ui-failure-isolation',
-        'reader-finish',
-        'entry-capture',
-        'entry-capture-context',
-        'standard-review-grade',
-        'focus-drill-grade',
-        'drift-judgment-observation-bridge',
-        'drift-host-ack-rollback',
-        'stable-storage-alert',
-        'dynamic-sheet-alert-description',
-        'article-load-retry',
-        'scheduler-clock-clamp',
-        'due-queue-order-and-no-debt',
-        'fuzz-off-scheduler-policy',
-        'bounded-standard-review',
-        'started-mark-promotion',
-        'learner-fsrs-params-gate',
-        'ignored-params-obslog-note',
-        'declared-recall-obslog-row',
-        'transactional-sweep-p04',
-        'lesson-practice-evidence-and-explicit-enroll',
-        'dojo-second-lap-practice',
-        'persisted-quiz-run',
-      ],
-      residualUnsafeSaveCallers: 6,
-      browserAndDevice: 'NOT_RUN',
-    },
-    null,
-    2,
-  ),
-);
+const clone = (value) => JSON.parse(JSON.stringify(value));
+function freezeJson(value) {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.values(value).forEach(freezeJson);
+    Object.freeze(value);
+  }
+  return value;
+}
+function actionContext() {
+  const queued = [];
+  const context = vm.createContext({
+    S: state({ taken: [], obslog: [], deepWords: {}, readDone: {} }),
+    D: { dict: {} },
+    NODE_KIND: { word: ['語', 'word'] },
+    lookup: () => ({ r: 'うみ', m: ['sea'], seq: 'synthetic-deep-entry' }),
+    commitStorePatch: (produce) => new Promise((settle) => queued.push({ produce, settle })),
+  });
+  const seal = () => {
+    for (const key of ['taken', 'deepWords', 'readDone', 'obslog', 'srs', 'revlog', 'stats']) freezeJson(context.S[key]);
+  };
+  seal();
+  vm.runInContext(definitions('readDonePending', 'commitReadDone', 'captureStorePatch', 'commitCapture',
+    'setOwnRecordValue', 'owns', 'obsLog', 'srsParamNotePending', 'noteIgnoredSrsParams'), context);
+  return { context, queued, acknowledge(save = true) {
+    const next = queued.shift(); assert(next, 'An actual application action queued a save');
+    const patch = next.produce(context.S);
+    assert(storeApi.validStoreEnvelope(clone(storeApi.storeEnvelope({ ...context.S, ...patch }))), 'Every reducer result satisfies the real learner schema');
+    if (save) Object.assign(context.S, clone(patch));
+    seal(); next.settle(save);
+    return patch;
+  } };
+}
+
+await verifiedAsync('reader-completion-is-acknowledged-double-input-safe-and-merges-latest', async () => {
+  const { context: c, queued, acknowledge } = actionContext();
+  let pending = c.commitReadDone('article', 10);
+  assert.equal(await c.commitReadDone('article', 11), false);
+  assert.equal(queued.length, 1); assert.equal(c.S.readDone.article, undefined);
+  acknowledge(false); assert.equal(await pending, false); assert.equal(c.S.readDone.article, undefined);
+  pending = c.commitReadDone('article', 12);
+  c.S.readDone = freezeJson({ other: 7 });
+  acknowledge(); assert.equal(await pending, true); assert.deepEqual(clone(c.S.readDone), { article: 12, other: 7 });
+  pending = c.commitReadDone('article', 13); acknowledge(); await pending;
+  assert.deepEqual(clone(c.S.readDone), { other: 7 });
+  pending = c.commitReadDone('__proto__', 14); acknowledge(); await pending;
+  assert(Object.hasOwn(c.S.readDone, '__proto__')); assert.equal(c.S.readDone.__proto__, 14);
+});
+
+await verifiedAsync('deep-capture-context-and-promotion-cross-one-acknowledged-boundary', async () => {
+  const { context: c, queued, acknowledge } = actionContext();
+  const node = { t: 'word', id: '海', from: { passage: 'p', index: 4 }, ctxScope: 'sent' };
+  let pending = c.commitCapture(node, '海', 111);
+  assert.equal(queued.length, 1); assert.equal(c.S.taken.length, 0); assert.equal(Object.keys(c.S.deepWords).length, 0);
+  acknowledge(false); assert.equal(await pending, false); assert.equal(c.S.taken.length, 0);
+  pending = c.commitCapture(node, '海', 112); acknowledge(); assert.equal(await pending, true);
+  const taken = c.S.taken[0];
+  assert.equal(taken.started, 112); assert.equal(taken.entrySeq, 'synthetic-deep-entry'); assert.equal(taken.cueReading, 'うみ');
+  assert.deepEqual(clone(taken.ctx), { p: 'p', i: 4, scope: 'sent' });
+  assert.equal(c.S.deepWords['海'].m[0], 'sea'); assert.equal(c.S.deepWords['海'].seq, 'synthetic-deep-entry');
+  pending = c.commitCapture(node, '海', 113); acknowledge(); await pending; assert.equal(c.S.taken.length, 1, 'Retaking an existing capture does not duplicate it');
+  pending = c.commitCapture({ t: 'word', id: '波', ctxScope: 'sent' }, '波', 114); acknowledge(); await pending;
+  assert.equal(Object.hasOwn(c.S.taken[1], 'ctx'), false, 'Context requires real encounter provenance');
+  assert.deepEqual(clone(c.S.srs), {}); assert.deepEqual(clone(c.S.revlog), []);
+});
+
+await verifiedAsync('observation-reducers-append-latest-with-no-pre-acknowledgment-publication', async () => {
+  const { context: c, queued, acknowledge } = actionContext();
+  let pending = c.obsLog('tap', 'word:海', 1, 'article');
+  assert.equal(c.S.obslog.length, 0); acknowledge(false); assert.equal(await pending, false); assert.equal(c.S.obslog.length, 0);
+  pending = c.obsLog('tap', 'word:海', 1, 'article');
+  const second = c.obsLog('reveal', 'word:海', 0); assert.equal(queued.length, 2);
+  acknowledge(); await pending; acknowledge(); await second;
+  assert.deepEqual(c.S.obslog.map((row) => row[1]), ['tap', 'reveal']);
+  assert.deepEqual(clone(c.S.srs), {}); assert.deepEqual(clone(c.S.revlog), []); assert.equal(c.S.taken.length, 0);
+});
+
+await verifiedAsync('ignored-params-note-deduplicates-pending-acknowledged-and-rejected-reasons', async () => {
+  const { context: c, queued, acknowledge } = actionContext();
+  let pending = c.noteIgnoredSrsParams('length');
+  assert.strictEqual(c.noteIgnoredSrsParams('length'), pending); assert.equal(queued.length, 1); assert.equal(c.S.obslog.length, 0);
+  acknowledge(false); assert.equal(await pending, false); assert.equal(c.S.obslog.length, 0);
+  pending = c.noteIgnoredSrsParams('length'); acknowledge(); assert.equal(await pending, true);
+  assert.equal(await c.noteIgnoredSrsParams('length'), true); assert.equal(queued.length, 0); assert.equal(c.S.obslog.length, 1);
+  const b = c.noteIgnoredSrsParams('bounds'); const a = c.noteIgnoredSrsParams('length');
+  assert.equal(queued.length, 2); acknowledge(); await b; acknowledge(); await a;
+  assert.deepEqual(c.S.obslog.map((row) => row[3]), ['length', 'bounds', 'length']);
+  const rejected = c.noteIgnoredSrsParams('bounds'); const repeated = c.noteIgnoredSrsParams('length');
+  acknowledge(false); assert.equal(await rejected, false); acknowledge(); await repeated;
+  assert.equal(c.S.obslog.length, 3, 'A failed intervening reason does not create a duplicate of the current reason');
+  assert.deepEqual(clone(c.S.srs), {}); assert.equal(c.S.taken.length, 0); assert.equal(c.S.revlog.length, 0);
+});
+
+await verifiedAsync('current-commit-wrapper-refuses-unowned-stale-and-unacknowledged-results', async () => {
+  let writes = 0; let resolveWrite;
+  const context = vm.createContext({ S: state(), recordEpoch: 1, publishedRecord: {}, DEFAULT_LEARNER_RECORD: {},
+    recordWritable: (epoch) => context.writable && epoch === context.recordEpoch,
+    writable: false, safelySyncStoreAlert: () => {},
+    recordFailure: (reason) => { context.failure = reason; },
+    recordApp: { write: () => { writes += 1; return new Promise((done) => { resolveWrite = done; }); } },
+  });
+  vm.runInContext(definitions('commitStorePatch', 'canonicalRecordJson', 'plainRecord'), context);
+  assert.equal(await context.commitStorePatch({ taken: [] }), false); assert.equal(writes, 0);
+  context.writable = true;
+  let pending = context.commitStorePatch({ taken: [] }); resolveWrite({ status: 'active', replayUiEffects: false });
+  assert.equal(await pending, false, 'A settled document without replay permission is not a UI acknowledgment');
+  pending = context.commitStorePatch({ taken: [] }); context.recordEpoch += 1; resolveWrite({ status: 'active', replayUiEffects: true });
+  assert.equal(await pending, false, 'A departed record generation cannot replay old UI effects');
+  pending = context.commitStorePatch({ taken: [] }); resolveWrite({ status: 'protected', reason: 'synthetic-uncertain' });
+  assert.equal(await pending, false); assert.equal(context.failure, 'synthetic-uncertain');
+  assert.equal(context.S.taken[0].id, 'old');
+});
+
+await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-personal-weights', async () => {
+  assert.equal(PIN.enableFuzz, false); assert.equal(PIN.reviewTimePolicyId, 'append-order-monotonic-clamp-v1');
+  const init = between('fsrsApi = window.__TSFSRS__', '  } catch (err) {');
+  const tuned = { w: PIN.w.map((value, index) => index === 0 ? value + 0.01 : value), source: 'synthetic-personal', basedOnReviews: 50 };
+  for (const fitted of [undefined, tuned, { w: PIN.w.slice(0, 20) }]) {
+    const notes = [];
+    const context = vm.createContext({ fsrsApi: null, scheduler: null, srsParams: null, srsCustom: null,
+      window: { __TSFSRS__: fsrs }, pin: clone(PIN), S: { srsPrefs: fitted === undefined ? {} : { fsrs: clone(fitted) } },
+      srsParamsProblem: storeApi.srsParamsProblem, noteIgnoredSrsParams: (reason) => notes.push(reason),
+    });
+    await vm.runInContext('(async () => { ' + init + ' })()', context);
+    assert(context.scheduler); assert.equal(context.srsParams.enable_fuzz, false);
+    assert.equal(context.srsParams.request_retention, PIN.requestRetention);
+    assert.equal(context.srsParams.maximum_interval, PIN.maximumInterval);
+    assert.deepEqual(clone(context.srsParams.learning_steps), PIN.learningSteps);
+    assert.deepEqual(clone(context.srsParams.relearning_steps), PIN.relearningSteps);
+    assert.deepEqual(clone(context.srsParams.w), fitted === tuned ? tuned.w : PIN.w);
+    if (fitted === tuned) assert.deepEqual(clone(context.srsCustom), { source: tuned.source, basedOnReviews: 50 });
+    else assert.equal(context.srsCustom, null);
+    assert.deepEqual(notes, fitted && fitted !== tuned ? ['length'] : []);
+    if (fitted) assert.deepEqual(clone(context.S.srsPrefs.fsrs), fitted, 'Ignoring unusable parameters never removes them from the record');
+    const now = new Date('2026-09-10T00:00:00Z'); const card = fsrs.createEmptyCard(now);
+    assert.deepEqual(clone(context.scheduler.repeat(card, now)), clone(context.scheduler.repeat(card, now)), 'Pinned no-fuzz scheduling replays deterministically');
+  }
+});
+
+verified('bounded-standard-review-executes-a-frozen-scoped-sitting', () => {
+  const pool = Array.from({ length: 8 }, (_, id) => ({ t: 'word', id: String(id) }));
+  const context = vm.createContext({ S: { view: 'tray' }, srsDueItems: () => pool, srsReviewLimit: () => 3,
+    srsKey: (type, id) => type + ':' + id, render: () => {} });
+  vm.runInContext(definitions('startReview'), context);
+  context.startReview(); assert.equal(context.S.review.queue.length, 3); assert.equal(context.S.review.deferred, 5);
+  assert.equal(pool.length, 8); assert.equal(context.S.review.declared, null); assert.equal(context.S.view, 'review');
+  context.startReview(pool.slice(4, 6)); assert.deepEqual(Array.from(context.S.review.queue, (row) => row.id), ['4', '5']);
+  assert.equal(context.S.review.deferred, 0);
+});
+
+const evidenceDir = resolveCorridorEvidence();
+mkdirSync(evidenceDir, { recursive: true });
+const report = {
+  format: 'kairo-schema-policy-verification', version: 2, status: failures.length ? 'FAIL' : 'PASS', checks: checks.length, checkNames: checks, failures,
+  sourceSha256: createHash('sha256').update(source).digest('hex'),
+  observations,
+  verifierSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'),
+  scope: 'Actual legacy input decoder, schema/hydration, alert behavior, current async action reducers and scheduler policies; controlled acknowledgments are not browser durability evidence',
+  coverageMigration: [
+    { before: 'Legacy read quarantine, deep known-root validation, reserved maps and future keys', now: 'Retained executed decoder and serialization/hydration round trips; legacy storage is read-only input' },
+    { before: 'Synchronous reader/capture/observation writes', now: 'Actual async reducers with frozen roots, delayed acknowledgment, rejection, latest-state merge and duplicate input' },
+    { before: 'Scheduler clock, due order, fitted weights and dojo refill', now: 'Retained edge cases plus executed actual scheduler initialization and bounded scoped sessions' },
+    { before: 'Synchronous saveStore/writeStore, localStorage live commits, crossing beacons and Drift rollback', now: 'Superseded by mandatory real-storage record-app, record-live and drift-record browser gates' },
+    { before: 'Grade/recall/lesson/probe/quiz source regex assertions and synchronous grade fixtures', now: 'Mandatory learning-record browser journeys and frozen queued FSRS/action tests; tutor-quiz-storage native failure cases' },
+    { before: 'Historical residual counts and CSS byte identity against an old commit', now: 'Historical counts no longer claim current behavior; explicit alert-layer and sticky safe-area CSS contracts retained' },
+  ],
+  mandatoryComplementarySuites: ['verify-record-app.mjs', 'verify-record-live.mjs', 'verify-learning-record.mjs', 'verify-drift-record.mjs', 'verify-tutor-quiz-storage.mjs'],
+  browserAndDevice: 'NOT_RUN_BY_THIS_SUITE',
+};
+writeFileSync(resolve(evidenceDir, 'storage-integrity.json'), JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify(report, null, 2));
+if (failures.length) process.exitCode = 1;

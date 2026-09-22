@@ -17,11 +17,12 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
-const REPO = resolve(CORRIDOR_DIR, '..', '..');
-const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/kairo-a05-accessibility');
+const CORRIDOR_DIR = resolveCorridorSite();
+const REPO = resolve(TOOL_DIR, '..', '..', '..');
+const EVIDENCE_DIR = resolveCorridorEvidence();
 const SHOTS_DIR = resolve(EVIDENCE_DIR, 'screenshots');
 const VIEWPORT = { width: 390, height: 844 };
 
