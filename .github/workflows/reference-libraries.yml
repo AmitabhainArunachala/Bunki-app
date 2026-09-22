@@ -25,6 +25,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The storage-integrity verifier reads its pinned CSS baseline via git show.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
