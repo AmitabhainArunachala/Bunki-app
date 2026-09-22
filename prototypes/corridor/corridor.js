@@ -20303,8 +20303,13 @@ function strokeSpeedControl(page) {
     paint();
     rewrite();
   });
-  wrap.append(speed, range, readout);
-  return wrap;
+  // Merge reconciliation (one-app night, 2026-09-23): the corner keeps the
+  // 08-15 four-corners law of the sleeping room (verify-writing-room: exactly
+  // the trigger + four corners); the sliding scale the operator asked for on
+  // 09-18 lives in the awake field, under the readings, and still drives the
+  // same S.strokeSpeed the corner toggles. For his eye.
+  wrap.append(range, readout);
+  return { corner: speed, slider: wrap };
 }
 
 /** The honest room: a character we can show but whose order we do not know. */
@@ -21352,9 +21357,10 @@ function renderStrokePage(root) {
       const numbersCorner = strokeNumbersControl(page, reduced);
       numbersCorner.classList.add('stroke-corner', 'stroke-corner-br');
       page.append(numbersCorner);
-      const speedCorner = strokeSpeedControl(page);
+      const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
       speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
       page.append(speedCorner);
+      page.querySelector('#stroke-awake-field')?.append(speedSlider);
     }
     setStrokeChrome(page, S.strokeChromeAwake);
   }
