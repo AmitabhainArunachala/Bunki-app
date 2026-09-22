@@ -108,11 +108,11 @@ function list(raw: unknown, maximum: number): unknown[] {
   return values;
 }
 function prose(raw: unknown, max: number): string {
-  // eslint-disable-next-line no-control-regex -- Source prose permits tab/newline only among controls.
   if (
     typeof raw !== 'string' ||
     raw.length > max ||
     !isWellFormedText(raw) ||
+    // eslint-disable-next-line no-control-regex -- Source prose permits tab/newline only among controls.
     /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/u.test(raw)
   )
     return reject('text');

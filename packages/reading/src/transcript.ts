@@ -79,11 +79,11 @@ function record<const K extends readonly string[]>(
   return value as Record<K[number], unknown>;
 }
 function prose(value: unknown, maximum: number): string {
-  // eslint-disable-next-line no-control-regex -- Preserve tabs and all source line endings.
   if (
     typeof value !== 'string' ||
     value.length > maximum ||
     !isWellFormedText(value) ||
+    // eslint-disable-next-line no-control-regex -- Preserve tabs and all source line endings.
     /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/u.test(value)
   )
     return reject('text');
