@@ -6,7 +6,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
-import { readSwiftTestReport } from './swift-test-report.mjs';
+import { discoverSwiftTestReport, readSwiftTestReport } from './swift-test-report.mjs';
 
 const packagePath = dirname(dirname(fileURLToPath(import.meta.url)));
 if (process.env.CI && (!process.env.KAIRO_EVIDENCE_DIR || !process.env.RUNNER_TEMP)) {
@@ -174,8 +174,9 @@ try {
     'swift-tests',
   );
   receipt.phase = 'test-receipt';
-  const xml = readFileSync(join(out, 'tests.xml'), 'utf8');
-  const tests = readSwiftTestReport(xml, readFileSync(join(out, 'swift-tests.log'), 'utf8'));
+  const report = discoverSwiftTestReport(out, { existsSync, readFileSync, join });
+  receipt.testReport = report.name;
+  const tests = readSwiftTestReport(report.xml, readFileSync(join(out, 'swift-tests.log'), 'utf8'));
   receipt.phase = 'source-recheck';
   requireVerification(
     JSON.stringify(sources()) === JSON.stringify(sourceFiles),

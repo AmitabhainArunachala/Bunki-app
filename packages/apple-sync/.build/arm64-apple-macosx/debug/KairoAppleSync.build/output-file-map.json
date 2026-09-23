@@ -1,0 +1,103 @@
+{
+  "": {
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/primary.swiftdeps"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/CloudKitBackend.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitBackend.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitBackend.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitBackend~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitBackend.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitBackend.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/CloudKitRecordCodec.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitRecordCodec.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitRecordCodec.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitRecordCodec~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitRecordCodec.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitRecordCodec.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/CloudKitSaveAdmission.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitSaveAdmission.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitSaveAdmission.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitSaveAdmission~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitSaveAdmission.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/CloudKitSaveAdmission.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/ForegroundJournalTransport.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/ForegroundJournalTransport.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/ForegroundJournalTransport.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/ForegroundJournalTransport~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/ForegroundJournalTransport.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/ForegroundJournalTransport.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCAdapter.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCAdapter.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCAdapter.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCAdapter~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCAdapter.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCAdapter.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCFraming.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCFraming.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCFraming.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCFraming~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCFraming.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCFraming.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCSessionGate.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCSessionGate.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCSessionGate.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCSessionGate~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCSessionGate.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCSessionGate.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCTypes.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCTypes.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCTypes.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCTypes~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCTypes.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalRPCTypes.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalTypes.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalTypes.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalTypes.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalTypes~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalTypes.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/JournalTypes.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeBootstrapControl.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeBootstrapControl.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeBootstrapControl.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeBootstrapControl~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeBootstrapControl.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeBootstrapControl.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeCloudEntitlements.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudEntitlements.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudEntitlements.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudEntitlements~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudEntitlements.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudEntitlements.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeCloudSyncBootstrap.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudSyncBootstrap.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudSyncBootstrap.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudSyncBootstrap~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudSyncBootstrap.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeCloudSyncBootstrap.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeProfileCandidate.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfileCandidate.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfileCandidate.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfileCandidate~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfileCandidate.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfileCandidate.dia"
+  },
+  "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeProfilePairing.swift": {
+    "dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfilePairing.d",
+    "object": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfilePairing.swift.o",
+    "swiftmodule": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfilePairing~partial.swiftmodule",
+    "swift-dependencies": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfilePairing.swiftdeps",
+    "diagnostics": "/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/.build/arm64-apple-macosx/debug/KairoAppleSync.build/NativeProfilePairing.dia"
+  }
+}

@@ -67,6 +67,21 @@ function requireReport(condition, code) {
 }
 const same = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 
+/** `swift test --xunit-output <dir>/tests.xml` writes XCTest results there and,
+ * since Swift 6.1, Swift Testing results beside it as `tests-swift-testing.xml`.
+ * This package's suites are Swift Testing, so the cases live in the sibling
+ * file; an older toolchain writes them into the requested name. Return the one
+ * report that carries test cases; two carrying cases or none is a defect. */
+export function discoverSwiftTestReport(dir, { existsSync, readFileSync, join }) {
+  const candidates = ['tests-swift-testing.xml', 'tests.xml']
+    .map((name) => ({ name, path: join(dir, name) }))
+    .filter((entry) => existsSync(entry.path))
+    .map((entry) => ({ ...entry, xml: readFileSync(entry.path, 'utf8') }))
+    .filter((entry) => /<testcase\b/u.test(entry.xml));
+  requireReport(candidates.length === 1, 'test-report-missing');
+  return candidates[0];
+}
+
 /** XML names and actual per-group Swift summaries must independently agree. */
 export function readSwiftTestReport(xml, output) {
   const names = [...xml.matchAll(/<testcase\s+[^>]*name="([^"]+)"/gu)]
