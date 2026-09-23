@@ -16,14 +16,12 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
-const REPO = resolve(CORRIDOR_DIR, '..', '..');
-const RECEIPT = resolve(
-  REPO,
-  'docs/build-evidence/kairo-a05-accessibility/performance-receipt.json',
-);
+const CORRIDOR_DIR = resolveCorridorSite();
+const REPO = resolve(TOOL_DIR, '..', '..', '..');
+const RECEIPT = resolve(resolveCorridorEvidence(), 'performance-receipt.json');
 const VIEWPORT = { width: 390, height: 844 };
 const DIAGNOSTIC_BOOT_RUNS = 5;
 const DIAGNOSTIC_LOOKUP_RUNS = 10;

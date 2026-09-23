@@ -1,5 +1,5 @@
 /**
- * The corridor's verifier. Done = this is green.
+ * Rendered Corridor flow coverage on one staged release.
  *
  * Runs the six-step corridor walk (§2 of the goal) in real Chromium at
  * 390×844 with touch emulation, asserting on RENDERED PIXELS and real DOM
@@ -15,18 +15,24 @@
  * Usage: node verify-corridor.mjs [--shots DIR] [--keep-open]
  */
 
+import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
+import { evaluateAppRecord, restoreAppFixture } from './record-fixture-support.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-export const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
-const REPO = resolve(CORRIDOR_DIR, '..', '..');
+export const CORRIDOR_DIR = resolveCorridorSite();
+const REPO = resolve(TOOL_DIR, '..', '..', '..');
+const EVIDENCE_DIR = resolveCorridorEvidence();
 
 const VIEWPORT = { width: 390, height: 844 };
 const MIN_TAP = 44; // the canon's own --tap, not what the app happened to ship
@@ -38,6 +44,9 @@ const MIME = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.m4a': 'audio/mp4',
+  '.woff2': 'font/woff2',
 };
 
 export function startCorridorServer(rootDir = CORRIDOR_DIR) {
@@ -68,6 +77,7 @@ export function startCorridorServer(rootDir = CORRIDOR_DIR) {
 /* --------------------------------------------------------------- harness */
 const results = [];
 let failures = 0;
+let activeReport = null;
 
 function check(name, pass, detail = '') {
   results.push({ name, pass: !!pass, detail: String(detail) });
@@ -116,6 +126,15 @@ async function tap(page, selector, index = 0) {
   await touchAt(page, selector, index, 0);
 }
 
+async function chooseDial(page, key, value) {
+  await page.locator(`[data-dial="${key}:${value}"]`).click();
+  await waitForAppRecord(page, (record) => record.dials?.[key] === value,
+    { description: `committed ${key} dial` });
+  await page.waitForFunction(({ key, value }) =>
+    document.querySelector(`[data-dial="${key}:${value}"]`)?.getAttribute('aria-pressed') === 'true',
+  { key, value });
+}
+
 /** The reader's click grammar (v1.2): a full dictionary entry opens by
  * holding a word past the mini-dictionary stage. */
 async function holdWord(page, selector, index = 0) {
@@ -139,6 +158,95 @@ async function settleReader(page) {
     null,
     { polling: 400, timeout: 15000 },
   );
+}
+
+/** Track only the two lazy sources that can replace an opened word sheet.
+ * Call before navigation/open, so an already in-flight request cannot escape
+ * the prerequisite. Reading bodies and unrelated background fetches stay out. */
+function observeWordSheetLoads(page) {
+  const pending = new Set();
+  const failed = [];
+  let revision = 0;
+  const relevant = (request) => /\/data\/(?:share_alike\/dict-v2|proprietary_safe\/examples)\//.test(request.url());
+  const start = (request) => { if (relevant(request)) { pending.add(request); revision += 1; } };
+  const finish = (request) => { if (pending.delete(request)) revision += 1; };
+  const fail = (request) => { if (pending.has(request)) failed.push(request.url()); finish(request); };
+  const response = (reply) => {
+    if (pending.has(reply.request()) && reply.status() >= 400) failed.push(`${reply.status()} ${reply.url()}`);
+  };
+  page.on('request', start);
+  page.on('requestfinished', finish);
+  page.on('requestfailed', fail);
+  page.on('response', response);
+  return {
+    pending, failed, revision: () => revision,
+    dispose() {
+      page.off('request', start);
+      page.off('requestfinished', finish);
+      page.off('requestfailed', fail);
+      page.off('response', response);
+    },
+  };
+}
+
+/** A positive same-word entry plus completed lazy loads, with their DOM
+ * publication settled across frames. There is no elapsed-time sleep or
+ * gesture retry: a held real shard/example response keeps this pending. */
+async function waitForWordSheetBody(page, loads) {
+  const node = await page.locator('#sheet').getAttribute('data-node');
+  assert.match(node, /^word:/);
+  const deadline = Date.now() + 30000;
+  while (Date.now() < deadline) {
+    assert.deepEqual(loads.failed, [], 'Word-sheet prerequisite requests must succeed');
+    const revision = loads.revision();
+    const ready = await page.evaluate((node) => new Promise((done) => {
+      const before = document.querySelector('#sheet');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const sheet = document.querySelector('#sheet');
+        done(!!sheet && sheet === before && sheet.dataset.node === node &&
+          !!sheet.querySelector('.dictionary-entry') &&
+          !sheet.querySelector('.dictionary-opening, .dictionary-warning'));
+      }));
+    }), node);
+    if (ready && loads.pending.size === 0 && revision === loads.revision()) return node;
+  }
+  assert.fail(`Word sheet did not finish loading: ${node}`);
+}
+
+/** Wait for the requested surface's finite motion and fonts, preserving the
+ * intentional infinite ambient glow. DOM existence alone is not a settled
+ * answer face: reveal zones remain blurred during their staggered entrance. */
+async function waitForFiniteMotion(page, selector) {
+  await page.evaluate(async (selector) => {
+    await document.fonts.ready;
+    const deadline = performance.now() + 10000;
+    let stable = 0;
+    let previous = null;
+    while (performance.now() < deadline) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const root = document.querySelector(selector);
+      if (!root) { stable = 0; continue; }
+      const moving = root.getAnimations({ subtree: true }).some((animation) =>
+        Number.isFinite(animation.effect?.getComputedTiming().endTime) &&
+        animation.playState !== 'finished');
+      if (root === previous && !moving) stable += 1;
+      else stable = 0;
+      previous = root;
+      if (stable >= 3) return;
+    }
+    throw new Error(`Finite animation did not settle: ${selector}`);
+  }, selector);
+}
+
+async function sheetViewportGeometry(page) {
+  return page.evaluate(() => {
+    const sheet = document.querySelector('#sheet').getBoundingClientRect();
+    const close = document.querySelector('#sheet-close').getBoundingClientRect();
+    return { innerWidth, clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      visualWidth: window.visualViewport?.width ?? innerWidth,
+      sheet: sheet.toJSON(), close: close.toJSON() };
+  });
 }
 
 async function shoot(page, dir, name) {
@@ -263,21 +371,23 @@ async function main() {
   const argv = process.argv.slice(2);
   const shotArg = argv.indexOf('--shots');
   const shotsDir =
-    shotArg >= 0 ? resolve(argv[shotArg + 1]) : resolve(REPO, 'docs/prototype/screenshots');
+    shotArg >= 0 ? resolve(argv[shotArg + 1]) : resolve(EVIDENCE_DIR, 'screenshots');
   mkdirSync(shotsDir, { recursive: true });
 
   const { server, base } = await startCorridorServer();
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
   });
-  const context = await browser.newContext({
+  const contextOptions = {
     viewport: VIEWPORT,
     deviceScaleFactor: 2,
     isMobile: true,
     hasTouch: true,
     userAgent:
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-  });
+  };
+  const context = await browser.newContext(contextOptions);
+  await silenceBrowserAudio(context);
   const page = await context.newPage();
   const consoleErrors = [];
   page.on('console', (m) => {
@@ -285,7 +395,19 @@ async function main() {
   });
   page.on('pageerror', (e) => consoleErrors.push(`pageerror: ${e.message}`));
 
-  const report = { viewport: VIEWPORT, steps: [], measurements: {}, shelf: [], caps: {} };
+  const hashFile = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
+  const report = {
+    artifact: { path: CORRIDOR_DIR, sha256: JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8')).artifactSha256 },
+    sources: {
+      verifier: hashFile(fileURLToPath(import.meta.url)),
+      nativeRecordHelper: hashFile(resolve(TOOL_DIR, 'record-test-support.mjs')),
+      fixtureHelper: hashFile(resolve(TOOL_DIR, 'record-fixture-support.mjs')),
+      audioSilenceHelper: hashFile(resolve(TOOL_DIR, 'browser-audio-silence.mjs')),
+    },
+    runtime: { node: process.version, engine: 'chromium', version: browser.version(), audioOutput: TEST_AUDIO_OUTPUT },
+    viewport: VIEWPORT, steps: [], measurements: {}, shelf: [], caps: {},
+  };
+  activeReport = report;
 
   const open = async (query = '') => {
     await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
@@ -321,7 +443,7 @@ async function main() {
   const afterDoor = await page.evaluate(`({
     layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
     layerDisplay: getComputedStyle(document.getElementById('drift-layer')).display,
-    shelfItems: document.querySelectorAll('.shelf-item').length,
+    shelfItems: document.querySelectorAll('.shelf-item:not([data-recommendation])').length,
   })`);
   check('Phase 2 · one door from the universe to the shelf',
     !afterDoor.layerActive && afterDoor.layerDisplay === 'none' && afterDoor.shelfItems >= 24,
@@ -423,11 +545,11 @@ async function main() {
   const t0 = Date.now();
   await open('?entry=shelf');
   const loadMs = Date.now() - t0;
-  check('the shelf renders real graded texts', (await page.locator('.shelf-item').count()) >= 8,
-    `${await page.locator('.shelf-item').count()} texts, ready in ${loadMs} ms`);
+  check('the shelf renders real graded texts', (await page.locator('.shelf-item:not([data-recommendation])').count()) >= 8,
+    `${await page.locator('.shelf-item:not([data-recommendation])').count()} texts, ready in ${loadMs} ms`);
 
   const shelfData = await page.evaluate(`(() => {
-    return [...document.querySelectorAll('.shelf-item')].map((n) => ({
+    return [...document.querySelectorAll('.shelf-item:not([data-recommendation])')].map((n) => ({
       title: n.querySelector('.shelf-title').textContent,
       titleEn: n.querySelector('.shelf-title-en')?.textContent ?? null,
       level: n.querySelector('.level-chip')?.textContent ?? null,
@@ -449,9 +571,10 @@ async function main() {
     const runs = [];
     let stray = 0;
     for (const kid of kids) {
-      if (kid.matches('p.eyebrow.shelf-section')) {
+      // 今日の棚 is a recommendation strip, not a section of the collection
+      if (kid.matches('p.eyebrow.shelf-section:not(.shelf-today)')) {
         runs.push({ header: kid.childNodes[0]?.textContent?.trim() ?? '', items: 0 });
-      } else if (kid.matches('.shelf-item')) {
+      } else if (kid.matches('.shelf-item:not([data-recommendation])')) {
         if (!runs.length) stray += 1;
         else runs[runs.length - 1].items += 1;
       }
@@ -474,7 +597,7 @@ async function main() {
   // the glossary is billed as itself: one-line definitions are labeled
   // 用語集 on the card and are never counted among the "real texts"
   const glossaryProbe = await page.evaluate(`(() => {
-    const cards = [...document.querySelectorAll('.shelf-item')];
+    const cards = [...document.querySelectorAll('.shelf-item:not([data-recommendation])')];
     const glossary = cards.filter((n) =>
       (n.querySelector('.shelf-meta')?.textContent ?? '').includes('用語集'));
     const labeled = glossary.filter((n) =>
@@ -482,7 +605,7 @@ async function main() {
     const intro = document.querySelector('.shelf-snippet.intro')?.textContent ?? '';
     return { cards: cards.length, glossary: glossary.length, labeled: labeled.length, intro };
   })()`);
-  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) real texts|読み物 ([0-9]+) 本/)?.slice(1).find(Boolean) ?? NaN);
+  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) readings|読み物 ([0-9]+) 本/)?.slice(1).find(Boolean) ?? NaN);
   check('glossary rows are labeled 用語集 and stand outside the real-text count',
     glossaryProbe.glossary > 0 && glossaryProbe.labeled === glossaryProbe.glossary &&
       billedTexts === glossaryProbe.cards - glossaryProbe.glossary &&
@@ -509,7 +632,7 @@ async function main() {
   const inkanIndex = shelfData.findIndex((s) => s.title === '印鑑登録証');
   check('the cross-referencing glossary entry stands on the shelf', inkanIndex >= 0,
     `shelf index ${inkanIndex}`);
-  await tap(page, '.shelf-item', inkanIndex);
+  await tap(page, '.shelf-item:not([data-recommendation])', inkanIndex);
   await settleReader(page);
   const refProbe = await page.evaluate(`(() => {
     const reader = document.getElementById('reader');
@@ -544,16 +667,16 @@ async function main() {
   // pair (never a stale or faked number)
   await page.locator('[data-details]').first().click();
   await page.waitForTimeout(200);
-  const rawSignals = await page.locator('.shelf-item .sig').count();
+  const rawSignals = await page.locator('.shelf-item:not([data-recommendation]) .sig').count();
   const sigNames = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item .sig .sig-name')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig .sig-name')].map((n) => n.textContent)`,
   );
   check('the raw signals unfold behind 詳細 — separate, never averaged', rawSignals >= 3,
     `${rawSignals} signal rows on the opened card: ${sigNames.join(' · ')}`);
   check('the JLPT-lexicon signal is live on the opened card',
     sigNames.some((n) => n.includes('JLPT')), sigNames.join(' · '));
   const sigValues = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item .sig .sig-val')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig .sig-val')].map((n) => n.textContent)`,
   );
   const ninjalRow = sigNames.findIndex((n) => n.includes('国語研'));
   const firstGrading = gradingTruth.articles[0].grading;
@@ -570,7 +693,7 @@ async function main() {
   // ------------------------------------------- step 1b · Phase 1: the shelf
   // holds dozens of articles, lazily loaded, the 8 parked v11 texts among them
   console.log('\n— step 1b · Phase 1 shelf');
-  const shelfCount = await page.locator('.shelf-item').count();
+  const shelfCount = await page.locator('.shelf-item:not([data-recommendation])').count();
   check('Phase 1 · the shelf holds dozens of articles', shelfCount >= 24, `${shelfCount} articles`);
   const v11Titles = ['静かな朝', '雨の日の古本屋', '知らない町を歩く', '山を歩きながら考えたこと',
     'AI時代の知識と判断', '五箇条の御誓文', '方丈記 · 冒頭', '徒然草 · 序段'];
@@ -591,7 +714,7 @@ async function main() {
   check('Phase 1 · every article carries live signals or an honest absence', signalsTrue,
     'jreadability + jlpt_lexicon live; NINJAL pair measured or reason recorded');
   await page.evaluate(`(() => {
-    const items = [...document.querySelectorAll('.shelf-item .shelf-title')];
+    const items = [...document.querySelectorAll('.shelf-item:not([data-recommendation]) .shelf-title')];
     const first = items.find((n) => n.textContent === '静かな朝');
     if (first) first.scrollIntoView({ block: 'start' });
     window.scrollBy(0, -70);
@@ -604,7 +727,7 @@ async function main() {
   // the full-length story: ごん狐 ships whole, paragraphs intact
   const gonIndex = shelfTitles.findIndex((t) => t.includes('ごん狐'));
   check('Phase 1 · ごん狐 stands on the shelf', gonIndex >= 0, `shelf index ${gonIndex}`);
-  await tap(page, '.shelf-item', gonIndex);
+  await tap(page, '.shelf-item:not([data-recommendation])', gonIndex);
   await page.waitForSelector('#reader .tok', { timeout: 15000 });
   const gonText = await page.locator('#reader').innerText();
   check('Phase 1 · the story ships full-length — no 520-char excerpt',
@@ -626,9 +749,9 @@ async function main() {
   await page.goBack().catch(() => {});
   await open('?entry=shelf');
   const quietIndex = (await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item .shelf-title')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .shelf-title')].map((n) => n.textContent)`,
   )).findIndex((t) => t === '静かな朝');
-  await tap(page, '.shelf-item', quietIndex);
+  await tap(page, '.shelf-item:not([data-recommendation])', quietIndex);
   await page.waitForSelector('#reader .tok', { timeout: 15000 });
   const v11Ruby = await page.locator('#reader rt').count();
   check('Phase 1 · a v11 original carries real furigana from the pipeline', v11Ruby > 10,
@@ -638,7 +761,7 @@ async function main() {
 
   // ------------------------------------------------------------ step 2 read
   console.log('\n— step 2 · read');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   const readerText = await page.locator('#reader').innerText();
   check('the reader shows real Japanese', /[぀-ヿ一-鿌]/.test(readerText), `${readerText.length} chars rendered`);
@@ -666,13 +789,13 @@ async function main() {
     };
   })()`);
   const baseline = await dialProbe();
-  await page.locator('[data-dial="furigana:0"]').click();
+  await chooseDial(page, 'furigana', 0);
   const noFuri = await dialProbe();
   check('dial · furigana alone changes furigana',
     noFuri.rt === 0 && noFuri.spacing === baseline.spacing,
     `rt ${baseline.rt} → ${noFuri.rt}, spacing class unchanged`);
 
-  await page.locator('[data-dial="spacing:2"]').click();
+  await chooseDial(page, 'spacing', 2);
   const spaced = await dialProbe();
   check('dial · spacing alone changes spacing',
     spaced.spacing.includes('sp-bunsetsu') && spaced.rt === noFuri.rt,
@@ -681,9 +804,9 @@ async function main() {
   check('文節 grouping is real', bunsetsuCount > 5, `${bunsetsuCount} 文節 groups`);
   await shoot(page, shotsDir, '02b-dials-spacing-bunsetsu');
 
-  await page.locator('[data-dial="kanji:1"]').click();
+  await chooseDial(page, 'kanji', 1);
   const joyo = await dialProbe();
-  await page.locator('[data-dial="kanji:2"]').click();
+  await chooseDial(page, 'kanji', 2);
   const allKana = await dialProbe();
   check('dial · kanji alone changes the script',
     allKana.text !== baseline.text && /^[^一-鿌]*$/.test(allKana.text.replace(/[、。「」]/g, '')),
@@ -692,9 +815,9 @@ async function main() {
   report.dials = { baseline, noFuri, spaced, joyo, allKana };
 
   // reveal-on-tap
-  await page.locator('[data-dial="kanji:0"]').click();
-  await page.locator('[data-dial="spacing:0"]').click();
-  await page.locator('[data-dial="furigana:1"]').click();
+  await chooseDial(page, 'kanji', 0);
+  await chooseDial(page, 'spacing', 0);
+  await chooseDial(page, 'furigana', 1);
   const beforeReveal = await dialProbe();
   check('furigana can be held back and revealed',
     beforeReveal.hiddenRt > 0 && beforeReveal.hiddenRt === beforeReveal.rt,
@@ -769,7 +892,7 @@ async function main() {
 
   // the worst long-gloss word on the shelf must render its gloss WHOLE
   await open('?entry=shelf');
-  await tap(page, '.shelf-item', 2); // JR おおさか東線 — carries 沿線
+  await tap(page, '.shelf-item:not([data-recommendation])', 2); // JR おおさか東線 — carries 沿線
   await settleReader(page);
   const enIdx = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
@@ -791,7 +914,7 @@ async function main() {
     check('grammar · even the longest gloss renders whole — never truncated', false, '沿線 not found in text 3');
   }
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   await page.locator('#dials-toggle').click();
   await page.waitForTimeout(150);
@@ -827,7 +950,11 @@ async function main() {
   })()`);
   check('grammar · a long press floats the mini-dictionary', !!mini && !!mini.word,
     mini ? `${mini.word} — ${String(mini.gloss).slice(0, 30)}` : 'no #mini');
-  await tap(page, '.view-title');
+  // "anywhere else" must be outside the mini by construction: the floating
+  // mini grew a full-entry row and now reaches the title above a first-line
+  // word, so the title is not elsewhere any more — the context note beneath
+  // the text is (it never carries a handler of its own)
+  await tap(page, (await page.locator('#reader-context-note').count()) ? '#reader-context-note' : '.view-title');
   await page.waitForTimeout(120);
   check('grammar · one tap anywhere else backs out of the mini',
     (await page.locator('#mini').count()) === 0, 'mini dismissed');
@@ -928,8 +1055,59 @@ async function main() {
   check('the kanji page carries its 漢検級',
     kanjiPage.tags.some((t) => t.includes('漢検')),
     kanjiPage.tags.filter((t) => t.includes('漢検')).join(','));
+  await waitForFiniteMotion(page, '#sheet');
+  const phoneSheet = await sheetViewportGeometry(page);
+  report.measurements.kanjiPhoneViewport = phoneSheet;
+  check('phone thesaurus → kanji keeps the close control on the 390px viewport',
+    phoneSheet.innerWidth === VIEWPORT.width && phoneSheet.clientWidth === VIEWPORT.width &&
+    phoneSheet.scrollWidth <= VIEWPORT.width && phoneSheet.visualWidth === VIEWPORT.width &&
+    phoneSheet.sheet.left >= 0 && phoneSheet.sheet.right <= VIEWPORT.width &&
+    phoneSheet.close.left >= 0 && phoneSheet.close.right <= VIEWPORT.width &&
+    phoneSheet.close.top >= 0 && phoneSheet.close.bottom <= VIEWPORT.height,
+    JSON.stringify(phoneSheet));
   await shoot(page, shotsDir, '04-kanji-page');
   report.steps.push({ step: 4, name: 'kanji', shot: '04-kanji-page.png', kanjiPage });
+
+  // Reach the close with a keyboard, then use the actual pointer control.
+  await page.locator('#sheet-back').focus();
+  for (let step = 0; step < 3; step++) await page.keyboard.press('Tab');
+  check('phone kanji header keeps its close in keyboard order',
+    await page.evaluate(() => document.activeElement?.id === 'sheet-close'));
+  await page.locator('#sheet-close').click();
+  await page.waitForSelector('#sheet', { state: 'detached' });
+  check('phone kanji close dismisses the full entry', await page.locator('#sheet').count() === 0);
+
+  // Desktop control: retain the existing centred 820px measure and working
+  // close path. This is another page in the same already-headless browser.
+  const desktopSheetContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  try {
+    const desktopPage = await desktopSheetContext.newPage();
+    await desktopPage.goto(`${base}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
+    await desktopPage.waitForFunction(() => document.body.dataset.ready === '1');
+    await walkToSemPanel(desktopPage, async (target, selector) => target.locator(selector).first().click());
+    await desktopPage.locator('#sheet [data-kanjirow]').first().click();
+    await waitForFiniteMotion(desktopPage, '#sheet');
+    const desktopSheet = await sheetViewportGeometry(desktopPage);
+    report.measurements.kanjiDesktopViewport = desktopSheet;
+    check('desktop kanji keeps its centred measure and reachable close',
+      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.width === 820 &&
+      desktopSheet.sheet.left === 230 && desktopSheet.close.right <= 1280,
+      JSON.stringify(desktopSheet));
+    await shoot(desktopPage, shotsDir, '04b-kanji-desktop-settled');
+    await desktopPage.locator('#sheet-back').focus();
+    for (let step = 0; step < 3; step++) await desktopPage.keyboard.press('Tab');
+    check('desktop kanji close remains keyboard reachable',
+      await desktopPage.evaluate(() => document.activeElement?.id === 'sheet-close'));
+    await desktopPage.keyboard.press('Enter');
+    await desktopPage.waitForSelector('#sheet', { state: 'detached' });
+    check('desktop kanji keyboard close dismisses the entry', await desktopPage.locator('#sheet').count() === 0);
+  } finally { await desktopSheetContext.close(); }
+
+  // Reopen the exact word → kanji stack before the existing graph walk.
+  await open('?entry=shelf');
+  await walkToSemPanel(page, tap);
+  await tap(page, '#sheet [data-kanjirow]');
+  await waitForFiniteMotion(page, '#sheet');
 
   const idiomHeading = await page.locator('#sheet .eyebrow', { hasText: '熟語' }).count();
   report.idiomSectionPresent = idiomHeading > 0;
@@ -1040,7 +1218,7 @@ async function main() {
   console.log('\n— step 6 · return without losing your place');
   await page.evaluate('window.scrollTo(0, 0)');
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   await page.evaluate('window.scrollTo(0, 420)');
   await page.waitForTimeout(80);
@@ -1076,22 +1254,20 @@ async function main() {
 
   // A · card format
   for (const mode of ['mcd', 'word']) {
+    const sheetLoads = observeWordSheetLoads(page);
+    try {
     await open(`?entry=shelf&cards=${mode}`);
-    await tap(page, '.shelf-item');
+    await tap(page, '.shelf-item:not([data-recommendation])');
     await settleReader(page);
     await holdWord(page, '#reader .tok.content', 5);
     await page.waitForSelector('#sheet');
+    const cardNode = await waitForWordSheetBody(page, sheetLoads);
     // the card preview rides inside the study fold since 2026-08-27 — open
     // 学習の記録 first (for MCD the preview appears once the source
     // article's tokens arrive; the reader has them already)
     await tap(page, '#sheet .study-fold .fold-head');
     await page.waitForSelector('#sheet .card-preview');
-    // two one-time sheet swaps may follow the open (deep senses, bank
-    // examples) — let them land before touching located elements
-    await page
-      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
-      .catch(() => {});
-    await page.waitForTimeout(600);
+    assert.equal(await page.locator('#sheet').getAttribute('data-node'), cardNode, 'The fold tap must stay on the intended word');
     await page.locator('#sheet .card-preview').scrollIntoViewIfNeeded();
     await page.waitForTimeout(120);
     const card = await page.evaluate(`(() => {
@@ -1106,6 +1282,7 @@ async function main() {
       mode === 'mcd' ? card.cloze : card.target,
       `${card.kind.slice(0, 22)} — face "${card.face.replace(/\n/g, ' ').slice(0, 34)}"`);
     variantShots[`A-${mode}`] = await shoot(page, shotsDir, `V-A-cards-${mode}`);
+    } finally { sheetLoads.dispose(); }
   }
 
   // B · difficulty presentation — behind 詳細 since v1.2, so open one card
@@ -1114,9 +1291,9 @@ async function main() {
     await page.locator('[data-details]').first().click();
     await page.waitForTimeout(200);
     const shown = await page.evaluate(`(() => ({
-      sigs: document.querySelectorAll('.shelf-item .sig').length,
-      bands: document.querySelectorAll('.shelf-item .band').length,
-      uncertain: document.querySelectorAll('.shelf-item .uncertain').length,
+      sigs: document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig').length,
+      bands: document.querySelectorAll('.shelf-item:not([data-recommendation]) .band').length,
+      uncertain: document.querySelectorAll('.shelf-item:not([data-recommendation]) .uncertain').length,
     }))()`);
     check(`variant B · ${mode}`,
       mode === 'three' ? shown.sigs >= 3 && shown.bands === 0 : shown.bands === 1 && shown.sigs === 0,
@@ -1155,7 +1332,7 @@ async function main() {
     await open(`?entry=${mode}`);
     const landed = await page.evaluate(`(() => ({
       field: !!document.querySelector('#field'),
-      shelf: document.querySelectorAll('.shelf-item').length,
+      shelf: document.querySelectorAll('.shelf-item:not([data-recommendation])').length,
       words: document.querySelectorAll('.field-word').length,
       placeholder: !!document.querySelector('.note.placeholder'),
     }))()`);
@@ -1167,7 +1344,7 @@ async function main() {
       await tap(page, '#enter-shelf');
       await page.waitForTimeout(150);
       check('variant D · one gesture from the field to the shelf',
-        (await page.locator('.shelf-item').count()) >= 8, 'tap 棚へ → shelf');
+        (await page.locator('.shelf-item:not([data-recommendation])').count()) >= 8, 'tap 棚へ → shelf');
       variantShots['D-field-to-shelf'] = await shoot(page, shotsDir, 'V-D-entry-field-to-shelf');
     }
   }
@@ -1185,7 +1362,7 @@ async function main() {
   // no longer floats over the reader — the reader typography samples need
   // their own probe on a real reading page
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   const readerProbe = await page.evaluate(MEASURE_FN);
   const mergedText = new Map();
@@ -1278,8 +1455,8 @@ async function main() {
   await page.fill('#note-input', '読み物のふりがなが小さい');
   await tap(page, '#note-send');
   await page.waitForTimeout(300);
-  const noteRow = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const noteRow = await evaluateAppRecord(page, `(() => {
+    const s = record;
     const rows = (s.obslog || []).filter((r) => r[1] === 'note');
     const last = rows[rows.length - 1] || [];
     return { count: rows.length, kind: last[1] ?? null, key: last[2] ?? null, text: last[3] ?? null };
@@ -1301,7 +1478,7 @@ async function main() {
   // door's PRESENCE, its honest 仮の声 label, and the graceful no-voice
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await page.waitForSelector('#listen-toggle', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
@@ -1426,7 +1603,7 @@ async function main() {
 
   // the kanji page draws its stroke order
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet [data-kanjirow]');
@@ -1456,19 +1633,38 @@ async function main() {
   console.log('\n— v1.5 · search: four doors, one box');
   await open('?entry=shelf');
   const doors = [
-    ['kaisai', 'word:開催', 'romaji'],
-    ['かいさい', 'word:開催', 'kana'],
-    ['開', 'kanji:開', 'kanji'],
-    ['peninsula', 'word:半島', 'English'],
-    ['ばかり', 'grammar:bakari', 'grammar'],
+    ['kaisai', 'word:開催', 'romaji', '開催', 'かいさい', 'holding (a conference, exhibition, etc.)', '1202710'],
+    ['かいさい', 'word:開催', 'kana', '開催', 'かいさい', 'holding (a conference, exhibition, etc.)', '1202710'],
+    ['開', 'kanji:開', 'kanji', '開', '', 'Open', null],
+    ['peninsula', 'word:半島', 'English', '半島', 'はんとう', 'peninsula', '1479770'],
+    ['ばかり', 'grammar:bakari', 'grammar', '〜ばかり', 'N3', 'just did …; nothing but …', null],
   ];
-  for (const [q, want, door] of doors) {
+  for (const [q, want, door, word, reading, gloss, seq] of doors) {
     await page.fill('#search', q);
     await page.waitForTimeout(350);
-    const hit = await page.evaluate(
-      `[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === ${JSON.stringify(want)})`,
+    const actual = await page.evaluate(() => ({
+      query: document.querySelector('#search')?.value ?? null,
+      observedAt: performance.now(),
+      rows: [...document.querySelectorAll('[data-result]')].map((row) => ({
+        id: row.dataset.result,
+        word: [...(row.querySelector('.row-word')?.childNodes || [])]
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((node) => node.textContent).join('') || row.querySelector('.row-glyph')?.textContent || '',
+        reading: row.querySelector('.row-reading')?.textContent || '',
+        gloss: row.querySelector('.row-gloss')?.textContent || '',
+        visible: row.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
+      })),
+    }));
+    // A compatible full entry replaces the core row and carries its exact
+    // JMdict sequence. Both must display the intended word and meaning;
+    // unrelated sequence suffixes and other rows are not accepted.
+    const ids = seq ? [want, `${want}:${seq}`] : [want];
+    const hit = actual.query === q && actual.rows.some((row) =>
+      ids.includes(row.id) && row.word === word && row.reading === reading &&
+      row.gloss === gloss && row.visible === true,
     );
-    check(`search · the typed door accepts ${door}`, hit, `"${q}" → ${want}`);
+    check(`search · the typed door accepts ${door}`, hit,
+      JSON.stringify({ expected: { query: q, ids, word, reading, gloss }, actual }));
   }
   // Honest naming (canon §7.2 vs this build): the CANONICAL four doors are
   // typed · handwriting · radical/component picker · SKIP. What ships today is
@@ -1504,7 +1700,7 @@ async function main() {
 
   await page.fill('#search', '');
   await page.waitForTimeout(250);
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   const particleCount = await page.locator('#reader .tok.particle').count();
   check('particles · the reader marks particle tokens as doors', particleCount >= 5,
@@ -1523,10 +1719,10 @@ async function main() {
   // ------------------------------ Phase A · the observation log (taps)
   console.log('\n— Phase A · reader taps land in the observation log');
   await open('?entry=shelf&dials=0,0,0'); // furigana hidden → the full ladder
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
-  const obsBefore = await page.evaluate(
-    `(JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').obslog || []).length`,
+  const obsBefore = await evaluateAppRecord(page,
+    `(record.obslog || []).length`,
   );
   await tap(page, '#reader .tok.content', 3);
   await page.waitForTimeout(250);
@@ -1535,8 +1731,8 @@ async function main() {
   await holdWord(page, '#reader .tok.content', 3); // the entry lives on the hold now
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
-  const obs = await page.evaluate(`(() => {
-    const env = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const obs = await evaluateAppRecord(page, `(() => {
+    const env = record;
     const rows = (env.obslog || []).slice(${obsBefore});
     return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
   })()`);
@@ -1588,13 +1784,13 @@ async function main() {
   check('the probe room keeps the zen glass', probeZen === true, 'body.zen while a compound is up');
   await page.locator('#probe-reveal').click();
   await page.waitForSelector('.probe-meta');
-  const probeEnvBefore = await page.evaluate(
-    `(() => { const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}'); return { taken: (e.taken||[]).length }; })()`,
+  const probeEnvBefore = await evaluateAppRecord(page,
+    `(() => { const e = record; return { taken: (e.taken||[]).length }; })()`,
   );
   await page.locator('[data-probe="wrong"]').click();
   await page.waitForTimeout(300);
-  const probeAfter = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const probeAfter = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'probe');
     const last = rows[rows.length - 1];
     return { taken: (e.taken||[]).length, last, srsHas: last ? Object.prototype.hasOwnProperty.call(e.srs || {}, last[2]) : null };
@@ -1611,19 +1807,19 @@ async function main() {
   // could never surface, no revlog row, no burned daily new-card slot — and
   // the seals must stamp practice, never a next-due promise the scheduler
   // will not keep. A TAKEN card in the same block keeps the full deck path.
-  // The probe runs on a controlled envelope and hands the learner's own
-  // bytes back untouched when it is done.
+  // The probe imports a controlled synthetic record and restores the prior
+  // native snapshot through the same actual backup door when it is done.
   console.log('\n— Phase A · dojo drill: evidence for practice, the deck for the taken');
   await page.waitForTimeout(1400); // let the probe row's debounced save land first
-  const dojoSnapshot = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  const dojoSnapshot = await readAppRecord(page);
   // an in-app 覚える stamps the no-debt started mark (R2-A); this row is one
   // of those, which is what earns it the full deck path below. A row without
   // the mark is a legacy/imported capture and drills as practice instead —
   // that case is its own probe further down (E3-A).
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+  await restoreAppFixture(page, await page.evaluate(`({
     v: 1,
     taken: [{ t: 'kanji', id: '水', label: '水', kind: '漢字', kindEn: 'kanji', ts: Date.now(), started: Date.now() }],
-  }))`);
+  })`));
   await open('');
   await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
   await tap(page, '#ginga-symbol');
@@ -1648,8 +1844,8 @@ async function main() {
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
   const dojoDay = `(() => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); })()`;
-  const dojoTakenAfter = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const dojoTakenAfter = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const day = ${dojoDay};
     return {
       srsKeys: Object.keys(e.srs || {}),
@@ -1679,8 +1875,8 @@ async function main() {
   // new-card budget unburned, one obslog row naming the drill room
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
-  const dojoDrillAfter = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const dojoDrillAfter = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const day = ${dojoDay};
     const rows = (e.obslog || []).filter((r) => r[1] === 'dojo');
     return {
@@ -1699,12 +1895,8 @@ async function main() {
       dojoDrillAfter.last[2] === 'kanji:' + dojoDrillFront && dojoDrillAfter.last[3] === 3 &&
       dojoDrillAfter.last[4] === 'kanji',
     `row ${JSON.stringify(dojoDrillAfter.last)}`);
-  // hand the envelope back exactly as found — this probe leaves no learner state
-  await page.evaluate(`(() => {
-    const snap = ${JSON.stringify(dojoSnapshot)};
-    if (snap === null) localStorage.removeItem('kairo-corridor-v1');
-    else localStorage.setItem('kairo-corridor-v1', snap);
-  })()`);
+  // Restore the prior native record through the actual complete-backup importer.
+  await restoreAppFixture(page, dojoSnapshot);
 
   // -------------------------- the newspaper archive (新聞アーカイブ)
   console.log('\n— the newspaper archive: a deep stack behind one quiet door');
@@ -1744,10 +1936,6 @@ async function main() {
   await tap(page, '#back');
   await page.waitForSelector('.archive-year');
   check('back returns to the stack, not the shelf', true, 'archive restored');
-  const standaloneSrc = readFileSync(resolve(CORRIDOR_DIR, 'corridor-standalone.html'), 'utf8');
-  check('the single-file build does not embed the stack it cannot carry',
-    !standaloneSrc.includes('"articles/archive'),
-    'no articles/archive bundle keys in corridor-standalone.html');
   await shoot(page, shotsDir, '16-archive-stack');
 
   // ------------------ 用例の蔵 · examples everywhere, sentences that answer
@@ -1835,7 +2023,7 @@ async function main() {
 
   // capture scope: 語だけ · この文 · 段落 — the choice rides the card
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   await holdWord(page, '#reader .tok.content', 6);
   await page.waitForSelector('#sheet #take');
@@ -1846,8 +2034,8 @@ async function main() {
   await page.waitForSelector('[data-ctx-scope]', { timeout: 8000 });
   await tap(page, '[data-ctx-scope="sent"]');
   await page.waitForTimeout(300);
-  const ctxStored = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const ctxStored = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const it = (e.taken || []).find((t) => t.ctx);
     return it ? it.ctx : null;
   })()`);
@@ -1867,13 +2055,13 @@ async function main() {
   // boots with readings on request; the tap cycle ends where it began.
   // Self-baselining: earlier sections may have exercised the (persisted)
   // dials — this asserts the FACTORY default, so clear any stored choice.
-  await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  await restoreAppFixture(page, await evaluateAppRecord(page, `(() => {
+    const e = record;
     delete e.dials;
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify(e));
-  })()`);
+    return e;
+  })()`));
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   const bareBoot = await page.evaluate(`(() => ({
     visible: [...document.querySelectorAll('#reader rt')].filter((r) => !r.classList.contains('hidden-rt')).length,
@@ -1925,8 +2113,8 @@ async function main() {
   await page.waitForSelector('[data-dial="furigana:2"]', { state: 'attached', timeout: 8000 });
   await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
   await page.waitForTimeout(300);
-  const dialPersist = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').dials?.furigana`,
+  const dialPersist = await evaluateAppRecord(page,
+    `record.dials?.furigana`,
   );
   check('文字設定 rides the envelope — a chosen dial survives the session',
     dialPersist === 2,
@@ -1975,6 +2163,15 @@ async function main() {
     `“${answerFace.word.trim()}” · ${answerFace.lines} sentence lines · ${answerFace.live} live tokens`);
   check('TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)',
     answerFace.say === true, `card-say present on “${answerFace.word.trim()}”`);
+  await waitForFiniteMotion(page, '.review-face');
+  await waitForFiniteMotion(page, '.grade-row');
+  check('answer-face capture waits for legible settled ink', await page.evaluate(() => {
+    const ink = [...document.querySelectorAll('.review-face .reveal')];
+    return ink.length > 0 && ink.every((node) => {
+      const style = getComputedStyle(node);
+      return Number(style.opacity) === 1 && (style.filter === 'none' || style.filter === 'blur(0px)');
+    });
+  }));
   await shoot(page, shotsDir, '18-review-answer-face');
   // the walk's recall declarations ride the observation debounce; let it
   // land before the next probe replaces the envelope (same idiom as the
@@ -1988,12 +2185,12 @@ async function main() {
   console.log('\n— R2-B · 覚える top-right · reversible capture · list management');
   // a seeded record: one memorized word with real FSRS state and one revlog
   // row — un-memorize semantics must be provable against audit history
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+  await restoreAppFixture(page, await page.evaluate(`({
     v: 1,
     taken: [{ t: 'word', id: '学校', label: '学校', kind: '語', kindEn: 'word', from: null, ts: 1755000000000 }],
     srs: { 'word:学校': { due: '2020-01-01T00:00:00.000Z', last_review: '2019-12-31T00:00:00.000Z', stability: 3, difficulty: 5, elapsed_days: 1, scheduled_days: 1, reps: 1, lapses: 0, learning_steps: 0, state: 2 } },
     revlog: [[1754000000000, 'word:学校', 3, 0, null, null, null, null, 3, 5, 1, 1200]],
-  }))`);
+  })`));
   await open('?entry=shelf');
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
@@ -2013,8 +2210,8 @@ async function main() {
     sealBefore.taken && sealBefore.pressed === 'true', JSON.stringify(sealBefore));
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
-  const afterUntake = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const afterUntake = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length,
              srsKept: Object.prototype.hasOwnProperty.call(e.srs || {}, 'word:学校') };
   })()`);
@@ -2036,8 +2233,8 @@ async function main() {
   await page.waitForSelector('#sheet #sheet-take');
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
-  const reTaken = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const reTaken = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const rec = e.srs?.['word:学校'];
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length,
              reps: rec?.reps ?? null, due: rec?.due ?? null };
@@ -2062,8 +2259,8 @@ async function main() {
   await page.fill('#list-maker-field', '読書');
   await page.locator('#list-maker-make').click();
   await page.waitForTimeout(150);
-  const dupeState = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const dupeState = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const f = document.querySelector('#list-maker-field');
     return { lists: Object.keys(e.lists || {}), invalid: f?.getAttribute('aria-invalid'), hint: f?.placeholder ?? '' };
   })()`);
@@ -2073,8 +2270,8 @@ async function main() {
   await open('?entry=shelf');
   await tap(page, '#tray');
   await page.waitForSelector('.list-op');
-  const persisted = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const persisted = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { lists: Object.keys(e.lists || {}), shown: [...document.querySelectorAll('.list-head')].some((h) => h.textContent.includes('読書')) };
   })()`);
   check('R2-B · the new list survives a reload, on the surface and in the envelope',
@@ -2085,22 +2282,22 @@ async function main() {
   await page.fill('.list-rename .list-maker-field', '精読');
   await page.locator('.list-rename .list-maker-make').click();
   await page.waitForTimeout(250);
-  const renamed = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const renamed = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return Object.keys(e.lists || {});
   })()`);
   check('R2-B · rename lives where the list lives and persists',
     renamed.length === 1 && renamed[0] === '精読', JSON.stringify(renamed));
   await page.locator('.list-op').nth(1).click();
   await page.waitForTimeout(150);
-  const armed = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const armed = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { still: Object.keys(e.lists || {}).length, armedBtn: !!document.querySelector('.list-op.armed') };
   })()`);
   await page.locator('.list-op.armed').click();
   await page.waitForTimeout(250);
-  const deleted = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const deleted = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { lists: Object.keys(e.lists || {}).length, taken: (e.taken || []).length,
              revlog: (e.revlog || []).length, srsKept: Object.prototype.hasOwnProperty.call(e.srs || {}, 'word:学校') };
   })()`);
@@ -2111,7 +2308,7 @@ async function main() {
   // the reader's top-right door: quiet until a word is touched, then one
   // tap takes the current thing with the sentence it was met in
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await settleReader(page);
   const idleSeal = await page.evaluate(`(() => {
     const b = document.querySelector('#reader-take');
@@ -2130,14 +2327,14 @@ async function main() {
   check('R2-B · touching a word arms the door with that word, in place',
     touched.sealReady && touched.label.includes(touched.word),
     `${touched.word} — "${touched.label}"`);
-  const envBefore = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const envBefore = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   await tap(page, '#reader-take');
   await page.waitForSelector('#capture-panel');
-  const captured = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const captured = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     return { taken: (e.taken || []).length, t: it?.t, id: it?.id, ctx: it?.ctx ?? null };
   })()`);
@@ -2163,8 +2360,8 @@ async function main() {
   await shoot(page, shotsDir, '19-capture-sovereignty');
   await tap(page, '#capture-panel #take');
   await page.waitForTimeout(250);
-  const undone = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const undone = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   check('R2-B · a mis-tap leaves in one gesture; the revlog length never moves',
@@ -2180,8 +2377,8 @@ async function main() {
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
   await page.evaluate(`document.querySelector('#mini-take')?.click()`);
   await page.waitForTimeout(250);
-  const miniCap = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const miniCap = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     const seal = document.querySelector('#mini-take');
     return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
@@ -2191,8 +2388,8 @@ async function main() {
     JSON.stringify(miniCap));
   await page.evaluate(`document.querySelector('#mini-take')?.click()`);
   await page.waitForTimeout(250);
-  const miniUndone = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const miniUndone = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { taken: (e.taken || []).length, sealTaken: document.querySelector('#mini-take')?.classList.contains('taken') ?? null };
   })()`);
   check('R2-B · the mini lets it go again — reversible where the state shows',
@@ -2216,8 +2413,8 @@ async function main() {
     sentSeal.present && sentSeal.label.includes('半島'), JSON.stringify(sentSeal));
   await tap(page, '#sheet-take');
   await page.waitForTimeout(300);
-  const sentCap = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const sentCap = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     return { t: it?.t, id: it?.id, pressed: document.querySelector('#sheet-take')?.getAttribute('aria-pressed') };
   })()`);
@@ -2256,12 +2453,12 @@ async function main() {
 
   // (c) due order + no-debt legacy: three overdue cards seeded out of order,
   // one started fresh row, one legacy row with no mark and no card
-  await page.evaluate(`(() => {
+  await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
     const card = (dueMs, lastMs) => ({ due: iso(dueMs), last_review: iso(lastMs), stability: 5, difficulty: 5, elapsed_days: 1, scheduled_days: 3, reps: 2, lapses: 0, learning_steps: 0, state: 2 });
     const D = 86400000, H = 3600000;
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    return {
       v: 1,
       taken: [
         { t: 'word', id: '学校', label: '学校', ts: T - 9e6, started: T - 9e6 },
@@ -2275,8 +2472,8 @@ async function main() {
         'word:電話': card(T - 3 * D, T - 4 * D),
         'word:手帳': card(T - D, T - 2 * D),
       },
-    }));
-  })()`);
+    };
+  })()`));
   await open('?entry=shelf');
   const dueOrder = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
   check('R2-A · real dues come most-overdue first; started fresh after; legacy absent',
@@ -2295,8 +2492,8 @@ async function main() {
     `"${trayBefore.button.trim()}" · forecast "${trayBefore.forecast}"`);
   await page.locator('[data-srs-start="word:人々"]').click();
   await page.waitForTimeout(300);
-  const trayAfter = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const trayAfter = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const row = e.taken.find((t) => t.id === '人々');
     return {
       button: document.getElementById('review-start').textContent,
@@ -2312,23 +2509,23 @@ async function main() {
   // (d) a backward device clock: the card's anchor sits three days AHEAD of
   // the wall clock (written when the clock ran fast). Grading must neither
   // crash (ts-fsrs throws on negative day deltas) nor corrupt the schedule.
-  await page.evaluate(`(() => {
+  await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    return {
       v: 1,
       taken: [{ t: 'word', id: '学校', label: '学校', ts: T, started: T }],
       srs: {
         'word:学校': { due: iso(T - 60000), last_review: iso(T + 3 * 86400000), stability: 6, difficulty: 5, elapsed_days: 0, scheduled_days: 3, reps: 3, lapses: 0, learning_steps: 0, state: 2 },
       },
-    }));
-  })()`);
+    };
+  })()`));
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
-  const anchorIso = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).srs['word:学校'].last_review`,
+  const anchorIso = await evaluateAppRecord(page,
+    `record.srs['word:学校'].last_review`,
   );
   await tap(page, '#review-start');
   await page.waitForSelector('#declare-recalled');
@@ -2336,8 +2533,8 @@ async function main() {
   await page.waitForSelector('.grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
-  const backProbe = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const backProbe = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const rec = e.srs['word:学校'];
     const row = e.revlog[e.revlog.length - 1];
     return { rec, row, summaryUp: (document.querySelector('.view-title')?.textContent ?? '').length > 0 };
@@ -2355,10 +2552,9 @@ async function main() {
 
   // (e) bounded standard review: 25 overdue cards + 3 started fresh rows;
   // an ordinary sitting freezes 20 and says あと N on the goodbye screen.
-  // (the clamp probe's declaration armed the observation debounce — let it
-  // land so the reload's pagehide flush cannot overwrite this seed)
+  // Let the clamp probe's observation settle before importing the next fixture.
   await page.waitForTimeout(1400);
-  await page.evaluate(`(() => {
+  await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
     const taken = [];
@@ -2369,8 +2565,8 @@ async function main() {
       srs['word:' + id] = { due: iso(T - (i + 1) * 3600000), last_review: iso(T - 5 * 86400000), stability: 8, difficulty: 5, elapsed_days: 4, scheduled_days: 5, reps: 3, lapses: 0, learning_steps: 0, state: 2 };
     }
     for (const id of ['f1', 'f2', 'f3']) taken.push({ t: 'word', id, label: id, ts: T - 9e5, started: T - 9e5 });
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken, srs }));
-  })()`);
+    return { v: 1, taken, srs };
+  })()`));
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
@@ -2387,8 +2583,10 @@ async function main() {
     await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
     await page.waitForSelector('.grade.g-easy', { timeout: 8000 });
     await page.evaluate(`document.querySelector('.grade.g-easy')?.click()`);
-    await page.waitForTimeout(120);
+    await waitForAppRecord(page, (record) => record.revlog?.length === i + 1,
+      { description: 'committed bounded-review grade' });
   }
+  await page.waitForSelector('.review-deferred');
   const boundedEnd = await page.evaluate(`(() => ({
     title: document.querySelector('.view-title')?.textContent ?? '',
     deferredLine: document.querySelector('.review-deferred')?.textContent ?? '',
@@ -2412,8 +2610,8 @@ async function main() {
     await page.locator('[data-pref-down="newPerDay"]').click(); // 20 → 0
     await page.waitForTimeout(160);
   }
-  const prefsStored = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).srsPrefs`,
+  const prefsStored = await evaluateAppRecord(page,
+    `record.srsPrefs`,
   );
   const minusDisabled = await page.evaluate(
     `document.querySelector('[data-pref-down="newPerDay"]').disabled`,
@@ -2442,11 +2640,11 @@ async function main() {
   console.log('\n— R3-C · declared recall: the answer never precedes the declaration');
   const errsBeforeR3C = consoleErrors.length;
   await page.waitForTimeout(1400); // settle any pending observation debounce
-  await page.evaluate(`(() => {
+  await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
     const card = (dueAgoMs) => ({ due: iso(T - dueAgoMs), last_review: iso(T - 5 * 86400000), stability: 6, difficulty: 5, elapsed_days: 4, scheduled_days: 5, reps: 3, lapses: 0, learning_steps: 0, state: 2 });
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    return {
       v: 1,
       taken: [
         { t: 'word', id: '学校', label: '学校', ts: T - 3e6, started: T - 3e6 },
@@ -2454,8 +2652,8 @@ async function main() {
         { t: 'word', id: '電車', label: '電車', ts: T - 1e6, started: T - 1e6 },
       ],
       srs: { 'word:学校': card(3 * 86400000), 'word:先生': card(2 * 86400000), 'word:電車': card(86400000) },
-    }));
-  })()`);
+    };
+  })()`));
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
@@ -2495,8 +2693,8 @@ async function main() {
     JSON.stringify(recalledRow));
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(250);
-  const goodCommit = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const goodCommit = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const row = (e.revlog || [])[(e.revlog || []).length - 1] || [];
     return { key: row[1], rating: row[2] };
   })()`);
@@ -2520,34 +2718,43 @@ async function main() {
       !notyetRow.easy && notyetRow.reading,
     JSON.stringify(notyetRow));
   // (e) a failed persist mid-grade leaves session and store consistent
-  await page.evaluate(`(() => {
-    window.__setItemReal = Storage.prototype.setItem;
-    Storage.prototype.setItem = function () { throw new Error('quota'); };
-  })()`);
-  const revlogBefore = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).revlog.length`,
+  await armRecordWriteFailure(page, 'quota', { roots: ['srs'] });
+  const revlogBefore = await evaluateAppRecord(page,
+    `record.revlog.length`,
   );
   await page.evaluate(`document.querySelector('.grade.g-again')?.click()`);
-  await page.waitForTimeout(250);
-  const failedPersist = await page.evaluate(`(() => {
+  await page.waitForFunction(() => window.__recordTestFault?.fired > 0);
+  await page.locator('#store-alert').waitFor({ state: 'visible' });
+  const failedPersist = await evaluateAppRecord(page, `(() => {
     const alertNode = document.getElementById('store-alert');
     return {
       cardStillUp: !!document.querySelector('.grade.g-again'),
-      revlog: JSON.parse(localStorage.getItem('kairo-corridor-v1')).revlog.length,
+      revlog: record.revlog.length,
       alertUp: !!alertNode && alertNode.hidden === false && (alertNode.textContent || '').length > 0,
     };
   })()`);
   check('R3-C · a failed persist mid-grade moves nothing — card up, revlog whole, alert speaking',
     failedPersist.cardStillUp && failedPersist.revlog === revlogBefore && failedPersist.alertUp,
     JSON.stringify(failedPersist));
-  await page.evaluate(
-    `(() => { Storage.prototype.setItem = window.__setItemReal; delete window.__setItemReal; })()`,
-  );
+  const gradeFault = await clearRecordWriteFailure(page);
+  report.nativeWriteFaults = [gradeFault];
+  check('R3-C · the failure reached an actual native host-command write', gradeFault.fired === 1,
+    JSON.stringify(gradeFault));
+  // A protected record requires a reload; the next explicit sitting presents
+  // the same ungraded card and asks for its declaration again.
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  await tap(page, '#review-start');
+  await page.waitForSelector('#declare-notyet');
+  await page.locator('#declare-notyet').click();
+  await page.waitForSelector('.grade-row[data-declared="notyet"]');
   // (b) …and the committed grade is Again regardless of any later tap
   await page.evaluate(`document.querySelector('.grade.g-again')?.click()`);
-  await page.waitForTimeout(250);
-  const againCommit = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  await waitForAppRecord(page, (record) => record.revlog?.length === revlogBefore + 1,
+    { description: 'explicit retry of the failed grade after reload' });
+  const againCommit = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const row = e.revlog[e.revlog.length - 1];
     return { key: row[1], rating: row[2], state: e.srs['word:先生'].state };
   })()`);
@@ -2561,8 +2768,8 @@ async function main() {
   await page.waitForSelector('.review-undo', { timeout: 8000 });
   await page.evaluate(`document.querySelector('.review-undo')?.click()`);
   await page.waitForTimeout(300);
-  const undoneR3C = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const undoneR3C = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const last = e.revlog[e.revlog.length - 1];
     return {
       state: e.srs['word:先生'].state,
@@ -2576,8 +2783,8 @@ async function main() {
     JSON.stringify(undoneR3C));
   // (d) both declarations stand in the observation ledger as reveal rows
   await page.waitForTimeout(1400); // let any debounced observation land
-  const revealRows = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const revealRows = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return (e.obslog || []).filter((r) => r[1] === 'reveal').map((r) => [r[2], r[3]]);
   })()`);
   check('R3-C · the declarations land in the obslog as [t,reveal,key,1|0] rows',
@@ -2693,9 +2900,8 @@ async function main() {
   // up the new-card room, so nothing is due at this moment — the closed
   // door must then say "right now" and the forecast must say WHEN, never a
   // flat 予定なし directly above a bare 今日 N
-  await page.evaluate(`(() => {
-    const key = 'kairo-corridor-v1';
-    const e = JSON.parse(localStorage.getItem(key) || '{}');
+  await restoreAppFixture(page, await evaluateAppRecord(page, `(() => {
+    const e = record;
     const now = new Date();
     const cap = new Date(now);
     cap.setHours(23, 58, 0, 0);
@@ -2706,8 +2912,8 @@ async function main() {
     const day = now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate());
     e.stats = e.stats || {};
     e.stats[day] = Object.assign({}, e.stats[day], { nnew: 20 });
-    localStorage.setItem(key, JSON.stringify(e));
-  })()`);
+    return e;
+  })()`));
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
@@ -2746,9 +2952,9 @@ async function main() {
   // back its exact place
   await open('?entry=shelf');
   const gonIx3b = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item .shelf-title')].findIndex((n) => n.textContent.includes('ごん狐'))`,
+    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .shelf-title')].findIndex((n) => n.textContent.includes('ごん狐'))`,
   );
-  await tap(page, '.shelf-item', Math.max(gonIx3b, 0));
+  await tap(page, '.shelf-item:not([data-recommendation])', Math.max(gonIx3b, 0));
   await settleReader(page);
   await page.evaluate('window.scrollTo(0, 600)');
   await page.waitForTimeout(200);
@@ -2940,26 +3146,29 @@ async function main() {
   const DAY_MS = 86400000;
   // one due card whose next Good interval DIFFERS between the fitted and the
   // default weights (25 d vs 24 d at ten elapsed days) — no coincidences
-  await page.evaluate(`(() => {
+  await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    return {
       v: 1,
       taken: [{ t: 'word', id: '学校', label: '学校', ts: T - 10 * ${DAY_MS}, started: T - 10 * ${DAY_MS} }],
       srs: { 'word:学校': { due: iso(T - 4 * ${DAY_MS}), last_review: iso(T - 10 * ${DAY_MS}), stability: 5, difficulty: 5, elapsed_days: 6, scheduled_days: 6, reps: 3, lapses: 0, learning_steps: 0, state: 2 } },
-    }));
-  })()`);
+    };
+  })()`));
   await open('?entry=shelf');
   const paramsBefore = await page.evaluate(`window.__KAIRO_SRS__.params()`);
   // import the full dry-run REPORT: the door unwraps candidatePin and keeps
   // the training-review count as honest provenance
   await tap(page, '#tray');
   await page.waitForSelector('#import-file', { state: 'attached' });
-  await page.setInputFiles('#import-file', resolve(roundtripDir, 'fsrs-dry-run.json'));
-  await page.waitForFunction(
-    `(() => { try { return !!JSON.parse(localStorage.getItem('kairo-corridor-v1')).srsPrefs.fsrs; } catch { return false; } })()`,
-    null, { timeout: 8000 },
-  );
+  // A successful parameter import reloads the document after committing.
+  // Observe that load before starting a native read in the replacement page.
+  await Promise.all([
+    page.waitForEvent('load', { timeout: 8000 }),
+    page.setInputFiles('#import-file', resolve(roundtripDir, 'fsrs-dry-run.json')),
+  ]);
+  await waitForAppRecord(page, (record) => !!record.srsPrefs?.fsrs,
+    { timeout: 8000, description: 'imported optimizer parameters on native disk' });
   await open('?entry=shelf');
   const paramsAfter = await page.evaluate(`window.__KAIRO_SRS__.params()`);
   check('R3-D · the 読み込む door installs the optimizer output into the live scheduler',
@@ -2986,25 +3195,29 @@ async function main() {
     JSON.stringify(footerR3D));
   await shoot(page, shotsDir, '22-r3d-fitted-params');
   // a malformed parameter file is refused AT THE DOOR: told once, store kept
-  const badDirR3D = mkdtempSync(join(tmpdir(), 'r3d-bad-'));
+  const badDirR3D = mkdtempSync(join(EVIDENCE_DIR, 'r3d-bad-'));
   const badPathR3D = join(badDirR3D, 'bad-params.json');
   writeFileSync(badPathR3D, JSON.stringify({ ...candidateR3D, w: candidateR3D.w.slice(0, 20) }));
   await open('?entry=shelf');
   await tap(page, '#tray');
   await page.waitForSelector('#import-file', { state: 'attached' });
+  const beforeBadPrefsR3D = (await readAppRecord(page)).srsPrefs;
   await page.setInputFiles('#import-file', badPathR3D);
-  await page.waitForTimeout(500);
-  const afterBadR3D = await page.evaluate(`(() => ({
-    note: document.querySelector('.port-row + .airead-note')?.textContent ?? '',
-    w: JSON.parse(localStorage.getItem('kairo-corridor-v1')).srsPrefs.fsrs.w.length,
+  await page.waitForFunction(() => /Import could not finish|fsrs-optimize/u.test(
+    document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent || ''));
+  const afterBadR3D = await evaluateAppRecord(page, `(() => ({
+    note: document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent ?? '',
+    noteVisible: !!document.querySelector('.port-row:has(#import-file) + .airead-note')?.getBoundingClientRect().width,
+    prefs: record.srsPrefs,
   }))()`);
   check('R3-D · a malformed parameter file is refused at the door; the record stands',
-    afterBadR3D.note.includes('fsrs-optimize') && afterBadR3D.w === 21,
-    `note "${afterBadR3D.note}" · stored w length ${afterBadR3D.w}`);
+    afterBadR3D.noteVisible && /Import could not finish|fsrs-optimize/u.test(afterBadR3D.note) &&
+      JSON.stringify(afterBadR3D.prefs) === JSON.stringify(beforeBadPrefsR3D),
+    `note "${afterBadR3D.note}" · exact saved preferences retained`);
   // grade the seeded card in the real review flow, then replay the press in
   // Node on the vendored scheduler under BOTH weight sets
-  const preGradeR3D = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).srs['word:学校']`,
+  const preGradeR3D = await evaluateAppRecord(page,
+    `record.srs['word:学校']`,
   );
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
@@ -3014,8 +3227,8 @@ async function main() {
   await page.waitForSelector('.grade-row[data-declared="recalled"] .grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
-  const gradedR3D = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const gradedR3D = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { rec: e.srs['word:学校'], row: e.revlog[e.revlog.length - 1] };
   })()`);
   const fsrsVendor = await import(resolve(CORRIDOR_DIR, 'vendor/ts-fsrs.mjs'));
@@ -3047,21 +3260,35 @@ async function main() {
     `stored s=${gradedR3D.rec.stability} ivl=${gradedR3D.rec.scheduled_days}d · custom s=${customR3D.stability} ivl=${customR3D.scheduled_days}d · default s=${defaultR3D.stability} ivl=${defaultR3D.scheduled_days}d`);
   // an out-of-bounds STORED set is ignored fail-closed: the pinned defaults
   // rule, the bytes are kept verbatim, and one quiet obslog note says why.
-  // Let the debounced obslog writer (R3-C's reveal declaration rides it)
-  // flush first — a direct localStorage seed must not race the pagehide
-  // flush, which rewrites the envelope from live memory.
-  await page.waitForTimeout(1500);
-  await page.evaluate(`(() => {
-    const key = 'kairo-corridor-v1';
-    const e = JSON.parse(localStorage.getItem(key));
-    e.srsPrefs.fsrs = { w: e.srsPrefs.fsrs.w.map((x, i) => (i === 20 ? 5 : x)) };
-    localStorage.setItem(key, JSON.stringify(e));
-  })()`);
-  await open('?entry=shelf');
-  await page.waitForTimeout(1500); // the note rides the obslog debounce
-  const ignoredR3D = await page.evaluate(`(() => {
+  // This intentionally invalid legacy preference starts in a fresh isolated
+  // context, before migration. It never rewrites the active record's fence.
+  const invalidParamsRecord = await readAppRecord(page);
+  invalidParamsRecord.srsPrefs.fsrs = {
+    w: invalidParamsRecord.srsPrefs.fsrs.w.map((x, i) => (i === 20 ? 5 : x)),
+  };
+  const invalidParamsContext = await browser.newContext(contextOptions);
+  await invalidParamsContext.addInitScript((recordText) => {
+    if (!location.href.startsWith('http://127.0.0.1:') || sessionStorage.getItem('params-fixture-seeded')) return;
+    localStorage.setItem('kairo-corridor-v1', recordText);
+    // A migrated record contains its Drift state. This synthetic legacy
+    // installation must supply the matching old Drift store as well; otherwise
+    // the migration correctly protects two conflicting source records.
+    localStorage.setItem('bunki-drift-v1', JSON.stringify(JSON.parse(recordText).driftState.store));
+    sessionStorage.setItem('params-fixture-seeded', '1');
+  }, JSON.stringify(invalidParamsRecord));
+  const invalidParamsPage = await invalidParamsContext.newPage();
+  invalidParamsPage.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  invalidParamsPage.on('pageerror', (error) => consoleErrors.push(`pageerror: ${error.message}`));
+  await invalidParamsPage.goto(`${base}/index.html?entry=shelf`);
+  await invalidParamsPage.waitForFunction(() => document.body.dataset.ready === '1');
+  await waitForAppRecord(invalidParamsPage,
+    (record) => (record.obslog || []).some((row) => row[1] === 'params'),
+    { description: 'persisted invalid-parameter warning' });
+  const ignoredR3D = await evaluateAppRecord(invalidParamsPage, `(() => {
     const p = window.__KAIRO_SRS__.params();
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const e = record;
     return {
       custom: p.custom,
       w20: p.w ? p.w[20] : null,
@@ -3069,17 +3296,21 @@ async function main() {
       notes: (e.obslog || []).filter((r) => r[1] === 'params').map((r) => r.slice(1)),
     };
   })()`);
+  assert.deepEqual((await readAppRecord(invalidParamsPage)).driftState, invalidParamsRecord.driftState,
+    'The synthetic legacy fixture must preserve its existing Drift state during migration');
   check('R3-D · an out-of-bounds stored set is ignored — defaults rule, bytes kept, one quiet note',
     ignoredR3D.custom === false && ignoredR3D.w20 === pinR3D.w[20] && ignoredR3D.kept === 5 &&
       JSON.stringify(ignoredR3D.notes) === JSON.stringify([['params', 'fsrs', 'bounds']]),
     JSON.stringify(ignoredR3D));
-  await open('?entry=shelf');
-  await page.waitForTimeout(1500);
-  const dedupR3D = await page.evaluate(
-    `(JSON.parse(localStorage.getItem('kairo-corridor-v1')).obslog || []).filter((r) => r[1] === 'params').length`,
+  await invalidParamsPage.goto(`${base}/index.html?entry=shelf`);
+  await invalidParamsPage.waitForFunction(() => document.body.dataset.ready === '1');
+  await invalidParamsPage.waitForTimeout(1500);
+  const dedupR3D = await evaluateAppRecord(invalidParamsPage,
+    `(record.obslog || []).filter((r) => r[1] === 'params').length`,
   );
   check('R3-D · a thousand boots write one note, not a thousand',
     dedupR3D === 1, `params notes after a second boot: ${dedupR3D}`);
+  await invalidParamsContext.close();
   check('R3-D · the probes leave no console errors',
     consoleErrors.length === errsBeforeR3D,
     consoleErrors.slice(errsBeforeR3D).join(' | ') || 'clean');
@@ -3090,7 +3321,7 @@ async function main() {
   // was a ~22px target on a row that navigates.
   console.log('\n— R4-C · 出会い trail · rest/wake target');
   const errsBeforeR4C = consoleErrors.length;
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+  await restoreAppFixture(page, await page.evaluate(`({
     v: 1,
     taken: [{ t: 'word', id: '学校', label: '学校', ts: 1755000000000, started: 1755000000000 }],
     srs: {},
@@ -3103,7 +3334,7 @@ async function main() {
       [1754400000000, 'tap', 'word:学校', 3, 'wikinews:1403'],
       [1754500000000, 'tap', 'word:海', 2, 'wikinews:1403']
     ],
-  }))`);
+  })`));
   await open('?entry=shelf');
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
@@ -3125,8 +3356,8 @@ async function main() {
     /(稽古 2回|2 practice records)/.test(trail.lines[2] || '') &&
       /(習熟ではない|evidence, not mastery)/.test(trail.lines[2] || ''),
     trail.lines[2] || 'no practice line');
-  const trailWordsOnly = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const trailWordsOnly = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return { srs: Object.keys(e.srs || {}).length, revlog: (e.revlog || []).length };
   })()`);
   check('R4-C · reading the ledger writes nothing to the deck',
@@ -3135,6 +3366,9 @@ async function main() {
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForSelector('.rest-toggle');
+  // The rest row can sit below the fold; place its hit region before measuring.
+  await page.locator('.rest-toggle').first()
+    .evaluate((button) => button.scrollIntoView({ block: 'center' }));
   const restBox = await page.evaluate(`(() => {
     const b = document.querySelector('.rest-toggle');
     const r = b.getBoundingClientRect();
@@ -3149,10 +3383,19 @@ async function main() {
   // a press at the hit region's edge — outside the printed pill — must rest
   // the card and must NOT navigate into the entry the row points at
   const edgeY = restBox.cy + restBox.h / 2 + 6;
+  const restViewport = page.viewportSize();
+  assert(restViewport &&
+    restBox.cx >= 0 && restBox.cx < restViewport.width &&
+    edgeY >= 0 && edgeY < restViewport.height,
+  `rest edge must be inside viewport: ${JSON.stringify({ x: restBox.cx, y: edgeY, viewport: restViewport })}`);
+  assert(await page.evaluate(({ x, y }) => {
+    const target = document.querySelector('.rest-toggle');
+    return target !== null && document.elementFromPoint(x, y) === target;
+  }, { x: restBox.cx, y: edgeY }), 'rest edge must hit the intended rest button');
   await page.mouse.click(restBox.cx, edgeY);
   await page.waitForTimeout(300);
-  const afterEdge = await page.evaluate(`(() => ({
-    suspended: Object.keys(JSON.parse(localStorage.getItem('kairo-corridor-v1')).suspended || {}),
+  const afterEdge = await evaluateAppRecord(page, `(() => ({
+    suspended: Object.keys(record.suspended || {}),
     sheet: !!document.querySelector('#sheet'),
   }))()`);
   check('R4-C · a press at the target’s edge rests the card and never falls through to the row',
@@ -3167,8 +3410,8 @@ async function main() {
   // missing. A bank example must still show no door: honest absence.
   console.log('\n— C1 finding · the sentence page reaches its article');
   await open('?entry=shelf');
-  await page.waitForSelector('.shelf-item');
-  await tap(page, '.shelf-item');
+  await page.waitForSelector('.shelf-item:not([data-recommendation])');
+  await tap(page, '.shelf-item:not([data-recommendation])');
   await page.waitForSelector('#reader .tok.content');
   const sentHome = await page.evaluate(`(() => {
     const tok = document.querySelector('#reader .tok.content');
@@ -3210,11 +3453,11 @@ async function main() {
   // queue can never surface. Pre-fix this routed to commitStandardGrade.
   console.log('\n— E3-A · the dojo honours 始める · いま見る holds for the whole card');
   const errsBeforeE3 = consoleErrors.length;
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+  await restoreAppFixture(page, await page.evaluate(`({
     v: 1,
     taken: [{ t: 'kanji', id: '海', label: '海', kind: '漢字', kindEn: 'kanji', ts: 1 }],
     srs: {}, revlog: [], obslog: [], stats: {},
-  }))`);
+  })`));
   await open('');
   await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
   await tap(page, '#ginga-symbol');
@@ -3234,8 +3477,8 @@ async function main() {
     );
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(400);
-    const afterUnstarted = await page.evaluate(`(() => {
-      const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const afterUnstarted = await evaluateAppRecord(page, `(() => {
+      const e = record;
       const day = Object.values(e.stats || {}).reduce((a, s) => a + (s.nnew || 0), 0);
       return { srs: Object.keys(e.srs || {}).length, revlog: (e.revlog || []).length,
                dojo: (e.obslog || []).filter((r) => r[1] === 'dojo').length, nnew: day };
@@ -3249,10 +3492,8 @@ async function main() {
     consoleErrors.length === errsBeforeE3,
     consoleErrors.slice(errsBeforeE3).join(' | ') || 'clean');
 
-  // hand the next block the store it expects: a seed written straight to
-  // localStorage is overwritten by the LIVE page's pagehide flush, so the
-  // reset has to travel through a navigation to clear memory as well
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+  // Import the empty synthetic fixture the next block expects.
+  await restoreAppFixture(page, { v: 1, taken: [] });
   await open('?entry=shelf');
   await page.waitForTimeout(400);
 
@@ -3264,11 +3505,11 @@ async function main() {
   // learner's own bytes back untouched.
   console.log('\n— R4-B · practice writes evidence; enrolling is a choice; nothing is lost');
   const errsBeforeR4B = consoleErrors.length;
-  const r4bSnapshot = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  const r4bSnapshot = await readAppRecord(page);
 
   // (a) PR70-P0-1 · a finished lesson creates ZERO deck rows; the end screen
   // holds the one explicit door — per word or all — and only that choice mints
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+  await restoreAppFixture(page, { v: 1, taken: [] });
   await open('?entry=shelf');
   await page.waitForSelector('#lessons-link');
   await tap(page, '#lessons-link');
@@ -3295,8 +3536,8 @@ async function main() {
     await page.waitForTimeout(60);
   }
   await page.waitForSelector('.lesson-enroll', { timeout: 8000 });
-  const lessonDone = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const lessonDone = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'lesson');
     return {
       taken: (e.taken || []).length,
@@ -3318,8 +3559,8 @@ async function main() {
   const chosenWord = await page.evaluate(`document.querySelector('[data-enroll]')?.dataset.enroll ?? null`);
   await page.evaluate(`document.querySelector('[data-enroll]').click()`);
   await page.waitForTimeout(250);
-  const afterOne = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const afterOne = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return {
       taken: (e.taken || []).map((t) => [t.id, Number.isFinite(t.started)]),
       srsKeys: Object.keys(e.srs || {}).length,
@@ -3332,8 +3573,8 @@ async function main() {
   await shoot(page, shotsDir, '23-r4b-lesson-enroll-choice');
   await page.evaluate(`document.querySelector('#lesson-enroll-all').click()`);
   await page.waitForTimeout(250);
-  const afterAll = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const afterAll = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const ids = (e.taken || []).map((t) => t.id);
     return {
       n: ids.length,
@@ -3350,7 +3591,7 @@ async function main() {
   // schedule grade; when the clock outlasts the pool, the refill's second
   // lap is practice — the copy says so, the seals stamp 稽古, and the
   // long-term schedule holds still while evidence rows accrue
-  await page.evaluate(`(() => {
+  await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
     const card = (agoDays) => ({
@@ -3358,15 +3599,15 @@ async function main() {
       stability: 4, difficulty: 5, elapsed_days: 3, scheduled_days: 3,
       reps: 3, lapses: 0, learning_steps: 0, state: 2,
     });
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    return {
       v: 1,
       taken: [
         { t: 'word', id: '学校', label: '学校', ts: T, started: T },
         { t: 'word', id: '先生', label: '先生', ts: T, started: T },
       ],
       srs: { 'word:学校': card(2), 'word:先生': card(1) },
-    }));
-  })()`);
+    };
+  })()`));
   await open('');
   await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
   await tap(page, '#ginga-symbol');
@@ -3400,8 +3641,8 @@ async function main() {
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
-  const lap1After = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const lap1After = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return {
       srs: e.srs,
       revlog: (e.revlog || []).length,
@@ -3427,8 +3668,8 @@ async function main() {
   await shoot(page, shotsDir, '24-r4b-dojo-second-lap');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(300);
-  const lap2After = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const lap2After = await evaluateAppRecord(page, `(() => {
+    const e = record;
     const rows = (e.obslog || []).filter((r) => r[1] === 'dojo');
     return { srs: e.srs, revlog: (e.revlog || []).length, rows };
   })()`);
@@ -3442,7 +3683,7 @@ async function main() {
   // (c) POL-13 · the tutor's quiz survives reload: the seeded run stands in
   // the envelope exactly as the app would persist it — no key, no deck, no
   // network — and the tray's resume door reopens it where it stood
-  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+  await restoreAppFixture(page, await page.evaluate(`({
     v: 1,
     aiQuiz: {
       qs: [
@@ -3452,7 +3693,7 @@ async function main() {
       ],
       ix: 1, picked: null, correct: 1, ts: Date.now(),
     },
-  }))`);
+  })`));
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
@@ -3487,8 +3728,8 @@ async function main() {
   await page.waitForTimeout(150);
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
   await page.waitForTimeout(250);
-  const quizScore = await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+  const quizScore = await evaluateAppRecord(page, `(() => {
+    const e = record;
     return {
       title: document.querySelector('.view-title')?.textContent ?? '',
       stored: e.aiQuiz !== null,
@@ -3504,18 +3745,14 @@ async function main() {
     `title "${quizScore.title.trim()}" · stored ${quizScore.stored}`);
   await page.evaluate(`document.querySelector('#aiq-close').click()`);
   await page.waitForTimeout(250);
-  const quizClosed = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).aiQuiz`,
+  const quizClosed = await evaluateAppRecord(page,
+    `record.aiQuiz`,
   );
   check('R4-B · only the learner\'s own door lets the quiz go',
     quizClosed === null, `stored aiQuiz ${JSON.stringify(quizClosed)}`);
 
-  // hand the envelope back exactly as found — these probes leave no learner state
-  await page.evaluate(`(() => {
-    const snap = ${JSON.stringify(r4bSnapshot)};
-    if (snap === null) localStorage.removeItem('kairo-corridor-v1');
-    else localStorage.setItem('kairo-corridor-v1', snap);
-  })()`);
+  // Restore the prior native record through the actual complete-backup importer.
+  await restoreAppFixture(page, r4bSnapshot);
   check('R4-B · the probes leave no console errors',
     consoleErrors.length === errsBeforeR4B,
     consoleErrors.slice(errsBeforeR4B).join(' | ') || 'clean');
@@ -3540,7 +3777,7 @@ async function main() {
 
   report.summary = { total: results.length, failed: failures };
   report.results = results;
-  const reportPath = resolve(REPO, 'docs/prototype/verification-report.json');
+  const reportPath = resolve(EVIDENCE_DIR, 'verification-report.json');
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 
@@ -3550,10 +3787,17 @@ async function main() {
   return failures === 0 ? 0 : 1;
 }
 
-main().then(
-  (code) => process.exit(code),
-  (err) => {
-    console.error(err);
-    process.exit(2);
-  },
-);
+if (resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
+  main().then(
+    (code) => process.exit(code),
+    (err) => {
+      console.error(err);
+      if (activeReport) {
+        activeReport.summary = { total: results.length, failed: failures, error: err.stack || String(err) };
+        activeReport.results = results;
+        writeFileSync(resolve(EVIDENCE_DIR, 'verification-report.json'), `${JSON.stringify(activeReport, null, 2)}\n`);
+      }
+      process.exit(2);
+    },
+  );
+}

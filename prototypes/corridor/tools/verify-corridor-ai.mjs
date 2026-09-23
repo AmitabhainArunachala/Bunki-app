@@ -1,5 +1,5 @@
 /**
- * The AI runtime's verifier (RENKAN A2, terminal T6). Done = this is green.
+ * AI surface, archive, and restore journeys on one verified runtime artifact.
  *
  * Drives the six deployed AI surfaces — word-sheet tutor, graded examples,
  * tutor chat, quiz, post-review coach, custom reading room — in real Chromium
@@ -11,29 +11,37 @@
  *      考え中… resolves to the caller's own quiet failure line, never a
  *      dead spinner;
  *   2. "not a word is lost" — every outbound learner message and every reply,
- *      on every surface, lands in the append-only IndexedDB archive, and a
- *      broken archive never breaks the call;
- *   3. the 24-turn cap destroys nothing — the localStorage window stays
- *      bounded, but the archive keeps turn 1 past turn 25 and the visible
- *      chat history renders from the archive, not the capped store.
+ *      on every surface, lands in the append-only IndexedDB archive, and
+ *      an unavailable archive refuses unacknowledged learner writes;
+ *   3. accepted chat turns survive in the native learner record and archive,
+ *      while the visible history lazily unfolds earlier turns.
  *
- * The provider seam is probed live: the seeded envelope carries S.ai
- * overrides ({ baseUrl, model }) and the stub asserts the request actually
- * used them.
+ * The provider seam is probed live: a separately seeded device configuration
+ * binds the stub credential to its origin. Portable learner data grants no
+ * transport authority. The import/provider verifier drives the settings UI.
  *
  * Usage: node verify-corridor-ai.mjs
  */
 
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { extname, resolve, sep } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, readAppRecordSnapshot, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
 
-const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+const CORRIDOR_DIR = resolveCorridorSite();
+const OUT = resolveCorridorEvidence();
+const identity = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8'));
+const sourceSha256 = createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'))).digest('hex');
+const consoleErrors = [];
+const externalRequests = [];
+let browserVersion;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -48,7 +56,7 @@ function startCorridorServer(rootDir = CORRIDOR_DIR) {
     const path = decodeURIComponent((request.url ?? '/').split('?')[0]);
     const rel = path === '/' ? 'index.html' : path.replace(/^\/+/, '');
     const file = resolve(rootDir, rel);
-    if (!file.startsWith(rootDir) || !existsSync(file)) {
+    if (!file.startsWith(rootDir + sep) || !existsSync(file) || !statSync(file).isFile()) {
       response.writeHead(404, { 'content-type': 'text/plain' });
       response.end('not found');
       return;
@@ -84,7 +92,7 @@ const MARKER = 'MARKER-TURN-ONE 昔の言葉';
 
 // A valid learner envelope: five memorized N5 words, all with due review
 // state, so the tray offers both the quiz (≥4 words) and a review session
-// whose end screen carries the coach. The S.ai overrides prove the seam.
+// whose end screen carries the coach. Provider authority is separate below.
 function seedEnvelope() {
   const words = ['学校', '電話', '先生', '時間', '天気'];
   const due = new Date(Date.now() - 86400000).toISOString();
@@ -108,7 +116,6 @@ function seedEnvelope() {
     v: 1,
     taken: words.map((w, i) => ({ t: 'word', id: w, label: w, ts: 1755000000000 + i })),
     srs,
-    ai: { baseUrl: OVERRIDE_BASE_URL, model: OVERRIDE_MODEL },
   };
 }
 
@@ -119,7 +126,7 @@ function seedEnvelope() {
 function initScript(envelopeJson) {
   return `(() => {
     try {
-      localStorage.setItem('kairo-ai-key', 'sk-ant-test-key');
+      localStorage.setItem('kairo-ai-provider-v1', ${JSON.stringify(JSON.stringify({ v: 1, baseUrl: OVERRIDE_BASE_URL, model: OVERRIDE_MODEL, credential: { origin: OVERRIDE_BASE_URL, key: 'sk-ant-test-key' } }))});
       if (!localStorage.getItem('__ai_seeded')) {
         localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(envelopeJson)});
         localStorage.setItem('__ai_seeded', '1');
@@ -164,7 +171,7 @@ function initScript(envelopeJson) {
         text = JSON.stringify([1, 2, 3, 4, 5].map((n) => ({
           q: '問' + n, opts: ['a', 'b', 'c', 'd'], right: 0, why: 'because ' + n,
         })));
-      } else if (system.includes('Write natural example sentences')) {
+      } else if (system.includes('Nx | Japanese sentence | full reading of the sentence in hiragana | English')) {
         text = [
           'N5 | 学校へ行く。 | がっこうへいく。 | I go to school.',
           'N5 | 学校は近い。 | がっこうはちかい。 | The school is near.',
@@ -189,7 +196,35 @@ function initScript(envelopeJson) {
   })();`;
 }
 
-const logAll = (page, surface) => page.evaluate((s) => window.__KAIRO_AI__.logAll(s), surface);
+const logAll = async (page, surface) => {
+  const rows = (await readAppRecordSnapshot(page)).archive.turns;
+  return surface === undefined ? rows : rows.filter((row) => row.surface === surface);
+};
+const sameData = (left, right) => isDeepStrictEqual(
+  { record: left.record, archive: left.archive },
+  { record: right.record, archive: right.archive },
+);
+const wordCaptures = (record, id) => record.taken.filter((row) => row.t === 'word' && row.id === id);
+const hasNote = (record, text) => (record.obslog || []).some((row) => row[1] === 'note' && String(row[3]).includes(text));
+
+async function importThroughUi(page, text, name) {
+  if (!await page.locator('#import-file').count()) await page.locator('#tray').click();
+  await page.locator('#import-file').waitFor({ state: 'attached' });
+  await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
+  await page.locator('#import-file').setInputFiles({ name, mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
+  await page.waitForFunction(() => !window.__PRE_IMPORT_PAGE && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  return readAppRecordSnapshot(page);
+}
+
+async function exportThroughUi(page, name) {
+  if (!await page.locator('#export-store').count()) await page.locator('#tray').click();
+  const downloadReady = page.waitForEvent('download');
+  await page.locator('#export-store').click();
+  const download = await downloadReady;
+  const destination = resolve(OUT, name);
+  await download.saveAs(destination);
+  return readFileSync(destination, 'utf8');
+}
 
 async function waitRows(page, surface, min, timeout = 8000) {
   const deadline = Date.now() + timeout;
@@ -220,16 +255,25 @@ function exchangeShape(rows, surface, model) {
 }
 
 /* ------------------------------------------------------------------ main */
+let suiteBrowser, suiteServer;
 async function main() {
   const { server, base } = await startCorridorServer();
+  suiteServer = server;
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
   });
+  suiteBrowser = browser;
+  browserVersion = browser.version();
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await silenceBrowserAudio(context);
+  await context.route('**/*', (route) => {
+    if (new URL(route.request().url()).origin === base) return route.continue();
+    externalRequests.push(route.request().url());
+    return route.abort();
+  });
   const seedJson = JSON.stringify(seedEnvelope());
   await context.addInitScript(initScript(seedJson));
   const page = await context.newPage();
-  const consoleErrors = [];
   page.on('console', (m) => {
     if (m.type() === 'error') consoleErrors.push(m.text());
   });
@@ -268,6 +312,12 @@ async function main() {
       null,
       { timeout: 15000 },
     );
+    // This helper drives the successful provider mode. Wait for this exact
+    // exchange's mining receipt before subsequent exports or fixture imports.
+    const ownExchange = (await logAll(page, 'chat')).filter((row) => row.role === 'user' && row.content === text).at(-1)?.xid;
+    if (!ownExchange) throw new Error('The submitted chat message has no native archive receipt');
+    await waitForAppRecord(page, (record) => (record.obslog || []).some((row) => row[1] === 'sensei' && row[5] === ownExchange),
+      { description: 'mining acknowledgement for the submitted chat exchange' });
   };
 
   // ------------------------------------------ the budget and the seam exist
@@ -283,7 +333,7 @@ async function main() {
     `timeoutMs=${contract.timeoutMs}`,
   );
   check(
-    'S.ai overrides reach the provider seam — store-durable, no UI needed',
+    'explicit device settings reach the provider seam',
     contract.provider.baseUrl === OVERRIDE_BASE_URL && contract.provider.model === OVERRIDE_MODEL,
     `${contract.provider.baseUrl} · ${contract.provider.model}`,
   );
@@ -356,12 +406,10 @@ async function main() {
     quizQBefore.length > 0 && quizResume.q === quizQBefore && quizResume.calls === 0,
     `"${quizResume.q}" · calls since reload ${quizResume.calls}`,
   );
-  // let the run go so the rest of the walk meets the tray it always met
-  await page.evaluate(`(() => {
-    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    e.aiQuiz = null;
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify(e));
-  })()`);
+  // Discard through the same durable command as the learner's tray control.
+  await page.click('#back');
+  await page.click('#aiq-drop');
+  await waitForAppRecord(page, (record) => record.aiQuiz === null, { description: 'quiz discard' });
 
   await open('?entry=shelf');
   await page.click('#tray');
@@ -404,30 +452,22 @@ async function main() {
     `${readingRows.length} rows`,
   );
 
-  // ---------------- the tutor's autonomy: cards out of its own passage
-  // (operator's word, 2026-08-24). The 札 line names 犬・猫 (makeable),
-  // 天気 (already in the deck) and ゾロメ語 (no dictionary holds it) —
-  // only the two honest cards may exist, marked by:'sensei', started,
-  // dictionary-confirmed, and the 札 line itself never reaches the eye.
-  const afterReading = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const byId = (id) => s.taken.filter((t) => t.t === 'word' && t.id === id);
-    return {
-      dog: byId('犬'), cat: byId('猫'), weather: byId('天気'),
-      ghost: byId('ゾロメ語'),
-      made: s.aiReading?.made || null,
+  // Reading generation persists dictionary-checked suggestions only. The
+  // existing 天気 capture is preserved and the invented word is rejected.
+  const readingRecord = await readAppRecord(page);
+  const afterReading = {
+    dog: wordCaptures(readingRecord, '犬'), cat: wordCaptures(readingRecord, '猫'),
+    weather: wordCaptures(readingRecord, '天気'), ghost: wordCaptures(readingRecord, 'ゾロメ語'),
+    made: readingRecord.aiReading?.made || null,
+    candidates: readingRecord.aiReading?.candidates?.wordIds || [],
+    ...await page.evaluate(() => ({
       bodyHasFuda: document.querySelector('.airead-body')?.textContent.includes('札：') || false,
-      chips: [...document.querySelectorAll('[data-airead-made]')].map((c) => c.dataset.aireadMade),
-    };
-  })()`);
+      chips: [...document.querySelectorAll('[data-airead-candidate]')].map((c) => c.dataset.aireadCandidate),
+    })),
+  };
   check(
-    'reading · the tutor made exactly the two honest cards, provenance-marked',
-    afterReading.dog.length === 1 &&
-      afterReading.cat.length === 1 &&
-      afterReading.dog[0].by === 'sensei' &&
-      afterReading.cat[0].by === 'sensei' &&
-      Number.isFinite(afterReading.dog[0].started) &&
-      Number.isFinite(afterReading.cat[0].started),
+    'reading · generating a passage leaves suggestions without creating review debt',
+    afterReading.dog.length === 0 && afterReading.cat.length === 0 && afterReading.made === null,
     `犬×${afterReading.dog.length} 猫×${afterReading.cat.length}`,
   );
   check(
@@ -436,15 +476,26 @@ async function main() {
     `天気×${afterReading.weather.length} ゾロメ語×${afterReading.ghost.length}`,
   );
   check(
-    'reading · the record carries made:[犬,猫] and the 札 line stays out of the ink',
-    JSON.stringify(afterReading.made) === JSON.stringify(['犬', '猫']) && !afterReading.bodyHasFuda,
-    `made=${JSON.stringify(afterReading.made)}`,
+    'reading · dictionary-checked candidates persist and the 札 line stays out of the ink',
+    JSON.stringify(afterReading.candidates) === JSON.stringify(['犬', '猫', '天気']) && !afterReading.bodyHasFuda,
+    `candidates=${JSON.stringify(afterReading.candidates)}`,
   );
   check(
-    'reading · the made cards stand as doors under the passage',
-    JSON.stringify(afterReading.chips) === JSON.stringify(['犬', '猫']),
+    'reading · suggestions stand as word doors under the passage',
+    JSON.stringify(afterReading.chips) === JSON.stringify(['犬', '猫', '天気']),
     `chips=${JSON.stringify(afterReading.chips)}`,
   );
+
+  const scheduleBeforeTake = { srs: readingRecord.srs || {}, revlog: readingRecord.revlog || [] };
+  await page.click('[data-airead-take="犬"]');
+  const takenRecord = await waitForAppRecord(page, (record) => wordCaptures(record, '犬').length === 1,
+    { description: 'explicit reading capture' });
+  const explicitReadingTake = { dog: wordCaptures(takenRecord, '犬'), cat: wordCaptures(takenRecord, '猫'),
+    revlog: takenRecord.revlog || [], srs: takenRecord.srs || {} };
+  check('one explicit reading suggestion adds only that word without inventing a recall grade',
+    explicitReadingTake.dog.length === 1 && Number.isFinite(explicitReadingTake.dog[0].started) && explicitReadingTake.cat.length === 0 &&
+    JSON.stringify(explicitReadingTake.revlog) === JSON.stringify(scheduleBeforeTake.revlog) &&
+    JSON.stringify(explicitReadingTake.srs) === JSON.stringify(scheduleBeforeTake.srs), JSON.stringify(explicitReadingTake));
 
   // ---------------------------- the 札を頼む door: curation on demand
   console.log('\n— the tutor curates cards on demand');
@@ -457,11 +508,9 @@ async function main() {
     null,
     { timeout: 8000 },
   );
-  const afterDoor = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const byId = (id) => s.taken.filter((t) => t.t === 'word' && t.id === id);
-    return { walk: byId('散歩'), music: byId('音楽'), weather: byId('天気'), ghost: byId('ゾロメ語') };
-  })()`);
+  const curationRecord = await readAppRecord(page);
+  const afterDoor = { walk: wordCaptures(curationRecord, '散歩'), music: wordCaptures(curationRecord, '音楽'),
+    weather: wordCaptures(curationRecord, '天気'), ghost: wordCaptures(curationRecord, 'ゾロメ語') };
   check(
     '札 door · new words become provenance-marked cards; known and unconfirmable do not',
     afterDoor.walk.length === 1 &&
@@ -477,6 +526,7 @@ async function main() {
     exchangeShape(cardsRows, 'cards', OVERRIDE_MODEL),
     `${cardsRows.length} rows`,
   );
+  check('tutor-authored surfaces do not create mining exchanges', (await logAll(page, 'mine')).length === 0);
 
   // ------------------------- surface 6 · chat, and the end of the 24-turn cap
   console.log('\n— chat: turn 25 destroys nothing');
@@ -493,17 +543,15 @@ async function main() {
 
   for (let n = 2; n <= 21; n += 1) await sendChat(`メッセージ ${n} 番`);
   const chatAll = await waitRows(page, 'chat', 42);
-  const storedWindow = await page.evaluate(
-    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).aiChat.length`,
-  );
+  const storedWindow = (await readAppRecord(page)).aiChat.length;
   check(
     '42 turns later, turn 1 still stands in the archive',
     chatAll.length >= 42 && chatAll[0].role === 'user' && chatAll[0].content === MARKER,
     `${chatAll.length} archived turns; first is still the marker`,
   );
   check(
-    'the localStorage request window stays bounded (24) — cap kept, loss gone',
-    storedWindow === 24,
+    'all accepted structured chat turns survive in the learner record',
+    storedWindow === 42,
     `stored aiChat length ${storedWindow}`,
   );
   const beforeUnfold = await page.evaluate(`({
@@ -526,7 +574,7 @@ async function main() {
     `${beforeUnfold.turns} → ${afterUnfold.turns} turns; marker hidden→shown`,
   );
 
-  // a fresh boot renders the history from the archive, not the capped store
+  // A fresh boot reconstructs visible history from the durable transcript.
   await open('?entry=shelf');
   await page.click('#ai-link');
   await page.waitForFunction(() => document.querySelectorAll('.chat-turn').length > 24, null, {
@@ -545,9 +593,13 @@ async function main() {
   const chatT0 = Date.now();
   await page.fill('#chat-input', 'タイムアウトの探査');
   await page.click('#chat-send');
+  await page.locator('.chat-turn.thinking').waitFor({ state: 'visible', timeout: 4000 });
   const thinkingUp = await page.locator('.chat-turn.thinking').count();
   await page.waitForFunction(
-    () => document.body.textContent.includes('could not answer just now'),
+    () => !!document.querySelector('#chat-status')?.textContent?.trim() &&
+      !!document.querySelector('.chat-turn.app') &&
+      !document.querySelector('.chat-turn.thinking') &&
+      document.querySelector('#chat-send')?.disabled === false,
     null,
     { timeout: 15000 },
   );
@@ -668,60 +720,38 @@ async function main() {
     `"${readBack.answer}" · ${readBack.examples} examples · ${readBack.calls} calls`,
   );
 
-  // ------------------------- a broken archive must never break the AI call
-  console.log('\n— quarantine posture: archive failure never breaks the call');
+  // A missing archive at boot cannot prove a consistent learner generation.
+  console.log('\n— missing IndexedDB fails closed with the draft intact');
   const brokenContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await silenceBrowserAudio(brokenContext);
+  await brokenContext.route('**/*', (route) => {
+    if (new URL(route.request().url()).origin === base) return route.continue();
+    externalRequests.push(route.request().url());
+    return route.abort();
+  });
   await brokenContext.addInitScript(initScript(seedJson));
-  await brokenContext.addInitScript(
-    `Object.defineProperty(window, 'indexedDB', { value: undefined });`,
-  );
+  await brokenContext.addInitScript(`Object.defineProperty(window, 'indexedDB', { value: undefined });`);
   const broken = await brokenContext.newPage();
   await broken.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await broken.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   await broken.click('#ai-link');
-  await broken.waitForSelector('#chat-input', { timeout: 8000 });
   await broken.fill('#chat-input', '記録が壊れていても');
-  await broken.click('#chat-send');
-  await broken.waitForFunction(
-    () =>
-      /stub reply/.test(
-        [...document.querySelectorAll('.chat-turn.tutor')].map((n) => n.textContent).join(' '),
-      ),
-    null,
-    { timeout: 15000 },
-  );
-  const dropped = await broken.evaluate('window.__KAIRO_AI__.dropped()');
-  check(
-    'with IndexedDB gone the reply still arrives; the loss is counted, not thrown',
-    dropped >= 1,
-    `${dropped} turns honestly counted as dropped`,
-  );
-  const brokenMined = await broken.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    return (s.obslog || []).filter((r) => r[1] === 'sensei' || r[1] === 'confuse').length;
-  })()`);
-  check(
-    'with the archive gone, no observation is written — a ref must resolve or not exist',
-    brokenMined === 0,
-    `${brokenMined} rows`,
-  );
-  // 鏡 (PR #86 review): a backup off a device whose archive will not read
-  // must not pass silence off as emptiness — the record still leaves (the
-  // export is never refused) but carries aiEvidenceIncomplete and warns.
-  const brokenExport = await broken.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    s.obslog = [[Date.now(), 'sensei', 'word:天気', 1, 'misread', 'x-broken-1']];
-    localStorage.setItem('kairo-corridor-v1', JSON.stringify(s));
-    return window.__KAIRO_AI__.exportRecord();
-  })()`);
-  const brokenRecord = JSON.parse(brokenExport.text);
-  check(
-    'an unreadable archive marks the export honestly instead of omitting evidence',
-    brokenExport.warning === 'archive-unreadable' &&
-      brokenRecord.aiEvidenceIncomplete === true &&
-      !('aiEvidence' in brokenRecord),
-    `warning ${brokenExport.warning} · marker ${brokenRecord.aiEvidenceIncomplete}`,
-  );
+  await broken.press('#chat-input', 'Enter');
+  check('missing IndexedDB refuses the learner write and keeps the question draft',
+    await broken.inputValue('#chat-input') === '記録が壊れていても' &&
+      await broken.locator('#chat-send').isDisabled() && await broken.locator('#store-alert').isVisible());
+  // No native record exists in this context. These bytes are the untouched
+  // legacy migration input, not a substitute for an active learner record.
+  const brokenSource = await broken.evaluate(() => ({
+    text: localStorage.getItem('kairo-corridor-v1'), calls: window.__AI_STUB.calls,
+  }));
+  check('an unavailable archive preserves legacy input and sends no provider or mining request',
+    brokenSource.text === seedJson && brokenSource.calls === 0);
+  const unavailableExport = await broken.evaluate('window.__KAIRO_AI__.exportRecord()');
+  check('an unavailable archive refuses a complete-looking backup', unavailableExport.text === null && !!unavailableExport.warning);
+  // A historical partial legacy export remains importable with its loss
+  // marker. This fixture does not pretend the new refused export succeeded.
+  const brokenExport = { text: JSON.stringify({ v: 1, taken: [], aiEvidenceIncomplete: true }) };
   await brokenContext.close();
 
   // ------------------------- 鏡 KAGAMI PR 一 · the ledger's ear
@@ -736,25 +766,16 @@ async function main() {
     exchangeShape(mineRows, 'mine', OVERRIDE_MODEL),
     `${mineRows.length} rows`,
   );
-  await page.waitForFunction(
-    `(() => {
-      const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-      return (s.obslog || []).some((r) => r[1] === 'sensei');
-    })()`,
-    null,
-    { timeout: 8000 },
-  );
-  const mined = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const rows = s.obslog || [];
-    return {
-      sensei: rows.filter((r) => r[1] === 'sensei'),
-      confuse: rows.filter((r) => r[1] === 'confuse'),
-      ghost: rows.filter((r) => String(r[2]).includes('ゾロメ語') || String(r[3]).includes('ゾロメ語')),
-      badCode: rows.filter((r) => r[1] === 'sensei' && r[4] === 'not-a-code'),
-      badType: rows.filter((r) => r[1] === 'sensei' && (String(r[2]).includes('時間') || String(r[2]).includes('先生'))),
-    };
-  })()`);
+  const minedRecord = await waitForAppRecord(page, (record) => (record.obslog || []).some((row) => row[1] === 'sensei'),
+    { description: 'mined observations' });
+  const minedRows = minedRecord.obslog || [];
+  const mined = {
+    sensei: minedRows.filter((r) => r[1] === 'sensei'),
+    confuse: minedRows.filter((r) => r[1] === 'confuse'),
+    ghost: minedRows.filter((r) => String(r[2]).includes('ゾロメ語') || String(r[3]).includes('ゾロメ語')),
+    badCode: minedRows.filter((r) => r[1] === 'sensei' && r[4] === 'not-a-code'),
+    badType: minedRows.filter((r) => r[1] === 'sensei' && (String(r[2]).includes('時間') || String(r[2]).includes('先生'))),
+  };
   check(
     'a mined observation lands typed: [t, sensei, key, polarity, code, ref]',
     mined.sensei.length >= 1 &&
@@ -789,18 +810,12 @@ async function main() {
   // envelope through validStoreEnvelope — quarantine would zero the rows
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  const afterReload = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const rows = s.obslog || [];
-    return {
-      sensei: rows.filter((r) => r[1] === 'sensei').length,
-      confuse: rows.filter((r) => r[1] === 'confuse').length,
-      alert: (() => {
-        const node = document.getElementById('store-alert');
-        return !!(node && !node.hidden && node.textContent);
-      })(),
-    };
-  })()`);
+  const reloadedRows = (await readAppRecord(page)).obslog || [];
+  const afterReload = {
+    sensei: reloadedRows.filter((r) => r[1] === 'sensei').length,
+    confuse: reloadedRows.filter((r) => r[1] === 'confuse').length,
+    alert: await page.locator('#store-alert').isVisible(),
+  };
   check(
     'the envelope validator accepts the mined kinds across a reload — no quarantine',
     afterReload.sensei >= 1 && afterReload.confuse >= 1 && afterReload.alert === false,
@@ -808,7 +823,7 @@ async function main() {
   );
   const minerSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
   check(
-    'mine is never mined, and only learner-authored surfaces are minable',
+    'the staged mining eligibility declaration admits only learner chat',
     minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat'])"),
     'AI_MINABLE_SURFACES pinned to chat — the one door where the learner types',
   );
@@ -819,16 +834,10 @@ async function main() {
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   await sendChat('もう一度、天気の言葉');
   await waitRows(page, 'mine', 4);
-  const refCheck = await page.evaluate(`window.__KAIRO_AI__.logAll().then((rows) => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const refs = (s.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
-    const xids = new Set(rows.map((r) => r.xid).filter(Boolean));
-    return {
-      total: refs.length,
-      distinct: new Set(refs).size,
-      resolved: refs.filter((ref) => xids.has(ref)).length,
-    };
-  })`);
+  const referenceSnapshot = await readAppRecordSnapshot(page);
+  const refs = (referenceSnapshot.record.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+  const xids = new Set(referenceSnapshot.archive.turns.map((row) => row.xid).filter(Boolean));
+  const refCheck = { total: refs.length, distinct: new Set(refs).size, resolved: refs.filter((ref) => xids.has(ref)).length };
   check(
     'every observation names its exact exchange — distinct refs, each resolving in the archive',
     refCheck.total >= 2 && refCheck.distinct >= 2 && refCheck.resolved === refCheck.total,
@@ -837,336 +846,203 @@ async function main() {
   // the whole exchange or nothing: mining is gated on every append of the
   // exchange landing durably, never on the reply alone (PR #86 review)
   check(
-    'mining requires the WHOLE exchange archived — the gate covers every append',
+    'the staged mining code awaits all exchange append acknowledgements',
     minerSource.includes('Promise.all(appended)'),
     'Promise.all(appended) gate present',
   );
-  // 鏡: evidence rides the export and returns through the real import door
-  const exportResult = await page.evaluate(`window.__KAIRO_AI__.exportRecord()`);
-  const exportedRecord = exportResult.text;
+  // Evidence rides the downloaded backup and returns through the actual port.
+  const exportedRecord = await exportThroughUi(page, 'synthetic-complete-backup.json');
   const exported = JSON.parse(exportedRecord);
-  const exportRefs = (exported.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+  const exportRefs = (exported.record.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
   check(
-    'the export carries aiEvidence for every observation ref',
-    exportRefs.length >= 2 &&
-      exportResult.warning === undefined &&
-      !!exported.aiEvidence &&
-      exportRefs.every(
-        (ref) => Array.isArray(exported.aiEvidence[ref]) && exported.aiEvidence[ref].length >= 2,
-      ),
-    `${exportRefs.length} refs, ${Object.keys(exported.aiEvidence || {}).length} evidenced exchanges, warning ${exportResult.warning}`,
+    'the complete backup carries archived turns for every observation ref',
+    exported.format === 'kairo-backup' && exported.completeness === 'complete' && exportRefs.length >= 2 &&
+      exportRefs.every((ref) => exported.archive.turns.filter((row) => row.xid === ref).length >= 2),
+    `${exportRefs.length} refs, ${exported.archive.turns.length} archived turns`,
   );
-  await page.evaluate(`window.__KAIRO_AI__.__clear()`);
-  // a foreign turn seeded after the clear: the real import door must
-  // replace it — old conversations may not survive under the new record
-  await page.evaluate(
-    `window.__KAIRO_AI__.__seed({ surface: 'chat', role: 'user', content: 'RECORD-A の秘密', model: 'test', ts: Date.now() })`,
-  );
-  // the port row lives in the 覚える tray — the one chrome door on every surface
-  await open('?entry=shelf');
-  await page.click('#tray');
-  await page.waitForSelector('#import-file', { state: 'attached', timeout: 8000 });
-  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
-  await page.setInputFiles('#import-file', {
-    name: 'kairo-roundtrip.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(exportedRecord, 'utf8'),
-  });
-  // the import door reloads on success — wait for the NEW page, not the old
-  // one's still-true ready flag (the restore loop finishes before reload)
-  await page.waitForFunction(
-    '!window.__PRE_IMPORT_PAGE && document.body.dataset.ready === "1"',
-    null,
-    { timeout: 30000 },
-  );
-  const roundtrip = await page.evaluate(`window.__KAIRO_AI__.logAll().then((rows) => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const refs = (s.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
-    const xids = new Set(rows.map((r) => r.xid).filter(Boolean));
-    return {
-      refs: refs.length,
-      resolved: refs.filter((ref) => xids.has(ref)).length,
-      envelopeCarriesEvidence: 'aiEvidence' in s,
-      foreignSurvived: rows.some((r) => String(r.content).includes('RECORD-A')),
-    };
-  })`);
+  const exportSnapshot = await readAppRecordSnapshot(page);
+  check('a downloaded backup excludes device credentials and installation authority',
+    !exportedRecord.includes('sk-ant-test-key') && !exportedRecord.includes(exportSnapshot.installation.databaseName) &&
+      !Object.hasOwn(exported.record, 'ai'));
+
+  // Build a replacement history within this same installation through actual
+  // import and chat controls. This is not an authenticated learner switch.
+  // No active localStorage rewriting or hidden archive mutator sets fixtures.
+  const emptyImported = await importThroughUi(page, JSON.stringify({ v: 1, taken: [] }), 'synthetic-empty-legacy.json');
+  check('a legacy import replaces the archive and declares historical incompleteness',
+    emptyImported.archive.turns.length === 0 && emptyImported.record.aiEvidenceIncomplete === true);
+  await page.click('#ai-link');
+  await sendChat('RECORD-A の秘密');
+  await waitForAppRecord(page, (record) => (record.obslog || []).some((row) => row[1] === 'sensei'),
+    { description: 'synthetic foreign conversation mining' });
+  const foreignRows = await logAll(page);
+  check('the replacement fixture contains an actual archived foreign conversation',
+    foreignRows.some((row) => row.surface === 'chat' && row.content === 'RECORD-A の秘密'));
+
+  const latestSnapshot = await readAppRecordSnapshot(page);
+  const latestDrafts = latestSnapshot.record.teacherDrafts;
+  const emptySentenceDrafts = { version: 1, entries: [] };
+  if ((latestSnapshot.record.sentenceDrafts != null &&
+       !isDeepStrictEqual(latestSnapshot.record.sentenceDrafts, emptySentenceDrafts)) ||
+      exported.record.sentenceDrafts != null)
+    throw new Error('Roundtrip fixture requires no sentence drafts on either side');
+  if (latestDrafts?.entries.length !== 1 || latestDrafts.entries[0].contextRef !== null ||
+      latestDrafts.entries[0].text !== 'RECORD-A の秘密' || latestDrafts.entries[0].consumed !== true)
+    throw new Error('Roundtrip fixture requires the exact current consumed general question');
+  const restored = await importThroughUi(page, exportedRecord, 'synthetic-roundtrip.json');
+  // The actual importer merges both draft roots and commits exactly the file's
+  // record otherwise: the current consumed question survives (a non-empty merge),
+  // and an absent sentence root stays absent. Preserve exact comparison of every
+  // historical value.
+  const expectedRestored = { ...exported, record: { ...exported.record, teacherDrafts: latestDrafts } };
+  if (!sameData(restored, expectedRestored)) {
+    writeFileSync(resolve(OUT, 'restore-comparison.json'), JSON.stringify({ restored, expectedRestored }, null, 2) + '\n');
+  }
+  const restoredRefs = (restored.record.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+  const restoredXids = new Set(restored.archive.turns.map((r) => r.xid).filter(Boolean));
+  const roundtrip = {
+    refs: restoredRefs.length,
+    resolved: restoredRefs.filter((ref) => restoredXids.has(ref)).length,
+    envelopeCarriesEvidence: Object.hasOwn(restored.record, 'aiEvidence'),
+    foreignSurvived: restored.archive.turns.some((r) => String(r.content).includes('RECORD-A')),
+    currentDraftsKept: JSON.stringify(restored.record.teacherDrafts) === JSON.stringify(latestDrafts),
+  };
   check(
-    'after export → import on a cleared archive, every ref resolves again',
-    roundtrip.refs >= 2 && roundtrip.resolved === roundtrip.refs,
+    'after restore, every ref resolves and all historical roots and archive return while current drafts stay',
+    roundtrip.refs >= 2 && roundtrip.resolved === roundtrip.refs && roundtrip.currentDraftsKept &&
+      sameData(restored, expectedRestored),
     JSON.stringify(roundtrip),
   );
   check(
-    'aiEvidence rides the file, never the stored envelope',
+    'archive evidence rides the backup without duplication in the learner envelope',
     roundtrip.envelopeCarriesEvidence === false,
     `in envelope: ${roundtrip.envelopeCarriesEvidence}`,
   );
   check(
-    'the import REPLACES the archive in one crossing — no pre-import turn survives it',
+    'the import replaces the archive in one transaction — no pre-import turn survives',
     roundtrip.foreignSurvived === false,
     `foreign turn survived: ${roundtrip.foreignSurvived}`,
   );
-  // 鏡 (PR #86 review): a record file is foreign bytes — evidence turns are
-  // validated to the exact exported shape, and one malformed turn stops the
-  // import cold: no reload, no store change, the note names the refusal.
+
+  // A malformed evidence turn stops the real importer before any native write.
   const tampered = JSON.parse(exportedRecord);
-  tampered.aiEvidence[Object.keys(tampered.aiEvidence)[0]] = [
-    { surface: 'chat', role: 'oracle', content: 'まがいもの', ts: 'yesterday' },
-  ];
-  const storeBefore = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  tampered.archive.turns[0] = { surface: 'chat', role: 'oracle', content: 'まがいもの', ts: 'yesterday' };
+  const storeBefore = await readAppRecordSnapshot(page);
   await page.click('#tray');
-  await page.waitForSelector('#import-file', { state: 'attached', timeout: 8000 });
-  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
   await page.setInputFiles('#import-file', {
-    name: 'kairo-tampered.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(JSON.stringify(tampered), 'utf8'),
+    name: 'synthetic-tampered.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(tampered), 'utf8'),
   });
-  await page.waitForFunction(
-    `!!document.querySelector('.port-row + .airead-note') && document.querySelector('.port-row + .airead-note').textContent.length > 0`,
-    null,
-    { timeout: 8000 },
-  );
-  const tamperedOutcome = await page.evaluate(
-    (before) => ({
-      samePage: window.__PRE_IMPORT_PAGE === 1,
-      storeUnchanged: localStorage.getItem('kairo-corridor-v1') === before,
-      note: document.querySelector('.port-row + .airead-note').textContent,
-    }),
-    storeBefore,
-  );
+  await page.waitForFunction(() => !!document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent, null, { timeout: 8000 });
+  const tamperedOutcome = {
+    samePage: await page.evaluate(() => window.__PRE_IMPORT_PAGE === 1),
+    unchanged: sameData(await readAppRecordSnapshot(page), storeBefore),
+    note: await page.locator('.port-row:has(#import-file) + .airead-note').textContent(),
+  };
   check(
-    'malformed imported evidence aborts the import — no reload, store untouched',
-    tamperedOutcome.samePage === true &&
-      tamperedOutcome.storeUnchanged === true &&
-      tamperedOutcome.note.length > 0,
-    `same page ${tamperedOutcome.samePage} · store unchanged ${tamperedOutcome.storeUnchanged}`,
+    'malformed imported evidence aborts the import — no reload, record and archive untouched',
+    tamperedOutcome.samePage && tamperedOutcome.unchanged && tamperedOutcome.note.length > 0,
+    JSON.stringify(tamperedOutcome),
   );
-  // the abort must lift the seal: a REAL write through the app's own
-  // boundary (the tray's ひとこと door → commitStorePatch → writeStore)
-  // still lands after the refused import
   await page.fill('#note-input', '封は解けたか');
   await page.click('#note-send');
-  const unsealed = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    return (s.obslog || []).some((r) => r[1] === 'note' && String(r[3]).includes('封は解けたか'));
-  })()`);
-  check(
-    'an aborted import leaves the device writable — the next real write lands',
-    unsealed === true,
-    `note row persisted: ${unsealed}`,
-  );
-  // 一補 (review round 4): the device refuses the record AFTER the archive
-  // swap — the old conversations must come back. A one-shot quota bomb on
-  // the store key fires exactly at the import's setItem; the import aborts,
-  // the store is untouched, and the archive is rolled back to what it held.
-  const archBefore = await page.evaluate(`window.__KAIRO_AI__.logAll().then((r) => r.length)`);
-  const storeBeforeQuota = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
-  await page.evaluate(`(() => {
-    const proto = Object.getPrototypeOf(localStorage);
-    window.__REAL_SET_ITEM = proto.setItem;
-    window.__QUOTA_BOMB = true;
-    proto.setItem = function (k, v) {
-      if (window.__QUOTA_BOMB && k === 'kairo-corridor-v1') {
-        window.__QUOTA_BOMB = false;
-        throw new DOMException('quota', 'QuotaExceededError');
-      }
-      return window.__REAL_SET_ITEM.call(this, k, v);
-    };
-  })()`);
-  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  const unsealed = await waitForAppRecord(page, (record) => hasNote(record, '封は解けたか'));
+  check('a validation-rejected import leaves the device writable — the next real write lands', hasNote(unsealed, '封は解けたか'));
+
+  // Abort the actual host restore transaction after native record/archive puts.
+  // A fault must fire; complete equality includes the transcript, not row counts.
+  const storeBeforeQuota = await readAppRecordSnapshot(page);
+  await armRecordWriteFailure(page, 'quota');
+  await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
   await page.setInputFiles('#import-file', {
-    name: 'kairo-quota.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(exportedRecord, 'utf8'),
+    name: 'synthetic-quota.json', mimeType: 'application/json', buffer: Buffer.from(exportedRecord, 'utf8'),
   });
-  await page.waitForFunction(
-    `(() => {
-      const n = document.querySelector('.port-row + .airead-note');
-      return !!n && (n.textContent.includes('戻した') || n.textContent.includes('restored'));
-    })()`,
-    null,
-    { timeout: 8000 },
-  );
-  const quotaOutcome = await page.evaluate(
-    (before) =>
-      window.__KAIRO_AI__.logAll().then((rows) => {
-        Object.getPrototypeOf(localStorage).setItem = window.__REAL_SET_ITEM;
-        return {
-          samePage: window.__PRE_IMPORT_PAGE === 1,
-          storeUnchanged: localStorage.getItem('kairo-corridor-v1') === before,
-          rows: rows.length,
-          hasChatTurn: rows.some((r) => r.surface === 'chat' && r.role === 'user'),
-        };
-      }),
-    storeBeforeQuota,
-  );
+  await page.waitForFunction(() => window.__recordTestFault?.fired > 0, null, { timeout: 8000 });
+  await page.waitForFunction(() => !!document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent, null, { timeout: 8000 });
+  const quotaAfter = await readAppRecordSnapshot(page);
+  const quotaOutcome = {
+    samePage: await page.evaluate(() => window.__PRE_IMPORT_PAGE === 1),
+    unchanged: sameData(quotaAfter, storeBeforeQuota),
+    revisionUnchanged: quotaAfter.revision === storeBeforeQuota.revision,
+    fault: await clearRecordWriteFailure(page),
+  };
   check(
-    'a refused record write rolls the archive back — nothing stranded, nothing lost',
-    quotaOutcome.samePage === true &&
-      quotaOutcome.storeUnchanged === true &&
-      quotaOutcome.rows === archBefore &&
-      quotaOutcome.hasChatTurn === true,
-    `rows ${archBefore} → ${quotaOutcome.rows} · store unchanged ${quotaOutcome.storeUnchanged}`,
+    'a refused native restore preserves the complete prior record, archive, and revision',
+    quotaOutcome.samePage && quotaOutcome.unchanged && quotaOutcome.revisionUnchanged && quotaOutcome.fault.fired > 0,
+    JSON.stringify(quotaOutcome),
   );
-  // 一補 (review round 4): the seal is per-tab, so a second window gets its
-  // own law — the storage event (which fires only in tabs that did NOT
-  // write) marks the watcher stale: alert up, writes refused, reload to
-  // continue. Two live tabs are single-writer, never last-writer-wins.
+  // Native operational failure seals the owner until a reload reopens the
+  // last durable generation. The reload must not replay the rejected import.
+  await open('?entry=shelf');
+  check('reload after refused restore reopens the prior record and archive',
+    sameData(await readAppRecordSnapshot(page), storeBeforeQuota));
+  await page.click('#tray');
+
+  // A second window reads the same disk but cannot write while A owns it.
   const pageB = await context.newPage();
   await pageB.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
-  await pageB.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  // B stays passive until it is stale — a tray click would itself write a
-  // bookmark and stale A instead; the law under probe is A writes, B freezes
+  await pageB.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
   await page.fill('#note-input', 'タブAの筆');
   await page.click('#note-send');
-  await pageB.waitForFunction(
-    `(() => {
-      const n = document.getElementById('store-alert');
-      return !!n && !n.hidden && (n.textContent.includes('別のタブ') || n.textContent.includes('another tab'));
-    })()`,
-    null,
-    { timeout: 8000 },
-  );
+  await waitForAppRecord(page, (record) => hasNote(record, 'タブAの筆'));
+  await pageB.locator('#store-alert').waitFor({ state: 'visible' });
   await pageB.click('#tray');
-  await pageB.waitForSelector('#note-input', { state: 'attached', timeout: 8000 });
   await pageB.fill('#note-input', 'タブBの筆');
-  await pageB.click('#note-send');
-  await pageB.waitForTimeout(300);
-  const twoTab = await pageB.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const notes = (s.obslog || []).filter((r) => r[1] === 'note').map((r) => String(r[3]));
-    return { aLanded: notes.some((t) => t.includes('タブA')), bRefused: !notes.some((t) => t.includes('タブB')) };
-  })()`);
+  await pageB.press('#note-input', 'Enter');
+  const twoTabRecord = await readAppRecord(pageB);
+  const twoTab = {
+    aLanded: hasNote(twoTabRecord, 'タブAの筆'), bRefused: !hasNote(twoTabRecord, 'タブBの筆'),
+    buttonDisabled: await pageB.locator('#note-send').isDisabled(),
+    draft: await pageB.inputValue('#note-input'),
+  };
   check(
-    'a stale tab freezes instead of clobbering — the other window’s write stands',
-    twoTab.aLanded === true && twoTab.bRefused === true,
+    'a secondary tab refuses a write and keeps its draft while the owner write stands',
+    twoTab.aLanded && twoTab.bRefused && twoTab.buttonDisabled && twoTab.draft === 'タブBの筆',
     JSON.stringify(twoTab),
   );
-  // 一補 round 5 (Codex P1): the import door is a write like any other —
-  // a stale tab may not carry a record across it either
-  const storeBeforeStaleImport = await pageB.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
-  await pageB.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  const storeBeforeStaleImport = await readAppRecordSnapshot(pageB);
+  await pageB.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
   await pageB.setInputFiles('#import-file', {
-    name: 'kairo-stale.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(exportedRecord, 'utf8'),
+    name: 'synthetic-stale.json', mimeType: 'application/json', buffer: Buffer.from(exportedRecord, 'utf8'),
   });
-  await pageB.waitForFunction(
-    `(() => {
-      const n = document.querySelector('.port-row + .airead-note');
-      return !!n && (n.textContent.includes('再読み込み') || n.textContent.includes('reload before importing'));
-    })()`,
-    null,
-    { timeout: 8000 },
-  );
-  const staleImport = await pageB.evaluate(
-    (before) => ({
-      samePage: window.__PRE_IMPORT_PAGE === 1,
-      storeUnchanged: localStorage.getItem('kairo-corridor-v1') === before,
-    }),
-    storeBeforeStaleImport,
-  );
+  await pageB.waitForFunction(() => /reload|再読み込み/.test(document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent || ''),
+    null, { timeout: 8000 });
+  const staleImport = {
+    samePage: await pageB.evaluate(() => window.__PRE_IMPORT_PAGE === 1),
+    unchanged: sameData(await readAppRecordSnapshot(pageB), storeBeforeStaleImport),
+  };
   await pageB.close();
-  check(
-    'a stale tab may not import — the door refuses before touching anything',
-    staleImport.samePage === true && staleImport.storeUnchanged === true,
-    JSON.stringify(staleImport),
-  );
-  // 一補 (review round 4): a declared evidence loss stays declared — the
-  // aiEvidenceIncomplete marker survives import (via the storeExtras seam),
-  // a real write, and the next export.
-  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
-  await page.setInputFiles('#import-file', {
-    name: 'kairo-incomplete.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(brokenExport.text, 'utf8'),
-  });
-  await page.waitForFunction(
-    '!window.__PRE_IMPORT_PAGE && document.body.dataset.ready === "1"',
-    null,
-    { timeout: 30000 },
-  );
+  check('a secondary tab may not import — both native documents stay unchanged',
+    staleImport.samePage && staleImport.unchanged, JSON.stringify(staleImport));
+
+  // Historical evidence loss remains declared across a real note and download.
+  await importThroughUi(page, brokenExport.text, 'synthetic-incomplete.json');
   await page.click('#tray');
-  await page.waitForSelector('#note-input', { state: 'attached', timeout: 8000 });
   await page.fill('#note-input', '印は残るか');
   await page.click('#note-send');
-  const markerRide = await page.evaluate(`window.__KAIRO_AI__.exportRecord().then((rec) => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    return {
-      inEnvelope: s.aiEvidenceIncomplete === true,
-      inExport: JSON.parse(rec.text).aiEvidenceIncomplete === true,
-      noteLanded: (s.obslog || []).some((r) => r[1] === 'note'),
-    };
-  })`);
-  check(
-    'a declared evidence loss stays declared across import, writes, and re-export',
-    markerRide.inEnvelope === true &&
-      markerRide.inExport === true &&
-      markerRide.noteLanded === true,
-    JSON.stringify(markerRide),
-  );
-  // the crossing's mechanism, pinned at the source: seal → beacon →
-  // rollback snapshot → swap, in that order (round 5: a snapshot taken
-  // before the seal could miss a late append; a beacon written first
-  // freezes sibling tabs at the START of the crossing); writeStore and
-  // the archive refuse while sealed OR stale; the stale law listens on
-  // both the record key and the beacon; a snapshot that will not read
-  // refuses the crossing; a stale tab cannot import.
-  const sealAt = minerSource.indexOf('storeSealed = true;');
-  // fromIndex: standDown's -aborted write appears earlier in the handler —
-  // the pin wants the crossing's START beacon, minted right after the seal
-  const beaconAt = minerSource.indexOf('localStorage.setItem(CROSSING_KEY', sealAt);
-  // fromIndex: the export path reads the archive strictly too, earlier in
-  // the file — the pin wants the CROSSING's snapshot, after its seal
-  const snapshotAt = minerSource.indexOf('await aiLogAll(undefined, true)', sealAt);
-  const swapAt = minerSource.indexOf('await aiArchiveReplace(evidence)');
-  check(
-    'the import crossing is sealed, atomic, and cross-tab honest at the source',
-    minerSource.includes('let storeSealed = false') &&
-      minerSource.includes('let staleTab = false') &&
-      minerSource.includes('if (storeSealed || staleTab) return false;') &&
-      minerSource.includes('storeSealed || staleTab || !kept.every((row) => row === true)') &&
-      minerSource.includes('e.key !== CROSSING_KEY') &&
-      minerSource.includes("endsWith('-aborted')") &&
-      minerSource.includes('`${crossingMark}-aborted`') &&
-      minerSource.includes('const restoredStale = await aiArchiveReplace(oldRows);') &&
-      minerSource.includes('could not be restored — reload') &&
-      minerSource.includes('so nothing was imported — nothing was changed') &&
-      minerSource.includes('reload before importing') &&
-      minerSource.includes('function aiArchiveReplace') &&
-      // round 9: the guard before the await cannot speak for the moment
-      // after it — an append that opened the database inside a crossing
-      // would be erased by the swap or carried off by the rollback
-      minerSource.includes(
-        'if (!db) {\n      aiLogDropped += 1;\n      return false;\n    }\n    // the door may have closed',
-      ) &&
-      minerSource.includes('function crossingId') &&
-      sealAt > 0 &&
-      sealAt < beaconAt &&
-      beaconAt < snapshotAt &&
-      snapshotAt < swapAt,
-    `order seal@${sealAt} < beacon@${beaconAt} < snapshot@${snapshotAt} < swap@${swapAt} · gates · listener on both keys`,
-  );
+  const partialRecord = await waitForAppRecord(page, (record) => hasNote(record, '印は残るか'));
+  const partialExport = JSON.parse(await exportThroughUi(page, 'synthetic-incomplete-backup.json'));
+  const markerRide = {
+    inEnvelope: partialRecord.aiEvidenceIncomplete === true,
+    inExport: partialExport.record.aiEvidenceIncomplete === true && partialExport.completeness === 'incomplete',
+    noteLanded: hasNote(partialRecord, '印は残るか'),
+  };
+  check('a declared evidence loss stays declared across import, writes, and re-export',
+    markerRide.inEnvelope && markerRide.inExport && markerRide.noteLanded, JSON.stringify(markerRide));
 
-  // ------------------------------------------ import clears the archive
-  // E3 round-A (AI lens): the file IS the record, but the archive lives in
-  // IndexedDB outside the exported envelope — so an import left the
-  // PREVIOUS learner's conversations sitting under the new record.
-  // Clearing is now part of importing, and a failure to clear stops the
-  // import rather than mixing two learners' words.
-  await page.evaluate(
-    `window.__KAIRO_AI__.__seed({ surface: 'chat', role: 'user', content: 'RECORD-A の秘密', model: 'test', ts: Date.now() })`,
-  );
-  const archiveBefore = await page.evaluate(`window.__KAIRO_AI__.logAll().then((r) => r.length)`);
-  const archiveCleared = await page.evaluate(
-    `window.__KAIRO_AI__.__clear().then(() => true, () => false)`,
-  );
-  const archiveAfter = await page.evaluate(`window.__KAIRO_AI__.logAll().then((r) => r.length)`);
-  check(
-    'an import clears the archive — no learner reads another learner’s conversations',
-    archiveBefore >= 1 && archiveCleared === true && archiveAfter === 0,
-    `before ${archiveBefore} · cleared ${archiveCleared} · after ${archiveAfter}`,
-  );
+  // The real import port also clears a populated archive when the file has none.
+  await open('?entry=shelf');
+  await page.click('#ai-link');
+  await sendChat('RECORD-A の秘密');
+  await waitForAppRecord(page, (record) => (record.obslog || []).some((row) => row[1] === 'sensei'));
+  const archiveBefore = await logAll(page);
+  const cleared = await importThroughUi(page, JSON.stringify({ v: 1, taken: [] }), 'synthetic-clear-history.json');
+  check('an actual empty-history import clears all prior learner conversations',
+    archiveBefore.some((row) => row.content === 'RECORD-A の秘密') && cleared.archive.turns.length === 0 &&
+      (cleared.record.aiChat || []).length === 0,
+    `before ${archiveBefore.length} · after ${cleared.archive.turns.length}`);
+  check('all requests stay on the isolated origin or the in-memory synthetic provider', externalRequests.length === 0,
+    externalRequests.join(' | '));
 
   check(
     'no console or page errors across the AI walk',
@@ -1181,9 +1057,25 @@ async function main() {
   return failures === 0 ? 0 : 1;
 }
 
-main().then(
-  (code) => process.exit(code),
+function writeReceipt(status, error) {
+  writeFileSync(resolve(OUT, 'receipt.json'), JSON.stringify({
+    format: 'kairo-ai-runtime-verification', version: 2, status,
+    browser: 'chromium', browserVersion, artifactSha256: identity.artifactSha256,
+    sourceSha256, verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+    results, consoleErrors, externalRequests, ...(error ? { error: error.message } : {}),
+    scope: 'Synthetic provider; actual UI actions, native IndexedDB record/archive reads and host-command failure injection. Legacy localStorage seeds exist only before boot; missing-IDB source preservation is checked explicitly.',
+    supplementalSourceChecks: ['staged chat-only mining declaration', 'staged Promise.all append gate'],
+    pass: status === 'PASS',
+  }, null, 2) + '\n');
+}
+
+main().finally(async () => {
+  try { await suiteBrowser?.close(); }
+  finally { if (suiteServer) await new Promise((done) => suiteServer.close(done)); }
+}).then(
+  (code) => { writeReceipt(code === 0 ? 'PASS' : 'FAIL'); process.exit(code); },
   (err) => {
+    writeReceipt('ERROR', err);
     console.error(err);
     process.exit(2);
   },

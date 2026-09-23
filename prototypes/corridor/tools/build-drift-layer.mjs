@@ -135,6 +135,28 @@ const patch = (from, to, label) => {
   js = js.slice(0, first) + to + js.slice(first + from.length);
   patchCount += 1;
 };
+const patchSection = (start, end, replacement, label) => {
+  const a = js.indexOf(start), b = js.indexOf(end, a + start.length);
+  if (a < 0 || b < 0 || js.indexOf(start, a + start.length) >= 0 || js.indexOf(end, b + end.length) >= 0)
+    throw new Error(`section anchor missing or ambiguous (${label})`);
+  patch(js.slice(a, b), replacement, label);
+};
+
+// Keep the frozen design source intact while emitting explicit control flow
+// and removing unused bindings from the shipped layer. These patches preserve
+// behavior; the normal Drift browser verifier still checks the generated code.
+patch('window.bunkiDriftDepth&&window.bunkiDriftDepth(stack.length);',
+  'if(window.bunkiDriftDepth)window.bunkiDriftDepth(stack.length);', 'explicit host depth callback');
+patch('}catch(err){/* a query string never blocks the field */}',
+  '}catch{/* a query string never blocks the field */}', 'unused query catch binding');
+patch('const NB=9, blobs=[], stains=[];', 'const NB=9, blobs=[];', 'unused stains array');
+patch('}}catch(err){', '}}catch{', 'unused record catch binding');
+patch('}catch(err){\n    setHint(', '}catch{\n    setHint(', 'unused save catch binding');
+patch('let pg=null,L;', 'let pg,L;', 'branch-assigned layout parent');
+patch('pts.forEach((p,i)=>{i?fctx.lineTo(p.x,p.y):fctx.moveTo(p.x,p.y);});',
+  'pts.forEach((p,i)=>{if(i)fctx.lineTo(p.x,p.y);else fctx.moveTo(p.x,p.y);});', 'explicit trail drawing');
+patch('let ack=false;', 'let ack;', 'branch-assigned acknowledgement');
+patch('if(wr.lk){}', 'if(wr.lk){/* Locked words keep their anchored position. */}', 'intentional locked position');
 
 // 1 · wrap + gate flag + self-mount. The markup is injected before any of the
 // script's parse-time getElementById calls run, so load order is one line in
@@ -144,9 +166,12 @@ patch(
   '(function () {\n"use strict";\n' +
     'const __layer = document.createElement("div");\n' +
     '__layer.id = "drift-layer";\n' +
+    '__layer.dataset.recordState = "loading";\n' +
     `__layer.innerHTML = ${'__MARKUP_JSON__'};\n` +
     'document.body.prepend(__layer);\n' +
-    'let DRIFT_ON = false;\nlet rafOn = false;',
+    'let DRIFT_ON = false;\nlet rafOn = false;\n' +
+    'let recordBridge=null,recordGeneration=0,recordView=null,recordReady=false,recordRead=null,recordCodec=null;\n' +
+    'const recordPending=new Set();\nlet recordCueIntent=null,recordCueRun=null;',
   'IIFE head + gate flag',
 );
 
@@ -171,7 +196,7 @@ patch(
 );
 patch(
   'addEventListener("pointerdown",e=>{\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
-  'addEventListener("pointerdown",e=>{\n  if(!DRIFT_ON)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
+  'addEventListener("pointerdown",e=>{\n  if(!DRIFT_ON||recordPending.size)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
   'gate pointerdown',
 );
 patch(
@@ -214,6 +239,48 @@ patch(
   'radoc close returns inert',
 );
 
+// The generated Corridor layer is always hosted, including before the host
+// finishes booting. Only the untouched standalone donor may use legacy LS.
+// The host owns the reducer and transaction; this layer sends an intent and
+// publishes a committed projection, never a locally edited candidate store.
+patchSection('const DRIFT_STORE_KEY="bunki-drift-v1";', 'let seq=0,gathered=',
+  'let store={known:{},unknown:{},lk:0,lu:0};\n', 'hosted boot has no legacy storage access');
+patchSection('function grade(n,dir){', '  n.gone=true; n.frozen=true;',
+  'function grade(n,dir){\n  if(n.gone||recordPending.size||recordCueRun)return;\n  void hostedGrade(n,dir);\n}\nfunction finishGrade(n,dir,wasCenter){\n',
+  'departure follows confirmed host receipt');
+patch('  if(dir>0){settled++;bloom(n);} else {gathered++;sink(n);}',
+  '  if(dir>0)bloom(n);else sink(n);', 'committed host counters are authoritative');
+patchSection("// The front door's one first-touch cue.", '\n// ---- radical explainer ----',
+  '// The first answered node touch retires this invitation through the host.\n' +
+  'if(!store.cue)hint.classList.add("first-cue");\n' +
+  'function cueRetire(n,gesture){\n  if(store.cue)return;\n  void hostedCue(n,gesture);\n}\n',
+  'first answered touch retires the cue through the durable host');
+patch('  cueRetire();   // a held word is a first touch answered, same as a tap',
+  '  cueRetire(n,"hold");   // retain the identity of the answered gesture', 'cue hold gesture identity');
+patch('  cueRetire();   // a word answered the finger: the first-touch cue has served',
+  '  cueRetire(n,"tap");   // retain the identity of the answered gesture', 'cue tap gesture identity');
+
+// Compressing a polar ring against the phone edge can put one held word's
+// body over another's centre. Keep the donor targets and camera grammar, then
+// separate only colliding held bodies inside the same chrome boundaries.
+patch(
+  '      for(const wr of FOCUS) if(!wr.lk&&wr.bR){\n        const bt=ringTarget(ax,ay,wr.bAng,wr.bR);\n        wr.hx=bt.x-wr.wx;\n        wr.hy=bt.y-wr.wy;\n      }',
+  '      layoutHeldRing(ax,ay);',
+  'held ring hit ownership at compressed edges',
+);
+// The record queue may outlive a gesture. Recycling or changing constellations
+// must not dispose of a word while its durable outcome is still unknown.
+for (const name of ['refreshActive()', 'clearBloom(keep)', 'collapseUnfold()', 'surface()', 'tideChange()', 'diveWord(n)', 'diveKanji(g)', 'divePart(p)', 'diveFromList(ch)', 'bloomFocus(n)', 'constellationLock(n)']) {
+  patch(`function ${name}{`, `function ${name}{\n  if(recordPending.size)return;`, `pending judgment preserves ${name}`);
+}
+patch('function removeNode(n,delay){\n  const el=n.el;\n  setTimeout(function(){',
+  'function removeNode(n,delay){\n  const el=n.el;\n  setTimeout(function(){\n    if(n.recordPending)return;', 'pending node cannot be removed by a prior timer');
+patch('function tapNode(n){', 'function tapNode(n){\n  if(recordPending.size){setHint("判断を保存しています。");return;}', 'pending judgment keeps taps from rebuilding the field');
+patch('lvlEl.addEventListener("pointerdown",e=>{\n  e.stopPropagation();',
+  'lvlEl.addEventListener("pointerdown",e=>{\n  if(recordPending.size)return;\n  e.stopPropagation();', 'pending judgment preserves the level tide');
+patch('      const nd=wr.node;\n      if(nd&&(nd===focusN||nd.hlDom)) continue;',
+  '      const nd=wr.node;\n      if(nd&&nd.recordIntent)continue;\n      if(nd&&(nd===focusN||nd.hlDom)) continue;', 'unconfirmed judgment stays available after failure');
+
 // 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
 patch(
   '  drawTrail(t);\n  requestAnimationFrame(frame);\n}',
@@ -233,10 +300,227 @@ patch(
   'boot rAF deferred',
 );
 
+// A receipt is evidence only for its exact command and current local scope.
+// Lazy reuse of the controller codec prevents a second Drift schema here.
+js += `
+function layoutHeldRing(ax,ay){
+  const measure=n=>{
+    const scale=Math.max(n.s||1,n.ts||1)*cam.z;
+    const angle=Math.max(Math.abs(n.cr||0),Math.abs(n.rot||0))*Math.PI/180;
+    const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
+    const w=n.el.offsetWidth,h=n.el.offsetHeight;
+    return {hw:(w*c+h*s)*scale/2+2,hh:(w*s+h*c)*scale/2+2};
+  };
+  const origin=w2s(ax,ay);
+  const centre={x:origin.x,y:origin.y,...measure(focusN),fixed:true};
+  const bodies=[centre];
+  for(const wr of FOCUS){
+    const n=wr.node;
+    if(wr.lk||!wr.bR||!n||n.gone||n.removed)continue;
+    const raw=ringTarget(ax,ay,wr.bAng,wr.bR),at=w2s(raw.x,raw.y);
+    const body={wr,x:at.x,y:at.y,...measure(n)};
+    body.left=RING_EDGE_W+body.hw;body.right=vw()-RING_EDGE_E-body.hw;
+    body.top=RING_EDGE_TOP+body.hh;body.bottom=vh()-RING_EDGE_BOT-body.hh;
+    // A body wider than the available band still keeps its own centre on
+    // the glass; no member is hidden, discarded, or silently made smaller.
+    if(body.left>body.right)body.left=body.right=(RING_EDGE_W+vw()-RING_EDGE_E)/2;
+    if(body.top>body.bottom)body.top=body.bottom=(RING_EDGE_TOP+vh()-RING_EDGE_BOT)/2;
+    body.x=clamp(body.x,body.left,body.right);body.y=clamp(body.y,body.top,body.bottom);
+    bodies.push(body);
+  }
+  const separate=(a,b,axis,amount)=>{
+    const positive=b[axis]>=a[axis],sign=positive?1:-1;
+    const low=axis==="x"?"left":"top",high=axis==="x"?"right":"bottom";
+    const roomA=a.fixed?0:Math.max(0,positive?a[axis]-a[low]:a[high]-a[axis]);
+    const roomB=b.fixed?0:Math.max(0,positive?b[high]-b[axis]:b[axis]-b[low]);
+    if(roomA+roomB<amount)return false;
+    let moveA=Math.min(roomA,amount/2),moveB=amount-moveA;
+    if(moveB>roomB){moveA+=moveB-roomB;moveB=roomB;}
+    a[axis]-=sign*moveA;b[axis]+=sign*moveB;
+    return true;
+  };
+  // At most fourteen satellites participate. Repeated local separation
+  // resolves chains of neighbours while leaving already-clear targets alone.
+  for(let pass=0;pass<32;pass++){
+    let changed=false;
+    for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){
+      const a=bodies[i],b=bodies[j];
+      const dx=a.hw+b.hw-Math.abs(a.x-b.x),dy=a.hh+b.hh-Math.abs(a.y-b.y);
+      if(dx<=0||dy<=0)continue;
+      const moved=dx<dy?(separate(a,b,"x",dx+0.25)||separate(a,b,"y",dy+0.25)):
+        (separate(a,b,"y",dy+0.25)||separate(a,b,"x",dx+0.25));
+      changed=moved||changed;
+    }
+    if(!changed)break;
+  }
+  for(const body of bodies)if(body.wr){
+    const at=s2wl(body.x,body.y);
+    body.wr.hx=at.x-body.wr.wx;body.wr.hy=at.y-body.wr.wy;
+  }
+}
+function recordCurrent(bridge,generation,scopeId){
+  return bridge===recordBridge&&generation===recordGeneration&&bridge.isCurrent(scopeId)===true;
+}
+async function checkedRecordView(raw){
+  if(!raw||raw.status!=="active"||typeof raw.scopeId!=="string"||!raw.scopeId.length||raw.scopeId.length>200||
+    !Number.isSafeInteger(raw.revision)||raw.revision<0)throw new Error("record-unavailable");
+  recordCodec=recordCodec||import("./record-controller.mjs");
+  const {parseDriftState}=await recordCodec;
+  return Object.freeze({status:"active",scopeId:raw.scopeId,revision:raw.revision,driftState:parseDriftState(raw.driftState)});
+}
+function publishRecord(view,bridge,generation){
+  if(!recordCurrent(bridge,generation,view.scopeId))throw new Error("record-owner-changed");
+  if(recordView&&recordView.scopeId===view.scopeId){
+    if(view.revision<recordView.revision)throw new Error("record-stale-projection");
+    if(view.revision===recordView.revision&&JSON.stringify(view.driftState)!==JSON.stringify(recordView.driftState))
+      throw new Error("record-projection-conflict");
+  }
+  const firstScope=!recordView||recordView.scopeId!==view.scopeId;
+  recordView=view;recordReady=true;
+  store=JSON.parse(JSON.stringify(view.driftState.store));
+  settled=store.lk;gathered=store.lu;
+  __layer.dataset.recordState="active";
+  updateTray();rePri();
+  if(firstScope){
+    hint.classList.toggle("first-cue",!store.cue);
+    for(const n of nodes)if(!n.recordPending)delete n.recordIntent;
+    // The initial field may have been built before hosted hydration. Rebuild
+    // only on a scope handoff; routine commits preserve the encountered field.
+    tideChange();
+  }
+}
+function unavailableRecord(bridge,generation){
+  if(bridge!==recordBridge||generation!==recordGeneration)return;
+  recordReady=false;__layer.dataset.recordState="recovery-required";
+  setHint("判断を確認できません。ことばを残しています。再読み込みしてください。");
+}
+function refreshRecord(){
+  if(!recordBridge)return Promise.resolve({status:"loading"});
+  if(recordRead)return recordRead;
+  const bridge=recordBridge,generation=recordGeneration;
+  const run=(async()=>{
+    try{
+      const view=await checkedRecordView(await bridge.read());
+      // A background read may have captured the previous durable revision
+      // before a gesture committed. Its late arrival cannot demote the newer
+      // projection. Acknowledgments still require publishRecord's strict check.
+      if(recordReady&&recordView&&view.scopeId===recordView.scopeId&&view.revision<recordView.revision&&
+        recordCurrent(bridge,generation,view.scopeId))return recordView;
+      publishRecord(view,bridge,generation);
+      return view;
+    }catch{
+      unavailableRecord(bridge,generation);
+      return {status:"recovery-required"};
+    }
+  })();
+  recordRead=run;
+  void run.finally(()=>{if(recordRead===run)recordRead=null;});
+  return run;
+}
+function hostedCue(n,gesture){
+  if(recordCueRun)return recordCueRun;
+  const bridge=recordBridge,generation=recordGeneration;
+  if(!bridge||!recordView){setHint("学びの記録を読み込んでいます。続く場合は再読み込みしてください。");return Promise.resolve(false);}
+  const kind=n.kind,key=kind==="word"?n.w:n.ch;
+  if(!["word","glyph","kanji","part"].includes(kind)||typeof key!=="string"||!key.length||!["tap","hold"].includes(gesture))
+    return Promise.resolve(false);
+  if(recordCueIntent&&recordCueIntent.scopeId!==recordView.scopeId)return Promise.resolve(false);
+  if(!recordCueIntent)recordCueIntent=Object.freeze({version:1,changeId:crypto.randomUUID(),occurredAt:new Date().toISOString(),scopeId:recordView.scopeId,kind,key,gesture});
+  const intent=recordCueIntent;
+  hint.classList.remove("first-cue");
+  __layer.dataset.recordCuePending=intent.changeId;
+  const run=(async()=>{
+    try{
+      if(!recordReady){
+        const refreshed=await refreshRecord();
+        if(refreshed.status!=="active")throw new Error("record-unavailable");
+      }
+      if(!recordCurrent(bridge,generation,intent.scopeId))throw new Error("record-owner-changed");
+      const raw=await bridge.retireCue(intent);
+      if(!raw||!raw.receipt||raw.receipt.changeId!==intent.changeId||!["committed","duplicate"].includes(raw.receipt.outcome))
+        throw new Error("record-receipt-mismatch");
+      const view=await checkedRecordView(raw);
+      if(view.scopeId!==intent.scopeId||view.driftState.store.cue!==1)throw new Error("record-cue-mismatch");
+      publishRecord(view,bridge,generation);
+      if(!recordCurrent(bridge,generation,intent.scopeId))throw new Error("record-owner-changed");
+      hint.classList.remove("first-cue");
+      recordCueIntent=null;
+      return true;
+    }catch{
+      unavailableRecord(bridge,generation);
+      if(bridge===recordBridge&&generation===recordGeneration)hint.classList.add("first-cue");
+      return false;
+    }finally{
+      if(bridge===recordBridge&&generation===recordGeneration)delete __layer.dataset.recordCuePending;
+    }
+  })();
+  recordCueRun=run;
+  void run.finally(()=>{if(recordCueRun===run)recordCueRun=null;});
+  return run;
+}
+async function hostedGrade(n,dir){
+  const bridge=recordBridge,generation=recordGeneration;
+  if(!bridge||!recordView){setHint("学びの記録を読み込んでいます。続く場合は再読み込みしてください。");return;}
+  if(dir!==1&&dir!==-1)return;
+  const kind=n.kind,key=kind==="word"?n.w:n.ch;
+  if(!["word","glyph","kanji","part"].includes(kind)||typeof key!=="string"||!key.length)return;
+  let intent=n.recordIntent;
+  if(intent&&(intent.scopeId!==recordView.scopeId||intent.kind!==kind||intent.key!==key||intent.direction!==dir)){
+    setHint("前の判断を確認するには、もう一度同じ方向に払ってください。");return;
+  }
+  if(!intent){
+    intent=Object.freeze({version:1,changeId:crypto.randomUUID(),occurredAt:new Date().toISOString(),scopeId:recordView.scopeId,kind,key,direction:dir});
+    n.recordIntent=intent;
+  }
+  const frozen=!!n.frozen;
+  n.recordPending=true;n.frozen=true;recordPending.add(n);
+  n.el.setAttribute("aria-busy","true");n.el.dataset.recordPending=intent.changeId;
+  setHint("判断を保存しています。");
+  try{
+    if(!recordReady){
+      const refreshed=await refreshRecord();
+      if(refreshed.status!=="active")throw new Error("record-unavailable");
+    }
+    if(!recordCurrent(bridge,generation,intent.scopeId))throw new Error("record-owner-changed");
+    const raw=await bridge.commit(intent);
+    if(!raw||!raw.receipt||raw.receipt.changeId!==intent.changeId||!["committed","duplicate"].includes(raw.receipt.outcome))
+      throw new Error("record-receipt-mismatch");
+    const view=await checkedRecordView(raw);
+    if(view.scopeId!==intent.scopeId)throw new Error("record-scope-mismatch");
+    publishRecord(view,bridge,generation);
+    if(!recordCurrent(bridge,generation,intent.scopeId))throw new Error("record-owner-changed");
+    n.recordPending=false;recordPending.delete(n);
+    n.el.removeAttribute("aria-busy");delete n.el.dataset.recordPending;
+    const lvl=stack[stack.length-1],wasCenter=lvl&&lvl.center===n;
+    finishGrade(n,dir,wasCenter);
+    delete n.recordIntent;
+  }catch{
+    unavailableRecord(bridge,generation);
+  }finally{
+    if(n.recordPending){n.recordPending=false;n.frozen=frozen;recordPending.delete(n);}
+    n.el.removeAttribute("aria-busy");delete n.el.dataset.recordPending;
+  }
+}
+function setRecordBridge(bridge){
+  if(!bridge||bridge.version!==1||typeof bridge.read!=="function"||typeof bridge.commit!=="function"||typeof bridge.retireCue!=="function"||typeof bridge.isCurrent!=="function")
+    return Promise.reject(new Error("record-bridge-required"));
+  if(bridge!==recordBridge&&recordPending.size)return Promise.reject(new Error("record-judgment-pending"));
+  if(bridge!==recordBridge&&recordCueRun)return Promise.reject(new Error("record-cue-pending"));
+  if(bridge!==recordBridge){
+    recordBridge=bridge;recordGeneration++;recordView=null;recordReady=false;recordRead=null;recordCueIntent=null;
+    __layer.dataset.recordState="loading";
+  }
+  return refreshRecord();
+}
+`;
+
 // 4 · the public seam the corridor drives
 js += `
 window.__DRIFT__ = {
+  setRecordBridge,
+  refreshRecord,
   show() {
+    if(recordBridge)void refreshRecord();
     DRIFT_ON = true;
     document.getElementById('drift-layer').classList.add('active');
     sizeCanvases();

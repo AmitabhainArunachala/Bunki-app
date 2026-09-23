@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "lint": "eslint .",
@@ -23,24 +23,46 @@
     "verify:integration-manifest": "node scripts/verify-integration-manifest.mjs",
     "verify:writing-room:clock": "node prototypes/corridor/tools/verify-writing-room-clock.mjs",
     "verify:writing-room": "npm run verify:writing-room:clock && node prototypes/corridor/tools/verify-writing-room.mjs",
-    "bunki:web:dev": "npm --prefix prototypes/bunki-sites-v11 run dev -- --host 0.0.0.0",
-    "bunki:web:build": "npm --prefix prototypes/bunki-sites-v11 run build",
-    "bunki:web:test": "npm --prefix prototypes/bunki-sites-v11 run test:unit",
-    "bunki:web:e2e": "npm --prefix prototypes/bunki-sites-v11 run test:e2e",
-    "bunki:web:deploy": "npm --prefix prototypes/bunki-sites-v11 run deploy:worker",
+    "bunki:web:dev": "node scripts/serve-corridor-dev.mjs",
+    "bunki:web:build": "node scripts/build-corridor-site.mjs",
+    "bunki:web:test": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+    "bunki:web:e2e": "node prototypes/corridor/tools/verify-corridor.mjs",
+    "bunki:web:deploy": "node -e \"console.error('Deployment uses the tested Pages workflow; see docs/operator/KAIRO_PRODUCTION_BUILD_2026-09-10.md'); process.exit(1)\"",
     "verify:drift": "npm run verify:drift:fast",
     "verify:drift:fast": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode fast",
-    "verify:drift:full": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode full"
+    "verify:drift:full": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode full",
+    "verify:release-gates": "node scripts/verify-release-gates.mjs",
+    "verify:corridor-build": "node scripts/verify-corridor-build.mjs"
+  },
+  "dependencies": {
+    "decode-uri-component": "file:./packages/uri-decoder-compat"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",
     "@eslint/js": "10.0.1",
-    "@playwright/test": "1.56.0",
+    "@playwright/test": "1.63.0",
+    "esbuild": "0.28.2",
     "eslint": "10.8.0",
-    "playwright-core": "1.56.0",
+    "playwright-core": "1.63.0",
     "prettier": "3.9.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11",
+    "yaml": "2.9.0"
+  },
+  "overrides": {
+    "react-native@0.86.0": {
+      "metro": "0.84.5",
+      "metro-config": "0.84.5",
+      "metro-core": "0.84.5",
+      "metro-runtime": "0.84.5",
+      "metro-source-map": "0.84.5"
+    },
+    "xcode@3.0.1": {
+      "uuid": "11.1.1"
+    },
+    "query-string@7.1.3": {
+      "decode-uri-component": "$decode-uri-component"
+    }
   }
 }

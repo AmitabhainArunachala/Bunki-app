@@ -1,0 +1,42 @@
+// !$*UTF8*$!
+{
+  archiveVersion = 1;
+  classes = {};
+  objectVersion = 56;
+  objects = {
+    A10000000000000000000001 = {isa = PBXBuildFile; fileRef = A20000000000000000000001; };
+    A10000000000000000000002 = {isa = PBXBuildFile; fileRef = A20000000000000000000002; };
+    A10000000000000000000003 = {isa = PBXBuildFile; fileRef = A20000000000000000000003; };
+    A10000000000000000000004 = {isa = PBXBuildFile; productRef = A90000000000000000000001; };
+    A10000000000000000000005 = {isa = PBXBuildFile; productRef = A90000000000000000000002; };
+    A10000000000000000000006 = {isa = PBXBuildFile; fileRef = A20000000000000000000006; };
+    A10000000000000000000007 = {isa = PBXBuildFile; fileRef = A20000000000000000000007; };
+    A20000000000000000000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+    A20000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorridorViewController.swift; sourceTree = "<group>"; };
+    A20000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = HostBridge.js; sourceTree = "<group>"; };
+    A20000000000000000000004 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+    A20000000000000000000005 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kairo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+    A20000000000000000000006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKSyncOwner.swift; sourceTree = "<group>"; };
+    A20000000000000000000007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKIntakeOwner.swift; sourceTree = "<group>"; };
+    A30000000000000000000001 = {isa = PBXGroup; children = (A30000000000000000000002, A30000000000000000000003); sourceTree = "<group>"; };
+    A30000000000000000000002 = {isa = PBXGroup; children = (A20000000000000000000001, A20000000000000000000002, A20000000000000000000006, A20000000000000000000007, A20000000000000000000003, A20000000000000000000004); path = App; sourceTree = "<group>"; };
+    A30000000000000000000003 = {isa = PBXGroup; children = (A20000000000000000000005); name = Products; sourceTree = "<group>"; };
+    A40000000000000000000001 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000001, A10000000000000000000002, A10000000000000000000006, A10000000000000000000007); runOnlyForDeploymentPostprocessing = 0; };
+    A40000000000000000000002 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000004, A10000000000000000000005); runOnlyForDeploymentPostprocessing = 0; };
+    A40000000000000000000003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000003); runOnlyForDeploymentPostprocessing = 0; };
+    A40000000000000000000004 = {isa = PBXShellScriptBuildPhase; alwaysOutOfDate = 1; buildActionMask = 2147483647; files = (); inputPaths = (); name = "Verify and embed canonical Corridor"; outputPaths = (); runOnlyForDeploymentPostprocessing = 0; shellPath = /bin/sh; shellScript = "set -eu\nif [ -z \"${KAIRO_NODE_BINARY:-}\" ]; then echo 'Run scripts/build-ios-host.mjs to supply the pinned artifact and Node executable.' >&2; exit 1; fi\n\"$KAIRO_NODE_BINARY\" \"$SRCROOT/../../scripts/build-ios-host.mjs\" --embed\n"; };
+    A50000000000000000000001 = {isa = PBXNativeTarget; buildConfigurationList = A70000000000000000000002; buildPhases = (A40000000000000000000001, A40000000000000000000002, A40000000000000000000003, A40000000000000000000004); buildRules = (); dependencies = (); name = Kairo; packageProductDependencies = (A90000000000000000000001, A90000000000000000000002); productName = Kairo; productReference = A20000000000000000000005; productType = "com.apple.product-type.application"; };
+    A60000000000000000000001 = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = YES; LastSwiftUpdateCheck = 1600; LastUpgradeCheck = 1600; TargetAttributes = {A50000000000000000000001 = {CreatedOnToolsVersion = 16.0; }; }; }; buildConfigurationList = A70000000000000000000001; compatibilityVersion = "Xcode 14.0"; developmentRegion = ja; hasScannedForEncodings = 0; knownRegions = (ja, en, Base); mainGroup = A30000000000000000000001; packageReferences = (A80000000000000000000001, A80000000000000000000002); productRefGroup = A30000000000000000000003; projectDirPath = ""; projectRoot = ""; targets = (A50000000000000000000001); };
+    A70000000000000000000001 = {isa = XCConfigurationList; buildConfigurations = (AB0000000000000000000001, AB0000000000000000000002); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+    A70000000000000000000002 = {isa = XCConfigurationList; buildConfigurations = (AB0000000000000000000003, AB0000000000000000000004); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+    A80000000000000000000001 = {isa = XCLocalSwiftPackageReference; relativePath = "."; };
+    A80000000000000000000002 = {isa = XCLocalSwiftPackageReference; relativePath = "../../packages/apple-sync"; };
+    A90000000000000000000001 = {isa = XCSwiftPackageProductDependency; package = A80000000000000000000001; productName = KairoIOSHostCore; };
+    A90000000000000000000002 = {isa = XCSwiftPackageProductDependency; package = A80000000000000000000002; productName = KairoAppleSync; };
+    AB0000000000000000000001 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; ENABLE_USER_SCRIPT_SANDBOXING = NO; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; }; name = Debug; };
+    AB0000000000000000000002 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; ENABLE_USER_SCRIPT_SANDBOXING = NO; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; SWIFT_COMPILATION_MODE = wholemodule; }; name = Release; };
+    AB0000000000000000000003 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = App/Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks"); MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = "$(KAIRO_BUNDLE_IDENTIFIER)"; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Debug; };
+    AB0000000000000000000004 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = App/Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks"); MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = "$(KAIRO_BUNDLE_IDENTIFIER)"; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_OPTIMIZATION_LEVEL = "-O"; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Release; };
+  };
+  rootObject = A60000000000000000000001;
+}

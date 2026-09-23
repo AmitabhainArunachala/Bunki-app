@@ -1,19 +1,25 @@
 /** Real-input recursive walk regression. No application state is exposed or patched.
- * node prototypes/corridor/tools/verify-reference-connections.mjs [--shots DIR]
+ * node prototypes/corridor/tools/verify-reference-connections.mjs [--shots DIR] [--case source-return]
  * Covers returns, not full corpus correctness (verify-reference.mjs owns that).
  */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, extname, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { extname, resolve, sep } from 'node:path';
 import { chromium } from 'playwright-core';
 import { createRequire } from 'node:module';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+const root = resolveCorridorSite();
 const shotsIndex = process.argv.indexOf('--shots');
-const shots = shotsIndex < 0 ? null : resolve(process.argv[shotsIndex + 1]);
+const shots = shotsIndex < 0 ? resolveCorridorEvidence() : resolve(process.argv[shotsIndex + 1]);
+const caseIndex = process.argv.indexOf('--case');
+const selectedCase = caseIndex < 0 ? null : process.argv[caseIndex + 1];
+assert.ok(caseIndex < 0 || selectedCase === 'source-return', '--case must be source-return');
 if (shots) mkdirSync(shots, { recursive: true });
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
 const server = createServer((request, response) => {
   try {
     const pathname = decodeURIComponent((request.url || '/').split('?')[0]);
@@ -25,14 +31,25 @@ const server = createServer((request, response) => {
   } catch { response.writeHead(404).end(); }
 });
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
+const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+await silenceBrowserAudio(context);
+const externalRequests = [];
+await context.route('**/*', route => {
+  const url = new URL(route.request().url());
+  if (url.origin === base) return route.continue();
+  externalRequests.push({ origin: url.origin, pathname: url.pathname });
+  return route.abort();
+});
 const page = await context.newPage();
 page.setDefaultTimeout(12000);
 const errors = [];
 page.on('pageerror', (error) => errors.push(String(error)));
 const results = [];
-const check = async (name, run) => {
+const excludedChecks = [];
+const check = async (name, run, caseId = null) => {
+  if (selectedCase && selectedCase !== caseId) { excludedChecks.push(name); return; }
   try { await run(); results.push({ name, pass: true }); console.log(`PASS ${name}`); }
   catch (error) {
     results.push({ name, pass: false, error: String(error) }); console.error(`FAIL ${name}: ${error}`);
@@ -40,7 +57,7 @@ const check = async (name, run) => {
   }
 };
 const boot = async () => {
-  await page.goto(`http://127.0.0.1:${server.address().port}/?entry=shelf`, { waitUntil: 'load' });
+  await page.goto(`${base}/?entry=shelf`, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1');
 };
 const library = async (id = 'jlpt:N5', query = '') => {
@@ -51,7 +68,10 @@ const library = async (id = 'jlpt:N5', query = '') => {
 };
 const entry = async (word = '学校', collection = 'jlpt:N5') => {
   await library(collection, word);
-  await page.locator(`[data-entry-id="${word}"]`).click();
+  const matches = catalog.collections.find((item) => item.id === collection).entries
+    .filter((item) => item.id === word && item.canonicalTarget?.type === 'word');
+  assert.equal(matches.length, 1, 'a canonical test entry must resolve one exact form and reading');
+  await page.locator(`[data-reference-key=${JSON.stringify(matches[0].key)}]`).click();
   await nodeIs(`word:${word}`);
 };
 const nodeIs = async (node) => page.waitForFunction((value) => document.querySelector('.sheet')?.dataset.node === value, node);
@@ -62,13 +82,13 @@ const stable = async () => {
   await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
 };
 const capture = async (name) => { await stable(); if (shots) await page.screenshot({ path: resolve(shots, `${name}.png`) }); };
-const evidence = () => page.evaluate(() => {
-  const s = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+const evidence = async () => {
+  const s = await readAppRecord(page);
   const defaults = { taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {}, mockDone: {}, mockRun: null };
   // A first reader bookmark materializes the envelope; empty fields still
   // mean zero evidence, whether absent on disk or normalized by the store.
   return Object.fromEntries(Object.entries(defaults).map(([key, empty]) => [key, s[key] ?? empty]));
-});
+};
 const json = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 const fixtures = {
   dict: json('data/share_alike/dict.json').words, words: json('data/share_alike/words.json').words,
@@ -212,7 +232,8 @@ try {
     const after = await evidence(); assert.equal(after.taken.length, (initial.taken?.length || 0) + 1); assert.deepEqual(after.revlog, initial.revlog);
     await page.click('#reference-study'); assert.ok((await page.locator('main').innerText()).includes('学校')); await page.click('#back');
     await page.click('[data-entry-id="学校"]'); await page.click('#sheet-take');
-    assert.equal((await evidence()).taken.length, initial.taken?.length || 0);
+    const removed = await waitForAppRecord(page, record => !record.taken.some(item => item.t === 'word' && item.id === '学校'));
+    assert.equal(removed.taken.length, initial.taken?.length || 0);
   });
   for (const width of [320, 390, 1280]) {
     await check(`${width}px library, word and source-tag disclosure fit their viewport`, async () => {
@@ -226,10 +247,92 @@ try {
       const rect = await page.locator('.sheet').boundingBox(); assert.ok(rect.x >= 0 && rect.x + rect.width <= width + 1);
     });
   }
+  await check('nested article detour restores the exact live review, taken item and source identity', async () => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await boot();
+    const article = json('data/articles/index.json').articles.find(item => item.id === 'wikinews:1403');
+    const body = json(`data/articles/${article.file}`);
+    const word = '世界';
+    const index = body.tokens.findIndex(token => token.b === word && token.c);
+    assert.ok(index >= 0);
+    await page.locator(`[data-passage="${article.id}"]`).first().click();
+    const token = page.locator(`#reader .tok[data-index="${index}"][data-word="${word}"]`);
+    await token.click();
+    await page.click('#reader-sentence-practice');
+    await page.locator('#sentence-choose-cloze').check();
+    await page.click('#sentence-practice-confirm');
+    await page.waitForSelector('#sentence-review-start');
+    const chosen = await waitForAppRecord(page, record => record.sentencePractice?.entries.some(entry =>
+      entry.context.sourceId === article.id && entry.context.index === index));
+    const practice = chosen.sentencePractice.entries.find(entry => entry.context.sourceId === article.id && entry.context.index === index);
+    const taken = chosen.taken.find(item => item.t === 'sentence' && item.id === practice.plan.id);
+    assert.ok(taken && Number.isFinite(taken.started));
+    assert.equal(taken.sourceContextRef, practice.context.id);
+    assert.equal(practice.context.sourceKind, 'bundled-passage');
+    const surfaces = body.tokens.map(item => item.s);
+    assert.equal(practice.context.sourceDigest, createHash('sha256').update(JSON.stringify(surfaces)).digest('hex'));
+    assert.equal(practice.context.quote, surfaces.slice(practice.context.start, practice.context.end).join(''));
+    assert.equal(practice.context.title, article.title);
+    await page.click('#sentence-review-start');
+    await page.fill('#sentence-recall-answer', body.tokens[index].s);
+    await page.click('#sentence-recall-check');
+    await page.waitForSelector('.grade.g-easy');
+    const answered = await readAppRecord(page);
+    const response = answered.sentencePractice.responses.at(-1);
+    assert.equal(response.text, body.tokens[index].s);
+    const session = await page.evaluate(() => window.__KAIRO_SRS__.session());
+    assert.equal(session.queue, 1); assert.equal(session.ix, 0);
+    if (shots) writeFileSync(resolve(shots, 'source-return-before-detour.json'), `${JSON.stringify({ record: answered, session, practiceId: practice.plan.id, responseId: response.id }, null, 2)}\n`);
+    await page.click('#review-source-return');
+    await page.waitForSelector('#reader-source-back');
+    assert.match(await page.locator('#reader-source-back').innerText(), /Resume review/);
+    await page.waitForFunction(tokenIndex => document.activeElement?.matches(`#reader .tok[data-index="${tokenIndex}"]`), index);
+    await page.click('#chrome-search');
+    await page.fill('#nav-search-input', word); await page.press('#nav-search-input', 'Enter');
+    await nodeIs(`word:${word}`);
+    await page.locator('.sent-door').first().click();
+    await page.waitForSelector('#sent-home');
+    const sentence = await page.locator('.sent-reader').innerText();
+    await page.click('#sent-home');
+    await page.waitForSelector('#source-entry-return');
+    assert.equal(await page.locator('h1.view-title').innerText(), article.title);
+    await capture('review-source-nested-article');
+    await page.click('#source-entry-return');
+    assert.equal(await page.locator('.sent-reader').innerText(), sentence);
+    await page.click('#sheet-close');
+    assert.equal(await page.locator('#nav-search-input').inputValue(), word);
+    await page.click('#back');
+    await page.waitForSelector('#reader');
+    await capture('review-source-after-nested-return');
+    assert.equal(await page.locator('#reader-source-back').count(), 1, 'Nested article return must retain the live Resume review caller');
+    assert.match(await page.locator('#reader-source-back').innerText(), /Resume review/);
+    await page.click('#reader-source-back');
+    await page.waitForSelector('.grade.g-easy');
+    await page.waitForFunction(() => document.activeElement?.id === 'review-source-return');
+    assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()), session);
+    const returned = await readAppRecord(page);
+    for (const key of ['taken', 'srs', 'revlog', 'stats', 'obslog', 'sentencePractice', 'teacherContexts', 'lists'])
+      assert.deepEqual(returned[key], answered[key], `Passive source detour preserves ${key}`);
+    assert.equal(returned.taken.find(item => item.id === practice.plan.id).sourceContextRef, practice.context.id);
+    if (shots) writeFileSync(resolve(shots, 'source-return-resumed.json'), `${JSON.stringify({ record: returned, session }, null, 2)}\n`);
+    await capture('exact-live-review-resumed');
+    await page.click('.grade.g-easy');
+    await page.waitForSelector('.review-summary');
+    const graded = await waitForAppRecord(page, record => record.revlog.length === answered.revlog.length + 1);
+    assert.equal(graded.revlog.at(-1)[1], `sentence:${practice.plan.id}`);
+    assert.ok(graded.sentencePractice.grades.some(grade => grade.responseId === response.id));
+    assert.equal(graded.srs[`sentence:${practice.plan.id}`].reps, 1);
+    assert.deepEqual(graded.taken, answered.taken);
+    assert.deepEqual(externalRequests, []);
+    assert.deepEqual(errors, []);
+    if (shots) writeFileSync(resolve(shots, 'source-return-one-explicit-grade.json'), `${JSON.stringify(graded, null, 2)}\n`);
+  }, 'source-return');
   await check('no uncaught application exceptions', async () => assert.deepEqual(errors, []));
 } finally {
   await browser.close(); await new Promise((done) => server.close(done));
   if (shots) writeFileSync(resolve(shots, 'connections-results.json'), `${JSON.stringify(results, null, 2)}\n`);
+  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests,
+    browser: { engine: 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
 }
 const failures = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failures.length}/${results.length} recursive connection checks passed.`);

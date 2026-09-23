@@ -37,11 +37,9 @@
  *
  * These scans run on the **hydrated** page, which is what a person interacts
  * with and what axe is defined against. It is not the same thing as the bytes
- * `expo export` writes: the static export still ships an empty `<title>`,
- * because expo-router's `Head` is focus-gated and does not render during static
- * pre-rendering. That residual is pinned separately, as its own annotated
- * expectation, in `adv-known-defects.spec.ts` (T4-1b). Nothing here should be
- * read as a claim about pre-hydration markup.
+ * `expo export` writes. The static titles are checked separately with JavaScript
+ * disabled in `adv-known-defects.spec.ts` (T4-1b); this suite checks the hydrated
+ * route metadata, including resolved words and characters.
  */
 
 import AxeBuilder from '@axe-core/playwright';
@@ -60,7 +58,9 @@ const ROUTES = [
   '/canvas',
   '/repair',
   '/evidence',
+  '/monthly',
   '/debug',
+  '/+not-found',
 ] as const;
 
 const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const;
@@ -272,7 +272,7 @@ test('keyboard: focus follows reading order, is always visible, and never traps'
     'nav-capture',
     'nav-session',
     'nav-evidence',
-    'nav-about-diagnostics',
+    'nav-monthly',
   ]);
 
   // Reading order: focus moves down the page, never back up. Compared by row

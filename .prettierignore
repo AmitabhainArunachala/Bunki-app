@@ -37,6 +37,14 @@ docs/prototype/verification-report.json
 # Local Python venv for the corpus grader runtime (never committed)
 .venv/
 
+# This fixture retains the exact reviewed publisher policy section bytes.
+# Reformatting changes its identity and invalidates the source admission check.
+packages/feed/test/full-reader/alma/reviewed-rights-section.html
+
+# Exact Node JSON.stringify bytes/no newline are imported and re-exported by
+# Swift to verify cross-device profile-candidate interoperability.
+packages/apple-sync/Tests/KairoAppleSyncTests/Fixtures/native-profile-candidate.json
+
 # Consistency-sweep output — written by verify-drift-consistency.mjs each run
 docs/audits/drift-consistency-report.json
 docs/audits/drift-consistency-shots/
@@ -48,3 +56,7 @@ docs/audits/drift-consistency-shots/
 # prettier-formatted — it is hand-authored, not generated.
 docs/content/feed-curation-report.json
 docs/content/feed-review-queue.json
+
+# Pinned-bytes data fixtures (tools/test-reference-core.mjs asserts their sha256); never reformat.
+tools/fixtures/reference/coverage.json
+tools/fixtures/reference/relationships.json

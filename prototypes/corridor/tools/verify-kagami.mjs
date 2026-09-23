@@ -23,14 +23,16 @@
 
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { extname, resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { verifyKagamiFreshness } from './verify-kagami-freshness.mjs';
+import { readAppRecord, readAppRecordSnapshot } from './record-test-support.mjs';
+import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
-const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+const CORRIDOR_DIR = resolveCorridorSite();
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -90,7 +92,7 @@ function seedMeasured() {
   });
   N4.forEach((w, i) => {
     for (let n = 0; n < 5; n += 1) {
-      obslog.push([T0 + 9000 + i * 100 + n, 'mock', `word:${w}`, n === 0 ? 3 : 1, 'n4-01']);
+      obslog.push([T0 + 9000 + i * 100 + n, 'dojo', `word:${w}`, n === 0 ? 3 : 1]);
     }
   });
   // readings: five probe rows, four right
@@ -291,13 +293,22 @@ const readCells = (page) =>
     return out;
   })()`);
 
+let suiteBrowser, suiteServer;
+async function silentContext(browser, options) {
+  const context = await browser.newContext(options);
+  await silenceBrowserAudio(context);
+  return context;
+}
+
 async function main() {
   const { server, base } = await startServer();
+  suiteServer = server;
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  suiteBrowser = browser;
   const consoleErrors = [];
 
   console.log('— 鏡: the mirror over a measured ledger');
-  const measured = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const measured = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await measured.addInitScript(initScript(seedMeasured()));
   const page = await openMirror(measured, base);
   page.on('console', (m) => {
@@ -368,14 +379,14 @@ async function main() {
   check('and the same model again after a reload — nothing carried in memory', before === after);
 
   // derived, never stored: the envelope gains nothing from the mirror
-  const envelopeBefore = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  const envelopeBefore = await readAppRecordSnapshot(page);
   await page.click('#kagami-link');
   await page.waitForSelector('[data-band="lexis"]', { timeout: 15000 });
   await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
   await page.waitForTimeout(400);
-  const envelopeAfter = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
-  check('walking the mirror writes nothing — the record is byte-identical after', envelopeBefore === envelopeAfter);
-  const stored = JSON.parse(envelopeAfter);
+  const envelopeAfter = await readAppRecordSnapshot(page);
+  check('walking the mirror writes nothing — native record and revision stay identical', JSON.stringify(envelopeBefore) === JSON.stringify(envelopeAfter));
+  const stored = envelopeAfter.record;
   check(
     'the model is nowhere in the envelope: it is derived, and stays derived',
     !('learnerModel' in stored) && !('kagami' in stored) && !('bands' in stored),
@@ -408,7 +419,7 @@ async function main() {
   await measured.close();
 
   console.log('\n— 鏡: provenance, and the honest empty');
-  const observed = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const observed = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await observed.addInitScript(initScript(seedObservedOnly()));
   const mined = await openMirror(observed, base);
   const minedProv = await mined.evaluate(
@@ -430,7 +441,7 @@ async function main() {
   );
   await observed.close();
 
-  const odd = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const odd = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await odd.addInitScript(initScript(seedContradiction()));
   const contradictory = await openMirror(odd, base);
   const flagged = await contradictory.evaluate(`(() => {
@@ -445,7 +456,7 @@ async function main() {
   await odd.close();
 
   // round 10: a withdrawn drill withdraws its grade, and counts as nothing
-  const undone = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const undone = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await undone.addInitScript(initScript(seedUndoneDrill()));
   const drills = await openMirror(undone, base);
   const afterUndo = await drills.evaluate(`(() => {
@@ -465,7 +476,7 @@ async function main() {
   await undone.close();
 
   // round 10: a grammar review is sentence form, not vocabulary
-  const grammar = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const grammar = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await grammar.addInitScript(initScript(seedGrammarReviews()));
   const gpage = await grammar.newPage();
   await gpage.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
@@ -527,7 +538,7 @@ async function main() {
   await grammar.close();
 
   // round 10: confusions with no judged answers are still a record
-  const pairsOnly = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const pairsOnly = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await pairsOnly.addInitScript(initScript(seedConfusionsOnly()));
   const ponly = await pairsOnly.newPage();
   await ponly.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
@@ -548,7 +559,7 @@ async function main() {
   await pairsOnly.close();
 
   // round 11: mined successes are shown and are powerless
-  const minedWin = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const minedWin = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await minedWin.addInitScript(initScript(seedMinedSuccess()));
   const mw = await openMirror(minedWin, base);
   const mwState = await mw.evaluate(`(() => {
@@ -573,7 +584,7 @@ async function main() {
   await minedWin.close();
 
   // round 11: Hard is a recall, not a miss
-  const hard = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const hard = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await hard.addInitScript(initScript(seedHardRecalls()));
   const hp = await openMirror(hard, base);
   const hardState = await hp.evaluate(`(() => {
@@ -588,7 +599,7 @@ async function main() {
   await hard.close();
 
   // round 11: a level that was answered and failed is not an unsampled level
-  const failedLevel = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const failedLevel = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await failedLevel.addInitScript(initScript(seedSampledButFailing()));
   const fl = await openMirror(failedLevel, base);
   const wording = await fl.evaluate(`(() => {
@@ -613,22 +624,32 @@ async function main() {
   await failedLevel.close();
 
   // round 11: a paper's question kind decides its band, not its subject
-  const modal = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const modal = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await modal.addInitScript(initScript(seedMockModalities()));
-  const mp = await openMirror(modal, base);
+  const mp = await modal.newPage();
+  await mp.goto(`${base}/index.html?entry=shelf`);
+  await mp.waitForFunction(() => document.body.dataset.ready === '1');
+  await mp.click('#kagami-link');
+  const modalRows = (await readAppRecord(mp)).obslog.length;
   const byKind = await mp.evaluate(`(() => {
     const m = window.__KAIRO_KAGAMI__.model();
-    return { syntax: m.bands.syntax.measured, readings: m.bands.readings.measured, lexis: m.bands.lexis.measured };
+    return { version: m.modelVersion, syntax: m.bands.syntax.measured, readings: m.bands.readings.measured,
+      lexis: m.bands.lexis.measured, practice: m.unverifiedPractice,
+      rawRows: ${modalRows},
+      notice: document.querySelector('#kagami-unverified-practice')?.textContent || '' };
   })()`);
   check(
-    'a form question is sentence form, a reading question is readings — even about the same word',
-    byKind.syntax === 5 && byKind.readings === 5 && byKind.lexis === 10,
+    'unverified legacy practice preserves question modalities and raw answers without measuring ability',
+    byKind.version === 2 && byKind.syntax === 0 && byKind.readings === 0 && byKind.lexis === 0 &&
+      byKind.practice?.rows === 20 && byKind.practice?.byBand.syntax === 5 &&
+      byKind.practice?.byBand.readings === 5 && byKind.practice?.byBand.lexis === 10 &&
+      byKind.rawRows === 20 && /ability|測定/u.test(byKind.notice),
     JSON.stringify(byKind),
   );
   await modal.close();
 
   // round 11: an answer on an untagged word is still an answer
-  const untagged = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const untagged = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await untagged.addInitScript(initScript(seedUntagged()));
   const up = await openMirror(untagged, base);
   const oov = await up.evaluate(`(() => {
@@ -648,7 +669,7 @@ async function main() {
   );
   await untagged.close();
 
-  const empty = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const empty = await silentContext(browser, { viewport: { width: 390, height: 844 } });
   await empty.addInitScript(initScript({ v: 1, taken: [], srs: {} }));
   const bare = await empty.newPage();
   await bare.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
@@ -670,12 +691,18 @@ async function main() {
   check('no console or page errors across the 鏡 walk', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | ') || 'clean');
 
   await browser.close();
-  server.close();
+  try {
+    const freshness = await verifyKagamiFreshness(base);
+    for (const engine of freshness.engines) check(`${engine}: same-count rest swap refreshes the warm mirror and preserves native records`, true);
+  } finally { server.close(); }
   console.log(`\n${results.length - failures}/${results.length} checks passed`);
   return failures === 0 ? 0 : 1;
 }
 
-main().then(
+main().finally(async () => {
+  try { await suiteBrowser?.close(); }
+  finally { if (suiteServer) await new Promise((done) => suiteServer.close(done)); }
+}).then(
   (code) => process.exit(code),
   (err) => {
     console.error(err);

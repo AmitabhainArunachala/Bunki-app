@@ -22,6 +22,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -305,10 +306,23 @@ describe('mint provenance — the registry has no public write side', () => {
     expect(read('src/events/index.ts')).not.toMatch(/from '\.\/mint-registry\.ts'/);
   });
 
-  it('is not reachable through the package exports map', () => {
+  it('cannot be imported through any public package entry or a private subpath', async () => {
     const manifest = JSON.parse(read('package.json')) as { exports: Record<string, string> };
-    expect(Object.keys(manifest.exports)).toEqual(['.']);
-    expect(manifest.exports['.']).toBe('./src/index.ts');
+    const packageRequire = createRequire(import.meta.url);
+    for (const entry of Object.keys(manifest.exports)) {
+      const specifier = `@bunki/domain${entry === '.' ? '' : entry.slice(1)}`;
+      const exported = (await import(specifier)) as Record<string, unknown>;
+      expect(exported['recordKernelMint'], specifier).toBeUndefined();
+    }
+    for (const entry of ['events/mint-registry', 'src/events/mint-registry.ts']) {
+      let failure: unknown;
+      try {
+        packageRequire.resolve(`@bunki/domain/${entry}`);
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure, entry).toMatchObject({ code: 'ERR_PACKAGE_PATH_NOT_EXPORTED' });
+    }
   });
 
   it('has exactly two callers, both of them minters', () => {
