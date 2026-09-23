@@ -127,6 +127,13 @@ async function journal(page, operations) {
     schemaEpoch: 1, deletionEpoch: 0, mergePolicy: 'kairo-conservative-merge/1', operations: JSON.parse(JSON.stringify(operations)) };
   return { ...body, sha256: digest(body) };
 }
+/** An import canonicalizes absent draft roots to empty collections (the
+ * 'known empty-draft canonicalization' the practice and tutor suites declare);
+ * expectations captured before an import compare through the same rule. */
+const withCanonicalDrafts = (record) => ({ ...record,
+  teacherDrafts: record.teacherDrafts ?? { version: 1, entries: [] },
+  sentenceDrafts: record.sentenceDrafts ?? { version: 1, entries: [] } });
+
 async function admit(page, evidence, stage, expectedOperations) {
   const state = await native(page);
   if (expectedOperations) assert.deepEqual(sortOperations(state.snapshot.replica.operations), sortOperations(expectedOperations), 'The installed target must contain the exact admitted operation bytes');
@@ -506,7 +513,7 @@ try {
         assert.equal((await faultState(page, true)).complete, true);
         state = await admit(page, evidence, 'received-after-held-commit', [original, next]);
         await foreground(page); await assertRendered(page, state); await assertSurface(page, surface, evidence);
-        assert.deepEqual(state.raw.record, record, 'Received notes cannot mint feedback, change the quiz, or rewrite learner roots');
+        assert.deepEqual(state.raw.record, withCanonicalDrafts(record), 'Received notes cannot mint feedback, change the quiz, or rewrite learner roots');
         assert.equal((await receive(page, [next], 'foreground-duplicate-bytes')).status, 'committed');
         state = await admit(page, evidence, 'duplicate-operation-delivery', [original, next]);
         await foreground(page); await assertRendered(page, state); await assertSurface(page, surface, evidence);

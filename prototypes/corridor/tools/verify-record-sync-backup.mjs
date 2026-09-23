@@ -31,6 +31,13 @@ const server = createServer((request, response) => {
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
 const results = [];
+/** An import canonicalizes absent draft roots to empty collections (the
+ * 'known empty-draft canonicalization' the practice and tutor suites declare);
+ * expectations captured before an import compare through the same rule. */
+const withCanonicalDrafts = (record) => ({ ...record,
+  teacherDrafts: record.teacherDrafts ?? { version: 1, entries: [] },
+  sentenceDrafts: record.sentenceDrafts ?? { version: 1, entries: [] } });
+
 const errors = [];
 const externalRequests = [];
 const startedAt = new Date().toISOString();
@@ -135,11 +142,11 @@ try {
         assert.equal(native.actor.sequence, 0, 'Restore must not allocate a new local event');
         const file = await exported(page, directory);
         assert.equal(file.version, 2);
-        assert.deepEqual(file.record, record);
+        assert.deepEqual(file.record, withCanonicalDrafts(record));
         assert.deepEqual(file.archive.turns, archive);
         assert.deepEqual(file.journal, old);
         assert.equal(file.counts.syncOperations, 1);
-        assert.deepEqual(file.sha256, { record: digest(record), archive: digest(file.archive), journal: digest(old) });
+        assert.deepEqual(file.sha256, { record: digest(withCanonicalDrafts(record)), archive: digest(file.archive), journal: digest(old) });
         assert.deepEqual((await readAppRecordSnapshot(page)).installation, initial.installation);
       });
       await test('old-ui-backup-preserves-current-tombstone-and-unrelated-work', async ({ page }) => {
