@@ -100,6 +100,8 @@ function fixture(overrides = {}) {
     findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
+    // a DOM focus helper startReview calls after rendering; no scheduling effect
+    focusKanjiReadingReview: () => {},
     endLessonRun: () => {}, srsCustom: null, srsNewPerDay: () => S.srsPrefs.newPerDay, srsReviewLimit: () => S.srsPrefs.reviewLimit,
     mockPending: null, leaveMockRun: () => {}, dropMockRun: () => {},
     aiLevelGuess: () => 'N5', aiAsk: async () => JSON.stringify(questions),

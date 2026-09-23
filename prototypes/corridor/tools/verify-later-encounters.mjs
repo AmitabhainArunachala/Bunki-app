@@ -206,7 +206,7 @@ for (const engine of engines) for (const width of sizes) {
       assert.equal(initial.taken.length, 0); await shelf(page);
       await page.locator('#airead-link').click(); await page.locator('#airead-startingLevel').selectOption('N5');
       await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
-      const item = page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
+      const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
       await item.locator('.shelf-open').click(); await page.locator('#reader .tok[data-index="9"][data-word="窓"]').click();
       await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
       await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();

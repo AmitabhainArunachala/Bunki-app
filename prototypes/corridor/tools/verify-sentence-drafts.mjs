@@ -216,7 +216,7 @@ async function listening(fixture) {
 }
 async function practiceFromSource(fixture, source = SOURCE, { addListening = true, savePlace = false } = {}) {
   const page = fixture.page; await shelf(fixture);
-  await page.locator(`[data-passage="${source.id}"] .shelf-open`).click();
+  await page.locator(`[data-passage="${source.id}"]:not([data-recommendation]) .shelf-open`).click();
   await page.locator(`#reader .tok[data-index="${source.index}"][data-word="${source.word}"]`).click();
   if (savePlace) {
     await page.locator('#reader-place-save').click();
