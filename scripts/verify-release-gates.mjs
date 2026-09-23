@@ -1464,6 +1464,7 @@ const STANDALONE_JOURNEY_STATIONS = [
   '10 levels · grammar(100+) · thesaurus · 字引',
   '11 return to the drift',
   '12 same-file offline reload retains the exact learner record',
+  '13 offline kanji sheet names its Kodansha entry',
 ];
 const STANDALONE_RECORD_MODULES = [
   './record-controller.mjs',
