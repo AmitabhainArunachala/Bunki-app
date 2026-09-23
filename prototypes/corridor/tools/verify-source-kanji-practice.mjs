@@ -597,7 +597,8 @@ async function ordinary(fixture) {
   retained(checkpoint, await snapshot(fixture, 'closed-local-checkpoint-reopened'));
   await importUi(fixture, exported.file);
   const restored = await snapshot(fixture, 'ordinary-ui-same-installation-restore'), expected = { ...exported.before.record };
-  assert.deepEqual(restored.record, expected, 'Restore recovers every exact portable root');
+  for (const key of ['teacherDrafts', 'sentenceDrafts']) if (expected[key] == null) expected[key] = { version: 1, entries: [] };
+  assert.deepEqual(restored.record, expected, 'Restore recovers every exact portable root with only known empty-draft canonicalization');
   assert.deepEqual(restored.archive, exported.before.archive); authorityUnchanged(checkpoint, restored);
   assert(restored.record.sentencePractice.responses.length > checkpoint.record.sentencePractice.responses.length);
   assert(restored.record.sentencePractice.grades.length > checkpoint.record.sentencePractice.grades.length);
