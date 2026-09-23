@@ -70,6 +70,7 @@ const expectedStations = [
   '10 levels · grammar(100+) · thesaurus · 字引',
   '11 return to the drift',
   '12 same-file offline reload retains the exact learner record',
+  '13 offline kanji sheet names its Kodansha entry',
 ];
 const limits = { buildMs: 120000, launchMs: 30000, browserRunMs: 300000, closeMs: 10000 };
 
@@ -422,6 +423,22 @@ try {
     assert.equal(await page.locator('.store-alert:visible').count(), 0, 'Reload must not protect the record after recovery');
     recoveredRecordSha256 = createHash('sha256').update(JSON.stringify(restored)).digest('hex');
     await shot('12-record-recovered');
+  });
+  await step('13 offline kanji sheet names its Kodansha entry', async () => {
+    // every request is aborted here: the Kodansha table must come from the file
+    await page.tap('.nav-symbol');
+    await page.waitForTimeout(400);
+    await page.tap('.bubble-shelf');
+    await page.waitForSelector('.shelf-item', { timeout: 10000 });
+    await page.click('#kanjidex-link');
+    await page.waitForSelector('.kdx-row', { timeout: 5000 });
+    await page.click('[data-kdx-part="木"]');
+    await page.waitForSelector('.kdx-glyph', { timeout: 5000 });
+    await page.locator('.kdx-glyph').first().click();
+    await page.waitForSelector('#sheet #kanji-kkld', { timeout: 8000 });
+    const chip = await page.locator('#sheet #kanji-kkld').textContent();
+    assert.match(chip, /Kodansha/, 'The kanji sheet names its Kodansha entry while offline');
+    await shot('13-kodansha-offline');
   });
 } catch (error) {
   startupErrors.push({ phase, error: errorText(error) });
