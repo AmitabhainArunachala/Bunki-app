@@ -9272,22 +9272,18 @@ function renderPortRow(main) {
       const currentDrafts = teacherDraftModule.parseTeacherDrafts(preview.snapshot.record.teacherDrafts);
       const importedDrafts = teacherDraftModule.parseTeacherDrafts(record.teacherDrafts);
       const currentTopics = new Set(currentDrafts.entries.map((entry) => entry.contextRef));
-      const mergedTeacherDrafts = teacherDraftModule.parseTeacherDrafts({ version: 1, entries: [
+      // an import canonicalizes absent drafts to an empty collection — the form
+      // every restore suite expects ('known empty-draft canonicalization')
+      record.teacherDrafts = teacherDraftModule.parseTeacherDrafts({ version: 1, entries: [
         ...importedDrafts.entries.filter((entry) => !currentTopics.has(entry.contextRef)), ...currentDrafts.entries,
       ] });
-      // An empty collection and an absent one are the same record; never
-      // materialize a drafts object the imported record did not carry.
-      if (mergedTeacherDrafts.entries.length) record.teacherDrafts = mergedTeacherDrafts;
-      else if (record.teacherDrafts != null) record.teacherDrafts = mergedTeacherDrafts;
       const currentSentenceDrafts = sentenceDraftModule.parseSentenceDrafts(preview.snapshot.record.sentenceDrafts);
       const importedSentenceDrafts = sentenceDraftModule.parseSentenceDrafts(record.sentenceDrafts);
       const draftKey = (row) => JSON.stringify([row.entryId, row.mode]);
       const currentSentenceKeys = new Set(currentSentenceDrafts.entries.map(draftKey));
-      const mergedSentenceDrafts = sentenceDraftModule.parseSentenceDrafts({ version: 1, entries: [
+      record.sentenceDrafts = sentenceDraftModule.parseSentenceDrafts({ version: 1, entries: [
         ...importedSentenceDrafts.entries.filter((entry) => !currentSentenceKeys.has(draftKey(entry))), ...currentSentenceDrafts.entries,
       ] });
-      if (mergedSentenceDrafts.entries.length) record.sentenceDrafts = mergedSentenceDrafts;
-      else if (record.sentenceDrafts != null) record.sentenceDrafts = mergedSentenceDrafts;
       if (s.format !== 'kairo-backup') record.aiEvidenceIncomplete = true;
       const archive = { version: 1, turns: plan.evidence };
       const backup = { format: 'kairo-backup', version: plan.journal ? 2 : 1,
