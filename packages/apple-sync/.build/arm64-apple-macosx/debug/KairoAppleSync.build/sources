@@ -1,0 +1,14 @@
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/CloudKitBackend.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/CloudKitRecordCodec.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/CloudKitSaveAdmission.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/ForegroundJournalTransport.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCAdapter.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCFraming.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCSessionGate.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalRPCTypes.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/JournalTypes.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeBootstrapControl.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeCloudEntitlements.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeCloudSyncBootstrap.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeProfileCandidate.swift
+/Users/dhyana/worktrees/Bunki-app/integration_one_app_20260923/packages/apple-sync/Sources/KairoAppleSync/NativeProfilePairing.swift
