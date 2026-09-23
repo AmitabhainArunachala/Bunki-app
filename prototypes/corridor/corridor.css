@@ -194,11 +194,13 @@ body::before {
 }
 /* 320-px phones: the chrome row (back · search · seal · language · tray) already
  * fills 309 px; the dojo door (R5) pushed it to 363 and the whole page scrolled
- * sideways. Below 340 px the door steps out of the chrome — the dojo stays one
- * tap away in the study hall. Reconciliation for the operator's eye. */
+ * sideways. Below 340 px the row wraps instead — every door, including the
+ * dojo's, keeps its 44-px target and its keyboard reach; the chrome grows a
+ * second line on the smallest phones. Reconciliation for the operator's eye. */
 @media (max-width: 340px) {
-  .chrome button.chrome-dojo {
-    display: none;
+  .chrome {
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
 }
 
