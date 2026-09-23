@@ -636,7 +636,7 @@ try {
   await page.waitForFunction(
     (expected) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item').length === expected,
+      document.querySelectorAll('.shelf-item:not([data-recommendation])').length === expected,
     CURATED_COUNT,
     { timeout: 30_000 },
   );
@@ -655,10 +655,10 @@ try {
 
   check(
     'the one native shelf renders exactly the curated index rows',
-    (await page.locator('.shelf-item').count()) === CURATED_COUNT,
-    `${await page.locator('.shelf-item').count()}/${CURATED_COUNT}`,
+    (await page.locator('.shelf-item:not([data-recommendation])').count()) === CURATED_COUNT,
+    `${await page.locator('.shelf-item:not([data-recommendation])').count()}/${CURATED_COUNT}`,
   );
-  const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]').evaluate((node) => {
+  const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]:not([data-recommendation])').evaluate((node) => {
     const style = getComputedStyle(node);
     const title = getComputedStyle(node.querySelector('.shelf-title'));
     const snippet = getComputedStyle(node.querySelector('.shelf-snippet'));
@@ -674,7 +674,7 @@ try {
   });
 
   // A shelf screenshot at the boundary between the preserved 40 and additions.
-  await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
+  await page.locator(`[data-passage="${IDS[0]}"]:not([data-recommendation])`).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-first-added.png') });
 
   for (const id of IDS) {
@@ -682,7 +682,7 @@ try {
     const row = rows.get(id);
     const body = bodies.get(id);
     const beforeNoise = noise.length;
-    const item = page.locator(`[data-passage="${id}"]`);
+    const item = page.locator(`[data-passage="${id}"]:not([data-recommendation])`);
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
@@ -818,7 +818,7 @@ try {
     await page.waitForTimeout(80);
     const intendedPosition = await page.evaluate(() => Math.round(window.scrollY));
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]`);
+    await page.waitForSelector(`[data-passage="${id}"]:not([data-recommendation])`);
     const returnedShelfY = await page.evaluate(() => window.scrollY);
     const state = await waitForAppRecord(page,
       (record) => record.readDone?.[id] && record.readerPos?.[id] === intendedPosition,
@@ -828,11 +828,11 @@ try {
       done: !!state.readDone?.[id],
     };
     const completionTag = await page
-      .locator(`[data-passage="${id}"] .read-tag`)
+      .locator(`[data-passage="${id}"]:not([data-recommendation]) .read-tag`)
       .textContent()
       .catch(() => '');
 
-    await touchAt(page, page.locator(`[data-passage="${id}"]`));
+    await touchAt(page, page.locator(`[data-passage="${id}"]:not([data-recommendation])`));
     await settleReader(page);
     await page.waitForTimeout(120);
     const restoredPosition = await page.evaluate(() => Math.round(window.scrollY));
@@ -896,7 +896,7 @@ try {
     });
 
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]`);
+    await page.waitForSelector(`[data-passage="${id}"]:not([data-recommendation])`);
   }
   activeArticleId = null;
 
@@ -924,7 +924,7 @@ try {
   const readShelfCards = () =>
     page.evaluate(() =>
       Object.fromEntries(
-        [...document.querySelectorAll('.shelf-item')].map((item) => [
+        [...document.querySelectorAll('.shelf-item:not([data-recommendation])')].map((item) => [
           item.dataset.passage,
           {
             en: item.querySelector('.shelf-title-en')?.textContent ?? null,
@@ -955,7 +955,7 @@ try {
   await page.waitForFunction(
     (want) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item').length === want,
+      document.querySelectorAll('.shelf-item:not([data-recommendation])').length === want,
     CURATED_COUNT,
     { timeout: 30_000 },
   );
@@ -978,7 +978,7 @@ try {
     biUnmarked.length === 0,
     biUnmarked.map((record) => record.id).slice(0, 4).join(', '),
   );
-  await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
+  await page.locator(`[data-passage="${IDS[0]}"]:not([data-recommendation])`).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
   check(
     'the bilingual shelf pass added no request, console, or page errors',

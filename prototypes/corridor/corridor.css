@@ -192,6 +192,15 @@ body::before {
 .chrome button.chrome-dojo .en-sub {
   display: none;
 }
+/* 320-px phones: the chrome row (back · search · seal · language · tray) already
+ * fills 309 px; the dojo door (R5) pushed it to 363 and the whole page scrolled
+ * sideways. Below 340 px the door steps out of the chrome — the dojo stays one
+ * tap away in the study hall. Reconciliation for the operator's eye. */
+@media (max-width: 340px) {
+  .chrome button.chrome-dojo {
+    display: none;
+  }
+}
 
 .crumb {
   flex: 1;
@@ -5217,6 +5226,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .teacher-note {
   margin: 10px 0 0;
+}
+/* the reader's context note rewrites itself for the touched word (two lines →
+ * one); reserving two lines keeps the text beneath from moving 21 px */
+#reader-context-note.teacher-note {
+  min-height: calc(2 * 1.65em);
 }
 
 .source-processing {
