@@ -97,13 +97,6 @@ async function native(page) {
     } finally { await store.close(); }
   });
 }
-/** An import canonicalizes absent draft roots to empty collections (the
- * 'known empty-draft canonicalization' the practice and tutor suites declare);
- * expectations captured before an import compare through the same rule. */
-const withCanonicalDrafts = (record) => ({ ...record,
-  teacherDrafts: record.teacherDrafts ?? { version: 1, entries: [] },
-  sentenceDrafts: record.sentenceDrafts ?? { version: 1, entries: [] } });
-
 async function admit(page, evidence, stage) {
   const state = await native(page);
   const profile = state.rows.find((row) => row.kind === 'profile');
@@ -507,7 +500,7 @@ try {
         await page.waitForFunction(() => !window.__ownNoteImportDocument && document.body.dataset.ready === '1');
         await tray(page);
         const restored = await admit(page, evidence, 'own-journal-ui-backup-restored');
-        assert.deepEqual(restored.record, withCanonicalDrafts(exported.backup.record), 'Explicit restore uses the actual file, whose stats precede the export timestamp');
+        assert.deepEqual(restored.record, exported.backup.record, 'Explicit restore uses the actual file, whose stats precede the export timestamp');
         assert.deepEqual(restored.archive, exported.backup.archive);
         rootsUnchanged(next, restored);
         assert.deepEqual(restored.snapshot.actor, reopened.snapshot.actor, 'Restoring exact existing own history cannot allocate a new event');
