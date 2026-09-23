@@ -69,6 +69,7 @@ const SHELL = [
   'reference-ui.js',
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
+  'data/share_alike/kkld.json',
 ];
 
 // Keep this in step with boot()'s awaited data and scheduler import. Testing

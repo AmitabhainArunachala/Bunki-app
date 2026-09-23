@@ -12872,8 +12872,10 @@ let kkldPromise = null;
 function ensureKkld() {
   if (D.kkld) return Promise.resolve(D.kkld);
   if (!kkldPromise) {
-    kkldPromise = fetch('data/share_alike/kkld.json')
-      .then((r) => (r.ok ? r.json() : null))
+    // the standalone file carries the table; a served site fetches it, and
+    // the service worker keeps it for offline visits
+    const bundled = window.__CORRIDOR_BUNDLE__?.['share_alike/kkld'];
+    kkldPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/kkld.json').then((r) => (r.ok ? r.json() : null)))
       .then((data) => {
         D.kkld = data && data.entries ? data : { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
         return D.kkld;

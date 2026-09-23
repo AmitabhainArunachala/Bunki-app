@@ -171,6 +171,7 @@ const BUNDLES = {
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
   'share_alike/reference-extra': 'data/share_alike/reference-extra.json',
+  'share_alike/kkld': 'data/share_alike/kkld.json',
 };
 
 const bundle = {};

@@ -108,7 +108,7 @@ try{
  });
  await segment('E05-reader-capture',async()=>{
   await click('.details-toggle');await shot('shelf-source-details','Source and difficulty detail disclosure stays distinct from mastery');
-  await page.locator('.shelf-open').filter({hasText:'静かな朝'}).click();await page.locator('.reader .tok.content').first().waitFor();await sleep(900);await shot('reader-initial','Actual Japanese text, reading controls, and clear return');
+  await page.locator('.shelf-item:not([data-recommendation]) .shelf-open').filter({hasText:'静かな朝'}).click();await page.locator('.reader .tok.content').first().waitFor();await sleep(900);await shot('reader-initial','Actual Japanese text, reading controls, and clear return');
   await role(/text settings/);await click('[data-dial="spacing:1"]');await click('[data-dial="furigana:2"]');await click('[data-dial="kanji:2"]');await shot('reader-settings','Independent kanji, furigana and spacing settings all accept deliberate input');await click('[data-dial="kanji:0"]');await click('[data-dial="furigana:1"]');await click('[data-dial="spacing:0"]');await role(/text settings/);
   const token=page.locator('.reader .tok.content').first();await token.click();await sleep(350);await shot('reader-reading-rung','First activation reveals reading without opening full entry');await token.click();await sleep(350);await shot('reader-gloss-rung','Second activation reveals meaning without taking over the reading');
   await token.click({delay:2500});await sleep(850);
