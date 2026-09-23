@@ -957,6 +957,10 @@ function actionContext() {
     NODE_KIND: { word: ['語', 'word'] },
     lookup: () => ({ r: 'うみ', m: ['sea'], seq: 'synthetic-deep-entry' }),
     commitStorePatch: (produce) => new Promise((settle) => queued.push({ produce, settle })),
+    // the record-ownership guard every capture crosses first (same model as the
+    // write-boundary probe below): an owned, current epoch is writable; nothing else
+    recordEpoch: 1, writable: true,
+    recordWritable: (epoch) => context.writable && epoch === context.recordEpoch,
   });
   const seal = () => {
     for (const key of ['taken', 'deepWords', 'readDone', 'obslog', 'srs', 'revlog', 'stats']) freezeJson(context.S[key]);
@@ -1004,6 +1008,10 @@ await verifiedAsync('deep-capture-context-and-promotion-cross-one-acknowledged-b
   pending = c.commitCapture({ t: 'word', id: '波', ctxScope: 'sent' }, '波', 114); acknowledge(); await pending;
   assert.equal(Object.hasOwn(c.S.taken[1], 'ctx'), false, 'Context requires real encounter provenance');
   assert.deepEqual(clone(c.S.srs), {}); assert.deepEqual(clone(c.S.revlog), []);
+  // the guard itself, exercised: an unwritable record queues nothing
+  const before = queued.length;
+  c.writable = false; assert.equal(await c.commitCapture(node, '海', 114), false); assert.equal(queued.length, before, 'An unwritable record queues no capture');
+  c.writable = true;
 });
 
 await verifiedAsync('observation-reducers-append-latest-with-no-pre-acknowledgment-publication', async () => {
@@ -1082,7 +1090,9 @@ await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-per
 verified('bounded-standard-review-executes-a-frozen-scoped-sitting', () => {
   const pool = Array.from({ length: 8 }, (_, id) => ({ t: 'word', id: String(id) }));
   const context = vm.createContext({ S: { view: 'tray' }, srsDueItems: () => pool, srsReviewLimit: () => 3,
-    srsKey: (type, id) => type + ':' + id, render: () => {} });
+    srsKey: (type, id) => type + ':' + id, render: () => {},
+    // a DOM focus helper startReview calls after rendering; no scheduling effect
+    focusKanjiReadingReview: () => {} });
   vm.runInContext(definitions('startReview'), context);
   context.startReview(); assert.equal(context.S.review.queue.length, 3); assert.equal(context.S.review.deferred, 5);
   assert.equal(pool.length, 8); assert.equal(context.S.review.declared, null); assert.equal(context.S.view, 'review');

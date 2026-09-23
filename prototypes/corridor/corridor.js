@@ -4841,7 +4841,13 @@ function renderShelfBody() {
     const strip = el('div', 'shelf-today-strip');
     strip.id = 'shelf-today';
     strip.dataset.day = day;
-    for (const p of picks) strip.append(shelfCard(p));
+    for (const p of picks) {
+      // a recommendation repeats a reading that already lives in its section;
+      // the identity lets a census count the collection, not the strip
+      const card = shelfCard(p);
+      card.dataset.recommendation = 'today';
+      strip.append(card);
+    }
     main.append(strip);
   }
 
