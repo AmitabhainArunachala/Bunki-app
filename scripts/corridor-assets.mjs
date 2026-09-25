@@ -48,6 +48,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'skip-core.js',
   'skip-ui.js',
   'skip-ui.css',
+  'register.css',
   'reference-core.js',
   'reference-ui.js',
   'reference-ui.css',

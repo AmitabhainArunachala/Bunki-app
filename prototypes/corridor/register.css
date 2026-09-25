@@ -1,0 +1,606 @@
+/* ============================================================================
+   回廊 KAIRO — the whole-app register. Landed as source 2026-09-25 from the
+   2026-09-24 study layer (bunki_review/2026-09-23/designs/whole-app). Loaded
+   after corridor.css; overrides only. <html data-room> is stamped natively by
+   corridor.js (stampRegister) — no observer, no telemetry.
+
+   Sources, in priority: his words ("flat and stale", "lack of depth, of
+   texture, of changing quality of the feel", "more pop and contrast … it can
+   be very subtle", "more real, never more decoration", T8 "collapse the
+   chrome"); the review's §7 ruling — 間 ma with 静's doors, 渦 at the door
+   and the return only; §8.5 relief between rooms; the standard's own three
+   materials (ground · raised paper · lacquer), one red.
+
+   The register is CSS-level relief that carries meaning: every room gets the
+   material of its purpose; the halls get hierarchy (three grades of door);
+   the attempt gets a sheet of paper and a receding chrome; understanding
+   gets lacquer; results get two sheets under section rules.
+   ========================================================================== */
+
+:root {
+  --display: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  --paper-shadow: 0 1px 0 rgba(28, 47, 66, 0.06), 0 6px 18px -12px rgba(28, 47, 66, 0.35);
+  --paper-edge: 1px solid rgba(28, 47, 66, 0.12);
+  --rule: 1px solid var(--line);
+  --stage: 0;
+  --t-display: 26px;
+  --t-section: 20px;
+  --t-read: 20px;
+}
+
+/* ---------------------------------------------------------------- 1 · CHROME
+   Seven equal circles above every room → one quiet mast. Ink text doors on a
+   hairline; the tools recede to glyphs; 覚 is a seal only when it counts. */
+.chrome {
+  gap: 14px;
+  padding: 10px 16px calc(8px + env(safe-area-inset-top)) 16px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--ground) 96%, transparent);
+  border-bottom: var(--rule);
+  backdrop-filter: none;
+}
+.chrome > button,
+.chrome .theme-seal,
+.chrome .chrome-search,
+.chrome .chrome-dojo {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0 2px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.chrome > button:first-child { /* 戻る back */
+  font-family: var(--display);
+  font-size: 17px;
+  line-height: 1.1;
+  text-align: start;
+}
+.chrome > button:first-child .l-ja { display: block; font-family: var(--display); font-size: 17px; color: var(--ink); }
+.chrome > button:first-child .en-sub,
+.chrome > button:last-child .en-sub { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em; color: var(--faint); }
+.chrome > button:last-child .l-ja { font-family: var(--display); font-size: 17px; }
+.chrome .crumb {
+  /* at phone width the mast is full; the crumb only fits when the chrome has
+     receded (the attempt), where it is the room's name beside 戻る */
+  display: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  position: static;
+  clip: auto;
+  clip-path: none;
+  font-family: var(--display);
+  font-size: 15px;
+  color: var(--ink-2);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chrome .chrome-search svg { width: 18px; height: 18px; }
+.chrome .chrome-dojo, .chrome .theme-seal { font-size: 14px; color: var(--ink-2); }
+.chrome .lang-seg {
+  border: var(--rule);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 0;
+  background: transparent;
+}
+.chrome .lang-seg > * {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  min-height: 0;
+}
+.chrome > button:last-child { /* 覚 lists — a seal only when it counts */
+  font-family: var(--display);
+  color: var(--ink-2);
+}
+
+/* T8 — during an attempt the chrome collapses to 戻る · progress · seal */
+html[data-room="attempt"] .chrome {
+  background: var(--ground);
+  border-bottom-color: var(--line-soft);
+}
+html[data-room="attempt"] .chrome .chrome-search,
+html[data-room="attempt"] .chrome .chrome-dojo,
+html[data-room="attempt"] .chrome .theme-seal,
+html[data-room="attempt"] .chrome .lang-seg,
+html[data-room="attempt"] .chrome > button:last-child { display: none; }
+html[data-room="attempt"] .chrome .crumb { display: block; color: var(--faint); font-size: 13px; }
+
+/* the stage bar — place in the sitting, 3 px of ink under the mast */
+html[data-room="attempt"] .chrome::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 3px;
+  background: linear-gradient(to right, var(--ink) 0 calc(var(--stage) * 100%), transparent calc(var(--stage) * 100%));
+  transition: background 240ms ease-out;
+}
+.chrome { position: sticky; }
+
+/* the one seal — the 回廊 glyph stays the only round thing in the house */
+.nav-symbol {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  box-shadow: var(--paper-shadow);
+}
+
+/* ------------------------------------------------------------- 2 · TYPE
+   Display in Shippori (the card's own metal-type face); body stays Hiragino
+   Mincho; labels in Hiragino Sans with air. Every H1 is a room name, so it is
+   set as one: display size, tight, no weight. */
+main h1.view-title,
+main h1.exam-heading,
+.assessment-room > h1 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--t-display);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  margin: 6px 0 6px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.view-title-en, .eyebrow {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+}
+/* the red rule above an eyebrow was the only red in the hall — ink now; red
+   is for what is wrong, what is read aloud, and 再 */
+.eyebrow::before, .shelf-eyebrow::before, .section-rule::before { background: var(--ink) !important; }
+main h2 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--t-section);
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------- 3 · SHELF
+   Three grades of door — rooms as washi plates · tools as stones · a
+   preference as a line — so the hall has hierarchy before it has type. */
+html[data-room="shelf"] .search-field {
+  background: transparent;
+  border: 0;
+  border-bottom: var(--rule);
+  border-radius: 0;
+  padding: 0 0 6px;
+  min-height: 40px;
+  font-size: 16px;
+  margin: 0 0 22px;
+  color: var(--ink-2);
+}
+html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
+#shelf-body { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+/* only the graded doors share a row; everything else on the shelf (reading cards, headings,
+   sections, notes) keeps the full measure — in the study every reading card fell into one of
+   six columns and shrank to 51 px at 390 (C1, 2026-09-25) */
+#shelf-body > :not(button.grammar-link) { grid-column: 1 / -1; }
+@media (max-width: 520px) {
+  #shelf-body button.grammar-link[data-grade="room"] { grid-column: 1 / -1; }
+  #shelf-body button.grammar-link[data-grade="tool"] { grid-column: span 3; }
+}
+#shelf-body .shelf-snippet.intro { font-size: 15px; color: var(--ink-2); margin: 0 0 14px; }
+#shelf-body button.grammar-link {
+  font-family: var(--display);
+  border-radius: 6px;
+  transition: transform 120ms ease-out, box-shadow 120ms ease-out;
+}
+#shelf-body button.grammar-link[data-grade="room"] {
+  grid-column: span 3;
+  min-height: 92px;
+  padding: 16px 14px;
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  box-shadow: var(--paper-shadow);
+  font-size: 22px;
+  text-align: start;
+}
+#shelf-body button.grammar-link[data-grade="tool"] {
+  grid-column: span 2;
+  min-height: 56px;
+  padding: 10px 12px;
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  box-shadow: none;
+  font-size: 17px;
+}
+#shelf-body button.grammar-link[data-grade="line"] {
+  grid-column: 1 / -1;
+  background: transparent;
+  border: 0;
+  border-top: var(--rule);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 14px 0 0;
+  margin-top: 6px;
+  font-size: 15px;
+  text-align: start;
+  color: var(--ink-2);
+}
+#shelf-body button.grammar-link small,
+#shelf-body button.grammar-link .en,
+#shelf-body button.grammar-link span:last-child {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+  margin-top: 4px;
+}
+#shelf-body button.grammar-link[data-grade="tool"] small,
+#shelf-body button.grammar-link[data-grade="tool"] span:last-child { display: none; }
+#shelf-body button.grammar-link[data-grade="room"]:nth-of-type(5) { grid-column: 1 / -1; font-size: 24px; }
+#shelf-body button.grammar-link[data-grade="room"]:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(28,47,66,0.06); }
+
+/* ------------------------------------------------------------ 4 · JLPT ROOM
+   A room, not a form: bilingual name, five level seals, three lengths as
+   sheets with the time beneath, the offered practice as one washi plate. */
+html[data-room="jlpt"] .assessment-room > h1.view-title::before {
+  content: 'JLPT の練習';
+  display: block;
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+html[data-room="jlpt"] .assessment-room > h1.view-title {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  font-weight: 400;
+}
+html[data-room="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); margin: 10px 0 18px; }
+.exam-levels { gap: 8px; margin: 0 0 14px; }
+.exam-levels .chip {
+  font-family: var(--display);
+  font-size: 18px;
+  min-width: 56px;
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: var(--paper-edge);
+  background: var(--ground-0);
+  box-shadow: none;
+  color: var(--ink-2);
+}
+.exam-levels .chip[aria-pressed="true"] {
+  color: var(--ground-0);
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: none;
+}
+.exam-lengths { gap: 10px; margin: 0 0 22px; }
+.exam-length {
+  border-radius: 6px;
+  border: var(--paper-edge);
+  background: var(--ground-0);
+  box-shadow: var(--paper-shadow);
+  padding: 14px 12px 12px;
+  font-family: var(--display);
+  font-size: 17px;
+  color: var(--ink);
+}
+.exam-length[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink), var(--paper-shadow); }
+.exam-length-time { font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); margin-top: 6px; }
+.assessment-room .exam-form {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  box-shadow: var(--paper-shadow);
+  border-radius: 6px;
+  padding: 18px 18px 14px;
+  margin: 0 0 14px;
+}
+.assessment-room .exam-form h2 { font-size: 22px; margin: 0 0 6px; }
+.assessment-room .exam-form .exam-skills,
+.assessment-room .exam-form .exam-status { font-family: var(--sans); font-size: 12px; letter-spacing: 0.06em; color: var(--ink-2); }
+.assessment-room .exam-form .exam-status { color: var(--faint); }
+.assessment-room h2.exam-section-heading {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  margin: 26px 0 10px;
+  padding-top: 12px;
+  border-top: var(--rule);
+}
+
+/* --------------------------------------------------------- 5 · THE ATTEMPT
+   The question is a sheet of paper on the ground. A section rule replaces
+   the bold title; the stem is the largest reading text; the choices are
+   numbered in the margin; the one navy verb is the commit. "Saved" does not
+   say so before an answer exists (§8.7). */
+html[data-room="attempt"] main { padding-top: 10px; }
+html[data-room="attempt"] h1.exam-heading {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  font-weight: 400;
+  margin: 8px 0 2px;
+}
+html[data-room="attempt"] .exam-progress {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  margin: 0 0 4px;
+}
+html[data-room="attempt"] .exam-timer { color: var(--red); font-variant-numeric: tabular-nums; }
+html[data-room="attempt"] .exam-save { margin: 0 0 10px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
+html[data-room="attempt"]:not([data-answered]) .exam-save { visibility: hidden; }
+html[data-room="attempt"] .exam-skill {
+  font-family: var(--display);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin: 12px 0 0;
+  padding-bottom: 6px;
+  border-bottom: var(--rule);
+}
+html[data-room="attempt"] .exam-prompt {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  box-shadow: var(--paper-shadow);
+  padding: 20px 18px 8px;
+  margin: 14px 0 0;
+  font-size: var(--t-read);
+  line-height: 1.9;
+  color: var(--ink);
+}
+html[data-room="attempt"] .exam-instruction {
+  background: var(--ground-0);
+  border-inline: var(--paper-edge);
+  margin: 0;
+  padding: 0 18px 12px;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+html[data-room="attempt"] .mock-opts {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+  box-shadow: var(--paper-shadow);
+  padding: 4px 10px 12px;
+  margin: 0 0 14px;
+  display: grid;
+  gap: 0;
+}
+html[data-room="attempt"] .mock-opt {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 13px 8px;
+  min-height: var(--tap);
+  font-size: 19px;
+  line-height: 1.6;
+  text-align: start;
+  color: var(--ink);
+  transition: background 120ms ease-out;
+}
+html[data-room="attempt"] .mock-opt:first-child { border-top: 0; }
+html[data-room="attempt"] .mock-opt:hover { background: var(--ai-wash); }
+html[data-room="attempt"] .mock-opt[aria-pressed="true"],
+html[data-room="attempt"] .mock-opt[aria-checked="true"],
+html[data-room="attempt"] .mock-opt.chosen,
+html[data-room="attempt"] .mock-opt.selected {
+  background: var(--ink);
+  color: var(--ground-0);
+  border-radius: 4px;
+  border-top-color: transparent;
+}
+html[data-room="attempt"] .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
+html[data-room="attempt"] .mock-opt.right { box-shadow: inset 3px 0 0 var(--ai); }
+html[data-room="attempt"] .mock-nav { display: flex; align-items: center; gap: 12px; }
+html[data-room="attempt"] #exam-flag,
+html[data-room="attempt"] .chip#exam-flag {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 8px 0;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--line);
+}
+html[data-room="attempt"] .exam-question-map summary,
+html[data-room="attempt"] .exam-leave-controls .chip {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+
+/* the threshold — one sheet, the rule stated, two doors of different weight */
+html[data-room="threshold"] .exam-confirm {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  box-shadow: var(--paper-shadow);
+  border-radius: 6px;
+  padding: 22px 20px;
+  margin-top: 12px;
+}
+html[data-room="threshold"] .exam-confirm h1 { font-size: 24px; }
+
+/* ------------------------------------------------------------- 6 · RESULTS
+   The number is the headline; two sheets under two section rules; the
+   wrong rows keep their red bar — the one screen that already read. */
+html[data-room="results"] .assessment-room > h1.view-title {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  font-weight: 400;
+}
+html[data-room="results"] .exam-score {
+  font-family: var(--display);
+  font-size: 44px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 2px 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+html[data-room="results"] .exam-score-note { font-size: 14px; color: var(--ink-2); margin: 0 0 18px; }
+html[data-room="results"] .exam-counts,
+html[data-room="results"] .exam-results-skills {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  box-shadow: var(--paper-shadow);
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin: 0 0 14px;
+}
+html[data-room="results"] .exam-counts dt { font-family: var(--sans); font-size: 11px; letter-spacing: 0.14em; color: var(--faint); }
+html[data-room="results"] .exam-counts dd { font-family: var(--display); font-size: 22px; margin: 0; font-variant-numeric: tabular-nums; }
+html[data-room="results"] .exam-results-skills .wrong { box-shadow: inset 3px 0 0 var(--red); padding-inline-start: 12px; }
+html[data-room="results"] .exam-followup { font-size: 15px; color: var(--ink-2); }
+html[data-room="results"] details.exam-answer {
+  border-top: var(--rule);
+  padding: 10px 0 10px 12px;
+  margin: 0;
+}
+html[data-room="results"] details.exam-answer.incorrect { box-shadow: inset 3px 0 0 var(--red); }
+html[data-room="results"] details.exam-answer.correct summary { color: var(--faint); }
+html[data-room="results"] details.exam-answer summary { font-size: 16px; line-height: 1.7; cursor: pointer; }
+html[data-room="results"] details.exam-answer.incorrect summary { color: var(--ink); }
+html[data-room="results"] #exam-sensei {
+  background: var(--ink);
+  color: var(--ground-0);
+  border: 0;
+  border-radius: 6px;
+  min-height: 48px;
+  padding: 0 18px;
+  font-family: var(--display);
+  font-size: 17px;
+}
+html[data-room="results"] #exam-undo-additions { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; color: var(--ink-2); }
+
+/* ----------------------------------------------------------- 7 · THE TUTOR
+   Understanding is a room of its own material: the lacquer stage, with
+   the learner's words and the tutor's on washi cards — the review card's
+   two materials, so attempt and understanding feel different. */
+html[data-room="tutor"] body, html[data-room="tutor"] { background: var(--sheet-ground); }
+html[data-room="tutor"] main {
+  background: var(--sheet-ground);
+  color: var(--sheet-ink);
+  --ink: var(--sheet-ink);
+  --ink-2: var(--sheet-ink-2);
+  --faint: var(--sheet-faint);
+  --faint-2: var(--sheet-faint-2);
+  --line: var(--sheet-line);
+  --line-soft: var(--sheet-line-soft);
+  --ai: var(--sheet-ai);
+  --ai-wash: var(--sheet-ai-wash);
+  --red: var(--sheet-red);
+  --red-wash: var(--sheet-red-wash);
+  --ground-0: var(--sheet-ground-0);
+  --ground-2: var(--sheet-ground-2);
+  min-height: 100vh;
+}
+html[data-room="tutor"] .chrome { background: var(--sheet-ground); border-bottom-color: var(--sheet-line-soft); }
+html[data-room="tutor"] .chrome > *, html[data-room="tutor"] .chrome .crumb, html[data-room="tutor"] .chrome .lang-seg > * { color: var(--sheet-ink-2); }
+html[data-room="tutor"] .chrome .lang-seg { border-color: var(--sheet-line); }
+html[data-room="tutor"] .chrome > button:first-child, html[data-room="tutor"] .chrome > button:first-child * { color: var(--sheet-ink); }
+html[data-room="tutor"] .chrome > button:first-child small, html[data-room="tutor"] .chrome > button:first-child span:last-child { color: var(--sheet-faint); }
+html[data-room="tutor"] .chrome > button:last-child, html[data-room="tutor"] .chrome > button:last-child * { color: var(--sheet-ink); }
+html[data-room="tutor"] .chrome .lang-seg > [aria-pressed="true"], html[data-room="tutor"] .chrome .lang-seg > .on { background: var(--sheet-ink); color: var(--sheet-ground); }
+/* the sentence under discussion sits on a washi card — the review card's material — on the lacquer stage */
+html[data-room="tutor"] .teacher-context {
+  background: var(--card-ground);
+  color: var(--card-ink);
+  --ink: var(--card-ink); --ink-2: var(--card-ink-2); --faint: var(--card-faint); --faint-2: var(--card-faint-2); --line: var(--card-line); --line-soft: var(--card-line-soft); --red: var(--card-red); --red-wash: var(--card-red-wash); --ai: var(--card-ai); --ai-wash: var(--card-ai-wash); --ground-0: var(--card-ground-0); --ground-2: var(--card-ground-2);
+  border-radius: 6px;
+  padding: 18px 18px 14px;
+  margin: 8px 0 18px;
+  box-shadow: 0 14px 34px -20px rgba(0,0,0,0.9);
+}
+html[data-room="tutor"] .teacher-context .chip { background: transparent; border: 1px solid var(--card-line); color: var(--card-ink); }
+html[data-room="tutor"] main button:not(.chip) { background: var(--sheet-ground-2); color: var(--sheet-ink); border: 1px solid var(--sheet-line); }
+html[data-room="tutor"] main .view-title { color: var(--sheet-ink); }
+html[data-room="tutor"] .chat-log .chat-row { border: 0; }
+html[data-room="tutor"] .chat-row.tutor, html[data-room="tutor"] .chat-row[data-role="assistant"], html[data-room="tutor"] .chat-row.teacher {
+  background: var(--card-ground);
+  color: var(--card-ink);
+  --ink: var(--card-ink); --ink-2: var(--card-ink-2); --faint: var(--card-faint); --line: var(--card-line); --red: var(--card-red); --ai: var(--card-ai);
+  border-radius: 6px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 30px -18px rgba(0,0,0,0.8);
+}
+html[data-room="tutor"] .search-field, html[data-room="tutor"] select, html[data-room="tutor"] textarea, html[data-room="tutor"] input {
+  background: var(--sheet-ground-2);
+  color: var(--sheet-ink);
+  border-color: var(--sheet-line);
+}
+html[data-room="tutor"] .teacher-note { color: var(--sheet-faint); }
+html[data-room="tutor"] .chat-row { display: flex; gap: 10px; align-items: stretch; }
+html[data-room="tutor"] .chat-row .chat-field { flex: 1 1 auto; border-radius: 6px; }
+html[data-room="tutor"] main button.chat-send, html[data-room="tutor"] main .take { background: var(--sheet-ai); color: var(--sheet-ground); border: 0; border-radius: 6px; font-family: var(--display); min-width: 64px; }
+html[data-room="tutor"] .teacher-context-label, html[data-room="tutor"] label { color: var(--sheet-faint); }
+
+/* ------------------------------------------------------ 8 · THE REPORT RAIL
+   Codex's report doors stay, as two text doors on a hairline; they recede
+   during an attempt and go dark on lacquer. */
+#bunki-reports-root .br-rail {
+  background: color-mix(in srgb, var(--ground) 94%, transparent);
+  border: 0;
+  border-top: var(--rule);
+  border-left: var(--rule);
+  border-radius: 6px 0 0 0;
+  box-shadow: none;
+}
+#bunki-reports-root .br-rail button, #bunki-reports-root .br-rail a {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  border: 0;
+  background: transparent;
+}
+html[data-room="attempt"] #bunki-reports-root .br-rail { opacity: 0.55; }
+html[data-room="attempt"] #bunki-reports-root .br-rail:hover, html[data-room="attempt"] #bunki-reports-root .br-rail:focus-within { opacity: 1; }
+html[data-room="tutor"] #bunki-reports-root .br-rail { background: var(--sheet-ground-2); border-color: var(--sheet-line-soft); }
+html[data-room="tutor"] #bunki-reports-root .br-rail button { color: var(--sheet-ink-2); }
+
+/* ----------------------------------------------------------------- 9 · MOTION
+   Rooms lift in like a sheet set down (120 ms). Reduced motion: appear. */
+@keyframes kairo-lift { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+html[data-room] #app > main > * { animation: kairo-lift 160ms ease-out both; }
+html[data-room="attempt"] #app > main > * { animation-duration: 120ms; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room] #app > main > * { animation: none; }
+  html[data-room="attempt"] .chrome::after { transition: none; }
+}
+
+/* ------------------------------------------------------------- 10 · WIDE
+   On a desk the house keeps the phone's measure and centres it. */
+@media (min-width: 820px) {
+  main { max-width: 720px; }
+  html[data-room="attempt"] .exam-prompt { padding: 26px 26px 10px; font-size: 22px; }
+  html[data-room="attempt"] .mock-opt { font-size: 20px; }
+}
