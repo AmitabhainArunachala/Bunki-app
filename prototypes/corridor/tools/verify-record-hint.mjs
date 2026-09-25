@@ -666,10 +666,38 @@ const waitNoOffer = (page, timeout) =>
   page.waitForFunction(() => window.__hintProbe?.offerVisible() === false, null, { timeout }).then(() => true, () => false);
 const waitQueries = (page, above, timeout) =>
   page.waitForFunction((n) => (window.__hintProbe?.queryStarts ?? 0) > n, above, { timeout }).then(() => true, () => false);
-const waitLockFree = (page, timeout) => page.waitForFunction(async (name) => {
+// BEGIN resolved-value polling helper: exact reviewed F repair implementation.
+async function pollNativeState(check, { timeoutMs, description, intervalMs = 50 }) {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || !Number.isFinite(intervalMs) || intervalMs <= 0)
+    throw new TypeError('Native-state polling requires positive finite bounds');
+  const deadline = performance.now() + timeoutMs;
+  const timeoutError = new Error(`Timed out after ${timeoutMs}ms waiting for ${description}`);
+  timeoutError.name = 'TimeoutError';
+  let deadlineTimer, intervalTimer;
+  const expired = new Promise((resolve, reject) => { deadlineTimer = setTimeout(() => reject(timeoutError), timeoutMs); });
+  try {
+    while (true) {
+      if (performance.now() >= deadline) throw timeoutError;
+      // evaluate has no Playwright timeout; bound even an evaluation that never settles.
+      const observed = await Promise.race([Promise.resolve().then(check), expired]);
+      if (performance.now() >= deadline) throw timeoutError;
+      if (observed === true) return;
+      if (observed !== false) throw new TypeError('Native-state predicate must resolve to a boolean');
+      await Promise.race([new Promise(resolve => {
+        intervalTimer = setTimeout(resolve, Math.min(intervalMs, Math.max(0, deadline - performance.now())));
+      }), expired]);
+    }
+  } finally { clearTimeout(deadlineTimer); clearTimeout(intervalTimer); }
+}
+// END resolved-value polling helper.
+const waitLockFree = (page, timeout) => pollNativeState(() => page.evaluate(async (name) => {
   const snapshot = await window.__hintProbe.raw.query();
   return !snapshot.held.some((row) => row.name === name);
-}, RECORD_LOCK, { timeout, polling: 100 }).then(() => true, () => false);
+}, RECORD_LOCK), { timeoutMs: timeout, intervalMs: 100, description: 'native record lock clearance' }).catch(error => {
+  const failure = new Error(`Failed setup: native record lock clearance (${String(error?.message ?? error)})`, { cause: error });
+  failure.name = 'FixtureSetupError';
+  throw failure;
+});
 const setHidden = (page, hidden) => page.evaluate((hidden) => window.__hintProbe.setHidden(hidden), hidden);
 const setControl = (page, patch) => page.evaluate((patch) => { Object.assign(window.__hintProbe.control, patch); }, patch);
 async function settle(page, n, how) {
