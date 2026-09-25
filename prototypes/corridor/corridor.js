@@ -17274,6 +17274,11 @@ function renderReview(main) {
   if (S.reviewMore) {
     const moreRow = el('div', 'zen-more-row');
     renderReviewUndo(moreRow, rv);
+    if (maintenanceReports) {
+      const report = el('button', 'chip report-door', tx('問題を報告', 'Report a problem')); report.type = 'button';
+      report.dataset.reportEntry = 'open'; report.addEventListener('click', () => maintenanceReports.openReport());
+      moreRow.append(report);
+    }
     const rest2 = biLabel('button', 'chip review-rest', '休ませる', 'rest this card');
     rest2.type = 'button';
     rest2.id = 'review-rest';
@@ -22531,6 +22536,7 @@ function renderSheet(root) {
       first.focus();
     }
   });
+  if (maintenanceReports) sheet.append(reportEntries('report-line-sheet'));
   root.append(sheet);
 
   // The sheet keeps its place across a full re-render: 筆順 carries the
@@ -23653,6 +23659,12 @@ function buildGingaChrome(root) {
     render();
   });
   bar.append(dojo);
+  if (maintenanceReports) {
+    const report = el('button', 'nav-report', tx('問題を報告', 'Report a problem')); report.type = 'button';
+    report.dataset.reportEntry = 'open';
+    report.addEventListener('click', () => { S.navOpen = false; render(); maintenanceReports.openReport(); });
+    bar.append(report);
+  }
   root.append(bar);
 
   const shelf = biLabel('button', 'corner-bubble bubble-shelf', '本棚', 'bookshelf');
@@ -24055,6 +24067,7 @@ function render() {
     main.replaceChildren();
     renderRoomError(main, S.view, error);
   }
+  if (maintenanceReports && !['drift', 'entry'].includes(S.view)) main.append(reportEntries());
 
   renderSheet(root);
   renderStrokePage(root);
@@ -24117,9 +24130,21 @@ function maintenanceContext() {
     action_trace: maintenanceNavigation.slice(),
   };
 }
+let maintenanceReports = null;
+/** The report entry lives in the page's own flow — never a layer over its controls. */
+function reportEntries(className) {
+  const line = el('p', `report-line ${className || ''}`.trim());
+  const open = el('button', 'report-door', tx('問題を報告', 'Report a problem')); open.type = 'button';
+  open.dataset.reportEntry = 'open'; open.addEventListener('click', () => maintenanceReports?.openReport());
+  const list = el('button', 'report-door', tx('送った報告', 'My reports')); list.type = 'button';
+  list.dataset.reportEntry = 'list'; list.addEventListener('click', () => maintenanceReports?.openReports());
+  line.append(open, list);
+  return line;
+}
 function mountMaintenanceReports() {
   if (!window.BunkiReports) return;
-  window.BunkiReports.mount({
+  maintenanceReports = window.BunkiReports.mount({
+    rail: false,
     serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
     getContext: maintenanceContext,
     clockNotice: () => {

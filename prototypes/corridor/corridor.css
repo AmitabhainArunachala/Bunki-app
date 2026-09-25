@@ -7508,3 +7508,11 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 /* One carrier for the reason: while a room says why it cannot write, the fixed
  * store banner (same text, same reload) would only cover the room's title. */
 body:has(#app main .room-state[data-room-state='blocked']) #store-alert { display: none; }
+
+/* The report entry, in the page's own flow (2026-09-25): quiet, last on the page,
+ * never a layer over a control. The focused stage carries it in its more-row. */
+.report-line { display: flex; flex-wrap: wrap; gap: .25rem 1rem; justify-content: center; margin: 3rem 0 1.5rem; }
+.report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
+.report-line-sheet { margin: 2rem 0 .5rem; }
+body.zen main > .report-line { display: none; }
