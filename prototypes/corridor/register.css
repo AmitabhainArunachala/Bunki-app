@@ -20,12 +20,17 @@
 :root {
   --display: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
   --paper-shadow: 0 1px 0 rgba(28, 47, 66, 0.06), 0 6px 18px -12px rgba(28, 47, 66, 0.35);
-  --paper-edge: 1px solid rgba(28, 47, 66, 0.12);
+  --paper-edge: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
   --rule: 1px solid var(--line);
   --stage: 0;
   --t-display: 26px;
   --t-section: 20px;
   --t-read: 20px;
+}
+/* the five night worlds (corridor.js setKairoTheme): a ベロ藍 shadow vanishes on a dark
+   ground, so night paper casts a black one, never a glow */
+:root:is([data-theme="rokusho"], [data-theme="yoru"], [data-theme="nami"], [data-theme="hakuu"], [data-theme="kaku"]) {
+  --paper-shadow: 0 1px 0 rgba(0, 0, 0, 0.35), 0 8px 20px -12px rgba(0, 0, 0, 0.7);
 }
 
 /* ---------------------------------------------------------------- 1 · CHROME
@@ -68,14 +73,15 @@
 .chrome > button:last-child .en-sub { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em; color: var(--faint); }
 .chrome > button:last-child .l-ja { font-family: var(--display); font-size: 17px; }
 .chrome .crumb {
-  /* at phone width the mast is full; the crumb only fits when the chrome has
-     receded (the attempt), where it is the room's name beside 戻る */
-  display: none;
+  /* the mast is full; the crumb is shown only where the chrome has receded (the
+     attempt), as the room's name beside 戻る. Elsewhere it is hidden visually, as
+     corridor.css does on phones, so screen readers keep the room path */
   flex: 1 1 auto;
   min-width: 0;
-  position: static;
-  clip: auto;
-  clip-path: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
   font-family: var(--display);
   font-size: 15px;
   color: var(--ink-2);
@@ -83,6 +89,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* the crumb was the mast's spacer: the door after it takes the push, so 戻る stands
+   alone and the tools sit right (phones keep corridor.css's space-between) */
+@media (min-width: 441px) {
+  .chrome > .crumb + * { margin-inline-start: auto; }
 }
 .chrome .chrome-search svg { width: 18px; height: 18px; }
 .chrome .chrome-dojo, .chrome .theme-seal { font-size: 14px; color: var(--ink-2); }
@@ -113,10 +124,9 @@ html[data-room="attempt"] .chrome {
 }
 html[data-room="attempt"] .chrome .chrome-search,
 html[data-room="attempt"] .chrome .chrome-dojo,
-html[data-room="attempt"] .chrome .theme-seal,
 html[data-room="attempt"] .chrome .lang-seg,
 html[data-room="attempt"] .chrome > button:last-child { display: none; }
-html[data-room="attempt"] .chrome .crumb { display: block; color: var(--faint); font-size: 13px; }
+html[data-room="attempt"] .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--faint); font-size: 13px; }
 
 /* the stage bar — place in the sitting, 3 px of ink under the mast */
 html[data-room="attempt"] .chrome::after {
@@ -139,7 +149,8 @@ html[data-room="attempt"] .chrome::after {
 /* ------------------------------------------------------------- 2 · TYPE
    Display in Shippori (the card's own metal-type face); body stays Hiragino
    Mincho; labels in Hiragino Sans with air. Every H1 is a room name, so it is
-   set as one: display size, tight, no weight. */
+   set as one: display size, tight. fonts.css ships Shippori at weight 800 only,
+   so the 500 asked for below renders at 800. */
 main h1.view-title,
 main h1.exam-heading,
 .assessment-room > h1 {
@@ -204,13 +215,14 @@ html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
   box-shadow: var(--paper-shadow);
   font-size: 22px;
   text-align: start;
+  align-items: flex-start;
 }
 #shelf-body button.grammar-link[data-grade="tool"] {
   grid-column: span 2;
   min-height: 56px;
   padding: 10px 12px;
   background: var(--ground-2);
-  border: 1px solid var(--line-soft);
+  border: var(--paper-edge);
   box-shadow: none;
   font-size: 17px;
 }
@@ -250,21 +262,6 @@ html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
 /* ------------------------------------------------------------ 4 · JLPT ROOM
    A room, not a form: bilingual name, five level seals, three lengths as
    sheets with the time beneath, the offered practice as one washi plate. */
-html[data-room="jlpt"] .assessment-room > h1.view-title::before {
-  content: 'JLPT の練習';
-  display: block;
-  font-family: var(--display);
-  font-size: 30px;
-  line-height: 1.2;
-  margin-bottom: 2px;
-}
-html[data-room="jlpt"] .assessment-room > h1.view-title {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--faint);
-  font-weight: 400;
-}
 html[data-room="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); margin: 10px 0 18px; }
 .exam-levels { gap: 8px; margin: 0 0 14px; }
 .exam-levels .chip {
@@ -343,7 +340,8 @@ html[data-room="attempt"] .exam-progress {
 }
 html[data-room="attempt"] .exam-timer { color: var(--red); font-variant-numeric: tabular-nums; }
 html[data-room="attempt"] .exam-save { margin: 0 0 10px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
-html[data-room="attempt"]:not([data-answered]) .exam-save { visibility: hidden; }
+html[data-room="attempt"]:not([data-answered]) .exam-save,
+html[data-room="attempt"]:not([data-answered]) .mock-attempt-policy { visibility: hidden; }
 html[data-room="attempt"] .exam-skill {
   font-family: var(--display);
   font-size: 13px;
@@ -353,7 +351,8 @@ html[data-room="attempt"] .exam-skill {
   padding-bottom: 6px;
   border-bottom: var(--rule);
 }
-html[data-room="attempt"] .exam-prompt {
+html[data-room="attempt"] .exam-prompt,
+html[data-room="attempt"] .mock-q {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-bottom: 0;
@@ -375,7 +374,8 @@ html[data-room="attempt"] .exam-instruction {
   letter-spacing: 0.06em;
   color: var(--faint);
 }
-html[data-room="attempt"] .mock-opts {
+html[data-room="attempt"] .mock-opts,
+html[data-room="attempt"] .mock-q + .lesson-options {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-top: 0;
@@ -386,7 +386,30 @@ html[data-room="attempt"] .mock-opts {
   display: grid;
   gap: 0;
 }
-html[data-room="attempt"] .mock-opt {
+/* audio, an image or a notice can stand between the prompt and the choices: a piece
+   that ends or starts the sheet alone keeps its own edge, and a passage is its own paper */
+html[data-room="attempt"] .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)),
+html[data-room="attempt"] .exam-instruction:not(:has(+ .mock-opts)) {
+  border-bottom: var(--paper-edge);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  box-shadow: var(--paper-shadow);
+}
+html[data-room="attempt"] :not(.exam-prompt, .exam-instruction) + .mock-opts {
+  border-top: var(--paper-edge);
+  border-radius: 6px;
+  margin-top: 12px;
+}
+html[data-room="attempt"] .exam-passage {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  border-radius: 6px;
+  box-shadow: var(--paper-shadow);
+  padding: 16px 18px;
+}
+html[data-room="attempt"] .mock-opt,
+html[data-room="attempt"] .lesson-option {
+  font-family: var(--serif);
   background: transparent;
   border: 0;
   border-top: 1px solid var(--line-soft);
@@ -400,12 +423,17 @@ html[data-room="attempt"] .mock-opt {
   color: var(--ink);
   transition: background 120ms ease-out;
 }
-html[data-room="attempt"] .mock-opt:first-child { border-top: 0; }
-html[data-room="attempt"] .mock-opt:hover { background: var(--ai-wash); }
+html[data-room="attempt"] .mock-opt:first-child,
+html[data-room="attempt"] .lesson-option:first-child { border-top: 0; }
+@media (hover: hover) {
+  html[data-room="attempt"] .mock-opt:hover,
+  html[data-room="attempt"] .lesson-option:hover { background: var(--ai-wash); }
+}
 html[data-room="attempt"] .mock-opt[aria-pressed="true"],
 html[data-room="attempt"] .mock-opt[aria-checked="true"],
 html[data-room="attempt"] .mock-opt.chosen,
-html[data-room="attempt"] .mock-opt.selected {
+html[data-room="attempt"] .mock-opt.selected,
+html[data-room="attempt"] .lesson-option.picked {
   background: var(--ink);
   color: var(--ground-0);
   border-radius: 4px;
@@ -486,7 +514,7 @@ html[data-room="results"] details.exam-answer {
   padding: 10px 0 10px 12px;
   margin: 0;
 }
-html[data-room="results"] details.exam-answer.incorrect { box-shadow: inset 3px 0 0 var(--red); }
+html[data-room="results"] details.exam-answer.incorrect { box-shadow: inset 3px 0 0 var(--red); border-inline-start: 0; }
 html[data-room="results"] details.exam-answer.correct summary { color: var(--faint); }
 html[data-room="results"] details.exam-answer summary { font-size: 16px; line-height: 1.7; cursor: pointer; }
 html[data-room="results"] details.exam-answer.incorrect summary { color: var(--ink); }
@@ -500,6 +528,17 @@ html[data-room="results"] #exam-sensei {
   font-family: var(--display);
   font-size: 17px;
 }
+/* the older sets' review (the N1 検収前 path) is paper too; every row keeps a margin so
+   the red bar on a wrong one never sits on its × */
+html[data-room="review"] .mock-review {
+  background: var(--ground-0);
+  border: var(--paper-edge);
+  box-shadow: var(--paper-shadow);
+  border-radius: 6px;
+  padding: 4px 18px;
+}
+html[data-room="review"] .mock-review-row { padding-inline-start: 12px; }
+html[data-room="review"] .mock-review-row.wrong { box-shadow: inset 3px 0 0 var(--red); }
 html[data-room="results"] #exam-undo-additions { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; color: var(--ink-2); }
 
 /* ----------------------------------------------------------- 7 · THE TUTOR
@@ -507,7 +546,8 @@ html[data-room="results"] #exam-undo-additions { background: transparent; border
    the learner's words and the tutor's on washi cards — the review card's
    two materials, so attempt and understanding feel different. */
 html[data-room="tutor"] body, html[data-room="tutor"] { background: var(--sheet-ground); }
-html[data-room="tutor"] main {
+html[data-room="tutor"] main,
+.exam-why-sheet {
   background: var(--sheet-ground);
   color: var(--sheet-ink);
   --ink: var(--sheet-ink);
@@ -522,8 +562,13 @@ html[data-room="tutor"] main {
   --red-wash: var(--sheet-red-wash);
   --ground-0: var(--sheet-ground-0);
   --ground-2: var(--sheet-ground-2);
-  min-height: 100vh;
 }
+html[data-room="tutor"] main { min-height: 100vh; }
+/* the why sheet (T6) is understanding, not the attempt: the tutor's material as a sheet,
+   and its verdict red only when the answer was wrong */
+.exam-why-sheet { border-radius: 6px; padding: 18px 18px 14px; margin: 10px 0 16px; }
+.exam-why-verdict { font-family: var(--display); font-size: 22px; }
+.exam-why-verdict[data-verdict="incorrect"] { color: var(--red); }
 html[data-room="tutor"] .chrome { background: var(--sheet-ground); border-bottom-color: var(--sheet-line-soft); }
 html[data-room="tutor"] .chrome > *, html[data-room="tutor"] .chrome .crumb, html[data-room="tutor"] .chrome .lang-seg > * { color: var(--sheet-ink-2); }
 html[data-room="tutor"] .chrome .lang-seg { border-color: var(--sheet-line); }
@@ -589,6 +634,9 @@ html[data-room-entering][data-room="attempt"] #app > main > * { animation-durati
    On a desk the house keeps the phone's measure and centres it. */
 @media (min-width: 820px) {
   main { max-width: 720px; }
-  html[data-room="attempt"] .exam-prompt { padding: 26px 26px 10px; font-size: 22px; }
-  html[data-room="attempt"] .mock-opt { font-size: 20px; }
+  body:not([data-view="entry"], [data-view="drift"]) .chrome { padding-inline: max(16px, calc((100% - 720px) / 2 + 16px)); }
+  html[data-room="attempt"] .exam-prompt,
+  html[data-room="attempt"] .mock-q { padding: 26px 26px 10px; font-size: 22px; }
+  html[data-room="attempt"] .mock-opt,
+  html[data-room="attempt"] .lesson-option { font-size: 20px; }
 }

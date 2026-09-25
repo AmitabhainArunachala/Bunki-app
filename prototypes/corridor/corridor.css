@@ -5966,10 +5966,10 @@ body.zen .review-example {
 }
 .dictionary-retry {
   min-height: var(--tap);
-  border: 1px solid var(--indigo);
+  border: 1px solid var(--ai);
   border-radius: 7px;
   background: transparent;
-  color: var(--indigo);
+  color: var(--ai);
   padding: 7px 14px;
   margin: 0 0 12px;
   font: inherit;
@@ -5980,7 +5980,7 @@ body.zen .review-example {
   align-items: center;
   min-height: var(--tap);
   margin: -13px 0;
-  color: var(--indigo);
+  color: var(--ai);
   text-underline-offset: 3px;
 }
 .dictionary-entry {
@@ -6003,7 +6003,7 @@ body.zen .review-example {
   border: 0;
   border-bottom: 1px solid var(--line-soft);
   background: transparent;
-  color: var(--indigo);
+  color: var(--ai);
   text-align: left;
   font: inherit;
   cursor: pointer;
@@ -6090,7 +6090,7 @@ body.zen .review-example {
   border: 0;
   border-bottom: 1px solid var(--line-soft);
   background: transparent;
-  color: var(--indigo);
+  color: var(--ai);
   text-align: left;
   font: inherit;
   cursor: pointer;
@@ -7471,10 +7471,10 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .exam-levels .chip[aria-pressed="true"], .exam-length[aria-pressed="true"] {
   border-color: currentColor; box-shadow: inset 0 -3px currentColor;
 }
-.exam-length { flex: 1 1 150px; min-width: 0; padding: 1rem; border: 1px solid #76808066;
+.exam-length { flex: 1 1 150px; min-width: 0; padding: 1rem; border: 1px solid var(--line);
   border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: start; }
 .exam-length-time { display: block; font-size: .78em; margin-top: .4rem; line-height: 1.5; }
-.exam-form { padding: 1.25rem 0; border-bottom: 1px solid #76808044; }
+.exam-form { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
 .exam-form h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
 .exam-form .take { margin: 1rem 0 .5rem; }
 .exam-skills { font-size: .86rem; line-height: 1.6; }
@@ -7488,14 +7488,14 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .exam-save { margin: .35rem 0 1.2rem; opacity: .75; }
 .exam-skill { font-size: .85rem; }
 .exam-prompt { white-space: pre-wrap; margin: 1.3rem 0 .65rem; }
-.exam-passage { white-space: pre-wrap; border-inline-start: 2px solid #76808066; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.exam-passage { white-space: pre-wrap; border-inline-start: 2px solid var(--line); padding-inline-start: 1rem; margin: 1.5rem 0; }
 .exam-passage h2 { font-size: 1.1rem; }
 .exam-passage p { margin: 0; }
 .assessment-room .mock-opts { display: grid; gap: .6rem; margin-block: 1rem; }
 .assessment-room .mock-opt { width: 100%; min-height: 52px; text-align: start; overflow-wrap: anywhere;
   font-size: 1rem; color: inherit; background: transparent; padding: .6rem .85rem;
   border: 1px solid var(--line, #76808066); border-radius: .4rem; }
-.assessment-room .mock-opt[aria-pressed="true"] { outline: 2px solid currentColor; background: #76808022; }
+.assessment-room .mock-opt[aria-pressed="true"] { outline: 2px solid currentColor; background: var(--line-soft); }
 .exam-question-map { margin: 1.2rem 0; }
 .exam-question-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: .5rem; }
 .exam-question-grid .chip { padding: .5rem; min-height: 44px; }
@@ -7506,9 +7506,9 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .exam-counts div { min-width: 70px; }
 .exam-counts dt { font-size: .8rem; }
 .exam-counts dd { margin: .35rem 0; font-size: 1.4rem; }
-.exam-results-skills, .exam-followup { padding: 1rem 0; border-block: 1px solid #76808044; }
+.exam-results-skills, .exam-followup { padding: 1rem 0; border-block: 1px solid var(--line); }
 .exam-answer { margin: 1rem 0; line-height: 1.7; }
-.exam-answer.incorrect { border-inline-start: 2px solid #a74b3e; padding-inline-start: .75rem; }
+.exam-answer.incorrect { border-inline-start: 2px solid var(--red); padding-inline-start: .75rem; }
 .exam-rationale { white-space: pre-wrap; }
 .exam-conditions, .exam-audio-status { font-size: .86rem; line-height: 1.7; }
 .exam-conditions summary { cursor: pointer; padding: .5rem 0; }
@@ -7520,7 +7520,7 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
  * size, on word, sentence and question backs alike. No badge, colour, icon or rule of its own. */
 .review-face .assessment-review-assisted { margin: .75rem 0 0; font-size: var(--t-chrome, 13px); line-height: 1.6; color: var(--ink-2, #4a5d70); }
 body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a453a); }
-.exam-notice { border-inline-start: 3px solid #a74b3e; padding: .75rem; line-height: 1.6; }
+.exam-notice { border-inline-start: 3px solid var(--red); padding: .75rem; line-height: 1.6; }
 .exam-image { max-width: 100%; height: auto; }
 @media (max-width: 480px) {
   .exam-lengths { gap: .4rem; }
@@ -7578,8 +7578,8 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 .reader-choice { margin: 8px 0 14px; }
 .reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: 12px; letter-spacing: 0.08em; }
 .reader-choice-row { display: flex; align-items: center; gap: 9px; width: 100%; min-height: var(--tap); padding: 7px 1px;
-  border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; color: var(--indigo); text-align: left; font: inherit; cursor: pointer; }
-.reader-choice-row:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+  border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; color: var(--ai); text-align: left; font: inherit; cursor: pointer; }
+.reader-choice-row:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
 .reader-choice-more,
 .reader-choice-note,
 .reader-choice-capture { margin: 6px 0 10px; font-size: 12px; line-height: 1.6; color: var(--faint); }

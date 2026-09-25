@@ -190,7 +190,9 @@ export function createAssessmentView(host) {
     main.append(block);
   }
   function renderCatalog(main) {
-    main.append(node('h1', 'view-title', tx('JLPT 模試・練習', 'JLPT tests & practice')));
+    const heading = node('h1', 'view-title', 'JLPT 模試・練習'); heading.lang = 'ja';
+    if (host.english()) { const en = node('span', 'en-inline', 'JLPT tests & practice'); en.lang = 'en'; heading.append(en); }
+    main.append(heading);
     main.append(node('p', 'exam-intro', tx('級と長さを選んで、今できることを確かめよう。', 'Choose your level and how much time you have.')));
     const levels = node('div', 'exam-levels'); levels.setAttribute('role', 'group'); levels.setAttribute('aria-label', tx('級', 'Level'));
     for (const value of ['N5', 'N4', 'N3', 'N2', 'N1']) {
@@ -463,8 +465,9 @@ export function createAssessmentView(host) {
     const title = node('h2', '', tx('解説', 'Explanation')); title.id = 'exam-why-title'; title.tabIndex = -1;
     const rule = node('p', 'exam-rationale', explanation.rule || tx('この問題の解説はまだありません。', 'No explanation has been written for this question yet.'));
     if (explanation.rule) rule.lang = 'ja';
-    sheet.append(title,
-      node('p', 'exam-why-verdict', explanation.verdict === 'correct' ? tx('正解。', 'Correct.') : tx('不正解。', 'Incorrect.')),
+    const verdict = node('p', 'exam-why-verdict', explanation.verdict === 'correct' ? tx('正解。', 'Correct.') : tx('不正解。', 'Incorrect.'));
+    verdict.dataset.verdict = explanation.verdict;
+    sheet.append(title, verdict,
       node('p', '', `${tx('あなたの回答', 'Your answer')}: ${explanation.chosen.text}`),
       node('p', '', `${tx('正解', 'Correct answer')}: ${explanation.key.text}`), rule,
       node('p', 'exam-why-absent', tx('ほかの選択肢が違う理由は、まだ書かれていません。', 'Why the other choices are wrong hasn’t been written yet.')),
