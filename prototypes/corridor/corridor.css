@@ -7516,6 +7516,10 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
   border-inline-start: 2px solid var(--edge, #76808066); line-height: 1.8; overflow-wrap: anywhere; }
 .assessment-review-context h2 { font: inherit; font-weight: 600; letter-spacing: normal; }
 .assessment-review-context p { white-space: pre-wrap; font-size: 1rem; }
+/* G1: a card from an assisted answer says so once, in the register's secondary ink at chrome
+ * size, on word, sentence and question backs alike. No badge, colour, icon or rule of its own. */
+.review-face .assessment-review-assisted { margin: .75rem 0 0; font-size: var(--t-chrome, 13px); line-height: 1.6; color: var(--ink-2, #4a5d70); }
+body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a453a); }
 .exam-notice { border-inline-start: 3px solid #a74b3e; padding: .75rem; line-height: 1.6; }
 .exam-image { max-width: 100%; height: auto; }
 @media (max-width: 480px) {
