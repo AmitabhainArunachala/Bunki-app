@@ -278,6 +278,18 @@ try {
     const leaked = await page.waitForSelector('#mock-next', { timeout: 3_000 }).then(() => true, () => false);
     const still = await page.evaluate(() => !!document.querySelector('button[data-study-door="mock"]'));
     check('T14 a late download after leaving starts nothing and does not pull the learner back', !leaked && still, JSON.stringify({ leaked, still }));
+    // leave AND return before the download lands: the stale tap still must not start the set
+    let releaseAgain; const heldAgain = new Promise((done) => { releaseAgain = done; });
+    await context.unroute('**/data/mock/n1-03.json');
+    await context.route('**/data/mock/n1-04.json', async (route) => { await heldAgain; await route.continue(); });
+    await page.locator('button[data-study-door="mock"]').click(); await catalogComplete(page);
+    const door4 = await page.locator('[data-legacy-set="n1-04"]').waitFor({ timeout: 10_000 }).then(() => true, () => false);
+    if (door4) await page.locator('[data-legacy-set="n1-04"]').click();
+    await page.locator('#chrome-dojo').click();
+    await page.locator('button[data-study-door="mock"]').click(); await catalogComplete(page);
+    releaseAgain();
+    const replayed = await page.waitForSelector('#mock-next', { timeout: 3_000 }).then(() => true, () => false);
+    check('T14 leave and return before the download lands: the stale tap does not start the set', door4 && !replayed, JSON.stringify({ door4, replayed }));
     await context.close();
   }
 

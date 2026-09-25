@@ -23776,6 +23776,9 @@ function render() {
   stopAssessmentQuestionForRender();
   syncPracticeClock();
   if (lastRenderedView === 'feed' && S.view !== 'feed') publisherOpenRequest += 1;
+  // leaving the JLPT room cancels any older-set start still downloading: returning later must
+  // not replay a stale tap
+  if (lastRenderedView === 'mock' && S.view !== 'mock') olderStartToken += 1;
   removeMini();
   // Rebuilding #app empties the page for a moment, and the browser clamps
   // window scroll to 0 — so a double-tap for a gloss, opening a sheet, or
