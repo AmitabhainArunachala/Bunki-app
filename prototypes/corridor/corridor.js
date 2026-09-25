@@ -23612,6 +23612,38 @@ function buildGingaChrome(root) {
   root.append(shelf, sensei);
 }
 
+/* The whole-app register (register.css) gives each purpose its own material. It keys on
+ * <html data-room>, stamped here after every render from what the room actually drew — the
+ * same rules the 2026-09-24 register study walked across 13 rooms — plus the attempt's stage
+ * (--stage), whether an answer exists (data-answered), and the shelf's three grades of door. */
+const REGISTER_ROOM_DOORS = ['いまの日本を読む', '日本語を持ち込む', '参考書庫', 'レッスン', 'JLPT の練習'];
+const REGISTER_LINE_DOORS = ['読み物の好み'];
+function stampRegister() {
+  const html = document.documentElement;
+  const main = document.querySelector('#app > main');
+  const room = document.body.classList.contains('ginga') || !main ? 'door'
+    : main.querySelector('.mock-opts') ? 'attempt'
+      : main.querySelector('.exam-confirm') ? 'threshold'
+        : main.querySelector('.exam-score') ? 'results'
+          : main.querySelector('.exam-levels') ? 'jlpt'
+            : main.querySelector('.chat-log') ? 'tutor'
+              : main.querySelector('#shelf-body') ? 'shelf'
+                : main.querySelector('.mock-review') ? 'review' : 'hall';
+  if (html.dataset.room !== room) html.dataset.room = room;
+  const progress = document.querySelector('.exam-progress');
+  const counted = ((progress?.firstElementChild || progress)?.textContent || '').match(/(\d+)\s*(?:of|\/)\s*(\d+)/);
+  if (counted) html.style.setProperty('--stage', String(Number(counted[1]) / Number(counted[2])));
+  else html.style.removeProperty('--stage');
+  const opts = document.querySelector('.mock-opts');
+  if (opts?.querySelector('[aria-pressed="true"], [aria-checked="true"], .chosen, .selected, .is-selected')) html.dataset.answered = '1';
+  else delete html.dataset.answered;
+  for (const door of document.querySelectorAll('#shelf-body button.grammar-link:not([data-grade])')) {
+    const label = (door.textContent || '').replace(/\s+/g, ' ').trim();
+    door.dataset.grade = REGISTER_ROOM_DOORS.some((name) => label.startsWith(name)) ? 'room'
+      : REGISTER_LINE_DOORS.some((name) => label.startsWith(name)) ? 'line' : 'tool';
+  }
+}
+
 /** The visible state of a room that failed to draw. Keeps drafts; logs the fault. */
 function renderRoomError(main, view, error) {
   console.error(`room ${view} failed to render`, error);
@@ -24032,6 +24064,7 @@ function render() {
     if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
   }
   lastRenderedView = S.view;
+  stampRegister();
   // every navigation passes through here — keep the Back sentinel honest
   syncWalkSentinel();
 }

@@ -38,6 +38,7 @@ const SHELL = [
   'corridor.js',
   'maintenance/report-client.js',
   'maintenance/report-client.css',
+  'register.css',
   'reading-controller.mjs',
   'teacher-context.mjs',
   'teacher-drafts.mjs',
