@@ -725,53 +725,80 @@ if (propertyMode) await check('generated-learning-handler-histories', async () =
  * browser time zone and stays with the browser checks; it is listed as pending, not passed. */
 let reference;
 async function referenceChecks() {
-  const pin = JSON.parse(readFileSync(resolve(site || root, 'data/fsrs-pin.json'), 'utf8'));
-  assert.equal(pin.algorithm, 'FSRS-6'); assert.equal(pin.enableFuzz, false);
-  const declared = (w = pin.w) => fsrsApi.generatorParameters({ w, request_retention: pin.requestRetention,
-    maximum_interval: pin.maximumInterval, enable_fuzz: pin.enableFuzz, enable_short_term: pin.enableShortTerm,
-    learning_steps: pin.learningSteps, relearning_steps: pin.relearningSteps });
-  const R = fsrsApi.Rating;
-  const at = (iso) => new Date(iso);
-  const fittedW = pin.w.map((value, i) => (i < 4 ? Number((value * 1.5).toFixed(4)) : value));
-  const V3 = [[R.Good, '2026-09-01T00:00:00Z'], [R.Good, '2026-09-02T00:00:00Z'], [R.Good, '2026-09-06T00:00:00Z'], [R.Good, '2026-09-13T00:00:00Z']];
-  const vectors = [
-    ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V1-new-${rating}`, history: [], now: '2026-09-25T00:00:00Z', rating })),
-    ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating })),
-    ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating })),
-    ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating })),
-    { id: 'V5-overdue-good', history: V3, now: '2026-10-25T00:00:00Z', rating: R.Good },
-    { id: 'V7-fitted-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, fitted: true },
-  ];
-  const rows = [];
-  for (const vector of vectors) {
-    const expectedScheduler = fsrsApi.fsrs(declared(vector.fitted ? fittedW : pin.w));
-    let card = fsrsApi.createEmptyCard(at(vector.history[0]?.[1] || vector.now));
-    for (const [rating, when] of vector.history) card = expectedScheduler.next(card, at(when), rating).card;
-    const expected = expectedScheduler.next(card, at(vector.now), vector.rating).card;
-    const f = fixture(vector.history.length ? { srs: { 'word:学校': { ...card, due: card.due.toISOString(),
-      ...(card.last_review ? { last_review: card.last_review.toISOString() } : {}) } } } : {});
-    // the app's own construction of its scheduler from the same pin (and the fitted weights for V7)
-    f.c.scheduler = fsrsApi.fsrs(fsrsApi.generatorParameters(f.c.pinnedSchedulerInput(pin, vector.fitted ? fittedW : null)));
-    const key = { [R.Again]: 'again', [R.Hard]: 'hard', [R.Good]: 'good', [R.Easy]: 'easy' }[vector.rating];
-    const pending = grade(f, { rating: vector.rating, key, now: at(vector.now), day: vector.now.slice(0, 10) });
-    f.ack(true);
-    assert.equal(await pending, true, `${vector.id}: the app committed its grade`);
-    const actual = f.durable().srs['word:学校'];
-    const mismatch = [];
-    for (const field of ['state', 'reps', 'lapses', 'scheduled_days', 'elapsed_days', 'learning_steps']) {
-      if (actual[field] !== expected[field]) mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+  const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
+  const pinPath = resolve(site || root, 'data/fsrs-pin.json');
+  const pinBytes = readFileSync(pinPath);
+  const pin = JSON.parse(pinBytes.toString('utf8'));
+  // the receipt is written from finally: an early failure keeps the vectors that ran and the one that failed
+  reference = { format: 'kairo-fsrs-reference-vectors', v: 2, pass: false, rows: [],
+    identity: { pinSha256: sha(pinBytes), vendorSha256: sha(readFileSync(resolve(root, 'vendor/ts-fsrs.mjs'))),
+      verifierSha256: sha(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: sha(source), programSha256: sha(program),
+      parameterSetId: pin.parameterSetId, pinnedVersion: pin.pinnedVersion },
+    pending: ['V6-local-midnight (browser time zone)', 'native boot selection of fitted vs default weights (srsParamsProblem/srsCustom), restart, export/restore — browser witness'],
+    controls: ['Good→Easy: in commitStandardGrade, `[rating]` → `[rating === fsrsApi.Rating.Good ? fsrsApi.Rating.Easy : rating]` must fail every Good vector',
+      'ignored fitted weights: in pinnedSchedulerInput, `w: fittedW || pin.w` → `w: pin.w` must fail V7a and V7b'] };
+  try {
+    assert.equal(pin.algorithm, 'FSRS-6'); assert.equal(pin.enableFuzz, false);
+    const declared = (w) => fsrsApi.generatorParameters({ w, request_retention: pin.requestRetention,
+      maximum_interval: pin.maximumInterval, enable_fuzz: pin.enableFuzz, enable_short_term: pin.enableShortTerm,
+      learning_steps: pin.learningSteps, relearning_steps: pin.relearningSteps });
+    const R = fsrsApi.Rating, S = fsrsApi.State;
+    const at = (iso) => new Date(iso);
+    // fitted weights differ in the initial-stability weights (w0–3, used by a new card) AND in a
+    // mature-transition weight (w8, recall-stability growth), so both V7 vectors can tell them apart
+    const fittedW = pin.w.map((value, i) => (i < 4 ? Number((value * 1.5).toFixed(4)) : i === 8 ? Number((value + 0.3).toFixed(4)) : value));
+    const V3 = [[R.Good, '2026-09-01T00:00:00Z'], [R.Good, '2026-09-02T00:00:00Z'], [R.Good, '2026-09-06T00:00:00Z'], [R.Good, '2026-09-13T00:00:00Z']];
+    const vectors = [
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V1-new-${rating}`, history: [], now: '2026-09-25T00:00:00Z', rating, state: S.New })),
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Learning })),
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating, state: S.Review })),
+      ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Relearning })),
+      { id: 'V5-overdue-good', history: V3, now: '2026-10-25T00:00:00Z', rating: R.Good, state: S.Review },
+      { id: 'V7a-fitted-new-good', history: [], now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.New, fitted: true },
+      { id: 'V7b-fitted-mature-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
+    ];
+    const stored = (card) => ({ ...card, due: card.due.toISOString(), ...(card.last_review ? { last_review: card.last_review.toISOString() } : {}) });
+    for (const vector of vectors) {
+      const weights = vector.fitted ? fittedW : pin.w;
+      const expectedScheduler = fsrsApi.fsrs(declared(weights));
+      let card = fsrsApi.createEmptyCard(at(vector.history[0]?.[1] || vector.now));
+      for (const [rating, when] of vector.history) card = expectedScheduler.next(card, at(when), rating).card;
+      const row = { id: vector.id, variant: vector.fitted ? 'fitted' : 'default', history: vector.history, now: vector.now, rating: vector.rating,
+        before: stored(card), pass: false, mismatch: [] };
+      reference.rows.push(row);
+      assert.equal(card.state, vector.state, `${vector.id}: the declared card is in the labelled state`);
+      const expected = expectedScheduler.next(card, at(vector.now), vector.rating).card;
+      if (vector.fitted) {
+        // the fitted vector must be able to fail: default and fitted weights disagree on this exact input
+        const otherwise = fsrsApi.fsrs(declared(pin.w)).next(card, at(vector.now), vector.rating).card;
+        assert.notEqual(otherwise.stability, expected.stability, `${vector.id}: default and fitted weights must differ here`);
+      }
+      const f = fixture(vector.history.length ? { srs: { 'word:学校': stored(card) } } : {});
+      // the app's own construction of its scheduler from the same pin (and the fitted weights for V7)
+      f.c.scheduler = fsrsApi.fsrs(fsrsApi.generatorParameters(f.c.pinnedSchedulerInput(pin, vector.fitted ? fittedW : null)));
+      const key = { [R.Again]: 'again', [R.Hard]: 'hard', [R.Good]: 'good', [R.Easy]: 'easy' }[vector.rating];
+      const pending = grade(f, { rating: vector.rating, key, now: at(vector.now), day: vector.now.slice(0, 10) });
+      f.ack(true);
+      assert.equal(await pending, true, `${vector.id}: the app committed its grade`);
+      const actual = f.durable().srs['word:学校'];
+      row.expected = stored(expected); row.actual = actual;
+      for (const field of ['state', 'reps', 'lapses', 'scheduled_days', 'elapsed_days', 'learning_steps']) {
+        if (actual[field] !== expected[field]) row.mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+      }
+      if (actual.due !== expected.due.toISOString()) row.mismatch.push(`due ${actual.due} ≠ ${expected.due.toISOString()}`);
+      const expectedLast = expected.last_review ? expected.last_review.toISOString() : undefined;
+      if (actual.last_review !== expectedLast) row.mismatch.push(`last_review ${actual.last_review} ≠ ${expectedLast}`);
+      for (const field of ['stability', 'difficulty']) {
+        if (!(Math.abs(actual[field] - expected[field]) <= 1e-9)) row.mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+      }
+      row.pass = row.mismatch.length === 0;
     }
-    if (actual.due !== expected.due.toISOString()) mismatch.push(`due ${actual.due} ≠ ${expected.due.toISOString()}`);
-    for (const field of ['stability', 'difficulty']) {
-      if (!(Math.abs(actual[field] - expected[field]) <= 1e-9)) mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
-    }
-    rows.push({ id: vector.id, pass: mismatch.length === 0, mismatch });
+    reference.pass = reference.rows.length === vectors.length && reference.rows.every((row) => row.pass);
+    const failed = reference.rows.filter((row) => !row.pass);
+    assert.equal(failed.length, 0, JSON.stringify(failed.map(({ id, mismatch }) => ({ id, mismatch }))));
+  } finally {
+    writeFileSync(resolve(out, 'learning-reference.json'), JSON.stringify(reference, null, 2) + '\n');
   }
-  reference = { format: 'kairo-fsrs-reference-vectors', v: 1, pin: { parameterSetId: pin.parameterSetId, pinnedVersion: pin.pinnedVersion },
-    rows, pending: ['V6-local-midnight (browser time zone)'], pass: rows.every((row) => row.pass) };
-  writeFileSync(resolve(out, 'learning-reference.json'), JSON.stringify(reference, null, 2) + '\n');
-  const failed = rows.filter((row) => !row.pass);
-  assert.equal(failed.length, 0, JSON.stringify(failed));
 }
 if (referenceMode) await check('pinned-fsrs-reference-vectors', referenceChecks);
 
