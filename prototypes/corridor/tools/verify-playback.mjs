@@ -1,5 +1,8 @@
 /** Real reader navigation with deterministic browser audio doubles. These
- * probes establish playback lifecycle behavior, not voice or codec quality. */
+ * probes establish playback lifecycle behavior, not voice or codec quality.
+ * Since 2026-09-25 (D13b) there is no device voice and no automatic voice: the
+ * recorded modes choose アミ explicitly, the speech double must never be called,
+ * and a passage with nothing playable keeps its listen door shut with a reason. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -31,6 +34,9 @@ async function fixture(mode) {
     }
     return route.continue();
   });
+  if (mode !== 'tts' && mode !== 'unchosen') {
+    await context.addInitScript(() => { try { localStorage.setItem('kairo-rec-voice-v1', 'ami'); } catch { /* double */ } });
+  }
   await context.addInitScript(() => {
     const audio = { utterances: [], clips: [], cancels: 0 };
     window.__playbackFixture = audio;
@@ -59,6 +65,7 @@ async function fixture(mode) {
 }
 
 async function press(page) { await page.locator('#listen-toggle').click(); }
+const listenShut = (page) => page.evaluate(() => document.querySelector('#listen-toggle')?.disabled === true);
 async function counts(page) {
   return page.evaluate(() => ({
     utterances: window.__playbackFixture.utterances.map((u) => u.text),
@@ -98,46 +105,50 @@ async function check(name, mode, body) {
 }
 
 try {
-  await check('passage-switch-cancels-tts', 'tts', async ({ page }) => {
-    await press(page);
-    await started(page, 'utterances');
-    const before = await counts(page);
-    await switchPassage(page);
+  await check('no-recordings-listen-is-shut-and-silent', 'tts', async ({ page }) => {
+    assert.equal(await listenShut(page), true, 'with no recordings the listen door is shut');
+    await page.locator('#listen-toggle').click({ force: true }).catch(() => {});
+    await page.waitForTimeout(350);
     const after = await counts(page);
-    assert.equal(after.pressed, 'false');
-    assert.equal(after.cancels, before.cancels + 1);
-    await page.evaluate(() => window.__playbackFixture.utterances[0].onend());
-    await page.waitForTimeout(350); // exceed the reader's inter-sentence timer
-    assert.equal((await counts(page)).utterances.length, 1);
+    assert.equal(after.utterances.length, 0, 'no device voice, ever');
+    assert.equal(after.clips.length, 0);
+    assert.match(after.note, /no recorded voices|収録音声がありません/u);
   });
-  await check('stale-tts-events-cannot-change-a-restarted-read', 'tts', async ({ page }) => {
+  await check('no-chosen-voice-listen-is-shut-and-silent', 'unchosen', async ({ page }) => {
+    assert.equal(await listenShut(page), true, 'no voice chosen: the door is shut');
+    const after = await counts(page);
+    assert.equal(after.utterances.length, 0); assert.equal(after.clips.length, 0);
+    assert.match(after.note, /recorded only in Koharune Ami|小春音アミ（仮の声・検収前）の収録だけ/u);
+  });
+  await check('stale-clip-events-cannot-change-a-restarted-read', 'recorded', async ({ page }) => {
     await press(page);
-    await started(page, 'utterances');
+    await started(page, 'clips');
     await press(page);
     await press(page);
-    await started(page, 'utterances', 2);
+    await started(page, 'clips', 2);
     await page.evaluate(() => {
-      const old = window.__playbackFixture.utterances[0];
-      old.onend();
-      old.onerror({ error: 'synthesis-failed' });
+      const old = window.__playbackFixture.clips[0];
+      old.onended?.();
+      old.onerror?.();
     });
     await page.waitForTimeout(350);
     const active = await counts(page);
-    assert.equal(active.utterances.length, 2);
+    assert.equal(active.clips.length, 2, 'a stale clip cannot advance the restarted read');
     assert.equal(active.pressed, 'true');
-    assert.ok(!/no Japanese voice/.test(active.note));
-    await page.evaluate(() => window.__playbackFixture.utterances[1].onend());
-    await started(page, 'utterances', 3);
+    assert.ok(!/could not play|再生できません/u.test(active.note), 'a stale failure does not stop the live read');
+    assert.equal(active.utterances.length, 0);
+    await page.evaluate(() => window.__playbackFixture.clips[1].onended());
+    await started(page, 'clips', 3);
   });
-  await check('reader-settings-keep-the-active-passage-playing', 'tts', async ({ page }) => {
+  await check('reader-settings-keep-the-active-recording-playing', 'recorded', async ({ page }) => {
     await press(page);
-    await started(page, 'utterances');
-    const before = await counts(page);
+    await started(page, 'clips');
     await page.locator('#dials-toggle').click();
     const after = await counts(page);
     assert.equal(after.pressed, 'true');
-    assert.equal(after.cancels, before.cancels);
-    assert.equal(after.utterances.length, 1);
+    assert.equal(after.clips.length, 1);
+    assert.equal(after.clips[0].paused, false);
+    assert.equal(after.utterances.length, 0);
   });
   await check('passage-switch-pauses-recording-and-ignores-late-error', 'recorded', async ({ page }) => {
     await press(page);
@@ -151,28 +162,26 @@ try {
     await page.waitForTimeout(350);
     const active = await counts(page);
     assert.equal(active.pressed, 'true');
-    assert.equal(active.utterances.length, 0, 'old clip failure cannot start old-passage TTS');
+    assert.equal(active.utterances.length, 0, 'old clip failure cannot start any device voice');
     assert.equal(active.clips.length, 2);
     await page.evaluate(() => window.__playbackFixture.clips[1].onended());
     await started(page, 'clips', 3);
     assert.match((await counts(page)).clips[2].src, /yasashii_6-001\.m4a$/);
   });
-  await check('late-manifest-starts-only-the-current-passage', 'delayed', async ({ page, release }) => {
-    await press(page);
+  await check('late-manifest-opens-listen-for-the-current-passage', 'delayed', async ({ page, release }) => {
+    assert.equal(await listenShut(page), true, 'listen is shut while recordings are still being checked');
     await switchPassage(page);
-    assert.equal((await counts(page)).pressed, 'false');
-    await press(page);
     release();
+    await page.waitForFunction(() => document.querySelector('#listen-toggle') && !document.querySelector('#listen-toggle').disabled, null, { timeout: 5000 });
+    await press(page);
     await started(page, 'clips');
-    await page.waitForTimeout(350);
     const active = await counts(page);
     assert.equal(active.clips.length, 1);
     assert.match(active.clips[0].src, /yasashii_6-000\.m4a$/);
     assert.equal(active.pressed, 'true');
   });
-  await check('stop-before-manifest-arrival-stays-stopped', 'delayed', async ({ page, release }) => {
-    await press(page);
-    await press(page);
+  await check('a-shut-door-pressed-while-checking-starts-nothing-later', 'delayed', async ({ page, release }) => {
+    await page.locator('#listen-toggle').click({ force: true }).catch(() => {});
     release();
     await page.waitForTimeout(350);
     const after = await counts(page);
@@ -180,13 +189,14 @@ try {
     assert.equal(after.clips.length, 0);
     assert.equal(after.utterances.length, 0);
   });
-  await check('current-recording-failure-falls-back-to-tts', 'recorded', async ({ page }) => {
+  await check('current-recording-failure-stops-with-a-reason-and-no-device-voice', 'recorded', async ({ page }) => {
     await press(page);
     await started(page, 'clips');
     await page.evaluate(() => window.__playbackFixture.clips[0].onerror());
-    await started(page, 'utterances');
-    assert.equal((await counts(page)).pressed, 'true');
-    assert.match((await counts(page)).note, /interim device voice/, 'fallback names the voice actually in use');
+    await page.waitForFunction(() => document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5000 });
+    const after = await counts(page);
+    assert.equal(after.utterances.length, 0, 'no fallback voice of any kind');
+    assert.match(after.note, /could not play|再生できません/u, 'the failure is named');
   });
 } finally {
   await browser.close();
@@ -197,7 +207,7 @@ const failures = results.filter((row) => !row.pass).length;
 writeFileSync(resolve(out, 'verify-playback.json'), `${JSON.stringify({
   site: CORRIDOR_DIR,
   corridorSha256: createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'))).digest('hex'),
-  simulatedBrowser: 'Chromium', audio: 'deterministic speech and media doubles; no voice-quality claim',
+  simulatedBrowser: 'Chromium', audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
   results, failures,
 }, null, 2)}\n`);
 console.log(`Playback lifecycle: ${results.length - failures}/${results.length} passed.`);
