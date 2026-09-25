@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { sha256Hex } from '@bunki/ai/hash';
+import { inputHashOf, sha256Hex } from '@bunki/ai/hash';
+import { revisionOf } from '../src/common.ts';
 import { artifactReference, createMediaVersion } from '../src/content.ts';
 import {
   beginAttemptV2,
@@ -392,5 +393,401 @@ describe('shared listening stimulus', () => {
     );
     expect(practice.conditions).toContain('audio-replayed');
     expect(practice.audio[0]!.starts).toBe(2);
+  });
+});
+
+describe('per-item explanation after a committed practice answer', () => {
+  const practice = { ...initial, mode: 'practice' };
+  const answered = () =>
+    update(
+      beginAttemptV2(paper, practice),
+      { kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } },
+      100,
+    );
+  const explain = (attempt: AssessmentAttemptV2, itemId = 'one', elapsed = 200) =>
+    update(attempt, { kind: 'assistance', itemId, reason: 'explanation' }, elapsed);
+  type Stored = {
+    mode: string;
+    recordedAt: number;
+    conditions: string[];
+    assistanceAttribution?: string;
+    events: { kind: string }[];
+    answers: {
+      response: unknown;
+      reached: boolean;
+      assistance?: { kind: string; at: number; response: unknown };
+    }[];
+  };
+  // Re-seal an edited copy with a valid public digest, so parse must judge the content.
+  function reseal(attempt: AssessmentAttemptV2, edit: (state: Stored) => void) {
+    const {
+      revisionId: _revisionId,
+      sha256: _sha256,
+      ...payload
+    } = JSON.parse(JSON.stringify(attempt)) as Stored & { revisionId: string; sha256: string };
+    edit(payload);
+    return revisionOf('attempt-v2', payload);
+  }
+
+  it('records one mark with a canonical copy of the committed answer, then locks the answer', () => {
+    const before = answered();
+    const marked = explain(before);
+    expect(marked.revision).toBe(before.revision + 1);
+    expect(marked.answers[0]!.assistance).toEqual({
+      kind: 'explanation',
+      at: NOW + 200,
+      response: { kind: 'selected', optionId: 'b' },
+    });
+    expect(inputHashOf(marked.answers[0]!.assistance!.response)).toBe(
+      inputHashOf(marked.answers[0]!.response),
+    );
+    expect(marked.conditions).toContain('assisted');
+    expect(marked.events.filter((entry) => entry.kind === 'assistance')).toHaveLength(1);
+    for (const response of [{ kind: 'selected', optionId: 'a' }, { kind: 'unanswered' }] as const)
+      expect(() => update(marked, { kind: 'answer', itemId: 'one', response }, 300)).toThrow(
+        /answer-locked-after-assistance/u,
+      );
+    let later = update(marked, { kind: 'flag', itemId: 'one', flagged: true }, 300);
+    later = update(later, { kind: 'visit', itemId: 'two' }, 400);
+    later = update(later, { kind: 'visit', itemId: 'one' }, 500);
+    const submitted = update(later, { kind: 'submit' }, 600);
+    expect(submitted.answers[0]).toMatchObject({
+      response: { kind: 'selected', optionId: 'b' },
+      flagged: true,
+      assistance: marked.answers[0]!.assistance,
+    });
+    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(submitted))).revisionId).toBe(
+      submitted.revisionId,
+    );
+  });
+
+  it('reopens without a tick or a revision, but still refuses a stale command', () => {
+    const marked = explain(answered());
+    const again = explain(marked, 'one', 900);
+    expect(again.revisionId).toBe(marked.revisionId);
+    expect(again.clock).toEqual(marked.clock);
+    expect(again.events).toEqual(marked.events);
+    expect(() =>
+      updateAttemptV2(paper, marked, {
+        expectedRevisionId: `assessment-attempt-v2:${'c'.repeat(64)}`,
+        now: NOW + 900,
+        monotonicMs: 900,
+        clockSessionId: 'session:one',
+        action: { kind: 'assistance', itemId: 'one', reason: 'explanation' },
+      }),
+    ).toThrow(/stale-checkpoint/u);
+  });
+
+  it('carries inherited unknown attribution through a later lawful explanation', () => {
+    // S: an admitted active practice state with two selected answers (the second current),
+    // the aggregate condition, and no item mark or assistance event: a parser-valid legacy shape.
+    const payload = {
+      format: 'kairo-assessment-attempt',
+      v: 2,
+      protocol: 'assessment-delivery/v2',
+      attemptId: 'attempt:legacy',
+      scope,
+      form: { ...artifactReference(paper), kind: 'form' },
+      mode: 'practice',
+      priorExposure: 'unknown',
+      editorialAtStart: { status: 'unreviewed', policyVersion: null, decisionRevisionIds: [] },
+      startedAt: NOW,
+      recordedAt: NOW + 2000,
+      endedAt: null,
+      status: 'in-progress',
+      revision: 4,
+      previousRevisionId: `assessment-attempt-v2:${'d'.repeat(64)}`,
+      cursor: { blockId: 'block:grammar', itemId: 'two' },
+      clock: {
+        sessionId: 'session:one',
+        lastWallMs: NOW + 2000,
+        lastMonotonicMs: 2000,
+        elapsedMs: 2000,
+        interrupted: false,
+      },
+      conditions: ['assisted'],
+      blocks: [
+        {
+          blockId: 'block:grammar',
+          status: 'open',
+          startedAt: NOW,
+          startedElapsedMs: 0,
+          deadlineAt: null,
+          elapsedMs: 2000,
+          closedAt: null,
+          closeReason: null,
+        },
+      ],
+      answers: paper.items.map((entry, index) => ({
+        item: { ...artifactReference(entry), kind: 'item' },
+        response:
+          index < 2 ? { kind: 'selected', optionId: index === 0 ? 'b' : 'a' } : { kind: 'unanswered' },
+        reached: index < 2,
+        flagged: false,
+        elapsedMs: index < 2 ? 1000 : 0,
+      })),
+      audio: [],
+      events: [{ kind: 'block-opened', at: NOW, blockId: 'block:grammar', detail: 'block:grammar' }],
+    };
+    const sha256 = inputHashOf(payload);
+    const stored = { ...payload, revisionId: `assessment-attempt-v2:${sha256}`, sha256 };
+    const legacy = parseAttemptV2(paper, JSON.parse(JSON.stringify(stored)));
+    expect(inputHashOf(legacy)).toBe(inputHashOf(stored));
+    expect('assistanceAttribution' in legacy).toBe(false);
+    // One lawful explanation on the current answer keeps the inherited uncertainty.
+    const marked = updateAttemptV2(paper, legacy, {
+      expectedRevisionId: legacy.revisionId,
+      now: NOW + 3000,
+      monotonicMs: 3000,
+      clockSessionId: 'session:one',
+      action: { kind: 'assistance', itemId: 'two', reason: 'explanation' },
+    });
+    expect(marked.assistanceAttribution).toBe('unknown');
+    expect(marked.answers.filter((entry) => entry.assistance).map((entry) => entry.item.id)).toEqual([
+      'two',
+    ]);
+    const reread = parseAttemptV2(
+      paper,
+      JSON.parse(JSON.stringify(update(marked, { kind: 'submit' }, 3500))),
+    );
+    expect(reread.assistanceAttribution).toBe('unknown');
+    expect(reread.answers[1]!.response).toEqual({ kind: 'selected', optionId: 'a' });
+    expect(reread.answers[1]!.assistance?.response).toEqual({ kind: 'selected', optionId: 'a' });
+    // A fresh attempt's first explanation records nothing extra.
+    const fresh = explain(
+      update(
+        update(answered(), { kind: 'visit', itemId: 'two' }, 150),
+        { kind: 'answer', itemId: 'two', response: { kind: 'selected', optionId: 'a' } },
+        160,
+      ),
+      'two',
+      200,
+    );
+    expect('assistanceAttribution' in fresh).toBe(false);
+    // The record needs the aggregate condition and at least one item mark.
+    const orphan = reseal(fresh, (state) => {
+      state.assistanceAttribution = 'unknown';
+      delete state.answers[1]!.assistance;
+    });
+    expect(() => parseAttemptV2(paper, orphan)).toThrow(/assistance\.attribution/u);
+  });
+
+  it('checks a marked item retry like a first request before its no-op', () => {
+    const marked = explain(answered());
+    // An earlier mark must not make an unsupported item-specific request look accepted.
+    expect(() =>
+      update(marked, { kind: 'assistance', itemId: 'one', reason: 'hint' }, 300),
+    ).toThrow(/assistance-reason/u);
+    const away = update(marked, { kind: 'visit', itemId: 'two' }, 300);
+    expect(() => explain(away, 'one', 400)).toThrow(/assistance-not-current-item/u);
+    // Back on the marked item, a valid reopen is the exact previous state.
+    const back = update(away, { kind: 'visit', itemId: 'one' }, 500);
+    const reopened = explain(back, 'one', 900);
+    expect(reopened.revisionId).toBe(back.revisionId);
+    expect(inputHashOf(reopened)).toBe(inputHashOf(back));
+    expect(reopened.clock).toEqual(back.clock);
+    expect(reopened.events).toEqual(back.events);
+    expect(() =>
+      updateAttemptV2(paper, back, {
+        expectedRevisionId: marked.revisionId,
+        now: NOW + 900,
+        monotonicMs: 900,
+        clockSessionId: 'session:one',
+        action: { kind: 'assistance', itemId: 'one', reason: 'explanation' },
+      }),
+    ).toThrow(/stale-checkpoint/u);
+    // The historical command without an item stays lawful after a mark, adding its event.
+    const generic = update(back, { kind: 'assistance', reason: 'hint' }, 600);
+    expect(generic.revision).toBe(back.revision + 1);
+    expect(generic.events.filter((entry) => entry.kind === 'assistance')).toHaveLength(2);
+    expect(generic.answers.filter((entry) => entry.assistance)).toHaveLength(1);
+  });
+
+  it('refuses a mark before an answer, off the current item, for another reason, or while timed', () => {
+    expect(() => explain(beginAttemptV2(paper, practice))).toThrow(/assistance-before-answer/u);
+    const moved = update(answered(), { kind: 'visit', itemId: 'two' }, 150);
+    expect(() => explain(moved, 'one')).toThrow(/assistance-not-current-item/u);
+    expect(() => explain(moved, 'two')).toThrow(/assistance-before-answer/u);
+    expect(() =>
+      update(answered(), { kind: 'assistance', itemId: 'one', reason: 'hint' }, 200),
+    ).toThrow(/assistance-reason/u);
+    const timed = update(
+      beginAttemptV2(paper, initial),
+      { kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } },
+      100,
+    );
+    expect(() => explain(timed)).toThrow(/assistance-in-timed-mode/u);
+  });
+
+  it('keeps terminal and deadline behaviour: once closed there is no mark and no timed exception', () => {
+    const submitted = update(answered(), { kind: 'submit' }, 300);
+    expect(explain(submitted, 'one', 400)).toEqual(submitted);
+    const timed = update(
+      beginAttemptV2(paper, initial),
+      { kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } },
+      100,
+    );
+    const expired = explain(timed, 'one', 61_000);
+    expect(expired.status).toBe('submitted');
+    expect(expired.answers[0]!.assistance).toBeUndefined();
+    expect(expired.conditions).not.toContain('assisted');
+  });
+
+  it('rejects inconsistent stored marks, but cannot authenticate a jointly re-sealed answer', () => {
+    const marked = explain(answered());
+    const rejects = (edit: (state: Stored) => void, reason: RegExp) =>
+      expect(() => parseAttemptV2(paper, reseal(marked, edit))).toThrow(reason);
+    rejects((state) => {
+      state.answers[0]!.response = { kind: 'selected', optionId: 'a' };
+    }, /assistance\.copy/u);
+    rejects((state) => {
+      state.answers[0]!.assistance!.response = { kind: 'selected', optionId: 'a' };
+    }, /assistance\.copy/u);
+    rejects((state) => {
+      state.answers[0]!.response = { kind: 'unanswered' };
+      state.answers[0]!.assistance!.response = { kind: 'unanswered' };
+    }, /assistance\.response/u);
+    rejects((state) => {
+      state.answers[1]!.assistance = {
+        kind: 'explanation',
+        at: NOW + 200,
+        response: { kind: 'unanswered' },
+      };
+    }, /assistance\.reached/u);
+    rejects((state) => {
+      state.answers[0]!.assistance!.at = NOW - 1;
+    }, /assistance\.at/u);
+    rejects((state) => {
+      state.answers[0]!.assistance!.at = state.recordedAt + 1;
+    }, /assistance\.at/u);
+    rejects((state) => {
+      state.conditions = state.conditions.filter((value) => value !== 'assisted');
+    }, /assistance\.condition/u);
+    rejects((state) => {
+      state.events = state.events.filter((entry) => entry.kind !== 'assistance');
+    }, /assistance\.events/u);
+    rejects((state) => {
+      state.mode = 'timed';
+    }, /assistance\.mode/u);
+    rejects((state) => {
+      state.answers[0]!.response = { kind: 'selected', optionId: 'z' };
+      state.answers[0]!.assistance!.response = { kind: 'selected', optionId: 'z' };
+    }, /response\.optionId/u);
+    rejects((state) => {
+      state.answers[0]!.assistance!.kind = 'hint';
+    }, /invalid-input/u);
+    // Documented limits, not guarantees (C6): changing both copies together, or
+    // removing the mark with its condition and event, then re-sealing, gives a
+    // consistent standalone record. Catching either needs retained history.
+    const forged = reseal(marked, (state) => {
+      state.answers[0]!.response = { kind: 'selected', optionId: 'a' };
+      state.answers[0]!.assistance!.response = { kind: 'selected', optionId: 'a' };
+    });
+    expect(parseAttemptV2(paper, forged).answers[0]!.response).toEqual({
+      kind: 'selected',
+      optionId: 'a',
+    });
+    const erased = reseal(marked, (state) => {
+      delete state.answers[0]!.assistance;
+      state.conditions = state.conditions.filter((value) => value !== 'assisted');
+      state.events = state.events.filter((entry) => entry.kind !== 'assistance');
+    });
+    expect(parseAttemptV2(paper, erased).answers[0]!.assistance).toBeUndefined();
+  });
+
+  it('keeps attempt-level history unattributed when a later item mark is added', () => {
+    const aggregate = update(answered(), { kind: 'assistance', reason: 'hint' }, 150);
+    const both = explain(aggregate);
+    expect(both.answers.filter((entry) => entry.assistance)).toHaveLength(1);
+    expect(both.events.filter((entry) => entry.kind === 'assistance')).toHaveLength(2);
+    expect(both.events.map((entry) => entry.detail)).toEqual(
+      expect.arrayContaining(['hint', 'explanation']),
+    );
+    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(both))).revisionId).toBe(both.revisionId);
+  });
+
+  it('keeps old unassisted and lawful attempt-level assisted checkpoints byte-identical', () => {
+    const checkpoint = (conditions: string[], events: object[], answeredFirst = true) => {
+      const payload = {
+        format: 'kairo-assessment-attempt',
+        v: 2,
+        protocol: 'assessment-delivery/v2',
+        attemptId: 'attempt:golden',
+        scope,
+        form: { ...artifactReference(paper), kind: 'form' },
+        mode: 'practice',
+        priorExposure: 'unknown',
+        editorialAtStart: { status: 'unreviewed', policyVersion: null, decisionRevisionIds: [] },
+        startedAt: NOW,
+        recordedAt: NOW + 2000,
+        endedAt: null,
+        status: 'in-progress',
+        revision: 2,
+        previousRevisionId: `assessment-attempt-v2:${'b'.repeat(64)}`,
+        cursor: { blockId: 'block:grammar', itemId: 'one' },
+        clock: {
+          sessionId: 'session:one',
+          lastWallMs: NOW + 2000,
+          lastMonotonicMs: 2000,
+          elapsedMs: 2000,
+          interrupted: false,
+        },
+        conditions,
+        blocks: [
+          {
+            blockId: 'block:grammar',
+            status: 'open',
+            startedAt: NOW,
+            startedElapsedMs: 0,
+            deadlineAt: null,
+            elapsedMs: 2000,
+            closedAt: null,
+            closeReason: null,
+          },
+        ],
+        answers: paper.items.map((entry, index) => ({
+          item: { ...artifactReference(entry), kind: 'item' },
+          response:
+            index === 0 && answeredFirst
+              ? { kind: 'selected', optionId: 'b' }
+              : { kind: 'unanswered' },
+          reached: index === 0,
+          flagged: false,
+          elapsedMs: index === 0 ? 2000 : 0,
+        })),
+        audio: [],
+        events: [
+          { kind: 'block-opened', at: NOW, blockId: 'block:grammar', detail: 'block:grammar' },
+          ...events,
+        ],
+      };
+      const sha256 = inputHashOf(payload);
+      return { ...payload, revisionId: `assessment-attempt-v2:${sha256}`, sha256 };
+    };
+    for (const stored of [
+      checkpoint([], []),
+      // Historical attempt-level help: a condition and an event, no item attribution.
+      checkpoint(
+        ['assisted'],
+        [{ kind: 'assistance', at: NOW + 2000, blockId: 'block:grammar', detail: 'hint' }],
+      ),
+      // The old command was also lawful before any answer existed.
+      checkpoint(
+        ['assisted'],
+        [{ kind: 'assistance', at: NOW + 2000, blockId: 'block:grammar', detail: 'hint' }],
+        false,
+      ),
+      // Parser-valid imported legacy shape: the aggregate condition with no event
+      // and no item mark. Accepted and kept byte-identical; never rewritten.
+      checkpoint(['assisted'], []),
+    ]) {
+      const parsed = parseAttemptV2(paper, JSON.parse(JSON.stringify(stored)));
+      expect(inputHashOf(parsed)).toBe(inputHashOf(stored));
+      expect(parsed.revisionId).toBe(stored.revisionId);
+      expect(parsed.answers.some((entry) => 'assistance' in entry)).toBe(false);
+    }
+    const aggregate = update(answered(), { kind: 'assistance', reason: 'hint' }, 200);
+    expect(aggregate.conditions).toContain('assisted');
+    expect(aggregate.answers.some((entry) => 'assistance' in entry)).toBe(false);
   });
 });

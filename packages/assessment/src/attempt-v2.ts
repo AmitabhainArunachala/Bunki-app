@@ -43,12 +43,23 @@ const conditionSchema = z.enum([
   'audio-seeked',
   'assisted',
 ]);
+/** An explanation opened after this item's committed answer. The response copy
+ * lets every parse re-check the lock; it is a consistency check against the
+ * enclosing answer, not proof of the learner's history (a jointly re-sealed
+ * record is outside what a standalone checkpoint can authenticate). */
+const assistanceSchema = z.strictObject({
+  kind: z.literal('explanation'),
+  at: milliseconds,
+  response: responseSchema,
+});
 const answerSchema = z.strictObject({
   item: artifactReferenceSchema.extend({ kind: z.literal('item') }),
   response: responseSchema,
   reached: z.boolean(),
   flagged: z.boolean(),
   elapsedMs: elapsedSchema,
+  /** Absent means no item-level assistance was recorded, not proof of independence. */
+  assistance: assistanceSchema.optional(),
 });
 const blockSchema = z.strictObject({
   blockId: idSchema,
@@ -99,6 +110,9 @@ const payloadSchema = z.strictObject({
     interrupted: z.boolean(),
   }),
   conditions: z.array(conditionSchema).max(8),
+  /** Set by an item explanation added while earlier help had no item attribution, so the
+   * new mark cannot make that help look accounted for. Absent records nothing either way. */
+  assistanceAttribution: z.literal('unknown').optional(),
   blocks: z.array(blockSchema).min(1).max(32),
   answers: z.array(answerSchema).min(1).max(1000),
   audio: z.array(audioSchema).max(256),
@@ -132,7 +146,9 @@ export const assessmentActionV2Schema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('abandon') }),
   z.strictObject({ kind: z.literal('interruption'), reason: idSchema }),
   z.strictObject({ kind: z.literal('resume') }),
-  z.strictObject({ kind: z.literal('assistance'), reason: idSchema }),
+  /** Without itemId: the historical attempt-level form, unchanged. With itemId:
+   * one explanation for the current item's committed selected answer. */
+  z.strictObject({ kind: z.literal('assistance'), reason: idSchema, itemId: idSchema.optional() }),
   z.strictObject({
     kind: z.literal('audio'),
     mediaId: idSchema,
@@ -191,13 +207,38 @@ function validate(form: FormVersion, state: Payload) {
     state.blocks.length !== form.timingBlocks.length
   )
     fail('form-shape');
+  let assistanceMarks = 0;
   for (const [index, answer] of state.answers.entries()) {
     const item = form.items[index]!;
     assertExactReference(answer.item, item);
     assertItemResponse(item, answer.response);
     if (!answer.reached && (answer.response.kind !== 'unanswered' || answer.elapsedMs > 0))
       fail('response-before-exposure');
+    if (answer.assistance) {
+      assistanceMarks += 1;
+      if (state.mode !== 'practice') fail('assistance.mode');
+      if (!answer.reached) fail('assistance.reached');
+      if (answer.response.kind !== 'selected' || item.response.kind !== 'selected')
+        fail('assistance.response');
+      if (inputHashOf(answer.assistance.response) !== inputHashOf(answer.response))
+        fail('assistance.copy');
+      if (answer.assistance.at < state.startedAt || answer.assistance.at > state.recordedAt)
+        fail('assistance.at');
+      if (!state.conditions.includes('assisted')) fail('assistance.condition');
+    }
   }
+  // Events describe the timeline; they carry no item reference. Each item mark
+  // is written with one event, so fewer events than marks is malformed. More
+  // events than marks is lawful historical attempt-level assistance.
+  if (assistanceMarks > state.events.filter((entry) => entry.kind === 'assistance').length)
+    fail('assistance.events');
+  // Only an item explanation writes the inherited-uncertainty record, so it needs the
+  // aggregate condition and at least one item mark.
+  if (
+    state.assistanceAttribution !== undefined &&
+    (!state.conditions.includes('assisted') || assistanceMarks === 0)
+  )
+    fail('assistance.attribution');
   let open = 0;
   let pending = false;
   for (const [index, block] of state.blocks.entries()) {
@@ -383,6 +424,20 @@ export function updateAttemptV2(
   if (input.expectedRevisionId !== previous.revisionId)
     throw new AssessmentValidationError('stale-checkpoint');
   if (previous.status !== 'in-progress') return previous;
+  // Reopening an explanation already recorded for this item is not a new
+  // event: no clock tick, no revision. Stale commands were rejected above, and
+  // the item-specific preconditions are checked first, so an earlier mark
+  // never makes an unsupported retry look accepted.
+  const requested = input.action;
+  if (
+    requested.kind === 'assistance' &&
+    requested.itemId !== undefined &&
+    previous.answers.some((entry) => entry.item.id === requested.itemId && entry.assistance)
+  ) {
+    if (requested.reason !== 'explanation') fail('assistance-reason');
+    if (previous.cursor.itemId !== requested.itemId) fail('assistance-not-current-item');
+    return previous;
+  }
   const { revisionId: _revisionId, sha256: _sha256, ...copied } = previous;
   const state = parse(payloadSchema, copied);
   const sameSession = input.clockSessionId === state.clock.sessionId;
@@ -450,6 +505,7 @@ export function updateAttemptV2(
       } else if (action.kind === 'flag') answer.flagged = action.flagged;
       else {
         if (!answer.reached) fail('response-before-exposure');
+        if (answer.assistance) fail('answer-locked-after-assistance');
         answer.response = parse(
           responseSchema,
           assertItemResponse(
@@ -482,6 +538,26 @@ export function updateAttemptV2(
       event(state, 'resume', 'resume');
     } else if (action.kind === 'assistance') {
       if (state.mode === 'timed') fail('assistance-in-timed-mode');
+      if (action.itemId !== undefined) {
+        if (action.reason !== 'explanation') fail('assistance-reason');
+        if (state.cursor.itemId !== action.itemId) fail('assistance-not-current-item');
+        const answer = state.answers.find((entry) => entry.item.id === action.itemId)!;
+        const spec = form.items.find((item) => item.id === action.itemId)!.response;
+        if (!answer.reached || answer.response.kind !== 'selected' || spec.kind !== 'selected')
+          fail('assistance-before-answer');
+        // A new explanation cannot account for help recorded before any item mark (the
+        // aggregate condition with no mark, or more assistance events than marks). Carry that
+        // known uncertainty into this revision instead of letting the new mark hide it.
+        const marksBefore = state.answers.filter((entry) => entry.assistance).length;
+        const eventsBefore = state.events.filter((entry) => entry.kind === 'assistance').length;
+        if ((state.conditions.includes('assisted') && marksBefore === 0) || eventsBefore > marksBefore)
+          state.assistanceAttribution = 'unknown';
+        answer.assistance = {
+          kind: 'explanation',
+          at: state.recordedAt,
+          response: { ...answer.response },
+        };
+      }
       condition(state, 'assisted');
       event(state, 'assistance', action.reason);
     } else if (action.kind === 'audio') {

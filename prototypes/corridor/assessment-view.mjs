@@ -34,6 +34,8 @@ export function createAssessmentView(host) {
   let activeAudio = null, audioKey = null, audioUrl = null, audioLoading = false;
   let lifecycle = 0, playbackEpoch = 0, advancingAudio = false, deliveryLoading = false;
   let resumeOnEntry = false, entryResumePending = false;
+  // why-sheet: which item's sheet is open (view-only), and where focus goes after the next render
+  let whyOpenItemId = null, focusAfterRender = null;
   const deliveryFailures = new Set();
   const imageUrls = new Map();
   let confirmation = null;
@@ -99,7 +101,8 @@ export function createAssessmentView(host) {
     if (action.kind === 'close-block' && selection()?.attempt.mode === 'timed' && nextUnit(selection())) return false;
     const generation = lifecycle;
     notice = null;
-    if (!internal && ['answer', 'visit', 'flag'].includes(action.kind) && !await resumeAttempt(generation)) { refresh(); return false; }
+    if (action.kind === 'visit') whyOpenItemId = null;
+    if (!internal && ['answer', 'visit', 'flag', 'assistance'].includes(action.kind) && !await resumeAttempt(generation)) { refresh(); return false; }
     if (['close-block', 'abandon', 'submit', 'interruption'].includes(action.kind)) {
       cancelPendingPlayback(); await suspendAudio();
     }
@@ -245,8 +248,8 @@ export function createAssessmentView(host) {
     if (value.kind === 'start') {
       const writtenSection = value.entry.mode === 'section', audio = hasListening(value.entry);
       section.append(node('p', '', writtenSection
-        ? tx(`${value.entry.durationMinutes}分の練習です。ヒントは表示されません。時間制限なしでも練習できます。`,
-          `You have ${value.entry.durationMinutes} minutes, with no hints. You can also practice without a timer.`)
+        ? tx(`${value.entry.durationMinutes}分の練習です。ヒントや解説は表示されません。時間制限なしでも練習でき、そこでは答えたあとに解説を見られます（その問題は「助けあり」と記録されます）。`,
+          `You have ${value.entry.durationMinutes} minutes, with no hints or explanations. You can also practice without a timer: there you can open the explanation after you answer, and that question is marked assisted.`)
         : tx('本番モードでは時間制限があり、ヒントは表示されません。終了したパートには戻れません。',
           'Exam mode has a time limit and no hints. Once you finish a section, you can’t return to it.')));
       section.append(node('p', '', tx('間違えた内容は結果と一緒に保存し、覚えるリストと先生との学習に引き継ぎます。',
@@ -436,6 +439,61 @@ export function createAssessmentView(host) {
       if (alive(generation)) { deliveryFailures.add(selected.form.sha256); host.onMediaError?.(error); }
     } finally { if (alive(generation)) { deliveryLoading = false; refresh(); } }
   }
+  // The review wording comes from this attempt's own editorial record, never a fixed label.
+  function explanationProvenance(status) {
+    return status === 'ai-reviewed-full' ? tx('AIモデルが確認した解説です。人による確認はまだです。', 'Checked by AI models; not yet reviewed by a person.')
+      : status === 'ai-reviewed-practice' ? tx('練習用としてAIモデルが確認した解説です。人による確認はまだです。', 'Checked by AI models for practice; not yet reviewed by a person.')
+        : tx('この解説は、まだ確認されていません。', 'This explanation hasn’t been checked yet.');
+  }
+  function closeWhy() { whyOpenItemId = null; focusAfterRender = '#exam-why'; refresh(); }
+  async function openWhy(itemId) {
+    const current = selection();
+    const answer = current?.attempt.answers.find(row => row.item.id === itemId);
+    if (!current || current.attempt.status !== 'in-progress' || !answer) return;
+    if (!answer.assistance) {
+      // durable before reveal: the key appears only once the mark is saved
+      if (!await command({ kind: 'assistance', itemId, reason: 'explanation' })) return;
+      if (!selection()?.attempt.answers.find(row => row.item.id === itemId)?.assistance) return;
+    }
+    whyOpenItemId = itemId; focusAfterRender = '#exam-why-title'; refresh();
+  }
+  function renderWhySheet(main, explanation) {
+    const sheet = node('section', 'exam-why-sheet'); sheet.id = 'exam-why-sheet';
+    sheet.setAttribute('role', 'region'); sheet.setAttribute('aria-labelledby', 'exam-why-title');
+    const title = node('h2', '', tx('解説', 'Explanation')); title.id = 'exam-why-title'; title.tabIndex = -1;
+    const rule = node('p', 'exam-rationale', explanation.rule || tx('この問題の解説はまだありません。', 'No explanation has been written for this question yet.'));
+    if (explanation.rule) rule.lang = 'ja';
+    sheet.append(title,
+      node('p', 'exam-why-verdict', explanation.verdict === 'correct' ? tx('正解。', 'Correct.') : tx('不正解。', 'Incorrect.')),
+      node('p', '', `${tx('あなたの回答', 'Your answer')}: ${explanation.chosen.text}`),
+      node('p', '', `${tx('正解', 'Correct answer')}: ${explanation.key.text}`), rule,
+      node('p', 'exam-why-absent', tx('ほかの選択肢が違う理由は、まだ書かれていません。', 'Why the other choices are wrong hasn’t been written yet.')),
+      node('p', 'exam-why-provenance', explanationProvenance(explanation.editorial)),
+      button(tx('閉じる', 'Close'), 'exam-why-close', closeWhy));
+    sheet.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); closeWhy(); } });
+    main.append(sheet);
+  }
+  // Untimed practice only, after a committed selected answer. Timed attempts get no door at all.
+  function renderWhy(main, selected, question, answer) {
+    if (selected.attempt.mode !== 'practice' || question.response.kind !== 'selected' ||
+        (!answer.assistance && answer.response.kind !== 'selected')) return;
+    const line = node('p', 'exam-why');
+    if (answer.assistance) {
+      const locked = node('span', 'exam-why-locked', tx('助けあり · 解説を見たので、この回答は確定しています', 'Assisted · you opened the explanation, so this answer is locked'));
+      locked.id = 'exam-why-locked'; line.append(locked);
+    }
+    const door = button(answer.assistance ? tx('解説をもう一度見る', 'See the explanation again') : tx('なぜ？— 解説を見る', 'Why? — See the explanation'),
+      'exam-why', () => openWhy(question.id), 'chip exam-why-door');
+    door.disabled = host.pending(); line.append(door);
+    if (!answer.assistance) {
+      const cost = node('span', 'exam-why-cost', tx('見ると、この回答は確定し「助けあり」になります', 'Opening it locks this answer and marks it assisted'));
+      cost.id = 'exam-why-cost'; door.setAttribute('aria-describedby', 'exam-why-cost'); line.append(cost);
+    }
+    main.append(line);
+    const explanation = whyOpenItemId === question.id && answer.assistance
+      ? host.explanation?.(selected.attempt.attemptId, question.id) : null;
+    if (explanation) renderWhySheet(main, explanation);
+  }
   function renderQuestion(main, selected) {
     const { form, attempt } = selected;
     const block = attempt.blocks.find(row => row.status === 'open');
@@ -513,12 +571,19 @@ export function createAssessmentView(host) {
       question.response.options.forEach((option, number) => {
         const unit = deliveryUnits(selected).find(row => row.kind === 'question' && row.itemIds.includes(question.id));
         const audioOnly = question.skill === 'listening' && (!unit || !unit.printedOptions);
-        const control = button(audioOnly ? String(number + 1) : `${number + 1}\u3000${option.text}`, null, () => command({ kind: 'answer', itemId: question.id, response: { kind: 'selected', optionId: option.id } }), 'mock-opt');
+        const control = button(audioOnly ? String(number + 1) : `${number + 1}\u3000${option.text}`, null, () => {
+          // keep keyboard focus on the chosen option across the re-render (one Tab then reaches the why-door)
+          focusAfterRender = `[data-exam-option="${CSS.escape(option.id)}"]`;
+          return command({ kind: 'answer', itemId: question.id, response: { kind: 'selected', optionId: option.id } });
+        }, 'mock-opt');
         control.lang = 'ja'; control.dataset.examOption = option.id;
         control.setAttribute('aria-pressed', String(answer.response.kind === 'selected' && answer.response.optionId === option.id));
-        control.disabled = host.pending(); options.append(control);
-      }); main.append(options);
+        control.disabled = host.pending() || !!answer.assistance; options.append(control);
+      });
+      if (answer.assistance) options.setAttribute('aria-describedby', 'exam-why-locked');
+      main.append(options);
     }
+    renderWhy(main, selected, question, answer);
     const flag = button(answer.flagged ? tx('見直しを解除', 'Unflag question') : tx('あとで見直す', 'Flag for review'), 'exam-flag',
       () => command({ kind: 'flag', itemId: question.id, flagged: !answer.flagged }));
     flag.setAttribute('aria-pressed', String(answer.flagged)); flag.disabled = host.pending(); main.append(flag);
@@ -533,9 +598,10 @@ export function createAssessmentView(host) {
     const grid = node('div', 'exam-question-grid');
     ids.forEach((id, i) => {
       const saved = attempt.answers.find(row => row.item.id === id);
-      const control = button(`${i + 1}${saved.flagged ? ' ⚑' : saved.response.kind !== 'unanswered' ? ' ✓' : ''}`, null,
+      const control = button(`${i + 1}${saved.flagged ? ' ⚑' : saved.response.kind !== 'unanswered' ? ' ✓' : ''}${saved.assistance ? ' 助' : ''}`, null,
         () => command({ kind: 'visit', itemId: id }));
-      control.setAttribute('aria-label', tx(`${i + 1}問目${saved.flagged ? '、要見直し' : ''}`, `Question ${i + 1}${saved.flagged ? ', flagged' : ''}`));
+      control.setAttribute('aria-label', tx(`${i + 1}問目${saved.flagged ? '、要見直し' : ''}${saved.assistance ? '、助けあり' : ''}`,
+        `Question ${i + 1}${saved.flagged ? ', flagged' : ''}${saved.assistance ? ', assisted' : ''}`));
       control.dataset.examVisit = id;
       control.disabled = host.pending() || advancingAudio || !canVisit(selected, id); grid.append(control);
     }); map.append(grid); main.append(map);
@@ -544,11 +610,20 @@ export function createAssessmentView(host) {
   function renderResult(main, selected) {
     const { form, attempt, score } = selected;
     const stopped = attempt.status === 'abandoned';
+    const independence = host.independence?.(selected) || null;
+    const assistedItem = itemId => !!attempt.answers.find(row => row.item.id === itemId)?.assistance;
     main.append(node('h1', 'view-title', stopped ? tx('中断した練習', 'Attempt stopped') : tx('結果', 'Your results')));
     if (stopped) main.append(node('p', '', tx('回答を保存しました。中断した結果は弱点の判定に使いません。', 'Your answers are saved. A stopped test won’t be treated as evidence of weaknesses.')));
     else {
-      main.append(node('p', 'exam-score', tx(`${score.correct} / ${score.totalItems} 問正解`, `${score.correct} of ${score.totalItems} correct`)));
+      // an assisted answer was committed before its explanation opened; the headline says how many
+      main.append(node('p', 'exam-score', tx(`${score.correct} / ${score.totalItems} 問正解`, `${score.correct} of ${score.totalItems} correct`) +
+        (independence?.assistedCorrect ? tx(`（うち助けあり ${independence.assistedCorrect}）`, `, including ${independence.assistedCorrect} assisted`) : '')));
       main.append(node('p', 'exam-score-note', tx('この模試の正答数です。JLPT公式の換算点や合否予測ではありません。', 'This is your accuracy on this test, not an official JLPT score or pass prediction.')));
+      if (independence) main.append(node('p', 'exam-independence', independence.independent === null
+        ? tx(`問題ごとの助けの記録なし ${independence.answered - independence.assisted} · 助けあり ${independence.assisted} · 未回答 ${independence.unanswered}`,
+          `No item-level help recorded ${independence.answered - independence.assisted} · Assisted ${independence.assisted} · Unanswered ${independence.unanswered}`)
+        : tx(`自力 ${independence.independent} · 助けあり ${independence.assisted} · 未回答 ${independence.unanswered}`,
+          `Independent ${independence.independent} · Assisted ${independence.assisted} · Unanswered ${independence.unanswered}`)));
       const counts = node('dl', 'exam-counts');
       for (const [label, count] of [[tx('不正解', 'Incorrect'), score.incorrect], [tx('未回答', 'Unanswered'), score.unanswered], [tx('未到達', 'Not reached'), score.notReached]]) {
         const item = node('div'); item.append(node('dt', '', label), node('dd', '', String(count))); counts.append(item);
@@ -557,14 +632,18 @@ export function createAssessmentView(host) {
       for (const [skill, labels] of Object.entries(SKILLS)) {
         const rows = score.items.filter(row => row.skill === skill); if (!rows.length) continue;
         const correct = rows.filter(row => row.result === 'correct').length;
-        skills.append(node('p', '', `${tx(...labels)} · ${correct}/${rows.length} · ${minutes(rows.reduce((n, row) => n + row.elapsedMs, 0))} ${tx('分', 'min')}`));
+        const helped = rows.filter(row => assistedItem(row.itemId)).length;
+        skills.append(node('p', '', `${tx(...labels)} · ${correct}/${rows.length}${helped ? tx(`（助けあり ${helped}）`, ` (${helped} assisted)`) : ''} · ${minutes(rows.reduce((n, row) => n + row.elapsedMs, 0))} ${tx('分', 'min')}`));
       } main.append(skills);
       const conditions = node('details', 'exam-conditions');
       conditions.append(node('summary', '', tx('受験時の状況', 'Test conditions')));
       conditions.append(node('p', '', attempt.mode === 'timed' ? tx('時間制限あり', 'Timed attempt') : tx('時間制限なし', 'Untimed practice')));
       if (attempt.priorExposure === 'reported') conditions.append(node('p', '', tx('以前に見た問題を含みます。初回の結果とは分けて比べてください。', 'Includes previously seen questions. Compare separately from first attempts.')));
       if (attempt.priorExposure === 'unknown') conditions.append(node('p', '', tx('以前に同じ問題を見たかどうか：未記録', 'Previous exposure: not recorded')));
-      if (attempt.conditions.length) conditions.append(node('p', '', tx('途中の中断などを含む結果です。', 'Includes interruptions or changes to test conditions.')));
+      if (attempt.conditions.some(value => value !== 'assisted')) conditions.append(node('p', '', tx('途中の中断などを含む結果です。', 'Includes interruptions or changes to test conditions.')));
+      if (independence?.assisted) conditions.append(node('p', '', tx(`解説を見た問題：${independence.assisted}問`,
+        `Explanation opened on ${independence.assisted} question${independence.assisted === 1 ? '' : 's'}`)));
+      if (independence?.attribution === 'unknown') conditions.append(node('p', '', tx('問題を特定できない助けの記録があります。', 'Includes help that isn’t tied to a specific question.')));
       main.append(conditions);
       const followup = host.followup(attempt.attemptId);
       if (followup) {
@@ -594,7 +673,9 @@ export function createAssessmentView(host) {
         details.open = true; focusItemId = null;
         requestAnimationFrame(() => details.scrollIntoView({ block: 'center' }));
       }
-      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${question.prompt.split('\n').at(-1)}`));
+      const helped = assistedItem(result.itemId);
+      if (helped) details.dataset.examAssisted = 'true';
+      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${question.prompt.split('\n').at(-1)}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
       const selectedOption = question.response.kind === 'selected' && result.response.kind === 'selected'
         ? question.response.options.find(row => row.id === result.response.optionId)?.text : tx('未回答', 'No answer');
       details.append(node('p', '', `${tx('あなたの回答', 'Your answer')}: ${selectedOption}`));
@@ -625,6 +706,11 @@ export function createAssessmentView(host) {
   }
   return {
     render(main) {
+      if (focusAfterRender) {
+        // applied after the rebuilt room is in the document; a missing target is a no-op
+        const target = focusAfterRender; focusAfterRender = null;
+        requestAnimationFrame(() => document.querySelector(target)?.focus());
+      }
       if (!owned()) { stopAudio(); renderUnowned(main); return true; }
       if (legacyOpen) {
         main.append(button(tx('模試に戻る', 'Back to mock tests'), 'exam-close-legacy', () => { legacyOpen = false; refresh(); }));
@@ -653,7 +739,7 @@ export function createAssessmentView(host) {
       return true;
     },
     open(attemptId, itemId) {
-      selectedId = attemptId; focusItemId = itemId || null;
+      selectedId = attemptId; focusItemId = itemId || null; whyOpenItemId = null;
       historyOpen = false; legacyOpen = false; confirmation = null;
       if (!selection()) { selectedId = null; focusItemId = null; notice = tx('その問題はもう表示できません。', 'That question is no longer available.'); }
     },
@@ -668,6 +754,6 @@ export function createAssessmentView(host) {
     },
     async interrupt() { cancelPendingPlayback(); await suspendAudio(); if (!owned()) return false; return host.action({ kind: 'interruption', reason: 'background' }); },
     async suspend() { cancelPendingPlayback(); await suspendAudio(); resumeOnEntry = true; },
-    dispose() { lifecycle += 1; cancelPendingPlayback(); deliveryLoading = false; entryResumePending = false; stopAudio(); for (const url of imageUrls.values()) URL.revokeObjectURL(url); imageUrls.clear(); },
+    dispose() { lifecycle += 1; cancelPendingPlayback(); deliveryLoading = false; entryResumePending = false; whyOpenItemId = null; focusAfterRender = null; stopAudio(); for (const url of imageUrls.values()) URL.revokeObjectURL(url); imageUrls.clear(); },
   };
 }

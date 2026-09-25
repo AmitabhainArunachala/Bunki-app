@@ -137,7 +137,8 @@ export function commandAssessmentV2(raw, options) {
   const form = library.forms.find((candidate) => sameRef(candidate, attempt.form));
   const input = { ...options }; delete input.scope; delete input.attemptId;
   const updated = updateAttemptV2(form, attempt, input);
-  if (updated === attempt) return library;
+  // An unchanged revision is a no-op (terminal, or an explanation already recorded).
+  if (updated === attempt || updated.revisionId === attempt.revisionId) return library;
   return freezeLibrary(library.scope, [...library.forms],
     library.attempts.map((entry) => entry.attemptId === attempt.attemptId ? updated : entry),
     library.activeAttemptId);
@@ -173,4 +174,75 @@ export function selectAssessmentV2(raw, attemptId) {
     remainingMs: attempt.mode === 'timed' && block ? Math.max(0, spec.durationMs - block.elapsedMs) : null,
     score: attempt.status === 'in-progress' ? null : scoreAttemptV2(form, attempt),
   });
+}
+
+/** A local item mark (attempt answer) or its evidence copy. Nothing else is assistance. */
+export function validAssessmentAssistanceMark(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
+    value.kind === 'explanation' && Number.isSafeInteger(value.at) && value.at >= 0;
+}
+/** The one enrollment rule: wrong, or correct and flagged or assisted. */
+export function assessmentFollowupEligible({ outcome, flagged, assisted }) {
+  return outcome === 'incorrect' || outcome === 'correct' && (flagged === true || assisted === true);
+}
+/** Local evidence adapter: `assistance` must be a valid mark, never a truthy stand-in. */
+export function assessmentEvidenceEligible(evidence) {
+  return !!evidence && assessmentFollowupEligible({ outcome: evidence.outcome, flagged: evidence.flagged,
+    assisted: validAssessmentAssistanceMark(evidence.assistance) });
+}
+/** Received wire adapter: only the literal `assisted: true` counts. */
+export function assessmentResultItemEligible(item) {
+  return !!item && assessmentFollowupEligible({ outcome: item.result, flagged: item.flagged, assisted: item.assisted === true });
+}
+/** One outcome projection for finalization and enrichment retry, so both see the
+ * same flag and item-level assistance from the same retained attempt. */
+export function assessmentOutcomesV2(selected) {
+  return selected.score.items.map(row => {
+    const answer = selected.attempt.answers.find(entry => entry.item.id === row.itemId);
+    return { ...row, outcome: row.result, flagged: answer?.flagged === true,
+      ...(answer?.assistance ? { assistance: { kind: answer.assistance.kind, at: answer.assistance.at } } : {}) };
+  });
+}
+/** The why-sheet for one item. Null until that item's assistance is durably
+ * recorded (or the attempt is terminal), so no key is handed to the view first. */
+export function selectAssessmentExplanationV2(raw, attemptId, itemId) {
+  const selected = selectAssessmentV2(raw, attemptId);
+  if (!selected) return null;
+  const item = selected.form.items.find(entry => entry.id === itemId);
+  const answer = selected.attempt.answers.find(entry => entry.item.id === itemId);
+  if (!item || !answer || item.response.kind !== 'selected' || answer.response.kind !== 'selected') return null;
+  if (selected.attempt.status === 'in-progress' && !answer.assistance) return null;
+  const option = id => item.response.options.find(entry => entry.id === id);
+  const chosen = option(answer.response.optionId), key = option(item.response.answerOptionId);
+  if (!chosen || !key) return null;
+  return Object.freeze({ itemId: item.id, itemRevisionId: item.revisionId,
+    verdict: chosen.id === key.id ? 'correct' : 'incorrect',
+    chosen: Object.freeze({ optionId: chosen.id, text: chosen.text }),
+    key: Object.freeze({ optionId: key.id, text: key.text }),
+    rule: typeof item.rationale === 'string' && item.rationale.trim() ? item.rationale : null,
+    distractorLines: null, editorial: selected.attempt.editorialAtStart.status,
+    assistance: answer.assistance ?? null });
+}
+/** Results partition over questions. A missing item mark is not proof of
+ * independence. Assistance recorded without item attribution (the retained
+ * aggregate `assisted` condition with no item mark, more assistance events than
+ * marks, or the engine's carried `assistanceAttribution: 'unknown'` record from
+ * a later explanation) makes attribution unknown, and the independent count is
+ * then withheld (null). Only question counts are reported: an event count is not
+ * a number of questions, and no missing count is invented. */
+export function assessmentIndependenceV2(selected) {
+  if (!selected?.score) return null;
+  let answered = 0, assisted = 0, assistedCorrect = 0, unanswered = 0;
+  for (const row of selected.score.items) {
+    if (['unanswered', 'not-reached'].includes(row.result)) { unanswered++; continue; }
+    answered++;
+    if (selected.attempt.answers.find(entry => entry.item.id === row.itemId)?.assistance) {
+      assisted++; if (row.result === 'correct') assistedCorrect++;
+    }
+  }
+  const events = selected.attempt.events.filter(entry => entry.kind === 'assistance').length;
+  const unknown = selected.attempt.assistanceAttribution === 'unknown' || events > assisted ||
+    selected.attempt.conditions.includes('assisted') && assisted === 0;
+  return Object.freeze({ answered, assisted, assistedCorrect, unanswered,
+    attribution: unknown ? 'unknown' : 'complete', independent: unknown ? null : answered - assisted });
 }

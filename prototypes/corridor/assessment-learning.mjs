@@ -2,7 +2,8 @@
  * It is committed with that sitting by the record host. This module neither
  * schedules a review nor calls a model: a test answer is not an FSRS grade. */
 import { encodeLocalJson } from './modules/record-core.mjs';
-import { selectAssessmentV2, parseAssessmentLibraryV2 } from './assessment-v2-controller.mjs';
+import { selectAssessmentV2, parseAssessmentLibraryV2, assessmentEvidenceEligible,
+  validAssessmentAssistanceMark } from './assessment-v2-controller.mjs';
 import { deriveAssessmentCloze, createAssessmentClozePractice } from './assessment-cloze.mjs';
 import { acceptSentencePractice } from './sentence-practice.mjs';
 import { selectTeacherContext } from './teacher-context.mjs';
@@ -52,7 +53,10 @@ export function parseAssessmentLearning(raw, scope) {
           evidence.id !== `assessment-evidence:${hash([followup.id, evidence.item])}` ||
           evidenceIds.has(evidence.id) ||
           !['correct', 'incorrect', 'unanswered', 'not-reached'].includes(evidence.outcome) ||
-          !Array.isArray(evidence.subjects) || !Number.isSafeInteger(evidence.elapsedMs) || evidence.elapsedMs < 0)
+          !Array.isArray(evidence.subjects) || !Number.isSafeInteger(evidence.elapsedMs) || evidence.elapsedMs < 0 ||
+          evidence.assistance !== undefined && (!validAssessmentAssistanceMark(evidence.assistance) ||
+            Object.keys(evidence.assistance).some(key => !['kind', 'at'].includes(key)) ||
+            !['correct', 'incorrect'].includes(evidence.outcome)))
         fail('invalid-evidence');
       evidenceIds.add(evidence.id);
     }
@@ -104,7 +108,9 @@ export function validateAssessmentLearningRecord(record) {
       if (!item || item.revisionId !== evidence.item.revisionId || item.sha256 !== evidence.item.sha256 ||
           result.result !== evidence.outcome || !same(result.response, evidence.response) ||
           result.elapsedMs !== evidence.elapsedMs || answer.flagged !== evidence.flagged ||
-          item.skill !== evidence.skill || item.task !== evidence.task || !same(item.subjects, evidence.subjects))
+          item.skill !== evidence.skill || item.task !== evidence.task || !same(item.subjects, evidence.subjects) ||
+          (answer.assistance == null) !== (evidence.assistance == null) ||
+          answer.assistance && (evidence.assistance.kind !== answer.assistance.kind || evidence.assistance.at !== answer.assistance.at))
         fail('evidence-mismatch');
     }
     for (const action of followup.actions) {
@@ -120,8 +126,7 @@ export function validateAssessmentLearningRecord(record) {
           same(plan.editorialAtCreation, followup.editorialAtStart) &&
           plan.createdAt === new Date(followup.completedAt).toISOString();
       }
-      if (!validTarget ||
-          !(evidence.outcome === 'incorrect' || evidence.outcome === 'correct' && evidence.flagged) ||
+      if (!validTarget || !assessmentEvidenceEligible(evidence) ||
           followup.editorialAtStart.status === 'unreviewed') fail('action-mismatch');
     }
   }
@@ -149,11 +154,14 @@ export function planAssessmentLearning({ scope, form, attempt, outcomes, resolve
       skill: item.skill, task: item.task, subjects: [...item.subjects],
       outcome: result.outcome, elapsedMs: result.elapsedMs || 0,
       response: copy(result.response || { kind: 'unanswered' }),
-      flagged: result.flagged === true };
+      flagged: result.flagged === true,
+      // Provenance only: an assisted answer is never counted as independent recall.
+      ...(validAssessmentAssistanceMark(result.assistance)
+        ? { assistance: { kind: result.assistance.kind, at: result.assistance.at } } : {}) };
     followup.evidence.push(evidence);
     // Skips and expired time are pacing evidence, not vocabulary weaknesses.
     if (attempt.editorialAtStart.status === 'unreviewed') { followup.status = 'pending-review'; continue; }
-    if (result.outcome !== 'incorrect' && !(result.outcome === 'correct' && result.flagged)) continue;
+    if (!assessmentEvidenceEligible(evidence)) continue;
     const learnable = canonicalSubjects(item);
     const mapped = learnable.map(subject => resolveSubject?.(subject, item));
     const targets = mapped.filter(Boolean);

@@ -124,7 +124,9 @@ export function readAssessmentLearningViewsV2(replica: SyncReplica): AssessmentL
           const evidence = entry.payload.evidence.find((entry) => entry.id === action.evidenceId);
           const item = matched.payload.items.find((entry) => entry.item.id === evidence?.item.id);
           return (
-            item && (item.result === 'incorrect' || (item.result === 'correct' && item.flagged))
+            item &&
+            (item.result === 'incorrect' ||
+              (item.result === 'correct' && (item.flagged || item.assisted === true)))
           );
         });
       const eligible =

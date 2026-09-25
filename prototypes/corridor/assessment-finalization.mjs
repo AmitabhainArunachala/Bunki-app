@@ -1,7 +1,7 @@
 /** One deterministic terminal assessment transaction, independently recomputed
  * by RecordHost and RecordApp's commit guard. No UI patch is accepted here. */
 import { createSyncOperationV2, createAssessmentSyncIntentsV2, createLearningSuppressionIntentV2, encodeLocalJson, operationReference } from './modules/record-core.mjs';
-import { commandAssessmentV2, parseAssessmentLibraryV2, selectAssessmentV2 } from './assessment-v2-controller.mjs';
+import { assessmentOutcomesV2, commandAssessmentV2, parseAssessmentLibraryV2, selectAssessmentV2 } from './assessment-v2-controller.mjs';
 import { ASSESSMENT_LEARNING_POLICY, planAssessmentLearning, applyAssessmentLearning, parseAssessmentLearning, suppressAssessmentLearning, undoAssessmentLearning } from './assessment-learning.mjs';
 
 export const ASSESSMENT_FINALIZE = 'host.assessment-finalize/2';
@@ -69,8 +69,7 @@ export function prepareAssessmentFinalization({ binding, snapshot, meta, input: 
   const nextLibrary = commandAssessmentV2(library, { ...command, now: Date.parse(meta.occurredAt) });
   const selected = selectAssessmentV2(nextLibrary, input.attemptId);
   insist(selected.score && selected.attempt.status !== 'in-progress', 'assessment-not-terminal');
-  const outcomes = selected.score.items.map((row) => ({ ...row, outcome: row.result,
-    flagged: selected.attempt.answers.find((answer) => answer.item.id === row.itemId)?.flagged === true }));
+  const outcomes = assessmentOutcomesV2(selected);
   const planned = planAssessmentLearning({ scope, form: selected.form, attempt: selected.attempt, outcomes, presentation: resolvePresentation?.(selected.form) || null,
     resolveSubject: (subject, item) => checkedAssessmentTarget(subject, resolveSubject?.(subject, item, record) ?? null) });
   const learning = applyAssessmentLearning(record, planned);

@@ -10312,6 +10312,10 @@ async function performAssessmentV2(action) {
     const command = assessmentCommand(selected, action);
     const preview = assessmentV2Module.commandAssessmentV2(S.assessmentLibraryV2, command);
     const after = assessmentV2Module.selectAssessmentV2(preview);
+    // An unchanged revision (reopening an explanation already recorded) changes
+    // nothing durable: no store write, no receipt, no revision.
+    if (after.attempt.attemptId === selected.attempt.attemptId &&
+        after.attempt.revisionId === selected.attempt.revisionId) return true;
     if (after.attempt.status !== 'in-progress') {
       const { now, ...input } = command;
       const request = assessmentFinalizationRetry?.epoch === epoch ? assessmentFinalizationRetry : {
@@ -10450,6 +10454,9 @@ function createAssessmentRoom() {
       return { assessmentLibraryV2: { ...library, activeAttemptId: null } };
     }),
     followup: attemptId => S.assessmentLearning?.followups.find(row => row.attemptId === attemptId),
+    // null until the item's assistance is durable; the view never reads a key before
+    explanation: (attemptId, itemId) => assessmentV2Module.selectAssessmentExplanationV2(S.assessmentLibraryV2, attemptId, itemId),
+    independence: selected => assessmentV2Module.assessmentIndependenceV2(selected),
     removableAdditions: followup => {
       const current = S.taken.filter(row => row.assessmentRef?.followupId === followup.id);
       return { currentCount: current.length, removableCount: current.filter(row =>
@@ -10645,7 +10652,7 @@ function assessmentReviewContext(card) {
   const key = srsKey(card.t, card.id);
   const retained = S.taken.find(row => srsKey(row.t, row.id) === key);
   if (!retained || !assessmentV2Module) return null;
-  let followup, evidence, selected;
+  let followup, evidence, selected, eligible = false, assisted = false;
   if (retained.assessmentRef) {
     const ref = retained.assessmentRef;
     followup = S.assessmentLearning?.followups.find(row => row.id === ref.followupId);
@@ -10653,6 +10660,8 @@ function assessmentReviewContext(card) {
       srsKey(row.target.t, row.target.id) === key && ['added', 'existing'].includes(row.status));
     if (!action || !assessmentAttemptVisible(followup.attemptId)) return null;
     evidence = followup.evidence.find(row => row.id === action.evidenceId);
+    eligible = assessmentV2Module.assessmentEvidenceEligible(evidence);
+    assisted = assessmentV2Module.validAssessmentAssistanceMark(evidence?.assistance);
     selected = assessmentV2Module.selectAssessmentV2(S.assessmentLibraryV2, followup.attemptId);
     if (selected?.attempt.revisionId !== followup.attemptRevisionId) return null;
   } else if (retained.assessmentReceivedRef) {
@@ -10678,16 +10687,18 @@ function assessmentReviewContext(card) {
     const result = publishedNoteSnapshot.assessmentResultViewsV2.find(row => row.attemptId === ref.attemptId)?.headResults[0]?.payload;
     const receivedItem = result?.items.find(row => row.item.id === evidence?.item.id && row.item.sha256 === evidence?.item.sha256);
     if (!receivedItem) return null;
-    evidence = { ...evidence, outcome: receivedItem.result, flagged: receivedItem.flagged };
+    // the received adapter carries the wire flag instead of dropping it
+    evidence = { ...evidence, outcome: receivedItem.result, flagged: receivedItem.flagged, assisted: receivedItem.assisted === true };
+    eligible = assessmentV2Module.assessmentResultItemEligible(receivedItem);
+    assisted = receivedItem.assisted === true;
   }
   if (!selected || selected.attempt.status !== 'submitted' || !evidence ||
-      selected.form.sha256 !== followup.form.sha256 ||
-      !(evidence.outcome === 'incorrect' || evidence.outcome === 'correct' && evidence.flagged)) return null;
+      selected.form.sha256 !== followup.form.sha256 || !eligible) return null;
   const item = selected.form.items.find(row => row.id === evidence.item.id && row.revisionId === evidence.item.revisionId &&
     row.sha256 === evidence.item.sha256 && row.subjects.includes(key));
   if (!item) return null;
   return { attemptId: selected.attempt.attemptId, itemId: item.id, title: selected.form.title,
-    prompt: item.prompt, rationale: item.rationale };
+    prompt: item.prompt, rationale: item.rationale, assisted };
 }
 function allAssessmentEvidence(state = S) {
   const visibleLearning = state.assessmentLearning && { ...state.assessmentLearning,
@@ -17607,7 +17618,11 @@ function renderReview(main) {
       context.append(el('h2', '', tx('模試での使い方', 'From your mock test')));
       const prompt = el('p', '', assessment.prompt); prompt.lang = 'ja';
       const explanation = el('p', 'assessment-review-rationale', assessment.rationale); explanation.lang = 'ja';
-      context.append(prompt, explanation); face.append(context);
+      context.append(prompt, explanation);
+      // the answer was locked before the explanation opened; the card says so, and grades nothing
+      if (assessment.assisted) context.append(el('p', 'assessment-review-assisted',
+        tx('助けあり · 答えたあとに解説を見た問題', 'Assisted · you opened the explanation after answering')));
+      face.append(context);
     }
     // 読み — the answer line wears the brush hand and carries the 音 door
     // (operator, 2026-08-20: audio on every answer card; their word

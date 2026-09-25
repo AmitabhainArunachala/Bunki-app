@@ -2,7 +2,7 @@
  * immutable; each changed follow-up explicitly supersedes its prior sync head. */
 import { encodeLocalJson, createAssessmentSyncIntentsV2, createLearningFollowupRevisionIntentV2,
   createSyncOperationV2, operationReference, readAssessmentResultViewsV2 } from './modules/record-core.mjs';
-import { parseAssessmentLibraryV2, selectAssessmentV2 } from './assessment-v2-controller.mjs';
+import { assessmentOutcomesV2, parseAssessmentLibraryV2, selectAssessmentV2 } from './assessment-v2-controller.mjs';
 import { parseAssessmentLearning, planAssessmentLearning, applyAssessmentLearningEnrichment } from './assessment-learning.mjs';
 import { checkedAssessmentTarget } from './assessment-finalization.mjs';
 
@@ -54,8 +54,8 @@ export function prepareAssessmentEnrichment({ binding, snapshot, meta, input: ra
     const heads = entity.heads.map(ref => snapshot.replica.operations.find(row => same(operationReference(row), ref)));
     if (heads.some(row => !row || row.payload.kind !== 'learning.followup/2' ||
         !same(withoutCausality(row.payload), withoutCausality(previousIntents[1].payload)))) continue;
-    const outcomes = selected.score.items.map(row => ({ ...row, outcome: row.result,
-      flagged: selected.attempt.answers.find(answer => answer.item.id === row.itemId)?.flagged === true }));
+    // The same projection as finalization, so a retry reconstructs identical evidence.
+    const outcomes = assessmentOutcomesV2(selected);
     const planned = planAssessmentLearning({ scope, form: selected.form, attempt: selected.attempt, outcomes,
       presentation: resolvePresentation?.(selected.form, record) || null,
       resolveSubject: (subject, item) => {
