@@ -7497,3 +7497,11 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .assessment-question-image { display: block; max-width: 100%; height: auto; }
 .assessment-question-review .teacher-actions { flex-wrap: wrap; }
 .assessment-question-review button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+
+/* A room that cannot draw says why (2026-09-25): a quiet sheet, the room's name,
+ * one line of plain reason and the one action that helps. Never an empty page. */
+.room-state { max-width: 34rem; margin: 2.5rem auto; padding: 1.5rem 1.25rem; border: 1px solid var(--line, rgba(0, 0, 0, .12)); border-radius: 6px; }
+.room-state .view-title { margin-top: 0; }
+.room-state p { margin: .5rem 0; line-height: 1.6; }
+.room-state .room-state-why { opacity: .78; font-size: .92em; }
+.room-state .chip { margin: .75rem .5rem 0 0; }
