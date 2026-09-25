@@ -7,7 +7,6 @@ import {
   mkdtempSync,
   readFileSync,
   realpathSync,
-  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { homedir } from 'node:os';
@@ -121,12 +120,6 @@ export function resolveCorridorSite() {
       sourceCompared: suppliedDigest === undefined,
       modules: manifest.modules,
     });
-    // An assembled site is a ~325 MB regenerable copy; every run used to leave one
-    // behind (33 GB under ~/.dharma/bunki/corridor by 2026-09-25). The receipt keeps
-    // its identity; the copy leaves with the process unless explicitly retained.
-    const retain = supplied !== undefined || process.env.KAIRO_KEEP_ASSEMBLED_SITE === '1';
-    receipt.siteRetained = retain;
-    if (!retain) process.once('exit', () => rmSync(site, { recursive: true, force: true }));
     writeFileSync(join(run, 'selection.json'), JSON.stringify(receipt, null, 2) + '\n');
     requested = supplied;
     requestedDigest = suppliedDigest;
@@ -139,7 +132,6 @@ export function resolveCorridorSite() {
         String(error.stdout || '') + String(error.stderr || ''),
       );
     }
-    if (supplied === undefined) rmSync(join(run, 'site'), { recursive: true, force: true });
     Object.assign(receipt, { status: 'failed', error: error.message });
     writeFileSync(join(run, 'selection.json'), JSON.stringify(receipt, null, 2) + '\n');
     throw error;
