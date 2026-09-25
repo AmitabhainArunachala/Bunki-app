@@ -29,7 +29,7 @@ const exposed = ['S', 'D', 'recordApp', 'recordController', 'recordInstallation'
   'loadAssessmentCatalog', 'startAssessmentRoom', 'currentAssessmentV2', 'applyAssessmentV2',
   'toggleTaken', 'commitStorePatch', 'publishRecordSnapshot', 'reconcileAssessmentResults',
   'resolveTeacherSource', 'assertLearningSource', 'enrichAssessmentCards', 'assessmentV2Notice', 'allAssessmentEvidence',
-  'assessmentReviewContext', 'startReview', 'render'];
+  'assessmentReviewContext', 'startReview', 'render', 'openAssessmentSensei'];
 const corridorSource = readFileSync(resolve(site, 'corridor.js'));
 const gradeDiagnostics = process.env.KAIRO_GRADE_DIAGNOSTICS === '1';
 // Diagnostic wrappers are served only by this fixture. They observe the real
