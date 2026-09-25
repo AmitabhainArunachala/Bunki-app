@@ -7516,3 +7516,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 .report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
 .report-line-sheet { margin: 2rem 0 .5rem; }
 #app > .report-line-page { max-width: 40rem; margin-inline: auto; padding-inline: 1rem; }
+
+/* the 音 door's reason when it cannot play — visible and announced, never a silent tap */
+.say-note { display: block; flex-basis: 100%; margin-top: .25rem; font-size: .82rem; color: var(--faint); }
+.say-note:empty { display: none; }
