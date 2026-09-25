@@ -23629,7 +23629,13 @@ function stampRegister() {
             : main.querySelector('.chat-log') ? 'tutor'
               : main.querySelector('#shelf-body') ? 'shelf'
                 : main.querySelector('.mock-review') ? 'review' : 'hall';
-  if (html.dataset.room !== room) html.dataset.room = room;
+  if (html.dataset.room !== room) {
+    html.dataset.room = room;
+    // one beat of entrance motion on arrival only (register.css keys the lift on this)
+    html.dataset.roomEntering = '1';
+    clearTimeout(stampRegister.enterTimer);
+    stampRegister.enterTimer = setTimeout(() => { delete html.dataset.roomEntering; }, 220);
+  }
   const progress = document.querySelector('.exam-progress');
   const counted = ((progress?.firstElementChild || progress)?.textContent || '').match(/(\d+)\s*(?:of|\/)\s*(\d+)/);
   if (counted) html.style.setProperty('--stage', String(Number(counted[1]) / Number(counted[2])));
