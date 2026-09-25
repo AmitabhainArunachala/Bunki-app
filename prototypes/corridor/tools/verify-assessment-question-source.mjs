@@ -157,6 +157,35 @@ check('received wrong or flagged evidence is eligible; skips and unflagged corre
     refreshDigest(input); assert.equal(!!resolveSource(input), eligible);
   }
 });
+// G1: the fixed eligibility truth table (LITERALS.json eligibilityTruthTable, fixture ledger 5653be4e…)
+// through both adapters of the real resolver: the local branch reads a valid evidence mark, the
+// received branch the literal wire flag. A truthy stand-in for either is not assistance.
+check('local mark and received wire flag drive the fixed truth table; truthy stand-ins do not', () => {
+  const mark = { kind: 'explanation', at };
+  for (const [outcome, flagged, assisted, eligible] of [['incorrect', false, false, true], ['incorrect', true, true, true],
+    ['correct', false, false, false], ['correct', true, false, true], ['correct', false, true, true],
+    ['correct', true, true, true], ['unanswered', true, false, false], ['not-reached', false, false, false]]) {
+    const localInput = local(), evidence = localInput.record.assessmentLearning.followups[0].evidence[0];
+    Object.assign(evidence, { outcome, flagged }); delete evidence.assistance;
+    if (assisted) evidence.assistance = { ...mark };
+    assert.equal(!!resolveSource(localInput), eligible, `local ${outcome} flagged=${flagged} assisted=${assisted}`);
+    const receivedInput = received(), wire = receivedInput.results[0].headResults[0].payload.items[0];
+    Object.assign(wire, { result: outcome, flagged }); delete wire.assisted;
+    if (assisted) wire.assisted = true;
+    refreshDigest(receivedInput);
+    assert.equal(!!resolveSource(receivedInput), eligible, `received ${outcome} flagged=${flagged} assisted=${assisted}`);
+  }
+  for (const standIn of [true, 'explanation', { kind: 'hint', at }, { kind: 'explanation', at: -1 }, {}]) {
+    const input = local();
+    Object.assign(input.record.assessmentLearning.followups[0].evidence[0], { outcome: 'correct', flagged: false, assistance: standIn });
+    assert.equal(resolveSource(input), null, `local stand-in ${JSON.stringify(standIn)}`);
+  }
+  for (const standIn of ['true', 1, {}, false]) {
+    const input = received();
+    Object.assign(input.results[0].headResults[0].payload.items[0], { result: 'correct', flagged: false, assisted: standIn });
+    refreshDigest(input); assert.equal(resolveSource(input), null, `received stand-in ${JSON.stringify(standIn)}`);
+  }
+});
 check('remote undo preserves a reviewed retained-history card and explicit removal remains absent', () => {
   const input = received(); input.record.srs = { [key]: { due: '2026-10-01T00:00:00.000Z', reps: 3 } };
   input.record.revlog = [[at, key, 3]];

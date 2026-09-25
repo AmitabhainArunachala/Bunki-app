@@ -66,7 +66,118 @@ async function pendingQuestion(page) {
   });
 }
 
+// G1 E1/E2 at the host: the KE2b witness. A lawful practice sitting answers 'two' correctly and
+// opens its explanation, so 'two' is eligible only through its mark; 'one' is wrong and its word is
+// already a card. The word for 'two' is not mapped yet, so the accepted finish is pending-mapping
+// with the mark in evidence. The host's record check also runs the app's own learning-record
+// validator and keeps its refusal text.
+async function assistedPending(page) {
+  return page.evaluate(async () => {
+    const f = window.fixture, learning = await import('/assessment-learning.mjs');
+    const scope = f.input.scope, now = Date.parse('2026-09-23T00:00:00Z'), attemptId = 'attempt:enrich-why';
+    const resolve = f.options.assessmentSubjectResolver, validate = f.options.validateRecord;
+    f.available = new Set(['word:one']); f.refusals = [];
+    f.options = { ...f.options,
+      assessmentSubjectResolver: (subject, item, record) => f.available.has(subject) ? resolve(subject, item, record) : null,
+      validateRecord: (record) => {
+        if (!validate(record)) return false;
+        try { return record.assessmentLearning == null || learning.validateAssessmentLearningRecord(record) === true; }
+        catch (error) { f.refusals.push(String(error?.message || error)); return false; }
+      } };
+    f.instance = await f.app.createRecordApp(f.options);
+    let library = f.assessment.startAssessmentV2(f.assessment.createAssessmentLibraryV2({ scope }), f.form,
+      { scope, attemptId, mode: 'practice', now, clockSessionId: 'clock:enrich-why', monotonicMs: 0,
+        editorialAtStart: { status: 'ai-reviewed-practice', policyVersion: 'synthetic-test-only', decisionRevisionIds: ['synthetic:no-content-approval'] } });
+    const step = (action, ms) => { library = f.assessment.commandAssessmentV2(library, { scope, attemptId,
+      expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId,
+      now: now + ms, clockSessionId: 'clock:enrich-why', monotonicMs: ms, action }); };
+    step({ kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } }, 100);
+    step({ kind: 'visit', itemId: 'two' }, 200);
+    step({ kind: 'answer', itemId: 'two', response: { kind: 'selected', optionId: 'a' } }, 300);
+    step({ kind: 'assistance', itemId: 'two', reason: 'explanation' }, 400);
+    const mark = f.assessment.selectAssessmentV2(library).attempt.answers.find((row) => row.item.id === 'two').assistance ?? null;
+    const seeded = await f.instance.write(() => ({ patch: { assessmentLibraryV2: library } }));
+    let finish;
+    try {
+      finish = await f.instance.finalizeAssessment({ changeId: 'finish:enrich-why', occurredAt: new Date(now + 500).toISOString() },
+        (snapshot) => ({ scope, attemptId, expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId,
+          clockSessionId: 'clock:enrich-why', monotonicMs: 500, action: { kind: 'submit' }, expectedRevision: snapshot.revision }));
+    } catch (error) { finish = { status: 'thrown', reason: String(error?.code ?? error?.message ?? error) }; }
+    const followup = finish.status === 'active'
+      ? finish.snapshot.record.assessmentLearning.followups.find((row) => row.attemptId === attemptId) : null;
+    f.enrichmentBefore = await f.disk();
+    return { seeded: seeded.status, mark: mark && { kind: mark.kind, at: mark.at },
+      finish: { status: finish.status, reason: finish.reason ?? null }, refusals: [...f.refusals],
+      followup: followup && { status: followup.status,
+        evidence: followup.evidence.map((row) => [row.item.id, row.assistance ?? null]),
+        actions: followup.actions.map((row) => [row.target.t, row.target.id, row.status]) } };
+  });
+}
+
 export async function runAssessmentEnrichmentCases(browser, engine, runCase) {
+  // Candidate: the only new action is the assisted item's; evidence (with its mark) and the prior
+  // action stay byte-equal; one followup revision, no new result, no grade; the exact retry is a
+  // duplicate and a later call writes nothing. Under KE2b (the enrichment mapper drops the mark)
+  // the refusal row fails with enrichment-evidence-changed and reports whether durable state held.
+  await runCase(browser, engine, 'enrichment-assisted-mark-survives-mapping-retry-through-the-validator', async page => {
+    const setup = await assistedPending(page);
+    // setup: the marked sitting was stored by an ordinary write and finalized pending-mapping
+    assert.equal(setup.seeded, 'active');
+    assert(setup.mark && setup.mark.kind === 'explanation');
+    assert.equal(setup.finish.status, 'active', `setup finish ${setup.finish.reason}; validator ${JSON.stringify(setup.refusals)}`);
+    assert.equal(setup.followup.status, 'pending-mapping');
+    assert.deepEqual(setup.followup.evidence, [['one', null], ['two', setup.mark], ['three', null]]);
+    assert.deepEqual(setup.followup.actions, [['word', 'one', 'existing']]);
+    const value = await page.evaluate(async () => {
+      const f = window.fixture; f.available.add('word:two');
+      const state = await f.instance.snapshot();
+      const call = { meta: { changeId: 'enrich:why', occurredAt: '2026-09-23T00:00:02.000Z' },
+        input: { expectedRevision: state.snapshot.revision, scope: state.snapshot.identity } };
+      let enriched, refusal = null;
+      try { enriched = await f.instance.enrichAssessmentLearning(call.meta, call.input); }
+      catch (error) { refusal = [error?.code, error?.message].filter(Boolean).join(': ') || String(error); }
+      const disk = await f.disk();
+      const unchanged = JSON.stringify(disk) === JSON.stringify(f.enrichmentBefore);
+      if (refusal || enriched.status !== 'active')
+        return { refusal: refusal ?? `${enriched.status}: ${enriched.reason}`, unchanged, refusals: [...f.refusals] };
+      const retry = await f.instance.enrichAssessmentLearning(call.meta, call.input), afterRetry = await f.disk();
+      const current = await f.instance.snapshot();
+      const noop = await f.instance.enrichAssessmentLearning({ changeId: 'enrich:why:again', occurredAt: '2026-09-23T00:00:03.000Z' },
+        { expectedRevision: current.snapshot.revision, scope: current.snapshot.identity });
+      return { refusal, unchanged, refusals: [...f.refusals], before: f.enrichmentBefore, enriched, disk,
+        retry, afterRetry, noop, afterNoop: await f.disk() };
+    });
+    // KE2b's permitted failing row: the enrichment path refuses changed evidence before any write
+    assert.equal(value.refusal, null,
+      `enrichment refused: ${value.refusal}; durable state unchanged: ${value.unchanged}; validator ${JSON.stringify(value.refusals)}`);
+    // candidate: accepted by the host and the app's validator; only the assisted item's card is added
+    assert.deepEqual(value.refusals, []);
+    const before = value.before.documents.find((row) => row.collection === 'learner-record').value;
+    const record = value.enriched.snapshot.record;
+    const prior = before.assessmentLearning.followups.find((row) => row.attemptId === 'attempt:enrich-why');
+    const followup = record.assessmentLearning.followups.find((row) => row.attemptId === 'attempt:enrich-why');
+    assert.equal(followup.id, prior.id); assert.equal(followup.status, 'complete');
+    assert.equal(followup.attemptRevisionId, prior.attemptRevisionId);
+    assert.deepEqual(followup.evidence, prior.evidence);
+    assert.deepEqual(followup.actions.slice(0, prior.actions.length), prior.actions);
+    const added = followup.actions.slice(prior.actions.length);
+    assert.deepEqual(added.map((row) => [row.target.t, row.target.id, row.status]), [['word', 'two', 'added']]);
+    assert.equal(added[0].evidenceId, followup.evidence.find((row) => row.item.id === 'two').id);
+    assert.deepEqual(record.assessmentLibraryV2, before.assessmentLibraryV2);
+    assert.deepEqual(record.taken.slice(0, before.taken.length), before.taken);
+    const card = record.taken.slice(before.taken.length);
+    assert.deepEqual(card.map((row) => [row.t, row.id, row.by, row.started, row.ts]),
+      [['word', 'two', 'assessment', followup.completedAt, followup.completedAt]]);
+    assert.deepEqual(card[0].assessmentRef, { followupId: followup.id, evidenceId: added[0].evidenceId, actionId: added[0].id });
+    assert.deepEqual(record.srs, before.srs); assert.deepEqual(record.revlog, before.revlog); assert.deepEqual(record.obslog, before.obslog);
+    const operations = value.disk.outbox.toSorted((a, b) => a.actor.sequence - b.actor.sequence);
+    assert.deepEqual(operations.map((row) => row.payload.kind), ['assessment.result/2', 'learning.followup/2', 'learning.followup/2']);
+    assert.deepEqual(operations.slice(0, 2), value.before.outbox.toSorted((a, b) => a.actor.sequence - b.actor.sequence));
+    assert.deepEqual(operations[0].payload.items.filter((row) => row.assisted === true).map((row) => row.item.id), ['two']);
+    assert.deepEqual(operations[2].payload.supersedes, [value.before.replica.ready.find((row) => row.opId === operations[1].opId)]);
+    assert.equal(value.retry.receipt.outcome, 'duplicate'); assert.deepEqual(value.afterRetry, value.disk);
+    assert.equal(value.noop.status, 'active'); assert.equal(value.noop.receipt, undefined); assert.deepEqual(value.afterNoop, value.disk);
+  });
   await runCase(browser, engine, 'enrichment-historical-question-adds-one-card-without-regrading-or-changing-evidence', async page => {
     await pendingQuestion(page);
     const value = await page.evaluate(async () => {

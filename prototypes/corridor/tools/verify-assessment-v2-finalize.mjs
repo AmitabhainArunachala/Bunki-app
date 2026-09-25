@@ -227,6 +227,121 @@ try {
         assert.equal(value.status, 'submitted');
         assert.deepEqual(value.evidence, [{ kind: value.mark.kind, at: value.mark.at }, null, null]);
       });
+      // G1 F3 at the host: an assisted practice finish whose acknowledgement is lost after the durable
+      // commit. The exact retry confirms that one commit as a duplicate: one result carrying the flag
+      // on the marked item only, one followup, one finalize receipt, the mark kept in evidence, the
+      // assisted card added once, no grade, and no durable byte changed by the retry. (The staged app
+      // has no DOM path to this retry: an unconfirmed finish protects the window, and its recovery is a
+      // reload that drops the in-memory retry. The packet README gives the source lines.)
+      await runCase(browser, engine, 'assisted-lost-ack-retry-confirms-once-and-keeps-the-mark', async (page) => {
+        const value = await page.evaluate(async () => {
+          const f = window.fixture, scope = f.input.scope, now = Date.parse('2026-09-23T00:00:00Z'), attemptId = 'attempt:lost-why';
+          let library = f.assessment.startAssessmentV2(f.assessment.createAssessmentLibraryV2({ scope }), f.form,
+            { scope, attemptId, mode: 'practice', now, clockSessionId: 'clock:lost-why', monotonicMs: 0,
+              editorialAtStart: { status: 'ai-reviewed-practice', policyVersion: 'synthetic-test-only', decisionRevisionIds: ['synthetic:no-content-approval'] } });
+          const step = (action, ms) => { library = f.assessment.commandAssessmentV2(library, { scope, attemptId,
+            expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId,
+            now: now + ms, clockSessionId: 'clock:lost-why', monotonicMs: ms, action }); };
+          step({ kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } }, 100);
+          step({ kind: 'visit', itemId: 'two' }, 200);
+          step({ kind: 'answer', itemId: 'two', response: { kind: 'selected', optionId: 'a' } }, 300);
+          step({ kind: 'assistance', itemId: 'two', reason: 'explanation' }, 400);
+          const mark = f.assessment.selectAssessmentV2(library).attempt.answers.find((row) => row.item.id === 'two').assistance ?? null;
+          const seeded = await f.instance.write(() => ({ patch: { assessmentLibraryV2: library } }));
+          const meta = { changeId: 'finish:lost-why', occurredAt: new Date(now + 500).toISOString() };
+          const input = { scope, attemptId, expectedRevision: seeded.snapshot.revision,
+            expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId,
+            clockSessionId: 'clock:lost-why', monotonicMs: 500, action: { kind: 'submit' } };
+          f.controller.commitLocal = async (request) => { await f.realCommit(request); throw new Error('Synthetic lost acknowledgement'); };
+          let first;
+          try { first = await f.instance.finalizeAssessment(meta, input); } finally { f.controller.commitLocal = f.realCommit; }
+          const committed = await f.disk();
+          f.instance = await f.app.createRecordApp(f.options);
+          const before = await f.disk();
+          let retry;
+          try { retry = await f.instance.finalizeAssessment(meta, input); }
+          catch (error) { retry = { status: 'thrown', reason: String(error?.code ?? error?.message ?? error) }; }
+          return { seeded: seeded.status, mark: mark && { kind: mark.kind, at: mark.at }, first, committed, before, retry, after: await f.disk() };
+        });
+        const recordOf = (disk) => disk.documents.find((row) => row.collection === 'learner-record').value;
+        // setup: the mark was stored, and the first commit is durable although its acknowledgement was lost
+        assert.equal(value.seeded, 'active'); assert(value.mark && value.mark.kind === 'explanation');
+        assert.equal(value.first.status, 'recovery-required');
+        assert.equal(recordOf(value.committed).assessmentLibraryV2.attempts.find((row) => row.attemptId === 'attempt:lost-why').status, 'submitted');
+        // the exact retry (the retained pre-commit meta and input) leaves durable state unchanged, whatever its outcome
+        assert.deepEqual(value.after, value.before);
+        // and confirms that commit as a duplicate. KF3's permitted failing row is this one, after the row above
+        // passed: with the receipt lookup bypassed, the retained stale revision is refused first by the revision
+        // guard, `exact retry refused: assessment-store-superseded` (never assessment-already-emitted)
+        assert.equal(value.retry.status, 'active', `exact retry refused: ${value.retry.reason}`);
+        assert.equal(value.retry.receipt.outcome, 'duplicate'); assert.equal(value.retry.replayUiEffects, false);
+        const operations = value.after.outbox.filter((row) => row.payload.attemptId === 'attempt:lost-why');
+        const results = operations.filter((row) => row.payload.kind === 'assessment.result/2');
+        assert.equal(results.length, 1);
+        assert.equal(operations.filter((row) => row.payload.kind === 'learning.followup/2').length, 1);
+        assert.deepEqual(results[0].payload.items.filter((row) => row.assisted === true).map((row) => row.item.id), ['two']);
+        assert.equal(value.after.documents.filter((row) => row.collection === 'kairo:record-host-commands' &&
+          row.value?.type === 'host.assessment-finalize/2').length, 1);
+        const record = value.retry.snapshot.record;
+        const followup = record.assessmentLearning.followups.find((row) => row.attemptId === 'attempt:lost-why');
+        assert.deepEqual(followup.evidence.find((row) => row.item.id === 'two').assistance, value.mark);
+        assert.deepEqual(record.taken.filter((row) => row.id === 'two').map((row) => [row.by, row.started]), [['assessment', followup.completedAt]]);
+        assert.deepEqual(record.srs, { 'word:one': { due: 999, stability: 12 } }); assert.deepEqual(record.revlog, [[111, 'word:one', 3]]);
+      });
+      // G1 F2 at the host: assisted enrollment never overrides earlier study state. 'one' (correct, assisted)
+      // already has a card with a schedule and a review; 'two' (correct, assisted) was removed after an
+      // earlier sitting; 'three' (wrong) is suspended. Each keeps its state (existing, suppressed,
+      // suppressed): no card is re-added or re-dated, no grade is written, and the marks stay in evidence.
+      await runCase(browser, engine, 'assisted-finalization-keeps-existing-removed-and-suspended-targets', async (page) => {
+        const value = await page.evaluate(async () => {
+          const f = window.fixture, now = Date.parse('2026-09-23T00:00:00Z'), attemptId = 'attempt:kept-why';
+          const finished = await f.finish();
+          const removed = await f.instance.suppressAssessmentLearning({ changeId: 'remove:kept-two', occurredAt: '2026-09-23T00:00:01.000Z' },
+            { expectedRevision: finished.snapshot.revision, scope: finished.snapshot.identity, kind: 'remove', key: 'word:two' });
+          const scope = removed.snapshot.identity;
+          let library = f.assessment.startAssessmentV2(removed.snapshot.record.assessmentLibraryV2, f.form,
+            { scope, attemptId, mode: 'practice', now: now + 2000, clockSessionId: 'clock:kept-why', monotonicMs: 0,
+              editorialAtStart: { status: 'ai-reviewed-practice', policyVersion: 'synthetic-test-only', decisionRevisionIds: ['synthetic:no-content-approval'] } });
+          const step = (action, ms) => { library = f.assessment.commandAssessmentV2(library, { scope, attemptId,
+            expectedRevisionId: f.assessment.selectAssessmentV2(library, attemptId).attempt.revisionId,
+            now: now + 2000 + ms, clockSessionId: 'clock:kept-why', monotonicMs: ms, action }); };
+          step({ kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'a' } }, 100);
+          step({ kind: 'assistance', itemId: 'one', reason: 'explanation' }, 200);
+          step({ kind: 'visit', itemId: 'two' }, 300);
+          step({ kind: 'answer', itemId: 'two', response: { kind: 'selected', optionId: 'a' } }, 400);
+          step({ kind: 'assistance', itemId: 'two', reason: 'explanation' }, 500);
+          step({ kind: 'visit', itemId: 'three' }, 600);
+          step({ kind: 'answer', itemId: 'three', response: { kind: 'selected', optionId: 'b' } }, 700);
+          const marks = f.assessment.selectAssessmentV2(library, attemptId).attempt.answers.filter((row) => row.assistance)
+            .map((row) => [row.item.id, { kind: row.assistance.kind, at: row.assistance.at }]);
+          const staged = await f.instance.write(() => ({ patch: { assessmentLibraryV2: library, suspended: { 'word:three': now + 1500 } } }));
+          const before = await f.disk();
+          let ack;
+          try {
+            ack = await f.instance.finalizeAssessment({ changeId: 'finish:kept-why', occurredAt: new Date(now + 2800).toISOString() },
+              { scope, attemptId, expectedRevision: staged.snapshot.revision,
+                expectedRevisionId: f.assessment.selectAssessmentV2(library, attemptId).attempt.revisionId,
+                clockSessionId: 'clock:kept-why', monotonicMs: 800, action: { kind: 'submit' } });
+          } catch (error) { ack = { status: 'thrown', reason: String(error?.code ?? error?.message ?? error) }; }
+          return { states: [finished.status, removed.status, staged.status], marks, before, ack, after: await f.disk() };
+        });
+        // setup: an earlier sitting finished, its word:two card was removed, and the marked sitting was staged
+        assert.deepEqual(value.states, ['active', 'active', 'active']);
+        assert.deepEqual(value.marks.map(([id]) => id), ['one', 'two']);
+        assert.equal(value.ack.status, 'active', `finish ${value.ack.reason}`);
+        const before = value.before.documents.find((row) => row.collection === 'learner-record').value;
+        const record = value.ack.snapshot.record;
+        const followup = record.assessmentLearning.followups.find((row) => row.attemptId === 'attempt:kept-why');
+        assert.deepEqual(followup.actions.map((row) => [row.target.id, row.status]), [['one', 'existing'], ['two', 'suppressed'], ['three', 'suppressed']]);
+        assert.deepEqual(followup.evidence.filter((row) => row.assistance).map((row) => [row.item.id, row.assistance]), value.marks);
+        assert.deepEqual(record.taken, before.taken);
+        assert.deepEqual(record.taken.map((row) => [row.id, row.started, row.ts, row.label]), [['one', 123, 123, 'Existing']]);
+        assert.deepEqual(record.srs, before.srs); assert.deepEqual(record.revlog, before.revlog);
+        assert.deepEqual(record.suspended, before.suspended);
+        assert.deepEqual(record.assessmentLearning.suppressions, before.assessmentLearning.suppressions);
+        const result = value.after.outbox.find((row) => row.payload.kind === 'assessment.result/2' && row.payload.attemptId === 'attempt:kept-why');
+        assert.deepEqual(result.payload.items.filter((row) => row.assisted === true).map((row) => row.item.id), ['one', 'two']);
+      });
       await runCase(browser, engine, 'assessment-input-producer-runs-after-queued-write-and-retains-exact-retry', async (page) => {
         const value = await page.evaluate(async () => {
           const f = window.fixture; let retained;

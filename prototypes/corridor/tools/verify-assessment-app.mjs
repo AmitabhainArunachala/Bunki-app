@@ -327,19 +327,24 @@ async function finish(page) {
     return { answered, submitted, writable: recordWritable(), record: recordApp.current().snapshot.record };
   });
 }
-async function receive(page, mappedWord = false) {
-  return page.evaluate(async ({ form, entry, mappedWord }) => {
+async function receive(page, mappedWord = false, assisted = false) {
+  return page.evaluate(async ({ form, entry, mappedWord, assisted }) => {
     const sync = await import('./modules/record-core.mjs');
     const current = await recordApp.snapshot(), scope = current.snapshot.identity;
     const now = Date.now() - 10_000, attemptId = 'received:app-fixture';
     let library = assessmentV2Module.startAssessmentV2(assessmentV2Module.createAssessmentLibraryV2({ scope }), form,
-      { scope, attemptId, mode: 'timed', now, clockSessionId: 'received:clock', monotonicMs: 0, editorialAtStart: entry.editorialAtStart });
-    for (const action of [{ kind: 'answer', itemId: form.items[0].id, response: { kind: 'selected', optionId: 'b' } }, { kind: 'submit' }])
+      { scope, attemptId, mode: assisted ? 'practice' : 'timed', now, clockSessionId: 'received:clock', monotonicMs: 0, editorialAtStart: entry.editorialAtStart });
+    // G1: an assisted sender answers correctly, then opens the explanation, so its item is eligible only through the mark
+    const itemId = form.items[0].id;
+    for (const action of assisted
+      ? [{ kind: 'answer', itemId, response: { kind: 'selected', optionId: 'a' } }, { kind: 'assistance', itemId, reason: 'explanation' }, { kind: 'submit' }]
+      : [{ kind: 'answer', itemId, response: { kind: 'selected', optionId: 'b' } }, { kind: 'submit' }])
       library = assessmentV2Module.commandAssessmentV2(library, { scope, attemptId, now: now + 100, clockSessionId: 'received:clock', monotonicMs: 100,
         expectedRevisionId: assessmentV2Module.selectAssessmentV2(library).attempt.revisionId, action });
     const selected = assessmentV2Module.selectAssessmentV2(library);
     const planned = assessmentLearningModule.planAssessmentLearning({ scope, form, attempt: selected.attempt,
-      outcomes: selected.score.items.map(row => ({ ...row, outcome: row.result, flagged: false })),
+      outcomes: assisted ? assessmentV2Module.assessmentOutcomesV2(selected)
+        : selected.score.items.map(row => ({ ...row, outcome: row.result, flagged: false })),
       resolveSubject: () => mappedWord ? { t: 'word', id: 'assessment-fixture-word', label: 'assessment-fixture-word',
         dictionary: { r: 'ご', m: ['Synthetic dictionary sense differs from test context'] } } : null });
     const applied = assessmentLearningModule.applyAssessmentLearning(current.snapshot.record, planned);
@@ -362,8 +367,9 @@ async function receive(page, mappedWord = false) {
     const reconciled = await reconcileAssessmentResults();
     const sentence = S.taken.find(row => row.t === 'sentence');
     return { reconciled, writable: recordWritable(), sentence, record: recordApp.current().snapshot.record,
-      status: recordApp.current().snapshot.assessmentReconciliation };
-  }, { form, entry, mappedWord });
+      status: recordApp.current().snapshot.assessmentReconciliation,
+      wireAssisted: intents[0].payload.items.filter(row => row.assisted === true).map(row => row.item.id) };
+  }, { form, entry, mappedWord, assisted });
 }
 const caseFilter = process.argv.find(arg => arg.startsWith('--case='))?.slice(7);
 async function run(engine, name, body, { assessmentRetry = false } = {}) {
@@ -548,6 +554,51 @@ try {
         await page.waitForFunction(() => [...document.querySelectorAll('.review-face .reveal')].every(node => Number(getComputedStyle(node).opacity) >= .99));
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Assessment context fits the review card without horizontal overflow');
         await page.screenshot({ path: resolve(evidence, `${engine}-${source}-revealed-context.png`), fullPage: true });
+      });
+      // G1: an assisted card's back names where its help was recorded. A local card says this learner opened the
+      // explanation after answering; a received card says only what its synced result records, with no event on
+      // this device and no time. The word back and the sentence back are both read, for each origin.
+      const assistedWording = { local: 'Assisted · you opened the explanation after answering',
+        received: 'Assisted · the synced result records help on this question' };
+      for (const source of ['local', 'received']) await run(engine, `${source}-assisted-card-backs-name-where-help-was-recorded`, async page => {
+        await page.evaluate(() => { D.dict['assessment-fixture-word'] = { r: 'ご', m: ['Synthetic dictionary sense differs from test context'] }; });
+        if (source === 'local') {
+          const local = await page.evaluate(async () => {
+            const catalog = await loadAssessmentCatalog();
+            if (!await startAssessmentRoom(catalog.entries[0], 'practice')) throw new Error('Assisted fixture start');
+            const itemId = currentAssessmentV2().form.items[0].id;
+            for (const action of [{ kind: 'answer', itemId, response: { kind: 'selected', optionId: 'a' } },
+              { kind: 'assistance', itemId, reason: 'explanation' }, { kind: 'submit' }])
+              if (!await applyAssessmentV2(action)) throw new Error(`Assisted fixture ${action.kind}`);
+            const attempt = S.assessmentLibraryV2.attempts.at(-1);
+            return { status: attempt.status, marked: attempt.answers.filter(row => row.assistance).map(row => row.item.id) };
+          });
+          // setup: a submitted practice sitting whose one correct answer carries the mark
+          assert.deepEqual(local, { status: 'submitted', marked: [item.id] });
+        } else {
+          const received = await receive(page, true, true);
+          // setup: the synced result carries the flag on its one correct answer, and it was reconciled
+          assert(received.reconciled); assert.deepEqual(received.wireAssisted, [item.id]);
+        }
+        const cards = await page.evaluate(() => ['word', 'sentence'].map(t => {
+          const card = S.taken.find(row => row.t === t && (t === 'sentence' || row.id === 'assessment-fixture-word'));
+          const context = card ? assessmentReviewContext(card, t === 'sentence') : null;
+          return { t, id: card?.id ?? null, local: !!card?.assessmentRef, received: !!card?.assessmentReceivedRef,
+            assisted: context?.assisted ?? null, origin: context?.assistedOrigin ?? null };
+        }));
+        // setup: both cards came from this source, and the transient context names its origin
+        for (const card of cards) assert.deepEqual(card, { t: card.t, id: card.id,
+          local: source === 'local', received: source === 'received', assisted: true, origin: source });
+        await page.evaluate(() => startReview([{ t: 'word', id: 'assessment-fixture-word' }]));
+        await page.locator('#declare-notyet').click(); await page.locator('.assessment-review-context').waitFor();
+        const word = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
+        await page.evaluate(id => startReview([{ t: 'sentence', id }]), cards.find(card => card.t === 'sentence').id);
+        await page.locator('#sentence-recall-reveal').click(); await page.locator('.grade.g-again').waitFor();
+        const sentence = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
+        // K9c's permitted failing row (received case): each back shows exactly its origin's wording, never the other
+        assert.deepEqual({ word, sentence }, { word: [assistedWording[source]], sentence: [assistedWording[source]] },
+          `${source} backs name where the help was recorded`);
+        assert(![...word, ...sentence].includes(assistedWording[source === 'local' ? 'received' : 'local']));
       });
       // "Return to this sentence" for a test question once called openPassage(undefined) and went
       // nowhere (PLAN D20). Both real callers must open the JLPT room on THAT attempt with THAT

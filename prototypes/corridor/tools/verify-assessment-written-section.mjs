@@ -468,7 +468,51 @@ const G1 = {
     ['q10', 'question', '受付を早めに済ませるよう求めている理由は何ですか。'],
   ],
   assisted: ['q05', 'q06', 'q10'],
+  // Physical ids of the derived targets. g1PhysicalIds reproduces them from the pinned form; both
+  // formulas were first checked against ids observed in earlier sealed runs of other fixtures.
+  physical: {
+    q03: 'source-practice:teacher-context:2e82ab0f3686ffffedeb5214ea79b4528fa7efc149002066a1cd44b701cff10a:13:15:v1',
+    q05: 'source-practice:teacher-context:3e50223ac8f53315c6d11b2a0e5542213dac160fb2b40c9c669ed53edd28aeec:9:13:v1',
+    q06: 'source-practice:teacher-context:3e66ec5137c81dbff2d0c50d0f8efb3ae9a61d6cf9be3f0f7e97d07f0b89cf02:7:10:v1',
+    q10: 'assessment-question:682faad2ffb4cf7db6769adc379156e7859efe6bfc372d3116f4638cc2e229e5',
+  },
 };
+// The published identity formulas, restated here and computed with node:crypto from the pinned form,
+// never from planner output or candidate action ids. A sentence card is the item's one reviewed blank
+// filled with its key: source-practice:<teacher-context id>:<blank start>:<blank end>:v1, where the
+// context id hashes its sorted content. A question card is assessment-question:<sha256 of the compact
+// sorted JSON of [policy, form ref, item ref, presentation digest]>.
+function g1PhysicalIds(form) {
+  const canonical = (value) => Array.isArray(value) ? value.map(canonical)
+    : value && typeof value === 'object'
+      ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])])) : value;
+  const digest = (value) => sha(JSON.stringify(canonical(value)));
+  const ref = (value, kind) => ({ kind, id: value.id, revisionId: value.revisionId, sha256: value.sha256 });
+  const itemOf = (q) => form.items.find((item) => item.id.split(':').at(-1) === q);
+  assert.equal(form.provenance.kind, 'original-ai');
+  const sentence = (q) => {
+    const item = itemOf(q);
+    const answer = item.response.options.find((option) => option.id === item.response.answerOptionId).text;
+    const line = item.prompt.split('\n').at(-1);
+    const blanks = [...line.matchAll(item.task === 'orthography' ? /【[^【】]+】/gu : /（[\s\u3000]*）/gu)];
+    assert.equal(blanks.length, 1);
+    const start = blanks[0].index, text = line.slice(0, start) + answer + line.slice(start + blanks[0][0].length);
+    const content = { attribution: 'KAIRO original practice · AI authored', end: text.length, index: start, quote: text,
+      sourceDigest: sha(text), sourceId: JSON.stringify({ formId: form.id, formSha256: form.sha256, itemId: item.id,
+        itemRevisionId: item.revisionId, derivation: 'cloze-v2' }), sourceKind: 'assessment-item', start: 0, target: null,
+      title: form.title, unit: 'utf16-code-unit', url: null, version: 2 };
+    return `source-practice:teacher-context:${digest(content)}:${start}:${start + answer.length}:v1`;
+  };
+  const question = (q) => {
+    const item = itemOf(q);
+    assert.deepEqual(item.media, []);
+    const passages = item.passages.map((row) =>
+      ref(form.passages.find((passage) => passage.id === row.id && passage.sha256 === row.sha256), 'passage'));
+    const presentation = digest({ item: ref(item, 'item'), passages, media: [], presentation: null });
+    return `assessment-question:${digest(['assessment-question/1', ref(form, 'form'), ref(item, 'item'), presentation])}`;
+  };
+  return { q03: sentence('q03'), q05: sentence('q05'), q06: sentence('q06'), q10: question('q10') };
+}
 const g1Skipped = [];
 async function g1Reload(page) {
   const origin = await page.evaluate(() => performance.timeOrigin);
@@ -925,7 +969,136 @@ async function assistedWhyCase(page, section, log) {
     assert.deepEqual(again.snapshot.record.taken, done.taken);
     assert.deepEqual(again.snapshot.record.assessmentLearning.followups, done.assessmentLearning.followups);
   });
+  await stage('F1-physical-ids', 'behavior', async (o) => {
+    // placed last with the card back, so neither can hide an earlier accepted row. The derived
+    // sentence and question cards carry the physical ids the published formulas give.
+    o.derived = g1PhysicalIds(section.form);
+    o.observed = Object.fromEntries(done.taken.filter((row) => ['sentence', 'question'].includes(row.t)).map((row) =>
+      [followup.evidence.find((evidence) => evidence.id === row.assessmentRef?.evidenceId)?.item.id.split(':').at(-1), row.id]));
+    assert.deepEqual(o.derived, G1.physical, 'setup: the restated formulas reproduce the frozen ids');
+    assert.deepEqual(o.observed, G1.physical);
+  });
+  await stage('card-back-assisted-mark', 'behavior', async (o) => {
+    // q10's question card came from an assisted answer: its back says so once the answer is checked.
+    // The timed case's unassisted question card is the negative companion.
+    const card = done.taken.find((row) => row.t === 'question');
+    const plan = done.assessmentQuestionPractice.plans.find((row) => row.id === card.id);
+    o.item = followup.evidence.find((row) => row.id === card.assessmentRef?.evidenceId)?.item.id;
+    assert.equal(o.item, byQ.q10.id);
+    await page.locator('#tray').click();
+    await page.locator('.tray-line').first().waitFor();
+    await page.getByRole('button', { name: `${card.label} — full entry`, exact: true }).click();
+    await page.locator('#assessment-question-check').waitFor();
+    o.before = await page.locator('.review-face .assessment-review-assisted').count();
+    await page
+      .locator(`input[name="assessment-question-answer"][value=${JSON.stringify(plan.item.response.answerOptionId)}]`)
+      .check();
+    await page.locator('#assessment-question-check').click();
+    await page.locator('#assessment-question-feedback').waitFor();
+    o.marks = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
+    assert.equal(o.before, 0, 'No mark before the answer is checked');
+    assert.deepEqual(o.marks, ['Assisted · you opened the explanation after answering']);
+  });
   return { attemptId, kept, counts: { correct: 8, incorrect: 2, independent: 7, assisted: 3, unanswered: 2 } };
+}
+
+// ---- G1 F2, native pre-existing-target variant. A first practice sitting enrolls q01's word
+// (点検, LITERALS.json) through an ordinary wrong answer. A second sitting answers q01 correctly
+// and opens its why, so q01 is eligible only through its mark. That card already exists: its
+// action is 'existing', and the card row keeps its first start and provenance, with no grade.
+const G1_EXISTING_CASE = 'untimed-assisted-why-keeps-an-existing-card';
+async function existingCardCase(page, section, log) {
+  const stage = g1Stages(log);
+  const byQ = Object.fromEntries(section.items.map((item) => [item.id.split(':').at(-1), item]));
+  const answerOf = (record, attemptId, q) =>
+    selectAssessmentV2(record.assessmentLibraryV2, attemptId).attempt.answers.find((row) => row.item.id === byQ[q].id);
+  const cards = (record) => record.taken.filter((row) => row.t === 'word' && row.id === '点検');
+  const atPrompt = (q) =>
+    page.waitForFunction((prompt) => document.querySelector('.exam-prompt')?.textContent === prompt, byQ[q].prompt);
+  // finish one sitting: jump to the last question with the real map, then Finish and confirm
+  const finishFromMap = async () => {
+    await page.locator('.exam-question-map summary').click();
+    await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(byQ.q12.id)}]`).click();
+    await atPrompt('q12');
+    await page.locator('#exam-finish-block').click();
+    await page.locator('#exam-confirm-finish').click();
+    await page.locator('.exam-score').waitFor();
+  };
+  let baseline, first, firstCards, second;
+  await stage('first-sitting-enrolls-the-word', 'setup', async (o) => {
+    baseline = await disk(page);
+    assert.deepEqual(baseline.taken, []);
+    await start(page, section, 'practice');
+    const attemptId = selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt.attemptId;
+    await page.locator('[data-exam-option="choice-2"]').click();
+    await pollRecord(page, (record) => answerOf(record, attemptId, 'q01').response.optionId === 'choice-2');
+    await finishFromMap();
+    const done = await pollRecord(page, (record) =>
+      record.assessmentLearning?.followups.some((row) => row.attemptId === attemptId));
+    const followup = done.assessmentLearning.followups.find((row) => row.attemptId === attemptId);
+    first = { attemptId, endedAt: selectAssessmentV2(done.assessmentLibraryV2, attemptId).attempt.endedAt };
+    firstCards = cards(done);
+    o.first = { attemptId, actions: followup.actions.map((row) => [row.target.t, row.target.id, row.status]), cards: firstCards };
+    assert.deepEqual(o.first.actions, [['word', '点検', 'added']]);
+    assert.equal(firstCards.length, 1);
+    assert.equal(firstCards[0].started, first.endedAt);
+  });
+  await stage('second-sitting-marks-the-same-item', 'setup', async (o) => {
+    await page.locator('#exam-done').click();
+    await selectLevel(page, section.pin.level);
+    await page.locator(`[data-exam-start=${JSON.stringify(section.entry.id)}]`).click();
+    await page.locator('#exam-practice-start').click();
+    await atPrompt('q01');
+    const started = await pollRecord(page, (record) => record.assessmentLibraryV2.attempts.length === 2 &&
+      selectAssessmentV2(record.assessmentLibraryV2)?.attempt.status === 'in-progress');
+    const attemptId = selectAssessmentV2(started.assessmentLibraryV2).attempt.attemptId;
+    const key = byQ.q01.response.answerOptionId;
+    await page.locator(`[data-exam-option=${JSON.stringify(key)}]`).click();
+    await pollRecord(page, (record) => answerOf(record, attemptId, 'q01').response.optionId === key);
+    await page.locator('#exam-why').click();
+    await page.locator('#exam-why-sheet').waitFor();
+    const marked = await pollRecord(page, (record) => !!answerOf(record, attemptId, 'q01').assistance);
+    const mark = answerOf(marked, attemptId, 'q01').assistance;
+    second = { attemptId, mark: { kind: mark.kind, at: mark.at } };
+    o.second = second;
+    assert.notEqual(attemptId, first.attemptId);
+    assert.equal(mark.kind, 'explanation');
+    await page.locator('#exam-why-close').click();
+  });
+  let done, selected, followup;
+  await stage('second-finish-accepted-terminal', 'accepted-terminal', async (o) => {
+    await finishFromMap();
+    done = await pollRecord(page, (record) =>
+      record.assessmentLearning?.followups.some((row) => row.attemptId === second.attemptId));
+    selected = selectAssessmentV2(done.assessmentLibraryV2, second.attemptId);
+    followup = done.assessmentLearning.followups.find((row) => row.attemptId === second.attemptId);
+    o.status = selected.attempt.status;
+    o.followupStatus = followup.status;
+    assert.equal(o.status, 'submitted');
+    log.acceptedTerminal = true;
+  });
+  await stage('F2-existing-card-kept', 'behavior', async (o) => {
+    const evidence = followup.evidence.find((row) => row.item.id === byQ.q01.id);
+    o.evidence = { outcome: evidence.outcome, assistance: evidence.assistance ?? null };
+    o.actions = followup.actions.map((row) => [row.target.t, row.target.id, row.status]);
+    o.cards = cards(done);
+    assert.deepEqual(o.evidence, { outcome: 'correct', assistance: second.mark });
+    assert.deepEqual(o.actions, [['word', '点検', 'existing']]);
+    // the card keeps its first start and provenance: nothing re-added, re-dated or graded
+    assert.deepEqual(o.cards, firstCards);
+    assert.notEqual(o.cards[0].started, selected.attempt.endedAt);
+    assert.equal(done.taken.length, 1);
+    assert.deepEqual(done.srs, baseline.srs);
+    assert.deepEqual(done.revlog, baseline.revlog);
+  });
+  await stage('operations-carry-the-mark', 'behavior', async (o) => {
+    const store = await g1Store(page, second.attemptId);
+    const results = store.operations.filter((operation) => operation.payload.kind === 'assessment.result/2');
+    o.assistedWire = results[0]?.payload.items.filter((row) => row.assisted === true).map((row) => row.item.id);
+    assert.equal(results.length, 1);
+    assert.deepEqual(o.assistedWire, [byQ.q01.id]);
+  });
+  return { first: first.attemptId, second: second.attemptId, mark: second.mark };
 }
 
 const dojoPracticeLabel = `${sections.length} practice set${sections.length === 1 ? '' : 's'} · mock tests in preparation`;
@@ -1152,6 +1325,9 @@ try {
         .check();
       await page.locator('#assessment-question-check').click();
       await page.locator('#assessment-question-feedback').waitFor();
+      // negative companion of the G1 card-back stage: an unassisted question card carries no mark
+      assert.equal(await page.locator('.review-face .assessment-review-assisted').count(), 0,
+        'An unassisted card has no assisted mark');
       const answered = await disk(page);
       assert.equal(answered.assessmentQuestionPractice.responses.length, 1);
       assert.deepEqual(answered.revlog, baseline.revlog);
@@ -1278,9 +1454,10 @@ try {
       };
     });
     // G1: the literal ledger belongs to one pinned form; any other section is skipped visibly.
-    if (form.id === G1.form.id && form.sha256 === G1.form.sha256)
+    if (form.id === G1.form.id && form.sha256 === G1.form.sha256) {
       await run(engine, `${G1_CASE}${suffix}`, (page, _context, log) => assistedWhyCase(page, section, log));
-    else {
+      await run(engine, `${G1_EXISTING_CASE}${suffix}`, (page, _context, log) => existingCardCase(page, section, log));
+    } else {
       g1Skipped.push({ engine, formId: form.id, formSha256: form.sha256 });
       console.log(`SKIP ${engine}/assisted-why${suffix}: ${form.id} is not the pinned G1 ledger form`);
     }
@@ -1331,6 +1508,14 @@ try {
           skipped: g1Skipped,
           claimable: engines.every((engine) =>
             results.some((row) => row.engine === engine && row.name.startsWith(G1_CASE) && row.passed)),
+        },
+        // The native pre-existing-target variant (F2), claimed separately on the same terms.
+        assistedWhyExistingCard: {
+          requiredCase: G1_EXISTING_CASE,
+          runs: results.filter((row) => row.name.startsWith(G1_EXISTING_CASE)).map(({ engine, name, passed, acceptedTerminal, failedStage }) =>
+            ({ engine, name, passed, acceptedTerminal, failedStage: failedStage?.name ?? null, failedKind: failedStage?.kind ?? null })),
+          claimable: engines.every((engine) =>
+            results.some((row) => row.engine === engine && row.name.startsWith(G1_EXISTING_CASE) && row.passed)),
         },
         results,
         passed: results.length > 0 && results.every((row) => row.passed),

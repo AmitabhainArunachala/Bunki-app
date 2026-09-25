@@ -10610,6 +10610,9 @@ function renderAssessmentQuestionRecall(face, rv, item) {
       }, () => { rv.questionAttemptId = id; rv.declared = checked.mustRepeat ? 0 : 1; rv.revealed = true; });
       if (current()) requestAnimationFrame(() => document.getElementById('assessment-question-feedback')?.focus({ preventScroll: true }));
     } });
+  // G1: the back of a card from an assisted answer says so, quietly, once the answer is checked
+  const assistance = rv.revealed ? assessmentCardAssistance(item) : null;
+  if (assistance) face.append(assessmentAssistedMark(assistance));
 }
 
 function assessmentTeachingText(item, answer) {
@@ -10671,12 +10674,16 @@ function receivedAssessmentSource(record, attemptId) {
 }
 /** Keep the sense assessed by the test beside the canonical dictionary card.
  * This is revealed source context, never a replacement dictionary definition
- * or an extra review grade. Deleted/stale received evidence cannot supply it. */
-function assessmentReviewContext(card) {
+ * or an extra review grade. Deleted/stale received evidence cannot supply it.
+ * `derived`: a sentence or question card is derived from the item itself, so the
+ * item is matched exactly without being named among its subjects. The transient
+ * `assistedOrigin` says where `assisted` came from: 'local' (this learner's evidence
+ * mark), 'received' (a synced result's wire flag), or null. Nothing is stored. */
+function assessmentReviewContext(card, derived = false) {
   const key = srsKey(card.t, card.id);
   const retained = S.taken.find(row => srsKey(row.t, row.id) === key);
   if (!retained || !assessmentV2Module) return null;
-  let followup, evidence, selected, eligible = false, assisted = false;
+  let followup, evidence, selected, eligible = false, assisted = false, origin = null;
   if (retained.assessmentRef) {
     const ref = retained.assessmentRef;
     followup = S.assessmentLearning?.followups.find(row => row.id === ref.followupId);
@@ -10686,6 +10693,7 @@ function assessmentReviewContext(card) {
     evidence = followup.evidence.find(row => row.id === action.evidenceId);
     eligible = assessmentV2Module.assessmentEvidenceEligible(evidence);
     assisted = assessmentV2Module.validAssessmentAssistanceMark(evidence?.assistance);
+    origin = 'local';
     selected = assessmentV2Module.selectAssessmentV2(S.assessmentLibraryV2, followup.attemptId);
     if (selected?.attempt.revisionId !== followup.attemptRevisionId) return null;
   } else if (retained.assessmentReceivedRef) {
@@ -10715,14 +10723,29 @@ function assessmentReviewContext(card) {
     evidence = { ...evidence, outcome: receivedItem.result, flagged: receivedItem.flagged, assisted: receivedItem.assisted === true };
     eligible = assessmentV2Module.assessmentResultItemEligible(receivedItem);
     assisted = receivedItem.assisted === true;
+    origin = 'received';
   }
   if (!selected || selected.attempt.status !== 'submitted' || !evidence ||
       selected.form.sha256 !== followup.form.sha256 || !eligible) return null;
   const item = selected.form.items.find(row => row.id === evidence.item.id && row.revisionId === evidence.item.revisionId &&
-    row.sha256 === evidence.item.sha256 && row.subjects.includes(key));
+    row.sha256 === evidence.item.sha256 && (derived || row.subjects.includes(key)));
   if (!item) return null;
   return { attemptId: selected.attempt.attemptId, itemId: item.id, title: selected.form.title,
-    prompt: item.prompt, rationale: item.rationale, assisted };
+    prompt: item.prompt, rationale: item.rationale, assisted, assistedOrigin: assisted ? origin : null };
+}
+/** G1: where a card's recorded help came from, through the word back's own bindings:
+ * 'local' (this learner's evidence mark), 'received' (a synced result's wire flag), or null. */
+function assessmentCardAssistance(card) {
+  return assessmentReviewContext(card, true)?.assistedOrigin ?? null;
+}
+/** The back names only what its source establishes. A local mark is this learner's own
+ * explanation, opened after answering. A received flag is what a synced result records:
+ * its sync provenance, not a device, and no event on this device or time. */
+function assessmentAssistedMark(origin) {
+  if (origin !== 'local' && origin !== 'received') throw new TypeError(`assessment-assisted-origin:${origin}`);
+  return el('p', 'assessment-review-assisted', origin === 'local'
+    ? tx('助けあり · 答えたあとに解説を見た問題', 'Assisted · you opened the explanation after answering')
+    : tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'Assisted · the synced result records help on this question'));
 }
 function allAssessmentEvidence(state = S) {
   const visibleLearning = state.assessmentLearning && { ...state.assessmentLearning,
@@ -16758,6 +16781,9 @@ function renderSentenceRecallFace(face, rv, item) {
       const status = el('p', 'teacher-note', rv.sentenceSourceError);
       status.id = 'kanji-reading-review-status'; status.setAttribute('role', 'status'); status.tabIndex = -1; face.append(status);
     }
+    // G1: a sentence card from an assisted answer says so on its back, as the word back does
+    const assistance = assessmentCardAssistance(item);
+    if (assistance) face.append(assessmentAssistedMark(assistance));
   }
 }
 function focusKanjiReadingReview(rv, previousItem = null) {
@@ -18130,9 +18156,8 @@ function renderReview(main) {
       const prompt = el('p', '', assessment.prompt); prompt.lang = 'ja';
       const explanation = el('p', 'assessment-review-rationale', assessment.rationale); explanation.lang = 'ja';
       context.append(prompt, explanation);
-      // the answer was locked before the explanation opened; the card says so, and grades nothing
-      if (assessment.assisted) context.append(el('p', 'assessment-review-assisted',
-        tx('助けあり · 答えたあとに解説を見た問題', 'Assisted · you opened the explanation after answering')));
+      // the card names where the help was recorded (this learner's answer, or a synced result), and grades nothing
+      if (assessment.assisted) context.append(assessmentAssistedMark(assessment.assistedOrigin));
       face.append(context);
     }
     // 読み — the answer line wears the brush hand and carries the 音 door

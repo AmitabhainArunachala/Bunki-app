@@ -2,9 +2,26 @@
 /* global window, IDBObjectStore, DOMException */
 import assert from 'node:assert/strict';
 
-async function recipient(page, { formAvailable = true, targetAvailable = true, corruptResponse = false, cloze = false, question = false } = {}) {
-  await page.evaluate(async ({ formAvailable, targetAvailable, corruptResponse, cloze, question }) => {
+async function recipient(page, { formAvailable = true, targetAvailable = true, corruptResponse = false, cloze = false, question = false,
+  assisted = false } = {}) {
+  await page.evaluate(async ({ formAvailable, targetAvailable, corruptResponse, cloze, question, assisted }) => {
     const f = window.fixture;
+    if (assisted) {
+      // G1: a practice sitting where 'two' is correct and assisted, so it is eligible only through its mark
+      const scope = f.instance.current().snapshot.identity, now = Date.parse('2026-09-23T00:00:00Z');
+      let library = f.assessment.startAssessmentV2(f.assessment.createAssessmentLibraryV2({ scope }), f.form,
+        { scope, attemptId: 'attempt:test', mode: 'practice', now, clockSessionId: 'clock:test', monotonicMs: 0,
+          editorialAtStart: { status: 'ai-reviewed-practice', policyVersion: 'synthetic-test-only', decisionRevisionIds: ['synthetic:no-content-approval'] } });
+      for (const [action, ms] of [[{ kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } }, 100],
+        [{ kind: 'visit', itemId: 'two' }, 200], [{ kind: 'answer', itemId: 'two', response: { kind: 'selected', optionId: 'a' } }, 300],
+        [{ kind: 'assistance', itemId: 'two', reason: 'explanation' }, 400]])
+        library = f.assessment.commandAssessmentV2(library, { scope, attemptId: 'attempt:test',
+          expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId,
+          now: now + ms, clockSessionId: 'clock:test', monotonicMs: ms, action });
+      const ack = await f.instance.write(() => ({ patch: { assessmentLibraryV2: library } }));
+      f.input.expectedRevision = ack.snapshot.revision;
+      f.input.expectedRevisionId = f.assessment.selectAssessmentV2(library).attempt.revisionId;
+    }
     if (cloze || question) {
       const payload = (value) => { const body = JSON.parse(JSON.stringify(value)); delete body.revisionId; delete body.sha256; return body; };
       const formPayload = payload(f.form);
@@ -77,10 +94,58 @@ async function recipient(page, { formAvailable = true, targetAvailable = true, c
     f.recipientDisk = async () => JSON.parse(JSON.stringify(await f.recipientStore.snapshot()));
     const received = await import('/assessment-received.mjs');
     f.summary = (value) => received.receivedAssessmentEvidenceSummary(value.snapshot.record, value.snapshot);
-  }, { formAvailable, targetAvailable, corruptResponse, cloze, question });
+  }, { formAvailable, targetAvailable, corruptResponse, cloze, question, assisted });
 }
 
 export async function runReceivedAssessmentCases(browser, engine, runCase) {
+  // G1 received adapter, enrollment and duplicate receive through the real recipient host. The sender's
+  // 'two' is correct, unflagged and assisted: the recipient enrolls it through the wire flag alone,
+  // once, and a redelivery adds nothing. Under K7b (the view ignores the flag) the card is absent.
+  await runCase(browser, engine, 'received-assisted-correct-enrolls-once-through-the-wire-flag', async (page) => {
+    await recipient(page, { assisted: true });
+    const value = await page.evaluate(async () => {
+      const f = window.fixture; await f.receive(); const applied = await f.reconcile();
+      await f.receive(); const repeated = await f.reconcile();
+      return { applied, repeated, after: await f.recipientDisk(), wire: f.senderOperations };
+    });
+    // setup: the sender's result carries the literal flag on the assisted item only
+    const result = value.wire.find((row) => row.payload.kind === 'assessment.result/2');
+    assert.deepEqual(result.payload.items.filter((row) => row.assisted === true).map((row) => row.item.id), ['two']);
+    assert.equal(value.applied.status, 'active');
+    const record = value.applied.snapshot.record;
+    assert.deepEqual(record.taken.map((row) => row.id), ['two']);
+    assert(record.taken[0].assessmentReceivedRef);
+    assert.equal(record.assessmentReceived.followups[0].status, 'applied');
+    assert.deepEqual(record.srs, { 'word:one': { due: 7000, stability: 44 } });
+    assert.deepEqual(record.revlog, [[123, 'word:one', 4]]);
+    assert.equal(value.repeated.status, 'active'); assert.equal(value.repeated.receipt, undefined);
+    assert.deepEqual(value.repeated.snapshot.record, record);
+    assert.equal(value.after.replica.operations.length, 2); assert.equal(value.after.outbox.length, 0);
+  });
+  // The negative companion: strip only the wire flag, reseal, and the same action is ineligible.
+  await runCase(browser, engine, 'received-stripped-flag-makes-the-assisted-action-ineligible', async (page) => {
+    await recipient(page, { assisted: true });
+    const value = await page.evaluate(async () => {
+      const f = window.fixture; let predecessor = null;
+      const stripped = f.senderOperations.map((original) => {
+        const input = JSON.parse(JSON.stringify(original)); delete input.opId; delete input.payloadSha256;
+        input.predecessor = predecessor;
+        if (input.payload.kind === 'assessment.result/2') delete input.payload.items.find((row) => row.item.id === 'two').assisted;
+        const operation = f.core.createSyncOperationV2(input); predecessor = f.core.operationReference(operation); return operation;
+      });
+      await f.receive(stripped); const observed = await f.reconcile();
+      return { observed, wire: f.senderOperations, stripped };
+    });
+    // setup: the original carried the flag; only the flag was removed (the aggregate condition stays)
+    const original = value.wire.find((row) => row.payload.kind === 'assessment.result/2');
+    const stripped = value.stripped.find((row) => row.payload.kind === 'assessment.result/2');
+    assert.deepEqual(original.payload.items.filter((row) => row.assisted === true).map((row) => row.item.id), ['two']);
+    assert.equal(stripped.payload.items.some((row) => 'assisted' in row), false);
+    assert.deepEqual(stripped.payload.conditions, original.payload.conditions);
+    assert.equal(value.observed.status, 'active');
+    assert.equal(value.observed.snapshot.record.assessmentReceived.followups[0].status, 'ineligible');
+    assert.deepEqual(value.observed.snapshot.record.taken, []);
+  });
   await runCase(browser, engine, 'received-question-reconstructs-exact-source-without-a-local-sitting-or-fake-grade', async (page) => {
     await recipient(page, { question: true });
     const value = await page.evaluate(async () => {
