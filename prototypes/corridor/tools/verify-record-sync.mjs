@@ -213,8 +213,6 @@ const plainRecord=v=>!!v&&typeof v==='object'&&!Array.isArray(v),tx=(_,en)=>en;
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;}
 const biLabel=(tag,cls,_,en)=>el(tag,cls,en),recordWritable=(epoch=recordEpoch)=>f.owned&&epoch===recordEpoch;
 const dayKey=()=> '2026-09-10',buildExportRecord=async()=>({text:'{"synthetic":true}'});
-// renderPortRow paints the unavailable-sentence-drafts notice; a display helper, stubbed like the others
-const renderUnavailableSentenceDrafts=()=>{};
 const commitStorePatch=async fn=>{f.patches.push(fn({stats:{}}));return true;};
 const recordFailure=()=>{f.owned=false;closeRecordSync();};
 HTMLAnchorElement.prototype.click=function(){f.downloads++;};
