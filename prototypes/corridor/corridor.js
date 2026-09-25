@@ -7124,10 +7124,9 @@ function ensureRecManifest() {
         recManifest = m && m.v ? m : null;
         // the reader may have drawn while this was loading ('Checking…'): repaint its listen row
         // once, never mid-read and never under an open sheet
-        // …and never while the learner's focus is somewhere in the page (a glossary, a token):
-        // the next natural render shows the listen row's final state anyway
-        if (typeof S !== 'undefined' && S.view === 'reader' && !readAloud.on && !S.stack.length &&
-          (!document.activeElement || document.activeElement === document.body)) render();
+        // …by swapping only that row: focused tokens and glossary entries elsewhere are never
+        // replaced; focus inside the row itself returns to the same control
+        if (typeof S !== 'undefined' && S.view === 'reader' && !readAloud.on) refreshListenRow();
         return recManifest;
       });
   }
@@ -7217,78 +7216,18 @@ function speakCardReading(text, btn, word) {
 }
 
 
-function renderReader(main) {
+function refreshListenRow() {
+  const row = document.querySelector('#app main .listen-row');
   const p = passage();
-  if (!p) {
-    S.view = 'shelf';
-    return renderShelf(main);
-  }
-  if (learningSourceVisit) {
-    const back = el('button', 'chip', learningSourceBackLabel()); back.type = 'button'; back.id = 'reader-source-back';
-    back.addEventListener('click', leaveBundledSourceVisit); main.append(back);
-  } else {
-    const sourceReturn = S.navigationReturns.at(-1);
-  if (sourceReturn?.destination === 'reader' && sourceReturn.stack.length) {
-    const door = el('button', 'chip reference-source-return', tx('← 元の項目へ', '← Return to entry'));
-    door.type = 'button';
-    door.id = 'source-entry-return';
-    door.addEventListener('click', back);
-    main.append(door);
-    }
-  }
-  main.append(el('p', 'eyebrow', p.sourceLabel));
-  // the reader was the one view in bi mode that dropped the English title —
-  // the handle the learner chose the text by (E3 round-A, reader lens). It
-  // rides BESIDE the heading, the way the shelf card carries it, so the
-  // heading itself still reads as the Japanese title alone.
-  main.append(el('h1', 'view-title', p.title));
-  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
-  const lv = levelPhrase(p.grading);
-  const levelLine = el('div', 'level-line');
-  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
-  main.append(levelLine);
-
-  // the dials fold away — the text is the point, the settings one tap away
-  const dialsToggle = el('button', 'details-toggle');
-  dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
-  dialsToggle.type = 'button';
-  dialsToggle.id = 'dials-toggle';
-  dialsToggle.textContent = (S.dialsOpen ? '▾ ' : '▸ ') + tx('文字設定', 'text settings 文字設定');
-  dialsToggle.addEventListener('click', () => {
-    S.dialsOpen = !S.dialsOpen;
-    render();
-  });
-  main.append(dialsToggle);
-  if (S.dialsOpen) {
-    const dials = el('div', 'dials');
-    dials.append(
-      dialRow('漢字', 'kanji', 'kanji', [
-        ['そのまま', 'as written'],
-        ['常用まで', 'jōyō only'],
-        ['すべて仮名', 'all kana'],
-      ]),
-    );
-    dials.append(
-      dialRow('ふりがな', 'readings', 'furigana', [
-        ['なし', 'off'],
-        ['触れて', 'on touch'],
-        ['つねに', 'always'],
-      ]),
-    );
-    dials.append(
-      dialRow('分かち', 'spacing', 'spacing', [
-        ['なし', 'none'],
-        ['語の間', 'words'],
-        ['文節', 'phrases'],
-      ]),
-    );
-    main.append(dials);
-  }
-
-  // the listen door rides beside the settings fold — one tap to hear the
-  // article, one tap to stop; the voice names itself 仮 (interim) until
-  // the judged voice of PR 五 replaces it
+  if (!row || !p || row.dataset.passage !== p.id) return;
+  const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
+  const next = buildListenRow(p);
+  row.replaceWith(next);
+  if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
+}
+/** The reader's listen row, built on its own so a late recordings manifest can refresh just this
+ * row in place — the focused token or glossary entry elsewhere in the reader is never replaced. */
+function buildListenRow(p) {
   const listenRow = el('div', 'listen-row');
   const listen = biLabel('button', 'chip listen-toggle', readAloud.on ? '止める' : '聞く', readAloud.on ? 'stop' : 'listen');
   listen.type = 'button';
@@ -7372,7 +7311,82 @@ function renderReader(main) {
     });
     listenRow.append(pick);
   }
-  main.append(listenRow);
+  listenRow.classList.add('listen-row'); listenRow.dataset.passage = p.id;
+  return listenRow;
+}
+function renderReader(main) {
+  const p = passage();
+  if (!p) {
+    S.view = 'shelf';
+    return renderShelf(main);
+  }
+  if (learningSourceVisit) {
+    const back = el('button', 'chip', learningSourceBackLabel()); back.type = 'button'; back.id = 'reader-source-back';
+    back.addEventListener('click', leaveBundledSourceVisit); main.append(back);
+  } else {
+    const sourceReturn = S.navigationReturns.at(-1);
+  if (sourceReturn?.destination === 'reader' && sourceReturn.stack.length) {
+    const door = el('button', 'chip reference-source-return', tx('← 元の項目へ', '← Return to entry'));
+    door.type = 'button';
+    door.id = 'source-entry-return';
+    door.addEventListener('click', back);
+    main.append(door);
+    }
+  }
+  main.append(el('p', 'eyebrow', p.sourceLabel));
+  // the reader was the one view in bi mode that dropped the English title —
+  // the handle the learner chose the text by (E3 round-A, reader lens). It
+  // rides BESIDE the heading, the way the shelf card carries it, so the
+  // heading itself still reads as the Japanese title alone.
+  main.append(el('h1', 'view-title', p.title));
+  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
+  const lv = levelPhrase(p.grading);
+  const levelLine = el('div', 'level-line');
+  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
+  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
+  main.append(levelLine);
+
+  // the dials fold away — the text is the point, the settings one tap away
+  const dialsToggle = el('button', 'details-toggle');
+  dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
+  dialsToggle.type = 'button';
+  dialsToggle.id = 'dials-toggle';
+  dialsToggle.textContent = (S.dialsOpen ? '▾ ' : '▸ ') + tx('文字設定', 'text settings 文字設定');
+  dialsToggle.addEventListener('click', () => {
+    S.dialsOpen = !S.dialsOpen;
+    render();
+  });
+  main.append(dialsToggle);
+  if (S.dialsOpen) {
+    const dials = el('div', 'dials');
+    dials.append(
+      dialRow('漢字', 'kanji', 'kanji', [
+        ['そのまま', 'as written'],
+        ['常用まで', 'jōyō only'],
+        ['すべて仮名', 'all kana'],
+      ]),
+    );
+    dials.append(
+      dialRow('ふりがな', 'readings', 'furigana', [
+        ['なし', 'off'],
+        ['触れて', 'on touch'],
+        ['つねに', 'always'],
+      ]),
+    );
+    dials.append(
+      dialRow('分かち', 'spacing', 'spacing', [
+        ['なし', 'none'],
+        ['語の間', 'words'],
+        ['文節', 'phrases'],
+      ]),
+    );
+    main.append(dials);
+  }
+
+  // the listen door rides beside the settings fold — one tap to hear the
+  // article, one tap to stop; the voice names itself 仮 (interim) until
+  // the judged voice of PR 五 replaces it
+  main.append(buildListenRow(p));
   renderTeacherDoor(main, () => {
     const current = readerTakeCurrent();
     return current ? readerTakeNode(current) : null;
