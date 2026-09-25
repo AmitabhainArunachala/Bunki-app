@@ -1345,6 +1345,11 @@ function validStoreEnvelope(value) {
  * keeps working in memory, the original bytes stay untouched on the device,
  * and one quiet alert says so in the active learner surface. */
 let storeAlertNode = null;
+/* B2a-hint (D4, first slice; Codex signature B2-CODEX-SIGNATURE-v5): a window that lost the boot
+ * race LOOKS at the record lock with navigator.locks.query() — never request() — and offers a
+ * retry when the lock looks free. Only the boot's own ifAvailable request ever acquires; the
+ * hint grants nothing and can be stale by the time it is read. */
+const recordHint = { active: false, token: 0, inFlight: 0, timer: null, visibleSince: 0, free: false, channel: null, query: null, failure: '' };
 
 function positionStoreAlert(node) {
   if (!node || typeof document === 'undefined') return;
@@ -1405,6 +1410,7 @@ function syncStoreAlert() {
     else sheet.removeAttribute('aria-describedby');
   }
   positionStoreAlert(storeAlertNode);
+  if (recordHint.active) positionRecordHint();
   return storeAlertNode;
 }
 
@@ -2018,13 +2024,240 @@ async function acquireRecordOwnership() {
     const settle = (value) => { if (!settled) { settled = true; done(value); } };
     try {
       navigator.locks.request(RECORD_LOCK, { mode: 'exclusive', ifAvailable: true }, async (lock) => {
-        if (!lock || recordDeparted) { recordUnavailable(); settle(false); return; }
+        if (!lock || recordDeparted) {
+          recordUnavailable();
+          if (!lock && !recordDeparted) startRecordHint();
+          settle(false);
+          return;
+        }
         recordOwner = true;
         const lifetime = new Promise((release) => { releaseRecordLock = release; });
         settle(true);
         await lifetime;
       }).catch(() => { recordOwner = false; recordUnavailable(); settle(false); });
     } catch { recordUnavailable(); settle(false); }
+  });
+}
+const RECORD_HINT_CHANNEL = 'kairo-record-hint-v1';
+const RECORD_RETRY_ROUTE_KEY = 'kairo-retry-route-v1';
+const RECORD_HINT_POLL_MS = 3000;
+const RECORD_HINT_WINDOW_MS = 10 * 60_000;
+const RECORD_RETRY_ROUTE_TTL_MS = 120_000;
+function startRecordHint() {
+  if (recordHint.active) return;
+  let query = null;
+  try {
+    query = typeof navigator.locks?.query === 'function' ? navigator.locks.query.bind(navigator.locks) : null;
+  } catch { query = null; }
+  // no passive way to look: the existing read-only message and its reload remain the whole story
+  if (!query) return;
+  recordHint.active = true;
+  recordHint.token += 1;
+  recordHint.query = query;
+  recordHint.free = false;
+  recordHint.failure = '';
+  recordHint.visibleSince = Date.now();
+  try {
+    recordHint.channel = new BroadcastChannel(RECORD_HINT_CHANNEL);
+    const token = recordHint.token;
+    // advisory only: a reason to look again, never a statement that the record is free
+    recordHint.channel.onmessage = (event) => {
+      if (event.data?.v !== 1 || event.data.type !== 'released' || token !== recordHint.token) return;
+      void queryRecordHint();
+      setTimeout(() => { void queryRecordHint(); }, 500);
+    };
+  } catch { recordHint.channel = null; }
+  scheduleRecordHint();
+  void queryRecordHint();
+}
+function stopRecordHint() {
+  recordHint.active = false;
+  recordHint.token += 1;
+  recordHint.free = false;
+  clearTimeout(recordHint.timer);
+  recordHint.timer = null;
+  try { recordHint.channel?.close(); } catch { /* already closed */ }
+  recordHint.channel = null;
+  syncRecordHint();
+}
+function recordHintLive(token) {
+  return recordHint.active && token === recordHint.token && !recordOwner && !recordDeparted && !staleTab && !storeSealed
+    && document.visibilityState === 'visible' && Date.now() - recordHint.visibleSince < RECORD_HINT_WINDOW_MS;
+}
+function scheduleRecordHint() {
+  clearTimeout(recordHint.timer);
+  recordHint.timer = null;
+  if (!recordHint.active || document.visibilityState !== 'visible') return;
+  if (Date.now() - recordHint.visibleSince >= RECORD_HINT_WINDOW_MS) return;
+  const token = recordHint.token;
+  recordHint.timer = setTimeout(() => {
+    recordHint.timer = null;
+    void queryRecordHint().finally(() => { if (token === recordHint.token) scheduleRecordHint(); });
+  }, RECORD_HINT_POLL_MS);
+}
+/** One look at a time; every result is re-checked after its await before it may show anything. */
+async function queryRecordHint() {
+  const token = recordHint.token;
+  if (recordHint.inFlight === token || !recordHintLive(token)) return;
+  recordHint.inFlight = token;
+  let snapshot;
+  try {
+    snapshot = await recordHint.query();
+  } catch {
+    // the query itself failed: stop looking, and the manual reload stays
+    if (token === recordHint.token) stopRecordHint();
+    return;
+  } finally {
+    if (recordHint.inFlight === token) recordHint.inFlight = 0;
+  }
+  if (!recordHintLive(token)) return;
+  if (!Array.isArray(snapshot?.held) || !Array.isArray(snapshot?.pending)) { stopRecordHint(); return; }
+  const named = (rows) => rows.some((row) => row?.name === RECORD_LOCK);
+  const free = !named(snapshot.held) && !named(snapshot.pending);
+  if (free !== recordHint.free) {
+    recordHint.free = free;
+    syncRecordHint();
+  }
+}
+function positionRecordHint() {
+  const node = document.getElementById('record-hint');
+  if (!node) return;
+  const alert = storeAlertNode?.isConnected && !storeAlertNode.hidden ? storeAlertNode.getBoundingClientRect() : null;
+  if (alert && alert.height > 0) node.style.setProperty('--record-hint-top', `${Math.ceil(alert.bottom + 6)}px`);
+  else node.style.removeProperty('--record-hint-top');
+}
+/** The hint lives outside #app, so renders never replace it and never touch the learner's fields. */
+function syncRecordHint() {
+  if (typeof document === 'undefined' || !document.body) return;
+  let node = document.getElementById('record-hint');
+  const show = recordHint.active && !recordOwner && !recordDeparted && (recordHint.free || !!recordHint.failure);
+  if (!show) {
+    if (node) node.hidden = true;
+    return;
+  }
+  if (!node) {
+    node = document.createElement('div');
+    node.id = 'record-hint';
+    node.className = 'record-hint';
+    const text = document.createElement('span');
+    text.className = 'record-hint-text';
+    text.setAttribute('role', 'status');
+    text.setAttribute('aria-live', 'polite');
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.id = 'record-hint-retry';
+    retry.className = 'chip';
+    retry.addEventListener('click', retryRecordHere);
+    const failure = document.createElement('span');
+    failure.className = 'record-hint-failure';
+    failure.setAttribute('role', 'alert');
+    node.append(text, ' ', retry, failure);
+    document.body.append(node);
+  }
+  node.hidden = false;
+  const text = node.querySelector('.record-hint-text');
+  const message = recordHint.free ? tx('もう一方の窓が閉じたようです。', 'The other window seems to have closed.') : '';
+  if (text.textContent !== message) text.textContent = message;
+  node.querySelector('#record-hint-retry').textContent = tx('ここで続けてみる', 'Try again here');
+  const failure = node.querySelector('.record-hint-failure');
+  if (failure.textContent !== recordHint.failure) failure.textContent = recordHint.failure;
+  positionRecordHint();
+}
+function retryRecordHere() {
+  const refuse = () => {
+    recordHint.failure = tx('この窓の下書きを保存できなかったので、再読み込みしませんでした。文はここに残っています。コピーしてから再読み込みしてください。',
+      'This window could not keep its drafts, so it did not reload. Your text is still here — copy it, then reload.');
+    syncRecordHint();
+  };
+  recordHint.failure = '';
+  if (!preserveVisibleDrafts()) return refuse();
+  const route = captureRetryRoute();
+  try {
+    if (route) sessionStorage.setItem(RECORD_RETRY_ROUTE_KEY, JSON.stringify(route));
+  } catch {
+    return refuse();
+  }
+  location.reload();
+}
+const RETRY_ROUTE_VIEWS = new Set(['reader', 'mock', 'shelf']);
+const retryRouteId = (value) => typeof value === 'string' && value.length > 0 && value.length <= 160 && /^[\w:.\-]+$/u.test(value);
+function readRetryRoute(now = Date.now()) {
+  let record = null;
+  try { record = JSON.parse(sessionStorage.getItem(RECORD_RETRY_ROUTE_KEY) || 'null'); } catch { record = null; }
+  const valid = !!record && typeof record === 'object' && record.v === 1 && RETRY_ROUTE_VIEWS.has(record.view)
+    && Number.isFinite(record.ts) && now - record.ts >= 0 && now - record.ts <= RECORD_RETRY_ROUTE_TTL_MS
+    && (record.passageId === undefined || retryRouteId(record.passageId))
+    && (record.attemptId === undefined || retryRouteId(record.attemptId))
+    && (record.itemId === undefined || retryRouteId(record.itemId));
+  if (!valid) {
+    try { sessionStorage.removeItem(RECORD_RETRY_ROUTE_KEY); } catch { /* nothing to keep */ }
+    return null;
+  }
+  return record;
+}
+/** Where this window is, so a retry reload can come back to it. A still-fresh target that a losing
+ * boot could not open is kept, unless the learner has since gone somewhere else on purpose. */
+function captureRetryRoute() {
+  if (!RETRY_ROUTE_VIEWS.has(S.view)) return null;
+  const route = { v: 1, view: S.view, ts: Date.now() };
+  if (S.view === 'reader' && retryRouteId(S.passageId)) route.passageId = S.passageId;
+  if (S.view === 'mock') {
+    const main = document.querySelector('#app main');
+    const attemptId = main?.dataset.examAttempt;
+    const itemId = main?.querySelector('details[data-exam-item][open]')?.dataset.examItem;
+    if (retryRouteId(attemptId)) route.attemptId = attemptId;
+    if (route.attemptId && retryRouteId(itemId)) route.itemId = itemId;
+    const kept = readRetryRoute();
+    if (!route.attemptId && kept?.view === 'mock' && kept.attemptId) {
+      route.attemptId = kept.attemptId;
+      if (kept.itemId) route.itemId = kept.itemId;
+      route.ts = kept.ts;
+    }
+  }
+  return route;
+}
+/** Boot: go back where the retry was pressed. Reading is safe in any window; a JLPT result opens only
+ * through the checked source path, never an in-progress attempt, and never writes. */
+function restoreRetryRoute() {
+  const record = readRetryRoute();
+  if (!record) return;
+  const drop = () => { try { sessionStorage.removeItem(RECORD_RETRY_ROUTE_KEY); } catch { /* best effort */ } };
+  if (record.view === 'reader') {
+    if (D.passages?.some((row) => row.id === record.passageId)) openPassage(record.passageId);
+    return drop();
+  }
+  if (record.view === 'mock') {
+    if (record.attemptId && recordWritable()) {
+      try { openAssessmentSource({ attemptId: record.attemptId, itemId: record.itemId }); return drop(); }
+      catch { /* the result is gone: the room itself is the honest landing */ }
+    }
+    S.stack = [];
+    S.view = 'mock';
+    // a blocked window cannot show the result yet: keep the target for the next retry, until its TTL
+    if (!record.attemptId || recordWritable()) drop();
+    return;
+  }
+  S.stack = [];
+  S.view = 'shelf';
+  drop();
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!recordHint.active) return;
+    if (document.visibilityState === 'visible') {
+      recordHint.visibleSince = Date.now();
+      scheduleRecordHint();
+      void queryRecordHint();
+    } else {
+      clearTimeout(recordHint.timer);
+      recordHint.timer = null;
+    }
+  });
+  addEventListener('focus', () => {
+    if (!recordHint.active || document.visibilityState !== 'visible') return;
+    recordHint.visibleSince = Date.now();
+    scheduleRecordHint();
+    void queryRecordHint();
   });
 }
 function readRecordDrafts() {
@@ -2774,7 +3007,14 @@ addEventListener('pagehide', () => {
   if (mockClock && S.assessmentLibrary?.activeAttemptId && recordReady()) {
     applyPractice('interruptPractice', { reason: 'process-stop' });
   }
+  const wasOwner = recordOwner;
+  stopRecordHint();
   releaseRecordOwnership();
+  // advisory: blocked windows look again now instead of at their next poll; it grants nothing
+  if (wasOwner) {
+    try { const channel = new BroadcastChannel(RECORD_HINT_CHANNEL); channel.postMessage({ v: 1, type: 'released' }); channel.close(); }
+    catch { /* the blocked windows' own polling still notices */ }
+  }
 });
 addEventListener('pageshow', (event) => {
   if (event.persisted) { recordDeparted = true; recordUnavailable(); }
@@ -3699,6 +3939,7 @@ async function boot() {
   }
 
   S.ready = true;
+  restoreRetryRoute();
   document.body.dataset.ready = '1';
   render();
   prefetchArticles();
