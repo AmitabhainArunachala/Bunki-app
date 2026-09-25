@@ -192,6 +192,30 @@ async function disk(page) {
     }
   });
 }
+// BEGIN resolved-value polling helper: exact reviewed F repair implementation.
+async function pollNativeState(check, { timeoutMs, description, intervalMs = 50 }) {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || !Number.isFinite(intervalMs) || intervalMs <= 0)
+    throw new TypeError('Native-state polling requires positive finite bounds');
+  const deadline = performance.now() + timeoutMs;
+  const timeoutError = new Error(`Timed out after ${timeoutMs}ms waiting for ${description}`);
+  timeoutError.name = 'TimeoutError';
+  let deadlineTimer, intervalTimer;
+  const expired = new Promise((resolve, reject) => { deadlineTimer = setTimeout(() => reject(timeoutError), timeoutMs); });
+  try {
+    while (true) {
+      if (performance.now() >= deadline) throw timeoutError;
+      // evaluate has no Playwright timeout; bound even an evaluation that never settles.
+      const observed = await Promise.race([Promise.resolve().then(check), expired]);
+      if (performance.now() >= deadline) throw timeoutError;
+      if (observed === true) return;
+      if (observed !== false) throw new TypeError('Native-state predicate must resolve to a boolean');
+      await Promise.race([new Promise(resolve => {
+        intervalTimer = setTimeout(resolve, Math.min(intervalMs, Math.max(0, deadline - performance.now())));
+      }), expired]);
+    }
+  } finally { clearTimeout(deadlineTimer); clearTimeout(intervalTimer); }
+}
+// END resolved-value polling helper.
 async function pollRecord(page, predicate) {
   for (let count = 0; count < 120; count++) {
     const record = await disk(page);
@@ -651,12 +675,15 @@ try {
       const baseline = await disk(page);
       await start(page, section, 'practice');
       const firstChoice = await wrongAnswer(page, items[0]);
-      await page.waitForFunction(
-        async () =>
-          (await navigator.serviceWorker.getRegistration())?.active?.state === 'activated',
-        null,
-        { timeout: 60000 },
-      );
+      await pollNativeState(
+        () => page.evaluate(async () =>
+          (await navigator.serviceWorker.getRegistration())?.active?.state === 'activated'),
+        { timeoutMs: 60000, description: 'service-worker activation' },
+      ).catch(error => {
+        const failure = new Error(`Failed setup: service-worker activation (${String(error?.message ?? error)})`, { cause: error });
+        failure.name = 'FixtureSetupError';
+        throw failure;
+      });
       await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, {
         timeout: 60000,
       });
