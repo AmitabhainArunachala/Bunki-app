@@ -65,6 +65,10 @@ const itemResultSchema = z.strictObject({
   subjects: z.array(idSchema).max(16),
   elapsedMs: elapsed,
   flagged: z.boolean(),
+  /** Present only as `true`: an explanation was opened after this committed
+   * answer. Absent makes no claim either way. An observation, not authentication.
+   * Peers built before this field reject payloads that carry it (strict schema). */
+  assisted: z.literal(true).optional(),
 });
 const audioSchema = z.strictObject({
   media: mediaRefSchema,
@@ -184,6 +188,14 @@ export function parseAssessmentOperationV2(raw: unknown): AssessmentOperationV2 
         fail('items.response');
       if (item.response.kind === 'ordered')
         unique(item.response.tokenIds, 'items.response.tokenIds');
+      if (
+        item.assisted &&
+        (payload.mode !== 'practice' ||
+          !payload.conditions.includes('assisted') ||
+          item.response.kind !== 'selected' ||
+          !['correct', 'incorrect'].includes(item.result))
+      )
+        fail('items.assisted');
     }
   } else if (payload.kind === 'learning.followup/2') {
     unique(
@@ -257,7 +269,22 @@ const sourceSchema = z.looseObject({
     clock: z.looseObject({ elapsedMs: elapsed }),
     audio: z.array(audioSchema).max(256),
     answers: z
-      .array(z.looseObject({ item: itemRefSchema, response: responseSchema, flagged: z.boolean() }))
+      .array(
+        z.looseObject({
+          item: itemRefSchema,
+          response: responseSchema,
+          flagged: z.boolean(),
+          // Optional so older minimal unmarked inputs stay valid; a marked answer must say reached.
+          reached: z.boolean().optional(),
+          assistance: z
+            .strictObject({
+              kind: z.literal('explanation'),
+              at: countSchema,
+              response: responseSchema,
+            })
+            .optional(),
+        }),
+      )
       .min(1)
       .max(1000),
   }),
@@ -347,6 +374,19 @@ export function createAssessmentSyncIntentsV2(raw: unknown) {
       inputHashOf(row.response) !== inputHashOf(answer.response)
     )
       fail('result.items');
+    // Only a marker consistent with the retained attempt becomes a wire claim.
+    if (
+      answer.assistance &&
+      (attempt.mode !== 'practice' ||
+        !attempt.conditions.includes('assisted') ||
+        answer.reached !== true ||
+        answer.response.kind !== 'selected' ||
+        inputHashOf(answer.assistance.response) !== inputHashOf(answer.response) ||
+        answer.assistance.at < attempt.startedAt ||
+        answer.assistance.at > attempt.endedAt ||
+        !['correct', 'incorrect'].includes(row.result))
+    )
+      fail('result.items.assistance');
     return {
       item: {
         kind: 'item' as const,
@@ -361,6 +401,8 @@ export function createAssessmentSyncIntentsV2(raw: unknown) {
       subjects: row.subjects,
       elapsedMs: row.elapsedMs,
       flagged: answer.flagged,
+      // Emitted only when true, so unassisted payload bytes are unchanged.
+      ...(answer.assistance ? { assisted: true as const } : {}),
     };
   });
   const exam = parseAssessmentOperationV2({

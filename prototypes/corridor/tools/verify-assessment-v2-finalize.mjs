@@ -171,6 +171,62 @@ try {
         assert.deepEqual(value.disk.outbox.toSorted((a, b) => a.actor.sequence - b.actor.sequence).map((operation) => operation.payload.kind), ['assessment.result/2', 'learning.followup/2']);
         assert.equal(value.disk.documents.filter((entry) => entry.collection === 'kairo:record-host-commands').length, 1);
       });
+      // G1 KE2a driver: a lawful assisted practice finalization through the real host and store,
+      // with no injected fault. The host's record check runs the app's own learning-record
+      // validator and keeps its refusal text. Candidate: accepted, the mark carried into
+      // evidence, no refusal. Under KE2a (finalization mapper drops the mark) the refusal row
+      // below fails with evidence-mismatch and reports whether durable state stayed unchanged.
+      await runCase(browser, engine, 'assisted-finalization-carries-the-mark-through-the-validator', async (page) => {
+        const value = await page.evaluate(async () => {
+          const f = window.fixture;
+          const learning = await import('/assessment-learning.mjs');
+          const scope = f.input.scope, now = Date.parse('2026-09-23T00:00:00Z');
+          let refusal = null;
+          const validateRecord = (record) => {
+            if (!f.options.validateRecord(record)) return false;
+            try { return record.assessmentLearning == null || learning.validateAssessmentLearningRecord(record) === true; }
+            catch (error) { refusal = String(error?.message || error); return false; }
+          };
+          f.instance = await f.app.createRecordApp({ ...f.options, validateRecord });
+          let library = f.assessment.startAssessmentV2(f.assessment.createAssessmentLibraryV2({ scope }), f.form,
+            { scope, attemptId: 'attempt:why', mode: 'practice', now, clockSessionId: 'clock:why', monotonicMs: 0,
+              editorialAtStart: { status: 'ai-reviewed-practice', policyVersion: 'synthetic-test-only', decisionRevisionIds: ['synthetic:no-content-approval'] } });
+          const step = (action, ms) => { library = f.assessment.commandAssessmentV2(library, { scope, attemptId: 'attempt:why',
+            expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId,
+            now: now + ms, clockSessionId: 'clock:why', monotonicMs: ms, action }); };
+          step({ kind: 'answer', itemId: 'one', response: { kind: 'selected', optionId: 'b' } }, 100);
+          step({ kind: 'assistance', itemId: 'one', reason: 'explanation' }, 200);
+          step({ kind: 'visit', itemId: 'two' }, 300);
+          step({ kind: 'answer', itemId: 'two', response: { kind: 'selected', optionId: 'a' } }, 400);
+          const mark = f.assessment.selectAssessmentV2(library).attempt.answers[0].assistance || null;
+          const seeded = await f.instance.write(() => ({ patch: { assessmentLibraryV2: library } }));
+          const before = await f.disk();
+          const input = { scope, attemptId: 'attempt:why', clockSessionId: 'clock:why', monotonicMs: 500, action: { kind: 'submit' },
+            expectedRevisionId: f.assessment.selectAssessmentV2(library).attempt.revisionId };
+          let ack;
+          try {
+            ack = await f.instance.finalizeAssessment({ changeId: 'finish:why', occurredAt: new Date(now + 500).toISOString() },
+              (snapshot) => ({ ...input, expectedRevision: snapshot.revision }));
+          } catch (error) { ack = { status: 'thrown', reason: error?.code ?? String(error?.message || error) }; }
+          const after = await f.disk();
+          const record = ack.status === 'active' ? ack.snapshot.record : null;
+          return { seeded: seeded.status, mark, refusal, unchanged: JSON.stringify(after) === JSON.stringify(before),
+            ack: { status: ack.status, reason: ack.reason ?? null },
+            status: record?.assessmentLibraryV2.attempts.find((row) => row.attemptId === 'attempt:why')?.status ?? null,
+            evidence: record?.assessmentLearning.followups.find((row) => row.attemptId === 'attempt:why')
+              ?.evidence.map((row) => row.assistance ?? null) ?? null };
+        });
+        // setup: the marked practice attempt was stored through an ordinary write
+        assert.equal(value.seeded, 'active');
+        assert(value.mark && value.mark.kind === 'explanation');
+        // KE2a's permitted failing row: a validator refusal (its text and durable state reported)
+        assert.equal(value.refusal, null,
+          `validator refused: ${value.refusal}; durable state unchanged: ${value.unchanged}; ack: ${JSON.stringify(value.ack)}`);
+        // candidate: accepted terminal with the item mark carried into evidence, and no other
+        assert.equal(value.ack.status, 'active');
+        assert.equal(value.status, 'submitted');
+        assert.deepEqual(value.evidence, [{ kind: value.mark.kind, at: value.mark.at }, null, null]);
+      });
       await runCase(browser, engine, 'assessment-input-producer-runs-after-queued-write-and-retains-exact-retry', async (page) => {
         const value = await page.evaluate(async () => {
           const f = window.fixture; let retained;

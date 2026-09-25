@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import process from 'node:process';
@@ -264,6 +265,246 @@ check('untargeted reading and grammar mistakes become exact question cards while
   assert.deepEqual(learning.applyAssessmentLearningEnrichment(enriched, first.followup), {});
   assert(learning.validateAssessmentLearningRecord(enriched));
   checks.push('enrichment adds only missing question plans and preserves prior action bytes');
+});
+// G1 assisted why. Oracles are literal (the independent acceptance ledger's truth table
+// and fixed expectations); planner output is never used to build an expected value.
+const reviewedAtStart = { status: 'ai-reviewed-practice', policyVersion: 'fixture-policy', decisionRevisionIds: ['fixture-decision'] };
+const word = subject => ({ t: 'word', id: subject.slice(5), label: subject.slice(5) });
+const withoutMark = row => { const copy = { ...row }; delete copy.assistance; return copy; };
+// One untimed attempt: item 0 correct, item 1 wrong, item 2 correct, item 3 never reached.
+// `assist` lists items whose explanation is opened after their committed answer.
+function practiced({ assist = [], abandon = false, resolveSubject = word } = {}) {
+  let library = api.startAssessmentV2(api.createAssessmentLibraryV2({ scope }), form, { scope, attemptId: 'why-attempt',
+    mode: 'practice', now, clockSessionId: 'why-clock', monotonicMs: 0, priorExposure: 'none-reported', editorialAtStart: reviewedAtStart });
+  let ms = 0;
+  const command = action => {
+    ms += 1000;
+    library = api.commandAssessmentV2(library, { scope, attemptId: 'why-attempt',
+      expectedRevisionId: api.selectAssessmentV2(library).attempt.revisionId,
+      now: now + ms, clockSessionId: 'why-clock', monotonicMs: ms, action });
+  };
+  for (const [index, optionId] of [[0, 'a'], [1, 'b'], [2, 'a']]) {
+    if (index) command({ kind: 'visit', itemId: items[index].id });
+    command({ kind: 'answer', itemId: items[index].id, response: { kind: 'selected', optionId } });
+    if (assist.includes(index)) command({ kind: 'assistance', itemId: items[index].id, reason: 'explanation' });
+  }
+  command({ kind: abandon ? 'abandon' : 'submit' });
+  const selected = api.selectAssessmentV2(library);
+  const followup = learning.planAssessmentLearning({ scope, form, attempt: selected.attempt,
+    outcomes: api.assessmentOutcomesV2(selected), resolveSubject });
+  return { library, selected, followup };
+}
+check('one enrollment rule through the evidence adapter, the wire adapter and the planner', () => {
+  const table = [['incorrect', false, false, true], ['incorrect', true, true, true], ['correct', false, false, false],
+    ['correct', true, false, true], ['correct', false, true, true], ['correct', true, true, true],
+    ['unanswered', true, false, false], ['not-reached', false, false, false]];
+  const { selected } = practiced();
+  const mark = { kind: 'explanation', at: now + 500 };
+  for (const [outcome, flagged, assisted, eligible] of table) {
+    assert.equal(api.assessmentFollowupEligible({ outcome, flagged, assisted }), eligible);
+    assert.equal(api.assessmentEvidenceEligible({ outcome, flagged, ...(assisted ? { assistance: mark } : {}) }), eligible);
+    assert.equal(api.assessmentResultItemEligible({ result: outcome, flagged, ...(assisted ? { assisted: true } : {}) }), eligible);
+    const outcomes = api.assessmentOutcomesV2(selected).map((row, index) => index ? { ...row, outcome: 'correct', flagged: false } : {
+      ...row, outcome, flagged, response: ['correct', 'incorrect'].includes(outcome) ? row.response : { kind: 'unanswered' },
+      ...(assisted ? { assistance: mark } : {}) });
+    const planned = learning.planAssessmentLearning({ scope, form, attempt: selected.attempt, outcomes, resolveSubject: word });
+    // once per exact target: a flagged and assisted answer still yields one action
+    assert.equal(planned.actions.length, eligible ? 1 : 0, `${outcome}/${flagged}/${assisted}`);
+  }
+  for (const fake of [true, 'yes', 1, {}, [], { kind: 'hint', at: now }, { kind: 'explanation', at: 'soon' }, { kind: 'explanation', at: -1 }]) {
+    assert.equal(api.assessmentEvidenceEligible({ outcome: 'correct', flagged: false, assistance: fake }), false);
+    const outcomes = api.assessmentOutcomesV2(selected).map(row => ({ ...row, outcome: 'correct', flagged: false, assistance: fake }));
+    assert.equal(learning.planAssessmentLearning({ scope, form, attempt: selected.attempt, outcomes, resolveSubject: word }).actions.length, 0);
+  }
+  for (const fake of ['true', 1, {}, { kind: 'explanation' }, false, null])
+    assert.equal(api.assessmentResultItemEligible({ result: 'correct', flagged: false, assisted: fake }), false);
+});
+check('assisted answers enroll with the mark as provenance, never as a grade', () => {
+  const { library, selected, followup } = practiced({ assist: [0, 1] });
+  const marks = selected.attempt.answers.map(row => row.assistance ? { kind: row.assistance.kind, at: row.assistance.at } : null);
+  assert.deepEqual(marks.map(Boolean), [true, true, false, false]);
+  assert.deepEqual(followup.evidence.map(row => row.assistance ?? null), marks);
+  const state = record(library), patch = learning.applyAssessmentLearning(state, followup);
+  assert.deepEqual(patch.taken.map(row => row.id), ['猫', '犬']);
+  assert(patch.taken.every(row => row.by === 'assessment' && row.started === selected.attempt.endedAt));
+  assert.equal(patch.srs, undefined); assert.equal(patch.revlog, undefined); assert.equal(patch.stats, undefined);
+  assert(learning.validateAssessmentLearningRecord({ ...state, ...patch }));
+  const plain = practiced();
+  assert.deepEqual(learning.applyAssessmentLearning(record(plain.library), plain.followup).taken.map(row => row.id), ['犬']);
+  const unassistedKeys = JSON.stringify(['elapsedMs', 'flagged', 'id', 'item', 'outcome', 'response', 'skill', 'subjects', 'task']);
+  assert(plain.followup.evidence.every(row => JSON.stringify(Object.keys(row).sort()) === unassistedKeys));
+});
+check('an assisted answer whose target already exists keeps that card and its schedule', () => {
+  const { library, followup } = practiced({ assist: [0] });
+  const state = { ...record(library), taken: [{ t: 'word', id: '猫', ts: 1 }], srs: { 'word:猫': { due: '2027-01-01', stability: 99 } } };
+  const before = JSON.stringify(state);
+  const patch = learning.applyAssessmentLearning(state, followup);
+  assert.equal(JSON.stringify(state), before);
+  assert.deepEqual(patch.taken[0], state.taken[0]);
+  assert.deepEqual(patch.assessmentLearning.followups[0].actions.map(row => [row.target.id, row.status]), [['猫', 'existing'], ['犬', 'added']]);
+  assert.equal(patch.srs, undefined);
+});
+check('the record validator binds every evidence mark to its attempt', () => {
+  const { library, followup } = practiced({ assist: [0] });
+  const state = { ...record(library), ...learning.applyAssessmentLearning(record(library), followup) };
+  const variant = edit => { const copy = JSON.parse(JSON.stringify(state)); edit(copy.assessmentLearning.followups[0].evidence); return copy; };
+  assert.throws(() => learning.validateAssessmentLearningRecord(variant(rows => { delete rows[0].assistance; })), /evidence-mismatch/u);
+  assert.throws(() => learning.validateAssessmentLearningRecord(variant(rows => { rows[0].assistance.at += 1; })), /evidence-mismatch/u);
+  assert.throws(() => learning.validateAssessmentLearningRecord(variant(rows => { rows[2].assistance = { kind: 'explanation', at: now }; })), /evidence-mismatch/u);
+  assert.throws(() => learning.parseAssessmentLearning(variant(rows => { rows[0].assistance.extra = 1; }).assessmentLearning), /invalid-evidence/u);
+  assert.throws(() => learning.parseAssessmentLearning(variant(rows => { rows[3].assistance = { kind: 'explanation', at: now }; }).assessmentLearning), /invalid-evidence/u);
+});
+check('E1: a pending-mapping retry keeps assisted evidence and prior actions, adding only the unresolved target', () => {
+  const partial = subject => subject === 'word:犬' ? word(subject) : null; // the assisted 猫 is unresolved at first
+  const first = practiced({ assist: [0], resolveSubject: partial });
+  assert.equal(first.followup.status, 'pending-mapping');
+  const base = record(first.library), before = { ...base, ...learning.applyAssessmentLearning(base, first.followup) };
+  assert.deepEqual(before.taken.map(row => row.id), ['犬']);
+  const prior = before.assessmentLearning.followups[0], priorActions = JSON.stringify(prior.actions);
+  const replanned = learning.planAssessmentLearning({ scope, form, attempt: first.selected.attempt,
+    outcomes: api.assessmentOutcomesV2(first.selected), resolveSubject: word });
+  const after = { ...before, ...learning.applyAssessmentLearningEnrichment(before, replanned) };
+  const enriched = after.assessmentLearning.followups[0];
+  assert.equal(enriched.id, prior.id); assert.equal(enriched.status, 'complete');
+  assert.equal(JSON.stringify(enriched.evidence), JSON.stringify(prior.evidence));
+  assert.deepEqual(enriched.evidence[0].assistance, { kind: 'explanation', at: first.selected.attempt.answers[0].assistance.at });
+  assert.equal(JSON.stringify(enriched.actions.slice(0, prior.actions.length)), priorActions);
+  assert.deepEqual(after.taken.map(row => row.id), ['犬', '猫']);
+  assert.deepEqual(after.srs, {}); assert.deepEqual(after.revlog, []);
+  assert(learning.validateAssessmentLearningRecord(after));
+  // once complete, a repeat is refused rather than re-applied (the host then prepares no write)
+  assert.throws(() => learning.applyAssessmentLearningEnrichment(after, replanned), /not-pending-mapping/u);
+});
+check('E2: dropping the mark in finalization, or separately in enrichment, is refused with prior state intact', () => {
+  const run = practiced({ assist: [0] });
+  const dropped = learning.planAssessmentLearning({ scope, form, attempt: run.selected.attempt,
+    outcomes: api.assessmentOutcomesV2(run.selected).map(withoutMark), resolveSubject: word });
+  const state = record(run.library), before = JSON.stringify(state);
+  assert.throws(() => learning.validateAssessmentLearningRecord({ ...state, ...learning.applyAssessmentLearning(state, dropped) }), /evidence-mismatch/u);
+  assert.equal(JSON.stringify(state), before);
+  const pending = practiced({ assist: [0], resolveSubject: subject => subject === 'word:犬' ? word(subject) : null });
+  const committed = { ...record(pending.library), ...learning.applyAssessmentLearning(record(pending.library), pending.followup) };
+  const snapshot = JSON.stringify(committed);
+  const retry = learning.planAssessmentLearning({ scope, form, attempt: pending.selected.attempt,
+    outcomes: api.assessmentOutcomesV2(pending.selected).map(withoutMark), resolveSubject: word });
+  assert.throws(() => learning.applyAssessmentLearningEnrichment(committed, retry), /enrichment-evidence-changed/u);
+  assert.equal(JSON.stringify(committed), snapshot);
+});
+check('PENDING-JOHN-Q1 (a regression boundary, not a ruling): a stopped practice with an assisted answer creates no followup work', () => {
+  const { library, selected, followup } = practiced({ assist: [0], abandon: true });
+  assert(selected.attempt.answers[0].assistance);
+  assert.equal(followup.status, 'stopped'); assert.deepEqual(followup.evidence, []); assert.deepEqual(followup.actions, []);
+  assert.equal(learning.applyAssessmentLearning(record(library), followup).taken.length, 0);
+});
+check('the sheet stays closed until the mark is durable; results partition honestly, history included', () => {
+  const begin = api.startAssessmentV2(api.createAssessmentLibraryV2({ scope }), form, { scope, attemptId: 'sheet',
+    mode: 'practice', now, clockSessionId: 'sheet-clock', monotonicMs: 0, priorExposure: 'none-reported', editorialAtStart: reviewedAtStart });
+  const step = (library, action, ms) => api.commandAssessmentV2(library, { scope, attemptId: 'sheet',
+    expectedRevisionId: api.selectAssessmentV2(library, 'sheet').attempt.revisionId, now: now + ms,
+    clockSessionId: 'sheet-clock', monotonicMs: ms, action });
+  const answered = step(begin, { kind: 'answer', itemId: items[0].id, response: { kind: 'selected', optionId: 'b' } }, 1000);
+  assert.equal(api.selectAssessmentExplanationV2(answered, 'sheet', items[0].id), null);
+  const marked = step(answered, { kind: 'assistance', itemId: items[0].id, reason: 'explanation' }, 2000);
+  const sheet = api.selectAssessmentExplanationV2(marked, 'sheet', items[0].id);
+  assert.deepEqual({ verdict: sheet.verdict, chosen: sheet.chosen.optionId, key: sheet.key.optionId, rule: sheet.rule,
+    distractorLines: sheet.distractorLines, editorial: sheet.editorial },
+  { verdict: 'incorrect', chosen: 'b', key: 'a', rule: items[0].rationale, distractorLines: null, editorial: 'ai-reviewed-practice' });
+  assert.equal(step(marked, { kind: 'assistance', itemId: items[0].id, reason: 'explanation' }, 3000), marked);
+  const done = step(marked, { kind: 'submit' }, 4000);
+  assert.deepEqual({ ...api.assessmentIndependenceV2(api.selectAssessmentV2(done, 'sheet')) },
+    { answered: 1, assisted: 1, assistedCorrect: 0, unanswered: 3, attribution: 'complete', independent: 0 });
+  // C3: attempt-level help from before any item mark stays unattributed afterwards
+  const history = step(answered, { kind: 'assistance', reason: 'hint' }, 1500);
+  const both = step(step(history, { kind: 'assistance', itemId: items[0].id, reason: 'explanation' }, 2000), { kind: 'submit' }, 3000);
+  const counts = api.assessmentIndependenceV2(api.selectAssessmentV2(both, 'sheet'));
+  assert.deepEqual([counts.assisted, counts.attribution, counts.independent], [1, 'unknown', null]);
+  const only = api.assessmentIndependenceV2(api.selectAssessmentV2(step(history, { kind: 'submit' }, 2000), 'sheet'));
+  assert.deepEqual([only.assisted, only.attribution, only.independent], [0, 'unknown', null]);
+  assert(api.selectAssessmentV2(both, 'sheet').attempt.answers.filter(row => row.assistance).length === 1);
+});
+// Re-derives the published revision formula (sha256 over 2-space canonical JSON) to seal a
+// derived legacy shape. A wrong formula makes parse reject it: a setup failure, never a pass.
+const canonical = value => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object'
+  ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
+const canonicalText = value => JSON.stringify(canonical(value), null, 2);
+function resealAttempt(attempt) {
+  const payload = JSON.parse(JSON.stringify(attempt)); delete payload.revisionId; delete payload.sha256;
+  const sha256 = createHash('sha256').update(canonicalText(payload), 'utf8').digest('hex');
+  return { ...payload, revisionId: `assessment-attempt-v2:${sha256}`, sha256 };
+}
+check('C1: an aggregate assisted condition without item attribution withholds the independent count', () => {
+  const begin = api.startAssessmentV2(api.createAssessmentLibraryV2({ scope }), form, { scope, attemptId: 'legacy',
+    mode: 'practice', now, clockSessionId: 'legacy-clock', monotonicMs: 0, priorExposure: 'none-reported', editorialAtStart: reviewedAtStart });
+  const step = (library, action, ms) => api.commandAssessmentV2(library, { scope, attemptId: 'legacy',
+    expectedRevisionId: api.selectAssessmentV2(library, 'legacy').attempt.revisionId, now: now + ms,
+    clockSessionId: 'legacy-clock', monotonicMs: ms, action });
+  let library = step(begin, { kind: 'answer', itemId: items[0].id, response: { kind: 'selected', optionId: 'a' } }, 1000);
+  library = step(library, { kind: 'visit', itemId: items[1].id }, 2000);
+  library = step(library, { kind: 'answer', itemId: items[1].id, response: { kind: 'selected', optionId: 'a' } }, 3000);
+  const aggregate = step(step(library, { kind: 'assistance', reason: 'hint' }, 4000), { kind: 'submit' }, 5000);
+  // The parser-valid legacy shape: the condition kept, no event, no item mark.
+  const withEvent = api.selectAssessmentV2(aggregate, 'legacy').attempt;
+  assert(withEvent.conditions.includes('assisted'));
+  const legacyAttempt = resealAttempt({ ...withEvent, events: withEvent.events.filter(row => row.kind !== 'assistance') });
+  const plain = JSON.parse(JSON.stringify(aggregate));
+  const legacy = api.parseAssessmentLibraryV2({ ...plain, attempts: [legacyAttempt] });
+  const parsed = api.selectAssessmentV2(legacy, 'legacy');
+  assert.equal(canonicalText(parsed.attempt), canonicalText(legacyAttempt), 'the legacy bytes are kept as they are');
+  const result = api.assessmentIndependenceV2(parsed);
+  assert.deepEqual({ ...result }, { answered: 2, assisted: 0, assistedCorrect: 0, unanswered: 2, attribution: 'unknown', independent: null });
+  assert(parsed.attempt.conditions.includes('assisted'));
+  assert(parsed.attempt.answers.every(row => !row.assistance));
+  // An ordinary record with neither condition nor event keeps the independent branch.
+  const ordinary = api.assessmentIndependenceV2(practiced().selected);
+  assert.deepEqual([ordinary.attribution, ordinary.independent, ordinary.answered], ['complete', 3, 3]);
+  // Repeated historical commands on one answered item: five events on a four-question form.
+  let repeated = step(begin, { kind: 'answer', itemId: items[0].id, response: { kind: 'selected', optionId: 'a' } }, 1000);
+  for (let index = 0; index < 5; index++) repeated = step(repeated, { kind: 'assistance', reason: 'hint' }, 2000 + index);
+  const five = api.selectAssessmentV2(step(repeated, { kind: 'submit' }, 3000), 'legacy');
+  assert.equal(five.attempt.events.filter(row => row.kind === 'assistance').length, 5);
+  const honest = api.assessmentIndependenceV2(five);
+  // question units only: no event count is exposed, and the partition still sums to the form
+  assert.deepEqual(Object.keys(honest).sort(), ['answered', 'assisted', 'assistedCorrect', 'attribution', 'independent', 'unanswered']);
+  assert.deepEqual([honest.answered, honest.assisted, honest.unanswered, honest.attribution, honest.independent], [1, 0, 3, 'unknown', null]);
+  assert.equal(honest.answered + honest.unanswered, form.items.length);
+});
+check('D1: a later lawful explanation keeps inherited unknown attribution; a fresh one stays complete', () => {
+  const begin = api.startAssessmentV2(api.createAssessmentLibraryV2({ scope }), form, { scope, attemptId: 'inherited',
+    mode: 'practice', now, clockSessionId: 'inherited-clock', monotonicMs: 0, priorExposure: 'none-reported', editorialAtStart: reviewedAtStart });
+  const step = (library, action, ms) => api.commandAssessmentV2(library, { scope, attemptId: 'inherited',
+    expectedRevisionId: api.selectAssessmentV2(library, 'inherited').attempt.revisionId, now: now + ms,
+    clockSessionId: 'inherited-clock', monotonicMs: ms, action });
+  const twoAnswers = library => {
+    library = step(library, { kind: 'answer', itemId: items[0].id, response: { kind: 'selected', optionId: 'a' } }, 1000);
+    library = step(library, { kind: 'visit', itemId: items[1].id }, 2000);
+    return step(library, { kind: 'answer', itemId: items[1].id, response: { kind: 'selected', optionId: 'a' } }, 3000);
+  };
+  // S, frozen once: an admitted active practice state with two answers (the second current),
+  // the aggregate condition, and no item mark or assistance event.
+  const withHelp = step(twoAnswers(begin), { kind: 'assistance', reason: 'hint' }, 4000);
+  const live = api.selectAssessmentV2(withHelp, 'inherited').attempt;
+  const frozen = resealAttempt({ ...live, events: live.events.filter(row => row.kind !== 'assistance') });
+  const S = api.parseAssessmentLibraryV2({ ...JSON.parse(JSON.stringify(withHelp)), attempts: [frozen] });
+  assert.equal(canonicalText(api.selectAssessmentV2(S, 'inherited').attempt), canonicalText(frozen));
+  assert.equal(api.selectAssessmentV2(S, 'inherited').attempt.cursor.itemId, items[1].id);
+  const through = library => api.parseAssessmentLibraryV2(JSON.parse(JSON.stringify(library))); // serialize, then parse
+  // Branch A: submit directly.
+  const a = api.assessmentIndependenceV2(api.selectAssessmentV2(through(step(S, { kind: 'submit' }, 5000)), 'inherited'));
+  assert.deepEqual([a.answered, a.assisted, a.attribution, a.independent], [2, 0, 'unknown', null]);
+  // Branch B: one lawful explanation on the current answer, then submit.
+  const bSelected = api.selectAssessmentV2(through(step(step(S, { kind: 'assistance', itemId: items[1].id,
+    reason: 'explanation' }, 5000), { kind: 'submit' }, 6000)), 'inherited');
+  const b = api.assessmentIndependenceV2(bSelected);
+  assert.deepEqual([b.answered, b.assisted, b.attribution, b.independent], [2, 1, 'unknown', null]);
+  assert.deepEqual(bSelected.attempt.answers.filter(row => row.assistance).map(row => row.item.id), [items[1].id]);
+  assert.deepEqual(bSelected.attempt.answers[1].response, { kind: 'selected', optionId: 'a' });
+  assert.deepEqual(bSelected.attempt.answers[1].assistance.response, { kind: 'selected', optionId: 'a' });
+  // Fresh companion: the same answers with no history; its sole explanation is complete.
+  const cSelected = api.selectAssessmentV2(through(step(step(twoAnswers(begin), { kind: 'assistance', itemId: items[1].id,
+    reason: 'explanation' }, 4000), { kind: 'submit' }, 5000)), 'inherited');
+  const c = api.assessmentIndependenceV2(cSelected);
+  assert.deepEqual([c.answered, c.assisted, c.attribution, c.independent], [2, 1, 'complete', 1]);
+  assert.equal('assistanceAttribution' in cSelected.attempt, false);
 });
 writeFileSync(resolve(stage, 'receipt.json'), JSON.stringify({ checks, count: checks.length, status: 'passed' }, null, 2));
 console.log(JSON.stringify({ checks: checks.length, status: 'passed', evidence: stage }));
