@@ -753,7 +753,7 @@ async function referenceChecks() {
       ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Learning })),
       ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating, state: S.Review })),
       ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Relearning })),
-      { id: 'V5-overdue-good', history: V3, now: '2026-10-25T00:00:00Z', rating: R.Good, state: S.Review },
+      { id: 'V5-overdue-good', history: V3, now: '2026-11-30T00:00:00Z', rating: R.Good, state: S.Review },
       { id: 'V7a-fitted-new-good', history: [], now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.New, fitted: true },
       { id: 'V7b-fitted-mature-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
     ];
@@ -767,6 +767,16 @@ async function referenceChecks() {
         before: stored(card), pass: false, mismatch: [] };
       reference.rows.push(row);
       assert.equal(card.state, vector.state, `${vector.id}: the declared card is in the labelled state`);
+      if (vector.id === 'V5-overdue-good') {
+        // The history, not the vector label, must establish the promised overdue input.
+        const overdueDays = (at(vector.now).getTime() - card.due.getTime()) / 86_400_000;
+        row.overdue = { due: card.due.toISOString(), gradingTime: at(vector.now).toISOString(),
+          expectedDue: '2026-10-31T00:00:00.000Z', expectedDays: 30, actualDays: overdueDays, pass: false };
+        assert.equal(row.overdue.due, row.overdue.expectedDue, `${vector.id}: history must produce the pinned due date`);
+        assert(overdueDays > 0, `${vector.id}: grading clock must be after the actual due date`);
+        assert.equal(overdueDays, row.overdue.expectedDays, `${vector.id}: grading clock must be exactly 30 days overdue`);
+        row.overdue.pass = true;
+      }
       const expected = expectedScheduler.next(card, at(vector.now), vector.rating).card;
       if (vector.fitted) {
         // the fitted vector must be able to fail: default and fitted weights disagree on this exact input
