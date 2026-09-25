@@ -45,6 +45,8 @@ const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const SITE = resolveCorridorSite();
 const EVIDENCE = resolveCorridorEvidence();
 const results = [];
+const pageErrors = []; // bounded: the first 20 uncaught page errors, each tagged with its case
+let currentCase = 'setup';
 const check = (name, pass, detail = '') => {
   results.push({ name, pass: !!pass, detail });
   console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? `  — ${detail}` : ''}`);
@@ -72,6 +74,9 @@ async function openContext({ absent = false, pref = null } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 860 } });
   await silenceBrowserAudio(context);
   await context.addInitScript(SPY);
+  context.on('page', (page) => page.on('pageerror', (error) => {
+    if (pageErrors.length < 20) pageErrors.push({ case: currentCase, message: error.message });
+  }));
   if (pref) await context.addInitScript((value) => { try { localStorage.setItem('kairo-rec-voice-v1', value); } catch { /* spy */ } }, pref);
   if (absent) await context.route('**/audio/manifest.json', (route) => route.fulfill({ status: 404, body: '' }));
   const requests = [];
@@ -94,6 +99,7 @@ async function openRecordedReader(page) {
 try {
   // V0
   {
+    currentCase = 'V0';
     const context = await browser.newContext(); const page = await context.newPage();
     const identity = await (await page.request.get(`${origin}/build-identity.json`)).json();
     let head = null; try { head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { /* outside a checkout */ }
@@ -109,6 +115,7 @@ try {
 
   // V1 recordings absent
   {
+    currentCase = 'V1';
     const { context } = await openContext({ absent: true }); const page = await context.newPage();
     const state = await openRecordedReader(page);
     await page.locator('#listen-toggle').click({ force: false, trial: false }).catch(() => {});
@@ -121,6 +128,7 @@ try {
 
   // V2 present, no choice
   {
+    currentCase = 'V2';
     const { context, requests } = await openContext(); const page = await context.newPage();
     const state = await openRecordedReader(page);
     check('V2 no choice: listen is shut on a recorded passage', state.disabled === true, JSON.stringify(state));
@@ -132,6 +140,7 @@ try {
     check('V2 no choice: zero device speech', (await deviceSpoken(page)) === 0);
 
     // V3 choose アミ explicitly
+    currentCase = 'V3';
     await page.locator('#listen-voice').selectOption('ami');
     await page.waitForFunction(() => document.querySelector('#listen-toggle') && !document.querySelector('#listen-toggle').disabled, null, { timeout: 5_000 }).catch(() => {});
     const opened = await page.evaluate(() => !document.querySelector('#listen-toggle')?.disabled);
@@ -146,6 +155,7 @@ try {
 
   // V4 a recording that fails to load
   {
+    currentCase = 'V4';
     const { context } = await openContext({ pref: 'ami' });
     await context.route('**/audio/s/**', (route) => route.fulfill({ status: 404, body: '' }));
     const page = await context.newPage();
@@ -160,6 +170,7 @@ try {
 
   // V5 the review card's 音 door
   {
+    currentCase = 'V5';
     const { context, requests } = await openContext();
     await context.addInitScript((word) => {
       if (localStorage.getItem('voice-honesty-seeded')) return;
@@ -189,11 +200,16 @@ try {
     check('V5 zero device speech', (await deviceSpoken(page)) === 0);
     await context.close();
   }
+} catch (error) {
+  // a setup or click exception is a named, failed row with its stack, not a silently short receipt
+  results.push({ name: `terminal (${currentCase})`, pass: false, detail: error.stack || String(error) });
+  console.log(`  FAIL terminal in ${currentCase} — ${error.message}`);
 } finally {
-  writeFileSync(resolve(EVIDENCE, 'voice-picker.json'), JSON.stringify({ origin, results }, null, 2) + '\n');
+  writeFileSync(resolve(EVIDENCE, 'voice-picker.json'), JSON.stringify({ origin, results, pageErrors, lastCase: currentCase }, null, 2) + '\n');
   await browser.close();
   await host.close();
 }
+if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);
 process.exit(failed.length ? 1 : 0);
