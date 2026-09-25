@@ -100,7 +100,7 @@ try {
   if (pinnedArtifact) check('T0 served artifact is the pinned digest', identity.artifactSha256 === pinnedArtifact,
     `served=${identity.artifactSha256} pinned=${pinnedArtifact}`);
   const manifest = new Map(identity.files.map((row) => [row.path, row.sha256]));
-  for (const path of ['index.html', 'corridor.js', 'corridor.css', 'assessment-view.mjs']) {
+  for (const path of ['index.html', 'corridor.js', 'corridor.css', 'register.css', 'assessment-view.mjs']) {
     const bytes = Buffer.from(await (await page0.request.get(`${origin}/${path}`)).body());
     const served = createHash('sha256').update(bytes).digest('hex');
     check(`T0 served ${path} matches its manifest entry`, served === manifest.get(path), served.slice(0, 16));
