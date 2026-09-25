@@ -103,6 +103,7 @@ function fixture(overrides = {}, options = {}) {
     findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
+    recManifest: null, // Explicit audio-unavailable fixture; this suite does not exercise audio.
     // a DOM focus helper startReview calls after rendering; no scheduling effect
     focusKanjiReadingReview: () => {},
     endLessonRun: () => {}, srsCustom: null, srsNewPerDay: () => S.srsPrefs.newPerDay, srsReviewLimit: () => S.srsPrefs.reviewLimit,
@@ -121,10 +122,13 @@ function fixture(overrides = {}, options = {}) {
     }
     return pending;
   };
-  const ack = (save = true, { acknowledge = true } = {}) => {
+  const ack = (save = true, { acknowledge = true, afterPublish } = {}) => {
     const pending = stage(); queue.shift();
     const ok = save && !pending.error && pending.epoch === sandbox.recordEpoch;
     if (ok) { durable = freeze(ordered(clone({ ...durable, ...pending.patch }))); Object.assign(S, durable); }
+    // Test-only boundary: durable publication may precede loss of ownership.
+    // The callback runs before resolving the awaited save, not after its handler.
+    if (ok) afterPublish?.();
     pending.settle(ok && acknowledge);
     return pending;
   };
@@ -316,10 +320,11 @@ async function propertyChecks() {
     state: 2, stability: 12, difficulty: 5, elapsed_days: 2, scheduled_days: 12, learning_steps: 0, reps: 4, lapses: 1 });
   const scope = 'Generated word and dictionary-backed kanji grade/dojo/undo handler contracts with frozen synthetic roots, default unfitted FSRS weights, fixed clock and controlled save acknowledgments. Resume serializes these modeled roots into a fresh fixture. No browser/native durability, native lost-ack recovery, fitted-weight initialization, retained dictionary provenance, sentence/question source contract, or undo initiated after reload claim.';
   const counters = {};
-  const count = (name) => { counters[name] = (counters[name] || 0) + 1; };
+  let countEnabled = true;
+  const count = (name) => { if (countEnabled) counters[name] = (counters[name] || 0) + 1; };
   const report = { format: 'kairo-learning-handler-properties', version: 1, scope, seed, requestedHistories: runs,
     replayHistory: onlyHistory, minimumCommands: 12, maximumCommands: 64, completedHistories: 0, totalCommands: 0,
-    historyLengths: {}, sourceSha256: hash(source), selectedProgramSha256: hash(program), testedDefinitions: [...names],
+    historyLengths: {}, deterministicReplays: 0, sourceSha256: hash(source), selectedProgramSha256: hash(program), testedDefinitions: [...names],
     verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))),
     schedulerSha256: hash(readFileSync(resolve(root, 'vendor/ts-fsrs.mjs'))),
     counters, negativeControls: [], failures: [], pass: false };
@@ -335,30 +340,42 @@ async function propertyChecks() {
   const revokeTarget = (row, key, index) => same(row.slice(1), [key, 0, index], 'Undo targets its original grade row');
   // Deliberately corrupt only oracle inputs, never authored code or live data.
   // Each control must fail at the same assertion used by generated histories.
-  for (const [name, action, expectedMessage] of [
-    ['premature-root-publication', () => unchanged({ durable: () => ({ srs: { unexpected: true } }) }, { srs: {} }, { ix: 0 }, { ix: 0 }, 'before acknowledgment'), /before acknowledgment: saved roots/],
-    ['duplicate-pending-write', () => pendingCount({ queue: [{}, {}] }), /One pending intention/],
-    ['duplicate-session-advance', () => advancedOnce({ ix: 2 }, 0), /advances the cursor exactly once/],
-    ['wrong-revocation-target', () => revokeTarget([fixedStart, 'word:学校', 0, 8], 'word:学校', 7), /original grade row/],
-  ]) {
-    let caught;
-    try { action(); } catch (error) { caught = error; }
-    assert(caught instanceof assert.AssertionError && expectedMessage.test(caught.message), name + ' must trip its intended assertion');
-    report.negativeControls.push({ name, rejected: true, assertion: caught.message.split('\n')[0] });
-  }
+  const runNegativeControls = () => {
+    for (const [name, action, expectedMessage] of [
+      ['premature-root-publication', () => unchanged({ durable: () => ({ srs: { unexpected: true } }) }, { srs: {} }, { ix: 0 }, { ix: 0 }, 'before acknowledgment'), /before acknowledgment: saved roots/],
+      ['duplicate-pending-write', () => pendingCount({ queue: [{}, {}] }), /One pending intention/],
+      ['duplicate-session-advance', () => advancedOnce({ ix: 2 }, 0), /advances the cursor exactly once/],
+      ['wrong-revocation-target', () => revokeTarget([fixedStart, 'word:学校', 0, 8], 'word:学校', 7), /original grade row/],
+    ]) {
+      let caught;
+      try { action(); } catch (error) { caught = error; }
+      const rejected = caught instanceof assert.AssertionError && expectedMessage.test(caught.message);
+      report.negativeControls.push({ name, rejected, assertion: caught?.message?.split('\n')[0] || null });
+      if (!rejected) {
+        const error = new Error(name + ' must trip its intended assertion');
+        error.propertyFailure = { negativeControl: name, reason: error.stack, observedError: caught?.stack || null };
+        throw error;
+      }
+    }
+  };
   const rngFor = (value) => {
     let state = value >>> 0;
-    return (limit) => { state = (Math.imul(1664525, state) + 1013904223) >>> 0; return state % limit; };
+    return (limit) => {
+      state = (state + 0x6d2b79f5) >>> 0;
+      let mixed = Math.imul(state ^ (state >>> 15), state | 1);
+      mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
+      return ((mixed ^ (mixed >>> 14)) >>> 0) % limit;
+    };
   };
   const scenarioNames = ['grade', 'reject-retry', 'undo-reject-retry', 'undo-conflict', 'replace-before-stage',
     'replace-after-stage', 'epoch-loss', 'stale-enrollment', 'disclosure-guard', 'concurrent-merge',
-    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack'];
+    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo'];
   const commandsFor = (historyIndex, historySeed) => {
     const random = rngFor(historySeed);
     const commands = [];
     const episodes = 2 + random(4);
     for (let episode = 0; episode < episodes; episode += 1) {
-      const kind = episode === 0 ? historyIndex % scenarioNames.length : random(scenarioNames.length);
+      const kind = episode === 0 ? historyIndex % scenarioNames.length : episode === 1 ? 0 : random(scenarioNames.length);
       const rating = 1 + random(4);
       const start = { op: 'start', type: kind === 11 ? 1 : random(2), dojo: kind === 10,
         declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)] };
@@ -385,6 +402,10 @@ async function propertyChecks() {
         case 'kanji-unavailable': part = [start, { op: 'dictionary', available: false }, gradeCommand, stage, ok,
           { op: 'dictionary', available: true }, gradeCommand, stage, ok]; break;
         case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
+        case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
+        case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
+          { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
+          { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
         default: part = [start, gradeCommand, { op: 'duplicate' }, stage, ok];
       }
       part.push({ op: 'resume' });
@@ -402,13 +423,16 @@ async function propertyChecks() {
     const initial = { taken: clone(items), srs: historySeed & 1 ? { [keyOf(items[0])]: mature(), [keyOf(items[1])]: mature() } : {},
       deepWords: { unrelated: { keep: historySeed } }, obslog: [], revlog: [], stats: {} };
     let f = fixture(initial, { Date: FixedDate, kanji: { 学: { m: 'synthetic learning' } } });
-    let target = items[0], pending = null, lastSaved = null, rejectedGrade = false;
+    let target = items[0], pending = null, lastSaved = null, lastPostCommitOwnershipLoss = false, rejectedGrade = false, acceptedGrades = 0;
     let sessionEntries = new WeakMap([[f.S.review, []]]);
+    let sessionUndos = new WeakMap();
     const trace = [];
     const newSession = (dojo = false) => {
-      const rv = { queue: [clone(target), { t: 'word', id: '電話', label: '電話', ts: 100, started: 100 }],
+      const other = items.find((value) => keyOf(value) !== keyOf(target));
+      const rv = { queue: [clone(target), clone(other)],
         ix: 0, revealed: true, declared: 1, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
       f.S.review = rv; f.S.focus = dojo ? { mode: 'kanji' } : null; sessionEntries.set(rv, []);
+      sessionUndos.set(rv, { count: 0, reinserted: false, days: new Set() });
       return rv;
     };
     const attemptGrade = (rating) => {
@@ -493,10 +517,11 @@ async function propertyChecks() {
         const command = commands[index]; trace.push({ index, ...command, beforeTime: now }); count('command:' + command.op);
         switch (command.op) {
           case 'start': {
-            assert.equal(pending, null); target = items[command.type]; now += command.shift;
+            assert.equal(pending, null); rejectedGrade = false; target = items[command.type]; now += command.shift;
             if (command.shift < 0) count('backwardClockMoves'); else if (command.shift === 0) count('equalClockMoves');
             const rv = newSession(command.dojo); rv.declared = command.declared; break;
           }
+          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
           case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared }); break;
           case 'dictionary': if (command.available) f.c.D.kanji.学 = { m: 'synthetic learning' }; else delete f.c.D.kanji.学; break;
           case 'grade': {
@@ -550,11 +575,29 @@ async function propertyChecks() {
           case 'ack': {
             stagePending(); const p = pending, before = f.durable(), replacement = f.S.review !== p.rv ? sessionValue(f.S.review) : null;
             const saved = command.save && p.valid && p.epoch === f.c.recordEpoch;
-            const advance = saved && !command.lostAck && f.S.review === p.rv;
-            f.ack(command.save, { acknowledge: !command.lostAck }); const returned = await p.promise;
+            const advance = saved && !command.lostAck && !command.loseOwnershipAfterPublish && f.S.review === p.rv;
+            let publishedBeforeOwnershipLoss = null;
+            if (command.loseOwnershipAfterPublish) assert(saved, 'The postcommit ownership case must first save under its original owner');
+            f.ack(command.save, { acknowledge: !command.lostAck, afterPublish: command.loseOwnershipAfterPublish ? () => {
+              publishedBeforeOwnershipLoss = f.durable();
+              assert.notDeepEqual(publishedBeforeOwnershipLoss, before, 'Complete saved grade roots exist before ownership changes');
+              same(sessionValue(p.rv), p.session, 'Publication alone does not resume or advance the awaiting handler');
+              assert.equal(f.c.recordEpoch, p.epoch, 'Original owner still holds the publication boundary');
+              f.c.recordEpoch += 1;
+              trace.at(-1).publicationBoundary = { savedBeforeOwnershipLoss: true, oldEpoch: p.epoch, newEpoch: f.c.recordEpoch };
+            } : undefined });
+            const returned = await p.promise;
+            if (command.loseOwnershipAfterPublish) {
+              assert(publishedBeforeOwnershipLoss, 'Ownership-loss callback ran only after saved publication');
+              same(f.durable(), publishedBeforeOwnershipLoss, 'Ownership loss retains the complete published roots');
+              count('postCommitOwnershipLoss');
+            }
             assert.equal(returned, !!advance, 'Return value reports acknowledged current-session success, not inferred durability');
             assert.equal(f.queue.length, 0); assert.equal(p.rv.pending, null);
-            if (saved) { checkSaved(p, before, f.durable()); count('savedOperations'); }
+            if (saved) {
+              checkSaved(p, before, f.durable()); count('savedOperations');
+              if (p.kind === 'grade') acceptedGrades += 1;
+            }
             else { same(f.durable(), before, 'Rejected or old-owner save preserves every saved root'); count('rejectedOperations'); }
             if (advance && p.kind === 'grade') {
               advancedOnce(p.rv, p.ix);
@@ -566,6 +609,7 @@ async function propertyChecks() {
               const entry = { key: p.key, previous: before.srs[p.key], after: f.durable().srs[p.key], day: p.day, rating: p.effectiveRating,
                 logIndex: before.revlog.length, dojo: p.dojo, ix: p.ix, session: p.session, reinserted };
               sessionEntries.get(p.rv).push(entry);
+              if (sessionEntries.get(p.rv).length === 2) count('sameSittingTwoGrades');
               if (!p.dojo) {
                 const actualEntry = p.rv.history.at(-1);
                 same(actualEntry.prev ?? null, entry.previous ?? null, 'Undo snapshot is the dequeue-time schedule');
@@ -576,29 +620,41 @@ async function propertyChecks() {
               assert.equal(p.rv.ix, entry.ix); assert.equal(p.rv.history.length, p.session.history.length - 1);
               same(p.rv.done, entry.session.done, 'Undo restores the independent sitting counter snapshot');
               same(p.rv.queue, entry.session.queue, 'Undo removes only its own short-step reinsertion');
+              const undone = sessionUndos.get(p.rv); undone.count += 1;
+              undone.reinserted ||= entry.reinserted; undone.days.add(entry.day);
+              if (undone.count === 2) {
+                count('sameSittingTwoUndos');
+                if (undone.reinserted) count('twoUndosWithReinsertion');
+                if (undone.days.size === 2) count('twoUndosAcrossDays');
+              }
             } else {
               same(sessionValue(p.rv), p.session, 'A failed or superseded acknowledgment never advances the old sitting');
-              if (p.kind === 'grade') { rejectedGrade = true; count('gradeRejections'); }
+              if (p.kind === 'grade') {
+                count('unadvancedGrades');
+                if (!saved) { rejectedGrade = true; count('preCommitGradeRejections'); }
+              }
               else { count('undoRejections'); if (!p.valid) count('undoConflictRejections'); }
             }
             if (replacement) same(sessionValue(f.S.review), replacement, 'Late save cannot advance replacement sitting');
             if (advance) { assert.equal(p.rv.revealed, false); assert.equal(p.rv.declared, null); }
             if (command.lostAck && saved) count('simulatedCommittedLostAcks');
-            lastSaved = saved; pending = null; break;
+            lastSaved = saved; lastPostCommitOwnershipLoss = !!command.loseOwnershipAfterPublish; pending = null; break;
           }
           case 'resume': {
             assert.equal(pending, null); assert.equal(f.queue.length, 0); const before = f.durable();
             f = fixture(clone(before), { Date: FixedDate, kanji: { 学: { m: 'synthetic learning' } } });
-            sessionEntries = new WeakMap([[f.S.review, []]]);
+            sessionEntries = new WeakMap([[f.S.review, []]]); sessionUndos = new WeakMap(); rejectedGrade = false;
             same(f.durable(), before, 'Serialize and resume preserves all modeled saved roots');
             assert.equal(f.S.review.history.length, 0); assert.equal(f.S.review.ix, 0); assert.equal(f.queue.length, 0);
             if (lastSaved === true) count('resumesAfterSave'); else if (lastSaved === false) count('resumesAfterRejection');
+            if (lastPostCommitOwnershipLoss) count('resumesAfterPostCommitOwnershipLoss');
             count('resumes'); break;
           }
           default: assert.fail('Unknown generated command: ' + command.op);
         }
       }
       assert.equal(pending, null); assert.equal(f.queue.length, 0);
+      assert(acceptedGrades > 0, 'A completed history must exercise an accepted grade, not only no-ops or rejected preconditions');
       return { semanticSha256: hash(JSON.stringify(ordered(f.durable()))), trace };
     } catch (error) {
       error.propertyFailure = { historyIndex, historySeed, failedCommandIndex: trace.length - 1, trace,
@@ -608,11 +664,23 @@ async function propertyChecks() {
   };
   const semanticDigests = [];
   try {
+    runNegativeControls();
     for (let offset = 0; offset < runs; offset += 1) {
       const historyIndex = onlyHistory ?? offset;
       const historySeed = (seed ^ Math.imul(historyIndex + 1, 0x9e3779b1)) >>> 0;
       const commands = commandsFor(historyIndex, historySeed);
       const result = await runHistory(historyIndex, historySeed, commands);
+      // Replay every scenario twice through the first 30 histories, plus a
+      // deterministic sparse sample. This is a separate repeatability check;
+      // it is not the reference model and does not inflate coverage counts.
+      if (historyIndex < 30 || historyIndex % 97 === 0) {
+        countEnabled = false;
+        try {
+          const replayed = await runHistory(historyIndex, historySeed, commandsFor(historyIndex, historySeed));
+          assert.equal(replayed.semanticSha256, result.semanticSha256, 'Identical commands, seed and clock replay to identical modeled roots');
+          report.deterministicReplays += 1;
+        } finally { countEnabled = true; }
+      }
       semanticDigests.push(result.semanticSha256);
       report.completedHistories += 1; report.totalCommands += commands.length;
       report.historyLengths[commands.length] = (report.historyLengths[commands.length] || 0) + 1;
@@ -622,10 +690,11 @@ async function propertyChecks() {
     report.coverageFloorApplicable = runs >= 1000 && onlyHistory === null;
     if (report.coverageFloorApplicable) {
       const required = ['standardGrades', 'wordGrades', 'kanjiGrades', 'rating1', 'rating2', 'rating3', 'rating4', 'pendingDuplicates',
-        'gradeRejections', 'explicitGradeRetry', 'standardUndos', 'undoRejections', 'undoConflictRejections', 'resumesAfterSave',
+        'preCommitGradeRejections', 'explicitGradeRetry', 'standardUndos', 'undoRejections', 'undoConflictRejections', 'resumesAfterSave',
         'resumesAfterRejection', 'backwardClockMoves', 'equalClockMoves', 'backwardAnchoredGrades', 'dojoOnExistingSchedule', 'dojoUndos',
         'disclosureRejections', 'notRecalledForcedAgain', 'concurrentUnrelatedChanges', 'concurrentTargetChanges', 'sessionReplacements',
-        'ownershipChanges', 'simulatedCommittedLostAcks'];
+        'ownershipChanges', 'simulatedCommittedLostAcks', 'postCommitOwnershipLoss', 'resumesAfterPostCommitOwnershipLoss',
+        'sameSittingTwoGrades', 'sameSittingTwoUndos', 'twoUndosWithReinsertion', 'twoUndosAcrossDays'];
       report.coverageFloors = Object.fromEntries(required.map((name) => [name, 10]));
       for (const name of required) assert((counters[name] || 0) >= 10, 'Non-vacuity coverage floor: ' + name);
     }
