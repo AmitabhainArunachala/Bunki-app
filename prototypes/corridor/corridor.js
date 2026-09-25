@@ -20677,25 +20677,32 @@ function readerChoiceMatch(choice, rows) {
   const spelled = READER_KANJI.test(base);
   const key = (spelled || READER_KANA.test(base) ? base : choice.r) || '';
   const reading = spelled ? '' : kataToHira(key);
-  // an uninflected token's own reading is evidence: 産 read さん in 産巣日 is never ウブ.
-  // An inflected one (分かっ for 分かる) says nothing about the dictionary form's reading.
-  const surface = spelled && choice.s === base ? kataToHira(choice.r || '') : '';
-  const found = [];
-  if (key && (spelled || reading)) {
+  const by = spelled ? 'spelling' : 'reading';
+  if (!key || (!spelled && !reading)) return { by, key, rows: [] };
+  const collect = (fits) => {
+    const found = [];
     for (const row of rows) {
-      const k = row[5].findIndex((kana, index) =>
-        spelled
-          ? readerReadingFits(row, index, base) && (!surface || kataToHira(kana) === surface)
-          : kataToHira(kana) === reading,
-      );
+      const k = row[5].findIndex((kana, index) => fits(row, kana, index));
       if (k < 0) continue;
       // a kana match is shown under a spelling its own reading permits (垂れ for だれ,
       // not the entry's kana head たれ), or as itself when it is kana only (ダレ)
       const head = spelled ? base : row[4].find((form) => readerReadingFits(row, k, form)) || row[5][k];
       found.push({ seq: String(row[0]), head, reading: row[5][k], gloss: readerSummaryFor(row, k)[2] });
     }
-  }
-  return { by: spelled ? 'spelling' : 'reading', key, rows: found };
+    return found;
+  };
+  if (!spelled) return { by, key, rows: collect((row, kana) => kataToHira(kana) === reading) };
+  const written = (row, kana, index) => readerReadingFits(row, index, base);
+  // an uninflected token's own reading is evidence: 産 read さん in 産巣日 is not ウブ.
+  // An inflected one (分かっ for 分かる) says nothing about the dictionary form's reading.
+  const surface = choice.s === base ? kataToHira(choice.r || '') : '';
+  if (!surface) return { by, key, rows: collect(written) };
+  const matching = collect((row, kana, index) => written(row, kana, index) && kataToHira(kana) === surface);
+  if (matching.length) return { by, key, rows: matching };
+  // no entry of this spelling carries the text's reading (the tokenizer may be wrong, or the word a
+  // fragment): its entries are offered as explicit candidates under their own readings — never opened
+  // for the learner, never called absent (産 is listed, as うぶ)
+  return { by, key, rows: collect(written), mismatch: choice.r || surface };
 }
 
 /** Whether the listed reading at kanaIndex may be printed with this spelling, by that
@@ -20754,7 +20761,9 @@ function resolveReaderChoice(node) {
       const matching = match.rows;
       choice.by = match.by;
       choice.key = match.key;
-      if (matching.length === 1) {
+      choice.mismatch = match.mismatch || null;
+      // a reading mismatch is only ever offered, even as one candidate
+      if (matching.length === 1 && !match.mismatch) {
         node.seq = matching[0].seq;
         node.reading = matching[0].reading;
         node.matchedHead = matching[0].head;
@@ -20852,6 +20861,14 @@ function renderReaderChoice(sheet, node) {
     box.setAttribute('role', 'group');
     box.setAttribute('aria-labelledby', title.id);
     box.append(title);
+    if (choice.mismatch) {
+      const mismatch = el('p', 'dictionary-warning', tx(
+        `辞書に、この書き方で読み「${choice.mismatch}」の項目はない。別の読みの項目：`,
+        `No entry with this spelling is read ${choice.mismatch}. Entries with other readings:`,
+      ));
+      mismatch.id = 'reader-choice-mismatch';
+      box.append(mismatch);
+    }
     for (const candidate of choice.candidates) {
       const button = el('button', 'reader-choice-row');
       button.type = 'button';
@@ -20920,8 +20937,9 @@ function renderWordNode(sheet, node) {
   const found = lookup(node.id, node.seq, node.reading, node.matchedGloss);
   // a reader-chosen entry is shown by the spelling and exact reading it was chosen by: the shared
   // lookup keys readings by normalised kana and can head 結う/いう as いう (Codex D11 11:15Z)
+  // lookup's alt was computed for its own head: beside the chosen spelling it can only repeat it (結う／結う)
   const rec = found && node.readerChoice && node.matchedHead
-    ? { ...found, head: node.matchedHead, r: node.reading || found.r }
+    ? { ...found, head: node.matchedHead, r: node.reading || found.r, alt: found.alt === node.matchedHead ? null : found.alt }
     : found;
   const legacy = D.words[node.id];
   const label = rec?.head || node.id;
