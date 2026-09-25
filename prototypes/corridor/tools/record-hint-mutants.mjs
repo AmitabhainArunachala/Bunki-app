@@ -77,6 +77,19 @@ export const RECORD_HINT_MUTANTS = Object.freeze({
 // v3 receipt contract. Verifier declarations must match this data before setup can run.
 // This is a record-hint-suite schema, not closure of the pending assessment retry matrix.
 export const RECORD_HINT_AUTO_ROWS = Object.freeze(['max-one-outstanding-query', 'served-script-identity', 'no-page-errors', 'completed']);
+// Required observed app documents, per role, for a completed case. Plain harness pages
+// carry no app bytes. W1's declared early stop, W2's failed reload, and W5's Back branch
+// are resolved explicitly by the adjudicator; receipt-supplied inventories are not authority.
+export const RECORD_HINT_DOCUMENT_SCHEMA = Object.freeze({
+  W1: { A: 1, B: 2 }, W2: { A: 21, B: 1 }, W3: { A: 1, B: 2, C: 2 },
+  W5: { A: 2, B: 1 }, W6a: { A: 1, B: 2 }, W6b: { A: 1, B: 2 },
+  W7a: { A: 1, B: 2 }, W7b: { A: 1, B: 1 }, W7c: { A: 1, B: 3 },
+  W7d: { A: 11 }, W8: { A: 1, B: 1 }, W9: { A: 1, B: 1 },
+  L1: { A: 1, B: 1 }, L2: { A: 1, B: 1 }, L3: { A: 1, B: 1 },
+  L4: { A: 1, B: 1 }, L5: { A: 1, B: 1 }, L6: { A: 1, B: 1 },
+  L7: { A: 1, G: 1, K: 1 }, L8: { A: 1, B: 1 },
+  L9: { A: 1, B1: 1, B2: 1 }, L10: { A: 1, B: 1 },
+});
 export const RECORD_HINT_CASE_SCHEMA = Object.freeze({
   "W1": Object.freeze({"rows":["W1.owner-still-held","W1.owner-query-established","W1.lock-free-after-owner-close","W1.seed-and-owner-before-first-grade","W1.owner-grade-durable","W1.blocked-boot-lost","W1.no-offer-while-owner-lives","W1.observer-never-queued","W1.observer-held-identity","W1.zero-observer-acquisition-attempts","W1.offer-within-4s-of-close","W1.retry-new-document-and-ownership","W1.owner-revlog-exact","W1.writable-after-retry"],"optional":["W1.mutant-held-gate-established"],"browser":true}),
   "W2": Object.freeze({"rows":["W2.blocked-at-start","W2.owner-every-reload","W2.blocked-never-held-or-queued","W2.blocked-zero-observer-attempts","W2.blocked-kept-looking"],"optional":[],"browser":true}),

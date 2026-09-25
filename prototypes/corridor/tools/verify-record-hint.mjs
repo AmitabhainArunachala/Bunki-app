@@ -500,8 +500,9 @@ function trackAppDocuments(env, page, role) {
   DOCUMENTS.set(page, slot);
   page.on('framenavigated', (frame) => {
     if (frame !== page.mainFrame()) return;
-    // pushState/replaceState also emit framenavigated. They carry no new navigation request.
-    if (slot.current && !slot.pendingNavigation) { slot.current.url = frame.url(); return; }
+    // pushState/replaceState and about:blank can carry no navigation request. Preserve
+    // the URL whose response checks belong to this document, rather than overwriting it.
+    if (slot.current && !slot.pendingNavigation) return;
     const doc = { role, navigation: ++slot.serial, url: frame.url(), docId: null, required: false, checks: [] };
     env.documents.push(doc);
     slot.current = doc;
@@ -547,6 +548,7 @@ function bindObservedDocument(page, state) {
   assert(doc.role === state.role, 'navigation and observed probe role disagree');
   doc.docId = state.docId;
   doc.required = true;
+  doc.probe = state; // last observed snapshot, including documents subsequently closed/replaced
   slot.byId.set(state.docId, doc);
 }
 
@@ -833,7 +835,7 @@ async function runCase(spec) {
     for (const doc of env.documents.filter((entry) => entry.required)) {
       const checks = await settledChecks(doc.checks.map((check) => check.promise || Promise.resolve(check.result
         || { ok: null, error: 'no completed script response' })), 15_000);
-      documents.push({ role: doc.role, navigation: doc.navigation, docId: doc.docId, url: doc.url, checks });
+      documents.push({ role: doc.role, navigation: doc.navigation, docId: doc.docId, url: doc.url, probe: doc.probe, checks });
     }
     const allChecks = documents.flatMap((doc) => doc.checks);
     const evidence = { kind: 'document-script-identity', documents, errors: env.identityErrors };
@@ -926,7 +928,8 @@ defineCase('W2', { rows: ['W2.blocked-at-start', 'W2.owner-every-reload', 'W2.bl
       if (!seen && (view.held.includes(blocked.clientId) || view.pending.includes(blocked.clientId))) seen = { reload, view };
     }
   } finally { await b.evaluate(() => window.__hintProbe.releaseGate()).catch(() => 0); }
-  t.row('W2.owner-every-reload', !failure, failure ? json(failure) : '20/20 reloads named A the owner');
+  t.row('W2.owner-every-reload', !failure, failure ? json(failure) : '20/20 reloads named A the owner',
+    { kind: 'owner-reload-progress', completedReloads: failure?.reload ?? 20, failedDocId: failure?.own.docId ?? null });
   t.row('W2.blocked-never-held-or-queued', !seen, json(seen));
   const state = await observe(env, b);
   const auth = authority(state);
