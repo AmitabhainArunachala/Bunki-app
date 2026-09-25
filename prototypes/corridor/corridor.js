@@ -5867,6 +5867,8 @@ function learningSourceCaller(focusId) {
   return { epoch: recordEpoch, view: S.view, stack: S.stack.slice(), scroll: window.scrollY,
     dialogInvoker: S.dialogInvoker, focusId, review: S.review, parent: learningSourceVisit,
     sentencePracticeView: S.sentencePracticeView,
+    // the caller's reveal/gloss marks travel with its passage coordinates (D22b)
+    revealed: S.revealed ? new Set(S.revealed) : null, glossed: S.glossed ? new Set(S.glossed) : null,
     // Recursive lookup can visit another source. Restore the caller's reader
     // coordinates as well as its view, without restoring any learner roots.
     sourceState: { sourceCaptureId: S.sourceCaptureId, sourceContextReturn: S.sourceContextReturn,
@@ -5878,6 +5880,14 @@ function restoreLearningSourceCaller(visit) {
   if (!visit || !recordReady(visit.epoch)) return false;
   if (visit.view === 'review' && S.review !== visit.review) return false;
   learningSourceVisit = visit.parent || null;
+  // 元の文を読む → reader-source-back switches passages without openPassage, like D22's detour:
+  // the source visit's index-keyed marks must not land on the caller's passage, and a 聞く
+  // started in the source stops with it (D22b). The same passage keeps its current marks.
+  if (visit.sourceState.passageId !== S.passageId) {
+    stopReadAloud();
+    S.revealed = visit.revealed ? new Set(visit.revealed) : null;
+    S.glossed = visit.glossed ? new Set(visit.glossed) : null;
+  }
   Object.assign(S, visit.sourceState);
   S.sentencePracticeView = visit.sentencePracticeView || null;
   S.view = visit.view; S.stack = visit.stack; S.dialogInvoker = visit.dialogInvoker;
