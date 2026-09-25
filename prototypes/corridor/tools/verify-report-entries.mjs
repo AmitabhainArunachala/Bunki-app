@@ -13,10 +13,17 @@
  *      reading door still opens its passage.
  *   R3 word sheet: the entry at the end of the sheet opens the dialog; the sheet's
  *      own back control still closes the sheet.
- *   R4 front door: the navigation strip carries the entry and it opens the dialog.
+ *   R4 front door: the navigation strip carries the entry and it opens the dialog;
+ *      closing it returns focus to the 回廊 symbol that opened the navigation.
+ *   R5 focused stage (読み探査 probe, body.zen): the page entry sits after the stage,
+ *      opens the dialog, and the probe's reveal still takes a real click.
+ *   R6 a room that failed to draw still carries the entry.
+ *   R7 'My reports' opens the list; focus returns to the entry that opened it.
+ * Every case runs in Chromium and WebKit, at 1728×996 and 390×844.
  *
- * Claim boundary: the focused review stage (its more-row entry) needs seeded due
- * cards and is exercised by the review suites, not here.
+ * Claim boundary: the review more-row entry needs seeded due cards; the probe
+ * covers the focused stage's layout. No backend is contacted (the dialog opens
+ * locally; a static host has no report service — PLAN D19).
  *
  * Usage: node verify-report-entries.mjs   (KAIRO_SITE_DIR may pin a staged artifact)
  */
@@ -27,7 +34,7 @@ import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
 const require = createRequire(import.meta.url);
@@ -42,7 +49,8 @@ const check = (name, pass, detail = '') => {
 };
 const host = await startStaticHost({ site: SITE, port: 0 });
 const origin = host.origin;
-const browser = await chromium.launch();
+const ENGINES = { chromium, webkit };
+let browser = null;
 
 const ready = (page) => page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
 const railVisible = (page) => page.evaluate(() => {
@@ -56,9 +64,13 @@ async function closeReport(page) {
   await page.locator('#bunki-reports-root .br-close').click();
   await page.waitForFunction(() => !document.querySelector('#bunki-reports-root dialog.br-sheet[open]'), null, { timeout: 5_000 });
 }
+const focusedIs = (page, selector) => page.evaluate((sel) => !!document.activeElement?.matches(sel), selector);
+const PAGE_ENTRY = '#app > .report-line-page [data-report-entry="open"]';
+const PAGE_LIST = '#app > .report-line-page [data-report-entry="list"]';
 
 try {
   // R0
+  browser = await chromium.launch();
   {
     const context = await browser.newContext(); const page = await context.newPage();
     const identity = await (await page.request.get(`${origin}/build-identity.json`)).json();
@@ -75,20 +87,29 @@ try {
     if (results.some((r) => !r.pass)) throw new Error('identity failed');
   }
 
+  await browser.close(); browser = null;
+  for (const [engineName, engine] of Object.entries(ENGINES)) {
+  browser = await engine.launch();
   for (const viewport of [{ width: 1728, height: 996 }, { width: 390, height: 844 }]) {
-    const w = viewport.width;
+    const w = `${engineName} ${viewport.width}`;
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
 
     // R2 shelf footer
     await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
     check(`R1 ${w}px shelf: no floating report rail is visible`, !(await railVisible(page)));
-    const footer = page.locator('#app main > .report-line [data-report-entry="open"]');
-    check(`R2 ${w}px shelf: the footer entry exists in main's flow`, (await footer.count()) === 1);
+    const footer = page.locator(PAGE_ENTRY);
+    check(`R2 ${w}px shelf: the page entry exists in the page's own flow`, (await footer.count()) === 1);
     if (await footer.count()) {
       await footer.click();
-      check(`R2 ${w}px shelf: the footer entry opens the report dialog`, await reportOpen(page));
+      check(`R2 ${w}px shelf: the page entry opens the report dialog`, await reportOpen(page));
       await closeReport(page);
+      check(`R7 ${w}px shelf: closing returns focus to the entry that opened it`, await focusedIs(page, PAGE_ENTRY));
+      await page.locator(PAGE_LIST).click();
+      check(`R7 ${w}px shelf: 'My reports' opens the report list`, await reportOpen(page) &&
+        await page.evaluate(() => /report/i.test(document.querySelector('#bunki-reports-root .br-body')?.innerText || '')));
+      await closeReport(page);
+      check(`R7 ${w}px shelf: closing the list returns focus to 'My reports'`, await focusedIs(page, PAGE_LIST));
     }
     const reading = page.locator('.shelf-item:not([data-recommendation]) .shelf-open').first();
     await reading.click();
@@ -135,12 +156,55 @@ try {
       await navEntry.click();
       check(`R4 ${w}px front door: the entry opens the report dialog`, await reportOpen(page));
       await closeReport(page);
+      check(`R4 ${w}px front door: closing returns focus to the 回廊 symbol`, await focusedIs(page, '#ginga-symbol'));
     }
+
+    // R5 the focused stage: the 読み探査 probe (body.zen), reached as a learner does
+    await page.goto(origin); await ready(page);
+    await page.locator('#ginga-symbol').click();
+    await page.locator('.nav-dojo').click();
+    await page.locator('.focus-mode', { hasText: '読み探査' }).click();
+    await page.locator('.focus-start').click();
+    const inProbe = await page.waitForSelector('.review-front', { timeout: 20_000 }).then(() => true, () => false);
+    const zen = await page.evaluate(() => document.body.classList.contains('zen'));
+    check(`R5 ${w}px probe: the focused stage is up (body.zen)`, inProbe && zen);
+    check(`R1 ${w}px probe: no floating report rail is visible`, !(await railVisible(page)));
+    const probeEntry = page.locator(PAGE_ENTRY);
+    check(`R5 ${w}px probe: the page entry exists after the stage`, (await probeEntry.count()) === 1);
+    if (await probeEntry.count()) {
+      await probeEntry.scrollIntoViewIfNeeded();
+      await probeEntry.click();
+      check(`R5 ${w}px probe: the entry opens the report dialog`, await reportOpen(page));
+      await closeReport(page);
+    }
+    const reveal = page.locator('#probe-reveal');
+    await reveal.scrollIntoViewIfNeeded();
+    const revealed = await reveal.click({ timeout: 5_000 }).then(() => true, () => false);
+    check(`R5 ${w}px probe: the stage's own reveal still takes a real click`, revealed &&
+      await page.waitForSelector('.probe-meta', { timeout: 5_000 }).then(() => true, () => false));
     await context.close();
+
+    // R6 a room that failed to draw keeps its entry (fault injected by this harness only)
+    const faultContext = await browser.newContext({ viewport });
+    await faultContext.route('**/assessment-view.mjs', async (route) => {
+      const response = await route.fetch();
+      const body = (await response.text()).replace('    render(main) {\n', "    render(main) {\n      throw new Error('injected room fault');\n");
+      await route.fulfill({ response, body });
+    });
+    const faultPage = await faultContext.newPage();
+    await faultPage.goto(`${origin}/index.html?entry=shelf`); await ready(faultPage);
+    await faultPage.locator('#chrome-dojo').click();
+    await faultPage.locator('button[data-study-door="mock"]').click();
+    const errored = await faultPage.waitForSelector('[data-room-error]', { timeout: 10_000 }).then(() => true, () => false);
+    check(`R6 ${w}px failed room: the error state is shown`, errored);
+    check(`R6 ${w}px failed room: the page entry is still there`, (await faultPage.locator(PAGE_ENTRY).count()) === 1);
+    await faultContext.close();
+  }
+  await browser.close(); browser = null;
   }
 } finally {
   writeFileSync(resolve(EVIDENCE, 'report-entries.json'), JSON.stringify({ origin, results }, null, 2) + '\n');
-  await browser.close();
+  await browser?.close();
   await host.close();
 }
 const failed = results.filter((r) => !r.pass);
