@@ -42,8 +42,10 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 
-const SITE = resolveCorridorSite();
+// the evidence destination first; the site is resolved inside the receipt's try, so a selection
+// failure is a terminal row in this suite's own JSON (an unwritable destination cannot be)
 const EVIDENCE = resolveCorridorEvidence();
+let SITE = null;
 const results = [];
 const pageErrors = []; // bounded: the first 20 uncaught page errors, each tagged with its case
 let currentCase = 'setup';
@@ -93,6 +95,7 @@ async function openRecordedReader(page) {
 }
 
 try {
+  SITE = resolveCorridorSite();
   host = await startStaticHost({ site: SITE, port: 0 });
   origin = host.origin;
   browser = await chromium.launch();
