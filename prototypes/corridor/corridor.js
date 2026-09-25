@@ -4320,6 +4320,8 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
     destination, view: S.view, stack: S.stack, dialogInvoker: S.dialogInvoker,
     focus: invokerKey(invoker), scroll: window.scrollY,
     passageId: S.passageId, readerScroll: S.readerScroll, readerTake: S.readerTake,
+    // reveal/gloss marks are part of the place this detour leaves (see returnFromNavigation)
+    revealed: S.revealed ? new Set(S.revealed) : null, glossed: S.glossed ? new Set(S.glossed) : null,
     // This caller owns a live review session and DOM focus. Keep its identity.
     learningSourceVisit,
     searchFrom: S.searchFrom, navQ: S.navQ, navSourceContext: S.navSourceContext,
@@ -4340,6 +4342,14 @@ function returnFromNavigation() {
   }
   learningSourceVisit = home.learningSourceVisit || null;
   pendingReferenceCollection = home.pendingReferenceCollection || null;
+  // この記事を読む → 戻る switches passages without openPassage: marks keyed by token index must not
+  // land on the same indexes here (D22), and 聞く started in the detour's article stops with it.
+  // The same passage keeps its current marks.
+  if (home.passageId !== S.passageId) {
+    stopReadAloud();
+    S.revealed = home.revealed ? new Set(home.revealed) : null;
+    S.glossed = home.glossed ? new Set(home.glossed) : null;
+  }
   Object.assign(S, {
     view: home.view, stack: home.stack, dialogInvoker: home.dialogInvoker,
     passageId: home.passageId, readerScroll: home.readerScroll, readerTake: home.readerTake,
