@@ -17,6 +17,10 @@ import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const browserMode = process.argv.includes('--browser');
 const propertyMode = process.argv.includes('--property');
+// --reference (G4): the app's own grade handler, on the app's own pinned scheduler construction,
+// against an independent ts-fsrs computation from the pin's declared values. Its definition is
+// extracted only in this mode, so default and --property runs keep their exact bytes.
+const referenceMode = process.argv.includes('--reference');
 let site;
 let artifact;
 if (browserMode) {
@@ -38,6 +42,7 @@ const names = new Set([
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
   'canonicalRecordJson',
 ]);
+if (referenceMode) names.add('pinnedSchedulerInput');
 const selected = ast.statements.filter((statement) => {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text] :
     ts.isVariableStatement(statement) ? statement.declarationList.declarations.map((node) => node.name.getText(ast)) : [];
@@ -711,6 +716,65 @@ async function propertyChecks() {
 let properties;
 if (propertyMode) await check('generated-learning-handler-histories', async () => { properties = await propertyChecks(); });
 
+/* G4 reference vectors (design/G4-FSRS-REFERENCE.md). Each vector declares a card by the history
+ * that produced it and a grade to apply; the expected card comes from an independent reference
+ * scheduler built here from the pin file's declared values; the actual card is what the app's own
+ * commitStandardGrade stored, running on a scheduler built by the app's own pinnedSchedulerInput.
+ * Control: in commitStandardGrade, `[rating]` → `[rating === fsrsApi.Rating.Good ? fsrsApi.Rating.Easy : rating]`
+ * (the log still says Good) must fail every Good vector. The local-midnight vector (V6) needs a
+ * browser time zone and stays with the browser checks; it is listed as pending, not passed. */
+let reference;
+async function referenceChecks() {
+  const pin = JSON.parse(readFileSync(resolve(site || root, 'data/fsrs-pin.json'), 'utf8'));
+  assert.equal(pin.algorithm, 'FSRS-6'); assert.equal(pin.enableFuzz, false);
+  const declared = (w = pin.w) => fsrsApi.generatorParameters({ w, request_retention: pin.requestRetention,
+    maximum_interval: pin.maximumInterval, enable_fuzz: pin.enableFuzz, enable_short_term: pin.enableShortTerm,
+    learning_steps: pin.learningSteps, relearning_steps: pin.relearningSteps });
+  const R = fsrsApi.Rating;
+  const at = (iso) => new Date(iso);
+  const fittedW = pin.w.map((value, i) => (i < 4 ? Number((value * 1.5).toFixed(4)) : value));
+  const V3 = [[R.Good, '2026-09-01T00:00:00Z'], [R.Good, '2026-09-02T00:00:00Z'], [R.Good, '2026-09-06T00:00:00Z'], [R.Good, '2026-09-13T00:00:00Z']];
+  const vectors = [
+    ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V1-new-${rating}`, history: [], now: '2026-09-25T00:00:00Z', rating })),
+    ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating })),
+    ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating })),
+    ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating })),
+    { id: 'V5-overdue-good', history: V3, now: '2026-10-25T00:00:00Z', rating: R.Good },
+    { id: 'V7-fitted-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, fitted: true },
+  ];
+  const rows = [];
+  for (const vector of vectors) {
+    const expectedScheduler = fsrsApi.fsrs(declared(vector.fitted ? fittedW : pin.w));
+    let card = fsrsApi.createEmptyCard(at(vector.history[0]?.[1] || vector.now));
+    for (const [rating, when] of vector.history) card = expectedScheduler.next(card, at(when), rating).card;
+    const expected = expectedScheduler.next(card, at(vector.now), vector.rating).card;
+    const f = fixture(vector.history.length ? { srs: { 'word:学校': { ...card, due: card.due.toISOString(),
+      ...(card.last_review ? { last_review: card.last_review.toISOString() } : {}) } } } : {});
+    // the app's own construction of its scheduler from the same pin (and the fitted weights for V7)
+    f.c.scheduler = fsrsApi.fsrs(fsrsApi.generatorParameters(f.c.pinnedSchedulerInput(pin, vector.fitted ? fittedW : null)));
+    const key = { [R.Again]: 'again', [R.Hard]: 'hard', [R.Good]: 'good', [R.Easy]: 'easy' }[vector.rating];
+    const pending = grade(f, { rating: vector.rating, key, now: at(vector.now), day: vector.now.slice(0, 10) });
+    f.ack(true);
+    assert.equal(await pending, true, `${vector.id}: the app committed its grade`);
+    const actual = f.durable().srs['word:学校'];
+    const mismatch = [];
+    for (const field of ['state', 'reps', 'lapses', 'scheduled_days', 'elapsed_days', 'learning_steps']) {
+      if (actual[field] !== expected[field]) mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+    }
+    if (actual.due !== expected.due.toISOString()) mismatch.push(`due ${actual.due} ≠ ${expected.due.toISOString()}`);
+    for (const field of ['stability', 'difficulty']) {
+      if (!(Math.abs(actual[field] - expected[field]) <= 1e-9)) mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+    }
+    rows.push({ id: vector.id, pass: mismatch.length === 0, mismatch });
+  }
+  reference = { format: 'kairo-fsrs-reference-vectors', v: 1, pin: { parameterSetId: pin.parameterSetId, pinnedVersion: pin.pinnedVersion },
+    rows, pending: ['V6-local-midnight (browser time zone)'], pass: rows.every((row) => row.pass) };
+  writeFileSync(resolve(out, 'learning-reference.json'), JSON.stringify(reference, null, 2) + '\n');
+  const failed = rows.filter((row) => !row.pass);
+  assert.equal(failed.length, 0, JSON.stringify(failed));
+}
+if (referenceMode) await check('pinned-fsrs-reference-vectors', referenceChecks);
+
 async function browserChecks() {
   const mime = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.woff2': 'font/woff2' };
   const server = createServer((request, response) => {
@@ -923,6 +987,7 @@ const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
   sourceSha256: createHash('sha256').update(source).digest('hex'),
   artifactSha256: artifact?.artifactSha256,
   ...(propertyMode ? { properties: properties || { pass: false, receipt: 'learning-properties.json' } } : {}),
+  ...(referenceMode ? { reference: reference ? { pass: reference.pass, receipt: 'learning-reference.json' } : { pass: false, receipt: 'learning-reference.json' } } : {}),
   testedDefinitions: [...names], scope: browserMode ? 'Actual immutable staged browser UI and independently read native IndexedDB, plus controlled frozen-root acknowledgment tests' : 'Actual authored handlers with frozen synthetic roots and controlled save acknowledgments; no browser-storage claim',
   results, pass: results.every((result) => result.pass) };
 writeFileSync(resolve(out, 'learning-record.json'), JSON.stringify(receipt, null, 2) + '\n');
