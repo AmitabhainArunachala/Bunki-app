@@ -29,7 +29,17 @@ if (browserMode) {
   artifact = verifyBundledArtifact(site);
   assert.equal(artifact.artifactSha256, process.env.KAIRO_ARTIFACT_SHA256, 'Supply the exact staged artifact digest');
 }
-const source = readFileSync(resolve(site || root, 'corridor.js'), 'utf8');
+// D23 controls (word-saved-answer-controls.mjs): `--control <name>` applies one control's literal
+// edits, each matching exactly once, to the authored source before anything is lifted from it
+const controlAt = process.argv.indexOf('--control');
+const controlName = controlAt >= 0 ? process.argv[controlAt + 1] : null;
+assert(!controlName || !browserMode, 'A control edits the authored source, never a staged artifact');
+let source = readFileSync(resolve(site || root, 'corridor.js'), 'utf8');
+if (controlName) {
+  const controls = await import('./word-saved-answer-controls.mjs');
+  source = controls.applyControl(source, controls.LEARNING_RECORD_CONTROLS, controlName);
+  console.log(`CONTROL-APPLIED ${controlName} ${createHash('sha256').update(source).digest('hex')}`);
+}
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = new Set([
   'srsKey', 'srsCardOf', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
@@ -41,6 +51,10 @@ const names = new Set([
   'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem',
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
   'canonicalRecordJson',
+  // D23: the saved word answer, the shown-answer binding both grade producers check, and the capture plan
+  'reviewAnswerAvailable', 'reviewCardBack', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'owns',
+  'wordPresentationKey', 'presentReviewAnswer', 'assertWordAnswerPresented',
+  'wordCapturePlan', 'wordCardIdentity', 'sameWordIdentity', 'wordAnswerIdentity', 'wordStudied',
 ]);
 if (referenceMode) names.add('pinnedSchedulerInput');
 const selected = ast.statements.filter((statement) => {
@@ -70,6 +84,7 @@ class Element {
   append(...children) { this.children.push(...children); }
   setAttribute() {}
   addEventListener(kind, run) { this.events[kind] = run; }
+  remove() { this.removed = true; }
   fire() { return this.events.click?.(); }
   get childNodes() { return this.children; }
 }
@@ -103,11 +118,14 @@ function fixture(overrides = {}, options = {}) {
     tx: (ja, en) => en, withEn: (node) => node, bi: () => true,
     finiteNumber: (value) => Number.isFinite(value),
     plainRecord: (value) => value !== null && typeof value === 'object' && !Array.isArray(value),
-    D: { exampleBank: new Map(), dict: {}, kanji: options.kanji || {} },
+    // D23: 学校, the reviewed word, is a core entry so its card has an answer to show and grade
+    D: { exampleBank: new Map(), dict: { 学校: { r: 'がっこう', m: ['school'] } }, kanji: options.kanji || {} },
     lookup: (id) => ({ r: 'がっこう', m: [id], seq: 'synthetic-' + id }),
     findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
+    // D23: the revealed answer face is now rendered here; it reads no assessment context or source note
+    assessmentReviewContext: () => null, renderLearningSource: () => {},
     recManifest: null, // Explicit audio-unavailable fixture; this suite does not exercise audio.
     // a DOM focus helper startReview calls after rendering; no scheduling effect
     focusKanjiReadingReview: () => {},
@@ -118,6 +136,10 @@ function fixture(overrides = {}, options = {}) {
   };
   const context = vm.createContext(sandbox);
   vm.runInContext(program, context, { filename: 'authored-learning-handlers.js' });
+  // D23: a grade-seam fixture's revealed card has presented its answer, as rendering it would
+  // (grades are bound to it). A rendered-face test passes bind: false and starts unbound, so the
+  // actual renderReview must bind the real session itself.
+  if (S.review?.revealed && options.bind !== false) context.presentReviewAnswer(S.review);
   const stage = () => {
     const pending = queue[0]; assert(pending, 'An actual handler queued a save');
     if (!pending.staged) {
@@ -144,7 +166,13 @@ function fixture(overrides = {}, options = {}) {
 const results = [];
 async function check(name, action) {
   try { await action(); results.push({ name, pass: true }); console.log('PASS ' + name); }
-  catch (error) { results.push({ name, pass: false, reason: error.stack }); console.error('FAIL ' + name + ': ' + error.message); }
+  catch (error) {
+    // D23: the row keeps the exact text this failure writes to stderr, in the same step, so a reader of
+    // the receipt can require stderr to be exactly the failing rows' diagnostics, in order, and nothing else
+    const diagnostic = 'FAIL ' + name + ': ' + error?.message;
+    results.push({ name, pass: false, reason: error?.stack, diagnostic });
+    process.stderr.write(diagnostic + '\n');
+  }
 }
 const grade = (f, overrides = {}) => f.c.commitStandardGrade({ rv: f.S.review, item, key: 'good', skey: 'word:学校',
   rating: fsrsApi.Rating.Good, now: new Date('2026-09-10T10:00:00Z'), day: '2026-09-10', ...overrides });
@@ -249,6 +277,79 @@ await check('recall-declaration-rejects-without-revealing-and-serializes-double-
   f.ack(false); await first; assert.equal(f.S.review.revealed, false); assert.equal(f.S.review.declared, null);
   const second = byId(f.render('renderReview'), 'declare-notyet').fire(); f.ack(); await second;
   assert.equal(f.S.review.revealed, true); assert.equal(f.S.review.declared, 0); assert.equal(f.S.obslog[0][3], 0);
+});
+/* D23 · the saved word answer at the rendered review face. The answer shown is the card's
+ * saved answer; an unavailable one shows the honest face and grades nothing. An answer that
+ * changed after it was shown refuses both grade producers and asks for a fresh look.
+ * These rendered-face tests start unbound (fixture bind: false), so the binding they inspect is
+ * the one the actual renderReview made on the real session. Controls RB (the renderer binds a
+ * copy of the session) and C6b (the UI answer check removed) run through `--control <name>`;
+ * test-word-saved-answer.mjs --controls adjudicates them against this receipt. */
+const wordSession = (row) => ({ queue: [row], ix: 0, revealed: true, declared: 1, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] });
+const MEKURU_SOURCE = { release: '3.6.2+20260803141815', archiveSha256: '1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c' };
+const MEKURU = { r: 'めくる', m: ['to turn over', 'to turn (pages)', 'to leaf through (a book, etc.)', 'to tear off'], seq: '1257810', k: ['捲'],
+  selection: { v: 1, seq: '1257810', r: 'めくる', head: '捲る', src: MEKURU_SOURCE } };
+const mekuruRow = () => ({ t: 'word', id: '捲る', label: '捲る', ts: 100, started: 100, entrySeq: '1257810', cueReading: 'めくる' });
+const wordGrade = (f, rv, drill) => drill
+  ? f.c.commitDrillGrade({ rv, item: rv.queue[0], next: { state: 2, scheduled_days: 1 }, key: 'good', skey: 'word:' + rv.queue[0].id, rating: 3, mode: 'due', now: new Date('2026-09-10T10:00:00Z') })
+  : f.c.commitStandardGrade({ rv, item: rv.queue[0], key: 'good', skey: 'word:' + rv.queue[0].id, rating: fsrsApi.Rating.Good, now: new Date('2026-09-10T10:00:00Z'), day: '2026-09-10' });
+await check('word-review-render-fixture-starts-unbound', async () => {
+  const row = mekuruRow();
+  const unbound = fixture({ taken: [row], deepWords: { 捲る: MEKURU }, review: wordSession(row) }, { bind: false });
+  assert.equal(unbound.S.review.presented, undefined, 'a rendered-face test starts with no presentation binding');
+  const prebound = fixture({ taken: [row], deepWords: { 捲る: MEKURU }, review: wordSession(row) });
+  assert.equal(prebound.S.review.presented?.item, row, 'a grade-seam fixture binds its revealed card');
+});
+await check('word-review-shows-and-binds-its-saved-answer', async () => {
+  const row = mekuruRow();
+  const f = fixture({ taken: [row], deepWords: { 捲る: MEKURU }, review: wordSession(row) }, { bind: false });
+  assert.equal(f.S.review.presented, undefined);
+  const main = f.render('renderReview');
+  assert.equal(byClass(main, 'review-reading').textContent, 'めくる');
+  assert.equal(byClass(main, 'review-sense-primary').textContent, 'to turn over');
+  assert(find(main, (node) => node.className === 'grade-row'), 'an available answer can be graded');
+  assert.equal(f.S.review.presented?.item, row, 'the actual renderer bound the real session');
+  assert.equal(f.S.review.presented.ix, 0);
+  const promise = wordGrade(f, f.S.review, false); f.ack(); assert.equal(await promise, true);
+  assert.equal(f.S.revlog.length, 1); assert.equal(f.S.revlog[0][1], 'word:捲る');
+});
+await check('word-review-unavailable-face-refuses-grades-and-writes-nothing', async () => {
+  const row = mekuruRow();   // H04: an explicit row whose snapshot is missing
+  const f = fixture({ taken: [row], deepWords: {}, review: wordSession(row) }, { bind: false });
+  assert.equal(f.S.review.presented, undefined);
+  const before = f.durable();
+  const main = f.render('renderReview');
+  assert.equal(byId(main, 'review-answer-unavailable').dataset.reason, 'snapshot-missing');
+  assert.equal(find(main, (node) => node.className === 'grade-row'), undefined, 'no grade seals for an unavailable answer');
+  byId(main, 'review-unavailable-next').fire();
+  assert.equal(f.queue.length, 0); assert.deepEqual(f.durable(), before); assert.equal(f.S.review.ix, 1);
+  for (const drill of [false, true]) {
+    const rv = wordSession(row); rv.presented = { item: row, ix: 0, key: 'forged' };
+    f.S.review = rv;
+    const promise = wordGrade(f, rv, drill);
+    assert.equal(f.stage().error?.code, 'word-answer-unavailable', drill ? 'drill producer' : 'standard producer');
+    f.ack(); assert.equal(await promise, false); assert.deepEqual(f.durable(), before);
+  }
+});
+await check('word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look', async () => {
+  for (const drill of [false, true]) {
+    const pound = { t: 'word', id: 'ポンド', label: 'ポンド', ts: 100, started: 100, entrySeq: '1126030', cueReading: 'ポンド' };
+    const f = fixture({ taken: [pound], deepWords: { ポンド: { seq: '1126030', r: 'ポンド', m: ['pound (unit of weight)', 'pound (currency)'] } },
+      review: wordSession(pound), focus: drill ? { mode: 'due' } : null }, { bind: false });
+    assert.equal(f.S.review.presented, undefined);
+    f.render('renderReview');   // shows A and binds it
+    assert.equal(f.S.review.presented?.item, pound, 'the actual renderer bound the real session');
+    f.external({ taken: [{ ...pound, entrySeq: '2855351' }], deepWords: { ポンド: { seq: '2855351', r: 'ポンド', m: ['pond'] } } });
+    const before = f.durable(); const rv = f.S.review;
+    const promise = wordGrade(f, rv, drill);
+    assert.equal(f.stage().error?.code, 'word-answer-changed', drill ? 'drill producer' : 'standard producer');
+    f.ack(); assert.equal(await promise, false);
+    assert.deepEqual(f.durable(), before, 'refused against latest B: nothing written, B kept');
+    assert.equal(rv.ix, 0); assert.equal(rv.declared, 1);
+    const again = byId(f.render('renderReview'), 'review-answer-again');
+    again.fire();
+    assert.equal(rv.revealed, false); assert.equal(rv.declared, null); assert.equal(rv.presented, null);
+  }
 });
 await check('quiz-answer-next-and-close-use-only-acknowledged-run-and-ignore-stale-buttons', async () => {
   const f = fixture({ view: 'aiquiz', aiQuiz: quiz() }); const before = f.durable();
@@ -438,6 +539,7 @@ async function propertyChecks() {
         ix: 0, revealed: true, declared: 1, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
       f.S.review = rv; f.S.focus = dojo ? { mode: 'kanji' } : null; sessionEntries.set(rv, []);
       sessionUndos.set(rv, { count: 0, reinserted: false, days: new Set() });
+      f.c.presentReviewAnswer(rv);
       return rv;
     };
     const attemptGrade = (rating) => {
@@ -455,6 +557,7 @@ async function propertyChecks() {
         const entry = before.taken.find((value) => keyOf(value) === pending.key);
         let valid = ownsSession;
         if (pending.kind === 'grade') valid = valid && (pending.item.t !== 'kanji' || !!f.c.D.kanji[pending.item.id]?.m?.trim()) &&
+          (pending.item.t !== 'word' || !!f.c.D.dict[pending.item.id]?.m?.length) &&
           (pending.dojo || (!!entry && (before.srs[pending.key] !== undefined || Number.isFinite(entry.started)) && !before.suspended[pending.key]));
         if (pending.kind === 'undo' && !pending.entry.dojo) valid = valid &&
           JSON.stringify(ordered(before.srs[pending.entry.key] ?? null)) === JSON.stringify(ordered(pending.entry.after ?? null));
@@ -527,7 +630,10 @@ async function propertyChecks() {
             const rv = newSession(command.dojo); rv.declared = command.declared; break;
           }
           case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
-          case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared }); break;
+          case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared });
+            // the rendered face: a revealed card presents (binds) its answer, a face-down one has none
+            if (command.revealed) f.c.presentReviewAnswer(f.S.review); else f.S.review.presented = null;
+            break;
           case 'dictionary': if (command.available) f.c.D.kanji.学 = { m: 'synthetic learning' }; else delete f.c.D.kanji.学; break;
           case 'grade': {
             assert.equal(pending, null); const rv = f.S.review, before = f.durable(), session = sessionValue(rv);
@@ -1021,6 +1127,7 @@ async function browserChecks() {
 if (browserMode) await browserChecks();
 
 const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
+  ...(controlName ? { control: controlName } : {}),
   sourceSha256: createHash('sha256').update(source).digest('hex'),
   artifactSha256: artifact?.artifactSha256,
   ...(propertyMode ? { properties: properties || { pass: false, receipt: 'learning-properties.json' } } : {}),
