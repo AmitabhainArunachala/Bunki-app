@@ -2388,7 +2388,10 @@ async function verifyRunner(out) {
     'offline',
     'prefetch-lifecycle',
   ];
-  const requiredGates = batteryGates(out).filter((item) => requiredNames.includes(item.name));
+  // The runner's required-gate inventory is a list of names; it must not inherit an
+  // ambient artifact pin (KAIRO_SITE_DIR without KAIRO_VERIFIED_ARTIFACT_SHA256 made
+  // it assert on an empty digest). Production pin validation stays strict below.
+  const requiredGates = batteryGates(out, {}).filter((item) => requiredNames.includes(item.name));
   assert.deepEqual(requiredGates.map((item) => item.name).sort(), [...requiredNames].sort());
   const pinnedGates = batteryGates(out, { KAIRO_VERIFIED_ARTIFACT_SHA256: 'e'.repeat(64) });
   for (const gate of pinnedGates.filter((item) => item.report?.offlineFault)) {
