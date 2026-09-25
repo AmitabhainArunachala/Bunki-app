@@ -1853,6 +1853,13 @@ function recordFailure(reason, protectedState = false) {
     'The record changed while saving. Check the current state and try again.');
   if (!protectedState && /^(reading-cue|kanji-reading)/u.test(reason || ''))
     S.storeError = sentencePracticeError({ message: reason });
+  // D23: a word's card identity or saved answer refused the change, and nothing was written
+  if (!protectedState && reason === 'word-identity-conflict')
+    S.storeError = tx('この表記には別の項目のカードがある。何も変更していない。',
+      'This spelling holds a card for another entry. Nothing was changed.');
+  if (!protectedState && (reason === 'word-answer-changed' || reason === 'word-answer-unavailable'))
+    S.storeError = tx('この語の答えを確かめられないため、保存していない。',
+      'This word’s answer could not be confirmed, so nothing was saved.');
   safelySyncStoreAlert();
 }
 
@@ -6984,7 +6991,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // D11: a reader token the core dictionary lacks is never captured from the
   // mini — the capture path would store an empty or first-row answer for it
   const held = reader && !D.dict[token.b];
-  if (held) {
+  // D23: nor is a spelling whose card is another entry's (上手 saved as うわて): the
+  // mini's spelling-only toggle would remove or suppress that card
+  const miniState = held ? null : wordCaptureState(from ? { t: 'word', id: token.b, from, ctxScope: 'sent' } : { t: 'word', id: token.b });
+  const identityHeld = miniState === 'conflict' || miniState === 'unavailable';
+  if (held || identityHeld) {
     seal.disabled = true;
     seal.classList.add('reader-capture-held');
     seal.setAttribute('aria-describedby', 'mini-take-reason');
@@ -7007,8 +7018,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   if (g?.r) mini.append(el('span', 'mini-reading', g.r));
   if (reader && !g?.m?.[0]) mini.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
   else mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
-  if (held) {
-    const reason = el('span', 'mini-take-reason', readerCaptureReasonText(token.b));
+  if (held || identityHeld) {
+    const reason = el('span', 'mini-take-reason', held ? readerCaptureReasonText(token.b)
+      : wordCaptureHeldText({ t: 'word', id: token.b }));
     reason.id = 'mini-take-reason';
     mini.append(reason);
   }
@@ -9378,14 +9390,18 @@ function trayLine(item, dueKeys) {
 /* リストの間 — every list, named or monthly, opens to its own page
  * (operator, 2026-08-27): the rows, a review door for just this list, and
  * the list compiled outward as a note (.md download or clipboard). */
+// D23: a list note carries the card's own saved answer (savedAnswerFor), the reading and first
+// meaning its review shows, never the legacy word layer or a cache row laid over it
 function listReading(item) {
   if (item.t !== 'word') return '';
-  return D.words[item.id]?.r || S.deepWords?.[item.id]?.r || item.cueReading || '';
+  const answer = savedAnswerFor(item);
+  return answer?.status === 'available' ? answer.reading : '';
 }
 
 function listGloss(item) {
   if (item.t !== 'word') return '';
-  return D.words[item.id]?.g || S.deepWords?.[item.id]?.m?.[0] || '';
+  const answer = savedAnswerFor(item);
+  return answer?.status === 'available' ? answer.meanings[0] : '';
 }
 
 function listToMarkdown(name, items) {
@@ -9918,7 +9934,10 @@ async function commitLearningEnrollment(owner, nodes, isCurrent) {
       let current = latest;
       const patch = {};
       for (const node of nodes) {
-        const change = captureStorePatch(current, node, node.label || node.id, now);
+        let change;
+        // D23: a word whose spelling holds another entry's card is skipped, as a duplicate is
+        try { change = captureStorePatch(current, node, node.label || node.id, now); }
+        catch (error) { if (error?.code === 'word-identity-conflict') continue; throw error; }
         Object.assign(patch, change);
         current = { ...current, ...change };
       }
@@ -10184,7 +10203,9 @@ function resolveAssessmentSubject(subject, item, record) {
   const t = subject.slice(0, cut), id = subject.slice(cut + 1);
   if (cut < 1 || !id) return null;
   if (t === 'word') {
-    const entry = record.deepWords?.[id] || D.dict?.[id] || lookup(id);
+    // D23: a core spelling's test item is its core entry; the learner's saved snapshot for that
+    // spelling may be another entry (上手 saved as うわて) and never answers for the test's word
+    const entry = D.dict?.[id] || record.deepWords?.[id] || lookup(id);
     if (!entry || !Array.isArray(entry.m) || !entry.m.length) return null;
     return { t, id, label: id, dictionary: { r: entry.r || '', m: entry.m.slice(0, 8),
       ...(entry.jlpt ? { jlpt: entry.jlpt } : {}), ...(entry.k?.length ? { k: entry.k } : {}) } };
@@ -10373,10 +10394,12 @@ async function performAssessmentEnrichment() {
   finally { assessmentEnrichmentPending = false; }
 }
 const assessmentSuppressionRetries = new Map();
-function suppressAssessmentCards(command) {
-  return queueAssessmentWork(() => performAssessmentSuppression(command));
+function suppressAssessmentCards(command, guard = null) {
+  return queueAssessmentWork(() => performAssessmentSuppression(command, guard));
 }
-async function performAssessmentSuppression(command) {
+/** guard (D23): an optional check of the latest learner record, run in the producer before any
+ * suppression input exists; a throw writes nothing (a word door that no longer names the card). */
+async function performAssessmentSuppression(command, guard = null) {
   const retryKey = JSON.stringify(command);
   const epoch = recordEpoch;
   if (!recordWritable(epoch)) return false;
@@ -10391,6 +10414,7 @@ async function performAssessmentSuppression(command) {
       };
       const outcome = await recordApp.suppressAssessmentLearning(request.meta, request.input || (snapshot => {
         if (!recordWritable(epoch)) throw new Error('record-owner-changed');
+        guard?.(snapshot.record || {});
         request.input = { expectedRevision: snapshot.revision, scope: snapshot.identity, ...command };
         assessmentSuppressionRetries.set(retryKey, request);
         return request.input;
@@ -15424,7 +15448,283 @@ function takenContext(item) {
   return { tokens: p.tokens.slice(start, end), source: p.sourceLabel, passage: p.id, start };
 }
 
-function captureStorePatch(latest, node, label, now = Date.now(), sourceContext = null) {
+/* ------------------------------------------------ D23 · the saved word answer
+ * A learner's word card answers from its own record: the taken row's entrySeq
+ * and cueReading, bound to the deepWords snapshot saved at capture. It never
+ * answers from the mutable deep-dictionary cache, so the card reads the same
+ * cold, warm, offline and after a restore. An explicit entry never falls through
+ * to another entry or to the core. lookup() stays the dictionary's own answer
+ * for browsing, the reader and the lessons; savedAnswerFor() serves learner
+ * items only (the review card, its audio, both grade guards and the list note). */
+const nonBlankMeanings = (meanings) =>
+  Array.isArray(meanings) ? meanings.filter((meaning) => typeof meaning === 'string' && meaning.trim().length > 0) : [];
+
+/** The D23 marker of a validated explicit selection: a versioned object naming the
+ * same entry and exact reading as its snapshot, with the head the learner saw and
+ * the dictionary release its cue was validated against. Anything else is opaque
+ * legacy data, kept byte for byte and never read as provenance: another shape under
+ * this name, or head/src at the snapshot's top level, which older records may
+ * lawfully carry with any safe value (head: 17, src: 'third-party-note'). */
+function wordSelection(snap) {
+  const selection = snap?.selection;
+  const src = selection?.src;
+  return plainRecord(selection) && selection.v === 1 && nonEmptyString(snap.seq) && selection.seq === snap.seq &&
+    nonEmptyString(snap.r) && selection.r === snap.r && nonEmptyString(selection.head) && plainRecord(src) &&
+    typeof src.release === 'string' && /^\d+\.\d+\.\d+\+\d{14}$/u.test(src.release) &&
+    typeof src.archiveSha256 === 'string' && /^[0-9a-f]{64}$/u.test(src.archiveSha256)
+    ? selection
+    : null;
+}
+
+/** The saved answer of a learner's word item: a taken row, or a list member, which
+ * inherits the taken row of its spelling. Pure; it reads record.taken,
+ * record.deepWords, D.dict and D.words, and nothing else. The first rule that
+ * matches wins:
+ *   1 the row names an entry and there is no snapshot      → unavailable · snapshot-missing
+ *   2 the row names an entry the snapshot does not name    → mismatch · seq-conflict
+ *     (snapshot seq absent or different)
+ *   3 the row names an entry, or the snapshot names one    → a present cueReading unlike the
+ *     and there is no row or the spelling is not core        snapshot's → mismatch · reading-conflict;
+ *                                                            no non-blank meaning → unavailable ·
+ *                                                            answer-empty; else the snapshot
+ *   4 a core spelling (its row names no entry)             → the core record
+ *   5 a snapshot without seq                               → saved-legacy, else unavailable · answer-empty
+ *   6 the legacy word layer's gloss                        → words-layer
+ *   7 nothing                                              → unavailable · no-record
+ * A missing optional cueReading is not contrary evidence. A present one is compared as
+ * it is: a snapshot without a reading does not match it (reading-conflict). */
+function savedAnswerFor(item, record = S) {
+  if (item?.t !== 'word' || !nonEmptyString(item.id)) return null;
+  const id = item.id;
+  const answer = (status, reason, fields = {}) =>
+    ({ status, reason, seq: null, reading: '', meanings: [], head: id, source: null, ...fields });
+  const row = (record.taken || []).find((entry) => entry.t === 'word' && entry.id === id) || null;
+  const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
+  const snap = snapshots && owns(snapshots, id) && plainRecord(snapshots[id]) ? snapshots[id] : null;
+  const core = D.dict?.[id] || null;
+  const rowSeq = nonEmptyString(row?.entrySeq) ? row.entrySeq : null;
+  const snapSeq = nonEmptyString(snap?.seq) ? snap.seq : null;
+  const saved = (seq) => {
+    const meanings = nonBlankMeanings(snap.m);
+    if (!meanings.length) return answer('unavailable', 'answer-empty', { seq });
+    const selection = wordSelection(snap);
+    return answer('available', null, { seq, reading: typeof snap.r === 'string' ? snap.r : '', meanings,
+      head: selection?.head || id, source: selection ? 'selection' : 'saved-legacy' });
+  };
+  if (rowSeq && !snap) return answer('unavailable', 'snapshot-missing', { seq: rowSeq });
+  if (rowSeq && snapSeq !== rowSeq) return answer('mismatch', 'seq-conflict', { seq: rowSeq });
+  if (rowSeq || (snapSeq && (!row || !core))) {
+    if (nonEmptyString(row?.cueReading) && snap.r !== row.cueReading) {
+      return answer('mismatch', 'reading-conflict', { seq: rowSeq || snapSeq });
+    }
+    return saved(rowSeq || snapSeq);
+  }
+  if (core) {
+    const meanings = nonBlankMeanings(core.m);
+    return meanings.length
+      ? answer('available', null, { reading: core.r || '', meanings, source: 'core' })
+      : answer('unavailable', 'answer-empty');
+  }
+  if (snap) return saved(null);
+  const old = D.words?.[id];
+  if (typeof old?.g === 'string' && old.g.trim()) {
+    return answer('available', null, { reading: old.r || '', meanings: [old.g], source: 'words-layer' });
+  }
+  return answer('unavailable', 'no-record');
+}
+
+/** The lexical identity an answer stands for. A core answer carries no entry
+ * number, so it is the core record, never equated with an entry by its reading or
+ * gloss: a matching cue does not recover missing provenance. Saved text without an
+ * entry number is its exact reading and first meaning. An answer that is not
+ * available has no identity to match. */
+function wordAnswerIdentity(answer) {
+  if (answer?.status !== 'available') return { kind: 'unknown' };
+  if (answer.seq) return { kind: 'seq', seq: answer.seq, reading: answer.reading || null };
+  if (answer.source === 'core') return { kind: 'core' };
+  return { kind: 'text', reading: answer.reading, gloss: answer.meanings[0] };
+}
+
+/** Same lexical identity. Entries match by number and, where both carry one, by
+ * exact reading: ポンド#1126030 is not #2855351 though both read ポンド, and
+ * 上手#1580400 read うわて is not #1580400 read かみて. The core record matches only
+ * itself. Text matches by exact reading and first meaning. Unknown never matches. */
+function sameWordIdentity(a, b) {
+  if (!a || !b || a.kind !== b.kind || a.kind === 'unknown') return false;
+  if (a.kind === 'core') return true;
+  if (a.kind === 'seq') return a.seq === b.seq && (a.reading == null || b.reading == null || a.reading === b.reading);
+  return a.reading === b.reading && a.gloss === b.gloss;
+}
+
+/** Whether this spelling's card has schedule history. This is the assessment
+ * modules' own predicate (assessment-received.mjs `studied`). */
+function wordStudied(record, id) {
+  const key = srsKey('word', id);
+  return !!record.srs?.[key] || (record.revlog || []).some((row) => row[1] === key);
+}
+
+/** The identity the record's card for this spelling claims or, once the card is
+ * removed, the identity its surviving history belongs to. The checks run in order:
+ * the row's own entry and reading, so a card whose answer broke can still be
+ * removed from its own door; then a removed card's saved entry; then the core
+ * record; then saved or legacy text. A row without its optional cue reads the
+ * exact reading of a snapshot saved for the same entry, so 上手#1580400 saved as
+ * うわて is not removed or deduped through a かみて door. Only a reading nothing
+ * records is left unknown (null), which matches any reading. */
+function wordCardIdentity(record, id) {
+  const row = (record.taken || []).find((entry) => entry.t === 'word' && entry.id === id) || null;
+  const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
+  const snap = snapshots && owns(snapshots, id) && plainRecord(snapshots[id]) ? snapshots[id] : null;
+  if (nonEmptyString(row?.entrySeq)) {
+    // a present row cue is authoritative (even beside a broken snapshot); an absent one takes the
+    // matching-seq snapshot's exact reading before the reading is left unknown (null)
+    const known = nonEmptyString(row.cueReading) ? row.cueReading
+      : snap?.seq === row.entrySeq && nonEmptyString(snap.r) ? snap.r : null;
+    return { kind: 'seq', seq: row.entrySeq, reading: known };
+  }
+  if (!row && nonEmptyString(snap?.seq)) return { kind: 'seq', seq: snap.seq, reading: nonEmptyString(snap.r) ? snap.r : null };
+  if (D.dict?.[id]) return { kind: 'core' };
+  return wordAnswerIdentity(savedAnswerFor({ t: 'word', id }, record));
+}
+
+/** The identity a word control stands for. An explicit door names its entry and
+ * exact reading. A door that names no entry stands for the core record on a core
+ * spelling. On any other spelling it stands for the card, history or saved answer
+ * the record already holds (as its cold display does); failing those, for what the
+ * capture would store from lookup, which is today's path. */
+function wordNodeIdentity(node, record = S) {
+  if (node?.t !== 'word') return null;
+  if (node.seq != null && node.seq !== '') {
+    return { kind: 'seq', seq: String(node.seq), reading: nonEmptyString(node.reading) ? node.reading : null };
+  }
+  if (D.dict?.[node.id]) return { kind: 'core' };
+  const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
+  if ((record.taken || []).some((entry) => entry.t === 'word' && entry.id === node.id) ||
+    wordStudied(record, node.id) || (snapshots && owns(snapshots, node.id))) {
+    return wordCardIdentity(record, node.id);
+  }
+  const rec = lookup(node.id);
+  if (rec?.seq) return { kind: 'seq', seq: String(rec.seq), reading: nonEmptyString(rec.r) ? rec.r : null };
+  return rec ? { kind: 'text', reading: rec.r || '', gloss: nonBlankMeanings(rec.m)[0] ?? null } : { kind: 'unknown' };
+}
+
+/** The answer an explicit door selected, validated against that entry's own index
+ * row. The rules:
+ *   - The reading must be one of the entry's kana forms, byte for byte.
+ *   - Both the card's spelling and the head shown must be printable with THAT
+ *     reading, by its own restriction (readerReadingFits). Normalised kana never
+ *     lends one reading's restriction to another: 産 is read うぶ, never ウブ.
+ *   - A matched gloss must be one of the entry's own glosses.
+ * A saved answer for the same entry and exact reading is kept exactly as saved,
+ * text and provenance included, and is never rewritten by a door that chose another
+ * gloss. It is reused in two cases: when the row is cached and permits the cue, or,
+ * cold, when the answer carries a validated selection or belongs to the learner's
+ * card or its history. Returns null when no answer can be validated. */
+function explicitWordSnapshot(node, record = S) {
+  if (node?.t !== 'word' || node.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return null;
+  const seq = String(node.seq);
+  const head = nonEmptyString(node.matchedHead) ? node.matchedHead : node.id;
+  const row = dictionaryRowBySeq(seq);
+  const indexed = Array.isArray(row) && String(row[0]) === seq ? row : null;
+  const kana = indexed ? indexed[5].indexOf(node.reading) : -1;
+  if (indexed && !(kana >= 0 && readerReadingFits(indexed, kana, node.id) && readerReadingFits(indexed, kana, head))) {
+    return null;
+  }
+  const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
+  const saved = snapshots && owns(snapshots, node.id) && plainRecord(snapshots[node.id]) ? snapshots[node.id] : null;
+  const held = (record.taken || []).some((entry) => entry.t === 'word' && entry.id === node.id) ||
+    wordStudied(record, node.id);
+  if (saved && saved.seq === seq && saved.r === node.reading && nonBlankMeanings(saved.m).length &&
+    (indexed || wordSelection(saved) || held)) {
+    return saved;
+  }
+  if (!indexed) return null;
+  const glosses = nonBlankMeanings(indexed[6]);
+  if (nonEmptyString(node.matchedGloss) && !glosses.includes(node.matchedGloss)) return null;
+  const first = nonEmptyString(node.matchedGloss) ? node.matchedGloss : readerSummaryFor(indexed, kana)[2];
+  const meanings = [first, ...glosses.filter((gloss) => gloss !== first)]
+    .filter((gloss) => nonEmptyString(gloss) && gloss.trim().length > 0).slice(0, 8);
+  if (!meanings.length) return null;
+  const snapshot = { r: node.reading, m: meanings, seq };
+  const kanji = [...head].filter((c) => /[一-鿌々]/.test(c));
+  if (kanji.length) snapshot.k = kanji;
+  const source = D.dictionaryIndex?.source;
+  const selection = { v: 1, seq, r: node.reading, head, src: { release: source?.pin, archiveSha256: source?.jmdict?.sha256 } };
+  if (wordSelection({ ...snapshot, selection })) snapshot.selection = selection;
+  return snapshot;
+}
+
+/** What a word capture writes, decided against the latest record. It throws before
+ * anything is written. The outcomes:
+ *   dedupe   the record's card already is this identity (the existing no-op re-take).
+ *   resume   there is no row, but the spelling's history or saved answer is this
+ *            identity; the saved answer is kept exactly as saved.
+ *   new      there is nothing to protect. An explicit selection saves its validated
+ *            snapshot; a core capture saves none, and a stale seq snapshot is dropped;
+ *            any other capture keeps today's lookup snapshot, unless a usable one is
+ *            already saved.
+ *   replace  only on request, and only while the other entry's card has never been
+ *            studied.
+ * Any other difference throws 'word-identity-conflict'. An explicit selection with no
+ * validated answer throws 'word-answer-unavailable'. */
+function wordCapturePlan(latest, node, { replace = false } = {}) {
+  const id = node.id;
+  const snapshots = plainRecord(latest.deepWords) ? latest.deepWords : {};
+  const saved = owns(snapshots, id) && plainRecord(snapshots[id]) ? snapshots[id] : null;
+  const row = (latest.taken || []).find((entry) => entry.t === 'word' && entry.id === id) || null;
+  const studied = wordStudied(latest, id);
+  let identity;
+  let snapshot = null;
+  if (node.seq != null && node.seq !== '') {
+    snapshot = explicitWordSnapshot(node, latest);
+    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
+    identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };
+  } else if (D.dict[id]) {
+    identity = { kind: 'core' };
+  } else {
+    const kept = savedAnswerFor({ t: 'word', id }, { taken: [], deepWords: snapshots });
+    if (saved && kept?.status === 'available') {
+      snapshot = saved;
+      identity = wordAnswerIdentity(kept);
+    } else {
+      // today's path: the answer lookup gives this spelling
+      const rec = lookup(id);
+      if (rec) {
+        snapshot = {
+          r: rec.r || '',
+          m: (rec.m || []).slice(0, 8),
+          ...(rec.jlpt ? { jlpt: rec.jlpt } : {}),
+          ...(rec.alt ? { alt: rec.alt } : {}),
+          ...(rec.k?.length ? { k: rec.k } : {}),
+          ...(rec.seq ? { seq: String(rec.seq) } : {}),
+        };
+      }
+      identity = rec?.seq ? { kind: 'seq', seq: String(rec.seq), reading: nonEmptyString(rec.r) ? rec.r : null }
+        : rec ? { kind: 'text', reading: rec.r || '', gloss: nonBlankMeanings(rec.m)[0] ?? null } : { kind: 'unknown' };
+    }
+  }
+  const guarded = !!row || studied;
+  const same = guarded && sameWordIdentity(identity, wordCardIdentity(latest, id));
+  if (row && same) return { dedupe: true };
+  if (guarded && !same && !(replace && row && !studied)) {
+    throw Object.assign(new Error('word-identity-conflict'), { code: 'word-identity-conflict' });
+  }
+  let deepWords = null;
+  if (identity.kind === 'core') {
+    if (saved && nonEmptyString(saved.seq)) deepWords = Object.fromEntries(Object.entries(snapshots).filter(([key]) => key !== id));
+  } else if (snapshot && snapshot !== saved) {
+    deepWords = { ...snapshots, [id]: snapshot };
+  }
+  const bound = identity.kind === 'core' ? null : snapshot;
+  return {
+    entrySeq: nonEmptyString(bound?.seq) ? bound.seq : null,
+    cueReading: nonEmptyString(bound?.r) ? bound.r : null,
+    replaceRow: !!row && !same,
+    deepWords,
+  };
+}
+
+function captureStorePatch(latest, node, label, now = Date.now(), sourceContext = null, { replace = false } = {}) {
   const item = {
     t: node.t,
     id: node.id,
@@ -15463,28 +15763,22 @@ function captureStorePatch(latest, node, label, now = Date.now(), sourceContext 
   if (node.from?.passage && Number.isInteger(node.from.index) && node.from.index >= 0) {
     item.ctx = { p: node.from.passage, i: node.from.index, scope: node.ctxScope || 'sent' };
   }
-  let deepWord = null;
-  // A word taken from the deep tier writes its own compact record into the
-  // learner's store: the card must answer on any device, offline, without
-  // re-opening the 70k index. The exact entry (ent_seq) and the reading the
-  // learner actually met ride along as provenance.
-  if (node.t === 'word' && !D.dict[node.id]) {
-    const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
-    if (rec?.seq) item.entrySeq = String(rec.seq);
-    if (rec?.r) item.cueReading = rec.r;
-    if (rec) {
-      deepWord = {
-        r: rec.r || '',
-        m: (rec.m || []).slice(0, 8),
-        ...(rec.jlpt ? { jlpt: rec.jlpt } : {}),
-        ...(rec.alt ? { alt: rec.alt } : {}),
-        ...(rec.k?.length ? { k: rec.k } : {}),
-        ...(rec.seq ? { seq: String(rec.seq) } : {}),
-      };
-    }
-  }
-  if (latest.taken.some((entry) => entry.t === node.t && entry.id === node.id)) return {};
-  const patch = { taken: [...latest.taken, item] };
+  // D23: a word capture takes one lexical identity, decided against the latest
+  // record (wordCapturePlan). An explicit selection keeps its validated answer in
+  // the learner's own store whether or not the core knows the spelling (上手 read
+  // うわて), so the card answers on any device, offline, without re-opening the
+  // 70k index. A capture that names no entry is today's capture.
+  let taken = latest.taken;
+  let deepWords = null;
+  if (node.t === 'word') {
+    const plan = wordCapturePlan(latest, node, { replace });
+    if (plan.dedupe) return {};
+    if (plan.entrySeq) item.entrySeq = plan.entrySeq;
+    if (plan.cueReading) item.cueReading = plan.cueReading;
+    if (plan.replaceRow) taken = latest.taken.filter((entry) => entry.t !== 'word' || entry.id !== node.id);
+    deepWords = plan.deepWords;
+  } else if (latest.taken.some((entry) => entry.t === node.t && entry.id === node.id)) return {};
+  const patch = { taken: [...taken, item] };
   if (sourceContext) {
     // Enrollment and its encounter are one acknowledged write. This reference
     // is provenance only; it grants neither processing nor scheduling rights.
@@ -15492,10 +15786,10 @@ function captureStorePatch(latest, node, label, now = Date.now(), sourceContext 
     const contexts = teacherContextModule.selectTeacherContext(latest.teacherContexts, sourceContext);
     patch.teacherContexts = { ...contexts, activeRef: latest.teacherContexts?.activeRef || null };
   }
-  if (deepWord) patch.deepWords = { ...latest.deepWords, [node.id]: deepWord };
+  if (deepWords) patch.deepWords = deepWords;
   return patch;
 }
-async function commitCapture(node, label, now = Date.now()) {
+async function commitCapture(node, label, now = Date.now(), options = {}) {
   const epoch = recordEpoch;
   if (!recordWritable(epoch)) return false;
   try {
@@ -15507,7 +15801,7 @@ async function commitCapture(node, label, now = Date.now()) {
       if (article) context = await teacherContextModule.sourceSentenceContext(context, article.body.text);
     }
     if (!recordWritable(epoch)) return false;
-    return await commitStorePatch((latest) => captureStorePatch(latest, node, label, now, context));
+    return await commitStorePatch((latest) => captureStorePatch(latest, node, label, now, context, options));
   } catch (error) { recordFailure(error?.code || error?.message); return false; }
 }
 
@@ -16547,16 +16841,124 @@ async function toggleTaken(node, label) {
   try {
     const taking = !S.taken.some((entry) => entry.t === node.t && entry.id === node.id);
     if (taking) return await commitCapture(node, label);
+    // D23: a word's removal names the card this control stood for when it was painted.
+    // The latest record must still hold that card, or nothing is removed or suppressed:
+    // a stale door, or another entry's door on the same spelling (the core mini on a
+    // 上手#1580400 card).
+    const expected = node.t === 'word' ? wordNodeIdentity(node, S) : null;
+    const holds = (record) => {
+      if (expected && !sameWordIdentity(expected, wordCardIdentity(record, node.id))) {
+        throw Object.assign(new Error('word-identity-conflict'), { code: 'word-identity-conflict' });
+      }
+    };
     if (S.assessmentLearning && ['word', 'kanji', 'grammar', 'particle', 'sentence', 'question'].includes(node.t))
-      return await suppressAssessmentCards({ kind: 'remove', key });
-    return await commitStorePatch((latest) => ({
-      taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id),
-    }));
+      return await suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null);
+    return await commitStorePatch((latest) => {
+      holds(latest);
+      return { taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id) };
+    });
   } finally { capturePending.delete(key); }
 }
 
+/** 置き換える (D23): this entry takes the place of another entry's card under the
+ * same spelling. It is one guarded write that re-checks, against the latest record,
+ * that the old card was never studied (wordCapturePlan). Lists, observations and a
+ * rest mark stay with the spelling; they do not become evidence about the new entry. */
+async function replaceWordCard(node, label) {
+  const key = srsKey(node.t, node.id);
+  if (capturePending.has(key)) return false;
+  capturePending.add(key);
+  try { return await commitCapture(node, label, Date.now(), { replace: true }); }
+  finally { capturePending.delete(key); }
+}
+
+/** One capture state for every word control: the sheet foot, the sheet bar, the mini
+ * and the reader's panel.
+ *   taken        the record's card is the identity this control stands for.
+ *   conflict     another entry's card, or that entry's studied history, holds the
+ *                spelling.
+ *   unavailable  an explicit entry's answer cannot be validated yet. */
+function wordCaptureState(node, record = S) {
+  const row = (record.taken || []).some((entry) => entry.t === node.t && entry.id === node.id);
+  if (node.t !== 'word') return row ? 'taken' : 'take';
+  const explicit = node.seq != null && node.seq !== '';
+  if (!row && !wordStudied(record, node.id)) return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
+  if (!sameWordIdentity(wordNodeIdentity(node, record), wordCardIdentity(record, node.id))) return 'conflict';
+  if (row) return 'taken';
+  return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
+}
+
+/** The one-line reason a word control is held (D23), for surfaces without the full note. */
+function wordCaptureHeldText(node) {
+  return wordCaptureState(node) === 'unavailable'
+    ? tx('この項目の答えをまだ確かめられないため、覚えられない。', 'This entry’s answer cannot be confirmed yet, so it cannot be memorized.')
+    : tx(`「${node.id}」には別の項目のカードがあるため、ここでは覚える・やめるができない。`,
+      `${node.id} holds a card for another entry, so it cannot be memorized or stopped here.`);
+}
+
+/** Why a word control is held (D23): another entry's card holds the spelling, or the
+ * selected entry's answer cannot be validated yet. Keeping the existing card is the
+ * default and writes nothing. A card that has never been studied may give way to this
+ * entry (replaceWordCard). A studied card is never replaced here; starting another
+ * entry fresh is a separate decision. */
+function renderWordCaptureNote(container, node, label = node.id) {
+  if (node?.t !== 'word') return;
+  const state = wordCaptureState(node);
+  if (state !== 'conflict' && state !== 'unavailable') return;
+  const note = el('div', 'word-capture-note');
+  note.id = 'word-capture-note';
+  note.setAttribute('role', 'status');
+  if (state === 'unavailable') {
+    note.append(el('p', null, tx('この項目の答えをまだ確かめられないため、ここでは覚えられない。',
+      'This entry’s answer cannot be confirmed yet, so it cannot be memorized here.')));
+    container.append(note);
+    return;
+  }
+  const card = savedAnswerFor({ t: 'word', id: node.id });
+  const shown = card?.status === 'available'
+    ? `${card.head}〔${card.reading}〕${card.meanings[0] ? ` ${card.meanings[0]}` : ''}`
+    : node.id;
+  const studied = wordStudied(S, node.id);
+  const enrolled = S.taken.some((entry) => entry.t === 'word' && entry.id === node.id);
+  note.append(el('p', null, studied
+    ? tx(`「${node.id}」には別の項目（${shown}）のカードと復習の記録があります。表記一つにカード一枚なので、そのまま残します。`,
+      `${node.id} already has a card, with review history, for another entry (${shown}). One spelling holds one card, so it stays as it is.`)
+    : tx(`「${node.id}」には、まだ復習していない別の項目（${shown}）のカードがあります。そのままにすると、いまのカードが残ります。`,
+      `${node.id} has a card for another entry (${shown}) that has not been reviewed yet. Leaving it keeps that card.`)));
+  const actions = el('div', 'teacher-actions');
+  if (!studied && enrolled) {
+    const replace = biLabel('button', 'chip', 'この項目に置き換える', 'replace it with this entry');
+    replace.type = 'button';
+    replace.id = 'word-capture-replace';
+    replace.disabled = !recordWritable();
+    replace.addEventListener('click', async () => {
+      if (replace.disabled) return;
+      replace.disabled = true;
+      const saved = await replaceWordCard(node, label);
+      replace.disabled = false;
+      if (saved) render();
+    });
+    actions.append(replace);
+  }
+  const open = biLabel('button', 'chip', 'そのカードを開く', 'open that card');
+  open.type = 'button';
+  open.id = 'word-capture-open';
+  open.addEventListener('click', () => {
+    const held = wordCardIdentity(S, node.id);
+    go(held.kind === 'seq'
+      ? { t: 'word', id: node.id, seq: held.seq, ...(held.reading ? { reading: held.reading } : {}) }
+      : { t: 'word', id: node.id });
+  });
+  actions.append(open);
+  note.append(actions);
+  container.append(note);
+}
+
 function takeButton(node, label) {
-  const already = S.taken.some((t) => t.t === node.t && t.id === node.id);
+  // D23: a word's control is 'taken' only when the record's card is the identity it stands
+  // for. Another entry's card, or an explicit answer not yet validated, holds it.
+  const state = node.t === 'word' ? wordCaptureState(node) : null;
+  const already = state ? state === 'taken' : S.taken.some((t) => t.t === node.t && t.id === node.id);
   const btn = biLabel(
     'button',
     already ? 'take taken' : 'take',
@@ -16572,6 +16974,11 @@ function takeButton(node, label) {
       btn.disabled = true;
       btn.setAttribute('aria-label', tx('語義が未収録のため覚える対象にできません。', 'A meaning is needed before this kanji can be memorized.'));
     }
+  }
+  if (state === 'conflict' || state === 'unavailable') {
+    btn.disabled = true;
+    btn.classList.add('word-capture-held');
+    btn.setAttribute('aria-describedby', 'word-capture-note');
   }
   btn.addEventListener('click', async () => {
     if (btn.disabled) return;
@@ -16705,6 +17112,8 @@ function recordPickerSurface(node) {
 function renderContextPicker(sheet, node) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item || node.t !== 'word') return;
+  // D23: another entry's card under this spelling is not this door's to adjust
+  if (wordCaptureState(node) !== 'taken') return;
   const from = node.from || item.from;
   if (!from?.passage || from.index == null) return;
   const wrap = el('div', 'list-picker context-picker');
@@ -16758,6 +17167,7 @@ function renderContextPicker(sheet, node) {
 function renderListPicker(sheet, node, label) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item) return;
+  if (node.t === 'word' && wordCaptureState(node) !== 'taken') return;
   const menuKey = `${node.t}|${node.id}`;
   const currentSurface = recordPickerSurface(node);
   const open = S.listMenuFor === menuKey;
@@ -17066,6 +17476,8 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.revealed = false;
   // the next card asks its own question — no declaration carries over
   rv.declared = null;
+  // …and binds its own shown answer (D23, presentReviewAnswer)
+  rv.presented = null;
   // …and neither does いま見る: the next ripening card gets its own wait
   rv.showEarly = false;
   // the fold closes with the card it opened on
@@ -17114,6 +17526,7 @@ async function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }
   return commitReviewAction(rv, item,
     (latest) => {
       if (!kanjiAnswerAvailable(item, latest)) throw new Error('kanji-answer-unavailable');
+      if (item.t === 'word') assertWordAnswerPresented(rv, item, latest);
       return { obslog: [...(latest.obslog || []), row] };
     },
     () => advanceReviewSession(rv, item, next, { key, drill: true }));
@@ -17127,6 +17540,7 @@ async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
   const questionGradeId = item.t === 'question' ? crypto.randomUUID() : null;
   return commitReviewAction(rv, item, (latest, snapshot) => {
     if (!kanjiAnswerAvailable(item, latest)) throw new Error('kanji-answer-unavailable');
+    if (item.t === 'word') assertWordAnswerPresented(rv, item, latest);
     let sentenceRoot = null, questionRoot = null;
     if (item.t === 'sentence') {
       if (S.focus || !rv.sentenceAttemptId) throw new Error('sentence-response-required');
@@ -17333,6 +17747,68 @@ window.__KAIRO_SRS__ = Object.freeze({
       ? { queue: S.review.queue.length, ix: S.review.ix, deferred: S.review.deferred ?? 0 }
       : null,
 });
+/** D23 · whether a review card has an answer to show and grade. A word needs its
+ * saved answer (savedAnswerFor); a kanji needs its retained or bundled record; other
+ * kinds keep their own. */
+function reviewAnswerAvailable(item, record = S) {
+  return item.t === 'word' ? savedAnswerFor(item, record)?.status === 'available' : kanjiAnswerAvailable(item, record);
+}
+
+/** The back a review card shows. A word shows its saved answer, the one resolved
+ * instance that the face binds (presentReviewAnswer) and the 音 door speaks. Every
+ * other kind keeps reviewBack, and so do lessons for their own words. */
+function reviewCardBack(item, answer = null) {
+  if (item.t !== 'word') return reviewBack(item);
+  const resolved = answer || savedAnswerFor(item);
+  return resolved?.status === 'available' ? { reading: resolved.reading, senses: resolved.meanings.slice(0, 4) } : null;
+}
+
+/** The answer a word card presents, as one canonical string: its card key, the kind
+ * and number of its entry, the head, the exact reading and the meanings the face
+ * shows. The displayed meaning is part of it, so a same-entry answer whose text
+ * changed is a different presentation. */
+function wordPresentationKey(item, answer) {
+  return JSON.stringify([srsKey('word', item.id), answer.seq ? 'seq' : answer.source, answer.seq, answer.head,
+    answer.reading, answer.meanings.slice(0, 4)]);
+}
+
+/** Bind the answer a revealed word card shows to this sitting position, once; a
+ * later render never refreshes the binding. Returns null for anything but a revealed
+ * word, else { state, answer }:
+ *   shown        the record still gives the bound answer.
+ *   changed      the record now answers otherwise.
+ *   unavailable  there is no answer. */
+function presentReviewAnswer(rv, record = S) {
+  const item = rv?.queue?.[rv.ix];
+  if (!rv?.revealed || item?.t !== 'word') return null;
+  const answer = savedAnswerFor(item, record);
+  if (answer?.status !== 'available') return { state: 'unavailable', answer };
+  const key = wordPresentationKey(item, answer);
+  const bound = rv.presented;
+  if (!bound || bound.item !== item || bound.ix !== rv.ix) {
+    rv.presented = { item, ix: rv.ix, key };
+    return { state: 'shown', answer };
+  }
+  return { state: bound.key === key ? 'shown' : 'changed', answer };
+}
+
+/** A word grade, standard or drill, is authorized only for the answer this card
+ * presented, and only while the latest record still gives exactly that answer:
+ * entry, reading, head and meanings. Anything else writes nothing: an unavailable
+ * answer, no presentation, or a different answer. A different answer can be another
+ * entry under the same spelling, even with the same reading, or the same entry whose
+ * text changed. */
+function assertWordAnswerPresented(rv, item, record) {
+  const answer = savedAnswerFor(item, record);
+  if (answer?.status !== 'available') {
+    throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
+  }
+  const bound = rv.presented;
+  if (!bound || bound.item !== item || bound.ix !== rv.ix || bound.key !== wordPresentationKey(item, answer)) {
+    throw Object.assign(new Error('word-answer-changed'), { code: 'word-answer-changed' });
+  }
+}
+
 /** The card back, by kind — reading and meaning from the same records the
  * entry sheets read, so the session and the dictionary never disagree. */
 function reviewBack(item) {
@@ -17508,6 +17984,8 @@ function renderReview(main) {
     }
   }
   const item = rv.queue[rv.ix];
+  // D23: a face-down card has shown no answer yet; its next reveal binds its own
+  if (!rv.revealed) rv.presented = null;
   // ZEN — while a card is up there is nothing on the glass but the card.
   // Progress is a hairline, not a count. One quiet way out. Everything
   // secondary (undo · rest · the full entry) waits behind one faint mark.
@@ -17540,14 +18018,24 @@ function renderReview(main) {
   });
   main.append(moreBtn);
 
-  if (!kanjiAnswerAvailable(item)) {
+  if (!reviewAnswerAvailable(item)) {
     moreBtn.remove();
     const unavailable = el('div', 'review-face');
     unavailable.id = 'review-answer-unavailable';
+    // D23: a word whose saved answer is missing or contradicts its card is shown
+    // honestly and never graded, in the same face as a kanji without its record
+    const wordAnswer = item.t === 'word' ? savedAnswerFor(item) : null;
+    if (wordAnswer) unavailable.dataset.reason = wordAnswer.reason || wordAnswer.status;
     unavailable.append(el('div', 'review-front', item.label || item.id));
-    unavailable.append(el('p', 'review-sense', tx(
+    unavailable.append(el('p', 'review-sense', !wordAnswer ? tx(
       'この字の答えが保存されていません。記録は残し、評価せずに進みます。',
       'This kanji has no saved answer. Keep its record and continue without grading it.',
+    ) : wordAnswer.status === 'mismatch' ? tx(
+      'この語の保存した答えがカードと食い違っています。記録は残し、評価せずに進みます。',
+      'This word’s saved answer does not match its card. Keep its record and continue without grading it.',
+    ) : tx(
+      'この語の答えが保存されていません。記録は残し、評価せずに進みます。',
+      'This word has no saved answer. Keep its record and continue without grading it.',
     )));
     const next = el('button', 'btn', tx('評価せずに次へ', 'Continue without grading'));
     next.id = 'review-unavailable-next'; next.type = 'button';
@@ -17557,6 +18045,29 @@ function renderReview(main) {
       render();
     });
     unavailable.append(next); main.append(unavailable);
+    return;
+  }
+  // D23: the answer a revealed word card showed is bound to it. If the record now
+  // answers otherwise, nothing may be graded until the card is turned over afresh;
+  // the old declaration is not carried over to the new answer.
+  const presented = presentReviewAnswer(rv);
+  if (presented?.state === 'changed') {
+    moreBtn.remove();
+    const changed = el('div', 'review-face');
+    changed.id = 'review-answer-changed';
+    changed.append(el('div', 'review-front', item.label || item.id));
+    changed.append(el('p', 'review-sense', tx(
+      'この語の答えが変わりました。評価する前に、カードをもう一度めくってください。',
+      'This word’s answer changed. Turn the card over again before grading it.',
+    )));
+    const again = el('button', 'btn', tx('もう一度めくる', 'Turn it over again'));
+    again.id = 'review-answer-again'; again.type = 'button';
+    again.addEventListener('click', () => {
+      if (S.review !== rv || rv.queue[rv.ix] !== item || rv.pending) return;
+      rv.revealed = false; rv.declared = null; rv.presented = null;
+      render();
+    });
+    changed.append(again); main.append(changed);
     return;
   }
 
@@ -17610,7 +18121,7 @@ function renderReview(main) {
     face.append(front);
   }
   if (rv.revealed && !['sentence', 'question'].includes(item.t)) {
-    const backc = reviewBack(item);
+    const backc = reviewCardBack(item, presented?.answer) || { reading: '', senses: [] };
     const assessment = assessmentReviewContext(item);
     if (assessment) {
       const context = el('section', 'assessment-review-context reveal r-1');
@@ -21138,6 +21649,8 @@ function renderWordNode(sheet, node) {
   const take = takeButton(node, label);
   if (node.readerChoice) holdReaderCapture(take);
   sheet.append(take);
+  // D23: why 覚 is held on this entry: another entry's card, or an answer not yet validated
+  if (!node.readerChoice) renderWordCaptureNote(sheet, node, label);
   renderContextPicker(sheet, node);
   renderListPicker(sheet, node, label);
   renderStudyFold(sheet, node, { id: node.id, from: node.from });
@@ -23185,7 +23698,9 @@ function renderSheet(root) {
       } : {}) }
       : null;
   if (capNode) {
-    const takenNow = S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
+    // D23: the seal shares the foot button's state, 'taken' only for this identity's card
+    const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
+    const takenNow = capState ? capState === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
     const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', '覚');
     capture.type = 'button';
     capture.id = 'sheet-take';
@@ -23210,6 +23725,12 @@ function renderSheet(root) {
     });
     // a word matched from a reader token cannot be carried safely by a card (D11)
     if (node.readerChoice) holdReaderCapture(capture);
+    else if (capState === 'conflict' || capState === 'unavailable') {
+      capture.disabled = true;
+      capture.classList.add('word-capture-held');
+      if (capNode === node) capture.setAttribute('aria-describedby', 'word-capture-note');
+      else capture.setAttribute('aria-label', wordCaptureHeldText(capNode));
+    }
     bar.append(capture);
   }
   const closeBtn = el('button', 'sheet-close', '✕');
@@ -24770,6 +25291,12 @@ function render() {
         render();
         return;
       }
+      // D23: a spelling whose record answers as another entry opens the panel with the reason
+      if (!S.taken.some((t) => t.t === 'word' && t.id === now.id) && wordCaptureState(readerTakeNode(now)) === 'conflict') {
+        S.captureOpen = true;
+        render();
+        return;
+      }
       // first touch takes the word as encountered — sentence and all; the
       // panel that opens holds the undo, the scope stages, and the lists
       if (!S.taken.some((t) => t.t === 'word' && t.id === now.id)) {
@@ -24841,6 +25368,7 @@ function render() {
       panel.append(reason);
     } else {
       panel.append(takeButton(capNode, cur.id));
+      renderWordCaptureNote(panel, capNode, cur.id);
       renderContextPicker(panel, capNode);
       renderListPicker(panel, capNode, cur.id);
     }
