@@ -1,0 +1,25 @@
+{
+  "form": {
+    "kind": "form",
+    "id": "kairo-original-jlpt-n2-short-01:written-review",
+    "revisionId": "assessment-form:56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2",
+    "sha256": "56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2"
+  },
+  "presentationSha256": null,
+  "status": "ai-reviewed-practice",
+  "productionEligible": true,
+  "authorityPolicyVersion": "bunki-ai-review/2",
+  "decisionRevisionIds": [
+    "assessment-ai-editorial-v2:0ce3c2558d264153632a8c4e054a3fdb617f7699653c21b063fab46822b990d2",
+    "assessment-ai-editorial-v2:214e169c2aca78ae7e9147e6fac59773db9719cb3f43d18e621ab6a54bd2735c",
+    "assessment-ai-editorial-v2:4acd0903051b060a1aeb4c423cbc550f0ae6aa7d3ba21aef48a54ff5a87bf2e8",
+    "assessment-ai-editorial-v2:a83735c6144fe3664d545e0d923f8d447580b7278c9aadb4554334f86d71f023",
+    "assessment-ai-editorial-v2:c8fe41d9399614ec9eb10ee671813788d4a26e1993c0a24ceb27cfdbcda3400d",
+    "assessment-ai-editorial-v2:cfa3d788157935224fbe9fca1542e14845dd193e71cc8529434c21c5ff521748",
+    "assessment-ai-editorial-v2:efa187004775698e8380a3159565daeb4e11121de2d01fa296522f52bf7e94e0"
+  ],
+  "problems": [],
+  "officialScoreCalibrated": false,
+  "rejectedRuntimeReceipts": [],
+  "rejectedResolutionRuntimeReceipts": []
+}

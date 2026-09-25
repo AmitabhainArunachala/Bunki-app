@@ -250,6 +250,7 @@ try {
       );
       writeFileSync(join(directory, 'child.log'), child.stdout + child.stderr);
       assert.equal(child.status, 0, child.stderr || String(child.error));
+      const bundleReceipt = JSON.parse(readFileSync(output + '.build.json'));
       browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
       const context = await browser.newContext();
       await silenceBrowserAudio(context);
@@ -269,6 +270,12 @@ try {
         const sources = await import(window.__KAIRO_FEED_CONTROLLER_URL__);
         const assessments = await import(window.__KAIRO_ASSESSMENT_CONTROLLER_URL__);
         const publishers = await import(window.__KAIRO_PUBLISHER_CONTROLLER_URL__);
+        const controllerBytes = await (await window.fetch(url)).arrayBuffer();
+        const controllerSha256 = [
+          ...new Uint8Array(await window.crypto.subtle.digest('SHA-256', controllerBytes)),
+        ]
+          .map((byte) => byte.toString(16).padStart(2, '0'))
+          .join('');
         let rejected = false;
         try {
           controller.parseArticleCandidate({});
@@ -276,7 +283,8 @@ try {
           rejected = true;
         }
         return {
-          embedded: url.startsWith('data:text/javascript;base64,'),
+          embedded: url.startsWith('blob:'),
+          controllerSha256,
           length: controller.readingSettings().length,
           rejected,
           ready: document.body.dataset.ready,
@@ -289,6 +297,7 @@ try {
       });
       assert.deepEqual(result, {
         embedded: true,
+        controllerSha256: bundleReceipt.controllerSha256,
         length: 'medium',
         rejected: true,
         ready: '1',
@@ -303,7 +312,7 @@ try {
       await page.screenshot({ path: join(OUT, 'standalone-offline.png') });
       await browser.close();
       browser = undefined;
-      return JSON.parse(readFileSync(output + '.build.json'));
+      return bundleReceipt;
     },
   );
   await stopServer();

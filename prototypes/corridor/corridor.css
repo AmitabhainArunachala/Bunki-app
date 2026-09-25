@@ -7415,3 +7415,85 @@ body.v-depth-layered main > .eyebrow::before {
 body.v-depth-layered .skip-wheels { border-bottom-color: var(--edge); }
 body.v-depth-layered .skip-wheel-column + .skip-wheel-column { border-left-color: var(--edge); }
 body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
+/* Assessment instructions use ordinary prose spacing. The Japanese question
+   keeps the reading room's type, while English chrome stays easy to scan. */
+.assessment-room { max-width: 880px; margin-inline: auto; }
+.assessment-room[lang="en"] { font-family: var(--sans, system-ui, sans-serif); }
+.assessment-room p, .assessment-room button, .assessment-room summary,
+.assessment-room .card-kind { letter-spacing: normal; text-transform: none; }
+.assessment-room .exam-prompt, .assessment-room .exam-passage, .assessment-room .mock-opt[lang="ja"] {
+  font-family: var(--serif, "Noto Serif JP", serif); line-height: 1.9;
+}
+.exam-intro, .exam-instruction, .exam-form-meta, .exam-score-note { line-height: 1.6; }
+.exam-levels, .exam-lengths, .exam-leave-controls { display: flex; gap: .6rem; flex-wrap: wrap; margin: 1.2rem 0; }
+.exam-levels .chip[aria-pressed="true"], .exam-length[aria-pressed="true"] {
+  border-color: currentColor; box-shadow: inset 0 -3px currentColor;
+}
+.exam-length { flex: 1 1 150px; min-width: 0; padding: 1rem; border: 1px solid #76808066;
+  border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: start; }
+.exam-length-time { display: block; font-size: .78em; margin-top: .4rem; line-height: 1.5; }
+.exam-form { padding: 1.25rem 0; border-bottom: 1px solid #76808044; }
+.exam-form h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
+.exam-form .take { margin: 1rem 0 .5rem; }
+.exam-skills { font-size: .86rem; line-height: 1.6; }
+.exam-status, .exam-save, .exam-version { font-size: .8rem; line-height: 1.6; }
+.exam-sources { margin: 1rem 0; font-size: .85rem; line-height: 1.7; }
+.exam-sources a { display: block; overflow-wrap: anywhere; }
+.exam-sources summary, .exam-question-map summary, .exam-answer summary { cursor: pointer; padding: .5rem 0; }
+.exam-heading { font-size: 1.4rem; margin: 0 0 1.2rem; }
+.exam-progress { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.exam-timer { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.exam-save { margin: .35rem 0 1.2rem; opacity: .75; }
+.exam-skill { font-size: .85rem; }
+.exam-prompt { white-space: pre-wrap; margin: 1.3rem 0 .65rem; }
+.exam-passage { white-space: pre-wrap; border-inline-start: 2px solid #76808066; padding-inline-start: 1rem; margin: 1.5rem 0; }
+.exam-passage h2 { font-size: 1.1rem; }
+.exam-passage p { margin: 0; }
+.assessment-room .mock-opts { display: grid; gap: .6rem; margin-block: 1rem; }
+.assessment-room .mock-opt { width: 100%; min-height: 52px; text-align: start; overflow-wrap: anywhere;
+  font-size: 1rem; color: inherit; background: transparent; padding: .6rem .85rem;
+  border: 1px solid var(--line, #76808066); border-radius: .4rem; }
+.assessment-room .mock-opt[aria-pressed="true"] { outline: 2px solid currentColor; background: #76808022; }
+.exam-question-map { margin: 1.2rem 0; }
+.exam-question-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: .5rem; }
+.exam-question-grid .chip { padding: .5rem; min-height: 44px; }
+.exam-confirm { line-height: 1.7; }
+.exam-confirm button { display: block; margin: 1rem 0; }
+.exam-score { font-size: 2rem; margin: 1.2rem 0 .6rem; }
+.exam-counts { display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap; margin: 1.5rem 0; }
+.exam-counts div { min-width: 70px; }
+.exam-counts dt { font-size: .8rem; }
+.exam-counts dd { margin: .35rem 0; font-size: 1.4rem; }
+.exam-results-skills, .exam-followup { padding: 1rem 0; border-block: 1px solid #76808044; }
+.exam-answer { margin: 1rem 0; line-height: 1.7; }
+.exam-answer.incorrect { border-inline-start: 2px solid #a74b3e; padding-inline-start: .75rem; }
+.exam-rationale { white-space: pre-wrap; }
+.exam-conditions, .exam-audio-status { font-size: .86rem; line-height: 1.7; }
+.exam-conditions summary { cursor: pointer; padding: .5rem 0; }
+.assessment-review-context { max-width: 42rem; margin: 1rem auto; padding: 1rem; text-align: start;
+  border-inline-start: 2px solid var(--edge, #76808066); line-height: 1.8; overflow-wrap: anywhere; }
+.assessment-review-context h2 { font: inherit; font-weight: 600; letter-spacing: normal; }
+.assessment-review-context p { white-space: pre-wrap; font-size: 1rem; }
+.exam-notice { border-inline-start: 3px solid #a74b3e; padding: .75rem; line-height: 1.6; }
+.exam-image { max-width: 100%; height: auto; }
+@media (max-width: 480px) {
+  .exam-lengths { gap: .4rem; }
+  .exam-length { flex-basis: calc(33% - .4rem); padding: .75rem .4rem; font-size: .85rem; }
+  .exam-score { font-size: 1.6rem; }
+  .assessment-room .mock-nav { gap: .5rem; }
+  .assessment-room .chip, .assessment-room .take { max-width: 100%; white-space: normal; }
+}
+
+/* Exact test-question recall shares the ordinary SRS queue. */
+.assessment-question-review { width: 100%; min-width: 0; text-align: left; }
+.assessment-question-passage, .assessment-question-prompt, .assessment-question-rationale,
+.assessment-question-transcript p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.85; }
+.assessment-question-passage { padding: 1rem; border: 1px solid var(--line); border-radius: .4rem; }
+.assessment-question-options { min-inline-size: 0; margin: 1rem 0; padding: 0; border: 0; }
+.assessment-question-option { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; min-height: 44px;
+  margin: .5rem 0; padding: .7rem; border: 1px solid var(--line); border-radius: .4rem; overflow-wrap: anywhere; }
+.assessment-question-option input { flex: 0 0 auto; margin-top: .35rem; }
+.assessment-question-key { font-size: .8em; flex: 0 0 auto; }
+.assessment-question-image { display: block; max-width: 100%; height: auto; }
+.assessment-question-review .teacher-actions { flex-wrap: wrap; }
+.assessment-question-review button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }

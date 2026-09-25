@@ -136,6 +136,33 @@ describe.each(engines.filter(([name]) => requested.includes(name)))(
       await page.close();
     });
 
+    it('durably allocates v2 result and followup without transmitting private question bodies', async () => {
+      const { page, database } = await pageFor();
+      const first = await page.evaluate(async () => {
+        const receipt = await window.fixture.commit(window.fixture.assessmentLocalFixtureV2());
+        const snapshot = await window.fixture.snapshot();
+        return { receipt, operations: snapshot.outbox, documents: snapshot.documents };
+      });
+      expect(first.operations.map((operation) => operation.v)).toEqual([2, 2]);
+      expect(
+        first.operations.find((operation) => operation.payload.kind === 'learning.followup/2')!
+          .predecessor,
+      ).toEqual(first.receipt.operations[0]);
+      expect(JSON.stringify(first.operations)).not.toContain('PRIVATE_QUESTION_BODY');
+      await page.evaluate(() => window.fixture.close());
+      await page.reload();
+      await page.waitForFunction(() => !!window.fixture);
+      const recovered = await page.evaluate(async (name) => {
+        await window.fixture.open(name);
+        const duplicate = await window.fixture.commit(window.fixture.assessmentLocalFixtureV2());
+        return { duplicate, snapshot: await window.fixture.snapshot() };
+      }, database);
+      expect(recovered.duplicate.outcome).toBe('duplicate');
+      expect(recovered.snapshot.outbox).toEqual(first.operations);
+      expect(recovered.snapshot.documents).toEqual(first.documents);
+      await page.close();
+    });
+
     it('preserves full local histories and own prototype-like keys through reload without replicating them', async () => {
       const { page, database } = await pageFor();
       const before = await page.evaluate(async () => {

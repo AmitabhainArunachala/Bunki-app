@@ -11,6 +11,10 @@ import { createSyncOperation, encodeLocalJson, exportOperationJournal, operation
 import { parseSourceReferenceInput, sourceReferenceIntent, prepareSourceReferenceCapture } from './source-inbox.mjs';
 
 const PRACTICE_FINALIZE = 'host.practice-finalize/1';
+const ASSESSMENT_FINALIZE = 'host.assessment-finalize/2';
+const ASSESSMENT_SUPPRESS = 'host.assessment-suppress/2';
+const ASSESSMENT_RECONCILE = 'host.assessment-reconcile/2';
+const ASSESSMENT_ENRICH = 'host.assessment-enrich/2';
 const RECORD = 'learner-record';
 const ARCHIVE = 'learner-archive';
 const COMMANDS = 'kairo:record-host-commands';
@@ -25,7 +29,7 @@ const NOTE_RESTORE_ORIGINAL = 'host.note-restore-original/1';
 const READING_RESUME = 'host.reading-resume/1';
 const SOURCE_REFERENCE = 'host.source-reference/1';
 const NOTE_COMMANDS = new Set([NOTE_CREATE, NOTE_EDIT, NOTE_DELETE, NOTE_RESTORE, NOTE_CHOOSE, NOTE_RESTORE_ORIGINAL]);
-const BUILTIN = new Set(['host.observations/1', 'host.archive/1', 'host.restore/1', 'host.restore/2', ...NOTE_COMMANDS, PRACTICE_FINALIZE, READING_RESUME, SOURCE_REFERENCE]);
+const BUILTIN = new Set(['host.observations/1', 'host.archive/1', 'host.restore/1', 'host.restore/2', ...NOTE_COMMANDS, PRACTICE_FINALIZE, ASSESSMENT_FINALIZE, ASSESSMENT_SUPPRESS, ASSESSMENT_RECONCILE, ASSESSMENT_ENRICH, READING_RESUME, SOURCE_REFERENCE]);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const plain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const copy = (value) => encodeLocalJson(value).value;
@@ -332,6 +336,22 @@ function practiceEvidence(value) {
     /^[0-9a-f]{64}$/u.test(value.intentSha256), 'unsupported-command-receipt');
   noteRef(value.operation);
 }
+function assessmentEvidence(value) {
+  keys(value, ['attemptId', 'attemptRevisionId', 'followupId', 'intentsSha256', 'operations'], [], 'unsupported-command-receipt');
+  insist([value.attemptId, value.attemptRevisionId, value.followupId].every(id) &&
+    typeof value.intentsSha256 === 'string' && /^[0-9a-f]{64}$/u.test(value.intentsSha256) &&
+    Array.isArray(value.operations) && value.operations.length > 0 && value.operations.length <= 16, 'unsupported-command-receipt');
+  noteRefs(value.operations);
+}
+function suppressionEvidence(value) {
+  keys(value, ['keys', 'remaining', 'intentsSha256', 'operations'], [], 'unsupported-command-receipt');
+  insist(Array.isArray(value.keys) && value.keys.length <= 100 && new Set(value.keys).size === value.keys.length &&
+    value.keys.every((key) => typeof key === 'string' && /^(word|kanji|grammar|particle|sentence|question):\S+$/u.test(key) && key.length <= 210) &&
+    Number.isSafeInteger(value.remaining) && value.remaining >= 0 && value.remaining <= 1000 &&
+    typeof value.intentsSha256 === 'string' && /^[0-9a-f]{64}$/u.test(value.intentsSha256) &&
+    Array.isArray(value.operations) && value.operations.length === value.keys.length, 'unsupported-command-receipt');
+  noteRefs(value.operations);
+}
 function sourceReferenceEvidence(value) {
   keys(value, ['captureId', 'intentSha256', 'operation'], [], 'unsupported-command-receipt');
   insist(typeof value.captureId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(value.captureId) &&
@@ -358,11 +378,17 @@ function capture(writer, binding) {
 
 class RecordHost {
   #controller; #writer; #binding; #validateRecord; #validateArchive; #reducers;
+  #assessmentSubjectResolver;
+  #assessmentFormResolver;
+  #assessmentPresentationResolver;
   #tail = Promise.resolve(); #closed = false; #published = Object.freeze({ status: 'uninitialized' }); #publishedWriter = null;
   constructor(options) {
     this.#controller = options.controller; this.#writer = options.writer; this.#binding = copy(options.binding);
     this.#validateRecord = options.validateRecord; this.#validateArchive = options.validateArchive;
     this.#reducers = options.reducers;
+    this.#assessmentSubjectResolver = options.assessmentSubjectResolver;
+    this.#assessmentFormResolver = options.assessmentFormResolver;
+    this.#assessmentPresentationResolver = options.assessmentPresentationResolver;
   }
   #guard(captured) {
     insist(!this.#closed, 'closed');
@@ -377,7 +403,8 @@ class RecordHost {
     return run;
   }
   #validate(record, archive) {
-    insist(plain(record) && record.v === 1 && !own(record, 'ai') &&
+    insist(plain(record) && [1, 2].includes(record.v) && !own(record, 'ai') &&
+      (record.v === 2 || (record.assessmentLibraryV2 == null && record.assessmentLearning == null && record.assessmentReceived == null && record.assessmentQuestionPractice == null)) &&
       (record.aiChat === undefined || Array.isArray(record.aiChat)) &&
       (record.aiReadings === undefined || Array.isArray(record.aiReadings)) &&
       (record.aiReading == null || plain(record.aiReading)) &&
@@ -396,7 +423,7 @@ class RecordHost {
   }
   #checkedReceipt(value, rowId, revision) {
     keys(value, ['format', 'version', 'changeId', 'type', 'occurredAt', 'scope', 'commandSha256',
-      'beforeRevision', 'committedRevision', 'recordSha256', 'archiveSha256'], value.type === PRACTICE_FINALIZE ? ['practice'] : value.type === SOURCE_REFERENCE ? ['sourceReference'] : [], 'unsupported-command-receipt');
+      'beforeRevision', 'committedRevision', 'recordSha256', 'archiveSha256'], value.type === PRACTICE_FINALIZE ? ['practice'] : value.type === ASSESSMENT_FINALIZE ? ['assessment'] : value.type === ASSESSMENT_SUPPRESS ? ['learningSuppression'] : value.type === ASSESSMENT_ENRICH ? ['learningEnrichment'] : value.type === ASSESSMENT_RECONCILE ? ['assessmentReconciliation'] : value.type === SOURCE_REFERENCE ? ['sourceReference'] : [], 'unsupported-command-receipt');
     insist(value.format === 'kairo-local-command-receipt' && value.version === 1 && id(rowId) && value.changeId === rowId &&
       id(value.type) && same(value.scope, scopeOf(this.#binding)) && Number.isSafeInteger(value.beforeRevision) && value.beforeRevision >= 0 &&
       value.committedRevision === value.beforeRevision + 1 && value.committedRevision <= revision &&
@@ -404,6 +431,22 @@ class RecordHost {
     'unsupported-command-receipt');
     instant(value.occurredAt);
     if (value.type === PRACTICE_FINALIZE) { practiceEvidence(value.practice); insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 4096, 'unsupported-command-receipt'); }
+    if (value.type === ASSESSMENT_FINALIZE) { assessmentEvidence(value.assessment); insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 8192, 'unsupported-command-receipt'); }
+    if (value.type === ASSESSMENT_SUPPRESS) { suppressionEvidence(value.learningSuppression); insist(new globalThis.TextEncoder().encode(encodeLocalJson(value).text).byteLength <= 65_536, 'unsupported-command-receipt'); }
+    if (value.type === ASSESSMENT_ENRICH) {
+      keys(value.learningEnrichment, ['followupIds', 'remaining', 'intentsSha256', 'operations'], [], 'unsupported-command-receipt');
+      const proof = value.learningEnrichment;
+      insist(Array.isArray(proof.followupIds) && proof.followupIds.length > 0 && proof.followupIds.length <= 20 &&
+        proof.followupIds.every(id) && new Set(proof.followupIds).size === proof.followupIds.length &&
+        Number.isSafeInteger(proof.remaining) && proof.remaining >= 0 && proof.remaining <= 1000 &&
+        /^[a-f0-9]{64}$/u.test(proof.intentsSha256) && Array.isArray(proof.operations) && proof.operations.length === proof.followupIds.length,
+      'unsupported-command-receipt');
+      noteRefs(proof.operations);
+    }
+    if (value.type === ASSESSMENT_RECONCILE) {
+      keys(value.assessmentReconciliation, ['sourceDigest', 'projectionDigest'], [], 'unsupported-command-receipt');
+      insist(Object.values(value.assessmentReconciliation).every((part) => typeof part === 'string' && /^[a-f0-9]{64}$/u.test(part)), 'unsupported-command-receipt');
+    }
     if (value.type === SOURCE_REFERENCE) sourceReferenceEvidence(value.sourceReference);
     return value;
   }
@@ -425,11 +468,20 @@ class RecordHost {
     const readingViews = readReadingViews(snapshot.replica);
     const sourceReferenceViews = readSourceReferenceViews(snapshot.replica);
     const examAttemptViews = readExamAttemptViews(snapshot.replica);
-    return { snapshot, record, archive, receipts, noteViews, readingViews, sourceReferenceViews, examAttemptViews, outcome: result };
+    let assessmentViews;
+    if (record.assessmentReceived != null || snapshot.replica.operations.some((operation) => operation.v === 2)) {
+      const { assessmentReceivedViews, assessmentReconciliationSummary, parseAssessmentReceived } = await import('./assessment-received.mjs');
+      this.#guard(captured);
+      if (record.assessmentReceived != null) parseAssessmentReceived(record.assessmentReceived, scopeOf(this.#binding));
+      const views = assessmentReceivedViews(snapshot);
+      assessmentViews = { assessmentResultViewsV2: views.results, assessmentLearningViewsV2: views.learning,
+        assessmentReconciliation: assessmentReconciliationSummary(record, views) };
+    }
+    return { snapshot, record, archive, receipts, noteViews, readingViews, sourceReferenceViews, examAttemptViews, assessmentViews, outcome: result };
   }
   #view(state) {
     return copy({ identity: scopeOf(this.#binding), revision: state.snapshot.revision, record: state.record,
-      archive: state.archive, noteViews: state.noteViews, readingViews: state.readingViews, sourceReferenceViews: state.sourceReferenceViews, examAttemptViews: state.examAttemptViews, runtimeLabel: state.snapshot.runtimeLabel });
+      archive: state.archive, noteViews: state.noteViews, readingViews: state.readingViews, sourceReferenceViews: state.sourceReferenceViews, examAttemptViews: state.examAttemptViews, ...(state.assessmentViews || {}), runtimeLabel: state.snapshot.runtimeLabel });
   }
   #publish(captured, state) {
     this.#guard(captured);
@@ -507,7 +559,7 @@ class RecordHost {
     } else if (value.type === 'host.archive/1') result = { patch: {}, appendArchive: value.input };
     else {
       const reduce = this.#reducers[value.type]; insist(typeof reduce === 'function', 'unknown-command');
-      result = copy(reduce(copy({ record: state.record, archive: state.archive }), value.input));
+      result = copy(reduce(copy({ record: state.record, archive: state.archive, revision: state.snapshot.revision }), value.input));
     }
     keys(result, ['patch'], ['appendArchive']);
     insist(plain(result.patch) && Object.keys(result.patch).every((key) => !NONPORTABLE.has(key)), 'invalid-record-patch');
@@ -600,6 +652,161 @@ class RecordHost {
         ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
     }
   }
+  async #finalizeAssessment(captured, value, state, prior) {
+    const { parseAssessmentFinalizeInput, prepareAssessmentFinalization, confirmAssessmentProof, assessmentProofCurrent } = await import('./assessment-finalization.mjs');
+    this.#guard(captured);
+    const input = parseAssessmentFinalizeInput(value.input);
+    insist(same(input.scope, scopeOf(this.#binding)), 'scope-mismatch');
+    const meta = { changeId: value.changeId, occurredAt: value.occurredAt };
+    if (prior) {
+      const proof = confirmAssessmentProof({ binding: this.#binding, snapshot: state.snapshot, meta, input, row: prior });
+      this.#publish(captured, state);
+      return copy({ ...this.#ack(prior, 'duplicate', state, proof.operations),
+        assessment: { ...proof, current: assessmentProofCurrent(state.snapshot, proof) } });
+    }
+    const request = prepareAssessmentFinalization({ binding: this.#binding, snapshot: state.snapshot,
+      meta, input, resolveSubject: this.#assessmentSubjectResolver, resolvePresentation: this.#assessmentPresentationResolver });
+    const row = request.mutations[2].value;
+    this.#validate(request.mutations[0].value, request.mutations[1].value);
+    let receipt;
+    try {
+      this.#guard(captured);
+      const outcome = await this.#controller.commitLocal(request);
+      receipt = outcome.receipt || outcome.targetReceipt;
+      this.#guard(captured);
+      if (outcome.status !== 'active') return this.#block({ ...outcome, changeId: value.changeId });
+      insist(receipt && receipt.committedRevision === row.committedRevision &&
+        same(receipt.operations, row.assessment.operations), 'assessment-receipt-mismatch');
+      const current = await this.#read(captured);
+      if (current.outcome.status !== 'active') return this.#block({ ...current.outcome,
+        changeId: value.changeId, targetCommitDurable: true, targetReceipt: receipt });
+      insist(same(current.receipts.get(value.changeId), row) && digest(current.record) === row.recordSha256 &&
+        digest(current.archive) === row.archiveSha256, 'assessment-result-superseded');
+      const proof = confirmAssessmentProof({ binding: this.#binding, snapshot: current.snapshot, meta, input, row });
+      insist(assessmentProofCurrent(current.snapshot, proof), 'assessment-result-superseded');
+      this.#publish(captured, current);
+      return copy({ ...this.#ack(row, receipt.outcome === 'duplicate' ? 'duplicate' : 'committed', current, proof.operations),
+        assessment: { ...proof, current: true } });
+    } catch (error) {
+      return this.#failure(error, { changeId: value.changeId,
+        ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
+    }
+  }
+  async #suppressAssessment(captured, value, state, prior) {
+    const { parseAssessmentSuppressionInput, prepareAssessmentSuppression, confirmAssessmentSuppression } = await import('./assessment-finalization.mjs');
+    this.#guard(captured);
+    const input = parseAssessmentSuppressionInput(value.input);
+    insist(same(input.scope, scopeOf(this.#binding)), 'scope-mismatch');
+    const meta = { changeId: value.changeId, occurredAt: value.occurredAt };
+    if (prior) {
+      const proof = confirmAssessmentSuppression({ binding: this.#binding, snapshot: state.snapshot, meta, input, row: prior });
+      this.#publish(captured, state);
+      return copy({ ...this.#ack(prior, 'duplicate', state, proof.operations), learningSuppression: proof });
+    }
+    const request = prepareAssessmentSuppression({ binding: this.#binding, snapshot: state.snapshot, meta, input });
+    const row = request.mutations[2].value;
+    this.#validate(request.mutations[0].value, request.mutations[1].value);
+    let receipt;
+    try {
+      this.#guard(captured);
+      const outcome = await this.#controller.commitLocal(request);
+      receipt = outcome.receipt || outcome.targetReceipt;
+      this.#guard(captured);
+      if (outcome.status !== 'active') return this.#block({ ...outcome, changeId: value.changeId });
+      insist(receipt && receipt.committedRevision === row.committedRevision &&
+        same(receipt.operations, row.learningSuppression.operations), 'assessment-receipt-mismatch');
+      const current = await this.#read(captured);
+      if (current.outcome.status !== 'active') return this.#block({ ...current.outcome,
+        changeId: value.changeId, targetCommitDurable: true, targetReceipt: receipt });
+      insist(same(current.receipts.get(value.changeId), row) && digest(current.record) === row.recordSha256 &&
+        digest(current.archive) === row.archiveSha256, 'assessment-result-superseded');
+      const proof = confirmAssessmentSuppression({ binding: this.#binding, snapshot: current.snapshot, meta, input, row });
+      this.#publish(captured, current);
+      return copy({ ...this.#ack(row, receipt.outcome === 'duplicate' ? 'duplicate' : 'committed', current, proof.operations), learningSuppression: proof });
+    } catch (error) {
+      return this.#failure(error, { changeId: value.changeId,
+        ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
+    }
+  }
+  async #enrichAssessment(captured, value, state, prior) {
+    const { parseAssessmentEnrichmentInput, prepareAssessmentEnrichment, confirmAssessmentEnrichment } = await import('./assessment-enrichment.mjs');
+    this.#guard(captured);
+    const input = parseAssessmentEnrichmentInput(value.input);
+    insist(same(input.scope, scopeOf(this.#binding)), 'scope-mismatch');
+    const meta = { changeId: value.changeId, occurredAt: value.occurredAt };
+    if (prior) {
+      const proof = confirmAssessmentEnrichment({ binding: this.#binding, snapshot: state.snapshot, meta, input, row: prior });
+      this.#publish(captured, state);
+      return copy({ ...this.#ack(prior, 'duplicate', state, proof.operations), learningEnrichment: proof });
+    }
+    const request = prepareAssessmentEnrichment({ binding: this.#binding, snapshot: state.snapshot, meta, input, resolveSubject: this.#assessmentSubjectResolver, resolvePresentation: this.#assessmentPresentationResolver });
+    if (!request) {
+      this.#publish(captured, state);
+      return copy({ status: 'active', snapshot: this.#view(state), replayUiEffects: false, learningEnrichment: null });
+    }
+    const row = request.mutations[2].value;
+    this.#validate(request.mutations[0].value, request.mutations[1].value);
+    let receipt;
+    try {
+      this.#guard(captured);
+      const outcome = await this.#controller.commitLocal(request);
+      receipt = outcome.receipt || outcome.targetReceipt;
+      this.#guard(captured);
+      if (outcome.status !== 'active') return this.#block({ ...outcome, changeId: value.changeId });
+      insist(receipt && receipt.committedRevision === row.committedRevision &&
+        same(receipt.operations, row.learningEnrichment.operations), 'assessment-receipt-mismatch');
+      const current = await this.#read(captured);
+      if (current.outcome.status !== 'active') return this.#block({ ...current.outcome,
+        changeId: value.changeId, targetCommitDurable: true, targetReceipt: receipt });
+      insist(same(current.receipts.get(value.changeId), row) && digest(current.record) === row.recordSha256 &&
+        digest(current.archive) === row.archiveSha256, 'assessment-result-superseded');
+      const proof = confirmAssessmentEnrichment({ binding: this.#binding, snapshot: current.snapshot, meta, input, row });
+      this.#publish(captured, current);
+      return copy({ ...this.#ack(row, receipt.outcome === 'duplicate' ? 'duplicate' : 'committed', current, proof.operations), learningEnrichment: proof });
+    } catch (error) {
+      return this.#failure(error, { changeId: value.changeId,
+        ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
+    }
+  }
+  async #reconcileAssessments(captured, value, state, prior) {
+    keys(value.input, []);
+    if (prior) {
+      this.#publish(captured, state);
+      return copy({ ...this.#ack(prior, 'duplicate', state), assessmentReconciliation: state.assessmentViews?.assessmentReconciliation || null });
+    }
+    const { prepareAssessmentReconciliation } = await import('./assessment-received.mjs');
+    this.#guard(captured);
+    const request = prepareAssessmentReconciliation({ binding: this.#binding, snapshot: state.snapshot,
+      meta: { changeId: value.changeId, occurredAt: value.occurredAt },
+      resolveForm: this.#assessmentFormResolver, resolveSubject: this.#assessmentSubjectResolver, resolvePresentation: this.#assessmentPresentationResolver });
+    if (!request) {
+      this.#publish(captured, state);
+      return copy({ status: 'active', snapshot: this.#view(state), replayUiEffects: false,
+        assessmentReconciliation: state.assessmentViews?.assessmentReconciliation || null });
+    }
+    const row = request.mutations[2].value;
+    this.#validate(request.mutations[0].value, request.mutations[1].value);
+    let receipt;
+    try {
+      this.#guard(captured);
+      const outcome = await this.#controller.commitLocal(request);
+      receipt = outcome.receipt || outcome.targetReceipt;
+      this.#guard(captured);
+      if (outcome.status !== 'active') return this.#block({ ...outcome, changeId: value.changeId });
+      insist(receipt && receipt.committedRevision === row.committedRevision && !receipt.operations.length, 'assessment-receipt-mismatch');
+      const current = await this.#read(captured);
+      if (current.outcome.status !== 'active') return this.#block({ ...current.outcome,
+        changeId: value.changeId, targetCommitDurable: true, targetReceipt: receipt });
+      insist(same(current.receipts.get(value.changeId), row) && digest(current.record) === row.recordSha256 &&
+        digest(current.archive) === row.archiveSha256, 'assessment-result-superseded');
+      this.#publish(captured, current);
+      return copy({ ...this.#ack(row, receipt.outcome === 'duplicate' ? 'duplicate' : 'committed', current),
+        assessmentReconciliation: current.assessmentViews?.assessmentReconciliation || null });
+    } catch (error) {
+      return this.#failure(error, { changeId: value.changeId,
+        ...(receipt ? { targetCommitDurable: true, targetReceipt: receipt } : {}) });
+    }
+  }
   #confirmSourceReference(value, row, state) {
     const proof = row.sourceReference, intent = sourceReferenceIntent(value.input);
     const operation = state.snapshot.replica.operations.find((entry) => entry.opId === proof.operation.opId);
@@ -669,6 +876,10 @@ class RecordHost {
     const prior = state.receipts.get(value.changeId);
     if (prior) insist(prior.commandSha256 === fingerprint && prior.type === value.type && prior.occurredAt === value.occurredAt, 'command-id-conflict');
     if (value.type === PRACTICE_FINALIZE) return this.#finalizePractice(captured, value, state, fingerprint, prior);
+    if (value.type === ASSESSMENT_FINALIZE) return this.#finalizeAssessment(captured, value, state, prior);
+    if (value.type === ASSESSMENT_SUPPRESS) return this.#suppressAssessment(captured, value, state, prior);
+    if (value.type === ASSESSMENT_RECONCILE) return this.#reconcileAssessments(captured, value, state, prior);
+    if (value.type === ASSESSMENT_ENRICH) return this.#enrichAssessment(captured, value, state, prior);
     if (value.type === SOURCE_REFERENCE) return this.#captureSourceReference(captured, value, state, fingerprint, prior);
     const noteIntents = value.type === READING_RESUME ? [readingResumeIntent(state.snapshot, value.input, !!prior)] :
       value.type === NOTE_RESTORE_ORIGINAL ? restoreOriginalIntents(this.#binding, value, state, !!prior) :
@@ -751,6 +962,19 @@ class RecordHost {
     try { return this.dispatch(baseCommand(raw, PRACTICE_FINALIZE, practiceInput(input))); }
     catch (error) { return Promise.reject(error); }
   }
+  finalizeAssessment(raw, input) {
+    try { return this.dispatch(baseCommand(raw, ASSESSMENT_FINALIZE, copy(input))); }
+    catch (error) { return Promise.reject(error); }
+  }
+  suppressAssessmentLearning(raw, input) {
+    try { return this.dispatch(baseCommand(raw, ASSESSMENT_SUPPRESS, copy(input))); }
+    catch (error) { return Promise.reject(error); }
+  }
+  reconcileReceivedAssessments(raw) { return this.dispatch(baseCommand(raw, ASSESSMENT_RECONCILE, {})); }
+  enrichAssessmentLearning(raw, input) {
+    try { return this.dispatch(baseCommand(raw, ASSESSMENT_ENRICH, copy(input))); }
+    catch (error) { return Promise.reject(error); }
+  }
   appendObservations(raw, rows) { return this.dispatch(baseCommand(raw, 'host.observations/1', rows)); }
   appendArchive(raw, turns) { return this.dispatch(baseCommand(raw, 'host.archive/1', turns)); }
   createNote(raw, input) {
@@ -809,7 +1033,10 @@ class RecordHost {
 export async function createRecordHost(options) {
   insist(plain(options) && plain(options.writer) && typeof options.writer.capture === 'function' && typeof options.writer.assert === 'function' &&
     options.controller && typeof options.controller.snapshot === 'function' && typeof options.controller.commitLocal === 'function' &&
-    typeof options.validateRecord === 'function' && typeof options.validateArchive === 'function', 'invalid-options');
+    typeof options.validateRecord === 'function' && typeof options.validateArchive === 'function' &&
+    (options.assessmentSubjectResolver === undefined || typeof options.assessmentSubjectResolver === 'function') &&
+    (options.assessmentFormResolver === undefined || typeof options.assessmentFormResolver === 'function') &&
+    (options.assessmentPresentationResolver === undefined || typeof options.assessmentPresentationResolver === 'function'), 'invalid-options');
   const binding = copy(options.binding);
   keys(binding, ['accountId', 'learnerId', 'sessionId'], [], 'invalid-binding');
   insist(Object.values(binding).every(id), 'invalid-binding');

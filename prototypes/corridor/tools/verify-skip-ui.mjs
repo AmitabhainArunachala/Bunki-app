@@ -75,7 +75,9 @@ try {
   await page.getByRole('button', { name: '字引 find a kanji by shape' }).click();
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-hit').first().waitFor();
-  check('lens preserves heading and old lenses', await page.locator('h1').innerText() === '字引' && await page.locator('.kdx-lens').count() === 6);
+  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === '字引' &&
+    JSON.stringify(await page.locator('.kdx-lens .l-ja').allTextContents()) ===
+      JSON.stringify(['部品', 'SKIP', '手書き', '音訓', '意味', '画数', '部首', '頻度', '漢検', 'Kodansha']));
   await page.locator('.skip-hit').first().click();
   await page.locator('#sheet-search').click();
   await query('１－３－８');

@@ -82,9 +82,9 @@ async function submit(page, backup) {
   await tray(page);
   await page.locator('#import-file').setInputFiles({ name: 'synthetic-full-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
 }
-async function failedImport(page) {
-  await page.waitForFunction(() => [...document.querySelectorAll('.airead-note')]
-    .some((node) => node.getClientRects().length > 0 && /Import could not finish/u.test(node.textContent)));
+async function failedImport(page, expected = 'Import could not finish') {
+  await page.waitForFunction((message) => [...document.querySelectorAll('.airead-note')]
+    .some((node) => node.getClientRects().length > 0 && node.textContent.includes(message)), expected);
 }
 async function exported(page, directory) {
   await tray(page);
@@ -184,7 +184,7 @@ try {
         await tray(page);
         const before = await readAppRecordSnapshot(page);
         await submit(page, createAppBackupFixture(initial.record, archive, old));
-        await failedImport(page);
+        await failedImport(page, kind === 'foreign-scope' ? 'This backup belongs to a different learner.' : 'Import could not finish');
         assert.deepEqual(await readAppRecordSnapshot(page), before);
       });
       for (const mode of ['quota', 'abort']) await test(`${mode}-ui-restore-rolls-back-documents-journal-and-outbox-together`, async ({ page }) => {
