@@ -5,6 +5,13 @@
   const SCHEMA = 'bunki.maintenance/v1';
   const DB_NAME = 'bunki-maintenance-reports-v1';
   const DEFAULT_LIMITS = { attachment_bytes: 2097152, attachment_count: 4, total_attachment_bytes: 6291456 };
+  // Service config reaches innerHTML; only bounded integers may pass (a hostile
+  // or broken service cannot inject markup through a limit).
+  const LIMIT_CAPS = { attachment_bytes: 67108864, attachment_count: 32, total_attachment_bytes: 268435456 };
+  const boundedLimits = (raw) => Object.fromEntries(Object.entries(DEFAULT_LIMITS).map(([key, fallback]) => {
+    const value = raw?.[key];
+    return [key, Number.isSafeInteger(value) && value >= 0 && value <= LIMIT_CAPS[key] ? value : fallback];
+  }));
   const STATUS = { received: 'Received', looking_into_it: 'Looking into it', preparing_fix: 'Preparing a fix', ready_for_review: 'Ready for review' };
   const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   // Contract lengths count Unicode codepoints. UTF-16 slicing can split an emoji.
@@ -45,11 +52,15 @@
     root.innerHTML = `<div class="br-rail" aria-label="Report support"><button type="button" data-br="open">Report a problem</button><button type="button" data-br="reports">My reports <span class="br-count"></span></button></div>
       <dialog class="br-sheet" aria-labelledby="br-title"><header class="br-heading"><h2 id="br-title">Report a problem</h2><button type="button" class="br-close" data-br="close" aria-label="Close reports and return to learning">Close</button></header><nav class="br-nav" aria-label="Reports"><button type="button" data-br="new" aria-current="page">Report a problem</button><button type="button" data-br="list">My reports</button></nav><div class="br-body"></div></dialog><div class="br-sr" role="status" aria-live="polite" id="br-live"></div>`;
     document.body.append(root);
+    // A host that supplies its own in-flow entries (openReport/openReports) mounts
+    // with rail:false: no overlay may ever sit over its controls.
+    const railless = options.rail === false;
+    if (railless) root.querySelector('.br-rail').style.display = 'none';
     const dialog = root.querySelector('dialog'), body = root.querySelector('.br-body');
     // Native top-layer modals make even high-z-index siblings inert. Keep the
     // report entry inside the active host dialog, without taking over its UI.
     function keepEntryReachable() {
-      if (disposed || dialog.open) return;
+      if (disposed || dialog.open || railless) return;
       const hostDialogs = [...document.querySelectorAll('dialog[open]')].filter(item => item !== dialog && !root.contains(item));
       const focusedHost = document.activeElement?.closest('dialog[open]');
       const destination = hostDialogs.includes(focusedHost) ? focusedHost : hostDialogs[hostDialogs.length - 1] || document.body;
@@ -308,7 +319,7 @@
       body.scrollTop = scroll;
     }
     function newMarkup() {
-      const limits = { ...DEFAULT_LIMITS, ...config?.limits };
+      const limits = boundedLimits(config?.limits);
       return `${notice()}<p>Tell us what happened. Your place in the lesson stays here.</p>${options.clockNotice ? `<p class="br-note">${esc(typeof options.clockNotice === 'function' ? options.clockNotice() : options.clockNotice)}</p>` : ''}
         ${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}<form id="br-form"><label class="br-field"><span>What happened?</span><textarea id="br-actual" name="actual" required maxlength="12000" rows="4" placeholder="Which sentence or control was involved?">${esc(draft?.actual)}</textarea></label>
         <label class="br-field"><span>What did you expect? <small>Optional</small></span><textarea id="br-expected" name="expected" maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
@@ -364,7 +375,7 @@
     async function addFiles(files) {
       if (attachmentBusy || busy) return;
       attachmentBusy = true;
-      const limits = { ...DEFAULT_LIMITS, ...config?.limits };
+      const limits = boundedLimits(config?.limits);
       try {
         const selected = [...files];
         if (draft.attachments.length + selected.length > limits.attachment_count) throw new Error(`Choose at most ${limits.attachment_count} screenshots.`);
