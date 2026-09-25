@@ -8,7 +8,7 @@
    loadAssessmentCatalog, startAssessmentRoom, currentAssessmentV2, applyAssessmentV2,
    toggleTaken, commitStorePatch, publishRecordSnapshot, reconcileAssessmentResults,
    resolveTeacherSource, assertLearningSource, enrichAssessmentCards, assessmentV2Notice,
-   allAssessmentEvidence, assessmentReviewContext, startReview, render */
+   allAssessmentEvidence, assessmentReviewContext, startReview, render, captureRetryRoute, assessmentV2Pending */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -17,7 +17,9 @@ import { extname, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const evidence = resolveCorridorEvidence();
 const site = resolveCorridorSite();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
@@ -29,7 +31,7 @@ const exposed = ['S', 'D', 'recordApp', 'recordController', 'recordInstallation'
   'loadAssessmentCatalog', 'startAssessmentRoom', 'currentAssessmentV2', 'applyAssessmentV2',
   'toggleTaken', 'commitStorePatch', 'publishRecordSnapshot', 'reconcileAssessmentResults',
   'resolveTeacherSource', 'assertLearningSource', 'enrichAssessmentCards', 'assessmentV2Notice', 'allAssessmentEvidence',
-  'assessmentReviewContext', 'startReview', 'render', 'openAssessmentSensei'];
+  'assessmentReviewContext', 'startReview', 'render', 'openAssessmentSensei', 'captureRetryRoute', 'assessmentV2Pending'];
 const corridorSource = readFileSync(resolve(site, 'corridor.js'));
 const gradeDiagnostics = process.env.KAIRO_GRADE_DIAGNOSTICS === '1';
 // Diagnostic wrappers are served only by this fixture. They observe the real
@@ -164,6 +166,147 @@ const server = createServer((request, response) => {
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
 const results = [], failures = [], diagnostics = [];
+const assessmentRetryEvidence = [], retryPages = new WeakMap();
+const RETRY_LOCK = 'kairo-record:kairo-corridor-v1:kairo-ai-log', RETRY_KEY = 'kairo-retry-route-v1';
+// AR1/AR2 only: native requests/queries pass through. AR2 deliberately holds a later query
+// result until this document unloads; it never invents a free snapshot or changes visibility.
+function installAssessmentRetryProbe({ origin, lock }) {
+  if (location.origin !== origin || window.top !== window) return;
+  const rawRequest = navigator.locks.request.bind(navigator.locks), rawQuery = navigator.locks.query.bind(navigator.locks);
+  const p = window.__assessmentRetry = { docId: crypto.randomUUID(), rawRequest, rawQuery,
+    requests: [], queries: [], defer: false, unhandled: [] };
+  addEventListener('unhandledrejection', event => p.unhandled.push(String(event.reason?.message || event.reason)));
+  navigator.locks.request = function (name, ...args) {
+    const options = args.length > 1 ? args[0] : {}, callback = args.at(-1);
+    const row = { name, mode: options.mode || 'exclusive', ifAvailable: options.ifAvailable === true,
+      steal: options.steal === true, signal: options.signal !== undefined, queriesBefore: p.queries.length, granted: null };
+    p.requests.push(row);
+    args[args.length - 1] = function (value) { row.granted = !!value; return callback.call(this, value); };
+    return rawRequest(name, ...args);
+  };
+  navigator.locks.query = async function () {
+    const row = { delivered: false, deferred: false, free: null }; p.queries.push(row);
+    const snapshot = await rawQuery();
+    row.free = ![...snapshot.held, ...snapshot.pending].some(entry => entry.name === lock);
+    if (p.defer) { row.deferred = true; await new Promise(() => {}); }
+    row.delivered = true; return snapshot;
+  };
+}
+async function trackAssessmentRetry(page, proof, role) {
+  const trace = { role, loads: [], errors: [] }, requests = new WeakMap();
+  retryPages.set(page, trace); proof.pages.push(trace);
+  page.on('pageerror', error => trace.errors.push(error.message));
+  page.on('crash', () => trace.errors.push('renderer crashed'));
+  page.on('request', request => {
+    if (request.frame() !== page.mainFrame()) return;
+    if (request.isNavigationRequest()) trace.loads.push({ url: request.url(), docId: null, scripts: [] });
+    if (new URL(request.url()).pathname !== '/corridor.js' || request.resourceType() !== 'script') return;
+    const row = { url: request.url(), status: 'pending', sha256: null };
+    trace.loads.at(-1).scripts.push(row); requests.set(request, row);
+  });
+  page.on('response', response => {
+    const row = requests.get(response.request()); if (!row) return;
+    void response.body().then(bytes => { row.sha256 = sha(bytes); row.status = 'read'; },
+      error => { row.status = 'unavailable'; row.error = String(error); });
+  });
+  await page.addInitScript(installAssessmentRetryProbe, { origin, lock: RETRY_LOCK });
+}
+async function retryState(page) {
+  const state = await page.evaluate(async ({ lock, key }) => {
+    const p = window.__assessmentRetry, self = `assessment-retry-self:${crypto.randomUUID()}`;
+    const clientId = await p.rawRequest(self, { mode: 'exclusive' }, async () =>
+      (await p.rawQuery()).held.find(row => row.name === self)?.clientId);
+    const native = await p.rawQuery(), named = rows => rows.filter(row => row.name === lock).map(row => row.clientId).sort();
+    return { docId: p.docId, clientId, requests: p.requests.filter(row => row.name === lock), queries: p.queries,
+      held: named(native.held), pending: named(native.pending), unhandled: p.unhandled,
+      writable: typeof recordWritable === 'function' && recordWritable(), view: typeof S === 'undefined' ? null : S.view,
+      offer: document.getElementById('record-hint')?.hidden === false, route: sessionStorage.getItem(key),
+      attempt: document.querySelector('#app main')?.dataset.examAttempt || null,
+      openItems: [...document.querySelectorAll('details[data-exam-item][open]')].map(node => node.dataset.examItem),
+      protectedAnswers: document.querySelectorAll('details[data-exam-item], .exam-rationale').length };
+  }, { lock: RETRY_LOCK, key: RETRY_KEY });
+  assert(typeof state.clientId === 'string' && state.clientId.length > 0, 'native client identity is required');
+  assert.deepEqual(state.unhandled, []); return state;
+}
+async function waitRetryBoot(page, previous = null) {
+  await page.waitForFunction(old => document.body.dataset.ready === '1' && window.__assessmentRetry && window.__assessmentRetry.docId !== old,
+    previous, { timeout: 60_000 });
+  const load = retryPages.get(page).loads.at(-1), deadline = Date.now() + 10_000;
+  while (load.scripts.some(row => row.status === 'pending') && Date.now() < deadline) await page.waitForTimeout(25);
+  assert.equal(load.scripts.length, 1, 'exactly one required script response per app document');
+  assert.equal(load.scripts[0].status, 'read', 'unreadable required response is inconclusive');
+  assert.equal(load.scripts[0].sha256, sha(corridorFixture));
+  const state = await retryState(page); assert.notEqual(state.docId, previous); load.docId = state.docId; return state;
+}
+function requireRetryAuthority(state, ownerId, writable) {
+  assert.equal(state.requests.length, 1, 'only the boot may request the record lock');
+  assert.deepEqual(state.requests[0], { name: RETRY_LOCK, mode: 'exclusive', ifAvailable: true,
+    steal: false, signal: false, queriesBefore: 0, granted: writable });
+  assert.deepEqual(state.held, [ownerId]); assert.deepEqual(state.pending, []);
+  assert.equal(state.writable, writable);
+  if (writable) assert.equal(state.clientId, ownerId); else assert.notEqual(state.clientId, ownerId);
+}
+async function retryNative(page, proof, label) {
+  const snapshot = await readAppRecordSnapshot(page);
+  snapshot.bindingText = await page.evaluate(() => localStorage.getItem('kairo-local-record-binding-v1'));
+  proof.snapshots.push({ label, snapshot }); return snapshot;
+}
+function terminalRetryProjection(snapshot) {
+  return { installation: snapshot.installation, bindingText: snapshot.bindingText,
+    roots: Object.fromEntries(['assessmentLibraryV2', 'assessmentLearning', 'assessmentQuestionPractice', 'taken', 'srs', 'revlog']
+      .filter(key => Object.hasOwn(snapshot.record, key)).map(key => [key, snapshot.record[key]])),
+    operations: snapshot.rows.filter(row => row.kind === 'operation').sort((a, b) => a.id.localeCompare(b.id)) };
+}
+async function retryCheckpoint(page, proof, label, baseline) {
+  const state = await retryState(page); proof.steps.push({ label, state });
+  assert.deepEqual(terminalRetryProjection(await retryNative(page, proof, label)), terminalRetryProjection(baseline),
+    `${label}: no durable terminal assessment/review change`); return state;
+}
+async function genuineRetryOffer(page, docId) {
+  await page.waitForFunction(id => window.__assessmentRetry?.docId === id && document.visibilityState === 'visible'
+    && document.getElementById('record-hint')?.hidden === false
+    && window.__assessmentRetry.queries.some(row => row.delivered && row.free), docId, { timeout: 6000 });
+  const state = await retryState(page); assert.equal(state.docId, docId);
+  assert.equal(state.requests.length, 1); assert.equal(state.requests[0].granted, false); assert.equal(state.writable, false);
+  assert.deepEqual(state.held, []); assert.deepEqual(state.pending, []); return state;
+}
+async function clickAssessmentRetry(page, previous) {
+  const before = await retryState(page); assert.equal(before.docId, previous, 'same document immediately before retry');
+  assert.equal(before.requests.length, 1); assert.equal(before.writable, false);
+  assert(!before.held.includes(before.clientId)); assert(!before.pending.includes(before.clientId));
+  await page.locator('#record-hint-retry').waitFor({ state: 'visible', timeout: 6000 });
+  await Promise.all([page.waitForEvent('load', { timeout: 60_000 }), page.locator('#record-hint-retry').click()]);
+  return waitRetryBoot(page, previous);
+}
+async function terminalRetryFixture(page, proof, withItem) {
+  await page.locator('#mock-link').click();
+  const attemptId = await page.evaluate(async () => {
+    const catalog = await loadAssessmentCatalog();
+    if (!await startAssessmentRoom(catalog.entries.find(row => row.id === 'question-app:form'), 'timed')) throw new Error('AR fixture start');
+    for (const item of currentAssessmentV2().form.items) {
+      if (!await applyAssessmentV2({ kind: 'visit', itemId: item.id }) || !await applyAssessmentV2({ kind: 'answer', itemId: item.id,
+        response: { kind: 'selected', optionId: 'b' } })) throw new Error('AR fixture answer');
+    }
+    if (!await applyAssessmentV2({ kind: 'submit' })) throw new Error('AR fixture submit');
+    await reconcileAssessmentResults(); return currentAssessmentV2().attempt.attemptId;
+  });
+  await page.waitForFunction(id => document.querySelector('#app main')?.dataset.examAttempt === id, attemptId);
+  if (withItem) await page.locator('details[data-exam-item="question-app:item-2"] > summary').click();
+  assert.deepEqual((await retryState(page)).openItems, withItem ? ['question-app:item-2'] : []);
+  const route = await page.evaluate(() => captureRetryRoute());
+  assert.deepEqual(route, { v: 1, view: 'mock', ts: route.ts, attemptId, ...(withItem ? { itemId: 'question-app:item-2' } : {}) });
+  assert(Number.isFinite(route.ts)); proof.seed = { kind: 'captured-owner-route-copied-once-to-blocked-tab', route };
+  await page.locator('#exam-done').click();
+  await waitForAppRecord(page, record => record.assessmentLibraryV2?.activeAttemptId === null);
+  await page.waitForFunction(() => !assessmentV2Pending && !recordApp.pending);
+  const baseline = await retryNative(page, proof, 'terminal-setup-after-dismissal');
+  assert.equal(baseline.record.assessmentLibraryV2.activeAttemptId, null, 'target must not be the default result');
+  assert.equal(baseline.record.assessmentLibraryV2.attempts.find(row => row.attemptId === attemptId)?.status, 'submitted');
+  assert.equal(baseline.record.assessmentLibraryV2.forms.find(row => row.id === questionForm.id)?.sha256, questionForm.sha256);
+  assert(baseline.rows.some(row => row.kind === 'operation')); assert.equal((await retryState(page)).attempt, null);
+  assert(!baseline.record.assessmentLearning?.followups.some(row => row.status === 'pending-mapping'));
+  return { route, baseline };
+}
 const engines = process.env.KAIRO_BROWSER === 'all' ? ['chromium', 'webkit'] : [process.env.KAIRO_BROWSER || 'chromium'];
 async function boot(page) {
   await page.goto(`${origin}/?entry=shelf&ui=bi`);
@@ -223,7 +366,7 @@ async function receive(page, mappedWord = false) {
   }, { form, entry, mappedWord });
 }
 const caseFilter = process.argv.find(arg => arg.startsWith('--case='))?.slice(7);
-async function run(engine, name, body) {
+async function run(engine, name, body, { assessmentRetry = false } = {}) {
   if (caseFilter && !name.includes(caseFilter)) return;
   // This WebKit runtime's ephemeral context loses CacheStorage on navigation.
   // An isolated durable profile exercises the actual reload/offline contract.
@@ -231,11 +374,26 @@ async function run(engine, name, body) {
   const context = await ({ chromium, webkit }[engine]).launchPersistentContext(profile, { headless: true });
   const page = context.pages()[0] || await context.newPage();
   const pageErrors = []; page.on('pageerror', error => pageErrors.push(error.message));
+  const proof = assessmentRetry ? { engine, browserVersion: context.browser()?.version() || null,
+    name, status: 'running', pages: [], steps: [], snapshots: [] } : null;
+  if (proof) assessmentRetryEvidence.push(proof);
   try {
-    await boot(page); await body(page, context);
+    if (proof) await trackAssessmentRetry(page, proof, 'A');
+    await boot(page); if (proof) await waitRetryBoot(page);
+    await body(page, context, proof);
+    if (proof) {
+      assert.deepEqual(proof.pages.flatMap(page => page.errors), []);
+      for (const page of proof.pages) for (const load of page.loads) {
+        if (!['/', '/index.html'].includes(new URL(load.url).pathname)) continue;
+        assert(load.docId, 'unverified app document'); assert.equal(load.scripts.length, 1);
+        assert.equal(load.scripts[0].status, 'read'); assert.equal(load.scripts[0].sha256, sha(corridorFixture));
+      }
+    }
     assert.deepEqual(pageErrors, []); results.push({ engine, name, passes: true });
+    if (proof) proof.status = 'passed';
     console.log(`PASS ${engine}/${name}`);
   } catch (error) {
+    if (proof) { proof.status = 'failed'; proof.error = String(error); }
     const state = await page.evaluate(() => ({ text: document.body.innerText.slice(0, 5000),
       error: typeof S === 'undefined' ? null : S.storeError, notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice,
       writable: typeof recordWritable === 'function' && recordWritable(),
@@ -642,7 +800,7 @@ try {
       await run(engine, 'retry-route-restores-a-result-with-no-question-open', async page => {
         const attemptId = await submittedAttempt(page);
         await writeRoute(page, { view: 'mock', attemptId });
-        await page.reload(); await boot(page);
+        await page.reload(); await readyAgain(page);
         await page.waitForFunction(id => document.querySelector('#app main')?.dataset.examAttempt === id, attemptId, { timeout: 10_000 });
         const at = await place(page);
         assert.equal(at.view, 'mock'); assert.equal(at.open, 0, 'no question is forced open'); assert.equal(at.route, null, 'a restored route is spent');
@@ -685,13 +843,64 @@ try {
         assert.equal(at.view, 'mock', 'the retry returns to the room the learner chose');
         assert.notEqual(at.attempt, attemptId, `not to the old result: ${JSON.stringify(at)}`);
       });
+      // A seeded retained-route input is explicit; every later transition uses the real hint retry.
+      // AR3–AR5 (nonmember/deleted/protected targets) remain pending, not implied by these positives.
+      for (const withItem of [true, false]) await run(engine, withItem ? 'AR1-retry-exact-item' : 'AR2-retry-retained-result', async (a, context, proof) => {
+        const { route, baseline } = await terminalRetryFixture(a, proof, withItem);
+        const owner = await retryCheckpoint(a, proof, 'owner-ready', baseline); requireRetryAuthority(owner, owner.clientId, true);
+        const holder = withItem ? null : await context.newPage();
+        if (holder) { await trackAssessmentRetry(holder, proof, 'H'); await holder.goto(`${origin}/fonts.css`); }
+        const b = await context.newPage(); await trackAssessmentRetry(b, proof, 'B');
+        await b.goto(`${origin}/fonts.css`);
+        await b.evaluate(({ key, route }) => sessionStorage.setItem(key, JSON.stringify(route)), { key: RETRY_KEY, route });
+        await b.goto(`${origin}/?entry=shelf&ui=bi`); await waitRetryBoot(b); await b.bringToFront();
+        const blocked = await retryCheckpoint(b, proof, 'initial-losing-boot', baseline);
+        requireRetryAuthority(blocked, owner.clientId, false); assert.equal(blocked.view, 'mock');
+        assert.deepEqual(JSON.parse(blocked.route), route); assert.equal(blocked.attempt, null); assert.equal(blocked.protectedAnswers, 0);
+        await a.close();
+        proof.steps.push({ label: 'genuine-free-offer', state: await genuineRetryOffer(b, blocked.docId) });
+        let previous = blocked.docId;
+        if (holder) {
+          await b.evaluate(() => { window.__assessmentRetry.defer = true; });
+          await holder.evaluate(lock => new Promise((granted, fail) => {
+            window.__assessmentRetry.rawRequest(lock, { mode: 'exclusive', ifAvailable: true }, grantedLock => {
+              if (!grantedLock) throw new Error('AR2 native holder prerequisite failed');
+              granted(true); return new Promise(release => { window.__releaseAssessmentHold = release; });
+            }).catch(fail);
+          }), RETRY_LOCK);
+          const heldBy = await retryState(holder);
+          proof.steps.push({ label: 'native-holder-granted', state: heldBy }); assert.deepEqual(heldBy.held, [heldBy.clientId]);
+          await b.waitForFunction(() => window.__assessmentRetry.queries.some(row => row.deferred), null, { timeout: 6000 });
+          const held = await retryCheckpoint(b, proof, 'same-document-offer-while-holder-owns', baseline);
+          assert.equal(held.docId, previous); assert(held.offer); requireRetryAuthority(held, heldBy.clientId, false);
+          const lost = await clickAssessmentRetry(b, previous); requireRetryAuthority(lost, heldBy.clientId, false);
+          assert.deepEqual(JSON.parse(lost.route), route); assert.equal(lost.attempt, null); assert.equal(lost.protectedAnswers, 0);
+          await b.waitForFunction(() => window.__assessmentRetry.queries.some(row => row.delivered && !row.free), null, { timeout: 6000 });
+          const settled = await retryCheckpoint(b, proof, 'retry-lost-to-holder', baseline); assert.equal(settled.offer, false);
+          assert.equal(settled.docId, lost.docId); requireRetryAuthority(settled, heldBy.clientId, false);
+          await holder.evaluate(() => window.__releaseAssessmentHold()); previous = lost.docId;
+          proof.steps.push({ label: 'second-genuine-free-offer', state: await genuineRetryOffer(b, previous) });
+        }
+        const won = await clickAssessmentRetry(b, previous); requireRetryAuthority(won, won.clientId, true);
+        const restored = await retryCheckpoint(b, proof, 'winning-retry-restored-target', baseline);
+        assert.equal(restored.docId, won.docId); requireRetryAuthority(restored, won.clientId, true);
+        assert.equal(restored.view, 'mock'); assert.equal(restored.attempt, route.attemptId); assert.equal(restored.route, null);
+        assert.deepEqual(restored.openItems, withItem ? ['question-app:item-2'] : []);
+      }, { assessmentRetry: true });
   }
 } finally { await new Promise(done => server.close(done)); }
-const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const receipt = { format: 'kairo-assessment-instrumented-app-verification', v: 1,
   artifactSha256: identity.artifactSha256, sourceAssetSha256: identity.sourceAssetSha256, gitSha: identity.gitSha,
   instrumentation: { path: 'corridor.js', originalSha256: sha(corridorSource), servedSha256: sha(corridorFixture), exposed, gradeDiagnostics },
   fixtures: [...fixtures].map(([path, bytes]) => ({ path, sha256: sha(bytes) })), results, failures, diagnostics,
+  assessmentRetry: { evidence: assessmentRetryEvidence, pending: ['AR3-nonmember-item', 'AR4-inaccessible-target', 'AR5-in-progress-protected-answers', 'full-remote-handoff'],
+    requiredCases: ['AR1-retry-exact-item', 'AR2-retry-retained-result'], caseFilter: caseFilter || null,
+    harnessSha256: sha(readFileSync(new URL(import.meta.url))), nodeVersion: process.version,
+    buildIdentitySha256: sha(readFileSync(resolve(site, 'build-identity.json'))),
+    nativeSupportSha256: sha(readFileSync(new URL('./record-test-support.mjs', import.meta.url))),
+    limits: ['AR1/AR2 copy one owner-captured route into a blocked tab; later retries are actual hint actions',
+      'AR2 defers a real native query result before a held retry; no visibility or lock snapshots are fabricated',
+      'native equality covers terminal assessment/review roots and operation rows, not absence of all native write calls'] },
   limits: ['test-only export shim; this is not the uninstrumented production browser battery', ...(gradeDiagnostics ? ['deleted-result cases add diagnostic promise-observation microtasks and an extra native snapshot before grading; reproduce with KAIRO_GRADE_DIAGNOSTICS unset too'] : []), 'synthetic assessment content, not editorial approval', 'offline check covers retained exact source cache; production service-worker shell lifecycle is verified separately'] };
 writeFileSync(resolve(evidence, 'assessment-app.json'), `${JSON.stringify(receipt, null, 2)}\n`);
 console.log(`Assessment app: ${results.length}/${results.length + failures.length} passed. ${resolve(evidence, 'assessment-app.json')}`);
