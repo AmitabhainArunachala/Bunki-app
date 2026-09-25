@@ -259,11 +259,10 @@ try {
   const unicodeWords = 'x'.repeat(3999) + '😀tail';
   await ownPage.locator('#br-actual').fill(unicodeWords);
   await ownPage.getByRole('button', { name: 'Send report', exact: true }).click();
-  await ownPage.waitForFunction(async () => {
-    const db = await new Promise(resolve => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); });
-    const rows = await new Promise(resolve => { const r = db.transaction('records').objectStore('records').getAll(); r.onsuccess = () => resolve(r.result); });
-    return rows[0]?.wire_text && rows[0]?.delivery_error;
-  });
+  await pollNativeState(async () => {
+    const rows = await readReportStoreRows(ownPage, 'records');
+    return Boolean(rows[0]?.wire_text && rows[0]?.delivery_error);
+  }, { timeoutMs: 30000, description: 'same-origin outbox wire text and delivery error' });
   await ownPage.waitForFunction(() => document.querySelector('.br-body').textContent.includes('Failed to fetch'));
   await ownPage.evaluate(() => window.fixture.retry());
   await ownPage.getByRole('heading', { name: 'Received', exact: true }).waitFor();
@@ -786,14 +785,57 @@ async function localState(target) {
     } finally { db.close(); }
   });
 }
-async function waitForDraftText(target, text) {
-  await target.waitForFunction(async expected => {
-    const db = await new Promise(resolve => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); });
+// Await the resolved predicate in Node. Playwright 1.63's waitForFunction truth-tests
+// an async predicate's Promise before resolution, so async false can stop its poll.
+async function pollNativeState(check, { timeoutMs, description, intervalMs = 50 }) {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || !Number.isFinite(intervalMs) || intervalMs <= 0)
+    throw new TypeError('Native-state polling requires positive finite bounds');
+  const deadline = performance.now() + timeoutMs;
+  const timeoutError = new Error(`Timed out after ${timeoutMs}ms waiting for ${description}`);
+  timeoutError.name = 'TimeoutError';
+  let deadlineTimer, intervalTimer;
+  const expired = new Promise((resolve, reject) => { deadlineTimer = setTimeout(() => reject(timeoutError), timeoutMs); });
+  try {
+    while (true) {
+      if (performance.now() >= deadline) throw timeoutError;
+      // evaluate has no Playwright timeout; bound even an evaluation that never settles.
+      const observed = await Promise.race([Promise.resolve().then(check), expired]);
+      if (performance.now() >= deadline) throw timeoutError;
+      if (observed === true) return;
+      if (observed !== false) throw new TypeError('Native-state predicate must resolve to a boolean');
+      await Promise.race([new Promise(resolve => {
+        intervalTimer = setTimeout(resolve, Math.min(intervalMs, Math.max(0, deadline - performance.now())));
+      }), expired]);
+    }
+  } finally { clearTimeout(deadlineTimer); clearTimeout(intervalTimer); }
+}
+async function readReportStoreRows(target, store) {
+  return target.evaluate(async storeName => {
+    let db;
     try {
-      const rows = await new Promise(resolve => { const r = db.transaction('meta').objectStore('meta').getAll(); r.onsuccess = () => resolve(r.result); });
-      return rows.some(row => { const value = row.value?.draft_id ? row.value.draft : row.value; return value?.actual === expected || value?.text === expected; });
-    } finally { db.close(); }
-  }, text);
+      db = await new Promise((resolve, reject) => {
+        const request = indexedDB.open('bunki-maintenance-reports-v1');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error('Report fixture database open failed'));
+      });
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const request = tx.objectStore(storeName).getAll();
+        let rows;
+        request.onsuccess = () => { rows = request.result; };
+        request.onerror = () => reject(request.error || new Error('Report fixture getAll failed'));
+        tx.onerror = () => reject(tx.error || request.error || new Error('Report fixture read transaction failed'));
+        tx.onabort = () => reject(tx.error || new Error('Report fixture read transaction aborted'));
+        tx.oncomplete = () => Array.isArray(rows) ? resolve(rows) : reject(new Error('Report fixture read returned no rows array'));
+      });
+    } finally { db?.close(); }
+  }, store);
+}
+async function waitForDraftText(target, text) {
+  await pollNativeState(async () => {
+    const rows = await readReportStoreRows(target, 'meta');
+    return rows.some(row => { const value = row.value?.draft_id ? row.value.draft : row.value; return value?.actual === text || value?.text === text; });
+  }, { timeoutMs: target === page ? 10000 : 30000, description: 'persisted report draft text' });
 }
 async function openFirstReport(target) {
   await target.evaluate(() => window.fixture.ready);
