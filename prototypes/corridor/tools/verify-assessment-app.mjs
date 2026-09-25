@@ -253,7 +253,7 @@ async function retryNative(page, proof, label) {
 }
 function terminalRetryProjection(snapshot) {
   return { installation: snapshot.installation, bindingText: snapshot.bindingText,
-    roots: Object.fromEntries(['assessmentLibraryV2', 'assessmentLearning', 'assessmentQuestionPractice', 'taken', 'srs', 'revlog']
+    roots: Object.fromEntries(['assessmentLibraryV2', 'assessmentLearning', 'assessmentReceived', 'assessmentQuestionPractice', 'taken', 'srs', 'revlog']
       .filter(key => Object.hasOwn(snapshot.record, key)).map(key => [key, snapshot.record[key]])),
     operations: snapshot.rows.filter(row => row.kind === 'operation').sort((a, b) => a.id.localeCompare(b.id)) };
 }
