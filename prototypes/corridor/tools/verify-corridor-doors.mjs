@@ -175,6 +175,44 @@ try {
     await context.close();
   }
 
+  // T10 — N1 is not a dead end: with no checked N1 test, the room names the older N1 sets
+  // (each marked 検収前) and one of them opens into a real question.
+  for (const [viewport, fromDoor] of [[{ width: 1728, height: 996 }, false], [{ width: 1728, height: 996 }, true],
+    [{ width: 390, height: 844 }, false], [{ width: 390, height: 844 }, true]]) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage(); await page.goto(fromDoor ? origin : `${origin}/index.html?entry=shelf`); await ready(page);
+    await enterJlptFromDojo(page, { fromDoor });
+    await catalogComplete(page);
+    const initial = await page.evaluate(() => document.querySelector('[data-exam-level][aria-pressed="true"]')?.dataset.examLevel);
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: a first visit opens at the default level (N2)`, initial === 'N2', `initial=${initial}`);
+    await page.locator('[data-exam-level="N1"]').click();
+    // the learner's choice is remembered: a fresh visit opens at N1 with no click
+    await page.reload(); await ready(page);
+    await enterJlptFromDojo(page, { fromDoor });
+    await catalogComplete(page);
+    const remembered = await page.evaluate(() => document.querySelector('[data-exam-level][aria-pressed="true"]')?.dataset.examLevel);
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: after a reload the room opens at the level he chose (N1)`, remembered === 'N1', `opened at ${remembered}`);
+    const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
+    await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
+    const listed = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-legacy-set]')]
+      .map((door) => ({ id: door.dataset.legacySet, pending: door.textContent.includes('検収前'), text: door.textContent })));
+    // expected identities and counts come from the artifact's own data, never from this file
+    const expected = (await (await page.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
+    const matches = listed.length === expected.length && expected.every((set, i) => listed[i]?.id === set.setId && listed[i].text.includes(String(set.items)));
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older N1 set is named with its real id and question count`, expected.length > 0 && matches,
+      JSON.stringify({ listed: listed.map((row) => row.id), expected: expected.map((set) => `${set.setId}:${set.items}`) }));
+    const limits = await page.evaluate(() => document.querySelector('[data-exam-older="N1"] .exam-older-limits')?.textContent || '');
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the room says what these sets lack (no listening, no timer)`, /no listening|聴解/u.test(limits), limits);
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked 検収前 (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
+    if (listed.length) {
+      await doors.first().click();
+      const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
+      check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: an older set opens into a real question`, started);
+    }
+    await page.screenshot({ path: resolve(EVIDENCE, `t10-n1-${viewport.width}-${fromDoor ? 'door' : 'shelf'}.png`), fullPage: true });
+    await context.close();
+  }
+
   // T9 — the completion check itself discriminates: with the catalog stalled forever,
   // the room must NOT count as complete (a loading room once passed as 'drawn').
   {

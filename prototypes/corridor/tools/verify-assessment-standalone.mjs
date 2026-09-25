@@ -91,7 +91,10 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
   });
   try {
     await page.goto('http://127.0.0.1:3000/?entry=shelf&ui=bi', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => typeof recordWritable === 'function' && recordWritable(), null, { timeout: 60000 });
+    // Completed boot, not just a writable flag: recordRecovered can turn true before
+    // createRecordApp resolves and before boot marks the body ready (Codex STANDALONE-FAILURE-REVIEW).
+    await page.waitForFunction(() => document.body.dataset.ready === '1' && typeof recordWritable === 'function' && recordWritable()
+      && typeof recordApp === 'object' && recordApp?.current?.().status === 'active', null, { timeout: 60000 });
     const runtime = await page.evaluate(async () => {
       const runtime = await import(window.__KAIRO_RECORD_RUNTIME_URL__);
       const catalog = await loadAssessmentCatalog();
@@ -105,16 +108,25 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
     if (variant === 'public') {
       publicWritten = await page.evaluate(async entryId => {
         const catalog = await loadAssessmentCatalog(), entry = catalog.entries.find(row => row.id === entryId);
-        const started = !!entry && await startAssessmentRoom(entry, 'practice');
+        const probe = () => ({ ready: S.ready ?? null, bodyReady: document.body.dataset.ready || null,
+          recordApp: !!recordApp, status: recordApp?.current?.().status ?? null,
+          revision: recordApp?.current?.().snapshot?.revision ?? null, pending: recordApp?.pending ?? null,
+          writable: recordWritable(), notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice });
+        const before = probe();
+        let rawStart = null, startError = null;
+        try { rawStart = !!entry && await startAssessmentRoom(entry, 'practice'); }
+        catch (error) { startError = { message: String(error?.message || error), stack: String(error?.stack || '').slice(0, 1200) }; }
         const selected = currentAssessmentV2();
-        if (!started || !selected) return { started: false };
+        const started = rawStart === true;
+        if (!started || !selected) return { started: false, stage: 'start', entryFound: !!entry, rawStart, startError,
+          selectedPresent: !!selected, before, after: probe() };
         S.view = 'mock'; render();
         const item = selected.form.items[0];
         return { started, formSha256: selected.form.sha256, questionCount: selected.form.items.length,
           attemptId: selected.attempt.attemptId, itemId: item.id, responseKind: item.response.kind,
           optionId: item.response.options?.at(-1)?.id, editorial: selected.attempt.editorialAtStart.status };
       }, publicWrittenEntry.id);
-      assert.equal(publicWritten.started, true); assert.equal(publicWritten.formSha256, publicWrittenEntry.formSha256);
+      assert.equal(publicWritten.started, true, `start failed: ${JSON.stringify(publicWritten)}`); assert.equal(publicWritten.formSha256, publicWrittenEntry.formSha256);
       assert.equal(publicWritten.questionCount, 12); assert.equal(publicWritten.responseKind, 'selected');
       assert.equal(publicWritten.editorial, 'ai-reviewed-practice');
       await page.locator(`[data-exam-option="${publicWritten.optionId}"]`).click();
