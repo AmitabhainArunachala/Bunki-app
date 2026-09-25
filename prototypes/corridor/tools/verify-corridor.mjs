@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
-import { readAppRecord, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
+import { readAppRecord, readAppRecordSnapshot, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
 import { evaluateAppRecord, restoreAppFixture } from './record-fixture-support.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
@@ -1653,8 +1653,9 @@ async function main() {
         visible: row.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
       })),
     }));
-    // A compatible full entry replaces the core row and carries its exact
-    // JMdict sequence. Both must display the intended word and meaning;
+    // The scored core row stays (D23); a full entry that displays exactly as
+    // it is shown once, as the core row, and any other entry keeps its own
+    // JMdict sequence. Either row must display the intended word and meaning;
     // unrelated sequence suffixes and other rows are not accepted.
     const ids = seq ? [want, `${want}:${seq}`] : [want];
     const hit = actual.query === q && actual.rows.some((row) =>
@@ -1686,6 +1687,216 @@ async function main() {
     (await page.locator('#sheet').count()) === 1,
     (await page.locator('#sheet').getAttribute('data-node').catch(() => 'none')) ?? '');
   await shoot(page, shotsDir, '12-v15-search');
+
+  // ------------------------------- D23 · the core row stays; a numbered card at a core door
+  // Search stand-in (design r3 FINAL to r3.3.1; Codex 16:17:40Z, 16:20:08Z, 16:27:39Z, 17:55:51Z). Every row set is
+  // read only after the real full-index answer for its query has settled: the incompatible 上手 1580400 うわて row
+  // is observed first, on each surface. 上手 is read in the graded letter at token 189.
+  console.log('\n— D23 · search keeps the core row; its door captures core; a 1353320 card is held at a core door');
+  // the complete native snapshot: the probe's installation binding, the whole learner record (every root), the archive,
+  // the profile revision and every replication row, read by the app's own record probe
+  const d23SnapshotText = (snapshot) => JSON.stringify({ installation: snapshot.installation ?? null, record: snapshot.record,
+    archive: snapshot.archive ?? null, revision: snapshot.revision, rows: snapshot.rows });
+  const d23SnapshotDiff = (a, b) => JSON.stringify({
+    changedRoots: [...new Set([...Object.keys(a.record), ...Object.keys(b.record)])]
+      .filter((root) => JSON.stringify(a.record[root]) !== JSON.stringify(b.record[root])),
+    archiveEqual: JSON.stringify(a.archive ?? null) === JSON.stringify(b.archive ?? null), revision: [a.revision, b.revision],
+    rows: [a.rows.length, b.rows.length], rowsEqual: JSON.stringify(a.rows) === JSON.stringify(b.rows) });
+  /** The snapshot once `ready` holds and nothing has changed for a full quiet window (longer than the reader's 900 ms
+   * position debounce). It never throws and never retries past a failure: a read or wait error returns at once as
+   * unsettled, the error latched beside the last snapshot observed; the bound running out returns unsettled too. */
+  const d23SettledSnapshot = async (ready, { quietMs = 1500, timeout = 15000 } = {}) => {
+    const deadline = Date.now() + timeout;
+    let text = null;
+    let since = 0;
+    let last = { snapshot: null, text: null };
+    try {
+      while (Date.now() < deadline) {
+        const snapshot = await readAppRecordSnapshot(page);
+        const now = d23SnapshotText(snapshot);
+        last = { snapshot, text: now };
+        if (!ready(snapshot)) text = null;
+        else if (now !== text) { text = now; since = Date.now(); }
+        else if (Date.now() - since >= quietMs) return { settled: true, ...last, error: null };
+        await page.waitForTimeout(150);
+      }
+    } catch (error) {
+      return { settled: false, ...last, error: String(error?.message || error) };
+    }
+    return { settled: false, ...last, error: `not settled within ${timeout} ms` };
+  };
+  /** The exact serialization of a taken snapshot, the one the comparison reads, written once under the run's evidence
+   * directory (whatever its outcome, settled or not) and described by its path, byte length and sha256. */
+  const d23Retain = (name, taken) => {
+    const identity = { installation: taken.snapshot?.installation ?? null, revision: taken.snapshot?.revision ?? null };
+    if (taken.text == null) {
+      return { bytes: null, descriptor: { name, settled: taken.settled, path: null, bytes: 0, sha256: null, ...identity, error: taken.error } };
+    }
+    const bytes = Buffer.from(taken.text, 'utf8');
+    const path = join('d23-native-snapshots', `${name}${taken.settled ? '' : '-unsettled'}.json`);
+    mkdirSync(join(EVIDENCE_DIR, 'd23-native-snapshots'), { recursive: true });
+    writeFileSync(join(EVIDENCE_DIR, path), bytes);
+    return { bytes, descriptor: { name, settled: taken.settled, path, bytes: bytes.length,
+      sha256: createHash('sha256').update(bytes).digest('hex'), ...identity, error: taken.error } };
+  };
+  const d23Cards = (record) => (record.taken || []).filter((entry) => entry.t === 'word' && entry.id === '上手');
+  const d23Letter = '[data-passage="bunki-graded-n4-letter"]:not([data-recommendation]) .shelf-open';
+  const d23Token = '#reader .tok[data-index="189"]';
+  const d23Held = ['「上手」には保存済みのカードがある。管理するには、そのカードを開く。', 'A saved card exists for 上手. Open that card to manage it.'];
+  const d23Exact = (ids) => ids.filter((id) => id === 'word:上手' || id.startsWith('word:上手:'));
+  const d23Mini = () => page.evaluate(() => {
+    const seal = document.querySelector('#mini-take');
+    return { word: document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? null, taken: !!seal?.classList.contains('taken'),
+      pressed: seal?.getAttribute('aria-pressed') ?? null, disabled: !!seal?.disabled,
+      reason: document.querySelector('#mini-take-reason')?.textContent ?? null, open: !!document.querySelector('#mini-take-open'),
+      openLabel: document.querySelector('#mini-take-open .l-ja')?.textContent ?? null };
+  });
+  const d23PageSearch = async () => {
+    await open('?entry=shelf');
+    await page.fill('#search', '上手');
+    await page.waitForSelector('#search-results [data-result="word:上手:1580400"]', { timeout: 20000 });
+    return page.evaluate(() => ({
+      ids: [...document.querySelectorAll('#search-results [data-result]')].map((row) => row.dataset.result),
+      token: document.getElementById('shelf-body')?.dataset.renderToken ?? null,
+      mode: window.__KAIRO_DICTIONARY_PERF__?.mode ?? null,
+    }));
+  };
+  const d23OpenLetterMini = async () => {
+    await open('?entry=shelf');
+    await page.locator(d23Letter).first().click();
+    await settleReader(page);
+    await touchAt(page, d23Token, 0, 700);
+    await page.waitForSelector('#mini #mini-take');
+  };
+  const d23Start = d23Cards(await readAppRecord(page));
+  check('D23 · prerequisite: the record holds no 上手 card', d23Start.length === 0, JSON.stringify(d23Start));
+
+  // (1) both search surfaces, after the full index: the core row once, 1580400 its own row, never 1353320
+  const d23Page = await d23PageSearch();
+  check('D23 · page search 上手 after the full index: the core row and 1580400, never 1353320',
+    JSON.stringify(d23Exact(d23Page.ids)) === JSON.stringify(['word:上手', 'word:上手:1580400']),
+    JSON.stringify({ ...d23Page, ids: d23Exact(d23Page.ids) }));
+  await open('');
+  await page.waitForTimeout(1600);
+  await page.tap('.nav-symbol');
+  await page.waitForSelector('#nav-search-door');
+  await page.tap('#nav-search-door');
+  await page.waitForSelector('#nav-search-input');
+  await page.locator('#nav-search-input').fill('上手');
+  await page.waitForFunction(() => [...document.querySelectorAll('.nav-search-row')].some((row) =>
+    row.querySelector('.nsr-glyph')?.textContent === '上手' && row.querySelector('.nsr-read')?.textContent === 'うわて'), null, { timeout: 20000 });
+  const d23Nav = await page.evaluate(() => [...document.querySelectorAll('.nav-search-row')]
+    .map((row) => [row.querySelector('.nsr-glyph')?.textContent ?? '', row.querySelector('.nsr-read')?.textContent ?? '',
+      row.querySelector('.nsr-gloss')?.textContent ?? ''])
+    .filter(([glyph]) => glyph === '上手'));
+  check('D23 · nav search 上手 after the full index: one じょうず row (the core word), then うわて',
+    JSON.stringify(d23Nav) === JSON.stringify([['上手', 'じょうず', 'skillful'], ['上手', 'うわて', 'upper part']]), JSON.stringify(d23Nav));
+  await page.locator('.nav-search-row').filter({ has: page.locator('.nsr-glyph', { hasText: /^上手$/u }) })
+    .filter({ has: page.locator('.nsr-read', { hasText: /^じょうず$/u }) }).click();
+  await page.waitForFunction(() => document.querySelector('#sheet')?.dataset.node === 'word:上手', null, { timeout: 10000 });
+  await page.waitForSelector('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]', { timeout: 15000 });
+  const d23NavSheet = await page.evaluate(() => ({ reading: document.querySelector('#sheet .reading')?.textContent ?? null,
+    pressed: document.querySelectorAll('#sheet .dictionary-homograph[aria-pressed="true"]').length }));
+  check('D23 · the nav じょうず row opens the core word: its sheet presses no entry',
+    d23NavSheet.reading === 'じょうず' && d23NavSheet.pressed === 0, JSON.stringify(d23NavSheet));
+
+  // (2) the page's core row → 覚 → a core card; the reader's 上手 door is then `taken`
+  await d23PageSearch();
+  await tap(page, '#search-results [data-result="word:上手"]');
+  await page.waitForFunction(() => document.querySelector('#sheet')?.dataset.node === 'word:上手', null, { timeout: 10000 });
+  await page.waitForSelector('#sheet-take');
+  await tap(page, '#sheet-take');
+  const d23Core = await waitForAppRecord(page, (record) => d23Cards(record).length === 1, { description: 'the core 上手 card' });
+  const [d23CoreCard] = d23Cards(d23Core);
+  check('D23 · 覚 on the core row saves a core card: no entry number, no cue, no 上手 snapshot',
+    !Object.hasOwn(d23CoreCard, 'entrySeq') && !Object.hasOwn(d23CoreCard, 'cueReading') && !Object.hasOwn(d23Core.deepWords || {}, '上手'),
+    JSON.stringify({ card: d23CoreCard, snapshot: d23Core.deepWords?.['上手'] ?? null }));
+  await d23OpenLetterMini();
+  const d23Taken = await d23Mini();
+  check('D23 · the reader’s 上手 door is taken: the mini seal is inked and live, nothing held',
+    d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
+    JSON.stringify(d23Taken));
+  // the core card leaves through its own door
+  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
+
+  // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
+  await d23PageSearch();
+  await tap(page, '#search-results [data-result="word:上手"]');
+  await page.waitForSelector('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]', { timeout: 15000 });
+  await page.locator('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]')
+    .filter({ has: page.locator('.row-reading', { hasText: /^じょうず$/u }) }).click();
+  await page.waitForSelector('#sheet .dictionary-homograph.active[data-dictionary-entry="1353320"]', { timeout: 10000 });
+  const d23Explicit = await page.evaluate(() => ({ reading: document.querySelector('#sheet .reading')?.textContent ?? null,
+    active: [...document.querySelectorAll('#sheet .dictionary-homograph.active')].map((door) =>
+      [door.dataset.dictionaryEntry, door.querySelector('.row-reading')?.textContent ?? '']) }));
+  check('D23 · the core sheet’s 1353320 door opens that entry and its exact reading',
+    d23Explicit.reading === 'じょうず' && JSON.stringify(d23Explicit.active) === JSON.stringify([['1353320', 'じょうず']]), JSON.stringify(d23Explicit));
+  await tap(page, '#sheet-take');
+  const d23Seq = await waitForAppRecord(page, (record) => d23Cards(record).length === 1, { description: 'the 1353320 card' });
+  const [d23SeqCard] = d23Cards(d23Seq);
+  check('D23 · the capture through that door stays explicit: 1353320, cue じょうず, its own selection',
+    d23SeqCard.entrySeq === '1353320' && d23SeqCard.cueReading === 'じょうず' && d23Seq.deepWords?.['上手']?.seq === '1353320' &&
+      d23Seq.deepWords['上手'].selection?.seq === '1353320' && d23Seq.deepWords['上手'].selection?.r === 'じょうず',
+    JSON.stringify({ card: d23SeqCard, snapshot: d23Seq.deepWords?.['上手'] ?? null }));
+
+  // (4) that card at the core mini: held with the unestablished line, its open route, no write
+  const d23PreHold = (await readAppRecord(page)).obslog?.length ?? 0;
+  await d23OpenLetterMini();
+  const d23Heldmini = await d23Mini();
+  // The hold's own writes land before the baseline: its quick-look observation, and the reader's position bookmark
+  // (readerPos, 900 ms after the token was scrolled into view). The baseline is the complete native snapshot once the
+  // observation is in and the record has stayed still for the quiet window.
+  const d23Baseline = await d23SettledSnapshot((snapshot) => (snapshot.record.obslog || []).slice(d23PreHold).some((row) =>
+    row[1] === 'tap' && row[2] === 'word:上手' && row[3] === 2 && row[4] === 'bunki-graded-n4-letter'));
+  // written at once, settled or not, and entered in the report before any action: a later error cannot discard it
+  const d23BaselineKept = d23Retain('baseline', d23Baseline);
+  report.d23NativeSnapshots = { outcome: 'pending', baseline: d23BaselineKept.descriptor };
+  // the seal keeps its product ink (paintSeal reads the spelling's row) and is disabled: its taken/aria-pressed are
+  // reported, not required either way
+  check('D23 · at a core mini the 1353320 card is held, says only that a saved card exists, and offers that card',
+    d23Heldmini.disabled && d23Held.includes(d23Heldmini.reason) && d23Heldmini.open && d23Heldmini.openLabel === 'そのカードを開く',
+    JSON.stringify(d23Heldmini));
+  // the action and its DOM observation, in one guard: a failure is latched in the report at once, the bounded after
+  // snapshot is still attempted and kept, and the row is incomplete
+  let d23ActionError = null;
+  let d23Opened = null;
+  try {
+    await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+    await page.locator('#mini-take-open').click();
+    await page.waitForSelector('#sheet .dictionary-homograph.active[data-dictionary-entry="1353320"]', { timeout: 10000 });
+    d23Opened = await page.evaluate(() => ({ node: document.querySelector('#sheet')?.dataset.node ?? null,
+      reading: document.querySelector('#sheet .reading')?.textContent ?? null, mini: !!document.querySelector('#mini') }));
+  } catch (error) {
+    d23ActionError = String(error?.message || error);
+    report.d23NativeSnapshots = { ...report.d23NativeSnapshots, actionError: d23ActionError };
+  }
+  const d23AfterOpen = await d23SettledSnapshot(() => true);
+  const d23AfterKept = d23Retain('after-open', d23AfterOpen);
+  // the bytes written are the bytes compared: equality is read from the two retained buffers, never from a re-read
+  const d23Settled = d23Baseline.settled && d23AfterOpen.settled && !d23ActionError;
+  const d23Identical = d23Settled && d23BaselineKept.bytes !== null && d23AfterKept.bytes !== null &&
+    Buffer.compare(d23BaselineKept.bytes, d23AfterKept.bytes) === 0;
+  const d23Outcome = {
+    outcome: !d23Settled ? 'incomplete' : d23Identical ? 'identical' : 'different',
+    baseline: d23BaselineKept.descriptor,
+    afterOpen: d23AfterKept.descriptor,
+    ...(d23ActionError ? { actionError: d23ActionError } : {}),
+    ...(d23Settled && !d23Identical ? { difference: JSON.parse(d23SnapshotDiff(d23Baseline.snapshot, d23AfterOpen.snapshot)) } : {}),
+    ...(d23Identical ? { recordRoots: Object.keys(d23Baseline.snapshot.record).length, revision: d23Baseline.snapshot.revision,
+      rows: d23Baseline.snapshot.rows.length } : {}),
+  };
+  report.d23NativeSnapshots = d23Outcome;
+  check('D23 · the held seal and the open route write nothing: the complete native snapshot before and after is identical',
+    d23Identical, JSON.stringify(d23Outcome));
+  check('D23 · the open route opens the retained entry and exact reading: 1353320 じょうず',
+    !d23ActionError && d23Opened?.node === 'word:上手' && d23Opened.reading === 'じょうず' && !d23Opened.mini,
+    JSON.stringify({ opened: d23Opened, ...(d23ActionError ? { actionError: d23ActionError } : {}) }));
+  // through that route the card leaves by its own door, and the record is as it began
+  await tap(page, '#sheet-take');
+  await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the 1353320 card removed through its own door' });
+  check('D23 · through the opened route the 1353320 card is removed by its own door', true, 'no 上手 card remains');
+  await shoot(page, shotsDir, '12b-d23-core-row');
 
   // ------------------------------------------ v1.6 · particles as doors
   console.log('\n— v1.6 · particles: no dead pixels');

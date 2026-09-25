@@ -1853,10 +1853,11 @@ function recordFailure(reason, protectedState = false) {
     'The record changed while saving. Check the current state and try again.');
   if (!protectedState && /^(reading-cue|kanji-reading)/u.test(reason || ''))
     S.storeError = sentencePracticeError({ message: reason });
-  // D23: a word's card identity or saved answer refused the change, and nothing was written
+  // D23: a word's card identity or saved answer refused the change, and nothing was written.
+  // No identities are at hand here, so the alert claims neither a current card nor a differing record
   if (!protectedState && reason === 'word-identity-conflict')
-    S.storeError = tx('この表記には別の項目のカードがある。何も変更していない。',
-      'This spelling holds a card for another entry. Nothing was changed.');
+    S.storeError = tx('この操作では、この表記のカードや残っている記録を変更できない。何も変更していない。',
+      "This action can't change the card or retained history for this spelling. Nothing was changed.");
   if (!protectedState && (reason === 'word-answer-changed' || reason === 'word-answer-unavailable'))
     S.storeError = tx('この語の答えを確かめられないため、保存していない。',
       'This word’s answer could not be confirmed, so nothing was saved.');
@@ -7024,6 +7025,20 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     reason.id = 'mini-take-reason';
     mini.append(reason);
   }
+  // D23: a spelling held by a card, or kept history, this door does not stand for offers it, by
+  // its own identity, as the full note's route does. Opening only navigates: nothing is
+  // removed, suppressed, replaced or converted
+  if (miniState === 'conflict') {
+    const open = biLabel('button', 'mini-take-open', ...wordCaptureOpenLabel(wordCaptureBasis(S, token.b)));
+    open.type = 'button';
+    open.id = 'mini-take-open';
+    open.addEventListener('click', (event) => {
+      event.stopPropagation();
+      removeMini();
+      go(heldWordCardNode(S, token.b), { invoker: span });
+    });
+    mini.append(open);
+  }
   mini.append(el('span', 'mini-hint', tx('辞書の全項目へ進める', 'open the complete entry')));
   const entry = biLabel('button', 'mini-entry', '全項目', 'full entry');
   entry.type = 'button';
@@ -9948,6 +9963,15 @@ async function commitLearningEnrollment(owner, nodes, isCurrent) {
     if (recordReady(epoch) && isCurrent()) render();
   }
 }
+/** Why an enrollment row holds its word (D23): the one-line held text when the spelling's
+ * card or history stands for an identity this spelling-only door does not, or the answer
+ * cannot be confirmed; otherwise null. The lesson and older-set rows show it before any
+ * commit; commitLearningEnrollment's skip stays the producer's guard for a later change. */
+function learningEnrollHeldText(node) {
+  if (node?.t !== 'word') return null;
+  const state = wordCaptureState(node);
+  return state === 'conflict' || state === 'unavailable' ? wordCaptureHeldText(node) : null;
+}
 function renderLessons(main) {
   const run = S.lessonRun;
   main.append(withEn(el('p', 'eyebrow', 'レッスン'), 'lessons', 'en-inline'));
@@ -10096,24 +10120,36 @@ function renderLessons(main) {
   const enroll = (words) => commitLearningEnrollment(run, words.map((id) => ({ t: kt, id, from: null })),
     () => S.view === 'lessons' && S.lessonRun === run);
   const list = el('div', 'lesson-enroll');
+  const held = new Set();
   run.words.forEach((w, i) => {
     const row = el('div', 'lesson-enroll-row');
     const right = (run.results || [])[i] === 3;
     row.append(el('span', 'lesson-enroll-mark' + (right ? ' right' : ' wrong'), right ? '○' : '×'));
     row.append(el('span', 'lesson-enroll-word', w));
-    const have = inDeck.has(srsKey(kt, w));
+    // D23: a word whose spelling holds a card this door does not stand for shows why, with
+    // 覚える held, instead of a ✓ or a 覚える the batch would skip without a word
+    const heldText = learningEnrollHeldText({ t: kt, id: w, from: null });
+    if (heldText) held.add(w);
+    const have = !heldText && inDeck.has(srsKey(kt, w));
     const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
     b.type = 'button';
     b.dataset.enroll = w;
-    b.disabled = have || learningEnrollmentPending.has(run);
-    if (!have) {
+    b.disabled = have || !!heldText || learningEnrollmentPending.has(run);
+    if (!have && !heldText) {
       b.addEventListener('click', () => enroll([w]));
     }
     row.append(b);
     list.append(row);
+    if (heldText) {
+      b.classList.add('word-capture-held');
+      const reason = el('p', 'enroll-held', heldText);
+      reason.id = `lesson-enroll-held-${i}`;
+      b.setAttribute('aria-describedby', reason.id);
+      list.append(reason);
+    }
   });
   main.append(list);
-  const freshWords = run.words.filter((w) => !inDeck.has(srsKey(kt, w)));
+  const freshWords = run.words.filter((w) => !inDeck.has(srsKey(kt, w)) && !held.has(w));
   if (freshWords.length) {
     const all = biLabel(
       'button',
@@ -11611,14 +11647,23 @@ function renderMockResult(main, set, flat, run, selected) {
     if (f.item.why) body.append(el('p', 'mock-review-why', f.item.why));
     row.append(body);
     const key = mockSubjectKey(f.item.subject);
-    if (completed && !unanswered && !ok && key && !inDeck.has(key)) {
-      const [t, id] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)];
-      missed.push({ t, id, key });
+    const [t, id] = key ? [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)] : [];
+    // D23: a held word shows why, even when its spelling holds a card as another identity, and stays out
+    // of the batch instead of being skipped silently; a word enrolled as itself stays quiet, as before
+    const heldText = completed && !unanswered && !ok && key ? learningEnrollHeldText({ t, id, from: null }) : null;
+    if (completed && !unanswered && !ok && key && (heldText || !inDeck.has(key))) {
+      if (!heldText) missed.push({ t, id, key });
       const b = biLabel('button', 'chip lesson-enroll-one', '覚える', 'memorize');
       b.type = 'button';
       b.dataset.enroll = id;
-      b.disabled = learningEnrollmentPending.has(enrollmentOwner);
-      b.addEventListener('click', () => enroll([{ t, id, from: null }]));
+      b.disabled = !!heldText || learningEnrollmentPending.has(enrollmentOwner);
+      if (heldText) {
+        b.classList.add('word-capture-held');
+        const reason = el('p', 'enroll-held', heldText);
+        reason.id = `mock-enroll-held-${i}`;
+        b.setAttribute('aria-describedby', reason.id);
+        body.append(reason);
+      } else b.addEventListener('click', () => enroll([{ t, id, from: null }]));
       row.append(b);
     }
     list.append(row);
@@ -14721,9 +14766,11 @@ function buildSearchIndex() {
  * The core index answers instantly, exactly as before. The full 70k index
  * answers behind it: on the served build a worker scans it off the main
  * thread and the visible results refresh once when it settles; on the
- * standalone the embedded entries are scanned inline. A deep row that is
- * fully compatible with a core word replaces that core row (the deep entry
- * is the superset — every sense, homographs, cross-references). */
+ * standalone the embedded entries are scanned inline. A scored core row is
+ * never replaced (D23): a deep row is folded into it only when both display
+ * the same word, reading and gloss and the core sheet offers that exact
+ * entry as a door (searchRowShownByCore); every other deep row keeps its own
+ * numbered door. */
 function dictionarySearchContext(query) {
   const q = String(query || '').trim();
   const hasKanji = /[一-鿌]/.test(q);
@@ -15075,24 +15122,36 @@ function searchResults(query) {
     (a, b) =>
       b.score - a.score || Number(!a.e.seq) - Number(!b.e.seq) || a.tie - b.tie || a.e.w.length - b.e.w.length,
   );
-  const coreIds = new Set(scored.filter(({ e }) => e.core).map(({ e }) => e.id));
-  const compatibleCoreIds = new Set(workerSearch?.compatibleCoreIds || []);
-  for (const { e } of scored) {
-    if (!e.dictionaryRow) continue;
-    const forms = new Set([e.dictionaryRow[1], ...e.dictionaryRow[4], ...e.dictionaryRow[5]]);
-    for (const form of forms) {
-      if (coreIds.has(form) && dictionaryCoreMatch(form, e.dictionaryRow).compatible) {
-        compatibleCoreIds.add(form);
-      }
-    }
-  }
+  // D23: a scored core row is never dropped, and a numbered row is never cast to core.
+  // A numbered row that displays exactly what the scored core row of its id displays is
+  // shown once, as that core row, at the better of the two ranks, and only while the core
+  // sheet still offers its entry (searchRowShownByCore). This is presentation, not identity.
+  const coreRows = new Map();
+  for (const { e } of scored) if (e.core && !coreRows.has(e.id)) coreRows.set(e.id, e);
   const results = [];
+  const shown = new Set();
   for (const { e } of scored) {
-    if (e.core && compatibleCoreIds.has(e.id)) continue;
-    results.push(e);
+    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;
+    if (shown.has(row)) continue;
+    shown.add(row);
+    results.push(row);
     if (results.length >= 40) break;
   }
   return results;
+}
+
+/** Whether a numbered search row is shown as the scored core row of its id, in its place
+ * (D23 search policy, not an identity claim). Both must hold:
+ *   - the displayed word, reading and gloss are byte-identical to that core row's;
+ *   - the core word's seq-less sheet renders this exact entry and reading as an enabled
+ *     door (dictionaryHomographChoices, the list that sheet renders).
+ * Otherwise the row keeps its own numbered door: another gloss, another exact reading
+ * (even one that normalises equal), another spelling, or no scored core row at all. */
+function searchRowShownByCore(e, core) {
+  if (!core || !e?.seq || core.w !== e.w || core.r !== e.r || core.g !== e.g) return false;
+  return dictionaryHomographChoices(core.id).some(
+    (choice) => choice.enabledOnCore && String(choice.row[0]) === String(e.seq) && choice.summary[0] === e.reading,
+  );
 }
 
 function renderSearchResults(main, query) {
@@ -15579,6 +15638,20 @@ function sameWordIdentity(a, b) {
   if (a.kind === 'core') return true;
   if (a.kind === 'seq') return a.seq === b.seq && (a.reading == null || b.reading == null || a.reading === b.reading);
   return a.reading === b.reading && a.gloss === b.gloss;
+}
+
+/** What two identities establish about each other, for held copy only; it never decides
+ * identity (sameWordIdentity does). `node` is the identity a door stands for
+ * (wordNodeIdentity), `card` the one the record's card claims (wordCardIdentity).
+ *   other-entry    both name entries, and the numbers differ.
+ *   other-reading  both name the same entry, with two different known readings.
+ *   unestablished  anything else: the core record beside an entry (上手 beside 上手#1353320),
+ *                  saved text, unknown, or a reading nothing records. */
+function wordIdentityRelation(node, card) {
+  if (node?.kind !== 'seq' || card?.kind !== 'seq') return 'unestablished';
+  if (node.seq !== card.seq) return 'other-entry';
+  if (nonEmptyString(node.reading) && nonEmptyString(card.reading) && node.reading !== card.reading) return 'other-reading';
+  return 'unestablished';
 }
 
 /** Whether this spelling's card has schedule history. This is the assessment
@@ -16916,19 +16989,102 @@ function wordCaptureState(node, record = S) {
   return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
 }
 
-/** The one-line reason a word control is held (D23), for surfaces without the full note. */
+/** The one-line reason a word control is held (D23), for surfaces without the full note. It
+ * claims only what the door's and the card's identities establish (wordIdentityRelation). */
 function wordCaptureHeldText(node) {
-  return wordCaptureState(node) === 'unavailable'
-    ? tx('この項目の答えをまだ確かめられないため、覚えられない。', 'This entry’s answer cannot be confirmed yet, so it cannot be memorized.')
-    : tx(`「${node.id}」には別の項目のカードがあるため、ここでは覚える・やめるができない。`,
+  if (wordCaptureState(node) === 'unavailable') {
+    return tx('この項目の答えをまだ確かめられないため、覚えられない。', 'This entry’s answer cannot be confirmed yet, so it cannot be memorized.');
+  }
+  const relation = wordIdentityRelation(wordNodeIdentity(node, S), wordCardIdentity(S, node.id));
+  if (wordCaptureBasis(S, node.id) === 'history') {
+    if (relation === 'other-entry') {
+      return tx(`「${node.id}」には別の項目の以前のカードの記録が残っているため、ここでは覚える・やめるができない。`,
+        `${node.id} keeps history from an earlier card for another entry, so it cannot be memorized or stopped here.`);
+    }
+    if (relation === 'other-reading') {
+      return tx(`「${node.id}」には別の読みの以前のカードの記録が残っているため、ここでは覚える・やめるができない。`,
+        `${node.id} keeps history from an earlier card for another reading, so it cannot be memorized or stopped here.`);
+    }
+    return tx(`「${node.id}」には以前のカードの復習の記録が残っているため、ここでは覚える・やめるができない。`,
+      `${node.id} keeps review history from an earlier card, so it cannot be memorized or stopped here.`);
+  }
+  if (relation === 'other-entry') {
+    return tx(`「${node.id}」には別の項目のカードがあるため、ここでは覚える・やめるができない。`,
       `${node.id} holds a card for another entry, so it cannot be memorized or stopped here.`);
+  }
+  if (relation === 'other-reading') {
+    return tx(`「${node.id}」には別の読みのカードがあるため、ここでは覚える・やめるができない。`,
+      `${node.id} holds a card for another reading, so it cannot be memorized or stopped here.`);
+  }
+  return tx(`「${node.id}」には保存済みのカードがある。管理するには、そのカードを開く。`,
+    `A saved card exists for ${node.id}. Open that card to manage it.`);
 }
 
-/** Why a word control is held (D23): another entry's card holds the spelling, or the
- * selected entry's answer cannot be validated yet. Keeping the existing card is the
- * default and writes nothing. A card that has never been studied may give way to this
- * entry (replaceWordCard). A studied card is never replaced here; starting another
- * entry fresh is a separate decision. */
+/** The full note's line for a held spelling (D23), by what the door's and the card's
+ * identities establish (wordIdentityRelation), whether a card is there at all
+ * (wordCaptureBasis) and whether the card has review history. */
+function wordCaptureNoteText(relation, basis, id, shown, studied) {
+  if (basis === 'history') {
+    if (relation === 'other-entry') {
+      return tx(`「${id}」には別の項目の以前のカード（${shown}）の復習の記録が残っている。この入り口はその記録を表していない。表記一つにカード一枚なので、そのまま残す。`,
+        `${id} keeps review history from an earlier card for another entry (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`);
+    }
+    if (relation === 'other-reading') {
+      return tx(`「${id}」には別の読みの以前のカード（${shown}）の復習の記録が残っている。この入り口はその記録を表していない。表記一つにカード一枚なので、そのまま残す。`,
+        `${id} keeps review history from an earlier card for another reading (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`);
+    }
+    return tx(`「${id}」には以前のカード（${shown}）の復習の記録が残っている。この入り口はその記録を表していない。表記一つにカード一枚なので、そのまま残す。`,
+      `${id} keeps review history from an earlier card (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`);
+  }
+  if (relation === 'other-entry') {
+    return studied
+      ? tx(`「${id}」には別の項目（${shown}）のカードと復習の記録があります。表記一つにカード一枚なので、そのまま残します。`,
+        `${id} already has a card, with review history, for another entry (${shown}). One spelling holds one card, so it stays as it is.`)
+      : tx(`「${id}」には、まだ復習していない別の項目（${shown}）のカードがあります。そのままにすると、いまのカードが残ります。`,
+        `${id} has a card for another entry (${shown}) that has not been reviewed yet. Leaving it keeps that card.`);
+  }
+  if (relation === 'other-reading') {
+    return studied
+      ? tx(`「${id}」には別の読み（${shown}）のカードと復習の記録があります。表記一つにカード一枚なので、そのまま残します。`,
+        `${id} already has a card, with review history, for another reading (${shown}). One spelling holds one card, so it stays as it is.`)
+      : tx(`「${id}」には、まだ復習していない別の読み（${shown}）のカードがあります。そのままにすると、いまのカードが残ります。`,
+        `${id} has a card for another reading (${shown}) that has not been reviewed yet. Leaving it keeps that card.`);
+  }
+  return studied
+    ? tx(`「${id}」には保存済みのカード（${shown}）と復習の記録がある。この入り口はそのカードを表していない。表記一つにカード一枚なので、そのまま残す。`,
+      `A saved card exists for ${id} (${shown}), with review history. This door doesn't stand for it. One spelling holds one card, so it stays as it is.`)
+    : tx(`「${id}」には、まだ復習していない保存済みのカード（${shown}）がある。この入り口はそのカードを表していない。そのままにすると、いまのカードが残る。`,
+      `A saved card exists for ${id} (${shown}) that has not been reviewed yet. This door doesn't stand for it. Leaving it keeps that card.`);
+}
+
+/** The door to the card the record holds for a spelling, or to the entry its kept history
+ * belongs to (D23): its own entry and exact reading when it names one, otherwise the spelling.
+ * The full note's and the mini's route both open it; opening only navigates. */
+function heldWordCardNode(record, id) {
+  const held = wordCardIdentity(record, id);
+  return held.kind === 'seq'
+    ? { t: 'word', id, seq: held.seq, ...(held.reading ? { reading: held.reading } : {}) }
+    : { t: 'word', id };
+}
+
+/** Whether a held spelling still has a card (D23 r3.3), for copy only: 'card' when the
+ * record's taken list has a word row for it; otherwise 'history', a hold that comes from the
+ * studied history a removed card left (wordCardIdentity reads both alike). */
+function wordCaptureBasis(record, id) {
+  return (record.taken || []).some((entry) => entry.t === 'word' && entry.id === id) ? 'card' : 'history';
+}
+
+/** The route's label, by basis: a current card is opened as a card; kept history, which has no
+ * card left to open, opens the entry it belongs to. */
+function wordCaptureOpenLabel(basis) {
+  return basis === 'history' ? ['その項目を開く', 'open that entry'] : ['そのカードを開く', 'open that card'];
+}
+
+/** Why a word control is held (D23): a card this door does not stand for holds the spelling
+ * (worded by wordIdentityRelation), or the selected entry's answer cannot be validated
+ * yet. Keeping the existing card is the default and writes nothing. A card that has never
+ * been studied may give way to this entry (replaceWordCard). A studied card is never
+ * replaced here; starting another entry fresh is a separate decision. */
 function renderWordCaptureNote(container, node, label = node.id) {
   if (node?.t !== 'word') return;
   const state = wordCaptureState(node);
@@ -16948,11 +17104,9 @@ function renderWordCaptureNote(container, node, label = node.id) {
     : node.id;
   const studied = wordStudied(S, node.id);
   const enrolled = S.taken.some((entry) => entry.t === 'word' && entry.id === node.id);
-  note.append(el('p', null, studied
-    ? tx(`「${node.id}」には別の項目（${shown}）のカードと復習の記録があります。表記一つにカード一枚なので、そのまま残します。`,
-      `${node.id} already has a card, with review history, for another entry (${shown}). One spelling holds one card, so it stays as it is.`)
-    : tx(`「${node.id}」には、まだ復習していない別の項目（${shown}）のカードがあります。そのままにすると、いまのカードが残ります。`,
-      `${node.id} has a card for another entry (${shown}) that has not been reviewed yet. Leaving it keeps that card.`)));
+  const relation = wordIdentityRelation(wordNodeIdentity(node, S), wordCardIdentity(S, node.id));
+  const basis = wordCaptureBasis(S, node.id);
+  note.append(el('p', null, wordCaptureNoteText(relation, basis, node.id, shown, studied)));
   const actions = el('div', 'teacher-actions');
   if (!studied && enrolled) {
     const replace = biLabel('button', 'chip', 'この項目に置き換える', 'replace it with this entry');
@@ -16968,15 +17122,10 @@ function renderWordCaptureNote(container, node, label = node.id) {
     });
     actions.append(replace);
   }
-  const open = biLabel('button', 'chip', 'そのカードを開く', 'open that card');
+  const open = biLabel('button', 'chip', ...wordCaptureOpenLabel(basis));
   open.type = 'button';
   open.id = 'word-capture-open';
-  open.addEventListener('click', () => {
-    const held = wordCardIdentity(S, node.id);
-    go(held.kind === 'seq'
-      ? { t: 'word', id: node.id, seq: held.seq, ...(held.reading ? { reading: held.reading } : {}) }
-      : { t: 'word', id: node.id });
-  });
+  open.addEventListener('click', () => go(heldWordCardNode(S, node.id)));
   actions.append(open);
   note.append(actions);
   container.append(note);
@@ -21060,34 +21209,54 @@ function renderDictionaryDetails(container, details, node) {
   });
 }
 
-function renderDictionaryHomographs(container, node) {
-  const rows = dictionaryRowsForForm(node.id);
+/** The entries a word sheet offers as doors for one written form: every entry and reading
+ * whose own restriction permits the form, in the form's row order. The sheet
+ * (renderDictionaryHomographs) and search (searchRowShownByCore) read this one list, so
+ * search folds a numbered row into the core row only while the core sheet offers it.
+ * `enabledOnCore`: a seq-less sheet for a core spelling stands for the core record, not for
+ * any entry (wordNodeIdentity), so it renders this choice as an enabled door that pushes its
+ * own entry and exact reading, a lone choice included (「辞書の項目」). */
+function dictionaryHomographChoices(form) {
   const choices = [];
   const seen = new Set();
-  for (const row of rows) {
+  for (const row of dictionaryRowsForForm(form)) {
     for (const summary of dictionaryReadingSummaries(row)) {
-      if (!dictionaryReadingSupportsForm(row, summary[0], node.id)) continue;
+      if (!dictionaryReadingSupportsForm(row, summary[0], form)) continue;
       const key = `${row[0]}\u0000${summary[0]}\u0000${summary[1]}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      choices.push({ row, summary: [summary[0], node.id, summary[2]] });
+      choices.push({ row, summary: [summary[0], form, summary[2]] });
     }
   }
-  if (choices.length <= 1) return;
+  const enabledOnCore = !!D.dict?.[form];
+  return choices.map((choice) => ({ ...choice, enabledOnCore }));
+}
+
+function renderDictionaryHomographs(container, node) {
+  const choices = dictionaryHomographChoices(node.id);
+  const seqless = node.seq == null || node.seq === '';
+  // a seq-less core sheet shows even a lone entry, as a door (D23 B2)
+  const coreDoors = seqless && choices.some((choice) => choice.enabledOnCore);
+  if (choices.length <= 1 && !coreDoors) return;
   const currentSeq = String(node.seq || node.dictionaryResolvedSeq || '');
   const currentReading = kataToHira(node.reading || lookup(node.id, node.seq)?.r || '');
   const block = el('div', 'dictionary-homographs');
   block.append(
-    withEn(
-      el('p', 'dictionary-rel-title', `同じ形の ${choices.length} 項目`),
-      `${choices.length} readings or entries share this form`,
-      'en-inline',
-    ),
+    choices.length === 1
+      ? withEn(el('p', 'dictionary-rel-title', '辞書の項目'), 'Dictionary entry', 'en-inline')
+      : withEn(
+        el('p', 'dictionary-rel-title', `同じ形の ${choices.length} 項目`),
+        `${choices.length} readings or entries share this form`,
+        'en-inline',
+      ),
   );
-  for (const { row, summary } of choices) {
+  for (const { row, summary, enabledOnCore } of choices) {
     const [seq] = row;
     const [reading, headForm, primaryGloss] = summary;
-    const active = String(seq) === currentSeq && (!currentReading || kataToHira(reading) === currentReading);
+    // only an explicit sheet's own entry is no door to itself; on a seq-less core sheet the
+    // resolved entry the senses below come from is still a door (D23, Codex 16:20:08Z)
+    const active = !(seqless && enabledOnCore) && String(seq) === currentSeq &&
+      (!currentReading || kataToHira(reading) === currentReading);
     const choice = el('button', active ? 'dictionary-homograph active' : 'dictionary-homograph');
     choice.type = 'button';
     choice.dataset.dictionaryEntry = String(seq);

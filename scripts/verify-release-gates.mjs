@@ -1451,7 +1451,7 @@ const SEARCH_FALLBACK_CASES = [
   'graded numeric JLPT values keep their intended search tie ranks',
   'fallback entries with no deep written counterpart remain present without loading the optional dictionary',
   'written, kana, romaji and whole glossary searches return the exact fallback while deep data is unavailable',
-  'current deep counterpart selection keeps both 生物 homographs and prefers compatible seq entries',
+  'both 生物 homographs stay reachable beside the restored core row; an identical numbered row is shown once, as the core row',
   'fallback without a deep counterpart survives the ready deep tier with unchanged identity',
   'actual search leaves the input corpus unchanged and repeated immediate indexing stable',
 ];
