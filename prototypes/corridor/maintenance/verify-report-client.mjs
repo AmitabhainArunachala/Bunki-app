@@ -4,20 +4,31 @@ import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const out = resolve(process.env.BUNKI_REPORT_PROOF_DIR || `${process.env.HOME}/.dharma/bunki_experience/2026-09-23/experience-evolution/report-client-proof`);
 mkdirSync(out, { recursive: true });
-const js = readFileSync(resolve(here, 'report-client.js'), 'utf8');
+const sourcePath = resolve(process.env.BUNKI_REPORT_CLIENT_SOURCE || resolve(here, 'report-client.js'));
+let browser, sourceIdentity = null, stage = 'setup', terminalResult = null;
+const engineIdentity = { name: process.env.BUNKI_REPORT_BROWSER ?? 'chromium', version: null };
+try {
+const js = readFileSync(sourcePath, 'utf8');
+sourceIdentity = { path: sourcePath, sha256: createHash('sha256').update(js).digest('hex') };
 const css = readFileSync(resolve(here, 'report-client.css'), 'utf8');
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><title>Report client browser fixture</title><style>body{margin:0;background:#f1e9d3;color:#1c2f42;font:16px system-ui}#app{padding:40px;min-height:1400px}input{font:inherit;padding:12px}h1{font:32px Georgia,serif}${css}</style><div id="app"><h1>Learning surface · test fixture</h1><label>Pending answer <input id="answer" value="kept answer"></label><p>Report controls persist outside this application surface.</p></div><script>${js}</script><script>window.hookCalls=0;window.fixture=window.BunkiReports.mount({serviceUrl:'https://reports.bunki.test',getContext:()=>({surface:'test/explanation',route:'/question/2',build_sha:null,content_ids:['fixture:q2'],locale:'en',action_trace:[{action:'explanation_open',target:'fixture:q2',raw_dom:'never capture'}],raw_dom:'never capture',storage:'never capture'}),onOpen:()=>window.hookCalls++});</script></html>`;
-const browser = await chromium.launch({ headless: true });
+stage = 'browser-selection';
+if (!['chromium', 'webkit'].includes(engineIdentity.name)) throw new Error('BUNKI_REPORT_BROWSER must be chromium or webkit.');
+browser = await ({ chromium, webkit })[engineIdentity.name].launch({ headless: true });
+engineIdentity.version = browser.version();
+stage = 'browser-setup';
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
 const page = await context.newPage();
 page.setDefaultTimeout(10000);
 const requests = [], errors = [], received = new Map();
 let failAfterPersistence = true, proposalReady = false, postBodies = [], followCount = 0;
+let followupGate = null;
+const followupBodies = [], followupKeys = new Set();
 page.on('pageerror', error => errors.push(error.message));
 const proposal = {
   schema_version: 'bunki.maintenance/v1', id: 'proposal_fixture', revision: 1, created_at: new Date().toISOString(), kind: 'build_proposal', execution_authority: 'none',
@@ -27,7 +38,7 @@ const proposal = {
   acceptance_cases: [{ id: 'case_fixture', given: 'A teaching target', when: 'Its explanation opens', then: 'Its verified reading is available.' }],
   unknowns: ['Editorial correctness still needs inspection.'], rollback: 'Restore the previous renderer.', requested_action: 'review', proposed_files: [], evidence: [], context: {}
 };
-await page.route('**/*', async route => {
+const serveFixture = async route => {
   const request = route.request(), url = new URL(request.url());
   if (url.hostname === 'bunki.test') return route.fulfill({ contentType: 'text/html', body: html });
   requests.push({ method: request.method(), path: url.pathname });
@@ -51,18 +62,28 @@ await page.route('**/*', async route => {
     return send({ queued: true, report_id: [...received.keys()][0] });
   }
   if (url.pathname.endsWith('/messages') || url.pathname.endsWith('/reopen')) {
-    followCount++;
     const payload = request.postDataJSON(), view = [...received.values()][0];
-    view.conversation.push({ actor: 'user', text: payload.text, id: `follow_${followCount}`, created_at: new Date().toISOString() });
+    followupBodies.push(request.postData());
+    if (!followupKeys.has(payload.idempotency_key)) {
+      followupKeys.add(payload.idempotency_key); followCount++;
+      view.conversation.push({ actor: 'user', text: payload.text, id: `follow_${followCount}`, created_at: new Date().toISOString() });
+    }
     if (url.pathname.endsWith('/reopen')) assert.equal(payload.context.surface, 'test/explanation');
+    if (followupGate) {
+      const gate = followupGate; followupGate = null; gate.arrive();
+      const outcome = await gate.release;
+      if (outcome === 'abort') return route.abort('failed');
+    }
     return send(view);
   }
   if (url.pathname === '/api/reports') return send({ reports: [...received.values()] });
   if (url.pathname.startsWith('/api/reports/')) return send(received.get(url.pathname.split('/')[3]));
   return route.fulfill({ status: 404, headers, body: '{}' });
-});
+};
+await context.route('**/*', serveFixture);
 
 try {
+  stage = 'existing-browser-contracts';
   await page.goto('https://bunki.test');
   await page.evaluate(() => window.fixture.ready);
   assert.equal(requests.length, 0, 'Fresh mount must not make network requests');
@@ -138,6 +159,57 @@ try {
   await page.getByRole('button', { name: 'Still happening', exact: true }).click();
   await page.getByText('The report was reopened with your current screen context.', { exact: true }).first().waitFor();
   assert.equal(followCount, 2);
+  stage = 'followup-draft-races';
+  const holdFollowup = () => {
+    let arrive, release;
+    const reached = new Promise(resolve => { arrive = resolve; });
+    const wait = new Promise(resolve => { release = resolve; });
+    followupGate = { arrive, release: wait };
+    return { reached, release };
+  };
+  // Acknowledging A cannot clear B typed while A's response is outstanding.
+  let held = holdFollowup();
+  await page.locator('#br-follow').fill('Pending A: delayed acknowledgement.');
+  await page.getByRole('button', { name: 'Send follow-up', exact: true }).click();
+  await held.reached;
+  await page.locator('#br-follow').fill('Next B: preserve this exact unsent detail.');
+  await waitForDraftText(page, 'Next B: preserve this exact unsent detail.');
+  held.release('success');
+  await page.getByText('Your follow-up was received.', { exact: true }).first().waitFor();
+  assert.equal(await page.locator('#br-follow').inputValue(), 'Next B: preserve this exact unsent detail.');
+  await page.reload();
+  await openFirstReport(page);
+  assert.equal(await page.locator('#br-follow').inputValue(), 'Next B: preserve this exact unsent detail.', 'ACK A must preserve B after reload');
+  // A service persists C, then its response exceeds the native fetch deadline. D remains editable and
+  // durable while an explicit retry recovers C with its identical wire body.
+  held = holdFollowup();
+  await page.locator('#br-follow').fill('Pending C: recover exactly after connection loss.');
+  await page.getByRole('button', { name: 'Still happening', exact: true }).click();
+  await held.reached;
+  const frozenFollowup = followupBodies.at(-1);
+  await page.locator('#br-follow').fill('Next D: survives failed C, reload and retry.');
+  await waitForDraftText(page, 'Next D: survives failed C, reload and retry.');
+  await page.getByText(/Your pending follow-up is kept on this device.*The service did not reply in time/).first().waitFor({ timeout: 25000 });
+  held.release('success'); // The response arrives after the real fetch deadline; it cannot acknowledge the client.
+  await page.reload();
+  await openFirstReport(page);
+  assert.equal(await page.locator('#br-follow').inputValue(), 'Next D: survives failed C, reload and retry.');
+  assert.equal(await page.getByRole('button', { name: 'Send follow-up', exact: true }).isDisabled(), true);
+  assert.match(await page.locator('.br-pending').innerText(), /Pending C: recover exactly/);
+  await page.getByRole('button', { name: 'Retry pending follow-up', exact: true }).click();
+  await page.getByText('The report was reopened with your current screen context.', { exact: true }).first().waitFor();
+  assert.equal(followupBodies.at(-1), frozenFollowup, 'Retry retains the original request ID, action and captured context');
+  assert.equal(followupBodies.filter(body => body === frozenFollowup).length, 2);
+  assert.equal(followCount, 4, 'The synthetic service receives one logical message per request ID');
+  assert.equal(await page.locator('#br-follow').inputValue(), 'Next D: survives failed C, reload and retry.');
+  await page.reload();
+  await openFirstReport(page);
+  assert.equal(await page.locator('#br-follow').inputValue(), 'Next D: survives failed C, reload and retry.');
+  assert.equal(await page.locator('.br-pending').count(), 0);
+  stage = 'followup-ack-cleanup-abort'; await verifyFollowupAckCleanup(page, holdFollowup);
+  stage = 'followup-equal-revision-owner'; await verifyFollowupOwnerIsolation(page);
+  stage = 'followup-unmount-drain'; await verifyFollowupUnmount(page, holdFollowup);
+
   await page.evaluate(() => { window.BunkiReports.mount({ protectAnswers: true }); document.querySelector('#app').innerHTML = '<h1>Application rerendered</h1>'; });
   await page.getByRole('button', { name: 'Refresh & retry' }).click();
   await page.getByText('Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.', { exact: true }).waitFor();
@@ -204,7 +276,523 @@ try {
   assert.equal(ownPostBodies.length, 2);
   assert.equal(new Set(ownPostBodies).size, 1, 'Unicode payload retries retain the same request and digest');
   await ownOrigin.close();
+  stage = 'independent-drafts'; await verifyIndependentDrafts(png);
+  stage = 'attachment-recovery-race'; await verifyAttachmentRecovery(png);
+  stage = 'hostile-config'; await verifyHostileConfig(png);
+  stage = 'no-service-durable-save'; await verifyNoServiceDurability();
   assert.deepEqual(errors, []);
-  writeFileSync(resolve(out, 'browser-results.json'), JSON.stringify({ passed: true, cases: ['idle_mount', 'idempotent_mount', 'allowlisted_context', 'attachment_preview_remove', 'mobile_320', 'focus_scroll_return', 'offline_atomic_outbox', 'reload_recovery', 'timeout_after_persistence', 'stable_wire_retry', 'honest_ai', 'inert_untrusted_text', 'proposal_export', 'followup', 'reopen', 'protected_answers', 'host_rerender', 'native_host_modal', 'same_origin_lazy_build', 'same_origin_offline_unknown', 'cross_origin_build_not_substituted', 'unicode_codepoint_bounds', 'unicode_stable_wire_receipt'], service_fixture: 'synthetic, no live AI', received_reports: received.size, post_attempts: postBodies.length, errors }, null, 2));
-  console.log(`Report client browser checks passed. Evidence: ${out}`);
-} catch (error) { console.error(await page.locator('.br-body').innerText().catch(() => '')); throw error; } finally { await browser.close(); }
+  terminalResult = { passed: true, cases: ['idle_mount', 'idempotent_mount', 'allowlisted_context', 'attachment_preview_remove', 'mobile_320', 'focus_scroll_return', 'offline_atomic_outbox', 'reload_recovery', 'timeout_after_persistence', 'stable_wire_retry', 'honest_ai', 'inert_untrusted_text', 'proposal_export', 'followup', 'reopen', 'protected_answers', 'host_rerender', 'native_host_modal', 'same_origin_lazy_build', 'same_origin_offline_unknown', 'cross_origin_build_not_substituted', 'unicode_codepoint_bounds', 'unicode_stable_wire_receipt', 'followup_ack_preserves_new_draft', 'followup_pending_retry_preserves_new_draft', 'two_tab_draft_attachment_isolation', 'duplicated_tab_revision_fork', 'orphan_draft_recovery', 'legacy_draft_retained', 'hostile_config_limits', 'no_service_capability_before_save', 'durable_save_ack_boundary', 'equal_revision_duplicate_first_report', 'equal_revision_duplicate_first_followup', 'unmount_drains_accepted_followup_ack_and_saves', 'unmount_failed_flush_retains_editor', 'attachment_validation_blocks_recovery', 'attachment_validation_checks_draft_identity', 'native_modal_keyboard_frozen_during_unmount', 'native_modal_keyboard_restored_after_failed_unmount', 'ack_cleanup_abort_preserves_pending_and_next_draft', 'ack_cleanup_abort_retry_same_request_once', 'ack_cleanup_abort_preserves_newer_input', 'ack_refresh_abort_is_not_a_delivery_or_draft_failure'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'synthetic, no live AI', received_reports: received.size, post_attempts: postBodies.length, errors };
+} catch (error) { console.error(await page.locator('.br-body').innerText().catch(() => '')); throw error; }
+
+
+async function installAckCleanupFault(target, settings) {
+  await target.evaluate(({ sentText, draftText, laterText, mode }) => {
+    const put = IDBObjectStore.prototype.put, getAll = IDBObjectStore.prototype.getAll;
+    const proof = window.__ackCleanupProof = { receiptCommitted: false, cleanupStarted: false, cleanupCommitted: false, cleanupAborted: false, cleanupCount: 0, laterCommitted: false, refreshStarted: false, refreshAborted: false };
+    window.__restoreAckCleanupFault = () => { IDBObjectStore.prototype.put = put; IDBObjectStore.prototype.getAll = getAll; };
+    IDBObjectStore.prototype.put = function(value, ...args) {
+      const request = put.call(this, value, ...args), tx = this.transaction;
+      if (this.name === 'records' && value.view?.receipt && value.view.conversation?.some(item => item.actor === 'user' && item.text === sentText)) {
+        tx.addEventListener('complete', () => { proof.receiptCommitted = true; }, { once: true });
+      }
+      const draft = this.name === 'meta' && value.key?.startsWith('followup:') ? value.value?.draft : null;
+      if (draft && laterText && draft.text === laterText && !draft.pending) {
+        tx.addEventListener('complete', () => { proof.laterCommitted = true; }, { once: true });
+      }
+      // Target only the actual no-pending checkpoint after this received view's
+      // native records commit. Earlier A/B writes and subsequent C are untouched.
+      if (!proof.cleanupStarted && proof.receiptCommitted && draft?.text === draftText && !draft.pending) {
+        proof.cleanupStarted = true; proof.cleanupCount++;
+        tx.addEventListener('complete', () => { proof.cleanupCommitted = true; }, { once: true });
+        tx.addEventListener('abort', () => { proof.cleanupAborted = true; }, { once: true });
+        if (mode === 'abort') queueMicrotask(() => tx.abort());
+        else if (mode === 'hold') {
+          let held = true;
+          const keepOpen = () => {
+            const pending = tx.objectStore('meta').get('__synthetic_cleanup_hold__');
+            pending.onsuccess = () => { if (held) keepOpen(); };
+          };
+          keepOpen();
+          window.__abortAckCleanup = () => { held = false; tx.abort(); };
+        }
+      }
+      return request;
+    };
+    IDBObjectStore.prototype.getAll = function(...args) {
+      const request = getAll.apply(this, args), tx = this.transaction;
+      if (mode === 'refresh' && this.name === 'records' && proof.cleanupCommitted && !proof.refreshStarted) {
+        proof.refreshStarted = true;
+        tx.addEventListener('abort', () => { proof.refreshAborted = true; }, { once: true });
+        queueMicrotask(() => tx.abort());
+      }
+      return request;
+    };
+  }, settings);
+}
+async function waitForFollowupNotice(target, prefix) {
+  await target.waitForFunction(expected => document.querySelector('.br-body .br-notice')?.textContent.startsWith(expected), prefix);
+  return target.locator('.br-body .br-notice').innerText();
+}
+async function verifyFollowupAckCleanup(target, holdFollowup) {
+  const cleanupFailure = 'Your follow-up was received. This device could not finish saving the updated draft.';
+  for (const mode of ['abort', 'hold', 'refresh']) {
+    stage = `followup-ack-cleanup-${mode}`;
+    const sentText = `ACK ${mode}: one logical received follow-up.`, draftText = `Draft B ${mode}: retained after ACK.`, laterText = `Draft C ${mode}: entered while cleanup was pending.`;
+    const countBefore = followCount, held = holdFollowup();
+    let frozenBody;
+    try {
+      await target.locator('#br-follow').fill(sentText);
+      await target.getByRole('button', { name: 'Send follow-up', exact: true }).click();
+      let arrivalDeadline;
+      try {
+        await Promise.race([held.reached, new Promise((_, reject) => {
+          arrivalDeadline = setTimeout(() => reject(new Error('The ACK cleanup fixture follow-up never reached its synthetic service.')), 10000);
+        })]);
+      } finally { clearTimeout(arrivalDeadline); }
+      frozenBody = followupBodies.at(-1);
+      const frozenKey = JSON.parse(frozenBody).idempotency_key;
+      await target.locator('#br-follow').fill(draftText);
+      await waitForDraftText(target, draftText);
+      await installAckCleanupFault(target, { sentText, draftText, laterText, mode });
+      held.release('success');
+      await target.waitForFunction(() => window.__ackCleanupProof.cleanupStarted);
+      assert.equal(await target.evaluate(() => window.__ackCleanupProof.receiptCommitted), true, 'Cleanup fault follows the actual received-view records commit');
+      if (mode === 'hold') {
+        assert.equal(await target.evaluate(() => window.__ackCleanupProof.cleanupCommitted || window.__ackCleanupProof.cleanupAborted), false);
+        await target.locator('#br-follow').fill(laterText);
+        assert.equal(await target.locator('#br-follow').inputValue(), laterText);
+        await target.evaluate(() => window.__abortAckCleanup());
+      }
+      const notice = await waitForFollowupNotice(target, mode === 'refresh' ? 'Your follow-up was received. This report could not be refreshed.' : cleanupFailure);
+      assert.doesNotMatch(notice, /Retry it with the button|pending follow-up is kept|service did not reply in time/i, 'A post-ACK local failure cannot claim a network timeout or a nonexistent pending retry');
+      assert.equal(await target.getByRole('button', { name: 'Retry pending follow-up', exact: true }).count(), 0, 'Session knowledge keeps the acknowledged request cleared');
+      await target.waitForFunction(mode => mode === 'refresh' ? window.__ackCleanupProof.refreshAborted : window.__ackCleanupProof.cleanupAborted, mode);
+      const proof = await target.evaluate(() => window.__ackCleanupProof);
+      assert.equal(proof.cleanupCount, 1, 'Only one cleanup checkpoint was selected');
+      if (mode === 'refresh') {
+        assert.equal(proof.cleanupCommitted, true);
+        assert.equal(proof.cleanupAborted, false);
+        assert.equal(proof.refreshAborted, true, 'Only the post-cleanup native records read was aborted');
+        assert.doesNotMatch(notice, /could not finish saving the updated draft|copy any unsent text/i);
+      } else {
+        assert.equal(proof.cleanupAborted, true, 'The real IndexedDB cleanup transaction aborted');
+        assert.equal(proof.cleanupCommitted, false);
+      }
+      const expectedText = mode === 'hold' ? laterText : draftText;
+      assert.equal(await target.locator('#br-follow').inputValue(), expectedText, 'An ACK cleanup await cannot overwrite newer editable text');
+      if (mode === 'hold') {
+        await target.waitForFunction(() => window.__ackCleanupProof.laterCommitted);
+        await waitForDraftText(target, laterText);
+      }
+      let state = await localState(target);
+      const receivedRow = state.records.find(row => row.view?.conversation?.some(item => item.actor === 'user' && item.text === sentText));
+      assert(receivedRow?.view?.receipt, 'The acknowledged view remains durably saved despite later local failure');
+      const draftPointer = await target.evaluate(reportId => sessionStorage.getItem(`bunki-reports-editor:followup:${reportId}:https://reports.bunki.test`), receivedRow.id);
+      assert(draftPointer, 'The current follow-up has a persistent recovery pointer');
+      const durableDraft = state.drafts.find(row => row.key === `followup:${receivedRow.id}:https://reports.bunki.test:${draftPointer}`);
+      assert(durableDraft, 'The current next draft has a native durable copy');
+      assert.equal(durableDraft.value.text, expectedText, 'The current recovery pointer preserves the exact next text');
+      if (mode === 'abort') {
+        assert.equal(durableDraft.value.pending?.data.idempotency_key, frozenKey, 'The aborted cleanup leaves the original pending request as a reload recovery hint');
+        assert.equal(JSON.stringify(durableDraft.value.pending.data), frozenBody, 'Durable recovery data preserves the exact request body');
+      } else assert.equal(durableDraft.value.pending, undefined, 'A successful later C checkpoint or successful cleanup removes pending durably');
+      assert.equal(followCount, countBefore + 1);
+      assert.equal(followupBodies.filter(body => body === frozenBody).length, 1);
+      await target.reload(); await openFirstReport(target);
+      assert.equal(await target.locator('#br-follow').inputValue(), expectedText);
+      if (mode === 'abort') {
+        await target.getByRole('button', { name: 'Retry pending follow-up', exact: true }).click();
+        await waitForFollowupNotice(target, 'Your follow-up was received.');
+        assert.equal(followupBodies.at(-1), frozenBody);
+        assert.equal(followupBodies.filter(body => body === frozenBody).length, 2, 'Reload recovery replays the same request exactly once');
+        assert.equal(followCount, countBefore + 1, 'Retry does not create another logical A in the synthetic service');
+        assert.equal(await target.locator('#br-follow').inputValue(), draftText);
+        state = await localState(target);
+        const currentId = await target.evaluate(reportId => sessionStorage.getItem(`bunki-reports-editor:followup:${reportId}:https://reports.bunki.test`), receivedRow.id);
+        assert(currentId, 'Retry retains a current recovery pointer');
+        const cleanedDraft = state.drafts.find(row => row.key === `followup:${receivedRow.id}:https://reports.bunki.test:${currentId}`);
+        assert(cleanedDraft, 'The recovered current draft exists after retry');
+        assert.equal(cleanedDraft.value.text, draftText);
+        assert.equal(cleanedDraft.value.pending, undefined, 'The recovered current draft finishes cleanup');
+      }
+      assert.equal(await target.locator('.br-pending').count(), 0);
+      assert.equal([...received.values()][0].conversation.filter(item => item.actor === 'user' && item.text === sentText).length, 1, 'A was received once logically');
+    } finally {
+      held.release('success');
+      await target.evaluate(() => {
+        if (window.__ackCleanupProof?.cleanupStarted && !window.__ackCleanupProof.cleanupAborted && !window.__ackCleanupProof.cleanupCommitted) window.__abortAckCleanup?.();
+        window.__restoreAckCleanupFault?.();
+      }).catch(() => {});
+    }
+  }
+}
+
+async function verifyFollowupOwnerIsolation(target) {
+  const original = await target.locator('#br-follow').inputValue();
+  await waitForDraftText(target, original);
+  const copiedSession = await target.evaluate(() => Object.entries(sessionStorage));
+  const duplicate = await context.newPage();
+  duplicate.on('pageerror', error => errors.push(error.message));
+  try {
+    await duplicate.addInitScript(entries => { for (const [key, value] of entries) if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, value); }, copiedSession);
+    await duplicate.goto('https://bunki.test'); await openFirstReport(duplicate);
+    assert.equal(await duplicate.locator('#br-follow').inputValue(), original);
+    await duplicate.locator('#br-follow').fill('Other tab follow-up: writes first at the same revision.');
+    await waitForDraftText(duplicate, 'Other tab follow-up: writes first at the same revision.');
+    await target.reload(); await openFirstReport(target);
+    assert.equal(await target.locator('#br-follow').inputValue(), original, 'An equal-revision duplicate must preserve the original follow-up owner');
+    const state = await localState(target);
+    const own = state.drafts.find(row => row.value.text === original), other = state.drafts.find(row => row.value.text === 'Other tab follow-up: writes first at the same revision.');
+    assert(own && other); assert.notEqual(own.key, other.key);
+  } finally { await duplicate.close(); }
+}
+async function remountFixture(target) {
+  await target.evaluate(() => {
+    window.fixture = window.BunkiReports.mount({ serviceUrl: 'https://reports.bunki.test', getContext: () => ({ surface: 'test/explanation', route: '/question/2', content_ids: ['fixture:q2'] }) });
+  });
+  await openFirstReport(target);
+}
+async function verifyFollowupUnmount(target, holdFollowup) {
+  await target.evaluate(() => {
+    const transaction = IDBDatabase.prototype.transaction;
+    window.__restoreDraftTransaction = () => { IDBDatabase.prototype.transaction = transaction; };
+    IDBDatabase.prototype.transaction = function(stores, mode, ...rest) {
+      const tx = transaction.call(this, stores, mode, ...rest), names = typeof stores === 'string' ? [stores] : [...stores];
+      if (mode === 'readwrite' && names.length === 1 && names[0] === 'meta') {
+        tx.addEventListener('complete', () => { window.__draftNativeAcks = (window.__draftNativeAcks || 0) + 1; });
+        if (window.__rejectDraftWrites) queueMicrotask(() => tx.abort());
+        else if (window.__holdDraftAck) {
+          window.__draftWriteStarted = true;
+          const keepOpen = () => { const r = tx.objectStore('meta').get('__synthetic_hold__'); r.onsuccess = () => { if (window.__holdDraftAck) keepOpen(); }; };
+          keepOpen();
+        }
+      }
+      return tx;
+    };
+  });
+  const held = holdFollowup();
+  try {
+    await target.locator('#br-follow').fill('Accepted follow-up: its ACK is pending during unmount.');
+    await target.getByRole('button', { name: 'Send follow-up', exact: true }).click();
+    await held.reached;
+    await target.evaluate(() => { window.__holdDraftAck = true; window.__draftWriteStarted = false; });
+    await target.locator('#br-follow').fill('Queued next draft one.');
+    await target.waitForFunction(() => window.__draftWriteStarted);
+    await target.locator('#br-follow').fill('Queued next draft two.');
+    await target.locator('#br-follow').fill('Newest next draft: retain through unmount.');
+    await target.evaluate(() => {
+      window.__unmountState = 'pending';
+      window.__unmountTask = window.fixture.unmount().then(() => { window.__unmountState = 'fulfilled'; }, error => { window.__unmountState = 'rejected'; window.__unmountError = error.message; });
+    });
+    assert.equal(await target.evaluate(() => window.__unmountState), 'pending', 'Unmount cannot finish ahead of accepted native writes and network ACK');
+    await target.getByText('Finishing report saves before closing. Your text is protected while this finishes.', { exact: true }).waitFor();
+    // A native showModal dialog escapes ancestor inertness. Exercise the real
+    // focused control with keyboard events, rather than trusting root.inert.
+    await target.locator('#br-follow').focus();
+    await target.keyboard.press('End');
+    await target.keyboard.type(' This must not change the closing draft.');
+    await target.keyboard.press('Backspace');
+    assert.equal(await target.locator('#br-follow').inputValue(), 'Newest next draft: retain through unmount.', 'The modal textarea itself must reject keyboard edits during the held unmount');
+    await target.keyboard.press('Escape');
+    assert.equal(await target.evaluate(() => document.querySelector('.br-sheet').open), true, 'The saving status stays available while unmount is pending');
+
+    await target.evaluate(() => { window.__holdDraftAck = false; });
+    await waitForDraftText(target, 'Newest next draft: retain through unmount.');
+    assert.equal(await target.evaluate(() => window.__unmountState), 'pending', 'Draining only the current queue is insufficient while a follow-up ACK can enqueue cleanup');
+    held.release('success');
+    await target.waitForFunction(() => window.__unmountState !== 'pending');
+    assert.equal(await target.evaluate(() => window.__unmountState), 'fulfilled');
+    assert.equal(await target.locator('#bunki-reports-root').count(), 0);
+    assert((await target.evaluate(() => window.__draftNativeAcks)) >= 3, 'Native IndexedDB completions were observed');
+    await remountFixture(target);
+    assert.equal(await target.locator('#br-follow').inputValue(), 'Newest next draft: retain through unmount.');
+    assert.equal(await target.locator('.br-pending').count(), 0);
+
+    // A failed final checkpoint must reject unmount and keep the exact editor.
+    await target.evaluate(() => {
+      window.__rejectDraftWrites = true; window.__unmountState = 'pending';
+      window.__unmountTask = window.fixture.unmount().then(() => { window.__unmountState = 'fulfilled'; }, error => { window.__unmountState = 'rejected'; window.__unmountError = error.message; });
+    });
+    await target.waitForFunction(() => window.__unmountState !== 'pending');
+    assert.equal(await target.evaluate(() => window.__unmountState), 'rejected');
+    assert.equal(await target.locator('#bunki-reports-root').count(), 1);
+    assert.equal(await target.evaluate(() => document.querySelector('#bunki-reports-root').inert), false);
+    assert.equal(await target.locator('#br-follow').inputValue(), 'Newest next draft: retain through unmount.');
+    await target.evaluate(() => { window.__rejectDraftWrites = false; });
+    await target.locator('#br-follow').fill('Editing works after a rejected unmount.');
+    await target.keyboard.press('End');
+    await target.keyboard.type(' Keyboard entry also works.');
+    assert.equal(await target.locator('#br-follow').inputValue(), 'Editing works after a rejected unmount. Keyboard entry also works.', 'Rejected unmount restores actual keyboard editing');
+    await waitForDraftText(target, 'Editing works after a rejected unmount. Keyboard entry also works.');
+    await target.evaluate(() => window.fixture.unmount());
+    await remountFixture(target);
+    assert.equal(await target.locator('#br-follow').inputValue(), 'Editing works after a rejected unmount. Keyboard entry also works.');
+  } finally {
+    held.release('success');
+    await target.evaluate(() => { window.__holdDraftAck = false; window.__rejectDraftWrites = false; window.__restoreDraftTransaction?.(); }).catch(() => {});
+  }
+}
+async function verifyAttachmentRecovery(png) {
+  const isolated = await fixtureContext({ init: () => {
+    const decode = window.createImageBitmap;
+    window.createImageBitmap = async (...args) => {
+      const bitmap = await decode(...args);
+      if (window.__holdBitmap) await new Promise(resolve => { window.__bitmapValidated = true; window.__releaseBitmap = resolve; });
+      return bitmap;
+    };
+  } });
+  try {
+    const full = await isolated.newPage(); await openDraft(full);
+    await full.locator('#br-actual').fill('Full saved draft: keep its four original screenshots.');
+    await full.locator('#br-files').setInputFiles(Array.from({ length: 4 }, (_, index) => ({ name: `full-${index}.png`, mimeType: 'image/png', buffer: png })));
+    await full.waitForFunction(() => document.querySelectorAll('.br-attachments img').length === 4);
+    const before = (await localState(full)).drafts.find(row => row.value.actual === 'Full saved draft: keep its four original screenshots.');
+    const editing = await isolated.newPage(); await openDraft(editing);
+    await editing.locator('#br-actual').fill('Attachment belongs to this draft only.');
+    await editing.getByText('Recover saved reports', { exact: true }).click();
+    await editing.evaluate(() => { window.__holdBitmap = true; });
+    await editing.locator('#br-files').setInputFiles({ name: 'pending-other-draft.png', mimeType: 'image/png', buffer: png });
+    await editing.waitForFunction(() => window.__bitmapValidated);
+    const recovery = editing.locator(`[data-br="recover-draft"][data-id="${before.key}"]`);
+    assert.equal(await recovery.isDisabled(), true, 'Recovery cannot switch drafts while an accepted screenshot is being validated');
+    await editing.evaluate(() => { window.__holdBitmap = false; window.__releaseBitmap(); });
+    await editing.waitForFunction(() => document.querySelectorAll('.br-attachments img').length === 1);
+    await editing.getByText('Recover saved reports', { exact: true }).click();
+    await recovery.click();
+    await editing.getByText('Draft recovered. Its earlier saved copy is still available.', { exact: true }).first().waitFor();
+    assert.equal(await editing.locator('.br-attachments img').count(), 4);
+    assert.equal(await editing.locator('.br-attachments').innerText().then(text => text.includes('pending-other-draft')), false);
+    assert.deepEqual((await localState(editing)).drafts.find(row => row.key === before.key).value.attachments, before.value.attachments);
+
+    // Public close/open can replace an empty draft while decoding is pending.
+    // The validated file must then be rejected instead of attached to its successor.
+    const blank = await isolated.newPage(); await openDraft(blank);
+    await blank.evaluate(() => { window.__holdBitmap = true; });
+    await blank.locator('#br-files').setInputFiles({ name: 'old-empty-draft.png', mimeType: 'image/png', buffer: png });
+    await blank.waitForFunction(() => window.__bitmapValidated);
+    await blank.evaluate(async () => { window.fixture.close(); await window.fixture.openReport(); window.__holdBitmap = false; window.__releaseBitmap(); });
+    await blank.getByText('The draft changed while checking the screenshots. No files were added; select them again in this draft.', { exact: true }).first().waitFor();
+    assert.equal(await blank.locator('.br-attachments img').count(), 0);
+  } finally { await isolated.close(); }
+}
+
+async function localState(target) {
+  return target.evaluate(async () => {
+    const db = await new Promise((resolve, reject) => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); });
+    try {
+      const read = store => new Promise((resolve, reject) => { const r = db.transaction(store).objectStore(store).getAll(); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); });
+      const meta = await read('meta'), records = await read('records');
+      const describe = async item => ({ id: item.id, name: item.name, bytes: item.blob.size, sha256: Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await item.blob.arrayBuffer())), byte => byte.toString(16).padStart(2, '0')).join('') });
+      const drafts = [];
+      for (const row of meta) {
+        if (!row.key.startsWith('draft:') && !row.key.startsWith('followup:')) continue;
+        const value = row.value.draft_id ? row.value.draft : row.value;
+        drafts.push({ key: row.key, revision: row.value.revision, value: { ...value, attachments: await Promise.all((value.attachments || []).map(describe)) } });
+      }
+      return { drafts, records, attachments: await Promise.all((await read('attachments')).map(describe)) };
+    } finally { db.close(); }
+  });
+}
+async function waitForDraftText(target, text) {
+  await target.waitForFunction(async expected => {
+    const db = await new Promise(resolve => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); });
+    try {
+      const rows = await new Promise(resolve => { const r = db.transaction('meta').objectStore('meta').getAll(); r.onsuccess = () => resolve(r.result); });
+      return rows.some(row => { const value = row.value?.draft_id ? row.value.draft : row.value; return value?.actual === expected || value?.text === expected; });
+    } finally { db.close(); }
+  }, text);
+}
+async function openFirstReport(target) {
+  await target.evaluate(() => window.fixture.ready);
+  await target.evaluate(() => window.fixture.openReports());
+  await target.locator('[data-br="detail"]').first().click();
+  await target.locator('#br-follow').waitFor();
+  await target.getByRole('button', { name: 'Refresh & retry', exact: true }).waitFor();
+  await target.waitForFunction(() => !document.querySelector('[data-br="refresh"]')?.disabled);
+}
+async function fixtureContext({ config, init } = {}) {
+  const isolated = await browser.newContext();
+  isolated.on('page', target => target.on('pageerror', error => errors.push(error.message)));
+  await isolated.addInitScript(() => {
+    const json = Response.prototype.json;
+    Response.prototype.json = async function(...args) {
+      const value = await json.apply(this, args);
+      if (this.url.endsWith('/api/config')) window.__fixtureConfigConsumed = true;
+      return value;
+    };
+  });
+  if (init) await isolated.addInitScript(init);
+  await isolated.route('**/*', route => {
+    const request = route.request(), url = new URL(request.url());
+    if (url.hostname === 'bunki.test' && request.isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: html });
+    const headers = { 'Access-Control-Allow-Origin': 'https://bunki.test', 'Access-Control-Allow-Headers': 'Authorization,Content-Type', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS' };
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+    if (url.pathname === '/api/config' && config) return route.fulfill({ contentType: 'application/json', headers, body: JSON.stringify(config) });
+    return route.fulfill({ status: 404, headers, contentType: 'application/json', body: '{}' });
+  });
+  return isolated;
+}
+async function openDraft(target) {
+  await target.goto('https://bunki.test');
+  await target.evaluate(() => window.fixture.ready);
+  await target.evaluate(() => window.fixture.openReport());
+}
+async function verifyIndependentDrafts(png) {
+  const isolated = await fixtureContext();
+  try {
+    const first = await isolated.newPage(), second = await isolated.newPage();
+    await openDraft(first); await openDraft(second);
+    await first.locator('#br-actual').fill('Tab A: only submit this report.');
+    await second.locator('#br-actual').fill('Tab B: keep these exact unsent words.');
+    await second.locator('#br-expected').fill('Tab B expected result remains distinct.');
+    await second.locator('#br-files').setInputFiles({ name: 'tab-b.png', mimeType: 'image/png', buffer: png });
+    await second.locator('.br-attachments img').waitFor();
+    await waitForDraftText(second, 'Tab B: keep these exact unsent words.');
+    const before = (await localState(second)).drafts.find(row => row.value.actual === 'Tab B: keep these exact unsent words.');
+    assert.equal(before.value.attachments.length, 1);
+    await first.getByRole('button', { name: 'Send report', exact: true }).click();
+    await first.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
+    await second.reload(); await second.evaluate(() => window.fixture.ready); await second.evaluate(() => window.fixture.openReport());
+    assert.equal(await second.locator('#br-actual').inputValue(), before.value.actual);
+    assert.equal(await second.locator('#br-expected').inputValue(), before.value.expected);
+    assert.equal(await second.locator('.br-attachments img').count(), 1);
+    const after = (await localState(second)).drafts.find(row => row.key === before.key);
+    assert.deepEqual(after.value.attachments, before.value.attachments, 'Submitting another tab cannot remove or change draft attachment bytes');
+
+    // A copied tab writes FIRST at the exact revision loaded by its idle
+    // original. Revision equality alone must not permit replacing that owner.
+    const ownerSnapshot = await second.evaluate(() => Object.entries(sessionStorage));
+    const firstWriter = await isolated.newPage();
+    await firstWriter.addInitScript(entries => { for (const [key, value] of entries) if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, value); }, ownerSnapshot);
+    await openDraft(firstWriter);
+    await firstWriter.locator('#br-actual').fill('Duplicate writes first: preserve the idle original.');
+    await waitForDraftText(firstWriter, 'Duplicate writes first: preserve the idle original.');
+    await second.reload(); await second.evaluate(() => window.fixture.ready); await second.evaluate(() => window.fixture.openReport());
+    assert.equal(await second.locator('#br-actual').inputValue(), before.value.actual, 'Equal revision does not authorize another document to overwrite the idle original');
+    assert.equal(await second.locator('#br-expected').inputValue(), before.value.expected);
+    const untouched = (await localState(second)).drafts.find(row => row.key === before.key);
+    assert.deepEqual(untouched.value.attachments, before.value.attachments);
+    assert.equal(untouched.value.actual, before.value.actual);
+    await firstWriter.close();
+
+    // Browsers copy sessionStorage into duplicated/opener tabs. Exercise that
+    // exact copied recovery pointer; it cannot serve as a shared ownership lock.
+    const copiedSession = await second.evaluate(() => Object.entries(sessionStorage));
+    const duplicate = await isolated.newPage();
+    await duplicate.addInitScript(entries => { for (const [key, value] of entries) if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, value); }, copiedSession);
+    await openDraft(duplicate);
+    assert.equal(await duplicate.locator('#br-actual').inputValue(), before.value.actual);
+    await second.locator('#br-actual').fill('Tab B: edited after its duplicate opened.');
+    await waitForDraftText(second, 'Tab B: edited after its duplicate opened.');
+    await duplicate.locator('#br-actual').fill('Duplicate tab: a different recoverable draft.');
+    await waitForDraftText(duplicate, 'Duplicate tab: a different recoverable draft.');
+    const divergent = (await localState(second)).drafts;
+    const originalDraft = divergent.find(row => row.value.actual === 'Tab B: edited after its duplicate opened.');
+    const duplicatedDraft = divergent.find(row => row.value.actual === 'Duplicate tab: a different recoverable draft.');
+    assert(originalDraft && duplicatedDraft);
+    assert.notEqual(originalDraft.key, duplicatedDraft.key, 'A stale duplicate forks its own persistent identity');
+    assert.deepEqual(duplicatedDraft.value.attachments, originalDraft.value.attachments);
+    await duplicate.reload(); await duplicate.evaluate(() => window.fixture.ready); await duplicate.evaluate(() => window.fixture.openReport());
+    assert.equal(await duplicate.locator('#br-actual').inputValue(), duplicatedDraft.value.actual);
+
+    // A browser restart or lost sessionStorage can still recover orphan drafts.
+    await second.close();
+    const recovered = await isolated.newPage();
+    await openDraft(recovered);
+    await recovered.getByText('Recover saved reports', { exact: true }).click();
+    await recovered.locator(`[data-br="recover-draft"][data-id="${originalDraft.key}"]`).click();
+    await recovered.getByText('Draft recovered. Its earlier saved copy is still available.', { exact: true }).first().waitFor();
+    assert.equal(await recovered.locator('#br-actual').inputValue(), originalDraft.value.actual);
+    assert.equal(await recovered.locator('#br-expected').inputValue(), before.value.expected);
+    assert.equal(await recovered.locator('.br-attachments img').count(), 1);
+    assert((await localState(recovered)).drafts.some(row => row.key === originalDraft.key), 'Recovery does not consume the orphan copy');
+
+    // Legacy shared-key data is copied, never deleted during migration or submit.
+    await recovered.evaluate(async key => {
+      const db = await new Promise(resolve => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); });
+      try {
+        const source = await new Promise(resolve => { const r = db.transaction('meta').objectStore('meta').get(key); r.onsuccess = () => resolve(r.result); });
+        await new Promise((resolve, reject) => { const tx = db.transaction('meta', 'readwrite'); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.objectStore('meta').put({ key: 'draft:https://reports.bunki.test', value: { ...source.value.draft, actual: 'Legacy report: retain original bytes.' } }); });
+      } finally { db.close(); }
+    }, originalDraft.key);
+    const legacy = await isolated.newPage(); await openDraft(legacy);
+    assert.equal(await legacy.locator('#br-actual').inputValue(), 'Legacy report: retain original bytes.');
+    await legacy.getByRole('button', { name: 'Send report', exact: true }).click();
+    await legacy.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
+    const legacyCopy = (await localState(legacy)).drafts.find(row => row.key === 'draft:https://reports.bunki.test');
+    assert.equal(legacyCopy.value.actual, 'Legacy report: retain original bytes.');
+    assert.deepEqual(legacyCopy.value.attachments, before.value.attachments);
+  } finally { await isolated.close(); }
+}
+async function verifyHostileConfig(png) {
+  const isolated = await fixtureContext({ config: { limits: { attachment_count: '<img id="config-injected" src=x onerror="window.__reportConfigExecuted=true">', attachment_bytes: -1, total_attachment_bytes: Number.MAX_SAFE_INTEGER } } });
+  try {
+    const target = await isolated.newPage(); await openDraft(target);
+    await target.waitForFunction(() => window.__fixtureConfigConsumed);
+    await target.waitForFunction(() => document.querySelector('#br-file-note')?.textContent.includes('up to 4 images, 2 MB each'));
+    assert.equal(await target.locator('#config-injected').count(), 0);
+    assert.equal(await target.evaluate(() => window.__reportConfigExecuted === true), false);
+    await target.locator('#br-files').setInputFiles(Array.from({ length: 5 }, (_, index) => ({ name: `limit-${index}.png`, mimeType: 'image/png', buffer: png })));
+    await target.getByText('Choose at most 4 screenshots.', { exact: true }).first().waitFor();
+    assert.equal(await target.locator('.br-attachments img').count(), 0);
+    await target.locator('#br-files').setInputFiles({ name: 'oversized.png', mimeType: 'image/png', buffer: Buffer.alloc(2097153) });
+    await target.getByText('Each screenshot must be at most 2 MB. No files were added.', { exact: true }).first().waitFor();
+    assert.equal(await target.locator('.br-attachments img').count(), 0);
+  } finally { await isolated.close(); }
+}
+async function verifyNoServiceDurability() {
+  const isolated = await fixtureContext({ init: () => {
+    const transaction = IDBDatabase.prototype.transaction;
+    IDBDatabase.prototype.transaction = function(stores, mode, ...rest) {
+      const tx = transaction.call(this, stores, mode, ...rest), names = typeof stores === 'string' ? [stores] : [...stores];
+      if (mode === 'readwrite' && names.includes('records') && names.includes('attachments')) {
+        window.__reportTransactionStarted = true;
+        tx.addEventListener('complete', () => { window.__reportTransactionAck = true; });
+        if (window.__rejectReportCommit) queueMicrotask(() => tx.abort());
+        else if (window.__holdReportCommit) {
+          const keepOpen = () => { const r = tx.objectStore('records').get('__synthetic_hold__'); r.onsuccess = () => { if (window.__holdReportCommit) keepOpen(); }; };
+          keepOpen();
+        }
+      }
+      return tx;
+    };
+  } });
+  try {
+    const target = await isolated.newPage(); await openDraft(target);
+    await target.getByText('This copy of KAIRO has no report service yet. You can save a report on this device; it will not be sent.', { exact: true }).waitFor();
+    assert.equal(await target.getByRole('heading', { name: 'Saved on this device', exact: true }).count(), 0);
+    assert.doesNotMatch(await target.locator('.br-body').innerText(), /Your report is saved on this device/);
+    await target.locator('#br-actual').fill('No service: this report still needs a durable save.');
+    await target.evaluate(() => { window.__rejectReportCommit = true; });
+    await target.getByRole('button', { name: 'Send report', exact: true }).click();
+    await target.getByText(/The report could not be saved\. Your draft is still here/).first().waitFor();
+    assert.equal(await target.getByRole('heading', { name: 'Saved on this device', exact: true }).count(), 0);
+    assert.equal((await localState(target)).records.length, 0);
+    assert.equal(await target.locator('#br-actual').inputValue(), 'No service: this report still needs a durable save.');
+    await target.evaluate(() => { window.__rejectReportCommit = false; window.__holdReportCommit = true; window.__reportTransactionStarted = false; });
+    await target.getByRole('button', { name: 'Send report', exact: true }).click();
+    await target.waitForFunction(() => window.__reportTransactionStarted);
+    assert.equal(await target.getByRole('heading', { name: 'Saved on this device', exact: true }).count(), 0, 'An unacknowledged transaction cannot claim saved');
+    assert.equal(await target.evaluate(() => window.__reportTransactionAck === true), false);
+    await target.evaluate(() => { window.__holdReportCommit = false; });
+    await target.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
+    assert.equal(await target.evaluate(() => window.__reportTransactionAck), true, 'Saved UI follows the actual IndexedDB completion event');
+    assert.equal((await localState(target)).records.length, 1);
+    await target.getByText('Saved on this device. It has not been sent.', { exact: true }).first().waitFor();
+  } finally { await isolated.close(); }
+}
+
+} catch (error) {
+  terminalResult = { passed: false, stage, browser: engineIdentity, source: sourceIdentity || { path: sourcePath, sha256: null }, error: { name: error.name, message: error.message, stack: error.stack }, service_fixture: 'synthetic, no live AI' };
+  writeFileSync(resolve(out, 'browser-results.json'), JSON.stringify(terminalResult, null, 2) + '\n');
+  throw error;
+} finally {
+  try { await browser?.close(); }
+  catch (error) {
+    terminalResult = { ...terminalResult, passed: false, cleanup_error: { name: error.name, message: error.message, stack: error.stack } };
+    writeFileSync(resolve(out, 'browser-results.json'), JSON.stringify(terminalResult, null, 2) + '\n');
+    throw error;
+  }
+}
+writeFileSync(resolve(out, 'browser-results.json'), JSON.stringify(terminalResult, null, 2) + '\n');
+console.log(`Report client browser checks passed. Evidence: ${out}`);
