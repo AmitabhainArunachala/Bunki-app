@@ -1,0 +1,157 @@
+{
+  "schema": "kairo-assessment-sources/1",
+  "sources": [
+    {
+      "id": "jlpt-official-workbooks",
+      "title": "Japanese-Language Proficiency Test Official Practice Workbooks",
+      "edition": "2012 and 2018",
+      "url": "https://www.jlpt.jp/e/samples/sampleindex.html",
+      "location": "source landing page",
+      "checkedAt": "2026-09-23T05:12:26.171Z",
+      "sourceSha256": "e20d76d048fa0be9c4d12b6cd96deb3d3367ddb601062cb3fdebf01402313d5c",
+      "sourceBytes": 58005,
+      "sourceClass": "official",
+      "distribution": "reference",
+      "publicQuestionRedistribution": "not-established",
+      "personalUseBasis": "jlpt-site-policy:copyright-1",
+      "note": "2012 and 2018 editions contain questions drawn from real tests. Some N1/N2 reading texts and all listening recordings have third-party rights."
+    },
+    {
+      "id": "jlpt-official-samples",
+      "title": "Official JLPT sample questions",
+      "edition": "current sample page",
+      "url": "https://www.jlpt.jp/e/samples/forlearners.html",
+      "location": "source landing page",
+      "checkedAt": "2026-09-23T05:12:26.165Z",
+      "sourceSha256": "b634cf00ec9d8f1962a07975e610f8468afffd6fb9df03e2c758eba9c3df852e",
+      "sourceBytes": 14812,
+      "sourceClass": "official",
+      "distribution": "reference",
+      "publicQuestionRedistribution": "not-established",
+      "personalUseBasis": "jlpt-site-policy:copyright-1",
+      "note": "Official examples of question types; this page is not a full exam."
+    },
+    {
+      "id": "jlpt-site-policy",
+      "title": "Official JLPT site policy",
+      "edition": "current policy page",
+      "url": "https://www.jlpt.jp/sp/e/policy.html",
+      "location": "source landing page",
+      "checkedAt": "2026-09-23T05:12:26.164Z",
+      "sourceSha256": "25edcdda62ced80f68f09692aa1fb9f7cb15b109f49437befbdc7a6ec257e3f9",
+      "sourceBytes": 15338,
+      "sourceClass": "official",
+      "distribution": "reference",
+      "publicQuestionRedistribution": "not-established",
+      "personalUseBasis": null,
+      "note": "Personal-study use is permitted under the stated policy. This record does not grant public redistribution."
+    },
+    {
+      "id": "bunki-original-n2-20260910",
+      "title": "Bunki original N2 full test draft",
+      "edition": "authoring-candidate",
+      "url": null,
+      "location": "original Bunki assessment authoring",
+      "sourceClass": "original-ai",
+      "distribution": "public-candidate",
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "rightsBasis": "bunki-original-authoring-20260923",
+      "note": "Original AI-authored questions. Release requires independent AI editorial review and rendered-media inspection. No official endorsement or score calibration."
+    },
+    {
+      "id": "bunki-original-n2-20260923",
+      "title": "Bunki original N2 short and medium practice",
+      "edition": "authoring-candidate",
+      "url": null,
+      "location": "original Bunki assessment authoring",
+      "sourceClass": "original-ai",
+      "distribution": "public-candidate",
+      "processRef": "codex-original-n2-practice-20260923",
+      "rightsBasis": "bunki-original-authoring-20260923",
+      "note": "Original AI-authored questions. Release requires independent AI editorial review and rendered-media inspection. No official endorsement or score calibration."
+    },
+    {
+      "id": "bunki-original-jlpt-generated-20260923",
+      "title": "Bunki original JLPT form authoring",
+      "edition": "authoring-candidate",
+      "url": null,
+      "location": "original Bunki task-batch authoring",
+      "sourceClass": "original-ai",
+      "distribution": "public-candidate",
+      "rightsBasis": "bunki-original-authoring-20260923",
+      "note": "Actual author provider and model identity are preserved in each batch receipt. Original authored content requires independent editorial review and rendered-media inspection before release."
+    },
+    {
+      "id": "kairo-local-tts-voices-20260923",
+      "title": "Listening audio: original scripts, synthesized with credited voice models",
+      "edition": "2026-09-23 local rendering",
+      "url": null,
+      "sourceClass": "voice-attribution",
+      "distribution": "reference",
+      "componentSourceIds": ["voice-koharune-ami", "voice-jvnv-sbv2"],
+      "rightsScope": "Rendered original assessment audio; each component retains its own terms. No voice model files are distributed.",
+      "note": "These voices are synthesized. The credited speakers did not record or endorse these exam scripts."
+    },
+    {
+      "id": "voice-koharune-ami",
+      "title": "Style-Bert-VITS2 model: 小春音アミ / あみたろの声素材工房",
+      "edition": "litagin model revision 7af50fba79c52110046679eb5a0c8895afc5c584",
+      "url": "https://amitaro.net/",
+      "sourceClass": "voice-attribution",
+      "distribution": "reference",
+      "modelUrl": "https://huggingface.co/litagin/sbv2_koharune_ami",
+      "voiceIds": ["koharune-ami"],
+      "attribution": "Style-Bert-VITS2モデル: 小春音アミ、あみたろの声素材工房 (https://amitaro.net/)",
+      "license": "Amitaro custom voice terms; not Creative Commons",
+      "termsEvidence": [
+        {
+          "url": "https://huggingface.co/litagin/sbv2_koharune_ami/raw/7af50fba79c52110046679eb5a0c8895afc5c584/README.md",
+          "checkedAt": "2026-09-23T07:05:50.451463+00:00",
+          "sourceSha256": "b9c7cd51e92f7a9b42784c4e91a47da8dce53b682b0b24ef07d13d1f998724e8",
+          "sourceBytes": 3321
+        },
+        {
+          "url": "https://amitaro.net/voice/voice_rule/",
+          "checkedAt": "2026-09-23T07:05:53.424152+00:00",
+          "sourceSha256": "efd05bf47534acdd97458ec2facb8331592065155ed0b5013d64eb4bbf3644d9",
+          "sourceBytes": 265956
+        },
+        {
+          "url": "https://amitaro.net/voice/livevoice/",
+          "checkedAt": "2026-09-23T07:05:54.021005+00:00",
+          "sourceSha256": "0c028b9accf69e38ffe15f652971ccc349042f9c6aa29152503d4007725bd431",
+          "sourceBytes": 250833
+        }
+      ],
+      "note": "Synthesized from litagin’s model based on Amitaro voice material. Follow both linked voice and live-audio terms; visible attribution is required. The model and generated speech are not official recordings by Amitaro."
+    },
+    {
+      "id": "voice-jvnv-sbv2",
+      "title": "Style-Bert-VITS2 JVNV voices F1, M1 and M2 / litagin — CC BY-SA 4.0 models",
+      "edition": "litagin model revision 205830ca1d49e666ddfbf2a755f0108e9cade4dd",
+      "url": "https://huggingface.co/litagin/style_bert_vits2_jvnv",
+      "sourceClass": "voice-attribution",
+      "distribution": "reference",
+      "voiceIds": ["jvnv-F1-jp", "jvnv-M1-jp", "jvnv-M2-jp"],
+      "attribution": "Style-Bert-VITS2 JVNV / litagin; trained on the JVNV corpus; CC BY-SA 4.0",
+      "license": "CC-BY-SA-4.0",
+      "licenseScope": "Voice models, inherited from the JVNV corpus; this is not a blanket relicensing of the whole application or other voice components.",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "termsEvidence": [
+        {
+          "url": "https://huggingface.co/litagin/style_bert_vits2_jvnv/raw/205830ca1d49e666ddfbf2a755f0108e9cade4dd/README.md",
+          "checkedAt": "2026-09-23T07:05:51.910170+00:00",
+          "sourceSha256": "ec0d5d05c21c62d313d812bd7c2660b54cc6335259679f36834131bd9abbbe3c",
+          "sourceBytes": 832
+        },
+        {
+          "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "checkedAt": "2026-09-23T07:05:54.635631+00:00",
+          "sourceSha256": "17de6b7071e8f4816b103fb45aff75f71c94821f303534fc3e21cb68bd0f7148",
+          "sourceBytes": 35744
+        }
+      ],
+      "changes": "Original Japanese assessment scripts synthesized locally in Neutral style; utterances assembled with pauses and encoded to mono 64 kbps MP3. Model files were not modified or distributed."
+    }
+  ]
+}

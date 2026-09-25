@@ -1,6 +1,11 @@
 import { inputHashOf } from '@bunki/ai/hash';
 import { isoInstantSchema } from '@bunki/domain/events/shared';
 import { z } from 'zod';
+import {
+  assessmentOperationV2Schema,
+  parseAssessmentOperationV2,
+  type AssessmentOperationV2,
+} from './assessment-operations-v2.ts';
 
 import {
   assertJsonBudget,
@@ -18,6 +23,8 @@ import {
 export const SYNC_SCHEMA_VERSION = 1;
 export const SYNC_SCHEMA_EPOCH = 1;
 export const SYNC_MERGE_POLICY = 'kairo-conservative-merge/1';
+/** Payload capability changes; causal and deletion policy epochs remain unchanged. */
+export const ASSESSMENT_SYNC_SCHEMA_VERSION = 2;
 
 export const scopeSchema = z.strictObject({
   accountId: idSchema,
@@ -70,7 +77,9 @@ export const targetSchema = z
     id: idSchema,
   })
   .refine((value) => value.kind !== 'source-reference' || captureIdPattern.test(value.id));
-export type EntityTarget = DeepReadonly<z.infer<typeof targetSchema>>;
+export type EntityTarget =
+  | DeepReadonly<z.infer<typeof targetSchema>>
+  | { readonly kind: 'learning-followup' | 'learning-card'; readonly id: string };
 const sourceVersionSchema = z.strictObject({
   sourceId: idSchema,
   versionId: idSchema,
@@ -257,7 +266,8 @@ export const recordOperationSchema = z.discriminatedUnion('kind', [
   tombstoneSchema,
   restoreSchema,
 ]);
-export type RecordOperation = DeepReadonly<z.infer<typeof recordOperationSchema>>;
+export type LegacyRecordOperation = DeepReadonly<z.infer<typeof recordOperationSchema>>;
+export type RecordOperation = LegacyRecordOperation | AssessmentOperationV2;
 
 const operationFields = {
   format: z.literal('kairo-sync-operation'),
@@ -280,8 +290,21 @@ const envelopeSchema = z.strictObject({
   opId: digestSchema,
   payloadSha256: digestSchema,
 });
-export type SyncOperationInput = DeepReadonly<z.infer<typeof creationSchema>>;
-export type SyncOperation = DeepReadonly<z.infer<typeof envelopeSchema>>;
+export type SyncOperationInput = Omit<DeepReadonly<z.infer<typeof creationSchema>>, 'payload'> & {
+  readonly payload: RecordOperation;
+};
+export type LegacySyncOperation = DeepReadonly<z.infer<typeof envelopeSchema>>;
+const creationV2Schema = creationSchema.extend({
+  v: z.literal(ASSESSMENT_SYNC_SCHEMA_VERSION),
+  payload: assessmentOperationV2Schema,
+});
+const envelopeV2Schema = creationV2Schema.extend({
+  opId: digestSchema,
+  payloadSha256: digestSchema,
+});
+export type SyncOperationV2Input = DeepReadonly<z.infer<typeof creationV2Schema>>;
+export type SyncOperationV2 = DeepReadonly<z.infer<typeof envelopeV2Schema>>;
+export type SyncOperation = LegacySyncOperation | SyncOperationV2;
 
 export function targetOf(payload: RecordOperation): EntityTarget {
   switch (payload.kind) {
@@ -292,7 +315,12 @@ export function targetOf(payload: RecordOperation): EntityTarget {
     case 'reading.resume':
       return { kind: 'reading-position', id: payload.anchor.source.sourceId };
     case 'exam.attempt':
+    case 'assessment.result/2':
       return { kind: 'exam-attempt', id: payload.attemptId };
+    case 'learning.followup/2':
+      return { kind: 'learning-followup', id: payload.followupId };
+    case 'learning.suppress/2':
+      return { kind: 'learning-card', id: `${payload.target.t}:${payload.target.id}` };
     case 'review.attempt':
       return { kind: 'review-attempt', id: payload.attemptId };
     case 'entity.restore':
@@ -307,7 +335,7 @@ export function referencesOf(operation: SyncOperation): readonly OperationRef[] 
   if (operation.predecessor) refs.push(operation.predecessor);
   const payload = operation.payload;
   if ('generation' in payload && payload.generation) refs.push(payload.generation);
-  if ('supersedes' in payload) refs.push(...payload.supersedes);
+  if ('supersedes' in payload && payload.supersedes) refs.push(...payload.supersedes);
   if (payload.kind === 'entity.restore') refs.push(...payload.tombstones);
   const unique = new Map<string, OperationRef>();
   for (const ref of refs) {
@@ -349,7 +377,7 @@ function sealOperation(operation: SyncOperation): SyncOperation {
   return frozen;
 }
 
-export function createSyncOperation(input: SyncOperationInput): SyncOperation {
+export function createSyncOperation(input: unknown): LegacySyncOperation {
   const parsed = parse(creationSchema, input);
   const operation = {
     ...parsed,
@@ -362,9 +390,12 @@ export function createSyncOperation(input: SyncOperationInput): SyncOperation {
   return immutable(operation);
 }
 
-export function parseSyncOperation(raw: unknown): SyncOperation {
+/** Strict v1 parser retained for old clients and compatibility checks. */
+export function parseSyncOperation(raw: unknown): LegacySyncOperation {
   if (typeof raw === 'object' && raw !== null && validatedOperations.has(raw)) {
-    return raw as SyncOperation;
+    if ((raw as SyncOperation).v !== SYNC_SCHEMA_VERSION)
+      throw new SyncValidationError('unsupported-version', ['v']);
+    return raw as LegacySyncOperation;
   }
   assertJsonBudget(raw);
   if (typeof raw === 'object' && raw !== null && 'v' in raw && raw.v !== SYNC_SCHEMA_VERSION) {
@@ -372,11 +403,41 @@ export function parseSyncOperation(raw: unknown): SyncOperation {
   }
   const parsed = parse(envelopeSchema, raw);
   validateEnvelope(parsed);
+  return sealOperation(parsed) as LegacySyncOperation;
+}
+
+export function createSyncOperationV2(input: unknown): SyncOperationV2 {
+  const parsed = parse(creationV2Schema, input);
+  parseAssessmentOperationV2(parsed.payload);
+  const operation = {
+    ...parsed,
+    opId: inputHashOf({ scope: parsed.scope, actor: parsed.actor }),
+    payloadSha256: inputHashOf(parsed.payload),
+  };
+  validateEnvelope(operation);
+  return immutable(operation);
+}
+
+/** New clients explicitly opt in. Unknown future versions still fail closed. */
+export function parseAnySyncOperation(raw: unknown): SyncOperation {
+  if (typeof raw === 'object' && raw !== null && validatedOperations.has(raw))
+    return raw as SyncOperation;
+  assertJsonBudget(raw);
+  if (
+    typeof raw !== 'object' ||
+    raw === null ||
+    !('v' in raw) ||
+    raw.v !== ASSESSMENT_SYNC_SCHEMA_VERSION
+  )
+    return parseSyncOperation(raw);
+  const parsed = parse(envelopeV2Schema, raw);
+  parseAssessmentOperationV2(parsed.payload);
+  validateEnvelope(parsed);
   return sealOperation(parsed);
 }
 
 export function operationReference(raw: SyncOperation): OperationRef {
-  const operation = parseSyncOperation(raw);
+  const operation = parseAnySyncOperation(raw);
   const existing = operationReferences.get(operation);
   if (existing) return existing;
   const reference = immutable({

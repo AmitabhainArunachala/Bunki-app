@@ -881,17 +881,16 @@ async function main() {
 
   const latestSnapshot = await readAppRecordSnapshot(page);
   const latestDrafts = latestSnapshot.record.teacherDrafts;
-  const emptySentenceDrafts = { version: 1, entries: [] };
-  if (!isDeepStrictEqual(latestSnapshot.record.sentenceDrafts, emptySentenceDrafts) ||
+  if (latestSnapshot.record.sentenceDrafts != null ||
       exported.record.sentenceDrafts != null)
-    throw new Error('Roundtrip fixture requires only the known empty sentence-draft canonicalization');
+    throw new Error('Roundtrip fixture requires absent sentence drafts on both records');
   if (latestDrafts?.entries.length !== 1 || latestDrafts.entries[0].contextRef !== null ||
       latestDrafts.entries[0].text !== 'RECORD-A の秘密' || latestDrafts.entries[0].consumed !== true)
     throw new Error('Roundtrip fixture requires the exact current consumed general question');
   const restored = await importThroughUi(page, exportedRecord, 'synthetic-roundtrip.json');
-  // The actual importer parses both draft roots; an absent sentence root becomes
-  // its known empty form. Preserve exact comparison of every historical value.
-  const expectedRestored = { ...exported, record: { ...exported.record, teacherDrafts: latestDrafts, sentenceDrafts: emptySentenceDrafts } };
+  // The actual importer preserves the current question draft and absent sentence
+  // root. Compare every historical value without an empty-root substitution.
+  const expectedRestored = { ...exported, record: { ...exported.record, teacherDrafts: latestDrafts } };
   if (!sameData(restored, expectedRestored)) {
     writeFileSync(resolve(OUT, 'restore-comparison.json'), JSON.stringify({ restored, expectedRestored }, null, 2) + '\n');
   }

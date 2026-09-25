@@ -48,6 +48,8 @@ export function readExamAttemptViews(replica: SyncReplica): readonly ExamAttempt
     >();
     for (const reference of projection.heads) {
       const operation = operations.get(reference.opId);
+      // V2 has its own explicit view; old history never reinterprets a rich result as v1.
+      if (operation?.payload.kind === 'assessment.result/2') continue;
       if (
         !operation ||
         operation.payload.kind !== 'exam.attempt' ||

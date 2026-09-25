@@ -1,0 +1,578 @@
+{
+  "schema": "kairo-assessment-audio-scripts/1",
+  "formId": "kairo-original-jlpt-n2-medium-01",
+  "units": [
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q33:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q33"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "明日の発表資料、なんとか形にはなったんですけど、やっぱり写真が少し寂しい気がして。もう何枚か関連する画像を探してきたほうがいいでしょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うーん、見せてもらったけど、写真は今の数でも十分伝わるよ。画像が多すぎるとかえって話のポイントがぼやけるし。むしろ、もう少し構成のほうを工夫したほうがいいかな。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "構成、ですか。最後にまとめとして結論をきちんと書いてあるんですけど、それだけじゃ足りないんでしょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "結論は最後に残しておいていいんだけど、聞き手は最初の数分で何が言いたいのかを知りたいんだよね。だから、最初のスライドにも結論を一言だけ先に出してみて。冒頭で結論が見えると、その後の説明にも説得力が出るから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "なるほど、最後のまとめはそのまま残して、最初にも結論を加えるんですね。そういえば、資料は何部くらい印刷しておきましょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "印刷はまだいいよ。まず結論を入れる変更が終わったら、全体を一度通して読み直して、流れに違和感がないか確認して。それが終わってから印刷の枚数を決めよう。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "わかりました。じゃあ、まず最初のスライドに結論を入れるところから始めます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "女の人は、このあとまず何をしますか。\n明日の発表資料、なんとか形にはなったんですけど、やっぱり写真が少し寂しい気がして。もう何枚か関連する画像を探してきたほうがいいでしょうか。\nうーん、見せてもらったけど、写真は今の数でも十分伝わるよ。画像が多すぎるとかえって話のポイントがぼやけるし。むしろ、もう少し構成のほうを工夫したほうがいいかな。\n構成、ですか。最後にまとめとして結論をきちんと書いてあるんですけど、それだけじゃ足りないんでしょうか。\n結論は最後に残しておいていいんだけど、聞き手は最初の数分で何が言いたいのかを知りたいんだよね。だから、最初のスライドにも結論を一言だけ先に出してみて。冒頭で結論が見えると、その後の説明にも説得力が出るから。\nなるほど、最後のまとめはそのまま残して、最初にも結論を加えるんですね。そういえば、資料は何部くらい印刷しておきましょうか。\n印刷はまだいいよ。まず結論を入れる変更が終わったら、全体を一度通して読み直して、流れに違和感がないか確認して。それが終わってから印刷の枚数を決めよう。\nわかりました。じゃあ、まず最初のスライドに結論を入れるところから始めます。\n女の人は、このあとまず何をしますか。",
+      "transcriptSha256": "1010ab1be23f32d155b6c84d49d00fe39592613fad6a0dd4bc770ec399acb277",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-medium-01-revise-01",
+        "runtimeSha256": "bfa38f279d0a84388ef400307b134228e5944423005f903ec0598758fe39d4b8",
+        "responseSha256": "c470614173a4a73d1ad661e092640e15501d2de686d09270b889f16ada282f26",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "男の人は写真について「今の数で十分伝わる」と述べ、追加の画像探しを否定するためchoice-1は不正確。結論は最後に残すよう明示し、削除は一切指示していないためchoice-2も不正確。印刷は「まだいいよ」と後回しにし、変更後に通して読み直してから枚数を決める流れなのでchoice-4はまずやることではない。正解はchoice-3：女の人が確認のうえ「まず最初のスライドに結論を入れるところから始めます」と最後に復唱しており、結論を最初に加える変更が次の行動として一意に確定する。"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q34:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q34"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、このあと何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "会議室、午後も引き続き企画会議で使う予定ですけど、このままの配置で大丈夫でしょうか。お昼の間に机とか椅子を別の部屋に戻したほうがいいですか。それとも、午後の準備で何かしておくことはありますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "いや、午後も同じメンバーで使うから、椅子の配置はそのままでいいわよ。机も動かさないで。ただ、昼休みの間に少しだけ片づけておいてほしいことがあるの。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "あ、はい。じゃあ、ホワイトボードに書いてある今日の議事録みたいなのは消したほうがいいですか。午後も使うなら残しておいたほうがいいですよね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうね、ホワイトボードは午後の議論でも参照するから、そのまま残しておいて。それより、机の上に配付資料が何種類か散らばってるでしょう。あれ、午後は別の資料を使うから、種類ごとに分けて棚に入れておいてくれる？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "わかりました。つまり、椅子はこのままで、ホワイトボードも消さずに残して、机の上にある紙を種類別に棚にしまうんですね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、それでお願いするわ。午後の開始時には新しい資料を配るから、机の上は空けておいてちょうだい。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、このあと何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "男の人は、このあと何をしますか。\n会議室、午後も引き続き企画会議で使う予定ですけど、このままの配置で大丈夫でしょうか。お昼の間に机とか椅子を別の部屋に戻したほうがいいですか。それとも、午後の準備で何かしておくことはありますか。\nいや、午後も同じメンバーで使うから、椅子の配置はそのままでいいわよ。机も動かさないで。ただ、昼休みの間に少しだけ片づけておいてほしいことがあるの。\nあ、はい。じゃあ、ホワイトボードに書いてある今日の議事録みたいなのは消したほうがいいですか。午後も使うなら残しておいたほうがいいですよね。\nそうね、ホワイトボードは午後の議論でも参照するから、そのまま残しておいて。それより、机の上に配付資料が何種類か散らばってるでしょう。あれ、午後は別の資料を使うから、種類ごとに分けて棚に入れておいてくれる？\nわかりました。つまり、椅子はこのままで、ホワイトボードも消さずに残して、机の上にある紙を種類別に棚にしまうんですね。\nええ、それでお願いするわ。午後の開始時には新しい資料を配るから、机の上は空けておいてちょうだい。\n男の人は、このあと何をしますか。",
+      "transcriptSha256": "eaaea3be36e747668e2dd6f35d063d06cbbbb0a0e50e2e9fb64ad54cd75aa4a9",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "male",
+        "speaker-b": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "The authored question or speaker description identifies speaker-a as a man; the other dialogue voice is distinct and female."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-medium-01-revise-02",
+        "runtimeSha256": "22bcf08a63c2aad2f7959616067ada99b277cdbb33f93d6bfae09e53674d32cc",
+        "responseSha256": "76162bc93083b9e27ee4c969718f0b19bf9147bba145813b8f24e4e76c62ca4a",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "女の人は午後も同じメンバーで会議室を使うため、椅子の配置はそのままでよいと明言し、机も動かさないよう指示している。これにより選択肢1「椅子を片づける」と選択肢4「机を別の部屋へ運ぶ」は却下される。ホワイトボードは午後の議論でも参照するため残すよう求め、選択肢3「ホワイトボードを消す」も却下される。一方、机の上に散らばる配付資料は午後に別の資料を使うため不要となり、種類ごとに分けて棚にしまうよう依頼する。この指示が男の人の次のアクションとして明確に提示され、選択肢2「紙を分けて棚に入れる」が唯一の正答となる。男の人の確認発言でも椅子はそのまま、ホワイトボードは残す、紙を種類別に棚にしまうと復唱し、女の人も承認しているため、正答の一意性が保たれている。"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q35:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q35"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人が電車で行くことにした理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "今週末の展示会、今回は電車で行くことにしたんだよね。前回は車だったから、てっきりまた車かと思ってたよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん、実は二人で行くなら車のほうが安いって計算したんだ。高速代を入れても電車の片道分くらいで済むし、ガソリン代も考えればかなりお得なんだよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "じゃあ、やっぱり車のほうがいいんじゃない？会場の駐車場代もそれほど高くないでしょうし、荷物も多いから車のほうが楽じゃない？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "それが、会場の駐車場が今週は工事中で使えないんだ。周辺もコインパーキングが少なくて、事前に調べたらどこも満車予想で、三駅先まで行かないと空きがない状態だったんだ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうか、それじゃ車で行っても止めるところがないわね。電車なら到着時間も正確だし、乗り換えも一回で済むから便利よね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうなんだ。正直、時間はけっこう余裕があるから、少し早く着いても問題ないし、運転自体は苦じゃないんだ。ただ、車を置く場所が確保できないと結局どうしようもないからね。駐車場さえ使えれば車にしたんだけど、今回は電車にしたよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人が電車で行くことにした理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "男の人が電車で行くことにした理由は何ですか。\n今週末の展示会、今回は電車で行くことにしたんだよね。前回は車だったから、てっきりまた車かと思ってたよ。\nうん、実は二人で行くなら車のほうが安いって計算したんだ。高速代を入れても電車の片道分くらいで済むし、ガソリン代も考えればかなりお得なんだよ。\nじゃあ、やっぱり車のほうがいいんじゃない？会場の駐車場代もそれほど高くないでしょうし、荷物も多いから車のほうが楽じゃない？\nそれが、会場の駐車場が今週は工事中で使えないんだ。周辺もコインパーキングが少なくて、事前に調べたらどこも満車予想で、三駅先まで行かないと空きがない状態だったんだ。\nそうか、それじゃ車で行っても止めるところがないわね。電車なら到着時間も正確だし、乗り換えも一回で済むから便利よね。\nそうなんだ。正直、時間はけっこう余裕があるから、少し早く着いても問題ないし、運転自体は苦じゃないんだ。ただ、車を置く場所が確保できないと結局どうしようもないからね。駐車場さえ使えれば車にしたんだけど、今回は電車にしたよ。\n男の人が電車で行くことにした理由は何ですか。",
+      "transcriptSha256": "0ef568902e74dfcda4270a6805a0ceb9777f2f3260054221920c7c4b6199d75e",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-medium-01-revise-03",
+        "runtimeSha256": "481719c7972183d646c723db79339988d769d5b29bbdcd1c323b224623319ed1",
+        "responseSha256": "07395228c9926f242cb2ca55f97405bbb0312e79da346b5e0019fa3232ae4d3b",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "The man explicitly states that driving would actually be cheaper for two people, including highway and gas costs, so choice-1 is rejected. He says he has plenty of time and arriving early would not be a problem, so choice-3 (wanting to arrive earlier) is rejected. He mentions that driving itself is not a hardship for him, so choice-4 is rejected. The decisive factor he names is that the venue's parking lot is under construction and nearby coin parking is expected to be full, with no available space even three stations away—leaving no place to park. This makes choice-2 uniquely correct. The expanded dialogue adds competing considerations (cost advantage of driving, luggage convenience, time flexibility, driving comfort) so each distractor is audibly considered and dismissed, while the parking problem remains the sole decisive reason."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q36:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q36"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、今の職場の何がよいと言っていますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "新しい職場、もう二週間くらい経った？仕事の感じはどう？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん、正直まだ大変かな。覚えることが多くて、特に社内の手続きとかシステムの使い方とか、一度じゃなかなか頭に入らなくて。でも、それ以上にありがたいと思ってるのは、隣の席の先輩がすごく面倒見がいいことなんだ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうなの？具体的にどういう風に助けてもらってるの？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "分からないことがあったら、どんな些細なことでもいつでも聞いてって最初に言ってくれたんだ。最初は何度も質問するのは申し訳ないかなって遠慮してたんだけど、何度聞いても嫌な顔一つせず丁寧に教えてくれるから、今は困ったままにしなくて済むのが本当に助かってる。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "それはいい環境だね。前の職場とは違うの？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "全然違うよ。前は質問するタイミングが掴めなくて、結局自分で調べるしかなかったから。今の職場だと、聞きたい時にすぐ聞けるから、仕事も早く進むし。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、今の職場の何がよいと言っていますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "男の人は、今の職場の何がよいと言っていますか。\n新しい職場、もう二週間くらい経った？仕事の感じはどう？\nうん、正直まだ大変かな。覚えることが多くて、特に社内の手続きとかシステムの使い方とか、一度じゃなかなか頭に入らなくて。でも、それ以上にありがたいと思ってるのは、隣の席の先輩がすごく面倒見がいいことなんだ。\nそうなの？具体的にどういう風に助けてもらってるの？\n分からないことがあったら、どんな些細なことでもいつでも聞いてって最初に言ってくれたんだ。最初は何度も質問するのは申し訳ないかなって遠慮してたんだけど、何度聞いても嫌な顔一つせず丁寧に教えてくれるから、今は困ったままにしなくて済むのが本当に助かってる。\nそれはいい環境だね。前の職場とは違うの？\n全然違うよ。前は質問するタイミングが掴めなくて、結局自分で調べるしかなかったから。今の職場だと、聞きたい時にすぐ聞けるから、仕事も早く進むし。\n男の人は、今の職場の何がよいと言っていますか。",
+      "transcriptSha256": "6f3bf73259b1fca4e3e5a31aa6ac8aad8cd6f77465c93e01998a1c9c74311106",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-medium-01-revise-04",
+        "runtimeSha256": "18a20059561524b8f8856a1cd17047494c02cf07f77005100b429cfa646bd8dd",
+        "responseSha256": "b7ff4be2855b0d1aec2cfa07eb98becf96a2a8cdf296174f207eedc449e7b7a3",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "男の人は「覚えることが多くて大変」と述べつつ、それ以上に感謝しているのは隣の席の先輩が「いつでも聞いて」と言ってくれ、何度でも丁寧に教えてくれるため、困ったままにしなくて済む点であると明言している。これにより choice-3「困った時に質問しやすいこと」が唯一の正答となる。choice-1「覚える仕事が少ないこと」は、覚えることが多いと明言しているため誤り。choice-2「席が毎日変わること」は言及がなく、隣の席が固定されている文脈とも矛盾する。choice-4「前の仕事と内容が同じこと」は、前の職場とは全然違うと述べているため誤りである。"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q37:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q37"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "announcer",
+          "text": "旅行の予定を立てるとき、ガイドブックを開くとあちこち行きたくなりますよね。特に時間が限られていると、有名な観光地を全部回ろうとしがちですが、そうすると移動ばかりで各場所に滞在する時間が本当に短くなってしまいます。せっかく着いたのに写真を撮るだけで帰ることになりかねません。かえって疲れるだけです。かといって、現地に着くまで何も決めないのもお勧めしません。限られた時間を無駄にしてしまうからです。そこで、私がいつもしている方法を紹介します。まず、今回どうしてもやりたいことを一つだけ決めます。例えば、ある美術館をゆっくり見たいとか、地元の市場で食べ歩きをしたいとか、具体的に一つ選びます。その中心となる予定に十分な時間を確保してから、余裕があれば近くでできることを追加するんです。こうすれば、すべてを予定通りにできなくても、一番大事な体験は確実に楽しめるので、満足度の高い旅になります。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "この人は、旅行の計画をどう立てることを勧めていますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1。移動に使う時間を最も長くする"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2。有名な場所を全て入れる"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3。一番したいことを優先して予定を組む"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "4。現地に着くまで何も決めない"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "旅行の予定を立てるとき、ガイドブックを開くとあちこち行きたくなりますよね。特に時間が限られていると、有名な観光地を全部回ろうとしがちですが、そうすると移動ばかりで各場所に滞在する時間が本当に短くなってしまいます。せっかく着いたのに写真を撮るだけで帰ることになりかねません。かえって疲れるだけです。かといって、現地に着くまで何も決めないのもお勧めしません。限られた時間を無駄にしてしまうからです。そこで、私がいつもしている方法を紹介します。まず、今回どうしてもやりたいことを一つだけ決めます。例えば、ある美術館をゆっくり見たいとか、地元の市場で食べ歩きをしたいとか、具体的に一つ選びます。その中心となる予定に十分な時間を確保してから、余裕があれば近くでできることを追加するんです。こうすれば、すべてを予定通りにできなくても、一番大事な体験は確実に楽しめるので、満足度の高い旅になります。\nこの人は、旅行の計画をどう立てることを勧めていますか。\n1。移動に使う時間を最も長くする\n2。有名な場所を全て入れる\n3。一番したいことを優先して予定を組む\n4。現地に着くまで何も決めない",
+      "transcriptSha256": "65a3359dd7236366f183ecb4d5189672360fe0d17d31cd33c3ca4718b7df158c",
+      "printedOptions": false,
+      "voiceRoles": {
+        "announcer": "male",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-medium-01-revise-05",
+        "runtimeSha256": "a723479fecb8d74cfe7837ae7d719fcbcc7ff7ed51da3e03394c4c9370f97322",
+        "responseSha256": "0041217409f285e86a4bacd3e5470345d5b5364958aad7bb4de7eb591599a124",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "The speaker recommends first choosing the single most important thing to do, securing enough time for it, and only then adding nearby activities—directly supporting choice-3. Choice-1 is rejected because the speaker warns that excessive travel time shortens each stay and causes fatigue. Choice-2 is rejected because trying to visit every famous spot leads to superficial, rushed visits. Choice-4 is rejected because the speaker explicitly advises against leaving plans undecided until arrival, noting it wastes limited time. Only choice-3 remains uniquely correct."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q38:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q38"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "お待たせして、申し訳ありません。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "最もよい返事を選んでください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1。いいえ、私も今来たところです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2。はい、待っていただけませんか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3。いいえ、ぜひお待ちください。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "お待たせして、申し訳ありません。\n最もよい返事を選んでください。\n1。いいえ、私も今来たところです。\n2。はい、待っていただけませんか。\n3。いいえ、ぜひお待ちください。",
+      "transcriptSha256": "54a17140012742ead07ae275f34b5b38e73aef7e188d2e8836aa70f2188faab5",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q39:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q39"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "この書類、今日中でなくても構いませんよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "最もよい返事を選んでください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1。では、明日の午前中にお渡しします。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2。では、今日中にしていただけませんか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3。今日から書類ではなくなります。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "この書類、今日中でなくても構いませんよ。\n最もよい返事を選んでください。\n1。では、明日の午前中にお渡しします。\n2。では、今日中にしていただけませんか。\n3。今日から書類ではなくなります。",
+      "transcriptSha256": "5b9e4058d233042c964859d1d55a8cfafd7cd3f1ad99efa05bb0eeb14e7cc5bb",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01:q40:audio",
+      "itemIds": ["kairo-original-jlpt-n2-medium-01:q40"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "announcer",
+          "text": "市民センターでは、今月四つの体験講座を開きます。写真講座は土曜日の午前中に行われ、受講料は材料費込みで千円です。カメラの貸し出しもありますので、カメラをお持ちでなくてもご参加いただけます。料理講座は土曜日の午後、受講料は二千円で、食材はすべて会場で用意しますので、手ぶらでご参加いただけます。工作講座は日曜日の午前、受講料は五百円とお手軽ですが、各自で道具を持参してください。園芸講座は日曜日の午後、受講料は千五百円で、必要な道具や材料は会場で用意しますので、手ぶらでご参加いただけます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "ねえ、市民センターの体験講座の案内がポストに入ってたんだけど、一緒に何か受けてみない？ 最近仕事ばかりで全然趣味みたいなことやってないし、たまには息抜きしたほうがいいかなって。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "あ、それいいね。ちょうど僕も何か始めたいと思ってたところだよ。どんな講座があるの？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "写真と料理と工作と園芸の四つがあるんだって。でも、私は土曜日は一日中仕事が入ってるから、土曜日の講座は絶対に無理なんだよね。日曜日なら特に予定もないから、午前でも午後でも空いているよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "僕も日曜日なら大丈夫だよ。土曜日は実家に帰る予定があって。じゃあ、日曜日に開かれているのは工作と園芸の二つだけだね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そう。工作は日曜の午前で五百円、園芸は日曜の午後で千五百円。工作は安いけど、案内を見ると道具を持っていかないといけないみたい。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん、それなんだよね。僕、そういう工作用の道具って家に全然ないんだ。わざわざ買いに行くのももったいないし、できれば何も準備しないでそのまま行けるものがいいなあ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "なるほど。それから予算なんだけど、一人二千円までにしてもいい？ 今月ちょっと出費が多くて、あまりお金をかけたくないんだ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん、二千円まででいいよ。えーと、日曜日に開いていて、道具の持参が不要で、二千円以内の条件に合うものは……一つだけあるね。園芸講座にしよう。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうだね、それにしよう。午後だから朝ゆっくりできるし。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二人は、どの講座に参加しますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1。写真講座"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2。料理講座"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3。工作講座"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "4。園芸講座"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "市民センターでは、今月四つの体験講座を開きます。写真講座は土曜日の午前中に行われ、受講料は材料費込みで千円です。カメラの貸し出しもありますので、カメラをお持ちでなくてもご参加いただけます。料理講座は土曜日の午後、受講料は二千円で、食材はすべて会場で用意しますので、手ぶらでご参加いただけます。工作講座は日曜日の午前、受講料は五百円とお手軽ですが、各自で道具を持参してください。園芸講座は日曜日の午後、受講料は千五百円で、必要な道具や材料は会場で用意しますので、手ぶらでご参加いただけます。\nねえ、市民センターの体験講座の案内がポストに入ってたんだけど、一緒に何か受けてみない？ 最近仕事ばかりで全然趣味みたいなことやってないし、たまには息抜きしたほうがいいかなって。\nあ、それいいね。ちょうど僕も何か始めたいと思ってたところだよ。どんな講座があるの？\n写真と料理と工作と園芸の四つがあるんだって。でも、私は土曜日は一日中仕事が入ってるから、土曜日の講座は絶対に無理なんだよね。日曜日なら特に予定もないから、午前でも午後でも空いているよ。\n僕も日曜日なら大丈夫だよ。土曜日は実家に帰る予定があって。じゃあ、日曜日に開かれているのは工作と園芸の二つだけだね。\nそう。工作は日曜の午前で五百円、園芸は日曜の午後で千五百円。工作は安いけど、案内を見ると道具を持っていかないといけないみたい。\nうん、それなんだよね。僕、そういう工作用の道具って家に全然ないんだ。わざわざ買いに行くのももったいないし、できれば何も準備しないでそのまま行けるものがいいなあ。\nなるほど。それから予算なんだけど、一人二千円までにしてもいい？ 今月ちょっと出費が多くて、あまりお金をかけたくないんだ。\nうん、二千円まででいいよ。えーと、日曜日に開いていて、道具の持参が不要で、二千円以内の条件に合うものは……一つだけあるね。園芸講座にしよう。\nそうだね、それにしよう。午後だから朝ゆっくりできるし。\n二人は、どの講座に参加しますか。\n1。写真講座\n2。料理講座\n3。工作講座\n4。園芸講座",
+      "transcriptSha256": "7670cb48f29494df3f2ce94c02825abbefb595c0faf48d7cb754f7976ea0b132",
+      "printedOptions": false,
+      "voiceRoles": {
+        "announcer": "male",
+        "speaker-a": "female",
+        "speaker-b": "male",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-medium-01-revise-08",
+        "runtimeSha256": "ba9a48192acf1304c429e7f7266638064ea788e97e690a3f11f663a7101e858d",
+        "responseSha256": "cd56a305ebf313d3d048ee0f6937500402987109e260a92e4025133f0e3dc116",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "三人の統合条件が対話内で明示的に積み重ねられる。第一に、speaker-aは土曜一日中仕事のため土曜開催の講座は不可となり、写真講座（土曜午前）と料理講座（土曜午後）が排除される。第二に、残る日曜講座のうち、工作講座は道具持参が必要だが、speaker-bは工作用の道具を一切持っておらず、買いに行くのも避けたいと述べ、持参不要を条件に挙げる。これにより工作講座が排除される。第三に、予算は一人二千円以内と確認され、園芸講座は千五百円で条件内である。園芸講座は日曜午後開催、道具・材料は会場で用意され手ぶらで参加可能、かつ二千円以内であり、三条件すべてを唯一満たす。各誤選択肢は、写真と料理は土曜開催でspeaker-aの日程制約に抵触し、工作は道具持参要件でspeaker-bの条件に抵触するため、それぞれ確実に不正解となる。"
+      }
+    }
+  ]
+}

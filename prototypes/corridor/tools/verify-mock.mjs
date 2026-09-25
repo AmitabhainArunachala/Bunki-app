@@ -96,7 +96,7 @@ const PASS_CLAIMS = [
   /(likely to|should|will) pass\b/iu,
   /(?<!whether )you would pass/iu,
 ];
-const DISCLAIMS = [/ここでは分からない/u, /not knowable from here/iu, /cannot predict a N[1-5] result/iu, /合否や習熟度の判定には使わない/u];
+const DISCLAIMS = [/ここでは分からない/u, /not knowable from here/iu, /cannot predict a N[1-5] result/iu, /合否や習熟度の判定には使わない/u, /use this as practice rather than a N[1-5] readiness score/iu];
 
 function verifyPapers() {
   const index = readJson(resolve(MOCK_DIR, 'index.json'));
@@ -217,12 +217,14 @@ async function main() {
   // the door stands on the shelf, beside the lessons
   await page.waitForSelector('#mock-link', { timeout: 8000 });
   await page.click('#mock-link');
+  await page.waitForSelector('.assessment-room #exam-legacy');
+  await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
     return { rows: rows.length, pending: document.querySelectorAll('.mock-pending').length };
   })()`);
-  check('the room lists all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
+  check('earlier exercises retain all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time
   await page.click('[data-mock-set="n5-01"]');
@@ -328,6 +330,7 @@ async function main() {
   check('full submitted answers cross a reload whole without measured legacy grades', survived.rows === 0 && survived.responses === 18 && survived.done === true && survived.quarantined === false, JSON.stringify(survived));
   await page.click('#mock-link');
   await page.click('#mock-done');
+  await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-history]');
   const historyRecord = await waitForAppRecord(page, (record) => record.assessmentLibrary?.activeAttemptId === null,
     { description: 'cleared practice pointer with retained history' });
@@ -354,6 +357,7 @@ async function main() {
   await lonely.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await lonely.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   await lonely.click('#mock-link');
+  await lonely.click('#exam-legacy');
   await lonely.waitForSelector('#mock-retry', { timeout: 10000 });
   const settledAt = attempts;
   await lonely.waitForTimeout(1500);

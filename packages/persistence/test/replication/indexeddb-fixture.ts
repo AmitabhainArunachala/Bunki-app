@@ -14,6 +14,7 @@ import type {
   ReceiveCommit,
 } from '../../src/replication/port.ts';
 import { ACTOR, POLICY, local, note, remote } from './fixtures.ts';
+import { assessmentLocalFixtureV2 } from './assessment-v2-fixtures.ts';
 
 type FaultMode = 'abort' | 'constraint' | 'throw-quota' | 'hold' | 'lose-ack';
 interface Fault {
@@ -78,6 +79,7 @@ export const fixture = {
   POLICY,
   ACTOR,
   local,
+  assessmentLocalFixtureV2,
   note,
   remote,
   createSyncOperation,

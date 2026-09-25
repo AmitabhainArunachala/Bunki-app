@@ -638,9 +638,9 @@ const bodies = {
     await launch(b); const before = await native(b, 'fresh-admitted-target'); assert.notDeepEqual(before.installation.actor, saved.after.installation.actor);
     assert.notEqual(before.installation.binding.sessionId, saved.after.installation.binding.sessionId);
     assert.equal(before.record.teacherDrafts, null); assert.equal(before.record.sentenceDrafts, null);
-    const expectedRecord = { ...before.record, teacherDrafts: { version: 1, entries: [] }, sentenceDrafts: { version: 1, entries: [] } };
-    b.observations.push({ kind: 'synthetic-import-fixture-canonical-empty-drafts', expectedRecordSha256: digest(expectedRecord),
-      explanation: 'The fresh target has exactly null teacherDrafts and sentenceDrafts. The ordinary importer represents both as empty version 1 libraries; every other target root remains exact.' });
+    const expectedRecord = { ...before.record };
+    b.observations.push({ kind: 'synthetic-import-fixture-preserves-absent-drafts', expectedRecordSha256: digest(expectedRecord),
+      explanation: 'The fresh target has exactly null teacherDrafts and sentenceDrafts. The ordinary importer preserves both absent libraries; every other target root also remains exact.' });
     // The target supplies its own current document roots. Only source journal
     // history is imported through the actual v2 file UI, never peer authority.
     await restoreAppFixture(b.page, expectedRecord, { archive: before.archive.turns, journal: exported.journal }); await ready(b);

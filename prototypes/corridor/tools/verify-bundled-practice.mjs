@@ -131,7 +131,7 @@ for (const engine of engines) for (const width of sizes) {
     await waitForAppRecord(page, record => record.readingSettings?.startingLevel === 'N5');
     assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
     await page.locator('#back').click();
-    const item = page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
+    const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     assert(await page.locator('#reader-sentence-practice').isDisabled()); await sourceToken(page).click();

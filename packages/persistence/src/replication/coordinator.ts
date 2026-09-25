@@ -1,7 +1,7 @@
 import {
   operationReference,
   parseSyncBinding,
-  parseSyncOperation,
+  parseAnySyncOperation as parseSyncOperation,
   type OperationRef,
   type SyncBinding,
   type SyncOperation,

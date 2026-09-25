@@ -3,10 +3,12 @@
 import {
   createReplica,
   createSyncOperation,
+  createSyncOperationV2,
+  isAssessmentOperationV2,
   operationReference,
   parseActorIdentity,
   parseSyncBinding,
-  parseSyncOperation,
+  parseAnySyncOperation as parseSyncOperation,
   planReceive,
   SYNC_SCHEMA_VERSION,
   type ActorIdentity,
@@ -665,9 +667,10 @@ export class IndexedDbReplicationStore implements ReplicationStore {
         if (sequence === Number.MAX_SAFE_INTEGER)
           throw new ReplicationStoreError('sequence-exhausted');
         sequence += 1;
-        const operation = createSyncOperation({
+        const assessmentV2 = isAssessmentOperationV2(intent.payload);
+        const operation = (assessmentV2 ? createSyncOperationV2 : createSyncOperation)({
           format: 'kairo-sync-operation',
-          v: SYNC_SCHEMA_VERSION,
+          v: assessmentV2 ? 2 : SYNC_SCHEMA_VERSION,
           scope: { accountId: this.#scope[0], learnerId: this.#scope[1] },
           actor: { ...this.#actor, sequence },
           predecessor,

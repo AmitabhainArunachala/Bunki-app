@@ -32,12 +32,15 @@ try {
   await page.getByRole('button',{name:'字引 find a kanji by shape'}).click();
   await page.locator('.kdx-lens').filter({hasText:'SKIP'}).click();
   await page.locator('.skip-hit').first().waitFor();
-  assert.equal(await page.locator('.skip-wheel').count(),4);
+  assert.equal(await page.locator('.skip-wheel').count(),5);
+  assert.equal(await page.locator('.skip-wheel-column:not(.skip-wheel-filter)').count(),3);
+  assert.equal(await page.locator('.skip-wheel-filter[data-role="filter"]').count(),1);
+  assert.equal(await page.locator('.skip-wheel-parts[data-role="left-parts"]').count(),1);
   assert.equal(requests.filter(u=>u.includes('skip')).length,0);
   assert.equal(errors.length,0,JSON.stringify(errors));
   await page.screenshot({path:resolve(temporary,'skip-standalone.png')});
   writeFileSync(resolve(temporary,'result.json'),JSON.stringify({pass:true,artifactSha256:identity.artifactSha256,browser:browser.version(),requests,errors,scope:'Silent Chromium standalone lookup mechanics; no physical-device or full learner journey acceptance'},null,2)+'\n');
-  console.log('PASS standalone: real SKIP grid and four wheels with all subresource network blocked.');
+  console.log('PASS standalone: real SKIP grid, three code wheels and two independent filters with all subresource network blocked.');
   console.log('PASS no runtime exceptions or external SKIP data requests.');
 } finally {
   await browser.close();

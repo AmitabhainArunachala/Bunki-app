@@ -215,6 +215,27 @@ struct JournalTests {
         #expect(throws: JournalError.invalidEnvelope) { try JournalEnvelope(reference: renamed, bytes: original.bytes, scope: scope) }
     }
 
+    @Test func assessmentEnvelopeVersionIsExplicitAndFutureVersionsRemainRejected() throws {
+        let original = try fixture()
+        var root = try JSONSerialization.jsonObject(with: original.bytes) as! [String: Any]
+        root["v"] = 2
+        root["payload"] = ["kind": "assessment.result/2"]
+        let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let reference = try OperationReference(opId: original.reference.opId, sha256: digest(bytes))
+        let envelope = try JournalEnvelope(reference: reference, bytes: bytes, scope: scope)
+        #expect(envelope.bytes == bytes)
+        // Payload semantics remain the TypeScript core's responsibility.
+        root["v"] = 3
+        let future = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let futureReference = try OperationReference(opId: original.reference.opId, sha256: digest(future))
+        #expect(throws: JournalError.invalidEnvelope) { try JournalEnvelope(reference: futureReference, bytes: future, scope: scope) }
+        root["v"] = 2
+        root["payload"] = ["kind": "unregistered.payload"]
+        let unknown = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let unknownReference = try OperationReference(opId: original.reference.opId, sha256: digest(unknown))
+        #expect(throws: JournalError.invalidEnvelope) { try JournalEnvelope(reference: unknownReference, bytes: unknown, scope: scope) }
+    }
+
     @Test func encryptedCodecRejectsWrongZonePlaintextMissingCipherFieldAndWrongRecordIdentity() throws {
         let original = try fixture()
         let record = CloudKitRecordCodec.encode(original, zoneName: "zone-a")

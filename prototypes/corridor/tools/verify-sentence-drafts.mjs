@@ -216,7 +216,9 @@ async function listening(fixture) {
 }
 async function practiceFromSource(fixture, source = SOURCE, { addListening = true, savePlace = false } = {}) {
   const page = fixture.page; await shelf(fixture);
-  await page.locator(`[data-passage="${source.id}"] .shelf-open`).click();
+  const sourceDoor = page.locator(`.shelf-item[data-passage="${source.id}"]:not([data-recommendation]) .shelf-open`);
+  assert.equal(await sourceDoor.count(), 1, 'Source has one canonical bookshelf entry');
+  await sourceDoor.click();
   await page.locator(`#reader .tok[data-index="${source.index}"][data-word="${source.word}"]`).click();
   if (savePlace) {
     await page.locator('#reader-place-save').click();
@@ -541,7 +543,7 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   const restored = await snapshot(fixture, 'same-installation-local-checkpoint-restored');
   const currentKeys = new Set(recoveryBaseline.record.sentenceDrafts.entries.map(row => JSON.stringify([row.entryId, row.mode])));
   const expectedRecord = { ...exported.before.record,
-    teacherDrafts: exported.before.record.teacherDrafts ?? { version: 1, entries: [] },
+    teacherDrafts: exported.before.record.teacherDrafts,
     sentenceDrafts: { version: 1, entries: [...exported.before.record.sentenceDrafts.entries.filter(row => !currentKeys.has(JSON.stringify([row.entryId, row.mode]))),
       ...recoveryBaseline.record.sentenceDrafts.entries] } };
   assert.deepEqual(restored.record, expectedRecord, 'Restore keeps the current exact tuple rows and imports only absent draft tuples');
@@ -762,9 +764,21 @@ async function injectRecovery(fixture, raw, label) {
   // canonical index.html. A same-origin blob document has no app scripts and
   // cannot be mistaken for that navigation fallback.
   const blobUrl = await page.evaluate(html => URL.createObjectURL(new Blob([html], { type: 'text/html' })), html);
-  const requests = [], startedAt = Date.now();
+  const requests = [], startedAt = Date.now(), departingDocumentUrl = page.url();
+  let fixtureCommitted = false;
+  const observeNavigation = frame => { if (frame === page.mainFrame() && frame.url() === blobUrl) fixtureCommitted = true; };
   const observeRequest = request => requests.push({ url: request.url(), resourceType: request.resourceType(),
-    navigation: request.isNavigationRequest(), at: Date.now() });
+    navigation: request.isNavigationRequest(), at: Date.now(), documentUrl: request.frame().url(),
+    phase: fixtureCommitted ? 'scriptless-fixture' : 'departing-app' });
+  const checkFixtureRequests = () => {
+    assert(fixtureCommitted, 'The main frame committed the exact scriptless fixture');
+    assert(requests.every(request => request.url === blobUrl || request.phase === 'departing-app' &&
+      request.documentUrl === departingDocumentUrl && request.url.startsWith(`${ORIGIN}/`)),
+    'Only the departing app may finish an already-starting local request before fixture navigation commits');
+    assert(requests.filter(request => request.phase === 'scriptless-fixture').every(request => request.url === blobUrl),
+      'The committed scriptless fixture must not request app runtime or data');
+  };
+  page.on('framenavigated', observeNavigation);
   page.on('request', observeRequest);
   let before;
   try {
@@ -775,7 +789,7 @@ async function injectRecovery(fixture, raw, label) {
       appView: document.body.dataset.view || null, ready: document.body.dataset.ready || null,
       resources: performance.getEntriesByType('resource').map(entry => ({ name: entry.name, initiatorType: entry.initiatorType })),
       bindingText: localStorage.getItem('kairo-local-record-binding-v1') }));
-    const provenance = { label, startedAt, arrivedAt: Date.now(), expectedOrigin: ORIGIN, blobUrl, documentState,
+    const provenance = { label, startedAt, arrivedAt: Date.now(), expectedOrigin: ORIGIN, blobUrl, departingDocumentUrl, documentState,
       serializedBodySha256: sha(documentState.body), expectedSerializedBodySha256: sha(body),
       serializedDocumentSha256: sha(documentState.document), expectedSerializedDocumentSha256: sha(html.slice('<!doctype html>'.length)), requests };
     const provenanceFile = join(fixture.out, `${label}-actual-scriptless-fixture.json`);
@@ -786,7 +800,7 @@ async function injectRecovery(fixture, raw, label) {
     assert.equal(documentState.document, html.slice('<!doctype html>'.length));
     assert.equal(documentState.scripts, 0); assert.equal(documentState.appView, null); assert.equal(documentState.ready, null);
     assert.deepEqual(documentState.resources, [], 'The actual fixture document loads no runtime resources');
-    assert(requests.every(request => request.url === blobUrl), 'The fixture transition must not request app runtime or data');
+    checkFixtureRequests();
     assert.equal(documentState.bindingText, appUi.recovery.installationText, 'The blob keeps the exact installation storage scope');
     before = await readAppRecordSnapshot(page); const ui = await uiState(fixture);
     assert.deepEqual(before, appBefore, 'Leaving the ready app for the scriptless fixture preserves every native row');
@@ -797,13 +811,14 @@ async function injectRecovery(fixture, raw, label) {
     writeFileSync(nativeProofFile, JSON.stringify({ before, after, recoveryBefore: ui.recovery, recoveryAfter: afterUi.recovery, requests }, null, 2) + '\n');
     assert.deepEqual(after, before, 'The explicit local recovery fixture never modifies a native row');
     assert.equal(afterUi.recovery.key, ui.recovery.key); assert.equal(afterUi.recovery.installationText, ui.recovery.installationText);
-    assert.equal(afterUi.recovery.text, raw); assert(requests.every(request => request.url === blobUrl));
+    assert.equal(afterUi.recovery.text, raw); checkFixtureRequests();
     const file = join(fixture.out, `${label}-injected-recovery-slot.txt`); writeFileSync(file, raw);
     fixture.observations.push({ name: 'explicit-synthetic-local-recovery-slot', label, path: file, sha256: sha(raw), nativeInputWrites: 0,
       fixtureProvenance: { path: provenanceFile, sha256: sha(readFileSync(provenanceFile)), serializedBodySha256: provenance.serializedBodySha256,
-        origin: documentState.origin, scripts: documentState.scripts, requests, appRuntimeRequests: 0 },
+        origin: documentState.origin, scripts: documentState.scripts, requests, fixtureRuntimeRequests: 0,
+        departingAppRequests: requests.filter(request => request.url !== blobUrl && request.phase === 'departing-app').length },
       nativeProof: { path: nativeProofFile, sha256: sha(readFileSync(nativeProofFile)) } });
-  } finally { page.off('request', observeRequest); }
+  } finally { page.off('request', observeRequest); page.off('framenavigated', observeNavigation); }
   await navigate(fixture, { protectedState: true }); return before;
 }
 async function resolveRecovery(fixture, entryId, mode, choice) {
