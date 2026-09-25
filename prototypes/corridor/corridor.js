@@ -7018,7 +7018,9 @@ function glossaryCrossRefPlan(p) {
  * that truth on its face (仮の声). Word-level audio stays absent until a
  * judged voice ships: a lone word's pitch teaches, a read-along sentence
  * carries its own context. Nothing here writes learner state. */
-const readAloud = { on: false, timer: null, failed: false, generation: 0, usingDeviceVoice: false };
+// failed: null, or { pid, voice } — the failure belongs to the article and voice that failed, so a
+// different article or a new voice choice never inherits its note
+const readAloud = { on: false, timer: null, failed: null, generation: 0, usingDeviceVoice: false };
 
 
 function stopReadAloud() {
@@ -7053,12 +7055,9 @@ function speakPassage(p, onDone) {
         playRecClip(`audio/s/ami/${p.id.replace(':', '_')}-${ix}.m4a`, null).then((played) => {
           if (!current()) return;
           if (!played) {
-            // a browser without the codec (or a missing file) must not leave
-            // the reader silent: the very first clip failing hands the whole
-            // passage to the device voice; a mid-passage failure stops honestly
             // no device-voice fallback (operator, 09-17: the computer voice must not be an option);
             // a failure at any sentence stops the read and the note says so
-            readAloud.failed = true;
+            readAloud.failed = { pid: p.id, voice: 'ami' };
             readAloud.on = false;
             onDone();
             return;
@@ -7085,8 +7084,8 @@ function speakPassage(p, onDone) {
  * voice with recordings of the shelf sentences; the UI labels it 仮の声 検収前.
  * Which voice leads waits for a real audition with his ear.
  * Real neural recordings shipped as static files (audio/manifest.json +
- * audio/w/<voice>/<id>.m4a, sentences in audio/s/ami/) — the device TTS is
- * demoted to offline fallback. The chosen voice is a device preference in
+ * audio/w/<voice>/<id>.m4a, sentences in audio/s/ami/). There is no device-voice
+ * fallback and no automatic voice. The chosen voice is a device preference in
  * its own key, never the learner store. Licences ride audio/LICENCES.md. */
 const REC_VOICE_KEY = 'kairo-rec-voice-v1';
 const REC_ROSTER = ['ami', 'f1', 'metan', 'zundamon', 'takehiro'];
@@ -7142,7 +7141,7 @@ function stopRecAudio() {
   }
 }
 // warm the manifest at boot so the reader's first render already knows
-// whether the roster exists (absent → device fallback, quiet)
+// whether the roster exists (absent → the listen row says so; nothing plays)
 if (typeof window !== 'undefined') ensureRecManifest();
 
 /** Play one recorded clip; resolves true when it actually played. */
@@ -7171,9 +7170,8 @@ function playRecClip(src, btn) {
   });
 }
 
-/** 音 — the answer card's voice door. The roster's recorded clip when the
- * word has one (pref voice → アミ fallback), the device voice only when no
- * recording exists. One tap speaks; a retap restarts. */
+/** 音 — the answer card's voice door. The recorded clip in the voice the learner chose, when
+ * the word has one; otherwise a visible reason and silence. One tap speaks; a retap restarts. */
 let cardAudioSerial = 0, cardFaceKey = '';
 /** Called from render(): any change of card face (grade, undo, reveal, leave) retires card audio. */
 function retireCardAudioOnFaceChange() {
@@ -7242,11 +7240,12 @@ function buildListenRow(p) {
   // voice (アミ rejected, 2026-09-19). The listen door opens only for a passage recorded in the
   // voice the learner chose; every voice here is interim until his audition.
   const playable = passageRecorded && pref === 'ami';
+  const failedHere = !!readAloud.failed && readAloud.failed.pid === p.id && readAloud.failed.voice === pref;
   listen.disabled = !playable && !readAloud.on;
   listenNote.dataset.recorded = String(passageRecorded);
   listenNote.textContent = readAloud.on
-    ? tx('小春音アミの合成音声で再生中（仮の声・検収前）', 'playing Koharune Ami’s synthetic voice (interim, not yet chosen)')
-    : readAloud.failed
+    ? tx('小春音アミの合成音声で再生中（仮の声・検収前）', 'playing Koharune Ami’s synthetic voice (interim, not yet reviewed)')
+    : failedHere
       ? tx('この環境では収録を再生できませんでした', 'The recording could not play here')
       : recManifest === undefined
         ? tx('収録音声を確認しています…', 'Checking for recordings…')
@@ -7255,9 +7254,9 @@ function buildListenRow(p) {
           : !passageRecorded
           ? tx('この記事の収録音声はまだありません', 'No recorded voice for this article yet')
           : pref === 'ami'
-            ? tx('合成音声：小春音アミ（仮の声・検収前）', 'synthetic voice: Koharune Ami (interim, not yet chosen)')
+            ? tx('合成音声：小春音アミ（仮の声・検収前）', 'synthetic voice: Koharune Ami (interim, not yet reviewed)')
             : tx('この記事は小春音アミ（仮の声・検収前）の収録だけです。聞くには下で選んでください。',
-              'This article is recorded only in Koharune Ami (interim, not yet chosen). Choose her below to listen.');
+              'This article is recorded only in Koharune Ami (interim, not yet reviewed). Choose her below to listen.');
   listen.addEventListener('click', () => {
     if (readAloud.on) {
       stopReadAloud();
@@ -7265,7 +7264,7 @@ function buildListenRow(p) {
       return;
     }
     if (!playable) return;
-    readAloud.failed = false;
+    readAloud.failed = null;
     readAloud.usingDeviceVoice = false;
     readAloud.on = true;
     speakPassage(p, () => {
@@ -7280,7 +7279,7 @@ function buildListenRow(p) {
     const pick = document.createElement('select');
     pick.className = 'listen-voice';
     pick.id = 'listen-voice';
-    pick.setAttribute('aria-label', tx('声を選ぶ（仮の声・検収前）', 'choose a voice (interim, not yet chosen)'));
+    pick.setAttribute('aria-label', tx('声を選ぶ（仮の声・検収前）', 'choose a voice (interim, not yet reviewed)'));
     if (!pref) {
       const none = document.createElement('option');
       none.value = '';
@@ -7297,6 +7296,7 @@ function buildListenRow(p) {
     }
     pick.addEventListener('change', () => {
       sessionVoicePref = null;
+      readAloud.failed = null;
       try {
         if (pick.value) localStorage.setItem(REC_VOICE_KEY, pick.value);
         else localStorage.removeItem(REC_VOICE_KEY);
