@@ -38,9 +38,13 @@ const inputs = inputPaths.map((path) => {
   return { path, bytes: bytes.length, sha256: expected.sha256 };
 });
 const functions = new Set(['GRAMMARS', 'mergeGrammar', 'buildSearchIndex', 'searchResults', 'dictionarySearchContext', 'requestDictionarySearch',
-  'kataToHira', 'hiraToKata', 'normalizeGloss', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'dictionaryGlossSummary', 'dictionaryReadingSupportsForm']);
+  'kataToHira', 'hiraToKata', 'normalizeGloss', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'dictionaryGlossSummary', 'dictionaryReadingSupportsForm',
+  // D23: search folds an identical numbered row into the core row only while the core sheet offers its door
+  'searchRowShownByCore', 'dictionaryHomographChoices', 'dictionaryRowsForForm']);
+// introduced by that D23 change: required of the candidate, absent from an older --baseline-site source
+const sinceD23 = new Set(['searchRowShownByCore', 'dictionaryHomographChoices']);
 const variables = new Set(['GRAMMAR', 'PARTICLES', 'searchIndex', 'KATA_TO_HIRA_OFFSET', 'ROMAJI', 'GLOSS_MESSY', 'GLOSS_LEAD', 'JLPT_RANK', 'jlptRank']);
-function extract(source) {
+function extract(source, baseline = false) {
   const ast = parse(source, { ecmaVersion: 'latest', sourceType: 'module', locations: true });
   const selected = [], found = new Set();
   for (const node of ast.body) {
@@ -52,7 +56,7 @@ function extract(source) {
       }
     }
   }
-  for (const name of [...functions, ...variables]) assert.ok(found.has(name), `Missing actual source binding ${name}`);
+  for (const name of [...functions, ...variables]) assert.ok(found.has(name) || (baseline && sinceD23.has(name)), `Missing actual source binding ${name}`);
   return selected;
 }
 const words = readJson(site, 'data/share_alike/words.json').words, dict = readJson(site, 'data/share_alike/dict.json').words;
@@ -63,17 +67,23 @@ const writtenForms = new Set(compact.entries.flatMap((row) => row[4]));
 const fallbackWithoutDeep = fallback.filter(([form]) => !writtenForms.has(form));
 const beforeDataSha256 = sha(JSON.stringify({ words, dict, kanji, grammar, compact }));
 function actualSource(root, name) {
-  const source = readFileSync(resolve(root, 'corridor.js'), 'utf8'), extracted = extract(source);
+  const source = readFileSync(resolve(root, 'corridor.js'), 'utf8'), extracted = extract(source, name === 'baseline');
   const program = extracted.map((entry) => entry.text).join('\n\n');
   writeFileSync(resolve(out, `${name}-extracted-source.js`), program);
-  const D = { words, dict, kanji, dictionaryMode: 'inline', dictionaryIndex: null }, context = vm.createContext({ D, grammar });
-  vm.runInContext(`${program}\nD.grammar=mergeGrammar(grammar); this.api={index(){buildSearchIndex(); return searchIndex;},search:searchResults};`, context, { timeout: 3000 });
+  // the form-row caches installDictionaryIndex gives every loaded index (dictionaryRowsForForm fills them)
+  const D = { words, dict, kanji, dictionaryMode: 'inline', dictionaryIndex: null, dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(),
+    dictionaryBySeq: new Map() }, context = vm.createContext({ D, grammar });
+  vm.runInContext(`${program}\nD.grammar=mergeGrammar(grammar); this.api={index(){buildSearchIndex(); return searchIndex;},search:searchResults,` +
+    `choices(form){return dictionaryHomographChoices(form).map(({row,summary,enabledOnCore})=>({seq:String(row[0]),reading:summary[0],enabledOnCore}));}};`,
+  context, { timeout: 3000 });
   const invoke = (expression, query = '') => {
     context.query = query;
     return clone(vm.runInContext(expression, context, { timeout: 5000 }));
   };
   return { sourceSha256: sha(source), extracted: extracted.map(({ name: binding, line, text }) => ({ name: binding, line, sha256: sha(text) })),
-    index: () => invoke('api.index()'), search: (query, deep = false) => { D.dictionaryIndex = deep ? compact : null; return invoke('api.search(query)', query); } };
+    index: () => invoke('api.index()'), search: (query, deep = false) => { D.dictionaryIndex = deep ? compact : null; return invoke('api.search(query)', query); },
+    // the entry doors the seq-less core sheet renders for a form, from the actual dictionaryHomographChoices
+    choices: (form) => { D.dictionaryIndex = compact; return invoke('api.choices(query)', form); } };
 }
 const actual = actualSource(site, 'candidate'), baselineArg = argument('--baseline-site');
 let baseline = null, baselineIdentity = null;
@@ -139,13 +149,15 @@ check('written, kana, romaji and whole glossary searches return the exact fallba
   }
   return outputs;
 });
-check('current deep counterpart selection keeps both 生物 homographs and prefers compatible seq entries', () => {
+check('both 生物 homographs stay reachable beside the restored core row; an identical numbered row is shown once, as the core row', () => {
+  // D23: the scored core row is never dropped. 1379430 displays exactly as the core row (生物・せいぶつ・living thing) and
+  // the core sheet offers its door, so it is shown once, as the core row in its rank; 1379440 なまもの keeps its numbered row.
   const hits = actual.search('生物', true), exact = hits.filter((entry) => entry.w === '生物');
-  assert.deepEqual(exact.map((entry) => String(entry.seq)).sort(), ['1379430', '1379440']);
-  assert.deepEqual(exact.map((entry) => entry.r).sort(), ['せいぶつ', 'なまもの']);
-  assert.ok(exact.every((entry) => !!entry.seq && !entry.core));
+  assert.deepEqual(exact.map((entry) => [entry.seq ? String(entry.seq) : null, entry.r, !!entry.core]), [[null, 'せいぶつ', true], ['1379440', 'なまもの', false]]);
+  const doors = actual.choices('生物').map(({ seq, reading, enabledOnCore }) => [seq, reading, enabledOnCore]);
+  for (const door of [['1379430', 'せいぶつ', true], ['1379440', 'なまもの', true]]) assert.ok(doors.some((entry) => entry.join() === door.join()), door.join());
   const raw = actual.search('raw food', true)[0]; assert.equal(String(raw.seq), '1379440'); assert.equal(raw.r, 'なまもの');
-  return { written: visible(exact), glossFirst: visible([raw])[0] };
+  return { written: visible(exact), coreSheetDoors: doors, glossFirst: visible([raw])[0] };
 });
 check('fallback without a deep counterpart survives the ready deep tier with unchanged identity', () => {
   const immediate = actual.search('原典').find((entry) => entry.id === '原典');
@@ -160,11 +172,22 @@ if (baseline) {
     return { baselineArtifactSha256: baselineIdentity.artifactSha256, sourceSha256: baseline.sourceSha256, absent: 'word:原典' };
   });
   check('existing exact deep homograph identities and readings match the actual R3 search behavior', () => {
+    // D23: a numbered row the R3 search showed is still shown, or it is shown once as the restored core row, whose
+    // display it matches byte for byte, while the core sheet offers its exact entry and reading as an enabled door
     const output = {};
     for (const query of ['生物', '上手', '学校']) {
       const select = (hits) => visible(hits.filter((entry) => entry.w === query && entry.seq));
-      const prior = select(baseline.search(query, true)), current = select(actual.search(query, true));
-      assert.ok(prior.length); assert.deepEqual(current, prior, query); output[query] = current;
+      const prior = select(baseline.search(query, true)), hits = actual.search(query, true), current = select(hits);
+      const core = visible(hits.filter((entry) => entry.core && entry.id === query))[0];
+      const doors = actual.choices(query);
+      assert.ok(prior.length);
+      for (const row of prior) {
+        if (current.some((entry) => JSON.stringify(entry) === JSON.stringify(row))) continue;
+        assert.ok(core && [core.w, core.r, core.g].join() === [row.w, row.r, row.g].join(), `${query} ${row.seq}: folded only into an identical core row`);
+        assert.ok(doors.some((door) => door.seq === row.seq && door.reading === row.r && door.enabledOnCore), `${query} ${row.seq}: its door stays`);
+      }
+      assert.ok(current.every((entry) => prior.some((row) => JSON.stringify(row) === JSON.stringify(entry))), `${query}: no new numbered row`);
+      output[query] = { current, core };
     }
     return output;
   });

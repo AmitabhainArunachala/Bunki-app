@@ -4767,6 +4767,18 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 10px 0 4px;
 }
 
+/* D23: why a word's 覚える is held, said on its own row before any batch */
+.enroll-held {
+  margin: 2px 0 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+
+.lesson-enroll > .enroll-held {
+  padding-inline-start: 28px;
+}
+
 /* ------------------------------------------------------------ thesaurus
  * 類語辞典 — the paper-thesaurus spread. Each cluster is a headword row
  * followed by sem-rows (shared with the entry sheet's 意味の近く block). */
@@ -7588,3 +7600,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 /* the chrome seal stays reachable (aria-disabled): pressing it opens the reason */
 .reader-capture-held[aria-disabled='true'] { cursor: help; }
 #mini .mini-take-reason { margin-top: 3px; font-size: 10.5px; line-height: 1.45; color: var(--faint); }
+/* D23: the held mini opens the card the record holds, as the full note does */
+#mini .mini-take-open { min-height: var(--tap); margin-top: 5px; padding: 4px 12px;
+  border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ai, var(--ink-2));
+  font: inherit; font-family: var(--sans); font-size: 11px; cursor: pointer; }

@@ -4,8 +4,8 @@
  * A control is a set of literal edits to corridor.js. Each edit must match exactly once; the
  * edited source is then lifted by the test it is run against. This module declares:
  *   - the exact test inventory;
- *   - every control, with its witnesses and the collateral it may cause: 18 WORD_CONTROLS and 2
- *     LEARNING_RECORD_CONTROLS, 20 controls, run as 22 children with the two baselines;
+ *   - every control, with its witnesses and the collateral it may cause: 29 WORD_CONTROLS and 2
+ *     LEARNING_RECORD_CONTROLS, 31 controls, run as 33 children with the two baselines;
  *   - the admission rules;
  *   - the runner, and the evidence it keeps for every child.
  *
@@ -30,7 +30,7 @@
  *
  * Bounds: each child has timeoutMs (300 s, then SIGKILL) and CHILD_MAX_BUFFER (16 MiB) per stream.
  * These are per-child bounds only; the phase has no separately admitted total bound (worst case:
- * the assessment staging plus 22 × 300 s).
+ * the assessment staging plus 33 × 300 s).
  *
  *   node prototypes/corridor/tools/test-word-saved-answer.mjs --controls   runs every control below
  */
@@ -44,7 +44,9 @@ import { fileURLToPath } from 'node:url';
 export const CHILD_TIMEOUT_MS = 300_000;
 export const CHILD_MAX_BUFFER = 16 * 1024 * 1024;
 
-export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7r', 'T7s', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15']);
+export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7r', 'T7s', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15',
+  // D23 search stand-in: relation copy (X), search presentation (S), the core sheet's live door (N), the preservation table (V), P3
+  'X1', 'X2', 'X3', 'X4', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'N1', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b']);
 /** The exact rows test-word-saved-answer.mjs must report: F0, then a setup row and a behaviour row per case. */
 export const INVENTORY = Object.freeze(['F0', ...WORD_CASES.flatMap((id) => [`${id}.setup`, id])]);
 
@@ -54,14 +56,19 @@ export const WORD_CONTROLS = Object.freeze({
   C1: { note: 'resolver bypassed: the review back is lookup()’s (reviewCardBack → reviewBack)', witnesses: ['T1'], collateral: [], edits: [
     ["  if (item.t !== 'word') return reviewBack(item);\n", '  return reviewBack(item);\n']] },
   C2: { note: 'capture guard reverted: an explicit selection on a core spelling saves nothing', witnesses: ['T2'],
-    collateral: ['T7r.setup', 'T7r', 'T7s.setup', 'T7s', 'T11.setup', 'T11', 'T13.setup', 'T13', 'T15'], edits: [
+    // the search stand-in rows built on a 1353320 or うわて capture on the core spelling 上手 then hold a core card,
+    // and the history fixtures then keep no うわて snapshot
+    collateral: ['T7r.setup', 'T7r', 'T7s.setup', 'T7s', 'T11.setup', 'T11', 'T13.setup', 'T13', 'T15',
+      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b'], edits: [
       ["  if (node.seq != null && node.seq !== '') {\n    snapshot = explicitWordSnapshot(node, latest);",
         "  if (node.seq != null && node.seq !== '' && !D.dict[id]) {\n    snapshot = explicitWordSnapshot(node, latest);"]] },
   C3: { note: 'fail-closed removed: an explicit selection with no validated answer captures a row without identity', witnesses: ['T3'],
     collateral: ['T4'], edits: [
       ["    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });\n    identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };",
         "    identity = snapshot ? { kind: 'seq', seq: snapshot.seq, reading: snapshot.r } : { kind: 'unknown' };"]] },
-  C4: { note: 'identity by reading only: a shared reading passes for a shared entry', witnesses: ['T5'], collateral: ['T8.setup', 'T8'], edits: [
+  C4: { note: 'identity by reading only: a shared reading passes for a shared entry', witnesses: ['T5'],
+    // ポンド 2855351 is then no conflict beside the 1126030 card or its history: the relation rows lose their other-entry fixture
+    collateral: ['T8.setup', 'T8', 'X1', 'X2', 'X3', 'V5'], edits: [
     ["  if (a.kind === 'seq') return a.seq === b.seq && (a.reading == null || b.reading == null || a.reading === b.reading);",
       "  if (a.kind === 'seq') return a.reading == null || b.reading == null || a.reading === b.reading;"]] },
   C5: { note: 'list note precedence reverted: the legacy word layer answers first', witnesses: ['T12', 'T2'], collateral: [], edits: [
@@ -75,9 +82,13 @@ export const WORD_CONTROLS = Object.freeze({
       '    if (saved && nonEmptyString(saved.seq)) deepWords = null;']] },
   C8: { note: 'assessment subject precedence reverted: a learner snapshot answers for a core test word', witnesses: ['T2'], collateral: [], edits: [
     ['    const entry = D.dict?.[id] || record.deepWords?.[id] || lookup(id);', '    const entry = record.deepWords?.[id] || D.dict?.[id] || lookup(id);']] },
-  C9r: { note: 'removal guard removed from the ordinary remove producer', witnesses: ['T7r'], collateral: [], edits: [
+  C9r: { note: 'removal guard removed from the ordinary remove producer', witnesses: ['T7r'],
+    // a core door (V3), the 1353320 door on a core card (V4) and every other-identity door (V5) then remove the card
+    collateral: ['V3', 'V4', 'V5'], edits: [
     ['      holds(latest);\n', '']] },
-  C9s: { note: 'suppression guard removed from the assessment suppression producer', witnesses: ['T7s'], collateral: [], edits: [
+  C9s: { note: 'suppression guard removed from the assessment suppression producer', witnesses: ['T7s'],
+    // the core door then suppresses the route-captured 1353320 card
+    collateral: ['V3'], edits: [
     ["suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null)", "suppressAssessmentCards({ kind: 'remove', key }, null)"]] },
   C10: { note: 'shown-answer binding removed: availability alone authorizes a grade', witnesses: ['T8'], collateral: [], edits: [
     ['  if (!bound || bound.item !== item || bound.ix !== rv.ix || bound.key !== wordPresentationKey(item, answer)) {', '  if (false) {']] },
@@ -100,6 +111,44 @@ export const WORD_CONTROLS = Object.freeze({
   C17: { note: 'absent row cue made a wildcard again (the matching snapshot’s reading ignored)', witnesses: ['T15'], collateral: ['T7r', 'T7s'], edits: [
     ["    const known = nonEmptyString(row.cueReading) ? row.cueReading\n      : snap?.seq === row.entrySeq && nonEmptyString(snap.r) ? snap.r : null;",
       '    const known = nonEmptyString(row.cueReading) ? row.cueReading : null;']] },
+  // D23 search stand-in (design r3 FINAL; Codex 16:17:40Z, 16:20:08Z, 16:27:39Z)
+  KS1: { note: 'search dedup removed: a numbered row identical to the core row is shown beside it (上手 shows the core row plus 1353320)',
+    // S11: with no fold, a numbered row takes a place its core word then loses in the first 40
+    witnesses: ['S1', 'S2', 'S3', 'S8', 'S9'], collateral: ['S11'], edits: [
+      ['    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;', '    const row = e;']] },
+  KS2: { note: 'search dedup widened to non-identical rows (the stand-in proposal’s compatible + normalised-reading test): the critic’s ‘tin’ row, ペラペラ and The Economist are dropped',
+    witnesses: ['S4', 'S6', 'S8'], collateral: [], edits: [
+      ['  if (!core || !e?.seq || core.w !== e.w || core.r !== e.r || core.g !== e.g) return false;',
+        '  if (!core || !e?.seq || !dictionaryCoreMatch(e.id, e.dictionaryRow).compatible || kataToHira(core.r) !== kataToHira(e.reading || e.r)) return false;']] },
+  KS3: { note: 'the old core drop restored: a compatible deep row hides the scored core row again (word:上手, word:学校 missing)',
+    witnesses: ['S1', 'S2', 'S3', 'S4', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11'], collateral: [], edits: [
+      ['    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;',
+        '    if (e.core && scored.some(({ e: deep }) => deep.dictionaryRow && [deep.dictionaryRow[1], ...deep.dictionaryRow[4], ' +
+          '...deep.dictionaryRow[5]].includes(e.id) && dictionaryCoreMatch(e.id, deep.dictionaryRow).compatible)) continue;\n    const row = e;']] },
+  KS4: { note: 'B2 and the live core-sheet door removed (no choice is enabled on a seq-less core sheet): 学校 loses its lone door and its dedup, and セント’s resolved door is inert again',
+    // S11: with no enabled door nothing folds, so its reach check has no folded row to test
+    witnesses: ['S1', 'S9', 'N1'], collateral: ['S2', 'S3', 'S8', 'S11'], edits: [
+      ['  const enabledOnCore = !!D.dict?.[form];', '  const enabledOnCore = false;']] },
+  KS4b: { note: 'the resolved-seq active rule restored on the core sheet only (B2 and the dedup kept): the resolved entry’s door is inert, a failed click',
+    witnesses: ['N1'], collateral: ['S8'], edits: [
+      ['    const active = !(seqless && enabledOnCore) && String(seq) === currentSeq &&', '    const active = String(seq) === currentSeq &&']] },
+  KS5: { note: 'fold by skipping: the numbered row is dropped and the core row keeps its own later rank, so words fall out of the first 40',
+    witnesses: ['S1', 'S8', 'S11'], collateral: [], edits: [
+      ['    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;',
+        '    if (e.seq && searchRowShownByCore(e, coreRows.get(e.id))) continue;\n    const row = e;']] },
+  KC1: { note: 'relation collapsed to other-entry: every held line claims another entry again',
+    witnesses: ['X1', 'X2', 'X3', 'V2', 'V4', 'V5', 'P3', 'P3b'], collateral: [], edits: [
+      ["  if (node?.kind !== 'seq' || card?.kind !== 'seq') return 'unestablished';", "  return 'other-entry';"]] },
+  KR1: { note: 'the open route removed from the held mini', witnesses: ['V2'], collateral: ['V3', 'V5', 'X3'], edits: [
+    ["  if (miniState === 'conflict') {\n    const open = biLabel('button', 'mini-take-open'", "  if (false) {\n    const open = biLabel('button', 'mini-take-open'"]] },
+  KP3: { note: 'the held reason removed from the lesson and older-set enroll rows', witnesses: ['P3', 'P3b'], collateral: [], edits: [
+    ['    const heldText = learningEnrollHeldText({ t: kt, id: w, from: null });', '    const heldText = null;'],
+    ['    const heldText = completed && !unanswered && !ok && key ? learningEnrollHeldText({ t, id, from: null }) : null;', '    const heldText = null;']] },
+  KP3b: { note: 'the older set’s enrolled-spelling exclusion restored ahead of the hold (the r1 draft 29e15532): a word enrolled as another identity is silent again',
+    witnesses: ['P3', 'P3b'], collateral: [], edits: [
+      ['    if (completed && !unanswered && !ok && key && (heldText || !inDeck.has(key))) {', '    if (completed && !unanswered && !ok && key && !inDeck.has(key)) {']] },
+  KB1: { note: 'basis forced to card (r3.3): a hold that only studied history keeps claims a card that exists again', witnesses: ['X3', 'P3'], collateral: [], edits: [
+    ["  return (record.taken || []).some((entry) => entry.t === 'word' && entry.id === id) ? 'card' : 'history';", "  return 'card';"]] },
 });
 
 /* Controls on verify-learning-record.mjs (receipt children). Its inventory is the exact, unique
@@ -311,11 +360,11 @@ export function childRecord({ id, kind, role, control = null, table = null, edit
   };
 }
 
-/** Run every control and write controls-report.json. The 22 children run one at a time: the TAP
- * baseline, the 18 WORD_CONTROLS, the learning-record baseline and its 2 controls. Each child is
+/** Run every control and write controls-report.json. The 33 children run one at a time: the TAP
+ * baseline, the 29 WORD_CONTROLS, the learning-record baseline and its 2 controls. Each child is
  * bounded (timeoutMs, then SIGKILL; CHILD_MAX_BUFFER per stream), and its raw bytes and evidence
  * record are kept under children/, referenced by path and sha256 from the report, whatever its
- * outcome. There is no total bound for the phase: the worst case is the staging plus 22 × timeoutMs. */
+ * outcome. There is no total bound for the phase: the worst case is the staging plus 33 × timeoutMs. */
 export async function runControls({ root, testFile, learningRecordFile, evidence, timeoutMs = CHILD_TIMEOUT_MS }) {
   const phaseStartedAt = new Date().toISOString();
   const phaseStart = performance.now();
