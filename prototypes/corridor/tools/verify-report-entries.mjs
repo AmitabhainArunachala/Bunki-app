@@ -67,6 +67,22 @@ async function closeReport(page) {
 }
 const focusedIs = (page, selector) => page.evaluate((sel) => !!document.activeElement?.matches(sel), selector);
 const PAGE_ENTRY = '#app > .report-line-page [data-report-entry="open"]';
+// The focused stage breathes (a slow continuous transform), so an actionability
+// "stable box" wait never settles there. A finger does not wait for stillness:
+// centre the control, prove the topmost element at that point IS the control
+// (nothing covers it), and press those real coordinates.
+async function fingerClick(page, selector) {
+  const hit = await page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return { found: false };
+    el.scrollIntoView({ block: 'center', inline: 'center' });
+    const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const top = document.elementFromPoint(x, y);
+    return { found: true, x, y, uncovered: !!top && (top === el || el.contains(top)), top: top ? `${top.tagName}.${top.className}` : null };
+  }, selector);
+  if (hit.found && hit.uncovered) await page.mouse.click(hit.x, hit.y);
+  return hit;
+}
 const PAGE_LIST = '#app > .report-line-page [data-report-entry="list"]';
 
 try {
@@ -185,14 +201,13 @@ try {
     const probeEntry = page.locator(PAGE_ENTRY);
     check(`R5 ${w}px probe: the page entry exists after the stage`, (await probeEntry.count()) === 1);
     if (await probeEntry.count()) {
-      await probeEntry.scrollIntoViewIfNeeded();
-      await probeEntry.click();
+      const hit = await fingerClick(page, PAGE_ENTRY);
+      check(`R5 ${w}px probe: nothing covers the entry`, hit.uncovered, JSON.stringify(hit));
       check(`R5 ${w}px probe: the entry opens the report dialog`, await reportOpen(page));
-      await closeReport(page);
+      if (await reportOpen(page)) await closeReport(page);
     }
-    const reveal = page.locator('#probe-reveal');
-    await reveal.scrollIntoViewIfNeeded();
-    const revealed = await reveal.click({ timeout: 5_000 }).then(() => true, () => false);
+    const revealHit = await fingerClick(page, '#probe-reveal');
+    const revealed = revealHit.found && revealHit.uncovered;
     check(`R5 ${w}px probe: the stage's own reveal still takes a real click`, revealed &&
       await page.waitForSelector('.probe-meta', { timeout: 5_000 }).then(() => true, () => false));
     await context.close();
