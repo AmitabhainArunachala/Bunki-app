@@ -17276,7 +17276,8 @@ function renderReview(main) {
     renderReviewUndo(moreRow, rv);
     if (maintenanceReports) {
       const report = el('button', 'chip report-door', tx('問題を報告', 'Report a problem')); report.type = 'button';
-      report.dataset.reportEntry = 'open'; report.addEventListener('click', () => maintenanceReports.openReport());
+      report.dataset.reportEntry = 'open';
+      report.addEventListener('click', () => { report.focus({ preventScroll: true }); maintenanceReports.openReport(); });
       moreRow.append(report);
     }
     const rest2 = biLabel('button', 'chip review-rest', '休ませる', 'rest this card');
@@ -24142,9 +24143,10 @@ let maintenanceReports = null;
 function reportEntries(className) {
   const line = el('p', `report-line ${className || ''}`.trim());
   const open = el('button', 'report-door', tx('問題を報告', 'Report a problem')); open.type = 'button';
-  open.dataset.reportEntry = 'open'; open.addEventListener('click', () => maintenanceReports?.openReport());
+  // WebKit does not focus a clicked button; take focus first so closing the report returns here
+  open.dataset.reportEntry = 'open'; open.addEventListener('click', () => { open.focus({ preventScroll: true }); maintenanceReports?.openReport(); });
   const list = el('button', 'report-door', tx('送った報告', 'My reports')); list.type = 'button';
-  list.dataset.reportEntry = 'list'; list.addEventListener('click', () => maintenanceReports?.openReports());
+  list.dataset.reportEntry = 'list'; list.addEventListener('click', () => { list.focus({ preventScroll: true }); maintenanceReports?.openReports(); });
   line.append(open, list);
   return line;
 }
