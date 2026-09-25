@@ -7039,8 +7039,9 @@ function speakPassage(p, onDone) {
             // a browser without the codec (or a missing file) must not leave
             // the reader silent: the very first clip failing hands the whole
             // passage to the device voice; a mid-passage failure stops honestly
-            // no device-voice fallback (operator, 09-17: the computer voice must not be an option)
-            readAloud.failed = i === 0;
+            // no device-voice fallback (operator, 09-17: the computer voice must not be an option);
+            // a failure at any sentence stops the read and the note says so
+            readAloud.failed = true;
             readAloud.on = false;
             onDone();
             return;
@@ -7104,6 +7105,9 @@ function ensureRecManifest() {
       .catch(() => null)
       .then((m) => {
         recManifest = m && m.v ? m : null;
+        // the reader may have drawn while this was loading ('Checking…'): repaint its listen row
+        // once, never mid-read and never under an open sheet
+        if (typeof S !== 'undefined' && S.view === 'reader' && !readAloud.on && !S.stack.length) render();
         return recManifest;
       });
   }
@@ -7152,7 +7156,11 @@ function playRecClip(src, btn) {
  * word has one (pref voice → アミ fallback), the device voice only when no
  * recording exists. One tap speaks; a retap restarts. */
 function speakCardReading(text, btn, word) {
+  // the clip belongs to the card that asked: if the learner has moved on by the time the
+  // manifest answers, it must not speak over the next card
+  const view = S.view, review = S.review, ix = S.review?.ix, stack = S.stack.length;
   ensureRecManifest().then((m) => {
+    if (S.view !== view || S.review !== review || S.review?.ix !== ix || S.stack.length !== stack) return;
     const entry = m && word && m.words ? m.words[word] : null;
     const pref = recVoicePref();
     if (entry && pref && entry.voices.includes(pref)) {
@@ -7323,6 +7331,7 @@ function renderReader(main) {
       try {
         if (pick.value) localStorage.setItem(REC_VOICE_KEY, pick.value);
         else localStorage.removeItem(REC_VOICE_KEY);
+        readAloud.voiceNotSaved = false;
       } catch {
         // storage refused: keep the explicit choice for this session and say so
         sessionVoicePref = pick.value || null;
