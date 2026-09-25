@@ -20650,21 +20650,65 @@ const READER_CHOICE_MAX = 6;
 const READER_KANJI = /[\p{Script=Han}〆]/u;
 const READER_KANA = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
 
-/** The deep rows a reader token may be matched to, named by its base form:
- *   (a) a base form written with kanji keeps the rows that write it exactly
- *       (head or a listed written form); the reading is then irrelevant;
- *   (b) a base form in kana is its own reading: rows whose primary reading it
- *       is (いう → 言う alone; 結う's primary reading is ゆう);
+/** The deep rows a reader token may be matched to, named by its base form, each
+ * carried with the reading, spelling and gloss it matched by. This is a heuristic,
+ * not a reviewed binding: every dictionary-listed reading counts, and ambiguity
+ * stays an explicit choice (Codex D11 delta 11:06Z).
+ *   (a) a base form written with kanji keeps the rows that write it exactly, shown
+ *       with a reading that spelling permits by that reading's own restriction;
+ *       an uninflected token must also carry that reading (産 read さん ≠ ウブ);
+ *   (b) a base form in kana is its own reading: rows that list it among their
+ *       readings, restrictions permitting (いう → 言う and 結う, which lists いう
+ *       too; ゆく → 行く, whose secondary reading it is);
  *   (c) with no base form, or one in neither script (JR, No), the token's own
  *       reading stands in for it. */
 function readerChoiceMatch(choice, rows) {
   const base = choice.b || '';
-  if (READER_KANJI.test(base)) {
-    return { by: 'spelling', key: base, rows: rows.filter((row) => row[1] === base || row[4].includes(base)) };
+  const spelled = READER_KANJI.test(base);
+  const key = (spelled || READER_KANA.test(base) ? base : choice.r) || '';
+  const reading = spelled ? '' : kataToHira(key);
+  // an uninflected token's own reading is evidence: 産 read さん in 産巣日 is never ウブ.
+  // An inflected one (分かっ for 分かる) says nothing about the dictionary form's reading.
+  const surface = spelled && choice.s === base ? kataToHira(choice.r || '') : '';
+  const found = [];
+  if (key && (spelled || reading)) {
+    for (const row of rows) {
+      const k = row[5].findIndex((kana, index) =>
+        spelled
+          ? readerReadingFits(row, index, base) && (!surface || kataToHira(kana) === surface)
+          : kataToHira(kana) === reading,
+      );
+      if (k < 0) continue;
+      // a kana match is shown under a spelling its own reading permits (垂れ for だれ,
+      // not the entry's kana head たれ), or as itself when it is kana only (ダレ)
+      const head = spelled ? base : row[4].find((form) => readerReadingFits(row, k, form)) || row[5][k];
+      found.push({ seq: String(row[0]), head, reading: row[5][k], gloss: readerSummaryFor(row, k)[2] });
+    }
   }
-  const key = (READER_KANA.test(base) ? base : choice.r) || '';
-  const reading = kataToHira(key);
-  return { by: 'reading', key, rows: reading ? rows.filter((row) => kataToHira(String(row[2] || '')) === reading) : [] };
+  return { by: spelled ? 'spelling' : 'reading', key, rows: found };
+}
+
+/** Whether the listed reading at kanaIndex may be printed with this spelling, by that
+ * reading's OWN restriction (cell 11: 0 every written form, 1 none, an array the
+ * permitted cell-4 indexes). The shared dictionaryReadingSupportsForm finds the first
+ * reading that normalises alike, so ウブ (kana only) could lend its restriction to
+ * うぶ (every spelling) — Codex D11 11:08Z. */
+function readerReadingFits(row, kanaIndex, form) {
+  if (row[5][kanaIndex] === form) return true;
+  const writtenIndex = row[4].indexOf(form);
+  if (writtenIndex < 0) return false;
+  const scope = row[11][kanaIndex];
+  return scope === 0 || (Array.isArray(scope) && scope.includes(writtenIndex));
+}
+
+/** The reading summary (reading, spelling, gloss) of this exact listed reading. */
+function readerSummaryFor(row, kanaIndex) {
+  const kana = row[5][kanaIndex];
+  const summaries = dictionaryReadingSummaries(row);
+  const summary =
+    summaries.find((item) => item[0] === kana) ||
+    summaries.find((item) => kataToHira(item[0]) === kataToHira(kana));
+  return summary ? [kana, summary[1] || row[1] || '', summary[2] || ''] : [kana, row[1] || '', row[3] || ''];
 }
 
 function readerEntryNode(token, index, p) {
@@ -20701,15 +20745,14 @@ function resolveReaderChoice(node) {
       choice.by = match.by;
       choice.key = match.key;
       if (matching.length === 1) {
-        node.seq = String(matching[0][0]);
-        node.reading = matching[0][2];
+        node.seq = matching[0].seq;
+        node.reading = matching[0].reading;
+        node.matchedGloss = matching[0].gloss || null;
         choice.state = 'single';
       } else if (matching.length) {
         choice.state = 'choose';
         choice.total = matching.length;
-        choice.candidates = matching.slice(0, READER_CHOICE_MAX).map((row) => ({
-          seq: String(row[0]), head: row[1], reading: row[2], gloss: row[3] || '',
-        }));
+        choice.candidates = matching.slice(0, READER_CHOICE_MAX);
       } else {
         choice.state = 'none';
         choice.formRows = rows.length;
@@ -20817,7 +20860,8 @@ function renderReaderChoice(sheet, node) {
         // the article token keeps its identity (id, from); the chosen entry
         // rides only as seq/reading, exactly as a homograph door opens one
         go({
-          t: 'word', id: node.id, seq: candidate.seq, reading: candidate.reading, from: node.from, ctxScope: 'sent',
+          t: 'word', id: node.id, seq: candidate.seq, reading: candidate.reading, matchedGloss: candidate.gloss || null,
+          from: node.from, ctxScope: 'sent',
           readerChoice: {
             passage: choice.passage, index: choice.index, s: choice.s, b: choice.b, r: choice.r,
             by: choice.by, key: choice.key, state: 'chosen',
