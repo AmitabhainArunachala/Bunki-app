@@ -13,8 +13,8 @@
  * `kairo-test-mutation` record is recomputed from the verified base and its literal edits
  * (make-corridor-mutant.mjs verifyTestMutant), pinned, hashed file by file and served; W0 then
  * shows the explicit mutant identity and never calls those bytes a clean build. Every corridor.js
- * the browser loads in every case is hashed against the expected bytes (auto row
- * `<case>.served-script-identity`). Service workers are blocked in every context, base and mutant
+ * response used by an observed app document is bound by role/navigation/docId and hashed (auto row
+ * `<case>.served-script-identity`); any missing/unreadable required response is inconclusive. Service workers are blocked in every context, base and mutant
  * alike, so each load is the host's verified bytes (the worker would install for the base and
  * refuse the mutant, a difference other than the mutation).
  *
@@ -122,6 +122,7 @@ import { chromium } from 'playwright-core';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { MUTANT_PRODUCT, MUTATION_FORMAT, verifyTestMutant } from './make-corridor-mutant.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { RECORD_HINT_CASE_SCHEMA, RECORD_HINT_HARNESS_PATHS, RECORD_HINT_AUTO_ROWS } from './record-hint-mutants.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
 const require = createRequire(import.meta.url);
@@ -129,6 +130,7 @@ const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 
 const SELF = fileURLToPath(import.meta.url);
 const TOOLS = dirname(SELF);
+const REPO = resolve(TOOLS, '../../..');
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const json = (value) => JSON.stringify(value);
 const same = (a, b) => isDeepStrictEqual(a, b);
@@ -157,21 +159,18 @@ const EVIDENCE = resolveCorridorEvidence();
 const RECEIPT_PATH = join(EVIDENCE, 'record-hint.json');
 const fileSha = (path) => { try { return sha256(readFileSync(path)); } catch { return null; } };
 const receipt = {
-  format: 'kairo-record-hint-verification', v: 2, runId: randomUUID(), status: 'incomplete',
+  format: 'kairo-record-hint-verification', v: 3, runId: randomUUID(), status: 'incomplete',
   startedAt: new Date().toISOString(), finishedAt: null,
-  verifier: { path: 'prototypes/corridor/tools/verify-record-hint.mjs', sha256: fileSha(SELF), support: {
-    'make-corridor-mutant.mjs': fileSha(join(TOOLS, 'make-corridor-mutant.mjs')),
-    'record-test-support.mjs': fileSha(join(TOOLS, 'record-test-support.mjs')),
-    'browser-audio-silence.mjs': fileSha(join(TOOLS, 'browser-audio-silence.mjs')),
-    'resolve-corridor-site.mjs': fileSha(resolve(TOOLS, '../../../scripts/resolve-corridor-site.mjs')),
-  } },
+  verifier: { path: 'prototypes/corridor/tools/verify-record-hint.mjs', sha256: fileSha(SELF),
+    support: Object.fromEntries(RECORD_HINT_HARNESS_PATHS.map((path) => [path, fileSha(join(REPO, path))])) },
   setup: { status: 'pending', error: null },
   artifact: { kind: null, base: null, mutant: null, served: null },
   browser: null,
-  environment: { engine: 'chromium', serviceWorkers: 'blocked in every context', visibility: 'emulated by the probe',
+  environment: { node: process.versions.node, platform: process.platform, arch: process.arch, engine: 'chromium', serviceWorkers: 'blocked in every context', visibility: 'emulated by the probe',
     webkit: 'not covered', clock: 'L4/L9 advance only the hint timers and the hint clock' },
   selection: null,
   cases: { required: [], omitted: [] },
+  coveragePending: ['assessment retry item/removed/inaccessible/protected-answer matrix and native no-write proof; no assessment receipt is consumed here'],
   counts: null,
   results: [],
   cleanup: [],
@@ -182,9 +181,9 @@ function writeReceipt() {
   writeFileSync(temporary, `${JSON.stringify(receipt, null, 2)}\n`);
   renameSync(temporary, RECEIPT_PATH);
 }
-function record(caseId, id, status, detail = '') {
-  results.push({ id, case: caseId, status, detail: String(detail).slice(0, 4000) });
-  const mark = { passed: 'ok  ', failed: 'FAIL', unreached: 'SKIP', unavailable: 'N/A ' }[status] || status;
+function record(caseId, id, status, detail = '', evidence = null) {
+  results.push({ id, case: caseId, status, detail: String(detail).slice(0, 4000), ...(evidence ? { evidence } : {}) });
+  const mark = { passed: 'ok  ', failed: 'FAIL', unreached: 'SKIP', unavailable: 'N/A ', inconclusive: 'INC ' }[status] || status;
   console.log(`  ${mark} ${id}${detail ? `  — ${String(detail).slice(0, 300)}` : ''}`);
 }
 let finished = false;
@@ -198,7 +197,7 @@ function finish(forced = null, reason = null) {
     ...results.filter((row) => row.status === 'unavailable').map((row) => ({ id: row.id, reason: row.detail })),
     ...(receipt.selection?.unselected || []).map((id) => ({ id, reason: 'case not selected (KAIRO_RECORD_HINT_ONLY)' })),
   ];
-  receipt.counts = { required: required.length, passed: count('passed'), failed: count('failed'), unreached: count('unreached'),
+  receipt.counts = { required: required.length, passed: count('passed'), failed: count('failed'), unreached: count('unreached'), inconclusive: count('inconclusive'),
     unavailable: results.length - required.length };
   const cleanupTimedOut = receipt.cleanup.some((row) => row.outcome === 'timeout');
   const cleanupFailed = receipt.cleanup.some((row) => row.outcome !== 'closed');
@@ -241,10 +240,13 @@ function installRecordHintProbe(config) {
     timers: new Map(), maxWakeTimers: 0, channels: [], unhandled: [], advisory: null,
     control: { defer: false, transform: null, fail: flags.queryFail === 'always' ? 'always' : 'none', hidden: false,
       refuseSession: false, clockOffsetMs: 0 },
-    gate: { entered: 0, holding: 0, released: 0, waiters: [] },
+    gate: { entered: 0, holding: 0, released: 0, waiters: [] }, crossingEvents: [],
     raw: { setTimeout: (handler, ms) => Reflect.apply(nativeSetTimeout, window, [handler, ms]) },
   };
   Object.defineProperty(window, '__hintProbe', { value: probe });
+  addEventListener('storage', (event) => {
+    if (event.key === config.crossingKey) probe.crossingEvents.push(event.newValue);
+  });
   addEventListener('unhandledrejection', (event) => {
     if (probe.unhandled.length < 50) probe.unhandled.push(String(event.reason?.message ?? event.reason));
   });
@@ -466,7 +468,7 @@ function installRecordHintProbe(config) {
     deadlineTimersLive: [...probe.timers.values()].filter((row) => row.site === 'armRecordHintDeadline').length,
     maxWakeTimers: probe.maxWakeTimers,
     channels: probe.channels.map((row) => ({ ...row })),
-    unhandled: [...probe.unhandled],
+    unhandled: [...probe.unhandled], crossingEvents: [...probe.crossingEvents],
     gate: { entered: probe.gate.entered, holding: probe.gate.holding, released: probe.gate.released },
     ready: document.body?.dataset.ready === '1', offer: probe.offerVisible(),
     hintNode: !!document.getElementById('record-hint'),
@@ -486,20 +488,66 @@ class CaseStop extends Error {
   constructor(row) { super(`required row failed: ${row}`); this.row = row; }
 }
 
+const DOCUMENTS = new WeakMap();
 async function newContext(env) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, serviceWorkers: 'block' });
   env.contexts.push(context);
   await silenceBrowserAudio(context);
-  context.on('response', (response) => {
-    let path;
-    try { path = new URL(response.url()).pathname; } catch { return; }
-    if (path !== '/corridor.js') return;
-    env.scriptChecks.push(response.body().then(
-      (body) => ({ ok: sha256(body) === EXPECTED.script }),
-      (error) => ({ ok: null, error: error.message }),
-    ));
-  });
   return context;
+}
+function trackAppDocuments(env, page, role) {
+  const slot = { current: null, pendingNavigation: null, byId: new Map(), requests: new WeakMap(), serial: 0 };
+  DOCUMENTS.set(page, slot);
+  page.on('framenavigated', (frame) => {
+    if (frame !== page.mainFrame()) return;
+    // pushState/replaceState also emit framenavigated. They carry no new navigation request.
+    if (slot.current && !slot.pendingNavigation) { slot.current.url = frame.url(); return; }
+    const doc = { role, navigation: ++slot.serial, url: frame.url(), docId: null, required: false, checks: [] };
+    env.documents.push(doc);
+    slot.current = doc;
+    slot.pendingNavigation = null;
+  });
+  const isScript = (request) => {
+    try { const url = new URL(request.url()); return request.frame() === page.mainFrame()
+      && url.origin === origin && url.pathname === '/corridor.js'; } catch { return false; }
+  };
+  page.on('request', (request) => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) slot.pendingNavigation = request;
+    if (!isScript(request)) return;
+    const doc = slot.current;
+    if (!doc) { env.identityErrors.push({ role, reason: 'script request without committed document' }); return; }
+    const check = { result: null, promise: null };
+    doc.checks.push(check);
+    slot.requests.set(request, check);
+  });
+  page.on('requestfailed', (request) => {
+    const check = slot.requests.get(request);
+    if (check) check.result = { ok: null, error: request.failure()?.errorText || 'script request failed' };
+  });
+  page.on('response', (response) => {
+    if (!isScript(response.request())) return;
+    const check = slot.requests.get(response.request());
+    if (!check) { env.identityErrors.push({ role, reason: 'script response without bound request' }); return; }
+    check.promise = response.body().then((body) => ({ ok: sha256(body) === EXPECTED.script, sha256: sha256(body) }),
+      (error) => ({ ok: null, error: error.message })).then((result) => { check.result = result; return result; });
+  });
+}
+function bindObservedDocument(page, state) {
+  const slot = DOCUMENTS.get(page);
+  assert(slot?.current && typeof state.docId === 'string' && state.docId, 'observed document has no navigation identity');
+  // A genuine bfcache return carries the same random probe docId and reuses its prior byte evidence.
+  const prior = slot.byId.get(state.docId);
+  if (prior && prior !== slot.current) {
+    assert(slot.current.checks.length === 0, 'a restored document unexpectedly loaded another script');
+    slot.current.restoredFrom = prior.navigation;
+    slot.current = prior;
+  }
+  const doc = slot.current;
+  assert(doc.docId === null || doc.docId === state.docId, 'navigation and observed probe identity disagree');
+  assert(doc.role === state.role, 'navigation and observed probe role disagree');
+  doc.docId = state.docId;
+  doc.required = true;
+  slot.byId.set(state.docId, doc);
 }
 
 async function booted(page, previousDocId) {
@@ -509,15 +557,18 @@ async function booted(page, previousDocId) {
     const boot = probe.requests.find((row) => row.name === lock);
     return !!boot && boot.granted !== null;
   }, { previous: previousDocId, lock: RECORD_LOCK }, { timeout: 45_000 });
-  return page.evaluate(() => window.__hintProbe.state());
+  const state = await page.evaluate(() => window.__hintProbe.state());
+  bindObservedDocument(page, state);
+  return state;
 }
 
 async function openApp(env, context, { role, seed = false, flags = {}, path = '?entry=shelf' }) {
   const page = await context.newPage();
+  trackAppDocuments(env, page, role);
   page.on('pageerror', (error) => env.errors.push({ role, message: error.message }));
   page.on('crash', () => env.errors.push({ role, message: 'renderer crashed' }));
   await page.addInitScript(installRecordHintProbe, {
-    origin, role, seed, flags, lock: RECORD_LOCK, storeKey: STORE_KEY, bindingKey: BINDING_KEY, channel: HINT_CHANNEL,
+    origin, role, seed, flags, lock: RECORD_LOCK, storeKey: STORE_KEY, bindingKey: BINDING_KEY, channel: HINT_CHANNEL, crossingKey: CROSSING_KEY,
   });
   env.apps.push(page);
   await page.goto(`${origin}/index.html${path}`, { waitUntil: 'load', timeout: 45_000 });
@@ -563,6 +614,7 @@ const writeStorage = (page, key, value) => page.evaluate(([key, value]) => { loc
 async function observe(env, page) {
   const state = await page.evaluate(() => window.__hintProbe?.state() ?? null);
   assert(state, 'the page has no record-hint probe');
+  bindObservedDocument(page, state);
   env.maxInFlight = Math.max(env.maxInFlight, state.maxInFlight);
   return state;
 }
@@ -722,22 +774,36 @@ async function onPassage(page, passageId) {
 /* ------------------------------------------------------------------ cases */
 
 const CASES = new Map();
-const AUTO_ROWS = ['max-one-outstanding-query', 'served-script-identity', 'no-page-errors', 'completed'];
+const AUTO_ROWS = RECORD_HINT_AUTO_ROWS;
 function defineCase(id, { rows = [], optional = {}, browser: usesBrowser = true }, run) {
+  const schema = RECORD_HINT_CASE_SCHEMA[id];
+  assert(schema, `no receipt schema for ${id}`);
+  assert.deepEqual(rows, schema.rows, `${id}: required rows differ from the shared schema`);
+  assert.deepEqual(Object.keys(optional), schema.optional, `${id}: optional rows differ from the shared schema`);
+  assert.equal(usesBrowser, schema.browser, `${id}: browser scope differs from the shared schema`);
   CASES.set(id, { id, rows, optional, browser: usesBrowser, run });
 }
 function caseContext(spec) {
   const recorded = new Set();
   const auto = spec.browser ? AUTO_ROWS.map((name) => `${spec.id}.${name}`) : [`${spec.id}.completed`];
-  const put = (id, status, detail) => {
+  const put = (id, status, detail, evidence = null) => {
     assert(spec.rows.includes(id) || Object.hasOwn(spec.optional, id) || auto.includes(id), `undeclared row ${id}`);
     assert(!recorded.has(id), `row ${id} recorded twice`);
     recorded.add(id);
-    record(spec.id, id, status, detail);
+    record(spec.id, id, status, detail, evidence);
   };
   return {
     recorded,
-    row(id, pass, detail = '') { put(id, pass ? 'passed' : 'failed', detail); return !!pass; },
+    row(id, pass, detail = '', evidence = null) { put(id, pass ? 'passed' : 'failed', detail, evidence); return !!pass; },
+    inconclusive(id, detail, evidence) { put(id, 'inconclusive', detail, evidence); },
+    witness(id, violated, kind, detail = '', extra = {}) {
+      put(id, violated ? 'failed' : 'passed', detail, { ...extra, kind, observed: !!violated });
+      return !!violated;
+    },
+    requireWitness(id, violated, kind, detail = '') {
+      put(id, violated ? 'failed' : 'passed', detail, { kind, observed: !!violated });
+      if (violated) throw new CaseStop(id);
+    },
     require(id, pass, detail = '') { put(id, pass ? 'passed' : 'failed', detail); if (!pass) throw new CaseStop(id); },
     unavailable(id, reason) { assert(Object.hasOwn(spec.optional, id), `only an optional row can be unavailable: ${id}`); put(id, 'unavailable', reason); },
   };
@@ -750,7 +816,7 @@ async function settledChecks(checks, ms) {
 async function runCase(spec) {
   console.log(`\n${spec.id}`);
   const t = caseContext(spec);
-  const env = { contexts: [], apps: [], errors: [], scriptChecks: [], maxInFlight: 0 };
+  const env = { contexts: [], apps: [], errors: [], documents: [], identityErrors: [], maxInFlight: 0 };
   let completed = true;
   let detail = '';
   try { await spec.run(t, env); } catch (error) {
@@ -763,13 +829,21 @@ async function runCase(spec) {
       try { await observe(env, page); } catch { /* navigating or already gone */ }
     }
     t.row(`${spec.id}.max-one-outstanding-query`, env.maxInFlight <= 1, `max in flight ${env.maxInFlight}`);
-    const checks = await settledChecks(env.scriptChecks, 15_000);
-    const verified = checks.filter((row) => row.ok === true).length;
-    const mismatched = checks.filter((row) => row.ok === false).length;
-    t.row(`${spec.id}.served-script-identity`, verified >= 1 && mismatched === 0,
-      json({ loads: checks.length, verified, mismatched, unverifiable: checks.length - verified - mismatched }));
-    t.row(`${spec.id}.no-page-errors`, env.errors.length === 0, json(env.errors.slice(0, 10)));
+    const documents = [];
+    for (const doc of env.documents.filter((entry) => entry.required)) {
+      const checks = await settledChecks(doc.checks.map((check) => check.promise || Promise.resolve(check.result
+        || { ok: null, error: 'no completed script response' })), 15_000);
+      documents.push({ role: doc.role, navigation: doc.navigation, docId: doc.docId, url: doc.url, checks });
+    }
+    const allChecks = documents.flatMap((doc) => doc.checks);
+    const evidence = { kind: 'document-script-identity', documents, errors: env.identityErrors };
+    const incomplete = documents.length === 0 || documents.some((doc) => doc.checks.length === 0)
+      || allChecks.some((check) => check.ok === null) || env.identityErrors.length > 0;
+    if (incomplete) t.inconclusive(`${spec.id}.served-script-identity`, 'a behavior-bearing document lacks complete byte evidence', evidence);
+    else t.row(`${spec.id}.served-script-identity`, allChecks.every((check) => check.ok === true),
+      `${documents.length} observed documents, ${allChecks.length} verified responses`, evidence);
     for (const context of env.contexts) receipt.cleanup.push({ case: spec.id, ...(await bounded('context', () => context.close(), 10_000)) });
+    t.row(`${spec.id}.no-page-errors`, env.errors.length === 0, json(env.errors.slice(0, 10)), { kind: 'page-errors', errors: env.errors });
   }
   t.row(`${spec.id}.completed`, completed, detail);
   for (const id of spec.rows) if (!t.recorded.has(id)) record(spec.id, id, 'unreached', 'the case stopped before this assertion');
@@ -778,10 +852,11 @@ async function runCase(spec) {
 }
 
 defineCase('W1', { rows: [
+  'W1.owner-still-held', 'W1.owner-query-established', 'W1.lock-free-after-owner-close',
   'W1.seed-and-owner-before-first-grade', 'W1.owner-grade-durable', 'W1.blocked-boot-lost', 'W1.no-offer-while-owner-lives',
   'W1.observer-never-queued', 'W1.observer-held-identity', 'W1.zero-observer-acquisition-attempts', 'W1.offer-within-4s-of-close',
   'W1.retry-new-document-and-ownership', 'W1.owner-revlog-exact', 'W1.writable-after-retry',
-] }, async (t, env) => {
+], optional: { 'W1.mutant-held-gate-established': 'only the deliberately held m2 callback uses this control' } }, async (t, env) => {
   const context = await newContext(env);
   const a = await openApp(env, context, { role: 'A', seed: true });
   await seededOwner(env, t, 'W1.seed-and-owner-before-first-grade', a);
@@ -795,7 +870,9 @@ defineCase('W1', { rows: [
   await b.waitForTimeout(3600);
   const early = await observe(env, b);
   const queued = await lockView(b);
-  t.row('W1.no-offer-while-owner-lives', !early.offer && early.queryStarts >= 1, json({ offer: early.offer, looks: early.queryStarts }));
+  t.require('W1.owner-still-held', same(queued.held, [ownerId]), json(queued));
+  t.row('W1.owner-query-established', early.queryStarts >= 1, json({ looks: early.queryStarts }));
+  t.witness('W1.no-offer-while-owner-lives', early.offer, 'offer-while-native-owner-held', json({ offer: early.offer, looks: early.queryStarts }));
   t.row('W1.observer-never-queued', !queued.pending.includes(blocked.clientId) && !queued.held.includes(blocked.clientId), json(queued));
   await a.close();
   const closedAt = Date.now();
@@ -806,14 +883,19 @@ defineCase('W1', { rows: [
   }, null, { timeout: OFFER_MS }).then((handle) => handle.jsonValue(), () => 'none');
   const firstAt = Date.now();
   const sample = await lockView(b);
-  t.row('W1.observer-held-identity', !sample.held.includes(blocked.clientId), json({ first, held: sample.held, blocked: blocked.clientId }));
+  t.row('W1.lock-free-after-owner-close', sample.held.length === 0 && sample.pending.length === 0, json(sample));
+  const gate = (await observe(env, b)).gate;
+  if (receipt.artifact.mutant?.name === 'm2') {
+    t.row('W1.mutant-held-gate-established', first === 'gate' && gate.entered >= 1 && gate.holding >= 1
+      && same(sample.held, [blocked.clientId]), json({ gate, sample }));
+  } else t.unavailable('W1.mutant-held-gate-established', 'only the deliberately held m2 callback uses this control');
+  t.witness('W1.observer-held-identity', sample.held.includes(blocked.clientId), 'observer-native-held', json({ first, gate, held: sample.held, blocked: blocked.clientId }));
   const released = await b.evaluate(() => window.__hintProbe.releaseGate());
   const offered = first === 'offer' || await waitOffer(b, Math.max(250, OFFER_MS - (Date.now() - closedAt)));
   const elapsed = (first === 'offer' ? firstAt : Date.now()) - closedAt;
   const beforeTap = authority(await observe(env, b));
-  t.row('W1.zero-observer-acquisition-attempts', beforeTap.bootShape && beforeTap.bootGranted === false
-    && beforeTap.namedRequests === 1 && beforeTap.observerAttempts === 0, json(beforeTap));
-  t.require('W1.offer-within-4s-of-close', offered && elapsed <= OFFER_MS, json({ elapsed, first, gateReleased: released }));
+  t.witness('W1.zero-observer-acquisition-attempts', beforeTap.observerAttempts > 0, 'observer-record-request', json(beforeTap));
+  t.requireWitness('W1.offer-within-4s-of-close', !offered || elapsed > OFFER_MS, 'offer-deadline-missed', json({ elapsed, first, gateReleased: released }));
   await retryFromOffer(env, b);
   const after = await ownership(env, b);
   t.require('W1.retry-new-document-and-ownership', after.owns && after.docId !== blocked.docId, json(after));
@@ -1044,10 +1126,10 @@ defineCase('W7c', { rows: ['W7c.passage-opened', 'W7c.first-offer-genuine', 'W7c
   await retryFromOffer(env, b); // the real retry path; its boot must lose
   const lost = await ownership(env, b);
   t.require('W7c.losing-boot-new-document', lost.docId !== standing.docId, json(lost));
-  t.row('W7c.losing-boot-blocked', lost.blocked && lost.observerAttempts === 0 && !lost.pending.includes(lost.clientId)
+  t.require('W7c.losing-boot-blocked', lost.blocked && lost.observerAttempts === 0 && !lost.pending.includes(lost.clientId)
     && same(lost.held, [holderId]), json(lost));
   const lostPlace = await onPassage(b, passageId);
-  t.row('W7c.losing-boot-same-passage', lostPlace.ok, json(lostPlace.place));
+  t.witness('W7c.losing-boot-same-passage', !lostPlace.ok, 'losing-retry-wrong-passage', json(lostPlace.place));
   const restarted = await waitQueries(b, 0, 4000);
   await b.waitForTimeout(3600);
   t.row('W7c.losing-boot-no-offer-while-held', restarted && !(await observe(env, b)).offer, json({ restarted }));
@@ -1178,7 +1260,8 @@ defineCase('L1', { rows: ['L1.visible-free-result-publishes', 'L1.hide-retires-o
   t.row('L1.no-queries-after-pagehide', gone.queryStarts === fourth.n && openHintChannels(gone) === 0, json({ looks: gone.queryStarts, channels: openHintChannels(gone) }));
 });
 
-defineCase('L2', { rows: ['L2.single-outstanding-across-generations', 'L2.old-free-result-not-published',
+defineCase('L2', { rows: [
+  'L2.old-free-look-and-new-holder-established', 'L2.old-rejection-established','L2.single-outstanding-across-generations', 'L2.old-free-result-not-published',
   'L2.completion-rechecks-current-generation', 'L2.current-held-result-no-offer', 'L2.old-rejection-does-not-stop',
   'L2.after-old-rejection-offer-returns'] }, async (t, env) => {
   const context = await newContext(env);
@@ -1191,6 +1274,8 @@ defineCase('L2', { rows: ['L2.single-outstanding-across-generations', 'L2.old-fr
   await setHidden(b, true);
   await hold(holder, RECORD_LOCK);
   await setHidden(b, false);
+  t.require('L2.old-free-look-and-new-holder-established', stale.nativeFree === true && stale.deferred && stale.awaiting
+    && same((await lockView(b)).held, [await clientId(holder)]), json(stale));
   await b.waitForTimeout(1500);
   const waiting = await observe(env, b);
   t.row('L2.single-outstanding-across-generations', waiting.queryStarts === stale.n && waiting.inFlight === 1 && !waiting.offer,
@@ -1198,7 +1283,7 @@ defineCase('L2', { rows: ['L2.single-outstanding-across-generations', 'L2.old-fr
   await settle(b, stale.n, 'resolve');
   const rechecked = await waitQueries(b, stale.n, 3000);
   await b.waitForTimeout(500);
-  t.row('L2.old-free-result-not-published', !(await observe(env, b)).offer, `look #${stale.n}`);
+  t.witness('L2.old-free-result-not-published', (await observe(env, b)).offer, 'old-free-result-published', `look #${stale.n}`);
   t.row('L2.completion-rechecks-current-generation', rechecked, '');
   const current = await nextDeferred(env, b, { wantFree: false });
   await settle(b, current.n, 'resolve');
@@ -1210,13 +1295,17 @@ defineCase('L2', { rows: ['L2.single-outstanding-across-generations', 'L2.old-fr
   await setHidden(b, true);
   await setHidden(b, false);
   await settle(b, staleReject.n, 'reject');
-  t.row('L2.old-rejection-does-not-stop', await waitQueries(b, staleReject.n, 3000), `look #${staleReject.n}`);
+  const restartedAfterReject = await waitQueries(b, staleReject.n, 3000);
+  const rejected = (await observe(env, b)).queries.find((row) => row.n === staleReject.n);
+  t.require('L2.old-rejection-established', staleReject.nativeFree === true && staleReject.deferred && rejected?.settled === 'rejected', json(rejected));
+  t.requireWitness('L2.old-rejection-does-not-stop', !restartedAfterReject, 'old-rejection-stopped-new-period', `look #${staleReject.n}`);
   const next = await nextDeferred(env, b, { wantFree: true });
   await settle(b, next.n, 'resolve');
   t.row('L2.after-old-rejection-offer-returns', await waitOffer(b, 1500), `look #${next.n}`);
 });
 
-defineCase('L3', { rows: ['L3.offer-before-crossing', 'L3.stale-retires-offer', 'L3.no-queries-while-stale', 'L3.abort-resumes-looking',
+defineCase('L3', { rows: [
+  'L3.crossing-event-observed','L3.offer-before-crossing', 'L3.stale-retires-offer', 'L3.no-queries-while-stale', 'L3.abort-resumes-looking',
   'L3.pre-crossing-result-not-published', 'L3.abort-looks-afresh', 'L3.fresh-result-after-abort-publishes'] }, async (t, env) => {
   const context = await newContext(env);
   const a = await openApp(env, context, { role: 'A', seed: true });
@@ -1226,7 +1315,10 @@ defineCase('L3', { rows: ['L3.offer-before-crossing', 'L3.stale-retires-offer', 
   t.require('L3.offer-before-crossing', await waitOffer(b), '');
   // another tab's crossing beacon makes this window stale
   await writeStorage(other, CROSSING_KEY, 'record-hint-l3');
-  t.row('L3.stale-retires-offer', await waitNoOffer(b, 2000), '');
+  const crossingObserved = await b.waitForFunction(() => window.__hintProbe.crossingEvents.includes('record-hint-l3'), null,
+    { timeout: 2000 }).then(() => true, () => false);
+  t.require('L3.crossing-event-observed', crossingObserved, json((await observe(env, b)).crossingEvents));
+  t.witness('L3.stale-retires-offer', !(await waitNoOffer(b, 2000)), 'offer-survived-crossing', '');
   const staleAt = (await observe(env, b)).queryStarts;
   await b.waitForTimeout(4000);
   const stale = await observe(env, b);
@@ -1266,8 +1358,8 @@ defineCase('L4', { rows: ['L4.clock-and-timers-installed', 'L4.looking-before-de
   const at11 = (await observe(env, b)).queryStarts;
   await b.waitForTimeout(7000);
   const after = await observe(env, b);
-  t.row('L4.deadline-stops-looking', after.queryStarts === at11 && after.wakeTimersLive === 0 && after.deadlineTimersLive === 0
-    && openHintChannels(after) === 0, json({ fired, at11, looks: after.queryStarts, wake: after.wakeTimersLive, deadline: after.deadlineTimersLive }));
+  t.witness('L4.deadline-stops-looking', after.queryStarts !== at11 || after.wakeTimersLive !== 0 || after.deadlineTimersLive !== 0
+    || openHintChannels(after) !== 0, 'deadline-still-active', json({ fired, at11, looks: after.queryStarts, wake: after.wakeTimersLive, deadline: after.deadlineTimersLive }));
   await focusEvent(b);
   await b.waitForTimeout(2000);
   t.row('L4.focus-after-deadline-does-not-restart', (await observe(env, b)).queryStarts === at11, '');
@@ -1296,7 +1388,7 @@ defineCase('L5', { rows: ['L5.timer-tracer-live', 'L5.burst-query-starts-bounded
     return { starts: probe.queryStarts - startLooks, ms: performance.now() - began, maxWake: probe.maxWakeTimers, maxInFlight: probe.maxInFlight };
   });
   const bound = Math.floor(burst.ms / 1000) + 2;
-  t.row('L5.burst-query-starts-bounded', burst.starts <= bound, json({ ...burst, bound }));
+  t.witness('L5.burst-query-starts-bounded', burst.starts > bound, 'burst-look-bound-exceeded', json({ ...burst, bound }));
   t.row('L5.one-wake-timer', burst.maxWake <= 1, json(burst));
   t.row('L5.max-one-outstanding', burst.maxInFlight <= 1, json(burst));
 });
@@ -1311,8 +1403,9 @@ defineCase('L6', { rows: ['L6.injection-fired', 'L6.one-failed-query-then-none',
   await advisory(b, 2);
   await b.waitForTimeout(7000);
   const state = await observe(env, b);
-  t.row('L6.injection-fired', state.fired.queryFailures === state.queryStarts && state.queryStarts >= 1, json(state.fired));
-  t.row('L6.one-failed-query-then-none', state.queryStarts === 1 && state.queries[0]?.settled === 'rejected', json({ looks: state.queryStarts }));
+  t.require('L6.injection-fired', state.fired.queryFailures === state.queryStarts && state.queryStarts >= 1
+    && state.queries[0]?.settled === 'rejected', json(state.fired));
+  t.witness('L6.one-failed-query-then-none', state.queryStarts > 1, 'look-after-current-query-rejection', json({ looks: state.queryStarts }));
   t.row('L6.no-offer-manual-reload', !state.offer && openHintChannels(state) === 0 && await manualReload(b), '');
   t.row('L6.no-unhandled-rejection', state.unhandled.length === 0, json(state.unhandled));
 });
@@ -1351,7 +1444,7 @@ defineCase('L8', { rows: ['L8.pending-only-control-established', 'L8.pending-onl
   const looks = state.queries.filter((row) => row.n > from && row.settled === 'resolved');
   t.require('L8.pending-only-control-established', looks.length >= 1 && state.fired.transformed >= 1
     && looks.every((row) => row.viewNamedHeld === 0 && row.viewNamedPending === 1), json(looks));
-  t.row('L8.pending-only-no-offer', !state.offer && !(await waitOffer(b, 3500)), '');
+  t.witness('L8.pending-only-no-offer', state.offer || await waitOffer(b, 3500), 'offer-with-native-pending-row', '');
   await abortQueued(other, 'pending');
   t.row('L8.transform-can-offer', await waitOffer(b, 4500), 'the same transformed view without the pending row offers');
   await setControl(b, { transform: null });
@@ -1362,13 +1455,14 @@ defineCase('L8', { rows: ['L8.pending-only-control-established', 'L8.pending-onl
   await a.close();
   await waitLockFree(b, 5000);
   const view = await lockView(b);
-  t.row('L8.unrelated-rows-present', view.held.length === 0 && view.pending.length === 0
+  t.require('L8.unrelated-rows-present', view.held.length === 0 && view.pending.length === 0
     && view.heldNames.includes('kairo-unrelated-lock') && view.heldNames.includes(`${RECORD_LOCK}:shadow`)
     && view.pendingNames.includes('kairo-unrelated-lock'), json(view));
-  t.row('L8.unrelated-names-offer', await waitOffer(b, 4500), '');
+  t.witness('L8.unrelated-names-offer', !(await waitOffer(b, 4500)), 'unrelated-locks-suppressed-offer', '');
 });
 
-defineCase('L9', { rows: ['L9.free-offer', 'L9.deadline-hides-offer', 'L9.channel-stopped', 'L9.no-overlapping-query',
+defineCase('L9', { rows: [
+  'L9.held-free-looks-established', 'L9.deadline-timers-fired','L9.free-offer', 'L9.deadline-hides-offer', 'L9.channel-stopped', 'L9.no-overlapping-query',
   'L9.resolved-old-look-does-not-revive', 'L9.rejected-old-look-does-not-revive', 'L9.no-unhandled-rejection'] }, async (t, env) => {
   const context = await newContext(env);
   const a = await openApp(env, context, { role: 'A', seed: true });
@@ -1380,13 +1474,15 @@ defineCase('L9', { rows: ['L9.free-offer', 'L9.deadline-hides-offer', 'L9.channe
   await setControl(two, { defer: true });
   const look1 = await nextDeferred(env, one, { wantFree: true });
   const look2 = await nextDeferred(env, two, { wantFree: true });
+  t.require('L9.held-free-looks-established', look1.nativeFree === true && look2.nativeFree === true
+    && look1.deferred && look2.deferred && look1.awaiting && look2.awaiting, json({ look1, look2 }));
   // from here only the controlled clock moves: no focus, visibility, storage or advisory event
   const fired1 = await advance(one, HINT_WINDOW_MS + 1000);
   const fired2 = await advance(two, HINT_WINDOW_MS + 1000);
   await one.waitForTimeout(500);
   const [s1, s2] = [await observe(env, one), await observe(env, two)];
-  t.row('L9.deadline-hides-offer', !s1.offer && !s2.offer && fired1.includes('armRecordHintDeadline') && fired2.includes('armRecordHintDeadline'),
-    json({ fired1, fired2, offers: [s1.offer, s2.offer] }));
+  t.require('L9.deadline-timers-fired', fired1.includes('armRecordHintDeadline') && fired2.includes('armRecordHintDeadline'), json({ fired1, fired2 }));
+  t.witness('L9.deadline-hides-offer', s1.offer || s2.offer, 'offer-survived-deadline', json({ offers: [s1.offer, s2.offer] }));
   t.row('L9.channel-stopped', openHintChannels(s1) === 0 && openHintChannels(s2) === 0, '');
   await one.waitForTimeout(4000);
   const [l1, l2] = [await observe(env, one), await observe(env, two)];
@@ -1401,7 +1497,8 @@ defineCase('L9', { rows: ['L9.free-offer', 'L9.deadline-hides-offer', 'L9.channe
   t.row('L9.no-unhandled-rejection', e1.unhandled.length === 0 && e2.unhandled.length === 0, json([e1.unhandled, e2.unhandled]));
 });
 
-defineCase('L10', { rows: ['L10.sync-throw-fired', 'L10.no-unhandled-rejection', 'L10.hint-retired-manual-reload',
+defineCase('L10', { rows: [
+  'L10.no-unexpected-errors','L10.sync-throw-fired', 'L10.no-unhandled-rejection', 'L10.hint-retired-manual-reload',
   'L10.no-later-queries', 'L10.zero-record-requests-beyond-boot'] }, async (t, env) => {
   const context = await newContext(env);
   const a = await openApp(env, context, { role: 'A', seed: true });
@@ -1414,7 +1511,12 @@ defineCase('L10', { rows: ['L10.sync-throw-fired', 'L10.no-unhandled-rejection',
   await b.waitForTimeout(6000);
   const state = await observe(env, b);
   const pageErrors = env.errors.filter((row) => row.role === 'B');
-  t.row('L10.no-unhandled-rejection', state.unhandled.length === 0 && pageErrors.length === 0, json({ unhandled: state.unhandled, pageErrors }));
+  const expectedError = 'probe: query threw synchronously';
+  const unexpectedErrors = [...state.unhandled.filter((message) => message !== expectedError),
+    ...pageErrors.filter((row) => row.message !== expectedError)];
+  t.require('L10.no-unexpected-errors', unexpectedErrors.length === 0, json(unexpectedErrors));
+  t.witness('L10.no-unhandled-rejection', state.unhandled.includes(expectedError) || pageErrors.some((row) => row.message === expectedError),
+    'expected-sync-query-rejection', json({ unhandled: state.unhandled, pageErrors }), { unexpectedErrors });
   t.row('L10.hint-retired-manual-reload', !state.offer && openHintChannels(state) === 0 && await manualReload(b), '');
   t.row('L10.no-later-queries', state.fired.querySyncThrows === 1, json(state.fired));
   const auth = authority(state);
@@ -1428,6 +1530,7 @@ function playwrightVersion() {
 }
 const w0 = (id, pass, detail = '') => record('W0', id, pass ? 'passed' : 'failed', detail);
 async function setup() {
+  assert(Object.values(receipt.verifier.support).every((hash) => /^[a-f0-9]{64}$/.test(hash || '')), 'required harness source unavailable');
   const only = process.env.KAIRO_RECORD_HINT_ONLY;
   const all = [...CASES.keys()];
   const chosen = only === undefined ? all : only.split(',').map((id) => id.trim()).filter(Boolean);
