@@ -164,7 +164,7 @@ try {
     await context.addInitScript((word) => {
       if (localStorage.getItem('voice-honesty-seeded')) return;
       const t = 1700000000000;
-      localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [{ t: 'word', id: word, label: word, ts: t }], srs: {}, revlog: [], obslog: [] }));
+      localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [{ t: 'word', id: word, label: word, ts: t, started: t }], srs: {}, revlog: [], obslog: [] }));
       localStorage.setItem('voice-honesty-seeded', '1');
     }, recordedWord);
     const page = await context.newPage();

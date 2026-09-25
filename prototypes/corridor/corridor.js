@@ -7124,7 +7124,10 @@ function ensureRecManifest() {
         recManifest = m && m.v ? m : null;
         // the reader may have drawn while this was loading ('Checking…'): repaint its listen row
         // once, never mid-read and never under an open sheet
-        if (typeof S !== 'undefined' && S.view === 'reader' && !readAloud.on && !S.stack.length) render();
+        // …and never while the learner's focus is somewhere in the page (a glossary, a token):
+        // the next natural render shows the listen row's final state anyway
+        if (typeof S !== 'undefined' && S.view === 'reader' && !readAloud.on && !S.stack.length &&
+          (!document.activeElement || document.activeElement === document.body)) render();
         return recManifest;
       });
   }
@@ -7172,12 +7175,22 @@ function playRecClip(src, btn) {
 /** 音 — the answer card's voice door. The roster's recorded clip when the
  * word has one (pref voice → アミ fallback), the device voice only when no
  * recording exists. One tap speaks; a retap restarts. */
+let cardAudioSerial = 0, cardFaceKey = '';
+/** Called from render(): any change of card face (grade, undo, reveal, leave) retires card audio. */
+function retireCardAudioOnFaceChange() {
+  const rv = S.review;
+  const key = `${S.view}|${rv ? rv.ix : ''}|${rv ? rv.revealed : ''}|${rv?.history?.length ?? ''}|${S.stack.length}`;
+  if (key === cardFaceKey) return;
+  cardFaceKey = key;
+  cardAudioSerial += 1;
+  if (!readAloud.on) stopRecAudio();
+}
 function speakCardReading(text, btn, word) {
-  // the clip belongs to the card that asked: if the learner has moved on by the time the
-  // manifest answers, it must not speak over the next card
-  const view = S.view, review = S.review, ix = S.review?.ix, stack = S.stack.length;
+  // the clip belongs to the card face that asked: a grade, undo, reveal change or leave before
+  // the manifest answers retires it, and a playing clip stops when the face changes
+  const serial = cardAudioSerial;
   ensureRecManifest().then((m) => {
-    if (S.view !== view || S.review !== review || S.review?.ix !== ix || S.stack.length !== stack) return;
+    if (serial !== cardAudioSerial) return;
     const entry = m && word && m.words ? m.words[word] : null;
     const pref = recVoicePref();
     if (entry && pref && entry.voices.includes(pref)) {
@@ -24088,6 +24101,7 @@ function render() {
   }
   lastRenderedView = S.view;
   stampRegister();
+  retireCardAudioOnFaceChange();
   // every navigation passes through here — keep the Back sentinel honest
   syncWalkSentinel();
 }

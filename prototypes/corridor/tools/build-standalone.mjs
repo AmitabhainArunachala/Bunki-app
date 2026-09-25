@@ -371,6 +371,7 @@ ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
 ${read('skip-ui.css')}
+${read('register.css')}
 ${read('maintenance/report-client.css')}
 </style>
 ${BODY}
@@ -391,6 +392,7 @@ ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
 ${read('skip-ui.css')}
+${read('register.css')}
 ${read('maintenance/report-client.css')}
 </style>
 </head>
