@@ -1484,17 +1484,15 @@ async function main() {
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
     note: document.querySelector('#listen-note')?.textContent ?? '',
   })`);
-  await tap(page, '#listen-toggle');
-  await page.waitForTimeout(250);
-  const listenAfter = await page.evaluate(`({
-    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
-    note: document.querySelector('#listen-note')?.textContent ?? '',
-  })`);
-  check('reader · the 聞く door stands, names its voice honestly, and answers a tap',
-    listenBefore.pressed === 'false' &&
-      /仮の声|interim device voice|小春音アミ|Koharune Ami/.test(listenBefore.note) &&
-      (listenAfter.pressed === 'true' || /声が見つからない|no Japanese voice/.test(listenAfter.note)),
-    `before ${JSON.stringify(listenBefore)} → after ${JSON.stringify(listenAfter)}`);
+  // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
+  // is shut and the note says why honestly (no recording, or recorded only in the interim
+  // アミ voice, or recordings still being checked); it never offers a device voice.
+  const shut = await page.evaluate(`document.querySelector('#listen-toggle')?.disabled === true`);
+  check('reader · the 聞く door stands shut with an honest reason until a voice is chosen',
+    listenBefore.pressed === 'false' && shut &&
+      /収録音声|recorded voice|recorded only in Koharune Ami|小春音アミ（仮の声・検収前）|Checking for recordings|この版には収録音声/u.test(listenBefore.note) &&
+      !/device voice|端末の声/u.test(listenBefore.note),
+    `${JSON.stringify(listenBefore)} shut=${shut}`);
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
