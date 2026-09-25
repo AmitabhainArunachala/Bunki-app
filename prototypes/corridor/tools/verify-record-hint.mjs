@@ -1,406 +1,1526 @@
 /**
  * B2a-hint (D4, first slice): a window that lost the boot race LOOKS at the record lock
- * (navigator.locks.query) and offers a retry when it looks free. It never requests the
- * lock; only the unchanged boot ifAvailable request acquires. Design: B2-handoff-protocol
- * v5, signed with amendments in B2-CODEX-SIGNATURE-v5.md. D4's remote hand-off (B2c) and
- * in-place acquisition (B2b) stay open; this suite claims neither.
+ * (navigator.locks.query) and offers a retry when it looks free. It never requests the lock; only
+ * the unchanged boot ifAvailable request acquires. Design: B2-handoff-protocol v5 with the
+ * B2-CODEX-SIGNATURE-v5 amendments; this rewrite answers B2-TEST-REVIEW-r1, B2-LIFECYCLE-REVIEW-r1/r2,
+ * B2-ROUTE-REVIEW-r1 and B2-MUTANT-REVIEW-r2. D4's remote hand-off (B2c) and in-place acquisition
+ * (B2b) stay open; this suite claims neither. Engine scope: Chromium only; WebKit is not covered.
  *
- *   W0  identity: the served build is the commit under test (or a named mutant of it).
- *   W1  owner closes → the blocked window offers a retry within 4.5 s; before the tap it has
- *       made exactly one lock request (its boot) and never holds the lock; tap → writable,
- *       with the owner's revlog exactly.
- *   W2  the owner reloads 20 times beside a visible blocked window whose looks are slowed:
- *       the owner is the owner after every reload; the blocked window's request count stays 1.
- *   W3  three windows: close the owner, tap both retries → exactly one writable window.
- *   W5  the owner navigates away → retry offered; its Back returns it to ownership and the
- *       offer withdraws.
- *   W6a a grade with a durable ACK, then the owner closes → present exactly once after retry.
- *   W6b a grade tap followed at once by closing the owner (a race, not a held commit) →
- *       absent, or present exactly once with its card state; never duplicated.
- *   W7a drafts typed just before the tap survive the retry reload.
- *   W7b session storage refused at the tap → no reload, a visible alert, the text intact.
- *   W7c the reader passage returns after the retry, including after losing one race.
- *   W8  no locks.query → no offer, the existing manual reload remains.
- *   W9  hidden → no looks; visible again → the offer arrives.
- *   W10 a failing query stops the looks; a slow result that lands after hiding shows nothing.
+ * IDENTITY (W0, before any case). The base artifact is selected and verified by
+ * resolveCorridorSite() inside the terminal lifecycle. A release run serves it and requires the
+ * served build-identity.json and corridor.js to be those verified bytes, with no mutation marker.
+ * A mutant is accepted ONLY through KAIRO_TEST_MUTANT_DIR + KAIRO_TEST_MUTANT_SHA256: its
+ * `kairo-test-mutation` record is recomputed from the verified base and its literal edits
+ * (make-corridor-mutant.mjs verifyTestMutant), pinned, hashed file by file and served; W0 then
+ * shows the explicit mutant identity and never calls those bytes a clean build. Every corridor.js
+ * the browser loads in every case is hashed against the expected bytes (auto row
+ * `<case>.served-script-identity`). Service workers are blocked in every context, base and mutant
+ * alike, so each load is the host's verified bytes (the worker would install for the base and
+ * refuse the mutant, a difference other than the mutation).
  *
- * Mutation controls (run this file against each; it must FAIL where named):
- *   node tools/record-hint-mutants.mjs <site> <out>, then KAIRO_SITE_DIR=<out>/m1 and <out>/m2
- *   m1  the held/pending filter removed (always "free") → W1 fails its no-offer-while-owned row.
- *   m2  the look becomes a queued locks.request (the rejected v4 watcher) → W1/W2 request-count
- *       rows fail deterministically; no repeated races are needed to see it.
+ * ONE ORDERED INIT. Each app page gets exactly one init script (installRecordHintProbe) carrying its
+ * role and scenario flags and all instrumentation, in a fixed order; there are no context-level
+ * probe scripts and no sessionStorage flag hand-off. It runs only on the app origin's top document.
+ * silenceBrowserAudio's separate context script touches only media/speech prototypes, so its
+ * relative order is immaterial. Each injection counts its firing and the cases assert those counts.
+ * Scenario controls that change after boot (defer, transform, hidden, session refusal, the clock)
+ * live on the documented mutable `window.__hintProbe.control`.
  *
- * Engine scope: Chromium only. A WebKit crash case is not claimed; W4 (renderer crash) is
- * recorded as unavailable here rather than passed. Visibility is emulated by overriding
- * document.visibilityState, which tests the app's logic, not an engine's tab throttling.
+ * AUTHORITY ORACLE. The probe records every navigator.locks.request with its name, options and
+ * whether native granted it. The boot request is the first request named RECORD_LOCK, made before
+ * any query, exactly {mode:'exclusive', ifAvailable:true}; every other RECORD_LOCK request is an
+ * observer acquisition attempt and must number zero. Client identities come from a raw self-lock
+ * query and must be non-empty. Ownership = the page's boot was granted AND the exact-name held list
+ * is exactly its client id; "blocked" = its boot was refused and its id is not held (being QUEUED is
+ * an observer acquisition attempt, asserted by its own rows).
+ * Where the protocol says "writable", the page also grades a card and the grade is read back from
+ * the native store. Store-alert text is never used as an ownership or writability oracle. (A
+ * granted boot is the only place the app sets recordOwner, so a refused boot also means
+ * recordOwner/recordRecovered/recordApp were never set in that document.)
  *
- * Usage: node verify-record-hint.mjs   (KAIRO_SITE_DIR may pin a staged artifact)
+ * CASES (rows are named `<case>.<assertion>`; every declared row that is not evaluated is
+ * `unreached`, which fails a run; `unavailable` is a distinct status, never counted as passed):
+ *   W1  owner closes → offer ≤ 4 s; before the tap one boot request, zero observer attempts, never
+ *       queued or held (m2's held interval captured through its gate); tap → new document, named
+ *       owner, revlog/srs exactly the owner's acknowledged ones, then a durable grade.
+ *   W2  the owner reloads 20 times beside a visible blocked window: named owner after every reload.
+ *   W3  two blocked windows tap together: exactly one named owner, the other refused and looking
+ *       again; persisted history equals the single-window one; the winner writes.
+ *   W4  renderer crash: unavailable in this suite (not exercised, not passed).
+ *   W5  the owner navigates away → offer; Back: a fresh document re-acquires and the offer
+ *       withdraws, or a bfcache restore stays departed (whichever the engine produced; the other
+ *       branch is recorded unavailable).
+ *   W6a durable ACK read natively (row + card identity captured) → close → retry → exactly that row
+ *       and card, then a write.
+ *   W6b grade tap racing the close (a race, not a held commit): the settled native store holds
+ *       either no change or one coherent row for the tapped card; B's boot preserves it exactly.
+ *   W7a a note draft edited just before the tap survives the retry.
+ *   W7b session storage refused at the tap: no reload, a role=alert reason, the text intact.
+ *   W7c reader passage X: a genuine free offer, another client takes the real lock, the real retry
+ *       boots and loses on X (exact passage id), then a second genuine retry owns and is on X.
+ *   W7d route validation through real owner reloads: a valid reader route restores and is spent;
+ *       malformed, wrong-version, expired, future, non-finite, over-long, bad-character and
+ *       unknown-view records land on the front door and are deleted; an unknown attempt lands in the
+ *       room; ten restores leave the learner and assessment roots unchanged. Assessment result/item
+ *       targets, kept targets and deliberate navigation: verify-assessment-app.mjs retry-route-*.
+ *   W8  no locks.query: no offer, no hint timer or channel, the manual reload remains.
+ *   W9  hidden: no looks; visible again: the offer arrives.
+ *   L1  a deferred FREE look in flight across hide, and across pagehide, then resolved: nothing
+ *       published; the same deferred free look resolved while visible does publish (control).
+ *   L2  hidden→visible ABA: an old free look resolved after another client took the lock does not
+ *       publish and at most one look is out; an old look rejected after the return does not stop
+ *       the new period.
+ *   L3  a visible offer retires when a crossing beacon makes the window stale; no looks while stale;
+ *       an abort resumes; a pre-crossing free look landing after the abort does not publish.
+ *   L4  focus inside the window does not extend it: past ten minutes (controlled clock) looking stops,
+ *       focus does not restart it, a real hidden→visible return does.
+ *   L5  a focus/advisory burst: bounded look starts, at most one wake timer, one look in flight.
+ *   L6  a failing look: exactly one failed look, none later, no offer, manual reload, no unhandled
+ *       rejection.
+ *   L7  locks.query getter throws / bind throws: no hint, no timer, the manual reload remains.
+ *   L8  pending-only (real pending request, named held row hidden by the probe) → no offer, with a
+ *       matching positive; unrelated and prefix-sharing names held/pending → offer.
+ *   L9  a free offer, then a never-settling look carried past the deadline by the controlled clock
+ *       alone: offer hidden, channel closed, no overlapping look; resolving or rejecting the old
+ *       look (separate windows) revives nothing.
+ *   L10 a query that throws synchronously: no unhandled rejection or page error, the hint retires,
+ *       the manual reload remains, zero record requests beyond the boot.
+ *
+ * CONTROLLED CLOCK (L4, L9). With flags.clock the probe offsets performance.now (the app's hintNow)
+ * and advances only the hint's own timers — those set directly by wakeRecordHint or
+ * armRecordHintDeadline, identified by their immediate caller frame — when the offset passes their
+ * due time. corridor.js is not changed; other app timers keep real time.
+ *
+ * MUTATION CONTROLS: record-hint-mutants.mjs (m0–m13 with their named rows) and
+ * adjudicate-record-hint-mutants.mjs, whose kill needs a passed baseline, valid mutation provenance,
+ * a passed setup and the named rows evaluated and failed. Nothing here is a kill by itself.
+ *
+ * RECEIPT: <evidence>/record-hint.json, rewritten as `incomplete` before setup (a stale pass cannot
+ * survive a crashed rerun) and after every case: artifact identity (base and mutant), verifier and
+ * support hashes, browser version, selection, required and omitted rows, counts, bounded cleanup.
+ * A watchdog writes `incomplete` if no terminal outcome arrives. Evidence-directory resolution and
+ * imports stay process-level failures that cannot always emit JSON.
+ *
+ * Environment: KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 (base, as resolveCorridorSite reads them),
+ * KAIRO_TEST_MUTANT_DIR + KAIRO_TEST_MUTANT_SHA256 (explicit mutant), KAIRO_RECORD_HINT_ONLY
+ * (comma-separated cases; a partial run can never be an adjudicated baseline),
+ * KAIRO_RECORD_HINT_DEADLINE_MS (watchdog, default 30 min).
+ * Visibility is emulated by the probe; this tests the app's logic, not an engine's tab throttling.
+ *
+ * Usage: node verify-record-hint.mjs
  */
 
-import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { writeFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
+import { readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { chromium } from 'playwright-core';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
-import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { MUTANT_PRODUCT, MUTATION_FORMAT, verifyTestMutant } from './make-corridor-mutant.mjs';
+import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 
-const SITE = resolveCorridorSite();
-const EVIDENCE = resolveCorridorEvidence();
-const RECORD_LOCK = 'kairo-record:kairo-corridor-v1:kairo-ai-log';
-const results = [];
-const pageErrors = [];
-let currentCase = 'setup';
-const check = (name, pass, detail = '') => {
-  results.push({ name, pass: !!pass, detail });
-  console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? `  — ${detail}` : ''}`);
-};
+const SELF = fileURLToPath(import.meta.url);
+const TOOLS = dirname(SELF);
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const json = (value) => JSON.stringify(value);
+const same = (a, b) => isDeepStrictEqual(a, b);
+const sorted = (values) => [...values].sort();
 
-// Instrumentation installed before the app: counts every lock request and query the page
-// makes, keeps the raw methods for the harness's own probes, and lets a case slow or fail
-// the looks, hide the page, or refuse session storage.
-const PROBE = `(() => {
-  const locks = navigator.locks;
-  const probe = window.__lockProbe = { requests: 0, queries: 0, queryDelayMs: 0, queryFail: false,
-    rawRequest: locks && locks.request.bind(locks), rawQuery: locks && locks.query && locks.query.bind(locks) };
-  const flags = JSON.parse(sessionStorage.getItem('hint-flags') || '{}');
-  if (locks) {
-    locks.request = (...args) => { probe.requests += 1; return probe.rawRequest(...args); };
-    if (flags.noQuery) locks.query = undefined;
-    else locks.query = async () => {
-      probe.queries += 1;
-      if (flags.queryFail || probe.queryFail) throw new Error('probe: query refused');
-      const snapshot = await probe.rawQuery();
-      const delay = flags.queryDelayMs || probe.queryDelayMs;
-      if (delay) await new Promise((done) => setTimeout(done, delay));
-      return snapshot;
+const RECORD_LOCK = 'kairo-record:kairo-corridor-v1:kairo-ai-log';
+const STORE_KEY = 'kairo-corridor-v1';
+const BINDING_KEY = 'kairo-local-record-binding-v1';
+const CROSSING_KEY = 'kairo-crossing-v1';
+const HINT_CHANNEL = 'kairo-record-hint-v1';
+const ROUTE_KEY = 'kairo-retry-route-v1';
+const HINT_WINDOW_MS = 10 * 60_000;
+const OFFER_MS = 4000;
+// the served source must still carry what this suite reaches for, or its assertions go vacuous
+const SOURCE_ANCHORS = [
+  `const RECORD_LOCK = '${RECORD_LOCK}';`, `const STORE_KEY = '${STORE_KEY}';`, `const CROSSING_KEY = '${CROSSING_KEY}';`,
+  `const RECORD_HINT_CHANNEL = '${HINT_CHANNEL}';`, 'const RECORD_HINT_WINDOW_MS = 10 * 60_000;', `'${BINDING_KEY}'`,
+  'function wakeRecordHint(delay) {', 'function armRecordHintDeadline() {', "retry.id = 'record-hint-retry';",
+  `const RECORD_RETRY_ROUTE_KEY = '${ROUTE_KEY}';`, 'const RECORD_RETRY_ROUTE_TTL_MS = 120_000;',
+];
+const DEADLINE_MS = Number(process.env.KAIRO_RECORD_HINT_DEADLINE_MS || 30 * 60_000);
+
+/* ------------------------------------------------------------------ receipt */
+
+const EVIDENCE = resolveCorridorEvidence();
+const RECEIPT_PATH = join(EVIDENCE, 'record-hint.json');
+const fileSha = (path) => { try { return sha256(readFileSync(path)); } catch { return null; } };
+const receipt = {
+  format: 'kairo-record-hint-verification', v: 2, runId: randomUUID(), status: 'incomplete',
+  startedAt: new Date().toISOString(), finishedAt: null,
+  verifier: { path: 'prototypes/corridor/tools/verify-record-hint.mjs', sha256: fileSha(SELF), support: {
+    'make-corridor-mutant.mjs': fileSha(join(TOOLS, 'make-corridor-mutant.mjs')),
+    'record-test-support.mjs': fileSha(join(TOOLS, 'record-test-support.mjs')),
+    'browser-audio-silence.mjs': fileSha(join(TOOLS, 'browser-audio-silence.mjs')),
+    'resolve-corridor-site.mjs': fileSha(resolve(TOOLS, '../../../scripts/resolve-corridor-site.mjs')),
+  } },
+  setup: { status: 'pending', error: null },
+  artifact: { kind: null, base: null, mutant: null, served: null },
+  browser: null,
+  environment: { engine: 'chromium', serviceWorkers: 'blocked in every context', visibility: 'emulated by the probe',
+    webkit: 'not covered', clock: 'L4/L9 advance only the hint timers and the hint clock' },
+  selection: null,
+  cases: { required: [], omitted: [] },
+  counts: null,
+  results: [],
+  cleanup: [],
+};
+const results = receipt.results;
+function writeReceipt() {
+  const temporary = `${RECEIPT_PATH}.${process.pid}.tmp`;
+  writeFileSync(temporary, `${JSON.stringify(receipt, null, 2)}\n`);
+  renameSync(temporary, RECEIPT_PATH);
+}
+function record(caseId, id, status, detail = '') {
+  results.push({ id, case: caseId, status, detail: String(detail).slice(0, 4000) });
+  const mark = { passed: 'ok  ', failed: 'FAIL', unreached: 'SKIP', unavailable: 'N/A ' }[status] || status;
+  console.log(`  ${mark} ${id}${detail ? `  — ${String(detail).slice(0, 300)}` : ''}`);
+}
+let finished = false;
+function finish(forced = null, reason = null) {
+  if (finished) return receipt.status === 'passed' ? 0 : 1;
+  finished = true;
+  const required = results.filter((row) => row.status !== 'unavailable');
+  const count = (status) => required.filter((row) => row.status === status).length;
+  receipt.cases.required = required.map((row) => row.id);
+  receipt.cases.omitted = [
+    ...results.filter((row) => row.status === 'unavailable').map((row) => ({ id: row.id, reason: row.detail })),
+    ...(receipt.selection?.unselected || []).map((id) => ({ id, reason: 'case not selected (KAIRO_RECORD_HINT_ONLY)' })),
+  ];
+  receipt.counts = { required: required.length, passed: count('passed'), failed: count('failed'), unreached: count('unreached'),
+    unavailable: results.length - required.length };
+  const cleanupTimedOut = receipt.cleanup.some((row) => row.outcome === 'timeout');
+  const cleanupFailed = receipt.cleanup.some((row) => row.outcome !== 'closed');
+  receipt.status = forced ?? (receipt.setup.status !== 'passed' ? 'failed'
+    : cleanupTimedOut ? 'incomplete'
+      : required.length && count('passed') === required.length && !cleanupFailed ? 'passed' : 'failed');
+  if (reason) receipt.terminalReason = reason;
+  receipt.finishedAt = new Date().toISOString();
+  writeReceipt();
+  console.log(`\n${receipt.status.toUpperCase()} · ${receipt.counts.passed}/${receipt.counts.required} required rows passed · `
+    + `${receipt.counts.unavailable} unavailable (not counted) · ${RECEIPT_PATH}`);
+  return receipt.status === 'passed' ? 0 : 1;
+}
+async function bounded(label, action, ms) {
+  let timer;
+  try {
+    const outcome = await Promise.race([
+      Promise.resolve().then(action).then(() => 'closed', (error) => `error: ${error?.message || error}`),
+      new Promise((done) => { timer = setTimeout(() => done('timeout'), ms); }),
+    ]);
+    return { label, outcome };
+  } finally { clearTimeout(timer); }
+}
+
+/* ------------------------------------------------------------------ the probe (runs in the page) */
+
+// Installed by page.addInitScript(installRecordHintProbe, config): self-contained, serialized.
+function installRecordHintProbe(config) {
+  if (location.origin !== config.origin || window.top !== window || Object.hasOwn(window, '__hintProbe')) return;
+  const flags = config.flags || {};
+  const nativeNow = performance.now.bind(performance);
+  const nativeSetTimeout = window.setTimeout;
+  const nativeClearTimeout = window.clearTimeout;
+  const NativeChannel = window.BroadcastChannel;
+  const probe = {
+    docId: crypto.randomUUID(), role: config.role, flags,
+    fired: { seed: 0, queryAbsentReads: 0, queryGetterThrows: 0, queryBindThrows: 0, querySyncThrows: 0, queryFailures: 0,
+      deferred: 0, transformed: 0, sessionRefused: 0, clockAdvances: 0, wakeTimerSets: 0, deadlineTimerSets: 0 },
+    requests: [], queries: [], queryStarts: 0, inFlight: 0, maxInFlight: 0,
+    timers: new Map(), maxWakeTimers: 0, channels: [], unhandled: [], advisory: null,
+    control: { defer: false, transform: null, fail: flags.queryFail === 'always' ? 'always' : 'none', hidden: false,
+      refuseSession: false, clockOffsetMs: 0 },
+    gate: { entered: 0, holding: 0, released: 0, waiters: [] },
+    raw: { setTimeout: (handler, ms) => Reflect.apply(nativeSetTimeout, window, [handler, ms]) },
+  };
+  Object.defineProperty(window, '__hintProbe', { value: probe });
+  addEventListener('unhandledrejection', (event) => {
+    if (probe.unhandled.length < 50) probe.unhandled.push(String(event.reason?.message ?? event.reason));
+  });
+
+  // 1. seed: a first-install v1 legacy record (a legitimate migration input), only on a fresh origin
+  if (config.seed && localStorage.getItem(config.storeKey) === null && localStorage.getItem(config.bindingKey) === null) {
+    const t = 1700000000000;
+    localStorage.setItem(config.storeKey, JSON.stringify({ v: 1,
+      taken: [{ t: 'word', id: '会う', label: '会う', ts: t, started: t }, { t: 'word', id: '青', label: '青', ts: t + 1, started: t + 1 }],
+      srs: {}, revlog: [], obslog: [] }));
+    probe.fired.seed = 1;
+  }
+
+  // 2. the controlled clock: performance.now (the app's hintNow) plus an offset that only grows
+  if (flags.clock) {
+    Object.defineProperty(performance, 'now', { configurable: true, writable: true,
+      value: function now() { return nativeNow() + probe.control.clockOffsetMs; } });
+  }
+
+  // 3. the hint's two timer sites, by their immediate caller frame; tracked, and advanced with the clock
+  if (flags.clock || flags.traceTimers) {
+    const SITE = /^\s*at (wakeRecordHint|armRecordHintDeadline) \(/;
+    const run = (timer) => {
+      if (timer.done) return;
+      timer.done = true;
+      probe.timers.delete(timer.id);
+      nativeClearTimeout(timer.real);
+      if (typeof timer.handler === 'function') timer.handler(...timer.args);
+    };
+    window.setTimeout = function setTimeout(handler, ms, ...args) {
+      const site = SITE.exec((new Error().stack || '').split('\n')[2] || '')?.[1];
+      if (!site) return Reflect.apply(nativeSetTimeout, window, [handler, ms, ...args]);
+      const delay = Math.max(0, Number(ms) || 0);
+      const timer = { site, handler, args, due: performance.now() + delay, done: false, id: 0, real: 0 };
+      timer.real = Reflect.apply(nativeSetTimeout, window, [() => run(timer), delay]);
+      timer.id = timer.real;
+      probe.timers.set(timer.id, timer);
+      probe.fired[site === 'wakeRecordHint' ? 'wakeTimerSets' : 'deadlineTimerSets'] += 1;
+      probe.maxWakeTimers = Math.max(probe.maxWakeTimers, [...probe.timers.values()].filter((row) => row.site === 'wakeRecordHint').length);
+      return timer.id;
+    };
+    window.clearTimeout = function clearTimeout(id) {
+      const timer = probe.timers.get(id);
+      if (timer) { timer.done = true; probe.timers.delete(id); }
+      return Reflect.apply(nativeClearTimeout, window, [id]);
+    };
+    probe.advanceClock = (delta) => {
+      if (!flags.clock || !Number.isFinite(delta) || delta <= 0) throw new Error('probe: the clock only moves forward, and only when installed');
+      probe.control.clockOffsetMs += delta;
+      probe.fired.clockAdvances += 1;
+      const now = performance.now();
+      const due = [...probe.timers.values()].filter((timer) => timer.due <= now).sort((a, b) => a.due - b.due);
+      for (const timer of due) {
+        nativeClearTimeout(timer.real);
+        Reflect.apply(nativeSetTimeout, window, [() => run(timer), 0]);
+      }
+      return due.map((timer) => timer.site);
     };
   }
-  const visibility = Object.getOwnPropertyDescriptor(Document.prototype, 'visibilityState');
-  Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true,
-    get() { return window.__forceHidden ? 'hidden' : visibility.get.call(this); } });
-  Object.defineProperty(Document.prototype, 'hidden', { configurable: true, get() { return !!window.__forceHidden; } });
-  const setItem = Storage.prototype.setItem;
-  Storage.prototype.setItem = function (key, value) {
-    if (window.__refuseSession && this === sessionStorage) throw new DOMException('refused', 'QuotaExceededError');
-    return Reflect.apply(setItem, this, [key, value]);
-  };
-})();`;
-const SEED = `(() => {
-  if (localStorage.getItem('hint-seeded')) return;
-  const t = 1700000000000;
-  localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1,
-    taken: [{ t: 'word', id: '会う', label: '会う', ts: t, started: t }, { t: 'word', id: '青', label: '青', ts: t + 1, started: t + 1 }],
-    srs: {}, revlog: [], obslog: [] }));
-  localStorage.setItem('hint-seeded', '1');
-})();`;
 
-let host = null, origin = null, browser = null;
-const ready = (page) => page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
-async function newContext() {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 860 } });
+  // 4. channel custody: which record-hint channels are open, observed rather than inferred
+  if (NativeChannel) {
+    const rows = new WeakMap();
+    window.BroadcastChannel = class BroadcastChannel extends NativeChannel {
+      constructor(name) {
+        super(name);
+        const row = { name: String(name), closed: false };
+        probe.channels.push(row);
+        rows.set(this, row);
+      }
+      close() {
+        const row = rows.get(this);
+        if (row) row.closed = true;
+        return super.close();
+      }
+    };
+    probe.postAdvisory = (count = 1) => {
+      probe.advisory ||= new NativeChannel(config.channel);
+      for (let i = 0; i < count; i += 1) probe.advisory.postMessage({ v: 1, type: 'released' });
+      return count;
+    };
+  }
+
+  // 5. the m2 mutant's started/held/released handshake; production never calls it
+  Object.defineProperty(window, '__recordHintMutantGate', { value: Object.freeze({
+    enter: () => {
+      probe.gate.entered += 1;
+      probe.gate.holding += 1;
+      return new Promise((release) => probe.gate.waiters.push(release));
+    },
+  }) });
+  probe.releaseGate = () => {
+    const waiters = probe.gate.waiters.splice(0);
+    probe.gate.holding -= waiters.length;
+    probe.gate.released += waiters.length;
+    waiters.forEach((release) => release());
+    return waiters.length;
+  };
+
+  // 6. the lock manager: every request (name, options, native grant); the page's query per scenario
+  const locks = navigator.locks;
+  if (locks) {
+    const rawRequest = locks.request.bind(locks);
+    const rawQuery = locks.query.bind(locks);
+    probe.raw.request = rawRequest;
+    probe.raw.query = rawQuery;
+    Object.defineProperty(locks, 'request', { configurable: true, writable: true, value: function request(name, ...rest) {
+      const options = rest.length > 1 && rest[0] !== null && typeof rest[0] === 'object' ? rest[0] : {};
+      const entry = { name: String(name), mode: options.mode === undefined ? 'exclusive' : String(options.mode),
+        ifAvailable: options.ifAvailable === true, steal: options.steal === true, signal: options.signal !== undefined,
+        at: nativeNow(), queriesBefore: probe.queryStarts, granted: null };
+      probe.requests.push(entry);
+      const callback = rest[rest.length - 1];
+      if (typeof callback === 'function') {
+        rest[rest.length - 1] = function granted(lock) {
+          entry.granted = lock !== null && lock !== undefined;
+          return callback.call(this, lock);
+        };
+      }
+      return rawRequest(name, ...rest);
+    } });
+    const named = (rows) => rows.filter((row) => row?.name === config.lock).length;
+    const probeQuery = function query() {
+      const entry = { n: probe.queryStarts + 1, at: nativeNow(), deferred: false, free: null, nativeFree: null,
+        viewNamedHeld: null, viewNamedPending: null, settled: null };
+      probe.queryStarts = entry.n;
+      probe.queries.push(entry);
+      if (probe.queries.length > 400) probe.queries.shift();
+      probe.inFlight += 1;
+      probe.maxInFlight = Math.max(probe.maxInFlight, probe.inFlight);
+      let pending;
+      if (probe.control.fail === 'always') {
+        probe.fired.queryFailures += 1;
+        pending = Promise.reject(new DOMException('probe: query refused', 'InvalidStateError'));
+      } else {
+        pending = rawQuery().then((snapshot) => {
+          let view = snapshot;
+          if (probe.control.transform === 'hide-named-held') {
+            probe.fired.transformed += 1;
+            view = { held: snapshot.held.filter((row) => row.name !== config.lock), pending: snapshot.pending };
+          }
+          entry.nativeFree = named(snapshot.held) === 0 && named(snapshot.pending) === 0;
+          entry.viewNamedHeld = named(view.held);
+          entry.viewNamedPending = named(view.pending);
+          entry.free = entry.viewNamedHeld === 0 && entry.viewNamedPending === 0;
+          if (!probe.control.defer) return view;
+          probe.fired.deferred += 1;
+          return new Promise((release, fail) => {
+            entry.release = () => release(view);
+            entry.fail = () => fail(new DOMException('probe: deferred query refused', 'AbortError'));
+            entry.deferred = true;
+          });
+        });
+      }
+      return pending.then(
+        (value) => { entry.settled = 'resolved'; probe.inFlight -= 1; return value; },
+        (error) => { entry.settled = 'rejected'; probe.inFlight -= 1; throw error; },
+      );
+    };
+    const variant = flags.query || 'native';
+    if (variant === 'native') Object.defineProperty(locks, 'query', { configurable: true, writable: true, value: probeQuery });
+    else if (variant === 'absent') {
+      Object.defineProperty(locks, 'query', { configurable: true, get() { probe.fired.queryAbsentReads += 1; return undefined; } });
+    } else if (variant === 'getter-throws') {
+      Object.defineProperty(locks, 'query', { configurable: true, get() { probe.fired.queryGetterThrows += 1; throw new Error('probe: query getter refused'); } });
+    } else if (variant === 'bind-throws') {
+      const query = function query() { return probeQuery(); };
+      Object.defineProperty(query, 'bind', { value() { probe.fired.queryBindThrows += 1; throw new Error('probe: query bind refused'); } });
+      Object.defineProperty(locks, 'query', { configurable: true, writable: true, value: query });
+    } else if (variant === 'sync-throws') {
+      Object.defineProperty(locks, 'query', { configurable: true, writable: true,
+        value: function query() { probe.fired.querySyncThrows += 1; throw new Error('probe: query threw synchronously'); } });
+    } else throw new Error(`probe: unknown query variant ${variant}`);
+  }
+
+  // 7. visibility, emulated: 'visible' unless the harness hides this document
+  Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true, get() { return probe.control.hidden ? 'hidden' : 'visible'; } });
+  Object.defineProperty(Document.prototype, 'hidden', { configurable: true, get() { return probe.control.hidden; } });
+  probe.setHidden = (hidden) => {
+    probe.control.hidden = !!hidden;
+    document.dispatchEvent(new Event('visibilitychange'));
+  };
+
+  // 8. session storage refusal, installed only where a case asks for it
+  if (flags.sessionRefusal) {
+    for (const method of ['setItem', 'removeItem']) {
+      const native = Storage.prototype[method];
+      Storage.prototype[method] = function (...args) {
+        if (probe.control.refuseSession && this === window.sessionStorage) {
+          probe.fired.sessionRefused += 1;
+          throw new DOMException('probe: refused', 'QuotaExceededError');
+        }
+        return Reflect.apply(native, this, args);
+      };
+    }
+  }
+
+  // 9. reading helpers for the harness
+  probe.offerVisible = () => {
+    const node = document.getElementById('record-hint');
+    const text = node?.querySelector('.record-hint-text')?.textContent || '';
+    return !!node && !node.hidden && !!document.getElementById('record-hint-retry') && /seems to have closed|閉じたよう/u.test(text);
+  };
+  probe.settle = (n, how) => {
+    const entry = probe.queries.find((row) => row.n === n);
+    if (!entry?.deferred || !entry.release) return false;
+    const act = how === 'reject' ? entry.fail : entry.release;
+    entry.release = null;
+    entry.fail = null;
+    act();
+    return true;
+  };
+  probe.state = () => ({
+    docId: probe.docId, role: probe.role, flags: probe.flags, fired: { ...probe.fired },
+    requests: probe.requests.map((row) => ({ ...row })),
+    queryStarts: probe.queryStarts, inFlight: probe.inFlight, maxInFlight: probe.maxInFlight,
+    queries: probe.queries.map(({ release, fail, ...row }) => ({ ...row, awaiting: !!release })),
+    wakeTimersLive: [...probe.timers.values()].filter((row) => row.site === 'wakeRecordHint').length,
+    deadlineTimersLive: [...probe.timers.values()].filter((row) => row.site === 'armRecordHintDeadline').length,
+    maxWakeTimers: probe.maxWakeTimers,
+    channels: probe.channels.map((row) => ({ ...row })),
+    unhandled: [...probe.unhandled],
+    gate: { entered: probe.gate.entered, holding: probe.gate.holding, released: probe.gate.released },
+    ready: document.body?.dataset.ready === '1', offer: probe.offerVisible(),
+    hintNode: !!document.getElementById('record-hint'),
+    failure: document.querySelector('#record-hint .record-hint-failure')?.textContent || '',
+    view: document.body?.dataset.view ?? null,
+  });
+}
+
+/* ------------------------------------------------------------------ harness helpers */
+
+let host = null;
+let origin = null;
+let browser = null;
+const EXPECTED = { script: null };
+
+class CaseStop extends Error {
+  constructor(row) { super(`required row failed: ${row}`); this.row = row; }
+}
+
+async function newContext(env) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, serviceWorkers: 'block' });
+  env.contexts.push(context);
   await silenceBrowserAudio(context);
-  await context.addInitScript(PROBE);
-  await context.addInitScript(SEED);
-  context.on('page', (page) => page.on('pageerror', (error) => {
-    if (pageErrors.length < 20) pageErrors.push({ case: currentCase, message: error.message });
-  }));
+  context.on('response', (response) => {
+    let path;
+    try { path = new URL(response.url()).pathname; } catch { return; }
+    if (path !== '/corridor.js') return;
+    env.scriptChecks.push(response.body().then(
+      (body) => ({ ok: sha256(body) === EXPECTED.script }),
+      (error) => ({ ok: null, error: error.message }),
+    ));
+  });
   return context;
 }
-async function openWindow(context, { flags = null, path = '?entry=shelf' } = {}) {
+
+async function booted(page, previousDocId) {
+  await page.waitForFunction(({ previous, lock }) => {
+    const probe = window.__hintProbe;
+    if (!probe || probe.docId === previous || document.body?.dataset.ready !== '1') return false;
+    const boot = probe.requests.find((row) => row.name === lock);
+    return !!boot && boot.granted !== null;
+  }, { previous: previousDocId, lock: RECORD_LOCK }, { timeout: 45_000 });
+  return page.evaluate(() => window.__hintProbe.state());
+}
+
+async function openApp(env, context, { role, seed = false, flags = {}, path = '?entry=shelf' }) {
   const page = await context.newPage();
-  if (flags) await page.addInitScript((value) => { sessionStorage.setItem('hint-flags', value); }, JSON.stringify(flags));
-  await page.goto(`${origin}/index.html${path}`);
-  await ready(page);
+  page.on('pageerror', (error) => env.errors.push({ role, message: error.message }));
+  page.on('crash', () => env.errors.push({ role, message: 'renderer crashed' }));
+  await page.addInitScript(installRecordHintProbe, {
+    origin, role, seed, flags, lock: RECORD_LOCK, storeKey: STORE_KEY, bindingKey: BINDING_KEY, channel: HINT_CHANNEL,
+  });
+  env.apps.push(page);
+  await page.goto(`${origin}/index.html${path}`, { waitUntil: 'load', timeout: 45_000 });
+  const state = await booted(page, null);
+  assert.equal(state.role, role, `the probe did not install for ${role}`);
+  assert(same(state.flags, flags), `${role}: the probe carries other flags than the case's`);
+  if (seed) assert.equal(state.fired.seed, 1, `${role}: the seed did not install on a fresh origin`);
   return page;
 }
-const blocked = (page) => page.evaluate(() => {
+
+/** A same-origin document that is not the app (a stylesheet shown as text): no probe, no app. */
+async function openHarness(env, context) {
+  const page = await context.newPage();
+  page.on('pageerror', (error) => env.errors.push({ role: 'harness', message: error.message }));
+  await page.goto(`${origin}/fonts.css`, { waitUntil: 'load' });
+  assert.equal(await page.evaluate(() => location.origin), origin, 'the harness document is not on the app origin');
+  assert(await page.evaluate(() => !!navigator.locks && !window.__hintProbe), 'the harness document must be a plain same-origin page');
+  await page.evaluate(() => { window.__harness = { holds: new Map(), aborts: new Map() }; });
+  return page;
+}
+const hold = (page, name) => page.evaluate((name) => new Promise((granted, failed) => {
+  navigator.locks.request(name, { mode: 'exclusive' }, () => {
+    granted(true);
+    return new Promise((release) => window.__harness.holds.set(name, release));
+  }).catch(failed);
+}), name);
+const queueRequest = (page, name, key) => page.evaluate(({ name, key }) => {
+  const controller = new AbortController();
+  window.__harness.aborts.set(key, controller);
+  navigator.locks.request(name, { mode: 'exclusive', signal: controller.signal },
+    () => new Promise((release) => window.__harness.holds.set(key, release))).catch(() => {});
+  return true;
+}, { name, key });
+const releaseHold = (page, key) => page.evaluate((key) => {
+  const release = window.__harness.holds.get(key);
+  window.__harness.holds.delete(key);
+  release?.();
+  return !!release;
+}, key);
+const abortQueued = (page, key) => page.evaluate((key) => { window.__harness.aborts.get(key)?.abort(); return true; }, key);
+const writeStorage = (page, key, value) => page.evaluate(([key, value]) => { localStorage.setItem(key, value); }, [key, value]);
+
+async function observe(env, page) {
+  const state = await page.evaluate(() => window.__hintProbe?.state() ?? null);
+  assert(state, 'the page has no record-hint probe');
+  env.maxInFlight = Math.max(env.maxInFlight, state.maxInFlight);
+  return state;
+}
+function authority(state) {
+  const named = state.requests.filter((row) => row.name === RECORD_LOCK);
+  const boot = named[0];
+  const bootShape = !!boot && boot.mode === 'exclusive' && boot.ifAvailable === true && !boot.steal && !boot.signal && boot.queriesBefore === 0;
+  return { bootShape, bootGranted: boot?.granted ?? null, namedRequests: named.length,
+    observerAttempts: named.length - (bootShape ? 1 : 0),
+    otherNames: [...new Set(state.requests.filter((row) => row.name !== RECORD_LOCK).map((row) => row.name))] };
+}
+/** The page's own lock client id, through the native methods; never empty. */
+async function clientId(page) {
+  const id = await page.evaluate(async () => {
+    const request = window.__hintProbe?.raw.request ?? navigator.locks.request.bind(navigator.locks);
+    const query = window.__hintProbe?.raw.query ?? navigator.locks.query.bind(navigator.locks);
+    const name = `record-hint-self:${crypto.randomUUID()}`;
+    return request(name, { mode: 'exclusive' }, async () => (await query()).held.find((row) => row.name === name)?.clientId ?? null);
+  });
+  assert(typeof id === 'string' && id.length > 0, 'the page has no lock client identity');
+  return id;
+}
+/** Exact-name held/pending client ids, read natively. */
+const lockView = (page) => page.evaluate(async (name) => {
+  const query = window.__hintProbe?.raw.query ?? navigator.locks.query.bind(navigator.locks);
+  const snapshot = await query();
+  return {
+    held: snapshot.held.filter((row) => row.name === name).map((row) => row.clientId),
+    pending: snapshot.pending.filter((row) => row.name === name).map((row) => row.clientId),
+    heldNames: snapshot.held.map((row) => row.name), pendingNames: snapshot.pending.map((row) => row.name),
+  };
+}, RECORD_LOCK);
+async function ownership(env, page) {
+  const state = await observe(env, page);
+  const id = await clientId(page);
+  const view = await lockView(page);
+  const auth = authority(state);
+  return { docId: state.docId, clientId: id, ...auth, held: view.held, pending: view.pending,
+    owns: auth.bootShape && auth.bootGranted === true && auth.observerAttempts === 0 && same(view.held, [id]),
+    // refused at boot and not holding; queueing (an observer attempt) is asserted separately where it matters
+    blocked: auth.bootShape && auth.bootGranted === false && !view.held.includes(id) };
+}
+
+const waitOffer = (page, timeout = OFFER_MS) =>
+  page.waitForFunction(() => window.__hintProbe?.offerVisible() === true, null, { timeout }).then(() => true, () => false);
+const waitNoOffer = (page, timeout) =>
+  page.waitForFunction(() => window.__hintProbe?.offerVisible() === false, null, { timeout }).then(() => true, () => false);
+const waitQueries = (page, above, timeout) =>
+  page.waitForFunction((n) => (window.__hintProbe?.queryStarts ?? 0) > n, above, { timeout }).then(() => true, () => false);
+const waitLockFree = (page, timeout) => page.waitForFunction(async (name) => {
+  const snapshot = await window.__hintProbe.raw.query();
+  return !snapshot.held.some((row) => row.name === name);
+}, RECORD_LOCK, { timeout, polling: 100 }).then(() => true, () => false);
+const setHidden = (page, hidden) => page.evaluate((hidden) => window.__hintProbe.setHidden(hidden), hidden);
+const setControl = (page, patch) => page.evaluate((patch) => { Object.assign(window.__hintProbe.control, patch); }, patch);
+async function settle(page, n, how) {
+  assert(await page.evaluate(([n, how]) => window.__hintProbe.settle(n, how), [n, how]), `look #${n} is not a held deferred look`);
+}
+const advance = (page, ms) => page.evaluate((ms) => window.__hintProbe.advanceClock(ms), ms);
+const focusEvent = (page) => page.evaluate(() => { window.dispatchEvent(new FocusEvent('focus')); });
+const advisory = (page, count = 1) => page.evaluate((count) => window.__hintProbe.postAdvisory(count), count);
+const pagehideEvent = (page) => page.evaluate(() => { window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false })); });
+const openHintChannels = (state) => state.channels.filter((row) => row.name === HINT_CHANNEL && !row.closed).length;
+const manualReload = (page) => page.evaluate(() => {
   const alert = document.getElementById('store-alert');
-  return !!alert && !alert.hidden && /read-only|読み取り専用/u.test(alert.textContent || '');
+  const reload = document.getElementById('record-reload');
+  return !!alert && !alert.hidden && !!reload && alert.contains(reload);
 });
-const offerShown = (page) => page.evaluate(() => {
-  const node = document.getElementById('record-hint');
-  return !!node && !node.hidden && /seems to have closed|閉じたよう/u.test(node.textContent || '');
-});
-const waitOffer = (page, timeout = 4500) =>
-  page.waitForFunction(() => {
-    const node = document.getElementById('record-hint');
-    return !!node && !node.hidden && /seems to have closed|閉じたよう/u.test(node.textContent || '');
-  }, null, { timeout }).then(() => true, () => false);
-const probeOf = (page) => page.evaluate(() => ({ requests: window.__lockProbe.requests, queries: window.__lockProbe.queries }));
-const holders = (page) => page.evaluate(async (name) =>
-  (await window.__lockProbe.rawQuery()).held.filter((row) => row.name === name).map((row) => row.clientId), RECORD_LOCK);
-const ownClientId = (page) => page.evaluate(() => {
-  const name = `hint-self-${performance.now()}`;
-  return window.__lockProbe.rawRequest(name, async () => (await window.__lockProbe.rawQuery()).held.find((row) => row.name === name)?.clientId);
-});
-async function tapRetry(page) {
-  await Promise.all([page.waitForEvent('load', { timeout: 15_000 }), page.locator('#record-hint-retry').click()]);
-  await ready(page);
+
+/** The next deferred look of the wanted kind; looks of the other kind are let through as they come. */
+async function nextDeferred(env, page, { wantFree, timeoutMs = 12_000 }) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const handle = await page.waitForFunction(() => window.__hintProbe.queries.find((row) => row.deferred && row.release)?.n ?? false,
+      null, { timeout: Math.max(1, deadline - Date.now()) }).catch(() => null);
+    if (!handle) break;
+    const n = await handle.jsonValue();
+    const entry = (await observe(env, page)).queries.find((row) => row.n === n);
+    if (entry.free === wantFree) return entry;
+    await settle(page, n, 'resolve');
+  }
+  throw new Error(`no deferred ${wantFree ? 'free' : 'held'} look within ${timeoutMs} ms`);
 }
+
+/** Tap the visible offer (never a manual reload) and wait for a NEW document's completed boot. */
+async function retryFromOffer(env, page) {
+  const before = await observe(env, page);
+  assert(before.offer, 'there is no visible offer to tap');
+  await Promise.all([page.waitForEvent('load', { timeout: 20_000 }), page.locator('#record-hint-retry').click({ timeout: 5_000 })]);
+  return booted(page, before.docId);
+}
+
 async function gradeOnce(page) {
-  await page.locator('#tray').click();
-  await page.locator('#review-start').click();
-  await page.locator('#declare-notyet').click();
-  await page.locator('.grade.g-again').click();
+  await page.locator('#tray').click({ timeout: 10_000 });
+  const key = await page.evaluate(() => window.__KAIRO_SRS__.dueKeys()[0] ?? null);
+  assert(key, 'no due card to grade');
+  await page.locator('#review-start').click({ timeout: 10_000 });
+  await page.locator('#declare-notyet').click({ timeout: 10_000 });
+  await page.locator('.grade.g-again').click({ timeout: 10_000 });
+  return key;
 }
-const revlogLength = async (page) => ((await readAppRecord(page)).revlog || []).length;
+const pick = (row) => ({ taken: row.taken, revlog: row.revlog || [], srs: row.srs || {} });
+/** One grade row for `key` on top of `before`, its card stamped by that grade, nothing else moved. */
+function gradeCoherence(before, after, key) {
+  const baseRevlog = before.revlog || [];
+  const revlog = after.revlog || [];
+  const baseSrs = before.srs || {};
+  const srs = after.srs || {};
+  const added = revlog.slice(baseRevlog.length);
+  const others = [...new Set([...Object.keys(srs), ...Object.keys(baseSrs)])].filter((name) => name !== key);
+  const coherent = revlog.length === baseRevlog.length + 1 && same(revlog.slice(0, baseRevlog.length), baseRevlog)
+    && added[0]?.[1] === key && srs[key] !== undefined && Date.parse(srs[key].last_review) === added[0][0]
+    && others.every((name) => same(srs[name], baseSrs[name])) && same(after.taken, before.taken);
+  return { coherent, key, added, card: srs[key] ?? null };
+}
+async function provesWritable(page, before) {
+  const key = await gradeOnce(page);
+  const after = await waitForAppRecord(page, (row) => (row.revlog || []).length === before.length + 1,
+    { timeout: 10_000, description: 'a grade written after the retry' }).catch(() => null);
+  return { ok: !!after && same(after.revlog.slice(0, before.length), before) && after.revlog.at(-1)?.[1] === key,
+    key, revlog: after?.revlog.length ?? null };
+}
+async function seededOwner(env, t, rowId, page) {
+  const state = await observe(env, page);
+  const own = await ownership(env, page);
+  const snapshot = await readAppRecordSnapshot(page);
+  const taken = sorted((snapshot.record.taken || []).map((row) => `${row.t}:${row.id}`));
+  t.require(rowId, state.fired.seed === 1 && own.owns && same(taken, sorted(['word:会う', 'word:青']))
+    && (snapshot.record.revlog || []).length === 0 && Object.keys(snapshot.record.srs || {}).length === 0,
+    json({ seed: state.fired.seed, owns: own.owns, taken, revlog: (snapshot.record.revlog || []).length }));
+  return snapshot.record;
+}
+/** Read the native store until three reads 250 ms apart agree (pending transactions settled). */
+async function settledRecord(page, timeoutMs = 10_000) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  let agreeing = 0;
+  while (Date.now() < deadline) {
+    const row = (await readAppRecordSnapshot(page)).record;
+    const text = JSON.stringify(pick(row));
+    agreeing = text === last ? agreeing + 1 : 1;
+    last = text;
+    if (agreeing >= 3) return row;
+    await page.waitForTimeout(250);
+  }
+  return null;
+}
+const placeOf = (page) => page.evaluate(() => ({ view: document.body.dataset.view ?? null,
+  passages: [...document.querySelectorAll('.listen-row')].map((node) => node.dataset.passage) }));
+async function onPassage(page, passageId) {
+  await page.waitForFunction((id) => document.body.dataset.view === 'reader'
+    && [...document.querySelectorAll('.listen-row')].some((node) => node.dataset.passage === id), passageId, { timeout: 5_000 }).catch(() => null);
+  const place = await placeOf(page);
+  return { ok: place.view === 'reader' && same(place.passages, [passageId]), place };
+}
 
-try {
-  host = await startStaticHost({ site: SITE, port: 0 });
+/* ------------------------------------------------------------------ cases */
+
+const CASES = new Map();
+const AUTO_ROWS = ['max-one-outstanding-query', 'served-script-identity', 'no-page-errors', 'completed'];
+function defineCase(id, { rows = [], optional = {}, browser: usesBrowser = true }, run) {
+  CASES.set(id, { id, rows, optional, browser: usesBrowser, run });
+}
+function caseContext(spec) {
+  const recorded = new Set();
+  const auto = spec.browser ? AUTO_ROWS.map((name) => `${spec.id}.${name}`) : [`${spec.id}.completed`];
+  const put = (id, status, detail) => {
+    assert(spec.rows.includes(id) || Object.hasOwn(spec.optional, id) || auto.includes(id), `undeclared row ${id}`);
+    assert(!recorded.has(id), `row ${id} recorded twice`);
+    recorded.add(id);
+    record(spec.id, id, status, detail);
+  };
+  return {
+    recorded,
+    row(id, pass, detail = '') { put(id, pass ? 'passed' : 'failed', detail); return !!pass; },
+    require(id, pass, detail = '') { put(id, pass ? 'passed' : 'failed', detail); if (!pass) throw new CaseStop(id); },
+    unavailable(id, reason) { assert(Object.hasOwn(spec.optional, id), `only an optional row can be unavailable: ${id}`); put(id, 'unavailable', reason); },
+  };
+}
+async function settledChecks(checks, ms) {
+  let timer;
+  const late = new Promise((done) => { timer = setTimeout(() => done({ ok: null, error: 'timeout' }), ms); });
+  try { return await Promise.all(checks.map((check) => Promise.race([check, late]))); } finally { clearTimeout(timer); }
+}
+async function runCase(spec) {
+  console.log(`\n${spec.id}`);
+  const t = caseContext(spec);
+  const env = { contexts: [], apps: [], errors: [], scriptChecks: [], maxInFlight: 0 };
+  let completed = true;
+  let detail = '';
+  try { await spec.run(t, env); } catch (error) {
+    completed = false;
+    detail = error instanceof CaseStop ? `stopped: ${error.row} failed` : String(error?.stack || error);
+  }
+  if (spec.browser) {
+    for (const page of env.apps) {
+      if (page.isClosed()) continue;
+      try { await observe(env, page); } catch { /* navigating or already gone */ }
+    }
+    t.row(`${spec.id}.max-one-outstanding-query`, env.maxInFlight <= 1, `max in flight ${env.maxInFlight}`);
+    const checks = await settledChecks(env.scriptChecks, 15_000);
+    const verified = checks.filter((row) => row.ok === true).length;
+    const mismatched = checks.filter((row) => row.ok === false).length;
+    t.row(`${spec.id}.served-script-identity`, verified >= 1 && mismatched === 0,
+      json({ loads: checks.length, verified, mismatched, unverifiable: checks.length - verified - mismatched }));
+    t.row(`${spec.id}.no-page-errors`, env.errors.length === 0, json(env.errors.slice(0, 10)));
+    for (const context of env.contexts) receipt.cleanup.push({ case: spec.id, ...(await bounded('context', () => context.close(), 10_000)) });
+  }
+  t.row(`${spec.id}.completed`, completed, detail);
+  for (const id of spec.rows) if (!t.recorded.has(id)) record(spec.id, id, 'unreached', 'the case stopped before this assertion');
+  for (const [id, reason] of Object.entries(spec.optional)) if (!t.recorded.has(id)) record(spec.id, id, 'unavailable', reason);
+  writeReceipt();
+}
+
+defineCase('W1', { rows: [
+  'W1.seed-and-owner-before-first-grade', 'W1.owner-grade-durable', 'W1.blocked-boot-lost', 'W1.no-offer-while-owner-lives',
+  'W1.observer-never-queued', 'W1.observer-held-identity', 'W1.zero-observer-acquisition-attempts', 'W1.offer-within-4s-of-close',
+  'W1.retry-new-document-and-ownership', 'W1.owner-revlog-exact', 'W1.writable-after-retry',
+] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  await seededOwner(env, t, 'W1.seed-and-owner-before-first-grade', a);
+  const key = await gradeOnce(a);
+  const acked = await waitForAppRecord(a, (row) => (row.revlog || []).length === 1, { description: 'the owner grade' });
+  t.require('W1.owner-grade-durable', acked.revlog[0][1] === key, json({ key, row: acked.revlog[0] }));
+  const ownerId = await clientId(a);
+  const b = await openApp(env, context, { role: 'B' });
+  const blocked = await ownership(env, b);
+  t.require('W1.blocked-boot-lost', blocked.blocked && same(blocked.held, [ownerId]), json(blocked));
+  await b.waitForTimeout(3600);
+  const early = await observe(env, b);
+  const queued = await lockView(b);
+  t.row('W1.no-offer-while-owner-lives', !early.offer && early.queryStarts >= 1, json({ offer: early.offer, looks: early.queryStarts }));
+  t.row('W1.observer-never-queued', !queued.pending.includes(blocked.clientId) && !queued.held.includes(blocked.clientId), json(queued));
+  await a.close();
+  const closedAt = Date.now();
+  // whichever comes first: the offer, or a mutant observer holding the lock through its gate
+  const first = await b.waitForFunction(() => {
+    const probe = window.__hintProbe;
+    return probe.offerVisible() ? 'offer' : probe.gate.holding > 0 ? 'gate' : false;
+  }, null, { timeout: OFFER_MS }).then((handle) => handle.jsonValue(), () => 'none');
+  const firstAt = Date.now();
+  const sample = await lockView(b);
+  t.row('W1.observer-held-identity', !sample.held.includes(blocked.clientId), json({ first, held: sample.held, blocked: blocked.clientId }));
+  const released = await b.evaluate(() => window.__hintProbe.releaseGate());
+  const offered = first === 'offer' || await waitOffer(b, Math.max(250, OFFER_MS - (Date.now() - closedAt)));
+  const elapsed = (first === 'offer' ? firstAt : Date.now()) - closedAt;
+  const beforeTap = authority(await observe(env, b));
+  t.row('W1.zero-observer-acquisition-attempts', beforeTap.bootShape && beforeTap.bootGranted === false
+    && beforeTap.namedRequests === 1 && beforeTap.observerAttempts === 0, json(beforeTap));
+  t.require('W1.offer-within-4s-of-close', offered && elapsed <= OFFER_MS, json({ elapsed, first, gateReleased: released }));
+  await retryFromOffer(env, b);
+  const after = await ownership(env, b);
+  t.require('W1.retry-new-document-and-ownership', after.owns && after.docId !== blocked.docId, json(after));
+  const native = (await readAppRecordSnapshot(b)).record;
+  t.row('W1.owner-revlog-exact', same(native.revlog, acked.revlog) && same(native.srs, acked.srs), json({ revlog: native.revlog }));
+  const writable = await provesWritable(b, native.revlog || []);
+  t.row('W1.writable-after-retry', writable.ok, json(writable));
+});
+
+defineCase('W2', { rows: ['W2.blocked-at-start', 'W2.owner-every-reload', 'W2.blocked-never-held-or-queued',
+  'W2.blocked-zero-observer-attempts', 'W2.blocked-kept-looking'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const blocked = await ownership(env, b);
+  t.require('W2.blocked-at-start', blocked.blocked, json(blocked));
+  const looksAtStart = (await observe(env, b)).queryStarts;
+  let failure = null;
+  let seen = null;
+  try {
+    for (let reload = 1; reload <= 20 && !failure; reload += 1) {
+      const previous = (await observe(env, a)).docId;
+      await a.reload({ waitUntil: 'load', timeout: 45_000 });
+      await booted(a, previous);
+      const own = await ownership(env, a);
+      if (!own.owns) failure = { reload, own };
+      const view = await lockView(b);
+      if (!seen && (view.held.includes(blocked.clientId) || view.pending.includes(blocked.clientId))) seen = { reload, view };
+    }
+  } finally { await b.evaluate(() => window.__hintProbe.releaseGate()).catch(() => 0); }
+  t.row('W2.owner-every-reload', !failure, failure ? json(failure) : '20/20 reloads named A the owner');
+  t.row('W2.blocked-never-held-or-queued', !seen, json(seen));
+  const state = await observe(env, b);
+  const auth = authority(state);
+  t.row('W2.blocked-zero-observer-attempts', auth.bootShape && auth.namedRequests === 1 && auth.observerAttempts === 0, json(auth));
+  t.row('W2.blocked-kept-looking', state.queryStarts > looksAtStart, json({ looksAtStart, looks: state.queryStarts }));
+});
+
+defineCase('W3', { rows: ['W3.both-offered', 'W3.both-rebooted', 'W3.exactly-one-named-owner', 'W3.loser-blocked',
+  'W3.loser-hint-restarted', 'W3.history-equals-single-window', 'W3.winner-writable'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const history = (await readAppRecordSnapshot(a)).record;
+  const b = await openApp(env, context, { role: 'B' });
+  const c = await openApp(env, context, { role: 'C' });
+  const docs = { b: (await observe(env, b)).docId, c: (await observe(env, c)).docId };
+  await a.close();
+  const offered = await Promise.all([waitOffer(b), waitOffer(c)]);
+  t.require('W3.both-offered', offered.every(Boolean), json(offered));
+  await Promise.all([retryFromOffer(env, b), retryFromOffer(env, c)]);
+  const rb = await ownership(env, b);
+  const rc = await ownership(env, c);
+  t.require('W3.both-rebooted', rb.docId !== docs.b && rc.docId !== docs.c, json({ b: rb.docId, c: rc.docId }));
+  const owners = [rb, rc].filter((row) => row.owns);
+  t.require('W3.exactly-one-named-owner', owners.length === 1 && [rb, rc].filter((row) => row.bootGranted === true).length === 1, json({ b: rb, c: rc }));
+  const [winner, loser, winnerPage, loserPage] = rb.owns ? [rb, rc, b, c] : [rc, rb, c, b];
+  t.row('W3.loser-blocked', loser.blocked && loser.observerAttempts === 0 && !loser.pending.includes(loser.clientId)
+    && same(loser.held, [winner.clientId]), json(loser));
+  const restarted = await waitQueries(loserPage, 0, 4000);
+  await loserPage.waitForTimeout(3600);
+  const loserState = await observe(env, loserPage);
+  t.row('W3.loser-hint-restarted', restarted && !loserState.offer, json({ looks: loserState.queryStarts, offer: loserState.offer }));
+  const after = (await readAppRecordSnapshot(winnerPage)).record;
+  t.row('W3.history-equals-single-window', same(pick(after), pick(history)), json({ after: pick(after), history: pick(history) }));
+  const writable = await provesWritable(winnerPage, after.revlog || []);
+  t.row('W3.winner-writable', writable.ok, json(writable));
+});
+
+defineCase('W4', { browser: false, optional: {
+  'W4.renderer-crash': 'not exercised: no renderer-crash scenario is implemented in this suite (Chromium CDP Page.crash could share a renderer process with the blocked window); unavailable, not passed',
+} }, async (t) => {
+  t.unavailable('W4.renderer-crash', 'not exercised in this suite; unavailable, not passed');
+});
+
+defineCase('W5', { rows: ['W5.offer-after-owner-navigates-away', 'W5.back-outcome', 'W5.offer-follows-lock'], optional: {
+  'W5.bfcache-restore-stays-departed': 'Back produced a fresh document, so the persisted-pageshow fence was not exercised',
+  'W5.fresh-document-reacquires': 'Back restored the document from bfcache, so fresh re-acquisition was not exercised',
+} }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const before = await observe(env, a);
+  await a.goto('about:blank');
+  t.require('W5.offer-after-owner-navigates-away', await waitOffer(b), '');
+  await a.goBack({ waitUntil: 'load', timeout: 30_000 });
+  await a.waitForFunction(() => !!window.__hintProbe && document.body?.dataset.ready === '1', null, { timeout: 45_000 });
+  const back = await observe(env, a);
+  if (back.docId !== before.docId) {
+    await booted(a, before.docId);
+    const own = await ownership(env, a);
+    t.row('W5.fresh-document-reacquires', own.owns, json(own));
+    t.row('W5.back-outcome', own.owns, `fresh document: ${json(own)}`);
+    t.unavailable('W5.bfcache-restore-stays-departed', 'Back produced a fresh document (no bfcache restore in this engine configuration)');
+    t.row('W5.offer-follows-lock', await waitNoOffer(b, 4500), 'the offer withdraws once A holds the lock again');
+  } else {
+    const auth = authority(back);
+    const view = await lockView(b);
+    const id = await clientId(a);
+    const departed = auth.namedRequests === authority(before).namedRequests && !view.held.includes(id) && back.queryStarts === 0;
+    t.row('W5.bfcache-restore-stays-departed', departed, json({ auth, view, looks: back.queryStarts }));
+    t.row('W5.back-outcome', departed, 'bfcache restore');
+    t.unavailable('W5.fresh-document-reacquires', 'Back restored the document from bfcache');
+    t.row('W5.offer-follows-lock', (await observe(env, b)).offer, 'nobody holds the lock, so the offer stays');
+  }
+});
+
+defineCase('W6a', { rows: ['W6a.seed-and-owner-before-first-grade', 'W6a.acknowledged-row-and-card-coherent', 'W6a.blocked-before-close',
+  'W6a.offer', 'W6a.retry-new-document-and-ownership', 'W6a.row-present-exactly-once', 'W6a.writable-after-retry'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const seeded = await seededOwner(env, t, 'W6a.seed-and-owner-before-first-grade', a);
+  const key = await gradeOnce(a);
+  const acked = await waitForAppRecord(a, (row) => (row.revlog || []).length === 1, { description: 'the durable ACK' });
+  const grade = gradeCoherence(seeded, acked, key);
+  t.require('W6a.acknowledged-row-and-card-coherent', grade.coherent, json(grade));
+  const b = await openApp(env, context, { role: 'B' });
+  const blocked = await ownership(env, b);
+  t.require('W6a.blocked-before-close', blocked.blocked, json(blocked));
+  await a.close();
+  t.require('W6a.offer', await waitOffer(b), '');
+  await retryFromOffer(env, b);
+  const own = await ownership(env, b);
+  t.require('W6a.retry-new-document-and-ownership', own.owns && own.docId !== blocked.docId, json(own));
+  const native = (await readAppRecordSnapshot(b)).record;
+  t.row('W6a.row-present-exactly-once', same(pick(native), pick(acked)), json({ revlog: native.revlog, card: native.srs?.[key] ?? null }));
+  const writable = await provesWritable(b, native.revlog || []);
+  t.row('W6a.writable-after-retry', writable.ok, json(writable));
+});
+
+defineCase('W6b', { rows: ['W6b.seed-and-owner-before-first-grade', 'W6b.blocked-before-race', 'W6b.settled-store-read',
+  'W6b.absent-or-one-coherent-row', 'W6b.offer', 'W6b.retry-new-document-and-ownership', 'W6b.boot-preserved-settled-record'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const baseline = await seededOwner(env, t, 'W6b.seed-and-owner-before-first-grade', a);
+  await a.locator('#tray').click({ timeout: 10_000 });
+  const key = await a.evaluate(() => window.__KAIRO_SRS__.dueKeys()[0] ?? null);
+  await a.locator('#review-start').click({ timeout: 10_000 });
+  await a.locator('#declare-notyet').click({ timeout: 10_000 });
+  await a.locator('.grade.g-again').waitFor({ state: 'visible', timeout: 10_000 });
+  const b = await openApp(env, context, { role: 'B' });
+  const blocked = await ownership(env, b);
+  t.require('W6b.blocked-before-race', blocked.blocked && !!key, json({ blocked, key }));
+  // a race, not a held commit: the tap and the close are not ordered against the IDB commit
+  await a.locator('.grade.g-again').click({ timeout: 5_000 });
+  await a.close();
+  const settled = await settledRecord(b);
+  t.require('W6b.settled-store-read', !!settled, 'three agreeing native reads after the owner closed');
+  const unchanged = same(pick(settled), pick(baseline));
+  const grade = gradeCoherence(baseline, settled, key);
+  t.row('W6b.absent-or-one-coherent-row', unchanged || grade.coherent, json({ outcome: unchanged ? 'absent' : grade.coherent ? 'present-once' : 'incoherent', grade }));
+  t.require('W6b.offer', await waitOffer(b), '');
+  await retryFromOffer(env, b);
+  const own = await ownership(env, b);
+  t.require('W6b.retry-new-document-and-ownership', own.owns && own.docId !== blocked.docId, json(own));
+  const after = (await readAppRecordSnapshot(b)).record;
+  t.row('W6b.boot-preserved-settled-record', same(pick(after), pick(settled)), json({ after: pick(after), settled: pick(settled) }));
+});
+
+defineCase('W7a', { rows: ['W7a.offer', 'W7a.retry-new-document-and-ownership', 'W7a.note-draft-survives'], optional: {
+  'W7a.chat-draft-survives': 'the teacher chat input needs a conversation fixture this suite does not build; the teacher-draft verifiers own that surface',
+} }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const docId = (await observe(env, b)).docId;
+  await b.locator('#tray').click({ timeout: 10_000 });
+  await b.fill('#note-input', 'Bの筆');
+  await a.close();
+  t.require('W7a.offer', await waitOffer(b), '');
+  await b.fill('#note-input', 'Bの筆・直前の追記');
+  await retryFromOffer(env, b);
+  const own = await ownership(env, b);
+  t.require('W7a.retry-new-document-and-ownership', own.owns && own.docId !== docId, json(own));
+  await b.locator('#tray').click({ timeout: 10_000 });
+  const value = await b.inputValue('#note-input', { timeout: 10_000 });
+  t.row('W7a.note-draft-survives', value === 'Bの筆・直前の追記', json(value));
+  t.unavailable('W7a.chat-draft-survives', 'no teacher conversation fixture in this suite');
+});
+
+defineCase('W7b', { rows: ['W7b.offer', 'W7b.refusal-injected', 'W7b.no-reload', 'W7b.visible-alert', 'W7b.text-intact'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B', flags: { sessionRefusal: true } });
+  await b.locator('#tray').click({ timeout: 10_000 });
+  await b.fill('#note-input', '残すべき文');
+  await a.close();
+  t.require('W7b.offer', await waitOffer(b), '');
+  const before = await observe(env, b);
+  let loads = 0;
+  b.on('load', () => { loads += 1; });
+  await setControl(b, { refuseSession: true });
+  await b.locator('#record-hint-retry').click({ timeout: 5_000 });
+  await b.waitForTimeout(1500);
+  const after = await observe(env, b);
+  t.row('W7b.refusal-injected', after.fired.sessionRefused >= 1, json(after.fired));
+  t.row('W7b.no-reload', after.docId === before.docId && loads === 0, json({ loads }));
+  const alert = b.locator('#record-hint .record-hint-failure[role="alert"]');
+  t.row('W7b.visible-alert', after.failure.length > 0 && await alert.isVisible(), json(after.failure));
+  t.row('W7b.text-intact', await b.inputValue('#note-input') === '残すべき文', '');
+});
+
+defineCase('W7c', { rows: ['W7c.passage-opened', 'W7c.first-offer-genuine', 'W7c.holder-acquired', 'W7c.offer-still-shown-while-held',
+  'W7c.losing-boot-new-document', 'W7c.losing-boot-blocked', 'W7c.losing-boot-same-passage', 'W7c.losing-boot-no-offer-while-held',
+  'W7c.second-offer', 'W7c.second-retry-ownership', 'W7c.second-retry-same-passage', 'W7c.writable-after-second-retry'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const holder = await openHarness(env, context);
+  const passageId = await b.evaluate(() => [...document.querySelectorAll('.shelf-item:not([data-recommendation])')]
+    .map((node) => node.dataset.passage).find((id) => typeof id === 'string' && /^[\w:.\-]{1,160}$/u.test(id)) ?? null);
+  if (passageId !== null) {
+    await b.evaluate((id) => [...document.querySelectorAll('.shelf-item')].find((node) => node.dataset.passage === id)
+      .querySelector('.shelf-open').click(), passageId);
+  }
+  t.require('W7c.passage-opened', passageId !== null && (await onPassage(b, passageId)).ok, json({ passageId }));
+  await a.close();
+  const offered = await waitOffer(b);
+  const look = (await observe(env, b)).queries.filter((row) => row.settled === 'resolved').at(-1);
+  t.require('W7c.first-offer-genuine', offered && look?.free === true && look?.nativeFree === true, json(look));
+  // later looks stay in flight, so this genuine free offer stands while another client takes the lock
+  await setControl(b, { defer: true });
+  await hold(holder, RECORD_LOCK);
+  const holderId = await clientId(holder);
+  const held = await lockView(b);
+  t.require('W7c.holder-acquired', same(held.held, [holderId]), json(held));
+  const standing = await observe(env, b);
+  t.require('W7c.offer-still-shown-while-held', standing.offer, '');
+  await retryFromOffer(env, b); // the real retry path; its boot must lose
+  const lost = await ownership(env, b);
+  t.require('W7c.losing-boot-new-document', lost.docId !== standing.docId, json(lost));
+  t.row('W7c.losing-boot-blocked', lost.blocked && lost.observerAttempts === 0 && !lost.pending.includes(lost.clientId)
+    && same(lost.held, [holderId]), json(lost));
+  const lostPlace = await onPassage(b, passageId);
+  t.row('W7c.losing-boot-same-passage', lostPlace.ok, json(lostPlace.place));
+  const restarted = await waitQueries(b, 0, 4000);
+  await b.waitForTimeout(3600);
+  t.row('W7c.losing-boot-no-offer-while-held', restarted && !(await observe(env, b)).offer, json({ restarted }));
+  await releaseHold(holder, RECORD_LOCK);
+  t.require('W7c.second-offer', await waitOffer(b, 6000), '');
+  await retryFromOffer(env, b);
+  const own = await ownership(env, b);
+  t.require('W7c.second-retry-ownership', own.owns && own.docId !== lost.docId, json(own));
+  const wonPlace = await onPassage(b, passageId);
+  t.row('W7c.second-retry-same-passage', wonPlace.ok, json(wonPlace.place));
+  const native = (await readAppRecordSnapshot(b)).record;
+  const writable = await provesWritable(b, native.revlog || []);
+  t.row('W7c.writable-after-second-retry', writable.ok, json(writable));
+});
+
+defineCase('W7d', { rows: ['W7d.valid-reader-route-restores-and-is-spent', 'W7d.malformed-json-dropped', 'W7d.wrong-version-dropped',
+  'W7d.expired-dropped', 'W7d.future-timestamp-dropped', 'W7d.non-finite-timestamp-dropped', 'W7d.over-long-id-dropped',
+  'W7d.bad-character-id-dropped', 'W7d.unknown-view-dropped', 'W7d.unknown-attempt-lands-in-room', 'W7d.restore-writes-no-record-state'] }, async (t, env) => {
+  // the boot's route validation, through real reloads of an owner window (assessment result/item
+  // targets, kept targets and deliberate navigation: verify-assessment-app.mjs retry-route-* cases)
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const passageId = await a.evaluate(() => [...document.querySelectorAll('.shelf-item:not([data-recommendation])')]
+    .map((node) => node.dataset.passage).find((id) => typeof id === 'string' && /^[\w:.\-]{1,160}$/u.test(id)) ?? null);
+  assert(passageId, 'no shelf passage with a route-safe id');
+  const roots = (row) => ({ ...pick(row), assessmentLibraryV2: row.assessmentLibraryV2 ?? null,
+    assessmentLearning: row.assessmentLearning ?? null, assessmentQuestionPractice: row.assessmentQuestionPractice ?? null });
+  const before = roots((await readAppRecordSnapshot(a)).record);
+  const bootWith = async (value) => {
+    const previous = (await observe(env, a)).docId;
+    await a.evaluate(([key, text]) => { sessionStorage.setItem(key, text); }, [ROUTE_KEY, value]);
+    await a.reload({ waitUntil: 'load', timeout: 45_000 });
+    await booted(a, previous);
+    return a.evaluate((key) => ({ view: document.body.dataset.view ?? null,
+      passages: [...document.querySelectorAll('.listen-row')].map((node) => node.dataset.passage),
+      attempt: document.querySelector('#app main')?.dataset.examAttempt ?? null, route: sessionStorage.getItem(key) }), ROUTE_KEY);
+  };
+  const route = (fields) => JSON.stringify({ v: 1, view: 'reader', passageId, ts: Date.now(), ...fields });
+  const frontDoor = (place) => place.view === 'shelf' && place.route === null;
+  const valid = await bootWith(route({}));
+  t.row('W7d.valid-reader-route-restores-and-is-spent', valid.view === 'reader' && same(valid.passages, [passageId]) && valid.route === null, json(valid));
+  const cases = [
+    ['W7d.malformed-json-dropped', '{"v":1,"view":"reader"'],
+    ['W7d.wrong-version-dropped', route({ v: 2 })],
+    ['W7d.expired-dropped', route({ ts: Date.now() - 121_000 })],
+    ['W7d.future-timestamp-dropped', route({ ts: Date.now() + 60_000 })],
+    ['W7d.non-finite-timestamp-dropped', route({ ts: null })],
+    ['W7d.over-long-id-dropped', route({ passageId: 'a'.repeat(161) })],
+    ['W7d.bad-character-id-dropped', route({ passageId: `${passageId}/../x` })],
+    ['W7d.unknown-view-dropped', route({ view: 'tray' })],
+  ];
+  for (const [id, value] of cases) {
+    const place = await bootWith(value);
+    t.row(id, frontDoor(place), json(place));
+  }
+  const room = await bootWith(JSON.stringify({ v: 1, view: 'mock', attemptId: 'record-hint-no-such-attempt', ts: Date.now() }));
+  t.row('W7d.unknown-attempt-lands-in-room', room.view === 'mock' && room.attempt !== 'record-hint-no-such-attempt' && room.route === null, json(room));
+  const after = roots((await readAppRecordSnapshot(a)).record);
+  t.row('W7d.restore-writes-no-record-state', same(after, before), 'learner and assessment roots are unchanged by ten route restores');
+});
+
+defineCase('W8', { rows: ['W8.injection-fired', 'W8.no-offer', 'W8.no-hint-timer-or-channel', 'W8.manual-reload-remains'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B', flags: { query: 'absent', traceTimers: true } });
+  await a.close();
+  await b.waitForTimeout(5000);
+  const state = await observe(env, b);
+  t.row('W8.injection-fired', state.fired.queryAbsentReads >= 1, json(state.fired));
+  t.row('W8.no-offer', !state.offer && !state.hintNode && state.queryStarts === 0, json({ offer: state.offer, node: state.hintNode }));
+  t.row('W8.no-hint-timer-or-channel', state.fired.wakeTimerSets === 0 && state.fired.deadlineTimerSets === 0 && openHintChannels(state) === 0, json(state.fired));
+  t.row('W8.manual-reload-remains', await manualReload(b), '');
+});
+
+defineCase('W9', { rows: ['W9.hidden-no-queries', 'W9.visible-wakes-offer'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  await setHidden(b, true);
+  const hiddenAt = (await observe(env, b)).queryStarts;
+  await a.close();
+  await b.waitForTimeout(5000);
+  const later = await observe(env, b);
+  t.row('W9.hidden-no-queries', later.queryStarts === hiddenAt && !later.offer, json({ hiddenAt, later: later.queryStarts }));
+  await setHidden(b, false);
+  t.row('W9.visible-wakes-offer', await waitOffer(b, 2500), '');
+});
+
+defineCase('L1', { rows: ['L1.visible-free-result-publishes', 'L1.hide-retires-offer', 'L1.late-free-result-after-hide-not-published',
+  'L1.no-queries-while-hidden', 'L1.return-looks-afresh', 'L1.pagehide-retires-offer',
+  'L1.late-free-result-after-pagehide-not-published', 'L1.no-queries-after-pagehide'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  await setControl(b, { defer: true });
+  await a.close();
+  // the positive control: a deferred free look resolved while visible publishes
+  const first = await nextDeferred(env, b, { wantFree: true });
+  await settle(b, first.n, 'resolve');
+  t.require('L1.visible-free-result-publishes', await waitOffer(b, 1500), `look #${first.n}`);
+  // hidden with a free look in flight, then the look lands
+  const second = await nextDeferred(env, b, { wantFree: true });
+  await setHidden(b, true);
+  t.row('L1.hide-retires-offer', !(await observe(env, b)).offer, '');
+  await settle(b, second.n, 'resolve');
+  await b.waitForTimeout(1500);
+  t.row('L1.late-free-result-after-hide-not-published', !(await observe(env, b)).offer, `look #${second.n}`);
+  await b.waitForTimeout(4000);
+  const hidden = await observe(env, b);
+  t.row('L1.no-queries-while-hidden', hidden.queryStarts === second.n && !hidden.offer, json({ looks: hidden.queryStarts, last: second.n }));
+  // a real return looks again before offering anything
+  await setHidden(b, false);
+  const third = await nextDeferred(env, b, { wantFree: true });
+  const quiet = await observe(env, b);
+  await settle(b, third.n, 'resolve');
+  t.row('L1.return-looks-afresh', third.n > second.n && !quiet.offer && await waitOffer(b, 1500), json({ third: third.n, quiet: quiet.offer }));
+  // pagehide with a free look in flight (dispatched, so the document survives to observe the late result)
+  const fourth = await nextDeferred(env, b, { wantFree: true });
+  await pagehideEvent(b);
+  t.row('L1.pagehide-retires-offer', !(await observe(env, b)).offer, '');
+  await settle(b, fourth.n, 'resolve');
+  await b.waitForTimeout(1500);
+  t.row('L1.late-free-result-after-pagehide-not-published', !(await observe(env, b)).offer, `look #${fourth.n}`);
+  await focusEvent(b);
+  await advisory(b, 3);
+  await b.waitForTimeout(4000);
+  const gone = await observe(env, b);
+  t.row('L1.no-queries-after-pagehide', gone.queryStarts === fourth.n && openHintChannels(gone) === 0, json({ looks: gone.queryStarts, channels: openHintChannels(gone) }));
+});
+
+defineCase('L2', { rows: ['L2.single-outstanding-across-generations', 'L2.old-free-result-not-published',
+  'L2.completion-rechecks-current-generation', 'L2.current-held-result-no-offer', 'L2.old-rejection-does-not-stop',
+  'L2.after-old-rejection-offer-returns'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const holder = await openHarness(env, context);
+  await setControl(b, { defer: true });
+  await a.close();
+  const stale = await nextDeferred(env, b, { wantFree: true });
+  await setHidden(b, true);
+  await hold(holder, RECORD_LOCK);
+  await setHidden(b, false);
+  await b.waitForTimeout(1500);
+  const waiting = await observe(env, b);
+  t.row('L2.single-outstanding-across-generations', waiting.queryStarts === stale.n && waiting.inFlight === 1 && !waiting.offer,
+    json({ looks: waiting.queryStarts, stale: stale.n, inFlight: waiting.inFlight }));
+  await settle(b, stale.n, 'resolve');
+  const rechecked = await waitQueries(b, stale.n, 3000);
+  await b.waitForTimeout(500);
+  t.row('L2.old-free-result-not-published', !(await observe(env, b)).offer, `look #${stale.n}`);
+  t.row('L2.completion-rechecks-current-generation', rechecked, '');
+  const current = await nextDeferred(env, b, { wantFree: false });
+  await settle(b, current.n, 'resolve');
+  await b.waitForTimeout(1000);
+  t.row('L2.current-held-result-no-offer', !(await observe(env, b)).offer, `look #${current.n}`);
+  // the rejection variant: an old look rejected after a hidden→visible return
+  await releaseHold(holder, RECORD_LOCK);
+  const staleReject = await nextDeferred(env, b, { wantFree: true });
+  await setHidden(b, true);
+  await setHidden(b, false);
+  await settle(b, staleReject.n, 'reject');
+  t.row('L2.old-rejection-does-not-stop', await waitQueries(b, staleReject.n, 3000), `look #${staleReject.n}`);
+  const next = await nextDeferred(env, b, { wantFree: true });
+  await settle(b, next.n, 'resolve');
+  t.row('L2.after-old-rejection-offer-returns', await waitOffer(b, 1500), `look #${next.n}`);
+});
+
+defineCase('L3', { rows: ['L3.offer-before-crossing', 'L3.stale-retires-offer', 'L3.no-queries-while-stale', 'L3.abort-resumes-looking',
+  'L3.pre-crossing-result-not-published', 'L3.abort-looks-afresh', 'L3.fresh-result-after-abort-publishes'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const other = await openHarness(env, context);
+  await a.close();
+  t.require('L3.offer-before-crossing', await waitOffer(b), '');
+  // another tab's crossing beacon makes this window stale
+  await writeStorage(other, CROSSING_KEY, 'record-hint-l3');
+  t.row('L3.stale-retires-offer', await waitNoOffer(b, 2000), '');
+  const staleAt = (await observe(env, b)).queryStarts;
+  await b.waitForTimeout(4000);
+  const stale = await observe(env, b);
+  t.row('L3.no-queries-while-stale', stale.queryStarts === staleAt && openHintChannels(stale) === 0, json({ staleAt, looks: stale.queryStarts }));
+  await writeStorage(other, CROSSING_KEY, 'record-hint-l3-aborted');
+  t.row('L3.abort-resumes-looking', await waitQueries(b, staleAt, 3000) && await waitOffer(b, 3000), '');
+  // a free look from before a crossing round trip lands after the abort
+  await setControl(b, { defer: true });
+  const inflight = await nextDeferred(env, b, { wantFree: true });
+  await writeStorage(other, CROSSING_KEY, 'record-hint-l3b');
+  await waitNoOffer(b, 2000);
+  await writeStorage(other, CROSSING_KEY, 'record-hint-l3b-aborted');
+  await b.waitForTimeout(500);
+  await settle(b, inflight.n, 'resolve');
+  await b.waitForTimeout(1000);
+  t.row('L3.pre-crossing-result-not-published', !(await observe(env, b)).offer, `look #${inflight.n}`);
+  const fresh = await nextDeferred(env, b, { wantFree: true });
+  t.row('L3.abort-looks-afresh', fresh.n > inflight.n, json({ fresh: fresh.n, old: inflight.n }));
+  await settle(b, fresh.n, 'resolve');
+  t.row('L3.fresh-result-after-abort-publishes', await waitOffer(b, 1500), '');
+});
+
+defineCase('L4', { rows: ['L4.clock-and-timers-installed', 'L4.looking-before-deadline', 'L4.deadline-stops-looking',
+  'L4.focus-after-deadline-does-not-restart', 'L4.visibility-return-restarts'] }, async (t, env) => {
+  const context = await newContext(env);
+  await openApp(env, context, { role: 'A', seed: true }); // stays the owner: no offer, ordinary polling
+  const b = await openApp(env, context, { role: 'B', flags: { clock: true, traceTimers: true } });
+  await waitQueries(b, 0, 5000);
+  const start = await observe(env, b);
+  t.require('L4.clock-and-timers-installed', start.fired.wakeTimerSets >= 1 && start.fired.deadlineTimerSets >= 1, json(start.fired));
+  await advance(b, 9 * 60_000);
+  await focusEvent(b); // inside the window: may ask for a look, must not extend the window
+  const at9 = (await observe(env, b)).queryStarts;
+  t.row('L4.looking-before-deadline', await waitQueries(b, at9, 4500), json({ at9 }));
+  const fired = await advance(b, 2 * 60_000); // eleven minutes of continuous visibility
+  await b.waitForTimeout(300);
+  const at11 = (await observe(env, b)).queryStarts;
+  await b.waitForTimeout(7000);
+  const after = await observe(env, b);
+  t.row('L4.deadline-stops-looking', after.queryStarts === at11 && after.wakeTimersLive === 0 && after.deadlineTimersLive === 0
+    && openHintChannels(after) === 0, json({ fired, at11, looks: after.queryStarts, wake: after.wakeTimersLive, deadline: after.deadlineTimersLive }));
+  await focusEvent(b);
+  await b.waitForTimeout(2000);
+  t.row('L4.focus-after-deadline-does-not-restart', (await observe(env, b)).queryStarts === at11, '');
+  await setHidden(b, true);
+  await setHidden(b, false);
+  t.row('L4.visibility-return-restarts', await waitQueries(b, at11, 2500), '');
+});
+
+defineCase('L5', { rows: ['L5.timer-tracer-live', 'L5.burst-query-starts-bounded', 'L5.one-wake-timer', 'L5.max-one-outstanding'] }, async (t, env) => {
+  const context = await newContext(env);
+  await openApp(env, context, { role: 'A', seed: true }); // stays the owner: every look sees it held
+  const b = await openApp(env, context, { role: 'B', flags: { traceTimers: true } });
+  const live = await b.waitForFunction(() => window.__hintProbe.queryStarts >= 1 && window.__hintProbe.fired.wakeTimerSets >= 1,
+    null, { timeout: 8000 }).then(() => true, () => false);
+  t.require('L5.timer-tracer-live', live, json((await observe(env, b)).fired));
+  const burst = await b.evaluate(async () => {
+    const probe = window.__hintProbe;
+    const startLooks = probe.queryStarts;
+    const began = performance.now();
+    for (let i = 0; i < 40; i += 1) {
+      window.dispatchEvent(new FocusEvent('focus'));
+      probe.postAdvisory(1);
+      await new Promise((done) => probe.raw.setTimeout(done, 25));
+    }
+    await new Promise((done) => probe.raw.setTimeout(done, 1200));
+    return { starts: probe.queryStarts - startLooks, ms: performance.now() - began, maxWake: probe.maxWakeTimers, maxInFlight: probe.maxInFlight };
+  });
+  const bound = Math.floor(burst.ms / 1000) + 2;
+  t.row('L5.burst-query-starts-bounded', burst.starts <= bound, json({ ...burst, bound }));
+  t.row('L5.one-wake-timer', burst.maxWake <= 1, json(burst));
+  t.row('L5.max-one-outstanding', burst.maxInFlight <= 1, json(burst));
+});
+
+defineCase('L6', { rows: ['L6.injection-fired', 'L6.one-failed-query-then-none', 'L6.no-offer-manual-reload', 'L6.no-unhandled-rejection'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B', flags: { queryFail: 'always' } });
+  await waitQueries(b, 0, 5000);
+  await a.close();
+  await focusEvent(b);
+  await advisory(b, 2);
+  await b.waitForTimeout(7000);
+  const state = await observe(env, b);
+  t.row('L6.injection-fired', state.fired.queryFailures === state.queryStarts && state.queryStarts >= 1, json(state.fired));
+  t.row('L6.one-failed-query-then-none', state.queryStarts === 1 && state.queries[0]?.settled === 'rejected', json({ looks: state.queryStarts }));
+  t.row('L6.no-offer-manual-reload', !state.offer && openHintChannels(state) === 0 && await manualReload(b), '');
+  t.row('L6.no-unhandled-rejection', state.unhandled.length === 0, json(state.unhandled));
+});
+
+defineCase('L7', { rows: ['L7.getter-throw-fired', 'L7.getter-throw-no-hint', 'L7.bind-throw-fired', 'L7.bind-throw-no-hint',
+  'L7.manual-reload-remains'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const getter = await openApp(env, context, { role: 'G', flags: { query: 'getter-throws', traceTimers: true } });
+  const binder = await openApp(env, context, { role: 'K', flags: { query: 'bind-throws', traceTimers: true } });
+  await a.close();
+  await getter.waitForTimeout(5000);
+  const noHint = (state) => !state.offer && !state.hintNode && state.queryStarts === 0 && state.fired.wakeTimerSets === 0
+    && state.fired.deadlineTimerSets === 0 && openHintChannels(state) === 0;
+  const g = await observe(env, getter);
+  const k = await observe(env, binder);
+  t.row('L7.getter-throw-fired', g.fired.queryGetterThrows >= 1, json(g.fired));
+  t.row('L7.getter-throw-no-hint', noHint(g), json({ offer: g.offer, node: g.hintNode, looks: g.queryStarts }));
+  t.row('L7.bind-throw-fired', k.fired.queryBindThrows >= 1, json(k.fired));
+  t.row('L7.bind-throw-no-hint', noHint(k), json({ offer: k.offer, node: k.hintNode, looks: k.queryStarts }));
+  t.row('L7.manual-reload-remains', await manualReload(getter) && await manualReload(binder), '');
+});
+
+defineCase('L8', { rows: ['L8.pending-only-control-established', 'L8.pending-only-no-offer', 'L8.transform-can-offer',
+  'L8.unrelated-rows-present', 'L8.unrelated-names-offer'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B' });
+  const other = await openHarness(env, context);
+  // a REAL pending request behind the owner; the probe hides only the owner's named held row from B
+  await queueRequest(other, RECORD_LOCK, 'pending');
+  await setControl(b, { transform: 'hide-named-held' });
+  const from = (await observe(env, b)).queryStarts;
+  await waitQueries(b, from + 1, 8000);
+  const state = await observe(env, b);
+  const looks = state.queries.filter((row) => row.n > from && row.settled === 'resolved');
+  t.require('L8.pending-only-control-established', looks.length >= 1 && state.fired.transformed >= 1
+    && looks.every((row) => row.viewNamedHeld === 0 && row.viewNamedPending === 1), json(looks));
+  t.row('L8.pending-only-no-offer', !state.offer && !(await waitOffer(b, 3500)), '');
+  await abortQueued(other, 'pending');
+  t.row('L8.transform-can-offer', await waitOffer(b, 4500), 'the same transformed view without the pending row offers');
+  await setControl(b, { transform: null });
+  await waitNoOffer(b, 4500);
+  await hold(other, 'kairo-unrelated-lock');
+  await hold(other, `${RECORD_LOCK}:shadow`);
+  await queueRequest(other, 'kairo-unrelated-lock', 'unrelated-pending');
+  await a.close();
+  await waitLockFree(b, 5000);
+  const view = await lockView(b);
+  t.row('L8.unrelated-rows-present', view.held.length === 0 && view.pending.length === 0
+    && view.heldNames.includes('kairo-unrelated-lock') && view.heldNames.includes(`${RECORD_LOCK}:shadow`)
+    && view.pendingNames.includes('kairo-unrelated-lock'), json(view));
+  t.row('L8.unrelated-names-offer', await waitOffer(b, 4500), '');
+});
+
+defineCase('L9', { rows: ['L9.free-offer', 'L9.deadline-hides-offer', 'L9.channel-stopped', 'L9.no-overlapping-query',
+  'L9.resolved-old-look-does-not-revive', 'L9.rejected-old-look-does-not-revive', 'L9.no-unhandled-rejection'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const one = await openApp(env, context, { role: 'B1', flags: { clock: true, traceTimers: true } });
+  const two = await openApp(env, context, { role: 'B2', flags: { clock: true, traceTimers: true } });
+  await a.close();
+  t.require('L9.free-offer', (await Promise.all([waitOffer(one), waitOffer(two)])).every(Boolean), '');
+  await setControl(one, { defer: true });
+  await setControl(two, { defer: true });
+  const look1 = await nextDeferred(env, one, { wantFree: true });
+  const look2 = await nextDeferred(env, two, { wantFree: true });
+  // from here only the controlled clock moves: no focus, visibility, storage or advisory event
+  const fired1 = await advance(one, HINT_WINDOW_MS + 1000);
+  const fired2 = await advance(two, HINT_WINDOW_MS + 1000);
+  await one.waitForTimeout(500);
+  const [s1, s2] = [await observe(env, one), await observe(env, two)];
+  t.row('L9.deadline-hides-offer', !s1.offer && !s2.offer && fired1.includes('armRecordHintDeadline') && fired2.includes('armRecordHintDeadline'),
+    json({ fired1, fired2, offers: [s1.offer, s2.offer] }));
+  t.row('L9.channel-stopped', openHintChannels(s1) === 0 && openHintChannels(s2) === 0, '');
+  await one.waitForTimeout(4000);
+  const [l1, l2] = [await observe(env, one), await observe(env, two)];
+  t.row('L9.no-overlapping-query', l1.queryStarts === look1.n && l2.queryStarts === look2.n && l1.inFlight === 1 && l2.inFlight === 1,
+    json({ one: [l1.queryStarts, look1.n, l1.inFlight], two: [l2.queryStarts, look2.n, l2.inFlight] }));
+  await settle(one, look1.n, 'resolve');
+  await settle(two, look2.n, 'reject');
+  await one.waitForTimeout(2000);
+  const [e1, e2] = [await observe(env, one), await observe(env, two)];
+  t.row('L9.resolved-old-look-does-not-revive', !e1.offer && e1.queryStarts === look1.n && openHintChannels(e1) === 0, json({ looks: e1.queryStarts }));
+  t.row('L9.rejected-old-look-does-not-revive', !e2.offer && e2.queryStarts === look2.n && openHintChannels(e2) === 0, json({ looks: e2.queryStarts }));
+  t.row('L9.no-unhandled-rejection', e1.unhandled.length === 0 && e2.unhandled.length === 0, json([e1.unhandled, e2.unhandled]));
+});
+
+defineCase('L10', { rows: ['L10.sync-throw-fired', 'L10.no-unhandled-rejection', 'L10.hint-retired-manual-reload',
+  'L10.no-later-queries', 'L10.zero-record-requests-beyond-boot'] }, async (t, env) => {
+  const context = await newContext(env);
+  const a = await openApp(env, context, { role: 'A', seed: true });
+  const b = await openApp(env, context, { role: 'B', flags: { query: 'sync-throws' } });
+  const threw = await b.waitForFunction(() => window.__hintProbe.fired.querySyncThrows >= 1, null, { timeout: 5000 }).then(() => true, () => false);
+  t.require('L10.sync-throw-fired', threw, json((await observe(env, b)).fired));
+  await a.close();
+  await focusEvent(b);
+  await advisory(b, 2);
+  await b.waitForTimeout(6000);
+  const state = await observe(env, b);
+  const pageErrors = env.errors.filter((row) => row.role === 'B');
+  t.row('L10.no-unhandled-rejection', state.unhandled.length === 0 && pageErrors.length === 0, json({ unhandled: state.unhandled, pageErrors }));
+  t.row('L10.hint-retired-manual-reload', !state.offer && openHintChannels(state) === 0 && await manualReload(b), '');
+  t.row('L10.no-later-queries', state.fired.querySyncThrows === 1, json(state.fired));
+  const auth = authority(state);
+  t.row('L10.zero-record-requests-beyond-boot', auth.bootShape && auth.namedRequests === 1 && auth.observerAttempts === 0, json(auth));
+});
+
+/* ------------------------------------------------------------------ setup (W0) and the run */
+
+function playwrightVersion() {
+  try { return require('playwright-core/package.json').version; } catch { return null; }
+}
+const w0 = (id, pass, detail = '') => record('W0', id, pass ? 'passed' : 'failed', detail);
+async function setup() {
+  const only = process.env.KAIRO_RECORD_HINT_ONLY;
+  const all = [...CASES.keys()];
+  const chosen = only === undefined ? all : only.split(',').map((id) => id.trim()).filter(Boolean);
+  for (const id of chosen) assert(CASES.has(id), `unknown case ${id}`);
+  receipt.selection = { full: only === undefined, cases: all.filter((id) => chosen.includes(id)), unselected: all.filter((id) => !chosen.includes(id)) };
+
+  const site = resolveCorridorSite(); // inside the terminal lifecycle: a rejection is a failed setup receipt
+  const baseBytes = readFileSync(join(site, 'build-identity.json'));
+  const base = JSON.parse(baseBytes.toString('utf8'));
+  const pinned = process.env.KAIRO_ARTIFACT_SHA256;
+  receipt.artifact.base = { site, product: base.product, gitSha: base.gitSha, sourceDirty: base.sourceDirty,
+    sourceAssetSha256: base.sourceAssetSha256, artifactSha256: base.artifactSha256, manifestSha256: sha256(baseBytes),
+    selection: pinned === undefined ? 'source-compared' : 'pinned-bundled', sourceCompared: pinned === undefined };
+  const markers = ['mutant', 'testMutation', 'format', 'mutationSha256'].filter((key) => Object.hasOwn(base, key));
+  w0('W0.base-artifact-verified', base.product === 'KAIRO' && markers.length === 0,
+    json({ artifactSha256: base.artifactSha256, sourceDirty: base.sourceDirty, sourceCompared: pinned === undefined, markers }));
+
+  const mutantDir = process.env.KAIRO_TEST_MUTANT_DIR;
+  const mutantPin = process.env.KAIRO_TEST_MUTANT_SHA256;
+  assert.equal(mutantDir === undefined, mutantPin === undefined, 'KAIRO_TEST_MUTANT_DIR and KAIRO_TEST_MUTANT_SHA256 go together');
+  let served = site;
+  let mutant = null;
+  if (mutantDir !== undefined) {
+    try { mutant = verifyTestMutant({ baseSite: site, mutantSite: mutantDir, expectedMutationSha256: mutantPin }); } catch (error) {
+      record('W0', 'W0.mutation-provenance-verified', 'failed', error.message);
+      throw error;
+    }
+    record('W0', 'W0.mutation-provenance-verified', 'passed', json({ name: mutant.name, mutationSha256: mutant.mutationSha256 }));
+    served = mutant.site;
+    receipt.artifact.kind = 'test-mutation';
+    receipt.artifact.mutant = { name: mutant.name, site: mutant.site, mutationSha256: mutant.mutationSha256,
+      mutantFilesSha256: mutant.mutantFilesSha256, identitySha256: mutant.identitySha256,
+      edits: mutant.edits.map(({ file, fromSha256, toSha256, offset }) => ({ file, fromSha256, toSha256, offset })), results: mutant.results };
+    EXPECTED.script = mutant.files.get('corridor.js');
+  } else {
+    receipt.artifact.kind = 'release-artifact';
+    EXPECTED.script = base.files.find((row) => row.path === 'corridor.js')?.sha256 ?? null;
+  }
+
+  host = await startStaticHost({ site: served, port: 0 });
   origin = host.origin;
+  const fetchBytes = async (path) => {
+    const response = await fetch(`${origin}/${path.split('/').map(encodeURIComponent).join('/')}`);
+    assert.equal(response.status, 200, `${path}: HTTP ${response.status}`);
+    return Buffer.from(await response.arrayBuffer());
+  };
+  const identityBytes = await fetchBytes('build-identity.json');
+  const script = await fetchBytes('corridor.js');
+  receipt.artifact.served = { site: served, origin, identitySha256: sha256(identityBytes), corridorJsSha256: sha256(script) };
+  if (mutant) {
+    const identity = JSON.parse(identityBytes.toString('utf8'));
+    w0('W0.served-identity-is-declared-mutation', sha256(identityBytes) === mutant.identitySha256
+      && identity.product === MUTANT_PRODUCT && identity.format === MUTATION_FORMAT && identity.cleanBuild === false
+      && identity.name === mutant.name && identity.base?.artifactSha256 === base.artifactSha256,
+    json({ product: identity.product, name: identity.name, cleanBuild: identity.cleanBuild, base: identity.base?.artifactSha256 }));
+    const touched = [];
+    for (const row of mutant.results) touched.push({ path: row.path, ok: sha256(await fetchBytes(row.path)) === row.after.sha256 });
+    w0('W0.served-script-is-mutant-bytes', touched.every((row) => row.ok) && sha256(script) === EXPECTED.script, json(touched));
+  } else {
+    w0('W0.served-identity-is-base-manifest', identityBytes.equals(baseBytes), 'the served identity is the verified manifest, byte for byte');
+    w0('W0.served-script-matches-manifest', !!EXPECTED.script && sha256(script) === EXPECTED.script, sha256(script));
+  }
+  const text = script.toString('utf8');
+  const missing = SOURCE_ANCHORS.filter((anchor) => !text.includes(anchor));
+  w0('W0.constants-match-served-source', missing.length === 0, json(missing));
+  if (results.some((row) => row.case === 'W0' && row.status !== 'passed')) throw new Error('W0 identity failed; no case runs');
+
   browser = await chromium.launch();
-
-  currentCase = 'W0';
-  {
-    const context = await browser.newContext(); const page = await context.newPage();
-    const identity = await (await page.request.get(`${origin}/build-identity.json`)).json();
-    let head = null; try { head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { /* outside a checkout */ }
-    const expected = process.env.KAIRO_EXPECT_GITSHA || head;
-    const served = createHash('sha256').update(Buffer.from(await (await page.request.get(`${origin}/corridor.js`)).body())).digest('hex');
-    check('W0 served build is the expected clean commit', identity.gitSha === expected && identity.sourceDirty === false
-      && served === new Map(identity.files.map((row) => [row.path, row.sha256])).get('corridor.js'),
-      `served=${identity.gitSha} expected=${expected}${identity.mutant ? ` MUTANT=${identity.mutant}` : ''}`);
-    await context.close();
-    if (results.some((r) => !r.pass)) throw new Error('identity failed');
-  }
-
-  currentCase = 'W1';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    await gradeOnce(a);
-    await waitForAppRecord(a, (record) => (record.revlog || []).length === 1, { description: 'owner grade' });
-    const b = await openWindow(context);
-    check('W1 the second window boots blocked', await blocked(b));
-    await b.waitForTimeout(3600);
-    check('W1 no offer while the owner lives (m1 must fail here)', !(await offerShown(b)));
-    const bId = await ownClientId(b);
-    await a.close();
-    const t0 = Date.now();
-    const offered = await waitOffer(b);
-    check('W1 the offer arrives within 4.5 s of the owner closing', offered, `${Date.now() - t0} ms`);
-    const before = await probeOf(b);
-    check('W1 before the tap the window made one lock request, its boot (m2 must fail here)', before.requests === 1, JSON.stringify(before));
-    check('W1 before the tap the window does not hold the lock', !(await holders(b)).includes(bId));
-    if (offered) {
-      await tapRetry(b);
-      check('W1 after the tap the window is writable', !(await blocked(b)));
-      check('W1 the record carries the owner\'s one grade, exactly', (await revlogLength(b)) === 1);
-    }
-    await context.close();
-  }
-
-  currentCase = 'W2';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context, { flags: { queryDelayMs: 500 } });
-    const bId = await ownClientId(b);
-    let ownerEvery = true, bHeld = false;
-    for (let i = 0; i < 20; i++) {
-      await a.reload();
-      await ready(a);
-      if (await blocked(a)) { ownerEvery = false; break; }
-      if ((await holders(a)).includes(bId)) bHeld = true;
-    }
-    check('W2 the owner is the owner after each of 20 reloads', ownerEvery);
-    check('W2 the blocked window never holds the lock', !bHeld);
-    const probe = await probeOf(b);
-    check('W2 the blocked window made no request beyond its boot (m2 must fail here)', probe.requests === 1, JSON.stringify(probe));
-    await context.close();
-  }
-
-  currentCase = 'W3';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context);
-    const c = await openWindow(context);
-    await a.close();
-    const offered = (await waitOffer(b)) && (await waitOffer(c));
-    check('W3 both blocked windows are offered a retry', offered);
-    if (offered) {
-      await Promise.all([tapRetry(b), tapRetry(c)]);
-      const writable = [!(await blocked(b)), !(await blocked(c))].filter(Boolean).length;
-      check('W3 exactly one window is writable after both taps', writable === 1, `writable=${writable}`);
-    }
-    await context.close();
-  }
-
-  currentCase = 'W4';
-  check('W4 renderer crash (Chromium CDP) — not exercised in this suite; unavailable, not passed', true, 'recorded as unavailable');
-  results.at(-1).unavailable = true;
-
-  currentCase = 'W5';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context);
-    await a.goto('about:blank');
-    check('W5 the owner navigating away offers a retry', await waitOffer(b));
-    await a.goBack();
-    await ready(a);
-    check('W5 Back returns the old owner to ownership (no one else tapped)', !(await blocked(a)));
-    const withdrawn = await b.waitForFunction(() => document.getElementById('record-hint')?.hidden !== false, null, { timeout: 4500 })
-      .then(() => true, () => false);
-    check('W5 the offer withdraws once the lock is held again', withdrawn);
-    await context.close();
-  }
-
-  currentCase = 'W6';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    await gradeOnce(a);
-    await waitForAppRecord(a, (record) => (record.revlog || []).length === 1, { description: 'durable ACK' });
-    const b = await openWindow(context);
-    await a.close();
-    if (await waitOffer(b)) await tapRetry(b);
-    const record = await readAppRecord(b);
-    check('W6a a durable grade is present exactly once after the retry', (record.revlog || []).length === 1
-      && Object.keys(record.srs || {}).length >= 1, `revlog=${(record.revlog || []).length}`);
-    await context.close();
-  }
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    await a.locator('#tray').click();
-    await a.locator('#review-start').click();
-    await a.locator('#declare-notyet').click();
-    const before = await revlogLength(a);
-    const b = await openWindow(context);
-    await a.locator('.grade.g-again').click();
-    await a.close();
-    if (await waitOffer(b)) await tapRetry(b);
-    const record = await readAppRecord(b);
-    const rows = (record.revlog || []).length - before;
-    check('W6b a grade racing the close is absent or present once, never duplicated', rows === 0 || rows === 1, `new rows=${rows}`);
-    if (rows === 1) check('W6b a present grade carries its card state', Object.keys(record.srs || {}).length >= 1);
-    await context.close();
-  }
-
-  currentCase = 'W7';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context);
-    await b.locator('#tray').click();
-    await b.fill('#note-input', 'Bの筆');
-    await a.close();
-    const offered = await waitOffer(b);
-    await b.fill('#note-input', 'Bの筆・直前の追記');
-    if (offered) await tapRetry(b);
-    await b.locator('#tray').click();
-    check('W7a text typed just before the tap survives the retry', (await b.inputValue('#note-input')) === 'Bの筆・直前の追記');
-    await context.close();
-  }
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context);
-    await b.locator('#tray').click();
-    await b.fill('#note-input', '残すべき文');
-    await a.close();
-    const offered = await waitOffer(b);
-    await b.evaluate(() => { window.__stay = 1; window.__refuseSession = true; });
-    if (offered) await b.locator('#record-hint-retry').click();
-    await b.waitForTimeout(1500);
-    const state = await b.evaluate(() => ({ stayed: window.__stay === 1,
-      alert: document.querySelector('#record-hint .record-hint-failure')?.textContent || '',
-      text: document.getElementById('note-input')?.value }));
-    check('W7b refused storage: no reload, a visible reason, the text intact', offered && state.stayed && !!state.alert && state.text === '残すべき文', JSON.stringify(state));
-    await context.close();
-  }
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context);
-    const c = await openWindow(context);
-    const door = b.locator('.shelf-item:not([data-recommendation]) .shelf-open').first();
-    await door.click();
-    await b.waitForSelector('#reader');
-    const title = await b.locator('h1.view-title').textContent();
-    await a.close();
-    await waitOffer(c); await tapRetry(c); // c wins the race first
-    const offeredB = await waitOffer(b, 1500);
-    if (offeredB) await tapRetry(b); // b may lose: the lock is c's now
-    else await b.evaluate(() => { const r = document.getElementById('record-reload'); r ? r.click() : location.reload(); }).catch(() => {});
-    await ready(b);
-    const place = await b.evaluate(() => ({ view: document.body.dataset.view, title: document.querySelector('h1.view-title')?.textContent }));
-    check('W7c after losing a race the window is back on its passage, read-only', place.view === 'reader' && place.title === title, JSON.stringify(place));
-    await c.close();
-    if (await waitOffer(b)) await tapRetry(b);
-    const later = await b.evaluate(() => ({ view: document.body.dataset.view, title: document.querySelector('h1.view-title')?.textContent }));
-    check('W7c a later retry still returns to the passage, now writable', later.view === 'reader' && later.title === title && !(await blocked(b)), JSON.stringify(later));
-    await context.close();
-  }
-
-  currentCase = 'W8';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context, { flags: { noQuery: true } });
-    await a.close();
-    await b.waitForTimeout(5000);
-    check('W8 without locks.query there is no offer', !(await offerShown(b)));
-    check('W8 the manual reload remains', await b.evaluate(() => !!document.getElementById('record-reload')));
-    await context.close();
-  }
-
-  currentCase = 'W9';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context);
-    await b.evaluate(() => { window.__forceHidden = true; document.dispatchEvent(new Event('visibilitychange')); });
-    const hiddenAt = await probeOf(b);
-    await a.close();
-    await b.waitForTimeout(5000);
-    const hiddenAfter = await probeOf(b);
-    check('W9 a hidden window makes no looks', hiddenAfter.queries === hiddenAt.queries && !(await offerShown(b)), JSON.stringify({ hiddenAt, hiddenAfter }));
-    await b.evaluate(() => { window.__forceHidden = false; document.dispatchEvent(new Event('visibilitychange')); });
-    check('W9 visible again, the offer arrives', await waitOffer(b, 2500));
-    await context.close();
-  }
-
-  currentCase = 'W10';
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context, { flags: { queryFail: true } });
-    await a.close();
-    await b.waitForTimeout(5000);
-    check('W10 a failing query shows no offer and leaves the manual reload', !(await offerShown(b))
-      && await b.evaluate(() => !!document.getElementById('record-reload')));
-    await context.close();
-  }
-  {
-    const context = await newContext();
-    const a = await openWindow(context);
-    const b = await openWindow(context, { flags: { queryDelayMs: 2000 } });
-    await a.close();
-    await b.waitForTimeout(200);
-    await b.evaluate(() => { window.__forceHidden = true; document.dispatchEvent(new Event('visibilitychange')); });
-    await b.waitForTimeout(3000);
-    check('W10 a slow look that lands after hiding shows nothing', !(await offerShown(b)));
-    await context.close();
-  }
-} catch (error) {
-  results.push({ name: `terminal (${currentCase})`, pass: false, detail: error.stack || String(error) });
-  console.log(`  FAIL terminal in ${currentCase} — ${error.message}`);
-} finally {
-  await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, detail: error.message }));
-  await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
-  if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
-  writeFileSync(resolve(EVIDENCE, 'record-hint.json'), JSON.stringify({ origin, results, pageErrors, lastCase: currentCase }, null, 2) + '\n');
+  receipt.browser = { engine: 'chromium', version: browser.version(), playwrightCore: playwrightVersion() };
 }
-const failed = results.filter((r) => !r.pass);
-console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);
-process.exit(failed.length ? 1 : 0);
+
+writeReceipt(); // an older receipt in a reused evidence directory is replaced before anything runs
+const watchdog = setTimeout(() => {
+  finish('incomplete', `no terminal outcome within ${DEADLINE_MS} ms`);
+  process.exit(1);
+}, DEADLINE_MS);
+watchdog.unref();
+let exitCode = 1;
+try {
+  console.log('W0');
+  await setup();
+  receipt.setup.status = 'passed';
+  writeReceipt();
+  for (const id of receipt.selection.cases) await runCase(CASES.get(id));
+} catch (error) {
+  if (receipt.setup.status === 'pending') {
+    receipt.setup.status = 'failed';
+    receipt.setup.error = String(error?.stack || error);
+    console.log(`  FAIL setup — ${error?.message || error}`);
+  } else record('terminal', 'terminal', 'failed', String(error?.stack || error));
+} finally {
+  if (browser) receipt.cleanup.push(await bounded('browser', () => browser.close(), 20_000));
+  if (host) receipt.cleanup.push(await bounded('host', () => host.close(), 10_000));
+  exitCode = finish();
+}
+process.exit(exitCode);
