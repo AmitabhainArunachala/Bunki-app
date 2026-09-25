@@ -74,14 +74,23 @@ export async function serveMutation(context, { origin, manifest, control, edits 
  * spec: { run, edits, requires, kills, allowed, witness(rowsById) → '' or why not }.
  * control: { rows, served, pageErrors, setupError, error }.
  * runRows: the schedule of every run, by name. editFile(key) → the file an edit serves.
- * candidateRows: the candidate's verdict rows (each { id, pass }).
+ * candidateRows: the candidate's verdict rows (each { id, pass }). foundationIds: the exact F0 ids that must each pass once.
  * Returns [verdict, reason].
  */
-export function adjudicate(spec, control, { runRows, editFile, candidateRows }) {
+export function adjudicate(spec, control, { runRows, editFile, candidateRows, foundationIds }) {
   const expected = runRows[spec.run];
   const declared = [...spec.requires, ...spec.kills, ...spec.allowed];
   if (!expected || declared.some((id) => !expected.includes(id)) || new Set(declared).size !== declared.length || !spec.kills.length)
     return ['incomplete', 'declaration: requires, kills and allowed must be distinct rows of the run, with at least one kill'];
+  // no kill without the fixture foundation, exactly: each declared F0 id once and passing, no F0 row beside them, none
+  // renamed or duplicated (Codex D11 verifier r2 independent review)
+  const f0 = candidateRows.filter((row) => String(row.id || '').startsWith('F0.') || String(row.name || '').startsWith('F0 '));
+  const f0Ids = foundationIds || [];
+  const f0Complete = f0Ids.length > 0 && f0.length === f0Ids.length
+    && f0Ids.every((id) => f0.filter((row) => row.id === id).length === 1) && f0.every((row) => row.pass && f0Ids.includes(row.id));
+  if (!f0Complete) return ['incomplete', 'the fixture foundation (F0) is not exactly its declared checks, each once and passing'];
+  const after = candidateRows.filter((row) => row.observed?.afterRows && expected.includes(String(row.id).replace(/\.after$/, '')));
+  if (after.length) return ['incomplete', `the candidate's schedule errored after its rows: ${after.map((row) => row.id).join(', ')}`];
   if (control.setupError) return ['incomplete', `setup: ${control.setupError}`];
   if (control.error) return ['incomplete', `stopped: ${control.error}`];
   if (control.pageErrors.length) return ['incomplete', `page errors in the mutant: ${JSON.stringify(control.pageErrors)}`];
@@ -134,12 +143,23 @@ const constant = (src, name) => {
   return match[0];
 };
 
+/** Every census input read once: the bytes a digest names are the bytes parsed (Codex D11 verifier r2 review). */
+export function inputReader(dir = CORRIDOR) {
+  const bytes = new Map();
+  const at = (path) => {
+    if (!bytes.has(path)) bytes.set(path, readFileSync(resolve(dir, path)));
+    return bytes.get(path);
+  };
+  at.digests = () => Object.fromEntries([...bytes].map(([path, body]) => [path, sha256(body)]));
+  return at;
+}
+
 /** readerChoiceMatch as corridor.js defines it, and rowsForForm as the dictionary worker defines it. */
-export function liftReaderMatcher(dir = CORRIDOR) {
-  const app = readFileSync(resolve(dir, 'corridor.js'), 'utf8');
-  const worker = readFileSync(resolve(dir, 'dictionary-worker.js'), 'utf8');
-  const index = JSON.parse(readFileSync(resolve(dir, 'data/share_alike/dict-v2/index.json'), 'utf8'));
-  const core = JSON.parse(readFileSync(resolve(dir, 'data/share_alike/dict.json'), 'utf8')).words;
+export function liftReaderMatcher(dir = CORRIDOR, at = inputReader(dir)) {
+  const app = at('corridor.js').toString('utf8');
+  const worker = at('dictionary-worker.js').toString('utf8');
+  const index = JSON.parse(at('data/share_alike/dict-v2/index.json').toString('utf8'));
+  const core = JSON.parse(at('data/share_alike/dict.json').toString('utf8')).words;
   const fromApp = lifter(app), fromWorker = lifter(worker);
   const { readerChoiceMatch } = new Function([
     ...['KATA_TO_HIRA_OFFSET', 'READER_KANJI', 'READER_KANA'].map((name) => constant(app, name)),
@@ -154,18 +174,16 @@ export function liftReaderMatcher(dir = CORRIDOR) {
   return { readerChoiceMatch, rowsForForm, core };
 }
 
-/** One / chooser / absence for every core-miss content token, and each against the pre-D11 door's first row. */
+/** One / chooser / offered / absence for every core-miss content token, and each against the pre-D11 door's first row. */
 export function measureReaderMatch(dir = CORRIDOR) {
-  const { readerChoiceMatch, rowsForForm, core } = liftReaderMatcher(dir);
-  const read = (path) => readFileSync(resolve(dir, path));
-  const inputs = Object.fromEntries(['corridor.js', 'dictionary-worker.js', 'data/share_alike/dict-v2/index.json', 'data/share_alike/dict.json',
-    'data/articles/index.json'].map((path) => [path, sha256(read(path))]));
+  const at = inputReader(dir);
+  const { readerChoiceMatch, rowsForForm, core } = liftReaderMatcher(dir, at);
   const classes = { one: 0, chooser: 0, offered: 0, absent: 0 };
   const vsFirstRow = { same: 0, chooserContains: 0, chooserWithout: 0, offeredContains: 0, offeredWithout: 0, different: 0, nowAbsent: 0, noRowBefore: 0 };
   const lists = { different: {}, chooserWithout: {}, offeredWithout: {}, nowAbsent: {} };
   let total = 0;
-  for (const article of JSON.parse(read('data/articles/index.json')).articles) {
-    JSON.parse(read(`data/articles/${article.file}`)).tokens.forEach((token, index) => {
+  for (const article of JSON.parse(at('data/articles/index.json').toString('utf8')).articles) {
+    JSON.parse(at(`data/articles/${article.file}`).toString('utf8')).tokens.forEach((token, index) => {
       if (!token.c || core[token.b]) return;
       total++;
       const rows = rowsForForm(token.b || token.s);
@@ -187,7 +205,8 @@ export function measureReaderMatch(dir = CORRIDOR) {
       }
     });
   }
-  return { inputs, total, classes, vsFirstRow, lists };
+  // every digest names bytes this run parsed; nothing is re-read for hashing
+  return { inputs: at.digests(), total, classes, vsFirstRow, lists };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === 'measure') {
