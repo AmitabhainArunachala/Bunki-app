@@ -148,7 +148,14 @@
             if (draftDirty) await persistDraft();
           }
           return config;
-        } catch (error) { configError = errorText(error); return null; }
+        } catch (error) {
+          // a host with no report service (a static site answers 404) is not an outage: say plainly
+          // that the report stays on this device, rather than a generic service failure
+          configError = error?.status === 404
+            ? 'This copy of KAIRO has no report service yet. Your report is saved on this device and has not been sent.'
+            : errorText(error);
+          return null;
+        }
       })();
       try { return await configPromise; } finally { configPromise = null; }
     }

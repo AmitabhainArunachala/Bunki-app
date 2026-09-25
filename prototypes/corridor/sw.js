@@ -363,6 +363,9 @@ self.addEventListener('fetch', (event) => {
   if (!url.href.startsWith(SCOPE)) return;
 
   const relativePath = url.href.slice(SCOPE.length);
+  // API traffic (the report service) is live by nature: never a release asset, never answered
+  // from the installed version — it goes to the network, or fails as the network fails
+  if (/^api\//.test(relativePath)) return;
   const isContent = /^(data|vendor|design|modules)\//.test(relativePath);
   const navigation = request.mode === 'navigate';
   const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;
