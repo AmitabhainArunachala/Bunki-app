@@ -365,7 +365,7 @@ ${appScript}
 
 // Fragment mode: style + body content only, for hosts that supply the document
 // skeleton themselves.
-const fragmentHtml = `<title>回廊 KAIRO — corridor prototype</title>
+const fragmentHtml = `<title>回廊 KAIRO</title>
 <style>
 ${read('corridor.css')}
 ${read('reference-ui.css')}
@@ -386,7 +386,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="${FAVICON}">
-<title>回廊 KAIRO — corridor prototype</title>
+<title>回廊 KAIRO</title>
 <style>
 ${read('corridor.css')}
 ${read('reference-ui.css')}

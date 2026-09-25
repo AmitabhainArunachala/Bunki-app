@@ -11486,10 +11486,12 @@ function renderMockItem(main, set, flat, run) {
     main.append(box);
   }
   const q = el('div', 'mock-q');
+  q.lang = 'ja';
   for (const line of String(item.q).split('\n')) q.append(el('p', 'mock-q-line', line));
   main.append(q);
   const picked = run.answers[run.ix];
   const list = el('div', 'lesson-options');
+  list.lang = 'ja';
   item.opts.forEach((opt, i) => {
     const b = el('button', 'lesson-option' + (picked === i ? ' picked' : ''));
     b.type = 'button';
@@ -25026,7 +25028,7 @@ function stampRegister() {
   const html = document.documentElement;
   const main = document.querySelector('#app > main');
   const room = document.body.classList.contains('ginga') || !main ? 'door'
-    : main.querySelector('.mock-opts') ? 'attempt'
+    : main.querySelector('.mock-opts, .mock-q') ? 'attempt'
       : main.querySelector('.exam-confirm') ? 'threshold'
         : main.querySelector('.exam-score') ? 'results'
           : main.querySelector('.exam-levels') ? 'jlpt'
@@ -25045,11 +25047,13 @@ function stampRegister() {
     clearTimeout(stampRegister.enterTimer);
     delete html.dataset.roomEntering;
   }
-  const progress = document.querySelector('.exam-progress');
+  // the older sets have no .exam-progress: their counter is the card-kind after the policy line
+  const progress = document.querySelector('.exam-progress') ||
+    document.querySelector('#app > main[data-mock-set] > .card-kind:not(.mock-attempt-policy)');
   const counted = ((progress?.firstElementChild || progress)?.textContent || '').match(/(\d+)\s*(?:of|\/)\s*(\d+)/);
   if (counted) html.style.setProperty('--stage', String(Number(counted[1]) / Number(counted[2])));
   else html.style.removeProperty('--stage');
-  const opts = document.querySelector('.mock-opts');
+  const opts = document.querySelector('.mock-opts, .mock-q + .lesson-options');
   if (opts?.querySelector('[aria-pressed="true"], [aria-checked="true"], .chosen, .selected, .is-selected')) html.dataset.answered = '1';
   else delete html.dataset.answered;
   for (const door of document.querySelectorAll('#shelf-body button.grammar-link:not([data-grade])')) {
