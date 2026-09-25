@@ -223,8 +223,10 @@ try {
       await context.addInitScript(() => { try { localStorage.setItem('kairo-exam-level-v1', 'N1'); } catch { /* preference only */ } });
       const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
       await enterJlptFromDojo(page); await catalogComplete(page);
-      await page.locator(`[data-exam-older="N1"] [data-legacy-set="${set.setId}"]`).click();
-      const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
+      const door = page.locator(`[data-exam-older="N1"] [data-legacy-set="${set.setId}"]`);
+      const present = await door.waitFor({ timeout: 10_000 }).then(() => true, () => false);
+      if (present) await door.click();
+      const started = present && await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
       const running = await page.evaluate(() => ({ set: document.querySelector('#app main')?.dataset.mockSet || null,
         progress: (document.querySelector('#app main')?.innerText.match(/(\d+)\s*\/\s*(\d+)\s*問/u) || []).slice(1) }));
       check(`T11 ${set.setId}: its door starts that set, with its ${set.items} questions`,
@@ -245,14 +247,14 @@ try {
     const failedState = await page.waitForSelector('[data-exam-older="N1"][data-older-state="failed"]', { timeout: 10_000 }).then(() => true, () => false);
     check('T12 a failed older-set index says so and offers a retry', failedState && (await page.locator('#exam-older-retry').count()) === 1);
     failIndex = false;
-    await page.locator('#exam-older-retry').click();
+    if (await page.locator('#exam-older-retry').count()) await page.locator('#exam-older-retry').click();
     const recovered = await page.waitForSelector('[data-exam-older="N1"][data-older-state="ready"] [data-legacy-set]', { timeout: 10_000 }).then(() => true, () => false);
     check('T12 retry loads the older sets', recovered);
-    await page.locator('[data-legacy-set="n1-02"]').click();
+    if (await page.locator('[data-legacy-set="n1-02"]').count()) await page.locator('[data-legacy-set="n1-02"]').click();
     const setFailed = await page.waitForSelector('[data-older-failed="n1-02"]', { timeout: 10_000 }).then(() => true, () => false);
     check('T13 a set that fails to load says so beside its door', setFailed);
     failSet = false;
-    await page.locator('[data-legacy-set="n1-02"]').click();
+    if (await page.locator('[data-legacy-set="n1-02"]').count()) await page.locator('[data-legacy-set="n1-02"]').click();
     const retried = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
     check('T13 pressing the door again retries and starts the set', retried &&
       await page.evaluate(() => document.querySelector('#app main')?.dataset.mockSet === 'n1-02'));
@@ -267,7 +269,9 @@ try {
     await context.route('**/data/mock/n1-03.json', async (route) => { await held; await route.continue(); });
     const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
     await enterJlptFromDojo(page); await catalogComplete(page);
-    await page.locator('[data-legacy-set="n1-03"]').click();
+    const lateDoor = await page.locator('[data-legacy-set="n1-03"]').waitFor({ timeout: 10_000 }).then(() => true, () => false);
+    check('T14 the n1-03 door exists to press', lateDoor);
+    if (lateDoor) await page.locator('[data-legacy-set="n1-03"]').click();
     await page.locator('#chrome-dojo').click();   // leave the room while n1-03 is still downloading
     await page.waitForSelector('button[data-study-door="mock"]');
     release();
