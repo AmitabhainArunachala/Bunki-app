@@ -7003,21 +7003,6 @@ function glossaryCrossRefPlan(p) {
  * carries its own context. Nothing here writes learner state. */
 const readAloud = { on: false, timer: null, failed: false, generation: 0, usingDeviceVoice: false };
 
-// Warm the voice list at boot: iOS and Android hand it over asynchronously,
-// and a getVoices() call is what starts the delivery — without this the
-// first tap on 聞く sees an empty list and a real phone stays silent.
-try {
-  if ('speechSynthesis' in window) {
-    speechSynthesis.getVoices();
-    speechSynthesis.addEventListener?.('voiceschanged', () => {
-      speechSynthesis.getVoices();
-      // the list often lands after the reader painted — repaint once so the
-      // voice picker appears without the learner leaving the room (never
-      // mid-read: a re-render would drop the ladder and the running voice)
-      if (S.view === 'reader' && !readAloud.on && !S.stack.length) render();
-    });
-  }
-} catch { /* Voice discovery is optional; the reader reports unavailable audio. */ }
 
 function stopReadAloud() {
   if (!readAloud.on) return;
@@ -7025,75 +7010,6 @@ function stopReadAloud() {
   readAloud.generation += 1;
   clearTimeout(readAloud.timer);
   stopRecAudio();
-  try {
-    speechSynthesis.cancel();
-  } catch { /* An unavailable synthesis engine is already stopped. */ }
-}
-
-/** Device preference only — which installed voice reads aloud. NOT learner
- * state: it lives beside the store, never inside it, like a display dial
- * that belongs to the hardware rather than the learner. */
-const VOICE_PREF_KEY = 'kairo-voice-pref-v1';
-
-/* The device voices a learner may pick from (operator, 2026-09-17: "the basic
- * computer voice needs to NOT BE AN OPTION AT ALL"). Apple's novelty and
- * Eloquence voices announce themselves as ja-JP but read Japanese as noise;
- * they never appear. The compact default (Kyoko compact) appears only when
- * the device holds nothing better. */
-const NOVELTY_VOICE_NAMES = new Set([
-  'albert', 'bad news', 'bahh', 'bells', 'boing', 'bubbles', 'cellos', 'eddy', 'flo', 'fred',
-  'good news', 'grandma', 'grandpa', 'jester', 'junior', 'kathy', 'organ', 'ralph', 'reed', 'rocko',
-  'sandy', 'shelley', 'superstar', 'trinoids', 'whisper', 'wobble', 'zarvox',
-]);
-function isNoveltyVoice(v) {
-  const uri = String(v.voiceURI || '').toLowerCase();
-  const name = String(v.name || '').toLowerCase().replace(/\s*\(.*\)$/, '').trim();
-  return uri.includes('eloquence') || uri.includes('novelty') || NOVELTY_VOICE_NAMES.has(name);
-}
-function isCompactVoice(v) {
-  const uri = String(v.voiceURI || '').toLowerCase();
-  return uri.includes('.compact.') || /\bcompact\b/i.test(String(v.name || ''));
-}
-function jaVoices() {
-  try {
-    const ja = speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja') && !isNoveltyVoice(v));
-    const better = ja.filter((v) => !isCompactVoice(v));
-    return better.length ? better : ja;
-  } catch {
-    return [];
-  }
-}
-
-/** A short audible proof that the picked voice is the one that reads — the
- * operator heard no change when switching voices (2026-09-17). */
-function previewDeviceVoice(voice) {
-  try {
-    if (!('speechSynthesis' in window) || !voice) return false;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance('この声で読みます。');
-    u.lang = 'ja-JP';
-    u.voice = voice;
-    u.rate = 0.92;
-    speechSynthesis.speak(u);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function bestJaVoice() {
-  const voices = jaVoices();
-  if (!voices.length) return null;
-  // the operator's own pick outranks the guesswork (real-phone escalation,
-  // 2026-08-20: the default compact voice is unbearable — surface the
-  // better voices the device already holds)
-  try {
-    const pref = localStorage.getItem(VOICE_PREF_KEY);
-    const chosen = pref && voices.find((v) => v.voiceURI === pref);
-    if (chosen) return chosen;
-  } catch { /* A device preference failure falls back to the installed voices. */ }
-  const score = (v) => (/(premium|enhanced|siri|拡張)/i.test(v.name) ? 2 : 0) + (v.localService ? 1 : 0);
-  return [...voices].sort((a, b) => score(b) - score(a))[0];
 }
 
 /** Speak the passage sentence by sentence — short utterances keep 止める
@@ -7106,7 +7022,8 @@ function speakPassage(p, onDone) {
   ensureRecManifest().then((m) => {
     if (!current()) return;
     const rec = m && m.sentences ? m.sentences[p.id] : null;
-    if (rec && rec.have && rec.have.length) {
+    // the shelf sentences exist only in アミ's recording: they play only when she was chosen
+    if (rec && rec.have && rec.have.length && recVoicePref() === 'ami') {
       let i = 0;
       const next = () => {
         if (!current()) return;
@@ -7122,10 +7039,8 @@ function speakPassage(p, onDone) {
             // a browser without the codec (or a missing file) must not leave
             // the reader silent: the very first clip failing hands the whole
             // passage to the device voice; a mid-passage failure stops honestly
-            if (i === 0) {
-              speakPassageTts(p, onDone, generation);
-              return;
-            }
+            // no device-voice fallback (operator, 09-17: the computer voice must not be an option)
+            readAloud.failed = i === 0;
             readAloud.on = false;
             onDone();
             return;
@@ -7137,51 +7052,12 @@ function speakPassage(p, onDone) {
       next();
       return;
     }
-    speakPassageTts(p, onDone, generation);
+    // nothing recorded in a chosen voice: stop honestly; the listen row says why
+    readAloud.on = false;
+    onDone();
   });
 }
 
-function speakPassageTts(p, onDone, generation) {
-  const current = () => readAloud.on && readAloud.generation === generation;
-  if (!current()) return;
-  readAloud.usingDeviceVoice = true;
-  if (S.view === 'reader') render();
-  const text = (p.text || '').replace(/\s+/g, ' ').trim();
-  const sentences = text.match(/[^。！？]+[。！？]?/g) || [];
-  let i = 0;
-  const next = () => {
-    if (!current()) return;
-    if (i >= sentences.length) {
-      readAloud.on = false;
-      onDone();
-      return;
-    }
-    const u = new SpeechSynthesisUtterance(sentences[i]);
-    // lang alone is enough for the platform to pick its Japanese voice; the
-    // explicit pick (re-resolved per sentence, since the list arrives late on
-    // phones) only upgrades it to the best one installed
-    u.lang = 'ja-JP';
-    const voice = bestJaVoice();
-    if (voice) u.voice = voice;
-    u.rate = 0.92;
-    u.onend = () => {
-      if (!current()) return;
-      i += 1;
-      // a breath between sentences, the way a reader breathes
-      readAloud.timer = setTimeout(next, 260);
-    };
-    u.onerror = (e) => {
-      if (!current()) return;
-      const wasOn = readAloud.on;
-      readAloud.on = false;
-      // cancel() surfaces here on some engines — a stop is not a failure
-      if (wasOn && e?.error !== 'canceled' && e?.error !== 'interrupted') readAloud.failed = true;
-      onDone();
-    };
-    speechSynthesis.speak(u);
-  };
-  next();
-}
 
 /* ------------------------------------------------ 収録の声 the recorded voice
  * Interim roster, NOT operator-chosen: 小春音アミ · F1 · 四国めたん · ずんだもん ·
@@ -7202,10 +7078,12 @@ let recAudioEl = null;
 
 function recVoicePref() {
   try {
+    // no automatic voice: アミ and the device voice were both rejected by the operator
+    // (09-19, 09-17); a recorded voice plays only once the learner has chosen it
     const v = localStorage.getItem(REC_VOICE_KEY);
-    return REC_ROSTER.includes(v) ? v : 'ami';
+    return REC_ROSTER.includes(v) ? v : null;
   } catch {
-    return 'ami';
+    return null;
   }
 }
 
@@ -7274,34 +7152,22 @@ function playRecClip(src, btn) {
 function speakCardReading(text, btn, word) {
   ensureRecManifest().then((m) => {
     const entry = m && word && m.words ? m.words[word] : null;
-    if (entry) {
-      const pref = recVoicePref();
-      const voice = entry.voices.includes(pref) ? pref : entry.voices.includes('ami') ? 'ami' : entry.voices[0];
-      if (voice) {
-        playRecClip(`audio/w/${voice}/${entry.id}.m4a`, btn).then((played) => {
-          if (!played) speakCardReadingTts(text, btn);
-        });
-        return;
-      }
+    const pref = recVoicePref();
+    if (entry && pref && entry.voices.includes(pref)) {
+      playRecClip(`audio/w/${pref}/${entry.id}.m4a`, btn).then((played) => {
+        if (!played && btn) btn.title = tx('この環境では再生できませんでした', 'This recording could not play here');
+      });
+      return;
     }
-    speakCardReadingTts(text, btn);
+    // no chosen voice, or no recording in it: say so, never fall back to the device voice
+    if (btn) {
+      btn.dataset.voiceUnavailable = pref ? 'not-recorded' : 'no-voice';
+      btn.title = pref ? tx('この語は選んだ声でまだ収録されていません', 'Not yet recorded in your chosen voice')
+        : tx('声がまだ選ばれていません（読み物の「聞く」から選べます）', 'No voice chosen yet — choose one beside a reading’s listen button');
+    }
   });
 }
 
-function speakCardReadingTts(text, btn) {
-  if (!('speechSynthesis' in window) || !text) return;
-  try {
-    speechSynthesis.cancel();
-  } catch { /* The new utterance may still use an available device engine. */ }
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP';
-  const voice = bestJaVoice();
-  if (voice) u.voice = voice;
-  u.rate = 0.9;
-  u.onstart = () => btn.classList.add('is-speaking');
-  u.onend = u.onerror = () => btn.classList.remove('is-speaking');
-  speechSynthesis.speak(u);
-}
 
 function renderReader(main) {
   const p = passage();
@@ -7382,25 +7248,34 @@ function renderReader(main) {
   listen.setAttribute('aria-pressed', String(readAloud.on));
   const listenNote = el('span', 'listen-note');
   listenNote.id = 'listen-note';
+  const voiceNames = { ami: '小春音アミ', f1: 'F1', metan: '四国めたん', zundamon: 'ずんだもん', takehiro: '玄野武宏' };
+  const pref = recVoicePref();
+  const passageRecorded = !!(recManifest?.sentences?.[p.id]?.have?.length);
+  // No device voice (operator, 2026-09-17: "needs to NOT BE AN OPTION AT ALL") and no automatic
+  // voice (アミ rejected, 2026-09-19). The listen door opens only for a passage recorded in the
+  // voice the learner chose; every voice here is interim until his audition.
+  const playable = passageRecorded && pref === 'ami';
+  listen.disabled = !playable && !readAloud.on;
+  listenNote.dataset.recorded = String(passageRecorded);
   listenNote.textContent = readAloud.on
-    ? tx('仮の声で読んでいます', 'reading in the interim device voice')
+    ? tx('小春音アミの合成音声で再生中（仮の声・検収前）', 'playing Koharune Ami’s synthetic voice (interim, not yet chosen)')
     : readAloud.failed
-      ? tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet')
-      : tx('仮の声 — 検収前', 'interim device voice, for now');
+      ? tx('この環境では収録を再生できませんでした', 'The recording could not play here')
+      : !recManifest
+        ? tx('収録音声を確認しています…', 'Checking for recordings…')
+        : !passageRecorded
+          ? tx('この記事の収録音声はまだありません', 'No recorded voice for this article yet')
+          : pref === 'ami'
+            ? tx('合成音声：小春音アミ（仮の声・検収前）', 'synthetic voice: Koharune Ami (interim, not yet chosen)')
+            : tx('この記事は小春音アミ（仮の声・検収前）の収録だけです。聞くには下で選んでください。',
+              'This article is recorded only in Koharune Ami (interim, not yet chosen). Choose her below to listen.');
   listen.addEventListener('click', () => {
     if (readAloud.on) {
       stopReadAloud();
       render();
       return;
     }
-    if (!('speechSynthesis' in window)) {
-      listenNote.textContent = tx('この端末は読み上げに対応していない', 'this device cannot read aloud');
-      return;
-    }
-    // An empty getVoices() list is NOT "no voice" — phones deliver the list
-    // asynchronously, and gating on it kept every first tap silent. Speak:
-    // u.lang picks the platform's Japanese voice even before the list lands,
-    // and a genuine failure surfaces through readAloud.failed instead.
+    if (!playable) return;
     readAloud.failed = false;
     readAloud.usingDeviceVoice = false;
     readAloud.on = true;
@@ -7410,95 +7285,35 @@ function renderReader(main) {
     render();
   });
   listenRow.append(listen, listenNote);
-  // the device's other Japanese voices, surfaced (operator escalation,
-  // 2026-08-20): the compact default is the worst voice a phone holds —
-  // when better ones are installed, the hand picks; the choice is a device
-  // preference (its own key, never the learner store), and the next
-  // sentence already speaks with it because speakPassage re-resolves
-  //
-  // The roster picker belongs only to a passage that HAS recordings (the 77
-  // curated readings). A news or archive article has none and reads in the
-  // device voice — the picker must say so instead of offering アミ and then
-  // playing Kyoko (operator, 2026-09-18: "no matter what voice i click on it
-  // is the exact same mechanical female voice").
-  const passageRecorded = !!(recManifest?.sentences?.[p.id]?.have?.length);
-  if (recManifest && !passageRecorded) {
-    listenNote.textContent = readAloud.on
-      ? tx('この記事に収録音声はまだない — 端末の声で読んでいます', 'no recorded voice for this article yet — reading in the device voice')
-      : readAloud.failed
-        ? tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet')
-        : tx('この記事に収録音声はまだない — 端末の声で読む', 'no recorded voice for this article yet — the device voice reads it');
-    listenNote.dataset.recorded = 'false';
-  } else if (recManifest) listenNote.dataset.recorded = 'true';
-  if (recManifest && passageRecorded) {
-    // the roster: which recorded voice speaks the WORDS (sentences are
-    // always アミ, the primary — the one voice that recorded the shelf)
-    const names = { ami: '小春音アミ', f1: 'F1', metan: '四国めたん', zundamon: 'ずんだもん', takehiro: '玄野武宏' };
+  if (recManifest) {
+    // the interim roster, chosen explicitly — never preselected, never presented as approved
     const pick = document.createElement('select');
     pick.className = 'listen-voice';
     pick.id = 'listen-voice';
-    pick.setAttribute('aria-label', tx('語の声を選ぶ', 'choose the word voice'));
+    pick.setAttribute('aria-label', tx('声を選ぶ（仮の声・検収前）', 'choose a voice (interim, not yet chosen)'));
+    if (!pref) {
+      const none = document.createElement('option');
+      none.value = '';
+      none.textContent = tx('声を選ぶ…', 'Choose a voice…');
+      none.selected = true;
+      pick.append(none);
+    }
     for (const v of REC_ROSTER) {
       const opt = document.createElement('option');
       opt.value = v;
-      opt.textContent = names[v] || v;
-      if (v === recVoicePref()) opt.selected = true;
+      opt.textContent = tx(`${voiceNames[v] || v}（仮・検収前）`, `${voiceNames[v] || v} (interim)`);
+      if (v === pref) opt.selected = true;
       pick.append(opt);
     }
     pick.addEventListener('change', () => {
       try {
-        localStorage.setItem(REC_VOICE_KEY, pick.value);
-      } catch { /* Keep the current voice for this session if preferences cannot save. */ }
+        if (pick.value) localStorage.setItem(REC_VOICE_KEY, pick.value);
+        else localStorage.removeItem(REC_VOICE_KEY);
+      } catch { /* the choice lasts this session if preferences cannot save */ }
+      if (readAloud.on) stopReadAloud();
+      render();
     });
     listenRow.append(pick);
-    // the roster's name never papers over a real failure: after a device
-    // that could play nothing, the honest no-voice note stands
-    if (recManifest.sentences && recManifest.sentences[p.id] && !readAloud.failed && !(readAloud.on && readAloud.usingDeviceVoice)) {
-      listenNote.textContent = readAloud.on
-        ? tx('小春音アミの合成音声で再生中', 'playing Koharune Ami’s synthetic voice')
-        : tx('合成音声：小春音アミ', 'synthetic voice: Koharune Ami');
-    }
-  } else {
-    // no recording for this passage (or no manifest at all): the device
-    // voices, filtered, with a preview on change
-    const voiceChoices = jaVoices();
-    if (voiceChoices.length > 1) {
-      const pick = document.createElement('select');
-      pick.className = 'listen-voice';
-      pick.id = 'listen-voice';
-      pick.setAttribute('aria-label', tx('読み上げの声を選ぶ', 'choose the reading voice'));
-      const current = bestJaVoice();
-      for (const v of voiceChoices) {
-        const opt = document.createElement('option');
-        opt.value = v.voiceURI;
-        opt.textContent = v.name;
-        if (current && v.voiceURI === current.voiceURI) opt.selected = true;
-        pick.append(opt);
-      }
-      pick.addEventListener('change', () => {
-        try {
-          localStorage.setItem(VOICE_PREF_KEY, pick.value);
-        } catch { /* Keep the current voice for this session if preferences cannot save. */ }
-        // the change must be heard, not trusted: a one-line preview in the
-        // picked voice, and the running read-aloud restarts with it
-        const chosen = jaVoices().find((v) => v.voiceURI === pick.value) || null;
-        if (readAloud.on) {
-          stopReadAloud();
-          readAloud.on = true;
-          speakPassage(p, () => {
-            if (S.view === 'reader') render();
-          });
-        } else {
-          previewDeviceVoice(chosen);
-        }
-        listenNote.textContent = chosen
-          ? tx(`端末の声：${chosen.name}`, `device voice: ${chosen.name}`)
-          : tx('仮の声 — 検収前', 'interim device voice, for now');
-      });
-      listenRow.append(pick);
-    } else if (voiceChoices.length === 1) {
-      listenNote.textContent = tx(`端末の声：${voiceChoices[0].name}`, `device voice: ${voiceChoices[0].name}`);
-    }
   }
   main.append(listenRow);
   renderTeacherDoor(main, () => {
@@ -17256,11 +17071,12 @@ function renderReview(main) {
     const spoken = backc.reading || (item.t === 'kanji' ? '' : item.label);
     const row = el('div', 'review-reading-row reveal r-1');
     if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
-    if ('speechSynthesis' in window && spoken) {
+    if (spoken) {
       const say = el('button', 'say');
       say.type = 'button';
       say.id = 'card-say';
-      say.setAttribute('aria-label', tx('読み上げ — 仮の声', 'speak the reading (interim device voice)'));
+      // recorded clips only, in the voice the learner chose (interim until the audition)
+      say.setAttribute('aria-label', tx('読み上げ — 選んだ仮の声（収録）', 'speak the reading (your chosen interim recorded voice)'));
       say.innerHTML =
         '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
       say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
