@@ -53,7 +53,7 @@ const railVisible = (page) => page.evaluate(() => {
 });
 const reportOpen = (page) => page.evaluate(() => !!document.querySelector('#bunki-reports-root dialog.br-sheet[open]'));
 async function closeReport(page) {
-  await page.locator('#bunki-reports-root [data-br="close"]').click();
+  await page.locator('#bunki-reports-root .br-close').click();
   await page.waitForFunction(() => !document.querySelector('#bunki-reports-root dialog.br-sheet[open]'), null, { timeout: 5_000 });
 }
 
@@ -90,18 +90,26 @@ try {
       check(`R2 ${w}px shelf: the footer entry opens the report dialog`, await reportOpen(page));
       await closeReport(page);
     }
-    const reading = page.locator('.shelf-item .shelf-open').first();
+    const reading = page.locator('.shelf-item:not([data-recommendation]) .shelf-open').first();
     await reading.click();
-    await page.waitForFunction(() => document.querySelector('#app')?.querySelector('.reader, .tok'), null, { timeout: 10_000 }).catch(() => {});
-    const inReader = await page.evaluate(() => !!document.querySelector('.reader .tok, .reader'));
+    // the reader's text arrives asynchronously and re-renders once; wait for it to hold still
+    const inReader = await page.waitForFunction(() => {
+      const n = document.querySelectorAll('#reader .tok.content').length;
+      const settled = n > 0 && window.__reportTokN === n; window.__reportTokN = n; return settled;
+    }, null, { timeout: 15_000, polling: 250 }).then(() => true, () => false);
     check(`R2 ${w}px shelf: a reading door still opens its passage (host control clickable)`, inReader);
     check(`R1 ${w}px reader: no floating report rail is visible`, !(await railVisible(page)));
 
     // R3 word sheet
-    const token = page.locator('.reader button.tok').first();
+    const token = page.locator('#reader .tok.content').nth(3);
     if (await token.count()) {
-      await token.click();
-      await page.waitForSelector('#sheet', { timeout: 10_000 }).catch(() => {});
+      // a word's full sheet opens on a press-and-hold, as a finger does it (2.4 s)
+      await token.scrollIntoViewIfNeeded();
+      const box = await token.boundingBox();
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down(); await page.waitForTimeout(2400); await page.mouse.up();
+      const opened = await page.waitForSelector('#sheet', { timeout: 10_000 }).then(() => true, () => false);
+      check(`R3 ${w}px sheet: a press-and-hold opens the word sheet`, opened);
       const sheetEntry = page.locator('#sheet .report-line [data-report-entry="open"]');
       check(`R1 ${w}px sheet: no floating report rail is visible`, !(await railVisible(page)));
       check(`R3 ${w}px sheet: the entry sits at the end of the sheet`, (await sheetEntry.count()) === 1);
@@ -114,7 +122,7 @@ try {
       await page.locator('#sheet-back').click();
       const sheetGone = await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 }).then(() => true, () => false);
       check(`R3 ${w}px sheet: its own back control still closes the sheet`, sheetGone);
-    } else check(`R3 ${w}px sheet: a word token to open`, false, 'no .reader button.tok');
+    } else check(`R3 ${w}px sheet: a word token to open`, false, 'no #reader .tok.content');
     await page.screenshot({ path: resolve(EVIDENCE, `report-entries-${w}.png`), fullPage: false });
 
     // R4 front door navigation strip
