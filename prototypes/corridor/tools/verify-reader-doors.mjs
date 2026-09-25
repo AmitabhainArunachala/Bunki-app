@@ -46,6 +46,20 @@
  *      the stopReadAloud() the D22 fix adds on this return is unobserved. Not covered: the learning
  *      source route (元の文を読む → reader-source-back, D22b, fixed and tested separately), the
  *      same-passage detour (its marks stay as they are, by design), and nested detours.
+ *   D6 the learning-source return (D22b), dials 0,1,0. First the record gets one saved word, わかる,
+ *      whose encounter is ごん狐's sentence 2347–2356 (わかる at 2351). It enters through the real
+ *      importer (record-fixture-support's restoreAppFixture). The encounter is built by the served
+ *      candidate's own teacher-context.mjs, so its content-derived id is the one this candidate
+ *      verifies. Then, in ONE document: home やまなし takes the same marks as in D5 (token 3 底,
+ *      home-only). わかる's sheet, opened from token 293 through its focus actions, shows the saved
+ *      encounter. 元の文を読む visits ごん狐 at token 2351, where token 1 これ (colliding with home's
+ *      unmarked 谷川) takes two taps. reader-source-back returns home under the sheet the visit
+ *      left from, and ends the visit; 戻る closes that sheet. The same oracle as D5 applies: home's
+ *      marks exact under the sheet and with it closed (a clear-all fails), 谷川 not lit and its
+ *      label exact (the leak fails), a tap on 谷川 shows exactly たにがわ, and no reading door in
+ *      home shows English. Controls m6, m7 (below). Scope: this route only. No read-aloud claim:
+ *      the D22b stopReadAloud() is unobserved. Not covered: the review and sentence-practice
+ *      callers of 元の文を読む, source-reader (capture) and publisher visits, nested visits.
  *
  * Token taps and D1's doors go to coordinates (page.mouse), not locator.click: Playwright
  * retries a locator click when another element would receive it, which hides exactly the D1
@@ -59,9 +73,11 @@
  * served in its place. Each control declares the rows that establish its schedule (requires), the
  * witness rows it must fail (kills) and the only other rows allowed to fail with it (allowed).
  * Its run must record exactly the schedule's rows (RUN_ROWS), once each, with every other row
- * passing, against a candidate that passes those same rows once each. Otherwise the control is
- * `incomplete` (setup or identity failure, page error, edit never served, schedule not
- * established, rows never reached, an unclean candidate or baseline) or `contaminated`
+ * passing, against a candidate that passes those same rows once each and whose fixture row for
+ * that schedule (RUN_FIXTURE: D2/D4/D5/D6.fixture, the candidate's alone) passed exactly once.
+ * Otherwise the control is `incomplete` (setup or identity failure, a failed candidate fixture, page
+ * error, edit never served, schedule not established, rows never reached, an unclean candidate or
+ * baseline) or `contaminated`
  * (duplicate or extra rows, an unallowed failure, witnesses failing other than as declared),
  * never a kill. Each control adds one `C` row (pass = killed). Its own rows are evidence about
  * the mutant, kept in the receipt's `controls`, and do not enter the verdict.
@@ -89,16 +105,23 @@
  *   m5  the restore's two assignments replaced by clearing every mark: nothing leaks, but home's
  *       own mark is lost → D5.home-marks-restored fails, having come back with no marks at all.
  *       Allowed: nothing else (谷川 stays unlit, and its tap and English rows must pass).
+ *   m6  restoreLearningSourceCaller's D22b block removed: the source return of 1561ff95. Home comes
+ *       back showing exactly ごん狐's marks → D6.home-marks-restored and D6.away-index-not-lit fail.
+ *       Allowed: D6.named-toggle. D6.named-no-english must pass.
+ *   m7  D22b's two assignments replaced by clearing every mark → only D6.home-marks-restored fails,
+ *       having come back with no marks at all. Allowed: nothing else.
+ *       D6's English row has no control of its own here: the painter's English defect is controlled
+ *       on D4 (m2) and D5 (m4).
  *   r1  aozora:046605 token 1 served read たにかわ (r and ruby): a consistent wrong reading, the
  *       kind the old oracle (any ruby, toggled consistently) accepted → D2.f1/f0
  *       visible-reading and accessible-reading all fail, having shown たにかわ as ruby and as the
  *       whole label. Allowed: nothing else.
  *
  * Scope: desktop Chromium only (chromium.launch; no WebKit), the bilingual UI (ui=bi, pinned for
- * D2, D4 and D5; the product default), mouse clicks at coordinates and keyboard Enter/Space. Not
+ * D2, D4, D5 and D6; the product default), mouse clicks at coordinates and keyboard Enter/Space. Not
  * the 日本語のみ UI (ui=ja), whose door label is Japanese. D1's 390×844 is a narrow window driven by the mouse,
  * not touch: real mobile touch input on a reading door (and WebKit) stays pending. Dials: D2
- * 0,1,0 and 0,0,0; D3 0,2,0 and 2,1,0; D4 and D5 0,1,0. Not covered: kanji 1 with an
+ * 0,1,0 and 0,0,0; D3 0,2,0 and 2,1,0; D4, D5 and D6 0,1,0. Not covered: kanji 1 with an
  * all-converted token, spacing 1 and 2, reading doors other than the fixture token.
  *
  * Receipt: reader-doors.json is written from `finally`, with every row, each control's record
@@ -116,9 +139,11 @@ import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { chromium } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { restoreAppFixture } from './record-fixture-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -174,6 +199,13 @@ const D5 = Object.freeze({ home: PASSAGE_B, away: PASSAGE_A, awaySource: '青空
   known: Object.freeze({ index: 3, token: Object.freeze({ s: '底', b: '底', p: '名詞', r: 'そこ', f: [{ t: '底', r: 'そこ' }], c: true }) }),
   word: Object.freeze({ index: 293, token: Object.freeze({ s: 'わから', b: 'わかる', p: '動詞', r: 'わから', f: [{ t: 'わから' }], c: true }) }),
   awaySentence: Object.freeze({ start: 2347, at: 2351 }) });
+// D6 (D22b): the saved word わかる, whose encounter is that same ごん狐 sentence, tokens 2347–2356 (わかる at 2351).
+// The literals are read from the committed article and index row (2026-09-25). The reader is やまなし again, with D5's
+// home-only index (3) and colliding index (1).
+const D6 = Object.freeze({ home: D5.home, away: D5.away, word: D5.word, savedAt: Date.parse('2026-09-25T00:00:00Z'),
+  encounter: Object.freeze({ sourceKind: 'bundled-passage', sourceId: PASSAGE_A, unit: 'token-index', start: 2347, end: 2357, index: 2351,
+    quote: '」「それがわからんのだよ。', title: 'ごん狐', attribution: '青空文庫 新美南吉「ごん狐」',
+    url: 'https://www.aozora.gr.jp/cards/000121/card628.html', target: Object.freeze({ type: 'word', id: 'わかる' }) }) });
 
 // The controls' literal edits. Each `from` was counted exactly once in 9ceb139e's corridor.js and
 // aozora-046605.json; the served bytes are edited, never the checkout.
@@ -190,6 +222,13 @@ const EDITS = Object.freeze({
   clearall: Object.freeze({ file: 'corridor.js',
     from: '    S.revealed = home.revealed ? new Set(home.revealed) : null;\n    S.glossed = home.glossed ? new Set(home.glossed) : null;\n',
     to: '    S.revealed = new Set(); S.glossed = new Set();\n' }),
+  // D22b's block in restoreLearningSourceCaller, counted exactly once in 5d9d4cdd's corridor.js (7fdaa61c) and absent from
+  // 1561ff95's; then its two assignments, for a return that clears instead of restoring
+  visitRestore: Object.freeze({ file: 'corridor.js', from: '  if (visit.sourceState.passageId !== S.passageId) {\n    stopReadAloud();\n'
+    + '    S.revealed = visit.revealed ? new Set(visit.revealed) : null;\n    S.glossed = visit.glossed ? new Set(visit.glossed) : null;\n  }\n', to: '' }),
+  visitClearall: Object.freeze({ file: 'corridor.js',
+    from: '    S.revealed = visit.revealed ? new Set(visit.revealed) : null;\n    S.glossed = visit.glossed ? new Set(visit.glossed) : null;\n',
+    to: '    S.revealed = new Set(); S.glossed = new Set();\n' }),
 });
 // Every row one D4 walk or one D2 pair records, by id. A control's run must produce exactly these, once each, and the
 // candidate must pass all of them, once each, before any mutant can be said to differ from it.
@@ -200,7 +239,11 @@ const RUN_ROWS = Object.freeze({
     'neighbour-unchanged', 'no-navigation', 'label-names-reading'].map((row) => `D2.f${f}.${row}`))),
   d5: Object.freeze(['D5.home-marks', 'D5.detour', 'D5.away-marks', 'D5.returned', 'D5.home-marks-restored',
     'D5.away-index-not-lit', 'D5.named-toggle', 'D5.named-no-english']),
+  d6: Object.freeze(['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned', 'D6.home-marks-restored',
+    'D6.away-index-not-lit', 'D6.named-toggle', 'D6.named-no-english']),
 });
+// The candidate-only fixture row each schedule's controls stand on: it must have passed exactly once before any kill counts.
+const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d4: 'D4.fixture', d5: 'D5.fixture', d6: 'D6.fixture' });
 // requires: rows that establish the schedule. kills: witness rows that must fail, as `witness` describes.
 // allowed: the only other rows that may fail. Every remaining row of the run must pass.
 const CONTROLS = Object.freeze([
@@ -248,6 +291,20 @@ const CONTROLS = Object.freeze([
     // clearing leaks nothing: 谷川 stays unlit, and its tap and English rows must all still pass
     allowed: [],
     witness: (rows) => (canonical(rows.get('D5.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [], glossed: [] })
+      ? '' : 'home did not come back with no marks at all') }),
+  Object.freeze({ name: 'm6', title: 'the D22b restore removed from restoreLearningSourceCaller (the source return of 1561ff95)', edits: ['visitRestore'], run: 'd6',
+    requires: ['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned'],
+    kills: ['D6.home-marks-restored', 'D6.away-index-not-lit'],
+    // 谷川 comes back revealed by ごん狐's mark, so its tap hides the reading; D6.named-no-english must still pass
+    allowed: ['D6.named-toggle'],
+    witness: (rows) => (canonical(rows.get('D6.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [A_TOKEN.index], glossed: [] })
+      ? '' : `home did not come back showing exactly ${D6.away}'s mark at index ${A_TOKEN.index}`) }),
+  Object.freeze({ name: 'm7', title: 'the D22b restore replaced by clearing every mark on the source return', edits: ['visitClearall'], run: 'd6',
+    requires: ['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned'],
+    kills: ['D6.home-marks-restored'],
+    // clearing leaks nothing: only the restore row may die
+    allowed: [],
+    witness: (rows) => (canonical(rows.get('D6.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [], glossed: [] })
       ? '' : 'home did not come back with no marks at all') }),
 ]);
 
@@ -573,14 +630,127 @@ async function d5Detour(page, rec) {
     toggle.done && [namedAtReturn, namedUncovered, namedAfter].every((view) => view && view.gloss === null && !view.hasEn), JSON.stringify(glosses), { glosses });
 }
 
+/** The saved word enters through the real importer (record-fixture-support's restoreAppFixture, the existing convention).
+ * Its encounter is built by the SERVED candidate's own teacher-context.mjs, so the content-derived id is the one this
+ * candidate verifies. The source digest is computed here from the served article. */
+async function seedSavedEncounter(page) {
+  const away = await servedJson(page, A_TOKEN.file);
+  const sourceDigest = sha256(Buffer.from(JSON.stringify((away?.tokens || []).map((token) => token.s)), 'utf8'));
+  const teacher = await import(pathToFileURL(resolve(SITE, 'teacher-context.mjs')).href);
+  const encounter = await teacher.createTeacherContext({ ...D6.encounter, target: { ...D6.encounter.target }, sourceDigest });
+  const saved = { t: 'word', id: D6.word.token.b, label: D6.word.token.b, kind: '語', kindEn: 'word', from: null,
+    ts: D6.savedAt, started: D6.savedAt, sourceContextRef: encounter.id };
+  await restoreAppFixture(page, { v: 1, taken: [saved], teacherContexts: { version: 1, activeRef: null, entries: [encounter] } });
+  return encounter;
+}
+
+/** D6: after seeding, in one document, home takes its own marks. わかる's sheet shows the saved encounter; 元の文を読む
+ * visits ごん狐 and marks index 1 there; reader-source-back returns home (D22b). */
+async function d6Visit(page, rec) {
+  await seedSavedEncounter(page);
+  await page.goto(`${origin}/index.html${D4_QUERY}`); await ready(page);
+  const marker = await page.evaluate(() => (window.__readerDoorsDocument = `${Date.now()}-${Math.random().toString(36).slice(2)}`));
+  const sameDocument = () => page.evaluate((value) => window.__readerDoorsDocument === value, marker);
+  const frames = () => page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+  await openFromShelf(page, D6.home);
+  const clean = await readerMarks(page);
+  const knownTaps = [];
+  for (let i = 0; i < 2; i++) knownTaps.push(await tapCentre(page, D5.known.index));
+  await page.waitForFunction((i) => !!document.querySelector(`#reader .tok[data-index="${i}"] .tok-en`), String(D5.known.index), { timeout: 3_000 })
+    .catch(() => {});
+  const homeBefore = await readerMarks(page);
+  const known = await tokenState(page, D5.known.index), named = await tokenState(page, DOOR.index);
+  rec('D6.home-marks', `D6 ${D6.home} opens unmarked; two taps leave token ${D5.known.index} ${D5.known.token.s} revealed (${D5.known.token.r}) and glossed, its only marks; token ${DOOR.index} ${SURFACE} is the hidden reading door`,
+    canonical(markSets(clean)) === canonical({ lit: [], glossed: [] }) && knownTaps.every((tap) => tap.done)
+      && canonical(markSets(homeBefore)) === canonical({ lit: [D5.known.index], glossed: [D5.known.index] })
+      && known?.visibleRuby === D5.known.token.r && typeof known.gloss === 'string' && known.gloss.trim() !== ''
+      && named?.tag === 'button' && classes(named).includes('named') && named.visibleRuby === '' && named.label === doorLabel(),
+    JSON.stringify({ clean: markSets(clean), homeBefore: markSets(homeBefore), known, named, knownTaps }));
+
+  const visit = { word: (await tokenState(page, D6.word.index))?.surface ?? null, quote: null, anchor: null, sourceBack: false };
+  let step = `focus token ${D6.word.index}`;
+  try {
+    // the sheet opens through the token's own actions (focus without a press shows 全項目; nothing climbs the tap ladder)
+    await page.locator(`#reader .tok[data-index="${D6.word.index}"]`).focus();
+    step = '全項目';
+    const entry = page.locator('#reader .token-door').filter({ has: page.locator(`.tok[data-index="${D6.word.index}"]`) })
+      .locator('[data-action="entry.open"]');
+    await entry.waitFor({ state: 'visible', timeout: 5_000 });
+    await entry.click();
+    step = `the ${D6.word.token.b} sheet's saved encounter`;
+    await page.locator(`#sheet[data-node="word:${D6.word.token.b}"] .learning-source`).waitFor({ timeout: 10_000 });
+    const source = page.locator('#sheet .learning-source');
+    visit.quote = await source.locator('.teacher-source-quote').textContent();
+    if (!(await source.evaluate((node) => node.open))) await source.locator('summary').click();
+    step = '元の文を読む';
+    await page.locator('#learning-source-return').click();
+    step = `${D6.away} at the encounter`;
+    await page.waitForFunction((pid) => document.body.dataset.view === 'reader' && document.querySelector('.listen-row')?.dataset.passage === pid
+      && !document.querySelector('#sheet') && document.querySelector('#reader .tok'), D6.away, { timeout: 10_000 });
+    // openPassage restores the encounter's place in an animation frame: wait for its focus, so no later scroll moves a tap
+    await page.waitForFunction((i) => document.activeElement?.dataset?.index === i, String(D6.encounter.index), { timeout: 5_000 });
+    visit.anchor = D6.encounter.index;
+    visit.sourceBack = (await page.locator('#reader-source-back').count()) === 1;
+  } catch (error) {
+    throw new Error(`D6 source visit stopped at ${step}: ${error.message}`);
+  }
+  rec('D6.source-visit', `D6 ${D6.word.token.b}'s sheet, opened from token ${D6.word.index}, shows the saved encounter "${D6.encounter.quote}"; 元の文を読む opens ${D6.away} at token ${D6.encounter.index}, offering reader-source-back, in the same document`,
+    visit.word === D6.word.token.s && visit.quote === D6.encounter.quote && visit.anchor === D6.encounter.index && visit.sourceBack
+      && await sameDocument(), JSON.stringify(visit));
+
+  const awayClean = await readerMarks(page);
+  const awayTaps = [];
+  for (let i = 0; i < 2; i++) awayTaps.push(await tapCentre(page, A_TOKEN.index));
+  await page.waitForFunction((i) => !!document.querySelector(`#reader .tok[data-index="${i}"] .tok-en`), String(A_TOKEN.index), { timeout: 3_000 })
+    .catch(() => {});
+  const awayMarked = await readerMarks(page);
+  rec('D6.away-marks', `D6 ${D6.away} opens unmarked, and two taps leave its token ${A_TOKEN.index} ${A_TOKEN.token.s} (an index ${D6.home} has not revealed) revealed and glossed, its only marks`,
+    awayClean.passage === D6.away && canonical(markSets(awayClean)) === canonical({ lit: [], glossed: [] }) && awayTaps.every((tap) => tap.done)
+      && canonical(markSets(awayMarked)) === canonical({ lit: [A_TOKEN.index], glossed: [A_TOKEN.index] }) && !homeBefore.lit.includes(A_TOKEN.index),
+    JSON.stringify({ awayClean: markSets(awayClean), awayMarked: markSets(awayMarked), awayTaps }));
+
+  // reader-source-back: the visit returns home under the sheet it left from; 戻る only while a sheet is still open
+  await page.locator('#reader-source-back').click();
+  await page.waitForFunction((pid) => document.querySelector('.listen-row')?.dataset.passage === pid && document.querySelector('#reader .tok'),
+    D6.home, { timeout: 10_000 });
+  const namedEnglish = () => page.evaluate(() => document.querySelectorAll('#reader .tok.named .tok-en, #reader .tok.named.has-en').length);
+  const atReturn = await readerMarks(page), namedAtReturn = await tokenState(page, DOOR.index), englishAtReturn = await namedEnglish();
+  let presses = 0;
+  while (presses < 3 && (await page.locator('#sheet').count())) { await page.locator('#back').click(); presses += 1; }
+  const uncovered = await readerMarks(page), namedUncovered = await tokenState(page, DOOR.index), englishUncovered = await namedEnglish();
+  const visitGone = (await page.locator('#reader-source-back').count()) === 0;
+  rec('D6.returned', `D6 reader-source-back returns to ${D6.home} in the same document and ends the visit; closing the sheet it left from keeps ${D6.home}`,
+    atReturn.passage === D6.home && uncovered.passage === D6.home && uncovered.sheet === null && visitGone && await sameDocument(),
+    JSON.stringify({ atReturn: { passage: atReturn.passage, sheet: atReturn.sheet }, uncovered: { passage: uncovered.passage, sheet: uncovered.sheet }, presses, visitGone }));
+  rec('D6.home-marks-restored', `D6 ${D6.home}'s own marks come back exactly (token ${D5.known.index} revealed and glossed, nothing else), under the sheet and with it closed`,
+    canonical(markSets(atReturn)) === canonical(markSets(homeBefore)) && canonical(markSets(uncovered)) === canonical(markSets(homeBefore)),
+    JSON.stringify({ before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) }),
+    { before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) });
+  rec('D6.away-index-not-lit', `D6 ${D6.away}'s mark at index ${A_TOKEN.index} does not land on ${D6.home}'s ${SURFACE}: not lit, reading hidden, label exactly "${doorLabel()}"`,
+    [namedAtReturn, namedUncovered].every((view) => view && classes(view).includes('named') && !view.lit && view.visibleRuby === '' && view.label === doorLabel()),
+    JSON.stringify({ namedAtReturn, namedUncovered }));
+  // the closed sheet hands focus back in an animation frame: let that land, then move focus to the door itself
+  await frames();
+  await page.locator(`#reader .tok[data-index="${DOOR.index}"]`).focus().catch(() => {});
+  const toggle = await tapCentre(page, DOOR.index);
+  const namedAfter = await tokenState(page, DOOR.index), englishAfter = await namedEnglish();
+  rec('D6.named-toggle', `D6 a tap on ${D6.home}'s ${SURFACE} then shows exactly ${READING}, labelled exactly "${doorLabel(READING)}"`,
+    toggle.done && namedAfter?.visibleRuby === READING && namedAfter.label === doorLabel(READING), JSON.stringify({ namedAfter, toggle }));
+  const glosses = [namedAtReturn, namedUncovered, namedAfter].map((view) => view?.gloss ?? null);
+  rec('D6.named-no-english', `D6 no reading door in ${D6.home} shows English (${SURFACE} included): under the sheet, with it closed, or after ${SURFACE}'s tap`,
+    toggle.done && [namedAtReturn, namedUncovered, namedAfter].every((view) => view && view.gloss === null && !view.hasEn)
+      && englishAtReturn === 0 && englishUncovered === 0 && englishAfter === 0,
+    JSON.stringify({ glosses, named: [englishAtReturn, englishUncovered, englishAfter] }), { glosses });
+}
+
 /** killed only when the run is exactly the schedule: every row once, the witnesses failing as declared, only `allowed`
  * rows failing beside them. incomplete: the schedule never stood (setup, identity, page errors, rows not reached, a
  * candidate or baseline that is not clean). contaminated: it ran, but more changed than the declared mechanism. */
 function adjudicate(spec, control) {
   const expected = RUN_ROWS[spec.run];
   const declared = [...spec.requires, ...spec.kills, ...spec.allowed];
-  if (!expected || declared.some((id) => !expected.includes(id)) || new Set(declared).size !== declared.length)
-    return ['incomplete', 'declaration: requires, kills and allowed must be distinct rows of the run'];
+  if (!expected || !RUN_FIXTURE[spec.run] || declared.some((id) => !expected.includes(id)) || new Set(declared).size !== declared.length)
+    return ['incomplete', 'declaration: a run with a fixture row; requires, kills and allowed must be distinct rows of the run'];
   if (control.setupError) return ['incomplete', `setup: ${control.setupError}`];
   if (control.error) return ['incomplete', `stopped: ${control.error}`];
   if (control.pageErrors.length) return ['incomplete', `page errors in the mutant: ${JSON.stringify(control.pageErrors)}`];
@@ -590,7 +760,10 @@ function adjudicate(spec, control) {
     const base = controls.find((row) => row.name === spec.baseline);
     if (base?.verdict !== 'killed') return ['incomplete', `baseline ${spec.baseline} is not an admitted kill (${base?.verdict ?? 'absent'})`];
   }
-  // the mutant can only differ from a candidate that passes the same schedule, row for row
+  // the mutant can only differ from a candidate that passes the same schedule, row for row, on the fixture it was built
+  // for. The fixture row is the candidate's alone; a mutant run is never asked to repeat it.
+  const fixture = RUN_FIXTURE[spec.run], fixtureHits = results.filter((row) => row.id === fixture);
+  if (fixtureHits.length !== 1 || !fixtureHits[0].pass) return ['incomplete', `setup: the candidate's ${fixture} did not pass exactly once`];
   const unclean = expected.filter((id) => { const hits = results.filter((row) => row.id === id); return hits.length !== 1 || !hits[0].pass; });
   if (unclean.length) return ['incomplete', `the candidate does not pass these rows exactly once: ${unclean.join(', ')}`];
   const ids = control.rows.map((row) => row.id);
@@ -627,6 +800,7 @@ async function runControl(spec) {
     context = opened.context;
     if (spec.run === 'd4') await d4Walk(opened.page, rec);
     else if (spec.run === 'd5') await d5Detour(opened.page, rec);
+    else if (spec.run === 'd6') await d6Visit(opened.page, rec);
     else for (const furigana of [1, 0]) await d2Door(opened.page, rec, furigana);
   } catch (error) {
     control.error = error.message;
@@ -734,6 +908,26 @@ try {
         && index.articles.find((row) => row.id === D5.away)?.sourceLabel === D5.awaySource,
       JSON.stringify({ word, before: before?.s ?? null, order: [ids.indexOf(D5.away), ids.indexOf(D5.home)] }), { id: 'D5.fixture' });
     await d5Detour(page, record);
+    await context.close();
+  }
+
+  currentCase = 'D6';
+  {
+    const { context, page } = await openPage(DESK, D4_QUERY);
+    const away = await servedJson(page, A_TOKEN.file), home = await servedJson(page, DOOR.file);
+    const surfaces = (away?.tokens || []).map((token) => token.s), { encounter } = D6;
+    // the importer and resolveTeacherSource compare the encounter with the passage as the app holds it (index row + body)
+    const row = (await servedJson(page, 'data/articles/index.json'))?.articles?.find((entry) => entry.id === D6.away);
+    const p = { ...row, ...away };
+    check(`D6 fixture: ${D6.away} tokens ${encounter.start}–${encounter.end - 1} are the sentence "${encounter.quote}" with ${D6.word.token.b} at ${encounter.index}; its title, attribution and url are the encounter's; ${D6.home} token ${D6.word.index} is ${D6.word.token.s}`,
+      surfaces.slice(encounter.start, encounter.end).join('') === encounter.quote && '。！？'.includes(surfaces[encounter.start - 1] || '-')
+        && '。！？'.includes(surfaces[encounter.end - 1] || '-') && !surfaces.slice(encounter.start, encounter.end - 1).some((s) => '。！？'.includes(s))
+        && away?.tokens?.[encounter.index]?.b === encounter.target.id && away?.tokens?.[encounter.index]?.c === true
+        && (p.title || '') === encounter.title && (p.attribution || p.sourceLabel || '') === encounter.attribution && (p.url || null) === encounter.url
+        && canonical(home?.tokens?.[D6.word.index]) === canonical(D6.word.token),
+      JSON.stringify({ quote: surfaces.slice(encounter.start, encounter.end).join(''), title: p.title ?? null, attribution: p.attribution ?? null, url: p.url ?? null }),
+      { id: 'D6.fixture' });
+    await d6Visit(page, record);
     await context.close();
   }
 
