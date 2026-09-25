@@ -599,13 +599,14 @@ async function d5Detour(page, rec) {
       && canonical(markSets(awayMarked)) === canonical({ lit: [A_TOKEN.index], glossed: [A_TOKEN.index] }) && !homeBefore.lit.includes(A_TOKEN.index),
     JSON.stringify({ awayClean: markSets(awayClean), awayMarked: markSets(awayMarked), awayTaps }));
 
-  // 戻る: the frame returns home under the sheets the detour left from; 戻る again only while one of them is still open
+  // 戻る: the frame returns home under the sheets the detour left from; then the sheet's own 戻る (#sheet-back), only while one
+  // of them is still open — under a dialog the chrome's #back is inert behind the scrim (the layer law)
   await page.locator('#back').click();
   await page.waitForFunction((pid) => document.querySelector('.listen-row')?.dataset.passage === pid && document.querySelector('#reader .tok'),
     D5.home, { timeout: 10_000 });
   const atReturn = await readerMarks(page), namedAtReturn = await tokenState(page, DOOR.index);
   let presses = 0;
-  while (presses < 3 && (await page.locator('#sheet').count())) { await page.locator('#back').click(); presses += 1; }
+  while (presses < 3 && (await page.locator('#sheet').count())) { await page.locator('#sheet #sheet-back').click(); presses += 1; }
   const uncovered = await readerMarks(page), namedUncovered = await tokenState(page, DOOR.index);
   rec('D5.returned', `D5 戻る returns to ${D5.home} in the same document, and closing the sheets it left from keeps ${D5.home}`,
     atReturn.passage === D5.home && uncovered.passage === D5.home && uncovered.sheet === null && await sameDocument(),
@@ -720,7 +721,7 @@ async function d6Visit(page, rec) {
   const atReturn = await readerMarks(page), namedAtReturn = await tokenState(page, DOOR.index), englishAtReturn = await namedEnglish();
   const sheetsAtReturn = await page.evaluate(() => [...document.querySelectorAll('#sheet')].map((sheet) => sheet.dataset.node ?? null));
   const focusAtReturn = await page.evaluate(() => document.activeElement?.id || null);
-  const closed = await page.locator('#back').click({ timeout: 5_000 }).then(() => true, () => false);
+  const closed = await page.locator('#sheet #sheet-back').click({ timeout: 5_000 }).then(() => true, () => false);
   await frames();
   const sheetsAfterClose = await page.locator('#sheet').count();
   const focusAfterClose = await page.evaluate(() => {
