@@ -567,9 +567,25 @@ export function createAssessmentView(host) {
       selectedId = null; await host.dismiss(attempt.attemptId); refresh();
     }, 'take'));
   }
+  // A window that cannot write the record still owes the learner a room that
+  // says so. An empty main here was the blank JLPT room of 2026-09-24.
+  function renderUnowned(main) {
+    const state = host.recordState?.() || { kind: 'blocked', message: '' };
+    const card = node('section', 'room-state'); card.dataset.roomState = state.kind;
+    card.setAttribute('role', 'status');
+    card.append(node('h1', 'view-title', tx('JLPT 模試・練習', 'JLPT tests & practice')));
+    if (state.kind === 'booting') card.append(node('p', '', tx('記録を開いています…', 'Opening your notebook…')));
+    else if (state.kind === 'busy') card.append(node('p', '', state.message || tx('記録を読み込んでいます…', 'Restoring your notebook…')));
+    else {
+      card.append(node('p', '', tx('この窓では練習を始められません。', 'You can’t practise in this window right now.')));
+      if (state.message) card.append(node('p', 'room-state-why', state.message));
+      card.append(button(tx('この窓を再読み込み', 'Reload this window'), null, () => location.reload()));
+    }
+    main.append(card);
+  }
   return {
     render(main) {
-      if (!owned()) { stopAudio(); return true; }
+      if (!owned()) { stopAudio(); renderUnowned(main); return true; }
       if (legacyOpen) {
         main.append(button(tx('模試に戻る', 'Back to mock tests'), 'exam-close-legacy', () => { legacyOpen = false; refresh(); }));
         return false;

@@ -1988,6 +1988,14 @@ function recordReady(epoch = recordEpoch) {
 function recordWritable(epoch = recordEpoch) {
   return recordReady(epoch) && !storeSealed && !S.storeReadOnly;
 }
+/** Why a record room cannot write right now, in the learner's words. */
+function recordRoomState(epoch = recordEpoch) {
+  if (recordWritable(epoch)) return { kind: 'writable' };
+  if (storeSealed) return { kind: 'busy', message: tx('バックアップを読み込んでいます…', 'Restoring your backup…') };
+  if (S.storeReadOnly || recordDeparted || staleTab || S.storeError)
+    return { kind: 'blocked', message: S.storeError || '' };
+  return { kind: 'booting' };
+}
 function recordUnavailable() {
   invalidateRecordNoteViews();
   protectStore(
@@ -10045,7 +10053,7 @@ async function performAssessmentSuppression(command) {
 }
 function createAssessmentRoom() {
   return assessmentViewModule.createAssessmentView({ english: bi, render: () => { if (S.view === 'mock') render(); },
-    owned: recordWritable,
+    owned: recordWritable, recordState: recordRoomState,
     pending: () => assessmentV2Pending, notice: () => assessmentV2Notice,
     library: () => S.assessmentLibraryV2 && { ...S.assessmentLibraryV2,
       attempts: S.assessmentLibraryV2.attempts.filter(attempt => attempt.status === 'in-progress' || assessmentAttemptVisible(attempt.attemptId)) },
@@ -23662,6 +23670,28 @@ function buildGingaChrome(root) {
   root.append(shelf, sensei);
 }
 
+/** The visible state of a room that failed to draw. Keeps drafts; logs the fault. */
+function renderRoomError(main, view, error) {
+  console.error(`room ${view} failed to render`, error);
+  const card = el('section', 'room-state room-error');
+  card.dataset.roomError = view; card.setAttribute('role', 'alert');
+  card.append(el('h1', 'view-title', tx('この部屋を開けませんでした', 'This room didn’t open')));
+  card.append(el('p', '', tx('保存した記録はそのまま残っています。もう一度試すか、本棚に戻ってください。',
+    'Nothing you saved is affected. Try again, or go back to the shelf.')));
+  const retry = el('button', 'chip', tx('もう一度', 'Try again')); retry.type = 'button';
+  retry.dataset.roomRetry = ''; retry.addEventListener('click', () => render());
+  const home = el('button', 'chip', tx('本棚へ', 'To the shelf')); home.type = 'button';
+  home.addEventListener('click', () => { S.view = 'shelf'; render(); });
+  card.append(retry, home);
+  main.append(card);
+}
+// An async room fault that leaves the page empty gets the same visible state.
+addEventListener('unhandledrejection', (event) => {
+  const main = document.querySelector('#app main');
+  if (main && main.children.length === 0 && document.body.dataset.ready === '1')
+    renderRoomError(main, S.view, event.reason);
+});
+
 function render() {
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.
@@ -23992,33 +24022,40 @@ function render() {
   // the interim voice belongs to the reader: leaving the room ends it
   if (S.view !== 'reader') stopReadAloud();
 
-  if (S.view === 'drift') renderDrift(main);
-  else if (S.view === 'entry') renderEntry(main);
-  else if (S.view === 'reader') renderReader(main);
-  else if (S.view === 'tray') renderTray(main);
-  else if (S.view === 'list') renderListPage(main);
-  else if (S.view === 'review') renderReview(main);
-  else if (S.view === 'probe') renderProbe(main);
-  else if (S.view === 'archive') renderArchive(main);
-  else if (S.view === 'dojo') renderFocus(main);
-  else if (S.view === 'aiquiz') renderAiQuiz(main);
-  else if (S.view === 'levels') renderLevels(main);
-  else if (S.view === 'ai') renderAiSetup(main);
-  else if (S.view === 'lessons') renderLessons(main);
-  else if (S.view === 'mock') renderMock(main);
-  else if (S.view === 'kagami') renderKagami(main);
-  else if (S.view === 'thesaurus') renderThesaurus(main);
-  else if (S.view === 'airead') renderAiReading(main);
-  else if (S.view === 'feed') renderFeed(main);
-  else if (S.view === 'publisher') renderPublisherReading(main);
-  else if (S.view === 'source-inbox') renderSourceInbox(main);
-  else if (S.view === 'source-reader') renderSourceReading(main);
-  else if (S.view === 'sentence-practice') renderSentencePractice(main);
-  else if (S.view === 'kanjidex') renderKanjidex(main);
-  else if (S.view === 'yoji') renderYoji(main);
-  else if (S.view === 'grammar') renderGrammar(main);
-  else if (S.view === 'search') renderSearchPage(main);
-  else renderShelf(main);
+  // A room that throws must never leave an empty page: that is how a blank
+  // room reached the learner with no message (2026-09-24).
+  try {
+    if (S.view === 'drift') renderDrift(main);
+    else if (S.view === 'entry') renderEntry(main);
+    else if (S.view === 'reader') renderReader(main);
+    else if (S.view === 'tray') renderTray(main);
+    else if (S.view === 'list') renderListPage(main);
+    else if (S.view === 'review') renderReview(main);
+    else if (S.view === 'probe') renderProbe(main);
+    else if (S.view === 'archive') renderArchive(main);
+    else if (S.view === 'dojo') renderFocus(main);
+    else if (S.view === 'aiquiz') renderAiQuiz(main);
+    else if (S.view === 'levels') renderLevels(main);
+    else if (S.view === 'ai') renderAiSetup(main);
+    else if (S.view === 'lessons') renderLessons(main);
+    else if (S.view === 'mock') renderMock(main);
+    else if (S.view === 'kagami') renderKagami(main);
+    else if (S.view === 'thesaurus') renderThesaurus(main);
+    else if (S.view === 'airead') renderAiReading(main);
+    else if (S.view === 'feed') renderFeed(main);
+    else if (S.view === 'publisher') renderPublisherReading(main);
+    else if (S.view === 'source-inbox') renderSourceInbox(main);
+    else if (S.view === 'source-reader') renderSourceReading(main);
+    else if (S.view === 'sentence-practice') renderSentencePractice(main);
+    else if (S.view === 'kanjidex') renderKanjidex(main);
+    else if (S.view === 'yoji') renderYoji(main);
+    else if (S.view === 'grammar') renderGrammar(main);
+    else if (S.view === 'search') renderSearchPage(main);
+    else renderShelf(main);
+  } catch (error) {
+    main.replaceChildren();
+    renderRoomError(main, S.view, error);
+  }
 
   renderSheet(root);
   renderStrokePage(root);
