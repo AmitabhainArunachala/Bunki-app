@@ -13,6 +13,7 @@ import {
   resolveCorridorEvidence,
   resolveCorridorSite,
 } from '../../../scripts/resolve-corridor-site.mjs';
+import { admittedWrittenSections } from './assessment/bank.mjs';
 
 assert(
   process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256,
@@ -24,28 +25,38 @@ const sha = (value) => createHash('sha256').update(value).digest('hex');
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
 const catalogPath = 'data/assessment/catalog.json';
 const catalog = JSON.parse(readFileSync(resolve(site, catalogPath), 'utf8'));
-const entry = catalog.entries.find(
-  (row) => row.id === 'kairo-original-jlpt-n2-short-01:written-review',
-);
-assert(
-  entry?.availability.ready && entry.review.status === 'ai-reviewed',
-  'The public written pack is admitted.',
-);
-assert.equal(entry.mode, 'section');
-assert.equal(entry.questionCount, 12);
-assert.equal(entry.durationMinutes, 15);
-assert.deepEqual(entry.skillCounts, { vocabulary: 4, grammar: 4, reading: 4, listening: 0 });
-assert.equal(catalog.entries.filter((row) => row.availability.ready).length, 1);
+// One ready written entry per level with a filled REVIEWED_WRITTEN pin, and no other ready entry.
+const sections = admittedWrittenSections(catalog).map(({ pin, entry }) => {
+  assert(
+    entry.availability.ready && entry.review.status === 'ai-reviewed',
+    `The public ${pin.level} written pack is admitted.`,
+  );
+  assert.equal(entry.mode, 'section');
+  assert.equal(entry.questionCount, pin.questionCount);
+  assert.equal(entry.durationMinutes, pin.durationMinutes);
+  assert.deepEqual(entry.skillCounts, { ...pin.skillCounts });
+  const formPath = `data/assessment/${entry.formPath}`;
+  const deliveryPath = `data/assessment/${entry.deliveryPath}`;
+  return {
+    pin,
+    entry,
+    formPath,
+    deliveryPath,
+    form: JSON.parse(readFileSync(resolve(site, formPath), 'utf8')),
+    delivery: JSON.parse(readFileSync(resolve(site, deliveryPath), 'utf8')),
+    // A single admitted level keeps the original case and screenshot names.
+    suffix: '',
+  };
+});
+assert(sections.length > 0, 'At least one written section is admitted.');
+if (sections.length > 1)
+  for (const section of sections) section.suffix = `-${section.pin.level.toLowerCase()}`;
 assert.equal(
   catalog.entries.filter(
     (row) => !row.availability.ready && ['short', 'medium', 'full'].includes(row.mode),
   ).length,
   3,
 );
-const formPath = `data/assessment/${entry.formPath}`;
-const deliveryPath = `data/assessment/${entry.deliveryPath}`;
-const form = JSON.parse(readFileSync(resolve(site, formPath), 'utf8'));
-const delivery = JSON.parse(readFileSync(resolve(site, deliveryPath), 'utf8'));
 const core = await import(pathToFileURL(resolve(site, 'modules/assessment-core.mjs')));
 const recordCore = await import(pathToFileURL(resolve(site, 'modules/record-core.mjs')));
 const { selectAssessmentV2 } = await import(
@@ -54,27 +65,38 @@ const { selectAssessmentV2 } = await import(
 const { assessmentLearningSummary } = await import(
   pathToFileURL(resolve(site, 'assessment-learning.mjs'))
 );
-assert.equal(core.parseFormVersion(form).sha256, entry.formSha256);
-assert.equal(recordCore.encodeLocalJson(delivery).sha256, entry.deliverySha256);
-assert.equal(form.scope, 'section-practice');
-assert.equal(form.items.length, 12);
-assert.equal(form.media.length, 0);
-assert.deepEqual(delivery.assets, []);
-assert.deepEqual(delivery.units, []);
-assert.equal(
-  form.timingBlocks.reduce((sum, block) => sum + block.durationMs, 0),
-  900000,
-);
-const items = form.timingBlocks.flatMap((block) =>
-  block.sectionIds.flatMap((sectionId) =>
-    form.sections
-      .find((section) => section.id === sectionId)
-      .itemIds.map((itemId) => form.items.find((item) => item.id === itemId)),
-  ),
-);
-assert.equal(new Set(items.map((item) => item.id)).size, 12);
-assert(items.every((item) => item.response.kind === 'selected' && item.media.length === 0));
-const publicFiles = [catalogPath, formPath, deliveryPath, 'corridor.js', 'assessment-view.mjs'];
+for (const section of sections) {
+  const { pin, entry, form, delivery } = section;
+  assert.equal(core.parseFormVersion(form).sha256, entry.formSha256);
+  assert.equal(recordCore.encodeLocalJson(delivery).sha256, entry.deliverySha256);
+  assert.equal(form.scope, 'section-practice');
+  assert.equal(form.exam.track, pin.level);
+  assert.equal(form.items.length, pin.questionCount);
+  assert.equal(form.media.length, 0);
+  assert.deepEqual(delivery.assets, []);
+  assert.deepEqual(delivery.units, []);
+  assert.equal(
+    form.timingBlocks.reduce((sum, block) => sum + block.durationMs, 0),
+    pin.durationMinutes * 60_000,
+  );
+  section.items = form.timingBlocks.flatMap((block) =>
+    block.sectionIds.flatMap((sectionId) =>
+      form.sections
+        .find((candidate) => candidate.id === sectionId)
+        .itemIds.map((itemId) => form.items.find((item) => item.id === itemId)),
+    ),
+  );
+  assert.equal(new Set(section.items.map((item) => item.id)).size, pin.questionCount);
+  assert(
+    section.items.every((item) => item.response.kind === 'selected' && item.media.length === 0),
+  );
+}
+const publicFiles = [
+  catalogPath,
+  ...sections.flatMap((section) => [section.formPath, section.deliveryPath]),
+  'corridor.js',
+  'assessment-view.mjs',
+];
 const fileHashes = Object.fromEntries(
   publicFiles.map((path) => {
     const digest = sha(readFileSync(resolve(site, path)));
@@ -194,21 +216,35 @@ async function fit(page, label) {
     `${label} must fit 320px: ${JSON.stringify(dimensions)}`,
   );
 }
-async function catalogDoor(page, screenshotPrefix = null) {
+/** The room lists one level at a time; press this section's level only if it is not current. */
+async function selectLevel(page, level) {
+  const control = page.locator(`[data-exam-level="${level}"]`);
+  if ((await control.getAttribute('aria-pressed')) !== 'true') await control.click();
+}
+async function catalogDoor(page, section, screenshotPrefix = null) {
+  const { entry, pin } = section;
   await page.locator('#mock-link').click();
+  await selectLevel(page, pin.level);
   const card = page
     .locator('[data-exam-form]')
     .filter({ has: page.locator(`[data-exam-start=${JSON.stringify(entry.id)}]`) });
   await card.waitFor();
   assert.match(await page.locator('.exam-section-heading').innerText(), /Practice by skill/u);
   assert.equal(await card.locator('h2').textContent(), entry.titleEn);
-  assert.match(await card.locator('.exam-form-meta').innerText(), /12 questions · about 15 min/u);
+  assert.match(
+    await card.locator('.exam-form-meta').innerText(),
+    new RegExp(`${pin.questionCount} questions · about ${pin.durationMinutes} min`, 'u'),
+  );
   assert.equal(await card.locator('.exam-skills').textContent(), 'Vocabulary · Grammar · Reading');
   assert.match(await card.locator('.exam-status').innerText(), /without listening/u);
   for (const mode of ['medium', 'full', 'short']) {
     await page.locator(`[data-exam-length="${mode}"]`).click();
-    const pending = catalog.entries.find((row) => row.mode === mode);
-    assert.equal(await page.locator(`[data-exam-start=${JSON.stringify(pending.id)}]`).count(), 0);
+    const pending = catalog.entries.find((row) => row.level === pin.level && row.mode === mode);
+    if (pending)
+      assert.equal(
+        await page.locator(`[data-exam-start=${JSON.stringify(pending.id)}]`).count(),
+        0,
+      );
   }
   await fit(page, 'Public catalog');
   if (screenshotPrefix)
@@ -224,16 +260,24 @@ async function catalogDoor(page, screenshotPrefix = null) {
   );
   assert(!/audio/iu.test(await page.locator('.exam-download-note').textContent()));
 }
-async function start(page, mode, screenshotPrefix = null) {
-  await catalogDoor(page, screenshotPrefix);
+async function start(page, section, mode, screenshotPrefix = null) {
+  const { entry, pin, items } = section;
+  await catalogDoor(page, section, screenshotPrefix);
   await page.locator(mode === 'timed' ? '#exam-confirm-start' : '#exam-practice-start').click();
   await page.locator('.exam-prompt').waitFor();
-  assert.equal(await page.locator('.exam-heading').textContent(), 'N2 practice');
+  assert.equal(await page.locator('.exam-heading').textContent(), `${pin.level} practice`);
   assert.equal(await page.locator('.exam-prompt').textContent(), items[0].prompt);
-  assert.match(await page.locator('.exam-progress').innerText(), /Question 1 of 12/u);
+  assert.match(
+    await page.locator('.exam-progress').innerText(),
+    new RegExp(`Question 1 of ${items.length}`, 'u'),
+  );
   assert.equal(await page.locator('audio, #exam-audio-play, #exam-example-audio-play').count(), 0);
   if (mode === 'practice') assert.equal(await page.locator('#exam-timer').textContent(), 'Untimed');
-  else assert.match(await page.locator('#exam-timer').textContent(), /^(15:00|14:\d\d)$/u);
+  else
+    assert.match(
+      await page.locator('#exam-timer').textContent(),
+      new RegExp(`^(${pin.durationMinutes}:00|${pin.durationMinutes - 1}:\\d\\d)$`, 'u'),
+    );
   const record = await pollRecord(page, (row) => row.assessmentLibraryV2?.attempts.length === 1);
   const selected = selectAssessmentV2(record.assessmentLibraryV2);
   assert.equal(selected.attempt.mode, mode);
@@ -349,25 +393,30 @@ async function run(engine, name, action) {
   }
 }
 
+const dojoPracticeLabel = `${sections.length} practice set${sections.length === 1 ? '' : 's'} · mock tests in preparation`;
 try {
   for (const engine of engines) {
-    await run(engine, 'public-catalog-and-dojo-practice-labels', async (page) => {
+    for (const section of sections) {
+    const { entry, pin, form, formPath, deliveryPath, items, suffix } = section;
+    await run(engine, `public-catalog-and-dojo-practice-labels${suffix}`, async (page) => {
       await page.locator('#chrome-dojo').click();
       const door = page.locator('[data-study-door="mock"]');
       await page.waitForFunction(
-        () =>
+        (label) =>
           document.querySelector('[data-study-door="mock"] .study-door-sub')?.textContent ===
-          '1 practice set · mock tests in preparation',
+          label,
+        dojoPracticeLabel,
       );
       const dojoLabel = await door.locator('.study-door-sub').textContent();
-      assert.equal(dojoLabel, '1 practice set · mock tests in preparation');
+      assert.equal(dojoLabel, dojoPracticeLabel);
       assert.match(await door.locator('.study-door-t').innerText(), /JLPT tests & practice/iu);
       await fit(page, 'Dojo practice count');
       await page.screenshot({
-        path: resolve(evidence, `${engine}-written-dojo-320.png`),
+        path: resolve(evidence, `${engine}${suffix}-written-dojo-320.png`),
         fullPage: true,
       });
       await door.click();
+      await selectLevel(page, pin.level);
       await page.locator(`[data-exam-start=${JSON.stringify(entry.id)}]`).waitFor();
       assert.equal(
         await page.locator('.assessment-room > h1').textContent(),
@@ -382,16 +431,17 @@ try {
       );
       assert.match(await written.locator('.exam-status').innerText(), /without listening/u);
       assert.equal(await page.locator('[data-exam-start]').count(), 1);
-      const pending = catalog.entries.find((row) => row.mode === 'short');
-      assert.match(
-        await page
-          .locator(`[data-exam-form=${JSON.stringify(pending.id)}] .exam-status`)
-          .innerText(),
-        /Question and audio review in progress/u,
-      );
+      const pending = catalog.entries.find((row) => row.level === pin.level && row.mode === 'short');
+      if (pending)
+        assert.match(
+          await page
+            .locator(`[data-exam-form=${JSON.stringify(pending.id)}] .exam-status`)
+            .innerText(),
+          /Question and audio review in progress/u,
+        );
       await fit(page, 'Catalog practice heading');
       await page.screenshot({
-        path: resolve(evidence, `${engine}-written-catalog-320.png`),
+        path: resolve(evidence, `${engine}${suffix}-written-catalog-320.png`),
         fullPage: true,
       });
       const record = await disk(page);
@@ -416,7 +466,7 @@ try {
       );
       await fit(page, 'Readable written choices');
       await page.screenshot({
-        path: resolve(evidence, `${engine}-written-question-320.png`),
+        path: resolve(evidence, `${engine}${suffix}-written-question-320.png`),
         fullPage: true,
       });
       await wrongAnswer(page, items[0]);
@@ -435,16 +485,16 @@ try {
       return {
         dojoLabel,
         catalogTitle: 'JLPT tests & practice',
-        readyWrittenSections: 1,
+        readyWrittenSections: sections.length,
         readyMockTests: 0,
         choiceMetrics,
         nextQuestion: advanced.attempt.cursor.itemId,
       };
     });
-    await run(engine, 'timed-written-completion-to-learn-review-and-sensei', async (page) => {
+    await run(engine, `timed-written-completion-to-learn-review-and-sensei${suffix}`, async (page) => {
       const baseline = await disk(page);
       assert.deepEqual(baseline.taken, []);
-      await start(page, 'timed', engine);
+      await start(page, section, 'timed', `${engine}${suffix}`);
       for (let index = 0; index < items.length; index++) {
         await wrongAnswer(page, items[index]);
         await fit(page, `Question ${index + 1}`);
@@ -459,18 +509,21 @@ try {
       await page.locator('#exam-finish-block').click();
       await page.locator('#exam-confirm-finish').click();
       await page.locator('.exam-score').waitFor();
-      assert.equal(await page.locator('.exam-score').textContent(), '0 of 12 correct');
+      assert.equal(
+        await page.locator('.exam-score').textContent(),
+        `0 of ${items.length} correct`,
+      );
       assert.match(
         await page.locator('.exam-score-note').textContent(),
         /not an official JLPT score or pass prediction/u,
       );
       assert.equal(await page.locator('.exam-results-skills p').count(), 3);
       const completed = await pollRecord(page, (row) =>
-        row.assessmentLearning?.followups.some((followup) => followup.evidence.length === 12),
+        row.assessmentLearning?.followups.some((followup) => followup.evidence.length === items.length),
       );
       const selected = selectAssessmentV2(completed.assessmentLibraryV2);
       assert.equal(selected.attempt.status, 'submitted');
-      assert.equal(selected.score.incorrect, 12);
+      assert.equal(selected.score.incorrect, items.length);
       assert.equal(selected.score.correct, 0);
       const followup = completed.assessmentLearning.followups.find(
         (row) => row.attemptId === selected.attempt.attemptId,
@@ -509,11 +562,11 @@ try {
       assert.equal(summary.completed, 1);
       assert.equal(summary.pending, 0);
       for (const skill of ['vocabulary', 'grammar', 'reading'])
-        assert.equal(summary.skills[skill].incorrect, 4);
+        assert.equal(summary.skills[skill].incorrect, pin.skillCounts[skill]);
       assert.equal(summary.skills.listening, undefined);
       await fit(page, 'Written results');
       await page.screenshot({
-        path: resolve(evidence, `${engine}-written-results-320.png`),
+        path: resolve(evidence, `${engine}${suffix}-written-results-320.png`),
         fullPage: true,
       });
       await page.locator('#exam-sensei').click();
@@ -536,7 +589,7 @@ try {
       assert.match(senseiVisibleCredit, /JLPT practice question/u);
       await fit(page, 'Sensei question context');
       await page.screenshot({
-        path: resolve(evidence, `${engine}-written-sensei-320.png`),
+        path: resolve(evidence, `${engine}${suffix}-written-sensei-320.png`),
         fullPage: true,
       });
       await page.locator('#tray').click();
@@ -583,7 +636,7 @@ try {
       assert.equal(assessmentLearningSummary(reloaded.assessmentLearning).completed, 1);
       return {
         attemptId: selected.attempt.attemptId,
-        result: '0/12',
+        result: `0/${items.length}`,
         cards: completed.taken.length,
         targetTypes: [...new Set(completed.taken.map((row) => row.t))],
         evidence: summary,
@@ -594,9 +647,9 @@ try {
         laterQuestionReviews: reviewed.revlog.length,
       };
     });
-    await run(engine, 'untimed-written-offline-reload-answer-and-stop', async (page) => {
+    await run(engine, `untimed-written-offline-reload-answer-and-stop${suffix}`, async (page) => {
       const baseline = await disk(page);
-      await start(page, 'practice');
+      await start(page, section, 'practice');
       const firstChoice = await wrongAnswer(page, items[0]);
       await page.waitForFunction(
         async () =>
@@ -671,7 +724,7 @@ try {
       );
       await fit(page, 'Offline stopped result');
       await page.screenshot({
-        path: resolve(evidence, `${engine}-written-offline-stopped-320.png`),
+        path: resolve(evidence, `${engine}${suffix}-written-offline-stopped-320.png`),
         fullPage: true,
       });
       return {
@@ -684,6 +737,7 @@ try {
         evidence: summary,
       };
     });
+    }
   }
 } finally {
   if (server.listening) await new Promise((done) => server.close(done));
@@ -697,8 +751,13 @@ try {
         version: 1,
         artifactSha256: identity.artifactSha256,
         sourceAssetSha256: identity.sourceAssetSha256,
-        formSha256: entry.formSha256,
-        deliverySha256: entry.deliverySha256,
+        formSha256: sections[0].entry.formSha256,
+        deliverySha256: sections[0].entry.deliverySha256,
+        sections: sections.map(({ pin, entry }) => ({
+          level: pin.level,
+          formSha256: entry.formSha256,
+          deliverySha256: entry.deliverySha256,
+        })),
         publicFiles: fileHashes,
         instrumentation:
           'none; unchanged staged runtime and public content; independent read-only IDB observation',

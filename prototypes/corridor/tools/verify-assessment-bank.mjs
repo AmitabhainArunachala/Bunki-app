@@ -7,10 +7,13 @@ import {
   AUTHORING,
   PUBLIC_BANK,
   REVIEWED_N2_WRITTEN,
+  REVIEWED_WRITTEN,
+  admittedWrittenSections,
   assessmentAPI,
   assertMediaFreeWrittenDelivery,
   assertListeningTiming,
   assertNumberedGapPositions,
+  assertReviewPolicyExcludesAuthor,
   assertSeparateForms,
   boundedAsset,
   buildAssessmentBank,
@@ -18,9 +21,13 @@ import {
   loadAudioManifest,
   materializeForm,
   materializeWrittenReview,
+  materializeWrittenSection,
   publishReviewedWrittenPractice,
+  retainedWrittenEntries,
   voiceRolesHash,
+  writtenSectionPublisher,
 } from './assessment/bank.mjs';
+import { WRITTEN_SPECS, prepareWrittenOriginal } from './assessment/prepare-originals.mjs';
 import { importSource, sourceURL, validateSourceRequest } from './assessment/source-import.mjs';
 import { learningTargets } from './assessment/learning-targets.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
@@ -303,6 +310,499 @@ await check(
     assert.equal(entry.officialScoreCalibrated, false);
   },
 );
+
+// Synthetic fixture manuscript: exercises the per-level mechanics only. It is not N1 content,
+// and nothing below admits, pins or publishes product data; every site is an isolated directory.
+const n1Passages = {
+  notice:
+    '検証用のお知らせ\n資料室は月曜日に休館します。利用を希望する方は、前日までに受付へ連絡してください。',
+};
+const n1Items = [
+  {
+    skill: 'vocabulary',
+    task: 'kanji-reading',
+    prompt: '【　】の言葉の読み方を選んでください。\n検証用の文です。書類を【整理】した。',
+    options: ['せいり', 'せいりょう', 'ぜいり', 'しょうり'],
+    answer: 0,
+    rationale: '整理は「せいり」と読む。',
+    target: '整理',
+    doubts: ['FIXTURE-DOUBT vocabulary: synthetic item'],
+  },
+  {
+    skill: 'grammar',
+    task: 'grammar-form',
+    prompt: '（　）に入る最もよいものを選んでください。\n検証用の文です。雨が降っている（　）、出かけた。',
+    options: ['にもかかわらず', 'ばかりに', 'からには', 'とたんに'],
+    answer: 0,
+    rationale: '逆接の「にもかかわらず」が入る。',
+  },
+  {
+    skill: 'reading',
+    task: 'information-retrieval',
+    passage: 'notice',
+    prompt: '資料室を利用したい人は、いつまでに連絡しますか。',
+    options: ['前日まで', '当日', '月曜日', '一週間前'],
+    answer: 0,
+    rationale: '前日までに受付へ連絡するとある。',
+  },
+  {
+    skill: 'reading',
+    task: 'compact-main-idea',
+    passage: 'notice',
+    prompt: 'このお知らせで最も伝えたいことは何ですか。',
+    options: ['休館日と連絡の期限', '資料の種類', '受付の場所', '開館時間の変更'],
+    answer: 0,
+    rationale: '休館日と、利用の連絡期限を知らせている。',
+    doubts: ['FIXTURE-DOUBT reading: compact task is not an official task'],
+  },
+];
+const n1ManuscriptBytes = Buffer.from(JSON.stringify({ n1Items, n1Passages }));
+const n1Spec = (patch = {}) => ({
+  ...WRITTEN_SPECS.N1,
+  id: 'fixture-n1-written-01',
+  items: n1Items,
+  passages: n1Passages,
+  status: { level: 'N1', authorModelFamily: WRITTEN_SPECS.N1.authorModelFamily },
+  manuscriptSha256: hash(n1ManuscriptBytes),
+  ...patch,
+});
+const n1Manuscript = { bytes: n1ManuscriptBytes, items: n1Items, passages: n1Passages };
+const n1Section = await materializeWrittenSection(prepareWrittenOriginal(n1Spec()), n1Manuscript);
+const n1Bytes = n1Section.files['form.json'];
+const fixturePin = (form, bytes, patch = {}) =>
+  Object.freeze({
+    ...REVIEWED_WRITTEN.N1,
+    id: form.id,
+    sha256: form.sha256,
+    bytesSha256: hash(bytes),
+    filenameStem: 'fixture-n1-written-01',
+    questionCount: 4,
+    skillCounts: Object.freeze({ vocabulary: 1, grammar: 1, reading: 2, listening: 0 }),
+    ...patch,
+  });
+const n1Pins = (pin = fixturePin(n1Section.form, n1Bytes)) =>
+  Object.freeze({ N2: REVIEWED_WRITTEN.N2, N1: pin });
+const reviewFor = (form, patch = {}) => ({
+  form: api.artifactReference(form),
+  presentationSha256: null,
+  status: 'ai-reviewed-practice',
+  productionEligible: true,
+  authorityPolicyVersion: 'test-only-host',
+  decisionRevisionIds: [`assessment-ai-editorial-v2:${'2'.repeat(64)}`],
+  problems: [],
+  rejectedRuntimeReceipts: [],
+  rejectedResolutionRuntimeReceipts: [],
+  officialScoreCalibrated: false,
+  ...patch,
+});
+const shippedCatalog = await read(join(PUBLIC_BANK, 'catalog.json'));
+const shippedSources = await read(join(PUBLIC_BANK, 'sources.json'));
+const n1Source = {
+  id: REVIEWED_WRITTEN.N1.sourceId,
+  title: 'Fixture-only N1 written source',
+  edition: 'fixture',
+  url: null,
+  location: 'isolated verifier fixture',
+  sourceClass: 'original-ai',
+  distribution: 'public-candidate',
+  processRef: REVIEWED_WRITTEN.N1.processRef,
+  rightsBasis: REVIEWED_WRITTEN.N1.rightsBasis,
+};
+let fixtureSites = 0;
+async function writtenFixtureSite({ withN2 = true, sources = [n1Source] } = {}) {
+  const site = join(evidence, `fixture-written-levels-${++fixtureSites}`);
+  await mkdir(site);
+  const catalog = structuredClone(shippedCatalog);
+  if (!withN2) catalog.entries = catalog.entries.filter((entry) => entry.id !== REVIEWED_WRITTEN.N2.id);
+  const registry = structuredClone(shippedSources);
+  registry.sources.push(...sources);
+  await writeFile(join(site, 'catalog.json'), JSON.stringify(catalog));
+  await writeFile(join(site, 'sources.json'), JSON.stringify(registry));
+  return site;
+}
+
+await check('N1 authoring maps exactly, binds its manuscript and keeps doubts out of the form', async () => {
+  const { form, binding, files } = n1Section;
+  assert.equal(api.parseFormVersion(JSON.parse(n1Bytes.toString('utf8'))).sha256, form.sha256);
+  assert.equal(api.inspectFormStructure(form).passesKnownChecks, true);
+  assert.deepEqual(form.exam, { family: 'jlpt', track: 'N1' });
+  assert.equal(form.scope, 'section-practice');
+  assert.equal(form.blueprintId, 'jlpt-n1-facts-20260910');
+  assert.deepEqual(
+    form.sections.map((section) => section.skill),
+    ['vocabulary', 'grammar', 'reading'],
+  );
+  assert.equal(form.timingBlocks.length, 1);
+  assert.equal(form.timingBlocks[0].durationMs, 19 * 60_000);
+  assert.deepEqual(form.timingBlocks[0].authority, {
+    kind: 'authoring-rule',
+    ruleId: 'n1-written-allocation-20260925',
+  });
+  assert.equal(binding.status, 'unreviewed-authoring-material');
+  assert.equal(binding.timing.basis, 'author-selected practice allocation; not official timing');
+  assert.equal(binding.manuscript.sha256, hash(n1ManuscriptBytes));
+  assert.equal(binding.manuscript.authorModelFamily, 'anthropic-claude');
+  assert.equal(binding.authoringNotes.sha256, hash(files['authoring-notes.json']));
+  assert.equal(binding.intent.sha256, hash(files['intent.json']));
+  assert.deepEqual(binding.form, {
+    path: 'form.json',
+    id: form.id,
+    revisionId: form.revisionId,
+    sha256: form.sha256,
+    bytesSha256: hash(n1Bytes),
+  });
+  assert.deepEqual(
+    binding.items.map((row) => [row.itemId, row.task, row.answerOptionId]),
+    n1Items.map((item, index) => [
+      `fixture-n1-written-01:q0${index + 1}`,
+      item.task,
+      `choice-${item.answer + 1}`,
+    ]),
+  );
+  assert.deepEqual(
+    binding.passages.map((row) => row.passageId),
+    ['fixture-n1-written-01:passage-notice'],
+  );
+  assert(!n1Bytes.toString('utf8').includes('FIXTURE-DOUBT'));
+  const notes = JSON.parse(files['authoring-notes.json'].toString('utf8'));
+  assert.equal(notes.reviewEvidence, false);
+  assert.deepEqual(notes.items[0].doubts, n1Items[0].doubts);
+  assert.deepEqual(notes.items[1].doubts, []);
+  // Declared compact tasks keep their own IDs and stay outside the official jlpt-n1 namespace.
+  assert.deepEqual(form.items[3].subjects, ['practice-n1:compact-main-idea']);
+  assert.deepEqual(form.items[1].subjects, ['jlpt-n1:grammar-form']);
+  const prepared = () => prepareWrittenOriginal(n1Spec());
+  // Each edit leaves the key in place, so only the named field comparison can refuse it.
+  const distractors = prepared();
+  const options = distractors.intent.formPayload.items[1].response.options;
+  [options[2].text, options[3].text] = [options[3].text, options[2].text];
+  const reprompted = prepared();
+  reprompted.intent.formPayload.items[1].prompt += '。';
+  const reasoned = prepared();
+  reasoned.intent.formPayload.items[1].rationale += '。';
+  for (const altered of [distractors, reprompted, reasoned])
+    await assert.rejects(
+      materializeWrittenSection(altered, n1Manuscript),
+      /did not preserve manuscript item 2/u,
+    );
+  const rekeyed = prepared();
+  rekeyed.intent.formPayload.items[2].response.answerOptionId = 'choice-2';
+  await assert.rejects(
+    materializeWrittenSection(rekeyed, n1Manuscript),
+    /did not preserve manuscript item 3/u,
+  );
+  const edited = prepared();
+  edited.intent.formPayload.passages[0].text += '。';
+  edited.intent.formPayload.passages[0].textSha256 = hash(edited.intent.formPayload.passages[0].text);
+  await assert.rejects(
+    materializeWrittenSection(edited, n1Manuscript),
+    /did not preserve manuscript passage notice/u,
+  );
+  const leaked = prepared();
+  leaked.intent.formPayload.items[0].rationale += n1Items[0].doubts[0];
+  await assert.rejects(
+    materializeWrittenSection(leaked, {
+      ...n1Manuscript,
+      items: n1Items.map((item, index) =>
+        index ? item : { ...item, rationale: item.rationale + item.doubts[0] },
+      ),
+    }),
+    /Author doubts leaked/u,
+  );
+  const renoted = prepared();
+  renoted.notes.items[0].doubts = [];
+  await assert.rejects(
+    materializeWrittenSection(renoted, n1Manuscript),
+    /did not preserve manuscript item 1/u,
+  );
+  await assert.rejects(
+    materializeWrittenSection(prepared(), { ...n1Manuscript, bytes: Buffer.from('other') }),
+    /Manuscript bytes differ/u,
+  );
+});
+
+await check('N1 authoring policy refuses excluded, undeclared and relabelled tasks', () => {
+  const withItem = (index, patch) =>
+    n1Spec({ items: n1Items.map((item, at) => (at === index ? { ...item, ...patch } : item)) });
+  for (const [spec, reason] of [
+    [withItem(0, { task: 'orthography' }), /Excluded N1 task by authoring policy: orthography/u],
+    [withItem(3, { task: 'invented-reading' }), /Undeclared N1 task: invented-reading/u],
+    [withItem(3, { skill: 'grammar' }), /task compact-main-idea is not a grammar task/u],
+    [withItem(1, { dialogue: [] }), /Unmapped manuscript field in N1 manuscript item 2: dialogue/u],
+    [withItem(1, { answer: 4 }), /invalid option list or key/u],
+    [n1Spec({ nonOfficialTasks: { 'claim-reading': 'reading' } }), /cannot reuse an official/u],
+    [n1Spec({ status: { level: 'N2', authorModelFamily: 'anthropic-claude' } }), /spec level/u],
+    [n1Spec({ status: { level: 'N1', authorModelFamily: 'openai-codex' } }), /author family/u],
+    [n1Spec({ level: 'N6' }), /Unknown written level: N6/u],
+    [n1Spec({ manuscriptSha256: undefined }), /exact manuscript SHA-256/u],
+  ])
+    assert.throws(() => prepareWrittenOriginal(spec), reason);
+  // Authoring spec and admission pin must agree; neither is derived from the other at runtime.
+  for (const key of ['sourceId', 'processRef', 'rightsBasis'])
+    assert.equal(WRITTEN_SPECS.N1[key], REVIEWED_WRITTEN.N1[key], key);
+  assert.equal(WRITTEN_SPECS.N1.minutes, REVIEWED_WRITTEN.N1.durationMinutes);
+  assert.deepEqual([...WRITTEN_SPECS.N1.forbiddenTasks], [...REVIEWED_WRITTEN.N1.forbiddenTasks]);
+});
+
+await check('Unfilled N1 pin and unknown levels fail before any publication step', async () => {
+  assert.equal(REVIEWED_N2_WRITTEN, REVIEWED_WRITTEN.N2);
+  assert.deepEqual(
+    [REVIEWED_WRITTEN.N1.id, REVIEWED_WRITTEN.N1.sha256, REVIEWED_WRITTEN.N1.bytesSha256],
+    [null, null, null],
+  );
+  assert.deepEqual(REVIEWED_WRITTEN.N1.sharesQuestionsWith, []);
+  const empty = join(evidence, 'fixture-no-catalog');
+  await mkdir(empty);
+  const options = {
+    formBytes: n1Bytes,
+    publicDirectory: empty,
+    publish: true,
+    reviewForm: async () => reviewFor(n1Section.form),
+  };
+  await assert.rejects(
+    publishReviewedWrittenPractice({ ...options, level: 'N1' }),
+    /No admitted written section is pinned for N1/u,
+  );
+  for (const level of ['N3', 'n2', '__proto__', 'toString', null, ''])
+    await assert.rejects(
+      publishReviewedWrittenPractice({ ...options, level }),
+      /Unknown written section level/u,
+    );
+  assert.deepEqual(await readdir(empty), []);
+  assert.throws(
+    () =>
+      writtenSectionPublisher(
+        n1Pins({ ...REVIEWED_WRITTEN.N1, sha256: n1Section.form.sha256 }),
+      ),
+    /partially filled/u,
+  );
+  assert.throws(() => writtenSectionPublisher({ N1: REVIEWED_WRITTEN.N2 }), /inconsistent at N1/u);
+  assert.deepEqual(
+    admittedWrittenSections(shippedCatalog).map(({ pin }) => pin.level),
+    ['N2'],
+  );
+});
+
+await check('N1-only and both-level publication and rebuild keep each section once', async () => {
+  const pins = n1Pins();
+  const publish = writtenSectionPublisher(pins);
+  const review = async () => reviewFor(n1Section.form);
+  const shippedN2 = shippedCatalog.entries.find((entry) => entry.id === REVIEWED_WRITTEN.N2.id);
+  // N1 only: the site has no N2 written section.
+  const alone = await writtenFixtureSite({ withN2: false });
+  const onlyN1 = await publish({
+    level: 'N1',
+    formBytes: n1Bytes,
+    publicDirectory: alone,
+    publish: true,
+    reviewForm: review,
+  });
+  assert.equal(onlyN1.entry.level, 'N1');
+  assert.equal(onlyN1.entry.durationMinutes, 19);
+  assert.equal(onlyN1.entry.titleEn, 'N1 written practice · 12 questions');
+  assert.deepEqual(onlyN1.entry.sharesQuestionsWith, []);
+  assert.deepEqual(onlyN1.entry.sourceIds, [REVIEWED_WRITTEN.N1.sourceId]);
+  assert.deepEqual(await readFile(join(alone, onlyN1.entry.formPath)), n1Bytes);
+  const aloneRebuilt = await buildAssessmentBank({
+    directories: [],
+    assets: new Map(),
+    publicDirectory: alone,
+    evidenceDirectory: join(evidence, 'fixture-levels-alone'),
+    writtenPins: pins,
+  });
+  assert.deepEqual(
+    aloneRebuilt.entries.map((entry) => entry.id),
+    [n1Section.form.id],
+  );
+  // Both levels: N1 is appended; the shipped N2 entry is untouched and re-publishing is idempotent.
+  const both = await writtenFixtureSite();
+  const withBoth = await publish({
+    level: 'N1',
+    formBytes: n1Bytes,
+    publicDirectory: both,
+    publish: true,
+    reviewForm: review,
+  });
+  assert.deepEqual(
+    withBoth.catalog.entries.find((entry) => entry.id === shippedN2.id),
+    shippedN2,
+  );
+  assert.deepEqual(
+    (await publish({ level: 'N1', formBytes: n1Bytes, publicDirectory: both, reviewForm: review }))
+      .catalog,
+    withBoth.catalog,
+  );
+  const duplicate = structuredClone(withBoth.catalog);
+  duplicate.entries.push(structuredClone(withBoth.entry), structuredClone(shippedN2));
+  assert.deepEqual(
+    retainedWrittenEntries(duplicate.entries, pins).map((entry) => entry.id),
+    [shippedN2.id, n1Section.form.id],
+  );
+  const bothRebuilt = await buildAssessmentBank({
+    directories: [],
+    assets: new Map(),
+    publicDirectory: both,
+    evidenceDirectory: join(evidence, 'fixture-levels-both'),
+    writtenPins: pins,
+  });
+  assert.deepEqual(
+    bothRebuilt.entries.map((entry) => entry.id),
+    [shippedN2.id, n1Section.form.id],
+  );
+  assert.deepEqual(
+    admittedWrittenSections(bothRebuilt, pins).map(({ pin }) => pin.level),
+    ['N2', 'N1'],
+  );
+  // The production table has no filled N1 pin, so it retains only N2 and never falls back.
+  const productionRebuilt = await buildAssessmentBank({
+    directories: [],
+    assets: new Map(),
+    publicDirectory: both,
+    evidenceDirectory: join(evidence, 'fixture-levels-production'),
+  });
+  assert.deepEqual(
+    productionRebuilt.entries.map((entry) => entry.id),
+    [shippedN2.id],
+  );
+});
+
+await check('Written publication refuses changed bytes, cross-track, source, rights and process', async () => {
+  const site = await writtenFixtureSite();
+  const base = {
+    level: 'N1',
+    publicDirectory: site,
+    reviewForm: async () => reviewFor(n1Section.form),
+  };
+  const publish = writtenSectionPublisher(n1Pins());
+  // One character changed inside a prompt, and one byte of trailing whitespace removed.
+  const text = n1Bytes.toString('utf8');
+  const at = text.indexOf('書類を');
+  assert(at > 0);
+  const oneChar = Buffer.from(`${text.slice(0, at)}本${text.slice(at + 1)}`);
+  assert.equal(oneChar.toString('utf8').length, text.length);
+  for (const formBytes of [oneChar, n1Bytes.subarray(0, n1Bytes.length - 1)])
+    await assert.rejects(publish({ ...base, formBytes }), /exact reviewed form bytes/u);
+  // A pin re-filled to the altered bytes still cannot move the reviewed content hash.
+  await assert.rejects(
+    writtenSectionPublisher(
+      n1Pins(fixturePin(n1Section.form, oneChar)),
+    )({ ...base, formBytes: oneChar }),
+  );
+  // N1 bytes that claim track N2.
+  const crossTrack = prepareWrittenOriginal(n1Spec());
+  crossTrack.intent.formPayload.exam.track = 'N2';
+  crossTrack.intent.formPayload.blueprintId = 'jlpt-n2-facts-20260910';
+  await assert.rejects(
+    materializeWrittenSection(crossTrack, n1Manuscript),
+    /authoring input is inconsistent/u,
+  );
+  const n2Claim = await materializeWrittenReview(crossTrack.intent);
+  const n2ClaimBytes = Buffer.from(JSON.stringify(n2Claim, null, 2) + '\n');
+  await assert.rejects(
+    writtenSectionPublisher(n1Pins(fixturePin(n2Claim, n2ClaimBytes)))({
+      ...base,
+      formBytes: n2ClaimBytes,
+      reviewForm: async () => reviewFor(n2Claim),
+    }),
+    /Written section track N2 does not match its N1 pin/u,
+  );
+  await assert.rejects(
+    publishReviewedWrittenPractice({ ...base, level: 'N2', formBytes: n2ClaimBytes }),
+    /exact reviewed form bytes/u,
+  );
+  // An orthography item in pinned bytes is refused by the publisher as well as by authoring.
+  const excluded = prepareWrittenOriginal(n1Spec());
+  excluded.intent.formPayload.items[0].task = 'orthography';
+  excluded.intent.formPayload.authoring.requirements[0].task = 'orthography';
+  const excludedForm = await materializeWrittenReview(excluded.intent);
+  const excludedBytes = Buffer.from(JSON.stringify(excludedForm, null, 2) + '\n');
+  await assert.rejects(
+    writtenSectionPublisher(n1Pins(fixturePin(excludedForm, excludedBytes)))({
+      ...base,
+      formBytes: excludedBytes,
+      reviewForm: async () => reviewFor(excludedForm),
+    }),
+    /task its N1 pin excludes: orthography/u,
+  );
+  // Source, rights and process must agree across registry, pin and every artifact.
+  const noSource = await writtenFixtureSite({ sources: [] });
+  await assert.rejects(
+    publish({ ...base, formBytes: n1Bytes, publicDirectory: noSource }),
+    /source rights are not established/u,
+  );
+  for (const patch of [
+    { processRef: REVIEWED_WRITTEN.N2.processRef },
+    { rightsBasis: 'fixture-other-rights-basis' },
+    { sourceId: REVIEWED_WRITTEN.N2.sourceId, processRef: 'fixture-other-process' },
+  ])
+    await assert.rejects(
+      writtenSectionPublisher(n1Pins(fixturePin(n1Section.form, n1Bytes, patch)))({
+        ...base,
+        formBytes: n1Bytes,
+      }),
+      /source rights are not established/u,
+    );
+  const otherProcess = await writtenFixtureSite({
+    sources: [{ ...n1Source, processRef: 'fixture-other-process' }],
+  });
+  await assert.rejects(
+    writtenSectionPublisher(
+      n1Pins(fixturePin(n1Section.form, n1Bytes, { processRef: 'fixture-other-process' })),
+    )({ ...base, formBytes: n1Bytes, publicDirectory: otherProcess }),
+    /lacks original public rights/u,
+  );
+  assert.deepEqual((await readdir(site)).sort(), ['catalog.json', 'sources.json']);
+});
+
+await check('Written review authority is exact to the revision, AI-labelled and media-free', async () => {
+  const site = await writtenFixtureSite();
+  const publish = writtenSectionPublisher(n1Pins());
+  const base = { level: 'N1', formBytes: n1Bytes, publicDirectory: site };
+  const n2Form = await materializeWrittenReview(inputs[1]);
+  for (const review of [
+    reviewFor(n2Form),
+    reviewFor(n1Section.form, { form: { ...api.artifactReference(n1Section.form), revisionId: 'x' } }),
+    reviewFor(n1Section.form, { status: 'human-reviewed' }),
+    reviewFor(n1Section.form, { decisionRevisionIds: ['human-editor:fixture'] }),
+    reviewFor(n1Section.form, { officialScoreCalibrated: true }),
+  ])
+    await assert.rejects(
+      publish({ ...base, reviewForm: async () => review }),
+      /does not admit this exact written section/u,
+    );
+  await assert.rejects(
+    publish({
+      ...base,
+      reviewForm: async () => reviewFor(n1Section.form, { presentationSha256: '0'.repeat(64) }),
+    }),
+    /media-free/u,
+  );
+  await assert.rejects(publish({ ...base, reviewForm: undefined }), /trusted current host review/u);
+  const form = n1Section.form;
+  const delivery = {
+    schema: 'kairo-assessment-bank-delivery/1',
+    form: api.artifactReference(form),
+    assets: [],
+    units: [],
+  };
+  assertMediaFreeWrittenDelivery(form, delivery, { presentationSha256: null });
+  for (const altered of [
+    { ...form, media: [{}] },
+    { ...form, items: [{ ...form.items[0], skill: 'listening' }, ...form.items.slice(1)] },
+  ])
+    assert.throws(
+      () => assertMediaFreeWrittenDelivery(altered, delivery, { presentationSha256: null }),
+      /media-free/u,
+    );
+  // The collector disqualifies author-family receipts only for families its policy names.
+  assertReviewPolicyExcludesAuthor({ authorFamilyIds: ['OpenAI', 'Anthropic'] }, REVIEWED_WRITTEN.N1);
+  assertReviewPolicyExcludesAuthor({ authorFamilyIds: ['openai', 'anthropic'] }, REVIEWED_WRITTEN.N2);
+  for (const policy of [{ authorFamilyIds: ['openai'] }, {}, { authorFamilyIds: 'anthropic' }])
+    assert.throws(
+      () => assertReviewPolicyExcludesAuthor(policy, REVIEWED_WRITTEN.N1),
+      /does not exclude the N1 author family/u,
+    );
+});
 await check('No audio placeholders can make a full form', async () => {
   const result = await materializeForm(inputs[0], scripts[0], new Map());
   assert.equal(result.form, null);
