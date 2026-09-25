@@ -91,7 +91,7 @@
  *       which shows たれ／垂れ・垂.
  *   c4  retired at r4. Its only visible effect was 誰's headword 誰／誰, the alt repetition r4 fixed; matchedGloss has no
  *       displayed effect on these fixtures now, so c4 is not a claimed guard.
- *   c5  the r4 overlay removed (lookup()'s own head and reading). ゆけ shows ゆく／行く・往く, and 垂れ shows だれ／垂れ・垂.
+ *   c5  the r4 overlay removed (lookup()'s own head and reading); M.iu.yuu then shows いう／結う and is a declared kill. ゆけ shows ゆく／行く・往く, and 垂れ shows だれ／垂れ・垂.
  *       Kills M.yuke.single and M.dare.tare. 言う and 誰 display alike either way, so their rows are not witnesses and
  *       must pass.
  *   c6  a core hit's full entry opened on a wrong row (seq 1254600). The quick look stays "severe", and the sheet shows
@@ -107,7 +107,10 @@
  * dictionary-worker.js 316ff6fd…, dict-v2 index adac33df…, dict.json a752529a…, articles/index.json 0459ae82….
  *   2,206 core-miss content tokens: 741 open one row, 559 a chooser, 23 are offered with a reading mismatch, and 883
  *   are absent (no entry writes the form at all).
- *   Against the first row the door opened before D11 (the worker's rows[0]):
+ *   Against the first row the door opened before D11 (the worker's rows[0]). This compares seq MEMBERSHIP only (is the
+ *   old first row's seq still among the rows opened or offered); it says nothing of reading, gloss or contextual
+ *   correctness, reads the checkout rather than a served artifact, and is an author-side run, not independent evidence.
+ *   Its receipt binds every input it parsed, article bodies included, as flat inputs['data/articles/<file>'] digests:
  *     883 had no row then either.
  *     736 open that same row.
  *     559 get a chooser containing it; 0 a chooser without it.
@@ -115,7 +118,11 @@
  *       環/わ, 小家/こいえ, 禍/わざわい, 官/つかさ, 其/それ, 栖/す, 産/うぶ, and the rest; never opened by themselves).
  *     5 open a different row, both forms fixes: 代 read だい ×4 (1960-70年代) opens 代/だい#1982860 where 代/しろ#1411560
  *       was first; 証し read あかし ×1 opens 証/あかし#1351580 where 印/しるし#1168060 was first.
- *     0 are now absent.
+ *     None becomes empty. Of the 1,323 occurrences with an old first row, 1,318 keep that seq among the rows opened or
+ *     offered, and 5 open a different seq (the author reads these as fixes; that is not independently established).
+ *     Codex reproduced the counts independently (evidence/d11-census-independent/run-20260925T120549Z).
+ *   Coverage limit: 15 occurrences have more than six candidates (at most ten); none of their old first seqs falls
+ *   outside the visible six, but the omitted choices are not reachable from that chooser, whose count line says so.
  *
  * Scope: desktop Chromium, mouse at coordinates, keyboard Enter; ui=bi except G2's ja pass; dials 0,1,0. Every gesture
  * on a token or a sheet control is a real pointer at that element's own centre (elementFromPoint-checked), never
@@ -190,6 +197,9 @@ const WAKAT = tok(HANDWRITING, 139, { s: '分かっ', b: '分かる', p: '動詞
 const SAN = tok(MUSUBI, 621, { s: '産', b: '産', p: '名詞', r: 'さん', f: [{ t: '産', r: 'さん' }], c: true });
 const SAN_TWIN = tok(MUSUBI_VISUAL, 118, { s: '産', b: '産', p: '名詞', r: 'さん', f: [{ t: '産', r: 'さん' }], c: true });
 const FIXTURES = [CORE, IU, MIKOMI, DARE, ITT, YUKE, HI, WAKAT, SAN, SAN_TWIN];
+/** The fixture foundation, exactly: no control kill is admitted unless each of these F0 rows ran once and passed. */
+const F0_IDS = Object.freeze([...FIXTURES.map((fixture) => `F0.${fixture.passage.id}#${fixture.index}`),
+  'F0.core', 'F0.misses', 'F0.iu', 'F0.dare', 'F0.yuku', 'F0.san', 'F0.hi', 'F0.bases', 'F0.glosses', 'F0.senses']);
 const MISS_BASES = ['いう', '見込', 'だれ', 'ゆく', 'ひ', '分かる', '産'];
 
 // what each door must show: candidates as the chooser lists them, entries as the full sheet displays them
@@ -267,7 +277,8 @@ const CONTROLS = Object.freeze([
   Object.freeze({ name: 'c1', title: "the kana branch admits a row only by its primary reading (8d0fbccf's rule)", edits: ['primaryOnly'], run: 'match',
     requires: ['M.wakat.single', 'M.san.offered', 'M.dare.key'],
     kills: ['M.iu.chooser', 'M.itt.chooser', 'M.yuke.single'],
-    allowed: ['M.iu.choose', 'M.iu.back', 'M.itt.choose', 'M.dare.chooser', 'M.dare.tare', 'M.dare.back', 'M.hi.cap'],
+    // M.iu.yuu depends on the 結う candidate this rule removes (Codex D11 verifier r2)
+    allowed: ['M.iu.choose', 'M.iu.back', 'M.itt.choose', 'M.dare.chooser', 'M.dare.tare', 'M.dare.back', 'M.hi.cap', 'M.iu.yuu'],
     witness: (rows) => (seen(rows, 'M.iu.chooser').noteSeq === IU_PICK.seq && seen(rows, 'M.iu.chooser').noteState === 'single'
       && seen(rows, 'M.itt.chooser').noteSeq === IU_PICK.seq && seen(rows, 'M.yuke.single').choiceState === 'none'
       ? '' : 'いう/いっ did not open 言う directly, or ゆけ was not absent') }),
@@ -283,10 +294,11 @@ const CONTROLS = Object.freeze([
     witness: (rows) => (seen(rows, 'M.dare.chooser').candidates?.[0]?.head === 'たれ' ? '' : 'だれ did not list たれ first') }),
   Object.freeze({ name: 'c5', title: "the r3 overlay removed (lookup()'s own head and reading)", edits: ['noOverlay'], run: 'match',
     requires: ['M.iu.chooser', 'M.iu.choose', 'M.dare.chooser'],
-    kills: ['M.yuke.single', 'M.dare.tare'],
+    kills: ['M.yuke.single', 'M.dare.tare', 'M.iu.yuu'],
     allowed: [],
     witness: (rows) => (seen(rows, 'M.yuke.single').headword === 'ゆく／行く・往く' && seen(rows, 'M.dare.tare').headword === 'だれ／垂れ・垂'
-      ? '' : 'ゆけ and 垂れ were not displayed under lookup()\'s heads ゆく and だれ') }),
+      && seen(rows, 'M.iu.yuu').headword === 'いう／結う'
+      ? '' : 'ゆけ, 垂れ and 結う were not displayed under lookup()\'s heads ゆく, だれ and いう') }),
   Object.freeze({ name: 'c9', title: "lookup()'s alt kept beside the chosen head (r4 reverted)", edits: ['altKept'], run: 'match',
     requires: ['M.iu.chooser', 'M.iu.choose'],
     kills: ['M.iu.yuu'],
@@ -565,7 +577,12 @@ async function block(rec, ids, body) {
     rec(id, name, pass, detail, observed);
   };
   try { await body(once); } catch (error) {
-    for (const id of ids) if (!done.has(id)) { done.add(id); rec(id, `${id}: not reached`, false, `stopped: ${error.message}`, { unreached: true }); }
+    const unrecorded = ids.filter((id) => !done.has(id));
+    for (const id of unrecorded) { done.add(id); rec(id, `${id}: not reached`, false, `stopped: ${error.message}`, { unreached: true }); }
+    // an error after the block's last row (a close, say) is still this schedule's failure: it is never dropped
+    if (!unrecorded.length)
+      rec(`${ids.at(-1)}.after`, `${ids.join(', ')}: an error after the last row`, false, `stopped after its rows: ${error.message}`,
+        { unreached: true, afterRows: true });
   }
   for (const id of ids) if (!done.has(id)) { done.add(id); rec(id, `${id}: not recorded`, false, 'the block ended without this row', { unreached: true }); }
 }
@@ -878,7 +895,7 @@ async function runControl(spec) {
   try { await SCHEDULES[spec.run](open, rec); } catch (error) { control.error = error.message; } finally {
     for (const context of contexts) await context.close().catch(() => {});
   }
-  [control.verdict, control.reason] = adjudicate(spec, control, { runRows: RUN_ROWS, editFile: (key) => EDITS[key].file, candidateRows: results });
+  [control.verdict, control.reason] = adjudicate(spec, control, { runRows: RUN_ROWS, editFile: (key) => EDITS[key].file, candidateRows: results, foundationIds: F0_IDS });
   check(`C ${spec.name} (${spec.title}) is killed by ${spec.kills.join(' + ')}`, control.verdict === 'killed', `${control.verdict}: ${control.reason}`,
     { id: `C.${spec.name}` });
   return control;
