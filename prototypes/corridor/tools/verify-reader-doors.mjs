@@ -709,19 +709,34 @@ async function d6Visit(page, rec) {
       && canonical(markSets(awayMarked)) === canonical({ lit: [A_TOKEN.index], glossed: [A_TOKEN.index] }) && !homeBefore.lit.includes(A_TOKEN.index),
     JSON.stringify({ awayClean: markSets(awayClean), awayMarked: markSets(awayMarked), awayTaps }));
 
-  // reader-source-back: the visit returns home under the sheet it left from; 戻る only while a sheet is still open
+  // reader-source-back: the visit returns home under exactly the sheet it left from, that sheet's own door focused
+  // (restoreLearningSourceCaller focuses the visit's focusId in a frame); closing that ONE sheet hands focus back to the
+  // reader token it was opened from. Restoring passage and marks while losing S.stack must fail here (Codex D6 review).
   await page.locator('#reader-source-back').click();
   await page.waitForFunction((pid) => document.querySelector('.listen-row')?.dataset.passage === pid && document.querySelector('#reader .tok'),
     D6.home, { timeout: 10_000 });
+  await frames();
   const namedEnglish = () => page.evaluate(() => document.querySelectorAll('#reader .tok.named .tok-en, #reader .tok.named.has-en').length);
   const atReturn = await readerMarks(page), namedAtReturn = await tokenState(page, DOOR.index), englishAtReturn = await namedEnglish();
-  let presses = 0;
-  while (presses < 3 && (await page.locator('#sheet').count())) { await page.locator('#back').click(); presses += 1; }
+  const sheetsAtReturn = await page.evaluate(() => [...document.querySelectorAll('#sheet')].map((sheet) => sheet.dataset.node ?? null));
+  const focusAtReturn = await page.evaluate(() => document.activeElement?.id || null);
+  const closed = await page.locator('#back').click({ timeout: 5_000 }).then(() => true, () => false);
+  await frames();
+  const sheetsAfterClose = await page.locator('#sheet').count();
+  const focusAfterClose = await page.evaluate(() => {
+    const active = document.activeElement;
+    return { index: active?.dataset?.index ?? null, doorOf: active?.closest?.('.token-door')?.querySelector('.tok')?.dataset?.index ?? null };
+  });
   const uncovered = await readerMarks(page), namedUncovered = await tokenState(page, DOOR.index), englishUncovered = await namedEnglish();
   const visitGone = (await page.locator('#reader-source-back').count()) === 0;
-  rec('D6.returned', `D6 reader-source-back returns to ${D6.home} in the same document and ends the visit; closing the sheet it left from keeps ${D6.home}`,
-    atReturn.passage === D6.home && uncovered.passage === D6.home && uncovered.sheet === null && visitGone && await sameDocument(),
-    JSON.stringify({ atReturn: { passage: atReturn.passage, sheet: atReturn.sheet }, uncovered: { passage: uncovered.passage, sheet: uncovered.sheet }, presses, visitGone }));
+  const wordIndex = String(D6.word.index);
+  rec('D6.returned', `D6 reader-source-back returns to ${D6.home} in the same document under exactly the word:${D6.word.token.b} sheet, focus on #learning-source-return; one close ends the visit and focus returns to token ${D6.word.index}`,
+    atReturn.passage === D6.home && canonical(sheetsAtReturn) === canonical([`word:${D6.word.token.b}`])
+      && focusAtReturn === 'learning-source-return' && closed && sheetsAfterClose === 0
+      && (focusAfterClose.index === wordIndex || focusAfterClose.doorOf === wordIndex)
+      && uncovered.passage === D6.home && uncovered.sheet === null && visitGone && await sameDocument(),
+    JSON.stringify({ atReturn: { passage: atReturn.passage, sheets: sheetsAtReturn, focus: focusAtReturn }, closed, sheetsAfterClose,
+      focusAfterClose, uncovered: { passage: uncovered.passage, sheet: uncovered.sheet }, visitGone }));
   rec('D6.home-marks-restored', `D6 ${D6.home}'s own marks come back exactly (token ${D5.known.index} revealed and glossed, nothing else), under the sheet and with it closed`,
     canonical(markSets(atReturn)) === canonical(markSets(homeBefore)) && canonical(markSets(uncovered)) === canonical(markSets(homeBefore)),
     JSON.stringify({ before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) }),
