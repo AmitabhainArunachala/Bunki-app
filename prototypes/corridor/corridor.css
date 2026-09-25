@@ -6153,6 +6153,44 @@ body.zen .review-example {
     border-color: CanvasText;
   }
 }
+/* B2a-hint: the other window seems to have closed — a retry offer, never a promise. It sits
+ * under the read-only alert, outside #app, so a render never replaces it. */
+.record-hint {
+  position: fixed;
+  top: var(--record-hint-top, calc(120px + env(safe-area-inset-top)));
+  left: 50%;
+  z-index: 130;
+  width: min(calc(100% - 24px), 760px);
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line, currentColor);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(20, 24, 28, 0.18);
+}
+.record-hint[hidden] {
+  display: none;
+}
+.record-hint-failure {
+  display: block;
+  color: var(--red);
+}
+.record-hint-failure:empty {
+  display: none;
+}
+@media (forced-colors: active) {
+  .record-hint {
+    color: CanvasText;
+    background: Canvas;
+    border-color: CanvasText;
+  }
+}
 
 /* ------------------------------------------------------------ 復習 · zen
  * While a card is up, the glass holds only the card: no bar, no crumb, no
