@@ -6927,7 +6927,7 @@ document.addEventListener(
   true,
 );
 
-function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}) {
+function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false } = {}) {
   removeMini();
   activeTokenAlternatives = null;
   // the mini owns the moment: any lingering token-actions pill from an
@@ -6936,7 +6936,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}
     pill.hidden = true;
     pill.remove();
   }
-  const g = lookup(token.b);
+  // a reader token reads through the reader's quick look (D11); sentence
+  // tokens elsewhere keep lookup() and their old wording
+  const g = reader ? readerQuickRecord(token) : lookup(token.b);
   const mini = el('div', null);
   mini.id = 'mini';
   mini.setAttribute('role', 'dialog');
@@ -6959,6 +6961,14 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}
     );
   };
   paintSeal();
+  // D11: a reader token the core dictionary lacks is never captured from the
+  // mini — the capture path would store an empty or first-row answer for it
+  const held = reader && !D.dict[token.b];
+  if (held) {
+    seal.disabled = true;
+    seal.classList.add('reader-capture-held');
+    seal.setAttribute('aria-describedby', 'mini-take-reason');
+  }
   seal.addEventListener('click', async (event) => {
     event.stopPropagation();
     if (seal.disabled) return;
@@ -6975,7 +6985,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}
   });
   mini.append(seal);
   if (g?.r) mini.append(el('span', 'mini-reading', g.r));
-  mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  if (reader && !g?.m?.[0]) mini.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
+  else mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  if (held) {
+    const reason = el('span', 'mini-take-reason', readerCaptureReasonText(token.b));
+    reason.id = 'mini-take-reason';
+    mini.append(reason);
+  }
   mini.append(el('span', 'mini-hint', tx('辞書の全項目へ進める', 'open the complete entry')));
   const entry = biLabel('button', 'mini-entry', '全項目', 'full entry');
   entry.type = 'button';
@@ -7124,6 +7140,36 @@ function inlineGloss(rec) {
   return best;
 }
 
+/* D11 · the reader's quick look at ONE content token: its tap-2 line, its
+ * mini and its label. A core hit is lookup() itself, so it renders exactly as
+ * before. A spelling the core lacks answers only from records keyed by that
+ * spelling, in lookup()'s own order when no index row is in play: the
+ * learner's kept deep word, then the original word layer. It never takes the
+ * deep index's first row for the form, which lookup() returns once that form's
+ * rows are cached: that row is a guess about this token (いう → 結う "to do up
+ * (hair)"). With nothing to show, the reader says so instead of staying
+ * silent. lookup() is unchanged for every other caller. */
+function readerQuickRecord(token) {
+  if (D.dict[token.b]) return lookup(token.b);
+  const kept = S.deepWords?.[token.b];
+  if (kept) return { r: kept.r || '', m: kept.m || [] };
+  const old = D.words[token.b];
+  return old ? { r: old.r, m: old.g ? [old.g] : [] } : null;
+}
+
+function readerGlossMissText() {
+  return tx('この語は簡易辞書にありません・長押しで全辞書', 'Not in the quick dictionary — hold for the full dictionary');
+}
+
+/** The line under a content word on the ladder's English rung: its gloss
+ * exactly as before, or an honest dash when the quick dictionary has none. */
+function readerGlossLine(token) {
+  const record = readerQuickRecord(token);
+  return record?.m?.length
+    ? el('span', 'tok-en', inlineGloss(record))
+    : el('span', 'tok-en tok-en-miss', '—');
+}
+
 /** The tap ladder has one rung fewer when the ふりがな dial is つねに: the
  * reading is already on the page, so the first activation cannot reveal it and
  * goes straight to the English gloss (see activate(), below). The hint has to
@@ -7144,12 +7190,12 @@ function tapLadderHint() {
 }
 
 function tokenAccessibleLabel(token, index) {
-  const record = lookup(token.b);
+  const record = readerQuickRecord(token);
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
   const hasEnglish = S.glossed?.has(index);
   const parts = [token.s || token.b, tx('語', 'word')];
   if (hasReading && record?.r && record.r !== token.s) parts.push(record.r);
-  if (hasEnglish && record?.m?.length) parts.push(inlineGloss(record));
+  if (hasEnglish) parts.push(record?.m?.length ? inlineGloss(record) : readerGlossMissText());
   parts.push(
     readingsAlwaysOn()
       ? tx('もう一度で元どおり。長押しで全項目。フォーカスで別の操作。', 'a further activation clears; hold for the full entry; focus for more actions')
@@ -7222,11 +7268,8 @@ function paintTok(span, token, index) {
   span.classList.toggle('lit', !!(S.revealed?.has(index) || hasEn));
   const existingEn = span.querySelector('.tok-en');
   if (hasEn && !existingEn) {
-    const g = lookup(token.b);
-    if (g?.m?.length) {
-      span.classList.add('has-en');
-      span.append(el('span', 'tok-en', inlineGloss(g)));
-    }
+    span.classList.add('has-en');
+    span.append(readerGlossLine(token));
   } else if (!hasEn && existingEn) {
     span.classList.remove('has-en');
     existingEn.remove();
@@ -7249,10 +7292,9 @@ function wireTokenGestures(span, token, index, p) {
     if (down) swallowClickUntil = Date.now() + 700;
     obsLog('tap', obsKey, 3, p.id);
     if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-token');
-    go(
-      { t: 'word', id: token.b, from: { passage: p.id, index }, ctxScope: 'sent' },
-      { invoker: span },
-    );
+    // a core hit opens exactly as before; a spelling the core lacks is
+    // matched by this token's reading first (D11, readerEntryNode)
+    go(readerEntryNode(token, index, p), { invoker: span });
   };
   const quickLook = (modality = 'pointer', emitAction = false) => {
     setReaderTake(token.b, index, p.id);
@@ -7261,6 +7303,7 @@ function wireTokenGestures(span, token, index, p) {
     showMini(span, token, (entryModality) => openFull(entryModality, true), {
       focusEntry: modality !== 'pointer',
       from: { passage: p.id, index },
+      reader: true,
     });
   };
   const activate = (modality) => {
@@ -7869,11 +7912,8 @@ function renderReader(main) {
       }),
     );
     if (token.c && S.glossed?.has(index)) {
-      const g = lookup(token.b);
-      if (g?.m?.length) {
-        span.classList.add('has-en');
-        span.append(el('span', 'tok-en', inlineGloss(g)));
-      }
+      span.classList.add('has-en');
+      span.append(readerGlossLine(token));
     }
     let rendered = span;
     if (interactive) {
@@ -16538,6 +16578,25 @@ function readerTakeNode(cur) {
   return { t: 'word', id: cur.id, from: { passage: cur.p, index: cur.index }, ctxScope: 'sent' };
 }
 
+/** D11 · the reader's current word is one the core dictionary lacks: the
+ * capture path would store an empty or first-row answer for it, so the chrome
+ * seal never captures it. */
+function readerTakeHeld(cur) {
+  return !!cur && !D.dict?.[cur.id];
+}
+
+/** While the current word is held, the seal says so: aria-disabled rather than
+ * disabled, so it stays reachable and opens the reason where the capture panel
+ * opens, never a silent grey. A core hit's seal is left exactly as before. */
+function holdReaderTakeSeal(btn, cur) {
+  const held = readerTakeHeld(cur);
+  btn.classList.toggle('reader-capture-held', held);
+  if (held) {
+    btn.setAttribute('aria-disabled', 'true');
+    btn.setAttribute('aria-label', readerCaptureReasonText(cur.id));
+  } else btn.removeAttribute('aria-disabled');
+}
+
 function readerTakeLabel(cur, takenNow) {
   if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
   return takenNow
@@ -16571,6 +16630,7 @@ function syncReaderTakeSeal() {
   btn.setAttribute('aria-pressed', String(takenNow));
   btn.setAttribute('aria-expanded', String(!!S.captureOpen));
   btn.setAttribute('aria-label', readerTakeLabel(cur, takenNow));
+  holdReaderTakeSeal(btn, cur);
 }
 
 /* a tap anywhere outside the capture panel puts it away — the mini's law.
@@ -20550,7 +20610,247 @@ function requestDictionaryDetails(node) {
     });
 }
 
+/* ------------------------------------ D11 · a reader token's full-entry door
+ * The long hold (and the mini's 全項目 and the focus pill, which share it)
+ * used to open the deep index's first row for any spelling the core lacks:
+ * いう → 結う, だれ → 垂れ "sauce". A reader token whose spelling has no core
+ * entry now resolves here, never by changing lookup(), whose meaning stays the
+ * same for every other caller. The deep index is asked for the token's base
+ * form, and readerChoiceMatch() keeps only the rows that base form names —
+ * by its written form when it has kanji, by its reading when it is kana (結う
+ * is read ゆう, so いう never meets it), so a conjugated surface (分かっ, いっ)
+ * still finds its word:
+ *   one row    → it opens directly, by its entry number (seq);
+ *   several    → native candidate buttons, at most READER_CHOICE_MAX, in the
+ *                index's own order; a choice opens that seq, and 戻る returns
+ *                here with focus on the button that was chosen;
+ *   none       → the sheet says so plainly;
+ *   no index   → an honest unavailable line and a retry; the reader and its
+ *                core glosses never depend on the index.
+ * An answer that arrives after the sheet, the token or the passage changed
+ * paints nothing. Nothing on this path captures, grades or writes the learner
+ * record, and 覚 is held off along it with the reason on the sheet — the
+ * one-row case included, although it otherwise opens as before. The capture
+ * path does store the entry's seq, but a card is keyed by the spelling and
+ * reviewBack() looks that spelling up WITHOUT the seq: once the index holds
+ * the form's rows it answers with their first row, so a いう card would be
+ * reviewed as 結う. Until review carries the seq, the path cannot carry the
+ * choice safely. */
+const READER_CHOICE_MAX = 6;
+const READER_KANJI = /[\p{Script=Han}〆]/u;
+const READER_KANA = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
+
+/** The deep rows a reader token may be matched to, named by its base form:
+ *   (a) a base form written with kanji keeps the rows that write it exactly
+ *       (head or a listed written form); the reading is then irrelevant;
+ *   (b) a base form in kana is its own reading: rows whose primary reading it
+ *       is (いう → 言う alone; 結う's primary reading is ゆう);
+ *   (c) with no base form, or one in neither script (JR, No), the token's own
+ *       reading stands in for it. */
+function readerChoiceMatch(choice, rows) {
+  const base = choice.b || '';
+  if (READER_KANJI.test(base)) {
+    return { by: 'spelling', key: base, rows: rows.filter((row) => row[1] === base || row[4].includes(base)) };
+  }
+  const key = (READER_KANA.test(base) ? base : choice.r) || '';
+  const reading = kataToHira(key);
+  return { by: 'reading', key, rows: reading ? rows.filter((row) => kataToHira(String(row[2] || '')) === reading) : [] };
+}
+
+function readerEntryNode(token, index, p) {
+  const node = { t: 'word', id: token.b, from: { passage: p.id, index }, ctxScope: 'sent' };
+  if (D.dict[token.b]) return node;
+  node.readerChoice = { passage: p.id, index, s: token.s, b: token.b, r: token.r || '', state: 'pending' };
+  return node;
+}
+
+/** The token a choice was opened from still stands where it stood. */
+function readerChoiceTokenHolds(choice) {
+  if (S.view !== 'reader' || S.passageId !== choice.passage) return false;
+  const token = D.passages?.find((p) => p.id === choice.passage)?.tokens?.[choice.index];
+  return !!token && token.s === choice.s && token.b === choice.b && (token.r || '') === choice.r;
+}
+
+function resolveReaderChoice(node) {
+  const choice = node.readerChoice;
+  if (!choice || choice.state !== 'pending' || choice.requested) return;
+  choice.requested = true;
+  const settle = (apply) => {
+    choice.requested = false;
+    // a sheet that closed, or lies under another, takes nothing and paints
+    // nothing; should it reach the top again still pending, it asks again
+    if (S.stack.at(-1) !== node) return;
+    if (readerChoiceTokenHolds(choice)) apply();
+    else choice.state = 'moved';
+    refreshWordSheet(node);
+  };
+  ensureDictionaryRowsForForm(choice.b || choice.s).then(
+    (rows) => settle(() => {
+      const match = readerChoiceMatch(choice, rows);
+      const matching = match.rows;
+      choice.by = match.by;
+      choice.key = match.key;
+      if (matching.length === 1) {
+        node.seq = String(matching[0][0]);
+        node.reading = matching[0][2];
+        choice.state = 'single';
+      } else if (matching.length) {
+        choice.state = 'choose';
+        choice.total = matching.length;
+        choice.candidates = matching.slice(0, READER_CHOICE_MAX).map((row) => ({
+          seq: String(row[0]), head: row[1], reading: row[2], gloss: row[3] || '',
+        }));
+      } else {
+        choice.state = 'none';
+        choice.formRows = rows.length;
+      }
+    }),
+    () => settle(() => { choice.state = 'unavailable'; }),
+  );
+}
+
+/** Why 覚 is off for a reader token the core dictionary lacks: one reason,
+ * said wherever the reader could otherwise capture it (this path's sheets,
+ * the mini, the chrome seal). A core hit captures exactly as before. */
+function readerCaptureReasonText(spelling) {
+  return tx(
+    `この語はここで覚えられない。簡易辞書に項目がないため、綴り「${spelling}」で保存したカードは、復習で答えが空になるか別の語の意味になることがある。`,
+    `覚 is off for this word: it has no quick-dictionary entry, so a card saved under the spelling ${spelling} could be answered on review with no meaning or another word's.`,
+  );
+}
+
+function readerCaptureReason(node) {
+  const reason = el('p', 'reader-choice-capture', readerCaptureReasonText(node.id));
+  reason.id = 'reader-choice-capture';
+  return reason;
+}
+
+function holdReaderCapture(button) {
+  button.disabled = true;
+  button.classList.add('reader-capture-held');
+  button.setAttribute('aria-describedby', 'reader-choice-capture');
+}
+
+/** The sheet of a reader token before any entry is open: matching, the
+ * candidates, or an honest reason there is nothing to open. */
+function renderReaderChoice(sheet, node) {
+  const choice = node.readerChoice;
+  const head = el('h2', 'headword');
+  head.append(document.createTextNode(node.id));
+  sheet.append(head);
+  if (choice.r) sheet.append(el('p', 'reading', choice.r));
+  const box = el('div', 'reader-choice');
+  box.id = 'reader-choice';
+  box.dataset.state = choice.state;
+  if (choice.by) box.dataset.by = choice.by;
+  if (choice.state === 'pending') {
+    // the existing opening line: the index opens off the main thread
+    box.append(el('p', 'dictionary-opening', tx('語義と用法をひらいています…', 'Opening complete senses and usage…')));
+    queueMicrotask(() => resolveReaderChoice(node));
+  } else if (choice.state === 'unavailable') {
+    const warning = el('p', 'dictionary-warning', tx(
+      '全辞書をひらけないため、この語に合う項目を選べない。読み物と簡易辞書はそのまま使える。',
+      'The full dictionary could not be opened, so no entry can be matched to this word. The reader and its quick dictionary still work.',
+    ));
+    warning.id = 'reader-choice-unavailable';
+    const retry = biLabel('button', 'dictionary-retry', 'もう一度ひらく', 'try the full dictionary again');
+    retry.type = 'button';
+    retry.id = 'reader-choice-retry';
+    retry.addEventListener('click', () => {
+      if (S.stack.at(-1) !== node || choice.state !== 'unavailable') return;
+      choice.state = 'pending';
+      render();
+    });
+    box.append(warning, retry);
+  } else if (choice.state === 'moved') {
+    const moved = el('p', 'dictionary-warning', tx(
+      '辞書をひらく間に本文が変わったため、この語は照合していない。本文からもう一度ひらいてください。',
+      'The text changed while the dictionary opened, so this word was not matched. Open it again from the text.',
+    ));
+    moved.id = 'reader-choice-moved';
+    box.append(moved);
+  } else if (choice.state === 'none') {
+    // name what was actually matched: a written base form, or the reading used
+    const none = el('p', 'gloss absent', !choice.formRows || choice.by === 'spelling'
+      ? tx('この語は辞書にない。', 'This word is not in the dictionary.')
+      : choice.key
+        ? tx(`辞書に、読み「${choice.key}」の項目はない。`, `No dictionary entry is read ${choice.key}.`)
+        : tx('この語には読みがないため、辞書の項目と照合できない。', 'This word carries no reading, so it cannot be matched to a dictionary entry.'));
+    none.id = 'reader-choice-none';
+    box.append(none);
+  } else if (choice.state === 'choose') {
+    const title = withEn(
+      el('p', 'reader-choice-title', '候補から選ぶ（この文での意味は確かめてください）'),
+      'Choose the word — check it fits this sentence',
+      'en-inline',
+    );
+    title.id = 'reader-choice-title';
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-labelledby', title.id);
+    box.append(title);
+    for (const candidate of choice.candidates) {
+      const button = el('button', 'reader-choice-row');
+      button.type = 'button';
+      button.id = `reader-choice-${candidate.seq}`;
+      button.dataset.readerChoice = candidate.seq;
+      button.setAttribute('aria-label', [candidate.head, candidate.reading, candidate.gloss].filter(Boolean).join(' · '));
+      const stack = el('span', 'row-stack');
+      const word = el('span', 'row-word');
+      word.append(document.createTextNode(candidate.head), el('span', 'row-reading', candidate.reading));
+      stack.append(word);
+      if (candidate.gloss) stack.append(el('span', 'row-gloss', candidate.gloss));
+      const arrow = el('span', 'row-go', '›');
+      arrow.setAttribute('aria-hidden', 'true');
+      button.append(stack, arrow);
+      button.addEventListener('click', () => {
+        if (S.stack.at(-1) !== node) return;
+        // the article token keeps its identity (id, from); the chosen entry
+        // rides only as seq/reading, exactly as a homograph door opens one
+        go({
+          t: 'word', id: node.id, seq: candidate.seq, reading: candidate.reading, from: node.from, ctxScope: 'sent',
+          readerChoice: {
+            passage: choice.passage, index: choice.index, s: choice.s, b: choice.b, r: choice.r,
+            by: choice.by, key: choice.key, state: 'chosen',
+          },
+        }, { invoker: button });
+      });
+      box.append(button);
+    }
+    if (choice.total > choice.candidates.length) {
+      box.append(el('p', 'reader-choice-more', tx(
+        `候補 ${choice.total} 件のうち ${choice.candidates.length} 件を表示`,
+        `Showing ${choice.candidates.length} of ${choice.total} candidates`,
+      )));
+    }
+  }
+  box.append(readerCaptureReason(node));
+  sheet.append(box);
+}
+
+/** An entry opened from a reader token says how it was matched. */
+function renderReaderChoiceNote(sheet, node) {
+  const choice = node.readerChoice;
+  const note = el('div', 'reader-choice-note');
+  note.id = 'reader-choice-note';
+  note.dataset.seq = String(node.seq);
+  note.dataset.state = choice.state;
+  if (choice.by) note.dataset.by = choice.by;
+  const single = choice.by === 'spelling'
+    ? tx(`表記「${choice.key}」の項目はこれ一つ（この文での意味は確かめてください）`, `The one entry written ${choice.key} — check it fits this sentence`)
+    : tx(`読み「${choice.key}」の項目はこれ一つ（この文での意味は確かめてください）`, `The one entry read ${choice.key} — check it fits this sentence`);
+  note.append(el('p', null, choice.state === 'single'
+    ? single
+    : tx('候補から選んだ項目（この文での意味は確かめてください）', 'Chosen from the candidates — check it fits this sentence')));
+  note.append(readerCaptureReason(node));
+  sheet.append(note);
+}
+
 function renderWordNode(sheet, node) {
+  // D11: a reader token the core lacks is matched by reading before any entry opens
+  if (node.readerChoice && !node.seq) {
+    renderReaderChoice(sheet, node);
+    return;
+  }
   const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
   const legacy = D.words[node.id];
   const label = rec?.head || node.id;
@@ -20563,7 +20863,10 @@ function renderWordNode(sheet, node) {
   } else if (rec?.alt) head.append(el('span', 'headword-alt', `／${rec.alt}`));
   sheet.append(head);
   if (rec?.r) sheet.append(el('p', 'reading', rec.r));
-  renderDictionaryHomographs(sheet, node);
+  // an entry matched from a reader token offers no other rows of the form:
+  // its reading already chose among them (D11)
+  if (node.readerChoice) renderReaderChoiceNote(sheet, node);
+  else renderDictionaryHomographs(sheet, node);
 
   // TRANSLATION — every sense, most common first (JMdict order). Once the
   // word's shard arrives, the full source senses take this spot: homographs,
@@ -20720,7 +21023,9 @@ function renderWordNode(sheet, node) {
     sheet.append(semWrap);
   }
 
-  sheet.append(takeButton(node, label));
+  const take = takeButton(node, label);
+  if (node.readerChoice) holdReaderCapture(take);
+  sheet.append(take);
   renderContextPicker(sheet, node);
   renderListPicker(sheet, node, label);
   renderStudyFold(sheet, node, { id: node.id, from: node.from });
@@ -22791,6 +23096,8 @@ function renderSheet(root) {
       S.listMenuFor = takenNow ? null : `${capNode.t}|${capNode.id}`;
       render();
     });
+    // a word matched from a reader token cannot be carried safely by a card (D11)
+    if (node.readerChoice) holdReaderCapture(capture);
     bar.append(capture);
   }
   const closeBtn = el('button', 'sheet-close', '✕');
@@ -24334,12 +24641,20 @@ function render() {
     capBtn.setAttribute('aria-pressed', String(curTaken));
     capBtn.setAttribute('aria-expanded', String(!!S.captureOpen));
     capBtn.setAttribute('aria-label', readerTakeLabel(cur, curTaken));
+    holdReaderTakeSeal(capBtn, cur);
     capBtn.addEventListener('click', async () => {
       if (capBtn.disabled) return;
       const now = readerTakeCurrent();
       if (!now) return;
       if (S.captureOpen) {
         S.captureOpen = false;
+        render();
+        return;
+      }
+      // D11: a word the core dictionary lacks is never captured here; the
+      // panel opens with the reason instead of the capture controls
+      if (readerTakeHeld(now)) {
+        S.captureOpen = true;
         render();
         return;
       }
@@ -24406,9 +24721,17 @@ function render() {
     head.append(el('span', 'capture-word', cur.id));
     head.append(el('span', 'pool-tag', tx(NODE_KIND.word[0], NODE_KIND.word[1])));
     panel.append(head);
-    panel.append(takeButton(capNode, cur.id));
-    renderContextPicker(panel, capNode);
-    renderListPicker(panel, capNode, cur.id);
+    if (readerTakeHeld(cur)) {
+      // D11: a held word shows why, and offers nothing that could capture it
+      panel.setAttribute('aria-label', tx(`「${cur.id}」はここで覚えられない`, `${cur.id} cannot be memorized here`));
+      const reason = el('p', 'reader-choice-capture', readerCaptureReasonText(cur.id));
+      reason.id = 'reader-take-reason';
+      panel.append(reason);
+    } else {
+      panel.append(takeButton(capNode, cur.id));
+      renderContextPicker(panel, capNode);
+      renderListPicker(panel, capNode, cur.id);
+    }
     root.append(panel);
     requestAnimationFrame(() => {
       const bar = document.querySelector('.chrome');

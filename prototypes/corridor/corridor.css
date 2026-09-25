@@ -7562,3 +7562,25 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 /* the 音 door's reason when it cannot play — visible and announced, never a silent tap */
 .say-note { display: block; flex-basis: 100%; margin-top: .25rem; font-size: .82rem; color: var(--faint); }
 .say-note:empty { display: none; }
+
+/* D11 · the reader's honest gloss (2026-09-25). A content word the quick
+ * dictionary cannot gloss says so: a faint dash on the English rung, one
+ * plain line in the mini. Its full-entry door offers only dictionary rows
+ * read as the token is read, as native candidate buttons, and holds 覚 off
+ * along that path with the reason on the sheet. New classes only; nothing a
+ * core hit renders is restyled. */
+.tok-en.tok-en-miss { color: var(--faint); }
+#mini .mini-miss { color: var(--faint); }
+.reader-choice { margin: 8px 0 14px; }
+.reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: 12px; letter-spacing: 0.08em; }
+.reader-choice-row { display: flex; align-items: center; gap: 9px; width: 100%; min-height: var(--tap); padding: 7px 1px;
+  border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; color: var(--indigo); text-align: left; font: inherit; cursor: pointer; }
+.reader-choice-row:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+.reader-choice-more,
+.reader-choice-note,
+.reader-choice-capture { margin: 6px 0 10px; font-size: 12px; line-height: 1.6; color: var(--faint); }
+.reader-choice-note p { margin: 0 0 4px; }
+.reader-capture-held { opacity: 0.45; cursor: not-allowed; }
+/* the chrome seal stays reachable (aria-disabled): pressing it opens the reason */
+.reader-capture-held[aria-disabled='true'] { cursor: help; }
+#mini .mini-take-reason { margin-top: 3px; font-size: 10.5px; line-height: 1.45; color: var(--faint); }
