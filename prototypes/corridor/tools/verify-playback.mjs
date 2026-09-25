@@ -15,7 +15,9 @@
  * named reason, otherwise a named one-line source mutant of corridor.js):
  *   article/voice binding  → 19e5b1ec (a global failure flag follows the learner)
  *   new choice clears      → 19e5b1ec, or delete `readAloud.failed = null` in the picker
- *   second clip errors     → delete the `return` after the failure stop: the third clip is asked for
+ *   second clip errors     → replace the failure branch's stop (failed/on=false/onDone/return) with
+ *                            `i += 1; readAloud.timer = setTimeout(next, 260); return;`: the read
+ *                            skips the failure, asks for the third clip, and names nothing
  *   refused-then-saved     → delete `readAloud.voiceNotSaved = false`
  *   late manifest (both)   → replace refreshListenRow() with render(): focus leaves the probe
  *   pending grade+undo     → delete `if (serial !== cardAudioSerial) return;`
@@ -486,15 +488,22 @@ try {
   results.push({ name: 'terminal', pass: false, error: error.message, stack: error.stack });
 } finally {
   await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, error: error.message }));
-  if (server) await new Promise((done) => server.close(done));
+  if (server) await new Promise((done) => server.close((error) => {
+    if (error) results.push({ name: 'server · cleanup', pass: false, error: error.message });
+    done();
+  }));
   if (!results.length) results.push({ name: filter || 'playback', pass: false, error: 'No matching tests' });
-  const failures = results.filter((row) => !row.pass).length;
+  // the identity read must never cost the receipt: a failure is recorded in place of the digest
+  let corridorSha256;
+  try { corridorSha256 = createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'))).digest('hex'); }
+  catch (error) { corridorSha256 = null; results.push({ name: 'identity · corridor.js digest', pass: false, error: error.message }); }
   writeFileSync(resolve(out, 'verify-playback.json'), `${JSON.stringify({
     site: CORRIDOR_DIR,
-    corridorSha256: createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'))).digest('hex'),
+    corridorSha256,
     simulatedBrowser: 'Chromium', audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
-    results, failures,
+    results, failures: results.filter((row) => !row.pass).length,
   }, null, 2)}\n`);
+  const failures = results.filter((row) => !row.pass).length;
   console.log(`Playback lifecycle: ${results.length - failures}/${results.length} passed.`);
   process.exitCode = failures ? 1 : 0;
 }
