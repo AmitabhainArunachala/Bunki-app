@@ -1126,8 +1126,17 @@ try {
       await door.click();
       await selectLevel(page, pin.level);
       await page.locator(`[data-exam-start=${JSON.stringify(entry.id)}]`).waitFor();
+      // the room's real title is Japanese; English rides as its inline subtitle (E r1 A11)
+      assert.deepEqual(
+        await page.locator('.assessment-room > h1').evaluate((h1) => ({
+          lang: h1.lang,
+          title: h1.firstChild?.nodeType === Node.TEXT_NODE ? h1.firstChild.textContent : null,
+          subtitleLang: h1.querySelector(':scope > .en-inline')?.lang ?? null,
+        })),
+        { lang: 'ja', title: 'JLPT 模試・練習', subtitleLang: 'en' },
+      );
       assert.equal(
-        await page.locator('.assessment-room > h1').textContent(),
+        await page.locator('.assessment-room > h1 > .en-inline').textContent(),
         'JLPT tests & practice',
       );
       assert.match(await page.locator('.exam-section-heading').innerText(), /Practice by skill/u);
@@ -1192,7 +1201,8 @@ try {
       );
       return {
         dojoLabel,
-        catalogTitle: 'JLPT tests & practice',
+        catalogTitleJa: 'JLPT 模試・練習',
+        catalogSubtitleEn: 'JLPT tests & practice',
         readyWrittenSections: sections.length,
         readyMockTests: 0,
         choiceMetrics,
