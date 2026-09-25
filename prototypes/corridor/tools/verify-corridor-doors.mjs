@@ -22,6 +22,7 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -77,15 +78,27 @@ async function enterJlptFromDojo(page, { fromDoor = false } = {}) {
 }
 
 try {
-  // T0
+  // T0 — the build under test is the one named, byte for byte, or nothing below counts.
   const context0 = await browser.newContext();
   const page0 = await context0.newPage();
   const identity = await (await page0.request.get(`${origin}/build-identity.json`)).json();
   let head = null;
   try { head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { /* outside a checkout */ }
-  check('T0 served build identity is recorded', typeof identity.gitSha === 'string',
-    `gitSha=${identity.gitSha} sourceDirty=${identity.sourceDirty} head=${head}`);
+  const expectedSha = process.env.KAIRO_EXPECT_GITSHA || head;
+  const pinnedArtifact = process.env.KAIRO_ARTIFACT_SHA256;
+  check('T0 served gitSha is the expected commit', !!expectedSha && identity.gitSha === expectedSha,
+    `served=${identity.gitSha} expected=${expectedSha} sourceDirty=${identity.sourceDirty}`);
+  check('T0 served build is clean', identity.sourceDirty === false, `sourceDirty=${identity.sourceDirty}`);
+  if (pinnedArtifact) check('T0 served artifact is the pinned digest', identity.artifactSha256 === pinnedArtifact,
+    `served=${identity.artifactSha256} pinned=${pinnedArtifact}`);
+  const manifest = new Map(identity.files.map((row) => [row.path, row.sha256]));
+  for (const path of ['index.html', 'corridor.js', 'corridor.css', 'assessment-view.mjs']) {
+    const bytes = Buffer.from(await (await page0.request.get(`${origin}/${path}`)).body());
+    const served = createHash('sha256').update(bytes).digest('hex');
+    check(`T0 served ${path} matches its manifest entry`, served === manifest.get(path), served.slice(0, 16));
+  }
   await context0.close();
+  if (results.some((r) => !r.pass)) throw new Error('T0 identity failed: no behaviour below would describe the named build');
 
   // T1 — two windows in one profile share the record lock.
   {
@@ -128,6 +141,22 @@ try {
     } else check('T3 retry leaves the fault and draws the room', false, 'no retry control');
     await page.screenshot({ path: resolve(EVIDENCE, 't3-room-error.png') });
     faulty = false;
+    await context.close();
+  }
+
+  // T8 — a late rejection from somewhere else never paints an error on the healthy front door,
+  // whose main is deliberately empty (Drift draws on its own layer).
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage(); await page.goto(origin); await ready(page);
+    const before = await mainState(page);
+    await page.evaluate(() => new Promise((done) => {
+      setTimeout(() => { Promise.reject(new Error('late fault from a room already left')); }, 50);
+      setTimeout(done, 400);
+    }));
+    const after = await mainState(page);
+    check('T8 a stray late rejection leaves the healthy front door untouched',
+      !after.error && after.kids === before.kids, JSON.stringify({ before, after }));
     await context.close();
   }
 
