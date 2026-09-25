@@ -23662,7 +23662,12 @@ function buildGingaChrome(root) {
   if (maintenanceReports) {
     const report = el('button', 'nav-report', tx('問題を報告', 'Report a problem')); report.type = 'button';
     report.dataset.reportEntry = 'open';
-    report.addEventListener('click', () => { S.navOpen = false; render(); maintenanceReports.openReport(); });
+    report.addEventListener('click', () => {
+      S.navOpen = false; render();
+      // the initiating control leaves with the nav; closing the report returns to the symbol that opened it
+      document.getElementById('ginga-symbol')?.focus({ preventScroll: true });
+      maintenanceReports.openReport();
+    });
     bar.append(report);
   }
   root.append(bar);
@@ -24067,7 +24072,9 @@ function render() {
     main.replaceChildren();
     renderRoomError(main, S.view, error);
   }
-  if (maintenanceReports && !['drift', 'entry'].includes(S.view)) main.append(reportEntries());
+  // after the room, never inside its stage: the focused stage keeps its composition and every
+  // state (probe, unavailable card, error) keeps a report entry one scroll away
+  if (maintenanceReports && S.view !== 'drift') root.append(reportEntries('report-line-page'));
 
   renderSheet(root);
   renderStrokePage(root);

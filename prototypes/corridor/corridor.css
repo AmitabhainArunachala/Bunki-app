@@ -7515,4 +7515,4 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 .report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
 .report-line-sheet { margin: 2rem 0 .5rem; }
-body.zen main > .report-line { display: none; }
+#app > .report-line-page { max-width: 40rem; margin-inline: auto; padding-inline: 1rem; }
