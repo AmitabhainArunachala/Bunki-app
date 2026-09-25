@@ -1,0 +1,217 @@
+{
+  "schema": "kairo-assessment-catalog/1",
+  "revision": "67928be0f0d58d0c2724175d48224807da7360db1d2c41feb352b3621c581969",
+  "entries": [
+    {
+      "id": "kairo-original-jlpt-n2-form-01",
+      "level": "N2",
+      "mode": "full",
+      "titleJa": "N2 模擬試験 1",
+      "titleEn": "N2 full practice test 1",
+      "questionCount": 107,
+      "durationMinutes": 158,
+      "listeningTiming": {
+        "officialNominalMinutes": 50,
+        "recordedDurationMs": 3104847,
+        "startupTransitionAllowanceMs": 60000,
+        "scheduledDurationMs": 3180000,
+        "basis": "Exact53-minute authored playback budget. The official reference is approximately50minutes; its nominal-listening group permits variation according to recorded materials."
+      },
+      "skillCounts": {
+        "vocabulary": 32,
+        "grammar": 22,
+        "reading": 21,
+        "listening": 32
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-n2-20260910",
+        "jlpt-official-workbooks",
+        "bunki-original-jlpt-generated-20260923",
+        "kairo-local-tts-voices-20260923",
+        "voice-koharune-ami",
+        "voice-jvnv-sbv2"
+      ],
+      "formPath": null,
+      "formSha256": null,
+      "editorialAtStart": null,
+      "deliveryPath": null,
+      "deliverySha256": null,
+      "mediaAssets": [],
+      "review": {
+        "status": "pending",
+        "evidencePath": null
+      },
+      "availability": {
+        "ready": false,
+        "reasons": [
+          "independent-editorial-review-pending"
+        ]
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n2-medium-01",
+      "level": "N2",
+      "mode": "medium",
+      "titleJa": "N2 ミディアム練習",
+      "titleEn": "N2 medium practice",
+      "questionCount": 40,
+      "durationMinutes": 60,
+      "skillCounts": {
+        "vocabulary": 12,
+        "grammar": 10,
+        "reading": 10,
+        "listening": 8
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-n2-20260923",
+        "bunki-original-jlpt-generated-20260923",
+        "kairo-local-tts-voices-20260923",
+        "voice-koharune-ami",
+        "voice-jvnv-sbv2"
+      ],
+      "formPath": null,
+      "formSha256": null,
+      "editorialAtStart": null,
+      "deliveryPath": null,
+      "deliverySha256": null,
+      "mediaAssets": [],
+      "review": {
+        "status": "pending",
+        "evidencePath": null
+      },
+      "availability": {
+        "ready": false,
+        "reasons": [
+          "independent-editorial-review-pending"
+        ]
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01",
+      "level": "N2",
+      "mode": "short",
+      "titleJa": "N2 ショート練習",
+      "titleEn": "N2 short practice",
+      "questionCount": 16,
+      "durationMinutes": 20,
+      "skillCounts": {
+        "vocabulary": 4,
+        "grammar": 4,
+        "reading": 4,
+        "listening": 4
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-n2-20260923",
+        "kairo-local-tts-voices-20260923",
+        "voice-koharune-ami",
+        "voice-jvnv-sbv2"
+      ],
+      "formPath": null,
+      "formSha256": null,
+      "editorialAtStart": null,
+      "deliveryPath": null,
+      "deliverySha256": null,
+      "mediaAssets": [],
+      "review": {
+        "status": "pending",
+        "evidencePath": null
+      },
+      "availability": {
+        "ready": false,
+        "reasons": [
+          "independent-editorial-review-pending"
+        ]
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:written-review",
+      "level": "N2",
+      "mode": "section",
+      "titleJa": "N2 文字・語彙・文法・読解の練習 · 12問",
+      "titleEn": "N2 written practice · 12 questions",
+      "questionCount": 12,
+      "durationMinutes": 15,
+      "skillCounts": {
+        "vocabulary": 4,
+        "grammar": 4,
+        "reading": 4,
+        "listening": 0
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-n2-20260923"
+      ],
+      "publicationRoute": "exact-reviewed-written-section/1",
+      "sharesQuestionsWith": [
+        "kairo-original-jlpt-n2-short-01"
+      ],
+      "formPath": "forms/kairo-original-jlpt-n2-written-12-01-56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2.json",
+      "formSha256": "56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2",
+      "editorialAtStart": {
+        "status": "ai-reviewed-practice",
+        "policyVersion": "bunki-ai-review/2",
+        "decisionRevisionIds": [
+          "assessment-ai-editorial-v2:0ce3c2558d264153632a8c4e054a3fdb617f7699653c21b063fab46822b990d2",
+          "assessment-ai-editorial-v2:214e169c2aca78ae7e9147e6fac59773db9719cb3f43d18e621ab6a54bd2735c",
+          "assessment-ai-editorial-v2:4acd0903051b060a1aeb4c423cbc550f0ae6aa7d3ba21aef48a54ff5a87bf2e8",
+          "assessment-ai-editorial-v2:a83735c6144fe3664d545e0d923f8d447580b7278c9aadb4554334f86d71f023",
+          "assessment-ai-editorial-v2:c8fe41d9399614ec9eb10ee671813788d4a26e1993c0a24ceb27cfdbcda3400d",
+          "assessment-ai-editorial-v2:cfa3d788157935224fbe9fca1542e14845dd193e71cc8529434c21c5ff521748",
+          "assessment-ai-editorial-v2:efa187004775698e8380a3159565daeb4e11121de2d01fa296522f52bf7e94e0"
+        ]
+      },
+      "deliveryPath": "delivery/kairo-original-jlpt-n2-written-12-01-a63dd060f7e3cdbd68c534955095567146d14f09a24716db7fab45c17f1b0953.json",
+      "deliverySha256": "a63dd060f7e3cdbd68c534955095567146d14f09a24716db7fab45c17f1b0953",
+      "mediaAssets": [],
+      "review": {
+        "status": "ai-reviewed",
+        "evidencePath": "reviews/kairo-original-jlpt-n2-written-12-01-dff008e8618b386548978b8359d78b6a750314352fbafdd2e9effa904c3022e1.json"
+      },
+      "availability": {
+        "ready": true,
+        "reasons": []
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    }
+  ],
+  "archivedEntries": [],
+  "archivalPolicy": "Admitted revisions remain addressable by form ID and SHA-256. Immutable form, delivery, review and audio files are retained for saved attempts and learning cards; a new catalog version does not delete them.",
+  "targetDistinctFullFormsPerLevel": 5,
+  "levels": [
+    {
+      "level": "N5",
+      "readyFullForms": 0,
+      "authoredFullForms": 0
+    },
+    {
+      "level": "N4",
+      "readyFullForms": 0,
+      "authoredFullForms": 0
+    },
+    {
+      "level": "N3",
+      "readyFullForms": 0,
+      "authoredFullForms": 0
+    },
+    {
+      "level": "N2",
+      "readyFullForms": 0,
+      "authoredFullForms": 1
+    },
+    {
+      "level": "N1",
+      "readyFullForms": 0,
+      "authoredFullForms": 0
+    }
+  ]
+}

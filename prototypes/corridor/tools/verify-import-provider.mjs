@@ -213,10 +213,10 @@ try {
       }, { ...seed, ai: { baseUrl: origin, model: 'synthetic-legacy-model' } }, { [DEVICE_KEY]: null, [LEGACY_KEY]: key });
     }
     const malformed = [
-      ['future-version', { v: 2, taken: [] }],
-      ['future-record-with-parameter-candidate', { v: 2, taken: [], candidatePin: parameterPin }],
+      ['future-version', { v: 3, taken: [] }],
+      ['future-record-with-parameter-candidate', { v: 3, taken: [], candidatePin: parameterPin }],
       ['backup-with-parameter-candidate', { format: 'kairo-backup', version: 1, record: { v: 2, taken: [] }, candidatePin: parameterPin }],
-      ['future-version-without-taken-and-parameter-candidate', { v: 2, candidatePin: parameterPin }],
+      ['future-version-without-taken-and-parameter-candidate', { v: 3, candidatePin: parameterPin }],
       ['missing-version', { taken: [] }],
       ['invalid-list-item', { v: 1, taken: [], lists: { saved: [{ t: 'word', id: 5 }] } }],
       ['invalid-observation', { v: 1, taken: [], obslog: [[1, 'sensei', 'word:学校', 4, 'misread', 'x']] }],

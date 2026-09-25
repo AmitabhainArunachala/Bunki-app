@@ -27,6 +27,7 @@ const SOURCE_UNITS = Object.freeze({
   'bundled-passage': 'token-index',
   'personal-reading': 'utf16-code-unit',
   'publisher-reading': 'utf16-code-unit',
+  'assessment-item': 'utf16-code-unit',
 });
 const TARGET_TYPES = new Set(['word', 'kanji', 'grammar', 'particle']);
 // These validators intentionally reject control characters in serialized text.
@@ -159,7 +160,8 @@ function decode(raw) {
 function payload(raw, constructor = false) {
   record(raw, constructor ? INPUT_FIELDS : CONTEXT_FIELDS, constructor ? ['version'] : []);
   const version = constructor && !Object.hasOwn(raw, 'version') ? VERSION : raw.version;
-  if (version !== VERSION) fail('invalid-version', 'version');
+  if (version !== VERSION && version !== 2) fail('invalid-version', 'version');
+  if ((raw.sourceKind === 'assessment-item') !== (version === 2)) fail('invalid-version', 'sourceKind');
   if (typeof raw.sourceKind !== 'string' || !Object.hasOwn(SOURCE_UNITS, raw.sourceKind))
     fail('invalid-source-kind', 'sourceKind');
   if (raw.unit !== SOURCE_UNITS[raw.sourceKind]) fail('invalid-unit', 'unit');

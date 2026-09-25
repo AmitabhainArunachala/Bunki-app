@@ -23,6 +23,12 @@
     "verify:integration-manifest": "node scripts/verify-integration-manifest.mjs",
     "verify:writing-room:clock": "node prototypes/corridor/tools/verify-writing-room-clock.mjs",
     "verify:writing-room": "npm run verify:writing-room:clock && node prototypes/corridor/tools/verify-writing-room.mjs",
+    "verify:assessment:bank": "node prototypes/corridor/tools/verify-assessment-bank.mjs",
+    "verify:assessment:learning": "node prototypes/corridor/tools/verify-assessment-learning.mjs",
+    "verify:assessment:room": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-room.mjs",
+    "verify:assessment:record": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-v2-finalize.mjs",
+    "verify:assessment:app": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-app.mjs",
+    "verify:assessment:standalone": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-standalone.mjs",
     "bunki:web:dev": "node scripts/serve-corridor-dev.mjs",
     "bunki:web:build": "node scripts/build-corridor-site.mjs",
     "bunki:web:test": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
@@ -32,7 +38,11 @@
     "verify:drift:fast": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode fast",
     "verify:drift:full": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode full",
     "verify:release-gates": "node scripts/verify-release-gates.mjs",
-    "verify:corridor-build": "node scripts/verify-corridor-build.mjs"
+    "verify:corridor-build": "node scripts/verify-corridor-build.mjs",
+    "verify:assessment:question": "node prototypes/corridor/tools/verify-assessment-question-practice.mjs",
+    "verify:assessment:question-source": "node prototypes/corridor/tools/verify-assessment-question-source.mjs",
+    "verify:assessment:question-view": "node prototypes/corridor/tools/verify-assessment-question-view.mjs",
+    "verify:assessment:written-section": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-written-section.mjs"
   },
   "dependencies": {
     "decode-uri-component": "file:./packages/uri-decoder-compat"

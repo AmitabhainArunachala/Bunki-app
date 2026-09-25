@@ -28,7 +28,8 @@ const source = readFileSync(resolve(site || root, 'corridor.js'), 'utf8');
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = new Set([
   'srsKey', 'srsCardOf', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
-  'advanceReviewSession', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
+  'focusKanjiReadingReview', 'kanjiAnswerAvailable',
+  'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
@@ -85,6 +86,7 @@ function fixture(overrides = {}) {
   let scrolls = 0;
   const sandbox = {
     S, Date, Math, JSON, Set, Map, console, fsrsApi, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
+    assessmentQuestionReviewOwner: null,
     recordReady: (epoch = 1) => epoch === sandbox.recordEpoch,
     recordWritable: (epoch = 1) => epoch === sandbox.recordEpoch,
     render: () => { paints += 1; },
@@ -153,6 +155,7 @@ await check('queued-grade-recomputes-latest-card-and-preserves-concurrent-log-an
   assert.equal(f.S.revlog.length, 2); assert.equal(f.S.revlog[1][3], prior.state);
   assert.equal(f.S.stats['2026-09-10'].n, 3); assert.equal(f.S.stats['2026-09-10'].nnew, 2);
   assert.deepEqual(clone(f.S.review.history[0].prev), clone(prior)); assert.equal(f.S.review.history[0].logIx, 1);
+  assert.equal(f.S.review.history[0].item, item); assert.equal(f.S.review.history[0].queueIndex, 0);
   assert.equal(f.S.review.ix, 1);
 });
 await check('not-recalled-forces-again-even-if-another-grade-is-requested', async () => {
@@ -184,6 +187,42 @@ await check('undo-does-not-overwrite-a-later-card-change', async () => {
   promise = byClass(f.render('renderReviewUndo', f.S.review), 'review-undo').fire();
   f.external({ srs: { 'word:学校': { ...f.S.srs['word:学校'], reps: 90 } } }); const before = f.durable();
   f.ack(); await promise; assert.deepEqual(f.durable(), before); assert.equal(f.S.review.ix, 1);
+});
+await check('acknowledged-grade-disposes-question-view-and-clears-transient-response-state', async () => {
+  const f = fixture(); const rv = f.S.review;
+  Object.assign(rv, { questionAttemptId: 'previous-question-response', questionError: 'previous error',
+    questionSourceAttempted: true, questionSourceChecking: true, questionSourceAvailable: true });
+  let disposed = 0;
+  const owner = { rv, view: { dispose: () => { disposed += 1; } } };
+  f.c.assessmentQuestionReviewOwner = owner;
+  let promise = grade(f);
+  assert.equal(disposed, 0); assert.equal(rv.questionAttemptId, 'previous-question-response');
+  f.ack(false); assert.equal(await promise, false);
+  assert.equal(disposed, 0); assert.equal(f.c.assessmentQuestionReviewOwner, owner);
+  assert.equal(rv.questionSourceAvailable, true);
+  promise = grade(f); f.ack(); assert.equal(await promise, true);
+  assert.equal(disposed, 1); assert.equal(f.c.assessmentQuestionReviewOwner, null);
+  assert.equal(rv.questionAttemptId, null); assert.equal(rv.questionError, '');
+  assert.equal(rv.questionSourceAttempted, false); assert.equal(rv.questionSourceChecking, false);
+  assert.equal(rv.questionSourceAvailable, false);
+});
+await check('undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion', async () => {
+  const f = fixture(); const rv = f.S.review;
+  const skipped = { t: 'word', id: '電話', label: '電話', ts: 100, started: 100 };
+  const current = { t: 'word', id: '先生', label: '先生', ts: 100, started: 100 };
+  rv.queue = [item, skipped, current]; rv.declared = 0;
+  let promise = grade(f); f.ack(); assert.equal(await promise, true);
+  assert.equal(rv.history[0].item, item); assert.equal(rv.history[0].queueIndex, 0);
+  assert.equal(rv.history[0].reinserted, true); assert.deepEqual(rv.queue, [item, skipped, current, item]);
+  // Skip advances the cursor without minting a grade or a history entry.
+  rv.ix = 2;
+  promise = byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
+  f.ack(); assert.equal(await promise, true);
+  assert.equal(rv.ix, 0); assert.equal(rv.history.length, 0); assert.equal(rv.done.again, 0);
+  assert.deepEqual(rv.queue, [item, skipped, current]);
+  assert.equal(f.S.srs['word:学校'], undefined); assert.equal(f.S.revlog.length, 2);
+  assert.deepEqual(f.S.revlog[1].slice(1), ['word:学校', 0, 0]);
+  assert.equal(f.S.stats['2026-09-10'].n, 0); assert.equal(f.S.stats['2026-09-10'].nnew, 0);
 });
 await check('dojo-evidence-waits-for-ack-and-never-creates-schedule-state', async () => {
   const f = fixture(); const before = f.durable();
@@ -417,14 +456,14 @@ async function browserChecks() {
           assert.deepEqual(enrolled.srs, before.srs); assert.deepEqual(enrolled.revlog, before.revlog); assert.deepEqual(enrolled.futureRoot, before.futureRoot);
         });
         await journey('practice-answer-rejection-keeps-the-question-unanswered', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').waitFor(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('[data-mock-opt="0"]').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
           assert.equal(await page.locator('#mock-next').isDisabled(), true);
           assert.equal(await page.locator('[data-mock-opt][aria-pressed="true"]').count(), 0);
         });
         await journey('practice-navigation-rejection-keeps-the-acknowledged-answer-and-question', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').click(); await page.locator('[data-mock-opt="0"][aria-pressed="true"]').waitFor();
           const question = await page.locator('.mock-q').textContent(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('#mock-next').click(); await failed(page, before);

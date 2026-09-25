@@ -214,9 +214,10 @@ async function openCapture(page) {
 
 async function openReading(page, articleId) {
   const item = articleId
-    ? page.locator(`.shelf-item[data-passage=${JSON.stringify(articleId)}]`)
-    : page.locator('.shelf-item').first();
+    ? page.locator(`.shelf-item:not([data-recommendation])[data-passage=${JSON.stringify(articleId)}]`)
+    : page.locator('.shelf-item:not([data-recommendation])').first();
   await item.waitFor();
+  assert.equal(await item.count(), 1, 'Reading action targets one canonical bookshelf item');
   const id = await item.getAttribute('data-passage');
   await item.locator('.shelf-open').click();
   await page.locator('#reader .tok').first().waitFor();

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { canonicalJson } from '@bunki/domain/canonical-json';
 import {
   createSyncOperation,
+  createSyncOperationV2,
   operationReference,
   SYNC_MERGE_POLICY,
   SYNC_SCHEMA_EPOCH,
@@ -16,6 +17,7 @@ import {
   type NativeRpcOwnerCapture,
   type NativeRpcLimits,
 } from '../../src/replication/native-rpc-session.ts';
+import { assessmentResultFixtureV2 } from './assessment-v2-fixtures.ts';
 
 const BINDING: SyncBinding = {
   accountId: 'account-a',
@@ -205,6 +207,23 @@ function fixture(limits?: Partial<NativeRpcLimits>) {
 }
 
 describe('Native RPC session exact bytes and caller authority', () => {
+  it('transports version2 assessment envelopes with the same scoped exact-byte RPC', async () => {
+    const { opId: _id, payloadSha256: _digest, ...base } = FIRST;
+    const rich = createSyncOperationV2({ ...base, v: 2, payload: assessmentResultFixtureV2() });
+    const f = fixture();
+    const pending = f.push(f.pushRequest([rich]));
+    await tick();
+    expect(body(f.port.sent[0]!)['params']).toEqual({
+      leaseId: OWNER.leaseId,
+      envelopes: [envelope(rich)],
+    });
+    f.port.emit(reply(pushResult([rich])));
+    await expect(pending).resolves.toMatchObject({ accepted: [operationReference(rich)] });
+    const pull = f.pull();
+    await tick();
+    f.port.emit(reply(pullResult([rich]), { id: '2', method: 'pull' }));
+    await expect(pull).resolves.toMatchObject({ operations: [rich] });
+  });
   it('accepts cloned captures, maps opaque coordinator IDs, and preserves partial acknowledgements', async () => {
     const f = fixture();
     expect(f.session.assertCurrent(structuredClone(f.captured))).toBe(true);

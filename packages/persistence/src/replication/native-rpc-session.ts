@@ -2,7 +2,7 @@ import { canonicalJson } from '@bunki/domain/canonical-json';
 import {
   operationReference,
   parseSyncBinding,
-  parseSyncOperation,
+  parseAnySyncOperation as parseSyncOperation,
   type OperationRef,
   type SyncBinding,
   type SyncOperation,

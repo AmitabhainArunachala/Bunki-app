@@ -25,7 +25,7 @@ assert(
 );
 const stage = mkdtempSync(resolve(out, 'runtime-'));
 mkdirSync(resolve(stage, 'modules'));
-let core;
+let modules;
 let sourceArtifact = null;
 if (process.env.KAIRO_ASSESSMENT_SITE_DIR) {
   const sourceSite = resolve(process.env.KAIRO_ASSESSMENT_SITE_DIR);
@@ -42,21 +42,32 @@ if (process.env.KAIRO_ASSESSMENT_SITE_DIR) {
     expectedArtifact,
     'Staged manifest must match the supplied artifact identity',
   );
-  const metadata = identity.modules.find((entry) => entry.path === 'modules/assessment-core.mjs');
-  const file = identity.files.find((entry) => entry.path === 'modules/assessment-core.mjs');
-  assert(metadata && file, 'The pinned artifact must contain its assessment module');
-  const bytes = readFileSync(resolve(sourceSite, file.path));
-  assert.equal(bytes.length, file.bytes);
-  assert.equal(sha256(bytes), file.sha256);
-  core = { ...metadata, bytes };
+  modules = identity.files.filter((file) => file.path.startsWith('modules/') && file.path.endsWith('.mjs')).map((file) => {
+    const metadata = identity.modules.find((entry) => entry.path === file.path);
+    assert(metadata, `The staged module needs compiler metadata: ${file.path}`);
+    const bytes = readFileSync(resolve(sourceSite, file.path));
+    assert.equal(bytes.length, file.bytes);
+    assert.equal(sha256(bytes), file.sha256);
+    return { ...metadata, bytes };
+  });
   sourceArtifact = { path: sourceSite, artifactSha256: expectedArtifact };
 } else
-  core = buildCorridorModules(root).find((module) => module.path === 'modules/assessment-core.mjs');
+  modules = buildCorridorModules(root);
+const core = modules.find((module) => module.path === 'modules/assessment-core.mjs');
 assert(core, 'The canonical production builder must stage modules/assessment-core.mjs');
-const controllerPath = resolve(root, 'prototypes/corridor/assessment-controller.mjs');
+assert(modules.some((module) => module.path === 'modules/record-core.mjs'), 'The controller requires its shared record module');
+const controllerPath = sourceArtifact ? resolve(sourceArtifact.path, 'assessment-controller.mjs')
+  : resolve(root, 'prototypes/corridor/assessment-controller.mjs');
 const controllerBytes = readFileSync(controllerPath);
+if (sourceArtifact) {
+  const identity = JSON.parse(readFileSync(resolve(sourceArtifact.path, 'build-identity.json'), 'utf8'));
+  const file = identity.files.find((entry) => entry.path === 'assessment-controller.mjs');
+  assert(file, 'The pinned artifact must contain its controller');
+  assert.equal(controllerBytes.length, file.bytes);
+  assert.equal(sha256(controllerBytes), file.sha256);
+}
 writeFileSync(resolve(stage, 'assessment-controller.mjs'), controllerBytes);
-writeFileSync(resolve(stage, core.path), core.bytes);
+for (const module of modules) writeFileSync(resolve(stage, module.path), module.bytes);
 const api = await import(pathToFileURL(resolve(stage, 'assessment-controller.mjs')).href);
 const shared = await import(pathToFileURL(resolve(stage, core.path)).href);
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -612,9 +623,13 @@ assert.equal(
   sha256(controllerBytes),
   'Controller source must stay unchanged through this verification',
 );
-const currentInputDifferences = core.inputs
+for (const module of modules) {
+  assert.equal(sha256(readFileSync(resolve(stage, module.path))), sha256(module.bytes), 'Tested staged module stays unchanged');
+  if (sourceArtifact) assert.equal(sha256(readFileSync(resolve(sourceArtifact.path, module.path))), sha256(module.bytes), 'Pinned source module stays unchanged');
+}
+const currentInputDifferences = [...new Set(modules.flatMap((module) => module.inputs
   .filter((input) => sha256(readFileSync(resolve(root, input.path))) !== input.sha256)
-  .map((input) => input.path);
+  .map((input) => input.path)))];
 if (!sourceArtifact)
   assert.deepEqual(
     currentInputDifferences,
@@ -636,6 +651,8 @@ const receipt = {
     compiler: core.compiler,
     inputs: core.inputs,
   },
+  modules: modules.map((module) => ({ path: module.path, sha256: sha256(module.bytes),
+    bytes: module.bytes.length, compiler: module.compiler, inputs: module.inputs })),
   fixture: {
     path: relative(root, sourcePath),
     sha256: sha256(sourceBytes),

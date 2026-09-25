@@ -4,6 +4,18 @@ Kairo keeps the learner's encounters, unfinished work and explicit practice resp
 
 ## Language
 
+**Mock test**:
+A practice form with declared JLPT level, task coverage, duration and reviewed
+questions. A full mock includes listening and follows the official timing blocks.
+Its raw accuracy is not an official scaled score or a certificate.
+_Avoid_: Real JLPT score, guaranteed pass prediction
+
+**Assessment follow-up**:
+The saved connection from a completed test response to a learning target and its
+review card. It preserves the test evidence without inventing an SRS review grade.
+Skipped questions describe pacing; stopped tests do not declare weaknesses.
+_Avoid_: Automatic failure grade, mastery update
+
 **Sentence draft**:
 Unfinished text for one selected sentence-practice mode. It can be empty and is neither a submitted response nor an assessment.
 _Avoid_: Attempt, answer, assessed production

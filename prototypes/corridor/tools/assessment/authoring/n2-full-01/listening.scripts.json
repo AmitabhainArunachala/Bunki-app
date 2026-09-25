@@ -1,0 +1,4135 @@
+[
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l01",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l01",
+      "revisionId": "assessment-item:59e6ffff9e7877a6718611cef1b82fd11f8fc724d6892e24159d2841bc4be84b",
+      "sha256": "59e6ffff9e7877a6718611cef1b82fd11f8fc724d6892e24159d2841bc4be84b"
+    },
+    "scored": true,
+    "sourceId": "l01",
+    "task": "listening-task",
+    "globalNumber": 69,
+    "booklet": "listening",
+    "bookletNumber": 1,
+    "group": 1,
+    "localNumber": 1,
+    "printedLabel": "1",
+    "spokenNumber": "1番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "修正依頼を確認する女性編集担当",
+      "speaker-b": "写真説明を見直す男性編集担当",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "地域の情報誌を作っている二人が話しています。女の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "次の号の原稿、誤字の確認は終わりました。取材先に送ってよろしいですか。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "その前に、昨日届いた筆者からの修正依頼を見てくれるかな。数字を一か所変えたいそうなんだ。",
+        "authoredDialogueIndex": 1
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "料金のところでしょうか。取材先に電話して確かめます。",
+        "authoredDialogueIndex": 2
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "いや、何の数字かはメールに詳しく書いてある。まずそれを読んで、原稿に反映してほしい。料金は先方に確認済みだから、改めて電話する必要はないよ。",
+        "authoredDialogueIndex": 3
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "わかりました。修正してから、取材先に送る版を作ります。写真の説明文も直しますか。",
+        "authoredDialogueIndex": 4
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "そこは僕が今、見直しているところだから任せて。",
+        "authoredDialogueIndex": 5
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "女の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 地域の情報誌を作っている二人が話しています。女の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 次の号の原稿、誤字の確認は終わりました。取材先に送ってよろしいですか。\nspeaker-b: その前に、昨日届いた筆者からの修正依頼を見てくれるかな。数字を一か所変えたいそうなんだ。\nspeaker-a: 料金のところでしょうか。取材先に電話して確かめます。\nspeaker-b: いや、何の数字かはメールに詳しく書いてある。まずそれを読んで、原稿に反映してほしい。料金は先方に確認済みだから、改めて電話する必要はないよ。\nspeaker-a: わかりました。修正してから、取材先に送る版を作ります。写真の説明文も直しますか。\nspeaker-b: そこは僕が今、見直しているところだから任せて。\nnarrator: 女の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "efee096d0adc2bc2d2e5227d908ebd5181ff331c5e726bb08e0daf8d7c516b10",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:a5cc3290dec709394570a9da6b0f0fe20b91b9b5a1b7d2a3a41ecf5627706815",
+    "draftSha256": "a5cc3290dec709394570a9da6b0f0fe20b91b9b5a1b7d2a3a41ecf5627706815"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l02",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l02",
+      "revisionId": "assessment-item:0eeec06164c5c49ba964eeab6c5655f7dde358769ed533ebc3ce90efd832aed1",
+      "sha256": "0eeec06164c5c49ba964eeab6c5655f7dde358769ed533ebc3ce90efd832aed1"
+    },
+    "scored": true,
+    "sourceId": "l02",
+    "task": "listening-task",
+    "globalNumber": 70,
+    "booklet": "listening",
+    "bookletNumber": 2,
+    "group": 1,
+    "localNumber": 2,
+    "printedLabel": "2",
+    "spokenNumber": "2番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "試着する男性客",
+      "speaker-b": "貸衣装店の店員",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "衣装を借りる店で、男の人が店員と話しています。男の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "この上着、少し袖が長いようですが、短くできますか。式は来週です。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "こちらは貸出用なので縫い直せないんです。ただ、同じデザインで一つ小さいサイズなら、明日戻る予定があります。",
+        "authoredDialogueIndex": 1
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "明日は来られなくて。今ここにある別のデザインも試していいですか。",
+        "authoredDialogueIndex": 2
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "はい。寸法の表ではそちらが合いそうですが、着た感じを確かめてから決めたほうがよいですね。小さいサイズのほうは、必要なら電話で取り置きできます。",
+        "authoredDialogueIndex": 3
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "では、そちらを着てみます。そのうえで決めますね。",
+        "authoredDialogueIndex": 4
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "男の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 衣装を借りる店で、男の人が店員と話しています。男の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: この上着、少し袖が長いようですが、短くできますか。式は来週です。\nspeaker-b: こちらは貸出用なので縫い直せないんです。ただ、同じデザインで一つ小さいサイズなら、明日戻る予定があります。\nspeaker-a: 明日は来られなくて。今ここにある別のデザインも試していいですか。\nspeaker-b: はい。寸法の表ではそちらが合いそうですが、着た感じを確かめてから決めたほうがよいですね。小さいサイズのほうは、必要なら電話で取り置きできます。\nspeaker-a: では、そちらを着てみます。そのうえで決めますね。\nnarrator: 男の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "b8b7f53fb2355a992d370ae44c60bf0ad7cd95688478af08c64cab50a362d8e9",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:5d807b7e8b9ec0716d9deed621209187bb72e784aa66154fb53a3f0b52824b2f",
+    "draftSha256": "5d807b7e8b9ec0716d9deed621209187bb72e784aa66154fb53a3f0b52824b2f"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l03",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l03",
+      "revisionId": "assessment-item:f8958d3f27f4d3565422bd9f208361925328086a507a10a27bc177800c2345aa",
+      "sha256": "f8958d3f27f4d3565422bd9f208361925328086a507a10a27bc177800c2345aa"
+    },
+    "scored": true,
+    "sourceId": "l03",
+    "task": "listening-task",
+    "globalNumber": 71,
+    "booklet": "listening",
+    "bookletNumber": 3,
+    "group": 1,
+    "localNumber": 3,
+    "printedLabel": "3",
+    "spokenNumber": "3番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "動作確認をする女性担当",
+      "speaker-b": "実験準備の同僚",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "研究室で、公開実験の準備について話しています。女の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "申し込みが予定より多いので、実験の回数を増やしましょうか。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "回数を増やす前に、使える器具の数を確かめたいな。箱に入っているだけでは、全部動くとは限らないから。",
+        "authoredDialogueIndex": 1
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "先週、数は数えましたが、動かしてはいません。",
+        "authoredDialogueIndex": 2
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "では、午前中に動作を確認して、使えないものを分けておいて。必要な数がわかったら、不足分を借りられるか隣の研究室に聞こう。",
+        "authoredDialogueIndex": 3
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "了解です。参加者への時間変更の連絡は、その後ですね。",
+        "authoredDialogueIndex": 4
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "うん。人数の表は僕が整理しておくよ。",
+        "authoredDialogueIndex": 5
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "女の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 研究室で、公開実験の準備について話しています。女の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 申し込みが予定より多いので、実験の回数を増やしましょうか。\nspeaker-b: 回数を増やす前に、使える器具の数を確かめたいな。箱に入っているだけでは、全部動くとは限らないから。\nspeaker-a: 先週、数は数えましたが、動かしてはいません。\nspeaker-b: では、午前中に動作を確認して、使えないものを分けておいて。必要な数がわかったら、不足分を借りられるか隣の研究室に聞こう。\nspeaker-a: 了解です。参加者への時間変更の連絡は、その後ですね。\nspeaker-b: うん。人数の表は僕が整理しておくよ。\nnarrator: 女の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "e506e54e407b9f763607cfcf3ec61d72a398b9cef8ccfbfb5414b73d2e417afa",
+    "answerOptionId": "choice-4",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:8b774b959559c29dd5846449adafc741057171ace406b759617f5876e387b0ff",
+    "draftSha256": "8b774b959559c29dd5846449adafc741057171ace406b759617f5876e387b0ff"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l04",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l04",
+      "revisionId": "assessment-item:fb5dbede0f224d51920dc7fb92cc6712eece9e1963d1783c4e5c1588318996f8",
+      "sha256": "fb5dbede0f224d51920dc7fb92cc6712eece9e1963d1783c4e5c1588318996f8"
+    },
+    "scored": true,
+    "sourceId": "l04",
+    "task": "listening-task",
+    "globalNumber": 72,
+    "booklet": "listening",
+    "bookletNumber": 4,
+    "group": 1,
+    "localNumber": 4,
+    "printedLabel": "4",
+    "spokenNumber": "4番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "箱を撮影する男性",
+      "speaker-b": "予備の箱を取りに行く女性",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "催し物の会場で、商品を運び込んだ二人が話しています。男の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "入口に置いた箱、底がぬれているね。中の商品を出して乾かしたほうがいいかな。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "その前に、今の状態を写真に残しておいてもらえる？ 運送会社に連絡するときに必要になるかもしれないから。",
+        "authoredDialogueIndex": 1
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "わかった。商品が無事なら、箱だけ替えればいいね。",
+        "authoredDialogueIndex": 2
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "ええ。予備の箱は私が倉庫から持ってくる。そのあと二人で中身を確認しましょう。まだ破損していると決まったわけではないので、運送会社への連絡は確認してからでいいと思う。",
+        "authoredDialogueIndex": 3
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "じゃあ、今の箱を動かす前に撮っておくよ。",
+        "authoredDialogueIndex": 4
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "男の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 催し物の会場で、商品を運び込んだ二人が話しています。男の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 入口に置いた箱、底がぬれているね。中の商品を出して乾かしたほうがいいかな。\nspeaker-b: その前に、今の状態を写真に残しておいてもらえる？ 運送会社に連絡するときに必要になるかもしれないから。\nspeaker-a: わかった。商品が無事なら、箱だけ替えればいいね。\nspeaker-b: ええ。予備の箱は私が倉庫から持ってくる。そのあと二人で中身を確認しましょう。まだ破損していると決まったわけではないので、運送会社への連絡は確認してからでいいと思う。\nspeaker-a: じゃあ、今の箱を動かす前に撮っておくよ。\nnarrator: 男の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "4b9094cbff2b5ae061a0b19f489b4b9081c084ea24b1048334594bb339f03836",
+    "answerOptionId": "choice-4",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:a18e01f8ecf244bfa9f7db15c63cc76ce5c5bdf6d21b84c8a59d9361416d2747",
+    "draftSha256": "a18e01f8ecf244bfa9f7db15c63cc76ce5c5bdf6d21b84c8a59d9361416d2747"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l05",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l05",
+      "revisionId": "assessment-item:e9ad71807e50936ac85ba8ffce297d22bb14501f91b5d0fc8ab98e67607cbc44",
+      "sha256": "e9ad71807e50936ac85ba8ffce297d22bb14501f91b5d0fc8ab98e67607cbc44"
+    },
+    "scored": true,
+    "sourceId": "l05",
+    "task": "listening-task",
+    "globalNumber": 73,
+    "booklet": "listening",
+    "bookletNumber": 5,
+    "group": 1,
+    "localNumber": 5,
+    "printedLabel": "5",
+    "spokenNumber": "5番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "受付担当の女性",
+      "speaker-b": "展示受付の責任者",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "長期展示の受付で、責任者と担当者が話しています。担当の女の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "発券機が止まってしまいました。来場者が並び始めています。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "修理の連絡は入れたので、それまでは手書きの券を使おう。引き出しに予備があるはずだ。",
+        "authoredDialogueIndex": 1
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "先に券を出して販売を始めますか。",
+        "authoredDialogueIndex": 2
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "販売を再開する前に、入口にいる案内係へ、手書き券に切り替えることを伝えて。券の見た目が違うと入場を止めてしまうかもしれない。番号の記録は私が確認する。",
+        "authoredDialogueIndex": 3
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "わかりました。案内係に説明してから、窓口に戻って再開します。",
+        "authoredDialogueIndex": 4
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "担当の女の人は、このあとまず何をしますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 長期展示の受付で、責任者と担当者が話しています。担当の女の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 発券機が止まってしまいました。来場者が並び始めています。\nspeaker-b: 修理の連絡は入れたので、それまでは手書きの券を使おう。引き出しに予備があるはずだ。\nspeaker-a: 先に券を出して販売を始めますか。\nspeaker-b: 販売を再開する前に、入口にいる案内係へ、手書き券に切り替えることを伝えて。券の見た目が違うと入場を止めてしまうかもしれない。番号の記録は私が確認する。\nspeaker-a: わかりました。案内係に説明してから、窓口に戻って再開します。\nnarrator: 担当の女の人は、このあとまず何をしますか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "18b6b7c73ccfae5f6e765ad79a1dc8b11a100a430569e0c7a5d7496287d41806",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:7945052b5f7e9b97f73d2aff41a5632642e50a69300962dc25e0262a4b60e75a",
+    "draftSha256": "7945052b5f7e9b97f73d2aff41a5632642e50a69300962dc25e0262a4b60e75a"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l06",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l06",
+      "revisionId": "assessment-item:febd1b406c455b50af434db1980d6550f024341e587c0922e1b13332217b0306",
+      "sha256": "febd1b406c455b50af434db1980d6550f024341e587c0922e1b13332217b0306"
+    },
+    "scored": true,
+    "sourceId": "l06",
+    "task": "listening-point",
+    "globalNumber": 74,
+    "booklet": "listening",
+    "bookletNumber": 1,
+    "group": 2,
+    "localNumber": 1,
+    "printedLabel": "1",
+    "spokenNumber": "1番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "勉強会について説明する男性",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "社内の勉強会について、男の人が説明しています。次回から形式を変える主な理由は何ですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "勉強会について、次回から初めの二十分を参加者の質問の時間にします。今までは最後に質問を受けていましたが、説明が予定より延びると、十分に答えられないことがありました。参加人数が増えたからというわけではありません。聞きたいことを先に共有すれば、その後の説明でどこを詳しく話すかも調整できます。基本的な用語は事前の資料で確認してもらい、当日は具体的な疑問を中心に進めたいと考えています。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "次回から形式を変える主な理由は何ですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 社内の勉強会について、男の人が説明しています。次回から形式を変える主な理由は何ですか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 勉強会について、次回から初めの二十分を参加者の質問の時間にします。今までは最後に質問を受けていましたが、説明が予定より延びると、十分に答えられないことがありました。参加人数が増えたからというわけではありません。聞きたいことを先に共有すれば、その後の説明でどこを詳しく話すかも調整できます。基本的な用語は事前の資料で確認してもらい、当日は具体的な疑問を中心に進めたいと考えています。\nnarrator: 次回から形式を変える主な理由は何ですか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "40ba06e1c7b8bb7c4ae72f2e6ff0ded2cdfba10e728e168845257a3361631a4a",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:5eb5c99d8d3a943d99b10f866ae914757ee554932c3f5a3ae1485d616dd4574a",
+    "draftSha256": "5eb5c99d8d3a943d99b10f866ae914757ee554932c3f5a3ae1485d616dd4574a"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l07",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l07",
+      "revisionId": "assessment-item:ee4220857194d96dc03c22cef3eeef909fba2ce55c3e7dbedab8a52c5c92cafb",
+      "sha256": "ee4220857194d96dc03c22cef3eeef909fba2ce55c3e7dbedab8a52c5c92cafb"
+    },
+    "scored": true,
+    "sourceId": "l07",
+    "task": "listening-point",
+    "globalNumber": 75,
+    "booklet": "listening",
+    "bookletNumber": 2,
+    "group": 2,
+    "localNumber": 2,
+    "printedLabel": "2",
+    "spokenNumber": "2番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "出版社の連絡担当",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "出版社の担当者が書店への連絡事項を話しています。今回、返送する本について変わったのは何ですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "売れ残った本の返送についてお知らせします。これまでは種類ごとに箱を分けていただいていましたが、来月からは同じ箱に入れて構いません。ただし、同封する一覧表には、書名ごとの冊数を書いてください。箱の数を減らすことで、運ぶ負担を軽くしたいと考えています。返送先の住所と受け付ける期間には変更ありません。また、箱に貼る送り状は従来のものをそのまま使えます。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "今回、返送する本について変わったのは何ですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 出版社の担当者が書店への連絡事項を話しています。今回、返送する本について変わったのは何ですか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 売れ残った本の返送についてお知らせします。これまでは種類ごとに箱を分けていただいていましたが、来月からは同じ箱に入れて構いません。ただし、同封する一覧表には、書名ごとの冊数を書いてください。箱の数を減らすことで、運ぶ負担を軽くしたいと考えています。返送先の住所と受け付ける期間には変更ありません。また、箱に貼る送り状は従来のものをそのまま使えます。\nnarrator: 今回、返送する本について変わったのは何ですか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "103f8369ae8e2e2e6d3f4af789d51244120d54fd9eda79d89bee1c02dfd76519",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:61e37c57adfd9d9f58f9cbd675bb61ac85d212ca06fdc7fd7d4fdda9c573f60c",
+    "draftSha256": "61e37c57adfd9d9f58f9cbd675bb61ac85d212ca06fdc7fd7d4fdda9c573f60c"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l08",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l08",
+      "revisionId": "assessment-item:71f3a812ae8a9121824b336d6cb6a4c294488b573087d05f608ad936823582ab",
+      "sha256": "71f3a812ae8a9121824b336d6cb6a4c294488b573087d05f608ad936823582ab"
+    },
+    "scored": true,
+    "sourceId": "l08",
+    "task": "listening-point",
+    "globalNumber": 76,
+    "booklet": "listening",
+    "bookletNumber": 3,
+    "group": 2,
+    "localNumber": 3,
+    "printedLabel": "3",
+    "spokenNumber": "3番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "翻訳授業の先生",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "翻訳の授業で、先生が説明しています。最初に辞書を使わずに読むように言っているのはなぜですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "今日は、初めの五分間は辞書を閉じて文章全体を読んでください。知らない単語を覚えているか試すためではありません。一つの語の意味を先に決めてしまうと、周りの文に合わなくても、その意味のまま読み進めてしまうことがあります。まず誰が何を伝えようとしているのかを考え、意味を確かめる必要がある語に印をつけてください。そのあと辞書を使い、全体の理解に合う意味を選び直しましょう。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "最初に辞書を使わずに読むように言っているのはなぜですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 翻訳の授業で、先生が説明しています。最初に辞書を使わずに読むように言っているのはなぜですか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 今日は、初めの五分間は辞書を閉じて文章全体を読んでください。知らない単語を覚えているか試すためではありません。一つの語の意味を先に決めてしまうと、周りの文に合わなくても、その意味のまま読み進めてしまうことがあります。まず誰が何を伝えようとしているのかを考え、意味を確かめる必要がある語に印をつけてください。そのあと辞書を使い、全体の理解に合う意味を選び直しましょう。\nnarrator: 最初に辞書を使わずに読むように言っているのはなぜですか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "05d0c186497f607be98a8a4b83bca9f2344fc1674ecc8563422343bcf6dffdf7",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:8ebb63b45f56643ed37fa327a5a365b284142955b1dff3ce564218a2871ba50d",
+    "draftSha256": "8ebb63b45f56643ed37fa327a5a365b284142955b1dff3ce564218a2871ba50d"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l09",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l09",
+      "revisionId": "assessment-item:310f84c3fb6aa394a4cbb64dfa108a70c2f959380492d5406af9c9bee7f9f400",
+      "sha256": "310f84c3fb6aa394a4cbb64dfa108a70c2f959380492d5406af9c9bee7f9f400"
+    },
+    "scored": true,
+    "sourceId": "l09",
+    "task": "listening-point",
+    "globalNumber": 77,
+    "booklet": "listening",
+    "bookletNumber": 4,
+    "group": 2,
+    "localNumber": 4,
+    "printedLabel": "4",
+    "spokenNumber": "4番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "研修旅行の担当者",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "研修旅行の担当者が集合について説明しています。参加者が受付を済ませておかなければならないのは何時までですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "明日のバスは八時四十分に出発します。乗る前に資料をお渡しし、人数を確認しますので、八時二十分までに受付を済ませてください。受付は八時から開いています。以前の案内には八時半集合と書いてありましたが、それでは出発前の確認に間に合わないため変更しました。バスが出る時刻自体は変わりません。駅から集合場所までは歩いて十分ほどかかるので、余裕を持ってお越しください。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "参加者が受付を済ませておかなければならないのは何時までですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 研修旅行の担当者が集合について説明しています。参加者が受付を済ませておかなければならないのは何時までですか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 明日のバスは八時四十分に出発します。乗る前に資料をお渡しし、人数を確認しますので、八時二十分までに受付を済ませてください。受付は八時から開いています。以前の案内には八時半集合と書いてありましたが、それでは出発前の確認に間に合わないため変更しました。バスが出る時刻自体は変わりません。駅から集合場所までは歩いて十分ほどかかるので、余裕を持ってお越しください。\nnarrator: 参加者が受付を済ませておかなければならないのは何時までですか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "8caa9b7734bdec00c1dad865268f018f19fdaae0569c6f2e9f9410c1b87115c8",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:a57b0c201ca4ea6e4c1518bdb54fc61a2094dbaf4bc09852ceb50e3b77c08113",
+    "draftSha256": "a57b0c201ca4ea6e4c1518bdb54fc61a2094dbaf4bc09852ceb50e3b77c08113"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l10",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l10",
+      "revisionId": "assessment-item:93bd782dab900ad82ad29bbb6a3328ba327b27a56aefe38113383bb89c03a521",
+      "sha256": "93bd782dab900ad82ad29bbb6a3328ba327b27a56aefe38113383bb89c03a521"
+    },
+    "scored": true,
+    "sourceId": "l10",
+    "task": "listening-point",
+    "globalNumber": 78,
+    "booklet": "listening",
+    "bookletNumber": 5,
+    "group": 2,
+    "localNumber": 5,
+    "printedLabel": "5",
+    "spokenNumber": "5番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "かばんの修理を頼む客",
+      "speaker-b": "修理店の店員",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-before",
+        "voice": "narrator",
+        "text": "かばんの修理について、客と店員が話しています。店員は、なぜ今日すぐに修理代を確定できないと言っていますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Preview printed choices; local provisional pause."
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "持ち手が外れたので、付け直していただきたいんですが。だいたいいくらになりますか。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "縫い直すだけなら三千円です。ただ、内側の布も傷んでいるようなので、開いて確認しないと、布の交換が必要かどうかわかりません。交換する場合は追加で千五百円かかります。",
+        "authoredDialogueIndex": 1
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "修理をする人が今日は休みなんですか。",
+        "authoredDialogueIndex": 2
+      },
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-b",
+        "text": "いえ、おります。お預かりして内側を確認してから、必要な作業と金額を電話でお伝えします。了承をいただく前に修理を進めることはありません。",
+        "authoredDialogueIndex": 3
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "店員は、なぜ今日すぐに修理代を確定できないと言っていますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 10000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: かばんの修理について、客と店員が話しています。店員は、なぜ今日すぐに修理代を確定できないと言っていますか。\n[PLANNED SILENCE 10000 ms: Preview printed choices; local provisional pause.]\nspeaker-a: 持ち手が外れたので、付け直していただきたいんですが。だいたいいくらになりますか。\nspeaker-b: 縫い直すだけなら三千円です。ただ、内側の布も傷んでいるようなので、開いて確認しないと、布の交換が必要かどうかわかりません。交換する場合は追加で千五百円かかります。\nspeaker-a: 修理をする人が今日は休みなんですか。\nspeaker-b: いえ、おります。お預かりして内側を確認してから、必要な作業と金額を電話でお伝えします。了承をいただく前に修理を進めることはありません。\nnarrator: 店員は、なぜ今日すぐに修理代を確定できないと言っていますか。\n[PLANNED SILENCE 10000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "a49f6081b9e622ea75ee91cb39cbafc9ae8226e659b86e28f0ed22b988e70626",
+    "answerOptionId": "choice-4",
+    "spokenOptions": [],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:df2fbfac618481234eca024464b93097d1462aee8115907f492c9ba427cc4079",
+    "draftSha256": "df2fbfac618481234eca024464b93097d1462aee8115907f492c9ba427cc4079"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l11",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l11",
+      "revisionId": "assessment-item:7ba88706ee67dd8c05dd2c9ed86937852b7091be1130fbab2b3f0574d22e7ed4",
+      "sha256": "7ba88706ee67dd8c05dd2c9ed86937852b7091be1130fbab2b3f0574d22e7ed4"
+    },
+    "scored": true,
+    "sourceId": "l11",
+    "task": "listening-gist",
+    "globalNumber": 79,
+    "booklet": "listening",
+    "bookletNumber": 1,
+    "group": 3,
+    "localNumber": 1,
+    "printedLabel": "1",
+    "spokenNumber": "1番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "料理を教える女性",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "料理を人に教えるとき、以前は分量と手順を正確に伝えれば十分だと思っていました。けれども、同じ材料でも水分の量が違えば、同じ火加減で同じ時間煮ても、仕上がりは変わります。最近は、何分という数字だけでなく、どんな香りがしてきたら火を弱めるか、混ぜたときにどのくらいの重さを感じるかも話すようにしています。手順を守らなくていいということではありません。手順が何のためにあるのかわかれば、その日の材料や道具に合わせて調整できるからです。再現するためには、決められた通りにするだけでなく、変化を見て判断する力も必要なのだと思います。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "女の人が最も伝えたいことは何ですか。"
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "手順の目的と変化の目安も伝え、状況に応じて判断できるようにすることが大切だ"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "毎回同じ材料を使えば、火加減や道具は結果に影響しない"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "料理では分量や手順を覚える必要がなく、感覚だけで作るべきだ"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "四番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "料理を教える人は、数字以外の表現を一切使わないほうがよい"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 12000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 料理を人に教えるとき、以前は分量と手順を正確に伝えれば十分だと思っていました。けれども、同じ材料でも水分の量が違えば、同じ火加減で同じ時間煮ても、仕上がりは変わります。最近は、何分という数字だけでなく、どんな香りがしてきたら火を弱めるか、混ぜたときにどのくらいの重さを感じるかも話すようにしています。手順を守らなくていいということではありません。手順が何のためにあるのかわかれば、その日の材料や道具に合わせて調整できるからです。再現するためには、決められた通りにするだけでなく、変化を見て判断する力も必要なのだと思います。\nnarrator: 女の人が最も伝えたいことは何ですか。\nnarrator: 一番。\nnarrator: 手順の目的と変化の目安も伝え、状況に応じて判断できるようにすることが大切だ\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nnarrator: 毎回同じ材料を使えば、火加減や道具は結果に影響しない\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nnarrator: 料理では分量や手順を覚える必要がなく、感覚だけで作るべきだ\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 四番。\nnarrator: 料理を教える人は、数字以外の表現を一切使わないほうがよい\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 12000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "b06437545df788aa283af78cb7d1b7e4557e8ff24adcbd5da746e9fe0367e332",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "手順の目的と変化の目安も伝え、状況に応じて判断できるようにすることが大切だ"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "毎回同じ材料を使えば、火加減や道具は結果に影響しない"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "料理では分量や手順を覚える必要がなく、感覚だけで作るべきだ"
+      },
+      {
+        "id": "choice-4",
+        "number": 4,
+        "text": "料理を教える人は、数字以外の表現を一切使わないほうがよい"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:e537651b6d7ece24703539a7b85906968d78ccee0f523c0e2e0b8373908a3825",
+    "draftSha256": "e537651b6d7ece24703539a7b85906968d78ccee0f523c0e2e0b8373908a3825"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l12",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l12",
+      "revisionId": "assessment-item:142e1c14a04ec218f2f5748aa50fa9a831fe1fc78a9d6a8b86540b7737854f0a",
+      "sha256": "142e1c14a04ec218f2f5748aa50fa9a831fe1fc78a9d6a8b86540b7737854f0a"
+    },
+    "scored": true,
+    "sourceId": "l12",
+    "task": "listening-gist",
+    "globalNumber": 80,
+    "booklet": "listening",
+    "bookletNumber": 2,
+    "group": 3,
+    "localNumber": 2,
+    "printedLabel": "2",
+    "spokenNumber": "2番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "会議記録について話す男性",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "会議の記録には、決まったことだけを書けばよいと言われることがあります。確かに、あとで何をするか確認するには、そのほうが読みやすいでしょう。ただ、私は、採用されなかった案についても、反対された理由を短く残すようにしています。条件が変わったとき、その理由が今も当てはまるのかを確かめられるからです。前に却下されたという事実だけが伝わると、再検討する価値があっても、同じ案を出しにくくなります。議論を全部書き起こす必要はありませんが、なぜその結論になったかを後からたどれる記録にしたいと考えています。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "男の人は、主にどのような記録が必要だと話していますか。"
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "結論に加え、後から判断を見直せる程度に理由も残した記録"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "今後することだけを残し、議論の経緯を全て消した記録"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "会議での発言を一言も省かず全て書き起こした記録"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "四番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "一度採用されなかった案を二度と検討しないための記録"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 12000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 会議の記録には、決まったことだけを書けばよいと言われることがあります。確かに、あとで何をするか確認するには、そのほうが読みやすいでしょう。ただ、私は、採用されなかった案についても、反対された理由を短く残すようにしています。条件が変わったとき、その理由が今も当てはまるのかを確かめられるからです。前に却下されたという事実だけが伝わると、再検討する価値があっても、同じ案を出しにくくなります。議論を全部書き起こす必要はありませんが、なぜその結論になったかを後からたどれる記録にしたいと考えています。\nnarrator: 男の人は、主にどのような記録が必要だと話していますか。\nnarrator: 一番。\nnarrator: 結論に加え、後から判断を見直せる程度に理由も残した記録\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nnarrator: 今後することだけを残し、議論の経緯を全て消した記録\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nnarrator: 会議での発言を一言も省かず全て書き起こした記録\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 四番。\nnarrator: 一度採用されなかった案を二度と検討しないための記録\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 12000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "142f65d28ffa22fe25d5a4dbfa4a6253109afd2078d4cec9926c9d3f96b34326",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "結論に加え、後から判断を見直せる程度に理由も残した記録"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "今後することだけを残し、議論の経緯を全て消した記録"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "会議での発言を一言も省かず全て書き起こした記録"
+      },
+      {
+        "id": "choice-4",
+        "number": 4,
+        "text": "一度採用されなかった案を二度と検討しないための記録"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:fde98f9676046987f083da24508c32e4f40d05ff6412c88944921a8d328695b6",
+    "draftSha256": "fde98f9676046987f083da24508c32e4f40d05ff6412c88944921a8d328695b6"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l13",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l13",
+      "revisionId": "assessment-item:e855cf5734aa8445568db9783f576cab9bed6dad3ba2f8f4ff09b91c3ea5b43c",
+      "sha256": "e855cf5734aa8445568db9783f576cab9bed6dad3ba2f8f4ff09b91c3ea5b43c"
+    },
+    "scored": true,
+    "sourceId": "l13",
+    "task": "listening-gist",
+    "globalNumber": 81,
+    "booklet": "listening",
+    "bookletNumber": 3,
+    "group": 3,
+    "localNumber": 3,
+    "printedLabel": "3",
+    "spokenNumber": "3番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "観戦の経験を話す男性",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "初めて野球を見に来た友人に、ルールを詳しく説明しようとして、かえって困らせてしまったことがあります。私には当たり前の言葉でも、友人には聞き慣れないものばかりでした。それからは、最初に全部教えるのではなく、友人が「今、どうして走ったの」と聞いたときに、その場面に必要なことだけ話しています。すると、友人のほうから次の動きを予想するようになりました。詳しく知っている人ほど、相手が何に気づき、何を知りたがっているかを待つことも大事なのだと感じます。知識を一度に渡すより、一緒に楽しめる入口を見つけたいですね。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "男の人が最も伝えたいことは何ですか。"
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "詳しい人はルールを聞かれても、説明を断ったほうがよい"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "相手の関心が生まれた場面に合わせて説明すると、一緒に楽しみやすい"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "初心者には最初に全ての専門用語を暗記させる必要がある"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "四番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "初心者が自分で次の動きを予想することは避けるべきだ"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 12000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 初めて野球を見に来た友人に、ルールを詳しく説明しようとして、かえって困らせてしまったことがあります。私には当たり前の言葉でも、友人には聞き慣れないものばかりでした。それからは、最初に全部教えるのではなく、友人が「今、どうして走ったの」と聞いたときに、その場面に必要なことだけ話しています。すると、友人のほうから次の動きを予想するようになりました。詳しく知っている人ほど、相手が何に気づき、何を知りたがっているかを待つことも大事なのだと感じます。知識を一度に渡すより、一緒に楽しめる入口を見つけたいですね。\nnarrator: 男の人が最も伝えたいことは何ですか。\nnarrator: 一番。\nnarrator: 詳しい人はルールを聞かれても、説明を断ったほうがよい\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nnarrator: 相手の関心が生まれた場面に合わせて説明すると、一緒に楽しみやすい\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nnarrator: 初心者には最初に全ての専門用語を暗記させる必要がある\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 四番。\nnarrator: 初心者が自分で次の動きを予想することは避けるべきだ\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 12000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "6f42c4be46088200bef4769107e3048d5203904ceecb75d37ea292a3e4e2f99e",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "詳しい人はルールを聞かれても、説明を断ったほうがよい"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "相手の関心が生まれた場面に合わせて説明すると、一緒に楽しみやすい"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "初心者には最初に全ての専門用語を暗記させる必要がある"
+      },
+      {
+        "id": "choice-4",
+        "number": 4,
+        "text": "初心者が自分で次の動きを予想することは避けるべきだ"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:cc581e8dc91bdac01c0f48ad79177525d3c1a0deda6624443972fce14428d515",
+    "draftSha256": "cc581e8dc91bdac01c0f48ad79177525d3c1a0deda6624443972fce14428d515"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l14",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l14",
+      "revisionId": "assessment-item:f234e93e386962cf1acd79d8ed9c635800b9e8c8ec19c43e9038592f86462fd0",
+      "sha256": "f234e93e386962cf1acd79d8ed9c635800b9e8c8ec19c43e9038592f86462fd0"
+    },
+    "scored": true,
+    "sourceId": "l14",
+    "task": "listening-gist",
+    "globalNumber": 82,
+    "booklet": "listening",
+    "bookletNumber": 4,
+    "group": 3,
+    "localNumber": 4,
+    "printedLabel": "4",
+    "spokenNumber": "4番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "案内文の確認について話す女性",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "外国語の案内文を作るとき、自動翻訳を使うと作業は速くなります。ただ、訳文が自然に見えるかどうかだけで確認を終えてはいけません。例えば、誰が申請するのか、何をいつまでに出すのかが、元の文と同じ関係で伝わっている必要があります。私は、訳文だけを読んだ人に、実際にどの順番で行動すると思うか尋ねるようにしています。便利な道具を使わないという話ではなく、その文章で相手に何をしてもらいたいのかに戻って確かめるのです。読みやすい文であることと、必要な行動につながる文であることは、いつも同じではありません。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "女の人が最も重視している確認はどれですか。"
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "元の文章より必ず短い文になっているかを調べること"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "自動翻訳を使わず、全てを手作業に戻すこと"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "読み手が、元の案内と同じ条件や手順で行動できるかを確かめること"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "四番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "外国語として自然に見えれば、内容の確認を省くこと"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 12000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 外国語の案内文を作るとき、自動翻訳を使うと作業は速くなります。ただ、訳文が自然に見えるかどうかだけで確認を終えてはいけません。例えば、誰が申請するのか、何をいつまでに出すのかが、元の文と同じ関係で伝わっている必要があります。私は、訳文だけを読んだ人に、実際にどの順番で行動すると思うか尋ねるようにしています。便利な道具を使わないという話ではなく、その文章で相手に何をしてもらいたいのかに戻って確かめるのです。読みやすい文であることと、必要な行動につながる文であることは、いつも同じではありません。\nnarrator: 女の人が最も重視している確認はどれですか。\nnarrator: 一番。\nnarrator: 元の文章より必ず短い文になっているかを調べること\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nnarrator: 自動翻訳を使わず、全てを手作業に戻すこと\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nnarrator: 読み手が、元の案内と同じ条件や手順で行動できるかを確かめること\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 四番。\nnarrator: 外国語として自然に見えれば、内容の確認を省くこと\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 12000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "5aac8aa7289b23a60c01ed3ddb34d1c8ae2030f7c7018c55cab93551e3f2adcf",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "元の文章より必ず短い文になっているかを調べること"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "自動翻訳を使わず、全てを手作業に戻すこと"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "読み手が、元の案内と同じ条件や手順で行動できるかを確かめること"
+      },
+      {
+        "id": "choice-4",
+        "number": 4,
+        "text": "外国語として自然に見えれば、内容の確認を省くこと"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:4db2ddc3cf4d2f9f9a85a4653fb7855b878cdb971fe1d8ad85618322c7feff18",
+    "draftSha256": "4db2ddc3cf4d2f9f9a85a4653fb7855b878cdb971fe1d8ad85618322c7feff18"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l15",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l15",
+      "revisionId": "assessment-item:82ea40ebd78db0ba75abaea79edd92f5a84800e3a73adc9b73a51f3233b8f09a",
+      "sha256": "82ea40ebd78db0ba75abaea79edd92f5a84800e3a73adc9b73a51f3233b8f09a"
+    },
+    "scored": true,
+    "sourceId": "l15",
+    "task": "listening-response",
+    "globalNumber": 83,
+    "booklet": "listening",
+    "bookletNumber": 1,
+    "group": 4,
+    "localNumber": 1,
+    "printedLabel": "1",
+    "spokenNumber": "1番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "今日の説明、もう少し具体的にしていただけるとありがたいのですが。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "では、実際の例を挙げてご説明します。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "では、詳しい例は省いて、全体だけお話しします。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "ありがとうございます。具体的なご説明でよくわかりました。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 今日の説明、もう少し具体的にしていただけるとありがたいのですが。\nnarrator: 一番。\nspeaker-b: では、実際の例を挙げてご説明します。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: では、詳しい例は省いて、全体だけお話しします。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: ありがとうございます。具体的なご説明でよくわかりました。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "e90788b31107fe33edd16e08a8d6564e3a861e25611b3e6299be2ed853787240",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "では、実際の例を挙げてご説明します。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "では、詳しい例は省いて、全体だけお話しします。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "ありがとうございます。具体的なご説明でよくわかりました。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:669b61af9ae009634e2c2dcfa69c75ae1ce720db31e352226bb10bbf8af078b9",
+    "draftSha256": "669b61af9ae009634e2c2dcfa69c75ae1ce720db31e352226bb10bbf8af078b9"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l16",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l16",
+      "revisionId": "assessment-item:56a735b378b932634f2e23ae08bc176e0afb0b0df9341e06352a6ad41f4eeec3",
+      "sha256": "56a735b378b932634f2e23ae08bc176e0afb0b0df9341e06352a6ad41f4eeec3"
+    },
+    "scored": true,
+    "sourceId": "l16",
+    "task": "listening-response",
+    "globalNumber": 84,
+    "booklet": "listening",
+    "bookletNumber": 2,
+    "group": 4,
+    "localNumber": 2,
+    "printedLabel": "2",
+    "spokenNumber": "2番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "結局、今回の担当は私ということになったんですね。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "はい、今回はどなたに担当していただくか、まだ決めていません。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "ええ、今回は私が担当することになったんですね。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "はい、ほかの皆さんにもそう伝えてあります。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 結局、今回の担当は私ということになったんですね。\nnarrator: 一番。\nspeaker-b: はい、今回はどなたに担当していただくか、まだ決めていません。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: ええ、今回は私が担当することになったんですね。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: はい、ほかの皆さんにもそう伝えてあります。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "6a82b3c5701d1b417842279156b14cc06e2aa658d832b453b6bb1ef42d073336",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "はい、今回はどなたに担当していただくか、まだ決めていません。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "ええ、今回は私が担当することになったんですね。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "はい、ほかの皆さんにもそう伝えてあります。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:9af53ee0d7a75aa716dd8590e554f0fd2503fd3af76dec31d4327ddf1dd9aa02",
+    "draftSha256": "9af53ee0d7a75aa716dd8590e554f0fd2503fd3af76dec31d4327ddf1dd9aa02"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l17",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l17",
+      "revisionId": "assessment-item:82a99a7881959b7c6b01a0faaaf4f80e6c928ea21618a7c3377f92df65a2780f",
+      "sha256": "82a99a7881959b7c6b01a0faaaf4f80e6c928ea21618a7c3377f92df65a2780f"
+    },
+    "scored": true,
+    "sourceId": "l17",
+    "task": "listening-response",
+    "globalNumber": 85,
+    "booklet": "listening",
+    "bookletNumber": 3,
+    "group": 4,
+    "localNumber": 3,
+    "printedLabel": "3",
+    "spokenNumber": "3番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "この締め切り、何とか一日延ばしてもらえないでしょうか。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "一日延ばしていただき、ありがとうございました。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "一日だけなら調整できるか、確認してみます。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "では、締め切りを一日早められるか確認します。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: この締め切り、何とか一日延ばしてもらえないでしょうか。\nnarrator: 一番。\nspeaker-b: 一日延ばしていただき、ありがとうございました。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: 一日だけなら調整できるか、確認してみます。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: では、締め切りを一日早められるか確認します。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "08826b513d87b0c3bffb4e6a270b36d6f0c19214e92089d43ecaf8266cd5b593",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "一日延ばしていただき、ありがとうございました。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "一日だけなら調整できるか、確認してみます。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "では、締め切りを一日早められるか確認します。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:621c74157281adb4a7c2175c2a4e6dde846914ebe480b1b290b3b14e7bfdd748",
+    "draftSha256": "621c74157281adb4a7c2175c2a4e6dde846914ebe480b1b290b3b14e7bfdd748"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l18",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l18",
+      "revisionId": "assessment-item:8b347b49c12e470bcf0fbabb661b0c97a36f15cf33253ec1a69b893884a7ad3c",
+      "sha256": "8b347b49c12e470bcf0fbabb661b0c97a36f15cf33253ec1a69b893884a7ad3c"
+    },
+    "scored": true,
+    "sourceId": "l18",
+    "task": "listening-response",
+    "globalNumber": 86,
+    "booklet": "listening",
+    "bookletNumber": 4,
+    "group": 4,
+    "localNumber": 4,
+    "printedLabel": "4",
+    "spokenNumber": "4番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "お手数ですが、席を替わっていただけませんか。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "席を取っていただき、ありがとうございました。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "席は来月から全て予約制になるそうです。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "かまいませんよ。こちらでよろしいですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: お手数ですが、席を替わっていただけませんか。\nnarrator: 一番。\nspeaker-b: 席を取っていただき、ありがとうございました。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: 席は来月から全て予約制になるそうです。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: かまいませんよ。こちらでよろしいですか。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "2812a248a70f96cfa141b3c50f92c78294587b17911600e134b208c3a02b5940",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "席を取っていただき、ありがとうございました。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "席は来月から全て予約制になるそうです。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "かまいませんよ。こちらでよろしいですか。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:0b160f40ec66910efa4001436221b34efb28ab4c46194b6779c5d7a2258e53f0",
+    "draftSha256": "0b160f40ec66910efa4001436221b34efb28ab4c46194b6779c5d7a2258e53f0"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l19",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l19",
+      "revisionId": "assessment-item:d4dff26c92e221943fd97912e0d27a19a3f2a258bf19a6c3c1f1c55b16394a3f",
+      "sha256": "d4dff26c92e221943fd97912e0d27a19a3f2a258bf19a6c3c1f1c55b16394a3f"
+    },
+    "scored": true,
+    "sourceId": "l19",
+    "task": "listening-response",
+    "globalNumber": 87,
+    "booklet": "listening",
+    "bookletNumber": 5,
+    "group": 4,
+    "localNumber": 5,
+    "printedLabel": "5",
+    "spokenNumber": "5番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "もう少しで終わるところだったのに、途中で電源が切れてしまって。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "それは大変でしたね。保存した分は残っていますか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "これから電源を切ってもよろしいですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "終わったあとでよかったですね。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: もう少しで終わるところだったのに、途中で電源が切れてしまって。\nnarrator: 一番。\nspeaker-b: それは大変でしたね。保存した分は残っていますか。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: これから電源を切ってもよろしいですか。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: 終わったあとでよかったですね。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "700f6cc4a78e04cf0fca03c4fa37ead024f49535f73b6e3ee5ed50cd74f59928",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "それは大変でしたね。保存した分は残っていますか。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "これから電源を切ってもよろしいですか。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "終わったあとでよかったですね。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:a1f5e19063c9c9dd5ca1e9affa0f1d9207f0e33de802eed5dbca463e0b6df283",
+    "draftSha256": "a1f5e19063c9c9dd5ca1e9affa0f1d9207f0e33de802eed5dbca463e0b6df283"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l20",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l20",
+      "revisionId": "assessment-item:73362ee923819b54380111ffe64b2c67cded79b5803ccf374f61d71e054e5b9e",
+      "sha256": "73362ee923819b54380111ffe64b2c67cded79b5803ccf374f61d71e054e5b9e"
+    },
+    "scored": true,
+    "sourceId": "l20",
+    "task": "listening-response",
+    "globalNumber": 88,
+    "booklet": "listening",
+    "bookletNumber": 6,
+    "group": 4,
+    "localNumber": 6,
+    "printedLabel": "6",
+    "spokenNumber": "6番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "来月から毎週出張だそうですね。体には気をつけてください。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "出張の報告書なら、先月提出してあります。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "はい、来月の出張はもう全て終わりました。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "ありがとうございます。無理のない予定を組むつもりです。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 来月から毎週出張だそうですね。体には気をつけてください。\nnarrator: 一番。\nspeaker-b: 出張の報告書なら、先月提出してあります。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: はい、来月の出張はもう全て終わりました。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: ありがとうございます。無理のない予定を組むつもりです。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "abca99f49aa249deb499e26e362a516527186fbe7025a2762f6d746a9f1bce17",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "出張の報告書なら、先月提出してあります。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "はい、来月の出張はもう全て終わりました。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "ありがとうございます。無理のない予定を組むつもりです。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:827340925414ccd6d3ebd16ab15f55f4f02a09908d06b6604007b08eeff443ce",
+    "draftSha256": "827340925414ccd6d3ebd16ab15f55f4f02a09908d06b6604007b08eeff443ce"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l21",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l21",
+      "revisionId": "assessment-item:5b266b4ac84fdf1ad40e9f8e737ba9d32d6e67b8bd08a11411109f614439b8fd",
+      "sha256": "5b266b4ac84fdf1ad40e9f8e737ba9d32d6e67b8bd08a11411109f614439b8fd"
+    },
+    "scored": true,
+    "sourceId": "l21",
+    "task": "listening-response",
+    "globalNumber": 89,
+    "booklet": "listening",
+    "bookletNumber": 7,
+    "group": 4,
+    "localNumber": 7,
+    "printedLabel": "7",
+    "spokenNumber": "7番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "この資料、思ったほど複雑じゃありませんね。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "いえ、昨日はまだ持ってきていません。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "そうですね。要点が見つけやすくなっています。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "ええ、予想よりずっと複雑ですね。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: この資料、思ったほど複雑じゃありませんね。\nnarrator: 一番。\nspeaker-b: いえ、昨日はまだ持ってきていません。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: そうですね。要点が見つけやすくなっています。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: ええ、予想よりずっと複雑ですね。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "c824a9adc51a201b2dcff10bcdd01666667a210496d48c9d2c46d00684b79adb",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "いえ、昨日はまだ持ってきていません。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "そうですね。要点が見つけやすくなっています。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "ええ、予想よりずっと複雑ですね。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:600395fa63177aed6d63377bb3d06e1a267f06de557cf87592204a3df135c1cf",
+    "draftSha256": "600395fa63177aed6d63377bb3d06e1a267f06de557cf87592204a3df135c1cf"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l22",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l22",
+      "revisionId": "assessment-item:757533c12d4ad7a0b0c8e6d65a74d4f2e8ae36db4063829e72b6b82a3ada635d",
+      "sha256": "757533c12d4ad7a0b0c8e6d65a74d4f2e8ae36db4063829e72b6b82a3ada635d"
+    },
+    "scored": true,
+    "sourceId": "l22",
+    "task": "listening-response",
+    "globalNumber": 90,
+    "booklet": "listening",
+    "bookletNumber": 8,
+    "group": 4,
+    "localNumber": 8,
+    "printedLabel": "8",
+    "spokenNumber": "8番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "遠いところ、わざわざお越しいただいて。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "いえ、お目にかかれてうれしいです。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "いえ、これからそちらへ伺うところです。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "どういたしまして。来ていただいて助かりました。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 遠いところ、わざわざお越しいただいて。\nnarrator: 一番。\nspeaker-b: いえ、お目にかかれてうれしいです。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: いえ、これからそちらへ伺うところです。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: どういたしまして。来ていただいて助かりました。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "a1209c61bcb3b1e07c533bce6445ae530227c6a28c3dde4087892a32ec42f0a3",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "いえ、お目にかかれてうれしいです。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "いえ、これからそちらへ伺うところです。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "どういたしまして。来ていただいて助かりました。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:3ab09774aea0a72624caea3a6c01d3b6fc7390396421874d7f76a94e08b26d30",
+    "draftSha256": "3ab09774aea0a72624caea3a6c01d3b6fc7390396421874d7f76a94e08b26d30"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l23",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l23",
+      "revisionId": "assessment-item:8a5c83787fcd021235e7a64d97186ea763eedfd052e1f1ab64b3b2d8be52a9f5",
+      "sha256": "8a5c83787fcd021235e7a64d97186ea763eedfd052e1f1ab64b3b2d8be52a9f5"
+    },
+    "scored": true,
+    "sourceId": "l23",
+    "task": "listening-response",
+    "globalNumber": 91,
+    "booklet": "listening",
+    "bookletNumber": 9,
+    "group": 4,
+    "localNumber": 9,
+    "printedLabel": "9",
+    "spokenNumber": "9番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "手伝ってもらったうえに、お土産までいただいて、恐縮です。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "どうぞお気になさらないでください。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "では、お土産をいただけると助かります。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "手伝う前にお土産を買っておいてください。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 手伝ってもらったうえに、お土産までいただいて、恐縮です。\nnarrator: 一番。\nspeaker-b: どうぞお気になさらないでください。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: では、お土産をいただけると助かります。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: 手伝う前にお土産を買っておいてください。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "79e91bacbdec79c03a410f314b43f0e44cf9a916983b5c2c98ed872781a7ebf0",
+    "answerOptionId": "choice-1",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "どうぞお気になさらないでください。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "では、お土産をいただけると助かります。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "手伝う前にお土産を買っておいてください。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:8a0bcdf6c2f67f254ae9a7ddffead57f5676ddfce66f0d2a20083f3f4070bd48",
+    "draftSha256": "8a0bcdf6c2f67f254ae9a7ddffead57f5676ddfce66f0d2a20083f3f4070bd48"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l24",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l24",
+      "revisionId": "assessment-item:dc5789eb53c9b923531fc6399ecbe8477462fec47d24fe59740d300957d154ff",
+      "sha256": "dc5789eb53c9b923531fc6399ecbe8477462fec47d24fe59740d300957d154ff"
+    },
+    "scored": true,
+    "sourceId": "l24",
+    "task": "listening-response",
+    "globalNumber": 92,
+    "booklet": "listening",
+    "bookletNumber": 10,
+    "group": 4,
+    "localNumber": 10,
+    "printedLabel": "10",
+    "spokenNumber": "10番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": null,
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": null,
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "dialogue",
+        "voice": "speaker-a",
+        "text": "一応決まりましたが、まだ社外には知らせないでいただけますか。",
+        "authoredDialogueIndex": 0
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-1",
+        "text": "では、社外の方にもすぐお知らせします。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-2",
+        "text": "承知しました。正式な発表を待ちます。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "speaker-b",
+        "optionId": "choice-3",
+        "text": "まだ何も決まっていないとおっしゃったんですね。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 8000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "speaker-a: 一応決まりましたが、まだ社外には知らせないでいただけますか。\nnarrator: 一番。\nspeaker-b: では、社外の方にもすぐお知らせします。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nspeaker-b: 承知しました。正式な発表を待ちます。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nspeaker-b: まだ何も決まっていないとおっしゃったんですね。\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 8000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "e618a74ea22baecce3e016fd59265b845bd9dd9bd2a3adf81d075112566c7fbf",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "では、社外の方にもすぐお知らせします。"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "承知しました。正式な発表を待ちます。"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "まだ何も決まっていないとおっしゃったんですね。"
+      }
+    ],
+    "scope": "complete ordinary item script",
+    "draftRevisionId": "listening-script-draft:27f966a4b0f236694be1a4ac1530be5bef32f7c4fd1a6a47b4a54de9c40aaaa0",
+    "draftSha256": "27f966a4b0f236694be1a4ac1530be5bef32f7c4fd1a6a47b4a54de9c40aaaa0"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l25",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l25",
+      "revisionId": "assessment-item:3d8428a0a081eecc3bcdb95759d55ee1e1cfad8d0a7d17c6b9a743306ca70d24",
+      "sha256": "3d8428a0a081eecc3bcdb95759d55ee1e1cfad8d0a7d17c6b9a743306ca70d24"
+    },
+    "scored": true,
+    "sourceId": "l25",
+    "task": "listening-integrated",
+    "globalNumber": 93,
+    "booklet": "listening",
+    "bookletNumber": 1,
+    "group": 5,
+    "localNumber": 1,
+    "printedLabel": "1",
+    "spokenNumber": "1番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": "kairo-original-jlpt-n2-form-01:stimulus-integrated-1",
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-1",
+      "draftRevisionId": "listening-stimulus-draft:97dcfc67774b94ca121aa0fe643959ffce96a9bfa1f6e67431354f20a9620290",
+      "draftSha256": "97dcfc67774b94ca121aa0fe643959ffce96a9bfa1f6e67431354f20a9620290"
+    },
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "どのような企画を行うことにしましたか。"
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "新しい装置を作り、外部の先生に実演してもらう"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "録画した実験の映像だけを繰り返し流す"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "海外の先生と通信しながら、オンライン講演を聞く"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "四番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "職員が手元の材料で実験を紹介し、来場者にも試してもらう"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 15000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: どのような企画を行うことにしましたか。\nnarrator: 一番。\nnarrator: 新しい装置を作り、外部の先生に実演してもらう\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nnarrator: 録画した実験の映像だけを繰り返し流す\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nnarrator: 海外の先生と通信しながら、オンライン講演を聞く\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 四番。\nnarrator: 職員が手元の材料で実験を紹介し、来場者にも試してもらう\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 15000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "75060c65ac356945e9e4131cc8c99087f24d36881755d9a28b6c3bc97bb58e43",
+    "answerOptionId": "choice-4",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "新しい装置を作り、外部の先生に実演してもらう"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "録画した実験の映像だけを繰り返し流す"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "海外の先生と通信しながら、オンライン講演を聞く"
+      },
+      {
+        "id": "choice-4",
+        "number": 4,
+        "text": "職員が手元の材料で実験を紹介し、来場者にも試してもらう"
+      }
+    ],
+    "scope": "question-only; preceding exact stimulus is scheduled by a separate authoring delivery unit",
+    "draftRevisionId": "listening-script-draft:c8a9a849336140a82fefcf6f803720b8d8c6cb712ff0c8f933aa9faab80f0ad1",
+    "draftSha256": "c8a9a849336140a82fefcf6f803720b8d8c6cb712ff0c8f933aa9faab80f0ad1"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l26",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l26",
+      "revisionId": "assessment-item:2835e19111632635263d3aa39fc33ae1fa8c43fd6b76208c14a62113f828d610",
+      "sha256": "2835e19111632635263d3aa39fc33ae1fa8c43fd6b76208c14a62113f828d610"
+    },
+    "scored": true,
+    "sourceId": "l26",
+    "task": "listening-integrated",
+    "globalNumber": 94,
+    "booklet": "listening",
+    "bookletNumber": 2,
+    "group": 5,
+    "localNumber": 2,
+    "printedLabel": "2",
+    "spokenNumber": "2番。",
+    "sharedQuestionNumber": null,
+    "stimulusId": "kairo-original-jlpt-n2-form-01:stimulus-integrated-2",
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": false,
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-2",
+      "draftRevisionId": "listening-stimulus-draft:ca926116dd44882b9f4ace9c097ac994990a915625997abe623be01776a69902",
+      "draftSha256": "ca926116dd44882b9f4ace9c097ac994990a915625997abe623be01776a69902"
+    },
+    "sharedMenuId": null,
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "表紙に使うことにしたのは、どの写真ですか。"
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "一番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-1",
+        "text": "川の夕景"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "二番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-2",
+        "text": "春の祭り"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "三番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-3",
+        "text": "図書館の外観"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "speech",
+        "role": "option-number",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "四番。"
+      },
+      {
+        "kind": "speech",
+        "role": "spoken-option",
+        "voice": "narrator",
+        "optionId": "choice-4",
+        "text": "商店街の朝"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 1500,
+        "purpose": "Separate spoken choices; provisional."
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 15000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 表紙に使うことにしたのは、どの写真ですか。\nnarrator: 一番。\nnarrator: 川の夕景\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 二番。\nnarrator: 春の祭り\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 三番。\nnarrator: 図書館の外観\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\nnarrator: 四番。\nnarrator: 商店街の朝\n[PLANNED SILENCE 1500 ms: Separate spoken choices; provisional.]\n[PLANNED SILENCE 15000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "958eeb4fa1f30a0ad62edc6dcc2eee2de767f7cde8a89d4260145e7dcac2b84e",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [
+      {
+        "id": "choice-1",
+        "number": 1,
+        "text": "川の夕景"
+      },
+      {
+        "id": "choice-2",
+        "number": 2,
+        "text": "春の祭り"
+      },
+      {
+        "id": "choice-3",
+        "number": 3,
+        "text": "図書館の外観"
+      },
+      {
+        "id": "choice-4",
+        "number": 4,
+        "text": "商店街の朝"
+      }
+    ],
+    "scope": "question-only; preceding exact stimulus is scheduled by a separate authoring delivery unit",
+    "draftRevisionId": "listening-script-draft:ce1f52cf1e78c80fe7dd250efee8ca99d81e38fed160fbf48973c435eab5d873",
+    "draftSha256": "ce1f52cf1e78c80fe7dd250efee8ca99d81e38fed160fbf48973c435eab5d873"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l27",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l27",
+      "revisionId": "assessment-item:0d1c602860b54d57aa2a750b17a900891bd7f5c647654fbc73c4a60354a87dff",
+      "sha256": "0d1c602860b54d57aa2a750b17a900891bd7f5c647654fbc73c4a60354a87dff"
+    },
+    "scored": true,
+    "sourceId": "l27",
+    "task": "listening-integrated",
+    "globalNumber": 95,
+    "booklet": "listening",
+    "bookletNumber": 3,
+    "group": 5,
+    "localNumber": 3,
+    "printedLabel": "3番・質問1",
+    "spokenNumber": "3番。",
+    "sharedQuestionNumber": 1,
+    "stimulusId": "kairo-original-jlpt-n2-form-01:stimulus-integrated-3",
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-3",
+      "draftRevisionId": "listening-stimulus-draft:00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9",
+      "draftSha256": "00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9"
+    },
+    "sharedMenuId": "menu-integrated-3",
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "女の人が参加するのは、どの担当ですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 15000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 女の人が参加するのは、どの担当ですか。\n[PLANNED SILENCE 15000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "47398db630bf38215353a84f4147c77ed03be3d75564565942e8cbb75c608ef7",
+    "answerOptionId": "choice-3",
+    "spokenOptions": [],
+    "scope": "question-only; preceding exact stimulus is scheduled by a separate authoring delivery unit",
+    "draftRevisionId": "listening-script-draft:1e1b61ddf00f75844eada5d0229648b4737d2cdfc512ec86339c403001f09b35",
+    "draftSha256": "1e1b61ddf00f75844eada5d0229648b4737d2cdfc512ec86339c403001f09b35"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:script-l28",
+    "format": "kairo-listening-authoring-script",
+    "item": {
+      "kind": "item",
+      "id": "kairo-original-jlpt-n2-form-01:l28",
+      "revisionId": "assessment-item:8528f9aa45ca02301316162c9ae53ed7077f4970e032d4e351a3a8b76dd26516",
+      "sha256": "8528f9aa45ca02301316162c9ae53ed7077f4970e032d4e351a3a8b76dd26516"
+    },
+    "scored": true,
+    "sourceId": "l28",
+    "task": "listening-integrated",
+    "globalNumber": 96,
+    "booklet": "listening",
+    "bookletNumber": 3,
+    "group": 5,
+    "localNumber": 4,
+    "printedLabel": "3番・質問2",
+    "spokenNumber": "3番。",
+    "sharedQuestionNumber": 2,
+    "stimulusId": "kairo-original-jlpt-n2-form-01:stimulus-integrated-3",
+    "state": "unreviewed-unrendered-no-media",
+    "actualVoiceSettings": null,
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "actualAudioBytesSha256": null,
+    "roles": {
+      "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+      "announcer": "四つの活動や講座の条件を案内する話者。",
+      "speaker-a": "短い発言の話者（実際の声は未割当）。",
+      "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+      "speaker-c": "三人目の担当者（実際の声は未割当）。"
+    },
+    "printedOptions": true,
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-3",
+      "draftRevisionId": "listening-stimulus-draft:00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9",
+      "draftSha256": "00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9"
+    },
+    "sharedMenuId": "menu-integrated-3",
+    "cues": [
+      {
+        "kind": "speech",
+        "role": "question-after",
+        "voice": "narrator",
+        "text": "男の人が参加するのは、どの担当ですか。"
+      },
+      {
+        "kind": "planned-silence",
+        "milliseconds": 15000,
+        "purpose": "Answer time; unrendered provisional authoring pause."
+      }
+    ],
+    "text": "narrator: 男の人が参加するのは、どの担当ですか。\n[PLANNED SILENCE 15000 ms: Answer time; unrendered provisional authoring pause.]\n",
+    "textSha256": "ed11e6b34e839cfb9e2125608c35f494859b96bff91416242ca2cf00b3d389a0",
+    "answerOptionId": "choice-2",
+    "spokenOptions": [],
+    "scope": "question-only; preceding exact stimulus is scheduled by a separate authoring delivery unit",
+    "draftRevisionId": "listening-script-draft:9658aeabb4fbbc0d39e5ea8d8488e5d0bfe35f9682682dcd27465a453676dcc4",
+    "draftSha256": "9658aeabb4fbbc0d39e5ea8d8488e5d0bfe35f9682682dcd27465a453676dcc4"
+  }
+]

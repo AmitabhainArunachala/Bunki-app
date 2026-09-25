@@ -206,7 +206,7 @@ for (const engine of engines) for (const width of sizes) {
       assert.equal(initial.taken.length, 0); await shelf(page);
       await page.locator('#airead-link').click(); await page.locator('#airead-startingLevel').selectOption('N5');
       await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
-      const item = page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
+      const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
       await item.locator('.shelf-open').click(); await page.locator('#reader .tok[data-index="9"][data-word="窓"]').click();
       await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
       await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
@@ -330,13 +330,10 @@ for (const engine of engines) for (const width of sizes) {
     const originTime = await page.evaluate(() => performance.timeOrigin); await page.locator('#import-file').setInputFiles(backup);
     await page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', originTime, { timeout: 30000 });
     const restored = await readAppRecordSnapshot(page);
-    // Import parses both optional draft roots, including null/omitted roots.
-    // Assert their exact empty canonical values; populated drafts and every
-    // other learner root remain part of the whole-record comparison.
+    // Import preserves null/omitted draft roots when neither side has drafts.
+    // Every learner root remains part of the exact whole-record comparison.
     const expectedRestored = { ...beforeExport.record };
-    for (const key of ['teacherDrafts', 'sentenceDrafts'])
-      if (expectedRestored[key] == null) expectedRestored[key] = { version: 1, entries: [] };
-    assert.deepEqual(restored.record, expectedRestored, 'Restore recovers every portable root, with only the existing empty-draft canonicalization');
+    assert.deepEqual(restored.record, expectedRestored, 'Restore recovers every portable root, including absent draft libraries');
     assert.deepEqual(restored.archive, beforeExport.archive);
     assert.deepEqual(restored.installation, recoveryBaseline.installation, 'Restore cannot grant or replace installation authority');
     assert.deepEqual(restored.rows.filter(row => row.kind === 'operation'), recoveryBaseline.rows.filter(row => row.kind === 'operation'));

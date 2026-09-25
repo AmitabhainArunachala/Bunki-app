@@ -299,7 +299,14 @@ async function waitSelected(page, predicate, description) {
 }
 async function door(page) {
   await page.locator('#mock-link').click();
+  await page.waitForSelector('#exam-legacy, [data-mock-set="n5-01"], #mock-next, #mock-done');
+  if (await page.locator('#exam-legacy').count()) await page.locator('#exam-legacy').click();
   await page.waitForSelector('[data-mock-set="n5-01"], #mock-next, #mock-done');
+}
+async function earlierExercises(page) {
+  await page.waitForSelector('#exam-legacy, [data-mock-set="n5-01"]');
+  if (await page.locator('#exam-legacy').count()) await page.locator('#exam-legacy').click();
+  await page.waitForSelector('[data-mock-set="n5-01"]');
 }
 async function start(page) {
   await page.locator('[data-mock-set="n5-01"]').click();
@@ -330,7 +337,7 @@ async function previous(page) {
 }
 async function done(page) {
   await page.locator('#mock-done').click();
-  await page.waitForSelector('[data-mock-set="n5-01"]');
+  await earlierExercises(page);
   await waitForAppRecord(page, (record) => record.assessmentLibrary?.activeAttemptId === null,
     { description: 'cleared practice active pointer' });
 }
@@ -569,7 +576,7 @@ async function ordinaryTerminal(peer, outcome, { answered = false } = {}) {
     await peer.page.locator('#mock-drop').click();
     await waitForAppRecord(peer.page, record => record.assessmentLibrary?.activeAttemptId === null &&
       record.assessmentLibrary.attempts.at(-1).status === 'abandoned');
-    await peer.page.locator('[data-mock-set="n5-01"]').waitFor();
+    await earlierExercises(peer.page);
   }
   const after = await receivedNative(peer, `${outcome}-finished`); rootsUnchanged(started, after, ['assessmentLibrary']);
   const added = after.snapshot.replica.operations.filter(operation => !started.snapshot.replica.operations.some(old => old.opId === operation.opId));
@@ -921,7 +928,9 @@ async function checkReceived(name) {
 try {
   await check('two-completed-attempts-and-failed-save-actions', async ({ page }) => {
     await door(page);
-    assert.match(await page.locator('main').innerText(), /short, unreviewed practice sets/iu);
+    assert.match(await page.locator('main').innerText(), /Short practice sets/u);
+    assert.match(await page.locator('main').innerText(), /answer keys still need checking/u);
+    assert.match(await page.locator('main').innerText(), /don’t include listening or a time limit/u);
     await start(page);
     const firstId = (await selected(page)).attempt.attemptId;
     const firstQuestion = await page.locator('.mock-q').innerText();
@@ -1077,7 +1086,7 @@ try {
       );
       assert.equal(await page.locator('[data-mock-opt="3"]').getAttribute('aria-pressed'), 'true');
       await page.locator('#mock-drop').click();
-      await page.waitForSelector('[data-mock-set="n5-01"]');
+      await earlierExercises(page);
       await start(page);
       assert.equal(upstream.length, 1, 'A deliberate new attempt fetches the new source');
       assert.equal(await page.locator('.mock-q').innerText(), changed.sections[0].items[0].q);
@@ -1118,8 +1127,10 @@ try {
       const cachePaths = [
         'index.html',
         'corridor.js',
-        'assessment-controller.mjs',
-        'modules/assessment-core.mjs',
+        // Boot now loads the assessment, source-cloze and shared record graph.
+        // Require its complete staged module inventory, including transitive
+        // dependencies, rather than letting an online first visit hide a gap.
+        ...files.filter((file) => file.path.endsWith('.mjs')).map((file) => file.path),
         'data/manifest.json',
       ];
       const cacheHashes = await page.evaluate(async (paths) => {

@@ -92,7 +92,7 @@ for (const engine of engines) {
   try {
     await silenceBrowserAudio(context);
     await page.goto(`${ORIGIN}/index.html?ui=bi`);await ready(page);await shelf(page);
-    await page.locator('.shelf-item').filter({has:page.locator('.shelf-title',{hasText:/^静かな朝$/u})}).locator('.shelf-open').click();
+    await page.locator('.shelf-item:not([data-recommendation])').filter({has:page.locator('.shelf-title',{hasText:/^静かな朝$/u})}).locator('.shelf-open').click();
     await sourceToken(page).click();await page.locator('#reader-sentence-practice').click();
     await page.locator('#sentence-choose-cloze').uncheck();await page.locator('#sentence-choose-listening').check();
     const before=await snapshot('before-corrupt-audio');const count=fault.served;fault.corruptAudio=true;

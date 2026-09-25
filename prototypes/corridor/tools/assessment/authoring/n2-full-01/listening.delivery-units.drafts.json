@@ -1,0 +1,569 @@
+[
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-integrated-1",
+    "format": "kairo-listening-delivery-unit-authoring-envelope",
+    "notInstalledRuntimeSchedule": true,
+    "scored": true,
+    "deliveryMode": "single-question-spoken-choices",
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-1",
+      "draftRevisionId": "listening-stimulus-draft:97dcfc67774b94ca121aa0fe643959ffce96a9bfa1f6e67431354f20a9620290",
+      "draftSha256": "97dcfc67774b94ca121aa0fe643959ffce96a9bfa1f6e67431354f20a9620290"
+    },
+    "stimulusPlayCount": 1,
+    "questionOrder": [
+      {
+        "ordinal": 1,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l25",
+          "revisionId": "assessment-item:3d8428a0a081eecc3bcdb95759d55ee1e1cfad8d0a7d17c6b9a743306ca70d24",
+          "sha256": "3d8428a0a081eecc3bcdb95759d55ee1e1cfad8d0a7d17c6b9a743306ca70d24"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l25",
+          "draftRevisionId": "listening-script-draft:c8a9a849336140a82fefcf6f803720b8d8c6cb712ff0c8f933aa9faab80f0ad1",
+          "draftSha256": "c8a9a849336140a82fefcf6f803720b8d8c6cb712ff0c8f933aa9faab80f0ad1"
+        },
+        "printedOptions": false
+      }
+    ],
+    "sharedMenu": null,
+    "sequence": [
+      {
+        "kind": "stimulus",
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-1",
+          "draftRevisionId": "listening-stimulus-draft:97dcfc67774b94ca121aa0fe643959ffce96a9bfa1f6e67431354f20a9620290",
+          "draftSha256": "97dcfc67774b94ca121aa0fe643959ffce96a9bfa1f6e67431354f20a9620290"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l25",
+          "revisionId": "assessment-item:3d8428a0a081eecc3bcdb95759d55ee1e1cfad8d0a7d17c6b9a743306ca70d24",
+          "sha256": "3d8428a0a081eecc3bcdb95759d55ee1e1cfad8d0a7d17c6b9a743306ca70d24"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l25",
+          "draftRevisionId": "listening-script-draft:c8a9a849336140a82fefcf6f803720b8d8c6cb712ff0c8f933aa9faab80f0ad1",
+          "draftSha256": "c8a9a849336140a82fefcf6f803720b8d8c6cb712ff0c8f933aa9faab80f0ad1"
+        }
+      }
+    ],
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "authorityBoundary": "Preview of an authoring playback-unit shape. This envelope grants no playback authority and claims no installed scheduler implementation.",
+    "draftRevisionId": "listening-delivery-unit-draft:6df7726a798d0028f8d7c9425a2c83b0934f09b72ae2232acf9cfc2987932919",
+    "draftSha256": "6df7726a798d0028f8d7c9425a2c83b0934f09b72ae2232acf9cfc2987932919"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-integrated-2",
+    "format": "kairo-listening-delivery-unit-authoring-envelope",
+    "notInstalledRuntimeSchedule": true,
+    "scored": true,
+    "deliveryMode": "single-question-spoken-choices",
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-2",
+      "draftRevisionId": "listening-stimulus-draft:ca926116dd44882b9f4ace9c097ac994990a915625997abe623be01776a69902",
+      "draftSha256": "ca926116dd44882b9f4ace9c097ac994990a915625997abe623be01776a69902"
+    },
+    "stimulusPlayCount": 1,
+    "questionOrder": [
+      {
+        "ordinal": 1,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l26",
+          "revisionId": "assessment-item:2835e19111632635263d3aa39fc33ae1fa8c43fd6b76208c14a62113f828d610",
+          "sha256": "2835e19111632635263d3aa39fc33ae1fa8c43fd6b76208c14a62113f828d610"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l26",
+          "draftRevisionId": "listening-script-draft:ce1f52cf1e78c80fe7dd250efee8ca99d81e38fed160fbf48973c435eab5d873",
+          "draftSha256": "ce1f52cf1e78c80fe7dd250efee8ca99d81e38fed160fbf48973c435eab5d873"
+        },
+        "printedOptions": false
+      }
+    ],
+    "sharedMenu": null,
+    "sequence": [
+      {
+        "kind": "stimulus",
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-2",
+          "draftRevisionId": "listening-stimulus-draft:ca926116dd44882b9f4ace9c097ac994990a915625997abe623be01776a69902",
+          "draftSha256": "ca926116dd44882b9f4ace9c097ac994990a915625997abe623be01776a69902"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l26",
+          "revisionId": "assessment-item:2835e19111632635263d3aa39fc33ae1fa8c43fd6b76208c14a62113f828d610",
+          "sha256": "2835e19111632635263d3aa39fc33ae1fa8c43fd6b76208c14a62113f828d610"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l26",
+          "draftRevisionId": "listening-script-draft:ce1f52cf1e78c80fe7dd250efee8ca99d81e38fed160fbf48973c435eab5d873",
+          "draftSha256": "ce1f52cf1e78c80fe7dd250efee8ca99d81e38fed160fbf48973c435eab5d873"
+        }
+      }
+    ],
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "authorityBoundary": "Preview of an authoring playback-unit shape. This envelope grants no playback authority and claims no installed scheduler implementation.",
+    "draftRevisionId": "listening-delivery-unit-draft:bc3e12d914bcdbd242082873074ff3e30328b9da5a7d64f8a670510a631a3322",
+    "draftSha256": "bc3e12d914bcdbd242082873074ff3e30328b9da5a7d64f8a670510a631a3322"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-integrated-3",
+    "format": "kairo-listening-delivery-unit-authoring-envelope",
+    "notInstalledRuntimeSchedule": true,
+    "scored": true,
+    "deliveryMode": "shared-two-questions-printed-choices",
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-3",
+      "draftRevisionId": "listening-stimulus-draft:00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9",
+      "draftSha256": "00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9"
+    },
+    "stimulusPlayCount": 1,
+    "questionOrder": [
+      {
+        "ordinal": 1,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l27",
+          "revisionId": "assessment-item:0d1c602860b54d57aa2a750b17a900891bd7f5c647654fbc73c4a60354a87dff",
+          "sha256": "0d1c602860b54d57aa2a750b17a900891bd7f5c647654fbc73c4a60354a87dff"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l27",
+          "draftRevisionId": "listening-script-draft:1e1b61ddf00f75844eada5d0229648b4737d2cdfc512ec86339c403001f09b35",
+          "draftSha256": "1e1b61ddf00f75844eada5d0229648b4737d2cdfc512ec86339c403001f09b35"
+        },
+        "printedOptions": true
+      },
+      {
+        "ordinal": 2,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l28",
+          "revisionId": "assessment-item:8528f9aa45ca02301316162c9ae53ed7077f4970e032d4e351a3a8b76dd26516",
+          "sha256": "8528f9aa45ca02301316162c9ae53ed7077f4970e032d4e351a3a8b76dd26516"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l28",
+          "draftRevisionId": "listening-script-draft:9658aeabb4fbbc0d39e5ea8d8488e5d0bfe35f9682682dcd27465a453676dcc4",
+          "draftSha256": "9658aeabb4fbbc0d39e5ea8d8488e5d0bfe35f9682682dcd27465a453676dcc4"
+        },
+        "printedOptions": true
+      }
+    ],
+    "sharedMenu": {
+      "id": "kairo-original-jlpt-n2-form-01:menu-integrated-3",
+      "itemOptions": [
+        {
+          "id": "choice-1",
+          "text": "資料入力"
+        },
+        {
+          "id": "choice-2",
+          "text": "広報取材"
+        },
+        {
+          "id": "choice-3",
+          "text": "写真整理"
+        },
+        {
+          "id": "choice-4",
+          "text": "イベント案内"
+        }
+      ]
+    },
+    "sequence": [
+      {
+        "kind": "stimulus",
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:stimulus-integrated-3",
+          "draftRevisionId": "listening-stimulus-draft:00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9",
+          "draftSha256": "00b2315a68b51629f5c780209a5132e66bbd33d0788ed1c31e53636ddf8c5eb9"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l27",
+          "revisionId": "assessment-item:0d1c602860b54d57aa2a750b17a900891bd7f5c647654fbc73c4a60354a87dff",
+          "sha256": "0d1c602860b54d57aa2a750b17a900891bd7f5c647654fbc73c4a60354a87dff"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l27",
+          "draftRevisionId": "listening-script-draft:1e1b61ddf00f75844eada5d0229648b4737d2cdfc512ec86339c403001f09b35",
+          "draftSha256": "1e1b61ddf00f75844eada5d0229648b4737d2cdfc512ec86339c403001f09b35"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:l28",
+          "revisionId": "assessment-item:8528f9aa45ca02301316162c9ae53ed7077f4970e032d4e351a3a8b76dd26516",
+          "sha256": "8528f9aa45ca02301316162c9ae53ed7077f4970e032d4e351a3a8b76dd26516"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-l28",
+          "draftRevisionId": "listening-script-draft:9658aeabb4fbbc0d39e5ea8d8488e5d0bfe35f9682682dcd27465a453676dcc4",
+          "draftSha256": "9658aeabb4fbbc0d39e5ea8d8488e5d0bfe35f9682682dcd27465a453676dcc4"
+        }
+      }
+    ],
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "authorityBoundary": "Preview of an authoring playback-unit shape. This envelope grants no playback authority and claims no installed scheduler implementation.",
+    "draftRevisionId": "listening-delivery-unit-draft:135827ae3827b7f7dee26d200878e11a772353e531be0a03a97d133a0e0f4444",
+    "draftSha256": "135827ae3827b7f7dee26d200878e11a772353e531be0a03a97d133a0e0f4444"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-ex-integrated-solo",
+    "format": "kairo-listening-delivery-unit-authoring-envelope",
+    "notInstalledRuntimeSchedule": true,
+    "scored": false,
+    "deliveryMode": "single-question-spoken-choices",
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-ex-integrated-solo",
+      "draftRevisionId": "listening-stimulus-draft:f577f2a37f0f54702a99cd718ca0ae6a5f919f85e2152b94628d4b685c767131",
+      "draftSha256": "f577f2a37f0f54702a99cd718ca0ae6a5f919f85e2152b94628d4b685c767131"
+    },
+    "stimulusPlayCount": 1,
+    "questionOrder": [
+      {
+        "ordinal": 1,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:ex-integrated-solo",
+          "revisionId": "assessment-item:df427f738bf17a66bacb937d188716635795e87f9747eef45f2c16f1d7a0d977",
+          "sha256": "df427f738bf17a66bacb937d188716635795e87f9747eef45f2c16f1d7a0d977"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-ex-integrated-solo",
+          "draftRevisionId": "listening-example-script-draft:ee2f90b49efe50e285f81df840afe4a49333c4c308ecb6d529afd070584e451a",
+          "draftSha256": "ee2f90b49efe50e285f81df840afe4a49333c4c308ecb6d529afd070584e451a"
+        },
+        "printedOptions": false
+      }
+    ],
+    "sharedMenu": null,
+    "sequence": [
+      {
+        "kind": "stimulus",
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:stimulus-ex-integrated-solo",
+          "draftRevisionId": "listening-stimulus-draft:f577f2a37f0f54702a99cd718ca0ae6a5f919f85e2152b94628d4b685c767131",
+          "draftSha256": "f577f2a37f0f54702a99cd718ca0ae6a5f919f85e2152b94628d4b685c767131"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:ex-integrated-solo",
+          "revisionId": "assessment-item:df427f738bf17a66bacb937d188716635795e87f9747eef45f2c16f1d7a0d977",
+          "sha256": "df427f738bf17a66bacb937d188716635795e87f9747eef45f2c16f1d7a0d977"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-ex-integrated-solo",
+          "draftRevisionId": "listening-example-script-draft:ee2f90b49efe50e285f81df840afe4a49333c4c308ecb6d529afd070584e451a",
+          "draftSha256": "ee2f90b49efe50e285f81df840afe4a49333c4c308ecb6d529afd070584e451a"
+        }
+      }
+    ],
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "authorityBoundary": "Preview of an authoring playback-unit shape. This envelope grants no playback authority and claims no installed scheduler implementation.",
+    "draftRevisionId": "listening-delivery-unit-draft:f50c90dcf077ba091bb4cb63282c8e60fb9695ca1d5660a076de73333e67978d",
+    "draftSha256": "f50c90dcf077ba091bb4cb63282c8e60fb9695ca1d5660a076de73333e67978d"
+  },
+  {
+    "v": 1,
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "codex-original-n2-form-01-20260910-r1",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "retain": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "sync": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "adapt": {
+        "status": "unknown",
+        "reason": "not-established"
+      },
+      "synthesize-audio": {
+        "status": "unknown",
+        "reason": "not-established"
+      }
+    },
+    "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-ex-integrated-shared",
+    "format": "kairo-listening-delivery-unit-authoring-envelope",
+    "notInstalledRuntimeSchedule": true,
+    "scored": false,
+    "deliveryMode": "shared-two-questions-printed-choices",
+    "stimulus": {
+      "kind": "authoring-draft-ref",
+      "id": "kairo-original-jlpt-n2-form-01:stimulus-ex-integrated-shared",
+      "draftRevisionId": "listening-stimulus-draft:87ca28cd9fa06790688f149c1ae660c7cc2097daff2c4ce590321f851cd82d46",
+      "draftSha256": "87ca28cd9fa06790688f149c1ae660c7cc2097daff2c4ce590321f851cd82d46"
+    },
+    "stimulusPlayCount": 1,
+    "questionOrder": [
+      {
+        "ordinal": 1,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:ex-integrated-shared-1",
+          "revisionId": "assessment-item:95ffc805ccf527e4c3f5db491cd4b87ac9b7b3c0697d2bcbbd74df6b26d97b40",
+          "sha256": "95ffc805ccf527e4c3f5db491cd4b87ac9b7b3c0697d2bcbbd74df6b26d97b40"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-ex-integrated-shared-1",
+          "draftRevisionId": "listening-example-script-draft:7a6ce6232f89d1f8f01e7206f6c3ee230364d21d11568d3850eaaf4cc77c251d",
+          "draftSha256": "7a6ce6232f89d1f8f01e7206f6c3ee230364d21d11568d3850eaaf4cc77c251d"
+        },
+        "printedOptions": true
+      },
+      {
+        "ordinal": 2,
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:ex-integrated-shared-2",
+          "revisionId": "assessment-item:9b2923fa49b4236203385abc8cbd2d98b4b0164021c4a7e352be657837b7e163",
+          "sha256": "9b2923fa49b4236203385abc8cbd2d98b4b0164021c4a7e352be657837b7e163"
+        },
+        "script": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-ex-integrated-shared-2",
+          "draftRevisionId": "listening-example-script-draft:1bcbaca3a5e60ac07aa361ae581dfd182680458f9729d1edd03cdaae365ce597",
+          "draftSha256": "1bcbaca3a5e60ac07aa361ae581dfd182680458f9729d1edd03cdaae365ce597"
+        },
+        "printedOptions": true
+      }
+    ],
+    "sharedMenu": {
+      "id": "kairo-original-jlpt-n2-form-01:menu-ex-integrated-shared",
+      "itemOptions": [
+        {
+          "id": "choice-1",
+          "text": "植物観察"
+        },
+        {
+          "id": "choice-2",
+          "text": "紙の工作"
+        },
+        {
+          "id": "choice-3",
+          "text": "布の修理"
+        },
+        {
+          "id": "choice-4",
+          "text": "写真散歩"
+        }
+      ]
+    },
+    "sequence": [
+      {
+        "kind": "stimulus",
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:stimulus-ex-integrated-shared",
+          "draftRevisionId": "listening-stimulus-draft:87ca28cd9fa06790688f149c1ae660c7cc2097daff2c4ce590321f851cd82d46",
+          "draftSha256": "87ca28cd9fa06790688f149c1ae660c7cc2097daff2c4ce590321f851cd82d46"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:ex-integrated-shared-1",
+          "revisionId": "assessment-item:95ffc805ccf527e4c3f5db491cd4b87ac9b7b3c0697d2bcbbd74df6b26d97b40",
+          "sha256": "95ffc805ccf527e4c3f5db491cd4b87ac9b7b3c0697d2bcbbd74df6b26d97b40"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-ex-integrated-shared-1",
+          "draftRevisionId": "listening-example-script-draft:7a6ce6232f89d1f8f01e7206f6c3ee230364d21d11568d3850eaaf4cc77c251d",
+          "draftSha256": "7a6ce6232f89d1f8f01e7206f6c3ee230364d21d11568d3850eaaf4cc77c251d"
+        }
+      },
+      {
+        "kind": "question",
+        "item": {
+          "kind": "item",
+          "id": "kairo-original-jlpt-n2-form-01:ex-integrated-shared-2",
+          "revisionId": "assessment-item:9b2923fa49b4236203385abc8cbd2d98b4b0164021c4a7e352be657837b7e163",
+          "sha256": "9b2923fa49b4236203385abc8cbd2d98b4b0164021c4a7e352be657837b7e163"
+        },
+        "ref": {
+          "kind": "authoring-draft-ref",
+          "id": "kairo-original-jlpt-n2-form-01:script-ex-integrated-shared-2",
+          "draftRevisionId": "listening-example-script-draft:1bcbaca3a5e60ac07aa361ae581dfd182680458f9729d1edd03cdaae365ce597",
+          "draftSha256": "1bcbaca3a5e60ac07aa361ae581dfd182680458f9729d1edd03cdaae365ce597"
+        }
+      }
+    ],
+    "actualMedia": null,
+    "actualDurationMs": null,
+    "authorityBoundary": "Preview of an authoring playback-unit shape. This envelope grants no playback authority and claims no installed scheduler implementation.",
+    "draftRevisionId": "listening-delivery-unit-draft:e1cb2b9a8e5157913b7a7e1e74c395aa05ba4d6ac7617f872a712f0aeb117a55",
+    "draftSha256": "e1cb2b9a8e5157913b7a7e1e74c395aa05ba4d6ac7617f872a712f0aeb117a55"
+  }
+]

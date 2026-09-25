@@ -483,7 +483,7 @@ async function uiNative(page) {
 async function openUiPractice(page) {
   await page.goto(`${origin}/index.html?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#mock-link').click(); await page.locator('[data-mock-set="n5-01"]').click();
+  await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
   await page.locator('[data-mock-opt="0"]').waitFor();
   await waitForAppRecord(page, (record) => record.assessmentLibrary?.attempts.some((attempt) => attempt.status === 'in-progress'));
 }
@@ -509,6 +509,7 @@ test('rendered-new-library-owned-scope-and-submission', async (page) => {
   await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1'); const reopened = await uiNative(page);
   assert.deepEqual(reopened, after);
   await page.locator('#mock-link').click(); await page.locator('#mock-done').click();
+  await page.locator('#exam-legacy').click();
   const attemptId = after.replica.operations[0].payload.attemptId;
   await page.locator(`[data-mock-history="${attemptId}"]`).waitFor();
   assert.match(await page.locator(`[data-mock-history="${attemptId}"]`).innerText(), /on this device/iu);
@@ -531,6 +532,7 @@ test('rendered-abandonment-dismiss-and-rollback-preserve-ui', async (page) => {
   await waitForAppRecord(page, (record) => record.assessmentLibrary.activeAttemptId === null && record.assessmentLibrary.attempts[0].status === 'abandoned');
   const after = await uiNative(page); assert.equal(after.outbox.length, 1); assert.equal(after.replica.operations[0].payload.outcome, 'abandoned');
   assert(after.replica.operations[0].payload.answers.every((answer) => answer.response.kind === 'no-response'));
+  await page.locator('#exam-legacy').click();
   await page.locator('[data-mock-set="n5-01"]').waitFor();
   const attemptId = after.replica.operations[0].payload.attemptId;
   assert.match(await page.locator(`[data-mock-history="${attemptId}"]`).innerText(), /on this device/iu);
