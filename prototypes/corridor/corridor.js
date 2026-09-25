@@ -4405,10 +4405,15 @@ addEventListener('popstate', () => {
 
 /** A test question's source: the JLPT room, on that result, with that question open. */
 function openAssessmentSource({ attemptId, itemId }) {
+  // confirm the exact result and question still exist BEFORE touching the learner's surface;
+  // otherwise the caller's note says so and nothing moves
+  const selected = currentAssessmentV2(attemptId);
+  if (!assessmentViewModule || !selected || selected.attempt.status === 'in-progress' || !assessmentAttemptVisible(attemptId) ||
+      !selected.form.items.some((row) => row.id === itemId)) throw new Error('source-unavailable');
   S.stack = []; S.dialogInvoker = null;
   keepScroll();
   S.view = 'mock';
-  if (assessmentViewModule) { assessmentRoom ||= createAssessmentRoom(); assessmentRoom.open?.(attemptId, itemId); }
+  assessmentRoom ||= createAssessmentRoom(); assessmentRoom.open?.(attemptId, itemId);
   render();
 }
 
@@ -10079,12 +10084,23 @@ function createAssessmentRoom() {
     },
     rememberLevel: (value) => { try { localStorage.setItem('kairo-exam-level-v1', value); } catch { /* a device preference only */ } },
     olderSets: (level) => {
-      if (!D.mock) { if (!D.mockLoading && !mockFailed('index')) ensureMockIndex().then(() => { if (S.view === 'mock') render(); }, () => markMockFailed('index')); return mockFailed('index') ? [] : null; }
-      return D.mock.filter((set) => set.level === level);
+      if (D.mock) return { state: 'ready', sets: D.mock.filter((set) => set.level === level) };
+      if (mockFailed('index')) return { state: 'failed', sets: [] };
+      if (!D.mockLoading) ensureMockIndex().then(() => { if (S.view === 'mock') render(); }, () => { markMockFailed('index'); if (S.view === 'mock') render(); });
+      return { state: 'loading', sets: [] };
     },
+    retryOlderIndex: () => { D.mockFailed?.delete('index'); render(); },
+    olderSetFailed: (setId) => mockFailed(setId),
+    olderSetLoading: (setId) => !!D.mockSetsLoading?.has(setId),
     startOlder: (setId) => {
+      // fetching a set has not begun an attempt: only the same record, still in this room, on the
+      // latest request may start it — a late download after leaving must not mint a run
+      const epoch = recordEpoch, token = ++olderStartToken;
       D.mockFailed?.delete(setId);
-      ensureMockSet(setId).then(() => startMock(setId), () => markMockFailed(setId));
+      ensureMockSet(setId).then(
+        () => { if (recordEpoch === epoch && token === olderStartToken && S.view === 'mock' && recordWritable(epoch)) startMock(setId); },
+        () => { markMockFailed(setId); if (S.view === 'mock') render(); },
+      );
       render();
     },
     // the room's own reload keeps unsent drafts exactly as the banner's does
@@ -11045,6 +11061,7 @@ function renderMock(main) {
 /** One question, in the traditional posture: the paper does not tell you as
  * you go. Answers are recorded, changeable, and marked only at the end. */
 function renderMockItem(main, set, flat, run) {
+  main.dataset.mockSet = set.setId;
   const { section, item } = flat[run.ix];
   const epoch = recordEpoch;
   const selection = practiceSelection();
@@ -24180,6 +24197,7 @@ function maintenanceContext() {
   };
 }
 let maintenanceReports = null;
+let olderStartToken = 0;
 /** The report entry lives in the page's own flow — never a layer over its controls. */
 function reportEntries(className) {
   const line = el('p', `report-line ${className || ''}`.trim());

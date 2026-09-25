@@ -399,13 +399,22 @@ try {
         assert.equal(await start(page), true); assert((await finish(page)).submitted);
         const ids = await page.evaluate(async () => {
           const attempts = S.assessmentLibraryV2.attempts.filter(row => row.status === 'submitted');
-          const target = attempts[attempts.length - 1], selected = currentAssessmentV2(target.attemptId);
+          // target the OLDER attempt while the newer one is the active selection: an implementation
+          // that opens whatever is current cannot pass
+          const target = attempts[0], selected = currentAssessmentV2(target.attemptId);
           const itemId = selected.form.items[0].id;
           await openAssessmentSensei(target.attemptId, itemId);
+          const record = recordApp.current().snapshot.record;
           return { attempts: attempts.map(row => row.attemptId), attemptId: target.attemptId, itemId, view: S.view,
-            record: { srs: JSON.stringify(S.srs), revlog: S.revlog.length } };
+            active: currentAssessmentV2()?.attempt.attemptId ?? null,
+            learner: JSON.stringify({ srs: record.srs, revlog: record.revlog, practice: record.assessmentQuestionPractice,
+              answers: record.assessmentLibraryV2?.attempts.map(row => [row.attemptId, row.answers?.length ?? 0]) }) };
         });
         assert.equal(ids.attempts.length, 2, 'two submitted attempts'); assert.equal(ids.view, 'ai');
+        assert.notEqual(ids.active, ids.attemptId, 'the target is not the active attempt');
+        const learner = () => page.evaluate(() => { const record = recordApp.current().snapshot.record;
+          return JSON.stringify({ srs: record.srs, revlog: record.revlog, practice: record.assessmentQuestionPractice,
+            answers: record.assessmentLibraryV2?.attempts.map(row => [row.attemptId, row.answers?.length ?? 0]) }); });
         const landed = () => page.evaluate(id => {
           const d = document.querySelector(`details[data-exam-item="${CSS.escape(id)}"]`);
           return { view: S.view, attempt: document.querySelector('#app main')?.dataset.examAttempt || null, found: !!d, open: !!d?.open,
@@ -417,7 +426,7 @@ try {
         const one = await landed();
         assert.deepEqual({ attempt: one.attempt, found: one.found, open: one.open }, { attempt: ids.attemptId, found: true, open: true },
           `Sensei return lands on the exact attempt and question: ${JSON.stringify(one)}`);
-        assert.deepEqual({ srs: one.srs, revlog: one.revlog }, ids.record, 'Returning writes no grade');
+        assert.equal(await learner(), ids.learner, 'Returning writes no response, grade or SRS state');
         // caller 2: a learned word carrying that Sensei context, in review, "read the original sentence"
         const word = await page.evaluate(async () => {
           const context = S.teacherContexts.entries.find(entry => entry.sourceKind === 'assessment-item');
@@ -433,6 +442,9 @@ try {
         const two = await landed();
         assert.deepEqual({ attempt: two.attempt, found: two.found, open: two.open }, { attempt: ids.attemptId, found: true, open: true },
           `Review return lands on the exact attempt and question: ${JSON.stringify(two)}`);
+        const afterWord = JSON.parse(await learner()), baseline = JSON.parse(ids.learner);
+        assert.deepEqual({ revlog: afterWord.revlog, practice: afterWord.practice, answers: afterWord.answers },
+          { revlog: baseline.revlog, practice: baseline.practice, answers: baseline.answers }, 'The review return writes no response or grade');
         // an unavailable source keeps the learner where they are, with the caller's note
         await page.evaluate(async attemptId => {
           const native = await recordController.snapshot();
