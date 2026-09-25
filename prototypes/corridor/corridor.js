@@ -7063,6 +7063,23 @@ function tokenAccessibleLabel(token, index) {
   return parts.filter(Boolean).join(' · ');
 }
 
+/** 名 — a name has no dictionary entry here, but it has a reading: its door shows or hides it. */
+function namedAccessibleLabel(token, index) {
+  const shown = S.revealed?.has(index);
+  return [token.s, tx('名前', 'name'), shown ? token.r : '', tx('押すと読みを表示・非表示', 'activate to show or hide its reading')]
+    .filter(Boolean).join(' · ');
+}
+function wireNamedToken(span, token, index) {
+  span.addEventListener('click', () => {
+    if (Date.now() < swallowClickUntil) return;
+    (S.revealed ||= new Set());
+    if (S.revealed.has(index)) S.revealed.delete(index);
+    else S.revealed.add(index);
+    paintTok(span, token, index);
+    span.setAttribute('aria-label', namedAccessibleLabel(token, index));
+  });
+}
+
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -7694,7 +7711,10 @@ function renderReader(main) {
     // whatever the grader thinks of it; punctuation and bare kana are not.
     const namedReading =
       !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
-    const interactive = !!token.c || !!particle || namedReading;
+    // a name's door shows or hides its reading; with readings always on there is nothing
+    // for it to do, so it is plain text rather than a button that answers nothing
+    const namedDoor = namedReading && S.dials.furigana !== 2;
+    const interactive = !!token.c || !!particle || namedDoor;
     // its own class: a door, but never mistaken for a graded content word —
     // the app and its verifiers both select on .tok.content, and a name with
     // no dictionary entry answering to that name breaks both
@@ -7723,6 +7743,8 @@ function renderReader(main) {
         'aria-label',
         tx(`${particle.p}、助詞。通常の操作は何もしない。フォーカスで助詞の項目へ。`, `${particle.p}, particle; ordinary activation is inert; focus for its full entry`),
       );
+    } else if (namedDoor) {
+      span.setAttribute('aria-label', namedAccessibleLabel(token, index));
     }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
@@ -7751,6 +7773,8 @@ function renderReader(main) {
       } else if (particle) {
         const adapter = wireParticleGestures(span, particle);
         installTokenAlternatives(wrapper, span, adapter.target, adapter);
+      } else if (namedDoor) {
+        wireNamedToken(span, token, index);
       }
       rendered = wrapper;
     }
