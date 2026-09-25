@@ -97,6 +97,9 @@ jobs:
       - name: Install the pinned browser and system libraries
         run: npx playwright install --with-deps chromium webkit
 
+      - name: Install assessment media inspection
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y ffmpeg
+
       - name: Assemble the canonical Corridor artifact once
         run: |
           mkdir -p "$KAIRO_EVIDENCE_ROOT"

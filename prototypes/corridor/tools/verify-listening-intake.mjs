@@ -51,12 +51,45 @@ async function ready(page) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
   assert.equal(await page.locator('#store-alert').isVisible(), false);
 }
+// Source returns preserve their Tutor/dictionary origin. Walk the visible Back
+// controls to the shelf instead of assuming that every room has galaxy chrome.
+async function shelf(page) {
+  const visited = [];
+  for (let step = 0; step < 12; step += 1) {
+    const view = await page.locator('body').getAttribute('data-view');
+    visited.push(view);
+    if (await page.locator('#sheet-close').isVisible()) {
+      await page.locator('#sheet-close').click();
+      continue;
+    }
+    if (view === 'shelf') {
+      await page.locator('#source-inbox-link').waitFor();
+      return;
+    }
+    if (await page.locator('#ginga-symbol').isVisible()) {
+      await page.locator('#ginga-symbol').click();
+      await page.locator('.bubble-shelf').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'shelf');
+      continue;
+    }
+    assert(await page.locator('#back').isVisible() && await page.locator('#back').isEnabled(),
+      `No visible shelf return from ${view}; route: ${visited.join(' → ')}`);
+    await page.locator('#back').click();
+    await page.waitForFunction((prior) => document.body.dataset.view !== prior || !!document.querySelector('#sheet-close'), view);
+  }
+  assert.fail(`Shelf return exceeded its bounded visible route: ${visited.join(' → ')}`);
+}
+async function inbox(page) {
+  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
+    await shelf(page);
+    await page.locator('#source-inbox-link').click();
+  }
+  await page.locator('#source-capture-save').waitFor();
+}
 async function frontDoor(page) {
   await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
-  if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-  }
-  await page.locator('#source-inbox-link').click(); await page.locator('#source-capture-text').waitFor();
+  await inbox(page);
+  await page.locator('#source-capture-text').waitFor();
 }
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
@@ -77,19 +110,6 @@ async function selectWord(page) {
   await page.waitForFunction(() => window.getSelection()?.toString() === '町');
   await page.waitForFunction(() => document.querySelector('#source-context-save')?.disabled === false);
   return point.start;
-}
-async function inbox(page) {
-  if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
-  if (await page.locator('body').getAttribute('data-view') === 'source-reader') {
-    await page.locator('#source-reader-back').click(); await page.locator('#source-reader-back').waitFor({ state: 'hidden' });
-  }
-  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox') {
-    if (!await page.locator('#source-inbox-link').count()) {
-      await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-    }
-    await page.locator('#source-inbox-link').click();
-  }
-  await page.locator('#source-capture-save').waitFor();
 }
 async function lists(page) {
   await inbox(page); await page.locator('#back').click(); await page.waitForFunction(() => document.body.dataset.view === 'shelf');

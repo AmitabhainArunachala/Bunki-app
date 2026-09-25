@@ -1259,7 +1259,16 @@ async function ui() {
           fullPage: true,
         });
         const selectedContext = await selectedContextRoundTrip(page, 'phone');
-        await backToSavedArticles(page);
+        // A source opened from Sensei returns to that exact caller. Leave the
+        // tutor explicitly before checking the saved-article list's targets.
+        assert.match(await page.locator('#publisher-back').innerText(), /Back to tutor/u);
+        await page.locator('#publisher-back').click();
+        await page.waitForSelector('#teacher-source-return:focus');
+        assert.equal(await page.locator('.teacher-context .teacher-source-quote').textContent(), selectedContext.context.quote);
+        await page.locator('#back').click();
+        await shelf(page);
+        await page.locator('#feed-panel-articles').click();
+        await page.waitForSelector('[data-publisher-article]');
         const open = await page.locator('[data-publisher-article]').boundingBox();
         assert(open.width >= 44 && open.height >= 44);
         return { ...sizes, selectedContext };

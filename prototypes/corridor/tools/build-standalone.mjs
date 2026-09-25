@@ -116,9 +116,21 @@ const recordImports = new Map([
   ['./record-sync.mjs', 'sync'],
   ['./modules/record-core.mjs', 'core'],
 ]);
+const assessmentImports = new Map([
+  ['./assessment-v2-controller.mjs', 'assessmentV2'],
+  ['./assessment-learning.mjs', 'assessmentLearning'],
+  ...(existsSync(resolve(CORRIDOR, 'assessment-question-practice.mjs')) ? [
+    ['./assessment-question-practice.mjs', 'assessmentQuestionPractice'],
+    ['./assessment-question-view.mjs', 'assessmentQuestionView'],
+    ['./assessment-question-source.mjs', 'assessmentQuestionSource'],
+  ] : []),
+  ['./assessment-view.mjs', 'assessmentView'],
+  ['./assessment-delivery.mjs', 'assessmentDelivery'],
+  ['./assessment-received.mjs', 'assessmentReceived'],
+]);
 const recordRuntimeBuild = buildSync({
   absWorkingDir: CORRIDOR,
-  stdin: { contents: [...recordImports].map(([specifier, name]) =>
+  stdin: { contents: [...recordImports, ...assessmentImports].map(([specifier, name]) =>
     `export * as ${name} from ${JSON.stringify(specifier)};`).join('\n'),
   resolveDir: CORRIDOR, sourcefile: 'standalone-record-entry.mjs', loader: 'js' },
   outfile: 'standalone-record-runtime.mjs', bundle: true, format: 'esm',
@@ -148,6 +160,11 @@ let appScript = read('corridor.js');
 for (const [specifier, name] of recordImports) {
   const original = `import('${specifier}')`;
   assert.equal(appScript.split(original).length - 1, 1, `Standalone record import changed: ${specifier}`);
+  appScript = appScript.replace(original, `import(window.__KAIRO_RECORD_RUNTIME_URL__).then(module => module.${name})`);
+}
+for (const [specifier, name] of assessmentImports) {
+  const original = `import('${specifier}')`;
+  assert.equal(appScript.split(original).length - 1, 1, `Standalone assessment import changed: ${specifier}`);
   appScript = appScript.replace(original, `import(window.__KAIRO_RECORD_RUNTIME_URL__).then(module => module.${name})`);
 }
 assert.equal(appScript.split("import('./corridor-ink.js')").length - 1, 1, 'Standalone writing import changed');
@@ -204,6 +221,42 @@ if (existsSync(mockDir)) {
   }
 }
 
+// Only assets admitted into the public catalog travel with the handoff. The
+// private authoring/review workspaces are never searched or embedded here.
+const assessmentAssets = new Map();
+const publicDigest = bytes => createHash('sha256').update(bytes).digest('hex');
+function assessmentPath(raw) {
+  const path = raw?.startsWith('data/assessment/') ? raw : `data/assessment/${raw}`;
+  assert(/^data\/assessment\/[a-zA-Z0-9_./-]+$/u.test(path) &&
+    path.split('/').every(part => part && part !== '.' && part !== '..'), 'Invalid public assessment path');
+  return path;
+}
+function packAssessment(path, mimeType = 'application/json') {
+  path = assessmentPath(path);
+  if (!assessmentAssets.has(path)) {
+    const bytes = readFileSync(resolve(CORRIDOR, path));
+    assessmentAssets.set(path, { mimeType, base64: bytes.toString('base64'), bytes: bytes.length, sha256: publicDigest(bytes) });
+  }
+  return assessmentAssets.get(path);
+}
+packAssessment('catalog.json'); packAssessment('sources.json');
+const assessmentCatalog = JSON.parse(read('data/assessment/catalog.json'));
+for (const entry of [...assessmentCatalog.entries, ...(assessmentCatalog.archivedEntries || [])]) {
+  if (!entry.availability?.ready) continue;
+  assert.equal(entry.review?.status, 'ai-reviewed', 'Only admitted public assessments may be embedded');
+  packAssessment(entry.formPath); packAssessment(entry.deliveryPath);
+  const form = JSON.parse(read(assessmentPath(entry.formPath)));
+  const delivery = JSON.parse(read(assessmentPath(entry.deliveryPath)));
+  assert.equal(form.sha256, entry.formSha256, 'Public form identity changed');
+  assert.equal(delivery.form.sha256, form.sha256, 'Public delivery identity changed');
+  for (const asset of delivery.assets) {
+    const packed = packAssessment(asset.path, asset.mimeType);
+    assert.equal(packed.sha256, asset.bytesSha256, 'Public assessment media changed');
+  }
+}
+const assessmentPack = Object.fromEntries([...assessmentAssets].map(([path, asset]) =>
+  [path, { mimeType: asset.mimeType, base64: asset.base64 }]));
+
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
 const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
 
@@ -228,6 +281,9 @@ const dictionaryScripts = readdirSync(dictionaryDir)
 // emitter asserts the file carries no "</script" sequence, so inlining is safe
 const BODY = `<div id="app"></div>
 <script>
+${read('maintenance/report-client.js')}
+</script>
+<script>
 ${read('reference-core.js')}
 ${read('reference-ui.js')}
 </script>
@@ -249,6 +305,7 @@ ${tsfsrs}
 window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
 </script>
 <script type="application/octet-stream" id="standalone-record-module">${recordRuntimeBase64}</script>
+<script type="application/json" id="standalone-assessment-assets">${JSON.stringify(assessmentPack).replace(/</g, '\\u003c')}</script>
 <script type="module">
 // Local module URLs avoid the Chromium full-page boot/reload crashes seen
 // with large data URLs. Isolated data-URL imports pass; no general URL-size
@@ -260,6 +317,30 @@ function standaloneModuleUrl(base64) {
 }
 window.__CORRIDOR_STANDALONE__ = true;
 window.__CORRIDOR_BUNDLE__ = JSON.parse(document.getElementById('corridor-bundle').textContent);
+const assessmentPackNode = document.getElementById('standalone-assessment-assets');
+const assessmentPack = new Map(Object.entries(JSON.parse(assessmentPackNode.textContent)).map(([path, value]) =>
+  [new URL(path, document.baseURI).href, value]));
+assessmentPackNode.remove();
+const assessmentAddress = input => new URL(typeof input === 'string' || input instanceof URL ? input : input.url, document.baseURI).href;
+window.__KAIRO_ASSESSMENT_FETCH__ = async (input, init) => {
+  const entry = assessmentPack.get(assessmentAddress(input));
+  if (!entry || (init?.method || input?.method || 'GET') !== 'GET') return fetch(input, init);
+  const bytes = Uint8Array.from(atob(entry.base64), character => character.charCodeAt(0));
+  return new Response(bytes, { headers: { 'Content-Type': entry.mimeType } });
+};
+// CacheStorage does not accept file:// requests. The immutable public pack is
+// already durable in this HTML; this document-local cache only saves decoding.
+const assessmentCaches = new Map();
+window.__KAIRO_ASSESSMENT_CACHE__ = {
+  async open(name) {
+    if (!assessmentCaches.has(name)) assessmentCaches.set(name, new Map());
+    const entries = assessmentCaches.get(name);
+    return {
+      async match(input) { return entries.get(assessmentAddress(input))?.clone(); },
+      async put(input, response) { entries.set(assessmentAddress(input), response.clone()); },
+    };
+  },
+};
 window.__KAIRO_READING_CONTROLLER_URL__ = ${moduleUrlExpression(controllerUrl)};
 window.__KAIRO_TEACHER_CONTEXT_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'teacher-context.mjs')).toString('base64'))};
 window.__KAIRO_TEACHER_DRAFTS_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'teacher-drafts.mjs')).toString('base64'))};
@@ -290,6 +371,7 @@ ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
 ${read('skip-ui.css')}
+${read('maintenance/report-client.css')}
 </style>
 ${BODY}
 `;
@@ -309,6 +391,7 @@ ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
 ${read('skip-ui.css')}
+${read('maintenance/report-client.css')}
 </style>
 </head>
 <body>
@@ -328,6 +411,8 @@ writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORR
   publisherControllerSha256: digest(publisherControllerBytes),
   teacherDraftControllerSha256: digest(teacherDraftControllerBytes),
   recordRuntimeSha256: digest(recordRuntimeBytes), inlinedRecordModules: [...recordImports.keys()],
+  inlinedAssessmentModules: [...assessmentImports.keys()],
+  assessmentAssets: [...assessmentAssets].map(([path, { bytes, sha256 }]) => ({ path, bytes, sha256 })),
   recordModuleTransport: 'blob', inlinedModuleTransport: 'blob', driftSharesRecordRuntime: true,
   inkModuleSha256: digest(inkBytes), builderSha256: digest(readFileSync(fileURLToPath(import.meta.url))),
   compiler: { name: 'esbuild', version }, selfContainedController: true,

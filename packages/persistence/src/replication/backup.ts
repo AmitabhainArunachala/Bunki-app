@@ -1,7 +1,7 @@
 import {
   createReplica,
   parseSyncBinding,
-  parseSyncOperation,
+  parseAnySyncOperation as parseSyncOperation,
   planReceive,
   SyncValidationError,
   type ReplicaPolicy,

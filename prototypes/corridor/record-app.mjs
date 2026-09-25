@@ -8,6 +8,10 @@ import { createRecordHost, readingResumeIntent } from './record-host.mjs';
 import { parseSourceReferenceInput, prepareSourceReferenceCapture } from './source-inbox.mjs';
 
 const PRACTICE_FINALIZE = 'host.practice-finalize/1';
+const ASSESSMENT_FINALIZE = 'host.assessment-finalize/2';
+const ASSESSMENT_SUPPRESS = 'host.assessment-suppress/2';
+const ASSESSMENT_RECONCILE = 'host.assessment-reconcile/2';
+const ASSESSMENT_ENRICH = 'host.assessment-enrich/2';
 const TYPE = 'app.patch/1';
 const NOTE_CREATE = 'host.note-create/1';
 const NOTE_EDIT = 'host.note-edit/1';
@@ -74,8 +78,12 @@ function expectedRoots(record, roots) {
     sha256: own(record, root) ? digest(record[root]) : null,
   }));
 }
-function reducePatch({ record }, input) {
-  keys(input, ['patch', 'expected'], ['appendArchive']);
+function reducePatch({ record, revision }, input) {
+  keys(input, ['patch', 'expected'], ['appendArchive', 'expectedRevision']);
+  if (own(input.patch, 'assessmentQuestionPractice'))
+    insist(Number.isSafeInteger(input.expectedRevision) && input.expectedRevision === revision, 'stale-question-snapshot');
+  else if (own(input, 'expectedRevision'))
+    insist(Number.isSafeInteger(input.expectedRevision) && input.expectedRevision === revision, 'stale-patch');
   const roots = patchRoots(input.patch);
   insist(
     Array.isArray(input.expected) && input.expected.length === roots.length,
@@ -311,6 +319,112 @@ function confirmPracticeAcknowledgement(binding, gate, result) {
     same(result.snapshot.identity, scope) && same(result.snapshot.record, record) && same(result.snapshot.archive, archive), 'practice-operation-unconfirmed');
   if (gate.commitAttempted) insist(current && digest(record) === row.recordSha256 && digest(archive) === row.archiveSha256, 'practice-result-superseded');
 }
+async function confirmAssessmentAcknowledgement(binding, gate, result) {
+  const { confirmAssessmentProof, assessmentProofCurrent } = await import('./assessment-finalization.mjs');
+  const snapshot = gate.after || gate.snapshot;
+  insist(snapshot && same(snapshot.policy.binding, binding), 'assessment-operation-unconfirmed');
+  const select = (collection, id = 'current') => snapshot.documents.find((entry) => entry.collection === collection && entry.id === id)?.value;
+  const row = select('kairo:record-host-commands', gate.meta.changeId);
+  insist(row && row.beforeRevision === gate.input.expectedRevision &&
+    row.committedRevision === row.beforeRevision + 1 && row.committedRevision <= snapshot.revision,
+  'assessment-operation-unconfirmed');
+  if (gate.commitAttempted) insist(same(row, gate.request.mutations[2].value), 'assessment-operation-unconfirmed');
+  else insist(result.receipt?.outcome === 'duplicate' && result.replayUiEffects === false, 'assessment-operation-unconfirmed');
+  const proof = confirmAssessmentProof({ binding, snapshot, meta: gate.meta, input: gate.input, row });
+  const current = assessmentProofCurrent(snapshot, proof);
+  const record = select('learner-record'), archive = select('learner-archive');
+  insist(same(result.assessment, { ...proof, current }) && same(result.receipt?.operations, proof.operations) &&
+    result.receipt.changeId === gate.meta.changeId && result.receipt.type === ASSESSMENT_FINALIZE &&
+    result.receipt.committedRevision === row.committedRevision && result.receipt.recordSha256 === row.recordSha256 &&
+    result.receipt.archiveSha256 === row.archiveSha256 && result.snapshot.revision === snapshot.revision &&
+    same(result.snapshot.identity, row.scope) && same(result.snapshot.record, record) && same(result.snapshot.archive, archive),
+  'assessment-operation-unconfirmed');
+  if (gate.commitAttempted) insist(current && digest(record) === row.recordSha256 && digest(archive) === row.archiveSha256,
+    'assessment-result-superseded');
+}
+async function confirmSuppressionAcknowledgement(binding, gate, result) {
+  const { confirmAssessmentSuppression } = await import('./assessment-finalization.mjs');
+  const snapshot = gate.after || gate.snapshot;
+  insist(snapshot && same(snapshot.policy.binding, binding), 'assessment-operation-unconfirmed');
+  const select = (collection, id = 'current') => snapshot.documents.find((entry) => entry.collection === collection && entry.id === id)?.value;
+  const row = select('kairo:record-host-commands', gate.meta.changeId);
+  insist(row && row.beforeRevision === gate.input.expectedRevision && row.committedRevision === row.beforeRevision + 1 &&
+    row.committedRevision <= snapshot.revision, 'assessment-operation-unconfirmed');
+  if (gate.commitAttempted) insist(same(row, gate.request.mutations[2].value), 'assessment-operation-unconfirmed');
+  else insist(result.receipt?.outcome === 'duplicate' && result.replayUiEffects === false, 'assessment-operation-unconfirmed');
+  const proof = confirmAssessmentSuppression({ binding, snapshot, meta: gate.meta, input: gate.input, row });
+  const record = select('learner-record'), archive = select('learner-archive');
+  insist(same(result.learningSuppression, proof) && same(result.receipt?.operations, proof.operations) &&
+    result.receipt.changeId === gate.meta.changeId && result.receipt.type === ASSESSMENT_SUPPRESS &&
+    result.receipt.committedRevision === row.committedRevision && result.receipt.recordSha256 === row.recordSha256 &&
+    result.receipt.archiveSha256 === row.archiveSha256 && result.snapshot.revision === snapshot.revision &&
+    same(result.snapshot.identity, row.scope) && same(result.snapshot.record, record) && same(result.snapshot.archive, archive),
+  'assessment-operation-unconfirmed');
+  if (gate.commitAttempted) insist(digest(record) === row.recordSha256 && digest(archive) === row.archiveSha256,
+    'assessment-result-superseded');
+}
+async function confirmEnrichmentAcknowledgement(binding, gate, result, resolvers) {
+  const { confirmAssessmentEnrichment, prepareAssessmentEnrichment } = await import('./assessment-enrichment.mjs');
+  const snapshot = gate.after || gate.snapshot;
+  insist(snapshot && same(snapshot.policy.binding, binding), 'assessment-operation-unconfirmed');
+  const select = (collection, id = 'current') => snapshot.documents.find((entry) => entry.collection === collection && entry.id === id)?.value;
+  if (!result.receipt) {
+    insist(!gate.commitAttempted && result.replayUiEffects === false && result.learningEnrichment === null &&
+      prepareAssessmentEnrichment({ binding, snapshot, meta: gate.meta, input: gate.input, ...resolvers }) === null &&
+      result.snapshot.revision === snapshot.revision && same(result.snapshot.identity, { accountId: binding.accountId, learnerId: binding.learnerId }) &&
+      same(result.snapshot.record, select('learner-record')) && same(result.snapshot.archive, select('learner-archive')),
+    'assessment-enrichment-omitted');
+    return;
+  }
+  const row = select('kairo:record-host-commands', gate.meta.changeId);
+  insist(row && row.beforeRevision === gate.input.expectedRevision && row.committedRevision === row.beforeRevision + 1 &&
+    row.committedRevision <= snapshot.revision, 'assessment-operation-unconfirmed');
+  if (gate.commitAttempted) insist(same(row, gate.request.mutations[2].value), 'assessment-operation-unconfirmed');
+  else insist(result.receipt?.outcome === 'duplicate' && result.replayUiEffects === false, 'assessment-operation-unconfirmed');
+  const proof = confirmAssessmentEnrichment({ binding, snapshot, meta: gate.meta, input: gate.input, row });
+  const record = select('learner-record'), archive = select('learner-archive');
+  insist(same(result.learningEnrichment, proof) && same(result.receipt?.operations, proof.operations) &&
+    result.receipt.changeId === gate.meta.changeId && result.receipt.type === ASSESSMENT_ENRICH &&
+    result.receipt.committedRevision === row.committedRevision && result.receipt.recordSha256 === row.recordSha256 &&
+    result.receipt.archiveSha256 === row.archiveSha256 && result.snapshot.revision === snapshot.revision &&
+    same(result.snapshot.identity, row.scope) && same(result.snapshot.record, record) && same(result.snapshot.archive, archive),
+  'assessment-operation-unconfirmed');
+  if (gate.commitAttempted) insist(digest(record) === row.recordSha256 && digest(archive) === row.archiveSha256,
+    'assessment-result-superseded');
+}
+async function confirmReconciliationAcknowledgement(binding, gate, result, resolvers) {
+  const { prepareAssessmentReconciliation, assessmentReceivedViews, assessmentReconciliationSummary } = await import('./assessment-received.mjs');
+  const snapshot = gate.after || gate.snapshot;
+  insist(snapshot && same(snapshot.policy.binding, binding), 'assessment-operation-unconfirmed');
+  const select = (collection, id = 'current') => snapshot.documents.find((entry) => entry.collection === collection && entry.id === id)?.value;
+  const record = select('learner-record'), archive = select('learner-archive');
+  if (gate.commitAttempted) {
+    const row = gate.request.mutations[2].value;
+    insist(same(select('kairo:record-host-commands', gate.meta.changeId), row) &&
+      result.receipt?.changeId === row.changeId && result.receipt.type === ASSESSMENT_RECONCILE &&
+      result.receipt.committedRevision === row.committedRevision && result.receipt.recordSha256 === row.recordSha256 &&
+      result.receipt.archiveSha256 === row.archiveSha256 && digest(record) === row.recordSha256 && digest(archive) === row.archiveSha256,
+    'assessment-result-superseded');
+  } else if (result.receipt) {
+    const row = select('kairo:record-host-commands', gate.meta.changeId);
+    const scope = { accountId: binding.accountId, learnerId: binding.learnerId };
+    insist(row && row.type === ASSESSMENT_RECONCILE && row.occurredAt === gate.meta.occurredAt &&
+      row.commandSha256 === digest({ scope, type: ASSESSMENT_RECONCILE, occurredAt: gate.meta.occurredAt, input: {} }) &&
+      result.receipt.changeId === row.changeId && result.receipt.type === row.type && result.receipt.outcome === 'duplicate' &&
+      result.receipt.committedRevision === row.committedRevision && result.receipt.recordSha256 === row.recordSha256 &&
+      result.receipt.archiveSha256 === row.archiveSha256 && result.replayUiEffects === false, 'assessment-operation-unconfirmed');
+  } else {
+    insist(prepareAssessmentReconciliation({ binding, snapshot, meta: gate.meta, ...resolvers }) === null &&
+      result.replayUiEffects === false, 'assessment-projection-omitted');
+  }
+  const views = assessmentReceivedViews(snapshot);
+  const summary = assessmentReconciliationSummary(record, views);
+  insist(same(result.snapshot.identity, { accountId: binding.accountId, learnerId: binding.learnerId }) &&
+    result.snapshot.revision === snapshot.revision && same(result.snapshot.record, record) && same(result.snapshot.archive, archive) &&
+    (result.snapshot.assessmentReconciliation == null ? summary.state === 'none' : same(result.snapshot.assessmentReconciliation, summary)) &&
+    (result.assessmentReconciliation == null ? summary.state === 'none' : same(result.assessmentReconciliation, summary)),
+  'assessment-operation-unconfirmed');
+}
 function writerCapture(writer, binding) {
   const captured = copy(writer.capture());
   keys(captured, ['ownerId', 'epoch', 'sessionId'], [], 'writer-required');
@@ -334,11 +448,13 @@ class RecordApp {
   #restoreGate;
   #noteGate;
   #practiceGate;
+  #assessmentGate;
+  #assessmentResolvers;
   #sourceReferenceGate;
   #tail = Promise.resolve();
   #pending = 0;
   #closed = false;
-  constructor({ host, writer, binding, onPublish, restoreGate, noteGate, practiceGate, sourceReferenceGate }) {
+  constructor({ host, writer, binding, onPublish, restoreGate, noteGate, practiceGate, assessmentGate, assessmentResolvers, sourceReferenceGate }) {
     this.#host = host;
     this.#writer = writer;
     this.#binding = binding;
@@ -346,6 +462,8 @@ class RecordApp {
     this.#restoreGate = restoreGate;
     this.#noteGate = noteGate;
     this.#practiceGate = practiceGate;
+    this.#assessmentGate = assessmentGate;
+    this.#assessmentResolvers = assessmentResolvers;
     this.#sourceReferenceGate = sourceReferenceGate;
   }
   #guard(captured) {
@@ -441,10 +559,12 @@ class RecordApp {
       const current = await this.#host.snapshot();
       this.#guard(captured);
       if (current.status !== 'active') return normalized(current);
-      const result = checkedProducerResult(producer(current.snapshot.record));
+      const expectedRevision = current.snapshot.revision;
+      const result = checkedProducerResult(producer(current.snapshot.record, current.snapshot));
       this.#guard(captured);
       const input = copy({
         ...result,
+        ...(own(result.patch, 'assessmentQuestionPractice') ? { expectedRevision } : {}),
         expected: expectedRoots(current.snapshot.record, patchRoots(result.patch)),
       });
       return this.#finish(captured, await this.#host.dispatch({ ...meta, type: TYPE, input }));
@@ -544,6 +664,104 @@ class RecordApp {
       } finally { this.#practiceGate.current = null; }
     });
   }
+  finalizeAssessment(rawMeta, rawInput) {
+    let meta; let input;
+    const producer = typeof rawInput === 'function' ? rawInput : null;
+    try { meta = copy(rawMeta); input = producer ? null : copy(rawInput); keys(meta, ['changeId', 'occurredAt'], [], 'invalid-assessment-command'); }
+    catch (error) { return Promise.reject(error); }
+    return this.#enqueue(async (captured) => {
+      if (producer) {
+        const current = await this.#host.snapshot();
+        this.#guard(captured);
+        if (current.status !== 'active') return this.#finish(captured, current);
+        const proposed = producer(copy(current.snapshot));
+        insist(!proposed || typeof proposed.then !== 'function', 'async-assessment-producer');
+        input = copy(proposed);
+        this.#guard(captured);
+      }
+      const gate = { type: ASSESSMENT_FINALIZE, meta, input, snapshot: null, after: null, commitAttempted: false, request: null };
+      this.#assessmentGate.current = gate;
+      try {
+        const result = await this.#host.finalizeAssessment(meta, input);
+        if (result.status === 'active') {
+          try { this.#guard(captured); await confirmAssessmentAcknowledgement(this.#binding, gate, result); this.#guard(captured); }
+          catch (error) { return this.#recovery(error, result); }
+        }
+        return this.#finish(captured, result);
+      } finally { this.#assessmentGate.current = null; }
+    });
+  }
+  suppressAssessmentLearning(rawMeta, rawInput) {
+    let meta; let input;
+    const producer = typeof rawInput === 'function' ? rawInput : null;
+    try { meta = copy(rawMeta); input = producer ? null : copy(rawInput); keys(meta, ['changeId', 'occurredAt'], [], 'invalid-assessment-command'); }
+    catch (error) { return Promise.reject(error); }
+    return this.#enqueue(async (captured) => {
+      if (producer) {
+        const current = await this.#host.snapshot();
+        this.#guard(captured);
+        if (current.status !== 'active') return this.#finish(captured, current);
+        const proposed = producer(copy(current.snapshot));
+        insist(!proposed || typeof proposed.then !== 'function', 'async-assessment-producer');
+        input = copy(proposed);
+        this.#guard(captured);
+      }
+      const gate = { type: ASSESSMENT_SUPPRESS, meta, input, snapshot: null, after: null, commitAttempted: false, request: null };
+      this.#assessmentGate.current = gate;
+      try {
+        const result = await this.#host.suppressAssessmentLearning(meta, input);
+        if (result.status === 'active') {
+          try { this.#guard(captured); await confirmSuppressionAcknowledgement(this.#binding, gate, result); this.#guard(captured); }
+          catch (error) { return this.#recovery(error, result); }
+        }
+        return this.#finish(captured, result);
+      } finally { this.#assessmentGate.current = null; }
+    });
+  }
+  enrichAssessmentLearning(rawMeta, rawInput) {
+    let meta; let input;
+    const producer = typeof rawInput === 'function' ? rawInput : null;
+    try { meta = copy(rawMeta); input = producer ? null : copy(rawInput); keys(meta, ['changeId', 'occurredAt'], [], 'invalid-assessment-command'); }
+    catch (error) { return Promise.reject(error); }
+    return this.#enqueue(async (captured) => {
+      if (producer) {
+        const current = await this.#host.snapshot();
+        this.#guard(captured);
+        if (current.status !== 'active') return this.#finish(captured, current);
+        const proposed = producer(copy(current.snapshot));
+        insist(!proposed || typeof proposed.then !== 'function', 'async-assessment-producer');
+        input = copy(proposed);
+        this.#guard(captured);
+      }
+      const gate = { type: ASSESSMENT_ENRICH, meta, input, snapshot: null, after: null, commitAttempted: false, request: null };
+      this.#assessmentGate.current = gate;
+      try {
+        const result = await this.#host.enrichAssessmentLearning(meta, input);
+        if (result.status === 'active') {
+          try { this.#guard(captured); await confirmEnrichmentAcknowledgement(this.#binding, gate, result, this.#assessmentResolvers); this.#guard(captured); }
+          catch (error) { return this.#recovery(error, result); }
+        }
+        return this.#finish(captured, result);
+      } finally { this.#assessmentGate.current = null; }
+    });
+  }
+  reconcileReceivedAssessments(rawMeta) {
+    let meta;
+    try { meta = copy(rawMeta); keys(meta, ['changeId', 'occurredAt'], [], 'invalid-assessment-command'); }
+    catch (error) { return Promise.reject(error); }
+    return this.#enqueue(async (captured) => {
+      const gate = { type: ASSESSMENT_RECONCILE, meta, input: {}, snapshot: null, after: null, commitAttempted: false, request: null };
+      this.#assessmentGate.current = gate;
+      try {
+        const result = await this.#host.reconcileReceivedAssessments(meta);
+        if (result.status === 'active') {
+          try { this.#guard(captured); await confirmReconciliationAcknowledgement(this.#binding, gate, result, this.#assessmentResolvers); this.#guard(captured); }
+          catch (error) { return this.#recovery(error, result); }
+        }
+        return this.#finish(captured, result);
+      } finally { this.#assessmentGate.current = null; }
+    });
+  }
   previewNoteRestore(input) {
     const value = copy(input);
     return this.#enqueue(async (captured) => {
@@ -596,7 +814,9 @@ class RecordApp {
  * after awaiting the acknowledgement and rechecking its own lifecycle. */
 export async function createRecordApp(options) {
   insist(
-    plain(options) && (options.onPublish === undefined || typeof options.onPublish === 'function'),
+    plain(options) && (options.onPublish === undefined || typeof options.onPublish === 'function') &&
+      (options.assessmentSubjectResolver === undefined || typeof options.assessmentSubjectResolver === 'function') &&
+      (options.assessmentFormResolver === undefined || typeof options.assessmentFormResolver === 'function'),
     'invalid-options',
   );
   const binding = copy(options.binding);
@@ -610,6 +830,7 @@ export async function createRecordApp(options) {
   const restoreGate = { current: null };
   const noteGate = { current: null };
   const practiceGate = { current: null };
+  const assessmentGate = { current: null };
   const sourceReferenceGate = { current: null };
   // Full replacement and the named original-note commands each receive their
   // own narrow transaction guard. Reading intents use the same receipt-only
@@ -627,6 +848,10 @@ export async function createRecordApp(options) {
         if (practiceGate.current.commitAttempted) practiceGate.current.after = outcome.snapshot;
         else if (!practiceGate.current.snapshot) practiceGate.current.snapshot = outcome.snapshot;
       }
+      if (assessmentGate.current && outcome.status === 'active') {
+        if (assessmentGate.current.commitAttempted) assessmentGate.current.after = outcome.snapshot;
+        else if (!assessmentGate.current.snapshot) assessmentGate.current.snapshot = outcome.snapshot;
+      }
       if (sourceReferenceGate.current && outcome.status === 'active') {
         if (sourceReferenceGate.current.commitAttempted) sourceReferenceGate.current.after = outcome.snapshot;
         else if (!sourceReferenceGate.current.snapshot) sourceReferenceGate.current.snapshot = outcome.snapshot;
@@ -636,9 +861,28 @@ export async function createRecordApp(options) {
     async commitLocal(request) {
       insist(Array.isArray(request.operations), 'unexpected-sync-operations');
       const practice = practiceGate.current;
+      const assessment = assessmentGate.current;
       const note = noteGate.current;
       const sourceReference = sourceReferenceGate.current;
-      if (sourceReference) {
+      if (assessment) {
+        insist(!note && !practice && !sourceReference && !restoreGate.current && !assessment.commitAttempted, 'unexpected-sync-operations');
+        if (assessment.type === ASSESSMENT_RECONCILE) {
+          const { prepareAssessmentReconciliation } = await import('./assessment-received.mjs');
+          assessment.request = prepareAssessmentReconciliation({ binding, snapshot: assessment.snapshot, meta: assessment.meta,
+            resolveForm: options.assessmentFormResolver, resolveSubject: options.assessmentSubjectResolver, resolvePresentation: options.assessmentPresentationResolver });
+        } else if (assessment.type === ASSESSMENT_ENRICH) {
+          const { prepareAssessmentEnrichment } = await import('./assessment-enrichment.mjs');
+          assessment.request = prepareAssessmentEnrichment({ binding, snapshot: assessment.snapshot, meta: assessment.meta,
+            input: assessment.input, resolveSubject: options.assessmentSubjectResolver, resolvePresentation: options.assessmentPresentationResolver });
+        } else {
+          const { prepareAssessmentFinalization, prepareAssessmentSuppression } = await import('./assessment-finalization.mjs');
+          const prepare = assessment.type === ASSESSMENT_SUPPRESS ? prepareAssessmentSuppression : prepareAssessmentFinalization;
+          assessment.request = prepare({ binding, snapshot: assessment.snapshot,
+            meta: assessment.meta, input: assessment.input, resolveSubject: options.assessmentSubjectResolver, resolvePresentation: options.assessmentPresentationResolver });
+        }
+        insist(same(request, assessment.request), 'unexpected-sync-operations');
+        assessment.commitAttempted = true;
+      } else if (sourceReference) {
         insist(!note && !practice && !restoreGate.current && !sourceReference.commitAttempted, 'unexpected-sync-operations');
         sourceReference.request = sourceReferenceCommandRequest(binding, sourceReference);
         insist(same(request, sourceReference.request), 'unexpected-sync-operations');
@@ -677,6 +921,9 @@ export async function createRecordApp(options) {
     writer: options.writer,
     validateRecord: options.validateRecord,
     validateArchive: options.validateArchive,
+    assessmentSubjectResolver: options.assessmentSubjectResolver,
+    assessmentFormResolver: options.assessmentFormResolver,
+    assessmentPresentationResolver: options.assessmentPresentationResolver,
     reducers: { [TYPE]: reducePatch },
   });
   return new RecordApp({
@@ -687,6 +934,9 @@ export async function createRecordApp(options) {
     restoreGate,
     noteGate,
     practiceGate,
+    assessmentGate,
+    assessmentResolvers: { resolveForm: options.assessmentFormResolver, resolveSubject: options.assessmentSubjectResolver,
+      resolvePresentation: options.assessmentPresentationResolver },
     sourceReferenceGate,
   });
 }

@@ -1,5 +1,8 @@
 /** Focused adapter and real-browser controls checks. All identities, documents,
  * native responses and saves are synthetic; no operator profile is opened. */
+// The page.evaluate callbacks below execute against these browser fixture
+// bindings, which are declared in the generated document rather than Node.
+/* global recordEpoch: writable, recordSyncSlot, closeRecordSync */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -195,11 +198,17 @@ function extract(name, async = false) {
 }
 const functions = [extract('closeRecordSync'), extract('recordSyncStatus'), extract('refreshRecordSyncSnapshot', true), extract('installRecordSync', true),
   extract('runRecordSyncAction', true), extract('updateRecordSyncSurface'), extract('renderRecordSync'),
-  extract('refreshRecordSyncSurface'), extract('renderPortRow')].join('\n');
+  extract('refreshRecordSyncSurface'), extract('renderUnavailableSentenceDrafts'), extract('renderPortRow'),
+  extract('queueAssessmentWork'), extract('reconcileAssessmentResults'), extract('performAssessmentReconciliation', true)].join('\n');
 const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Synthetic sync controls</title><body><script>
 const f = window.fixture = {owned:true,calls:[],refreshes:0,publications:0,saves:[],patches:[],downloads:0,mode:'true'};
 let recordEpoch=1,recordApp={snapshot:async()=>{f.refreshes++;return {status:'active',snapshot:{}};},current:()=>({status:'active',snapshot:{}})},recordController={},recordInstallation={policy:{binding:${JSON.stringify(binding)}}},recordSyncSlot=null;
 const publishRecordSnapshot=()=>{f.publications++;};
+const S={sentenceDrafts:null},sentenceDraftController=null;
+// Exercise the actual reconciliation path with this fixture's empty assessment
+// snapshot. No catalog, content, or learner projection exists in these cases.
+let assessmentActionTail=Promise.resolve(),assessmentReconcilePending=false,assessmentReconcileLast=0;
+const assessmentReceivedModule={};
 const plainRecord=v=>!!v&&typeof v==='object'&&!Array.isArray(v),tx=(_,en)=>en;
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;}
 const biLabel=(tag,cls,_,en)=>el(tag,cls,en),recordWritable=(epoch=recordEpoch)=>f.owned&&epoch===recordEpoch;
@@ -247,7 +256,8 @@ try {
   await check('save waits for confirmation and old owner cannot update timestamp', async () => {
     await page.evaluate(() => window.setupSave('deferred')); await page.locator('#export-store').click();
     assert.equal(await page.evaluate(() => fixture.patches.length), 0);
-    await page.evaluate(() => { recordEpoch++; fixture.finish(true); });
+    const epochs = await page.evaluate(() => { const prior = recordEpoch; recordEpoch++; fixture.finish(true); return [prior, recordEpoch]; });
+    assert.equal(epochs[1], epochs[0] + 1);
     await page.waitForFunction(() => !document.getElementById('export-store').disabled);
     assert.equal(await page.evaluate(() => fixture.patches.length), 0);
   });

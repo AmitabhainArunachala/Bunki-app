@@ -34,15 +34,20 @@ const ENGINES =
     : [process.env.KAIRO_BROWSER || 'chromium'];
 const FILTER = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
 assert(ENGINES.every((engine) => ['chromium', 'webkit'].includes(engine)));
-const names = [
+const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const manifest = JSON.parse(readFileSync(resolve(SITE, 'build-identity.json'), 'utf8'));
+// Serve the staged module inventory, including static and lazy dependencies.
+// Every served byte must belong to this immutable artifact; never fall back to
+// repository files when a new RecordApp dependency is introduced.
+const names = manifest.files.filter((file) => file.path.endsWith('.mjs')).map((file) => file.path);
+for (const entry of [
   'record-app.mjs',
   'record-host.mjs',
   'record-controller.mjs',
   'modules/record-core.mjs',
-];
+])
+  assert(names.includes(entry), `Staged record module missing: ${entry}`);
 const assets = new Map(names.map((name) => [name, readFileSync(resolve(SITE, name))]));
-const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
-const manifest = JSON.parse(readFileSync(resolve(SITE, 'build-identity.json'), 'utf8'));
 for (const [name, bytes] of assets)
   assert.equal(manifest.files.find((file) => file.path === name)?.sha256, sha(bytes));
 const pageHtml = `<!doctype html><meta charset="utf-8"><title>Synthetic record app</title>
@@ -114,12 +119,12 @@ const turns = [
   },
 ];
 
-async function initialize(page, { seed = true, active = true } = {}) {
+async function initialize(page, { seed = true, active = true, questionFixture = false } = {}) {
   await page.goto(`${origin}/fixture`);
   await page.waitForFunction(() => !!window.fixture);
   await exact(
     page,
-    async ({ seed, active, policy, actor, record, turns }) => {
+    async ({ seed, active, questionFixture, policy, actor, record, turns }) => {
       const f = window.fixture;
       if (seed) {
         localStorage.setItem('kairo-corridor-v1', JSON.stringify(record));
@@ -218,7 +223,7 @@ async function initialize(page, { seed = true, active = true } = {}) {
       f.producerCalls = 0;
       f.publishMode = 'normal';
       f.validateRecord = (value) =>
-        value?.v === 1 &&
+        (value?.v === 1 || (questionFixture && value?.v === 2)) &&
         Array.isArray(value.taken) &&
         (value.obslog === undefined || Array.isArray(value.obslog)) &&
         !value.invalidFixture;
@@ -319,6 +324,87 @@ async function initialize(page, { seed = true, active = true } = {}) {
           return f.realSnapshot();
         };
       };
+      // These transaction tests use a synthetic sidecar, not a question-plan
+      // validator. The journal operation itself passes the real v2 parser and
+      // receive path so a source-only change advances the native IDB revision.
+      f.receiveAssessment = async () => {
+        const current = (await f.realSnapshot()).snapshot;
+        const operation = f.core.createSyncOperationV2({
+          format: 'kairo-sync-operation',
+          v: 2,
+          scope: {
+            accountId: policy.binding.accountId,
+            learnerId: policy.binding.learnerId,
+          },
+          actor: {
+            deviceId: 'question-fixture-phone',
+            incarnationId: 'phone-install',
+            sequence: 1,
+          },
+          predecessor: null,
+          dependencies: [],
+          schemaEpoch: policy.schemaEpoch,
+          deletionEpoch: policy.deletionEpoch,
+          mergePolicy: policy.mergePolicy,
+          occurredAt: '2026-09-23T00:00:01.000Z',
+          payload: {
+            kind: 'assessment.result/2',
+            attemptId: 'question-fixture-attempt',
+            attemptRevisionId: 'question-fixture-terminal',
+            generation: null,
+            form: {
+              kind: 'form',
+              id: 'fixture-form',
+              revisionId: 'fixture-form-r1',
+              sha256: 'a'.repeat(64),
+            },
+            outcome: 'submitted',
+            startedAt: '2026-09-23T00:00:00.000Z',
+            endedAt: '2026-09-23T00:00:01.000Z',
+            elapsedMs: 1000,
+            mode: 'practice',
+            priorExposure: 'unknown',
+            conditions: [],
+            editorialAtStart: {
+              status: 'unreviewed',
+              policyVersion: null,
+              decisionRevisionIds: [],
+            },
+            items: [
+              {
+                item: {
+                  kind: 'item',
+                  id: 'fixture-item',
+                  revisionId: 'fixture-item-r1',
+                  sha256: 'b'.repeat(64),
+                },
+                result: 'incorrect',
+                response: { kind: 'selected', optionId: 'b' },
+                skill: 'reading',
+                task: 'short-reading',
+                subjects: [],
+                elapsedMs: 1000,
+                flagged: false,
+              },
+            ],
+            audio: [],
+            officialScore: null,
+            passPrediction: null,
+          },
+        });
+        const outcome = await f.instance.commitReceive({
+          deliveryId: 'question-source-receive',
+          expectedRevision: current.revision,
+          delivery: { binding: current.policy.binding, operations: [operation] },
+          checkpoint: {
+            channelId: 'question-fixture-channel',
+            expected: null,
+            next: 'received-once',
+          },
+        });
+        if (outcome.status !== 'active') throw new Error('Synthetic assessment receive failed');
+        return outcome;
+      };
       f.quota = () => {
         const put = window.IDBObjectStore.prototype.put;
         let armed = true;
@@ -344,7 +430,7 @@ async function initialize(page, { seed = true, active = true } = {}) {
         };
       };
     },
-    { seed, active, policy, actor, record, turns },
+    { seed, active, questionFixture, policy, actor, record, turns },
   );
 }
 
@@ -748,6 +834,268 @@ try {
         assert.equal(stored.externalAfterRead, true);
         assert(!Object.hasOwn(stored, 'rejectedCas'));
       });
+      await test(
+        'question-producer-sees-fresh-received-result-before-any-ui-publication',
+        async ({ page }) => {
+          const result = await exact(page, async () => {
+            const f = window.fixture;
+            const before = f.adapter.current();
+            await f.receiveAssessment();
+            const staleCurrent = f.adapter.current();
+            let observed;
+            const ack = await f.adapter.write((currentRecord, snapshot) => {
+              f.producerCalls++;
+              observed = {
+                snapshot,
+                recordMatches: currentRecord === snapshot.record,
+                frozen:
+                  Object.isFrozen(snapshot) && Object.isFrozen(snapshot.assessmentResultViewsV2),
+                published: f.published.length,
+              };
+              return {
+                patch: {
+                  v: 2,
+                  assessmentQuestionPractice: { syntheticTransactionFixture: true, writes: 1 },
+                },
+              };
+            });
+            return {
+              before,
+              staleCurrent,
+              observed,
+              ack,
+              calls: f.producerCalls,
+              published: f.published.length,
+            };
+          });
+          assert.deepEqual(result.staleCurrent, result.before);
+          assert.equal(result.before.snapshot.assessmentResultViewsV2, undefined);
+          assert.equal(result.observed.snapshot.revision, result.before.snapshot.revision + 1);
+          assert.deepEqual(result.observed.snapshot.record, result.before.snapshot.record);
+          assert.equal(result.observed.recordMatches, true);
+          assert.equal(result.observed.frozen, true);
+          assert.equal(result.observed.published, 0);
+          assert.equal(result.observed.snapshot.assessmentResultViewsV2.length, 1);
+          assert.equal(
+            result.observed.snapshot.assessmentResultViewsV2[0].attemptId,
+            'question-fixture-attempt',
+          );
+          assert.equal(
+            result.observed.snapshot.assessmentResultViewsV2[0].headResults[0].payload
+              .attemptRevisionId,
+            'question-fixture-terminal',
+          );
+          assert.match(
+            result.observed.snapshot.assessmentReconciliation.sourceDigest,
+            /^[a-f0-9]{64}$/u,
+          );
+          assert.equal(result.ack.status, 'active');
+          assert.equal(result.ack.snapshot.revision, result.observed.snapshot.revision + 1);
+          assert.equal(result.ack.snapshot.record.assessmentQuestionPractice.writes, 1);
+          assert.equal(result.calls, 1);
+          assert.equal(result.published, 1);
+        },
+        { questionFixture: true },
+      );
+      await test(
+        'question-source-only-receive-between-snapshots-refuses-without-target-write',
+        async ({ page }) => {
+          const result = await exact(page, async () => {
+            const f = window.fixture;
+            const before = (await f.realSnapshot()).snapshot;
+            let afterReceive;
+            let producerRevision;
+            let failure;
+            f.atSnapshot(2, async () => {
+              await f.receiveAssessment();
+              afterReceive = await f.disk();
+            });
+            try {
+              await f.adapter.write((currentRecord, snapshot) => {
+                f.producerCalls++;
+                producerRevision = snapshot.revision;
+                return {
+                  patch: {
+                    v: 2,
+                    assessmentQuestionPractice: { syntheticTransactionFixture: true, writes: 1 },
+                  },
+                };
+              });
+            } catch (error) {
+              failure = error.code;
+            }
+            return {
+              before,
+              afterReceive,
+              after: await f.disk(),
+              target: (await f.realSnapshot()).snapshot,
+              producerRevision,
+              failure,
+              fired: f.snapshotRaceFired,
+              calls: f.producerCalls,
+              published: f.published.length,
+              pending: f.adapter.pending,
+            };
+          });
+          assert.equal(result.fired, true);
+          assert.equal(result.failure, 'stale-question-snapshot');
+          assert.equal(result.producerRevision, result.before.revision);
+          assert.equal(result.target.revision, result.before.revision + 1);
+          assert.deepEqual(result.after, result.afterReceive);
+          assert.deepEqual(result.target.documents, result.before.documents);
+          assert.equal(result.target.inbox.length, 1);
+          assert.equal(result.target.outbox.length, 0);
+          assert.equal(
+            result.target.documents.filter((row) => row.collection === 'kairo:record-host-commands')
+              .length,
+            0,
+          );
+          assert.equal(result.calls, 1);
+          assert.equal(result.published, 0);
+          assert.equal(result.pending, 0);
+        },
+        { questionFixture: true },
+      );
+      await test(
+        'question-unchanged-snapshot-commits-once-with-the-pinned-revision',
+        async ({ page }) => {
+          const result = await exact(page, async () => {
+            const f = window.fixture;
+            const before = (await f.realSnapshot()).snapshot;
+            let expectedRevision;
+            f.instance.commitLocal = async (request) => {
+              expectedRevision = request.expectedRevision;
+              return f.realCommit(request);
+            };
+            const ack = await f.adapter.write((currentRecord, snapshot) => {
+              f.producerCalls++;
+              if (snapshot.revision !== before.revision)
+                throw new Error('Fixture revision changed');
+              return {
+                patch: {
+                  v: 2,
+                  assessmentQuestionPractice: { syntheticTransactionFixture: true, writes: 1 },
+                },
+              };
+            });
+            return {
+              before,
+              expectedRevision,
+              ack,
+              calls: f.producerCalls,
+              published: f.published.length,
+              target: (await f.realSnapshot()).snapshot,
+            };
+          });
+          assert.equal(result.expectedRevision, result.before.revision);
+          assert.equal(result.ack.status, 'active');
+          assert.equal(result.ack.receipt.outcome, 'committed');
+          assert.equal(result.target.revision, result.before.revision + 1);
+          assert.equal(
+            result.target.documents.filter((row) => row.collection === 'kairo:record-host-commands')
+              .length,
+            1,
+          );
+          assert.deepEqual(result.ack.snapshot.record.assessmentQuestionPractice, {
+            syntheticTransactionFixture: true,
+            writes: 1,
+          });
+          assert.deepEqual(result.ack.snapshot.record.revlog, []);
+          assert.equal(result.calls, 1);
+          assert.equal(result.published, 1);
+        },
+        { questionFixture: true },
+      );
+      await test(
+        'question-duplicate-target-receipt-preserves-one-write-without-publication-replay',
+        async ({ page }) => {
+          const result = await exact(page, async () => {
+            const f = window.fixture;
+            const before = (await f.realSnapshot()).snapshot;
+            f.instance.commitLocal = async (request) => {
+              await f.realCommit(request);
+              return f.realCommit(request);
+            };
+            const ack = await f.adapter.write(() => {
+              f.producerCalls++;
+              return {
+                patch: {
+                  v: 2,
+                  assessmentQuestionPractice: { syntheticTransactionFixture: true, writes: 1 },
+                },
+              };
+            });
+            return {
+              before,
+              ack,
+              calls: f.producerCalls,
+              published: f.published.length,
+              target: (await f.realSnapshot()).snapshot,
+            };
+          });
+          assert.equal(result.ack.status, 'active');
+          assert.equal(result.ack.receipt.outcome, 'duplicate');
+          assert.equal(result.ack.replayUiEffects, false);
+          assert.equal(result.ack.snapshot.record.assessmentQuestionPractice.writes, 1);
+          assert.equal(result.target.revision, result.before.revision + 1);
+          assert.equal(
+            result.target.documents.filter((row) => row.collection === 'kairo:record-host-commands')
+              .length,
+            1,
+          );
+          assert.equal(result.calls, 1);
+          assert.equal(result.published, 0);
+        },
+        { questionFixture: true },
+      );
+      await test(
+        'question-lost-acknowledgement-reload-recovers-one-write-without-producer-replay',
+        async ({ page }) => {
+          const failed = await exact(page, async () => {
+            const f = window.fixture;
+            const before = (await f.realSnapshot()).snapshot;
+            f.instance.commitLocal = async (request) => {
+              await f.realCommit(request);
+              throw new Error('Synthetic question acknowledgement loss');
+            };
+            const ack = await f.adapter.write(() => {
+              f.producerCalls++;
+              return {
+                patch: {
+                  v: 2,
+                  assessmentQuestionPractice: { syntheticTransactionFixture: true, writes: 1 },
+                },
+              };
+            });
+            return { before, ack, calls: f.producerCalls, published: f.published.length };
+          });
+          assert.equal(failed.ack.status, 'recovery-required');
+          assert.equal(failed.calls, 1);
+          assert.equal(failed.published, 0);
+          await initialize(page, { seed: false, questionFixture: true });
+          const recovered = await exact(page, async () => {
+            const f = window.fixture;
+            return {
+              current: await f.adapter.snapshot(),
+              calls: f.producerCalls,
+              published: f.published.length,
+              target: (await f.realSnapshot()).snapshot,
+            };
+          });
+          assert.equal(recovered.current.status, 'active');
+          assert.equal(recovered.current.snapshot.record.assessmentQuestionPractice.writes, 1);
+          assert.equal(recovered.target.revision, failed.before.revision + 1);
+          assert.equal(
+            recovered.target.documents.filter(
+              (row) => row.collection === 'kairo:record-host-commands',
+            ).length,
+            1,
+          );
+          assert.equal(recovered.calls, 0);
+          assert.equal(recovered.published, 0);
+        },
+        { questionFixture: true },
+      );
       await test('real-quota-abort-keeps-target-and-proposal-unpublished', async ({ page }) => {
         const result = await exact(page, async () => {
           const f = window.fixture;
@@ -1405,7 +1753,7 @@ try {
             : 'explicit-immutable-artifact',
         currentRuntimeSourceMatches: Object.fromEntries(
           names
-            .filter((name) => !name.startsWith('modules/'))
+            .filter((name) => !name.includes('/'))
             .map((name) => [
               name,
               sha(readFileSync(new URL(`../${name}`, import.meta.url))) === sha(assets.get(name)),

@@ -3,7 +3,7 @@
  * Native durability, ownership and browser UI acceptance live in the mandatory
  * RecordApp, record-live, learning-record and drift-record browser suites. */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, webcrypto } from 'node:crypto';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
@@ -192,7 +192,7 @@ function fakeDocument() {
 const legacySchemaBlock = between("const STORE_KEY = 'kairo-corridor-v1';", '// Only acknowledged changed roots') + '\n' + definitions('storeEnvelope');
 const document = fakeDocument();
 const storeContext = vm.createContext({ S: state(), document, localStorage: storage(),
-  tx: (_ja, en) => en, window: {}, recordWritable: () => false });
+  tx: (_ja, en) => en, window: {}, crypto: webcrypto, recordWritable: () => false });
 vm.runInContext(legacySchemaBlock + '\n;globalThis.__storeApi = { loadStore, hydrateStore, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };', storeContext);
 const storeApi = storeContext.__storeApi;
 
@@ -216,7 +216,7 @@ verified('read-exception-quarantine-and-global-alert', () => {
 });
 
 verified('empty-malformed-future-bytes-quarantine', () => {
-  for (const raw of ['', '{broken', '{"v":2,"taken":[]}']) {
+  for (const raw of ['', '{broken', '{"v":3,"taken":[]}']) {
     storeContext.S = state();
     storeContext.localStorage = storage(raw);
     storeApi.loadStore();
@@ -717,6 +717,7 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
   );
   const dueContext = vm.createContext({
     S: {},
+    crypto: webcrypto,
     document: fakeDocument(),
     localStorage: storage(),
     tx: (_ja, en) => en,

@@ -1,0 +1,3254 @@
+{
+  "schema": "kairo-assessment-authoring-input/1",
+  "id": "kairo-original-jlpt-n2-medium-01",
+  "level": "N2",
+  "mode": "medium",
+  "titleJa": "N2 ミディアム練習",
+  "titleEn": "N2 medium practice",
+  "durationMinutes": 60,
+  "sourceIds": ["bunki-original-n2-20260923", "bunki-original-jlpt-generated-20260923"],
+  "formPayload": {
+    "v": 1,
+    "id": "kairo-original-jlpt-n2-medium-01",
+    "format": "kairo-assessment-form",
+    "provenance": {
+      "kind": "original-ai",
+      "authorRef": null,
+      "processRef": "bunki-original-n2-medium-listening-r2-20260923",
+      "sources": []
+    },
+    "rights": {
+      "display": {
+        "status": "allowed",
+        "basisRef": "bunki-original-authoring-20260923",
+        "policyVersion": "bunki-original-rights-1"
+      },
+      "retain": {
+        "status": "allowed",
+        "basisRef": "bunki-original-authoring-20260923",
+        "policyVersion": "bunki-original-rights-1"
+      },
+      "sync": {
+        "status": "allowed",
+        "basisRef": "bunki-original-authoring-20260923",
+        "policyVersion": "bunki-original-rights-1"
+      },
+      "adapt": {
+        "status": "allowed",
+        "basisRef": "bunki-original-authoring-20260923",
+        "policyVersion": "bunki-original-rights-1"
+      },
+      "synthesize-audio": {
+        "status": "allowed",
+        "basisRef": "bunki-original-authoring-20260923",
+        "policyVersion": "bunki-original-rights-1"
+      }
+    },
+    "title": "N2 medium practice",
+    "exam": {
+      "family": "jlpt",
+      "track": "N2"
+    },
+    "scope": "section-practice",
+    "blueprintId": "jlpt-n2-facts-20260910",
+    "items": [
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q01",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "kanji-reading",
+        "prompt": "【　】の言葉の読み方を選んでください。\n就職先を選ぶ際には、給与だけでなく【待遇】全体を確認した。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "待遇は「たいぐう」と読む。職場での条件や取り扱いを表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:待遇"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "たいぐう"
+            },
+            {
+              "id": "choice-2",
+              "text": "たいくう"
+            },
+            {
+              "id": "choice-3",
+              "text": "だいぐう"
+            },
+            {
+              "id": "choice-4",
+              "text": "たいぐ"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q02",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "kanji-reading",
+        "prompt": "【　】の言葉の読み方を選んでください。\n大きなファイルを【圧縮】して送信した。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "圧縮は「あっしゅく」と読む。データの容量などを小さくすること。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:圧縮"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "あつじゅく"
+            },
+            {
+              "id": "choice-2",
+              "text": "あっしゅく"
+            },
+            {
+              "id": "choice-3",
+              "text": "あつしゅく"
+            },
+            {
+              "id": "choice-4",
+              "text": "あっじゅく"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q03",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "orthography",
+        "prompt": "【　】の言葉を漢字で書くと、どれですか。\n道具を使ったら、決められた場所に【もどして】ください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "「もどす」は元の場所に戻すこと。「返す」は「かえす」と読む。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:戻す"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "返して"
+            },
+            {
+              "id": "choice-2",
+              "text": "直して"
+            },
+            {
+              "id": "choice-3",
+              "text": "戻して"
+            },
+            {
+              "id": "choice-4",
+              "text": "渡して"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q04",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "orthography",
+        "prompt": "【　】の言葉を漢字で書くと、どれですか。\nこの箱には、割れやすい品物が入っているので【しんちょう】に運んでください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "注意して丁寧に扱うことを「慎重」という。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:慎重"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "身長"
+            },
+            {
+              "id": "choice-2",
+              "text": "新調"
+            },
+            {
+              "id": "choice-3",
+              "text": "慎重"
+            },
+            {
+              "id": "choice-4",
+              "text": "伸長"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q05",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "word-formation",
+        "prompt": "（　）に入る最もよいものを選んでください。\n古い建物が密集する駅前地区では、建物をまとめて建て替える（　）開発計画が進んでいる。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "既存の地区を整備し直すことは「再開発」。未開発はまだ開発されていないこと、乱開発は無秩序な開発、新開発は新たな開発を表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:再開発"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "再"
+            },
+            {
+              "id": "choice-2",
+              "text": "未"
+            },
+            {
+              "id": "choice-3",
+              "text": "乱"
+            },
+            {
+              "id": "choice-4",
+              "text": "新"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q06",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "word-formation",
+        "prompt": "（　）に入る最もよいものを選んでください。\n商品が倉庫を出て配送業者に渡った後、注文画面の表示は「発送（　）」に変わる。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "発送という手続きが終わった状態は「発送済み」。ほかの三つは発送前の状態を表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:済み"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "待ち"
+            },
+            {
+              "id": "choice-2",
+              "text": "予定"
+            },
+            {
+              "id": "choice-3",
+              "text": "済み"
+            },
+            {
+              "id": "choice-4",
+              "text": "前"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q07",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "contextual-expression",
+        "prompt": "（　）に入る最もよいものを選んでください。\n暗い道を歩くときは、車から見えやすいように反射材を（　）とよい。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "反射材を衣服などにつけて使うので「身につける」が適切。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:身につける"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "身につける"
+            },
+            {
+              "id": "choice-2",
+              "text": "引き受ける"
+            },
+            {
+              "id": "choice-3",
+              "text": "手に入れる"
+            },
+            {
+              "id": "choice-4",
+              "text": "見つめる"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q08",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "contextual-expression",
+        "prompt": "（　）に入る最もよいものを選んでください。\n二つの案を比較した結果、費用の低いほうを（　）した。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "複数の案から選んで取り入れることは「採用」。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:採用"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "採用"
+            },
+            {
+              "id": "choice-2",
+              "text": "利用"
+            },
+            {
+              "id": "choice-3",
+              "text": "使用"
+            },
+            {
+              "id": "choice-4",
+              "text": "運用"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q09",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "paraphrase",
+        "prompt": "【　】の言葉に意味が最も近いものを選んでください。\nこの問題は、【いずれ】解決するだろう。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "この文の「いずれ」は将来のいつかを表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:いずれ"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "すぐに必ず"
+            },
+            {
+              "id": "choice-2",
+              "text": "いつか"
+            },
+            {
+              "id": "choice-3",
+              "text": "偶然に"
+            },
+            {
+              "id": "choice-4",
+              "text": "一度だけ"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q10",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "paraphrase",
+        "prompt": "【　】の言葉に意味が最も近いものを選んでください。\n参加者の意見は【おおむね】一致していた。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "おおむねは全体として、だいたいという意味で、完全な一致までは表さない。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:おおむね"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "完全に"
+            },
+            {
+              "id": "choice-2",
+              "text": "急に"
+            },
+            {
+              "id": "choice-3",
+              "text": "だいたい"
+            },
+            {
+              "id": "choice-4",
+              "text": "次第に"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q11",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "usage",
+        "prompt": "「取り消す」の使い方として、最もよいものを選んでください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "予約など、一度決めたことを無効にする場合に「取り消す」を使う。金額を正しい数字にするのは「訂正する」、減った売り上げを回復させるのは「取り戻す」、申請を内容ごとに分けるのは「分類する」。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:取り消す"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "領収書の金額を間違えたので、正しい数字に取り消した。"
+            },
+            {
+              "id": "choice-2",
+              "text": "都合が悪くなったので、ホテルの予約を取り消した。"
+            },
+            {
+              "id": "choice-3",
+              "text": "以前より減った売り上げを取り消すため、新しい販売方法を考えた。"
+            },
+            {
+              "id": "choice-4",
+              "text": "社員の申請を内容ごとに取り消してから、一覧表にまとめた。"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q12",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "vocabulary",
+        "task": "paraphrase",
+        "prompt": "「連絡先を控えておく」の「控える」と同じ意味で使われているものを選んでください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "「連絡先を控える」と「電話番号を手帳に控える」は、必要な情報を記録しておく意味。甘い物を控えるは量を減らすこと、俳優が控えるは待機すること、試験を控えるは近いうちに予定があることを表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["word:控える"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "忘れないように、担当者の電話番号を手帳に控えた。"
+            },
+            {
+              "id": "choice-2",
+              "text": "健康のため、甘い物を控えることにした。"
+            },
+            {
+              "id": "choice-3",
+              "text": "舞台の裏で、次に出る俳優が控えている。"
+            },
+            {
+              "id": "choice-4",
+              "text": "大事な試験を控えて、毎晩復習している。"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q13",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "grammar-form",
+        "prompt": "（　）に入る最もよいものを選んでください。\n忙しい（　）、昼食を抜くのは体によくない。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "忙しいことを理由にしても昼食を抜くことは正当化できない、という意味。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:grammar-form"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "からといって"
+            },
+            {
+              "id": "choice-2",
+              "text": "ところを見ると"
+            },
+            {
+              "id": "choice-3",
+              "text": "にしたがって"
+            },
+            {
+              "id": "choice-4",
+              "text": "にこたえて"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q14",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "grammar-form",
+        "prompt": "（　）に入る最もよいものを選んでください。\nこの本は子ども向けに書かれている（　）、大人が読んでも面白い。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "子ども向けであることを認めながら、大人にも面白いと対比する「とはいえ」が適切。「だけあって」は期待通りの評価、「ばかりに」は好ましくない結果の原因、「につれて」は変化の進行を表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:grammar-form"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "だけあって"
+            },
+            {
+              "id": "choice-2",
+              "text": "ばかりに"
+            },
+            {
+              "id": "choice-3",
+              "text": "とはいえ"
+            },
+            {
+              "id": "choice-4",
+              "text": "につれて"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q15",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "grammar-form",
+        "prompt": "（　）に入る最もよいものを選んでください。\n工事の進み具合（　）、開店の日を変更する可能性があります。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "工事の状況によっては日程が変わる、という条件を「次第では」で表す。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:grammar-form"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "次第では"
+            },
+            {
+              "id": "choice-2",
+              "text": "に限って"
+            },
+            {
+              "id": "choice-3",
+              "text": "を込めて"
+            },
+            {
+              "id": "choice-4",
+              "text": "にわたって"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q16",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "grammar-form",
+        "prompt": "（　）に入る最もよいものを選んでください。\nこの仕事を引き受けた（　）、途中で投げ出すわけにはいかない。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "「〜た上は」は、そう決めた以上は責任を果たすという判断につながる。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:grammar-form"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "上は"
+            },
+            {
+              "id": "choice-2",
+              "text": "最中に"
+            },
+            {
+              "id": "choice-3",
+              "text": "ついでに"
+            },
+            {
+              "id": "choice-4",
+              "text": "ところに"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q17",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "sentence-composition",
+        "prompt": "★に入るものを選んでください。\n実際に ____ ____ ★ ____ 気づかなかった。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "「実際に作ってみるまでその難しさには気づかなかった」の順。★は「その」。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:sentence-composition"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "難しさには"
+            },
+            {
+              "id": "choice-2",
+              "text": "作ってみる"
+            },
+            {
+              "id": "choice-3",
+              "text": "まで"
+            },
+            {
+              "id": "choice-4",
+              "text": "その"
+            }
+          ],
+          "answerOptionId": "choice-4"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q18",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "sentence-composition",
+        "prompt": "★に入るものを選んでください。\nこの店では ____ ____ ★ ____ ことができる。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "「自分の好みに合わせて選ぶことができる」の順。★は「合わせて」。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:sentence-composition"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "選ぶ"
+            },
+            {
+              "id": "choice-2",
+              "text": "好みに"
+            },
+            {
+              "id": "choice-3",
+              "text": "自分の"
+            },
+            {
+              "id": "choice-4",
+              "text": "合わせて"
+            }
+          ],
+          "answerOptionId": "choice-4"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q19",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "sentence-composition",
+        "prompt": "★に入るものを選んでください。\n彼は ____ ____ ★ ____ 引き受けてくれた。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "「忙しいにもかかわらず仕事を引き受けてくれた」の順。★は「かかわらず」。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:sentence-composition"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "忙しい"
+            },
+            {
+              "id": "choice-2",
+              "text": "にも"
+            },
+            {
+              "id": "choice-3",
+              "text": "仕事を"
+            },
+            {
+              "id": "choice-4",
+              "text": "かかわらず"
+            }
+          ],
+          "answerOptionId": "choice-4"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q20",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "text-grammar",
+        "prompt": "文章の（ 1 ）に入る最もよいものを選んでください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "専門用語の説明が必要と分かったことを受けて、対策を行うので「そこで」。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-grammarText"],
+        "media": [],
+        "subjects": ["jlpt-n2:text-grammar"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "それなのに"
+            },
+            {
+              "id": "choice-2",
+              "text": "そこで"
+            },
+            {
+              "id": "choice-3",
+              "text": "ところが"
+            },
+            {
+              "id": "choice-4",
+              "text": "それにしても"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q21",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "text-grammar",
+        "prompt": "文章の（ 2 ）に入る最もよいものを選んでください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "聞くだけの方法と、実際にやってみる方法を対比する「のではなく」が適切。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-grammarText"],
+        "media": [],
+        "subjects": ["jlpt-n2:text-grammar"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "にすぎず"
+            },
+            {
+              "id": "choice-2",
+              "text": "といっても"
+            },
+            {
+              "id": "choice-3",
+              "text": "のではなく"
+            },
+            {
+              "id": "choice-4",
+              "text": "にしては"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q22",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "grammar",
+        "task": "text-grammar",
+        "prompt": "文章の（ 3 ）に入る最もよいものを選んでください。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "資料を完成後も改善し続けるという筆者の今後の意志に合う。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-grammarText"],
+        "media": [],
+        "subjects": ["jlpt-n2:text-grammar"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "直していきたい"
+            },
+            {
+              "id": "choice-2",
+              "text": "直してしまった"
+            },
+            {
+              "id": "choice-3",
+              "text": "直すはずがなかった"
+            },
+            {
+              "id": "choice-4",
+              "text": "直してもらいたかった"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q23",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "short-reading",
+        "prompt": "見本だけを先に送るのはなぜですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "説明カードの印刷は遅れているが、打ち合わせに間に合うよう見本は本日発送する。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-shortEmail"],
+        "media": [],
+        "subjects": ["jlpt-n2:short-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "説明カードの内容が未定だから"
+            },
+            {
+              "id": "choice-2",
+              "text": "打ち合わせに見本を間に合わせたいから"
+            },
+            {
+              "id": "choice-3",
+              "text": "小林さんが印刷を断ったから"
+            },
+            {
+              "id": "choice-4",
+              "text": "見本の数が足りないから"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q24",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "short-reading",
+        "prompt": "小林さんは打ち合わせで何を使うよう求められていますか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "最後に添付データを打ち合わせに利用するよう依頼している。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-shortEmail"],
+        "media": [],
+        "subjects": ["jlpt-n2:short-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "昨年の説明カード"
+            },
+            {
+              "id": "choice-2",
+              "text": "明後日発送される印刷物だけ"
+            },
+            {
+              "id": "choice-3",
+              "text": "メールに添付された説明データ"
+            },
+            {
+              "id": "choice-4",
+              "text": "完成していない見本の写真"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q25",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "mid-reading",
+        "prompt": "筆者が相談会を始めた時、主に何をするつもりでしたか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "最初は修理の技術を教える場にするつもりだった。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-midEssay"],
+        "media": [],
+        "subjects": ["jlpt-n2:mid-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "家具の販売方法を教える"
+            },
+            {
+              "id": "choice-2",
+              "text": "修理の技術を教える"
+            },
+            {
+              "id": "choice-3",
+              "text": "新しい家具を設計する"
+            },
+            {
+              "id": "choice-4",
+              "text": "古い家具を集めて処分する"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q26",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "mid-reading",
+        "prompt": "椅子の持ち主に踏み台を勧めたのはなぜですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "椅子の上に立つ使い方が続けば再び傷むかもしれないので、安全な踏み台を勧めた。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-midEssay"],
+        "media": [],
+        "subjects": ["jlpt-n2:mid-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "椅子を直すことが不可能だったから"
+            },
+            {
+              "id": "choice-2",
+              "text": "椅子を棚として使っていたから"
+            },
+            {
+              "id": "choice-3",
+              "text": "椅子にかかる負担の原因を減らすため"
+            },
+            {
+              "id": "choice-4",
+              "text": "新しい道具を売るため"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q27",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "mid-reading",
+        "prompt": "筆者は、道具を手に取る前に話す時間をどう考えていますか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "使う人との関係を知るために話す時間を修理の一部と考えている。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-midEssay"],
+        "media": [],
+        "subjects": ["jlpt-n2:mid-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "修理とは関係のない休憩である"
+            },
+            {
+              "id": "choice-2",
+              "text": "技術が足りない時だけ必要である"
+            },
+            {
+              "id": "choice-3",
+              "text": "どんな問題も必ず解決する方法である"
+            },
+            {
+              "id": "choice-4",
+              "text": "物の使われ方を知る修理の一部である"
+            }
+          ],
+          "answerOptionId": "choice-4"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q28",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "integrated-reading",
+        "prompt": "ＡとＢの両方が賛成していることはどれですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "二人とも広場に座る場所を作ることに賛成だが、配置や固定方法の意見は異なる。",
+        "passageIds": [
+          "kairo-original-jlpt-n2-medium-01:passage-integratedA",
+          "kairo-original-jlpt-n2-medium-01:passage-integratedB"
+        ],
+        "media": [],
+        "subjects": ["jlpt-n2:integrated-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "広場に座れる場所を設けること"
+            },
+            {
+              "id": "choice-2",
+              "text": "中央に固定した椅子を置くこと"
+            },
+            {
+              "id": "choice-3",
+              "text": "利用者が自由に椅子を動かすこと"
+            },
+            {
+              "id": "choice-4",
+              "text": "週末の市場を別の場所に移すこと"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q29",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "integrated-reading",
+        "prompt": "椅子について、Ｂだけが述べている心配はどれですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "自由に動かす椅子で通路が狭くなる心配はＢにのみ書かれている。",
+        "passageIds": [
+          "kairo-original-jlpt-n2-medium-01:passage-integratedA",
+          "kairo-original-jlpt-n2-medium-01:passage-integratedB"
+        ],
+        "media": [],
+        "subjects": ["jlpt-n2:integrated-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "高齢の人が買い物に来なくなること"
+            },
+            {
+              "id": "choice-2",
+              "text": "市場で使う場所が足りなくなること"
+            },
+            {
+              "id": "choice-3",
+              "text": "自由に動かした椅子で通路が狭くなること"
+            },
+            {
+              "id": "choice-4",
+              "text": "座っている人が会話をしなくなること"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q30",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "claim-reading",
+        "prompt": "失敗の記録について、筆者が勧めていることはどれですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "判断した時の情報と予想を記録することで、どこに問題があったか考えられると述べている。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-claimEssay"],
+        "media": [],
+        "subjects": ["jlpt-n2:claim-reading"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "反省の言葉を繰り返して気を引き締める"
+            },
+            {
+              "id": "choice-2",
+              "text": "当時の情報と判断の過程を具体的に残す"
+            },
+            {
+              "id": "choice-3",
+              "text": "結果が悪かった理由を他の人に決めてもらう"
+            },
+            {
+              "id": "choice-4",
+              "text": "同じ失敗をしないと約束する文を書く"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q31",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "information-retrieval",
+        "prompt": "四人で二時間利用したい人が、利用日の前日に予約するには、どうすればよいですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "四人・二時間に合うのはグループ室で、前日午後六時までウェブ予約ができる。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-info"],
+        "media": [],
+        "subjects": ["jlpt-n2:information-retrieval"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "個人室を電話で予約する"
+            },
+            {
+              "id": "choice-2",
+              "text": "相談室を窓口で予約する"
+            },
+            {
+              "id": "choice-3",
+              "text": "午後六時までにグループ室をウェブで予約する"
+            },
+            {
+              "id": "choice-4",
+              "text": "グループ室の当日受付を電話で依頼する"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q32",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "reading",
+        "task": "information-retrieval",
+        "prompt": "どの部屋でも認められていることはどれですか。",
+        "translatedInstruction": "Choose the best answer.",
+        "rationale": "ふたのある容器の飲み物は共通事項で許可されている。",
+        "passageIds": ["kairo-original-jlpt-n2-medium-01:passage-info"],
+        "media": [],
+        "subjects": ["jlpt-n2:information-retrieval"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "空きがあれば利用時間を延長する"
+            },
+            {
+              "id": "choice-2",
+              "text": "ふたのある容器の飲み物を持ち込む"
+            },
+            {
+              "id": "choice-3",
+              "text": "利用者登録なしで予約する"
+            },
+            {
+              "id": "choice-4",
+              "text": "予約から二十分遅れて必ず利用する"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q33",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "bunki-listening-r2-bfa38f279d0a84388ef40030",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-task",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "最初に結論を加え、その後で通して読む順序が指示されている。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-task"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "写真を探す"
+            },
+            {
+              "id": "choice-2",
+              "text": "結論を最後から削除する"
+            },
+            {
+              "id": "choice-3",
+              "text": "発表の最初に結論を加える"
+            },
+            {
+              "id": "choice-4",
+              "text": "資料を印刷する"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q34",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "bunki-listening-r2-22bcf08a63c2aad2f7959616",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-task",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "片づけるのは机上の紙だけで、種類別に棚へ入れる。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-task"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "椅子を片づける"
+            },
+            {
+              "id": "choice-2",
+              "text": "紙を分けて棚に入れる"
+            },
+            {
+              "id": "choice-3",
+              "text": "ホワイトボードを消す"
+            },
+            {
+              "id": "choice-4",
+              "text": "机を別の部屋へ運ぶ"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q35",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "bunki-listening-r2-481719c7972183d646c723db",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-point",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "決め手は駐車場所がないことで、料金や時間ではない。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-point"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "料金が車より安いから"
+            },
+            {
+              "id": "choice-2",
+              "text": "駐車できる場所がないから"
+            },
+            {
+              "id": "choice-3",
+              "text": "到着時間を早めたいから"
+            },
+            {
+              "id": "choice-4",
+              "text": "運転が苦手だから"
+            }
+          ],
+          "answerOptionId": "choice-2"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q36",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "bunki-listening-r2-18a20059561524b8f8856a1c",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-point",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "いつでも聞いてよいと言われ、質問をためらわずに済む点をよいと述べている。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-point"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "覚える仕事が少ないこと"
+            },
+            {
+              "id": "choice-2",
+              "text": "席が毎日変わること"
+            },
+            {
+              "id": "choice-3",
+              "text": "困った時に質問しやすいこと"
+            },
+            {
+              "id": "choice-4",
+              "text": "前の仕事と内容が同じこと"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q37",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "bunki-listening-r2-a723479fecb8d74cfe7837ae",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-gist",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "最もしたいことを先に決め、その時間を確保する方法を勧めている。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-gist"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "移動に使う時間を最も長くする"
+            },
+            {
+              "id": "choice-2",
+              "text": "有名な場所を全て入れる"
+            },
+            {
+              "id": "choice-3",
+              "text": "一番したいことを優先して予定を組む"
+            },
+            {
+              "id": "choice-4",
+              "text": "現地に着くまで何も決めない"
+            }
+          ],
+          "answerOptionId": "choice-3"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q38",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-response",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "待たせたことへの謝罪に、今来たばかりなので気にしなくてよいと返している。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-response"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "いいえ、私も今来たところです。"
+            },
+            {
+              "id": "choice-2",
+              "text": "はい、待っていただけませんか。"
+            },
+            {
+              "id": "choice-3",
+              "text": "いいえ、ぜひお待ちください。"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q39",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-response",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "今日中でなくてもよいという許可を受けて、翌日の提出予定を伝える返事。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-response"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "では、明日の午前中にお渡しします。"
+            },
+            {
+              "id": "choice-2",
+              "text": "では、今日中にしていただけませんか。"
+            },
+            {
+              "id": "choice-3",
+              "text": "今日から書類ではなくなります。"
+            }
+          ],
+          "answerOptionId": "choice-1"
+        }
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:q40",
+        "format": "kairo-assessment-item",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "bunki-listening-r2-ba9a48192acf1304c429e7f7",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "skill": "listening",
+        "task": "listening-integrated",
+        "prompt": "音声を聞いて、答えを一つ選んでください。",
+        "translatedInstruction": "Listen and choose one answer.",
+        "rationale": "日曜開催、道具の持参不要、二千円以内の全条件を満たすのは園芸講座。",
+        "passageIds": [],
+        "media": [],
+        "subjects": ["jlpt-n2:listening-integrated"],
+        "response": {
+          "kind": "selected",
+          "options": [
+            {
+              "id": "choice-1",
+              "text": "写真講座"
+            },
+            {
+              "id": "choice-2",
+              "text": "料理講座"
+            },
+            {
+              "id": "choice-3",
+              "text": "工作講座"
+            },
+            {
+              "id": "choice-4",
+              "text": "園芸講座"
+            }
+          ],
+          "answerOptionId": "choice-4"
+        }
+      }
+    ],
+    "passages": [
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-grammarText",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "会社の研修を担当することになった。昨年の資料をそのまま使おうと思ったが、新しく入った社員に見てもらうと、分からない言葉が多いと言われた。自分には当たり前の言葉でも、初めて聞く人には説明が必要なのだ。（ 1 ）、まず専門用語を短い言葉で説明する欄を加えた。次に、実際の作業を一つずつ試せるようにした。説明を聞くだけ（ 2 ）、自分でやってみることで疑問に気づけると考えたからだ。準備には時間がかかったが、研修後の質問が具体的になった。資料は完成したら終わりではない。受講者の反応を見ながら、今後も（ 3 ）。",
+        "textSha256": "77308a1be1d9ef30d7426ec9dd27782bba876f64086f11f96e36df1976440a9b",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-shortEmail",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "小林様\n来週の打ち合わせに使う見本を、本日発送する予定でしたが、箱に入れる説明カードの印刷が遅れています。見本自体は完成しております。間に合わせるため、まず見本だけを本日お送りし、説明カードのデータをメールに添付します。印刷したカードは明後日発送いたします。お手数ですが、打ち合わせには添付のデータをご利用ください。\n森田",
+        "textSha256": "f7feab31e9add417a4fec7f93be800e1b62aed8031cb78673f2febe8008a6359",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-midEssay",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "地域の工房で、壊れた家具を直す相談会を開いている。最初は、修理の技術を教える場にするつもりだった。ところが、持ち込まれた家具を見ながら話していると、持ち主がどのように使っているのかを聞くことのほうが重要だと気づいた。例えば、脚がぐらつく椅子を持ってきた人に詳しく聞くと、高い棚の物を取るために、毎日その椅子の上に立っているという。脚を直すだけでは、同じ負担がかかり、また壊れるかもしれない。そこで、椅子を修理すると同時に、安全な踏み台を用意することを勧めた。\n修理とは、元の形に戻す作業だけではない。その物と使う人との関係を考える作業でもある。もちろん、話を聞けば必ずよい解決策が見つかるわけではない。それでも、傷んだ部分だけを見て結論を急ぐより、問題の原因に近づける。最近では、道具を手に取る前に、まず話すための時間を設けている。相談者から「直し方を知りたかったのに」と言われることもあるが、その時間も修理の一部なのだと説明している。",
+        "textSha256": "8fcce038587cab85bbec8fd492f72a587c2ab013c79fd229201828829c980fed",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-integratedA",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "Ａ\n商店街の広場に椅子を増やす計画に賛成です。買い物の途中で少し休める場所があれば、高齢の方も出かけやすくなります。ただし、広場の中央に固定した椅子を並べるのは避けてほしいです。週末には市場が開かれるので、必要に応じて動かせる椅子にするか、端に置くべきだと思います。",
+        "textSha256": "1164a445abafaa1f9211f1e78e224d3ae2540a57e03ec3590305e95f80e619b9",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-integratedB",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "Ｂ\n広場は通り抜けるだけの場所になっています。座れる場所を設けることで、人が会話を楽しむ場にもなるでしょう。しかし、使う人が自由に椅子を動かせると、通路が狭くなる心配があります。市場で使う範囲を先に決め、その外側に固定するのがよいと思います。日差しを避けられる位置も検討してください。",
+        "textSha256": "8600eb040ed13b7a422bc1d36e94689967cb133c8be349dbcd642979044497e6",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-claimEssay",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "失敗した経験を記録しておこうとすると、「確認が足りなかった」「もっと注意すべきだった」といった言葉で終わりやすい。しかし、こうした反省だけでは、次に同じ場面に出会ったとき、何を変えればよいのか分からない。私は、失敗の記録に、その時どの情報を見て、何を予想して行動したのかを書くようにしている。結果を知った今なら誤りに見える判断にも、当時はそれなりの理由があったはずだからだ。その理由を振り返ると、必要な情報を見落としたのか、情報の意味を取り違えたのかを分けて考えられる。失敗から学ぶために大切なのは、過去の自分を責める言葉を増やすことではなく、判断の過程を確かめられる形で残すことだ。",
+        "textSha256": "33cce1f7eea3b8c804b19bc26cabd1bda87c88a0ba0f0973356e816ac4d175ba",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      },
+      {
+        "v": 1,
+        "id": "kairo-original-jlpt-n2-medium-01:passage-info",
+        "format": "kairo-assessment-passage",
+        "provenance": {
+          "kind": "original-ai",
+          "authorRef": null,
+          "processRef": "codex-original-n2-practice-20260923",
+          "sources": []
+        },
+        "rights": {
+          "display": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "retain": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "sync": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "adapt": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          },
+          "synthesize-audio": {
+            "status": "allowed",
+            "basisRef": "bunki-original-authoring-20260923",
+            "policyVersion": "bunki-original-rights-1"
+          }
+        },
+        "title": null,
+        "text": "市立図書館　作業室の利用案内\n【個人室】一人用。最長二時間。予約不要。当日、窓口で申し込む。\n【相談室】二〜四人用。最長一時間。電話または窓口で、利用日の三日前から予約できる。\n【グループ室】三〜八人用。最長三時間。ウェブサイトで、利用日の七日前から前日午後六時まで予約できる。当日予約はできない。\n共通事項：利用者登録が必要です。室内での食事はできません。ふたのある容器の飲み物は持ち込めます。予約時刻から十五分過ぎても来館されない場合、予約は取り消されます。延長はできません。",
+        "textSha256": "70fcabaadd0c14f63c23906ee16f61e4e7900a7ebea911ff644ecb05506d1266",
+        "language": "ja",
+        "locationUnit": "utf16-code-unit"
+      }
+    ],
+    "media": [],
+    "sections": [
+      {
+        "id": "section-vocabulary",
+        "title": "文字・語彙",
+        "skill": "vocabulary",
+        "itemIds": [
+          "kairo-original-jlpt-n2-medium-01:q01",
+          "kairo-original-jlpt-n2-medium-01:q02",
+          "kairo-original-jlpt-n2-medium-01:q03",
+          "kairo-original-jlpt-n2-medium-01:q04",
+          "kairo-original-jlpt-n2-medium-01:q05",
+          "kairo-original-jlpt-n2-medium-01:q06",
+          "kairo-original-jlpt-n2-medium-01:q07",
+          "kairo-original-jlpt-n2-medium-01:q08",
+          "kairo-original-jlpt-n2-medium-01:q09",
+          "kairo-original-jlpt-n2-medium-01:q10",
+          "kairo-original-jlpt-n2-medium-01:q11",
+          "kairo-original-jlpt-n2-medium-01:q12"
+        ]
+      },
+      {
+        "id": "section-grammar",
+        "title": "文法",
+        "skill": "grammar",
+        "itemIds": [
+          "kairo-original-jlpt-n2-medium-01:q13",
+          "kairo-original-jlpt-n2-medium-01:q14",
+          "kairo-original-jlpt-n2-medium-01:q15",
+          "kairo-original-jlpt-n2-medium-01:q16",
+          "kairo-original-jlpt-n2-medium-01:q17",
+          "kairo-original-jlpt-n2-medium-01:q18",
+          "kairo-original-jlpt-n2-medium-01:q19",
+          "kairo-original-jlpt-n2-medium-01:q20",
+          "kairo-original-jlpt-n2-medium-01:q21",
+          "kairo-original-jlpt-n2-medium-01:q22"
+        ]
+      },
+      {
+        "id": "section-reading",
+        "title": "読解",
+        "skill": "reading",
+        "itemIds": [
+          "kairo-original-jlpt-n2-medium-01:q23",
+          "kairo-original-jlpt-n2-medium-01:q24",
+          "kairo-original-jlpt-n2-medium-01:q25",
+          "kairo-original-jlpt-n2-medium-01:q26",
+          "kairo-original-jlpt-n2-medium-01:q27",
+          "kairo-original-jlpt-n2-medium-01:q28",
+          "kairo-original-jlpt-n2-medium-01:q29",
+          "kairo-original-jlpt-n2-medium-01:q30",
+          "kairo-original-jlpt-n2-medium-01:q31",
+          "kairo-original-jlpt-n2-medium-01:q32"
+        ]
+      },
+      {
+        "id": "section-listening",
+        "title": "聴解",
+        "skill": "listening",
+        "itemIds": [
+          "kairo-original-jlpt-n2-medium-01:q33",
+          "kairo-original-jlpt-n2-medium-01:q34",
+          "kairo-original-jlpt-n2-medium-01:q35",
+          "kairo-original-jlpt-n2-medium-01:q36",
+          "kairo-original-jlpt-n2-medium-01:q37",
+          "kairo-original-jlpt-n2-medium-01:q38",
+          "kairo-original-jlpt-n2-medium-01:q39",
+          "kairo-original-jlpt-n2-medium-01:q40"
+        ]
+      }
+    ],
+    "timingBlocks": [
+      {
+        "id": "block-language-reading",
+        "sectionIds": ["section-vocabulary", "section-grammar", "section-reading"],
+        "durationMs": 2700000,
+        "clock": "elapsed-including-interruptions",
+        "authority": {
+          "kind": "authoring-rule",
+          "ruleId": "n2-medium-allocation-20260923"
+        }
+      },
+      {
+        "id": "block-listening",
+        "sectionIds": ["section-listening"],
+        "durationMs": 900000,
+        "clock": "elapsed-including-interruptions",
+        "authority": {
+          "kind": "authoring-rule",
+          "ruleId": "n2-medium-allocation-20260923"
+        }
+      }
+    ],
+    "authoring": {
+      "policyVersion": "n2-medium-allocation-20260923",
+      "countsAre": "authoring-rules",
+      "requirements": [
+        {
+          "task": "kanji-reading",
+          "minimumItems": 2
+        },
+        {
+          "task": "orthography",
+          "minimumItems": 2
+        },
+        {
+          "task": "word-formation",
+          "minimumItems": 2
+        },
+        {
+          "task": "contextual-expression",
+          "minimumItems": 2
+        },
+        {
+          "task": "paraphrase",
+          "minimumItems": 3
+        },
+        {
+          "task": "usage",
+          "minimumItems": 1
+        },
+        {
+          "task": "grammar-form",
+          "minimumItems": 4
+        },
+        {
+          "task": "sentence-composition",
+          "minimumItems": 3
+        },
+        {
+          "task": "text-grammar",
+          "minimumItems": 3
+        },
+        {
+          "task": "short-reading",
+          "minimumItems": 2
+        },
+        {
+          "task": "mid-reading",
+          "minimumItems": 3
+        },
+        {
+          "task": "integrated-reading",
+          "minimumItems": 2
+        },
+        {
+          "task": "claim-reading",
+          "minimumItems": 1
+        },
+        {
+          "task": "information-retrieval",
+          "minimumItems": 2
+        },
+        {
+          "task": "listening-task",
+          "minimumItems": 2
+        },
+        {
+          "task": "listening-point",
+          "minimumItems": 2
+        },
+        {
+          "task": "listening-gist",
+          "minimumItems": 1
+        },
+        {
+          "task": "listening-response",
+          "minimumItems": 2
+        },
+        {
+          "task": "listening-integrated",
+          "minimumItems": 1
+        }
+      ]
+    }
+  },
+  "revisionNotes": []
+}

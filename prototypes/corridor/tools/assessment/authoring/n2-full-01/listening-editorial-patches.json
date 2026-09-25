@@ -1,0 +1,68 @@
+{
+  "schema": "kairo-listening-editorial-patches/1",
+  "patches": [
+    {
+      "jobId": "n2-full-01-add-listening-response",
+      "sourceResponseSha256": "771802c7616339b4884e7f92eaadada1de3bf6aec1196a0024ace18500ee0314",
+      "authorFamily": "codex",
+      "basis": "Author self-check: original second item had multiple natural responses; first key introduced unnecessary next-month timing. Keys, stimuli and explanations are replaced as new original candidate content, not accepted by model vote.",
+      "replacementBatch": {
+        "passages": [],
+        "stimuli": [
+          {
+            "id": "stim-01",
+            "dialogue": [
+              {
+                "voice": "speaker-a",
+                "text": "あの、先日お願いした資料の件なんですが、急ぎではありませんので、お忙しい時期が落ち着いたころで。"
+              }
+            ]
+          },
+          {
+            "id": "stim-02",
+            "dialogue": [
+              {
+                "voice": "speaker-a",
+                "text": "先日の会議、あなたの説明がなかったら、あの場では決まらなかったと思います。"
+              }
+            ]
+          }
+        ],
+        "items": [
+          {
+            "localId": "1",
+            "prompt": "音声を聞いて、最も適当な応答を選びなさい。",
+            "options": [
+              "お気遣いありがとうございます。落ち着き次第、取りかかります。",
+              "こちらこそ、お急ぎのところ作っていただいて、助かりました。",
+              "では、私から資料をお願いするのは控えておきます。"
+            ],
+            "answerIndex": 0,
+            "rationale": "女性は依頼した資料の作成を急がなくてよいと配慮している。一番はその配慮に礼を述べ、忙しさが落ち着いたら作業する返事で自然。二番は相手が資料を作ってくれたことに礼を言っており、作成を頼まれた側という役割と合わない。三番も自分が資料を依頼する側の発言になっている。",
+            "target": null,
+            "passageIds": [],
+            "stimulusId": "stim-01",
+            "spokenQuestion": null,
+            "printedOptions": false
+          },
+          {
+            "localId": "2",
+            "prompt": "音声を聞いて、最も適当な応答を選びなさい。",
+            "options": [
+              "お役に立てたなら、うれしいです。",
+              "決まるまでは、ご説明できませんので。",
+              "では、説明を抜いてお話しします。"
+            ],
+            "answerIndex": 0,
+            "rationale": "女性は、相手の説明が決定につながったと評価し、感謝の気持ちを伝えている。一番は、その評価を受け止める自然な返事。二番は決定前には説明できないという別の条件を述べ、すでに行われた説明への評価に応じていない。三番は説明を省くという今後の行動で、説明が役立ったという発言を取り違えている。",
+            "target": null,
+            "passageIds": [],
+            "stimulusId": "stim-02",
+            "spokenQuestion": null,
+            "printedOptions": false
+          }
+        ]
+      }
+    }
+  ]
+}
