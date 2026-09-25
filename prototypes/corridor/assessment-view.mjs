@@ -28,8 +28,9 @@ const minutes = ms => Math.max(0, Math.ceil(ms / 60_000));
 const clockText = ms => `${Math.floor(ms / 60_000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
 
 export function createAssessmentView(host) {
-  let level = 'N2', length = 'short', catalog = null, failed = false, loading = false;
-  let selectedId = null, historyOpen = false, notice = null, legacyOpen = false;
+  // the room opens where the learner last chose to stand; with no choice yet it opens at N2
+  let level = host.initialLevel?.() || 'N2', length = 'short', catalog = null, failed = false, loading = false;
+  let selectedId = null, historyOpen = false, notice = null, legacyOpen = false, focusItemId = null;
   let activeAudio = null, audioKey = null, audioUrl = null, audioLoading = false;
   let lifecycle = 0, playbackEpoch = 0, advancingAudio = false, deliveryLoading = false;
   let resumeOnEntry = false, entryResumePending = false;
@@ -154,12 +155,32 @@ export function createAssessmentView(host) {
     if (form) details.append(node('p', 'exam-version', `${tx('問題番号', 'Form')} ${form.id}`));
     container.append(details);
   }
+  // A level with no checked test is not a dead end: its older sets are named here, each
+  // marked 検収前 (answers not yet checked). No date is promised; nothing is called reviewed.
+  function renderOlderSets(main) {
+    const sets = host.olderSets?.(level);
+    const block = node('section', 'exam-older'); block.dataset.examOlder = level;
+    if (sets === null || sets === undefined) { block.append(node('p', 'exam-status', tx('以前の練習セットを読み込み中…', 'Loading the older practice sets…'))); main.append(block); return; }
+    block.append(node('p', '', sets.length
+      ? tx(`${level}の確認済みテストは、まだありません。以前の${level}練習セットが${sets.length}つあり、今すぐ使えます。答えは未確認です。`,
+        `No checked ${level} tests yet. ${sets.length} older ${level} sets are ready now. Their answers haven't been checked.`)
+      : tx(`${level}の確認済みテストは、まだありません。`, `No checked ${level} tests yet.`)));
+    if (sets.length) block.append(node('p', 'exam-older-limits', tx('語彙・文法・読解のみ。聴解と時間制限はありません。', 'Vocabulary, grammar and reading only — no listening, no timer.')));
+    for (const set of sets) {
+      const door = button(host.english() ? (set.title.en || set.title.ja) : set.title.ja, null, () => host.startOlder(set.setId), 'entry-row exam-older-set');
+      door.dataset.legacySet = set.setId;
+      door.append(node('span', 'exam-older-meta', tx(`${set.items}問`, `${set.items} questions`)));
+      if (!set.approved) door.append(node('span', 'mock-pending', '検収前'));
+      block.append(door);
+    }
+    main.append(block);
+  }
   function renderCatalog(main) {
     main.append(node('h1', 'view-title', tx('JLPT 模試・練習', 'JLPT tests & practice')));
     main.append(node('p', 'exam-intro', tx('級と長さを選んで、今できることを確かめよう。', 'Choose your level and how much time you have.')));
     const levels = node('div', 'exam-levels'); levels.setAttribute('role', 'group'); levels.setAttribute('aria-label', tx('級', 'Level'));
     for (const value of ['N5', 'N4', 'N3', 'N2', 'N1']) {
-      const control = button(value, null, () => { level = value; refresh(); });
+      const control = button(value, null, () => { level = value; host.rememberLevel?.(value); refresh(); });
       control.setAttribute('aria-pressed', String(value === level)); control.dataset.examLevel = value; levels.append(control);
     }
     main.append(levels);
@@ -178,7 +199,9 @@ export function createAssessmentView(host) {
       return;
     }
     const entries = catalog.entries.filter(entry => entry.level === level && entry.mode === length);
-    if (!entries.length) main.append(node('p', '', tx('この級の問題を準備しています。', 'Tests for this level are being prepared.')));
+    const levelChecked = catalog.entries.some(entry => entry.level === level);
+    if (!levelChecked) renderOlderSets(main);
+    else if (!entries.length) main.append(node('p', '', tx('この長さの確認済みテストは、まだありません。', 'No checked test of this length yet.')));
     const sections = catalog.entries.filter(entry => entry.level === level && entry.mode === 'section');
     for (const [index, entry] of [...entries, ...sections].entries()) {
       if (index === entries.length && sections.length) main.append(node('h2', 'exam-section-heading', tx('分野別の練習', 'Practice by skill')));
@@ -554,6 +577,12 @@ export function createAssessmentView(host) {
     for (const result of score.items) {
       const question = form.items.find(row => row.id === result.itemId);
       const details = node('details', `exam-answer ${result.result}`);
+      details.dataset.examItem = result.itemId;
+      if (result.itemId === focusItemId) {
+        // arrived from "return to this sentence": this question, open and in view, once
+        details.open = true; focusItemId = null;
+        requestAnimationFrame(() => details.scrollIntoView({ block: 'center' }));
+      }
       details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${question.prompt.split('\n').at(-1)}`));
       const selectedOption = question.response.kind === 'selected' && result.response.kind === 'selected'
         ? question.response.options.find(row => row.id === result.response.optionId)?.text : tx('未回答', 'No answer');
@@ -607,10 +636,15 @@ export function createAssessmentView(host) {
       else if (historyOpen) renderHistory(main);
       else if (current) {
         if (current.attempt.status === 'in-progress') renderQuestion(main, current);
-        else renderResult(main, current);
+        else { main.dataset.examAttempt = current.attempt.attemptId; renderResult(main, current); }
       }
       else renderCatalog(main);
       return true;
+    },
+    open(attemptId, itemId) {
+      selectedId = attemptId; focusItemId = itemId || null;
+      historyOpen = false; legacyOpen = false; confirmation = null;
+      if (!selection()) { selectedId = null; focusItemId = null; notice = tx('その問題はもう表示できません。', 'That question is no longer available.'); }
     },
     tick() {
       if (!owned()) { stopAudio(); return; }

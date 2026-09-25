@@ -4403,7 +4403,18 @@ addEventListener('popstate', () => {
   }
 });
 
+/** A test question's source: the JLPT room, on that result, with that question open. */
+function openAssessmentSource({ attemptId, itemId }) {
+  S.stack = []; S.dialogInvoker = null;
+  keepScroll();
+  S.view = 'mock';
+  if (assessmentViewModule) { assessmentRoom ||= createAssessmentRoom(); assessmentRoom.open?.(attemptId, itemId); }
+  render();
+}
+
 function openPassage(id, anchor = null) {
+  // no id means no reading: callers show their own "source unavailable" note
+  if (id == null) throw new Error('source-unavailable');
   keepScroll();
   learningSourceVisit = anchor?.visit || null;
   // a running 聞く belongs to the passage it was started in: the glossary
@@ -7168,8 +7179,12 @@ function speakPassageTts(p, onDone, generation) {
 }
 
 /* ------------------------------------------------ 収録の声 the recorded voice
- * The operator's roster (2026-08-20, their ear on an 11-candidate
- * shootout): 小春音アミ PRIMARY · F1 · 四国めたん · ずんだもん · 玄野武宏.
+ * Interim roster, NOT operator-chosen: 小春音アミ · F1 · 四国めたん · ずんだもん ·
+ * 玄野武宏. The 11-candidate shootout was never run (docs/build-evidence/
+ * tenohira/RUN_STATE.md: "shootout unrun"), and the operator has since said
+ * アミ is not the voice (2026-09-19). アミ leads only because she is the one
+ * voice with recordings of the shelf sentences; the UI labels it 仮の声 検収前.
+ * Which voice leads waits for a real audition with his ear.
  * Real neural recordings shipped as static files (audio/manifest.json +
  * audio/w/<voice>/<id>.m4a, sentences in audio/s/ami/) — the device TTS is
  * demoted to offline fallback. The chosen voice is a device preference in
@@ -10058,6 +10073,20 @@ async function performAssessmentSuppression(command) {
 function createAssessmentRoom() {
   return assessmentViewModule.createAssessmentView({ english: bi, render: () => { if (S.view === 'mock') render(); },
     owned: recordWritable, recordState: recordRoomState,
+    initialLevel: () => {
+      try { const value = localStorage.getItem('kairo-exam-level-v1'); return ['N5', 'N4', 'N3', 'N2', 'N1'].includes(value) ? value : null; }
+      catch { return null; }
+    },
+    rememberLevel: (value) => { try { localStorage.setItem('kairo-exam-level-v1', value); } catch { /* a device preference only */ } },
+    olderSets: (level) => {
+      if (!D.mock) { if (!D.mockLoading && !mockFailed('index')) ensureMockIndex().then(() => { if (S.view === 'mock') render(); }, () => markMockFailed('index')); return mockFailed('index') ? [] : null; }
+      return D.mock.filter((set) => set.level === level);
+    },
+    startOlder: (setId) => {
+      D.mockFailed?.delete(setId);
+      ensureMockSet(setId).then(() => startMock(setId), () => markMockFailed(setId));
+      render();
+    },
     // the room's own reload keeps unsent drafts exactly as the banner's does
     reload: () => { if (preserveVisibleDrafts()) location.reload(); },
     pending: () => assessmentV2Pending, notice: () => assessmentV2Notice,
@@ -12076,11 +12105,12 @@ async function resolveTeacherSource(raw) {
   const context = await module.verifyTeacherContext(raw);
   if (context.sourceKind === 'assessment-item') {
     await reconcileAssessmentResults();
-    const { selected, text } = assessmentContextSource(S, context);
+    const { selected, item, text } = assessmentContextSource(S, context);
     if (await module.digestText(text) !== context.sourceDigest) throw new Error('source-changed');
     const catalog = await loadAssessmentCatalog();
     const admitted = assessmentCatalogVersions(catalog).some(entry => entry.availability.ready && entry.formSha256 === selected.form.sha256);
-    return { context, p: { title: selected.form.title }, aiAllowed: admitted &&
+    // a test question has no reading to open: its source is the question in its result
+    return { context, p: { title: selected.form.title }, assessment: { attemptId: selected.attempt.attemptId, itemId: item.id }, aiAllowed: admitted &&
       selected.form.provenance.kind === 'original-ai' && selected.form.rights.adapt.status === 'allowed' };
   }
   if (context.sourceKind === 'publisher-reading') {
@@ -12379,6 +12409,7 @@ function renderTeacherContexts(main) {
       const visit = learningSourceCaller(back.id);
       if (resolved.publisher) openPublisherReading(resolved.publisher.receiptSha256, { context: resolved.context, visit });
       else if (resolved.capture) openSourceReading(resolved.capture.id, resolved.context, visit);
+      else if (resolved.assessment) openAssessmentSource(resolved.assessment);
       else openPassage(resolved.p.id, { index: context.index, visit });
     } catch (error) { note.textContent = teacherSourceError(error); }
     finally { back.disabled = false; }
@@ -15204,6 +15235,7 @@ function renderLearningSource(container, item, review = false, disclosure = item
       S.stack = []; S.dialogInvoker = null;
       if (resolved.capture) openSourceReading(resolved.capture.id, resolved.context, visit);
       else if (resolved.publisher) openPublisherReading(resolved.publisher.receiptSha256, { context: resolved.context, visit });
+      else if (resolved.assessment) openAssessmentSource(resolved.assessment);
       else openPassage(resolved.p.id, { index: context.index, visit });
     } catch (error) { if (note.isConnected) note.textContent = teacherSourceError(error); }
     finally { button.disabled = false; }
@@ -22102,6 +22134,15 @@ function renderStrokePage(root) {
     setStrokeChrome(page, S.strokeChromeAwake);
   }
 
+  // the writing room is its own opaque, focus-trapped layer: its report entry lives inside
+  // it — in the quiet room, with the other waking controls (the ensō opens it); otherwise
+  // at the end of the room, in flow
+  if (maintenanceReports) {
+    const line = reportEntries('report-line-stroke');
+    const field = page.querySelector('#stroke-awake-field');
+    if (S.strokeMinimal && field) field.append(line); else page.append(line);
+  }
+
   page.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -24174,5 +24215,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const root = $('#app');
     root.textContent = '';
     root.append(el('div', 'loading', `読み込めなかった could not load: ${err.message}`));
+    // a learner whose app will not start is exactly who needs to say so
+    if (maintenanceReports) root.append(reportEntries('report-line-page'));
   });
 });
