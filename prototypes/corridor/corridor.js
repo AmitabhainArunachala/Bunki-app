@@ -17319,7 +17319,7 @@ function renderReview(main) {
         : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
     const b = el('button', `grade hanko g-${key}`);
     b.type = 'button';
-    b.disabled = !!rv.pending;
+    b.disabled = !!rv.pending || !recordWritable();
     b.append(el('span', 'g-seal', sealChar));
     b.append(el('span', 'g-label', tx(ja, key)));
     b.append(el('span', 'g-when', when));
@@ -17358,6 +17358,19 @@ function renderReview(main) {
         });
     });
     row.append(b);
+  }
+  // A window that cannot write the record must not offer seals that silently do nothing:
+  // the seals are shut and the reason stands above them, with a draft-safe reload (D3)
+  if (!recordWritable()) {
+    const state = recordRoomState();
+    const why = el('div', 'room-state review-unwritable');
+    why.dataset.roomState = state.kind; why.setAttribute('role', 'status');
+    why.append(el('p', '', tx('この窓では評価を保存できません。', 'Grades can’t be saved in this window.')));
+    if (state.message) why.append(el('p', 'room-state-why', state.message));
+    const reload = el('button', 'chip', tx('この窓を再読み込み', 'Reload this window')); reload.type = 'button';
+    reload.addEventListener('click', () => { if (preserveVisibleDrafts()) location.reload(); });
+    why.append(reload);
+    main.append(why);
   }
   main.append(row);
   // rest · undo · the full entry live behind the … mark — the zen glass
