@@ -2,8 +2,8 @@ import { build } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { copyFile, mkdir, readFile, readdir, realpath, stat, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, resolve, sep } from 'node:path';
+import { copyFile, lstat, mkdir, readFile, readdir, realpath, stat, writeFile } from 'node:fs/promises';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { constants } from 'node:fs';
@@ -442,11 +442,19 @@ export function assertSeparateAudio(packets) {
 
 /** Useful for early textual findings; its receipts never authorize the later full form. */
 export async function materializeWrittenReview(input) {
+  return materializeWrittenCandidate(input, false);
+}
+
+// Preserve the historical N2 defaults; new written specs carry their own prepared rights.
+async function materializeWrittenCandidate(input, preservePreparedRights) {
   const api = await assessmentAPI();
   if (!/^[a-z0-9][a-z0-9-]{0,119}$/u.test(input.id)) throw new Error('Unsafe form ID');
   const candidate = input.formPayload;
   const passages = candidate.passages.map((passage) =>
-    api.createPassageVersion({ ...plain(passage), rights: originalRights }),
+    api.createPassageVersion({
+      ...plain(passage),
+      rights: preservePreparedRights ? passage.rights : originalRights,
+    }),
   );
   const items = candidate.items
     .filter((item) => item.skill !== 'listening')
@@ -456,7 +464,7 @@ export async function materializeWrittenReview(input) {
       delete raw.passageIds;
       return api.createItemVersion({
         ...raw,
-        rights: originalRights,
+        rights: preservePreparedRights ? item.rights : originalRights,
         passages: passageIds.map((id) =>
           api.artifactReference(passages.find((value) => value.id === id)),
         ),
@@ -468,7 +476,7 @@ export async function materializeWrittenReview(input) {
     id: `${candidate.id}:written-review`,
     title: `${input.titleEn} — written editorial review`,
     scope: 'section-practice',
-    rights: originalRights,
+    rights: preservePreparedRights ? candidate.rights : originalRights,
     items,
     passages,
     media: [],
@@ -501,7 +509,7 @@ export async function materializeWrittenSection(prepared, manuscript) {
     throw new Error('Written section authoring input is inconsistent');
   if (!Buffer.isBuffer(manuscript.bytes) || notes.manuscriptSha256 !== hash(manuscript.bytes))
     throw new Error('Manuscript bytes differ from the prepared authoring input');
-  const form = await materializeWrittenReview(intent);
+  const form = await materializeWrittenCandidate(intent, true);
   const basis = intent.formPayload.rights.display.basisRef;
   for (const artifact of [form, ...form.items, ...form.passages])
     if (Object.values(artifact.rights).some((grant) => grant.basisRef !== basis))
@@ -795,14 +803,53 @@ function assertOriginalWrittenRights(form, registry, pin) {
   }
 }
 
-/**
- * Binds publication to a pin table. Production uses only publishReviewedWrittenPractice, bound to
- * the frozen REVIEWED_WRITTEN; a different table is for isolated fixture directories only.
- */
+/** Resolve an explicit fixture target without creating it or following unresolved symlinks. */
+async function writtenFixtureDirectory(directory) {
+  if (typeof directory !== 'string' || !isAbsolute(directory))
+    throw new Error('Custom written pins require an explicit absolute fixture directory');
+  const requested = resolve(directory);
+  let ancestor = requested;
+  let destination;
+  while (true) {
+    try {
+      destination = resolve(await realpath(ancestor), relative(ancestor, requested));
+      break;
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      try {
+        await lstat(ancestor);
+      } catch (missing) {
+        if (missing.code !== 'ENOENT') throw missing;
+        ancestor = dirname(ancestor);
+        continue;
+      }
+      throw new Error('Custom written pins cannot use an unresolved fixture symlink');
+    }
+  }
+  const within = (root, path) => {
+    const difference = relative(root, path);
+    return (
+      difference === '' ||
+      (difference !== '..' && !difference.startsWith(`..${sep}`) && !isAbsolute(difference))
+    );
+  };
+  for (const root of [await realpath(REPOSITORY), await realpath(PUBLIC_BANK)])
+    if (within(root, destination) || within(destination, root))
+      throw new Error(
+        'Custom written pins require a fixture directory outside the checkout and public bank',
+      );
+  return destination;
+}
+
+/** Production uses the frozen table; custom pins require an explicit external fixture target. */
 export function writtenSectionPublisher(pins) {
   assertWrittenPinTable(pins);
   /** Trusted host callback must re-verify saved runtime evidence; bank JSON is not authority. */
   return async function publishWrittenSection(options) {
+    if (pins !== REVIEWED_WRITTEN) {
+      const publicDirectory = await writtenFixtureDirectory(options.publicDirectory);
+      options = { ...options, publicDirectory };
+    }
     // Omitting level keeps the pre-level N2 contract; any other value must name a filled pin.
     const pin = admittedWrittenPin(options.level === undefined ? 'N2' : options.level, pins);
     return publishPinnedWrittenSection(pin, options);
@@ -949,6 +996,11 @@ export const publishReviewedWrittenPractice = writtenSectionPublisher(REVIEWED_W
 
 /** reviewForm is trusted host code. Imported bank JSON never supplies this capability. */
 export async function buildAssessmentBank(options = {}) {
+  const writtenPins = options.writtenPins ?? REVIEWED_WRITTEN;
+  const publicDirectory =
+    writtenPins === REVIEWED_WRITTEN
+      ? options.publicDirectory ?? PUBLIC_BANK
+      : await writtenFixtureDirectory(options.publicDirectory);
   const directories =
     options.directories ??
     (await readdir(AUTHORING))
@@ -957,7 +1009,6 @@ export async function buildAssessmentBank(options = {}) {
   const evidence =
     options.evidenceDirectory ??
     join(homedir(), '.dharma/bunki_assessment/2026-09-23/bank-candidates');
-  const publicDirectory = options.publicDirectory ?? PUBLIC_BANK;
   let previous = { entries: [], archivedEntries: [] };
   try {
     previous = await readJSON(join(publicDirectory, 'catalog.json'));
@@ -1121,10 +1172,8 @@ export async function buildAssessmentBank(options = {}) {
     });
   }
   // A later native-mock build must not withdraw any separately admitted written section.
-  // writtenPins is a fixture seam; production rebuilds use the frozen REVIEWED_WRITTEN.
-  entries.push(
-    ...retainedWrittenEntries(previous.entries, options.writtenPins ?? REVIEWED_WRITTEN),
-  );
+  // Custom writtenPins were confined to an explicit external fixture target before any work.
+  entries.push(...retainedWrittenEntries(previous.entries, writtenPins));
   const archives = new Map();
   for (const entry of [...(previous.archivedEntries ?? []), ...(previous.entries ?? [])]) {
     if (

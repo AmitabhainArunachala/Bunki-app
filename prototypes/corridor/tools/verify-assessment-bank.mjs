@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises';
+import { lstat, mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import {
   AUTHORING,
   PUBLIC_BANK,
+  REPOSITORY,
   REVIEWED_N2_WRITTEN,
   REVIEWED_WRITTEN,
   admittedWrittenSections,
@@ -521,6 +522,52 @@ await check('N1 authoring maps exactly, binds its manuscript and keeps doubts ou
   );
 });
 
+await check('Written specs retain a distinct original-rights basis through mapping and publication', async () => {
+  const rightsBasis = 'fixture-n1-original-authoring-rights';
+  const prepared = prepareWrittenOriginal(n1Spec({ rightsBasis }));
+  const section = await materializeWrittenSection(prepared, n1Manuscript);
+  for (const artifact of [section.form, ...section.form.items, ...section.form.passages])
+    assert.deepEqual(artifact.rights, prepared.intent.formPayload.rights);
+  const bytes = section.files['form.json'];
+  const publish = writtenSectionPublisher(n1Pins(fixturePin(section.form, bytes, { rightsBasis })));
+  const site = await writtenFixtureSite({ sources: [{ ...n1Source, rightsBasis }] });
+  const options = {
+    level: 'N1',
+    formBytes: bytes,
+    publicDirectory: site,
+    reviewForm: async () => reviewFor(section.form),
+  };
+  const result = await publish({ ...options, publish: true });
+  assert.equal(result.published, true);
+  assert.deepEqual(await readFile(join(site, result.entry.formPath)), bytes);
+  const wrongRegistry = await writtenFixtureSite();
+  await assert.rejects(
+    publish({ ...options, publicDirectory: wrongRegistry }),
+    /source rights are not established/u,
+  );
+  const mismatched = prepareWrittenOriginal(n1Spec({ rightsBasis }));
+  const item = mismatched.intent.formPayload.items[0];
+  item.rights = {
+    ...item.rights,
+    display: { ...item.rights.display, basisRef: 'fixture-unmatched-basis' },
+  };
+  await assert.rejects(
+    materializeWrittenSection(mismatched, n1Manuscript),
+    /rights basis differs from its authoring spec/u,
+  );
+  // A valid denial must be refused during mapping, never replaced with N2's allowed grants.
+  const denied = prepareWrittenOriginal(n1Spec({ rightsBasis }));
+  const deniedItem = denied.intent.formPayload.items[0];
+  deniedItem.rights = {
+    ...deniedItem.rights,
+    display: { status: 'denied', reason: 'Fixture grant withheld' },
+  };
+  await assert.rejects(
+    materializeWrittenSection(denied, n1Manuscript),
+    /rights basis differs from its authoring spec/u,
+  );
+});
+
 await check('N1 authoring policy refuses excluded, undeclared and relabelled tasks', () => {
   const withItem = (index, patch) =>
     n1Spec({ items: n1Items.map((item, at) => (at === index ? { ...item, ...patch } : item)) });
@@ -581,6 +628,78 @@ await check('Unfilled N1 pin and unknown levels fail before any publication step
     admittedWrittenSections(shippedCatalog).map(({ pin }) => pin.level),
     ['N2'],
   );
+});
+
+await check('Custom written pins reject omitted, public and aliased targets before any work', async () => {
+  const probe = join(evidence, 'fixture-destination-guards');
+  await mkdir(probe);
+  const alias = join(probe, 'public-bank-link');
+  await symlink(PUBLIC_BANK, alias, 'dir');
+  const dangling = join(probe, 'unresolved-link');
+  await symlink(join(probe, 'missing-target'), dangling, 'dir');
+  const missingName = `${basename(evidence)}-must-not-exist`;
+  const uncreated = join(PUBLIC_BANK, missingName);
+  await assert.rejects(lstat(uncreated), { code: 'ENOENT' });
+  const before = (await readdir(probe)).sort();
+  const pins = n1Pins();
+  const publish = writtenSectionPublisher(pins);
+  for (const publicDirectory of [
+    undefined,
+    null,
+    '',
+    './fixture',
+    PUBLIC_BANK,
+    `${PUBLIC_BANK}/.`,
+    REPOSITORY,
+    dirname(REPOSITORY),
+    alias,
+    join(alias, missingName, 'nested'),
+    dangling,
+    join(dangling, 'nested'),
+  ]) {
+    let proceeded = false;
+    const stop = () => {
+      proceeded = true;
+      throw new Error('Destination guard was bypassed; stopped before any artifact write');
+    };
+    // These getters make a guard regression safe even when the named target is production.
+    // The publisher cannot obtain bytes and the builder cannot enumerate inputs if it proceeds.
+    await assert.rejects(
+      publish({
+        level: 'N1',
+        publicDirectory,
+        publish: true,
+        get formBytes() {
+          return stop();
+        },
+      }),
+      /Custom written pins/u,
+    );
+    await assert.rejects(
+      buildAssessmentBank({
+        publicDirectory,
+        writtenPins: pins,
+        get directories() {
+          return stop();
+        },
+      }),
+      /Custom written pins/u,
+    );
+    assert.equal(proceeded, false, 'Destination refusal must precede artifact work');
+  }
+  assert.deepEqual((await readdir(probe)).sort(), before);
+  await assert.rejects(lstat(uncreated), { code: 'ENOENT' });
+  // A nonexistent external target resolves through its existing parent and is still usable.
+  const fresh = join(probe, 'new-fixture', 'bank');
+  const catalog = await buildAssessmentBank({
+    directories: [],
+    assets: new Map(),
+    publicDirectory: fresh,
+    evidenceDirectory: join(probe, 'unused-evidence'),
+    writtenPins: pins,
+  });
+  assert.deepEqual(catalog.entries, []);
+  assert.deepEqual((await readdir(fresh)).sort(), ['catalog.json']);
 });
 
 await check('N1-only and both-level publication and rebuild keep each section once', async () => {
