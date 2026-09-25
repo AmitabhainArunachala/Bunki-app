@@ -7505,3 +7505,6 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .room-state p { margin: .5rem 0; line-height: 1.6; }
 .room-state .room-state-why { opacity: .78; font-size: .92em; }
 .room-state .chip { margin: .75rem .5rem 0 0; }
+/* One carrier for the reason: while a room says why it cannot write, the fixed
+ * store banner (same text, same reload) would only cover the room's title. */
+body:has(#app main .room-state[data-room-state='blocked']) #store-alert { display: none; }

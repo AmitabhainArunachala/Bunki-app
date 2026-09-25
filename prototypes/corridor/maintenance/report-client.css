@@ -80,3 +80,14 @@
   #bunki-reports-root .br-sheet[open] { animation: br-sheet-enter 180ms cubic-bezier(.16, 1, .3, 1); }
   @keyframes br-sheet-enter { from { transform: translateY(14px); } to { transform: translateY(0); } }
 }
+
+/* Never over a learner's control (2026-09-25). The rail floated over the pinned
+ * bottom action zone (review Undo, まだ / not yet) and took their taps. Content
+ * now scrolls clear of it; in the focused review/practice mode, whose bottom
+ * edge IS the thumb zone, the rail moves up under the chrome. */
+body:has(#bunki-reports-root .br-rail) main { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+/* In the focused stage the page already reserves a 60-px band at the top, where
+ * the exit and more marks float; the rail takes the middle of that band, one
+ * door only, so it never sits in the thumb zone or on the question. */
+body.zen #bunki-reports-root .br-rail { bottom: auto; top: calc(8px + env(safe-area-inset-top, 0px)); right: auto; left: 50%; transform: translateX(-50%); max-width: calc(100vw - 2 * (var(--tap, 44px) + 20px)); }
+body.zen #bunki-reports-root .br-rail [data-br="reports"] { display: none; }

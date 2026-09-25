@@ -579,7 +579,7 @@ export function createAssessmentView(host) {
     else {
       card.append(node('p', '', tx('この窓では練習を始められません。', 'You can’t practise in this window right now.')));
       if (state.message) card.append(node('p', 'room-state-why', state.message));
-      card.append(button(tx('この窓を再読み込み', 'Reload this window'), null, () => location.reload()));
+      card.append(button(tx('この窓を再読み込み', 'Reload this window'), 'room-state-reload', () => host.reload ? host.reload() : location.reload()));
     }
     main.append(card);
   }

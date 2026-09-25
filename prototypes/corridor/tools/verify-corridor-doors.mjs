@@ -116,6 +116,28 @@ try {
     const state = await enterJlptFromDojo(second);
     check('T1 second window: JLPT from the dojo door is never an empty main', state.kids > 0, JSON.stringify(state));
     check('T1 second window: the room says it is blocked, not booting', state.state === 'blocked', `state=${state.state}`);
+    const overlap = await second.evaluate(() => {
+      const alert = document.getElementById('store-alert');
+      const title = document.querySelector('#app main .room-state .view-title');
+      if (!title) return { title: false };
+      const shown = !!alert && !alert.hidden && getComputedStyle(alert).display !== 'none';
+      if (!shown) return { shown, intersects: false };
+      const a = alert.getBoundingClientRect(), t = title.getBoundingClientRect();
+      return { shown, intersects: a.left < t.right && t.left < a.right && a.top < t.bottom && t.top < a.bottom };
+    });
+    check('T1 second window: nothing covers the room title (one carrier for the reason)', overlap.title !== false && !overlap.intersects, JSON.stringify(overlap));
+    for (const width of [390]) {
+      await second.setViewportSize({ width, height: 844 });
+      const narrow = await second.evaluate(() => {
+        const alert = document.getElementById('store-alert');
+        const title = document.querySelector('#app main .room-state .view-title');
+        const shown = !!alert && !alert.hidden && getComputedStyle(alert).display !== 'none';
+        if (!shown || !title) return { shown, intersects: false };
+        const a = alert.getBoundingClientRect(), t = title.getBoundingClientRect();
+        return { shown, intersects: a.left < t.right && t.left < a.right && a.top < t.bottom && t.top < a.bottom };
+      });
+      check(`T1 second window at ${width}px: nothing covers the room title`, !narrow.intersects, JSON.stringify(narrow));
+    }
     await second.screenshot({ path: resolve(EVIDENCE, 't1-second-window.png') });
     await context.close();
   }

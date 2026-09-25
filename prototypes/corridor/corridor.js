@@ -10058,6 +10058,8 @@ async function performAssessmentSuppression(command) {
 function createAssessmentRoom() {
   return assessmentViewModule.createAssessmentView({ english: bi, render: () => { if (S.view === 'mock') render(); },
     owned: recordWritable, recordState: recordRoomState,
+    // the room's own reload keeps unsent drafts exactly as the banner's does
+    reload: () => { if (preserveVisibleDrafts()) location.reload(); },
     pending: () => assessmentV2Pending, notice: () => assessmentV2Notice,
     library: () => S.assessmentLibraryV2 && { ...S.assessmentLibraryV2,
       attempts: S.assessmentLibraryV2.attempts.filter(attempt => attempt.status === 'in-progress' || assessmentAttemptVisible(attempt.attemptId)) },
