@@ -4008,20 +4008,7 @@ async function boot() {
     srsCustom = fittedProblem
       ? null
       : { source: fitted.source ?? null, basedOnReviews: fitted.basedOnReviews ?? null };
-    srsParams = fsrsApi.generatorParameters({
-      w: srsCustom ? fitted.w.slice() : pin.w,
-      request_retention: pin.requestRetention,
-      maximum_interval: pin.maximumInterval,
-      // One scheduler policy in both engines (ADR-003): fuzz is OFF, exactly
-      // as the domain pin says. Any randomness inside the scheduler would
-      // let two replays of one log disagree, which is what every evidence
-      // claim rests on. If interval spreading is ever wanted, it belongs in
-      // session planning, where it changes presentation, not memory state.
-      enable_fuzz: pin.enableFuzz,
-      enable_short_term: pin.enableShortTerm,
-      learning_steps: pin.learningSteps,
-      relearning_steps: pin.relearningSteps,
-    });
+    srsParams = fsrsApi.generatorParameters(pinnedSchedulerInput(pin, srsCustom ? fitted.w.slice() : null));
     scheduler = fsrsApi.fsrs(srsParams);
   } catch (err) {
     console.warn('FSRS unavailable', err);
@@ -16882,6 +16869,24 @@ function srsCardOf(item, now) {
   const c = { ...rec, due: new Date(rec.due) };
   if (rec.last_review) c.last_review = new Date(rec.last_review);
   return c;
+}
+/** The scheduler policy the pin declares, with the learner's fitted weights when they passed the
+ * gate. Kept as its own function so the reference verifier runs this exact construction. */
+function pinnedSchedulerInput(pin, fittedW = null) {
+  return {
+    w: fittedW || pin.w,
+    request_retention: pin.requestRetention,
+    maximum_interval: pin.maximumInterval,
+    // One scheduler policy in both engines (ADR-003): fuzz is OFF, exactly
+    // as the domain pin says. Any randomness inside the scheduler would
+    // let two replays of one log disagree, which is what every evidence
+    // claim rests on. If interval spreading is ever wanted, it belongs in
+    // session planning, where it changes presentation, not memory state.
+    enable_fuzz: pin.enableFuzz,
+    enable_short_term: pin.enableShortTerm,
+    learning_steps: pin.learningSteps,
+    relearning_steps: pin.relearningSteps,
+  };
 }
 function srsStoredRecord(card) {
   return {
