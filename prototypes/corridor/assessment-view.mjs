@@ -158,9 +158,15 @@ export function createAssessmentView(host) {
   // A level with no checked test is not a dead end: its older sets are named here, each
   // marked 検収前 (answers not yet checked). No date is promised; nothing is called reviewed.
   function renderOlderSets(main) {
-    const sets = host.olderSets?.(level);
-    const block = node('section', 'exam-older'); block.dataset.examOlder = level;
-    if (sets === null || sets === undefined) { block.append(node('p', 'exam-status', tx('以前の練習セットを読み込み中…', 'Loading the older practice sets…'))); main.append(block); return; }
+    const older = host.olderSets?.(level) || { state: 'failed', sets: [] };
+    const sets = older.sets;
+    const block = node('section', 'exam-older'); block.dataset.examOlder = level; block.dataset.olderState = older.state;
+    if (older.state === 'loading') { block.append(node('p', 'exam-status', tx('以前の練習セットを読み込み中…', 'Loading the older practice sets…'))); main.append(block); return; }
+    if (older.state === 'failed') {
+      block.append(node('p', 'exam-status', tx(`${level}の確認済みテストは、まだありません。以前の練習セットを読み込めませんでした。`, `No checked ${level} tests yet, and the older practice sets couldn’t load.`)));
+      block.append(button(tx('もう一度読み込む', 'Try loading again'), 'exam-older-retry', () => host.retryOlderIndex?.()));
+      main.append(block); return;
+    }
     block.append(node('p', '', sets.length
       ? tx(`${level}の確認済みテストは、まだありません。以前の${level}練習セットが${sets.length}つあり、今すぐ使えます。答えは未確認です。`,
         `No checked ${level} tests yet. ${sets.length} older ${level} sets are ready now. Their answers haven't been checked.`)
@@ -171,7 +177,12 @@ export function createAssessmentView(host) {
       door.dataset.legacySet = set.setId;
       door.append(node('span', 'exam-older-meta', tx(`${set.items}問`, `${set.items} questions`)));
       if (!set.approved) door.append(node('span', 'mock-pending', '検収前'));
+      door.disabled = !!host.olderSetLoading?.(set.setId);
       block.append(door);
+      if (host.olderSetFailed?.(set.setId)) {
+        const failure = node('p', 'exam-status exam-older-failed', tx('このセットを読み込めませんでした。もう一度押すと再試行します。', 'This set couldn’t load. Press it again to retry.'));
+        failure.dataset.olderFailed = set.setId; block.append(failure);
+      }
     }
     main.append(block);
   }

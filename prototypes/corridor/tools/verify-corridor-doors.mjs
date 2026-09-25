@@ -213,6 +213,70 @@ try {
     await context.close();
   }
 
+  // T11 — every older N1 door opens its OWN set (a door wired to n1-01 for all five must fail)
+  {
+    const dataContext = await browser.newContext();
+    const expected = (await (await dataContext.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
+    await dataContext.close();
+    for (const set of expected) {
+      const context = await browser.newContext({ viewport: { width: 1728, height: 996 } });
+      await context.addInitScript(() => { try { localStorage.setItem('kairo-exam-level-v1', 'N1'); } catch { /* preference only */ } });
+      const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
+      await enterJlptFromDojo(page); await catalogComplete(page);
+      await page.locator(`[data-exam-older="N1"] [data-legacy-set="${set.setId}"]`).click();
+      const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
+      const running = await page.evaluate(() => ({ set: document.querySelector('#app main')?.dataset.mockSet || null,
+        progress: (document.querySelector('#app main')?.innerText.match(/(\d+)\s*\/\s*(\d+)\s*問/u) || []).slice(1) }));
+      check(`T11 ${set.setId}: its door starts that set, with its ${set.items} questions`,
+        started && running.set === set.setId && Number(running.progress[1]) === set.items, JSON.stringify(running));
+      await context.close();
+    }
+  }
+
+  // T12/T13 — failure is visible, with retry: the older-set index, then one set
+  {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(() => { try { localStorage.setItem('kairo-exam-level-v1', 'N1'); } catch { /* preference only */ } });
+    let failIndex = true, failSet = true;
+    await context.route('**/data/mock/index.json', (route) => failIndex ? route.fulfill({ status: 503, body: 'down' }) : route.continue());
+    await context.route('**/data/mock/n1-02.json', (route) => failSet ? route.abort() : route.continue());
+    const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
+    await enterJlptFromDojo(page); await catalogComplete(page);
+    const failedState = await page.waitForSelector('[data-exam-older="N1"][data-older-state="failed"]', { timeout: 10_000 }).then(() => true, () => false);
+    check('T12 a failed older-set index says so and offers a retry', failedState && (await page.locator('#exam-older-retry').count()) === 1);
+    failIndex = false;
+    await page.locator('#exam-older-retry').click();
+    const recovered = await page.waitForSelector('[data-exam-older="N1"][data-older-state="ready"] [data-legacy-set]', { timeout: 10_000 }).then(() => true, () => false);
+    check('T12 retry loads the older sets', recovered);
+    await page.locator('[data-legacy-set="n1-02"]').click();
+    const setFailed = await page.waitForSelector('[data-older-failed="n1-02"]', { timeout: 10_000 }).then(() => true, () => false);
+    check('T13 a set that fails to load says so beside its door', setFailed);
+    failSet = false;
+    await page.locator('[data-legacy-set="n1-02"]').click();
+    const retried = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
+    check('T13 pressing the door again retries and starts the set', retried &&
+      await page.evaluate(() => document.querySelector('#app main')?.dataset.mockSet === 'n1-02'));
+    await context.close();
+  }
+
+  // T14 — a set that finishes downloading after the learner has left must not start a run
+  {
+    const context = await browser.newContext({ viewport: { width: 1728, height: 996 } });
+    await context.addInitScript(() => { try { localStorage.setItem('kairo-exam-level-v1', 'N1'); } catch { /* preference only */ } });
+    let release; const held = new Promise((done) => { release = done; });
+    await context.route('**/data/mock/n1-03.json', async (route) => { await held; await route.continue(); });
+    const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
+    await enterJlptFromDojo(page); await catalogComplete(page);
+    await page.locator('[data-legacy-set="n1-03"]').click();
+    await page.locator('#chrome-dojo').click();   // leave the room while n1-03 is still downloading
+    await page.waitForSelector('button[data-study-door="mock"]');
+    release();
+    const leaked = await page.waitForSelector('#mock-next', { timeout: 3_000 }).then(() => true, () => false);
+    const still = await page.evaluate(() => !!document.querySelector('button[data-study-door="mock"]'));
+    check('T14 a late download after leaving starts nothing and does not pull the learner back', !leaked && still, JSON.stringify({ leaked, still }));
+    await context.close();
+  }
+
   // T9 — the completion check itself discriminates: with the catalog stalled forever,
   // the room must NOT count as complete (a loading room once passed as 'drawn').
   {

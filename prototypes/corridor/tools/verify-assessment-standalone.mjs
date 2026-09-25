@@ -67,7 +67,7 @@ for (const [path, value] of Object.entries({ 'catalog.json': { schema: 'kairo-as
   fixture[`data/assessment/${path}`] = { mimeType: 'application/json', base64: Buffer.from(JSON.stringify(value)).toString('base64') };
 fixture['data/assessment/audio/fixture.wav'] = { mimeType: 'audio/wav', base64: wav.toString('base64') };
 const exposed = ['S', 'recordApp', 'recordWritable', 'loadAssessmentCatalog', 'startAssessmentRoom', 'applyAssessmentV2',
-  'currentAssessmentV2', 'assessmentMediaBytes', 'render'];
+  'currentAssessmentV2', 'assessmentMediaBytes', 'render', 'assessmentV2Notice'];
 const instrument = html => {
   const cut = html.lastIndexOf('</script>');
   return html.slice(0, cut) + '\n' + exposed.map(name => `Object.defineProperty(window,${JSON.stringify(name)},{get:()=>${name}});`).join('\n') + html.slice(cut);
@@ -80,7 +80,7 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
   const profile = mkdtempSync(resolve(evidence, `${engine}-${variant}-`));
   const browser = await ({ chromium, webkit }[engine]).launchPersistentContext(profile, { headless: true });
   const page = browser.pages()[0], errors = [], requests = [];
-  let publicWritten = null;
+  let publicWritten = null, stage = 'boot';
   page.on('pageerror', error => errors.push(error.message));
   await browser.route('**/*', route => {
     if (route.request().isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: variant === 'public' ? instrument(original) : synthetic });
@@ -105,7 +105,9 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
         entries: catalog.entries.length, fileCache: await (await cache.match('file:///public-test.json')).text() };
     });
     assert(runtime.methods); assert.equal(runtime.fileCache, 'fixture');
+    stage = 'runtime-ready';
     if (variant === 'public') {
+      stage = 'start';
       publicWritten = await page.evaluate(async entryId => {
         const catalog = await loadAssessmentCatalog(), entry = catalog.entries.find(row => row.id === entryId);
         const probe = () => ({ ready: S.ready ?? null, bodyReady: document.body.dataset.ready || null,
@@ -122,7 +124,8 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
           selectedPresent: !!selected, before, after: probe() };
         S.view = 'mock'; render();
         const item = selected.form.items[0];
-        return { started, formSha256: selected.form.sha256, questionCount: selected.form.items.length,
+        return { started, stage: 'started', entryFound: !!entry, rawStart, selectedPresent: true, before, after: probe(),
+          formSha256: selected.form.sha256, questionCount: selected.form.items.length,
           attemptId: selected.attempt.attemptId, itemId: item.id, responseKind: item.response.kind,
           optionId: item.response.options?.at(-1)?.id, editorial: selected.attempt.editorialAtStart.status };
       }, publicWrittenEntry.id);
@@ -136,7 +139,9 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
         const state = await recordApp.snapshot();
         return state.snapshot.record.assessmentLibraryV2;
       });
-      await page.reload(); await page.waitForFunction(() => recordWritable() && !!currentAssessmentV2());
+      stage = 'reload-resume';
+      await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1' && recordWritable()
+        && recordApp?.current?.().status === 'active' && !!currentAssessmentV2());
       const resumed = await page.evaluate(({ itemId }) => {
         const selected = currentAssessmentV2();
         return { attemptId: selected.attempt.attemptId, formSha256: selected.form.sha256,
@@ -164,7 +169,9 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
           terminal: currentAssessmentV2()?.attempt.status, writable: recordWritable() };
       });
       assert.deepEqual(finished, { saved: true, audioBytes: wav.length, cards: 1, terminal: 'submitted', writable: true });
-      await page.reload(); await page.waitForFunction(() => recordWritable() && currentAssessmentV2()?.attempt.status === 'submitted');
+      stage = 'reload-submitted';
+      await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1' && recordWritable()
+        && recordApp?.current?.().status === 'active' && currentAssessmentV2()?.attempt.status === 'submitted');
     }
     assert.deepEqual(errors, []);
     assert.deepEqual(requests.filter(url => /assessment|\.mjs(?:$|\?)/u.test(url)), []);
@@ -174,7 +181,8 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
     const state = await page.evaluate(() => ({ text: document.body.innerText.slice(0, 1500),
       storeError: typeof S === 'undefined' ? null : S.storeError,
       recordState: typeof recordApp === 'undefined' ? null : recordApp?.current()?.status })).catch(() => null);
-    failures.push({ engine, variant, error: String(error), errors, requests, state }); console.error(`FAIL ${engine}/${variant}: ${error}`);
+    failures.push({ engine, variant, stage, error: String(error), stack: String(error?.stack || '').slice(0, 2000), publicWritten, errors, requests, state });
+    console.error(`FAIL ${engine}/${variant} at ${stage}: ${error}`);
     await page.screenshot({ path: resolve(evidence, `${engine}-${variant}-failure.png`), fullPage: true }).catch(() => {});
   } finally { await browser.close(); }
 }
