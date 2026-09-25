@@ -4922,22 +4922,28 @@ function renderShelfBody() {
     let seed = 0;
     for (const ch of day) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
     // Today's six are the shelf's best foot (operator, 2026-09-24: "the articles still suck"):
-    // only readings a human approved and nothing awaiting verification; no news older than
+    // only readings with review 'approved' — decided under the delegated feed-approval rubric
+    // (rubric-v1, TENOHIRA Decision 4), not human editorial review — and nothing awaiting
+    // verification; no news older than
     // three years (it stays on the full shelf below, it just isn't "today"); and at most three
     // from one difficulty band, so a day is never six of the same level.
     const year = Number(day.slice(0, 4));
     const stale = (p) => /wikinews/u.test(p.source || '') && Number(String(p.date || '').slice(0, 4)) < year - 3;
     const pool = curated.filter((p) => p.source !== 'isa-yasashii-glossary' && p.review === 'approved' && !p.pendingVerification && !stale(p));
     const band = (p) => p.grading?.signals?.jreadability?.band || 'unbanded';
-    const picks = [];
-    const taken = new Set();
-    const perBand = new Map();
-    let x = seed || 1, guard = 0;
-    while (picks.length < Math.min(6, pool.length) && guard++ < pool.length * 20) {
+    // a seeded permutation of the whole pool, then the band cap: every candidate is considered
+    // once, so the only way to show fewer than six is a pool that truly cannot supply them
+    const order = pool.map((_, i) => i);
+    let x = seed || 1;
+    for (let i = order.length - 1; i > 0; i -= 1) {
       x = (x * 1103515245 + 12345) >>> 0;
-      const ix = x % pool.length;
-      if (taken.has(ix)) continue;
-      taken.add(ix);
+      const j = x % (i + 1);
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    const picks = [];
+    const perBand = new Map();
+    for (const ix of order) {
+      if (picks.length >= 6) break;
       const b = band(pool[ix]);
       if ((perBand.get(b) || 0) >= 3) continue;
       perBand.set(b, (perBand.get(b) || 0) + 1);

@@ -88,7 +88,7 @@ if (!a || a.ids.length !== 6) failures.push(`today's six: ${a ? a.ids.length : '
 if (!b || b.ids.length !== 6) failures.push(`today's six: ${b ? b.ids.length : 'strip missing'} on 2026-09-19`);
 if (a && b && a.ids.join() === b.ids.join()) failures.push("today's six did not change between two days");
 if (a && a.day !== '2026-09-18') failures.push(`strip day ${a.day} ≠ 2026-09-18`);
-// quality, read from the artifact's own index: every pick human-approved, none awaiting
+// quality, read from the artifact's own index: every pick rubric-approved (review 'approved', decided under rubric-v1), none awaiting
 // verification, no news older than three years, at most three from one difficulty band
 {
   const index = await page.evaluate(`fetch('data/articles/index.json').then((r) => r.json())`);
@@ -100,7 +100,7 @@ if (a && a.day !== '2026-09-18') failures.push(`strip day ${a.day} ≠ 2026-09-1
     for (const id of six.ids) {
       const row = byId.get(id);
       if (!row) { failures.push(`today's six ${label}: ${id} is not in the index`); continue; }
-      if (row.review !== 'approved' || row.pendingVerification) failures.push(`today's six ${label}: ${id} is not human-approved (${row.review})`);
+      if (row.review !== 'approved' || row.pendingVerification) failures.push(`today's six ${label}: ${id} is not rubric-approved (${row.review})`);
       if (/wikinews/u.test(row.source) && Number(String(row.date).slice(0, 4)) < year - 3) failures.push(`today's six ${label}: ${id} is stale news (${row.date})`);
       const band = row.grading?.signals?.jreadability?.band || 'unbanded';
       bands.set(band, (bands.get(band) || 0) + 1);
