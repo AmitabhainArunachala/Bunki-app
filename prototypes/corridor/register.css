@@ -189,10 +189,6 @@ html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
    sections, notes) keeps the full measure — in the study every reading card fell into one of
    six columns and shrank to 51 px at 390 (C1, 2026-09-25) */
 #shelf-body > :not(button.grammar-link) { grid-column: 1 / -1; }
-@media (max-width: 520px) {
-  #shelf-body button.grammar-link[data-grade="room"] { grid-column: 1 / -1; }
-  #shelf-body button.grammar-link[data-grade="tool"] { grid-column: span 3; }
-}
 #shelf-body .shelf-snippet.intro { font-size: 15px; color: var(--ink-2); margin: 0 0 14px; }
 #shelf-body button.grammar-link {
   font-family: var(--display);
@@ -245,6 +241,11 @@ html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
 #shelf-body button.grammar-link[data-grade="tool"] span:last-child { display: none; }
 #shelf-body button.grammar-link[data-grade="room"]:nth-of-type(5) { grid-column: 1 / -1; font-size: 24px; }
 #shelf-body button.grammar-link[data-grade="room"]:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(28,47,66,0.06); }
+/* phones: after the base door rules, so they actually win at equal specificity (Codex 06:46Z) */
+@media (max-width: 520px) {
+  #shelf-body button.grammar-link[data-grade="room"] { grid-column: 1 / -1; }
+  #shelf-body button.grammar-link[data-grade="tool"] { grid-column: span 3; }
+}
 
 /* ------------------------------------------------------------ 4 · JLPT ROOM
    A room, not a form: bilingual name, five level seals, three lengths as
@@ -563,37 +564,24 @@ html[data-room="tutor"] .chat-row .chat-field { flex: 1 1 auto; border-radius: 6
 html[data-room="tutor"] main button.chat-send, html[data-room="tutor"] main .take { background: var(--sheet-ai); color: var(--sheet-ground); border: 0; border-radius: 6px; font-family: var(--display); min-width: 64px; }
 html[data-room="tutor"] .teacher-context-label, html[data-room="tutor"] label { color: var(--sheet-faint); }
 
-/* ------------------------------------------------------ 8 · THE REPORT RAIL
-   Codex's report doors stay, as two text doors on a hairline; they recede
-   during an attempt and go dark on lacquer. */
-#bunki-reports-root .br-rail {
-  background: color-mix(in srgb, var(--ground) 94%, transparent);
-  border: 0;
-  border-top: var(--rule);
-  border-left: var(--rule);
-  border-radius: 6px 0 0 0;
-  box-shadow: none;
-}
-#bunki-reports-root .br-rail button, #bunki-reports-root .br-rail a {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--ink-2);
-  border: 0;
-  background: transparent;
-}
-html[data-room="attempt"] #bunki-reports-root .br-rail { opacity: 0.55; }
-html[data-room="attempt"] #bunki-reports-root .br-rail:hover, html[data-room="attempt"] #bunki-reports-root .br-rail:focus-within { opacity: 1; }
-html[data-room="tutor"] #bunki-reports-root .br-rail { background: var(--sheet-ground-2); border-color: var(--sheet-line-soft); }
-html[data-room="tutor"] #bunki-reports-root .br-rail button { color: var(--sheet-ink-2); }
+/* ------------------------------------------------------ 8 · THE REPORT LINE
+   The report entry lives in each page's own flow (no floating rail since 2026-09-25): two
+   quiet text doors on a hairline; fainter during an attempt, ink-on-lacquer in the tutor. */
+#app > .report-line-page, #sheet .report-line-sheet { border-top: var(--rule); padding-top: 12px; }
+.report-line .report-door { font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; }
+html[data-room="attempt"] #app > .report-line-page { opacity: 0.6; }
+html[data-room="attempt"] #app > .report-line-page:hover, html[data-room="attempt"] #app > .report-line-page:focus-within { opacity: 1; }
+html[data-room="tutor"] #app > .report-line-page .report-door { color: var(--sheet-ink-2); }
 
 /* ----------------------------------------------------------------- 9 · MOTION
    Rooms lift in like a sheet set down (120 ms). Reduced motion: appear. */
 @keyframes kairo-lift { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-html[data-room] #app > main > * { animation: kairo-lift 160ms ease-out both; }
-html[data-room="attempt"] #app > main > * { animation-duration: 120ms; }
+/* only on ENTERING a room (stampRegister marks data-room-entering for one beat): a grade, a
+   save or a clock tick re-renders main and must never fade the surface in again */
+html[data-room-entering] #app > main > * { animation: kairo-lift 160ms ease-out both; }
+html[data-room-entering][data-room="attempt"] #app > main > * { animation-duration: 120ms; }
 @media (prefers-reduced-motion: reduce) {
-  html[data-room] #app > main > * { animation: none; }
+  html[data-room-entering] #app > main > * { animation: none; }
   html[data-room="attempt"] .chrome::after { transition: none; }
 }
 
