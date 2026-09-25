@@ -1988,7 +1988,11 @@ function recordReady(epoch = recordEpoch) {
 function recordWritable(epoch = recordEpoch) {
   return recordReady(epoch) && !storeSealed && !S.storeReadOnly;
 }
-/** Why a record room cannot write right now, in the learner's words. */
+/** Why a record room cannot write right now, in the learner's words.
+ * Precedence mirrors recordWritable(): writable exactly when owned() is true;
+ * an import seal is 'busy'; any protection, departure, foreign write or stored
+ * error is 'blocked' (its stored message is the reason); otherwise the lock or
+ * recovery is still pending, which is 'booting'. UI state never grants writes. */
 function recordRoomState(epoch = recordEpoch) {
   if (recordWritable(epoch)) return { kind: 'writable' };
   if (storeSealed) return { kind: 'busy', message: tx('バックアップを読み込んでいます…', 'Restoring your backup…') };
@@ -23685,13 +23689,6 @@ function renderRoomError(main, view, error) {
   card.append(retry, home);
   main.append(card);
 }
-// An async room fault that leaves the page empty gets the same visible state.
-addEventListener('unhandledrejection', (event) => {
-  const main = document.querySelector('#app main');
-  if (main && main.children.length === 0 && document.body.dataset.ready === '1')
-    renderRoomError(main, S.view, event.reason);
-});
-
 function render() {
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.
