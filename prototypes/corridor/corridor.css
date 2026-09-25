@@ -1274,6 +1274,10 @@ button.tok::before {
 .tok.plain {
   cursor: default;
 }
+/* a name or numeral whose reading is already on screen is text, not a control */
+span.tok.named {
+  cursor: default;
+}
 
 .tok.particle {
   cursor: pointer;

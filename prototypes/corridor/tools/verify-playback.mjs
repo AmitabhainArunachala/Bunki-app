@@ -23,6 +23,10 @@
  *   pending grade+undo     → delete `if (serial !== cardAudioSerial) return;`
  *   pending leave          → the same mutant (9101b3b0 already passes this case; it is no control)
  *   playing grade / leave  → delete `if (!readAloud.on) stopRecAudio();` in retireCardAudioOnFaceChange
+ *   late page error        → throw an uncaught error from the page during the final observation:
+ *                            the receipt must carry a '· late page errors' row and exit nonzero
+ *   refused-save speech    → call speechSynthesis.speak in the refused-save branch only: the
+ *                            pre-reload zero-speech assertion must fail
  *   stale card error       → in speakCardReading's failure continuation, write the reason to
  *                            document.getElementById('card-say-note') instead of the asking row:
  *                            the next card then carries the old reason
@@ -215,10 +219,11 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
       assert.deepEqual(record.srs || {}, {}, 'listening never schedules a review');
       assert.deepEqual(record.revlog || [], [], 'listening never grades a review');
     }
-    // invariants of every case, checked last so late failures are counted
-    assert.equal((await counts(f.page)).utterances.length, 0, 'the device voice is never called, in any case');
+    // invariants of every case, from one final observation that the passing row also records
+    const final = await counts(f.page);
+    assert.equal(final.utterances.length, 0, 'the device voice is never called, in any case');
     assert.deepEqual(f.errors, [], 'no uncaught application errors');
-    results.push({ name, pass: true, observed: await counts(f.page).catch((error) => ({ unreadable: error.message })) });
+    results.push({ name, pass: true, observed: final });
     console.log(`  ok  ${name}`);
   } catch (error) {
     const stage = f ? 'body' : 'fixture';
@@ -230,7 +235,13 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
   } finally {
     f?.release();
     // a context that will not close is a named failure, not a silent one
+    const seen = f ? f.errors.length : 0;
     if (f) await f.context.close().catch((error) => results.push({ name: `${name} · cleanup`, pass: false, error: error.message }));
+    // a page error raised during the final observation or the close is still this case's failure
+    const row = results.findLast((entry) => entry.name === name);
+    if (f && (f.errors.length > seen || (row?.pass && f.errors.length))) {
+      results.push({ name: `${name} · late page errors`, pass: false, pageErrors: f.errors.slice() });
+    }
   }
 }
 
@@ -404,6 +415,8 @@ try {
     now = await counts(page);
     assert.doesNotMatch(now.note, /could not be saved|保存できず/u, 'a successful save clears the warning');
     assert.equal(await page.evaluate(() => localStorage.getItem('kairo-rec-voice-v1')), 'zundamon');
+    // the reload replaces the speech spy: this document's history is checked before it goes
+    assert.equal(now.utterances.length, 0, 'neither the refused save nor the reselection reached the device voice');
     await page.reload();
     await page.waitForFunction(() => document.body.dataset.ready === '1');
     if (!(await page.locator('#listen-voice').count())) await openPassage(page);

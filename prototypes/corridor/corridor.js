@@ -1350,7 +1350,7 @@ let storeAlertNode = null;
  * retry when the lock looks free. Only the boot's own ifAvailable request ever acquires; the
  * hint grants nothing and can be stale by the time it is read. */
 const recordHint = { active: false, token: 0, generation: 0, epoch: 0, outstanding: null, timer: null, timerAt: 0, lastStart: 0,
-  visibleSince: 0, suspended: false, advisoryUntil: 0, free: false, channel: null, query: null, failure: '' };
+  visibleSince: 0, suspended: false, advisoryUntil: 0, deadlineTimer: null, free: false, channel: null, query: null, failure: '' };
 
 function positionStoreAlert(node) {
   if (!node || typeof document === 'undefined') return;
@@ -2073,6 +2073,7 @@ function startRecordHint() {
   recordHint.suspended = false;
   openRecordHintChannel();
   newRecordHintGeneration();
+  armRecordHintDeadline();
   wakeRecordHint(0);
 }
 function openRecordHintChannel() {
@@ -2093,6 +2094,16 @@ function closeRecordHintChannel() {
   try { recordHint.channel?.close(); } catch { /* already closed */ }
   recordHint.channel = null;
 }
+/** The visible-time deadline is its own timer: a look that never settles cannot keep the offer or
+ * the advisory channel alive past it. It invalidates the generation but leaves the outstanding guard. */
+function armRecordHintDeadline() {
+  clearTimeout(recordHint.deadlineTimer);
+  const remaining = RECORD_HINT_WINDOW_MS - (hintNow() - recordHint.visibleSince);
+  recordHint.deadlineTimer = setTimeout(() => {
+    recordHint.deadlineTimer = null;
+    if (recordHint.active && !recordHint.suspended) suspendRecordHint();
+  }, Math.max(0, remaining));
+}
 /** A new period of eligibility: nothing from an earlier one may show, and the offer hides until re-checked. */
 function newRecordHintGeneration() {
   recordHint.generation += 1;
@@ -2106,6 +2117,8 @@ function newRecordHintGeneration() {
 function stopRecordHint() {
   recordHint.active = false;
   recordHint.token += 1;
+  clearTimeout(recordHint.deadlineTimer);
+  recordHint.deadlineTimer = null;
   closeRecordHintChannel();
   newRecordHintGeneration();
 }
@@ -2113,6 +2126,8 @@ function stopRecordHint() {
 function suspendRecordHint() {
   if (!recordHint.active) return;
   recordHint.suspended = true;
+  clearTimeout(recordHint.deadlineTimer);
+  recordHint.deadlineTimer = null;
   closeRecordHintChannel();
   newRecordHintGeneration();
 }
@@ -2123,6 +2138,7 @@ function resumeRecordHint({ newVisibleWindow = false } = {}) {
   if (!hintEligible()) { suspendRecordHint(); return; }
   openRecordHintChannel();
   newRecordHintGeneration();
+  armRecordHintDeadline();
   wakeRecordHint(0);
 }
 /** Protection or staleness entered or left (called from the store alert sync). */
@@ -2157,7 +2173,8 @@ async function queryRecordHint() {
   const generation = recordHint.generation;
   recordHint.lastStart = hintNow();
   let snapshot;
-  const outstanding = recordHint.query();
+  // invoked inside a promise, so a synchronous throw from the query becomes a rejection handled below
+  const outstanding = Promise.resolve().then(() => recordHint.query());
   recordHint.outstanding = outstanding;
   try {
     snapshot = await outstanding;
@@ -4750,7 +4767,14 @@ function openPassage(id, anchor = null) {
   // a running 聞く belongs to the passage it was started in: the glossary
   // cross-ref door and the word sheet's この記事を読む door switch passages
   // WITHOUT leaving the reader view, so the view-change guard never fires
-  if (S.passageId !== id) stopReadAloud();
+  if (S.passageId !== id) {
+    stopReadAloud();
+    // reveal/gloss marks are keyed by token index: they belong to one passage and must not carry
+    // over to the same index in another (Codex D11-NAME-DOOR-REVIEW); a re-render of the same
+    // passage keeps them
+    S.revealed = new Set();
+    S.glossed = new Set();
+  }
   S.passageId = id;
   S.view = 'reader';
   // an article you have visited opens where you left it, like a bookmark
@@ -7147,11 +7171,28 @@ function tokenAccessibleLabel(token, index) {
   return parts.filter(Boolean).join(' · ');
 }
 
-/** 名 — a name has no dictionary entry here, but it has a reading: its door shows or hides it. */
+/** 読 — a non-content word written in kanji (a name, a numeral) has no entry here but has a
+ * reading: its door shows or hides that reading, and nothing else. */
 function namedAccessibleLabel(token, index) {
   const shown = S.revealed?.has(index);
-  return [token.s, tx('名前', 'name'), shown ? token.r : '', tx('押すと読みを表示・非表示', 'activate to show or hide its reading')]
+  return [token.s, shown ? token.r : '', tx('押すと読みを表示・非表示', 'activate to show or hide the reading')]
     .filter(Boolean).join(' · ');
+}
+/** Reading only: never a gloss, whatever the shared per-index state holds. */
+function paintNamedTok(span, token, index) {
+  const shown = !!S.revealed?.has(index);
+  if (S.dials.furigana === 1) {
+    for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !shown);
+  } else if (S.dials.furigana === 0) {
+    const next = wordRow(displayPairs(token), { furigana: shown ? 1 : 0, revealed: shown });
+    const row = span.querySelector('.tok-word');
+    if (row) row.replaceWith(next);
+    else { span.textContent = ''; span.append(next); }
+  }
+  span.querySelector('.tok-en')?.remove();
+  span.classList.remove('has-en');
+  span.classList.toggle('lit', shown);
+  span.setAttribute('aria-label', namedAccessibleLabel(token, index));
 }
 function wireNamedToken(span, token, index) {
   span.addEventListener('click', () => {
@@ -7159,8 +7200,7 @@ function wireNamedToken(span, token, index) {
     (S.revealed ||= new Set());
     if (S.revealed.has(index)) S.revealed.delete(index);
     else S.revealed.add(index);
-    paintTok(span, token, index);
-    span.setAttribute('aria-label', namedAccessibleLabel(token, index));
+    paintNamedTok(span, token, index);
   });
 }
 
@@ -7797,7 +7837,8 @@ function renderReader(main) {
       !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
     // a name's door shows or hides its reading; with readings always on there is nothing
     // for it to do, so it is plain text rather than a button that answers nothing
-    const namedDoor = namedReading && S.dials.furigana !== 2;
+    // …and when the kanji dial has already turned it into kana, there is nothing to reveal either
+    const namedDoor = namedReading && S.dials.furigana !== 2 && displayPairs(token).some((pair) => pair.r);
     const interactive = !!token.c || !!particle || namedDoor;
     // its own class: a door, but never mistaken for a graded content word —
     // the app and its verifiers both select on .tok.content, and a name with
