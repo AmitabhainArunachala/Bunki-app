@@ -1349,7 +1349,8 @@ let storeAlertNode = null;
  * race LOOKS at the record lock with navigator.locks.query() — never request() — and offers a
  * retry when the lock looks free. Only the boot's own ifAvailable request ever acquires; the
  * hint grants nothing and can be stale by the time it is read. */
-const recordHint = { active: false, token: 0, inFlight: 0, timer: null, visibleSince: 0, free: false, channel: null, query: null, failure: '' };
+const recordHint = { active: false, token: 0, generation: 0, epoch: 0, outstanding: null, timer: null, timerAt: 0, lastStart: 0,
+  visibleSince: 0, suspended: false, advisoryUntil: 0, free: false, channel: null, query: null, failure: '' };
 
 function positionStoreAlert(node) {
   if (!node || typeof document === 'undefined') return;
@@ -1410,7 +1411,8 @@ function syncStoreAlert() {
     else sheet.removeAttribute('aria-describedby');
   }
   positionStoreAlert(storeAlertNode);
-  if (recordHint.active) positionRecordHint();
+  // protection and staleness arrive through this sync: they retire (or, when lifted, renew) the hint
+  if (recordHint.active) { recheckRecordHintEligibility(); positionRecordHint(); }
   return storeAlertNode;
 }
 
@@ -2043,6 +2045,18 @@ const RECORD_RETRY_ROUTE_KEY = 'kairo-retry-route-v1';
 const RECORD_HINT_POLL_MS = 3000;
 const RECORD_HINT_WINDOW_MS = 10 * 60_000;
 const RECORD_RETRY_ROUTE_TTL_MS = 120_000;
+// Lifecycle (Codex B2-LIFECYCLE-REVIEW-r1): `token` is the page lifetime; `generation` is one
+// period of eligibility — it moves on hide, on protection or staleness, on an epoch change and at the
+// visible-time deadline, so a result that started in an earlier period can never show or stop
+// anything. One native query is outstanding at most, across generations. Every wake (poll, focus,
+// advisory message) goes through one coalesced timer with a minimum spacing.
+const RECORD_HINT_MIN_SPACING_MS = 1000;
+const hintNow = () => performance.now();
+function hintEligible() {
+  return recordHint.active && !recordHint.suspended && !recordOwner && !recordDeparted && !staleTab && !storeSealed
+    && recordEpoch === recordHint.epoch && document.visibilityState === 'visible'
+    && hintNow() - recordHint.visibleSince < RECORD_HINT_WINDOW_MS;
+}
 function startRecordHint() {
   if (recordHint.active) return;
   let query = null;
@@ -2054,63 +2068,112 @@ function startRecordHint() {
   recordHint.active = true;
   recordHint.token += 1;
   recordHint.query = query;
-  recordHint.free = false;
   recordHint.failure = '';
-  recordHint.visibleSince = Date.now();
+  recordHint.visibleSince = hintNow();
+  recordHint.suspended = false;
+  openRecordHintChannel();
+  newRecordHintGeneration();
+  wakeRecordHint(0);
+}
+function openRecordHintChannel() {
+  if (recordHint.channel) return;
   try {
-    recordHint.channel = new BroadcastChannel(RECORD_HINT_CHANNEL);
+    const channel = new BroadcastChannel(RECORD_HINT_CHANNEL);
     const token = recordHint.token;
-    // advisory only: a reason to look again, never a statement that the record is free
-    recordHint.channel.onmessage = (event) => {
+    // advisory only: a reason to look again soon, never a statement that the record is free
+    channel.onmessage = (event) => {
       if (event.data?.v !== 1 || event.data.type !== 'released' || token !== recordHint.token) return;
-      void queryRecordHint();
-      setTimeout(() => { void queryRecordHint(); }, 500);
+      recordHint.advisoryUntil = hintNow() + 1500;
+      wakeRecordHint(0);
     };
+    recordHint.channel = channel;
   } catch { recordHint.channel = null; }
-  scheduleRecordHint();
-  void queryRecordHint();
+}
+function closeRecordHintChannel() {
+  try { recordHint.channel?.close(); } catch { /* already closed */ }
+  recordHint.channel = null;
+}
+/** A new period of eligibility: nothing from an earlier one may show, and the offer hides until re-checked. */
+function newRecordHintGeneration() {
+  recordHint.generation += 1;
+  recordHint.epoch = recordEpoch;
+  recordHint.free = false;
+  clearTimeout(recordHint.timer);
+  recordHint.timer = null;
+  recordHint.timerAt = 0;
+  syncRecordHint();
 }
 function stopRecordHint() {
   recordHint.active = false;
   recordHint.token += 1;
-  recordHint.free = false;
-  clearTimeout(recordHint.timer);
-  recordHint.timer = null;
-  try { recordHint.channel?.close(); } catch { /* already closed */ }
-  recordHint.channel = null;
-  syncRecordHint();
+  closeRecordHintChannel();
+  newRecordHintGeneration();
 }
-function recordHintLive(token) {
-  return recordHint.active && token === recordHint.token && !recordOwner && !recordDeparted && !staleTab && !storeSealed
-    && document.visibilityState === 'visible' && Date.now() - recordHint.visibleSince < RECORD_HINT_WINDOW_MS;
+/** Pause looking (hidden, protected, stale, deadline) until a real transition makes it eligible again. */
+function suspendRecordHint() {
+  if (!recordHint.active) return;
+  recordHint.suspended = true;
+  closeRecordHintChannel();
+  newRecordHintGeneration();
 }
-function scheduleRecordHint() {
+function resumeRecordHint({ newVisibleWindow = false } = {}) {
+  if (!recordHint.active) return;
+  if (newVisibleWindow) recordHint.visibleSince = hintNow();
+  recordHint.suspended = false;
+  if (!hintEligible()) { suspendRecordHint(); return; }
+  openRecordHintChannel();
+  newRecordHintGeneration();
+  wakeRecordHint(0);
+}
+/** Protection or staleness entered or left (called from the store alert sync). */
+function recheckRecordHintEligibility() {
+  if (!recordHint.active) return;
+  const protectedNow = recordOwner || recordDeparted || !!staleTab || storeSealed || recordEpoch !== recordHint.epoch;
+  if (protectedNow && !recordHint.suspended) suspendRecordHint();
+  else if (!protectedNow && recordHint.suspended && document.visibilityState === 'visible'
+    && hintNow() - recordHint.visibleSince < RECORD_HINT_WINDOW_MS) {
+    recordHint.epoch = recordEpoch;
+    resumeRecordHint();
+  }
+}
+/** The one wake timer: the earliest requested time wins, never sooner than the minimum spacing. */
+function wakeRecordHint(delay) {
+  if (!hintEligible()) { suspendRecordHint(); return; }
+  const at = Math.max(hintNow() + delay, (recordHint.lastStart || -Infinity) + RECORD_HINT_MIN_SPACING_MS);
+  if (recordHint.timer && recordHint.timerAt <= at) return;
   clearTimeout(recordHint.timer);
-  recordHint.timer = null;
-  if (!recordHint.active || document.visibilityState !== 'visible') return;
-  if (Date.now() - recordHint.visibleSince >= RECORD_HINT_WINDOW_MS) return;
-  const token = recordHint.token;
+  recordHint.timerAt = at;
   recordHint.timer = setTimeout(() => {
     recordHint.timer = null;
-    void queryRecordHint().finally(() => { if (token === recordHint.token) scheduleRecordHint(); });
-  }, RECORD_HINT_POLL_MS);
+    recordHint.timerAt = 0;
+    void queryRecordHint();
+  }, Math.max(0, at - hintNow()));
 }
-/** One look at a time; every result is re-checked after its await before it may show anything. */
+/** One look. The result counts only for the generation that asked, and only while still eligible. */
 async function queryRecordHint() {
-  const token = recordHint.token;
-  if (recordHint.inFlight === token || !recordHintLive(token)) return;
-  recordHint.inFlight = token;
+  if (!hintEligible()) { suspendRecordHint(); return; }
+  // an earlier look is still out: its completion re-checks for the current generation
+  if (recordHint.outstanding) return;
+  const generation = recordHint.generation;
+  recordHint.lastStart = hintNow();
   let snapshot;
+  const outstanding = recordHint.query();
+  recordHint.outstanding = outstanding;
   try {
-    snapshot = await recordHint.query();
+    snapshot = await outstanding;
   } catch {
-    // the query itself failed: stop looking, and the manual reload stays
-    if (token === recordHint.token) stopRecordHint();
+    // the query itself failed now, for this period: stop looking, and the manual reload stays.
+    // A failure from an earlier period cannot stop the current one.
+    if (generation === recordHint.generation && hintEligible()) stopRecordHint();
+    else if (hintEligible()) wakeRecordHint(0);
     return;
   } finally {
-    if (recordHint.inFlight === token) recordHint.inFlight = 0;
+    if (recordHint.outstanding === outstanding) recordHint.outstanding = null;
   }
-  if (!recordHintLive(token)) return;
+  if (generation !== recordHint.generation || !hintEligible()) {
+    if (hintEligible()) wakeRecordHint(0);
+    return;
+  }
   if (!Array.isArray(snapshot?.held) || !Array.isArray(snapshot?.pending)) { stopRecordHint(); return; }
   const named = (rows) => rows.some((row) => row?.name === RECORD_LOCK);
   const free = !named(snapshot.held) && !named(snapshot.pending);
@@ -2118,6 +2181,8 @@ async function queryRecordHint() {
     recordHint.free = free;
     syncRecordHint();
   }
+  // shortly after an advisory 'released' look quickly; otherwise the ordinary poll
+  wakeRecordHint(hintNow() < (recordHint.advisoryUntil || 0) ? 500 : RECORD_HINT_POLL_MS);
 }
 function positionRecordHint() {
   const node = document.getElementById('record-hint');
@@ -2130,7 +2195,7 @@ function positionRecordHint() {
 function syncRecordHint() {
   if (typeof document === 'undefined' || !document.body) return;
   let node = document.getElementById('record-hint');
-  const show = recordHint.active && !recordOwner && !recordDeparted && (recordHint.free || !!recordHint.failure);
+  const show = recordHint.active && (recordHint.failure ? !recordOwner && !recordDeparted : recordHint.free && hintEligible());
   if (!show) {
     if (node) node.hidden = true;
     return;
@@ -2258,20 +2323,13 @@ function restoreRetryRoute() {
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
     if (!recordHint.active) return;
-    if (document.visibilityState === 'visible') {
-      recordHint.visibleSince = Date.now();
-      scheduleRecordHint();
-      void queryRecordHint();
-    } else {
-      clearTimeout(recordHint.timer);
-      recordHint.timer = null;
-    }
+    // hidden ends this period; only a real return to visible opens a new ten-minute window
+    if (document.visibilityState === 'visible') resumeRecordHint({ newVisibleWindow: true });
+    else suspendRecordHint();
   });
+  // focus asks for a look (rate-limited) inside the current window; it never extends the window
   addEventListener('focus', () => {
-    if (!recordHint.active || document.visibilityState !== 'visible') return;
-    recordHint.visibleSince = Date.now();
-    scheduleRecordHint();
-    void queryRecordHint();
+    if (recordHint.active && !recordHint.suspended) wakeRecordHint(0);
   });
 }
 function readRecordDrafts() {
