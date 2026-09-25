@@ -20637,14 +20637,18 @@ function requestDictionaryDetails(node) {
  * entry now resolves here, never by changing lookup(), whose meaning stays the
  * same for every other caller. The deep index is asked for the token's base
  * form, and readerChoiceMatch() keeps only the rows that base form names —
- * by its written form when it has kanji, by its reading when it is kana (結う
- * is read ゆう, so いう never meets it), so a conjugated surface (分かっ, いっ)
+ * by its written form when it has kanji (under a reading that spelling permits;
+ * an uninflected token's own reading must be among them, or its entries are only
+ * offered), by any listed reading when it is kana (いう meets 言う and 結う, which
+ * lists いう too, as an explicit choice), so a conjugated surface (分かっ, いっ)
  * still finds its word:
- *   one row    → it opens directly, by its entry number (seq);
+ *   one row    → it opens directly, by its entry number (seq), unless it matched
+ *                only under another reading: a mismatch is offered, never opened;
  *   several    → native candidate buttons, at most READER_CHOICE_MAX, in the
  *                index's own order; a choice opens that seq, and 戻る returns
  *                here with focus on the button that was chosen;
- *   none       → the sheet says so plainly;
+ *   none       → the sheet names what is missing: no entry for the form, a
+ *                listed spelling with no permitted reading, or none read that way;
  *   no index   → an honest unavailable line and a retry; the reader and its
  *                core glosses never depend on the index.
  * An answer that arrives after the sheet, the token or the passage changed
@@ -20844,9 +20848,12 @@ function renderReaderChoice(sheet, node) {
     moved.id = 'reader-choice-moved';
     box.append(moved);
   } else if (choice.state === 'none') {
-    // name what was actually matched: a written base form, or the reading used
-    const none = el('p', 'gloss absent', !choice.formRows || choice.by === 'spelling'
+    // name what was actually missing: no entry for the form at all; a listed spelling no reading is
+    // permitted for (田ぼ, Codex D11 r4 review); or no entry read the way a kana base is
+    const none = el('p', 'gloss absent', !choice.formRows
       ? tx('この語は辞書にない。', 'This word is not in the dictionary.')
+      : choice.by === 'spelling'
+        ? tx('辞書にこの書き方は載っているが、この書き方で読める項目はない。', 'The dictionary lists this spelling, but no entry permits a reading for it.')
       : choice.key
         ? tx(`辞書に、読み「${choice.key}」の項目はない。`, `No dictionary entry is read ${choice.key}.`)
         : tx('この語には読みがないため、辞書の項目と照合できない。', 'This word carries no reading, so it cannot be matched to a dictionary entry.'));
