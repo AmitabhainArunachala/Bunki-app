@@ -23,6 +23,9 @@
  *   pending grade+undo     → delete `if (serial !== cardAudioSerial) return;`
  *   pending leave          → the same mutant (9101b3b0 already passes this case; it is no control)
  *   playing grade / leave  → delete `if (!readAloud.on) stopRecAudio();` in retireCardAudioOnFaceChange
+ *   stale card error       → in speakCardReading's failure continuation, write the reason to
+ *                            document.getElementById('card-say-note') instead of the asking row:
+ *                            the next card then carries the old reason
  *   unrecorded / invalid / chosen-unrecorded → invert `passageRecorded` / accept any stored value /
  *                            drop `pref === 'ami'` from playable */
 import assert from 'node:assert/strict';
@@ -31,7 +34,8 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright-core';
-import { CORRIDOR_DIR, startCorridorServer } from './verify-corridor.mjs';
+// verify-corridor.mjs resolves the site when it loads, so it is imported inside the receipt's try
+let CORRIDOR_DIR = null, startCorridorServer = null;
 import { readAppRecord } from './record-test-support.mjs';
 
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/playback'));
@@ -56,13 +60,14 @@ async function fixture(mode) {
   const ready = new Promise((done) => { release = done; });
   // owned from the first line after the context exists: any later throw closes this context
   const errors = [];
-  const f = { context, page: null, errors, release, manifestServed: false };
+  const f = { context, page: null, errors, release, manifestServed: false, manifestArrived: false };
   try {
     if (mode !== 'delayed' && mode !== 'delayed-fail' && mode !== 'card-held') release();
     await context.route('**/*', async (route) => {
       const url = new URL(route.request().url());
       if (url.origin !== base) return route.abort();
       if (url.pathname.endsWith('/audio/manifest.json')) {
+        f.manifestArrived = true;
         await ready;
         if (mode === 'delayed-fail') { await route.fulfill({ status: 404, body: '' }); f.manifestServed = true; return; }
         const body = mode === 'tts' ? null : mode === 'partial' ? partialManifest : mode.startsWith('card') ? cardManifest : manifest;
@@ -94,6 +99,24 @@ async function fixture(mode) {
       Storage.prototype.setItem = function (key, value) {
         if (key === 'kairo-rec-voice-v1' && window.__refuseVoiceSave) throw new DOMException('refused', 'QuotaExceededError');
         return Reflect.apply(setItem, this, [key, value]);
+      };
+    });
+    // the app parses the manifest with Response.json(); its cache assignment and any waiting card
+    // continuation are promise reactions of that parse, so a task queued when the parse settles runs
+    // only after them. That task, not a delay after fulfilment, is the consumption signal.
+    await context.addInitScript(() => {
+      const nativeJson = Response.prototype.json;
+      window.__manifestConsumed = 0;
+      Response.prototype.json = function () {
+        const parsed = Reflect.apply(nativeJson, this, []);
+        let manifest = false;
+        try { manifest = new URL(this.url, location.href).pathname.endsWith('/audio/manifest.json'); } catch { /* opaque url */ }
+        if (manifest) parsed.then(() => {
+          const channel = new MessageChannel();
+          channel.port1.onmessage = () => { window.__manifestConsumed += 1; channel.port1.close(); };
+          channel.port2.postMessage(0);
+        }, () => {});
+        return parsed;
       };
     });
     await context.addInitScript(() => {
@@ -156,23 +179,20 @@ async function switchPassage(page) {
 async function started(page, type, length = 1) {
   await page.waitForFunction(({ type, length }) => window.__playbackFixture[type].length === length, { type, length }, { timeout: 5000 });
 }
-/** The held manifest was actually served, and the page has run the tasks after it. */
+/** The app parsed the held manifest and ran every reaction waiting on it (see the Response.json hook). */
 async function manifestSettled(f) {
-  const until = Date.now() + 5000;
-  while (!f.manifestServed) {
-    if (Date.now() > until) throw new Error('the held manifest was never served');
-    await f.page.waitForTimeout(25);
-  }
-  await f.page.evaluate(() => new Promise((done) => setTimeout(() => setTimeout(done, 50), 0)));
+  await f.page.waitForFunction(() => window.__manifestConsumed > 0, null, { timeout: 5000 })
+    .catch(() => { throw new Error(`the app never consumed the manifest (served=${f.manifestServed})`); });
 }
 /** Positive control inside a retirement test: a fresh tap on the current face does play once. */
-async function freshTapPlays(page, word) {
+async function freshTapPlays(page) {
   await page.locator('#card-say').click();
   await started(page, 'clips');
   await page.evaluate(() => new Promise((done) => setTimeout(done, 100)));
   const state = await cardState(page);
   assert.equal(state.clips.length, 1, 'exactly one clip: the fresh tap, never the retired one');
-  if (word) assert.match(state.clips[0].src, new RegExp(`/${word}\\.m4a$`));
+  assert.match(state.clips[0].src, new RegExp(`^audio/w/zundamon/(${CARD_WORDS.map(([, id]) => id).join('|')})\\.m4a$`),
+    'the fresh tap plays a seeded word in the chosen voice');
 }
 const cardState = (page) => page.evaluate(() => ({
   view: document.body.dataset.view,
@@ -189,13 +209,15 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
     if (!browser) throw new Error('browser not started');
     f = await fixture(mode);
     await body(f);
-    assert.deepEqual(f.errors, [], 'no uncaught application errors');
     if (learnerRecord === 'untouched') {
       const record = await readAppRecord(f.page);
       assert.deepEqual(record.taken || [], [], 'listening never promotes a card');
       assert.deepEqual(record.srs || {}, {}, 'listening never schedules a review');
       assert.deepEqual(record.revlog || [], [], 'listening never grades a review');
     }
+    // invariants of every case, checked last so late failures are counted
+    assert.equal((await counts(f.page)).utterances.length, 0, 'the device voice is never called, in any case');
+    assert.deepEqual(f.errors, [], 'no uncaught application errors');
     results.push({ name, pass: true, observed: await counts(f.page).catch((error) => ({ unreadable: error.message })) });
     console.log(`  ok  ${name}`);
   } catch (error) {
@@ -213,6 +235,7 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
 }
 
 try {
+  ({ CORRIDOR_DIR, startCorridorServer } = await import('./verify-corridor.mjs'));
   ({ server, base } = await startCorridorServer());
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   await check('no-recordings-listen-is-shut-and-silent', 'tts', async ({ page }) => {
@@ -431,6 +454,7 @@ try {
     await page.locator('.review-undo').click();
     // the only grade is taken back: no undo chip, and the first card is up again, unrevealed
     await page.waitForFunction(() => !document.querySelector('.review-undo') && !!document.querySelector('#declare-notyet'), null, { timeout: 10000 });
+    assert.equal(f.manifestArrived, true, 'the manifest request is being held before release');
     f.release();
     await manifestSettled(f);
     const after = await cardState(page);
@@ -446,6 +470,7 @@ try {
     await page.goBack();
     await page.waitForFunction(() => location.pathname.endsWith('/index.html') && document.body.dataset.ready === '1'
       && document.body.dataset.view !== 'review', null, { timeout: 10000 });
+    assert.equal(f.manifestArrived, true, 'the manifest request is being held before release');
     f.release();
     await manifestSettled(f);
     const after = await cardState(page);
@@ -488,14 +513,17 @@ try {
   results.push({ name: 'terminal', pass: false, error: error.message, stack: error.stack });
 } finally {
   await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, error: error.message }));
-  if (server) await new Promise((done) => server.close((error) => {
-    if (error) results.push({ name: 'server · cleanup', pass: false, error: error.message });
-    done();
-  }));
+  if (server) {
+    // a connection left by a failed browser close must not hold the receipt hostage
+    server.closeAllConnections?.();
+    const closed = new Promise((done) => server.close((error) => done(error ? error.message : null)));
+    const outcome = await Promise.race([closed, new Promise((done) => setTimeout(() => done('server close timed out after 5 s'), 5000))]);
+    if (outcome) results.push({ name: 'server · cleanup', pass: false, error: outcome });
+  }
   if (!results.length) results.push({ name: filter || 'playback', pass: false, error: 'No matching tests' });
   // the identity read must never cost the receipt: a failure is recorded in place of the digest
   let corridorSha256;
-  try { corridorSha256 = createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'))).digest('hex'); }
+  try { corridorSha256 = createHash('sha256').update(readFileSync(resolve(CORRIDOR_DIR ?? '', 'corridor.js'))).digest('hex'); }
   catch (error) { corridorSha256 = null; results.push({ name: 'identity · corridor.js digest', pass: false, error: error.message }); }
   writeFileSync(resolve(out, 'verify-playback.json'), `${JSON.stringify({
     site: CORRIDOR_DIR,
