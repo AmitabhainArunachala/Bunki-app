@@ -19,6 +19,7 @@
  *      opens the dialog, and the probe's reveal still takes a real click.
  *   R6 a room that failed to draw still carries the entry.
  *   R7 'My reports' opens the list; focus returns to the entry that opened it.
+ *   R8 the field entry (?entry=field) carries the page entry.
  * Every case runs in Chromium and WebKit, at 1728×996 and 390×844.
  *
  * Claim boundary: the review more-row entry needs seeded due cards; the probe
@@ -157,6 +158,18 @@ try {
       check(`R4 ${w}px front door: the entry opens the report dialog`, await reportOpen(page));
       await closeReport(page);
       check(`R4 ${w}px front door: closing returns focus to the 回廊 symbol`, await focusedIs(page, '#ginga-symbol'));
+    }
+
+    // R8 the field entry (?entry=field) is a front door too; it carries the page entry
+    await page.goto(`${origin}/index.html?entry=field`); await ready(page);
+    const onField = await page.evaluate(() => !!document.querySelector('#field'));
+    check(`R8 ${w}px field entry: the field is up`, onField);
+    const fieldEntry = page.locator(PAGE_ENTRY);
+    check(`R8 ${w}px field entry: the page entry exists`, (await fieldEntry.count()) === 1);
+    if (await fieldEntry.count()) {
+      await fieldEntry.scrollIntoViewIfNeeded(); await fieldEntry.click();
+      check(`R8 ${w}px field entry: the entry opens the report dialog`, await reportOpen(page));
+      await closeReport(page);
     }
 
     // R5 the focused stage: the 読み探査 probe (body.zen), reached as a learner does
