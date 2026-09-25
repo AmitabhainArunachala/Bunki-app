@@ -2173,13 +2173,21 @@ function retryRecordHere() {
   if (!preserveVisibleDrafts()) return refuse();
   const route = captureRetryRoute();
   try {
+    // no supported place to return to: a route kept from earlier must not steer this reload
     if (route) sessionStorage.setItem(RECORD_RETRY_ROUTE_KEY, JSON.stringify(route));
+    else sessionStorage.removeItem(RECORD_RETRY_ROUTE_KEY);
   } catch {
     return refuse();
   }
   location.reload();
 }
 const RETRY_ROUTE_VIEWS = new Set(['reader', 'mock', 'shelf']);
+// the view a losing boot restored while keeping its target; leaving it on purpose drops the target
+let retainedRetryView = null;
+function dropRetainedRetryRoute() {
+  retainedRetryView = null;
+  try { sessionStorage.removeItem(RECORD_RETRY_ROUTE_KEY); } catch { /* the TTL still bounds it */ }
+}
 const retryRouteId = (value) => typeof value === 'string' && value.length > 0 && value.length <= 160 && /^[\w:.\-]+$/u.test(value);
 function readRetryRoute(now = Date.now()) {
   let record = null;
@@ -2207,7 +2215,7 @@ function captureRetryRoute() {
     const itemId = main?.querySelector('details[data-exam-item][open]')?.dataset.examItem;
     if (retryRouteId(attemptId)) route.attemptId = attemptId;
     if (route.attemptId && retryRouteId(itemId)) route.itemId = itemId;
-    const kept = readRetryRoute();
+    const kept = retainedRetryView === 'mock' ? readRetryRoute() : null;
     if (!route.attemptId && kept?.view === 'mock' && kept.attemptId) {
       route.attemptId = kept.attemptId;
       if (kept.itemId) route.itemId = kept.itemId;
@@ -2228,13 +2236,19 @@ function restoreRetryRoute() {
   }
   if (record.view === 'mock') {
     if (record.attemptId && recordWritable()) {
-      try { openAssessmentSource({ attemptId: record.attemptId, itemId: record.itemId }); return drop(); }
-      catch { /* the result is gone: the room itself is the honest landing */ }
+      try {
+        // a question was open: the strict source path; only the result: the result itself
+        if (record.itemId) openAssessmentSource({ attemptId: record.attemptId, itemId: record.itemId });
+        else openAssessmentResult(record.attemptId);
+        return drop();
+      } catch { /* the result is gone: the room itself is the honest landing */ }
     }
     S.stack = [];
     S.view = 'mock';
-    // a blocked window cannot show the result yet: keep the target for the next retry, until its TTL
+    // a blocked window cannot show the result yet: keep the target for the next retry, until its
+    // TTL, and only while the learner stays in this room (render drops it on any other view)
     if (!record.attemptId || recordWritable()) drop();
+    else retainedRetryView = 'mock';
     return;
   }
   S.stack = [];
@@ -4655,6 +4669,18 @@ function openAssessmentSource({ attemptId, itemId }) {
   keepScroll();
   S.view = 'mock';
   assessmentRoom ||= createAssessmentRoom(); assessmentRoom.open?.(attemptId, itemId);
+  render();
+}
+
+/** A completed or abandoned result, with no question expanded; never an in-progress or hidden attempt. */
+function openAssessmentResult(attemptId) {
+  const selected = currentAssessmentV2(attemptId);
+  if (!assessmentViewModule || !selected || selected.attempt.status === 'in-progress' || !assessmentAttemptVisible(attemptId))
+    throw new Error('source-unavailable');
+  S.stack = []; S.dialogInvoker = null;
+  keepScroll();
+  S.view = 'mock';
+  assessmentRoom ||= createAssessmentRoom(); assessmentRoom.open?.(attemptId, null);
   render();
 }
 
@@ -23980,6 +24006,7 @@ function renderRoomError(main, view, error) {
   main.append(card);
 }
 function render() {
+  if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.
   if (S.view !== 'levels') pendingReferenceCollection = null;

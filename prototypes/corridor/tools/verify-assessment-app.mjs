@@ -623,6 +623,68 @@ try {
         assert.deepEqual(value.record.srs, value.beforeReview.srs);
         assert.deepEqual(value.record.revlog, value.beforeReview.revlog);
       });
+
+      // B2a retry routes (Codex B2-ROUTE-REVIEW-r1). A route record is written as a retry would
+      // write it; the unit under test is the boot's restoration and the drop of a kept target.
+      const ROUTE_KEY = 'kairo-retry-route-v1';
+      const submittedAttempt = async page => {
+        await start(page);
+        const done = await finish(page);
+        assert(done.submitted, JSON.stringify(done));
+        return done.record.assessmentLibraryV2.attempts.at(-1).attemptId;
+      };
+      const writeRoute = (page, route) => page.evaluate(([key, value]) =>
+        sessionStorage.setItem(key, JSON.stringify({ v: 1, ts: Date.now(), ...value })), [ROUTE_KEY, route]);
+      const readyAgain = page => page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 60_000 });
+      const place = page => page.evaluate(key => ({ view: S.view, attempt: document.querySelector('#app main')?.dataset.examAttempt || null,
+        open: document.querySelectorAll('details[data-exam-item][open]').length, route: sessionStorage.getItem(key) }), ROUTE_KEY);
+      // control: 9ee2976d sends an item-less result route through the strict source helper, which refuses it
+      await run(engine, 'retry-route-restores-a-result-with-no-question-open', async page => {
+        const attemptId = await submittedAttempt(page);
+        await writeRoute(page, { view: 'mock', attemptId });
+        await page.reload(); await boot(page);
+        await page.waitForFunction(id => document.querySelector('#app main')?.dataset.examAttempt === id, attemptId, { timeout: 10_000 });
+        const at = await place(page);
+        assert.equal(at.view, 'mock'); assert.equal(at.open, 0, 'no question is forced open'); assert.equal(at.route, null, 'a restored route is spent');
+      });
+      // a losing boot keeps a result target; a retry from an unsupported view must not revive it
+      // (control: delete the `else sessionStorage.removeItem(...)` in retryRecordHere)
+      await run(engine, 'retry-route-kept-target-yields-to-an-unsupported-view', async (page, context) => {
+        const attemptId = await submittedAttempt(page);
+        const second = await context.newPage();
+        await second.goto(`${origin}/?entry=shelf&ui=bi`); await readyAgain(second);
+        assert.equal(await second.evaluate(() => recordWritable()), false, 'the second window is blocked');
+        await writeRoute(second, { view: 'mock', attemptId });
+        await second.reload(); await readyAgain(second);
+        let at = await place(second);
+        assert.equal(at.view, 'mock'); assert(at.route, 'the losing boot keeps the result target');
+        await second.evaluate(() => { S.stack = []; S.view = 'tray'; render(); });
+        await page.close();
+        await second.waitForFunction(() => document.getElementById('record-hint')?.hidden === false, null, { timeout: 6_000 });
+        await Promise.all([second.waitForEvent('load'), second.locator('#record-hint-retry').click()]);
+        await readyAgain(second);
+        at = await place(second);
+        assert.notEqual(at.attempt, attemptId, `the old result must not return after a move away: ${JSON.stringify(at)}`);
+        assert.equal(at.route, null);
+      });
+      // leaving the kept room and coming back to the catalog is a new visit, not the old target
+      // (control: delete the render() line that drops a retained target on any other view)
+      await run(engine, 'retry-route-kept-target-yields-to-a-deliberate-return', async (page, context) => {
+        const attemptId = await submittedAttempt(page);
+        const second = await context.newPage();
+        await second.goto(`${origin}/?entry=shelf&ui=bi`); await readyAgain(second);
+        await writeRoute(second, { view: 'mock', attemptId });
+        await second.reload(); await readyAgain(second);
+        await second.evaluate(() => { S.stack = []; S.view = 'shelf'; render(); S.view = 'mock'; render(); });
+        assert.equal((await place(second)).route, null, 'the move away dropped the kept target');
+        await page.close();
+        await second.waitForFunction(() => document.getElementById('record-hint')?.hidden === false, null, { timeout: 6_000 });
+        await Promise.all([second.waitForEvent('load'), second.locator('#record-hint-retry').click()]);
+        await readyAgain(second);
+        const at = await place(second);
+        assert.equal(at.view, 'mock', 'the retry returns to the room the learner chose');
+        assert.notEqual(at.attempt, attemptId, `not to the old result: ${JSON.stringify(at)}`);
+      });
   }
 } finally { await new Promise(done => server.close(done)); }
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
