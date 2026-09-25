@@ -51,12 +51,8 @@ const check = (name, pass, detail = '') => {
   results.push({ name, pass: !!pass, detail });
   console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? `  — ${detail}` : ''}`);
 };
-const host = await startStaticHost({ site: SITE, port: 0 });
-const origin = host.origin;
-const browser = await chromium.launch();
-const manifest = JSON.parse(readFileSync(resolve(SITE, 'audio/manifest.json'), 'utf8'));
-const recordedPassage = Object.keys(manifest.sentences).find((id) => manifest.sentences[id].have?.length);
-const recordedWord = Object.keys(manifest.words).find((w) => manifest.words[w].voices.includes('zundamon'));
+// host, browser and manifest start inside the receipt's try below: a setup failure still writes JSON
+let host = null, origin = null, browser = null, recordedPassage = null, recordedWord = null;
 
 // A device engine that records every attempt to speak — the rulings allow none.
 const SPY = `(() => {
@@ -97,6 +93,12 @@ async function openRecordedReader(page) {
 }
 
 try {
+  host = await startStaticHost({ site: SITE, port: 0 });
+  origin = host.origin;
+  browser = await chromium.launch();
+  const manifest = JSON.parse(readFileSync(resolve(SITE, 'audio/manifest.json'), 'utf8'));
+  recordedPassage = Object.keys(manifest.sentences).find((id) => manifest.sentences[id].have?.length);
+  recordedWord = Object.keys(manifest.words).find((w) => manifest.words[w].voices.includes('zundamon'));
   // V0
   {
     currentCase = 'V0';
@@ -205,11 +207,12 @@ try {
   results.push({ name: `terminal (${currentCase})`, pass: false, detail: error.stack || String(error) });
   console.log(`  FAIL terminal in ${currentCase} — ${error.message}`);
 } finally {
+  // every row — cleanup and page errors included — is settled before the receipt is written
+  await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, detail: error.message }));
+  await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
+  if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
   writeFileSync(resolve(EVIDENCE, 'voice-picker.json'), JSON.stringify({ origin, results, pageErrors, lastCase: currentCase }, null, 2) + '\n');
-  await browser.close();
-  await host.close();
 }
-if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);
 process.exit(failed.length ? 1 : 0);
