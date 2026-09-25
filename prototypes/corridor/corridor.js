@@ -23665,6 +23665,11 @@ function stampRegister() {
     html.dataset.roomEntering = '1';
     clearTimeout(stampRegister.enterTimer);
     stampRegister.enterTimer = setTimeout(() => { delete html.dataset.roomEntering; }, 220);
+  } else if (html.dataset.roomEntering) {
+    // a re-render of the same room (a grade, a save, a tick) clears the marker before style
+    // resolution, so only the arrival render's children animate
+    clearTimeout(stampRegister.enterTimer);
+    delete html.dataset.roomEntering;
   }
   const progress = document.querySelector('.exam-progress');
   const counted = ((progress?.firstElementChild || progress)?.textContent || '').match(/(\d+)\s*(?:of|\/)\s*(\d+)/);
