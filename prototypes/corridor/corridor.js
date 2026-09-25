@@ -20701,8 +20701,9 @@ function readerChoiceMatch(choice, rows) {
   if (matching.length) return { by, key, rows: matching };
   // no entry of this spelling carries the text's reading (the tokenizer may be wrong, or the word a
   // fragment): its entries are offered as explicit candidates under their own readings — never opened
-  // for the learner, never called absent (産 is listed, as うぶ)
-  return { by, key, rows: collect(written), mismatch: choice.r || surface };
+  // for the learner, never called absent (産 is listed, as うぶ). With no entry at all, it is absent.
+  const offered = collect(written);
+  return offered.length ? { by, key, rows: offered, mismatch: choice.r || surface } : { by, key, rows: [] };
 }
 
 /** Whether the listed reading at kanaIndex may be printed with this spelling, by that
