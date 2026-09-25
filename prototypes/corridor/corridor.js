@@ -20757,6 +20757,7 @@ function resolveReaderChoice(node) {
       if (matching.length === 1) {
         node.seq = matching[0].seq;
         node.reading = matching[0].reading;
+        node.matchedHead = matching[0].head;
         node.matchedGloss = matching[0].gloss || null;
         choice.state = 'single';
       } else if (matching.length) {
@@ -20870,7 +20871,8 @@ function renderReaderChoice(sheet, node) {
         // the article token keeps its identity (id, from); the chosen entry
         // rides only as seq/reading, exactly as a homograph door opens one
         go({
-          t: 'word', id: node.id, seq: candidate.seq, reading: candidate.reading, matchedGloss: candidate.gloss || null,
+          t: 'word', id: node.id, seq: candidate.seq, reading: candidate.reading, matchedHead: candidate.head,
+          matchedGloss: candidate.gloss || null,
           from: node.from, ctxScope: 'sent',
           readerChoice: {
             passage: choice.passage, index: choice.index, s: choice.s, b: choice.b, r: choice.r,
@@ -20915,7 +20917,12 @@ function renderWordNode(sheet, node) {
     renderReaderChoice(sheet, node);
     return;
   }
-  const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
+  const found = lookup(node.id, node.seq, node.reading, node.matchedGloss);
+  // a reader-chosen entry is shown by the spelling and exact reading it was chosen by: the shared
+  // lookup keys readings by normalised kana and can head 結う/いう as いう (Codex D11 11:15Z)
+  const rec = found && node.readerChoice && node.matchedHead
+    ? { ...found, head: node.matchedHead, r: node.reading || found.r }
+    : found;
   const legacy = D.words[node.id];
   const label = rec?.head || node.id;
   const details = dictionaryDetailsFor(node);
