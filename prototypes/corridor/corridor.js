@@ -4921,15 +4921,26 @@ function renderShelfBody() {
     const day = (/^\d{4}-\d{2}-\d{2}$/.test(dayOverride || '') && dayOverride) || new Date().toISOString().slice(0, 10);
     let seed = 0;
     for (const ch of day) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-    const pool = curated.filter((p) => p.source !== 'isa-yasashii-glossary');
+    // Today's six are the shelf's best foot (operator, 2026-09-24: "the articles still suck"):
+    // only readings a human approved and nothing awaiting verification; no news older than
+    // three years (it stays on the full shelf below, it just isn't "today"); and at most three
+    // from one difficulty band, so a day is never six of the same level.
+    const year = Number(day.slice(0, 4));
+    const stale = (p) => /wikinews/u.test(p.source || '') && Number(String(p.date || '').slice(0, 4)) < year - 3;
+    const pool = curated.filter((p) => p.source !== 'isa-yasashii-glossary' && p.review === 'approved' && !p.pendingVerification && !stale(p));
+    const band = (p) => p.grading?.signals?.jreadability?.band || 'unbanded';
     const picks = [];
     const taken = new Set();
-    let x = seed || 1;
-    while (picks.length < Math.min(6, pool.length)) {
+    const perBand = new Map();
+    let x = seed || 1, guard = 0;
+    while (picks.length < Math.min(6, pool.length) && guard++ < pool.length * 20) {
       x = (x * 1103515245 + 12345) >>> 0;
       const ix = x % pool.length;
       if (taken.has(ix)) continue;
       taken.add(ix);
+      const b = band(pool[ix]);
+      if ((perBand.get(b) || 0) >= 3) continue;
+      perBand.set(b, (perBand.get(b) || 0) + 1);
       picks.push(pool[ix]);
     }
     main.append(withEn(el('p', 'eyebrow shelf-section shelf-today', '今日の棚'), `today's six · ${day}`, 'en-inline'));

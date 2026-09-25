@@ -88,6 +88,26 @@ if (!a || a.ids.length !== 6) failures.push(`today's six: ${a ? a.ids.length : '
 if (!b || b.ids.length !== 6) failures.push(`today's six: ${b ? b.ids.length : 'strip missing'} on 2026-09-19`);
 if (a && b && a.ids.join() === b.ids.join()) failures.push("today's six did not change between two days");
 if (a && a.day !== '2026-09-18') failures.push(`strip day ${a.day} ≠ 2026-09-18`);
+// quality, read from the artifact's own index: every pick human-approved, none awaiting
+// verification, no news older than three years, at most three from one difficulty band
+{
+  const index = await page.evaluate(`fetch('data/articles/index.json').then((r) => r.json())`);
+  const byId = new Map(index.articles.map((row) => [row.id, row]));
+  for (const [label, six] of [['2026-09-18', a], ['2026-09-19', b]]) {
+    if (!six) continue;
+    const year = Number(label.slice(0, 4));
+    const bands = new Map();
+    for (const id of six.ids) {
+      const row = byId.get(id);
+      if (!row) { failures.push(`today's six ${label}: ${id} is not in the index`); continue; }
+      if (row.review !== 'approved' || row.pendingVerification) failures.push(`today's six ${label}: ${id} is not human-approved (${row.review})`);
+      if (/wikinews/u.test(row.source) && Number(String(row.date).slice(0, 4)) < year - 3) failures.push(`today's six ${label}: ${id} is stale news (${row.date})`);
+      const band = row.grading?.signals?.jreadability?.band || 'unbanded';
+      bands.set(band, (bands.get(band) || 0) + 1);
+    }
+    for (const [band, count] of bands) if (count > 3) failures.push(`today's six ${label}: ${count} from band ${band}`);
+  }
+}
 await shot('today');
 await page.evaluate(`localStorage.removeItem('kairo-shelf-day')`);
 
