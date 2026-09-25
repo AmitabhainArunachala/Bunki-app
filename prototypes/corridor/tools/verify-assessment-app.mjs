@@ -31,8 +31,73 @@ const exposed = ['S', 'D', 'recordApp', 'recordController', 'recordInstallation'
   'resolveTeacherSource', 'assertLearningSource', 'enrichAssessmentCards', 'assessmentV2Notice', 'allAssessmentEvidence',
   'assessmentReviewContext', 'startReview', 'render'];
 const corridorSource = readFileSync(resolve(site, 'corridor.js'));
+const gradeDiagnostics = process.env.KAIRO_GRADE_DIAGNOSTICS === '1';
+// Diagnostic wrappers are served only by this fixture. They observe the real
+// grade/write functions and do not alter their result or suppress any failure.
+// Installation is opt-in per isolated case; ordinary cases retain the export
+// shim alone. This introduces promise-observation microtasks, recorded below.
+const gradeDiagnosticShim = String.raw`
+Object.defineProperty(window, '__installAssessmentGradeDiagnostic', { value: () => {
+  const copy = value => value === undefined ? null : JSON.parse(JSON.stringify(value));
+  const diagnostic = { events: [], entered: 0, settled: 0 };
+  const review = () => copy(S.review && { ix: S.review.ix, queue: S.review.queue,
+    history: S.review.history, done: S.review.done, questionAttemptId: S.review.questionAttemptId,
+    questionError: S.review.questionError, pending: !!S.review.pending,
+    revealed: S.review.revealed, declared: S.review.declared, focus: S.focus });
+  const errorInfo = error => ({ code: error?.code || null, message: String(error?.message || error) });
+  const event = (kind, detail = {}) => diagnostic.events.push({ kind, at: performance.now(), ...copy(detail) });
+  const originalFailure = recordFailure;
+  recordFailure = function (...args) {
+    event('record-failure', { args, stack: new Error('diagnostic caller').stack });
+    return originalFailure.apply(this, args);
+  };
+  const originalWrite = recordApp.write;
+  recordApp.write = async function (...args) {
+    try {
+      const outcome = await originalWrite.apply(this, args);
+      event('app-write-return', { outcome });
+      return outcome;
+    } catch (error) { event('app-write-throw', errorInfo(error)); throw error; }
+  };
+  const originalPatch = commitStorePatch;
+  commitStorePatch = async function (patch, ...args) {
+    event('write-enter', { pending: recordApp.pending });
+    const observed = typeof patch === 'function' ? function (...input) {
+      event('producer-enter', { snapshot: input[1] });
+      try { const value = patch.apply(this, input); event('producer-return'); return value; }
+      catch (error) { event('producer-throw', errorInfo(error)); throw error; }
+    } : patch;
+    try {
+      const value = await originalPatch.call(this, observed, ...args);
+      // Capture current host outcome before any diagnostic snapshot reread.
+      event('write-return', { value, current: recordApp.current(), pending: recordApp.pending });
+      return value;
+    } catch (error) { event('write-throw', errorInfo(error)); throw error; }
+  };
+  const originalGrade = commitStandardGrade;
+  commitStandardGrade = async function (...args) {
+    diagnostic.entered++;
+    const { item, key, skey, rating, now, day } = args[0];
+    event('grade-enter', { item, key, skey, rating, now, day, review: review(), writable: recordWritable() });
+    try {
+      const value = await originalGrade.apply(this, args);
+      event('grade-return', { value, review: review(), writable: recordWritable(),
+        current: recordApp.current(), pending: recordApp.pending });
+      return value;
+    } catch (error) { event('grade-throw', errorInfo(error)); throw error; }
+    finally { diagnostic.settled++; }
+  };
+  diagnostic.review = review;
+  diagnostic.invoke = () => {
+    const rv = S.review, item = rv.queue[rv.ix], now = new Date();
+    return commitStandardGrade({ rv, item, key: 'good', skey: srsKey(item.t, item.id),
+      rating: fsrsApi.Rating.Good, now, day: dayKey(now) });
+  };
+  window.__assessmentGradeDiagnostic = diagnostic;
+}});
+`;
 const corridorFixture = Buffer.concat([corridorSource, Buffer.from('\n' + exposed.map(name =>
-  `Object.defineProperty(window,${JSON.stringify(name)},{get:()=>${name}});`).join('\n'))]);
+  `Object.defineProperty(window,${JSON.stringify(name)},{get:()=>${name}});`).join('\n') + (gradeDiagnostics ? gradeDiagnosticShim : ''))]);
 const core = await import(pathToFileURL(resolve(site, 'modules/assessment-core.mjs')));
 const recordCore = await import(pathToFileURL(resolve(site, 'modules/record-core.mjs')));
 const rights = { ...core.unknownAssessmentRights(), adapt: { status: 'allowed', basisRef: 'synthetic-original', policyVersion: 'fixture-only' } };
@@ -98,7 +163,7 @@ const server = createServer((request, response) => {
 });
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
-const results = [], failures = [];
+const results = [], failures = [], diagnostics = [];
 const engines = process.env.KAIRO_BROWSER === 'all' ? ['chromium', 'webkit'] : [process.env.KAIRO_BROWSER || 'chromium'];
 async function boot(page) {
   await page.goto(`${origin}/?entry=shelf&ui=bi`);
@@ -173,7 +238,8 @@ async function run(engine, name, body) {
   } catch (error) {
     const state = await page.evaluate(() => ({ text: document.body.innerText.slice(0, 5000),
       error: typeof S === 'undefined' ? null : S.storeError, notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice,
-      writable: typeof recordWritable === 'function' && recordWritable() })).catch(() => null);
+      writable: typeof recordWritable === 'function' && recordWritable(),
+      gradeDiagnostic: JSON.parse(JSON.stringify(window.__assessmentGradeDiagnostic || null)) })).catch(() => null);
     failures.push({ engine, name, error: String(error), pageErrors, state });
     console.error(`FAIL ${engine}/${name}: ${String(error)}`);
     writeFileSync(resolve(evidence, 'assessment-app-failures.json'), `${JSON.stringify(failures, null, 2)}\n`);
@@ -253,9 +319,10 @@ try {
         assert.equal(record.assessmentQuestionPractice.responses.length, 1);
         assert.equal(record.assessmentQuestionPractice.grades.length, 1); assert.equal(record.revlog[0][2], 3);
       });
-      await run(engine, 'question-card-deleted-result-blocks-fresh-grade', async page => {
+      for (const invocation of gradeDiagnostics ? ['click', 'direct'] : ['click']) await run(engine,
+        `question-card-deleted-result-blocks-fresh-grade${invocation === 'direct' ? '-direct-control' : ''}`, async page => {
         await finishQuestionFixture(page); await checkQuestionAnswer(page);
-        const retained = await page.evaluate(async () => {
+        const before = await page.evaluate(async diagnostic => {
           const selected = currentAssessmentV2(), native = await recordController.snapshot();
           const result = await recordController.commitLocal({ changeId: 'fixture:question-delete', binding: recordInstallation.policy.binding,
             expectedRevision: native.snapshot.revision, occurredAt: new Date().toISOString(), mutations: [],
@@ -263,14 +330,41 @@ try {
               reason: 'user-deleted' }, dependencies: [] }] });
           if (result.status !== 'active') throw new Error(result.reason);
           // Leave published UI deliberately stale: the queued grade must use its fresh storage snapshot.
-          return JSON.stringify(S.assessmentQuestionPractice);
-        });
-        await page.locator('.grade.g-good').click();
-        await page.waitForFunction(() => !S.review.pending);
-        const result = await page.evaluate(() => ({ writable: recordWritable(), srs: S.srs, revlog: S.revlog,
-          sidecar: JSON.stringify(S.assessmentQuestionPractice), error: S.review.questionError }));
-        assert.deepEqual(result.srs, {}); assert.deepEqual(result.revlog, []); assert.equal(result.sidecar, retained);
-        assert(result.error); assert(result.writable);
+          const durable = diagnostic ? await recordController.snapshot() : null;
+          if (diagnostic) window.__installAssessmentGradeDiagnostic();
+          return { retained: JSON.stringify(S.assessmentQuestionPractice), deletion: result,
+            durable, review: diagnostic ? window.__assessmentGradeDiagnostic.review() : null };
+        }, gradeDiagnostics);
+        const diagnostic = { engine, invocation, before,
+          limitation: invocation === 'direct' ? 'Calls the production grade function directly, bypassing button-handler guards.' : null };
+        const saveDiagnostics = () => writeFileSync(resolve(evidence, 'assessment-grade-diagnostics.json'), `${JSON.stringify(diagnostics, null, 2)}\n`);
+        if (gradeDiagnostics) { diagnostics.push(diagnostic); saveDiagnostics(); }
+        try {
+          if (invocation === 'click') await page.locator('.grade.g-good').click();
+          else diagnostic.directReturn = await page.evaluate(() => window.__assessmentGradeDiagnostic.invoke());
+          // An idle pending flag alone does not establish that the action ran.
+          if (gradeDiagnostics) await page.waitForFunction(() => window.__assessmentGradeDiagnostic.entered > 0 &&
+            window.__assessmentGradeDiagnostic.settled === window.__assessmentGradeDiagnostic.entered);
+          await page.waitForFunction(() => !S.review.pending);
+          const result = await page.evaluate(() => ({ writable: recordWritable(), srs: S.srs, revlog: S.revlog,
+            sidecar: JSON.stringify(S.assessmentQuestionPractice), error: S.review.questionError }));
+          diagnostic.result = result;
+          assert.deepEqual(result.srs, {}); assert.deepEqual(result.revlog, []); assert.equal(result.sidecar, before.retained);
+          assert(result.error); assert(result.writable);
+        } catch (error) { diagnostic.executionError = String(error); throw error; }
+        finally {
+          if (gradeDiagnostics) {
+            diagnostic.after = await page.evaluate(async () => {
+              const currentBeforeRead = recordApp.current(), probe = window.__assessmentGradeDiagnostic;
+              const captured = { currentBeforeRead, review: probe.review(), events: JSON.parse(JSON.stringify(probe.events)),
+                entered: probe.entered, settled: probe.settled };
+              try { captured.durable = await recordController.snapshot(); }
+              catch (error) { captured.snapshotError = String(error); }
+              return captured;
+            }).catch(error => ({ captureError: String(error) }));
+            saveDiagnostics();
+          }
+        }
       });
       for (const source of ['local', 'received']) await run(engine, `${source}-canonical-card-keeps-assessed-context`, async page => {
         if (source === 'received') await page.setViewportSize({ width: 320, height: 844 });
@@ -415,9 +509,9 @@ try {
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const receipt = { format: 'kairo-assessment-instrumented-app-verification', v: 1,
   artifactSha256: identity.artifactSha256, sourceAssetSha256: identity.sourceAssetSha256, gitSha: identity.gitSha,
-  instrumentation: { path: 'corridor.js', originalSha256: sha(corridorSource), servedSha256: sha(corridorFixture), exposed },
-  fixtures: [...fixtures].map(([path, bytes]) => ({ path, sha256: sha(bytes) })), results, failures,
-  limits: ['test-only export shim; this is not the uninstrumented production browser battery', 'synthetic assessment content, not editorial approval', 'offline check covers retained exact source cache; production service-worker shell lifecycle is verified separately'] };
+  instrumentation: { path: 'corridor.js', originalSha256: sha(corridorSource), servedSha256: sha(corridorFixture), exposed, gradeDiagnostics },
+  fixtures: [...fixtures].map(([path, bytes]) => ({ path, sha256: sha(bytes) })), results, failures, diagnostics,
+  limits: ['test-only export shim; this is not the uninstrumented production browser battery', ...(gradeDiagnostics ? ['deleted-result cases add diagnostic promise-observation microtasks and an extra native snapshot before grading; reproduce with KAIRO_GRADE_DIAGNOSTICS unset too'] : []), 'synthetic assessment content, not editorial approval', 'offline check covers retained exact source cache; production service-worker shell lifecycle is verified separately'] };
 writeFileSync(resolve(evidence, 'assessment-app.json'), `${JSON.stringify(receipt, null, 2)}\n`);
 console.log(`Assessment app: ${results.length}/${results.length + failures.length} passed. ${resolve(evidence, 'assessment-app.json')}`);
 if (failures.length) { console.error(JSON.stringify(failures, null, 2)); process.exitCode = 1; }
