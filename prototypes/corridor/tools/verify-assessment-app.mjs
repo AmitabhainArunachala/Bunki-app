@@ -391,6 +391,113 @@ try {
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Assessment context fits the review card without horizontal overflow');
         await page.screenshot({ path: resolve(evidence, `${engine}-${source}-revealed-context.png`), fullPage: true });
       });
+      // "Return to this sentence" for a test question once called openPassage(undefined) and went
+      // nowhere (PLAN D20). Both real callers must open the JLPT room on THAT attempt with THAT
+      // question open — a second attempt catches a wrong-result landing — and write nothing.
+      await run(engine, 'source-return-opens-the-exact-question', async page => {
+        assert.equal(await start(page), true); assert((await finish(page)).submitted);
+        assert.equal(await start(page), true); assert((await finish(page)).submitted);
+        const ids = await page.evaluate(async () => {
+          const attempts = S.assessmentLibraryV2.attempts.filter(row => row.status === 'submitted');
+          const target = attempts[attempts.length - 1], selected = currentAssessmentV2(target.attemptId);
+          const itemId = selected.form.items[0].id;
+          await openAssessmentSensei(target.attemptId, itemId);
+          return { attempts: attempts.map(row => row.attemptId), attemptId: target.attemptId, itemId, view: S.view,
+            record: { srs: JSON.stringify(S.srs), revlog: S.revlog.length } };
+        });
+        assert.equal(ids.attempts.length, 2, 'two submitted attempts'); assert.equal(ids.view, 'ai');
+        const landed = () => page.evaluate(id => {
+          const d = document.querySelector(`details[data-exam-item="${CSS.escape(id)}"]`);
+          return { view: S.view, attempt: document.querySelector('#app main')?.dataset.examAttempt || null, found: !!d, open: !!d?.open,
+            srs: JSON.stringify(S.srs), revlog: S.revlog.length };
+        }, ids.itemId);
+        // caller 1: the Sensei room's "return to this sentence"
+        await page.locator('#teacher-source-return').click();
+        await page.waitForFunction(() => S.view === 'mock', null, { timeout: 5_000 });
+        const one = await landed();
+        assert.deepEqual({ attempt: one.attempt, found: one.found, open: one.open }, { attempt: ids.attemptId, found: true, open: true },
+          `Sensei return lands on the exact attempt and question: ${JSON.stringify(one)}`);
+        assert.deepEqual({ srs: one.srs, revlog: one.revlog }, ids.record, 'Returning writes no grade');
+        // caller 2: a learned word carrying that Sensei context, in review, "read the original sentence"
+        const word = await page.evaluate(async () => {
+          const context = S.teacherContexts.entries.find(entry => entry.sourceKind === 'assessment-item');
+          const id = Object.keys(D.dict).find(key => key.length === 2 && !S.taken.some(row => row.id === key));
+          const ok = await commitStorePatch(latest => ({ taken: [...latest.taken, { t: 'word', id, label: id, ts: Date.now(), sourceContextRef: context.id }] }));
+          startReview([{ t: 'word', id }]);
+          return { ok, id, contextId: context.id };
+        });
+        assert(word.ok, 'fixture word saved with the Sensei context');
+        await page.locator('#declare-notyet').click();
+        await page.locator('#review-source-return').click();
+        await page.waitForFunction(() => S.view === 'mock', null, { timeout: 5_000 });
+        const two = await landed();
+        assert.deepEqual({ attempt: two.attempt, found: two.found, open: two.open }, { attempt: ids.attemptId, found: true, open: true },
+          `Review return lands on the exact attempt and question: ${JSON.stringify(two)}`);
+        // an unavailable source keeps the learner where they are, with the caller's note
+        await page.evaluate(async attemptId => {
+          const native = await recordController.snapshot();
+          const removed = await recordController.commitLocal({ changeId: 'fixture:source-return-removed', binding: recordInstallation.policy.binding,
+            expectedRevision: native.snapshot.revision, occurredAt: new Date().toISOString(), mutations: [],
+            operations: [{ payload: { kind: 'entity.tombstone', target: { kind: 'exam-attempt', id: attemptId }, reason: 'user-deleted' }, dependencies: [] }] });
+          if (removed.status !== 'active') throw new Error(removed.reason);
+          publishRecordSnapshot((await recordApp.snapshot()).snapshot);
+          await reconcileAssessmentResults();
+          S.view = 'ai'; render();
+        }, ids.attemptId);
+        await page.locator('#teacher-source-return').click();
+        await page.waitForFunction(() => (document.querySelector('#teacher-source-status')?.textContent || '').trim().length > 0, null, { timeout: 5_000 });
+        const stayed = await page.evaluate(() => ({ view: S.view, note: document.querySelector('#teacher-source-status')?.textContent }));
+        assert.equal(stayed.view, 'ai', `An unavailable source keeps the learner in place: ${JSON.stringify(stayed)}`);
+      });
+      // A question card whose result was deleted (a real durable tombstone) is unavailable: the
+      // review returns before its more-row. The page's report entry must still be there, and
+      // reporting must leave the settled state, queue and durable record exactly as they were;
+      // Skip then advances without writing a response or a grade (Codex fixture recipe).
+      await run(engine, 'report-entry-in-unavailable-question', async page => {
+        await finishQuestionFixture(page);
+        await page.evaluate(async () => {
+          const selected = currentAssessmentV2(), native = await recordController.snapshot();
+          const removed = await recordController.commitLocal({ changeId: 'fixture:report-unavailable-question',
+            binding: recordInstallation.policy.binding, expectedRevision: native.snapshot.revision,
+            occurredAt: new Date().toISOString(), mutations: [], operations: [{ payload: {
+              kind: 'entity.tombstone', target: { kind: 'exam-attempt', id: selected.attempt.attemptId }, reason: 'user-deleted' }, dependencies: [] }] });
+          if (removed.status !== 'active') throw new Error(`Deletion ${removed.reason}`);
+          publishRecordSnapshot((await recordApp.snapshot()).snapshot);
+          S.view = 'tray'; S.review = null; render();
+          startReview(S.taken.filter(row => row.t === 'question'));
+        });
+        await page.waitForFunction(() => {
+          const status = document.querySelector('#assessment-question-status');
+          return !!status && !/Loading|読み込み中/u.test(status.textContent) && status.textContent.trim().length > 0;
+        }, null, { timeout: 15_000 });
+        const snapshot = () => page.evaluate(() => ({ ix: S.review.ix, queue: S.review.queue.map(row => `${row.t}:${row.id}`),
+          history: S.review.history?.length ?? null, done: JSON.stringify(S.review.done), revealed: S.review.revealed,
+          declared: S.review.declared, status: document.querySelector('#assessment-question-status')?.textContent,
+          srs: JSON.stringify(S.srs), revlog: S.revlog.length,
+          practice: JSON.stringify(recordApp.current().snapshot.record.assessmentQuestionPractice),
+          controls: document.querySelectorAll('.grade, #assessment-question-check').length }));
+        const before = await snapshot();
+        const entry = '#app > .report-line-page [data-report-entry="open"]';
+        assert.equal(await page.locator(entry).count(), 1, 'The page report entry exists in the unavailable-question state');
+        const hit = await page.evaluate(sel => {
+          const el = document.querySelector(sel); el.scrollIntoView({ block: 'center' });
+          const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, top = document.elementFromPoint(x, y);
+          return { x, y, uncovered: !!top && (top === el || el.contains(top)) };
+        }, entry);
+        assert(hit.uncovered, 'Nothing covers the report entry');
+        await page.mouse.click(hit.x, hit.y);
+        await page.waitForSelector('#bunki-reports-root dialog.br-sheet[open]');
+        await page.locator('#bunki-reports-root .br-close').click();
+        await page.waitForFunction(() => !document.querySelector('#bunki-reports-root dialog.br-sheet[open]'));
+        const after = await snapshot();
+        assert.deepEqual(after, before, 'Reporting changed nothing in the unavailable-question state');
+        assert.equal(after.controls, 0, 'No grade or check controls while the question is unavailable');
+        await page.locator('#assessment-question-skip').click();
+        await page.waitForFunction(ix => S.review.ix > ix, before.ix);
+        const skipped = await page.evaluate(() => ({ srs: JSON.stringify(S.srs), revlog: S.revlog.length,
+          practice: JSON.stringify(recordApp.current().snapshot.record.assessmentQuestionPractice) }));
+        assert.deepEqual(skipped, { srs: before.srs, revlog: before.revlog, practice: before.practice }, 'Skip writes no response or grade');
+      });
       await run(engine, 'older-card-removal-after-test', async page => {
         assert.equal(await start(page), true); const finished = await finish(page);
         assert(finished.answered && finished.submitted && finished.writable);

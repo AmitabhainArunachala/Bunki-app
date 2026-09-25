@@ -20,6 +20,8 @@
  *   R6 a room that failed to draw still carries the entry.
  *   R7 'My reports' opens the list; focus returns to the entry that opened it.
  *   R8 the field entry (?entry=field) carries the page entry.
+ *   R9 an unavailable kanji card (legacy row 㐆, no saved answer): entry present, reporting
+ *      changes nothing, and continuing advances without a grade.
  * Every case runs in Chromium and WebKit, at 1728×996 and 390×844.
  *
  * Claim boundary: the review more-row entry needs seeded due cards; the probe
@@ -211,6 +213,45 @@ try {
     check(`R5 ${w}px probe: the stage's own reveal still takes a real click`, revealed &&
       await page.waitForSelector('.probe-meta', { timeout: 5_000 }).then(() => true, () => false));
     await context.close();
+
+    // R9 an unavailable kanji card (a real legacy row with no saved answer, 㐆): the review
+    // returns early without its more-row; the page entry must still be there, and reporting
+    // must leave the settled state, the queue and the durable record exactly as they were.
+    {
+      const kanjiContext = await browser.newContext({ viewport });
+      await kanjiContext.addInitScript(() => {
+        if (localStorage.getItem('report-entries-seeded')) return;
+        const t = 1700000000000;
+        localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [{ t: 'kanji', id: '㐆', label: '㐆', ts: t, started: t }],
+          srs: {}, revlog: [], obslog: [] }));
+        localStorage.setItem('report-entries-seeded', '1');
+      });
+      const kp = await kanjiContext.newPage();
+      await kp.goto(`${origin}/index.html?entry=shelf`); await ready(kp);
+      await kp.locator('#tray').click();
+      await kp.locator('#review-start').click();
+      const unavailable = await kp.waitForSelector('#review-answer-unavailable', { timeout: 15_000 }).then(() => true, () => false);
+      check(`R9 ${w}px unavailable kanji: the real unavailable state is up`, unavailable);
+      const state = () => kp.evaluate(() => ({ ix: S.review?.ix, queue: S.review?.queue.map((row) => `${row.t}:${row.id}`),
+        revealed: S.review?.revealed, declared: S.review?.declared, srs: JSON.stringify(S.srs), revlog: S.revlog.length,
+        text: document.querySelector('#review-answer-unavailable')?.innerText || null,
+        grades: document.querySelectorAll('.grade, #declare-recalled, #declare-notyet').length }));
+      const before = await state();
+      check(`R9 ${w}px unavailable kanji: the page entry exists`, (await kp.locator(PAGE_ENTRY).count()) === 1);
+      if (await kp.locator(PAGE_ENTRY).count()) {
+        const hit = await fingerClick(kp, PAGE_ENTRY);
+        check(`R9 ${w}px unavailable kanji: the entry is uncovered and opens the dialog`, hit.uncovered && await reportOpen(kp), JSON.stringify(hit));
+        if (await reportOpen(kp)) await closeReport(kp);
+      }
+      const after = await state();
+      check(`R9 ${w}px unavailable kanji: reporting changed nothing (state, queue, record, no grade controls)`,
+        JSON.stringify(after) === JSON.stringify(before) && after.grades === 0, JSON.stringify({ before, after }));
+      await fingerClick(kp, '#review-unavailable-next');
+      const moved = await kp.waitForFunction((ix) => S.review && S.review.ix > ix, before.ix, { timeout: 5_000 }).then(() => true, () => false);
+      const graded = await kp.evaluate(() => ({ srs: JSON.stringify(S.srs), revlog: S.revlog.length }));
+      check(`R9 ${w}px unavailable kanji: continuing advances without writing a grade`, moved && graded.srs === before.srs && graded.revlog === before.revlog, JSON.stringify(graded));
+      await kanjiContext.close();
+    }
 
     // R6 a room that failed to draw keeps its entry (fault injected by this harness only)
     const faultContext = await browser.newContext({ viewport });
