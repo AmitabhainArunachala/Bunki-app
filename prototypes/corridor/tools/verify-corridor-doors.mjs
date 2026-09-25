@@ -67,6 +67,14 @@ async function settle(page) {
   } catch { /* the assertion below reports the empty main */ }
   return mainState(page);
 }
+// The room is complete only once its catalog has resolved: the history/legacy
+// doors are appended after the data, never while it is still loading.
+async function catalogComplete(page, timeout = 10_000) {
+  try {
+    await page.waitForFunction(() => !!document.querySelector('#app main #exam-legacy'), null, { timeout });
+    return true;
+  } catch { return false; }
+}
 async function enterJlptFromDojo(page, { fromDoor = false } = {}) {
   if (fromDoor) {
     // the front door: open the 回廊 navigation, then its 集中道場 door
@@ -107,7 +115,7 @@ try {
     const second = await context.newPage(); await second.goto(`${origin}/index.html?entry=shelf`); await ready(second);
     const state = await enterJlptFromDojo(second);
     check('T1 second window: JLPT from the dojo door is never an empty main', state.kids > 0, JSON.stringify(state));
-    check('T1 second window: the room names its state', !!state.state, `state=${state.state}`);
+    check('T1 second window: the room says it is blocked, not booting', state.state === 'blocked', `state=${state.state}`);
     await second.screenshot({ path: resolve(EVIDENCE, 't1-second-window.png') });
     await context.close();
   }
@@ -136,11 +144,25 @@ try {
     if (await retry.count()) {
       await page.evaluate(() => { globalThis.__doorsFault = false; });
       await retry.click();
-      const after = await settle(page);
-      check('T3 retry leaves the fault and draws the room', !after.error && after.kids > 0, JSON.stringify(after));
+      const complete = await catalogComplete(page);
+      const after = await mainState(page);
+      check('T3 retry leaves the fault and draws the completed room', !after.error && complete, JSON.stringify(after));
     } else check('T3 retry leaves the fault and draws the room', false, 'no retry control');
     await page.screenshot({ path: resolve(EVIDENCE, 't3-room-error.png') });
     faulty = false;
+    await context.close();
+  }
+
+  // T9 — the completion check itself discriminates: with the catalog stalled forever,
+  // the room must NOT count as complete (a loading room once passed as 'drawn').
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    await context.route('**/data/assessment/catalog.json', () => { /* never answered */ });
+    const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
+    await enterJlptFromDojo(page);
+    const complete = await catalogComplete(page, 4_000);
+    const state = await mainState(page);
+    check('T9 control: a stalled catalog is not counted as a completed room', !complete, JSON.stringify(state));
     await context.close();
   }
 
@@ -167,13 +189,17 @@ try {
     const route = fromDoor ? 'front door → 集中道場' : 'shelf → 道場';
     const context = await browser.newContext({ viewport, deviceScaleFactor });
     const page = await context.newPage(); await page.goto(fromDoor ? origin : `${origin}/index.html?entry=shelf`); await ready(page);
-    const state = await enterJlptFromDojo(page, { fromDoor });
-    check(`T6 ${viewport.width}px ${route}: JLPT draws the room`, state.kids > 0, JSON.stringify(state));
+    await enterJlptFromDojo(page, { fromDoor });
+    const loaded = await catalogComplete(page);
+    const state = await mainState(page);
+    check(`T6 ${viewport.width}px ${route}: JLPT draws the completed room`, loaded && state.kids > 0, JSON.stringify(state));
     const n1 = page.locator('[data-exam-level="N1"]');
     if (await n1.count()) {
       await n1.click();
-      const after = await settle(page);
-      check(`T6 ${viewport.width}px ${route}: N1 draws something the learner can act on`, after.kids > 0, JSON.stringify(after));
+      const loadedN1 = await catalogComplete(page);
+      const after = await mainState(page);
+      check(`T6 ${viewport.width}px ${route}: N1 completes with something the learner can act on`,
+        loadedN1 && after.kids > 0 && !/Loading tests|読み込み中/u.test(after.text), JSON.stringify(after));
     } else check(`T6 ${viewport.width}px ${route}: N1 level control present`, false, 'no [data-exam-level=N1]');
     await page.screenshot({ path: resolve(EVIDENCE, `t6-${viewport.width}-${fromDoor ? 'door' : 'shelf'}.png`), fullPage: true });
     await context.close();
