@@ -7076,7 +7076,9 @@ let recManifest; // undefined = not asked · null = absent · object = loaded
 let recManifestWait = null;
 let recAudioEl = null;
 
+let sessionVoicePref = null; // the explicit choice for this session when storage cannot keep it
 function recVoicePref() {
+  if (sessionVoicePref) return sessionVoicePref;
   try {
     // no automatic voice: アミ and the device voice were both rejected by the operator
     // (09-19, 09-17); a recorded voice plays only once the learner has chosen it
@@ -7155,15 +7157,23 @@ function speakCardReading(text, btn, word) {
     const pref = recVoicePref();
     if (entry && pref && entry.voices.includes(pref)) {
       playRecClip(`audio/w/${pref}/${entry.id}.m4a`, btn).then((played) => {
-        if (!played && btn) btn.title = tx('この環境では再生できませんでした', 'This recording could not play here');
+        if (played || !btn) return;
+        const reason = tx('この環境では再生できませんでした', 'This recording could not play here');
+        btn.title = reason;
+        const note = btn.parentElement?.querySelector('.say-note');
+        if (note) note.textContent = reason;
       });
       return;
     }
-    // no chosen voice, or no recording in it: say so, never fall back to the device voice
+    // no chosen voice, or no recording in it: say so where it can be seen, never fall back to the device voice
+    const reason = !m ? tx('この版には収録音声がありません', 'This build has no recorded voices')
+      : pref ? tx('この語は選んだ声でまだ収録されていません', 'Not yet recorded in your chosen voice')
+        : tx('声がまだ選ばれていません（読み物の「聞く」の横で選べます）', 'No voice chosen yet — choose one beside a reading’s listen button');
     if (btn) {
-      btn.dataset.voiceUnavailable = pref ? 'not-recorded' : 'no-voice';
-      btn.title = pref ? tx('この語は選んだ声でまだ収録されていません', 'Not yet recorded in your chosen voice')
-        : tx('声がまだ選ばれていません（読み物の「聞く」から選べます）', 'No voice chosen yet — choose one beside a reading’s listen button');
+      btn.dataset.voiceUnavailable = !m ? 'no-recordings' : pref ? 'not-recorded' : 'no-voice';
+      btn.title = reason;
+      const note = btn.parentElement?.querySelector('.say-note');
+      if (note) note.textContent = reason;
     }
   });
 }
@@ -7261,9 +7271,11 @@ function renderReader(main) {
     ? tx('小春音アミの合成音声で再生中（仮の声・検収前）', 'playing Koharune Ami’s synthetic voice (interim, not yet chosen)')
     : readAloud.failed
       ? tx('この環境では収録を再生できませんでした', 'The recording could not play here')
-      : !recManifest
+      : recManifest === undefined
         ? tx('収録音声を確認しています…', 'Checking for recordings…')
-        : !passageRecorded
+        : !recManifest
+          ? tx('この版には収録音声がありません', 'This build has no recorded voices')
+          : !passageRecorded
           ? tx('この記事の収録音声はまだありません', 'No recorded voice for this article yet')
           : pref === 'ami'
             ? tx('合成音声：小春音アミ（仮の声・検収前）', 'synthetic voice: Koharune Ami (interim, not yet chosen)')
@@ -7284,6 +7296,7 @@ function renderReader(main) {
     });
     render();
   });
+  if (readAloud.voiceNotSaved) listenNote.textContent += tx('（この声の選択は保存できず、今回だけ有効です）', ' (this choice could not be saved; it lasts this session)');
   listenRow.append(listen, listenNote);
   if (recManifest) {
     // the interim roster, chosen explicitly — never preselected, never presented as approved
@@ -7306,10 +7319,15 @@ function renderReader(main) {
       pick.append(opt);
     }
     pick.addEventListener('change', () => {
+      sessionVoicePref = null;
       try {
         if (pick.value) localStorage.setItem(REC_VOICE_KEY, pick.value);
         else localStorage.removeItem(REC_VOICE_KEY);
-      } catch { /* the choice lasts this session if preferences cannot save */ }
+      } catch {
+        // storage refused: keep the explicit choice for this session and say so
+        sessionVoicePref = pick.value || null;
+        readAloud.voiceNotSaved = true;
+      }
       if (readAloud.on) stopReadAloud();
       render();
     });
@@ -17071,7 +17089,7 @@ function renderReview(main) {
     const spoken = backc.reading || (item.t === 'kanji' ? '' : item.label);
     const row = el('div', 'review-reading-row reveal r-1');
     if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
-    if (spoken) {
+    if (spoken && recManifest !== null) {
       const say = el('button', 'say');
       say.type = 'button';
       say.id = 'card-say';
@@ -17081,6 +17099,10 @@ function renderReview(main) {
         '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
       say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
       row.append(say);
+      // a tap that cannot play says why, visibly and to assistive tech — never a silent no-op
+      const sayNote = el('span', 'say-note');
+      sayNote.id = 'card-say-note'; sayNote.setAttribute('role', 'status'); sayNote.setAttribute('aria-live', 'polite');
+      row.append(sayNote);
     }
     if (row.childNodes.length) face.append(row);
     // 語義 — one sense decides the grade; the next two whisper on one line
