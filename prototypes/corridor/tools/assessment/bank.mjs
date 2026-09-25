@@ -485,16 +485,268 @@ export async function materializeWrittenReview(input) {
   });
 }
 
-// This one already-reviewed section is deliberately independent of native mock assembly.
-// Its immutable ID and digest are admission constraints, not editable publication metadata.
-export const REVIEWED_N2_WRITTEN = Object.freeze({
-  id: 'kairo-original-jlpt-n2-short-01:written-review',
-  sha256: '56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2',
-  bytesSha256: '2806699c318d0b74fdb2fdb3e45aac85f05ba857da8e81687b082039ce2418fc',
-  filenameStem: 'kairo-original-jlpt-n2-written-12-01',
-  sourceId: 'bunki-original-n2-20260923',
-  publicationRoute: 'exact-reviewed-written-section/1',
+/** Prepared written-only material bound to its manuscript. Unreviewed authoring material only. */
+export async function materializeWrittenSection(prepared, manuscript) {
+  const { intent, audio, notes } = prepared;
+  if (
+    intent.mode !== 'section' ||
+    intent.formPayload.scope !== 'section-practice' ||
+    intent.formPayload.exam.track !== intent.level ||
+    audio.schema !== 'kairo-assessment-audio-scripts/1' ||
+    audio.formId !== intent.id ||
+    audio.units.length !== 0 ||
+    notes.formId !== intent.id ||
+    notes.level !== intent.level
+  )
+    throw new Error('Written section authoring input is inconsistent');
+  if (!Buffer.isBuffer(manuscript.bytes) || notes.manuscriptSha256 !== hash(manuscript.bytes))
+    throw new Error('Manuscript bytes differ from the prepared authoring input');
+  const form = await materializeWrittenReview(intent);
+  const basis = intent.formPayload.rights.display.basisRef;
+  for (const artifact of [form, ...form.items, ...form.passages])
+    if (Object.values(artifact.rights).some((grant) => grant.basisRef !== basis))
+      throw new Error(`Written section rights basis differs from its authoring spec: ${artifact.id}`);
+  const passageKeys = Object.keys(manuscript.passages);
+  if (passageKeys.length !== form.passages.length)
+    throw new Error('Mapper did not preserve the manuscript passages');
+  const passageMap = passageKeys.map((key) => {
+    const passageId = `${intent.id}:passage-${key}`;
+    const passage = form.passages.find((candidate) => candidate.id === passageId);
+    if (passage?.text !== manuscript.passages[key])
+      throw new Error(`Mapper did not preserve manuscript passage ${key}`);
+    return { key, passageId, textSha256: passage.textSha256 };
+  });
+  if (manuscript.items.length !== form.items.length || notes.items.length !== form.items.length)
+    throw new Error('Mapper did not preserve the manuscript item count');
+  const itemMap = manuscript.items.map((entry, index) => {
+    const itemId = `${intent.id}:q${String(index + 1).padStart(2, '0')}`;
+    const item = form.items.find((candidate) => candidate.id === itemId);
+    const passageIds = (entry.passages ?? (entry.passage ? [entry.passage] : [])).map(
+      (key) => `${intent.id}:passage-${key}`,
+    );
+    if (
+      !item ||
+      item.skill !== entry.skill ||
+      item.task !== entry.task ||
+      item.prompt !== entry.prompt ||
+      item.rationale !== entry.rationale ||
+      item.response.kind !== 'selected' ||
+      JSON.stringify(item.response.options.map((option) => option.text)) !==
+        JSON.stringify(entry.options) ||
+      item.response.answerOptionId !== item.response.options[entry.answer]?.id ||
+      JSON.stringify(item.passages.map((reference) => reference.id)) !==
+        JSON.stringify(passageIds) ||
+      item.media.length !== 0 ||
+      notes.items[index].itemId !== itemId ||
+      JSON.stringify(notes.items[index].doubts) !== JSON.stringify(entry.doubts ?? [])
+    )
+      throw new Error(`Mapper did not preserve manuscript item ${index + 1}`);
+    return {
+      index: index + 1,
+      itemId,
+      skill: item.skill,
+      task: item.task,
+      answerOptionId: item.response.answerOptionId,
+      promptSha256: hash(item.prompt),
+      passageIds,
+    };
+  });
+  const formBytes = Buffer.from(JSON.stringify(form, null, 2) + '\n');
+  const formText = formBytes.toString('utf8');
+  if (
+    formText.includes('"doubts"') ||
+    manuscript.items.some((entry) =>
+      (entry.doubts ?? []).some((doubt) => formText.includes(JSON.stringify(doubt).slice(1, -1))),
+    )
+  )
+    throw new Error('Author doubts leaked into the learner form');
+  const files = {
+    'intent.json': Buffer.from(JSON.stringify(intent, null, 2) + '\n'),
+    'audio-scripts.json': Buffer.from(JSON.stringify(audio, null, 2) + '\n'),
+    'authoring-notes.json': Buffer.from(JSON.stringify(notes, null, 2) + '\n'),
+    'form.json': formBytes,
+  };
+  const block = intent.formPayload.timingBlocks[0];
+  const binding = {
+    schema: 'kairo-written-section-binding/1',
+    status: 'unreviewed-authoring-material',
+    level: intent.level,
+    manuscript: {
+      sha256: notes.manuscriptSha256,
+      authorModelFamily: notes.authorModelFamily,
+    },
+    authoringNotes: {
+      path: 'authoring-notes.json',
+      sha256: hash(files['authoring-notes.json']),
+    },
+    intent: { path: 'intent.json', sha256: hash(files['intent.json']) },
+    timing: {
+      minutes: intent.durationMinutes,
+      authority: block.authority,
+      basis: 'author-selected practice allocation; not official timing',
+    },
+    items: itemMap,
+    passages: passageMap,
+    form: {
+      path: 'form.json',
+      id: form.id,
+      revisionId: form.revisionId,
+      sha256: form.sha256,
+      bytesSha256: hash(formBytes),
+    },
+  };
+  files['binding.json'] = Buffer.from(JSON.stringify(binding, null, 2) + '\n');
+  return { form, binding, files };
+}
+
+// Each admitted section is deliberately independent of native mock assembly.
+// Its immutable ID and digests are admission constraints, not editable publication metadata.
+// A level whose id/sha256/bytesSha256 are null has no admitted section and cannot publish.
+const WRITTEN_COUNT_SKILLS = ['vocabulary', 'grammar', 'reading', 'listening'];
+const DIGEST = /^[a-f0-9]{64}$/u;
+const writtenPin = (pin) =>
+  Object.freeze({
+    ...pin,
+    skillCounts: Object.freeze({ ...pin.skillCounts }),
+    sharesQuestionsWith: Object.freeze([...pin.sharesQuestionsWith]),
+    forbiddenTasks: Object.freeze([...pin.forbiddenTasks]),
+    authorFamilyIds: Object.freeze([...pin.authorFamilyIds]),
+  });
+const twelveWritten = { vocabulary: 4, grammar: 4, reading: 4, listening: 0 };
+export const REVIEWED_WRITTEN = Object.freeze({
+  N2: writtenPin({
+    level: 'N2',
+    id: 'kairo-original-jlpt-n2-short-01:written-review',
+    sha256: '56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2',
+    bytesSha256: '2806699c318d0b74fdb2fdb3e45aac85f05ba857da8e81687b082039ce2418fc',
+    filenameStem: 'kairo-original-jlpt-n2-written-12-01',
+    sourceId: 'bunki-original-n2-20260923',
+    processRef: 'codex-original-n2-practice-20260923',
+    rightsBasis: 'bunki-original-authoring-20260923',
+    publicationRoute: 'exact-reviewed-written-section/1',
+    titleJa: 'N2 文字・語彙・文法・読解の練習 · 12問',
+    titleEn: 'N2 written practice · 12 questions',
+    questionCount: 12,
+    durationMinutes: 15,
+    skillCounts: twelveWritten,
+    sharesQuestionsWith: ['kairo-original-jlpt-n2-short-01'],
+    forbiddenTasks: [],
+    authorFamilyIds: ['openai'],
+  }),
+  // Unfilled until the exact mapped form has independent collector evidence and
+  // John's editorial acceptance. 19 minutes is an authoring allocation, not official timing.
+  N1: writtenPin({
+    level: 'N1',
+    id: null,
+    sha256: null,
+    bytesSha256: null,
+    filenameStem: 'kairo-original-jlpt-n1-written-12-01',
+    sourceId: 'bunki-original-n1-20260925',
+    processRef: 'claude-original-n1-practice-20260925',
+    rightsBasis: 'bunki-original-authoring-20260923',
+    publicationRoute: 'exact-reviewed-written-section/1',
+    titleJa: 'N1 文字・語彙・文法・読解の練習 · 12問',
+    titleEn: 'N1 written practice · 12 questions',
+    questionCount: 12,
+    durationMinutes: 19,
+    skillCounts: twelveWritten,
+    sharesQuestionsWith: [],
+    forbiddenTasks: ['orthography'],
+    authorFamilyIds: ['anthropic'],
+  }),
 });
+/** Compatibility alias for callers that predate level-keyed pins. */
+export const REVIEWED_N2_WRITTEN = REVIEWED_WRITTEN.N2;
+
+function assertWrittenPinTable(pins) {
+  for (const [level, pin] of Object.entries(pins)) {
+    if (!/^N[1-5]$/u.test(level) || pin?.level !== level)
+      throw new Error(`Written pin table is inconsistent at ${level}`);
+    const unfilled = pin.id === null && pin.sha256 === null && pin.bytesSha256 === null;
+    if (
+      !unfilled &&
+      (typeof pin.id !== 'string' || !DIGEST.test(pin.sha256) || !DIGEST.test(pin.bytesSha256))
+    )
+      throw new Error(`Written pin for ${level} is partially filled`);
+  }
+  return pins;
+}
+assertWrittenPinTable(REVIEWED_WRITTEN);
+
+/** Never falls back: an unknown level or an unfilled pin fails before any publication step. */
+export function admittedWrittenPin(level, pins = REVIEWED_WRITTEN) {
+  if (typeof level !== 'string' || !Object.hasOwn(pins, level))
+    throw new Error(`Unknown written section level: ${String(level)}`);
+  const pin = pins[level];
+  if (pin.level !== level) throw new Error(`Written pin level mismatch: ${level}`);
+  if (pin.id === null || pin.sha256 === null || pin.bytesSha256 === null)
+    throw new Error(`No admitted written section is pinned for ${level}`);
+  return pin;
+}
+
+/** The collector disqualifies author-family receipts only for families its host policy names. */
+export function assertReviewPolicyExcludesAuthor(policy, pin) {
+  const named = new Set(
+    (Array.isArray(policy?.authorFamilyIds) ? policy.authorFamilyIds : [])
+      .filter((id) => typeof id === 'string')
+      .map((id) => id.toLowerCase()),
+  );
+  const missing = pin.authorFamilyIds.filter((id) => !named.has(id.toLowerCase()));
+  if (!pin.authorFamilyIds.length || missing.length)
+    throw new Error(
+      `Review policy does not exclude the ${pin.level} author family: ${missing.join(', ') || 'none pinned'}`,
+    );
+}
+
+/** A native rebuild keeps each admitted written section once, and nothing it does not pin. */
+export function retainedWrittenEntries(entries, pins = REVIEWED_WRITTEN) {
+  const admitted = Object.values(assertWrittenPinTable(pins)).filter((pin) => pin.sha256 !== null);
+  const kept = new Map();
+  for (const entry of entries ?? [])
+    if (
+      !kept.has(entry.id) &&
+      admitted.some(
+        (pin) =>
+          entry.id === pin.id &&
+          entry.level === pin.level &&
+          entry.formSha256 === pin.sha256 &&
+          entry.publicationRoute === pin.publicationRoute &&
+          entry.mode === 'section' &&
+          entry.availability?.ready === true,
+      )
+    )
+      kept.set(entry.id, entry);
+  return [...kept.values()];
+}
+
+/** Public expectation: one ready entry per admitted level, and no other ready entry. */
+export function admittedWrittenSections(catalog, pins = REVIEWED_WRITTEN) {
+  const rows = Object.values(assertWrittenPinTable(pins))
+    .filter((pin) => pin.sha256 !== null)
+    .map((pin) => {
+      const matches = catalog.entries.filter((entry) => entry.id === pin.id);
+      const entry = matches[0];
+      if (
+        matches.length !== 1 ||
+        entry.availability?.ready !== true ||
+        entry.review?.status !== 'ai-reviewed' ||
+        entry.level !== pin.level ||
+        entry.mode !== 'section' ||
+        entry.formSha256 !== pin.sha256 ||
+        entry.titleEn !== pin.titleEn ||
+        entry.questionCount !== pin.questionCount ||
+        entry.durationMinutes !== pin.durationMinutes ||
+        JSON.stringify(entry.skillCounts) !== JSON.stringify(pin.skillCounts) ||
+        entry.officialScoreCalibrated !== false
+      )
+        throw new Error(`Public written section does not match its ${pin.level} pin`);
+      return { pin, entry };
+    });
+  const ready = catalog.entries.filter((entry) => entry.availability?.ready).length;
+  if (ready !== rows.length)
+    throw new Error(`Expected ${rows.length} ready written sections, found ${ready} ready entries`);
+  return rows;
+}
 
 export function assertMediaFreeWrittenDelivery(form, delivery, review) {
   if (
@@ -517,14 +769,14 @@ export function assertMediaFreeWrittenDelivery(form, delivery, review) {
     throw new Error('Null presentation is allowed only for a strictly media-free written section');
 }
 
-function assertOriginalWrittenRights(form, registry) {
-  const source = registry.sources?.find((entry) => entry.id === REVIEWED_N2_WRITTEN.sourceId);
+function assertOriginalWrittenRights(form, registry, pin) {
+  const source = registry.sources?.find((entry) => entry.id === pin.sourceId);
   if (
     registry.schema !== 'kairo-assessment-sources/1' ||
     source?.sourceClass !== 'original-ai' ||
     source.distribution !== 'public-candidate' ||
-    source.rightsBasis !== 'bunki-original-authoring-20260923' ||
-    source.processRef !== 'codex-original-n2-practice-20260923'
+    source.rightsBasis !== pin.rightsBasis ||
+    source.processRef !== pin.processRef
   )
     throw new Error('Written section source rights are not established');
   for (const artifact of [form, ...form.items, ...form.passages]) {
@@ -543,30 +795,47 @@ function assertOriginalWrittenRights(form, registry) {
   }
 }
 
-/** Trusted host callback must re-verify saved runtime evidence; bank JSON is not authority. */
-export async function publishReviewedWrittenPractice(options) {
+/**
+ * Binds publication to a pin table. Production uses only publishReviewedWrittenPractice, bound to
+ * the frozen REVIEWED_WRITTEN; a different table is for isolated fixture directories only.
+ */
+export function writtenSectionPublisher(pins) {
+  assertWrittenPinTable(pins);
+  /** Trusted host callback must re-verify saved runtime evidence; bank JSON is not authority. */
+  return async function publishWrittenSection(options) {
+    // Omitting level keeps the pre-level N2 contract; any other value must name a filled pin.
+    const pin = admittedWrittenPin(options.level === undefined ? 'N2' : options.level, pins);
+    return publishPinnedWrittenSection(pin, options);
+  };
+}
+
+async function publishPinnedWrittenSection(pin, options) {
   const api = await assessmentAPI();
   const formBytes = options.formBytes;
   if (!Buffer.isBuffer(formBytes)) throw new Error('Exact original form bytes are required');
-  if (hash(formBytes) !== REVIEWED_N2_WRITTEN.bytesSha256)
+  if (hash(formBytes) !== pin.bytesSha256)
     throw new Error('Written publication must preserve the exact reviewed form bytes');
   const form = api.parseFormVersion(JSON.parse(formBytes.toString('utf8')));
-  if (form.id !== REVIEWED_N2_WRITTEN.id || form.sha256 !== REVIEWED_N2_WRITTEN.sha256)
+  if (form.id !== pin.id || form.sha256 !== pin.sha256)
     throw new Error('Written publication requires the exact independently reviewed form');
+  if (form.exam.family !== 'jlpt' || form.exam.track !== pin.level)
+    throw new Error(`Written section track ${form.exam.track} does not match its ${pin.level} pin`);
   const skillCounts = Object.fromEntries(
-    ['vocabulary', 'grammar', 'reading', 'listening'].map((skill) => [
+    WRITTEN_COUNT_SKILLS.map((skill) => [
       skill,
       form.items.filter((item) => item.skill === skill).length,
     ]),
   );
   if (
-    form.exam.family !== 'jlpt' ||
-    form.exam.track !== 'N2' ||
-    form.items.length !== 12 ||
-    JSON.stringify(Object.values(skillCounts)) !== '[4,4,4,0]' ||
-    form.timingBlocks.reduce((total, block) => total + block.durationMs, 0) !== 900000
+    form.items.length !== pin.questionCount ||
+    WRITTEN_COUNT_SKILLS.some((skill) => skillCounts[skill] !== pin.skillCounts[skill]) ||
+    form.timingBlocks.reduce((total, block) => total + block.durationMs, 0) !==
+      pin.durationMinutes * 60_000
   )
-    throw new Error('Written section does not match its declared 12-question scope');
+    throw new Error(`Written section does not match its declared ${pin.questionCount}-question scope`);
+  const excluded = form.items.find((item) => pin.forbiddenTasks.includes(item.task));
+  if (excluded)
+    throw new Error(`Written section contains a task its ${pin.level} pin excludes: ${excluded.task}`);
   const publicDirectory = options.publicDirectory ?? PUBLIC_BANK;
   const previous = await readJSON(join(publicDirectory, 'catalog.json'));
   if (
@@ -576,7 +845,7 @@ export async function publishReviewedWrittenPractice(options) {
   )
     throw new Error('An existing valid assessment catalog is required');
   const sources = await readJSON(join(publicDirectory, 'sources.json'));
-  assertOriginalWrittenRights(form, sources);
+  assertOriginalWrittenRights(form, sources, pin);
   if (typeof options.reviewForm !== 'function')
     throw new Error('A trusted current host review is required');
   const review = await options.reviewForm(form);
@@ -611,20 +880,20 @@ export async function publishReviewedWrittenPractice(options) {
   };
   assertMediaFreeWrittenDelivery(form, delivery, review);
   const deliverySha256 = api.encodeLocalJson(delivery).sha256;
-  const stem = REVIEWED_N2_WRITTEN.filenameStem;
+  const stem = pin.filenameStem;
   const entry = {
     id: form.id,
-    level: 'N2',
+    level: pin.level,
     mode: 'section',
-    titleJa: 'N2 文字・語彙・文法・読解の練習 · 12問',
-    titleEn: 'N2 written practice · 12 questions',
-    questionCount: 12,
-    durationMinutes: 15,
+    titleJa: pin.titleJa,
+    titleEn: pin.titleEn,
+    questionCount: pin.questionCount,
+    durationMinutes: pin.durationMinutes,
     skillCounts,
     sourceClass: 'original-ai',
-    sourceIds: [REVIEWED_N2_WRITTEN.sourceId],
-    publicationRoute: REVIEWED_N2_WRITTEN.publicationRoute,
-    sharesQuestionsWith: ['kairo-original-jlpt-n2-short-01'],
+    sourceIds: [pin.sourceId],
+    publicationRoute: pin.publicationRoute,
+    sharesQuestionsWith: [...pin.sharesQuestionsWith],
     formPath: `forms/${stem}-${form.sha256}.json`,
     formSha256: form.sha256,
     editorialAtStart: {
@@ -676,6 +945,7 @@ export async function publishReviewedWrittenPractice(options) {
     published: options.publish === true,
   };
 }
+export const publishReviewedWrittenPractice = writtenSectionPublisher(REVIEWED_WRITTEN);
 
 /** reviewForm is trusted host code. Imported bank JSON never supplies this capability. */
 export async function buildAssessmentBank(options = {}) {
@@ -850,16 +1120,10 @@ export async function buildAssessmentBank(options = {}) {
       officialScoreCalibrated: false,
     });
   }
-  // A later native-mock build must not withdraw this separately admitted written section.
+  // A later native-mock build must not withdraw any separately admitted written section.
+  // writtenPins is a fixture seam; production rebuilds use the frozen REVIEWED_WRITTEN.
   entries.push(
-    ...(previous.entries ?? []).filter(
-      (entry) =>
-        entry.id === REVIEWED_N2_WRITTEN.id &&
-        entry.formSha256 === REVIEWED_N2_WRITTEN.sha256 &&
-        entry.publicationRoute === REVIEWED_N2_WRITTEN.publicationRoute &&
-        entry.mode === 'section' &&
-        entry.availability?.ready === true,
-    ),
+    ...retainedWrittenEntries(previous.entries, options.writtenPins ?? REVIEWED_WRITTEN),
   );
   const archives = new Map();
   for (const entry of [...(previous.archivedEntries ?? []), ...(previous.entries ?? [])]) {

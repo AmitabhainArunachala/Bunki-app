@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Publish the one exact reviewed written section; never assemble or promote a native mock. */
+/** Publish one exact reviewed written section per level; never assemble or promote a native mock. */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdir, mkdtemp, readFile, readdir, realpath, writeFile } from 'node:fs/promises';
@@ -8,6 +8,8 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import {
   PUBLIC_BANK,
   REPOSITORY,
+  admittedWrittenPin,
+  assertReviewPolicyExcludesAuthor,
   hash,
   publishReviewedWrittenPractice,
 } from './assessment/bank.mjs';
@@ -16,7 +18,9 @@ const args = new Map();
 for (let index = 2; index < process.argv.length; index++) {
   const key = process.argv[index];
   if (key === '--publish') args.set(key, true);
-  else if (['--form', '--config', '--runs', '--evidence', '--public-directory'].includes(key)) {
+  else if (
+    ['--form', '--config', '--runs', '--evidence', '--public-directory', '--level'].includes(key)
+  ) {
     const value = process.argv[++index];
     if (!value || value.startsWith('--')) throw new Error(`Missing ${key}`);
     args.set(key, value);
@@ -24,6 +28,9 @@ for (let index = 2; index < process.argv.length; index++) {
 }
 for (const key of ['--form', '--config', '--runs', '--evidence'])
   if (!args.get(key)) throw new Error(`Required: ${key}`);
+// Defaults to N2 so the pre-level invocation is unchanged; an unknown or unpinned level stops here.
+const level = args.get('--level') ?? 'N2';
+const pin = admittedWrittenPin(level);
 
 const evidenceRoot = resolve(args.get('--evidence'));
 const privateRoot = await realpath(join(homedir(), '.dharma'));
@@ -53,6 +60,7 @@ const publicDirectory = resolve(args.get('--public-directory') ?? PUBLIC_BANK);
 const collector = join(REPOSITORY, 'scripts/review-assessment-bank.mjs');
 const collectorBytes = await readFile(collector);
 const configBytes = await readFile(configPath);
+assertReviewPolicyExcludesAuthor(JSON.parse(configBytes.toString('utf8')), pin);
 const runtimeIndex = async () =>
   Promise.all(
     (await readdir(runsPath))
@@ -65,6 +73,7 @@ const collected = join(evidence, 'current-host-review');
 const run = promisify(execFile);
 const formBytes = await readFile(formPath);
 const result = await publishReviewedWrittenPractice({
+  level,
   formBytes,
   publicDirectory,
   publish: args.get('--publish') === true,
@@ -108,8 +117,7 @@ const receipt = {
   runtimeHashes,
   modelRequestsIssued: 0,
   publicDirectory,
-  scope:
-    'Exact 12-question media-free N2 written practice only; existing native mocks remain unchanged.',
+  scope: `Exact ${pin.questionCount}-question media-free ${pin.level} written practice only; existing native mocks remain unchanged.`,
 };
 await writeFile(join(evidence, 'publication.json'), JSON.stringify(receipt, null, 2) + '\n');
 console.log(JSON.stringify({ published: result.published, entry: result.entry, evidence }));
