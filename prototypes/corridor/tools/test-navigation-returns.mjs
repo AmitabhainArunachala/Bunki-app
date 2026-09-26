@@ -15,13 +15,13 @@ function app() {
   const drawingBoundary = new Error('DOM drawing boundary');
   const positions = [];
   const context = vm.createContext({
-    S: { view: 'reader', stack: [], navigationReturns: [], passageId: 'source-a',
+    S: { view: 'reader', stack: [], strokes: null, navigationReturns: [], passageId: 'source-a',
       readerScroll: 180, readerPos: {}, readerTake: { p: 'source-a', id: '世界', index: 3 },
       taken: [], srs: {}, revlog: [], dialogInvoker: null },
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
     requestAnimationFrame() {}, passage: () => null,
@@ -29,6 +29,7 @@ function app() {
     saveReaderPosition: async (id, y) => { positions.push({ id, y }); return true; },
     stopSentenceListening() { throw drawingBoundary; },
   });
+  vm.runInContext(actualFunction('syncSheetActionVisit'), context);
   vm.runInContext(actualFunction('render').replace('function render(', 'function renderUntilDOM('), context);
   context.render = () => {
     try { context.renderUntilDOM(); }
