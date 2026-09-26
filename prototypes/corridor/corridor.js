@@ -1331,7 +1331,7 @@ function validStoreEnvelope(value) {
   if (value.assessmentLearning != null) {
     try { if (!assessmentLearningModule?.validateAssessmentLearningRecord(value)) return false; } catch { return false; }
   }
-  if ((value.assessmentQuestionPractice != null || value.taken?.some(item => item?.t === 'question')) &&
+  if ((value.assessmentQuestionPractice != null || (Array.isArray(value.taken) && value.taken.some(item => item?.t === 'question'))) &&
       !assessmentQuestionModule?.validateAssessmentQuestionRecord(value)) return false;
   if ((value.sentencePractice != null || (Array.isArray(value.taken) && value.taken.some((item) => item?.t === 'sentence'))) &&
       !sentencePracticeModule?.validateSentencePracticeRecord(value)) return false;
