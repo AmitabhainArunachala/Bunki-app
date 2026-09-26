@@ -243,7 +243,7 @@ async function fit(page, label) {
   }));
   if (!(dimensions.document <= dimensions.viewport + 1)) {
     try {
-      const overflow = await page.evaluate(() => {
+      const overflowSnapshot = () => {
         const elementLimit = 2000, rowLimit = 50, rows = [];
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
         let node = walker.currentNode, inspected = 0, matching = 0;
@@ -252,7 +252,8 @@ async function fit(page, label) {
           const rect = node.getBoundingClientRect();
           const outsideViewport = rect.left < -1 || rect.right > innerWidth + 1;
           const contentOverflow = node.scrollWidth > node.clientWidth + 1;
-          if (rect.width > 0 && rect.height > 0 && (outsideViewport || contentOverflow)) {
+          const nativeSelect = node.matches('#teacher-context-select, #teacher-context-select option');
+          if (nativeSelect || (rect.width > 0 && rect.height > 0 && (outsideViewport || contentOverflow))) {
             matching++;
             if (rows.length < rowLimit) {
               const style = getComputedStyle(node);
@@ -268,25 +269,59 @@ async function fit(page, label) {
                 clientWidth: node.clientWidth, scrollWidth: node.scrollWidth,
                 outsideViewport, contentOverflow,
                 computed: Object.fromEntries(['display', 'position', 'width', 'minWidth', 'maxWidth',
-                  'whiteSpace', 'overflowWrap', 'overflowX', 'flex'].map((key) => [key, style[key].slice(0, 160)])),
+                  'whiteSpace', 'overflowWrap', 'overflowX', 'flex', 'transform', 'animationName',
+                  'animationDuration'].map((key) => [key, style[key].slice(0, 160)])),
               });
             }
           }
           node = walker.nextNode();
         }
         return {
+          sampledAt: performance.now(), roomEntering: document.documentElement.dataset.roomEntering || null,
           viewport: { width: innerWidth, height: innerHeight },
           document: { clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth },
           body: { clientWidth: document.body.clientWidth, scrollWidth: document.body.scrollWidth },
           elementLimit, rowLimit, inspected, matching, inspectionTruncated: !!node,
           rowsTruncated: matching > rows.length, rows,
         };
-      });
+      };
+      const overflow = await page.evaluate(overflowSnapshot);
+      let layoutProbe = null;
+      if (process.env.KAIRO_OVERFLOW_PROBE === '1') {
+        try {
+        // Only after the original assertion has failed: observe settling, then
+        // isolate the source of scroll extent in this disposable fixture DOM.
+        // Each style is restored, and the original failure remains the verdict.
+        await page.waitForTimeout(250);
+        const settled = await page.evaluate(overflowSnapshot);
+        const isolation = await page.evaluate(() => {
+          const width = () => document.documentElement.scrollWidth;
+          const baseline = width(), rows = [];
+          const children = [...(document.querySelector('main')?.children || [])];
+          for (const node of children.slice(0, 32)) {
+            const original = node.getAttribute('style');
+            try {
+              node.style.setProperty('display', 'none', 'important');
+              rows.push({ tag: node.tagName.toLowerCase(), id: node.id,
+                class: node.getAttribute('class') || '', hiddenDocumentWidth: width() });
+            } finally {
+              if (original === null) node.removeAttribute('style'); else node.setAttribute('style', original);
+            }
+            rows.at(-1).restoredDocumentWidth = width();
+          }
+          return { baseline, finalDocumentWidth: width(), childCount: children.length,
+            truncated: children.length > 32, rows };
+        });
+        layoutProbe = { delayMs: 250, settled, isolation, scope: 'Post-failure diagnostic only; original assertion unchanged' };
+        } catch (error) {
+          layoutProbe = { error: String(error), scope: 'Optional probe failed; original diagnostic and assertion retained' };
+        }
+      }
       const { engine, name } = fitContext.get(page);
       const path = resolve(evidence, `${engine}-${name}-overflow.json`);
       writeFileSync(path, JSON.stringify({
         schemaVersion: 1, engine, case: name, label, artifactSha256: identity.artifactSha256,
-        assertionDimensions: dimensions, diagnosticSnapshot: overflow,
+        assertionDimensions: dimensions, diagnosticSnapshot: overflow, layoutProbe,
       }, null, 2) + '\n');
       console.error(`Overflow diagnostics: ${path}`);
     } catch (error) {
