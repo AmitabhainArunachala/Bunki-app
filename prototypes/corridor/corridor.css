@@ -5406,6 +5406,8 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   width: 100%;
   max-width: 100%;
   min-height: 44px;
+  /* Long source labels must not contribute intrinsic width to the page. */
+  contain: inline-size;
 }
 
 .chat-row .chat-field {
