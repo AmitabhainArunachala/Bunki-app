@@ -310,13 +310,20 @@ async function fit(page, label) {
             contain: getComputedStyle(select).contain,
           });
           const baseline = sample();
-          let clipped, hidden;
+          let clipped, reclipped, hidden;
           try { select.style.overflow = 'hidden'; clipped = sample(); }
           finally { restore(); }
           const afterClipRestore = sample();
+          try { select.style.overflow = 'hidden'; reclipped = sample(); }
+          finally { restore(); }
+          const afterReclipRestore = sample();
           try { select.style.display = 'none'; hidden = sample(); }
           finally { restore(); }
-          return { baseline, clipped, afterClipRestore, hidden, afterHideRestore: sample(),
+          const afterHideRestore = sample();
+          // Layout reads may reserialize the empty style attribute in WebKit.
+          restore();
+          return { baseline, clipped, afterClipRestore, reclipped, afterReclipRestore,
+            hidden, afterHideRestore, originalStyle: original, finalStyle: select.getAttribute('style'),
             exactStyleRestored: select.getAttribute('style') === original };
         });
         const isolation = await page.evaluate(() => {
