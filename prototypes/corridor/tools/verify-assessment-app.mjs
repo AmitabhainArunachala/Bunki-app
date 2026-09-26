@@ -932,6 +932,7 @@ try {
       await run(engine, 'retry-route-kept-target-yields-to-a-deliberate-return', async (page, context) => {
         await page.locator('#mock-link').click();
         const attemptId = await submittedAttempt(page);
+        assert.equal(await page.evaluate(() => reconcileAssessmentResults()), true, 'terminal fixture reconciliation acknowledged');
         await page.waitForFunction(id => document.querySelector('#app main')?.dataset.examAttempt === id, attemptId);
         // As in terminalRetryFixture, dismiss the owner's terminal result so
         // the retained route is the only way this attempt can be selected.
