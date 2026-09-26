@@ -516,7 +516,10 @@ describe('optional-when-true item assistance on assessment.result/2', () => {
         form,
         status: 'pending-review',
         evidence: [
-          { id: 'evidence:one', item: { id: item.id, revisionId: item.revisionId, sha256: item.sha256 } },
+          {
+            id: 'evidence:one',
+            item: { id: item.id, revisionId: item.revisionId, sha256: item.sha256 },
+          },
         ],
         actions: [],
       },
@@ -624,7 +627,10 @@ describe('optional-when-true item assistance on assessment.result/2', () => {
           form,
           status: 'complete',
           evidence: [
-            { id: 'evidence:one', item: { id: item.id, revisionId: item.revisionId, sha256: item.sha256 } },
+            {
+              id: 'evidence:one',
+              item: { id: item.id, revisionId: item.revisionId, sha256: item.sha256 },
+            },
             {
               id: 'evidence:two',
               item: { id: second.id, revisionId: second.revisionId, sha256: second.sha256 },
@@ -645,7 +651,9 @@ describe('optional-when-true item assistance on assessment.result/2', () => {
     const unmarked = build({})[0]!.payload;
     if (unmarked.kind !== 'assessment.result/2') throw new Error('Expected result');
     expect(unmarked.items.some((row) => 'assisted' in row)).toBe(false);
-    expect(() => build({ reached: false, assistance: marker })).toThrow(/result\.items\.assistance/u);
+    expect(() => build({ reached: false, assistance: marker })).toThrow(
+      /result\.items\.assistance/u,
+    );
     expect(() => build({ assistance: marker })).toThrow(/result\.items\.assistance/u);
     for (const broken of [
       { ...marker, kind: 'hint' },
@@ -660,11 +668,10 @@ describe('optional-when-true item assistance on assessment.result/2', () => {
     // An unanswered claim fails the assistance check itself, not a response mismatch.
     const blank = { kind: 'unanswered' };
     expect(() =>
-      build(
-        { response: blank, ...marked({ ...marker, response: blank }) },
-        {},
-        [{ ...unflagged, result: 'unanswered', response: blank }, assisted.items[1]!],
-      ),
+      build({ response: blank, ...marked({ ...marker, response: blank }) }, {}, [
+        { ...unflagged, result: 'unanswered', response: blank },
+        assisted.items[1]!,
+      ]),
     ).toThrow(/result\.items\.assistance/u);
   });
 

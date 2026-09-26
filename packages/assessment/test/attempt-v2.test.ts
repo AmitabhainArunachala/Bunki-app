@@ -521,13 +521,17 @@ describe('per-item explanation after a committed practice answer', () => {
       answers: paper.items.map((entry, index) => ({
         item: { ...artifactReference(entry), kind: 'item' },
         response:
-          index < 2 ? { kind: 'selected', optionId: index === 0 ? 'b' : 'a' } : { kind: 'unanswered' },
+          index < 2
+            ? { kind: 'selected', optionId: index === 0 ? 'b' : 'a' }
+            : { kind: 'unanswered' },
         reached: index < 2,
         flagged: false,
         elapsedMs: index < 2 ? 1000 : 0,
       })),
       audio: [],
-      events: [{ kind: 'block-opened', at: NOW, blockId: 'block:grammar', detail: 'block:grammar' }],
+      events: [
+        { kind: 'block-opened', at: NOW, blockId: 'block:grammar', detail: 'block:grammar' },
+      ],
     };
     const sha256 = inputHashOf(payload);
     const stored = { ...payload, revisionId: `assessment-attempt-v2:${sha256}`, sha256 };
@@ -543,9 +547,9 @@ describe('per-item explanation after a committed practice answer', () => {
       action: { kind: 'assistance', itemId: 'two', reason: 'explanation' },
     });
     expect(marked.assistanceAttribution).toBe('unknown');
-    expect(marked.answers.filter((entry) => entry.assistance).map((entry) => entry.item.id)).toEqual([
-      'two',
-    ]);
+    expect(
+      marked.answers.filter((entry) => entry.assistance).map((entry) => entry.item.id),
+    ).toEqual(['two']);
     const reread = parseAttemptV2(
       paper,
       JSON.parse(JSON.stringify(update(marked, { kind: 'submit' }, 3500))),
@@ -703,7 +707,9 @@ describe('per-item explanation after a committed practice answer', () => {
     expect(both.events.map((entry) => entry.detail)).toEqual(
       expect.arrayContaining(['hint', 'explanation']),
     );
-    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(both))).revisionId).toBe(both.revisionId);
+    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(both))).revisionId).toBe(
+      both.revisionId,
+    );
   });
 
   it('keeps old unassisted and lawful attempt-level assisted checkpoints byte-identical', () => {

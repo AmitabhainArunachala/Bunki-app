@@ -550,7 +550,10 @@ export function updateAttemptV2(
         // known uncertainty into this revision instead of letting the new mark hide it.
         const marksBefore = state.answers.filter((entry) => entry.assistance).length;
         const eventsBefore = state.events.filter((entry) => entry.kind === 'assistance').length;
-        if ((state.conditions.includes('assisted') && marksBefore === 0) || eventsBefore > marksBefore)
+        if (
+          (state.conditions.includes('assisted') && marksBefore === 0) ||
+          eventsBefore > marksBefore
+        )
           state.assistanceAttribution = 'unknown';
         answer.assistance = {
           kind: 'explanation',
