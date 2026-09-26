@@ -237,10 +237,29 @@ jobs:
       # logs, screenshots and receipts live outside the source checkout.
       - name: Run every required current-app and domain gate
         id: battery
+        timeout-minutes: 75
         run: bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"
 
       - name: Verify tested bytes and source identity have not changed
         run: node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$KAIRO_EVIDENCE_ROOT/artifact-after.json"
+
+      - name: Retain battery diagnostics before bulk evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kairo-release-diagnostics
+          path: |
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/build.json
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/artifact-before.json
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/artifact-after.json
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/artifact-verification.json
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/battery.json
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/SUMMARY.md
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/*.log
+            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/corridor/verification-report.json
+            ${{ runner.temp }}/corridor-smoke.log
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Retain battery receipts, traces and logs
         if: always()
