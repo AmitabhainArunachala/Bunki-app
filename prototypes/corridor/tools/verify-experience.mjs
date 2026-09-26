@@ -170,7 +170,10 @@ try{
   await role(/back to lessons|レッスン一覧/);await click('#back');
  });
  await segment('E09-mock',async()=>{
-  mockBefore=await state();await click('#mock-link');await page.locator('.mock-row').first().waitFor();await shot('mock-catalog','Bundled mock papers clearly separate score evidence from scheduling');await click('.mock-row');await page.locator('[data-mock-opt]').first().waitFor();await shot('mock-question','Paper starts with unselected answer and next disabled');
+  mockBefore=await state();await click('#mock-link');
+  await page.locator('.assessment-room #exam-legacy').waitFor();await click('.assessment-room #exam-legacy');
+  await page.locator('button[data-mock-set="n5-01"]').waitFor();await shot('mock-catalog','Bundled mock papers clearly separate score evidence from scheduling');await click('button[data-mock-set="n5-01"]');
+  await page.locator('[data-mock-opt]').first().waitFor();await shot('mock-question','Paper starts with unselected answer and next disabled');
   await check('E09-requires-answer','Cannot advance without choosing an answer',async()=>assert.equal(await page.locator('#mock-next').isDisabled(),true));
   await click('[data-mock-opt="0"]');await shot('mock-selected-answer','Selection is visible and still editable; no instant correctness');
   await click('#mock-next');await click('#mock-prev');await check('E09-answer-persists-back','Previous returns to original chosen answer',async()=>assert.equal(await page.locator('[data-mock-opt="0"]').getAttribute('aria-pressed'),'true'));
