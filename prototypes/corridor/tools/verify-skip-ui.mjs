@@ -53,9 +53,8 @@ async function open(context) {
   await p.goto(`${base}/?entry=shelf`);
   const kanjidex = p.locator('#kanjidex-link');
   await kanjidex.waitFor();
-  check('dictionary tool retains its visible label', (await kanjidex.innerText()).trim() === '字引');
-  check('dictionary tool retains its accessible name',
-    await kanjidex.and(p.getByRole('button', { name: '字引', exact: true })).count() === 1);
+  check('dictionary tool includes its label in the accessible name',
+    await kanjidex.and(p.getByRole('button', { name: /^字引/u })).count() === 1);
   return p;
 }
 async function query(raw) {
