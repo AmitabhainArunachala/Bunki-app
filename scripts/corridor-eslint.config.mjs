@@ -10,7 +10,7 @@ const browser = readonly(`window document navigator location history localStorag
   FormData TextEncoder TextDecoder AbortController AbortSignal DOMException Event CustomEvent
   HTMLElement HTMLInputElement HTMLTextAreaElement HTMLButtonElement HTMLSelectElement HTMLAudioElement
   Element Node NodeFilter DOMParser XMLSerializer MutationObserver IntersectionObserver ResizeObserver
-  Audio SpeechSynthesisUtterance speechSynthesis CSS Worker indexedDB IDBKeyRange caches self clients
+  Audio SpeechSynthesisUtterance speechSynthesis CSS Worker BroadcastChannel indexedDB IDBKeyRange caches self clients
   setTimeout clearTimeout setInterval clearInterval requestAnimationFrame cancelAnimationFrame
   queueMicrotask structuredClone addEventListener removeEventListener dispatchEvent atob btoa
   getComputedStyle matchMedia innerWidth innerHeight scrollY devicePixelRatio Image OffscreenCanvas

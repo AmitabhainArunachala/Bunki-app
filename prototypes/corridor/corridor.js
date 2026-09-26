@@ -2067,7 +2067,7 @@ function hintEligible() {
 }
 function startRecordHint() {
   if (recordHint.active) return;
-  let query = null;
+  let query;
   try {
     query = typeof navigator.locks?.query === 'function' ? navigator.locks.query.bind(navigator.locks) : null;
   } catch { query = null; }
@@ -2278,9 +2278,9 @@ function dropRetainedRetryRoute() {
   retainedRetryView = null;
   try { sessionStorage.removeItem(RECORD_RETRY_ROUTE_KEY); } catch { /* the TTL still bounds it */ }
 }
-const retryRouteId = (value) => typeof value === 'string' && value.length > 0 && value.length <= 160 && /^[\w:.\-]+$/u.test(value);
+const retryRouteId = (value) => typeof value === 'string' && value.length > 0 && value.length <= 160 && /^[\w:.-]+$/u.test(value);
 function readRetryRoute(now = Date.now()) {
-  let record = null;
+  let record;
   try { record = JSON.parse(sessionStorage.getItem(RECORD_RETRY_ROUTE_KEY) || 'null'); } catch { record = null; }
   const valid = !!record && typeof record === 'object' && record.v === 1 && RETRY_ROUTE_VIEWS.has(record.view)
     && Number.isFinite(record.ts) && now - record.ts >= 0 && now - record.ts <= RECORD_RETRY_ROUTE_TTL_MS
