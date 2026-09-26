@@ -25706,6 +25706,8 @@ function render() {
       child.setAttribute('aria-hidden', 'true');
     }
   }
+  // Resolve the new room's styles before store-alert positioning reads layout.
+  stampRegister();
   safelySyncStoreAlert();
   updateMeasurements();
   if (restoreY != null) window.scrollTo(0, restoreY);
@@ -25718,7 +25720,6 @@ function render() {
     if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
   }
   lastRenderedView = S.view;
-  stampRegister();
   // Sample the resolved ground after both the view classes and room stamp settle.
   syncPaper();
   retireCardAudioOnFaceChange();

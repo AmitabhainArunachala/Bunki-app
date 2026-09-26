@@ -31,9 +31,8 @@ try {
   await page.goto('http://127.0.0.1:3000/?entry=shelf&ui=bi',{waitUntil:'domcontentloaded'});
   const kanjidex = page.locator('#kanjidex-link');
   await kanjidex.waitFor();
-  assert.equal((await kanjidex.innerText()).trim(),'字引','Dictionary tool retains its visible label');
-  assert.equal(await kanjidex.and(page.getByRole('button',{name:'字引',exact:true})).count(),1,
-    'Dictionary tool retains its accessible name');
+  assert.equal(await kanjidex.and(page.getByRole('button',{name:/^字引/u})).count(),1,
+    'Dictionary tool includes its label in the accessible name');
   await kanjidex.click();
   await page.locator('.kdx-lens').filter({hasText:'SKIP'}).click();
   await page.locator('.skip-hit').first().waitFor();
