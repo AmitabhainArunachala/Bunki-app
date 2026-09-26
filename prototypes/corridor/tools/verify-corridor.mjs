@@ -361,6 +361,23 @@ const MEASURE_FN = `(() => {
       measure('.reading', 'reading, the one red'),
     ].filter(Boolean),
     targets,
+    // B4 diagnostics (PR #99 CI), measurement only: every faint snippet with its context, and every
+    // chrome child with its visible box — the crumb is clipped (register.css), the mast labels are not
+    diagnostics: {
+      snippets: [...document.querySelectorAll('.shelf-snippet')].slice(0, 12).map((n) => ({
+        text: (n.textContent || '').trim().slice(0, 40), color: getComputedStyle(n).color, contrast: ratio(n),
+        context: n.closest('[data-recommendation]') ? 'recommendation' : n.closest('.shelf-item') ? 'shelf-item' : (n.parentElement && n.parentElement.className) || '',
+      })),
+      chrome: [...document.querySelectorAll('.chrome > *')].map((n) => {
+        const r = n.getBoundingClientRect();
+        const cs = getComputedStyle(n);
+        const ja = n.querySelector('.l-ja');
+        return { tag: n.tagName, id: n.id || n.className, text: (n.textContent || '').trim().slice(0, 14),
+          w: Math.round(r.width), h: Math.round(r.height), fontSize: parseFloat(cs.fontSize),
+          jaFontSize: ja ? parseFloat(getComputedStyle(ja).fontSize) : null, clipPath: cs.clipPath, position: cs.position,
+          visible: r.width > 1 && r.height > 1 && cs.clipPath === 'none' && cs.visibility !== 'hidden' };
+      }),
+    },
     docScrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
   };
@@ -1314,6 +1331,8 @@ async function main() {
       if (!merged.has(row.label)) merged.set(row.label, row);
     }
     contrastByVariant[mode] = [...merged.values()];
+    report.b4Diagnostics = { ...(report.b4Diagnostics || {}) };
+    report.b4Diagnostics[`contrast-${mode}`] = { shelf: shelfProbe.diagnostics, panel: panelProbe.diagnostics };
     variantShots[`C-${mode}`] = await shoot(page, shotsDir, `V-C-contrast-${mode}`);
   }
   report.measurements.contrast = contrastByVariant;
@@ -1374,6 +1393,8 @@ async function main() {
   report.measurements.text = m.text;
   report.measurements.targets = m.targets;
   report.measurements.semRowsOnProbePanel = semRows;
+  report.b4Diagnostics = { ...(report.b4Diagnostics || {}),
+    chrome: { shelf: shelfProbe.diagnostics.chrome, panel: panelProbe.diagnostics.chrome, reader: readerProbe.diagnostics.chrome } };
   await shoot(page, shotsDir, '07-measurement-probe');
 
   const reader = m.text.find((t) => t.label.startsWith('reading body'));
@@ -1409,8 +1430,19 @@ async function main() {
     const chips = [...document.querySelectorAll('.kdx-chip')].filter((c) => c.offsetParent !== null);
     const rects = chips.map((c) => c.getBoundingClientRect());
     const small = rects.filter((r) => r.width < ${MIN_TAP} || r.height < ${MIN_TAP});
-    return { total: chips.length, small: small.length };
+    // B4 diagnostics (PR #99 CI), measurement only: which chips, their boxes and the styles that size them
+    const smallChips = chips.filter((c, i) => rects[i].width < ${MIN_TAP} || rects[i].height < ${MIN_TAP}).slice(0, 20).map((c) => {
+      const r = c.getBoundingClientRect();
+      const cs = getComputedStyle(c);
+      const row = c.closest('.kdx-row');
+      return { text: (c.textContent || '').trim().slice(0, 12), cls: c.className, row: row ? row.className : null,
+        // raw beside rounded: the predicate compares unrounded boxes (43.999 fails and would print 44)
+        w: Math.round(r.width), h: Math.round(r.height), rawW: r.width, rawH: r.height, minWidth: cs.minWidth, minHeight: cs.minHeight,
+        padding: cs.padding, display: cs.display, flex: cs.flex, fontSize: cs.fontSize, boxSizing: cs.boxSizing };
+    });
+    return { total: chips.length, small: small.length, smallChips };
   })()`);
+  report.b4Diagnostics = { ...(report.b4Diagnostics || {}), kanjidexSmallChips: kdx.smallChips };
   check(`kanjidex · every radical and stroke chip is at least ${MIN_TAP}px`,
     kdx.total > 100 && kdx.small === 0,
     `${kdx.total} chips measured, ${kdx.small} under ${MIN_TAP}px`);
@@ -1751,6 +1783,9 @@ async function main() {
       reason: document.querySelector('#mini-take-reason')?.textContent ?? null, open: !!document.querySelector('#mini-take-open'),
       openLabel: document.querySelector('#mini-take-open .l-ja')?.textContent ?? null };
   });
+  // one exact homograph door: entry AND its exact reading (1353320 renders じょうず, じょうて and じょうしゅ doors)
+  const d23Door = (seq, reading, active = false) => page.locator(`#sheet .dictionary-homograph${active ? '.active' : ''}[data-dictionary-entry="${seq}"]`)
+    .filter({ has: page.locator('.row-reading', { hasText: new RegExp(`^${reading}$`, 'u') }) });
   const d23PageSearch = async () => {
     await open('?entry=shelf');
     await page.fill('#search', '上手');
@@ -1794,9 +1829,10 @@ async function main() {
   await page.locator('.nav-search-row').filter({ has: page.locator('.nsr-glyph', { hasText: /^上手$/u }) })
     .filter({ has: page.locator('.nsr-read', { hasText: /^じょうず$/u }) }).click();
   await page.waitForFunction(() => document.querySelector('#sheet')?.dataset.node === 'word:上手', null, { timeout: 10000 });
-  await page.waitForSelector('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]', { timeout: 15000 });
+  await d23Door('1353320', 'じょうず').waitFor({ timeout: 15000 });
   const d23NavSheet = await page.evaluate(() => ({ reading: document.querySelector('#sheet .reading')?.textContent ?? null,
-    pressed: document.querySelectorAll('#sheet .dictionary-homograph[aria-pressed="true"]').length }));
+    pressed: document.querySelectorAll('#sheet .dictionary-homograph[aria-pressed="true"]').length,
+    doors1353320: document.querySelectorAll('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]').length }));
   check('D23 · the nav じょうず row opens the core word: its sheet presses no entry',
     d23NavSheet.reading === 'じょうず' && d23NavSheet.pressed === 0, JSON.stringify(d23NavSheet));
 
@@ -1823,10 +1859,9 @@ async function main() {
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
   await d23PageSearch();
   await tap(page, '#search-results [data-result="word:上手"]');
-  await page.waitForSelector('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]', { timeout: 15000 });
-  await page.locator('#sheet .dictionary-homograph[data-dictionary-entry="1353320"]')
-    .filter({ has: page.locator('.row-reading', { hasText: /^じょうず$/u }) }).click();
-  await page.waitForSelector('#sheet .dictionary-homograph.active[data-dictionary-entry="1353320"]', { timeout: 10000 });
+  await d23Door('1353320', 'じょうず').waitFor({ timeout: 15000 });
+  await d23Door('1353320', 'じょうず').click();
+  await d23Door('1353320', 'じょうず', true).waitFor({ timeout: 10000 });
   const d23Explicit = await page.evaluate(() => ({ reading: document.querySelector('#sheet .reading')?.textContent ?? null,
     active: [...document.querySelectorAll('#sheet .dictionary-homograph.active')].map((door) =>
       [door.dataset.dictionaryEntry, door.querySelector('.row-reading')?.textContent ?? '']) }));
@@ -1861,16 +1896,33 @@ async function main() {
   // snapshot is still attempted and kept, and the row is incomplete
   let d23ActionError = null;
   let d23Opened = null;
+  // the post-open page as it stands: the sheet's own identity and its 覚 control, plus the homograph doors as a
+  // diagnostic only (a cold explicit sheet holds its row by number and need not draw the same-form list)
+  const d23OpenFacts = () => page.evaluate(() => {
+    const sheet = document.querySelector('#sheet'), take = document.querySelector('#sheet-take');
+    return { node: sheet?.dataset.node ?? null, reading: sheet?.querySelector('.reading')?.textContent ?? null,
+      mini: !!document.querySelector('#mini'),
+      take: take ? { taken: take.classList.contains('taken'), pressed: take.getAttribute('aria-pressed'), disabled: take.disabled } : null,
+      homographDoors: document.querySelectorAll('#sheet .dictionary-homograph').length,
+      homographActive: [...document.querySelectorAll('#sheet .dictionary-homograph.active')].map((door) =>
+        [door.dataset.dictionaryEntry, door.querySelector('.row-reading')?.textContent ?? '']) };
+  });
   try {
     await page.evaluate(`document.querySelector('#mini-take')?.click()`);
     await page.locator('#mini-take-open').click();
-    await page.waitForSelector('#sheet .dictionary-homograph.active[data-dictionary-entry="1353320"]', { timeout: 10000 });
-    d23Opened = await page.evaluate(() => ({ node: document.querySelector('#sheet')?.dataset.node ?? null,
-      reading: document.querySelector('#sheet .reading')?.textContent ?? null, mini: !!document.querySelector('#mini') }));
+    // the cold route's own identity: the 上手 sheet at reading じょうず with its 覚 control drawn
+    await page.waitForFunction(() => {
+      const sheet = document.querySelector('#sheet');
+      return sheet?.dataset.node === 'word:上手' && sheet.querySelector('.reading')?.textContent === 'じょうず' && !!document.querySelector('#sheet-take');
+    }, null, { timeout: 10000 });
+    d23Opened = await d23OpenFacts();
   } catch (error) {
     d23ActionError = String(error?.message || error);
+    // the post-open page is kept on failure too, when the page can still answer
+    d23Opened = await d23OpenFacts().catch((factsError) => ({ factsError: String(factsError?.message || factsError) }));
     report.d23NativeSnapshots = { ...report.d23NativeSnapshots, actionError: d23ActionError };
   }
+  report.d23OpenedDom = d23Opened;
   const d23AfterOpen = await d23SettledSnapshot(() => true);
   const d23AfterKept = d23Retain('after-open', d23AfterOpen);
   // the bytes written are the bytes compared: equality is read from the two retained buffers, never from a re-read
@@ -1889,8 +1941,11 @@ async function main() {
   report.d23NativeSnapshots = d23Outcome;
   check('D23 · the held seal and the open route write nothing: the complete native snapshot before and after is identical',
     d23Identical, JSON.stringify(d23Outcome));
-  check('D23 · the open route opens the retained entry and exact reading: 1353320 じょうず',
-    !d23ActionError && d23Opened?.node === 'word:上手' && d23Opened.reading === 'じょうず' && !d23Opened.mini,
+  // identity without the same-form list: the sheet's 覚 is `taken` only when its node is this card's identity
+  // (wordCaptureState: 1353320 じょうず); a core door for the same spelling would be held, never taken
+  check('D23 · the open route opens the retained entry and exact reading: 1353320 じょうず, its own 覚 taken and live',
+    !d23ActionError && d23Opened?.node === 'word:上手' && d23Opened.reading === 'じょうず' && !d23Opened.mini &&
+      d23Opened.take?.taken === true && d23Opened.take.pressed === 'true' && d23Opened.take.disabled === false,
     JSON.stringify({ opened: d23Opened, ...(d23ActionError ? { actionError: d23ActionError } : {}) }));
   // through that route the card leaves by its own door, and the record is as it began
   await tap(page, '#sheet-take');
@@ -2577,12 +2632,28 @@ async function main() {
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
 
-  // the mini carries the same door, repainting in place — the mini never blinks
-  const miniIx = await page.evaluate(
-    `[...document.querySelectorAll('#reader .tok.content')].findIndex((t, i) => i >= 12 && t.dataset.word !== '学校')`,
+  // the mini carries the same door, repainting in place — the mini never blinks.
+  // D11 (8d0fbccf) holds the mini's seal for a reader token the core dictionary lacks, and D23 for a
+  // spelling another entry's card holds: the take runs on the first token from 12 on whose mini offers
+  // an enabled, not-yet-taken seal; each other mini is put away with one tap elsewhere, as a finger would
+  const miniCandidates = await page.evaluate(
+    `[...document.querySelectorAll('#reader .tok.content')].flatMap((t, i) => (i >= 12 && t.dataset.word !== '学校' ? [i] : []))`,
   );
-  await touchAt(page, '#reader .tok.content', miniIx, 700);
-  await page.waitForSelector('#mini #mini-take');
+  let miniIx = -1;
+  const miniSkipped = [];
+  for (const ix of miniCandidates.slice(0, 16)) {
+    await touchAt(page, '#reader .tok.content', ix, 700);
+    await page.waitForSelector('#mini #mini-take');
+    const seal = await page.evaluate(`(() => {
+      const s = document.querySelector('#mini-take');
+      return { disabled: !!s?.disabled, taken: !!s?.classList.contains('taken'),
+        word: document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? '' };
+    })()`);
+    if (!seal.disabled && !seal.taken) { miniIx = ix; break; }
+    miniSkipped.push(`${seal.word}:${seal.disabled ? 'held' : 'taken'}`);
+    await tap(page, (await page.locator('#reader-context-note').count()) ? '#reader-context-note' : '.view-title');
+    await page.waitForTimeout(120);
+  }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
   await page.evaluate(`document.querySelector('#mini-take')?.click()`);
   await page.waitForTimeout(250);
@@ -2593,8 +2664,8 @@ async function main() {
     return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
   })()`);
   check('R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up',
-    miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
-    JSON.stringify(miniCap));
+    miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
+    JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
   await page.evaluate(`document.querySelector('#mini-take')?.click()`);
   await page.waitForTimeout(250);
   const miniUndone = await evaluateAppRecord(page, `(() => {
@@ -2768,12 +2839,15 @@ async function main() {
     const iso = (ms) => new Date(ms).toISOString();
     const taken = [];
     const srs = {};
+    // real N5 core words: since D23 a card is presented only with an answer it can resolve, and a
+    // synthetic id (the old 'w00'…) has none, so review showed no 思い出した (PR #99 CI abort here)
+    const WORDS = ["お兄さん", "お姉さん", "お弁当", "お手洗い", "お母さん", "お父さん", "お皿", "お腹", "お茶", "お菓子", "お酒", "お金", "お風呂", "ご飯", "一", "一つ", "一人", "一日", "一昨年", "一昨日", "一月", "一番", "一緒", "七", "七つ", "万", "万年筆", "丈夫"];
     for (let i = 0; i < 25; i++) {
-      const id = 'w' + String(i).padStart(2, '0');
+      const id = WORDS[i];
       taken.push({ t: 'word', id, label: id, ts: T - 1e6, started: T - 1e6 });
       srs['word:' + id] = { due: iso(T - (i + 1) * 3600000), last_review: iso(T - 5 * 86400000), stability: 8, difficulty: 5, elapsed_days: 4, scheduled_days: 5, reps: 3, lapses: 0, learning_steps: 0, state: 2 };
     }
-    for (const id of ['f1', 'f2', 'f3']) taken.push({ t: 'word', id, label: id, ts: T - 9e5, started: T - 9e5 });
+    for (const id of WORDS.slice(25)) taken.push({ t: 'word', id, label: id, ts: T - 9e5, started: T - 9e5 });
     return { v: 1, taken, srs };
   })()`));
   await open('?entry=shelf');
