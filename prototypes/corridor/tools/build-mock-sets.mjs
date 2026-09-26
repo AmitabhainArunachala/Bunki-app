@@ -502,7 +502,7 @@ function buildSet(cfg, n, pool, articlePool, allTitles, levelWordsUsed) {
     {
       name: 'graded word list',
       attribution: readJson(resolve(DATA_DIR, 'share_alike/words.json')).sources?.[0]?.attribution || 'open-anki-jlpt-decks',
-      licence: 'CC BY 4.0',
+      licence: readJson(resolve(DATA_DIR, 'share_alike/words.json')).sources?.[0]?.licence || 'CC BY-SA 4.0 (JMdict lineage)',
     },
     ...exManifest.sources.map((s) => ({
       name: s.name,

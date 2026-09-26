@@ -52,12 +52,45 @@ async function ready(page) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
   assert.equal(await page.locator('#store-alert').isVisible(), false);
 }
+// Source returns preserve their Tutor/dictionary origin. Walk the visible Back
+// controls to the shelf instead of assuming that every room has galaxy chrome.
+async function shelf(page) {
+  const visited = [];
+  for (let step = 0; step < 12; step += 1) {
+    const view = await page.locator('body').getAttribute('data-view');
+    visited.push(view);
+    if (await page.locator('#sheet-close').isVisible()) {
+      await page.locator('#sheet-close').click();
+      continue;
+    }
+    if (view === 'shelf') {
+      await page.locator('#source-inbox-link').waitFor();
+      return;
+    }
+    if (await page.locator('#ginga-symbol').isVisible()) {
+      await page.locator('#ginga-symbol').click();
+      await page.locator('.bubble-shelf').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'shelf');
+      continue;
+    }
+    assert(await page.locator('#back').isVisible() && await page.locator('#back').isEnabled(),
+      `No visible shelf return from ${view}; route: ${visited.join(' → ')}`);
+    await page.locator('#back').click();
+    await page.waitForFunction((prior) => document.body.dataset.view !== prior || !!document.querySelector('#sheet-close'), view);
+  }
+  assert.fail(`Shelf return exceeded its bounded visible route: ${visited.join(' → ')}`);
+}
+async function inbox(page) {
+  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
+    await shelf(page);
+    await page.locator('#source-inbox-link').click();
+  }
+  await page.locator('#source-capture-save').waitFor();
+}
 async function frontDoor(page) {
   await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
-  if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-  }
-  await page.locator('#source-inbox-link').click(); await page.locator('#source-capture-text').waitFor();
+  await inbox(page);
+  await page.locator('#source-capture-text').waitFor();
 }
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
@@ -174,6 +207,9 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#source-reader-finished').click();
     await waitForAppRecord(page, (record) => Object.hasOwn(record.readDone, `capture:${source.id}`));
     await page.locator('#source-reader-back').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'ai');
+    assert.equal(await page.locator('#teacher-source-return').count(), 1, 'Source return preserves its Tutor origin');
+    await inbox(page);
     await page.locator('#source-capture-title').fill('あとで聴くリンク');
     await page.locator('#source-capture-url').fill('https://example.org/audio#t=93');
     assert.equal(await page.locator('#source-capture-text').inputValue(), '');
@@ -183,7 +219,7 @@ for (const engine of engines) for (const width of sizes) {
     await screenshot('saved-link');
     await page.locator('#source-reader-back').click();
     const saved = await readAppRecordSnapshot(page); assert.equal(saved.record.sourceInbox.entries.length, 2); noReviewChange(before, saved);
-    await page.locator('#tray').click();
+    await shelf(page); await page.locator('#tray').click();
     const downloadWork = page.waitForEvent('download'); await page.locator('#export-store').click();
     const download = await downloadWork, backupFile = join(out, 'ordinary-ui-backup.json'); await download.saveAs(backupFile);
     const backup = JSON.parse(readFileSync(backupFile));
@@ -202,10 +238,7 @@ for (const engine of engines) for (const width of sizes) {
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
     if (engine === 'webkit') disconnected = true; else await context.setOffline(true);
     await page.reload(); await ready(page);
-    if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
-      await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-    }
-    await page.locator('#source-inbox-link').click();
+    await inbox(page);
     await page.locator(`[data-source-capture="${source.id}"]`).click(); await page.locator('#source-reader-body').waitFor();
     assert.equal(await page.locator('#source-reader-body').textContent(), TEXT);
     await screenshot('offline-source-reopened');
@@ -243,6 +276,7 @@ for (const engine of engines) for (const width of sizes) {
     result.observations.push({ syntheticFault: 'explicit fake provider settings plus deliberate disabled-button tampering',
       sourceTextEgress: false, archiveUnchanged: true, questionPreserved: true });
     await page.locator('#teacher-source-return').click(); await page.locator('#source-reader-back').click();
+    await inbox(page);
     // Fault-only phase, after the ordinary flow and recording observations.
     await page.locator('#source-capture-text').fill('保存に失敗しても、この文章を残す。');
     const preFault = await readAppRecordSnapshot(page);

@@ -60,12 +60,45 @@ async function ready(page) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
   assert.equal(await page.locator('#store-alert').isVisible(), false);
 }
+// Source returns preserve their Tutor/dictionary origin. Walk the visible Back
+// controls to the shelf instead of assuming that every room has galaxy chrome.
+async function shelf(page) {
+  const visited = [];
+  for (let step = 0; step < 12; step += 1) {
+    const view = await page.locator('body').getAttribute('data-view');
+    visited.push(view);
+    if (await page.locator('#sheet-close').isVisible()) {
+      await page.locator('#sheet-close').click();
+      continue;
+    }
+    if (view === 'shelf') {
+      await page.locator('#source-inbox-link').waitFor();
+      return;
+    }
+    if (await page.locator('#ginga-symbol').isVisible()) {
+      await page.locator('#ginga-symbol').click();
+      await page.locator('.bubble-shelf').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'shelf');
+      continue;
+    }
+    assert(await page.locator('#back').isVisible() && await page.locator('#back').isEnabled(),
+      `No visible shelf return from ${view}; route: ${visited.join(' → ')}`);
+    await page.locator('#back').click();
+    await page.waitForFunction((prior) => document.body.dataset.view !== prior || !!document.querySelector('#sheet-close'), view);
+  }
+  assert.fail(`Shelf return exceeded its bounded visible route: ${visited.join(' → ')}`);
+}
+async function inbox(page) {
+  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
+    await shelf(page);
+    await page.locator('#source-inbox-link').click();
+  }
+  await page.locator('#source-capture-save').waitFor();
+}
 async function frontDoor(page) {
   await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
-  if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-  }
-  await page.locator('#source-inbox-link').click(); await page.locator('#source-capture-text').waitFor();
+  await inbox(page);
+  await page.locator('#source-capture-text').waitFor();
 }
 async function assertSourceReadable(page) {
   // Inspect the generated texture actually painted beneath the text, not just
@@ -98,10 +131,7 @@ async function assertSourceReadable(page) {
   return rendered;
 }
 async function openLists(page) {
-  if (!await page.locator('#tray').count()) {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-  }
-  await page.locator('#tray').click();
+  await shelf(page); await page.locator('#tray').click();
 }
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
@@ -126,18 +156,8 @@ async function selectWord(page) {
 const FAKE_MODEL = 'synthetic-source-tutor';
 const FAKE_KEY = 'synthetic-fixture-credential-not-a-real-key';
 async function tutor(page) {
-  if (await page.locator('#chat-input').count()) return;
-  if (await page.locator('#source-reader-back').count()) {
-    await page.locator('#source-reader-back').click();
-    await page.locator('#source-reader-back').waitFor({ state: 'hidden' });
-  }
-  if (await page.locator('body').getAttribute('data-view') === 'source-inbox') {
-    await page.locator('#back').click();
-    await page.waitForFunction(() => document.body.dataset.view === 'shelf');
-  }
-  if (!await page.locator('#ai-link').count()) {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
-  }
+  if (await page.locator('#chat-input').isVisible()) return;
+  await shelf(page);
   await page.locator('#ai-link').click(); await page.locator('#chat-input').waitFor();
 }
 async function configure(page, model = FAKE_MODEL) {

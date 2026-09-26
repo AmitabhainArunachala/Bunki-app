@@ -240,6 +240,18 @@ export function batteryGates(out, env = process.env) {
     node('skip-core', tool('test-skip-core')),
     node('skip-ui-contracts', tool('test-skip-ui')),
     node('kanji-capture', tool('test-kanji-capture')),
+    node(
+      'word-saved-answer',
+      tool('test-word-saved-answer'),
+      [],
+      report('word-saved-answer', 'checks'),
+    ),
+    node(
+      'word-saved-answer-controls',
+      tool('test-word-saved-answer-controls'),
+      [],
+      report('word-saved-answer-controls', 'checks'),
+    ),
     node('navigation-returns', tool('test-navigation-returns')),
     node('reference-packaging', tool('test-reference-packaging')),
     node('skip-packaging', tool('test-skip-packaging')),
@@ -263,6 +275,17 @@ export function batteryGates(out, env = process.env) {
       'prototypes/corridor/reading-position.mjs',
       'prototypes/corridor/feed-controller.mjs',
       'prototypes/corridor/assessment-controller.mjs',
+      'prototypes/corridor/assessment-v2-controller.mjs',
+      'prototypes/corridor/assessment-learning.mjs',
+      'prototypes/corridor/assessment-question-practice.mjs',
+      'prototypes/corridor/assessment-question-source.mjs',
+      'prototypes/corridor/assessment-question-view.mjs',
+      'prototypes/corridor/assessment-cloze.mjs',
+      'prototypes/corridor/assessment-delivery.mjs',
+      'prototypes/corridor/assessment-view.mjs',
+      'prototypes/corridor/assessment-finalization.mjs',
+      'prototypes/corridor/assessment-received.mjs',
+      'prototypes/corridor/assessment-enrichment.mjs',
       'prototypes/corridor/record-controller.mjs',
       'prototypes/corridor/record-host.mjs',
       'prototypes/corridor/record-app.mjs',
@@ -421,6 +444,22 @@ export function batteryGates(out, env = process.env) {
       env: { KAIRO_BROWSER: 'all' },
     },
     node('storage-integ', tool('verify-corridor-storage-integrity')),
+    node('assessment-bank', tool('verify-assessment-bank')),
+    node('assessment-v2-controller', tool('verify-assessment-v2-controller')),
+    node('assessment-learning', tool('verify-assessment-learning')),
+    node('assessment-question-practice', tool('verify-assessment-question-practice')),
+    node('assessment-question-source', tool('verify-assessment-question-source')),
+    node('assessment-question-view', tool('verify-assessment-question-view')),
+    {
+      ...node('assessment-written-section', tool('verify-assessment-written-section')),
+      env: { KAIRO_BROWSER: 'all' },
+    },
+    ...['assessment-v2-finalize', 'assessment-room', 'assessment-app', 'assessment-standalone'].map(
+      (name) => ({
+        ...node(name, tool(`verify-${name}`)),
+        env: { KAIRO_BROWSER: 'all' },
+      }),
+    ),
     node('record-integrity', tool('verify-record-integrity')),
     node('record-controller', tool('verify-record-controller')),
     {
@@ -597,9 +636,9 @@ export function batteryGates(out, env = process.env) {
         path: join(out, 'practice-history/receipt.json'),
         type: 'practice',
         engine: 'chromium',
-        offlineFault: 'context-offline',
+        offlineFault: 'server-disconnected',
       }),
-      env: { KAIRO_BROWSER: 'chromium', KAIRO_PRACTICE_OFFLINE_FAULT: 'context-offline' },
+      env: { KAIRO_BROWSER: 'chromium', KAIRO_PRACTICE_OFFLINE_FAULT: 'server-disconnected' },
     },
     {
       ...node('practice-history-webkit', tool('verify-practice-history'), [], {
@@ -764,6 +803,8 @@ const RECORD_GATE_CASES = {
     'stale-grade-refuses-removed-or-suspended-card-without-lost-latest-data',
     'undo-is-atomic-append-only-and-rejection-keeps-the-grade',
     'undo-does-not-overwrite-a-later-card-change',
+    'acknowledged-grade-disposes-question-view-and-clears-transient-response-state',
+    'undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion',
     'dojo-evidence-waits-for-ack-and-never-creates-schedule-state',
     'recall-declaration-rejects-without-revealing-and-serializes-double-input',
     'quiz-answer-next-and-close-use-only-acknowledged-run-and-ignore-stale-buttons',
@@ -771,6 +812,10 @@ const RECORD_GATE_CASES = {
     'explicit-enrollment-batch-is-one-save-deduplicated-and-keeps-deep-word-provenance',
     'probe-mint-and-evidence-wait-together-and-double-input-cannot-mint-twice',
     'preference-step-merges-latest-pacing-without-publishing-unacknowledged-value',
+    'word-review-render-fixture-starts-unbound',
+    'word-review-shows-and-binds-its-saved-answer',
+    'word-review-unavailable-face-refuses-grades-and-writes-nothing',
+    'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look',
   ],
   learningBrowser: [
     'quiz-answer-rejection-and-reload-preserve-the-unanswered-question',
@@ -1406,7 +1451,7 @@ const SEARCH_FALLBACK_CASES = [
   'graded numeric JLPT values keep their intended search tie ranks',
   'fallback entries with no deep written counterpart remain present without loading the optional dictionary',
   'written, kana, romaji and whole glossary searches return the exact fallback while deep data is unavailable',
-  'current deep counterpart selection keeps both 生物 homographs and prefers compatible seq entries',
+  'both 生物 homographs stay reachable beside the restored core row; an identical numbered row is shown once, as the core row',
   'fallback without a deep counterpart survives the ready deep tier with unchanged identity',
   'actual search leaves the input corpus unchanged and repeated immediate indexing stable',
 ];
@@ -1472,6 +1517,18 @@ const STANDALONE_RECORD_MODULES = [
   './record-app.mjs',
   './record-sync.mjs',
   './modules/record-core.mjs',
+];
+const PRACTICE_HISTORY_CASES = [
+  'two-completed-attempts-and-failed-save-actions',
+  'saved-form-survives-changed-upstream-and-no-set-fetch-reload',
+  'real-offline-reload-retains-answers-without-set-fetch',
+  'legacy-evidence-and-full-export-restore-keep-exact-history',
+  'phone-fit-and-44px-practice-controls',
+  'wall-clock-rollback-keeps-observed-time-and-monotonic-duration',
+  'received-ordinary-submit-stop-operation-relay-restart-offline',
+  'received-local-dedup-conflicts-and-keyboard-focus',
+  'received-exact-labels-and-unavailable-boundaries',
+  'received-hidden-restored-protected-and-stale-resolution',
 ];
 
 function requireNamedCases(rows, names, field = 'pass', accepted = true) {
@@ -2017,12 +2074,8 @@ function requireCompleteReport({
       artifactSha256,
       'Practice receipt belongs to another artifact',
     );
-    assert(
-      Array.isArray(value.results) && value.results.length === 6,
-      'Practice journeys incomplete',
-    );
-    assert(value.results.every((row) => row.pass === true));
-    assert.equal(value.passed, 6);
+    requireNamedCases(value.results, PRACTICE_HISTORY_CASES);
+    assert.equal(value.passed, PRACTICE_HISTORY_CASES.length);
     assert.equal(value.failed, 0);
   } else if (type === 'drift') {
     assert.equal(value.gate?.status, 'pass');
@@ -2256,6 +2309,8 @@ async function verifyRunner(out) {
     'skip-core',
     'skip-ui-contracts',
     'kanji-capture',
+    'word-saved-answer',
+    'word-saved-answer-controls',
     'navigation-returns',
     'reference-packaging',
     'skip-packaging',
@@ -2351,9 +2406,18 @@ async function verifyRunner(out) {
     'offline',
     'prefetch-lifecycle',
   ];
-  const requiredGates = batteryGates(out).filter((item) => requiredNames.includes(item.name));
+  // The runner's required-gate inventory is a list of names; it must not inherit an
+  // ambient artifact pin (KAIRO_SITE_DIR without KAIRO_VERIFIED_ARTIFACT_SHA256 made
+  // it assert on an empty digest). Production pin validation stays strict below.
+  const requiredGates = batteryGates(out, {}).filter((item) => requiredNames.includes(item.name));
   assert.deepEqual(requiredGates.map((item) => item.name).sort(), [...requiredNames].sort());
   const pinnedGates = batteryGates(out, { KAIRO_VERIFIED_ARTIFACT_SHA256: 'e'.repeat(64) });
+  for (const gate of pinnedGates.filter((item) => item.report?.offlineFault)) {
+    const configuredFaults = Object.entries(gate.env)
+      .filter(([key]) => key.endsWith('_OFFLINE_FAULT'))
+      .map(([, value]) => value);
+    assert.deepEqual(configuredFaults, [gate.report.offlineFault], `${gate.name} offline fault`);
+  }
   assert(
     pinnedGates
       .find((item) => item.name === 'desktop-host')
@@ -2502,8 +2566,8 @@ async function verifyRunner(out) {
     v: 1,
     runtime: { engine: 'webkit', protocol: 'https', offlineFault: 'server-disconnected' },
     artifact: { sha256: practiceSha },
-    results: Array.from({ length: 6 }, () => ({ pass: true })),
-    passed: 6,
+    results: PRACTICE_HISTORY_CASES.map((name) => ({ name, pass: true })),
+    passed: PRACTICE_HISTORY_CASES.length,
     failed: 0,
   };
   const practiceReport = {
@@ -2523,6 +2587,31 @@ async function verifyRunner(out) {
     ['offline-fault', { runtime: { ...practiceReceipt.runtime, offlineFault: 'context-offline' } }],
     ['artifact', { artifact: { sha256: 'b'.repeat(64) } }],
     ['partial', { results: practiceReceipt.results.slice(0, 5), passed: 5 }],
+    [
+      'duplicate',
+      {
+        results: practiceReceipt.results.map((row, index) =>
+          index === 9 ? practiceReceipt.results[0] : row,
+        ),
+      },
+    ],
+    [
+      'substitution',
+      {
+        results: practiceReceipt.results.map((row, index) =>
+          index === 9 ? { ...row, name: 'unrelated-journey' } : row,
+        ),
+      },
+    ],
+    [
+      'failed-case',
+      {
+        results: practiceReceipt.results.map((row, index) =>
+          index === 9 ? { ...row, pass: false } : row,
+        ),
+      },
+    ],
+    ['false-count', { passed: PRACTICE_HISTORY_CASES.length - 1 }],
   ]) {
     writeJson(practicePath, { ...practiceReceipt, ...changed });
     result = invoke(`practice-wrong-${name}`, [

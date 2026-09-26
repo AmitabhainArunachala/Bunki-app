@@ -76,7 +76,8 @@ public struct JournalEnvelope: Sendable, Equatable {
         guard isDigest(reference.opId), isDigest(reference.sha256), digest(bytes) == reference.sha256,
               let root = try? JSONSerialization.jsonObject(with: bytes) as? [String: Any],
               root["format"] as? String == "kairo-sync-operation",
-              let version = root["v"] as? NSNumber, CFGetTypeID(version) != CFBooleanGetTypeID(), version == 1,
+              let version = root["v"] as? NSNumber, CFGetTypeID(version) != CFBooleanGetTypeID(),
+              version == 1 || (version == 2 && ["assessment.result/2", "learning.followup/2", "learning.suppress/2"].contains((root["payload"] as? [String: Any])?["kind"] as? String ?? "")),
               root["opId"] as? String == reference.opId,
               let envelopeScope = root["scope"] as? [String: String], envelopeScope.count == 2 else {
             throw JournalError.invalidEnvelope

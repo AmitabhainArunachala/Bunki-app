@@ -16,6 +16,11 @@ import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const browserMode = process.argv.includes('--browser');
+const propertyMode = process.argv.includes('--property');
+// --reference (G4): the app's own grade handler, on the app's own pinned scheduler construction,
+// against an independent ts-fsrs computation from the pin's declared values. Its definition is
+// extracted only in this mode, so default and --property runs keep their exact bytes.
+const referenceMode = process.argv.includes('--reference');
 let site;
 let artifact;
 if (browserMode) {
@@ -24,18 +29,34 @@ if (browserMode) {
   artifact = verifyBundledArtifact(site);
   assert.equal(artifact.artifactSha256, process.env.KAIRO_ARTIFACT_SHA256, 'Supply the exact staged artifact digest');
 }
-const source = readFileSync(resolve(site || root, 'corridor.js'), 'utf8');
+// D23 controls (word-saved-answer-controls.mjs): `--control <name>` applies one control's literal
+// edits, each matching exactly once, to the authored source before anything is lifted from it
+const controlAt = process.argv.indexOf('--control');
+const controlName = controlAt >= 0 ? process.argv[controlAt + 1] : null;
+assert(!controlName || !browserMode, 'A control edits the authored source, never a staged artifact');
+let source = readFileSync(resolve(site || root, 'corridor.js'), 'utf8');
+if (controlName) {
+  const controls = await import('./word-saved-answer-controls.mjs');
+  source = controls.applyControl(source, controls.LEARNING_RECORD_CONTROLS, controlName);
+  console.log(`CONTROL-APPLIED ${controlName} ${createHash('sha256').update(source).digest('hex')}`);
+}
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = new Set([
   'srsKey', 'srsCardOf', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
-  'advanceReviewSession', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
+  'focusKanjiReadingReview', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord', 'nonEmptyString', 'safeJsonValue',
+  'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
   'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem',
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
   'canonicalRecordJson',
+  // D23: the saved word answer, the shown-answer binding both grade producers check, and the capture plan
+  'reviewAnswerAvailable', 'reviewCardBack', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'owns',
+  'wordPresentationKey', 'presentReviewAnswer', 'assertWordAnswerPresented',
+  'wordCapturePlan', 'wordCardIdentity', 'sameWordIdentity', 'wordAnswerIdentity', 'wordStudied',
 ]);
+if (referenceMode) names.add('pinnedSchedulerInput');
 const selected = ast.statements.filter((statement) => {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text] :
     ts.isVariableStatement(statement) ? statement.declarationList.declarations.map((node) => node.name.getText(ast)) : [];
@@ -63,6 +84,7 @@ class Element {
   append(...children) { this.children.push(...children); }
   setAttribute() {}
   addEventListener(kind, run) { this.events[kind] = run; }
+  remove() { this.removed = true; }
   fire() { return this.events.click?.(); }
   get childNodes() { return this.children; }
 }
@@ -73,7 +95,7 @@ const item = { t: 'word', id: '学校', label: '学校', ts: 100, started: 100 }
 const run = () => ({ queue: [item], ix: 0, revealed: true, declared: 1, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] });
 const questions = Array.from({ length: 3 }, (_, i) => ({ q: 'Synthetic question ' + i, opts: ['a', 'b', 'c', 'd'], right: 0, why: 'Synthetic explanation' }));
 const quiz = () => ({ qs: questions, ix: 0, picked: null, correct: 0, ts: 100 });
-function fixture(overrides = {}) {
+function fixture(overrides = {}, options = {}) {
   const durableNames = ['taken', 'srs', 'revlog', 'obslog', 'stats', 'suspended', 'lessonsDone', 'deepWords', 'srsPrefs', 'aiQuiz'];
   const S = { view: 'review', focus: null, review: run(), reviewMore: false, probe: null,
     taken: [clone(item)], srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, lessonsDone: {}, deepWords: {},
@@ -84,7 +106,8 @@ function fixture(overrides = {}) {
   let paints = 0;
   let scrolls = 0;
   const sandbox = {
-    S, Date, Math, JSON, Set, Map, console, fsrsApi, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
+    S, Date: options.Date || Date, Math, JSON, Set, Map, console, fsrsApi, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
+    assessmentQuestionReviewOwner: null,
     recordReady: (epoch = 1) => epoch === sandbox.recordEpoch,
     recordWritable: (epoch = 1) => epoch === sandbox.recordEpoch,
     render: () => { paints += 1; },
@@ -95,11 +118,15 @@ function fixture(overrides = {}) {
     tx: (ja, en) => en, withEn: (node) => node, bi: () => true,
     finiteNumber: (value) => Number.isFinite(value),
     plainRecord: (value) => value !== null && typeof value === 'object' && !Array.isArray(value),
-    D: { exampleBank: new Map(), dict: {}, kanji: {} },
+    // D23: 学校, the reviewed word, is a core entry so its card has an answer to show and grade
+    D: { exampleBank: new Map(), dict: { 学校: { r: 'がっこう', m: ['school'] } }, kanji: options.kanji || {} },
     lookup: (id) => ({ r: 'がっこう', m: [id], seq: 'synthetic-' + id }),
     findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
+    // D23: the revealed answer face is now rendered here; it reads no assessment context or source note
+    assessmentReviewContext: () => null, renderLearningSource: () => {},
+    recManifest: null, // Explicit audio-unavailable fixture; this suite does not exercise audio.
     // a DOM focus helper startReview calls after rendering; no scheduling effect
     focusKanjiReadingReview: () => {},
     endLessonRun: () => {}, srsCustom: null, srsNewPerDay: () => S.srsPrefs.newPerDay, srsReviewLimit: () => S.srsPrefs.reviewLimit,
@@ -109,6 +136,10 @@ function fixture(overrides = {}) {
   };
   const context = vm.createContext(sandbox);
   vm.runInContext(program, context, { filename: 'authored-learning-handlers.js' });
+  // D23: a grade-seam fixture's revealed card has presented its answer, as rendering it would
+  // (grades are bound to it). A rendered-face test passes bind: false and starts unbound, so the
+  // actual renderReview must bind the real session itself.
+  if (S.review?.revealed && options.bind !== false) context.presentReviewAnswer(S.review);
   const stage = () => {
     const pending = queue[0]; assert(pending, 'An actual handler queued a save');
     if (!pending.staged) {
@@ -118,11 +149,14 @@ function fixture(overrides = {}) {
     }
     return pending;
   };
-  const ack = (save = true) => {
+  const ack = (save = true, { acknowledge = true, afterPublish } = {}) => {
     const pending = stage(); queue.shift();
     const ok = save && !pending.error && pending.epoch === sandbox.recordEpoch;
     if (ok) { durable = freeze(ordered(clone({ ...durable, ...pending.patch }))); Object.assign(S, durable); }
-    pending.settle(ok);
+    // Test-only boundary: durable publication may precede loss of ownership.
+    // The callback runs before resolving the awaited save, not after its handler.
+    if (ok) afterPublish?.();
+    pending.settle(ok && acknowledge);
     return pending;
   };
   return { S, c: context, queue, stage, ack, paints: () => paints, scrolls: () => scrolls,
@@ -132,7 +166,13 @@ function fixture(overrides = {}) {
 const results = [];
 async function check(name, action) {
   try { await action(); results.push({ name, pass: true }); console.log('PASS ' + name); }
-  catch (error) { results.push({ name, pass: false, reason: error.stack }); console.error('FAIL ' + name + ': ' + error.message); }
+  catch (error) {
+    // D23: the row keeps the exact text this failure writes to stderr, in the same step, so a reader of
+    // the receipt can require stderr to be exactly the failing rows' diagnostics, in order, and nothing else
+    const diagnostic = 'FAIL ' + name + ': ' + error?.message;
+    results.push({ name, pass: false, reason: error?.stack, diagnostic });
+    process.stderr.write(diagnostic + '\n');
+  }
 }
 const grade = (f, overrides = {}) => f.c.commitStandardGrade({ rv: f.S.review, item, key: 'good', skey: 'word:学校',
   rating: fsrsApi.Rating.Good, now: new Date('2026-09-10T10:00:00Z'), day: '2026-09-10', ...overrides });
@@ -155,6 +195,7 @@ await check('queued-grade-recomputes-latest-card-and-preserves-concurrent-log-an
   assert.equal(f.S.revlog.length, 2); assert.equal(f.S.revlog[1][3], prior.state);
   assert.equal(f.S.stats['2026-09-10'].n, 3); assert.equal(f.S.stats['2026-09-10'].nnew, 2);
   assert.deepEqual(clone(f.S.review.history[0].prev), clone(prior)); assert.equal(f.S.review.history[0].logIx, 1);
+  assert.equal(f.S.review.history[0].item, item); assert.equal(f.S.review.history[0].queueIndex, 0);
   assert.equal(f.S.review.ix, 1);
 });
 await check('not-recalled-forces-again-even-if-another-grade-is-requested', async () => {
@@ -187,6 +228,42 @@ await check('undo-does-not-overwrite-a-later-card-change', async () => {
   f.external({ srs: { 'word:学校': { ...f.S.srs['word:学校'], reps: 90 } } }); const before = f.durable();
   f.ack(); await promise; assert.deepEqual(f.durable(), before); assert.equal(f.S.review.ix, 1);
 });
+await check('acknowledged-grade-disposes-question-view-and-clears-transient-response-state', async () => {
+  const f = fixture(); const rv = f.S.review;
+  Object.assign(rv, { questionAttemptId: 'previous-question-response', questionError: 'previous error',
+    questionSourceAttempted: true, questionSourceChecking: true, questionSourceAvailable: true });
+  let disposed = 0;
+  const owner = { rv, view: { dispose: () => { disposed += 1; } } };
+  f.c.assessmentQuestionReviewOwner = owner;
+  let promise = grade(f);
+  assert.equal(disposed, 0); assert.equal(rv.questionAttemptId, 'previous-question-response');
+  f.ack(false); assert.equal(await promise, false);
+  assert.equal(disposed, 0); assert.equal(f.c.assessmentQuestionReviewOwner, owner);
+  assert.equal(rv.questionSourceAvailable, true);
+  promise = grade(f); f.ack(); assert.equal(await promise, true);
+  assert.equal(disposed, 1); assert.equal(f.c.assessmentQuestionReviewOwner, null);
+  assert.equal(rv.questionAttemptId, null); assert.equal(rv.questionError, '');
+  assert.equal(rv.questionSourceAttempted, false); assert.equal(rv.questionSourceChecking, false);
+  assert.equal(rv.questionSourceAvailable, false);
+});
+await check('undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion', async () => {
+  const f = fixture(); const rv = f.S.review;
+  const skipped = { t: 'word', id: '電話', label: '電話', ts: 100, started: 100 };
+  const current = { t: 'word', id: '先生', label: '先生', ts: 100, started: 100 };
+  rv.queue = [item, skipped, current]; rv.declared = 0;
+  let promise = grade(f); f.ack(); assert.equal(await promise, true);
+  assert.equal(rv.history[0].item, item); assert.equal(rv.history[0].queueIndex, 0);
+  assert.equal(rv.history[0].reinserted, true); assert.deepEqual(rv.queue, [item, skipped, current, item]);
+  // Skip advances the cursor without minting a grade or a history entry.
+  rv.ix = 2;
+  promise = byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
+  f.ack(); assert.equal(await promise, true);
+  assert.equal(rv.ix, 0); assert.equal(rv.history.length, 0); assert.equal(rv.done.again, 0);
+  assert.deepEqual(rv.queue, [item, skipped, current]);
+  assert.equal(f.S.srs['word:学校'], undefined); assert.equal(f.S.revlog.length, 2);
+  assert.deepEqual(f.S.revlog[1].slice(1), ['word:学校', 0, 0]);
+  assert.equal(f.S.stats['2026-09-10'].n, 0); assert.equal(f.S.stats['2026-09-10'].nnew, 0);
+});
 await check('dojo-evidence-waits-for-ack-and-never-creates-schedule-state', async () => {
   const f = fixture(); const before = f.durable();
   const promise = f.c.commitDrillGrade({ rv: f.S.review, item, next: { state: 2, scheduled_days: 1 }, key: 'good', skey: 'word:学校', rating: 3, mode: 'kanji', now: new Date() });
@@ -200,6 +277,79 @@ await check('recall-declaration-rejects-without-revealing-and-serializes-double-
   f.ack(false); await first; assert.equal(f.S.review.revealed, false); assert.equal(f.S.review.declared, null);
   const second = byId(f.render('renderReview'), 'declare-notyet').fire(); f.ack(); await second;
   assert.equal(f.S.review.revealed, true); assert.equal(f.S.review.declared, 0); assert.equal(f.S.obslog[0][3], 0);
+});
+/* D23 · the saved word answer at the rendered review face. The answer shown is the card's
+ * saved answer; an unavailable one shows the honest face and grades nothing. An answer that
+ * changed after it was shown refuses both grade producers and asks for a fresh look.
+ * These rendered-face tests start unbound (fixture bind: false), so the binding they inspect is
+ * the one the actual renderReview made on the real session. Controls RB (the renderer binds a
+ * copy of the session) and C6b (the UI answer check removed) run through `--control <name>`;
+ * test-word-saved-answer.mjs --controls adjudicates them against this receipt. */
+const wordSession = (row) => ({ queue: [row], ix: 0, revealed: true, declared: 1, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] });
+const MEKURU_SOURCE = { release: '3.6.2+20260803141815', archiveSha256: '1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c' };
+const MEKURU = { r: 'めくる', m: ['to turn over', 'to turn (pages)', 'to leaf through (a book, etc.)', 'to tear off'], seq: '1257810', k: ['捲'],
+  selection: { v: 1, seq: '1257810', r: 'めくる', head: '捲る', src: MEKURU_SOURCE } };
+const mekuruRow = () => ({ t: 'word', id: '捲る', label: '捲る', ts: 100, started: 100, entrySeq: '1257810', cueReading: 'めくる' });
+const wordGrade = (f, rv, drill) => drill
+  ? f.c.commitDrillGrade({ rv, item: rv.queue[0], next: { state: 2, scheduled_days: 1 }, key: 'good', skey: 'word:' + rv.queue[0].id, rating: 3, mode: 'due', now: new Date('2026-09-10T10:00:00Z') })
+  : f.c.commitStandardGrade({ rv, item: rv.queue[0], key: 'good', skey: 'word:' + rv.queue[0].id, rating: fsrsApi.Rating.Good, now: new Date('2026-09-10T10:00:00Z'), day: '2026-09-10' });
+await check('word-review-render-fixture-starts-unbound', async () => {
+  const row = mekuruRow();
+  const unbound = fixture({ taken: [row], deepWords: { 捲る: MEKURU }, review: wordSession(row) }, { bind: false });
+  assert.equal(unbound.S.review.presented, undefined, 'a rendered-face test starts with no presentation binding');
+  const prebound = fixture({ taken: [row], deepWords: { 捲る: MEKURU }, review: wordSession(row) });
+  assert.equal(prebound.S.review.presented?.item, row, 'a grade-seam fixture binds its revealed card');
+});
+await check('word-review-shows-and-binds-its-saved-answer', async () => {
+  const row = mekuruRow();
+  const f = fixture({ taken: [row], deepWords: { 捲る: MEKURU }, review: wordSession(row) }, { bind: false });
+  assert.equal(f.S.review.presented, undefined);
+  const main = f.render('renderReview');
+  assert.equal(byClass(main, 'review-reading').textContent, 'めくる');
+  assert.equal(byClass(main, 'review-sense-primary').textContent, 'to turn over');
+  assert(find(main, (node) => node.className === 'grade-row'), 'an available answer can be graded');
+  assert.equal(f.S.review.presented?.item, row, 'the actual renderer bound the real session');
+  assert.equal(f.S.review.presented.ix, 0);
+  const promise = wordGrade(f, f.S.review, false); f.ack(); assert.equal(await promise, true);
+  assert.equal(f.S.revlog.length, 1); assert.equal(f.S.revlog[0][1], 'word:捲る');
+});
+await check('word-review-unavailable-face-refuses-grades-and-writes-nothing', async () => {
+  const row = mekuruRow();   // H04: an explicit row whose snapshot is missing
+  const f = fixture({ taken: [row], deepWords: {}, review: wordSession(row) }, { bind: false });
+  assert.equal(f.S.review.presented, undefined);
+  const before = f.durable();
+  const main = f.render('renderReview');
+  assert.equal(byId(main, 'review-answer-unavailable').dataset.reason, 'snapshot-missing');
+  assert.equal(find(main, (node) => node.className === 'grade-row'), undefined, 'no grade seals for an unavailable answer');
+  byId(main, 'review-unavailable-next').fire();
+  assert.equal(f.queue.length, 0); assert.deepEqual(f.durable(), before); assert.equal(f.S.review.ix, 1);
+  for (const drill of [false, true]) {
+    const rv = wordSession(row); rv.presented = { item: row, ix: 0, key: 'forged' };
+    f.S.review = rv;
+    const promise = wordGrade(f, rv, drill);
+    assert.equal(f.stage().error?.code, 'word-answer-unavailable', drill ? 'drill producer' : 'standard producer');
+    f.ack(); assert.equal(await promise, false); assert.deepEqual(f.durable(), before);
+  }
+});
+await check('word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look', async () => {
+  for (const drill of [false, true]) {
+    const pound = { t: 'word', id: 'ポンド', label: 'ポンド', ts: 100, started: 100, entrySeq: '1126030', cueReading: 'ポンド' };
+    const f = fixture({ taken: [pound], deepWords: { ポンド: { seq: '1126030', r: 'ポンド', m: ['pound (unit of weight)', 'pound (currency)'] } },
+      review: wordSession(pound), focus: drill ? { mode: 'due' } : null }, { bind: false });
+    assert.equal(f.S.review.presented, undefined);
+    f.render('renderReview');   // shows A and binds it
+    assert.equal(f.S.review.presented?.item, pound, 'the actual renderer bound the real session');
+    f.external({ taken: [{ ...pound, entrySeq: '2855351' }], deepWords: { ポンド: { seq: '2855351', r: 'ポンド', m: ['pond'] } } });
+    const before = f.durable(); const rv = f.S.review;
+    const promise = wordGrade(f, rv, drill);
+    assert.equal(f.stage().error?.code, 'word-answer-changed', drill ? 'drill producer' : 'standard producer');
+    f.ack(); assert.equal(await promise, false);
+    assert.deepEqual(f.durable(), before, 'refused against latest B: nothing written, B kept');
+    assert.equal(rv.ix, 0); assert.equal(rv.declared, 1);
+    const again = byId(f.render('renderReview'), 'review-answer-again');
+    again.fire();
+    assert.equal(rv.revealed, false); assert.equal(rv.declared, null); assert.equal(rv.presented, null);
+  }
 });
 await check('quiz-answer-next-and-close-use-only-acknowledged-run-and-ignore-stale-buttons', async () => {
   const f = fixture({ view: 'aiquiz', aiQuiz: quiz() }); const before = f.durable();
@@ -247,6 +397,526 @@ await check('preference-step-merges-latest-pacing-without-publishing-unacknowled
   f.external({ srsPrefs: { newPerDay: 25, reviewLimit: 50 } }); f.ack(); await promise;
   assert.equal(f.S.srsPrefs.newPerDay, 30); assert.equal(f.S.srsPrefs.reviewLimit, 50);
 });
+
+/* Opt-in generated handler histories. Storage is deliberately a small controlled
+ * acknowledgment model: a saved root is not a native IndexedDB durability proof.
+ * Start/disclosure/clock/external changes are fixture commands; grade, drill and
+ * undo invoke the actual AST-selected handlers above. The oracle does not invoke
+ * a scheduler or production handler to calculate its expectations. */
+async function propertyChecks() {
+  const integerOption = (flag, fallback, min, max) => {
+    const positions = process.argv.flatMap((value, i) => value === flag ? [i] : []);
+    assert(positions.length <= 1, 'Supply ' + flag + ' at most once');
+    const text = positions.length ? process.argv[positions[0] + 1] : String(fallback);
+    assert(/^(?:0x[0-9a-f]+|\d+)$/iu.test(text || ''), flag + ' needs an unsigned integer');
+    const value = Number(text);
+    assert(Number.isSafeInteger(value) && value >= min && value <= max, flag + ' out of bounds');
+    return value;
+  };
+  const seed = integerOption('--seed', 0x51ee7, 0, 0xffffffff);
+  const runs = integerOption('--runs', 1000, 1, 100000);
+  const onlyHistory = process.argv.includes('--history') ? integerOption('--history', 0, 0, 1000000) : null;
+  assert(onlyHistory === null || runs === 1, 'Replay one history with --runs 1 --history N');
+  const hash = (text) => createHash('sha256').update(text).digest('hex');
+  const same = (actual, expected, label) => assert.deepEqual(ordered(clone(actual)), ordered(clone(expected)), label);
+  const items = [clone(item), { t: 'kanji', id: '学', label: '学', ts: 100, started: 100 }];
+  const keyOf = (value) => value.t + ':' + value.id;
+  const fixedStart = Date.parse('2026-09-10T10:00:00Z');
+  const mature = () => ({ due: '2026-09-13T10:00:00.000Z', last_review: '2026-09-01T10:00:00.000Z',
+    state: 2, stability: 12, difficulty: 5, elapsed_days: 2, scheduled_days: 12, learning_steps: 0, reps: 4, lapses: 1 });
+  const scope = 'Generated word and dictionary-backed kanji grade/dojo/undo handler contracts with frozen synthetic roots, default unfitted FSRS weights, fixed clock and controlled save acknowledgments. Resume serializes these modeled roots into a fresh fixture. No browser/native durability, native lost-ack recovery, fitted-weight initialization, retained dictionary provenance, sentence/question source contract, or undo initiated after reload claim.';
+  const counters = {};
+  let countEnabled = true;
+  const count = (name) => { if (countEnabled) counters[name] = (counters[name] || 0) + 1; };
+  const report = { format: 'kairo-learning-handler-properties', version: 1, scope, seed, requestedHistories: runs,
+    replayHistory: onlyHistory, minimumCommands: 12, maximumCommands: 64, completedHistories: 0, totalCommands: 0,
+    historyLengths: {}, deterministicReplays: 0, sourceSha256: hash(source), selectedProgramSha256: hash(program), testedDefinitions: [...names],
+    verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))),
+    schedulerSha256: hash(readFileSync(resolve(root, 'vendor/ts-fsrs.mjs'))),
+    counters, negativeControls: [], failures: [], pass: false };
+  const receiptFile = resolve(out, 'learning-properties.json');
+  const saveReport = () => writeFileSync(receiptFile, JSON.stringify(report, null, 2) + '\n');
+  const sessionValue = (rv) => clone({ ...rv, pending: undefined });
+  const unchanged = (f, before, rv, session, label) => {
+    same(f.durable(), before, label + ': saved roots');
+    same(sessionValue(rv), session, label + ': session');
+  };
+  const pendingCount = (f) => assert.equal(f.queue.length, 1, 'One pending intention must queue exactly one save');
+  const advancedOnce = (rv, previousIx) => assert.equal(rv.ix, previousIx + 1, 'One acknowledged grade advances the cursor exactly once');
+  const revokeTarget = (row, key, index) => same(row.slice(1), [key, 0, index], 'Undo targets its original grade row');
+  // Deliberately corrupt only oracle inputs, never authored code or live data.
+  // Each control must fail at the same assertion used by generated histories.
+  const runNegativeControls = () => {
+    for (const [name, action, expectedMessage] of [
+      ['premature-root-publication', () => unchanged({ durable: () => ({ srs: { unexpected: true } }) }, { srs: {} }, { ix: 0 }, { ix: 0 }, 'before acknowledgment'), /before acknowledgment: saved roots/],
+      ['duplicate-pending-write', () => pendingCount({ queue: [{}, {}] }), /One pending intention/],
+      ['duplicate-session-advance', () => advancedOnce({ ix: 2 }, 0), /advances the cursor exactly once/],
+      ['wrong-revocation-target', () => revokeTarget([fixedStart, 'word:学校', 0, 8], 'word:学校', 7), /original grade row/],
+    ]) {
+      let caught;
+      try { action(); } catch (error) { caught = error; }
+      const rejected = caught instanceof assert.AssertionError && expectedMessage.test(caught.message);
+      report.negativeControls.push({ name, rejected, assertion: caught?.message?.split('\n')[0] || null });
+      if (!rejected) {
+        const error = new Error(name + ' must trip its intended assertion');
+        error.propertyFailure = { negativeControl: name, reason: error.stack, observedError: caught?.stack || null };
+        throw error;
+      }
+    }
+  };
+  const rngFor = (value) => {
+    let state = value >>> 0;
+    return (limit) => {
+      state = (state + 0x6d2b79f5) >>> 0;
+      let mixed = Math.imul(state ^ (state >>> 15), state | 1);
+      mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
+      return ((mixed ^ (mixed >>> 14)) >>> 0) % limit;
+    };
+  };
+  const scenarioNames = ['grade', 'reject-retry', 'undo-reject-retry', 'undo-conflict', 'replace-before-stage',
+    'replace-after-stage', 'epoch-loss', 'stale-enrollment', 'disclosure-guard', 'concurrent-merge',
+    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo'];
+  const commandsFor = (historyIndex, historySeed) => {
+    const random = rngFor(historySeed);
+    const commands = [];
+    const episodes = 2 + random(4);
+    for (let episode = 0; episode < episodes; episode += 1) {
+      const kind = episode === 0 ? historyIndex % scenarioNames.length : episode === 1 ? 0 : random(scenarioNames.length);
+      const rating = 1 + random(4);
+      const start = { op: 'start', type: kind === 11 ? 1 : random(2), dojo: kind === 10,
+        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)] };
+      const gradeCommand = { op: 'grade', rating };
+      const ok = { op: 'ack', save: true };
+      const stage = { op: 'stage' };
+      let part;
+      switch (scenarioNames[kind]) {
+        case 'reject-retry': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: false }, gradeCommand, stage, ok]; break;
+        case 'undo-reject-retry': part = [start, gradeCommand, { op: 'duplicate' }, stage, ok, { op: 'undo' }, { op: 'duplicate' }, stage,
+          { op: 'ack', save: false }, { op: 'undo' }, stage, ok]; break;
+        case 'undo-conflict': part = [start, gradeCommand, stage, ok, { op: 'undo' }, { op: 'external', kind: 'target' }, stage, ok]; break;
+        case 'replace-before-stage': part = [start, gradeCommand, { op: 'replace' }, stage, ok]; break;
+        case 'replace-after-stage': part = [start, gradeCommand, stage, { op: 'replace' }, ok]; break;
+        case 'epoch-loss': part = [start, gradeCommand, stage, { op: 'epoch' }, ok]; break;
+        case 'stale-enrollment': {
+          const enrollment = random(2) ? 'suspend' : 'remove';
+          part = [start, gradeCommand, { op: 'external', kind: enrollment }, stage, ok, { op: 'external', kind: 'enroll' }]; break;
+        }
+        case 'disclosure-guard': part = [start, { op: 'disclosure', revealed: false, declared: 1 }, gradeCommand,
+          { op: 'disclosure', revealed: true, declared: null }, gradeCommand, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok]; break;
+        case 'concurrent-merge': part = [start, gradeCommand, { op: 'external', kind: 'unrelated' }, { op: 'external', kind: 'target' }, stage, ok]; break;
+        case 'dojo-existing': part = [start, { op: 'external', kind: 'mature' }, gradeCommand, { op: 'duplicate' }, stage, ok, { op: 'undo' }, stage, ok]; break;
+        case 'kanji-unavailable': part = [start, { op: 'dictionary', available: false }, gradeCommand, stage, ok,
+          { op: 'dictionary', available: true }, gradeCommand, stage, ok]; break;
+        case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
+        case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
+        case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
+          { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
+          { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
+        default: part = [start, gradeCommand, { op: 'duplicate' }, stage, ok];
+      }
+      part.push({ op: 'resume' });
+      // Two complete episodes always fit and always contain at least 12 commands.
+      // Longer histories stop at a completed episode, never discard an in-flight save.
+      if (commands.length + part.length > 64) break;
+      commands.push(...part.map((command) => ({ ...command, scenario: scenarioNames[kind] })));
+    }
+    assert(commands.length >= 12 && commands.length <= 64);
+    return commands;
+  };
+  const runHistory = async (historyIndex, historySeed, commands) => {
+    let now = fixedStart;
+    class FixedDate extends Date { constructor(...args) { super(...(args.length ? args : [now])); } static now() { return now; } }
+    const initial = { taken: clone(items), srs: historySeed & 1 ? { [keyOf(items[0])]: mature(), [keyOf(items[1])]: mature() } : {},
+      deepWords: { unrelated: { keep: historySeed } }, obslog: [], revlog: [], stats: {} };
+    let f = fixture(initial, { Date: FixedDate, kanji: { 学: { m: 'synthetic learning' } } });
+    let target = items[0], pending = null, lastSaved = null, lastPostCommitOwnershipLoss = false, rejectedGrade = false, acceptedGrades = 0;
+    let sessionEntries = new WeakMap([[f.S.review, []]]);
+    let sessionUndos = new WeakMap();
+    const trace = [];
+    const newSession = (dojo = false) => {
+      const other = items.find((value) => keyOf(value) !== keyOf(target));
+      const rv = { queue: [clone(target), clone(other)],
+        ix: 0, revealed: true, declared: 1, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
+      f.S.review = rv; f.S.focus = dojo ? { mode: 'kanji' } : null; sessionEntries.set(rv, []);
+      sessionUndos.set(rv, { count: 0, reinserted: false, days: new Set() });
+      f.c.presentReviewAnswer(rv);
+      return rv;
+    };
+    const attemptGrade = (rating) => {
+      const rv = f.S.review, current = rv.queue[rv.ix];
+      const key = ['again', 'hard', 'good', 'easy'][rating - 1];
+      const args = { rv, item: current, key, skey: keyOf(current), rating, now: new FixedDate(now), day: new FixedDate(now).toISOString().slice(0, 10) };
+      return f.S.focus ? f.c.commitDrillGrade({ ...args, next: { state: 2, scheduled_days: 1 }, mode: 'kanji' }) : f.c.commitStandardGrade(args);
+    };
+    const stagePending = () => {
+      assert(pending, 'Stage requires a generated pending intention');
+      if (!pending.staged) {
+        const before = f.durable();
+        pending.before = before;
+        const ownsSession = f.S.review === pending.rv && pending.rv.ix === pending.ix && pending.rv.queue[pending.ix] === pending.item;
+        const entry = before.taken.find((value) => keyOf(value) === pending.key);
+        let valid = ownsSession;
+        if (pending.kind === 'grade') valid = valid && (pending.item.t !== 'kanji' || !!f.c.D.kanji[pending.item.id]?.m?.trim()) &&
+          (pending.item.t !== 'word' || !!f.c.D.dict[pending.item.id]?.m?.length) &&
+          (pending.dojo || (!!entry && (before.srs[pending.key] !== undefined || Number.isFinite(entry.started)) && !before.suspended[pending.key]));
+        if (pending.kind === 'undo' && !pending.entry.dojo) valid = valid &&
+          JSON.stringify(ordered(before.srs[pending.entry.key] ?? null)) === JSON.stringify(ordered(pending.entry.after ?? null));
+        pending.valid = !!valid; pending.staged = true;
+        const staged = f.stage();
+        assert.equal(!!staged.error, !pending.valid, 'Producer accepts exactly the independently modeled preconditions');
+        unchanged(f, before, pending.rv, pending.session, 'dequeue before acknowledgment');
+      }
+    };
+    const checkSaved = (p, before, after) => {
+      const expected = clone(before);
+      if (p.kind === 'grade' && p.dojo) {
+        expected.obslog.push([p.at, 'dojo', p.key, p.rating, 'kanji']);
+        count('dojoGrades'); if (before.srs[p.key]) count('dojoOnExistingSchedule');
+      } else if (p.kind === 'grade') {
+        const previous = before.srs[p.key], card = after.srs[p.key];
+        assert(card, 'An accepted standard grade creates exactly its schedule');
+        for (const field of ['stability', 'difficulty', 'elapsed_days', 'scheduled_days', 'reps', 'lapses'])
+          assert(Number.isFinite(card[field]), 'Finite scheduled ' + field);
+        assert(card.stability > 0 && card.difficulty >= 1 && card.difficulty <= 10);
+        assert([1, 2, 3].includes(card.state));
+        assert(card.elapsed_days >= 0 && card.scheduled_days >= 0 && card.lapses >= 0);
+        assert.equal(card.reps, (previous?.reps || 0) + 1, 'One intention increments repetitions exactly once');
+        const anchor = Math.max(p.at, previous?.last_review ? Date.parse(previous.last_review) : p.at);
+        assert.equal(Date.parse(card.last_review), anchor, 'New grade uses the effective monotonic scheduling anchor');
+        assert(Number.isFinite(Date.parse(card.due)) && Date.parse(card.due) >= anchor, 'Newly scheduled due never precedes its effective anchor');
+        const row = after.revlog[before.revlog.length]; assert(row && row.length === 12, 'One complete grade row');
+        same(row.slice(0, 4), [p.at, p.key, p.effectiveRating, previous?.state || 0], 'Raw time, identity, effective grade and prior state');
+        assert.equal(row[11], Date.parse(card.due)); assert.equal(row[10], card.scheduled_days);
+        assert.equal(row[8], Number(card.stability.toFixed(4))); assert.equal(row[9], Number(card.difficulty.toFixed(4)));
+        if (!previous?.last_review) same(row.slice(4, 8), [null, null, null, null], 'First grade has no invented prior memory');
+        else {
+          assert.equal(row[4], Number(((anchor - Date.parse(previous.last_review)) / 86400000).toFixed(3)));
+          assert(row[5] === null || (Number.isFinite(row[5]) && row[5] >= 0 && row[5] <= 1));
+          assert.equal(row[6], Number(previous.stability.toFixed(4))); assert.equal(row[7], Number(previous.difficulty.toFixed(4)));
+          if (p.at < Date.parse(previous.last_review)) count('backwardAnchoredGrades');
+        }
+        expected.srs[p.key] = clone(card); // Numeric schedule is validated above, not recomputed with FSRS.
+        expected.revlog.push(clone(row)); // Prefix/count and every row field are checked independently.
+        const day = expected.stats[p.day] || { n: 0, again: 0 };
+        day.n = (day.n || 0) + 1;
+        if (p.effectiveRating === 1) day.again = (day.again || 0) + 1;
+        if (previous === undefined) day.nnew = (day.nnew || 0) + 1;
+        expected.stats[p.day] = day;
+        count('standardGrades'); count(p.item.t + 'Grades'); count('rating' + p.effectiveRating);
+        if (p.declared === 0) count('notRecalledForcedAgain');
+        if (rejectedGrade) { count('explicitGradeRetry'); rejectedGrade = false; }
+      } else if (p.entry.dojo) {
+        expected.obslog.push([p.at, 'dojo', p.entry.key, 0]); count('dojoUndos');
+      } else {
+        const entry = p.entry;
+        if (entry.previous === undefined) delete expected.srs[entry.key]; else expected.srs[entry.key] = clone(entry.previous);
+        expected.revlog.push([p.at, entry.key, 0, entry.logIndex]);
+        revokeTarget(after.revlog[before.revlog.length], entry.key, entry.logIndex);
+        const day = expected.stats[entry.day]; assert(day, 'A generated undo has its accepted grade counters');
+        day.n = Math.max(0, (day.n || 0) - 1);
+        if (entry.rating === 1) day.again = Math.max(0, (day.again || 0) - 1);
+        if (entry.previous === undefined && day.nnew) day.nnew -= 1;
+        count('standardUndos');
+      }
+      same(after, expected, 'Accepted operation changes only its independently modeled roots and counters');
+    };
+    try {
+      for (let index = 0; index < commands.length; index += 1) {
+        const command = commands[index]; trace.push({ index, ...command, beforeTime: now }); count('command:' + command.op);
+        switch (command.op) {
+          case 'start': {
+            assert.equal(pending, null); rejectedGrade = false; target = items[command.type]; now += command.shift;
+            if (command.shift < 0) count('backwardClockMoves'); else if (command.shift === 0) count('equalClockMoves');
+            const rv = newSession(command.dojo); rv.declared = command.declared; break;
+          }
+          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
+          case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared });
+            // the rendered face: a revealed card presents (binds) its answer, a face-down one has none
+            if (command.revealed) f.c.presentReviewAnswer(f.S.review); else f.S.review.presented = null;
+            break;
+          case 'dictionary': if (command.available) f.c.D.kanji.学 = { m: 'synthetic learning' }; else delete f.c.D.kanji.学; break;
+          case 'grade': {
+            assert.equal(pending, null); const rv = f.S.review, before = f.durable(), session = sessionValue(rv);
+            const allowed = !!f.S.focus || (rv.revealed && rv.declared !== null);
+            const promise = attemptGrade(command.rating);
+            unchanged(f, before, rv, session, 'grade activation before acknowledgment');
+            if (!allowed) { assert.equal(await promise, false); assert.equal(f.queue.length, 0); count('disclosureRejections'); break; }
+            pendingCount(f);
+            const current = rv.queue[rv.ix], dojo = !!f.S.focus;
+            const effectiveRating = !dojo && rv.declared === 0 ? 1 : command.rating;
+            pending = { kind: 'grade', rv, item: current, ix: rv.ix, key: keyOf(current), dojo, rating: command.rating, effectiveRating,
+              gradeKey: ['again', 'hard', 'good', 'easy'][effectiveRating - 1], declared: rv.declared, day: new FixedDate(now).toISOString().slice(0, 10),
+              at: now, epoch: f.c.recordEpoch, session, promise };
+            break;
+          }
+          case 'undo': {
+            assert.equal(pending, null); const rv = f.S.review, before = f.durable(), session = sessionValue(rv);
+            const entry = sessionEntries.get(rv).at(-1); assert(entry, 'Undo requires independently tracked accepted history');
+            const promise = byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
+            unchanged(f, before, rv, session, 'undo activation before acknowledgment'); pendingCount(f);
+            pending = { kind: 'undo', rv, item: rv.queue[rv.ix], ix: rv.ix, entry, key: entry.key, at: now, epoch: f.c.recordEpoch, session, promise };
+            break;
+          }
+          case 'duplicate': {
+            assert(pending); const before = f.durable(), session = sessionValue(pending.rv);
+            const value = pending.kind === 'grade' ? await attemptGrade(pending.rating) : await byClass(f.render('renderReviewUndo', pending.rv), 'review-undo').fire();
+            assert.equal(value, false); pendingCount(f); unchanged(f, before, pending.rv, session, 'duplicate pending activation'); count('pendingDuplicates'); break;
+          }
+          case 'stage': stagePending(); break;
+          case 'external': {
+            const before = f.durable(), key = keyOf(target); let patch;
+            if (command.kind === 'unrelated') {
+              patch = { srs: { ...before.srs, 'word:unrelated': mature() }, revlog: [...before.revlog, [now, 'word:unrelated', 3, 2]],
+                obslog: [...before.obslog, [now, 'synthetic-external', 'word:unrelated', 1]],
+                stats: { ...before.stats, '1999-01-01': { n: historyIndex + 2, again: 1, nnew: 1 } },
+                deepWords: { ...before.deepWords, preserved: { historyIndex, index } } }; count('concurrentUnrelatedChanges');
+            } else if (command.kind === 'target' || command.kind === 'mature') {
+              patch = { srs: { ...before.srs, [key]: command.kind === 'mature' ? mature() : { ...(before.srs[key] || mature()), reps: 90 + index } } };
+              if (pending?.kind === 'undo') count('undoConflictsInjected'); else count('concurrentTargetChanges');
+            } else if (command.kind === 'remove') patch = { taken: before.taken.filter((value) => keyOf(value) !== key) };
+            else if (command.kind === 'suspend') patch = { suspended: { ...before.suspended, [key]: now } };
+            else if (command.kind === 'enroll') {
+              const suspended = { ...before.suspended }; delete suspended[key];
+              patch = { taken: [...before.taken.filter((value) => keyOf(value) !== key), clone(target)], suspended };
+            } else assert.fail('Unknown generated external change');
+            f.external(patch); same(f.durable(), { ...before, ...patch }, 'Only explicit fixture external changes publish'); break;
+          }
+          case 'replace': assert(pending); newSession(false); count('sessionReplacements'); break;
+          case 'epoch': assert(pending); f.c.recordEpoch += 1; count('ownershipChanges'); break;
+          case 'ack': {
+            stagePending(); const p = pending, before = f.durable(), replacement = f.S.review !== p.rv ? sessionValue(f.S.review) : null;
+            const saved = command.save && p.valid && p.epoch === f.c.recordEpoch;
+            const advance = saved && !command.lostAck && !command.loseOwnershipAfterPublish && f.S.review === p.rv;
+            let publishedBeforeOwnershipLoss = null;
+            if (command.loseOwnershipAfterPublish) assert(saved, 'The postcommit ownership case must first save under its original owner');
+            f.ack(command.save, { acknowledge: !command.lostAck, afterPublish: command.loseOwnershipAfterPublish ? () => {
+              publishedBeforeOwnershipLoss = f.durable();
+              assert.notDeepEqual(publishedBeforeOwnershipLoss, before, 'Complete saved grade roots exist before ownership changes');
+              same(sessionValue(p.rv), p.session, 'Publication alone does not resume or advance the awaiting handler');
+              assert.equal(f.c.recordEpoch, p.epoch, 'Original owner still holds the publication boundary');
+              f.c.recordEpoch += 1;
+              trace.at(-1).publicationBoundary = { savedBeforeOwnershipLoss: true, oldEpoch: p.epoch, newEpoch: f.c.recordEpoch };
+            } : undefined });
+            const returned = await p.promise;
+            if (command.loseOwnershipAfterPublish) {
+              assert(publishedBeforeOwnershipLoss, 'Ownership-loss callback ran only after saved publication');
+              same(f.durable(), publishedBeforeOwnershipLoss, 'Ownership loss retains the complete published roots');
+              count('postCommitOwnershipLoss');
+            }
+            assert.equal(returned, !!advance, 'Return value reports acknowledged current-session success, not inferred durability');
+            assert.equal(f.queue.length, 0); assert.equal(p.rv.pending, null);
+            if (saved) {
+              checkSaved(p, before, f.durable()); count('savedOperations');
+              if (p.kind === 'grade') acceptedGrades += 1;
+            }
+            else { same(f.durable(), before, 'Rejected or old-owner save preserves every saved root'); count('rejectedOperations'); }
+            if (advance && p.kind === 'grade') {
+              advancedOnce(p.rv, p.ix);
+              assert.equal(p.rv.history.length, p.session.history.length + 1);
+              const done = { ...p.session.done, [p.gradeKey]: p.session.done[p.gradeKey] + 1 }; same(p.rv.done, done, 'One grade increments exactly its sitting counter');
+              const card = p.dojo ? { state: 2, scheduled_days: 1 } : f.durable().srs[p.key];
+              const reinserted = [1, 3].includes(card.state) && card.scheduled_days < 1;
+              same(p.rv.queue, reinserted ? [...p.session.queue, p.item] : p.session.queue, 'Only a short learning step is reinserted once');
+              const entry = { key: p.key, previous: before.srs[p.key], after: f.durable().srs[p.key], day: p.day, rating: p.effectiveRating,
+                logIndex: before.revlog.length, dojo: p.dojo, ix: p.ix, session: p.session, reinserted };
+              sessionEntries.get(p.rv).push(entry);
+              if (sessionEntries.get(p.rv).length === 2) count('sameSittingTwoGrades');
+              if (!p.dojo) {
+                const actualEntry = p.rv.history.at(-1);
+                same(actualEntry.prev ?? null, entry.previous ?? null, 'Undo snapshot is the dequeue-time schedule');
+                assert.equal(actualEntry.logIx, entry.logIndex);
+              }
+            } else if (advance) {
+              const entry = sessionEntries.get(p.rv).pop(); assert.equal(entry, p.entry);
+              assert.equal(p.rv.ix, entry.ix); assert.equal(p.rv.history.length, p.session.history.length - 1);
+              same(p.rv.done, entry.session.done, 'Undo restores the independent sitting counter snapshot');
+              same(p.rv.queue, entry.session.queue, 'Undo removes only its own short-step reinsertion');
+              const undone = sessionUndos.get(p.rv); undone.count += 1;
+              undone.reinserted ||= entry.reinserted; undone.days.add(entry.day);
+              if (undone.count === 2) {
+                count('sameSittingTwoUndos');
+                if (undone.reinserted) count('twoUndosWithReinsertion');
+                if (undone.days.size === 2) count('twoUndosAcrossDays');
+              }
+            } else {
+              same(sessionValue(p.rv), p.session, 'A failed or superseded acknowledgment never advances the old sitting');
+              if (p.kind === 'grade') {
+                count('unadvancedGrades');
+                if (!saved) { rejectedGrade = true; count('preCommitGradeRejections'); }
+              }
+              else { count('undoRejections'); if (!p.valid) count('undoConflictRejections'); }
+            }
+            if (replacement) same(sessionValue(f.S.review), replacement, 'Late save cannot advance replacement sitting');
+            if (advance) { assert.equal(p.rv.revealed, false); assert.equal(p.rv.declared, null); }
+            if (command.lostAck && saved) count('simulatedCommittedLostAcks');
+            lastSaved = saved; lastPostCommitOwnershipLoss = !!command.loseOwnershipAfterPublish; pending = null; break;
+          }
+          case 'resume': {
+            assert.equal(pending, null); assert.equal(f.queue.length, 0); const before = f.durable();
+            f = fixture(clone(before), { Date: FixedDate, kanji: { 学: { m: 'synthetic learning' } } });
+            sessionEntries = new WeakMap([[f.S.review, []]]); sessionUndos = new WeakMap(); rejectedGrade = false;
+            same(f.durable(), before, 'Serialize and resume preserves all modeled saved roots');
+            assert.equal(f.S.review.history.length, 0); assert.equal(f.S.review.ix, 0); assert.equal(f.queue.length, 0);
+            if (lastSaved === true) count('resumesAfterSave'); else if (lastSaved === false) count('resumesAfterRejection');
+            if (lastPostCommitOwnershipLoss) count('resumesAfterPostCommitOwnershipLoss');
+            count('resumes'); break;
+          }
+          default: assert.fail('Unknown generated command: ' + command.op);
+        }
+      }
+      assert.equal(pending, null); assert.equal(f.queue.length, 0);
+      assert(acceptedGrades > 0, 'A completed history must exercise an accepted grade, not only no-ops or rejected preconditions');
+      return { semanticSha256: hash(JSON.stringify(ordered(f.durable()))), trace };
+    } catch (error) {
+      error.propertyFailure = { historyIndex, historySeed, failedCommandIndex: trace.length - 1, trace,
+        fullCommands: commands, savedRoots: f.durable(), session: sessionValue(f.S.review), reason: error.stack };
+      throw error;
+    }
+  };
+  const semanticDigests = [];
+  try {
+    runNegativeControls();
+    for (let offset = 0; offset < runs; offset += 1) {
+      const historyIndex = onlyHistory ?? offset;
+      const historySeed = (seed ^ Math.imul(historyIndex + 1, 0x9e3779b1)) >>> 0;
+      const commands = commandsFor(historyIndex, historySeed);
+      const result = await runHistory(historyIndex, historySeed, commands);
+      // Replay every scenario twice through the first 30 histories, plus a
+      // deterministic sparse sample. This is a separate repeatability check;
+      // it is not the reference model and does not inflate coverage counts.
+      if (historyIndex < 30 || historyIndex % 97 === 0) {
+        countEnabled = false;
+        try {
+          const replayed = await runHistory(historyIndex, historySeed, commandsFor(historyIndex, historySeed));
+          assert.equal(replayed.semanticSha256, result.semanticSha256, 'Identical commands, seed and clock replay to identical modeled roots');
+          report.deterministicReplays += 1;
+        } finally { countEnabled = true; }
+      }
+      semanticDigests.push(result.semanticSha256);
+      report.completedHistories += 1; report.totalCommands += commands.length;
+      report.historyLengths[commands.length] = (report.historyLengths[commands.length] || 0) + 1;
+    }
+    // The main gate always requests >=1,000 histories. Short runs are explicit
+    // diagnostic replays and may not claim the campaign's coverage floor.
+    report.coverageFloorApplicable = runs >= 1000 && onlyHistory === null;
+    if (report.coverageFloorApplicable) {
+      const required = ['standardGrades', 'wordGrades', 'kanjiGrades', 'rating1', 'rating2', 'rating3', 'rating4', 'pendingDuplicates',
+        'preCommitGradeRejections', 'explicitGradeRetry', 'standardUndos', 'undoRejections', 'undoConflictRejections', 'resumesAfterSave',
+        'resumesAfterRejection', 'backwardClockMoves', 'equalClockMoves', 'backwardAnchoredGrades', 'dojoOnExistingSchedule', 'dojoUndos',
+        'disclosureRejections', 'notRecalledForcedAgain', 'concurrentUnrelatedChanges', 'concurrentTargetChanges', 'sessionReplacements',
+        'ownershipChanges', 'simulatedCommittedLostAcks', 'postCommitOwnershipLoss', 'resumesAfterPostCommitOwnershipLoss',
+        'sameSittingTwoGrades', 'sameSittingTwoUndos', 'twoUndosWithReinsertion', 'twoUndosAcrossDays'];
+      report.coverageFloors = Object.fromEntries(required.map((name) => [name, 10]));
+      for (const name of required) assert((counters[name] || 0) >= 10, 'Non-vacuity coverage floor: ' + name);
+    }
+    report.semanticDigest = hash(semanticDigests.join('\n'));
+    report.pass = true;
+  } catch (error) {
+    const failure = error.propertyFailure || { reason: error.stack };
+    if (failure.historyIndex !== undefined) failure.replay = 'node prototypes/corridor/tools/verify-learning-record.mjs --property --seed ' + seed + ' --runs 1 --history ' + failure.historyIndex;
+    report.failures.push(failure);
+    throw error;
+  } finally { saveReport(); }
+  return report;
+}
+let properties;
+if (propertyMode) await check('generated-learning-handler-histories', async () => { properties = await propertyChecks(); });
+
+/* G4 reference vectors (design/G4-FSRS-REFERENCE.md). Each vector declares a card by the history
+ * that produced it and a grade to apply; the expected card comes from an independent reference
+ * scheduler built here from the pin file's declared values; the actual card is what the app's own
+ * commitStandardGrade stored, running on a scheduler built by the app's own pinnedSchedulerInput.
+ * Control: in commitStandardGrade, `[rating]` → `[rating === fsrsApi.Rating.Good ? fsrsApi.Rating.Easy : rating]`
+ * (the log still says Good) must fail every Good vector. The local-midnight vector (V6) needs a
+ * browser time zone and stays with the browser checks; it is listed as pending, not passed. */
+let reference;
+async function referenceChecks() {
+  const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
+  const pinPath = resolve(site || root, 'data/fsrs-pin.json');
+  const pinBytes = readFileSync(pinPath);
+  const pin = JSON.parse(pinBytes.toString('utf8'));
+  // the receipt is written from finally: an early failure keeps the vectors that ran and the one that failed
+  reference = { format: 'kairo-fsrs-reference-vectors', v: 2, pass: false, rows: [],
+    identity: { pinSha256: sha(pinBytes), vendorSha256: sha(readFileSync(resolve(root, 'vendor/ts-fsrs.mjs'))),
+      verifierSha256: sha(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: sha(source), programSha256: sha(program),
+      parameterSetId: pin.parameterSetId, pinnedVersion: pin.pinnedVersion },
+    pending: ['V6-local-midnight (browser time zone)', 'native boot selection of fitted vs default weights (srsParamsProblem/srsCustom), restart, export/restore — browser witness'],
+    controls: ['Good→Easy: in commitStandardGrade, `[rating]` → `[rating === fsrsApi.Rating.Good ? fsrsApi.Rating.Easy : rating]` must fail every Good vector',
+      'ignored fitted weights: in pinnedSchedulerInput, `w: fittedW || pin.w` → `w: pin.w` must fail V7a and V7b'] };
+  try {
+    assert.equal(pin.algorithm, 'FSRS-6'); assert.equal(pin.enableFuzz, false);
+    const declared = (w) => fsrsApi.generatorParameters({ w, request_retention: pin.requestRetention,
+      maximum_interval: pin.maximumInterval, enable_fuzz: pin.enableFuzz, enable_short_term: pin.enableShortTerm,
+      learning_steps: pin.learningSteps, relearning_steps: pin.relearningSteps });
+    const R = fsrsApi.Rating, S = fsrsApi.State;
+    const at = (iso) => new Date(iso);
+    // fitted weights differ in the initial-stability weights (w0–3, used by a new card) AND in a
+    // mature-transition weight (w8, recall-stability growth), so both V7 vectors can tell them apart
+    const fittedW = pin.w.map((value, i) => (i < 4 ? Number((value * 1.5).toFixed(4)) : i === 8 ? Number((value + 0.3).toFixed(4)) : value));
+    const V3 = [[R.Good, '2026-09-01T00:00:00Z'], [R.Good, '2026-09-02T00:00:00Z'], [R.Good, '2026-09-06T00:00:00Z'], [R.Good, '2026-09-13T00:00:00Z']];
+    const vectors = [
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V1-new-${rating}`, history: [], now: '2026-09-25T00:00:00Z', rating, state: S.New })),
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Learning })),
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating, state: S.Review })),
+      ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Relearning })),
+      { id: 'V5-overdue-good', history: V3, now: '2026-11-30T00:00:00Z', rating: R.Good, state: S.Review },
+      { id: 'V7a-fitted-new-good', history: [], now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.New, fitted: true },
+      { id: 'V7b-fitted-mature-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
+    ];
+    const stored = (card) => ({ ...card, due: card.due.toISOString(), ...(card.last_review ? { last_review: card.last_review.toISOString() } : {}) });
+    for (const vector of vectors) {
+      const weights = vector.fitted ? fittedW : pin.w;
+      const expectedScheduler = fsrsApi.fsrs(declared(weights));
+      let card = fsrsApi.createEmptyCard(at(vector.history[0]?.[1] || vector.now));
+      for (const [rating, when] of vector.history) card = expectedScheduler.next(card, at(when), rating).card;
+      const row = { id: vector.id, variant: vector.fitted ? 'fitted' : 'default', history: vector.history, now: vector.now, rating: vector.rating,
+        before: stored(card), pass: false, mismatch: [] };
+      reference.rows.push(row);
+      assert.equal(card.state, vector.state, `${vector.id}: the declared card is in the labelled state`);
+      if (vector.id === 'V5-overdue-good') {
+        // The history, not the vector label, must establish the promised overdue input.
+        const overdueDays = (at(vector.now).getTime() - card.due.getTime()) / 86_400_000;
+        row.overdue = { due: card.due.toISOString(), gradingTime: at(vector.now).toISOString(),
+          expectedDue: '2026-10-31T00:00:00.000Z', expectedDays: 30, actualDays: overdueDays, pass: false };
+        assert.equal(row.overdue.due, row.overdue.expectedDue, `${vector.id}: history must produce the pinned due date`);
+        assert(overdueDays > 0, `${vector.id}: grading clock must be after the actual due date`);
+        assert.equal(overdueDays, row.overdue.expectedDays, `${vector.id}: grading clock must be exactly 30 days overdue`);
+        row.overdue.pass = true;
+      }
+      const expected = expectedScheduler.next(card, at(vector.now), vector.rating).card;
+      if (vector.fitted) {
+        // the fitted vector must be able to fail: default and fitted weights disagree on this exact input
+        const otherwise = fsrsApi.fsrs(declared(pin.w)).next(card, at(vector.now), vector.rating).card;
+        assert.notEqual(otherwise.stability, expected.stability, `${vector.id}: default and fitted weights must differ here`);
+      }
+      const f = fixture(vector.history.length ? { srs: { 'word:学校': stored(card) } } : {});
+      // the app's own construction of its scheduler from the same pin (and the fitted weights for V7)
+      f.c.scheduler = fsrsApi.fsrs(fsrsApi.generatorParameters(f.c.pinnedSchedulerInput(pin, vector.fitted ? fittedW : null)));
+      const key = { [R.Again]: 'again', [R.Hard]: 'hard', [R.Good]: 'good', [R.Easy]: 'easy' }[vector.rating];
+      const pending = grade(f, { rating: vector.rating, key, now: at(vector.now), day: vector.now.slice(0, 10) });
+      f.ack(true);
+      assert.equal(await pending, true, `${vector.id}: the app committed its grade`);
+      const actual = f.durable().srs['word:学校'];
+      row.expected = stored(expected); row.actual = actual;
+      for (const field of ['state', 'reps', 'lapses', 'scheduled_days', 'elapsed_days', 'learning_steps']) {
+        if (actual[field] !== expected[field]) row.mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+      }
+      if (actual.due !== expected.due.toISOString()) row.mismatch.push(`due ${actual.due} ≠ ${expected.due.toISOString()}`);
+      const expectedLast = expected.last_review ? expected.last_review.toISOString() : undefined;
+      if (actual.last_review !== expectedLast) row.mismatch.push(`last_review ${actual.last_review} ≠ ${expectedLast}`);
+      for (const field of ['stability', 'difficulty']) {
+        if (!(Math.abs(actual[field] - expected[field]) <= 1e-9)) row.mismatch.push(`${field} ${actual[field]} ≠ ${expected[field]}`);
+      }
+      row.pass = row.mismatch.length === 0;
+    }
+    reference.pass = reference.rows.length === vectors.length && reference.rows.every((row) => row.pass);
+    const failed = reference.rows.filter((row) => !row.pass);
+    assert.equal(failed.length, 0, JSON.stringify(failed.map(({ id, mismatch }) => ({ id, mismatch }))));
+  } finally {
+    writeFileSync(resolve(out, 'learning-reference.json'), JSON.stringify(reference, null, 2) + '\n');
+  }
+}
+if (referenceMode) await check('pinned-fsrs-reference-vectors', referenceChecks);
 
 async function browserChecks() {
   const mime = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.woff2': 'font/woff2' };
@@ -419,14 +1089,14 @@ async function browserChecks() {
           assert.deepEqual(enrolled.srs, before.srs); assert.deepEqual(enrolled.revlog, before.revlog); assert.deepEqual(enrolled.futureRoot, before.futureRoot);
         });
         await journey('practice-answer-rejection-keeps-the-question-unanswered', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').waitFor(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('[data-mock-opt="0"]').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
           assert.equal(await page.locator('#mock-next').isDisabled(), true);
           assert.equal(await page.locator('[data-mock-opt][aria-pressed="true"]').count(), 0);
         });
         await journey('practice-navigation-rejection-keeps-the-acknowledged-answer-and-question', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').click(); await page.locator('[data-mock-opt="0"][aria-pressed="true"]').waitFor();
           const question = await page.locator('.mock-q').textContent(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('#mock-next').click(); await failed(page, before);
@@ -457,8 +1127,11 @@ async function browserChecks() {
 if (browserMode) await browserChecks();
 
 const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
+  ...(controlName ? { control: controlName } : {}),
   sourceSha256: createHash('sha256').update(source).digest('hex'),
   artifactSha256: artifact?.artifactSha256,
+  ...(propertyMode ? { properties: properties || { pass: false, receipt: 'learning-properties.json' } } : {}),
+  ...(referenceMode ? { reference: reference ? { pass: reference.pass, receipt: 'learning-reference.json' } : { pass: false, receipt: 'learning-reference.json' } } : {}),
   testedDefinitions: [...names], scope: browserMode ? 'Actual immutable staged browser UI and independently read native IndexedDB, plus controlled frozen-root acknowledgment tests' : 'Actual authored handlers with frozen synthetic roots and controlled save acknowledgments; no browser-storage claim',
   results, pass: results.every((result) => result.pass) };
 writeFileSync(resolve(out, 'learning-record.json'), JSON.stringify(receipt, null, 2) + '\n');

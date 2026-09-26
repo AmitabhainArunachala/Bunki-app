@@ -36,15 +36,30 @@ const SHELL = [
   'fonts.css',
   'corridor.css',
   'corridor.js',
+  'maintenance/report-client.js',
+  'maintenance/report-client.css',
+  'register.css',
   'reading-controller.mjs',
   'teacher-context.mjs',
   'teacher-drafts.mjs',
   'teacher-draft-controller.mjs',
   'sentence-drafts.mjs',
   'sentence-draft-controller.mjs',
+  'sentence-practice.mjs',
   'reading-position.mjs',
   'feed-controller.mjs',
   'assessment-controller.mjs',
+  'assessment-v2-controller.mjs',
+  'assessment-learning.mjs',
+  'assessment-question-practice.mjs',
+  'assessment-question-view.mjs',
+  'assessment-question-source.mjs',
+  'assessment-view.mjs',
+  'assessment-delivery.mjs',
+  'assessment-cloze.mjs',
+  'assessment-received.mjs',
+  'assessment-enrichment.mjs',
+  'assessment-finalization.mjs',
   'record-controller.mjs',
   'record-host.mjs',
   'record-app.mjs',
@@ -77,6 +92,8 @@ const SHELL = [
 // offline: an ordinary online visit would hide a missing prerequisite.
 const BOOT_DATA = [
   'data/manifest.json',
+  'data/assessment/catalog.json',
+  'data/assessment/sources.json',
   'data/fsrs-pin.json',
   'data/articles/index.json',
   'data/proprietary_safe/kanken.json',
@@ -92,6 +109,7 @@ const BOOT_DATA = [
   'modules/reading-core.mjs',
   'modules/feed-core.mjs',
   'modules/assessment-core.mjs',
+  'modules/learning-core.mjs',
   'modules/record-core.mjs',
 ];
 const PRECACHE_URLS = new Set([...SHELL, ...BOOT_DATA].map((path) => new URL(path, SCOPE).href));
@@ -346,6 +364,9 @@ self.addEventListener('fetch', (event) => {
   if (!url.href.startsWith(SCOPE)) return;
 
   const relativePath = url.href.slice(SCOPE.length);
+  // API traffic (the report service) is live by nature: never a release asset, never answered
+  // from the installed version — it goes to the network, or fails as the network fails
+  if (/^api\//.test(relativePath)) return;
   const isContent = /^(data|vendor|design|modules)\//.test(relativePath);
   const navigation = request.mode === 'navigate';
   const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;

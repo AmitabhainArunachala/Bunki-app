@@ -12,7 +12,7 @@ import {
 import {
   bindingSchema,
   operationReference,
-  parseSyncOperation,
+  parseAnySyncOperation,
   referencesOf,
   SYNC_MERGE_POLICY,
   SYNC_SCHEMA_EPOCH,
@@ -178,7 +178,7 @@ function validateLinks(operation: SyncOperation, byId: ReadonlyMap<string, SyncO
     )
       throw new SyncValidationError('causal-reference-conflict', ['generation']);
   }
-  if ('supersedes' in payload) {
+  if ('supersedes' in payload && payload.supersedes) {
     for (const ref of payload.supersedes) {
       const older = byId.get(ref.opId);
       if (
@@ -365,7 +365,7 @@ function project(graph: CausalGraph): SyncProjection {
       }));
     const superseded = new Set<string>();
     for (const operation of active) {
-      if ('supersedes' in operation.payload) {
+      if ('supersedes' in operation.payload && operation.payload.supersedes) {
         for (const ref of operation.payload.supersedes) superseded.add(ref.opId);
       }
       if (operation.payload.kind === 'review.attempt') reviews.push(operation);
@@ -450,7 +450,7 @@ export function planReceive(replica: SyncReplica, delivery: ReceiveDelivery): Re
   const insert: SyncOperation[] = [];
   const duplicates: OperationRef[] = [];
   for (const raw of delivery.operations) {
-    const operation = parseSyncOperation(raw);
+    const operation = parseAnySyncOperation(raw);
     assertScope(replica.policy, operation);
     const prior = byId.get(operation.opId);
     if (prior) {

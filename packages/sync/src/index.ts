@@ -3,8 +3,11 @@ export {
   SYNC_SCHEMA_VERSION,
   SYNC_SCHEMA_EPOCH,
   SYNC_MERGE_POLICY,
+  ASSESSMENT_SYNC_SCHEMA_VERSION,
   createSyncOperation,
+  createSyncOperationV2,
   parseSyncOperation,
+  parseAnySyncOperation,
   operationReference,
   parseActorIdentity,
   parseSyncBinding,
@@ -20,7 +23,13 @@ export {
   type RecordOperation,
   type SyncOperationInput,
   type SyncOperation,
+  type SyncOperationV2,
+  type SyncOperationV2Input,
+  type LegacySyncOperation,
+  type LegacyRecordOperation,
 } from './operations.ts';
+export * from './assessment-operations-v2.ts';
+export * from './assessment-views-v2.ts';
 export {
   createReplica,
   planReceive,

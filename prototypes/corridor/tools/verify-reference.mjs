@@ -273,6 +273,8 @@ try {
     await page.click('#back');
     await page.waitForSelector('#reference-library[data-view="overview"]');
     await page.click('#reference-mock');
+    await page.waitForSelector('.assessment-room #exam-legacy');
+    await page.click('#exam-legacy');
     await page.waitForSelector('[data-mock-set="n5-01"]');
     await page.click('#back');
     await page.waitForSelector('#reference-library[data-view="overview"]');

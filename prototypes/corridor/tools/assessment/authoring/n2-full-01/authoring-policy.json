@@ -1,0 +1,150 @@
+{
+  "schema": "kairo-original-n2-authoring-policy/1",
+  "id": "n2-form-01-local-allocation-20260910-r1",
+  "formId": "kairo-original-jlpt-n2-form-01",
+  "exam": {
+    "family": "jlpt",
+    "track": "N2"
+  },
+  "blueprintId": "jlpt-n2-facts-20260910",
+  "countsAre": "authoring-rules-not-official-fixed-counts",
+  "allocation": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "count": 5
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "count": 5
+    },
+    {
+      "skill": "vocabulary",
+      "task": "word-formation",
+      "count": 5
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "count": 5
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "count": 5
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "count": 5
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "count": 10
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "count": 5
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "count": 5
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "count": 4
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "count": 6
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "count": 2
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "count": 4
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "count": 2
+    },
+    {
+      "skill": "listening",
+      "task": "listening-task",
+      "count": 5
+    },
+    {
+      "skill": "listening",
+      "task": "listening-point",
+      "count": 5
+    },
+    {
+      "skill": "listening",
+      "task": "listening-gist",
+      "count": 4
+    },
+    {
+      "skill": "listening",
+      "task": "listening-response",
+      "count": 10
+    },
+    {
+      "skill": "listening",
+      "task": "listening-integrated",
+      "count": 4
+    }
+  ],
+  "scoredItems": 96,
+  "workedExampleGroups": 20,
+  "unscoredExampleItems": 21,
+  "timing": [
+    {
+      "skills": [
+        "vocabulary",
+        "grammar",
+        "reading"
+      ],
+      "minutes": 105,
+      "kind": "fixed"
+    },
+    {
+      "skills": [
+        "listening"
+      ],
+      "minutes": 50,
+      "kind": "nominal-recording-dependent"
+    }
+  ],
+  "integratedListening": {
+    "scoredStimuli": 3,
+    "questionCountsPerStimulus": [
+      1,
+      1,
+      2
+    ],
+    "singleQuestionChoices": "spoken",
+    "sharedTwoQuestionChoices": "printed",
+    "sharedStimulusDelivery": "once-before-all-linked-questions",
+    "examples": [
+      "one single-question spoken-choice unit",
+      "one shared stimulus followed by two printed-choice questions"
+    ]
+  },
+  "candidateCountRepresented": 1,
+  "reviewedCompleteForms": 0,
+  "releasedCompleteForms": 0,
+  "targetDistinctReviewedFormsPerLevel": 5,
+  "runtimeBoundary": "Only authoring envelopes express shared-stimulus delivery. Installed ItemVersion has no playback schedule; no runtime scheduling support or FormVersion is asserted.",
+  "mediaPolicy": "No images, audio, media references, media rights grant, human approval or FormVersion created."
+}

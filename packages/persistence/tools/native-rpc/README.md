@@ -102,12 +102,13 @@ deadline through `AbortSignal` and may close an unresponsive connection.
 
 ## Verification and limitations
 
-The focused suite covers 61 unit cases and seven actual Swift OS-pipe cases.
+The focused suite covers 62 unit cases and seven actual Swift OS-pipe cases.
 The native suite is named `native-rpc-session.interop.ts` and explicitly included
-by this runner. Ordinary root Vitest collects the 61 portable `.test.ts` cases;
+by this runner. Ordinary root Vitest collects the 62 portable `.test.ts` cases;
 the native suite never succeeds by skipping when its fixture host is absent.
-It compiles all nine unchanged native source files with the real SDK, plus
-`FixtureHost.swift` in the same module to access the internal synthetic backend.
+It requires the exact sorted inventory of fourteen native source filenames and
+compiles all of them with the real SDK, plus `FixtureHost.swift` in the same module
+to access the internal synthetic backend.
 That fixture uses an explicit synthetic native authorizer. Separate inherited
 file descriptors `3` and `4` carry its small test-only grant/control messages;
 stdin/stdout carry only the real frozen journal RPC. These fixture descriptors

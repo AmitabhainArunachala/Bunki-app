@@ -1,0 +1,219 @@
+{
+  "schema": "kairo-assessment-audio-scripts/1",
+  "formId": "kairo-original-jlpt-n2-short-01",
+  "units": [
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q13:audio",
+      "itemIds": ["kairo-original-jlpt-n2-short-01:q13"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "展示会の案内状、印刷を頼んでいいですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "その前に、住所だけ確認してくれる？　会場が隣の建物に変わったんだ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "日付と時間は、そのままでいいんですね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん。住所を直したら僕に見せて。それから印刷を頼もう。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "女の人は、このあとまず何をしますか。\n展示会の案内状、印刷を頼んでいいですか。\nその前に、住所だけ確認してくれる？　会場が隣の建物に変わったんだ。\n日付と時間は、そのままでいいんですね。\nうん。住所を直したら僕に見せて。それから印刷を頼もう。\n女の人は、このあとまず何をしますか。",
+      "transcriptSha256": "84851f7f8acba420c965f9c1b6e28875792d33b1b921a41131645f3ca6d485c2",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q14:audio",
+      "itemIds": ["kairo-original-jlpt-n2-short-01:q14"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人がこの講座を選んだ一番の理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "あの講座、申し込んだ？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん。土曜日なら仕事がないからね。平日の夜だと帰りが遅くなるし。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "料金も安かったんだって？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "それは申し込んだ後で知ったんだ。先生の名前も知らなかったけど、土曜に通えるのが一番だった。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人がこの講座を選んだ一番の理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "男の人がこの講座を選んだ一番の理由は何ですか。\nあの講座、申し込んだ？\nうん。土曜日なら仕事がないからね。平日の夜だと帰りが遅くなるし。\n料金も安かったんだって？\nそれは申し込んだ後で知ったんだ。先生の名前も知らなかったけど、土曜に通えるのが一番だった。\n男の人がこの講座を選んだ一番の理由は何ですか。",
+      "transcriptSha256": "4388688eb1ee2feaebef9a23ed505606c3472a2f7cc41f002cce47c47769ce97",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q15:audio",
+      "itemIds": ["kairo-original-jlpt-n2-short-01:q15"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "announcer",
+          "text": "新しい道具を買うと、すぐに作業が楽になると思いがちです。でも、使い方を調べる時間も、保管する場所も必要です。古い道具で困っている点がはっきりしてから選べば、買ったのに使わなかった、ということを減らせます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "話している人は、道具を買う前に何が大切だと言っていますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1。新製品を全て調べること"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2。今の道具の問題を明らかにすること"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3。保管場所だけを先に決めること"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "4。安くなるまで待つこと"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "新しい道具を買うと、すぐに作業が楽になると思いがちです。でも、使い方を調べる時間も、保管する場所も必要です。古い道具で困っている点がはっきりしてから選べば、買ったのに使わなかった、ということを減らせます。\n話している人は、道具を買う前に何が大切だと言っていますか。\n1。新製品を全て調べること\n2。今の道具の問題を明らかにすること\n3。保管場所だけを先に決めること\n4。安くなるまで待つこと",
+      "transcriptSha256": "041a0cacf2b33532ff730f213211c6734182cc0b8d25ddbd29fc88f00153ebaa",
+      "printedOptions": false,
+      "voiceRoles": {
+        "announcer": "male",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q16:audio",
+      "itemIds": ["kairo-original-jlpt-n2-short-01:q16"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "資料を運ぶの、手伝ってもらえると助かるんだけど。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "最もよい返事を選んでください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1。もう助けてもらいました。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2。はい、どこへ運べばいいですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3。資料を読んでくれてありがとう。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "資料を運ぶの、手伝ってもらえると助かるんだけど。\n最もよい返事を選んでください。\n1。もう助けてもらいました。\n2。はい、どこへ運べばいいですか。\n3。資料を読んでくれてありがとう。",
+      "transcriptSha256": "80a91f6b377a08fef3bb6ad49d5e53801acce8aed6b3340555ed40fac71b609b",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    }
+  ]
+}

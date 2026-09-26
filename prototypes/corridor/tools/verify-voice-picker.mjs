@@ -1,199 +1,221 @@
-/* 声の選択 — the device-voice picker tells the truth (operator, 2026-09-17:
- * "despite changing the voice input choice the voice DOES NOT CHANGE AT
- * ALL. and the basic computer voice needs to NOT BE AN OPTION AT ALL").
+/**
+ * Voice honesty: no device voice, no automatic voice, a reason whenever nothing can play.
  *
- * With the recorded reader absent (audio/manifest.json → 404) and a
- * synthetic voice list installed before boot, open the reader and ASSERT on
- * the rendered picker: novelty/Eloquence voices never appear, the compact
- * default hides behind a better voice, and choosing a voice speaks a preview
- * in THAT voice (spy on speechSynthesis.speak, no audio leaves the box).
+ * The operator's words are the specification:
+ *   2026-09-17 "the basic computer voice needs to NOT BE AN OPTION AT ALL!!! it is
+ *              terrible and grating and needs to be cut."
+ *   2026-09-19 "ami was the shitty voice"
+ * Every roster voice is interim until his audition; nothing plays unless the learner
+ * explicitly chose it. This file previously asserted the device-voice picker these
+ * rulings removed; its name is kept so every caller still runs it.
  *
- * Claim boundary: proves the list and the utterance's voice binding in
- * Chromium; it cannot judge how a voice sounds — that is the operator's ear.
+ *   V0 identity: the served build is the commit under test.
+ *   V1 a build whose recordings are absent (manifest 404): listen is shut, the note
+ *      says there are no recorded voices, no picker, zero device speech.
+ *   V2 recordings present, no choice: on a recorded passage listen is shut, the note
+ *      says the passage is recorded only in アミ, the picker preselects "Choose a
+ *      voice…" and labels every voice interim; zero device speech.
+ *   V3 choosing アミ opens listen and plays her recorded sentence (a real audio/s/ami
+ *      request); zero device speech.
+ *   V4 a recording that fails to load stops honestly with a visible reason; no
+ *      fallback voice of any kind.
+ *   V5 the review card's 音 door with no choice: a visible role=status reason and no
+ *      sound; after choosing ずんだもん it requests audio/w/zundamon/…; zero device speech.
+ * Every case spies speechSynthesis.speak: a single call anywhere is a failure.
  *
- * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
- *        node prototypes/corridor/tools/verify-voice-picker.mjs
+ * Claim boundary: proves wiring and honesty in Chromium; it cannot judge how any voice
+ * sounds — that is the operator's audition (JOHN-DECISIONS #4).
+ *
+ * Usage: node verify-voice-picker.mjs   (KAIRO_SITE_DIR may pin a staged artifact)
  */
-import { createServer } from 'node:http';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { extname, join, resolve } from 'node:path';
+
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { resolve } from 'node:path';
+
 import { chromium } from 'playwright-core';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
-import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
-const CORRIDOR = resolveCorridorSite();
-const OUT = resolveCorridorEvidence();
-mkdirSync(OUT, { recursive: true });
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
-const { server, base } = await new Promise((ok, fail) => {
-  const s = createServer((req, res) => {
-    const p = decodeURIComponent((req.url ?? '/').split('?')[0]);
-    if (p === '/audio/manifest.json') { res.writeHead(404).end(); return; } // no recorded reader tonight
-    const rel = p === '/' ? 'index.html' : p.replace(/^\/+/, '');
-    const f = resolve(CORRIDOR, rel);
-    if (!f.startsWith(CORRIDOR) || !existsSync(f)) { res.writeHead(404).end(); return; }
-    res.writeHead(200, { 'content-type': MIME[extname(f)] ?? 'application/octet-stream' });
-    res.end(readFileSync(f));
-  });
-  s.once('error', fail);
-  s.listen(0, '127.0.0.1', () => ok({ server: s, base: `http://127.0.0.1:${s.address().port}` }));
-});
+const require = createRequire(import.meta.url);
+const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 
-const VOICES = [
-  { name: 'Eddy', voiceURI: 'com.apple.eloquence.ja-JP.Eddy', lang: 'ja-JP', localService: true },
-  { name: 'Grandma', voiceURI: 'com.apple.eloquence.ja-JP.Grandma', lang: 'ja-JP', localService: true },
-  { name: 'Kyoko', voiceURI: 'com.apple.voice.compact.ja-JP.Kyoko', lang: 'ja-JP', localService: true },
-  { name: 'Kyoko (Enhanced)', voiceURI: 'com.apple.voice.enhanced.ja-JP.Kyoko', lang: 'ja-JP', localService: true },
-  { name: 'Google 日本語', voiceURI: 'Google 日本語', lang: 'ja-JP', localService: false },
-  { name: 'Samantha', voiceURI: 'com.apple.voice.compact.en-US.Samantha', lang: 'en-US', localService: true },
-];
-const STUB = `(() => {
-  const voices = ${JSON.stringify(VOICES)}.map((v) => ({ ...v, default: false }));
+// the evidence destination first; the site is resolved inside the receipt's try, so a selection
+// failure is a terminal row in this suite's own JSON (an unwritable destination cannot be)
+const EVIDENCE = resolveCorridorEvidence();
+let SITE = null;
+const results = [];
+const pageErrors = []; // bounded: the first 20 uncaught page errors, each tagged with its case
+let currentCase = 'setup';
+const check = (name, pass, detail = '') => {
+  results.push({ name, pass: !!pass, detail });
+  console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? `  — ${detail}` : ''}`);
+};
+// host, browser and manifest start inside the receipt's try below: a setup failure still writes JSON
+let host = null, origin = null, browser = null, recordedPassage = null, recordedWord = null;
+
+// A device engine that records every attempt to speak — the rulings allow none.
+const SPY = `(() => {
   const spoken = [];
-  const synth = {
-    getVoices: () => voices,
-    speak: (u) => { spoken.push({ text: u.text, voiceURI: u.voice ? u.voice.voiceURI : null, lang: u.lang }); },
-    cancel: () => {}, pause: () => {}, resume: () => {},
-    addEventListener: () => {}, removeEventListener: () => {},
-    speaking: false, pending: false, paused: false,
-  };
+  const synth = { getVoices: () => [{ name: 'Kyoko', voiceURI: 'kyoko', lang: 'ja-JP', localService: true, default: true }],
+    speak: (u) => { spoken.push(String(u && u.text || '')); }, cancel() {}, pause() {}, resume() {},
+    addEventListener() {}, removeEventListener() {}, speaking: false, pending: false, paused: false };
   Object.defineProperty(window, 'speechSynthesis', { value: synth, configurable: true });
-  window.__spoken = spoken;
-  // the real utterance refuses a plain object as its voice (TypeError on the
-  // setter); the app then falls back honestly, which is not what is under
-  // test here — so the utterance is faked along with the voice list
-  window.SpeechSynthesisUtterance = function (text) { this.text = text; this.voice = null; this.lang = ''; this.rate = 1; };
+  window.SpeechSynthesisUtterance = function (text) { this.text = text; this.voice = null; this.lang = ''; };
+  window.__deviceSpoken = spoken;
 })();`;
-
-const failures = [];
-const receipt = { schemaVersion: 1, site: CORRIDOR, stubVoices: VOICES.map((v) => v.name) };
-const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: 1280, height: 820 } });
-await silenceBrowserAudio(context);
-await context.addInitScript(STUB);
-const page = await context.newPage();
-await page.goto(`${base}/?entry=shelf`);
-await page.waitForSelector('#tray', { timeout: 30000 });
-const card = await page.$('#shelf-body [data-passage]');
-if (!card) { failures.push('no passage card on the shelf'); }
-else {
-  await card.click();
-  await page.waitForSelector('#reader', { timeout: 30000 });
-  await page.waitForTimeout(600);
-  const options = await page.evaluate(`(() => {
-    const s = document.querySelector('#listen-voice');
-    return s ? [...s.options].map((o) => ({ name: o.textContent, uri: o.value })) : null;
-  })()`);
-  receipt.options = options;
-  if (!options) failures.push('#listen-voice picker absent although the recorded reader is unavailable');
-  else {
-    const names = options.map((o) => o.name);
-    for (const bad of ['Eddy', 'Grandma', 'Samantha']) if (names.includes(bad)) failures.push(`novelty/foreign voice offered: ${bad}`);
-    if (names.includes('Kyoko')) failures.push('compact default offered while an enhanced voice exists');
-    for (const good of ['Kyoko (Enhanced)', 'Google 日本語']) if (!names.includes(good)) failures.push(`expected voice missing: ${good}`);
-    await page.screenshot({ path: join(OUT, 'picker.png') });
-    await page.selectOption('#listen-voice', 'Google 日本語');
-    await page.waitForTimeout(300);
-    const spoken = await page.evaluate('window.__spoken');
-    receipt.spokenAfterChange = spoken;
-    const preview = spoken.find((s) => s.voiceURI === 'Google 日本語');
-    if (!preview) failures.push(`no preview utterance in the picked voice; spoken=${JSON.stringify(spoken)}`);
-    const note = await page.evaluate(`document.querySelector('#listen-note')?.textContent || ''`);
-    receipt.noteAfterChange = note;
-    if (!/Google 日本語/.test(note)) failures.push(`listen note does not name the picked voice: "${note}"`);
-    const pref = await page.evaluate(`localStorage.getItem('kairo-voice-pref-v1')`);
-    if (pref !== 'Google 日本語') failures.push(`preference not persisted: ${pref}`);
-    await page.screenshot({ path: join(OUT, 'picker-after.png') });
-  }
+const ready = (page) => page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
+const deviceSpoken = (page) => page.evaluate(() => window.__deviceSpoken.length);
+async function openContext({ absent = false, pref = null } = {}) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 860 } });
+  await silenceBrowserAudio(context);
+  await context.addInitScript(SPY);
+  context.on('page', (page) => page.on('pageerror', (error) => {
+    if (pageErrors.length < 20) pageErrors.push({ case: currentCase, message: error.message });
+  }));
+  if (pref) await context.addInitScript((value) => { try { localStorage.setItem('kairo-rec-voice-v1', value); } catch { /* spy */ } }, pref);
+  if (absent) await context.route('**/audio/manifest.json', (route) => route.fulfill({ status: 404, body: '' }));
+  const requests = [];
+  context.on('request', (request) => { const path = new URL(request.url()).pathname; if (path.startsWith('/audio/')) requests.push(path); });
+  return { context, requests };
 }
-await browser.close();
-server.close();
+async function openRecordedReader(page) {
+  await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
+  const door = page.locator(`[data-passage="${recordedPassage}"]:not([data-recommendation]) .shelf-open`).first();
+  await door.click();
+  await page.waitForSelector('#listen-toggle', { timeout: 15_000 });
+  await page.waitForFunction(() => !/Checking for recordings|収録音声を確認/u.test(document.querySelector('#listen-note')?.textContent || ''), null, { timeout: 10_000 }).catch(() => {});
+  return page.evaluate(() => ({ disabled: document.querySelector('#listen-toggle')?.disabled ?? null,
+    note: document.querySelector('#listen-note')?.textContent || '',
+    picker: !!document.querySelector('#listen-voice'),
+    selected: document.querySelector('#listen-voice')?.value ?? null,
+    options: [...document.querySelectorAll('#listen-voice option')].map((o) => ({ value: o.value, text: o.textContent })) }));
+}
 
-// Scenario 2 — the real manifest is served: a news/archive article (no
-// recording) must show the device picker and say so; a curated reading with
-// clips must show the roster (operator, 2026-09-18: "no matter what voice i
-// click on it is the exact same mechanical female voice").
-const manifestPath = join(CORRIDOR, 'audio/manifest.json');
-if (existsSync(manifestPath)) {
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  const recordedIds = Object.keys(manifest.sentences || {}).filter((id) => (manifest.sentences[id].have || []).length);
-  const { server: s2, base: base2 } = await new Promise((ok, fail) => {
-    const s = createServer((req, res) => {
-      const p = decodeURIComponent((req.url ?? '/').split('?')[0]);
-      const rel = p === '/' ? 'index.html' : p.replace(/^\/+/, '');
-      const f = resolve(CORRIDOR, rel);
-      if (!f.startsWith(CORRIDOR) || !existsSync(f)) { res.writeHead(404).end(); return; }
-      res.writeHead(200, { 'content-type': MIME[extname(f)] ?? 'application/octet-stream' });
-      res.end(readFileSync(f));
-    });
-    s.once('error', fail);
-    s.listen(0, '127.0.0.1', () => ok({ server: s, base: `http://127.0.0.1:${s.address().port}` }));
-  });
-  const b2 = await chromium.launch();
-  const c2 = await b2.newContext({ viewport: { width: 1280, height: 820 } });
-  await silenceBrowserAudio(c2);
-  await c2.addInitScript(STUB);
-  const p2 = await c2.newPage();
-  await p2.goto(`${base2}/?entry=shelf`);
-  await p2.waitForSelector('#tray', { timeout: 30000 });
-  const cards = await p2.$$eval('#shelf-body [data-passage]', (els) => els.map((e) => e.dataset.passage));
-  const recorded = cards.find((id) => recordedIds.includes(id));
-  // the unrecorded case lives in the newspaper archive (686 articles, no clips)
-  let unrecorded = cards.find((id) => !recordedIds.includes(id)) || null;
-  let unrecordedVia = unrecorded ? 'shelf' : null;
-  if (!unrecorded) {
-    const arc = await p2.$('#archive-link');
-    if (arc) {
-      await arc.click();
-      await p2.waitForSelector('.archive-year', { timeout: 15000 }).catch(() => {});
-      const yr = await p2.$('.archive-year');
-      if (yr) { await yr.click(); await p2.waitForTimeout(500); }
-      const row = await p2.$('.archive-row[data-passage]');
-      if (row) { unrecorded = await row.evaluate((e) => e.dataset.passage); unrecordedVia = 'archive'; }
+try {
+  SITE = resolveCorridorSite();
+  host = await startStaticHost({ site: SITE, port: 0 });
+  origin = host.origin;
+  browser = await chromium.launch();
+  const manifest = JSON.parse(readFileSync(resolve(SITE, 'audio/manifest.json'), 'utf8'));
+  recordedPassage = Object.keys(manifest.sentences).find((id) => manifest.sentences[id].have?.length);
+  recordedWord = Object.keys(manifest.words).find((w) => manifest.words[w].voices.includes('zundamon'));
+  // V0
+  {
+    currentCase = 'V0';
+    const context = await browser.newContext(); const page = await context.newPage();
+    const identity = await (await page.request.get(`${origin}/build-identity.json`)).json();
+    let head = null; try { head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { /* outside a checkout */ }
+    const expected = process.env.KAIRO_EXPECT_GITSHA || head;
+    const served = createHash('sha256').update(Buffer.from(await (await page.request.get(`${origin}/corridor.js`)).body())).digest('hex');
+    check('V0 served build is the expected clean commit', identity.gitSha === expected && identity.sourceDirty === false
+      && served === new Map(identity.files.map((row) => [row.path, row.sha256])).get('corridor.js'), `served=${identity.gitSha} expected=${expected}`);
+    await context.close();
+    if (results.some((r) => !r.pass)) throw new Error('identity failed');
+  }
+  check('fixture: a recorded passage and a word recorded in ずんだもん exist in the manifest', !!recordedPassage && !!recordedWord,
+    `${recordedPassage} · ${recordedWord}`);
+
+  // V1 recordings absent
+  {
+    currentCase = 'V1';
+    const { context } = await openContext({ absent: true }); const page = await context.newPage();
+    const state = await openRecordedReader(page);
+    await page.locator('#listen-toggle').click({ force: false, trial: false }).catch(() => {});
+    check('V1 absent recordings: listen is shut', state.disabled === true, JSON.stringify(state));
+    check('V1 absent recordings: the note says there are none', /no recorded voices|収録音声がありません/u.test(state.note), state.note);
+    check('V1 absent recordings: no voice picker is offered', state.picker === false);
+    check('V1 absent recordings: zero device speech', (await deviceSpoken(page)) === 0);
+    await context.close();
+  }
+
+  // V2 present, no choice
+  {
+    currentCase = 'V2';
+    const { context, requests } = await openContext(); const page = await context.newPage();
+    const state = await openRecordedReader(page);
+    check('V2 no choice: listen is shut on a recorded passage', state.disabled === true, JSON.stringify(state));
+    check('V2 no choice: the note says it is recorded only in アミ and to choose', /recorded only in Koharune Ami|小春音アミ（仮の声・検収前）の収録だけ/u.test(state.note), state.note);
+    check('V2 no choice: the picker preselects "Choose a voice…"', state.selected === '' && state.options[0]?.value === '', JSON.stringify(state.options[0]));
+    const roster = state.options.filter((o) => o.value);
+    check('V2 no choice: every voice is labelled interim', roster.length === 5 && roster.every((o) => /interim|仮/u.test(o.text)), JSON.stringify(roster.map((o) => o.text)));
+    check('V2 no choice: nothing requested from the recordings', !requests.some((path) => path.startsWith('/audio/s/') || path.startsWith('/audio/w/')), requests.join(','));
+    check('V2 no choice: zero device speech', (await deviceSpoken(page)) === 0);
+
+    // V3 choose アミ explicitly
+    currentCase = 'V3';
+    await page.locator('#listen-voice').selectOption('ami');
+    await page.waitForFunction(() => document.querySelector('#listen-toggle') && !document.querySelector('#listen-toggle').disabled, null, { timeout: 5_000 }).catch(() => {});
+    const opened = await page.evaluate(() => !document.querySelector('#listen-toggle')?.disabled);
+    check('V3 choosing アミ opens listen', opened);
+    if (opened) await page.locator('#listen-toggle').click();
+    const played = await page.waitForFunction((prefix) => performance.getEntriesByType('resource').some((e) => new URL(e.name).pathname.startsWith(prefix)),
+      `/audio/s/ami/`, { timeout: 5_000 }).then(() => true, () => false);
+    check('V3 listen plays her recorded sentence', played || requests.some((path) => path.startsWith('/audio/s/ami/')), requests.slice(-3).join(','));
+    check('V3 zero device speech', (await deviceSpoken(page)) === 0);
+    await context.close();
+  }
+
+  // V4 a recording that fails to load
+  {
+    currentCase = 'V4';
+    const { context } = await openContext({ pref: 'ami' });
+    await context.route('**/audio/s/**', (route) => route.fulfill({ status: 404, body: '' }));
+    const page = await context.newPage();
+    const state = await openRecordedReader(page);
+    if (!state.disabled) await page.locator('#listen-toggle').click();
+    const stopped = await page.waitForFunction(() => /could not play|再生できません/u.test(document.querySelector('#listen-note')?.textContent || ''), null, { timeout: 10_000 })
+      .then(() => true, () => false);
+    check('V4 a failed recording stops with a visible reason', stopped, await page.evaluate(() => document.querySelector('#listen-note')?.textContent || ''));
+    check('V4 no fallback voice: zero device speech', (await deviceSpoken(page)) === 0);
+    await context.close();
+  }
+
+  // V5 the review card's 音 door
+  {
+    currentCase = 'V5';
+    const { context, requests } = await openContext();
+    await context.addInitScript((word) => {
+      if (localStorage.getItem('voice-honesty-seeded')) return;
+      const t = 1700000000000;
+      localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [{ t: 'word', id: word, label: word, ts: t, started: t }], srs: {}, revlog: [], obslog: [] }));
+      localStorage.setItem('voice-honesty-seeded', '1');
+    }, recordedWord);
+    const page = await context.newPage();
+    await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
+    await page.locator('#tray').click();
+    await page.locator('#review-start').click();
+    await page.locator('#declare-notyet').click().catch(() => {});
+    const door = await page.waitForSelector('#card-say', { timeout: 10_000 }).then(() => true, () => false);
+    check('V5 the card carries its 音 door', door);
+    if (door) {
+      await page.locator('#card-say').click();
+      const reason = await page.waitForFunction(() => (document.querySelector('#card-say-note')?.textContent || '').length > 0, null, { timeout: 5_000 })
+        .then(() => page.evaluate(() => document.querySelector('#card-say-note').textContent), () => '');
+      check('V5 with no choice the door says why, visibly', /No voice chosen|声がまだ選ばれていません/u.test(reason), reason);
+      check('V5 with no choice nothing is requested', !requests.some((path) => path.startsWith('/audio/w/')), requests.join(','));
+      await page.evaluate(() => localStorage.setItem('kairo-rec-voice-v1', 'zundamon'));
+      await page.locator('#card-say').click();
+      const asked = await page.waitForFunction(() => performance.getEntriesByType('resource').some((e) => new URL(e.name).pathname.startsWith('/audio/w/zundamon/')), null, { timeout: 5_000 })
+        .then(() => true, () => false);
+      check('V5 after choosing ずんだもん the door plays her recording', asked || requests.some((path) => path.startsWith('/audio/w/zundamon/')), requests.slice(-3).join(','));
     }
+    check('V5 zero device speech', (await deviceSpoken(page)) === 0);
+    await context.close();
   }
-  receipt.scenario2 = { unrecorded, unrecordedVia, recorded };
-  const openAndRead = async (id) => {
-    await p2.goto(`${base2}/?entry=shelf`);
-    await p2.waitForSelector('#tray', { timeout: 30000 });
-    if (unrecordedVia === 'archive' && id === unrecorded) {
-      await p2.click('#archive-link');
-      await p2.waitForSelector('.archive-year', { timeout: 15000 });
-      await p2.click('.archive-year');
-      await p2.waitForTimeout(400);
-      await p2.click(`.archive-row[data-passage="${id}"]`);
-    } else await p2.click(`#shelf-body [data-passage="${id}"]`);
-    await p2.waitForSelector('#reader', { timeout: 30000 });
-    await p2.waitForFunction(`!!document.querySelector('#listen-note')`, null, { timeout: 15000 }).catch(() => {});
-    await p2.waitForTimeout(700);
-    return p2.evaluate(`(() => {
-      const note = document.querySelector('#listen-note');
-      const pick = document.querySelector('#listen-voice');
-      return { note: note ? note.textContent : null, recorded: note ? note.dataset.recorded : null,
-        options: pick ? [...pick.options].map((o) => o.textContent) : null };
-    })()`);
-  };
-  if (unrecorded) {
-    const r = await openAndRead(unrecorded);
-    receipt.unrecordedReader = r;
-    if (r.recorded !== 'false') failures.push(`unrecorded ${unrecorded}: note does not say it has no recording (data-recorded=${r.recorded})`);
-    if (!/no recorded voice|収録音声はまだない/.test(r.note || '')) failures.push(`unrecorded ${unrecorded}: note "${r.note}"`);
-    if (r.options && r.options.includes('小春音アミ')) failures.push(`unrecorded ${unrecorded}: the recorded roster is offered although nothing is recorded`);
-    await p2.screenshot({ path: join(OUT, 'unrecorded.png') });
-  } else failures.push('scenario 2: no unrecorded article on the shelf to test');
-  if (recorded) {
-    const r = await openAndRead(recorded);
-    receipt.recordedReader = r;
-    if (r.recorded !== 'true') failures.push(`recorded ${recorded}: note not marked recorded (data-recorded=${r.recorded})`);
-    if (!r.options || !r.options.includes('小春音アミ')) failures.push(`recorded ${recorded}: roster picker missing`);
-    await p2.screenshot({ path: join(OUT, 'recorded.png') });
-  } else failures.push('scenario 2: no recorded reading on the shelf to test');
-  await b2.close();
-  s2.close();
+} catch (error) {
+  // a setup or click exception is a named, failed row with its stack, not a silently short receipt
+  results.push({ name: `terminal (${currentCase})`, pass: false, detail: error.stack || String(error) });
+  console.log(`  FAIL terminal in ${currentCase} — ${error.message}`);
+} finally {
+  // every row — cleanup and page errors included — is settled before the receipt is written
+  await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, detail: error.message }));
+  await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
+  if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
+  writeFileSync(resolve(EVIDENCE, 'voice-picker.json'), JSON.stringify({ origin, results, pageErrors, lastCase: currentCase }, null, 2) + '\n');
 }
-
-receipt.failures = failures;
-receipt.status = failures.length ? 'failed' : 'passed';
-writeFileSync(join(OUT, 'voice-picker.json'), JSON.stringify(receipt, null, 2) + '\n');
-if (failures.length) { console.log('VOICE PICKER FAILURES:'); failures.forEach((f) => console.log(' -', f)); process.exit(1); }
-console.log(`VOICE PICKER CLEAN — novelty voices hidden, compact hidden behind enhanced, preview speaks in the picked voice; evidence ${OUT}`);
+const failed = results.filter((r) => !r.pass);
+console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);
+process.exit(failed.length ? 1 : 0);

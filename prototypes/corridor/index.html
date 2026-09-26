@@ -8,7 +8,7 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%239e2b25'/%3E%3Ctext x='8' y='12' font-size='11' text-anchor='middle' fill='%23fcfbf6' font-family='serif'%3E回%3C/text%3E%3C/svg%3E"
     />
-    <title>回廊 KAIRO — corridor prototype</title>
+    <title>回廊 KAIRO</title>
     <meta
       name="description"
       content="An instrument for deciding, not a product: one continuous corridor over real graded Japanese, with four open Wayfinder decisions rendered as switchable variants."
@@ -40,6 +40,8 @@
     <link rel="stylesheet" href="reference-ui.css" />
     <link rel="stylesheet" href="drift-layer.css" />
     <link rel="stylesheet" href="skip-ui.css" />
+    <link rel="stylesheet" href="register.css" />
+    <link rel="stylesheet" href="maintenance/report-client.css" />
   </head>
   <body>
     <div id="app"></div>
@@ -51,6 +53,7 @@
     <!-- Optional lookup lens: its JSON sidecar is fetched only on demand. -->
     <script defer src="skip-core.js"></script>
     <script defer src="skip-ui.js"></script>
+    <script defer src="maintenance/report-client.js"></script>
     <script type="module" src="corridor.js"></script>
     <!-- the https guard is deliberate: the verification suites drive the app
          over http://127.0.0.1 and must never inherit a worker's cache -->

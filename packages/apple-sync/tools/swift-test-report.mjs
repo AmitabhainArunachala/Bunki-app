@@ -38,6 +38,7 @@ export const expectedTestNames = Object.freeze(
     'rpcFixedFailureCodesOnly()',
     'rpcRealFileHandleFraming()',
     'actualSDKSaveResultAdmissionPreservesPartialsAndProvesImmutableDuplicates()',
+    'assessmentEnvelopeVersionIsExplicitAndFutureVersionsRemainRejected()',
     'authenticAccountSwitchIsDetectedEvenWithoutNotificationAndCancelledResponsesDoNotAcknowledge()',
     'canonicalTypeScriptEnvelopeAndEncryptedSDKRecordRoundTrip()',
     'canonicallyEquivalentUnicodeIDsRemainDistinctOpaqueProfiles(variant:)',

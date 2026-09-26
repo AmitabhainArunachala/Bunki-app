@@ -1,0 +1,32 @@
+{
+  "schema": "kairo-assessment-authoring-origin/1",
+  "source": "preserved-n2-original-authoring-20260910-r1",
+  "copiedAt": "2026-09-23",
+  "files": [
+    {
+      "file": "full-form.intent.json",
+      "bytes": 281952,
+      "sha256": "254914e32e977050865eb63f6c8540b276e19123673e96e60cad257a68b9ff60"
+    },
+    {
+      "file": "listening.scripts.json",
+      "bytes": 161426,
+      "sha256": "ebfc2a75d2b3afa82b0e8cf0691dd532d4ea0555fee1e8f832be51fda5cc6a0b"
+    },
+    {
+      "file": "listening.stimuli.drafts.json",
+      "bytes": 29931,
+      "sha256": "6a5467a0f6a2591917b83ef97724d97586d2ce59ddcc254e87c8ff48275fa0d8"
+    },
+    {
+      "file": "listening.delivery-units.drafts.json",
+      "bytes": 22014,
+      "sha256": "379f094f2445583b6a580b9ff711dd6111abc1e3b500429a095650663a75bdce"
+    },
+    {
+      "file": "authoring-policy.json",
+      "bytes": 3266,
+      "sha256": "aa2d89d0ffc97bc098579d7eca8d538a00ad37729aada4772a9b3b4ba81589e8"
+    }
+  ]
+}
