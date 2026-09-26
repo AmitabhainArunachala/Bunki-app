@@ -294,6 +294,31 @@ async function fit(page, label) {
         // Each style is restored, and the original failure remains the verdict.
         await page.waitForTimeout(250);
         const settled = await page.evaluate(overflowSnapshot);
+        const selectOverflow = await page.evaluate(() => {
+          const select = document.querySelector('#teacher-context-select');
+          if (!select) return { absent: true };
+          const original = select.getAttribute('style');
+          const restore = () => {
+            if (original === null) select.removeAttribute('style');
+            else select.setAttribute('style', original);
+          };
+          const sample = () => ({
+            document: document.documentElement.scrollWidth,
+            main: document.querySelector('main').scrollWidth,
+            select: select.getBoundingClientRect().width,
+            overflowX: getComputedStyle(select).overflowX,
+            contain: getComputedStyle(select).contain,
+          });
+          const baseline = sample();
+          let clipped, hidden;
+          try { select.style.overflow = 'hidden'; clipped = sample(); }
+          finally { restore(); }
+          const afterClipRestore = sample();
+          try { select.style.display = 'none'; hidden = sample(); }
+          finally { restore(); }
+          return { baseline, clipped, afterClipRestore, hidden, afterHideRestore: sample(),
+            exactStyleRestored: select.getAttribute('style') === original };
+        });
         const isolation = await page.evaluate(() => {
           const width = () => document.documentElement.scrollWidth;
           const baseline = width(), rows = [];
@@ -312,7 +337,7 @@ async function fit(page, label) {
           return { baseline, finalDocumentWidth: width(), childCount: children.length,
             truncated: children.length > 32, rows };
         });
-        layoutProbe = { delayMs: 250, settled, isolation, scope: 'Post-failure diagnostic only; original assertion unchanged' };
+        layoutProbe = { delayMs: 250, settled, selectOverflow, isolation, scope: 'Post-failure diagnostic only; original assertion unchanged' };
         } catch (error) {
           layoutProbe = { error: String(error), scope: 'Optional probe failed; original diagnostic and assertion retained' };
         }
