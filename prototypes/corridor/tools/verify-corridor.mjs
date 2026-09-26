@@ -2666,7 +2666,7 @@ async function main() {
   check('R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up',
     miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
-  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  if (miniIx >= 0) await page.evaluate(`document.querySelector('#mini-take')?.click()`);
   await page.waitForTimeout(250);
   const miniUndone = await evaluateAppRecord(page, `(() => {
     const e = record;
@@ -2834,6 +2834,8 @@ async function main() {
   // an ordinary sitting freezes 20 and says あと N on the goodbye screen.
   // Let the clamp probe's observation settle before importing the next fixture.
   await page.waitForTimeout(1400);
+  // 25 overdue + 3 started fresh: real N5 core words (the fixture and the zero-new probe below share them)
+  const R2A_WORDS = ["お兄さん", "お姉さん", "お弁当", "お手洗い", "お母さん", "お父さん", "お皿", "お腹", "お茶", "お菓子", "お酒", "お金", "お風呂", "ご飯", "一", "一つ", "一人", "一日", "一昨年", "一昨日", "一月", "一番", "一緒", "七", "七つ", "万", "万年筆", "丈夫"];
   await restoreAppFixture(page, await page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
@@ -2841,7 +2843,7 @@ async function main() {
     const srs = {};
     // real N5 core words: since D23 a card is presented only with an answer it can resolve, and a
     // synthetic id (the old 'w00'…) has none, so review showed no 思い出した (PR #99 CI abort here)
-    const WORDS = ["お兄さん", "お姉さん", "お弁当", "お手洗い", "お母さん", "お父さん", "お皿", "お腹", "お茶", "お菓子", "お酒", "お金", "お風呂", "ご飯", "一", "一つ", "一人", "一日", "一昨年", "一昨日", "一月", "一番", "一緒", "七", "七つ", "万", "万年筆", "丈夫"];
+    const WORDS = ${JSON.stringify(R2A_WORDS)};
     for (let i = 0; i < 25; i++) {
       const id = WORDS[i];
       taken.push({ t: 'word', id, label: id, ts: T - 1e6, started: T - 1e6 });
@@ -2908,7 +2910,7 @@ async function main() {
   const dueWithZeroNew = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
   check('R2-A · the chosen pacing survives reboot and rules the queue',
     prefsAfterReload.newPerDay === 0 && prefsAfterReload.reviewLimit === 10 &&
-      dueWithZeroNew.length === 5 && !dueWithZeroNew.some((k) => k.startsWith('word:f')),
+      dueWithZeroNew.length === 5 && !dueWithZeroNew.some((k) => R2A_WORDS.slice(25).map((w) => 'word:' + w).includes(k)),
     `prefs ${JSON.stringify(prefsAfterReload)} · ${dueWithZeroNew.length} due, no fresh admitted`);
   check('R2-A · the probes leave no console errors',
     consoleErrors.length === errsBeforeR2A,
