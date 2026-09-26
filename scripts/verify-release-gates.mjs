@@ -3854,7 +3854,7 @@ export async function verifyWorkflows(root = ROOT) {
   assert(battery >= 0 && artifact > battery);
   assert.equal(
     steps[battery].run,
-    'bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"',
+    'exec bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"',
   );
   assert.equal(steps[artifact].with.path, '${{ env.KAIRO_SITE_DIR }}');
   for (const step of steps.slice(0, artifact + 1))

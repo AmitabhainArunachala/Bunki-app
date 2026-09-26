@@ -2330,7 +2330,8 @@ function restoreRetryRoute() {
         // a question was open: the strict source path; only the result: the result itself
         if (record.itemId) openAssessmentSource({ attemptId: record.attemptId, itemId: record.itemId });
         else openAssessmentResult(record.attemptId);
-        return drop();
+        drop();
+        return true; // the checked result path already rendered its one-shot question focus
       } catch { /* the result is gone: the room itself is the honest landing */ }
     }
     S.stack = [];
@@ -4023,9 +4024,9 @@ async function boot() {
   }
 
   S.ready = true;
-  restoreRetryRoute();
+  const retryRouteRendered = restoreRetryRoute();
   document.body.dataset.ready = '1';
-  render();
+  if (!retryRouteRendered) render();
   prefetchArticles();
 }
 
@@ -12796,9 +12797,9 @@ function renderTeacherDoor(container, getNode, reader = false) {
     const key = (value) => JSON.stringify([value?.t, value?.id, value?.from?.passage, value?.from?.index, value?.sourceContext?.id]);
     practice.disabled = !node || !recordWritable();
     practice.addEventListener('click', () => {
-      const selected = selectedNode();
+      const selected = selectedNode(), selectedKey = key(selected);
       if (selected) void openBundledSentenceChoice(() => contextFromTeacherNode(selected), practice, note,
-        () => key(selectedNode()) === key(selected));
+        () => key(selectedNode()) === selectedKey);
     });
     actions.append(practice);
   }
@@ -16005,6 +16006,23 @@ function renderLearningSource(container, item, review = false, disclosure = item
 /* Source sentences keep their own immutable prompts and responses, while
  * recall uses the same finite queue, clock policy, rest and undo as words. */
 let sentenceChoiceSerial = 0;
+// Dictionary completion can redraw a sheet while an action is awaiting data.
+// Ownership follows this visit, and expires even if Back later restores its nodes.
+let sheetActionVisit = null;
+function syncSheetActionVisit() {
+  if (!S.stack.length || S.strokes) return (sheetActionVisit = null);
+  if (!sheetActionVisit || sheetActionVisit.view !== S.view || sheetActionVisit.passageId !== S.passageId ||
+      sheetActionVisit.stack !== S.stack || sheetActionVisit.path.length !== S.stack.length ||
+      sheetActionVisit.path.some((node, index) => node !== S.stack[index])) {
+    sheetActionVisit = { view: S.view, passageId: S.passageId, stack: S.stack, path: S.stack.slice() };
+  }
+  return sheetActionVisit;
+}
+function retainActionSurface(button) {
+  if (!button.isConnected || !button.closest('#sheet')) return () => button.isConnected;
+  const visit = syncSheetActionVisit();
+  return () => !!visit && syncSheetActionVisit() === visit;
+}
 let sentenceListeningCatalog = null, sentenceListeningCatalogWait = null, sentenceListeningOwner = null;
 function ensureSentenceListeningCatalog() {
   if (window.__CORRIDOR_STANDALONE__ === true || !window.__KAIRO_AUDIO__) return Promise.resolve(null);
@@ -16048,14 +16066,15 @@ window.addEventListener('pagehide', stopSentenceListening);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSentenceListening(); });
 async function openBundledSentenceChoice(getContext, button, note, stillCurrent) {
   if (button.disabled || !recordWritable() || !sentencePracticeModule) return;
-  const epoch = recordEpoch, serial = ++sentenceChoiceSerial;
+  const epoch = recordEpoch, serial = ++sentenceChoiceSerial, currentSurface = retainActionSurface(button);
   button.disabled = true;
   try {
     const context = await getContext(), resolved = await resolveTeacherSource(context);
     assertLearningSource(S, context);
     const choice = sentencePracticeModule.prepareBundledSentencePractice(context, resolved.p.tokens?.map((token) => token.s));
     const listeningCue = await resolveSentenceListeningCue(context).catch(() => null);
-    if (!recordWritable(epoch) || serial !== sentenceChoiceSerial || !button.isConnected || !stillCurrent() || !preserveVisibleDrafts()) return;
+    assertLearningSource(S, context);
+    if (!recordWritable(epoch) || serial !== sentenceChoiceSerial || !currentSurface() || !stillCurrent() || !preserveVisibleDrafts()) return;
     const returnCaller = learningSourceCaller(button.id);
     keepScroll(); stopReadAloud();
     S.sentencePracticeView = { ...choice, cloze: true, production: false, listening: false, listeningCue, returnCaller,
@@ -16077,12 +16096,12 @@ function renderSourceKanjiDoor(sheet, node) {
   const note = el('p', 'teacher-note'); note.setAttribute('role', 'status');
   button.addEventListener('click', async () => {
     if (button.disabled || !sentencePracticeModule) return;
-    const epoch = recordEpoch, serial = ++sentenceChoiceSerial; button.disabled = true;
+    const epoch = recordEpoch, serial = ++sentenceChoiceSerial, currentSurface = retainActionSurface(button); button.disabled = true;
     try {
       const context = await contextFromTeacherNode(node), resolved = await resolveTeacherSource(context);
       assertLearningSource(S, context);
       const choice = sentencePracticeModule.prepareBundledKanjiReading(context, resolved.p, node.id);
-      if (!recordWritable(epoch) || serial !== sentenceChoiceSerial || !button.isConnected || !preserveVisibleDrafts()) return;
+      if (!recordWritable(epoch) || serial !== sentenceChoiceSerial || !currentSurface() || !preserveVisibleDrafts()) return;
       const returnCaller = learningSourceCaller(button.id);
       keepScroll(); stopReadAloud();
       S.sentencePracticeView = { ...choice, kind: 'kanji-reading', returnCaller, returnView: S.view, returnScroll: window.scrollY };
@@ -17180,10 +17199,11 @@ function takeButton(node, label) {
   }
   btn.addEventListener('click', async () => {
     if (btn.disabled) return;
+    const epoch = recordEpoch, currentSurface = retainActionSurface(btn);
     btn.disabled = true;
     const saved = await toggleTaken(node, label);
     btn.disabled = false;
-    if (!saved || !btn.isConnected) return;
+    if (!saved || !recordWritable(epoch) || !currentSurface()) return;
     // taking opens the list drawer right under the finger — the "where does
     // it go" choice arrives with the act (operator, 2026-08-27); letting go
     // closes it
@@ -23933,10 +23953,11 @@ function renderSheet(root) {
     );
     capture.addEventListener('click', async () => {
       if (capture.disabled) return;
+      const epoch = recordEpoch, currentSurface = retainActionSurface(capture);
       capture.disabled = true;
       const saved = await toggleTaken(capNode, nodeTitle(capNode));
       capture.disabled = false;
-      if (!saved || !capture.isConnected) return;
+      if (!saved || !recordWritable(epoch) || !currentSurface()) return;
       S.listMenuFor = takenNow ? null : `${capNode.t}|${capNode.id}`;
       render();
     });
@@ -25269,6 +25290,7 @@ function renderRoomError(main, view, error) {
   main.append(card);
 }
 function render() {
+  syncSheetActionVisit();
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.
@@ -25340,9 +25362,6 @@ function render() {
   // the probe room keeps the same glass: word up → world recedes
   const zenProbe = S.ready && S.view === 'probe' && !!S.probe && S.probe.ix < S.probe.queue.length;
   document.body.classList.toggle('zen', !!zenReview || !!zenProbe);
-  // The texture samples the resolved ground. A source visit can suspend an
-  // active review; let the view's zen class settle before growing its paper.
-  syncPaper();
   if (!zenReview) S.reviewMore = false;
 
   const chrome = el('div', 'chrome');
@@ -25605,6 +25624,8 @@ function render() {
     main.append(el('div', 'loading', tx('回廊 をひらいています…', 'opening the corridor…')));
     renderVariants(root);
     safelySyncStoreAlert();
+    stampRegister();
+    syncPaper();
     return;
   }
 
@@ -25698,6 +25719,8 @@ function render() {
   }
   lastRenderedView = S.view;
   stampRegister();
+  // Sample the resolved ground after both the view classes and room stamp settle.
+  syncPaper();
   retireCardAudioOnFaceChange();
   // every navigation passes through here — keep the Back sentinel honest
   syncWalkSentinel();

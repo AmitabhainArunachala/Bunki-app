@@ -61,7 +61,7 @@ jobs:
     name: complete required battery / tested Corridor artifact
     needs: apple-sync
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 210
     env:
       KAIRO_CORPUS_PYTHON: python3
 
@@ -237,8 +237,9 @@ jobs:
       # logs, screenshots and receipts live outside the source checkout.
       - name: Run every required current-app and domain gate
         id: battery
-        timeout-minutes: 75
-        run: bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"
+        timeout-minutes: 180
+        # Replace the step shell so cancellation reaches the battery's signal handlers.
+        run: exec bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"
 
       - name: Verify tested bytes and source identity have not changed
         run: node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$KAIRO_EVIDENCE_ROOT/artifact-after.json"

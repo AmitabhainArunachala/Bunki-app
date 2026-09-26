@@ -303,8 +303,16 @@ function coherent(context, source, index, word) {
 }
 
 async function selected(page, context) {
+  await waitForAppRecord(page, (record) => record.teacherContexts?.activeRef === context.id, {
+    timeout: 15_000,
+    description: 'committed teacher-context selection',
+  });
+  // selectOption updates the DOM value before the native commit and rerender finish.
   await page.waitForFunction(
-    (id) => document.querySelector('#teacher-context-select')?.value === id,
+    (id) => {
+      const select = document.querySelector('#teacher-context-select');
+      return !!select && select.value === id && !select.disabled;
+    },
     context.id,
     { timeout: 15_000 },
   );
@@ -386,7 +394,6 @@ async function returnToSource(page, context) {
 async function chooseContext(page, context) {
   await page.locator('#teacher-context-select').selectOption(context.id);
   await selected(page, context);
-  await page.waitForFunction(() => !document.querySelector('#teacher-context-select')?.disabled);
 }
 
 async function configureProvider(page) {
