@@ -4779,6 +4779,17 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   padding-inline-start: 28px;
 }
 
+/* D23: a held row opens the card the record holds, as the mini and the full note do */
+.enroll-held-open {
+  align-self: flex-start;
+  margin: 0 0 8px;
+  color: var(--ai, var(--ink-2));
+}
+
+.lesson-enroll > .enroll-held-open {
+  margin-inline-start: 28px;
+}
+
 /* ------------------------------------------------------------ thesaurus
  * 類語辞典 — the paper-thesaurus spread. Each cluster is a headword row
  * followed by sem-rows (shared with the entry sheet's 意味の近く block). */

@@ -4,8 +4,8 @@
  * A control is a set of literal edits to corridor.js. Each edit must match exactly once; the
  * edited source is then lifted by the test it is run against. This module declares:
  *   - the exact test inventory;
- *   - every control, with its witnesses and the collateral it may cause: 29 WORD_CONTROLS and 2
- *     LEARNING_RECORD_CONTROLS, 31 controls, run as 33 children with the two baselines;
+ *   - every control, with its witnesses and the collateral it may cause: 32 WORD_CONTROLS and 2
+ *     LEARNING_RECORD_CONTROLS, 34 controls, run as 36 children with the two baselines;
  *   - the admission rules;
  *   - the runner, and the evidence it keeps for every child.
  *
@@ -30,7 +30,7 @@
  *
  * Bounds: each child has timeoutMs (300 s, then SIGKILL) and CHILD_MAX_BUFFER (16 MiB) per stream.
  * These are per-child bounds only; the phase has no separately admitted total bound (worst case:
- * the assessment staging plus 33 × 300 s).
+ * the assessment staging plus 36 × 300 s).
  *
  *   node prototypes/corridor/tools/test-word-saved-answer.mjs --controls   runs every control below
  */
@@ -46,7 +46,7 @@ export const CHILD_MAX_BUFFER = 16 * 1024 * 1024;
 
 export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7r', 'T7s', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15',
   // D23 search stand-in: relation copy (X), search presentation (S), the core sheet's live door (N), the preservation table (V), P3
-  'X1', 'X2', 'X3', 'X4', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'N1', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b']);
+  'X1', 'X2', 'X3', 'X4', 'X5', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'N1', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r']);
 /** The exact rows test-word-saved-answer.mjs must report: F0, then a setup row and a behaviour row per case. */
 export const INVENTORY = Object.freeze(['F0', ...WORD_CASES.flatMap((id) => [`${id}.setup`, id])]);
 
@@ -59,7 +59,7 @@ export const WORD_CONTROLS = Object.freeze({
     // the search stand-in rows built on a 1353320 or うわて capture on the core spelling 上手 then hold a core card,
     // and the history fixtures then keep no うわて snapshot
     collateral: ['T7r.setup', 'T7r', 'T7s.setup', 'T7s', 'T11.setup', 'T11', 'T13.setup', 'T13', 'T15',
-      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b'], edits: [
+      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r'], edits: [
       ["  if (node.seq != null && node.seq !== '') {\n    snapshot = explicitWordSnapshot(node, latest);",
         "  if (node.seq != null && node.seq !== '' && !D.dict[id]) {\n    snapshot = explicitWordSnapshot(node, latest);"]] },
   C3: { note: 'fail-closed removed: an explicit selection with no validated answer captures a row without identity', witnesses: ['T3'],
@@ -137,18 +137,32 @@ export const WORD_CONTROLS = Object.freeze({
       ['    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;',
         '    if (e.seq && searchRowShownByCore(e, coreRows.get(e.id))) continue;\n    const row = e;']] },
   KC1: { note: 'relation collapsed to other-entry: every held line claims another entry again',
-    witnesses: ['X1', 'X2', 'X3', 'V2', 'V4', 'V5', 'P3', 'P3b'], collateral: [], edits: [
+    witnesses: ['X1', 'X2', 'X3', 'X5', 'V2', 'V4', 'V5', 'P3', 'P3b'], collateral: [], edits: [
       ["  if (node?.kind !== 'seq' || card?.kind !== 'seq') return 'unestablished';", "  return 'other-entry';"]] },
   KR1: { note: 'the open route removed from the held mini', witnesses: ['V2'], collateral: ['V3', 'V5', 'X3'], edits: [
     ["  if (miniState === 'conflict') {\n    const open = biLabel('button', 'mini-take-open'", "  if (false) {\n    const open = biLabel('button', 'mini-take-open'"]] },
-  KP3: { note: 'the held reason removed from the lesson and older-set enroll rows', witnesses: ['P3', 'P3b'], collateral: [], edits: [
+  KP3: { note: 'the held reason removed from the lesson and older-set enroll rows', witnesses: ['P3', 'P3b'],
+    // with no held line the row offers no route either
+    collateral: ['P3r'], edits: [
     ['    const heldText = learningEnrollHeldText({ t: kt, id: w, from: null });', '    const heldText = null;'],
     ['    const heldText = completed && !unanswered && !ok && key ? learningEnrollHeldText({ t, id, from: null }) : null;', '    const heldText = null;']] },
   KP3b: { note: 'the older set’s enrolled-spelling exclusion restored ahead of the hold (the r1 draft 29e15532): a word enrolled as another identity is silent again',
-    witnesses: ['P3', 'P3b'], collateral: [], edits: [
+    // the silent older-set row offers no route either
+    witnesses: ['P3', 'P3b'], collateral: ['P3r'], edits: [
       ['    if (completed && !unanswered && !ok && key && (heldText || !inDeck.has(key))) {', '    if (completed && !unanswered && !ok && key && !inDeck.has(key)) {']] },
-  KB1: { note: 'basis forced to card (r3.3): a hold that only studied history keeps claims a card that exists again', witnesses: ['X3', 'P3'], collateral: [], edits: [
+  KB1: { note: 'basis forced to card (r3.3): a hold that only studied history keeps claims a card that exists again', witnesses: ['X3', 'X5', 'P3', 'P3r'], collateral: [], edits: [
     ["  return (record.taken || []).some((entry) => entry.t === 'word' && entry.id === id) ? 'card' : 'history';", "  return 'card';"]] },
+  // NM review-1 (run 01M3EDXJHA9TPQ1PA7VV5TDQFV): the held enroll rows' route, and the route-less line for a page without one
+  KR3: { note: 'the open route removed from the held lesson and older-set rows: their held line names a control that is not there (NM review-1)',
+    witnesses: ['P3r'], collateral: [], edits: [
+      ["  if (node?.t !== 'word' || wordCaptureState(node) !== 'conflict') return null;\n  const open = biLabel('button', 'chip enroll-held-open'",
+        "  return null;\n  const open = biLabel('button', 'chip enroll-held-open'"]] },
+  KR3t: { note: 'the enroll-row route opens the bare spelling, whose core door cannot manage the retained card', witnesses: ['P3r'], collateral: [], edits: [
+    ["  open.addEventListener('click', () => go(heldWordCardNode(S, node.id), { invoker: open }));\n  return open;",
+      "  open.addEventListener('click', () => go({ t: 'word', id: node.id }, { invoker: open }));\n  return open;"]] },
+  KX5: { note: 'the route-less line ignored: the sentence sheet’s seal, whose page has no route, says “open that card” again (NM review-1, third site)',
+    witnesses: ['X5'], collateral: [], edits: [
+      ['  if (!route) {\n    return tx(`「${node.id}」には保存済みのカードがあるため', '  if (false) {\n    return tx(`「${node.id}」には保存済みのカードがあるため']] },
 });
 
 /* Controls on verify-learning-record.mjs (receipt children). Its inventory is the exact, unique

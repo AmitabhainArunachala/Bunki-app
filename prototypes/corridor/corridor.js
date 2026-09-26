@@ -9972,6 +9972,18 @@ function learningEnrollHeldText(node) {
   const state = wordCaptureState(node);
   return state === 'conflict' || state === 'unavailable' ? wordCaptureHeldText(node) : null;
 }
+
+/** The held enroll row's route (D23): a spelling held by a card, or kept history, this door does
+ * not stand for opens that card or entry from the row too, as the mini's and the full note's route
+ * do, so the held line's "open that card" has its control. Opening only navigates. */
+function heldEnrollRoute(node, id) {
+  if (node?.t !== 'word' || wordCaptureState(node) !== 'conflict') return null;
+  const open = biLabel('button', 'chip enroll-held-open', ...wordCaptureOpenLabel(wordCaptureBasis(S, node.id)));
+  open.type = 'button';
+  open.id = id;
+  open.addEventListener('click', () => go(heldWordCardNode(S, node.id), { invoker: open }));
+  return open;
+}
 function renderLessons(main) {
   const run = S.lessonRun;
   main.append(withEn(el('p', 'eyebrow', 'レッスン'), 'lessons', 'en-inline'));
@@ -10146,6 +10158,8 @@ function renderLessons(main) {
       reason.id = `lesson-enroll-held-${i}`;
       b.setAttribute('aria-describedby', reason.id);
       list.append(reason);
+      const open = heldEnrollRoute({ t: kt, id: w, from: null }, `lesson-enroll-open-${i}`);
+      if (open) list.append(open);
     }
   });
   main.append(list);
@@ -11663,6 +11677,8 @@ function renderMockResult(main, set, flat, run, selected) {
         reason.id = `mock-enroll-held-${i}`;
         b.setAttribute('aria-describedby', reason.id);
         body.append(reason);
+        const open = heldEnrollRoute({ t, id, from: null }, `mock-enroll-open-${i}`);
+        if (open) body.append(open);
       } else b.addEventListener('click', () => enroll([{ t, id, from: null }]));
       row.append(b);
     }
@@ -16990,8 +17006,9 @@ function wordCaptureState(node, record = S) {
 }
 
 /** The one-line reason a word control is held (D23), for surfaces without the full note. It
- * claims only what the door's and the card's identities establish (wordIdentityRelation). */
-function wordCaptureHeldText(node) {
+ * claims only what the door's and the card's identities establish (wordIdentityRelation). A
+ * surface that cannot offer the card's route (route: false) says only what cannot be done here. */
+function wordCaptureHeldText(node, { route = true } = {}) {
   if (wordCaptureState(node) === 'unavailable') {
     return tx('この項目の答えをまだ確かめられないため、覚えられない。', 'This entry’s answer cannot be confirmed yet, so it cannot be memorized.');
   }
@@ -17015,6 +17032,10 @@ function wordCaptureHeldText(node) {
   if (relation === 'other-reading') {
     return tx(`「${node.id}」には別の読みのカードがあるため、ここでは覚える・やめるができない。`,
       `${node.id} holds a card for another reading, so it cannot be memorized or stopped here.`);
+  }
+  if (!route) {
+    return tx(`「${node.id}」には保存済みのカードがあるため、ここでは覚える・やめるができない。`,
+      `A saved card exists for ${node.id}, so it cannot be memorized or stopped here.`);
   }
   return tx(`「${node.id}」には保存済みのカードがある。管理するには、そのカードを開く。`,
     `A saved card exists for ${node.id}. Open that card to manage it.`);
@@ -23925,7 +23946,7 @@ function renderSheet(root) {
       capture.disabled = true;
       capture.classList.add('word-capture-held');
       if (capNode === node) capture.setAttribute('aria-describedby', 'word-capture-note');
-      else capture.setAttribute('aria-label', wordCaptureHeldText(capNode));
+      else capture.setAttribute('aria-label', wordCaptureHeldText(capNode, { route: false }));
     }
     bar.append(capture);
   }

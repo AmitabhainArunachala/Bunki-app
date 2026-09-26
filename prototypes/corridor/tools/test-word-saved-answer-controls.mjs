@@ -166,7 +166,7 @@ row('A11', 'an edit that matches zero or several times refuses the control befor
 row('A12', 'the declared inventory is exact and unique, and every control names rows that exist in it', () => {
   assert.equal(new Set(INVENTORY).size, INVENTORY.length);
   assert.equal(parseTap(tapRun(all()).stdout).rows.length, INVENTORY.length);
-  assert.deepEqual([Object.keys(WORD_CONTROLS).length, Object.keys(LEARNING_RECORD_CONTROLS).length], [29, 2], '31 controls, 33 children with the baselines');
+  assert.deepEqual([Object.keys(WORD_CONTROLS).length, Object.keys(LEARNING_RECORD_CONTROLS).length], [32, 2], '34 controls, 36 children with the baselines');
   for (const [name, control] of Object.entries(WORD_CONTROLS)) {
     for (const id of [...control.witnesses, ...control.collateral]) assert(INVENTORY.includes(id), `${name}: ${id}`);
     for (const id of control.witnesses) assert(!control.collateral.includes(id), `${name}: ${id} is both witness and collateral`);

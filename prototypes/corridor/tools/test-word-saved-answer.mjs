@@ -102,7 +102,7 @@ function defineRows() {
     // worker seam (request → dispatch → response), and the word sheet's entry doors
     'wordIdentityRelation', 'wordCaptureNoteText', 'heldWordCardNode', 'renderWordCaptureNote', 'withEn',
     'wordCaptureBasis', 'wordCaptureOpenLabel',
-    'learningEnrollHeldText', 'renderLessons', 'renderMockResult', 'mockSubjectKey',
+    'learningEnrollHeldText', 'heldEnrollRoute', 'renderLessons', 'renderMockResult', 'mockSubjectKey',
     'hiraToKata', 'ROMAJI', 'JLPT_RANK', 'jlptRank', 'searchIndex', 'buildSearchIndex', 'dictionarySearchContext', 'searchResults',
     'searchRowShownByCore', 'renderSearchResults', 'dictionaryQueryKey', 'activeDictionaryQuery', 'clearDictionarySearchTimer',
     'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'dictionarySearchGeneration',
@@ -433,6 +433,10 @@ function defineRows() {
         `${id} keeps review history from an earlier card (${shown}). This door doesn't stand for it. One spelling holds one card, so it stays as it is.`],
     },
     route: { card: ['そのカードを開く', 'open that card'], history: ['その項目を開く', 'open that entry'] },
+    // a surface with no route of its own (the sentence sheet's seal, NM review-1's third site): only what cannot be done
+    heldNoRoute: {
+      unestablished: (id) => [`「${id}」には保存済みのカードがあるため、ここでは覚える・やめるができない。`, `A saved card exists for ${id}, so it cannot be memorized or stopped here.`],
+    },
     // r3.3.1: no identity context, so neither a current card nor a differing record is claimed
     store: ['この操作では、この表記のカードや残っている記録を変更できない。何も変更していない。',
       "This action can't change the card or retained history for this spelling. Nothing was changed."],
@@ -457,23 +461,25 @@ function defineRows() {
       open: byId(note, 'word-capture-open'), replace: byId(note, 'word-capture-replace') } : null;
   };
   const enrollOf = (main, word) => find(main, (node) => node.tag === 'button' && node.dataset?.enroll === word);
-  /** The actual lesson end screen (renderLessons) after a lesson of 上手 and 海. */
-  const lessonEnd = (record) => {
+  /** The actual lesson end screen (renderLessons) after a lesson of 上手 and 海, with its context. */
+  const lessonEndOf = (record) => {
     const ctx = app({ mode: 'main', record });
     Object.assign(ctx.S, { view: 'lessons', lessonRun: { id: 'N5-synthetic', kind: 'word', words: ['上手', '海'], phase: 'end', results: [3, 1], correct: 1 } });
     const main = new FakeElement('main');
     ctx.renderLessons(main);
-    return main;
+    return { ctx, main };
   };
-  /** The actual older-set result (renderMockResult) after a completed sitting that missed 上手 and 海. */
-  const olderSetResult = (record) => {
+  const lessonEnd = (record) => lessonEndOf(record).main;
+  /** The actual older-set result (renderMockResult) after a completed sitting that missed 上手 and 海, with its context. */
+  const olderSetResultOf = (record) => {
     const ctx = app({ mode: 'main', record });
     const set = { level: 'N5', sections: [{ title: { ja: '語彙' } }] };
     const flat = ['上手', '海'].map((word) => ({ section: set.sections[0], item: { q: word, opts: ['a', 'b', 'c', 'd'], right: 0, subject: `word:${word}` } }));
     const main = new FakeElement('main');
     ctx.renderMockResult(main, set, flat, { answers: [1, 1] }, { status: 'submitted', activeMs: 1000, attemptId: 'attempt-synthetic' });
-    return main;
+    return { ctx, main };
   };
+  const olderSetResult = (record) => olderSetResultOf(record).main;
   const CORE_DOOR = { t: 'word', id: '上手' };
   const JOZU = { t: 'word', id: '上手', seq: '1353320', reading: 'じょうず' };
   /** The explicit 上手 1353320/じょうず card, captured the way it is reached once search shows 上手 once: the core
@@ -1506,5 +1512,56 @@ function defineRows() {
     assert.equal(enrollOf(main, '上手'), undefined, 'a spelling enrolled as itself shows no 覚える, as before');
     assert.equal(all(main, (node) => node.className === 'enroll-held').length, 0, 'and no held line');
     assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed');
+  });
+
+  row('X5.setup', 'the route-captured 1353320 card and the card-less studied うわて history, each holding the core spelling 上手', () => {
+    const jozu = need('V1').record;
+    const history = { ...captured(NODES.uwate), taken: [], srs: { 'word:上手': STUDIED }, revlog: REVLOG('word:上手') };
+    for (const [name, record] of [['card', jozu], ['history', history]]) {
+      assert.equal(app({ mode: 'main', record }).wordCaptureState(CORE_DOOR), 'conflict', `the core spelling is held · ${name}`);
+    }
+    fixtures.set('X5', { jozu, history });
+  });
+  row('X5', 'NM review-1, third site: a surface with no route of its own (the sentence sheet’s seal) says only what cannot be done; the rest keep “open that card”', () => {
+    const { jozu, history } = need('X5');
+    for (const [lang, at] of LANGS) {
+      let ctx = app({ mode: 'main', record: jozu, lang });
+      assert.equal(ctx.wordCaptureHeldText(CORE_DOOR), COPY.held.unestablished('上手')[at], `with a route: the instruction · ${lang}`);
+      assert.equal(ctx.wordCaptureHeldText(CORE_DOOR, { route: false }), COPY.heldNoRoute.unestablished('上手')[at], `without a route: none · ${lang}`);
+      // kept history already says only what cannot be done here: the same line with or without a route
+      ctx = app({ mode: 'main', record: history, lang });
+      assert.equal(ctx.wordCaptureHeldText(CORE_DOOR), COPY.historyHeld.unestablished('上手')[at], `history · ${lang}`);
+      assert.equal(ctx.wordCaptureHeldText(CORE_DOOR, { route: false }), COPY.historyHeld.unestablished('上手')[at], `history, no route · ${lang}`);
+    }
+  });
+
+  row('P3r.setup', 'the P3 records, and a plain core 上手 card: a lesson and an older set ending with 上手 and 海', () => {
+    const history = { ...captured(NODES.uwate), taken: [], srs: { 'word:上手': STUDIED }, revlog: REVLOG('word:上手') };
+    fixtures.set('P3r', { jozu: need('V1').record, history, core: captured(CORE_DOOR) });
+  });
+  row('P3r', 'NM review-1: a held lesson or older-set row offers the route its held line names, right after that line, labelled by basis; it opens the retained entry and writes nothing', () => {
+    const { jozu, history, core } = need('P3r');
+    const kept = [[jozu, COPY.route.card, JOZU], [history, COPY.route.history, { t: 'word', id: '上手', seq: '1580400', reading: 'うわて' }]];
+    for (const [screen, render, prefix] of [['lesson', lessonEndOf, 'lesson-enroll-open-'], ['older set', olderSetResultOf, 'mock-enroll-open-']]) {
+      for (const [record, route, entry] of kept) {
+        const { ctx, main } = render(record);
+        const label = `${screen} · ${route[1]}`;
+        const held = enrollOf(main, '上手');
+        const open = byId(main, `${prefix}0`);
+        assert(open, `the held 上手 row offers its route · ${label}`);
+        assert.deepEqual([open.tag, open.type, labels(open)], ['button', 'button', route], `labelled by basis · ${label}`);
+        const parent = find(main, (node) => node.children?.includes(open));
+        assert.equal(parent.children[parent.children.indexOf(open) - 1]?.id, held.getAttribute('aria-describedby'), `right after the held line · ${label}`);
+        assert.equal(byId(main, `${prefix}1`), undefined, `海 is free: no route · ${label}`);
+        const before = bytes(ctx.latest);
+        open.listeners.click();
+        assert.deepEqual(ctx.opened.at(-1), entry, `it opens the retained entry and exact reading · ${label}`);
+        assert.equal(bytes(ctx.latest), before, `opening wrote nothing · ${label}`);
+        assert.equal(held.disabled, true, `覚える stays held · ${label}`);
+      }
+      // a spelling enrolled as itself is not held: no held line, so no route
+      const { main } = render(core);
+      assert.equal(all(main, (node) => String(node.className || '').includes('enroll-held-open')).length, 0, `self-enrolled 上手: no route · ${screen}`);
+    }
   });
 }
