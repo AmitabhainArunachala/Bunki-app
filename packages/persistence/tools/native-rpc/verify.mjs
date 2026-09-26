@@ -198,7 +198,23 @@ try {
     .filter((path) => path.endsWith('.swift'))
     .sort()
     .map((path) => `${nativeDirectory}/${path}`);
-  if (native.length !== 9) {
+  const expectedNative = [
+    'CloudKitBackend.swift',
+    'CloudKitRecordCodec.swift',
+    'CloudKitSaveAdmission.swift',
+    'ForegroundJournalTransport.swift',
+    'JournalRPCAdapter.swift',
+    'JournalRPCFraming.swift',
+    'JournalRPCSessionGate.swift',
+    'JournalRPCTypes.swift',
+    'JournalTypes.swift',
+    'NativeBootstrapControl.swift',
+    'NativeCloudEntitlements.swift',
+    'NativeCloudSyncBootstrap.swift',
+    'NativeProfileCandidate.swift',
+    'NativeProfilePairing.swift',
+  ].map((path) => `${nativeDirectory}/${path}`);
+  if (JSON.stringify(native) !== JSON.stringify(expectedNative)) {
     phase = 'native-sources';
     reason = 'frozen-native-source-inventory-changed';
     throw new Error(reason);
@@ -256,13 +272,13 @@ try {
   reason = 'complete-test-report-required';
   const report = JSON.parse(await readFile(resolve(out, 'tests.json'), 'utf8'));
   const expected = new Map([
-    [resolve(candidateRoot, files[1]), 61],
+    [resolve(candidateRoot, files[1]), 62],
     [resolve(candidateRoot, files[2]), 7],
   ]);
   if (
     report.success !== true ||
-    report.numTotalTests !== 68 ||
-    report.numPassedTests !== 68 ||
+    report.numTotalTests !== 69 ||
+    report.numPassedTests !== 69 ||
     report.numFailedTests !== 0 ||
     report.numPendingTests !== 0 ||
     report.numTodoTests !== 0 ||
@@ -284,10 +300,10 @@ try {
       });
     }
   }
-  if (expected.size || new Set(cases.map((row) => row.name)).size !== 68) throw new Error(reason);
+  if (expected.size || new Set(cases.map((row) => row.name)).size !== 69) throw new Error(reason);
   receipt.cases = cases;
   receipt.caseSha256 = digest(JSON.stringify(cases));
-  checks.push({ name: 'complete-test-receipt', status: 'passed', unitCases: 61, interopCases: 7 });
+  checks.push({ name: 'complete-test-receipt', status: 'passed', unitCases: 62, interopCases: 7 });
   phase = 'source-stability';
   reason = 'source-stability-check-failed';
   if (
