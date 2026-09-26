@@ -4763,6 +4763,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   color: var(--ink-2);
 }
 
+/* D23: a held enroll button is disabled, and looks it, as the reader's held capture does */
+.lesson-enroll-one.word-capture-held:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .lesson-enroll-all {
   margin: 10px 0 4px;
 }
