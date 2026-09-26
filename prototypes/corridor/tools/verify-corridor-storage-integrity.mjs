@@ -1129,6 +1129,7 @@ await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-per
       window: { __TSFSRS__: fsrs }, pin: clone(PIN), S: { srsPrefs: fitted === undefined ? {} : { fsrs: clone(fitted) } },
       srsParamsProblem: storeApi.srsParamsProblem, noteIgnoredSrsParams: (reason) => notes.push(reason),
     });
+    vm.runInContext(definitions('pinnedSchedulerInput'), context);
     await vm.runInContext('(async () => { ' + init + ' })()', context);
     assert(context.scheduler); assert.equal(context.srsParams.enable_fuzz, false);
     assert.equal(context.srsParams.request_retention, PIN.requestRetention);
