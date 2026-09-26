@@ -165,7 +165,7 @@ const server = createServer((request, response) => {
 });
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
-const results = [], failures = [], diagnostics = [];
+const results = [], failures = [], diagnostics = [], deletionSetups = [];
 const assessmentRetryEvidence = [], retryPages = new WeakMap();
 const RETRY_LOCK = 'kairo-record:kairo-corridor-v1:kairo-ai-log', RETRY_KEY = 'kairo-retry-route-v1';
 // AR1/AR2 only: native requests/queries pass through. AR2 deliberately holds a later query
@@ -418,7 +418,8 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
       view: typeof S === 'undefined' ? null : S.view,
       error: typeof S === 'undefined' ? null : S.storeError, notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice,
       writable: typeof recordWritable === 'function' && recordWritable(),
-      gradeDiagnostic: JSON.parse(JSON.stringify(window.__assessmentGradeDiagnostic || null)) })).catch(() => null);
+      gradeDiagnostic: JSON.parse(JSON.stringify(window.__assessmentGradeDiagnostic || null)),
+      deletionSetup: window.__assessmentDeletionSetup || null })).catch(() => null);
     failures.push({ engine, name, error: String(error), pageErrors, lifecycle, state });
     console.error(`FAIL ${engine}/${name}: ${String(error)}`);
     writeFileSync(resolve(evidence, 'assessment-app-failures.json'), `${JSON.stringify(failures, null, 2)}\n`);
@@ -505,18 +506,37 @@ try {
         `question-card-deleted-result-blocks-fresh-grade${invocation === 'direct' ? '-direct-control' : ''}`, async page => {
         await finishQuestionFixture(page); await checkQuestionAnswer(page);
         const before = await page.evaluate(async diagnostic => {
-          const selected = currentAssessmentV2(), native = await recordController.snapshot();
-          const result = await recordController.commitLocal({ changeId: 'fixture:question-delete', binding: recordInstallation.policy.binding,
-            expectedRevision: native.snapshot.revision, occurredAt: new Date().toISOString(), mutations: [],
+          const selected = currentAssessmentV2();
+          const request = { changeId: 'fixture:question-delete', binding: recordInstallation.policy.binding,
+            occurredAt: new Date().toISOString(), mutations: [],
             operations: [{ payload: { kind: 'entity.tombstone', target: { kind: 'exam-attempt', id: selected.attempt.attemptId },
-              reason: 'user-deleted' }, dependencies: [] }] });
+              reason: 'user-deleted' }, dependencies: [] }] };
+          const setup = window.__assessmentDeletionSetup = { changeId: request.changeId, attempts: [] };
+          let result;
+          // Fixture setup alone may refresh a rejected CAS. The learner's grade
+          // below runs exactly once, against the deliberately stale published UI.
+          for (let attempt = 0; attempt < 3; attempt++) {
+            const native = await recordController.snapshot();
+            if (native.status !== 'active') throw new Error(native.reason);
+            const row = { expectedRevision: native.snapshot.revision, error: null };
+            setup.attempts.push(row);
+            try {
+              result = await recordController.commitLocal({ ...request, expectedRevision: native.snapshot.revision });
+              break;
+            } catch (error) {
+              row.error = error?.code || String(error);
+              if (error?.code !== 'stale-revision' || attempt === 2) throw error;
+            }
+          }
           if (result.status !== 'active') throw new Error(result.reason);
+          if (!result.receipt) throw new Error('Fixture deletion requires a durable receipt');
           // Leave published UI deliberately stale: the queued grade must use its fresh storage snapshot.
           const durable = diagnostic ? await recordController.snapshot() : null;
           if (diagnostic) window.__installAssessmentGradeDiagnostic();
-          return { retained: JSON.stringify(S.assessmentQuestionPractice), deletion: result,
+          return { retained: JSON.stringify(S.assessmentQuestionPractice), deletion: result, setup,
             durable, review: diagnostic ? window.__assessmentGradeDiagnostic.review() : null };
         }, gradeDiagnostics);
+        deletionSetups.push({ engine, invocation, ...before.setup, receipt: before.deletion.receipt });
         const diagnostic = { engine, invocation, before,
           limitation: invocation === 'direct' ? 'Calls the production grade function directly, bypassing button-handler guards.' : null };
         const saveDiagnostics = () => writeFileSync(resolve(evidence, 'assessment-grade-diagnostics.json'), `${JSON.stringify(diagnostics, null, 2)}\n`);
@@ -910,7 +930,9 @@ try {
       // leaving the kept room and coming back to the catalog is a new visit, not the old target
       // (control: delete the render() line that drops a retained target on any other view)
       await run(engine, 'retry-route-kept-target-yields-to-a-deliberate-return', async (page, context) => {
+        await page.locator('#mock-link').click();
         const attemptId = await submittedAttempt(page);
+        await page.waitForFunction(id => document.querySelector('#app main')?.dataset.examAttempt === id, attemptId);
         // As in terminalRetryFixture, dismiss the owner's terminal result so
         // the retained route is the only way this attempt can be selected.
         assert.equal(await page.evaluate(() => recordWritable()), true, 'the owner dismisses the terminal result');
@@ -997,7 +1019,7 @@ try {
 const receipt = { format: 'kairo-assessment-instrumented-app-verification', v: 1,
   artifactSha256: identity.artifactSha256, sourceAssetSha256: identity.sourceAssetSha256, gitSha: identity.gitSha,
   instrumentation: { path: 'corridor.js', originalSha256: sha(corridorSource), servedSha256: sha(corridorFixture), exposed, gradeDiagnostics },
-  fixtures: [...fixtures].map(([path, bytes]) => ({ path, sha256: sha(bytes) })), results, failures, diagnostics,
+  fixtures: [...fixtures].map(([path, bytes]) => ({ path, sha256: sha(bytes) })), results, failures, diagnostics, deletionSetups,
   assessmentRetry: { evidence: assessmentRetryEvidence, pending: ['AR3-nonmember-item', 'AR4-inaccessible-target', 'AR5-in-progress-protected-answers', 'full-remote-handoff'],
     requiredCases: ['AR1-retry-exact-item', 'AR2-retry-retained-result'], caseFilter: caseFilter || null,
     harnessSha256: sha(readFileSync(new URL(import.meta.url))), nodeVersion: process.version,
