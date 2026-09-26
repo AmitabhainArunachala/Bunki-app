@@ -10,11 +10,13 @@ import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, extname, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 const ROOT=resolveCorridorSite();
+const { selectPractice } = await import(pathToFileURL(resolve(ROOT, 'assessment-controller.mjs')).href);
 const OUT=resolveCorridorEvidence();
 const REQUIRE_SKIP=process.argv.includes('--require-skip')||process.env.EXPERIENCE_REQUIRE_SKIP==='1';
 mkdirSync(resolve(OUT,'screenshots'),{recursive:true});
@@ -173,16 +175,52 @@ try{
   mockBefore=await state();await click('#mock-link');
   await page.locator('.assessment-room #exam-legacy').waitFor();await click('.assessment-room #exam-legacy');
   await page.locator('button[data-mock-set="n5-01"]').waitFor();await shot('mock-catalog','Bundled mock papers clearly separate score evidence from scheduling');await click('button[data-mock-set="n5-01"]');
-  await page.locator('[data-mock-opt]').first().waitFor();await shot('mock-question','Paper starts with unselected answer and next disabled');
+  await page.locator('[data-mock-opt]').first().waitFor();
+  const pinned=selectPractice((await readAppRecord(page)).assessmentLibrary);
+  assert.equal(pinned?.status,'in-progress');assert.equal(pinned.run.setId,'n5-01');
+  assert.equal(pinned.run.ix,0);assert.equal(pinned.flat.length,18);
+  const currentPractice=record=>{
+   const current=selectPractice(record.assessmentLibrary);
+   assert.equal(current?.attemptId,pinned.attemptId);
+   assert.deepEqual(current.attempt.form,pinned.attempt.form);
+   return current;
+  };
+  const waitQuestion=async(index,answered=false)=>{
+   await waitForAppRecord(page,record=>{
+    const current=currentPractice(record);
+    return current.status==='in-progress'&&current.run.ix===index&&(!answered||current.run.answers[index]===0);
+   },{description:`saved practice question ${index+1}${answered?' answer':''}`});
+   await page.waitForFunction(({setId,index,total,optionCount})=>{
+    const main=document.querySelector('main[data-mock-set]');
+    if(main?.dataset.mockSet!==setId)return false;
+    const choices=[...main.querySelectorAll('[data-mock-opt]')];
+    const position=[...main.querySelectorAll('.card-kind')].some(node=>
+     node.textContent.endsWith(`Question ${index+1} of ${total}`)||node.textContent.endsWith(`${index+1} / ${total} 問`));
+    return position&&choices.length===optionCount&&choices.every(choice=>{
+     const rect=choice.getBoundingClientRect();
+     return !choice.disabled&&rect.width>0&&rect.height>0&&getComputedStyle(choice).visibility==='visible';
+    });
+   },{setId:pinned.run.setId,index,total:pinned.flat.length,optionCount:pinned.flat[index].item.opts.length});
+  };
+  await waitQuestion(0);await shot('mock-question','Paper starts with unselected answer and next disabled');
   await check('E09-requires-answer','Cannot advance without choosing an answer',async()=>assert.equal(await page.locator('#mock-next').isDisabled(),true));
-  await click('[data-mock-opt="0"]');await shot('mock-selected-answer','Selection is visible and still editable; no instant correctness');
-  await click('#mock-next');await click('#mock-prev');await check('E09-answer-persists-back','Previous returns to original chosen answer',async()=>assert.equal(await page.locator('[data-mock-opt="0"]').getAttribute('aria-pressed'),'true'));
-  for(let i=0;i<40&&!await visible('#mock-done');i++){await click('[data-mock-opt="0"]');await click('#mock-next');}
+  await click('[data-mock-opt="0"]');await waitQuestion(0,true);await shot('mock-selected-answer','Selection is visible and still editable; no instant correctness');
+  await click('#mock-next');await waitQuestion(1);await click('#mock-prev');await waitQuestion(0,true);
+  await check('E09-answer-persists-back','Previous returns to original chosen answer',async()=>assert.equal(await page.locator('[data-mock-opt="0"]').getAttribute('aria-pressed'),'true'));
+  for(let index=0;index<pinned.flat.length;index++){
+   // The first answer was already saved before exercising Next and Previous.
+   if(index>0){await click('[data-mock-opt="0"]');await waitQuestion(index,true);}
+   await click('#mock-next');
+   if(index+1<pinned.flat.length)await waitQuestion(index+1);
+   else await waitForAppRecord(page,record=>currentPractice(record).status==='submitted',
+    {description:'submitted pinned practice attempt'});
+  }
   await page.locator('#mock-done').waitFor();await shot('mock-results','Submitted paper has score, explanations and deliberate optional enrollment');
   await check('E09-no-auto-enrollment','Paper submission retains a complete unreviewed practice attempt without altering deck or scheduler',async()=>{
    const s=await waitForAppRecord(page,record=>submittedAttempts(record).length===submittedAttempts(mockBefore).length+1);
    assert.equal(debt(s),debt(mockBefore));assert.deepEqual(s.mockDone,mockBefore.mockDone,'Legacy score summaries are preserved, not overwritten');
    savedMockAttempt=submittedAttempts(s).at(-1);assert.ok(savedMockAttempt.answers.length>0);
+   assert.equal(savedMockAttempt.attemptId,pinned.attemptId);assert.deepEqual(savedMockAttempt.form,pinned.attempt.form);
    assert.ok(savedMockAttempt.answers.every(answer=>answer.response.kind!=='unanswered'&&answer.lastResponseFactId));
    const storedForm=s.assessmentLibrary.forms.find(entry=>entry.form.revisionId===savedMockAttempt.form.revisionId)?.form;
    assert.ok(storedForm);assert.equal(storedForm.sha256,savedMockAttempt.form.sha256);
