@@ -354,7 +354,9 @@ const MEASURE_FN = `(() => {
       measure('.shelf-title', 'shelf title'),
       measure('.gloss', 'gloss'),
       measure('.sem-note', 'discrimination note'),
-      measure('.shelf-snippet', 'faint / snippet'),
+      // the faint preview itself, per the local r4 walk's diagnostics (not CI): the first .shelf-snippet is the shelf's
+      // intro line (5.11:1 in both variant-C modes); the previews a learner skims sit inside the shelf items (2.38:1 current, 7.34:1 wcag)
+      measure('.shelf-item:not([data-recommendation]) .shelf-snippet', 'faint / snippet'),
       measure('.sig-name', 'faint / signal label'),
       measure('.crumb', 'chrome breadcrumb (background)'),
       measure('.eyebrow', 'eyebrow label'),
@@ -3002,25 +3004,57 @@ async function main() {
     notyetRow.grades === 1 && notyetRow.again && !notyetRow.good && !notyetRow.hard &&
       !notyetRow.easy && notyetRow.reading,
     JSON.stringify(notyetRow));
-  // (e) a failed persist mid-grade leaves session and store consistent
+  // (e) a failed persist mid-grade leaves session and store consistent. Since D3 (ef5c06ad) a window that cannot
+  // write shuts the seals and states why inline, between the card and its shut grades, with a draft-safe reload; the one-carrier rule
+  // (6c6a08da) then hides the fixed banner, which would repeat the same text over the room's title. The complete
+  // native snapshot (every root, the archive, revision, replication rows) must not move.
+  const r3cBaseline = await d23SettledSnapshot(() => true);
+  const r3cBaselineKept = d23Retain('r3c-baseline', r3cBaseline);
   await armRecordWriteFailure(page, 'quota', { roots: ['srs'] });
   const revlogBefore = await evaluateAppRecord(page,
     `record.revlog.length`,
   );
   await page.evaluate(`document.querySelector('.grade.g-again')?.click()`);
   await page.waitForFunction(() => window.__recordTestFault?.fired > 0);
-  await page.locator('#store-alert').waitFor({ state: 'visible' });
-  const failedPersist = await evaluateAppRecord(page, `(() => {
-    const alertNode = document.getElementById('store-alert');
+  await page.locator('.review-unwritable').waitFor({ state: 'visible', timeout: 8000 }).catch(() => {});
+  // the carriers, the card and the fault count are retained before any assertion reads them
+  const failedPersist = await page.evaluate(`(() => {
+    const vis = (n) => { if (!n) return false; const r = n.getBoundingClientRect(); const cs = getComputedStyle(n);
+      return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'; };
+    const room = document.querySelector('.review-unwritable');
+    const why = room ? room.querySelector('.room-state-why') : null;
+    const reload = room ? [...room.querySelectorAll('button')].find((b) => /再読み込み|Reload/.test(b.textContent || '')) : null;
+    const grades = [...document.querySelectorAll('.grade')];
+    const banner = document.getElementById('store-alert');
     return {
-      cardStillUp: !!document.querySelector('.grade.g-again'),
-      revlog: record.revlog.length,
-      alertUp: !!alertNode && alertNode.hidden === false && (alertNode.textContent || '').length > 0,
+      room: room ? { visible: vis(room), kind: room.dataset.roomState ?? null, text: (room.textContent || '').trim().slice(0, 160) } : null,
+      why: why ? { visible: vis(why), text: why.textContent ?? '' } : null,
+      reload: reload ? { visible: vis(reload), enabled: !reload.disabled } : null,
+      card: { again: !!document.querySelector('.grade.g-again'), grades: grades.length, allDisabled: grades.length > 0 && grades.every((g) => g.disabled) },
+      banner: banner ? { visible: vis(banner), hiddenAttr: banner.hidden, text: (banner.textContent || '').trim().slice(0, 120), message: banner.dataset.message ?? null } : null,
+      fault: window.__recordTestFault ? { fired: window.__recordTestFault.fired } : null,
     };
   })()`);
-  check('R3-C · a failed persist mid-grade moves nothing — card up, revlog whole, alert speaking',
-    failedPersist.cardStillUp && failedPersist.revlog === revlogBefore && failedPersist.alertUp,
-    JSON.stringify(failedPersist));
+  const r3cAfter = await d23SettledSnapshot(() => true);
+  const r3cAfterKept = d23Retain('r3c-after-failed-grade', r3cAfter);
+  const r3cEqual = !!(r3cBaseline.settled && r3cAfter.settled && r3cBaselineKept.bytes && r3cAfterKept.bytes &&
+    Buffer.compare(r3cBaselineKept.bytes, r3cAfterKept.bytes) === 0);
+  const revlogAfter = await evaluateAppRecord(page, `record.revlog.length`);
+  report.r3cFailedPersist = { dom: failedPersist, baseline: r3cBaselineKept.descriptor, after: r3cAfterKept.descriptor, equal: r3cEqual,
+    revlog: [revlogBefore, revlogAfter],
+    diff: r3cBaseline.snapshot && r3cAfter.snapshot ? JSON.parse(d23SnapshotDiff(r3cBaseline.snapshot, r3cAfter.snapshot)) : null };
+  check('R3-C · a failed persist mid-grade moves nothing — the complete native snapshot is identical and the revlog whole',
+    r3cEqual && revlogAfter === revlogBefore,
+    JSON.stringify({ equal: r3cEqual, revlog: [revlogBefore, revlogAfter], baseline: r3cBaselineKept.descriptor.sha256, after: r3cAfterKept.descriptor.sha256 }));
+  // the reason shown is the stored reason itself: the room's .room-state-why and the banner's data-message are both S.storeError
+  const r3cReason = failedPersist.why?.text ?? '';
+  check('R3-C · the window says why inline above its shut grades — the stored reason, visible, with a reload; the card kept',
+    !!(failedPersist.room?.visible && failedPersist.room.kind === 'blocked' && failedPersist.why?.visible && r3cReason.trim() &&
+      r3cReason === failedPersist.banner?.message && failedPersist.reload?.visible && failedPersist.reload.enabled &&
+      failedPersist.card.again && failedPersist.card.allDisabled),
+    JSON.stringify({ room: failedPersist.room, why: failedPersist.why, bannerMessage: failedPersist.banner?.message ?? null, reload: failedPersist.reload, card: failedPersist.card }));
+  check('R3-C · one carrier: the fixed banner that would repeat the reason stays hidden',
+    !!failedPersist.banner && !failedPersist.banner.visible, JSON.stringify(failedPersist.banner));
   const gradeFault = await clearRecordWriteFailure(page);
   report.nativeWriteFaults = [gradeFault];
   check('R3-C · the failure reached an actual native host-command write', gradeFault.fired === 1,
