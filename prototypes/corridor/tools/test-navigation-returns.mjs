@@ -20,7 +20,7 @@ function app() {
       taken: [], srs: {}, revlog: [], dialogInvoker: null },
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null }, referenceLibrary: null,
-    learningSourceVisit: null, pendingReferenceCollection: null,
+    learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
     activeTokenAlternatives: null, readerPosTimer: null,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
