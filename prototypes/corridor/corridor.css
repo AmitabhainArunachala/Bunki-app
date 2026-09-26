@@ -6187,12 +6187,13 @@ body.zen .review-example {
   }
 }
 /* B2a-hint: the other window seems to have closed — a retry offer, never a promise. It sits
- * under the read-only alert, outside #app, so a render never replaces it. */
+ * under the read-only alert, below its lower edge and one layer beneath it, outside #app, so a
+ * render never replaces it and it never covers the alert's reason. */
 .record-hint {
   position: fixed;
   top: var(--record-hint-top, calc(120px + env(safe-area-inset-top)));
   left: 50%;
-  z-index: 130;
+  z-index: 129;
   width: min(calc(100% - 24px), 760px);
   box-sizing: border-box;
   transform: translateX(-50%);
