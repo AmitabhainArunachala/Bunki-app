@@ -299,18 +299,23 @@ async function waitSelected(page, predicate, description) {
 }
 async function door(page) {
   await page.locator('#mock-link').click();
-  await page.waitForSelector('#exam-legacy, [data-mock-set="n5-01"], #mock-next, #mock-done');
+  await page.waitForSelector('#exam-legacy, button[data-mock-set="n5-01"], #mock-next, #mock-done');
   if (await page.locator('#exam-legacy').count()) await page.locator('#exam-legacy').click();
-  await page.waitForSelector('[data-mock-set="n5-01"], #mock-next, #mock-done');
+  await page.waitForSelector('button[data-mock-set="n5-01"], #mock-next, #mock-done');
 }
 async function earlierExercises(page) {
-  await page.waitForSelector('#exam-legacy, [data-mock-set="n5-01"]');
+  await page.waitForSelector('#exam-legacy, button[data-mock-set="n5-01"]');
   if (await page.locator('#exam-legacy').count()) await page.locator('#exam-legacy').click();
-  await page.waitForSelector('[data-mock-set="n5-01"]');
+  await page.waitForSelector('button[data-mock-set="n5-01"]');
 }
 async function start(page) {
-  await page.locator('[data-mock-set="n5-01"]').click();
+  const priorIds = new Set(((await record(page)).assessmentLibrary?.attempts || []).map(attempt => attempt.attemptId));
+  await page.locator('button[data-mock-set="n5-01"]').click();
   await page.waitForSelector('#mock-next');
+  const started = await waitSelected(page, value => value.status === 'in-progress' && !priorIds.has(value.attemptId),
+    'new saved practice attempt');
+  await page.locator('main[data-mock-set="n5-01"] [data-mock-opt]:not([disabled])').first().waitFor();
+  assert.equal((await selected(page)).attemptId, started.attemptId);
   assert.equal((await selected(page)).run.ix, 0);
 }
 async function choose(page, choice) {
@@ -1110,6 +1115,11 @@ try {
       );
       assert.equal(await page.locator('[data-mock-opt="3"]').getAttribute('aria-pressed'), 'true');
       await page.locator('#mock-drop').click();
+      await waitForAppRecord(page, record => {
+        const library = record.assessmentLibrary;
+        return library?.activeAttemptId === null &&
+          library.attempts.find(attempt => attempt.attemptId === before.attempt.attemptId)?.status === 'abandoned';
+      }, { description: 'abandoned saved practice and cleared active pointer' });
       await earlierExercises(page);
       await start(page);
       assert.equal(upstream.length, 1, 'A deliberate new attempt fetches the new source');
