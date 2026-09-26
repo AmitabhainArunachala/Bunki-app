@@ -372,6 +372,10 @@ async function receive(page, mappedWord = false, assisted = false) {
   }, { form, entry, mappedWord, assisted });
 }
 const caseFilter = process.argv.find(arg => arg.startsWith('--case='))?.slice(7);
+const pageLifecycles = new WeakMap();
+function pageStage(page, stage, detail = {}) {
+  pageLifecycles.get(page)?.push({ stage, at: new Date().toISOString(), url: page.url(), ...detail });
+}
 async function run(engine, name, body, { assessmentRetry = false } = {}) {
   if (caseFilter && !name.includes(caseFilter)) return;
   // This WebKit runtime's ephemeral context loses CacheStorage on navigation.
@@ -379,13 +383,22 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
   const profile = mkdtempSync(resolve(evidence, `${engine}-${name}-`));
   const context = await ({ chromium, webkit }[engine]).launchPersistentContext(profile, { headless: true });
   const page = context.pages()[0] || await context.newPage();
-  const pageErrors = []; page.on('pageerror', error => pageErrors.push(error.message));
+  const pageErrors = [], lifecycle = [];
+  pageLifecycles.set(page, lifecycle);
+  page.on('pageerror', error => {
+    pageErrors.push(error.message);
+    pageStage(page, 'pageerror', { name: error.name, message: error.message, stack: error.stack || null });
+  });
+  page.on('framenavigated', frame => { if (frame === page.mainFrame()) pageStage(page, 'navigation'); });
+  page.on('domcontentloaded', () => pageStage(page, 'domcontentloaded'));
+  page.on('load', () => pageStage(page, 'load'));
   const proof = assessmentRetry ? { engine, browserVersion: context.browser()?.version() || null,
     name, status: 'running', pages: [], steps: [], snapshots: [] } : null;
   if (proof) assessmentRetryEvidence.push(proof);
   try {
     if (proof) await trackAssessmentRetry(page, proof, 'A');
     await boot(page); if (proof) await waitRetryBoot(page);
+    pageStage(page, 'boot-complete');
     await body(page, context, proof);
     if (proof) {
       assert.deepEqual(proof.pages.flatMap(page => page.errors), []);
@@ -395,16 +408,18 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
         assert.equal(load.scripts[0].status, 'read'); assert.equal(load.scripts[0].sha256, sha(corridorFixture));
       }
     }
-    assert.deepEqual(pageErrors, []); results.push({ engine, name, passes: true });
+    assert.deepEqual(pageErrors, []); results.push({ engine, name, passes: true, lifecycle });
     if (proof) proof.status = 'passed';
     console.log(`PASS ${engine}/${name}`);
   } catch (error) {
     if (proof) { proof.status = 'failed'; proof.error = String(error); }
     const state = await page.evaluate(() => ({ text: document.body.innerText.slice(0, 5000),
+      documentReadyState: document.readyState, appReady: document.body.dataset.ready || null,
+      view: typeof S === 'undefined' ? null : S.view,
       error: typeof S === 'undefined' ? null : S.storeError, notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice,
       writable: typeof recordWritable === 'function' && recordWritable(),
       gradeDiagnostic: JSON.parse(JSON.stringify(window.__assessmentGradeDiagnostic || null)) })).catch(() => null);
-    failures.push({ engine, name, error: String(error), pageErrors, state });
+    failures.push({ engine, name, error: String(error), pageErrors, lifecycle, state });
     console.error(`FAIL ${engine}/${name}: ${String(error)}`);
     writeFileSync(resolve(evidence, 'assessment-app-failures.json'), `${JSON.stringify(failures, null, 2)}\n`);
     await page.screenshot({ path: resolve(evidence, `${engine}-${name}.png`), fullPage: true }).catch(() => {});
@@ -459,7 +474,10 @@ try {
         await page.locator('.grade.g-good').click();
         await page.waitForFunction(() => S.revlog.length === 3);
         const beforeReload = await page.evaluate(() => JSON.stringify(S.assessmentQuestionPractice));
-        await page.reload(); await page.waitForFunction(() => recordWritable() && !!S.assessmentQuestionPractice);
+        pageStage(page, 'question-reload-start');
+        await page.reload();
+        await page.waitForFunction(() => document.body.dataset.ready === '1' && recordWritable() && !!S.assessmentQuestionPractice);
+        pageStage(page, 'question-reload-ready');
         assert.equal(await page.evaluate(() => JSON.stringify(S.assessmentQuestionPractice)), beforeReload);
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
       });
@@ -641,10 +659,23 @@ try {
           const context = S.teacherContexts.entries.find(entry => entry.sourceKind === 'assessment-item');
           const id = Object.keys(D.dict).find(key => key.length === 2 && !S.taken.some(row => row.id === key));
           const ok = await commitStorePatch(latest => ({ taken: [...latest.taken, { t: 'word', id, label: id, ts: Date.now(), sourceContextRef: context.id }] }));
-          startReview([{ t: 'word', id }]);
           return { ok, id, contextId: context.id };
         });
         assert(word.ok, 'fixture word saved with the Sensei context');
+        // A saved row has no review debt until the learner explicitly starts it.
+        assert.equal(await page.evaluate(id => window.__KAIRO_SRS__.dueKeys().includes(`word:${id}`), word.id), false);
+        await page.locator('#tray').click();
+        await page.locator(`[data-srs-start=${JSON.stringify(`word:${word.id}`)}]`).click();
+        const started = await waitForAppRecord(page, record => Number.isFinite(record.taken.find(row => row.t === 'word' && row.id === word.id)?.started));
+        assert.equal(started.srs[`word:${word.id}`], undefined, 'explicit start makes the word eligible without grading it');
+        const review = await page.evaluate(id => {
+          const eligible = window.__KAIRO_SRS__.dueKeys().includes(`word:${id}`);
+          startReview([{ t: 'word', id }]);
+          return { eligible, view: S.view, queue: S.review?.queue.map(row => ({ t: row.t, id: row.id })) };
+        }, word.id);
+        assert.deepEqual(review, { eligible: true, view: 'review', queue: [{ t: 'word', id: word.id }] },
+          'the explicitly started fixture enters the scoped review');
+        await page.locator('#declare-notyet').waitFor({ state: 'visible' });
         await page.locator('#declare-notyet').click();
         await page.locator('#review-source-return').click();
         await page.waitForFunction(() => S.view === 'mock', null, { timeout: 5_000 });
@@ -880,10 +911,27 @@ try {
       // (control: delete the render() line that drops a retained target on any other view)
       await run(engine, 'retry-route-kept-target-yields-to-a-deliberate-return', async (page, context) => {
         const attemptId = await submittedAttempt(page);
+        // As in terminalRetryFixture, dismiss the owner's terminal result so
+        // the retained route is the only way this attempt can be selected.
+        assert.equal(await page.evaluate(() => recordWritable()), true, 'the owner dismisses the terminal result');
+        await page.locator('#exam-done').click();
+        await waitForAppRecord(page, record => record.assessmentLibraryV2?.activeAttemptId === null);
+        await page.waitForFunction(() => !assessmentV2Pending && !recordApp.pending);
+        const baseline = await readAppRecordSnapshot(page);
+        baseline.bindingText = await page.evaluate(() => localStorage.getItem('kairo-local-record-binding-v1'));
+        assert.equal(baseline.record.assessmentLibraryV2.activeAttemptId, null, 'the old result is not the durable default');
+        assert.equal(baseline.record.assessmentLibraryV2.attempts.find(row => row.attemptId === attemptId)?.status, 'submitted');
         const second = await context.newPage();
         await second.goto(`${origin}/?entry=shelf&ui=bi`); await readyAgain(second);
+        assert.equal(await second.evaluate(() => recordWritable()), false, 'the second window is blocked');
         await writeRoute(second, { view: 'mock', attemptId });
+        const expectedRoute = await second.evaluate(key => JSON.parse(sessionStorage.getItem(key)), ROUTE_KEY);
         await second.reload(); await readyAgain(second);
+        const retained = await place(second);
+        assert.equal(retained.view, 'mock');
+        assert.equal(retained.attempt, null, 'the blocked window does not expose the retained result');
+        assert.equal(await second.locator('details[data-exam-item], .exam-rationale').count(), 0, 'the blocked window exposes no protected answers');
+        assert.deepEqual(JSON.parse(retained.route), expectedRoute, 'the losing boot keeps the exact result target');
         await second.evaluate(() => { S.stack = []; S.view = 'shelf'; render(); S.view = 'mock'; render(); });
         assert.equal((await place(second)).route, null, 'the move away dropped the kept target');
         await page.close();
@@ -891,8 +939,14 @@ try {
         await Promise.all([second.waitForEvent('load'), second.locator('#record-hint-retry').click()]);
         await readyAgain(second);
         const at = await place(second);
+        assert.equal(await second.evaluate(() => recordWritable()), true, 'retry reacquires ownership');
         assert.equal(at.view, 'mock', 'the retry returns to the room the learner chose');
         assert.notEqual(at.attempt, attemptId, `not to the old result: ${JSON.stringify(at)}`);
+        assert.equal(at.route, null, 'the deliberate return does not restore the old target');
+        await second.waitForFunction(() => !assessmentV2Pending && !recordApp.pending);
+        const after = await readAppRecordSnapshot(second);
+        after.bindingText = await second.evaluate(() => localStorage.getItem('kairo-local-record-binding-v1'));
+        assert.deepEqual(terminalRetryProjection(after), terminalRetryProjection(baseline), 'deliberate return preserves the acknowledged terminal assessment and review record');
       });
       // A seeded retained-route input is explicit; every later transition uses the real hint retry.
       // AR3–AR5 (nonmember/deleted/protected targets) remain pending, not implied by these positives.

@@ -993,9 +993,27 @@ async function browserChecks() {
     }, { target, beforeText: JSON.stringify(before[target]) });
     return before;
   };
-  const failed = async (page, before) => {
+  const failed = async (page, before, { review = false } = {}) => {
     await page.waitForFunction(() => window.__learningFault?.fired === true);
-    await page.locator('#store-alert').waitFor({ state: 'visible' });
+    if (review) {
+      // Review owns the visible reason and reload; its duplicate fixed banner
+      // is deliberately hidden by the accepted one-carrier room contract.
+      const room = page.locator('.review-unwritable[data-room-state="blocked"]');
+      await room.waitFor({ state: 'visible' });
+      const why = room.locator('.room-state-why');
+      await why.waitFor({ state: 'visible' });
+      const reason = await why.textContent();
+      assert(reason?.trim(), 'the blocked review states a saving-failure reason');
+      assert.equal(reason, await page.locator('#store-alert').getAttribute('data-message'), 'review shows the stored reason');
+      const reload = room.getByRole('button', { name: /再読み込み|Reload/ });
+      assert.equal(await reload.isVisible(), true, 'the inline reload is visible');
+      assert.equal(await reload.isEnabled(), true, 'the inline reload is available');
+      const grades = page.locator('.grade-row .grade');
+      assert(await grades.count() > 0, 'the current card keeps its grades');
+      assert.equal(await grades.evaluateAll(nodes => nodes.every(node => node.disabled)), true, 'saving failure disables every grade');
+      assert.equal(await page.locator('#store-alert').isVisible(), false, 'the duplicate fixed banner stays hidden');
+      assert.equal(await page.locator('#app main .room-state-why:visible, #store-alert:visible').count(), 1, 'exactly one reason carrier is visible');
+    } else await page.locator('#store-alert').waitFor({ state: 'visible' });
     assert.deepEqual(await disk(page), before, 'Native transaction rejection preserved the entire acknowledged learner record');
   };
   const pollDisk = async (page, predicate) => {
@@ -1062,7 +1080,7 @@ async function browserChecks() {
         await journey('review-grade-rejection-keeps-card-schedule-log-and-stats', async (page) => {
           await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#declare-recalled').click();
           await page.locator('.g-good').waitFor(); const label = await page.locator('.review-front').textContent(); const before = await fault(page, 'srs');
-          await page.locator('.g-good').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
+          await page.locator('.g-good').evaluate((node) => { node.click(); node.click(); }); await failed(page, before, { review: true });
           assert.equal(await page.locator('.review-front').textContent(), label); assert.equal(await page.locator('.g-good').count(), 1);
         });
         await journey('review-grade-and-undo-persist-one-schedule-with-an-append-only-revocation', async (page) => {

@@ -235,11 +235,64 @@ async function boot(page) {
   assert.equal(await page.locator('#store-alert').isVisible(), false);
   await pollRecord(page, (record) => Array.isArray(record.taken));
 }
+const fitContext = new WeakMap();
 async function fit(page, label) {
   const dimensions = await page.evaluate(() => ({
     viewport: innerWidth,
     document: document.documentElement.scrollWidth,
   }));
+  if (!(dimensions.document <= dimensions.viewport + 1)) {
+    try {
+      const overflow = await page.evaluate(() => {
+        const elementLimit = 2000, rowLimit = 50, rows = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+        let node = walker.currentNode, inspected = 0, matching = 0;
+        while (node && inspected < elementLimit) {
+          inspected++;
+          const rect = node.getBoundingClientRect();
+          const outsideViewport = rect.left < -1 || rect.right > innerWidth + 1;
+          const contentOverflow = node.scrollWidth > node.clientWidth + 1;
+          if (rect.width > 0 && rect.height > 0 && (outsideViewport || contentOverflow)) {
+            matching++;
+            if (rows.length < rowLimit) {
+              const style = getComputedStyle(node);
+              rows.push({
+                tag: node.tagName.toLowerCase(), id: node.id.slice(0, 120),
+                class: (node.getAttribute('class') || '').slice(0, 240),
+                // Fresh profiles contain only this case's public/synthetic fixture text.
+                // Do not collect input values, storage, script text or unrelated surfaces.
+                text: node.closest('#app') && !node.matches('script, style, template, noscript')
+                  ? (node.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120) : '',
+                rect: { x: rect.x, y: rect.y, left: rect.left, top: rect.top,
+                  right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height },
+                clientWidth: node.clientWidth, scrollWidth: node.scrollWidth,
+                outsideViewport, contentOverflow,
+                computed: Object.fromEntries(['display', 'position', 'width', 'minWidth', 'maxWidth',
+                  'whiteSpace', 'overflowWrap', 'overflowX', 'flex'].map((key) => [key, style[key].slice(0, 160)])),
+              });
+            }
+          }
+          node = walker.nextNode();
+        }
+        return {
+          viewport: { width: innerWidth, height: innerHeight },
+          document: { clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth },
+          body: { clientWidth: document.body.clientWidth, scrollWidth: document.body.scrollWidth },
+          elementLimit, rowLimit, inspected, matching, inspectionTruncated: !!node,
+          rowsTruncated: matching > rows.length, rows,
+        };
+      });
+      const { engine, name } = fitContext.get(page);
+      const path = resolve(evidence, `${engine}-${name}-overflow.json`);
+      writeFileSync(path, JSON.stringify({
+        schemaVersion: 1, engine, case: name, label, artifactSha256: identity.artifactSha256,
+        assertionDimensions: dimensions, diagnosticSnapshot: overflow,
+      }, null, 2) + '\n');
+      console.error(`Overflow diagnostics: ${path}`);
+    } catch (error) {
+      console.error(`Could not capture overflow diagnostics for ${label}: ${String(error)}`);
+    }
+  }
   assert(
     dimensions.document <= dimensions.viewport + 1,
     `${label} must fit 320px: ${JSON.stringify(dimensions)}`,
@@ -354,6 +407,7 @@ async function run(engine, name, action) {
     viewport: { width: 320, height: 844 },
   });
   const page = context.pages()[0] || (await context.newPage());
+  fitContext.set(page, { engine, name });
   page.setDefaultTimeout(20000);
   const errors = [],
     external = [];

@@ -51,7 +51,11 @@ async function open(context) {
   });
   p.on('requestfailed', request => failedRequests.push({ url: request.url(), method: request.method(), failure: request.failure(), afterCheck: checks.at(-1)?.name || 'boot' }));
   await p.goto(`${base}/?entry=shelf`);
-  await p.getByRole('button', { name: '字引 find a kanji by shape' }).waitFor();
+  const kanjidex = p.locator('#kanjidex-link');
+  await kanjidex.waitFor();
+  check('dictionary tool retains its visible label', (await kanjidex.innerText()).trim() === '字引');
+  check('dictionary tool retains its accessible name',
+    await kanjidex.and(p.getByRole('button', { name: '字引', exact: true })).count() === 1);
   return p;
 }
 async function query(raw) {
@@ -72,7 +76,7 @@ try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   page = await open(context);
   check('JSON sidecar absent at boot', await page.evaluate(() => !performance.getEntriesByType('resource').some((e) => e.name.endsWith('/skip.json'))));
-  await page.getByRole('button', { name: '字引 find a kanji by shape' }).click();
+  await page.locator('#kanjidex-link').click();
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-hit').first().waitFor();
   check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === '字引' &&
@@ -270,7 +274,7 @@ try {
     return route.continue();
   });
   page = await open(failureContext);
-  await page.getByRole('button', { name: '字引 find a kanji by shape' }).click();
+  await page.locator('#kanjidex-link').click();
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-retry').waitFor();
   check('fresh-context load failure is recoverable', await page.locator('.skip-error').count() === 1);
