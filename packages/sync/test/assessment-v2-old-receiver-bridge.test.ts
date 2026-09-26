@@ -141,7 +141,11 @@ function sitting(id: 'old' | 'companion' | 'new-assisted') {
         ...(assisted && index === 0
           ? {
               reached: true,
-              assistance: { kind: 'explanation', at: Date.parse(START) + 500, response: response(0) },
+              assistance: {
+                kind: 'explanation',
+                at: Date.parse(START) + 500,
+                response: response(0),
+              },
             }
           : {}),
       })),
@@ -338,7 +342,10 @@ describe('C4 bridge: the candidate against the sealed pre-G1 V2 receiver referen
     if (payload.kind !== 'assessment.result/2') throw new Error('Expected the assisted result');
     const [first, ...rest] = payload.items;
     if (!first) throw new Error('Expected a first item');
-    const withFlag = (value: unknown) => ({ ...payload, items: [{ ...first, assisted: value }, ...rest] });
+    const withFlag = (value: unknown) => ({
+      ...payload,
+      items: [{ ...first, assisted: value }, ...rest],
+    });
     // isolation: the specimen differs from the lawful body only in the flag's value
     expect(inputHashOf(withFlag(true))).toBe(assistedResult.payloadSha256);
     expect(parseAssessmentOperationV2(withFlag(true)).kind).toBe('assessment.result/2');
@@ -347,7 +354,11 @@ describe('C4 bridge: the candidate against the sealed pre-G1 V2 receiver referen
       format: 'kairo-sync-operation',
       v: 2,
       scope,
-      actor: { deviceId: 'device:g1-c4-malformed', incarnationId: 'incarnation:g1-c4', sequence: 1 },
+      actor: {
+        deviceId: 'device:g1-c4-malformed',
+        incarnationId: 'incarnation:g1-c4',
+        sequence: 1,
+      },
       predecessor: null,
       dependencies: [],
       schemaEpoch: SYNC_SCHEMA_EPOCH,
@@ -362,7 +373,8 @@ describe('C4 bridge: the candidate against the sealed pre-G1 V2 receiver referen
       payloadSha256: inputHashOf(input.payload),
     };
     expect(
-      new Set([...Object.values(operations()).map((operation) => operation.opId), malformed.opId]).size,
+      new Set([...Object.values(operations()).map((operation) => operation.opId), malformed.opId])
+        .size,
     ).toBe(6);
     const baseline = baselinePlan().next;
     const companionPlan = planReceive(baseline, delivery([companion]));
