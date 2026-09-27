@@ -658,37 +658,101 @@ check('hunt · a release on a hub sun releases the constellation instead of divi
  * touch set while its every move still reached the drag branch, P1).
  * Run inside a dive with the card open: no camera pan, no tide rail, so a
  * raw pixel delta is honest here. */
-await stageCard('particle');
-const stage = await page.evaluate(`(() => {
-  const card = document.getElementById('card');
-  const cr = card && card.classList.contains('open') ? card.getBoundingClientRect() : null;
-  // the tear is (foreign finger − owner finger) × 0.9 horizontally, so the
-  // two fingers must be as far apart as the surface allows for the failure to
-  // be unmistakable against ordinary orbit drift
-  const orb = [...document.querySelectorAll('#drift-layer .word')].map((el) => {
-    const r = el.getBoundingClientRect();
-    return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
-  }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
-    parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
-    (!cr || o.r.bottom < cr.top - 20) && o.el.contains(document.elementFromPoint(o.x, o.y)))
-    .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];   // highest and leftmost
-  return {
-    card: cr ? { x: cr.right - 26, y: cr.top + 20 } : null,   // far corner of the card
-    orb: orb ? { w: orb.el.querySelector('.base')?.textContent ?? '', x: orb.x, y: orb.y } : null,
-  };
-})()`);
-// orbiters keep circling on their own inside a dive, so a raw pixel delta
-// measures orbit, not carry. Compare the held word against the field's own
-// median displacement over the identical window — the way the hunt measured.
+// Orbiters keep circling on their own inside a dive. Keep the same field
+// displacement baseline and compare the held word with its moving peers.
 const fieldPos = `(() => Object.fromEntries([...document.querySelectorAll('#drift-layer .word')]
   .map((el) => {
     const r = el.getBoundingClientRect();
     return [el.querySelector('.base')?.textContent ?? '', [r.left + r.width / 2, r.top + r.height / 2]];
   })))()`;
-if (stage.card && stage.orb) {
-  const p0 = await page.evaluate(fieldPos);
-  await page.evaluate(() => { window.__driftHuntPointerDowns.length = 0; });
+let stage = null;
+let p0 = null;
+let confirmedOwner = null;
+let ownerStagingFailure = 'no owner touch attempted';
+for (let attempt = 1; attempt <= 3; attempt++) {
+  const cardReady = await stageCard('particle');
+  const trace = stagings[stagings.length - 1];
+  const staging = trace.ownerStaging = { attempt, status: 'preparing' };
+  if (!cardReady) {
+    staging.status = ownerStagingFailure = 'card staging failed';
+    break;
+  }
+  // Reset observations, take p0 and aim in one synchronous evaluation. No
+  // page read, screenshot or wait belongs between this snapshot and native
+  // touchStart: the selected body continues orbiting after we return.
+  const snapshot = await page.evaluate(`(() => {
+    window.__driftHuntPointerDowns.length = 0;
+    window.__driftHuntOwnerHit = null;
+    const p0 = ${fieldPos};
+    const card = document.getElementById('card');
+    const cr = card && card.classList.contains('open') ? card.getBoundingClientRect() : null;
+    const words = [...document.querySelectorAll('#drift-layer .word')];
+    // Keep the original highest/leftmost clear orbiter and far card corner.
+    const orb = words.map((el) => {
+      const r = el.getBoundingClientRect();
+      return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
+      parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
+      (!cr || o.r.bottom < cr.top - 20) && o.el.contains(document.elementFromPoint(o.x, o.y)))
+      .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];
+    const corner = cr ? { x: cr.right - 26, y: cr.top + 20 } : null;
+    const stage = {
+      card: corner ? { ...corner, hit: card.contains(document.elementFromPoint(corner.x, corner.y)) } : null,
+      orb: orb ? {
+        w: orb.el.querySelector('.base')?.textContent ?? '', x: orb.x, y: orb.y,
+        rect: { left: orb.r.left, top: orb.r.top, right: orb.r.right, bottom: orb.r.bottom },
+        matchCount: words.filter((el) => el.querySelector('.base')?.textContent === orb.el.querySelector('.base')?.textContent).length,
+      } : null,
+    };
+    if (stage.card?.hit && stage.orb) {
+      // Observe exact DOM ownership at delivery; a duplicate label must not
+      // turn a touch of a different body into a successful owner staging.
+      addEventListener('pointerdown', (event) => {
+        const word = event.target?.closest?.('.word');
+        window.__driftHuntOwnerHit = {
+          id: event.pointerId, type: event.pointerType, isPrimary: event.isPrimary,
+          isTrusted: event.isTrusted, x: event.clientX, y: event.clientY,
+          word: word?.querySelector('.base')?.textContent ?? null,
+          card: !!event.target?.closest?.('#card.open'),
+          sameNode: word === orb.el, at: performance.now(),
+        };
+      }, { capture: true, once: true });
+    }
+    return { stage, p0, aimedAt: performance.now() };
+  })()`);
+  stage = snapshot.stage;
+  p0 = snapshot.p0;
+  staging.snapshot = snapshot;
+  if (!stage.card?.hit || !stage.orb) {
+    staging.status = ownerStagingFailure = 'no hit-owned card/owner staging';
+    break;
+  }
   await TI('touchStart', [{ x: stage.orb.x, y: stage.orb.y, id: 1 }]);
+  const confirmation = await page.evaluate(() => ({
+    hit: window.__driftHuntOwnerHit,
+    downs: window.__driftHuntPointerDowns.slice(),
+    observedAt: performance.now(),
+  }));
+  staging.confirmation = confirmation;
+  const first = confirmation.downs.length === 1 ? confirmation.downs[0] : null;
+  const hit = confirmation.hit;
+  const observedTouch = first?.type === 'touch' && hit?.type === 'touch' &&
+    first.id === hit.id && first.word === hit.word && first.card === hit.card &&
+    hit.isTrusted === true && Math.hypot(first.x - stage.orb.x, first.y - stage.orb.y) < 1;
+  if (observedTouch && hit.sameNode && hit.word === stage.orb.w) {
+    confirmedOwner = hit;
+    staging.status = 'owner-confirmed';
+    break;
+  }
+  await TI('touchCancel', []);
+  const wrongInitialTarget = observedTouch && hit.sameNode === false;
+  staging.status = ownerStagingFailure = wrongInitialTarget
+    ? 'observed wrong initial target' : 'initial owner touch unconfirmed';
+  // Only a proven first-touch miss can re-stage. Missing/ambiguous events,
+  // failed setup and every correctly delivered gesture are terminal here.
+  if (!wrongInitialTarget || attempt === 3) break;
+}
+if (confirmedOwner) {
   await page.waitForTimeout(90);
   await TI('touchStart', [{ x: stage.orb.x, y: stage.orb.y, id: 1 }, { x: stage.card.x, y: stage.card.y, id: 2 }]);
   for (let i = 1; i <= 6; i++) {
@@ -711,7 +775,7 @@ if (stage.card && stage.orb) {
     ? Math.hypot(p1[stage.orb.w][0] - p0[stage.orb.w][0], p1[stage.orb.w][1] - p0[stage.orb.w][1]) : -1;
   const ownerFinger = observedFingers.find((finger) => finger.word === stage.orb.w);
   const cardFinger = observedFingers.find((finger) => finger.card);
-  stagings[stagings.length - 1].fingers = { stage, observedFingers, target, median };
+  stagings[stagings.length - 1].fingers = { stage, observedFingers, target, median, confirmedOwner, p0, p1 };
   check('hunt · a finger the gesture never owned cannot carry a held word',
     ownerFinger && cardFinger && ownerFinger.id !== cardFinger.id && target >= 0 && target - median < 30,
     `held ${target.toFixed(1)}px vs orbiter median ${median.toFixed(1)}px of ${live.length} moving ` +
@@ -719,7 +783,7 @@ if (stage.card && stage.orb) {
     `owner id=${ownerFinger?.id ?? null}, card id=${cardFinger?.id ?? null}`);
 } else {
   check('hunt · a finger the gesture never owned cannot carry a held word', false,
-    `staging failed: card=${!!stage.card} orbiter=${!!stage.orb}`);
+    `staging failed: ${ownerStagingFailure}; card=${!!stage?.card} orbiter=${!!stage?.orb}`);
 }
 
 /* 13 · a finger on the glass is not inactivity — the bloom must outlive the
