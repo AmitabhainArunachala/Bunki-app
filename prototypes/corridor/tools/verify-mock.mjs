@@ -67,7 +67,7 @@ function startServer(rootDir = CORRIDOR_DIR) {
 const results = [];
 let failures = 0;
 function check(name, pass, detail = '') {
-  results.push({ name, pass: !!pass });
+  results.push({ name, pass: !!pass, detail });
   if (!pass) failures += 1;
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
 }
@@ -96,7 +96,7 @@ const PASS_CLAIMS = [
   /(likely to|should|will) pass\b/iu,
   /(?<!whether )you would pass/iu,
 ];
-const DISCLAIMS = [/ここでは分からない/u, /not knowable from here/iu, /cannot predict a N[1-5] result/iu, /合否や習熟度の判定には使わない/u];
+const DISCLAIMS = [/ここでは分からない/u, /not knowable from here/iu, /cannot predict a N[1-5] result/iu, /合否や習熟度の判定には使わない/u, /use this as practice rather than a N[1-5] readiness score/iu];
 
 function verifyPapers() {
   const index = readJson(resolve(MOCK_DIR, 'index.json'));
@@ -217,12 +217,14 @@ async function main() {
   // the door stands on the shelf, beside the lessons
   await page.waitForSelector('#mock-link', { timeout: 8000 });
   await page.click('#mock-link');
+  await page.waitForSelector('.assessment-room #exam-legacy');
+  await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
     return { rows: rows.length, pending: document.querySelectorAll('.mock-pending').length };
   })()`);
-  check('the room lists all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
+  check('earlier exercises retain all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time
   await page.click('[data-mock-set="n5-01"]');
@@ -249,15 +251,49 @@ async function main() {
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   await page.click('#mock-link');
   await page.waitForSelector('#mock-next', { timeout: 15000 });
-  const noList = await page.evaluate(`document.querySelectorAll('[data-mock-set]').length`);
-  check('the door re-enters the open paper, not the list', noList === 0);
+  // The running paper also carries data-mock-set for identity; only buttons are catalog doors.
+  const reentry = await page.evaluate(() => {
+    const inspect = (node) => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return {
+        tag: node.tagName, id: node.id, className: node.className,
+        setId: node.getAttribute('data-mock-set'),
+        visible: rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.visibility !== 'collapse',
+      };
+    };
+    return {
+      matches: [...document.querySelectorAll('[data-mock-set]')].map(inspect),
+      catalogButtons: [...document.querySelectorAll('#app > main button[data-mock-set]')].map(inspect),
+      activeMains: [...document.querySelectorAll('#app > main[data-mock-set]')].map(inspect),
+    };
+  });
+  reentry.expectedSetId = selected?.run.setId;
+  reentry.nextVisible = await page.locator('#app > main #mock-next').isVisible();
+  check('the door re-enters the open paper, not the list',
+    reentry.expectedSetId === 'n5-01' && reentry.catalogButtons.length === 0 &&
+      reentry.activeMains.length === 1 && reentry.activeMains[0].setId === reentry.expectedSetId &&
+      reentry.activeMains[0].visible && reentry.nextVisible,
+    JSON.stringify(reentry));
   const resumedSelection = selectPractice((await readAppRecord(page)).assessmentLibrary);
   const quarantined = () => page.evaluate(() => {
     const alert = document.getElementById('store-alert');
     return !!(alert && !alert.hidden && alert.textContent);
   });
-  const resumed = { ix: resumedSelection?.run.ix, clockStatus: resumedSelection?.clockStatus, quarantined: await quarantined() };
-  check('a reload resumes at the same pinned question with unknown process downtime', resumed.ix === 1 && resumed.clockStatus === 'unverified' && resumed.quarantined === false, JSON.stringify(resumed));
+  const resumed = {
+    ix: resumedSelection?.run.ix, setId: resumedSelection?.run.setId,
+    attemptId: resumedSelection?.attemptId, formRevisionId: resumedSelection?.formRevisionId,
+    itemId: resumedSelection?.flat[resumedSelection.run.ix]?.itemId,
+    itemVersionId: resumedSelection?.flat[resumedSelection.run.ix]?.itemVersionId,
+    firstAnswer: resumedSelection?.run.answers[0],
+    clockStatus: resumedSelection?.clockStatus, quarantined: await quarantined(),
+  };
+  check('a reload resumes at the same pinned question with unknown process downtime',
+    resumed.ix === 1 && resumed.setId === 'n5-01' && resumed.attemptId === selected?.attemptId &&
+      resumed.formRevisionId === selected?.formRevisionId && resumed.itemId === selected?.flat[1]?.itemId &&
+      resumed.itemVersionId === selected?.flat[1]?.itemVersionId && resumed.firstAnswer === 0 &&
+      resumed.clockStatus === 'unverified' && resumed.quarantined === false,
+    JSON.stringify(resumed));
 
   const beforeRecord = await readAppRecord(page);
   const before = { taken: (beforeRecord.taken || []).length, srs: Object.keys(beforeRecord.srs || {}).length, revlog: (beforeRecord.revlog || []).length };
@@ -328,6 +364,7 @@ async function main() {
   check('full submitted answers cross a reload whole without measured legacy grades', survived.rows === 0 && survived.responses === 18 && survived.done === true && survived.quarantined === false, JSON.stringify(survived));
   await page.click('#mock-link');
   await page.click('#mock-done');
+  await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-history]');
   const historyRecord = await waitForAppRecord(page, (record) => record.assessmentLibrary?.activeAttemptId === null,
     { description: 'cleared practice pointer with retained history' });
@@ -354,6 +391,7 @@ async function main() {
   await lonely.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await lonely.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   await lonely.click('#mock-link');
+  await lonely.click('#exam-legacy');
   await lonely.waitForSelector('#mock-retry', { timeout: 10000 });
   const settledAt = attempts;
   await lonely.waitForTimeout(1500);

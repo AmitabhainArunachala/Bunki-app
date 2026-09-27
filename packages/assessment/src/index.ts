@@ -6,3 +6,5 @@ export * from './content.ts';
 export * from './editorial.ts';
 export * from './attempt.ts';
 export * from './legacy.ts';
+export * from './attempt-v2.ts';
+export * from './editorial-v2.ts';

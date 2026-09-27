@@ -1,7 +1,9 @@
 # 収録の声 — voice licences
 
-Generated 2026-08-20 on the build machine (no cloud API), operator-picked
-roster from an 11-candidate shootout. All synthesis engines and voice
+Generated 2026-08-20 on the build machine (no cloud API). The roster is
+interim and was NOT chosen by the operator: the planned 11-candidate shootout
+never ran (docs/build-evidence/tenohira/RUN_STATE.md), and on 2026-09-19 he
+said 小春音アミ is not the voice. A real audition decides the roster. All synthesis engines and voice
 models are free with attribution; this file is that attribution. The
 audio pool is licence-separated from the content pools per the
 corridor's rights discipline.

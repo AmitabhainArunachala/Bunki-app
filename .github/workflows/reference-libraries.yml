@@ -55,7 +55,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # verify-kagami-freshness walks chromium AND webkit and asserts both results;
+      # installing chromium alone left it one result short on every run (attempts 1-6 on PR #96).
+      - run: npx playwright install --with-deps chromium webkit
       - name: Prepare one canonical artifact for every check
         run: |
           echo "KAIRO_SITE_DIR=$RUNNER_TEMP/reference-site" >> "$GITHUB_ENV"

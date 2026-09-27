@@ -559,9 +559,16 @@ async function nativeDepartureCase(browser, engine, mode) {
     if (delayed) {
       assert.deepEqual(bodyPaths(), [], 'The native first prefetch timer is still pending');
       observe('reload-start');
-      await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => document.body.dataset.ready === '1');
-      assert.notEqual(await page.evaluate(() => window.__articleDepartureProbe.docId), docId);
+      await Promise.all([
+        page.waitForResponse(
+          (response) => response.url() === origin + target && response.status() === 200,
+        ),
+        (async () => {
+          await page.reload({ waitUntil: 'domcontentloaded' });
+          await page.waitForFunction(() => document.body.dataset.ready === '1');
+          assert.notEqual(await page.evaluate(() => window.__articleDepartureProbe.docId), docId);
+        })(),
+      ]);
       await page.waitForLoadState('networkidle');
     } else {
       const limit = Date.now() + 10000;
@@ -922,7 +929,12 @@ try {
             );
             row.recordPreserved = true;
             if (mode !== 'real-pagehide-close') {
-              await page.evaluate(() => window.__articlePrefetchProbe.releaseRestart());
+              await Promise.all([
+                page.waitForResponse(
+                  (response) => response.url() === origin + target && response.status() === 200,
+                ),
+                page.evaluate(() => window.__articlePrefetchProbe.releaseRestart()),
+              ]);
               await page.waitForLoadState('networkidle');
               assert.equal(
                 targetRequests().length,

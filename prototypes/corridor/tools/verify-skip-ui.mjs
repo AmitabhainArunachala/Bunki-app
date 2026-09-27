@@ -51,7 +51,10 @@ async function open(context) {
   });
   p.on('requestfailed', request => failedRequests.push({ url: request.url(), method: request.method(), failure: request.failure(), afterCheck: checks.at(-1)?.name || 'boot' }));
   await p.goto(`${base}/?entry=shelf`);
-  await p.getByRole('button', { name: '字引 find a kanji by shape' }).waitFor();
+  const kanjidex = p.locator('#kanjidex-link');
+  await kanjidex.waitFor();
+  check('dictionary tool includes its label in the accessible name',
+    await kanjidex.and(p.getByRole('button', { name: /^字引/u })).count() === 1);
   return p;
 }
 async function query(raw) {
@@ -72,10 +75,12 @@ try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   page = await open(context);
   check('JSON sidecar absent at boot', await page.evaluate(() => !performance.getEntriesByType('resource').some((e) => e.name.endsWith('/skip.json'))));
-  await page.getByRole('button', { name: '字引 find a kanji by shape' }).click();
+  await page.locator('#kanjidex-link').click();
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-hit').first().waitFor();
-  check('lens preserves heading and old lenses', await page.locator('h1').innerText() === '字引' && await page.locator('.kdx-lens').count() === 6);
+  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === '字引' &&
+    JSON.stringify(await page.locator('.kdx-lens .l-ja').allTextContents()) ===
+      JSON.stringify(['部品', 'SKIP', '手書き', '音訓', '意味', '画数', '部首', '頻度', '漢検', 'Kodansha']));
   await page.locator('.skip-hit').first().click();
   await page.locator('#sheet-search').click();
   await query('１－３－８');
@@ -268,7 +273,7 @@ try {
     return route.continue();
   });
   page = await open(failureContext);
-  await page.getByRole('button', { name: '字引 find a kanji by shape' }).click();
+  await page.locator('#kanjidex-link').click();
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-retry').waitFor();
   check('fresh-context load failure is recoverable', await page.locator('.skip-error').count() === 1);

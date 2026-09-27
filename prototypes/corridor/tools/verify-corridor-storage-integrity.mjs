@@ -3,7 +3,7 @@
  * Native durability, ownership and browser UI acceptance live in the mandatory
  * RecordApp, record-live, learning-record and drift-record browser suites. */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, webcrypto } from 'node:crypto';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
@@ -192,7 +192,7 @@ function fakeDocument() {
 const legacySchemaBlock = between("const STORE_KEY = 'kairo-corridor-v1';", '// Only acknowledged changed roots') + '\n' + definitions('storeEnvelope');
 const document = fakeDocument();
 const storeContext = vm.createContext({ S: state(), document, localStorage: storage(),
-  tx: (_ja, en) => en, window: {}, recordWritable: () => false });
+  tx: (_ja, en) => en, window: {}, crypto: webcrypto, recordWritable: () => false });
 vm.runInContext(legacySchemaBlock + '\n;globalThis.__storeApi = { loadStore, hydrateStore, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };', storeContext);
 const storeApi = storeContext.__storeApi;
 
@@ -216,7 +216,7 @@ verified('read-exception-quarantine-and-global-alert', () => {
 });
 
 verified('empty-malformed-future-bytes-quarantine', () => {
-  for (const raw of ['', '{broken', '{"v":2,"taken":[]}']) {
+  for (const raw of ['', '{broken', '{"v":3,"taken":[]}']) {
     storeContext.S = state();
     storeContext.localStorage = storage(raw);
     storeApi.loadStore();
@@ -717,6 +717,7 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
   );
   const dueContext = vm.createContext({
     S: {},
+    crypto: webcrypto,
     document: fakeDocument(),
     localStorage: storage(),
     tx: (_ja, en) => en,
@@ -949,11 +950,12 @@ function freezeJson(value) {
   }
   return value;
 }
-function actionContext() {
+function actionContext({ dict = {}, dictionaryIndex = null, rows = [] } = {}) {
   const queued = [];
   const context = vm.createContext({
     S: state({ taken: [], obslog: [], deepWords: {}, readDone: {} }),
-    D: { dict: {} },
+    // D23: a core spelling and a cached index row are opt-in; the older captures keep their exact setup
+    D: { dict, ...(dictionaryIndex ? { dictionaryIndex, dictionaryBySeq: new Map(rows.map((row) => [String(row[0]), row])) } : {}) },
     NODE_KIND: { word: ['語', 'word'] },
     lookup: () => ({ r: 'うみ', m: ['sea'], seq: 'synthetic-deep-entry' }),
     commitStorePatch: (produce) => new Promise((settle) => queued.push({ produce, settle })),
@@ -967,7 +969,11 @@ function actionContext() {
   };
   seal();
   vm.runInContext(definitions('readDonePending', 'commitReadDone', 'captureStorePatch', 'commitCapture',
-    'setOwnRecordValue', 'owns', 'obsLog', 'srsParamNotePending', 'noteIgnoredSrsParams'), context);
+    'setOwnRecordValue', 'owns', 'obsLog', 'srsParamNotePending', 'noteIgnoredSrsParams',
+    // D23: the word capture plan and what it reads (the saved answer and the explicit-cue validation)
+    'plainRecord', 'nonEmptyString', 'srsKey', 'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity',
+    'sameWordIdentity', 'wordStudied', 'wordCardIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'dictionaryRowBySeq',
+    'readerReadingFits', 'readerSummaryFor', 'dictionaryReadingSummaries', 'kataToHira', 'KATA_TO_HIRA_OFFSET'), context);
   return { context, queued, acknowledge(save = true) {
     const next = queued.shift(); assert(next, 'An actual application action queued a save');
     const patch = next.produce(context.S);
@@ -1012,6 +1018,58 @@ await verifiedAsync('deep-capture-context-and-promotion-cross-one-acknowledged-b
   const before = queued.length;
   c.writable = false; assert.equal(await c.commitCapture(node, '海', 114), false); assert.equal(queued.length, before, 'An unwritable record queues no capture');
   c.writable = true;
+});
+
+await verifiedAsync('d23-explicit-core-capture-and-its-answer-cross-one-acknowledged-boundary', async () => {
+  // the served index row of 上手 1580400, cells 0–11 (test-word-saved-answer.mjs F0 pins it against the index)
+  const row = ['1580400', '上手', 'うわて', 'upper part', ['上手'], ['うわて', 'かみて'],
+    ['upper part', 'upper stream', 'upper course of a river', "right side of the stage (audience's or camera's POV)", "stage left (actor's POV)",
+      'skillful (in comparisons)', 'dexterity', "over-arm grip on opponent's belt"],
+    ['upper part', 'upper stream', 'upper course of a river', 'right side of the stage', 'stage left', 'skillful', 'dexterity',
+      "over-arm grip on opponent's belt"], 0, [[0, 0], [0, 0]], [[0, 0], [1, 0], [1, 0], [1, 0], [1, 0], [0, 0], [0, 0], [0, 0]], [0, 0]];
+  const source = { pin: '3.6.2+20260803141815', jmdict: { sha256: '1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c' } };
+  const { context: c, queued, acknowledge } = actionContext({ dict: { 上手: { r: 'じょうず', m: ['skillful'] } }, dictionaryIndex: { source }, rows: [row] });
+  const node = { t: 'word', id: '上手', seq: '1580400', reading: 'うわて', matchedGloss: 'upper part' };
+  let pending = c.commitCapture(node, '上手', 200);
+  assert.equal(queued.length, 1); assert.equal(c.S.taken.length, 0); assert.equal(Object.keys(c.S.deepWords).length, 0);
+  acknowledge(false); assert.equal(await pending, false); assert.equal(c.S.taken.length, 0);
+  pending = c.commitCapture(node, '上手', 201); const patch = acknowledge(); assert.equal(await pending, true);
+  assert.deepEqual(Object.keys(patch).sort(), ['deepWords', 'taken'], 'the row and its answer publish in one write');
+  assert.equal(c.S.taken[0].entrySeq, '1580400'); assert.equal(c.S.taken[0].cueReading, 'うわて');
+  assert.equal(c.S.deepWords['上手'].m[0], 'upper part'); assert.equal(c.S.deepWords['上手'].selection.head, '上手');
+  assert.deepEqual(clone(c.S.srs), {}); assert.deepEqual(clone(c.S.revlog), []);
+  // another entry of this spelling (the core record) refuses in the producer and changes no root
+  const roots = clone({ taken: c.S.taken, deepWords: c.S.deepWords, srs: c.S.srs, revlog: c.S.revlog });
+  assert.throws(() => c.captureStorePatch(c.S, { t: 'word', id: '上手' }, '上手', 202), (error) => error.code === 'word-identity-conflict');
+  assert.deepEqual(clone({ taken: c.S.taken, deepWords: c.S.deepWords, srs: c.S.srs, revlog: c.S.revlog }), roots);
+});
+
+verified('d23-lawful-legacy-head-src-and-a-selection-snapshot-round-trip-exactly', () => {
+  // F07, built from literal JSON (an own "__proto__" is data here, never a prototype setter). The old
+  // lawful head:17 and src:'third-party-note' stay opaque bytes; the D23 snapshot carries its
+  // validated provenance only inside its versioned selection object.
+  const legacy = JSON.parse('{"futureRecord":{"retain":[true,0,null]},' +
+    '"taken":[{"t":"word","id":"捲る","label":"捲る","entrySeq":"1257810","cueReading":"めくる","ts":10,"futureTaken":{"note":"keep"}},' +
+    '{"t":"word","id":"上手","label":"上手","entrySeq":"1580400","cueReading":"うわて","ts":11,"started":11}],' +
+    '"deepWords":{"捲る":{"seq":"1257810","r":"めくる","m":["to turn over"],"head":17,"src":"third-party-note",' +
+    '"futureSnapshot":{"retain":true},"__proto__":{"retainOwnData":true}},' +
+    '"上手":{"r":"うわて","m":["upper part"],"seq":"1580400","k":["上","手"],"selection":{"v":1,"seq":"1580400","r":"うわて","head":"上手",' +
+    '"src":{"release":"3.6.2+20260803141815","archiveSha256":"1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c"}}}},' +
+    '"lists":{"__proto__":[{"t":"word","id":"捲る","futureListItem":true}],"constructor":[]}}');
+  const envelope = { v: 1, ...legacy };
+  assert(storeApi.validStoreEnvelope(clone(envelope)), 'a lawful pre-D23 record and a D23 snapshot are accepted as they are');
+  storeContext.S = state();
+  storeContext.localStorage = storage(JSON.stringify(envelope));
+  storeApi.loadStore();
+  assert.equal(storeContext.S.storeReadOnly, false);
+  const encoded = JSON.parse(JSON.stringify(storeApi.storeEnvelope(storeContext.S)));
+  for (const root of ['taken', 'deepWords', 'lists', 'futureRecord']) {
+    assert.equal(JSON.stringify(encoded[root]), JSON.stringify(legacy[root]), `${root}: not a byte dropped on the round trip`);
+  }
+  assert(Object.hasOwn(storeContext.S.deepWords['捲る'], '__proto__'), 'an own __proto__ stays data');
+  assert.equal(Object.getPrototypeOf(storeContext.S.deepWords['捲る']).retainOwnData, undefined, 'no prototype was set');
+  assert.equal(Object.hasOwn(storeContext.S.taken[0], 'started'), false, 'nothing fabricates a promotion mark');
+  assert.equal(storeContext.localStorage.writes, 0);
 });
 
 await verifiedAsync('observation-reducers-append-latest-with-no-pre-acknowledgment-publication', async () => {
@@ -1071,6 +1129,7 @@ await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-per
       window: { __TSFSRS__: fsrs }, pin: clone(PIN), S: { srsPrefs: fitted === undefined ? {} : { fsrs: clone(fitted) } },
       srsParamsProblem: storeApi.srsParamsProblem, noteIgnoredSrsParams: (reason) => notes.push(reason),
     });
+    vm.runInContext(definitions('pinnedSchedulerInput'), context);
     await vm.runInContext('(async () => { ' + init + ' })()', context);
     assert(context.scheduler); assert.equal(context.srsParams.enable_fuzz, false);
     assert.equal(context.srsParams.request_retention, PIN.requestRetention);
