@@ -12762,7 +12762,7 @@ function renderTeacherDoor(container, getNode, reader = false) {
     button.addEventListener('click', async () => {
       const selected = typeof getNode === 'function' ? getNode() : getNode;
       if (!selected || button.disabled) return;
-      const epoch = recordEpoch;
+      const epoch = recordEpoch, currentSurface = retainActionSurface(button);
       const selectionSerial = discuss ? ++teacherContextSelectionSerial : null;
       for (const control of actions.children) control.disabled = true;
       try {
@@ -12770,12 +12770,12 @@ function renderTeacherDoor(container, getNode, reader = false) {
         if (!recordWritable(epoch)) return;
         const saved = await commitStorePatch((latest) => {
           const selectedRoot = teacherContextModule.selectTeacherContext(latest.teacherContexts, context);
-          const activate = discuss && button.isConnected && selectionSerial === teacherContextSelectionSerial;
+          const activate = discuss && currentSurface() && selectionSerial === teacherContextSelectionSerial;
           return { teacherContexts: activate ? selectedRoot : teacherContextModule.activateTeacherContext(
             selectedRoot, latest.teacherContexts?.activeRef || null) };
         });
         if (!saved || !recordWritable(epoch)) return;
-        if (!button.isConnected) return;
+        if (!currentSurface()) return;
         if (discuss && selectionSerial === teacherContextSelectionSerial) {
           keepScroll(); stopReadAloud(); S.stack = []; S.captureOpen = false;
           S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
