@@ -418,6 +418,19 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
       view: typeof S === 'undefined' ? null : S.view,
       error: typeof S === 'undefined' ? null : S.storeError, notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice,
       writable: typeof recordWritable === 'function' && recordWritable(),
+      recordState: (() => {
+        try {
+          if (typeof recordApp === 'undefined' || !recordApp) return null;
+          const current = recordApp.current();
+          return { status: current.status, reason: current.reason ?? null,
+            snapshotRevision: current.snapshot?.revision ?? null,
+            lastCommittedRevision: current.lastCommitted?.revision ?? null, pending: recordApp.pending };
+        } catch (error) { return { captureError: String(error).slice(0, 500) }; }
+      })(),
+      reviewState: typeof S === 'undefined' || !S.review ? null : {
+        pending: !!S.review.pending, questionError: S.review.questionError || null,
+        questionAttemptId: S.review.questionAttemptId || null, ix: S.review.ix,
+        revealed: !!S.review.revealed, declared: S.review.declared ?? null },
       gradeDiagnostic: JSON.parse(JSON.stringify(window.__assessmentGradeDiagnostic || null)),
       deletionSetup: window.__assessmentDeletionSetup || null })).catch(() => null);
     failures.push({ engine, name, error: String(error), pageErrors, lifecycle, state });
