@@ -528,6 +528,12 @@ try {
         `question-card-deleted-result-blocks-fresh-grade${invocation === 'direct' ? '-direct-control' : ''}`, async page => {
         await finishQuestionFixture(page); await checkQuestionAnswer(page);
         const before = await page.evaluate(async diagnostic => {
+          const retained = JSON.stringify(S.assessmentQuestionPractice), review = S.review;
+          // Settle the real app queue before this fixture's out-of-band controller commit.
+          if (await reconcileAssessmentResults() !== true || !review || S.review !== review || review.pending ||
+              recordApp.pending || !recordWritable()) throw new Error('Question deletion fixture did not settle');
+          if (JSON.stringify(S.assessmentQuestionPractice) !== retained)
+            throw new Error('Question deletion settlement changed retained practice');
           const selected = currentAssessmentV2();
           const request = { changeId: 'fixture:question-delete', binding: recordInstallation.policy.binding,
             occurredAt: new Date().toISOString(), mutations: [],
@@ -553,9 +559,13 @@ try {
           if (result.status !== 'active') throw new Error(result.reason);
           if (!result.receipt) throw new Error('Fixture deletion requires a durable receipt');
           // Leave published UI deliberately stale: the queued grade must use its fresh storage snapshot.
+          if (S.review !== review || review.pending || recordApp.pending || !recordWritable() ||
+              currentAssessmentV2()?.attempt.attemptId !== selected.attempt.attemptId ||
+              JSON.stringify(S.assessmentQuestionPractice) !== retained)
+            throw new Error('Question deletion fixture changed the stale review');
           const durable = diagnostic ? await recordController.snapshot() : null;
           if (diagnostic) window.__installAssessmentGradeDiagnostic();
-          return { retained: JSON.stringify(S.assessmentQuestionPractice), deletion: result, setup,
+          return { retained, deletion: result, setup,
             durable, review: diagnostic ? window.__assessmentGradeDiagnostic.review() : null };
         }, gradeDiagnostics);
         deletionSetups.push({ engine, invocation, ...before.setup, receipt: before.deletion.receipt });
