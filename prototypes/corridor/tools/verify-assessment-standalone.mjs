@@ -67,13 +67,15 @@ for (const [path, value] of Object.entries({ 'catalog.json': { schema: 'kairo-as
   fixture[`data/assessment/${path}`] = { mimeType: 'application/json', base64: Buffer.from(JSON.stringify(value)).toString('base64') };
 fixture['data/assessment/audio/fixture.wav'] = { mimeType: 'audio/wav', base64: wav.toString('base64') };
 const exposed = ['S', 'recordApp', 'recordWritable', 'loadAssessmentCatalog', 'startAssessmentRoom', 'applyAssessmentV2',
-  'currentAssessmentV2', 'assessmentMediaBytes', 'render', 'assessmentV2Notice'];
+  'currentAssessmentV2', 'assessmentMediaBytes', 'render', 'assessmentV2Notice', 'assessmentV2Pending'];
 const instrument = html => {
   const cut = html.lastIndexOf('</script>');
   return html.slice(0, cut) + '\n' + exposed.map(name => `Object.defineProperty(window,${JSON.stringify(name)},{get:()=>${name}});`).join('\n') + html.slice(cut);
 };
 const synthetic = instrument(original.replace(packPattern, (_all, open, _json, close) => open + JSON.stringify(fixture) + close));
 writeFileSync(resolve(evidence, 'synthetic-standalone.html'), synthetic);
+// Observation only: no command wrapper, extra action, retry, or changed predicate.
+const clickDiagnostics = process.env.KAIRO_ASSESSMENT_CLICK_DIAGNOSTICS === '1';
 const results = [], failures = [];
 const engines = process.env.KAIRO_BROWSER === 'all' ? ['chromium', 'webkit'] : [process.env.KAIRO_BROWSER || 'chromium'];
 for (const engine of engines) for (const variant of ['public', 'synthetic']) {
@@ -132,9 +134,48 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
       assert.equal(publicWritten.started, true, `start failed: ${JSON.stringify(publicWritten)}`); assert.equal(publicWritten.formSha256, publicWrittenEntry.formSha256);
       assert.equal(publicWritten.questionCount, 12); assert.equal(publicWritten.responseKind, 'selected');
       assert.equal(publicWritten.editorial, 'ai-reviewed-practice');
+      if (clickDiagnostics) await page.evaluate(expected => {
+        const events = [], nodes = new WeakMap(); let nextNode = 0, droppedEvents = 0;
+        const nodeId = node => {
+          if (!node) return null;
+          if (!nodes.has(node)) nodes.set(node, ++nextNode);
+          return nodes.get(node);
+        };
+        const describe = node => node instanceof Element ? { node: nodeId(node), tag: node.tagName,
+          id: node.id || null, optionId: node.getAttribute('data-exam-option'),
+          disabled: 'disabled' in node ? node.disabled : null, connected: node.isConnected } : null;
+        const currentButton = () => document.querySelector(`[data-exam-option="${CSS.escape(expected.optionId)}"]`);
+        const probe = () => {
+          const current = recordApp.current(), library = S.assessmentLibraryV2;
+          const attempt = library?.attempts.find(row => row.attemptId === library.activeAttemptId);
+          const answer = attempt?.answers.find(row => row.item.id === expected.itemId);
+          return { view: S.view, writable: recordWritable(), recordPending: recordApp.pending,
+            recordStatus: current.status, revision: current.snapshot?.revision ?? null,
+            assessmentPending: assessmentV2Pending, visibility: document.visibilityState,
+            selected: { activeAttemptId: library?.activeAttemptId ?? null, attemptId: attempt?.attemptId ?? null,
+              revisionId: attempt?.revisionId ?? null, itemId: attempt?.cursor?.itemId ?? null,
+              response: answer?.response ? { ...answer.response } : null },
+            activeElement: describe(document.activeElement), button: describe(currentButton()) };
+        };
+        const diagnostic = window.__assessmentClickDiagnostic = { expected, before: probe(), events };
+        for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'])
+          document.addEventListener(type, event => {
+            if (events.length === 24) { droppedEvents++; return; }
+            const target = event.target instanceof Element ? event.target.closest('[data-exam-option]') : null;
+            events.push({ type, at: event.timeStamp, trusted: event.isTrusted,
+              mouseButton: event.button, pointerId: event.pointerId ?? null,
+              target: describe(target), expectedNode: nodeId(currentButton()),
+              pathIncludesExpected: event.composedPath().includes(currentButton()), ...probe() });
+          }, { capture: true, passive: true });
+        diagnostic.capture = () => ({ expected, before: diagnostic.before, events,
+          eventLimit: 24, droppedEvents, after: probe() });
+      }, publicWritten);
+      stage = 'public-answer-click';
       await page.locator(`[data-exam-option="${publicWritten.optionId}"]`).click();
+      stage = 'public-answer-persistence';
       await page.waitForFunction(({ itemId, optionId }) =>
         currentAssessmentV2()?.attempt.answers.find(row => row.item.id === itemId)?.response?.optionId === optionId, publicWritten);
+      if (clickDiagnostics) publicWritten.clickDiagnostic = await page.evaluate(() => window.__assessmentClickDiagnostic.capture());
       const durableBefore = await page.evaluate(async () => {
         const state = await recordApp.snapshot();
         return state.snapshot.record.assessmentLibraryV2;
@@ -178,9 +219,25 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
     results.push({ engine, variant, passes: true, publicWritten, blockedExternalRequests: requests });
     console.log(`PASS ${engine}/${variant} standalone assessment`);
   } catch (error) {
-    const state = await page.evaluate(() => ({ text: document.body.innerText.slice(0, 1500),
-      storeError: typeof S === 'undefined' ? null : S.storeError,
-      recordState: typeof recordApp === 'undefined' ? null : recordApp?.current()?.status })).catch(() => null);
+    const state = await page.evaluate(expected => {
+      const current = typeof recordApp === 'undefined' ? null : recordApp?.current();
+      const selected = typeof currentAssessmentV2 === 'function' ? currentAssessmentV2() : null;
+      return { text: document.body.innerText.slice(0, 1500),
+        storeError: typeof S === 'undefined' ? null : S.storeError,
+        recordState: current?.status ?? null, recordReason: current?.reason ?? null,
+        revision: current?.snapshot?.revision ?? null, recordPending: typeof recordApp === 'undefined' ? null : recordApp?.pending,
+        writable: typeof recordWritable === 'function' ? recordWritable() : null,
+        assessmentPending: typeof assessmentV2Pending === 'undefined' ? null : assessmentV2Pending,
+        view: typeof S === 'undefined' ? null : S.view, visibility: document.visibilityState,
+        notice: typeof assessmentV2Notice === 'undefined' ? null : assessmentV2Notice,
+        roomNotice: document.querySelector('.exam-notice')?.textContent ?? null,
+        selected: selected && { attemptId: selected.attempt.attemptId, revisionId: selected.attempt.revisionId,
+          status: selected.attempt.status, cursor: selected.attempt.cursor, clock: selected.attempt.clock,
+          answer: selected.attempt.answers.find(row => row.item.id === expected?.itemId) ?? null },
+        options: [...document.querySelectorAll('[data-exam-option]')].slice(0, 16).map(node => ({
+          optionId: node.dataset.examOption, disabled: node.disabled, pressed: node.getAttribute('aria-pressed') })),
+        clickDiagnostic: window.__assessmentClickDiagnostic?.capture() ?? null };
+    }, publicWritten).catch(error => ({ captureError: String(error) }));
     failures.push({ engine, variant, stage, error: String(error), stack: String(error?.stack || '').slice(0, 2000), publicWritten, errors, requests, state });
     console.error(`FAIL ${engine}/${variant} at ${stage}: ${error}`);
     await page.screenshot({ path: resolve(evidence, `${engine}-${variant}-failure.png`), fullPage: true }).catch(() => {});
@@ -189,6 +246,7 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
 mkdirSync(evidence, { recursive: true });
 writeFileSync(resolve(evidence, 'assessment-standalone.json'), JSON.stringify({ format: 'kairo-assessment-standalone-verification', v: 1,
   artifactSha256: identity.artifactSha256, originalSha256: sha(original), syntheticSha256: sha(synthetic), exposed, build,
+  clickDiagnostics,
   syntheticAssets: Object.entries(fixture).map(([path, value]) => ({ path, sha256: sha(Buffer.from(value.base64, 'base64')) })),
   results, failures, limits: ['Synthetic ready bank and test-only export shim are separately hashed.', 'All external subresource requests are blocked; no live provider or editorial approval.'] }, null, 2) + '\n');
 console.log(`Standalone assessment: ${results.length}/${results.length + failures.length} passed. ${evidence}`);

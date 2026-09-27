@@ -929,7 +929,12 @@ try {
             );
             row.recordPreserved = true;
             if (mode !== 'real-pagehide-close') {
-              await page.evaluate(() => window.__articlePrefetchProbe.releaseRestart());
+              await Promise.all([
+                page.waitForResponse(
+                  (response) => response.url() === origin + target && response.status() === 200,
+                ),
+                page.evaluate(() => window.__articlePrefetchProbe.releaseRestart()),
+              ]);
               await page.waitForLoadState('networkidle');
               assert.equal(
                 targetRequests().length,

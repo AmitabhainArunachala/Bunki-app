@@ -109,7 +109,9 @@ async function setRevealOnTouch(page) {
 
 async function glyphBottom(page, index) {
   return page.locator('#reader .tok.content').nth(index).evaluate((node) => {
-    const glyph = node.querySelector('ruby') ?? node;
+    // English is a sibling row; the whole button is not a glyph anchor.
+    const glyph = node.querySelector('ruby') ?? node.querySelector(':scope > .tok-word');
+    if (!glyph) throw new Error('Reader token is missing its glyph row');
     return glyph.getBoundingClientRect().bottom;
   });
 }
