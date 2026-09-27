@@ -1428,6 +1428,8 @@ async function main() {
   await open('?entry=shelf');
   await tap(page, '#kanjidex-link');
   await page.waitForSelector('.kdx-row', { timeout: 5000 });
+  // The entrance translation can round a 44px box below 44; measure the settled grid.
+  await waitForFiniteMotion(page, '#kdx-partgrid');
   const kdx = await page.evaluate(`(() => {
     const chips = [...document.querySelectorAll('.kdx-chip')].filter((c) => c.offsetParent !== null);
     const rects = chips.map((c) => c.getBoundingClientRect());
