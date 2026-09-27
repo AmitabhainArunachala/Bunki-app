@@ -1471,6 +1471,14 @@ try {
       assert.equal(reviewed.revlog.at(-1)[1], `question:${question.id}`);
       assert.equal(Object.keys(reviewed.srs).length, 1);
       const retained = JSON.stringify(reviewed.assessmentLibraryV2);
+      // Good starts this question's next source load after the native grade commits.
+      // Reload the media-free card only after its new public question face is ready.
+      assert.deepEqual(plan.media, [], 'This source-readiness barrier assumes a media-free card.');
+      const repeatedQuestion = page.locator(
+        `.review-face .assessment-question-review[data-question-plan=${JSON.stringify(plan.id)}]`,
+      );
+      await repeatedQuestion.locator('#assessment-question-check').waitFor();
+      assert.equal(await repeatedQuestion.locator('#assessment-question-status').textContent(), '');
       await page.reload();
       await page.waitForFunction(() => document.body.dataset.ready === '1');
       const reloaded = await disk(page);
