@@ -226,7 +226,13 @@ try{
    assert.ok(storedForm);assert.equal(storedForm.sha256,savedMockAttempt.form.sha256);
    assert.equal(savedMockAttempt.editorialAtStart.status,'unreviewed');
    return `Deck remains ${s.taken.length}; ${savedMockAttempt.answers.length} responses and exact form retained in ${submittedAttempts(s).length} submitted practice attempt`;
-  });await click('#mock-done');await click('#back');
+  });await click('#mock-done');
+  const dismissed=await waitForAppRecord(page,record=>record.assessmentLibrary?.activeAttemptId===null,
+   {description:'dismissed submitted practice attempt'});
+  assert.deepEqual(submittedAttempts(dismissed).find(attempt=>attempt.attemptId===pinned.attemptId),
+   savedMockAttempt,'Done preserves the exact submitted practice attempt');
+  await page.locator('main button[data-mock-set]').first().waitFor();
+  await click('#back');await page.locator('#levels-link').waitFor();
  });
  await segment('E10-reference',async()=>{
   const before=await state();await click('#levels-link');await page.locator('#reference-library').waitFor();await shot('reference-overview','Reference includes complete bundled level collections independently of lessons');
