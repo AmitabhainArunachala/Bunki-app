@@ -1,5 +1,9 @@
 /** Single-file assessment packaging, actual public written-test persistence,
  * and a separately hashed synthetic bank for native audio delivery. */
+/* The instrumented page exposes these globals for page.evaluate callbacks. */
+/* global S, recordApp, recordWritable, loadAssessmentCatalog, startAssessmentRoom,
+  applyAssessmentV2, currentAssessmentV2, assessmentMediaBytes, render,
+  assessmentV2Notice, assessmentV2Pending */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
