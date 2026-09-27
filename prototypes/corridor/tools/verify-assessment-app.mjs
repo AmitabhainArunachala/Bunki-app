@@ -739,11 +739,20 @@ try {
           { revlog: baseline.revlog, practice: baseline.practice, answers: baseline.answers }, 'The review return writes no response or grade');
         // an unavailable source keeps the learner where they are, with the caller's note
         await page.evaluate(async attemptId => {
+          const retained = JSON.stringify({ library: S.assessmentLibraryV2, practice: S.assessmentQuestionPractice,
+            srs: S.srs, revlog: S.revlog });
+          // Settle real assessment work before this out-of-band fixture deletion.
+          if (await reconcileAssessmentResults() !== true || recordApp.pending || !recordWritable() ||
+              !currentAssessmentV2(attemptId) || JSON.stringify({ library: S.assessmentLibraryV2,
+                practice: S.assessmentQuestionPractice, srs: S.srs, revlog: S.revlog }) !== retained)
+            throw new Error('Source-return deletion fixture did not settle');
           const native = await recordController.snapshot();
+          if (native.status !== 'active') throw new Error(native.reason);
           const removed = await recordController.commitLocal({ changeId: 'fixture:source-return-removed', binding: recordInstallation.policy.binding,
             expectedRevision: native.snapshot.revision, occurredAt: new Date().toISOString(), mutations: [],
             operations: [{ payload: { kind: 'entity.tombstone', target: { kind: 'exam-attempt', id: attemptId }, reason: 'user-deleted' }, dependencies: [] }] });
           if (removed.status !== 'active') throw new Error(removed.reason);
+          if (!removed.receipt) throw new Error('Source-return deletion requires a durable receipt');
           publishRecordSnapshot((await recordApp.snapshot()).snapshot);
           await reconcileAssessmentResults();
           S.view = 'ai'; render();
@@ -760,12 +769,27 @@ try {
       await run(engine, 'report-entry-in-unavailable-question', async page => {
         await finishQuestionFixture(page);
         await page.evaluate(async () => {
-          const selected = currentAssessmentV2(), native = await recordController.snapshot();
+          const selected = currentAssessmentV2(), review = S.review;
+          const retained = JSON.stringify(S.assessmentQuestionPractice);
+          // This fixture deletes outside recordApp's queue. First settle the real
+          // assessment work, preserving the exact review and retained practice.
+          if (!selected || await reconcileAssessmentResults() !== true || !review || S.review !== review ||
+              review.pending || recordApp.pending || !recordWritable() ||
+              currentAssessmentV2()?.attempt.attemptId !== selected.attempt.attemptId ||
+              JSON.stringify(S.assessmentQuestionPractice) !== retained)
+            throw new Error('Unavailable-question deletion fixture did not settle');
+          const native = await recordController.snapshot();
+          if (native.status !== 'active') throw new Error(native.reason);
           const removed = await recordController.commitLocal({ changeId: 'fixture:report-unavailable-question',
             binding: recordInstallation.policy.binding, expectedRevision: native.snapshot.revision,
             occurredAt: new Date().toISOString(), mutations: [], operations: [{ payload: {
               kind: 'entity.tombstone', target: { kind: 'exam-attempt', id: selected.attempt.attemptId }, reason: 'user-deleted' }, dependencies: [] }] });
           if (removed.status !== 'active') throw new Error(`Deletion ${removed.reason}`);
+          if (!removed.receipt) throw new Error('Unavailable-question deletion requires a durable receipt');
+          if (S.review !== review || review.pending || recordApp.pending || !recordWritable() ||
+              currentAssessmentV2()?.attempt.attemptId !== selected.attempt.attemptId ||
+              JSON.stringify(S.assessmentQuestionPractice) !== retained)
+            throw new Error('Unavailable-question deletion fixture changed the retained review');
           publishRecordSnapshot((await recordApp.snapshot()).snapshot);
           S.view = 'tray'; S.review = null; render();
           startReview(S.taken.filter(row => row.t === 'question'));
@@ -865,12 +889,22 @@ try {
           const beforeReviewContext = assessmentReviewContext(word);
           const beforeEvidence = allAssessmentEvidence();
           const retained = JSON.stringify(recordApp.current().snapshot.record.assessmentLibraryV2);
+          // Preserve the before-evidence baseline while settling queued app work;
+          // the following single native tombstone is the only fixture mutation.
+          if (await reconcileAssessmentResults() !== true || recordApp.pending || !recordWritable() ||
+              currentAssessmentV2()?.attempt.attemptId !== attemptId ||
+              JSON.stringify(recordApp.current().snapshot.record.assessmentLibraryV2) !== retained ||
+              JSON.stringify(allAssessmentEvidence()) !== JSON.stringify(beforeEvidence) ||
+              JSON.stringify(assessmentReviewContext(word)) !== JSON.stringify(beforeReviewContext))
+            throw new Error('Local-result deletion fixture did not settle');
           const native = await recordController.snapshot();
+          if (native.status !== 'active') throw new Error(native.reason);
           const removed = await recordController.commitLocal({ changeId: 'fixture:delete-local-result',
             binding: recordInstallation.policy.binding, expectedRevision: native.snapshot.revision,
             occurredAt: new Date().toISOString(), mutations: [], operations: [{ payload: {
               kind: 'entity.tombstone', target: { kind: 'exam-attempt', id: attemptId }, reason: 'user-deleted' }, dependencies: [] }] });
           if (removed.status !== 'active') throw new Error(`Deletion ${removed.reason}`);
+          if (!removed.receipt) throw new Error('Local-result deletion requires a durable receipt');
           publishRecordSnapshot((await recordApp.snapshot()).snapshot);
           await reconcileAssessmentResults();
           let sourceError = null; try { await resolveTeacherSource(context); } catch (error) { sourceError = error.message; }
