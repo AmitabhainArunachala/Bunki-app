@@ -40,7 +40,7 @@ import { resolve } from 'node:path';
 import { chromium } from 'playwright-core';
 // verify-corridor.mjs resolves the site when it loads, so it is imported inside the receipt's try
 let CORRIDOR_DIR = null, startCorridorServer = null;
-import { readAppRecord } from './record-test-support.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/playback'));
 mkdirSync(out, { recursive: true });
@@ -461,10 +461,23 @@ try {
   // answer-card 音: a clip belongs to the face that asked (grade, undo and leave retire it)
   await check('pending-card-audio-is-retired-by-grade-and-undo', 'card-held', async (f) => {
     const { page } = f;
+    const before = await readAppRecord(page);
+    const declaration = before.obslog.at(-1);
+    assert.equal(declaration?.[1], 'reveal', 'the asking card has an acknowledged declaration');
     await page.locator('#card-say').click();
     await page.locator('.grade.g-again').click();
+    const graded = await waitForAppRecord(page, record => record.revlog.length === before.revlog.length + 1
+      && record.revlog.at(-1)?.[1] === declaration[2] && record.revlog.at(-1)?.[2] === 1,
+    { timeout: 10000, description: 'Again grade before pending-audio undo' });
+    await page.locator('#declare-notyet:not(:disabled)').waitFor({ state: 'visible', timeout: 10000 });
+    // On the next card, undo is behind the real More door.
+    await page.locator('#zen-more').click();
     await page.waitForSelector('.review-undo', { timeout: 10000 });
     await page.locator('.review-undo').click();
+    await waitForAppRecord(page, record => record.revlog.length === graded.revlog.length + 1
+      && record.revlog.at(-1)?.[1] === declaration[2] && record.revlog.at(-1)?.[2] === 0
+      && record.revlog.at(-1)?.[3] === before.revlog.length,
+    { timeout: 10000, description: 'durable revocation of the pending-audio grade' });
     // the only grade is taken back: no undo chip, and the first card is up again, unrevealed
     await page.waitForFunction(() => !document.querySelector('.review-undo') && !!document.querySelector('#declare-notyet'), null, { timeout: 10000 });
     assert.equal(f.manifestArrived, true, 'the manifest request is being held before release');

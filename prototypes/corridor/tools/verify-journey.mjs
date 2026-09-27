@@ -335,17 +335,21 @@ try {
     await shot('08-tray');
     await page.click('#review-start');
     for (let i = 0; i < 60; i++) {
-      // the zen room asks for the recall declaration first (T-06)
-      const rev = await page.$('#declare-recalled');
-      if (rev) {
-        await rev.click();
-        await page.waitForTimeout(100);
-      }
-      const g = await page.$('.grade.g-good');
-      if (g) {
-        await g.click();
-        await page.waitForTimeout(100);
-      }
+      await page.waitForFunction(() => !!document.querySelector('.review-summary')
+        || !!document.querySelector('#declare-recalled:not(:disabled)'), null, { timeout: 5000 });
+      if (await page.locator('.review-summary').count()) break;
+      // Each acknowledged action redraws the face: resolve a fresh control and
+      // wait for its durable record transition before pressing the next one.
+      const before = await readAppRecord(page);
+      await page.locator('#declare-recalled').click();
+      const declared = await waitForAppRecord(page, record => record.obslog.length === before.obslog.length + 1
+        && record.obslog.at(-1)?.[1] === 'reveal' && record.obslog.at(-1)?.[3] === 1,
+      { timeout: 5000, description: 'journey recall declaration' });
+      const key = declared.obslog.at(-1)[2];
+      await page.locator('.grade.g-good').click();
+      await waitForAppRecord(page, record => record.revlog.length === declared.revlog.length + 1
+        && record.revlog.at(-1)?.[1] === key && record.revlog.at(-1)?.[2] === 3,
+      { timeout: 5000, description: 'journey Good grade for the declared card' });
       if (await page.$('.review-summary')) break;
     }
     if (!(await page.$('.review-summary'))) throw new Error('no summary reached');

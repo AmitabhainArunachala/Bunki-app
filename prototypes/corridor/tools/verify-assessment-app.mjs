@@ -474,6 +474,15 @@ try {
         await page.locator('#assessment-question-check').waitFor(); await checkQuestionAnswer(page);
         await page.locator('.grade.g-good').click();
         await page.waitForFunction(() => S.revlog.length === 3);
+        // The third review lands on card 2 and starts its source load (CacheStorage match/put).
+        // Reloading while it is in flight can make WebKit log a Cache API console error from the
+        // closing document, which Playwright reports as a pageerror. Let that next face settle.
+        assert(await page.evaluate(() => S.assessmentQuestionPractice.plans.every(plan => Array.isArray(plan.media) && plan.media.length === 0)),
+          'this barrier assumes media-free cards; media cards must also wait for their view preparation');
+        await page.waitForFunction(cardId => S.review?.ix === 1 && S.review.queue[1]?.id === cardId &&
+          !S.review.pending && !S.review.questionSourceChecking && S.review.questionSourceAvailable,
+        initial.cards[1].id);
+        await page.locator('#assessment-question-check').waitFor();
         const beforeReload = await page.evaluate(() => JSON.stringify(S.assessmentQuestionPractice));
         pageStage(page, 'question-reload-start');
         await page.reload();
