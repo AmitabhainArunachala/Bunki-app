@@ -21113,6 +21113,17 @@ async function aiLastReply(surface, ref) {
   return null;
 }
 
+/* A failure is not an assistant turn and is never archived, so a repaint mid-request replaced the
+ * sheet's quiet "could not answer just now" with silence and a re-armed door (PR #77 007479d0).
+ * The line waits here, per surface and word, until the learner asks again. A reply or a line that
+ * lands after the sheet was rebuilt asks for one render: the archive read-back, or this note,
+ * puts it where it belongs. */
+const aiSheetNotes = new Map();
+function aiSheetSettle(box, paint) {
+  if (box.isConnected) paint();
+  else if ($('.sheet')) render();
+}
+
 /** The tutor door on a word entry — present only when a key is stored. */
 function renderAiTutor(sheet, node, rec) {
   if (node.from?.passage || node.sourceContext) {
@@ -21124,21 +21135,28 @@ function renderAiTutor(sheet, node, rec) {
     node.from?.passage || node.sourceContext ? 'ask about the word alone' : 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
-  aiLastReply('word-tutor', `word:${node.id}`).then((prev) => {
+  const ref = `word:${node.id}`;
+  const note = aiSheetNotes.get(`word-tutor|${ref}`);
+  if (note) out.textContent = note;
+  else aiLastReply('word-tutor', ref).then((prev) => {
     if (prev && !out.textContent) out.textContent = prev;
   });
   btn.addEventListener('click', async () => {
+    aiSheetNotes.delete(`word-tutor|${ref}`);
     btn.disabled = true;
     out.textContent = tx('考え中…', 'thinking…');
     try {
       const senses = (rec?.m || []).slice(0, 4).join('; ');
-      out.textContent = await aiAsk(
+      const said = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use using the separate learning dimensions, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'word-tutor', ref: `word:${node.id}` },
+        { surface: 'word-tutor', ref },
       );
+      aiSheetSettle(out, () => { out.textContent = said; });
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      aiSheetNotes.set(`word-tutor|${ref}`, line);
+      aiSheetSettle(out, () => { out.textContent = line; });
     }
     btn.disabled = false;
   });
@@ -21178,10 +21196,14 @@ function renderAiExamples(sheet, node, rec) {
     }
     return shown;
   };
-  aiLastReply('examples', `word:${node.id}`).then((prev) => {
+  const exRef = `word:${node.id}`;
+  const note = aiSheetNotes.get(`examples|${exRef}`);
+  if (note) out.append(el('p', 'ai-ex-note', note));
+  else aiLastReply('examples', exRef).then((prev) => {
     if (prev && !out.childElementCount && !btn.disabled) paint(prev);
   });
   btn.addEventListener('click', async () => {
+    aiSheetNotes.delete(`examples|${exRef}`);
     btn.disabled = true;
     out.textContent = '';
     out.append(el('p', 'ai-ex-note', tx('つくっています…', 'writing examples…')));
@@ -21191,13 +21213,18 @@ function renderAiExamples(sheet, node, rec) {
       const raw = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. Write 6 to 8 natural example sentences for the given word across a useful range of difficulty, easiest first, using the separate learning dimensions. Keep an unrecorded word classification unknown; a word tag alone does not establish a sentence\'s difficulty. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. Nx is your provisional N5–N1 difficulty estimate for that example, not an official classification or a claim about the learner. No numbering, no markdown, no extra commentary.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Source word JLPT classification: ${wordLv || 'not recorded'}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'examples', ref: `word:${node.id}` },
+        { surface: 'examples', ref: exRef },
       );
-      const shown = paint(raw);
-      if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      aiSheetSettle(out, () => {
+        if (!paint(raw)) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      });
     } catch {
-      out.textContent = '';
-      out.append(el('p', 'ai-ex-note', tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.')));
+      const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
+      aiSheetNotes.set(`examples|${exRef}`, line);
+      aiSheetSettle(out, () => {
+        out.textContent = '';
+        out.append(el('p', 'ai-ex-note', line));
+      });
     }
     btn.disabled = false;
   });
