@@ -77,15 +77,19 @@ async function learner({ seed = null, tutor = false, reducedMotion = false, init
     if (url.origin !== PROVIDER) return route.abort();
     stub.calls += 1;
     const system = String(route.request().postDataJSON()?.system || '');
-    if (stub.delay) await new Promise((done) => setTimeout(done, stub.delay));
+    // a plan answers call by call ({ mode, delay } each); without one, every call answers alike
+    const step = stub.plan?.shift() || stub;
+    if (step.delay) await new Promise((done) => setTimeout(done, step.delay));
     try {
-      if (stub.mode === 'fail') {
+      if (step.mode === 'fail') {
         await route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":{"type":"overloaded"}}' });
         return;
       }
       let text = `stub reply ${stub.calls}`;
       if (system.includes('Output ONLY a JSON array')) {
         text = JSON.stringify([1, 2, 3, 4, 5].map((n) => ({ q: `問${n}`, opts: ['a', 'b', 'c', 'd'], right: 0, why: `because ${n}` })));
+      } else if (system.includes('Each line MUST be exactly')) {
+        text = `N5 | 学校へ行く。 | がっこうへいく。 | I go to school. (${stub.calls})`;
       } else if (system.includes('reading passage')) {
         text = '朝、学校（がっこう）へ行く。犬（いぬ）と猫（ねこ）を見た。天気（てんき）がいい。友だちと帰る。\n札：犬、猫';
       }
@@ -842,6 +846,35 @@ PROBES['eaten-back-strokes'] = async () => {
   const answered = after.ready !== '1' || after.view !== before.view;
   check('eaten-back-writing-room · the first Back after a reload in the writing room is answered, not eaten',
     answered, JSON.stringify({ before, after }));
+  await context.close();
+};
+
+/* tutor-sheet-stale-failure — after 60de2207 a repaint re-arms the word sheet's ask door while
+ * the first ask is out. With a slow failing first ask and a fast second one that succeeds, the
+ * late failure set its line after the success, which never cleared it: "could not answer" stood
+ * over a saved reply. The examples door had the same shape. */
+PROBES['tutor-sheet-race'] = async () => {
+  const { context, page, stub } = await learner({ seed: envelope(), tutor: true });
+  await open(page, '?entry=shelf&ui=bi');
+  await page.fill('#search', '学校');
+  await page.locator('[data-result="word:学校"]').first().click();
+  await page.waitForSelector('#sheet .ai-ask');
+  await settle(page, 500);
+  const race = async (label, box) => {
+    stub.plan = [{ mode: 'fail', delay: 2500 }, { mode: 'ok', delay: 0 }];
+    await page.locator('#sheet .ai-ask', { hasText: label }).click();
+    await settle(page, 300);
+    await repaint(page);
+    await page.locator('#sheet .ai-ask', { hasText: label }).click();
+    await settle(page, 3500);
+    return page.evaluate((sel) => document.querySelector(sel)?.textContent || '', box);
+  };
+  const tutor = await race('ask the tutor', '#sheet .ai-answer');
+  const examples = await race('write examples', '#sheet .ai-examples');
+  check('tutor-sheet-stale-failure · an older ask failing after a newer reply leaves the reply, not "could not answer"',
+    /stub reply/.test(tutor) && !/could not answer/.test(tutor), tutor.slice(0, 160));
+  check('tutor-sheet-stale-failure · the same on the examples door',
+    /学校へ行く/.test(examples) && !/could not write examples/.test(examples), examples.slice(0, 160));
   await context.close();
 };
 
