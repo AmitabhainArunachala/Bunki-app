@@ -385,6 +385,7 @@ def main() -> int:
     started = datetime.now(timezone.utc).isoformat(timespec="seconds")
     fetched: list[dict] = []
     restaged: list[dict] = []
+    first_added: dict[str, str] = {}  # a restaged reading keeps the day it first reached the shelf
     report: dict = {"terms": [], "sources": {}, "skipped": []}
     # only a reading nobody has decided on may be re-extracted
     pending_fresh = {row["id"] for row in queue if row.get("kind") == QUEUE_KIND and row.get("decision") == "pending"}
@@ -425,16 +426,14 @@ def main() -> int:
         print(f"· staged {len(fetched)} new items → {DATASET.relative_to(REPO)}")
         if restaged:
             # a pending reading's source text is replaced in place; the run log
-            # and the row keep the hash of what it replaced
+            # and the row keep the hash of what it replaced. Nothing is written
+            # until the re-mint below has succeeded.
             replacement = {row["id"]: row for row in restaged}
             dataset = [replacement.get(row["id"], row) for row in dataset]
-            DATASET.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in dataset), "utf-8")
-            first_added = {row["id"]: row.get("addedAt") for row in queue if row["id"] in replacement}
+            first_added = {row["id"]: row["addedAt"] for row in queue if row["id"] in replacement and row.get("addedAt")}
             index["articles"] = [row for row in index["articles"] if row["id"] not in replacement]
             queue = [row for row in queue if row["id"] not in replacement]
             shelf_ids -= set(replacement)
-            for row in restaged:
-                row["_addedAt"] = first_added.get(row["id"])
             print(f"· restaged {len(restaged)} pending items whose text changed: " + ", ".join(sorted(replacement)))
 
     minted: list[dict] = []
@@ -475,19 +474,19 @@ def main() -> int:
                 ready.append((row, "", "untitled-pending"))
             else:
                 untitled.append(row)
-        if ready or retitled:
-            INDEX_PATH.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", "utf-8")
-            write_json_keeping_indent(QUEUE_PATH, queue)
         if ready:
             from corpus.grading._mecab import get_tagger
 
             tagger = get_tagger()
             jlpt_maps = ba.load_jlpt_lexicon()
-            first_added = {row["id"]: row["_addedAt"] for row in restaged if row.get("_addedAt")}
-            for row, title_en, title_source in sorted(ready, key=lambda r: (r[0]["date"], r[0]["id"])):
-                topic = titles["topics"].get(row["id"], "")
-                record, index_row, queue_row = mint(row, title_en, title_source, topic,
-                                                    first_added.get(row["id"], as_of), tagger, jlpt_maps)
+            # every reading is minted before anything touches disk: a mint that
+            # throws leaves the dataset, the shelf and the queue as they were
+            outputs = [
+                mint(row, title_en, title_source, titles["topics"].get(row["id"], ""),
+                     first_added.get(row["id"], as_of), tagger, jlpt_maps)
+                for row, title_en, title_source in sorted(ready, key=lambda r: (r[0]["date"], r[0]["id"]))
+            ]
+            for record, index_row, queue_row in outputs:
                 (ARTICLES / index_row["file"]).write_text(
                     json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
                 )
@@ -495,8 +494,11 @@ def main() -> int:
                 queue.append(queue_row)
                 minted.append(queue_row)
                 jr = index_row["grading"]["signals"]["jreadability"]
-                print(f"    minted {row['date']}  {row['id']:<46} {index_row['chars']:>5}字  {jr['band']}  検収前")
+                print(f"    minted {record['date']}  {record['id']:<46} {index_row['chars']:>5}字  {jr['band']}  検収前")
             ensure_sources(index, {row["sourceKey"] for row, _, _ in ready})
+        if restaged:
+            DATASET.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in dataset), "utf-8")
+        if ready or retitled or restaged:
             INDEX_PATH.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", "utf-8")
             write_json_keeping_indent(QUEUE_PATH, queue)
         print(f"· minted {len(minted)}; {len(untitled)} staged items wait for an authored English title"
