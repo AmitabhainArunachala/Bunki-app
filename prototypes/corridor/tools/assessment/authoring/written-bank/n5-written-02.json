@@ -1,0 +1,379 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N5",
+  "number": 2,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "わたしの　やすみの　日\n　わたしは　どようびと　にちようびが　やすみです。\n　どようびは　午前中に　へやの　そうじを　します。午後は　スーパーへ　かいものに　いきます。\n　にちようびは　天気が　いい　日は、こうえんへ　いきます。こうえんには　大きな　いけが　あります。わたしは　いけの　まわりを　あるくのが　すきです。（１）、あめの　日は　どこへも　いきません。うちで　ほんを　よんだり、おんがくを　きいたり　します。\n　きのうは　あめでしたから、うちで　ともだちに　てがみを　（２）。",
+    "s1": "ユキさん\n　あしたの　ピクニックは、あめが　ふったら　やめます。天気が　いい　ときは、十時に　えきの　まえで　あいましょう。\nマイ",
+    "s2": "　この　みせは、月曜日から　金曜日まで、あさ　十時から　よる　八時まで　あいて　います。土曜日と　日曜日は、よる　六時までです。",
+    "s3": "　きのうは　やすみでした。あさ　おそく　おきて、ひるごはんの　あとで　プールへ　およぎに　いきました。よるは　ともだちと　でんわで　ながく　はなしました。",
+    "m1": "あたらしい　くつ\n　せんしゅうの　にちようび、ははと　デパートへ　いきました。わたしの　くつが　ふるく　なったからです。\n　デパートの　三かいに　くつの　うりばが　あります。あかい　くつと　しろい　くつが　ありました。わたしは　あかい　くつが　ほしかったですが、とても　たかかったです。しろい　くつは　あかい　くつより　やすかったです。それに、はいて　みると、しろい　くつの　ほうが　かるくて、あるきやすかったです。\n　それで、わたしは　しろい　くつを　かいました。つぎの　日、その　くつで　がっこうへ　いきました。ともだちが「いい　くつだね」と　いいました。",
+    "info": "スーパー　ひかり　こんしゅうの　やすい　もの\n　月曜日　　トマト　１こ　５０円\n　火曜日　　たまご　１０こ　１５０円\n　水曜日　　ぎゅうにく　１００グラム　２００円\n　木曜日　　りんご　１こ　８０円\n　金曜日　　パン　１ふくろ　１００円\n※　どれも　ひとり　五つまでです。\n※　土曜日と　日曜日は　ありません。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nえきを　でて、【右】へ　いって　ください。",
+      "options": [
+        "ひだり",
+        "みぎ",
+        "みき",
+        "うえ"
+      ],
+      "answer": 1,
+      "rationale": "「右」は「みぎ」と読む。「ひだり」は「左」だ。\nThe word 右 is read migi and means right.",
+      "target": "右"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n【午後】は　ともだちと　かいものに　いきます。",
+      "options": [
+        "ごこ",
+        "ごうご",
+        "こご",
+        "ごご"
+      ],
+      "answer": 3,
+      "rationale": "「午後」は「ごご」と読む。\nThe word 午後 is read gogo and means afternoon.",
+      "target": "午後"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nつめたい　【水】を　のみたいです。",
+      "options": [
+        "みず",
+        "みそ",
+        "すい",
+        "みつ"
+      ],
+      "answer": 0,
+      "rationale": "「水」は「みず」と読む。\nThe word 水 is read mizu and means water.",
+      "target": "水"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nえきの　まえに　あたらしい　【みせ】が　できました。",
+      "options": [
+        "店",
+        "占",
+        "広",
+        "床"
+      ],
+      "answer": 0,
+      "rationale": "「みせ」は「店」と書く。\nThe word mise (shop) is written 店.",
+      "target": "店"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nにちようびは　ははと　【かいもの】に　いきました。",
+      "options": [
+        "貝い物",
+        "買い物",
+        "買い者",
+        "員い物"
+      ],
+      "answer": 1,
+      "rationale": "「かいもの」は「買い物」と書く。「貝」「員」「者」はまちがい。\nThe word kaimono (shopping) is written 買い物.",
+      "target": "買い物"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nあたらしい　【すかーと】を　かいました。",
+      "options": [
+        "スカード",
+        "ヌカート",
+        "スカート",
+        "スカーツ"
+      ],
+      "answer": 2,
+      "rationale": "「すかーと」はカタカナで「スカート」と書く。\nThe word sukaato (skirt) is written スカート in katakana.",
+      "target": "スカート"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nきょうは　（　）ので、コートを　きて　いきます。",
+      "options": [
+        "あつい",
+        "あかるい",
+        "あまい",
+        "さむい"
+      ],
+      "answer": 3,
+      "rationale": "コートをきるのは「さむい」ときだ。\nSamui (cold) is why you wear a coat.",
+      "target": "寒い"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nやすみの　日は　へやで　ゆっくり　（　）を　よみます。",
+      "options": [
+        "おんがく",
+        "テレビ",
+        "しゃしん",
+        "ざっし"
+      ],
+      "answer": 3,
+      "rationale": "「よむ」ものは「ざっし」だ。\nZasshi means magazine, something you read.",
+      "target": "雑誌"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nきのう　みた　えいがは　【つまらない】　えいがでした。",
+      "options": [
+        "きのう　みた　えいがは　おもしろく　なかったです。",
+        "きのう　みた　えいがは　とても　おもしろかったです。",
+        "きのう　みた　えいがは　ながかったです。",
+        "きのう　みた　えいがは　こわかったです。"
+      ],
+      "answer": 0,
+      "rationale": "「つまらない」は「おもしろくない」と同じ意味だ。\nTsumaranai means boring, the same as not interesting.",
+      "target": "つまらない"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nもっと　【ゆっくり】　あるいて　ください。",
+      "options": [
+        "もっと　はやく　あるいて　ください。",
+        "そんなに　はやく　あるかないで　ください。",
+        "もっと　ながく　あるいて　ください。",
+        "もっと　たくさん　あるいて　ください。"
+      ],
+      "answer": 1,
+      "rationale": "「ゆっくり」は「はやくない」という意味だ。\nYukkuri means slowly, so the speaker asks you not to walk so fast.",
+      "target": "ゆっくり"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nデパート（　）　くつを　かいました。",
+      "options": [
+        "に",
+        "を",
+        "へ",
+        "で"
+      ],
+      "answer": 3,
+      "rationale": "なにかをするところには「で」をつかう。\nDe marks the place where an action happens: I bought shoes at the department store.",
+      "subject": "particle:de"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nバスより　でんしゃの（　）　はやいです。",
+      "options": [
+        "ほうが",
+        "より",
+        "ほど",
+        "だけ"
+      ],
+      "answer": 0,
+      "rationale": "「AよりBのほうが〜」でくらべる。\nYori ... no hou ga compares two things: the train is faster than the bus.",
+      "subject": "grammar:yori-houga"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nすみません、その　あかい　かさを　みせて（　）。",
+      "options": [
+        "います",
+        "ください",
+        "あります",
+        "いきます"
+      ],
+      "answer": 1,
+      "rationale": "おねがいするときは「〜てください」をつかう。\nTe kudasai makes a polite request: please show me that red umbrella.",
+      "subject": "grammar:tekudasai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nあしたは　はれる（　）。",
+      "options": [
+        "ましょう",
+        "ください",
+        "でしょう",
+        "ません"
+      ],
+      "answer": 2,
+      "rationale": "たぶんそうなると言うときは「〜でしょう」をつかう。\nDeshou expresses a likely future: it will probably be sunny tomorrow.",
+      "subject": "grammar:deshou"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nにちようびは　ともだち（　）　えいがを　みました。",
+      "options": [
+        "と",
+        "を",
+        "で",
+        "へ"
+      ],
+      "answer": 0,
+      "rationale": "いっしょにする人には「と」をつかう。\nTo marks the person you do something with: I watched a movie with a friend.",
+      "subject": "particle:to"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　あかい　シャツは　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
+      "options": [
+        "もの",
+        "デパートで",
+        "かった",
+        "きのう"
+      ],
+      "answer": 2,
+      "rationale": "ただしいじゅんばんは「きのう　デパートで　かった　もの　です」で、★には「かった」が入る。\nThe order is きのう デパートで かった もの です, so かった fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nわたしは　＿＿＿　＿＿＿　＿＿＿　＿★＿　すきです。",
+      "options": [
+        "日に",
+        "さんぽするのが",
+        "やすみの",
+        "こうえんを"
+      ],
+      "answer": 1,
+      "rationale": "ただしいじゅんばんは「やすみの　日に　こうえんを　さんぽするのが　すきです」で、★には「さんぽするのが」が入る。\nThe order is やすみの 日に こうえんを さんぽするのが すきです, so さんぽするのが fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "だから",
+        "でも",
+        "では",
+        "じゃあ"
+      ],
+      "answer": 1,
+      "rationale": "いけのまわりをあるくのがすきだが、あめの日はいかない。はんたいのことをつなぐ「でも」が入る。\nDemo (but) contrasts liking walks with staying home on rainy days.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "かきます",
+        "かいて　ください",
+        "かきましょう",
+        "かきました"
+      ],
+      "answer": 3,
+      "rationale": "「きのう」のことなので「かきました」がいい。\nThe sentence is about yesterday, so the past form kakimashita fits.",
+      "passage": "tg"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "あした　天気が　いい　とき、ユキさんは　どう　しますか。",
+      "options": [
+        "十時に　えきの　まえへ　いく",
+        "ピクニックを　やめる",
+        "マイさんに　でんわする",
+        "十時に　マイさんの　うちへ　いく"
+      ],
+      "answer": 0,
+      "rationale": "「天気が　いい　ときは、十時に　えきの　まえで　あいましょう」とある。\nIf the weather is good, they will meet in front of the station at ten.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　みせは　土曜日は　なん時に　しまりますか。",
+      "options": [
+        "八時",
+        "六時",
+        "十時",
+        "五時"
+      ],
+      "answer": 1,
+      "rationale": "「土曜日と　日曜日は、よる　六時までです」とある。\nOn Saturdays and Sundays the shop is open until six in the evening.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人は　きのう　ひるごはんの　あとで　なにを　しましたか。",
+      "options": [
+        "おそく　おきた",
+        "ともだちと　でんわで　はなした",
+        "ひるごはんを　つくった",
+        "プールで　およいだ"
+      ],
+      "answer": 3,
+      "rationale": "「ひるごはんの　あとで　プールへ　およぎに　いきました」とある。\nAfter lunch the writer went swimming at the pool.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　どうして　デパートへ　いきましたか。",
+      "options": [
+        "くつが　ふるく　なったから",
+        "ははの　くつを　かうから",
+        "あかい　くつが　ほしかったから",
+        "ともだちに　あいたかったから"
+      ],
+      "answer": 0,
+      "rationale": "「わたしの　くつが　ふるく　なったからです」とある。\nThe writer went because their shoes had become old.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　どうして　しろい　くつを　かいましたか。",
+      "options": [
+        "あかい　くつより　かわいかったから",
+        "ははが　しろい　くつを　すきだったから",
+        "やすくて、あるきやすかったから",
+        "あかい　くつが　なかったから"
+      ],
+      "answer": 2,
+      "rationale": "しろいくつは、あかいくつよりやすくて、かるくてあるきやすかった。\nThe white shoes were cheaper, lighter and easier to walk in.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "たまごを　やすく　かいたいです。なんようびに　いきますか。",
+      "options": [
+        "月曜日",
+        "水曜日",
+        "金曜日",
+        "火曜日"
+      ],
+      "answer": 3,
+      "rationale": "たまごがやすいのは火曜日だ。\nEggs are on sale on Tuesday.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "木曜日に　りんごを　三こ　かいます。いくらですか。",
+      "options": [
+        "８０円",
+        "１６０円",
+        "２４０円",
+        "３００円"
+      ],
+      "answer": 2,
+      "rationale": "木曜日のりんごは１こ８０円なので、三こで２４０円だ。\nOn Thursday apples are 80 yen each, so three cost 240 yen.",
+      "passage": "info"
+    }
+  ]
+}
