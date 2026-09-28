@@ -4825,9 +4825,17 @@ function openPassage(id, anchor = null) {
 const passage = () => D.passages.find((p) => p.id === S.passageId);
 const BEYOND_JOYO = new Set(['準1級', '1級']);
 
+const JOYO_JUDGEABLE = /[\u3400-\u4dbf\u4e00-\u9fff々〆ヶ]/;
 function beyondJoyo(ch) {
+  // kana, numerals and marks are never "beyond" anything — the dial replaces
+  // KANJI a learner at this level would not have met
+  if (!JOYO_JUDGEABLE.test(ch)) return false;
   const k = D.kanken[ch];
-  return !!k && BEYOND_JOYO.has(k.kk);
+  // …and a kanji the 漢検 table does not carry is not 常用. The table holds
+  // 2,453 characters and every common one is in it; 硯, 蟹, 學, 國, 纂, 鐵 are
+  // not. Reading "unknown" as jōyō made the dial inert for precisely the
+  // characters it exists to replace (PR #77 b4d6b825, E3 round-D, reader lens).
+  return !k || BEYOND_JOYO.has(k.kk);
 }
 
 function rubyNode(pairs, { furigana, revealed }) {
@@ -16070,6 +16078,13 @@ function stopSentenceListening() {
 }
 window.addEventListener('pagehide', stopSentenceListening);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSentenceListening(); });
+// coming back wakes the galaxy the way leaving slept it — through the seam alone, never a whole
+// render that could disturb a room's drafts
+document.addEventListener('visibilitychange', () => {
+  if (!window.__DRIFT__ || document.body?.dataset?.ready !== '1') return;
+  if (document.hidden) window.__DRIFT__.hide();
+  else if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
+});
 async function openBundledSentenceChoice(getContext, button, note, stillCurrent) {
   if (button.disabled || !recordWritable() || !sentencePracticeModule) return;
   const epoch = recordEpoch, serial = ++sentenceChoiceSerial, currentSurface = retainActionSurface(button);
@@ -25986,7 +26001,10 @@ function render() {
   // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
     syncDriftTheme();
-    if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
+    // …and a page nobody is looking at is a room they have left: the galaxy is the
+    // default entry, and its loop held the main thread even in a background tab
+    // (PR #77 ef524842). The same public seam the view switch uses; nothing reaches in.
+    if (S.view === 'drift' && !S.stack.length && !document.hidden) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }
 
