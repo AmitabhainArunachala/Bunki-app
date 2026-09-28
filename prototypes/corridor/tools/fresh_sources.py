@@ -300,26 +300,57 @@ def normalize(text: str) -> str:
     return text.strip(" 　")
 
 
+class Line(str):
+    """A line that is all one list item, link or table row; `unit` is that element.
+    rejoin_wrapped never joins lines from two different ones."""
+
+    unit: "Node | None" = None
+
+
+def unit_line(text: str, unit: "Node | None") -> str:
+    if unit is None:
+        return text
+    line = Line(text)
+    line.unit = unit
+    return line
+
+
+def shared_unit(chains: list[tuple]) -> "Node | None":
+    """The innermost li/a element every piece of a line sits in, if there is one."""
+    if not chains:
+        return None
+    shared = chains[0]
+    for chain in chains[1:]:
+        k = 0
+        while k < min(len(shared), len(chain)) and shared[k] is chain[k]:
+            k += 1
+        shared = shared[:k]
+    return shared[-1] if shared else None
+
+
 def block_lines(node: Node, skip: set[str] | frozenset[str] = frozenset(SKIP_TAGS)) -> list[str]:
     """Paragraph-shaped lines: every block element and <br> ends a line; a table
-    row becomes one line of its cells in document order. Nothing is invented."""
+    row becomes one line of its cells in document order. Nothing is invented.
+    A line that is all one list item, link or table row comes back as a Line."""
     out: list[str] = []
-    buf: list[str] = []
+    buf: list[tuple[str, tuple]] = []  # (text, the li/a elements it sits in)
 
     def flush() -> None:
-        line = normalize("".join(buf))
+        line = normalize("".join(text for text, _ in buf))
+        chains = [chain for text, chain in buf if normalize(text)]
         buf.clear()
         if line:
-            out.append(line)
+            out.append(unit_line(line, shared_unit(chains)))
 
-    def walk(n: Node) -> None:
+    def walk(n: Node, chain: tuple) -> None:
         for child in n.children:
             if isinstance(child, str):
-                buf.append(child)
+                buf.append((child, chain))
                 continue
             if (child.tag in skip or "hidden" in child.attrs or child.attrs.get("aria-hidden") == "true"
                     or re.search(r"display\s*:\s*none", child.attrs.get("style", ""))):
                 continue
+            inner = chain + (child,) if child.tag in ("li", "a") else chain
             if child.tag == "br":
                 flush()
             elif child.tag == "tr":
@@ -327,15 +358,15 @@ def block_lines(node: Node, skip: set[str] | frozenset[str] = frozenset(SKIP_TAG
                 cells = [normalize(" ".join(block_lines(c, skip))) for c in child.children if isinstance(c, Node) and c.tag in ("td", "th")]
                 line = "　".join(c for c in cells if c)
                 if line:
-                    out.append(line)
+                    out.append(unit_line(line, child))
             elif child.tag in BLOCK_TAGS:
                 flush()
-                walk(child)
+                walk(child, inner)
                 flush()
             else:
-                walk(child)
+                walk(child, inner)
 
-    walk(node)
+    walk(node, ())
     flush()
     return out
 
@@ -375,11 +406,15 @@ LIST_START = re.compile(r"^([（(【［\[＜<■●○◆◇・※＊*]|[0-9０-
 def rejoin_wrapped(lines: list[str]) -> list[str]:
     """Undo hard line wrapping (a <br> every ~40 characters inside one
     sentence): a long line that stops mid-sentence continues on the next
-    line unless that line opens a new item. Only line breaks are removed."""
+    line unless that line opens a new item. Only line breaks are removed, and
+    never between two list items, links or table rows (block_lines' Line)."""
     out: list[str] = []
     for line in lines:
-        if out and len(out[-1]) >= 30 and out[-1][-1] not in SENTENCE_END and not LIST_START.match(line):
-            out[-1] += line
+        prev = out[-1] if out else ""
+        unit = getattr(prev, "unit", None)
+        if (out and len(prev) >= 30 and prev[-1] not in SENTENCE_END and not LIST_START.match(line)
+                and getattr(line, "unit", None) is unit):
+            out[-1] = unit_line(prev + line, unit)
         else:
             out.append(line)
     return out
@@ -625,12 +660,14 @@ class GovAdapter:
 
     def extract_from(self, res: Response, root: Node, stub: dict) -> Item | None:
         url = stub["url"]
+        # the page's own title and date first: container() may cut both out of
+        # the tree (the MHLW/MEXT release header), leaving only the feed's
+        title = self.page_title(root, stub["title"])
+        day = self.page_date(root, title)
         box = self.container(root)
         if box is None:
             self.skip(url, "article container not found (template changed?)")
             return None
-        title = self.page_title(root, stub["title"])
-        day = self.page_date(root, title)
         lines = [line for line in clean_lines(block_lines(box), self.stop) if line != title]
         lines = rejoin_wrapped(self.trim_header(lines))
         if not lines:
@@ -894,11 +931,16 @@ def stable_revision(title: str, as_of: datetime) -> dict | None:
     return {"pageid": page["pageid"], "title": page["title"], "revid": rev["revid"], "timestamp": rev["timestamp"]}
 
 
-def wiki_attribution(title: str, revid: int, timestamp: str, excerpt_note: str) -> str:
+def wiki_attribution(title: str, revid: int, timestamp: str, excerpt_note: str,
+                     more: list[tuple[str, int, str]] | tuple = ()) -> str:
+    """CC BY-SA credit for a page revision — and for every other (title, revid,
+    timestamp) in `more` the text also draws from."""
+    pages = [(title, revid, timestamp), *more]
+    named = "、".join(f"「{t}」（版 {r}、{ts[:10]}）" for t, r, ts in pages)
+    history = " 、 ".join(f"https://ja.wikipedia.org/w/index.php?title={urllib.parse.quote(t)}&action=history" for t, _, _ in pages)
     return (
-        f"出典：ウィキペディア日本語版「{title}」（版 {revid}、{timestamp[:10]}）の執筆者、"
-        f"CC BY-SA 4.0（{CC_BY_SA_URL}）。履歴 https://ja.wikipedia.org/w/index.php?title="
-        f"{urllib.parse.quote(title)}&action=history ／ {excerpt_note}ふりがなと辞書リンクを付けて掲載（Bunki）。"
+        f"出典：ウィキペディア日本語版{named}の執筆者、"
+        f"CC BY-SA 4.0（{CC_BY_SA_URL}）。履歴 {history} ／ {excerpt_note}ふりがなと辞書リンクを付けて掲載（Bunki）。"
         "この頁の本文は CC BY-SA 4.0 で再利用できる。"
     )
 
@@ -1006,6 +1048,12 @@ class WikiNewsDigestAdapter:
             return None
         latest = rows[0]
         page = latest["page"]
+        # a week across a month boundary, or a thin week merged into the one
+        # before it, draws on more than one month page: each is credited
+        sources: list[tuple[str, int, str]] = []
+        for b in rows:
+            if (b["page"], b["revid"]) not in [(t, r) for t, r, _ in sources]:
+                sources.append((b["page"], b["revid"], b["timestamp"]))
         title = f"{monday.month}月{monday.day}日〜{sunday.month}月{sunday.day}日のできごと"
         note = "日付節の要約文を週ごとにまとめ、事件・事故・訃報の項目を除き、"
         return Item(
@@ -1018,8 +1066,9 @@ class WikiNewsDigestAdapter:
             published_at=latest["timestamp"],
             fetched_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
             excerpt={"rule": "portal summaries for the week, 事件・事故・訃報 lines left out", "summaries": len(rows)},
-            attribution=wiki_attribution(page, latest["revid"], latest["timestamp"], note),
-            credits={"page": page, "revid": latest["revid"]},
+            attribution=wiki_attribution(page, latest["revid"], latest["timestamp"], note, sources[1:]),
+            credits={"page": page, "revid": latest["revid"],
+                     **({"revisions": [{"page": t, "revid": r} for t, r, _ in sources]} if len(sources) > 1 else {})},
         )
 
 

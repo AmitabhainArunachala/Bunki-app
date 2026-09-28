@@ -752,21 +752,6 @@
   "topic": "disaster"
  },
  {
-  "id": "mhlw:stf-newpage_76095",
-  "kind": "fresh",
-  "title": "外国人技能実習生又は特定技能外国人を使用する事業場に対して行った 令和７年の監督指導、送検等の状況を公表します",
-  "titleEn": "Labour inspections at workplaces employing foreign trainees and skilled workers (2025)",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級後半 · jread 1.09 · JLPT語彙 77% · 796字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mhlw.go.jp",
-  "date": "2026-09-15",
-  "url": "https://www.mhlw.go.jp/stf/newpage_76095.html",
-  "topic": "society"
- },
- {
   "id": "env:press-press_05575",
   "kind": "fresh",
   "title": "環境省ナッジ実証事業の取りまとめ結果の公表について",
@@ -900,21 +885,6 @@
   "date": "2026-09-18",
   "url": "https://www.mhlw.go.jp/stf/newpage_76100.html",
   "topic": "health"
- },
- {
-  "id": "mhlw:stf-newpage_76152",
-  "kind": "fresh",
-  "title": "毎年10月は中小企業退職金共済制度の「加入促進強化月間」です",
-  "titleEn": "October is sign-up month for the small-business retirement fund",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級後半 · jread 0.82 · JLPT語彙 72% · 1285字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mhlw.go.jp",
-  "date": "2026-09-18",
-  "url": "https://www.mhlw.go.jp/stf/newpage_76152.html",
-  "topic": "economy"
  },
  {
   "id": "mhlw:stf-newpage_76233",
@@ -1112,21 +1082,6 @@
   "topic": "economy"
  },
  {
-  "id": "mext:b_menu-houdou-2025-mext_00009",
-  "kind": "fresh",
-  "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
-  "titleEn": "Japan Startup Awards 2026: the university start-up prize goes to Rapyuta Robotics",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級前半 · jread 2.19 · JLPT語彙 64% · 1100字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mext.go.jp",
-  "date": "2026-09-25",
-  "url": "https://www.mext.go.jp/b_menu/houdou/2025/mext_00009.html",
-  "topic": "science"
- },
- {
   "id": "mhlw:stf-houdou-newpage_75698",
   "kind": "fresh",
   "title": "かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について",
@@ -1232,21 +1187,6 @@
   "topic": "local"
  },
  {
-  "id": "mhlw:stf-newpage_76126",
-  "kind": "fresh",
-  "title": "令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました ～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ 入賞企業を10月９日（金）に表彰～",
-  "titleEn": "Winners of the contest for companies where older workers thrive",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級前半 · jread 1.63 · JLPT語彙 65% · 1189字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mhlw.go.jp",
-  "date": "2026-09-16",
-  "url": "https://www.mhlw.go.jp/stf/newpage_76126.html",
-  "topic": "society"
- },
- {
   "id": "mhlw:stf-newpage_76340",
   "kind": "fresh",
   "title": "ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします",
@@ -1260,21 +1200,6 @@
   "date": "2026-09-18",
   "url": "https://www.mhlw.go.jp/stf/newpage_76340.html",
   "topic": "culture"
- },
- {
-  "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
-  "kind": "fresh",
-  "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
-  "titleEn": "This year's lifelong-sports awards are announced",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 64% · 1067字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mext.go.jp/sports",
-  "date": "2026-09-18",
-  "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
-  "topic": "sports"
  },
  {
   "id": "jawiki-news:2026-09-14",
@@ -1431,5 +1356,80 @@
   "url": "https://jp.globalvoices.org/2026/09/28/65726/",
   "topic": "international",
   "adaptationOf": "global-voices:2026-09-28-65726"
+ },
+ {
+  "id": "mhlw:stf-newpage_76095",
+  "kind": "fresh",
+  "title": "外国人技能実習生又は特定技能外国人を使用する事業場に対して行った令和７年の監督指導、送検等の状況を公表します",
+  "titleEn": "Labour inspections at workplaces employing foreign trainees and skilled workers (2025)",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級後半 · jread 1.09 · JLPT語彙 77% · 796字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mhlw.go.jp",
+  "date": "2026-09-15",
+  "url": "https://www.mhlw.go.jp/stf/newpage_76095.html",
+  "topic": "society"
+ },
+ {
+  "id": "mhlw:stf-newpage_76126",
+  "kind": "fresh",
+  "title": "令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました",
+  "titleEn": "Winners of the contest for companies where older workers thrive",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級前半 · jread 1.63 · JLPT語彙 65% · 1189字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mhlw.go.jp",
+  "date": "2026-09-16",
+  "url": "https://www.mhlw.go.jp/stf/newpage_76126.html",
+  "topic": "society"
+ },
+ {
+  "id": "mhlw:stf-newpage_76152",
+  "kind": "fresh",
+  "title": "10月は中小企業退職金共済制度の加入促進強化月間",
+  "titleEn": "October is sign-up month for the small-business retirement fund",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級後半 · jread 0.82 · JLPT語彙 72% · 1285字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mhlw.go.jp",
+  "date": "2026-09-18",
+  "url": "https://www.mhlw.go.jp/stf/newpage_76152.html",
+  "topic": "economy"
+ },
+ {
+  "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+  "kind": "fresh",
+  "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
+  "titleEn": "This year's lifelong-sports awards are announced",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 64% · 1073字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mext.go.jp/sports",
+  "date": "2026-09-18",
+  "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
+  "topic": "sports"
+ },
+ {
+  "id": "mext:b_menu-houdou-2025-mext_00009",
+  "kind": "fresh",
+  "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
+  "titleEn": "Japan Startup Awards 2026: the university start-up prize goes to Rapyuta Robotics",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級前半 · jread 2.19 · JLPT語彙 64% · 1110字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mext.go.jp",
+  "date": "2026-09-25",
+  "url": "https://www.mext.go.jp/b_menu/houdou/2025/mext_00009.html",
+  "topic": "science"
  }
 ]

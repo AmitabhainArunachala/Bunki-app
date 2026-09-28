@@ -1,0 +1,104 @@
+{
+  "kind": "feed-fresh-run",
+  "run": 7,
+  "startedAt": "2026-09-28T13:45:54+00:00",
+  "asOf": "2026-09-28",
+  "mode": "restage",
+  "window": {
+    "since": "2026-09-18",
+    "until": "2026-09-28",
+    "timezone": "Asia/Tokyo"
+  },
+  "terms": [
+    {
+      "source": "mext",
+      "termsUrl": "https://www.mext.go.jp/b_menu/1351168.htm",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T13:45:54+00:00",
+      "termsSha256": "0c24077cadf72db608f9e16b9914caa121957a4c4db87acf5210880096c28f80",
+      "matched": "の利用について、制限するものではありません。\nイ　本利用ルールは、平成28年7月12日に定めたものです。本利用ルールは、公共データ利用規約（第1.0版）（https://www.digital.go.jp/resources/open_data/public_data_l",
+      "ok": true
+    },
+    {
+      "source": "sports",
+      "termsUrl": "https://www.mext.go.jp/sports/b_menu/about_link.htm",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T13:45:55+00:00",
+      "termsSha256": "7c275b7d330549a9978cd8c95897b7348490c4aea75cf04a9c00318c2559b89c",
+      "matched": "象となっており、ともに日本国著作権法及び国際条約により保護されています。\n当ホームページのコンテンツを利用する場合は、「文部科学省ウェブサイト利用規約」に従って、御利用ください。\n文部科学省ウェブサイト利用規約\n免責事項\n当ホームページに記載されている情報の正確さについては万全を",
+      "ok": true
+    }
+  ],
+  "sources": {
+    "mext": {
+      "discovered": 1,
+      "extracted": 1,
+      "passed": 1,
+      "error": null
+    },
+    "sports": {
+      "discovered": 1,
+      "extracted": 1,
+      "passed": 1,
+      "error": null
+    }
+  },
+  "staged": [],
+  "restaged": [
+    {
+      "id": "mext:b_menu-houdou-2025-mext_00009",
+      "chars": 1110,
+      "contentSha256": "c68552d753c11669eabc6a08745daa15f1d389d66d17dccc5105069a96d8d62c",
+      "previousContentSha256": "63cbebb14b6464115411d43f3df0002ea368e2b06f58701a273991ce9b60beac"
+    },
+    {
+      "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+      "chars": 1073,
+      "contentSha256": "2942d7af8d418afdf9be79cbf0db88c89b480de7641bfceea7efee6b4271b3b7",
+      "previousContentSha256": "a2632f999a248b35523fb3375ad2cdc503183e878d37a7284ed102f00f374707"
+    }
+  ],
+  "skipped": [],
+  "minted": [
+    {
+      "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+      "kind": "fresh",
+      "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
+      "titleEn": "This year's lifelong-sports awards are announced",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 64% · 1073字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "mext.go.jp/sports",
+      "date": "2026-09-18",
+      "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
+      "topic": "sports"
+    },
+    {
+      "id": "mext:b_menu-houdou-2025-mext_00009",
+      "kind": "fresh",
+      "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
+      "titleEn": "Japan Startup Awards 2026: the university start-up prize goes to Rapyuta Robotics",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "上級前半 · jread 2.19 · JLPT語彙 64% · 1110字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "mext.go.jp",
+      "date": "2026-09-25",
+      "url": "https://www.mext.go.jp/b_menu/houdou/2025/mext_00009.html",
+      "topic": "science"
+    }
+  ],
+  "untitled": [],
+  "retitled": [],
+  "allowUntitled": false,
+  "outputSha256": {
+    "index.json": "15d9310c6415574828ae05baa049b2329c64cdaf046019037cdf475614898af2",
+    "feed-review-queue.json": "c947e7416ecbbb2f534fd4da0379ebeab8df11bd0cc4ed4db5b578eac803bc04",
+    "items.jsonl": "37bdb17aa8db083bd4565a8b8224fc576a3472d036dbafcf82d172d860d34149"
+  }
+}

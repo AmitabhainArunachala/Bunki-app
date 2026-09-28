@@ -66,6 +66,36 @@ def test_rejoin_wrapped_undoes_hard_wrapping_but_not_list_items():
     assert fs.rejoin_wrapped(items) == items
 
 
+def test_rejoin_wrapped_keeps_links_list_items_and_table_rows_apart():
+    # shaped like スポーツ庁 1420919_00007: a <br>-separated run of link titles
+    # (with an empty zero-width link beside two of them), then a table
+    links = """<body><p><a href="/4">&#8203;</a><a href="/6">令和7年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました<img alt="別ウィンドウ"></a><br>
+      <a href="/4">令和6年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました</a><a href="/2">&#8203;</a><br>
+      <a href="/3">令和5年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました</a></p>
+      <table><tr><td>過去の総表彰数と表彰した団体の数を示す表の行です</td><td>6,437名</td></tr>
+      <tr><td>審査及び推薦基準</td><td>十年以上スポーツの普及に尽力した者であること。</td></tr></table>
+      <ul><li>都道府県の教育委員会から推薦された候補者の一覧です</li><li>公益財団法人日本スポーツ協会</li></ul></body>"""
+    assert fs.rejoin_wrapped(lines_of(links)) == [
+        "令和7年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました",
+        "令和6年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました",
+        "令和5年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました",
+        "過去の総表彰数と表彰した団体の数を示す表の行です　6,437名",
+        "審査及び推薦基準　十年以上スポーツの普及に尽力した者であること。",
+        "都道府県の教育委員会から推薦された候補者の一覧です",
+        "公益財団法人日本スポーツ協会",
+    ]
+    # controls: hard wrapping inside one paragraph, one list item or one link still rejoins,
+    # and so does running text that merely contains a link
+    wrapped = """<body><p>地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治<br>療を促進します。</p>
+      <ul><li>地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治<br>療を促進します。</li></ul>
+      <p>詳しくは<a href="/x">地域社会における精神保健及び精神障害者の福祉に関する案内</a>をご覧のうえ<br>お申し込みください。</p></body>"""
+    assert fs.rejoin_wrapped(lines_of(wrapped)) == [
+        "地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治療を促進します。",
+        "地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治療を促進します。",
+        "詳しくは地域社会における精神保健及び精神障害者の福祉に関する案内をご覧のうえお申し込みください。",
+    ]
+
+
 def test_trim_paragraphs_cuts_on_paragraph_boundaries_and_says_so():
     paras = ["あ" * 500, "い" * 500, "う" * 500]
     kept, excerpt = fs.trim_paragraphs(paras, 1200)
@@ -106,6 +136,29 @@ def test_mhlw_container_drops_the_release_header_and_reader_note():
     assert fs.block_lines(adapter.container(root)) == ["厚生労働省は、運用を開始します。"]
 
 
+@pytest.mark.parametrize("adapter, html", [
+    (fs.MhlwAdapter, """<body><div class="l-contentMain">
+      <div class="m-boxInfo"><p class="m-boxInfo__date">令和8年9月22日（火）</p><p>照会先</p></div>
+      <p class="m-txtM">報道関係者　各位</p><div><h1 class="m-hdgLv1__hdg">ページの題</h1></div>
+      <div class="m-grid"><p>厚生労働省は、運用を開始します。</p></div></div></body>"""),
+    (fs.MextAdapter, """<body><div id="contentsMain"><h1>ページの題</h1><p class="right">令和8年9月22日</p>
+      <p>文部科学省は、運用を開始します。</p></div></body>"""),
+])
+def test_release_title_and_date_are_the_pages_own_not_the_feeds(adapter, html):
+    # extract_from, not page_date: container() cuts the h1 and the date stamp
+    # out of the tree, so they have to be read before it runs
+    stub = {"url": "https://www.example.go.jp/newpage_99999.html", "title": "フィードの題",
+            "published": datetime(2026, 9, 24, 14, tzinfo=fs.JST)}
+    item = adapter().extract_from(fs.Response(stub["url"], 200, "text/html", html.encode()), fs.parse_html(html), stub)
+    assert (item.title, item.date) == ("ページの題", "2026-09-22")
+    assert len(item.paragraphs) == 1 and item.paragraphs[0].endswith("運用を開始します。")
+    assert "「ページの題」" in item.attribution and "フィードの題" not in item.attribution
+    # control: a page with neither keeps the feed's title and listing date
+    bare = html.replace("<h1", "<h2").replace("</h1>", "</h2>").replace("9月22日", "")
+    item = adapter().extract_from(fs.Response(stub["url"], 200, "text/html", bare.encode()), fs.parse_html(bare), stub)
+    assert (item.title, item.date) == ("フィードの題", "2026-09-24")
+
+
 def test_env_header_trim():
     lines = ["この記事を印刷", "2026年09月25日", "自然環境", "＜兵庫県・神戸市同時発表＞", "本文です。"]
     assert fs.EnvAdapter().trim_header(lines) == ["＜兵庫県・神戸市同時発表＞", "本文です。"]
@@ -120,6 +173,35 @@ def test_wikitext_bullets_become_plain_text_with_their_link_targets():
     assert targets[0] == "2026年アジア競技大会"
     text, _ = fs.wikitext_plain("[[2026年の台風#台風25号（ドゥージェン）|台風25号]]による大雨{{仮リンク|某川|en|River}}<ref>x</ref>")
     assert text == "台風25号による大雨某川"
+
+
+def digest_bullet(day, page, revid, timestamp):
+    return {"date": day, "text": f"{day.day}日の要約文。", "targets": [], "page": page, "revid": revid,
+            "timestamp": timestamp, "excluded": False}
+
+
+def test_a_weekly_digest_credits_every_month_page_it_draws_from():
+    sep, oct_ = "Portal:最近の出来事/2026年9月", "Portal:最近の出来事/2026年10月"
+    adapter = fs.WikiNewsDigestAdapter(now=datetime(2026, 10, 6, tzinfo=fs.timezone.utc))
+    week = [digest_bullet(date(2026, 9, d), sep, 111200000, "2026-10-04T10:00:00Z") for d in (28, 29, 30)]
+    week += [digest_bullet(date(2026, 10, d), oct_, 111200500, "2026-10-05T09:00:00Z") for d in (1, 2)]
+    item = adapter.extract({"monday": date(2026, 9, 28), "sunday": date(2026, 10, 4), "bullets": week})
+    for page, revid in ((sep, 111200000), (oct_, 111200500)):
+        assert f"「{page}」（版 {revid}、" in item.attribution
+        assert f"title={fs.urllib.parse.quote(page)}&action=history" in item.attribution
+    assert item.credits["revisions"] == [{"page": oct_, "revid": 111200500}, {"page": sep, "revid": 111200000}]
+    assert item.url.endswith("oldid=111200500") and item.credits["revid"] == 111200500
+    # control: a week inside one month keeps the one-page credit, word for word as shipped
+    one = adapter.extract({"monday": date(2026, 9, 21), "sunday": date(2026, 9, 27),
+                           "bullets": [digest_bullet(date(2026, 9, d), sep, 111174909, "2026-09-27T03:02:37Z") for d in (21, 23, 25)]})
+    assert one.attribution == (
+        "出典：ウィキペディア日本語版「Portal:最近の出来事/2026年9月」（版 111174909、2026-09-27）の執筆者、"
+        "CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?"
+        "title=Portal%3A%E6%9C%80%E8%BF%91%E3%81%AE%E5%87%BA%E6%9D%A5%E4%BA%8B/2026%E5%B9%B49%E6%9C%88&action=history ／ "
+        "日付節の要約文を週ごとにまとめ、事件・事故・訃報の項目を除き、ふりがなと辞書リンクを付けて掲載（Bunki）。"
+        "この頁の本文は CC BY-SA 4.0 で再利用できる。"
+    )
+    assert one.credits == {"page": sep, "revid": 111174909}
 
 
 def test_event_targets_are_instances_not_topics_or_calendar_pages():
@@ -204,6 +286,92 @@ def test_default_since_ignores_mint_only_runs(tmp_path, monkeypatch):
     for path in tmp_path.glob("run-*.json"):
         path.unlink()
     assert ff.default_since() == datetime.now(fs.JST).date() - ff.timedelta(days=ff.DEFAULT_DAYS)
+
+
+def restage_shelf(tmp_path, monkeypatch):
+    """One pending fresh reading on a scratch shelf, and a refetch whose text changed."""
+    import json
+
+    import feed_fresh as ff
+    import feed_ingest
+
+    old = dict(fake_item().record(), stagedAt="2026-09-25T03:00:00+00:00")
+    paths = {
+        "DATASET": tmp_path / "items.jsonl",
+        "INDEX_PATH": tmp_path / "articles" / "index.json",
+        "QUEUE_PATH": tmp_path / "queue.json",
+        "ARTICLES": tmp_path / "articles",
+        "TITLES_PATH": tmp_path / "titles.json",
+        "EVIDENCE_DIR": tmp_path / "runs",
+        "ADAPTATIONS_PATH": tmp_path / "no-adaptations.json",
+        "REPO": tmp_path,
+    }
+    for name, path in paths.items():
+        monkeypatch.setattr(ff, name, path)
+    monkeypatch.setattr(feed_ingest, "QUEUE_PATH", paths["QUEUE_PATH"])
+    paths["ARTICLES"].mkdir()
+    body = paths["ARTICLES"] / "env-press-press_99999.json"
+    body.write_text('{"id":"env:press-press_99999","text":"old"}', "utf-8")
+    paths["DATASET"].write_text(json.dumps(old, ensure_ascii=False) + "\n", "utf-8")
+    paths["INDEX_PATH"].write_text(json.dumps({"sources": {}, "articles": [
+        {"id": old["id"], "file": body.name, "addedAt": "2026-09-26"}]}, indent=1) + "\n", "utf-8")
+    paths["QUEUE_PATH"].write_text(json.dumps([{"id": old["id"], "kind": "fresh", "decision": "pending",
+                                                  "addedAt": "2026-09-26", "titleEn": "New ants at Kobe"}], indent=2) + "\n", "utf-8")
+    paths["TITLES_PATH"].write_text(json.dumps({"titleEnSource": "test", "titles": {old["id"]: "New ants at Kobe"}}), "utf-8")
+    changed = fake_item(paragraphs=["環境省は、神戸港で確認されたアリの同定結果を改めて公表しました。" * 8]).record()
+    report = {"terms": [], "skipped": [], "sources": {"env": {"discovered": 1, "extracted": 1, "passed": 1, "error": None}}}
+    monkeypatch.setattr(ff, "fetch", lambda since, until, only, known: ([dict(changed)], report))
+    monkeypatch.setattr(ff.ba, "load_jlpt_lexicon", lambda: {})
+    monkeypatch.setattr(sys, "argv", ["feed_fresh.py", "--restage", "--since", "2026-09-14"])
+    return ff, paths, body, old, changed
+
+
+@pytest.mark.parametrize("failure", ["mint throws", "tokenizer missing"])
+def test_restage_writes_nothing_when_the_mint_fails(tmp_path, monkeypatch, failure):
+    import types
+
+    ff, paths, body, _old, _changed = restage_shelf(tmp_path, monkeypatch)
+    if failure == "tokenizer missing":
+        monkeypatch.setitem(sys.modules, "corpus.grading._mecab", None)
+    else:
+        monkeypatch.setitem(sys.modules, "corpus.grading._mecab", types.SimpleNamespace(get_tagger=lambda: None))
+
+        def broken_mint(*_args, **_kwargs):
+            raise RuntimeError("the tagger died mid-run")
+
+        monkeypatch.setattr(ff, "mint", broken_mint)
+    before = {name: paths[name].read_bytes() for name in ("DATASET", "INDEX_PATH", "QUEUE_PATH")}
+    with pytest.raises((RuntimeError, ImportError)):
+        ff.main()
+    assert {name: paths[name].read_bytes() for name in before} == before
+    assert body.read_text("utf-8") == '{"id":"env:press-press_99999","text":"old"}'
+    assert not paths["EVIDENCE_DIR"].exists()
+
+
+def test_restage_replaces_the_reading_once_the_mint_succeeds(tmp_path, monkeypatch):
+    import json
+    import types
+
+    ff, paths, body, old, changed = restage_shelf(tmp_path, monkeypatch)
+    monkeypatch.setitem(sys.modules, "corpus.grading._mecab", types.SimpleNamespace(get_tagger=lambda: None))
+
+    def fake_mint(row, title_en, _title_source, _topic, as_of, _tagger, _maps):
+        shared = {"id": row["id"], "addedAt": as_of, "date": row["date"], "titleEn": title_en}
+        grading = {"signals": {"jreadability": {"band": "中級"}}}
+        return (dict(shared, text=row["text"]), dict(shared, file=body.name, chars=len(row["text"]), grading=grading),
+                dict(shared, kind="fresh", decision="pending"))
+
+    monkeypatch.setattr(ff, "mint", fake_mint)
+    assert ff.main() == 0
+    rows = [json.loads(line) for line in paths["DATASET"].read_text("utf-8").splitlines()]
+    assert len(rows) == 1 and rows[0]["text"] == changed["text"]
+    assert rows[0]["previousContentSha256"] == old["contentSha256"] and rows[0]["stagedAt"] == old["stagedAt"]
+    assert "_addedAt" not in rows[0]
+    shelf = json.loads(paths["INDEX_PATH"].read_text("utf-8"))["articles"]
+    queue = json.loads(paths["QUEUE_PATH"].read_text("utf-8"))
+    assert [(r["id"], r["addedAt"]) for r in shelf] == [(old["id"], "2026-09-26")]
+    assert [(r["id"], r["addedAt"]) for r in queue] == [(old["id"], "2026-09-26")]
+    assert json.loads(body.read_text("utf-8"))["text"] == changed["text"]
 
 
 def test_global_voices_byline_and_preface_move_to_the_attribution():
