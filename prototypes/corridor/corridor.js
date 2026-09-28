@@ -24272,10 +24272,19 @@ function renderStrokePage(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring also catches focus that is inside the room but not ON the ring. The room can
+    // hold focus on its own container, which is neither first nor last, so one Shift+Tab walked
+    // out to <body>, and Escape, bound to the room, went dead with it (PR #77 d9f0b984)
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -24676,10 +24685,19 @@ function renderSheet(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring also catches focus that is inside the room but not ON the ring. The room can
+    // hold focus on its own container, which is neither first nor last, so one Shift+Tab walked
+    // out to <body>, and Escape, bound to the room, went dead with it (PR #77 d9f0b984)
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
