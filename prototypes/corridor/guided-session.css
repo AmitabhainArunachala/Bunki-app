@@ -356,7 +356,10 @@
 .gs-duecard button.gs-light b {
   font-size: 15px;
 }
-.gs-duecard .gs-gloss {
+/* the glosses ride inline beside their Japanese, even inside the card's block-level small */
+.gs-duecard button .gs-gloss {
+  display: inline;
+  margin: 0 0 0 7px;
   color: inherit;
   opacity: 0.8;
 }
@@ -625,6 +628,21 @@
   box-shadow: var(--gs-sheet-shadow);
   padding: 20px 18px 18px;
 }
+:root:is(
+    [data-theme='rokusho'],
+    [data-theme='yoru'],
+    [data-theme='nami'],
+    [data-theme='hakuu'],
+    [data-theme='kaku']
+  )
+  .gs-sheet:not(.gs-lacquer) {
+  /* night paper keeps its grain but no sheen: on a dark ground a light sheen reads as glow */
+  background-image: repeating-linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--ink) 2.5%, transparent) 0 1px,
+    transparent 1px 3px
+  );
+}
 .gs-sheet .gs-title {
   font-size: clamp(21px, 3vw, 26px);
   margin-bottom: 14px !important;
@@ -855,7 +873,8 @@ legend.gs-instruction {
   gap: 14px;
   padding-top: 6px;
 }
-.gs-aside h3 {
+.gs-aside h3,
+.gs-aside .gs-aside-title {
   font-size: 16px;
 }
 .gs-aside p {
@@ -1118,7 +1137,8 @@ legend.gs-instruction {
   color: var(--faint);
   padding-top: 3px;
 }
-.gs-row h3 {
+.gs-row h3,
+.gs-row .gs-row-title {
   font-size: 18px;
   display: flex;
   flex-wrap: wrap;

@@ -507,13 +507,28 @@ export function createGuidedSession(host) {
       if (ready) return ['saved due', t('いま復習できる', 'Ready to review')];
       return ['saved', inDeck ? t('デッキにある', 'In your deck') : t('覚にある', 'In Learn')];
     }
+    // no Learn row, but the learner's deck already holds this target's card (from here or
+    // from anywhere else in Bunki): the field says so, from the real rows
+    const keys = q.cards.map(keyOf);
+    if (keys.some((key) => infos.get(key)?.ready))
+      return ['saved due', t('いま復習できる', 'Ready to review')];
+    if (keys.some((key) => infos.get(key)?.taken))
+      return ['saved', t('デッキにある', 'In your deck')];
     if (answer(q).choice !== null) return ['encountered', t('出会った', 'Encountered')];
     return ['', t('これから', 'Still ahead')];
   }
+  /** The cards this session put into Learn: its active rows' targets and its saved words. */
   function sessionKeys() {
     const keys = new Set();
     for (const row of activeLearn()) for (const card of row.cards) keys.add(card.key);
     for (const row of state.savedWords) keys.add(keyOf(wordNode(row.wordId)));
+    return [...keys].filter((key) => nodeOf(key).id);
+  }
+  /** Everything the field stands for: every question's target cards and the saved words,
+   * whether the card came from this session or from anywhere else in the learner's deck. */
+  function fieldKeys() {
+    const keys = new Set(Q.flatMap((q) => q.cards.map(keyOf)));
+    for (const key of sessionKeys()) keys.add(key);
     return [...keys].filter((key) => nodeOf(key).id);
   }
   function fieldMap(infos) {
@@ -540,7 +555,7 @@ export function createGuidedSession(host) {
     const ready = [...infos.entries()].filter(([, info]) => info?.ready);
     if (!ready.length) return '';
     const labels = ready.map(([key]) => host.deck.title(nodeOf(key)));
-    return `<div class="gs-duecard"><button type="button" data-action="review"><b>${bi(`復習 · ${ready.length} 件`, 'ready to review now')}</b><small lang="ja">${esc(labels.slice(0, 4).join(' · '))}${labels.length > 4 ? ' …' : ''}</small><span class="gs-go">${bi('始める', 'begin')} →</span></button><button type="button" class="gs-light" data-action="results"><b>${bi(`${set.level} · 前回`, 'last time')}</b><small>${countRight()} / ${answered()} ${bi('正解', 'correct')} · ${activeLearn().length} ${bi('覚に', 'in Learn')}</small></button></div>`;
+    return `<div class="gs-duecard"><button type="button" data-action="review" data-scope="field"><b>${bi(`復習 · ${ready.length} 件`, 'ready to review now')}</b><small lang="ja">${esc(labels.slice(0, 4).join(' · '))}${labels.length > 4 ? ' …' : ''}</small><span class="gs-go">${bi('始める', 'begin')} →</span></button><button type="button" class="gs-light" data-action="results"><b>${bi(`${set.level} · 前回`, 'last time')}</b><small>${countRight()} / ${answered()} ${bi('正解', 'correct')} · ${activeLearn().length} ${bi('覚に', 'in Learn')}</small></button></div>`;
   }
 
   function roomBar() {
@@ -549,7 +564,7 @@ export function createGuidedSession(host) {
 
   function home() {
     const returning = state.finished;
-    const infos = cardInfo(sessionKeys());
+    const infos = cardInfo(fieldKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
     return `<section class="gs-arrival"><div class="gs-intro"><span class="gs-eyebrow">Bunki <span class="gs-dot">/</span> ${bi('生きた糸', 'a living thread')}</span>
       <h1 class="gs-title gs-hero" tabindex="-1">${returning ? t('糸の続きを、<br>たどろう。', 'Pick up<br>your thread.') : t('十五分、<br>日本語と<br>ともに。', 'Spend fifteen<br>minutes with<br>Japanese.')}</h1>
@@ -598,7 +613,7 @@ export function createGuidedSession(host) {
 
   function aside(q) {
     const a = answer(q);
-    return `<aside class="gs-aside"><div><h3>${bi('ここに戻れます。', 'your place is held')}</h3><p>${
+    return `<aside class="gs-aside"><div><h2 class="gs-aside-title">${bi('ここに戻れます。', 'your place is held')}</h2><p>${
       a.choice !== null
         ? t(
             '解説をひらいても、言葉をたどってもいい。最初の答えはこの問題に残る。',
@@ -735,7 +750,7 @@ export function createGuidedSession(host) {
             : a.correct
               ? bi('正解', 'correct')
               : bi('不正解', 'incorrect');
-        return `<div class="gs-row ${a.correct === false ? 'missed' : ''}"><span class="gs-row-number">${String(i + 1).padStart(2, '0')}</span><div><h3>${bi(kindLabel(q)[0], kindLabel(q)[1])}</h3><p>${outcome}${a.helpBefore ? ` · ${bi('助けあり', 'assisted')}` : ''}${a.flagged ? ` · ${bi('旗', 'flagged')}` : ''}</p></div><div class="gs-row-actions">${textBtn(bi('見直す', 'revisit'), 'source', `data-index="${i}"`)}</div></div>`;
+        return `<div class="gs-row ${a.correct === false ? 'missed' : ''}"><span class="gs-row-number">${String(i + 1).padStart(2, '0')}</span><div><h2 class="gs-row-title">${bi(kindLabel(q)[0], kindLabel(q)[1])}</h2><p>${outcome}${a.helpBefore ? ` · ${bi('助けあり', 'assisted')}` : ''}${a.flagged ? ` · ${bi('旗', 'flagged')}` : ''}</p></div><div class="gs-row-actions">${textBtn(bi('見直す', 'revisit'), 'source', `data-index="${i}"`)}</div></div>`;
       },
     ).join(
       '',
@@ -845,11 +860,11 @@ export function createGuidedSession(host) {
     const infos = cardInfo(sessionKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
     const ready = [...infos.values()].filter((info) => info?.ready).length;
-    return `<div class="gs-deck-summary gs-spaced"><p>${t(`この稽古の札: デッキに${inDeck}枚 · いま復習できる${ready}枚`, `This session’s cards: ${inDeck} in your deck · ${ready} ready to review now`)}</p><div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, 'review these now'), 'review', 'primary') : ''}${btn(bi('覚えるデッキを開く', 'open your 覚える deck'), 'deck', ready ? 'quiet' : '')}</div></div>`;
+    return `<div class="gs-deck-summary gs-spaced"><p>${t(`この稽古の札: デッキに${inDeck}枚 · いま復習できる${ready}枚`, `This session’s cards: ${inDeck} in your deck · ${ready} ready to review now`)}</p><div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, 'review these now'), 'review', 'primary', 'data-scope="session"') : ''}${btn(bi('覚えるデッキを開く', 'open your 覚える deck'), 'deck', ready ? 'quiet' : '')}</div></div>`;
   }
 
   function learn() {
-    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('覚', 'learn')} <span class="gs-dot">/</span> ${bi('覚える', 'oboeru')}</span><h1 class="gs-title" tabindex="-1">${bi('もう一度、会いに行く。', 'worth another visit')}</h1><p class="gs-lede">${t('間違えた問題と旗を立てた問題は、最初に出会った場所とつながったまま。', 'Missed questions and the ones you flagged stay connected to where you first met them.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-spaced">${followups()}</div>${savedWordsView()}${deckSummary()}<p class="gs-side-note gs-spaced">${t('ここで加えた札は、ほかの札と同じ覚えるデッキに入る。行を外すと、この稽古で加え、まだ復習していない札だけが抜ける。', 'Cards added here join your 覚える deck with every other card. Removing a row takes out only a card this session added and you have not reviewed yet.')}</p><div class="gs-actions">${btn(bi('場へ戻る', 'back to your field'), 'field', 'primary')}${!state.finished ? textBtn(state.started ? bi('続きへ', 'continue session') : bi('はじめる', 'begin session'), state.started ? 'resume' : 'setup') : textBtn(bi('結果へ', 'session results'), 'results')}</div></section>`;
+    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('覚', 'learn')} <span class="gs-dot">/</span> ${bi('覚える', 'oboeru')}</span><h1 class="gs-title" tabindex="-1">${bi('もう一度、会いに行く。', 'worth another visit')}</h1><p class="gs-lede">${t('間違えた問題と旗を立てた問題は、最初に出会った場所とつながったまま。', 'Missed questions and the ones you flagged stay connected to where you first met them.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-spaced"><h2 class="gs-sr-only">${t('見直す問題', 'Questions to revisit')}</h2>${followups()}</div>${savedWordsView()}${deckSummary()}<p class="gs-side-note gs-spaced">${t('ここで加えた札は、ほかの札と同じ覚えるデッキに入る。行を外すと、この稽古で加え、まだ復習していない札だけが抜ける。', 'Cards added here join your 覚える deck with every other card. Removing a row takes out only a card this session added and you have not reviewed yet.')}</p><div class="gs-actions">${btn(bi('場へ戻る', 'back to your field'), 'field', 'primary')}${!state.finished ? textBtn(state.started ? bi('続きへ', 'continue session') : bi('はじめる', 'begin session'), state.started ? 'resume' : 'setup') : textBtn(bi('結果へ', 'session results'), 'results')}</div></section>`;
   }
 
   function freshView() {
@@ -879,10 +894,10 @@ export function createGuidedSession(host) {
   }
 
   function field() {
-    const infos = cardInfo(sessionKeys());
+    const infos = cardInfo(fieldKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
     const ready = [...infos.values()].filter((info) => info?.ready).length;
-    return `<section class="gs-field-layout"><div><span class="gs-eyebrow">${bi('あなたの場', 'your return field')}</span><h1 class="gs-title" tabindex="-1">${t('見慣れたもの。<br>少し深く。', 'Familiar things.<br>A little more depth.')}</h1><p class="gs-lede">${state.started ? t('どの点にも一つの出会いがある。点をひらくと、答えがついたままの元の問題に戻る。', 'Each point holds an encounter. Open one to return to the exact question, with your answer still attached.') : t('場は練習するほど形になる。稽古を始めて、最初の跡を残そう。', 'Your field takes shape as you practise. Begin a session to leave your first traces.')}</p><div class="gs-legend"><span>${t('出会った', 'Encountered')}</span><span>${t('覚・デッキ', 'In Learn · your deck')}</span><span>${t('いま復習できる', 'Ready to review')}</span><span>${t('もう一度練習', 'Practised again')}</span></div>${state.draft ? `<div class="gs-personal-line" lang="ja">${esc(state.draft)}</div><p class="gs-side-note">${t('自分の言葉 · 採点なし', 'Your own words · ungraded')}</p>` : ''}<div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, 'review what is ready'), 'review', 'primary') : ''}${btn(state.started ? bi('覚を開く', 'open Learn') : bi('はじめる', 'begin a guided session'), state.started ? 'learn' : 'setup', ready ? 'quiet' : 'primary')}${textBtn(bi('戻る', 'home'), state.finished ? 'return-home' : 'home')}</div><p class="gs-side-note gs-spaced">${t('これはこの稽古の跡で、習熟の地図ではない。', 'These are traces of this session, not a map of mastery.')}</p></div><div>${fieldMap(infos)}<div class="gs-field-caption"><strong>${t(`${answered()}問に出会った`, `${answered()} questions encountered`)}</strong><span>${t(`デッキに${inDeck}枚 · もう一度練習${state.reviewed.length}`, `${inDeck} in your deck · ${state.reviewed.length} practised again`)}</span></div></div></section>`;
+    return `<section class="gs-field-layout"><div><span class="gs-eyebrow">${bi('あなたの場', 'your return field')}</span><h1 class="gs-title" tabindex="-1">${t('見慣れたもの。<br>少し深く。', 'Familiar things.<br>A little more depth.')}</h1><p class="gs-lede">${state.started ? t('どの点にも一つの出会いがある。点をひらくと、答えがついたままの元の問題に戻る。', 'Each point holds an encounter. Open one to return to the exact question, with your answer still attached.') : t('場は練習するほど形になる。稽古を始めて、最初の跡を残そう。', 'Your field takes shape as you practise. Begin a session to leave your first traces.')}</p><div class="gs-legend"><span>${t('出会った', 'Encountered')}</span><span>${t('覚・デッキ', 'In Learn · your deck')}</span><span>${t('いま復習できる', 'Ready to review')}</span><span>${t('もう一度練習', 'Practised again')}</span></div>${state.draft ? `<div class="gs-personal-line" lang="ja">${esc(state.draft)}</div><p class="gs-side-note">${t('自分の言葉 · 採点なし', 'Your own words · ungraded')}</p>` : ''}<div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, 'review what is ready'), 'review', 'primary', 'data-scope="field"') : ''}${btn(state.started ? bi('覚を開く', 'open Learn') : bi('はじめる', 'begin a guided session'), state.started ? 'learn' : 'setup', ready ? 'quiet' : 'primary')}${textBtn(bi('戻る', 'home'), state.finished ? 'return-home' : 'home')}</div><p class="gs-side-note gs-spaced">${t('これはこの稽古の跡で、習熟の地図ではない。', 'These are traces of this session, not a map of mastery.')}</p></div><div>${fieldMap(infos)}<div class="gs-field-caption"><strong>${t(`${answered()}問に出会った`, `${answered()} questions encountered`)}</strong><span>${t(`デッキに${inDeck}枚 · もう一度練習${state.reviewed.length}`, `${inDeck} in your deck · ${state.reviewed.length} practised again`)}</span></div></div></section>`;
   }
 
   function senseiText() {
@@ -1297,7 +1312,11 @@ export function createGuidedSession(host) {
         host.openTutor?.();
         return;
       case 'review':
-        if (!host.deck.review(sessionKeys().map(nodeOf))) {
+        if (
+          !host.deck.review(
+            (b.dataset.scope === 'session' ? sessionKeys() : fieldKeys()).map(nodeOf),
+          )
+        ) {
           notice = t('いま復習できる札はない。', 'No cards are ready to review right now.');
           redraw();
         }
