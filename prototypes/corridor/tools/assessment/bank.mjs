@@ -7,6 +7,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { constants } from 'node:fs';
+import { MACHINE_CHECK_ROUTE, isMachineCheckedEntry } from './machine-checked-class.mjs';
 
 export const REPOSITORY = fileURLToPath(new URL('../../../../', import.meta.url));
 export const AUTHORING = fileURLToPath(new URL('./authoring/', import.meta.url));
@@ -750,10 +751,22 @@ export function admittedWrittenSections(catalog, pins = REVIEWED_WRITTEN) {
         throw new Error(`Public written section does not match its ${pin.level} pin`);
       return { pin, entry };
     });
-  const ready = catalog.entries.filter((entry) => entry.availability?.ready).length;
+  // The machine-checked class is admitted and verified separately (written-bank.mjs); any
+  // other ready entry, including one that only claims that route, still fails here.
+  const ready = catalog.entries.filter(
+    (entry) => entry.availability?.ready && !isMachineCheckedEntry(entry),
+  ).length;
   if (ready !== rows.length)
     throw new Error(`Expected ${rows.length} ready written sections, found ${ready} ready entries`);
   return rows;
+}
+
+/** A native rebuild keeps every machine-checked written entry exactly as published. */
+export function retainedMachineCheckedEntries(entries) {
+  return (entries ?? []).filter(
+    (entry) => entry.publicationRoute === MACHINE_CHECK_ROUTE && isMachineCheckedEntry(entry) &&
+      entry.availability?.ready === true,
+  );
 }
 
 export function assertMediaFreeWrittenDelivery(form, delivery, review) {
@@ -1174,6 +1187,7 @@ export async function buildAssessmentBank(options = {}) {
   // A later native-mock build must not withdraw any separately admitted written section.
   // Custom writtenPins were confined to an explicit external fixture target before any work.
   entries.push(...retainedWrittenEntries(previous.entries, writtenPins));
+  entries.push(...retainedMachineCheckedEntries(previous.entries));
   const archives = new Map();
   for (const entry of [...(previous.archivedEntries ?? []), ...(previous.entries ?? [])]) {
     if (

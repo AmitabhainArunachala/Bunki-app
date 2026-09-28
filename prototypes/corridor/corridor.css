@@ -7576,6 +7576,11 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .review-face .assessment-review-assisted { margin: .75rem 0 0; font-size: var(--t-chrome, 13px); line-height: 1.6; color: var(--ink-2, #4a5d70); }
 body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a453a); }
 .exam-notice { border-inline-start: 3px solid var(--red); padding: .75rem; line-height: 1.6; }
+/* 検収前 · machine-checked forms: the label reads as provenance, in secondary ink. */
+.assessment-room .exam-machine-label { display: block; margin: .35rem 0; font-size: .8rem; line-height: 1.6;
+  color: var(--ink-2); white-space: normal; overflow-wrap: anywhere; }
+.assessment-room .exam-item-provenance { font-size: .8rem; line-height: 1.6; color: var(--ink-2); }
+.exam-written { margin-bottom: 1.5rem; }
 .exam-image { max-width: 100%; height: auto; }
 @media (max-width: 480px) {
   .exam-lengths { gap: .4rem; }

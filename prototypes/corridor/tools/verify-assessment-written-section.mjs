@@ -378,7 +378,11 @@ async function catalogDoor(page, section, screenshotPrefix = null) {
     .locator('[data-exam-form]')
     .filter({ has: page.locator(`[data-exam-start=${JSON.stringify(entry.id)}]`) });
   await card.waitFor();
-  assert.match(await page.locator('.exam-section-heading').innerText(), /Practice by skill/u);
+  // The level may also list machine-checked written tests and older sets under their own headings.
+  assert.match(
+    await page.locator('.exam-section-heading', { hasText: /Practice by skill/u }).innerText(),
+    /Practice by skill/u,
+  );
   assert.equal(await card.locator('h2').textContent(), entry.titleEn);
   assert.match(
     await card.locator('.exam-form-meta').innerText(),
@@ -1222,7 +1226,11 @@ async function existingCardCase(page, section, log) {
   return { first: first.attemptId, second: second.attemptId, mark: second.mark };
 }
 
-const dojoPracticeLabel = `${sections.length} practice set${sections.length === 1 ? '' : 's'} · mock tests in preparation`;
+// Machine-checked written tests, when published, name themselves on the door as awaiting review.
+const machineWritten = catalog.entries.filter((row) => row.availability.ready && row.mode === 'written').length;
+const dojoPracticeLabel = machineWritten
+  ? `${machineWritten} written tests · awaiting review`
+  : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · mock tests in preparation`;
 try {
   for (const engine of engines) {
     for (const section of sections) {
@@ -1260,7 +1268,10 @@ try {
         await page.locator('.assessment-room > h1 > .en-inline').textContent(),
         'JLPT tests & practice',
       );
-      assert.match(await page.locator('.exam-section-heading').innerText(), /Practice by skill/u);
+      assert.match(
+        await page.locator('.exam-section-heading', { hasText: /Practice by skill/u }).innerText(),
+        /Practice by skill/u,
+      );
       const written = page.locator(`[data-exam-form=${JSON.stringify(entry.id)}]`);
       assert.equal(await written.locator('h2').textContent(), entry.titleEn);
       assert.equal(
@@ -1268,7 +1279,16 @@ try {
         'Vocabulary · Grammar · Reading',
       );
       assert.match(await written.locator('.exam-status').innerText(), /without listening/u);
-      assert.equal(await page.locator('[data-exam-start]').count(), 1);
+      // Exactly one host-reviewed start at this level; the labelled machine-checked group holds
+      // exactly this level's machine-checked catalog entries and nothing else.
+      const machineStarts = await page.locator(`[data-exam-written="${pin.level}"] [data-exam-start]`).count();
+      assert.equal(
+        machineStarts,
+        catalog.entries.filter(
+          (row) => row.level === pin.level && row.publicationRoute === 'machine-checked-written/1',
+        ).length,
+      );
+      assert.equal((await page.locator('[data-exam-start]').count()) - machineStarts, 1);
       const pending = catalog.entries.find((row) => row.level === pin.level && row.mode === 'short');
       if (pending)
         assert.match(

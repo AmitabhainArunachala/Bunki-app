@@ -178,10 +178,13 @@ const MANUSCRIPT_FIELDS = new Set([
   'answer',
   'rationale',
   'target',
+  'subject',
   'passage',
   'passages',
   'doubts',
 ]);
+// A canonical dictionary or grammar identity for the tested target (word, grammar, particle, kanji).
+const MANUSCRIPT_SUBJECT = /^(?:word|grammar|particle|kanji):\S+$/u;
 
 /** Written-only practice. Content enters through a manuscript; these values never admit it. */
 export const WRITTEN_SPECS = Object.freeze({
@@ -261,6 +264,11 @@ export function prepareWrittenOriginal(spec) {
     )
       throw new Error(`${label} has an invalid option list or key`);
     if (
+      entry.subject !== undefined &&
+      (entry.target !== undefined || typeof entry.subject !== 'string' || !MANUSCRIPT_SUBJECT.test(entry.subject))
+    )
+      throw new Error(`${label} subject must be one canonical identity, not combined with target`);
+    if (
       entry.doubts !== undefined &&
       (!Array.isArray(entry.doubts) || entry.doubts.some((doubt) => typeof doubt !== 'string'))
     )
@@ -299,7 +307,9 @@ export function prepareWrittenOriginal(spec) {
     media: [],
     subjects: entry.target
       ? [`word:${entry.target}`]
-      : [`${nonOfficial.has(entry.task) ? 'practice' : 'jlpt'}-${namespace}:${entry.task}`],
+      : entry.subject
+        ? [entry.subject]
+        : [`${nonOfficial.has(entry.task) ? 'practice' : 'jlpt'}-${namespace}:${entry.task}`],
     response: {
       kind: 'selected',
       options: entry.options.map((text, choice) => ({ id: `choice-${choice + 1}`, text })),
