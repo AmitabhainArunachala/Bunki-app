@@ -5,9 +5,11 @@
  * roughly doubled after it. Each probe here reproduces one of that branch's
  * findings in real Chromium on one staged artifact. A fix was ported only
  * where its probe failed on the fused head; the probes of findings that head
- * already answered stay as regression guards. Every probe drives the app's
- * own controls; the only stand-ins are a seeded legacy envelope (the app's
- * migration input) and a stubbed tutor provider.
+ * already answered stay as regression guards. The fusion review's findings
+ * (2026-09-28) are probed the same way, in their own section. Every probe
+ * drives the app's own controls; the only stand-ins are a seeded legacy
+ * envelope (the app's migration input), a stubbed tutor provider, and for the
+ * stats charts a fixed clock and timezone.
  *
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-pr77-ports.mjs [--only probe,probe]
