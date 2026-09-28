@@ -367,7 +367,8 @@ def clean_lines(lines: list[str], stop: list[str] | tuple = ()) -> list[str]:
     return kept
 
 
-SENTENCE_END = "。！？!?」』）)】］]：:"
+# a "～subtitle～" line and a closing bracket end a thought as surely as 。
+SENTENCE_END = "。！？!?」』）)】］]：:～〜"
 LIST_START = re.compile(r"^([（(【［\[＜<■●○◆◇・※＊*]|[0-9０-９一二三四五六七八九十]+[．.、）)　 ]|[ア-ン][．.、）)]|第)")
 
 
@@ -385,6 +386,15 @@ def rejoin_wrapped(lines: list[str]) -> list[str]:
 
 
 # an attachment link line: 「…（PDF:401KB）」「…［PDF形式：261KB］」「…[PDF 146KB]」「…［48KB］」
+# a table row of names set out one character at a time (「漆　原　　　肇」) is
+# page layout, not text to read — and a tokenizer can only guess its readings
+SPACED_NAME_RE = re.compile(r"[一-鿿]　+[一-鿿]")
+
+
+def spaced_table_line(line: str) -> bool:
+    return len(SPACED_NAME_RE.findall(line)) >= 3
+
+
 PDF_LINK_RE = re.compile(r"[（(［\[](?:PDF|ＰＤＦ)?(?:形式)?[:：]?\s*[\d.,]+\s*[KMG]?B[）)］\]]", re.I)
 URL_LINE_RE = re.compile(r"^[（(]?https?://\S+[）)]?$")
 
@@ -629,8 +639,10 @@ class GovAdapter:
         if sum(1 for line in lines if PDF_LINK_RE.search(line)) >= max(2, len(lines) * 0.25):
             self.skip(url, "an index of document links, not a release text")
             return None
-        # attachment links and bare URLs are navigation, not text to read
-        lines = [line for line in lines if not PDF_LINK_RE.search(line) and not URL_LINE_RE.match(line)]
+        # attachment links, bare URLs and spaced-out name tables are page
+        # furniture, not text to read
+        lines = [line for line in lines if not PDF_LINK_RE.search(line) and not URL_LINE_RE.match(line)
+                 and not spaced_table_line(line)]
         paras, excerpt = trim_paragraphs(lines, self.cap)
         published = stub["published"]
         listed = published.astimezone(JST).date()
@@ -1146,11 +1158,37 @@ class PublisherReaderAdapter:
             self.skipped.append({"url": fallback.get("url"), "reason": f"shared reader link fallback: {fallback.get('reason')}"})
         return [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
 
+    # Global Voices opens a republished piece with the writer's byline and a
+    # note on where it first appeared / the content partnership / the series.
+    # That is provenance, not the article: it moves into the attribution and
+    # the reading starts on the article's own first sentence.
+    PREFACE_RE = re.compile(r"最初に公開|初出|再公開|転載|コンテンツ共有|提携|の一環|シリーズ|スポットライト|支援はこちら")
+
+    def split_preface(self, paras: list[str], row: dict) -> tuple[list[str], list[str]]:
+        names = set(row.get("authors") or []) | set(row.get("translators") or [])
+        moved: list[str] = []
+        while paras:
+            head = paras[0]
+            byline = head in names or (len(head) <= 25 and not re.search(r"[。！？]", head) and not moved)
+            if byline or self.PREFACE_RE.search(head):
+                moved.append(head)
+                paras = paras[1:]
+                continue
+            break
+        return paras, moved
+
     def extract(self, row):
         published = datetime.fromisoformat(row["publishedAt"].replace("Z", "+00:00"))
         paras = [p.strip() for p in re.split(r"\n{2,}", row["text"]) if p.strip()]
+        paras, moved = self.split_preface(paras, row)
+        if not paras:
+            self.skipped.append({"url": row["url"], "reason": "nothing left after the byline/preface"})
+            return None
         paras, excerpt = trim_paragraphs(paras, self.cap)
         attribution = row["attribution"] + (" Excerpted at paragraph boundaries by Bunki." if excerpt else "")
+        if moved:
+            attribution += " 本文の前の署名・初出の注記（本文から外し、ここに記す）：" + " / ".join(moved)
+            excerpt = dict(excerpt or {}, movedToAttribution=moved)
         attribution += " ふりがなと辞書リンクを付けて掲載（Bunki）。"
         slug = urllib.parse.urlsplit(row["url"]).path.strip("/").replace("/", "-")
         return Item(

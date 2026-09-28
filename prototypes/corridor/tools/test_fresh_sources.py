@@ -204,3 +204,28 @@ def test_default_since_ignores_mint_only_runs(tmp_path, monkeypatch):
     for path in tmp_path.glob("run-*.json"):
         path.unlink()
     assert ff.default_since() == datetime.now(fs.JST).date() - ff.timedelta(days=ff.DEFAULT_DAYS)
+
+
+def test_global_voices_byline_and_preface_move_to_the_attribution():
+    adapter = fs.PublisherReaderAdapter("global-voices")
+    row = {
+        "authors": ["lahlah"], "translators": ["Moegi Tanaka"], "title": "シリアの「連帯の畑」",
+        "text": "レイダ・ゼイダン\n\nこの記事は2026年4月7日、Lahlah誌にアラビア語で最初に公開された。コンテンツ共有合意に基づき再公開する。"
+                "\n\n当記事はスポットライト・シリーズの一環である。\n\nダマスカス郊外の小さな区画では、在来の種子がよみがえりつつある。\n\n続きの段落。",
+        "publishedAt": "2026-09-28T02:16:26.000Z", "url": "https://jp.globalvoices.org/2026/09/28/65726/",
+        "fetchedAt": "2026-09-28T02:30:00Z", "responseSha256": "0" * 64, "attribution": "Global Voices 日本語 — 原文: lahlah",
+    }
+    item = adapter.extract(row)
+    assert item.paragraphs[0].startswith("ダマスカス郊外")
+    assert "レイダ・ゼイダン" in item.attribution and "最初に公開された" in item.attribution
+    assert item.excerpt["movedToAttribution"][0] == "レイダ・ゼイダン"
+    # negative control: an article that opens on its own sentence keeps it
+    plain = adapter.extract(dict(row, text="ダマスカス郊外の小さな区画では、在来の種子がよみがえりつつある。\n\n続きの段落。"))
+    assert plain.paragraphs[0].startswith("ダマスカス郊外") and "movedToAttribution" not in (plain.excerpt or {})
+
+
+def test_spaced_name_tables_drop_and_subtitles_stay_whole():
+    assert fs.spaced_table_line("漆　原　　　肇　　日本労働組合総連合会　総合政策推進局　労働法制局　局長阿　部　博　司")
+    assert not fs.spaced_table_line("インドネシア　令和８年11月２日予定　令和９年１月４日予定")
+    subtitle = "～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ入賞企業を10月９日（金）に表彰～"
+    assert fs.rejoin_wrapped([subtitle, "厚生労働省では、このほど決定しました。"]) == [subtitle, "厚生労働省では、このほど決定しました。"]

@@ -276,6 +276,46 @@
       "readings": ["にほん", "ご"],
       "kind": "term",
       "note": "UniDic reads the bare 日本 as にっぽん and tokenizes 日本語 as 日本|語, so the reader printed にっぽん directly above a following 語 at 12 sites across the curated shelf — including token 0 of an N3 graded text, the first word a learner meets there. 日本語 is にほんご; にっぽんご is not a word. The override binds only the adjacent pair, so a standalone 日本 keeps whatever the tokenizer gives it (E3 round-D, reader lens)."
+    },
+    {
+      "word": "習近平",
+      "reading": "しゅうきんぺい",
+      "surfaces": ["習近", "平"],
+      "readings": ["しゅうきん", "ぺい"],
+      "kind": "person-name",
+      "note": "UniDic splits the name as 習近|平, leaves 習近 without a reading and reads 平 たいら, so the fresh-shelf Wikipedia digest (jawiki-news:2026-09-14) showed a bare 習近 over たいら. The Chinese leader is しゅうきんぺい (fresh shelf, 2026-09-28)."
+    },
+    {
+      "word": "自維連立",
+      "reading": "じいれんりつ",
+      "surfaces": ["自", "維連", "立"],
+      "readings": ["じ", "いれん", "りつ"],
+      "kind": "term",
+      "note": "The LDP–Ishin coalition (自民・維新の連立) in jawiki:5294446. UniDic merges 維連 into one unknown noun with no reading; the characters read い・れん, the phrase じいれんりつ (fresh shelf, 2026-09-28)."
+    },
+    {
+      "word": "建退共",
+      "reading": "けんたいきょう",
+      "surfaces": ["建", "退", "共"],
+      "readings": ["けん", "たい", "きょう"],
+      "kind": "term",
+      "note": "Abbreviation of 建設業退職金共済制度 (勤労者退職金共済機構), in mhlw:stf-newpage_76152. UniDic downgrades 退 and 共 to unknown symbols; the guessed readings happen to be right, and this entry makes them reviewed rather than guessed (fresh shelf, 2026-09-28)."
+    },
+    {
+      "word": "清退共",
+      "reading": "せいたいきょう",
+      "surfaces": ["清", "退", "共"],
+      "readings": ["せい", "たい", "きょう"],
+      "kind": "term",
+      "note": "Abbreviation of 清酒製造業退職金共済制度, in mhlw:stf-newpage_76152; all three characters fall to UniDic's unknown-symbol path (fresh shelf, 2026-09-28)."
+    },
+    {
+      "word": "林退共",
+      "reading": "りんたいきょう",
+      "surfaces": ["林", "退", "共"],
+      "readings": ["りん", "たい", "きょう"],
+      "kind": "term",
+      "note": "Abbreviation of 林業退職金共済制度, in mhlw:stf-newpage_76152. UniDic read 林 as the surname はやし; the abbreviation is りんたいきょう (fresh shelf, 2026-09-28)."
     }
   ],
   "accepts": [
@@ -292,6 +332,13 @@
       "surfaces": ["東京", "都"],
       "readings": ["とうきょう", "と"],
       "note": "Reviewed CORRECT — administrative suffix 都(と) after 東京 (wikinews:45089). Recorded so the checker's 都(と) probe can tell it from the 野ばら/方丈記 defects; bytes untouched."
+    },
+    {
+      "word": "都道府県",
+      "reading": "とどうふけん",
+      "surfaces": ["都", "道", "府", "県"],
+      "readings": ["と", "どう", "ふ", "けん"],
+      "note": "Reviewed CORRECT — 都(と) inside 都道府県 (prefectures) is right; it appears in most government releases on the fresh shelf (19 sites on 2026-09-28). Recorded so the checker's 都(と) probe can tell it from the 野ばら/方丈記 defects; bytes untouched."
     }
   ]
 }

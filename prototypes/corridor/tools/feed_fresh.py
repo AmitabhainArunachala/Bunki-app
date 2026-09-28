@@ -19,6 +19,11 @@ Usage (run from anywhere; the corpus grading stack must be importable —
   python feed_fresh.py --list-untitled         print the staged items still waiting
                                                for an English title, as a JSON stub
   python feed_fresh.py --verbose               also print every skipped item and why
+  python feed_fresh.py --restage --since D     re-fetch with today's adapters; an item still
+                                               PENDING review whose text changed is replaced
+                                               in the dataset (its previous content hash kept)
+                                               and re-minted in place. Approved or rejected
+                                               items are never touched.
 
 It installs no schedule. Running it daily is the operator's decision.
 
@@ -296,6 +301,7 @@ def main() -> int:
     mode.add_argument("--mint-only", action="store_true")
     mode.add_argument("--dry-run", action="store_true")
     mode.add_argument("--list-untitled", action="store_true")
+    mode.add_argument("--restage", action="store_true", help="re-extract still-pending items with the current adapters and re-mint the changed ones")
     ap.add_argument("--allow-untitled", action="store_true", help="mint staged items that have no authored English title (operator choice)")
     ap.add_argument("--verbose", action="store_true", help="print every skipped item with its reason")
     args = ap.parse_args()
@@ -322,10 +328,27 @@ def main() -> int:
 
     started = datetime.now(timezone.utc).isoformat(timespec="seconds")
     fetched: list[dict] = []
+    restaged: list[dict] = []
     report: dict = {"terms": [], "sources": {}, "skipped": []}
+    # only a reading nobody has decided on may be re-extracted
+    pending_fresh = {row["id"] for row in queue if row.get("kind") == QUEUE_KIND and row.get("decision") == "pending"}
     if not args.mint_only:
         print(f"· window {since} … {until} (JST)")
-        fetched, report = fetch(since, until, only, staged_ids | shelf_ids | queued_ids)
+        known = staged_ids | shelf_ids | queued_ids
+        if args.restage:
+            known -= pending_fresh
+        fetched, report = fetch(since, until, only, known)
+        if args.restage:
+            by_id = {row["id"]: row for row in dataset}
+            fresh_rows = []
+            for row in fetched:
+                old = by_id.get(row["id"])
+                if old is None:
+                    fresh_rows.append(row)
+                elif any(old.get(k) != row.get(k) for k in ("text", "title", "url", "date", "attribution")):
+                    restaged.append(dict(row, stagedAt=old.get("stagedAt"), restagedAt=started,
+                                         previousContentSha256=old.get("contentSha256")))
+            fetched = fresh_rows
         for key, entry in report["sources"].items():
             print(f"    {key:>14}: discovered {entry['discovered']:>3} · extracted {entry['extracted']:>3} · passed {entry['passed']:>3}"
                   + (f" · {entry['error']}" if entry["error"] else ""))
@@ -344,10 +367,44 @@ def main() -> int:
                     fh.write(json.dumps(dict(row, stagedAt=started), ensure_ascii=False) + "\n")
             dataset.extend(fetched)
         print(f"· staged {len(fetched)} new items → {DATASET.relative_to(REPO)}")
+        if restaged:
+            # a pending reading's source text is replaced in place; the run log
+            # and the row keep the hash of what it replaced
+            replacement = {row["id"]: row for row in restaged}
+            dataset = [replacement.get(row["id"], row) for row in dataset]
+            DATASET.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in dataset), "utf-8")
+            first_added = {row["id"]: row.get("addedAt") for row in queue if row["id"] in replacement}
+            index["articles"] = [row for row in index["articles"] if row["id"] not in replacement]
+            queue = [row for row in queue if row["id"] not in replacement]
+            shelf_ids -= set(replacement)
+            for row in restaged:
+                row["_addedAt"] = first_added.get(row["id"])
+            print(f"· restaged {len(restaged)} pending items whose text changed: " + ", ".join(sorted(replacement)))
 
     minted: list[dict] = []
     untitled: list[dict] = []
+    retitled: list[str] = []
     if not args.stage_only:
+        # an authored title changed after its reading was minted: carry it to
+        # the queue row, the shelf row and the body while the row is pending
+        by_file = {row["id"]: row for row in index["articles"]}
+        for qrow in queue:
+            title_en = str(titles["titles"].get(qrow["id"], "")).strip()
+            if qrow.get("kind") != QUEUE_KIND or qrow.get("decision") != "pending" or not title_en or qrow.get("titleEn") == title_en:
+                continue
+            shelf_row = by_file.get(qrow["id"])
+            if shelf_row is None:
+                continue
+            body_path = ARTICLES / shelf_row["file"]
+            body = json.loads(body_path.read_text("utf-8"))
+            for record in (qrow, shelf_row, body):
+                record["titleEn"] = title_en
+            for record in (shelf_row, body):
+                record["titleEnSource"] = titles["titleEnSource"]
+            body_path.write_text(json.dumps(body, ensure_ascii=False, separators=(",", ":")), "utf-8")
+            retitled.append(qrow["id"])
+        if retitled:
+            print("· retitled " + ", ".join(retitled))
         rejected = {row["id"] for row in queue if row.get("kind") == QUEUE_KIND and row.get("decision") == "rejected"}
         candidates = [r for r in dataset if r["id"] not in shelf_ids and r["id"] not in rejected and r["id"] not in titles["skip"]]
         if only:
@@ -361,14 +418,19 @@ def main() -> int:
                 ready.append((row, "", "untitled-pending"))
             else:
                 untitled.append(row)
+        if ready or retitled:
+            INDEX_PATH.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", "utf-8")
+            write_json_keeping_indent(QUEUE_PATH, queue)
         if ready:
             from corpus.grading._mecab import get_tagger
 
             tagger = get_tagger()
             jlpt_maps = ba.load_jlpt_lexicon()
+            first_added = {row["id"]: row["_addedAt"] for row in restaged if row.get("_addedAt")}
             for row, title_en, title_source in sorted(ready, key=lambda r: (r[0]["date"], r[0]["id"])):
                 topic = titles["topics"].get(row["id"], "")
-                record, index_row, queue_row = mint(row, title_en, title_source, topic, as_of, tagger, jlpt_maps)
+                record, index_row, queue_row = mint(row, title_en, title_source, topic,
+                                                    first_added.get(row["id"], as_of), tagger, jlpt_maps)
                 (ARTICLES / index_row["file"]).write_text(
                     json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
                 )
@@ -383,7 +445,7 @@ def main() -> int:
         print(f"· minted {len(minted)}; {len(untitled)} staged items wait for an authored English title"
               + (" (python feed_fresh.py --list-untitled)" if untitled else ""))
 
-    if args.mint_only and not minted:
+    if args.mint_only and not minted and not retitled:
         print("· nothing to mint — no run log written")
         return 0
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -396,14 +458,17 @@ def main() -> int:
         "run": run_number,
         "startedAt": started,
         "asOf": as_of,
-        "mode": "mint-only" if args.mint_only else "stage-only" if args.stage_only else "fetch+mint",
+        "mode": "mint-only" if args.mint_only else "stage-only" if args.stage_only else "restage" if args.restage else "fetch+mint",
         "window": None if args.mint_only else {"since": since.isoformat(), "until": until.isoformat(), "timezone": "Asia/Tokyo"},
         "terms": report["terms"],
         "sources": report["sources"],
         "staged": [{"id": r["id"], "date": r["date"], "chars": len(r["text"]), "url": r["url"]} for r in fetched],
+        "restaged": [{"id": r["id"], "chars": len(r["text"]), "contentSha256": r["contentSha256"],
+                      "previousContentSha256": r.get("previousContentSha256")} for r in restaged],
         "skipped": report["skipped"],
         "minted": minted,
         "untitled": [r["id"] for r in untitled],
+        "retitled": retitled,
         "allowUntitled": bool(args.allow_untitled),
         "outputSha256": {
             "index.json": sha256_path(INDEX_PATH),
