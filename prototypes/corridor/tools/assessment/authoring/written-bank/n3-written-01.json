@@ -1,0 +1,507 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N3",
+  "number": 1,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　わたしは先月から、駅前のパン屋でアルバイトをしています。最初の日は、パンの名前がなかなか覚えられず、お客さんに聞かれても（１）。すると、店長が「最初はだれでもそうだよ」と言って、パンの名前と値段を書いた表を作ってくれました。（２）、毎日少しずつ覚えることができました。\n　今では、お客さんにおすすめのパンを聞かれても、自信を持って答えられるようになりました。この仕事を（３）、人と話すことが前よりずっと好きになったと思います。",
+    "s1": "山田さんへ\n　来週の土曜日の引っ越し、手伝ってくれてありがとう。朝九時に新しいアパートの前で会いましょう。荷物は引っ越し会社のトラックで運ぶので、山田さんには部屋の中で箱を開けて、本や食器を棚に並べるのを手伝ってほしいです。お昼ご飯はわたしが用意しますから、何も持ってこなくて大丈夫です。\n林",
+    "s2": "　中学生のとき、わたしはバスケットボール部に入っていた。背が低かったので、試合にはほとんど出られなかった。それでも三年間やめなかったのは、仲間と一緒に練習する時間が好きだったからだ。試合に出る選手のためにボールを準備したり、相手チームの動きを記録したりするのも、大切な役割だと思っていた。",
+    "s3": "みどり公園をご利用のみなさまへ\n　来月一日から、公園の中でのボール遊びは、東側の広場だけでできることになりました。西側の広場は、小さな子どもやお年寄りがゆっくり過ごせる場所にします。また、夜九時以降は、近くに住む人の迷惑にならないよう、大きな声を出さないでください。\nみどり市　公園課",
+    "m1": "　わたしの家の近くに、小さな公園がある。毎朝六時ごろ、その公園でごみを拾っているおじいさんがいる。最初は、公園を管理している市の人だと思っていたが、ある日話しかけてみると、近所に住んでいる人だとわかった。\n　おじいさんは、会社をやめてから、毎朝散歩をするようになったそうだ。散歩の途中でごみが落ちているのに気づいて、拾い始めたのがきっかけだという。「だれかに頼まれたわけではないけれど、きれいな公園で遊ぶ子どもたちを見ると、うれしくなるんだよ」と笑っていた。\n　それから、わたしも週末だけ、おじいさんと一緒にごみを拾うことにした。最近は、公園で遊ぶ子どもたちの親も手伝ってくれるようになり、以前より公園がきれいになったと思う。",
+    "l1": "　去年の春、わたしは仕事の都合で、東京から地方の小さな町へ引っ越した。知り合いが一人もいない町での生活は、思っていたよりずっとさびしかった。都会では、隣に住んでいる人の顔を知らなくても、特に困ることはなかった。だから、この町でも同じように暮らせばいいと考えていたのだ。\n　ところが、この町では、近所の人がよく声をかけてくる。最初は、どう返事をすればいいのか分からず、少し面倒だと感じることもあった。ある日、ごみを出しに行くと、隣の家のおばあさんに「今度の日曜日、みんなで川沿いの道をそうじするから、よかったら来てね」と誘われた。断る理由も思いつかなかったので、行ってみることにした。\n　当日は、三十人ほどの住民が集まっていて、みんなで道を掃除した。作業のあとには、お茶を飲みながら話す時間があった。そこで、同じ年ごろの人や、わたしと同じように都会から引っ越してきた人と知り合うことができた。\n　今では、道で会えばあいさつをし、野菜をもらったり、あげたりする関係になった。近所の人に声をかけられるのは、面倒なことではなく、その町の一員として受け入れられているということなのだと、今は思っている。",
+    "i1": "アルバイト募集　カフェ・さくら通り店\n\n【仕事の内容】\n・ホール：注文を聞く、料理を運ぶ\n・キッチン：サラダやデザートを作る、皿を洗う\n※キッチンは、飲食店で働いた経験がある方のみです。\n\n【働く時間】\n・朝　7:00～11:00\n・昼　11:00～15:00\n・夜　17:00～22:00\n※週2日から働けます。夜の時間は18歳以上の方のみです。\n\n【時給】\n・ホール：1,100円　・キッチン：1,150円\n・土曜日と日曜日は、時給が100円上がります。\n\n【応募の方法】\n・まず電話で面接の日を決めてから、写真をはった履歴書を持って来てください。\n・高校生の方は、保護者の同意書も必要です。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n新しいアパートは駅から近いが、【家賃】が少し高い。",
+      "options": [
+        "かちん",
+        "いえちん",
+        "やちん",
+        "やじん"
+      ],
+      "answer": 2,
+      "rationale": "家賃は「やちん」と読む。部屋や家を借りるために払うお金のこと。\nThe word 家賃 (rent) is read yachin.",
+      "target": "家賃"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n引っ越しのトラックは、午後二時ごろに【到着】する予定だ。",
+      "options": [
+        "とうちゃく",
+        "どうちゃく",
+        "とうじゃく",
+        "とちゃく"
+      ],
+      "answer": 0,
+      "rationale": "到着は「とうちゃく」と読む。「とう」も「ちゃく」も濁らない。\nThe word 到着 (arrival) is read tōchaku, with no voiced sounds.",
+      "target": "到着"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n公園の【芝生】の上で、子どもたちがボールを蹴って遊んでいる。",
+      "options": [
+        "しばう",
+        "しぼう",
+        "しばぶ",
+        "しばふ"
+      ],
+      "answer": 3,
+      "rationale": "芝生は「しばふ」と読む特別な読み方の言葉だ。\nThe word 芝生 (lawn) has the special reading shibafu.",
+      "target": "芝生"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nサッカー部は、今年の大会で初めて【優勝】した。",
+      "options": [
+        "ゆしょう",
+        "ゆうしょう",
+        "ゆうしょ",
+        "ゆうじょう"
+      ],
+      "answer": 1,
+      "rationale": "優勝は「ゆうしょう」と読む。「優」も「勝」も長い音になる。\nThe word 優勝 (winning the championship) is read yūshō, with two long vowels.",
+      "target": "優勝"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n引っ越しの前に、使わない物を【せいり】しておいた。",
+      "options": [
+        "正理",
+        "整理",
+        "整里",
+        "政理"
+      ],
+      "answer": 1,
+      "rationale": "物をきちんと片付けることは「整理」と書く。ほかの書き方の言葉はない。\nTo sort out and tidy things is written 整理.",
+      "target": "整理"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nこのアルバイトでは、三時間ごとに十五分の【きゅうけい】がある。",
+      "options": [
+        "休係",
+        "求憩",
+        "休憩",
+        "休継"
+      ],
+      "answer": 2,
+      "rationale": "仕事の途中で休むことは「休憩」と書く。\nA short rest during work is written 休憩.",
+      "target": "休憩"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n部長は、試合の結果を先生に【ほうこく】した。",
+      "options": [
+        "方告",
+        "報刻",
+        "法告",
+        "報告"
+      ],
+      "answer": 3,
+      "rationale": "起きたことや結果を知らせることは「報告」と書く。\nTo report a result to someone is written 報告.",
+      "target": "報告"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい部屋は日当たりがよくて、とても（　）だ。",
+      "options": [
+        "豊富",
+        "快適",
+        "正確",
+        "丁寧"
+      ],
+      "answer": 1,
+      "rationale": "部屋が気持ちよく過ごせる様子は「快適」で表す。ほかの言葉は部屋の住みやすさには使わない。\nA room that is pleasant to live in is 快適 (comfortable); the other words do not describe rooms.",
+      "target": "快適"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n雨が続いたので、公園での練習は来週に（　）された。",
+      "options": [
+        "延期",
+        "中止",
+        "変化",
+        "保存"
+      ],
+      "answer": 0,
+      "rationale": "予定の日を後にずらすことを「延期」という。「来週に」と一緒に使えるのは「延期」だけだ。\nMoving a plan to a later date is 延期 (postponement); only it fits with 来週に.",
+      "target": "延期"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n家庭の（　）で、アルバイトをやめることになった。",
+      "options": [
+        "状態",
+        "事情",
+        "条件",
+        "様子"
+      ],
+      "answer": 1,
+      "rationale": "「家庭の事情」は、家の中の理由や都合を表す決まった言い方だ。\nThe set phrase 家庭の事情 means family circumstances, a reason at home.",
+      "target": "事情"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n久しぶりに会った兄は、【相変わらず】忙しそうだった。",
+      "options": [
+        "前と同じように",
+        "前よりもっと",
+        "急に",
+        "少しだけ"
+      ],
+      "answer": 0,
+      "rationale": "「相変わらず」は、前と変わらずに同じ様子が続いていることを表す。\nThe word 相変わらず means as before, unchanged.",
+      "target": "相変わらず"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n引っ越しの荷物を【一度に】運ぶのは無理だ。",
+      "options": [
+        "少しずつ",
+        "何回かに分けて",
+        "全部まとめて",
+        "急いで"
+      ],
+      "answer": 2,
+      "rationale": "「一度に」は、分けないで全部を同時に、という意味だ。\nThe word 一度に means all at once, not split up.",
+      "target": "一度に"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【慌てる】",
+      "options": [
+        "疲れたときは、家で慌てて休むのがいちばんだ。",
+        "電車に遅れそうになって、慌てて駅まで走った。",
+        "試験に合格して、慌てるほどうれしかった。",
+        "約束の時間までまだ一時間あるので、慌てて待つことにした。"
+      ],
+      "answer": 1,
+      "rationale": "「慌てる」は、急なことで落ち着きをなくし、急いで行動する様子に使う。\nThe verb 慌てる describes losing composure and rushing, as when nearly missing a train.",
+      "target": "慌てる"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【似合う】",
+      "options": [
+        "父と兄は、声がよく似合っている。",
+        "約束の時間に似合うように、早く家を出た。",
+        "二人の意見が、話し合ってやっと似合った。",
+        "その帽子は、あなたによく似合っている。"
+      ],
+      "answer": 3,
+      "rationale": "「似合う」は、服や物がその人によく合って見えることに使う。1は「似ている」、2は「間に合う」、3は「合う」が正しい。\nThe verb 似合う means something suits a person, such as a hat.",
+      "target": "似合う"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n天気予報（　）、午後から雨が降るそうだ。",
+      "options": [
+        "にとって",
+        "によると",
+        "に対して",
+        "について"
+      ],
+      "answer": 1,
+      "rationale": "情報の出どころを示して「〜そうだ」と続けるときは「によると」を使う。\nThe pattern によると marks the source of information before 〜そうだ (I hear that).",
+      "subject": "grammar:niyoruto"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n父の仕事の都合で、来月大阪へ引っ越す（　）。",
+      "options": [
+        "ことがある",
+        "ようになった",
+        "ことになった",
+        "ばかりだ"
+      ],
+      "answer": 2,
+      "rationale": "自分の意志ではなく、事情によって決まったことは「ことになった」で表す。\nThe pattern ことになった expresses a decision brought about by circumstances, not one's own choice.",
+      "subject": "grammar:kotoninaru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n部屋のドアを開けた（　）、猫が外へ飛び出していった。",
+      "options": [
+        "うちに",
+        "とたん",
+        "あいだ",
+        "ながら"
+      ],
+      "answer": 1,
+      "rationale": "「〜たとたん」は、ある動作のすぐあとに別のことが起きたことを表す。\nThe pattern たとたん means that the moment one thing happened, another followed.",
+      "subject": "grammar:tatotan"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの公園は、子ども（　）大人にも人気がある。",
+      "options": [
+        "によって",
+        "にとって",
+        "として",
+        "ばかりでなく"
+      ],
+      "answer": 3,
+      "rationale": "「AばかりでなくBも」で、AだけでなくBもそうだと言う。後ろの「大人にも」と合う。\nAばかりでなくBも means not only A but also B, matching 大人にも.",
+      "subject": "grammar:bakaridenaku"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n兄は、たくさん食べる（　）あまり太らない。",
+      "options": [
+        "ために",
+        "わりに",
+        "までに",
+        "とおりに"
+      ],
+      "answer": 1,
+      "rationale": "「〜わりに」は、予想される結果と違うことを表す。たくさん食べるのに太らない、という意味になる。\nThe pattern わりに marks an unexpected result: he eats a lot yet does not gain weight.",
+      "subject": "grammar:warini"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n傘を持た（　）出かけたら、途中で雨が降ってきた。",
+      "options": [
+        "ないと",
+        "なければ",
+        "ずに",
+        "なくては"
+      ],
+      "answer": 2,
+      "rationale": "「〜ずに」は「〜ないで」と同じ意味で、傘を持たない状態で出かけたことを表す。\nThe pattern ずに means without doing, like ないで: he went out without an umbrella.",
+      "subject": "grammar:zuni"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこのアパートは　＿＿＿　＿★＿　＿＿＿　＿＿＿　安い。",
+      "options": [
+        "うえに",
+        "家賃も",
+        "近い",
+        "駅から"
+      ],
+      "answer": 2,
+      "rationale": "正しい順番は「駅から　近い　うえに　家賃も」で、★には「近い」が入る。\nThe order is 駅から 近い うえに 家賃も (close to the station and cheap too), so 近い fills the star.",
+      "subject": "grammar:ueni"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n先輩が　＿＿＿　＿＿＿　＿＿＿　＿★＿　とても分かりやすかった。",
+      "options": [
+        "練習の",
+        "計画表は",
+        "書いて",
+        "くれた"
+      ],
+      "answer": 1,
+      "rationale": "正しい順番は「書いて　くれた　練習の　計画表は」で、★には「計画表は」が入る。\nThe order is 書いて くれた 練習の 計画表は (the practice plan my senior wrote for me), so 計画表は fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "答えるつもりでした",
+        "すぐに答えられませんでした",
+        "すぐに答えてしまいました",
+        "答えたことがありました"
+      ],
+      "answer": 1,
+      "rationale": "パンの名前を覚えられなかったので、聞かれても答えられなかったという流れになる。\nShe could not remember the names, so she could not answer when asked."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "それなのに",
+        "そのかわりに",
+        "そのおかげで",
+        "それとも"
+      ],
+      "answer": 2,
+      "rationale": "店長が表を作ってくれたことが、覚えられた理由になっているので「そのおかげで」が合う。\nThe manager's chart is the good reason she could learn them, so そのおかげで (thanks to that) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "始めてから",
+        "始める前に",
+        "始めるために",
+        "始めないで"
+      ],
+      "answer": 0,
+      "rationale": "アルバイトを始めたあとに気持ちが変わったので「始めてから」が合う。\nHer feelings changed after she started the job, so 始めてから (since starting) fits."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "山田さんは、土曜日に何をしますか。",
+      "options": [
+        "トラックで荷物を新しいアパートへ運ぶ。",
+        "部屋で箱を開けて、本や食器を棚に並べる。",
+        "昼ご飯を作って、新しいアパートへ持っていく。",
+        "朝九時に、林さんの前の家へ行く。"
+      ],
+      "answer": 1,
+      "rationale": "林さんは山田さんに、部屋の中で箱を開けて本や食器を棚に並べてほしいと頼んでいる。\nHayashi asks Yamada to unpack boxes and put books and dishes on the shelves."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "この人が三年間部活動を続けたのは、なぜか。",
+      "options": [
+        "試合にたくさん出られたから",
+        "仲間と一緒に練習する時間が好きだったから",
+        "背が高くなりたかったから",
+        "先生にやめないように言われたから"
+      ],
+      "answer": 1,
+      "rationale": "「三年間やめなかったのは、仲間と一緒に練習する時間が好きだったからだ」と書いてある。\nThe writer says they stayed because they loved practicing with teammates."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "このお知らせによると、来月から公園はどう変わるか。",
+      "options": [
+        "ボール遊びは、東側の広場でしかできなくなる。",
+        "西側の広場でも、ボール遊びができるようになる。",
+        "夜九時以降は、公園に入れなくなる。",
+        "小さな子どもは、東側の広場で遊べなくなる。"
+      ],
+      "answer": 0,
+      "rationale": "ボール遊びは東側の広場だけでできることになった、と書いてある。\nThe notice says ball games will be allowed only in the east square."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "「わたし」は最初、おじいさんのことをどう思っていたか。",
+      "options": [
+        "近所に住んでいる人だと思っていた。",
+        "公園を管理している市の人だと思っていた。",
+        "子どもたちの親だと思っていた。",
+        "毎朝散歩をしている人だと思っていた。"
+      ],
+      "answer": 1,
+      "rationale": "「最初は、公園を管理している市の人だと思っていた」とある。\nAt first the writer thought he was a city worker who managed the park."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "おじいさんがごみを拾い始めたきっかけは何か。",
+      "options": [
+        "市の人にごみを拾うように頼まれたこと",
+        "子どもたちがごみを捨てているのを見たこと",
+        "散歩の途中で、ごみが落ちているのに気づいたこと",
+        "会社で、ごみを拾う仕事をしていたこと"
+      ],
+      "answer": 2,
+      "rationale": "散歩の途中でごみが落ちているのに気づいて拾い始めた、と書いてある。\nHe began after noticing litter during his morning walks."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "最近、公園はどうなったか。",
+      "options": [
+        "子どもたちが公園であまり遊ばなくなった。",
+        "市の人が毎朝掃除をするようになった。",
+        "手伝う人が増えて、以前よりきれいになった。",
+        "おじいさんが一人でごみを拾うようになった。"
+      ],
+      "answer": 2,
+      "rationale": "子どもたちの親も手伝うようになり、以前より公園がきれいになったとある。\nParents started helping too, and the park is cleaner than before."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "引っ越してきたばかりのころ、「わたし」は近所の人に声をかけられて、どう感じたか。",
+      "options": [
+        "都会と同じだと思って、安心した。",
+        "うれしくて、すぐに友だちになった。",
+        "どう返事をすればいいか分からず、面倒だと思うこともあった。",
+        "失礼だと思って、返事をしなかった。"
+      ],
+      "answer": 2,
+      "rationale": "「どう返事をすればいいのか分からず、少し面倒だと感じることもあった」と書いてある。\nAt first the writer did not know how to reply and sometimes found it bothersome."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "「わたし」が今考えていることは何か。",
+      "options": [
+        "都会のように、近所の人とあまり話さないほうが楽だ。",
+        "近所の人に声をかけられるのは、町の一員として受け入れられているしるしだ。",
+        "町のそうじには、できるだけ参加しないほうがいい。",
+        "小さな町で友だちを作るのは、とても難しい。"
+      ],
+      "answer": 1,
+      "rationale": "最後の段落で、声をかけられるのは町の一員として受け入れられているということだと述べている。\nIn the last paragraph the writer sees being greeted as a sign of being accepted in the town."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "大学生のキムさんは、飲食店で働いたことがない。土曜日の朝だけ働きたいと思っている。キムさんがこの店で働く場合、時給はいくらになるか。",
+      "options": [
+        "1,100円",
+        "1,150円",
+        "1,200円",
+        "1,250円"
+      ],
+      "answer": 2,
+      "rationale": "経験がないのでホールで働く。ホールは1,100円で、土曜日は100円上がるので1,200円になる。\nWith no experience Kim works in the hall at 1,100 yen, plus 100 yen on Saturdays, so 1,200 yen."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "十六歳の高校生の田中さんは、このアルバイトに応募したい。田中さんは、どうしなければならないか。",
+      "options": [
+        "写真をはった履歴書を持って、すぐに店へ行く。",
+        "電話で面接の日を決めて、写真をはった履歴書と保護者の同意書を持って行く。",
+        "電話で面接の日を決めて、夜の時間に面接を受ける。",
+        "保護者と一緒に店へ行って、その場で同意書を書く。"
+      ],
+      "answer": 1,
+      "rationale": "まず電話で面接の日を決め、履歴書を持って行く。高校生は保護者の同意書も必要だ。\nFirst phone to set an interview, then bring the résumé and, as a high school student, a parent's consent form."
+    }
+  ]
+}

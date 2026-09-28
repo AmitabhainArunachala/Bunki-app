@@ -1,6 +1,6 @@
 {
   "schema": "kairo-assessment-catalog/1",
-  "revision": "a1196b980d64c6731dbc1244d24a5b2f4a71795eed6a383482bb6679f6fcb057",
+  "revision": "b7944988dde11cc94fed7bf730971e4f839cc080576db0595dffdb3ec237f585",
   "entries": [
     {
       "id": "kairo-original-jlpt-n2-form-01",
@@ -779,6 +779,281 @@
         ],
         "items": 40,
         "threeFamilies": 40,
+        "twoFamilies": 0
+      },
+      "availability": {
+        "ready": true,
+        "reasons": []
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n3-written-01:written-review",
+      "level": "N3",
+      "mode": "written",
+      "titleJa": "N3 筆記テスト 1",
+      "titleEn": "N3 written test 1",
+      "questionCount": 35,
+      "durationMinutes": 50,
+      "skillCounts": {
+        "vocabulary": 14,
+        "grammar": 11,
+        "reading": 10,
+        "listening": 0
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-jlpt-written-bank-20260928"
+      ],
+      "publicationRoute": "machine-checked-written/1",
+      "formPath": "forms/kairo-original-jlpt-n3-written-01-2b6e4f7ee91eec76e678798bdf485fce43449eb855b4d7d2aa2912b4f4e1d42b.json",
+      "formSha256": "2b6e4f7ee91eec76e678798bdf485fce43449eb855b4d7d2aa2912b4f4e1d42b",
+      "editorialAtStart": {
+        "status": "ai-reviewed-practice",
+        "policyVersion": "bunki-machine-check/1",
+        "decisionRevisionIds": [
+          "machine-check-v1:d9a8272f79a9c17921a91f966918387e269c5270e3333d18a50d1724879d77ba"
+        ]
+      },
+      "deliveryPath": "delivery/kairo-original-jlpt-n3-written-01-c6f23754bad38c7c2eed44dc4879512cca416312f3d6d520bad4007697ccdf48.json",
+      "deliverySha256": "c6f23754bad38c7c2eed44dc4879512cca416312f3d6d520bad4007697ccdf48",
+      "mediaAssets": [],
+      "review": {
+        "status": "machine-checked",
+        "acceptance": "awaiting-john",
+        "label": "検収前 · machine-checked, awaiting John's review",
+        "evidencePath": "reviews/kairo-original-jlpt-n3-written-01-d9a8272f79a9c17921a91f966918387e269c5270e3333d18a50d1724879d77ba.json"
+      },
+      "machineCheck": {
+        "authorFamily": "anthropic-claude",
+        "verifierFamilies": [
+          "zhipu-glm",
+          "moonshot-kimi",
+          "deepseek"
+        ],
+        "items": 35,
+        "threeFamilies": 35,
+        "twoFamilies": 0
+      },
+      "availability": {
+        "ready": true,
+        "reasons": []
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n3-written-02:written-review",
+      "level": "N3",
+      "mode": "written",
+      "titleJa": "N3 筆記テスト 2",
+      "titleEn": "N3 written test 2",
+      "questionCount": 35,
+      "durationMinutes": 50,
+      "skillCounts": {
+        "vocabulary": 14,
+        "grammar": 11,
+        "reading": 10,
+        "listening": 0
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-jlpt-written-bank-20260928"
+      ],
+      "publicationRoute": "machine-checked-written/1",
+      "formPath": "forms/kairo-original-jlpt-n3-written-02-2ecb3c4668e10918796be1d0bbd6e6428880923515cc5aebade69016259cdd97.json",
+      "formSha256": "2ecb3c4668e10918796be1d0bbd6e6428880923515cc5aebade69016259cdd97",
+      "editorialAtStart": {
+        "status": "ai-reviewed-practice",
+        "policyVersion": "bunki-machine-check/1",
+        "decisionRevisionIds": [
+          "machine-check-v1:f642f36e61c2ed3827f60288b48c86c2ff7816a42119a00a1403caa7f620f2c2"
+        ]
+      },
+      "deliveryPath": "delivery/kairo-original-jlpt-n3-written-02-6108e397dce53a253bdfc64709d3f7175a1fbb1fb33d8a227b7d4dae8ae3b466.json",
+      "deliverySha256": "6108e397dce53a253bdfc64709d3f7175a1fbb1fb33d8a227b7d4dae8ae3b466",
+      "mediaAssets": [],
+      "review": {
+        "status": "machine-checked",
+        "acceptance": "awaiting-john",
+        "label": "検収前 · machine-checked, awaiting John's review",
+        "evidencePath": "reviews/kairo-original-jlpt-n3-written-02-f642f36e61c2ed3827f60288b48c86c2ff7816a42119a00a1403caa7f620f2c2.json"
+      },
+      "machineCheck": {
+        "authorFamily": "anthropic-claude",
+        "verifierFamilies": [
+          "zhipu-glm",
+          "moonshot-kimi",
+          "deepseek"
+        ],
+        "items": 35,
+        "threeFamilies": 35,
+        "twoFamilies": 0
+      },
+      "availability": {
+        "ready": true,
+        "reasons": []
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n3-written-03:written-review",
+      "level": "N3",
+      "mode": "written",
+      "titleJa": "N3 筆記テスト 3",
+      "titleEn": "N3 written test 3",
+      "questionCount": 35,
+      "durationMinutes": 50,
+      "skillCounts": {
+        "vocabulary": 14,
+        "grammar": 11,
+        "reading": 10,
+        "listening": 0
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-jlpt-written-bank-20260928"
+      ],
+      "publicationRoute": "machine-checked-written/1",
+      "formPath": "forms/kairo-original-jlpt-n3-written-03-67d23f2b5457c5f5baf8d317750dc4d08acf3642e8a856ea03b0f18320d57828.json",
+      "formSha256": "67d23f2b5457c5f5baf8d317750dc4d08acf3642e8a856ea03b0f18320d57828",
+      "editorialAtStart": {
+        "status": "ai-reviewed-practice",
+        "policyVersion": "bunki-machine-check/1",
+        "decisionRevisionIds": [
+          "machine-check-v1:27d57227afe9aa7d7f95033a2e2d192e03dd10deb6a72682488318d7e1e8fdd2"
+        ]
+      },
+      "deliveryPath": "delivery/kairo-original-jlpt-n3-written-03-a7276bda7b851d0f419a7ecaad301650717d37523dea1b7e3bf46bb849daf9e3.json",
+      "deliverySha256": "a7276bda7b851d0f419a7ecaad301650717d37523dea1b7e3bf46bb849daf9e3",
+      "mediaAssets": [],
+      "review": {
+        "status": "machine-checked",
+        "acceptance": "awaiting-john",
+        "label": "検収前 · machine-checked, awaiting John's review",
+        "evidencePath": "reviews/kairo-original-jlpt-n3-written-03-27d57227afe9aa7d7f95033a2e2d192e03dd10deb6a72682488318d7e1e8fdd2.json"
+      },
+      "machineCheck": {
+        "authorFamily": "anthropic-claude",
+        "verifierFamilies": [
+          "zhipu-glm",
+          "moonshot-kimi",
+          "deepseek"
+        ],
+        "items": 35,
+        "threeFamilies": 35,
+        "twoFamilies": 0
+      },
+      "availability": {
+        "ready": true,
+        "reasons": []
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n3-written-04:written-review",
+      "level": "N3",
+      "mode": "written",
+      "titleJa": "N3 筆記テスト 4",
+      "titleEn": "N3 written test 4",
+      "questionCount": 35,
+      "durationMinutes": 50,
+      "skillCounts": {
+        "vocabulary": 14,
+        "grammar": 11,
+        "reading": 10,
+        "listening": 0
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-jlpt-written-bank-20260928"
+      ],
+      "publicationRoute": "machine-checked-written/1",
+      "formPath": "forms/kairo-original-jlpt-n3-written-04-8c14d92de98acfc1c91702c248d77dd1cfc050521cb9606b0e39bd8841ef02da.json",
+      "formSha256": "8c14d92de98acfc1c91702c248d77dd1cfc050521cb9606b0e39bd8841ef02da",
+      "editorialAtStart": {
+        "status": "ai-reviewed-practice",
+        "policyVersion": "bunki-machine-check/1",
+        "decisionRevisionIds": [
+          "machine-check-v1:68bfef6fc8d816fcb3d6db4a6927bc7473bed6d65799d00565737efbe03d6e5c"
+        ]
+      },
+      "deliveryPath": "delivery/kairo-original-jlpt-n3-written-04-f8e76a4852c0895693bafbc572dcc2808a0833a3c6497bf82c16a9e27965633b.json",
+      "deliverySha256": "f8e76a4852c0895693bafbc572dcc2808a0833a3c6497bf82c16a9e27965633b",
+      "mediaAssets": [],
+      "review": {
+        "status": "machine-checked",
+        "acceptance": "awaiting-john",
+        "label": "検収前 · machine-checked, awaiting John's review",
+        "evidencePath": "reviews/kairo-original-jlpt-n3-written-04-68bfef6fc8d816fcb3d6db4a6927bc7473bed6d65799d00565737efbe03d6e5c.json"
+      },
+      "machineCheck": {
+        "authorFamily": "anthropic-claude",
+        "verifierFamilies": [
+          "zhipu-glm",
+          "moonshot-kimi",
+          "deepseek"
+        ],
+        "items": 35,
+        "threeFamilies": 35,
+        "twoFamilies": 0
+      },
+      "availability": {
+        "ready": true,
+        "reasons": []
+      },
+      "scoreMethod": "raw-practice-results",
+      "officialScoreCalibrated": false
+    },
+    {
+      "id": "kairo-original-jlpt-n3-written-05:written-review",
+      "level": "N3",
+      "mode": "written",
+      "titleJa": "N3 筆記テスト 5",
+      "titleEn": "N3 written test 5",
+      "questionCount": 35,
+      "durationMinutes": 50,
+      "skillCounts": {
+        "vocabulary": 14,
+        "grammar": 11,
+        "reading": 10,
+        "listening": 0
+      },
+      "sourceClass": "original-ai",
+      "sourceIds": [
+        "bunki-original-jlpt-written-bank-20260928"
+      ],
+      "publicationRoute": "machine-checked-written/1",
+      "formPath": "forms/kairo-original-jlpt-n3-written-05-7db98bb8f2b198f523426ed320d6359015ec854cb4e89eb66d545006b47262cb.json",
+      "formSha256": "7db98bb8f2b198f523426ed320d6359015ec854cb4e89eb66d545006b47262cb",
+      "editorialAtStart": {
+        "status": "ai-reviewed-practice",
+        "policyVersion": "bunki-machine-check/1",
+        "decisionRevisionIds": [
+          "machine-check-v1:7eb6492c7dea03166ab60a6f711b4002eb1063b0199eac5e7294fa716b369b46"
+        ]
+      },
+      "deliveryPath": "delivery/kairo-original-jlpt-n3-written-05-9b94f472d855176d3f4b6a7d570384e6fd297d74915d6efc41bfbe381c007c96.json",
+      "deliverySha256": "9b94f472d855176d3f4b6a7d570384e6fd297d74915d6efc41bfbe381c007c96",
+      "mediaAssets": [],
+      "review": {
+        "status": "machine-checked",
+        "acceptance": "awaiting-john",
+        "label": "検収前 · machine-checked, awaiting John's review",
+        "evidencePath": "reviews/kairo-original-jlpt-n3-written-05-7eb6492c7dea03166ab60a6f711b4002eb1063b0199eac5e7294fa716b369b46.json"
+      },
+      "machineCheck": {
+        "authorFamily": "anthropic-claude",
+        "verifierFamilies": [
+          "zhipu-glm",
+          "moonshot-kimi",
+          "deepseek"
+        ],
+        "items": 35,
+        "threeFamilies": 35,
         "twoFamilies": 0
       },
       "availability": {
