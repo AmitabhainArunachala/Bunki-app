@@ -8131,11 +8131,12 @@ function renderReader(main) {
       // the dial shattered every date into [2005] [年7] [月14日、] and split 第29回. A phrase
       // opens at a content word, a name, a numeral or a 接頭辞 — never at a 接尾辞, which
       // belongs to what precedes it — and a numeral or 接頭辞 holds it open for what completes
-      // it. Nothing here reads the ふりがな dial.
+      // it. Nothing here reads the ふりがな dial. The tokenizer splits kanji numerals one
+      // character a token, so they count as numerals too, or 二〇二六年八月 fell apart per digit.
       const pos = String(token.p || '');
       const suffix = pos === '接尾辞';
       const prefix = pos === '接頭辞';
-      const numeral = /^[0-9０-９]+$/u.test(String(token.s || ''));
+      const numeral = /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u.test(String(token.s || ''));
       const opens = (token.c || namedReading || numeral || prefix) && !suffix && !groupHolds;
       if (opens || !group) {
         group = el('span', 'bunsetsu');
