@@ -723,7 +723,8 @@ async function switches(browser, browserName) {
       'M21 the demo says no result is recorded',
       /no result recorded/iu.test(await page.locator('.samurai-effect__eyebrow').innerText()),
     );
-    await page.waitForTimeout(1150);
+    // dramatic cuts to black at the strike (1020 ms); the stage returns by ~1300 ms
+    await page.waitForTimeout(1500);
     await page.screenshot({ path: join(dir, '30-dramatic.png') });
     await page.locator('[data-moment-skip]').click();
     check('M22 Skip dismisses', (await page.locator('.samurai-effect').count()) === 0);
