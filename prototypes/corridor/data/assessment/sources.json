@@ -152,6 +152,28 @@
         }
       ],
       "changes": "Original Japanese assessment scripts synthesized locally in Neutral style; utterances assembled with pauses and encoded to mono 64 kbps MP3. Model files were not modified or distributed."
+    },
+    {
+      "id": "bunki-original-jlpt-written-bank-20260928",
+      "title": "Bunki original JLPT written tests (N1–N5), machine-checked",
+      "edition": "2026-09-28",
+      "url": null,
+      "location": "prototypes/corridor/tools/assessment/authoring/written-bank/",
+      "sourceClass": "original-ai",
+      "distribution": "public-candidate",
+      "processRef": "claude-original-jlpt-written-bank-20260928",
+      "rightsBasis": "bunki-original-authoring-20260923"
+    },
+    {
+      "id": "bunki-original-n1-r3-20260925",
+      "title": "Bunki original N1 written practice draft r3",
+      "edition": "r3",
+      "url": null,
+      "location": "prototypes/corridor/tools/assessment/authoring/n1-practice-originals.r3.mjs",
+      "sourceClass": "original-ai",
+      "distribution": "public-candidate",
+      "processRef": "claude-original-n1-practice-20260925",
+      "rightsBasis": "bunki-original-authoring-20260923"
     }
   ]
 }
