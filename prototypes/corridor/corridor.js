@@ -21216,21 +21216,36 @@ function renderAiCoach(main, rv) {
   btn.type = 'button';
   btn.id = 'ai-coach';
   const out = el('div', 'ai-answer');
-  btn.addEventListener('click', async () => {
+  // 考え中 and what the tutor said live on the session, not in this closure: a repaint
+  // mid-request killed the spinner, re-armed the door and lost the arriving reply
+  // (PR #77 d9f0b984)
+  const thinking = tx('考え中…', 'thinking…');
+  if (rv.coach?.pending) {
     btn.disabled = true;
-    out.textContent = tx('考え中…', 'thinking…');
+    out.textContent = thinking;
+  } else if (rv.coach?.said) out.textContent = rv.coach.said;
+  btn.addEventListener('click', async () => {
+    if (rv.coach?.pending) return;
+    rv.coach = { pending: true };
+    btn.disabled = true;
+    out.textContent = thinking;
+    let said;
     try {
       // history is queue-ordered (grades push sequentially, undo pops)
       const lines = rv.queue.map((item, i) => `${item.label} (${item.t}): ${rv.history[i]?.key || 'ungraded'}`);
-      out.textContent = await aiAsk(
+      said = await aiAsk(
         "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
         `Session grades:\n${lines.join('\n')}`,
         { surface: 'coach' },
       );
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      said = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
     }
-    btn.disabled = false;
+    rv.coach = { pending: false, said };
+    if (out.isConnected) {
+      out.textContent = said;
+      btn.disabled = false;
+    } else if (S.view === 'review' && S.review === rv) render();
   });
   wrap.append(btn, out);
   main.append(wrap);
