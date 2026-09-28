@@ -1,0 +1,585 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N1",
+  "number": 4,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　日本の伝統的な木造建築には、釘をほとんど使わずに木と木を組み合わせる技術がある。「継ぎ手」や「仕口」と呼ばれるもので、木材に複雑な切り込みを入れ、互いにかみ合わせることで固定する。釘を使わない（１）、木材が湿気で膨らんだり乾燥で縮んだりしても、接合部に無理な力がかかりにくい。そのため、建物は長い年月にわたって形を保つことができるのだ。\n　（２）、こうした技術を身につけた大工は年々減っている。現代の住宅の多くは工場で加工された部材を組み立てる方式で建てられ、複雑な加工を手で行う機会がほとんどないからだ。\n　もっとも、この技術は過去の遺産にすぎないわけではない。近年は、木材の性質を生かした接合方法として、海外の建築家からも注目されている。古い技術が、新しい建築の可能性を広げる手がかりになる（３）。",
+    "s1": "　週休三日制を導入する企業が少しずつ増えている。休みが増えれば仕事の効率が落ちると心配する声もあるが、ある会社では、導入後に一日あたりの生産性がむしろ向上したという。限られた時間で成果を出そうと、社員が会議を短くしたり、不要な作業を見直したりした結果だそうだ。休みを増やすことは、働き方そのものを見直すきっかけにもなるのである。",
+    "s2": "　「〇〇を食べれば病気が治る」といった情報が、インターネット上にはあふれている。その多くは、ごく少数の人の体験談をもとにしたものだ。しかし、ある人に効果があったように見えても、それが本当にその食品のおかげなのか、たまたま回復の時期と重なっただけなのかは、体験談からは判断できない。多くの人を対象に、比較の方法を工夫して調べてはじめて、効果の有無は確かめられるのである。",
+    "s3": "保護者の皆様へ\n\n　来月の合唱コンクールに向けて、放課後の練習時間を延長いたします。10月1日から20日までの間、練習は午後5時半までとなります。下校時刻が遅くなりますので、ご家庭でも安全についてお子さんとお話しください。\n　なお、塾や習い事などで練習に参加できない日がある場合は、担任まで事前にお知らせください。\n\n中央小学校　音楽科",
+    "m1": "　木造の校舎が、再び見直されている。かつて学校の校舎の多くは木で建てられていたが、火事や地震に強い鉄筋コンクリートの校舎に次々と建て替えられた。ところが最近、耐火性や耐震性を高めた新しい木造校舎を建てる自治体が増えている。\n　その理由の一つは、木が子どもたちに与える影響だ。ある調査では、木造の校舎で過ごす子どもは、コンクリートの校舎の子どもに比べて、疲れやいらいらを感じることが少なかったという。木には湿度を調整する働きがあり、室内の空気を快適に保つことが関係しているらしい。\n　もう一つは、地域の森林を守るという目的である。手入れされずに放置された人工林が増えているが、地元の木を使って校舎を建てれば、木を切って新たに植えるという森の循環が生まれる。木造校舎は、子どもだけでなく、地域の森にとっても意味のある選択なのだ。",
+    "m2": "　「趣味は何ですか」と聞かれて、答えに困る人が増えているという。忙しくて趣味に使う時間がないという人もいるが、話を聞いてみると、時間がないというより、何をすればいいのかわからないという人が多いようだ。\n　私自身、四十歳を過ぎるまで、これといった趣味を持たなかった。休日は疲れを取るために寝て過ごし、それで十分だと思っていた。転機は、近所の公民館で開かれていた陶芸教室に、友人に誘われて参加したことだった。初めて土に触れたとき、仕事のことをすっかり忘れて、二時間があっという間に過ぎた。その日から、休日の過ごし方が変わった。\n　趣味は、探して見つけるものというより、何かを試しているうちに出会うものなのかもしれない。最初から「自分に合うもの」を探そうとすると、なかなか一歩が踏み出せない。気軽な誘いに乗ってみることが、案外、近道なのではないだろうか。",
+    "a": "Ａ\n　楽器を習うなら、できるだけ早く始めたほうがよい。幼いころは耳が柔軟で、音の高さや響きの違いを自然に聞き分ける力が育ちやすいからだ。また、指の動きも、小さいうちから練習するほど滑らかになる。大人になってから始めても楽しむことはできるが、高い技術を身につけるには、幼少期からの積み重ねが大きな意味を持つ。",
+    "b": "Ｂ\n　親が熱心なあまり、子どもが嫌がっているのに楽器を習わせ続ける例は少なくない。確かに早く始めれば有利な面はあるだろう。しかし、嫌々続けた練習は、音楽そのものを嫌いにさせてしまう危険がある。大切なのは、子ども自身が音楽を楽しいと感じることだ。興味を持ったときに始めれば、上達は後からついてくる。",
+    "c1": "　科学に対して、「確実な答えを教えてくれるもの」というイメージを持っている人は多い。そのため、専門家の見解が途中で変わったり、研究者の間で意見が分かれたりすると、「科学は当てにならない」と失望する人も出てくる。\n　しかし、見解が変わることは、科学が不確かであることの証拠ではない。むしろ、それこそが科学の強みなのである。科学は、新しいデータが得られるたびに、それまでの考えを検証し直し、誤りがあれば修正していく営みだ。一度出した結論に固執せず、証拠に応じて考えを改めることができるからこそ、科学は長い時間をかけて、少しずつ真実に近づいていくことができる。\n　問題は、科学の結論を、変わることのない絶対的なものとして受け取ってしまうことにある。そうした受け取り方をしていると、見解が修正されたときに、科学全体への不信につながりかねない。また、まだ研究の途中にある事柄について、専門家に断定的な答えを求めてしまうことにもなる。\n　私たちに必要なのは、科学の結論には常に「現時点では」という前提がついていると理解することだ。確かさの程度を見極めながら、変わりうるものとして付き合っていく。それが、科学と上手に付き合うための態度なのではないだろうか。",
+    "i1": "ワークラウンジ　ひかり　ご利用案内\n\n【料金プラン】\n・一時利用　　1時間500円（1日の上限2,000円）　毎日 9:00〜21:00\n・平日会員　　月額12,000円　平日 9:00〜21:00 利用可\n・フル会員　　月額18,000円　毎日 7:00〜23:00 利用可（専用ロッカー付き）\n\n【会議室】（予約制・会員のみ利用可）\n・小会議室（4名まで）　1時間1,000円\n・大会議室（10名まで）　1時間2,500円\n※フル会員は、小会議室を月4時間まで無料で利用できます。\n\n【その他】\n・会員登録には、本人確認書類が必要です。\n・一時利用の方は、受付で名前を記入してからご利用ください。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n彼は与えられた任務を、最後まで責任を持って【遂行】した。",
+      "options": [
+        "ついこう",
+        "すいぎょう",
+        "すいこう",
+        "ついぎょう"
+      ],
+      "answer": 2,
+      "rationale": "遂行は「すいこう」と読み、物事を最後までやりとげることを表す。\n遂行 is read suikō: to carry out a task to the end.",
+      "target": "遂行"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの調査結果は、地方の深刻な人手不足を【如実】に示している。",
+      "options": [
+        "にょじつ",
+        "にょしつ",
+        "にょうじつ",
+        "じょうじつ"
+      ],
+      "answer": 0,
+      "rationale": "如実は「にょじつ」と読み、事実のとおりである様子を表す。「如実に示す」の形でよく使う。\n如実 is read nyojitsu; 如実に示す means to show something just as it really is.",
+      "target": "如実"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n両国は、対立を解消するための方法を【模索】している。",
+      "options": [
+        "ぼさく",
+        "もうさく",
+        "ぼうさく",
+        "もさく"
+      ],
+      "answer": 3,
+      "rationale": "模索は「もさく」と読み、手がかりのない中で方法を探し求めることを表す。\n模索 is read mosaku: to grope for a way forward.",
+      "target": "模索"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nスマートフォンの通知が【煩わしい】ので、設定を変えた。",
+      "options": [
+        "けがらわしい",
+        "わずらわしい",
+        "まぎらわしい",
+        "いまわしい"
+      ],
+      "answer": 1,
+      "rationale": "煩わしいは「わずらわしい」と読み、面倒でうっとうしい様子を表す。ほかは紛らわしい・汚らわしい・忌まわしいの読み。\n煩わしい is read wazurawashii (bothersome); the other readings belong to different words.",
+      "target": "煩わしい"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい校舎の設計には、子どもたちの意見も（　）された。",
+      "options": [
+        "反省",
+        "反射",
+        "反映",
+        "反復"
+      ],
+      "answer": 2,
+      "rationale": "「意見が反映される」は、意見が設計などに取り入れられて表れることを表す。\n意見が反映される means the children's opinions were taken into the design.",
+      "target": "反映"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n彼は、仕事と趣味の（　）をうまくとりながら、充実した毎日を送っている。",
+      "options": [
+        "釣り合い",
+        "見合い",
+        "請け合い",
+        "付き合い"
+      ],
+      "answer": 0,
+      "rationale": "「釣り合いをとる」は、二つのもののバランスを保つという意味である。\n釣り合いをとる means to keep a balance between two things, here work and hobbies.",
+      "target": "釣り合い"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\nその健康食品の効果には、科学的な（　）が乏しい。",
+      "options": [
+        "根底",
+        "根性",
+        "根回し",
+        "根拠"
+      ],
+      "answer": 3,
+      "rationale": "「科学的な根拠」は、主張を支える科学的な理由やよりどころのこと。\n科学的な根拠 means scientific grounds or evidence behind a claim.",
+      "target": "根拠"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\nコンクールを前に、生徒たちは毎日遅くまで練習に（　）。",
+      "options": [
+        "携わった",
+        "励んだ",
+        "甘んじた",
+        "陥った"
+      ],
+      "answer": 1,
+      "rationale": "「練習に励む」は、熱心に練習に取り組むという意味である。\n練習に励む means to practise diligently.",
+      "target": "励む"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n休日は、【もっぱら】家で音楽を聴いて過ごしている。",
+      "options": [
+        "たまに",
+        "主に",
+        "ときどき",
+        "久しぶりに"
+      ],
+      "answer": 1,
+      "rationale": "「もっぱら」は、ほかのことはせず、そのことばかりをする様子で、「主に」に近い。\nもっぱら means mainly or almost exclusively (主に).",
+      "target": "もっぱら"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n今年の冬は、【殊に】寒さが厳しい。",
+      "options": [
+        "意外に",
+        "例年どおり",
+        "少し",
+        "特に"
+      ],
+      "answer": 3,
+      "rationale": "「殊に」は、ほかと比べて特別に、という意味で「特に」と同じである。\n殊に means especially, the same as 特に.",
+      "target": "殊に"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n初めて舞台に立った彼の動きは、どこか【ぎこちない】。",
+      "options": [
+        "不自然だ",
+        "素早い",
+        "力強い",
+        "優雅だ"
+      ],
+      "answer": 0,
+      "rationale": "「ぎこちない」は、動作や話し方が滑らかでなく不自然な様子を表す。\nぎこちない means stiff and awkward, not natural in movement.",
+      "target": "ぎこちない"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【早急】",
+      "options": [
+        "彼は早急な性格で、よく忘れ物をする。",
+        "被害の状況を確認し、早急に対策を講じる必要がある。",
+        "早急の電車に乗り遅れてしまった。",
+        "この川は流れが早急で、泳ぐのは危ない。"
+      ],
+      "answer": 1,
+      "rationale": "早急は「非常に急いで」という意味で、対策などを急いで行う場面に使う。\n早急 means with urgency, as in taking measures without delay.",
+      "target": "早急"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【手分け】",
+      "options": [
+        "料理を手分けして、一人で全部食べた。",
+        "彼は手分けが器用で、何でも自分で作ってしまう。",
+        "年末の大掃除は、家族で手分けして行った。",
+        "手分けの時間が過ぎたので、店を閉めた。"
+      ],
+      "answer": 2,
+      "rationale": "手分けは、一つの仕事を何人かで分担することを表す。\n手分け means dividing a job among several people.",
+      "target": "手分け"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【頑な】",
+      "options": [
+        "このパンは頑なので、なかなか噛み切れない。",
+        "彼女は頑なな足取りで、山道を登っていった。",
+        "頑なな雨が、一晩中降り続いた。",
+        "彼は周りの説得にも耳を貸さず、頑なに参加を拒んだ。"
+      ],
+      "answer": 3,
+      "rationale": "頑なは、自分の考えや態度を変えようとしない様子で、「頑なに拒む」が自然である。\n頑な describes stubbornly refusing to change one's stance, as in 頑なに拒む.",
+      "target": "頑な"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n親が子どもを厳しく叱るのは、子どもの将来を思え（　）だ。",
+      "options": [
+        "ども",
+        "ばかりに",
+        "ばこそ",
+        "ばそれまで"
+      ],
+      "answer": 2,
+      "rationale": "「〜ばこそ」は「〜からこそ」という意味で、理由を強調する。「思えばこそ」となる。\n〜ばこそ stresses the reason: it is precisely because they care about the child's future.",
+      "subject": "grammar:bakoso"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n新しい工場の稼働（　）、地元の住民を対象に説明会が開かれた。",
+      "options": [
+        "にひきかえ",
+        "に先立って",
+        "をよそに",
+        "にかこつけて"
+      ],
+      "answer": 1,
+      "rationale": "「〜に先立って」は「〜の前に」という意味で、稼働の前に説明会を開いたことを表す。\n〜に先立って means prior to: the briefing was held before the plant started running.",
+      "subject": "grammar:nisakidatte"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n今年は、昇進に結婚にと、いいこと（　）の一年だった。",
+      "options": [
+        "ずくめ",
+        "まみれ",
+        "がち",
+        "めく"
+      ],
+      "answer": 0,
+      "rationale": "「〜ずくめ」は、そればかりが続く様子を表し、「いいことずくめ」の形でよく使う。\n〜ずくめ means nothing but: a year full of good things.",
+      "subject": "grammar:zukume"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n彼の無責任な発言は、聞く（　）ものだった。",
+      "options": [
+        "に足る",
+        "にもまして",
+        "にかたくない",
+        "に堪えない"
+      ],
+      "answer": 3,
+      "rationale": "「聞くに堪えない」は、ひどくて聞いていられないという意味である。\n聞くに堪えない means too awful to listen to.",
+      "subject": "grammar:nitaenai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n彼の情熱的な演奏は、聴く人の心を動かさ（　）。",
+      "options": [
+        "ずじまいだ",
+        "ずにはおかない",
+        "ないではすまない",
+        "んばかりだ"
+      ],
+      "answer": 1,
+      "rationale": "「〜ずにはおかない」は、必ずそうさせる、自然にそうなるという意味である。\n〜ずにはおかない means it cannot fail to: the performance is bound to move listeners.",
+      "subject": "grammar:n1-zu-niwa-okanai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n費用の問題（　）、まずは計画が実現可能かどうかを検討すべきだ。",
+      "options": [
+        "はおろか",
+        "ともなると",
+        "はさておき",
+        "とあって"
+      ],
+      "answer": 2,
+      "rationale": "「〜はさておき」は「〜は今は考えないことにして」という意味である。\n〜はさておき means setting aside for now: leave cost aside and check feasibility first.",
+      "subject": "grammar:hasateoki"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n確かな証拠が ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 人は少なくない。",
+      "options": [
+        "うのみにする",
+        "ない",
+        "広告の言葉を",
+        "にもかかわらず"
+      ],
+      "answer": 2,
+      "rationale": "「確かな証拠がないにもかかわらず広告の言葉をうのみにする人」となり、★には「広告の言葉を」が入る。\nThe order is ない・にもかかわらず・広告の言葉を・うのみにする, so 広告の言葉を fills the ★ slot."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nプロの演奏家 ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 練習するそうだ。",
+      "options": [
+        "以上",
+        "一日に",
+        "八時間",
+        "ともなると"
+      ],
+      "answer": 2,
+      "rationale": "「プロの演奏家ともなると、一日に八時間以上練習するそうだ」となり、★には「八時間」が入る。\nThe order is ともなると・一日に・八時間・以上, so 八時間 fills the ★ slot."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの講座には、年齢や経験 ＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 参加できる。",
+      "options": [
+        "誰でも",
+        "音楽に興味のある",
+        "を問わず",
+        "方なら"
+      ],
+      "answer": 1,
+      "rationale": "「年齢や経験を問わず、音楽に興味のある方なら誰でも参加できる」となり、★には「音楽に興味のある」が入る。\nThe order is を問わず・音楽に興味のある・方なら・誰でも, so 音楽に興味のある fills the ★ slot.",
+      "subject": "grammar:wotowazu"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "ものの",
+        "ために",
+        "どころか",
+        "ばかりに"
+      ],
+      "answer": 1,
+      "rationale": "釘を使わないことが、無理な力がかかりにくい理由になっているので、原因を表す「ために」が入る。\nNot using nails is the reason the joints avoid strain, so ために (because) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "そのため",
+        "しかも",
+        "ところが",
+        "つまり"
+      ],
+      "answer": 2,
+      "rationale": "優れた技術の説明から、それを身につけた大工が減っているという反対の事実に移るので「ところが」が入る。\nThe text turns from the technique's merits to the decline of carpenters who master it, so ところが (however) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "にすぎない",
+        "わけがない",
+        "ものか",
+        "かもしれない"
+      ],
+      "answer": 3,
+      "rationale": "古い技術が新しい建築の手がかりになる可能性を控えめに述べているので「かもしれない」が入る。\nThe writer cautiously suggests a possibility, so かもしれない (may) fits."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "筆者によると、週休三日制を導入した会社で生産性が向上したのはなぜか。",
+      "options": [
+        "社員の数を増やしたから",
+        "一日の労働時間を長くしたから",
+        "社員が働き方を見直し、無駄を省いたから",
+        "休日にも仕事をする社員が増えたから"
+      ],
+      "answer": 2,
+      "rationale": "限られた時間で成果を出そうと、社員が会議を短くしたり不要な作業を見直したりした結果だとある。\nStaff shortened meetings and cut unnecessary work to deliver in less time."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "筆者は、体験談についてどのように考えているか。",
+      "options": [
+        "効果を確かめる材料としては不十分だ。",
+        "多くの人の体験談を集めれば、効果を証明できる。",
+        "専門家の意見よりも信頼できる。",
+        "効果がなかった人の体験談は、公開すべきではない。"
+      ],
+      "answer": 0,
+      "rationale": "体験談からは本当に食品のおかげなのか判断できず、比較の方法を工夫して調べる必要があると述べている。\nA testimony cannot show whether the food caused the recovery; only careful comparative study can."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "このお知らせで、保護者に求められていることは何か。",
+      "options": [
+        "練習の日に、学校まで子どもを迎えに行くこと",
+        "合唱コンクールの練習に、保護者も参加すること",
+        "練習に参加できない日がある場合、前もって担任に知らせること",
+        "10月1日から20日まで、習い事を休ませること"
+      ],
+      "answer": 2,
+      "rationale": "塾や習い事などで練習に参加できない日がある場合は、事前に担任に知らせるよう求めている。\nParents are asked to tell the homeroom teacher in advance about days the child cannot attend."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "木造の校舎で過ごす子どもについて、調査ではどのようなことがわかったか。",
+      "options": [
+        "成績が向上した。",
+        "疲れやいらいらを感じることが少なかった。",
+        "病気になることが少なかった。",
+        "学校に来るのが楽しくなった。"
+      ],
+      "answer": 1,
+      "rationale": "木造の校舎の子どもは、疲れやいらいらを感じることが少なかったと書かれている。\nChildren in wooden schools reported less fatigue and irritation."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "筆者によると、地元の木で校舎を建てることは、森林にとってどのような意味があるか。",
+      "options": [
+        "人工林を減らし、自然の森を増やすことにつながる。",
+        "森林の手入れをする人を増やすことにつながる。",
+        "火事や地震に強い森を作ることにつながる。",
+        "木を切って新たに植えるという森の循環を生む。"
+      ],
+      "answer": 3,
+      "rationale": "地元の木を使えば、木を切って新たに植えるという森の循環が生まれると述べている。\nUsing local timber creates a cycle of cutting and replanting in the forest."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m2",
+      "prompt": "筆者が陶芸を始めたきっかけは何か。",
+      "options": [
+        "友人に誘われて、公民館の教室に参加したから",
+        "休日を寝て過ごすことに飽きたから",
+        "仕事で陶芸に関わる機会があったから",
+        "自分に合う趣味を探していたから"
+      ],
+      "answer": 0,
+      "rationale": "転機は、友人に誘われて公民館の陶芸教室に参加したことだと書かれている。\nThe turning point was joining a pottery class at the community centre when a friend invited the writer."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m2",
+      "prompt": "筆者は、趣味を見つけるにはどうするのがよいと考えているか。",
+      "options": [
+        "自分に合うものを、時間をかけて探す。",
+        "仕事と関係のあることから始める。",
+        "まず休日に十分休んで、疲れを取る。",
+        "気軽な誘いに乗って、試してみる。"
+      ],
+      "answer": 3,
+      "rationale": "趣味は試しているうちに出会うもので、気軽な誘いに乗ってみるのが近道だと述べている。\nThe writer suggests accepting casual invitations and trying things out."
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "passages": [
+        "a",
+        "b"
+      ],
+      "prompt": "楽器を始める時期について、ＡとＢはどのように述べているか。",
+      "options": [
+        "ＡもＢも、早く始めるほど有利だと強く主張している。",
+        "Ａは本人の興味を重視し、Ｂは早く始めることを重視している。",
+        "Ａはできるだけ早く始めるべきだと述べ、Ｂは本人が興味を持ったときに始めるのがよいと述べている。",
+        "ＡもＢも、大人になってから始めても上達しないと述べている。"
+      ],
+      "answer": 2,
+      "rationale": "Ａは幼いころからの積み重ねを重視し、Ｂは子どもが興味を持ったときに始めればよいとしている。\nA urges starting as early as possible; B says to start when the child becomes interested."
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "passages": [
+        "a",
+        "b"
+      ],
+      "prompt": "ＡとＢのどちらにも述べられている内容はどれか。",
+      "options": [
+        "早く始めることには、有利な点がある。",
+        "嫌々続けた練習は、音楽を嫌いにさせる。",
+        "幼いころは、耳が柔軟である。",
+        "親が熱心すぎると、子どもの上達が遅れる。"
+      ],
+      "answer": 0,
+      "rationale": "Ａは早く始める利点を述べ、Ｂも「早く始めれば有利な面はあるだろう」と認めている。\nA argues for early starts and B concedes that starting early has advantages."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者によると、見解が変わることは、なぜ科学の強みなのか。",
+      "options": [
+        "専門家の間で、活発な議論が行われるから",
+        "証拠に応じて考えを改めることで、少しずつ真実に近づけるから",
+        "新しい研究のための予算が得やすくなるから",
+        "人々が科学に関心を持つきっかけになるから"
+      ],
+      "answer": 1,
+      "rationale": "証拠に応じて考えを改めることができるからこそ、科学は少しずつ真実に近づけると述べている。\nBecause science revises its views to fit the evidence, it gradually approaches the truth."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者は、どのような受け取り方が問題だと述べているか。",
+      "options": [
+        "専門家の意見を、自分で確かめずに信じること",
+        "研究の途中の成果を、軽視すること",
+        "科学の結論を、はじめから疑ってかかること",
+        "科学の結論を、変わることのない絶対的なものと考えること"
+      ],
+      "answer": 3,
+      "rationale": "科学の結論を変わることのない絶対的なものとして受け取ってしまうことが問題だと述べている。\nThe problem is treating scientific conclusions as absolute and unchangeable."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者の考えに最も近いものはどれか。",
+      "options": [
+        "科学は不確かなので、あまり信頼しすぎないほうがよい。",
+        "専門家は、研究の途中でも断定的な答えを示すべきだ。",
+        "科学の結論は、現時点でのものとして理解し、付き合っていくべきだ。",
+        "見解が変わらない研究ほど、信頼できる。"
+      ],
+      "answer": 2,
+      "rationale": "科学の結論には常に「現時点では」という前提がつくと理解して付き合うべきだと主張している。\nScientific conclusions should be understood as provisional, valid for now."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "会社員の中村さんは、平日は仕事帰りの19時から22時まで、土曜日は朝から作業できる場所を探している。中村さんの希望に合うプランはどれか。",
+      "options": [
+        "一時利用",
+        "平日会員",
+        "フル会員",
+        "どのプランも合わない"
+      ],
+      "answer": 2,
+      "rationale": "22時まで利用でき、土曜日も使えるのは、毎日7時から23時まで利用できるフル会員だけである。\nOnly the full membership covers weekdays until 22:00 and Saturdays."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "フル会員の山本さんは、今月、小会議室を合計6時間利用した。会議室の料金はいくらになるか。",
+      "options": [
+        "0円",
+        "2,000円",
+        "4,000円",
+        "6,000円"
+      ],
+      "answer": 1,
+      "rationale": "フル会員は小会議室を月4時間まで無料なので、残りの2時間分、1時間1,000円で2,000円になる。\nFour hours are free for full members, so the remaining two hours cost 2,000 yen."
+    }
+  ]
+}

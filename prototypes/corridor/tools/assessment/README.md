@@ -76,6 +76,15 @@ Previously admitted catalog entries move to `archivedEntries` when replaced. The
 
 Canonical dictionary or grammar identities are incorporated into the final item's `subjects` before its hash is calculated. Only the tested target is mapped. An unresolved target remains available for the app's assessment-card follow-up; distractors are never automatically enrolled.
 
+### Machine-checked written tests (N1–N5)
+
+A separate admission class, `machine-checked-written/1`, carries original written tests at every level. The learner sees each one labelled **検収前 · machine-checked, awaiting John's review** on its card, start sheet, question header, explanation and results, with per-question provenance (author family, verifier families, agreement). It is not host editorial review and not John's acceptance.
+
+- Manuscripts live in `authoring/written-bank/nX-written-0K.json`; `written-bank.mjs validate --draft` checks format, the per-level blueprint (`WRITTEN_BANK_LEVELS`, scaled from `LEVEL_PROFILES`; not official counts), dictionary headwords for tested words, app grammar/particle ids for `subject`, and cross-test separation.
+- `machine-check.mjs run` asks three other model families (glm-5.3, kimi-k3, deepseek-v4-pro through the local ollama CLI; minimax-m3 in reserve) to solve every item blind — prompt, options and passages only — with a one-line reason and flags for ambiguity, no correct option or unnatural Japanese. Evidence stays under `~/.dharma/bunki_review/2026-09-28/jlpt/evidence/`. An item is kept only when every answering family chose the key and none flagged it: three families, or two when a family could not answer. A failing item is revised once and re-checked, or dropped.
+- `written-bank.mjs publish <manuscripts> [--legacy-n1 authoring/n1-practice-originals.r3.mjs]` maps each manuscript through `prepareWrittenOriginal` and `materializeWrittenSection`, refuses any item that is not kept, and writes the immutable form, a media-free delivery with `itemChecks`, and a public `bunki-machine-check-review/1` record. The catalog entry pins that record as its single editorial decision (`machine-check-v1:<sha256>`, policy `bunki-machine-check/1`). Without `publish` it is a dry run (`plan`).
+- `verify-assessment-bank.mjs` verifies every entry of the class from public files alone and keeps the N2 pin gate exact: `admittedWrittenSections` ignores only entries that fully match the class, so an entry that merely claims the route still fails. A native rebuild retains the class unchanged.
+
 ## Sources and personal study
 
 `data/assessment/sources.json` records actual primary-page fetch hashes and URLs. The official workbooks contain questions selected from real JLPT tests. Their official index identifies third-party reading texts and recordings; being available on the web is not a public redistribution grant. The app links to the official site rather than embedding it.

@@ -1,0 +1,587 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N1",
+  "number": 3,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　地球温暖化の影響は、すでに私たちの食卓にも及んでいる。夏の高温が続くと、米の粒が白く濁り、品質が落ちてしまう。果物も同様で、色づきが悪くなったり、実が日焼けしたりする被害が各地で報告されている。\n　（１）、こうした変化を逆に生かそうとする動きもある。これまで寒すぎて栽培が難しかった地域で、暖かい気候を好む果物の生産が始まっているのだ。ある北国の農家では、十年前には考えられなかった品種の栽培に成功し、新たな名産品として注目を集めている（２）。\n　もちろん、温暖化そのものは食い止めなければならない。だが、気候の変化がある程度避けられない以上、それに合わせて作物や育て方を見直していくことも必要だ。変化をただ嘆く（３）、変化の中に新しい可能性を探す。これからの農業には、そうした柔軟さが求められているのではないだろうか。",
+    "s1": "　将棋のAIが人間の名人に勝ってから、もう十年近くになる。当初は「将棋の魅力が失われる」と心配する声もあったが、実際にはその逆だった。若い棋士たちはAIを練習相手にして新しい戦法を次々と生み出し、ファンもまた、AIが示す形勢の数値を見ながら対局を楽しむようになった。AIは人間の敵ではなく、将棋の世界を広げる道具になったのである。",
+    "s2": "　旅先で写真ばかり撮っていると、かえってその場所のことを覚えていない。そんな経験をしたことはないだろうか。ある実験では、美術館で作品を撮影した人は、撮影せずに眺めた人よりも、作品の細部を思い出せなかったという。「写真に残したから大丈夫」という安心感が、目の前のものをしっかり見ようとする意識を弱めてしまうのかもしれない。記録することと記憶することは、必ずしも同じではないのだ。",
+    "s3": "森下様\n\n　先日は、当農園の稲刈り体験にお申し込みいただき、ありがとうございました。\n　あいにく、今月に入ってからの長雨の影響で稲の生育が遅れており、予定していた9月14日の実施は難しい状況です。つきましては、日程を9月28日に変更させていただきたく存じます。新しい日程のご都合が合わない場合は、参加費を全額お返しいたしますので、9月20日までにご連絡ください。\n　ご迷惑をおかけし、誠に申し訳ございません。\n\nやまびこ農園",
+    "m1": "　私の住む町では、数年前から、夕方になると防災無線で音楽が流れるようになった。子どもたちに帰宅を促すためだという。初めのうちは、その音を少しうるさいと感じていた。ところが、ある年、機械の故障でしばらく音楽が流れなかったとき、夕方がなんとも物足りなく感じられた。いつの間にか、あの音楽は私にとって一日の区切りになっていたのだ。\n　音は、私たちが思っている以上に、暮らしのリズムを形づくっている。寺の鐘や学校のチャイム、豆腐屋のラッパなど、かつては町の中に時を知らせる音があふれていた。そうした音の多くは消えてしまったが、それらを「騒音」として一方的に排除してきたことが、本当によかったのかどうか。静けさを求めるあまり、町の表情まで失ってはいないか、考えてみる価値はありそうだ。",
+    "m2": "　祖母が亡くなったあと、遺品を整理していて、祖母が若いころに祖父と交わした手紙の束を見つけた。便せんは黄ばみ、インクも薄れていたが、そこには、私の知らない二人の姿が生き生きと描かれていた。\n　今、私たちは毎日のように大量のメッセージをやり取りしている。しかし、そのほとんどは、読んだそばから流れ去っていく。機種を変えたりサービスが終了したりすれば、簡単に消えてしまうものも多い。何十年も後に、誰かが私たちのやり取りを手に取って読むことは、おそらくないだろう。\n　便利さと引き換えに、私たちは言葉を「残す」という感覚を失いつつあるのではないか。大切な人には、年に一度でも、手書きの手紙を送ってみたい。祖母の手紙の束を前に、そう思った。",
+    "a": "Ａ\n　保育園の建設計画が、近隣住民の反対で中止になる例が相次いでいる。理由の多くは「子どもの声がうるさい」というものだ。しかし、子どもが声を出して遊ぶのは成長に欠かせないことであり、それを工事や交通の騒音と同じように扱うのはおかしい。子育てを社会全体で支えるという考え方に立てば、多少の音は受け入れるべきではないだろうか。",
+    "b": "Ｂ\n　子どもの声を騒音と呼ぶことに抵抗を感じる人は多いだろう。だが、夜勤明けで昼間に眠る人や、自宅で仕事をする人にとって、毎日続く大きな声がつらいのも事実だ。大切なのは、どちらか一方に我慢を強いることではない。防音壁の設置や園庭の配置の工夫など、計画の段階で住民と話し合い、互いに納得できる方法を探ることが必要だ。",
+    "c1": "　本をたくさん読むことが良いこととされ、読書量を競うような風潮すらある。一か月に何冊読んだか、一年で何百冊読んだかを誇らしげに語る人も少なくない。速く、多く読む技術を教える本も売れている。\n　しかし、私は読書の価値を冊数で測ることに違和感を覚える。一冊の本をゆっくり読み、ときには同じ箇所を何度も読み返しながら、書き手の考えと自分の考えを突き合わせる。そうした時間の中でこそ、本は読み手の考え方を揺さぶり、変えていく力を持つ。速く読むことを目的にすると、自分の考えと合う部分だけを拾い、違和感を覚える部分は読み飛ばしてしまいがちだ。それでは、どれほど多くの本を読んでも、自分の中にもともとあった考えを確かめるだけに終わってしまう。\n　もちろん、情報を集めるための読書であれば、速く読む技術は役に立つ。問題は、あらゆる読書を同じように扱ってしまうことだ。必要な情報を取り出すための読み方と、書き手と対話するための読み方は、本来まったく別のものである。\n　本当に大切な本に出会ったら、急がずに向き合ってみてほしい。読み終えるまでに何か月かかってもかまわない。その本と過ごした時間は、読んだ冊数には表れない形で、きっとあなたの中に残るはずだ。",
+    "i1": "ひばり市　市民農園　利用者募集のお知らせ\n\n【区画の種類と年間利用料】\n・一般区画（15㎡）　　年間8,000円　　50区画\n・大型区画（30㎡）　　年間14,000円　　20区画\n・車いす対応区画（10㎡、高さ70cmの花壇型）　年間5,000円　　5区画\n\n【応募資格】\n・市内に住んでいる方（一世帯につき1区画まで）\n・利用期間中（4月1日〜翌年3月31日）、月に2回以上作業ができる方\n\n【応募方法】\n・往復はがきに、住所・氏名・電話番号・希望する区画の種類を書いて、2月10日（必着）までに市役所農政課へお送りください。\n・応募者が多い場合は抽選とし、結果は2月下旬に返信はがきでお知らせします。\n・初めて利用する方は、3月15日（土）の説明会に必ず出席してください。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n専門家は、新しい制度が現場の負担を増やすことを【懸念】している。",
+      "options": [
+        "げねん",
+        "けねん",
+        "かねん",
+        "けいねん"
+      ],
+      "answer": 1,
+      "rationale": "懸念は「けねん」と読み、先のことを気にかけて心配することを表す。\n懸念 is read kenen: concern or apprehension about what may happen.",
+      "target": "懸念"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n男女間の賃金格差を【是正】するための法律が施行された。",
+      "options": [
+        "ぜしょう",
+        "しせい",
+        "ぜいせい",
+        "ぜせい"
+      ],
+      "answer": 3,
+      "rationale": "是正は「ぜせい」と読み、悪い点や不公平を正しく直すことを表す。\n是正 is read zesei: to correct or redress an unfair situation.",
+      "target": "是正"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n記録的な猛暑が続き、今年の米の出来を【危ぶむ】声が農家から上がっている。",
+      "options": [
+        "あやぶむ",
+        "あやうむ",
+        "きぶむ",
+        "あぶむ"
+      ],
+      "answer": 0,
+      "rationale": "危ぶむは「あやぶむ」と読み、うまくいかないのではないかと心配することを表す。\n危ぶむ is read ayabumu: to fear that something will turn out badly.",
+      "target": "危ぶむ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n新人の彼の実力は、すでに先輩を【凌ぐ】ほどだ。",
+      "options": [
+        "しぬぐ",
+        "しのぐ",
+        "すすぐ",
+        "そそぐ"
+      ],
+      "answer": 1,
+      "rationale": "凌ぐは「しのぐ」と読み、ここでは能力が他を上回ることを表す。\n凌ぐ is read shinogu; here it means to surpass or outdo.",
+      "target": "凌ぐ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\nその棋士は、終盤に相手の（　）を突いて、一気に形勢を逆転させた。",
+      "options": [
+        "余裕",
+        "間",
+        "隙",
+        "穴埋め"
+      ],
+      "answer": 2,
+      "rationale": "「隙を突く」は、相手の油断や弱いところをねらって攻めるという意味の慣用表現である。\n隙を突く is an idiom meaning to exploit an opening or lapse in the opponent's guard.",
+      "target": "隙"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n天候不順が続き、野菜の価格が（　）している。",
+      "options": [
+        "高揚",
+        "向上",
+        "高尚",
+        "高騰"
+      ],
+      "answer": 3,
+      "rationale": "「高騰」は物価などが急に大きく上がることで、野菜の価格について使う。\n高騰 means a sharp rise in prices, which is what bad weather does to vegetable prices.",
+      "target": "高騰"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n昔の日記を読み返すと、当時の記憶が（　）よみがえってきた。",
+      "options": [
+        "鮮明に",
+        "賢明に",
+        "懸命に",
+        "厳密に"
+      ],
+      "answer": 0,
+      "rationale": "「鮮明に」は、はっきりとあざやかな様子で、記憶がよみがえる様子に合う。\n鮮明に means vividly and clearly, describing memories coming back.",
+      "target": "鮮明"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい物流システムの導入で、配送にかかる時間が大幅に（　）された。",
+      "options": [
+        "縮小",
+        "短縮",
+        "収縮",
+        "省略"
+      ],
+      "answer": 1,
+      "rationale": "時間や距離を短くすることは「短縮」という。縮小は規模、収縮は物の縮み、省略ははぶくこと。\n短縮 means shortening a time or distance; the others refer to scale, contraction or omission.",
+      "target": "短縮"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n今朝は、昨日よりも【一段と】冷え込んだ。",
+      "options": [
+        "少し",
+        "急に",
+        "いっそう",
+        "珍しく"
+      ],
+      "answer": 2,
+      "rationale": "「一段と」は、前よりさらに程度が増す様子で、「いっそう」と同じ意味である。\n一段と means even more than before (いっそう).",
+      "target": "一段と"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n空が【にわかに】暗くなり、激しい雨が降り出した。",
+      "options": [
+        "急に",
+        "徐々に",
+        "一時的に",
+        "再び"
+      ],
+      "answer": 0,
+      "rationale": "「にわかに」は、物事が急に起こる様子を表す。\nにわかに means suddenly, without warning.",
+      "target": "にわかに"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n年末は、どの店も警備が【手薄】になりやすい。",
+      "options": [
+        "厳重だ",
+        "人手が足りない",
+        "費用が高い",
+        "評判が悪い"
+      ],
+      "answer": 1,
+      "rationale": "「手薄」は、人手や備えが十分でない様子を表す。\n手薄 means short-handed or insufficiently staffed or guarded.",
+      "target": "手薄"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【一環】",
+      "options": [
+        "彼は、最初から最後まで一環して反対の立場をとった。",
+        "駅前の一環に、新しいパン屋が開店した。",
+        "この植樹活動は、市の環境保全計画の一環として行われている。",
+        "長い会議は、結論が出ないまま一環で終わった。"
+      ],
+      "answer": 2,
+      "rationale": "一環は、全体の中でつながりを持つ一部分のことで、「〜の一環として」の形で使う。\n一環 is one link in a larger whole, used as 〜の一環として (as part of).",
+      "target": "一環"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【発足】",
+      "options": [
+        "雨の中、マラソンの選手たちが一斉に発足した。",
+        "春になって、庭の木から新しい芽が発足した。",
+        "彼は毎朝六時に家を発足して会社に向かう。",
+        "新しい研究チームが、四月に正式に発足した。"
+      ],
+      "answer": 3,
+      "rationale": "発足は、組織や制度などが新しく作られて活動を始めることを表す。\n発足 means an organization or system is newly launched.",
+      "target": "発足"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【見晴らし】",
+      "options": [
+        "この部屋は高台にあるので、見晴らしがいい。",
+        "彼女は見晴らしがいいので、細かいミスにもすぐ気づく。",
+        "専門家によれば、今後の景気の見晴らしは明るいそうだ。",
+        "試験までの見晴らしを立ててから、勉強を始めた。"
+      ],
+      "answer": 0,
+      "rationale": "見晴らしは、高い所から遠くまで見渡せる眺めのこと。先の予測は「見通し」という。\n見晴らし is a view over a wide area; forecasts and plans use 見通し instead.",
+      "target": "見晴らし"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n彼女は会社勤めの（　）、週末は地域の子どもたちに将棋を教えている。",
+      "options": [
+        "がてら",
+        "かたわら",
+        "そばから",
+        "ついでに"
+      ],
+      "answer": 1,
+      "rationale": "「〜のかたわら」は、本業をしながら、その一方で別のことも行うことを表す。\n〜のかたわら means alongside one's main occupation, doing something else as well.",
+      "subject": "grammar:katawara"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの森は、一度道に迷っ（　）、出てくるのは難しいと言われている。",
+      "options": [
+        "たところで",
+        "たとたん",
+        "たが最後",
+        "た矢先"
+      ],
+      "answer": 2,
+      "rationale": "「〜たが最後」は「一度〜したら、もう取り返しがつかない」という意味である。\n〜たが最後 means once something happens, there is no way back.",
+      "subject": "grammar:tagasaigo"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nあの先生はとても厳しいので、宿題を忘れ（　）、大変なことになる。",
+      "options": [
+        "ようが",
+        "まいが",
+        "んばかりに",
+        "ようものなら"
+      ],
+      "answer": 3,
+      "rationale": "「〜ようものなら」は「もし〜したら、悪い結果になる」という意味である。\n〜ようものなら means if one were to do something, trouble would follow.",
+      "subject": "grammar:youmononara"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n待っていたチャンスが来た（　）、彼はすぐに手を挙げた。",
+      "options": [
+        "とばかりに",
+        "と思いきや",
+        "ともなく",
+        "とあれば"
+      ],
+      "answer": 0,
+      "rationale": "「〜とばかりに」は、いかにもそう言いたそうな様子で行動することを表す。\n〜とばかりに means acting as if to say something: as if to say 'here's my chance'.",
+      "subject": "grammar:tobakarini"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの試験では、一分（　）遅刻は認められない。",
+      "options": [
+        "ばかりか",
+        "ごとき",
+        "たりとも",
+        "ならでは"
+      ],
+      "answer": 2,
+      "rationale": "「一〜たりとも〜ない」は「ほんの少しも〜ない」という強い否定を表す。\n一〜たりとも〜ない means not even one: not even one minute late is allowed.",
+      "subject": "grammar:n1-tari-tomo"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n記録的な大雨のため、その地域の住民は避難を（　）。",
+      "options": [
+        "ものともしなかった",
+        "余儀なくされた",
+        "禁じ得なかった",
+        "皮切りにした"
+      ],
+      "answer": 1,
+      "rationale": "「〜を余儀なくされる」は、ほかに方法がなく仕方なくそうさせられることを表す。\n〜を余儀なくされる means to be forced to do something by circumstances.",
+      "subject": "grammar:woyoginakusareru"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nAIが名人に勝った ＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 失われたわけではない。",
+      "options": [
+        "対局の",
+        "からといって",
+        "価値が",
+        "人間同士の"
+      ],
+      "answer": 3,
+      "rationale": "「勝ったからといって、人間同士の対局の価値が失われたわけではない」となり、★には「人間同士の」が入る。\nThe order is からといって・人間同士の・対局の・価値が, so 人間同士の fills the ★ slot.",
+      "subject": "grammar:karatoitte"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n三年に及ぶ ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 今年から販売される。",
+      "options": [
+        "新しい品種が",
+        "開発された",
+        "を経て",
+        "試行錯誤"
+      ],
+      "answer": 1,
+      "rationale": "「三年に及ぶ試行錯誤を経て開発された新しい品種が今年から販売される」となり、★には「開発された」が入る。\nThe order is 試行錯誤・を経て・開発された・新しい品種が, so 開発された fills the ★ slot.",
+      "subject": "grammar:wohete"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nどんな ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 必ず記録した人の視点が入り込んでいる。",
+      "options": [
+        "そこには",
+        "記録",
+        "であれ",
+        "形の"
+      ],
+      "answer": 2,
+      "rationale": "「どんな形の記録であれ、そこには必ず記録した人の視点が入り込んでいる」となり、★には「であれ」が入る。\nThe order is 形の・記録・であれ・そこには, so であれ fills the ★ slot.",
+      "subject": "grammar:deare"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "したがって",
+        "なぜなら",
+        "一方で",
+        "要するに"
+      ],
+      "answer": 2,
+      "rationale": "前の段落の被害の話と対比して、変化を生かす動きを述べているので「一方で」が入る。\nThe paragraph turns from damage to efforts that exploit the change, so 一方で (on the other hand) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "ことだ",
+        "べきだ",
+        "ものか",
+        "という"
+      ],
+      "answer": 3,
+      "rationale": "ある農家の例を伝え聞いた情報として述べているので、伝聞の「という」が入る。\nThe writer is reporting what they have heard about a farm, so the hearsay ending という fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "のではなく",
+        "ばかりか",
+        "あまり",
+        "ついでに"
+      ],
+      "answer": 0,
+      "rationale": "「ただ嘆くのではなく、新しい可能性を探す」と、二つの態度を対比しているので「のではなく」が入る。\nのではなく (rather than) contrasts merely lamenting with looking for new possibilities."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "筆者によると、AIは将棋の世界にどのような影響を与えたか。",
+      "options": [
+        "将棋の人気を大きく低下させた。",
+        "人間同士の対局を不要にした。",
+        "棋士の数を減らす原因になった。",
+        "棋士やファンの将棋の楽しみ方を広げた。"
+      ],
+      "answer": 3,
+      "rationale": "棋士はAIで新しい戦法を生み、ファンも形勢の数値を見て楽しむようになったと書かれている。\nPlayers invented new strategies with AI and fans enjoy games with its evaluations: AI widened the game."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "この文章で筆者が最も言いたいことは何か。",
+      "options": [
+        "旅先では、できるだけ多くの写真を撮るべきだ。",
+        "写真に記録すると、かえって記憶に残りにくいことがある。",
+        "美術館では、作品の撮影を禁止するべきだ。",
+        "記憶力を高めるには、写真を見返すのがよい。"
+      ],
+      "answer": 1,
+      "rationale": "撮影した人のほうが細部を思い出せなかった例を挙げ、記録と記憶は同じではないと述べている。\nThe writer's point is that recording something can make it less memorable."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "このメールを受け取った人が、9月28日に参加できない場合、どうすればよいか。",
+      "options": [
+        "予定どおり、9月14日に農園へ行く。",
+        "参加費の返金を、当日農園で受け取る。",
+        "9月20日までに農園に連絡する。",
+        "何もしなくても、参加費は自動的に返される。"
+      ],
+      "answer": 2,
+      "rationale": "新しい日程に都合が合わない場合は、9月20日までに連絡すれば参加費が全額返されるとある。\nIf the new date does not suit, the recipient should contact the farm by September 20 for a refund."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "音楽が流れなかったとき、筆者が物足りなく感じたのはなぜか。",
+      "options": [
+        "その音楽が、筆者にとって一日の区切りになっていたから",
+        "子どもたちが帰宅する時間がわからなくなったから",
+        "もともと、その音楽が好きだったから",
+        "町が以前よりうるさくなったから"
+      ],
+      "answer": 0,
+      "rationale": "いつの間にか、その音楽が筆者にとって一日の区切りになっていたと書かれている。\nWithout noticing, the music had become the marker of the end of the writer's day."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "筆者の考えに合うものはどれか。",
+      "options": [
+        "町の音は、できるだけ減らしていくべきだ。",
+        "時を知らせる音を、昔のようにすべて復活させるべきだ。",
+        "防災無線の音楽は、子どもの帰宅には役に立たない。",
+        "町の音を騒音として排除してきたことを、見直してみる必要がある。"
+      ],
+      "answer": 3,
+      "rationale": "町の音を一方的に騒音として排除してきたことがよかったのか、考えてみる価値があると述べている。\nThe writer suggests reconsidering whether banishing town sounds as noise was wise."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m2",
+      "prompt": "筆者は、今のメッセージのやり取りについてどのように述べているか。",
+      "options": [
+        "手紙よりも気持ちが伝わりにくい。",
+        "後に残らず、消えてしまいやすい。",
+        "ほとんどが、読まれないまま消えてしまう。",
+        "書くのに時間がかかりすぎる。"
+      ],
+      "answer": 1,
+      "rationale": "メッセージは読んだそばから流れ去り、機種変更などで簡単に消えてしまうと述べている。\nMessages flow away once read and easily vanish with a new phone or a closed service."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m2",
+      "prompt": "「そう思った」とあるが、筆者はどのように思ったのか。",
+      "options": [
+        "祖母の手紙を、家族に読んでもらいたい。",
+        "これからはメッセージのやり取りをやめたい。",
+        "大切な人に、ときには手書きの手紙を送りたい。",
+        "祖母と祖父の手紙を、本にして残したい。"
+      ],
+      "answer": 2,
+      "rationale": "直前に、大切な人には年に一度でも手書きの手紙を送ってみたいと書かれている。\nThe sentence before says the writer wants to send handwritten letters to loved ones, at least once a year."
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "passages": [
+        "a",
+        "b"
+      ],
+      "prompt": "子どもの声について、ＡとＢはどのように述べているか。",
+      "options": [
+        "Ａは受け入れるべきだと述べ、Ｂはつらいと感じる人の事情にも配慮すべきだと述べている。",
+        "ＡもＢも、子どもの声は騒音だと述べている。",
+        "Ａは騒音だと述べ、Ｂは受け入れるべきだと述べている。",
+        "ＡもＢも、保育園の建設には反対だと述べている。"
+      ],
+      "answer": 0,
+      "rationale": "Ａは多少の音は受け入れるべきだとし、Ｂは声がつらい人の事情も事実だとして配慮を求めている。\nA says the noise should be accepted; B says those who suffer from it must also be considered."
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "passages": [
+        "a",
+        "b"
+      ],
+      "prompt": "ＡとＢの考えについて、正しいものはどれか。",
+      "options": [
+        "ＡもＢも、住民との話し合いが最も重要だと考えている。",
+        "Ａは防音壁の設置を提案し、Ｂは建設の中止を求めている。",
+        "ＡもＢも、自宅で仕事をする人を優先すべきだと考えている。",
+        "Ａは社会全体で子育てを支える立場から、Ｂは双方が納得できる方法を探る立場から述べている。"
+      ],
+      "answer": 3,
+      "rationale": "Ａは子育てを社会全体で支える考え方に立ち、Ｂは話し合いで互いに納得できる方法を探るべきだとしている。\nA argues from society sharing child-rearing; B argues for finding a solution both sides accept."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者によると、速く読むことを目的にすると、どうなりがちか。",
+      "options": [
+        "本の内容をまったく理解できなくなる。",
+        "自分の考えに合う部分だけを拾い、違和感のある部分を読み飛ばしてしまう。",
+        "読書そのものが嫌いになってしまう。",
+        "情報を集めるのに時間がかかってしまう。"
+      ],
+      "answer": 1,
+      "rationale": "速く読むことを目的にすると、自分の考えと合う部分だけを拾い、違和感のある部分は読み飛ばしがちだとある。\nReading for speed tends to pick out what agrees with us and skip what feels uncomfortable."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者は、速く読む技術についてどのように考えているか。",
+      "options": [
+        "どのような読書にも役に立つ。",
+        "読書の価値を下げるので、身につけるべきではない。",
+        "書き手と対話するために欠かせない。",
+        "情報を集めるための読書では役に立つ。"
+      ],
+      "answer": 3,
+      "rationale": "情報を集めるための読書であれば速く読む技術は役に立つが、すべての読書に当てはめるのが問題だとしている。\nSpeed reading helps when gathering information; the problem is applying it to all reading."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者の主張に最も近いものはどれか。",
+      "options": [
+        "できるだけ多くの本を読むことが、考えを深めることにつながる。",
+        "読書量を増やすために、速読の技術を身につけるべきだ。",
+        "大切な本は、時間をかけて書き手と向き合いながら読むべきだ。",
+        "同じ本を何度も読むのは、時間の無駄である。"
+      ],
+      "answer": 2,
+      "rationale": "本当に大切な本には急がずに向き合い、時間をかけて読んでほしいと主張している。\nThe writer urges taking time with truly important books, engaging with the author."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "市内に住む田中さんは、今年初めて市民農園を借りたいと考えている。田中さんがしなければならないことはどれか。",
+      "options": [
+        "2月10日までに往復はがきを送り、3月15日の説明会に出席する。",
+        "2月10日までに市役所に電話をし、3月15日の説明会に出席する。",
+        "2月下旬に市役所へ行き、抽選に参加する。",
+        "3月15日の説明会に出席し、その場で希望する区画を申し込む。"
+      ],
+      "answer": 0,
+      "rationale": "応募は2月10日必着の往復はがきで行い、初めて利用する人は3月15日の説明会に必ず出席する。\nApply by return postcard arriving by Feb 10, and first-time users must attend the March 15 briefing."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "ひばり市に住む鈴木さん夫婦は、夫と妻がそれぞれ一般区画を借りて、合わせて30㎡の畑にしたいと考えている。この希望について正しいものはどれか。",
+      "options": [
+        "一般区画を二つ借りることができ、利用料は合わせて16,000円になる。",
+        "一世帯1区画までなので二つは借りられず、30㎡の畑にしたいなら大型区画に応募する必要がある。",
+        "夫と妻がそれぞれ別に応募すれば、一般区画を二つ借りられる。",
+        "車いす対応区画と一般区画を、一つずつ借りることができる。"
+      ],
+      "answer": 1,
+      "rationale": "申し込みは一世帯につき1区画までなので、30㎡の畑にしたい場合は大型区画に応募することになる。\nThe limit is one plot per household, so a 30 m² plot means applying for a large plot."
+    }
+  ]
+}
