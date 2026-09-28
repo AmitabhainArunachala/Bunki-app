@@ -175,6 +175,35 @@ def test_wikitext_bullets_become_plain_text_with_their_link_targets():
     assert text == "台風25号による大雨某川"
 
 
+def digest_bullet(day, page, revid, timestamp):
+    return {"date": day, "text": f"{day.day}日の要約文。", "targets": [], "page": page, "revid": revid,
+            "timestamp": timestamp, "excluded": False}
+
+
+def test_a_weekly_digest_credits_every_month_page_it_draws_from():
+    sep, oct_ = "Portal:最近の出来事/2026年9月", "Portal:最近の出来事/2026年10月"
+    adapter = fs.WikiNewsDigestAdapter(now=datetime(2026, 10, 6, tzinfo=fs.timezone.utc))
+    week = [digest_bullet(date(2026, 9, d), sep, 111200000, "2026-10-04T10:00:00Z") for d in (28, 29, 30)]
+    week += [digest_bullet(date(2026, 10, d), oct_, 111200500, "2026-10-05T09:00:00Z") for d in (1, 2)]
+    item = adapter.extract({"monday": date(2026, 9, 28), "sunday": date(2026, 10, 4), "bullets": week})
+    for page, revid in ((sep, 111200000), (oct_, 111200500)):
+        assert f"「{page}」（版 {revid}、" in item.attribution
+        assert f"title={fs.urllib.parse.quote(page)}&action=history" in item.attribution
+    assert item.credits["revisions"] == [{"page": oct_, "revid": 111200500}, {"page": sep, "revid": 111200000}]
+    assert item.url.endswith("oldid=111200500") and item.credits["revid"] == 111200500
+    # control: a week inside one month keeps the one-page credit, word for word as shipped
+    one = adapter.extract({"monday": date(2026, 9, 21), "sunday": date(2026, 9, 27),
+                           "bullets": [digest_bullet(date(2026, 9, d), sep, 111174909, "2026-09-27T03:02:37Z") for d in (21, 23, 25)]})
+    assert one.attribution == (
+        "出典：ウィキペディア日本語版「Portal:最近の出来事/2026年9月」（版 111174909、2026-09-27）の執筆者、"
+        "CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?"
+        "title=Portal%3A%E6%9C%80%E8%BF%91%E3%81%AE%E5%87%BA%E6%9D%A5%E4%BA%8B/2026%E5%B9%B49%E6%9C%88&action=history ／ "
+        "日付節の要約文を週ごとにまとめ、事件・事故・訃報の項目を除き、ふりがなと辞書リンクを付けて掲載（Bunki）。"
+        "この頁の本文は CC BY-SA 4.0 で再利用できる。"
+    )
+    assert one.credits == {"page": sep, "revid": 111174909}
+
+
 def test_event_targets_are_instances_not_topics_or_calendar_pages():
     ok = [t for t in ["2026年アジア競技大会", "地震", "9月27日", "第2次高市内閣 (改造)", "ロシア"]
           if fs.EVENT_TARGET.search(t) and not fs.CALENDAR_TARGET.match(t)]
