@@ -559,6 +559,8 @@ export function batteryGates(out, env = process.env) {
     ),
     node('import-provider', tool('verify-import-provider')),
     node('playback', tool('verify-playback')),
+    // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
+    { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
     node('reading-candidates', tool('verify-reading-candidates')),
     {
       ...node('reading-candidates-webkit', tool('verify-reading-candidates')),
