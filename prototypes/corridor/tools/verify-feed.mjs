@@ -13,7 +13,12 @@
  *     LINK-SAFE cleanliness gate held (the wikinews-1483 lesson);
  *   · the curation report proposes, never performs: every pending cull
  *     proposal still has its artifacts in place;
- *   · the regenerated standalone carries the new shelf (builder-only artifact).
+ *   · the regenerated standalone carries the new shelf (builder-only artifact);
+ *   · every feed_fresh.py reading (queue kind "fresh") is minted in the full
+ *     schema, dated, attributed and linked, carries the pool its source
+ *     licence requires (CC BY-SA → share_alike, PDL1.0/CC BY → proprietary_safe),
+ *     matches the fetched text staged in corpus/datasets/fresh/items.jsonl,
+ *     wears its authored English title, and stays 検収前 until decided.
  *
  * Usage:
  *   node tools/verify-feed.mjs [--report FILE]
@@ -32,13 +37,16 @@ const ARTICLES = resolve(CORRIDOR, 'data/articles');
 
 const QUEUE_PATH = resolve(REPO, 'docs/content/feed-review-queue.json');
 const TITLES_PATH = resolve(REPO, 'docs/content/feed-titles-en.json');
+const FRESH_TITLES_PATH = resolve(REPO, 'docs/content/feed-fresh-titles-en.json');
+const FRESH_DATASET = resolve(REPO, 'corpus/datasets/fresh/items.jsonl');
+const FRESH_EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed-fresh');
 const REPORT_JSON = resolve(REPO, 'docs/content/feed-curation-report.json');
 const RECOVERED_SOURCE = resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.jsonl');
 const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed');
 
 const PRE_FEED_SHELF = 70; // the curated shelf the feed inherited (40 + recovered 30)
 const TITLE_EN_SOURCE = 'renkan-ai-2026-08';
-const KINDS = new Set(['mint', 'cull', 'legacy', 'rights']);
+const KINDS = new Set(['mint', 'cull', 'legacy', 'rights', 'fresh']);
 const DECISIONS = new Set(['pending', 'approved', 'rejected']);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const FORBIDDEN_LICENCE = /\bNC\b|\bND\b|Non-?Commercial|No-?Deriv/i;
@@ -68,6 +76,12 @@ const index = readJson(resolve(ARTICLES, 'index.json'));
 const archiveIndex = readJson(resolve(ARTICLES, 'archive-index.json'));
 const queue = readJson(QUEUE_PATH);
 const titles = readJson(TITLES_PATH);
+const freshTitles = existsSync(FRESH_TITLES_PATH) ? readJson(FRESH_TITLES_PATH) : { titles: {} };
+const freshStaged = new Map(
+  (existsSync(FRESH_DATASET) ? readFileSync(FRESH_DATASET, 'utf8').trim().split('\n').filter(Boolean) : [])
+    .map((line) => JSON.parse(line))
+    .map((row) => [row.id, row]),
+);
 const curation = readJson(REPORT_JSON);
 const recoveredIds = readFileSync(RECOVERED_SOURCE, 'utf8')
   .trim()
@@ -92,7 +106,7 @@ for (const row of queue) {
   if (!KINDS.has(row.kind)) problems.push('kind');
   if (!DECISIONS.has(row.decision)) problems.push('decision');
   if (typeof row.title !== 'string' || !row.title) problems.push('title');
-  if ((row.kind === 'mint' || row.kind === 'legacy') && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
+  if ((row.kind === 'mint' || row.kind === 'legacy' || row.kind === 'fresh') && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
     problems.push('titleEn');
   if (typeof row.lane !== 'string') problems.push('lane');
   if (typeof row.licence !== 'string') problems.push('licence');
@@ -108,6 +122,9 @@ check('every queue row carries the full schema (id/kind/title/titleEn/lane/licen
 const mintRows = queue.filter((row) => row.kind === 'mint');
 const cullRows = queue.filter((row) => row.kind === 'cull');
 const liveMints = mintRows.filter((row) => row.decision !== 'rejected');
+const freshRows = queue.filter((row) => row.kind === 'fresh');
+const liveFresh = freshRows.filter((row) => row.decision !== 'rejected');
+const freshIds = new Set(freshRows.map((row) => row.id));
 
 // ------------------------------------------------------------ pool separation
 const licenceBreach = [
@@ -116,16 +133,23 @@ const licenceBreach = [
   ...archiveIndex.articles.filter((row) => FORBIDDEN_LICENCE.test(row.licence)),
 ].map((row) => row.id);
 check('NC/ND never enters — queue, shelf, and archive licences are all clean', licenceBreach.length === 0, licenceBreach.slice(0, 4).join(', '));
+// One reviewed exception: a fresh reading fetched from a CC BY-SA source
+// (ja.wikipedia) IS share-alike text, so it rides in that pool — attributed,
+// linked and labelled — rather than being passed off as permissive.
+const shareAlikeReading = (row) =>
+  row.pool === 'share_alike' && freshIds.has(row.id) && /^CC BY-SA/.test(row.licence ?? '') && !!row.attribution && !!row.url;
 const poolBreach = [...curated, ...archiveIndex.articles].filter(
-  (row) => !ARTICLE_POOLS.has(row.pool),
+  (row) => !ARTICLE_POOLS.has(row.pool) && !shareAlikeReading(row),
 );
-check('share-alike stays confined to its bundles — no article row claims it', poolBreach.length === 0, poolBreach.map((row) => `${row.id}:${row.pool}`).slice(0, 4).join(', '));
+check('share-alike stays confined to its bundles — no article row claims it except CC BY-SA fresh readings, attributed and linked', poolBreach.length === 0, poolBreach.map((row) => `${row.id}:${row.pool}`).slice(0, 4).join(', '));
+const permissiveMislabel = curated.filter((row) => freshIds.has(row.id) && /SA\b|ShareAlike/i.test(row.licence ?? '') && row.pool !== 'share_alike');
+check('a share-alike licence never sits in a permissive pool', permissiveMislabel.length === 0, permissiveMislabel.map((row) => row.id).join(', '));
 
 // ------------------------------------------------------- shelf composition
 check(
-  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints`,
-  curated.length === PRE_FEED_SHELF + liveMints.length,
-  `${curated.length} = ${PRE_FEED_SHELF} + ${liveMints.length}`,
+  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints and fresh readings`,
+  curated.length === PRE_FEED_SHELF + liveMints.length + liveFresh.length,
+  `${curated.length} = ${PRE_FEED_SHELF} + ${liveMints.length} + ${liveFresh.length} fresh`,
 );
 const orphanFeedRows = curated.filter(
   (row) => row.titleEnSource === TITLE_EN_SOURCE && !queue.some((entry) => entry.id === row.id),
@@ -215,8 +239,10 @@ const editorialUnverified = curated.filter(
   (row) =>
     row.review === 'human-review-pending' &&
     !recoveredIds.includes(row.id) &&
-    !mintIds.has(row.id),
+    !mintIds.has(row.id) &&
+    !freshIds.has(row.id),
 ).length;
+const pendingFresh = freshRows.filter((row) => row.decision === 'pending').length;
 // TENOHIRA Decision 4: the operator delegated legacy/mint approval to the
 // committed rubric (docs/content/feed-approval-rubric.md), so a recovered
 // original may legitimately leave 検収前 — but ONLY where the queue's own
@@ -232,9 +258,9 @@ const recoveredPaired = recoveredIds.every((id) =>
     : curatedById.get(id)?.review === 'human-review-pending',
 );
 check(
-  `the 検収前 census is exact: ${recoveredPending.length} still-pending recovered originals + pending feed mints + rights holds`,
-  pendingShelf === recoveredPending.length + pendingFeed + editorialUnverified && recoveredPaired,
-  `${pendingShelf} = ${recoveredPending.length} + ${pendingFeed} + ${editorialUnverified} editorial-unverified · ${pendingRights} rights holds · queue-paired ${recoveredPaired}`,
+  `the 検収前 census is exact: ${recoveredPending.length} still-pending recovered originals + pending feed mints + pending fresh readings + rights holds`,
+  pendingShelf === recoveredPending.length + pendingFeed + pendingFresh + editorialUnverified && recoveredPaired,
+  `${pendingShelf} = ${recoveredPending.length} + ${pendingFeed} + ${pendingFresh} fresh + ${editorialUnverified} editorial-unverified · ${pendingRights} rights holds · queue-paired ${recoveredPaired}`,
 );
 
 // ----------------------------------------------------- per-candidate schema
@@ -328,6 +354,81 @@ for (const mint of mintRows) {
     problems.length === 0,
     problems.join(',') || `${body.tokens.length} tokens · ${jread.band} · ${row.chars}字`,
   );
+}
+
+// ------------------------------------------------------ fresh readings
+const FRESH_POOL = (licence) => (/^CC BY-SA/.test(licence) ? 'share_alike' : 'proprietary_safe');
+const freshSourceOk = (licence) => /^PDL1\.0 \(CC BY 4\.0 互換\)$|^CC BY(-SA)? [34]\.0$/.test(licence);
+for (const fresh of freshRows) {
+  const row = curatedById.get(fresh.id);
+  if (fresh.decision === 'rejected') {
+    check(`${fresh.id} · rejected fresh reading — off the shelf`, !row);
+    continue;
+  }
+  if (!row) {
+    check(`${fresh.id} · fresh queue row has its shelf row`, false, 'missing from index.json');
+    continue;
+  }
+  const bodyPath = resolve(ARTICLES, row.file);
+  if (!existsSync(bodyPath) || String(row.file).startsWith('archive/')) {
+    check(`${fresh.id} · body file minted at the shelf level`, false, row.file);
+    continue;
+  }
+  const body = readJson(bodyPath);
+  const problems = [];
+  const tokensOk = Array.isArray(body.tokens) && body.tokens.length > 0 && body.tokens.every(
+    (token) => typeof token.s === 'string' && typeof token.b === 'string' && typeof token.p === 'string' &&
+      typeof token.r === 'string' && Array.isArray(token.f) && typeof token.c === 'boolean',
+  );
+  if (!tokensOk) problems.push('tokens');
+  const fold = (value) => value.replace(/\s+/g, '');
+  if (fold(body.tokens.map((token) => token.s).join('')) !== fold(body.text)) problems.push('token-join≠text');
+  if (!(Array.isArray(body.paras) && body.paras.every((start, i) => Number.isInteger(start) && start > 0 && start < body.tokens.length && (i === 0 || start > body.paras[i - 1]))))
+    problems.push('paras');
+  const jread = body.grading?.signals?.jreadability;
+  const jlpt = body.grading?.signals?.jlpt_lexicon;
+  if (!(typeof jread?.score === 'number' && jread.band && jread.substrate)) problems.push('jreadability');
+  if (!(typeof jlpt?.coverage === 'number' && jlpt.substrate && jlpt.band_vector)) problems.push('jlpt_lexicon');
+  const ninjalHonest = body.grading?.signals?.lexical_coverage !== undefined || typeof body.grading?.unavailable?.lexical_coverage === 'string';
+  if (!ninjalHonest) problems.push('ninjal-absence-unrecorded');
+  if (!freshSourceOk(body.licence) || body.pool !== FRESH_POOL(body.licence)) problems.push('licence/pool');
+  if (!body.attribution || !/^https:\/\//.test(body.url ?? '') || !ISO_DATE.test(String(body.date)) || !body.termsUrl || !body.licenceUrl)
+    problems.push('attribution/url/date/terms');
+  if (body.titleEn !== fresh.titleEn || body.titleEnSource !== freshTitles.titleEnSource || freshTitles.titles?.[fresh.id] !== fresh.titleEn)
+    problems.push('titleEn');
+  if (body.date !== fresh.date || body.addedAt !== fresh.addedAt) problems.push('date/addedAt');
+  const expectedReview = fresh.decision === 'approved' ? 'approved' : 'human-review-pending';
+  if (body.review !== expectedReview || row.review !== expectedReview) problems.push('review');
+  if (expectedReview !== 'approved' && !/検収前/.test(`${row.sourceLabel} ${body.sourceLabel}`)) problems.push('検収前-mark');
+  for (const key of ['title', 'titleEn', 'sourceLabel', 'licence', 'pool', 'url', 'date', 'attribution']) {
+    if (row[key] !== body[key]) problems.push(`index≠body:${key}`);
+  }
+  if (row.chars !== body.text.length || row.snippet !== body.text.replace(/\n/g, ' ').slice(0, 64)) problems.push('index-chars/snippet');
+  const staged = freshStaged.get(fresh.id);
+  if (!staged) problems.push('not-in-dataset');
+  else if (staged.text !== body.text || staged.url !== body.url || staged.date !== body.date) problems.push('body≠staged-source');
+  if (RESIDUAL_MARKERS.some((marker) => body.text.includes(marker))) problems.push('residual-markup');
+  if (DROPPED_TEXT.some((pattern) => pattern.test(body.text))) problems.push('dropped-link-text');
+  check(
+    `${fresh.id} · fresh reading: full schema, dated, licensed pool, staged source text, authored title`,
+    problems.length === 0,
+    problems.join(',') || `${body.date} · ${body.pool} · ${jread.band} · ${row.chars}字`,
+  );
+}
+const freshRunLogs = existsSync(FRESH_EVIDENCE_DIR)
+  ? readdirSync(FRESH_EVIDENCE_DIR).filter((file) => /^run-\d+\.json$/.test(file)).sort()
+  : [];
+if (freshRows.length) {
+  const usedSources = new Set(freshRows.map((row) => freshStaged.get(row.id)?.sourceKey).filter(Boolean));
+  const evidenced = new Set();
+  for (const file of freshRunLogs) {
+    const log = readJson(resolve(FRESH_EVIDENCE_DIR, file));
+    if (log.kind !== 'feed-fresh-run') continue;
+    for (const terms of log.terms ?? []) if (terms.ok && terms.termsUrl && terms.termsSha256) evidenced.add(terms.source);
+  }
+  const unevidenced = [...usedSources].filter((key) => !evidenced.has(key));
+  check('every fresh source has a logged terms check that named its licence', unevidenced.length === 0 && freshRunLogs.length > 0,
+    unevidenced.join(', ') || `${usedSources.size} sources · ${freshRunLogs.length} run logs`);
 }
 
 // ---------------------------------------------------------- curation report

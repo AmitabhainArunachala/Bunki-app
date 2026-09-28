@@ -44,6 +44,48 @@
     "licence": "PD",
     "attribution": "五箇条の御誓文 · 方丈記 · 徒然草（原文はパブリックドメイン、解説はBunkiオリジナル）",
     "url": ""
+   },
+   {
+    "name": "env.go.jp",
+    "licence": "PDL1.0 (CC BY 4.0 互換)",
+    "attribution": "環境省ホームページ",
+    "url": "https://www.env.go.jp/mail.html"
+   },
+   {
+    "name": "jp.globalvoices.org",
+    "licence": "CC BY 3.0",
+    "attribution": "Global Voices",
+    "url": "https://jp.globalvoices.org/about/%E8%A8%98%E4%BA%8B%E3%81%AE%E8%BB%A2%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/"
+   },
+   {
+    "name": "gov-online.go.jp",
+    "licence": "PDL1.0 (CC BY 4.0 互換)",
+    "attribution": "政府広報オンライン",
+    "url": "https://www.gov-online.go.jp/tos/"
+   },
+   {
+    "name": "kantei.go.jp",
+    "licence": "PDL1.0 (CC BY 4.0 互換)",
+    "attribution": "首相官邸ホームページ",
+    "url": "https://www.kantei.go.jp/jp/terms.html"
+   },
+   {
+    "name": "mext.go.jp",
+    "licence": "PDL1.0 (CC BY 4.0 互換)",
+    "attribution": "文部科学省ホームページ",
+    "url": "https://www.mext.go.jp/b_menu/1351168.htm"
+   },
+   {
+    "name": "mhlw.go.jp",
+    "licence": "PDL1.0 (CC BY 4.0 互換)",
+    "attribution": "厚生労働省ホームページ",
+    "url": "https://www.mhlw.go.jp/chosakuken/index.html"
+   },
+   {
+    "name": "mext.go.jp/sports",
+    "licence": "PDL1.0 (CC BY 4.0 互換)",
+    "attribution": "スポーツ庁ホームページ",
+    "url": "https://www.mext.go.jp/sports/b_menu/about_link.htm"
    }
   ],
   "share_alike": [
@@ -52,6 +94,12 @@
     "licence": "CC BY-SA 4.0 (JMdict lineage glosses)",
     "attribution": "JLPT level tags: open-anki-jlpt-decks; glosses: JMdict/EDICT (EDRDG)",
     "url": "https://www.edrdg.org/"
+   },
+   {
+    "name": "ja.wikipedia",
+    "licence": "CC BY-SA 4.0",
+    "attribution": "ウィキペディア日本語版",
+    "url": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json"
    }
   ],
   "original": [
@@ -4868,6 +4916,3829 @@
     "する",
     "史上",
     "なる"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05591",
+   "title": "地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石巻市）の開催について",
+   "titleEn": "Study tours to Kameoka and Ishinomaki on local circular economies",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石巻市）の開催について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石巻市）の開催について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05591.html",
+   "date": "2026-09-14",
+   "publishedAt": "2026-09-14T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:52+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "local",
+   "file": "env-press-press_05591.json",
+   "chars": 1560,
+   "snippet": "１．環境省では、地域の主体と多様な主体の協働を基盤に、環境保全・社会課題解決・経済活性化を同時に実現する「地域循環共生圏」の取組",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.259325991189428,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7254004576659039,
+      "type_coverage": 0.6415094339622641,
+      "band_vector": {
+       "core": 0.37986270022883295,
+       "extended": 0.34553775743707094,
+       "oov": 0.2745995423340961
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 437
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.620137299771167,
+       "ninjal-kyoiku-kihon-goi:full": 0.2745995423340961
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 437
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6834862385321101,
+      "band_vector": {
+       "n5": 0.06880733944954129,
+       "n4": 0.14678899082568808,
+       "n3": 0.25,
+       "n2": 0.08486238532110092,
+       "n1": 0.13302752293577982,
+       "oov": 0.3165137614678899
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 436
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "地域",
+    "主体",
+    "多様",
+    "協働",
+    "基盤"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "govonline:article-202609-radio-3739",
+   "title": "世界をひとつに！国連ってどんなところ？",
+   "titleEn": "What kind of place is the United Nations?",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "出典：「世界をひとつに！国連ってどんなところ？」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「世界をひとつに！国連ってどんなところ？」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/radio-3739.html",
+   "date": "2026-09-14",
+   "publishedAt": "2026-09-14T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:18+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "international",
+   "file": "govonline-article-202609-radio-3739.json",
+   "chars": 350,
+   "snippet": "今回のテーマは「世界をひとつに！国連ってどんなところ？」 「国連」と聞いて、どんなことを思い浮かべますか？国連は、世界の平和や経",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.5381621621621626,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7469879518072289,
+      "type_coverage": 0.7164179104477612,
+      "band_vector": {
+       "core": 0.5301204819277109,
+       "extended": 0.21686746987951808,
+       "oov": 0.25301204819277107
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 83
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.46987951807228917,
+       "ninjal-kyoiku-kihon-goi:full": 0.25301204819277107
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 83
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7590361445783133,
+      "band_vector": {
+       "n5": 0.14457831325301204,
+       "n4": 0.21686746987951808,
+       "n3": 0.30120481927710846,
+       "n2": 0.012048192771084338,
+       "n1": 0.08433734939759036,
+       "oov": 0.24096385542168675
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 83
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "今回",
+    "テーマ",
+    "世界",
+    "どんな",
+    "ところ",
+    "聞く"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05463",
+   "title": "「国連砂漠化対処条約（UNCCD）第17回締約国会議（COP17）」の結果について",
+   "titleEn": "Results of the UN desertification conference (COP17) in Mongolia",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「「国連砂漠化対処条約（UNCCD）第17回締約国会議（COP17）」の結果について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「「国連砂漠化対処条約（UNCCD）第17回締約国会議（COP17）」の結果について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05463.html",
+   "date": "2026-09-15",
+   "publishedAt": "2026-09-15T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:50+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "international",
+   "file": "env-press-press_05463.json",
+   "chars": 390,
+   "snippet": "令和８年８月17日から同年８月28日までの12日間、モンゴル国・ウランバートルにおいて開催された、国連砂漠化対処条約第17回締約",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.126098360655737,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7052631578947368,
+      "type_coverage": 0.6875,
+      "band_vector": {
+       "core": 0.4631578947368421,
+       "extended": 0.24210526315789474,
+       "oov": 0.29473684210526313
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 95
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5368421052631579,
+       "ninjal-kyoiku-kihon-goi:full": 0.29473684210526313
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 95
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7157894736842105,
+      "band_vector": {
+       "n5": 0.11578947368421053,
+       "n4": 0.14736842105263157,
+       "n3": 0.23157894736842105,
+       "n2": 0.05263157894736842,
+       "n1": 0.16842105263157894,
+       "oov": 0.28421052631578947
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 95
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "同年",
+    "日間",
+    "おく",
+    "開催",
+    "砂漠",
+    "対処"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05585",
+   "title": "令和８年度「体験の機会の場」と連携した教職員等環境教育・学習推進リーダー養成研修の開催～「循環型社会を支える現場から学ぶ環境教育」①－サステナブルな未来を拓く環境学習の実践－～",
+   "titleEn": "Environmental-education training for teachers, held at a Kyoto recycling site",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「令和８年度「体験の機会の場」と連携した教職員等環境教育・学習推進リーダー養成研修の開催～「循環型社会を支える現場から学ぶ環境教育」①－サステナブルな未来を拓く環境学習の実践－～」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「令和８年度「体験の機会の場」と連携した教職員等環境教育・学習推進リーダー養成研修の開催～「循環型社会を支える現場から学ぶ環境教育」①－サステナブルな未来を拓く環境学習の実践－～」（環境省ホームページ）を加工して作成：段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05585.html",
+   "date": "2026-09-15",
+   "publishedAt": "2026-09-15T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:49+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "local",
+   "file": "env-press-press_05585.json",
+   "excerpt": {
+    "keptChars": 1584,
+    "sourceChars": 2608,
+    "rule": "whole paragraphs from the top"
+   },
+   "chars": 1601,
+   "snippet": "１．環境省は、学校教職員のほか、行政関係者、民間企業、NPO/NGO、大学生・大学院生等の環境教育や体験活動、地域づくりに関心の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.728236948678303,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7987927565392354,
+      "type_coverage": 0.74235807860262,
+      "band_vector": {
+       "core": 0.44668008048289737,
+       "extended": 0.352112676056338,
+       "oov": 0.2012072434607646
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 497
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5533199195171026,
+       "ninjal-kyoiku-kihon-goi:full": 0.2012072434607646
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 497
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8048289738430583,
+      "band_vector": {
+       "n5": 0.10865191146881288,
+       "n4": 0.13883299798792756,
+       "n3": 0.34808853118712274,
+       "n2": 0.06639839034205232,
+       "n1": 0.14285714285714285,
+       "oov": 0.19517102615694165
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 497
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "学校",
+    "教職員",
+    "ほか",
+    "行政",
+    "関係"
+   ],
+   "truncated": true
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-15hyousyou",
+   "title": "防災功労者内閣総理大臣表彰式",
+   "titleEn": "The PM honours this year's disaster-prevention award winners",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "kantei.go.jp",
+   "sourceLabel": "首相官邸 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.kantei.go.jp/jp/terms.html",
+   "attribution": "出典：「防災功労者内閣総理大臣表彰式」（首相官邸ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.kantei.go.jp/jp/terms.html］。「防災功労者内閣総理大臣表彰式」（首相官邸ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.kantei.go.jp/jp/105/actions/202609/15hyousyou.html",
+   "date": "2026-09-15",
+   "publishedAt": "2026-09-15T12:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:09+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "disaster",
+   "file": "kantei-jp-105-actions-202609-15hyousyou.json",
+   "chars": 730,
+   "snippet": "令和８年９月１５日、高市総理は、総理大臣官邸で令和８年防災功労者内閣総理大臣表彰式に出席しました。 総理は、挨拶で次のように述べ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.3187982832618026,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7268292682926829,
+      "type_coverage": 0.697841726618705,
+      "band_vector": {
+       "core": 0.43902439024390244,
+       "extended": 0.28780487804878047,
+       "oov": 0.2731707317073171
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 205
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5609756097560976,
+       "ninjal-kyoiku-kihon-goi:full": 0.2731707317073171
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 205
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7121951219512195,
+      "band_vector": {
+       "n5": 0.06829268292682927,
+       "n4": 0.17073170731707318,
+       "n3": 0.2780487804878049,
+       "n2": 0.03902439024390244,
+       "n1": 0.15609756097560976,
+       "oov": 0.28780487804878047
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 205
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "総理",
+    "大臣",
+    "官邸",
+    "防災",
+    "功労",
+    "内閣"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76095",
+   "title": "外国人技能実習生又は特定技能外国人を使用する事業場に対して行った 令和７年の監督指導、送検等の状況を公表します",
+   "titleEn": "Labour inspections at workplaces employing foreign trainees and skilled workers (2025)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「外国人技能実習生又は特定技能外国人を使用する事業場に対して行った 令和７年の監督指導、送検等の状況を公表します」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「外国人技能実習生又は特定技能外国人を使用する事業場に対して行った 令和７年の監督指導、送検等の状況を公表します」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76095.html",
+   "date": "2026-09-15",
+   "publishedAt": "2026-09-15T14:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:31+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "society",
+   "file": "mhlw-stf-newpage_76095.json",
+   "chars": 796,
+   "snippet": "厚生労働省は、このたび、全国の労働基準監督署等が、令和７年に外国人技能実習生（以下「技能実習生」）又は特定技能外国人を使用する事",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.0865204633204648,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7131147540983607,
+      "type_coverage": 0.7,
+      "band_vector": {
+       "core": 0.45491803278688525,
+       "extended": 0.2581967213114754,
+       "oov": 0.28688524590163933
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 244
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5450819672131147,
+       "ninjal-kyoiku-kihon-goi:full": 0.28688524590163933
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 244
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7704918032786885,
+      "band_vector": {
+       "n5": 0.06967213114754098,
+       "n4": 0.07377049180327869,
+       "n3": 0.36475409836065575,
+       "n2": 0.11885245901639344,
+       "n1": 0.14344262295081966,
+       "oov": 0.22950819672131148
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 244
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "厚生",
+    "労働",
+    "この",
+    "たび",
+    "全国",
+    "基準"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05575",
+   "title": "環境省ナッジ実証事業の取りまとめ結果の公表について",
+   "titleEn": "Nine years of 'nudge' trials for low-carbon living, summed up",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「環境省ナッジ実証事業の取りまとめ結果の公表について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「環境省ナッジ実証事業の取りまとめ結果の公表について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05575.html",
+   "date": "2026-09-16",
+   "publishedAt": "2026-09-16T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:48+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "science",
+   "file": "env-press-press_05575.json",
+   "chars": 1460,
+   "snippet": "＜EY・ストラテジー・アンド・コンサルティング株式会社　同時発表＞環境省は、「デコ活」（脱炭素につながる新しい豊かな暮らしを創る",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.5028157894736847,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7058823529411765,
+      "type_coverage": 0.7029702970297029,
+      "band_vector": {
+       "core": 0.44,
+       "extended": 0.26588235294117646,
+       "oov": 0.29411764705882354
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 425
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.56,
+       "ninjal-kyoiku-kihon-goi:full": 0.29411764705882354
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 425
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7247058823529412,
+      "band_vector": {
+       "n5": 0.05176470588235294,
+       "n4": 0.08470588235294117,
+       "n3": 0.4235294117647059,
+       "n2": 0.05647058823529412,
+       "n1": 0.10823529411764705,
+       "oov": 0.2752941176470588
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 425
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "EY",
+    "ストラテジー",
+    "アンド",
+    "コンサルティング",
+    "株式",
+    "会社"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76126",
+   "title": "令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました ～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ 入賞企業を10月９日（金）に表彰～",
+   "titleEn": "Winners of the contest for companies where older workers thrive",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました ～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ 入賞企業を10月９日（金）に表彰～」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました ～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ 入賞企業を10月９日（金）に表彰～」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76126.html",
+   "date": "2026-09-16",
+   "publishedAt": "2026-09-16T14:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:29+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "society",
+   "file": "mhlw-stf-newpage_76126.json",
+   "chars": 1406,
+   "snippet": "～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ入賞企業を10月９日（金）に表彰～厚生労働省では、このほ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.961816091954022,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.672209026128266,
+      "type_coverage": 0.6421052631578947,
+      "band_vector": {
+       "core": 0.3752969121140142,
+       "extended": 0.29691211401425177,
+       "oov": 0.32779097387173395
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 421
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6247030878859857,
+       "ninjal-kyoiku-kihon-goi:full": 0.32779097387173395
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 421
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6477541371158393,
+      "band_vector": {
+       "n5": 0.08274231678486997,
+       "n4": 0.08747044917257683,
+       "n3": 0.3215130023640662,
+       "n2": 0.03546099290780142,
+       "n1": 0.12056737588652482,
+       "oov": 0.35224586288416077
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 423
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "厚生",
+    "労働",
+    "大臣",
+    "表彰",
+    "優秀",
+    "株式"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_04591",
+   "title": "国際原子力機関（IAEA）による分析機関間比較の報告書の公表について",
+   "titleEn": "IAEA report on the labs that monitor Japan's seas",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「国際原子力機関（IAEA）による分析機関間比較の報告書の公表について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「国際原子力機関（IAEA）による分析機関間比較の報告書の公表について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_04591.html",
+   "date": "2026-09-17",
+   "publishedAt": "2026-09-17T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:48+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "science",
+   "file": "env-press-press_04591.json",
+   "chars": 609,
+   "snippet": "１．我が国の海域モニタリングの結果の信頼性、透明性の確保について日本政府を支援するため、IAEAによって分析機関間比較(ILC:",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.5422629107981223,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.725609756097561,
+      "type_coverage": 0.7088607594936709,
+      "band_vector": {
+       "core": 0.4817073170731707,
+       "extended": 0.24390243902439024,
+       "oov": 0.27439024390243905
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 164
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5182926829268293,
+       "ninjal-kyoiku-kihon-goi:full": 0.27439024390243905
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 164
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7012195121951219,
+      "band_vector": {
+       "n5": 0.12195121951219512,
+       "n4": 0.06707317073170732,
+       "n3": 0.42073170731707316,
+       "n2": 0.042682926829268296,
+       "n1": 0.04878048780487805,
+       "oov": 0.29878048780487804
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 164
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "我が",
+    "海域",
+    "モニタリング",
+    "結果",
+    "信頼",
+    "透明"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05584",
+   "title": "環境教育等促進法に基づく「体験の機会の場」の新規認定について（株式会社ツネミ「産業廃棄物最終処分場」）",
+   "titleEn": "A Kitakyushu landfill site becomes a certified place to learn about the environment",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「環境教育等促進法に基づく「体験の機会の場」の新規認定について（株式会社ツネミ「産業廃棄物最終処分場」）」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「環境教育等促進法に基づく「体験の機会の場」の新規認定について（株式会社ツネミ「産業廃棄物最終処分場」）」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05584.html",
+   "date": "2026-09-17",
+   "publishedAt": "2026-09-17T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:46+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "local",
+   "file": "env-press-press_05584.json",
+   "chars": 1332,
+   "snippet": "環境教育等促進法に基づき都道府県知事等が認定する「体験の機会の場」は、安全性の基準を満たし、質の高い体験プログラムを提供する体験",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.7957512578616353,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8333333333333334,
+      "type_coverage": 0.8023255813953488,
+      "band_vector": {
+       "core": 0.4492753623188406,
+       "extended": 0.38405797101449274,
+       "oov": 0.16666666666666666
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 414
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5507246376811594,
+       "ninjal-kyoiku-kihon-goi:full": 0.16666666666666666
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 414
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8111380145278451,
+      "band_vector": {
+       "n5": 0.09685230024213075,
+       "n4": 0.13075060532687652,
+       "n3": 0.3704600484261501,
+       "n2": 0.04600484261501211,
+       "n1": 0.16707021791767554,
+       "oov": 0.18886198547215496
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 413
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "教育",
+    "促進",
+    "基づく",
+    "知事",
+    "認定"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05589",
+   "title": "第五次循環型社会形成推進基本計画の進捗状況の第１回点検結果について",
+   "titleEn": "First progress check on Japan's plan for a circular economy",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「第五次循環型社会形成推進基本計画の進捗状況の第１回点検結果について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「第五次循環型社会形成推進基本計画の進捗状況の第１回点検結果について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05589.html",
+   "date": "2026-09-17",
+   "publishedAt": "2026-09-17T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:47+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "environment",
+   "file": "env-press-press_05589.json",
+   "chars": 1067,
+   "snippet": "このたび、中央環境審議会循環型社会部会（第66回）の審議を経て、第五次循環型社会形成推進基本計画（令和６年８月閣議決定。以下「第",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.0195805544395338,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7033639143730887,
+      "type_coverage": 0.6453900709219859,
+      "band_vector": {
+       "core": 0.39755351681957185,
+       "extended": 0.3058103975535168,
+       "oov": 0.2966360856269113
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 327
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6024464831804281,
+       "ninjal-kyoiku-kihon-goi:full": 0.2966360856269113
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 327
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7308868501529052,
+      "band_vector": {
+       "n5": 0.07951070336391437,
+       "n4": 0.12232415902140673,
+       "n3": 0.3058103975535168,
+       "n2": 0.08256880733944955,
+       "n1": 0.14067278287461774,
+       "oov": 0.2691131498470948
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 327
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "この",
+    "たび",
+    "中央",
+    "環境",
+    "審議",
+    "循環"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "govonline:article-202609-tv-6623",
+   "title": "闇バイトは犯罪!",
+   "titleEn": "'Dark part-time jobs' are crimes",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "出典：「闇バイトは犯罪!」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「闇バイトは犯罪!」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/tv-6623.html",
+   "date": "2026-09-17",
+   "publishedAt": "2026-09-17T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:15+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "society",
+   "file": "govonline-article-202609-tv-6623.json",
+   "chars": 484,
+   "snippet": "「高収入」などの甘い言葉で犯罪に誘い込む「闇バイト」。SNSでの募集がイメージされがちですが、特殊詐欺の受け子等になった少年のお",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.685789661319074,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8188405797101449,
+      "type_coverage": 0.8279569892473119,
+      "band_vector": {
+       "core": 0.5144927536231884,
+       "extended": 0.30434782608695654,
+       "oov": 0.18115942028985507
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 138
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.4855072463768116,
+       "ninjal-kyoiku-kihon-goi:full": 0.18115942028985507
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 138
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7681159420289855,
+      "band_vector": {
+       "n5": 0.13043478260869565,
+       "n4": 0.14492753623188406,
+       "n3": 0.3333333333333333,
+       "n2": 0.050724637681159424,
+       "n1": 0.10869565217391304,
+       "oov": 0.2318840579710145
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 138
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "収入",
+    "甘い",
+    "言葉",
+    "犯罪",
+    "誘い込む",
+    "バイト"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05582",
+   "title": "令和８年度水道関係功労者環境大臣表彰の受賞者の決定",
+   "titleEn": "Environment minister's awards for service to the water supply",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「令和８年度水道関係功労者環境大臣表彰の受賞者の決定」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「令和８年度水道関係功労者環境大臣表彰の受賞者の決定」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05582.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:45+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "society",
+   "file": "env-press-press_05582.json",
+   "chars": 463,
+   "snippet": "１．環境省では、水道の普及発展、水道に関する有益な調査研究、技術の改善若しくは発明発見又は水道行政に対する協力等に特に顕著な功績",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.1615773115773127,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7443609022556391,
+      "type_coverage": 0.7558139534883721,
+      "band_vector": {
+       "core": 0.48120300751879697,
+       "extended": 0.2631578947368421,
+       "oov": 0.2556390977443609
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 133
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.518796992481203,
+       "ninjal-kyoiku-kihon-goi:full": 0.2556390977443609
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 133
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6766917293233083,
+      "band_vector": {
+       "n5": 0.07518796992481203,
+       "n4": 0.21052631578947367,
+       "n3": 0.22556390977443608,
+       "n2": 0.08270676691729323,
+       "n1": 0.08270676691729323,
+       "oov": 0.3233082706766917
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 133
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "水道",
+    "普及",
+    "発展",
+    "関する",
+    "有益"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-18fukudaijin",
+   "title": "初副大臣会議・記念撮影",
+   "titleEn": "First meeting of the new senior vice-ministers",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "kantei.go.jp",
+   "sourceLabel": "首相官邸 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.kantei.go.jp/jp/terms.html",
+   "attribution": "出典：「初副大臣会議・記念撮影」（首相官邸ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.kantei.go.jp/jp/terms.html］。「初副大臣会議・記念撮影」（首相官邸ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.kantei.go.jp/jp/105/actions/202609/18fukudaijin.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-19T05:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:06+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "politics",
+   "file": "kantei-jp-105-actions-202609-18fukudaijin.json",
+   "chars": 896,
+   "snippet": "令和８年９月１８日、閣議において第２次高市改造内閣の副大臣が決定しました。 高市総理は、任命される副大臣と共に宮中における認証式",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.926978260869566,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7660377358490567,
+      "type_coverage": 0.6939890710382514,
+      "band_vector": {
+       "core": 0.47924528301886793,
+       "extended": 0.28679245283018867,
+       "oov": 0.2339622641509434
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 265
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5207547169811321,
+       "ninjal-kyoiku-kihon-goi:full": 0.2339622641509434
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 265
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7584905660377359,
+      "band_vector": {
+       "n5": 0.06792452830188679,
+       "n4": 0.12075471698113208,
+       "n3": 0.3660377358490566,
+       "n2": 0.052830188679245285,
+       "n1": 0.1509433962264151,
+       "oov": 0.24150943396226415
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 265
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "閣議",
+    "おく",
+    "改造",
+    "内閣",
+    "大臣",
+    "決定"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-19seimukan",
+   "title": "初大臣政務官会合・記念撮影",
+   "titleEn": "First meeting of the new parliamentary vice-ministers",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "kantei.go.jp",
+   "sourceLabel": "首相官邸 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.kantei.go.jp/jp/terms.html",
+   "attribution": "出典：「初大臣政務官会合・記念撮影」（首相官邸ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.kantei.go.jp/jp/terms.html］。「初大臣政務官会合・記念撮影」（首相官邸ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.kantei.go.jp/jp/105/actions/202609/19seimukan.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-19T06:30:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:06+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "politics",
+   "file": "kantei-jp-105-actions-202609-19seimukan.json",
+   "chars": 966,
+   "snippet": "令和８年９月１８日、閣議において第２次高市改造内閣の大臣政務官が決定しました。 高市総理は、総理大臣官邸において大臣政務官に対し",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.0707585711721403,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7649122807017544,
+      "type_coverage": 0.7193877551020408,
+      "band_vector": {
+       "core": 0.47368421052631576,
+       "extended": 0.2912280701754386,
+       "oov": 0.23508771929824562
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 285
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5263157894736842,
+       "ninjal-kyoiku-kihon-goi:full": 0.23508771929824562
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 285
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7508771929824561,
+      "band_vector": {
+       "n5": 0.08070175438596491,
+       "n4": 0.12631578947368421,
+       "n3": 0.3473684210526316,
+       "n2": 0.04912280701754386,
+       "n1": 0.14736842105263157,
+       "oov": 0.24912280701754386
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 285
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "閣議",
+    "おく",
+    "改造",
+    "内閣",
+    "大臣",
+    "政務"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76100",
+   "title": "特定機能病院に対する立入検査結果について（令和７年度）",
+   "titleEn": "Inspection results for Japan's advanced-treatment hospitals (FY2025)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「特定機能病院に対する立入検査結果について（令和７年度）」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「特定機能病院に対する立入検査結果について（令和７年度）」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76100.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T14:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:26+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "health",
+   "file": "mhlw-stf-newpage_76100.json",
+   "chars": 340,
+   "snippet": "医療法の規定に基づき、令和７年度に各地方厚生（支）局が実施した特定機能病院に対する立入検査結果の概要について公表します。 １．立",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.5974237954768924,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7666666666666667,
+      "type_coverage": 0.7878787878787878,
+      "band_vector": {
+       "core": 0.475,
+       "extended": 0.2916666666666667,
+       "oov": 0.23333333333333334
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 120
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.525,
+       "ninjal-kyoiku-kihon-goi:full": 0.23333333333333334
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 120
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.825,
+      "band_vector": {
+       "n5": 0.13333333333333333,
+       "n4": 0.09166666666666666,
+       "n3": 0.44166666666666665,
+       "n2": 0.075,
+       "n1": 0.08333333333333333,
+       "oov": 0.175
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 120
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "医療",
+    "規定",
+    "基づく",
+    "年度",
+    "地方",
+    "厚生"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76152",
+   "title": "毎年10月は中小企業退職金共済制度の「加入促進強化月間」です",
+   "titleEn": "October is sign-up month for the small-business retirement fund",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「毎年10月は中小企業退職金共済制度の「加入促進強化月間」です」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「毎年10月は中小企業退職金共済制度の「加入促進強化月間」です」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76152.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T14:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:25+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "economy",
+   "file": "mhlw-stf-newpage_76152.json",
+   "chars": 1285,
+   "snippet": "～掛金の一部を国が助成する「安心・簡単・有利」な制度～ 厚生労働省所管の独立行政法人勤労者退職金共済機構は、毎年10月を中小企業",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.8189284627092857,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.6117936117936118,
+      "type_coverage": 0.6428571428571429,
+      "band_vector": {
+       "core": 0.3783783783783784,
+       "extended": 0.2334152334152334,
+       "oov": 0.3882063882063882
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 407
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6216216216216216,
+       "ninjal-kyoiku-kihon-goi:full": 0.3882063882063882
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 407
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7174447174447174,
+      "band_vector": {
+       "n5": 0.06142506142506143,
+       "n4": 0.05405405405405406,
+       "n3": 0.3488943488943489,
+       "n2": 0.04668304668304668,
+       "n1": 0.20638820638820637,
+       "oov": 0.28255528255528256
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 407
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "掛金",
+    "一部",
+    "助成",
+    "する",
+    "安心",
+    "簡単"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76233",
+   "title": "第73回精神保健福祉普及運動を実施します",
+   "titleEn": "The 73rd Mental Health and Welfare Awareness Campaign",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「第73回精神保健福祉普及運動を実施します」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「第73回精神保健福祉普及運動を実施します」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76233.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T14:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:24+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "health",
+   "file": "mhlw-stf-newpage_76233.json",
+   "chars": 550,
+   "snippet": "～全国各地で精神保健福祉への理解促進、知識の普及に向けた取組を展開～ １　趣旨 地域社会における精神保健及び精神障害者の福祉に関",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.8227486033519558,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8586387434554974,
+      "type_coverage": 0.8222222222222222,
+      "band_vector": {
+       "core": 0.5445026178010471,
+       "extended": 0.31413612565445026,
+       "oov": 0.14136125654450263
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 191
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.45549738219895286,
+       "ninjal-kyoiku-kihon-goi:full": 0.14136125654450263
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 191
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8010471204188482,
+      "band_vector": {
+       "n5": 0.09424083769633508,
+       "n4": 0.14659685863874344,
+       "n3": 0.34554973821989526,
+       "n2": 0.06806282722513089,
+       "n1": 0.14659685863874344,
+       "oov": 0.19895287958115182
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 191
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "全国",
+    "各地",
+    "精神",
+    "保健",
+    "福祉",
+    "理解"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76330",
+   "title": "病院の耐震改修状況調査の結果",
+   "titleEn": "Survey: how many hospitals can withstand an earthquake",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「病院の耐震改修状況調査の結果」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「病院の耐震改修状況調査の結果」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76330.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T12:09:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:28+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "disaster",
+   "file": "mhlw-stf-newpage_76330.json",
+   "chars": 406,
+   "snippet": "令和７年における病院の耐震改修状況調査の結果を取りまとめましたので、公表いたします。 令和７年調査結果のポイント 病院の耐震化率",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.5578333333333347,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7037037037037037,
+      "type_coverage": 0.7090909090909091,
+      "band_vector": {
+       "core": 0.4444444444444444,
+       "extended": 0.25925925925925924,
+       "oov": 0.2962962962962963
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 108
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5555555555555556,
+       "ninjal-kyoiku-kihon-goi:full": 0.2962962962962963
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 108
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6851851851851851,
+      "band_vector": {
+       "n5": 0.23148148148148148,
+       "n4": 0.09259259259259259,
+       "n3": 0.23148148148148148,
+       "n2": 0.046296296296296294,
+       "n1": 0.08333333333333333,
+       "oov": 0.3148148148148148
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 108
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "おく",
+    "病院",
+    "耐震",
+    "改修",
+    "状況",
+    "調査"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76340",
+   "title": "ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします",
+   "titleEn": "Health ministry teams up with the WOWOW drama 'MR'",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします」（厚生労働省ホームページ）を加工して作成：段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76340.html",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T15:09:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:23+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "culture",
+   "file": "mhlw-stf-newpage_76340.json",
+   "excerpt": {
+    "keptChars": 1599,
+    "sourceChars": 2209,
+    "rule": "whole paragraphs from the top"
+   },
+   "chars": 1614,
+   "snippet": "～医薬品の適正使用と副作用被害救済制度の理解促進のため、普及啓発ポスターを作成～厚生労働省は、医薬品の適正使用や安全対策等に対す",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.6022739120830582,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7108433734939759,
+      "type_coverage": 0.7029702970297029,
+      "band_vector": {
+       "core": 0.4457831325301205,
+       "extended": 0.26506024096385544,
+       "oov": 0.2891566265060241
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 498
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5542168674698795,
+       "ninjal-kyoiku-kihon-goi:full": 0.2891566265060241
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 498
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7128514056224899,
+      "band_vector": {
+       "n5": 0.08634538152610442,
+       "n4": 0.13253012048192772,
+       "n3": 0.35542168674698793,
+       "n2": 0.03815261044176707,
+       "n1": 0.10040160642570281,
+       "oov": 0.28714859437751006
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 498
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "医薬",
+    "適正",
+    "使用",
+    "作用",
+    "被害",
+    "救済"
+   ],
+   "truncated": true
+  },
+  {
+   "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+   "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
+   "titleEn": "This year's lifelong-sports awards are announced",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mext.go.jp/sports",
+   "sourceLabel": "スポーツ庁 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mext.go.jp/sports/b_menu/about_link.htm",
+   "attribution": "出典：「令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました」（スポーツ庁ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mext.go.jp/sports/b_menu/about_link.htm］。「令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました」（スポーツ庁ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T12:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:38+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "sports",
+   "file": "sports-sports-b_menu-houdou-31-09-1420919_00007.json",
+   "chars": 1093,
+   "snippet": "文部科学大臣表彰 1．趣旨 地域又は職域におけるスポーツの健全な普及及び発展に貢献し、もって地域におけるスポーツの振興に顕著な成",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.68944912836767,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7844827586206896,
+      "type_coverage": 0.7851239669421488,
+      "band_vector": {
+       "core": 0.5545977011494253,
+       "extended": 0.22988505747126436,
+       "oov": 0.21551724137931033
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 348
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.4454022988505747,
+       "ninjal-kyoiku-kihon-goi:full": 0.21551724137931033
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 348
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6408045977011494,
+      "band_vector": {
+       "n5": 0.08620689655172414,
+       "n4": 0.08620689655172414,
+       "n3": 0.32471264367816094,
+       "n2": 0.06321839080459771,
+       "n1": 0.08045977011494253,
+       "oov": 0.35919540229885055
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 348
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "文部",
+    "科学",
+    "大臣",
+    "表彰",
+    "趣旨",
+    "地域"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "sports:sports-b_menu-houdou-31-09-1421070_00039",
+   "title": "令和8年度「スポーツ推進委員功労者表彰」受賞者を決定しました",
+   "titleEn": "Awards for community sports promotion officers",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mext.go.jp/sports",
+   "sourceLabel": "スポーツ庁 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mext.go.jp/sports/b_menu/about_link.htm",
+   "attribution": "出典：「令和8年度「スポーツ推進委員功労者表彰」受賞者を決定しました」（スポーツ庁ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mext.go.jp/sports/b_menu/about_link.htm］。「令和8年度「スポーツ推進委員功労者表彰」受賞者を決定しました」（スポーツ庁ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1421070_00039.htm",
+   "date": "2026-09-18",
+   "publishedAt": "2026-09-18T12:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:39+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "sports",
+   "file": "sports-sports-b_menu-houdou-31-09-1421070_00039.json",
+   "chars": 466,
+   "snippet": "文部科学大臣表彰 １．趣旨 スポーツ推進委員（体育指導委員を含む）として地域スポーツの推進に功績顕著な者を文部科学大臣が表彰する",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.475333333333335,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8741721854304636,
+      "type_coverage": 0.8241758241758241,
+      "band_vector": {
+       "core": 0.5298013245033113,
+       "extended": 0.3443708609271523,
+       "oov": 0.12582781456953643
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 151
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.47019867549668876,
+       "ninjal-kyoiku-kihon-goi:full": 0.12582781456953643
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 151
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7133333333333334,
+      "band_vector": {
+       "n5": 0.06,
+       "n4": 0.13333333333333333,
+       "n3": 0.32666666666666666,
+       "n2": 0.04666666666666667,
+       "n1": 0.14666666666666667,
+       "oov": 0.2866666666666667
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 150
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "文部",
+    "科学",
+    "大臣",
+    "表彰",
+    "趣旨",
+    "スポーツ"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "govonline:article-202609-radio-3741",
+   "title": "「伝える」をもっと豊かに！手話は言語です。",
+   "titleEn": "Sign language is a language",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "出典：「「伝える」をもっと豊かに！手話は言語です。」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「「伝える」をもっと豊かに！手話は言語です。」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/radio-3741.html",
+   "date": "2026-09-21",
+   "publishedAt": "2026-09-21T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:18+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "culture",
+   "file": "govonline-article-202609-radio-3741.json",
+   "chars": 347,
+   "snippet": "今回のテーマは「「伝える」をもっと豊かに！手話は言語です。」 9月23日は「手話の日」です。ニュースなどで目にすることの多い「手",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.7013133640553004,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7608695652173914,
+      "type_coverage": 0.8666666666666667,
+      "band_vector": {
+       "core": 0.5543478260869565,
+       "extended": 0.20652173913043478,
+       "oov": 0.2391304347826087
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 92
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.44565217391304346,
+       "ninjal-kyoiku-kihon-goi:full": 0.2391304347826087
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 92
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7173913043478262,
+      "band_vector": {
+       "n5": 0.22826086956521738,
+       "n4": 0.16304347826086957,
+       "n3": 0.25,
+       "n2": 0.021739130434782608,
+       "n1": 0.05434782608695652,
+       "oov": 0.2826086956521739
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 92
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "今回",
+    "テーマ",
+    "伝える",
+    "もっと",
+    "豊か",
+    "手話"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kantei:jp-105-discourse-20260923message",
+   "title": "日米観光・食文化交流の夕べ　高市総理ビデオメッセージ",
+   "titleEn": "PM's video message to a US–Japan evening of tourism and food",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "kantei.go.jp",
+   "sourceLabel": "首相官邸 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.kantei.go.jp/jp/terms.html",
+   "attribution": "出典：「日米観光・食文化交流の夕べ　高市総理ビデオメッセージ」（首相官邸ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.kantei.go.jp/jp/terms.html］。「日米観光・食文化交流の夕べ　高市総理ビデオメッセージ」（首相官邸ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.kantei.go.jp/jp/105/discourse/20260923message.html",
+   "date": "2026-09-23",
+   "publishedAt": "2026-09-23T17:30:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:05+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "culture",
+   "file": "kantei-jp-105-discourse-20260923message.json",
+   "chars": 841,
+   "snippet": "「日米観光・食文化交流の夕べ」にようこそお越しくださいました。 本年は、米国の建国２５０周年、誠におめでとうございます。 この記",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.302625840179239,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7285714285714285,
+      "type_coverage": 0.6948051948051948,
+      "band_vector": {
+       "core": 0.5476190476190477,
+       "extended": 0.18095238095238095,
+       "oov": 0.2714285714285714
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 210
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.4523809523809524,
+       "ninjal-kyoiku-kihon-goi:full": 0.2714285714285714
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 210
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6428571428571428,
+      "band_vector": {
+       "n5": 0.1,
+       "n4": 0.21428571428571427,
+       "n3": 0.22857142857142856,
+       "n2": 0.05238095238095238,
+       "n1": 0.047619047619047616,
+       "oov": 0.35714285714285715
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 210
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "日米",
+    "観光",
+    "文化",
+    "交流",
+    "夕べ",
+    "よい"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05569",
+   "title": "「里海づくり相談窓口」の開設について～里海づくりの疑問・課題を専門家に無料で相談できます～",
+   "titleEn": "A free help desk opens for 'satoumi' coastal restoration",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「「里海づくり相談窓口」の開設について～里海づくりの疑問・課題を専門家に無料で相談できます～」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「「里海づくり相談窓口」の開設について～里海づくりの疑問・課題を専門家に無料で相談できます～」（環境省ホームページ）を加工して作成：段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05569.html",
+   "date": "2026-09-24",
+   "publishedAt": "2026-09-24T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:43+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "local",
+   "file": "env-press-press_05569.json",
+   "excerpt": {
+    "keptChars": 1587,
+    "sourceChars": 1712,
+    "rule": "whole paragraphs from the top"
+   },
+   "chars": 1623,
+   "snippet": "１．環境省では、戦略的「令和の里海づくり」基盤構築支援事業の一環として、全国各地で里海づくりに取り組む、又は取組の実施を検討して",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.9752115942028983,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7,
+      "type_coverage": 0.6398104265402843,
+      "band_vector": {
+       "core": 0.41702127659574467,
+       "extended": 0.28297872340425534,
+       "oov": 0.3
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 470
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5829787234042553,
+       "ninjal-kyoiku-kihon-goi:full": 0.3
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 470
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6978723404255319,
+      "band_vector": {
+       "n5": 0.08936170212765958,
+       "n4": 0.125531914893617,
+       "n3": 0.274468085106383,
+       "n2": 0.05319148936170213,
+       "n1": 0.15531914893617021,
+       "oov": 0.3021276595744681
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 470
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "戦略",
+    "つくり",
+    "基盤",
+    "構築",
+    "支援"
+   ],
+   "truncated": true
+  },
+  {
+   "id": "env:press-press_05603",
+   "title": "シンガポール共和国持続可能性・環境省との環境協力に関する協力覚書の更新について",
+   "titleEn": "Japan and Singapore renew their environmental cooperation memorandum",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「シンガポール共和国持続可能性・環境省との環境協力に関する協力覚書の更新について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「シンガポール共和国持続可能性・環境省との環境協力に関する協力覚書の更新について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05603.html",
+   "date": "2026-09-24",
+   "publishedAt": "2026-09-24T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:44+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "international",
+   "file": "env-press-press_05603.json",
+   "chars": 638,
+   "snippet": "１． 2026年９月24日（木）、笹川環境大臣はグレース・フー・シンガポール共和国持続可能性・環境大臣と「日本国環境省とシンガポ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.3730666666666664,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8106508875739645,
+      "type_coverage": 0.7733333333333333,
+      "band_vector": {
+       "core": 0.378698224852071,
+       "extended": 0.4319526627218935,
+       "oov": 0.1893491124260355
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 169
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.621301775147929,
+       "ninjal-kyoiku-kihon-goi:full": 0.1893491124260355
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 169
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8284023668639053,
+      "band_vector": {
+       "n5": 0.05917159763313609,
+       "n4": 0.08284023668639054,
+       "n3": 0.5088757396449705,
+       "n2": 0.047337278106508875,
+       "n1": 0.1301775147928994,
+       "oov": 0.17159763313609466
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 169
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "大臣",
+    "共和",
+    "持続",
+    "可能",
+    "協力"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "govonline:article-202609-tv-6628",
+   "title": "先端産業に必須“重要鉱物”",
+   "titleEn": "Critical minerals: what advanced industry cannot do without",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "出典：「先端産業に必須“重要鉱物”」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「先端産業に必須“重要鉱物”」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/tv-6628.html",
+   "date": "2026-09-24",
+   "publishedAt": "2026-09-24T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:14+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "economy",
+   "file": "govonline-article-202609-tv-6628.json",
+   "chars": 550,
+   "snippet": "スマートフォンや電気自動車など、私たちの暮らしを支える様々な製品に使われている「重要鉱物」。先端産業の発展に欠かせない一方、ニッ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.566069930069931,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8050314465408805,
+      "type_coverage": 0.7757009345794392,
+      "band_vector": {
+       "core": 0.42138364779874216,
+       "extended": 0.3836477987421384,
+       "oov": 0.1949685534591195
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 159
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5786163522012578,
+       "ninjal-kyoiku-kihon-goi:full": 0.1949685534591195
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 159
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.779874213836478,
+      "band_vector": {
+       "n5": 0.10062893081761007,
+       "n4": 0.0880503144654088,
+       "n3": 0.42138364779874216,
+       "n2": 0.06918238993710692,
+       "n1": 0.10062893081761007,
+       "oov": 0.22012578616352202
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 159
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "スマート",
+    "フォン",
+    "電気",
+    "自動",
+    "暮らし",
+    "支える"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "jawiki-news:2026-09-14",
+   "title": "9月14日〜9月27日のできごと",
+   "titleEn": "The news, 14–27 September — Wikipedia's current-events summaries",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "ja.wikipedia",
+   "sourceLabel": "ウィキペディア 最近の出来事 · 検収前",
+   "pool": "share_alike",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+   "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+   "attribution": "出典：ウィキペディア日本語版「Portal:最近の出来事/2026年9月」（版 111174380、2026-09-27）の執筆者、CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?title=Portal%3A%E6%9C%80%E8%BF%91%E3%81%AE%E5%87%BA%E6%9D%A5%E4%BA%8B/2026%E5%B9%B49%E6%9C%88&action=history ／ 日付節の要約文を週ごとにまとめ、事件・事故・訃報の項目を除き、ふりがなと辞書リンクを付けて掲載（Bunki）。この頁の本文は CC BY-SA 4.0 で再利用できる。",
+   "url": "https://ja.wikipedia.org/w/index.php?oldid=111174380",
+   "date": "2026-09-24",
+   "publishedAt": "2026-09-27T02:30:18Z",
+   "fetchedAt": "2026-09-28T02:37:55+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "news digest",
+   "file": "jawiki-news-2026-09-14.json",
+   "excerpt": {
+    "rule": "portal summaries for the week, 事件・事故・訃報 lines left out",
+    "summaries": 13
+   },
+   "chars": 740,
+   "snippet": "9月24日　（政治）アメリカ合衆国大統領のドナルド・トランプと、中華人民共和国最高指導者の習近平（総書記）との米中首脳会談が行わ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.706519313304721,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7204301075268817,
+      "type_coverage": 0.6171875,
+      "band_vector": {
+       "core": 0.3870967741935484,
+       "extended": 0.3333333333333333,
+       "oov": 0.27956989247311825
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 186
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6129032258064516,
+       "ninjal-kyoiku-kihon-goi:full": 0.27956989247311825
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 186
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6559139784946236,
+      "band_vector": {
+       "n5": 0.03225806451612903,
+       "n4": 0.1774193548387097,
+       "n3": 0.26344086021505375,
+       "n2": 0.043010752688172046,
+       "n1": 0.13978494623655913,
+       "oov": 0.34408602150537637
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 186
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "政治",
+    "合衆",
+    "大統領",
+    "トランプ",
+    "人民",
+    "共和"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mext:b_menu-houdou-mext_01683",
+   "title": "第36回全国産業教育フェア佐賀大会（さんフェア SAGA2026）を開催します！",
+   "titleEn": "The national vocational high-school fair comes to Saga",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mext.go.jp",
+   "sourceLabel": "文部科学省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mext.go.jp/b_menu/1351168.htm",
+   "attribution": "出典：「第36回全国産業教育フェア佐賀大会（さんフェア SAGA2026）を開催します！」（文部科学省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mext.go.jp/b_menu/1351168.htm］。「第36回全国産業教育フェア佐賀大会（さんフェア SAGA2026）を開催します！」（文部科学省ホームページ）を加工して作成：段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mext.go.jp/b_menu/houdou/mext_01683.html",
+   "date": "2026-09-24",
+   "publishedAt": "2026-09-24T10:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:35+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "local",
+   "file": "mext-b_menu-houdou-mext_01683.json",
+   "excerpt": {
+    "keptChars": 1548,
+    "sourceChars": 1665,
+    "rule": "whole paragraphs from the top"
+   },
+   "chars": 1584,
+   "snippet": "全国産業教育フェアは、専門高校生等が全国から集い、日頃の学習や活動の成果を総合的に発表する場です。専門高校生による発表や展示、体",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.9380823970037433,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.743421052631579,
+      "type_coverage": 0.6512605042016807,
+      "band_vector": {
+       "core": 0.47149122807017546,
+       "extended": 0.2719298245614035,
+       "oov": 0.2565789473684211
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 456
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5285087719298246,
+       "ninjal-kyoiku-kihon-goi:full": 0.2565789473684211
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 456
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6572052401746724,
+      "band_vector": {
+       "n5": 0.048034934497816595,
+       "n4": 0.14192139737991266,
+       "n3": 0.314410480349345,
+       "n2": 0.04585152838427948,
+       "n1": 0.10698689956331878,
+       "oov": 0.34279475982532753
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 458
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "全国",
+    "産業",
+    "教育",
+    "フェア",
+    "専門",
+    "高校"
+   ],
+   "truncated": true
+  },
+  {
+   "id": "env:press-press_05614",
+   "title": "「令和８年度環境課題の統合的解決に向けたモデル支援事業」参加企業の決定について",
+   "titleEn": "Companies chosen for a model project tackling several environmental issues at once",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「「令和８年度環境課題の統合的解決に向けたモデル支援事業」参加企業の決定について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「「令和８年度環境課題の統合的解決に向けたモデル支援事業」参加企業の決定について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05614.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:43+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "economy",
+   "file": "env-press-press_05614.json",
+   "chars": 592,
+   "snippet": "環境省は、炭素中立、循環経済、自然再興をはじめとした複数の環境課題の統合的な取組・開示を後押しするため、「令和８年度環境課題の統",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.9849702660406905,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.6867469879518072,
+      "type_coverage": 0.6619718309859155,
+      "band_vector": {
+       "core": 0.39759036144578314,
+       "extended": 0.2891566265060241,
+       "oov": 0.3132530120481928
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 166
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6024096385542169,
+       "ninjal-kyoiku-kihon-goi:full": 0.3132530120481928
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 166
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7048192771084337,
+      "band_vector": {
+       "n5": 0.0783132530120482,
+       "n4": 0.0783132530120482,
+       "n3": 0.3433734939759036,
+       "n2": 0.060240963855421686,
+       "n1": 0.14457831325301204,
+       "oov": 0.29518072289156627
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 166
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "環境",
+    "炭素",
+    "中立",
+    "循環",
+    "経済",
+    "自然"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05616",
+   "title": "「浄化槽の日」における「第40回全国浄化槽大会」の開催について",
+   "titleEn": "The 40th national septic-tank convention, for Septic Tank Day",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「「浄化槽の日」における「第40回全国浄化槽大会」の開催について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「「浄化槽の日」における「第40回全国浄化槽大会」の開催について」（環境省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05616.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:42+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "environment",
+   "file": "env-press-press_05616.json",
+   "chars": 1126,
+   "snippet": "＜国土交通省同時発表＞ １．　10月１日は「浄化槽の日」です。これは、浄化槽に関する諸制度を整備した「浄化槽法」が、昭和60年1",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": -0.1644305980528511,
+      "band": "上級後半",
+      "in_scale": false,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.6935933147632312,
+      "type_coverage": 0.6545454545454545,
+      "band_vector": {
+       "core": 0.42618384401114207,
+       "extended": 0.26740947075208915,
+       "oov": 0.3064066852367688
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 359
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5738161559888579,
+       "ninjal-kyoiku-kihon-goi:full": 0.3064066852367688
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 359
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6545961002785515,
+      "band_vector": {
+       "n5": 0.06963788300835655,
+       "n4": 0.11977715877437325,
+       "n3": 0.28969359331476324,
+       "n2": 0.08635097493036212,
+       "n1": 0.08913649025069638,
+       "oov": 0.34540389972144847
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 359
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "国土",
+    "交通",
+    "同時",
+    "発表",
+    "１日",
+    "浄化"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "env:press-press_05643",
+   "title": "神戸港におけるコガネヒアリの確認について",
+   "titleEn": "Golden fire ants found at Kobe port — a first for Japan",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "出典：「神戸港におけるコガネヒアリの確認について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「神戸港におけるコガネヒアリの確認について」（環境省ホームページ）を加工して作成：段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05643.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:41+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "science",
+   "file": "env-press-press_05643.json",
+   "excerpt": {
+    "keptChars": 1537,
+    "sourceChars": 2382,
+    "rule": "whole paragraphs from the top"
+   },
+   "chars": 1565,
+   "snippet": "＜兵庫県・神戸市同時発表＞ 令和８年９月14日（月）に神戸港で確認されたアリについて、専門家による同定の結果、要緊急対処特定外来",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.866745315626705,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7019027484143763,
+      "type_coverage": 0.6379310344827587,
+      "band_vector": {
+       "core": 0.386892177589852,
+       "extended": 0.3150105708245243,
+       "oov": 0.29809725158562367
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 473
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6131078224101479,
+       "ninjal-kyoiku-kihon-goi:full": 0.29809725158562367
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 473
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6968421052631579,
+      "band_vector": {
+       "n5": 0.08210526315789474,
+       "n4": 0.10736842105263159,
+       "n3": 0.3473684210526316,
+       "n2": 0.06736842105263158,
+       "n1": 0.09263157894736843,
+       "oov": 0.3031578947368421
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 475
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "同時",
+    "発表",
+    "確認",
+    "アリ",
+    "つく",
+    "専門"
+   ],
+   "truncated": true
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-25startup",
+   "title": "日本スタートアップ大賞２０２６表彰式",
+   "titleEn": "PM Takaichi at the Japan Startup Awards 2026",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "kantei.go.jp",
+   "sourceLabel": "首相官邸 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.kantei.go.jp/jp/terms.html",
+   "attribution": "出典：「日本スタートアップ大賞２０２６表彰式」（首相官邸ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.kantei.go.jp/jp/terms.html］。「日本スタートアップ大賞２０２６表彰式」（首相官邸ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.kantei.go.jp/jp/105/actions/202609/25startup.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-26T01:30:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:02+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "economy",
+   "file": "kantei-jp-105-actions-202609-25startup.json",
+   "chars": 736,
+   "snippet": "令和８年９月２５日、高市総理は、総理大臣官邸で日本スタートアップ大賞２０２６表彰式に出席しました。 総理は、挨拶で次のように述べ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.6959472934472934,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.6825396825396826,
+      "type_coverage": 0.704,
+      "band_vector": {
+       "core": 0.4497354497354497,
+       "extended": 0.2328042328042328,
+       "oov": 0.31746031746031744
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 189
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5502645502645502,
+       "ninjal-kyoiku-kihon-goi:full": 0.31746031746031744
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 189
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5978835978835979,
+      "band_vector": {
+       "n5": 0.06878306878306878,
+       "n4": 0.17989417989417988,
+       "n3": 0.26455026455026454,
+       "n2": 0.0,
+       "n1": 0.08465608465608465,
+       "oov": 0.4021164021164021
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 189
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "総理",
+    "大臣",
+    "官邸",
+    "スタートアップ",
+    "大賞",
+    "表彰"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mext:b_menu-houdou-2025-mext_00009",
+   "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
+   "titleEn": "Japan Startup Awards 2026: the university start-up prize goes to Rapyuta Robotics",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mext.go.jp",
+   "sourceLabel": "文部科学省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mext.go.jp/b_menu/1351168.htm",
+   "attribution": "出典：「「日本スタートアップ大賞2026」受賞者を決定しました」（文部科学省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mext.go.jp/b_menu/1351168.htm］。「「日本スタートアップ大賞2026」受賞者を決定しました」（文部科学省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mext.go.jp/b_menu/houdou/2025/mext_00009.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T17:30:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:33+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "science",
+   "file": "mext-b_menu-houdou-2025-mext_00009.json",
+   "chars": 1100,
+   "snippet": "日本スタートアップ大賞2026において、Rapyuta Robotics株式会社が「大学発スタートアップ賞（文部科学大臣賞）」を",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.189598705501618,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.6599326599326599,
+      "type_coverage": 0.5648854961832062,
+      "band_vector": {
+       "core": 0.3400673400673401,
+       "extended": 0.31986531986531985,
+       "oov": 0.3400673400673401
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 297
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.6599326599326599,
+       "ninjal-kyoiku-kihon-goi:full": 0.3400673400673401
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 297
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6430976430976432,
+      "band_vector": {
+       "n5": 0.11784511784511785,
+       "n4": 0.08417508417508418,
+       "n3": 0.29292929292929293,
+       "n2": 0.03367003367003367,
+       "n1": 0.11447811447811448,
+       "oov": 0.3569023569023569
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 297
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "スタートアップ",
+    "大賞",
+    "おく",
+    "Rapyuta",
+    "Robotics",
+    "株式"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-houdou-newpage_75698",
+   "title": "かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について",
+   "titleEn": "Family-doctor information now on the Navii medical-information site",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/houdou/newpage_75698.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T14:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:21+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "health",
+   "file": "mhlw-stf-houdou-newpage_75698.json",
+   "chars": 598,
+   "snippet": "令和７年４月より施行された「かかりつけ医機能報告制度」に基づく医療情報ネット（ナビイ）を通じた医療機関の情報提供について、お知ら",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.7263372267145858,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7905759162303665,
+      "type_coverage": 0.7888888888888889,
+      "band_vector": {
+       "core": 0.5130890052356021,
+       "extended": 0.2774869109947644,
+       "oov": 0.2094240837696335
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 191
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.4869109947643979,
+       "ninjal-kyoiku-kihon-goi:full": 0.2094240837696335
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 191
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8429319371727748,
+      "band_vector": {
+       "n5": 0.07853403141361257,
+       "n4": 0.14136125654450263,
+       "n3": 0.5026178010471204,
+       "n2": 0.05235602094240838,
+       "n1": 0.06806282722513089,
+       "oov": 0.15706806282722513
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 191
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "施行",
+    "かかる",
+    "つける",
+    "機能",
+    "報告",
+    "制度"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "mhlw:stf-newpage_76360",
+   "title": "インドネシアにおける入国前結核スクリーニングを開始します",
+   "titleEn": "Pre-entry tuberculosis screening starts for Indonesia",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mhlw.go.jp",
+   "sourceLabel": "厚生労働省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+   "attribution": "出典：「インドネシアにおける入国前結核スクリーニングを開始します」（厚生労働省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mhlw.go.jp/chosakuken/index.html］。「インドネシアにおける入国前結核スクリーニングを開始します」（厚生労働省ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mhlw.go.jp/stf/newpage_76360.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T13:58:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:22+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "health",
+   "file": "mhlw-stf-newpage_76360.json",
+   "chars": 740,
+   "snippet": "厚生労働省は、日本国内における結核対策の推進のため実施している入国前結核スクリーニング（Japan Pre-Entry Tube",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.008111111111111,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7414634146341463,
+      "type_coverage": 0.6952380952380952,
+      "band_vector": {
+       "core": 0.43414634146341463,
+       "extended": 0.3073170731707317,
+       "oov": 0.25853658536585367
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 205
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5658536585365853,
+       "ninjal-kyoiku-kihon-goi:full": 0.25853658536585367
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 205
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7121951219512195,
+      "band_vector": {
+       "n5": 0.11219512195121951,
+       "n4": 0.1073170731707317,
+       "n3": 0.32195121951219513,
+       "n2": 0.05853658536585366,
+       "n1": 0.11219512195121951,
+       "oov": 0.28780487804878047
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 205
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "厚生",
+    "労働",
+    "おく",
+    "結核",
+    "対策",
+    "推進"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "sports:sports-b_menu-houdou-jsa_00246",
+   "title": "河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山市藤井市長との意見交換～",
+   "titleEn": "The Sports Agency's commissioner visits Toyama",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "mext.go.jp/sports",
+   "sourceLabel": "スポーツ庁 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.mext.go.jp/sports/b_menu/about_link.htm",
+   "attribution": "出典：「河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山市藤井市長との意見交換～」（スポーツ庁ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.mext.go.jp/sports/b_menu/about_link.htm］。「河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山市藤井市長との意見交換～」（スポーツ庁ホームページ）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.mext.go.jp/sports/b_menu/houdou/jsa_00246.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T12:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:37+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "sports",
+   "file": "sports-sports-b_menu-houdou-jsa_00246.json",
+   "chars": 1173,
+   "snippet": "河合スポーツ庁長官が富山県新田知事、富山市藤井市長との意見交換、YKK APアリーナオープニングイベントへの出席を目的とし、富山",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.2720404624277464,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7892976588628763,
+      "type_coverage": 0.7435897435897436,
+      "band_vector": {
+       "core": 0.5752508361204013,
+       "extended": 0.2140468227424749,
+       "oov": 0.21070234113712374
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 299
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.42474916387959866,
+       "ninjal-kyoiku-kihon-goi:full": 0.21070234113712374
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 299
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.674496644295302,
+      "band_vector": {
+       "n5": 0.05704697986577181,
+       "n4": 0.19798657718120805,
+       "n3": 0.2550335570469799,
+       "n2": 0.09395973154362416,
+       "n1": 0.07046979865771812,
+       "oov": 0.32550335570469796
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 298
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "スポーツ",
+    "長官",
+    "知事",
+    "市長",
+    "意見",
+    "交換"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "jawiki:3492442",
+   "title": "2026年アジア競技大会",
+   "titleEn": "The 2026 Asian Games in Aichi and Nagoya",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "ja.wikipedia",
+   "sourceLabel": "ウィキペディア · 検収前",
+   "pool": "share_alike",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+   "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+   "attribution": "出典：ウィキペディア日本語版「2026年アジア競技大会」（版 111162945、2026-09-26）の執筆者、CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?title=2026%E5%B9%B4%E3%82%A2%E3%82%B8%E3%82%A2%E7%AB%B6%E6%8A%80%E5%A4%A7%E4%BC%9A&action=history ／ 記事の冒頭部分から段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）。この頁の本文は CC BY-SA 4.0 で再利用できる。",
+   "url": "https://ja.wikipedia.org/w/index.php?oldid=111162945",
+   "date": "2026-09-26",
+   "publishedAt": "2026-09-26T09:19:09Z",
+   "fetchedAt": "2026-09-28T02:37:59+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "sports",
+   "file": "jawiki-3492442.json",
+   "excerpt": {
+    "rule": "lead section"
+   },
+   "chars": 305,
+   "snippet": "2026年アジア競技大会（2026ねんアジアきょうぎたいかい、The 20th Asian Games XX Asiad）は、日",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.51869696969697,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8194444444444444,
+      "type_coverage": 0.723404255319149,
+      "band_vector": {
+       "core": 0.4861111111111111,
+       "extended": 0.3333333333333333,
+       "oov": 0.18055555555555555
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 72
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5138888888888888,
+       "ninjal-kyoiku-kihon-goi:full": 0.18055555555555555
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 72
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.75,
+      "band_vector": {
+       "n5": 0.1388888888888889,
+       "n4": 0.09722222222222222,
+       "n3": 0.3888888888888889,
+       "n2": 0.013888888888888888,
+       "n1": 0.1111111111111111,
+       "oov": 0.25
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 72
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 0,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 2
+     }
+    }
+   },
+   "seeds": [
+    "競技",
+    "大会",
+    "ねん",
+    "きょうぎ",
+    "たいかい",
+    "The"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "jawiki:5238864-s63",
+   "title": "2026年の台風（台風25号（ドゥージェン））",
+   "titleEn": "Typhoon No. 25 (Dujuan)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "ja.wikipedia",
+   "sourceLabel": "ウィキペディア · 検収前",
+   "pool": "share_alike",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+   "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+   "attribution": "出典：ウィキペディア日本語版「2026年の台風」（版 111173216、2026-09-27）の執筆者、CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?title=2026%E5%B9%B4%E3%81%AE%E5%8F%B0%E9%A2%A8&action=history ／ 記事の該当節から段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）。この頁の本文は CC BY-SA 4.0 で再利用できる。",
+   "url": "https://ja.wikipedia.org/w/index.php?oldid=111173216",
+   "date": "2026-09-27",
+   "publishedAt": "2026-09-27T01:21:26Z",
+   "fetchedAt": "2026-09-28T02:38:04+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "weather",
+   "file": "jawiki-5238864-s63.json",
+   "excerpt": {
+    "rule": "section 台風25号（ドゥージェン）"
+   },
+   "chars": 759,
+   "snippet": "気象庁は、9月10日3時頃にグアム島遥か南東の北緯11度東経147度付近で発生した低気圧が、 14日3時頃にミクロネシア連邦・ポ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.877713286713286,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.6836734693877551,
+      "type_coverage": 0.5769230769230769,
+      "band_vector": {
+       "core": 0.4642857142857143,
+       "extended": 0.2193877551020408,
+       "oov": 0.3163265306122449
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 196
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5357142857142857,
+       "ninjal-kyoiku-kihon-goi:full": 0.3163265306122449
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 196
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5816326530612245,
+      "band_vector": {
+       "n5": 0.025510204081632654,
+       "n4": 0.08163265306122448,
+       "n3": 0.3112244897959184,
+       "n2": 0.08673469387755102,
+       "n1": 0.07653061224489796,
+       "oov": 0.41836734693877553
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 196
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "気象",
+    "遥か",
+    "南東",
+    "北緯",
+    "東経",
+    "付近"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "jawiki:5294446",
+   "title": "第2次高市内閣 (改造)",
+   "titleEn": "The reshuffled second Takaichi cabinet",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "ja.wikipedia",
+   "sourceLabel": "ウィキペディア · 検収前",
+   "pool": "share_alike",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+   "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+   "attribution": "出典：ウィキペディア日本語版「第2次高市内閣 (改造)」（版 111169091、2026-09-26）の執筆者、CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?title=%E7%AC%AC2%E6%AC%A1%E9%AB%98%E5%B8%82%E5%86%85%E9%96%A3%20%28%E6%94%B9%E9%80%A0%29&action=history ／ 記事の冒頭部分から段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）。この頁の本文は CC BY-SA 4.0 で再利用できる。",
+   "url": "https://ja.wikipedia.org/w/index.php?oldid=111169091",
+   "date": "2026-09-27",
+   "publishedAt": "2026-09-26T18:29:02Z",
+   "fetchedAt": "2026-09-28T02:38:10+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "politics",
+   "file": "jawiki-5294446.json",
+   "excerpt": {
+    "rule": "lead section"
+   },
+   "chars": 377,
+   "snippet": "第2次高市改造内閣（だいにじたかいちかいぞうないかく）は、衆議院議員・自由民主党総裁の高市早苗が第105代内閣総理大臣に任命され",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.7000784313725479,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7280701754385965,
+      "type_coverage": 0.7083333333333334,
+      "band_vector": {
+       "core": 0.4649122807017544,
+       "extended": 0.2631578947368421,
+       "oov": 0.2719298245614035
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 114
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5350877192982456,
+       "ninjal-kyoiku-kihon-goi:full": 0.2719298245614035
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 114
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7280701754385965,
+      "band_vector": {
+       "n5": 0.11403508771929824,
+       "n4": 0.12280701754385964,
+       "n3": 0.20175438596491227,
+       "n2": 0.08771929824561403,
+       "n1": 0.20175438596491227,
+       "oov": 0.2719298245614035
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 114
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "ordinals": {
+       "jreadability": 2,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 0
+     }
+    }
+   },
+   "seeds": [
+    "改造",
+    "内閣",
+    "にじ",
+    "たかい",
+    "ちかい",
+    "いかい"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "global-voices:2026-09-28-65726",
+   "title": "シリアの「連帯の畑」で在来種子の再生を目指す",
+   "titleEn": "Syria's 'solidarity fields' bring back native seeds",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "jp.globalvoices.org",
+   "sourceLabel": "Global Voices 日本語 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "termsUrl": "https://jp.globalvoices.org/about/%E8%A8%98%E4%BA%8B%E3%81%AE%E8%BB%A2%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/",
+   "attribution": "Global Voices 日本語 — 原文: lahlah; 翻訳: Moegi Tanaka; 校正: Yasuhisa Miyata. https://jp.globalvoices.org/2026/09/28/65726/ — CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). HTML layout, images and embedded media omitted; whitespace normalized; article text otherwise copied. Excerpted at paragraph boundaries by Bunki. ふりがなと辞書リンクを付けて掲載（Bunki）。",
+   "url": "https://jp.globalvoices.org/2026/09/28/65726/",
+   "date": "2026-09-28",
+   "publishedAt": "2026-09-28T11:16:26+09:00",
+   "fetchedAt": "2026-09-28T02:38:17.296Z",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "international",
+   "file": "global-voices-2026-09-28-65726.json",
+   "excerpt": {
+    "keptChars": 1865,
+    "sourceChars": 3264,
+    "rule": "whole paragraphs from the top"
+   },
+   "chars": 1878,
+   "snippet": "レイダ・ゼイダン この記事は2026年4月7日、 Lahlah誌にアラビア語で最初に公開された。グローバル・ボイスとのコンテンツ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.0966925088860577,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.65,
+      "type_coverage": 0.6115107913669064,
+      "band_vector": {
+       "core": 0.45208333333333334,
+       "extended": 0.19791666666666666,
+       "oov": 0.35
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 480
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.5479166666666667,
+       "ninjal-kyoiku-kihon-goi:full": 0.35
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 480
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6416666666666666,
+      "band_vector": {
+       "n5": 0.12708333333333333,
+       "n4": 0.08333333333333333,
+       "n3": 0.3125,
+       "n2": 0.025,
+       "n1": 0.09375,
+       "oov": 0.35833333333333334
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 480
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "ゼイダン",
+    "この",
+    "記事",
+    "Lahlah",
+    "最初",
+    "公開"
+   ],
+   "truncated": true
+  },
+  {
+   "id": "govonline:article-202609-radio-3743",
+   "title": "えっ、この建物も文化財！？地域の遺産・登録有形文化財",
+   "titleEn": "Is this building a cultural property? Japan's registered heritage turns 30",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "出典：「えっ、この建物も文化財！？地域の遺産・登録有形文化財」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「えっ、この建物も文化財！？地域の遺産・登録有形文化財」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/radio-3743.html",
+   "date": "2026-09-28",
+   "publishedAt": "2026-09-28T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:17+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "culture",
+   "file": "govonline-article-202609-radio-3743.json",
+   "chars": 304,
+   "snippet": "今回のテーマは「えっ、この建物も文化財！？地域の遺産・登録有形文化財」 私たちの身近にある、歴史ある建造物。もしかしたら「登録有",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.0918635863586363,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.7608695652173914,
+      "type_coverage": 0.7454545454545455,
+      "band_vector": {
+       "core": 0.5652173913043478,
+       "extended": 0.1956521739130435,
+       "oov": 0.2391304347826087
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 92
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.43478260869565216,
+       "ninjal-kyoiku-kihon-goi:full": 0.2391304347826087
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 92
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6847826086956521,
+      "band_vector": {
+       "n5": 0.17391304347826086,
+       "n4": 0.17391304347826086,
+       "n3": 0.22826086956521738,
+       "n2": 0.0,
+       "n1": 0.10869565217391304,
+       "oov": 0.31521739130434784
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 92
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "今回",
+    "テーマ",
+    "えっ",
+    "この",
+    "建物",
+    "文化"
    ],
    "truncated": false
   }
