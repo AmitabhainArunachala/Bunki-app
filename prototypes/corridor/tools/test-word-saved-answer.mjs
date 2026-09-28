@@ -536,7 +536,7 @@ function defineRows() {
     assert.deepEqual([r('2036160')[4], r('2036160')[5], r('2036160')[11]], [['初', '初心', '産', '生'], ['ウブ', 'うぶ'], [1, 0]]);
     assert.deepEqual([DICT['上手'].r, DICT['上手'].m[0]], ['じょうず', 'skillful']);
     for (const spelling of ['捲る', 'ポンド', '産']) assert.equal(DICT[spelling], undefined, spelling);
-    assert.deepEqual([WORDS['捲る'].r, WORDS['捲る'].g], ['めくる', 'to turn over, to turn pages of a']);
+    assert.deepEqual([WORDS['捲る'].r, WORDS['捲る'].g], ['めくる', 'to turn over, to turn (pages), to leaf through (a book, etc.); to tear off, to strip off, to take off']);
     assert.equal(WORDS['ポンド'], undefined);
     assert.equal(metadata.source.pin, '3.6.2+20260803141815');
     assert.equal(metadata.source.jmdict.sha256, '1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c');
