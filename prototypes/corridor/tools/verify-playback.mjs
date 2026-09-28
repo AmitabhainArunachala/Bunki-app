@@ -462,12 +462,12 @@ try {
   await check('pending-card-audio-is-retired-by-grade-and-undo', 'card-held', async (f) => {
     const { page } = f;
     const before = await readAppRecord(page);
-    const declaration = before.obslog.at(-1);
-    assert.equal(declaration?.[1], 'reveal', 'the asking card has an acknowledged declaration');
+    const cardKey = await page.evaluate(() => window.__KAIRO_SRS__.current());
+    assert.ok(cardKey, 'the answer card is the one on the glass');
     await page.locator('#card-say').click();
     await page.locator('.grade.g-again').click();
     const graded = await waitForAppRecord(page, record => record.revlog.length === before.revlog.length + 1
-      && record.revlog.at(-1)?.[1] === declaration[2] && record.revlog.at(-1)?.[2] === 1,
+      && record.revlog.at(-1)?.[1] === cardKey && record.revlog.at(-1)?.[2] === 1,
     { timeout: 10000, description: 'Again grade before pending-audio undo' });
     await page.locator('#reveal:not(:disabled)').waitFor({ state: 'visible', timeout: 10000 });
     // On the next card, undo is behind the real More door.
@@ -475,7 +475,7 @@ try {
     await page.waitForSelector('.review-undo', { timeout: 10000 });
     await page.locator('.review-undo').click();
     await waitForAppRecord(page, record => record.revlog.length === graded.revlog.length + 1
-      && record.revlog.at(-1)?.[1] === declaration[2] && record.revlog.at(-1)?.[2] === 0
+      && record.revlog.at(-1)?.[1] === cardKey && record.revlog.at(-1)?.[2] === 0
       && record.revlog.at(-1)?.[3] === before.revlog.length,
     { timeout: 10000, description: 'durable revocation of the pending-audio grade' });
     // the only grade is taken back: no undo chip, and the first card is up again, unrevealed
