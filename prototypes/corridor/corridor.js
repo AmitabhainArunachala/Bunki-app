@@ -4502,7 +4502,7 @@ function back() {
   }
   // a list page is only reachable from the tray (the リスト name-door), so
   // 戻る returns there — the same trip the in-page ← リスト一覧へ chip makes
-  if (S.view === 'list') {
+  if (S.view === 'list' || S.view === 'browse' || S.view === 'srs-stats') {
     S.view = 'tray';
     render();
     return;
@@ -8912,35 +8912,11 @@ function refreshRecordNotesSurface() {
 
 function renderTray(main) {
   const currentSurface = recordViewSurface();
-  main.append(withEn(el('p', 'eyebrow', 'リスト'), 'your lists', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', '復習'), 'review · your cards', 'en-inline'));
   main.append(
     el('h1', 'view-title', tx(`覚える ${S.taken.length} 件`, `Memorizing ${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)),
   );
-  renderSentencePracticeLibrary(main);
-  // The stable global live region owns storage errors. This surface adds only
-  // the quiet backup reminder when the record itself is healthy.
-  if (!S.storeError) {
-    const cardCount = S.taken.length + Object.keys(S.srs).length;
-    const last = Number(S.stats?.lastExportTs) || 0;
-    const stale = !last || Date.now() - last > 14 * 86400000;
-    if (cardCount >= 20 && stale) {
-      main.append(
-        el(
-          'p',
-          'store-nudge',
-          last
-            ? tx(
-                '最後の書き出しから二週間以上。下の「書き出す」で記録をひとつのファイルに。',
-                'It has been over two weeks since your last export — 書き出す below keeps the whole record in one file.',
-              )
-            : tx(
-                '記録はこの端末だけにある。下の「書き出す」でひとつのファイルに残せる。',
-                'Your record lives only on this device so far — 書き出す below keeps it all in one file.',
-              ),
-        ),
-      );
-    }
-  }
+  // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
     const due = srsDueItems();
     const f = srsForecast();
@@ -8959,7 +8935,7 @@ function renderTray(main) {
     btn.id = 'review-start';
     btn.disabled = !due.length;
     btn.addEventListener('click', startReview);
-    main.append(btn);
+    main.append(deckCounts(due), btn);
     if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
       // 未着手 appears only when no-debt rows exist: the backlog is named,
       // never hidden and never turned into due cards by anyone but the learner
@@ -8992,6 +8968,8 @@ function renderTray(main) {
         ),
       );
     }
+    renderDeckTable(main, due);
+    renderDeckDoors(main);
     renderSrsPrefs(main);
     // one layer of the tutor's testing — absent without a key, and folded
     // away while an unfinished quiz still holds the room (POL-13)
@@ -9030,6 +9008,31 @@ function renderTray(main) {
       main.append(qb, note);
     }
   }
+  renderSentencePracticeLibrary(main);
+  // The stable global live region owns storage errors. This surface adds only
+  // the quiet backup reminder when the record itself is healthy.
+  if (!S.storeError) {
+    const cardCount = S.taken.length + Object.keys(S.srs).length;
+    const last = Number(S.stats?.lastExportTs) || 0;
+    const stale = !last || Date.now() - last > 14 * 86400000;
+    if (cardCount >= 20 && stale) {
+      main.append(
+        el(
+          'p',
+          'store-nudge',
+          last
+            ? tx(
+                '最後の書き出しから二週間以上。下の「書き出す」で記録をひとつのファイルに。',
+                'It has been over two weeks since your last export — 書き出す below keeps the whole record in one file.',
+              )
+            : tx(
+                '記録はこの端末だけにある。下の「書き出す」でひとつのファイルに残せる。',
+                'Your record lives only on this device so far — 書き出す below keeps it all in one file.',
+              ),
+        ),
+      );
+    }
+  }
   // POL-13 · a quiz that was left mid-run survives reload: the way back in
   // stands here — no new request, the tutor's written questions intact —
   // with a quiet やめる beside it. No key and no deck are needed to finish
@@ -9064,7 +9067,6 @@ function renderTray(main) {
     qrow.append(qb, drop);
     main.append(qrow);
   }
-  main.append(renderReadingPlaces(), renderRecordNotes());
   if (!S.taken.length) {
     main.append(
       el(
@@ -9076,6 +9078,7 @@ function renderTray(main) {
         ),
       ),
     );
+    main.append(renderReadingPlaces(), renderRecordNotes());
     // a fresh device is exactly where bringing a record back matters most —
     // and where first frictions surface, so the note door stands here too
     renderPortRow(main);
@@ -9296,6 +9299,9 @@ function renderTray(main) {
     for (const item of sec.items) main.append(trayLine(item, dueKeys));
   }
   main.append(maker);
+  // notes, reading places and sync wait below the cards themselves (operator, 2026-09-28:
+  // the review page read as a kitchen sink)
+  main.append(renderReadingPlaces(), renderRecordNotes());
 
   renderPortRow(main);
   renderNoteDoor(main);
@@ -17751,7 +17757,7 @@ async function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }
 }
 
 async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
-  if (!rv.revealed || (!S.focus && rv.declared == null)) return false;
+  if (!rv.revealed) return false;
   if (!S.focus && rv.declared === 0) { rating = fsrsApi.Rating.Again; key = 'again'; }
   let committedNext;
   let entry;
@@ -18235,6 +18241,12 @@ function renderReview(main) {
     render();
   });
   main.append(moreBtn);
+  // Anki's three numbers (operator, 2026-09-28: a hairline told him nothing) and an undo
+  // that no longer hides behind …
+  if (!S.focus) main.append(reviewCounts(rv));
+  const undoSlot = el('div', 'anki-undo-slot');
+  renderReviewUndo(undoSlot, rv);
+  if (undoSlot.childNodes.length) main.append(undoSlot);
 
   if (!reviewAnswerAvailable(item)) {
     moreBtn.remove();
@@ -18431,7 +18443,6 @@ function renderReview(main) {
 
   if (S.reviewMore) {
     const moreRow = el('div', 'zen-more-row');
-    renderReviewUndo(moreRow, rv);
     if (maintenanceReports) {
       const report = el('button', 'chip report-door', tx('問題を報告', 'Report a problem')); report.type = 'button';
       report.dataset.reportEntry = 'open';
@@ -18474,58 +18485,21 @@ function renderReview(main) {
   if (!rv.revealed) {
     if (item.t === 'question') return;
     if (item.t === 'sentence') { renderSentenceRecallControls(main, rv, item); return; }
-    if (S.focus) {
-      // the dojo keeps its single turn-over — drilling early is its point,
-      // and a drill-only grade is practice evidence, not a scheduled
-      // review. The declared-recall gate below guards the zen room only.
-      // The card itself turns over — and the labeled button stays for
-      // hands and readers that want one.
-      face.addEventListener('click', () => {
-        if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item) return;
-        rv.revealed = true;
-        render();
-      });
-      const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
-      btn.type = 'button';
-      btn.id = 'reveal';
-      btn.disabled = !!rv.pending;
-      btn.addEventListener('click', () => {
-        if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item) return;
-        rv.revealed = true;
-        render();
-      });
-      main.append(btn);
-      return;
-    }
-    // 想起の二道 — the kernel law (ADR-002 T-06): a learner who saw the
-    // answer before recalling did not recall it. So the front face asks the
-    // only honest question first — did it come back? — and the answer is
-    // what turns the card over: 思い出した opens all four grades; まだ
-    // opens the back for study with Again as the one grade the schedule
-    // will record. There is no bare reveal in this room — the declaration
-    // IS the door. It lands in the observation ledger like the reader's
-    // tap ladder (debounce-persisted); the forcing itself rides rv.declared
-    // in session state and the acknowledged grade commit.
-    const declare = (declared) => {
-      if (rv.revealed) return false;
-      const now = Date.now();
-      return commitReviewAction(rv, item, (latest) => ({
-        obslog: [...(latest.obslog || []), [now, 'reveal', srsKey(item.t, item.id), declared]],
-      }), () => { rv.declared = declared; rv.revealed = true; });
-    };
-    const declRow = el('div', 'declare-row');
-    const notyet = biLabel('button', 'take declare-notyet', 'まだ', 'not yet');
-    notyet.type = 'button';
-    notyet.id = 'declare-notyet';
-    notyet.disabled = !!rv.pending;
-    notyet.addEventListener('click', () => declare(0));
-    const recalled = biLabel('button', 'take declare-recalled', '思い出した', 'I recalled it');
-    recalled.type = 'button';
-    recalled.id = 'declare-recalled';
-    recalled.disabled = !!rv.pending;
-    recalled.addEventListener('click', () => declare(1));
-    declRow.append(notyet, recalled);
-    main.append(declRow);
+    // Anki's turn-over (operator, 2026-09-28: "it should be at least more like anki AT A BARE
+    // MINIMUM"): recall in your head, Show answer, then grade honestly — Again is the miss.
+    // The review room and the dojo share it; Space or Enter presses it (reviewKeys).
+    const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show answer');
+    btn.type = 'button';
+    btn.id = 'reveal';
+    btn.disabled = !!rv.pending;
+    btn.addEventListener('click', () => {
+      if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || rv.revealed) return;
+      rv.revealed = true;
+      render();
+    });
+    // the dojo's card itself also turns over — drilling early is its point
+    if (S.focus) face.addEventListener('click', () => btn.click());
+    main.append(btn);
     return;
   }
   const now = new Date();
@@ -18579,7 +18553,7 @@ function renderReview(main) {
   if (!S.focus && rv.declared != null) {
     row.setAttribute('data-declared', notRecalled ? 'notyet' : 'recalled');
   }
-  for (const [rating, key, ja, sealChar] of grades) {
+  for (const [rating, key, ja] of grades) {
     if (notRecalled && rating !== 'Again') continue;
     const next = result[fsrsApi.Rating[rating]].card;
     const ms = next.due.getTime() - schedNow.getTime();
@@ -18588,12 +18562,16 @@ function renderReview(main) {
       : next.scheduled_days >= 1
         ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`)
         : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
-    const b = el('button', `grade hanko g-${key}`);
+    // Anki's answer bar (operator, 2026-09-28 — the seal row was hard to read): the
+    // interval stands above each plain-worded button, and 1–4 press them (reviewKeys)
+    const b = el('button', `grade anki g-${key}`);
     b.type = 'button';
     b.disabled = !!rv.pending || !recordWritable();
-    b.append(el('span', 'g-seal', sealChar));
-    b.append(el('span', 'g-label', tx(ja, key)));
+    b.dataset.gradeKey = String(grades.findIndex((g) => g[1] === key) + 1);
+    b.title = `${rating} (${b.dataset.gradeKey})`;
     b.append(el('span', 'g-when', when));
+    b.append(el('span', 'g-label', tx(ja, rating)));
+    b.append(el('span', 'g-sub', tx(rating, ja)));
     b.addEventListener('click', async () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return;
       const pressedNow = new Date();
@@ -18647,11 +18625,352 @@ function renderReview(main) {
   // rest · undo · the full entry live behind the … mark — the zen glass
   // holds only the card and the four honest buttons
 }
+/* ------------------------------------------------ Anki-grade SRS (operator, 2026-09-28)
+ * "the anki page is bad and hard to understand … it should be at least more like anki AT A
+ * BARE MINIMUM" — and his standing ask, "an amazing Anki-grade SRS — all of Anki's function,
+ * simplified". Anki's deck screen, counts, browser and stats, on the same FSRS state. */
+function srsCardKind(item) {
+  const rec = S.srs[srsKey(item.t, item.id)];
+  if (!rec || !rec.state) return 'new';
+  return rec.state === 2 ? 'due' : 'learn';
+}
+const SRS_KINDS = [['new', '新規', 'New'], ['learn', '学習中', 'Learning'], ['due', '復習', 'To review']];
+function reviewCounts(rv) {
+  const n = { new: 0, learn: 0, due: 0 };
+  for (const item of rv.queue.slice(rv.ix)) n[srsCardKind(item)] += 1;
+  const current = rv.queue[rv.ix] ? srsCardKind(rv.queue[rv.ix]) : null;
+  const box = el('div', 'anki-counts');
+  box.id = 'review-counts';
+  box.setAttribute('role', 'status');
+  box.setAttribute('aria-label', tx(`残り — 新規 ${n.new}・学習中 ${n.learn}・復習 ${n.due}`,
+    `left — ${n.new} new, ${n.learn} learning, ${n.due} to review`));
+  for (const [kind, ja, en] of SRS_KINDS) {
+    const c = el('span', `c-${kind}${current === kind ? ' now' : ''}`, String(n[kind]));
+    c.title = tx(ja, en);
+    box.append(c);
+  }
+  return box;
+}
+function deckCounts(due) {
+  const n = { new: 0, learn: 0, due: 0 };
+  for (const item of due) n[srsCardKind(item)] += 1;
+  const row = el('div', 'deck-counts');
+  row.id = 'deck-counts';
+  for (const [kind, ja, en] of SRS_KINDS) {
+    const cell = el('div', `deck-count c-${kind}`);
+    cell.append(el('span', 'deck-count-n', String(n[kind])));
+    cell.append(el('span', 'deck-count-l', tx(ja, en)));
+    row.append(cell);
+  }
+  return row;
+}
+/** The decks: named lists above the months that fill themselves — the lists page's own sections. */
+function srsDecks() {
+  const buckets = new Map();
+  for (const item of S.taken) {
+    const key = monthKey(item.ts || 0);
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(item);
+  }
+  return [
+    ...Object.entries(S.lists).map(([name, items]) => ({ name, items })),
+    ...[...buckets.entries()].map(([name, items]) => ({ name, items })),
+  ];
+}
+function renderDeckTable(main, due) {
+  const kindByKey = new Map(due.map((i) => [srsKey(i.t, i.id), srsCardKind(i)]));
+  const table = el('div', 'deck-table');
+  table.id = 'deck-table';
+  const head = el('div', 'deck-row deck-head');
+  head.setAttribute('aria-hidden', 'true');
+  head.append(el('span', 'd-name', tx('デッキ', 'Deck')));
+  for (const [kind, ja, en] of [['new', '新規', 'New'], ['learn', '学習', 'Learn'], ['due', '復習', 'Due']]) {
+    head.append(el('span', `c-${kind}`, tx(ja, en)));
+  }
+  table.append(head);
+  for (const deck of [{ name: tx('すべての札', 'All cards'), items: null }, ...srsDecks()]) {
+    const n = { new: 0, learn: 0, due: 0 };
+    for (const item of deck.items || S.taken) {
+      const kind = kindByKey.get(srsKey(item.t, item.id));
+      if (kind) n[kind] += 1;
+    }
+    const total = n.new + n.learn + n.due;
+    const row = el('button', 'deck-row' + (deck.items ? '' : ' deck-all'));
+    row.type = 'button';
+    row.disabled = !total || !scheduler;
+    row.dataset.deck = deck.items ? deck.name : '*';
+    row.setAttribute('aria-label', tx(`${deck.name} — 新規 ${n.new}・学習 ${n.learn}・復習 ${n.due}`,
+      `${deck.name} — ${n.new} new, ${n.learn} learning, ${n.due} due`));
+    row.append(el('span', 'd-name', deck.name));
+    for (const kind of ['new', 'learn', 'due']) row.append(el('span', `c-${kind}${n[kind] ? '' : ' zero'}`, String(n[kind])));
+    row.addEventListener('click', () => (deck.items ? startReview(deck.items) : startReview()));
+    table.append(row);
+  }
+  main.append(table);
+}
+function renderDeckDoors(main) {
+  const row = el('div', 'deck-doors');
+  for (const [id, view, ja, en] of [['deck-browse', 'browse', '札を探す', 'browse cards'], ['deck-stats', 'srs-stats', '統計', 'stats']]) {
+    const door = biLabel('button', 'chip deck-door', ja, en);
+    door.type = 'button';
+    door.id = id;
+    door.addEventListener('click', () => {
+      keepScroll();
+      S.view = view;
+      render();
+      window.scrollTo(0, 0);
+    });
+    row.append(door);
+  }
+  main.append(row);
+}
+function srsRoomBack(main) {
+  const back = biLabel('button', 'chip list-back', '← 復習', 'review');
+  back.type = 'button';
+  back.addEventListener('click', () => {
+    S.view = 'tray';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(back);
+}
+/** Anki's browser, simplified: every card, searchable, filtered by state, sorted, each row the
+ * same door and rest/wake toggle the lists page uses. */
+const BROWSE_FILTERS = [
+  ['all', 'すべて', 'all'], ['due', 'いま', 'due now'], ['new', '新規', 'new'], ['learn', '学習中', 'learning'],
+  ['review', '復習', 'review'], ['rest', '休み中', 'resting'], ['leech', '苦手', 'struggling'],
+];
+const BROWSE_SORTS = [['due', '期日', 'due date'], ['added', '追加順', 'newest added'], ['interval', '間隔', 'interval'], ['lapses', '忘れた回数', 'lapses'], ['word', '語順', 'word']];
+function renderBrowse(main) {
+  srsRoomBack(main);
+  main.append(withEn(el('p', 'eyebrow', '札を探す'), 'browse', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(`すべての札 — ${S.taken.length} 件`, `All cards — ${S.taken.length}`)));
+  const b = S.browse || (S.browse = { q: '', filter: 'all', sort: 'due', limit: 200 });
+  const q = el('input', 'browse-q');
+  q.type = 'search';
+  q.id = 'browse-q';
+  q.value = b.q;
+  q.placeholder = tx('語・読み・意味で探す', 'search a word, reading or meaning');
+  q.setAttribute('aria-label', tx('札を探す', 'search cards'));
+  const filters = el('div', 'browse-filters');
+  const sort = el('select', 'browse-sort');
+  sort.id = 'browse-sort';
+  sort.setAttribute('aria-label', tx('並べ方', 'sort by'));
+  for (const [value, ja, en] of BROWSE_SORTS) {
+    const o = el('option', null, tx(ja, en));
+    o.value = value;
+    o.selected = b.sort === value;
+    sort.append(o);
+  }
+  const count = el('p', 'fine browse-count');
+  count.setAttribute('role', 'status');
+  const list = el('div', 'browse-list');
+  const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
+  const facts = new Map(S.taken.map((item) => {
+    const answer = item.t === 'word' ? savedAnswerFor(item) : null;
+    const shown = answer?.status === 'available' ? answer : null;
+    return [item, {
+      reading: shown?.reading || '',
+      meaning: shown?.meanings?.[0] || '',
+    }];
+  }));
+  const matches = (item) => {
+    const key = srsKey(item.t, item.id);
+    const rec = S.srs[key];
+    const f = b.filter;
+    if (f === 'due' && !dueKeys.has(key)) return false;
+    if (f === 'new' && (rec || S.suspended[key])) return false;
+    if (f === 'learn' && !(rec && (rec.state === 1 || rec.state === 3))) return false;
+    if (f === 'review' && !(rec && rec.state === 2)) return false;
+    if (f === 'rest' && !S.suspended[key]) return false;
+    if (f === 'leech' && !isLeech(item)) return false;
+    const needle = b.q.trim().toLowerCase();
+    if (!needle) return true;
+    const fact = facts.get(item);
+    return [item.label, item.id, fact.reading, fact.meaning].some((s) => String(s || '').toLowerCase().includes(needle));
+  };
+  const sortKey = {
+    due: (item) => { const rec = S.srs[srsKey(item.t, item.id)]; return rec ? Date.parse(rec.due) : Number.MAX_SAFE_INTEGER; },
+    added: (item) => -(item.ts || 0),
+    interval: (item) => -(S.srs[srsKey(item.t, item.id)]?.scheduled_days || 0),
+    lapses: (item) => -(S.srs[srsKey(item.t, item.id)]?.lapses || 0),
+    word: null,
+  };
+  const paint = () => {
+    const hits = S.taken.filter(matches);
+    const keyOf = sortKey[b.sort];
+    if (keyOf) hits.sort((x, y) => keyOf(x) - keyOf(y));
+    else hits.sort((x, y) => String(x.label).localeCompare(String(y.label), 'ja'));
+    count.textContent = tx(`${hits.length} 件`, `${hits.length} card${hits.length === 1 ? '' : 's'}`);
+    list.replaceChildren();
+    for (const item of hits.slice(0, b.limit)) {
+      const line = trayLine(item, dueKeys);
+      const rec = S.srs[srsKey(item.t, item.id)];
+      const fact = facts.get(item);
+      const meta = el('span', 'browse-meta');
+      const bits = [];
+      if (fact.reading && fact.reading !== item.label) bits.push(fact.reading);
+      if (fact.meaning) bits.push(fact.meaning);
+      if (rec) {
+        bits.push(tx(`間隔 ${rec.scheduled_days || 0} 日`, `interval ${rec.scheduled_days || 0} d`));
+        if (rec.lapses) bits.push(tx(`忘れ ${rec.lapses}`, `lapses ${rec.lapses}`));
+      }
+      meta.textContent = bits.join(' · ');
+      line.append(meta);
+      list.append(line);
+    }
+    if (hits.length > b.limit) {
+      const more = biLabel('button', 'chip browse-more', 'もっと見る', `show ${Math.min(200, hits.length - b.limit)} more`);
+      more.type = 'button';
+      more.addEventListener('click', () => { b.limit += 200; paint(); });
+      list.append(more);
+    }
+  };
+  for (const [value, ja, en] of BROWSE_FILTERS) {
+    const chip = el('button', 'chip browse-filter' + (b.filter === value ? ' on' : ''), tx(ja, en));
+    chip.type = 'button';
+    chip.dataset.filter = value;
+    chip.setAttribute('aria-pressed', String(b.filter === value));
+    chip.addEventListener('click', () => {
+      b.filter = value;
+      b.limit = 200;
+      for (const other of filters.children) {
+        const on = other.dataset.filter === value;
+        other.classList.toggle('on', on);
+        other.setAttribute('aria-pressed', String(on));
+      }
+      paint();
+    });
+    filters.append(chip);
+  }
+  q.addEventListener('input', () => { b.q = q.value; b.limit = 200; paint(); });
+  sort.addEventListener('change', () => { b.sort = sort.value; paint(); });
+  const bar = el('div', 'browse-bar');
+  bar.append(q, sort);
+  main.append(bar, filters, count, list);
+  paint();
+}
+/** Anki's statistics, the parts a learner reads: today, the month's reviews, what is coming,
+ * where every card stands, and how often reviews are remembered. */
+function renderSrsStats(main) {
+  srsRoomBack(main);
+  main.append(withEn(el('p', 'eyebrow', '統計'), 'statistics', 'en-inline'));
+  main.append(el('h1', 'view-title', tx('復習の統計', 'Review statistics')));
+  const DAY = 86400000;
+  const now = new Date();
+  const today = S.stats[dayKey(now)] || {};
+  const todayN = today.n || 0;
+  const todayAgain = today.again || 0;
+  main.append(el('p', 'stats-today', todayN
+    ? tx(`今日 ${todayN} 枚 · もう一度 ${todayAgain} · 正答 ${Math.round(((todayN - todayAgain) / todayN) * 100)}%`,
+      `Today: ${todayN} card${todayN === 1 ? '' : 's'} studied · Again ${todayAgain} · ${Math.round(((todayN - todayAgain) / todayN) * 100)}% correct`)
+    : tx('今日はまだ復習していない。', 'No reviews yet today.')));
+  const counts = { new: 0, learn: 0, young: 0, mature: 0, rest: 0, unstarted: 0 };
+  for (const item of S.taken) {
+    const key = srsKey(item.t, item.id);
+    const rec = S.srs[key];
+    if (S.suspended[key]) counts.rest += 1;
+    else if (!rec) counts[finiteNumber(item.started) ? 'new' : 'unstarted'] += 1;
+    else if (rec.state === 1 || rec.state === 3) counts.learn += 1;
+    else if ((rec.scheduled_days || 0) >= 21) counts.mature += 1;
+    else counts.young += 1;
+  }
+  const standing = el('div', 'stats-standing');
+  for (const [kind, ja, en] of [['new', '新規', 'New'], ['learn', '学習中', 'Learning'], ['young', '若い', 'Young'], ['mature', '定着', 'Mature'], ['rest', '休み中', 'Resting'], ['unstarted', '未着手', 'Not started']]) {
+    if (kind === 'unstarted' && !counts.unstarted) continue;
+    const cell = el('div', `stats-cell s-${kind}`);
+    cell.append(el('span', 'stats-n', String(counts[kind])), el('span', 'stats-l', tx(ja, en)));
+    standing.append(cell);
+  }
+  main.append(withEn(el('p', 'eyebrow list-head', '札の状態'), 'where your cards stand', 'en-inline'), standing);
+  const bars = (title, en, values, labels, cls) => {
+    main.append(withEn(el('p', 'eyebrow list-head', title), en, 'en-inline'));
+    const chart = el('div', `stats-bars ${cls}`);
+    const max = Math.max(1, ...values);
+    values.forEach((v, i) => {
+      const col = el('div', 'stats-col');
+      col.title = `${labels[i]}: ${v}`;
+      const bar = el('i');
+      bar.style.height = `${Math.round((v / max) * 100)}%`;
+      col.append(bar);
+      chart.append(col);
+    });
+    main.append(chart);
+    main.append(el('p', 'fine stats-axis', `${labels[0]} … ${labels[labels.length - 1]} · ${tx('最大', 'max')} ${max}`));
+  };
+  const pastDays = [];
+  const pastLabels = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * DAY);
+    pastDays.push(S.stats[dayKey(d)]?.n || 0);
+    pastLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+  }
+  bars('この30日', 'reviews, last 30 days', pastDays, pastLabels, 'past');
+  const ahead = new Array(14).fill(0);
+  const aheadLabels = [];
+  const base = startOfDay(now);
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(base + i * DAY);
+    aheadLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+  }
+  for (const item of S.taken) {
+    const key = srsKey(item.t, item.id);
+    const rec = S.srs[key];
+    if (!rec || S.suspended[key]) continue;
+    const i = Math.max(0, Math.floor((startOfDay(new Date(rec.due)) - base) / DAY));
+    if (i < 14) ahead[i] += 1;
+  }
+  bars('これから14日', 'due, next 14 days', ahead, aheadLabels, 'ahead');
+  const revoked = new Set();
+  for (const row of S.revlog || []) if (row[2] === 0 && Number.isInteger(row[3])) revoked.add(row[3]);
+  let reviewed = 0;
+  let remembered = 0;
+  const since = now.getTime() - 30 * DAY;
+  (S.revlog || []).forEach((row, i) => {
+    if (revoked.has(i) || row[2] === 0 || row[0] < since || row[3] !== 2) return;
+    reviewed += 1;
+    if (row[2] > 1) remembered += 1;
+  });
+  main.append(withEn(el('p', 'eyebrow list-head', '定着率'), 'retention', 'en-inline'));
+  main.append(el('p', 'stats-retention', reviewed
+    ? tx(`この30日、復習 ${reviewed} 回のうち ${Math.round((remembered / reviewed) * 100)}% を思い出した。`,
+      `In the last 30 days you remembered ${Math.round((remembered / reviewed) * 100)}% of ${reviewed} review${reviewed === 1 ? '' : 's'}.`)
+    : tx('まだ復習（学習済みの札）の記録がない。', 'No reviews of learned cards yet.')));
+}
+/* Anki's keys: Space or Enter shows the answer, then 1–4 grade (Space or Enter = Good),
+ * Z or U takes the last grade back. Never while typing, never under an open sheet. */
+function reviewKeys(ev) {
+  if (S.view !== 'review' || !S.review || S.stack.length || S.strokes) return;
+  if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey || ev.repeat) return;
+  const target = ev.target;
+  if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  const plainKey = ev.key === ' ' || ev.key === 'Enter';
+  // a focused button answers its own Space and Enter
+  if (plainKey && target && target.closest && target.closest('button, a, [role="button"]')) return;
+  const press = (node) => {
+    if (!node || node.disabled) return;
+    ev.preventDefault();
+    node.click();
+  };
+  if (ev.key === 'z' || ev.key === 'u') {
+    press(document.querySelector('.review-undo'));
+    return;
+  }
+  if (!S.review.revealed) {
+    if (plainKey) press(document.getElementById('reveal'));
+    return;
+  }
+  const grade = { 1: 'again', 2: 'hard', 3: 'good', 4: 'easy' }[ev.key] || (plainKey ? 'good' : null);
+  if (grade) press(document.querySelector(`.grade-row .grade.g-${grade}`));
+}
+document.addEventListener('keydown', reviewKeys);
 /* The quiet beat between learning steps: every remaining card is a short
  * step that hasn't ripened. The glass keeps its zen — a soft count, one way
  * out — and turns the next card over by itself the moment the step matures.
  * Beats longer than this are pulled early instead of held. */
-const REVIEW_WAIT_HOLD_MS = 90000;
+// Anki shows a ripening learning card at once (its learn-ahead) — the countdown beat made the
+// operator wait a minute mid-session (2026-09-28), so no step is held any more
+const REVIEW_WAIT_HOLD_MS = 0;
 let reviewWaitTimer = null;
 function renderReviewWait(main, rv, nearestDueMs) {
   const progress = el('div', 'zen-progress');
@@ -25135,6 +25454,27 @@ function buildGingaChrome(root) {
   root.append(seal);
   if (S.sealWake) S.sealWake = false;
 
+  // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
+  // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
+  if (S.view === 'drift' && S.taken.length && scheduler) {
+    const waiting = srsDueItems().length;
+    const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
+      waiting ? `復習 ${waiting}` : '復習', waiting ? `review · ${waiting} due` : 'review');
+    pill.type = 'button';
+    pill.id = 'home-review';
+    pill.setAttribute('data-drift-chrome', '');
+    pill.addEventListener('click', () => {
+      S.navOpen = false;
+      keepScroll();
+      S.stack = [];
+      S.trayFrom = { view: 'drift', scroll: 0 };
+      S.view = 'tray';
+      render();
+      window.scrollTo(0, 0);
+    });
+    root.append(pill);
+  }
+
   // the search ghost — one tap from ANY screen into the search room with the
   // keyboard already raised (operator, 2026-08-27: "I hear a word and need
   // rapid access"). It stands beside the world seal, same barely-there skin,
@@ -25654,6 +25994,8 @@ function render() {
     else if (S.view === 'reader') renderReader(main);
     else if (S.view === 'tray') renderTray(main);
     else if (S.view === 'list') renderListPage(main);
+    else if (S.view === 'browse') renderBrowse(main);
+    else if (S.view === 'srs-stats') renderSrsStats(main);
     else if (S.view === 'review') renderReview(main);
     else if (S.view === 'probe') renderProbe(main);
     else if (S.view === 'archive') renderArchive(main);
