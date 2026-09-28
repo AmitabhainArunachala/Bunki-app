@@ -194,8 +194,7 @@ export function createGuidedSession(host) {
         }
         failure = null;
         void moments?.preload();
-        after = { top: true };
-        host.render();
+        // enrolment starts before the draw, so the draw already holds 外す while cards are written
         if (
           state.learn.some(
             (row) => !row.removed && row.cards.some((card) => card.status === 'pending'),
@@ -203,6 +202,8 @@ export function createGuidedSession(host) {
         ) {
           void enrolPending();
         }
+        after = { top: true };
+        host.render();
       })
       .catch((error) => {
         failure = error;
@@ -323,20 +324,32 @@ export function createGuidedSession(host) {
     return `<span class="gs-card" data-card="${esc(key)}" data-deck="${kind}"><b lang="ja">覚 ${title}</b> <span>${text}</span></span>`;
   }
 
+  /* Every write re-reads the live rows: emit replaces the state, so a walk over the rows it
+   * started with never saw a later change, and a call made while a walk runs was dropped — the
+   * rows a later FINISH gathered stayed "adding to your deck…" until a reload. Each card is tried
+   * once per walk. 外す waits while the walk runs (toggleRow), so no card lands on a removed row. */
   async function enrolPending() {
-    if (enrolling) return;
+    const tried = new Set();
+    const nextPending = () => {
+      for (const row of state.learn) {
+        if (row.removed) continue;
+        const card = row.cards.find(
+          (entry) => entry.status === 'pending' && !tried.has(`${row.id}|${entry.key}`),
+        );
+        if (card) return { id: row.id, key: card.key };
+      }
+      return null;
+    };
+    if (enrolling || !nextPending()) return;
     enrolling = true;
     let added = 0;
     try {
-      for (const row of state.learn) {
-        if (row.removed) continue;
-        for (const card of row.cards) {
-          if (card.status !== 'pending') continue;
-          const node = nodeOf(card.key);
-          const status = await host.deck.add(node, host.deck.title(node));
-          emit('CARD_RESULT', { id: row.id, card: card.key, status });
-          if (status === 'added') added += 1;
-        }
+      for (let next = nextPending(); next; next = nextPending()) {
+        tried.add(`${next.id}|${next.key}`);
+        const node = nodeOf(next.key);
+        const status = await host.deck.add(node, host.deck.title(node));
+        emit('CARD_RESULT', { id: next.id, card: next.key, status });
+        if (status === 'added') added += 1;
       }
     } finally {
       enrolling = false;
@@ -353,7 +366,7 @@ export function createGuidedSession(host) {
 
   async function toggleRow(id) {
     const row = learnRow(id);
-    if (!row || row.reviewed || deckBusy) return;
+    if (!row || row.reviewed || deckBusy || enrolling) return;
     deckBusy = true;
     notice = '';
     try {
@@ -827,7 +840,7 @@ export function createGuidedSession(host) {
           ? textBtn(
               row.removed ? bi('戻す', 'restore') : bi('外す', 'remove'),
               'undo',
-              `data-id="${esc(q.id)}" ${deckBusy ? 'disabled' : ''}`,
+              `data-id="${esc(q.id)}" ${deckBusy || enrolling ? 'disabled' : ''}`,
             )
           : '';
         return `<div class="gs-row ${cls}" data-learn-row="${esc(q.id)}"><span class="gs-row-number">${i + 1}</span><div><h3><span lang="ja">${esc(q.target.label)}</span> <span class="gs-gap-tag"><b lang="ja">${esc(q.gap.ja)}</b>${english() ? `<small class="gs-gloss">${esc(q.gap.en)}</small>` : ''}</span></h3><p>${status}</p><p class="gs-cards">${cards}</p>${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${i}"`)}</div><div class="gs-row-actions">${practise}${undo}</div></div>`;
@@ -1248,8 +1261,8 @@ export function createGuidedSession(host) {
             cards: entry.cards.map(keyOf),
           })),
         });
-        redraw({ top: true });
         void enrolPending();
+        redraw({ top: true });
         return;
       case 'undo':
         void toggleRow(b.dataset.id);

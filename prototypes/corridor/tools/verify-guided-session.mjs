@@ -1188,7 +1188,78 @@ async function held(browser, browserName) {
   const errors = [];
   watchErrors(page, errors);
   try {
+    // 外す while the deck write of an earlier row is still out, then a later FINISH
+    await mountHeld(page);
+    await page.evaluate(
+      async ({ key, ids }) => {
+        const engine = await import('/guided-session-engine.mjs');
+        const at = Date.now();
+        const correct = [0, 1, 0, 2, 3, 0];
+        const missed = new Set([0, 1, 4]);
+        let state = engine.createGuidedState('kairo-guided-n2-living-thread-01', ids);
+        state = engine.reduceGuidedState(state, { type: 'START', at, source: 'held-probe' });
+        ids.forEach((id, i) => {
+          const choice = missed.has(i) ? (correct[i] + 1) % 4 : correct[i];
+          state = engine.reduceGuidedState(state, { type: 'COMMIT', id, choice, correct: !missed.has(i), at, source: 'held-probe' });
+        });
+        state = engine.reduceGuidedState(state, { type: 'NAVIGATE', view: 'summary', at, source: 'held-probe' });
+        engine.saveGuidedState(localStorage, key, state);
+      },
+      { key: KEY, ids: Q },
+    );
+    await mountHeld(page);
+    await act(page, 'finish').click();
+    await page.waitForFunction(() => window.__heldProbe.pending.length === 1, null, { timeout: 10_000 });
+    const q09 = Q[4];
+    const removeDoor = page.locator(`.guided-room [data-action="undo"][data-id="${q09}"]`);
+    check('H1 外す is not offered while the room is still writing its cards', await removeDoor.isDisabled());
+    await page.evaluate((id) => document.querySelector(`.guided-room [data-action="undo"][data-id="${id}"]`)?.click(), q09);
+    // a later FINISH while the first write is still out: flag q10, walk to the summary, gather again
+    await act(page, 'source', '[data-index="4"]').click();
+    await act(page, 'source', '[data-index="5"]').click();
+    await act(page, 'flag').click();
+    await act(page, 'next').click();
+    await act(page, 'finish').click();
+    await releaseAll(page);
+    const settled = await page.evaluate(() => window.__heldProbe.snapshot());
+    const row = (id) => settled.learn.find((entry) => entry.id === id);
+    const deckNow = await heldDeck(page);
+    check(
+      'H2 a row the learner tried to remove mid-write is not left removed with its cards in the deck',
+      !(row(q09)?.removed && ['word:受付', 'word:済ませる'].some((key) => deckNow.includes(key))),
+      JSON.stringify({ removed: row(q09)?.removed, deck: deckNow }),
+    );
+    check(
+      'H3 a row gathered by a later FINISH is enrolled in the same pass',
+      row(Q[5])?.cards.every((card) => card.status === 'added') && deckNow.includes('word:限り'),
+      JSON.stringify(row(Q[5])),
+    );
+    check(
+      'H4 nothing is left "adding to your deck…"',
+      settled.learn.every((entry) => entry.cards.every((card) => card.status !== 'pending')) &&
+        (await page.locator('.guided-room .gs-card[data-deck="pending"]').count()) === 0,
+      JSON.stringify(settled.learn.map((entry) => entry.cards.map((card) => card.status))),
+    );
+    await page.waitForFunction(
+      (id) => !document.querySelector(`.guided-room [data-action="undo"][data-id="${id}"]`)?.disabled,
+      q09,
+      { timeout: 10_000 },
+    );
+    await removeDoor.click();
+    await releaseAll(page);
+    const after = await page.evaluate(() => window.__heldProbe.snapshot());
+    const deckAfter = await heldDeck(page);
+    check(
+      'H5 once the deck is quiet, 外す takes exactly that row\'s cards out',
+      after.learn.find((entry) => entry.id === q09)?.removed &&
+        !deckAfter.includes('word:受付') &&
+        !deckAfter.includes('word:済ませる') &&
+        ['word:点検', 'word:支障', 'word:限り'].every((key) => deckAfter.includes(key)),
+      JSON.stringify(deckAfter),
+    );
+
     // saved bytes that are not JSON: kept aside, never overwritten, and saving still works
+    await page.evaluate(() => localStorage.clear());
     const broken = '{"set":"kairo-guided-n2-living-thread-01","answers":{';
     await mountHeld(page, { seedBytes: broken });
     const footer = await page.locator('#guided-save-status').innerText();
