@@ -4090,7 +4090,7 @@ function ensureArchiveIndex() {
 
 function renderArchive(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
-  main.append(withEn(el('h1', 'view-title', '新聞アーカイブ'), 'the newspaper archive', 'en-inline'));
+  main.append(withEn(el('h1', 'view-title', '過去のニュース · 新聞アーカイブ'), 'older news · the newspaper archive', 'en-inline'));
   if (!D.archive) {
     main.append(el('p', 'gloss', tx('棚をひらいています…', 'Opening the stack…')));
     if (D.archiveError) {
@@ -4123,7 +4123,8 @@ function renderArchive(main) {
   main.append(sub);
   S.archiveYears ||= new Set();
   for (const y of [...years.keys()].sort().reverse()) {
-    const list = years.get(y);
+    // newest first inside the year too (operator, 2026-09-28)
+    const list = [...years.get(y)].sort(byNewest);
     const open = S.archiveYears.has(y);
     const toggle = el('button', 'details-toggle archive-year');
     // every fold says whether it is open — four of the five did not, so a
@@ -5137,6 +5138,7 @@ function renderShelfBody() {
       )
     : tx(`${curated.length} 本。触れてひらく。`, `${curated.length} readings. Tap one to read it.`);
   main.append(sub);
+  renderShelfFresh(main, curated);
   main.append(renderReadingPlaces());
   renderSentenceReadingSuggestions(main);
 
@@ -5326,18 +5328,25 @@ function renderShelfBody() {
     main.append(strip);
   }
 
-  // one shelf, quiet sections: cards keep the index's own order inside each
-  // section, and sections stand in the order the index first names them —
-  // the categories gather without anything being reshuffled
+  // one shelf, quiet sections. News leads and every section reads newest
+  // first (operator, 2026-09-28: "the articles are all old and the same old
+  // shit"); undated texts keep the index's order after the dated ones, and
+  // the undated Bunki essays and the glossary stand last — reachable, not on top
   const sections = new Map();
   for (const p of curated) {
     const sec = shelfSection(p);
     if (!sections.has(sec.ja)) sections.set(sec.ja, { sec, items: [] });
     sections.get(sec.ja).items.push(p);
   }
-  for (const { sec, items } of sections.values()) {
-    main.append(withEn(el('p', 'eyebrow shelf-section', sec.ja), sec.en, 'en-inline'));
-    for (const p of items) main.append(shelfCard(p));
+  const place = (ja) => {
+    const at = SHELF_SECTION_ORDER.indexOf(ja);
+    return at < 0 ? SHELF_SECTION_ORDER.length : at;
+  };
+  for (const { sec, items } of [...sections.values()].sort((a, b) => place(a.sec.ja) - place(b.sec.ja))) {
+    const head = withEn(el('p', 'eyebrow shelf-section', sec.ja), sec.en, 'en-inline');
+    if (sec.ja === 'ニュース') head.id = 'shelf-news';
+    main.append(head);
+    for (const p of [...items].sort(byNewest)) main.append(shelfCard(p));
   }
 
   // the deep stack: the frozen wikinews archive, its own quiet room —
@@ -5347,8 +5356,8 @@ function renderShelfBody() {
     arc.type = 'button';
     arc.id = 'archive-link';
     arc.append(
-      el('span', 'l-ja', '新聞アーカイブ'),
-      el('span', 'en-sub', bi() ? 'the newspaper archive · 2005–2026' : 'ウィキニュース 2005–2026'),
+      el('span', 'l-ja', '過去のニュース · 新聞アーカイブ'),
+      el('span', 'en-sub', bi() ? 'older news · the 2005–2026 archive, newest first' : 'ウィキニュース 2005–2026 · 新しい順'),
     );
     arc.addEventListener('click', () => {
       keepScroll();
@@ -6792,10 +6801,103 @@ function renderFeed(main) {
   }
 }
 
+/* ------------------------------------------------ freshness on the shelf
+ * A reading's date counts only when it is an ISO calendar day; a publication
+ * note that is not a date (青空文庫's 初出 line) stays text, never a sort key. */
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+const shelfDay = (p) => (ISO_DAY.test(String(p?.date || '')) ? p.date : '');
+const SHELF_SECTION_ORDER = ['ニュース', '青空文庫', '古典・一次資料', '段階別読み物', '随筆', 'やさしい日本語 用語集'];
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Newest first; within one day the later publication first; undated last,
+ * in the order they arrived (Array#sort is stable). */
+function byNewest(a, b) {
+  const da = shelfDay(a);
+  const db = shelfDay(b);
+  if (da !== db) {
+    if (!da) return 1;
+    if (!db) return -1;
+    return da < db ? 1 : -1;
+  }
+  return (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0);
+}
+
+/** Days since a calendar day, counted on the reader's own calendar. */
+function dayAge(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  const now = new Date();
+  return Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(y, m - 1, d)) / 86400000);
+}
+
+function shelfDateLabel(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  const age = dayAge(day);
+  const when =
+    age === 0 ? tx('今日', 'today') : age === 1 ? tx('昨日', 'yesterday') : age > 1 && age < 7 ? tx(`${age}日前`, `${age} days ago`) : '';
+  const base = bi() ? `${d} ${MONTHS_EN[m - 1]} ${y}` : `${y}年${m}月${d}日`;
+  return when ? `${base} · ${when}` : base;
+}
+
+function dateStamp(day, cls) {
+  const stamp = el('time', cls, shelfDateLabel(day));
+  stamp.dateTime = day;
+  return stamp;
+}
+
+/** 新着 — the newest dated news at the very top of the shelf, before the
+ * room doors, with the whole news run and the older-news archive one tap
+ * away. A recommendation strip: its cards repeat readings that live in the
+ * ニュース section below. */
+function renderShelfFresh(main, curated) {
+  const news = curated.filter((p) => shelfSection(p).ja === 'ニュース' && shelfDay(p)).sort(byNewest);
+  if (!news.length) return;
+  const recent = news.filter((p) => dayAge(shelfDay(p)) <= 14).length;
+  main.append(withEn(el('p', 'eyebrow shelf-fresh-head', '新着ニュース'), 'latest news · newest first', 'en-inline'));
+  main.append(
+    el(
+      'p',
+      'shelf-fresh-note',
+      tx(
+        `この2週間の読み物 ${recent} 本 · 最新は ${shelfDateLabel(shelfDay(news[0]))}`,
+        `${recent} readings from the last two weeks · newest ${shelfDateLabel(shelfDay(news[0]))}`,
+      ),
+    ),
+  );
+  const strip = el('div', 'shelf-fresh-strip');
+  strip.id = 'shelf-fresh';
+  for (const p of news.slice(0, 8)) {
+    const card = shelfCard(p);
+    card.dataset.recommendation = 'fresh';
+    strip.append(card);
+  }
+  main.append(strip);
+  const all = biLabel('button', 'grammar-link', `ニュースをすべて新しい順に · ${news.length} 本`, `all ${news.length} news readings, newest first`);
+  all.type = 'button';
+  all.id = 'shelf-news-all';
+  all.addEventListener('click', () => document.getElementById('shelf-news')?.scrollIntoView({ block: 'start' }));
+  main.append(all);
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    const older = el('button', 'grammar-link');
+    older.type = 'button';
+    older.id = 'archive-link-top';
+    older.append(
+      el('span', 'l-ja', '過去のニュース'),
+      el('span', 'en-sub', bi() ? 'older news · 2005–2026, newest first' : 'ウィキニュース 2005–2026 · 新しい順'),
+    );
+    older.addEventListener('click', () => {
+      keepScroll();
+      S.view = 'archive';
+      render();
+      window.scrollTo(0, 0);
+    });
+    main.append(older);
+  }
+}
+
 /** The shelf's quiet sections, named from each record's own provenance —
  * no code-side canon that the data could contradict. */
 function shelfSection(p) {
-  if (p.source === 'ja.wikinews') return { ja: 'ニュース', en: 'news' };
+  if (p.source === 'ja.wikinews' || p.lane === 'news') return { ja: 'ニュース', en: 'news' };
   if (p.source === 'aozorabunko-clean') return { ja: '青空文庫', en: 'Aozora Bunko' };
   if (p.source === 'isa-yasashii-glossary') {
     return { ja: 'やさしい日本語 用語集', en: 'the plain-Japanese glossary — one-line definitions' };
@@ -6831,10 +6933,14 @@ function shelfCard(p) {
   open.append(head);
 
   const meta = el('div', 'shelf-meta');
+  // the date leads, so freshness reads at a glance (2026-09-28)
+  const day = shelfDay(p);
+  if (day) meta.append(dateStamp(day, 'shelf-date'));
   meta.append(el('span', null, p.sourceLabel));
   // an absent date stays absent — a stringified null ("None") is data rot,
-  // never provenance, and must not stand in the card's meta line (R3-E)
-  if (p.date && p.date !== 'None') meta.append(el('span', null, p.date));
+  // never provenance, and must not stand in the card's meta line (R3-E);
+  // a publication note that is not a calendar day stays as written
+  if (!day && p.date && p.date !== 'None') meta.append(el('span', null, p.date));
   meta.append(el('span', 'pool-tag', p.licence));
   // an honest kind on the rows that are not articles
   if (p.source === 'isa-yasashii-glossary') {
@@ -7808,6 +7914,11 @@ function renderReader(main) {
   // heading itself still reads as the Japanese title alone.
   main.append(el('h1', 'view-title', p.title));
   if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
+  if (shelfDay(p)) {
+    const dated = el('p', 'reader-date');
+    dated.append(dateStamp(shelfDay(p), 'shelf-date'));
+    main.append(dated);
+  }
   const lv = levelPhrase(p.grading);
   const levelLine = el('div', 'level-line');
   levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
