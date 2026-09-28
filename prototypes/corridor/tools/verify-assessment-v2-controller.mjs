@@ -115,6 +115,27 @@ check('malformed, tampered, unsupported and accessor inputs fail without executi
   assert.throws(() => api.parseAssessmentLibraryV2(getter));
   assert.equal(called, false);
 });
+// A stored library is read back from JSON on every write. A reused (cached) finished attempt comes
+// back as the identical frozen object; a re-validated one is a new object, so identity tells a hit
+// from a re-hash. 511 finished attempts stay under the old 512 cap (the active attempt's churn
+// alone evicted them); 600 are past it.
+for (const count of [511, 600]) {
+  check(`${count} finished attempts stay reused while the active attempt is written`, () => {
+    const finished = Array.from({ length: count }, (_, i) =>
+      JSON.parse(JSON.stringify(command(start(`attempt:finished-${count}-${i}`), { kind: 'abandon' }, 10).attempts[0])));
+    const active = JSON.parse(JSON.stringify(start(`attempt:active-${count}`).attempts[0]));
+    const stored = (library) => api.parseAssessmentLibraryV2(JSON.parse(JSON.stringify(library)), { scope });
+    let library = stored({ format: 'kairo-assessment-library', v: 2, scope, forms: [form],
+      attempts: [...finished, active], activeAttemptId: active.attemptId });
+    const first = library.attempts.slice(0, count);
+    for (let write = 1; write <= 3; write += 1) {
+      library = stored(command(library, { kind: 'answer', itemId: items[0].id,
+        response: { kind: 'selected', optionId: write % 2 ? 'a' : 'b' } }, write * 100));
+    }
+    const reused = library.attempts.slice(0, count).filter((attempt, i) => attempt === first[i]).length;
+    assert.equal(reused, count, `after 3 writes, ${reused} of ${count} finished attempts were reused`);
+  });
+}
 
 const digest = (value) => createHash('sha256').update(value).digest('hex');
 writeFileSync(resolve(stage, 'result.json'), `${JSON.stringify({
