@@ -625,12 +625,14 @@ class GovAdapter:
 
     def extract_from(self, res: Response, root: Node, stub: dict) -> Item | None:
         url = stub["url"]
+        # the page's own title and date first: container() may cut both out of
+        # the tree (the MHLW/MEXT release header), leaving only the feed's
+        title = self.page_title(root, stub["title"])
+        day = self.page_date(root, title)
         box = self.container(root)
         if box is None:
             self.skip(url, "article container not found (template changed?)")
             return None
-        title = self.page_title(root, stub["title"])
-        day = self.page_date(root, title)
         lines = [line for line in clean_lines(block_lines(box), self.stop) if line != title]
         lines = rejoin_wrapped(self.trim_header(lines))
         if not lines:

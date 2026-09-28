@@ -106,6 +106,29 @@ def test_mhlw_container_drops_the_release_header_and_reader_note():
     assert fs.block_lines(adapter.container(root)) == ["厚生労働省は、運用を開始します。"]
 
 
+@pytest.mark.parametrize("adapter, html", [
+    (fs.MhlwAdapter, """<body><div class="l-contentMain">
+      <div class="m-boxInfo"><p class="m-boxInfo__date">令和8年9月22日（火）</p><p>照会先</p></div>
+      <p class="m-txtM">報道関係者　各位</p><div><h1 class="m-hdgLv1__hdg">ページの題</h1></div>
+      <div class="m-grid"><p>厚生労働省は、運用を開始します。</p></div></div></body>"""),
+    (fs.MextAdapter, """<body><div id="contentsMain"><h1>ページの題</h1><p class="right">令和8年9月22日</p>
+      <p>文部科学省は、運用を開始します。</p></div></body>"""),
+])
+def test_release_title_and_date_are_the_pages_own_not_the_feeds(adapter, html):
+    # extract_from, not page_date: container() cuts the h1 and the date stamp
+    # out of the tree, so they have to be read before it runs
+    stub = {"url": "https://www.example.go.jp/newpage_99999.html", "title": "フィードの題",
+            "published": datetime(2026, 9, 24, 14, tzinfo=fs.JST)}
+    item = adapter().extract_from(fs.Response(stub["url"], 200, "text/html", html.encode()), fs.parse_html(html), stub)
+    assert (item.title, item.date) == ("ページの題", "2026-09-22")
+    assert len(item.paragraphs) == 1 and item.paragraphs[0].endswith("運用を開始します。")
+    assert "「ページの題」" in item.attribution and "フィードの題" not in item.attribution
+    # control: a page with neither keeps the feed's title and listing date
+    bare = html.replace("<h1", "<h2").replace("</h1>", "</h2>").replace("9月22日", "")
+    item = adapter().extract_from(fs.Response(stub["url"], 200, "text/html", bare.encode()), fs.parse_html(bare), stub)
+    assert (item.title, item.date) == ("フィードの題", "2026-09-24")
+
+
 def test_env_header_trim():
     lines = ["この記事を印刷", "2026年09月25日", "自然環境", "＜兵庫県・神戸市同時発表＞", "本文です。"]
     assert fs.EnvAdapter().trim_header(lines) == ["＜兵庫県・神戸市同時発表＞", "本文です。"]
