@@ -23064,9 +23064,13 @@ function startStrokeAnimation(page) {
     return;
   }
 
-  const GAP = 90;
+  // ゆっくり governs this hand too: it is the only writing a device without WebGL/WebGPU ever
+  // sees, and the corner stood there pressed while it ran at one speed (PR #77 007479d0). The
+  // default speed keeps the classic timing exactly.
+  const pace = STROKE_SPEED_DEFAULT / strokeSpeed();
+  const GAP = 90 * pace;
   const durations = paths.map((path) =>
-    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)),
+    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)) * pace,
   );
   const starts = [];
   let acc = 0;
@@ -24281,10 +24285,15 @@ function renderStrokePage(root) {
       const numbersCorner = strokeNumbersControl(page, reduced);
       numbersCorner.classList.add('stroke-corner', 'stroke-corner-br');
       page.append(numbersCorner);
-      const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
-      speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
-      page.append(speedCorner);
-      page.querySelector('#stroke-awake-field')?.append(speedSlider);
+      // ゆっくり paces the writing. Under reduced motion nothing is written over time, so it is
+      // not offered, rather than standing in its corner reporting itself pressed while it
+      // governs nothing (PR #77 007479d0)
+      if (!reduced) {
+        const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
+        speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
+        page.append(speedCorner);
+        page.querySelector('#stroke-awake-field')?.append(speedSlider);
+      }
     }
     setStrokeChrome(page, S.strokeChromeAwake);
   }
