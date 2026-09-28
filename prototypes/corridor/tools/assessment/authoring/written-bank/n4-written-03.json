@@ -1,0 +1,409 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N4",
+  "number": 3,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "わたしの　アルバイト\n　わたしは　大学の　近くの　パン屋で　アルバイトを　して　います。朝　六時から　九時まで　はたらいて、それから　大学へ　行きます。朝　早く　起きるのは　たいへんですが、やきたての　パンの　においが　大好きです。\n　はじめは　パンの　名前が　なかなか　おぼえられませんでした。（１）、店長が　パンの　名前と　ねだんを　書いた　紙を　作って　くれました。毎日　その　紙を　見て　いたので、今は　全部　（２）。",
+    "s1": "あしたの　ハイキングに　ついて\n　天気よほうでは、あしたは　午前中　雨で、午後から　晴れるそうです。それで、ハイキングは　朝　九時では　なく、午後一時に　しゅっぱつする　ことに　しました。あつまる　場所は　かわりません。駅の　前です。\nたなか",
+    "s2": "アルバイトの　みなさんへ\n　来月から、店の　開く　時間が　午前十時から　午前九時に　かわります。朝の　アルバイトの　人は、今までより　一時間　早く　来て　ください。店が　しまる　時間は　今までと　同じ　午後八時です。\n店長",
+    "s3": "　わたしの　しゅみは　料理です。週末は　よく　友だちを　よんで、いっしょに　食べます。先週は　はじめて　パンを　作って　みました。形は　あまり　よく　ありませんでしたが、友だちは「おいしい」と　言って　くれました。来週は　ケーキに　ちょうせんする　つもりです。",
+    "m1": "新しい　町\n　先月、わたしは　家族と　東京から　北の　ほうに　ある　小さな　町へ　ひっこしました。父の　仕事が　かわったからです。\n　はじめは、ひっこしたくないと　思って　いました。東京には　友だちが　たくさん　いましたし、町には　大きい　デパートも　えいがかんも　ありません。\n　でも、今は　この　町が　好きに　なりました。家の　近くに　川が　あって、夏は　そこで　魚を　つったり、およいだり　できます。それに、町の　人たちが　とても　しんせつです。となりの　おばさんは、わたしたちが　ひっこして　きた　日に、野菜を　たくさん　持って　きて　くれました。\n　冬は　雪が　多くて　さむいそうです。わたしは　雪を　あまり　見た　ことが　ないので、今から　楽しみに　して　います。",
+    "info": "アルバイト　ぼしゅう\n【パン屋　ひまわり】\n　仕事：パンを　売る　仕事\n　時間：午前７時～１１時\n　日：月曜日～土曜日（週３日から）\n　お金：１時間　１，１００円\n【レストラン　さくら】\n　仕事：料理を　はこぶ　仕事\n　時間：午後５時～１０時\n　日：土曜日・日曜日（週１日から）\n　お金：１時間　１，３００円\n　※　１８さい　以上\n【図書館】\n　仕事：本を　たなに　もどす　仕事\n　時間：午前１０時～午後２時\n　日：火曜日と　木曜日\n　お金：１時間　１，０５０円\n【スーパー　みどり】\n　仕事：品物を　ならべる　仕事\n　時間：午前６時～９時\n　日：毎日（週２日から）\n　お金：１時間　１，１５０円"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nあしたは　【台風】が　来るので、学校は　休みです。",
+      "options": [
+        "だいふう",
+        "たいふう",
+        "たいふ",
+        "だいふ"
+      ],
+      "answer": 1,
+      "rationale": "「台風」は「たいふう」と読む。「だい」とにごらない。\nThe word 台風 is read taifuu and means typhoon.",
+      "target": "台風"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nアルバイトの　【経験】が　ありますか。",
+      "options": [
+        "けいげん",
+        "きょうけん",
+        "けいけん",
+        "けいかん"
+      ],
+      "answer": 2,
+      "rationale": "「経験」は「けいけん」と読む。前に何かをしたことだ。\nThe word 経験 is read keiken and means experience.",
+      "target": "経験"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n午後から　大切な　【会議】が　あります。",
+      "options": [
+        "かいき",
+        "がいぎ",
+        "かいぎょう",
+        "かいぎ"
+      ],
+      "answer": 3,
+      "rationale": "「会議」は「かいぎ」と読む。人が集まって話し合うことだ。\nThe word 会議 is read kaigi and means meeting.",
+      "target": "会議"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n来月、会社の　近くに　【ひっこす】　ことに　なりました。",
+      "options": [
+        "引っ越す",
+        "引っ超す",
+        "弓っ越す",
+        "引っ趣す"
+      ],
+      "answer": 0,
+      "rationale": "「ひっこす」は「引っ越す」と書く。「超」「趣」「弓」はまちがい。\nThe verb hikkosu (to move house) is written 引っ越す.",
+      "target": "引っ越す"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n週末は　友だちと　ピアノの　【こんさーと】に　行きます。",
+      "options": [
+        "コンサード",
+        "コソサート",
+        "コンサート",
+        "ユンサート"
+      ],
+      "answer": 2,
+      "rationale": "「こんさーと」はカタカナで「コンサート」と書く。\nThe word konsaato (concert) is written コンサート in katakana.",
+      "target": "コンサート"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nあしたは　天気が　いいので、せんたくものが　よく　（　）でしょう。",
+      "options": [
+        "ぬれる",
+        "かわく",
+        "ひえる",
+        "やける"
+      ],
+      "answer": 1,
+      "rationale": "天気がいいと、せんたくものは「よくかわく」。\nKawaku means to dry, which laundry does on a sunny day.",
+      "target": "乾く"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n仕事が　終わらなかったので、きのうは　夜　おそくまで　会社に　（　）。",
+      "options": [
+        "のこりました",
+        "もどりました",
+        "かよいました",
+        "むかいました"
+      ],
+      "answer": 0,
+      "rationale": "仕事が終わらず、帰らないで会社にいたので「のこりました」が入る。\nNokoru means to stay behind, here at the office until late.",
+      "target": "残る"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nわたしの　（　）は　古い　きってを　集める　ことです。",
+      "options": [
+        "ねだん",
+        "きぶん",
+        "どうぐ",
+        "しゅみ"
+      ],
+      "answer": 3,
+      "rationale": "好きで楽しんですることは「しゅみ」だ。\nShumi means a hobby, something you enjoy doing in your free time.",
+      "target": "趣味"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n【最近】、よく　雨が　ふります。",
+      "options": [
+        "きのうから、よく　雨が　ふります。",
+        "このごろ、よく　雨が　ふります。",
+        "むかしは、よく　雨が　ふりました。",
+        "これから、よく　雨が　ふります。"
+      ],
+      "answer": 1,
+      "rationale": "「最近」は「このごろ」と同じ意味だ。\nSaikin means recently, the same as konogoro.",
+      "target": "最近"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n新しい　町の　生活に　【慣れる】　ことが　できました。",
+      "options": [
+        "新しい　町の　生活が　もっと　たいへんに　なりました。",
+        "新しい　町の　生活を　はじめる　ことが　できませんでした。",
+        "新しい　町の　生活が　つまらなく　なりました。",
+        "新しい　町の　生活が　たいへんでは　なく　なりました。"
+      ],
+      "answer": 3,
+      "rationale": "「慣れる」は、はじめはたいへんだったことが、ふつうになることだ。\nNareru means to get used to something, so it is no longer hard.",
+      "target": "慣れる"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "つぎの　ことばの　つかいかたで　いちばん　いい　ものを　えらんで　ください。\n【届ける】",
+      "options": [
+        "毎朝　七時に　会社へ　届けます。",
+        "この　ボタンを　届けると、ドアが　開きます。",
+        "おとした　さいふを　交番に　届けました。",
+        "天気が　いいので、せんたくものを　外に　届けました。"
+      ],
+      "answer": 2,
+      "rationale": "「届ける」は、物を人やところへ持っていくことだ。1は「行きます」、2は「押す」、4は「干しました」が正しい。\nTodokeru means to take something to a person or place, like a lost wallet to a police box.",
+      "target": "届ける"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nとなりの　へやから　音が　聞こえます。だれか　いる（　）です。",
+      "options": [
+        "よう",
+        "ばかり",
+        "つもり",
+        "まま"
+      ],
+      "answer": 0,
+      "rationale": "聞こえた音から考えて言うので「〜ようです」を使う。\nYou da expresses a guess based on what you hear: someone seems to be there.",
+      "subject": "grammar:youda"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nきのう　雨に　（　）、かぜを　ひいて　しまいました。",
+      "options": [
+        "ふって",
+        "ふらせて",
+        "ふられて",
+        "ふりそうで"
+      ],
+      "answer": 2,
+      "rationale": "雨のせいでこまったことを言うときは「雨にふられる」を使う。\nAme ni furareru is a passive that shows being troubled by rain.",
+      "subject": "grammar:rareru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nこの　ボタンを　おす（　）、お茶が　出ます。",
+      "options": [
+        "のに",
+        "と",
+        "ても",
+        "まで"
+      ],
+      "answer": 1,
+      "rationale": "「〜と」は、あることをすると、いつもそうなることを表す。\nTo shows a result that always follows: press the button and tea comes out.",
+      "subject": "grammar:to-joken"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nすしを　食べる（　）、あの　店が　いいですよ。",
+      "options": [
+        "まで",
+        "ながら",
+        "なら",
+        "のが"
+      ],
+      "answer": 2,
+      "rationale": "相手の話を受けてすすめるときは「〜なら」を使う。\nNara gives advice on a topic: if you want sushi, that shop is good.",
+      "subject": "grammar:nara"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n空が　くらく　なって　きました。夕方から　雪が　ふる（　）。",
+      "options": [
+        "つもりです",
+        "ことに　します",
+        "ように　します",
+        "かもしれません"
+      ],
+      "answer": 3,
+      "rationale": "空を見て、たぶんそうなると言うので「〜かもしれません」が入る。\nKamoshiremasen means it might happen: it might snow this evening.",
+      "subject": "grammar:kamoshirenai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n弟は　しゅくだいを　しないで、ゲームを　して（　）。",
+      "options": [
+        "ばかり　います",
+        "あげます",
+        "おきます",
+        "みます"
+      ],
+      "answer": 0,
+      "rationale": "同じことばかりしていることを言うときは「〜てばかりいる」を使う。\nTe bakari iru means doing nothing but that: he only plays games.",
+      "subject": "grammar:tebakariiru"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nわたしの　ゆめは　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
+      "options": [
+        "とる",
+        "こと",
+        "写真を",
+        "山の"
+      ],
+      "answer": 0,
+      "rationale": "正しいじゅんばんは「山の　写真を　とる　こと　です」で、★には「とる」が入る。\nThe order is 山の 写真を とる こと です, so とる fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nあしたは　＿＿＿　＿＿＿　＿★＿　＿＿＿　なりました。",
+      "options": [
+        "家に",
+        "ことに",
+        "ひっこす",
+        "新しい"
+      ],
+      "answer": 2,
+      "rationale": "正しいじゅんばんは「新しい　家に　ひっこす　ことに　なりました」で、★には「ひっこす」が入る。\nThe order is 新しい 家に ひっこす ことに なりました, so ひっこす fills the star.",
+      "subject": "grammar:kotoninaru"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "たとえば",
+        "それで",
+        "ところで",
+        "それに"
+      ],
+      "answer": 1,
+      "rationale": "名前がおぼえられなかったので、店長が紙を作ってくれた。理由と結果をつなぐ「それで」が入る。\nSore de (so) links the problem with what the manager did about it.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "おぼえて　いきました",
+        "おぼえて　ほしいです",
+        "おぼえて　しまいました",
+        "おぼえた　ほうが　いいです"
+      ],
+      "answer": 2,
+      "rationale": "全部おぼえることが終わったので「おぼえてしまいました」がいい。\nOboete shimaimashita shows that the memorizing is now complete.",
+      "passage": "tg",
+      "subject": "grammar:teshimau"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "あしたの　ハイキングは　どう　なりましたか。",
+      "options": [
+        "雨なので、中止に　なった",
+        "しゅっぱつが　午後一時に　かわった",
+        "あつまる　場所が　かわった",
+        "朝　九時に　駅の　前に　あつまる"
+      ],
+      "answer": 1,
+      "rationale": "「朝　九時では　なく、午後一時に　しゅっぱつする　ことに　しました」とある。\nThe message says the hike will start at one in the afternoon instead of nine.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "来月から　何が　かわりますか。",
+      "options": [
+        "店が　午前九時に　開く",
+        "店が　午後九時に　しまる",
+        "朝の　アルバイトが　一時間　おそく　来る",
+        "店が　しまる　時間が　一時間　早く　なる"
+      ],
+      "answer": 0,
+      "rationale": "開く時間が午前十時から午前九時にかわる。しまる時間は同じだ。\nFrom next month the shop opens at nine instead of ten; closing time stays the same.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人は　来週　何を　しますか。",
+      "options": [
+        "友だちと　パンを　作る",
+        "ケーキを　作って　みる",
+        "パンの　形を　なおす",
+        "友だちの　家で　食べる"
+      ],
+      "answer": 1,
+      "rationale": "最後に「来週は　ケーキに　ちょうせんする　つもりです」とある。\nThe writer plans to try making a cake next week.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人の　家族は　どうして　ひっこしましたか。",
+      "options": [
+        "東京が　きらいに　なったから",
+        "父の　仕事が　かわったから",
+        "川の　近くに　住みたかったから",
+        "雪が　見たかったから"
+      ],
+      "answer": 1,
+      "rationale": "一段目に「父の　仕事が　かわったからです」とある。\nThe family moved because the father changed jobs.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　今、町の　ことを　どう　思って　いますか。",
+      "options": [
+        "デパートが　ないので、ひっこしたくない",
+        "冬が　さむいので、心配だ",
+        "友だちが　いないので、さびしい",
+        "町の　人が　しんせつで、好きに　なった"
+      ],
+      "answer": 3,
+      "rationale": "「今は　この　町が　好きに　なりました」「町の　人たちが　とても　しんせつです」とある。\nThe writer now likes the town, partly because the people are very kind.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "大学生の　リさんは、日曜日だけ　アルバイトを　したいです。リさんが　えらべるのは　どれですか。",
+      "options": [
+        "パン屋　ひまわり",
+        "レストラン　さくら",
+        "図書館",
+        "スーパー　みどり"
+      ],
+      "answer": 1,
+      "rationale": "日曜日にはたらけて、週１日からでいいのは「レストラン　さくら」だけだ。\nOnly the restaurant has Sunday shifts and accepts one day a week.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "朝　学校へ　行く　前に、週に　二日だけ　はたらきたい　人は、どこで　はたらけますか。",
+      "options": [
+        "パン屋　ひまわり",
+        "レストラン　さくら",
+        "図書館",
+        "スーパー　みどり"
+      ],
+      "answer": 3,
+      "rationale": "朝６時から９時で、週２日からはたらけるのは「スーパー　みどり」だ。\nThe supermarket has early shifts from six to nine and accepts two days a week.",
+      "passage": "info"
+    }
+  ]
+}

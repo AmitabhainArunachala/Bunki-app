@@ -1,0 +1,410 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N4",
+  "number": 4,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "日本の　季節\n　わたしの　国には　季節が　二つしか　ありません。雨が　多い　季節と、雨が　少ない　季節です。一年中　あついです。\n　日本に　来て、はじめて　秋を　知りました。木の　葉が　赤や　黄色に　なって、とても　きれいでした。（１）、冬は　とても　さむくて　たいへんでした。はじめて　雪を　見た　とき、うれしくて　外で　ずっと　写真を　とって　いました。そのあと、かぜを　ひいて　しまいました。\n　来年の　冬、また　雪が　（２）、スキーに　行って　みたいです。",
+    "s1": "ゆうびんきょくからの　お知らせ\n　１２月２９日から　１月３日まで、まどぐちは　お休みです。この　間に　にもつを　出したい　人は、駅前の　ゆうびんきょくを　使って　ください。駅前の　ゆうびんきょくは、お正月も　午前１０時から　午後３時まで　開いて　います。",
+    "s2": "どうぶつえんに　来た　みなさんへ\n　ここの　さるに　食べ物を　あげないで　ください。人の　食べ物を　食べると、さるは　病気に　なって　しまいます。さるの　食事は、毎日　午後２時に　どうぶつえんの　人が　あげて　います。その　時間に　来ると、さるが　食べる　ところを　見る　ことが　できます。",
+    "s3": "テニス部の　みなさん\n　あしたの　れんしゅうは、雨が　ふったら　体育館で　します。体育館では　くつを　はきかえるので、体育館の　中で　はく　くつを　持って　きて　ください。晴れたら、いつもの　コートで　九時から　始めます。\n部長",
+    "m1": "マラソン大会\n　わたしは　去年から　毎朝　三十分ぐらい　走って　います。はじめは　五分　走るだけで　つかれて　しまいましたが、少しずつ　長く　走れるように　なりました。\n　先月、町の　マラソン大会に　はじめて　出ました。十キロの　コースです。友だちに「さいごまで　走れるか　心配だ」と　話すと、友だちは「自分の　ペースで　走れば　だいじょうぶだよ」と　言って　くれました。\n　大会の　日は　とても　あつかったです。八キロの　ところで　足が　いたく　なって、歩いて　しまいました。でも、道で　おうえんして　いる　人たちが「がんばれ」と　言って　くれたので、また　走る　ことが　できました。ゴールした　時間は　一時間　二十分で、あまり　はやくは　ありませんでしたが、さいごまで　あきらめなかった　ことが　うれしかったです。\n　来年は　一時間　十分で　ゴールしたいと　思って　います。",
+    "info": "みなみ町　スポーツセンター　りよう　あんない\n■　プール\n　時間：午前９時～午後８時（月曜日は　休み）\n　お金：大人　４００円　子ども（中学生まで）　２００円\n■　テニスコート\n　時間：午前７時～午後９時\n　お金：１時間　１，０００円\n　※　よやくが　ひつようです。１週間前から　電話で　よやくできます。\n■　トレーニングルーム\n　時間：午前９時～午後９時（月曜日は　休み）\n　お金：大人　３００円\n　※　１６さい　以上。はじめての　人は　受付で　せつめいを　聞いて　ください（１５分）。\n◆　毎月　はじめの　日曜日は、町に　住んで　いる　人は　お金が　いりません。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nきのうの　サッカーの　【試合】は　とても　おもしろかったです。",
+      "options": [
+        "しごう",
+        "しあい",
+        "じあい",
+        "しかい"
+      ],
+      "answer": 1,
+      "rationale": "「試合」は「しあい」と読む。スポーツなどで勝ち負けをきめることだ。\nThe word 試合 is read shiai and means a match or game.",
+      "target": "試合"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n一年の　中で　どの　【季節】が　いちばん　好きですか。",
+      "options": [
+        "きせつ",
+        "きせち",
+        "きぜつ",
+        "けせつ"
+      ],
+      "answer": 0,
+      "rationale": "「季節」は「きせつ」と読む。春・夏・秋・冬のことだ。\nThe word 季節 is read kisetsu and means season.",
+      "target": "季節"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nふうとうに　【住所】と　名前を　書いて　ください。",
+      "options": [
+        "じゅうしょう",
+        "じゅしょ",
+        "すうしょ",
+        "じゅうしょ"
+      ],
+      "answer": 3,
+      "rationale": "「住所」は「じゅうしょ」と読む。住んでいるところのことだ。\nThe word 住所 is read juusho and means address.",
+      "target": "住所"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n国の　母に　にもつを　【おくる】　つもりです。",
+      "options": [
+        "迭る",
+        "送る",
+        "逆る",
+        "追る"
+      ],
+      "answer": 1,
+      "rationale": "「おくる」は「送る」と書く。形がにている「迭」「逆」「追」はまちがい。\nThe verb okuru (to send) is written 送る.",
+      "target": "送る"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n新しい　テニスの　【らけっと】を　買いました。",
+      "options": [
+        "ラケッド",
+        "ワケット",
+        "ラケット",
+        "ラテット"
+      ],
+      "answer": 2,
+      "rationale": "「らけっと」はカタカナで「ラケット」と書く。\nThe word raketto (racket) is written ラケット in katakana.",
+      "target": "ラケット"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nきのうの　テニスの　大会で　（　）ので、チームの　みんなで　よろこびました。",
+      "options": [
+        "かった",
+        "まけた",
+        "おくれた",
+        "にげた"
+      ],
+      "answer": 0,
+      "rationale": "みんなでよろこんだので、大会で「かった」とわかる。\nKatta (won) explains why the whole team was happy.",
+      "target": "勝つ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n秋に　なると、木の　（　）が　赤や　黄色に　なります。",
+      "options": [
+        "枝",
+        "根",
+        "葉",
+        "皮"
+      ],
+      "answer": 2,
+      "rationale": "秋に赤や黄色になるのは木の「葉」だ。\nHa (leaves) are what turn red and yellow in autumn.",
+      "target": "葉"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n毎日　れんしゅうしたので、テニスが　（　）　上手に　なりました。",
+      "options": [
+        "けっして",
+        "だいぶ",
+        "ぜひ",
+        "かならず"
+      ],
+      "answer": 1,
+      "rationale": "「だいぶ上手になった」は「かなり上手になった」という意味だ。「けっして」は後ろに「ない」が来る。\nDaibu means considerably: I have become much better at tennis.",
+      "target": "大分"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nこの　ニュースを　聞いたら、母は　きっと　【驚く】　でしょう。",
+      "options": [
+        "この　ニュースを　聞いたら、母は　きっと　よろこぶ　でしょう。",
+        "この　ニュースを　聞いたら、母は　きっと　おこる　でしょう。",
+        "この　ニュースを　聞いたら、母は　きっと　わらう　でしょう。",
+        "この　ニュースを　聞いたら、母は　きっと　びっくりする　でしょう。"
+      ],
+      "answer": 3,
+      "rationale": "「驚く」は「びっくりする」と同じ意味だ。\nOdoroku means to be surprised, the same as bikkuri suru.",
+      "target": "驚く"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n秋に　なって、朝と　夜は　【冷える】　ように　なりました。",
+      "options": [
+        "秋に　なって、朝と　夜は　さむく　なりました。",
+        "秋に　なって、朝と　夜は　あつく　なりました。",
+        "秋に　なって、朝と　夜は　あかるく　なりました。",
+        "秋に　なって、朝と　夜は　みじかく　なりました。"
+      ],
+      "answer": 0,
+      "rationale": "気温が下がることを「冷える」と言う。「さむくなる」と同じ意味だ。\nHieru means to get cold, the same as samuku naru.",
+      "target": "冷える"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "つぎの　ことばの　つかいかたで　いちばん　いい　ものを　えらんで　ください。\n【運動】",
+      "options": [
+        "この　時計は　電池が　なくて　運動しません。",
+        "毎日　少し　運動する　ように　して　います。",
+        "ひっこしの　とき、にもつを　車に　運動しました。",
+        "きのうは　運動に　なって、学校を　休みました。"
+      ],
+      "answer": 1,
+      "rationale": "「運動」は体を動かすことだ。1は「動きません」、3は「運びました」が正しい。\nUndou means physical exercise; the other sentences need different verbs.",
+      "target": "運動"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n日本の　季節（　）、レポートを　書きました。",
+      "options": [
+        "に　よって",
+        "に　とって",
+        "に　ついて",
+        "に　たいして"
+      ],
+      "answer": 2,
+      "rationale": "レポートのテーマを言うときは「〜について」を使う。\nNi tsuite marks the topic of the report: about the Japanese seasons.",
+      "subject": "grammar:nitsuite"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n犬が　外に　出（　）　います。",
+      "options": [
+        "たくて",
+        "たがって",
+        "たい",
+        "たかった"
+      ],
+      "answer": 1,
+      "rationale": "ほかの人や動物がしたい様子は「〜たがっている」と言う。\nTagatte iru shows that someone else, here the dog, wants to do something.",
+      "subject": "grammar:tagaru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n（　）　さむくても、毎朝　走ります。",
+      "options": [
+        "どうして",
+        "どこまで",
+        "どのくらい",
+        "どんなに"
+      ],
+      "answer": 3,
+      "rationale": "「どんなに〜ても」は、どれだけそうでも、という意味だ。\nDonna ni ... temo means no matter how cold it is.",
+      "subject": "grammar:donnanitemo"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nおんがくを　聞き（　）、ジョギングを　します。",
+      "options": [
+        "ながら",
+        "ので",
+        "のに",
+        "から"
+      ],
+      "answer": 0,
+      "rationale": "二つのことを同時にするときは「〜ながら」を使う。\nNagara shows two actions done at the same time: jogging while listening.",
+      "subject": "grammar:nagara"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nすみません、この　電話を　少し　使わ（　）。",
+      "options": [
+        "れて　ください",
+        "なくても　いいです",
+        "せて　あげます",
+        "せて　ください"
+      ],
+      "answer": 3,
+      "rationale": "自分がしたいことをおねがいするときは「〜させてください」を使う。\nSasete kudasai asks for permission: please let me use this phone.",
+      "subject": "grammar:sasetekudasai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n毎日　じてんしゃ（　）　学校へ　かよって　います。",
+      "options": [
+        "に",
+        "で",
+        "を",
+        "と"
+      ],
+      "answer": 1,
+      "rationale": "行く方法を言うときは「で」を使う。\nDe marks the means of transport: by bicycle.",
+      "subject": "particle:de"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\n兄は　＿＿＿　＿＿＿　＿★＿　＿＿＿　います。",
+      "options": [
+        "思って",
+        "せんしゅに",
+        "テニスの",
+        "なりたいと"
+      ],
+      "answer": 3,
+      "rationale": "正しいじゅんばんは「テニスの　せんしゅに　なりたいと　思って　います」で、★には「なりたいと」が入る。\nThe order is テニスの せんしゅに なりたいと 思って います, so なりたいと fills the star.",
+      "subject": "grammar:tai"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　公園には、＿＿＿　＿★＿　＿＿＿　＿＿＿　ところが　あります。",
+      "options": [
+        "入っては",
+        "いけない",
+        "犬を",
+        "つれて"
+      ],
+      "answer": 3,
+      "rationale": "正しいじゅんばんは「犬を　つれて　入っては　いけない　ところが　あります」で、★には「つれて」が入る。\nThe order is 犬を つれて 入っては いけない ところが あります, so つれて fills the star.",
+      "subject": "grammar:tewaikenai"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "だから",
+        "それでは",
+        "しかし",
+        "たとえば"
+      ],
+      "answer": 2,
+      "rationale": "秋はきれいだったが、冬はたいへんだった。反対のことをつなぐ「しかし」が入る。\nShikashi (however) contrasts the beautiful autumn with the hard winter.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "ふったら",
+        "ふっても",
+        "ふりながら",
+        "ふるまで"
+      ],
+      "answer": 0,
+      "rationale": "「雪がふったらスキーに行きたい」で、そうなったときにすることを言う。\nFuttara means if and when it snows, I would like to go skiing.",
+      "passage": "tg",
+      "subject": "grammar:tara"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "１月２日に　にもつを　出したい　人は、どう　しますか。",
+      "options": [
+        "この　ゆうびんきょくの　まどぐちへ　行く",
+        "駅前の　ゆうびんきょくへ　行く",
+        "駅前の　ゆうびんきょくへ　午後５時に　行く",
+        "１月４日まで　まつ"
+      ],
+      "answer": 1,
+      "rationale": "１２月２９日から１月３日までは駅前のゆうびんきょくを使う。そこは午後３時まで開いている。\nOver the New Year break, people should use the station post office, open until three.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "さるが　食べる　ところを　見たい　人は、どう　しますか。",
+      "options": [
+        "さるに　食べ物を　あげる",
+        "午後２時に　来る",
+        "どうぶつえんの　人に　たのむ",
+        "人の　食べ物を　持って　くる"
+      ],
+      "answer": 1,
+      "rationale": "「その　時間に　来ると、さるが　食べる　ところを　見る　ことが　できます」とある。\nThe sign says visitors can watch the monkeys eat if they come at two.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "あした　雨が　ふったら、何を　持って　いかなければ　なりませんか。",
+      "options": [
+        "体育館の　中で　はく　くつ",
+        "かさ",
+        "テニスの　ボール",
+        "何も　いらない"
+      ],
+      "answer": 0,
+      "rationale": "雨のときは体育館で練習するので、体育館の中ではくくつが必要だ。\nIf it rains, practice moves to the gym, so indoor shoes are needed.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "八キロの　ところで、この　人は　どう　なりましたか。",
+      "options": [
+        "あつくて　大会を　やめた",
+        "足が　いたく　なって　歩いた",
+        "友だちと　いっしょに　走った",
+        "はやく　走れるように　なった"
+      ],
+      "answer": 1,
+      "rationale": "「八キロの　ところで　足が　いたく　なって、歩いて　しまいました」とある。\nAt eight kilometers the writer's legs hurt and the writer walked for a while.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人が　うれしかったのは　どんな　ことですか。",
+      "options": [
+        "一時間で　ゴールできた　こと",
+        "友だちより　はやく　走れた　こと",
+        "さいごまで　あきらめなかった　こと",
+        "あつい　日に　走らなかった　こと"
+      ],
+      "answer": 2,
+      "rationale": "「さいごまで　あきらめなかった　ことが　うれしかったです」とある。\nThe writer was happy about not giving up until the finish.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "中学生の　妹と　大人の　わたしが、火曜日に　プールを　使います。二人で　いくらですか。",
+      "options": [
+        "４００円",
+        "６００円",
+        "８００円",
+        "０円"
+      ],
+      "answer": 1,
+      "rationale": "プールは大人４００円、中学生２００円なので、二人で６００円だ。\nThe pool costs 400 yen for an adult and 200 yen for a junior high student, 600 yen in total.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "はじめて　トレーニングルームを　使う　大人は、どう　しなければ　なりませんか。",
+      "options": [
+        "月曜日に　行く",
+        "１週間前に　電話で　よやくする",
+        "はじめの　日曜日に　行く",
+        "受付で　せつめいを　聞く"
+      ],
+      "answer": 3,
+      "rationale": "「はじめての　人は　受付で　せつめいを　聞いて　ください」とある。よやくはテニスコートの話だ。\nFirst-time users of the training room must hear an explanation at reception.",
+      "passage": "info"
+    }
+  ]
+}
