@@ -1,0 +1,791 @@
+{
+  "schema": "kairo-guided-set/1",
+  "id": "kairo-guided-n2-living-thread-01",
+  "level": "N2",
+  "minutes": 15,
+  "title": {
+    "ja": "一つの文を、もう少し深く",
+    "en": "One sentence, understood more deeply"
+  },
+  "source": {
+    "kind": "bank-copy",
+    "formId": "kairo-original-jlpt-n2-short-01:written-review",
+    "formRevisionId": "assessment-form:56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2",
+    "formSha256": "56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2",
+    "formPath": "data/assessment/forms/kairo-original-jlpt-n2-written-12-01-56d6ea3b6024cd04447a72c36640ee99c672808d93bcd22f7ccdb4c1e2c198a2.json",
+    "status": "ai-reviewed-practice",
+    "copiedAt": "2026-09-23",
+    "by": "Codex guided-session prototype (CONTENT-NOTES.md), ported unchanged 2026-09-28"
+  },
+  "sourceNote": {
+    "ja": "Bunki の審査済み N2 筆記問題（12問）から、6問をそのまま使った短い案内つきの練習です。オリジナルの練習問題で、JLPT の公式問題でも模試一回分でもありません。聴解の問題は含みません。英語の解説と新しい文の問題は下書きで、元の問題の審査はこの追加部分を保証しません。",
+    "en": "A short written guided practice built from six exact items in Bunki’s reviewed N2 written 12-question bank. It is original practice material, not an official JLPT paper or a full mock exam. It contains no listening task or listening claim. The English teaching copy and fresh return question are authored drafts; the original-item review does not certify that added prose."
+  },
+  "teaching": {
+    "status": "authored-draft",
+    "note": "English titles, meanings, rules, contrasts, example translations, the branches and every fresh-context question are authored teaching drafts (Codex, 2026-09-23). The original items’ review does not certify them."
+  },
+  "dictionary": {
+    "name": "JMdict subset (jmdict-simplified 3.6.2+20260803141815)",
+    "license": "CC BY-SA 4.0",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (https://www.edrdg.org/)"
+  },
+  "words": {
+    "word_1": {
+      "surface": "今回",
+      "reading": "こんかい",
+      "meaning": "this time; now",
+      "source": "JMdict 1289070"
+    },
+    "word_2": {
+      "surface": "道具",
+      "reading": "どうぐ",
+      "meaning": "tool; implement; instrument",
+      "source": "JMdict 1454180"
+    },
+    "word_3": {
+      "surface": "申し込み",
+      "reading": "もうしこみ",
+      "meaning": "application; entry; request",
+      "source": "JMdict 1605140"
+    },
+    "word_4": {
+      "surface": "作業",
+      "reading": "さぎょう",
+      "meaning": "work; operation; task",
+      "source": "JMdict 1297540"
+    },
+    "word_5": {
+      "surface": "判断",
+      "reading": "はんだん",
+      "meaning": "judgment; judgement; decision",
+      "source": "JMdict 1478620"
+    },
+    "word_6": {
+      "surface": "服装",
+      "reading": "ふくそう",
+      "meaning": "attire; dress; clothes",
+      "source": "JMdict 1500970"
+    },
+    "word_7": {
+      "surface": "毎月",
+      "reading": "まいつき",
+      "meaning": "every month; each month; monthly",
+      "source": "JMdict 1584350"
+    },
+    "word_8": {
+      "surface": "希望",
+      "reading": "きぼう",
+      "meaning": "hope; wish; aspiration",
+      "source": "JMdict 1219910"
+    },
+    "word_9": {
+      "surface": "予約",
+      "reading": "よやく",
+      "meaning": "reservation; appointment; booking",
+      "source": "JMdict 1543750"
+    },
+    "word_10": {
+      "surface": "影響",
+      "reading": "えいきょう",
+      "meaning": "influence; effect; impact",
+      "source": "JMdict 1173660"
+    },
+    "word_11": {
+      "surface": "参加者",
+      "reading": "さんかしゃ",
+      "meaning": "participant; entrant; player",
+      "source": "JMdict 1302110"
+    },
+    "word_12": {
+      "surface": "整理",
+      "reading": "せいり",
+      "meaning": "sorting; arrangement; organization",
+      "source": "JMdict 1376250"
+    },
+    "word_13": {
+      "surface": "妥当",
+      "reading": "だとう",
+      "meaning": "valid; proper; right",
+      "source": "JMdict 1408540"
+    },
+    "word_14": {
+      "surface": "講座",
+      "reading": "こうざ",
+      "meaning": "course (e.g. of lectures); academic university unit (professor, lecturers, etc.)",
+      "source": "JMdict 1282270"
+    },
+    "word_15": {
+      "surface": "通行",
+      "reading": "つうこう",
+      "meaning": "passage (of people or vehicles); passing (through); traffic",
+      "source": "JMdict 1433180"
+    },
+    "word_16": {
+      "surface": "運行",
+      "reading": "うんこう",
+      "meaning": "operation (of a bus or train service); service; running",
+      "source": "JMdict 1172750"
+    },
+    "word_17": {
+      "surface": "会場",
+      "reading": "かいじょう",
+      "meaning": "assembly hall; meeting place; venue",
+      "source": "JMdict 1198660"
+    },
+    "word_18": {
+      "surface": "車",
+      "reading": "くるま",
+      "meaning": "car; automobile; vehicle",
+      "source": "JMdict 1323080"
+    },
+    "word_19": {
+      "surface": "発表",
+      "reading": "はっぴょう",
+      "meaning": "announcement; publication; presenting",
+      "source": "JMdict 1477840"
+    },
+    "word_20": {
+      "surface": "開始",
+      "reading": "かいし",
+      "meaning": "start; commencement; beginning",
+      "source": "JMdict 1202760"
+    },
+    "word_21": {
+      "surface": "今週",
+      "reading": "こんしゅう",
+      "meaning": "this week",
+      "source": "JMdict 1289220"
+    },
+    "word_22": {
+      "surface": "準備",
+      "reading": "じゅんび",
+      "meaning": "preparation; arrangements; getting ready",
+      "source": "JMdict 1341670"
+    },
+    "word_23": {
+      "surface": "大雨",
+      "reading": "おおあめ",
+      "meaning": "heavy rain; torrential rainfall; downpour",
+      "source": "JMdict 1413070"
+    },
+    "word_24": {
+      "surface": "大雪",
+      "reading": "おおゆき",
+      "meaning": "heavy snow; heavy snowfall",
+      "source": "JMdict 1414350"
+    },
+    "word_25": {
+      "surface": "必要",
+      "reading": "ひつよう",
+      "meaning": "necessary; needed; essential",
+      "source": "JMdict 1487660"
+    },
+    "word_26": {
+      "surface": "受付",
+      "reading": "うけつけ",
+      "meaning": "reception (desk); information desk; receptionist",
+      "source": "JMdict 1588060"
+    },
+    "word_27": {
+      "surface": "済ませる",
+      "reading": "すませる",
+      "meaning": "to finish; to make an end of; to get through with",
+      "source": "JMdict 1295040"
+    },
+    "word_28": {
+      "surface": "使い方",
+      "reading": "つかいかた",
+      "meaning": "way of using (something); way to use; how to use",
+      "source": "JMdict 1305950"
+    },
+    "word_29": {
+      "surface": "市民",
+      "reading": "しみん",
+      "meaning": "citizen (of a country); citizenry; citizen (of a city)",
+      "source": "JMdict 1308690"
+    },
+    "word_30": {
+      "surface": "図書館",
+      "reading": "としょかん",
+      "meaning": "library",
+      "source": "JMdict 1370420"
+    },
+    "word_31": {
+      "surface": "道路",
+      "reading": "どうろ",
+      "meaning": "road; highway",
+      "source": "JMdict 1454290"
+    },
+    "word_32": {
+      "surface": "列車",
+      "reading": "れっしゃ",
+      "meaning": "train; railway train",
+      "source": "JMdict 1558370"
+    },
+    "word_33": {
+      "surface": "安全",
+      "reading": "あんぜん",
+      "meaning": "safety; security",
+      "source": "JMdict 1153930"
+    },
+    "word_34": {
+      "surface": "機械",
+      "reading": "きかい",
+      "meaning": "machine; mechanism; instrument",
+      "source": "JMdict 1220810"
+    },
+    "word_35": {
+      "surface": "橋",
+      "reading": "はし",
+      "meaning": "bridge",
+      "source": "JMdict 1237410"
+    },
+    "word_36": {
+      "surface": "菜園",
+      "reading": "さいえん",
+      "meaning": "vegetable garden",
+      "source": "JMdict 1295850"
+    },
+    "word_37": {
+      "surface": "結論",
+      "reading": "けつろん",
+      "meaning": "conclusion (of an argument, discussion, study, etc.); conclusion",
+      "source": "JMdict 1255020"
+    },
+    "word_38": {
+      "surface": "住む",
+      "reading": "すむ",
+      "meaning": "to live (of humans); to reside; to inhabit",
+      "source": "JMdict 1334040"
+    },
+    "word_39": {
+      "surface": "席",
+      "reading": "せき",
+      "meaning": "seat; location (of a gathering, etc.); place",
+      "source": "JMdict 1382250"
+    },
+    "word_40": {
+      "surface": "説明書",
+      "reading": "せつめいしょ",
+      "meaning": "(printed) instructions; manual; explanatory leaflet (pamphlet, note)",
+      "source": "JMdict 1386470"
+    },
+    "word_41": {
+      "surface": "点検",
+      "reading": "てんけん",
+      "meaning": "detailed inspection; thorough examination; checking",
+      "source": "JMdict 1441540"
+    },
+    "word_42": {
+      "surface": "料理",
+      "reading": "りょうり",
+      "meaning": "cooking; cookery; cuisine",
+      "source": "JMdict 1554310"
+    },
+    "word_43": {
+      "surface": "毎年",
+      "reading": "まいとし",
+      "meaning": "every year; yearly; annually",
+      "source": "JMdict 1584360"
+    },
+    "word_44": {
+      "surface": "緊張",
+      "reading": "きんちょう",
+      "meaning": "tension; strain; nervousness",
+      "source": "JMdict 1241880"
+    },
+    "word_45": {
+      "surface": "限り",
+      "reading": "かぎり",
+      "meaning": "limit; limits; bounds",
+      "source": "JMdict 1264610"
+    },
+    "word_46": {
+      "surface": "実物",
+      "reading": "じつぶつ",
+      "meaning": "real thing; original; actual",
+      "source": "JMdict 1321430"
+    },
+    "word_47": {
+      "surface": "出発",
+      "reading": "しゅっぱつ",
+      "meaning": "departure; leaving; setting off",
+      "source": "JMdict 1340000"
+    },
+    "word_48": {
+      "surface": "抵抗",
+      "reading": "ていこう",
+      "meaning": "resistance; opposition; standing up to",
+      "source": "JMdict 1436260"
+    },
+    "word_49": {
+      "surface": "負担",
+      "reading": "ふたん",
+      "meaning": "burden; load; responsibility",
+      "source": "JMdict 1498130"
+    },
+    "word_50": {
+      "surface": "不要",
+      "reading": "ふよう",
+      "meaning": "unnecessary; unneeded",
+      "source": "JMdict 1602900"
+    },
+    "word_51": {
+      "surface": "違反",
+      "reading": "いはん",
+      "meaning": "violation; offense; offence",
+      "source": "JMdict 1158950"
+    },
+    "word_52": {
+      "surface": "会社",
+      "reading": "かいしゃ",
+      "meaning": "company; corporation; firm",
+      "source": "JMdict 1198550"
+    },
+    "word_53": {
+      "surface": "資料",
+      "reading": "しりょう",
+      "meaning": "material; materials; data",
+      "source": "JMdict 1312820"
+    },
+    "word_54": {
+      "surface": "時間",
+      "reading": "じかん",
+      "meaning": "time; hour; period",
+      "source": "JMdict 1315920"
+    },
+    "word_55": {
+      "surface": "事前",
+      "reading": "じぜん",
+      "meaning": "prior; beforehand; in advance",
+      "source": "JMdict 1314050"
+    },
+    "word_56": {
+      "surface": "持参",
+      "reading": "じさん",
+      "meaning": "bringing; taking; carrying",
+      "source": "JMdict 1315790"
+    },
+    "word_57": {
+      "surface": "来月",
+      "reading": "らいげつ",
+      "meaning": "next month",
+      "source": "JMdict 1547900"
+    },
+    "word_58": {
+      "surface": "支障",
+      "reading": "ししょう",
+      "meaning": "obstacle; hindrance; impediment",
+      "source": "JMdict 1310190"
+    },
+    "word_59": {
+      "surface": "実際",
+      "reading": "じっさい",
+      "meaning": "reality; actuality; truth",
+      "source": "JMdict 1321110"
+    },
+    "word_60": {
+      "surface": "管理",
+      "reading": "かんり",
+      "meaning": "control; management (e.g. of a business)",
+      "source": "JMdict 1214200"
+    },
+    "word_61": {
+      "surface": "工事",
+      "reading": "こうじ",
+      "meaning": "construction work",
+      "source": "JMdict 1278130"
+    },
+    "word_62": {
+      "surface": "専門家",
+      "reading": "せんもんか",
+      "meaning": "specialist; expert; professional",
+      "source": "JMdict 1389890"
+    }
+  },
+  "questions": [
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q01",
+      "kind": "vocabulary",
+      "title": "Read a word in context",
+      "prompt": "【　】の言葉の読み方を選んでください。\nこの橋は、毎年専門家による【点検】を受けている。",
+      "options": ["てんけん", "てんげん", "でんけん", "てっけん"],
+      "correct": 0,
+      "target": {
+        "key": "tenken",
+        "reading": "てんけん",
+        "label": "点検",
+        "meaning": "inspection; checking for problems"
+      },
+      "gap": {
+        "ja": "読み",
+        "en": "kanji → reading"
+      },
+      "hint": {
+        "ja": "一つの語",
+        "en": "A word"
+      },
+      "cards": [
+        {
+          "t": "word",
+          "id": "点検"
+        }
+      ],
+      "branches": [],
+      "explanation": {
+        "meaning": "This bridge is inspected by specialists every year.",
+        "rule": "点検 is read てんけん. It means examining something for faults or safety problems.",
+        "contrast": "The other readings do not name this word.",
+        "exampleJa": "出発前に、車を点検した。",
+        "exampleEn": "I inspected the car before leaving."
+      },
+      "source": {
+        "label": "N2 written practice · Q1",
+        "ref": "kairo-original-jlpt-n2-short-01:q01",
+        "status": "ai-reviewed-practice",
+        "itemSha256": "f5892b70d9ee1bbb899655e1ee870d475cc89232c853e6d7851fca0bed3ee07c"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q03",
+      "kind": "vocabulary",
+      "title": "Why 支障 fits",
+      "prompt": "（　）に入る最もよいものを選んでください。\n大雪の影響で、列車の運行に（　）が出ている。",
+      "options": ["負担", "支障", "抵抗", "違反"],
+      "correct": 1,
+      "target": {
+        "key": "shisho",
+        "reading": "ししょう",
+        "label": "支障",
+        "meaning": "hindrance; disruption"
+      },
+      "gap": {
+        "ja": "語義",
+        "en": "sense · collocation"
+      },
+      "hint": {
+        "ja": "言い回し",
+        "en": "A phrase"
+      },
+      "cards": [
+        {
+          "t": "word",
+          "id": "支障"
+        }
+      ],
+      "branches": [],
+      "explanation": {
+        "meaning": "Heavy snow is disrupting train service.",
+        "rule": "運行に支障が出る is a natural way to say that an obstacle is preventing service from running smoothly.",
+        "contrast": "負担 is a burden, 抵抗 is resistance, and 違反 is a violation; none fits disruption to operations here.",
+        "exampleJa": "工事のため、道路の通行に支障が出ている。",
+        "exampleEn": "Construction is disrupting traffic on the road."
+      },
+      "source": {
+        "label": "N2 written practice · Q3",
+        "ref": "kairo-original-jlpt-n2-short-01:q03",
+        "status": "ai-reviewed-practice",
+        "itemSha256": "bf09fad13b315ec977a702d70d4bdb625912e2d08d0a7ad43a75d19871215077"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q05",
+      "kind": "grammar",
+      "title": "A condition that must be met",
+      "prompt": "（　）に入る最もよいものを選んでください。\n実際に住んでみない（　）、この町のよさは分からないと思う。",
+      "options": ["ことには", "ものの", "ばかりに", "ついでに"],
+      "correct": 0,
+      "target": {
+        "key": "kotoniha",
+        "reading": "〜ないことには",
+        "label": "〜ないことには",
+        "meaning": "unless; without doing X, Y cannot happen"
+      },
+      "gap": {
+        "ja": "文法",
+        "en": "grammar"
+      },
+      "hint": {
+        "ja": "条件",
+        "en": "A condition"
+      },
+      "cards": [],
+      "branches": ["sumu", "temiru", "monono"],
+      "explanation": {
+        "meaning": "I do not think you can understand what is good about this town unless you actually try living here.",
+        "rule": "〜ないことには、〜ない presents the first action or condition as necessary for the later result.",
+        "contrast": "ものの means “although” and introduces a contrast; this sentence instead says living there is required for understanding it.",
+        "exampleJa": "実物を見ないことには、決められない。",
+        "exampleEn": "I cannot decide unless I see the real thing."
+      },
+      "source": {
+        "label": "N2 written practice · Q5",
+        "ref": "kairo-original-jlpt-n2-short-01:q05",
+        "status": "ai-reviewed-practice",
+        "itemSha256": "74f51933ccfe5b8bd6ffbac44c0857c83bd49ecb7e02a0963f635288a776ce97"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q06",
+      "kind": "grammar",
+      "title": "A result that goes against expectation",
+      "prompt": "（　）に入る最もよいものを選んでください。\n説明書を読んだ（　）、まだ使い方がよく分からない。",
+      "options": ["うえで", "とたん", "ものの", "かぎり"],
+      "correct": 2,
+      "target": {
+        "key": "monono",
+        "reading": "〜ものの",
+        "label": "〜ものの",
+        "meaning": "although; despite that fact"
+      },
+      "gap": {
+        "ja": "文法",
+        "en": "grammar"
+      },
+      "hint": {
+        "ja": "対比",
+        "en": "A contrast"
+      },
+      "cards": [
+        {
+          "t": "grammar",
+          "id": "n2-mono-no"
+        }
+      ],
+      "branches": ["monono", "kotoniha"],
+      "explanation": {
+        "meaning": "Although I read the manual, I still do not really understand how to use it.",
+        "rule": "〜ものの states a real fact, then gives a result that runs against what that fact might lead you to expect.",
+        "contrast": "うえで is “after doing / on the basis of,” but it does not by itself create this contrast.",
+        "exampleJa": "準備したものの、発表では緊張してしまった。",
+        "exampleEn": "Although I prepared, I got nervous during the presentation."
+      },
+      "source": {
+        "label": "N2 written practice · Q6",
+        "ref": "kairo-original-jlpt-n2-short-01:q06",
+        "status": "ai-reviewed-practice",
+        "itemSha256": "a78bb145650e4fd74590576ddd81d3bbdbde3e1a2046eecdbcc77c1c4da59165"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q09",
+      "kind": "reading",
+      "title": "Find the practical instruction",
+      "prompt": "今回の講座について、正しいものはどれですか。",
+      "passage": "市民菜園からのお知らせ\n来月の種まき講座は、雨の場合も管理棟で行います。例年は参加者に道具を持参していただいていますが、今回は会場のものを使いますので、持参は不要です。汚れてもよい服装でお越しください。事前の申し込みは必要ありません。ただし、種の数に限りがあるため、参加を希望する方は開始十分前までに受付を済ませてください。",
+      "options": [
+        "雨が降れば中止される",
+        "道具を用意して行く必要がある",
+        "前日までに予約する必要がある",
+        "開始前に受付を済ませる必要がある"
+      ],
+      "correct": 3,
+      "target": {
+        "key": "uketuke",
+        "reading": "うけつけをすませる",
+        "label": "受付を済ませる",
+        "meaning": "complete registration"
+      },
+      "gap": {
+        "ja": "読解",
+        "en": "reading the notice"
+      },
+      "hint": {
+        "ja": "指示",
+        "en": "An instruction"
+      },
+      "cards": [
+        {
+          "t": "word",
+          "id": "受付"
+        },
+        {
+          "t": "word",
+          "id": "済ませる"
+        }
+      ],
+      "branches": [],
+      "explanation": {
+        "meaning": "People who want to join need to complete registration before the session begins.",
+        "rule": "The notice says to finish registration by ten minutes before the start because the number of seeds is limited.",
+        "contrast": "Rain does not cancel it, tools are supplied, and advance application is not required.",
+        "exampleJa": "開始前に受付を済ませてから、会場に入ってください。",
+        "exampleEn": "Please complete registration before entering the venue."
+      },
+      "source": {
+        "label": "N2 written practice · Q9",
+        "ref": "kairo-original-jlpt-n2-short-01:q09",
+        "status": "ai-reviewed-practice",
+        "itemSha256": "7dc2b28a8c0ea692b7f19a92c0c11cef2d3fb062839f13dbde93043365f3e67e",
+        "passageId": "kairo-original-jlpt-n2-short-01:passage-shortNotice",
+        "passageSha256": "85cf74df6abd3fc33cd571baad7ba4a76afb853970d37ee19f3d0f993a2bde7c"
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-short-01:q10",
+      "kind": "reading",
+      "title": "Connect a reason to an instruction",
+      "prompt": "受付を早めに済ませるよう求めている理由は何ですか。",
+      "passage": "市民菜園からのお知らせ\n来月の種まき講座は、雨の場合も管理棟で行います。例年は参加者に道具を持参していただいていますが、今回は会場のものを使いますので、持参は不要です。汚れてもよい服装でお越しください。事前の申し込みは必要ありません。ただし、種の数に限りがあるため、参加を希望する方は開始十分前までに受付を済ませてください。",
+      "options": [
+        "参加者が使う種には限りがあるから",
+        "道具の使い方を先に教えるから",
+        "管理棟から畑まで遠いから",
+        "参加者の服装を確認するから"
+      ],
+      "correct": 0,
+      "target": {
+        "key": "kagiri",
+        "reading": "〜にかぎりがある",
+        "label": "〜に限りがある",
+        "meaning": "there is a limit to; supplies are limited"
+      },
+      "gap": {
+        "ja": "読解",
+        "en": "reading the notice"
+      },
+      "hint": {
+        "ja": "理由",
+        "en": "A reason"
+      },
+      "cards": [
+        {
+          "t": "word",
+          "id": "限り"
+        }
+      ],
+      "branches": [],
+      "explanation": {
+        "meaning": "Early registration is requested because the seeds available to participants are limited.",
+        "rule": "ため marks the reason; locate the stated reason near the instruction rather than adding a plausible one from outside the notice.",
+        "contrast": "The notice mentions tools and clothing, but neither is given as the reason for early registration.",
+        "exampleJa": "席に限りがあるため、早めにお申し込みください。",
+        "exampleEn": "Please apply early because seats are limited."
+      },
+      "source": {
+        "label": "N2 written practice · Q10",
+        "ref": "kairo-original-jlpt-n2-short-01:q10",
+        "status": "ai-reviewed-practice",
+        "itemSha256": "952427b22260f8cc517d84643157f9994a9ea9f7e65eccbc0adfc383f6531d03",
+        "passageId": "kairo-original-jlpt-n2-short-01:passage-shortNotice",
+        "passageSha256": "85cf74df6abd3fc33cd571baad7ba4a76afb853970d37ee19f3d0f993a2bde7c"
+      }
+    }
+  ],
+  "branches": {
+    "sumu": {
+      "title": "住む",
+      "reading": "すむ",
+      "meaning": "to live; to reside",
+      "body": "住む means living somewhere, rather than just visiting. In the question, living there gives the experience needed to judge the town.",
+      "exampleJa": "この町に三年住んでいる。",
+      "exampleEn": "I have lived in this town for three years."
+    },
+    "temiru": {
+      "title": "〜てみる",
+      "reading": "てみる",
+      "meaning": "to try doing something",
+      "body": "Add 〜てみる to a verb to say you try doing it. 住んでみる means “try living there,” so direct experience matters in the sentence.",
+      "exampleJa": "一度使ってみてください。",
+      "exampleEn": "Please try using it once."
+    },
+    "kotoniha": {
+      "title": "〜ないことには",
+      "reading": "ないことには",
+      "meaning": "unless; without X, Y cannot happen",
+      "body": "This form makes the first condition essential. It looks forward: without X, the next result cannot be reached.",
+      "exampleJa": "話を聞かないことには、判断できない。",
+      "exampleEn": "I cannot judge unless I hear the explanation."
+    },
+    "monono": {
+      "title": "〜ものの",
+      "reading": "ものの",
+      "meaning": "although; despite that fact",
+      "body": "This form holds two facts together when the second is surprising after the first. It is a contrast, not a necessary condition.",
+      "exampleJa": "近いものの、道が混んでいて時間がかかる。",
+      "exampleEn": "Although it is close, traffic makes the trip take time."
+    }
+  },
+  "fresh": {
+    "byTarget": {
+      "tenken": {
+        "prompt": "（　）に入る最もよいものを選んでください。\nこの機械は、安全のため毎月専門の会社が（　）している。",
+        "options": ["点検", "支障", "受付", "限り"],
+        "correct": 0,
+        "explanation": "点検 means checking equipment for problems or safety. This is a new practice sentence."
+      },
+      "shisho": {
+        "prompt": "（　）に入る最もよいものを選んでください。\n大雨で、イベントの準備に（　）が出ている。",
+        "options": ["点検", "支障", "受付", "限り"],
+        "correct": 1,
+        "explanation": "支障 fits because the rain is creating an obstacle to preparation. This is a new practice sentence."
+      },
+      "kotoniha": {
+        "prompt": "（　）に入る最もよいものを選んでください。\nこの資料を最後まで読まない（　）、結論が妥当かどうか判断できない。",
+        "options": ["ことには", "ものの", "ばかりに", "ついでに"],
+        "correct": 0,
+        "explanation": "Reading the whole document is necessary before judging whether its conclusion is sound. This is a new practice sentence."
+      },
+      "monono": {
+        "prompt": "（　）に入る最もよいものを選んでください。\nこの店は駅から遠い（　）、料理がおいしいので客が多い。",
+        "options": ["ものの", "ことには", "ばかりに", "ついでに"],
+        "correct": 0,
+        "explanation": "ものの contrasts the inconvenient distance with the surprising result that many people still come for the food. This is a new practice sentence."
+      },
+      "uketuke": {
+        "prompt": "図書館からのお知らせ\n今週の資料整理は、利用者カードを持っている方なら予約なしで参加できます。ただし、作業用の席には限りがあるため、開始十五分前までに受付をしてください。\n参加する人は、始まる前に何をする必要がありますか。",
+        "options": ["利用者カードを作る", "受付をする", "資料を借りる", "予約をする"],
+        "correct": 1,
+        "explanation": "The instruction is to check in by fifteen minutes before the start. This is a fresh practice document."
+      },
+      "kagiri": {
+        "prompt": "図書館からのお知らせ\n今週の資料整理は、利用者カードを持っている方なら予約なしで参加できます。ただし、作業用の席には限りがあるため、開始十五分前までに受付をしてください。\n参加者が早めに受付をする理由は何ですか。",
+        "options": [
+          "利用者カードを作るため",
+          "作業用の席が限られているため",
+          "資料を借りるため",
+          "予約が必要なため"
+        ],
+        "correct": 1,
+        "explanation": "The notice gives one direct reason: the number of work seats is limited. This is a fresh practice document."
+      }
+    },
+    "byKind": {
+      "vocabulary": {
+        "prompt": "（　）に入る最もよいものを選んでください。\n大雨で、イベントの準備に（　）が出ている。",
+        "options": ["点検", "支障", "受付", "限り"],
+        "correct": 1,
+        "explanation": "支障 fits because the rain is creating an obstacle to preparation. This is a new practice sentence."
+      },
+      "grammar": {
+        "prompt": "（　）に入る最もよいものを選んでください。\nこの資料を最後まで読まない（　）、結論が妥当かどうか判断できない。",
+        "options": ["ことには", "ものの", "ばかりに", "ついでに"],
+        "correct": 0,
+        "explanation": "Reading the whole document is presented as necessary before judging whether its conclusion is sound. This is a new practice sentence."
+      },
+      "reading": {
+        "prompt": "図書館からのお知らせ\n今週の資料整理は、利用者カードを持っている方なら予約なしで参加できます。ただし、作業用の席には限りがあるため、開始十五分前までに受付をしてください。\n参加者が早めに受付をする理由は何ですか。",
+        "options": [
+          "利用者カードを作るため",
+          "作業用の席が限られているため",
+          "資料を借りるため",
+          "予約が必要なため"
+        ],
+        "correct": 1,
+        "explanation": "The notice gives one direct reason: the number of work seats is limited. This is a fresh practice document, separate from the earlier notice and examples."
+      }
+    },
+    "default": {
+      "prompt": "図書館からのお知らせ\n今週の資料整理は、利用者カードを持っている方なら予約なしで参加できます。ただし、作業用の席には限りがあるため、開始十五分前までに受付をしてください。\n参加者が早めに受付をする理由は何ですか。",
+      "options": [
+        "利用者カードを作るため",
+        "作業用の席が限られているため",
+        "資料を借りるため",
+        "予約が必要なため"
+      ],
+      "correct": 1,
+      "explanation": "The notice gives one direct reason: the number of work seats is limited. This is a fresh practice document, separate from the earlier notice and examples."
+    }
+  }
+}
