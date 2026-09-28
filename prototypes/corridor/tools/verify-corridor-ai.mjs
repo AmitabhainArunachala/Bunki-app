@@ -126,7 +126,7 @@ function initScript(envelopeJson) {
       }
     } catch {}
     const realFetch = window.fetch.bind(window);
-    window.__AI_STUB = { calls: 0, urls: [], models: [] };
+    window.__AI_STUB = { calls: 0, urls: [], models: [], systems: [] };
     window.fetch = (input, init = {}) => {
       const url = typeof input === 'string' ? input : input.url;
       if (!url.includes('/v1/messages')) return realFetch(input, init);
@@ -145,6 +145,7 @@ function initScript(envelopeJson) {
       }
       const body = JSON.parse(init.body);
       window.__AI_STUB.models.push(body.model);
+      window.__AI_STUB.systems.push(String(body.system || ''));
       const system = String(body.system || '');
       let text = 'stub reply ' + window.__AI_STUB.calls;
       if (system.includes('observations about the LEARNER')) {
@@ -322,6 +323,63 @@ async function main() {
     stubSeen.urls.every((u) => u.startsWith(`${OVERRIDE_BASE_URL}/`)) &&
       stubSeen.models.every((m) => m === OVERRIDE_MODEL),
     `${stubSeen.calls} calls → ${stubSeen.urls[0]} · ${stubSeen.models[0]}`,
+  );
+
+  // ------------------------------- 試用の先生 · the owner's private trial
+  // Off by default, every prompt is exactly what it was. ?sensei=trial turns
+  // on a derived learning context (learnerModel(), bands kept apart) on the
+  // teaching surfaces for this device only; ?sensei=off turns it back off.
+  console.log('\n— 試用の先生: the private trial switch');
+  const CONTEXT_LABEL = 'Derived learning context (guidance only):\n';
+  check(
+    'trial off by default — no prompt carries the learning context',
+    stubSeen.systems.length > 0 && stubSeen.systems.every((sys) => !sys.includes(CONTEXT_LABEL)),
+    `${stubSeen.systems.length} prompts inspected`,
+  );
+  const askTutorOnce = async () => {
+    await openWordSheet();
+    const before = await page.evaluate('window.__AI_STUB.calls');
+    await page.locator('#sheet .ai-ask', { hasText: '先生に聞く' }).click();
+    await page.waitForFunction((n) => window.__AI_STUB.calls > n, before, { timeout: 8000 });
+    await page.waitForFunction(() => !document.querySelector('#sheet .ai-ask:disabled'), null, { timeout: 8000 });
+    return page.evaluate(() => ({
+      system: window.__AI_STUB.systems.at(-1),
+      flag: localStorage.getItem('kairo-sensei-trial'),
+    }));
+  };
+  await open('?entry=shelf&sensei=trial');
+  const trialOn = await askTutorOnce();
+  let trialContext = null;
+  try {
+    trialContext = JSON.parse(trialOn.system.slice(trialOn.system.indexOf(CONTEXT_LABEL) + CONTEXT_LABEL.length));
+  } catch {
+    /* reported below */
+  }
+  check(
+    '?sensei=trial persists on this device and the tutor prompt carries the learning context',
+    trialOn.flag === '1' &&
+      trialContext?.kind === 'derived-learning-context' &&
+      trialContext.bands.map((b) => b.dimension).join() === 'lexis,readings,syntax,production' &&
+      trialContext.bands.every((b) => b.cells.every((c) => c.measured && c.observed)) &&
+      Array.isArray(trialContext.targets) &&
+      Array.isArray(trialContext.confusions),
+    `flag ${trialOn.flag} · ${trialContext ? trialContext.modelVersion + ' · ' + trialContext.bands.length + ' bands' : 'no context'}`,
+  );
+  await page.click('#sheet-close');
+  await open('?entry=shelf');
+  const trialStays = await askTutorOnce();
+  check(
+    'the trial survives a plain reload — no parameter changes nothing',
+    trialStays.flag === '1' && trialStays.system.includes(CONTEXT_LABEL),
+    `flag ${trialStays.flag}`,
+  );
+  await page.click('#sheet-close');
+  await open('?entry=shelf&sensei=off');
+  const trialOff = await askTutorOnce();
+  check(
+    '?sensei=off clears the switch and the prompt returns to what it was',
+    trialOff.flag === null && !trialOff.system.includes(CONTEXT_LABEL),
+    `flag ${trialOff.flag}`,
   );
 
   // --------------------------------------- surface 3+4 · quiz and the coach
