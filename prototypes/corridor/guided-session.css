@@ -1492,6 +1492,14 @@ legend.gs-instruction {
   }
 }
 @media (max-width: 760px) {
+  /* phones: the room's doors keep their Japanese names on one line (the fused study's rule) */
+  .gs-nav {
+    padding: 5px 8px !important;
+    white-space: nowrap;
+  }
+  .gs-nav .gs-gloss {
+    display: none;
+  }
   .gs-node {
     font-size: 14px;
     padding: 4px 6px !important;
