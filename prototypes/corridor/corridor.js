@@ -19129,10 +19129,12 @@ function renderSrsStats(main) {
     main.append(chart);
     main.append(el('p', 'fine stats-axis', `${labels[0]} … ${labels[labels.length - 1]} · ${tx('最大', 'max')} ${max}`));
   };
+  // calendar days, never fixed 24-hour blocks: where the clocks change a day is 23 or 25 hours,
+  // and stepping by 24 h skipped a day (or showed one twice); a DST-free zone is unchanged
   const pastDays = [];
   const pastLabels = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * DAY);
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
     pastDays.push(S.stats[dayKey(d)]?.n || 0);
     pastLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
   }
@@ -19141,14 +19143,16 @@ function renderSrsStats(main) {
   const aheadLabels = [];
   const base = startOfDay(now);
   for (let i = 0; i < 14; i++) {
-    const d = new Date(base + i * DAY);
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
     aheadLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
   }
   for (const item of S.taken) {
     const key = srsKey(item.t, item.id);
     const rec = S.srs[key];
     if (!rec || S.suspended[key]) continue;
-    const i = Math.max(0, Math.floor((startOfDay(new Date(rec.due)) - base) / DAY));
+    // two midnights can be 23 or 25 hours apart: round, as srsWhen does — floor put a card due the
+    // day after spring-forward one day early
+    const i = Math.max(0, Math.round((startOfDay(new Date(rec.due)) - base) / DAY));
     if (i < 14) ahead[i] += 1;
   }
   bars('これから14日', 'due, next 14 days', ahead, aheadLabels, 'ahead');
