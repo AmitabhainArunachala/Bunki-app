@@ -760,6 +760,40 @@ PROBES['kdx-chip-state'] = async () => {
   await context.close();
 };
 
+/* sheet-focus-ring-summary-trap — dbd5f48c's ring counted only button, a[href], input and
+ * [tabindex], and sent any focus off the ring back to the first control: forward Tab from the
+ * 出会った文章 <summary> of a captured word's sheet jumped back to 戻る, so nothing below it could
+ * be reached. The seeded card carries a source reference, as a word captured from a reading does. */
+PROBES['sheet-summary-tab'] = async () => {
+  const seed = envelope();
+  seed.taken[0].sourceContextRef = `teacher-context:${'a'.repeat(64)}`;
+  const { context, page } = await learner({ seed });
+  await open(page, '?entry=shelf&ui=bi');
+  await page.fill('#search', '学校');
+  await page.locator('[data-result="word:学校"]').first().click();
+  await page.waitForSelector('#sheet summary');
+  await settle(page, 500);
+  await page.focus('#sheet .learning-source > summary');
+  const walk = async (key) => {
+    await page.keyboard.press(key);
+    return page.evaluate(() => {
+      const summary = document.querySelector('#sheet .learning-source > summary');
+      const node = document.activeElement;
+      const after = !!(summary.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING);
+      return { at: node.id || node.className || node.tagName, text: (node.textContent || '').trim().slice(0, 16),
+        inside: !!document.getElementById('sheet')?.contains(node), after, back: node.classList.contains('sheet-back') };
+    });
+  };
+  const forward = await walk('Tab');
+  await page.focus('#sheet .learning-source > summary');
+  const backward = await walk('Shift+Tab');
+  check('sheet-focus-ring-summary-trap · Tab from 出会った文章\'s summary reaches the control after it, not 戻る',
+    forward.inside && forward.after && !forward.back, JSON.stringify(forward));
+  check('sheet-focus-ring-summary-trap · Shift+Tab from the summary stays in the sheet, before it',
+    backward.inside && !backward.after, JSON.stringify(backward));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {

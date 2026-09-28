@@ -24800,8 +24800,11 @@ function renderSheet(root) {
       return;
     }
     if (event.key !== 'Tab') return;
-    const focusable = [...sheet.querySelectorAll('button, a[href], input, [tabindex]')].filter(
-      (item) => !item.disabled && item.tabIndex >= 0 && item.offsetParent !== null,
+    // every control Tab can reach is on the ring — a <summary> (出会った文章, the level-tag notes),
+    // a textarea or a select left off it was "not on the ring" and sent forward Tab back to 戻る —
+    // and a rendered box is the visibility test, as in the writing room's ring
+    const focusable = [...sheet.querySelectorAll('summary, button, a[href], input, select, textarea, [tabindex]')].filter(
+      (item) => !item.disabled && item.tabIndex >= 0 && item.getClientRects().length > 0,
     );
     if (!focusable.length) {
       event.preventDefault();
