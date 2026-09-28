@@ -1228,8 +1228,8 @@ await check(
 
 await check('Machine-checked written tests verify from public files, stay labelled and never widen host review', async () => {
   const rows = await verifyMachineCheckedCatalog(PUBLIC_BANK, shippedCatalog);
-  for (const level of ['N1'])
-    assert(rows.some(({ entry }) => entry.level === level), `No machine-checked ${level} test`);
+  for (const level of ['N1', 'N2', 'N3', 'N4', 'N5'])
+    assert(rows.filter(({ entry }) => entry.level === level).length >= 5, `Fewer than five machine-checked ${level} tests`);
   for (const { entry } of rows) {
     assert.equal(entry.review.label, MACHINE_CHECK_LABEL);
     assert.equal(entry.editorialAtStart.policyVersion, MACHINE_CHECK_POLICY);
