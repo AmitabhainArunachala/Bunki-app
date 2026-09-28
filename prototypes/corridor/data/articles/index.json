@@ -8840,6 +8840,582 @@
     "禁止"
    ],
    "truncated": false
+  },
+  {
+   "id": "adapt-n3:govonline:article-202609-radio-3741",
+   "title": "手話も「言語」です",
+   "titleEn": "Sign language is a language, too (N3 rewrite)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "N3書き換え · 政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "Bunkiによる書き換え（N3向け。原文ではありません）。もとの記事：「「伝える」をもっと豊かに！手話は言語です。」 — 出典：「「伝える」をもっと豊かに！手話は言語です。」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「「伝える」をもっと豊かに！手話は言語です。」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/radio-3741.html",
+   "date": "2026-09-21",
+   "publishedAt": "2026-09-21T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:18+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "culture",
+   "file": "adapt-n3-govonline-article-202609-radio-3741.json",
+   "adaptation": {
+    "basedOn": "govonline:article-202609-radio-3741",
+    "level": "N3",
+    "by": "claude-opus-5.5-authored-2026-09-28",
+    "note": "Bunki rewrite for learners — not the original text; the source is linked"
+   },
+   "chars": 281,
+   "snippet": "9月23日は「手話の日」です。 手話は、手や指、体の動き、顔の表情を使って話す言葉です。耳が聞こえない人や、聞こえにくい人にとっ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.3282707182320443,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8658536585365854,
+      "type_coverage": 0.95,
+      "band_vector": {
+       "core": 0.7682926829268293,
+       "extended": 0.0975609756097561,
+       "oov": 0.13414634146341464
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 82
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.23170731707317074,
+       "ninjal-kyoiku-kihon-goi:full": 0.13414634146341464
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 82
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7560975609756098,
+      "band_vector": {
+       "n5": 0.35365853658536583,
+       "n4": 0.24390243902439024,
+       "n3": 0.13414634146341464,
+       "n2": 0.0,
+       "n1": 0.024390243902439025,
+       "oov": 0.24390243902439024
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 82
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "手話",
+    "動き",
+    "表情",
+    "使う",
+    "話す",
+    "言葉"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "adapt-n3:govonline:article-202609-tv-6628",
+   "title": "スマホや電気自動車に必要な「重要鉱物」",
+   "titleEn": "The critical minerals inside phones and electric cars (N3 rewrite)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "gov-online.go.jp",
+   "sourceLabel": "N3書き換え · 政府広報オンライン · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.gov-online.go.jp/tos/",
+   "attribution": "Bunkiによる書き換え（N3向け。原文ではありません）。もとの記事：「先端産業に必須“重要鉱物”」 — 出典：「先端産業に必須“重要鉱物”」（政府広報オンライン）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.gov-online.go.jp/tos/］。「先端産業に必須“重要鉱物”」（政府広報オンライン）を加工して作成：ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.gov-online.go.jp/article/202609/tv-6628.html",
+   "date": "2026-09-24",
+   "publishedAt": "2026-09-24T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:14+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "economy",
+   "file": "adapt-n3-govonline-article-202609-tv-6628.json",
+   "adaptation": {
+    "basedOn": "govonline:article-202609-tv-6628",
+    "level": "N3",
+    "by": "claude-opus-5.5-authored-2026-09-28",
+    "note": "Bunki rewrite for learners — not the original text; the source is linked"
+   },
+   "chars": 365,
+   "snippet": "スマートフォンや電気自動車など、わたしたちの生活を支える多くの製品に、「重要鉱物」が使われています。新しい産業を発展させるために",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.607454545454546,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.9560439560439561,
+      "type_coverage": 0.9402985074626866,
+      "band_vector": {
+       "core": 0.7252747252747253,
+       "extended": 0.23076923076923078,
+       "oov": 0.04395604395604396
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 91
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.27472527472527475,
+       "ninjal-kyoiku-kihon-goi:full": 0.04395604395604396
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 91
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8681318681318682,
+      "band_vector": {
+       "n5": 0.3076923076923077,
+       "n4": 0.15384615384615385,
+       "n3": 0.34065934065934067,
+       "n2": 0.04395604395604396,
+       "n1": 0.02197802197802198,
+       "oov": 0.13186813186813187
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 91
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "スマート",
+    "フォン",
+    "電気",
+    "自動",
+    "わたし",
+    "生活"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "adapt-n3:env:press-press_05643",
+   "title": "神戸港で「コガネヒアリ」が見つかった",
+   "titleEn": "Golden fire ants found at Kobe port (N3 rewrite)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "env.go.jp",
+   "sourceLabel": "N3書き換え · 環境省 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "PDL1.0 (CC BY 4.0 互換)",
+   "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+   "termsUrl": "https://www.env.go.jp/mail.html",
+   "attribution": "Bunkiによる書き換え（N3向け。原文ではありません）。もとの記事：「神戸港におけるコガネヒアリの確認について」 — 出典：「神戸港におけるコガネヒアリの確認について」（環境省ホームページ）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）［利用規約 https://www.env.go.jp/mail.html］。「神戸港におけるコガネヒアリの確認について」（環境省ホームページ）を加工して作成：段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）",
+   "url": "https://www.env.go.jp/press/press_05643.html",
+   "date": "2026-09-25",
+   "publishedAt": "2026-09-25T00:00:00+09:00",
+   "fetchedAt": "2026-09-28T02:37:41+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "science",
+   "file": "adapt-n3-env-press-press_05643.json",
+   "adaptation": {
+    "basedOn": "env:press-press_05643",
+    "level": "N3",
+    "by": "claude-opus-5.5-authored-2026-09-28",
+    "note": "Bunki rewrite for learners — not the original text; the source is linked"
+   },
+   "chars": 334,
+   "snippet": "9月14日、神戸港のコンテナ置き場で、めずらしいアリが見つかりました。 専門家が調べた結果、このアリは「コガネヒアリ」だとわかり",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.9912437810945276,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.85,
+      "type_coverage": 0.8163265306122449,
+      "band_vector": {
+       "core": 0.6375,
+       "extended": 0.2125,
+       "oov": 0.15
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 80
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.3625,
+       "ninjal-kyoiku-kihon-goi:full": 0.15
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 80
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6125,
+      "band_vector": {
+       "n5": 0.1875,
+       "n4": 0.2,
+       "n3": 0.2125,
+       "n2": 0.0125,
+       "n1": 0.0,
+       "oov": 0.3875
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 80
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "コンテナ",
+    "置き場",
+    "めずらしい",
+    "アリ",
+    "見つかる",
+    "専門"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "adapt-n3:jawiki:3492442",
+   "title": "アジア競技大会が愛知・名古屋で",
+   "titleEn": "The Asian Games come to Aichi and Nagoya (N3 rewrite)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "ja.wikipedia",
+   "sourceLabel": "N3書き換え · ウィキペディア · 検収前",
+   "pool": "share_alike",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+   "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+   "attribution": "Bunkiによる書き換え（N3向け。原文ではありません）。もとの記事：「2026年アジア競技大会」 — 出典：ウィキペディア日本語版「2026年アジア競技大会」（版 111162945、2026-09-26）の執筆者、CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?title=2026%E5%B9%B4%E3%82%A2%E3%82%B8%E3%82%A2%E7%AB%B6%E6%8A%80%E5%A4%A7%E4%BC%9A&action=history ／ 記事の冒頭部分から段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）。この頁の本文は CC BY-SA 4.0 で再利用できる。 この書き換えも CC BY-SA 4.0 で提供します。",
+   "url": "https://ja.wikipedia.org/w/index.php?oldid=111162945",
+   "date": "2026-09-26",
+   "publishedAt": "2026-09-26T09:19:09Z",
+   "fetchedAt": "2026-09-28T02:37:59+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "sports",
+   "file": "adapt-n3-jawiki-3492442.json",
+   "adaptation": {
+    "basedOn": "jawiki:3492442",
+    "level": "N3",
+    "by": "claude-opus-5.5-authored-2026-09-28",
+    "note": "Bunki rewrite for learners — not the original text; the source is linked"
+   },
+   "chars": 258,
+   "snippet": "2026年、第20回アジア競技大会が日本で開かれます。会場は、おもに愛知県と名古屋市です。東京都など、愛知県の外で行われる競技も",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.727435435435436,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.9038461538461539,
+      "type_coverage": 0.8529411764705882,
+      "band_vector": {
+       "core": 0.6538461538461539,
+       "extended": 0.25,
+       "oov": 0.09615384615384616
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 52
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.34615384615384615,
+       "ninjal-kyoiku-kihon-goi:full": 0.09615384615384616
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 52
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8076923076923077,
+      "band_vector": {
+       "n5": 0.25,
+       "n4": 0.19230769230769232,
+       "n3": 0.36538461538461536,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.19230769230769232
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 52
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 0,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 2
+     }
+    }
+   },
+   "seeds": [
+    "競技",
+    "大会",
+    "開く",
+    "会場",
+    "おもに",
+    "行う"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "adapt-n3:jawiki:5238864-s63",
+   "title": "台風25号と記録的な大雨",
+   "titleEn": "Typhoon No. 25 and record rain (N3 rewrite)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "ja.wikipedia",
+   "sourceLabel": "N3書き換え · ウィキペディア · 検収前",
+   "pool": "share_alike",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+   "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+   "attribution": "Bunkiによる書き換え（N3向け。原文ではありません）。もとの記事：「2026年の台風（台風25号（ドゥージェン））」 — 出典：ウィキペディア日本語版「2026年の台風」（版 111173216、2026-09-27）の執筆者、CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。履歴 https://ja.wikipedia.org/w/index.php?title=2026%E5%B9%B4%E3%81%AE%E5%8F%B0%E9%A2%A8&action=history ／ 記事の該当節から段落単位で抜粋し、ふりがなと辞書リンクを付けて掲載（Bunki）。この頁の本文は CC BY-SA 4.0 で再利用できる。 この書き換えも CC BY-SA 4.0 で提供します。",
+   "url": "https://ja.wikipedia.org/w/index.php?oldid=111173216",
+   "date": "2026-09-27",
+   "publishedAt": "2026-09-27T01:21:26Z",
+   "fetchedAt": "2026-09-28T02:38:04+00:00",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "weather",
+   "file": "adapt-n3-jawiki-5238864-s63.json",
+   "adaptation": {
+    "basedOn": "jawiki:5238864-s63",
+    "level": "N3",
+    "by": "claude-opus-5.5-authored-2026-09-28",
+    "note": "Bunki rewrite for learners — not the original text; the source is linked"
+   },
+   "chars": 341,
+   "snippet": "2026年9月、台風25号（名前は「ドゥージェン」）が日本に近づきました。 この台風は、9月16日の夜、マリアナ諸島の東で台風に",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.437326027397262,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8767123287671232,
+      "type_coverage": 0.86,
+      "band_vector": {
+       "core": 0.7123287671232876,
+       "extended": 0.1643835616438356,
+       "oov": 0.1232876712328767
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 73
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.2876712328767123,
+       "ninjal-kyoiku-kihon-goi:full": 0.1232876712328767
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 73
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.726027397260274,
+      "band_vector": {
+       "n5": 0.2602739726027397,
+       "n4": 0.2054794520547945,
+       "n3": 0.1780821917808219,
+       "n2": 0.0410958904109589,
+       "n1": 0.0410958904109589,
+       "oov": 0.273972602739726
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 73
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 2
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "台風",
+    "名前",
+    "ドゥージェン",
+    "近づく",
+    "この",
+    "諸島"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "adapt-n3:global-voices:2026-09-28-65726",
+   "title": "シリアの「連帯の畑」",
+   "titleEn": "Syria's 'solidarity fields' (N3 rewrite)",
+   "titleEnSource": "claude-opus-5.5-authored-2026-09-28",
+   "source": "jp.globalvoices.org",
+   "sourceLabel": "N3書き換え · Global Voices 日本語 · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "termsUrl": "https://jp.globalvoices.org/about/%E8%A8%98%E4%BA%8B%E3%81%AE%E8%BB%A2%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/",
+   "attribution": "Bunkiによる書き換え（N3向け。原文ではありません）。もとの記事：「シリアの「連帯の畑」で在来種子の再生を目指す」 — Global Voices 日本語 — 原文: lahlah; 翻訳: Moegi Tanaka; 校正: Yasuhisa Miyata. https://jp.globalvoices.org/2026/09/28/65726/ — CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). HTML layout, images and embedded media omitted; whitespace normalized; article text otherwise copied. Excerpted at paragraph boundaries by Bunki. 本文の前の署名・初出の注記（本文から外し、ここに記す）：レイダ・ゼイダン / この記事は2026年4月7日、 Lahlah誌にアラビア語で最初に公開された。グローバル・ボイスとのコンテンツ共有合意に基づきその翻訳版を再公開する。 / 当記事はグローバル・ボイス2026年5月のスポットライト・シリーズ「世界の危機、地域の解決策」の一環である。このシリーズは、気候変動対策や効果を上げた活動について取り上げる。さらにグローバル・サウスのコミュニティの取り組みや、将来の世代にどのような意味をもつかという分析なども紹介している。このシリーズへの支援はこちらから。 ふりがなと辞書リンクを付けて掲載（Bunki）。",
+   "url": "https://jp.globalvoices.org/2026/09/28/65726/",
+   "date": "2026-09-28",
+   "publishedAt": "2026-09-28T11:16:26+09:00",
+   "fetchedAt": "2026-09-28T03:04:23.272Z",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-09-28",
+   "lane": "news",
+   "feed": "fresh",
+   "topic": "international",
+   "file": "adapt-n3-global-voices-2026-09-28-65726.json",
+   "adaptation": {
+    "basedOn": "global-voices:2026-09-28-65726",
+    "level": "N3",
+    "by": "claude-opus-5.5-authored-2026-09-28",
+    "note": "Bunki rewrite for learners — not the original text; the source is linked"
+   },
+   "chars": 320,
+   "snippet": "シリアのダマスカスの郊外にあるジャラマナという町で、小さな畑が生まれ変わろうとしています。 2026年3月の初め、ここで「連帯の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.2140000000000004,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "lexical_coverage": {
+      "coverage": 0.8888888888888888,
+      "type_coverage": 0.8636363636363636,
+      "band_vector": {
+       "core": 0.8222222222222222,
+       "extended": 0.06666666666666667,
+       "oov": 0.1111111111111111
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_content_tokens": 90
+     },
+     "tmr": {
+      "by_level": {
+       "ninjal-kyoiku-kihon-goi:core": 0.17777777777777778,
+       "ninjal-kyoiku-kihon-goi:full": 0.1111111111111111
+      },
+      "substrate": "ninjal-kyoiku-kihon-goi",
+      "n_tokens": 90
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8111111111111111,
+      "band_vector": {
+       "n5": 0.32222222222222224,
+       "n4": 0.12222222222222222,
+       "n3": 0.3111111111111111,
+       "n2": 0.011111111111111112,
+       "n1": 0.044444444444444446,
+       "oov": 0.18888888888888888
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 90
+     }
+    },
+    "disagreement": {
+     "flag": true,
+     "detail": {
+      "ordinals": {
+       "jreadability": 1,
+       "lexical_coverage": 2,
+       "tmr": 1
+      },
+      "mapping": "0=easy,1=mid,2=hard; jreadability from its own band scale (上級=2/中級=1/初級=0); lexical/tmr tercile bins vs reference snow-t15-original-n2000-seed42-v1",
+      "tmr_level": "ninjal-kyoiku-kihon-goi:core",
+      "max_gap": 1
+     }
+    }
+   },
+   "seeds": [
+    "郊外",
+    "ある",
+    "ジャラ",
+    "いう",
+    "小さな",
+    "生まれ変わる"
+   ],
+   "truncated": false
   }
  ]
 }

@@ -44,7 +44,13 @@
     "jawiki:3492442": "The 2026 Asian Games in Aichi and Nagoya",
     "jawiki:5238864-s63": "Typhoon No. 25 (Dujuan)",
     "jawiki:5294446": "The reshuffled second Takaichi cabinet",
-    "global-voices:2026-09-28-65726": "Syria's 'solidarity fields' bring back native seeds"
+    "global-voices:2026-09-28-65726": "Syria's 'solidarity fields' bring back native seeds",
+    "adapt-n3:env:press-press_05643": "Golden fire ants found at Kobe port (N3 rewrite)",
+    "adapt-n3:govonline:article-202609-radio-3741": "Sign language is a language, too (N3 rewrite)",
+    "adapt-n3:jawiki:5238864-s63": "Typhoon No. 25 and record rain (N3 rewrite)",
+    "adapt-n3:jawiki:3492442": "The Asian Games come to Aichi and Nagoya (N3 rewrite)",
+    "adapt-n3:govonline:article-202609-tv-6628": "The critical minerals inside phones and electric cars (N3 rewrite)",
+    "adapt-n3:global-voices:2026-09-28-65726": "Syria's 'solidarity fields' (N3 rewrite)"
   },
   "topics": {
     "kantei:jp-105-actions-202609-25startup": "economy",
@@ -89,7 +95,13 @@
     "jawiki:3492442": "sports",
     "jawiki:5238864-s63": "weather",
     "jawiki:5294446": "politics",
-    "global-voices:2026-09-28-65726": "international"
+    "global-voices:2026-09-28-65726": "international",
+    "adapt-n3:env:press-press_05643": "science",
+    "adapt-n3:govonline:article-202609-radio-3741": "culture",
+    "adapt-n3:jawiki:5238864-s63": "weather",
+    "adapt-n3:jawiki:3492442": "sports",
+    "adapt-n3:govonline:article-202609-tv-6628": "economy",
+    "adapt-n3:global-voices:2026-09-28-65726": "international"
   },
   "skip": {}
 }
