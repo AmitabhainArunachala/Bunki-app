@@ -177,7 +177,9 @@ export function createAssessmentView(host) {
     if (hasTests) block.append(node('h2', 'exam-section-heading', tx('以前の練習セット', 'Older practice sets')));
     if (older.state === 'loading') { block.append(node('p', 'exam-status', tx('以前の練習セットを読み込み中…', 'Loading the older practice sets…'))); main.append(block); return; }
     if (older.state === 'failed') {
-      block.append(node('p', 'exam-status', tx(`${level}の確認済みテストは、まだありません。以前の練習セットを読み込めませんでした。`, `No checked ${level} tests yet, and the older practice sets couldn’t load.`)));
+      block.append(node('p', 'exam-status', hasTests
+        ? tx('以前の練習セットを読み込めませんでした。', 'The older practice sets couldn’t load.')
+        : tx(`${level}の確認済みテストは、まだありません。以前の練習セットを読み込めませんでした。`, `No checked ${level} tests yet, and the older practice sets couldn’t load.`)));
       block.append(button(tx('もう一度読み込む', 'Try loading again'), 'exam-older-retry', () => host.retryOlderIndex?.()));
       main.append(block); return;
     }
