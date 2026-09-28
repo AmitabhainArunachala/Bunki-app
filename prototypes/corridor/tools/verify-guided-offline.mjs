@@ -8,19 +8,25 @@
  * from its worker and the room is opened for the first time: its modules, styles, question
  * set and sprite sheet must all come from the install.
  *
+ * The single-file handoff (build-standalone.mjs) must carry the same room: it is opened from
+ * file:// with the context offline, and the room, its first question and its moments must work.
+ * The handoff is built from this site with the checkout's builder, or GUIDED_STANDALONE names one.
+ *
  * Real Chromium, HTTPS (index.html registers the worker only on https:), a fresh context.
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-guided-offline.mjs
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:https';
-import { extname, join, resolve, sep } from 'node:path';
+import { dirname, extname, join, resolve, sep } from 'node:path';
 import process from 'node:process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { chromium } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SITE = resolveCorridorSite();
 const RUN = mkdtempSync(join(resolveCorridorEvidence(), 'guided-offline-'));
 const HOST = 'kairo-guided-offline.test';
@@ -77,6 +83,54 @@ function startServer() {
 const ready = (page) => page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 60000 })
   .then(() => true, () => false);
 
+/** Open the room from the dojo, then walk it: arrival, the first question, a wrong answer's moment. */
+async function walkRoom(page, label, shots) {
+  try {
+    return await walk(page, label, shots);
+  } catch (error) {
+    check(`${label}, the walk through the room ran to its end`, false, String(error?.message || error).split('\n')[0]);
+    return false;
+  }
+}
+async function walk(page, label, shots) {
+  await page.locator('#chrome-dojo').click();
+  await page.locator('button[data-study-door="guided"]').click();
+  const opened = await Promise.race([
+    page.waitForSelector('.guided-room .gs-main', { timeout: 20000 }).then(() => 'room'),
+    page.waitForSelector('[data-guided-retry]', { timeout: 20000 }).then(() => 'failed'),
+  ]).catch(() => 'timeout');
+  const said = await page.evaluate(() => document.querySelector('main')?.innerText.slice(0, 160) || '');
+  await page.screenshot({ path: join(RUN, `${shots}-01-room.png`) });
+  check(`${label}, the guided room opens the first time its door is pressed`, opened === 'room', `${opened} · ${said.replace(/\s+/g, ' ')}`);
+  if (opened !== 'room') return false;
+  const styled = await page.evaluate(() => !!document.querySelector('link[data-guided-style]')?.sheet);
+  check(`${label}, its stylesheet loads`, styled);
+  await page.locator('.guided-room [data-action="setup"]').click();
+  await page.locator('.guided-room [data-action="start"]').click();
+  const stage = await page.locator('.guided-room').getAttribute('data-stage');
+  check(`${label}, its question set loads: the first question opens`, stage === 'question', `stage=${stage}`);
+  await page.screenshot({ path: join(RUN, `${shots}-02-first-question.png`) });
+  // a wrong answer plays the samurai cut: the moments module, its style and the sprite sheet
+  await page.locator('.guided-room [name="answer"][value="1"]').check();
+  await page.locator('.guided-room [data-action="check"]').first().click();
+  const moment = await page.waitForSelector('.samurai-effect', { timeout: 8000 }).then(() => true, () => false);
+  if (moment) {
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: join(RUN, `${shots}-03-samurai.png`) });
+  }
+  const sprite = await page.evaluate(async () => {
+    const node = document.querySelector('.samurai-effect__samurai-art');
+    const url = node && getComputedStyle(node).backgroundImage.match(/url\("?(.*?)"?\)/u)?.[1];
+    if (!url) return 0;
+    const image = new Image();
+    image.src = url;
+    try { await image.decode(); return image.naturalWidth; } catch { return 0; }
+  });
+  check(`${label}, its moments play: module, style and the sprite sheet the samurai is painted from`, moment && sprite > 0,
+    `samurai=${moment} · sprite ${sprite}px wide`);
+  return true;
+}
+
 async function main() {
   const identity = JSON.parse(readFileSync(resolve(SITE, 'build-identity.json'), 'utf8'));
   console.log(`artifact ${identity.artifactSha256} · ${identity.gitSha}${identity.sourceDirty ? ' (dirty)' : ''}`);
@@ -124,40 +178,33 @@ async function main() {
     });
     check('control: an uncached request really fails offline', unreachable);
 
-    await page.locator('#chrome-dojo').click();
-    await page.locator('button[data-study-door="guided"]').click();
-    const opened = await Promise.race([
-      page.waitForSelector('.guided-room .gs-main', { timeout: 20000 }).then(() => 'room'),
-      page.waitForSelector('[data-guided-retry]', { timeout: 20000 }).then(() => 'failed'),
-    ]).catch(() => 'timeout');
-    const said = await page.evaluate(() => document.querySelector('main')?.innerText.slice(0, 160) || '');
-    await page.screenshot({ path: join(RUN, '01-guided-room-offline.png') });
-    check('offline, the guided room opens the first time its door is pressed', opened === 'room', `${opened} · ${said.replace(/\s+/g, ' ')}`);
-    if (opened === 'room') {
-      const styled = await page.evaluate(() => !!document.querySelector('link[data-guided-style]')?.sheet);
-      check('its stylesheet came from the install', styled);
-      await page.locator('.guided-room [data-action="setup"]').click();
-      await page.locator('.guided-room [data-action="start"]').click();
-      const stage = await page.locator('.guided-room').getAttribute('data-stage');
-      check('its question set came from the install: the first question opens', stage === 'question', `stage=${stage}`);
-      await page.screenshot({ path: join(RUN, '02-first-question-offline.png') });
-      // a wrong answer plays the samurai cut: the moments module, its style and the sprite sheet
-      await page.locator('.guided-room [name="answer"][value="1"]').check();
-      await page.locator('.guided-room [data-action="check"]').first().click();
-      const moment = await page.waitForSelector('.samurai-effect', { timeout: 8000 }).then(() => true, () => false);
-      if (moment) await page.screenshot({ path: join(RUN, '03-samurai-offline.png') });
-      const sprite = await page.evaluate(async () => {
-        const image = new Image();
-        image.src = 'guided/samurai-sprites-v2.png';
-        try { await image.decode(); return image.naturalWidth; } catch { return 0; }
-      });
-      check('its moments play offline: module, style and sprite sheet from the install', moment && sprite > 0,
-        `samurai=${moment} · sprite ${sprite}px wide`);
-    }
+    const opened = await walkRoom(page, 'offline', 'served');
     const guidedMisses = state.offlineRequests.filter((path) => /\/guided/.test(path));
     report.offlineRequests = state.offlineRequests;
-    check('no guided asset was asked of the network while offline', opened === 'room' && guidedMisses.length === 0,
+    check('no guided asset was asked of the network while offline', opened && guidedMisses.length === 0,
       guidedMisses.join(', ') || `${state.offlineRequests.length} other request(s) refused: ${[...new Set(state.offlineRequests)].slice(0, 6).join(', ') || 'none'}`);
+    await context.close();
+
+    // the single-file handoff, opened from file:// with no network at all
+    let file = process.env.GUIDED_STANDALONE;
+    if (!file) {
+      file = join(RUN, 'corridor-standalone.html');
+      const built = spawnSync(process.execPath, [join(ROOT, 'prototypes/corridor/tools/build-standalone.mjs'), file],
+        { cwd: ROOT, env: process.env, encoding: 'utf8', timeout: 180000 });
+      if (built.status !== 0) throw new Error(`build-standalone failed: ${(built.stderr || String(built.error)).slice(0, 300)}`);
+    }
+    report.standalone = file;
+    const single = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    single.on('page', (page) => page.on('pageerror', (error) => pageErrors.push(error.message)));
+    await single.setOffline(true);
+    const handoff = await single.newPage();
+    const address = pathToFileURL(file);
+    address.searchParams.set('entry', 'shelf');
+    address.searchParams.set('ui', 'bi');
+    await handoff.goto(address.href);
+    check('the single-file handoff boots from file:// offline', await ready(handoff));
+    await walkRoom(handoff, 'in the single-file handoff', 'standalone');
+    await single.close();
     check('no page errors', pageErrors.length === 0, pageErrors.slice(0, 3).join(' | ') || 'clean');
   } finally {
     await browser.close();

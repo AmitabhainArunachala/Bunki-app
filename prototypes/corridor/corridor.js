@@ -19443,6 +19443,14 @@ function guidedHost() {
     english: bi,
     render: () => { if (S.view === 'guided') render(); },
     storage: () => localStorage,
+    // the single-file handoff carries the sets in its bundle, keyed by path; a served build
+    // lets the room fetch them
+    fetchJson: window.__CORRIDOR_STANDALONE__ === true
+      ? (path) => {
+        const bundled = window.__CORRIDOR_BUNDLE__?.[String(path).replace(/\.json$/u, '')];
+        return bundled ? Promise.resolve(structuredClone(bundled)) : Promise.reject(new Error(`${path} is not in this file`));
+      }
+      : null,
     openReport: maintenanceReports ? () => maintenanceReports.openReport() : null,
     openEntry: (node) => go(node, { invoker: document.activeElement }),
     openTutor: () => {
