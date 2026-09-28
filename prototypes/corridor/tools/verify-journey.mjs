@@ -336,12 +336,12 @@ try {
     await page.click('#review-start');
     for (let i = 0; i < 60; i++) {
       await page.waitForFunction(() => !!document.querySelector('.review-summary')
-        || !!document.querySelector('#declare-recalled:not(:disabled)'), null, { timeout: 5000 });
+        || !!document.querySelector('#reveal:not(:disabled)'), null, { timeout: 5000 });
       if (await page.locator('.review-summary').count()) break;
       // Each acknowledged action redraws the face: resolve a fresh control and
       // wait for its durable record transition before pressing the next one.
       const before = await readAppRecord(page);
-      await page.locator('#declare-recalled').click();
+      await page.locator('#reveal').click();
       const declared = await waitForAppRecord(page, record => record.obslog.length === before.obslog.length + 1
         && record.obslog.at(-1)?.[1] === 'reveal' && record.obslog.at(-1)?.[3] === 1,
       { timeout: 5000, description: 'journey recall declaration' });

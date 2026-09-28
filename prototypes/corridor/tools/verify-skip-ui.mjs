@@ -210,15 +210,15 @@ try {
   await page.locator('#review-start').click();
   let grades = 0;
   for (; grades < 12 && !(await page.locator('.review-summary').isVisible()); grades++) {
-    await page.locator('#declare-recalled').waitFor();
-    await page.locator('#declare-recalled').click();
+    await page.locator('#reveal').waitFor();
+    await page.locator('#reveal').click();
     await page.locator('.grade.g-good').waitFor();
     const answer = await page.locator('.review-sense-primary').innerText();
     check(`review answer ${grades + 1} comes from retained KANJIDIC2 meanings`, answer.includes(source.meanings[0]) && !answer.includes('No record in this layer'));
     check(`review ${grades + 1} does not invent a spoken reading`, await page.locator('#card-say').count() === 0);
     if (grades === 0) await page.screenshot({ path: resolve(out, 'skip-captured-review-answer.png') });
     await page.locator('.grade.g-good').click();
-    await page.waitForFunction(() => document.querySelector('#declare-recalled') || document.querySelector('.review-summary'));
+    await page.waitForFunction(() => document.querySelector('#reveal') || document.querySelector('.review-summary'));
   }
   await page.locator('.review-summary').waitFor();
   const reviewed = await waitForAppRecord(page, record => record.revlog.length === grades);

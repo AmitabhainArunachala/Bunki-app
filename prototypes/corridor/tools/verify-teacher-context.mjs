@@ -769,7 +769,7 @@ try {
       'Review asks in the same sentence that was saved',
     );
     await screenshot(fixture, 'contextual-cloze');
-    await page.locator('#declare-recalled').click();
+    await page.locator('#reveal').click();
     await page.locator('.grade.g-good').waitFor();
     assert.equal(await page.locator('.review-cloze .example-hit').textContent(), '窓');
     await page.locator('.grade.g-good').click();

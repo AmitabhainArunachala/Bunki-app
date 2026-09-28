@@ -270,13 +270,12 @@ await check('dojo-evidence-waits-for-ack-and-never-creates-schedule-state', asyn
   assert.equal(f.S.review.ix, 0); f.ack(); assert.equal(await promise, true);
   assert.equal(f.S.obslog.length, 1); assert.deepEqual(f.S.srs, before.srs); assert.deepEqual(f.S.revlog, before.revlog); assert.deepEqual(f.S.stats, before.stats);
 });
-await check('recall-declaration-rejects-without-revealing-and-serializes-double-input', async () => {
-  const f = fixture(); f.S.review.revealed = false; f.S.review.declared = null;
-  const main = f.render('renderReview'); const first = byId(main, 'declare-notyet').fire();
-  await byId(main, 'declare-recalled').fire(); assert.equal(f.queue.length, 1); assert.equal(f.S.review.revealed, false);
-  f.ack(false); await first; assert.equal(f.S.review.revealed, false); assert.equal(f.S.review.declared, null);
-  const second = byId(f.render('renderReview'), 'declare-notyet').fire(); f.ack(); await second;
-  assert.equal(f.S.review.revealed, true); assert.equal(f.S.review.declared, 0); assert.equal(f.S.obslog[0][3], 0);
+await check('show-answer-turns-the-card-without-a-write-and-ignores-a-second-press', async () => {
+  const f = fixture(); f.S.review.revealed = false; f.S.review.declared = null; const before = f.durable();
+  const main = f.render('renderReview'); const reveal = byId(main, 'reveal');
+  await reveal.fire(); await reveal.fire();
+  assert.equal(f.queue.length, 0); assert.equal(f.S.review.revealed, true); assert.equal(f.S.review.declared, null);
+  assert.deepEqual(f.S.obslog, before.obslog);
 });
 /* D23 · the saved word answer at the rendered review face. The answer shown is the card's
  * saved answer; an unavailable one shows the honest face and grades nothing. An answer that
@@ -1072,20 +1071,21 @@ async function browserChecks() {
           const before = await fault(page, 'aiQuiz'); await page.locator('#aiq-close').click(); await failed(page, before);
           assert.equal(await page.locator('#aiq-close').count(), 1);
         });
-        await journey('recall-declaration-rejection-keeps-the-answer-concealed', async (page) => {
+        await journey('show-answer-opens-four-grades-without-a-write', async (page) => {
           await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click();
-          const before = await fault(page, 'obslog'); await page.locator('#declare-recalled').click(); await failed(page, before);
-          assert.equal(await page.locator('#declare-recalled').count(), 1); assert.equal(await page.locator('.g-good').count(), 0);
+          const before = await pollDisk(page, () => true); await page.locator('#reveal').click(); await page.locator('.g-good').waitFor();
+          assert.equal(await page.locator('.grade').count(), 4); const after = await pollDisk(page, () => true);
+          assert.deepEqual(after.obslog, before.obslog);
         });
         await journey('review-grade-rejection-keeps-card-schedule-log-and-stats', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#declare-recalled').click();
+          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
           await page.locator('.g-good').waitFor(); const label = await page.locator('.review-front').textContent(); const before = await fault(page, 'srs');
           await page.locator('.g-good').evaluate((node) => { node.click(); node.click(); }); await failed(page, before, { review: true });
           assert.equal(await page.locator('.review-front').textContent(), label); assert.equal(await page.locator('.g-good').count(), 1);
         });
         await journey('review-grade-and-undo-persist-one-schedule-with-an-append-only-revocation', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#declare-notyet').click();
-          await page.locator('.g-again').waitFor(); assert.equal(await page.locator('.g-good').count(), 0);
+          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+          await page.locator('.g-again').waitFor(); assert.equal(await page.locator('.g-good').count(), 1);
           await page.locator('.g-again').click(); const graded = await pollDisk(page, (state) => state.revlog.length === 1);
           assert.equal(graded.revlog[0][2], 1); const key = graded.revlog[0][1]; assert(graded.srs[key]);
           await page.locator('#zen-more').click(); await page.locator('.review-undo').click();
