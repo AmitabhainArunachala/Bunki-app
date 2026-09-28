@@ -12,6 +12,7 @@
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-pr77-ports.mjs [--only probe,probe]
  */
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
@@ -63,12 +64,14 @@ let base;
 const pageErrors = [];
 
 /** One isolated learner: a fresh context, its own storage, its own stub. */
-async function learner({ seed = null, tutor = false, reducedMotion = false, initScript = null } = {}) {
+async function learner({ seed = null, tutor = false, reducedMotion = false, initScript = null, timezoneId = null, fixedTime = null } = {}) {
   const context = await browser.newContext({
     viewport: VIEWPORT,
     reducedMotion: reducedMotion ? 'reduce' : 'no-preference',
     serviceWorkers: 'block',
+    ...(timezoneId ? { timezoneId } : {}),
   });
+  if (fixedTime) await context.clock.setFixedTime(fixedTime);
   await silenceBrowserAudio(context);
   const stub = { mode: 'ok', delay: 0, calls: 0 };
   await context.route('**/*', async (route) => {
@@ -958,6 +961,66 @@ PROBES['browse-search'] = async () => {
   check('browse-search-word-only · control: a kanji with no record is listed, but not found by the placeholder\'s words ("record")',
     seen[''].includes('龘') && !seen.record.includes('龘'), JSON.stringify({ all: seen[''].length, record: seen.record }));
   await context.close();
+};
+
+/* stats-dst-bucketing — the 14-day forecast floored (startOfDay(due) − today) / 24 h, and the
+ * 30-day chart stepped back in fixed 24-hour blocks. Where the clocks change, a card due the day
+ * after spring-forward sat a day early, and the chart skipped a day (or showed one twice). Japan
+ * and Bali keep no DST: their charts are recorded by digest, to be compared across builds. */
+async function statsAt(timezoneId, fixedTime, due) {
+  const seed = {
+    v: 1,
+    taken: [{ t: 'word', id: '学校', label: '学校', ts: 1755000000000, started: 1755000000000 }],
+    srs: { 'word:学校': { due, last_review: '2026-02-20T03:00:00.000Z', stability: 20, difficulty: 5,
+      elapsed_days: 10, scheduled_days: 20, reps: 5, lapses: 0, learning_steps: 0, state: 2 } },
+    stats: { '2026-03-08': { n: 3, again: 1, nnew: 0 }, '2026-10-31': { n: 2, again: 0, nnew: 0 } },
+  };
+  const { context, page } = await learner({ seed, timezoneId, fixedTime });
+  await open(page);
+  await page.click('#tray');
+  await page.click('#deck-stats');
+  await page.waitForSelector('.stats-bars.ahead');
+  const got = await page.evaluate(() => ({
+    past: [...document.querySelectorAll('.stats-bars.past .stats-col')].map((n) => n.title),
+    ahead: [...document.querySelectorAll('.stats-bars.ahead .stats-col')].map((n) => n.title),
+    html: [...document.querySelectorAll('main .stats-bars, main .stats-axis')].map((n) => n.outerHTML).join('\n'),
+  }));
+  await context.close();
+  return got;
+}
+/** Every label one calendar day after the one before it (m/d from 2026, into 2027 at the turn). */
+function consecutive(titles) {
+  let year = 2026;
+  const days = titles.map((t) => t.split(':')[0].split('/').map(Number)).map(([m, d], i, all) => {
+    if (i && m < all[i - 1][0]) year += 1;
+    return Date.UTC(year, m - 1, d);
+  });
+  return days.every((day, i) => i === 0 || day - days[i - 1] === 86400000);
+}
+PROBES['stats-dst'] = async () => {
+  const beforeSpring = '2026-03-05T17:00:00.000Z'; // 3/5 12:00 in New York
+  const dueAfterSpring = '2026-03-10T16:00:00.000Z'; // 3/10 12:00 EDT
+  const pastSpring = '2026-03-09T04:30:00.000Z'; // 3/9 00:30 EDT, the day after spring-forward
+  const fallBack = '2026-11-02T04:30:00.000Z'; // 11/1 23:30 EST, the 25-hour day
+  const ny = await statsAt('America/New_York', beforeSpring, dueAfterSpring);
+  check('stats-dst-bucketing · New York: a card due the day after spring-forward sits in its own day (3/10)',
+    ny.ahead.includes('3/10: 1') && !ny.ahead.includes('3/9: 1') && consecutive(ny.ahead), ny.ahead.slice(3, 7).join(' · '));
+  const spring = await statsAt('America/New_York', pastSpring, dueAfterSpring);
+  check('stats-dst-bucketing · New York: the 30 days after spring-forward keep 3/8 and its 3 reviews',
+    spring.past.includes('3/8: 3') && consecutive(spring.past), spring.past.slice(-4).join(' · '));
+  const autumn = await statsAt('America/New_York', fallBack, dueAfterSpring);
+  check('stats-dst-bucketing · New York: the 30 days after fall-back show 10/31 once and 11/1 once',
+    autumn.past.includes('10/31: 2') && autumn.past.filter((t) => t.startsWith('11/1:')).length === 1 && consecutive(autumn.past),
+    autumn.past.slice(-4).join(' · '));
+  const digests = [];
+  for (const zone of ['Asia/Tokyo', 'Asia/Makassar']) {
+    for (const at of [beforeSpring, pastSpring, fallBack, '2026-03-08T15:30:00.000Z', '2026-12-31T14:59:00.000Z']) {
+      const got = await statsAt(zone, at, dueAfterSpring);
+      digests.push(`${zone}@${at}=${createHash('sha256').update(got.html).digest('hex').slice(0, 16)}${consecutive(got.past) && consecutive(got.ahead) ? '' : '(gap)'}`);
+    }
+  }
+  check('stats-dst-bucketing · Japan and Bali: every chart day follows the one before (digests recorded for a byte comparison across builds)',
+    digests.every((line) => !line.endsWith('(gap)')), digests.join(' '));
 };
 
 const PROBE_ORDER = Object.keys(PROBES);
