@@ -614,10 +614,28 @@ async function journey(browser, browserName, viewport) {
         'M14 the rematch verdict is explicit',
         (await page.locator('#samurai-effect-title').innerText()).trim() === 'Correct.',
       );
-      await page.waitForTimeout(700);
+      // the guard lands on the scene's own timer (impact − 220 ms), the bow at resolve
+      // (impact + 180 ms); a fixed 700 ms sleep left 70 ms of margin, which a loaded machine
+      // outran, so wait for the guard while the bow has not begun
       check(
         'M16 the learner blocks (guard) before the samurai bows',
-        (await page.locator('.samurai-effect--guard').count()) === 1,
+        await page
+          .waitForFunction(
+            () => {
+              const root = document.querySelector('.samurai-effect--rematch');
+              return (
+                !!root &&
+                root.classList.contains('samurai-effect--guard') &&
+                !root.classList.contains('samurai-effect--resolve')
+              );
+            },
+            null,
+            { timeout: 3_000 },
+          )
+          .then(
+            () => true,
+            () => false,
+          ),
       );
       await page.screenshot({ path: join(dir, '15-rematch-block.png') });
       await page.waitForTimeout(900);
@@ -892,12 +910,29 @@ async function switches(browser, browserName) {
       'M33 an explicit replay is still available',
       (await reduced.locator('.samurai-effect').count()) === 1,
     );
-    await reduced.waitForTimeout(100);
+    // the run class lands on the next animation frame, which a loaded machine can hold past a
+    // fixed 100 ms; the wait still asks for motion before the impact, as that read did, so a
+    // replay that reduced motion stilled times out here, while the scene is still up to skip
     check(
       'M34 the explicit replay actually animates',
       await reduced
-        .locator('.samurai-effect__samurai')
-        .evaluate((node) => getComputedStyle(node).animationName !== 'none'),
+        .waitForFunction(
+          () => {
+            const root = document.querySelector('.samurai-effect');
+            const node = root?.querySelector('.samurai-effect__samurai');
+            return (
+              !!node &&
+              !root.classList.contains('samurai-effect--impact') &&
+              getComputedStyle(node).animationName !== 'none'
+            );
+          },
+          null,
+          { timeout: 2_000 },
+        )
+        .then(
+          () => true,
+          () => false,
+        ),
     );
     await reduced.locator('[data-moment-skip]').click();
     await reduced.evaluate(() => {
