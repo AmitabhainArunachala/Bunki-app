@@ -12,8 +12,9 @@
 export const MOMENT_MODES = ['quiet', 'playful', 'dramatic'];
 const PREFERENCE_KEY = 'kairo-moments-v1';
 const DEFAULTS = { on: true, mode: 'playful', sound: false };
-const STYLESHEET_URL = new URL('./guided-moments.css', import.meta.url).href;
-const SPRITE_URL = new URL('./guided/samurai-sprites-v2.png', import.meta.url).href;
+/* A sibling's address, or the one the single-file handoff supplies: there this module runs from
+ * a blob: URL, which no relative address resolves against (build-standalone.mjs). */
+const sibling = (path, supplied) => globalThis[supplied] || new URL(path, import.meta.url).href;
 
 let stylesheet = null;
 function ensureStylesheet() {
@@ -25,7 +26,7 @@ function ensureStylesheet() {
     }
     const link = present || document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = STYLESHEET_URL;
+    link.href = sibling('./guided-moments.css', '__KAIRO_GUIDED_MOMENTS_STYLE_URL__');
     link.dataset.guidedMomentsStyle = '';
     link.addEventListener('load', () => resolve(true), { once: true });
     link.addEventListener(
@@ -45,7 +46,10 @@ function ensureStylesheet() {
 /** The moments with their stylesheet in place: nothing plays before it can be drawn. */
 export async function loadMoments(options = {}) {
   await ensureStylesheet();
-  return createMoments({ spriteUrl: SPRITE_URL, ...options });
+  return createMoments({
+    spriteUrl: sibling('./guided/samurai-sprites-v2.png', '__KAIRO_GUIDED_SPRITE_URL__'),
+    ...options,
+  });
 }
 
 const esc = (value) =>
