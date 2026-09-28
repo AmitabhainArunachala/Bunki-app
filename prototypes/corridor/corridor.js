@@ -4735,9 +4735,11 @@ addEventListener('popstate', () => {
     return;
   }
   if (walkConsuming) {
-    // our own quiet consume landed; re-check in case the learner moved on
+    // our own quiet consume landed; re-check in case the learner moved on. It can land on another
+    // walk entry: the writing room's own entry carries the marker of the walk it opened over, so
+    // a reload there leaves two. That one is adopted too, or the first real Back was a dead stop.
     walkConsuming = false;
-    walkArmed = false;
+    walkArmed = !!history.state?.bunkiWalk;
     syncWalkSentinel();
     return;
   }

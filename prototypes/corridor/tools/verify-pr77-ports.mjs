@@ -819,6 +819,32 @@ PROBES['chip-focus-rooms'] = async () => {
   await context.close();
 };
 
+/* eaten-back-writing-room — 6557fb0c answered the first Back after a reload in the reader, but
+ * the writing room's entry copies the walk marker it opened over. After a reload there, boot
+ * spent the adopted entry and landed on the walk entry below it, which nothing adopted: the
+ * first real Back was still a dead stop. */
+PROBES['eaten-back-strokes'] = async () => {
+  const { context, page } = await learner();
+  await open(page, '?entry=shelf&ui=bi');
+  await openKanjiSheet(page, '森');
+  await page.click('#strokes-door');
+  await page.waitForSelector('#stroke-page');
+  await settle(page, 300);
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+  await settle(page, 700);
+  const before = await page.evaluate(() => ({ view: document.body.dataset.view, length: history.length }));
+  await page.goBack().catch(() => null);
+  await settle(page, 700);
+  const after = await page.evaluate(() => ({
+    ready: document.body?.dataset?.ready ?? null, view: document.body?.dataset?.view ?? null, url: location.href,
+  })).catch(() => ({ ready: null, view: null, url: null }));
+  const answered = after.ready !== '1' || after.view !== before.view;
+  check('eaten-back-writing-room · the first Back after a reload in the writing room is answered, not eaten',
+    answered, JSON.stringify({ before, after }));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {
