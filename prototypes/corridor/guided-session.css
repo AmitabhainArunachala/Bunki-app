@@ -1,0 +1,1511 @@
+/* ============================================================================
+   案内つきの稽古 — the guided session (guided-session.mjs), loaded by the room itself.
+
+   The fused study's register (bunki_review/2026-09-23/designs/living-thread-fused), carried
+   onto the app's own tokens so every world recolours it: print ground for the hall, a washi
+   sheet for the attempt, the lacquer sheet (--sheet-*) for understanding, one red for what is
+   wrong and what is read. No neon, no glow: paper, ink and shadow only.
+   ========================================================================== */
+
+.guided-room {
+  --gs-radius: 6px;
+  --gs-sheet-shadow: var(
+    --paper-shadow,
+    0 1px 0 rgba(28, 47, 66, 0.06),
+    0 10px 28px rgba(28, 47, 66, 0.1)
+  );
+  --gs-edge: var(--paper-edge, 1px solid color-mix(in srgb, var(--ink) 30%, transparent));
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+.guided-room h1,
+.guided-room h2,
+.guided-room h3 {
+  font-family: var(--display, var(--serif));
+  font-weight: 500;
+  margin: 0;
+  text-wrap: balance;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+.guided-room h2 {
+  font-size: 20px;
+}
+.guided-room h3 {
+  font-size: 16px;
+}
+.guided-room p {
+  margin: 0 0 0.8em;
+}
+.guided-room [lang='ja'] {
+  font-family: var(--serif);
+}
+.guided-room h1 [lang='ja'],
+.guided-room h2 [lang='ja'],
+.guided-room h3 [lang='ja'] {
+  font-family: var(--display, var(--serif));
+}
+.guided-room button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: start;
+}
+.guided-room button:disabled {
+  cursor: default;
+}
+.guided-room :focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.gs-title:focus {
+  outline: none;
+}
+.gs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- bilingual labels: Japanese first, a small English gloss beside it ---------- */
+.gs-gloss {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin-left: 7px;
+  font-weight: 400;
+  vertical-align: middle;
+  text-transform: lowercase;
+}
+.gs-title .gs-gloss {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+.gs-eyebrow {
+  display: block;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-2);
+  margin: 0 0 8px;
+}
+.gs-eyebrow .gs-gloss {
+  margin-left: 5px;
+}
+.gs-dot {
+  color: var(--faint);
+  margin: 0 4px;
+}
+
+/* ---------- the room bar: the room's own doors under the app's mast ---------- */
+.gs-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 2px 0 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.gs-bar-name {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+.gs-bar-doors {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.gs-nav {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 36px;
+  padding: 6px 12px !important;
+  border: 1px solid transparent !important;
+  border-radius: 20px;
+  font-family: var(--serif);
+  font-size: 14px;
+}
+.gs-nav:hover {
+  border-color: var(--line) !important;
+}
+.gs-nav[aria-current='page'] {
+  border-color: var(--ink) !important;
+  background: color-mix(in srgb, var(--ground-0) 60%, transparent) !important;
+}
+.gs-nav .gs-gloss {
+  margin-left: 0;
+}
+/* during an attempt the room's own doors recede too (T8) */
+.guided-room[data-stage='question'] .gs-bar {
+  border-bottom-color: var(--line-soft);
+  padding-bottom: 6px;
+}
+.guided-room[data-stage='question'] .gs-nav {
+  font-size: 12px;
+  min-height: 32px;
+  padding: 4px 7px;
+  color: var(--ink-2);
+}
+.guided-room[data-stage='question'] .gs-nav .gs-gloss,
+.guided-room[data-stage='question'] .gs-bar-name .gs-gloss {
+  display: none;
+}
+
+/* ---------- one grammar of buttons: ink fill commits; outlined is secondary; text is quiet ---------- */
+.gs-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 22px;
+}
+.gs-button {
+  display: inline-flex !important;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 18px !important;
+  border: 1px solid var(--ink) !important;
+  border-radius: 4px;
+  font-family: var(--serif) !important;
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--ink);
+  background: transparent;
+}
+.gs-button.primary {
+  background: var(--ink) !important;
+  color: var(--ground-0) !important;
+}
+.gs-button.primary .gs-gloss {
+  color: color-mix(in srgb, var(--ground-0) 88%, transparent);
+}
+.gs-button.primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 88%, black) !important;
+}
+.gs-button.quiet {
+  border-color: var(--line) !important;
+}
+.gs-button:disabled,
+.gs-button.primary:disabled {
+  background: transparent !important;
+  color: var(--ink-2) !important;
+  border-color: var(--line) !important;
+}
+.gs-button.primary:disabled .gs-gloss {
+  color: var(--faint);
+}
+.gs-text {
+  color: var(--ink);
+  min-height: 32px;
+  padding: 2px 0 !important;
+  font-size: 14.5px;
+  border-bottom: 1px solid var(--line) !important;
+}
+.gs-text:hover {
+  border-bottom-color: var(--ink) !important;
+}
+.gs-text:disabled {
+  color: var(--faint);
+}
+
+/* ---------- arrival ---------- */
+.gs-arrival {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  padding-top: 22px;
+}
+.gs-hero {
+  font-size: clamp(32px, 7vw, 48px) !important;
+  line-height: 1.15;
+}
+.gs-title {
+  font-size: clamp(24px, 4.2vw, 32px);
+  line-height: 1.25;
+  margin-bottom: 4px !important;
+}
+.gs-lede {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--ink-2);
+  max-width: 48ch;
+  margin-top: 14px !important;
+}
+.gs-meta {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin-top: 14px !important;
+}
+.gs-personal-line {
+  margin-top: 22px;
+  padding: 14px 16px;
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ink);
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.gs-field-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--faint);
+  margin-top: 8px;
+  font-family: var(--serif);
+}
+.gs-field-caption strong {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.gs-journey-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.gs-journey-strip > div {
+  border-top: 1px solid var(--line);
+  padding: 12px 2px 8px;
+}
+.gs-step {
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--ink-2);
+  display: block;
+  margin-bottom: 6px;
+}
+.gs-journey-strip strong {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 17px;
+  display: block;
+}
+.gs-journey-strip p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 4px 0 0 !important;
+}
+
+/* the return door: a washi card with what is ready in the real deck */
+.gs-duecard {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0 4px;
+}
+.gs-duecard button {
+  display: block;
+  width: 100%;
+  background: var(--card-ground, #f5efe0) !important;
+  color: var(--card-ink, #211e17) !important;
+  border: 1px solid var(--card-line, rgba(33, 30, 23, 0.16)) !important;
+  border-radius: var(--gs-radius);
+  padding: 14px 16px !important;
+  box-shadow: 0 10px 28px -14px rgba(28, 47, 66, 0.35);
+}
+.gs-duecard button b {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 19px;
+}
+.gs-duecard button small {
+  display: block;
+  color: var(--card-faint, rgba(33, 30, 23, 0.6));
+  font-size: 12.5px;
+  margin-top: 3px;
+}
+.gs-duecard .gs-go {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--serif);
+  color: var(--card-ai, #2e4d6e);
+  font-size: 15px;
+}
+.gs-duecard button.gs-light {
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none;
+  border-color: var(--line) !important;
+}
+.gs-duecard button.gs-light small {
+  color: var(--ink-2);
+}
+.gs-duecard button.gs-light b {
+  font-size: 15px;
+}
+.gs-duecard .gs-gloss {
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* ---------- the field ---------- */
+.gs-field-map {
+  position: relative;
+  aspect-ratio: 5 / 4;
+  margin: 10px 6px;
+}
+.gs-field-map > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.gs-field-map path {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.2;
+}
+.gs-node {
+  position: absolute !important;
+  transform: translate(-50%, -50%);
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px !important;
+  font-family: var(--serif) !important;
+  font-size: 16px;
+  color: var(--ink);
+  background: none !important;
+  border-radius: 2px;
+  text-align: center !important;
+}
+.gs-node small {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+.gs-node span {
+  white-space: nowrap;
+}
+.gs-node::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--faint);
+  background: var(--ground-0);
+  margin-bottom: 2px;
+}
+.gs-node:disabled {
+  color: var(--ink-2);
+  opacity: 0.75;
+}
+.gs-node.encountered::before {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.gs-node.saved::before {
+  background: var(--red);
+  border-color: var(--red);
+}
+.gs-node.due {
+  font-size: 19px;
+}
+.gs-node.due::before {
+  width: 10px;
+  height: 10px;
+}
+.gs-node.practised::before {
+  background: var(--ai);
+  border-color: var(--ai);
+  box-shadow: 0 0 0 3px var(--ai-wash);
+}
+.gs-field-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  padding-top: 24px;
+}
+.gs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin: 14px 0;
+}
+.gs-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.gs-legend span::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.gs-legend span:nth-child(2)::before {
+  background: var(--red);
+}
+.gs-legend span:nth-child(3)::before {
+  background: var(--red);
+  width: 10px;
+  height: 10px;
+}
+.gs-legend span:nth-child(4)::before {
+  background: var(--ai);
+}
+
+/* ---------- narrow pages ---------- */
+.gs-narrow {
+  max-width: 640px;
+  padding-top: 24px;
+}
+.gs-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 22px 0;
+}
+.gs-facts div {
+  border-top: 1px solid var(--line);
+  padding: 10px 2px;
+}
+.gs-facts strong {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 18px;
+  display: block;
+}
+.gs-facts span {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.gs-details {
+  margin: 12px 0;
+}
+.gs-details summary {
+  cursor: pointer;
+  font-family: var(--serif);
+  color: var(--ink-2);
+  min-height: 32px;
+}
+.gs-details p {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-top: 8px;
+}
+.gs-spaced {
+  margin-top: 26px !important;
+}
+.gs-side-note {
+  font-size: 13px;
+  color: var(--faint);
+  line-height: 1.55;
+}
+.gs-muted {
+  color: var(--faint);
+}
+.gs-notice {
+  font-size: 13.5px;
+  color: var(--ink);
+  border-left: 3px solid var(--ai);
+  padding: 6px 10px;
+  background: var(--ai-wash);
+}
+
+/* ---------- the session: progress + thread ---------- */
+.gs-session-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 10px 0 16px;
+  padding: 8px 0 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.gs-session-top .gs-eyebrow {
+  margin: 0;
+  font-size: 12px;
+}
+.gs-count {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  margin: 0 !important;
+}
+.gs-progress {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.gs-progress button {
+  width: 30px;
+  height: 30px;
+  display: grid !important;
+  place-items: center;
+  font-family: var(--serif) !important;
+  font-size: 12px;
+  color: var(--faint);
+  border-bottom: 3px solid var(--line) !important;
+  text-align: center !important;
+}
+.gs-progress button.done {
+  border-bottom-color: var(--ink) !important;
+  color: var(--ink-2);
+}
+.gs-progress button[aria-current='step'] {
+  border-bottom-width: 4px !important;
+  border-bottom-color: var(--ink) !important;
+  color: var(--ink);
+  font-weight: 600;
+}
+.gs-thread {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.gs-rail {
+  display: none;
+}
+.gs-rail-item {
+  display: block;
+  padding-left: 14px;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+}
+.gs-rail-item small {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--faint-2, var(--faint));
+}
+.gs-rail-item.current {
+  border-left-color: var(--ink);
+  color: var(--ink);
+}
+
+/* the attempt: a sheet of washi on the ground */
+.gs-sheet {
+  background-color: var(--ground-0);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--ink) 2.5%, transparent) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(ellipse at 20% 0%, color-mix(in srgb, #fff 45%, transparent), transparent 60%);
+  border: 1px solid color-mix(in srgb, var(--ink) 32%, transparent);
+  border-radius: var(--gs-radius);
+  box-shadow: var(--gs-sheet-shadow);
+  padding: 20px 18px 18px;
+}
+.gs-sheet .gs-title {
+  font-size: clamp(21px, 3vw, 26px);
+  margin-bottom: 14px !important;
+}
+.gs-passage {
+  font-size: 16.5px;
+  line-height: 1.95;
+  padding: 14px 16px;
+  background: var(--ground-2);
+  border-left: 3px solid var(--line);
+  margin: 0 0 16px;
+  white-space: pre-line;
+}
+.gs-instruction {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-bottom: 6px !important;
+}
+.gs-question {
+  font-size: 19px;
+  line-height: 1.85;
+  margin: 0 0 18px !important;
+}
+.gs-pre {
+  white-space: pre-line;
+}
+.gs-choices {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+legend.gs-instruction {
+  display: block;
+  margin-bottom: 10px;
+  padding: 0;
+}
+.gs-choice-list {
+  display: grid;
+  gap: 8px;
+}
+.gs-choice {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ground-0) 70%, transparent);
+  font-size: 17px;
+  cursor: pointer;
+  text-wrap: pretty;
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+.gs-choice:hover {
+  border-color: var(--ink-2);
+}
+.gs-choice input {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--ink);
+  flex: none;
+  align-self: center;
+}
+.gs-choice-num {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--faint);
+  width: 12px;
+  flex: none;
+}
+.gs-choice:has(input:checked) {
+  background: var(--ground-2);
+  border: 2px solid var(--ink);
+  padding: 11px 13px;
+}
+.gs-choice:has(input:disabled) {
+  cursor: default;
+}
+.gs-choice.is-answer {
+  border-color: var(--ai);
+  box-shadow: inset 3px 0 0 var(--ai);
+}
+.gs-choice.is-answer:has(input:checked) {
+  background: var(--ai-wash);
+  border: 2px solid var(--ai);
+  padding: 11px 13px;
+}
+.gs-choice.is-wrong {
+  border-color: var(--red);
+  background: var(--red-wash);
+}
+.gs-choice.is-wrong:has(input:checked) {
+  border: 2px solid var(--red);
+}
+.gs-outcome {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+  color: var(--ink-2);
+}
+.gs-choice.is-wrong .gs-outcome {
+  color: var(--red);
+}
+.gs-choice.is-answer .gs-outcome {
+  color: var(--ai);
+}
+/* a verdict with a body, on the sheet: the slash cuts the chosen wrong option; its number
+   falls; nothing leaves the screen (MOMENTS.md law 1) */
+.gs-slash {
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+}
+.gs-slash svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.gs-slash path {
+  fill: var(--red);
+  opacity: 0.9;
+  clip-path: inset(0 100% 0 0);
+}
+.gs-choice.is-wrong.cut .gs-choice-num {
+  display: inline-block;
+  transform-origin: 50% 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gs-slash path {
+    animation: gs-slash 0.34s cubic-bezier(0.15, 0.9, 0.2, 1) 0.06s forwards;
+  }
+  .gs-choice.is-wrong.cut .gs-choice-num {
+    animation: gs-numfall 0.5s cubic-bezier(0.35, 0.6, 0.3, 1) 0.3s forwards;
+  }
+  .gs-choice {
+    transition:
+      border-color 0.12s,
+      background 0.12s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gs-slash path {
+    clip-path: none;
+  }
+  .gs-choice.is-wrong.cut .gs-choice-num {
+    transform: translate(2px, 10px) rotate(60deg);
+    opacity: 0.6;
+  }
+}
+@keyframes gs-slash {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes gs-numfall {
+  to {
+    transform: translate(2px, 14px) rotate(72deg);
+    opacity: 0.55;
+  }
+}
+
+/* the verdict: the shape says it before the words do */
+.gs-feedback {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--ink);
+  background: color-mix(in srgb, var(--ground-0) 60%, transparent);
+}
+.gs-feedback.gs-incorrect {
+  border-left-color: var(--red);
+  background: var(--red-wash);
+}
+.gs-verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+}
+.gs-incorrect .gs-verdict {
+  color: var(--red);
+}
+.gs-verdict svg {
+  width: 20px;
+  height: 20px;
+}
+.gs-verdict-ja {
+  display: block;
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  margin: -2px 0 0 28px;
+  color: var(--ink-2);
+}
+.gs-incorrect .gs-verdict-ja {
+  color: var(--red);
+}
+.gs-comparison {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin: 6px 0 0 !important;
+}
+.gs-feedback p {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+.gs-feedback .gs-text {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.gs-return-link {
+  margin-top: 16px;
+}
+
+/* the aside: "your place is held" */
+.gs-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 6px;
+}
+.gs-aside h3 {
+  font-size: 16px;
+}
+.gs-aside p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.gs-aside .gs-text {
+  display: block;
+  margin-top: 8px;
+  font-size: 13.5px;
+  border-bottom: 0 !important;
+}
+.gs-aside .gs-text [lang='ja'] {
+  border-bottom: 1px solid var(--line);
+}
+.gs-rule {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
+}
+.gs-aside .gs-rule p {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.gs-source-id {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  color: var(--ink-2);
+  word-break: break-all;
+}
+
+/* understanding: the lacquer sheet — 黒漆 in every world */
+.gs-lacquer {
+  background: var(--sheet-ground);
+  background-image: none;
+  color: var(--sheet-ink);
+  border-color: var(--sheet-ground-2);
+  box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.55);
+}
+.gs-lacquer .gs-eyebrow {
+  color: var(--gold);
+}
+.gs-lacquer .gs-gloss {
+  color: var(--sheet-faint);
+}
+.gs-lacquer .gs-title,
+.gs-lacquer h1 {
+  color: var(--sheet-ink);
+}
+.gs-anchor {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--sheet-faint);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--sheet-line);
+}
+.gs-anchor strong {
+  color: var(--sheet-ink);
+  font-weight: 500;
+}
+.gs-target {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0 10px !important;
+}
+.gs-target > span:first-child {
+  font-family: var(--serif);
+  font-size: 26px;
+  color: var(--sheet-ink);
+}
+.gs-target > span:last-child {
+  color: var(--sheet-ink-2);
+  font-size: 14px;
+}
+.gs-reading {
+  font-family: var(--sans);
+  font-size: 0.62em;
+  font-weight: 400;
+  margin-inline-start: 0.16em;
+  color: var(--red);
+}
+.gs-lacquer .gs-reading {
+  color: var(--sheet-red);
+}
+.gs-reading-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 12px 0 18px;
+  font-size: 12.5px;
+  color: var(--sheet-faint);
+}
+.gs-lacquer .gs-text {
+  color: var(--sheet-ink);
+  border-bottom-color: var(--sheet-line) !important;
+}
+/* the sentence, understood, sits on a washi card inside the lacquer */
+.gs-completed {
+  background: var(--card-ground, var(--ground-0));
+  color: var(--card-ink, var(--ink));
+  padding: 16px 18px;
+  border-radius: 4px;
+  font-size: 19px;
+  line-height: 1.9;
+  margin: 6px 0 14px !important;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+.gs-lacquer .gs-completed .gs-reading {
+  color: var(--card-red, var(--red));
+}
+.gs-lacquer .gs-passage {
+  background: var(--sheet-ground-2);
+  border-left-color: var(--gold);
+  color: var(--sheet-ink);
+}
+.gs-lacquer .gs-question {
+  color: var(--sheet-ink);
+}
+.gs-meaning {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--sheet-ink-2);
+  margin: 0 0 14px !important;
+}
+.gs-teaching {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--sheet-ink-2);
+  border-top: 1px solid var(--sheet-line);
+  padding-top: 12px;
+}
+.gs-teaching p {
+  margin: 0 0 8px !important;
+}
+.gs-example {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--sheet-line);
+  border-radius: 4px;
+}
+.gs-example p {
+  font-size: 17px;
+  margin: 0 0 4px !important;
+  color: var(--sheet-ink);
+}
+.gs-example small {
+  color: var(--sheet-faint);
+  font-size: 12.5px;
+}
+.gs-lacquer > .gs-eyebrow:not(:first-of-type) {
+  margin-top: 18px;
+}
+.gs-branch-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 6px;
+}
+.gs-branch-links button {
+  min-height: 40px;
+  padding: 8px 12px !important;
+  border: 1px solid var(--gold) !important;
+  border-radius: 4px;
+  color: var(--gold);
+  font-family: var(--serif) !important;
+  font-size: 15px;
+}
+.gs-branch-links button span {
+  opacity: 0.7;
+}
+.gs-lacquer .gs-button.primary {
+  background: var(--gold) !important;
+  color: var(--sheet-ground) !important;
+  border-color: var(--gold) !important;
+}
+.gs-lacquer .gs-button.primary .gs-gloss {
+  color: color-mix(in srgb, var(--sheet-ground) 80%, transparent);
+}
+.gs-lacquer .gs-side-note {
+  color: var(--sheet-faint);
+}
+.gs-branch-back {
+  margin-bottom: 12px;
+}
+.gs-branch .gs-title,
+.gs-word-room .gs-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.gs-branch-reading {
+  font-size: 14px;
+  color: var(--sheet-red);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+.gs-branch .gs-meaning {
+  color: var(--sheet-ink);
+}
+.gs-word {
+  display: inline !important;
+  padding: 0 1px !important;
+  border-bottom: 1px dotted currentColor !important;
+  border-radius: 0;
+  font: inherit !important;
+  color: inherit;
+  line-height: inherit;
+}
+.gs-word:hover {
+  background: var(--ai-wash) !important;
+}
+.gs-lacquer .gs-word:hover {
+  background: var(--sheet-ai-wash, rgba(217, 178, 95, 0.14)) !important;
+}
+/* the word room sits on the ground: its reading keeps the paper's red */
+.gs-word-room .gs-branch-reading {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.5em;
+  line-height: 1.6;
+  color: var(--red);
+}
+.gs-word-room .gs-meaning {
+  margin-top: 20px !important;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+/* ---------- summary · results · learn ---------- */
+.gs-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px 14px;
+  margin: 8px 0;
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 4px;
+}
+.gs-row.missed {
+  border-left-color: var(--red);
+}
+.gs-row.flagged {
+  border-left-color: var(--ink);
+}
+.gs-row.practised {
+  border-left-color: var(--ai);
+}
+.gs-row.removed {
+  opacity: 0.6;
+}
+.gs-row-number {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--faint);
+  padding-top: 3px;
+}
+.gs-row h3 {
+  font-size: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.gs-row p {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 2px 0 6px !important;
+}
+.gs-row .gs-text {
+  font-size: 13px;
+  border-bottom-color: transparent !important;
+}
+.gs-row .gs-text [lang='ja'] {
+  border-bottom: 1px solid var(--line);
+}
+.gs-row-actions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.gs-gap-tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.gs-gap-tag b {
+  font-weight: 500;
+  font-family: var(--serif);
+  border: 1px solid var(--line);
+  padding: 0 6px;
+  border-radius: 2px;
+}
+.gs-gap-tag .gs-gloss {
+  margin-left: 0;
+}
+.gs-cards {
+  display: grid;
+  gap: 4px;
+}
+.gs-card-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.gs-card {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.gs-card b {
+  font-weight: 500;
+  color: var(--ink);
+  margin-right: 4px;
+}
+/* ready to review now: a single red mark, the text stays ink (one red, MOMENTS.md law 4) */
+.gs-card[data-deck='ready'] span::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  margin: 0 6px 1px 0;
+  vertical-align: middle;
+}
+.gs-card[data-deck='failed'] span,
+.gs-card[data-deck='held'] span {
+  color: var(--red);
+}
+.gs-deck-line {
+  margin-top: 10px !important;
+}
+.gs-deck-summary {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.gs-deck-summary p {
+  font-family: var(--serif);
+  font-size: 15px;
+}
+.gs-results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 26px;
+  padding-top: 20px;
+}
+.gs-score {
+  font-size: clamp(40px, 9vw, 56px) !important;
+  line-height: 1.05;
+}
+.gs-of {
+  font-size: 0.42em;
+  color: var(--ink-2);
+}
+.gs-h-sub {
+  display: block;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  margin-top: 14px;
+}
+.gs-h-sub .gs-gloss {
+  display: inline;
+  margin: 0 0 0 8px;
+}
+.gs-results-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 18px 0 8px;
+}
+.gs-results-facts div {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.gs-results-facts strong {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+.gs-results-facts span {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  display: block;
+}
+.gs-results-facts .gs-gloss {
+  display: block;
+  margin: 2px 0 0;
+}
+.gs-gap-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin: 4px 0 12px !important;
+  font-family: var(--serif);
+  font-size: 16px;
+}
+.gs-gap-line b {
+  font-weight: 500;
+}
+.gs-gap-line i {
+  font-style: normal;
+  color: var(--ink-2);
+}
+.gs-gap-line .gs-gloss {
+  width: 100%;
+  margin: 0;
+}
+.gs-focus {
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: var(--gs-radius);
+  box-shadow: var(--gs-sheet-shadow);
+  padding: 18px 18px 16px;
+}
+.gs-focus-target {
+  font-family: var(--serif);
+  font-size: 30px;
+  margin: 6px 0 8px;
+}
+.gs-focus p {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* ---------- fresh · expression · sensei ---------- */
+.gs-end-mark {
+  width: 36px;
+  height: 2px;
+  background: var(--ink);
+  margin-bottom: 16px;
+}
+.gs-draft-label {
+  display: block;
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin: 16px 0 6px;
+}
+.gs-draft {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--ground-0);
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.8;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.gs-draft[lang='ja'] {
+  font-family: var(--serif);
+}
+.gs-sensei-context {
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px 18px;
+  margin: 16px 0;
+}
+.gs-sensei-context dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 10px 0 0;
+  font-size: 13.5px;
+}
+.gs-sensei-context dt {
+  color: var(--faint);
+}
+.gs-sensei-context dd {
+  margin: 0;
+}
+.gs-copy-message {
+  font-size: 13px;
+  color: var(--ai);
+  min-height: 1em;
+}
+
+/* ---------- the room's footer: moments and the session's own controls ---------- */
+.gs-footer {
+  display: grid;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.gs-moments,
+.gs-session-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+.gs-footer-label {
+  font-family: var(--serif);
+  letter-spacing: 0.08em;
+}
+.gs-footer .gs-text {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  min-height: 34px;
+}
+.gs-footer-demos {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.gs-effect {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+}
+.gs-effect select {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 5px 6px;
+  min-height: 34px;
+}
+.gs-effect input {
+  accent-color: var(--ink);
+  width: 16px;
+  height: 16px;
+}
+.gs-footer-note {
+  font-size: 12px;
+  color: var(--faint);
+}
+.gs-save-status {
+  font-family: var(--serif);
+  color: var(--faint);
+}
+.gs-save-status.gs-error {
+  color: var(--red);
+}
+.gs-room-state {
+  padding-top: 18px;
+}
+
+/* ---------- wide: the house keeps the phone's measure; the thread gains its rail ---------- */
+@media (min-width: 820px) {
+  .gs-arrival {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: 36px;
+    padding-top: 36px;
+  }
+  .gs-journey-strip {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .gs-thread {
+    grid-template-columns: 118px minmax(0, 1fr);
+    gap: 22px;
+  }
+  .gs-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-top: 10px;
+    border-left: 1px solid var(--line-soft);
+  }
+  .gs-aside {
+    grid-column: 2;
+    border-top: 1px solid var(--line-soft);
+    padding-top: 16px;
+    flex-direction: row;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .gs-aside > div {
+    flex: 1 1 220px;
+  }
+  .gs-sheet {
+    padding: 26px 26px 24px;
+  }
+  .gs-field-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  .gs-results {
+    grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.8fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .gs-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+  }
+  .gs-row-actions {
+    grid-column: 3;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+}
+@media (max-width: 380px) {
+  .gs-hero {
+    font-size: 30px !important;
+  }
+  .gs-choice {
+    font-size: 16px;
+  }
+  .gs-node {
+    font-size: 14px;
+    padding: 4px 6px !important;
+  }
+  .gs-node small {
+    font-size: 9px;
+  }
+}
+@media (max-width: 760px) {
+  .gs-node {
+    font-size: 14px;
+    padding: 4px 6px !important;
+  }
+  .gs-node small {
+    font-size: 9.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .guided-room *,
+  .guided-room *::before,
+  .guided-room *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

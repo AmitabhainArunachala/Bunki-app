@@ -1,0 +1,13 @@
+{
+  "schema": "kairo-guided-sets/1",
+  "sets": [
+    {
+      "id": "kairo-guided-n2-living-thread-01",
+      "path": "guided/sets/n2-living-thread-01.json",
+      "level": "N2",
+      "questionCount": 6,
+      "minutes": 15,
+      "title": { "ja": "一つの文を、もう少し深く", "en": "One sentence, understood more deeply" }
+    }
+  ]
+}
