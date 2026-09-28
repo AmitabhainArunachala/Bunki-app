@@ -1,0 +1,1179 @@
+{
+  "kind": "feed-fresh-run",
+  "run": 3,
+  "startedAt": "2026-09-28T03:03:02+00:00",
+  "asOf": "2026-09-28",
+  "mode": "restage",
+  "window": {
+    "since": "2026-09-14",
+    "until": "2026-09-28",
+    "timezone": "Asia/Tokyo"
+  },
+  "terms": [
+    {
+      "source": "kantei",
+      "termsUrl": "https://www.kantei.go.jp/jp/terms.html",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T03:03:02+00:00",
+      "termsSha256": "eaec2ac88702de206e7eacd2149519ef609e290a785c09757096ea3107bc863e",
+      "matched": "ている情報（以下「コンテンツ」といいます。）の著作権は、特記されていない限り内閣官房に帰属し、権利表記の記載がない限り「公共データ利用規約（第1.0版）（PDL1.0）」（デジタル庁ＨＰ）が適用されています。\nPDL1.0のうち、当ホームページ独自の出典記載例や本ルールの",
+      "ok": true
+    },
+    {
+      "source": "govonline",
+      "termsUrl": "https://www.gov-online.go.jp/tos/",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T03:03:15+00:00",
+      "termsSha256": "57b7ac75aedebe6469ea6dacbab0da8ac51cb772c19e79cf76275ec343b7921b",
+      "matched": "報（以下「コンテンツ」といいます。）の著作権は、特記されていない限り内閣府に帰属し、権利表記その他明示の記載がない限り「公共データ利用規約（第1.0版）」（以下「PDL1.0」といいます。）に準拠した利用条件の下で、利用することができます。 PDL1.0のうち、当ウェブサ",
+      "ok": true
+    },
+    {
+      "source": "mhlw",
+      "termsUrl": "https://www.mhlw.go.jp/chosakuken/index.html",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T03:03:23+00:00",
+      "termsSha256": "094afd93700b959f3d8d99ae1b7dbf5f8f4d4bf5a70c525f6f9c06f72d0b7265",
+      "matched": "公開している情報（以下「コンテンツ」といいます。）は、特記されていない限り厚生労働省に帰属し、権利表記の記載がない限り「公共データ利用規約（第1.0版）」（PDL1.0）に準拠した利用条件の下で、利用することができます。\nPDL1.0のうち、当ホームページ独自の出典記載例",
+      "ok": true
+    },
+    {
+      "source": "mext",
+      "termsUrl": "https://www.mext.go.jp/b_menu/1351168.htm",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T03:03:35+00:00",
+      "termsSha256": "0c24077cadf72db608f9e16b9914caa121957a4c4db87acf5210880096c28f80",
+      "matched": "の利用について、制限するものではありません。\nイ　本利用ルールは、平成28年7月12日に定めたものです。本利用ルールは、公共データ利用規約（第1.0版）（https://www.digital.go.jp/resources/open_data/public_data_l",
+      "ok": true
+    },
+    {
+      "source": "sports",
+      "termsUrl": "https://www.mext.go.jp/sports/b_menu/about_link.htm",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T03:03:38+00:00",
+      "termsSha256": "7c275b7d330549a9978cd8c95897b7348490c4aea75cf04a9c00318c2559b89c",
+      "matched": "象となっており、ともに日本国著作権法及び国際条約により保護されています。\n当ホームページのコンテンツを利用する場合は、「文部科学省ウェブサイト利用規約」に従って、御利用ください。\n文部科学省ウェブサイト利用規約\n免責事項\n当ホームページに記載されている情報の正確さについては万全を",
+      "ok": true
+    },
+    {
+      "source": "env",
+      "termsUrl": "https://www.env.go.jp/mail.html",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "licenceUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+      "checkedAt": "2026-09-28T03:03:42+00:00",
+      "termsSha256": "ea4331992f643fb2db9649ea134b793c875f2ee1535f4b8bb109ae8a4f8bc8b4",
+      "matched": "している情報（以下「コンテンツ」といいます。）の著作権は、特記されていない限り環境省に帰属し、権利表記の記載がない限り「公共データ利用規約（第1.0版）」（PDL1.0）が適用されています（PDL1.0に従って利用できるコンテンツを、以下「本コンテンツ」といいます。）。",
+      "ok": true
+    },
+    {
+      "source": "jawiki-news",
+      "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+      "checkedAt": "2026-09-28T03:03:55+00:00",
+      "termsSha256": "26b549133a97f132248c7ff4fc304fe7771d2592efc4129efe03fa4be53188b5",
+      "matched": ":{\"rightsinfo\":{\"url\":\"https://creativecommons.org/licenses/by-sa/4.0/deed.ja\",\"text\":\"Creative Commons Attribution-Share Alike 4",
+      "ok": true
+    },
+    {
+      "source": "jawiki",
+      "termsUrl": "https://ja.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.ja",
+      "checkedAt": "2026-09-28T03:03:55+00:00",
+      "termsSha256": "26b549133a97f132248c7ff4fc304fe7771d2592efc4129efe03fa4be53188b5",
+      "matched": ":{\"rightsinfo\":{\"url\":\"https://creativecommons.org/licenses/by-sa/4.0/deed.ja\",\"text\":\"Creative Commons Attribution-Share Alike 4",
+      "ok": true
+    },
+    {
+      "source": "global-voices",
+      "termsUrl": "https://jp.globalvoices.org/about/%E8%A8%98%E4%BA%8B%E3%81%AE%E8%BB%A2%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/",
+      "licence": "CC BY 3.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "checkedAt": "2026-09-28T03:04:16+00:00",
+      "termsSha256": "6de439ba67a698bbea3501f093bbeef9a6b79d8b11079e1d9056a088274bf86a",
+      "matched": "Skip to main content\n記事の転載について\nGV日本語に掲載されているすべての記事は Creative Commons 表示 3.0 非移植（日本語訳）で公開しております。このため、引用や転載は自由です。特に当団体への問い合わせは必要あり",
+      "ok": true
+    },
+    {
+      "source": "alma-ja",
+      "termsUrl": "https://alma-telescope.jp/policy/",
+      "licence": "CC BY 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "checkedAt": "2026-09-28T03:04:29+00:00",
+      "termsSha256": "e395534f64268675035070673a44d0759992bd81ab203652e0e07fd3ef3b7128",
+      "matched": "い限り、Creative Commons Attribution 4.0 International License (CC BY 4.0)に従ってください。すなわち国立天文台は、以下に示す条件を満たす限りにおいて、第三者が利用許諾を得ずに著作物の複",
+      "ok": true
+    }
+  ],
+  "sources": {
+    "kantei": {
+      "discovered": 13,
+      "extracted": 13,
+      "passed": 5,
+      "error": null
+    },
+    "govonline": {
+      "discovered": 8,
+      "extracted": 8,
+      "passed": 5,
+      "error": null
+    },
+    "mhlw": {
+      "discovered": 13,
+      "extracted": 13,
+      "passed": 9,
+      "error": null
+    },
+    "mext": {
+      "discovered": 3,
+      "extracted": 2,
+      "passed": 2,
+      "error": null
+    },
+    "sports": {
+      "discovered": 3,
+      "extracted": 3,
+      "passed": 3,
+      "error": null
+    },
+    "env": {
+      "discovered": 14,
+      "extracted": 13,
+      "passed": 13,
+      "error": null
+    },
+    "jawiki-news": {
+      "discovered": 2,
+      "extracted": 2,
+      "passed": 2,
+      "error": null
+    },
+    "jawiki": {
+      "discovered": 4,
+      "extracted": 4,
+      "passed": 3,
+      "error": null
+    },
+    "global-voices": {
+      "discovered": 1,
+      "extracted": 1,
+      "passed": 1,
+      "error": null,
+      "reader": {
+        "sourceId": "global-voices",
+        "since": "2026-09-14",
+        "feed": {
+          "status": "updated",
+          "error": null,
+          "entries": 10,
+          "latestPublishedAt": "2026-09-28T02:16:26.000Z"
+        },
+        "emitted": 1,
+        "fallbacks": [
+          {
+            "url": "https://jp.globalvoices.org/2026/09/25/65730/",
+            "reason": "attribution-ambiguous"
+          },
+          {
+            "url": "https://jp.globalvoices.org/2026/09/22/65800/",
+            "reason": "html-structure-invalid"
+          },
+          {
+            "url": "https://jp.globalvoices.org/2026/09/15/65712/",
+            "reason": "attribution-ambiguous"
+          }
+        ]
+      }
+    },
+    "alma-ja": {
+      "discovered": 0,
+      "extracted": 0,
+      "passed": 0,
+      "error": null,
+      "reader": {
+        "sourceId": "alma-ja",
+        "since": "2026-09-14",
+        "feed": {
+          "status": "updated",
+          "error": null,
+          "entries": 15,
+          "latestPublishedAt": "2026-09-07T18:28:38.000Z"
+        },
+        "emitted": 0,
+        "fallbacks": []
+      }
+    }
+  },
+  "staged": [
+    {
+      "id": "jawiki-news:2026-09-21",
+      "date": "2026-09-25",
+      "chars": 356,
+      "url": "https://ja.wikipedia.org/w/index.php?oldid=111174909"
+    }
+  ],
+  "restaged": [
+    {
+      "id": "mhlw:stf-newpage_76340",
+      "chars": 1615,
+      "contentSha256": "8d5b0dec5ff396dd553a1bce7585257aa9cc3a35ca3ed57668a6638b989f68df",
+      "previousContentSha256": "e3e86ce8b020739f8e57c5093ce9b2c8663c65acfe294ecd8a9c0b9b314f5d5b"
+    },
+    {
+      "id": "mhlw:stf-newpage_76126",
+      "chars": 1189,
+      "contentSha256": "18f7c0c1714e7da79341f40afd85b2ced84f5659648a37e35a50af9e2268c5cd",
+      "previousContentSha256": "efe1f4ff503ec925d7d4b71791cc73abaad530c6442ad5b179724da69be0128a"
+    },
+    {
+      "id": "sports:sports-b_menu-houdou-jsa_00246",
+      "chars": 1105,
+      "contentSha256": "60240ba4859c328661eed87d21e8d348d1b4cf4e384caecc59d189476a1d1a7b",
+      "previousContentSha256": "b71f42f4af55b89f3e5e096163f289d89c7915f4f8d990e3697664ce931f75b4"
+    },
+    {
+      "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+      "chars": 1067,
+      "contentSha256": "a2632f999a248b35523fb3375ad2cdc503183e878d37a7284ed102f00f374707",
+      "previousContentSha256": "dffa898856069222dac4da108b5ffa889231ac23a2c9bfa924710698ca8f8445"
+    },
+    {
+      "id": "env:press-press_05591",
+      "chars": 1561,
+      "contentSha256": "b4fc374becb4c81485eb7818f5cd6eca7cee02e6c70f8fa9a821fb79a762c224",
+      "previousContentSha256": "592dbcbbd7ee061042271462934f8964feee945ee32c1e0d5be87aa7f224f116"
+    },
+    {
+      "id": "jawiki-news:2026-09-14",
+      "chars": 469,
+      "contentSha256": "680186a8b394480adac6aeddbc15ace1ad3cef9ead0c8e27ddb86a762ff89d44",
+      "previousContentSha256": "0283b42c72f20e8943d6f747bed98689b0772621e90d630d4f5b848b410ea848"
+    },
+    {
+      "id": "global-voices:2026-09-28-65726",
+      "chars": 1939,
+      "contentSha256": "33eb3800dca207c847d9dc30cfda0d37b8d4eea86d607689b809dc494e1c5fca",
+      "previousContentSha256": "2fc5e7c95d364e3a865f21c4fa1bcf729bba545db3ea2d360e6e3c0661c52e36"
+    }
+  ],
+  "skipped": [
+    {
+      "url": "https://www.kantei.go.jp/jp/105/statement/2026/0926kaiken.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/statement/2026/0925kaiken.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/pages/20260925choukan_jikan.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/tyoukanpress/202609/25_a.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/statement/2026/0923naigai.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/statement/2026/0922enzetsu.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/statement/2026/0921kaiken.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/discourse/20260920shiji2.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/discourse/20260920shiji.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/tyoukanpress/202609/18_p.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/tyoukanpress/202609/17_p.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/pages/20260917kihonhoushin.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/statement/2026/0917kaiken.html",
+      "reason": "not an article page this adapter reads",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/25kaiken.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/21bura.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/17kaiken.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/26tel_kaidan.html",
+      "id": "kantei:jp-105-actions-202609-26tel_kaidan",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/22usa.html",
+      "id": "kantei:jp-105-actions-202609-22usa",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/discourse/20260924message.html",
+      "id": "kantei:jp-105-discourse-20260924message",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/pages/20260918choukan_hyoukei.html",
+      "id": "kantei:jp-pages-20260918choukan_hyoukei",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/17takaichinaikaku2.html",
+      "id": "kantei:jp-105-actions-202609-17takaichinaikaku2",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/actions/202609/14hyoukei.html",
+      "id": "kantei:jp-105-actions-202609-14hyoukei",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/discourse/20260917message.html",
+      "id": "kantei:jp-105-discourse-20260917message",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.kantei.go.jp/jp/105/discourse/20260915message.html",
+      "id": "kantei:jp-105-discourse-20260915message",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "kantei"
+    },
+    {
+      "url": "https://www.gov-online.go.jp/article/202609/tv-6616.html",
+      "id": "govonline:article-202609-tv-6616",
+      "reason": "dated 2026-09-10, outside the window 2026-09-14…2026-09-28",
+      "source": "govonline"
+    },
+    {
+      "url": "https://www.gov-online.go.jp/article/202609/tv-6611.html",
+      "id": "govonline:article-202609-tv-6611",
+      "reason": "dated 2026-09-03, outside the window 2026-09-14…2026-09-28",
+      "source": "govonline"
+    },
+    {
+      "url": "https://www.gov-online.go.jp/article/202609/radio-3714.html",
+      "id": "govonline:article-202609-radio-3714",
+      "reason": "dated 2026-09-07, outside the window 2026-09-14…2026-09-28",
+      "source": "govonline"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/kouseiroudoushou/saiyou/ninkituki/ninki-koyoukankyou_kintougyouseijouhou.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/iryouhoken/database/seido/kokuho_jittai_system.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/toukei/itiran/roudou/monthly/r08/2607r/2607r.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76393.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76380.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/toukei/saikin/hw/jinkou/geppo/s2026/07.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/other-hoken_474087_00009.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76354.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/toukei/list/6-18c-r07.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75993.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75956.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75794.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76341.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/shingi-rousei_126989.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76368.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76364.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76251.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75321.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_74911.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76077.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76357.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/seisakunitsuite/soshiki/toukei/fukushikaigochousa_kaigo.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/seisakunitsuite/soshiki/toukei/fukushikaigochousa_hukushi.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/seisakunitsuite/soshiki/toukei/fukushikaigochousa.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/kouseiroudoushou/kanbumeibo/index.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/web_magazine/",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/kouseiroudoushou/saiyou/ninkituki/ninki-kokusaikakokusaihokenkyouryokusitsusyusa_00002.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76296.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75976.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/rousai_shinryouhi/kaitei0604_00014.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/rousai_shinryouhi/kaitei0604_00013.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_021225156_00114.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/houdou/kikin_R8_1_00001.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76155.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/houdou/0000179105_00025.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76117.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75924.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75923.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75880.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/iryouhoken/database/seido/kouki_houkoku.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/kekkaku-kansenshou01/houdou_00025.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000121431_00485.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/houkokusuunosuii_00007.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/kekkaku-kansenshou01/houdou.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/chiikishokuikiportal/index.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/bunya/iryouhoken/jyuudou/ryouyouhi_yusyokouhu_sejutsusho.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/kouseiroudoushou/saiyou/hijoukin/hj-seisakutoukatsukantsukiiryouzyouhoukibantantousanzikanshitsu01.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76225.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/shingi-hosho_126734.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76306.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/toukei/list/113-1.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76303.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76302.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76036.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/shingi-rousei_474670.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000070286_00001.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76199.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76266.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/iryou/00001.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76035.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76162.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76187.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76243.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76239.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76212.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76198.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76070.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/photo_report/2026/ph0827-01.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76182.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76217.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76213.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/houdou/tie-up_firstvoicemovie.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76148.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/topics/2026/09/tp0914-1.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/newpage_75970.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/newpage_75952.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_75517.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76202.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/shingi/other-soumu_198922_00003.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/topics/2026/09/tp0914-2.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/kouseiroudoushou/saiyou/ninkituki/ninki-syakai-engokyokuhogokasyusa.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/ishoku/zouketukansaibo_00005.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/ishoku/zouketukansaibo_00004.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76193.html",
+      "id": "mhlw:stf-newpage_76193",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76096.html",
+      "id": "mhlw:stf-newpage_76096",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/newpage_76197.html",
+      "id": "mhlw:stf-newpage_76197",
+      "reason": "quality gate: under 300 chars — too thin for a news reading",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mhlw.go.jp/stf/houdou/newpage_75927.html",
+      "id": "mhlw:stf-houdou-newpage_75927",
+      "reason": "dated 2026-03-18, outside the window 2026-09-14…2026-09-28",
+      "source": "mhlw"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/saiyou/sonota/1416615_00027.htm",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/saiyou/sonota/1422427_00019.htm",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/a_menu/shotou/kaikaku/index_00002.htm",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/daijin/detail/mext_00732.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chukyo/chukyo3/093/kaisai/mext_00006.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chousa/shotou/209/siryo/mext_02352.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chukyo/chukyo3/kaisai/mext_00151.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/a_menu/kagaku/kihon/mext_00031.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chousa/shougai/kaisai/1403907_00021.htm",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chousa/koutou/136/siryo/mext_00004.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chukyo/chukyo3/128/siryo/1412213_00001.htm",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chukyo/chukyo2/kaisai/1422830_00034.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/shingi/chousa/koutou/137/mext_00005.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/a_menu/kaihatu/jishin/mext_00293.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/saiyou/sonota/1417284_00050.htm",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/a_menu/kagaku/kihon/mext_00029.html",
+      "reason": "notice/meeting/recruitment/statistics page — not a reading",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/daijin/detail/mext_00731.html",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/b_menu/saiyou/sougoujimu/setumei/1421199_00009.htm",
+      "reason": "not an article page this adapter reads",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.mext.go.jp/a_menu/r8kumamotojisin/index.html",
+      "reason": "an index of document links, not a release text",
+      "source": "mext"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05620.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05612.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05484.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05450.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05587.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05570.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05565.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05504.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05592.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05524.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05576.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05577.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05531.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05530.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05583.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05573.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05535.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05505.html",
+      "reason": "notice/meeting/recruitment page — not a reading",
+      "source": "env"
+    },
+    {
+      "url": "https://www.env.go.jp/press/press_05571.html",
+      "reason": "an index of document links, not a release text",
+      "source": "env"
+    },
+    {
+      "url": "https://ja.wikipedia.org/w/index.php?oldid=111169733",
+      "id": "jawiki:4212497",
+      "reason": "quality gate: residual wiki markup in extracted text; foreign-script letters 23% of the text — weak Japanese-reading stock",
+      "source": "jawiki"
+    },
+    {
+      "url": "https://jp.globalvoices.org/2026/09/25/65730/",
+      "reason": "shared reader link fallback: attribution-ambiguous",
+      "source": "global-voices"
+    },
+    {
+      "url": "https://jp.globalvoices.org/2026/09/22/65800/",
+      "reason": "shared reader link fallback: html-structure-invalid",
+      "source": "global-voices"
+    },
+    {
+      "url": "https://jp.globalvoices.org/2026/09/15/65712/",
+      "reason": "shared reader link fallback: attribution-ambiguous",
+      "source": "global-voices"
+    }
+  ],
+  "minted": [
+    {
+      "id": "env:press-press_05591",
+      "kind": "fresh",
+      "title": "地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石巻市）の開催について",
+      "titleEn": "Study tours to Kameoka and Ishinomaki on local circular economies",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "上級前半 · jread 2.26 · JLPT語彙 68% · 1561字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "env.go.jp",
+      "date": "2026-09-14",
+      "url": "https://www.env.go.jp/press/press_05591.html",
+      "topic": "local"
+    },
+    {
+      "id": "mhlw:stf-newpage_76126",
+      "kind": "fresh",
+      "title": "令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました ～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ 入賞企業を10月９日（金）に表彰～",
+      "titleEn": "Winners of the contest for companies where older workers thrive",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "上級前半 · jread 1.63 · JLPT語彙 65% · 1189字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "mhlw.go.jp",
+      "date": "2026-09-16",
+      "url": "https://www.mhlw.go.jp/stf/newpage_76126.html",
+      "topic": "society"
+    },
+    {
+      "id": "mhlw:stf-newpage_76340",
+      "kind": "fresh",
+      "title": "ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします",
+      "titleEn": "Health ministry teams up with the WOWOW drama 'MR'",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "上級後半 · jread 0.60 · JLPT語彙 71% · 1615字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "mhlw.go.jp",
+      "date": "2026-09-18",
+      "url": "https://www.mhlw.go.jp/stf/newpage_76340.html",
+      "topic": "culture"
+    },
+    {
+      "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+      "kind": "fresh",
+      "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
+      "titleEn": "This year's lifelong-sports awards are announced",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 64% · 1067字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "mext.go.jp/sports",
+      "date": "2026-09-18",
+      "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
+      "topic": "sports"
+    },
+    {
+      "id": "jawiki-news:2026-09-14",
+      "kind": "fresh",
+      "title": "9月14日〜9月20日のできごと",
+      "titleEn": "The news, 14–27 September — Wikipedia's current-events summaries",
+      "lane": "news",
+      "licence": "CC BY-SA 4.0",
+      "gradingSummary": "中級前半 · jread 3.78 · JLPT語彙 61% · 469字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "ja.wikipedia",
+      "date": "2026-09-19",
+      "url": "https://ja.wikipedia.org/w/index.php?oldid=111174909",
+      "topic": "news digest"
+    },
+    {
+      "id": "sports:sports-b_menu-houdou-jsa_00246",
+      "kind": "fresh",
+      "title": "河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山市藤井市長との意見交換～",
+      "titleEn": "The Sports Agency's commissioner visits Toyama",
+      "lane": "news",
+      "licence": "PDL1.0 (CC BY 4.0 互換)",
+      "gradingSummary": "中級後半 · jread 3.31 · JLPT語彙 67% · 1105字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "mext.go.jp/sports",
+      "date": "2026-09-25",
+      "url": "https://www.mext.go.jp/sports/b_menu/houdou/jsa_00246.html",
+      "topic": "sports"
+    },
+    {
+      "id": "global-voices:2026-09-28-65726",
+      "kind": "fresh",
+      "title": "シリアの「連帯の畑」で在来種子の再生を目指す",
+      "titleEn": "Syria's 'solidarity fields' bring back native seeds",
+      "lane": "news",
+      "licence": "CC BY 3.0",
+      "gradingSummary": "中級後半 · jread 2.85 · JLPT語彙 66% · 1939字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "jp.globalvoices.org",
+      "date": "2026-09-28",
+      "url": "https://jp.globalvoices.org/2026/09/28/65726/",
+      "topic": "international"
+    }
+  ],
+  "untitled": [
+    "jawiki-news:2026-09-21"
+  ],
+  "allowUntitled": false,
+  "outputSha256": {
+    "index.json": "c128b56a9a7beacf6a85b5183da7969dbc9c85a8e3029c4303dd9b311fd199bf",
+    "feed-review-queue.json": "596115fd02c8bc48dfb07edabad610771c89a35658ee98ac43a6bc98eece2c9d",
+    "items.jsonl": "75e13ab84c9d40e4cc47b00e969436e8c38ce5d34b8e434ddf30a29246792b55"
+  }
+}

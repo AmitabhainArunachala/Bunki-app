@@ -18,7 +18,10 @@
  *     schema, dated, attributed and linked, carries the pool its source
  *     licence requires (CC BY-SA → share_alike, PDL1.0/CC BY → proprietary_safe),
  *     matches the fetched text staged in corpus/datasets/fresh/items.jsonl,
- *     wears its authored English title, and stays 検収前 until decided.
+ *     wears its authored English title, and stays 検収前 until decided;
+ *   · every N3 adaptation (id "adapt-n3:<source>") is exactly the authored text
+ *     in docs/content/feed-fresh-adaptations.json, says 書き換え in its label and
+ *     attribution, and keeps its source's licence, pool, URL and date.
  *
  * Usage:
  *   node tools/verify-feed.mjs [--report FILE]
@@ -40,6 +43,7 @@ const TITLES_PATH = resolve(REPO, 'docs/content/feed-titles-en.json');
 const FRESH_TITLES_PATH = resolve(REPO, 'docs/content/feed-fresh-titles-en.json');
 const FRESH_DATASET = resolve(REPO, 'corpus/datasets/fresh/items.jsonl');
 const FRESH_EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed-fresh');
+const ADAPTATIONS_PATH = resolve(REPO, 'docs/content/feed-fresh-adaptations.json');
 const REPORT_JSON = resolve(REPO, 'docs/content/feed-curation-report.json');
 const RECOVERED_SOURCE = resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.jsonl');
 const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed');
@@ -77,6 +81,9 @@ const archiveIndex = readJson(resolve(ARTICLES, 'archive-index.json'));
 const queue = readJson(QUEUE_PATH);
 const titles = readJson(TITLES_PATH);
 const freshTitles = existsSync(FRESH_TITLES_PATH) ? readJson(FRESH_TITLES_PATH) : { titles: {} };
+const adaptations = new Map(
+  (existsSync(ADAPTATIONS_PATH) ? readJson(ADAPTATIONS_PATH).adaptations : []).map((row) => [`adapt-n3:${row.basedOn}`, row]),
+);
 const freshStaged = new Map(
   (existsSync(FRESH_DATASET) ? readFileSync(FRESH_DATASET, 'utf8').trim().split('\n').filter(Boolean) : [])
     .map((line) => JSON.parse(line))
@@ -404,9 +411,22 @@ for (const fresh of freshRows) {
     if (row[key] !== body[key]) problems.push(`index≠body:${key}`);
   }
   if (row.chars !== body.text.length || row.snippet !== body.text.replace(/\n/g, ' ').slice(0, 64)) problems.push('index-chars/snippet');
-  const staged = freshStaged.get(fresh.id);
-  if (!staged) problems.push('not-in-dataset');
-  else if (staged.text !== body.text || staged.url !== body.url || staged.date !== body.date) problems.push('body≠staged-source');
+  const authored = adaptations.get(fresh.id);
+  if (authored) {
+    // an adaptation: the authored text, the source's provenance, labelled as a rewrite
+    const source = freshStaged.get(authored.basedOn);
+    if (!source) problems.push('adaptation-source-not-staged');
+    else if (body.url !== source.url || body.date !== source.date || body.licence !== source.licence || body.pool !== source.pool)
+      problems.push('adaptation≠source-provenance');
+    if (body.text !== authored.text.trim()) problems.push('body≠authored-adaptation');
+    if (body.adaptation?.basedOn !== authored.basedOn) problems.push('adaptation-mark');
+    if (!/書き換え/.test(row.sourceLabel ?? '') || !/書き換え/.test(body.attribution ?? '') || !/原文ではありません/.test(body.attribution ?? ''))
+      problems.push('not-labelled-as-adaptation');
+  } else {
+    const staged = freshStaged.get(fresh.id);
+    if (!staged) problems.push('not-in-dataset');
+    else if (staged.text !== body.text || staged.url !== body.url || staged.date !== body.date) problems.push('body≠staged-source');
+  }
   if (RESIDUAL_MARKERS.some((marker) => body.text.includes(marker))) problems.push('residual-markup');
   if (DROPPED_TEXT.some((pattern) => pattern.test(body.text))) problems.push('dropped-link-text');
   check(
@@ -419,7 +439,7 @@ const freshRunLogs = existsSync(FRESH_EVIDENCE_DIR)
   ? readdirSync(FRESH_EVIDENCE_DIR).filter((file) => /^run-\d+\.json$/.test(file)).sort()
   : [];
 if (freshRows.length) {
-  const usedSources = new Set(freshRows.map((row) => freshStaged.get(row.id)?.sourceKey).filter(Boolean));
+  const usedSources = new Set(freshRows.map((row) => freshStaged.get(adaptations.get(row.id)?.basedOn ?? row.id)?.sourceKey).filter(Boolean));
   const evidenced = new Set();
   for (const file of freshRunLogs) {
     const log = readJson(resolve(FRESH_EVIDENCE_DIR, file));

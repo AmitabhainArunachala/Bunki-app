@@ -33,6 +33,12 @@ const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 export const CORRIDOR_DIR = resolveCorridorSite();
 const REPO = resolve(TOOL_DIR, '..', '..', '..');
 const EVIDENCE_DIR = resolveCorridorEvidence();
+// The walk reads the same texts whatever order the shelf presents them in —
+// since 2026-09-28 the shelf leads with the newest news. "The first text" is
+// the index's own first row, addressed by id, never by shelf position.
+const SHELF_INDEX = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles/index.json'), 'utf8'));
+const shelfText = (id) => `.shelf-item[data-passage="${id}"]:not([data-recommendation])`;
+const FIRST_TEXT = shelfText(SHELF_INDEX.articles[0].id);
 
 const VIEWPORT = { width: 390, height: 844 };
 const MIN_TAP = 44; // the canon's own --tap, not what the app happened to ship
@@ -684,7 +690,7 @@ async function main() {
   // the raw instrument is one 詳細 tap away, not gone — and it must include
   // the live JLPT-lexicon row plus an HONEST row for the unmeasured NINJAL
   // pair (never a stale or faked number)
-  await page.locator('[data-details]').first().click();
+  await page.locator(`${FIRST_TEXT} [data-details]`).click();
   await page.waitForTimeout(200);
   const rawSignals = await page.locator('.shelf-item:not([data-recommendation]) .sig').count();
   const sigNames = await page.evaluate(
@@ -704,7 +710,7 @@ async function main() {
       ? ninjalRow === -1 || !/未測定|not measured/.test(sigValues[ninjalRow])
       : ninjalRow >= 0 && /未測定|not measured/.test(sigValues[ninjalRow]),
     ninjalRow >= 0 ? `${sigNames[ninjalRow]} → ${sigValues[ninjalRow]}` : 'no NINJAL row');
-  await page.locator('[data-details]').first().click();
+  await page.locator(`${FIRST_TEXT} [data-details]`).click();
   await page.waitForTimeout(150);
   await shoot(page, shotsDir, '01-arrive-shelf');
   report.steps.push({ step: 1, name: 'arrive', shot: '01-arrive-shelf.png' });
@@ -780,7 +786,7 @@ async function main() {
 
   // ------------------------------------------------------------ step 2 read
   console.log('\n— step 2 · read');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const readerText = await page.locator('#reader').innerText();
   check('the reader shows real Japanese', /[぀-ヿ一-鿌]/.test(readerText), `${readerText.length} chars rendered`);
@@ -911,7 +917,7 @@ async function main() {
 
   // the worst long-gloss word on the shelf must render its gloss WHOLE
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])', 2); // JR おおさか東線 — carries 沿線
+  await tap(page, shelfText('wikinews:12024')); // JR おおさか東線 — carries 沿線
   await settleReader(page);
   const enIdx = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
@@ -933,7 +939,7 @@ async function main() {
     check('grammar · even the longest gloss renders whole — never truncated', false, '沿線 not found in text 3');
   }
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await page.locator('#dials-toggle').click();
   await page.waitForTimeout(150);
@@ -1237,7 +1243,7 @@ async function main() {
   console.log('\n— step 6 · return without losing your place');
   await page.evaluate('window.scrollTo(0, 0)');
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await page.evaluate('window.scrollTo(0, 420)');
   await page.waitForTimeout(80);
@@ -1276,7 +1282,7 @@ async function main() {
     const sheetLoads = observeWordSheetLoads(page);
     try {
     await open(`?entry=shelf&cards=${mode}`);
-    await tap(page, '.shelf-item:not([data-recommendation])');
+    await tap(page, FIRST_TEXT);
     await settleReader(page);
     await holdWord(page, '#reader .tok.content', 5);
     await page.waitForSelector('#sheet');
@@ -1307,7 +1313,7 @@ async function main() {
   // B · difficulty presentation — behind 詳細 since v1.2, so open one card
   for (const mode of ['three', 'band']) {
     await open(`?entry=shelf&difficulty=${mode}`);
-    await page.locator('[data-details]').first().click();
+    await page.locator(`${FIRST_TEXT} [data-details]`).click();
     await page.waitForTimeout(200);
     const shown = await page.evaluate(`(() => ({
       sigs: document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig').length,
@@ -1383,7 +1389,7 @@ async function main() {
   // no longer floats over the reader — the reader typography samples need
   // their own probe on a real reading page
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const readerProbe = await page.evaluate(MEASURE_FN);
   const mergedText = new Map();
@@ -1514,7 +1520,7 @@ async function main() {
   // door's PRESENCE, its honest 仮の声 label, and the graceful no-voice
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await page.waitForSelector('#listen-toggle', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
@@ -1637,7 +1643,7 @@ async function main() {
 
   // the kanji page draws its stroke order
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet [data-kanjirow]');
@@ -1968,7 +1974,7 @@ async function main() {
 
   await page.fill('#search', '');
   await page.waitForTimeout(250);
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const particleCount = await page.locator('#reader .tok.particle').count();
   check('particles · the reader marks particle tokens as doors', particleCount >= 5,
@@ -1987,7 +1993,7 @@ async function main() {
   // ------------------------------ Phase A · the observation log (taps)
   console.log('\n— Phase A · reader taps land in the observation log');
   await open('?entry=shelf&dials=0,0,0'); // furigana hidden → the full ladder
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
@@ -2291,7 +2297,7 @@ async function main() {
 
   // capture scope: 語だけ · この文 · 段落 — the choice rides the card
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await holdWord(page, '#reader .tok.content', 6);
   await page.waitForSelector('#sheet #take');
@@ -2329,7 +2335,7 @@ async function main() {
     return e;
   })()`));
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const bareBoot = await page.evaluate(`(() => ({
     visible: [...document.querySelectorAll('#reader rt')].filter((r) => !r.classList.contains('hidden-rt')).length,
@@ -2576,7 +2582,7 @@ async function main() {
   // the reader's top-right door: quiet until a word is touched, then one
   // tap takes the current thing with the sentence it was met in
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const idleSeal = await page.evaluate(`(() => {
     const b = document.querySelector('#reader-take');
@@ -3730,7 +3736,7 @@ async function main() {
   console.log('\n— C1 finding · the sentence page reaches its article');
   await open('?entry=shelf');
   await page.waitForSelector('.shelf-item:not([data-recommendation])');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await page.waitForSelector('#reader .tok.content');
   const sentHome = await page.evaluate(`(() => {
     const tok = document.querySelector('#reader .tok.content');
