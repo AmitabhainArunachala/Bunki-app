@@ -929,6 +929,37 @@ PROBES['review-keys-dialog'] = async () => {
   await context.close();
 };
 
+/* browse-search-word-only — Browse filled in reading and meaning only for word cards, and only
+ * from their first meaning: kanji, idiom and grammar cards were found by label or id alone, so
+ * "sea" or "うみ" missed 海 though the box promises word, reading or meaning. */
+PROBES['browse-search'] = async () => {
+  const seed = envelope();
+  for (const [t, id, i] of [['kanji', '海', 0], ['idiom', '一世一代', 1], ['grammar', 'niyoruto', 2], ['kanji', '龘', 3]])
+    seed.taken.push({ t, id, label: id === 'niyoruto' ? '〜によると' : id, ts: 1755000100000 + i, started: 1755000100000 + i });
+  const { context, page } = await learner({ seed });
+  await open(page);
+  await page.click('#tray');
+  await page.click('#deck-browse');
+  await page.waitForSelector('#browse-q');
+  const found = async (query) => {
+    await page.fill('#browse-q', query);
+    await settle(page, 150);
+    return page.evaluate(() => [...document.querySelectorAll('.browse-list .tray-line .w')].map((n) => n.textContent));
+  };
+  const seen = {};
+  for (const query of ['', 'sea', 'うみ', 'カイ', 'lifetime', 'いっせいちだい', 'according', 'master', 'doctor', 'record']) seen[query] = await found(query);
+  check('browse-search-word-only · a kanji card answers its meaning and readings: sea · うみ · カイ find 海',
+    ['sea', 'うみ', 'カイ'].every((q) => seen[q].includes('海')), JSON.stringify({ sea: seen.sea, うみ: seen['うみ'], カイ: seen['カイ'] }));
+  check('browse-search-word-only · an idiom and a grammar card answer theirs: lifetime · いっせいちだい · according',
+    seen.lifetime.includes('一世一代') && seen['いっせいちだい'].includes('一世一代') && seen.according.includes('〜によると'),
+    JSON.stringify({ lifetime: seen.lifetime, いっせいちだい: seen['いっせいちだい'], according: seen.according }));
+  check('browse-search-word-only · a word answers its later meanings too: master · doctor find 先生',
+    seen.master.includes('先生') && seen.doctor.includes('先生'), JSON.stringify({ master: seen.master, doctor: seen.doctor }));
+  check('browse-search-word-only · control: a kanji with no record is listed, but not found by the placeholder\'s words ("record")',
+    seen[''].includes('龘') && !seen.record.includes('龘'), JSON.stringify({ all: seen[''].length, record: seen.record }));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {
