@@ -206,6 +206,92 @@ def test_default_since_ignores_mint_only_runs(tmp_path, monkeypatch):
     assert ff.default_since() == datetime.now(fs.JST).date() - ff.timedelta(days=ff.DEFAULT_DAYS)
 
 
+def restage_shelf(tmp_path, monkeypatch):
+    """One pending fresh reading on a scratch shelf, and a refetch whose text changed."""
+    import json
+
+    import feed_fresh as ff
+    import feed_ingest
+
+    old = dict(fake_item().record(), stagedAt="2026-09-25T03:00:00+00:00")
+    paths = {
+        "DATASET": tmp_path / "items.jsonl",
+        "INDEX_PATH": tmp_path / "articles" / "index.json",
+        "QUEUE_PATH": tmp_path / "queue.json",
+        "ARTICLES": tmp_path / "articles",
+        "TITLES_PATH": tmp_path / "titles.json",
+        "EVIDENCE_DIR": tmp_path / "runs",
+        "ADAPTATIONS_PATH": tmp_path / "no-adaptations.json",
+        "REPO": tmp_path,
+    }
+    for name, path in paths.items():
+        monkeypatch.setattr(ff, name, path)
+    monkeypatch.setattr(feed_ingest, "QUEUE_PATH", paths["QUEUE_PATH"])
+    paths["ARTICLES"].mkdir()
+    body = paths["ARTICLES"] / "env-press-press_99999.json"
+    body.write_text('{"id":"env:press-press_99999","text":"old"}', "utf-8")
+    paths["DATASET"].write_text(json.dumps(old, ensure_ascii=False) + "\n", "utf-8")
+    paths["INDEX_PATH"].write_text(json.dumps({"sources": {}, "articles": [
+        {"id": old["id"], "file": body.name, "addedAt": "2026-09-26"}]}, indent=1) + "\n", "utf-8")
+    paths["QUEUE_PATH"].write_text(json.dumps([{"id": old["id"], "kind": "fresh", "decision": "pending",
+                                                  "addedAt": "2026-09-26", "titleEn": "New ants at Kobe"}], indent=2) + "\n", "utf-8")
+    paths["TITLES_PATH"].write_text(json.dumps({"titleEnSource": "test", "titles": {old["id"]: "New ants at Kobe"}}), "utf-8")
+    changed = fake_item(paragraphs=["環境省は、神戸港で確認されたアリの同定結果を改めて公表しました。" * 8]).record()
+    report = {"terms": [], "skipped": [], "sources": {"env": {"discovered": 1, "extracted": 1, "passed": 1, "error": None}}}
+    monkeypatch.setattr(ff, "fetch", lambda since, until, only, known: ([dict(changed)], report))
+    monkeypatch.setattr(ff.ba, "load_jlpt_lexicon", lambda: {})
+    monkeypatch.setattr(sys, "argv", ["feed_fresh.py", "--restage", "--since", "2026-09-14"])
+    return ff, paths, body, old, changed
+
+
+@pytest.mark.parametrize("failure", ["mint throws", "tokenizer missing"])
+def test_restage_writes_nothing_when_the_mint_fails(tmp_path, monkeypatch, failure):
+    import types
+
+    ff, paths, body, _old, _changed = restage_shelf(tmp_path, monkeypatch)
+    if failure == "tokenizer missing":
+        monkeypatch.setitem(sys.modules, "corpus.grading._mecab", None)
+    else:
+        monkeypatch.setitem(sys.modules, "corpus.grading._mecab", types.SimpleNamespace(get_tagger=lambda: None))
+
+        def broken_mint(*_args, **_kwargs):
+            raise RuntimeError("the tagger died mid-run")
+
+        monkeypatch.setattr(ff, "mint", broken_mint)
+    before = {name: paths[name].read_bytes() for name in ("DATASET", "INDEX_PATH", "QUEUE_PATH")}
+    with pytest.raises((RuntimeError, ImportError)):
+        ff.main()
+    assert {name: paths[name].read_bytes() for name in before} == before
+    assert body.read_text("utf-8") == '{"id":"env:press-press_99999","text":"old"}'
+    assert not paths["EVIDENCE_DIR"].exists()
+
+
+def test_restage_replaces_the_reading_once_the_mint_succeeds(tmp_path, monkeypatch):
+    import json
+    import types
+
+    ff, paths, body, old, changed = restage_shelf(tmp_path, monkeypatch)
+    monkeypatch.setitem(sys.modules, "corpus.grading._mecab", types.SimpleNamespace(get_tagger=lambda: None))
+
+    def fake_mint(row, title_en, _title_source, _topic, as_of, _tagger, _maps):
+        shared = {"id": row["id"], "addedAt": as_of, "date": row["date"], "titleEn": title_en}
+        grading = {"signals": {"jreadability": {"band": "中級"}}}
+        return (dict(shared, text=row["text"]), dict(shared, file=body.name, chars=len(row["text"]), grading=grading),
+                dict(shared, kind="fresh", decision="pending"))
+
+    monkeypatch.setattr(ff, "mint", fake_mint)
+    assert ff.main() == 0
+    rows = [json.loads(line) for line in paths["DATASET"].read_text("utf-8").splitlines()]
+    assert len(rows) == 1 and rows[0]["text"] == changed["text"]
+    assert rows[0]["previousContentSha256"] == old["contentSha256"] and rows[0]["stagedAt"] == old["stagedAt"]
+    assert "_addedAt" not in rows[0]
+    shelf = json.loads(paths["INDEX_PATH"].read_text("utf-8"))["articles"]
+    queue = json.loads(paths["QUEUE_PATH"].read_text("utf-8"))
+    assert [(r["id"], r["addedAt"]) for r in shelf] == [(old["id"], "2026-09-26")]
+    assert [(r["id"], r["addedAt"]) for r in queue] == [(old["id"], "2026-09-26")]
+    assert json.loads(body.read_text("utf-8"))["text"] == changed["text"]
+
+
 def test_global_voices_byline_and_preface_move_to_the_attribution():
     adapter = fs.PublisherReaderAdapter("global-voices")
     row = {
