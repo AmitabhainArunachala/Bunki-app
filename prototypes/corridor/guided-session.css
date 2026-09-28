@@ -356,7 +356,10 @@
 .gs-duecard button.gs-light b {
   font-size: 15px;
 }
-.gs-duecard .gs-gloss {
+/* the glosses ride inline beside their Japanese, even inside the card's block-level small */
+.gs-duecard button .gs-gloss {
+  display: inline;
+  margin: 0 0 0 7px;
   color: inherit;
   opacity: 0.8;
 }
