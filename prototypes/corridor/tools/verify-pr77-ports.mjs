@@ -247,8 +247,9 @@ PROBES['unidic-credit'] = async () => {
   await page.locator('button', { hasText: /sources & licences|出典と licence/ }).first().click();
   await settle(page);
   const fold = await page.evaluate(() => [...document.querySelectorAll('main .note')].map((n) => n.textContent).join(' '));
+  const at = fold.indexOf('UniDic');
   check('f7cd297c · the sources fold credits UniDic and fugashi',
-    /UniDic/.test(fold) && /fugashi/.test(fold), fold.slice(0, 200));
+    /UniDic/.test(fold) && /fugashi/.test(fold), at < 0 ? `no UniDic in ${fold.length} chars of the fold` : fold.slice(at, at + 160));
   await context.close();
 };
 

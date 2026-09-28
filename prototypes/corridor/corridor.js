@@ -24820,6 +24820,17 @@ function licencePanel() {
     line.append(document.createTextNode(' ' + sources.map((s) => `${s.name}（${s.licence}）`).join(' · ')));
     box.append(line);
   }
+  // …and the tokenizer. Every reading and part-of-speech tag in the app passed through UniDic
+  // via fugashi at build time, and the panel that claims to state everything named neither
+  // (PR #77 f7cd297c). A build-time dependency ships in no pool, so it is written down here.
+  const tokenizer = el('p');
+  tokenizer.style.margin = '8px 0 0';
+  tokenizer.append(el('span', 'pool-tag', tx('ビルド時', 'build time')));
+  tokenizer.append(document.createTextNode(' ' + tx(
+    'UniDic 2.1.2（UniDic Consortium、GPL・LGPL・BSD のいずれか）を unidic-lite と fugashi（MIT）で — 読みと品詞はすべてここから',
+    'UniDic 2.1.2 (the UniDic Consortium; GPL, LGPL or BSD) through unidic-lite and fugashi (MIT) — every reading and part-of-speech tag comes from it',
+  )));
+  box.append(tokenizer);
   return box;
 }
 
