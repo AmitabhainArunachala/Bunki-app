@@ -247,8 +247,14 @@ try {
     await page.waitForTimeout(300);
   });
 
+  // The journey reads one fixed text, addressed by id: the shelf leads with
+  // the newest news (2026-09-28), so "the first card" changes with the date
+  // and must never decide what this station exercises.
+  const JOURNEY_TEXT = '.shelf-item[data-passage="wikinews:1403"]:not([data-recommendation])';
+
   await step('4 reader capture', async () => {
-    await page.click('.shelf-item');
+    await page.locator(JOURNEY_TEXT).scrollIntoViewIfNeeded();
+    await page.click(JOURNEY_TEXT);
     await page.waitForSelector('.reader .tok.content', { timeout: 10000 });
     // the article body arrives async and re-renders once — wait for the token
     // count to hold still so the hold below is not cut by a mid-press repaint
@@ -294,8 +300,8 @@ try {
 
   await step('6 shelf 途中 tag', async () => {
     await page.click('#back');
-    await page.waitForSelector('.shelf-item', { timeout: 5000 });
-    const t = await page.evaluate(() => document.querySelector('.shelf-item .read-tag')?.textContent || '');
+    await page.waitForSelector(JOURNEY_TEXT, { timeout: 5000 });
+    const t = await page.evaluate((sel) => document.querySelector(`${sel} .read-tag`)?.textContent || '', JOURNEY_TEXT);
     if (!t.includes('途中')) throw new Error('tag: ' + JSON.stringify(t));
   });
 
