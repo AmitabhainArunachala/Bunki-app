@@ -396,7 +396,13 @@ export function loadGuidedState(storage, key, setId, questionIds) {
   try {
     const raw = storage && typeof storage.getItem === 'function' ? storage.getItem(key) : null;
     if (raw === null) return { state: clean, error: null };
-    const parsed = JSON.parse(raw);
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      // bytes that are not JSON are as unreadable as a wrong shape: the room keeps them aside
+      return { state: clean, error: 'invalid-state' };
+    }
     if (!validGuidedState(parsed, questionIds, setId))
       return { state: clean, error: 'invalid-state' };
     return { state: parsed, error: null };

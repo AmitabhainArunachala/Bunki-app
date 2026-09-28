@@ -12,6 +12,9 @@
  *   M  moments: the samurai cut, the rematch (block and bow), the crane, quiet · playful ·
  *      dramatic, the off switch, reduced motion, Escape/Skip, no stacking, report reachable
  *   R  restart and restore keep sessions exact and leave other storage alone
+ *   H  held: the room mounted on a blank page of the built site with a stub deck whose writes the
+ *      script holds open — 外す during enrolment, a later FINISH, unreadable saved bytes and set
+ *      fields that carry markup (the fusion review of 2026-09-28)
  *
  * Browsers: Chromium and WebKit (playwright-core), 390×844 and 1280×800, headless.
  * GUIDED_MOMENTS=0 skips the M checks, for a build that ships without the moments module.
@@ -47,7 +50,7 @@ const MOMENTS = process.env.GUIDED_MOMENTS !== '0';
 const ONLY_VIEWPORTS = process.env.GUIDED_VIEWPORTS
   ? process.env.GUIDED_VIEWPORTS.split(',')
   : null;
-const PARTS = new Set((process.env.GUIDED_PARTS || 'journey,moments,restart').split(','));
+const PARTS = new Set((process.env.GUIDED_PARTS || 'journey,moments,restart,held').split(','));
 /* Negative controls: GUIDED_FAULT serves one deliberately broken file, so a run can show that
  * the checks catch the fault. The anchor must exist, or the control would prove nothing. */
 const FAULTS = {
@@ -1084,6 +1087,131 @@ async function restart(browser, browserName) {
   }
 }
 
+/* ------------------------------------------------------------------ H (held) */
+const HELD_PAGE = `${origin}/__guided-held.html`;
+/** Mount the real room (guided-session.mjs from the built site) over a stub host whose deck
+ * writes wait until the script releases them. `status` rewrites one question's source status. */
+async function mountHeld(page, { seedBytes = null, status = null } = {}) {
+  await page.goto(HELD_PAGE);
+  await page.evaluate(
+    async ({ key, seedBytes, status }) => {
+      if (seedBytes !== null) localStorage.setItem(key, seedBytes);
+      const { createGuidedSession } = await import('/guided-session.mjs');
+      const deck = new Map();
+      const probe = { hold: true, pending: [], deck, writes: [] };
+      const nodeKey = (node) => `${node.t}:${node.id}`;
+      let room;
+      const host = {
+        english: () => true,
+        storage: () => localStorage,
+        render: () => {
+          const main = document.getElementById('main');
+          main.replaceChildren();
+          room.render(main);
+        },
+        fetchJson: (path) =>
+          fetch(new URL(path, document.baseURI))
+            .then((response) => response.json())
+            .then((json) => {
+              if (status && Array.isArray(json.questions)) json.questions[0].source.status = status;
+              return json;
+            }),
+        openReport: null,
+        openTutor: null,
+        openEntry: () => {},
+        deck: {
+          status: (node) => ({ state: deck.has(nodeKey(node)) ? 'taken' : 'take' }),
+          info: (nodes) =>
+            nodes.map((node) =>
+              deck.has(nodeKey(node))
+                ? { taken: true, ready: false, studied: false, kind: 'new', when: 'new' }
+                : { taken: false, ready: false, studied: false, kind: null, when: '' },
+            ),
+          title: (node) => node.id,
+          add: (node) =>
+            new Promise((resolve) => {
+              const finish = () => {
+                const id = nodeKey(node);
+                probe.writes.push(`add ${id}`);
+                if (deck.has(id)) return resolve('existing');
+                deck.set(id, true);
+                return resolve('added');
+              };
+              if (probe.hold) probe.pending.push(finish);
+              else finish();
+            }),
+          remove: async (node) => {
+            probe.writes.push(`remove ${nodeKey(node)}`);
+            deck.delete(nodeKey(node));
+            return true;
+          },
+          review: () => false,
+          open: () => {},
+        },
+      };
+      probe.release = () => probe.pending.splice(0).forEach((finish) => finish());
+      probe.snapshot = () => room.snapshot();
+      window.__heldProbe = probe;
+      room = createGuidedSession(host);
+      host.render();
+    },
+    { key: KEY, seedBytes, status },
+  );
+  await page.waitForSelector('.guided-room .gs-main', { timeout: 20_000 });
+}
+const heldDeck = (page) => page.evaluate(() => [...window.__heldProbe.deck.keys()].sort());
+const heldPending = (page) => page.evaluate(() => window.__heldProbe.pending.length);
+async function releaseAll(page) {
+  for (let round = 0; round < 20; round += 1) {
+    await page.waitForTimeout(80);
+    if (!(await heldPending(page))) {
+      await page.waitForTimeout(120);
+      if (!(await heldPending(page))) return;
+    }
+    await page.evaluate(() => window.__heldProbe.release());
+  }
+}
+
+async function held(browser, browserName) {
+  current = `${browserName}-held`;
+  const context = await newContext(browser, {
+    viewport: { width: 390, height: 844 },
+    reducedMotion: 'reduce',
+  });
+  await context.route(HELD_PAGE, (route) =>
+    route.fulfill({
+      contentType: 'text/html; charset=utf-8',
+      body: '<!doctype html><html lang="ja"><meta charset="utf-8"><title>held</title><main id="main"></main></html>',
+    }),
+  );
+  const page = await context.newPage();
+  const errors = [];
+  watchErrors(page, errors);
+  try {
+    // saved bytes that are not JSON: kept aside, never overwritten, and saving still works
+    const broken = '{"set":"kairo-guided-n2-living-thread-01","answers":{';
+    await mountHeld(page, { seedBytes: broken });
+    const footer = await page.locator('#guided-save-status').innerText();
+    check('H6 unreadable saved bytes do not claim saving is unavailable', !/unavailable/u.test(footer), footer);
+    await act(page, 'setup').click();
+    await act(page, 'start').click();
+    const kept = await page.evaluate((key) => localStorage.getItem(`${key}:unreadable`), KEY);
+    const saved = await page.evaluate((key) => localStorage.getItem(key), KEY);
+    check(
+      'H7 the unreadable bytes are kept aside exactly, and the new session saves beside them',
+      kept === broken && saved !== broken && JSON.parse(saved).started === true,
+      JSON.stringify({ kept, saved: saved?.slice(0, 40) }),
+    );
+
+  } catch (error) {
+    check('held walk completed without an exception', false, error.message);
+  } finally {
+    check('X4 no page errors', errors.length === 0, errors.join(' | '));
+    problems.push(...errors.map((error) => `${current}: ${error}`));
+    await context.close();
+  }
+}
+
 try {
   const engines = { chromium, webkit };
   const names = WHICH === 'all' ? ['chromium', 'webkit'] : [WHICH];
@@ -1098,6 +1226,7 @@ try {
       }
       if (MOMENTS && PARTS.has('moments')) await switches(browser, name);
       if (PARTS.has('restart')) await restart(browser, name);
+      if (PARTS.has('held')) await held(browser, name);
     } finally {
       await browser.close();
     }

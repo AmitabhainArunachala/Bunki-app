@@ -121,8 +121,19 @@ test('storage: round trip, set identity, unreadable bytes, failed writes', () =>
   assert.equal(fewer.error, 'invalid-state', 'nor into a different question list');
   storage.memory.set('bad', '{broken');
   const broken = loadGuidedState(storage, 'bad', 'set-a', ['q1']);
-  assert.ok(broken.error);
+  assert.equal(broken.error, 'invalid-state', 'bytes that are not JSON are unreadable, and kept aside');
   assert.equal(broken.state.answers.q1.choice, null);
+  const refused = loadGuidedState(
+    {
+      getItem() {
+        throw new Error('denied');
+      },
+    },
+    'k',
+    'set-a',
+    ['q1'],
+  );
+  assert.equal(refused.error, 'denied', 'storage that refuses to read is not unreadable bytes');
   const failed = saveGuidedState(
     {
       setItem() {
