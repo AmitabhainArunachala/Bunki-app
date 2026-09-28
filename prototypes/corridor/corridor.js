@@ -17966,6 +17966,10 @@ window.__KAIRO_SRS__ = Object.freeze({
     ).toISOString(),
   dueKeys: () => srsDueItems().map((i) => srsKey(i.t, i.id)),
   prefs: () => ({ newPerDay: srsNewPerDay(), reviewLimit: srsReviewLimit() }),
+  current: () => {
+    const item = S.review?.queue[S.review.ix];
+    return item ? srsKey(item.t, item.id) : null;
+  },
   session: () =>
     S.review
       ? { queue: S.review.queue.length, ix: S.review.ix, deferred: S.review.deferred ?? 0 }

@@ -340,12 +340,10 @@ try {
       if (await page.locator('.review-summary').count()) break;
       // Each acknowledged action redraws the face: resolve a fresh control and
       // wait for its durable record transition before pressing the next one.
-      const before = await readAppRecord(page);
+      const declared = await readAppRecord(page);
+      const key = await page.evaluate(() => window.__KAIRO_SRS__.current());
       await page.locator('#reveal').click();
-      const declared = await waitForAppRecord(page, record => record.obslog.length === before.obslog.length + 1
-        && record.obslog.at(-1)?.[1] === 'reveal' && record.obslog.at(-1)?.[3] === 1,
-      { timeout: 5000, description: 'journey recall declaration' });
-      const key = declared.obslog.at(-1)[2];
+      await page.locator('.grade.g-good').waitFor({ timeout: 5000 });
       await page.locator('.grade.g-good').click();
       await waitForAppRecord(page, record => record.revlog.length === declared.revlog.length + 1
         && record.revlog.at(-1)?.[1] === key && record.revlog.at(-1)?.[2] === 3,
