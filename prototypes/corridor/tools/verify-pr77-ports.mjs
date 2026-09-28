@@ -794,6 +794,31 @@ PROBES['sheet-summary-tab'] = async () => {
   await context.close();
 };
 
+/* chip-focus-fallback-crosses-rooms — 680aa4de's last-resort focus (class and place) also ran
+ * when a press changed rooms: Enter on the review summary's リストへ put the keyboard on the
+ * tray's 復習する, so a second Enter started a new review. Five of seven due cards per sitting,
+ * so the tray still offers a review after the summary. */
+PROBES['chip-focus-rooms'] = async () => {
+  const seed = envelope({ words: ['学校', '電話', '先生', '時間', '天気', '友達', '映画'] });
+  seed.srsPrefs = { reviewLimit: 5 };
+  const { context, page } = await learner({ seed });
+  await open(page);
+  await reachSummary(page);
+  await page.locator('.close-doors .take').first().focus();
+  await page.keyboard.press('Enter');
+  await settle(page, 400);
+  const landed = await page.evaluate(() => ({ view: document.body.dataset.view,
+    focus: document.activeElement === document.body ? 'body' : document.activeElement.id || document.activeElement.className,
+    offered: !!document.querySelector('#review-start:not([disabled])') }));
+  await page.keyboard.press('Enter');
+  await settle(page, 400);
+  const second = await page.evaluate(() => document.body.dataset.view);
+  check('chip-focus-fallback-crosses-rooms · after the summary\'s リストへ, the keyboard is not on the tray\'s 復習する',
+    landed.view === 'tray' && landed.offered && landed.focus !== 'review-start', JSON.stringify(landed));
+  check('chip-focus-fallback-crosses-rooms · a second Enter does not start a new review', second === 'tray', second);
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {
