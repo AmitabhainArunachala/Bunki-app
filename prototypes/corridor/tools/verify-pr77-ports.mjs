@@ -688,6 +688,31 @@ PROBES['summary-rest'] = async () => {
   await context.close();
 };
 
+/* ------------------------------------------------ the fusion review (2026-09-28)
+ * Defects a review of the fused branch found in these ports and their neighbours, each
+ * probed the same way: it fails on the build before its fix and passes after. */
+
+/* joyo-dial-marks — 362b6bd5 judged 々, 〆 and ヶ as kanji. The 漢検 table carries none of
+ * them, so 常用まで read them as rare and turned 人々 into ひとびと. */
+PROBES['joyo-marks'] = async () => {
+  const { context, page } = await learner();
+  const tokensIn = async (id, indexes) => {
+    await open(page, '?entry=shelf&ui=bi&dials=1,0,0');
+    await openRow(page, id);
+    return page.evaluate((list) => Object.fromEntries(list.map((i) =>
+      [i, document.querySelector(`.reader [data-index="${i}"]`)?.textContent ?? null])), indexes);
+  };
+  const gokajo = await tokensIn('real-gokajo', [54, 68, 78, 135]);
+  const radio = await tokensIn('govonline:article-202609-radio-3739', [72, 194]);
+  const city = await tokensIn('bunki-essay-n1-city', [32]);
+  const kept = [gokajo[135], radio[72], radio[194], city[32]];
+  check('joyo-dial-marks · with 常用まで on, 人々 · 国々 · 様々 · 日々 keep their kanji',
+    JSON.stringify(kept) === JSON.stringify(['人々', '国々', '様々', '日々']), JSON.stringify(kept));
+  check('joyo-dial-marks · control: the rare 綸, 迄 and 倦 are still replaced by their readings',
+    gokajo[54] === 'けいりん' && gokajo[68] === 'まで' && gokajo[78] === 'う', JSON.stringify(gokajo));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {

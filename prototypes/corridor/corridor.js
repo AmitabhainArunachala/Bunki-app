@@ -4840,9 +4840,13 @@ function openPassage(id, anchor = null) {
 const passage = () => D.passages.find((p) => p.id === S.passageId);
 const BEYOND_JOYO = new Set(['準1級', '1級']);
 
-const JOYO_JUDGEABLE = /[\u3400-\u4dbf\u4e00-\u9fff々〆ヶ]/;
+const JOYO_JUDGEABLE = /[\u3400-\u4dbf\u4e00-\u9fff]/;
+// 々 〆 ヶ are marks, not kanji: the 漢検 table carries none of them, so judged on their own they
+// read as rare and the dial turned 人々, 様々, 日々 and 国々 to kana. A mark takes the verdict of
+// the kanji before it instead (displayPairs), and with none before it is not judged at all.
+const JOYO_MARKS = /[々〆ヶ]/;
 function beyondJoyo(ch) {
-  // kana, numerals and marks are never "beyond" anything — the dial replaces
+  // kana, numerals and marks are never "beyond" anything on their own — the dial replaces
   // KANJI a learner at this level would not have met
   if (!JOYO_JUDGEABLE.test(ch)) return false;
   const k = D.kanken[ch];
@@ -4899,9 +4903,16 @@ function displayPairs(token) {
     if (!token.f) return [{ t: token.r || token.s }];
     return token.f.map((pair) => (pair.r ? { t: pair.r } : pair));
   }
+  let before = '';
   return token.f.map((pair) => {
+    let rare = false;
+    for (const ch of pair.t) {
+      const mark = JOYO_MARKS.test(ch);
+      if (beyondJoyo(mark ? before : ch)) rare = true;
+      if (!mark) before = ch;
+    }
     if (!pair.r) return pair;
-    return [...pair.t].some(beyondJoyo) ? { t: pair.r } : pair;
+    return rare ? { t: pair.r } : pair;
   });
 }
 
