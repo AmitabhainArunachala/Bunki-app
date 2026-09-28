@@ -92,7 +92,7 @@
         },
         "words": {
           "path": "prototypes/corridor/data/share_alike/words.json",
-          "sha256": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012"
+          "sha256": "8e8dd01254569908e5cd496ca6215fcf8bdc3ef43ef4092fe6e9d727a5294bfa"
         },
         "kanji": {
           "path": "prototypes/corridor/data/share_alike/kanji.json",
