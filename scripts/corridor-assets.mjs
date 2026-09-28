@@ -46,6 +46,8 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'guided-session.mjs',
   'guided-session-engine.mjs',
   'guided-session-content.mjs',
+  'guided-moments.mjs',
+  'guided-moments.css',
   'guided-session.css',
   'guided',
   'corridor-ink.js',
