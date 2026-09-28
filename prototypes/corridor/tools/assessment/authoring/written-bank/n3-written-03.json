@@ -1,0 +1,507 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N3",
+  "number": 3,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　わたしの趣味は、写真を撮ることです。高校生のとき、父が使わなくなった古いカメラをもらったのが（１）です。最初は、何を撮ればいいのか分からず、家の近くの花や猫ばかり撮っていました。\n　ある日、写真が好きな友だちに「毎日同じ場所で、同じ時間に撮ってみたら」と言われました。（２）、一年間、毎朝七時に家の前の川を撮り続けました。一年分の写真を並べてみると、季節によって川の色や光が少しずつ違うことに気づきました。今では、いつもの景色の中にも、発見できることがたくさんある（３）。",
+    "s1": "　最近、朝ご飯を食べない若い人が増えているという。朝ご飯を食べないと、午前中に頭が働かず、勉強や仕事に集中しにくくなる。だからといって、無理にたくさん食べる必要はない。バナナ一本や牛乳一杯だけでも、何も食べないよりずっといい。大切なのは、毎日続けることだ。",
+    "s2": "二年Ｂ組のみなさんへ\n　来週の時間割が一部変わります。月曜日の三時間目の数学と、水曜日の五時間目の音楽を入れかえます。また、金曜日の体育は、体育館の工事のため、教室で保健の授業をします。体操服は持ってこなくてかまいません。\n担任　佐藤",
+    "s3": "さくら町内会からのお知らせ\n　今年の夏祭りは、八月十日（土）に行います。準備のため、前日の九日（金）午後五時から、公民館の前でテントを立てます。お手伝いいただける方は、八月三日までに、町内会長の中村までお電話ください。\n　なお、当日雨が降った場合、夏祭りは次の日に行います。",
+    "m1": "　祖父は、七十歳になってから料理を始めた。それまでは料理をずっと祖母に任せていて、お湯をわかすことぐらいしかできなかったそうだ。\n　きっかけは、祖母が足をけがして、二か月ほど入院したことだった。毎日コンビニの弁当を食べていた祖父は、医者に「塩分が多すぎます。このままでは体に悪いですよ」と注意されてしまった。そこで、町の公民館で開かれている、高齢者向けの料理教室に通い始めたのだ。\n　最初は野菜を切るのにも時間がかかったが、今では、みそ汁や煮物など、いくつかの料理を作れるようになった。祖母が退院してからも、週に二回は祖父が夕食を作っている。「料理は頭を使うから、いい運動になるよ」と、祖父は楽しそうに言う。",
+    "l1": "　わたしが住んでいるマンションでは、三年ほど前から、町内会に入る人が少しずつ減っている。仕事が忙しい、知らない人と話すのが苦手だ、などが主な理由のようだ。わたし自身も、以前は町内会に入っていなかった。会費を払っても、自分にはあまり関係がないと思っていたからだ。\n　考えが変わったのは、去年の大雨のときだった。夜中に近くの川の水が増えて、避難しなければならなくなった。どこへ行けばいいのか分からずに困っていると、町内会の人たちが一軒一軒ドアをたたいて、避難所の場所を教えてくれた。お年寄りの手を引いて、一緒に歩いてくれる人もいた。\n　それから、わたしは町内会に入り、月に一度の会議にも出るようになった。実際に参加してみると、町内会は祭りやごみの問題だけでなく、いざというときに住民どうしが助け合うための大切なつながりなのだと分かった。\n　もちろん、忙しい人に無理に参加してもらう必要はない。しかし、ふだんから近所の人の顔を知っておくことが、自分や家族を守ることにもつながるのではないだろうか。",
+    "i1": "第十回　みなと市写真コンテスト　作品募集\n\n【テーマ】「わたしの好きなみなと市」\n【応募できる人】みなと市に住んでいる人、またはみなと市の学校・会社に通っている人\n【部門】\n・一般の部：高校生以上\n・ジュニアの部：中学生以下\n【応募のしかた】\n・一人三枚まで応募できます。\n・写真はＡ４サイズで印刷してください。\n・写真の裏に、名前・住所・電話番号・写真のタイトルを書いてください。\n・ジュニアの部の方は、学校名と学年も書いてください。\n・市役所の文化課に持ってくるか、郵送してください。\n【しめきり】十一月三十日（木）必着\n【賞】大賞（一名）：三万円　優秀賞（三名）：一万円\n※応募した写真はお返ししません。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n野菜には、体に必要な【栄養】がたくさん含まれている。",
+      "options": [
+        "えいよ",
+        "えいりょう",
+        "えいよう",
+        "えよう"
+      ],
+      "answer": 2,
+      "rationale": "栄養は「えいよう」と読む。体が元気に育つために必要なもののことだ。\nThe word 栄養 (nutrition) is read eiyō.",
+      "target": "栄養"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n健康のためには、十分な【睡眠】をとることが大切だ。",
+      "options": [
+        "すいみん",
+        "すいめん",
+        "ずいみん",
+        "すいみ"
+      ],
+      "answer": 0,
+      "rationale": "睡眠は「すいみん」と読む。眠ることを表す言葉だ。\nThe word 睡眠 (sleep) is read suimin.",
+      "target": "睡眠"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n今学期は、好きな【科目】を二つ選んで勉強できる。",
+      "options": [
+        "かぼく",
+        "がもく",
+        "かむく",
+        "かもく"
+      ],
+      "answer": 3,
+      "rationale": "科目は「かもく」と読む。数学や英語など、学校で勉強する教科のことだ。\nThe word 科目 (school subject) is read kamoku.",
+      "target": "科目"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの町の【住民】は、毎月一回、公園をそうじしている。",
+      "options": [
+        "じゅみん",
+        "じゅうみん",
+        "しゅうみん",
+        "すみん"
+      ],
+      "answer": 1,
+      "rationale": "住民は「じゅうみん」と読む。その地域に住んでいる人のことだ。\nThe word 住民 (residents) is read jūmin.",
+      "target": "住民"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nこの店の野菜は、スーパーより【かかく】が安い。",
+      "options": [
+        "価各",
+        "仮格",
+        "価確",
+        "価格"
+      ],
+      "answer": 3,
+      "rationale": "「かかく」は「価格」と書く。値段のこと。\nKakaku (price) is written 価格.",
+      "target": "価格"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n夏休みに、アサガオが育つ様子を毎日【かんさつ】した。",
+      "options": [
+        "観察",
+        "観擦",
+        "勧察",
+        "観祭"
+      ],
+      "answer": 0,
+      "rationale": "物事の様子を注意してよく見ることは「観察」と書く。\nWatching something carefully over time is written 観察.",
+      "target": "観察"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n町内会の祭りの準備には、多くの住民が【きょうりょく】してくれた。",
+      "options": [
+        "強力",
+        "共力",
+        "協力",
+        "協功"
+      ],
+      "answer": 2,
+      "rationale": "力を合わせて助けることは「協力」と書く。「強力」は力が強いという意味の別の言葉だ。\nWorking together to help is written 協力; 強力 is a different word meaning powerful.",
+      "target": "協力"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\nかぜで熱があるときは、（　）がなくて何も食べたくない。",
+      "options": [
+        "食品",
+        "食欲",
+        "食卓",
+        "食物"
+      ],
+      "answer": 1,
+      "rationale": "食べたいと思う気持ちを「食欲」という。「食欲がない」はよく使う言い方だ。\nThe desire to eat is 食欲 (appetite); 食欲がない means having no appetite.",
+      "target": "食欲"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n宿題は、金曜日までに先生に（　）しなければならない。",
+      "options": [
+        "提案",
+        "出席",
+        "提出",
+        "出発"
+      ],
+      "answer": 2,
+      "rationale": "宿題やレポートを先生などに出すことを「提出」という。\nHanding in homework or a report is 提出 (submission).",
+      "target": "提出"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n夕日を撮ったこの写真は、見る人に強い（　）を与える。",
+      "options": [
+        "感想",
+        "表情",
+        "想像",
+        "印象"
+      ],
+      "answer": 3,
+      "rationale": "見たあとに心に残る感じを「印象」といい、「強い印象を与える」という形でよく使う。\nThe feeling something leaves on you is 印象 (impression), as in 強い印象を与える.",
+      "target": "印象"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n運動を始めてから、体重が【徐々に】減ってきた。",
+      "options": [
+        "急に",
+        "少しずつ",
+        "たくさん",
+        "一度に"
+      ],
+      "answer": 1,
+      "rationale": "「徐々に」は、ゆっくりと少しずつ変化する様子を表す。\nThe word 徐々に means gradually, little by little.",
+      "target": "徐々に"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n出かける前に、宿題を【済ませる】つもりだ。",
+      "options": [
+        "始める",
+        "終わらせる",
+        "忘れる",
+        "見せる"
+      ],
+      "answer": 1,
+      "rationale": "「済ませる」は、しなければならないことを終わらせるという意味だ。\nThe verb 済ませる means to finish or get something done.",
+      "target": "済ませる"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【効く】",
+      "options": [
+        "駅までの道が分からなかったので、交番で効いた。",
+        "このかばんはたくさん物が入るので、旅行によく効く。",
+        "この薬はよく効くので、飲むとすぐに熱が下がる。",
+        "父は毎朝、ラジオのニュースを効いている。"
+      ],
+      "answer": 2,
+      "rationale": "「効く」は、薬などのききめが表れるときに使う。1と4は「聞く」、2は「役に立つ」が正しい。\nThe verb 効く means to take effect, as medicine does.",
+      "target": "効く"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【集中】",
+      "options": [
+        "図書館は静かなので、勉強に集中できる。",
+        "町内会の会費を、毎月集中している。",
+        "写真をたくさん撮ったので、アルバムに集中した。",
+        "雨が降ってきたので、洗濯物を急いで集中した。"
+      ],
+      "answer": 0,
+      "rationale": "「集中」は、一つのことに気持ちや力を向けることで、「〜に集中する」と使う。\nThe word 集中 means to concentrate on one thing, as in 勉強に集中する.",
+      "target": "集中"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n兄は夜遅くまで起きているので、朝ご飯を抜き（　）だ。",
+      "options": [
+        "っぽい",
+        "がち",
+        "らしい",
+        "ほど"
+      ],
+      "answer": 1,
+      "rationale": "「〜がち」は、よくない状態になることが多いという意味を表す。\nThe pattern がち means tending to do something undesirable often: he often skips breakfast.",
+      "subject": "grammar:gachi"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの授業では、一週間（　）に小テストがある。",
+      "options": [
+        "ほど",
+        "まで",
+        "おき",
+        "うち"
+      ],
+      "answer": 2,
+      "rationale": "「一週間おきに」は、一週間あいだをあけて、という意味を表す。\nThe pattern おきに means at intervals: a quiz every other week.",
+      "subject": "grammar:okini"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの薬を飲み（　）すれば、すぐに元気になりますよ。",
+      "options": [
+        "こそ",
+        "しか",
+        "さえ",
+        "まで"
+      ],
+      "answer": 2,
+      "rationale": "「〜さえ〜ば」は、それだけで十分だという条件を表す。\nThe pattern さえ〜ば means if only: just take this medicine and you will get better.",
+      "subject": "grammar:saeba"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n集まりは七時からなので、まだ一時間ある。急いで行く（　）。",
+      "options": [
+        "ことになる",
+        "ことはない",
+        "ことがある",
+        "ことにする"
+      ],
+      "answer": 1,
+      "rationale": "「〜ことはない」は、その必要がないことを表す。時間があるので急がなくていいという意味だ。\nThe pattern ことはない means there is no need: there is time, so no need to hurry.",
+      "subject": "grammar:kotohanai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n初めて撮った（　）、この写真はとてもよく撮れている。",
+      "options": [
+        "にとって",
+        "によって",
+        "にしては",
+        "として"
+      ],
+      "answer": 2,
+      "rationale": "「〜にしては」は、そこから予想されることと違う結果を表す。初めてなのに上手だという意味だ。\nThe pattern にしては means for, considering: surprisingly good for a first photo.",
+      "subject": "grammar:nishitewa"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n写真は、撮れ（　）撮るほど上手になる。",
+      "options": [
+        "ても",
+        "たら",
+        "と",
+        "ば"
+      ],
+      "answer": 3,
+      "rationale": "「〜ば〜ほど」は、一方が進むともう一方も進むことを表す。\nThe pattern ば〜ほど means the more you do, the more: the more you shoot, the better you get.",
+      "subject": "grammar:bahodo"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n健康のために、＿＿＿　＿＿＿　＿★＿　＿＿＿　ようにしている。",
+      "options": [
+        "階段を使う",
+        "なく",
+        "エレベーター",
+        "では"
+      ],
+      "answer": 1,
+      "rationale": "正しい順番は「エレベーター　では　なく　階段を使う」で、★には「なく」が入る。\nThe order is エレベーター では なく 階段を使う (use the stairs, not the elevator), so なく fills the star.",
+      "subject": "grammar:n3-dewa-naku"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n町内会の　＿＿＿　＿★＿　＿＿＿　＿＿＿　メールで知らせます。",
+      "options": [
+        "場合は",
+        "決まった",
+        "日時が",
+        "集まりの"
+      ],
+      "answer": 2,
+      "rationale": "正しい順番は「集まりの　日時が　決まった　場合は」で、★には「日時が」が入る。\nThe order is 集まりの 日時が 決まった 場合は (when the meeting date is set), so 日時が fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "意味",
+        "きっかけ",
+        "目的",
+        "結果"
+      ],
+      "answer": 1,
+      "rationale": "写真を始める最初の出来事を表しているので「きっかけ」が合う。\nGetting the old camera is what started the hobby, so きっかけ (the trigger) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "それでも",
+        "ところが",
+        "そこで",
+        "そのうえ"
+      ],
+      "answer": 2,
+      "rationale": "友だちに言われたことを受けて行動したので「そこで」が合う。\nThe writer acted on the friend's suggestion, so そこで (so, therefore) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "と思っていました",
+        "ことにしています",
+        "と思わせています",
+        "と思っています"
+      ],
+      "answer": 3,
+      "rationale": "「今では」と今の考えを述べているので「と思っています」が合う。\nWith 今では (now) the writer states a present view, so と思っています fits."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "筆者の考えに合うものはどれか。",
+      "options": [
+        "朝ご飯は、できるだけたくさん食べたほうがいい。",
+        "朝ご飯を食べなくても、午前中の仕事には集中できる。",
+        "少しでもいいから、毎日朝ご飯を食べたほうがいい。",
+        "若い人は、朝ご飯を食べる必要がない。"
+      ],
+      "answer": 2,
+      "rationale": "無理にたくさん食べる必要はなく、少しでも毎日続けることが大切だと述べている。\nThe writer says even a little breakfast is better than none, as long as you keep it up daily."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "来週の月曜日の三時間目は、何の授業か。",
+      "options": [
+        "数学",
+        "音楽",
+        "体育",
+        "保健"
+      ],
+      "answer": 1,
+      "rationale": "月曜日三時間目の数学と水曜日五時間目の音楽を入れかえるので、月曜日の三時間目は音楽になる。\nMonday's third-period math swaps with Wednesday's music, so Monday third period is music."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "夏祭りの準備を手伝いたい人は、どうすればいいか。",
+      "options": [
+        "八月九日の午後五時に、中村さんに電話する。",
+        "八月三日までに、中村さんに電話する。",
+        "八月十日に、公民館へ行って申し込む。",
+        "八月三日に、公民館の前でテントを立てる。"
+      ],
+      "answer": 1,
+      "rationale": "手伝える人は八月三日までに町内会長の中村さんに電話するように書いてある。\nVolunteers should phone Nakamura, the association head, by August 3."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "祖父が料理を始めたきっかけは何か。",
+      "options": [
+        "七十歳になって、時間ができたこと",
+        "公民館で料理教室の案内を見たこと",
+        "祖母が入院して、医者に食事のことを注意されたこと",
+        "コンビニの弁当が高かったこと"
+      ],
+      "answer": 2,
+      "rationale": "祖母が入院し、弁当ばかり食べていた祖父が医者に注意されたことがきっかけだ。\nWhile the grandmother was in hospital, the doctor warned him about his diet of convenience-store meals."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "「このままでは体に悪いですよ」とあるが、何が体に悪いのか。",
+      "options": [
+        "お湯をわかすことしかできないこと",
+        "料理を祖母に任せていること",
+        "野菜を切るのに時間がかかること",
+        "塩分の多い弁当を毎日食べていること"
+      ],
+      "answer": 3,
+      "rationale": "医者は、毎日食べているコンビニの弁当の塩分が多すぎると注意している。\nThe doctor meant eating salty convenience-store lunches every day."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "祖父は今、料理についてどう考えているか。",
+      "options": [
+        "頭を使うので、いい運動になる。",
+        "時間がかかるので、あまりしたくない。",
+        "祖母が退院したので、もう作らなくていい。",
+        "料理教室に通わなければ、作れない。"
+      ],
+      "answer": 0,
+      "rationale": "祖父は「料理は頭を使うから、いい運動になるよ」と楽しそうに言っている。\nHe says cooking uses the brain, so it is good exercise."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "「わたし」が以前、町内会に入っていなかったのは、なぜか。",
+      "options": [
+        "仕事が忙しくて、会議に出られなかったから",
+        "知らない人と話すのが苦手だったから",
+        "会費を払っても、自分にはあまり関係がないと思っていたから",
+        "マンションに町内会がなかったから"
+      ],
+      "answer": 2,
+      "rationale": "「会費を払っても、自分にはあまり関係がないと思っていたからだ」と自分の理由を書いている。\nThe writer thought paying the fee had little to do with their own life."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "筆者の考えに合うものはどれか。",
+      "options": [
+        "忙しい人も、町内会の会議には必ず出るべきだ。",
+        "町内会の主な仕事は、祭りとごみの問題だ。",
+        "大雨のときは、一人で避難所へ行ったほうがいい。",
+        "ふだんから近所の人とつながりを持っておくことが大切だ。"
+      ],
+      "answer": 3,
+      "rationale": "最後の段落で、ふだんから近所の人の顔を知っておくことが自分や家族を守ることにつながると述べている。\nThe writer concludes that knowing your neighbors in ordinary times helps protect you and your family."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "となりの市に住んでいて、みなと市の会社に通っている会社員の石田さんが、このコンテストに応募したい。正しいものはどれか。",
+      "options": [
+        "市に住んでいないので、応募できない。",
+        "ジュニアの部に、三枚まで応募できる。",
+        "一般の部に、三枚まで応募できる。",
+        "一般の部に、何枚でも応募できる。"
+      ],
+      "answer": 2,
+      "rationale": "みなと市の会社に通っている人は応募でき、会社員は一般の部で、一人三枚までだ。\nPeople who work in the city may enter; an office worker enters the general division, up to three photos."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "中学二年生の春香さんが応募するとき、写真の裏に書かなければならないことはどれか。",
+      "options": [
+        "名前と写真のタイトルだけ",
+        "名前・住所・電話番号・写真のタイトル",
+        "名前・住所・電話番号・写真のタイトル・学校名・学年",
+        "学校名・学年・写真のタイトルだけ"
+      ],
+      "answer": 2,
+      "rationale": "全員が名前・住所・電話番号・タイトルを書き、ジュニアの部はさらに学校名と学年も書く。\nEveryone writes name, address, phone and title; junior entrants also add school and grade."
+    }
+  ]
+}
