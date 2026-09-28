@@ -21195,6 +21195,15 @@ async function aiLastReply(surface, ref) {
  * lands after the sheet was rebuilt asks for one render: the archive read-back, or this note,
  * puts it where it belongs. */
 const aiSheetNotes = new Map();
+/* A repaint re-arms the door while an ask is still out, so a second ask can overtake the first. Each
+ * ask takes a turn: only the newest may leave the line, and a reply clears it — a late failure of an
+ * older ask never stands over a saved reply. */
+const aiSheetTurns = new Map();
+function aiSheetTurn(key) {
+  const turn = (aiSheetTurns.get(key) || 0) + 1;
+  aiSheetTurns.set(key, turn);
+  return turn;
+}
 function aiSheetSettle(box, paint) {
   if (box.isConnected) paint();
   else if ($('.sheet')) render();
@@ -21218,6 +21227,7 @@ function renderAiTutor(sheet, node, rec) {
     if (prev && !out.textContent) out.textContent = prev;
   });
   btn.addEventListener('click', async () => {
+    const turn = aiSheetTurn(`word-tutor|${ref}`);
     aiSheetNotes.delete(`word-tutor|${ref}`);
     btn.disabled = true;
     out.textContent = tx('考え中…', 'thinking…');
@@ -21228,11 +21238,14 @@ function renderAiTutor(sheet, node, rec) {
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}.`,
         { surface: 'word-tutor', ref },
       );
+      aiSheetNotes.delete(`word-tutor|${ref}`);
       aiSheetSettle(out, () => { out.textContent = said; });
     } catch {
-      const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
-      aiSheetNotes.set(`word-tutor|${ref}`, line);
-      aiSheetSettle(out, () => { out.textContent = line; });
+      if (aiSheetTurns.get(`word-tutor|${ref}`) === turn) {
+        const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+        aiSheetNotes.set(`word-tutor|${ref}`, line);
+        aiSheetSettle(out, () => { out.textContent = line; });
+      }
     }
     btn.disabled = false;
   });
@@ -21279,6 +21292,7 @@ function renderAiExamples(sheet, node, rec) {
     if (prev && !out.childElementCount && !btn.disabled) paint(prev);
   });
   btn.addEventListener('click', async () => {
+    const turn = aiSheetTurn(`examples|${exRef}`);
     aiSheetNotes.delete(`examples|${exRef}`);
     btn.disabled = true;
     out.textContent = '';
@@ -21291,16 +21305,19 @@ function renderAiExamples(sheet, node, rec) {
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Source word JLPT classification: ${wordLv || 'not recorded'}. Dictionary senses: ${senses || 'none recorded'}.`,
         { surface: 'examples', ref: exRef },
       );
+      aiSheetNotes.delete(`examples|${exRef}`);
       aiSheetSettle(out, () => {
         if (!paint(raw)) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
       });
     } catch {
-      const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
-      aiSheetNotes.set(`examples|${exRef}`, line);
-      aiSheetSettle(out, () => {
-        out.textContent = '';
-        out.append(el('p', 'ai-ex-note', line));
-      });
+      if (aiSheetTurns.get(`examples|${exRef}`) === turn) {
+        const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
+        aiSheetNotes.set(`examples|${exRef}`, line);
+        aiSheetSettle(out, () => {
+          out.textContent = '';
+          out.append(el('p', 'ai-ex-note', line));
+        });
+      }
     }
     btn.disabled = false;
   });
