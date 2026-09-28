@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { buildSync, version } from 'esbuild';
 import { externalPath } from '../../bunki-desktop/lib/paths.cjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { isMachineCheckedEntry } from './assessment/machine-checked-class.mjs';
 
 const args = process.argv.slice(2);
 assert(args.filter((arg) => !arg.startsWith('--')).length <= 1 && args.every((arg) => !arg.startsWith('--') || arg === '--fragment'), 'Usage: build-standalone.mjs [external-outfile] [--fragment]');
@@ -243,7 +244,7 @@ packAssessment('catalog.json'); packAssessment('sources.json');
 const assessmentCatalog = JSON.parse(read('data/assessment/catalog.json'));
 for (const entry of [...assessmentCatalog.entries, ...(assessmentCatalog.archivedEntries || [])]) {
   if (!entry.availability?.ready) continue;
-  assert.equal(entry.review?.status, 'ai-reviewed', 'Only admitted public assessments may be embedded');
+  assert(entry.review?.status === 'ai-reviewed' || isMachineCheckedEntry(entry), 'Only admitted public assessments may be embedded');
   packAssessment(entry.formPath); packAssessment(entry.deliveryPath);
   const form = JSON.parse(read(assessmentPath(entry.formPath)));
   const delivery = JSON.parse(read(assessmentPath(entry.deliveryPath)));

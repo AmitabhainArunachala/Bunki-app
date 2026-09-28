@@ -10342,9 +10342,16 @@ function assessmentPublicCache() { return window.__KAIRO_ASSESSMENT_CACHE__ || g
 function assessmentCatalogVersions(catalog = assessmentCatalog) {
   return [...(catalog?.entries || []), ...(catalog?.archivedEntries || [])];
 }
+/** A startable entry: host-reviewed exactly as before, or the separately labelled
+ * machine-checked written class (assessment-delivery.mjs owns the rule). */
+function assessmentAdmitted(row) {
+  if (assessmentDeliveryModule) return assessmentDeliveryModule.assessmentEntryAdmitted(row);
+  return !!(row?.availability?.ready && row.review?.status === 'ai-reviewed' &&
+    row.editorialAtStart && row.editorialAtStart.status !== 'unreviewed');
+}
 function resolveReceivedAssessmentForm(reference) {
   const entry = assessmentCatalogVersions().find(row => row.formSha256 === reference.sha256 && row.id === reference.id &&
-    row.availability?.ready && row.review?.status === 'ai-reviewed');
+    assessmentAdmitted(row));
   const form = assessmentForms.get(reference.sha256) || assessmentDefinitions.get(reference.sha256);
   return entry && form && form.revisionId === reference.revisionId
     ? { form, editorialAtStart: entry.editorialAtStart, presentation: resolveAssessmentPresentation(form) } : null;
@@ -10366,7 +10373,7 @@ async function performAssessmentReconciliation() {
       const ref = head.payload.form;
       const known = resolveReceivedAssessmentForm(ref);
       if (known && (!known.form.media.length || known.presentation)) continue;
-      const entry = assessmentCatalogVersions(catalog).find(row => row.id === ref.id && row.formSha256 === ref.sha256 && row.availability?.ready && row.review?.status === 'ai-reviewed');
+      const entry = assessmentCatalogVersions(catalog).find(row => row.id === ref.id && row.formSha256 === ref.sha256 && assessmentAdmitted(row));
       if (!entry) continue;
       try {
         const form = await loadAssessmentForm(entry);
@@ -10424,6 +10431,16 @@ async function loadAssessmentForm(entry) {
   const { form, delivery } = await assessmentDeliveryStore.prepare(entry, assessmentV2Module.parseFormVersion);
   assessmentForms.set(key, form); assessmentDeliveries.set(key, delivery); return form;
 }
+// A finished or reopened attempt may need its delivery for per-question provenance only.
+const assessmentDeliveryLoads = new Map();
+function ensureAssessmentDelivery(selected) {
+  const key = selected?.form?.sha256;
+  if (!key || assessmentDeliveries.has(key) || assessmentDeliveryLoads.has(key)) return;
+  assessmentDeliveryLoads.set(key, loadAssessmentCatalog().then(catalog => {
+    const entry = assessmentCatalogVersions(catalog).find(row => row.id === selected.form.id && row.formSha256 === key && assessmentAdmitted(row));
+    return entry ? loadAssessmentForm(entry) : null;
+  }).catch(() => null).finally(() => { if (S.view === 'mock') render(); }));
+}
 async function assessmentMediaBlob(selected, assetId) {
   if (!assessmentDeliveries.has(selected.form.sha256)) {
     const catalog = await loadAssessmentCatalog();
@@ -10467,8 +10484,7 @@ async function performAssessmentStart(entry, mode) {
   try {
     const catalog = await loadAssessmentCatalog();
     const admitted = catalog.entries.find(row => row.id === entry.id);
-    if (admitted !== entry || !entry.availability.ready || entry.review.status !== 'ai-reviewed' ||
-        !entry.editorialAtStart || entry.editorialAtStart.status === 'unreviewed') throw new Error('assessment-not-ready');
+    if (admitted !== entry || !assessmentAdmitted(entry)) throw new Error('assessment-not-ready');
     const form = await loadAssessmentForm(entry);
     if (!recordWritable(epoch)) return false;
     const owned = recordApp.current();
@@ -10650,6 +10666,11 @@ function createAssessmentRoom() {
     mediaBlob: assessmentMediaBlob,
     mediaBytes: assessmentMediaBytes,
     delivery: selected => assessmentDeliveries.get(selected.form.sha256),
+    // 検収前 class: the label for an attempt started on a machine-checked form, and each question's checks
+    machineCheckLabel: selected => assessmentDeliveryModule?.machineCheckedEditorial(selected?.attempt?.editorialAtStart)
+      ? assessmentDeliveryModule.MACHINE_CHECK_LABEL : null,
+    itemCheck: (selected, itemId) => assessmentDeliveries.get(selected.form.sha256)?.itemChecks?.find(row => row.itemId === itemId) || null,
+    ensureDelivery: ensureAssessmentDelivery,
     remaining: selected => {
       if (!selected.block || selected.remainingMs === null) return 0;
       const monotonicDelta = selected.attempt.clock.sessionId === assessmentClockSession && selected.attempt.clock.lastMonotonicMs !== null
@@ -10694,7 +10715,7 @@ setInterval(() => {
 }, 1000);
 function resolveAssessmentPresentation(form) {
   const entry = assessmentCatalogVersions().find(row => row.id === form.id && row.formSha256 === form.sha256 &&
-    row.availability?.ready && row.review?.status === 'ai-reviewed');
+    assessmentAdmitted(row));
   const delivery = assessmentDeliveries.get(form.sha256);
   return entry && delivery ? { delivery, reviewedSha256: entry.deliverySha256 } : null;
 }
@@ -10726,7 +10747,7 @@ function stopAssessmentQuestionForRender() {
 async function loadAssessmentQuestionSource(plan) {
   const catalog = await loadAssessmentCatalog();
   const entry = assessmentCatalogVersions(catalog).find(row => row.id === plan.form.id && row.formSha256 === plan.form.sha256 &&
-    row.availability?.ready && row.review?.status === 'ai-reviewed');
+    assessmentAdmitted(row));
   if (!entry) throw new Error('question-form-unavailable');
   const form = await loadAssessmentForm(entry);
   assessmentQuestionModule.assertAssessmentQuestionForm(plan, form);
@@ -19503,14 +19524,17 @@ function renderStudyHall(main) {
     assessmentOpening = true;
     loadAssessmentCatalog().then(() => { if (S.view === 'dojo') render(); }).catch(() => {}).finally(() => { assessmentOpening = false; });
   }
-  const readyTests = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode !== 'section').length || 0;
+  const readyTests = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && !['section', 'written'].includes(entry.mode)).length || 0;
   const readySections = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'section').length || 0;
+  // machine-checked written tests are counted apart: they have no length and still await review
+  const readyWritten = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'written').length || 0;
   const doors = [
     ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} cards waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
       ? tx(`${readyTests}組 · 級と長さを選ぶ`, `${readyTests} tests · choose a level and length`)
+      : readyWritten ? tx(`筆記テスト ${readyWritten}組 · 検収前`, `${readyWritten} written tests · awaiting review`)
       : readySections ? tx(`${readySections}組の練習 · 模試は準備中`, `${readySections} practice set${readySections === 1 ? '' : 's'} · mock tests in preparation`)
         : tx('新しい模試を準備中 · 以前の練習も使えます', 'New mocks in preparation · earlier exercises available'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
