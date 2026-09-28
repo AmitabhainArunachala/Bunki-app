@@ -8178,12 +8178,21 @@ function renderReader(main) {
   fin.append(finBtn);
   main.append(fin);
 
-  if (p.pendingVerification) {
+  // A row marked 検収前 explains itself wherever the mark shows. The note was gated on
+  // pendingVerification, which few marked rows carry, so the rest wore the mark with no reason,
+  // and the rights-held glossary rows told the Wikinews archive-freeze story, false of them
+  // (PR #77 d9f0b984, with round B's per-row reasons).
+  const rightsHeld = p.review === 'rights-review-pending';
+  if (p.pendingVerification || rightsHeld || p.review === 'human-review-pending' || /検収前/.test(p.sourceLabel || '')) {
     const pv = el('div', 'note');
-    pv.textContent = tx(
-      '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
-      'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
-    );
+    pv.textContent = rightsHeld
+      ? tx('出典の利用条件がまだ確認されていない。検収前。', 'The terms this source may be used under are not yet verified. Pending review.')
+      : p.pendingVerification
+        ? tx(
+          '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
+          'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
+        )
+        : tx('人手による確認がまだ済んでいない。検収前。', 'A human review of this text is still pending.');
     main.append(pv);
   }
 
