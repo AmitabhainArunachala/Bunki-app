@@ -86,7 +86,7 @@ licenses, reproducible generation, and limitations.
 
 ```sh
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
-  node prototypes/corridor/tools/verify-corridor.mjs   # 91 checks + screenshots
+  node prototypes/corridor/tools/verify-corridor.mjs   # browser checks + screenshots
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
   node prototypes/corridor/tools/verify-corridor-accessibility.mjs
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
@@ -110,7 +110,11 @@ prefetched in the background; adding an article to the shelf is adding a
 file. Sources are all in-repo: the corpus samples (wikinews · aozora ·
 やさしい日本語, full-length — the 520-char excerpt cap is gone) and the 8
 v11 reading-catalog texts (5 Bunki originals, pool `original`; 3
-public-domain classics).
+public-domain classics). Fresh dated readings are fetched live by
+`tools/feed_fresh.py`, which stages their text in
+`corpus/datasets/fresh/items.jsonl` and mints it through the same machinery as
+検収前; its docstring and `tools/fresh_sources.py` own the sources, licence
+checks and usage. Nothing schedules it.
 
 Level signals per article, stored separately, never averaged: jreadability
 (live), JLPT-lexicon coverage + band vector (live, substrate

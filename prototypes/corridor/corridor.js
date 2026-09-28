@@ -464,9 +464,10 @@ const S = {
   storeError: null,
   storeExtras: null,
   /** a running review session: { queue, ix, revealed, declared, done } —
-   * null at rest. declared is the zen room's recall declaration for the
-   * card that is up: 1 思い出した · 0 まだ · null before the card turns
-   * over (kernel law ADR-002 T-06 — see the reveal obslog row) */
+   * null at rest. declared is the checked answer of the sentence or
+   * question card that is up: 1 passed · 0 must repeat (Again is the only
+   * grade, kernel law ADR-002 T-06) · null before the check, and on every
+   * card that turns over with 答えを見る */
   review: null,
   /** a running yomi probe: { queue, ix, revealed, right, missed, minted } —
    * session-only; its evidence lives in the obslog, never in FSRS state */
@@ -2935,13 +2936,11 @@ async function commitStorePatch(patch, appendArchive = []) {
  *       the score, nothing else — no deck rows, no FSRS state: entering
  *       覚える is the learner's own explicit choice on the end screen.
  *   [t, 'reveal', key, declared]
- *       the zen review room's declared-recall gate (kernel law ADR-002
- *       T-06): before the answer turns over, the learner declares —
- *       declared 1 思い出した (recalled; all four grades open) · 0 まだ
- *       (not yet; Again is the only grade the schedule may record). The
- *       row is the declaration's evidence; the forcing itself rides the
- *       session state and the grade commit. The timed dojo keeps its bare
- *       reveal and stamps 'dojo' practice rows instead.
+ *       the zen review room's former declared-recall gate (kernel law
+ *       ADR-002 T-06): declared 1 思い出した (recalled) · 0 まだ (not yet;
+ *       Again was the only grade the schedule could record). Since the
+ *       Anki turn-over (答えを見る, 2026-09-28) no room writes this row;
+ *       older rows stay valid evidence and still read in the trail.
  *   [t, 'note', 'op', text]
  *       ひとこと (TENOHIRA §3) — the learner's own words to the builder,
  *       written from the tray's friction door. Names no item, grades
@@ -12121,10 +12120,9 @@ function learnerModel() {
       const dimension = kagamiMockBand(row[4], key);
       if (owns(unverifiedPractice.byBand, dimension)) unverifiedPractice.byBand[dimension] += 1;
     } else if (kind === 'lesson' || kind === 'dojo') {
-      // Again alone is the miss. In the review room Hard is reachable ONLY
-      // after the learner declares 思い出した (ADR-002 T-06), so a hard-won
-      // recall is a recall (review round 11); lesson and mock rows use 1|3
-      // and read the same either way.
+      // Again alone is the miss: Hard is a recall that came hard, as Anki's
+      // buttons mean it (review round 11); lesson and mock rows use 1|3 and
+      // read the same either way.
       const right = row[3] >= 2;
       touch(key, right, true, kind);
       const band = bands[kagamiBandFor(key)];
@@ -18423,7 +18421,7 @@ function renderReview(main) {
       }
       // いま見る holds for the WHOLE card, not for one render. Clearing it as
       // the front face painted meant the next render — the one the learner's
-      // own 思い出した/まだ triggers — fell back into the countdown and hid
+      // own 答えを見る triggers — fell back into the countdown and hid
       // the answer they had just asked for. advanceReviewSession retires the
       // flag when the card is done.
     }
@@ -18765,8 +18763,8 @@ function renderReview(main) {
     ['Good', 'good', 'ふつう', '良'],
     ['Easy', 'easy', '簡単', '易'],
   ];
-  // まだ was declared: the answer was seen before recall, so Again is the
-  // only grade this room may record (T-06). The row holds the one honest
+  // A sentence or question check must repeat (declared 0): the answer was
+  // seen before recall, so Again is the only grade this room may record (T-06). The row holds the one honest
   // seal instead of three dead promises — and the commit below derives the
   // rating from the DECLARATION, never from the button, so no later tap
   // can outrun the law even if a stray node were clicked.
@@ -18798,8 +18796,9 @@ function renderReview(main) {
       const pressedNow = new Date();
       const day = dayKey(pressedNow);
       const skey = srsKey(item.t, item.id);
-      // T-06 forcing at the commit: after まだ, the declaration names the
-      // grade — whatever was tapped, Again is what the schedule records
+      // T-06 forcing at the commit: after a check that must repeat, the
+      // declaration names the grade — whatever was tapped, Again is what the
+      // schedule records
       const forceAgain = !S.focus && rv.declared === 0;
       const effRating = forceAgain ? 'Again' : rating;
       const effKey = forceAgain ? 'again' : key;
