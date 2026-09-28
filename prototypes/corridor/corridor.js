@@ -18289,7 +18289,7 @@ function reviewBack(item) {
       };
     }
   }
-  return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')] };
+  return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')], unrecorded: true };
 }
 function renderReview(main) {
   const rv = S.review;
@@ -18990,9 +18990,16 @@ function renderBrowse(main) {
   const facts = new Map(S.taken.map((item) => {
     const answer = item.t === 'word' ? savedAnswerFor(item) : null;
     const shown = answer?.status === 'available' ? answer : null;
+    // what the search reads: every meaning of a word, and for every other kind the card back
+    // (reviewBack) — 海 answers "sea" and "うみ" — never the no-record placeholder; a grammar or
+    // particle back carries an example after its meaning, which is not searched
+    const back = item.t === 'word' ? null : reviewBack(item);
+    const known = back && !back.unrecorded ? back : null;
+    const senses = known ? (['grammar', 'particle'].includes(item.t) ? known.senses.slice(0, 1) : known.senses) : [];
     return [item, {
       reading: shown?.reading || '',
       meaning: shown?.meanings?.[0] || '',
+      search: [shown?.reading, ...(shown?.meanings || []), known?.reading, ...senses],
     }];
   }));
   const matches = (item) => {
@@ -19008,7 +19015,7 @@ function renderBrowse(main) {
     const needle = b.q.trim().toLowerCase();
     if (!needle) return true;
     const fact = facts.get(item);
-    return [item.label, item.id, fact.reading, fact.meaning].some((s) => String(s || '').toLowerCase().includes(needle));
+    return [item.label, item.id, ...fact.search].some((s) => String(s || '').toLowerCase().includes(needle));
   };
   const sortKey = {
     due: (item) => { const rec = S.srs[srsKey(item.t, item.id)]; return rec ? Date.parse(rec.due) : Number.MAX_SAFE_INTEGER; },
