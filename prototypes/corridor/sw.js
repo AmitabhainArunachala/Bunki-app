@@ -112,7 +112,24 @@ const BOOT_DATA = [
   'modules/learning-core.mjs',
   'modules/record-core.mjs',
 ];
-const PRECACHE_URLS = new Set([...SHELL, ...BOOT_DATA].map((path) => new URL(path, SCOPE).href));
+// The guided session (S.view 'guided') is imported only when its door is pressed, so an install
+// that stopped at the boot core left the room unable to open offline unless it had been opened
+// online first. Its modules, styles and set index travel with the install; its question sets and
+// sprite sheet are read from the release manifest (every file under guided/ but the provenance
+// note), so a new set needs no edit here.
+const GUIDED_ROOM = [
+  'guided-session.mjs',
+  'guided-session-engine.mjs',
+  'guided-session-content.mjs',
+  'guided-session.css',
+  'guided-moments.mjs',
+  'guided-moments.css',
+  'guided/sets/index.json',
+];
+const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
+const PRECACHE_URLS = new Set(
+  [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM].map((path) => new URL(path, SCOPE).href),
+);
 
 const assetUrl = (path) => new URL(path.split('/').map(encodeURIComponent).join('/'), SCOPE).href;
 const IDENTITY_URL = assetUrl(IDENTITY_PATH);
@@ -248,7 +265,7 @@ async function validateRelease(identityResponse, workerResponse) {
   if ((await digest(new TextEncoder().encode(JSON.stringify(inputs)))) !== assetVersion) {
     throw new Error('release source digest mismatch');
   }
-  for (const path of [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA]) {
+  for (const path of [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM]) {
     if (!entries.has(assetUrl(path))) throw new Error(`release boot entry missing: ${path}`);
   }
   return {
@@ -285,8 +302,13 @@ self.addEventListener('install', (event) => {
         networkAsset(WORKER_URL),
       ]);
       const release = await validateRelease(identity, worker);
+      const guided = [...release.entries.values()].map((entry) => entry.path).filter(guidedAsset);
       const urls = [
-        ...new Set([...SHELL.filter((path) => path !== '.'), ...BOOT_DATA].map(assetUrl)),
+        ...new Set(
+          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided].map(
+            assetUrl,
+          ),
+        ),
       ];
       const verified = await Promise.all(
         urls.map(async (url) => [

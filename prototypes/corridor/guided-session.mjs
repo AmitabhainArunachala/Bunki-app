@@ -21,8 +21,9 @@ import { loadGuidedState, reduceGuidedState, saveGuidedState } from './guided-se
 import { loadGuidedIndex, loadGuidedSet } from './guided-session-content.mjs';
 
 const STATE_PREFIX = 'kairo-guided-session-v1';
-const STYLESHEET_URL = new URL('./guided-session.css', import.meta.url).href;
-const MOMENTS_URL = new URL('./guided-moments.mjs', import.meta.url).href;
+/* A sibling's address, or the one the single-file handoff supplies: there this module runs from
+ * a blob: URL, which no relative address resolves against (build-standalone.mjs). */
+const sibling = (path, supplied) => globalThis[supplied] || new URL(path, import.meta.url).href;
 const KIND = {
   vocabulary: ['文字・語彙', 'vocabulary'],
   grammar: ['文法', 'grammar'],
@@ -65,7 +66,7 @@ function ensureStylesheet() {
     }
     const link = present || document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = STYLESHEET_URL;
+    link.href = sibling('./guided-session.css', '__KAIRO_GUIDED_STYLE_URL__');
     link.dataset.guidedStyle = '';
     link.addEventListener('load', () => resolve(true), { once: true });
     link.addEventListener(
@@ -109,7 +110,8 @@ export function createGuidedSession(host) {
    * room works the same without them, so a module that cannot load leaves only the cut. */
   let moments = null;
   const loadMoments = () =>
-    import(window.__KAIRO_GUIDED_MOMENTS_URL__ || MOMENTS_URL)
+    Promise.resolve()
+      .then(() => import(sibling('./guided-moments.mjs', '__KAIRO_GUIDED_MOMENTS_URL__')))
       .then((module) =>
         module.loadMoments({ storage, english, openReport: host.openReport || null }),
       )
