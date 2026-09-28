@@ -1082,21 +1082,6 @@
   "topic": "economy"
  },
  {
-  "id": "mext:b_menu-houdou-2025-mext_00009",
-  "kind": "fresh",
-  "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
-  "titleEn": "Japan Startup Awards 2026: the university start-up prize goes to Rapyuta Robotics",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級前半 · jread 2.19 · JLPT語彙 64% · 1100字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mext.go.jp",
-  "date": "2026-09-25",
-  "url": "https://www.mext.go.jp/b_menu/houdou/2025/mext_00009.html",
-  "topic": "science"
- },
- {
   "id": "mhlw:stf-houdou-newpage_75698",
   "kind": "fresh",
   "title": "かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について",
@@ -1215,21 +1200,6 @@
   "date": "2026-09-18",
   "url": "https://www.mhlw.go.jp/stf/newpage_76340.html",
   "topic": "culture"
- },
- {
-  "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
-  "kind": "fresh",
-  "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
-  "titleEn": "This year's lifelong-sports awards are announced",
-  "lane": "news",
-  "licence": "PDL1.0 (CC BY 4.0 互換)",
-  "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 64% · 1067字",
-  "addedAt": "2026-09-28",
-  "decision": "pending",
-  "source": "mext.go.jp/sports",
-  "date": "2026-09-18",
-  "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
-  "topic": "sports"
  },
  {
   "id": "jawiki-news:2026-09-14",
@@ -1431,5 +1401,35 @@
   "date": "2026-09-18",
   "url": "https://www.mhlw.go.jp/stf/newpage_76152.html",
   "topic": "economy"
+ },
+ {
+  "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+  "kind": "fresh",
+  "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
+  "titleEn": "This year's lifelong-sports awards are announced",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 64% · 1073字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mext.go.jp/sports",
+  "date": "2026-09-18",
+  "url": "https://www.mext.go.jp/sports/b_menu/houdou/31/09/1420919_00007.htm",
+  "topic": "sports"
+ },
+ {
+  "id": "mext:b_menu-houdou-2025-mext_00009",
+  "kind": "fresh",
+  "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
+  "titleEn": "Japan Startup Awards 2026: the university start-up prize goes to Rapyuta Robotics",
+  "lane": "news",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級前半 · jread 2.19 · JLPT語彙 64% · 1110字",
+  "addedAt": "2026-09-28",
+  "decision": "pending",
+  "source": "mext.go.jp",
+  "date": "2026-09-25",
+  "url": "https://www.mext.go.jp/b_menu/houdou/2025/mext_00009.html",
+  "topic": "science"
  }
 ]

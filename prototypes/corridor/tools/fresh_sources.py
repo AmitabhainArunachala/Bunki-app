@@ -300,26 +300,57 @@ def normalize(text: str) -> str:
     return text.strip(" 　")
 
 
+class Line(str):
+    """A line that is all one list item, link or table row; `unit` is that element.
+    rejoin_wrapped never joins lines from two different ones."""
+
+    unit: "Node | None" = None
+
+
+def unit_line(text: str, unit: "Node | None") -> str:
+    if unit is None:
+        return text
+    line = Line(text)
+    line.unit = unit
+    return line
+
+
+def shared_unit(chains: list[tuple]) -> "Node | None":
+    """The innermost li/a element every piece of a line sits in, if there is one."""
+    if not chains:
+        return None
+    shared = chains[0]
+    for chain in chains[1:]:
+        k = 0
+        while k < min(len(shared), len(chain)) and shared[k] is chain[k]:
+            k += 1
+        shared = shared[:k]
+    return shared[-1] if shared else None
+
+
 def block_lines(node: Node, skip: set[str] | frozenset[str] = frozenset(SKIP_TAGS)) -> list[str]:
     """Paragraph-shaped lines: every block element and <br> ends a line; a table
-    row becomes one line of its cells in document order. Nothing is invented."""
+    row becomes one line of its cells in document order. Nothing is invented.
+    A line that is all one list item, link or table row comes back as a Line."""
     out: list[str] = []
-    buf: list[str] = []
+    buf: list[tuple[str, tuple]] = []  # (text, the li/a elements it sits in)
 
     def flush() -> None:
-        line = normalize("".join(buf))
+        line = normalize("".join(text for text, _ in buf))
+        chains = [chain for text, chain in buf if normalize(text)]
         buf.clear()
         if line:
-            out.append(line)
+            out.append(unit_line(line, shared_unit(chains)))
 
-    def walk(n: Node) -> None:
+    def walk(n: Node, chain: tuple) -> None:
         for child in n.children:
             if isinstance(child, str):
-                buf.append(child)
+                buf.append((child, chain))
                 continue
             if (child.tag in skip or "hidden" in child.attrs or child.attrs.get("aria-hidden") == "true"
                     or re.search(r"display\s*:\s*none", child.attrs.get("style", ""))):
                 continue
+            inner = chain + (child,) if child.tag in ("li", "a") else chain
             if child.tag == "br":
                 flush()
             elif child.tag == "tr":
@@ -327,15 +358,15 @@ def block_lines(node: Node, skip: set[str] | frozenset[str] = frozenset(SKIP_TAG
                 cells = [normalize(" ".join(block_lines(c, skip))) for c in child.children if isinstance(c, Node) and c.tag in ("td", "th")]
                 line = "　".join(c for c in cells if c)
                 if line:
-                    out.append(line)
+                    out.append(unit_line(line, child))
             elif child.tag in BLOCK_TAGS:
                 flush()
-                walk(child)
+                walk(child, inner)
                 flush()
             else:
-                walk(child)
+                walk(child, inner)
 
-    walk(node)
+    walk(node, ())
     flush()
     return out
 
@@ -375,11 +406,15 @@ LIST_START = re.compile(r"^([（(【［\[＜<■●○◆◇・※＊*]|[0-9０-
 def rejoin_wrapped(lines: list[str]) -> list[str]:
     """Undo hard line wrapping (a <br> every ~40 characters inside one
     sentence): a long line that stops mid-sentence continues on the next
-    line unless that line opens a new item. Only line breaks are removed."""
+    line unless that line opens a new item. Only line breaks are removed, and
+    never between two list items, links or table rows (block_lines' Line)."""
     out: list[str] = []
     for line in lines:
-        if out and len(out[-1]) >= 30 and out[-1][-1] not in SENTENCE_END and not LIST_START.match(line):
-            out[-1] += line
+        prev = out[-1] if out else ""
+        unit = getattr(prev, "unit", None)
+        if (out and len(prev) >= 30 and prev[-1] not in SENTENCE_END and not LIST_START.match(line)
+                and getattr(line, "unit", None) is unit):
+            out[-1] = unit_line(prev + line, unit)
         else:
             out.append(line)
     return out

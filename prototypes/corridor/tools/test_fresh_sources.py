@@ -66,6 +66,36 @@ def test_rejoin_wrapped_undoes_hard_wrapping_but_not_list_items():
     assert fs.rejoin_wrapped(items) == items
 
 
+def test_rejoin_wrapped_keeps_links_list_items_and_table_rows_apart():
+    # shaped like スポーツ庁 1420919_00007: a <br>-separated run of link titles
+    # (with an empty zero-width link beside two of them), then a table
+    links = """<body><p><a href="/4">&#8203;</a><a href="/6">令和7年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました<img alt="別ウィンドウ"></a><br>
+      <a href="/4">令和6年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました</a><a href="/2">&#8203;</a><br>
+      <a href="/3">令和5年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました</a></p>
+      <table><tr><td>過去の総表彰数と表彰した団体の数を示す表の行です</td><td>6,437名</td></tr>
+      <tr><td>審査及び推薦基準</td><td>十年以上スポーツの普及に尽力した者であること。</td></tr></table>
+      <ul><li>都道府県の教育委員会から推薦された候補者の一覧です</li><li>公益財団法人日本スポーツ協会</li></ul></body>"""
+    assert fs.rejoin_wrapped(lines_of(links)) == [
+        "令和7年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました",
+        "令和6年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました",
+        "令和5年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を決定しました",
+        "過去の総表彰数と表彰した団体の数を示す表の行です　6,437名",
+        "審査及び推薦基準　十年以上スポーツの普及に尽力した者であること。",
+        "都道府県の教育委員会から推薦された候補者の一覧です",
+        "公益財団法人日本スポーツ協会",
+    ]
+    # controls: hard wrapping inside one paragraph, one list item or one link still rejoins,
+    # and so does running text that merely contains a link
+    wrapped = """<body><p>地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治<br>療を促進します。</p>
+      <ul><li>地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治<br>療を促進します。</li></ul>
+      <p>詳しくは<a href="/x">地域社会における精神保健及び精神障害者の福祉に関する案内</a>をご覧のうえ<br>お申し込みください。</p></body>"""
+    assert fs.rejoin_wrapped(lines_of(wrapped)) == [
+        "地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治療を促進します。",
+        "地域社会における精神保健及び精神障害者の福祉に関する理解を深め、精神障害者の早期治療を促進します。",
+        "詳しくは地域社会における精神保健及び精神障害者の福祉に関する案内をご覧のうえお申し込みください。",
+    ]
+
+
 def test_trim_paragraphs_cuts_on_paragraph_boundaries_and_says_so():
     paras = ["あ" * 500, "い" * 500, "う" * 500]
     kept, excerpt = fs.trim_paragraphs(paras, 1200)
