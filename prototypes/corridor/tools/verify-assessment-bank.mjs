@@ -36,7 +36,10 @@ import {
   MACHINE_CHECK_LABEL,
   MACHINE_CHECK_POLICY,
   MACHINE_CHECK_ROUTE,
+  isMachineCheckedEntry,
 } from './assessment/machine-checked-class.mjs';
+import { pathToFileURL } from 'node:url';
+import { buildCorridorModules } from '../../../scripts/build-reading-module.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const evidenceRoot = process.env.KAIRO_EVIDENCE_DIR
@@ -54,6 +57,17 @@ async function check(name, fn) {
   }
 }
 const read = async (path) => JSON.parse(await readFile(path, 'utf8'));
+/** The browser's assessment-delivery.mjs, staged beside the record core it imports (compiled by
+ * the canonical module build, as a site build does) and imported for real. */
+async function browserDelivery() {
+  const stage = join(evidence, 'browser-delivery');
+  await mkdir(join(stage, 'modules'), { recursive: true });
+  const record = buildCorridorModules(REPOSITORY).find((module) => module.path === 'modules/record-core.mjs');
+  assert(record, 'The module build must compile modules/record-core.mjs');
+  await writeFile(join(stage, record.path), record.bytes);
+  await copyFile(join(REPOSITORY, 'prototypes/corridor/assessment-delivery.mjs'), join(stage, 'assessment-delivery.mjs'));
+  return import(pathToFileURL(join(stage, 'assessment-delivery.mjs')).href);
+}
 const api = await assessmentAPI();
 const inputs = await Promise.all(
   ['n2-full-01', 'n2-short-01', 'n2-medium-01'].map((directory) =>
@@ -1235,12 +1249,34 @@ await check('Machine-checked written tests verify from public files, stay labell
     assert.equal(entry.editorialAtStart.policyVersion, MACHINE_CHECK_POLICY);
     assert.equal(entry.officialScoreCalibrated, false);
   }
-  const browser = await readFile(join(REPOSITORY, 'prototypes/corridor/assessment-delivery.mjs'), 'utf8');
+  // The browser keeps its own copy of the class. It is imported and run, never read as text: its
+  // constants are the bank's, and on every shipped catalog row its admission test agrees with the
+  // bank's own, over rows of both classes.
+  const browser = await browserDelivery();
   for (const [name, value] of Object.entries({ MACHINE_CHECK_ROUTE, MACHINE_CHECK_POLICY, MACHINE_CHECK_LABEL }))
-    assert(
-      browser.includes(`export const ${name} = '${value}';`) || browser.includes(`export const ${name} = ${JSON.stringify(value)};`),
-      `Browser ${name} differs from the bank class`,
-    );
+    assert.equal(browser[name], value, `Browser ${name} differs from the bank class`);
+  const verdicts = shippedCatalog.entries.map((entry) => ({
+    id: entry.id,
+    browser: browser.machineCheckedEntry(entry),
+    bank: isMachineCheckedEntry(entry),
+  }));
+  assert(verdicts.some((row) => row.bank) && verdicts.some((row) => !row.bank), 'The shipped catalog must hold both classes');
+  for (const row of verdicts) assert.equal(row.browser, row.bank, `Browser and bank classify ${row.id} differently`);
+  // …and a machine-checked row that loses any one field the browser checks leaves the class on both sides
+  const member = shippedCatalog.entries.find((entry) => isMachineCheckedEntry(entry));
+  for (const [field, mutate] of Object.entries({
+    route: (entry) => { entry.publicationRoute = 'host-reviewed-written/1'; },
+    mode: (entry) => { entry.mode = 'listening'; },
+    status: (entry) => { entry.review.status = 'ai-reviewed'; },
+    label: (entry) => { delete entry.review.label; },
+    editorial: (entry) => { entry.editorialAtStart.status = 'unreviewed'; },
+    policy: (entry) => { entry.editorialAtStart.policyVersion = 'bunki-ai-review/2'; },
+    media: (entry) => { entry.mediaAssets = [{ assetId: 'fixture' }]; },
+  })) {
+    const entry = structuredClone(member);
+    mutate(entry);
+    assert.deepEqual([browser.machineCheckedEntry(entry), isMachineCheckedEntry(entry)], [false, false], `A row without its ${field} stays in the class`);
+  }
   // The N2 pin gate is unchanged: only N2 is admitted, and a ready entry that merely claims
   // the route, or drops its label, still counts as an unexpected ready entry.
   assert.deepEqual(admittedWrittenSections(shippedCatalog).map(({ pin }) => pin.level), ['N2']);
