@@ -11,7 +11,7 @@
     "ranking": "most flags first, then fewest chars, then id — no composite score"
   },
   "counts": {
-    "shelf": 120,
+    "shelf": 126,
     "archive": 686,
     "flagged": 8,
     "cullProposals": 1

@@ -229,3 +229,31 @@ def test_spaced_name_tables_drop_and_subtitles_stay_whole():
     assert not fs.spaced_table_line("インドネシア　令和８年11月２日予定　令和９年１月４日予定")
     subtitle = "～厚生労働大臣表彰最優秀賞・株式会社エヴァーブルー（静岡県浜松市）はじめ入賞企業を10月９日（金）に表彰～"
     assert fs.rejoin_wrapped([subtitle, "厚生労働省では、このほど決定しました。"]) == [subtitle, "厚生労働省では、このほど決定しました。"]
+
+
+def test_adaptations_keep_their_source_licence_and_say_they_are_rewrites():
+    import feed_fresh as ff
+
+    dataset = [
+        fake_item().record(),
+        dict(fake_item(id="jawiki:1", source="jawiki", title="記事").record()),
+    ]
+    rows = {row["id"]: row for row in ff.adaptation_rows(dataset)}
+    # only adaptations whose source is staged are offered; with a stand-in
+    # dataset none of the committed sources match, so build one that does
+    authored = __import__("json").loads(ff.ADAPTATIONS_PATH.read_text("utf-8"))["adaptations"]
+    assert rows == {} or all(r["id"].startswith(ff.ADAPTATION_PREFIX) for r in rows.values())
+    staged = []
+    for ad in authored:
+        key = ad["basedOn"].split(":", 1)[0]
+        item = fake_item(id=ad["basedOn"], source=key if key in fs.SOURCES else "env")
+        staged.append(item.record())
+    rows = {row["id"]: row for row in ff.adaptation_rows(staged)}
+    assert len(rows) == len(authored)
+    for ad in authored:
+        row = rows[ff.ADAPTATION_PREFIX + ad["basedOn"]]
+        src = next(r for r in staged if r["id"] == ad["basedOn"])
+        assert row["text"] == ad["text"].strip() and row["url"] == src["url"] and row["date"] == src["date"]
+        assert row["pool"] == src["pool"] and row["licence"] == src["licence"]
+        assert row["attribution"].startswith("Bunkiによる書き換え") and "原文ではありません" in row["attribution"]
+        assert (src["pool"] == "share_alike") == ("CC BY-SA 4.0 で提供します" in row["attribution"])

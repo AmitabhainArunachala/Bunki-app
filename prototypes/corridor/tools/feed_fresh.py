@@ -49,6 +49,12 @@ What one run does
            "human-review-pending" with 検収前 in its sourceLabel, and gets a
            kind:"fresh" row in docs/content/feed-review-queue.json; only the
            operator's decision there (applied by feed_apply_review.py) lifts it.
+  adapt    docs/content/feed-fresh-adaptations.json holds authored N3 rewrites of
+           fresh readings (Bunki adaptations — never presented as the source).
+           Each one is minted as "adapt-n3:<basedOn>" once its source is staged
+           and its English title is authored, with the source's licence, pool
+           (a CC BY-SA source stays share_alike), URL and date, a sourceLabel
+           that says 書き換え, and an attribution naming the source it rewrites.
   record   docs/build-evidence/renkan/feed-fresh/run-NNN.json (append-only):
            window, terms evidence, per-source counts, every skip with its
            reason, what was minted, output hashes.
@@ -82,6 +88,8 @@ from feed_ingest import (  # noqa: E402
 
 DATASET = REPO / "corpus/datasets/fresh/items.jsonl"
 TITLES_PATH = REPO / "docs/content/feed-fresh-titles-en.json"
+ADAPTATIONS_PATH = REPO / "docs/content/feed-fresh-adaptations.json"
+ADAPTATION_PREFIX = "adapt-n3:"
 EVIDENCE_DIR = REPO / "docs/build-evidence/renkan/feed-fresh"
 DEFAULT_DAYS = 14
 QUEUE_KIND = "fresh"
@@ -231,6 +239,9 @@ def mint(row: dict, title_en: str, title_source: str, topic: str, as_of: str, ta
     }
     if row.get("excerpt"):
         a["excerpt"] = row["excerpt"]
+    if row.get("adaptation"):
+        a["adaptation"] = row["adaptation"]
+        a["sourceLabel"] = f"{row['adaptation']['level']}書き換え · {source.label}{PENDING_MARK}"
     tokens, para_starts = ba.tokenise_paragraphs(text, tagger)
     grading = ba.grade_article(text, tokens, tagger, jlpt_maps)
 
@@ -273,6 +284,8 @@ def mint(row: dict, title_en: str, title_source: str, topic: str, as_of: str, ta
         "url": row["url"],
         "topic": topic,
     }
+    if row.get("adaptation"):
+        queue_row["adaptationOf"] = row["adaptation"]["basedOn"]
     return record, index_row, queue_row
 
 
@@ -284,6 +297,49 @@ def ensure_sources(index: dict, keys: set[str]) -> None:
         if any(entry.get("name") == s.name for entry in pool):
             continue
         pool.append({"name": s.name, "licence": s.licence, "attribution": s.publisher, "url": s.terms_url})
+
+
+def adaptation_rows(dataset: list[dict]) -> list[dict]:
+    """Authored N3 rewrites as mintable rows: the text is the adaptation's,
+    every provenance field is its source's, and the label and attribution
+    say, before anything else, that this is a Bunki rewrite."""
+    if not ADAPTATIONS_PATH.exists():
+        return []
+    authored = json.loads(ADAPTATIONS_PATH.read_text("utf-8"))
+    sources = {row["id"]: row for row in dataset}
+    rows = []
+    for ad in authored.get("adaptations", []):
+        src = sources.get(ad["basedOn"])
+        if src is None:
+            continue
+        licence_note = "この書き換えも CC BY-SA 4.0 で提供します。" if src["pool"] == "share_alike" else ""
+        rows.append({
+            "id": ADAPTATION_PREFIX + ad["basedOn"],
+            "source": src["source"],
+            "sourceKey": src["sourceKey"],
+            "title": ad["title"],
+            "text": ad["text"].strip(),
+            "url": src["url"],
+            "date": src["date"],
+            "publishedAt": src["publishedAt"],
+            "fetchedAt": src["fetchedAt"],
+            "pool": src["pool"],
+            "licence": src["licence"],
+            "licenceUrl": src["licenceUrl"],
+            "termsUrl": src["termsUrl"],
+            "attribution": (
+                f"Bunkiによる書き換え（{authored.get('level', 'N3')}向け。原文ではありません）。"
+                f"もとの記事：「{src['title']}」 — {src['attribution']} {licence_note}"
+            ).strip(),
+            "excerpt": None,
+            "adaptation": {
+                "basedOn": ad["basedOn"],
+                "level": authored.get("level", "N3"),
+                "by": authored.get("adaptedBy", ""),
+                "note": "Bunki rewrite for learners — not the original text; the source is linked",
+            },
+        })
+    return rows
 
 
 def untitled_stub(rows: list[dict]) -> str:
@@ -406,7 +462,8 @@ def main() -> int:
         if retitled:
             print("· retitled " + ", ".join(retitled))
         rejected = {row["id"] for row in queue if row.get("kind") == QUEUE_KIND and row.get("decision") == "rejected"}
-        candidates = [r for r in dataset if r["id"] not in shelf_ids and r["id"] not in rejected and r["id"] not in titles["skip"]]
+        candidates = [r for r in dataset + adaptation_rows(dataset)
+                      if r["id"] not in shelf_ids and r["id"] not in rejected and r["id"] not in titles["skip"]]
         if only:
             candidates = [r for r in candidates if r["sourceKey"] in only]
         ready = []

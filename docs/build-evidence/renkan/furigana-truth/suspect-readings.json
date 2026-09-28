@@ -4,12 +4,12 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 120,
-  "tokens": 63766
+  "articles": 126,
+  "tokens": 64925
  },
  "statusCounts": {
   "lexicon-fixed": 368,
-  "accepted": 29
+  "accepted": 30
  },
  "openCount": 0,
  "rows": [
@@ -3982,6 +3982,16 @@
    "status": "lexicon-fixed",
    "context": "最高指導者の習近平（総書記）と",
    "note": "習近平"
+  },
+  {
+   "article": "adapt-n3:jawiki:3492442",
+   "token": 28,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "名古屋市です。東京都など、愛知県の",
+   "note": "東京都"
   }
  ]
 }
