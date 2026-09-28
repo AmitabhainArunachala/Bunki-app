@@ -605,6 +605,10 @@ PROBES['failure-line'] = async () => {
   check('007479d0 · control: with no repaint the tutor\'s failure line shows', /could not answer/.test(plain), plain.slice(0, 120));
   check('007479d0 · the tutor\'s failure line survives a repaint on both sheet surfaces',
     /could not answer/.test(tutor) && /could not write examples/.test(examples), JSON.stringify({ tutor, examples }).slice(0, 300));
+  // the same settle carries a REPLY that lands after the sheet was rebuilt (round B, 3df6ed8f)
+  stub.mode = 'ok';
+  const reply = await ask('ask the tutor', '#sheet .ai-answer', true);
+  check('3df6ed8f · a tutor reply that lands after a repaint still shows on the sheet', /stub reply/.test(reply), reply.slice(0, 120));
   await context.close();
 };
 
