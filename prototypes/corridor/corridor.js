@@ -26008,7 +26008,15 @@ function render() {
   // the search room's door stands in the galaxy bar, and its Back walks
   // there unless it was opened from the shelf
   const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
-  if (S.view === 'entry') parts.push(tx('野', 'field'));
+  // the lists tray opens from every room and its 戻る walks back there, so a room reached
+  // through it (the tray, its quiz, a plain review) is rooted where the tray was opened —
+  // it said 本棚 whichever room that was (PR #77 d9f0b984)
+  const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
+  const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
+  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' ||
+    (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
+  if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
+  else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
   else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
@@ -26017,7 +26025,9 @@ function render() {
     parts.push(passage().title);
   }
   if (S.view === 'search') parts.push(tx('検索', 'search'));
-  if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
+  // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
+  // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
+  if (viaTray) parts.push(tx('リスト', 'lists'));
   if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
