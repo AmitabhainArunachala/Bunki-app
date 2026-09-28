@@ -18322,11 +18322,19 @@ function renderReview(main) {
         rest.dataset.leechRest = item.id;
         rest.disabled = !!rv.pending;
         rest.addEventListener('click', () => {
-          // a rest is deck state — commit the copy, then show it (P0-4)
+          // a rest is deck state — commit the copy, then show it (P0-4) — and it joins the
+          // session history like its in-session twin, so ひとつ戻す wakes THIS card rather than
+          // taking back the last grade. It moves no cursor: the session is already over when
+          // this row is on the glass (PR #77 f7cd297c).
+          const key = srsKey(item.t, item.id);
           const now = Date.now();
-          return commitReviewAction(rv, rv.queue[rv.ix], (latest) => ({
-            suspended: { ...latest.suspended, [srsKey(item.t, item.id)]: now },
-          }));
+          let prevSuspended;
+          return commitReviewAction(rv, rv.queue[rv.ix], (latest) => {
+            prevSuspended = latest.suspended[key];
+            return { suspended: { ...latest.suspended, [key]: now } };
+          }, () => {
+            rv.history.push({ key: 'suspend', prevSuspended, afterSuspended: now, item, queueIndex: rv.ix });
+          });
         });
         row.append(rest);
         main.append(row);
