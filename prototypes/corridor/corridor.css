@@ -167,6 +167,27 @@ body::before {
   .shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* 新着 — the newest dated news, first on the shelf (operator, 2026-09-28) */
+.eyebrow.shelf-fresh-head { margin: 22px 2px 2px; }
+.shelf-fresh-note { font-size: var(--t-label); color: var(--ink-2); margin: 0 2px 10px; }
+.shelf-fresh-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 18px;
+  margin-bottom: 12px;
+}
+.shelf-fresh-strip .shelf-item { margin: 0; }
+@media (max-width: 640px) {
+  .shelf-fresh-strip { grid-template-columns: minmax(0, 1fr); }
+}
+/* the date leads a card's meta line and sits under a reader's title */
+.shelf-date {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.reader-date { font-size: var(--t-label); color: var(--ink-2); margin: 2px 0 10px; }
+
 /* the writing-speed slider beside ゆっくり (operator, 2026-09-18) */
 .stroke-speed-wrap { display: inline-flex; align-items: center; gap: 8px; }
 .stroke-speed-range { width: 96px; accent-color: var(--ink); }
