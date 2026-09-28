@@ -18779,7 +18779,7 @@ function renderBrowse(main) {
     const rec = S.srs[key];
     const f = b.filter;
     if (f === 'due' && !dueKeys.has(key)) return false;
-    if (f === 'new' && (rec || S.suspended[key])) return false;
+    if (f === 'new' && (srsCardKind(item) !== 'new' || S.suspended[key])) return false;
     if (f === 'learn' && !(rec && (rec.state === 1 || rec.state === 3))) return false;
     if (f === 'review' && !(rec && rec.state === 2)) return false;
     if (f === 'rest' && !S.suspended[key]) return false;
@@ -18870,7 +18870,7 @@ function renderSrsStats(main) {
     const key = srsKey(item.t, item.id);
     const rec = S.srs[key];
     if (S.suspended[key]) counts.rest += 1;
-    else if (!rec) counts[finiteNumber(item.started) ? 'new' : 'unstarted'] += 1;
+    else if (!rec || !rec.state) counts[finiteNumber(item.started) ? 'new' : 'unstarted'] += 1;
     else if (rec.state === 1 || rec.state === 3) counts.learn += 1;
     else if ((rec.scheduled_days || 0) >= 21) counts.mature += 1;
     else counts.young += 1;
@@ -18887,6 +18887,9 @@ function renderSrsStats(main) {
     main.append(withEn(el('p', 'eyebrow list-head', title), en, 'en-inline'));
     const chart = el('div', `stats-bars ${cls}`);
     const max = Math.max(1, ...values);
+    chart.setAttribute('role', 'img');
+    chart.setAttribute('aria-label', tx(`${title}: 合計 ${values.reduce((a, v) => a + v, 0)}、最大 ${Math.max(...values)}`,
+      `${en}: ${values.reduce((a, v) => a + v, 0)} in all, at most ${Math.max(...values)} a day`));
     values.forEach((v, i) => {
       const col = el('div', 'stats-col');
       col.title = `${labels[i]}: ${v}`;
