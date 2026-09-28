@@ -96,13 +96,22 @@ function parseStoredForm(raw) {
 }
 // Finished attempts are re-read unchanged on every write too; only the exact same text against
 // the same validated form is reused, so the active attempt still validates on every change.
+// Least recently used goes first, and a whole library fits: every write to the active attempt
+// adds a text never read again, and oldest-first eviction under a 512 cap let that churn (or a
+// library past 512 attempts, read in order on every write) push out each finished attempt just
+// before its next read, so a heavy library was re-hashed in full again.
 const validatedAttemptTexts = new Map();
 function parseStoredAttempt(form, raw) {
   const text = `${form.revisionId}\n${JSON.stringify(raw)}`;
   const known = validatedAttemptTexts.get(text);
-  if (known) return known;
+  if (known) {
+    validatedAttemptTexts.delete(text);
+    validatedAttemptTexts.set(text, known);
+    return known;
+  }
   const attempt = parseAttemptV2(form, raw);
-  if (validatedAttemptTexts.size >= 512) validatedAttemptTexts.delete(validatedAttemptTexts.keys().next().value);
+  if (validatedAttemptTexts.size >= ASSESSMENT_LIBRARY_V2_LIMITS.attempts)
+    validatedAttemptTexts.delete(validatedAttemptTexts.keys().next().value);
   validatedAttemptTexts.set(text, attempt);
   return attempt;
 }
