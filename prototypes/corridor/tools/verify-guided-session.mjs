@@ -1274,6 +1274,18 @@ async function held(browser, browserName) {
       JSON.stringify({ kept, saved: saved?.slice(0, 40) }),
     );
 
+    // a set field carrying markup is shown as text, never parsed
+    await page.evaluate(() => localStorage.clear());
+    await mountHeld(page, { status: '<b id="guided-injected">x</b>' });
+    await act(page, 'setup').click();
+    await act(page, 'start').click();
+    await page.locator('.guided-room .gs-aside details summary').click();
+    const source = await page.locator('.guided-room .gs-aside details p').first().innerText();
+    check(
+      'H8 a question\'s source status is escaped like every other set field',
+      (await page.locator('#guided-injected').count()) === 0 && source.includes('<b id="guided-injected">'),
+      source.slice(0, 160),
+    );
   } catch (error) {
     check('held walk completed without an exception', false, error.message);
   } finally {
