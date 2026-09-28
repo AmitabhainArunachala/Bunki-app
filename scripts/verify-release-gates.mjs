@@ -561,6 +561,14 @@ export function batteryGates(out, env = process.env) {
     node('playback', tool('verify-playback')),
     // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
     { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
+    // …its engine rules and set-versus-bank checks, and its offline and single-file claims
+    {
+      name: 'guided-session-contract',
+      command: process.execPath,
+      args: ['--test', tool('guided-session.test')],
+      requiredPath: tool('guided-session.test'),
+    },
+    node('guided-offline', tool('verify-guided-offline')),
     node('reading-candidates', tool('verify-reading-candidates')),
     {
       ...node('reading-candidates-webkit', tool('verify-reading-candidates')),
@@ -2393,6 +2401,8 @@ async function verifyRunner(out) {
     'kagami',
     'import-provider',
     'playback',
+    'guided-session-contract',
+    'guided-offline',
     'reading-candidates',
     'reading-candidates-webkit',
     'personal-reading',
