@@ -187,7 +187,7 @@ try {
     await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
     await page.locator('#tray').click();
     await page.locator('#review-start').click();
-    await page.locator('#declare-notyet').click().catch(() => {});
+    await page.locator('#reveal').click().catch(() => {});
     const door = await page.waitForSelector('#card-say', { timeout: 10_000 }).then(() => true, () => false);
     check('V5 the card carries its 音 door', door);
     if (door) {

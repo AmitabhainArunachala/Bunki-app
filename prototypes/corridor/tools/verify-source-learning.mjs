@@ -214,11 +214,11 @@ for (const engine of engines) for (const width of sizes) {
       assert.equal(await page.locator('body').getAttribute('data-view'), 'list');
       await page.locator('#sheet-close').click();
       await page.locator('.list-review').click();
-      await page.locator('#declare-recalled').waitFor();
+      await page.locator('#reveal').waitFor();
       assert.equal(await page.locator('#review-source-return').count(), 0, 'The original sentence does not reveal the review answer early');
       const session = await page.evaluate(() => window.__KAIRO_SRS__.session());
       assert.equal(session.queue, 1); assert.equal(session.ix, 0);
-      await page.locator('#declare-recalled').click();
+      await page.locator('#reveal').click();
       await page.locator('#review-source-return').waitFor();
       const recalled = await readAppRecordSnapshot(page);
       assert.deepEqual(recalled.record.srs, before.record.srs);

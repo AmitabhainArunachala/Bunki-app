@@ -235,7 +235,7 @@ try {
       const state = () => kp.evaluate(() => ({ ix: S.review?.ix, queue: S.review?.queue.map((row) => `${row.t}:${row.id}`),
         revealed: S.review?.revealed, declared: S.review?.declared, srs: JSON.stringify(S.srs), revlog: S.revlog.length,
         text: document.querySelector('#review-answer-unavailable')?.innerText || null,
-        grades: document.querySelectorAll('.grade, #declare-recalled, #declare-notyet').length }));
+        grades: document.querySelectorAll('.grade, #reveal').length }));
       const before = await state();
       check(`R9 ${w}px unavailable kanji: the page entry exists`, (await kp.locator(PAGE_ENTRY).count()) === 1);
       if (await kp.locator(PAGE_ENTRY).count()) {

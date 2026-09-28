@@ -742,7 +742,7 @@ async function gradeOnce(page) {
   const key = await page.evaluate(() => window.__KAIRO_SRS__.dueKeys()[0] ?? null);
   assert(key, 'no due card to grade');
   await page.locator('#review-start').click({ timeout: 10_000 });
-  await page.locator('#declare-notyet').click({ timeout: 10_000 });
+  await page.locator('#reveal').click({ timeout: 10_000 });
   await page.locator('.grade.g-again').click({ timeout: 10_000 });
   return key;
 }
@@ -1064,7 +1064,7 @@ defineCase('W6b', { rows: ['W6b.seed-and-owner-before-first-grade', 'W6b.blocked
   await a.locator('#tray').click({ timeout: 10_000 });
   const key = await a.evaluate(() => window.__KAIRO_SRS__.dueKeys()[0] ?? null);
   await a.locator('#review-start').click({ timeout: 10_000 });
-  await a.locator('#declare-notyet').click({ timeout: 10_000 });
+  await a.locator('#reveal').click({ timeout: 10_000 });
   await a.locator('.grade.g-again').waitFor({ state: 'visible', timeout: 10_000 });
   const b = await openApp(env, context, { role: 'B' });
   const blocked = await ownership(env, b);

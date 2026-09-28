@@ -129,9 +129,9 @@ try{
   await check('E07-list-create','Normal typed list creation persists an empty named list',async()=>{assert.deepEqual((await state()).lists['Evening Japanese'],[]);});
   await page.getByRole('button',{name:'rename Evening Japanese',exact:true}).click();await sleep(250);await page.getByRole('textbox',{name:'new name',exact:true}).fill('Uncommitted rename');await page.getByRole('textbox',{name:'new name',exact:true}).press('Escape');await sleep(250);await check('E07-list-cancel','Escape cancels rename without saving typed draft',async()=>{assert.equal(await page.getByRole('textbox',{name:'new name',exact:true}).count(),0);assert.ok(Object.hasOwn((await state()).lists,'Evening Japanese'));assert.ok(!Object.hasOwn((await state()).lists,'Uncommitted rename'));});
   await shot('my-study-list-created','Named list created, rename canceled safely');
-  await click('#review-start');await page.locator('#declare-recalled').waitFor();await shot('review-recall','Review asks learner for honest recall before revealing the answer');
-  await click('#declare-recalled');await page.locator('.grade.g-good').waitFor();await sleep(1600);await shot('review-revealed-grade','Answer and explicit grade control precede FSRS scheduling');await click('.grade.g-good');let gradeActions=1;
-  for(let i=0;i<12&&!await visible('.review-summary');i++){await page.locator('#declare-recalled').waitFor();await click('#declare-recalled');await click('.grade.g-good');gradeActions++;}
+  await click('#review-start');await page.locator('#reveal').waitFor();await shot('review-recall','Review shows the front with one Show answer, like Anki');
+  await click('#reveal');await page.locator('.grade.g-good').waitFor();await sleep(1600);await shot('review-revealed-grade','Answer and explicit grade control precede FSRS scheduling');await click('.grade.g-good');let gradeActions=1;
+  for(let i=0;i<12&&!await visible('.review-summary');i++){await page.locator('#reveal').waitFor();await click('#reveal');await click('.grade.g-good');gradeActions++;}
   await page.locator('.review-summary').waitFor();
   await check('E07-summary-surface','Completion restores matching day/night paper and readable heading',async()=>{
    const measured=await page.evaluate(async()=>{
