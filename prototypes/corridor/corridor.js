@@ -3808,16 +3808,20 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
-  // A reload cannot reconstruct the entry sheet until data has booted. Remove
-  // a stale same-document room sentinel now so Back never lands on an inert
-  // history stop; ordinary Forward navigation is handled live by popstate.
+  // A reload cannot reconstruct the entry sheet until data has booted, so the
+  // stroke room's marker goes: it names a room this boot cannot restore.
+  // The WALK sentinel's entry survives a reload, so stripping only its marker
+  // left a stop nothing recognised and the first device Back after any reload
+  // did nothing (PR #77 ea8252a9). The marker is adopted instead: the first
+  // render's syncWalkSentinel keeps it armed when there is somewhere to walk,
+  // or spends it the same quiet way walking home does.
   try {
-    if (history.state?.bunkiStrokeRoom || history.state?.bunkiWalk) {
+    if (history.state?.bunkiStrokeRoom) {
       const normalized = { ...history.state };
       delete normalized.bunkiStrokeRoom;
-      delete normalized.bunkiWalk;
       history.replaceState(normalized, '', location.href);
     }
+    if (history.state?.bunkiWalk) walkArmed = true;
     // The corridor owns every scroll restore (reader bookmarks, shelf and
     // archive offsets, sheet stacks). The platform's own traversal guess
     // would land the walk-back sentinel pops on a stale offset and fight
