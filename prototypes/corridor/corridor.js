@@ -19162,11 +19162,15 @@ function renderSrsStats(main) {
     : tx('まだ復習（学習済みの札）の記録がない。', 'No reviews of learned cards yet.')));
 }
 /* Anki's keys: Space or Enter shows the answer, then 1–4 grade (Space or Enter = Good),
- * Z or U takes the last grade back. Never while typing, never under an open sheet. */
+ * Z or U takes the last grade back. Never while typing, never under an open sheet, dialog or
+ * picker: the report form is a native modal over the card, and a key pressed in it graded or
+ * undid the card behind it. */
 function reviewKeys(ev) {
-  if (S.view !== 'review' || !S.review || S.stack.length || S.strokes) return;
+  if (S.view !== 'review' || !S.review || S.stack.length || S.strokes || worldPickerEls) return;
+  if (document.querySelector('dialog[open]')) return;
   if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey || ev.repeat) return;
   const target = ev.target;
+  if (target?.closest?.('dialog, [role="dialog"]')) return;
   if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
   const plainKey = ev.key === ' ' || ev.key === 'Enter';
   // a focused button answers its own Space and Enter

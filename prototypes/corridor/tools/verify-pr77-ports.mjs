@@ -878,6 +878,57 @@ PROBES['tutor-sheet-race'] = async () => {
   await context.close();
 };
 
+/* review-keys-under-dialog — reviewKeys stood aside only for a sheet and the writing room. With
+ * a card turned over and the report dialog (… → 問題を報告, a native modal) open over it, 1–4 and
+ * Z graded or undid the card behind it, and Enter on the dialog's <summary> pressed Good while
+ * its preventDefault kept the fold shut. */
+PROBES['review-keys-dialog'] = async () => {
+  const { context, page } = await learner({ seed: envelope() });
+  await open(page);
+  await page.click('#tray');
+  await page.click('#review-start');
+  await page.click('#reveal');
+  await page.click('.grade.g-good');
+  await settle(page, 300);
+  await page.click('#reveal');
+  await page.waitForSelector('.grade-row .grade.g-good');
+  const at = () => page.evaluate(() => window.__KAIRO_SRS__.session()?.ix ?? null);
+  const start = await at();
+  await page.click('#zen-more');
+  await page.locator('.zen-more-row .report-door').click();
+  await page.waitForSelector('dialog.br-sheet[open] details > summary');
+  const inDialog = {};
+  await page.locator('dialog.br-sheet .br-close').focus();
+  await page.keyboard.press('3');
+  await settle(page, 300);
+  inDialog.grade = await at();
+  await page.keyboard.press('z');
+  await settle(page, 300);
+  inDialog.undo = await at();
+  await page.locator('dialog.br-sheet details > summary').focus();
+  await page.keyboard.press('Enter');
+  await settle(page, 300);
+  inDialog.enter = await at();
+  inDialog.foldOpen = await page.evaluate(() => !!document.querySelector('dialog.br-sheet details')?.open);
+  check('review-keys-under-dialog · 3, Z and Enter inside the report dialog grade and undo nothing behind it',
+    inDialog.grade === start && inDialog.undo === start && inDialog.enter === start, JSON.stringify({ start, ...inDialog }));
+  check('review-keys-under-dialog · Enter on the dialog\'s summary opens its fold', inDialog.foldOpen, JSON.stringify(inDialog));
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('dialog[open]'), null, { timeout: 5000 });
+  await settle(page, 300);
+  await page.locator('#reveal, .grade-row .grade.g-good').first().waitFor();
+  await page.evaluate(() => document.activeElement?.blur());
+  if (await page.locator('#reveal').count()) {
+    await page.keyboard.press(' ');
+    await page.waitForSelector('.grade-row .grade.g-good');
+  }
+  await page.keyboard.press('3');
+  await settle(page, 400);
+  const control = await at();
+  check('review-keys-under-dialog · control: with the dialog closed, the keys still turn and grade the card', control === start + 1, JSON.stringify({ start, control }));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {
