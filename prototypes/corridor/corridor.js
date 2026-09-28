@@ -8015,10 +8015,14 @@ function renderReader(main) {
   const dueNow = new Date();
   const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
+  // set when the token just placed reaches FORWARD for what completes it — a numeral for its
+  // counter, a 接頭辞 for its stem
+  let groupHolds = false;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
+      groupHolds = false;
     }
     if (crossRefs) {
       const refTarget = crossRefs.doors.get(index);
@@ -8112,10 +8116,21 @@ function renderReader(main) {
       rendered = wrapper;
     }
     if (S.dials.spacing === 2) {
-      if (token.c || !group) {
+      // 文節 by part of speech, never by the grader's c flag alone (PR #77 1398bc2c): keyed on c
+      // the dial shattered every date into [2005] [年7] [月14日、] and split 第29回. A phrase
+      // opens at a content word, a name, a numeral or a 接頭辞 — never at a 接尾辞, which
+      // belongs to what precedes it — and a numeral or 接頭辞 holds it open for what completes
+      // it. Nothing here reads the ふりがな dial.
+      const pos = String(token.p || '');
+      const suffix = pos === '接尾辞';
+      const prefix = pos === '接頭辞';
+      const numeral = /^[0-9０-９]+$/u.test(String(token.s || ''));
+      const opens = (token.c || namedReading || numeral || prefix) && !suffix && !groupHolds;
+      if (opens || !group) {
         group = el('span', 'bunsetsu');
         reader.append(group);
       }
+      groupHolds = numeral || prefix;
       group.append(rendered);
     } else {
       reader.append(rendered);
