@@ -6801,11 +6801,12 @@ body.zen .declare-row .declare-notyet {
   border: 1px solid color-mix(in srgb, var(--zen-text) 32%, transparent);
 }
 
-/* the room's small lights */
+/* the room's small lights — small, not faint: they are the only way out of the room and its
+ * menu, and at 0.55 they fell under 4.5:1 in the 岩 world (PR #77 f7cd297c) */
 body.zen .zen-exit,
 body.zen .zen-more {
   color: var(--zen-text);
-  opacity: 0.55;
+  opacity: 1;
 }
 body.zen .zen-progress i {
   background: var(--zen-accent);

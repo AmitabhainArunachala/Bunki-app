@@ -3808,16 +3808,20 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
-  // A reload cannot reconstruct the entry sheet until data has booted. Remove
-  // a stale same-document room sentinel now so Back never lands on an inert
-  // history stop; ordinary Forward navigation is handled live by popstate.
+  // A reload cannot reconstruct the entry sheet until data has booted, so the
+  // stroke room's marker goes: it names a room this boot cannot restore.
+  // The WALK sentinel's entry survives a reload, so stripping only its marker
+  // left a stop nothing recognised and the first device Back after any reload
+  // did nothing (PR #77 ea8252a9). The marker is adopted instead: the first
+  // render's syncWalkSentinel keeps it armed when there is somewhere to walk,
+  // or spends it the same quiet way walking home does.
   try {
-    if (history.state?.bunkiStrokeRoom || history.state?.bunkiWalk) {
+    if (history.state?.bunkiStrokeRoom) {
       const normalized = { ...history.state };
       delete normalized.bunkiStrokeRoom;
-      delete normalized.bunkiWalk;
       history.replaceState(normalized, '', location.href);
     }
+    if (history.state?.bunkiWalk) walkArmed = true;
     // The corridor owns every scroll restore (reader bookmarks, shelf and
     // archive offsets, sheet stacks). The platform's own traversal guess
     // would land the walk-back sentinel pops on a stale offset and fight
@@ -8011,10 +8015,14 @@ function renderReader(main) {
   const dueNow = new Date();
   const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
+  // set when the token just placed reaches FORWARD for what completes it — a numeral for its
+  // counter, a 接頭辞 for its stem
+  let groupHolds = false;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
+      groupHolds = false;
     }
     if (crossRefs) {
       const refTarget = crossRefs.doors.get(index);
@@ -8108,10 +8116,21 @@ function renderReader(main) {
       rendered = wrapper;
     }
     if (S.dials.spacing === 2) {
-      if (token.c || !group) {
+      // 文節 by part of speech, never by the grader's c flag alone (PR #77 1398bc2c): keyed on c
+      // the dial shattered every date into [2005] [年7] [月14日、] and split 第29回. A phrase
+      // opens at a content word, a name, a numeral or a 接頭辞 — never at a 接尾辞, which
+      // belongs to what precedes it — and a numeral or 接頭辞 holds it open for what completes
+      // it. Nothing here reads the ふりがな dial.
+      const pos = String(token.p || '');
+      const suffix = pos === '接尾辞';
+      const prefix = pos === '接頭辞';
+      const numeral = /^[0-9０-９]+$/u.test(String(token.s || ''));
+      const opens = (token.c || namedReading || numeral || prefix) && !suffix && !groupHolds;
+      if (opens || !group) {
         group = el('span', 'bunsetsu');
         reader.append(group);
       }
+      groupHolds = numeral || prefix;
       group.append(rendered);
     } else {
       reader.append(rendered);
@@ -8159,12 +8178,21 @@ function renderReader(main) {
   fin.append(finBtn);
   main.append(fin);
 
-  if (p.pendingVerification) {
+  // A row marked 検収前 explains itself wherever the mark shows. The note was gated on
+  // pendingVerification, which few marked rows carry, so the rest wore the mark with no reason,
+  // and the rights-held glossary rows told the Wikinews archive-freeze story, false of them
+  // (PR #77 d9f0b984, with round B's per-row reasons).
+  const rightsHeld = p.review === 'rights-review-pending';
+  if (p.pendingVerification || rightsHeld || p.review === 'human-review-pending' || /検収前/.test(p.sourceLabel || '')) {
     const pv = el('div', 'note');
-    pv.textContent = tx(
-      '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
-      'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
-    );
+    pv.textContent = rightsHeld
+      ? tx('出典の利用条件がまだ確認されていない。検収前。', 'The terms this source may be used under are not yet verified. Pending review.')
+      : p.pendingVerification
+        ? tx(
+          '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
+          'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
+        )
+        : tx('人手による確認がまだ済んでいない。検収前。', 'A human review of this text is still pending.');
     main.append(pv);
   }
 
@@ -13950,6 +13978,8 @@ function renderKdxParts(main) {
     for (const p of S.kdx.parts) {
       const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
       b.type = 'button';
+      // the chosen row is a REMOVE control, not a toggle, and says so (PR #77 007479d0)
+      b.setAttribute('aria-label', tx(`${p} を外す`, `remove ${p}`));
       b.addEventListener('click', () => {
         S.kdx.parts = S.kdx.parts.filter((x) => x !== p);
         render();
@@ -14014,6 +14044,8 @@ function kdxPartGrid(coPresent) {
       const dead = coPresent && !sel && !coPresent.has(r.c);
       const b = el('button', `kdx-chip kdx-part${sel ? ' on-list' : ''}${dead ? ' dead' : ''}`, r.c);
       b.type = 'button';
+      // which one is chosen is STATE, not only a class and a colour (PR #77 007479d0)
+      b.setAttribute('aria-pressed', String(sel));
       b.dataset.kdxPart = r.c; // the journey verifier's seam (c76edfb4's contract)
       if (r.name) b.setAttribute('aria-label', r.name);
       if (dead) b.disabled = true;
@@ -15417,6 +15449,8 @@ function renderGrammar(main) {
     const active = (S.grammarLevel || 'all') === lv;
     const chip = el('button', active ? 'chip wide on-list' : 'chip wide');
     chip.type = 'button';
+    // the level shown is STATE, not only a colour (PR #77 f7cd297c)
+    chip.setAttribute('aria-pressed', String(active));
     chip.dataset.glevel = lv;
     chip.append(el('span', 'big', lv === 'all' ? tx('すべて', 'all') : lv));
     chip.addEventListener('click', () => {
@@ -18309,11 +18343,19 @@ function renderReview(main) {
         rest.dataset.leechRest = item.id;
         rest.disabled = !!rv.pending;
         rest.addEventListener('click', () => {
-          // a rest is deck state — commit the copy, then show it (P0-4)
+          // a rest is deck state — commit the copy, then show it (P0-4) — and it joins the
+          // session history like its in-session twin, so ひとつ戻す wakes THIS card rather than
+          // taking back the last grade. It moves no cursor: the session is already over when
+          // this row is on the glass (PR #77 f7cd297c).
+          const key = srsKey(item.t, item.id);
           const now = Date.now();
-          return commitReviewAction(rv, rv.queue[rv.ix], (latest) => ({
-            suspended: { ...latest.suspended, [srsKey(item.t, item.id)]: now },
-          }));
+          let prevSuspended;
+          return commitReviewAction(rv, rv.queue[rv.ix], (latest) => {
+            prevSuspended = latest.suspended[key];
+            return { suspended: { ...latest.suspended, [key]: now } };
+          }, () => {
+            rv.history.push({ key: 'suspend', prevSuspended, afterSuspended: now, item, queueIndex: rv.ix });
+          });
         });
         row.append(rest);
         main.append(row);
@@ -19422,6 +19464,14 @@ function guidedHost() {
     english: bi,
     render: () => { if (S.view === 'guided') render(); },
     storage: () => localStorage,
+    // the single-file handoff carries the sets in its bundle, keyed by path; a served build
+    // lets the room fetch them
+    fetchJson: window.__CORRIDOR_STANDALONE__ === true
+      ? (path) => {
+        const bundled = window.__CORRIDOR_BUNDLE__?.[String(path).replace(/\.json$/u, '')];
+        return bundled ? Promise.resolve(structuredClone(bundled)) : Promise.reject(new Error(`${path} is not in this file`));
+      }
+      : null,
     openReport: maintenanceReports ? () => maintenanceReports.openReport() : null,
     openEntry: (node) => go(node, { invoker: document.activeElement }),
     openTutor: () => {
@@ -19592,6 +19642,8 @@ function renderFocus(main) {
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
     b.type = 'button';
+    // the chosen length and mode are STATE, not only a class (PR #77 007479d0)
+    b.setAttribute('aria-pressed', String(S.focusMin === m));
     b.append(el('span', 'focus-chip-n', String(m)));
     b.append(el('span', 'focus-chip-u', tx('分', 'min')));
     b.addEventListener('click', () => {
@@ -19617,6 +19669,7 @@ function renderFocus(main) {
   for (const [id, ja, en, sub] of modeDefs) {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
     b.type = 'button';
+    b.setAttribute('aria-pressed', String(S.focusMode === id));
     b.append(withEn(el('span', 'focus-mode-t', ja), en, 'en-inline'));
     b.append(el('span', 'focus-mode-sub', sub));
     b.addEventListener('click', () => {
@@ -21118,6 +21171,17 @@ async function aiLastReply(surface, ref) {
   return null;
 }
 
+/* A failure is not an assistant turn and is never archived, so a repaint mid-request replaced the
+ * sheet's quiet "could not answer just now" with silence and a re-armed door (PR #77 007479d0).
+ * The line waits here, per surface and word, until the learner asks again. A reply or a line that
+ * lands after the sheet was rebuilt asks for one render: the archive read-back, or this note,
+ * puts it where it belongs. */
+const aiSheetNotes = new Map();
+function aiSheetSettle(box, paint) {
+  if (box.isConnected) paint();
+  else if ($('.sheet')) render();
+}
+
 /** The tutor door on a word entry — present only when a key is stored. */
 function renderAiTutor(sheet, node, rec) {
   if (node.from?.passage || node.sourceContext) {
@@ -21129,21 +21193,28 @@ function renderAiTutor(sheet, node, rec) {
     node.from?.passage || node.sourceContext ? 'ask about the word alone' : 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
-  aiLastReply('word-tutor', `word:${node.id}`).then((prev) => {
+  const ref = `word:${node.id}`;
+  const note = aiSheetNotes.get(`word-tutor|${ref}`);
+  if (note) out.textContent = note;
+  else aiLastReply('word-tutor', ref).then((prev) => {
     if (prev && !out.textContent) out.textContent = prev;
   });
   btn.addEventListener('click', async () => {
+    aiSheetNotes.delete(`word-tutor|${ref}`);
     btn.disabled = true;
     out.textContent = tx('考え中…', 'thinking…');
     try {
       const senses = (rec?.m || []).slice(0, 4).join('; ');
-      out.textContent = await aiAsk(
+      const said = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use using the separate learning dimensions, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'word-tutor', ref: `word:${node.id}` },
+        { surface: 'word-tutor', ref },
       );
+      aiSheetSettle(out, () => { out.textContent = said; });
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      aiSheetNotes.set(`word-tutor|${ref}`, line);
+      aiSheetSettle(out, () => { out.textContent = line; });
     }
     btn.disabled = false;
   });
@@ -21183,10 +21254,14 @@ function renderAiExamples(sheet, node, rec) {
     }
     return shown;
   };
-  aiLastReply('examples', `word:${node.id}`).then((prev) => {
+  const exRef = `word:${node.id}`;
+  const note = aiSheetNotes.get(`examples|${exRef}`);
+  if (note) out.append(el('p', 'ai-ex-note', note));
+  else aiLastReply('examples', exRef).then((prev) => {
     if (prev && !out.childElementCount && !btn.disabled) paint(prev);
   });
   btn.addEventListener('click', async () => {
+    aiSheetNotes.delete(`examples|${exRef}`);
     btn.disabled = true;
     out.textContent = '';
     out.append(el('p', 'ai-ex-note', tx('つくっています…', 'writing examples…')));
@@ -21196,13 +21271,18 @@ function renderAiExamples(sheet, node, rec) {
       const raw = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. Write 6 to 8 natural example sentences for the given word across a useful range of difficulty, easiest first, using the separate learning dimensions. Keep an unrecorded word classification unknown; a word tag alone does not establish a sentence\'s difficulty. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. Nx is your provisional N5–N1 difficulty estimate for that example, not an official classification or a claim about the learner. No numbering, no markdown, no extra commentary.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Source word JLPT classification: ${wordLv || 'not recorded'}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'examples', ref: `word:${node.id}` },
+        { surface: 'examples', ref: exRef },
       );
-      const shown = paint(raw);
-      if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      aiSheetSettle(out, () => {
+        if (!paint(raw)) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      });
     } catch {
-      out.textContent = '';
-      out.append(el('p', 'ai-ex-note', tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.')));
+      const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
+      aiSheetNotes.set(`examples|${exRef}`, line);
+      aiSheetSettle(out, () => {
+        out.textContent = '';
+        out.append(el('p', 'ai-ex-note', line));
+      });
     }
     btn.disabled = false;
   });
@@ -21221,21 +21301,36 @@ function renderAiCoach(main, rv) {
   btn.type = 'button';
   btn.id = 'ai-coach';
   const out = el('div', 'ai-answer');
-  btn.addEventListener('click', async () => {
+  // 考え中 and what the tutor said live on the session, not in this closure: a repaint
+  // mid-request killed the spinner, re-armed the door and lost the arriving reply
+  // (PR #77 d9f0b984)
+  const thinking = tx('考え中…', 'thinking…');
+  if (rv.coach?.pending) {
     btn.disabled = true;
-    out.textContent = tx('考え中…', 'thinking…');
+    out.textContent = thinking;
+  } else if (rv.coach?.said) out.textContent = rv.coach.said;
+  btn.addEventListener('click', async () => {
+    if (rv.coach?.pending) return;
+    rv.coach = { pending: true };
+    btn.disabled = true;
+    out.textContent = thinking;
+    let said;
     try {
       // history is queue-ordered (grades push sequentially, undo pops)
       const lines = rv.queue.map((item, i) => `${item.label} (${item.t}): ${rv.history[i]?.key || 'ungraded'}`);
-      out.textContent = await aiAsk(
+      said = await aiAsk(
         "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
         `Session grades:\n${lines.join('\n')}`,
         { surface: 'coach' },
       );
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      said = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
     }
-    btn.disabled = false;
+    rv.coach = { pending: false, said };
+    if (out.isConnected) {
+      out.textContent = said;
+      btn.disabled = false;
+    } else if (S.view === 'review' && S.review === rv) render();
   });
   wrap.append(btn, out);
   main.append(wrap);
@@ -23009,9 +23104,13 @@ function startStrokeAnimation(page) {
     return;
   }
 
-  const GAP = 90;
+  // ゆっくり governs this hand too: it is the only writing a device without WebGL/WebGPU ever
+  // sees, and the corner stood there pressed while it ran at one speed (PR #77 007479d0). The
+  // default speed keeps the classic timing exactly.
+  const pace = STROKE_SPEED_DEFAULT / strokeSpeed();
+  const GAP = 90 * pace;
   const durations = paths.map((path) =>
-    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)),
+    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)) * pace,
   );
   const starts = [];
   let acc = 0;
@@ -24226,10 +24325,15 @@ function renderStrokePage(root) {
       const numbersCorner = strokeNumbersControl(page, reduced);
       numbersCorner.classList.add('stroke-corner', 'stroke-corner-br');
       page.append(numbersCorner);
-      const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
-      speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
-      page.append(speedCorner);
-      page.querySelector('#stroke-awake-field')?.append(speedSlider);
+      // ゆっくり paces the writing. Under reduced motion nothing is written over time, so it is
+      // not offered, rather than standing in its corner reporting itself pressed while it
+      // governs nothing (PR #77 007479d0)
+      if (!reduced) {
+        const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
+        speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
+        page.append(speedCorner);
+        page.querySelector('#stroke-awake-field')?.append(speedSlider);
+      }
     }
     setStrokeChrome(page, S.strokeChromeAwake);
   }
@@ -24277,10 +24381,19 @@ function renderStrokePage(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring also catches focus that is inside the room but not ON the ring. The room can
+    // hold focus on its own container, which is neither first nor last, so one Shift+Tab walked
+    // out to <body>, and Escape, bound to the room, went dead with it (PR #77 d9f0b984)
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -24681,10 +24794,19 @@ function renderSheet(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring also catches focus that is inside the room but not ON the ring. The room can
+    // hold focus on its own container, which is neither first nor last, so one Shift+Tab walked
+    // out to <body>, and Escape, bound to the room, went dead with it (PR #77 d9f0b984)
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -24730,6 +24852,17 @@ function licencePanel() {
     line.append(document.createTextNode(' ' + sources.map((s) => `${s.name}（${s.licence}）`).join(' · ')));
     box.append(line);
   }
+  // …and the tokenizer. Every reading and part-of-speech tag in the app passed through UniDic
+  // via fugashi at build time, and the panel that claims to state everything named neither
+  // (PR #77 f7cd297c). A build-time dependency ships in no pool, so it is written down here.
+  const tokenizer = el('p');
+  tokenizer.style.margin = '8px 0 0';
+  tokenizer.append(el('span', 'pool-tag', tx('ビルド時', 'build time')));
+  tokenizer.append(document.createTextNode(' ' + tx(
+    'UniDic 2.1.2（UniDic Consortium、GPL・LGPL・BSD のいずれか）を unidic-lite と fugashi（MIT）で — 読みと品詞はすべてここから',
+    'UniDic 2.1.2 (the UniDic Consortium; GPL, LGPL or BSD) through unidic-lite and fugashi (MIT) — every reading and part-of-speech tag comes from it',
+  )));
+  box.append(tokenizer);
   return box;
 }
 
@@ -25927,6 +26060,9 @@ function renderRoomError(main, view, error) {
   card.append(retry, home);
   main.append(card);
 }
+/* classes a press FLIPS — left out of the last-resort focus key, or the control could never be
+ * found again by the very press that moved the keyboard */
+const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
   syncSheetActionVisit();
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
@@ -25960,9 +26096,18 @@ function render() {
   const focusKey = (() => {
     const node = document.activeElement;
     if (!node || node === document.body || !$('#app').contains(node)) return null;
-    if (node.id) return `#${CSS.escape(node.id)}`;
+    if (node.id) return { sel: `#${CSS.escape(node.id)}` };
     const action = node.dataset?.action;
-    return action ? `[data-action="${CSS.escape(action)}"]` : null;
+    if (action) return { sel: `[data-action="${CSS.escape(action)}"]` };
+    // Last resort: the filter chips in 字引, 文法 and the dojo lobby name themselves no other
+    // way, so every press dropped the keyboard to <body> (PR #77 1398bc2c). Such a control is
+    // found by its shape, minus the state classes its own press flips, and by its own text
+    // before its place — pressing a 部品 narrows the grid under the very chip pressed.
+    const shape = [...node.classList].filter((name) => !FOCUS_STATE_CLASSES.has(name));
+    if (!shape.length) return null;
+    const sel = shape.map((name) => `.${CSS.escape(name)}`).join('');
+    const ix = [...$('#app').querySelectorAll(sel)].indexOf(node);
+    return ix < 0 ? null : { sel, ix, text: (node.textContent || '').trim().slice(0, 16) };
   })();
   const root = $('#app');
   root.textContent = '';
@@ -26028,7 +26173,15 @@ function render() {
   // the search room's door stands in the galaxy bar, and its Back walks
   // there unless it was opened from the shelf
   const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
-  if (S.view === 'entry') parts.push(tx('野', 'field'));
+  // the lists tray opens from every room and its 戻る walks back there, so a room reached
+  // through it (the tray, its quiz, a plain review) is rooted where the tray was opened —
+  // it said 本棚 whichever room that was (PR #77 d9f0b984)
+  const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
+  const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
+  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' ||
+    (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
+  if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
+  else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
   else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
@@ -26037,7 +26190,9 @@ function render() {
     parts.push(passage().title);
   }
   if (S.view === 'search') parts.push(tx('検索', 'search'));
-  if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
+  // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
+  // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
+  if (viaTray) parts.push(tx('リスト', 'lists'));
   if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
@@ -26366,7 +26521,9 @@ function render() {
   // focus and must not be overruled, so this only reaches into #app, and it
   // never steals focus from whatever the rebuild legitimately moved it to.
   if (focusKey && document.activeElement === document.body) {
-    const again = $('#app').querySelector(focusKey);
+    const all = focusKey.ix == null ? [] : [...$('#app').querySelectorAll(focusKey.sel)];
+    const again = focusKey.ix == null ? $('#app').querySelector(focusKey.sel)
+      : all.find((node) => (node.textContent || '').trim().slice(0, 16) === focusKey.text) || all[focusKey.ix];
     if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
   }
   lastRenderedView = S.view;
