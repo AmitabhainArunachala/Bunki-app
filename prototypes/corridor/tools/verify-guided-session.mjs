@@ -26,6 +26,7 @@ import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
+import AxeBuilder from '@axe-core/playwright';
 import {
   resolveCorridorEvidence,
   resolveCorridorSite,
@@ -161,6 +162,12 @@ async function waitNoPending(page) {
     { timeout: 20_000 },
   );
 }
+/** axe-core over the room alone (the app's chrome has its own suites): no violation of any impact. */
+async function axeClean(page, stage) {
+  const result = await new AxeBuilder({ page }).include('.guided-room').analyze();
+  const found = result.violations.map((v) => `${v.id}(${v.impact})×${v.nodes.length}`);
+  check(`A11y ${stage}: axe finds no violation in the room`, found.length === 0, found.join(' '));
+}
 async function dueKeys(page) {
   return page.evaluate(() => window.__KAIRO_SRS__?.dueKeys?.() || []);
 }
@@ -231,6 +238,7 @@ async function journey(browser, browserName, viewport) {
     // J · arrival and setup
     check('J1 arrival names the set and its size', /N2/u.test(await room(page).innerText()));
     await shot(page, dir, '01-arrival', { full: true });
+    await axeClean(page, 'arrival');
     await noOverflow('arrival');
     await act(page, 'setup').click();
     await shot(page, dir, '02-setup', { full: true });
@@ -244,6 +252,7 @@ async function journey(browser, browserName, viewport) {
       (await page.evaluate(() => document.documentElement.dataset.room)) === 'attempt',
     );
     await shot(page, dir, '03-question-1');
+    await axeClean(page, 'question');
     await noOverflow('question');
 
     // M · the samurai on a wrong answer (check-samurai)
@@ -315,6 +324,7 @@ async function journey(browser, browserName, viewport) {
       (await page.locator('.guided-room .gs-target').innerText()).includes('てんけん'),
     );
     await shot(page, dir, '06-explanation', { full: true });
+    await axeClean(page, 'explanation');
     await noOverflow('explanation');
     const doors = page.locator('.guided-room .gs-word[data-word="word_62"]');
     check('J6 teaching words are doors', (await page.locator('.guided-room .gs-word').count()) > 3);
@@ -407,6 +417,29 @@ async function journey(browser, browserName, viewport) {
       'J9 a correct answer puts Next first',
       (await page.locator('.guided-room .gs-button.primary[data-action="next"]').count()) === 1,
     );
+    // a card added outside the room, through the app's own dictionary sheet (its 覚える), is
+    // read back by the room like any other real row
+    await act(page, 'explain').click();
+    await page.locator('.guided-room .gs-word[data-word="word_58"]').first().click();
+    await act(page, 'entry').click();
+    await page.locator('#sheet #take').click();
+    await page.waitForFunction(
+      () => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
+    );
+    check(
+      'S0 the app’s own entry sheet adds 支障 while the room waits underneath',
+      (await dueKeys(page)).includes('word:支障'),
+    );
+    await page.locator('#sheet-back').click();
+    await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5_000 });
+    check(
+      'S0b the room’s word door reads that card as already in the deck',
+      (await page.locator('.guided-room [data-action="save-word"]').isDisabled()) &&
+        (await page
+          .locator('.guided-room .gs-deck-line .gs-card[data-card="word:支障"]')
+          .count()) === 1,
+    );
+    await act(page, 'close-word').click();
     await act(page, 'next').click();
 
     // J · Q3: explanation first, a grammar branch, back to the same place
@@ -498,6 +531,7 @@ async function journey(browser, browserName, viewport) {
       (await page.locator('.guided-room .gs-card[data-deck="ready"]').count()) >= 4,
     );
     await shot(page, dir, '12-results', { full: true });
+    await axeClean(page, 'results');
     await noOverflow('results');
 
     // J · the prepared question for Sensei, and the tutor room's way back
@@ -550,6 +584,7 @@ async function journey(browser, browserName, viewport) {
     );
     await page.locator('.guided-room [data-action="nav"][data-view="learn"]').click();
     await shot(page, dir, '13-learn', { full: true });
+    await axeClean(page, 'learn');
     check(
       'S11 Learn lists the saved word with its deck state',
       (await page
@@ -605,9 +640,16 @@ async function journey(browser, browserName, viewport) {
     const field = await stored(page);
     check('J18 the practised target is marked practised', field.reviewed.includes(Q[0]));
     check(
-      'J19 the field reads the real deck (ready-to-review count)',
-      /復習する · 5|review what is ready/u.test(await room(page).innerText()) &&
-        (await page.locator('.guided-room [data-action="review"]').count()) === 1,
+      'J19 the field reads the real deck: 5 session cards and 支障 from the sheet are ready',
+      /復習する · 6/u.test(await act(page, 'review').innerText()),
+      await act(page, 'review').innerText(),
+    );
+    check(
+      'J19b a target with no Learn row still shows the card the deck already holds',
+      /Ready to review/u.test(
+        await page.locator('.guided-room .gs-node[data-index="1"]').innerText(),
+      ),
+      await page.locator('.guided-room .gs-node[data-index="1"]').innerText(),
     );
     check(
       'J20 the sentence is kept as the learner’s own words',
@@ -616,6 +658,7 @@ async function journey(browser, browserName, viewport) {
       ),
     );
     await shot(page, dir, '19-return-field', { full: true });
+    await axeClean(page, 'return field');
     await noOverflow('field');
     await act(page, 'return-home').click();
     check(
@@ -657,13 +700,13 @@ async function journey(browser, browserName, viewport) {
       };
     });
     check(
-      'S12 #deck-table counts the five session cards as new',
-      counts.newCount === 5,
+      'S12 #deck-table counts the six new cards (five from the session, 支障 from the sheet)',
+      counts.newCount === 6,
       JSON.stringify(counts),
     );
     check(
       'S13 #review-start offers them for review',
-      counts.disabled === false && /5/u.test(counts.start),
+      counts.disabled === false && /6/u.test(counts.start),
       JSON.stringify(counts),
     );
     await shot(page, dir, '21-srs-lists', { full: true });
@@ -672,7 +715,7 @@ async function journey(browser, browserName, viewport) {
     const face = await page.locator('#app main').innerText();
     check(
       'S14 the first review card is one the session added',
-      ['専門家', '点検', 'ものの', '受付', '済ませる'].some((word) => face.includes(word)),
+      ['専門家', '点検', 'ものの', '受付', '済ませる', '支障'].some((word) => face.includes(word)),
       face.slice(0, 80),
     );
     await shot(page, dir, '22-srs-review-card');
@@ -965,6 +1008,27 @@ async function restart(browser, browserName) {
         JSON.stringify(original),
     );
     await shot(page, dir, '40-restarted', { full: true });
+    // check-integrated-moments: every target carries its reading, every explanation has doors
+    const readings = await page.evaluate(async () =>
+      (await (await fetch('/guided/sets/n2-living-thread-01.json')).json()).questions.map(
+        (q) => q.target.reading,
+      ),
+    );
+    for (const [i, reading] of readings.entries()) {
+      await page.locator(`.guided-room .gs-progress [data-index="${i}"]`).click();
+      await act(page, 'explain').click();
+      check(
+        `R6.${i + 1} Q${i + 1}’s target carries its reading`,
+        (await page.locator('.guided-room .gs-target').innerText()).includes(reading),
+        reading,
+      );
+      check(
+        `R6.${i + 1} Q${i + 1}’s explanation has word doors`,
+        (await page.locator('.guided-room .gs-word').count()) > 0,
+      );
+      await act(page, 'question').click();
+    }
+    await page.locator('.guided-room .gs-progress [data-index="0"]').click();
     await answer(page, 1);
     await skipMoment(page);
     s = await state();
