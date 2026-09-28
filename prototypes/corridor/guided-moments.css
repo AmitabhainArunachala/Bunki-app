@@ -1,0 +1,824 @@
+/* ============================================================================
+   Moments (guided-moments.mjs), loaded by the moments module itself — a short paper
+   theatre: lacquer, washi, one vermilion seal. Codex's samurai-effect.css, kept whole; the
+   sword stroke and the spark are matte paper here (the prototype's drop-shadow glow is
+   removed: no glow in this house). The sprite sheet's provenance: guided/SAMURAI-PROVENANCE.md.
+   ========================================================================== */
+.samurai-effect {
+  --se-paper: #f5ebd3;
+  --se-ink: #0c2434;
+  --se-gold: #d8be86;
+  --se-red: #b34d38;
+  --se-anticipation: 850ms;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--se-paper);
+  background: var(--se-ink);
+  font-family: var(--sans);
+  isolation: isolate;
+  animation: se-enter 0.24s ease-out both;
+}
+.samurai-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 53% 45%, #244255 0, transparent 66%),
+    repeating-linear-gradient(0deg, transparent 0 3px, #fff1 4px, transparent 5px);
+  opacity: 0.42;
+}
+.samurai-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 150px #020a10a6;
+  z-index: 3;
+}
+.samurai-effect__frame {
+  position: absolute;
+  inset: clamp(10px, 2.4vw, 30px);
+  border: 1px solid #d8be8640;
+  pointer-events: none;
+  z-index: 5;
+}
+.samurai-effect__frame::before,
+.samurai-effect__frame::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-color: #d8be86;
+  border-style: solid;
+}
+.samurai-effect__frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+.samurai-effect__frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 1px 1px 0;
+}
+.samurai-effect__header {
+  position: relative;
+  z-index: 6;
+  flex: none;
+  text-align: center;
+  padding: clamp(30px, 7vh, 76px) 24px 0;
+}
+.samurai-effect__eyebrow {
+  display: block;
+  color: var(--se-gold);
+  font-size: 0.64rem;
+  line-height: 1.5;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.samurai-effect__verdict {
+  margin: 12px 0 0 !important;
+  color: var(--se-paper) !important;
+  font: 400 clamp(2.7rem, 6.5vw, 5.5rem)/1.1 var(--display, serif) !important;
+  letter-spacing: -0.02em !important;
+}
+.samurai-effect__verdict-ja {
+  display: block;
+  margin-top: 4px;
+  color: #d8be86b0;
+  font: 400 1rem/1.4 var(--serif, serif);
+  letter-spacing: 0.3em;
+}
+.samurai-effect__stage {
+  --scene-w: min(94vw, 108vh, 1080px);
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  width: var(--scene-w);
+  height: calc(var(--scene-w) * 0.5);
+  transform: translate(-50%, -43%);
+  z-index: 2;
+}
+.samurai-effect__sun {
+  position: absolute;
+  left: 39%;
+  top: 4%;
+  width: 37%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--se-red);
+  opacity: 0.77;
+  clip-path: polygon(
+    50% 0,
+    72% 5%,
+    88% 20%,
+    98% 42%,
+    99% 61%,
+    90% 81%,
+    70% 95%,
+    49% 100%,
+    27% 93%,
+    10% 77%,
+    1% 56%,
+    3% 31%,
+    20% 10%
+  );
+  transform: scale(0.96);
+  transition:
+    transform 0.55s ease,
+    opacity 0.4s ease;
+}
+.samurai-effect__sun::after {
+  content: '';
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 1px solid #f5ebd335;
+  transform: translate(-4%, 2%);
+}
+.samurai-effect__horizon {
+  position: absolute;
+  bottom: 9%;
+  left: 3%;
+  right: 3%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d8be8660 25%, #d8be8660 80%, transparent);
+}
+.samurai-effect__horizon::after {
+  content: '';
+  position: absolute;
+  left: 9%;
+  right: 5%;
+  top: -9px;
+  height: 24px;
+  border-radius: 50%;
+  background: #01091060;
+  filter: blur(9px);
+}
+.samurai-effect__stage-label {
+  position: absolute;
+  left: 5%;
+  top: 4%;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.15em;
+  color: #d8be8670;
+  font: 400 clamp(16px, 2.5vw, 27px)/1.5 var(--serif, serif);
+}
+.samurai-effect__samurai {
+  position: absolute;
+  left: 5%;
+  bottom: 10%;
+  width: 30%;
+  aspect-ratio: 543/686;
+  transform: translate(-62%, 10%) rotate(-9deg);
+  transform-origin: 50% 95%;
+  filter: drop-shadow(3px 10px 4px #02090d44);
+  will-change: transform;
+}
+.samurai-effect__samurai-art,
+.samurai-effect__learner-art {
+  position: absolute;
+  inset: 0;
+  background-image: url('guided/samurai-sprites-v2.png');
+  background-repeat: no-repeat;
+}
+/* Measured whole-figure crops on the 1226 × 1283 generated sheet (Codex, 2026-09-23).
+   Leap 0,0,543,686; strike 543,0,683,603; seated 0,686,548,597; block 650,603,576,680. */
+.samurai-effect__samurai-art {
+  background-size: 225.7827% 187.0262%;
+  background-position: 0 0;
+}
+.samurai-effect__learner {
+  position: absolute;
+  right: 6%;
+  bottom: 10%;
+  width: 28%;
+  aspect-ratio: 548/597;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(3px 7px 3px #02090d44);
+  will-change: transform, opacity;
+}
+.samurai-effect__learner-art {
+  background-size: 223.7226% 214.9079%;
+  background-position: 0 100%;
+  transform: scaleX(-1);
+}
+.samurai-effect__stroke {
+  position: absolute;
+  left: 29%;
+  top: 45%;
+  width: 47%;
+  height: 7px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, #f5ebd3 25%, #f5ebd3 67%, transparent);
+  clip-path: polygon(0 70%, 98% 0, 100% 25%, 19% 100%);
+  transform: rotate(-22deg) scaleX(0.08);
+  transform-origin: 10% 50%;
+}
+.samurai-effect__blackout {
+  position: absolute;
+  inset: -20% -10%;
+  background: var(--se-ink);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+.samurai-effect__spark {
+  position: absolute;
+  right: 25%;
+  top: 36%;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+}
+.samurai-effect__spark i {
+  position: absolute;
+  width: 27px;
+  height: 2px;
+  background: #f5ebd3;
+  transform: rotate(0deg);
+  transform-origin: 0 50%;
+}
+.samurai-effect__spark i:nth-child(2) {
+  transform: rotate(84deg);
+  width: 21px;
+}
+.samurai-effect__spark i:nth-child(3) {
+  transform: rotate(182deg);
+  width: 23px;
+}
+.samurai-effect__spark i:nth-child(4) {
+  transform: rotate(264deg);
+  width: 24px;
+}
+.samurai-effect__scraps {
+  position: absolute;
+  right: 9%;
+  bottom: 12%;
+  width: 23%;
+  height: 56%;
+  opacity: 0;
+  pointer-events: none;
+}
+.samurai-effect__scraps i {
+  position: absolute;
+  left: calc(var(--col) * 23%);
+  top: calc(var(--row) * 30%);
+  width: 32%;
+  height: 26%;
+  background: #f0e2bf;
+  clip-path: polygon(5% 2%, 100% 9%, 85% 100%, 0 85%);
+  box-shadow: 0 1px #dcc9a0;
+  transform: rotate(calc(var(--piece) * 9deg));
+  will-change: transform, opacity;
+}
+.samurai-effect__scraps i:nth-child(3n) {
+  background: #bbae8c;
+  clip-path: polygon(0 0, 100% 35%, 35% 100%);
+}
+.samurai-effect__scraps i:nth-child(4n) {
+  background: #e5d2a5;
+  clip-path: polygon(0 25%, 70% 0, 100% 90%, 13% 100%);
+}
+.samurai-effect__footer {
+  position: absolute;
+  z-index: 6;
+  bottom: clamp(28px, 6vh, 66px);
+  left: clamp(24px, 6vw, 80px);
+  right: clamp(24px, 6vw, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.samurai-effect__footer p {
+  margin: 0;
+  max-width: 33ch;
+  font-size: clamp(0.75rem, 1.3vw, 0.9rem);
+  line-height: 1.55;
+  color: #f5ebd3bd;
+}
+.samurai-effect__actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+.samurai-effect__report {
+  min-height: 44px;
+  padding: 8px 2px;
+  border: 0 !important;
+  background: transparent !important;
+  color: #f5ebd3bd !important;
+  font-family: inherit !important;
+  font-size: 0.73rem !important;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: #d8be8666;
+  cursor: pointer;
+}
+.samurai-effect__report:hover {
+  color: var(--se-paper) !important;
+  text-decoration-color: var(--se-paper);
+}
+.samurai-effect__report:focus-visible {
+  outline: 2px solid var(--se-gold) !important;
+  outline-offset: 5px;
+}
+.samurai-effect__skip {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 44px;
+  padding: 9px 14px;
+  border: 1px solid #d8be8666 !important;
+  background: #0c2434b3 !important;
+  color: var(--se-paper) !important;
+  border-radius: 2px !important;
+  font: inherit !important;
+  font-size: 0.76rem !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.samurai-effect__skip span {
+  border: 1px solid #d8be8655;
+  border-radius: 2px;
+  padding: 1px 4px;
+  color: #d8be86aa;
+  font-size: 0.62rem;
+}
+.samurai-effect__skip:hover {
+  background: #274151 !important;
+  border-color: #d8be86 !important;
+}
+.samurai-effect__skip:focus-visible {
+  outline: 2px solid var(--se-gold) !important;
+  outline-offset: 5px;
+}
+.samurai-effect--run .samurai-effect__samurai {
+  --samurai-motion: var(--se-anticipation);
+  animation: se-anticipate var(--se-anticipation) cubic-bezier(0.2, 0.7, 0.24, 1) both;
+}
+.samurai-effect--run .samurai-effect__learner {
+  --samurai-motion: var(--se-anticipation);
+  animation: se-brace var(--se-anticipation) ease both;
+}
+.samurai-effect--impact .samurai-effect__samurai {
+  width: 51%;
+  aspect-ratio: 683/603;
+  --samurai-motion: 440ms;
+  animation: se-strike 0.44s cubic-bezier(0.1, 0.8, 0.2, 1) both;
+}
+.samurai-effect--impact .samurai-effect__samurai-art {
+  background-size: 179.5022% 212.7695%;
+  background-position: 100% 0;
+}
+.samurai-effect--impact .samurai-effect__stroke {
+  --samurai-motion: 260ms;
+  animation: se-stroke 0.26s ease-out both;
+}
+.samurai-effect--incorrect.samurai-effect--impact .samurai-effect__blackout {
+  --samurai-motion: 320ms;
+  animation: se-blackout 0.32s linear both;
+}
+.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__learner {
+  opacity: 0;
+  animation: none;
+}
+.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__scraps {
+  opacity: 1;
+}
+.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__scraps i {
+  --samurai-motion: 1100ms;
+  animation: se-paper 1.1s cubic-bezier(0.15, 0.6, 0.25, 1) both;
+}
+.samurai-effect--resolve .samurai-effect__sun {
+  transform: scale(1.08);
+  opacity: 0.55;
+}
+.samurai-effect--settle .samurai-effect__stage {
+  transition: opacity 0.4s;
+  opacity: 0.62;
+}
+.samurai-effect--settle .samurai-effect__footer p {
+  color: var(--se-paper);
+}
+.samurai-effect--rematch .samurai-effect__sun {
+  background: #63795d;
+  opacity: 0.8;
+}
+.samurai-effect--rematch.samurai-effect--guard .samurai-effect__learner {
+  right: 3%;
+  width: 35%;
+  aspect-ratio: 576/680;
+  animation: none;
+}
+.samurai-effect--rematch.samurai-effect--guard .samurai-effect__learner-art {
+  background-size: 212.8472% 188.6765%;
+  background-position: 100% 100%;
+  transform: none;
+}
+.samurai-effect--rematch.samurai-effect--impact .samurai-effect__learner {
+  --samurai-motion: 500ms;
+  animation: se-block 0.5s ease-out both;
+}
+.samurai-effect--rematch.samurai-effect--impact .samurai-effect__spark {
+  --samurai-motion: 370ms;
+  animation: se-spark 0.37s ease-out both;
+}
+.samurai-effect--rematch.samurai-effect--resolve .samurai-effect__samurai {
+  --samurai-motion: 1250ms;
+  animation: se-bow 1.25s cubic-bezier(0.2, 0.65, 0.2, 1) both;
+}
+.samurai-effect--rematch.samurai-effect--settle .samurai-effect__stage {
+  opacity: 1;
+}
+.samurai-effect--dramatic::after {
+  box-shadow: inset 0 0 220px #020a10d9;
+}
+.samurai-effect--dramatic .samurai-effect__sun {
+  background: #ad3429;
+  opacity: 0.8;
+}
+.samurai-effect--dramatic.samurai-effect--rematch .samurai-effect__sun {
+  background: #63795d;
+}
+.samurai-effect--dramatic.samurai-effect--impact .samurai-effect__stage {
+  --samurai-motion: 260ms;
+  animation: se-impact 0.26s ease-out;
+}
+.samurai-effect--quiet .samurai-effect__stage {
+  --scene-w: min(70vw, 75vh, 680px);
+}
+.samurai-effect--quiet .samurai-effect__sun {
+  opacity: 0.35;
+}
+.samurai-effect--quiet .samurai-effect__blackout,
+.samurai-effect--quiet .samurai-effect__stroke,
+.samurai-effect--quiet .samurai-effect__scraps {
+  display: none;
+}
+.samurai-effect--quiet .samurai-effect__samurai {
+  transform: translate(25%, 0);
+}
+.samurai-effect--quiet .samurai-effect__stage-label {
+  display: none;
+}
+.samurai-effect--quiet.samurai-effect--run .samurai-effect__samurai,
+.samurai-effect--quiet.samurai-effect--run .samurai-effect__learner {
+  animation: none;
+}
+.samurai-effect--quiet.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__learner {
+  opacity: 0.6;
+}
+.samurai-effect--quiet.samurai-effect--resolve .samurai-effect__sun {
+  transform: none;
+}
+@keyframes se-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes se-anticipate {
+  0% {
+    transform: translate(-62%, 10%) rotate(-9deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  58% {
+    transform: translate(12%, -12%) rotate(1deg);
+  }
+  85% {
+    transform: translate(19%, -13%) rotate(2deg);
+  }
+  100% {
+    transform: translate(28%, -9%) rotate(4deg);
+  }
+}
+@keyframes se-brace {
+  0%,
+  55% {
+    transform: none;
+  }
+  85%,
+  100% {
+    transform: translateX(2%) rotate(2deg);
+  }
+}
+@keyframes se-strike {
+  0% {
+    transform: translate(23%, -4%) rotate(-3deg);
+  }
+  35% {
+    transform: translate(38%, 0) rotate(0);
+  }
+  100% {
+    transform: translate(40%, 0);
+  }
+}
+@keyframes se-stroke {
+  0% {
+    opacity: 0;
+    transform: rotate(-22deg) scaleX(0.08);
+  }
+  30% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+    transform: rotate(9deg) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(12deg) scaleX(1.08);
+  }
+}
+@keyframes se-blackout {
+  0% {
+    opacity: 0;
+  }
+  16%,
+  73% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes se-paper {
+  0% {
+    transform: translate(0, 0) rotate(calc(var(--piece) * 9deg));
+    opacity: 0.95;
+  }
+  55% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--turn)) scale(0.35);
+    opacity: 0;
+  }
+}
+@keyframes se-block {
+  0% {
+    transform: none;
+  }
+  24% {
+    transform: translateX(4%) rotate(4deg);
+  }
+  62%,
+  100% {
+    transform: translateX(-4%) rotate(-2deg);
+  }
+}
+@keyframes se-spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(30deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9) rotate(-10deg);
+  }
+}
+@keyframes se-bow {
+  0% {
+    transform: translate(40%, 0);
+  }
+  32% {
+    transform: translate(12%, 2%) rotate(-2deg);
+  }
+  70% {
+    transform: translate(12%, 3%) rotate(10deg);
+  }
+  100% {
+    transform: translate(12%, 3%) rotate(8deg);
+  }
+}
+@keyframes se-impact {
+  0%,
+  100% {
+    transform: translate(-50%, -43%);
+  }
+  24% {
+    transform: translate(-50.7%, -42.5%);
+  }
+  55% {
+    transform: translate(-49.5%, -43.5%);
+  }
+}
+/* A geometric origami crane carries a saved word to 覚. It never takes focus. */
+.bunki-moment {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482900;
+  pointer-events: none;
+  isolation: isolate;
+}
+.bunki-moment__flight {
+  position: absolute;
+  left: var(--crane-x);
+  top: var(--crane-y);
+  width: 110px;
+  height: 80px;
+  animation: crane-carry 1.75s cubic-bezier(0.3, 0.05, 0.25, 1) both;
+  will-change: transform;
+}
+.bunki-moment__crane {
+  position: absolute;
+  width: 110px;
+  height: 69px;
+  filter: drop-shadow(0 4px 4px #142d3c22);
+}
+.bunki-moment__wing {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: crane-wing 0.52s ease-in-out 3 alternate;
+}
+.bunki-moment__wing--back {
+  animation-delay: 0.08s;
+}
+.bunki-moment__note {
+  position: absolute;
+  left: 44px;
+  top: 51px;
+  width: 24px;
+  height: 30px;
+  background: #f7efd9;
+  border: 1px solid #baa983;
+  transform: rotate(9deg);
+  box-shadow: 0 2px 5px #142d3c16;
+}
+.bunki-moment__note::after {
+  content: '';
+  position: absolute;
+  inset: 8px 5px;
+  background: repeating-linear-gradient(0deg, #9b805980 0 1px, transparent 1px 5px);
+}
+.bunki-moment__message {
+  position: absolute;
+  left: 50%;
+  bottom: max(30px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 44px);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px 20px;
+  background: var(--ink, #17364a);
+  color: var(--ground-0, #fff7e7);
+  box-shadow: 0 5px 20px #142d3c1a;
+  font-family: var(--serif, serif);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: center;
+  border-radius: 4px;
+  animation: se-enter 0.2s ease-out both;
+}
+.bunki-moment--settle .bunki-moment__message {
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+.bunki-moment--still .bunki-moment__flight {
+  display: none;
+}
+@keyframes crane-carry {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-8deg) scale(0.75);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, -68%) rotate(-5deg) scale(1);
+  }
+  40% {
+    transform: translate(calc(var(--crane-dx) * 0.18 - 50%), calc(var(--crane-dy) * 0.4 - 50%))
+      rotate(4deg) scale(1);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--crane-dx) - 50%), calc(var(--crane-dy) - 50%)) rotate(-9deg)
+      scale(0.3);
+  }
+}
+@keyframes crane-wing {
+  0% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0.58);
+  }
+}
+@media (max-width: 600px) {
+  .samurai-effect__stage {
+    --scene-w: 108vw;
+    top: 49%;
+    transform: translate(-50%, -34%);
+  }
+  .samurai-effect__header {
+    padding-top: max(46px, 9vh);
+  }
+  .samurai-effect__verdict {
+    font-size: 3.15rem !important;
+  }
+  .samurai-effect__stage-label {
+    left: 10%;
+    top: -10%;
+  }
+  .samurai-effect__samurai {
+    left: 5%;
+  }
+  .samurai-effect__learner {
+    right: 6%;
+  }
+  .samurai-effect__sun {
+    top: -11%;
+    left: 34%;
+    width: 44%;
+  }
+  .samurai-effect__footer {
+    bottom: 7vh;
+    left: 26px;
+    right: 26px;
+    gap: 12px;
+    display: grid;
+  }
+  .samurai-effect__footer p {
+    font-size: 0.75rem;
+    max-width: 30ch;
+  }
+  .samurai-effect__actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .samurai-effect__skip {
+    padding: 9px 12px;
+    gap: 10px;
+  }
+  .samurai-effect__skip span {
+    display: none;
+  }
+  .samurai-effect__scraps {
+    right: 9%;
+  }
+  .samurai-effect--dramatic.samurai-effect--impact .samurai-effect__stage {
+    animation: none;
+  }
+}
+@media (max-height: 520px) and (min-width: 601px) {
+  .samurai-effect__header {
+    padding-top: 24px;
+  }
+  .samurai-effect__eyebrow {
+    font-size: 0.56rem;
+  }
+  .samurai-effect__verdict {
+    font-size: 2.3rem !important;
+    margin-top: 5px !important;
+  }
+  .samurai-effect__stage {
+    --scene-w: 96vh;
+    top: 46%;
+    transform: translate(-50%, -38%);
+  }
+  .samurai-effect__footer {
+    bottom: 23px;
+  }
+  .samurai-effect__footer p {
+    max-width: 38ch;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .samurai-effect {
+    animation: none;
+  }
+  .samurai-effect--forced * {
+    animation-duration: var(--samurai-motion, 1ms) !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 180ms !important;
+  }
+  .bunki-moment__flight {
+    display: none;
+  }
+  .bunki-moment__message {
+    animation: none;
+    transition: none !important;
+  }
+}
