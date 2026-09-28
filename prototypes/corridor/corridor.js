@@ -14082,6 +14082,7 @@ function renderKdxStrokes(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', String(n));
     b.type = 'button';
     b.dataset.kdxSt = String(n); // the journey verifier's seam (c76edfb4's contract)
+    b.setAttribute('aria-pressed', String(on));
     b.addEventListener('click', () => {
       S.kdx.st = on ? null : n;
       render();
@@ -14111,6 +14112,7 @@ function renderKdxRadical(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', glyph);
     b.type = 'button';
     b.dataset.kdxRad = String(n);
+    b.setAttribute('aria-pressed', String(on));
     b.setAttribute('aria-label', `${n} ${r?.c || ''} ${r?.name || ''}`.trim());
     b.title = `${n}${r?.name ? ' · ' + r.name : ''}`;
     b.addEventListener('click', () => {
@@ -14172,6 +14174,7 @@ function renderKdxFrequency(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', `${lo}–${hi}`);
     b.type = 'button';
     b.dataset.kdxFreq = String(lo);
+    b.setAttribute('aria-pressed', String(on));
     b.addEventListener('click', () => {
       S.kdx.freqLo = on ? null : lo;
       S.kdx.freqHi = on ? null : hi;
@@ -14211,6 +14214,7 @@ function renderKdxLevel(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', lv);
     b.type = 'button';
     b.dataset.kdxKk = lv;
+    b.setAttribute('aria-pressed', String(on));
     b.addEventListener('click', () => {
       S.kdx.kk = on ? null : lv;
       render();

@@ -739,6 +739,27 @@ PROBES['kanji-numerals'] = async () => {
   await context.close();
 };
 
+/* chip-groups-missing-aria-pressed — c78ead94 gave some chip groups their state; 字引's 画数,
+ * 部首, frequency-band and 漢検 chips still said which one was chosen only through a class. */
+PROBES['kdx-chip-state'] = async () => {
+  const { context, page } = await learner();
+  const seen = {};
+  for (const [lens, attr] of [['画数', 'data-kdx-st'], ['部首', 'data-kdx-rad'], ['頻度', 'data-kdx-freq'], ['漢検', 'data-kdx-kk']]) {
+    await open(page, '?entry=shelf&ui=bi');
+    await page.click('#kanjidex-link');
+    await page.locator('main .kdx-lens', { hasText: lens }).first().click();
+    const chip = page.locator(`main [${attr}]`).nth(1);
+    await chip.waitFor();
+    await chip.click();
+    await settle(page);
+    seen[lens] = await page.evaluate((a) => [...document.querySelectorAll(`main [${a}]`)].map((n) => n.getAttribute('aria-pressed')), attr);
+  }
+  check('chip-groups-missing-aria-pressed · 字引\'s 画数, 部首, frequency-band and 漢検 chips state which one is chosen',
+    Object.values(seen).length === 4 && Object.values(seen).every(oneOfPressed),
+    JSON.stringify(Object.fromEntries(Object.entries(seen).map(([lens, rows]) => [lens, `${rows.filter((r) => r === 'true').length} pressed · ${rows.filter((r) => r === null).length} unstated of ${rows.length}`]))));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {
