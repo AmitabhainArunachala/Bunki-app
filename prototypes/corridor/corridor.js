@@ -4427,6 +4427,16 @@ function back() {
     return;
   }
   if (returnFromNavigation()) return;
+  // the guided session walks its own layers first (word → sentence, branch → sentence,
+  // an inner page → the room's front); from the front it returns through the door it came in
+  if (S.view === 'guided') {
+    if (guidedRoom?.back()) return;
+    guidedRoom?.suspend();
+    S.view = guidedFrom === 'mock' ? 'mock' : 'dojo';
+    render();
+    window.scrollTo(0, 0);
+    return;
+  }
   // inside a drift dive, back means SURFACE one level of the water first —
   // the same walk whether it arrives from the nav arrow or the device Back
   if (S.view === 'drift' && S.driftDepth > 0 && window.bunkiDriftSurface) {
@@ -11502,7 +11512,7 @@ function renderMock(main) {
   main.classList.add('assessment-room'); main.lang = bi() ? 'en' : 'ja';
   if (assessmentViewModule && !practiceSelection() && !mockHistoryBrowse && !receivedPracticeSelection) {
     assessmentRoom ||= createAssessmentRoom();
-    if (assessmentRoom.render(main)) return;
+    if (assessmentRoom.render(main)) { guidedDoorInJlptRoom(main); return; }
   }
   main.append(withEn(el('p', 'eyebrow', 'JLPT の練習'), 'JLPT practice', 'en-inline'));
   if (!assessmentModule) {
@@ -19347,6 +19357,135 @@ function renderFocusHud(root) {
   root.append(hud);
 }
 
+/* ------------------------------------------- 案内つきの稽古 · the guided session
+ * Codex's living-thread journey (approved 2026-09-23), in its own module
+ * (guided-session.mjs). This host is the room's only way into the learner record:
+ * 覚える goes through toggleTaken — the reader's own door, with its D11/D23 holds — and
+ * the room reads S.taken / S.srs back through the helpers the lists page uses. */
+let guidedModule = null;
+let guidedModulePromise = null;
+let guidedFailed = false;
+let guidedRoom = null;
+let guidedFrom = 'dojo';
+function ensureGuidedModule() {
+  guidedModulePromise ||= import(window.__KAIRO_GUIDED_SESSION_URL__ || './guided-session.mjs').then(
+    (module) => { guidedModule = module; guidedFailed = false; return module; },
+    (error) => { guidedModulePromise = null; guidedFailed = true; throw error; },
+  );
+  return guidedModulePromise;
+}
+const guidedTaken = (node) => S.taken.find((row) => row.t === node.t && row.id === node.id) || null;
+function guidedCardStatus(node) {
+  const word = node.t === 'word';
+  const state = word ? wordCaptureState(node) : guidedTaken(node) ? 'taken' : 'take';
+  if (state === 'taken') return { state: 'taken' };
+  if (word && !D.dict?.[node.id]) return { state: 'held', reason: readerCaptureReasonText(node.id) };
+  if (word && state !== 'take') return { state: 'held', reason: wordCaptureHeldText(node, { route: false }) };
+  if (node.t === 'grammar' && !GRAMMARS().some((g) => g.id === node.id))
+    return { state: 'held', reason: tx('この文法は一覧にないため、覚えられない。', 'This grammar pattern is not in Bunki’s list, so it can’t be memorized.') };
+  if (!word && node.t !== 'grammar') return { state: 'held', reason: tx('この種類の札は、ここでは覚えられない。', 'This kind of card can’t be memorized here.') };
+  return { state: 'take' };
+}
+function guidedCardInfo(nodes) {
+  const ready = new Set(scheduler ? srsDueItems().map((item) => srsKey(item.t, item.id)) : []);
+  return nodes.map((node) => {
+    const key = srsKey(node.t, node.id);
+    const row = guidedTaken(node);
+    const studied = !!S.srs[key] || (S.revlog || []).some((review) => review[1] === key);
+    return row ? { taken: true, ready: ready.has(key), studied, kind: srsCardKind(row), when: srsWhen(row) }
+      : { taken: false, ready: false, studied, kind: null, when: '' };
+  });
+}
+function guidedHost() {
+  return {
+    english: bi,
+    render: () => { if (S.view === 'guided') render(); },
+    storage: () => localStorage,
+    openReport: maintenanceReports ? () => maintenanceReports.openReport() : null,
+    openEntry: (node) => go(node, { invoker: document.activeElement }),
+    openTutor: () => {
+      keepNavigationReturn('ai', document.activeElement);
+      S.view = 'ai'; render(); window.scrollTo(0, 0);
+    },
+    deck: {
+      status: guidedCardStatus,
+      info: guidedCardInfo,
+      title: nodeTitle,
+      // add-only: toggleTaken removes a card that is already there, so it is called only for 'take'
+      add: async (node, label) => {
+        const status = guidedCardStatus(node);
+        if (status.state === 'taken') return 'existing';
+        if (status.state !== 'take') return 'held';
+        if (!recordWritable()) return 'failed';
+        const saved = await toggleTaken(node, label);
+        return saved && guidedTaken(node) ? 'added' : 'failed';
+      },
+      remove: async (node) => {
+        if (!guidedTaken(node)) return true;
+        if (!recordWritable()) return false;
+        const saved = await toggleTaken(node, nodeTitle(node));
+        return !!saved && !guidedTaken(node);
+      },
+      review: (nodes) => {
+        const keys = new Set(nodes.map((node) => srsKey(node.t, node.id)));
+        if (!scheduler || !srsDueItems().some((item) => keys.has(srsKey(item.t, item.id)))) return false;
+        S.trayFrom = { view: 'guided', scroll: 0 };
+        startReview(S.taken.filter((row) => keys.has(srsKey(row.t, row.id))));
+        return S.view === 'review';
+      },
+      open: () => {
+        keepScroll(); S.stack = [];
+        S.trayFrom = { view: 'guided', scroll: Math.round(window.scrollY) };
+        S.view = 'tray'; render(); window.scrollTo(0, 0);
+      },
+    },
+  };
+}
+function openGuidedRoom(from) {
+  keepScroll();
+  guidedFrom = from;
+  S.stack = [];
+  S.view = 'guided';
+  guidedRoom?.enter();
+  render();
+  window.scrollTo(0, 0);
+}
+function renderGuided(main) {
+  if (guidedModule) {
+    guidedRoom ||= guidedModule.createGuidedSession(guidedHost());
+    guidedRoom.render(main);
+    return;
+  }
+  main.append(withEn(el('h1', 'view-title', '案内つきの稽古'), 'guided session', 'en-inline'));
+  const state = el('p', 'gloss', guidedFailed
+    ? tx('この部屋を開けなかった。保存した記録はそのまま残っている。', 'This room didn’t open. Nothing you saved is affected.')
+    : tx('稽古を開いています…', 'Opening the session…'));
+  state.setAttribute('role', 'status');
+  main.append(state);
+  if (guidedFailed) {
+    const retry = el('button', 'chip', tx('もう一度', 'Try again'));
+    retry.type = 'button'; retry.dataset.guidedRetry = '';
+    retry.addEventListener('click', () => { guidedFailed = false; render(); });
+    main.append(retry);
+    return;
+  }
+  ensureGuidedModule().then(() => { if (S.view === 'guided') { guidedRoom?.enter(); render(); } }, () => { if (S.view === 'guided') render(); });
+}
+/** The JLPT room's own door to the guided session, beside the level and length chooser. */
+function guidedDoorInJlptRoom(main) {
+  const lengths = main.querySelector('.exam-lengths');
+  if (!lengths || main.querySelector('[data-guided-door]')) return;
+  const row = el('div', 'study-hall guided-entry');
+  const door = el('button', 'study-door');
+  door.type = 'button';
+  door.dataset.guidedDoor = 'mock';
+  door.append(withEn(el('span', 'study-door-t', '案内つきの稽古'), 'a guided session', 'en-inline'));
+  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors as you go')));
+  door.addEventListener('click', () => openGuidedRoom('mock'));
+  row.append(door);
+  lengths.after(row);
+}
+
 /** 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18:
  * "we should have a whole corpus of test from JLPT levels and others, as well
  * as SRS cards. and other options to study here. not sure where they are…
@@ -19376,6 +19515,8 @@ function renderStudyHall(main) {
         : tx('新しい模試を準備中 · 以前の練習も使えます', 'New mocks in preparation · earlier exercises available'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
+    ['guided', '案内つきの稽古', 'a guided session', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors'),
+      () => openGuidedRoom('dojo')],
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
     }],
@@ -25712,7 +25853,7 @@ function stampRegister() {
   const html = document.documentElement;
   const main = document.querySelector('#app > main');
   const room = document.body.classList.contains('ginga') || !main ? 'door'
-    : main.querySelector('.mock-opts, .mock-q') ? 'attempt'
+    : main.querySelector('.mock-opts, .mock-q, .guided-room[data-stage="question"]') ? 'attempt'
       : main.querySelector('.exam-confirm') ? 'threshold'
         : main.querySelector('.exam-score') ? 'results'
           : main.querySelector('.exam-levels') ? 'jlpt'
@@ -25776,6 +25917,8 @@ function render() {
   // leaving the JLPT room cancels any older-set start still downloading: returning later must
   // not replay a stale tap
   if (lastRenderedView === 'mock' && S.view !== 'mock') olderStartToken += 1;
+  // leaving the guided session takes any moment off the glass; its progress is already saved
+  if (lastRenderedView === 'guided' && S.view !== 'guided') guidedRoom?.suspend();
   removeMini();
   // Rebuilding #app empties the page for a moment, and the browser clamps
   // window scroll to 0 — so a double-tap for a gloss, opening a sheet, or
@@ -25856,7 +25999,8 @@ function render() {
   // the crumb names the TRUE origin — the room 戻る actually reopens. The
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
-  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus) ||
+    (S.view === 'guided' && guidedFrom === 'dojo');
   // the search room's door stands in the galaxy bar, and its Back walks
   // there unless it was opened from the shelf
   const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
@@ -25890,6 +26034,9 @@ function render() {
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
   if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
+  if (S.view === 'guided') {
+    parts.push(guidedFrom === 'mock' ? tx('JLPT の練習', 'JLPT practice') : tx('集中道場', 'focus'), tx('案内つきの稽古', 'guided session'));
+  }
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   crumb.setAttribute('aria-label', crumb.title);
@@ -26152,6 +26299,7 @@ function render() {
     else if (S.view === 'kanjidex') renderKanjidex(main);
     else if (S.view === 'yoji') renderYoji(main);
     else if (S.view === 'grammar') renderGrammar(main);
+    else if (S.view === 'guided') renderGuided(main);
     else if (S.view === 'search') renderSearchPage(main);
     else renderShelf(main);
   } catch (error) {
