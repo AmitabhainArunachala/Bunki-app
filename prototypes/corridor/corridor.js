@@ -13957,6 +13957,8 @@ function renderKdxParts(main) {
     for (const p of S.kdx.parts) {
       const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
       b.type = 'button';
+      // the chosen row is a REMOVE control, not a toggle, and says so (PR #77 007479d0)
+      b.setAttribute('aria-label', tx(`${p} を外す`, `remove ${p}`));
       b.addEventListener('click', () => {
         S.kdx.parts = S.kdx.parts.filter((x) => x !== p);
         render();
@@ -14021,6 +14023,8 @@ function kdxPartGrid(coPresent) {
       const dead = coPresent && !sel && !coPresent.has(r.c);
       const b = el('button', `kdx-chip kdx-part${sel ? ' on-list' : ''}${dead ? ' dead' : ''}`, r.c);
       b.type = 'button';
+      // which one is chosen is STATE, not only a class and a colour (PR #77 007479d0)
+      b.setAttribute('aria-pressed', String(sel));
       b.dataset.kdxPart = r.c; // the journey verifier's seam (c76edfb4's contract)
       if (r.name) b.setAttribute('aria-label', r.name);
       if (dead) b.disabled = true;
@@ -15424,6 +15428,8 @@ function renderGrammar(main) {
     const active = (S.grammarLevel || 'all') === lv;
     const chip = el('button', active ? 'chip wide on-list' : 'chip wide');
     chip.type = 'button';
+    // the level shown is STATE, not only a colour (PR #77 f7cd297c)
+    chip.setAttribute('aria-pressed', String(active));
     chip.dataset.glevel = lv;
     chip.append(el('span', 'big', lv === 'all' ? tx('すべて', 'all') : lv));
     chip.addEventListener('click', () => {
@@ -19596,6 +19602,8 @@ function renderFocus(main) {
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
     b.type = 'button';
+    // the chosen length and mode are STATE, not only a class (PR #77 007479d0)
+    b.setAttribute('aria-pressed', String(S.focusMin === m));
     b.append(el('span', 'focus-chip-n', String(m)));
     b.append(el('span', 'focus-chip-u', tx('分', 'min')));
     b.addEventListener('click', () => {
@@ -19621,6 +19629,7 @@ function renderFocus(main) {
   for (const [id, ja, en, sub] of modeDefs) {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
     b.type = 'button';
+    b.setAttribute('aria-pressed', String(S.focusMode === id));
     b.append(withEn(el('span', 'focus-mode-t', ja), en, 'en-inline'));
     b.append(el('span', 'focus-mode-sub', sub));
     b.addEventListener('click', () => {
