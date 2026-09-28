@@ -713,6 +713,32 @@ PROBES['joyo-marks'] = async () => {
   await context.close();
 };
 
+/* bunsetsu-kanji-numerals — 1b57351a's numeral rule matched only [0-9０-９]. The tokenizer
+ * splits kanji numerals one character a token, so shipped dates still fell apart:
+ * 二〇 | 二 | 六 | 年 | 八 | 月, and 十 | 二 | 月. */
+async function phrasesOf(page, id, file) {
+  const tokens = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, `data/articles/${file}.json`), 'utf8')).tokens;
+  await open(page, '?entry=shelf&ui=bi&dials=0,1,2');
+  await openRow(page, id);
+  const groups = await page.evaluate(() => [...document.querySelectorAll('.reader .bunsetsu')]
+    .map((group) => [...group.querySelectorAll('[data-index]')].map((node) => Number(node.dataset.index))));
+  return groups.map((indexes) => indexes.map((i) => tokens[i]?.s ?? '?').join(''));
+}
+PROBES['kanji-numerals'] = async () => {
+  const { context, page } = await learner();
+  const testimony = await phrasesOf(page, 'bunki-essay-n1-miracle-testimony', 'bunki-essay-n1-miracle-testimony');
+  const crabs = await phrasesOf(page, 'aozora:046605', 'aozora-046605');
+  const near = (phrases, text) => {
+    const at = phrases.findIndex((p) => p.includes(text));
+    return phrases.slice(Math.max(0, at - 1), at + 5).join(' | ');
+  };
+  check('bunsetsu-kanji-numerals · a date in kanji numerals holds together: 二〇二六年 · 八月 · 十二日',
+    ['二〇二六年', '八月', '十二日'].every((p) => testimony.includes(p)), near(testimony, '二〇'));
+  check('bunsetsu-kanji-numerals · 十二月 stays one phrase', crabs.includes('十二月'),
+    crabs.filter((p) => /^[十二月]+$/u.test(p)).slice(0, 6).join(' | '));
+  await context.close();
+};
+
 const PROBE_ORDER = Object.keys(PROBES);
 
 async function main() {
