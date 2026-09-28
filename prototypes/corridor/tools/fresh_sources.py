@@ -931,11 +931,16 @@ def stable_revision(title: str, as_of: datetime) -> dict | None:
     return {"pageid": page["pageid"], "title": page["title"], "revid": rev["revid"], "timestamp": rev["timestamp"]}
 
 
-def wiki_attribution(title: str, revid: int, timestamp: str, excerpt_note: str) -> str:
+def wiki_attribution(title: str, revid: int, timestamp: str, excerpt_note: str,
+                     more: list[tuple[str, int, str]] | tuple = ()) -> str:
+    """CC BY-SA credit for a page revision — and for every other (title, revid,
+    timestamp) in `more` the text also draws from."""
+    pages = [(title, revid, timestamp), *more]
+    named = "、".join(f"「{t}」（版 {r}、{ts[:10]}）" for t, r, ts in pages)
+    history = " 、 ".join(f"https://ja.wikipedia.org/w/index.php?title={urllib.parse.quote(t)}&action=history" for t, _, _ in pages)
     return (
-        f"出典：ウィキペディア日本語版「{title}」（版 {revid}、{timestamp[:10]}）の執筆者、"
-        f"CC BY-SA 4.0（{CC_BY_SA_URL}）。履歴 https://ja.wikipedia.org/w/index.php?title="
-        f"{urllib.parse.quote(title)}&action=history ／ {excerpt_note}ふりがなと辞書リンクを付けて掲載（Bunki）。"
+        f"出典：ウィキペディア日本語版{named}の執筆者、"
+        f"CC BY-SA 4.0（{CC_BY_SA_URL}）。履歴 {history} ／ {excerpt_note}ふりがなと辞書リンクを付けて掲載（Bunki）。"
         "この頁の本文は CC BY-SA 4.0 で再利用できる。"
     )
 
@@ -1043,6 +1048,12 @@ class WikiNewsDigestAdapter:
             return None
         latest = rows[0]
         page = latest["page"]
+        # a week across a month boundary, or a thin week merged into the one
+        # before it, draws on more than one month page: each is credited
+        sources: list[tuple[str, int, str]] = []
+        for b in rows:
+            if (b["page"], b["revid"]) not in [(t, r) for t, r, _ in sources]:
+                sources.append((b["page"], b["revid"], b["timestamp"]))
         title = f"{monday.month}月{monday.day}日〜{sunday.month}月{sunday.day}日のできごと"
         note = "日付節の要約文を週ごとにまとめ、事件・事故・訃報の項目を除き、"
         return Item(
@@ -1055,8 +1066,9 @@ class WikiNewsDigestAdapter:
             published_at=latest["timestamp"],
             fetched_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
             excerpt={"rule": "portal summaries for the week, 事件・事故・訃報 lines left out", "summaries": len(rows)},
-            attribution=wiki_attribution(page, latest["revid"], latest["timestamp"], note),
-            credits={"page": page, "revid": latest["revid"]},
+            attribution=wiki_attribution(page, latest["revid"], latest["timestamp"], note, sources[1:]),
+            credits={"page": page, "revid": latest["revid"],
+                     **({"revisions": [{"page": t, "revid": r} for t, r, _ in sources]} if len(sources) > 1 else {})},
         )
 
 
