@@ -25922,6 +25922,9 @@ function renderRoomError(main, view, error) {
   card.append(retry, home);
   main.append(card);
 }
+/* classes a press FLIPS — left out of the last-resort focus key, or the control could never be
+ * found again by the very press that moved the keyboard */
+const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
   syncSheetActionVisit();
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
@@ -25955,9 +25958,18 @@ function render() {
   const focusKey = (() => {
     const node = document.activeElement;
     if (!node || node === document.body || !$('#app').contains(node)) return null;
-    if (node.id) return `#${CSS.escape(node.id)}`;
+    if (node.id) return { sel: `#${CSS.escape(node.id)}` };
     const action = node.dataset?.action;
-    return action ? `[data-action="${CSS.escape(action)}"]` : null;
+    if (action) return { sel: `[data-action="${CSS.escape(action)}"]` };
+    // Last resort: the filter chips in 字引, 文法 and the dojo lobby name themselves no other
+    // way, so every press dropped the keyboard to <body> (PR #77 1398bc2c). Such a control is
+    // found by its shape, minus the state classes its own press flips, and by its own text
+    // before its place — pressing a 部品 narrows the grid under the very chip pressed.
+    const shape = [...node.classList].filter((name) => !FOCUS_STATE_CLASSES.has(name));
+    if (!shape.length) return null;
+    const sel = shape.map((name) => `.${CSS.escape(name)}`).join('');
+    const ix = [...$('#app').querySelectorAll(sel)].indexOf(node);
+    return ix < 0 ? null : { sel, ix, text: (node.textContent || '').trim().slice(0, 16) };
   })();
   const root = $('#app');
   root.textContent = '';
@@ -26371,7 +26383,9 @@ function render() {
   // focus and must not be overruled, so this only reaches into #app, and it
   // never steals focus from whatever the rebuild legitimately moved it to.
   if (focusKey && document.activeElement === document.body) {
-    const again = $('#app').querySelector(focusKey);
+    const all = focusKey.ix == null ? [] : [...$('#app').querySelectorAll(focusKey.sel)];
+    const again = focusKey.ix == null ? $('#app').querySelector(focusKey.sel)
+      : all.find((node) => (node.textContent || '').trim().slice(0, 16) === focusKey.text) || all[focusKey.ix];
     if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
   }
   lastRenderedView = S.view;
