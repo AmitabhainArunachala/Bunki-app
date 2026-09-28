@@ -1,0 +1,584 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N2",
+  "number": 1,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "最近、私の町の図書館では、電子書籍の貸し出しを始めた。自宅のパソコンやスマートフォンから申し込めば、図書館まで行かなくても本が読めるのだ。（１）、返却の手続きもいらない。期限が来ると、自動的に読めなくなる仕組みになっている。\n　とても便利なサービスだが、（２）。紙の本を手に取りながら、棚の間を歩き回る楽しみもあるからだ。探していた本の隣に並んでいた本に、思いがけず心をひかれることも少なくない。電子書籍では、そうした出会いは（３）。\n　これからは、二つの方法をうまく使い分けていきたいと思う。",
+    "s1": "在宅勤務が始まったころは、通勤しなくていいことがただうれしかった。しかし、半年ほどたつと、仕事の相談をするたびにメールを書かなければならないのが面倒になってきた。隣の席の人に一言聞けば済んだことに、何十分もかかってしまう。在宅勤務の良さを否定するつもりはないが、週に一度でも同僚と顔を合わせる日があれば、仕事はもっと進むのではないかと思う。",
+    "s2": "山田様\n\nご予約いただいた本『身近な植物の図鑑』のご用意ができました。本館カウンターにて、10月20日（金）までにお受け取りください。期限を過ぎますと、次にお待ちの方へお回しいたしますので、ご了承ください。\nなお、本館は10月16日（月）が臨時休館となっております。分館でのお受け取りをご希望の場合は、受け取りを希望される日の前日までに、お電話でお知らせください。\n\n市立中央図書館",
+    "s3": "健康診断の結果を見て驚いた。去年と比べて体重はほとんど変わっていないのに、体脂肪率が上がっていたのだ。医師によると、筋肉が減って、その分、脂肪が増えた可能性があるという。体重計の数字だけを見て安心していた自分が恥ずかしくなった。数字が同じでも、中身まで同じだとは限らないのだ。",
+    "m1": "自転車で通勤するようになって三年になる。きっかけは、単に満員電車が嫌だったからだ。ところが、続けているうちに、思いがけない変化があった。\n　まず、町の見え方が変わった。電車に乗っていたころは、駅と会社を結ぶ線の上しか知らなかった。自転車だと、季節ごとに変わる街路樹の色や、新しくできたパン屋にすぐ気がつく。少し遠回りして、知らない道を通ってみることもある。\n　もう一つは、時間に対する考え方だ。電車は遅れることがあるが、自転車なら到着する時間はほぼ自分で決められる。雨の日は大変だが、自分の力で進んでいるという感覚が、一日の始まりを前向きなものにしてくれる。\n　もちろん、自転車通勤には危険もある。車道を走るときは、いつも以上に周りに注意しなければならない。それでも私は、この小さな旅をしばらく続けるつもりだ。",
+    "m2": "最近、図書館の役割が変わりつつある。以前は本を借りて返す場所というイメージが強かったが、今では、仕事や勉強をしに来る人、友人と話し合いをしに来る人など、利用の目的はさまざまだ。\n　ある町の図書館では、館内の一部を「話してもいいエリア」にした。本を読む人の邪魔にならないよう、場所を分けたのだ。初めは「図書館で話すなんて」という声もあったが、学生のグループ学習や地域の人の集まりに使われるようになり、今では利用者が以前の倍近くになったという。\n　静かに本を読みたい人がいる一方で、人と集まる場所を求める人もいる。どちらか一方に合わせるのではなく、両方の人が気持ちよく過ごせる工夫こそが、これからの図書館に求められているのだろう。",
+    "a": "Ａ\n在宅勤務の最大の利点は、通勤時間がなくなることだ。往復二時間かけて通っていた人なら、その時間を家族と過ごしたり、睡眠に充てたりできる。集中して作業したいときに、周りの話し声に邪魔されることもない。ただ、仕事と生活の区切りがつきにくいという問題はある。始業と終業の時刻をはっきり決めるなど、自分なりのルールを作ることが大切だ。",
+    "b": "Ｂ\n在宅勤務には確かに便利な面がある。しかし、新しく入った社員にとっては、先輩の仕事の仕方をそばで見て学ぶ機会が失われてしまう。質問したいことがあっても、相手の都合がわからず、遠慮してしまう人も多い。在宅勤務を取り入れるなら、少なくとも最初の数か月は出社を中心にするなど、経験の浅い社員への配慮が欠かせない。",
+    "c": "毎年、健康診断の結果が届くと、多くの人はまず「異常なし」という文字を探す。そして、その言葉を見つけると安心して、結果の用紙を引き出しにしまってしまう。私もかつてはそうだった。\n　しかし、「異常なし」は「健康である」という意味ではない。健康診断の基準値は、多くの人のデータをもとに決められた範囲にすぎない。範囲の中に入っていても、去年より数値が大きく変わっていれば、体の中で何かが起きているかもしれない。逆に、基準値から少し外れていても、その人にとっては普通の状態だということもある。\n　大切なのは、一回の結果を見て喜んだり落ち込んだりすることではなく、数年分の結果を並べて、変化の方向を見ることだ。数値が少しずつ悪くなっているなら、たとえ基準値の中であっても、生活を見直すきっかけにすべきだろう。\n　健康診断は、合格か不合格かを決める試験ではない。自分の体の変化を知るための記録である。そう考えれば、結果の用紙の読み方も変わってくるはずだ。",
+    "info": "自転車通勤制度のご案内（総務部）\n\n来月から、自転車通勤を希望する社員のための制度を始めます。\n\n■対象者\n・自宅から会社までの片道の距離が2km以上15km以下の社員\n\n■申請に必要なもの\n・自転車通勤申請書\n・自転車保険（対人賠償1億円以上）に加入していることがわかる書類\n\n■手当\n・片道の距離が2km以上5km未満：月2,000円\n・片道の距離が5km以上15km以下：月4,000円\n※電車・バスの定期代と両方を受け取ることはできません。\n\n■駐輪場\n・会社の駐輪場は30台分です。申請が多い場合は、距離が長い人を優先します。\n\n■申請期限\n・毎月20日までに申請すれば、翌月1日から利用できます。\n\n■その他\n・雨の日などに電車を利用した場合は、その日の交通費を請求できます（月5日まで）。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n在宅勤務を【継続】するかどうか、来月までに決めることになった。",
+      "options": [
+        "けいぞく",
+        "けいそく",
+        "げいぞく",
+        "けいしょく"
+      ],
+      "answer": 0,
+      "rationale": "継続は「けいぞく」と読む。「続」は「ぞく」と濁る。\nThe word 継続 (continuation) is read keizoku, with a voiced zoku.",
+      "target": "継続"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n図書館で借りた本の貸出期間を、一週間【延長】してもらった。",
+      "options": [
+        "えんちょう",
+        "えんちゅう",
+        "えいちょう",
+        "えんじょう"
+      ],
+      "answer": 0,
+      "rationale": "延長は「えんちょう」と読み、期間などを延ばすことを表す。\nThe word 延長 (extension) is read enchō.",
+      "target": "延長"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n医師の【診断】によると、足の骨には異常がないそうだ。",
+      "options": [
+        "しんたん",
+        "じんだん",
+        "しんだん",
+        "しんでん"
+      ],
+      "answer": 2,
+      "rationale": "診断は「しんだん」と読む。「断」は「だん」と濁る。\nThe word 診断 (diagnosis) is read shindan.",
+      "target": "診断"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n在宅勤務を始める前に、会社と新しい【けいやく】を結んだ。",
+      "options": [
+        "契訳",
+        "係約",
+        "契約",
+        "契絡"
+      ],
+      "answer": 2,
+      "rationale": "「けいやく」は「契約」と書く。約束を取り決めることを表す。\nKeiyaku (contract) is written 契約.",
+      "target": "契約"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n駅前の自転車店は、毎週水曜日が【ていきゅうび】だ。",
+      "options": [
+        "定休日",
+        "停休日",
+        "定久日",
+        "低休日"
+      ],
+      "answer": 0,
+      "rationale": "店が決まって休む日は「定休日」と書く。「停」は止まるという意味で合わない。\nA shop's regular day off is written 定休日.",
+      "target": "定休日"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "word-formation",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n在宅勤務を始めてから、食事の時間が（　）規則になりがちだ。",
+      "options": [
+        "反",
+        "不",
+        "非",
+        "未"
+      ],
+      "answer": 1,
+      "rationale": "「不規則」で、決まりがなく乱れている様子を表す。「反規則」「非規則」「未規則」とは言わない。\nFukisoku (irregular) takes the prefix 不.",
+      "target": "不規則"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "word-formation",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n最近、寝不足（　）で、仕事中に何度もあくびが出る。",
+      "options": [
+        "風",
+        "流",
+        "気味",
+        "式"
+      ],
+      "answer": 2,
+      "rationale": "名詞に「気味」がつくと、少しその傾向があることを表す。「寝不足気味」は自然な言い方だ。\nAdding 気味 to a noun means having a slight touch of that condition.",
+      "target": "～気味"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n自転車は、定期的に（　）をすれば、長く乗ることができる。",
+      "options": [
+        "手配",
+        "手当て",
+        "手入れ",
+        "手続き"
+      ],
+      "answer": 2,
+      "rationale": "物がよい状態を保てるように世話をすることを「手入れ」という。\nTeire means maintenance, looking after something to keep it in good condition.",
+      "target": "手入れ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n健康診断の前日は、夜9時以降の食事を（　）ように言われた。",
+      "options": [
+        "構える",
+        "備える",
+        "蓄える",
+        "控える"
+      ],
+      "answer": 3,
+      "rationale": "「食事を控える」は、食べるのを我慢してやめておくという意味だ。\nHikaeru here means to refrain from eating.",
+      "target": "控える"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n在宅勤務が続き、仕事と私生活の（　）があいまいになってきた。",
+      "options": [
+        "境界",
+        "範囲",
+        "限界",
+        "分野"
+      ],
+      "answer": 0,
+      "rationale": "二つのものを分ける区切りを「境界」という。仕事と私生活の区切りがはっきりしなくなったという意味だ。\nKyōkai is the boundary that divides two things.",
+      "target": "境界"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n課長の説明を聞いても、新しい制度のことが【さっぱり】わからなかった。",
+      "options": [
+        "少しだけ",
+        "全く",
+        "すぐには",
+        "思ったより"
+      ],
+      "answer": 1,
+      "rationale": "否定の文で使う「さっぱり」は、「全く」と同じ意味だ。\nIn negative sentences, sappari means not at all, like mattaku.",
+      "target": "さっぱり"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n図書館の会議室を使いたい場合は、【あらかじめ】予約してください。",
+      "options": [
+        "必ず",
+        "直接",
+        "当日に",
+        "前もって"
+      ],
+      "answer": 3,
+      "rationale": "「あらかじめ」は、事が始まる前にという意味で、「前もって」と同じだ。\nArakajime means beforehand, the same as maemotte.",
+      "target": "あらかじめ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n駅前の駐輪場は、朝早く行っても満車のことが【たびたび】ある。",
+      "options": [
+        "何度も",
+        "たまに",
+        "急に",
+        "必ず"
+      ],
+      "answer": 0,
+      "rationale": "「たびたび」は同じことが何回も起こる様子で、「何度も」と同じ意味だ。\nTabitabi means again and again, the same as nando mo.",
+      "target": "たびたび"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【手軽】",
+      "options": [
+        "彼は手軽な性格で、誰とでもすぐに仲良くなる。",
+        "この料理は材料が少なく、忙しい日でも手軽に作れる。",
+        "荷物が手軽になったので、階段も楽に上れた。",
+        "手軽な気持ちで引き受けたら、思ったより大変な仕事だった。"
+      ],
+      "answer": 1,
+      "rationale": "「手軽」は手間や費用がかからず簡単な様子を表す。性格や気持ちには「気軽」を使う。\nTegaru means easy and simple to do; for personality or attitude, kigaru is used.",
+      "target": "手軽"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【見直す】",
+      "options": [
+        "友人を駅まで見直してから、家に帰った。",
+        "久しぶりに会った先生は、昔と少しも見直していなかった。",
+        "窓から町を見直すと、きれいな夜景が広がっていた。",
+        "社員の意見をもとに、在宅勤務の制度を見直すことにした。"
+      ],
+      "answer": 3,
+      "rationale": "「見直す」は、もう一度よく調べて改めることを表す。1は「見送る」、3は「見下ろす」が自然だ。\nMinaosu means to look again at something and revise it.",
+      "target": "見直す"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n部屋の電気がついているから、兄はもう帰っている（　）。",
+      "options": [
+        "に違いない",
+        "わけがない",
+        "どころではない",
+        "ばかりだ"
+      ],
+      "answer": 0,
+      "rationale": "電気がついているという根拠から強く推測しているので、「に違いない」が合う。\nNi chigai nai expresses a confident guess based on evidence.",
+      "subject": "grammar:nichigainai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n在宅勤務だ（　）、一日中パジャマで過ごしていいわけではない。",
+      "options": [
+        "からには",
+        "からこそ",
+        "からといって",
+        "からして"
+      ],
+      "answer": 2,
+      "rationale": "「からといって〜わけではない」で、その理由だけで当然そうなるとは言えないことを表す。\nKara to itte ... wake de wa nai means just because ... does not mean.",
+      "subject": "grammar:karatoitte"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n図書館に本を返しに行った（　）、近くの郵便局で切手を買った。",
+      "options": [
+        "とたんに",
+        "うちに",
+        "最中に",
+        "ついでに"
+      ],
+      "answer": 3,
+      "rationale": "本を返しに行く機会を利用して別の用事もしたので、「ついでに」が合う。\nTsuide ni means doing something extra while one is out for another purpose.",
+      "subject": "grammar:tsuideni"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n在宅勤務で運動量が減った（　）、少し体重が増えてしまった。",
+      "options": [
+        "せいか",
+        "くせに",
+        "からには",
+        "ものの"
+      ],
+      "answer": 0,
+      "rationale": "はっきりとは言えないが原因だと考えられることを表す「せいか」が合う。\nSei ka marks a likely but uncertain cause, usually of a bad result.",
+      "subject": "grammar:seika"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n健康診断の結果が悪かったので、このまま何もしない（　）。",
+      "options": [
+        "ことはない",
+        "わけにはいかない",
+        "ものだ",
+        "にすぎない"
+      ],
+      "answer": 1,
+      "rationale": "事情があって、そうすることはできないという意味の「わけにはいかない」が合う。\nWake ni wa ikanai means one cannot reasonably do something.",
+      "subject": "grammar:wakeniwaikanai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの図書館は、年齢（　）誰でも利用することができる。",
+      "options": [
+        "に限って",
+        "をめぐって",
+        "に沿って",
+        "を問わず"
+      ],
+      "answer": 3,
+      "rationale": "年齢に関係なくという意味の「を問わず」が合う。\nO towazu means regardless of.",
+      "subject": "grammar:wotowazu"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n姉が在宅勤務を選んだのは、＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ からだ。",
+      "options": [
+        "子どものそばに",
+        "通勤が大変",
+        "いたかった",
+        "というより"
+      ],
+      "answer": 3,
+      "rationale": "正しい順は「通勤が大変・というより・子どものそばに・いたかった」で、★には「というより」が入る。\nThe order is tsūkin ga taihen / to iu yori / kodomo no soba ni / itakatta."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n在宅勤務の日は、＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ ようにしている。",
+      "options": [
+        "散歩して",
+        "変える",
+        "気分を",
+        "昼休みに近所を"
+      ],
+      "answer": 2,
+      "rationale": "正しい順は「昼休みに近所を・散歩して・気分を・変える」で、★には「気分を」が入る。\nThe order is hiruyasumi ni kinjo o / sanpo shite / kibun o / kaeru."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n健康診断を＿＿＿ ＿＿＿ ＿＿＿ ＿★＿ おいたほうがいい。",
+      "options": [
+        "なら",
+        "入れて",
+        "受ける",
+        "早めに予約を"
+      ],
+      "answer": 1,
+      "rationale": "正しい順は「受ける・なら・早めに予約を・入れて」で、★には「入れて」が入る。\nThe order is ukeru / nara / hayame ni yoyaku o / irete."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "ところが",
+        "それなら",
+        "しかも",
+        "つまり"
+      ],
+      "answer": 2,
+      "rationale": "図書館に行かなくてよいという便利な点に、さらに別の便利な点を付け加えているので「しかも」が合う。\nShikamo adds a further advantage to the one just mentioned.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "私はもう図書館には行かなくなった",
+        "利用する人はまだ少ないようだ",
+        "私は図書館に通うのをやめるつもりはない",
+        "紙の本はいずれなくなるだろう"
+      ],
+      "answer": 2,
+      "rationale": "後の文で、棚の間を歩き回る楽しみを理由として挙げているので、図書館に通い続けるという内容が合う。\nThe next sentence gives a reason for continuing to visit the library.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "生まれやすいに違いない",
+        "生まれにくいのではないだろうか",
+        "生まれるはずがなかった",
+        "生まれたことがある"
+      ],
+      "answer": 1,
+      "rationale": "棚の間で偶然本に出会う楽しみは電子書籍では得にくいと考えているので、「生まれにくい」が合う。\nThe writer suggests such chance encounters are less likely with e-books.",
+      "passage": "tg"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "筆者の考えに合うのはどれか。",
+      "options": [
+        "在宅勤務を続けながら、出社する日も作るといい。",
+        "在宅勤務はやめて、毎日出社したほうがいい。",
+        "仕事の相談は、メールでするほうが確実だ。",
+        "通勤にかかっていた時間は、仕事の相談に使うべきだ。"
+      ],
+      "answer": 0,
+      "rationale": "在宅勤務の良さは否定せず、週に一度でも顔を合わせる日があればよいと述べている。\nThe writer keeps remote work but wants some days together in the office.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "このメールを受け取った人が分館で本を受け取りたい場合、どうしなければならないか。",
+      "options": [
+        "10月16日に本館へ行って手続きをする。",
+        "受け取りを希望する日の前日までに、電話で知らせる。",
+        "次に予約している人に連絡して、順番を代わってもらう。",
+        "本館のカウンターで、分館に本を送るよう直接頼む。"
+      ],
+      "answer": 1,
+      "rationale": "分館で受け取りたい場合は、希望する日の前日までに電話で知らせるように書かれている。\nFor pickup at the branch, the reader must phone by the day before.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "筆者が恥ずかしくなったのはなぜか。",
+      "options": [
+        "去年より体重が大きく増えていたから",
+        "医師の説明がよく理解できなかったから",
+        "体重計の数字だけを見て安心していたから",
+        "体脂肪率という言葉を知らなかったから"
+      ],
+      "answer": 2,
+      "rationale": "体重が変わらないことだけで安心し、体の中身の変化に気づかなかったことを恥じている。\nThe writer was embarrassed at having trusted only the number on the scale.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "筆者が自転車通勤を始めたきっかけは何か。",
+      "options": [
+        "満員電車に乗るのが嫌だったから",
+        "健康のために体を動かしたかったから",
+        "町の新しい店を見つけたかったから",
+        "電車がよく遅れていたから"
+      ],
+      "answer": 0,
+      "rationale": "本文に「きっかけは、単に満員電車が嫌だったからだ」とある。\nThe text says the trigger was simply disliking crowded trains.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "筆者によると、自転車通勤を続けて、どのような変化があったか。",
+      "options": [
+        "通勤にかかる時間が短くなった。",
+        "雨の日の通勤が楽しくなった。",
+        "町の小さな変化に気づくようになった。",
+        "車道を走るのが怖くなくなった。"
+      ],
+      "answer": 2,
+      "rationale": "街路樹の色や新しいパン屋にすぐ気がつくようになったと述べている。\nThe writer now notices small changes in the town.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "「話してもいいエリア」について、本文の内容と合うものはどれか。",
+      "options": [
+        "初めから多くの利用者に歓迎された。",
+        "学生のグループだけが使うことができる。",
+        "本を読む人の邪魔にならないよう、場所が分けられている。",
+        "できたあと、図書館の利用者が以前の半分に減った。"
+      ],
+      "answer": 2,
+      "rationale": "本を読む人の邪魔にならないよう、場所を分けたと書かれている。\nThe area was set apart so that it would not disturb people reading.",
+      "passage": "m2"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "筆者の考えに最も近いものはどれか。",
+      "options": [
+        "図書館は、静かに本を読むための場所であり続けるべきだ。",
+        "図書館は、人が集まって話す場所に変わるべきだ。",
+        "図書館は、利用者の数を増やすことを第一に考えるべきだ。",
+        "図書館には、目的の違う人がともに気持ちよく過ごせる工夫が必要だ。"
+      ],
+      "answer": 3,
+      "rationale": "最後の段落で、両方の人が気持ちよく過ごせる工夫が求められていると述べている。\nThe writer calls for ways to let both kinds of users feel comfortable.",
+      "passage": "m2"
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "prompt": "AとBのどちらの文章でも述べられていることは何か。",
+      "options": [
+        "在宅勤務には便利な点があること",
+        "在宅勤務をすると睡眠時間が増えること",
+        "新しい社員が学ぶ機会が減ること",
+        "仕事と生活の区切りをつけるのが難しいこと"
+      ],
+      "answer": 0,
+      "rationale": "Aは通勤時間がなくなる利点を挙げ、Bも「確かに便利な面がある」と認めている。\nBoth A and B acknowledge that remote work has convenient aspects.",
+      "passages": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "prompt": "在宅勤務の課題について、AとBはどのように述べているか。",
+      "options": [
+        "AもBも、在宅勤務はやめたほうがいいと述べている。",
+        "Aは自分なりのルールを作ることを、Bは経験の浅い社員への配慮を求めている。",
+        "Aは通勤の大変さを、Bは質問のしやすさを問題にしている。",
+        "Aは課題はないと述べ、Bは課題が多いと述べている。"
+      ],
+      "answer": 1,
+      "rationale": "Aは始業・終業時刻などのルール作りが大切だとし、Bは新しい社員への配慮が欠かせないとしている。\nA asks for personal rules, while B asks for consideration toward inexperienced staff.",
+      "passages": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "prompt": "筆者によると、「異常なし」という結果はどのようなことを示しているか。",
+      "options": [
+        "数値が基準値の範囲に入っていること",
+        "その人が健康であること",
+        "去年の結果と比べる必要がないこと",
+        "生活を見直す必要がないこと"
+      ],
+      "answer": 0,
+      "rationale": "基準値は多くの人のデータから決めた範囲にすぎず、「異常なし」は「健康である」という意味ではないと述べている。\nThe writer says no abnormality only means the values fall within a reference range.",
+      "passage": "c"
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "prompt": "筆者が最も言いたいことは何か。",
+      "options": [
+        "健康診断の基準値は、もっと厳しくするべきだ。",
+        "健康診断は、毎年受ける必要はない。",
+        "基準値から外れた人は、すぐに医師に相談するべきだ。",
+        "健康診断の結果は、体の変化を知る記録として生かすべきだ。"
+      ],
+      "answer": 3,
+      "rationale": "最後の段落で、健康診断は自分の体の変化を知るための記録だと述べている。\nThe main point is to use checkup results as a record of how one's body changes.",
+      "passage": "c"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "リンさんは会社まで片道8kmで、今は電車の定期代を受け取っている。自転車通勤を始めた場合、手当について正しいものはどれか。",
+      "options": [
+        "定期代の代わりに、月2,000円の手当を受け取る。",
+        "月4,000円の手当と、今までどおりの定期代を受け取る。",
+        "定期代の代わりに、月4,000円の手当を受け取る。",
+        "定期代に加えて、月2,000円の手当を受け取る。"
+      ],
+      "answer": 2,
+      "rationale": "片道8kmは月4,000円の区分に当たり、定期代と両方を受け取ることはできない。\nEight kilometres falls in the 4,000-yen band, and the commuter pass cannot also be paid.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "山本さんは会社まで片道1.5kmで、自転車保険にも入っている。10月10日に申請書を出した場合、どうなるか。",
+      "options": [
+        "11月1日から利用でき、月2,000円の手当を受け取る。",
+        "駐輪場に空きがあれば、11月1日から利用できる。",
+        "距離が条件に合わないため、この制度は利用できない。",
+        "12月1日から利用できるが、手当は受け取れない。"
+      ],
+      "answer": 2,
+      "rationale": "対象は片道2km以上の社員なので、1.5kmの山本さんはこの制度を利用できない。\nOnly employees living at least 2 km away qualify, so 1.5 km does not.",
+      "passage": "info"
+    }
+  ]
+}
