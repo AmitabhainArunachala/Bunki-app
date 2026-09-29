@@ -13,6 +13,9 @@
  *   S2 first story      — the first shelf card's headline is inside 390×844 and not covered.
  *   S3 one count        — every number the unfiltered shelf states about its size is the same
  *                         number, and it equals the stories on the shelf (grid + today's band).
+ *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
+ *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
+ *                         level colour hook and a count of its tests (steps 3–4).
  *   A1 no F1            — with a stored F1 preference and the listen control pressed where one
  *                         exists, no F1 clip is requested and no narration manifest naming F1 loads.
  *
@@ -287,6 +290,27 @@ try {
       return probe;
     });
 
+    await run('J1-jlpt-room-wording', DESK, async (page) => {
+      await open(page);
+      await page.evaluate(() => { const door = document.getElementById('mock-link'); door.closest('details')?.setAttribute('open', ''); door.click(); });
+      await page.waitForSelector('[data-exam-start]');
+      const room = await page.evaluate(() => ({
+        text: document.querySelector('#app main').innerText,
+        chips: document.querySelectorAll('#app main .status-chip').length,
+        levels: [...document.querySelectorAll('[data-exam-level]')].map((n) => ({ level: n.dataset.level || null, tests: n.querySelector('.exam-level-tests')?.textContent || '' })),
+      }));
+      await page.evaluate(() => document.querySelector('[data-exam-start]').click());
+      await page.waitForSelector('.exam-confirm');
+      await page.locator('.exam-confirm button', { hasText: /study/i }).first().click();
+      await page.waitForSelector('.exam-paper');
+      const question = await page.evaluate(() => document.querySelector('#app main').innerText);
+      const leaks = [room.text, question].flatMap((t) => t.match(/.{0,20}(awaiting John|machine-checked).{0,20}/giu) || []);
+      assert.equal(leaks.length, 0, `diagnostic wording: ${leaks.join(' | ')}`);
+      assert(room.chips > 0, 'no 未確認 chip on unreviewed tests');
+      assert(room.levels.length === 5 && room.levels.every((l) => l.level && /\d/u.test(l.tests)), `level cards: ${JSON.stringify(room.levels)}`);
+      return { chips: room.chips, levels: room.levels };
+    });
+
     await run('A1-no-f1-audio', DESK, async (page) => {
       const requests = [];
       page.on('request', (r) => requests.push(r.url()));
@@ -317,7 +341,7 @@ try {
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
     scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording and first story; no F1 audio',
     results,
-    passed: results.length === engines.length * 10 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 11 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

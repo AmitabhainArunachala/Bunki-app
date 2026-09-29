@@ -61,6 +61,18 @@ export function createAssessmentView(host) {
   const imageUrls = new Map();
   let confirmation = null;
   const tx = (ja, en) => host.english() ? en : ja;
+  // 未確認 — one quiet chip where no person has reviewed the questions yet, its reason in the
+  // tooltip (and, with withReason, beside it). The review label stays in the record, not on screen.
+  const reviewMark = (label, withReason = false, className = 'exam-machine-label') => {
+    const mark = node('p', className);
+    const reason = tx('AIが作成・検証した問題です。まだ人は確認していません。', 'Written and checked by AI models; not yet reviewed by a person.');
+    const chip = node('span', 'status-chip', '未確認');
+    chip.title = reason; chip.setAttribute('aria-label', `未確認 — ${reason}`);
+    mark.append(chip);
+    if (withReason) mark.append(node('span', 'exam-review-reason', tx('人による確認の前', 'not yet reviewed by a person')));
+    mark.dataset.reviewLabel = label;
+    return mark;
+  };
   const titleOf = entry => host.english() ? entry.titleEn : entry.titleJa;
   const hasListening = entry => Number(entry.skillCounts?.listening) > 0;
   const refresh = () => host.render();
@@ -198,7 +210,7 @@ export function createAssessmentView(host) {
     if (entry?.review?.status === 'machine-checked') {
       const check = entry.machineCheck || {};
       const author = familyName(check.authorFamily || ''), verifiers = (check.verifierFamilies || []).map(familyName);
-      details.append(node('p', 'exam-machine-label', entry.review.label));
+      details.append(reviewMark(entry.review.label, true));
       details.append(node('p', '', tx(
         `作成：${author}（AI）。検証：${verifiers.join('・')}。どのモデルも答えを見ずに全問を解き、全員が同じ答えを選んで不備を指摘しなかった問題だけを残しています。まだ人による確認はしていません。JLPT公式問題ではありません。`,
         `Written by ${author} (AI). Checked by ${verifiers.join(', ')}: each model solved every question without seeing the answer, and only questions where all of them chose the same answer and flagged no problem were kept. Not yet reviewed by a person. Not an official JLPT paper.`)));
@@ -242,7 +254,7 @@ export function createAssessmentView(host) {
       const door = button(host.english() ? (set.title.en || set.title.ja) : set.title.ja, null, () => host.startOlder(set.setId), 'entry-row exam-older-set');
       door.dataset.legacySet = set.setId;
       door.append(node('span', 'exam-older-meta', tx(`${set.items}問`, `${set.items} questions`)));
-      if (!set.approved) door.append(node('span', 'mock-pending', '検収前'));
+      if (!set.approved) door.append(node('span', 'status-chip', '未確認'));
       door.disabled = !!host.olderSetLoading?.(set.setId);
       block.append(door);
       if (host.olderSetFailed?.(set.setId)) {
@@ -258,9 +270,27 @@ export function createAssessmentView(host) {
     main.append(heading);
     main.append(node('p', 'exam-intro', tx('級と長さを選んで、今できることを確かめよう。', 'Choose your level and how much time you have.')));
     const levels = node('div', 'exam-levels'); levels.setAttribute('role', 'group'); levels.setAttribute('aria-label', tx('級', 'Level'));
+    // each level is a card in its own colour: how many tests it holds, how many you finished, and
+    // your last score there (accuracy on that test, never an official JLPT score)
+    const library = host.library(), taken = library?.attempts || [];
+    const trackOf = attempt => library?.forms.find(row => row.sha256 === attempt.form.sha256)?.exam.track;
     for (const value of ['N5', 'N4', 'N3', 'N2', 'N1']) {
-      const control = button(value, null, () => { level = value; host.rememberLevel?.(value); refresh(); });
-      control.setAttribute('aria-pressed', String(value === level)); control.dataset.examLevel = value; levels.append(control);
+      const control = button('', null, () => { level = value; host.rememberLevel?.(value); refresh(); }, 'chip exam-level-card');
+      control.setAttribute('aria-pressed', String(value === level)); control.dataset.examLevel = value; control.dataset.level = value;
+      const tests = catalog ? catalog.entries.filter(entry => entry.level === value && entry.availability.ready).length : null;
+      const mine = taken.filter(attempt => trackOf(attempt) === value);
+      const finished = mine.filter(attempt => attempt.status !== 'in-progress' && attempt.status !== 'abandoned');
+      const last = finished.at(-1) && host.selection(finished.at(-1).attemptId)?.score;
+      control.dataset.last = last ? 'score' : mine.some(attempt => attempt.status === 'in-progress') ? 'in-progress' : 'none';
+      const progress = node('span', 'exam-level-progress');
+      progress.style.setProperty('--done', String(tests ? Math.min(1, new Set(finished.map(row => row.form.sha256)).size / tests) : 0));
+      control.append(node('span', 'exam-level-name', value),
+        node('span', 'exam-level-tests', tests === null ? '' : tx(`テスト ${tests} 本`, `${tests} ${tests === 1 ? 'test' : 'tests'}`)),
+        node('span', 'exam-level-last', last ? tx(`前回 ${last.correct}/${last.totalItems}`, `last ${last.correct}/${last.totalItems}`)
+          : mine.some(attempt => attempt.status === 'in-progress') ? tx('途中のテストあり', 'one in progress') : tx('まだ受けていません', 'not taken yet')),
+        progress);
+      control.setAttribute('aria-label', [value, control.querySelector('.exam-level-tests').textContent, control.querySelector('.exam-level-last').textContent].filter(Boolean).join(' · '));
+      levels.append(control);
     }
     main.append(levels);
     const lengths = node('div', 'exam-lengths'); lengths.setAttribute('role', 'group'); lengths.setAttribute('aria-label', tx('長さ', 'Test length'));
@@ -281,7 +311,7 @@ export function createAssessmentView(host) {
     if (written.length) {
       const group = node('section', 'exam-written'); group.dataset.examWritten = level;
       group.append(node('h2', 'exam-section-heading', tx('筆記テスト（文字・語彙・文法・読解）', 'Written tests (vocabulary, grammar, reading)')));
-      group.append(node('p', 'exam-machine-label', written[0].review.label));
+      group.append(reviewMark(written[0].review.label, true));
       group.append(node('p', 'exam-status', tx('オリジナル問題です。聴解はありません。出典と確認方法は各テストの下にあります。',
         'Original questions, no listening. Each test lists its sources and how it was checked.')));
       for (const entry of written) renderCard(group, entry);
@@ -305,7 +335,7 @@ export function createAssessmentView(host) {
     const card = node('article', 'exam-form'); card.dataset.examForm = entry.id;
     card.append(node('h2', '', titleOf(entry)), node('p', 'exam-form-meta',
       tx(`${entry.questionCount}問 · 約${entry.durationMinutes}分`, `${entry.questionCount} questions · about ${entry.durationMinutes} min`)));
-    if (entry.review?.status === 'machine-checked') card.append(node('p', 'mock-pending exam-machine-label', entry.review.label));
+    if (entry.review?.status === 'machine-checked') card.append(reviewMark(entry.review.label));
     card.append(node('p', 'exam-skills', Object.entries(SKILLS)
       .filter(([skill]) => Number(entry.skillCounts?.[skill]) > 0)
       .map(([, labels]) => tx(...labels)).join(' · ')));
@@ -327,7 +357,7 @@ export function createAssessmentView(host) {
     section.firstChild.id = 'exam-confirm-title';
     if (value.kind === 'start') {
       const writtenSection = ['section', 'written'].includes(value.entry.mode), audio = hasListening(value.entry);
-      if (value.entry.review?.status === 'machine-checked') section.append(node('p', 'mock-pending exam-machine-label', value.entry.review.label));
+      if (value.entry.review?.status === 'machine-checked') section.append(reviewMark(value.entry.review.label, true));
       if (writtenSection) section.append(node('p', 'exam-scope-note', tx(
         `${value.entry.questionCount}問・${value.entry.durationMinutes}分の短縮練習です。JLPT本試験の全問題・全科目ではありません。${audio ? '' : '聴解は含みません。'}`,
         `${value.entry.questionCount} questions · ${value.entry.durationMinutes} minutes: a shorter practice set, not a complete JLPT examination.${audio ? '' : ' Listening is not included.'}`)));
@@ -543,12 +573,12 @@ export function createAssessmentView(host) {
     const label = selected && host.machineCheckLabel?.(selected);
     if (!label) return [];
     const check = host.itemCheck?.(selected, itemId);
-    if (!check) { host.ensureDelivery?.(selected); return [node('p', 'exam-machine-label', label)]; }
+    if (!check) { host.ensureDelivery?.(selected); return [reviewMark(label)]; }
     const line = node('p', 'exam-item-provenance', tx(
       `この問題：作成 ${familyName(check.author)}・検証 ${check.verifiers.join('／')}（${check.agreed}/${check.verifiers.length} 一致）`,
       `This question: written by ${familyName(check.author)}, checked by ${check.verifiers.join(', ')} (${check.agreed}/${check.verifiers.length} agreed)`));
     line.dataset.itemProvenance = itemId;
-    return [node('p', 'exam-machine-label', label), line];
+    return [reviewMark(label), line];
   }
   function closeWhy() { whyOpenItemId = null; focusAfterRender = '#exam-why'; refresh(); }
   async function openWhy(itemId) {
@@ -618,7 +648,7 @@ export function createAssessmentView(host) {
       `${form.items.length}問の短縮練習 · 本試験の全科目ではありません`,
       `${form.items.length}-question practice set · not a complete JLPT examination`)));
     const machineLabel = host.machineCheckLabel?.(selected);
-    if (machineLabel) main.append(node('p', 'mock-pending exam-machine-label', machineLabel));
+    if (machineLabel) main.append(reviewMark(machineLabel));
     if (!block) {
       const pending = attempt.blocks.find(row => row.status === 'pending');
       main.append(node('p', '', tx('このパートは終了しました。準備ができたら次のパートへ進んでください。',
@@ -767,7 +797,7 @@ export function createAssessmentView(host) {
     const assistedItem = itemId => !!host.assistance?.(selected, itemId) || !!attempt.answers.find(row => row.item.id === itemId)?.assistance;
     main.append(node('h1', 'view-title', stopped ? tx('中断した練習', 'Attempt stopped') : tx('結果', 'Your results')));
     const machineLabel = host.machineCheckLabel?.(selected);
-    if (machineLabel) main.append(node('p', 'mock-pending exam-machine-label', machineLabel));
+    if (machineLabel) main.append(reviewMark(machineLabel, true));
     if (stopped) main.append(node('p', '', tx('回答を保存しました。中断した結果は弱点の判定に使いません。', 'Your answers are saved. A stopped test won’t be treated as evidence of weaknesses.')));
     else {
       // an assisted answer was committed before its explanation opened; the headline says how many

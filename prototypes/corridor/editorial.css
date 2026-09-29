@@ -2037,3 +2037,193 @@ body .reference-library .reference-level-unknown { min-height: 0; }
   body .reference-library .reference-level-name { font-size: 28px; }
   .reference-explainer > p { padding-inline: var(--s2); }
 }
+
+/* ------------------------------------------------------------------ step 4a
+   The JLPT room: a hall of tests on the washi ground. Five level cards in the
+   level colours carry how many tests each level holds, the last score there
+   and a progress line; the lengths are one segmented control; each test is a
+   raised tile; unreviewed tests wear one 未確認 chip. */
+:root html[data-room='jlpt'] body:not(.zen) #app > main, html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 1040px;
+  margin: 0 auto var(--s8);
+  padding: var(--s3) 0 var(--s8);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+html[data-room='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(32px, 4vw, 44px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+html[data-room='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 16px/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
+html[data-room='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: 16px/1.6 var(--sans); color: var(--text-2); }
+
+/* the level cards */
+html[data-room='jlpt'] .exam-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); margin: 0 0 var(--s3); }
+html[data-room='jlpt'] .exam-levels .chip.exam-level-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 4px;
+  min-width: 0;
+  min-height: 132px;
+  padding: var(--s2) var(--s2) 20px;
+  border: 1px solid color-mix(in srgb, var(--lv) 28%, var(--raised-edge));
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 8%, var(--raised)) 0%, var(--raised) 75%);
+  box-shadow: var(--raised-shadow);
+  color: var(--text);
+  text-align: start;
+  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+}
+@media (hover: hover) { html[data-room='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+html[data-room='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
+html[data-room='jlpt'] .exam-level-tests { font: 600 14px/1.4 var(--sans); color: var(--text); }
+html[data-room='jlpt'] .exam-level-last { font: 13px/1.4 var(--sans); color: var(--text-2); font-variant-numeric: tabular-nums; }
+html[data-room='jlpt'] .exam-level-progress {
+  position: absolute;
+  left: var(--s2);
+  right: var(--s2);
+  bottom: 12px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--lv) 16%, transparent);
+}
+html[data-room='jlpt'] .exam-level-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--done, 0) * 100%);
+  background: var(--lv);
+}
+html[data-room='jlpt'] .exam-levels .chip.exam-level-card[aria-pressed='true'] {
+  border-color: var(--lv);
+  background: var(--lv);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--lv) 30%, transparent), 0 16px 32px -16px color-mix(in srgb, var(--lv) 70%, transparent);
+  color: #fbf7ee;
+}
+html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: #fbf7ee; }
+html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress { background: rgb(255 255 255 / 26%); }
+html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: #fbf7ee; }
+
+/* the lengths: one segmented control */
+html[data-room='jlpt'] .exam-lengths {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  width: min(640px, 100%);
+  margin: 0 0 var(--s4);
+  padding: 4px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+}
+html[data-room='jlpt'] .exam-length {
+  display: grid;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-2);
+  font: 700 16px/1.3 var(--sans);
+  text-align: center;
+}
+html[data-room='jlpt'] .exam-length-time { margin: 0; font: 12px/1.3 var(--sans); letter-spacing: 0.01em; color: inherit; opacity: 0.9; }
+html[data-room='jlpt'] .exam-length[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
+
+/* the guided session: the recommended first step */
+html[data-room='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); border: 0; }
+html[data-room='jlpt'] .study-hall.guided-entry .study-door {
+  padding: 20px var(--s3);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+@media (hover: hover) { html[data-room='jlpt'] .study-hall.guided-entry .study-door:hover { box-shadow: var(--raised-shadow-hover); background: var(--raised); } }
+
+/* sections and test tiles */
+html[data-room='jlpt'] h2.exam-section-heading {
+  margin: var(--s5) 0 var(--s1);
+  padding-top: var(--s2);
+  border-top: 2px solid var(--rule-strong);
+  font: 800 24px/1.35 var(--display);
+  color: var(--text);
+}
+html[data-room='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
+html[data-room='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
+html[data-room='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
+html[data-room='jlpt'] .exam-machine-label { display: flex; align-items: center; gap: var(--s1); margin: 0; font: 13px/1.5 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .exam-written > .exam-status { margin: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .assessment-room .exam-form {
+  display: grid;
+  align-content: start;
+  gap: var(--s1);
+  margin: 0 0 var(--s2);
+  padding: 20px var(--s3) var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+html[data-room='jlpt'] .exam-written .exam-form { margin: 0; }
+html[data-room='jlpt'] .assessment-room .exam-form h2 { margin: 0; font: 800 22px/1.35 var(--display); color: var(--text); }
+html[data-room='jlpt'] .exam-form-meta { margin: 0; font: 600 15px/1.5 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
+html[data-room='jlpt'] .exam-form .exam-skills, html[data-room='jlpt'] .exam-form .exam-status { margin: 0; font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .exam-form button.take {
+  justify-self: start;
+  min-height: 44px;
+  margin-top: var(--s1);
+  padding: 0 var(--s3);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: var(--ai);
+  color: var(--raised);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
+  font: 700 15px/1 var(--sans);
+}
+html[data-room='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
+html[data-room='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
+html[data-room='jlpt'] .exam-form .exam-sources > summary { min-height: 36px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
+html[data-room='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
+  min-height: 56px;
+  margin: 0;
+  padding: 10px var(--s2);
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+}
+html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
+  min-height: 44px;
+  margin: var(--s2) var(--s2) 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ai);
+  font: 600 15px/1.4 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+.exam-review-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
+@media (max-width: 760px) {
+  html[data-room='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  :root html[data-room='jlpt'] body:not(.zen) #app > main, html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  /* five compact cards in one row: the level, its tests, and the last score once there is one */
+  html[data-room='jlpt'] .exam-levels { gap: 6px; }
+  html[data-room='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
+  html[data-room='jlpt'] .exam-level-name { font-size: 24px; }
+  html[data-room='jlpt'] .exam-level-tests { font-size: 12px; }
+  html[data-room='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
+  html[data-room='jlpt'] .exam-level-last { font-size: 11.5px; }
+  html[data-room='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
+  html[data-room='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
+  html[data-room='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
+}
