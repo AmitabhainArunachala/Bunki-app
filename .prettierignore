@@ -60,3 +60,6 @@ docs/content/feed-review-queue.json
 # Pinned-bytes data fixtures (tools/test-reference-core.mjs asserts their sha256); never reformat.
 tools/fixtures/reference/coverage.json
 tools/fixtures/reference/relationships.json
+
+# Generated hash denylist (scripts/verify-no-official-content.mjs --write-denylist); its generator owns the format.
+scripts/official-content-denylist.json
