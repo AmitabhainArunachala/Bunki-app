@@ -7115,7 +7115,7 @@ function enhanceJapaneseProse(root) {
   for (const quote of root.querySelectorAll('blockquote.sentence-original')) {
     if (quote.nextElementSibling?.classList.contains('excerpt-listen')) continue;
     const text = quote.textContent;
-    const listen = el('button', 'chip excerpt-listen', tx('この引用を聞く', 'Listen to this passage')); listen.type = 'button';
+    const listen = el('button', 'chip excerpt-listen', excerptListenLabel()); listen.type = 'button';
     listen.addEventListener('click', () => void playNarratedExcerpt(text, listen)); quote.after(listen);
   }
 }
@@ -7715,8 +7715,14 @@ function ensureArticleNarration() {
 }
 if (typeof window !== 'undefined') void ensureArticleNarration();
 
+function excerptListenLabel() {
+  // This click auditions F1 for this excerpt only; it does not choose a voice
+  // for the reader or write the learner's saved voice preference.
+  return tx('F1の声で聞く（試聴版）', 'Listen · F1 audition voice');
+}
+
 async function playNarratedExcerpt(text, button) {
-  const original = tx('この引用を聞く', 'Listen to this passage');
+  const original = excerptListenLabel();
   if (button.classList.contains('is-speaking')) { excerptPlayback += 1; stopRecAudio(); button.classList.remove('is-speaking'); button.textContent = original; return; }
   const generation = ++excerptPlayback;
   const manifest = await ensureArticleNarration();
@@ -7734,12 +7740,22 @@ async function playNarratedExcerpt(text, button) {
   }
   if (!clips?.length) { button.textContent = tx('この引用の音声を準備中', 'Narration for this excerpt is not available yet'); return; }
   stopReadAloud();
-  button.classList.add('is-speaking'); button.textContent = tx('止める · F1 合成音声', 'Stop · F1 neural voice');
-  for (const clip of clips) {
-    if (generation !== excerptPlayback || !button.isConnected) break;
-    if (!(await playRecClip(clip.src, null))) break;
+  button.classList.add('is-speaking'); button.textContent = tx('止める · F1の試聴音声', 'Stop · F1 audition voice');
+  let failed = false;
+  try {
+    for (const clip of clips) {
+      if (generation !== excerptPlayback || !button.isConnected) break;
+      if (!(await playRecClip(clip.src, null))) { failed = true; break; }
+    }
+  } catch {
+    failed = true;
   }
-  if (generation === excerptPlayback && button.isConnected) { button.classList.remove('is-speaking'); button.textContent = original; }
+  if (generation === excerptPlayback && button.isConnected) {
+    button.classList.remove('is-speaking');
+    button.textContent = failed
+      ? tx('再生できませんでした · F1の試聴音声で再試行', 'Playback failed · Retry F1 audition voice')
+      : original;
+  }
 }
 
 
