@@ -180,12 +180,14 @@ async function main() {
       shelfStructure.cards > 0 && shelfStructure.nestedInteractive === 0,
       JSON.stringify(shelfStructure),
     );
+    // Since the design pass of 2026-09-30 a card is one door and carries no diagnostics: 詳細
+    // unfolds in the article's own footer, so no card may carry a toggle of its own either.
     check(
-      'every card offers its text door and 詳細 as sibling buttons, both reachable',
+      'every card is one reachable text door, with 詳細 left to the article footer',
       shelfStructure.cardsWithOwnDoor === shelfStructure.cards &&
-        shelfStructure.cardsWithSiblingDetails === shelfStructure.cards,
+        shelfStructure.cardsWithSiblingDetails === 0,
       `${shelfStructure.cardsWithOwnDoor}/${shelfStructure.cards} text doors · ` +
-        `${shelfStructure.cardsWithSiblingDetails}/${shelfStructure.cards} sibling toggles`,
+        `${shelfStructure.cardsWithSiblingDetails} card toggles`,
     );
 
     console.log('\n— 銀河 home: the tab order names only visible controls');
