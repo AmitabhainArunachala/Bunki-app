@@ -32,12 +32,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　りんごは　とても　【安い】です。",
       "options": [
-        "やすい",
-        "あんい",
+        "あさい",
         "やさい",
-        "あさい"
+        "あんい",
+        "やすい"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「安い」は「やすい」と読む。ねだんが高くないことだ。\nThe word 安い is read yasui and means cheap.",
       "target": "安い"
     },
@@ -46,12 +46,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nとなりの　いえに　【白い】　ねこが　います。",
       "options": [
-        "しらい",
-        "くろい",
         "しいろい",
-        "しろい"
+        "しろい",
+        "しらい",
+        "くろい"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「白い」は「しろい」と読む。「くろい」は「黒い」だ。\nThe word 白い is read shiroi and means white.",
       "target": "白い"
     },
@@ -60,12 +60,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\n【はは】は　りょうりが　じょうずです。",
       "options": [
-        "毎",
-        "母",
         "海",
-        "苺"
+        "苺",
+        "毎",
+        "母"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「はは」は「母」と書く。「毎」「海」はにているが、ちがう字だ。\nThe word haha (my mother) is written 母.",
       "target": "母"
     },
@@ -74,12 +74,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\nあさごはんを　【たべる】　じかんが　ありません。",
       "options": [
-        "食べる",
-        "飲べる",
         "良べる",
-        "食ぺる"
+        "食ぺる",
+        "食べる",
+        "飲べる"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「たべる」は「食べる」と書く。\nThe verb taberu (to eat) is written 食べる.",
       "target": "食べる"
     },
@@ -88,12 +88,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\nあさは　いつも　【ぱん】を　たべます。",
       "options": [
-        "バン",
         "ハン",
-        "パン",
-        "ポン"
+        "バン",
+        "ポン",
+        "パン"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「ぱん」はカタカナで「パン」と書く。\nThe word pan (bread) is written パン in katakana.",
       "target": "パン"
     },
@@ -102,12 +102,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nきょうは　あめなので、（　）を　もって　いきます。",
       "options": [
-        "かばん",
-        "くつ",
+        "とけい",
         "かさ",
-        "とけい"
+        "くつ",
+        "かばん"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "あめの日にもっていくのは「かさ」だ。\nKasa means umbrella, which you take when it rains.",
       "target": "傘"
     },
@@ -116,12 +116,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nごはんを　たべた　あとで、（　）を　みがきます。",
       "options": [
-        "て",
-        "め",
+        "は",
         "あし",
-        "は"
+        "め",
+        "て"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "ごはんのあとにみがくのは「は」だ。\nHa means teeth, which you brush after eating.",
       "target": "歯"
     },
@@ -158,12 +158,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nわたしは　まいあさ　ぎゅうにゅう（　）　のみます。",
       "options": [
-        "に",
-        "で",
+        "が",
         "を",
-        "が"
+        "で",
+        "に"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "のむものには「を」をつかう。\nWo marks the object of the verb: I drink milk.",
       "subject": "particle:wo"
     },
@@ -172,12 +172,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nつぎの　にちようびは　うみへ　いき（　）です。",
       "options": [
-        "たい",
-        "ます",
+        "たく",
         "ない",
-        "たく"
+        "ます",
+        "たい"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "したいことを言うときは「〜たいです」をつかう。\nTai desu expresses a wish: I want to go to the sea.",
       "subject": "grammar:tai"
     },
@@ -186,12 +186,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nいもうとは　にわ（　）　います。",
       "options": [
-        "を",
-        "で",
+        "に",
         "へ",
-        "に"
+        "で",
+        "を"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "ひとやものがいるところには「に」をつかう。\nNi marks where someone is: my sister is in the garden.",
       "subject": "particle:ni"
     },
@@ -200,12 +200,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nあしたは　いっしょに　おひるごはんを　たべ（　）。",
       "options": [
-        "ました",
-        "ませんでした",
         "ましょう",
-        "たいでした"
+        "たいでした",
+        "ました",
+        "ませんでした"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "あしたのことをさそうので「〜ましょう」をつかう。\nMashou makes a suggestion about tomorrow: let us eat lunch together.",
       "subject": "grammar:mashou"
     },
@@ -214,12 +214,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nしゅくだいを　した（　）、テレビを　みます。",
       "options": [
-        "あとで",
-        "まえに",
         "ながら",
-        "まで"
+        "まで",
+        "あとで",
+        "まえに"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「〜たあとで」は、あることがおわってからすることを言う。\nTa ato de means after: I watch TV after doing my homework.",
       "subject": "grammar:atode"
     },
@@ -228,12 +228,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nこれは　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
       "options": [
-        "ケーキ",
-        "つくった",
         "ははが",
-        "おいしい"
+        "おいしい",
+        "ケーキ",
+        "つくった"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "ただしいじゅんばんは「ははが　つくった　おいしい　ケーキ　です」で、★には「おいしい」が入る。\nThe order is ははが つくった おいしい ケーキ です, so おいしい fills the star."
     },
     {
@@ -241,12 +241,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　かみに　＿＿＿　＿＿＿　＿★＿　＿＿＿　ください。",
       "options": [
-        "かいて",
         "なまえと",
-        "でんわばんごうを",
-        "あなたの"
+        "かいて",
+        "あなたの",
+        "でんわばんごうを"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "ただしいじゅんばんは「あなたの　なまえと　でんわばんごうを　かいて　ください」で、★には「でんわばんごうを」が入る。\nThe order is あなたの なまえと でんわばんごうを かいて ください, so でんわばんごうを fills the star.",
       "subject": "grammar:tekudasai"
     },
@@ -269,12 +269,12 @@
       "task": "text-grammar",
       "prompt": "（２）に　なにを　いれますか。",
       "options": [
-        "いきます",
-        "いきました",
         "いって　います",
-        "いきませんでした"
+        "いきませんでした",
+        "いきます",
+        "いきました"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "らいしゅうのことなので「いきます」がいい。\nThe birthday is next week, so the future form ikimasu fits.",
       "passage": "tg"
     },
@@ -283,12 +283,12 @@
       "task": "short-reading",
       "prompt": "たなかさんは　あした　なにを　もって　いきますか。",
       "options": [
-        "えんぴつと　じしょ",
         "えんぴつと　けしゴム",
-        "けしゴムと　じしょ",
-        "じしょだけ"
+        "えんぴつと　じしょ",
+        "じしょだけ",
+        "けしゴムと　じしょ"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「えんぴつと　けしゴムを　もって　きて　ください。じしょは　いりません」とある。\nThe note asks for a pencil and an eraser; no dictionary is needed.",
       "passage": "s1"
     },
@@ -311,12 +311,12 @@
       "task": "short-reading",
       "prompt": "あには　なにが　すきですか。",
       "options": [
-        "すし",
         "さかな",
-        "やさい",
-        "にく"
+        "すし",
+        "にく",
+        "やさい"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「あには　にくが　すきです」とある。\nThe text says the older brother likes meat.",
       "passage": "s3"
     },
@@ -325,12 +325,12 @@
       "task": "mid-reading",
       "prompt": "きのう、この　人は　ひるごはんに　なにを　たべましたか。",
       "options": [
-        "しょくどうの　カレー",
-        "コンビニの　おにぎり",
         "ははの　おべんとう",
-        "しょくどうの　おにぎり"
+        "しょくどうの　おにぎり",
+        "しょくどうの　カレー",
+        "コンビニの　おにぎり"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "しょくどうがやすみだったので、コンビニでおにぎりをかってたべた。\nThe cafeteria was closed, so the writer ate rice balls from a convenience store.",
       "passage": "m1"
     },
@@ -339,12 +339,12 @@
       "task": "mid-reading",
       "prompt": "この　人は　どうして　きのう　しょくどうで　たべませんでしたか。",
       "options": [
-        "カレーが　たかかったから",
         "おにぎりが　すきだから",
-        "ともだちと　きょうしつで　あそびたかったから",
-        "しょくどうが　やすみだったから"
+        "カレーが　たかかったから",
+        "しょくどうが　やすみだったから",
+        "ともだちと　きょうしつで　あそびたかったから"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「きのうは　しょくどうが　やすみでした。それで」とある。\nThe writer did not eat there because the cafeteria was closed.",
       "passage": "m1"
     },

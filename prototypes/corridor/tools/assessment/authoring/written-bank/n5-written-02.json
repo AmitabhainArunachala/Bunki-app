@@ -18,12 +18,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nえきを　でて、【右】へ　いって　ください。",
       "options": [
-        "ひだり",
-        "みぎ",
         "みき",
-        "うえ"
+        "うえ",
+        "ひだり",
+        "みぎ"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「右」は「みぎ」と読む。「ひだり」は「左」だ。\nThe word 右 is read migi and means right.",
       "target": "右"
     },
@@ -60,12 +60,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\nえきの　まえに　あたらしい　【みせ】が　できました。",
       "options": [
-        "店",
         "占",
-        "広",
-        "床"
+        "店",
+        "床",
+        "広"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「みせ」は「店」と書く。\nThe word mise (shop) is written 店.",
       "target": "店"
     },
@@ -88,12 +88,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\nあたらしい　【すかーと】を　かいました。",
       "options": [
-        "スカード",
         "ヌカート",
-        "スカート",
-        "スカーツ"
+        "スカード",
+        "スカーツ",
+        "スカート"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「すかーと」はカタカナで「スカート」と書く。\nThe word sukaato (skirt) is written スカート in katakana.",
       "target": "スカート"
     },
@@ -116,12 +116,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nやすみの　日は　へやで　ゆっくり　（　）を　よみます。",
       "options": [
-        "おんがく",
         "テレビ",
-        "しゃしん",
-        "ざっし"
+        "おんがく",
+        "ざっし",
+        "しゃしん"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「よむ」ものは「ざっし」だ。\nZasshi means magazine, something you read.",
       "target": "雑誌"
     },
@@ -130,12 +130,12 @@
       "task": "paraphrase",
       "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nきのう　みた　えいがは　【つまらない】　えいがでした。",
       "options": [
-        "きのう　みた　えいがは　おもしろく　なかったです。",
         "きのう　みた　えいがは　とても　おもしろかったです。",
-        "きのう　みた　えいがは　ながかったです。",
-        "きのう　みた　えいがは　こわかったです。"
+        "きのう　みた　えいがは　おもしろく　なかったです。",
+        "きのう　みた　えいがは　こわかったです。",
+        "きのう　みた　えいがは　ながかったです。"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「つまらない」は「おもしろくない」と同じ意味だ。\nTsumaranai means boring, the same as not interesting.",
       "target": "つまらない"
     },
@@ -172,12 +172,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nバスより　でんしゃの（　）　はやいです。",
       "options": [
-        "ほうが",
-        "より",
         "ほど",
-        "だけ"
+        "だけ",
+        "ほうが",
+        "より"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「AよりBのほうが〜」でくらべる。\nYori ... no hou ga compares two things: the train is faster than the bus.",
       "subject": "grammar:yori-houga"
     },
@@ -186,12 +186,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nすみません、その　あかい　かさを　みせて（　）。",
       "options": [
-        "います",
-        "ください",
+        "いきます",
         "あります",
-        "いきます"
+        "ください",
+        "います"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "おねがいするときは「〜てください」をつかう。\nTe kudasai makes a polite request: please show me that red umbrella.",
       "subject": "grammar:tekudasai"
     },
@@ -228,12 +228,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　あかい　シャツは　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
       "options": [
-        "もの",
         "デパートで",
-        "かった",
-        "きのう"
+        "もの",
+        "きのう",
+        "かった"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "ただしいじゅんばんは「きのう　デパートで　かった　もの　です」で、★には「かった」が入る。\nThe order is きのう デパートで かった もの です, so かった fills the star."
     },
     {
@@ -241,12 +241,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nわたしは　＿＿＿　＿＿＿　＿＿＿　＿★＿　すきです。",
       "options": [
-        "日に",
         "さんぽするのが",
-        "やすみの",
-        "こうえんを"
+        "日に",
+        "こうえんを",
+        "やすみの"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "ただしいじゅんばんは「やすみの　日に　こうえんを　さんぽするのが　すきです」で、★には「さんぽするのが」が入る。\nThe order is やすみの 日に こうえんを さんぽするのが すきです, so さんぽするのが fills the star."
     },
     {
@@ -268,12 +268,12 @@
       "task": "text-grammar",
       "prompt": "（２）に　なにを　いれますか。",
       "options": [
-        "かきます",
-        "かいて　ください",
+        "かきました",
         "かきましょう",
-        "かきました"
+        "かいて　ください",
+        "かきます"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「きのう」のことなので「かきました」がいい。\nThe sentence is about yesterday, so the past form kakimashita fits.",
       "passage": "tg"
     },
@@ -282,12 +282,12 @@
       "task": "short-reading",
       "prompt": "あした　天気が　いい　とき、ユキさんは　どう　しますか。",
       "options": [
-        "十時に　えきの　まえへ　いく",
-        "ピクニックを　やめる",
         "マイさんに　でんわする",
-        "十時に　マイさんの　うちへ　いく"
+        "十時に　マイさんの　うちへ　いく",
+        "十時に　えきの　まえへ　いく",
+        "ピクニックを　やめる"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「天気が　いい　ときは、十時に　えきの　まえで　あいましょう」とある。\nIf the weather is good, they will meet in front of the station at ten.",
       "passage": "s1"
     },
@@ -310,12 +310,12 @@
       "task": "short-reading",
       "prompt": "この　人は　きのう　ひるごはんの　あとで　なにを　しましたか。",
       "options": [
-        "おそく　おきた",
-        "ともだちと　でんわで　はなした",
+        "プールで　およいだ",
         "ひるごはんを　つくった",
-        "プールで　およいだ"
+        "ともだちと　でんわで　はなした",
+        "おそく　おきた"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「ひるごはんの　あとで　プールへ　およぎに　いきました」とある。\nAfter lunch the writer went swimming at the pool.",
       "passage": "s3"
     },
@@ -352,12 +352,12 @@
       "task": "information-retrieval",
       "prompt": "たまごを　やすく　かいたいです。なんようびに　いきますか。",
       "options": [
-        "月曜日",
-        "水曜日",
+        "火曜日",
         "金曜日",
-        "火曜日"
+        "水曜日",
+        "月曜日"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "たまごがやすいのは火曜日だ。\nEggs are on sale on Tuesday.",
       "passage": "info"
     },

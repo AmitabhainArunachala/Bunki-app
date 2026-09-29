@@ -19,12 +19,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの旅館に【宿泊】する客は、夕食を部屋で食べることができる。",
       "options": [
-        "しゅうはく",
-        "しゅくはく",
         "しゅくばく",
-        "すくはく"
+        "すくはく",
+        "しゅうはく",
+        "しゅくはく"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "宿泊は「しゅくはく」と読む。ホテルや旅館に泊まることだ。\nThe word 宿泊 (lodging, staying overnight) is read shukuhaku.",
       "target": "宿泊"
     },
@@ -61,12 +61,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n正月には、【親戚】が祖父の家に集まる。",
       "options": [
-        "しんせい",
-        "しんせき",
+        "おやせき",
         "しんぜき",
-        "おやせき"
+        "しんせき",
+        "しんせい"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "親戚は「しんせき」と読む。おじやおば、いとこなどの家族のつながりがある人のことだ。\nThe word 親戚 (relatives) is read shinseki.",
       "target": "親戚"
     },
@@ -75,12 +75,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n旅館の夕食で、飲み物を【ちゅうもん】した。",
       "options": [
-        "注問",
         "柱文",
-        "注文",
-        "注紋"
+        "注問",
+        "注紋",
+        "注文"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "店などで品物や料理を頼むことは「注文」と書く。\nOrdering food or goods is written 注文.",
       "target": "注文"
     },
@@ -89,12 +89,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n部屋のエアコンがこわれたので、【しゅうり】をたのんだ。",
       "options": [
-        "修理",
-        "修里",
+        "収理",
         "終理",
-        "収理"
+        "修里",
+        "修理"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "こわれた物を直すことは「修理」と書く。\nRepairing something broken is written 修理.",
       "target": "修理"
     },
@@ -103,12 +103,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n今年の【もくひょう】は、毎日三十分英語を勉強することだ。",
       "options": [
-        "目票",
-        "目標",
+        "木標",
         "目漂",
-        "木標"
+        "目標",
+        "目票"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「もくひょう」は「目標」と書く。\nMokuhyō (goal, target) is written 目標.",
       "target": "目標"
     },
@@ -131,12 +131,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n兄は（　）が苦手で、料理もそうじもほとんどしない。",
       "options": [
-        "行事",
         "家事",
-        "用事",
-        "返事"
+        "行事",
+        "返事",
+        "用事"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "料理やそうじなど、家の仕事のことを「家事」という。\nHousework such as cooking and cleaning is called 家事.",
       "target": "家事"
     },
@@ -145,12 +145,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n両親の結婚三十年の（　）に、家族で旅行に行った。",
       "options": [
-        "記録",
         "記憶",
-        "記入",
-        "記念"
+        "記録",
+        "記念",
+        "記入"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "特別な日を忘れないように何かをすることを「記念」という。\nDoing something to mark a special occasion is 記念 (commemoration).",
       "target": "記念"
     },
@@ -159,12 +159,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n旅館で、【偶然】高校のときの先生に会った。",
       "options": [
-        "わざわざ",
-        "たまたま",
         "久しぶりに",
-        "約束して"
+        "約束して",
+        "わざわざ",
+        "たまたま"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「偶然」は、思いがけずそうなったという意味で、「たまたま」と同じだ。\nThe word 偶然 means by chance, the same as たまたま.",
       "target": "偶然"
     },
@@ -173,12 +173,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n雨が強くなってきたので、プールで泳ぐのを【諦める】ことにした。",
       "options": [
-        "続ける",
-        "待つ",
+        "急ぐ",
         "やめる",
-        "急ぐ"
+        "待つ",
+        "続ける"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "「諦める」は、したかったことをしないと決めることで、ここでは「やめる」に近い。\nThe verb 諦める means to give up, close to やめる here.",
       "target": "諦める"
     },
@@ -187,12 +187,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【預ける】",
       "options": [
-        "友だちに借りていた本を、きのう預けた。",
         "駅で道が分からなかったので、交番で道を預けた。",
-        "旅館に着いてすぐ、大きな荷物をフロントに預けた。",
-        "雨が降りそうだったので、傘を預けて家を出た。"
+        "友だちに借りていた本を、きのう預けた。",
+        "雨が降りそうだったので、傘を預けて家を出た。",
+        "旅館に着いてすぐ、大きな荷物をフロントに預けた。"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「預ける」は、自分の物をしばらく人や場所に保管してもらうことに使う。\nThe verb 預ける means to leave something in someone's care, like luggage at a front desk.",
       "target": "預ける"
     },
@@ -201,12 +201,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【譲る】",
       "options": [
-        "友だちに、旅行の写真をメールで譲った。",
-        "毎月、給料の一部を銀行に譲っている。",
+        "電車の中で、お年寄りに席を譲った。",
         "母の誕生日に、きれいな花を譲った。",
-        "電車の中で、お年寄りに席を譲った。"
+        "毎月、給料の一部を銀行に譲っている。",
+        "友だちに、旅行の写真をメールで譲った。"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「譲る」は、自分が使える物や場所を人に渡すことで、「席を譲る」はよく使う言い方だ。\nThe verb 譲る means to give up something for another person, as in giving up one's seat.",
       "target": "譲る"
     },
@@ -215,12 +215,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n料理が温かい（　）、どうぞ召し上がってください。",
       "options": [
-        "ために",
-        "までに",
+        "ところに",
         "うちに",
-        "ところに"
+        "までに",
+        "ために"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "「〜うちに」は、その状態が変わる前に何かをすることを表す。冷める前に食べてほしいという意味だ。\nThe pattern うちに means while a state lasts: eat it before it gets cold.",
       "subject": "grammar:uchini"
     },
@@ -243,12 +243,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n祖父（　）、孫たちと過ごす正月は一年でいちばん楽しい時間だ。",
       "options": [
-        "によって",
         "について",
-        "にとって",
-        "に対して"
+        "によって",
+        "に対して",
+        "にとって"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「〜にとって」は、だれの立場から見た評価かを表す。\nThe pattern にとって marks whose point of view an evaluation comes from.",
       "subject": "grammar:nitotte"
     },
@@ -257,12 +257,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nプールから出たあと、ぬれた（　）の髪で外に出ると、かぜをひくよ。",
       "options": [
-        "ながら",
-        "まま",
         "ほど",
-        "きり"
+        "きり",
+        "ながら",
+        "まま"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「〜たまま」は、その状態が変わらずに続いていることを表す。髪がぬれた状態で、という意味だ。\nThe pattern たまま means the state stays unchanged: with your hair still wet.",
       "subject": "grammar:mama"
     },
@@ -271,12 +271,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n旅行中に道に迷わない（　）、スマホに地図を入れておいた。",
       "options": [
-        "ことに",
-        "そうに",
         "ように",
-        "らしく"
+        "らしく",
+        "ことに",
+        "そうに"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「〜ないように」は、そうならないための目的を表す。\nThe pattern ないように expresses a purpose: so as not to get lost.",
       "subject": "grammar:n3-you-ni"
     },
@@ -285,12 +285,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n今、旅館に着いた（　）なので、あとでこちらから電話します。",
       "options": [
-        "うち",
-        "あいだ",
+        "ところ",
         "まま",
-        "ところ"
+        "あいだ",
+        "うち"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「〜たところだ」は、ある動作が終わった直後であることを表す。\nThe pattern たところだ means one has just finished doing something.",
       "subject": "grammar:tokoroda"
     },
@@ -299,12 +299,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこのプールは、＿＿＿　＿★＿　＿＿＿　＿＿＿　人でも、気軽に利用できる。",
       "options": [
-        "では",
         "ない",
-        "得意",
-        "泳ぎが"
+        "では",
+        "泳ぎが",
+        "得意"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "正しい順番は「泳ぎが　得意　では　ない」で、★には「得意」が入る。\nThe order is 泳ぎが 得意 では ない (even people who are not good swimmers), so 得意 fills the star."
     },
     {
@@ -312,12 +312,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nルームシェアを始める前に、＿＿＿　＿＿＿　＿★＿　＿＿＿　について話し合った。",
       "options": [
-        "当番",
         "などの",
-        "そうじや",
-        "ごみ出し"
+        "当番",
+        "ごみ出し",
+        "そうじや"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "正しい順番は「そうじや　ごみ出し　などの　当番」で、★には「などの」が入る。\nThe order is そうじや ごみ出し などの 当番 (duties such as cleaning and taking out trash), so などの fills the star."
     },
     {
@@ -354,12 +354,12 @@
       "passage": "tg",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "思われました",
-        "思わせました",
+        "思っていません",
         "思いました",
-        "思っていません"
+        "思わせました",
+        "思われました"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "「わたし」が自分の気持ちを述べているので「知りたいと思いました」が自然だ。\nThe writer states her own feeling, so 知りたいと思いました (I wanted to know) is natural."
     },
     {
@@ -382,12 +382,12 @@
       "passage": "s2",
       "prompt": "二人が生活のルールを決めたのは、なぜか。",
       "options": [
-        "家賃を半分にしたかったから",
-        "二人の生活の時間が違ったから",
+        "台所がせまかったから",
         "友人が朝早く起きるから",
-        "台所がせまかったから"
+        "二人の生活の時間が違ったから",
+        "家賃を半分にしたかったから"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "生活の時間が違うことにとまどったので、ルールを決めたと書いてある。\nThey made rules because their daily schedules were different."
     },
     {
@@ -410,12 +410,12 @@
       "passage": "m1",
       "prompt": "旅行の前、「わたし」はどんな気持ちだったか。",
       "options": [
-        "家族と一緒に行けなくて、さびしかった。",
-        "一人で旅行するのは初めてなので、少し不安だった。",
+        "温泉が好きではないので、行きたくなかった。",
         "前にも行ったことがある町なので、楽しみだった。",
-        "温泉が好きではないので、行きたくなかった。"
+        "一人で旅行するのは初めてなので、少し不安だった。",
+        "家族と一緒に行けなくて、さびしかった。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "初めての一人旅で「一人で大丈夫だろうかと少し不安だった」とある。\nIt was the writer's first solo trip, and they felt a little uneasy."
     },
     {
@@ -424,12 +424,12 @@
       "passage": "m1",
       "prompt": "夕食のとき、「わたし」はどんなことをしたか。",
       "options": [
-        "おかみさんに、散歩道を教えてもらった。",
-        "同じ年の女性と、一緒に散歩をした。",
+        "家族に電話をして、旅館の話をした。",
         "一人で来ていた女性と話して、おすすめの店や散歩道を教えてもらった。",
-        "家族に電話をして、旅館の話をした。"
+        "同じ年の女性と、一緒に散歩をした。",
+        "おかみさんに、散歩道を教えてもらった。"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "夕食のとき、一人で来ていた年上の女性と話し、店や散歩道を教えてもらった。\nAt dinner the writer talked with an older woman traveling alone, who recommended shops and walks."
     },
     {
@@ -452,12 +452,12 @@
       "passage": "l1",
       "prompt": "大学に入ってから、「わたし」が正月に集まるのを面倒に感じたのは、なぜか。",
       "options": [
-        "祖母の料理が好きではなくなったから",
         "いとこたちと遊ぶのがつまらなくなったから",
-        "大学の勉強が忙しくて、時間がなかったから",
-        "親戚に、学校や将来のことを何度も聞かれるのが嫌だったから"
+        "祖母の料理が好きではなくなったから",
+        "親戚に、学校や将来のことを何度も聞かれるのが嫌だったから",
+        "大学の勉強が忙しくて、時間がなかったから"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "親戚に学校のことや将来のことを何度も聞かれるのが嫌だった、と書いてある。\nThe writer disliked being asked again and again about school and the future."
     },
     {
@@ -466,12 +466,12 @@
       "passage": "l1",
       "prompt": "この文章で「わたし」がいちばん言いたいことは何か。",
       "options": [
-        "正月は、家族より友だちと過ごしたほうが楽しい。",
-        "親戚に将来のことを聞くのは、やめたほうがいい。",
         "家族が集まる時間はいつまでも続くわけではないので、大切にしたい。",
-        "祖父の病気がすぐに治って、本当によかった。"
+        "祖父の病気がすぐに治って、本当によかった。",
+        "正月は、家族より友だちと過ごしたほうが楽しい。",
+        "親戚に将来のことを聞くのは、やめたほうがいい。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "最後に、家族が集まる時間はいつまでも続かないので大切にしたいと述べている。\nThe writer concludes that family gatherings will not last forever, so they want to treasure them."
     },
     {

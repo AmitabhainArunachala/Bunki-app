@@ -64,12 +64,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n新人の彼の実力は、すでに先輩を【凌ぐ】ほどだ。",
       "options": [
-        "しぬぐ",
         "しのぐ",
-        "すすぐ",
-        "そそぐ"
+        "しぬぐ",
+        "そそぐ",
+        "すすぐ"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "凌ぐは「しのぐ」と読み、ここでは能力が他を上回ることを表す。\n凌ぐ is read shinogu; here it means to surpass or outdo.",
       "target": "凌ぐ"
     },
@@ -78,12 +78,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nその棋士は、終盤に相手の（　）を突いて、一気に形勢を逆転させた。",
       "options": [
-        "余裕",
         "間",
-        "隙",
-        "穴埋め"
+        "余裕",
+        "穴埋め",
+        "隙"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「隙を突く」は、相手の油断や弱いところをねらって攻めるという意味の慣用表現である。\n隙を突く is an idiom meaning to exploit an opening or lapse in the opponent's guard.",
       "target": "隙"
     },
@@ -92,12 +92,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n天候不順が続き、野菜の価格が（　）している。",
       "options": [
-        "高揚",
         "向上",
-        "高尚",
-        "高騰"
+        "高揚",
+        "高騰",
+        "高尚"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「高騰」は物価などが急に大きく上がることで、野菜の価格について使う。\n高騰 means a sharp rise in prices, which is what bad weather does to vegetable prices.",
       "target": "高騰"
     },
@@ -106,12 +106,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n昔の日記を読み返すと、当時の記憶が（　）よみがえってきた。",
       "options": [
-        "鮮明に",
-        "賢明に",
         "懸命に",
-        "厳密に"
+        "厳密に",
+        "鮮明に",
+        "賢明に"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「鮮明に」は、はっきりとあざやかな様子で、記憶がよみがえる様子に合う。\n鮮明に means vividly and clearly, describing memories coming back.",
       "target": "鮮明"
     },
@@ -120,12 +120,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい物流システムの導入で、配送にかかる時間が大幅に（　）された。",
       "options": [
-        "縮小",
-        "短縮",
         "収縮",
-        "省略"
+        "省略",
+        "縮小",
+        "短縮"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "時間や距離を短くすることは「短縮」という。縮小は規模、収縮は物の縮み、省略ははぶくこと。\n短縮 means shortening a time or distance; the others refer to scale, contraction or omission.",
       "target": "短縮"
     },
@@ -148,12 +148,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n空が【にわかに】暗くなり、激しい雨が降り出した。",
       "options": [
-        "急に",
-        "徐々に",
+        "再び",
         "一時的に",
-        "再び"
+        "徐々に",
+        "急に"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「にわかに」は、物事が急に起こる様子を表す。\nにわかに means suddenly, without warning.",
       "target": "にわかに"
     },
@@ -162,12 +162,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n年末は、どの店も警備が【手薄】になりやすい。",
       "options": [
-        "厳重だ",
         "人手が足りない",
-        "費用が高い",
-        "評判が悪い"
+        "厳重だ",
+        "評判が悪い",
+        "費用が高い"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「手薄」は、人手や備えが十分でない様子を表す。\n手薄 means short-handed or insufficiently staffed or guarded.",
       "target": "手薄"
     },
@@ -246,12 +246,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nあの先生はとても厳しいので、宿題を忘れ（　）、大変なことになる。",
       "options": [
-        "ようが",
         "まいが",
-        "んばかりに",
-        "ようものなら"
+        "ようが",
+        "ようものなら",
+        "んばかりに"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「〜ようものなら」は「もし〜したら、悪い結果になる」という意味である。\n〜ようものなら means if one were to do something, trouble would follow.",
       "subject": "grammar:youmononara"
     },
@@ -274,12 +274,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの試験では、一分（　）遅刻は認められない。",
       "options": [
-        "ばかりか",
         "ごとき",
-        "たりとも",
-        "ならでは"
+        "ばかりか",
+        "ならでは",
+        "たりとも"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「一〜たりとも〜ない」は「ほんの少しも〜ない」という強い否定を表す。\n一〜たりとも〜ない means not even one: not even one minute late is allowed.",
       "subject": "grammar:n1-tari-tomo"
     },
@@ -288,12 +288,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n記録的な大雨のため、その地域の住民は避難を（　）。",
       "options": [
-        "ものともしなかった",
         "余儀なくされた",
-        "禁じ得なかった",
-        "皮切りにした"
+        "ものともしなかった",
+        "皮切りにした",
+        "禁じ得なかった"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「〜を余儀なくされる」は、ほかに方法がなく仕方なくそうさせられることを表す。\n〜を余儀なくされる means to be forced to do something by circumstances.",
       "subject": "grammar:woyoginakusareru"
     },
@@ -302,12 +302,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nAIが名人に勝った ＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 失われたわけではない。",
       "options": [
-        "対局の",
-        "からといって",
         "価値が",
-        "人間同士の"
+        "人間同士の",
+        "対局の",
+        "からといって"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「勝ったからといって、人間同士の対局の価値が失われたわけではない」となり、★には「人間同士の」が入る。\nThe order is からといって・人間同士の・対局の・価値が, so 人間同士の fills the ★ slot.",
       "subject": "grammar:karatoitte"
     },
@@ -316,12 +316,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n三年に及ぶ ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 今年から販売される。",
       "options": [
-        "新しい品種が",
-        "開発された",
+        "試行錯誤",
         "を経て",
-        "試行錯誤"
+        "開発された",
+        "新しい品種が"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「三年に及ぶ試行錯誤を経て開発された新しい品種が今年から販売される」となり、★には「開発された」が入る。\nThe order is 試行錯誤・を経て・開発された・新しい品種が, so 開発された fills the ★ slot.",
       "subject": "grammar:wohete"
     },
@@ -330,12 +330,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nどんな ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 必ず記録した人の視点が入り込んでいる。",
       "options": [
-        "そこには",
         "記録",
-        "であれ",
-        "形の"
+        "そこには",
+        "形の",
+        "であれ"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「どんな形の記録であれ、そこには必ず記録した人の視点が入り込んでいる」となり、★には「であれ」が入る。\nThe order is 形の・記録・であれ・そこには, so であれ fills the ★ slot.",
       "subject": "grammar:deare"
     },
@@ -345,12 +345,12 @@
       "passage": "tg",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "したがって",
-        "なぜなら",
+        "要するに",
         "一方で",
-        "要するに"
+        "なぜなら",
+        "したがって"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "前の段落の被害の話と対比して、変化を生かす動きを述べているので「一方で」が入る。\nThe paragraph turns from damage to efforts that exploit the change, so 一方で (on the other hand) fits."
     },
     {
@@ -373,12 +373,12 @@
       "passage": "tg",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "のではなく",
         "ばかりか",
-        "あまり",
-        "ついでに"
+        "のではなく",
+        "ついでに",
+        "あまり"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「ただ嘆くのではなく、新しい可能性を探す」と、二つの態度を対比しているので「のではなく」が入る。\nのではなく (rather than) contrasts merely lamenting with looking for new possibilities."
     },
     {
@@ -387,12 +387,12 @@
       "passage": "s1",
       "prompt": "筆者によると、AIは将棋の世界にどのような影響を与えたか。",
       "options": [
-        "将棋の人気を大きく低下させた。",
-        "人間同士の対局を不要にした。",
+        "棋士やファンの将棋の楽しみ方を広げた。",
         "棋士の数を減らす原因になった。",
-        "棋士やファンの将棋の楽しみ方を広げた。"
+        "人間同士の対局を不要にした。",
+        "将棋の人気を大きく低下させた。"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "棋士はAIで新しい戦法を生み、ファンも形勢の数値を見て楽しむようになったと書かれている。\nPlayers invented new strategies with AI and fans enjoy games with its evaluations: AI widened the game."
     },
     {
@@ -401,12 +401,12 @@
       "passage": "s2",
       "prompt": "この文章で筆者が最も言いたいことは何か。",
       "options": [
-        "旅先では、できるだけ多くの写真を撮るべきだ。",
         "写真に記録すると、かえって記憶に残りにくいことがある。",
-        "美術館では、作品の撮影を禁止するべきだ。",
-        "記憶力を高めるには、写真を見返すのがよい。"
+        "旅先では、できるだけ多くの写真を撮るべきだ。",
+        "記憶力を高めるには、写真を見返すのがよい。",
+        "美術館では、作品の撮影を禁止するべきだ。"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "撮影した人のほうが細部を思い出せなかった例を挙げ、記録と記憶は同じではないと述べている。\nThe writer's point is that recording something can make it less memorable."
     },
     {
@@ -415,12 +415,12 @@
       "passage": "s3",
       "prompt": "このメールを受け取った人が、9月28日に参加できない場合、どうすればよいか。",
       "options": [
-        "予定どおり、9月14日に農園へ行く。",
-        "参加費の返金を、当日農園で受け取る。",
+        "何もしなくても、参加費は自動的に返される。",
         "9月20日までに農園に連絡する。",
-        "何もしなくても、参加費は自動的に返される。"
+        "参加費の返金を、当日農園で受け取る。",
+        "予定どおり、9月14日に農園へ行く。"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "新しい日程に都合が合わない場合は、9月20日までに連絡すれば参加費が全額返されるとある。\nIf the new date does not suit, the recipient should contact the farm by September 20 for a refund."
     },
     {
@@ -443,12 +443,12 @@
       "passage": "m1",
       "prompt": "筆者の考えに合うものはどれか。",
       "options": [
-        "町の音は、できるだけ減らしていくべきだ。",
-        "時を知らせる音を、昔のようにすべて復活させるべきだ。",
         "防災無線の音楽は、子どもの帰宅には役に立たない。",
-        "町の音を騒音として排除してきたことを、見直してみる必要がある。"
+        "町の音を騒音として排除してきたことを、見直してみる必要がある。",
+        "町の音は、できるだけ減らしていくべきだ。",
+        "時を知らせる音を、昔のようにすべて復活させるべきだ。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "町の音を一方的に騒音として排除してきたことがよかったのか、考えてみる価値があると述べている。\nThe writer suggests reconsidering whether banishing town sounds as noise was wise."
     },
     {
@@ -457,12 +457,12 @@
       "passage": "m2",
       "prompt": "筆者は、今のメッセージのやり取りについてどのように述べているか。",
       "options": [
-        "手紙よりも気持ちが伝わりにくい。",
-        "後に残らず、消えてしまいやすい。",
+        "書くのに時間がかかりすぎる。",
         "ほとんどが、読まれないまま消えてしまう。",
-        "書くのに時間がかかりすぎる。"
+        "後に残らず、消えてしまいやすい。",
+        "手紙よりも気持ちが伝わりにくい。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "メッセージは読んだそばから流れ去り、機種変更などで簡単に消えてしまうと述べている。\nMessages flow away once read and easily vanish with a new phone or a closed service."
     },
     {
@@ -471,12 +471,12 @@
       "passage": "m2",
       "prompt": "「そう思った」とあるが、筆者はどのように思ったのか。",
       "options": [
-        "祖母の手紙を、家族に読んでもらいたい。",
-        "これからはメッセージのやり取りをやめたい。",
         "大切な人に、ときには手書きの手紙を送りたい。",
-        "祖母と祖父の手紙を、本にして残したい。"
+        "祖母と祖父の手紙を、本にして残したい。",
+        "祖母の手紙を、家族に読んでもらいたい。",
+        "これからはメッセージのやり取りをやめたい。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "直前に、大切な人には年に一度でも手書きの手紙を送ってみたいと書かれている。\nThe sentence before says the writer wants to send handwritten letters to loved ones, at least once a year."
     },
     {
@@ -488,12 +488,12 @@
       ],
       "prompt": "子どもの声について、ＡとＢはどのように述べているか。",
       "options": [
-        "Ａは受け入れるべきだと述べ、Ｂはつらいと感じる人の事情にも配慮すべきだと述べている。",
-        "ＡもＢも、子どもの声は騒音だと述べている。",
+        "ＡもＢも、保育園の建設には反対だと述べている。",
         "Ａは騒音だと述べ、Ｂは受け入れるべきだと述べている。",
-        "ＡもＢも、保育園の建設には反対だと述べている。"
+        "ＡもＢも、子どもの声は騒音だと述べている。",
+        "Ａは受け入れるべきだと述べ、Ｂはつらいと感じる人の事情にも配慮すべきだと述べている。"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "Ａは多少の音は受け入れるべきだとし、Ｂは声がつらい人の事情も事実だとして配慮を求めている。\nA says the noise should be accepted; B says those who suffer from it must also be considered."
     },
     {
@@ -519,12 +519,12 @@
       "passage": "c1",
       "prompt": "筆者によると、速く読むことを目的にすると、どうなりがちか。",
       "options": [
-        "本の内容をまったく理解できなくなる。",
-        "自分の考えに合う部分だけを拾い、違和感のある部分を読み飛ばしてしまう。",
+        "情報を集めるのに時間がかかってしまう。",
         "読書そのものが嫌いになってしまう。",
-        "情報を集めるのに時間がかかってしまう。"
+        "自分の考えに合う部分だけを拾い、違和感のある部分を読み飛ばしてしまう。",
+        "本の内容をまったく理解できなくなる。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "速く読むことを目的にすると、自分の考えと合う部分だけを拾い、違和感のある部分は読み飛ばしがちだとある。\nReading for speed tends to pick out what agrees with us and skip what feels uncomfortable."
     },
     {
@@ -533,12 +533,12 @@
       "passage": "c1",
       "prompt": "筆者は、速く読む技術についてどのように考えているか。",
       "options": [
-        "どのような読書にも役に立つ。",
-        "読書の価値を下げるので、身につけるべきではない。",
         "書き手と対話するために欠かせない。",
-        "情報を集めるための読書では役に立つ。"
+        "情報を集めるための読書では役に立つ。",
+        "どのような読書にも役に立つ。",
+        "読書の価値を下げるので、身につけるべきではない。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "情報を集めるための読書であれば速く読む技術は役に立つが、すべての読書に当てはめるのが問題だとしている。\nSpeed reading helps when gathering information; the problem is applying it to all reading."
     },
     {
@@ -547,12 +547,12 @@
       "passage": "c1",
       "prompt": "筆者の主張に最も近いものはどれか。",
       "options": [
-        "できるだけ多くの本を読むことが、考えを深めることにつながる。",
-        "読書量を増やすために、速読の技術を身につけるべきだ。",
+        "同じ本を何度も読むのは、時間の無駄である。",
         "大切な本は、時間をかけて書き手と向き合いながら読むべきだ。",
-        "同じ本を何度も読むのは、時間の無駄である。"
+        "読書量を増やすために、速読の技術を身につけるべきだ。",
+        "できるだけ多くの本を読むことが、考えを深めることにつながる。"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "本当に大切な本には急がずに向き合い、時間をかけて読んでほしいと主張している。\nThe writer urges taking time with truly important books, engaging with the author."
     },
     {
@@ -561,12 +561,12 @@
       "passage": "i1",
       "prompt": "市内に住む田中さんは、今年初めて市民農園を借りたいと考えている。田中さんがしなければならないことはどれか。",
       "options": [
-        "2月10日までに往復はがきを送り、3月15日の説明会に出席する。",
-        "2月10日までに市役所に電話をし、3月15日の説明会に出席する。",
         "2月下旬に市役所へ行き、抽選に参加する。",
-        "3月15日の説明会に出席し、その場で希望する区画を申し込む。"
+        "3月15日の説明会に出席し、その場で希望する区画を申し込む。",
+        "2月10日までに往復はがきを送り、3月15日の説明会に出席する。",
+        "2月10日までに市役所に電話をし、3月15日の説明会に出席する。"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "応募は2月10日必着の往復はがきで行い、初めて利用する人は3月15日の説明会に必ず出席する。\nApply by return postcard arriving by Feb 10, and first-time users must attend the March 15 briefing."
     },
     {
