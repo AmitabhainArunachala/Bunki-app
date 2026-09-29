@@ -25,6 +25,11 @@ const expose = ['S', 'D', 'openJapaneseLookup', 'appendJapaneseLookup', 'enhance
   'toggleTaken', 'wordCaptureState', 'wordCardIdentity', 'recordWritable'];
 const shim = '\nObject.defineProperty(window,"annotationFixture",{value:{' + expose.map(name => `get ${name}(){return ${name}}`).join(',') + '}});\n';
 const fixture = Buffer.concat([original, Buffer.from(shim)]);
+// Negative control: a build that re-enables the list form before reload must fail the read-only case.
+const reenable = ['create.disabled = value || !recordWritable();', 'create.disabled = value;'];
+assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
+const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
+const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -88,20 +93,25 @@ const cases = [
     const before = await state(page);
     await armRecordWriteFailure(page, 'abort', { roots: ['lists'] });
     await createList(page, 'Retry this list');
-    await page.waitForFunction(() => /retry|could not|not ready/i.test(document.querySelector('.vocabulary-list-status')?.textContent || ''));
+    await page.waitForFunction(() => /protected/i.test(document.querySelector('.vocabulary-list-status')?.textContent || ''));
+    assert.match(await page.locator('.vocabulary-list-status').textContent(), /reload/i, 'The notice must say a reload comes before any retry');
     assert.equal(await page.locator('.vocabulary-list-form input').inputValue(), 'Retry this list');
     assert.deepEqual((await state(page)).record, before.record, 'Failed list commit cannot claim or keep an optimistic membership');
     const fault = await clearRecordWriteFailure(page); assert(fault.fired > 0, 'The native transaction fault must actually fire');
-    assert.equal(await page.locator('.vocabulary-list-form [type="submit"]').isDisabled(), false);
-    // Record failures can require explicit recovery. The modal must remain
-    // dismissible so the real store recovery control can be reached.
+    // A native write fault protects the record until reload, even once the fault is gone.
+    assert.equal(await page.evaluate(() => window.annotationFixture.recordWritable()), false, 'The record must stay read-only until reload');
+    assert.equal(await page.locator('.vocabulary-list-form [type="submit"]').isDisabled(), true, 'The list form must stay disabled until reload');
+    // The modal must remain dismissible so the real store recovery control can be reached.
     await closeChooser(page);
-    if (await page.locator('#record-reload').isVisible()) {
-      await page.locator('#record-reload').click(); await page.waitForFunction(() => document.body.dataset.ready === '1');
-    }
-    assert(await page.evaluate(() => window.annotationFixture.recordWritable()), 'Record can recover after the native fault is removed');
-    await chooser(page); await createList(page, 'Retry this list');
+    await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
+    await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+    assert(await page.evaluate(() => window.annotationFixture.recordWritable()), 'Record recovers after reload');
+    assert.deepEqual((await state(page)).record, before.record);
+    await chooser(page);
+    assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list', 'The typed list name survives the reload as a session draft');
+    await page.locator('#vocabulary-list-dialog [type="submit"]').click();
     await waitForAppRecord(page, record => member(record, 'Retry this list', '電車'));
+    await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');
     assert.deepEqual(targetRows((await state(page)).record), targetRows(before.record));
   }],
   ['exact-entry-mini-and-conflict-protection', async page => {
@@ -232,17 +242,21 @@ const cases = [
 ];
 const filter = new Set(process.argv.slice(2).map(arg => { assert(arg.startsWith('--case=')); return arg.slice(7); }));
 for (const name of filter) assert(cases.some(([candidate]) => candidate === name), `Unknown case: ${name}`);
+const jobs = cases.filter(([name]) => !filter.size || filter.has(name)).map(([name, run]) => ({ name, run, body: fixture }));
+for (const [target, name, body, expect] of controls) {
+  if (!filter.size || filter.has(target)) jobs.push({ name: `control:${name}`, run: cases.find(([candidate]) => candidate === target)[1], body, expect });
+}
 let browser;
 try {
   for (const engine of engines) {
     browser = await ({ chromium, webkit })[engine].launch();
-    for (const [name, run] of cases.filter(([name]) => !filter.size || filter.has(name))) {
+    for (const { name, run, body, expect } of jobs) {
       const context = await browser.newContext({ viewport: { width: 1200, height: 900 }, locale: 'en-US', serviceWorkers: 'block' });
       await silenceBrowserAudio(context);
       await context.route('**/*', route => {
         const url = new URL(route.request().url());
         if (url.origin !== host.origin) return route.abort();
-        if (url.pathname === '/corridor.js') return route.fulfill({ contentType: 'text/javascript', body: fixture });
+        if (url.pathname === '/corridor.js') return route.fulfill({ contentType: 'text/javascript', body });
         return route.continue();
       });
       const page = await context.newPage(), errors = [];
@@ -250,8 +264,15 @@ try {
       try {
         await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
         await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
-        const observations = await run(page);
-        assert.deepEqual(errors, [], 'The interaction must not leave an unhandled application error');
+        let observations;
+        if (expect) {
+          const rejected = await run(page).then(() => null, error => error);
+          assert(expect.test(rejected?.message || ''), `The negative control must fail at its read-only assertion, not ${rejected ? rejected.message : 'pass'}`);
+          observations = { rejectedBy: rejected.message.split('\n')[0] };
+        } else {
+          observations = await run(page);
+          assert.deepEqual(errors, [], 'The interaction must not leave an unhandled application error');
+        }
         results.push({ engine, name, passed: true, ...(observations ? { observations } : {}) }); console.log(`ok ${engine}: ${name}`);
       } catch (error) {
         const detail = { engine, name, passed: false, error: String(error), stack: error.stack, errors };
@@ -267,6 +288,7 @@ try {
   await browser?.close(); await host.close();
   writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity,
     sourceSha256: sha(original), fixtureSha256: sha(fixture), shimSha256: sha(shim), verifierSha256: sha(readFileSync(new URL(import.meta.url))),
+    controls: controls.map(([target, name, body]) => ({ case: target, name, fixtureSha256: sha(body) })),
     results, failures, limits: ['Test-only export shim and synthetic anchors; no operator profile or external service.', 'Native database writes and reload durability are exercised; visual acceptance belongs to the uninstrumented app.'] }, null, 2) + '\n');
 }
 console.log(`${results.length}/${results.length + failures.length} annotation lookup cases passed. Evidence: ${evidence}`);
