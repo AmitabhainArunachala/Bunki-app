@@ -38,6 +38,7 @@ import { resolve } from 'node:path';
 
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord } from './record-test-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -159,7 +160,9 @@ try {
       check(`R1 ${w}px sheet: the permanent bug entry is visible`, (await railVisible(page)));
       check(`R3 ${w}px sheet: the entry sits at the end of the sheet`, (await sheetEntry.count()) === 1);
       if (await sheetEntry.count()) {
-        await sheetEntry.scrollIntoViewIfNeeded();
+        // Dictionary details can replace the sheet while it settles. A locator
+        // click reacquires the current entry and performs its own real scroll,
+        // visibility, stability and hit-target checks before pressing it.
         await sheetEntry.click();
         check(`R3 ${w}px sheet: the entry opens the report dialog`, await reportOpen(page));
         await closeReport(page);
@@ -237,11 +240,22 @@ try {
       await kp.locator('#review-start').click();
       const unavailable = await kp.waitForSelector('#review-answer-unavailable', { timeout: 15_000 }).then(() => true, () => false);
       check(`R9 ${w}px unavailable kanji: the real unavailable state is up`, unavailable);
-      const state = () => kp.evaluate(() => ({ ix: S.review?.ix, queue: S.review?.queue.map((row) => `${row.t}:${row.id}`),
-        revealed: S.review?.revealed, declared: S.review?.declared, srs: JSON.stringify(S.srs), revlog: S.revlog.length,
-        text: document.querySelector('#review-answer-unavailable')?.innerText || null,
-        grades: document.querySelectorAll('.grade, #reveal').length }));
+      // The staged app keeps its state inside a module. Verify the learner's
+      // actual card/counts and native durable record, without exporting or
+      // replacing private application state for this journey.
+      const state = async () => ({
+        visible: await kp.evaluate(() => ({ view: document.body.dataset.view,
+          card: document.querySelector('#review-answer-unavailable .review-front')?.textContent || null,
+          counts: ['new', 'learn', 'due'].map(kind => document.querySelector(`#review-counts .c-${kind}`)?.textContent || null),
+          progress: document.querySelector('.zen-progress i')?.style.width || null,
+          text: document.querySelector('#review-answer-unavailable')?.innerText || null,
+          grades: document.querySelectorAll('.grade, #reveal').length })),
+        record: await readAppRecord(kp),
+      });
       const before = await state();
+      check(`R9 ${w}px unavailable kanji: the seeded card is the only queued card`,
+        before.visible.card === '㐆' && JSON.stringify(before.visible.counts) === JSON.stringify(['1', '0', '0']) &&
+        before.record.taken.length === 1 && before.record.taken[0].id === '㐆', JSON.stringify(before.visible));
       check(`R9 ${w}px unavailable kanji: the page entry exists`, (await kp.locator(PAGE_ENTRY).count()) === 1);
       if (await kp.locator(PAGE_ENTRY).count()) {
         const hit = await fingerClick(kp, PAGE_ENTRY);
@@ -249,12 +263,18 @@ try {
         if (await reportOpen(kp)) await closeReport(kp);
       }
       const after = await state();
-      check(`R9 ${w}px unavailable kanji: reporting changed nothing (state, queue, record, no grade controls)`,
-        JSON.stringify(after) === JSON.stringify(before) && after.grades === 0, JSON.stringify({ before, after }));
-      await fingerClick(kp, '#review-unavailable-next');
-      const moved = await kp.waitForFunction((ix) => S.review && S.review.ix > ix, before.ix, { timeout: 5_000 }).then(() => true, () => false);
-      const graded = await kp.evaluate(() => ({ srs: JSON.stringify(S.srs), revlog: S.revlog.length }));
-      check(`R9 ${w}px unavailable kanji: continuing advances without writing a grade`, moved && graded.srs === before.srs && graded.revlog === before.revlog, JSON.stringify(graded));
+      check(`R9 ${w}px unavailable kanji: reporting changed nothing (card, queue counts, durable record, no grade controls)`,
+        JSON.stringify(after) === JSON.stringify(before) && after.visible.grades === 0,
+        JSON.stringify({ before: before.visible, after: after.visible, durableRecordUnchanged: JSON.stringify(after.record) === JSON.stringify(before.record) }));
+      const nextHit = await fingerClick(kp, '#review-unavailable-next');
+      const moved = await kp.waitForFunction(() => document.body.dataset.view === 'review' &&
+        !document.querySelector('#review-answer-unavailable') && !!document.querySelector('.review-summary') &&
+        document.querySelectorAll('.review-summary .sum-seal').length === 0,
+      null, { timeout: 5_000 }).then(() => true, () => false);
+      const finalRecord = await readAppRecord(kp);
+      check(`R9 ${w}px unavailable kanji: continuing reaches the zero-grade summary without changing the durable record`,
+        nextHit.uncovered && moved && JSON.stringify(finalRecord) === JSON.stringify(before.record),
+        JSON.stringify({ hit: nextHit, zeroGradeSummary: moved, durableRecordUnchanged: JSON.stringify(finalRecord) === JSON.stringify(before.record) }));
       await kanjiContext.close();
     }
 
