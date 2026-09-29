@@ -660,6 +660,8 @@ export function batteryGates(out, env = process.env) {
       env: { KAIRO_BROWSER: 'webkit', KAIRO_PRACTICE_OFFLINE_FAULT: 'server-disconnected' },
     },
     node('kagami', tool('verify-kagami')),
+    // card-system slice 1: the button, the counts and the session are one queue; three presets
+    node('srs-today', tool('verify-srs-today')),
     node(
       'native-readings',
       tool('verify-native-readings'),
@@ -2399,6 +2401,7 @@ async function verifyRunner(out) {
     'practice-history',
     'practice-history-webkit',
     'kagami',
+    'srs-today',
     'import-provider',
     'playback',
     'guided-session-contract',
