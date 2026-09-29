@@ -91,10 +91,10 @@ export function createAssessmentView(host) {
     return owned() && after?.attempt.attemptId === attemptId && after.attempt.status === 'in-progress' &&
       after.attempt.cursor.itemId === itemId && !!host.assistance?.(after, itemId);
   }
-  function appendText(container, text, selected, itemId, role) {
+  function appendText(container, text, selected, itemId, role, block = container) {
     const assistanceAllowed = selected.attempt.mode === 'practice' || selected.attempt.status !== 'in-progress';
     if (assistanceAllowed && host.appendLookupText) host.appendLookupText(container, text, {
-      surface: 'assessment', attemptId: selected.attempt.attemptId, itemId, role,
+      surface: 'assessment', attemptId: selected.attempt.attemptId, itemId, role, block,
       furigana: 'on-demand', beforeOpen: () => beforeLookup(selected.attempt.attemptId, itemId),
     });
     else container.append(document.createTextNode(text));
@@ -104,7 +104,8 @@ export function createAssessmentView(host) {
     for (const match of text.matchAll(/【([^】]+)】/gu)) {
       appendText(container, text.slice(cursor, match.index), selected, itemId, role);
       const target = node('span', 'exam-target');
-      appendText(target, match[1], selected, itemId, role); container.append(target);
+      // the underlined target stays part of its prompt's one keyboard stop
+      appendText(target, match[1], selected, itemId, role, container); container.append(target);
       cursor = match.index + match[0].length;
     }
     appendText(container, text.slice(cursor), selected, itemId, role);

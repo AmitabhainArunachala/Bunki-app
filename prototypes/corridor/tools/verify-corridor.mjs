@@ -597,36 +597,20 @@ async function main() {
     shelfData.every((s) => s.titleEn && s.level && /^[A-Za-z]/.test(s.level)),
     `${shelfData.length} texts, e.g. "${shelfData[0]?.titleEn}" — ${shelfData[0]?.level}${shelfData[0]?.levelNote}`);
 
-  // the shelf stands in quiet sections: every card under exactly one
-  // eyebrow, every category one contiguous run — never split across the
-  // shelf in disconnected stretches
+  // The editorial collection replaces the old static category sections.
+  // Every text remains reachable once, with the requested filter controls.
   const sectionProbe = await page.evaluate(`(() => {
-    const kids = [...document.querySelectorAll('#shelf-body > *')];
-    const runs = [];
-    let stray = 0;
-    for (const kid of kids) {
-      // 今日の棚 is a recommendation strip, not a section of the collection
-      if (kid.matches('p.eyebrow.shelf-section:not(.shelf-today)')) {
-        runs.push({ header: kid.childNodes[0]?.textContent?.trim() ?? '', items: 0 });
-      } else if (kid.matches('.shelf-item:not([data-recommendation])')) {
-        if (!runs.length) stray += 1;
-        else runs[runs.length - 1].items += 1;
-      }
-    }
-    const headers = runs.map((r) => r.header);
+    const ids = [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map(n => n.dataset.passage);
     return {
-      stray,
-      headers,
-      empty: runs.filter((r) => r.items === 0).length,
-      duplicated: headers.length !== new Set(headers).size,
-      grouped: runs.reduce((a, r) => a + r.items, 0),
+      ids, unique: new Set(ids).size,
+      controls: ['sort', 'topic', 'jlpt', 'grade'].every(key => !!document.getElementById('shelf-filter-' + key)),
+      search: !!document.getElementById('shelf-reading-search'),
     };
   })()`);
-  check('the shelf gathers into quiet sections — each category one run, no card outside one',
-    sectionProbe.stray === 0 && sectionProbe.headers.length >= 4 &&
-      !sectionProbe.duplicated && sectionProbe.empty === 0 &&
-      sectionProbe.grouped === shelfData.length,
-    `${sectionProbe.headers.length} sections: ${sectionProbe.headers.join(' · ')} — ${sectionProbe.grouped}/${shelfData.length} cards housed`);
+  check('the editorial collection contains every text once and exposes sort/topic/level/grade/search',
+    sectionProbe.controls && sectionProbe.search && sectionProbe.unique === shelfData.length &&
+      sectionProbe.ids.length === shelfData.length,
+    `${sectionProbe.unique}/${shelfData.length} unique collection entries`);
 
   // the glossary is billed as itself: one-line definitions are labeled
   // 用語集 on the card and are never counted among the "real texts"
@@ -636,15 +620,29 @@ async function main() {
       (n.querySelector('.shelf-meta')?.textContent ?? '').includes('用語集'));
     const labeled = glossary.filter((n) =>
       [...n.querySelectorAll('.shelf-meta .pool-tag')].some((t) => t.textContent.includes('用語集')));
-    const intro = document.querySelector('.shelf-snippet.intro')?.textContent ?? '';
-    return { cards: cards.length, glossary: glossary.length, labeled: labeled.length, intro };
+    const intro = document.querySelector('.shelf-count')?.textContent ?? '';
+    const results = document.querySelector('.shelf-results-count')?.textContent ?? '';
+    return { cards: cards.length, glossary: glossary.length, labeled: labeled.length, intro, results };
   })()`);
-  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) readings|読み物 ([0-9]+) 本/)?.slice(1).find(Boolean) ?? NaN);
+  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) readings?|([0-9]+) 本の読み物/)?.slice(1).find(Boolean) ?? NaN);
+  const resultTexts = Number(glossaryProbe.results.match(/([0-9]+) readings?|([0-9]+) 本の読み物/)?.slice(1).find(Boolean) ?? NaN);
   check('glossary rows are labeled 用語集 and stand outside the real-text count',
     glossaryProbe.glossary > 0 && glossaryProbe.labeled === glossaryProbe.glossary &&
       billedTexts === glossaryProbe.cards - glossaryProbe.glossary &&
-      /用語集|glossary/.test(glossaryProbe.intro),
+      resultTexts === billedTexts && /用語集|glossary/.test(glossaryProbe.intro) && /用語集|glossary/.test(glossaryProbe.results),
     `${glossaryProbe.labeled}/${glossaryProbe.glossary} labeled · intro bills ${billedTexts} texts for ${glossaryProbe.cards - glossaryProbe.glossary} non-glossary cards`);
+  await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
+  await page.locator('#shelf-reading-search').press('Enter');
+  await page.waitForFunction(() => document.querySelectorAll('#shelf-reading-results .shelf-item').length === 0);
+  check('editorial search applies an empty filter without inventing readings',
+    /0 (?:readings|本の読み物)/.test(await page.locator('.shelf-results-count').innerText()),
+    await page.locator('.shelf-results-count').innerText());
+  await page.locator('#shelf-reading-search').fill('');
+  await page.locator('#shelf-reading-search').press('Enter');
+  await page.waitForFunction(count => document.querySelectorAll('#shelf-reading-results .shelf-item').length === count, shelfData.length);
+  const restoredCollection = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(n => n.dataset.passage).sort());
+  check('clearing search restores the complete collection without duplicates',
+    JSON.stringify(restoredCollection) === JSON.stringify([...sectionProbe.ids].sort()), `${restoredCollection.length} entries restored`);
   // Disagreement may only fire where >=2 ordinal-capable signals were
   // measured on the displayed text. With the NINJAL pair unavailable to this
   // build environment, zero flags is the honest state — a flag with fewer
@@ -1872,8 +1870,12 @@ async function main() {
     d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
     JSON.stringify(d23Taken));
   // the core card leaves through its own door
-  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  await tap(page, '#mini-take');
+  await page.waitForSelector('#vocabulary-list-stop');
+  await tap(page, '#vocabulary-list-stop');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
+  await tap(page, '#vocabulary-list-close');
+  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
 
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
   await d23PageSearch();
@@ -1914,7 +1916,7 @@ async function main() {
   // the action and its DOM observation, in one guard: a failure is latched in the report at once, the bounded after
   // snapshot is still attempted and kept, and the row is incomplete
   let d23ActionError = null;
-  let d23Opened = null;
+  let d23Opened;
   // the post-open page as it stands: the sheet's own identity and its 覚 control, plus the homograph doors as a
   // diagnostic only (a cold explicit sheet holds its row by number and need not draw the same-form list)
   const d23OpenFacts = () => page.evaluate(() => {
@@ -2588,8 +2590,8 @@ async function main() {
     armed.armedBtn && armed.still === 1 && deleted.lists === 0 && deleted.taken === 1 && deleted.revlog === 1 && deleted.srsKept,
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
-  // the reader's top-right door: quiet until a word is touched, then one
-  // tap takes the current thing with the sentence it was met in
+  // The reader's capture door now opens the named-list chooser. Opening is
+  // reversible without enrollment; an explicit save keeps its source context.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
@@ -2615,7 +2617,12 @@ async function main() {
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   await tap(page, '#reader-take');
-  await page.waitForSelector('#capture-panel');
+  await page.waitForSelector('#vocabulary-list-dialog[open]');
+  check('R2-B · opening the list chooser does not enroll the word',
+    (await readAppRecord(page)).taken.length === envBefore.taken);
+  await tap(page, '#vocabulary-list-save');
+  await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
+    { description: 'explicit reader save' });
   const captured = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
@@ -2625,31 +2632,37 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
-  // the list drawer's contents wait behind its head since 2026-08-27 —
-  // open リストへ the way a finger does before probing what's inside
-  await page.evaluate(
-    `document.querySelector('#capture-panel .list-picker .fold-head')?.click()`,
-  );
-  await page.waitForTimeout(120);
   const panelBits = await page.evaluate(`(() => ({
-    take: !!document.querySelector('#capture-panel #take'),
-    scopes: document.querySelectorAll('#capture-panel [data-ctx-scope]').length,
-    lists: !!document.querySelector('#capture-panel .list-picker'),
-    newList: !!document.querySelector('#capture-panel #new-list'),
+    take: !!document.querySelector('#vocabulary-list-stop'),
+    scopes: document.querySelectorAll('#vocabulary-list-dialog [data-ctx-scope]').length,
+    lists: !!document.querySelector('#vocabulary-list-dialog .vocabulary-list-choices'),
+    newList: !!document.querySelector('#vocabulary-list-dialog .vocabulary-list-form input'),
   }))()`);
-  check('R2-B · the panel holds the undo, the scope stages, and the lists',
+  check('R2-B · the chooser preserves undo, context scopes, and named lists',
     panelBits.take && panelBits.scopes === 3 && panelBits.lists && panelBits.newList,
     JSON.stringify(panelBits));
+  for (const scope of ['word', 'para', 'sent']) {
+    await tap(page, `#vocabulary-list-dialog [data-ctx-scope="${scope}"]`);
+    const record = await waitForAppRecord(page, record => {
+      const row = record.taken.find(row => row.t === 'word' && row.id === touched.word);
+      return row && (row.ctx?.scope ?? 'word') === scope;
+    }, { description: `saved ${scope} capture context` });
+    check(`R2-B · the chooser durably saves ${scope} context without another enrollment or review`,
+      record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
+  }
   await shoot(page, shotsDir, '19-capture-sovereignty');
-  await tap(page, '#capture-panel #take');
-  await page.waitForTimeout(250);
+  await tap(page, '#vocabulary-list-stop');
+  await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === touched.word),
+    { description: 'explicit stop memorizing' });
   const undone = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  check('R2-B · a mis-tap leaves in one gesture; the revlog length never moves',
+  check('R2-B · explicit stop restores the deck size without changing the revlog',
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
+  await tap(page, '#vocabulary-list-close');
+  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
 
   // the mini carries the same door, repainting in place — the mini never blinks.
   // D11 (8d0fbccf) holds the mini's seal for a reader token the core dictionary lacks, and D23 for a
@@ -2674,19 +2687,31 @@ async function main() {
     await page.waitForTimeout(120);
   }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
-  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
-  await page.waitForTimeout(250);
+  await tap(page, '#mini-take');
+  await page.waitForSelector('#vocabulary-list-dialog[open]');
+  await tap(page, '#vocabulary-list-save');
+  await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === miniWordText),
+    { description: 'mini chooser save' });
+  await tap(page, '#vocabulary-list-close');
+  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
   const miniCap = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     const seal = document.querySelector('#mini-take');
     return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
   })()`);
-  check('R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up',
+  check('R2-B · saving through the mini chooser keeps its seal inked and sentence context',
     miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
-  if (miniIx >= 0) await page.evaluate(`document.querySelector('#mini-take')?.click()`);
-  await page.waitForTimeout(250);
+  if (miniIx >= 0) {
+    await tap(page, '#mini-take');
+    await page.waitForSelector('#vocabulary-list-stop');
+    await tap(page, '#vocabulary-list-stop');
+    await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
+      { description: 'mini chooser stop memorizing' });
+    await tap(page, '#vocabulary-list-close');
+    await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
+  }
   const miniUndone = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, sealTaken: document.querySelector('#mini-take')?.classList.contains('taken') ?? null };

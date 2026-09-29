@@ -227,11 +227,14 @@ export function selectAssessmentV2(raw, attemptId) {
 }
 
 /** Dictionary assistance is bound to the exact retained question digest. */
+function dictionaryEventFor(attempt, answer, event) {
+  return attempt?.mode === 'practice' && !!answer?.reached && attempt.conditions.includes('assisted') &&
+    event.kind === 'assistance' && event.detail === `dictionary:${answer.item.sha256}` &&
+    event.at >= attempt.startedAt && event.at <= attempt.recordedAt;
+}
 export function assessmentDictionaryAssistanceV2(attempt, itemId) {
   const answer = attempt?.answers?.find(row => row.item.id === itemId);
-  if (attempt?.mode !== 'practice' || !answer?.reached || !attempt.conditions.includes('assisted')) return null;
-  const event = attempt.events.find(row => row.kind === 'assistance' &&
-    row.detail === `dictionary:${answer.item.sha256}` && row.at >= attempt.startedAt && row.at <= attempt.recordedAt);
+  const event = answer && attempt.events.find(row => dictionaryEventFor(attempt, answer, row));
   return event ? { kind: 'dictionary', at: event.at } : null;
 }
 export function assessmentItemAssistanceV2(attempt, itemId) {
@@ -289,11 +292,12 @@ export function selectAssessmentExplanationV2(raw, attemptId, itemId) {
 }
 /** Results partition over questions. A missing item mark is not proof of
  * independence. Assistance recorded without item attribution (the retained
- * aggregate `assisted` condition with no item mark, more assistance events than
- * marks, or the engine's carried `assistanceAttribution: 'unknown'` record from
- * a later explanation) makes attribution unknown, and the independent count is
- * then withheld (null). Only question counts are reported: an event count is not
- * a number of questions, and no missing count is invented. */
+ * aggregate `assisted` condition with no item mark or item-bound lookup, more
+ * assistance events than marks and item-bound lookups, or the engine's carried
+ * `assistanceAttribution: 'unknown'` record from a later explanation) makes
+ * attribution unknown, and the independent count is then withheld (null). Only
+ * question counts are reported: an event count is not a number of questions,
+ * and no missing count is invented. */
 export function assessmentIndependenceV2(selected) {
   if (!selected?.score) return null;
   let answered = 0, assisted = 0, assistedCorrect = 0, unanswered = 0;
@@ -304,9 +308,12 @@ export function assessmentIndependenceV2(selected) {
       assisted++; if (row.result === 'correct') assistedCorrect++;
     }
   }
-  const events = selected.attempt.events.filter(entry => entry.kind === 'assistance').length;
-  const unknown = selected.attempt.assistanceAttribution === 'unknown' || events > assisted ||
-    selected.attempt.conditions.includes('assisted') && assisted === 0;
+  const { attempt } = selected;
+  const events = attempt.events.filter(entry => entry.kind === 'assistance');
+  const lookups = events.filter(entry => attempt.answers.some(answer => dictionaryEventFor(attempt, answer, entry))).length;
+  const marks = attempt.answers.filter(entry => entry.assistance).length;
+  const unknown = attempt.assistanceAttribution === 'unknown' || events.length - lookups > marks ||
+    attempt.conditions.includes('assisted') && marks === 0 && lookups === 0;
   return Object.freeze({ answered, assisted, assistedCorrect, unanswered,
     attribution: unknown ? 'unknown' : 'complete', independent: unknown ? null : answered - assisted });
 }

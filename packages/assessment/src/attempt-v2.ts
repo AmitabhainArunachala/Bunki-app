@@ -180,6 +180,21 @@ function condition(state: Payload, value: z.infer<typeof conditionSchema>) {
 function event(state: Payload, kind: z.infer<typeof eventSchema>['kind'], detail: string) {
   state.events.push({ kind, at: state.recordedAt, blockId: state.cursor.blockId, detail });
 }
+/** Dictionary help names the exact digest of a reached item, so it is already attributed. */
+function itemDictionaryEvents(state: Payload) {
+  const details = new Set(
+    state.answers
+      .filter((entry) => entry.reached)
+      .map((entry) => `dictionary:${entry.item.sha256}`),
+  );
+  return state.events.filter(
+    (entry) =>
+      entry.kind === 'assistance' &&
+      details.has(entry.detail) &&
+      entry.at >= state.startedAt &&
+      entry.at <= state.recordedAt,
+  ).length;
+}
 function validate(form: FormVersion, state: Payload) {
   assertExactReference(state.form, form);
   assertUnique(state.conditions, 'conditions');
@@ -545,14 +560,15 @@ export function updateAttemptV2(
         const spec = form.items.find((item) => item.id === action.itemId)!.response;
         if (!answer.reached || answer.response.kind !== 'selected' || spec.kind !== 'selected')
           fail('assistance-before-answer');
-        // A new explanation cannot account for help recorded before any item mark (the
-        // aggregate condition with no mark, or more assistance events than marks). Carry that
-        // known uncertainty into this revision instead of letting the new mark hide it.
+        // A new explanation cannot account for earlier help lacking either an item mark
+        // or an exact-item dictionary event. Carry that known uncertainty into this
+        // revision instead of letting the new mark hide it.
         const marksBefore = state.answers.filter((entry) => entry.assistance).length;
         const eventsBefore = state.events.filter((entry) => entry.kind === 'assistance').length;
+        const lookupsBefore = itemDictionaryEvents(state);
         if (
-          (state.conditions.includes('assisted') && marksBefore === 0) ||
-          eventsBefore > marksBefore
+          (state.conditions.includes('assisted') && marksBefore === 0 && lookupsBefore === 0) ||
+          eventsBefore - lookupsBefore > marksBefore
         )
           state.assistanceAttribution = 'unknown';
         answer.assistance = {
