@@ -805,11 +805,15 @@ PROBES['sheet-summary-tab'] = async () => {
 
 /* chip-focus-fallback-crosses-rooms — 680aa4de's last-resort focus (class and place) also ran
  * when a press changed rooms: Enter on the review summary's リストへ put the keyboard on the
- * tray's 復習する, so a second Enter started a new review. Five of seven due cards per sitting,
- * so the tray still offers a review after the summary. */
+ * tray's 復習する, so a second Enter started a new review. Five cards due now and two learning
+ * cards ripening in ten minutes: the sitting serves the five, and after the summary Anki's
+ * learn-ahead (20 minutes, card-system slice 1) still offers the two on the tray. */
 PROBES['chip-focus-rooms'] = async () => {
   const seed = envelope({ words: ['学校', '電話', '先生', '時間', '天気', '友達', '映画'] });
-  seed.srsPrefs = { reviewLimit: 5 };
+  for (const word of ['友達', '映画']) {
+    Object.assign(seed.srs[`word:${word}`], { state: 1, due: new Date(Date.now() + 10 * 60000).toISOString(),
+      scheduled_days: 0, learning_steps: 1 });
+  }
   const { context, page } = await learner({ seed });
   await open(page);
   await reachSummary(page);

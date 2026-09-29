@@ -51,6 +51,11 @@ const names = new Set([
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
   'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem',
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
+  // card-system slice 1: the preset buttons, the pacing steppers and the optional break
+  'NEW_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_MIN', 'REVIEWS_PER_DAY_MAX', 'RETENTION_MIN', 'RETENTION_MAX',
+  'PAUSE_EVERY_MIN', 'PAUSE_EVERY_MAX', 'SRS_PRESETS', 'SRS_PRESET_IDS', 'SRS_PRESET_LINES', 'SRS_PREF_LADDERS',
+  'validNewPerDay', 'validReviewsPerDay', 'validRetention', 'validPreset', 'validPauseEvery',
+  'srsPresetState', 'srsPrefValue', 'srsPrefStep', 'chooseSrsPreset', 'srsSchedulePolicy', 'srsPauseEvery', 'renderReviewBreak',
   'canonicalRecordJson',
   // D23: the saved word answer, the shown-answer binding both grade producers check, and the capture plan
   'reviewAnswerAvailable', 'reviewCardBack', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'owns',
@@ -396,6 +401,25 @@ await check('preference-step-merges-latest-pacing-without-publishing-unacknowled
   const promise = plus.fire(); await plus.fire(); assert.equal(f.queue.length, 1); assert.equal(f.S.srsPrefs.newPerDay, 20);
   f.external({ srsPrefs: { newPerDay: 25, reviewLimit: 50 } }); f.ack(); await promise;
   assert.equal(f.S.srsPrefs.newPerDay, 30); assert.equal(f.S.srsPrefs.reviewLimit, 50);
+});
+
+await check('pace-panel-offers-three-presets-and-names-a-hand-set-schedule-custom', async () => {
+  const find_all = (node, predicate, out = []) => { if (predicate(node)) out.push(node); node.children?.forEach((child) => find_all(child, predicate, out)); return out; };
+  let f = fixture({ view: 'tray', srsPrefsOpen: true, srsPrefs: { newPerDay: 20 } });
+  let root = f.render('renderSrsPrefs');
+  const presets = find_all(root, (node) => node.dataset?.preset);
+  assert.deepEqual(presets.map((node) => node.dataset.preset), ['gentle', 'standard', 'hardcore']);
+  assert.equal(byId(root, 'srs-preset-now').textContent, 'now — Standard');
+  assert.equal(find(root, (node) => node.dataset?.prefVal === 'reviewsPerDay').textContent, '200');
+  assert.equal(find(root, (node) => node.dataset?.prefVal === 'pauseEvery').textContent, 'off');
+  f = fixture({ view: 'tray', srsPrefsOpen: true, srsPrefs: { newPerDay: 35, preset: 'custom:hardcore', reviewsPerDay: 9999 } });
+  root = f.render('renderSrsPrefs');
+  assert.equal(byId(root, 'srs-preset-now').textContent, 'now — Custom (from Hardcore)');
+  assert.equal(find(root, (node) => node.dataset?.prefVal === 'reviewsPerDay').textContent, 'no cap');
+  assert(find(root, (node) => node.dataset?.prefUp === 'reviewsPerDay').disabled, 'no cap is the top of the ladder');
+  const plus = find(root, (node) => node.dataset?.prefUp === 'newPerDay');
+  const promise = plus.fire(); f.ack(); await promise;
+  assert.deepEqual({ ...f.S.srsPrefs }, { newPerDay: 40, preset: 'custom:hardcore', reviewsPerDay: 9999 });
 });
 
 /* Opt-in generated handler histories. Storage is deliberately a small controlled
