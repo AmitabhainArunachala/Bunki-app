@@ -226,24 +226,25 @@ async function openRow(page, id) {
 }
 
 /* d9f0b984 — rows wearing 検収前 offered no reason: the reason block was gated
- * on pendingVerification, which few of them carry. */
+ * on pendingVerification, which few of them carry. Since the design pass of 2026-09-30 the
+ * learner-facing mark is the 未確認 chip (its reason in the tooltip and the article's footer). */
 PROBES['review-reason'] = async () => {
   const { context, page } = await learner();
   await open(page, '?entry=shelf&ui=bi');
   const freeze = /archive froze/;
   const human = await openRow(page, 'env:press-press_05591');
-  check('d9f0b984 · a row marked 検収前 for human review says so, and not with another source\'s story',
-    /検収前/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
+  check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
+    /未確認/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
     JSON.stringify(human).slice(0, 400));
   await page.click('#back');
   const rights = await openRow(page, 'yasashii:1');
   check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /検収前/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
+    /未確認/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
     JSON.stringify(rights).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
   check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/検収前/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
+    !/未確認/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
     JSON.stringify(approved).slice(0, 300));
   await context.close();
 };

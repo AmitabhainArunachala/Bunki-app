@@ -176,7 +176,10 @@ const cases = [
   ['shelf-filters-match-and-survive-navigation', async page => {
     const readings = await page.evaluate(() => window.annotationFixture.D.passages
       .filter(row => !String(row.file || '').startsWith('archive/'))
-      .map(row => ({ id: row.id, title: row.title, titleEn: row.titleEn || '', snippet: row.snippet || '', facets: row.readingFacets || {} })));
+      .map(row => ({ id: row.id, title: row.title, titleEn: row.titleEn || '', snippet: row.snippet || '', facets: row.readingFacets || {}, basedOn: row.adaptation?.basedOn || null })))
+      // one card per story (design pass 2026-09-30): an N3 rewrite whose original stands on the
+      // shelf is that story's やさしい版 inside the article, not a card of its own
+      .then(rows => rows.filter(row => !(row.basedOn && rows.some(other => other.id === row.basedOn))));
     const topic = ['science', 'culture', 'news', 'society'].find(topic => {
       const matches = readings.filter(row => row.facets.topics?.includes(topic));
       return matches.length > 0 && matches.length < readings.length;
