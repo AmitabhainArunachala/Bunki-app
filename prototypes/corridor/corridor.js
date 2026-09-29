@@ -11248,6 +11248,13 @@ const assessmentForms = new Map();
 const assessmentDefinitions = new Map();
 const assessmentDeliveries = new Map();
 let assessmentDeliveryStore = null;
+// Real papers imported on this device: their own IndexedDB, their own delivery store, no network.
+let assessmentPrivateStore = null, assessmentPrivateDeliveryStore = null;
+const assessmentFormStores = new Map();
+function privateAssessmentStore() {
+  assessmentPrivateStore ||= assessmentDeliveryModule.createPrivateAssessmentStore({ validateForm: assessmentV2Module.parseFormVersion });
+  return assessmentPrivateStore;
+}
 function assessmentFetch(...args) { return (window.__KAIRO_ASSESSMENT_FETCH__ || fetch)(...args); }
 function assessmentPublicCache() { return window.__KAIRO_ASSESSMENT_CACHE__ || globalThis.caches; }
 function assessmentCatalogVersions(catalog = assessmentCatalog) {
@@ -11332,15 +11339,59 @@ async function loadAssessmentCatalog() {
   if (catalog.schema !== 'kairo-assessment-catalog/1' || !Array.isArray(catalog.entries) ||
       (catalog.archivedEntries !== undefined && !Array.isArray(catalog.archivedEntries)) ||
       sources.schema !== 'kairo-assessment-sources/1' || !Array.isArray(sources.sources)) throw new Error('assessment-catalog-version');
-  assessmentCatalog = { ...catalog, sources: sources.sources };
+  // A public catalog never carries a private paper; imported papers join from this device only.
+  const publicEntries = catalog.entries.filter(row => row?.sourceClass !== 'official-private' && row?.privatePack === undefined);
+  let privateEntries;
+  try { privateEntries = await privateAssessmentStore().entries(); } catch { privateEntries = []; }
+  assessmentCatalog = { ...catalog, entries: [...publicEntries, ...privateEntries], sources: sources.sources };
   return assessmentCatalog;
+}
+async function importPrivateAssessmentPack(files) {
+  try {
+    const result = await privateAssessmentStore().importFiles(files);
+    assessmentCatalog = null; await loadAssessmentCatalog();
+    return { ok: true, entry: result.entry };
+  } catch (error) {
+    return { ok: false, code: error?.code || (error?.name === 'QuotaExceededError' ? 'private-pack-quota' : 'private-pack-format'),
+      detail: String(error?.name || 'Error') };
+  }
+}
+async function removePrivateAssessmentPack(packId) {
+  try { await privateAssessmentStore().remove(packId); assessmentCatalog = null; await loadAssessmentCatalog(); return true; }
+  catch { return false; }
+}
+function officialAssessmentEntry(selected) {
+  const form = selected?.form;
+  if (form?.provenance?.kind !== 'official-private') return null;
+  return assessmentCatalogVersions().find(row => row.id === form.id && row.formSha256 === form.sha256 &&
+    assessmentDeliveryModule?.officialPrivateEntry(row)) || null;
+}
+async function officialAssessmentPages(selected, itemId) {
+  const entry = officialAssessmentEntry(selected);
+  if (!entry) return [];
+  const pack = await privateAssessmentStore().pack(entry.packId);
+  const item = selected.form.items.find(row => row.id === itemId);
+  const sheets = [...new Set([...(pack?.itemPages?.[itemId] || []),
+    ...(item?.passages || []).flatMap(ref => pack?.passagePages?.[ref.id] || [])])];
+  const pages = [];
+  for (const sheet of sheets) {
+    const page = (pack?.pages || []).find(row => row.sheet === sheet);
+    const blob = page && await privateAssessmentStore().pageBlob(entry.packId, page.sha256);
+    if (blob) pages.push({ sheet, blob });
+  }
+  return pages;
 }
 async function loadAssessmentForm(entry) {
   const key = entry.formSha256;
-  assessmentDeliveryStore ||= assessmentDeliveryModule.createAssessmentDelivery({ baseUrl: new URL('./', location.href).href,
+  let store;
+  if (assessmentDeliveryModule.officialPrivateEntry(entry)) {
+    const privateStore = privateAssessmentStore();
+    store = assessmentPrivateDeliveryStore ||= assessmentDeliveryModule.createAssessmentDelivery({
+      baseUrl: assessmentDeliveryModule.PRIVATE_BASE_URL, fetchAsset: privateStore.fetchAsset, cacheStorage: privateStore.cacheStorage });
+  } else store = assessmentDeliveryStore ||= assessmentDeliveryModule.createAssessmentDelivery({ baseUrl: new URL('./', location.href).href,
     fetchAsset: assessmentFetch, cacheStorage: assessmentPublicCache() });
-  const { form, delivery } = await assessmentDeliveryStore.prepare(entry, assessmentV2Module.parseFormVersion);
-  assessmentForms.set(key, form); assessmentDeliveries.set(key, delivery); return form;
+  const { form, delivery } = await store.prepare(entry, assessmentV2Module.parseFormVersion);
+  assessmentForms.set(key, form); assessmentDeliveries.set(key, delivery); assessmentFormStores.set(key, store); return form;
 }
 // A finished or reopened attempt may need its delivery for per-question provenance only.
 const assessmentDeliveryLoads = new Map();
@@ -11359,7 +11410,7 @@ async function assessmentMediaBlob(selected, assetId) {
     if (!entry) throw new Error('assessment-exact-form-unavailable');
     await loadAssessmentForm(entry);
   }
-  return assessmentDeliveryStore.mediaBlob(assetId);
+  return (assessmentFormStores.get(selected.form.sha256) || assessmentDeliveryStore).mediaBlob(assetId);
 }
 async function assessmentMediaBytes(selected, assetId) {
   if (!assessmentDeliveries.has(selected.form.sha256)) {
@@ -11368,7 +11419,7 @@ async function assessmentMediaBytes(selected, assetId) {
     if (!entry) throw new Error('assessment-exact-form-unavailable');
     await loadAssessmentForm(entry);
   }
-  return assessmentDeliveryStore.mediaBytes(assetId);
+  return (assessmentFormStores.get(selected.form.sha256) || assessmentDeliveryStore).mediaBytes(assetId);
 }
 function currentAssessmentV2(attemptId) {
   if (!assessmentV2Module || !S.assessmentLibraryV2) return null;
@@ -11584,6 +11635,11 @@ function createAssessmentRoom() {
       ? assessmentDeliveryModule.MACHINE_CHECK_LABEL : null,
     itemCheck: (selected, itemId) => assessmentDeliveries.get(selected.form.sha256)?.itemChecks?.find(row => row.itemId === itemId) || null,
     officialFacts: level => assessmentV2Module?.jlptOfficialFacts?.(level) || null,
+    // 本物 class: a real paper from this device's private store (never mixed with AI forms)
+    officialEntry: officialAssessmentEntry,
+    officialPages: officialAssessmentPages,
+    importPrivatePack: importPrivateAssessmentPack,
+    removePrivatePack: removePrivateAssessmentPack,
     ensureDelivery: ensureAssessmentDelivery,
     remaining: selected => {
       if (!selected.block || selected.remainingMs === null) return 0;

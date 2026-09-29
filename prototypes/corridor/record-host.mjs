@@ -59,8 +59,28 @@ function merged(record, patch) {
   for (const [key, value] of Object.entries(patch)) result[key] = value;
   return result;
 }
+/** A real exam paper imported for personal study has rights.sync denied: its questions, audio
+ * transcripts and attempts never ride a backup. The backup names each omitted attempt only. */
+function withoutPrivateAssessments(record) {
+  const library = record.assessmentLibraryV2;
+  const denied = (library?.forms || []).filter((form) => form?.rights?.sync?.status === 'denied');
+  if (!denied.length) return record;
+  const hashes = new Set(denied.map((form) => form.sha256));
+  const omitted = library.attempts.filter((attempt) => hashes.has(attempt.form?.sha256));
+  const ids = new Set(omitted.map((attempt) => attempt.attemptId));
+  const next = { ...record,
+    assessmentLibraryV2: { ...library, forms: library.forms.filter((form) => !hashes.has(form.sha256)),
+      attempts: library.attempts.filter((attempt) => !ids.has(attempt.attemptId)),
+      activeAttemptId: ids.has(library.activeAttemptId) ? null : library.activeAttemptId },
+    assessmentPrivateOmitted: [...(Array.isArray(record.assessmentPrivateOmitted) ? record.assessmentPrivateOmitted : []),
+      ...omitted.map((attempt) => ({ attemptId: attempt.attemptId, formId: attempt.form.id, formSha256: attempt.form.sha256 }))] };
+  if (Array.isArray(record.assessmentLearning?.followups))
+    next.assessmentLearning = { ...record.assessmentLearning,
+      followups: record.assessmentLearning.followups.filter((followup) => !ids.has(followup.attemptId)) };
+  return next;
+}
 function portable(record) {
-  return Object.fromEntries(Object.entries(record).filter(([key]) => !NONPORTABLE.has(key)));
+  return Object.fromEntries(Object.entries(withoutPrivateAssessments(record)).filter(([key]) => !NONPORTABLE.has(key)));
 }
 function counts(record, turns, journal) {
   return { archiveTurns: turns.length, chatTurns: record.aiChat?.length || 0,

@@ -27,6 +27,34 @@ async function mediaSource(bytes, mimeType) {
     parts.push(String.fromCharCode(...value.subarray(offset, offset + 32768)));
   return `data:${mimeType};base64,${btoa(parts.join(''))}`;
 }
+// Printed features of a real paper, carried as private-use marks in its text (see
+// tools/assessment/official-paper.mjs): underline, ruby base/reading, a boxed item number.
+const PAPER_MARKS = /[\uE000-\uE006]/u;
+function paperNodes(text) {
+  const fragment = document.createDocumentFragment();
+  let target = fragment, buffer = '';
+  const flush = () => { if (buffer) { target.append(document.createTextNode(buffer)); buffer = ''; } };
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index];
+    if (char === '\uE000') { flush(); const span = node('span', 'paper-underline'); fragment.append(span); target = span; }
+    else if (char === '\uE001') { flush(); target = fragment; }
+    else if (char === '\uE002') {
+      flush();
+      const split = text.indexOf('\uE003', index), close = text.indexOf('\uE004', split);
+      if (split < 0 || close < 0) continue;
+      const ruby = document.createElement('ruby');
+      ruby.append(document.createTextNode(text.slice(index + 1, split)), node('rt', '', text.slice(split + 1, close)));
+      target.append(ruby); index = close;
+    } else if (char === '\uE005') {
+      flush();
+      const close = text.indexOf('\uE006', index);
+      if (close < 0) continue;
+      target.append(node('span', 'paper-box', text.slice(index + 1, close))); index = close;
+    } else if (!PAPER_MARKS.test(char)) buffer += char;
+  }
+  flush(); return fragment;
+}
+const paperPlain = text => text.replace(/\uE002([^\uE003]*)\uE003[^\uE004]*\uE004/gu, '$1').replace(/[\uE000-\uE006]/gu, '');
 const minutes = ms => Math.max(0, Math.ceil(ms / 60_000));
 const clockText = ms => `${Math.floor(ms / 60_000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
 /** Display structure comes from the retained item; no answer key is read. */
@@ -252,6 +280,15 @@ export function createAssessmentView(host) {
   };
   const titleOf = entry => host.english() ? entry.titleEn : entry.titleJa;
   const hasListening = entry => Number(entry.skillCounts?.listening) > 0;
+  const isOfficial = entry => entry?.sourceClass === 'official-private';
+  const officialOf = selected => (selected ? host.officialEntry?.(selected) || null : null);
+  // Real-paper text keeps its printed underlines, ruby and boxed numbers; other forms stay plain text.
+  const textNode = (tag, className, text, official) => {
+    if (!official) return node(tag, className, text);
+    const element = node(tag, className); element.append(paperNodes(text)); return element;
+  };
+  let importing = false, importNotice = null;
+  const pageUrls = new Set();
   const refresh = () => host.render();
   const selection = () => host.selection(selectedId);
   const owned = () => host.owned?.() !== false;
@@ -364,7 +401,7 @@ export function createAssessmentView(host) {
     const ok = await host.action({ kind: 'resume' });
     if (!alive(generation)) return false;
     const updated = selection();
-    if (!ok) notice = tx('再開を保存できませんでした。もう一度お試しください。', 'Couldn’t resume the test. Please try again.');
+    if (!ok) notice = tx('再開を保存できませんでした。もう\u4E00度お試しください。', 'Couldn’t resume the test. Please try again.');
     return ok && updated?.attempt.attemptId === current.attempt.attemptId && updated.attempt.status === 'in-progress';
   }
   async function command(action, internal = false) {
@@ -390,7 +427,7 @@ export function createAssessmentView(host) {
     const current = selection();
     if (activeAudio && (!current || current.attempt.status !== 'in-progress' ||
         !current.attempt.blocks.some(row => row.status === 'open'))) stopAudio();
-    if (!ok) notice = tx('保存できませんでした。もう一度お試しください。', 'Couldn’t save that change. Please try again.');
+    if (!ok) notice = tx('保存できませんでした。もう\u4E00度お試しください。', 'Couldn’t save that change. Please try again.');
     refresh(); return ok;
   }
   async function audioFact(attemptId, mediaId, action, positionMs, generation = lifecycle) {
@@ -449,7 +486,7 @@ export function createAssessmentView(host) {
       block.append(node('p', 'exam-status', hasTests
         ? tx('以前の練習セットを読み込めませんでした。', 'The older practice sets couldn’t load.')
         : tx(`${level}の確認済みテストは、まだありません。以前の練習セットを読み込めませんでした。`, `No checked ${level} tests yet, and the older practice sets couldn’t load.`)));
-      block.append(button(tx('もう一度読み込む', 'Try loading again'), 'exam-older-retry', () => host.retryOlderIndex?.()));
+      block.append(button(tx('もう\u4E00度読み込む', 'Try loading again'), 'exam-older-retry', () => host.retryOlderIndex?.()));
       main.append(block); return;
     }
     block.append(node('p', '', hasTests
@@ -468,7 +505,7 @@ export function createAssessmentView(host) {
       door.disabled = !!host.olderSetLoading?.(set.setId);
       block.append(door);
       if (host.olderSetFailed?.(set.setId)) {
-        const failure = node('p', 'exam-status exam-older-failed', tx('このセットを読み込めませんでした。もう一度押すと再試行します。', 'This set couldn’t load. Press it again to retry.'));
+        const failure = node('p', 'exam-status exam-older-failed', tx('このセットを読み込めませんでした。もう\u4E00度押すと再試行します。', 'This set couldn’t load. Press it again to retry.'));
         failure.dataset.olderFailed = set.setId; block.append(failure);
       }
     }
@@ -512,12 +549,13 @@ export function createAssessmentView(host) {
     }
     main.append(lengths);
     if (!catalog) {
-      main.append(node('p', 'exam-status', failed ? tx('問題一覧を読み込めませんでした。', 'Couldn’t load the tests.') : tx('読み込み中…', 'Loading tests…')));
+      main.append(node('p', 'exam-status', failed ? tx('問題\u4E00覧を読み込めませんでした。', 'Couldn’t load the tests.') : tx('読み込み中…', 'Loading tests…')));
       if (failed) main.append(button(tx('再試行', 'Try again'), 'exam-retry', loadCatalog));
       else if (!loading) void loadCatalog();
       return;
     }
-    const written = catalog.entries.filter(entry => entry.level === level && entry.mode === 'written');
+    renderOfficial(main);
+    const written = catalog.entries.filter(entry => entry.level === level && entry.mode === 'written' && !isOfficial(entry));
     if (written.length) {
       const group = node('section', 'exam-written'); group.dataset.examWritten = level;
       group.append(node('h2', 'exam-section-heading', tx('筆記テスト（文字・語彙・文法・読解）', 'Written tests (vocabulary, grammar, reading)')));
@@ -527,9 +565,9 @@ export function createAssessmentView(host) {
       for (const entry of written) renderCard(group, entry);
       main.append(group);
     }
-    const entries = catalog.entries.filter(entry => entry.level === level && entry.mode === length);
-    const sections = catalog.entries.filter(entry => entry.level === level && entry.mode === 'section');
-    const levelChecked = catalog.entries.some(entry => entry.level === level && entry.mode !== 'written');
+    const entries = catalog.entries.filter(entry => entry.level === level && entry.mode === length && !isOfficial(entry));
+    const sections = catalog.entries.filter(entry => entry.level === level && entry.mode === 'section' && !isOfficial(entry));
+    const levelChecked = catalog.entries.some(entry => entry.level === level && entry.mode !== 'written' && !isOfficial(entry));
     if (levelChecked && !entries.length) main.append(node('p', '', tx('この長さの確認済みテストは、まだありません。', 'No checked test of this length yet.')));
     for (const [index, entry] of [...entries, ...sections].entries()) {
       if (index === entries.length && sections.length) main.append(node('h2', 'exam-section-heading', tx('分野別の練習', 'Practice by skill')));
@@ -540,6 +578,61 @@ export function createAssessmentView(host) {
     const attempts = host.library()?.attempts || [];
     if (attempts.length || host.received?.().length) main.append(button(tx('これまでの結果', 'Test history'), 'exam-history', () => { historyOpen = true; refresh(); }));
     main.append(button(tx('以前の短い練習問題', 'Earlier practice exercises'), 'exam-legacy', () => { legacyOpen = true; refresh(); }));
+  }
+  // Real JLPT papers the learner imported on this device. Never mixed with the original tests.
+  function renderOfficial(main) {
+    const group = node('section', 'exam-official'); group.dataset.examOfficial = level;
+    group.append(node('h2', 'exam-section-heading', tx('本物の試験（この端末だけ）', 'Real JLPT papers (this device only)')));
+    const imported = catalog.entries.filter(entry => isOfficial(entry) && entry.level === level);
+    group.append(node('p', 'exam-status', imported.length
+      ? tx('日本語能力試験の公式問題集から、この端末に読み込んだ問題です。個人学習用で、バックアップ・同期・外部のAIには送りません。',
+        'Questions from the official JLPT workbooks, imported on this device for personal study. They never go into backups, sync or an outside AI.')
+      : tx(`${level}の本物の試験は、まだ読み込まれていません。Macで作った .kairo-private-pack ファイルを選んでください。`,
+        `No real ${level} paper imported yet. Choose the .kairo-private-pack file made on your Mac.`)));
+    for (const entry of imported) renderOfficialCard(group, entry);
+    const label = node('label', 'chip exam-official-import');
+    label.append(node('span', '', importing ? tx('確認して保存しています…', 'Checking and saving…') : tx('本物の試験を読み込む', 'Import a real test')));
+    const input = node('input'); input.type = 'file'; input.multiple = true; input.id = 'exam-official-file';
+    input.accept = '.kairo-private-pack,application/json,audio/mpeg,image/jpeg'; input.disabled = importing || !host.importPrivatePack;
+    input.className = 'exam-official-file';
+    input.addEventListener('change', async () => {
+      const files = [...(input.files || [])]; if (!files.length || importing) return;
+      importing = true; importNotice = null; refresh();
+      const result = await host.importPrivatePack(files);
+      importing = false;
+      importNotice = { code: result.ok ? 'imported' : `${result.code}:${result.detail || ''}`, text: result.ok ? tx(`「${result.entry.titleJa}」を読み込みました（${result.entry.questionCount}問）。`, `Imported "${result.entry.titleEn}" (${result.entry.questionCount} questions).`)
+        : result.code === 'private-pack-changed' ? tx('ファイルの中身が作成時と\u4E00致しません。Macで作り直してください。', 'The file does not match what was built. Rebuild it on your Mac.')
+          : result.code === 'private-pack-quota' || result.code === 'private-pack-storage' ? tx('この端末に保存できませんでした。空き容量を確認してください。', 'Couldn’t store it on this device. Check your free space.')
+            : tx('本物の試験のファイルとして読めませんでした。', 'That file isn’t a real-test pack.') };
+      if (result.ok) { catalog = null; level = result.entry.level || level; }
+      refresh();
+    });
+    label.append(input); group.append(label);
+    if (importNotice) {
+      const status = node('p', 'exam-status exam-official-notice', importNotice.text); status.setAttribute('role', 'status');
+      if (importNotice.code) status.dataset.importCode = importNotice.code;
+      group.append(status);
+    }
+    main.append(group);
+  }
+  function officialBadge(entry) {
+    const badge = node('p', 'exam-official-badge'); badge.lang = 'ja';
+    badge.append(node('span', 'exam-official-mark', entry.review.label), node('span', 'exam-official-byline', entry.review.byline || ''));
+    return badge;
+  }
+  function renderOfficialCard(main, entry) {
+    const card = node('article', 'exam-form exam-official-form'); card.dataset.examForm = entry.id; card.dataset.officialForm = entry.id;
+    card.append(officialBadge(entry), node('h2', '', titleOf(entry)));
+    const listeningMinutes = Math.ceil((entry.listeningTiming?.recordedDurationMs || 0) / 60_000);
+    card.append(node('p', 'exam-form-meta', tx(`${entry.questionCount}問 · 言語知識・読解 ${entry.durationMinutes - Math.ceil((entry.listeningTiming?.scheduledDurationMs || 0) / 60_000)}分 · 聴解 約${listeningMinutes}分`,
+      `${entry.questionCount} questions · language knowledge and reading ${entry.durationMinutes - Math.ceil((entry.listeningTiming?.scheduledDurationMs || 0) / 60_000)} min · listening about ${listeningMinutes} min`)));
+    card.append(node('p', 'exam-skills', Object.entries(SKILLS).filter(([skill]) => Number(entry.skillCounts?.[skill]) > 0)
+      .map(([, labels]) => tx(...labels)).join(' · ')));
+    const start = button(tx('本番と同じ条件で始める', 'Start under exam conditions'), null, () => { confirmation = { kind: 'start', entry }; refresh(); }, 'take');
+    start.dataset.examStart = entry.id; start.disabled = host.pending(); card.append(start);
+    const remove = button(tx('この端末から削除', 'Remove from this device'), null, () => { confirmation = { kind: 'remove', entry }; refresh(); });
+    remove.dataset.officialRemove = entry.id; card.append(remove);
+    main.append(card);
   }
   function renderCard(main, entry) {
     const card = node('article', 'exam-form'); card.dataset.examForm = entry.id;
@@ -569,9 +662,33 @@ export function createAssessmentView(host) {
   }
   function renderConfirmation(main, value) {
     const section = node('section', 'exam-confirm'); section.setAttribute('aria-labelledby', 'exam-confirm-title');
-    section.append(node('h2', '', value.kind === 'start' ? titleOf(value.entry) : tx('このパートを終了しますか？', 'Finish this section?')));
+    section.append(node('h2', '', value.kind === 'start' ? titleOf(value.entry) : value.kind === 'remove'
+      ? tx('この端末から削除しますか？', 'Remove from this device?') : tx('このパートを終了しますか？', 'Finish this section?')));
     section.firstChild.id = 'exam-confirm-title';
-    if (value.kind === 'start') {
+    if (value.kind === 'start' && isOfficial(value.entry)) {
+      section.prepend(officialBadge(value.entry));
+      section.append(node('p', '', tx('本番と同じ条件で受けます。言語知識・読解は時間を計り、聴解は公式の音声を最初から最後まで\u4E00度だけ続けて流します。聴解の音声は止めたり、戻したり、もう\u4E00度聞いたりできません。',
+        'This runs like the real exam: the language-knowledge and reading paper is timed, and the listening plays the official recordings once, straight through. Listening can’t be paused, rewound or replayed.')));
+      section.append(node('p', '', tx('結果は、公式の得点区分ごとの正答数で表示します。尺度得点への換算や合否の予測はしません。',
+        'Results show your raw correct answers for each official score section. No conversion to a scaled score and no pass prediction.')));
+      section.append(node('p', 'exam-download-note', tx('この端末に保存した問題と音声を確認してから計時を始めます。', 'The questions and audio stored on this device are checked before the timer starts.')));
+      section.append(button(tx('本番モードで始める', 'Start exam mode'), 'exam-confirm-start', async () => {
+        if (!owned()) return; const generation = lifecycle;
+        const ok = await host.start(value.entry, 'timed'); if (!alive(generation)) return;
+        if (ok) confirmation = null; refresh();
+      }, 'take'));
+    } else if (value.kind === 'remove') {
+      section.prepend(officialBadge(value.entry));
+      section.append(node('p', '', tx('この端末から問題と音声を削除します。これまでの結果は残ります。もう\u4E00度使うときは、ファイルを読み込み直してください。',
+        'This deletes the questions and audio from this device. Your past results stay. Import the file again to use it.')));
+      section.append(button(tx('削除する', 'Remove'), 'exam-confirm-remove', async () => {
+        if (!owned()) return; const generation = lifecycle;
+        const ok = await host.removePrivatePack?.(value.entry.packId); if (!alive(generation)) return;
+        confirmation = null; if (ok) catalog = null;
+        importNotice = { code: ok ? 'removed' : 'remove-failed', text: ok ? tx('この端末から削除しました。', 'Removed from this device.') : tx('削除できませんでした。', 'Couldn’t remove it.') };
+        refresh();
+      }));
+    } else if (value.kind === 'start') {
       const writtenSection = ['section', 'written'].includes(value.entry.mode), audio = hasListening(value.entry);
       if (value.entry.review?.status === 'machine-checked') section.append(reviewMark(value.entry.review.label, true));
       if (writtenSection) section.append(node('p', 'exam-scope-note', tx(
@@ -677,7 +794,7 @@ export function createAssessmentView(host) {
       }
       main.append(section);
     }
-    if (host.reconciliation?.()?.state === 'pending') main.append(node('p', '', tx('一部の結果は、対応する問題を読み込んでから復習に反映します。',
+    if (host.reconciliation?.()?.state === 'pending') main.append(node('p', '', tx('\u4E00部の結果は、対応する問題を読み込んでから復習に反映します。',
       'Some results are waiting for their question pack before review cards can be prepared.')));
     main.append(button(tx('模試に戻る', 'Back to tests'), 'exam-history-back', () => { historyOpen = false; refresh(); }));
   }
@@ -770,13 +887,33 @@ export function createAssessmentView(host) {
     const played = !!playback?.starts, finished = playback?.status === 'ended';
     const playingHere = playback?.status === 'playing' && audioKey === `${selected.attempt.attemptId}:${media.sha256}` && activeAudio && !activeAudio.paused;
     const next = nextUnit(selected);
-    const play = button(playingHere ? tx('再生中', 'Playing') : audioLoading ? tx('音声を準備中…', 'Loading audio…') : finished ? tx('もう一度聴く', 'Play again') : played
+    const play = button(playingHere ? tx('再生中', 'Playing') : audioLoading ? tx('音声を準備中…', 'Loading audio…') : finished ? tx('もう\u4E00度聴く', 'Play again') : played
       ? tx('音声を続ける', 'Resume audio') : tx('音声を再生', 'Play audio'), example ? 'exam-example-audio-play' : 'exam-audio-play', () => playAudio(selected, media));
     play.disabled = !owned() || host.pending() || audioLoading || playingHere ||
       (selected.attempt.mode === 'timed' && (finished || next?.media.sha256 !== media.sha256));
     main.append(play, node('p', 'exam-audio-status', selected.attempt.mode === 'timed'
-      ? tx('音声は順番に、一度ずつ続けて流れます。', 'Recordings play in order, once each, without pauses between them.')
+      ? tx('音声は順番に、\u4E00度ずつ続けて流れます。', 'Recordings play in order, once each, without pauses between them.')
       : tx('音量を確認してから再生してください。', 'Check your volume before playing.')));
+  }
+  // The printed page for checking the typed question against the paper.
+  function renderOfficialPages(main, selected, itemId) {
+    const details = node('details', 'exam-official-pages'); details.dataset.officialPages = itemId;
+    details.append(node('summary', '', tx('原本のページを見る', 'See the printed page')));
+    const generation = lifecycle;
+    details.addEventListener('toggle', () => {
+      if (!details.open || details.dataset.loaded) return;
+      details.dataset.loaded = 'true';
+      void host.officialPages(selected, itemId).then(pages => {
+        if (!alive(generation) || !details.isConnected) return;
+        if (!pages.length) details.append(node('p', 'exam-status', tx('この問題のページはありません。', 'No page is stored for this question.')));
+        for (const page of pages) {
+          const url = URL.createObjectURL(page.blob); pageUrls.add(url);
+          const image = node('img', 'exam-official-page'); image.src = url; image.alt = tx(`原本 ${page.sheet}`, `Printed page ${page.sheet}`);
+          details.append(image);
+        }
+      }).catch(() => { if (details.isConnected) details.append(node('p', 'exam-status', tx('ページを読み込めませんでした。', 'Couldn’t load the page.'))); });
+    });
+    main.append(details);
   }
   function renderLeaveControls(main) {
     const controls = node('div', 'exam-leave-controls');
@@ -811,7 +948,7 @@ export function createAssessmentView(host) {
     const check = host.itemCheck?.(selected, itemId);
     if (!check) { host.ensureDelivery?.(selected); return [reviewMark(label)]; }
     const line = node('p', 'exam-item-provenance', tx(
-      `この問題：作成 ${familyName(check.author)}・検証 ${check.verifiers.join('／')}（${check.agreed}/${check.verifiers.length} 一致）`,
+      `この問題：作成 ${familyName(check.author)}・検証 ${check.verifiers.join('／')}（${check.agreed}/${check.verifiers.length} \u4E00致）`,
       `This question: written by ${familyName(check.author)}, checked by ${check.verifiers.join(', ')} (${check.agreed}/${check.verifiers.length} agreed)`));
     line.dataset.itemProvenance = itemId;
     return [reviewMark(label), line];
@@ -859,7 +996,7 @@ export function createAssessmentView(host) {
       const locked = node('span', 'exam-why-locked', tx('助けあり · 解説を見たので、この回答は確定しています', 'Assisted · you opened the explanation, so this answer is locked'));
       locked.id = 'exam-why-locked'; line.append(locked);
     }
-    const door = button(answer.assistance ? tx('解説をもう一度見る', 'See the explanation again') : tx('なぜ？— 解説を見る', 'Why? — See the explanation'),
+    const door = button(answer.assistance ? tx('解説をもう\u4E00度見る', 'See the explanation again') : tx('なぜ？— 解説を見る', 'Why? — See the explanation'),
       'exam-why', () => openWhy(question.id), 'chip exam-why-door');
     door.disabled = host.pending(); line.append(door);
     if (!answer.assistance) {
@@ -871,10 +1008,11 @@ export function createAssessmentView(host) {
       ? host.explanation?.(selected.attempt.attemptId, question.id) : null;
     if (explanation) renderWhySheet(main, explanation, selected, question);
   }
-  function renderOfficialSections(main, selected, facts, assistedItem) {
+  function renderScoreSections(main, selected, facts, assistedItem) {
     const { form, score } = selected;
     const rows = officialSectionResults(facts, form, score.items);
-    const box = node('section', 'exam-official'); box.dataset.examOfficial = form.exam.track;
+    // its own class: .exam-official / data-exam-official name the room's real-paper import group
+    const box = node('section', 'exam-official-results'); box.dataset.examOfficialResults = form.exam.track;
     box.append(node('h2', 'exam-official-title', tx('得点区分別の結果（素点）', 'By official score section (raw count)')));
     for (const row of rows) {
       const part = node('div', 'exam-official-row'); part.dataset.scoreSection = row.id;
@@ -926,6 +1064,8 @@ export function createAssessmentView(host) {
       `${form.items.length}-question practice set · not a complete JLPT examination`)));
     const machineLabel = host.machineCheckLabel?.(selected);
     if (machineLabel) main.append(reviewMark(machineLabel));
+    const official = officialOf(selected);
+    if (official) main.append(officialBadge(official));
     if (!block) {
       const pending = attempt.blocks.find(row => row.status === 'pending');
       main.append(node('p', '', tx('このパートは終了しました。準備ができたら次のパートへ進んでください。',
@@ -976,8 +1116,9 @@ export function createAssessmentView(host) {
     }
     // One sheet for every form. A machine-checked JLPT form sits the real paper on it: the official
     // 試験科目 name, 問題 numbers and item numbers that restart with each paper, the official
-    // instruction wording, underlined targets, blanks, ★ and numbered gaps. Other forms keep
-    // their retained instruction line and whole-form numbering.
+    // instruction wording, underlined targets, blanks, ★ and numbered gaps. A real paper imported
+    // on this device prints its own section title and text with their printed marks. Other forms
+    // keep their retained instruction line and whole-form numbering.
     const level = form.exam.track;
     const place = paperMode(selected) ? paperLayout(form, block.blockId).byItem.get(question.id) || null : null;
     const layout = assessmentQuestionLayout(form, question);
@@ -1001,10 +1142,14 @@ export function createAssessmentView(host) {
     taskHeading.id = 'exam-task-title'; paperHeader.append(taskHeading);
     const officialLine = place ? officialInstruction(level, place.group.task, { passages: place.group.passageIds.length,
       ...(place.group.gaps ? { first: place.group.numbers[0], last: place.group.numbers.at(-1) } : {}) }) : null;
-    if (officialLine) {
+    const printed = official ? form.sections.find(row => row.itemIds.includes(question.id)) : null;
+    if (printed) {
+      const instruction = textNode('p', 'exam-task-instruction exam-official-instruction', printed.title, true); instruction.lang = 'ja';
+      paperHeader.append(instruction);
+    } else if (officialLine) {
       const instruction = node('p', 'exam-task-instruction exam-mondai-instruction');
       appendSegments(instruction, officialLine, null, write('instruction')); paperHeader.append(instruction);
-    } else if (layout.instruction && (!place || paperStemDropsLine(question))) {
+    } else if (layout.instruction && !official && (!place || paperStemDropsLine(question))) {
       const instruction = node('p', 'exam-task-instruction');
       appendText(instruction, layout.instruction, selected, question.id, 'instruction'); paperHeader.append(instruction);
     }
@@ -1014,16 +1159,23 @@ export function createAssessmentView(host) {
       const text = node('section', 'exam-passage'); text.lang = 'ja';
       if (place && ['short-reading', 'mid-reading'].includes(place.group.task) && place.group.passageIds.length > 1)
         text.append(node('p', 'exam-passage-label', `（${place.group.passageIds.indexOf(reference.id) + 1}）`));
-      if (passage?.title) { const heading = node('h3', ''); appendText(heading, passage.title, selected, question.id, 'passage'); text.append(heading); }
-      const body = node('p', '');
-      if (place?.group.gaps) appendSegments(body, paperSegments(passage?.text || '', { gaps: place.group.gaps }), place.number, write('passage'));
-      else appendText(body, passage?.text || '', selected, question.id, 'passage');
+      if (passage?.title) {
+        const heading = official ? textNode('h3', '', passage.title, true) : node('h3', '');
+        if (!official) appendText(heading, passage.title, selected, question.id, 'passage'); text.append(heading);
+      }
+      // a real paper keeps its printed underlines, ruby and boxed numbers
+      const body = official ? textNode('p', '', passage?.text || '', true) : node('p', '');
+      if (!official && place?.group.gaps) appendSegments(body, paperSegments(passage?.text || '', { gaps: place.group.gaps }), place.number, write('passage'));
+      else if (!official) appendText(body, passage?.text || '', selected, question.id, 'passage');
       text.append(body); paper.append(text);
     }
-    const prompt = node('p', place ? 'mock-question exam-prompt exam-paper-question' : 'mock-question exam-prompt'); prompt.lang = 'ja';
-    prompt.append(node('span', 'exam-question-number', String(place ? place.number : layout.number)));
+    // A real paper's prompt opens with its own printed number box; the sheet adds none.
+    const prompt = official ? textNode('p', 'mock-question exam-prompt', question.prompt, true)
+      : node('p', place ? 'mock-question exam-prompt exam-paper-question' : 'mock-question exam-prompt');
+    prompt.lang = 'ja';
+    if (!official) prompt.append(node('span', 'exam-question-number', String(place ? place.number : layout.number)));
     if (place) { prompt.dataset.paperNumber = String(place.number); appendSegments(prompt, paperStem(question), null, write('prompt')); }
-    else questionText(prompt, layout.text, selected, question.id, 'prompt');
+    else if (!official) questionText(prompt, layout.text, selected, question.id, 'prompt');
     paper.append(prompt);
     if (attempt.mode === 'practice' && host.english() && question.translatedInstruction)
       paper.append(node('p', 'exam-instruction', question.translatedInstruction));
@@ -1050,13 +1202,14 @@ export function createAssessmentView(host) {
       if (paperMode(selected) && question.response.options.every(option => [...option.text].length <= 9)) options.classList.add('exam-opts-row');
       question.response.options.forEach((option, number) => {
         const unit = deliveryUnits(selected).find(row => row.kind === 'question' && row.itemIds.includes(question.id));
-        const audioOnly = question.skill === 'listening' && (!unit || !unit.printedOptions);
-        const lookupChoice = attempt.mode === 'practice' && !audioOnly && !!host.appendLookupText;
-        const control = button(audioOnly || lookupChoice ? String(number + 1) : `${number + 1}\u3000${option.text}`, null, () => {
+        const audioOnly = question.skill === 'listening' && (!unit || !unit.printedOptions || !!unit.spokenOptionItemIds?.includes(question.id));
+        const lookupChoice = attempt.mode === 'practice' && !audioOnly && !official && !!host.appendLookupText;
+        const control = button(audioOnly || lookupChoice ? String(number + 1) : official ? `${number + 1}　` : `${number + 1}　${option.text}`, null, () => {
           // keep keyboard focus on the chosen option across the re-render (one Tab then reaches the why-door)
           focusAfterRender = `[data-exam-option="${CSS.escape(option.id)}"]`;
           return command({ kind: 'answer', itemId: question.id, response: { kind: 'selected', optionId: option.id } });
         }, lookupChoice ? 'mock-opt exam-option-number' : 'mock-opt');
+        if (official && !audioOnly) control.append(paperNodes(option.text));
         control.lang = 'ja'; control.dataset.examOption = option.id;
         control.setAttribute('aria-pressed', String(answer.response.kind === 'selected' && answer.response.optionId === option.id));
         control.disabled = host.pending() || !!answer.assistance;
@@ -1076,6 +1229,7 @@ export function createAssessmentView(host) {
     if (!answer.assistance && host.assistance?.(selected, question.id)) main.append(node('p', 'exam-lookup-assisted', tx(
       '助けあり · 辞書を使った問題です。回答は変更できます。', 'Assisted · dictionary used on this question. You can still change your answer.')));
     renderWhy(main, selected, question, answer);
+    if (official && host.officialPages) renderOfficialPages(main, selected, question.id);
     const flag = button(answer.flagged ? tx('目印を外す', 'Remove bookmark') : tx('あとで見直す', 'Bookmark for later'), 'exam-flag',
       () => command({ kind: 'flag', itemId: question.id, flagged: !answer.flagged }));
     flag.setAttribute('aria-pressed', String(answer.flagged)); flag.disabled = host.pending(); main.append(flag);
@@ -1088,7 +1242,7 @@ export function createAssessmentView(host) {
     for (const control of nav.querySelectorAll('button')) control.disabled = host.pending() || advancingAudio ||
       (!!control.dataset.examVisit && !canVisit(selected, control.dataset.examVisit)) ||
       (control.id === 'exam-finish-block' && attempt.mode === 'timed' && !!nextUnit(selected)); main.append(nav);
-    const map = node('details', 'exam-question-map'); map.append(node('summary', '', tx('解答一覧・見直し', 'Questions and flags')));
+    const map = node('details', 'exam-question-map'); map.append(node('summary', '', tx('解答\u4E00覧・見直し', 'Questions and flags')));
     const grid = node('div', 'exam-question-grid');
     ids.forEach((id, i) => {
       const saved = attempt.answers.find(row => row.item.id === id);
@@ -1101,6 +1255,30 @@ export function createAssessmentView(host) {
     }); map.append(grid); main.append(map);
     renderLeaveControls(main);
   }
+  // Raw correct answers per official score section, beside the published pass marks. No conversion.
+  function renderOfficialSections(main, entry, score) {
+    const table = node('section', 'exam-official-sections'); table.setAttribute('aria-labelledby', 'exam-official-sections-title');
+    const heading = node('h2', '', tx('得点区分ごとの正答数', 'Correct answers by official score section')); heading.id = 'exam-official-sections-title';
+    table.append(heading);
+    const list = node('dl', 'exam-official-section-list');
+    for (const section of entry.officialSections) {
+      const rows = score.items.filter(row => section.skills.includes(row.skill));
+      const correct = rows.filter(row => row.result === 'correct').length;
+      const item = node('div'); item.dataset.officialSection = section.id;
+      item.append(node('dt', '', tx(section.titleJa, section.titleEn)),
+        node('dd', 'exam-official-raw', tx(`${correct} / ${rows.length} 問正解`, `${correct} of ${rows.length} correct`)),
+        node('dd', 'exam-official-mark', tx(`基準点 ${section.sectionMinimum}点（${section.scaledRange[0]}〜${section.scaledRange[1]}点の尺度得点）`,
+          `Sectional minimum ${section.sectionMinimum} (on a ${section.scaledRange[0]}–${section.scaledRange[1]} scaled score)`)));
+      list.append(item);
+    }
+    table.append(list);
+    if (entry.passMark) table.append(node('p', 'exam-official-pass', tx(`合格点 ${entry.passMark.total}点 / ${entry.passMark.maximum}点（尺度得点の合計）`,
+      `Pass mark ${entry.passMark.total} of ${entry.passMark.maximum} (total of scaled scores)`)));
+    const note = node('p', 'exam-score-note exam-official-scale', '本試験の得点は項目応答理論による尺度得点（各0–60）で、素点からは換算できません。'); note.lang = 'ja';
+    table.append(note);
+    if (host.english()) table.append(node('p', 'exam-score-note', 'Real JLPT scores are scaled by item response theory (0–60 per section); raw counts can’t be converted.'));
+    main.append(table);
+  }
   function renderResult(main, selected) {
     const { form, attempt, score } = selected;
     const stopped = attempt.status === 'abandoned';
@@ -1109,6 +1287,8 @@ export function createAssessmentView(host) {
     main.append(node('h1', 'view-title', stopped ? tx('中断した練習', 'Attempt stopped') : tx('結果', 'Your results')));
     const machineLabel = host.machineCheckLabel?.(selected);
     if (machineLabel) main.append(reviewMark(machineLabel, true));
+    const official = officialOf(selected);
+    if (official) main.append(officialBadge(official));
     if (stopped) main.append(node('p', '', tx('回答を保存しました。中断した結果は弱点の判定に使いません。', 'Your answers are saved. A stopped test won’t be treated as evidence of weaknesses.')));
     else {
       // an assisted answer was committed before its explanation opened; the headline says how many
@@ -1124,9 +1304,12 @@ export function createAssessmentView(host) {
       for (const [label, count] of [[tx('不正解', 'Incorrect'), score.incorrect], [tx('未回答', 'Unanswered'), score.unanswered], [tx('未到達', 'Not reached'), score.notReached]]) {
         const item = node('div'); item.append(node('dt', '', label), node('dd', '', String(count))); counts.append(item);
       } main.append(counts);
+      // A machine-checked JLPT form reports raw counts by the published 得点区分; a real paper by its
+      // pack's official sections; everything else by skill.
       const facts = paperMode(selected) ? officialFacts(form.exam.track)?.score : null;
-      if (facts) renderOfficialSections(main, selected, facts, assistedItem);
+      if (facts) renderScoreSections(main, selected, facts, assistedItem);
       else {
+        if (official) renderOfficialSections(main, official, score);
         const skills = node('div', 'exam-results-skills');
         for (const [skill, labels] of Object.entries(SKILLS)) {
           const rows = score.items.filter(row => row.skill === skill); if (!rows.length) continue;
@@ -1159,18 +1342,22 @@ export function createAssessmentView(host) {
         const { currentCount, removableCount } = host.removableAdditions?.(followup) ||
           { currentCount: historical, removableCount: historical };
         main.append(node('p', 'exam-followup', currentCount ? tx(`${currentCount}件が覚えるリストに入っています。復習はいつものペースで始まります。`,
-          `${currentCount} items from this test are in Learn. They’ll enter review at your usual pace.`) : tx('結果を保存しました。先生との学習にも引き継がれます。', 'Results saved for your next study session with Sensei.')));
-        if (followup.status === 'pending-mapping') main.append(node('p', '', tx('一部の復習カードを準備中です。結果は保存済みです。', 'Some review cards still need preparation. Your results are safely saved.')));
+          `${currentCount} items from this test are in Learn. They’ll enter review at your usual pace.`) : official
+          ? tx('結果をこの端末に保存しました。', 'Results saved on this device.')
+          : tx('結果を保存しました。先生との学習にも引き継がれます。', 'Results saved for your next study session with Sensei.')));
+        if (followup.status === 'pending-mapping') main.append(node('p', '', tx('\u4E00部の復習カードを準備中です。結果は保存済みです。', 'Some review cards still need preparation. Your results are safely saved.')));
         if (removableCount) main.append(button(tx('自動追加を取り消す', 'Undo automatic additions'), 'exam-undo-additions', async () => {
           if (!owned() || host.pending()) return; const generation = lifecycle;
           const ok = await host.undo(followup.id); if (!alive(generation)) return;
           notice = ok ? currentCount > removableCount
             ? tx('未学習の自動追加を取り消しました。学習済みの項目は残しています。', 'Automatic additions removed. Items you’ve already studied are kept.')
             : tx('自動追加を取り消しました。結果は保存されています。', 'Automatic additions removed. Your results are still saved.')
-            : tx('取り消しを保存できませんでした。もう一度お試しください。', 'Couldn’t save the removal. Please try again.'); refresh();
+            : tx('取り消しを保存できませんでした。もう\u4E00度お試しください。', 'Couldn’t save the removal. Please try again.'); refresh();
         }));
       }
-      main.append(button(tx('先生と復習する', 'Review with Sensei'), 'exam-sensei', () => host.sensei(attempt.attemptId)));
+      // A real question never goes to an outside AI model.
+      if (official) main.append(node('p', 'exam-status exam-official-private', tx('本物の問題は先生（外部のAI）には送りません。', 'Real questions are never sent to Sensei (an outside AI).')));
+      else main.append(button(tx('先生と復習する', 'Review with Sensei'), 'exam-sensei', () => host.sensei(attempt.attemptId)));
     }
     for (const result of score.items) {
       const question = form.items.find(row => row.id === result.itemId);
@@ -1183,22 +1370,29 @@ export function createAssessmentView(host) {
       }
       const helped = assistedItem(result.itemId);
       if (helped) details.dataset.examAssisted = 'true';
+      const plain = official ? paperPlain : text => text;
       const daimon = paperMode(selected) ? DAIMON[question.task]?.[0] : null;
-      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${question.prompt.split('\n').at(-1)}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
+      // A real paper's prompt opens with its printed number; the list already numbers each question.
+      const promptLine = official ? plain(question.prompt.replace(/^\d+　?/u, '')).split('\n').at(-1) || tx('本文の空欄', 'Blank in the passage')
+        : question.prompt.split('\n').at(-1);
+      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
+      const choice = id => { const index = question.response.options.findIndex(row => row.id === id);
+        return index < 0 ? '' : official ? `${index + 1}　${plain(question.response.options[index].text)}` : question.response.options[index].text; };
       const selectedOption = question.response.kind === 'selected' && result.response.kind === 'selected'
-        ? question.response.options.find(row => row.id === result.response.optionId)?.text : tx('未回答', 'No answer');
-      const sourcePrompt = node('p', 'exam-result-prompt');
-      questionText(sourcePrompt, question.prompt, selected, question.id, 'prompt'); details.append(sourcePrompt);
+        ? choice(result.response.optionId) : tx('未回答', 'No answer');
+      const sourcePrompt = official ? textNode('p', 'exam-result-prompt', question.prompt, true) : node('p', 'exam-result-prompt');
+      if (!official) questionText(sourcePrompt, question.prompt, selected, question.id, 'prompt');
+      details.append(sourcePrompt);
       const response = node('p', '', `${tx('あなたの回答', 'Your answer')}: `);
       appendText(response, selectedOption || '', selected, question.id, 'choice'); details.append(response);
       if (question.response.kind === 'selected') {
         const key = node('p', '', `${tx('正解', 'Correct answer')}: `);
-        appendText(key, question.response.options.find(row => row.id === question.response.answerOptionId)?.text || '', selected, question.id, 'choice'); details.append(key);
+        appendText(key, choice(question.response.answerOptionId), selected, question.id, 'choice'); details.append(key);
       }
       const rationale = node('p', 'exam-rationale'); appendText(rationale, question.rationale, selected, question.id, 'explanation'); details.append(rationale);
       if (machineLabel) details.append(...questionProvenance(selected, question.id).slice(1));
       main.append(details);
-      details.append(button(tx('先生にこの問題を聞く', 'Ask Sensei about this question'), null,
+      if (!official) details.append(button(tx('先生にこの問題を聞く', 'Ask Sensei about this question'), null,
         () => host.sensei(attempt.attemptId, question.id)));
     }
     main.append(button(tx('模試に戻る', 'Back to tests'), 'exam-done', async () => {
@@ -1271,6 +1465,6 @@ export function createAssessmentView(host) {
     },
     async interrupt() { cancelPendingPlayback(); await suspendAudio(); if (!owned()) return false; return host.action({ kind: 'interruption', reason: 'background' }); },
     async suspend() { cancelPendingPlayback(); await suspendAudio(); resumeOnEntry = true; },
-    dispose() { lifecycle += 1; cancelPendingPlayback(); deliveryLoading = false; entryResumePending = false; whyOpenItemId = null; focusAfterRender = null; stopAudio(); for (const url of imageUrls.values()) URL.revokeObjectURL(url); imageUrls.clear(); },
+    dispose() { lifecycle += 1; cancelPendingPlayback(); deliveryLoading = false; entryResumePending = false; whyOpenItemId = null; focusAfterRender = null; stopAudio(); for (const url of imageUrls.values()) URL.revokeObjectURL(url); imageUrls.clear(); for (const url of pageUrls) URL.revokeObjectURL(url); pageUrls.clear(); },
   };
 }
