@@ -5093,6 +5093,13 @@ function renderSignals(grading, { compact = false } = {}) {
 }
 
 /* ---------------------------------------------------------------- views */
+function shelfCollectionCount(rows) {
+  const glossary = rows.filter(row => row.source === 'isa-yasashii-glossary').length;
+  const readings = rows.length - glossary;
+  return tx(`${readings} 本の読み物${glossary ? ` · 用語集 ${glossary} 項目` : ''}`,
+    `${readings} ${readings === 1 ? 'reading' : 'readings'}${glossary ? ` · ${glossary} glossary ${glossary === 1 ? 'entry' : 'entries'}` : ''}`);
+}
+
 function renderShelf(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
 
@@ -5154,8 +5161,8 @@ function renderShelfBody() {
   const title = el('div');
   title.append(withEn(el('h1', 'view-title', '本棚'), 'The reading room', 'en-inline'));
   title.append(el('p', 'shelf-snippet intro', tx('世界を読む。ことばが残る。', 'Read the world. Keep the words.')));
-  title.append(el('p', 'shelf-count', tx(`${curated.filter(p => p.source !== 'isa-yasashii-glossary').length} 本の読み物 · ニュース、物語、随筆`, `${curated.filter(p => p.source !== 'isa-yasashii-glossary').length} readings · news, stories and essays`)));
-  const art = el('img', 'shelf-art'); art.src = 'design/ink-hoku-nami.png'; art.alt = tx('藍の地に白い筆の「永」', 'Bunki brush study: 永 in white ink on indigo'); art.width = 640; art.height = 640;
+  title.append(el('p', 'shelf-count', shelfCollectionCount(curated)));
+  const art = el('img', 'shelf-art'); art.src = window.__KAIRO_SHELF_ART_URL__ || 'design/ink-hoku-nami.png'; art.alt = tx('藍の地に白い筆の「永」', 'Bunki brush study: 永 in white ink on indigo'); art.width = 640; art.height = 640;
   masthead.append(title, art); main.append(masthead);
   const filters = S.shelfFilters ||= { sort: 'latest', topic: '', jlpt: '', grade: '', text: '' };
   const controls = el('div', 'shelf-controls');
@@ -5391,7 +5398,7 @@ function renderShelfBody() {
     return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
   matches.sort(filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest);
-  const count=el('p','shelf-results-count',tx(`${matches.length} 本の読み物`, `${matches.length} readings`));count.setAttribute('role','status');main.append(count);
+  const count=el('p','shelf-results-count',shelfCollectionCount(matches));count.setAttribute('role','status');main.append(count);
   if (Object.values(filters).some((v,i)=>i>0 && v)) { const reset=el('button','chip',tx('絞り込みを解除','Clear filters'));reset.type='button';reset.addEventListener('click',()=>{S.shelfFilters=null;refreshShelfBody();});main.append(reset); }
   const grid=el('div','shelf-story-grid');grid.id='shelf-reading-results';
   for(const p of matches)grid.append(shelfCard(p));
@@ -7049,10 +7056,32 @@ document.addEventListener(
   'pointerdown',
   (ev) => {
     const mini = document.getElementById('mini');
-    if (mini && !mini.contains(ev.target)) removeMini();
+    if (mini && !mini.contains(ev.target) && !ev.target.closest?.('#vocabulary-list-dialog')) removeMini();
   },
   true,
 );
+
+/** Endings and helper words are named only by an entry whose headword is exactly their text. */
+const LOOKUP_HELPER_POS = new Set(['助動詞', '助詞', '接尾辞', '接頭辞']);
+
+/** The entry a looked-up spelling names, or null. A reading the text supplies chooses among
+ * entries of that spelling and is never replaced by another entry's reading. A kana spelling
+ * (an ending, a helper word, a segmenter fragment) never borrows a kanji entry through its
+ * kana form: ます is not 升. */
+function japaneseLookupRecord(text, { reading = '', pos = '' } = {}) {
+  const wanted = kataToHira(String(reading || ''));
+  const fits = (value) => !wanted || kataToHira(String(value || '')) === wanted;
+  if (D.dict[text] && fits(D.dict[text].r)) return lookup(text);
+  const helper = LOOKUP_HELPER_POS.has(pos);
+  const rows = dictionaryRowsForForm(text);
+  const row = rows.find((candidate) => (candidate[1] === text || (!helper && candidate[4].includes(text))) &&
+    (!wanted || dictionaryReadingSummaries(candidate).some((summary) =>
+      fits(summary[0]) && dictionaryReadingSupportsForm(candidate, summary[0], text))));
+  if (row) return lookup(text, row[0], wanted ? reading : '');
+  if (rows.length) return null;
+  const kept = lookup(text);
+  return kept && fits(kept.r) ? kept : null;
+}
 
 /** A shared lookup door for Japanese prose, including questions and source quotations.
  * Assistance is committed by the caller before any reading or gloss is revealed. */
@@ -7062,14 +7091,17 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   if (!anchor?.isConnected) return;
   await ensureDictionaryRowsForForm(text).catch(() => {});
   if (!anchor.isConnected) return;
-  const record = lookup(text);
-  const token = { s: text, b: record?.head || text, r: record?.r || context.reading || '', c: !!record,
+  const record = japaneseLookupRecord(text, context);
+  const hasKanjiEntry = [...text].length === 1 && !!D.kanji[text];
+  const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
     ...(record?.seq ? { seq: record.seq } : {}) };
   showMini(anchor, token, () => {
+    // An unresolved spelling must not reopen lookup(text)'s rejected first row.
+    if (!record && !hasKanjiEntry) return;
     removeMini();
-    if ([...text].length === 1 && D.kanji[text]) go({ t: 'kanji', id: text }, { invoker: anchor });
+    if (hasKanjiEntry) go({ t: 'kanji', id: text }, { invoker: anchor });
     else go({ t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: anchor });
-  });
+  }, { record, entryAvailable: !!record || hasKanjiEntry });
 }
 
 function appendJapaneseLookup(container, text, context = {}) {
@@ -7101,7 +7133,11 @@ function enhanceJapaneseProse(root) {
   if (['mock', 'review', 'probe', 'aiquiz'].includes(S.view) || (S.view === 'lessons' && S.lessonRun?.phase !== 'learn')) return;
   const parents = root.querySelectorAll('p, blockquote, dd, li, h1, h2, h3, .view-title, .meaning, .publisher-body, .dictionary-forms, .review-face');
   for (const parent of parents) {
-    if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices')) continue;
+    // The writing room's own hints are room chrome above the popup's layer, not text to study.
+    if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
+    // A word looked up in a guided question is saved as help on that question before it shows.
+    const question = S.view === 'guided' ? parent.closest('.guided-room [data-question]')?.dataset.question : null;
+    const context = question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {};
     const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
     const textNodes = [];
     while (walker.nextNode()) {
@@ -7110,7 +7146,7 @@ function enhanceJapaneseProse(root) {
       if (node.parentElement?.closest('button,a,label,summary,rt,ruby,[data-japanese-lookup],input,textarea,code,pre')) continue;
       textNodes.push(node);
     }
-    for (const node of textNodes) { const fragment = document.createDocumentFragment(); appendJapaneseLookup(fragment, node.textContent); node.replaceWith(fragment); }
+    for (const node of textNodes) { const fragment = document.createDocumentFragment(); appendJapaneseLookup(fragment, node.textContent, context); node.replaceWith(fragment); }
   }
   for (const quote of root.querySelectorAll('blockquote.sentence-original')) {
     if (quote.nextElementSibling?.classList.contains('excerpt-listen')) continue;
@@ -7127,23 +7163,44 @@ function openVocabularyListChooser(node, label, invoker) {
   dialog.dataset.driftChrome = 'true';
   const heading = el('h2', '', tx(`「${label}」を覚える`, `Save ${label}`)); heading.id = 'vocabulary-list-title';
   dialog.setAttribute('aria-labelledby', heading.id);
-  const close = el('button', 'chip', tx('閉じる', 'Done')); close.type = 'button';
+  const close = el('button', 'chip', tx('閉じる', 'Done')); close.type = 'button'; close.id = 'vocabulary-list-close';
   close.addEventListener('click', () => dialog.close());
   const choices = el('div', 'vocabulary-list-choices');
+  const management = el('div', 'teacher-actions');
+  const context = el('div');
   const notice = el('p', 'vocabulary-list-status'); notice.setAttribute('role', 'status');
   const name = el('input', 'search-field'); name.placeholder = tx('新しいリストの名前', 'Name a new vocabulary list'); name.maxLength = 80;
   name.setAttribute('aria-label', name.placeholder);
   const create = el('button', 'chip', tx('リストを作って保存', 'Create list & save')); create.type = 'submit';
   const form = el('form', 'vocabulary-list-form'); form.append(name, create);
   let busy = false;
+  const setBusy = (value) => {
+    busy = value; create.disabled = value || !recordWritable(); name.readOnly = value;
+    for (const container of [choices, management, context]) {
+      for (const button of container.querySelectorAll('button')) button.disabled = value || !recordWritable();
+    }
+  };
+  const refreshCapture = () => {
+    syncReaderTakeSeal();
+    const taken = S.taken.some(row => row.t === node.t && row.id === node.id);
+    document.querySelectorAll('[data-word]').forEach(word => {
+      if (node.t === 'word' && word.dataset.word === node.id) word.classList.toggle('tok-learning', taken);
+    });
+    const mini = document.getElementById('mini');
+    const seal = mini?.querySelector('#mini-take');
+    if (node.t === 'word' && seal && mini.querySelector('.mini-word')?.textContent === label) {
+      seal.classList.toggle('taken', taken); seal.setAttribute('aria-pressed', String(taken));
+      seal.setAttribute('aria-label', taken ? tx(`「${label}」の保存先を選ぶ`, `choose lists for ${label}`)
+        : tx(`「${label}」をリストに保存`, `save ${label} to a list`));
+    }
+  };
   const save = async (listName) => {
     if (busy) return;
     if (!recordWritable()) { notice.textContent = tx('記録を読み込んでから、もう一度試してください。', 'Your record is not ready to save. Please try again once it is available.'); return; }
     if (node.t === 'word' && ['conflict', 'unavailable'].includes(wordCaptureState(node))) {
       notice.textContent = wordCaptureHeldText(node, { route: false }); return;
     }
-    busy = true; create.disabled = true;
-    for (const button of choices.querySelectorAll('button')) button.disabled = true;
+    setBusy(true);
     try {
       if (!S.taken.some(row => row.t === node.t && row.id === node.id) && !(await toggleTaken(node, label))) {
         notice.textContent = tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return;
@@ -7152,6 +7209,7 @@ function openVocabularyListChooser(node, label, invoker) {
         const saved = await commitStorePatch(latest => {
           const item = latest.taken.find(row => row.t === node.t && row.id === node.id);
           if (!item) throw new Error('captured-item-no-longer-available');
+          if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
           const lists = { ...latest.lists };
           const members = owns(lists, listName) ? lists[listName] : [];
           setOwnRecordValue(lists, listName, members.some(row => row.t === node.t && row.id === node.id) ? members : [...members,
@@ -7162,29 +7220,60 @@ function openVocabularyListChooser(node, label, invoker) {
         if (!saved) { notice.textContent = tx('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'); return; }
       }
       notice.textContent = listName ? tx(`「${listName}」に保存しました。`, `Saved to ${listName}.`) : tx('復習に保存しました。', 'Saved for review.');
-      name.value = ''; paint(); syncReaderTakeSeal();
-      document.querySelectorAll(`[data-word]`).forEach(word => { if (word.dataset.word === node.id) word.classList.add('tok-learning'); });
+      name.value = ''; paint(); refreshCapture();
     } catch {
       notice.textContent = tx('保存できませんでした。リスト名を残したまま、もう一度試せます。', 'Could not finish saving. Your list name is still here so you can retry.');
-    } finally { busy = false; create.disabled = false; for (const button of choices.querySelectorAll('button')) button.disabled = false; }
+    } finally { setBusy(false); }
   };
   const paint = () => {
     choices.replaceChildren();
-    const review = el('button', 'chip', tx('復習だけに保存', 'Save for review')); review.type = 'button'; review.addEventListener('click', () => void save(null)); choices.append(review);
+    management.replaceChildren(); context.replaceChildren();
+    const review = el('button', 'chip', tx('復習だけに保存', 'Save for review')); review.type = 'button'; review.id = 'vocabulary-list-save'; review.addEventListener('click', () => void save(null)); choices.append(review);
     for (const listName of Object.keys(S.lists)) {
       const present = S.lists[listName].some(row => row.t === node.t && row.id === node.id);
       const button = el('button', present ? 'chip on-list' : 'chip', `${present ? '✓ ' : ''}${listName}`);
       button.type = 'button'; button.setAttribute('aria-pressed', String(present)); button.addEventListener('click', () => void save(listName)); choices.append(button);
     }
+    const taken = S.taken.some(row => row.t === node.t && row.id === node.id);
+    const held = node.t === 'word' && wordCaptureState(node) !== 'taken';
+    if (taken && !held) {
+      const undo = biLabel('button', 'chip', '覚えるのをやめる', 'stop memorizing');
+      undo.type = 'button'; undo.id = 'vocabulary-list-stop';
+      undo.addEventListener('click', async () => {
+        if (busy || !recordWritable()) return;
+        setBusy(true);
+        try {
+          if (node.t === 'word' && wordCaptureState(node) !== 'taken') {
+            notice.textContent = wordCaptureHeldText(node, { route: false }); return;
+          }
+          const saved = await toggleTaken(node, label);
+          if (!saved) { notice.textContent = tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'); return; }
+          notice.textContent = tx('復習の対象から外しました。リストとこれまでの復習記録は残ります。', 'Stopped memorizing. Your lists and previous reviews are kept.');
+          paint(); refreshCapture();
+        } catch {
+          notice.textContent = tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.');
+        } finally { setBusy(false); }
+      });
+      management.append(undo);
+      renderContextPicker(context, node, {
+        currentSurface: () => dialog.isConnected && dialog.open,
+        onSaved: (scope) => {
+          paint(); refreshCapture();
+          dialog.querySelector(`[data-ctx-scope="${scope ?? 'word'}"]`)?.focus({ preventScroll: true });
+        },
+        onFailed: () => { notice.textContent = tx('文脈の変更を保存できませんでした。もう一度試してください。', 'Could not save the context change. Please try again.'); },
+      });
+    }
+    setBusy(busy);
   };
   form.addEventListener('submit', event => { event.preventDefault(); const value = name.value.trim(); if (!value) { name.focus(); return; } void save(value); });
-  dialog.append(heading, el('p', '', tx('リストを選ぶか、新しいリストを作ってください。複数のリストに保存できます。', 'Choose a list or make a new one. A word can belong to several lists.')), choices, form, notice, close);
+  dialog.append(heading, el('p', '', tx('リストを選ぶか、新しいリストを作ってください。複数のリストに保存できます。', 'Choose a list or make a new one. A word can belong to several lists.')), choices, form, management, context, notice, close);
   dialog.addEventListener('close', () => { dialog.remove(); if (invoker?.isConnected) invoker.focus({ preventScroll: true }); });
   for (const event of ['pointerdown','pointermove','pointerup','pointercancel']) dialog.addEventListener(event, ev => ev.stopPropagation());
   paint(); document.body.append(dialog); dialog.showModal();
 }
 
-function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false } = {}) {
+function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true } = {}) {
   removeMini();
   activeTokenAlternatives = null;
   // the mini owns the moment: any lingering token-actions pill from an
@@ -7195,7 +7284,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   // a reader token reads through the reader's quick look (D11); sentence
   // tokens elsewhere keep lookup() and their old wording
-  const g = reader ? readerQuickRecord(token) : lookup(token.b, token.seq, token.r);
+  // a caller that already chose the entry (the shared lookup door) hands it over as is
+  const g = record !== undefined ? record : reader ? readerQuickRecord(token) : lookup(token.b, token.seq, token.r);
   const mini = el('div', null);
   mini.id = 'mini';
   mini.setAttribute('role', 'dialog');
@@ -7263,10 +7353,12 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   const entry = biLabel('button', 'mini-entry', '全項目', 'full entry');
   entry.type = 'button';
+  entry.disabled = !entryAvailable;
   entry.dataset.action = 'entry.open';
   entry.dataset.targetKind = 'word';
   entry.addEventListener('click', (event) => {
     event.stopPropagation();
+    if (entry.disabled) return;
     onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
   });
   mini.append(entry);
@@ -7702,7 +7794,7 @@ function glossaryCrossRefPlan(p) {
 // different article or a new voice choice never inherits its note
 const readAloud = { on: false, timer: null, failed: null, generation: 0, usingDeviceVoice: false };
 let articleNarration, articleNarrationWait;
-let excerptPlayback = 0;
+let excerptPlayback = 0, excerptControl = null;
 function ensureArticleNarration() {
   if (typeof window === 'undefined' || !window.__KAIRO_NARRATION__) return Promise.resolve(null);
   if (articleNarration !== undefined) return Promise.resolve(articleNarration);
@@ -7721,10 +7813,21 @@ function excerptListenLabel() {
   return tx('F1の声で聞く（試聴版）', 'Listen · F1 audition voice');
 }
 
+/** Only one excerpt plays: a handoff returns the previous control to its idle label. */
+function retireExcerptControl() {
+  const previous = excerptControl;
+  excerptControl = null;
+  if (!previous) return;
+  previous.classList.remove('is-speaking');
+  previous.textContent = excerptListenLabel();
+  stopRecAudio();
+}
+
 async function playNarratedExcerpt(text, button) {
   const original = excerptListenLabel();
-  if (button.classList.contains('is-speaking')) { excerptPlayback += 1; stopRecAudio(); button.classList.remove('is-speaking'); button.textContent = original; return; }
+  if (button.classList.contains('is-speaking')) { excerptPlayback += 1; retireExcerptControl(); stopRecAudio(); button.classList.remove('is-speaking'); button.textContent = original; return; }
   const generation = ++excerptPlayback;
+  retireExcerptControl();
   const manifest = await ensureArticleNarration();
   if (generation !== excerptPlayback || !button.isConnected) return;
   const normalize = value => String(value || '').replace(/[\s「」『』“”"']/gu, '');
@@ -7740,17 +7843,21 @@ async function playNarratedExcerpt(text, button) {
   }
   if (!clips?.length) { button.textContent = tx('この引用の音声を準備中', 'Narration for this excerpt is not available yet'); return; }
   stopReadAloud();
+  excerptControl = button;
   button.classList.add('is-speaking'); button.textContent = tx('止める · F1の試聴音声', 'Stop · F1 audition voice');
   let failed = false;
   try {
     for (const clip of clips) {
       if (generation !== excerptPlayback || !button.isConnected) break;
-      if (!(await playRecClip(clip.src, null))) { failed = true; break; }
+      const played = await playRecClip(clip.src, null);
+      if (played === false) failed = true;
+      if (played !== true) break;
     }
   } catch {
     failed = true;
   }
   if (generation === excerptPlayback && button.isConnected) {
+    if (excerptControl === button) excerptControl = null;
     button.classList.remove('is-speaking');
     button.textContent = failed
       ? tx('再生できませんでした · F1の試聴音声で再試行', 'Playback failed · Retry F1 audition voice')
@@ -7781,7 +7888,9 @@ function speakPassage(p, onDone) {
       const clips = narration?.articles?.[p.id]?.clips || [];
       for (const clip of clips) {
         if (!current()) return;
-        if (!(await playRecClip(clip.src, null))) { if (current()) readAloud.failed = { pid: p.id, voice: 'f1' }; break; }
+        const played = await playRecClip(clip.src, null);
+        if (played === false && current()) readAloud.failed = { pid: p.id, voice: 'f1' };
+        if (played !== true) break;
       }
       if (current()) { readAloud.on = false; onDone(); }
       return;
@@ -7800,10 +7909,11 @@ function speakPassage(p, onDone) {
         const ix = String(rec.have[i]).padStart(3, '0');
         playRecClip(`audio/s/ami/${p.id.replace(':', '_')}-${ix}.m4a`, null).then((played) => {
           if (!current()) return;
-          if (!played) {
+          if (played !== true) {
             // no device-voice fallback (operator, 09-17: the computer voice must not be an option);
-            // a failure at any sentence stops the read and the note says so
-            readAloud.failed = { pid: p.id, voice: 'ami' };
+            // a failure at any sentence stops the read and the note says so; a clip another
+            // playback stopped ends the read without claiming a failure
+            if (played === false) readAloud.failed = { pid: p.id, voice: 'ami' };
             readAloud.on = false;
             onDone();
             return;
@@ -7890,7 +8000,8 @@ function stopRecAudio() {
 // whether the roster exists (absent → the listen row says so; nothing plays)
 if (typeof window !== 'undefined') ensureRecManifest();
 
-/** Play one recorded clip; resolves true when it actually played. */
+/** Play one recorded clip. Resolves true when it played to the end, false when it
+ * could not play, and null when it was stopped (a replay, another clip, or 止める). */
 function playRecClip(src, btn) {
   return new Promise((done) => {
     stopRecAudio();
@@ -7905,7 +8016,7 @@ function playRecClip(src, btn) {
       off();
       done(true);
     };
-    a.onpause = () => { off(); done(a.ended); };
+    a.onpause = () => { off(); done(a.ended ? true : null); };
     a.onerror = () => {
       off();
       done(false);
@@ -7939,7 +8050,7 @@ function speakCardReading(text, btn, word) {
     const pref = recVoicePref();
     if (entry && pref && entry.voices.includes(pref)) {
       playRecClip(`audio/w/${pref}/${entry.id}.m4a`, btn).then((played) => {
-        if (played || !btn) return;
+        if (played !== false || !btn) return;
         const reason = tx('この環境では再生できませんでした', 'This recording could not play here');
         btn.title = reason;
         const note = btn.parentElement?.querySelector('.say-note');
@@ -8275,13 +8386,13 @@ function renderReader(main) {
         span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
         const adapter = wireParticleGestures(span, particle);
         installTokenAlternatives(wrapper, span, adapter.target, adapter);
-      } else if (namedDoor) {
-        wireNamedToken(span, token, index);
-        span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
-        span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
       } else {
+        if (namedDoor) wireNamedToken(span, token, index);
+        // The supplied reading belongs to the surface; an inflected ending (まし of ます) looks
+        // up its dictionary form without it. The part of speech keeps helpers to exact entries.
+        const lookupContext = { reading: !token.b || token.b === token.s ? token.r : '', pos: token.p };
         span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
-        span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
+        span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, lookupContext));
       }
       rendered = wrapper;
     }
@@ -15220,7 +15331,9 @@ function refreshShelfBody() {
   shelfBodyRefreshing = true;
   try {
     const focusId = live.contains(document.activeElement) ? document.activeElement.id : null;
-    live.replaceWith(renderShelfBody());
+    const next = renderShelfBody();
+    live.replaceWith(next);
+    enhanceJapaneseProse(next);
     if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
   } finally { shelfBodyRefreshing = false; }
   const updated = document.getElementById('shelf-body');
@@ -17723,7 +17836,7 @@ function recordPickerSurface(node) {
   };
 }
 
-function renderContextPicker(sheet, node) {
+function renderContextPicker(sheet, node, { currentSurface = recordPickerSurface(node), onSaved = () => render(), onFailed = () => {} } = {}) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item || node.t !== 'word') return;
   // D23: another entry's card under this spelling is not this door's to adjust
@@ -17741,7 +17854,6 @@ function renderContextPicker(sheet, node) {
     ['para', '段落ごと', 'the whole paragraph'],
   ];
   const current = item.ctx?.scope ?? null;
-  const currentSurface = recordPickerSurface(node);
   const pendingKey = `context:${node.t}|${node.id}`;
   for (const [scope, ja, en] of scopes) {
     const on = current === scope;
@@ -17757,20 +17869,24 @@ function renderContextPicker(sheet, node) {
       for (const button of chips.querySelectorAll('button')) button.disabled = true;
       let saved;
       try {
-        saved = await commitStorePatch((latest) => ({
-          taken: latest.taken.map((row) => {
+        saved = await commitStorePatch((latest) => {
+          if (wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
+          return { taken: latest.taken.map((row) => {
             if (row.t !== node.t || row.id !== node.id) return row;
             const changed = { ...row };
             if (scope === null) delete changed.ctx;
             else changed.ctx = { p: from.passage, i: Number(from.index), scope };
             return changed;
-          }),
-        }));
+          }) };
+        });
       } finally {
         trayItemPending.delete(pendingKey);
         for (const button of chips.querySelectorAll('button')) button.disabled = !recordWritable();
       }
-      if (saved && currentSurface()) render();
+      if (currentSurface()) {
+        if (saved) onSaved(scope);
+        else onFailed();
+      }
     });
     chips.append(chip);
   }

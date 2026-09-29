@@ -576,6 +576,48 @@ describe('per-item explanation after a committed practice answer', () => {
     expect(() => parseAttemptV2(paper, orphan)).toThrow(/assistance\.attribution/u);
   });
 
+  it('counts a dictionary lookup bound to a reached item digest as attributed help', () => {
+    const lookup = (attempt: AssessmentAttemptV2, digest: string, elapsed: number) =>
+      update(attempt, { kind: 'assistance', reason: `dictionary:${digest}` }, elapsed);
+    const answer = (attempt: AssessmentAttemptV2, itemId: string, elapsed: number) =>
+      update(
+        attempt,
+        { kind: 'answer', itemId, response: { kind: 'selected', optionId: 'a' } },
+        elapsed,
+      );
+    const [one, , three] = paper.items;
+    const lookedUp = lookup(beginAttemptV2(paper, practice), one!.sha256, 50);
+    expect(lookedUp.conditions).toContain('assisted');
+    // A lookup on Q1, then an explanation on another item.
+    let other = answer(lookedUp, 'one', 100);
+    other = update(other, { kind: 'visit', itemId: 'two' }, 150);
+    other = explain(answer(other, 'two', 160), 'two', 200);
+    expect('assistanceAttribution' in other).toBe(false);
+    // A lookup and an explanation on the same item.
+    const same = explain(answer(lookedUp, 'one', 100), 'one', 200);
+    expect('assistanceAttribution' in same).toBe(false);
+    expect(same.events.filter((entry) => entry.kind === 'assistance')).toHaveLength(2);
+    // An unanswered lookup still has a known source; it cannot taint another answer.
+    let unanswered = update(lookedUp, { kind: 'visit', itemId: 'two' }, 100);
+    unanswered = explain(answer(unanswered, 'two', 150), 'two', 200);
+    expect(unanswered.answers[0]!.response).toEqual({ kind: 'unanswered' });
+    expect('assistanceAttribution' in unanswered).toBe(false);
+    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(unanswered)))).toEqual(unanswered);
+    // Bound lookup events must not hide genuinely unbound help in the same attempt.
+    const mixed = update(lookedUp, { kind: 'assistance', reason: 'hint' }, 75);
+    const explained = explain(answer(mixed, 'one', 100), 'one', 200);
+    expect(explained.assistanceAttribution).toBe('unknown');
+    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(explained))).assistanceAttribution)
+      .toBe('unknown');
+    // Help naming no reached item of this form stays unattributed.
+    for (const digest of ['f'.repeat(64), three!.sha256]) {
+      const unknown = explain(
+        answer(lookup(beginAttemptV2(paper, practice), digest, 50), 'one', 100),
+      );
+      expect(unknown.assistanceAttribution).toBe('unknown');
+    }
+  });
+
   it('checks a marked item retry like a first request before its no-op', () => {
     const marked = explain(answered());
     // An earlier mark must not make an unsupported item-specific request look accepted.
