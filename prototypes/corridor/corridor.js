@@ -5376,6 +5376,7 @@ function renderShelfBody() {
     .filter(form => p.readingFacets?.forms?.includes(form)) }))
     .filter(item => item.forms.length).sort((a, b) => b.forms.length - a.forms.length || byNewest(a.passage, b.passage)).slice(0, 3);
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
+  const picks = [];
   // the bands below ride inside the story grid, after the lead and its two seconds: magazine
   // rhythm, and the lead stays directly under the chip bar on a phone
   const bands = [];
@@ -5419,7 +5420,6 @@ function renderShelfBody() {
       const j = x % (i + 1);
       [order[i], order[j]] = [order[j], order[i]];
     }
-    const picks = [];
     const perBand = new Map();
     for (const ix of order) {
       if (picks.length >= 6) break;
@@ -5457,11 +5457,16 @@ function renderShelfBody() {
   if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
   if (Object.values(filters).some((v,i)=>i>0 && v)) { const reset=el('button','chip btn-tertiary shelf-clear',tx('絞り込みを解除','Clear filters'));reset.type='button';reset.addEventListener('click',()=>{S.shelfFilters=null;refreshShelfBody();});controls.append(reset); }
   const grid=el('div','shelf-story-grid');grid.id='shelf-reading-results';
-  // rank sets the headline size: the lead, two seconds, then the grid; the bands follow the seconds
-  matches.forEach((p, i) => {
-    if (i === 3) grid.append(...bands.splice(0));
-    grid.append(shelfCard(p, i === 0 ? 'lead' : i < 3 ? 'second' : 'grid'));
-  });
+  // rank sets the headline size: the lead, two seconds, then the grid; the bands follow the seconds.
+  // A story in today's six stands in that band, not a second time in the grid (one card per story).
+  const inBand = new Set(picks.map((p) => p.id));
+  let rank = 0;
+  for (const p of matches) {
+    if (rank >= 3 && inBand.has(p.id)) continue;
+    if (rank === 3) grid.append(...bands.splice(0));
+    grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
+    rank += 1;
+  }
   grid.append(...bands);
   if(!matches.length)grid.append(el('p','note',tx('この条件の読み物はありません。絞り込みを減らしてください。','No readings match these filters. Try a wider level or another topic.')));
   main.append(grid);
@@ -6964,6 +6969,15 @@ function dateStamp(day, cls) {
  * What a learner sees about a reading: where it is from, how hard it is, what it is about, and
  * whether a person has checked it yet. Grader diagnostics ("signals disagree", coverage ratios,
  * licence codes) stay in the article's own footer, never on the shelf. */
+/** The reader's date: the day itself, then how long ago in its own span (a phone drops it). */
+function readerDateStamp(day) {
+  const stamp = el('time', 'shelf-date');
+  stamp.dateTime = day;
+  const [whole, ago] = shelfDateLabel(day).split(' · ');
+  stamp.append(el('span', 'date-abs', whole));
+  if (ago) stamp.append(el('span', 'date-rel', ` · ${ago}`));
+  return stamp;
+}
 function learnerSourceLabel(p) {
   return String(p.sourceLabel || '').replace(/\s*·\s*検収前/gu, '').replace(/^N3書き換え\s*·\s*/u, '').trim();
 }
@@ -7066,7 +7080,7 @@ function shelfCard(p, rank = 'grid') {
   item.dataset.passage = p.id;
   const open = el('button', 'shelf-open');
   open.type = 'button';
-  if (rank === 'lead') open.append(storyArt(p));
+  if (rank === 'lead' || rank === 'second') open.append(storyArt(p));
   const head = el('div', 'shelf-head');
   head.append(storyKicker(p));
   head.append(el('div', 'shelf-title', p.title));
@@ -8218,7 +8232,7 @@ function renderReader(main) {
   const head = el('div', 'reader-head');
   const meta = el('p', 'eyebrow reader-meta');
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
-  if (shelfDay(p)) meta.append(dateStamp(shelfDay(p), 'shelf-date'));
+  if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
   meta.append(levelChip(p));
   if (reviewPending(p)) meta.append(unreviewedChip(p));
   // the dials fold away — the text is the point, the settings one tap away
@@ -8280,6 +8294,8 @@ function renderReader(main) {
         ['文節', 'phrases'],
       ]),
     );
+    // the tap ladder, recallable here after the one-time tip is gone
+    dials.append(el('p', 'dials-hint', tapLadderHint()));
     main.append(dials);
   }
 
@@ -17880,6 +17896,12 @@ function syncReaderTakeSeal() {
   if (contextNote && selected) contextNote.textContent = readerActionsNote(selected);
   const bar = document.querySelector('.reader-actions');
   if (bar) bar.hidden = !selected;
+  // the tip has done its work once a word is chosen: it does not come back
+  if (selected && document.getElementById('reader-tip')) {
+    S.readerTipSeen = true;
+    try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
+    document.getElementById('reader-tip').remove();
+  }
   for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
   if (selected) document.querySelector(`#reader .tok[data-index="${selected.index}"]`)?.classList.add('tok-current');
   const btn = document.getElementById('reader-take');

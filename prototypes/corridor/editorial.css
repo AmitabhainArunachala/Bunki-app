@@ -681,7 +681,7 @@ body .btn-tertiary, body .chip.btn-tertiary {
   border-radius: 3px;
   color: var(--ai);
   background: color-mix(in srgb, var(--ai) 7%, var(--raised));
-  font: 700 12px/1 var(--sans);
+  font: 700 13px/1 var(--sans);
   letter-spacing: 0.05em;
   font-variant-numeric: tabular-nums;
 }
@@ -693,7 +693,7 @@ body .btn-tertiary, body .chip.btn-tertiary {
   border: 1px dashed color-mix(in srgb, var(--ink) 45%, transparent);
   border-radius: 3px;
   color: var(--text-2);
-  font: 600 12px/1 var(--sans);
+  font: 600 13px/1 var(--sans);
   letter-spacing: 0.04em;
   cursor: help;
 }
@@ -707,7 +707,7 @@ body .btn-tertiary, body .chip.btn-tertiary {
 }
 .story-kicker .en-sub {
   display: inline;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -968,7 +968,7 @@ body #shelf-body .story-card {
   box-shadow: var(--raised-shadow);
   transition: box-shadow 180ms ease-out, transform 180ms ease-out;
 }
-body #shelf-body .story-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); }
+@media (hover: hover) { body #shelf-body .story-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
 body #shelf-body .story-card:focus-within { outline: 2px solid var(--ai); outline-offset: 3px; }
 #shelf-body .story-card .shelf-open {
   display: flex;
@@ -1000,7 +1000,7 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--ai); outlin
   letter-spacing: 0;
   color: var(--text-2);
 }
-#shelf-body .story-card:hover .shelf-title { color: var(--ai); }
+@media (hover: hover) { #shelf-body .story-card:hover .shelf-title { color: var(--ai); } }
 .story-foot {
   display: flex;
   flex-wrap: wrap;
@@ -1011,10 +1011,13 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--ai); outlin
 }
 #shelf-body .story-second .shelf-title { font-size: 27px; line-height: 1.45; }
 #shelf-body .story-second .shelf-title-en { font-size: 16px; }
-#shelf-body .story-second .shelf-open { padding: var(--s4); }
+#shelf-body .story-second .shelf-open { padding: 0; }
+#shelf-body .story-second .shelf-head { padding: var(--s3) var(--s4) var(--s4); }
+#shelf-body .story-second .story-art { min-height: 0; height: 132px; border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0 0; }
+#shelf-body .story-second .story-art-glyph { font-size: 96px; }
+#shelf-body .story-second .story-art-seal { width: 28px; height: 28px; font-size: 16px; right: 12px; bottom: 12px; }
 
 /* the lead: its own art, the largest headline, a vermilion rule of rank */
-body #shelf-body .story-lead { border-top: 3px solid var(--accent); }
 #shelf-body .story-lead .shelf-open {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -1209,7 +1212,9 @@ body[data-view='reader'] #app > main > .view-title-en {
   cursor: pointer;
 }
 .version-toggle .version-choice .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; }
-.version-toggle .version-choice[aria-pressed='true'] { background: var(--ai); color: var(--raised); }
+.version-toggle { background: color-mix(in srgb, var(--ink) 5%, var(--raised)); }
+.version-toggle .version-choice[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
+.dials-hint { margin: var(--s1) 0 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
 body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 1px solid var(--raised-edge); border-radius: 8px; background: color-mix(in srgb, var(--ink) 3%, var(--raised)); box-shadow: none; padding: var(--s2); }
 
 /* the play bar — only when the locked voice has clips for this article */
@@ -1276,7 +1281,7 @@ body.v-depth-layered #reader, #reader.reader {
   background: transparent;
   box-shadow: none;
   font-size: 22px;
-  line-height: 2.25;
+  line-height: 2.15;
   letter-spacing: 0.01em;
   color: var(--text);
 }
@@ -1304,7 +1309,7 @@ body.v-depth-layered #reader, #reader.reader {
 }
 #reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; }
 .reader rt, #reader rt { font-size: 0.6em; letter-spacing: 0.02em; color: var(--accent); pointer-events: none; }
-.reader .para-break { height: 1em; }
+.reader .para-break { height: 1.5em; }
 .reader .tok-en {
   margin-top: 0.1em;
   font-size: 15px;
@@ -1314,7 +1319,7 @@ body.v-depth-layered #reader, #reader.reader {
 }
 /* segmentation shows only under the finger or the pointer, hugging the glyphs */
 #reader .tok:hover, #reader .tok:focus-visible { background: transparent; }
-#reader .tok:hover > .tok-word { background: var(--ai-wash); border-radius: 2px; }
+@media (hover: hover) { #reader .tok:hover > .tok-word { background: var(--ai-wash); border-radius: 2px; } }
 #reader .tok.tok-current > .tok-word { background: var(--accent-wash); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 2px 2px 0 0; }
 body[data-view='reader'] main > blockquote {
   margin: var(--s4) 0;
@@ -1365,7 +1370,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   font: 700 15px/1.2 var(--sans);
   white-space: nowrap;
 }
-.reader-actions .teacher-actions .en-sub { font-size: 11px; letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
+.reader-actions .teacher-actions .en-sub { font-size: 12px; letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
 .reader-tip {
   position: fixed;
   z-index: 55;
@@ -1477,7 +1482,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .story-art { min-height: 0; aspect-ratio: 16 / 8; border-radius: 0; }
   .story-art-glyph { font-size: 132px; }
   #shelf-body .story-lead .shelf-head { padding: var(--s3); gap: var(--s1); }
-  #shelf-body .story-second .shelf-open { padding: var(--s3); }
+  #shelf-body .story-second .shelf-head { padding: var(--s3); }
   #shelf-body .story-second .shelf-title { font-size: 23px; }
   .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
 }
@@ -1509,6 +1514,11 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .shelf-filter-help[open] > p { position: fixed; top: auto; bottom: var(--s2); left: var(--s2); right: var(--s2); width: auto; transform: none; }
   .shelf-study-tools[open] > .shelf-tools-grid { position: fixed; top: auto; bottom: 0; left: 0; right: 0; width: auto; border-radius: 14px 14px 0 0; padding: var(--s2) var(--s2) calc(var(--s3) + env(safe-area-inset-bottom)); }
   #shelf-body .story-card .shelf-open { padding: var(--s2) var(--s2) 20px; }
+  #shelf-body :is(.story-lead, .story-second) .shelf-open { padding: 0; }
+  #shelf-body .story-second .shelf-head { padding: var(--s2) var(--s2) 20px; }
+  #shelf-body .story-second .story-art { height: 112px; }
+  #shelf-body .story-second .story-art-glyph { font-size: 80px; }
+  #shelf-body .story-teaser .shelf-title { font-size: 17px; }
   #shelf-body .story-card .shelf-title { font-size: 20px; }
   #shelf-body .story-second .shelf-title { font-size: 22px; }
   #shelf-body .story-lead .shelf-title { font-size: 26px; line-height: 1.45; }
@@ -1538,10 +1548,15 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
     box-shadow: none;
   }
   .reader-head { margin-bottom: var(--s2); }
+  body[data-view='reader'] #app > main .reader-meta { flex-wrap: nowrap; gap: 4px 10px; }
+  .reader-meta .reader-source { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .reader-meta .shelf-date, .reader-meta .level-chip, .reader-meta .status-chip { flex: 0 0 auto; white-space: nowrap; }
+  .reader-meta .date-rel { display: none; }
+  #reader:not(.fg-always) ruby::before, .reader rt, #reader rt { font-size: 0.63em; }
   body[data-view='reader'] #app > main > h1.view-title { font-size: 26px; line-height: 1.45; }
   body[data-view='reader'] #app > main > .view-title-en { margin-bottom: var(--s2); font-size: 15px; }
   .listen-row.play-bar.is-pending { margin-bottom: var(--s2); }
-  body.v-depth-layered #reader, #reader.reader { font-size: 19px; line-height: 2.2; }
+  body.v-depth-layered #reader, #reader.reader { font-size: 19px; line-height: 2.15; }
   .reader .tok-en { font-size: 15px; }
   /* the bar and the tip leave the corner to the bug: nothing fixed floats over the text column */
   .teacher-door.reader-actions, .reader-tip {
