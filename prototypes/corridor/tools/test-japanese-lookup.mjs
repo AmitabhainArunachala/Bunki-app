@@ -54,8 +54,8 @@ class Element {
     return this.tag === selector;
   }
   closest(selectors) {
-    for (let node = this; node; node = node.parentElement) if (selectors.split(',').some(selector => node.matches(selector.trim()))) return node;
-    return null;
+    if (selectors.split(',').some(selector => this.matches(selector.trim()))) return this;
+    return this.parentElement?.closest(selectors) ?? null;
   }
   querySelectorAll(selectors) {
     const found = [];
