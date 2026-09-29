@@ -1619,3 +1619,194 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   body #shelf-body .story-card, .shelf-controls .filter-search input { transition: none; }
   body #shelf-body .story-card:hover { transform: none; }
 }
+
+/* ------------------------------------------------------------------ step 3a
+   The word popup and the word sheet on the depth system. The popup is a
+   floating paper card: headword, reading, one meaning, one way deeper. The
+   sheet is the top layer: a lacquer bar over raised paper, sections under
+   hairline rules, kanji on washi tiles, one filled primary (覚える). */
+body #mini {
+  gap: 4px;
+  width: max-content;
+  min-width: 220px;
+  max-width: min(340px, calc(100vw - 2 * var(--s2)));
+  padding: var(--s2) var(--s2) var(--s2) 20px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+  color: var(--text);
+}
+body #mini .mini-word { padding-right: 56px; font: 800 30px/1.35 var(--display); letter-spacing: -0.01em; color: var(--text); }
+body #mini .mini-reading { font: 500 18px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--accent); }
+body #mini .mini-gloss { margin: 2px 0 0; font: 16px/1.55 var(--sans); color: var(--text); }
+body #mini .mini-gloss.mini-miss { color: var(--text-2); }
+body #mini .mini-take {
+  top: 14px;
+  right: 14px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font: 800 18px/1 var(--display);
+}
+body #mini .mini-take.taken { background: var(--accent); color: var(--raised); }
+body #mini .mini-take-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
+body #mini .mini-entry {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--s1);
+  min-height: 44px;
+  margin-top: var(--s1);
+  padding: 8px var(--s2);
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ai);
+  font: 700 15px/1.2 var(--sans);
+}
+body #mini .mini-entry .en-sub { display: inline; font-size: 12px; letter-spacing: 0.02em; text-transform: none; color: inherit; }
+body #mini .mini-entry::after { content: '›'; font-weight: 700; }
+body #mini .mini-entry:hover { background: var(--ai-wash); border-color: var(--ai); }
+
+/* the sheet: lacquer bar, raised paper */
+body.v-depth-layered .scrim, body .scrim { background: color-mix(in srgb, var(--chrome) 62%, transparent); }
+body.v-depth-layered .sheet, body .sheet {
+  border: 1px solid var(--raised-edge);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--raised);
+  box-shadow: 0 -2px 6px color-mix(in srgb, var(--ink) 14%, transparent), 0 -28px 64px -20px color-mix(in srgb, var(--ink) 55%, transparent);
+}
+body .sheet .sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--raised-edge-strong); }
+body .sheet .sheet-bar {
+  gap: var(--s1);
+  padding: 10px var(--s3);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 60%), var(--chrome);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 8px 18px -14px color-mix(in srgb, var(--chrome) 90%, transparent);
+}
+body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) {
+  min-width: 44px;
+  border: 1px solid color-mix(in srgb, var(--chrome-ink) 34%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, #fff 6%, transparent);
+  transition: background-color 120ms ease-out;
+}
+body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search):hover { background: color-mix(in srgb, #fff 14%, transparent); }
+body .sheet .sheet-bar .sheet-take[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff8ee; }
+
+/* the word's head: headword, reading, then everything under rules */
+body .sheet .headword { margin: var(--s1) 0 0; font: 800 46px/1.3 var(--display); letter-spacing: -0.02em; color: var(--text); }
+body .sheet .reading { margin: 2px 0 var(--s3); font: 500 21px/1.5 var(--serif); letter-spacing: 0.06em; color: var(--accent); }
+body .sheet > p.eyebrow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s1);
+  margin: var(--s4) 0 var(--s1);
+  padding: 12px 0 0;
+  border-top: 1px solid var(--hairline);
+  font: 700 14px/1.4 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+body .sheet > p.eyebrow .en-inline, body .sheet > p.eyebrow .en-sub {
+  display: inline;
+  font: 500 12px/1.4 var(--sans);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-2);
+}
+body .sheet .dictionary-homographs {
+  padding: 12px var(--s2);
+  border: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+}
+body .sheet .entry-rows { border-top: 0; }
+body .sheet .entry-row {
+  gap: var(--s2);
+  min-height: 64px;
+  padding: 10px 6px;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  transition: background-color 120ms ease-out;
+}
+body .sheet .entry-row .row-glyph {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 8px;
+  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 4%, var(--raised));
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent);
+  font: 400 30px/1 var(--serif);
+  color: var(--text);
+}
+body .sheet .entry-row .row-main { font: 16px/1.5 var(--sans); color: var(--text); }
+body .sheet .entry-row .row-go, body .sheet .entry-row > span:last-child { color: var(--text-2); }
+@media (hover: hover) { body .sheet .entry-row:hover { background: var(--ai-wash); } }
+body .sheet .senses { margin: var(--s2) 0 0; }
+body .sheet .sense-list li::marker { font: 700 14px var(--sans); color: var(--accent); }
+body .sheet .dictionary-credit { margin: var(--s2) 0 var(--s1); font: 12px/1.6 var(--sans); color: var(--text-2); }
+body .sheet > .shelf-meta { gap: var(--s1); margin: 0 0 var(--s2); }
+body .sheet > .shelf-meta > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ai) 7%, var(--raised));
+  color: var(--ai);
+  font: 700 13px/1 var(--sans);
+  letter-spacing: 0.04em;
+}
+body .sheet .teacher-door {
+  margin: var(--s3) 0;
+  padding: var(--s2) 20px;
+  border: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+}
+body .sheet .teacher-door .teacher-source-quote { font: 18px/1.9 var(--serif); color: var(--text); }
+body .sheet .example { padding: var(--s2) 0; border: 0; border-bottom: 1px solid var(--hairline); }
+body .sheet .example-ja { font: 20px/2 var(--serif); color: var(--text); }
+body .sheet .example-en { font: 15px/1.6 var(--sans); color: var(--text-2); }
+body .sheet > button.take {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--s1);
+  width: 100%;
+  min-height: 52px;
+  margin: var(--s3) 0 var(--s1);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: var(--ai);
+  color: var(--raised);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
+  font: 700 17px/1.2 var(--sans);
+}
+body .sheet > button.take .en-sub { display: inline; font-size: 13px; letter-spacing: 0.02em; text-transform: none; color: inherit; opacity: 0.88; }
+body .sheet > button.take.taken, body .sheet > button.take[aria-pressed='true'] { background: transparent; color: var(--ai); }
+@media (max-width: 520px) {
+  body .sheet .sheet-bar { padding: 8px 12px; }
+  body .sheet .headword { font-size: 38px; }
+  body .sheet .reading { font-size: 19px; }
+  body #mini .mini-word { font-size: 27px; }
+}
+/* an open sheet is the top layer: the reader's bar, tip and dock step back under it */
+body:has(#sheet) :is(.teacher-door.reader-actions, .reader-tip) { display: none !important; }
+@media (max-width: 520px) {
+  body:has(#sheet)[data-view='reader'] #app::after, body:has(#sheet)[data-view='reader'] .listen-row.play-bar { display: none; }
+}

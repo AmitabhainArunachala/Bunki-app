@@ -16171,7 +16171,7 @@ function takenContext(item) {
       }
     }
   }
-  return { tokens: p.tokens.slice(start, end), source: p.sourceLabel, passage: p.id, start };
+  return { tokens: p.tokens.slice(start, end), source: learnerSourceLabel(p), passage: p.id, start };
 }
 
 /* ------------------------------------------------ D23 · the saved word answer
@@ -20732,14 +20732,14 @@ function findExamples(id, cap = 4) {
       sentence.push(t);
       if (t.c && t.b === id) hit = true;
       if ('。！？'.includes(t.s)) {
-        if (hit) out.push({ tokens: sentence, source: p.sourceLabel, passage: p.id, start });
+        if (hit) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
         sentence = [];
         start = index + 1;
         hit = false;
         if (out.length >= cap) return out;
       }
     }
-    if (hit && sentence.length) out.push({ tokens: sentence, source: p.sourceLabel, passage: p.id, start });
+    if (hit && sentence.length) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
     if (out.length >= cap) return out;
   }
   // the bank fills what the shelf cannot — already-fetched sentences only
