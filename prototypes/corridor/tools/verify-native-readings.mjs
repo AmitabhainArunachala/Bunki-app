@@ -448,10 +448,13 @@ const curatedRows = index.articles.filter(
   (record) => !String(record.file || '').startsWith('archive/'),
 );
 const standingIds = new Set(curatedRows.map((record) => record.id));
-const STORY_COUNT = curatedRows.filter(
+const storyRows = curatedRows.filter(
   (record) => !(record.adaptation?.basedOn && standingIds.has(record.adaptation.basedOn)),
-).length;
+);
+const STORY_COUNT = storyRows.length;
 const STORY_CARDS = '#shelf-reading-results .shelf-item';
+const storyCard = (id) => `${STORY_CARDS}[data-passage="${id}"]`;
+const storyVariant = (className) => className.match(/\bstory-(lead|second|grid|teaser)\b/u)?.[1] ?? null;
 const bodies = new Map(
   IDS.map((id) => {
     const row = rows.get(id);
@@ -672,23 +675,32 @@ try {
     (await page.locator(STORY_CARDS).count()) === STORY_COUNT,
     `${await page.locator(STORY_CARDS).count()}/${STORY_COUNT}`,
   );
-  const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]:not([data-recommendation])').evaluate((node) => {
+  // Added readings wear the same native card as the existing ones: each card is compared with an
+  // existing reading's card of the same variant (lead, second, grid, or a teaser in today's six).
+  const cardStyles = await page.locator(STORY_CARDS).evaluateAll((nodes) => nodes.map((node) => {
     const style = getComputedStyle(node);
     const title = getComputedStyle(node.querySelector('.shelf-title'));
-    const snippet = getComputedStyle(node.querySelector('.shelf-snippet'));
+    const snippet = node.querySelector('.shelf-snippet');
     return {
+      id: node.dataset.passage,
       className: node.className,
       background: style.backgroundColor,
       border: style.border,
       radius: style.borderRadius,
       titleFamily: title.fontFamily,
       titleSize: title.fontSize,
-      snippetClamp: snippet.webkitLineClamp,
+      snippetClamp: snippet ? getComputedStyle(snippet).webkitLineClamp : null,
     };
-  });
+  }));
+  const addedIds = new Set(IDS);
+  const existingStyles = new Map();
+  for (const card of [...cardStyles.filter((row) => !addedIds.has(row.id)), ...cardStyles]) {
+    const variant = storyVariant(card.className);
+    if (!existingStyles.has(variant)) existingStyles.set(variant, card);
+  }
 
   // A shelf screenshot at the boundary between the preserved 40 and additions.
-  await page.locator(`[data-passage="${IDS[0]}"]:not([data-recommendation])`).scrollIntoViewIfNeeded();
+  await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-first-added.png') });
 
   for (const id of IDS) {
@@ -696,13 +708,13 @@ try {
     const row = rows.get(id);
     const body = bodies.get(id);
     const beforeNoise = noise.length;
-    const item = page.locator(`[data-passage="${id}"]:not([data-recommendation])`);
+    const item = page.locator(storyCard(id));
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
       const snippet = node.querySelector('.shelf-snippet');
       const titleStyle = getComputedStyle(title);
-      const snippetStyle = getComputedStyle(snippet);
+      const snippetStyle = snippet ? getComputedStyle(snippet) : null;
       return {
         className: node.className,
         title: title?.textContent ?? '',
@@ -715,7 +727,7 @@ try {
         radius: style.borderRadius,
         titleFamily: titleStyle.fontFamily,
         titleSize: titleStyle.fontSize,
-        snippetClamp: snippetStyle.webkitLineClamp,
+        snippetClamp: snippetStyle?.webkitLineClamp ?? null,
         forbidden: !!node.querySelector('.draft-tag, [class*="editorial"], [class*="pack"]'),
       };
     });
@@ -727,7 +739,7 @@ try {
       'titleFamily',
       'titleSize',
       'snippetClamp',
-    ].every((key) => shelfState[key] === existingStyle[key]);
+    ].every((key) => shelfState[key] === existingStyles.get(storyVariant(shelfState.className))?.[key]);
     await item.scrollIntoViewIfNeeded();
     await page.waitForTimeout(35);
     const shelfY = await page.evaluate(() => window.scrollY);
@@ -832,7 +844,7 @@ try {
     await page.waitForTimeout(80);
     const intendedPosition = await page.evaluate(() => Math.round(window.scrollY));
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]:not([data-recommendation])`);
+    await page.waitForSelector(storyCard(id));
     const returnedShelfY = await page.evaluate(() => window.scrollY);
     const state = await waitForAppRecord(page,
       (record) => record.readDone?.[id] && record.readerPos?.[id] === intendedPosition,
@@ -842,11 +854,11 @@ try {
       done: !!state.readDone?.[id],
     };
     const completionTag = await page
-      .locator(`[data-passage="${id}"]:not([data-recommendation]) .read-tag`)
+      .locator(`${storyCard(id)} .read-tag`)
       .textContent()
       .catch(() => '');
 
-    await touchAt(page, page.locator(`[data-passage="${id}"]:not([data-recommendation])`));
+    await touchAt(page, page.locator(storyCard(id)));
     await settleReader(page);
     await page.waitForTimeout(120);
     const restoredPosition = await page.evaluate(() => Math.round(window.scrollY));
@@ -910,7 +922,7 @@ try {
     });
 
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]:not([data-recommendation])`);
+    await page.waitForSelector(storyCard(id));
   }
   activeArticleId = null;
 
@@ -938,7 +950,7 @@ try {
   const readShelfCards = () =>
     page.evaluate(() =>
       Object.fromEntries(
-        [...document.querySelectorAll('.shelf-item:not([data-recommendation])')].map((item) => [
+        [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map((item) => [
           item.dataset.passage,
           {
             en: item.querySelector('.shelf-title-en')?.textContent ?? null,
@@ -980,11 +992,11 @@ try {
       reloadedRecord.readerPos?.[id] === savedRecord.readerPos?.[id]),
   );
   const biCards = await readShelfCards();
-  const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
+  const wrongEn = storyRows.filter((record) => biCards[record.id]?.en !== record.titleEn);
   check(
     'the bilingual shelf renders every English title from the records themselves',
     wrongEn.length === 0,
-    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${index.articles.length} titles`,
+    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${storyRows.length} titles`,
   );
   const biUnmarked = reviewRows.filter((record) => !/検収前/.test(biCards[record.id]?.meta ?? ''));
   check(
@@ -992,7 +1004,7 @@ try {
     biUnmarked.length === 0,
     biUnmarked.map((record) => record.id).slice(0, 4).join(', '),
   );
-  await page.locator(`[data-passage="${IDS[0]}"]:not([data-recommendation])`).scrollIntoViewIfNeeded();
+  await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
   check(
     'the bilingual shelf pass added no request, console, or page errors',
