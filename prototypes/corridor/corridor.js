@@ -5099,11 +5099,11 @@ function shelfStories(curated) {
   const standing = new Set(curated.map((p) => p.id));
   return curated.filter((p) => !(p.adaptation?.basedOn && standing.has(p.adaptation.basedOn)));
 }
+/** One number for the shelf: every card counts, and the line says what it includes. */
 function shelfTallyText(list) {
   const glossary = list.filter((p) => p.source === 'isa-yasashii-glossary').length;
-  const readings = list.length - glossary;
-  if (!glossary) return tx(`読み物 ${readings} 本`, `${readings} readings`);
-  return tx(`読み物 ${readings} 本 · 用語集 ${glossary}`, `${readings} readings · ${glossary} glossary entries`);
+  if (!glossary) return tx(`読み物 ${list.length} 本`, `${list.length} readings`);
+  return tx(`読み物 ${list.length} 本（うち用語集 ${glossary}）`, `${list.length} readings, including ${glossary} glossary entries`);
 }
 function shelfDateline(day) {
   const [y, m, d] = day.split('-').map(Number);
@@ -5190,13 +5190,13 @@ function renderShelfBody() {
   const tally = el('span', 'dateline-tally');
   const glossaryCount = stories.filter((p) => p.source === 'isa-yasashii-glossary').length;
   tally.append(el('span', 'tally-long', shelfTallyText(stories)),
-    el('span', 'tally-short', `${stories.length - glossaryCount}本${glossaryCount ? ` · 用語${glossaryCount}` : ''}`));
+    el('span', 'tally-short', `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
   dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
   title.append(dateline);
   // 未確認 is said once, here, not on every card; each article still wears it in its meta line
   const unreviewed = stories.filter(reviewPending).length;
-  if (unreviewed) title.append(el('p', 'shelf-review-note', tx(`未確認 ${unreviewed} 本 · 人による確認の前`,
-    `未確認 · ${unreviewed} of ${stories.length} not yet reviewed by a person`)));
+  if (unreviewed) title.append(el('p', 'shelf-review-note', tx(`このうち ${unreviewed} 本は未確認（人による確認の前）`,
+    `未確認 · ${unreviewed} of these ${stories.length} are not yet reviewed by a person`)));
   const art = el('img', 'shelf-art'); art.src = 'design/ink-hoku-nami.png'; art.alt = tx('藍の地に白い筆の「永」', 'Bunki brush study: 永 in white ink on indigo'); art.width = 640; art.height = 640;
   masthead.append(title);
   main.append(masthead);

@@ -11,6 +11,8 @@
  *   S1 learner wording  — no visible "signals disagree", 不一致 or "awaiting John" on the shelf or
  *                         in a reading.
  *   S2 first story      — the first shelf card's headline is inside 390×844 and not covered.
+ *   S3 one count        — every number the unfiltered shelf states about its size is the same
+ *                         number, and it equals the stories on the shelf (grid + today's band).
  *   A1 no F1            — with a stored F1 preference and the listen control pressed where one
  *                         exists, no F1 clip is requested and no narration manifest naming F1 loads.
  *
@@ -266,6 +268,25 @@ try {
       return probe;
     });
 
+    await run('S3-counts-agree', DESK, async (page) => {
+      await open(page);
+      const probe = await page.evaluate(() => {
+        const cards = new Set([...document.querySelectorAll('#shelf-body [data-passage] .shelf-open')]
+          .map((n) => n.closest('[data-passage]').dataset.passage)).size;
+        const lines = [...document.querySelectorAll('.shelf-masthead p, .shelf-results-count')]
+          .filter((n) => n.offsetParent !== null || n.classList.contains('shelf-results-count')).map((n) => n.innerText);
+        // a size is "N readings" / "N本" / "of these N"; "N of these" is a subset (the unreviewed count)
+        const numbers = lines.flatMap((t) => [
+          ...[...t.matchAll(/(\d+)\s*(?:readings|本)/gu)].map((m) => Number(m[1])),
+          ...[...t.matchAll(/of these (\d+)/gu)].map((m) => Number(m[1])),
+        ]);
+        return { cards, lines, numbers };
+      });
+      assert(probe.numbers.length, `no size stated: ${JSON.stringify(probe.lines)}`);
+      assert(probe.numbers.every((n) => n === probe.cards), `stated ${JSON.stringify(probe.numbers)} for ${probe.cards} stories: ${JSON.stringify(probe.lines)}`);
+      return probe;
+    });
+
     await run('A1-no-f1-audio', DESK, async (page) => {
       const requests = [];
       page.on('request', (r) => requests.push(r.url()));
@@ -296,7 +317,7 @@ try {
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
     scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording and first story; no F1 audio',
     results,
-    passed: results.length === engines.length * 9 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 10 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
