@@ -1451,6 +1451,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   margin: 0 0 var(--s3);
   padding: 0;
   border: 0;
+  border-radius: 0; /* a plain label: no pill corners for a tap to fall through */
   background: transparent;
 }
 .play-pending {
