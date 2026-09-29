@@ -676,7 +676,7 @@ try {
       ? await app.evaluate(() => {
           const art = document.querySelector('.shelf-art');
           const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => {
-            let rules = 0;
+            let rules;
             try {
               rules = link.sheet?.cssRules.length || 0;
             } catch {
