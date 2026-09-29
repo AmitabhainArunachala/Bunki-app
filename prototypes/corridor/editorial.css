@@ -1922,3 +1922,118 @@ body .sheet .stroke-door {
   body .sheet .hero-glyph { width: 104px; height: 104px; font-size: 80px; }
   body .sheet .hero-mean { font-size: 23px; }
 }
+
+/* ------------------------------------------------------------------ step 3c
+   The level palette (the library and the JLPT room share it) and the
+   reference library as a hall: level doors raised on the washi ground, the
+   JLPT levels in their own colours, and a plain "what is this?" under each
+   family that opens with the official page. */
+body, body.v-contrast-wcag {
+  --lv-n5: #4c7a47;
+  --lv-n4: #2d7080;
+  --lv-n3: #2e4d6e;
+  --lv-n2: #69446f;
+  --lv-n1: #7c2a3b;
+}
+[data-level='N5'] { --lv: var(--lv-n5); }
+[data-level='N4'] { --lv: var(--lv-n4); }
+[data-level='N3'] { --lv: var(--lv-n3); }
+[data-level='N2'] { --lv: var(--lv-n2); }
+[data-level='N1'] { --lv: var(--lv-n1); }
+
+:root body[data-view='levels']:not(.zen):not([data-view='entry']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 1160px;
+  margin: 0 auto var(--s8);
+  padding: var(--s3) 0 var(--s8);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.reference-library .reference-navigation { border-bottom: 2px solid var(--rule-strong); }
+.reference-library .reference-eyebrow { font: 700 13px/1.4 var(--sans); letter-spacing: 0.08em; color: var(--accent); }
+.reference-library .reference-title { font: 800 clamp(34px, 4vw, 46px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+.reference-library .reference-intro { max-width: 60ch; font: 17px/1.75 var(--sans); color: var(--text-2); }
+.reference-library .reference-family { margin: var(--s5) 0; }
+.reference-library .reference-family-heading { padding-top: var(--s2); border-top: 2px solid var(--rule-strong); }
+.reference-library .reference-family-heading h2 { font: 800 30px/1.3 var(--display); color: var(--text); }
+.reference-library .reference-family-note { font: 14px/1.5 var(--sans); color: var(--text-2); }
+
+/* the explainer: a pill that opens into a paper well */
+.reference-explainer { margin: var(--s2) 0; }
+.reference-explainer > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  min-height: 40px;
+  padding: 0 var(--s2) 0 12px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 999px;
+  background: var(--raised);
+  color: var(--ai);
+  font: 700 14px/1.2 var(--sans);
+  list-style: none;
+  cursor: pointer;
+}
+.reference-explainer > summary::-webkit-details-marker { display: none; }
+.reference-explainer > summary::before {
+  content: 'i';
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font: 700 12px/1 var(--serif);
+}
+.reference-explainer[open] > summary { background: var(--ai); color: var(--raised); border-color: var(--ai); }
+.reference-explainer > p {
+  max-width: 68ch;
+  margin: 0;
+  padding: 12px var(--s3) 0;
+  font: 15px/1.75 var(--sans);
+  color: var(--text);
+}
+.reference-explainer[open] {
+  padding-bottom: var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+.reference-explainer[open] > summary { margin: var(--s2) 0 0 var(--s2); }
+.reference-explainer .reference-explainer-links { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); padding-top: var(--s2); }
+.reference-explainer-links a { color: var(--ai); font-weight: 600; text-underline-offset: 0.2em; }
+.reference-explainer-links a::after { content: ' ↗'; }
+
+/* level doors: raised cards, JLPT in their level colours */
+.reference-library .reference-tabs { border-bottom: 1px solid var(--hairline); }
+.reference-library .reference-level-grid { gap: var(--s2); border: 0; background: none; }
+body .reference-library .reference-level {
+  position: relative;
+  min-height: 148px;
+  padding: 20px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+}
+body .reference-library .reference-level[data-level] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 9%, var(--raised)) 0%, var(--raised) 70%);
+  border-color: color-mix(in srgb, var(--lv) 30%, var(--raised-edge));
+}
+@media (hover: hover) { body .reference-library .reference-level:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+body .reference-library .reference-level-name { font: 800 34px/1.1 var(--display); color: var(--text); }
+body .reference-library .reference-level[data-level] .reference-level-name { color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
+body .reference-library .reference-level-count { margin-top: 12px; font: 600 17px/1.4 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
+body .reference-library .reference-level-study { font: 13px/1.5 var(--sans); color: var(--text-2); }
+body .reference-library .reference-level-arrow { color: var(--text-2); }
+body .reference-library .reference-level-unknown { min-height: 0; }
+.reference-library .reference-footnote { max-width: 70ch; font: 14px/1.7 var(--sans); color: var(--text-2); }
+@media (max-width: 520px) {
+  :root body[data-view='levels']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  body .reference-library .reference-level { min-height: 120px; padding: var(--s2); }
+  body .reference-library .reference-level-name { font-size: 28px; }
+  .reference-explainer > p { padding-inline: var(--s2); }
+}
