@@ -723,19 +723,6 @@ body.ginga #drift-layer #hint.first-cue {
   outline: 2px solid var(--ai, #2e4d6e);
   outline-offset: 1px;
 }
-/* the reading-voice picker beside 聞く — device voices, the hand's choice */
-.listen-voice {
-  min-height: 44px;
-  max-width: 46%;
-  padding: 6px 10px;
-  font: inherit;
-  font-size: 13px;
-  color: var(--ink, #23303f);
-  background: var(--ground-0, #fff);
-  border: 1px solid var(--line, #cfc7b5);
-  border-radius: 10px;
-}
-
 .search-page {
   max-width: 560px;
   margin: 4px auto 0;
@@ -2790,24 +2777,12 @@ body.v-depth-layered .inline-link {
   margin: 8px 2px 0;
 }
 
-/* 聞く — the reader's interim voice door: one chip, and the honest label
- * beside it naming the voice 仮 until PR 五's judged voice replaces it */
+/* 聞く — the reader's play bar (the locked Kore voice); its look lives in editorial.css */
 .listen-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* the voice picker joins the row without crushing it */
   gap: 10px;
   margin: 10px 0 0;
-}
-.listen-row .listen-toggle {
-  min-height: var(--tap);
-  min-width: var(--tap);
-}
-.listen-note {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--faint);
 }
 
 /* shelf card header — demarcated from the body */

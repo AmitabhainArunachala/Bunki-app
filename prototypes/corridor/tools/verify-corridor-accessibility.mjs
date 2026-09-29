@@ -310,15 +310,21 @@ async function main() {
       focusProbe.hiddenTabStops === 0,
       `${focusProbe.hiddenTabStops} hidden tab stop(s)`,
     );
-    await page.keyboard.press('Tab');
-    const firstAlternative = await page.evaluate('document.activeElement?.dataset.action ?? null');
-    await page.keyboard.press('Tab');
-    const secondAlternative = await page.evaluate('document.activeElement?.dataset.action ?? null');
+    // R4 (2026-09-30): the pill's buttons left the Tab order (one stop per paragraph); the keyboard
+    // reaches them from the word itself, and assistive technology still finds them in the tree
+    await page.keyboard.press('Shift+Enter');
+    const firstAlternative = await page.evaluate('document.querySelector("#mini") ? "quickLook.open" : null');
+    await page.keyboard.press('Escape');
+    const backOnWord = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.querySelector("#mini")');
+    await word.focus();
+    await page.keyboard.press('Control+Enter');
+    const secondAlternative = await page.evaluate('document.querySelector("#sheet") ? "entry.open" : null');
     check(
-      'sequential switch navigation reaches quick look then full entry',
-      firstAlternative === 'quickLook.open' && secondAlternative === 'entry.open',
-      `${firstAlternative} → ${secondAlternative}`,
+      'the keyboard reaches quick look (Shift+Enter) and full entry (Ctrl+Enter); Escape returns to the word',
+      firstAlternative === 'quickLook.open' && backOnWord && secondAlternative === 'entry.open',
+      `${firstAlternative} → back on word ${backOnWord} → ${secondAlternative}`,
     );
+    if (await page.locator('#sheet').count()) await page.keyboard.press('Escape');
     await word.focus();
     const accessibilitySession = await page.context().newCDPSession(page);
     const accessibilityTree = await accessibilitySession.send('Accessibility.getFullAXTree');
@@ -326,12 +332,13 @@ async function main() {
     const namedButtons = accessibilityTree.nodes
       .filter((node) => node.role?.value === 'button' && node.name?.value)
       .map((node) => node.name.value);
+    // R4: a word is named by itself; the ladder help is its shared description
+    const describedButtons = accessibilityTree.nodes
+      .filter((node) => node.role?.value === 'button' && node.description?.value)
+      .map((node) => node.description.value);
     check(
       'screen-reader tree exposes named token and non-hold action buttons',
-      // the token label describes the ladder from its CURRENT rung — with
-      // full furigana the default, "a further activation" is the honest
-      // wording; "third activation" was the fixed-ladder phrasing it replaced
-      namedButtons.some((name) => /further activation|third activation|三回目/.test(name)) &&
+      describedButtons.some((text) => /further activation|third activation|三回目/.test(text)) &&
         namedButtons.some((name) => /quick look|語釈/.test(name)) &&
         namedButtons.some((name) => /full entry|全項目/.test(name)),
       `${namedButtons.length} named button(s) in the accessibility tree`,

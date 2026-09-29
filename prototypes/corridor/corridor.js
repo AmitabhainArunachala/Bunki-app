@@ -7462,6 +7462,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
   });
   mini.append(entry);
+  mini.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    event.stopPropagation();
+    removeMini();
+    span.focus({ preventScroll: true });
+  });
   document.body.append(mini);
   const r = span.getBoundingClientRect();
   const m = mini.getBoundingClientRect();
@@ -7540,7 +7547,8 @@ function installTokenAlternatives(wrapper, span, target, { quickLook, openEntry 
   const show = () => {
     if (!actions.isConnected) wrapper.append(actions);
     actions.hidden = false;
-    for (const button of actions.querySelectorAll('button')) button.tabIndex = 0;
+    // the pill's buttons stay out of the Tab order (one stop per paragraph, R4): pointer and assistive
+    // technology reach them here, the keyboard through Shift+Enter and Ctrl+Enter on the word
     actions.style.visibility = 'hidden';
     const active = { wrapper, actions, position };
     activeTokenAlternatives = active;
@@ -7566,6 +7574,34 @@ function installTokenAlternatives(wrapper, span, target, { quickLook, openEntry 
   // and put a button under the lifting finger (P2 ×2, review). Keyboard,
   // switch, and screen-reader focus arrives with no press on this token
   // (AT cursor flicks target the screen, not the span) and keeps the pill.
+  span.setAttribute('aria-keyshortcuts', quickLook ? 'Shift+Enter Control+Enter' : 'Control+Enter');
+  for (const [button, keys, hint] of [[actions.querySelector('[data-action="quickLook.open"]'), 'Shift+Enter', '⇧↵'],
+    [actions.querySelector('[data-action="entry.open"]'), 'Control+Enter', '⌃↵']]) {
+    if (!button) continue;
+    button.setAttribute('aria-keyshortcuts', keys);
+    const kbd = el('kbd', 'tok-kbd', hint); kbd.setAttribute('aria-hidden', 'true'); button.append(kbd);
+  }
+  span.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      // Escape puts away what the word opened and leaves focus on the word itself
+      const mini = document.getElementById('mini');
+      if (!mini && actions.hidden) return;
+      event.preventDefault();
+      removeMini();
+      actions.hidden = true;
+      return;
+    }
+    if (event.key !== 'Enter') return;
+    if (event.shiftKey && quickLook) {
+      event.preventDefault();
+      interaction({ kind: 'quickLook.open', target }, 'keyboard', 'reader-alternative');
+      quickLook('keyboard');
+    } else if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      interaction({ kind: 'entry.open', target }, 'keyboard', 'reader-alternative');
+      openEntry('keyboard');
+    }
+  });
   let ownPressAt = 0;
   wrapper.addEventListener('pointerdown', () => (ownPressAt = Date.now()), true);
   span.addEventListener('focus', () => {
@@ -7649,27 +7685,67 @@ function tapLadderHint() {
   );
 }
 
-function tokenAccessibleLabel(token, index) {
-  const record = readerQuickRecord(token);
-  const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
-  const hasEnglish = S.glossed?.has(index);
-  const parts = [token.s || token.b, tx('語', 'word')];
-  if (hasReading && record?.r && record.r !== token.s) parts.push(record.r);
-  if (hasEnglish) parts.push(record?.m?.length ? inlineGloss(record) : readerGlossMissText());
-  parts.push(
-    readingsAlwaysOn()
-      ? tx('もう一度で元どおり。長押しで全項目。フォーカスで別の操作。', 'a further activation clears; hold for the full entry; focus for more actions')
-      : tx('三回目で元どおり。長押しで全項目。フォーカスで別の操作。', 'a third activation clears; hold for the full entry; focus for more actions'),
-  );
-  return parts.filter(Boolean).join(' · ');
+/* R4 (2026-09-30) — a reader word is named by the word itself. How to work it and what it shows now
+ * ride as its description: the kind and the tap-ladder help are shared by the whole reader
+ * (#reader-help-*); only a word that shows its reading or English carries a state line of its own. */
+function readerWordHint() {
+  return readingsAlwaysOn()
+    ? tx('もう一度で元どおり。長押しで全項目。フォーカスで別の操作。', 'a further activation clears; hold for the full entry; focus for more actions')
+    : tx('三回目で元どおり。長押しで全項目。フォーカスで別の操作。', 'a third activation clears; hold for the full entry; focus for more actions');
 }
-
-/** 読 — a non-content word written in kanji (a name, a numeral) has no entry here but has a
- * reading: its door shows or hides that reading, and nothing else. */
-function namedAccessibleLabel(token, index) {
-  const shown = S.revealed?.has(index);
-  return [token.s, shown ? token.r : '', tx('押すと読みを表示・非表示', 'activate to show or hide the reading')]
-    .filter(Boolean).join(' · ');
+function readerTokenState(token, index, kind) {
+  if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
+  if (kind !== 'word') return '';
+  const record = readerQuickRecord(token);
+  const parts = [];
+  if ((S.dials.furigana === 2 || S.revealed?.has(index)) && record?.r && record.r !== token.s) parts.push(record.r);
+  if (S.glossed?.has(index)) parts.push(record?.m?.length ? inlineGloss(record) : readerGlossMissText());
+  return parts.join(' · ');
+}
+function nameReaderToken(span, token, index, kind) {
+  span.setAttribute('aria-label', token.s || token.b);
+  const state = readerTokenState(token, index, kind);
+  const host = span.parentElement?.classList.contains('token-door') ? span.parentElement : null;
+  let node = host?.querySelector(':scope > .tok-state') || null;
+  if (state && host) {
+    if (!node) { node = el('span', 'tok-state visually-hidden'); node.id = `tok-state-${index}`; host.append(node); }
+    node.textContent = state;
+  } else { node?.remove(); node = null; }
+  const ids = kind === 'word' ? ['reader-help-kind', node?.id, 'reader-help-word'] : [node?.id, 'reader-help-lookup'];
+  span.setAttribute('aria-describedby', ids.filter(Boolean).join(' '));
+}
+function readerHelp() {
+  const help = el('div', 'visually-hidden reader-help');
+  for (const [id, text] of [['reader-help-kind', tx('語', 'word')], ['reader-help-word', readerWordHint()],
+    ['reader-help-lookup', tx('読みと意味', 'reading and meaning')]]) {
+    const line = el('span', null, text); line.id = id; help.append(line);
+  }
+  return help;
+}
+/** One Tab stop per paragraph; ←/→ walk its words, Home/End its ends; ↑/↓ stay the page's. */
+function installReaderRoving(reader) {
+  const byPara = new Map();
+  for (const tok of reader.querySelectorAll('button.tok[data-para]')) {
+    tok.tabIndex = -1;
+    if (!byPara.has(tok.dataset.para)) byPara.set(tok.dataset.para, []);
+    byPara.get(tok.dataset.para).push(tok);
+  }
+  const current = S.readerTake?.p === S.passageId ? reader.querySelector(`button.tok[data-index="${S.readerTake.index}"]`) : null;
+  for (const [para, list] of byPara) (current?.dataset.para === para ? current : list[0]).tabIndex = 0;
+  reader.addEventListener('focusin', (event) => {
+    const tok = event.target.closest?.('button.tok[data-para]');
+    if (tok) for (const other of byPara.get(tok.dataset.para) || []) other.tabIndex = other === tok ? 0 : -1;
+  });
+  reader.addEventListener('keydown', (event) => {
+    const tok = event.target.closest?.('button.tok[data-para]');
+    if (!tok || event.altKey || event.ctrlKey || event.metaKey) return;
+    const list = byPara.get(tok.dataset.para) || [];
+    const at = list.indexOf(tok);
+    const next = { ArrowRight: list[at + 1], ArrowLeft: list[at - 1], Home: list[0], End: list.at(-1) }[event.key];
+    if (!(event.key in { ArrowRight: 1, ArrowLeft: 1, Home: 1, End: 1 })) return;
+    event.preventDefault();
+    next?.focus();
+  });
 }
 /** Reading only: never a gloss, whatever the shared per-index state holds. */
 function paintNamedTok(span, token, index) {
@@ -7685,7 +7761,7 @@ function paintNamedTok(span, token, index) {
   span.querySelector('.tok-en')?.remove();
   span.classList.remove('has-en');
   span.classList.toggle('lit', shown);
-  span.setAttribute('aria-label', namedAccessibleLabel(token, index));
+  nameReaderToken(span, token, index, 'named');
 }
 function wireNamedToken(span, token, index) {
   span.addEventListener('click', () => {
@@ -7734,7 +7810,7 @@ function paintTok(span, token, index) {
     span.classList.remove('has-en');
     existingEn.remove();
   }
-  span.setAttribute('aria-label', tokenAccessibleLabel(token, index));
+  nameReaderToken(span, token, index, 'word');
 }
 
 function wireTokenGestures(span, token, index, p) {
@@ -8362,11 +8438,13 @@ function renderReader(main) {
   // set when the token just placed reaches FORWARD for what completes it — a numeral for its
   // counter, a 接頭辞 for its stem
   let groupHolds = false;
+  let para = 0;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
       groupHolds = false;
+      para += 1;
     }
     if (crossRefs) {
       const refTarget = crossRefs.doors.get(index);
@@ -8417,18 +8495,12 @@ function renderReader(main) {
         if (rec && new Date(rec.due) <= dueNow) span.classList.add('tok-due');
       }
       span.setAttribute('aria-haspopup', 'dialog');
-      span.setAttribute('aria-label', tokenAccessibleLabel(token, index));
     } else if (particle) {
       span.dataset.action = 'target.activate';
       span.dataset.targetKind = 'particle';
       span.setAttribute('aria-haspopup', 'dialog');
-      span.setAttribute(
-        'aria-label',
-        tx(`${particle.p}、助詞。通常の操作は何もしない。フォーカスで助詞の項目へ。`, `${particle.p}, particle; ordinary activation is inert; focus for its full entry`),
-      );
-    } else if (namedDoor) {
-      span.setAttribute('aria-label', namedAccessibleLabel(token, index));
     }
+    if (interactive) span.dataset.para = String(para);
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     // the word the sentence bar is about wears the one vermilion accent: current
     if (S.readerTake?.p === p.id && S.readerTake.index === index) span.classList.add('tok-current');
@@ -8452,16 +8524,17 @@ function renderReader(main) {
       if (token.c) {
         const adapter = wireTokenGestures(span, token, index, p);
         installTokenAlternatives(wrapper, span, adapter.target, adapter);
+        nameReaderToken(span, token, index, 'word');
       } else if (particle) {
-        span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
         const adapter = wireParticleGestures(span, particle);
         installTokenAlternatives(wrapper, span, adapter.target, adapter);
+        nameReaderToken(span, token, index, 'lookup');
       } else if (namedDoor) {
         wireNamedToken(span, token, index);
-        span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
+        nameReaderToken(span, token, index, 'lookup');
         span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
       } else {
-        span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
+        nameReaderToken(span, token, index, 'lookup');
         span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
       }
       rendered = wrapper;
@@ -8488,7 +8561,8 @@ function renderReader(main) {
       reader.append(rendered);
     }
   }
-  main.append(reader);
+  main.append(readerHelp(), reader);
+  installReaderRoving(reader);
   main.append(renderReadingPlaces(p));
 
   // The article's foot: finish the reading, then everything about the text itself — source,
