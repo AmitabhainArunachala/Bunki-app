@@ -386,11 +386,11 @@
     }
     async function syncUnlocked() {
       if (syncing || disposed || !initialized || !service || serviceUnavailable || canQueueReview()) return;
-      if (!config && !await loadConfig()) return;
       syncing = true;
       clearTimeout(retryTimer);
       try {
         await refreshRows();
+        if (!config && !await loadConfig()) return;
         for (let row of rows.filter(item => !item.view?.receipt)) {
           try {
             const auth = await session();

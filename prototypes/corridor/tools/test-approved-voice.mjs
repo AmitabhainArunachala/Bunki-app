@@ -144,7 +144,8 @@ test('The checked-in build stays pending and silent, including every stale saved
     f.context.speakCardReading('でんしゃ', button, '電車');
     await settle();
     assert.equal(f.created.length, 0, `The saved ${preference} preference cannot play an interim word clip`);
-    assert.match(note.textContent, /not.*record|preparation|on its way/i);
+    assert.equal(note.textContent, 'The Kore voice is on its way', 'Pending copy names the locked voice, not a learner choice');
+    assert.equal(button.dataset.voiceUnavailable, 'not-recorded');
     assert.equal(f.deviceVoiceCalls.length, 0);
     assert.deepEqual(f.writes, []);
     assert.equal(f.preferences.get('kairo-rec-voice-v1') ?? null, preference);
@@ -261,6 +262,22 @@ test('Saved and session preferences resolve only to Kore or Charon without mutat
   const denied = await fixture({ storageThrows: true });
   assert.equal(denied.context.recVoicePref(), 'kore');
   assert.deepEqual(denied.writes, []);
+});
+
+test('A word without an approved clip names the voice being prepared, never a learner choice', async () => {
+  for (const [preference, language, expected] of [[null, 'en', 'The Kore voice is on its way'],
+    [null, 'ja', 'Kore の声を準備中です'], ['charon', 'en', 'The Charon voice is on its way']]) {
+    const f = await fixture({ words: approvedWords(), preference, language });
+    const { button, note } = f.card(); f.context.speakCardReading('ゆき', button, '雪'); await settle();
+    assert.equal(note.textContent, expected);
+    assert.equal(button.title, expected);
+    assert.equal(button.dataset.voiceUnavailable, 'not-recorded');
+    assert.equal(f.created.length + f.deviceVoiceCalls.length, 0);
+  }
+  const absent = await fixture({ words: null });
+  const { button, note } = absent.card(); absent.context.speakCardReading('ゆき', button, '雪'); await settle();
+  assert.equal(note.textContent, 'This build has no recorded voices');
+  assert.equal(button.dataset.voiceUnavailable, 'no-recordings');
 });
 
 test('Card replay ignores stale failure completion while current playback can report a real failure', async () => {

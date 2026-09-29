@@ -25,4 +25,5 @@ The JVNV F1 narration and F1 word clips were withdrawn on 30 September 2026:
 in the blind voice audition of 29 September the operator rated F1 1/5, so no
 F1 audio ships or plays. The locked narration voice is Google Gemini TTS
 **Kore**, with **Charon** as the second speaker. Those clips are not rendered
-yet; until they are, the reader's play bar stays hidden.
+yet; until they are, the reader's play bar shows a visible 音声準備中 · Kore
+(voice in preparation) state and nothing plays.

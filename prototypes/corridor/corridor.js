@@ -7206,7 +7206,7 @@ function openVocabularyListChooser(node, label, invoker) {
         : tx(`「${label}」をリストに保存`, `save ${label} to a list`));
     }
   };
-  const save = async (listName) => {
+  const save = async (listName, typed = false) => {
     if (busy) return;
     if (!recordWritable()) { notice.textContent = tx('記録を読み込んでから、もう一度試してください。', 'Your record is not ready to save. Please try again once it is available.'); return; }
     if (node.t === 'word' && ['conflict', 'unavailable'].includes(wordCaptureState(node))) {
@@ -7232,7 +7232,8 @@ function openVocabularyListChooser(node, label, invoker) {
         if (!saved) { failed('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'); return; }
       }
       notice.textContent = listName ? tx(`「${listName}」に保存しました。`, `Saved to ${listName}.`) : tx('復習に保存しました。', 'Saved for review.');
-      name.value = ''; rememberRecordDraft(name); paint(); refreshCapture();
+      if (typed) { name.value = ''; rememberRecordDraft(name); }
+      paint(); refreshCapture();
     } catch {
       failed('保存できませんでした。リスト名を残したまま、もう一度試せます。', 'Could not finish saving. Your list name is still here so you can retry.');
     } finally { setBusy(false); }
@@ -7278,7 +7279,7 @@ function openVocabularyListChooser(node, label, invoker) {
     }
     setBusy(busy);
   };
-  form.addEventListener('submit', event => { event.preventDefault(); const value = name.value.trim(); if (!value) { name.focus(); return; } void save(value); });
+  form.addEventListener('submit', event => { event.preventDefault(); const value = name.value.trim(); if (!value) { name.focus(); return; } void save(value, true); });
   dialog.append(heading, el('p', '', tx('リストを選ぶか、新しいリストを作ってください。複数のリストに保存できます。', 'Choose a list or make a new one. A word can belong to several lists.')), choices, form, management, context, notice, close);
   dialog.addEventListener('cancel', event => { if (!rememberRecordDraft(name)) event.preventDefault(); });
   dialog.addEventListener('close', () => { dialog.remove(); if (invoker?.isConnected) invoker.focus({ preventScroll: true }); });
@@ -7807,7 +7808,8 @@ const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0
  * reads, Charon is the second speaker. JVNV F1 was rated 1/5 and withdrawn; it never plays.
  * Narration ships as audio/article-narration.json ({ v: 1, voice, articles: { id: { clips } } })
  * and is fetched only when index.html raises __KAIRO_NARRATION__. Until the Kore clips exist the
- * flag stays down and the reader's play bar stays hidden: no picker, no stand-in voice. */
+ * flag stays down and the reader's play bar shows its visible 音声準備中 · Kore pending state with
+ * nothing to play: no picker, no stand-in voice. */
 const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };
 const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
@@ -8032,7 +8034,7 @@ function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   });
 }
 
-/** 音 — the answer card's voice door. The recorded clip in the voice the learner chose, when
+/** 音 — the answer card's voice door. The recorded clip in the approved voice, when
  * the word has one; otherwise a visible reason and silence. One tap speaks; a retap restarts. */
 let cardAudioSerial = 0, cardFaceKey = '';
 /** Called from render(): any change of card face (grade, undo, reveal, leave) retires card audio. */
@@ -8068,12 +8070,12 @@ function speakCardReading(text, btn, word) {
       });
       return;
     }
-    // no chosen voice, or no recording in it: say so where it can be seen, never fall back to the device voice
+    // no recording in the approved voice yet: say so where it can be seen, never fall back to the device voice
+    const voice = NARRATION_VOICES[pref];
     const reason = !m ? tx('この版には収録音声がありません', 'This build has no recorded voices')
-      : pref ? tx('この語は選んだ声でまだ収録されていません', 'Not yet recorded in your chosen voice')
-        : tx('Kore の声を準備中です', 'The Kore voice is on its way');
+      : tx(`${voice} の声を準備中です`, `The ${voice} voice is on its way`);
     if (btn) {
-      btn.dataset.voiceUnavailable = !m ? 'no-recordings' : pref ? 'not-recorded' : 'no-voice';
+      btn.dataset.voiceUnavailable = !m ? 'no-recordings' : 'not-recorded';
       btn.title = reason;
       const note = btn.parentElement?.querySelector('.say-note');
       if (note) note.textContent = reason;
@@ -11193,12 +11195,14 @@ function receivedAssessmentSource(record, attemptId) {
  * `derived`: a sentence or question card is derived from the item itself, so the
  * item is matched exactly without being named among its subjects. The transient
  * `assistedOrigin` says where `assisted` came from: 'local' (this learner's evidence
- * mark), 'received' (a synced result's wire flag), or null. Nothing is stored. */
+ * mark), 'received' (a synced result's wire flag), or null. `assistedKind` is the local
+ * mark's own kind ('explanation' or 'dictionary'); a received flag carries none, so it
+ * stays null. Nothing is stored. */
 function assessmentReviewContext(card, derived = false) {
   const key = srsKey(card.t, card.id);
   const retained = S.taken.find(row => srsKey(row.t, row.id) === key);
   if (!retained || !assessmentV2Module) return null;
-  let followup, evidence, selected, eligible = false, assisted = false, origin = null;
+  let followup, evidence, selected, eligible = false, assisted = false, origin = null, kind = null;
   if (retained.assessmentRef) {
     const ref = retained.assessmentRef;
     followup = S.assessmentLearning?.followups.find(row => row.id === ref.followupId);
@@ -11208,7 +11212,7 @@ function assessmentReviewContext(card, derived = false) {
     evidence = followup.evidence.find(row => row.id === action.evidenceId);
     eligible = assessmentV2Module.assessmentEvidenceEligible(evidence);
     assisted = assessmentV2Module.validAssessmentAssistanceMark(evidence?.assistance);
-    origin = 'local';
+    origin = 'local'; kind = assisted ? evidence.assistance.kind : null;
     selected = assessmentV2Module.selectAssessmentV2(S.assessmentLibraryV2, followup.attemptId);
     if (selected?.attempt.revisionId !== followup.attemptRevisionId) return null;
   } else if (retained.assessmentReceivedRef) {
@@ -11246,21 +11250,29 @@ function assessmentReviewContext(card, derived = false) {
     row.sha256 === evidence.item.sha256 && (derived || row.subjects.includes(key)));
   if (!item) return null;
   return { attemptId: selected.attempt.attemptId, itemId: item.id, title: selected.form.title,
-    prompt: item.prompt, rationale: item.rationale, assisted, assistedOrigin: assisted ? origin : null };
+    prompt: item.prompt, rationale: item.rationale, assisted, assistedOrigin: assisted ? origin : null,
+    assistedKind: assisted ? kind : null };
 }
-/** G1: where a card's recorded help came from, through the word back's own bindings:
- * 'local' (this learner's evidence mark), 'received' (a synced result's wire flag), or null. */
+/** G1: a card's recorded help, through the word back's own bindings: its review context
+ * when the answer was assisted (origin and, for a local mark, kind), otherwise null. */
 function assessmentCardAssistance(card) {
-  return assessmentReviewContext(card, true)?.assistedOrigin ?? null;
+  const context = assessmentReviewContext(card, true);
+  return context?.assisted ? context : null;
 }
-/** The back names only what its source establishes. A local mark is this learner's own
- * explanation, opened after answering. A received flag is what a synced result records:
- * its sync provenance, not a device, and no event on this device or time. */
-function assessmentAssistedMark(origin) {
-  if (origin !== 'local' && origin !== 'received') throw new TypeError(`assessment-assisted-origin:${origin}`);
-  return el('p', 'assessment-review-assisted', origin === 'local'
-    ? tx('助けあり · 答えたあとに解説を見た問題', 'Assisted · you opened the explanation after answering')
-    : tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'Assisted · the synced result records help on this question'));
+/** The back names only what its source establishes. A local explanation mark is this
+ * learner's own explanation, opened after answering. A local dictionary mark is a word
+ * looked up on that question, with no claim about when. A received flag is what a synced
+ * result records: its sync provenance, not a device, no kind of help, and no event on this
+ * device or time. */
+function assessmentAssistedMark({ assistedOrigin: origin, assistedKind: kind }) {
+  const text = origin === 'received'
+    ? tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'Assisted · the synced result records help on this question')
+    : origin === 'local' && kind === 'explanation'
+      ? tx('助けあり · 答えたあとに解説を見た問題', 'Assisted · you opened the explanation after answering')
+      : origin === 'local' && kind === 'dictionary'
+        ? tx('助けあり · この問題で語を調べた', 'Assisted · you looked up a word on this question') : null;
+  if (!text) throw new TypeError(`assessment-assisted-origin:${origin}:${kind}`);
+  return el('p', 'assessment-review-assisted', text);
 }
 function allAssessmentEvidence(state = S) {
   const visibleLearning = state.assessmentLearning && { ...state.assessmentLearning,
@@ -18873,7 +18885,7 @@ function renderReview(main) {
       const explanation = el('p', 'assessment-review-rationale', assessment.rationale); explanation.lang = 'ja';
       context.append(prompt, explanation);
       // the card names where the help was recorded (this learner's answer, or a synced result), and grades nothing
-      if (assessment.assisted) context.append(assessmentAssistedMark(assessment.assistedOrigin));
+      if (assessment.assisted) context.append(assessmentAssistedMark(assessment));
       face.append(context);
     }
     // The reading's audio door follows the locked approved voices. A missing
