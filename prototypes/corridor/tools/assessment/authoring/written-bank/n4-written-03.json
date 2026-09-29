@@ -18,12 +18,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nあしたは　【台風】が　来るので、学校は　休みです。",
       "options": [
-        "だいふう",
         "たいふう",
-        "たいふ",
-        "だいふ"
+        "だいふう",
+        "だいふ",
+        "たいふ"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「台風」は「たいふう」と読む。「だい」とにごらない。\nThe word 台風 is read taifuu and means typhoon.",
       "target": "台風"
     },
@@ -46,12 +46,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n午後から　大切な　【会議】が　あります。",
       "options": [
-        "かいき",
-        "がいぎ",
+        "かいぎ",
         "かいぎょう",
-        "かいぎ"
+        "がいぎ",
+        "かいき"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「会議」は「かいぎ」と読む。人が集まって話し合うことだ。\nThe word 会議 is read kaigi and means meeting.",
       "target": "会議"
     },
@@ -60,12 +60,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\n来月、会社の　近くに　【ひっこす】　ことに　なりました。",
       "options": [
-        "引っ越す",
-        "引っ超す",
         "弓っ越す",
-        "引っ趣す"
+        "引っ趣す",
+        "引っ越す",
+        "引っ超す"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「ひっこす」は「引っ越す」と書く。「超」「趣」「弓」はまちがい。\nThe verb hikkosu (to move house) is written 引っ越す.",
       "target": "引っ越す"
     },
@@ -74,12 +74,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\n週末は　友だちと　ピアノの　【こんさーと】に　行きます。",
       "options": [
-        "コンサード",
-        "コソサート",
         "コンサート",
-        "ユンサート"
+        "ユンサート",
+        "コンサード",
+        "コソサート"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「こんさーと」はカタカナで「コンサート」と書く。\nThe word konsaato (concert) is written コンサート in katakana.",
       "target": "コンサート"
     },
@@ -88,12 +88,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nあしたは　天気が　いいので、せんたくものが　よく　（　）でしょう。",
       "options": [
-        "ぬれる",
-        "かわく",
         "ひえる",
-        "やける"
+        "やける",
+        "ぬれる",
+        "かわく"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "天気がいいと、せんたくものは「よくかわく」。\nKawaku means to dry, which laundry does on a sunny day.",
       "target": "乾く"
     },
@@ -102,12 +102,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\n仕事が　終わらなかったので、きのうは　夜　おそくまで　会社に　（　）。",
       "options": [
-        "のこりました",
-        "もどりました",
         "かよいました",
-        "むかいました"
+        "むかいました",
+        "のこりました",
+        "もどりました"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "仕事が終わらず、帰らないで会社にいたので「のこりました」が入る。\nNokoru means to stay behind, here at the office until late.",
       "target": "残る"
     },
@@ -116,12 +116,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nわたしの　（　）は　古い　きってを　集める　ことです。",
       "options": [
-        "ねだん",
-        "きぶん",
         "どうぐ",
-        "しゅみ"
+        "しゅみ",
+        "ねだん",
+        "きぶん"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "好きで楽しんですることは「しゅみ」だ。\nShumi means a hobby, something you enjoy doing in your free time.",
       "target": "趣味"
     },
@@ -130,12 +130,12 @@
       "task": "paraphrase",
       "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n【最近】、よく　雨が　ふります。",
       "options": [
-        "きのうから、よく　雨が　ふります。",
         "このごろ、よく　雨が　ふります。",
-        "むかしは、よく　雨が　ふりました。",
-        "これから、よく　雨が　ふります。"
+        "きのうから、よく　雨が　ふります。",
+        "これから、よく　雨が　ふります。",
+        "むかしは、よく　雨が　ふりました。"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「最近」は「このごろ」と同じ意味だ。\nSaikin means recently, the same as konogoro.",
       "target": "最近"
     },
@@ -172,12 +172,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nとなりの　へやから　音が　聞こえます。だれか　いる（　）です。",
       "options": [
-        "よう",
         "ばかり",
-        "つもり",
-        "まま"
+        "よう",
+        "まま",
+        "つもり"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "聞こえた音から考えて言うので「〜ようです」を使う。\nYou da expresses a guess based on what you hear: someone seems to be there.",
       "subject": "grammar:youda"
     },
@@ -186,12 +186,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nきのう　雨に　（　）、かぜを　ひいて　しまいました。",
       "options": [
-        "ふって",
-        "ふらせて",
+        "ふりそうで",
         "ふられて",
-        "ふりそうで"
+        "ふらせて",
+        "ふって"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "雨のせいでこまったことを言うときは「雨にふられる」を使う。\nAme ni furareru is a passive that shows being troubled by rain.",
       "subject": "grammar:rareru"
     },
@@ -200,12 +200,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nこの　ボタンを　おす（　）、お茶が　出ます。",
       "options": [
-        "のに",
-        "と",
+        "まで",
         "ても",
-        "まで"
+        "と",
+        "のに"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「〜と」は、あることをすると、いつもそうなることを表す。\nTo shows a result that always follows: press the button and tea comes out.",
       "subject": "grammar:to-joken"
     },
@@ -214,12 +214,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nすしを　食べる（　）、あの　店が　いいですよ。",
       "options": [
-        "まで",
         "ながら",
-        "なら",
-        "のが"
+        "まで",
+        "のが",
+        "なら"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "相手の話を受けてすすめるときは「〜なら」を使う。\nNara gives advice on a topic: if you want sushi, that shop is good.",
       "subject": "grammar:nara"
     },
@@ -228,12 +228,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\n空が　くらく　なって　きました。夕方から　雪が　ふる（　）。",
       "options": [
-        "つもりです",
         "ことに　します",
-        "ように　します",
-        "かもしれません"
+        "つもりです",
+        "かもしれません",
+        "ように　します"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "空を見て、たぶんそうなると言うので「〜かもしれません」が入る。\nKamoshiremasen means it might happen: it might snow this evening.",
       "subject": "grammar:kamoshirenai"
     },
@@ -256,12 +256,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nわたしの　ゆめは　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
       "options": [
-        "とる",
-        "こと",
+        "山の",
         "写真を",
-        "山の"
+        "こと",
+        "とる"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "正しいじゅんばんは「山の　写真を　とる　こと　です」で、★には「とる」が入る。\nThe order is 山の 写真を とる こと です, so とる fills the star."
     },
     {
@@ -269,12 +269,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nあしたは　＿＿＿　＿＿＿　＿★＿　＿＿＿　なりました。",
       "options": [
-        "家に",
         "ことに",
-        "ひっこす",
-        "新しい"
+        "家に",
+        "新しい",
+        "ひっこす"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "正しいじゅんばんは「新しい　家に　ひっこす　ことに　なりました」で、★には「ひっこす」が入る。\nThe order is 新しい 家に ひっこす ことに なりました, so ひっこす fills the star.",
       "subject": "grammar:kotoninaru"
     },
@@ -283,12 +283,12 @@
       "task": "text-grammar",
       "prompt": "（１）に　なにを　いれますか。",
       "options": [
-        "たとえば",
-        "それで",
         "ところで",
-        "それに"
+        "それに",
+        "たとえば",
+        "それで"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "名前がおぼえられなかったので、店長が紙を作ってくれた。理由と結果をつなぐ「それで」が入る。\nSore de (so) links the problem with what the manager did about it.",
       "passage": "tg"
     },
@@ -340,12 +340,12 @@
       "task": "short-reading",
       "prompt": "この　人は　来週　何を　しますか。",
       "options": [
-        "友だちと　パンを　作る",
         "ケーキを　作って　みる",
-        "パンの　形を　なおす",
-        "友だちの　家で　食べる"
+        "友だちと　パンを　作る",
+        "友だちの　家で　食べる",
+        "パンの　形を　なおす"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "最後に「来週は　ケーキに　ちょうせんする　つもりです」とある。\nThe writer plans to try making a cake next week.",
       "passage": "s3"
     },
@@ -368,12 +368,12 @@
       "task": "mid-reading",
       "prompt": "この　人は　今、町の　ことを　どう　思って　いますか。",
       "options": [
-        "デパートが　ないので、ひっこしたくない",
-        "冬が　さむいので、心配だ",
         "友だちが　いないので、さびしい",
-        "町の　人が　しんせつで、好きに　なった"
+        "町の　人が　しんせつで、好きに　なった",
+        "デパートが　ないので、ひっこしたくない",
+        "冬が　さむいので、心配だ"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「今は　この　町が　好きに　なりました」「町の　人たちが　とても　しんせつです」とある。\nThe writer now likes the town, partly because the people are very kind.",
       "passage": "m1"
     },

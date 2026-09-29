@@ -4,6 +4,8 @@
  */
 import {
   beginAttemptV2,
+  JLPT_SCORE_FACTS,
+  OFFICIAL_BLUEPRINTS,
   parseAttemptV2,
   parseFormVersion,
   scoreAttemptV2,
@@ -11,6 +13,13 @@ import {
 } from './modules/assessment-core.mjs';
 
 export { parseFormVersion };
+/** Published JLPT facts for one level: the result sections, pass mark and paper names, and the
+ * blueprint's official papers and times. Facts only; nothing here converts a raw score. */
+export function jlptOfficialFacts(level) {
+  const score = JLPT_SCORE_FACTS.find((row) => row.track === level);
+  const blueprint = OFFICIAL_BLUEPRINTS.find((row) => row.exam.family === 'jlpt' && row.exam.track === level);
+  return score && blueprint ? { score, blueprint } : null;
+}
 
 export const ASSESSMENT_LIBRARY_V2_LIMITS = Object.freeze({
   forms: 128, attempts: 5000, jsonCharacters: 96_000_000, jsonNodes: 4_000_000,

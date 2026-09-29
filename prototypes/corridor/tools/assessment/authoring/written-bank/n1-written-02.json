@@ -22,12 +22,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n市は、被害を受けた商店に対して税を減免する【措置】をとった。",
       "options": [
-        "そうち",
-        "しょち",
         "そち",
-        "そじ"
+        "そじ",
+        "そうち",
+        "しょち"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "措置は「そち」と読み、問題に対処するための手段を表す。「しょち」は処置の読み。\n措置 is read sochi (a measure taken); しょち is the reading of a different word, 処置.",
       "target": "措置"
     },
@@ -36,12 +36,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n現場で経験を積むことで、確かな判断力を【培う】ことができる。",
       "options": [
-        "つちかう",
-        "やしなう",
         "つかう",
-        "ばいかう"
+        "ばいかう",
+        "つちかう",
+        "やしなう"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "培うは「つちかう」と読み、時間をかけて力や性質を育てることを表す。「やしなう」は養うの読み。\n培う is read tsuchikau (to cultivate over time); やしなう is the reading of 養う.",
       "target": "培う"
     },
@@ -50,12 +50,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n今年は、若い世代の読書離れが特に【顕著】だった。",
       "options": [
-        "けんしょ",
-        "げんちょ",
         "けんちょう",
-        "けんちょ"
+        "けんちょ",
+        "けんしょ",
+        "げんちょ"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "顕著は「けんちょ」と読み、はっきりと目立つ様子を表す。\n顕著 is read kencho: clearly noticeable, marked.",
       "target": "顕著"
     },
@@ -64,12 +64,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n長く続いた不況にも、ようやく回復の【兆し】が見えてきた。",
       "options": [
-        "ちょうし",
-        "しるし",
         "きざし",
-        "けはい"
+        "けはい",
+        "ちょうし",
+        "しるし"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "兆しは「きざし」と読み、物事が起こりそうなしるしを表す。\n兆し is read kizashi: a sign or hint of something to come.",
       "target": "兆し"
     },
@@ -78,12 +78,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの地域では、伝統的な技術を若い世代に（　）ための取り組みが進められている。",
       "options": [
-        "踏襲する",
         "継承する",
-        "相続する",
-        "伝来する"
+        "踏襲する",
+        "伝来する",
+        "相続する"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "技術や文化を次の世代に受け継がせる意味では「継承する」を使う。相続は財産、伝来は外から伝わること。\n継承する (pass on, carry forward) fits skills handed to the next generation; 相続 is for property.",
       "target": "継承"
     },
@@ -106,12 +106,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n資金不足のため、新しい研究所の建設計画は（　）に戻された。",
       "options": [
-        "白紙",
-        "空白",
+        "無地",
         "余白",
-        "無地"
+        "空白",
+        "白紙"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「白紙に戻す」は、計画などをなかったことにして最初の状態に戻すという意味の慣用表現である。\n白紙に戻す is an idiom meaning to scrap a plan and return to square one.",
       "target": "白紙"
     },
@@ -120,12 +120,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n祖父は口数こそ少なかったが、職人としての（　）を最後まで失わなかった。",
       "options": [
-        "気配",
-        "気休め",
         "気兼ね",
-        "気概"
+        "気概",
+        "気配",
+        "気休め"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「気概」は困難にくじけない強い意気で、職人としての誇りを保った様子に合う。\n気概 is strong spirit or mettle, fitting a craftsman who kept his pride to the end.",
       "target": "気概"
     },
@@ -134,12 +134,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n彼の提案は、会議で【ことごとく】退けられた。",
       "options": [
-        "すべて",
-        "ほとんど",
+        "次々に",
         "一部",
-        "次々に"
+        "ほとんど",
+        "すべて"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「ことごとく」は「残らず全部」という意味である。\nことごとく means every single one, without exception (すべて).",
       "target": "ことごとく"
     },
@@ -148,12 +148,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n新しい部長は、部下の小さな失敗には【寛容】だ。",
       "options": [
-        "厳格だ",
-        "寛大だ",
+        "神経質だ",
         "無関心だ",
-        "神経質だ"
+        "寛大だ",
+        "厳格だ"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「寛容」は心が広く、人の失敗などを厳しくとがめない様子で、「寛大」とほぼ同じ意味である。\n寛容 means tolerant and forgiving, nearly the same as 寛大 (generous-minded).",
       "target": "寛容"
     },
@@ -162,12 +162,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n講座の参加者の年齢は【まちまち】だった。",
       "options": [
-        "同じくらいだった",
-        "若かった",
+        "わからなかった",
         "さまざまだった",
-        "わからなかった"
+        "若かった",
+        "同じくらいだった"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "「まちまち」は、それぞれが違っていてそろっていない様子を表す。\nまちまち means varied, differing from one to another (さまざま).",
       "target": "まちまち"
     },
@@ -176,12 +176,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【臆病】",
       "options": [
-        "この料理は臆病な味で、少し物足りない。",
-        "臆病に書類を確認したので、ミスは一つもなかった。",
         "その建物は臆病な造りで、地震に弱い。",
-        "弟は臆病で、夜は一人でトイレに行けない。"
+        "弟は臆病で、夜は一人でトイレに行けない。",
+        "この料理は臆病な味で、少し物足りない。",
+        "臆病に書類を確認したので、ミスは一つもなかった。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "臆病は、ちょっとしたことでも怖がる性質を表すので、人の性格について使う。\n臆病 describes a timid, easily frightened person, so it fits the younger brother afraid at night.",
       "target": "臆病"
     },
@@ -190,12 +190,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【心得】",
       "options": [
-        "明日の天気の心得を確かめておこう。",
         "彼女には茶道の心得があるので、作法を教えてもらった。",
-        "心得が悪くて、試験に落ちてしまった。",
-        "部屋の心得を変えて、広く見せた。"
+        "明日の天気の心得を確かめておこう。",
+        "部屋の心得を変えて、広く見せた。",
+        "心得が悪くて、試験に落ちてしまった。"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「〜の心得がある」は、その技芸をある程度身につけているという意味である。\n〜の心得がある means to have some training in an art, such as the tea ceremony.",
       "target": "心得"
     },
@@ -204,12 +204,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【赴く】",
       "options": [
-        "彼は新しい支社の立ち上げのため、単身で海外に赴いた。",
-        "友人の冗談を赴いて、思わず笑ってしまった。",
+        "毎朝、近所の公園を赴いて健康を保っている。",
         "急に雨が赴いてきたので、傘を差した。",
-        "毎朝、近所の公園を赴いて健康を保っている。"
+        "友人の冗談を赴いて、思わず笑ってしまった。",
+        "彼は新しい支社の立ち上げのため、単身で海外に赴いた。"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "赴くは、ある目的のためにその場所へ向かって行くことを表す。\n赴く means to proceed to a place for a purpose, such as going abroad to launch a branch.",
       "target": "赴く"
     },
@@ -218,12 +218,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n片付ける（　）子どもたちがおもちゃを散らかすので、きりがない。",
       "options": [
-        "がてら",
-        "そばから",
         "かたわら",
-        "ともなく"
+        "ともなく",
+        "がてら",
+        "そばから"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「〜そばから」は、ある事をしてもすぐにまた同じ事が起こることを表す。\n〜そばから means no sooner is something done than it is undone again.",
       "subject": "grammar:sobakara"
     },
@@ -246,12 +246,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nうちの息子（　）、休みの日は昼まで寝ていて、少しも手伝おうとしない。",
       "options": [
-        "ときたら",
         "にひきかえ",
-        "ともなると",
-        "とあれば"
+        "ときたら",
+        "とあれば",
+        "ともなると"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「〜ときたら」は、話題の人や物について不満や非難を込めて述べるときに使う。\n〜ときたら introduces someone the speaker is complaining about: as for my son...",
       "subject": "grammar:tokitara"
     },
@@ -260,12 +260,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n旅行中は忙しくて、楽しみにしていた美術館には結局行か（　）。",
       "options": [
-        "ずにはいられなかった",
         "んばかりだった",
-        "ざるを得なかった",
-        "ずじまいだった"
+        "ずにはいられなかった",
+        "ずじまいだった",
+        "ざるを得なかった"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「〜ずじまい」は、しようと思っていたことが結局できないまま終わったことを表す。\n〜ずじまい means something one meant to do was never done in the end.",
       "subject": "grammar:zujimai"
     },
@@ -274,12 +274,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n締め切りの前日になって仕様を変えろとは、身勝手（　）。",
       "options": [
-        "に越したことはない",
-        "極まりない",
         "までもない",
-        "に足る"
+        "に足る",
+        "に越したことはない",
+        "極まりない"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「〜極まりない」は「この上なく〜だ」という意味で、強い非難を表す。\n〜極まりない means extremely, here condemning the request as utterly selfish.",
       "subject": "grammar:kiwamarinai"
     },
@@ -288,12 +288,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n今年の夏は、例年（　）暑さが厳しい。",
       "options": [
-        "をもって",
-        "ならでは",
+        "にもまして",
         "をよそに",
-        "にもまして"
+        "ならでは",
+        "をもって"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「〜にもまして」は「〜以上に」という意味で、例年以上に暑いことを表す。\n〜にもまして means even more than: hotter than in other years.",
       "subject": "grammar:nimomashite"
     },
@@ -302,12 +302,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n毎日とは ＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 運動するようにしている。",
       "options": [
-        "週に",
-        "三回は",
         "までも",
-        "言わない"
+        "言わない",
+        "週に",
+        "三回は"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「毎日とは言わないまでも、週に三回は運動するようにしている」となり、★には「までも」が入る。\nThe order is 言わない・までも・週に・三回は, so までも fills the ★ slot.",
       "subject": "grammar:naimademo"
     },
@@ -316,12 +316,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの難しい手術を任せられるのは、＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ いないだろう。",
       "options": [
-        "ほかに",
-        "彼を",
         "経験豊富な",
-        "おいて"
+        "おいて",
+        "ほかに",
+        "彼を"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「経験豊富な彼をおいてほかにいないだろう」となり、★には「おいて」が入る。\nThe order is 経験豊富な・彼を・おいて・ほかに, so おいて fills the ★ slot."
     },
     {
@@ -329,12 +329,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n本日 ＿＿＿ ＿＿＿ ＿＿＿ ＿★＿ させていただきます。",
       "options": [
-        "営業を",
         "終了",
-        "をもって",
-        "当店は"
+        "営業を",
+        "当店は",
+        "をもって"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「本日をもって当店は営業を終了させていただきます」となり、★には「終了」が入る。\nThe order is をもって・当店は・営業を・終了, so 終了 fills the ★ slot.",
       "subject": "grammar:womotte"
     },
@@ -344,12 +344,12 @@
       "passage": "tg",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "すなわち",
-        "ところが",
+        "そのうえ",
         "それゆえ",
-        "そのうえ"
+        "ところが",
+        "すなわち"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "本来の使い方と、最近の違う使い方を対比しているので、逆接の「ところが」が入る。\nThe sentence contrasts the original use with today's different use, so ところが (however) fits."
     },
     {
@@ -372,12 +372,12 @@
       "passage": "tg",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "べきではないだろうか",
-        "ことはない",
+        "ものではない",
         "わけにはいかない",
-        "ものではない"
+        "ことはない",
+        "べきではないだろうか"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "違和感を覚えたときこそ考えてみようと読者に提案しているので、「べきではないだろうか」が入る。\nThe writer is proposing that readers reflect, so べきではないだろうか (shouldn't we...) fits."
     },
     {
@@ -386,12 +386,12 @@
       "passage": "s1",
       "prompt": "海底の詳しい地形が一部しか明らかになっていないのはなぜか。",
       "options": [
-        "深海には、調べる価値のある場所が少ないから",
-        "宇宙の調査に多くの予算が使われているから",
         "高い水圧や通信の難しさのため、調査が容易ではないから",
-        "海底の地形は、常に大きく変化し続けているから"
+        "海底の地形は、常に大きく変化し続けているから",
+        "深海には、調べる価値のある場所が少ないから",
+        "宇宙の調査に多くの予算が使われているから"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "高い水圧に耐える構造が必要で、通信も難しいという事情が理由として挙げられている。\nThe reasons given are the need to withstand huge pressure and the difficulty of communication."
     },
     {
@@ -414,12 +414,12 @@
       "passage": "s3",
       "prompt": "来月から、この診療所で変わることは何か。",
       "options": [
-        "土曜日の午後にも診察を受けられるようになる。",
         "健康診断が予約なしで受けられるようになる。",
-        "水曜日は一日中休診になる。",
-        "健康診断を行う曜日が変わる。"
+        "土曜日の午後にも診察を受けられるようになる。",
+        "健康診断を行う曜日が変わる。",
+        "水曜日は一日中休診になる。"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "土曜日は午後四時まで診療するようになる。水曜日は午後だけ休診で、健康診断は変わらない。\nSaturday hours extend to 4 p.m.; only Wednesday afternoon closes, and check-ups are unchanged."
     },
     {
@@ -518,12 +518,12 @@
       "passage": "c1",
       "prompt": "筆者によると、説明を簡潔にしようとすると、どのようなことが起こりやすいか。",
       "options": [
-        "専門家が、自分の意見を説明しなくなる。",
-        "受け手が、説明の内容を疑うようになる。",
+        "例外や意見の分かれている点が省かれ、結論が出ているかのように受け取られる。",
         "説明する側の負担が大きくなり、誤りが増える。",
-        "例外や意見の分かれている点が省かれ、結論が出ているかのように受け取られる。"
+        "受け手が、説明の内容を疑うようになる。",
+        "専門家が、自分の意見を説明しなくなる。"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "例外や条件、意見が分かれる点が省かれ、受け手は結論が出ているかのような印象を持つと述べている。\nExceptions and open questions get cut, so audiences think the matter is settled."
     },
     {
@@ -532,12 +532,12 @@
       "passage": "c1",
       "prompt": "筆者は、学ぶということをどのように考えているか。",
       "options": [
-        "わからない状態に耐えながら、少しずつ理解を深めていくこと",
-        "要点を手早く知り、多くの知識を身につけること",
+        "専門家の説明を、そのまま受け入れること",
         "わかりやすい説明を選んで、効率よく理解すること",
-        "専門家の説明を、そのまま受け入れること"
+        "要点を手早く知り、多くの知識を身につけること",
+        "わからない状態に耐えながら、少しずつ理解を深めていくこと"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "学ぶとは、わからない状態にしばらく耐え、少しずつ理解を深めていく営みだと述べている。\nThe writer defines learning as enduring not-knowing while gradually deepening understanding."
     },
     {
@@ -546,12 +546,12 @@
       "passage": "c1",
       "prompt": "筆者の主張に最も近いものはどれか。",
       "options": [
-        "わかりやすい説明は、物事を誤って伝えるので避けるべきだ。",
-        "わかりやすい説明は入り口にすぎないと知り、その先の複雑さにも向き合うべきだ。",
+        "わかりにくい説明は、説明する側に責任がある。",
         "専門家は、誰にでもわかる言葉で説明するよう努めるべきだ。",
-        "わかりにくい説明は、説明する側に責任がある。"
+        "わかりやすい説明は入り口にすぎないと知り、その先の複雑さにも向き合うべきだ。",
+        "わかりやすい説明は、物事を誤って伝えるので避けるべきだ。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "わかりやすさは否定しないが、それは見取り図にすぎず、その先の複雑さにこそ面白さがあると主張している。\nEasy explanations are only an entry point; the real interest lies in the complexity beyond them."
     },
     {

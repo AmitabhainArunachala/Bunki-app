@@ -22,12 +22,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n駅前の料理教室は、来月、隣の駅の近くに【移転】するそうだ。",
       "options": [
-        "いでん",
-        "いってん",
+        "うつてん",
         "いてん",
-        "うつてん"
+        "いってん",
+        "いでん"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "移転は「いてん」と読み、場所を移すことを表す。\nThe word 移転 (relocation) is read iten.",
       "target": "移転"
     },
@@ -36,12 +36,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n古い家を買って、少しずつ【修繕】しながら住んでいる。",
       "options": [
-        "しゅうぜん",
-        "しゅぜん",
         "しゅうせん",
-        "しゅうでん"
+        "しゅうでん",
+        "しゅうぜん",
+        "しゅぜん"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "修繕は「しゅうぜん」と読み、壊れた所を直すことを表す。\nThe word 修繕 (repair) is read shūzen.",
       "target": "修繕"
     },
@@ -50,12 +50,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n人気のパン屋の前には、朝から長い【行列】ができていた。",
       "options": [
-        "こうれつ",
-        "ぎょうれい",
+        "ぎょうれつ",
         "ごうれつ",
-        "ぎょうれつ"
+        "ぎょうれい",
+        "こうれつ"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "行列は「ぎょうれつ」と読む。「行」を「ぎょう」と読む言葉だ。\nThe word 行列 (queue) is read gyōretsu.",
       "target": "行列"
     },
@@ -78,12 +78,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n料理教室で、一週間分の【こんだて】の考え方を教わった。",
       "options": [
-        "健立",
-        "献建",
+        "研立",
         "献立",
-        "研立"
+        "献建",
+        "健立"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "食事に出す料理の組み合わせを「献立」と書く。\nKondate, a planned menu of dishes, is written 献立.",
       "target": "献立"
     },
@@ -92,12 +92,12 @@
       "task": "word-formation",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの教室は、料理（　）経験の人でも気軽に参加できます。",
       "options": [
-        "不",
-        "非",
         "未",
-        "反"
+        "反",
+        "不",
+        "非"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "まだ経験していないことを「未経験」という。「未」はまだそうなっていないことを表す。\nMikeiken, no experience yet, takes the prefix 未, meaning not yet."
     },
     {
@@ -105,12 +105,12 @@
       "task": "word-formation",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの町では、人口の高齢（　）が急速に進んでいる。",
       "options": [
-        "化",
-        "性",
         "式",
-        "状"
+        "状",
+        "化",
+        "性"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "その状態に変わっていくことを表す「化」が合う。「高齢化が進む」はよく使う表現だ。\nThe suffix 化 means becoming, as in kōreika, the aging of a population.",
       "target": "～化"
     },
@@ -119,12 +119,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの料理教室は、月謝が（　）なので、学生にも人気がある。",
       "options": [
-        "手薄",
-        "手ごろ",
         "手近",
-        "手際"
+        "手際",
+        "手薄",
+        "手ごろ"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "値段が高すぎず、ちょうどよいことを「手ごろ」という。\nTegoro means reasonable or affordable.",
       "target": "手ごろ"
     },
@@ -133,12 +133,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n移住して一年たち、ようやく地域の人たちの中に（　）ことができた。",
       "options": [
-        "溶け込む",
         "書き込む",
-        "割り込む",
-        "思い込む"
+        "溶け込む",
+        "思い込む",
+        "割り込む"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "周りの人たちとなじんで一体になることを「溶け込む」という。\nTokekomu means to blend in and become part of a group.",
       "target": "溶け込む"
     },
@@ -161,12 +161,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n新しくできたカフェは、SNSで話題になり、【たちまち】行列のできる店になった。",
       "options": [
-        "次第に",
         "すぐに",
-        "ついに",
-        "再び"
+        "次第に",
+        "再び",
+        "ついに"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「たちまち」は非常に短い時間で変化が起こる様子で、「すぐに」と同じ意味だ。\nTachimachi means in an instant, the same as sugu ni.",
       "target": "たちまち"
     },
@@ -175,12 +175,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n【あいにく】その日は予約がいっぱいで、料理教室に参加できなかった。",
       "options": [
-        "残念ながら",
         "幸いにも",
-        "念のため",
-        "前もって"
+        "残念ながら",
+        "前もって",
+        "念のため"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「あいにく」は、都合が悪くて残念な様子を表し、「残念ながら」と同じ意味だ。\nAiniku means unfortunately, the same as zannen nagara.",
       "target": "あいにく"
     },
@@ -217,12 +217,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【恵まれる】",
       "options": [
-        "毎日練習に恵まれたので、試合で勝つことができた。",
-        "この冷蔵庫は、あと十年は恵まれるだろう。",
         "この町は自然に恵まれていて、一年中おいしい野菜がとれる。",
-        "大雨で、川の水が恵まれている。"
+        "大雨で、川の水が恵まれている。",
+        "毎日練習に恵まれたので、試合で勝つことができた。",
+        "この冷蔵庫は、あと十年は恵まれるだろう。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「恵まれる」は、よいものや環境が十分に与えられていることを表す。\nMegumareru means to be blessed with something good.",
       "target": "恵まれる"
     },
@@ -231,12 +231,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの料理教室は、初心者（　）、料理が得意な人にも人気がある。",
       "options": [
-        "に限って",
-        "に限らず",
+        "に反して",
         "にかけては",
-        "に反して"
+        "に限らず",
+        "に限って"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "初心者だけでなくという意味の「に限らず」が合う。\nNi kagirazu means not only.",
       "subject": "grammar:nikagirazu"
     },
@@ -259,12 +259,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n新しい洗濯機を買う（　）、今のものを修理して使うことにした。",
       "options": [
-        "かわりに",
-        "ついでに",
         "うえに",
-        "ばかりに"
+        "ばかりに",
+        "かわりに",
+        "ついでに"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "新しい物を買うことはせず、別の方法をとるという意味の「かわりに」が合う。\nKawari ni means instead of.",
       "subject": "grammar:kawarini"
     },
@@ -273,12 +273,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n観光客が増えて町がにぎやかになった（　）、ごみの問題も深刻になっている。",
       "options": [
-        "あまり",
-        "末に",
         "一方で",
-        "ついでに"
+        "ついでに",
+        "あまり",
+        "末に"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "よい面と悪い面を対比して述べているので「一方で」が合う。\nIppō de contrasts one side of a situation with another.",
       "subject": "grammar:ippoude"
     },
@@ -287,12 +287,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの町の名前は、昔、川沿いに桜の木がたくさんあった（　）付けられたそうだ。",
       "options": [
-        "ことだから",
-        "ものだから",
+        "ことから",
         "わけだから",
-        "ことから"
+        "ものだから",
+        "ことだから"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "名前の由来や判断の根拠を表す「ことから」が合う。\nKoto kara gives the origin or basis of something, such as a name.",
       "subject": "grammar:kotokara"
     },
@@ -315,12 +315,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n田舎に移住した友人は、＿★＿ ＿＿＿ ＿＿＿ ＿＿＿ できたと話していた。",
       "options": [
-        "比べて",
-        "時間に余裕が",
         "いたころと",
-        "都会に"
+        "都会に",
+        "比べて",
+        "時間に余裕が"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "正しい順は「都会に・いたころと・比べて・時間に余裕が」で、★には「都会に」が入る。\nThe order is tokai ni / ita koro to / kurabete / jikan ni yoyū ga."
     },
     {
@@ -328,12 +328,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n連休中の観光地は、＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ ほどの人出だった。",
       "options": [
-        "できない",
-        "ことも",
+        "進む",
         "前に",
-        "進む"
+        "ことも",
+        "できない"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "正しい順は「前に・進む・ことも・できない」で、★には「ことも」が入る。\nThe order is mae ni / susumu / koto mo / dekinai."
     },
     {
@@ -354,12 +354,12 @@
       "task": "text-grammar",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "それとも",
-        "ところが",
         "そのうえ",
-        "したがって"
+        "したがって",
+        "それとも",
+        "ところが"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "周りに心配されたことと、実際には不便が気にならなかったことが反対の内容なので「ところが」が合う。\nTokoro ga introduces a result contrary to what was expected.",
       "passage": "tg"
     },
@@ -368,12 +368,12 @@
       "task": "text-grammar",
       "prompt": "文章の（２）に入る最もよいものを選んでください。",
       "options": [
-        "正直、面倒だ",
-        "参加できてうれしい",
         "もっと増えればいい",
-        "準備が楽しい"
+        "準備が楽しい",
+        "正直、面倒だ",
+        "参加できてうれしい"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「初めは〜と思っていたが」の後で見方がよい方向に変わっているので、否定的な「面倒だ」が合う。\nThe contrast shows the writer first felt the local events were a bother.",
       "passage": "tg"
     },
@@ -382,12 +382,12 @@
       "task": "text-grammar",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "移住をやめる理由だ",
-        "この町で暮らす楽しさだ",
+        "早くなくすべきものだ",
         "都会でも同じだ",
-        "早くなくすべきものだ"
+        "この町で暮らす楽しさだ",
+        "移住をやめる理由だ"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "行事を通して近所の人と話せるようになったと述べているので、「暮らす楽しさ」が合う。\nThe writer now sees the local events as the joy of living in the town.",
       "passage": "tg"
     },
@@ -396,12 +396,12 @@
       "task": "short-reading",
       "prompt": "予約制にした結果、どうなったか。",
       "options": [
-        "訪れる人も収入も大きく減った。",
         "訪れる人は増えたが、収入は減った。",
-        "訪れる人は減ったが、収入はほとんど変わらなかった。",
-        "訪れる人も収入も増えた。"
+        "訪れる人も収入も大きく減った。",
+        "訪れる人も収入も増えた。",
+        "訪れる人は減ったが、収入はほとんど変わらなかった。"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "訪れる人は二割ほど減ったが、収入はほとんど変わらなかったと書かれている。\nVisitors fell by about a fifth, but income hardly changed.",
       "passage": "s1"
     },
@@ -410,12 +410,12 @@
       "task": "short-reading",
       "prompt": "修理をしないことに決めた場合、客はどうしなければならないか。",
       "options": [
-        "お金は何も払わなくてよい。",
-        "点検料の2,000円だけを払う。",
+        "部品代だけを払う。",
         "修理代金の12,000円を払う。",
-        "部品代だけを払う。"
+        "点検料の2,000円だけを払う。",
+        "お金は何も払わなくてよい。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "修理をしない場合でも、点検料として2,000円がかかると書かれている。\nEven without the repair, the 2,000-yen inspection fee must be paid.",
       "passage": "s2"
     },
@@ -424,12 +424,12 @@
       "task": "short-reading",
       "prompt": "筆者は、料理についてどのように考えるようになったか。",
       "options": [
-        "自分で味を確かめながら判断することが大切だ。",
-        "レシピの分量を正確に守ることが最も大切だ。",
         "はかりを使わなければ、おいしい料理は作れない。",
-        "料理は先生に習わなければ上手にならない。"
+        "料理は先生に習わなければ上手にならない。",
+        "自分で味を確かめながら判断することが大切だ。",
+        "レシピの分量を正確に守ることが最も大切だ。"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "料理は書かれたとおりに作る作業ではなく、自分で判断する作業だと今は思うと述べている。\nThe writer now sees cooking as a matter of one's own judgment.",
       "passage": "s3"
     },
@@ -452,12 +452,12 @@
       "task": "mid-reading",
       "prompt": "「修理カフェ」について、筆者はどのように述べているか。",
       "options": [
-        "メーカーの社員が修理の方法を教える場所だ。",
         "物を直す技術を人から人へ伝える場にもなっている。",
-        "新しい製品を安く買える場所だ。",
-        "壊れた物を集めて処分する活動だ。"
+        "メーカーの社員が修理の方法を教える場所だ。",
+        "壊れた物を集めて処分する活動だ。",
+        "新しい製品を安く買える場所だ。"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "修理カフェは、直す技術を人から人へ伝える場にもなっていると述べている。\nRepair cafés also pass repair skills from person to person.",
       "passage": "m1"
     },
@@ -466,12 +466,12 @@
       "task": "mid-reading",
       "prompt": "住民が困っていることとして、本文で挙げられているものはどれか。",
       "options": [
-        "店の売り上げが下がったこと",
-        "古い町並みが壊されてしまったこと",
         "観光客がごみを捨てていくこと",
-        "通勤の時間にバスに乗れないことがあること"
+        "通勤の時間にバスに乗れないことがあること",
+        "店の売り上げが下がったこと",
+        "古い町並みが壊されてしまったこと"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "朝の通勤の時間にバスが観光客でいっぱいになり、乗れないことがあると書かれている。\nResidents sometimes cannot board morning buses crowded with tourists.",
       "passage": "m2"
     },
@@ -528,12 +528,12 @@
       "task": "claim-reading",
       "prompt": "筆者によると、都会に戻ってしまう人に共通しているのはどのようなことか。",
       "options": [
-        "都会を離れること自体が目的になっていたこと",
         "移住先で仕事が見つからなかったこと",
-        "地域の人との付き合いを避けていたこと",
-        "移住先の自然が思っていたほど豊かではなかったこと"
+        "都会を離れること自体が目的になっていたこと",
+        "移住先の自然が思っていたほど豊かではなかったこと",
+        "地域の人との付き合いを避けていたこと"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「都会から離れること」そのものが目的になっていた点が共通していると述べている。\nWhat they share is that leaving the city had itself become the goal.",
       "passage": "c"
     },
@@ -542,12 +542,12 @@
       "task": "claim-reading",
       "prompt": "筆者が最も言いたいことは何か。",
       "options": [
-        "地方には仕事が少ないので、移住はやめたほうがいい。",
-        "移住するなら、その土地で何をしたいのかを考えるべきだ。",
         "都会の生活に疲れた人こそ、地方に移住するべきだ。",
-        "地域の付き合いが苦手な人は、都会に住むべきだ。"
+        "地域の付き合いが苦手な人は、都会に住むべきだ。",
+        "地方には仕事が少ないので、移住はやめたほうがいい。",
+        "移住するなら、その土地で何をしたいのかを考えるべきだ。"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "どこから離れるかではなく、どこで何をするかを考えることが大切だと述べている。\nThe key is to think about what one will do in the new place.",
       "passage": "c"
     },
@@ -556,12 +556,12 @@
       "task": "information-retrieval",
       "prompt": "会社員の中村さんは、平日は毎日19時まで仕事がある。包丁を使ったことはない。中村さんが参加できるコースはどれか。",
       "options": [
-        "Aコース",
-        "Bコース",
         "Cコース",
-        "Dコース"
+        "Dコース",
+        "Aコース",
+        "Bコース"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "平日の昼と木曜の夜は仕事で参加できず、Dコースは包丁が使える人が対象なので、Cコースだけが合う。\nWeekday classes clash with work and course D requires knife skills, so only C fits.",
       "passage": "info"
     },

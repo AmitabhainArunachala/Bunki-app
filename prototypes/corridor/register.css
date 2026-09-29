@@ -497,7 +497,8 @@ html[data-room="results"] .exam-score {
 }
 html[data-room="results"] .exam-score-note { font-size: 14px; color: var(--ink-2); margin: 0 0 18px; }
 html[data-room="results"] .exam-counts,
-html[data-room="results"] .exam-results-skills {
+html[data-room="results"] .exam-results-skills,
+html[data-room="results"] .exam-official {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
