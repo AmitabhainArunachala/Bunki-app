@@ -1843,7 +1843,7 @@ body .sheet .hero .shelf-meta { display: flex; flex-wrap: wrap; gap: var(--s1); 
 body .sheet .hero .cat-chip {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
+  min-height: 44px; /* a catalog door is a real 44px target */
   padding: 0 10px;
   border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
   border-radius: 6px;
@@ -2432,3 +2432,7 @@ body .token-actions button {
 }
 body .token-actions button .en-sub { display: inline; font-size: 12px; font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 body .token-actions button:hover { background: var(--ai-wash); }
+
+/* reference pages: the pager wraps rather than pushing past a 320px screen */
+.reference-library .reference-page-controls { flex-wrap: wrap; row-gap: var(--s1); min-width: 0; }
+.reference-library .reference-pagination { flex-wrap: wrap; min-width: 0; }
