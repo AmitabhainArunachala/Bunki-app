@@ -5454,6 +5454,9 @@ function renderShelfBody() {
     .filter(form => p.readingFacets?.forms?.includes(form)) }))
     .filter(item => item.forms.length).sort((a, b) => b.forms.length - a.forms.length || byNewest(a.passage, b.passage)).slice(0, 3);
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
+  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest;
+  // one card per story: the lead and its two seconds head the grid, so today's six never repeat them
+  const heads = new Set(unfiltered ? [...stories].sort(shelfOrder).slice(0, 3).map((p) => p.id) : []);
   const picks = [];
   // the bands below ride inside the story grid, after the lead and its two seconds: magazine
   // rhythm, and the lead stays directly under the chip bar on a phone
@@ -5487,7 +5490,8 @@ function renderShelfBody() {
     // from one difficulty band, so a day is never six of the same level.
     const year = Number(day.slice(0, 4));
     const stale = (p) => /wikinews/u.test(p.source || '') && Number(String(p.date || '').slice(0, 4)) < year - 3;
-    const pool = curated.filter((p) => p.source !== 'isa-yasashii-glossary' && p.review === 'approved' && !p.pendingVerification && !stale(p));
+    // drawn from the folded stories: an N3 rewrite never stands in the band apart from its original
+    const pool = stories.filter((p) => p.source !== 'isa-yasashii-glossary' && p.review === 'approved' && !p.pendingVerification && !stale(p) && !heads.has(p.id));
     const band = (p) => p.grading?.signals?.jreadability?.band || 'unbanded';
     // a seeded permutation of the whole pool, then the band cap: every candidate is considered
     // once, so the only way to show fewer than six is a pool that truly cannot supply them
@@ -5529,7 +5533,7 @@ function renderShelfBody() {
     const f=p.readingFacets || {};
     return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
-  matches.sort(filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest);
+  matches.sort(shelfOrder);
   const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
   // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
   if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');

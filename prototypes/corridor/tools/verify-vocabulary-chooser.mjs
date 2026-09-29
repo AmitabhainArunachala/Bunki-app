@@ -122,22 +122,28 @@ try {
       await check('shelf-census-and-search', async page => {
         await shelf(page);
         const ids = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(node => node.dataset.passage));
-        assert.equal(new Set(ids).size, ids.length, 'Each collection card has a unique passage identity');
-        assert.deepEqual([...ids].sort(), articles.map(item => item.id).sort(), 'The grid carries the whole bundled collection');
-        const glossaryIds = new Set(articles.filter(item => item.source === 'isa-yasashii-glossary').map(item => item.id));
-        assert.equal(ids.length - glossaryIds.size, 116);
+        // one card per story (design pass): an N3 rewrite whose original stands folds into it, and a
+        // story in today's six stands in that band inside the grid instead of its ordinary card
+        const standing = new Set(articles.map(item => item.id));
+        const stories = articles.filter(item => !(item.adaptation?.basedOn && standing.has(item.adaptation.basedOn)));
+        assert.equal(new Set(ids).size, ids.length, 'Each story has exactly one card across the grid and today’s six');
+        assert.deepEqual([...ids].sort(), stories.map(item => item.id).sort(), 'The grid carries every bundled story once');
+        const glossaryIds = new Set(stories.filter(item => item.source === 'isa-yasashii-glossary').map(item => item.id));
         assert.equal(glossaryIds.size, 10);
-        assert.equal((await page.locator('.shelf-results-count').textContent()).trim(), '116 readings · 10 glossary entries');
+        // the shelf's one tally counts every story and says how many are glossary entries
+        const tally = (total, glossary) => glossary
+          ? [`読み物 ${total} 本（うち用語集 ${glossary}）`, `${total} readings, including ${glossary} glossary entries`]
+          : [`読み物 ${total} 本`, `${total} ${total === 1 ? 'reading' : 'readings'}`];
+        assert(tally(stories.length, glossaryIds.size).includes((await page.locator('.shelf-results-count').textContent()).trim()));
         await page.locator('#shelf-reading-search').fill('育児休業');
         await page.locator('#shelf-reading-search').press('Enter');
         const filtered = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(node => node.dataset.passage));
         assert(filtered.length < ids.length);
         assert(filtered.includes('yasashii:1') && filtered.includes('yasashii:2'));
         assert.equal(new Set(filtered).size, filtered.length);
-        const glossary = filtered.filter(id => glossaryIds.has(id)).length, readings = filtered.length - glossary;
-        assert.equal((await page.locator('.shelf-results-count').textContent()).trim(),
-          `${readings} ${readings === 1 ? 'reading' : 'readings'} · ${glossary} glossary ${glossary === 1 ? 'entry' : 'entries'}`);
-        return { readings: 116, glossary: 10, uniqueCards: ids.length, search: filtered };
+        const glossary = filtered.filter(id => glossaryIds.has(id)).length;
+        assert(tally(filtered.length, glossary).includes((await page.locator('.shelf-results-count').textContent()).trim()));
+        return { stories: stories.length, glossary: glossaryIds.size, uniqueCards: ids.length, search: filtered };
       });
       await check('cancel-default-and-three-context-scopes', async page => {
         await reader(page);
