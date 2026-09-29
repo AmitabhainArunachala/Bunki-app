@@ -744,6 +744,7 @@ try {
     });
     const teaser = storyVariant(shelfState.className) === 'teaser';
     const expectedLevel = row.readingFacets?.jlpt ?? null;
+    const learnerSource = row.sourceLabel.replace(/\s*·\s*検収前/gu, '').trim();
     const nativeStyle = [
       'className',
       'background',
@@ -868,7 +869,7 @@ try {
       position: state.readerPos?.[id] ?? null,
       done: !!state.readDone?.[id],
     };
-    const completionTag = await page
+    const completionTag = teaser ? '' : await page
       .locator(`${storyCard(id)} .read-tag`)
       .textContent()
       .catch(() => '');
@@ -894,8 +895,8 @@ try {
       shelfState.title === row.title &&
       (teaser ? !shelfState.foot : !!expectedLevel && shelfState.level === expectedLevel) &&
       readerShape.title === row.title &&
-      readerShape.source === row.sourceLabel &&
-      readerShape.facts['出典'] === row.sourceLabel &&
+      readerShape.source === learnerSource &&
+      readerShape.facts['出典'] === learnerSource &&
       readerShape.facts['利用条件']?.includes('Bunki original') &&
       readerShape.level === expectedLevel &&
       readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? '未確認' : null) &&
@@ -978,14 +979,16 @@ try {
       ),
     );
   const reviewNote = async () => {
-    const text = (await page.locator('.shelf-review-note').textContent().catch(() => '')) ?? '';
+    const notes = await page.locator('.shelf-review-note').count();
+    if (!notes) return { notes, text: '', count: 0, total: null };
+    const text = (await page.locator('.shelf-review-note').first().textContent()) ?? '';
     const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|未確認 · ([0-9]+) of these ([0-9]+)/u) ?? [];
-    return { text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
+    return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
   };
   const jaNote = await reviewNote();
   check(
     'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
-    jaNote.count === pendingStories.length,
+    pendingStories.length === 0 ? jaNote.notes === 0 : jaNote.notes === 1 && jaNote.count === pendingStories.length,
     jaNote.text || `no review note for ${pendingStories.length} pending stories`,
   );
   const pendingNoiseBefore = noise.length;
@@ -1035,7 +1038,8 @@ try {
   const biNote = await reviewNote();
   check(
     'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
-    biNote.count === pendingStories.length && biNote.total === STORY_COUNT,
+    pendingStories.length === 0 ? biNote.notes === 0
+      : biNote.notes === 1 && biNote.count === pendingStories.length && biNote.total === STORY_COUNT,
     biNote.text || `no review note for ${pendingStories.length} pending stories`,
   );
   await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
