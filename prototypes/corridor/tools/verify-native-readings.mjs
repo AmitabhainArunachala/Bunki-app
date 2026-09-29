@@ -1,8 +1,9 @@
 /**
  * Browser acceptance for every one of the 30 added native 本棚 readings.
  *
- * This drives the real served corridor at 390×844 with touch input. Each
- * article is opened from its ordinary `.shelf-item`, then exercises its own
+ * This drives the real served corridor at 390×844 with touch input, on a
+ * pinned shelf day. Each article is opened from its one `.shelf-item` card
+ * (in the grid or today's six), then exercises its own
  * JSON load, reader/ruby/paragraphs, text settings, quick look, full entry,
  * completion, bookmark, Back, shelf scroll return, and article-position
  * restoration. No representative-only shortcut and no alternate reader.
@@ -11,7 +12,8 @@
  * non-empty titleEn with a titleEnSource provenance marker, the code-side
  * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
  * must render each English title from the record itself, and every
- * human-review-pending row must stay visibly 検収前 on the shelf.
+ * human-review-pending story must be counted in the masthead's 未確認 note
+ * and wear 未確認 in its reader meta line.
  *
  * R3-A (furigana truth): the reading-override lexicon
  * (docs/content/reading-overrides.json) must be minted into every curated
