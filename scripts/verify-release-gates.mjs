@@ -460,6 +460,16 @@ export function batteryGates(out, env = process.env) {
         env: { KAIRO_BROWSER: 'all' },
       }),
     ),
+    // Real JLPT papers stay on the learner's device: the private importer, and a hash denylist
+    // that fails any tracked file carrying their text or bytes (it plants its own fixtures first).
+    {
+      ...node('assessment-private-import', tool('verify-assessment-private-import')),
+      env: { KAIRO_BROWSER: 'all' },
+    },
+    node('official-content-guard', 'scripts/verify-no-official-content.mjs', [
+      '--out',
+      join(out, 'official-content-guard', 'report.json'),
+    ]),
     node('record-integrity', tool('verify-record-integrity')),
     node('record-controller', tool('verify-record-controller')),
     {
@@ -2396,6 +2406,7 @@ async function verifyRunner(out) {
     'reading-position-integration',
     'mock',
     'assessment-controller',
+    'official-content-guard',
     'practice-history',
     'practice-history-webkit',
     'kagami',

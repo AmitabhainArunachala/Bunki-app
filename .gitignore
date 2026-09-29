@@ -70,3 +70,10 @@ deno.lock
 
 # Swift package build output (packages/apple-sync)
 packages/apple-sync/.build/
+
+# Real JLPT papers are personal-study copies kept on-device only (jlpt.jp policy §1(1)).
+# Packs and originals live under ~/.dharma/bunki_private/, never in this public repository;
+# scripts/verify-no-official-content.mjs fails any tracked copy. Defence in depth:
+*.kairo-private-pack
+private-assessment/
+bunki_private/
