@@ -18,12 +18,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n今夜は　海の　近くの　【旅館】に　とまります。",
       "options": [
-        "りょうかん",
-        "りょかん",
+        "りょがん",
         "ろかん",
-        "りょがん"
+        "りょかん",
+        "りょうかん"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「旅館」は「りょかん」と読む。「りょう」とのばさない。\nThe word 旅館 is read ryokan, a Japanese-style inn.",
       "target": "旅館"
     },
@@ -32,12 +32,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n旅行の　【準備】は　もう　できましたか。",
       "options": [
-        "じゅんび",
         "じゅんぴ",
-        "しゅんび",
-        "じゅうび"
+        "じゅんび",
+        "じゅうび",
+        "しゅんび"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「準備」は「じゅんび」と読む。何かをする前に用意することだ。\nThe word 準備 is read junbi and means preparation.",
       "target": "準備"
     },
@@ -60,12 +60,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\nホテルの　【よやく】は　インターネットで　しました。",
       "options": [
-        "子約",
         "予約",
-        "矛約",
-        "予的"
+        "子約",
+        "予的",
+        "矛約"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「よやく」は「予約」と書く。「子」「矛」「的」はまちがい。\nThe word yoyaku (reservation) is written 予約.",
       "target": "予約"
     },
@@ -102,12 +102,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nかぜを　ひいて　（　）が　あるので、きょうは　学校を　休みます。",
       "options": [
-        "力",
         "気分",
-        "具合",
-        "熱"
+        "力",
+        "熱",
+        "具合"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "かぜで体があつくなることを「熱がある」と言う。\nNetsu ga aru means to have a fever.",
       "target": "熱"
     },
@@ -130,12 +130,12 @@
       "task": "paraphrase",
       "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nきのうは　【久しぶり】に　かぞくで　旅行しました。",
       "options": [
-        "きのうは　はじめて　かぞくで　旅行しました。",
-        "きのうは　長い　あいだ　して　いなかった　かぞく旅行を　しました。",
+        "きのうは　少しだけ　かぞくで　旅行しました。",
         "きのうは　いつもの　ように　かぞくで　旅行しました。",
-        "きのうは　少しだけ　かぞくで　旅行しました。"
+        "きのうは　長い　あいだ　して　いなかった　かぞく旅行を　しました。",
+        "きのうは　はじめて　かぞくで　旅行しました。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「久しぶりに」は、長い間しなかったことをまたするときに使う。\nHisashiburi ni means doing something again after a long time.",
       "target": "久しぶり"
     },
@@ -144,12 +144,12 @@
       "task": "paraphrase",
       "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nきょうは　おなかの　【具合】が　よく　ありません。",
       "options": [
-        "きょうは　おなかの　ちょうしが　よく　ありません。",
         "きょうは　おなかの　大きさが　よく　ありません。",
-        "きょうは　おなかの　色が　よく　ありません。",
-        "きょうは　おなかの　音が　よく　ありません。"
+        "きょうは　おなかの　ちょうしが　よく　ありません。",
+        "きょうは　おなかの　音が　よく　ありません。",
+        "きょうは　おなかの　色が　よく　ありません。"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "体の「具合」は、体の「ちょうし」と同じ意味だ。\nGuai here means condition, the same as choushi.",
       "target": "具合"
     },
@@ -172,12 +172,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\n天気よほうに　よると、あしたは　雨が　ふる（　）。",
       "options": [
-        "つもりです",
-        "そうです",
+        "ままです",
         "ところです",
-        "ままです"
+        "そうです",
+        "つもりです"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「〜によると」と聞いたことを言うときは「〜そうです」を使う。\nAfter ni yoru to, souda reports information heard from another source.",
       "subject": "grammar:souda-denbun"
     },
@@ -186,12 +186,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\n日曜日は　料理を　作っ（　）、そうじを　したり　しました。",
       "options": [
-        "ても",
         "たら",
-        "たり",
-        "たまま"
+        "ても",
+        "たまま",
+        "たり"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「〜たり〜たりする」でいくつかのことをならべて言う。\nTari ... tari lists examples of activities, so tsukuttari fits.",
       "subject": "grammar:tari"
     },
@@ -200,12 +200,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\n熱が　あるなら、きょうは　早く　ねた（　）。",
       "options": [
-        "ことが　ありますよ",
-        "ばかりですよ",
+        "ほうが　いいですよ",
         "つもりですよ",
-        "ほうが　いいですよ"
+        "ばかりですよ",
+        "ことが　ありますよ"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "人にアドバイスするときは「〜たほうがいい」を使う。\nTa hou ga ii gives advice: you had better go to bed early.",
       "subject": "grammar:hougaii"
     },
@@ -214,12 +214,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nこの　ケーキは　とても　おいし（　）ですね。",
       "options": [
-        "そう",
         "よう",
-        "らしい",
-        "みたい"
+        "そう",
+        "みたい",
+        "らしい"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "見た感じを言う「おいしそう」になる。「よう」「らしい」「みたい」は「おいしい」の形につく。\nOishisou means it looks delicious; the other forms need oishii.",
       "subject": "grammar:souda-youtai"
     },
@@ -228,12 +228,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nわたしは　一度　ふじさんに　のぼった（　）。",
       "options": [
-        "ことが　あります",
         "ほうが　いいです",
-        "ばかりです",
-        "ところです"
+        "ことが　あります",
+        "ところです",
+        "ばかりです"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「一度〜たことがある」で、けいけんを言う。\nTa koto ga aru expresses experience: I have climbed it once.",
       "subject": "grammar:takotogaaru"
     },
@@ -242,12 +242,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nえきから　ホテル（　）　あるいて　十分です。",
       "options": [
-        "から",
         "で",
-        "まで",
-        "を"
+        "から",
+        "を",
+        "まで"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「AからBまで」で、ところのはじめとおわりを言う。\nKara ... made marks the start and end point: from the station to the hotel.",
       "subject": "particle:made"
     },
@@ -256,12 +256,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　ホテルの　へやからは　＿＿＿　＿＿＿　＿★＿　＿＿＿　できます。",
       "options": [
-        "海を",
-        "見る",
         "ことが",
-        "うつくしい"
+        "うつくしい",
+        "海を",
+        "見る"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "正しいじゅんばんは「うつくしい　海を　見る　ことが　できます」で、★には「見る」が入る。\nThe order is うつくしい 海を 見る ことが できます, so 見る fills the star.",
       "subject": "grammar:kotogadekiru"
     },
@@ -270,12 +270,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nこれは　たんじょうびに　＿＿＿　＿★＿　＿＿＿　＿＿＿　です。",
       "options": [
-        "くれた",
-        "とけい",
         "父が",
-        "買って"
+        "買って",
+        "くれた",
+        "とけい"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "正しいじゅんばんは「父が　買って　くれた　とけい　です」で、★には「買って」が入る。\nThe order is 父が 買って くれた とけい です, so 買って fills the star.",
       "subject": "grammar:age-kure-morau"
     },
@@ -284,12 +284,12 @@
       "task": "text-grammar",
       "prompt": "（１）に　なにを　いれますか。",
       "options": [
-        "それに",
-        "でも",
         "だから",
-        "それでは"
+        "それでは",
+        "それに",
+        "でも"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "船に乗る予定だったが、雨で乗れなかった。反対のことをつなぐ「でも」が入る。\nDemo (but) contrasts the plan with the rain that stopped it.",
       "passage": "tg"
     },
@@ -341,12 +341,12 @@
       "task": "short-reading",
       "prompt": "カレーの　ルーは　いつ　入れますか。",
       "options": [
-        "やさいを　切る　前",
-        "水を　入れる　前",
         "火を　とめた　あと",
-        "できあがった　あと"
+        "できあがった　あと",
+        "やさいを　切る　前",
+        "水を　入れる　前"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「火を　とめて　カレーの　ルーを　入れます」とある。\nThe recipe says to turn off the heat and then add the curry roux.",
       "passage": "s3"
     },
@@ -355,12 +355,12 @@
       "task": "mid-reading",
       "prompt": "町に　着いた　日、この　人は　どう　やって　ホテルへ　行きましたか。",
       "options": [
-        "ひとりで　あるいて　行った",
-        "タクシーに　乗って　行った",
         "おじいさんの　車で　送って　もらった",
-        "電車を　乗りかえて　行った"
+        "電車を　乗りかえて　行った",
+        "ひとりで　あるいて　行った",
+        "タクシーに　乗って　行った"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "道がわからなくなったとき、おじいさんが車で送ってくれた。\nAn old man offered to drive the writer to the hotel after the writer got lost.",
       "passage": "m1"
     },
@@ -369,12 +369,12 @@
       "task": "mid-reading",
       "prompt": "この　人は　ひとり旅に　ついて、どう　思いましたか。",
       "options": [
-        "さびしかったので、もう　したくない",
         "さびしいと　思って　いたが、よかった",
-        "道が　わからなくて、たいへんなだけだった",
-        "山に　のぼれなくて、ざんねんだった"
+        "さびしかったので、もう　したくない",
+        "山に　のぼれなくて、ざんねんだった",
+        "道が　わからなくて、たいへんなだけだった"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "最後に「少し　さびしいと　思って　いましたが、…とても　よかったです」とある。\nThe writer expected to feel lonely but found the trip very good.",
       "passage": "m1"
     },
@@ -383,12 +383,12 @@
       "task": "information-retrieval",
       "prompt": "山本さんは　会社で　はたらいて　いて、土曜日と　日曜日も　仕事が　あります。平日の　夜なら　時間が　あります。山本さんが　出られる　クラスは　どれですか。",
       "options": [
-        "Ａ",
-        "Ｂ",
+        "Ｄ",
         "Ｃ",
-        "Ｄ"
+        "Ｂ",
+        "Ａ"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "平日の夜にあるのは、水曜日の午後６時からのＣだけだ。\nOnly class C is on a weekday evening, Wednesday from six.",
       "passage": "info"
     },
@@ -397,12 +397,12 @@
       "task": "information-retrieval",
       "prompt": "Ｂの　クラスに　出たい　人は、いつまでに　もうしこみますか。",
       "options": [
-        "６月７日まで",
-        "６月１１日まで",
         "６月１３日まで",
-        "６月１４日まで"
+        "６月１４日まで",
+        "６月７日まで",
+        "６月１１日まで"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "Ｂは６月１４日で、クラスの三日前までにもうしこむので、６月１１日までだ。\nClass B is on June 14, and applications close three days before, on June 11.",
       "passage": "info"
     }

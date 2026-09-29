@@ -19,12 +19,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n家庭菜園で育てたトマトを、きのう【収穫】した。",
       "options": [
-        "しゅかく",
-        "しゅうがく",
+        "しゅうこく",
         "しゅうかく",
-        "しゅうこく"
+        "しゅうがく",
+        "しゅかく"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "収穫は「しゅうかく」と読む。育てた野菜や果物をとることだ。\nThe word 収穫 (harvest) is read shūkaku.",
       "target": "収穫"
     },
@@ -33,12 +33,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n台風で、家の【屋根】が一部こわれてしまった。",
       "options": [
-        "やね",
-        "おくね",
         "やこん",
-        "いえね"
+        "いえね",
+        "やね",
+        "おくね"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "屋根は「やね」と読む。家の上をおおっている部分のことだ。\nThe word 屋根 (roof) is read yane.",
       "target": "屋根"
     },
@@ -47,12 +47,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n毎週ピアノ教室に通っているので、少しずつ【上達】している。",
       "options": [
-        "じょうだつ",
         "しょうたつ",
-        "うえたつ",
-        "じょうたつ"
+        "じょうだつ",
+        "じょうたつ",
+        "うえたつ"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "上達は「じょうたつ」と読む。練習して上手になることだ。\nThe word 上達 (improvement in skill) is read jōtatsu.",
       "target": "上達"
     },
@@ -61,12 +61,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n祖父は、家の裏の【畑】でじゃがいもを育てている。",
       "options": [
-        "はたげ",
         "はたけ",
-        "ばたけ",
-        "はだけ"
+        "はたげ",
+        "はだけ",
+        "ばたけ"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "畑は一字で「はたけ」と読む。野菜などを育てる土地のことだ。\nOn its own, 畑 (field) is read hatake.",
       "target": "畑"
     },
@@ -75,12 +75,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n母の誕生日に、小さな【ほうせき】がついた指輪を贈った。",
       "options": [
-        "宝石",
         "豊石",
-        "宝右",
-        "方石"
+        "宝石",
+        "方石",
+        "宝右"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「ほうせき」は「宝石」と書く。\nHōseki (gem) is written 宝石.",
       "target": "宝石"
     },
@@ -89,12 +89,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n切れた電球を、新しいものと【こうかん】した。",
       "options": [
-        "交換",
         "交感",
-        "考換",
-        "公換"
+        "交換",
+        "公換",
+        "考換"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "古い物を新しい物ととりかえることは「交換」と書く。\nReplacing one thing with another is written 交換.",
       "target": "交換"
     },
@@ -103,12 +103,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nとれた野菜を【ふくろ】に入れて、近所の人に分けた。",
       "options": [
-        "装",
-        "裂",
+        "袋",
         "衷",
-        "袋"
+        "裂",
+        "装"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "物を入れる入れ物の「ふくろ」は「袋」と書く。形が似ている字に注意する。\nThe word for bag is written 袋; the other characters only look similar.",
       "target": "袋"
     },
@@ -117,12 +117,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの店では、いろいろな（　）のテニスラケットを売っている。",
       "options": [
-        "部分",
         "種類",
-        "区別",
-        "順番"
+        "部分",
+        "順番",
+        "区別"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "物の違いによる分け方を「種類」といい、「いろいろな種類」はよく使う言い方だ。\nThe word 種類 means kind or type, as in いろいろな種類.",
       "target": "種類"
     },
@@ -131,12 +131,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n書道を十年続けている姉は、字がとても（　）だ。",
       "options": [
-        "器用",
         "上等",
-        "見事",
-        "豪華"
+        "器用",
+        "豪華",
+        "見事"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "感心するほどすばらしい様子を「見事」という。字や作品のすばらしさを表すのに使える。\nThe word 見事 means splendid, and can describe beautiful handwriting.",
       "target": "見事"
     },
@@ -173,12 +173,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n出かける前に、ドアの鍵がかかっているかどうか【確かめる】。",
       "options": [
-        "注意する",
         "確認する",
-        "説明する",
-        "準備する"
+        "注意する",
+        "準備する",
+        "説明する"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「確かめる」は、本当にそうかどうかを調べて確認することだ。\nThe verb 確かめる means to check or confirm, like 確認する.",
       "target": "確かめる"
     },
@@ -187,12 +187,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【枯れる】",
       "options": [
-        "お風呂のお湯が枯れて、冷たくなった。",
         "古いシャツの色が枯れて、白っぽくなった。",
-        "ボールの空気が枯れて、うまく跳ねない。",
-        "水をやるのを忘れていたら、花が枯れてしまった。"
+        "お風呂のお湯が枯れて、冷たくなった。",
+        "水をやるのを忘れていたら、花が枯れてしまった。",
+        "ボールの空気が枯れて、うまく跳ねない。"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「枯れる」は、植物が水不足などで生きていられなくなることに使う。\nThe verb 枯れる means a plant withers and dies.",
       "target": "枯れる"
     },
@@ -201,12 +201,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【熱心】",
       "options": [
-        "今日はとても熱心なので、エアコンをつけた。",
-        "妹は熱心に、バイオリンの練習を続けている。",
         "熱心なスープを飲んで、体が温まった。",
-        "熱心が出たので、学校を休んだ。"
+        "熱心が出たので、学校を休んだ。",
+        "今日はとても熱心なので、エアコンをつけた。",
+        "妹は熱心に、バイオリンの練習を続けている。"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「熱心」は、一つのことに一生懸命に取り組む様子を表す。\nThe word 熱心 means eager and devoted, as in practicing hard.",
       "target": "熱心"
     },
@@ -229,12 +229,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nコーチが丁寧に教えてくれた（　）、試合で勝つことができた。",
       "options": [
-        "せいで",
-        "くせに",
         "おかげで",
-        "わりに"
+        "わりに",
+        "せいで",
+        "くせに"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "よい結果の理由には「おかげで」を使う。「せいで」は悪い結果の理由に使う。\nThe pattern おかげで gives the reason for a good result; せいで is for bad results.",
       "subject": "grammar:okagede-seide"
     },
@@ -243,12 +243,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこのスパイクは靴底がかたくて、走り（　）。",
       "options": [
-        "づらい",
-        "がちだ",
+        "ぎみだ",
         "っぽい",
-        "ぎみだ"
+        "がちだ",
+        "づらい"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「〜づらい」は、その動作をするのが難しいことを表す。\nThe pattern づらい means hard to do: these spikes are hard to run in.",
       "subject": "grammar:zurai"
     },
@@ -257,12 +257,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n雨の日に畑で作業をしたら、服がどろ（　）になった。",
       "options": [
-        "ばかり",
         "っぽい",
-        "ほど",
-        "だらけ"
+        "ばかり",
+        "だらけ",
+        "ほど"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "「〜だらけ」は、よくないものがたくさんついている様子を表す。\nThe pattern だらけ means covered in something unpleasant: clothes covered in mud.",
       "subject": "grammar:darake"
     },
@@ -271,12 +271,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n雨がやみ（　）ので、今日の庭の作業はやめよう。",
       "options": [
-        "そうだ",
         "そうにない",
-        "らしい",
-        "ようだ"
+        "そうだ",
+        "ようだ",
+        "らしい"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「〜そうにない」は、そうなる可能性が低いことを表す。雨がやまないようなので作業をやめるという意味だ。\nThe pattern そうにない means unlikely to happen: the rain does not look like stopping.",
       "subject": "grammar:souninai"
     },
@@ -285,12 +285,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n練習を重ねる（　）、少しずつ上手に弾けるようになった。",
       "options": [
-        "にとって",
-        "に対して",
         "につれて",
-        "について"
+        "について",
+        "にとって",
+        "に対して"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「〜につれて」は、一方が変わると、それに合わせてもう一方も変わることを表す。\nThe pattern につれて means as one thing changes, another changes with it.",
       "subject": "grammar:n3-ni-tsurete"
     },
@@ -299,12 +299,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこのラケットは、＿＿＿　＿＿＿　＿★＿　＿＿＿　作られている。",
       "options": [
-        "打ちやすいように",
-        "人でも",
+        "力の",
         "弱い",
-        "力の"
+        "人でも",
+        "打ちやすいように"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "正しい順番は「力の　弱い　人でも　打ちやすいように」で、★には「人でも」が入る。\nThe order is 力の 弱い 人でも 打ちやすいように (so that even people with little strength can hit easily), so 人でも fills the star."
     },
     {
@@ -312,12 +312,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n庭の木が　＿＿＿　＿＿＿　＿★＿　＿＿＿　ことにした。",
       "options": [
-        "切ってもらう",
-        "専門の人に",
         "大きく",
-        "なりすぎたので"
+        "なりすぎたので",
+        "切ってもらう",
+        "専門の人に"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "正しい順番は「大きく　なりすぎたので　専門の人に　切ってもらう」で、★には「専門の人に」が入る。\nThe order is 大きく なりすぎたので 専門の人に 切ってもらう (it grew too big, so we will have a professional cut it), so 専門の人に fills the star."
     },
     {
@@ -326,12 +326,12 @@
       "passage": "tg",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "ことがありました",
         "ようになりました",
-        "ことにしました",
-        "ところでした"
+        "ことがありました",
+        "ところでした",
+        "ことにしました"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "高いので自分で直そうと決めたので、自分の決定を表す「ことにしました」が合う。\nThe writer chose to fix it herself, so ことにしました (decided to) fits."
     },
     {
@@ -354,12 +354,12 @@
       "passage": "tg",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "しかし",
-        "それとも",
         "ところで",
-        "だから"
+        "だから",
+        "しかし",
+        "それとも"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "自分で直せてうれしかったことが、次も自分で直そうと思う理由になっているので「だから」が合う。\nHer success is the reason she will try again next time, so だから (so) fits."
     },
     {
@@ -396,12 +396,12 @@
       "passage": "s3",
       "prompt": "発表会に出る生徒は、どうしなければならないか。",
       "options": [
-        "土曜日の午後二時に、楽譜を持って教室へ行く。",
-        "日曜日の午後二時に、楽譜を持って教室へ行く。",
         "日曜日の午後二時に、何も持たずに教室へ行く。",
-        "土曜日に、先生に電話をする。"
+        "土曜日に、先生に電話をする。",
+        "土曜日の午後二時に、楽譜を持って教室へ行く。",
+        "日曜日の午後二時に、楽譜を持って教室へ行く。"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "練習は日曜日の午後二時からで、発表会に出る人は楽譜を必ず持ってくるように書いてある。\nPractice is Sunday at 2 p.m., and performers must bring their sheet music."
     },
     {
@@ -410,12 +410,12 @@
       "passage": "m1",
       "prompt": "筆者が書道を習い始めたきっかけは何か。",
       "options": [
-        "子どものころ、先生に字が下手だと言われたこと",
-        "娘に、字が読みにくいと言われたこと",
         "四十歳になって、時間ができたこと",
-        "学校の書類をたくさん書く必要があったこと"
+        "学校の書類をたくさん書く必要があったこと",
+        "子どものころ、先生に字が下手だと言われたこと",
+        "娘に、字が読みにくいと言われたこと"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "娘に「お母さんの字、読みにくいね」と言われて悔しかったことがきっかけだ。\nThe trigger was her daughter saying her handwriting was hard to read."
     },
     {
@@ -424,12 +424,12 @@
       "passage": "m1",
       "prompt": "書道の先生が大切にしていることは何か。",
       "options": [
-        "できるだけ速く書くこと",
         "一字一字を丁寧に書くこと",
-        "上手できれいな字を書くこと",
-        "毎日手紙を書くこと"
+        "できるだけ速く書くこと",
+        "毎日手紙を書くこと",
+        "上手できれいな字を書くこと"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "先生は上手に書くことよりも、一字一字を丁寧に書くことを大切にしている。\nThe teacher values writing each character carefully over writing skillfully."
     },
     {
@@ -452,12 +452,12 @@
       "passage": "l1",
       "prompt": "筆者のひざが痛くなったのは、なぜか。",
       "options": [
-        "一か月間、毎日長い距離を走ったから",
         "値段の安い靴を買ったから",
-        "初心者の自分に合わない靴で走っていたから",
-        "有名な選手と同じ走り方をしたから"
+        "一か月間、毎日長い距離を走ったから",
+        "有名な選手と同じ走り方をしたから",
+        "初心者の自分に合わない靴で走っていたから"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "底が薄い高い靴が初心者の筆者には合わず、ひざが痛くなったと書いてある。\nThe expensive thin-soled shoes did not suit a beginner, and the writer's knees began to hurt."
     },
     {
@@ -466,12 +466,12 @@
       "passage": "l1",
       "prompt": "筆者の考えに合うものはどれか。",
       "options": [
-        "人気のある道具を選べば、失敗しない。",
-        "道具は、店員にすすめられたものを買うのがいい。",
         "道具は、自分の体や目的に合っているかどうかで選ぶべきだ。",
-        "値段が高い道具は、どれもよくない。"
+        "値段が高い道具は、どれもよくない。",
+        "人気のある道具を選べば、失敗しない。",
+        "道具は、店員にすすめられたものを買うのがいい。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "最後の段落で、値段や人気ではなく、自分の体や目的に合っているかを考えることが大切だと述べている。\nThe writer concludes that gear should be chosen for your own body and purpose, not price or popularity."
     },
     {
