@@ -75,29 +75,6 @@ node prototypes/corridor/tools/verify-skip-ui.mjs
 node prototypes/corridor/tools/verify-skip-standalone.mjs
 ```
 
-### SKIP kanji lookup
-
-Open **字引 → SKIP**, or open search and type `1-3-8`, `skip:1-3-8`,
-`1-3`, or `1-*-8`. The four scrolling columns select pattern, first count,
-second count (solid subtype for pattern 4), and an optional radical filter.
-The radical is not a fourth part of the SKIP code. Recorded alternates are
-opt-in and labeled; kanji results use the existing detail sheets.
-
-The attributed, pinned sidecar covers the source's 10,384 kanji records.
-One invalid canonical source code and three invalid alternate codes are
-preserved for provenance but excluded from strict matching. See the
-[data contract and licensing record](docs/operator/SKIP_LOOKUP_2026-09-14.md)
-and [verification evidence](docs/build-evidence/skip/QA.md).
-This lookup change does not alter the frozen specifications, old stripped
-corpus, quiet writing room, or learning ledger.
-
-```bash
-node prototypes/corridor/tools/test-skip-core.mjs
-node prototypes/corridor/tools/test-skip-packaging.mjs
-node prototypes/corridor/tools/verify-skip-ui.mjs
-node prototypes/corridor/tools/verify-skip-standalone.mjs
-```
-
 Historical prototypes remain runnable as history, not authority: Sites v11
 (`npm --prefix prototypes/bunki-sites-v11 run dev`, source `prototypes/bunki-sites-v11/`) and the
 preserved Sites v5 donor on `sites/v5-import`.

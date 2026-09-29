@@ -464,9 +464,10 @@ const S = {
   storeError: null,
   storeExtras: null,
   /** a running review session: { queue, ix, revealed, declared, done } —
-   * null at rest. declared is the zen room's recall declaration for the
-   * card that is up: 1 思い出した · 0 まだ · null before the card turns
-   * over (kernel law ADR-002 T-06 — see the reveal obslog row) */
+   * null at rest. declared is the checked answer of the sentence or
+   * question card that is up: 1 passed · 0 must repeat (Again is the only
+   * grade, kernel law ADR-002 T-06) · null before the check, and on every
+   * card that turns over with 答えを見る */
   review: null,
   /** a running yomi probe: { queue, ix, revealed, right, missed, minted } —
    * session-only; its evidence lives in the obslog, never in FSRS state */
@@ -2935,13 +2936,11 @@ async function commitStorePatch(patch, appendArchive = []) {
  *       the score, nothing else — no deck rows, no FSRS state: entering
  *       覚える is the learner's own explicit choice on the end screen.
  *   [t, 'reveal', key, declared]
- *       the zen review room's declared-recall gate (kernel law ADR-002
- *       T-06): before the answer turns over, the learner declares —
- *       declared 1 思い出した (recalled; all four grades open) · 0 まだ
- *       (not yet; Again is the only grade the schedule may record). The
- *       row is the declaration's evidence; the forcing itself rides the
- *       session state and the grade commit. The timed dojo keeps its bare
- *       reveal and stamps 'dojo' practice rows instead.
+ *       the zen review room's former declared-recall gate (kernel law
+ *       ADR-002 T-06): declared 1 思い出した (recalled) · 0 まだ (not yet;
+ *       Again was the only grade the schedule could record). Since the
+ *       Anki turn-over (答えを見る, 2026-09-28) no room writes this row;
+ *       older rows stay valid evidence and still read in the trail.
  *   [t, 'note', 'op', text]
  *       ひとこと (TENOHIRA §3) — the learner's own words to the builder,
  *       written from the tray's friction door. Names no item, grades
@@ -3808,16 +3807,20 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
-  // A reload cannot reconstruct the entry sheet until data has booted. Remove
-  // a stale same-document room sentinel now so Back never lands on an inert
-  // history stop; ordinary Forward navigation is handled live by popstate.
+  // A reload cannot reconstruct the entry sheet until data has booted, so the
+  // stroke room's marker goes: it names a room this boot cannot restore.
+  // The WALK sentinel's entry survives a reload, so stripping only its marker
+  // left a stop nothing recognised and the first device Back after any reload
+  // did nothing (PR #77 ea8252a9). The marker is adopted instead: the first
+  // render's syncWalkSentinel keeps it armed when there is somewhere to walk,
+  // or spends it the same quiet way walking home does.
   try {
-    if (history.state?.bunkiStrokeRoom || history.state?.bunkiWalk) {
+    if (history.state?.bunkiStrokeRoom) {
       const normalized = { ...history.state };
       delete normalized.bunkiStrokeRoom;
-      delete normalized.bunkiWalk;
       history.replaceState(normalized, '', location.href);
     }
+    if (history.state?.bunkiWalk) walkArmed = true;
     // The corridor owns every scroll restore (reader bookmarks, shelf and
     // archive offsets, sheet stacks). The platform's own traversal guess
     // would land the walk-back sentinel pops on a stale offset and fight
@@ -4090,7 +4093,7 @@ function ensureArchiveIndex() {
 
 function renderArchive(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
-  main.append(withEn(el('h1', 'view-title', '新聞アーカイブ'), 'the newspaper archive', 'en-inline'));
+  main.append(withEn(el('h1', 'view-title', '過去のニュース · 新聞アーカイブ'), 'older news · the newspaper archive', 'en-inline'));
   if (!D.archive) {
     main.append(el('p', 'gloss', tx('棚をひらいています…', 'Opening the stack…')));
     if (D.archiveError) {
@@ -4123,7 +4126,8 @@ function renderArchive(main) {
   main.append(sub);
   S.archiveYears ||= new Set();
   for (const y of [...years.keys()].sort().reverse()) {
-    const list = years.get(y);
+    // newest first inside the year too (operator, 2026-09-28)
+    const list = [...years.get(y)].sort(byNewest);
     const open = S.archiveYears.has(y);
     const toggle = el('button', 'details-toggle archive-year');
     // every fold says whether it is open — four of the five did not, so a
@@ -4426,6 +4430,16 @@ function back() {
     return;
   }
   if (returnFromNavigation()) return;
+  // the guided session walks its own layers first (word → sentence, branch → sentence,
+  // an inner page → the room's front); from the front it returns through the door it came in
+  if (S.view === 'guided') {
+    if (guidedRoom?.back()) return;
+    guidedRoom?.suspend();
+    S.view = guidedFrom === 'mock' ? 'mock' : 'dojo';
+    render();
+    window.scrollTo(0, 0);
+    return;
+  }
   // inside a drift dive, back means SURFACE one level of the water first —
   // the same walk whether it arrives from the nav arrow or the device Back
   if (S.view === 'drift' && S.driftDepth > 0 && window.bunkiDriftSurface) {
@@ -4502,7 +4516,7 @@ function back() {
   }
   // a list page is only reachable from the tray (the リスト name-door), so
   // 戻る returns there — the same trip the in-page ← リスト一覧へ chip makes
-  if (S.view === 'list') {
+  if (S.view === 'list' || S.view === 'browse' || S.view === 'srs-stats') {
     S.view = 'tray';
     render();
     return;
@@ -4720,9 +4734,11 @@ addEventListener('popstate', () => {
     return;
   }
   if (walkConsuming) {
-    // our own quiet consume landed; re-check in case the learner moved on
+    // our own quiet consume landed; re-check in case the learner moved on. It can land on another
+    // walk entry: the writing room's own entry carries the marker of the walk it opened over, so
+    // a reload there leaves two. That one is adopted too, or the first real Back was a dead stop.
     walkConsuming = false;
-    walkArmed = false;
+    walkArmed = !!history.state?.bunkiWalk;
     syncWalkSentinel();
     return;
   }
@@ -4825,9 +4841,21 @@ function openPassage(id, anchor = null) {
 const passage = () => D.passages.find((p) => p.id === S.passageId);
 const BEYOND_JOYO = new Set(['準1級', '1級']);
 
+const JOYO_JUDGEABLE = /[\u3400-\u4dbf\u4e00-\u9fff]/;
+// 々 〆 ヶ are marks, not kanji: the 漢検 table carries none of them, so judged on their own they
+// read as rare and the dial turned 人々, 様々, 日々 and 国々 to kana. A mark takes the verdict of
+// the kanji before it instead (displayPairs), and with none before it is not judged at all.
+const JOYO_MARKS = /[々〆ヶ]/;
 function beyondJoyo(ch) {
+  // kana, numerals and marks are never "beyond" anything on their own — the dial replaces
+  // KANJI a learner at this level would not have met
+  if (!JOYO_JUDGEABLE.test(ch)) return false;
   const k = D.kanken[ch];
-  return !!k && BEYOND_JOYO.has(k.kk);
+  // …and a kanji the 漢検 table does not carry is not 常用. The table holds
+  // 2,453 characters and every common one is in it; 硯, 蟹, 學, 國, 纂, 鐵 are
+  // not. Reading "unknown" as jōyō made the dial inert for precisely the
+  // characters it exists to replace (PR #77 b4d6b825, E3 round-D, reader lens).
+  return !k || BEYOND_JOYO.has(k.kk);
 }
 
 function rubyNode(pairs, { furigana, revealed }) {
@@ -4876,9 +4904,16 @@ function displayPairs(token) {
     if (!token.f) return [{ t: token.r || token.s }];
     return token.f.map((pair) => (pair.r ? { t: pair.r } : pair));
   }
+  let before = '';
   return token.f.map((pair) => {
+    let rare = false;
+    for (const ch of pair.t) {
+      const mark = JOYO_MARKS.test(ch);
+      if (beyondJoyo(mark ? before : ch)) rare = true;
+      if (!mark) before = ch;
+    }
     if (!pair.r) return pair;
-    return [...pair.t].some(beyondJoyo) ? { t: pair.r } : pair;
+    return rare ? { t: pair.r } : pair;
   });
 }
 
@@ -5129,6 +5164,7 @@ function renderShelfBody() {
       )
     : tx(`${curated.length} 本。触れてひらく。`, `${curated.length} readings. Tap one to read it.`);
   main.append(sub);
+  renderShelfFresh(main, curated);
   main.append(renderReadingPlaces());
   renderSentenceReadingSuggestions(main);
 
@@ -5318,18 +5354,25 @@ function renderShelfBody() {
     main.append(strip);
   }
 
-  // one shelf, quiet sections: cards keep the index's own order inside each
-  // section, and sections stand in the order the index first names them —
-  // the categories gather without anything being reshuffled
+  // one shelf, quiet sections. News leads and every section reads newest
+  // first (operator, 2026-09-28: "the articles are all old and the same old
+  // shit"); undated texts keep the index's order after the dated ones, and
+  // the undated Bunki essays and the glossary stand last — reachable, not on top
   const sections = new Map();
   for (const p of curated) {
     const sec = shelfSection(p);
     if (!sections.has(sec.ja)) sections.set(sec.ja, { sec, items: [] });
     sections.get(sec.ja).items.push(p);
   }
-  for (const { sec, items } of sections.values()) {
-    main.append(withEn(el('p', 'eyebrow shelf-section', sec.ja), sec.en, 'en-inline'));
-    for (const p of items) main.append(shelfCard(p));
+  const place = (ja) => {
+    const at = SHELF_SECTION_ORDER.indexOf(ja);
+    return at < 0 ? SHELF_SECTION_ORDER.length : at;
+  };
+  for (const { sec, items } of [...sections.values()].sort((a, b) => place(a.sec.ja) - place(b.sec.ja))) {
+    const head = withEn(el('p', 'eyebrow shelf-section', sec.ja), sec.en, 'en-inline');
+    if (sec.ja === 'ニュース') head.id = 'shelf-news';
+    main.append(head);
+    for (const p of [...items].sort(byNewest)) main.append(shelfCard(p));
   }
 
   // the deep stack: the frozen wikinews archive, its own quiet room —
@@ -5339,8 +5382,8 @@ function renderShelfBody() {
     arc.type = 'button';
     arc.id = 'archive-link';
     arc.append(
-      el('span', 'l-ja', '新聞アーカイブ'),
-      el('span', 'en-sub', bi() ? 'the newspaper archive · 2005–2026' : 'ウィキニュース 2005–2026'),
+      el('span', 'l-ja', '過去のニュース · 新聞アーカイブ'),
+      el('span', 'en-sub', bi() ? 'older news · the 2005–2026 archive, newest first' : 'ウィキニュース 2005–2026 · 新しい順'),
     );
     arc.addEventListener('click', () => {
       keepScroll();
@@ -6784,10 +6827,103 @@ function renderFeed(main) {
   }
 }
 
+/* ------------------------------------------------ freshness on the shelf
+ * A reading's date counts only when it is an ISO calendar day; a publication
+ * note that is not a date (青空文庫's 初出 line) stays text, never a sort key. */
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+const shelfDay = (p) => (ISO_DAY.test(String(p?.date || '')) ? p.date : '');
+const SHELF_SECTION_ORDER = ['ニュース', '青空文庫', '古典・一次資料', '段階別読み物', '随筆', 'やさしい日本語 用語集'];
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Newest first; within one day the later publication first; undated last,
+ * in the order they arrived (Array#sort is stable). */
+function byNewest(a, b) {
+  const da = shelfDay(a);
+  const db = shelfDay(b);
+  if (da !== db) {
+    if (!da) return 1;
+    if (!db) return -1;
+    return da < db ? 1 : -1;
+  }
+  return (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0);
+}
+
+/** Days since a calendar day, counted on the reader's own calendar. */
+function dayAge(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  const now = new Date();
+  return Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(y, m - 1, d)) / 86400000);
+}
+
+function shelfDateLabel(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  const age = dayAge(day);
+  const when =
+    age === 0 ? tx('今日', 'today') : age === 1 ? tx('昨日', 'yesterday') : age > 1 && age < 7 ? tx(`${age}日前`, `${age} days ago`) : '';
+  const base = bi() ? `${d} ${MONTHS_EN[m - 1]} ${y}` : `${y}年${m}月${d}日`;
+  return when ? `${base} · ${when}` : base;
+}
+
+function dateStamp(day, cls) {
+  const stamp = el('time', cls, shelfDateLabel(day));
+  stamp.dateTime = day;
+  return stamp;
+}
+
+/** 新着 — the newest dated news at the very top of the shelf, before the
+ * room doors, with the whole news run and the older-news archive one tap
+ * away. A recommendation strip: its cards repeat readings that live in the
+ * ニュース section below. */
+function renderShelfFresh(main, curated) {
+  const news = curated.filter((p) => shelfSection(p).ja === 'ニュース' && shelfDay(p)).sort(byNewest);
+  if (!news.length) return;
+  const recent = news.filter((p) => dayAge(shelfDay(p)) <= 14).length;
+  main.append(withEn(el('p', 'eyebrow shelf-fresh-head', '新着ニュース'), 'latest news · newest first', 'en-inline'));
+  main.append(
+    el(
+      'p',
+      'shelf-fresh-note',
+      tx(
+        `この2週間の読み物 ${recent} 本 · 最新は ${shelfDateLabel(shelfDay(news[0]))}`,
+        `${recent} readings from the last two weeks · newest ${shelfDateLabel(shelfDay(news[0]))}`,
+      ),
+    ),
+  );
+  const strip = el('div', 'shelf-fresh-strip');
+  strip.id = 'shelf-fresh';
+  for (const p of news.slice(0, 8)) {
+    const card = shelfCard(p);
+    card.dataset.recommendation = 'fresh';
+    strip.append(card);
+  }
+  main.append(strip);
+  const all = biLabel('button', 'grammar-link', `ニュースをすべて新しい順に · ${news.length} 本`, `all ${news.length} news readings, newest first`);
+  all.type = 'button';
+  all.id = 'shelf-news-all';
+  all.addEventListener('click', () => document.getElementById('shelf-news')?.scrollIntoView({ block: 'start' }));
+  main.append(all);
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    const older = el('button', 'grammar-link');
+    older.type = 'button';
+    older.id = 'archive-link-top';
+    older.append(
+      el('span', 'l-ja', '過去のニュース'),
+      el('span', 'en-sub', bi() ? 'older news · 2005–2026, newest first' : 'ウィキニュース 2005–2026 · 新しい順'),
+    );
+    older.addEventListener('click', () => {
+      keepScroll();
+      S.view = 'archive';
+      render();
+      window.scrollTo(0, 0);
+    });
+    main.append(older);
+  }
+}
+
 /** The shelf's quiet sections, named from each record's own provenance —
  * no code-side canon that the data could contradict. */
 function shelfSection(p) {
-  if (p.source === 'ja.wikinews') return { ja: 'ニュース', en: 'news' };
+  if (p.source === 'ja.wikinews' || p.lane === 'news') return { ja: 'ニュース', en: 'news' };
   if (p.source === 'aozorabunko-clean') return { ja: '青空文庫', en: 'Aozora Bunko' };
   if (p.source === 'isa-yasashii-glossary') {
     return { ja: 'やさしい日本語 用語集', en: 'the plain-Japanese glossary — one-line definitions' };
@@ -6823,10 +6959,14 @@ function shelfCard(p) {
   open.append(head);
 
   const meta = el('div', 'shelf-meta');
+  // the date leads, so freshness reads at a glance (2026-09-28)
+  const day = shelfDay(p);
+  if (day) meta.append(dateStamp(day, 'shelf-date'));
   meta.append(el('span', null, p.sourceLabel));
   // an absent date stays absent — a stringified null ("None") is data rot,
-  // never provenance, and must not stand in the card's meta line (R3-E)
-  if (p.date && p.date !== 'None') meta.append(el('span', null, p.date));
+  // never provenance, and must not stand in the card's meta line (R3-E);
+  // a publication note that is not a calendar day stays as written
+  if (!day && p.date && p.date !== 'None') meta.append(el('span', null, p.date));
   meta.append(el('span', 'pool-tag', p.licence));
   // an honest kind on the rows that are not articles
   if (p.source === 'isa-yasashii-glossary') {
@@ -7800,6 +7940,11 @@ function renderReader(main) {
   // heading itself still reads as the Japanese title alone.
   main.append(el('h1', 'view-title', p.title));
   if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
+  if (shelfDay(p)) {
+    const dated = el('p', 'reader-date');
+    dated.append(dateStamp(shelfDay(p), 'shelf-date'));
+    main.append(dated);
+  }
   const lv = levelPhrase(p.grading);
   const levelLine = el('div', 'level-line');
   levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
@@ -7882,10 +8027,14 @@ function renderReader(main) {
   const dueNow = new Date();
   const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
+  // set when the token just placed reaches FORWARD for what completes it — a numeral for its
+  // counter, a 接頭辞 for its stem
+  let groupHolds = false;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
+      groupHolds = false;
     }
     if (crossRefs) {
       const refTarget = crossRefs.doors.get(index);
@@ -7979,10 +8128,22 @@ function renderReader(main) {
       rendered = wrapper;
     }
     if (S.dials.spacing === 2) {
-      if (token.c || !group) {
+      // 文節 by part of speech, never by the grader's c flag alone (PR #77 1398bc2c): keyed on c
+      // the dial shattered every date into [2005] [年7] [月14日、] and split 第29回. A phrase
+      // opens at a content word, a name, a numeral or a 接頭辞 — never at a 接尾辞, which
+      // belongs to what precedes it — and a numeral or 接頭辞 holds it open for what completes
+      // it. Nothing here reads the ふりがな dial. The tokenizer splits kanji numerals one
+      // character a token, so they count as numerals too, or 二〇二六年八月 fell apart per digit.
+      const pos = String(token.p || '');
+      const suffix = pos === '接尾辞';
+      const prefix = pos === '接頭辞';
+      const numeral = /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u.test(String(token.s || ''));
+      const opens = (token.c || namedReading || numeral || prefix) && !suffix && !groupHolds;
+      if (opens || !group) {
         group = el('span', 'bunsetsu');
         reader.append(group);
       }
+      groupHolds = numeral || prefix;
       group.append(rendered);
     } else {
       reader.append(rendered);
@@ -8030,12 +8191,21 @@ function renderReader(main) {
   fin.append(finBtn);
   main.append(fin);
 
-  if (p.pendingVerification) {
+  // A row marked 検収前 explains itself wherever the mark shows. The note was gated on
+  // pendingVerification, which few marked rows carry, so the rest wore the mark with no reason,
+  // and the rights-held glossary rows told the Wikinews archive-freeze story, false of them
+  // (PR #77 d9f0b984, with round B's per-row reasons).
+  const rightsHeld = p.review === 'rights-review-pending';
+  if (p.pendingVerification || rightsHeld || p.review === 'human-review-pending' || /検収前/.test(p.sourceLabel || '')) {
     const pv = el('div', 'note');
-    pv.textContent = tx(
-      '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
-      'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
-    );
+    pv.textContent = rightsHeld
+      ? tx('出典の利用条件がまだ確認されていない。検収前。', 'The terms this source may be used under are not yet verified. Pending review.')
+      : p.pendingVerification
+        ? tx(
+          '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
+          'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
+        )
+        : tx('人手による確認がまだ済んでいない。検収前。', 'A human review of this text is still pending.');
     main.append(pv);
   }
 
@@ -8912,35 +9082,11 @@ function refreshRecordNotesSurface() {
 
 function renderTray(main) {
   const currentSurface = recordViewSurface();
-  main.append(withEn(el('p', 'eyebrow', 'リスト'), 'your lists', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', '復習'), 'review · your cards', 'en-inline'));
   main.append(
     el('h1', 'view-title', tx(`覚える ${S.taken.length} 件`, `Memorizing ${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)),
   );
-  renderSentencePracticeLibrary(main);
-  // The stable global live region owns storage errors. This surface adds only
-  // the quiet backup reminder when the record itself is healthy.
-  if (!S.storeError) {
-    const cardCount = S.taken.length + Object.keys(S.srs).length;
-    const last = Number(S.stats?.lastExportTs) || 0;
-    const stale = !last || Date.now() - last > 14 * 86400000;
-    if (cardCount >= 20 && stale) {
-      main.append(
-        el(
-          'p',
-          'store-nudge',
-          last
-            ? tx(
-                '最後の書き出しから二週間以上。下の「書き出す」で記録をひとつのファイルに。',
-                'It has been over two weeks since your last export — 書き出す below keeps the whole record in one file.',
-              )
-            : tx(
-                '記録はこの端末だけにある。下の「書き出す」でひとつのファイルに残せる。',
-                'Your record lives only on this device so far — 書き出す below keeps it all in one file.',
-              ),
-        ),
-      );
-    }
-  }
+  // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
     const due = srsDueItems();
     const f = srsForecast();
@@ -8959,7 +9105,7 @@ function renderTray(main) {
     btn.id = 'review-start';
     btn.disabled = !due.length;
     btn.addEventListener('click', startReview);
-    main.append(btn);
+    main.append(deckCounts(due), btn);
     if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
       // 未着手 appears only when no-debt rows exist: the backlog is named,
       // never hidden and never turned into due cards by anyone but the learner
@@ -8992,6 +9138,8 @@ function renderTray(main) {
         ),
       );
     }
+    renderDeckTable(main, due);
+    renderDeckDoors(main);
     renderSrsPrefs(main);
     // one layer of the tutor's testing — absent without a key, and folded
     // away while an unfinished quiz still holds the room (POL-13)
@@ -9030,6 +9178,31 @@ function renderTray(main) {
       main.append(qb, note);
     }
   }
+  renderSentencePracticeLibrary(main);
+  // The stable global live region owns storage errors. This surface adds only
+  // the quiet backup reminder when the record itself is healthy.
+  if (!S.storeError) {
+    const cardCount = S.taken.length + Object.keys(S.srs).length;
+    const last = Number(S.stats?.lastExportTs) || 0;
+    const stale = !last || Date.now() - last > 14 * 86400000;
+    if (cardCount >= 20 && stale) {
+      main.append(
+        el(
+          'p',
+          'store-nudge',
+          last
+            ? tx(
+                '最後の書き出しから二週間以上。下の「書き出す」で記録をひとつのファイルに。',
+                'It has been over two weeks since your last export — 書き出す below keeps the whole record in one file.',
+              )
+            : tx(
+                '記録はこの端末だけにある。下の「書き出す」でひとつのファイルに残せる。',
+                'Your record lives only on this device so far — 書き出す below keeps it all in one file.',
+              ),
+        ),
+      );
+    }
+  }
   // POL-13 · a quiz that was left mid-run survives reload: the way back in
   // stands here — no new request, the tutor's written questions intact —
   // with a quiet やめる beside it. No key and no deck are needed to finish
@@ -9064,7 +9237,6 @@ function renderTray(main) {
     qrow.append(qb, drop);
     main.append(qrow);
   }
-  main.append(renderReadingPlaces(), renderRecordNotes());
   if (!S.taken.length) {
     main.append(
       el(
@@ -9076,6 +9248,7 @@ function renderTray(main) {
         ),
       ),
     );
+    main.append(renderReadingPlaces(), renderRecordNotes());
     // a fresh device is exactly where bringing a record back matters most —
     // and where first frictions surface, so the note door stands here too
     renderPortRow(main);
@@ -9296,6 +9469,9 @@ function renderTray(main) {
     for (const item of sec.items) main.append(trayLine(item, dueKeys));
   }
   main.append(maker);
+  // notes, reading places and sync wait below the cards themselves (operator, 2026-09-28:
+  // the review page read as a kitchen sink)
+  main.append(renderReadingPlaces(), renderRecordNotes());
 
   renderPortRow(main);
   renderNoteDoor(main);
@@ -10207,9 +10383,16 @@ function assessmentPublicCache() { return window.__KAIRO_ASSESSMENT_CACHE__ || g
 function assessmentCatalogVersions(catalog = assessmentCatalog) {
   return [...(catalog?.entries || []), ...(catalog?.archivedEntries || [])];
 }
+/** A startable entry: host-reviewed exactly as before, or the separately labelled
+ * machine-checked written class (assessment-delivery.mjs owns the rule). */
+function assessmentAdmitted(row) {
+  if (assessmentDeliveryModule) return assessmentDeliveryModule.assessmentEntryAdmitted(row);
+  return !!(row?.availability?.ready && row.review?.status === 'ai-reviewed' &&
+    row.editorialAtStart && row.editorialAtStart.status !== 'unreviewed');
+}
 function resolveReceivedAssessmentForm(reference) {
   const entry = assessmentCatalogVersions().find(row => row.formSha256 === reference.sha256 && row.id === reference.id &&
-    row.availability?.ready && row.review?.status === 'ai-reviewed');
+    assessmentAdmitted(row));
   const form = assessmentForms.get(reference.sha256) || assessmentDefinitions.get(reference.sha256);
   return entry && form && form.revisionId === reference.revisionId
     ? { form, editorialAtStart: entry.editorialAtStart, presentation: resolveAssessmentPresentation(form) } : null;
@@ -10231,7 +10414,7 @@ async function performAssessmentReconciliation() {
       const ref = head.payload.form;
       const known = resolveReceivedAssessmentForm(ref);
       if (known && (!known.form.media.length || known.presentation)) continue;
-      const entry = assessmentCatalogVersions(catalog).find(row => row.id === ref.id && row.formSha256 === ref.sha256 && row.availability?.ready && row.review?.status === 'ai-reviewed');
+      const entry = assessmentCatalogVersions(catalog).find(row => row.id === ref.id && row.formSha256 === ref.sha256 && assessmentAdmitted(row));
       if (!entry) continue;
       try {
         const form = await loadAssessmentForm(entry);
@@ -10289,6 +10472,16 @@ async function loadAssessmentForm(entry) {
   const { form, delivery } = await assessmentDeliveryStore.prepare(entry, assessmentV2Module.parseFormVersion);
   assessmentForms.set(key, form); assessmentDeliveries.set(key, delivery); return form;
 }
+// A finished or reopened attempt may need its delivery for per-question provenance only.
+const assessmentDeliveryLoads = new Map();
+function ensureAssessmentDelivery(selected) {
+  const key = selected?.form?.sha256;
+  if (!key || assessmentDeliveries.has(key) || assessmentDeliveryLoads.has(key)) return;
+  assessmentDeliveryLoads.set(key, loadAssessmentCatalog().then(catalog => {
+    const entry = assessmentCatalogVersions(catalog).find(row => row.id === selected.form.id && row.formSha256 === key && assessmentAdmitted(row));
+    return entry ? loadAssessmentForm(entry) : null;
+  }).catch(() => null).finally(() => { if (S.view === 'mock') render(); }));
+}
 async function assessmentMediaBlob(selected, assetId) {
   if (!assessmentDeliveries.has(selected.form.sha256)) {
     const catalog = await loadAssessmentCatalog();
@@ -10332,8 +10525,7 @@ async function performAssessmentStart(entry, mode) {
   try {
     const catalog = await loadAssessmentCatalog();
     const admitted = catalog.entries.find(row => row.id === entry.id);
-    if (admitted !== entry || !entry.availability.ready || entry.review.status !== 'ai-reviewed' ||
-        !entry.editorialAtStart || entry.editorialAtStart.status === 'unreviewed') throw new Error('assessment-not-ready');
+    if (admitted !== entry || !assessmentAdmitted(entry)) throw new Error('assessment-not-ready');
     const form = await loadAssessmentForm(entry);
     if (!recordWritable(epoch)) return false;
     const owned = recordApp.current();
@@ -10515,6 +10707,11 @@ function createAssessmentRoom() {
     mediaBlob: assessmentMediaBlob,
     mediaBytes: assessmentMediaBytes,
     delivery: selected => assessmentDeliveries.get(selected.form.sha256),
+    // 検収前 class: the label for an attempt started on a machine-checked form, and each question's checks
+    machineCheckLabel: selected => assessmentDeliveryModule?.machineCheckedEditorial(selected?.attempt?.editorialAtStart)
+      ? assessmentDeliveryModule.MACHINE_CHECK_LABEL : null,
+    itemCheck: (selected, itemId) => assessmentDeliveries.get(selected.form.sha256)?.itemChecks?.find(row => row.itemId === itemId) || null,
+    ensureDelivery: ensureAssessmentDelivery,
     remaining: selected => {
       if (!selected.block || selected.remainingMs === null) return 0;
       const monotonicDelta = selected.attempt.clock.sessionId === assessmentClockSession && selected.attempt.clock.lastMonotonicMs !== null
@@ -10559,7 +10756,7 @@ setInterval(() => {
 }, 1000);
 function resolveAssessmentPresentation(form) {
   const entry = assessmentCatalogVersions().find(row => row.id === form.id && row.formSha256 === form.sha256 &&
-    row.availability?.ready && row.review?.status === 'ai-reviewed');
+    assessmentAdmitted(row));
   const delivery = assessmentDeliveries.get(form.sha256);
   return entry && delivery ? { delivery, reviewedSha256: entry.deliverySha256 } : null;
 }
@@ -10591,7 +10788,7 @@ function stopAssessmentQuestionForRender() {
 async function loadAssessmentQuestionSource(plan) {
   const catalog = await loadAssessmentCatalog();
   const entry = assessmentCatalogVersions(catalog).find(row => row.id === plan.form.id && row.formSha256 === plan.form.sha256 &&
-    row.availability?.ready && row.review?.status === 'ai-reviewed');
+    assessmentAdmitted(row));
   if (!entry) throw new Error('question-form-unavailable');
   const form = await loadAssessmentForm(entry);
   assessmentQuestionModule.assertAssessmentQuestionForm(plan, form);
@@ -11377,7 +11574,7 @@ function renderMock(main) {
   main.classList.add('assessment-room'); main.lang = bi() ? 'en' : 'ja';
   if (assessmentViewModule && !practiceSelection() && !mockHistoryBrowse && !receivedPracticeSelection) {
     assessmentRoom ||= createAssessmentRoom();
-    if (assessmentRoom.render(main)) return;
+    if (assessmentRoom.render(main)) { guidedDoorInJlptRoom(main); return; }
   }
   main.append(withEn(el('p', 'eyebrow', 'JLPT の練習'), 'JLPT practice', 'en-inline'));
   if (!assessmentModule) {
@@ -11923,10 +12120,9 @@ function learnerModel() {
       const dimension = kagamiMockBand(row[4], key);
       if (owns(unverifiedPractice.byBand, dimension)) unverifiedPractice.byBand[dimension] += 1;
     } else if (kind === 'lesson' || kind === 'dojo') {
-      // Again alone is the miss. In the review room Hard is reachable ONLY
-      // after the learner declares 思い出した (ADR-002 T-06), so a hard-won
-      // recall is a recall (review round 11); lesson and mock rows use 1|3
-      // and read the same either way.
+      // Again alone is the miss: Hard is a recall that came hard, as Anki's
+      // buttons mean it (review round 11); lesson and mock rows use 1|3 and
+      // read the same either way.
       const right = row[3] >= 2;
       touch(key, right, true, kind);
       const band = bands[kagamiBandFor(key)];
@@ -13794,6 +13990,8 @@ function renderKdxParts(main) {
     for (const p of S.kdx.parts) {
       const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
       b.type = 'button';
+      // the chosen row is a REMOVE control, not a toggle, and says so (PR #77 007479d0)
+      b.setAttribute('aria-label', tx(`${p} を外す`, `remove ${p}`));
       b.addEventListener('click', () => {
         S.kdx.parts = S.kdx.parts.filter((x) => x !== p);
         render();
@@ -13858,6 +14056,8 @@ function kdxPartGrid(coPresent) {
       const dead = coPresent && !sel && !coPresent.has(r.c);
       const b = el('button', `kdx-chip kdx-part${sel ? ' on-list' : ''}${dead ? ' dead' : ''}`, r.c);
       b.type = 'button';
+      // which one is chosen is STATE, not only a class and a colour (PR #77 007479d0)
+      b.setAttribute('aria-pressed', String(sel));
       b.dataset.kdxPart = r.c; // the journey verifier's seam (c76edfb4's contract)
       if (r.name) b.setAttribute('aria-label', r.name);
       if (dead) b.disabled = true;
@@ -13882,6 +14082,7 @@ function renderKdxStrokes(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', String(n));
     b.type = 'button';
     b.dataset.kdxSt = String(n); // the journey verifier's seam (c76edfb4's contract)
+    b.setAttribute('aria-pressed', String(on));
     b.addEventListener('click', () => {
       S.kdx.st = on ? null : n;
       render();
@@ -13911,6 +14112,7 @@ function renderKdxRadical(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', glyph);
     b.type = 'button';
     b.dataset.kdxRad = String(n);
+    b.setAttribute('aria-pressed', String(on));
     b.setAttribute('aria-label', `${n} ${r?.c || ''} ${r?.name || ''}`.trim());
     b.title = `${n}${r?.name ? ' · ' + r.name : ''}`;
     b.addEventListener('click', () => {
@@ -13972,6 +14174,7 @@ function renderKdxFrequency(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', `${lo}–${hi}`);
     b.type = 'button';
     b.dataset.kdxFreq = String(lo);
+    b.setAttribute('aria-pressed', String(on));
     b.addEventListener('click', () => {
       S.kdx.freqLo = on ? null : lo;
       S.kdx.freqHi = on ? null : hi;
@@ -14011,6 +14214,7 @@ function renderKdxLevel(main) {
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', lv);
     b.type = 'button';
     b.dataset.kdxKk = lv;
+    b.setAttribute('aria-pressed', String(on));
     b.addEventListener('click', () => {
       S.kdx.kk = on ? null : lv;
       render();
@@ -15261,6 +15465,8 @@ function renderGrammar(main) {
     const active = (S.grammarLevel || 'all') === lv;
     const chip = el('button', active ? 'chip wide on-list' : 'chip wide');
     chip.type = 'button';
+    // the level shown is STATE, not only a colour (PR #77 f7cd297c)
+    chip.setAttribute('aria-pressed', String(active));
     chip.dataset.glevel = lv;
     chip.append(el('span', 'big', lv === 'all' ? tx('すべて', 'all') : lv));
     chip.addEventListener('click', () => {
@@ -16064,6 +16270,13 @@ function stopSentenceListening() {
 }
 window.addEventListener('pagehide', stopSentenceListening);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSentenceListening(); });
+// coming back wakes the galaxy the way leaving slept it — through the seam alone, never a whole
+// render that could disturb a room's drafts
+document.addEventListener('visibilitychange', () => {
+  if (!window.__DRIFT__ || document.body?.dataset?.ready !== '1') return;
+  if (document.hidden) window.__DRIFT__.hide();
+  else if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
+});
 async function openBundledSentenceChoice(getContext, button, note, stillCurrent) {
   if (button.disabled || !recordWritable() || !sentencePracticeModule) return;
   const epoch = recordEpoch, serial = ++sentenceChoiceSerial, currentSurface = retainActionSurface(button);
@@ -17751,7 +17964,7 @@ async function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }
 }
 
 async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
-  if (!rv.revealed || (!S.focus && rv.declared == null)) return false;
+  if (!rv.revealed) return false;
   if (!S.focus && rv.declared === 0) { rating = fsrsApi.Rating.Again; key = 'again'; }
   let committedNext;
   let entry;
@@ -17960,6 +18173,10 @@ window.__KAIRO_SRS__ = Object.freeze({
     ).toISOString(),
   dueKeys: () => srsDueItems().map((i) => srsKey(i.t, i.id)),
   prefs: () => ({ newPerDay: srsNewPerDay(), reviewLimit: srsReviewLimit() }),
+  current: () => {
+    const item = S.review?.queue[S.review.ix];
+    return item ? srsKey(item.t, item.id) : null;
+  },
   session: () =>
     S.review
       ? { queue: S.review.queue.length, ix: S.review.ix, deferred: S.review.deferred ?? 0 }
@@ -18070,7 +18287,7 @@ function reviewBack(item) {
       };
     }
   }
-  return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')] };
+  return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')], unrecorded: true };
 }
 function renderReview(main) {
   const rv = S.review;
@@ -18142,11 +18359,19 @@ function renderReview(main) {
         rest.dataset.leechRest = item.id;
         rest.disabled = !!rv.pending;
         rest.addEventListener('click', () => {
-          // a rest is deck state — commit the copy, then show it (P0-4)
+          // a rest is deck state — commit the copy, then show it (P0-4) — and it joins the
+          // session history like its in-session twin, so ひとつ戻す wakes THIS card rather than
+          // taking back the last grade. It moves no cursor: the session is already over when
+          // this row is on the glass (PR #77 f7cd297c).
+          const key = srsKey(item.t, item.id);
           const now = Date.now();
-          return commitReviewAction(rv, rv.queue[rv.ix], (latest) => ({
-            suspended: { ...latest.suspended, [srsKey(item.t, item.id)]: now },
-          }));
+          let prevSuspended;
+          return commitReviewAction(rv, rv.queue[rv.ix], (latest) => {
+            prevSuspended = latest.suspended[key];
+            return { suspended: { ...latest.suspended, [key]: now } };
+          }, () => {
+            rv.history.push({ key: 'suspend', prevSuspended, afterSuspended: now, item, queueIndex: rv.ix });
+          });
         });
         row.append(rest);
         main.append(row);
@@ -18196,7 +18421,7 @@ function renderReview(main) {
       }
       // いま見る holds for the WHOLE card, not for one render. Clearing it as
       // the front face painted meant the next render — the one the learner's
-      // own 思い出した/まだ triggers — fell back into the countdown and hid
+      // own 答えを見る triggers — fell back into the countdown and hid
       // the answer they had just asked for. advanceReviewSession retires the
       // flag when the card is done.
     }
@@ -18235,6 +18460,12 @@ function renderReview(main) {
     render();
   });
   main.append(moreBtn);
+  // Anki's three numbers (operator, 2026-09-28: a hairline told him nothing) and an undo
+  // that no longer hides behind …
+  if (!S.focus) main.append(reviewCounts(rv));
+  const undoSlot = el('div', 'anki-undo-slot');
+  renderReviewUndo(undoSlot, rv);
+  if (undoSlot.childNodes.length) main.append(undoSlot);
 
   if (!reviewAnswerAvailable(item)) {
     moreBtn.remove();
@@ -18431,7 +18662,6 @@ function renderReview(main) {
 
   if (S.reviewMore) {
     const moreRow = el('div', 'zen-more-row');
-    renderReviewUndo(moreRow, rv);
     if (maintenanceReports) {
       const report = el('button', 'chip report-door', tx('問題を報告', 'Report a problem')); report.type = 'button';
       report.dataset.reportEntry = 'open';
@@ -18474,58 +18704,21 @@ function renderReview(main) {
   if (!rv.revealed) {
     if (item.t === 'question') return;
     if (item.t === 'sentence') { renderSentenceRecallControls(main, rv, item); return; }
-    if (S.focus) {
-      // the dojo keeps its single turn-over — drilling early is its point,
-      // and a drill-only grade is practice evidence, not a scheduled
-      // review. The declared-recall gate below guards the zen room only.
-      // The card itself turns over — and the labeled button stays for
-      // hands and readers that want one.
-      face.addEventListener('click', () => {
-        if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item) return;
-        rv.revealed = true;
-        render();
-      });
-      const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
-      btn.type = 'button';
-      btn.id = 'reveal';
-      btn.disabled = !!rv.pending;
-      btn.addEventListener('click', () => {
-        if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item) return;
-        rv.revealed = true;
-        render();
-      });
-      main.append(btn);
-      return;
-    }
-    // 想起の二道 — the kernel law (ADR-002 T-06): a learner who saw the
-    // answer before recalling did not recall it. So the front face asks the
-    // only honest question first — did it come back? — and the answer is
-    // what turns the card over: 思い出した opens all four grades; まだ
-    // opens the back for study with Again as the one grade the schedule
-    // will record. There is no bare reveal in this room — the declaration
-    // IS the door. It lands in the observation ledger like the reader's
-    // tap ladder (debounce-persisted); the forcing itself rides rv.declared
-    // in session state and the acknowledged grade commit.
-    const declare = (declared) => {
-      if (rv.revealed) return false;
-      const now = Date.now();
-      return commitReviewAction(rv, item, (latest) => ({
-        obslog: [...(latest.obslog || []), [now, 'reveal', srsKey(item.t, item.id), declared]],
-      }), () => { rv.declared = declared; rv.revealed = true; });
-    };
-    const declRow = el('div', 'declare-row');
-    const notyet = biLabel('button', 'take declare-notyet', 'まだ', 'not yet');
-    notyet.type = 'button';
-    notyet.id = 'declare-notyet';
-    notyet.disabled = !!rv.pending;
-    notyet.addEventListener('click', () => declare(0));
-    const recalled = biLabel('button', 'take declare-recalled', '思い出した', 'I recalled it');
-    recalled.type = 'button';
-    recalled.id = 'declare-recalled';
-    recalled.disabled = !!rv.pending;
-    recalled.addEventListener('click', () => declare(1));
-    declRow.append(notyet, recalled);
-    main.append(declRow);
+    // Anki's turn-over (operator, 2026-09-28: "it should be at least more like anki AT A BARE
+    // MINIMUM"): recall in your head, Show answer, then grade honestly — Again is the miss.
+    // The review room and the dojo share it; Space or Enter presses it (reviewKeys).
+    const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show answer');
+    btn.type = 'button';
+    btn.id = 'reveal';
+    btn.disabled = !!rv.pending;
+    btn.addEventListener('click', () => {
+      if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || rv.revealed) return;
+      rv.revealed = true;
+      render();
+    });
+    // the dojo's card itself also turns over — drilling early is its point
+    if (S.focus) face.addEventListener('click', () => btn.click());
+    main.append(btn);
     return;
   }
   const now = new Date();
@@ -18570,8 +18763,8 @@ function renderReview(main) {
     ['Good', 'good', 'ふつう', '良'],
     ['Easy', 'easy', '簡単', '易'],
   ];
-  // まだ was declared: the answer was seen before recall, so Again is the
-  // only grade this room may record (T-06). The row holds the one honest
+  // A sentence or question check must repeat (declared 0): the answer was
+  // seen before recall, so Again is the only grade this room may record (T-06). The row holds the one honest
   // seal instead of three dead promises — and the commit below derives the
   // rating from the DECLARATION, never from the button, so no later tap
   // can outrun the law even if a stray node were clicked.
@@ -18579,7 +18772,7 @@ function renderReview(main) {
   if (!S.focus && rv.declared != null) {
     row.setAttribute('data-declared', notRecalled ? 'notyet' : 'recalled');
   }
-  for (const [rating, key, ja, sealChar] of grades) {
+  for (const [rating, key, ja] of grades) {
     if (notRecalled && rating !== 'Again') continue;
     const next = result[fsrsApi.Rating[rating]].card;
     const ms = next.due.getTime() - schedNow.getTime();
@@ -18588,19 +18781,24 @@ function renderReview(main) {
       : next.scheduled_days >= 1
         ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`)
         : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
-    const b = el('button', `grade hanko g-${key}`);
+    // Anki's answer bar (operator, 2026-09-28 — the seal row was hard to read): the
+    // interval stands above each plain-worded button, and 1–4 press them (reviewKeys)
+    const b = el('button', `grade anki g-${key}`);
     b.type = 'button';
     b.disabled = !!rv.pending || !recordWritable();
-    b.append(el('span', 'g-seal', sealChar));
-    b.append(el('span', 'g-label', tx(ja, key)));
+    b.dataset.gradeKey = String(grades.findIndex((g) => g[1] === key) + 1);
+    b.title = `${rating} (${b.dataset.gradeKey})`;
     b.append(el('span', 'g-when', when));
+    b.append(el('span', 'g-label', tx(ja, rating)));
+    b.append(el('span', 'g-sub', tx(rating, ja)));
     b.addEventListener('click', async () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return;
       const pressedNow = new Date();
       const day = dayKey(pressedNow);
       const skey = srsKey(item.t, item.id);
-      // T-06 forcing at the commit: after まだ, the declaration names the
-      // grade — whatever was tapped, Again is what the schedule records
+      // T-06 forcing at the commit: after a check that must repeat, the
+      // declaration names the grade — whatever was tapped, Again is what the
+      // schedule records
       const forceAgain = !S.focus && rv.declared === 0;
       const effRating = forceAgain ? 'Again' : rating;
       const effKey = forceAgain ? 'again' : key;
@@ -18647,11 +18845,370 @@ function renderReview(main) {
   // rest · undo · the full entry live behind the … mark — the zen glass
   // holds only the card and the four honest buttons
 }
+/* ------------------------------------------------ Anki-grade SRS (operator, 2026-09-28)
+ * "the anki page is bad and hard to understand … it should be at least more like anki AT A
+ * BARE MINIMUM" — and his standing ask, "an amazing Anki-grade SRS — all of Anki's function,
+ * simplified". Anki's deck screen, counts, browser and stats, on the same FSRS state. */
+function srsCardKind(item) {
+  const rec = S.srs[srsKey(item.t, item.id)];
+  if (!rec || !rec.state) return 'new';
+  return rec.state === 2 ? 'due' : 'learn';
+}
+const SRS_KINDS = [['new', '新規', 'New'], ['learn', '学習中', 'Learning'], ['due', '復習', 'To review']];
+function reviewCounts(rv) {
+  const n = { new: 0, learn: 0, due: 0 };
+  for (const item of rv.queue.slice(rv.ix)) n[srsCardKind(item)] += 1;
+  const current = rv.queue[rv.ix] ? srsCardKind(rv.queue[rv.ix]) : null;
+  const box = el('div', 'anki-counts');
+  box.id = 'review-counts';
+  box.setAttribute('role', 'status');
+  box.setAttribute('aria-label', tx(`残り — 新規 ${n.new}・学習中 ${n.learn}・復習 ${n.due}`,
+    `left — ${n.new} new, ${n.learn} learning, ${n.due} to review`));
+  for (const [kind, ja, en] of SRS_KINDS) {
+    const c = el('span', `c-${kind}${current === kind ? ' now' : ''}`, String(n[kind]));
+    c.title = tx(ja, en);
+    box.append(c);
+  }
+  return box;
+}
+function deckCounts(due) {
+  const n = { new: 0, learn: 0, due: 0 };
+  for (const item of due) n[srsCardKind(item)] += 1;
+  const row = el('div', 'deck-counts');
+  row.id = 'deck-counts';
+  for (const [kind, ja, en] of SRS_KINDS) {
+    const cell = el('div', `deck-count c-${kind}`);
+    cell.append(el('span', 'deck-count-n', String(n[kind])));
+    cell.append(el('span', 'deck-count-l', tx(ja, en)));
+    row.append(cell);
+  }
+  return row;
+}
+/** The decks: named lists above the months that fill themselves — the lists page's own sections. */
+function srsDecks() {
+  const buckets = new Map();
+  for (const item of S.taken) {
+    const key = monthKey(item.ts || 0);
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(item);
+  }
+  return [
+    ...Object.entries(S.lists).map(([name, items]) => ({ name, items })),
+    ...[...buckets.entries()].map(([name, items]) => ({ name, items })),
+  ];
+}
+function renderDeckTable(main, due) {
+  const kindByKey = new Map(due.map((i) => [srsKey(i.t, i.id), srsCardKind(i)]));
+  const table = el('div', 'deck-table');
+  table.id = 'deck-table';
+  const head = el('div', 'deck-row deck-head');
+  head.setAttribute('aria-hidden', 'true');
+  head.append(el('span', 'd-name', tx('デッキ', 'Deck')));
+  for (const [kind, ja, en] of [['new', '新規', 'New'], ['learn', '学習', 'Learn'], ['due', '復習', 'Due']]) {
+    head.append(el('span', `c-${kind}`, tx(ja, en)));
+  }
+  table.append(head);
+  for (const deck of [{ name: tx('すべての札', 'All cards'), items: null }, ...srsDecks()]) {
+    const n = { new: 0, learn: 0, due: 0 };
+    for (const item of deck.items || S.taken) {
+      const kind = kindByKey.get(srsKey(item.t, item.id));
+      if (kind) n[kind] += 1;
+    }
+    const total = n.new + n.learn + n.due;
+    const row = el('button', 'deck-row' + (deck.items ? '' : ' deck-all'));
+    row.type = 'button';
+    row.disabled = !total || !scheduler;
+    row.dataset.deck = deck.items ? deck.name : '*';
+    row.setAttribute('aria-label', tx(`${deck.name} — 新規 ${n.new}・学習 ${n.learn}・復習 ${n.due}`,
+      `${deck.name} — ${n.new} new, ${n.learn} learning, ${n.due} due`));
+    row.append(el('span', 'd-name', deck.name));
+    for (const kind of ['new', 'learn', 'due']) row.append(el('span', `c-${kind}${n[kind] ? '' : ' zero'}`, String(n[kind])));
+    row.addEventListener('click', () => (deck.items ? startReview(deck.items) : startReview()));
+    table.append(row);
+  }
+  main.append(table);
+}
+function renderDeckDoors(main) {
+  const row = el('div', 'deck-doors');
+  for (const [id, view, ja, en] of [['deck-browse', 'browse', '札を探す', 'browse cards'], ['deck-stats', 'srs-stats', '統計', 'stats']]) {
+    const door = biLabel('button', 'chip deck-door', ja, en);
+    door.type = 'button';
+    door.id = id;
+    door.addEventListener('click', () => {
+      keepScroll();
+      S.view = view;
+      render();
+      window.scrollTo(0, 0);
+    });
+    row.append(door);
+  }
+  main.append(row);
+}
+function srsRoomBack(main) {
+  const back = biLabel('button', 'chip list-back', '← 復習', 'review');
+  back.type = 'button';
+  back.addEventListener('click', () => {
+    S.view = 'tray';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(back);
+}
+/** Anki's browser, simplified: every card, searchable, filtered by state, sorted, each row the
+ * same door and rest/wake toggle the lists page uses. */
+const BROWSE_FILTERS = [
+  ['all', 'すべて', 'all'], ['due', 'いま', 'due now'], ['new', '新規', 'new'], ['learn', '学習中', 'learning'],
+  ['review', '復習', 'review'], ['rest', '休み中', 'resting'], ['leech', '苦手', 'struggling'],
+];
+const BROWSE_SORTS = [['due', '期日', 'due date'], ['added', '追加順', 'newest added'], ['interval', '間隔', 'interval'], ['lapses', '忘れた回数', 'lapses'], ['word', '語順', 'word']];
+function renderBrowse(main) {
+  srsRoomBack(main);
+  main.append(withEn(el('p', 'eyebrow', '札を探す'), 'browse', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(`すべての札 — ${S.taken.length} 件`, `All cards — ${S.taken.length}`)));
+  const b = S.browse || (S.browse = { q: '', filter: 'all', sort: 'due', limit: 200 });
+  const q = el('input', 'browse-q');
+  q.type = 'search';
+  q.id = 'browse-q';
+  q.value = b.q;
+  q.placeholder = tx('語・読み・意味で探す', 'search a word, reading or meaning');
+  q.setAttribute('aria-label', tx('札を探す', 'search cards'));
+  const filters = el('div', 'browse-filters');
+  const sort = el('select', 'browse-sort');
+  sort.id = 'browse-sort';
+  sort.setAttribute('aria-label', tx('並べ方', 'sort by'));
+  for (const [value, ja, en] of BROWSE_SORTS) {
+    const o = el('option', null, tx(ja, en));
+    o.value = value;
+    o.selected = b.sort === value;
+    sort.append(o);
+  }
+  const count = el('p', 'fine browse-count');
+  count.setAttribute('role', 'status');
+  const list = el('div', 'browse-list');
+  const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
+  const facts = new Map(S.taken.map((item) => {
+    const answer = item.t === 'word' ? savedAnswerFor(item) : null;
+    const shown = answer?.status === 'available' ? answer : null;
+    // what the search reads: every meaning of a word, and for every other kind the card back
+    // (reviewBack) — 海 answers "sea" and "うみ" — never the no-record placeholder; a grammar or
+    // particle back carries an example after its meaning, which is not searched
+    const back = item.t === 'word' ? null : reviewBack(item);
+    const known = back && !back.unrecorded ? back : null;
+    const senses = known ? (['grammar', 'particle'].includes(item.t) ? known.senses.slice(0, 1) : known.senses) : [];
+    return [item, {
+      reading: shown?.reading || '',
+      meaning: shown?.meanings?.[0] || '',
+      search: [shown?.reading, ...(shown?.meanings || []), known?.reading, ...senses],
+    }];
+  }));
+  const matches = (item) => {
+    const key = srsKey(item.t, item.id);
+    const rec = S.srs[key];
+    const f = b.filter;
+    if (f === 'due' && !dueKeys.has(key)) return false;
+    if (f === 'new' && (srsCardKind(item) !== 'new' || S.suspended[key])) return false;
+    if (f === 'learn' && !(rec && (rec.state === 1 || rec.state === 3))) return false;
+    if (f === 'review' && !(rec && rec.state === 2)) return false;
+    if (f === 'rest' && !S.suspended[key]) return false;
+    if (f === 'leech' && !isLeech(item)) return false;
+    const needle = b.q.trim().toLowerCase();
+    if (!needle) return true;
+    const fact = facts.get(item);
+    return [item.label, item.id, ...fact.search].some((s) => String(s || '').toLowerCase().includes(needle));
+  };
+  const sortKey = {
+    due: (item) => { const rec = S.srs[srsKey(item.t, item.id)]; return rec ? Date.parse(rec.due) : Number.MAX_SAFE_INTEGER; },
+    added: (item) => -(item.ts || 0),
+    interval: (item) => -(S.srs[srsKey(item.t, item.id)]?.scheduled_days || 0),
+    lapses: (item) => -(S.srs[srsKey(item.t, item.id)]?.lapses || 0),
+    word: null,
+  };
+  const paint = () => {
+    const hits = S.taken.filter(matches);
+    const keyOf = sortKey[b.sort];
+    if (keyOf) hits.sort((x, y) => keyOf(x) - keyOf(y));
+    else hits.sort((x, y) => String(x.label).localeCompare(String(y.label), 'ja'));
+    count.textContent = tx(`${hits.length} 件`, `${hits.length} card${hits.length === 1 ? '' : 's'}`);
+    list.replaceChildren();
+    for (const item of hits.slice(0, b.limit)) {
+      const line = trayLine(item, dueKeys);
+      const rec = S.srs[srsKey(item.t, item.id)];
+      const fact = facts.get(item);
+      const meta = el('span', 'browse-meta');
+      const bits = [];
+      if (fact.reading && fact.reading !== item.label) bits.push(fact.reading);
+      if (fact.meaning) bits.push(fact.meaning);
+      if (rec) {
+        bits.push(tx(`間隔 ${rec.scheduled_days || 0} 日`, `interval ${rec.scheduled_days || 0} d`));
+        if (rec.lapses) bits.push(tx(`忘れ ${rec.lapses}`, `lapses ${rec.lapses}`));
+      }
+      meta.textContent = bits.join(' · ');
+      line.append(meta);
+      list.append(line);
+    }
+    if (hits.length > b.limit) {
+      const more = biLabel('button', 'chip browse-more', 'もっと見る', `show ${Math.min(200, hits.length - b.limit)} more`);
+      more.type = 'button';
+      more.addEventListener('click', () => { b.limit += 200; paint(); });
+      list.append(more);
+    }
+  };
+  for (const [value, ja, en] of BROWSE_FILTERS) {
+    const chip = el('button', 'chip browse-filter' + (b.filter === value ? ' on' : ''), tx(ja, en));
+    chip.type = 'button';
+    chip.dataset.filter = value;
+    chip.setAttribute('aria-pressed', String(b.filter === value));
+    chip.addEventListener('click', () => {
+      b.filter = value;
+      b.limit = 200;
+      for (const other of filters.children) {
+        const on = other.dataset.filter === value;
+        other.classList.toggle('on', on);
+        other.setAttribute('aria-pressed', String(on));
+      }
+      paint();
+    });
+    filters.append(chip);
+  }
+  q.addEventListener('input', () => { b.q = q.value; b.limit = 200; paint(); });
+  sort.addEventListener('change', () => { b.sort = sort.value; paint(); });
+  const bar = el('div', 'browse-bar');
+  bar.append(q, sort);
+  main.append(bar, filters, count, list);
+  paint();
+}
+/** Anki's statistics, the parts a learner reads: today, the month's reviews, what is coming,
+ * where every card stands, and how often reviews are remembered. */
+function renderSrsStats(main) {
+  srsRoomBack(main);
+  main.append(withEn(el('p', 'eyebrow', '統計'), 'statistics', 'en-inline'));
+  main.append(el('h1', 'view-title', tx('復習の統計', 'Review statistics')));
+  const DAY = 86400000;
+  const now = new Date();
+  const today = S.stats[dayKey(now)] || {};
+  const todayN = today.n || 0;
+  const todayAgain = today.again || 0;
+  main.append(el('p', 'stats-today', todayN
+    ? tx(`今日 ${todayN} 枚 · もう一度 ${todayAgain} · 正答 ${Math.round(((todayN - todayAgain) / todayN) * 100)}%`,
+      `Today: ${todayN} card${todayN === 1 ? '' : 's'} studied · Again ${todayAgain} · ${Math.round(((todayN - todayAgain) / todayN) * 100)}% correct`)
+    : tx('今日はまだ復習していない。', 'No reviews yet today.')));
+  const counts = { new: 0, learn: 0, young: 0, mature: 0, rest: 0, unstarted: 0 };
+  for (const item of S.taken) {
+    const key = srsKey(item.t, item.id);
+    const rec = S.srs[key];
+    if (S.suspended[key]) counts.rest += 1;
+    else if (!rec || !rec.state) counts[finiteNumber(item.started) ? 'new' : 'unstarted'] += 1;
+    else if (rec.state === 1 || rec.state === 3) counts.learn += 1;
+    else if ((rec.scheduled_days || 0) >= 21) counts.mature += 1;
+    else counts.young += 1;
+  }
+  const standing = el('div', 'stats-standing');
+  for (const [kind, ja, en] of [['new', '新規', 'New'], ['learn', '学習中', 'Learning'], ['young', '若い', 'Young'], ['mature', '定着', 'Mature'], ['rest', '休み中', 'Resting'], ['unstarted', '未着手', 'Not started']]) {
+    if (kind === 'unstarted' && !counts.unstarted) continue;
+    const cell = el('div', `stats-cell s-${kind}`);
+    cell.append(el('span', 'stats-n', String(counts[kind])), el('span', 'stats-l', tx(ja, en)));
+    standing.append(cell);
+  }
+  main.append(withEn(el('p', 'eyebrow list-head', '札の状態'), 'where your cards stand', 'en-inline'), standing);
+  const bars = (title, en, values, labels, cls) => {
+    main.append(withEn(el('p', 'eyebrow list-head', title), en, 'en-inline'));
+    const chart = el('div', `stats-bars ${cls}`);
+    const max = Math.max(1, ...values);
+    chart.setAttribute('role', 'img');
+    chart.setAttribute('aria-label', tx(`${title}: 合計 ${values.reduce((a, v) => a + v, 0)}、最大 ${Math.max(...values)}`,
+      `${en}: ${values.reduce((a, v) => a + v, 0)} in all, at most ${Math.max(...values)} a day`));
+    values.forEach((v, i) => {
+      const col = el('div', 'stats-col');
+      col.title = `${labels[i]}: ${v}`;
+      const bar = el('i');
+      bar.style.height = `${Math.round((v / max) * 100)}%`;
+      col.append(bar);
+      chart.append(col);
+    });
+    main.append(chart);
+    main.append(el('p', 'fine stats-axis', `${labels[0]} … ${labels[labels.length - 1]} · ${tx('最大', 'max')} ${max}`));
+  };
+  // calendar days, never fixed 24-hour blocks: where the clocks change a day is 23 or 25 hours,
+  // and stepping by 24 h skipped a day (or showed one twice); a DST-free zone is unchanged
+  const pastDays = [];
+  const pastLabels = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    pastDays.push(S.stats[dayKey(d)]?.n || 0);
+    pastLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+  }
+  bars('この30日', 'reviews, last 30 days', pastDays, pastLabels, 'past');
+  const ahead = new Array(14).fill(0);
+  const aheadLabels = [];
+  const base = startOfDay(now);
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    aheadLabels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+  }
+  for (const item of S.taken) {
+    const key = srsKey(item.t, item.id);
+    const rec = S.srs[key];
+    if (!rec || S.suspended[key]) continue;
+    // two midnights can be 23 or 25 hours apart: round, as srsWhen does — floor put a card due the
+    // day after spring-forward one day early
+    const i = Math.max(0, Math.round((startOfDay(new Date(rec.due)) - base) / DAY));
+    if (i < 14) ahead[i] += 1;
+  }
+  bars('これから14日', 'due, next 14 days', ahead, aheadLabels, 'ahead');
+  const revoked = new Set();
+  for (const row of S.revlog || []) if (row[2] === 0 && Number.isInteger(row[3])) revoked.add(row[3]);
+  let reviewed = 0;
+  let remembered = 0;
+  const since = now.getTime() - 30 * DAY;
+  (S.revlog || []).forEach((row, i) => {
+    if (revoked.has(i) || row[2] === 0 || row[0] < since || row[3] !== 2) return;
+    reviewed += 1;
+    if (row[2] > 1) remembered += 1;
+  });
+  main.append(withEn(el('p', 'eyebrow list-head', '定着率'), 'retention', 'en-inline'));
+  main.append(el('p', 'stats-retention', reviewed
+    ? tx(`この30日、復習 ${reviewed} 回のうち ${Math.round((remembered / reviewed) * 100)}% を思い出した。`,
+      `In the last 30 days you remembered ${Math.round((remembered / reviewed) * 100)}% of ${reviewed} review${reviewed === 1 ? '' : 's'}.`)
+    : tx('まだ復習（学習済みの札）の記録がない。', 'No reviews of learned cards yet.')));
+}
+/* Anki's keys: Space or Enter shows the answer, then 1–4 grade (Space or Enter = Good),
+ * Z or U takes the last grade back. Never while typing, never under an open sheet, dialog or
+ * picker: the report form is a native modal over the card, and a key pressed in it graded or
+ * undid the card behind it. */
+function reviewKeys(ev) {
+  if (S.view !== 'review' || !S.review || S.stack.length || S.strokes || worldPickerEls) return;
+  if (document.querySelector('dialog[open]')) return;
+  if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey || ev.repeat) return;
+  const target = ev.target;
+  if (target?.closest?.('dialog, [role="dialog"]')) return;
+  if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  const plainKey = ev.key === ' ' || ev.key === 'Enter';
+  // a focused button answers its own Space and Enter
+  if (plainKey && target && target.closest && target.closest('button, a, [role="button"]')) return;
+  const press = (node) => {
+    if (!node || node.disabled) return;
+    ev.preventDefault();
+    node.click();
+  };
+  if (ev.key === 'z' || ev.key === 'u') {
+    press(document.querySelector('.review-undo'));
+    return;
+  }
+  if (!S.review.revealed) {
+    if (plainKey) press(document.getElementById('reveal'));
+    return;
+  }
+  const grade = { 1: 'again', 2: 'hard', 3: 'good', 4: 'easy' }[ev.key] || (plainKey ? 'good' : null);
+  if (grade) press(document.querySelector(`.grade-row .grade.g-${grade}`));
+}
+document.addEventListener('keydown', reviewKeys);
 /* The quiet beat between learning steps: every remaining card is a short
  * step that hasn't ripened. The glass keeps its zen — a soft count, one way
  * out — and turns the next card over by itself the moment the step matures.
  * Beats longer than this are pulled early instead of held. */
-const REVIEW_WAIT_HOLD_MS = 90000;
+// Anki shows a ripening learning card at once (its learn-ahead) — the countdown beat made the
+// operator wait a minute mid-session (2026-09-28), so no step is held any more
+const REVIEW_WAIT_HOLD_MS = 0;
 let reviewWaitTimer = null;
 function renderReviewWait(main, rv, nearestDueMs) {
   const progress = el('div', 'zen-progress');
@@ -18895,6 +19452,143 @@ function renderFocusHud(root) {
   root.append(hud);
 }
 
+/* ------------------------------------------- 案内つきの稽古 · the guided session
+ * Codex's living-thread journey (approved 2026-09-23), in its own module
+ * (guided-session.mjs). This host is the room's only way into the learner record:
+ * 覚える goes through toggleTaken — the reader's own door, with its D11/D23 holds — and
+ * the room reads S.taken / S.srs back through the helpers the lists page uses. */
+let guidedModule = null;
+let guidedModulePromise = null;
+let guidedFailed = false;
+let guidedRoom = null;
+let guidedFrom = 'dojo';
+function ensureGuidedModule() {
+  guidedModulePromise ||= import(window.__KAIRO_GUIDED_SESSION_URL__ || './guided-session.mjs').then(
+    (module) => { guidedModule = module; guidedFailed = false; return module; },
+    (error) => { guidedModulePromise = null; guidedFailed = true; throw error; },
+  );
+  return guidedModulePromise;
+}
+const guidedTaken = (node) => S.taken.find((row) => row.t === node.t && row.id === node.id) || null;
+function guidedCardStatus(node) {
+  const word = node.t === 'word';
+  const state = word ? wordCaptureState(node) : guidedTaken(node) ? 'taken' : 'take';
+  if (state === 'taken') return { state: 'taken' };
+  if (word && !D.dict?.[node.id]) return { state: 'held', reason: readerCaptureReasonText(node.id) };
+  if (word && state !== 'take') return { state: 'held', reason: wordCaptureHeldText(node, { route: false }) };
+  if (node.t === 'grammar' && !GRAMMARS().some((g) => g.id === node.id))
+    return { state: 'held', reason: tx('この文法は一覧にないため、覚えられない。', 'This grammar pattern is not in Bunki’s list, so it can’t be memorized.') };
+  if (!word && node.t !== 'grammar') return { state: 'held', reason: tx('この種類の札は、ここでは覚えられない。', 'This kind of card can’t be memorized here.') };
+  return { state: 'take' };
+}
+function guidedCardInfo(nodes) {
+  const ready = new Set(scheduler ? srsDueItems().map((item) => srsKey(item.t, item.id)) : []);
+  return nodes.map((node) => {
+    const key = srsKey(node.t, node.id);
+    const row = guidedTaken(node);
+    const studied = !!S.srs[key] || (S.revlog || []).some((review) => review[1] === key);
+    return row ? { taken: true, ready: ready.has(key), studied, kind: srsCardKind(row), when: srsWhen(row) }
+      : { taken: false, ready: false, studied, kind: null, when: '' };
+  });
+}
+function guidedHost() {
+  return {
+    english: bi,
+    render: () => { if (S.view === 'guided') render(); },
+    storage: () => localStorage,
+    // the single-file handoff carries the sets in its bundle, keyed by path; a served build
+    // lets the room fetch them
+    fetchJson: window.__CORRIDOR_STANDALONE__ === true
+      ? (path) => {
+        const bundled = window.__CORRIDOR_BUNDLE__?.[String(path).replace(/\.json$/u, '')];
+        return bundled ? Promise.resolve(structuredClone(bundled)) : Promise.reject(new Error(`${path} is not in this file`));
+      }
+      : null,
+    openReport: maintenanceReports ? () => maintenanceReports.openReport() : null,
+    openEntry: (node) => go(node, { invoker: document.activeElement }),
+    openTutor: () => {
+      keepNavigationReturn('ai', document.activeElement);
+      S.view = 'ai'; render(); window.scrollTo(0, 0);
+    },
+    deck: {
+      status: guidedCardStatus,
+      info: guidedCardInfo,
+      title: nodeTitle,
+      // add-only: toggleTaken removes a card that is already there, so it is called only for 'take'
+      add: async (node, label) => {
+        const status = guidedCardStatus(node);
+        if (status.state === 'taken') return 'existing';
+        if (status.state !== 'take') return 'held';
+        if (!recordWritable()) return 'failed';
+        const saved = await toggleTaken(node, label);
+        return saved && guidedTaken(node) ? 'added' : 'failed';
+      },
+      remove: async (node) => {
+        if (!guidedTaken(node)) return true;
+        if (!recordWritable()) return false;
+        const saved = await toggleTaken(node, nodeTitle(node));
+        return !!saved && !guidedTaken(node);
+      },
+      review: (nodes) => {
+        const keys = new Set(nodes.map((node) => srsKey(node.t, node.id)));
+        if (!scheduler || !srsDueItems().some((item) => keys.has(srsKey(item.t, item.id)))) return false;
+        S.trayFrom = { view: 'guided', scroll: 0 };
+        startReview(S.taken.filter((row) => keys.has(srsKey(row.t, row.id))));
+        return S.view === 'review';
+      },
+      open: () => {
+        keepScroll(); S.stack = [];
+        S.trayFrom = { view: 'guided', scroll: Math.round(window.scrollY) };
+        S.view = 'tray'; render(); window.scrollTo(0, 0);
+      },
+    },
+  };
+}
+function openGuidedRoom(from) {
+  keepScroll();
+  guidedFrom = from;
+  S.stack = [];
+  S.view = 'guided';
+  guidedRoom?.enter();
+  render();
+  window.scrollTo(0, 0);
+}
+function renderGuided(main) {
+  if (guidedModule) {
+    guidedRoom ||= guidedModule.createGuidedSession(guidedHost());
+    guidedRoom.render(main);
+    return;
+  }
+  main.append(withEn(el('h1', 'view-title', '案内つきの稽古'), 'guided session', 'en-inline'));
+  const state = el('p', 'gloss', guidedFailed
+    ? tx('この部屋を開けなかった。保存した記録はそのまま残っている。', 'This room didn’t open. Nothing you saved is affected.')
+    : tx('稽古を開いています…', 'Opening the session…'));
+  state.setAttribute('role', 'status');
+  main.append(state);
+  if (guidedFailed) {
+    const retry = el('button', 'chip', tx('もう一度', 'Try again'));
+    retry.type = 'button'; retry.dataset.guidedRetry = '';
+    retry.addEventListener('click', () => { guidedFailed = false; render(); });
+    main.append(retry);
+    return;
+  }
+  ensureGuidedModule().then(() => { if (S.view === 'guided') { guidedRoom?.enter(); render(); } }, () => { if (S.view === 'guided') render(); });
+}
+/** The JLPT room's own door to the guided session, beside the level and length chooser. */
+function guidedDoorInJlptRoom(main) {
+  const lengths = main.querySelector('.exam-lengths');
+  if (!lengths || main.querySelector('[data-guided-door]')) return;
+  const row = el('div', 'study-hall guided-entry');
+  const door = el('button', 'study-door');
+  door.type = 'button';
+  door.dataset.guidedDoor = 'mock';
+  door.append(withEn(el('span', 'study-door-t', '案内つきの稽古'), 'a guided session', 'en-inline'));
+  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors as you go')));
+  door.addEventListener('click', () => openGuidedRoom('mock'));
+  row.append(door);
+  lengths.after(row);
+}
+
 /** 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18:
  * "we should have a whole corpus of test from JLPT levels and others, as well
  * as SRS cards. and other options to study here. not sure where they are…
@@ -18912,18 +19606,23 @@ function renderStudyHall(main) {
     assessmentOpening = true;
     loadAssessmentCatalog().then(() => { if (S.view === 'dojo') render(); }).catch(() => {}).finally(() => { assessmentOpening = false; });
   }
-  const readyTests = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode !== 'section').length || 0;
+  const readyTests = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && !['section', 'written'].includes(entry.mode)).length || 0;
   const readySections = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'section').length || 0;
+  // machine-checked written tests are counted apart: they have no length and still await review
+  const readyWritten = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'written').length || 0;
   const doors = [
     ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} cards waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
       ? tx(`${readyTests}組 · 級と長さを選ぶ`, `${readyTests} tests · choose a level and length`)
+      : readyWritten ? tx(`筆記テスト ${readyWritten}組 · 検収前`, `${readyWritten} written tests · awaiting review`)
       : readySections ? tx(`${readySections}組の練習 · 模試は準備中`, `${readySections} practice set${readySections === 1 ? '' : 's'} · mock tests in preparation`)
         : tx('新しい模試を準備中 · 以前の練習も使えます', 'New mocks in preparation · earlier exercises available'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
+    ['guided', '案内つきの稽古', 'a guided session', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors'),
+      () => openGuidedRoom('dojo')],
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
     }],
@@ -18975,6 +19674,8 @@ function renderFocus(main) {
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
     b.type = 'button';
+    // the chosen length and mode are STATE, not only a class (PR #77 007479d0)
+    b.setAttribute('aria-pressed', String(S.focusMin === m));
     b.append(el('span', 'focus-chip-n', String(m)));
     b.append(el('span', 'focus-chip-u', tx('分', 'min')));
     b.addEventListener('click', () => {
@@ -19000,6 +19701,7 @@ function renderFocus(main) {
   for (const [id, ja, en, sub] of modeDefs) {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
     b.type = 'button';
+    b.setAttribute('aria-pressed', String(S.focusMode === id));
     b.append(withEn(el('span', 'focus-mode-t', ja), en, 'en-inline'));
     b.append(el('span', 'focus-mode-sub', sub));
     b.addEventListener('click', () => {
@@ -20501,6 +21203,26 @@ async function aiLastReply(surface, ref) {
   return null;
 }
 
+/* A failure is not an assistant turn and is never archived, so a repaint mid-request replaced the
+ * sheet's quiet "could not answer just now" with silence and a re-armed door (PR #77 007479d0).
+ * The line waits here, per surface and word, until the learner asks again. A reply or a line that
+ * lands after the sheet was rebuilt asks for one render: the archive read-back, or this note,
+ * puts it where it belongs. */
+const aiSheetNotes = new Map();
+/* A repaint re-arms the door while an ask is still out, so a second ask can overtake the first. Each
+ * ask takes a turn: only the newest may leave the line, and a reply clears it — a late failure of an
+ * older ask never stands over a saved reply. */
+const aiSheetTurns = new Map();
+function aiSheetTurn(key) {
+  const turn = (aiSheetTurns.get(key) || 0) + 1;
+  aiSheetTurns.set(key, turn);
+  return turn;
+}
+function aiSheetSettle(box, paint) {
+  if (box.isConnected) paint();
+  else if ($('.sheet')) render();
+}
+
 /** The tutor door on a word entry — present only when a key is stored. */
 function renderAiTutor(sheet, node, rec) {
   if (node.from?.passage || node.sourceContext) {
@@ -20512,21 +21234,32 @@ function renderAiTutor(sheet, node, rec) {
     node.from?.passage || node.sourceContext ? 'ask about the word alone' : 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
-  aiLastReply('word-tutor', `word:${node.id}`).then((prev) => {
+  const ref = `word:${node.id}`;
+  const note = aiSheetNotes.get(`word-tutor|${ref}`);
+  if (note) out.textContent = note;
+  else aiLastReply('word-tutor', ref).then((prev) => {
     if (prev && !out.textContent) out.textContent = prev;
   });
   btn.addEventListener('click', async () => {
+    const turn = aiSheetTurn(`word-tutor|${ref}`);
+    aiSheetNotes.delete(`word-tutor|${ref}`);
     btn.disabled = true;
     out.textContent = tx('考え中…', 'thinking…');
     try {
       const senses = (rec?.m || []).slice(0, 4).join('; ');
-      out.textContent = await aiAsk(
+      const said = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use using the separate learning dimensions, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'word-tutor', ref: `word:${node.id}` },
+        { surface: 'word-tutor', ref },
       );
+      aiSheetNotes.delete(`word-tutor|${ref}`);
+      aiSheetSettle(out, () => { out.textContent = said; });
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      if (aiSheetTurns.get(`word-tutor|${ref}`) === turn) {
+        const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+        aiSheetNotes.set(`word-tutor|${ref}`, line);
+        aiSheetSettle(out, () => { out.textContent = line; });
+      }
     }
     btn.disabled = false;
   });
@@ -20566,10 +21299,15 @@ function renderAiExamples(sheet, node, rec) {
     }
     return shown;
   };
-  aiLastReply('examples', `word:${node.id}`).then((prev) => {
+  const exRef = `word:${node.id}`;
+  const note = aiSheetNotes.get(`examples|${exRef}`);
+  if (note) out.append(el('p', 'ai-ex-note', note));
+  else aiLastReply('examples', exRef).then((prev) => {
     if (prev && !out.childElementCount && !btn.disabled) paint(prev);
   });
   btn.addEventListener('click', async () => {
+    const turn = aiSheetTurn(`examples|${exRef}`);
+    aiSheetNotes.delete(`examples|${exRef}`);
     btn.disabled = true;
     out.textContent = '';
     out.append(el('p', 'ai-ex-note', tx('つくっています…', 'writing examples…')));
@@ -20579,13 +21317,21 @@ function renderAiExamples(sheet, node, rec) {
       const raw = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. Write 6 to 8 natural example sentences for the given word across a useful range of difficulty, easiest first, using the separate learning dimensions. Keep an unrecorded word classification unknown; a word tag alone does not establish a sentence\'s difficulty. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. Nx is your provisional N5–N1 difficulty estimate for that example, not an official classification or a claim about the learner. No numbering, no markdown, no extra commentary.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Source word JLPT classification: ${wordLv || 'not recorded'}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'examples', ref: `word:${node.id}` },
+        { surface: 'examples', ref: exRef },
       );
-      const shown = paint(raw);
-      if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      aiSheetNotes.delete(`examples|${exRef}`);
+      aiSheetSettle(out, () => {
+        if (!paint(raw)) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      });
     } catch {
-      out.textContent = '';
-      out.append(el('p', 'ai-ex-note', tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.')));
+      if (aiSheetTurns.get(`examples|${exRef}`) === turn) {
+        const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
+        aiSheetNotes.set(`examples|${exRef}`, line);
+        aiSheetSettle(out, () => {
+          out.textContent = '';
+          out.append(el('p', 'ai-ex-note', line));
+        });
+      }
     }
     btn.disabled = false;
   });
@@ -20604,21 +21350,36 @@ function renderAiCoach(main, rv) {
   btn.type = 'button';
   btn.id = 'ai-coach';
   const out = el('div', 'ai-answer');
-  btn.addEventListener('click', async () => {
+  // 考え中 and what the tutor said live on the session, not in this closure: a repaint
+  // mid-request killed the spinner, re-armed the door and lost the arriving reply
+  // (PR #77 d9f0b984)
+  const thinking = tx('考え中…', 'thinking…');
+  if (rv.coach?.pending) {
     btn.disabled = true;
-    out.textContent = tx('考え中…', 'thinking…');
+    out.textContent = thinking;
+  } else if (rv.coach?.said) out.textContent = rv.coach.said;
+  btn.addEventListener('click', async () => {
+    if (rv.coach?.pending) return;
+    rv.coach = { pending: true };
+    btn.disabled = true;
+    out.textContent = thinking;
+    let said;
     try {
       // history is queue-ordered (grades push sequentially, undo pops)
       const lines = rv.queue.map((item, i) => `${item.label} (${item.t}): ${rv.history[i]?.key || 'ungraded'}`);
-      out.textContent = await aiAsk(
+      said = await aiAsk(
         "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
         `Session grades:\n${lines.join('\n')}`,
         { surface: 'coach' },
       );
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      said = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
     }
-    btn.disabled = false;
+    rv.coach = { pending: false, said };
+    if (out.isConnected) {
+      out.textContent = said;
+      btn.disabled = false;
+    } else if (S.view === 'review' && S.review === rv) render();
   });
   wrap.append(btn, out);
   main.append(wrap);
@@ -22392,9 +23153,13 @@ function startStrokeAnimation(page) {
     return;
   }
 
-  const GAP = 90;
+  // ゆっくり governs this hand too: it is the only writing a device without WebGL/WebGPU ever
+  // sees, and the corner stood there pressed while it ran at one speed (PR #77 007479d0). The
+  // default speed keeps the classic timing exactly.
+  const pace = STROKE_SPEED_DEFAULT / strokeSpeed();
+  const GAP = 90 * pace;
   const durations = paths.map((path) =>
-    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)),
+    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)) * pace,
   );
   const starts = [];
   let acc = 0;
@@ -23609,10 +24374,15 @@ function renderStrokePage(root) {
       const numbersCorner = strokeNumbersControl(page, reduced);
       numbersCorner.classList.add('stroke-corner', 'stroke-corner-br');
       page.append(numbersCorner);
-      const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
-      speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
-      page.append(speedCorner);
-      page.querySelector('#stroke-awake-field')?.append(speedSlider);
+      // ゆっくり paces the writing. Under reduced motion nothing is written over time, so it is
+      // not offered, rather than standing in its corner reporting itself pressed while it
+      // governs nothing (PR #77 007479d0)
+      if (!reduced) {
+        const { corner: speedCorner, slider: speedSlider } = strokeSpeedControl(page);
+        speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
+        page.append(speedCorner);
+        page.querySelector('#stroke-awake-field')?.append(speedSlider);
+      }
     }
     setStrokeChrome(page, S.strokeChromeAwake);
   }
@@ -23660,10 +24430,19 @@ function renderStrokePage(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring also catches focus that is inside the room but not ON the ring. The room can
+    // hold focus on its own container, which is neither first nor last, so one Shift+Tab walked
+    // out to <body>, and Escape, bound to the room, went dead with it (PR #77 d9f0b984)
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -24054,8 +24833,11 @@ function renderSheet(root) {
       return;
     }
     if (event.key !== 'Tab') return;
-    const focusable = [...sheet.querySelectorAll('button, a[href], input, [tabindex]')].filter(
-      (item) => !item.disabled && item.tabIndex >= 0 && item.offsetParent !== null,
+    // every control Tab can reach is on the ring — a <summary> (出会った文章, the level-tag notes),
+    // a textarea or a select left off it was "not on the ring" and sent forward Tab back to 戻る —
+    // and a rendered box is the visibility test, as in the writing room's ring
+    const focusable = [...sheet.querySelectorAll('summary, button, a[href], input, select, textarea, [tabindex]')].filter(
+      (item) => !item.disabled && item.tabIndex >= 0 && item.getClientRects().length > 0,
     );
     if (!focusable.length) {
       event.preventDefault();
@@ -24064,10 +24846,19 @@ function renderSheet(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring also catches focus that is inside the room but not ON the ring. The room can
+    // hold focus on its own container, which is neither first nor last, so one Shift+Tab walked
+    // out to <body>, and Escape, bound to the room, went dead with it (PR #77 d9f0b984)
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -24113,6 +24904,17 @@ function licencePanel() {
     line.append(document.createTextNode(' ' + sources.map((s) => `${s.name}（${s.licence}）`).join(' · ')));
     box.append(line);
   }
+  // …and the tokenizer. Every reading and part-of-speech tag in the app passed through UniDic
+  // via fugashi at build time, and the panel that claims to state everything named neither
+  // (PR #77 f7cd297c). A build-time dependency ships in no pool, so it is written down here.
+  const tokenizer = el('p');
+  tokenizer.style.margin = '8px 0 0';
+  tokenizer.append(el('span', 'pool-tag', tx('ビルド時', 'build time')));
+  tokenizer.append(document.createTextNode(' ' + tx(
+    'UniDic 2.1.2（UniDic Consortium、GPL・LGPL・BSD のいずれか）を unidic-lite と fugashi（MIT）で — 読みと品詞はすべてここから',
+    'UniDic 2.1.2 (the UniDic Consortium; GPL, LGPL or BSD) through unidic-lite and fugashi (MIT) — every reading and part-of-speech tag comes from it',
+  )));
+  box.append(tokenizer);
   return box;
 }
 
@@ -25135,6 +25937,27 @@ function buildGingaChrome(root) {
   root.append(seal);
   if (S.sealWake) S.sealWake = false;
 
+  // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
+  // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
+  if (S.view === 'drift' && S.taken.length && scheduler) {
+    const waiting = srsDueItems().length;
+    const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
+      waiting ? `復習 ${waiting}` : '復習', waiting ? `review · ${waiting} due` : 'review');
+    pill.type = 'button';
+    pill.id = 'home-review';
+    pill.setAttribute('data-drift-chrome', '');
+    pill.addEventListener('click', () => {
+      S.navOpen = false;
+      keepScroll();
+      S.stack = [];
+      S.trayFrom = { view: 'drift', scroll: 0 };
+      S.view = 'tray';
+      render();
+      window.scrollTo(0, 0);
+    });
+    root.append(pill);
+  }
+
   // the search ghost — one tap from ANY screen into the search room with the
   // keyboard already raised (operator, 2026-08-27: "I hear a word and need
   // rapid access"). It stands beside the world seal, same barely-there skin,
@@ -25239,7 +26062,7 @@ function stampRegister() {
   const html = document.documentElement;
   const main = document.querySelector('#app > main');
   const room = document.body.classList.contains('ginga') || !main ? 'door'
-    : main.querySelector('.mock-opts, .mock-q') ? 'attempt'
+    : main.querySelector('.mock-opts, .mock-q, .guided-room[data-stage="question"]') ? 'attempt'
       : main.querySelector('.exam-confirm') ? 'threshold'
         : main.querySelector('.exam-score') ? 'results'
           : main.querySelector('.exam-levels') ? 'jlpt'
@@ -25289,6 +26112,9 @@ function renderRoomError(main, view, error) {
   card.append(retry, home);
   main.append(card);
 }
+/* classes a press FLIPS — left out of the last-resort focus key, or the control could never be
+ * found again by the very press that moved the keyboard */
+const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
   syncSheetActionVisit();
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
@@ -25303,6 +26129,8 @@ function render() {
   // leaving the JLPT room cancels any older-set start still downloading: returning later must
   // not replay a stale tap
   if (lastRenderedView === 'mock' && S.view !== 'mock') olderStartToken += 1;
+  // leaving the guided session takes any moment off the glass; its progress is already saved
+  if (lastRenderedView === 'guided' && S.view !== 'guided') guidedRoom?.suspend();
   removeMini();
   // Rebuilding #app empties the page for a moment, and the browser clamps
   // window scroll to 0 — so a double-tap for a gloss, opening a sheet, or
@@ -25320,9 +26148,27 @@ function render() {
   const focusKey = (() => {
     const node = document.activeElement;
     if (!node || node === document.body || !$('#app').contains(node)) return null;
-    if (node.id) return `#${CSS.escape(node.id)}`;
+    if (node.id) return { sel: `#${CSS.escape(node.id)}` };
     const action = node.dataset?.action;
-    return action ? `[data-action="${CSS.escape(action)}"]` : null;
+    if (action) return { sel: `[data-action="${CSS.escape(action)}"]` };
+    // Last resort: the filter chips in 字引, 文法 and the dojo lobby name themselves no other
+    // way, so every press dropped the keyboard to <body> (PR #77 1398bc2c). Such a control is
+    // found by its shape, minus the state classes its own press flips, and by its own text
+    // before its place — pressing a 部品 narrows the grid under the very chip pressed. Only
+    // inside the room it was pressed in: a press that changed rooms (リストへ on the review
+    // summary) would otherwise hand the keyboard to a stranger of the same shape (the tray's
+    // 復習する, one Enter from a new review). And the text is a name only when no other
+    // control of that shape wears it, or a repeated label went back to its first copy.
+    if (lastRenderedView !== S.view) return null;
+    const shape = [...node.classList].filter((name) => !FOCUS_STATE_CLASSES.has(name));
+    if (!shape.length) return null;
+    const sel = shape.map((name) => `.${CSS.escape(name)}`).join('');
+    const all = [...$('#app').querySelectorAll(sel)];
+    const ix = all.indexOf(node);
+    if (ix < 0) return null;
+    const text = (node.textContent || '').trim().slice(0, 16);
+    const unique = all.filter((other) => (other.textContent || '').trim().slice(0, 16) === text).length === 1;
+    return { sel, ix, text: unique ? text : null };
   })();
   const root = $('#app');
   root.textContent = '';
@@ -25383,11 +26229,20 @@ function render() {
   // the crumb names the TRUE origin — the room 戻る actually reopens. The
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
-  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus) ||
+    (S.view === 'guided' && guidedFrom === 'dojo');
   // the search room's door stands in the galaxy bar, and its Back walks
   // there unless it was opened from the shelf
   const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
-  if (S.view === 'entry') parts.push(tx('野', 'field'));
+  // the lists tray opens from every room and its 戻る walks back there, so a room reached
+  // through it (the tray, its quiz, a plain review) is rooted where the tray was opened —
+  // it said 本棚 whichever room that was (PR #77 d9f0b984)
+  const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
+  const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
+  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' ||
+    (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
+  if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
+  else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
   else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
@@ -25396,7 +26251,9 @@ function render() {
     parts.push(passage().title);
   }
   if (S.view === 'search') parts.push(tx('検索', 'search'));
-  if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
+  // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
+  // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
+  if (viaTray) parts.push(tx('リスト', 'lists'));
   if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
@@ -25417,6 +26274,9 @@ function render() {
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
   if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
+  if (S.view === 'guided') {
+    parts.push(guidedFrom === 'mock' ? tx('JLPT の練習', 'JLPT practice') : tx('集中道場', 'focus'), tx('案内つきの稽古', 'guided session'));
+  }
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   crumb.setAttribute('aria-label', crumb.title);
@@ -25639,7 +26499,10 @@ function render() {
   // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
     syncDriftTheme();
-    if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
+    // …and a page nobody is looking at is a room they have left: the galaxy is the
+    // default entry, and its loop held the main thread even in a background tab
+    // (PR #77 ef524842). The same public seam the view switch uses; nothing reaches in.
+    if (S.view === 'drift' && !S.stack.length && !document.hidden) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }
 
@@ -25654,6 +26517,8 @@ function render() {
     else if (S.view === 'reader') renderReader(main);
     else if (S.view === 'tray') renderTray(main);
     else if (S.view === 'list') renderListPage(main);
+    else if (S.view === 'browse') renderBrowse(main);
+    else if (S.view === 'srs-stats') renderSrsStats(main);
     else if (S.view === 'review') renderReview(main);
     else if (S.view === 'probe') renderProbe(main);
     else if (S.view === 'archive') renderArchive(main);
@@ -25674,6 +26539,7 @@ function render() {
     else if (S.view === 'kanjidex') renderKanjidex(main);
     else if (S.view === 'yoji') renderYoji(main);
     else if (S.view === 'grammar') renderGrammar(main);
+    else if (S.view === 'guided') renderGuided(main);
     else if (S.view === 'search') renderSearchPage(main);
     else renderShelf(main);
   } catch (error) {
@@ -25716,7 +26582,10 @@ function render() {
   // focus and must not be overruled, so this only reaches into #app, and it
   // never steals focus from whatever the rebuild legitimately moved it to.
   if (focusKey && document.activeElement === document.body) {
-    const again = $('#app').querySelector(focusKey);
+    const all = focusKey.ix == null ? [] : [...$('#app').querySelectorAll(focusKey.sel)];
+    const named = focusKey.text == null ? [] : all.filter((node) => (node.textContent || '').trim().slice(0, 16) === focusKey.text);
+    const again = focusKey.ix == null ? $('#app').querySelector(focusKey.sel)
+      : (named.length === 1 ? named[0] : null) || all[focusKey.ix];
     if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
   }
   lastRenderedView = S.view;

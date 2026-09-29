@@ -16,6 +16,7 @@ import {
   resolveCorridorSite,
 } from '../../../scripts/resolve-corridor-site.mjs';
 import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
+import { fullPageScreenshot } from './screenshot-support.mjs';
 
 const OUT = resolveCorridorEvidence();
 const verifierSha256 = createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex');
@@ -423,10 +424,10 @@ try {
           }),
         ]);
         assert.equal(errors.filter((error) => error.name === name).length, 0, 'Journey has no uncaught page errors');
-        await page.screenshot({ path: resolve(caseOut, 'completed.png'), fullPage: true });
+        await fullPageScreenshot(page, resolve(caseOut, 'completed.png'));
         results.push({ name, status: 'passed', elapsedMs: Date.now() - start, ...details });
       } catch (error) {
-        await page.screenshot({ path: resolve(caseOut, 'failure.png'), fullPage: true }).catch(() => {});
+        await fullPageScreenshot(page, resolve(caseOut, 'failure.png')).catch(() => {});
         const rendered = await page.evaluate(() => ({
           ready: document.body.dataset.ready || null,
           title: document.querySelector('.view-title')?.textContent || null,
@@ -765,7 +766,7 @@ try {
         assert.deepEqual(reloaded.archive, backup.archive);
         await destination.locator('#tray').click();
         assert.match(await destination.locator('.view-title').textContent(), /2/u);
-        await destination.screenshot({ path: resolve(caseOut, 'restored.png'), fullPage: true });
+        await fullPageScreenshot(destination, resolve(caseOut, 'restored.png'));
         details.download = 'synthetic-record.json';
         details.sourceDatabaseName = initial.installation.databaseName;
         details.destinationDatabaseName = restored.installation.databaseName;

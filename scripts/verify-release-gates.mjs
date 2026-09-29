@@ -559,6 +559,16 @@ export function batteryGates(out, env = process.env) {
     ),
     node('import-provider', tool('verify-import-provider')),
     node('playback', tool('verify-playback')),
+    // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
+    { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
+    // …its engine rules and set-versus-bank checks, and its offline and single-file claims
+    {
+      name: 'guided-session-contract',
+      command: process.execPath,
+      args: ['--test', tool('guided-session.test')],
+      requiredPath: tool('guided-session.test'),
+    },
+    node('guided-offline', tool('verify-guided-offline')),
     node('reading-candidates', tool('verify-reading-candidates')),
     {
       ...node('reading-candidates-webkit', tool('verify-reading-candidates')),
@@ -806,7 +816,7 @@ const RECORD_GATE_CASES = {
     'acknowledged-grade-disposes-question-view-and-clears-transient-response-state',
     'undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion',
     'dojo-evidence-waits-for-ack-and-never-creates-schedule-state',
-    'recall-declaration-rejects-without-revealing-and-serializes-double-input',
+    'show-answer-turns-the-card-without-a-write-and-ignores-a-second-press',
     'quiz-answer-next-and-close-use-only-acknowledged-run-and-ignore-stale-buttons',
     'lesson-completion-atomically-files-score-and-evidence-after-ack',
     'explicit-enrollment-batch-is-one-save-deduplicated-and-keeps-deep-word-provenance',
@@ -821,7 +831,7 @@ const RECORD_GATE_CASES = {
     'quiz-answer-rejection-and-reload-preserve-the-unanswered-question',
     'quiz-next-and-close-reject-without-advancing-or-leaving',
     'quiz-close-rejection-keeps-the-completed-run',
-    'recall-declaration-rejection-keeps-the-answer-concealed',
+    'show-answer-opens-four-grades-without-a-write',
     'review-grade-rejection-keeps-card-schedule-log-and-stats',
     'review-grade-and-undo-persist-one-schedule-with-an-append-only-revocation',
     'lesson-completion-rejection-keeps-the-last-answer',
@@ -1411,7 +1421,7 @@ const NATIVE_GATE_CASES = [
   ...[
     'every primary index row carries a non-empty titleEn',
     'every titleEn names its provenance in titleEnSource',
-    'the title marker names its author: AI for the recovered and minted rows, the shelf map for the rest',
+    'the title marker names its author: AI for the recovered and minted rows, the fresh-shelf titles file for fresh readings, the shelf map for the rest',
     'the 30 authored records answer to the queue: approved rows lifted, pending rows still 検収前',
     'every archive row carries a non-empty titleEn with wrapper provenance',
     'the code-side TITLES_EN map is gone from corridor.js — titles live in data only',
@@ -2391,6 +2401,8 @@ async function verifyRunner(out) {
     'kagami',
     'import-provider',
     'playback',
+    'guided-session-contract',
+    'guided-offline',
     'reading-candidates',
     'reading-candidates-webkit',
     'personal-reading',

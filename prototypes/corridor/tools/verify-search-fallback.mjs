@@ -216,14 +216,14 @@ try {
     await page.locator('#sheet-close').click(); await page.locator('#review-start').click();
     let grades = 0;
     while (grades < 12 && !await page.locator('.review-summary').isVisible()) {
-      await page.locator('#declare-recalled').waitFor();
+      await page.locator('#reveal').waitFor();
       assert.equal(await page.locator('.review-front').innerText(), '原典');
-      await page.locator('#declare-recalled').click(); await page.locator('.grade.g-good').waitFor();
+      await page.locator('#reveal').click(); await page.locator('.grade.g-good').waitFor();
       assert.equal(await page.locator('.review-reading').innerText(), source.r);
       assert.equal(await page.locator('.review-sense-primary').innerText(), source.g);
       if (grades === 0) await capture('fallback-review-answer.png');
       await page.locator('.grade.g-good').click(); grades++;
-      await page.waitForFunction(() => document.querySelector('#declare-recalled') || document.querySelector('.review-summary'));
+      await page.waitForFunction(() => document.querySelector('#reveal') || document.querySelector('.review-summary'));
     }
     await page.locator('.review-summary').waitFor();
     const reviewed = await waitForAppRecord(page, (record) => record.revlog.length === grades);

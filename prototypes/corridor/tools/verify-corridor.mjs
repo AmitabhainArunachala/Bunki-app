@@ -33,6 +33,12 @@ const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 export const CORRIDOR_DIR = resolveCorridorSite();
 const REPO = resolve(TOOL_DIR, '..', '..', '..');
 const EVIDENCE_DIR = resolveCorridorEvidence();
+// The walk reads the same texts whatever order the shelf presents them in —
+// since 2026-09-28 the shelf leads with the newest news. "The first text" is
+// the index's own first row, addressed by id, never by shelf position.
+const SHELF_INDEX = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles/index.json'), 'utf8'));
+const shelfText = (id) => `.shelf-item[data-passage="${id}"]:not([data-recommendation])`;
+const FIRST_TEXT = shelfText(SHELF_INDEX.articles[0].id);
 
 const VIEWPORT = { width: 390, height: 844 };
 const MIN_TAP = 44; // the canon's own --tap, not what the app happened to ship
@@ -684,7 +690,7 @@ async function main() {
   // the raw instrument is one 詳細 tap away, not gone — and it must include
   // the live JLPT-lexicon row plus an HONEST row for the unmeasured NINJAL
   // pair (never a stale or faked number)
-  await page.locator('[data-details]').first().click();
+  await page.locator(`${FIRST_TEXT} [data-details]`).click();
   await page.waitForTimeout(200);
   const rawSignals = await page.locator('.shelf-item:not([data-recommendation]) .sig').count();
   const sigNames = await page.evaluate(
@@ -704,7 +710,7 @@ async function main() {
       ? ninjalRow === -1 || !/未測定|not measured/.test(sigValues[ninjalRow])
       : ninjalRow >= 0 && /未測定|not measured/.test(sigValues[ninjalRow]),
     ninjalRow >= 0 ? `${sigNames[ninjalRow]} → ${sigValues[ninjalRow]}` : 'no NINJAL row');
-  await page.locator('[data-details]').first().click();
+  await page.locator(`${FIRST_TEXT} [data-details]`).click();
   await page.waitForTimeout(150);
   await shoot(page, shotsDir, '01-arrive-shelf');
   report.steps.push({ step: 1, name: 'arrive', shot: '01-arrive-shelf.png' });
@@ -780,7 +786,7 @@ async function main() {
 
   // ------------------------------------------------------------ step 2 read
   console.log('\n— step 2 · read');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const readerText = await page.locator('#reader').innerText();
   check('the reader shows real Japanese', /[぀-ヿ一-鿌]/.test(readerText), `${readerText.length} chars rendered`);
@@ -911,7 +917,7 @@ async function main() {
 
   // the worst long-gloss word on the shelf must render its gloss WHOLE
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])', 2); // JR おおさか東線 — carries 沿線
+  await tap(page, shelfText('wikinews:12024')); // JR おおさか東線 — carries 沿線
   await settleReader(page);
   const enIdx = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
@@ -933,7 +939,7 @@ async function main() {
     check('grammar · even the longest gloss renders whole — never truncated', false, '沿線 not found in text 3');
   }
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await page.locator('#dials-toggle').click();
   await page.waitForTimeout(150);
@@ -1237,7 +1243,7 @@ async function main() {
   console.log('\n— step 6 · return without losing your place');
   await page.evaluate('window.scrollTo(0, 0)');
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await page.evaluate('window.scrollTo(0, 420)');
   await page.waitForTimeout(80);
@@ -1276,7 +1282,7 @@ async function main() {
     const sheetLoads = observeWordSheetLoads(page);
     try {
     await open(`?entry=shelf&cards=${mode}`);
-    await tap(page, '.shelf-item:not([data-recommendation])');
+    await tap(page, FIRST_TEXT);
     await settleReader(page);
     await holdWord(page, '#reader .tok.content', 5);
     await page.waitForSelector('#sheet');
@@ -1307,7 +1313,7 @@ async function main() {
   // B · difficulty presentation — behind 詳細 since v1.2, so open one card
   for (const mode of ['three', 'band']) {
     await open(`?entry=shelf&difficulty=${mode}`);
-    await page.locator('[data-details]').first().click();
+    await page.locator(`${FIRST_TEXT} [data-details]`).click();
     await page.waitForTimeout(200);
     const shown = await page.evaluate(`(() => ({
       sigs: document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig').length,
@@ -1383,7 +1389,7 @@ async function main() {
   // no longer floats over the reader — the reader typography samples need
   // their own probe on a real reading page
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const readerProbe = await page.evaluate(MEASURE_FN);
   const mergedText = new Map();
@@ -1514,7 +1520,7 @@ async function main() {
   // door's PRESENCE, its honest 仮の声 label, and the graceful no-voice
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await page.waitForSelector('#listen-toggle', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
@@ -1637,7 +1643,7 @@ async function main() {
 
   // the kanji page draws its stroke order
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet [data-kanjirow]');
@@ -1968,7 +1974,7 @@ async function main() {
 
   await page.fill('#search', '');
   await page.waitForTimeout(250);
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const particleCount = await page.locator('#reader .tok.particle').count();
   check('particles · the reader marks particle tokens as doors', particleCount >= 5,
@@ -1987,7 +1993,7 @@ async function main() {
   // ------------------------------ Phase A · the observation log (taps)
   console.log('\n— Phase A · reader taps land in the observation log');
   await open('?entry=shelf&dials=0,0,0'); // furigana hidden → the full ladder
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
@@ -2291,7 +2297,7 @@ async function main() {
 
   // capture scope: 語だけ · この文 · 段落 — the choice rides the card
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   await holdWord(page, '#reader .tok.content', 6);
   await page.waitForSelector('#sheet #take');
@@ -2329,7 +2335,7 @@ async function main() {
     return e;
   })()`));
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const bareBoot = await page.evaluate(`(() => ({
     visible: [...document.querySelectorAll('#reader rt')].filter((r) => !r.classList.contains('hidden-rt')).length,
@@ -2399,11 +2405,11 @@ async function main() {
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
-  await page.waitForSelector('#declare-recalled, .review-cloze', { timeout: 10000 });
+  await page.waitForSelector('#reveal, .review-cloze', { timeout: 10000 });
   let answerFace = { lines: 0, live: 0, word: '' };
   for (let cardN = 0; cardN < 6; cardN++) {
-    await page.waitForSelector('#declare-recalled', { timeout: 10000 });
-    await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+    await page.waitForSelector('#reveal', { timeout: 10000 });
+    await page.evaluate(`document.querySelector('#reveal')?.click()`);
     // ZEN-DOJO v2 (operator, 2026-08-20: the back decrowded): the word's
     // sentences wait one NAMED fold away — the probe opens it the way a
     // thumb would, then demands the same living tokens as ever
@@ -2576,7 +2582,7 @@ async function main() {
   // the reader's top-right door: quiet until a word is touched, then one
   // tap takes the current thing with the sentence it was met in
   await open('?entry=shelf');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await settleReader(page);
   const idleSeal = await page.evaluate(`(() => {
     const b = document.querySelector('#reader-take');
@@ -2812,8 +2818,8 @@ async function main() {
     `record.srs['word:学校'].last_review`,
   );
   await tap(page, '#review-start');
-  await page.waitForSelector('#declare-recalled');
-  await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+  await page.waitForSelector('#reveal');
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
   await page.waitForSelector('.grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
@@ -2862,14 +2868,14 @@ async function main() {
   await page.waitForSelector('#review-start');
   const boundedBtn = await page.locator('#review-start').textContent();
   await tap(page, '#review-start');
-  await page.waitForSelector('#declare-recalled');
+  await page.waitForSelector('#reveal');
   const session = await page.evaluate(`window.__KAIRO_SRS__.session()`);
   check('R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest',
     /28/.test(boundedBtn) && session.queue === 20 && session.deferred === 8,
     `button "${boundedBtn.trim()}" · frozen ${session.queue} · deferred ${session.deferred}`);
   for (let i = 0; i < 20; i++) {
-    await page.waitForSelector('#declare-recalled', { timeout: 8000 });
-    await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+    await page.waitForSelector('#reveal', { timeout: 8000 });
+    await page.evaluate(`document.querySelector('#reveal')?.click()`);
     await page.waitForSelector('.grade.g-easy', { timeout: 8000 });
     await page.evaluate(`document.querySelector('.grade.g-easy')?.click()`);
     await waitForAppRecord(page, (record) => record.revlog?.length === i + 1,
@@ -2920,13 +2926,13 @@ async function main() {
     consoleErrors.length === errsBeforeR2A,
     consoleErrors.slice(errsBeforeR2A).join(' | ') || 'clean');
 
-  // ------------------- R3-C · declared recall before reveal (ADR-002 T-06)
-  // The zen room's kernel law: revealing before declaring recall forces
-  // Again. Driven through the REAL room on a controlled three-card deck:
-  // (a) no bare reveal path exists; (b) まだ commits Again; (c) 思い出した
-  // opens four grades; (d) the declaration lands in the obslog; (e) a
-  // failed persist mid-grade moves nothing.
-  console.log('\n— R3-C · declared recall: the answer never precedes the declaration');
+  // ------------------- R3-C · Anki's turn-over (operator, 2026-09-28: "it should be at
+  // least more like anki AT A BARE MINIMUM"). Driven through the REAL room on a controlled
+  // three-card deck: (a) the front asks nothing but Show answer, under the three counts;
+  // (b) Space turns the card and four grades stand with their intervals; (c) the pressed
+  // grade commits as itself, Again included; (d) nothing is written by turning a card over;
+  // (e) a failed persist mid-grade moves nothing; undo is in plain sight.
+  console.log('\n— R3-C · Anki turn-over: Show answer, then four honest grades');
   const errsBeforeR3C = consoleErrors.length;
   await page.waitForTimeout(1400); // settle any pending observation debounce
   await restoreAppFixture(page, await page.evaluate(`(() => {
@@ -2948,64 +2954,64 @@ async function main() {
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
-  await page.waitForSelector('#declare-recalled', { timeout: 10000 });
-  // (a) no bare reveal: no #reveal button, and the card face itself is mute
+  await page.waitForSelector('#reveal', { timeout: 10000 });
+  // (a) the front asks nothing but Show answer, under the three counts; the face itself is mute
   const frontState = await page.evaluate(`(() => ({
     reveal: !!document.querySelector('#reveal'),
-    notyet: !!document.querySelector('#declare-notyet'),
-    recalled: !!document.querySelector('#declare-recalled'),
+    declarations: document.querySelectorAll('[id^="declare-"]').length,
+    counts: [...document.querySelectorAll('#review-counts span')].map((c) => c.textContent),
   }))()`);
   await page.evaluate(`document.querySelector('.review-face')?.click()`);
   await page.waitForTimeout(250);
   const afterFaceTap = await page.evaluate(`(() => ({
     grades: document.querySelectorAll('.grade').length,
     reading: !!document.querySelector('.review-reading'),
-    stillAsking: !!document.querySelector('#declare-recalled'),
+    stillAsking: !!document.querySelector('#reveal'),
   }))()`);
-  check('R3-C · the zen room offers no bare reveal — only the two declarations',
-    !frontState.reveal && frontState.notyet && frontState.recalled,
+  check("R3-C · Anki's front: one Show answer, no declaration, the new · learning · due counts above",
+    frontState.reveal && frontState.declarations === 0 && JSON.stringify(frontState.counts) === JSON.stringify(['0', '0', '3']),
     JSON.stringify(frontState));
-  check('R3-C · a tap on the card itself turns nothing over before a declaration',
+  check('R3-C · a tap on the card itself turns nothing over',
     afterFaceTap.grades === 0 && !afterFaceTap.reading && afterFaceTap.stillAsking,
     JSON.stringify(afterFaceTap));
-  // (c) 思い出した → the answer face with all four honest grades
-  await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
-  await page.waitForSelector('.grade-row[data-declared="recalled"]', { timeout: 8000 });
+  // (b) Space turns the card: the answer face with all four grades, each naming its interval
+  await page.keyboard.press('Space');
+  await page.waitForSelector('.grade-row .grade.g-good', { timeout: 8000 });
   const recalledRow = await page.evaluate(`(() => ({
     grades: [...document.querySelectorAll('.grade')].map((g) => (g.className.match(/g-(again|hard|good|easy)/) || [])[1]),
+    whens: [...document.querySelectorAll('.grade .g-when')].map((w) => w.textContent.trim()),
+    declared: document.querySelector('.grade-row')?.dataset.declared ?? null,
     reading: !!document.querySelector('.review-reading') || !!document.querySelector('.review-sense'),
   }))()`);
-  check('R3-C · 思い出した turns the card with all four grades open',
+  check('R3-C · Space shows the answer with all four grades open, each naming its interval',
     recalledRow.grades.length === 4 &&
       ['again', 'hard', 'good', 'easy'].every((g) => recalledRow.grades.includes(g)) &&
-      recalledRow.reading,
+      recalledRow.whens.length === 4 && recalledRow.whens.every(Boolean) &&
+      recalledRow.declared === null && recalledRow.reading,
     JSON.stringify(recalledRow));
-  await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+  // (c) the 3 key presses Good
+  await page.keyboard.press('3');
   await page.waitForTimeout(250);
   const goodCommit = await evaluateAppRecord(page, `(() => {
     const e = record;
     const row = (e.revlog || [])[(e.revlog || []).length - 1] || [];
     return { key: row[1], rating: row[2] };
   })()`);
-  check('R3-C · after 思い出した the pressed grade commits as itself',
+  check('R3-C · the 3 key commits Good as itself',
     goodCommit.key === 'word:学校' && goodCommit.rating === 3, JSON.stringify(goodCommit));
-  // card 2 · (b) まだ → the answer opens for study, Again is the one seal
-  await page.waitForSelector('#declare-notyet', { timeout: 8000 });
-  await page.evaluate(`document.querySelector('#declare-notyet')?.click()`);
-  await page.waitForSelector('.grade-row[data-declared="notyet"]', { timeout: 8000 });
-  await shoot(page, shotsDir, '22-r3c-notyet-again-only');
-  const notyetRow = await page.evaluate(`(() => ({
+  // card 2 · Show answer by tap: the same four grades, the undo of card 1 in plain sight
+  await page.waitForSelector('#reveal', { timeout: 8000 });
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade-row .grade.g-again', { timeout: 8000 });
+  await shoot(page, shotsDir, '22-r3c-anki-answer-bar');
+  const answerRow = await page.evaluate(`(() => ({
     grades: document.querySelectorAll('.grade').length,
-    again: !!document.querySelector('.grade.g-again'),
-    good: !!document.querySelector('.grade.g-good'),
-    hard: !!document.querySelector('.grade.g-hard'),
-    easy: !!document.querySelector('.grade.g-easy'),
+    undo: !!document.querySelector('.anki-undo-slot .review-undo'),
     reading: !!document.querySelector('.review-reading') || !!document.querySelector('.review-sense'),
   }))()`);
-  check('R3-C · まだ opens the back for study with Again as the only seal',
-    notyetRow.grades === 1 && notyetRow.again && !notyetRow.good && !notyetRow.hard &&
-      !notyetRow.easy && notyetRow.reading,
-    JSON.stringify(notyetRow));
+  check('R3-C · Show answer opens four grades, and undo stands in plain sight',
+    answerRow.grades === 4 && answerRow.undo && answerRow.reading,
+    JSON.stringify(answerRow));
   // (e) a failed persist mid-grade leaves session and store consistent. Since D3 (ef5c06ad) a window that cannot
   // write shuts the seals and states why inline, between the card and its shut grades, with a draft-safe reload; the one-carrier rule
   // (6c6a08da) then hides the fixed banner, which would repeat the same text over the room's title. The complete
@@ -3062,15 +3068,15 @@ async function main() {
   check('R3-C · the failure reached an actual native host-command write', gradeFault.fired === 1,
     JSON.stringify(gradeFault));
   // A protected record requires a reload; the next explicit sitting presents
-  // the same ungraded card and asks for its declaration again.
+  // the same ungraded card face down again.
   await open('?entry=shelf');
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
-  await page.waitForSelector('#declare-notyet');
-  await page.locator('#declare-notyet').click();
-  await page.waitForSelector('.grade-row[data-declared="notyet"]');
-  // (b) …and the committed grade is Again regardless of any later tap
+  await page.waitForSelector('#reveal');
+  await page.locator('#reveal').click();
+  await page.waitForSelector('.grade-row .grade.g-again');
+  // (c) Again is the miss, and commits as itself
   await page.evaluate(`document.querySelector('.grade.g-again')?.click()`);
   await waitForAppRecord(page, (record) => record.revlog?.length === revlogBefore + 1,
     { description: 'explicit retry of the failed grade after reload' });
@@ -3079,14 +3085,13 @@ async function main() {
     const row = e.revlog[e.revlog.length - 1];
     return { key: row[1], rating: row[2], state: e.srs['word:先生'].state };
   })()`);
-  check('R3-C · まだ commits Again — the schedule records the declaration, not a wish',
+  check('R3-C · Again commits Again — the miss relearns',
     againCommit.key === 'word:先生' && againCommit.rating === 1 && againCommit.state === 3,
     JSON.stringify(againCommit));
-  // card 3 stands ready (the Again learning step ripens later); undo takes
-  // the まだ grade back durably and returns to the UNDECLARED front face
-  await page.waitForSelector('#declare-recalled', { timeout: 8000 });
-  await tap(page, '#zen-more');
-  await page.waitForSelector('.review-undo', { timeout: 8000 });
+  // the next card stands face down; undo — in plain sight, no … needed — takes the
+  // Again back durably and returns to the front face
+  await page.waitForSelector('#reveal', { timeout: 8000 });
+  await page.waitForSelector('.anki-undo-slot .review-undo', { timeout: 8000 });
   await page.evaluate(`document.querySelector('.review-undo')?.click()`);
   await page.waitForTimeout(300);
   const undoneR3C = await evaluateAppRecord(page, `(() => {
@@ -3096,23 +3101,22 @@ async function main() {
       state: e.srs['word:先生'].state,
       reps: e.srs['word:先生'].reps,
       revocation: last[1] === 'word:先生' && last[2] === 0,
-      asking: !!document.querySelector('#declare-recalled') && !document.querySelector('.grade'),
+      asking: !!document.querySelector('#reveal') && !document.querySelector('.grade'),
     };
   })()`);
-  check('R3-C · undo restores the card, files a revocation, and asks the question afresh',
+  check('R3-C · undo restores the card, files a revocation, and shows the front afresh',
     undoneR3C.state === 2 && undoneR3C.reps === 3 && undoneR3C.revocation && undoneR3C.asking,
     JSON.stringify(undoneR3C));
-  // (d) both declarations stand in the observation ledger as reveal rows
+  // (d) turning a card over declares nothing, so the observation ledger holds no reveal rows
   await page.waitForTimeout(1400); // let any debounced observation land
   const revealRows = await evaluateAppRecord(page, `(() => {
     const e = record;
     return (e.obslog || []).filter((r) => r[1] === 'reveal').map((r) => [r[2], r[3]]);
   })()`);
-  check('R3-C · the declarations land in the obslog as [t,reveal,key,1|0] rows',
-    revealRows.length >= 2 &&
-      JSON.stringify(revealRows.slice(0, 2)) === JSON.stringify([['word:学校', 1], ['word:先生', 0]]),
+  check('R3-C · Show answer writes nothing — no reveal rows in the obslog',
+    revealRows.length === 0,
     JSON.stringify(revealRows));
-  check('R3-C · the declared-recall probes leave no console errors',
+  check('R3-C · the turn-over probes leave no console errors',
     consoleErrors.length === errsBeforeR3C,
     consoleErrors.slice(errsBeforeR3C).join(' | ') || 'clean');
 
@@ -3543,9 +3547,9 @@ async function main() {
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
   // R3-C landed the declared-recall gate: the reveal rides 思い出した now
-  await page.waitForSelector('#declare-recalled');
-  await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
-  await page.waitForSelector('.grade-row[data-declared="recalled"] .grade.g-good');
+  await page.waitForSelector('#reveal');
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade-row .grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
   const gradedR3D = await evaluateAppRecord(page, `(() => {
@@ -3732,7 +3736,7 @@ async function main() {
   console.log('\n— C1 finding · the sentence page reaches its article');
   await open('?entry=shelf');
   await page.waitForSelector('.shelf-item:not([data-recommendation])');
-  await tap(page, '.shelf-item:not([data-recommendation])');
+  await tap(page, FIRST_TEXT);
   await page.waitForSelector('#reader .tok.content');
   const sentHome = await page.evaluate(`(() => {
     const tok = document.querySelector('#reader .tok.content');
@@ -3790,8 +3794,8 @@ async function main() {
   await page.waitForSelector('.review-front', { timeout: 20000 });
   {
     const e3Front = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
-    await page.waitForSelector('#reveal, #declare-recalled', { timeout: 8000 });
-    await page.evaluate(`(document.querySelector('#reveal') || document.querySelector('#declare-recalled'))?.click()`);
+    await page.waitForSelector('#reveal', { timeout: 8000 });
+    await page.evaluate(`document.querySelector('#reveal')?.click()`);
     await page.waitForSelector('.grade-row', { timeout: 8000 });
     const practiceRow = await page.evaluate(
       `!!document.querySelector('.grade-row[data-practice]')`,

@@ -3,6 +3,27 @@
 import { encodeLocalJson } from './modules/record-core.mjs';
 const sha256 = async bytes => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))]
   .map(value => value.toString(16).padStart(2, '0')).join('');
+// A separately labelled admission class: original written forms kept only where independent
+// verifier model families agreed blind. The bank verifier keeps these equal to
+// tools/assessment/machine-checked-class.mjs.
+export const MACHINE_CHECK_ROUTE = 'machine-checked-written/1';
+export const MACHINE_CHECK_POLICY = 'bunki-machine-check/1';
+export const MACHINE_CHECK_LABEL = "検収前 · machine-checked, awaiting John's review";
+export function machineCheckedEntry(entry) {
+  return entry?.publicationRoute === MACHINE_CHECK_ROUTE && entry.mode === 'written' &&
+    entry.review?.status === 'machine-checked' && entry.review?.label === MACHINE_CHECK_LABEL &&
+    entry.editorialAtStart?.status === 'ai-reviewed-practice' &&
+    entry.editorialAtStart?.policyVersion === MACHINE_CHECK_POLICY &&
+    Array.isArray(entry.mediaAssets) && entry.mediaAssets.length === 0;
+}
+export const machineCheckedEditorial = editorial => editorial?.status === 'ai-reviewed-practice' &&
+  editorial.policyVersion === MACHINE_CHECK_POLICY;
+/** An entry the learner may start: host-reviewed exactly as before, or the machine-checked class. */
+export function assessmentEntryAdmitted(entry) {
+  if (!entry?.availability?.ready || !entry.editorialAtStart || entry.editorialAtStart.status === 'unreviewed') return false;
+  if (entry.review?.status === 'ai-reviewed') return entry.publicationRoute !== MACHINE_CHECK_ROUTE;
+  return machineCheckedEntry(entry);
+}
 export function assessmentAssetPath(path) {
   if (typeof path !== 'string') throw new TypeError('assessment-asset-path');
   if (!path.startsWith('data/assessment/')) path = `data/assessment/${path}`;
@@ -26,10 +47,10 @@ export function createAssessmentDelivery({ baseUrl, fetchAsset = fetch, cacheSto
     return response;
   }
   async function prepare(entry, validateForm) {
-    if (!entry.availability?.ready || entry.review?.status !== 'ai-reviewed' ||
-        !entry.formPath || !entry.deliveryPath || !/^[a-f0-9]{64}$/u.test(entry.deliverySha256 || '') ||
-        entry.editorialAtStart?.status === 'unreviewed')
+    if (!assessmentEntryAdmitted(entry) ||
+        !entry.formPath || !entry.deliveryPath || !/^[a-f0-9]{64}$/u.test(entry.deliverySha256 || ''))
       throw new Error('assessment-not-admitted');
+    const machineChecked = machineCheckedEntry(entry);
     const cache = await openCache();
     const formResponse = await responseFor(entry.formPath, cache);
     let form;
@@ -46,6 +67,11 @@ export function createAssessmentDelivery({ baseUrl, fetchAsset = fetch, cacheSto
     if (encodeLocalJson(delivery).sha256 !== entry.deliverySha256 ||
         delivery.schema !== 'kairo-assessment-bank-delivery/1' || !sameRef(delivery.form, form, 'form') ||
         !Array.isArray(delivery.assets) || !Array.isArray(delivery.units)) throw new Error('assessment-delivery-changed');
+    // A machine-checked form is strictly media-free and names its per-item provenance.
+    if (machineChecked && (delivery.assets.length || delivery.units.length || form.media.length ||
+        !Array.isArray(delivery.itemChecks) || delivery.itemChecks.length !== form.items.length ||
+        delivery.itemChecks.some((row, index) => row?.itemId !== form.items[index].id)))
+      throw new Error('assessment-delivery-changed');
     const unitIds = new Set(), unitMedia = new Set();
     for (const unit of delivery.units) {
       const media = form.media.find(row => sameRef(unit.media, row, 'media') && row.kind === 'audio');

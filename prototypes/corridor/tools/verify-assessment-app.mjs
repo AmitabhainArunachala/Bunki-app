@@ -614,9 +614,9 @@ try {
         });
         assert.equal(before.context.prompt, item.prompt); assert.equal(before.context.rationale, item.rationale);
         assert.equal(before.deepWord.m[0], 'Synthetic dictionary sense differs from test context');
-        await page.locator('#declare-notyet').waitFor();
+        await page.locator('#reveal').waitFor();
         assert.equal(await page.locator('.assessment-review-context').count(), 0, 'No assessed explanation before recall declaration');
-        await page.locator('#declare-notyet').click(); await page.locator('.assessment-review-context').waitFor();
+        await page.locator('#reveal').click(); await page.locator('.assessment-review-context').waitFor();
         assert.match(await page.locator('.assessment-review-context').innerText(), /From your mock test/u);
         assert.equal(await page.locator('.assessment-review-rationale').textContent(), item.rationale);
         const after = await page.evaluate(() => ({ srs: S.srs, revlog: S.revlog }));
@@ -660,7 +660,7 @@ try {
         for (const card of cards) assert.deepEqual(card, { t: card.t, id: card.id,
           local: source === 'local', received: source === 'received', assisted: true, origin: source });
         await page.evaluate(() => startReview([{ t: 'word', id: 'assessment-fixture-word' }]));
-        await page.locator('#declare-notyet').click(); await page.locator('.assessment-review-context').waitFor();
+        await page.locator('#reveal').click(); await page.locator('.assessment-review-context').waitFor();
         const word = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
         await page.evaluate(id => startReview([{ t: 'sentence', id }]), cards.find(card => card.t === 'sentence').id);
         await page.locator('#sentence-recall-reveal').click(); await page.locator('.grade.g-again').waitFor();
@@ -727,8 +727,8 @@ try {
         }, word.id);
         assert.deepEqual(review, { eligible: true, view: 'review', queue: [{ t: 'word', id: word.id }] },
           'the explicitly started fixture enters the scoped review');
-        await page.locator('#declare-notyet').waitFor({ state: 'visible' });
-        await page.locator('#declare-notyet').click();
+        await page.locator('#reveal').waitFor({ state: 'visible' });
+        await page.locator('#reveal').click();
         await page.locator('#review-source-return').click();
         await page.waitForFunction(() => S.view === 'mock', null, { timeout: 5_000 });
         const two = await landed();

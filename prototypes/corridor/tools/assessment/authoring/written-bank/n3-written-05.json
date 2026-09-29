@@ -1,0 +1,387 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N3",
+  "number": 5,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　わたしの町に、小さな本屋があります。最近は、インターネットで本を買う人が増えたため、町の本屋は少なくなっています。（１）、この本屋には、いつもたくさんのお客さんが来ます。\n　その理由の一つは、店主が毎月開いている「読書会」です。読書会では、参加者が同じ本を読んできて、感想を話し合います。一人で読んだときには気づかなかったことに、ほかの人の話を聞いて（２）ことも多いそうです。\n　わたしも先月、初めて参加してみました。本の話をするだけでなく、町の人と知り合うこともできて、とても楽しい時間でした。本屋は、ただ本を売る場所ではなく、人と人をつなぐ場所にも（３）と思いました。",
+    "s1": "みなみ駅をご利用のお客様へ\n　十一月一日から、平日の朝の電車の時刻が変わります。七時台の電車は、今までの一時間に六本から八本に増えます。そのかわり、昼の十一時から十四時までの電車は、一時間に四本から三本に減ります。なお、土曜日と日曜日の時刻は変わりません。",
+    "s2": "　電車の中で、ほとんどの人がスマホを見ている。わたしも以前はそうだったが、最近は電車に乗ったら、スマホをかばんにしまうことにしている。窓の外の景色を見たり、何も考えずにぼんやりしたりする時間が、頭を休ませてくれると気づいたからだ。短い時間でも画面から目を離すと、気持ちが楽になる。",
+    "s3": "ひかり町　秋のフリーマーケット　出店する方を募集します\n日時：十月二十日（日）午前十時〜午後三時\n場所：ひかり公園\n出店料：一区画　千円（町内に住んでいる方は五百円）\n申し込み：十月十日までに、町役場の地域課へ。先着五十区画です。\n※食べ物の販売はできません。",
+    "m1": "　去年の夏、わたしは初めて町の夏祭りでボランティアをした。担当は、会場のごみを分ける仕事だった。友だちはみんな屋台を回って楽しんでいたので、正直に言うと、最初はあまり気が進まなかった。\n　ところが、実際にやってみると、思っていたよりずっと大変だった。燃えるごみとプラスチックを分けずに捨てる人が多く、何度も袋の中を分け直さなければならなかった。それでも、一緒に作業をしていた近所のおばさんが「あなたたちのおかげで、会場がきれいになるわ」と声をかけてくれて、うれしくなった。\n　祭りが終わったあと、会場にはほとんどごみが残っていなかった。楽しむ側ではなく、祭りを支える側に立ったことで、多くの人の見えない努力によって祭りが成り立っていることに気づいた。今年も、ボランティアに参加するつもりだ。",
+    "l1": "　最近は、スマホやタブレットで本を読む人が増えている。電子書籍は、何百冊もの本を一つの機械に入れて持ち歩けるし、夜中でもすぐに買うことができる。字の大きさを変えられるので、目が疲れにくいという人もいる。わたしも、通勤の電車の中では、スマホで小説を読むことが多い。\n　しかし、家でゆっくり読むときは、今でも紙の本を選ぶ。紙の本は、ページをめくる手の感覚で、自分がどのくらい読み進めたのかが自然に分かる。また、気に入った本を棚に並べておくと、ふとしたときに手に取って、読み返したくなる。電子書籍では、買った本が画面の中に隠れてしまい、読んだことさえ忘れてしまうことがある。\n　ある調査によると、紙で読んだ場合のほうが、内容をよく覚えているという結果も出ているそうだ。ただ、これは読む人や本の種類によっても違うだろう。\n　大切なのは、どちらか一つを選ぶことではない。場所や目的に合わせて、紙の本と電子書籍を上手に使い分ければいいのだと思う。",
+    "i1": "さくら市コミュニティバス　料金のご案内\n\n【一回の料金】\n・大人（中学生以上）：200円\n・子ども（小学生）：100円\n・小学生未満：無料（大人一人につき二人まで）\n\n【一日乗車券】\n・大人：500円　子ども：250円\n※一日に何回でも乗れます。バスの中で運転手から買えます。\n\n【定期券（一か月）】\n・大人：6,000円　学生（中学生・高校生）：4,000円\n※定期券は、さくら駅前の案内所で買えます。学生の方は学生証が必要です。\n\n【その他】\n・七十歳以上の方は、シルバーカードを見せると、一回の料金が100円になります。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n事故のため、電車の【乗客】は駅で一時間待たされた。",
+      "options": ["じょうかく", "じょきゃく", "のりきゃく", "じょうきゃく"],
+      "answer": 3,
+      "rationale": "乗客は「じょうきゃく」と読む。電車やバスに乗っている客のことだ。\nThe word 乗客 (passenger) is read jōkyaku.",
+      "target": "乗客"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの小説は、十年前に【出版】された。",
+      "options": ["しゅっぱん", "しゅつはん", "しゅっばん", "しゅうはん"],
+      "answer": 0,
+      "rationale": "出版は「しゅっぱん」と読む。本などを作って世の中に出すことだ。\nThe word 出版 (publication) is read shuppan.",
+      "target": "出版"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n父は毎日、電車で会社に【通勤】している。",
+      "options": ["つうぎん", "つうきん", "つきん", "とおきん"],
+      "answer": 1,
+      "rationale": "通勤は「つうきん」と読む。仕事のために会社へ通うことだ。\nThe word 通勤 (commuting to work) is read tsūkin.",
+      "target": "通勤"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n新しいスマホには、便利な【機能】がたくさんついている。",
+      "options": ["ぎのう", "きんのう", "きのう", "きの"],
+      "answer": 2,
+      "rationale": "機能は「きのう」と読む。機械などが持っている働きのことだ。\nThe word 機能 (function, feature) is read kinō.",
+      "target": "機能"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n雨のため、今日の花火大会は【ちゅうし】になった。",
+      "options": ["中上", "中止", "中正", "注止"],
+      "answer": 1,
+      "rationale": "予定していたことをやめることは「中止」と書く。\nCalling off a planned event is written 中止.",
+      "target": "中止"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n連休の初日は、高速道路がひどく【じゅうたい】した。",
+      "options": ["重体", "渋帯", "渋滞", "汁滞"],
+      "answer": 2,
+      "rationale": "車が込んで進まないことは「渋滞」と書く。「重体」は病気やけがが重いことで、意味が違う。\nA traffic jam is written 渋滞; 重体 means being in critical condition.",
+      "target": "渋滞"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n工事のため、バスの道順が一部【へんこう】された。",
+      "options": ["変更", "変講", "返更", "偏更"],
+      "answer": 0,
+      "rationale": "決まっていたことを変えることは「変更」と書く。\nChanging something already decided is written 変更.",
+      "target": "変更"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n駅前の本屋は、夜十時まで（　）しているので便利だ。",
+      "options": ["経営", "営業", "開始", "通行"],
+      "answer": 1,
+      "rationale": "店が開いて仕事をしていることを「営業」という。\nWhen a shop is open for business, it is 営業 (in business).",
+      "target": "営業"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\nこのスマホは（　）が簡単なので、祖母でも使える。",
+      "options": ["作業", "行動", "活動", "操作"],
+      "answer": 3,
+      "rationale": "機械を動かして使うことを「操作」という。\nThe way a device is operated is called 操作 (operation).",
+      "target": "操作"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n祭りの日は、ふだん静かな商店街も（　）にあふれていた。",
+      "options": ["活気", "熱心", "景気", "勇気"],
+      "answer": 0,
+      "rationale": "人が多く、にぎやかで元気な様子を「活気」といい、「活気にあふれる」とよく言う。\nA lively, bustling atmosphere is 活気, as in 活気にあふれる.",
+      "target": "活気"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\nゲームをしていたら、スマホの画面が【突然】消えた。",
+      "options": ["ゆっくり", "急に", "少しずつ", "何度も"],
+      "answer": 1,
+      "rationale": "「突然」は、予想していないときに急に起こる様子を表す。\nThe word 突然 means suddenly, like 急に.",
+      "target": "突然"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n初めて出店したフリーマーケットは、【案外】うまくいった。",
+      "options": ["やはり", "予定どおり", "思ったより", "何度も"],
+      "answer": 2,
+      "rationale": "「案外」は、予想と違って、という意味で「思ったより」に近い。\nThe word 案外 means unexpectedly, close to 思ったより (more than expected).",
+      "target": "案外"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【乗り換える】",
+      "options": [
+        "暑くなったので、半そでのシャツに乗り換えた。",
+        "部屋の電球を、新しいものに乗り換えた。",
+        "読み終わった本を、友だちの本と乗り換えた。",
+        "東京駅で、新幹線に乗り換えた。"
+      ],
+      "answer": 3,
+      "rationale": "「乗り換える」は、ある乗り物から別の乗り物に移って乗ることに使う。\nThe verb 乗り換える means to change trains or other vehicles.",
+      "target": "乗り換える"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【解決】",
+      "options": [
+        "話し合いをして、問題を解決することができた。",
+        "本屋で、読みたかった本を解決した。",
+        "電車が遅れたので、会社に解決の電話をした。",
+        "祭りの準備が、夜遅くにようやく解決した。"
+      ],
+      "answer": 0,
+      "rationale": "「解決」は、問題や事件がうまく片付くことに使う。\nThe word 解決 means solving a problem or settling a matter.",
+      "target": "解決"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n電車は、バス（　）料金は高いが、時間は正確だ。",
+      "options": ["にとって", "によって", "に比べて", "について"],
+      "answer": 2,
+      "rationale": "二つのものを比較するときは「〜に比べて」を使う。\nThe pattern に比べて compares two things: compared with the bus.",
+      "subject": "grammar:nikurabete"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n（　）雨が降っても、祭りは予定どおり行われる。",
+      "options": ["まるで", "たとえ", "きっと", "ぜひ"],
+      "answer": 1,
+      "rationale": "「たとえ〜ても」は、もしそうなっても結果は変わらないことを表す。\nThe pattern たとえ〜ても means even if: even if it rains, the festival goes ahead.",
+      "subject": "grammar:tatoetemo"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nあの本屋、何時まで開いていた（　）。前に聞いたけど、忘れちゃった。",
+      "options": ["わけだ", "ものだ", "っけ", "ことだ"],
+      "answer": 2,
+      "rationale": "「〜っけ」は、忘れたことを思い出そうとして確かめるときに使う。\nThe pattern っけ is used when trying to recall something one has forgotten.",
+      "subject": "grammar:kke"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nスマホを持っていても、いつも使っている（　）。",
+      "options": ["ことにする", "ようになる", "ところだ", "わけではない"],
+      "answer": 3,
+      "rationale": "「〜わけではない」は、全部がそうだとは言えない、という部分的な否定を表す。\nThe pattern わけではない is a partial denial: it does not mean one is always using it.",
+      "subject": "grammar:n3-wake-dewa-nai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの本屋には、子ども（　）の本がたくさんある。",
+      "options": ["っぽい", "向け", "だらけ", "気味"],
+      "answer": 1,
+      "rationale": "「〜向け」は、その人たちのために作られたものであることを表す。\nThe pattern 向け means intended for: books made for children.",
+      "subject": "grammar:muke-muki"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの町に住む若い人の数は、減る（　）だ。",
+      "options": ["つもり", "まま", "一方", "うち"],
+      "answer": 2,
+      "rationale": "「〜一方だ」は、ある方向への変化がどんどん進むことを表す。\nThe pattern 一方だ means a change keeps going in one direction: the number keeps falling.",
+      "subject": "grammar:ippouda"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nスマホで　＿＿＿　＿＿＿　＿★＿　＿＿＿　便利になった。",
+      "options": ["ようになって", "調べられる", "時刻を", "電車の"],
+      "answer": 1,
+      "rationale": "正しい順番は「電車の　時刻を　調べられる　ようになって」で、★には「調べられる」が入る。\nThe order is 電車の 時刻を 調べられる ようになって (now I can check train times), so 調べられる fills the star.",
+      "subject": "grammar:n3-you-ni"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの辺りのバスは　＿＿＿　＿＿＿　＿★＿　＿＿＿　ので、不便だ。",
+      "options": ["来ない", "一時間に", "しか", "一本"],
+      "answer": 2,
+      "rationale": "正しい順番は「一時間に　一本　しか　来ない」で、★には「しか」が入る。\nThe order is 一時間に 一本 しか 来ない (only one bus an hour), so しか fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": ["それで", "そのため", "それでも", "すると"],
+      "answer": 2,
+      "rationale": "町の本屋が減っているのに、この本屋には客が多いという逆の内容が続くので「それでも」が合う。\nBookstores are declining, yet this one is busy, so the contrast word それでも (even so) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": ["気づかせる", "気づく", "気づかない", "気づかれる"],
+      "answer": 1,
+      "rationale": "一人では気づかなかったことに、話を聞いて自分で気づくという意味なので「気づく」が合う。\nReaders notice things they missed alone, so the plain verb 気づく (to notice) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": ["させる", "される", "なれない", "なれる"],
+      "answer": 3,
+      "rationale": "本屋が人と人をつなぐ場所にもなることができる、という意味なので「なれる」が合う。\nThe writer means a bookstore can also become a place that connects people, so なれる fits."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "十一月一日から、電車の時刻はどう変わるか。",
+      "options": [
+        "平日の昼の電車が増える。",
+        "土曜日の朝の電車が増える。",
+        "平日の朝七時台の電車が増える。",
+        "平日の朝の電車が減る。"
+      ],
+      "answer": 2,
+      "rationale": "平日の七時台の電車が一時間に六本から八本に増えると書いてある。\nOn weekdays the 7 o'clock hour goes from six trains to eight."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "筆者が電車の中でスマホをしまうことにしたのは、なぜか。",
+      "options": [
+        "周りの人の迷惑になると思ったから",
+        "スマホの電池が早くなくなるから",
+        "窓の外の景色を写真に撮りたいから",
+        "画面を見ない時間が、頭を休ませてくれると気づいたから"
+      ],
+      "answer": 3,
+      "rationale": "景色を見たりぼんやりしたりする時間が頭を休ませてくれると気づいたから、と書いてある。\nThe writer realized that time away from the screen rests the mind."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "このお知らせの内容と合っているものはどれか。",
+      "options": [
+        "町内に住んでいる人は、半額で出店できる。",
+        "食べ物を売ることもできる。",
+        "十月二十日までに申し込めばいい。",
+        "申し込んだ人は、全員出店できる。"
+      ],
+      "answer": 0,
+      "rationale": "出店料は千円だが、町内に住んでいる人は五百円なので、半額で出店できる。\nThe fee is 1,000 yen, but town residents pay 500 yen, which is half."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "ボランティアを始める前、「わたし」はどんな気持ちだったか。",
+      "options": [
+        "ごみを分けるのが得意なので、楽しみだった。",
+        "近所の人と話せるので、うれしかった。",
+        "友だちが屋台を回って楽しんでいるので、あまりやりたくなかった。",
+        "大変な仕事だと聞いて、心配だった。"
+      ],
+      "answer": 2,
+      "rationale": "友だちは屋台を回って楽しんでいたので、最初はあまり気が進まなかったと書いてある。\nWith friends enjoying the stalls, the writer was not keen at first."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "ごみを分ける作業が大変だったのは、なぜか。",
+      "options": [
+        "ごみを分けずに捨てる人が多かったから",
+        "一緒に作業をする人がいなかったから",
+        "会場が広くて、ごみ箱が少なかったから",
+        "屋台が多くて、食べ物のごみがたくさん出たから"
+      ],
+      "answer": 0,
+      "rationale": "燃えるごみとプラスチックを分けずに捨てる人が多く、何度も分け直したとある。\nMany people threw burnable trash and plastic together, so bags had to be re-sorted."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "祭りのボランティアを通して、「わたし」が気づいたことは何か。",
+      "options": [
+        "祭りは、支える側より楽しむ側のほうがいい。",
+        "祭りは、多くの人の見えない努力によって成り立っている。",
+        "ごみを分ける作業は、一人でしたほうが早い。",
+        "祭りの会場は、いつもきれいに使われている。"
+      ],
+      "answer": 1,
+      "rationale": "支える側に立ったことで、多くの人の見えない努力で祭りが成り立っていることに気づいたとある。\nBy helping behind the scenes, the writer saw that festivals rest on many people's unseen work."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "筆者が、家で読むときに紙の本を選ぶ理由として合っているものはどれか。",
+      "options": [
+        "字の大きさを変えられるから",
+        "どのくらい読んだかが、手の感覚で分かるから",
+        "夜中でもすぐに買えるから",
+        "何百冊も持ち歩けるから"
+      ],
+      "answer": 1,
+      "rationale": "紙の本はページをめくる手の感覚で、どのくらい読み進めたかが分かると書いてある。ほかは電子書籍のよい点だ。\nWith paper, you can feel how far you have read; the other choices describe e-books."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "筆者の考えに合うものはどれか。",
+      "options": [
+        "内容をよく覚えられるので、紙の本だけを読むべきだ。",
+        "電子書籍は目が疲れにくいので、紙の本よりすぐれている。",
+        "場所や目的によって、紙の本と電子書籍を使い分ければいい。",
+        "本は、できるだけ電車の中で読んだほうがいい。"
+      ],
+      "answer": 2,
+      "rationale": "最後の段落で、どちらか一つを選ぶのではなく、場所や目的に合わせて使い分ければいいと述べている。\nThe writer concludes that one should use paper and e-books according to place and purpose."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "大人一人と小学生二人が、一日にバスに三回乗る。いちばん安くなるように払うと、全部でいくらか。",
+      "options": ["800円", "1,000円", "1,100円", "1,200円"],
+      "answer": 1,
+      "rationale": "三回乗ると、大人は一日乗車券500円が600円より安く、子どもも250円が300円より安い。500＋250×2で1,000円だ。\nDay passes are cheaper for all three riders: 500 yen plus 250 yen for each child, 1,000 yen in total."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "高校生の林さんは、一か月の定期券を買いたい。林さんは、どうすればいいか。",
+      "options": [
+        "バスの中で、運転手から4,000円の定期券を買う。",
+        "学生証を持って、さくら駅前の案内所で4,000円の定期券を買う。",
+        "学生証を持って、さくら駅前の案内所で6,000円の定期券を買う。",
+        "バスの中で学生証を見せて、一日乗車券を買う。"
+      ],
+      "answer": 1,
+      "rationale": "定期券はさくら駅前の案内所で買え、学生は学生証を見せて4,000円で買える。\nPasses are sold at the Sakura Station information desk; students show ID and pay 4,000 yen."
+    }
+  ]
+}

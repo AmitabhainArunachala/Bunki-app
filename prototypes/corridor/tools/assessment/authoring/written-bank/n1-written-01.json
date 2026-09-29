@@ -1,0 +1,587 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N1",
+  "number": 1,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　翻訳の仕事を始めて二十年になる。この間、何度も思い知らされてきたのは、言葉を置き換えるだけでは文章は伝わらないということだ。（１）、日本語の「よろしくお願いします」には、英語に一語で訳せる表現がない。場面によって、期待を表すこともあれば、感謝を込めることもあり、時にはあいさつ以上の意味を持たないこともある。訳者はそのたびに、書き手が何を伝えたかったのかを考え、読み手の文化に合った言い方を探す（２）。\n　もっとも、読みやすさばかりを優先すると、原文の持つ独特の響きが失われてしまう。異文化の手ざわりをあえて残すことで、読者が新しい見方に出会うこともあるからだ。どこまで訳し、どこから原文に委ねるか。その線引き（３）、翻訳の難しさであり、面白さでもあるのだと思う。",
+    "s1": "　「寝だめ」という言葉がある。平日の睡眠不足を週末にまとめて取り戻そうというわけだ。しかし、睡眠の研究によれば、長く眠ったからといって、それまでの不足が帳消しになるわけではないらしい。それどころか、休日に起きる時刻が大きくずれると体内時計が乱れ、月曜の朝がかえってつらくなるという。不足を補いたいなら、休日も起きる時刻はなるべく平日と変えず、その分、少し早めに床に就くほうが体には優しいそうだ。",
+    "s2": "　駅前の再開発で、古い商店街の一角が高層ビルに生まれ変わった。便利になったと喜ぶ声がある一方で、以前のように店主と世間話をしながら買い物をする楽しみがなくなったと嘆く人も少なくない。町を新しくすること自体は悪いことではない。ただ、建物と一緒に、人と人とのつながりまで取り壊してしまっては、元も子もない。再開発を計画する側には、町に何を残すべきかという視点も持ってほしいものだ。",
+    "s3": "会員の皆様へ\n\n　日頃より当館をご利用いただき、誠にありがとうございます。\n　さて、当館では来年四月より、展示室の照明設備の改修工事を行うことになりました。工事期間中は常設展示室を閉鎖いたしますが、企画展示室は通常どおり開館いたします。なお、工事に伴い、会員の皆様の年会費を三か月分減額させていただきます。詳細は三月中旬に改めてご案内いたします。\n\nみなと市立美術館",
+    "m1": "　私の研究室では、実験がうまくいかなかったときこそ、記録を丁寧に取るように学生に言っている。予想どおりの結果が出た実験は、仮説が正しかったことを確かめるにすぎない。一方、予想に反する結果は、自分の考えのどこかに見落としがあったことを教えてくれる。つまり、新しい発見の入り口は、多くの場合「失敗」の中にあるのだ。\n　ところが、学生たちは失敗した実験を、なかったことにしたがる。ノートにも残さず、すぐに次の実験に取りかかってしまう。失敗を恥ずかしいと感じる気持ちはわからなくもない。しかし、記録されなかった失敗は、同じ誤りを繰り返す原因となるだけでなく、そこに隠れていたかもしれない発見の芽まで摘んでしまう。失敗を「なかったこと」にしないこと。それが研究者として最初に身につけるべき習慣だと私は考えている。",
+    "m2": "　人口二万人ほどの町で、小さな書店を営んで十五年になる。インターネットで何でも買える時代に、町の本屋に何ができるのかと、よく人に聞かれる。\n　正直に言えば、品ぞろえでは大型店やネット書店にはとてもかなわない。だから、うちでは置く本を絞り、一冊一冊に店主の手書きの紹介文を添えている。すると、「この紹介を読んで、普段なら手に取らない本を買ってみた」というお客さんが少しずつ増えてきた。探している本を確実に届けるのがネットの強みだとすれば、探してもいなかった本との出会いを用意するのが、町の本屋の役割なのではないか。最近はそう考えるようになった。",
+    "a": "Ａ\n　近年、館内での写真撮影を認める美術館が増えている。来館者が撮った作品の写真がSNSで広まれば、それを見た人が実物を見たいと足を運ぶきっかけになる。宣伝費を十分にかけられない地方の美術館にとっては、大きな助けになるだろう。もちろん、フラッシュの使用や、他の来館者の鑑賞を妨げる行為は禁止すべきだが、ルールを守る限り、撮影は作品と人との距離を縮める手段として歓迎してよいのではないか。",
+    "b": "Ｂ\n　展示室で、作品の前に立った途端にスマートフォンを構え、撮り終えるとすぐ次の作品へ移っていく人をよく見かける。撮影に夢中になるあまり、肝心の作品をじっくり見ていないのではないかと心配になる。また、作品の保護や著作権の問題もあり、一律に撮影を認めることには慎重であるべきだ。撮影を許可するにしても、作品ごとに可否を決めるなど、鑑賞の場としての美術館のあり方を損なわない工夫が必要だろう。",
+    "c1": "　スケジュール帳に空白があると落ち着かない、という人が増えているように思う。予定を詰め込み、移動中も動画や音声で何かを学び、一日を少しも無駄にしない。それが充実した生き方だと信じられているのだろう。\n　しかし、私はこうした風潮に疑問を感じている。人は、何もしていない時間にこそ、頭の中で経験を整理し、ばらばらだった考えを結びつけるものだからだ。散歩中や入浴中に、長く悩んでいた問題の答えがふと浮かんだという経験は、誰にでもあるだろう。それは偶然ではない。外からの情報が途切れた時間に、頭はそれまでに得たものを静かに組み立て直しているのである。\n　予定で埋め尽くされた生活は、一見すると効率的だ。だが、新しい情報を次々と取り込むばかりで、それを消化する時間がなければ、知識は積み重なっても、自分の考えには育たない。忙しさは、考えているという錯覚を与えてくれるが、実際には考える機会を奪っていることが多いのだ。\n　だからといって、怠けることを勧めたいわけではない。大切なのは、何もしない時間を、埋めるべき「空き時間」と見なすのではなく、考えを熟成させるための時間として意識的に確保することだ。余白は、充実した生活の欠けた部分ではなく、それを支える土台なのである。",
+    "i1": "さくら市民大学　秋期講座のご案内\n\n【講座一覧】\nＡ　はじめての文章講座　　土曜　10:00〜12:00　全6回　受講料6,000円　定員30名\nＢ　暮らしの中の睡眠科学　水曜　19:00〜20:30　全4回　受講料4,000円　定員50名\nＣ　英語で読む短編小説　　木曜　14:00〜16:00　全8回　受講料8,000円　定員20名\n　　※英検2級程度の英語力が必要です。\nＤ　美術館の舞台裏　　　　日曜　13:00〜15:00　全3回　受講料3,000円　定員40名\n　　※第3回は市立美術館で行います。\n\n【申し込みについて】\n・市内在住・在勤・在学の方が対象です。\n・申し込みは一人2講座までとします。\n・定員を超えた場合は抽選とし、結果は10月1日までにメールでお知らせします。\n・65歳以上の方は受講料が半額になります。申し込みの際に、年齢のわかる書類の写しを添付してください。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n規制が【緩和】されたことで、新しい事業に参入する企業が増えた。",
+      "options": [
+        "えんわ",
+        "かんわ",
+        "かんお",
+        "かんな"
+      ],
+      "answer": 1,
+      "rationale": "緩和は「かんわ」と読み、厳しさをゆるめることを表す。\n緩和 is read kanwa and means easing or relaxing (rules, tension).",
+      "target": "緩和"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n天候が悪化しそうなので、ここで引き返すのが【賢明】だ。",
+      "options": [
+        "けんみょう",
+        "げんめい",
+        "けんめい",
+        "けんべい"
+      ],
+      "answer": 2,
+      "rationale": "賢明は「けんめい」と読み、判断が賢く適切である様子を表す。\n賢明 is read kenmei: wise, sensible (a judgment).",
+      "target": "賢明"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n説明会の【趣旨】を参加者に改めて伝えた。",
+      "options": [
+        "しゅうし",
+        "しゅじ",
+        "しゅうじ",
+        "しゅし"
+      ],
+      "answer": 3,
+      "rationale": "趣旨は「しゅし」と読み、目的やねらいを表す。長音や濁音は入らない。\n趣旨 is read shushi (purpose, main aim), with no long vowel or voicing.",
+      "target": "趣旨"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの通りには、かつての宿場町の【名残】が今も見られる。",
+      "options": [
+        "なごり",
+        "なのこり",
+        "めいざん",
+        "なざん"
+      ],
+      "answer": 0,
+      "rationale": "名残は熟字訓で「なごり」と読み、過ぎ去ったものの跡を表す。\n名残 has the special reading nagori: traces or remnants of the past.",
+      "target": "名残"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい市長は、前任者の方針を大きく（　）、財政の立て直しを最優先にした。",
+      "options": [
+        "促し",
+        "覆し",
+        "賄い",
+        "凌ぎ"
+      ],
+      "answer": 1,
+      "rationale": "「方針を覆す」で、それまでの方針をすっかり変えるという意味になる。\n方針を覆す means to overturn a policy; the other verbs do not take 方針 this way.",
+      "target": "覆す"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n予算が限られているので、会場の飾りつけは（　）簡素にした。",
+      "options": [
+        "断じて",
+        "辛うじて",
+        "終始",
+        "極力"
+      ],
+      "answer": 3,
+      "rationale": "「極力」は「できるかぎり」という意味で、簡素にするという努力に合う。\n極力 means as far as possible, which fits making the decorations simple on a small budget.",
+      "target": "極力"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n両社の交渉は難航したが、最終的には互いに（　）し、合意に至った。",
+      "options": [
+        "譲歩",
+        "還元",
+        "模倣",
+        "干渉"
+      ],
+      "answer": 0,
+      "rationale": "「譲歩する」は自分の主張を一部ゆずること。互いにゆずって合意したという文脈に合う。\n譲歩する means to make concessions, which is how two sides reach agreement.",
+      "target": "譲歩"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n彼の説明は（　）で、専門外の人にもすぐに理解できた。",
+      "options": [
+        "婉曲",
+        "煩雑",
+        "簡潔",
+        "難解"
+      ],
+      "answer": 2,
+      "rationale": "「簡潔」は短く要点がまとまっている様子で、すぐに理解できたことと合う。\n簡潔 means concise and to the point, which is why non-specialists understood at once.",
+      "target": "簡潔"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\nその件については、【かねて】から社内で検討を重ねてきた。",
+      "options": [
+        "最近",
+        "急きょ",
+        "以前",
+        "ひそかに"
+      ],
+      "answer": 2,
+      "rationale": "「かねてから」は「以前から・前々から」という意味である。\nかねてから means for some time now, i.e. since earlier (以前から).",
+      "target": "かねて"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n新製品の売れ行きは【案の定】、思わしくなかった。",
+      "options": [
+        "意外にも",
+        "予想どおり",
+        "残念ながら",
+        "例年どおり"
+      ],
+      "answer": 1,
+      "rationale": "「案の定」は、心配していたとおり・予想したとおりという意味である。\n案の定 means just as expected (usually of something unwelcome).",
+      "target": "案の定"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n一部の失敗だけを見て、その計画を【一概に】否定するべきではない。",
+      "options": [
+        "一時的に",
+        "部分的に",
+        "意図的に",
+        "ひとまとめに"
+      ],
+      "answer": 3,
+      "rationale": "「一概に」は、細かい違いを考えずにひとまとめに判断する様子を表す。\n一概に means sweepingly, lumping everything together without distinction.",
+      "target": "一概に"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【手際】",
+      "options": [
+        "駅までの手際を地図で調べておいた。",
+        "彼女は手際よく料理を仕上げ、客を待たせなかった。",
+        "手際が悪い天気が続いて、洗濯物が乾かない。",
+        "彼の話は手際が長くて、要点がわかりにくい。"
+      ],
+      "answer": 1,
+      "rationale": "手際は物事を処理する腕前や段取りのことで、「手際よく仕上げる」が自然な使い方である。\n手際 is skill in handling a task; 手際よく仕上げる (finish deftly) is the natural use.",
+      "target": "手際"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【見地】",
+      "options": [
+        "このレポートは見地が多すぎて読みにくい。",
+        "山の見地に立つと、町全体が見渡せた。",
+        "彼は旅行の見地をまだ決めていない。",
+        "環境保護の見地から、この計画には慎重な検討が必要だ。"
+      ],
+      "answer": 3,
+      "rationale": "見地は物事を考えたり判断したりする立場のことで、「〜の見地から」の形で使う。\n見地 is a standpoint for judging something, used as 〜の見地から (from the standpoint of).",
+      "target": "見地"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【促す】",
+      "options": [
+        "市は住民に節水を促すため、ポスターを配布した。",
+        "彼は料理に塩を少し促して、味を整えた。",
+        "彼は重い荷物を棚の上に促した。",
+        "彼女は腕時計を促して、時間を確かめた。"
+      ],
+      "answer": 0,
+      "rationale": "促すは、ある行動をするように働きかけることで、「節水を促す」が自然である。\n促す means to urge or encourage an action, as in urging residents to save water.",
+      "target": "促す"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n開演のベルが鳴る（　）、客席のざわめきがぴたりとやんだ。",
+      "options": [
+        "とはいえ",
+        "や否や",
+        "にもまして",
+        "だに"
+      ],
+      "answer": 1,
+      "rationale": "「〜や否や」は、ある事が起こるとすぐに次の事が起こることを表す。\n〜や否や means the moment something happens, something else follows at once.",
+      "subject": "grammar:yainaya"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの病気は、専門医（　）正確に診断するのは難しい。",
+      "options": [
+        "ならでは",
+        "をよそに",
+        "といえども",
+        "にひきかえ"
+      ],
+      "answer": 2,
+      "rationale": "「〜といえども」は「〜であっても」という意味で、専門医であっても難しいことを表す。\n〜といえども means even (someone like) a specialist finds it hard.",
+      "subject": "grammar:toiedomo"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n締め切りに間に合わないなら、徹夜してでも仕上げる（　）。",
+      "options": [
+        "にすぎない",
+        "きらいがある",
+        "にかたくない",
+        "までだ"
+      ],
+      "answer": 3,
+      "rationale": "「〜までだ」は、ほかに方法がないのでそうするだけだという決意を表す。\n〜までだ says there is nothing else to do but this: I'll just finish it even if it takes all night.",
+      "subject": "grammar:madenokotoda"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n長年支えてくれた恩師の突然の訃報に、驚きを（　）。",
+      "options": [
+        "禁じ得なかった",
+        "余儀なくされた",
+        "皮切りにした",
+        "経ていた"
+      ],
+      "answer": 0,
+      "rationale": "「〜を禁じ得ない」は、ある感情をおさえられないことを表す。\n〜を禁じ得ない means one cannot help feeling an emotion, here shock at sad news.",
+      "subject": "grammar:n1-o-kinji-enai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n彼は、この大役を任せる（　）人物だと、誰もが認めている。",
+      "options": [
+        "に堪えない",
+        "に足る",
+        "までもない",
+        "をもって"
+      ],
+      "answer": 1,
+      "rationale": "「〜に足る」は「〜するだけの価値がある」という意味で、任せられる人物であることを表す。\n〜に足る means worthy of: he is a person worth entrusting with the role.",
+      "subject": "grammar:nitaru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n一言相談してくれれば手伝った（　）、彼は一人ですべて抱え込んでしまった。",
+      "options": [
+        "ものの",
+        "もので",
+        "ものを",
+        "ものなら"
+      ],
+      "answer": 2,
+      "rationale": "「〜ものを」は「〜のに」という意味で、そうしなかったことへの不満や残念さを表す。\n〜ものを expresses regret: I would have helped, yet he took it all on himself.",
+      "subject": "grammar:monowo"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの町の祭りには、地元の住民 ＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 多くの観光客が集まる。",
+      "options": [
+        "訪れる",
+        "のみならず",
+        "から",
+        "遠方"
+      ],
+      "answer": 2,
+      "rationale": "「地元の住民のみならず遠方から訪れる多くの観光客」となり、★には「から」が入る。\nThe order is のみならず・遠方・から・訪れる, so から fills the ★ slot.",
+      "subject": "grammar:nominarazu"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n来月の東京公演 ＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 予定だ。",
+      "options": [
+        "回る",
+        "十の都市を",
+        "を皮切りに",
+        "全国"
+      ],
+      "answer": 3,
+      "rationale": "「東京公演を皮切りに全国十の都市を回る予定だ」となり、★には「全国」が入る。\nThe order is を皮切りに・全国・十の都市を・回る, so 全国 fills the ★ slot.",
+      "subject": "grammar:n1-o-kawakiri-ni"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの店では、食材 ＿＿＿ ＿＿＿ ＿＿＿ ＿★＿ こだわっている。",
+      "options": [
+        "照明",
+        "に至るまで",
+        "はもちろん",
+        "店内の"
+      ],
+      "answer": 1,
+      "rationale": "「食材はもちろん店内の照明に至るまでこだわっている」となり、★には「に至るまで」が入る。\nThe order is はもちろん・店内の・照明・に至るまで, so に至るまで fills the ★ slot.",
+      "subject": "grammar:n1-ni-itaru-made"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "ところが",
+        "それゆえ",
+        "たとえば",
+        "そのうえ"
+      ],
+      "answer": 2,
+      "rationale": "前の文の主張を「よろしくお願いします」という具体例で説明しているので「たとえば」が入る。\nThe next sentence gives a concrete example of the claim, so たとえば (for example) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "ほかない",
+        "べきではない",
+        "わけがない",
+        "どころではない"
+      ],
+      "answer": 0,
+      "rationale": "一語で訳せない以上、読み手に合う言い方を探すしかないという意味で「ほかない」が入る。\nSince no one-word equivalent exists, the translator has no choice but to search: 探すほかない."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "さえ",
+        "ばかりか",
+        "ならでは",
+        "こそが"
+      ],
+      "answer": 3,
+      "rationale": "「その線引きこそが難しさであり面白さだ」と、線引きを強く取り立てているので「こそが」が入る。\nこそが singles out the line-drawing itself as both the difficulty and the pleasure."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "筆者によると、休日はどのように過ごすのがよいか。",
+      "options": [
+        "平日の不足分を取り戻すため、できるだけ長く眠る。",
+        "起きる時刻は平日と大きく変えず、少し早めに寝る。",
+        "体内時計を整えるため、昼寝をして睡眠を補う。",
+        "月曜に備えて、日曜の夜は遅くまで起きておく。"
+      ],
+      "answer": 1,
+      "rationale": "本文の最後に、起きる時刻は平日と変えず、早めに床に就くほうがよいとある。\nThe last sentence advises keeping the weekday wake-up time and going to bed a little earlier."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "筆者の考えに最も近いものはどれか。",
+      "options": [
+        "古い商店街は、そのまま残すべきだ。",
+        "再開発では、建物を新しくすることを最優先にすべきだ。",
+        "再開発を進める際には、住民のつながりを残すことも考えるべきだ。",
+        "高層ビルは、人と人とのつながりを生み出す場所になる。"
+      ],
+      "answer": 2,
+      "rationale": "筆者は再開発自体は否定せず、人のつながりまで壊さないよう、何を残すかを考えてほしいと述べている。\nThe writer accepts redevelopment but wants planners to preserve the ties between people."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "このお知らせで伝えられていることは何か。",
+      "options": [
+        "来年四月から、美術館全体が一時的に閉館する。",
+        "会員は、三月中旬までに年会費を支払わなければならない。",
+        "照明工事のため、企画展の開催が延期される。",
+        "工事の間も、企画展示室は利用できる。"
+      ],
+      "answer": 3,
+      "rationale": "工事中は常設展示室を閉鎖するが、企画展示室は通常どおり開館すると書かれている。\nOnly the permanent galleries close during the work; the special exhibition room stays open."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "筆者によると、予想に反する実験結果にはどのような意味があるか。",
+      "options": [
+        "考え方に見落としがあったことに気づかせてくれる。",
+        "仮説が正しかったことを確かめる手段になる。",
+        "実験の方法が間違っていたことを示している。",
+        "次の実験をすぐに始めるべきだという合図になる。"
+      ],
+      "answer": 0,
+      "rationale": "本文に、予想に反する結果は自分の考えのどこかに見落としがあったことを教えてくれるとある。\nThe text says an unexpected result shows there was an oversight somewhere in one's thinking."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "筆者が学生に最も伝えたいことは何か。",
+      "options": [
+        "失敗を恥ずかしいと思う気持ちを捨てるべきだ。",
+        "同じ実験を何度も繰り返すべきだ。",
+        "失敗した実験の記録も残しておくべきだ。",
+        "予想どおりの結果が出るまで実験を続けるべきだ。"
+      ],
+      "answer": 2,
+      "rationale": "筆者は失敗を「なかったこと」にせず記録することが、最初に身につけるべき習慣だと述べている。\nThe writer's key message is to record failed experiments rather than erase them."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m2",
+      "prompt": "筆者の店では、どのような工夫をしているか。",
+      "options": [
+        "大型店に負けないように、品ぞろえを増やしている。",
+        "客が探している本を、すぐに取り寄せている。",
+        "インターネットでも本を販売している。",
+        "置く本を絞り、一冊ずつ手書きの紹介文を添えている。"
+      ],
+      "answer": 3,
+      "rationale": "品ぞろえではかなわないので、置く本を絞り、手書きの紹介文を添えていると書かれている。\nThe shop stocks fewer books and adds a handwritten note to each one."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m2",
+      "prompt": "筆者は、町の本屋の役割をどのように考えているか。",
+      "options": [
+        "客が思いがけない本と出会う機会を作ること",
+        "客が求める本を、確実に届けること",
+        "ネット書店より安く本を売ること",
+        "町の人々が集まって話せる場所を作ること"
+      ],
+      "answer": 0,
+      "rationale": "確実に届けるのはネットの強みで、探してもいなかった本との出会いを用意するのが町の本屋の役割だと述べている。\nThe writer sees the local shop's role as arranging encounters with books people were not looking for."
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "passages": [
+        "a",
+        "b"
+      ],
+      "prompt": "美術館での写真撮影について、ＡとＢはどのように述べているか。",
+      "options": [
+        "ＡもＢも、撮影を全面的に禁止すべきだと述べている。",
+        "Ａは撮影を歓迎する立場で、Ｂは一律に認めることに慎重な立場である。",
+        "Ａは撮影に慎重な立場で、Ｂは撮影を歓迎する立場である。",
+        "ＡもＢも、撮影は美術館の宣伝になると述べている。"
+      ],
+      "answer": 1,
+      "rationale": "Ａはルールを守れば撮影を歓迎してよいとし、Ｂは一律に認めることには慎重であるべきだとしている。\nA welcomes photography under rules; B is cautious about allowing it across the board."
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "passages": [
+        "a",
+        "b"
+      ],
+      "prompt": "ＡとＢが共通して述べていることは何か。",
+      "options": [
+        "撮影は、作品をじっくり見る妨げになる。",
+        "地方の美術館ほど、撮影を認めるべきだ。",
+        "撮影を認める場合にも、何らかの制限や工夫が必要だ。",
+        "撮影された写真がSNSで広まることは避けられない。"
+      ],
+      "answer": 2,
+      "rationale": "Ａはフラッシュ等の禁止を、Ｂは作品ごとに可否を決める工夫を挙げ、どちらも条件付きで考えている。\nBoth attach conditions: A bans flash and disruption, B decides work by work."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者によると、散歩中などに問題の答えがふと浮かぶのはなぜか。",
+      "options": [
+        "外からの情報が途切れた時間に、頭が得たものを組み立て直しているから",
+        "体を動かすことで、頭の働きが活発になるから",
+        "長く悩んだ結果、偶然答えにたどり着くから",
+        "周りの景色から、新しい情報を得られるから"
+      ],
+      "answer": 0,
+      "rationale": "情報が途切れた時間に、頭はそれまでに得たものを静かに組み立て直していると述べている。\nThe writer says that when outside input stops, the mind quietly reassembles what it has taken in."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "「考えているという錯覚」とあるが、どういうことか。",
+      "options": [
+        "何もしない時間が長いと、考えることが苦手になること",
+        "予定を詰め込むと、時間を無駄にしていると感じること",
+        "休んでいる間も、頭は無意識に考え続けていること",
+        "忙しくしていると考えているように感じるが、実際には考える機会が少ないこと"
+      ],
+      "answer": 3,
+      "rationale": "忙しさは考えている気分にさせるが、実際には考える機会を奪っていると述べている。\nBusyness makes us feel we are thinking while actually taking away the chance to think."
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "passage": "c1",
+      "prompt": "筆者の主張に最も近いものはどれか。",
+      "options": [
+        "予定を減らして、できるだけ多く休むべきだ。",
+        "移動中の時間も、学習に活用すべきだ。",
+        "何もしない時間を、考えを深めるために意識して確保すべきだ。",
+        "空き時間は、新しい情報を得るために使うべきだ。"
+      ],
+      "answer": 2,
+      "rationale": "怠けることを勧めるのではなく、考えを熟成させる時間を意識的に確保すべきだと主張している。\nThe claim is to deliberately keep idle time for letting thoughts mature, not simply to rest more."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "市外に住み、市内の会社に勤めているキムさん（35歳）は、平日は18時まで仕事がある。平日の夜か週末に受けられる講座に申し込みたい。キムさんが申し込める組み合わせはどれか。",
+      "options": [
+        "ＡとＣ",
+        "ＢとＣ",
+        "ＡとＤ",
+        "ＡとＢとＤ"
+      ],
+      "answer": 2,
+      "rationale": "Ｃは平日の昼なので受けられず、申し込みは2講座までなので、ＡとＤが当てはまる。\nC meets on a weekday afternoon and the limit is two courses, so A and D is the valid choice."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "市内に住む70歳の山田さんは、講座Ｂと講座Ｄに申し込むつもりだ。受講料は合わせていくらで、申し込みの際に何が必要か。",
+      "options": [
+        "7,000円で、特に必要な書類はない。",
+        "3,500円で、特に必要な書類はない。",
+        "7,000円で、年齢のわかる書類の写しが必要だ。",
+        "3,500円で、年齢のわかる書類の写しが必要だ。"
+      ],
+      "answer": 3,
+      "rationale": "4,000円と3,000円の合計7,000円が65歳以上は半額で3,500円になり、年齢のわかる書類の写しが必要である。\n7,000 yen halves to 3,500 yen for those 65 and over, and a copy of proof of age is required."
+    }
+  ]
+}

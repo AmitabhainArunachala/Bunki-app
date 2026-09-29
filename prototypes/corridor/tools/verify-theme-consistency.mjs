@@ -67,11 +67,11 @@ for (const world of WORLDS) {
   await page.waitForSelector('#review-start', { timeout: 30000 });
   await shoot('2-tray');
   await page.click('#review-start');
-  await page.waitForSelector('#declare-recalled', { timeout: 30000 });
+  await page.waitForSelector('#reveal', { timeout: 30000 });
   await shoot('3-review-front');
   await check('review-front', 'body', ['zenStage']);
   await check('review-front-card', '.review-face', ['cardG0']);
-  await page.click('#declare-recalled');
+  await page.click('#reveal');
   await page.waitForSelector('.grade.g-good', { timeout: 30000 });
   await shoot('4-review-back');
   await check('review-back-card', '.review-face', ['cardG0']);

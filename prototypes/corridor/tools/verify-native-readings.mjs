@@ -249,7 +249,12 @@ const rows = new Map(index.articles.map((record) => [record.id, record]));
 // Counts are data (the feed grows the index 検収前-marked); composition is
 // pinned by tools/verify-feed.mjs against the review queue, so these checks
 // hold for EVERY row without hardcoding a census.
-const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08']);
+// fresh-shelf readings (feed_fresh.py) carry the authorship their titles file
+// names; every other row keeps the two historical markers
+const FRESH_TITLES = JSON.parse(
+  readFileSync(new URL('../../../docs/content/feed-fresh-titles-en.json', import.meta.url), 'utf8'),
+);
+const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08', FRESH_TITLES.titleEnSource]);
 // rows still WAITING on a human — an 'approved' review value is a decided
 // row (TENOHIRA Decision 4: the rubric may lift 検収前 where the committed
 // queue says approved), and a decided row no longer wears the mark
@@ -275,14 +280,16 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
   // mints wear AI-authored titles, while a row held for UNVERIFIED RIGHTS or
   // an unverified source text keeps whatever title it already had. The rule
   // is about who wrote the title, not about who is waiting.
-  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt).map((r) => r.id)]);
+  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt && r.feed !== 'fresh').map((r) => r.id)]);
   const wrongMarker = index.articles.filter((record) =>
-    aiTitled.has(record.id)
-      ? record.titleEnSource !== 'renkan-ai-2026-08'
-      : record.titleEnSource !== 'shelf-map-2026',
+    record.feed === 'fresh'
+      ? record.titleEnSource !== FRESH_TITLES.titleEnSource || FRESH_TITLES.titles?.[record.id] !== record.titleEn
+      : aiTitled.has(record.id)
+        ? record.titleEnSource !== 'renkan-ai-2026-08'
+        : record.titleEnSource !== 'shelf-map-2026',
   );
   check(
-    'the title marker names its author: AI for the recovered and minted rows, the shelf map for the rest',
+    'the title marker names its author: AI for the recovered and minted rows, the fresh-shelf titles file for fresh readings, the shelf map for the rest',
     wrongMarker.length === 0,
     wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
   );

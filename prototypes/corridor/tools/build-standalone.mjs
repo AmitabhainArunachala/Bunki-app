@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { buildSync, version } from 'esbuild';
 import { externalPath } from '../../bunki-desktop/lib/paths.cjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { isMachineCheckedEntry } from './assessment/machine-checked-class.mjs';
 
 const args = process.argv.slice(2);
 assert(args.filter((arg) => !arg.startsWith('--')).length <= 1 && args.every((arg) => !arg.startsWith('--') || arg === '--fragment'), 'Usage: build-standalone.mjs [external-outfile] [--fragment]');
@@ -151,6 +152,27 @@ assert.equal(inkBuild.outputFiles.length, 1);
 assert.deepEqual(Object.values(inkBuild.metafile.outputs)[0].imports, [], 'Standalone writing engine must have no external imports');
 const inkBytes = Buffer.from(inkBuild.outputFiles[0].contents);
 const inkUrl = 'data:text/javascript;base64,' + inkBytes.toString('base64');
+// 案内つきの稽古 — the guided session travels whole: its module (engine and content inlined), its
+// moments, both stylesheets, the sets its index lists and the sprite sheet. A served build loads
+// these as siblings; a blob: module resolves no sibling, so each gets its own URL at boot.
+const guidedModule = (entry) => {
+  const built = buildSync({
+    absWorkingDir: CORRIDOR, entryPoints: [entry],
+    outfile: `standalone-${entry}`, bundle: true, format: 'esm',
+    platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
+    minify: true, legalComments: 'inline', metafile: true, write: false,
+  });
+  assert.equal(built.outputFiles.length, 1);
+  assert.deepEqual(Object.values(built.metafile.outputs)[0].imports, [], `Standalone ${entry} must have no external imports`);
+  return Buffer.from(built.outputFiles[0].contents);
+};
+const guidedSessionBytes = guidedModule('guided-session.mjs');
+const guidedMomentsBytes = guidedModule('guided-moments.mjs');
+const GUIDED_SPRITE_REF = "url('guided/samurai-sprites-v2.png')";
+const guidedStyles = { session: read('guided-session.css'), moments: read('guided-moments.css') };
+assert.equal(guidedStyles.moments.split(GUIDED_SPRITE_REF).length - 1, 1, 'Standalone moments sprite reference changed');
+assert(!/url\(/u.test(guidedStyles.session), 'Standalone guided stylesheet gained a sibling reference');
+const guidedSprite = readFileSync(resolve(CORRIDOR, 'guided/samurai-sprites-v2.png'));
 function moduleUrlExpression(dataUrl) {
   const prefix = 'data:text/javascript;base64,';
   assert(dataUrl.startsWith(prefix), 'Standalone modules must contain inline JavaScript bytes');
@@ -221,6 +243,16 @@ if (existsSync(mockDir)) {
   }
 }
 
+// 案内つきの稽古's sets, keyed by path without .json — the room reads them through its host
+const guidedIndex = JSON.parse(read('guided/sets/index.json'));
+bundle['guided/sets/index'] = guidedIndex;
+for (const entry of guidedIndex.sets) {
+  const set = JSON.parse(read(entry.path));
+  bundle[entry.path.replace(/\.json$/u, '')] = set;
+  // a set built from the bank reads its questions from the reviewed form, so the form travels too
+  if (set.questions.some((question) => question.bank)) bundle[set.source.formPath.replace(/\.json$/u, '')] = JSON.parse(read(set.source.formPath));
+}
+
 // Only assets admitted into the public catalog travel with the handoff. The
 // private authoring/review workspaces are never searched or embedded here.
 const assessmentAssets = new Map();
@@ -243,7 +275,7 @@ packAssessment('catalog.json'); packAssessment('sources.json');
 const assessmentCatalog = JSON.parse(read('data/assessment/catalog.json'));
 for (const entry of [...assessmentCatalog.entries, ...(assessmentCatalog.archivedEntries || [])]) {
   if (!entry.availability?.ready) continue;
-  assert.equal(entry.review?.status, 'ai-reviewed', 'Only admitted public assessments may be embedded');
+  assert(entry.review?.status === 'ai-reviewed' || isMachineCheckedEntry(entry), 'Only admitted public assessments may be embedded');
   packAssessment(entry.formPath); packAssessment(entry.deliveryPath);
   const form = JSON.parse(read(assessmentPath(entry.formPath)));
   const delivery = JSON.parse(read(assessmentPath(entry.deliveryPath)));
@@ -306,6 +338,8 @@ window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
 </script>
 <script type="application/octet-stream" id="standalone-record-module">${recordRuntimeBase64}</script>
 <script type="application/json" id="standalone-assessment-assets">${JSON.stringify(assessmentPack).replace(/</g, '\\u003c')}</script>
+<script type="application/octet-stream" id="standalone-guided-sprite">${guidedSprite.toString('base64')}</script>
+<script type="application/json" id="standalone-guided-styles">${JSON.stringify(guidedStyles).replace(/</g, '\\u003c')}</script>
 <script type="module">
 // Local module URLs avoid the Chromium full-page boot/reload crashes seen
 // with large data URLs. Isolated data-URL imports pass; no general URL-size
@@ -360,6 +394,22 @@ const standaloneRecordData = document.getElementById('standalone-record-module')
 window.__KAIRO_RECORD_RUNTIME_URL__ = standaloneModuleUrl(standaloneRecordData.textContent);
 standaloneRecordData.remove();
 window.__KAIRO_INK_URL__ = ${moduleUrlExpression(inkUrl)};
+// 案内つきの稽古: one sprite blob, shared by the moments' stylesheet and their preload
+const guidedSpriteNode = document.getElementById('standalone-guided-sprite');
+const guidedSpriteUrl = URL.createObjectURL(new Blob([
+  Uint8Array.from(atob(guidedSpriteNode.textContent), character => character.charCodeAt(0)),
+], { type: 'image/png' }));
+guidedSpriteNode.remove();
+const guidedStylesNode = document.getElementById('standalone-guided-styles');
+const guidedStyles = JSON.parse(guidedStylesNode.textContent);
+guidedStylesNode.remove();
+const guidedStyleUrl = (css) => URL.createObjectURL(new Blob([css], { type: 'text/css' }));
+window.__KAIRO_GUIDED_SESSION_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + guidedSessionBytes.toString('base64'))};
+window.__KAIRO_GUIDED_MOMENTS_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + guidedMomentsBytes.toString('base64'))};
+window.__KAIRO_GUIDED_STYLE_URL__ = guidedStyleUrl(guidedStyles.session);
+window.__KAIRO_GUIDED_MOMENTS_STYLE_URL__ = guidedStyleUrl(
+  guidedStyles.moments.split(${JSON.stringify(GUIDED_SPRITE_REF)}).join("url('" + guidedSpriteUrl + "')"));
+window.__KAIRO_GUIDED_SPRITE_URL__ = guidedSpriteUrl;
 ${appScript}
 </script>`;
 
@@ -417,6 +467,8 @@ writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORR
   assessmentAssets: [...assessmentAssets].map(([path, { bytes, sha256 }]) => ({ path, bytes, sha256 })),
   recordModuleTransport: 'blob', inlinedModuleTransport: 'blob', driftSharesRecordRuntime: true,
   inkModuleSha256: digest(inkBytes), builderSha256: digest(readFileSync(fileURLToPath(import.meta.url))),
+  guidedSessionSha256: digest(guidedSessionBytes), guidedMomentsSha256: digest(guidedMomentsBytes),
+  guidedSets: guidedIndex.sets.map((entry) => entry.path),
   compiler: { name: 'esbuild', version }, selfContainedController: true,
   scope: 'Standalone corpus, shared controllers, durable record and writing engine; no live-provider, native account or whole-audio-library claim.' }, null, 2) + '\n', { flag: 'wx' });
 console.log(`${out}  ${(statSync(out).size / 1024 / 1024).toFixed(2)} MB`);

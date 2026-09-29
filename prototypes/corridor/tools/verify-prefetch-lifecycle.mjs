@@ -17,6 +17,7 @@ import {
   resolveCorridorSite,
 } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot } from './record-test-support.mjs';
+import { fullPageScreenshot } from './screenshot-support.mjs';
 
 const OUT = resolveCorridorEvidence();
 const SITE = resolveCorridorSite();
@@ -707,13 +708,14 @@ async function nativeDepartureCase(browser, engine, mode) {
       [],
     );
     const screenshot = resolve(OUT, `${engine}-${mode}.png`);
-    await page.screenshot({ path: screenshot, fullPage: true });
-    row.screenshot = { path: screenshot, sha256: sha(readFileSync(screenshot)) };
+    const shot = await fullPageScreenshot(page, screenshot);
+    row.screenshot = { path: screenshot, sha256: sha(readFileSync(screenshot)), pageHeight: shot.pageHeight,
+      tiles: shot.paths.map((path) => ({ path, sha256: sha(readFileSync(path)) })) };
     row.pass = true;
   } catch (error) {
     row.error = failure(error);
     const screenshot = resolve(OUT, `${engine}-${mode}-failure.png`);
-    await page.screenshot({ path: screenshot, fullPage: true }).then(
+    await fullPageScreenshot(page, screenshot).then(
       () => {
         row.failureScreenshot = { path: screenshot, sha256: sha(readFileSync(screenshot)) };
       },

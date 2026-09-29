@@ -329,7 +329,7 @@ try {
     const form = words.n1[0];
     const initial = await importFixture('review-undo', fixture([form], lessonRows(form, [true, true, true])));
     await openShelf(); await page.locator('#tray').click(); await page.locator('#review-start').click();
-    await page.locator('#declare-recalled').click(); await page.locator('.grade.g-easy').click();
+    await page.locator('#reveal').click(); await page.locator('.grade.g-easy').click();
     await page.locator('#ai-coach').waitFor();
     const coach = await send('coach', () => page.locator('#ai-coach').click());
     const graded = await readAppRecord(page), value = teaching(coach);

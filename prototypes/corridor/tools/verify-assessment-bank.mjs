@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import { lstat, mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises';
+import { copyFile, lstat, mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import {
@@ -31,6 +31,15 @@ import {
 import { WRITTEN_SPECS, prepareWrittenOriginal } from './assessment/prepare-originals.mjs';
 import { importSource, sourceURL, validateSourceRequest } from './assessment/source-import.mjs';
 import { learningTargets } from './assessment/learning-targets.mjs';
+import { verifyMachineCheckedCatalog } from './assessment/written-bank.mjs';
+import {
+  MACHINE_CHECK_LABEL,
+  MACHINE_CHECK_POLICY,
+  MACHINE_CHECK_ROUTE,
+  isMachineCheckedEntry,
+} from './assessment/machine-checked-class.mjs';
+import { pathToFileURL } from 'node:url';
+import { buildCorridorModules } from '../../../scripts/build-reading-module.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const evidenceRoot = process.env.KAIRO_EVIDENCE_DIR
@@ -48,6 +57,17 @@ async function check(name, fn) {
   }
 }
 const read = async (path) => JSON.parse(await readFile(path, 'utf8'));
+/** The browser's assessment-delivery.mjs, staged beside the record core it imports (compiled by
+ * the canonical module build, as a site build does) and imported for real. */
+async function browserDelivery() {
+  const stage = join(evidence, 'browser-delivery');
+  await mkdir(join(stage, 'modules'), { recursive: true });
+  const record = buildCorridorModules(REPOSITORY).find((module) => module.path === 'modules/record-core.mjs');
+  assert(record, 'The module build must compile modules/record-core.mjs');
+  await writeFile(join(stage, record.path), record.bytes);
+  await copyFile(join(REPOSITORY, 'prototypes/corridor/assessment-delivery.mjs'), join(stage, 'assessment-delivery.mjs'));
+  return import(pathToFileURL(join(stage, 'assessment-delivery.mjs')).href);
+}
 const api = await assessmentAPI();
 const inputs = await Promise.all(
   ['n2-full-01', 'n2-short-01', 'n2-medium-01'].map((directory) =>
@@ -414,6 +434,8 @@ async function writtenFixtureSite({ withN2 = true, sources = [n1Source] } = {}) 
   const site = join(evidence, `fixture-written-levels-${++fixtureSites}`);
   await mkdir(site);
   const catalog = structuredClone(shippedCatalog);
+  // Pin fixtures exercise the host-reviewed route only; the machine-checked class has its own checks.
+  catalog.entries = catalog.entries.filter((entry) => entry.publicationRoute !== MACHINE_CHECK_ROUTE);
   if (!withN2) catalog.entries = catalog.entries.filter((entry) => entry.id !== REVIEWED_WRITTEN.N2.id);
   const registry = structuredClone(shippedSources);
   registry.sources.push(...sources);
@@ -1217,6 +1239,113 @@ await check(
     assert.deepEqual(await readFile(join(site, prior.formPath)), previousBytes);
   },
 );
+
+await check('Machine-checked written tests verify from public files, stay labelled and never widen host review', async () => {
+  const rows = await verifyMachineCheckedCatalog(PUBLIC_BANK, shippedCatalog);
+  for (const level of ['N1', 'N2', 'N3', 'N4', 'N5'])
+    assert(rows.filter(({ entry }) => entry.level === level).length >= 5, `Fewer than five machine-checked ${level} tests`);
+  for (const { entry } of rows) {
+    assert.equal(entry.review.label, MACHINE_CHECK_LABEL);
+    assert.equal(entry.editorialAtStart.policyVersion, MACHINE_CHECK_POLICY);
+    assert.equal(entry.officialScoreCalibrated, false);
+  }
+  // The browser keeps its own copy of the class. It is imported and run, never read as text: its
+  // constants are the bank's, and on every shipped catalog row its admission test agrees with the
+  // bank's own, over rows of both classes.
+  const browser = await browserDelivery();
+  for (const [name, value] of Object.entries({ MACHINE_CHECK_ROUTE, MACHINE_CHECK_POLICY, MACHINE_CHECK_LABEL }))
+    assert.equal(browser[name], value, `Browser ${name} differs from the bank class`);
+  const verdicts = shippedCatalog.entries.map((entry) => ({
+    id: entry.id,
+    browser: browser.machineCheckedEntry(entry),
+    bank: isMachineCheckedEntry(entry),
+  }));
+  assert(verdicts.some((row) => row.bank) && verdicts.some((row) => !row.bank), 'The shipped catalog must hold both classes');
+  for (const row of verdicts) assert.equal(row.browser, row.bank, `Browser and bank classify ${row.id} differently`);
+  // …and a machine-checked row that loses any one field the browser checks leaves the class on both sides
+  const member = shippedCatalog.entries.find((entry) => isMachineCheckedEntry(entry));
+  for (const [field, mutate] of Object.entries({
+    route: (entry) => { entry.publicationRoute = 'host-reviewed-written/1'; },
+    mode: (entry) => { entry.mode = 'listening'; },
+    status: (entry) => { entry.review.status = 'ai-reviewed'; },
+    label: (entry) => { delete entry.review.label; },
+    editorial: (entry) => { entry.editorialAtStart.status = 'unreviewed'; },
+    policy: (entry) => { entry.editorialAtStart.policyVersion = 'bunki-ai-review/2'; },
+    media: (entry) => { entry.mediaAssets = [{ assetId: 'fixture' }]; },
+  })) {
+    const entry = structuredClone(member);
+    mutate(entry);
+    assert.deepEqual([browser.machineCheckedEntry(entry), isMachineCheckedEntry(entry)], [false, false], `A row without its ${field} stays in the class`);
+  }
+  // The N2 pin gate is unchanged: only N2 is admitted, and a ready entry that merely claims
+  // the route, or drops its label, still counts as an unexpected ready entry.
+  assert.deepEqual(admittedWrittenSections(shippedCatalog).map(({ pin }) => pin.level), ['N2']);
+  for (const mutate of [
+    (entry) => { entry.review.status = 'ai-reviewed'; },
+    (entry) => { delete entry.review.label; },
+    (entry) => { entry.editorialAtStart.policyVersion = 'bunki-ai-review/2'; },
+    (entry) => { entry.mediaAssets = [{ assetId: 'fixture' }]; },
+  ]) {
+    const claimed = structuredClone(shippedCatalog);
+    const entry = structuredClone(rows[0].entry);
+    mutate(entry);
+    claimed.entries.push({ ...entry, id: 'fixture-claims-machine-route' });
+    assert.throws(() => admittedWrittenSections(claimed), /ready written sections/u);
+  }
+});
+await check('Machine-checked records reject self-review, disagreement, flags, one family and edited forms', async () => {
+  const [{ entry }] = await verifyMachineCheckedCatalog(PUBLIC_BANK, shippedCatalog);
+  const site = join(evidence, 'fixture-machine-checked');
+  for (const path of [entry.formPath, entry.deliveryPath, entry.review.evidencePath]) {
+    await mkdir(dirname(join(site, path)), { recursive: true });
+    await copyFile(join(PUBLIC_BANK, path), join(site, path));
+  }
+  await writeFile(join(site, 'sources.json'), JSON.stringify(shippedSources));
+  assert.equal((await verifyMachineCheckedCatalog(site, { entries: [entry] })).length, 1);
+  const original = await read(join(PUBLIC_BANK, entry.review.evidencePath));
+  async function tampered(mutate, pattern) {
+    const review = structuredClone(original);
+    mutate(review);
+    const sha = api.encodeLocalJson(review).sha256;
+    const evidencePath = `reviews/fixture-${sha}.json`;
+    await writeFile(join(site, evidencePath), JSON.stringify(review));
+    const patched = structuredClone(entry);
+    patched.review.evidencePath = evidencePath;
+    patched.editorialAtStart.decisionRevisionIds = [`machine-check-v1:${sha}`];
+    await assert.rejects(verifyMachineCheckedCatalog(site, { entries: [patched] }), pattern);
+  }
+  await tampered((review) => { review.items[0].verdicts[0].family = review.author.family; }, /not independent/u);
+  await tampered((review) => { review.items[0].verdicts[0].choice = (review.items[0].key % 4) + 1; }, /disagreeing or flagged/u);
+  await tampered((review) => { review.items[0].verdicts[0].flags = ['ambiguous']; }, /disagreeing or flagged/u);
+  await tampered((review) => {
+    review.items[0].verdicts = review.items[0].verdicts.slice(0, 1);
+    review.items[0].status = 'kept-degraded';
+  }, /required independent agreement/u);
+  await tampered((review) => { review.label = 'reviewed'; }, /record does not match/u);
+  const stale = structuredClone(entry);
+  stale.editorialAtStart.decisionRevisionIds = [`machine-check-v1:${'0'.repeat(64)}`];
+  await assert.rejects(verifyMachineCheckedCatalog(site, { entries: [stale] }), /does not pin/u);
+  const form = await read(join(PUBLIC_BANK, entry.formPath));
+  form.items[0].response.options.reverse();
+  await writeFile(join(site, entry.formPath), JSON.stringify(form));
+  await assert.rejects(verifyMachineCheckedCatalog(site, { entries: [entry] }));
+});
+await check('A native rebuild keeps every machine-checked entry exactly', async () => {
+  const site = join(evidence, 'fixture-machine-checked-rebuild');
+  await mkdir(site);
+  await writeFile(join(site, 'catalog.json'), JSON.stringify(shippedCatalog));
+  await writeFile(join(site, 'sources.json'), JSON.stringify(shippedSources));
+  const rebuilt = await buildAssessmentBank({
+    directories: [],
+    assets: new Map(),
+    publicDirectory: site,
+    evidenceDirectory: join(evidence, 'fixture-machine-checked-rebuild-evidence'),
+  });
+  const ofClass = (catalog) => catalog.entries.filter((entry) => entry.publicationRoute === MACHINE_CHECK_ROUTE);
+  assert(ofClass(shippedCatalog).length > 0);
+  assert.deepEqual(ofClass(rebuilt), ofClass(shippedCatalog));
+  assert.deepEqual(admittedWrittenSections(rebuilt).map(({ pin }) => pin.level), ['N2']);
+});
 await check(
   'Registered sources cite real official URLs and distinguish reference rights',
   async () => {

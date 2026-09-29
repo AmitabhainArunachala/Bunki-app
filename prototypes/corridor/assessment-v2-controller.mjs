@@ -79,6 +79,42 @@ function freezeLibrary(scope, forms, attempts, activeAttemptId) {
   owned.add(result);
   return result;
 }
+// Stored forms are immutable and re-read on every record write, and parsing one re-hashes all of
+// its items. A form whose exact JSON text was already fully validated in this session is reused;
+// any difference in the text (content or key order) is validated from scratch. Callers run
+// budget() over the whole library first, so the text is the complete plain-JSON input.
+const validatedFormTexts = new Map();
+function parseStoredForm(raw) {
+  const text = JSON.stringify(raw);
+  const known = validatedFormTexts.get(text);
+  if (known) return known;
+  const form = parseFormVersion(raw);
+  if (validatedFormTexts.size >= ASSESSMENT_LIBRARY_V2_LIMITS.forms * 2)
+    validatedFormTexts.delete(validatedFormTexts.keys().next().value);
+  validatedFormTexts.set(text, form);
+  return form;
+}
+// Finished attempts are re-read unchanged on every write too; only the exact same text against
+// the same validated form is reused, so the active attempt still validates on every change.
+// Least recently used goes first, and a whole library fits: every write to the active attempt
+// adds a text never read again, and oldest-first eviction under a 512 cap let that churn (or a
+// library past 512 attempts, read in order on every write) push out each finished attempt just
+// before its next read, so a heavy library was re-hashed in full again.
+const validatedAttemptTexts = new Map();
+function parseStoredAttempt(form, raw) {
+  const text = `${form.revisionId}\n${JSON.stringify(raw)}`;
+  const known = validatedAttemptTexts.get(text);
+  if (known) {
+    validatedAttemptTexts.delete(text);
+    validatedAttemptTexts.set(text, known);
+    return known;
+  }
+  const attempt = parseAttemptV2(form, raw);
+  if (validatedAttemptTexts.size >= ASSESSMENT_LIBRARY_V2_LIMITS.attempts)
+    validatedAttemptTexts.delete(validatedAttemptTexts.keys().next().value);
+  validatedAttemptTexts.set(text, attempt);
+  return attempt;
+}
 export function createAssessmentLibraryV2({ scope }) {
   return freezeLibrary(scopeValue(scope), [], [], null);
 }
@@ -96,12 +132,12 @@ export function parseAssessmentLibraryV2(raw, options = {}) {
   if (!Array.isArray(raw.forms) || raw.forms.length > ASSESSMENT_LIBRARY_V2_LIMITS.forms ||
       !Array.isArray(raw.attempts) || raw.attempts.length > ASSESSMENT_LIBRARY_V2_LIMITS.attempts)
     fail('library-capacity');
-  const forms = raw.forms.map((form) => parseFormVersion(form));
+  const forms = raw.forms.map(parseStoredForm);
   if (new Set(forms.map((form) => form.revisionId)).size !== forms.length) fail('duplicate-form');
   const attempts = raw.attempts.map((attempt) => {
     const form = forms.find((candidate) => attempt?.form && sameRef(candidate, attempt.form));
     if (!form) fail('missing-form');
-    const parsed = parseAttemptV2(form, attempt);
+    const parsed = parseStoredAttempt(form, attempt);
     if (!sameScope(parsed.scope, scope)) fail('scope-mismatch');
     return parsed;
   });

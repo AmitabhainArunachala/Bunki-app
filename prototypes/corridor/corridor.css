@@ -167,6 +167,27 @@ body::before {
   .shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* 新着 — the newest dated news, first on the shelf (operator, 2026-09-28) */
+.eyebrow.shelf-fresh-head { margin: 22px 2px 2px; }
+.shelf-fresh-note { font-size: var(--t-label); color: var(--ink-2); margin: 0 2px 10px; }
+.shelf-fresh-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 18px;
+  margin-bottom: 12px;
+}
+.shelf-fresh-strip .shelf-item { margin: 0; }
+@media (max-width: 640px) {
+  .shelf-fresh-strip { grid-template-columns: minmax(0, 1fr); }
+}
+/* the date leads a card's meta line and sits under a reader's title */
+.shelf-date {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.reader-date { font-size: var(--t-label); color: var(--ink-2); margin: 2px 0 10px; }
+
 /* the writing-speed slider beside ゆっくり (operator, 2026-09-18) */
 .stroke-speed-wrap { display: inline-flex; align-items: center; gap: 8px; }
 .stroke-speed-range { width: 96px; accent-color: var(--ink); }
@@ -6780,11 +6801,12 @@ body.zen .declare-row .declare-notyet {
   border: 1px solid color-mix(in srgb, var(--zen-text) 32%, transparent);
 }
 
-/* the room's small lights */
+/* the room's small lights — small, not faint: they are the only way out of the room and its
+ * menu, and at 0.55 they fell under 4.5:1 in the 岩 world (PR #77 f7cd297c) */
 body.zen .zen-exit,
 body.zen .zen-more {
   color: var(--zen-text);
-  opacity: 0.55;
+  opacity: 1;
 }
 body.zen .zen-progress i {
   background: var(--zen-accent);
@@ -7555,6 +7577,11 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .review-face .assessment-review-assisted { margin: .75rem 0 0; font-size: var(--t-chrome, 13px); line-height: 1.6; color: var(--ink-2, #4a5d70); }
 body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a453a); }
 .exam-notice { border-inline-start: 3px solid var(--red); padding: .75rem; line-height: 1.6; }
+/* 検収前 · machine-checked forms: the label reads as provenance, in secondary ink. */
+.assessment-room .exam-machine-label { display: block; margin: .35rem 0; font-size: .8rem; line-height: 1.6;
+  color: var(--ink-2); white-space: normal; overflow-wrap: anywhere; }
+.assessment-room .exam-item-provenance { font-size: .8rem; line-height: 1.6; color: var(--ink-2); }
+.exam-written { margin-bottom: 1.5rem; }
 .exam-image { max-width: 100%; height: auto; }
 @media (max-width: 480px) {
   .exam-lengths { gap: .4rem; }
@@ -7628,3 +7655,351 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 #mini .mini-take-open { min-height: var(--tap); margin-top: 5px; padding: 4px 12px;
   border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ai, var(--ink-2));
   font: inherit; font-family: var(--sans); font-size: 11px; cursor: pointer; }
+
+/* ------------------------------------------------ Anki-grade review (operator, 2026-09-28)
+ * Anki's colours for its three numbers — blue new, red learning, green review — mixed toward
+ * the world's ink so they hold on paper and at night; matte, never glowing. */
+:root {
+  --srs-new: color-mix(in srgb, #2f6fbf 78%, var(--ink));
+  --srs-learn: color-mix(in srgb, #c2452d 80%, var(--ink));
+  --srs-due: color-mix(in srgb, #2e8a3e 78%, var(--ink));
+  --srs-hard: color-mix(in srgb, #a8772a 80%, var(--ink));
+}
+.c-new { color: var(--srs-new); }
+.c-learn { color: var(--srs-learn); }
+.c-due { color: var(--srs-due); }
+
+.bubble-review {
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: max-content;
+  background: #3d6b4f;
+}
+.bubble-review.quiet {
+  background: #56645c;
+}
+
+.deck-counts {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0 12px;
+}
+.deck-count {
+  flex: 1;
+  text-align: center;
+  padding: 10px 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ground-0, #faf6ea) 70%, transparent);
+}
+.deck-count .deck-count-n {
+  display: block;
+  font: 600 30px/1.1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+.deck-count .deck-count-l {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+}
+.deck-table {
+  margin: 16px 0 10px;
+  border-top: 1px solid var(--line);
+}
+.deck-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3.4em 3.4em 3.4em;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 8px 6px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.deck-row .d-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.deck-row > span:not(.d-name) {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.deck-row .zero {
+  color: var(--faint-2);
+  font-weight: 400;
+}
+.deck-row.deck-all .d-name {
+  font-weight: 600;
+}
+.deck-row.deck-head {
+  min-height: 0;
+  padding-block: 6px;
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: default;
+}
+.deck-row.deck-head > span {
+  font-weight: 400;
+}
+.deck-row:disabled {
+  cursor: default;
+  color: var(--ink-2);
+}
+.deck-row:not(:disabled):not(.deck-head):hover {
+  background: var(--ai-wash, rgba(46, 77, 110, 0.08));
+}
+.deck-doors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 18px;
+}
+
+/* the review room: three numbers under the top edge, undo beside … */
+.anki-counts {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: max-content;
+  display: flex;
+  gap: 14px;
+  z-index: 6;
+  font: 600 16px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.anki-counts span {
+  padding-bottom: 3px;
+  border-bottom: 2px solid transparent;
+}
+.anki-counts span.now {
+  border-bottom-color: currentColor;
+}
+body.zen .anki-counts .c-new { color: #9dbbe8; }
+body.zen .anki-counts .c-learn { color: #ec9a86; }
+body.zen .anki-counts .c-due { color: #9fd59c; }
+.anki-undo-slot {
+  position: fixed;
+  top: calc(6px + env(safe-area-inset-top));
+  left: 52px;
+  z-index: 6;
+}
+.anki-undo-slot .review-undo {
+  min-height: 36px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+.anki-undo-slot .review-undo .en-sub {
+  display: none;
+}
+body.zen .anki-undo-slot .review-undo {
+  color: var(--zen-text);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--zen-text) 30%, transparent);
+}
+
+/* Show answer: one full-width paper button where the thumb rests */
+body.zen .review-reveal {
+  background: var(--card-ground-0, var(--card-ground));
+  color: var(--card-ink);
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 6px 18px rgba(0, 0, 0, 0.45);
+  font-size: 18px;
+}
+
+/* the answer bar: interval above, the plain word, the other language beneath */
+.grade.anki {
+  min-height: 66px;
+  gap: 3px;
+  padding: 7px 0 6px;
+  border: 1px solid var(--line);
+  border-top-width: 3px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ground-0, #faf6ea) 72%, transparent);
+  color: var(--ink);
+}
+.grade.anki .g-when {
+  font: 600 13px/1 var(--sans);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.grade.anki .g-label {
+  font: 600 16px/1.15 var(--sans);
+  letter-spacing: 0.02em;
+}
+.grade.anki .g-sub {
+  font-size: 11px;
+  color: var(--ink-2);
+}
+.grade.anki.g-again { border-top-color: var(--srs-learn); }
+.grade.anki.g-again .g-label { color: var(--srs-learn); }
+.grade.anki.g-hard { border-top-color: var(--srs-hard); }
+.grade.anki.g-hard .g-label { color: var(--srs-hard); }
+.grade.anki.g-good { border-top-color: var(--srs-due); }
+.grade.anki.g-good .g-label { color: var(--srs-due); }
+.grade.anki.g-easy { border-top-color: var(--srs-new); }
+.grade.anki.g-easy .g-label { color: var(--srs-new); }
+.grade.anki:active {
+  transform: translateY(1px);
+}
+body.zen .grade.anki {
+  border-color: color-mix(in srgb, var(--zen-text) 22%, transparent);
+  background: color-mix(in srgb, var(--zen-stage-crown) 88%, transparent);
+}
+body.zen .grade.anki .g-when,
+body.zen .grade.anki .g-sub {
+  color: color-mix(in srgb, var(--zen-text) 72%, transparent);
+}
+body.zen .grade.anki.g-again { border-top-color: #ec9a86; }
+body.zen .grade.anki.g-again .g-label { color: #ec9a86; }
+body.zen .grade.anki.g-hard { border-top-color: #e2c486; }
+body.zen .grade.anki.g-hard .g-label { color: #e2c486; }
+body.zen .grade.anki.g-good { border-top-color: #9fd59c; }
+body.zen .grade.anki.g-good .g-label { color: #9fd59c; }
+body.zen .grade.anki.g-easy { border-top-color: #9dbbe8; }
+body.zen .grade.anki.g-easy .g-label { color: #9dbbe8; }
+/* Anki answers at once: the buttons are there the moment the answer is, and the answer
+ * itself arrives in a fifth of a second instead of a slow ink-soak */
+body.zen .grade-row .grade.anki {
+  animation: none;
+}
+body.zen .reveal,
+body.zen .reveal.r-1,
+body.zen .reveal.r-2,
+body.zen .reveal.r-3,
+body.zen .reveal.r-4 {
+  animation-duration: 200ms;
+  animation-delay: 0ms;
+}
+
+/* browse and stats */
+.browse-bar {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+.browse-q {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--ground-0, #faf6ea);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.browse-sort {
+  min-height: var(--tap);
+  max-width: 42%;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--ground-0, #faf6ea);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.browse-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.browse-filter.on {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+}
+.browse-list .tray-line {
+  flex-wrap: wrap;
+}
+.browse-meta {
+  flex-basis: 100%;
+  font-size: 13px;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stats-today,
+.stats-retention {
+  font-size: 17px;
+  margin: 10px 0 16px;
+}
+.stats-standing {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 18px;
+}
+.stats-cell {
+  padding: 10px 6px 8px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.stats-n {
+  display: block;
+  font: 600 24px/1.1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+.stats-l {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.s-new .stats-n { color: var(--srs-new); }
+.s-learn .stats-n { color: var(--srs-learn); }
+.s-young .stats-n { color: color-mix(in srgb, var(--srs-due) 70%, var(--ground)); }
+.s-mature .stats-n { color: var(--srs-due); }
+.stats-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 120px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.stats-col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.stats-col i {
+  display: block;
+  width: 100%;
+  min-height: 1px;
+  border-radius: 2px 2px 0 0;
+  background: var(--srs-due);
+}
+.stats-bars.ahead .stats-col i {
+  background: var(--srs-new);
+}
+.stats-axis {
+  margin: 4px 0 16px;
+  color: var(--ink-2);
+}
+main .browse-filters .chip.browse-filter.on {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+}
