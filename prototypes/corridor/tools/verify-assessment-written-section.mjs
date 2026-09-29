@@ -64,10 +64,10 @@ assert.equal(
 );
 const core = await import(pathToFileURL(resolve(site, 'modules/assessment-core.mjs')));
 const recordCore = await import(pathToFileURL(resolve(site, 'modules/record-core.mjs')));
-const { selectAssessmentV2 } = await import(
+const { selectAssessmentV2, assessmentItemAssistanceV2 } = await import(
   pathToFileURL(resolve(site, 'assessment-v2-controller.mjs'))
 );
-const { assessmentLearningSummary } = await import(
+const { assessmentLearningSummary, assessmentPracticePriorities } = await import(
   pathToFileURL(resolve(site, 'assessment-learning.mjs'))
 );
 for (const section of sections) {
@@ -366,13 +366,38 @@ async function fit(page, label) {
   );
 }
 /** The room lists one level at a time; press this section's level only if it is not current. */
+async function openAssessmentDoor(page) {
+  const tools = page.locator('details.shelf-study-tools');
+  if (await tools.count() && !await tools.evaluate(element => element.open))
+    await tools.locator('summary').click();
+  await page.locator('#mock-link').click();
+}
 async function selectLevel(page, level) {
   const control = page.locator(`[data-exam-level="${level}"]`);
   if ((await control.getAttribute('aria-pressed')) !== 'true') await control.click();
 }
+// The paper separates the source instruction and numeric label from the
+// question. Retained target brackets become typographic underlining.
+const expectedQuestionText = item => {
+  const lines = item.prompt.split('\n');
+  if (lines.length > 1) lines.shift();
+  return lines.join('\n').replace(/【([^】]+)】/gu, '$1');
+};
+const readQuestionText = node => {
+  const question = node.cloneNode(true);
+  question.querySelector('.exam-question-number')?.remove();
+  return question.textContent;
+};
+async function atQuestion(page, item) {
+  await page.waitForFunction(expected => {
+    const question = document.querySelector('.exam-prompt')?.cloneNode(true);
+    question?.querySelector('.exam-question-number')?.remove();
+    return question?.textContent === expected;
+  }, expectedQuestionText(item));
+}
 async function catalogDoor(page, section, screenshotPrefix = null) {
   const { entry, pin } = section;
-  await page.locator('#mock-link').click();
+  await openAssessmentDoor(page);
   await selectLevel(page, pin.level);
   const card = page
     .locator('[data-exam-form]')
@@ -419,7 +444,7 @@ async function start(page, section, mode, screenshotPrefix = null) {
   await page.locator(mode === 'timed' ? '#exam-confirm-start' : '#exam-practice-start').click();
   await page.locator('.exam-prompt').waitFor();
   assert.equal(await page.locator('.exam-heading').textContent(), `${pin.level} practice`);
-  assert.equal(await page.locator('.exam-prompt').textContent(), items[0].prompt);
+  assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(items[0]));
   assert.match(
     await page.locator('.exam-progress').innerText(),
     new RegExp(`Question 1 of ${items.length}`, 'u'),
@@ -445,7 +470,7 @@ async function start(page, section, mode, screenshotPrefix = null) {
   return record;
 }
 async function wrongAnswer(page, item) {
-  assert.equal(await page.locator('.exam-prompt').textContent(), item.prompt);
+  assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(item));
   const wrong = item.response.options.find((option) => option.id !== item.response.answerOptionId);
   const choice = page.locator(`[data-exam-option=${JSON.stringify(wrong.id)}]`);
   await choice.click();
@@ -644,7 +669,7 @@ async function g1Reload(page) {
   await page.reload();
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 60000 });
   assert.notEqual(await page.evaluate(() => performance.timeOrigin), origin, 'A real reload is a new document');
-  await page.locator('#mock-link').click();
+  await openAssessmentDoor(page);
 }
 // A refused host write either leaves a notice in the room or protects the window
 // (recordFailure → read-only → .room-state). Returns whether the window was protected.
@@ -661,7 +686,7 @@ async function g1RecoverProtected(page) {
   ]);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 60000 });
   assert.notEqual(await page.evaluate(() => performance.timeOrigin), origin, 'Recovery reload is a new document');
-  await page.locator('#mock-link').click();
+  await openAssessmentDoor(page);
 }
 // Scoped read-only native observation: store revision, raw rows, this attempt's
 // operations and finalize receipts. No app code is called.
@@ -791,8 +816,7 @@ async function assistedWhyCase(page, section, log) {
     const answer = answerOf(record, q);
     return { item: answer.item, response: answer.response, assistance: answer.assistance };
   };
-  const atPrompt = (q) =>
-    page.waitForFunction((prompt) => document.querySelector('.exam-prompt')?.textContent === prompt, byQ[q].prompt);
+  const atPrompt = q => atQuestion(page, byQ[q]);
   const choicesLocked = () =>
     page.locator('[data-exam-option]').evaluateAll((nodes) => nodes.length > 0 && nodes.every((node) => node.disabled));
   const bodyText = () => page.locator('body').innerText();
@@ -1138,8 +1162,7 @@ async function existingCardCase(page, section, log) {
   const answerOf = (record, attemptId, q) =>
     selectAssessmentV2(record.assessmentLibraryV2, attemptId).attempt.answers.find((row) => row.item.id === byQ[q].id);
   const cards = (record) => record.taken.filter((row) => row.t === 'word' && row.id === '点検');
-  const atPrompt = (q) =>
-    page.waitForFunction((prompt) => document.querySelector('.exam-prompt')?.textContent === prompt, byQ[q].prompt);
+  const atPrompt = q => atQuestion(page, byQ[q]);
   // finish one sitting: jump to the last question with the real map, then Finish and confirm
   const finishFromMap = async () => {
     await page.locator('.exam-question-map summary').click();
@@ -1329,10 +1352,7 @@ try {
       });
       await wrongAnswer(page, items[0]);
       await page.locator('#exam-next').click();
-      await page.waitForFunction(
-        (prompt) => document.querySelector('.exam-prompt')?.textContent === prompt,
-        items[1].prompt,
-      );
+      await atQuestion(page, items[1]);
       await fit(page, 'Next written question');
       const advanced = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(advanced.attempt.cursor.itemId, items[1].id);
@@ -1350,6 +1370,61 @@ try {
         nextQuestion: advanced.attempt.cursor.itemId,
       };
     });
+    await run(engine, `study-word-lookup-persists-and-unbookmarked-error-feeds-practice${suffix}`, async (page) => {
+      const baseline = await disk(page);
+      await start(page, section, 'practice');
+      const initial = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      const item = items[0];
+      assert.equal(initial.attempt.answers[0].response.kind, 'unanswered');
+      assert.equal(assessmentItemAssistanceV2(initial.attempt, item.id), null);
+      assert.equal(await page.locator('.exam-paper button button').count(), 0);
+      const lookupWord = page.locator('.exam-prompt .japanese-lookup-word').first();
+      assert(await lookupWord.count(), 'A real study question has lookup controls');
+      const lookupText = await lookupWord.textContent();
+      await lookupWord.click();
+      await page.locator('#mini').waitFor();
+      const assistedRecord = await disk(page);
+      const assisted = selectAssessmentV2(assistedRecord.assessmentLibraryV2);
+      const mark = assessmentItemAssistanceV2(assisted.attempt, item.id);
+      assert.equal(mark?.kind, 'dictionary', 'Native assistance must be committed before the reading popup');
+      assert.equal(assisted.attempt.answers[0].response.kind, 'unanswered');
+      assert.equal(await page.locator('#exam-why-sheet').count(), 0);
+      assert.equal(await page.locator('[data-exam-option]').first().isEnabled(), true);
+      await page.locator('.exam-heading').click();
+      await wrongAnswer(page, item);
+      const chosen = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(chosen.attempt.answers[0].flagged, false, 'No bookmark was needed');
+      await g1Reload(page);
+      await page.locator('.exam-lookup-assisted').waitFor();
+      const reloaded = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.deepEqual(assessmentItemAssistanceV2(reloaded.attempt, item.id), mark);
+      assert.equal(await page.locator('#exam-why-sheet').count(), 0);
+      await page.locator('.exam-question-map > summary').click();
+      await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(items.at(-1).id)}]`).click();
+      await atQuestion(page, items.at(-1));
+      await page.locator('#exam-finish-block').click();
+      await page.locator('#exam-confirm-finish').click();
+      await page.locator('.exam-score').waitFor();
+      const completed = await pollRecord(page, row => row.assessmentLearning?.followups.length === 1);
+      const followup = completed.assessmentLearning.followups[0];
+      const mistake = followup.evidence.find(row => row.item.id === item.id);
+      assert.equal(mistake.outcome, 'incorrect');
+      assert.equal(mistake.flagged, false);
+      assert.deepEqual(mistake.assistance, mark);
+      assert(followup.actions.some(row => row.evidenceId === mistake.id), 'Wrong unbookmarked answers automatically enter the real review workflow');
+      const priorities = assessmentPracticePriorities(completed.assessmentLearning);
+      assert.equal(priorities.authority, 'practice-only');
+      assert.equal(priorities.scheduling, 'unchanged');
+      assert.equal(priorities.mastery, 'unchanged');
+      assert(priorities.targets.some(target => target.evidence.some(row => row.evidenceId === mistake.id && row.assisted && !row.flagged)),
+        'The same retained mistake becomes a cross-app practice priority with assistance and bookmark provenance');
+      assert.deepEqual(completed.srs, baseline.srs, 'A missed test answer cannot fabricate an FSRS grade');
+      assert.deepEqual(completed.revlog, baseline.revlog);
+      assert.match(await page.locator('.exam-bookmark-note').innerText(), /1 wrong answers saved, with or without bookmarks/u);
+      await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-study-missed-without-bookmark.png`), fullPage: true });
+      return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
+        unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
+    });
     await run(engine, `timed-written-completion-to-learn-review-and-sensei${suffix}`, async (page) => {
       const baseline = await disk(page);
       assert.deepEqual(baseline.taken, []);
@@ -1361,10 +1436,7 @@ try {
         await fit(page, `Question ${index + 1}`);
         if (index < items.length - 1) {
           await page.locator('#exam-next').click();
-          await page.waitForFunction(
-            (prompt) => document.querySelector('.exam-prompt')?.textContent === prompt,
-            items[index + 1].prompt,
-          );
+          await atQuestion(page, items[index + 1]);
         }
       }
       await page.locator('#exam-finish-block').click();
@@ -1560,7 +1632,7 @@ try {
       await page.waitForFunction(() => document.body.dataset.ready === '1', null, {
         timeout: 60000,
       });
-      await page.locator('#mock-link').click();
+      await openAssessmentDoor(page);
       await page.locator('.exam-prompt').waitFor();
       assert.equal(await page.locator('#exam-timer').textContent(), 'Untimed');
       assert.equal(
@@ -1570,10 +1642,7 @@ try {
         'true',
       );
       await page.locator('#exam-next').click();
-      await page.waitForFunction(
-        (prompt) => document.querySelector('.exam-prompt')?.textContent === prompt,
-        items[1].prompt,
-      );
+      await atQuestion(page, items[1]);
       await wrongAnswer(page, items[1]);
       await page.locator('#exam-stop').click();
       await page.locator('#exam-confirm-stop').click();

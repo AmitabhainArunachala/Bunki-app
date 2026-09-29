@@ -172,6 +172,20 @@ export function commandAssessmentV2(raw, options) {
   if (!attempt) fail('missing-attempt');
   const form = library.forms.find((candidate) => sameRef(candidate, attempt.form));
   const input = { ...options }; delete input.scope; delete input.attemptId;
+  if (input.action?.kind === 'dictionary-lookup') {
+    fields(input.action, ['kind', 'itemId']);
+    if (attempt.mode !== 'practice') fail('lookup-in-timed-mode');
+    if (attempt.status !== 'in-progress' || attempt.cursor.itemId !== input.action.itemId)
+      fail('lookup-not-current-item');
+    const answer = attempt.answers.find(row => row.item.id === input.action.itemId);
+    if (!answer?.reached) fail('lookup-before-visit');
+    if (options.expectedRevisionId !== attempt.revisionId) fail('stale-lookup');
+    if (assessmentDictionaryAssistanceV2(attempt, input.action.itemId)) return library;
+    // The existing event schema retains an exact item digest, including before
+    // an answer exists. Dictionary help does not disclose the key or lock an
+    // answer. This event survives export/reload without inventing a response.
+    input.action = { kind: 'assistance', reason: `dictionary:${answer.item.sha256}` };
+  }
   const updated = updateAttemptV2(form, attempt, input);
   // An unchanged revision is a no-op (terminal, or an explanation already recorded).
   if (updated === attempt || updated.revisionId === attempt.revisionId) return library;
@@ -212,10 +226,22 @@ export function selectAssessmentV2(raw, attemptId) {
   });
 }
 
-/** A local item mark (attempt answer) or its evidence copy. Nothing else is assistance. */
+/** Dictionary assistance is bound to the exact retained question digest. */
+export function assessmentDictionaryAssistanceV2(attempt, itemId) {
+  const answer = attempt?.answers?.find(row => row.item.id === itemId);
+  if (attempt?.mode !== 'practice' || !answer?.reached || !attempt.conditions.includes('assisted')) return null;
+  const event = attempt.events.find(row => row.kind === 'assistance' &&
+    row.detail === `dictionary:${answer.item.sha256}` && row.at >= attempt.startedAt && row.at <= attempt.recordedAt);
+  return event ? { kind: 'dictionary', at: event.at } : null;
+}
+export function assessmentItemAssistanceV2(attempt, itemId) {
+  const mark = attempt?.answers?.find(row => row.item.id === itemId)?.assistance;
+  return mark ? { kind: mark.kind, at: mark.at } : assessmentDictionaryAssistanceV2(attempt, itemId);
+}
+/** A local mark or its evidence copy. Truthy stand-ins never count as help. */
 export function validAssessmentAssistanceMark(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value) &&
-    value.kind === 'explanation' && Number.isSafeInteger(value.at) && value.at >= 0;
+    ['explanation', 'dictionary'].includes(value.kind) && Number.isSafeInteger(value.at) && value.at >= 0;
 }
 /** The one enrollment rule: wrong, or correct and flagged or assisted. */
 export function assessmentFollowupEligible({ outcome, flagged, assisted }) {
@@ -235,8 +261,10 @@ export function assessmentResultItemEligible(item) {
 export function assessmentOutcomesV2(selected) {
   return selected.score.items.map(row => {
     const answer = selected.attempt.answers.find(entry => entry.item.id === row.itemId);
+    const assistance = ['correct', 'incorrect'].includes(row.result)
+      ? assessmentItemAssistanceV2(selected.attempt, row.itemId) : null;
     return { ...row, outcome: row.result, flagged: answer?.flagged === true,
-      ...(answer?.assistance ? { assistance: { kind: answer.assistance.kind, at: answer.assistance.at } } : {}) };
+      ...(assistance ? { assistance } : {}) };
   });
 }
 /** The why-sheet for one item. Null until that item's assistance is durably
@@ -272,7 +300,7 @@ export function assessmentIndependenceV2(selected) {
   for (const row of selected.score.items) {
     if (['unanswered', 'not-reached'].includes(row.result)) { unanswered++; continue; }
     answered++;
-    if (selected.attempt.answers.find(entry => entry.item.id === row.itemId)?.assistance) {
+    if (assessmentItemAssistanceV2(selected.attempt, row.itemId)) {
       assisted++; if (row.result === 'correct') assistedCorrect++;
     }
   }

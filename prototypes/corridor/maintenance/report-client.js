@@ -1,4 +1,5 @@
 /* Portable Bunki report client. No dependency on the learning app's state/storage. */
+/* global createImageBitmap */
 (() => {
   'use strict';
   if (window.BunkiReports) return;
@@ -42,7 +43,7 @@
     let service = normalizeService(options.serviceUrl);
     let dbPromise = database();
     dbPromise.catch(() => {});
-    let config = null, configPromise = null, configError = '', draft = null, draftDirty = false, active = 'new', selectedId = null;
+    let config = null, configPromise = null, configError = '', serviceUnavailable = false, draft = null, draftDirty = false, active = 'new', selectedId = null;
     let draftCanAdoptBuild = false;
     let syncing = false, disposed = false, closing = false, unmountPromise = null, initialized = false, engaged = false, saveTimer, retryTimer, pollTimer;
     let saveQueue = Promise.resolve(), message = '', returnState = null, rows = [], previewUrls = [];
@@ -51,14 +52,21 @@
     let draftSlot = null, savedDrafts = [], savedFollowups = [];
     const root = document.createElement('div');
     root.id = 'bunki-reports-root';
-    root.innerHTML = `<div class="br-rail" aria-label="Report support"><button type="button" data-br="open">Report a problem</button><button type="button" data-br="reports">My reports <span class="br-count"></span></button></div>
+    root.dataset.driftChrome = '';
+    root.innerHTML = `<div class="br-rail" aria-label="Report support"><button type="button" id="bunki-report-bug" class="br-bug" data-br="open" aria-label="Report a problem on this screen" title="Report a problem on this screen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7.5V6a4 4 0 0 1 8 0v1.5M9 3 7 1M15 3l2-2M8 10H3M16 10h5M8 14H2M16 14h6M8.5 18 5 21M15.5 18l3.5 3"/><rect x="7" y="7" width="10" height="14" rx="5"/><path d="M12 8v12"/></svg><span class="br-count" aria-hidden="true"></span></button></div>
       <dialog class="br-sheet" aria-labelledby="br-title"><header class="br-heading"><h2 id="br-title">Report a problem</h2><button type="button" class="br-close" data-br="close" aria-label="Close reports and return to learning">Close</button></header><nav class="br-nav" aria-label="Reports"><button type="button" data-br="new" aria-current="page">Report a problem</button><button type="button" data-br="list">My reports</button></nav><div class="br-body"></div></dialog><div class="br-sr" role="status" aria-live="polite" id="br-live"></div>`;
     document.body.append(root);
-    // A host that supplies its own in-flow entries (openReport/openReports) mounts
-    // with rail:false: no overlay may ever sit over its controls.
+    // Embedders can still opt out; Bunki keeps one visible bug entry in every room.
     const railless = options.rail === false;
     if (railless) root.querySelector('.br-rail').style.display = 'none';
-    const dialog = root.querySelector('dialog'), body = root.querySelector('.br-body');
+    const dialog = root.querySelector('dialog'), body = root.querySelector('.br-body'), rail = root.querySelector('.br-rail');
+    // A manual popover clears clipping/stacking contexts without making learning
+    // inert. It stays a descendant of the active modal for keyboard access.
+    if (!railless && typeof rail.showPopover === 'function') rail.setAttribute('popover', 'manual');
+    for (const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) {
+      root.addEventListener(type, event => event.stopPropagation());
+    }
+    root.addEventListener('keydown', event => { if (dialog.open) event.stopPropagation(); });
     function protectClosingDialog() {
       // showModal() escapes ancestor inertness. Freeze the actual controls while
       // leaving the native dialog's saving status readable and text selectable.
@@ -87,11 +95,15 @@
       if (disposed || dialog.open || railless) return;
       const hostDialogs = [...document.querySelectorAll('dialog[open]')].filter(item => item !== dialog && !root.contains(item));
       const focusedHost = document.activeElement?.closest('dialog[open]');
-      const destination = hostDialogs.includes(focusedHost) ? focusedHost : hostDialogs[hostDialogs.length - 1] || document.body;
+      const host = hostDialogs.includes(focusedHost) ? focusedHost : hostDialogs[hostDialogs.length - 1];
+      const destination = host || document.querySelector('#stroke-page:not([inert])') || document.querySelector('#sheet:not([inert])') || document.body;
       if (root.parentElement !== destination) destination.append(root);
+      if (rail.hasAttribute('popover') && !rail.matches(':popover-open')) {
+        try { rail.showPopover(); } catch { rail.removeAttribute('popover'); /* Fixed-position fallback. */ }
+      }
     }
     const hostObserver = new MutationObserver(keepEntryReachable);
-    hostObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open'] });
+    hostObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'inert'] });
     keepEntryReachable();
 
     // Closing stops new admissions, but already accepted work may still write
@@ -111,7 +123,7 @@
         if (url.username || url.password || url.search || url.hash) return '';
         if (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname))) return '';
         return url.href.replace(/\/$/, '');
-      } catch (_) { return ''; }
+      } catch { return ''; }
     }
     const metaKey = name => `${name}:${service || 'unconfigured'}`;
     const emptyDraft = () => { draftCanAdoptBuild = true; return { actual: '', expected: '', category: 'bug', context: capture(), attachments: [], created_at: new Date().toISOString() }; };
@@ -124,7 +136,7 @@
 
     function capture() {
       let source = {};
-      try { source = typeof options.getContext === 'function' ? options.getContext() || {} : {}; } catch (_) { /* Safe minimal context remains usable. */ }
+      try { source = typeof options.getContext === 'function' ? options.getContext() || {} : {}; } catch { /* Safe minimal context remains usable. */ }
       const sha = source.build?.git_sha || source.build_sha;
       const artifact = source.build?.artifact_sha256 || source.artifact_sha256;
       const context = { app_id: 'bunki', surface: clip(source.surface, 160) || 'unknown', route: clip(source.route, 500) || '/', build: { git_sha: /^[a-f0-9]{40}$/.test(sha || '') ? sha : null, artifact_sha256: /^[a-f0-9]{64}$/.test(artifact || '') ? artifact : null }, content_ids: Array.isArray(source.content_ids) ? source.content_ids.filter(value => typeof value === 'string' && value).slice(0, 32).map(value => clip(value, 160)) : [], locale: clip(source.locale, 32) || clip(navigator.language, 32) || 'en' };
@@ -152,6 +164,8 @@
     const putMeta = (key, value) => transact(['meta'], tx => tx.objectStore('meta').put({ key, value }));
     function announce(value) { root.querySelector('#br-live').textContent = value; }
     function setMessage(value) { message = value; announce(value); const element = body.querySelector('.br-notice'); if (element) { element.textContent = value; element.hidden = !value; } if (closing) protectClosingDialog(); }
+    const canQueueReview = () => typeof window.lavish?.queuePrompt === 'function';
+    const localServiceNote = 'You can save reports on this device. This preview has no connected report service, so nothing is sent automatically.';
     const errorText = error => error?.name === 'AbortError' ? 'The service did not reply in time. Your saved report will retry with the same ID.' : clip(error?.message, 400) || 'The service is unavailable. Your saved report can be retried.';
 
     async function request(path, { method = 'GET', data, token, bodyText, timeout = 18000 } = {}) {
@@ -162,18 +176,22 @@
         const response = await fetch(service + path, { method, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(data !== undefined || bodyText ? { 'Content-Type': 'application/json' } : {}) }, ...(bodyText || data !== undefined ? { body: bodyText || JSON.stringify(data) } : {}), credentials: 'omit', signal: controller.signal });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-          const error = new Error(response.status === 401 ? 'Your report session has expired. Saved reports are kept here; reconnect this browser with the service operator to restore access.' : result.error?.message || `Report service returned ${response.status}. Retry when the service is available.`);
+          const error = new Error(response.status === 401 ? 'Your report session has expired. Saved reports are kept here; reconnect this browser with the service operator to restore access.' : ([404, 405].includes(response.status) ? localServiceNote : result.error?.message || `The report service is unavailable (${response.status}). Your report stays on this device.`));
           error.status = response.status; throw error;
         }
         return result;
       } finally { clearTimeout(timer); }
     }
-    async function loadConfig() {
+    async function loadConfig(force = false) {
+      if (canQueueReview()) { configError = 'Review mode: save your report here, then use Send to Agent in Lavish to share the queued feedback.'; return null; }
+      if (serviceUnavailable && !force) return null;
       if (!service) { configError = 'The report service is not connected. You can save a report on this device.'; return null; }
       if (configPromise) return configPromise;
       configPromise = (async () => {
         try {
-          config = await request('/api/config'); configError = '';
+          const next = await request('/api/config');
+          if (next?.schema_version !== SCHEMA) { serviceUnavailable = true; config = null; configError = localServiceNote; return null; }
+          config = next; configError = ''; serviceUnavailable = false;
           const build = serviceBuild();
           // Only a context captured in this document may inherit this document's
           // same-origin build. Older offline drafts retain their unknown identity.
@@ -185,9 +203,9 @@
         } catch (error) {
           // a host with no report service (a static site answers 404) is not an outage: say plainly
           // that the report stays on this device, rather than a generic service failure
-          configError = error?.status === 404
-            ? 'This copy of KAIRO has no report service yet. You can save a report on this device; it will not be sent.'
-            : errorText(error);
+          config = null;
+          serviceUnavailable = [404, 405].includes(error?.status);
+          configError = serviceUnavailable ? localServiceNote : errorText(error);
           return null;
         }
       })();
@@ -215,11 +233,11 @@
     const newSlot = () => ({ id: id('draft'), revision: 0 });
     const slotKey = (name, slot) => `${metaKey(name)}:${slot.id}`;
     function rememberSlot(name, slot) {
-      try { sessionStorage.setItem(`bunki-reports-editor:${metaKey(name)}`, slot.id); } catch (_) { /* The saved-draft list still recovers this draft. */ }
+      try { sessionStorage.setItem(`bunki-reports-editor:${metaKey(name)}`, slot.id); } catch { /* The saved-draft list still recovers this draft. */ }
     }
     async function loadSlot(name, fallback) {
       let pointer;
-      try { pointer = sessionStorage.getItem(`bunki-reports-editor:${metaKey(name)}`); } catch (_) { /* Recovery remains available below. */ }
+      try { pointer = sessionStorage.getItem(`bunki-reports-editor:${metaKey(name)}`); } catch { /* Recovery remains available below. */ }
       const row = pointer ? await read('meta', `${metaKey(name)}:${pointer}`) : null;
       if (row?.value?.draft_id === pointer && Number.isSafeInteger(row.value.revision) && row.value.revision > 0) {
         return { slot: { id: pointer, revision: row.value.revision }, value: row.value.draft, recovered: true };
@@ -312,10 +330,11 @@
     }
     async function refreshRows() {
       rows = (await read('records')).filter(row => row.service === service).sort((a, b) => b.created_at.localeCompare(a.created_at));
-      root.querySelector('.br-count').textContent = rows.length ? `(${rows.length})` : '';
+      root.querySelector('.br-count').textContent = rows.length ? String(rows.length) : '';
+      root.querySelector('.br-count').hidden = !rows.length;
     }
     function statusLabel(row) {
-      if (!row.view?.receipt) return 'Saved on this device';
+      if (!row.view?.receipt) return row.review_queued_at ? 'Queued in Lavish' : 'Saved on this device';
       // A release claim needs server evidence; unknown client/model statuses cannot claim a fix.
       if (row.view.status === 'fixed' && row.view.release?.verified === true && row.view.release?.version) return `Fixed in ${row.view.release.version}`;
       return STATUS[row.view.status] || 'Received';
@@ -366,7 +385,8 @@
       return syncUnlocked();
     }
     async function syncUnlocked() {
-      if (syncing || disposed || !initialized) return;
+      if (syncing || disposed || !initialized || !service || serviceUnavailable || canQueueReview()) return;
+      if (!config && !await loadConfig()) return;
       syncing = true;
       clearTimeout(retryTimer);
       try {
@@ -389,7 +409,7 @@
         await refreshRows();
         if (dialog.open && active !== 'new' && !busy && !body.querySelector('textarea:focus')) render();
       } catch (error) { configError = errorText(error); }
-      finally { syncing = false; if (!disposed && !closing && service && rows.some(row => !row.view?.receipt)) retryTimer = setTimeout(() => run(sync), 30000); }
+      finally { syncing = false; if (!disposed && !closing && service && !serviceUnavailable && !canQueueReview() && rows.some(row => !row.view?.receipt)) retryTimer = setTimeout(() => run(sync), 30000); }
     }
 
     function snapshotReturn() {
@@ -404,9 +424,10 @@
       if (!dialog.open) {
         snapshotReturn();
         if (!draft || (!draft.actual && !draft.expected && !draft.attachments.length)) { draft = emptyDraft(); draftSlot = newSlot(); draftDirty = false; }
-        try { if (typeof options.onOpen === 'function') options.onOpen({ mode }); } catch (_) { /* A host playback error must not block reporting. */ }
+        try { if (typeof options.onOpen === 'function') options.onOpen({ mode }); } catch { /* A host playback error must not block reporting. */ }
         window.dispatchEvent(new CustomEvent('bunki:reports-open', { detail: { mode } }));
         // Protect the active sheet even if the host later rerenders its modal.
+        if (rail.hasAttribute('popover') && rail.matches(':popover-open')) rail.hidePopover();
         if (root.parentElement !== document.body) document.body.append(root);
         dialog.showModal();
       }
@@ -425,11 +446,11 @@
       if (saved.element?.isConnected) {
         saved.element.focus({ preventScroll: true });
         if (typeof saved.start === 'number' && typeof saved.element.setSelectionRange === 'function') {
-          try { saved.element.setSelectionRange(saved.start, saved.end); } catch (_) { /* Non-text controls do not accept ranges. */ }
+          try { saved.element.setSelectionRange(saved.start, saved.end); } catch { /* Non-text controls do not accept ranges. */ }
         }
       }
       if (saved.selection?.startContainer?.isConnected && !root.contains(saved.selection.startContainer)) {
-        try { const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(saved.selection); } catch (_) { /* Route rerender may invalidate an old range. */ }
+        try { const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(saved.selection); } catch { /* Route rerender may invalidate an old range. */ }
       }
       window.scrollTo(saved.x, saved.y);
     }
@@ -455,12 +476,16 @@
     }
     function newMarkup() {
       const limits = boundedLimits(config?.limits);
-      return `${notice()}<p>Tell us what happened. Your place in the lesson stays here.</p>${options.clockNotice ? `<p class="br-note">${esc(typeof options.clockNotice === 'function' ? options.clockNotice() : options.clockNotice)}</p>` : ''}
+      const context = draft?.context?.context;
+      const currentContext = capture().context;
+      const scopeChanged = canonical({ surface: context?.surface, ids: context?.content_ids }) !== canonical({ surface: currentContext.surface, ids: currentContext.content_ids });
+      const scope = [context?.surface?.replace(/^corridor\//, '').replaceAll('/', ' › '), ...(context?.content_ids || [])].filter(Boolean).join(' · ');
+      return `${notice()}<p>Tell us what happened. Your place in the lesson stays here.</p><p class="br-context-summary"><strong>Reporting this screen</strong><br>${esc(scope)}${scopeChanged ? '<br><button type="button" data-br="context">Use the current screen for this draft</button>' : ''}</p>${options.clockNotice ? `<p class="br-note">${esc(typeof options.clockNotice === 'function' ? options.clockNotice() : options.clockNotice)}</p>` : ''}
         ${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${recoveryMarkup(savedDrafts, 'recover-draft', 'reports')}<form id="br-form"><label class="br-field"><span>What happened?</span><textarea id="br-actual" name="actual" ${busy ? 'readonly' : ''} required maxlength="12000" rows="4" placeholder="Which sentence or control was involved?">${esc(draft?.actual)}</textarea></label>
         <label class="br-field"><span>What did you expect? <small>Optional</small></span><textarea id="br-expected" name="expected" ${busy ? 'readonly' : ''} maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
         <label class="br-field"><span>Category</span><select id="br-category" name="category" ${busy ? 'disabled' : ''}>${[['bug', 'Something isn’t working'], ['content', 'Language or content'], ['experience', 'Learning experience'], ['idea', 'An idea']].map(([value, label]) => `<option value="${value}" ${draft?.category === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
         ${exactContext(draft?.context)}<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>
-        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : service ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">Sending first saves the report on this device. “Received” appears only when the service confirms delivery.</p></form>`;
+        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
     }
     function listMarkup() {
       return `${notice()}<p class="br-note">Reports and guest access are saved in this browser. Clearing browser data removes that access.</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for Bunki.</p>'}`;
@@ -473,7 +498,7 @@
       if (!row) { active = 'list'; return listMarkup(); }
       const report = row.report, view = row.view, isReceived = !!view?.receipt, follow = followups[row.id]?.text || '', pending = followups[row.id]?.pending;
       const protectedAnswer = typeof options.protectAnswers === 'function' ? options.protectAnswers() : options.protectAnswers === true;
-      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : 'Delivery is pending. You can leave this sheet; the saved report stays in this browser.'}</p>${row.delivery_error ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>${isReceived ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
+      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
         ${isReceived ? `<h3>Sensei analysis</h3>${protectedAnswer ? '<p class="br-note">Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.</p>' : `<p class="br-note">${esc(triageText(view))}</p>${view.conversation?.length ? `<ol class="br-thread">${view.conversation.map(item => `<li><strong>${esc(item.actor === 'sensei' ? 'Sensei · AI interpretation' : item.actor === 'user' ? 'You' : 'Service update')}</strong><p class="br-verbatim">${esc(item.text)}</p></li>`).join('')}</ol>` : ''}${(view.proposals || []).map(proposalMarkup).join('')}`}${recoveryMarkup(savedFollowups, 'recover-followup', 'follow-ups')}${pending ? `<section class="br-pending"><h4>Awaiting confirmation</h4><p class="br-verbatim">${esc(pending.data.text)}</p><button type="button" data-br="retry-followup" ${busy ? 'disabled' : ''}>Retry pending follow-up</button><p class="br-note">This retries the same message and request ID. The text below is kept separately.</p></section>` : ''}<form id="br-follow-form"><label class="br-field"><span>Add a detail or reply</span><textarea id="br-follow" ${recovering || !followupSlots[row.id] ? 'readonly' : ''} maxlength="4000" rows="3">${esc(follow)}</textarea></label><div class="br-actions"><button type="submit" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Send follow-up</button><button type="button" data-br="reopen" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Still happening</button></div><p class="br-note">“Still happening” keeps this thread and adds the current screen context.</p></form>` : ''}`;
     }
     function triageText(view) {
@@ -505,11 +530,31 @@
         draft = emptyDraft(); draftSlot = newSlot(); rememberSlot('draft', draftSlot); draftDirty = false;
         selectedId = reportId; active = 'detail';
         message = 'Saved on this device. It has not been sent.';
+        if (canQueueReview()) await queueReview(row);
         await refreshRows();
         announce(message);
       } catch (error) { message = `The report could not be saved. Your draft is still here. ${errorText(error)}`; }
       finally { busy = false; render(); }
       run(sync);
+    }
+
+    async function queueReview(row = rows.find(item => item.id === selectedId)) {
+      if (!row || !canQueueReview()) { setMessage('Your report is saved here. Open this copy through Lavish to queue it for review.'); return; }
+      const report = row.report;
+      const prompt = `Bunki report — ${report.context.surface}\n\n${report.user_words}\n\nExpected: ${report.expected}\n\nScreen context: ${JSON.stringify(report.context)}`;
+      try {
+        await window.lavish.queuePrompt(prompt, {
+          tag: 'bunki-report', text: `${report.context.surface}: ${report.user_words}`,
+          queueKey: `bunki-report-${row.id}`,
+          data: { reportId: row.id, category: report.category, context: report.context, expected: report.expected, note: report.user_words },
+        });
+        const updated = { ...row, review_queued_at: new Date().toISOString() };
+        await transact(['records'], tx => tx.objectStore('records').put(updated));
+        message = 'Saved here and queued in Lavish. Use Send to Agent in Lavish when you are ready.';
+        await refreshRows();
+      } catch { message = 'Saved on this device. The feedback could not be queued; retry here or copy your words into Lavish.'; }
+      if (!busy) render();
+      announce(message);
     }
 
     async function addFiles(files) {
@@ -542,7 +587,7 @@
     async function updateReports() {
       if (busy) return;
       busy = true; render();
-      try { await loadConfig(); await sync(); await reloadRemote(); message = ''; configError = ''; }
+      try { const connected = await loadConfig(true); if (connected) { await sync(); await reloadRemote(); message = ''; configError = ''; } else { await refreshRows(); message = canQueueReview() ? 'Your saved reports are below. Use Send to Agent in Lavish to send queued notes.' : 'Your saved reports are below. They remain available on this device.'; } }
       catch (error) { message = errorText(error); }
       finally { busy = false; await refreshRows().catch(() => {}); if (dialog.open && active !== 'new') render(); }
     }
@@ -584,7 +629,8 @@
         const current = followups[reportId];
         if (current?.pending?.data.idempotency_key === pending.data.idempotency_key) {
           const sameDraft = (current.edit_revision || 0) === (pending.draft_revision || 0) && current.text === (pending.draft_text ?? pending.data.text);
-          const { pending: _acknowledged, ...next } = current;
+          const next = { ...current };
+          delete next.pending;
           // Clear the acknowledged request before awaiting storage: new input
           // must inherit this state, and must never be replaced by an old copy.
           followups[reportId] = { ...next, text: sameDraft ? '' : current.text };
@@ -612,12 +658,15 @@
     }
 
     root.addEventListener('click', event => {
+      event.stopPropagation();
       if (closing || disposed) return;
       run(async () => {
         const button = event.target.closest('[data-br]');
         if (!button || button.disabled) return;
         const action = button.dataset.br;
-        if (action === 'open' || action === 'new') return open('new');
+        if (action === 'open' || action === 'new') { button.focus({ preventScroll: true }); return open('new'); }
+        else if (action === 'context') { draft.context = capture(); scheduleDraft(); render(); }
+        else if (action === 'queue-review') return queueReview();
         else if (action === 'reports' || action === 'list') return open('list');
         else if (action === 'close') close();
         else if (action === 'detail') {
@@ -671,7 +720,7 @@
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     });
-    function onOnline() { if (engaged || rows.some(row => !row.view?.receipt)) run(() => loadConfig().then(sync)); }
+    function onOnline() { if (engaged || rows.some(row => !row.view?.receipt)) run(() => loadConfig(true).then(sync)); }
     function onVisibility() { if (document.visibilityState === 'hidden' && draftDirty) run(persistDraft).catch(() => {}); }
     window.addEventListener('online', onOnline);
     document.addEventListener('visibilitychange', onVisibility);

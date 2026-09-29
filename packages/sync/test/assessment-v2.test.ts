@@ -436,7 +436,7 @@ describe('optional-when-true item assistance on assessment.result/2', () => {
   // JSON (node:crypto, 2026-09-25). This change must not move one unassisted byte.
   const GOLDEN_RESULT = 'e90c61c88e37cdc781b7792ebd3e2342c01257cbf1c6116ed76882da2e253c31';
   const GOLDEN_FOLLOWUP = '1b8bde559d8c10f163cc04330286f9240177930eae90be897ba3af7ad7973c0a';
-  const second = { ...item, id: 'item:two' };
+  const second = { ...item, id: 'item:two', sha256: inputHashOf({ fixture: 'item:two' }) };
   const assisted: AssessmentResultPayloadV2 = {
     ...result,
     mode: 'practice',
@@ -651,6 +651,28 @@ describe('optional-when-true item assistance on assessment.result/2', () => {
     const unmarked = build({})[0]!.payload;
     if (unmarked.kind !== 'assessment.result/2') throw new Error('Expected result');
     expect(unmarked.items.some((row) => 'assisted' in row)).toBe(false);
+    const dictionaryEvent = {
+      kind: 'assistance',
+      at: Date.parse(NOW) + 500,
+      detail: `dictionary:${item.sha256}`,
+    };
+    const lookedUp = build({ reached: true }, { events: [dictionaryEvent] })[0]!.payload;
+    if (lookedUp.kind !== 'assessment.result/2') throw new Error('Expected result');
+    expect(lookedUp.items[0]!.assisted).toBe(true);
+    expect('assisted' in lookedUp.items[1]!).toBe(false);
+    expect(JSON.stringify(lookedUp)).not.toContain('dictionary:');
+    expect(() => build({ reached: true }, { mode: 'timed', events: [dictionaryEvent] })).toThrow(
+      /result\.items\.assistance/u,
+    );
+    expect(() => build({ reached: true }, { conditions: [], events: [dictionaryEvent] })).toThrow(
+      /result\.items\.assistance/u,
+    );
+    expect(() => build({ reached: false }, { events: [dictionaryEvent] })).toThrow(
+      /result\.items\.assistance/u,
+    );
+    expect(() =>
+      build({ reached: true }, { events: [{ ...dictionaryEvent, at: Date.parse(NOW) - 1 }] }),
+    ).toThrow(/result\.items\.assistance/u);
     expect(() => build({ reached: false, assistance: marker })).toThrow(
       /result\.items\.assistance/u,
     );

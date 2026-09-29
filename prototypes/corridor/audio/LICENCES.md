@@ -19,3 +19,19 @@ corridor's rights discipline.
 Format: AAC 32kbps mono 24kHz (`.m4a`). Every word clip passed a g2p
 reading gate against the dictionary reading before shipping; mismatched
 readings were synthesized from kana and marked in the manifest.
+
+## F1 article narration · September 2026
+
+`article-narration.json` and `narration/f1/` contain local Style-Bert-VITS2
+JP-Extra narration using `litagin/style_bert_vits2_jvnv` (`jvnv-F1-jp`,
+revision `205830`). Credit: the JVNV corpus and model contributors;
+voice model terms: CC BY-SA 4.0. Article text and its original attribution
+remain in the corresponding article JSON. Narration is a generated rendition
+of that text, not the publisher's original recording.
+
+These clips use AAC 48kbps mono 24kHz. The manifest retains each text segment
+and audio digest. This new passage audio has not passed a human pronunciation
+or voice audition; it is labelled accordingly and must be explicitly selected.
+The word-audio reading gate described above does not apply to these passages.
+Rebuild with `scripts/render-article-narration.py` and an installed local voice
+configuration. The selectable roster remains provisional.

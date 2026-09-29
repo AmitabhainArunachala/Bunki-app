@@ -1,4 +1,4 @@
-/* Bunki maintenance: a quiet utility rail and a focused sheet, in the host's ink. */
+/* A visible bug entry and a focused report sheet, in Bunki’s ink and paper. */
 #bunki-reports-root {
   --br-paper: var(--ground, #f1e9d3);
   --br-ink: var(--ink, #1c2f42);
@@ -14,10 +14,18 @@
 #bunki-reports-root button:hover { background: color-mix(in srgb, var(--br-ink) 8%, transparent); }
 #bunki-reports-root button:disabled { cursor: wait; opacity: .58; }
 #bunki-reports-root :focus-visible { outline: 2px solid var(--br-ink); outline-offset: 3px; }
-#bunki-reports-root .br-rail { position: fixed; z-index: 2147483000; right: 12px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 0; max-width: calc(100vw - 24px); border: 1px solid var(--br-line); background: var(--br-paper); }
-#bunki-reports-root .br-rail button { border: 0; border-radius: 0; font-size: 12px; padding: 7px 12px; min-height: 44px; }
-#bunki-reports-root .br-rail button + button { border-left: 1px solid var(--br-line); }
-#bunki-reports-root .br-count { font-variant-numeric: tabular-nums; }
+#bunki-reports-root .br-rail { position: fixed; z-index: 2147483000; inset: auto 18px calc(18px + env(safe-area-inset-bottom, 0px)) auto; margin: 0; padding: 0; display: flex; width: 52px; height: 52px; max-width: calc(100vw - 24px); overflow: visible; border: 0; background: transparent; color: var(--br-ink); }
+#bunki-reports-root .br-rail[popover]:not(:popover-open) { display: none; }
+#bunki-reports-root .br-rail::backdrop { background: transparent; pointer-events: none; }
+#bunki-reports-root .br-rail .br-bug { position: relative; display: grid; place-items: center; width: 52px; height: 52px; padding: 12px; border: 1.5px solid var(--br-ink); border-radius: 50%; background: var(--br-paper); color: var(--br-ink); box-shadow: 0 3px 0 color-mix(in srgb, var(--br-ink) 24%, transparent), 0 7px 20px rgba(20, 30, 40, .2); }
+#bunki-reports-root .br-rail .br-bug:hover { color: var(--br-paper); background: var(--br-ink); }
+#bunki-reports-root .br-bug svg { display: block; width: 26px; height: 26px; overflow: visible; pointer-events: none; }
+#bunki-reports-root .br-count { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid var(--br-paper); border-radius: 50%; font: 600 11px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; background: var(--br-ink); color: var(--br-paper); }
+#bunki-reports-root .br-count[hidden] { display: none; }
+#stroke-page #bunki-reports-root .br-rail, body.zen #bunki-reports-root .br-rail { top: calc(86px + env(safe-area-inset-top, 0px)); bottom: auto; }
+#bunki-reports-root .br-context-summary { padding: 12px 14px; border: 1px solid var(--br-line); border-left: 3px solid var(--br-ink); background: color-mix(in srgb, var(--br-paper) 93%, var(--br-ink)); font-size: 13px; }
+#bunki-reports-root .br-context-summary strong { font-size: 14px; }
+#bunki-reports-root .br-context-summary button { margin-top: 8px; font-size: 13px; }
 #bunki-reports-root .br-sheet { color: var(--br-ink); background: var(--br-paper); padding: 0; border: 0; border-radius: 0; width: min(600px, 100%); height: min(850px, 100dvh); max-width: 100%; max-height: 100dvh; margin: auto 0 0 auto; overflow: hidden; box-shadow: -12px 8px 60px rgba(20, 30, 40, .2); }
 #bunki-reports-root .br-sheet[open] { display: flex; flex-direction: column; }
 #bunki-reports-root .br-sheet::backdrop { background: rgba(20, 30, 40, .38); }
@@ -74,7 +82,7 @@
   #bunki-reports-root .br-nav { padding-inline: 18px; gap: 18px; }
   #bunki-reports-root h2 { font-size: 24px; }
   #bunki-reports-root .br-sheet { height: 100dvh; }
-  #bunki-reports-root .br-rail { right: 8px; max-width: calc(100vw - 16px); }
+  #bunki-reports-root .br-rail { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 24px); }
 }
 @media (prefers-reduced-motion: no-preference) {
   #bunki-reports-root .br-sheet[open] { animation: br-sheet-enter 180ms cubic-bezier(.16, 1, .3, 1); }

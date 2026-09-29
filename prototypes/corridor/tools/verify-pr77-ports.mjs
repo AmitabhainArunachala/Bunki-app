@@ -651,16 +651,17 @@ PROBES['speed-corner'] = async () => {
     const poll = () => (room.dataset.state === 'done' ? done(Math.round(performance.now() - t0)) : requestAnimationFrame(poll));
     requestAnimationFrame(poll);
   }));
-  const corner = await page.locator('#stroke-speed').count();
+  const corner = await page.locator('#stroke-speed-range').count();
   let pace = null;
   if (corner) {
     const normal = await writeOnce();
-    await page.click('#stroke-speed');
+    await page.locator('#stroke-speed-range').focus();
+    await page.keyboard.press('Home');
     const slow = await writeOnce();
-    pace = { normal, slow, pressed: await page.locator('#stroke-speed').getAttribute('aria-pressed') };
+    pace = { normal, slow, selected: await page.locator('#stroke-speed-range').inputValue() };
   }
   check('007479d0 · with no living ink, ゆっくり either governs the writing or is not offered',
-    !corner || (pace.pressed === 'true' && pace.slow >= pace.normal * 1.3), JSON.stringify({ living: 'fallback', corner, pace }));
+    !corner || (pace.selected === '0' && pace.slow >= pace.normal * 1.3), JSON.stringify({ living: 'fallback', corner, pace }));
   await fallback.context.close();
 
   const still = await learner({ reducedMotion: true });

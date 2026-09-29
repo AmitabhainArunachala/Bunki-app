@@ -84,6 +84,10 @@ const serveFixture = async route => {
 await context.route('**/*', serveFixture);
 
 try {
+  if (process.env.BUNKI_REPORT_SCENARIO === 'preview') {
+    stage = 'preview-feedback'; await verifyPreviewFeedback();
+    terminalResult = { passed: true, cases: ['preview_local_no_session', 'clipped_native_modal_bug', 'lavish_context_queue_after_save', 'lavish_queue_failure_preserves_report'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'static 404 and local Lavish bridge fixture', errors };
+  } else {
   stage = 'existing-browser-contracts';
   await page.goto('https://bunki.test');
   await page.evaluate(() => window.fixture.ready);
@@ -118,7 +122,7 @@ try {
   await page.keyboard.press('Shift+Tab');
   assert.equal(await page.evaluate(() => document.activeElement.dataset.br), 'close', 'Focus wraps to the final return control');
   await context.setOffline(true);
-  await page.getByRole('button', { name: 'Send report', exact: true }).click();
+  await page.getByRole('button', { name: /^(?:Send report|Save on this device)$/ }).click();
   await page.getByRole('heading', { name: 'Saved on this device' }).waitFor();
   const durable = await page.evaluate(async () => {
     const db = await new Promise(resolve => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); });
@@ -258,7 +262,7 @@ try {
   await ownPage.waitForFunction(sha => document.querySelector('details pre')?.textContent.includes(sha), expectedBuild.git_sha);
   const unicodeWords = 'x'.repeat(3999) + '😀tail';
   await ownPage.locator('#br-actual').fill(unicodeWords);
-  await ownPage.getByRole('button', { name: 'Send report', exact: true }).click();
+  await ownPage.getByRole('button', { name: /^(?:Send report|Save on this device)$/ }).click();
   await pollNativeState(async () => {
     const rows = await readReportStoreRows(ownPage, 'records');
     return Boolean(rows[0]?.wire_text && rows[0]?.delivery_error);
@@ -280,9 +284,11 @@ try {
   stage = 'attachment-recovery-race'; await verifyAttachmentRecovery(png);
   stage = 'hostile-config'; await verifyHostileConfig(png);
   stage = 'no-service-durable-save'; await verifyNoServiceDurability();
+  stage = 'preview-feedback'; await verifyPreviewFeedback();
   assert.deepEqual(errors, []);
-  terminalResult = { passed: true, cases: ['idle_mount', 'idempotent_mount', 'allowlisted_context', 'attachment_preview_remove', 'mobile_320', 'focus_scroll_return', 'offline_atomic_outbox', 'reload_recovery', 'timeout_after_persistence', 'stable_wire_retry', 'honest_ai', 'inert_untrusted_text', 'proposal_export', 'followup', 'reopen', 'protected_answers', 'host_rerender', 'native_host_modal', 'same_origin_lazy_build', 'same_origin_offline_unknown', 'cross_origin_build_not_substituted', 'unicode_codepoint_bounds', 'unicode_stable_wire_receipt', 'followup_ack_preserves_new_draft', 'followup_pending_retry_preserves_new_draft', 'two_tab_draft_attachment_isolation', 'duplicated_tab_revision_fork', 'orphan_draft_recovery', 'legacy_draft_retained', 'hostile_config_limits', 'no_service_capability_before_save', 'durable_save_ack_boundary', 'equal_revision_duplicate_first_report', 'equal_revision_duplicate_first_followup', 'unmount_drains_accepted_followup_ack_and_saves', 'unmount_failed_flush_retains_editor', 'attachment_validation_blocks_recovery', 'attachment_validation_checks_draft_identity', 'native_modal_keyboard_frozen_during_unmount', 'native_modal_keyboard_restored_after_failed_unmount', 'ack_cleanup_abort_preserves_pending_and_next_draft', 'ack_cleanup_abort_retry_same_request_once', 'ack_cleanup_abort_preserves_newer_input', 'ack_refresh_abort_is_not_a_delivery_or_draft_failure'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'synthetic, no live AI', received_reports: received.size, post_attempts: postBodies.length, errors };
+  terminalResult = { passed: true, cases: ['preview_local_no_session', 'clipped_native_modal_bug', 'lavish_context_queue_after_save', 'lavish_queue_failure_preserves_report', 'idle_mount', 'idempotent_mount', 'allowlisted_context', 'attachment_preview_remove', 'mobile_320', 'focus_scroll_return', 'offline_atomic_outbox', 'reload_recovery', 'timeout_after_persistence', 'stable_wire_retry', 'honest_ai', 'inert_untrusted_text', 'proposal_export', 'followup', 'reopen', 'protected_answers', 'host_rerender', 'native_host_modal', 'same_origin_lazy_build', 'same_origin_offline_unknown', 'cross_origin_build_not_substituted', 'unicode_codepoint_bounds', 'unicode_stable_wire_receipt', 'followup_ack_preserves_new_draft', 'followup_pending_retry_preserves_new_draft', 'two_tab_draft_attachment_isolation', 'duplicated_tab_revision_fork', 'orphan_draft_recovery', 'legacy_draft_retained', 'hostile_config_limits', 'no_service_capability_before_save', 'durable_save_ack_boundary', 'equal_revision_duplicate_first_report', 'equal_revision_duplicate_first_followup', 'unmount_drains_accepted_followup_ack_and_saves', 'unmount_failed_flush_retains_editor', 'attachment_validation_blocks_recovery', 'attachment_validation_checks_draft_identity', 'native_modal_keyboard_frozen_during_unmount', 'native_modal_keyboard_restored_after_failed_unmount', 'ack_cleanup_abort_preserves_pending_and_next_draft', 'ack_cleanup_abort_retry_same_request_once', 'ack_cleanup_abort_preserves_newer_input', 'ack_refresh_abort_is_not_a_delivery_or_draft_failure'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'synthetic, no live AI', received_reports: received.size, post_attempts: postBodies.length, errors };
   terminalResult.ackCleanupEvidence = ackCleanupEvidence;
+  }
 } catch (error) { console.error(await page.locator('.br-body').innerText().catch(() => '')); throw error; }
 
 
@@ -885,7 +891,7 @@ async function verifyIndependentDrafts(png) {
     await waitForDraftText(second, 'Tab B: keep these exact unsent words.');
     const before = (await localState(second)).drafts.find(row => row.value.actual === 'Tab B: keep these exact unsent words.');
     assert.equal(before.value.attachments.length, 1);
-    await first.getByRole('button', { name: 'Send report', exact: true }).click();
+    await first.getByRole('button', { name: /^(?:Send report|Save on this device)$/ }).click();
     await first.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
     await second.reload(); await second.evaluate(() => window.fixture.ready); await second.evaluate(() => window.fixture.openReport());
     assert.equal(await second.locator('#br-actual').inputValue(), before.value.actual);
@@ -952,7 +958,7 @@ async function verifyIndependentDrafts(png) {
     }, originalDraft.key);
     const legacy = await isolated.newPage(); await openDraft(legacy);
     assert.equal(await legacy.locator('#br-actual').inputValue(), 'Legacy report: retain original bytes.');
-    await legacy.getByRole('button', { name: 'Send report', exact: true }).click();
+    await legacy.getByRole('button', { name: /^(?:Send report|Save on this device)$/ }).click();
     await legacy.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
     const legacyCopy = (await localState(legacy)).drafts.find(row => row.key === 'draft:https://reports.bunki.test');
     assert.equal(legacyCopy.value.actual, 'Legacy report: retain original bytes.');
@@ -994,18 +1000,18 @@ async function verifyNoServiceDurability() {
   } });
   try {
     const target = await isolated.newPage(); await openDraft(target);
-    await target.getByText('This copy of KAIRO has no report service yet. You can save a report on this device; it will not be sent.', { exact: true }).waitFor();
+    await target.getByText('You can save reports on this device. This preview has no connected report service, so nothing is sent automatically.', { exact: true }).waitFor();
     assert.equal(await target.getByRole('heading', { name: 'Saved on this device', exact: true }).count(), 0);
     assert.doesNotMatch(await target.locator('.br-body').innerText(), /Your report is saved on this device/);
     await target.locator('#br-actual').fill('No service: this report still needs a durable save.');
     await target.evaluate(() => { window.__rejectReportCommit = true; });
-    await target.getByRole('button', { name: 'Send report', exact: true }).click();
+    await target.getByRole('button', { name: 'Save on this device', exact: true }).click();
     await target.getByText(/The report could not be saved\. Your draft is still here/).first().waitFor();
     assert.equal(await target.getByRole('heading', { name: 'Saved on this device', exact: true }).count(), 0);
     assert.equal((await localState(target)).records.length, 0);
     assert.equal(await target.locator('#br-actual').inputValue(), 'No service: this report still needs a durable save.');
     await target.evaluate(() => { window.__rejectReportCommit = false; window.__holdReportCommit = true; window.__reportTransactionStarted = false; });
-    await target.getByRole('button', { name: 'Send report', exact: true }).click();
+    await target.getByRole('button', { name: 'Save on this device', exact: true }).click();
     await target.waitForFunction(() => window.__reportTransactionStarted);
     assert.equal(await target.getByRole('heading', { name: 'Saved on this device', exact: true }).count(), 0, 'An unacknowledged transaction cannot claim saved');
     assert.equal(await target.evaluate(() => window.__reportTransactionAck === true), false);
@@ -1014,6 +1020,69 @@ async function verifyNoServiceDurability() {
     assert.equal(await target.evaluate(() => window.__reportTransactionAck), true, 'Saved UI follows the actual IndexedDB completion event');
     assert.equal((await localState(target)).records.length, 1);
     await target.getByText('Saved on this device. It has not been sent.', { exact: true }).first().waitFor();
+  } finally { await isolated.close(); }
+}
+
+async function verifyPreviewFeedback() {
+  const isolated = await browser.newContext({ viewport: { width: 900, height: 700 } });
+  const requests = [];
+  await isolated.route('**/*', route => {
+    if (route.request().isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: html });
+    requests.push(new URL(route.request().url()).pathname);
+    return route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+  });
+  try {
+    const target = await isolated.newPage();
+    await target.goto('https://bunki.test');
+    await target.evaluate(() => window.fixture.ready);
+    assert.equal(await target.locator('#bunki-report-bug svg').count(), 1);
+    await target.locator('#bunki-report-bug').click();
+    await target.getByText('You can save reports on this device. This preview has no connected report service, so nothing is sent automatically.', { exact: true }).waitFor();
+    await target.locator('#br-actual').fill('The glyph has no reading here.');
+    await target.getByRole('button', { name: 'Save on this device', exact: true }).click();
+    await target.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
+    await target.locator('[data-br="list"]').first().click();
+    assert.doesNotMatch(await target.locator('.br-body').innerText(), /404|Report service returned/);
+    assert(requests.length >= 1 && requests.every(path => path === '/api/config'), 'Static preview never asks for sessions or remote report lists');
+    await target.locator('.br-close').click();
+    await target.evaluate(() => {
+      window.fixture.update({ getContext: () => ({ surface: 'corridor/reader/strokes', route: '/bunki.html', content_ids: ['kanji:連', 'article:fixture'] }) });
+      window.reviewQueues = [];
+      window.lavish = { queuePrompt: (prompt, options) => { window.reviewQueues.push({ prompt, options }); } };
+      const overlay = document.createElement('dialog');
+      overlay.id = 'preview-host';
+      overlay.style.cssText = 'width:180px;height:70px;overflow:hidden;transform:translateZ(0)';
+      overlay.innerHTML = '<button>Host dialog control</button>';
+      document.body.append(overlay); overlay.showModal();
+    });
+    await target.waitForFunction(() => document.querySelector('#bunki-reports-root').parentElement.id === 'preview-host');
+    assert(await target.locator('#bunki-report-bug').evaluate(button => {
+      const rect = button.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+      return rect.width >= 44 && rect.height >= 44 && button.contains(hit);
+    }), 'The bug escapes a clipped transformed native modal and still receives the pointer');
+    await target.locator('#bunki-report-bug').click();
+    await target.locator('#br-actual').fill('Please make this stroke slower.');
+    await target.getByRole('button', { name: 'Save & queue in Lavish', exact: true }).click();
+    await target.getByRole('heading', { name: 'Queued in Lavish', exact: true }).waitFor();
+    const queue = await target.evaluate(() => window.reviewQueues);
+    assert.equal(queue.length, 1);
+    assert.match(queue[0].prompt, /Please make this stroke slower/);
+    assert.equal(queue[0].options.data.context.surface, 'corridor/reader/strokes');
+    assert(queue[0].options.data.context.content_ids.includes('kanji:連'));
+    assert.equal(queue[0].options.tag, 'bunki-report');
+    const records = await readReportStoreRows(target, 'records');
+    assert.equal(records.length, 2);
+    assert(records.find(row => row.id === queue[0].options.data.reportId)?.review_queued_at);
+    assert(records.every(row => !row.view?.receipt), 'A review queue is not a backend receipt');
+    await target.locator('[data-br="new"]').first().click();
+    await target.evaluate(() => { window.lavish.queuePrompt = () => { throw new Error('Synthetic unavailable review queue'); }; });
+    await target.locator('#br-actual').fill('Keep my note if the review bridge goes away.');
+    await target.getByRole('button', { name: 'Save & queue in Lavish', exact: true }).click();
+    await target.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
+    assert.equal((await readReportStoreRows(target, 'records')).length, 3);
+    assert.match(await target.locator('.br-body').innerText(), /could not be queued/);
+    assert.doesNotMatch(await target.locator('.br-body').innerText(), /could not be saved/);
   } finally { await isolated.close(); }
 }
 
