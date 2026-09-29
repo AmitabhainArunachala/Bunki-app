@@ -7711,12 +7711,14 @@ function nameReaderToken(span, token, index, kind) {
     if (!node) { node = el('span', 'tok-state visually-hidden'); node.id = `tok-state-${index}`; host.append(node); }
     node.textContent = state;
   } else { node?.remove(); node = null; }
-  const ids = kind === 'word' ? ['reader-help-kind', node?.id, 'reader-help-word'] : [node?.id, 'reader-help-lookup'];
+  const ids = kind === 'word' ? ['reader-help-kind', node?.id, 'reader-help-word']
+    : [node?.id, kind === 'named' ? 'reader-help-named' : 'reader-help-lookup'];
   span.setAttribute('aria-describedby', ids.filter(Boolean).join(' '));
 }
 function readerHelp() {
   const help = el('div', 'visually-hidden reader-help');
   for (const [id, text] of [['reader-help-kind', tx('語', 'word')], ['reader-help-word', readerWordHint()],
+    ['reader-help-named', tx('押すと読みを表示・非表示', 'activate to show or hide the reading')],
     ['reader-help-lookup', tx('読みと意味', 'reading and meaning')]]) {
     const line = el('span', null, text); line.id = id; help.append(line);
   }
@@ -8533,7 +8535,7 @@ function renderReader(main) {
         nameReaderToken(span, token, index, 'lookup');
       } else if (namedDoor) {
         wireNamedToken(span, token, index);
-        nameReaderToken(span, token, index, 'lookup');
+        nameReaderToken(span, token, index, 'named');
         span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
       } else {
         nameReaderToken(span, token, index, 'lookup');
