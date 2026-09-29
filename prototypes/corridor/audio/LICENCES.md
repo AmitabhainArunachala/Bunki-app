@@ -11,7 +11,6 @@ corridor's rights discipline.
 | Voice | Engine · model | Terms |
 | --- | --- | --- |
 | 小春音アミ (primary — all 8,407 graded words + the curated shelf sentences) | Style-Bert-VITS2 JP-Extra · `litagin/sbv2_koharune_ami` | ACML 1.0 — credit: 小春音アミ（あみたろの声素材工房 https://amitaro.net/） |
-| F1 (N5–N3 words) | Style-Bert-VITS2 JP-Extra · `litagin/style_bert_vits2_jvnv` jvnv-F1-jp | CC BY-SA 4.0 — JVNV corpus |
 | 四国めたん (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:四国めたん |
 | ずんだもん (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:ずんだもん |
 | 玄野武宏 (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:玄野武宏 |
@@ -20,18 +19,10 @@ Format: AAC 32kbps mono 24kHz (`.m4a`). Every word clip passed a g2p
 reading gate against the dictionary reading before shipping; mismatched
 readings were synthesized from kana and marked in the manifest.
 
-## F1 article narration · September 2026
+## Article narration · September 2026
 
-`article-narration.json` and `narration/f1/` contain local Style-Bert-VITS2
-JP-Extra narration using `litagin/style_bert_vits2_jvnv` (`jvnv-F1-jp`,
-revision `205830`). Credit: the JVNV corpus and model contributors;
-voice model terms: CC BY-SA 4.0. Article text and its original attribution
-remain in the corresponding article JSON. Narration is a generated rendition
-of that text, not the publisher's original recording.
-
-These clips use AAC 48kbps mono 24kHz. The manifest retains each text segment
-and audio digest. This new passage audio has not passed a human pronunciation
-or voice audition; it is labelled accordingly and must be explicitly selected.
-The word-audio reading gate described above does not apply to these passages.
-Rebuild with `scripts/render-article-narration.py` and an installed local voice
-configuration. The selectable roster remains provisional.
+The JVNV F1 narration and F1 word clips were withdrawn on 30 September 2026:
+in the blind voice audition of 29 September the operator rated F1 1/5, so no
+F1 audio ships or plays. The locked narration voice is Google Gemini TTS
+**Kore**, with **Charon** as the second speaker. Those clips are not rendered
+yet; until they are, the reader's play bar stays hidden.
