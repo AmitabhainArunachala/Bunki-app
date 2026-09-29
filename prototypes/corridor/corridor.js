@@ -8215,9 +8215,8 @@ function renderReader(main) {
     // whatever the grader thinks of it; punctuation and bare kana are not.
     const namedReading =
       !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
-    // a name's door shows or hides its reading; with readings always on there is nothing
-    // for it to do, so it is plain text rather than a button that answers nothing
-    // …and when the kanji dial has already turned it into kana, there is nothing to reveal either
+    // Preserve the inline reading toggle when the dial leaves a reading to reveal.
+    // Every Japanese token still opens lookup, including names already shown in kana.
     const namedDoor = namedReading && S.dials.furigana !== 2 && displayPairs(token).some((pair) => pair.r);
     const interactive = !!token.c || !!particle || namedDoor || /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s || '');
     // its own class: a door, but never mistaken for a graded content word —
@@ -8282,7 +8281,7 @@ function renderReader(main) {
         span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
       } else {
         span.setAttribute('aria-label', tx(`${token.s} の読みと意味`, `Reading and meaning of ${token.s}`));
-        span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s));
+        span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, { reading: token.r }));
       }
       rendered = wrapper;
     }
