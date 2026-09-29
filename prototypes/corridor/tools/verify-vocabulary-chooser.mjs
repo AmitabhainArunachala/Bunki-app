@@ -207,6 +207,36 @@ try {
         assert.deepEqual(history(await readAppRecord(page)), prior);
         return { list: 'Chooser history fixture', retainedReviewRows: prior.revlog.length, retainedScheduleKeys: Object.keys(prior.srs), miniReused: true };
       });
+      await check('only-a-named-save-clears-the-typed-list-name', async page => {
+        await reader(page);
+        await openChooser(page);
+        await listName(page).fill('Existing chooser list');
+        await create(page).click();
+        await waitForAppRecord(page, value => value.lists?.['Existing chooser list']?.some(item => item.id === word));
+        await status(page).filter({ hasText: 'Saved to Existing chooser list.' }).waitFor();
+        assert.equal(await listName(page).inputValue(), '', 'Saving the typed name clears that draft');
+        await listName(page).fill('N1 読解');
+        await page.locator('#vocabulary-list-save').click();
+        await status(page).filter({ hasText: 'Saved for review.' }).waitFor();
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Save for review keeps the unrelated typed name');
+        await dialog(page).getByRole('button', { name: /Existing chooser list$/u }).click();
+        await status(page).filter({ hasText: 'Saved to Existing chooser list.' }).waitFor();
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Tapping an existing list keeps the unrelated typed name');
+        assert.equal((await readAppRecord(page)).lists?.['N1 読解'], undefined, 'An unsubmitted name creates no list');
+        await closeChooser(page);
+        await reader(page);
+        await openChooser(page);
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'The kept name survives close and reload as a session draft');
+        await create(page).click();
+        await waitForAppRecord(page, value => value.lists?.['N1 読解']?.some(item => item.id === word));
+        await status(page).filter({ hasText: 'Saved to N1 読解.' }).waitFor();
+        assert.equal(await listName(page).inputValue(), '');
+        await closeChooser(page);
+        await reader(page);
+        await openChooser(page);
+        assert.equal(await listName(page).inputValue(), '', 'The explicitly saved name does not return as a draft');
+        return { kept: ['Save for review', 'existing list'], cleared: 'form submit of the typed name' };
+      });
       await check('native-write-failures-preserve-draft-and-retry', async page => {
         await reader(page);
         await openChooser(page, { mini: true });
@@ -261,11 +291,11 @@ try {
   }
 } finally {
   await host.close();
-  const passed = results.length === engines.length * 4 && results.every(result => result.passed);
+  const passed = results.length === engines.length * 5 && results.every(result => result.passed);
   writeFileSync(resolve(evidence, 'vocabulary-chooser.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    scope: 'Chooser lifecycle, native record durability, three context scopes, named lists, preserved synthetic review history, refusal/retry, mini reuse, and distinct shelf reading/glossary census',
+    scope: 'Chooser lifecycle, native record durability, three context scopes, named lists, typed-name draft kept across unrelated saves, preserved synthetic review history, refusal/retry, mini reuse, and distinct shelf reading/glossary census',
     results, passed,
   }, null, 2) + '\n');
   if (!passed) process.exitCode = 1;
