@@ -350,7 +350,7 @@ async function takeShots(base, browser) {
     await page.waitForSelector('#srs-prefs');
     await page.evaluate(() => document.fonts?.ready);
     await page.waitForTimeout(400);
-    const clip = async (selectors, pad = 12) => {
+    const clip = async (selectors, pad = 12, below = pad) => {
       const boxes = await page.evaluate((selectors) => selectors.map((s) => {
         const node = document.querySelector(s);
         if (!node) return null;
@@ -360,12 +360,12 @@ async function takeShots(base, browser) {
       const x = Math.max(0, Math.min(...boxes.map((b) => b.x)) - pad);
       const y = Math.max(0, Math.min(...boxes.map((b) => b.y)) - pad);
       return { x, y, width: Math.min(width - x, Math.max(...boxes.map((b) => b.right)) - x + pad),
-        height: Math.max(...boxes.map((b) => b.bottom)) - y + pad };
+        height: Math.max(...boxes.map((b) => b.bottom)) - y + below };
     };
     const home = join(SHOTS, `home-button-truthful-count-${width}.png`);
     await page.screenshot({ path: home, fullPage: true, clip: await clip(['.view-title', '#deck-counts', '#review-start', '.srs-held', '#deck-table']) });
     const pace = join(SHOTS, `pace-panel-three-presets-${width}.png`);
-    await page.screenshot({ path: pace, fullPage: true, clip: await clip(['#srs-prefs-toggle', '#srs-prefs']) });
+    await page.screenshot({ path: pace, fullPage: true, clip: await clip(['#srs-prefs-toggle', '#srs-prefs'], 12, 2) });
     // the galaxy's own 復習 pill reads the same number
     await open('?ui=bi');
     await page.waitForSelector('#home-review');
@@ -373,6 +373,18 @@ async function takeShots(base, browser) {
     const pill = join(SHOTS, `home-pill-truthful-count-${width}.png`);
     await page.screenshot({ path: pill, clip: await clip(['#home-review'], 48) });
     saved.push(home, pace, pill);
+    if (width === 390) {
+      // the same panel in 日本語のみ, where each preset's line is the Japanese one
+      await open('?entry=shelf&ui=ja');
+      await page.locator('#tray').click();
+      await page.waitForSelector('#review-start');
+      await page.locator('#srs-prefs-toggle').click();
+      await page.waitForSelector('#srs-prefs');
+      await page.waitForTimeout(300);
+      const ja = join(SHOTS, 'pace-panel-three-presets-390-ja.png');
+      await page.screenshot({ path: ja, fullPage: true, clip: await clip(['#srs-prefs-toggle', '#srs-prefs'], 12, 2) });
+      saved.push(ja);
+    }
     await context.close();
   }
   return saved;
