@@ -156,13 +156,15 @@ export interface JlptScoreFacts {
   readonly track: Extract<Exam, { family: 'jlpt' }>['track'];
   readonly checkedAt: '2026-09-29';
   readonly sources: readonly string[];
-  readonly totalRange: readonly [0, 180];
+  /** [minimum, maximum] */
+  readonly totalRange: readonly number[];
   readonly passMark: number;
   readonly sections: readonly {
     readonly id: string;
     readonly label: string;
     readonly skills: readonly ('vocabulary' | 'grammar' | 'reading' | 'listening')[];
-    readonly range: readonly [number, number];
+    /** [minimum, maximum] */
+    readonly range: readonly number[];
     readonly sectionalMinimum: number;
   }[];
   /** 試験科目: the papers sat, by the blueprint timing-block id. */
@@ -226,7 +228,8 @@ function jlptScores(track: JlptScoreFacts['track'], passMark: number): JlptScore
   });
 }
 
-export const JLPT_SCORE_FACTS: readonly JlptScoreFacts[] = immutable([
+// Each row is already deeply frozen; freezing the list keeps its tuple types.
+export const JLPT_SCORE_FACTS: readonly JlptScoreFacts[] = Object.freeze([
   jlptScores('N5', 80),
   jlptScores('N4', 90),
   jlptScores('N3', 95),

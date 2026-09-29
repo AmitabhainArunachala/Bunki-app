@@ -307,7 +307,7 @@ describe('official facts versus authored coverage', () => {
         'reading',
         'vocabulary',
       ]);
-      expect(facts.sections.reduce((total, section) => total + section.range[1], 0)).toBe(180);
+      expect(facts.sections.reduce((total, section) => total + section.range[1]!, 0)).toBe(180);
       // each paper name belongs to a timing block this level's blueprint really has
       const blueprint = OFFICIAL_BLUEPRINTS.find(
         (entry) => entry.exam.family === 'jlpt' && entry.exam.track === facts.track,
