@@ -5136,6 +5136,9 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .srs-preset {
   flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   min-width: 0;
   min-height: var(--tap);
   padding: 12px 14px;
