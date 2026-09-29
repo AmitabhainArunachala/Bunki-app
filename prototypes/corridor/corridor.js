@@ -4866,6 +4866,8 @@ function rubyNode(pairs, { furigana, revealed }) {
       continue;
     }
     const ruby = document.createElement('ruby');
+    // the reader draws a reading from this attribute when it floats the reading over its word
+    ruby.dataset.r = pair.r;
     ruby.append(document.createTextNode(pair.t));
     const rt = document.createElement('rt');
     rt.textContent = pair.r;
@@ -5040,9 +5042,8 @@ function renderSignals(grading, { compact = false } = {}) {
     foot.style.marginTop = '8px';
     foot.append(el('span', null, tx('信号は別々に。平均しない。', 'Signals stay separate — never averaged.')));
     if (grading.disagreement.flag) {
-      foot.append(
-        withEn(el('span', 'disagree-tag', `不一致 gap ${grading.disagreement.detail.max_gap}`), 'signals disagree'),
-      );
+      foot.append(el('span', 'disagree-tag', tx(`指標のずれ ${grading.disagreement.detail.max_gap}段`,
+        `the measures differ by ${grading.disagreement.detail.max_gap} step(s)`)));
     }
     wrap.append(foot);
   } else {
@@ -5090,6 +5091,25 @@ function renderSignals(grading, { compact = false } = {}) {
     wrap.append(note);
   }
   return wrap;
+}
+
+/* The shelf's one count. A story is a reading on the shelf; an N3 rewrite whose original stands
+ * beside it is that story's やさしい版, not a second story. Glossary entries are counted apart. */
+function shelfStories(curated) {
+  const standing = new Set(curated.map((p) => p.id));
+  return curated.filter((p) => !(p.adaptation?.basedOn && standing.has(p.adaptation.basedOn)));
+}
+function shelfTallyText(list) {
+  const glossary = list.filter((p) => p.source === 'isa-yasashii-glossary').length;
+  const readings = list.length - glossary;
+  if (!glossary) return tx(`読み物 ${readings} 本`, `${readings} readings`);
+  return tx(`読み物 ${readings} 本 · 用語集 ${glossary}`, `${readings} readings · ${glossary} glossary entries`);
+}
+function shelfDateline(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  return tx(`${y}年${m}月${d}日（${'日月火水木金土'[weekday]}）`,
+    `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekday]} ${d} ${MONTHS_EN[m - 1]} ${y}`);
 }
 
 /* ---------------------------------------------------------------- views */
@@ -5150,32 +5170,66 @@ function renderShelfBody() {
     return main;
   }
   const curated = D.passages.filter(p => !String(p.file || '').startsWith('archive/'));
+  // one card per story: an N3 rewrite whose original stands on the shelf is that story's
+  // やさしい版, reached by the toggle inside the article, never a second card
+  const stories = shelfStories(curated);
+  let dayOverride = null;
+  try { dayOverride = localStorage.getItem('kairo-shelf-day'); } catch { /* the verifier's seam only */ }
+  const day = (/^\d{4}-\d{2}-\d{2}$/.test(dayOverride || '') && dayOverride) || new Date().toISOString().slice(0, 10);
+  // A magazine masthead: the room's name, today's date and one honest count. The count and the
+  // results line below come from the same tally, so they cannot disagree.
   const masthead = el('header', 'shelf-masthead');
-  const title = el('div');
+  const title = el('div', 'shelf-mast-title');
   title.append(withEn(el('h1', 'view-title', '本棚'), 'The reading room', 'en-inline'));
-  title.append(el('p', 'shelf-snippet intro', tx('世界を読む。ことばが残る。', 'Read the world. Keep the words.')));
-  title.append(el('p', 'shelf-count', tx(`${curated.filter(p => p.source !== 'isa-yasashii-glossary').length} 本の読み物 · ニュース、物語、随筆`, `${curated.filter(p => p.source !== 'isa-yasashii-glossary').length} readings · news, stories and essays`)));
+  const dateline = el('p', 'shelf-snippet intro shelf-dateline');
+  // the masthead shows the reader's own date; the verifier's day seam overrides it
+  const now = new Date(), localDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const sep = el('span', 'dateline-sep', ' · ');
+  sep.setAttribute('aria-hidden', 'true');
+  dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, el('span', 'dateline-tally', shelfTallyText(stories)));
+  title.append(dateline);
   const art = el('img', 'shelf-art'); art.src = 'design/ink-hoku-nami.png'; art.alt = tx('藍の地に白い筆の「永」', 'Bunki brush study: 永 in white ink on indigo'); art.width = 640; art.height = 640;
-  masthead.append(title, art); main.append(masthead);
+  masthead.append(title);
+  main.append(masthead);
   const filters = S.shelfFilters ||= { sort: 'latest', topic: '', jlpt: '', grade: '', text: '' };
-  const controls = el('div', 'shelf-controls');
+  // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
+  // transparent, so the platform's own picker opens and nothing is truncated on the surface.
+  const controls = el('div', 'shelf-controls shelf-chipbar');
+  controls.setAttribute('role', 'toolbar');
+  controls.setAttribute('aria-label', tx('読み物の絞り込み', 'filter the readings'));
   const change = (key, value) => { filters[key] = value; refreshShelfBody(); };
   const select = (key, label, options) => {
-    const field = el('label'); field.append(el('span', '', label));
+    const chip = el('label', 'filter-chip');
+    const chosen = options.find(([value]) => value === filters[key]) || options[0];
+    if (key !== 'sort' && filters[key]) chip.classList.add('is-set');
+    const face = el('span', 'filter-chip-label');
+    face.append(el('span', 'l-ja', chosen[1]));
+    if (bi() && chosen[2]) face.append(el('span', 'en-sub', chosen[2]));
+    chip.append(face, uiIcon('chevron', 'ui-icon filter-chip-caret'));
     const input = el('select'); input.id = `shelf-filter-${key}`;
-    for (const [value, text] of options) { const option = el('option', '', text); option.value = value; option.selected = filters[key] === value; input.append(option); }
-    input.addEventListener('change', () => change(key, input.value)); field.append(input); controls.append(field);
+    input.setAttribute('aria-label', label);
+    for (const [value, ja, en] of options) { const option = el('option', '', bi() && en ? `${ja} · ${en}` : ja); option.value = value; option.selected = filters[key] === value; input.append(option); }
+    input.addEventListener('change', () => change(key, input.value)); chip.append(input); controls.append(chip);
   };
-  select('sort', tx('並び順', 'Sort'), [['latest', tx('最新の記事', 'Latest published')], ['new',tx('新しく追加', 'New to Bunki')], ['title',tx('見出し順', 'Title')], ['short',tx('短い読み物から', 'Shortest first')]]);
-  select('topic', tx('話題', 'Topic'), [['',tx('すべての話題', 'All topics')], ...[['news','ニュース','News'],['politics','政治','Politics'],['international','世界','World'],['technology','テクノロジー','Technology'],['science','科学','Science'],['economy','経済','Economy'],['environment','環境','Environment'],['culture','文化','Culture'],['literature','文学','Literature'],['sports','スポーツ','Sports'],['health','健康','Health'],['society','社会','Society']].map(([v,ja,en])=>[v,tx(ja,en)])]);
-  select('jlpt', tx('語彙の目安', 'JLPT vocabulary'), [['',tx('すべてのレベル', 'All levels')], ...['N5','N4','N3','N2','N1'].map(v=>[v, `${v} · ${tx('目安', 'estimated')}`])]);
-  select('grade', tx('漢字の学年', 'Kanji grade'), [['',tx('すべての学年', 'All grades')], ...[1,2,3,4,5,6].map(v=>[String(v),tx(`小学${v}年程度`, `Grade ${v} kanji`)]),['secondary',tx('中学以上', 'Secondary & above')]]);
-  const searchLabel = el('label', 'shelf-reading-search'); searchLabel.append(el('span','',tx('読み物を探す','Find a reading')));
-  const find = el('input'); find.type='search'; find.value=filters.text; find.placeholder=tx('見出し・話題・キーワード','Title, topic or keyword'); find.id='shelf-reading-search';
-  find.addEventListener('change',()=>change('text',find.value)); find.addEventListener('keydown',event=>{if(event.key==='Enter')change('text',find.value);}); searchLabel.append(find);controls.append(searchLabel);main.append(controls);
-  const help = el('details','shelf-filter-help'); help.append(el('summary','',tx('レベルの見方','How the level filters work')));
-  help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose a reading. JLPT uses its vocabulary; school grade describes its kanji. Neither is a rating of your ability or age.'))); main.append(help);
-  const toolsBox = el('details', 'shelf-study-tools'); toolsBox.append(el('summary','',tx('学習ツールと参考書庫','Study tools & reference'))); const tools=el('div','shelf-tools-grid');
+  const topics = [['news','ニュース','News'],['politics','政治','Politics'],['international','国際','World'],['technology','テクノロジー','Technology'],['science','科学','Science'],['economy','経済','Economy'],['environment','環境','Environment'],['culture','文化','Culture'],['literature','文学','Literature'],['sports','スポーツ','Sports'],['health','健康','Health'],['society','社会','Society']];
+  select('sort', tx('並び順', 'Sort'), [['latest', '最新', 'Latest'], ['new', '新着', 'New to Bunki'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
+  select('topic', tx('分野', 'Topic'), [['', '分野', 'Topic'], ...topics]);
+  select('jlpt', tx('レベル（JLPT語彙の目安）', 'Level (JLPT vocabulary, estimated)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
+  select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Secondary+']]);
+  const searchLabel = el('label', 'shelf-reading-search filter-search');
+  searchLabel.append(uiIcon('search'));
+  const find = el('input'); find.type='search'; find.value=filters.text; find.placeholder=tx('探す','Search'); find.id='shelf-reading-search';
+  find.setAttribute('aria-label', tx('読み物を探す（見出し・話題・キーワード）', 'Find a reading by title, topic or keyword'));
+  find.addEventListener('change',()=>change('text',find.value)); find.addEventListener('keydown',event=>{if(event.key==='Enter')change('text',find.value);}); searchLabel.append(find);controls.append(searchLabel);
+  const help = el('details','shelf-filter-help');
+  const helpSummary = el('summary', 'icon-button');
+  helpSummary.setAttribute('aria-label', tx('レベルの見方', 'How the level filters work'));
+  helpSummary.title = tx('レベルの見方', 'How the level filters work');
+  helpSummary.append(uiIcon('info'));
+  help.append(helpSummary);
+  help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose a reading. JLPT uses its vocabulary; school grade describes its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
+  main.append(controls);
+  const toolsBox = el('details', 'shelf-study-tools'); const toolsSummary = el('summary', 'filter-chip tools-chip'); const toolsFace = el('span', 'filter-chip-label'); toolsFace.append(el('span', 'l-ja', '学習ツール')); if (bi()) toolsFace.append(el('span', 'en-sub', 'Study tools')); toolsSummary.append(toolsFace, uiIcon('chevron', 'ui-icon filter-chip-caret')); toolsBox.append(toolsSummary); const tools=el('div','shelf-tools-grid');
   const news = biLabel('button', 'grammar-link', 'いまの日本を読む', 'news & magazines');
   news.type = 'button'; news.id = 'feed-link';
   news.addEventListener('click', () => {
@@ -5309,7 +5363,10 @@ function renderShelfBody() {
     tools.append(aread);
   }
 
-  toolsBox.append(tools); main.append(toolsBox);
+  toolsBox.append(tools);
+  const mastTools = el('div', 'shelf-mast-side');
+  mastTools.append(toolsBox, art);
+  masthead.append(mastTools);
   // A small shelf of real encounters. These selections use saved mistakes to
   // choose context; browsing them never changes a card's grade or due date.
   const priorities = allAssessmentEvidence().priorities.targets
@@ -5318,8 +5375,12 @@ function renderShelfBody() {
   const encounters = curated.map(p => ({ passage: p, forms: priorities.map(item => item.form)
     .filter(form => p.readingFacets?.forms?.includes(form)) }))
     .filter(item => item.forms.length).sort((a, b) => b.forms.length - a.forms.length || byNewest(a.passage, b.passage)).slice(0, 3);
-  if (encounters.length && !filters.text && !filters.topic && !filters.jlpt && !filters.grade) {
-    const related = el('section', 'shelf-encounters');
+  const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
+  // the bands below ride inside the story grid, after the lead and its two seconds: magazine
+  // rhythm, and the lead stays directly under the chip bar on a phone
+  const bands = [];
+  if (encounters.length && unfiltered) {
+    const related = el('section', 'shelf-encounters shelf-band');
     related.append(el('h2', '', tx('別の文で、もう一度', 'Meet these words again')));
     related.append(el('p', 'note', tx('最近の練習で出会ったことばを、記事の中でも読めます。', 'Words from your recent practice, in another setting.')));
     const choices = el('div', 'shelf-encounter-choices');
@@ -5329,17 +5390,14 @@ function renderShelfBody() {
         el('span', '', forms.join(' · ')));
       button.addEventListener('click', () => openPassage(passage.id)); choices.append(button);
     }
-    related.append(choices); main.append(related);
+    related.append(choices); bands.push(related);
   }
   // 今日の棚 — six readings that change every day (operator, 2026-09-18: "I
   // keep seeing the same articles all the time and it does not seem to
   // change, refresh, or renew"). A day's six are drawn from the curated shelf
   // by the date alone, so today's shelf is the same on every device and
   // different tomorrow; the full shelf still stands below in its own order.
-  if (curated.length > 6) {
-    let dayOverride = null;
-    try { dayOverride = localStorage.getItem('kairo-shelf-day'); } catch { /* the verifier's seam only */ }
-    const day = (/^\d{4}-\d{2}-\d{2}$/.test(dayOverride || '') && dayOverride) || new Date().toISOString().slice(0, 10);
+  if (curated.length > 6 && unfiltered) {
     let seed = 0;
     for (const ch of day) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
     // Today's six are the shelf's best foot (operator, 2026-09-24: "the articles still suck"):
@@ -5370,31 +5428,41 @@ function renderShelfBody() {
       perBand.set(b, (perBand.get(b) || 0) + 1);
       picks.push(pool[ix]);
     }
-    const selection = el('details', 'shelf-daily-selection');
-    selection.append(el('summary', '', tx('今日の６本', `Today’s reading selection · ${day}`)));
-    main.append(selection);
+    const selection = el('section', 'shelf-daily-selection shelf-band');
+    selection.setAttribute('aria-labelledby', 'shelf-today-head');
+    const todayHead = withEn(el('h2', 'shelf-band-head', '今日の６本'), 'Today’s six', 'en-inline');
+    todayHead.id = 'shelf-today-head';
+    selection.append(todayHead);
+    bands.unshift(selection);
     const strip = el('div', 'shelf-today-strip');
     strip.id = 'shelf-today';
     strip.dataset.day = day;
     for (const p of picks) {
       // a recommendation repeats a reading that already lives in its section;
       // the identity lets a census count the collection, not the strip
-      const card = shelfCard(p);
+      const card = shelfCard(p, 'teaser');
       card.dataset.recommendation = 'today';
       strip.append(card);
     }
     selection.append(strip);
   }
 
-  const matches = curated.filter(p => {
+  const matches = stories.filter(p => {
     const f=p.readingFacets || {};
     return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
   matches.sort(filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest);
-  const count=el('p','shelf-results-count',tx(`${matches.length} 本の読み物`, `${matches.length} readings`));count.setAttribute('role','status');main.append(count);
-  if (Object.values(filters).some((v,i)=>i>0 && v)) { const reset=el('button','chip',tx('絞り込みを解除','Clear filters'));reset.type='button';reset.addEventListener('click',()=>{S.shelfFilters=null;refreshShelfBody();});main.append(reset); }
+  const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
+  // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
+  if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
+  if (Object.values(filters).some((v,i)=>i>0 && v)) { const reset=el('button','chip btn-tertiary shelf-clear',tx('絞り込みを解除','Clear filters'));reset.type='button';reset.addEventListener('click',()=>{S.shelfFilters=null;refreshShelfBody();});controls.append(reset); }
   const grid=el('div','shelf-story-grid');grid.id='shelf-reading-results';
-  for(const p of matches)grid.append(shelfCard(p));
+  // rank sets the headline size: the lead, two seconds, then the grid; the bands follow the seconds
+  matches.forEach((p, i) => {
+    if (i === 3) grid.append(...bands.splice(0));
+    grid.append(shelfCard(p, i === 0 ? 'lead' : i < 3 ? 'second' : 'grid'));
+  });
+  grid.append(...bands);
   if(!matches.length)grid.append(el('p','note',tx('この条件の読み物はありません。絞り込みを減らしてください。','No readings match these filters. Try a wider level or another topic.')));
   main.append(grid);
   main.append(renderReadingPlaces()); renderSentenceReadingSuggestions(main);
@@ -6892,67 +6960,153 @@ function dateStamp(day, cls) {
   return stamp;
 }
 
-/** One shelf card. The card is a small row of PARALLEL controls, never a
- * button holding a button (invalid HTML that hides the inner toggle from
- * assistive tech): the text is one whole door, 詳細 its own sibling door. */
-function shelfCard(p) {
-  const item = el('article', 'shelf-item');
-  item.dataset.passage = p.id;
+/* ------------------------------------------- the learner's labels (design pass 2026-09-30)
+ * What a learner sees about a reading: where it is from, how hard it is, what it is about, and
+ * whether a person has checked it yet. Grader diagnostics ("signals disagree", coverage ratios,
+ * licence codes) stay in the article's own footer, never on the shelf. */
+function learnerSourceLabel(p) {
+  return String(p.sourceLabel || '').replace(/\s*·\s*検収前/gu, '').replace(/^N3書き換え\s*·\s*/u, '').trim();
+}
+function reviewPending(p) {
+  return p.review === 'human-review-pending' || p.review === 'rights-review-pending' || !!p.pendingVerification
+    || /検収前/u.test(p.sourceLabel || '');
+}
+function reviewReason(p) {
+  if (p.review === 'rights-review-pending') return tx('出典の利用条件を確認中', 'the source’s terms are still being checked');
+  if (p.pendingVerification) return tx('凍結アーカイブとの最終照合の前', 'the final check against the frozen archive is pending');
+  return tx('人による確認の前', 'not yet checked by a person');
+}
+/** 未確認 — one small chip for unreviewed text, its reason in the tooltip. */
+function unreviewedChip(p) {
+  const chip = el('span', 'status-chip', '未確認');
+  const reason = reviewReason(p);
+  chip.title = `未確認 — ${reason}`;
+  chip.setAttribute('aria-label', `未確認 — ${reason}`);
+  return chip;
+}
+/** The level a learner filters by: the JLPT vocabulary estimate, with the sentence band beside it. */
+function levelChip(p) {
+  const jlpt = p.readingFacets?.jlpt;
+  const lv = levelPhrase(p.grading);
+  const chip = el('span', 'level-chip', jlpt || (bi() ? lv.level : lv.ja));
+  if (jlpt) chip.dataset.level = jlpt;
+  chip.title = jlpt
+    ? tx(`JLPT ${jlpt} 程度の語彙（目安）· 文の難しさ ${lv.ja}`, `JLPT ${jlpt} vocabulary (estimate) · sentences ${lv.level}`)
+    : tx(`文の難しさ ${lv.ja}`, `sentences ${lv.level}`);
+  return chip;
+}
+const TOPIC_KICKERS = {
+  politics: ['政治', 'Politics'], economy: ['経済', 'Economy'], science: ['科学', 'Science'],
+  technology: ['テクノロジー', 'Technology'], international: ['国際', 'World'], environment: ['環境', 'Environment'],
+  health: ['健康', 'Health'], society: ['社会', 'Society'], culture: ['文化', 'Culture'], sports: ['スポーツ', 'Sports'],
+  literature: ['文学', 'Literature'], weather: ['天気', 'Weather'], disaster: ['防災', 'Disaster'], local: ['地域', 'Local'],
+  'news digest': ['今週のできごと', 'The week'], news: ['ニュース', 'News'],
+};
+const TOPIC_ORDER = ['politics', 'economy', 'science', 'technology', 'international', 'environment', 'health', 'society',
+  'culture', 'sports', 'weather', 'disaster', 'local', 'news digest', 'literature', 'news'];
+/** One topic per story, from the facets the 分野 filter already uses. */
+function storyTopic(p) {
+  if (p.source === 'isa-yasashii-glossary') return ['用語集', 'Glossary'];
+  if (TOPIC_KICKERS[p.topic]) return TOPIC_KICKERS[p.topic];
+  const topics = p.readingFacets?.topics || [];
+  for (const topic of TOPIC_ORDER) if (topics.includes(topic)) return TOPIC_KICKERS[topic];
+  return { essay: ['随筆', 'Essay'], graded: ['読み物', 'Graded reading'], primary: ['資料', 'Source'] }[p.lane] || ['読み物', 'Reading'];
+}
+function storyKicker(p) {
+  const [ja, en] = storyTopic(p);
+  const kicker = el('span', 'story-kicker');
+  kicker.append(el('span', 'l-ja', ja));
+  if (bi()) kicker.append(el('span', 'en-sub', en));
+  return kicker;
+}
+/** An original and its N3 rewrite are one story with two versions (adaptation.basedOn). */
+function storyVersions(p) {
+  const originalId = p.adaptation?.basedOn;
+  if (originalId) {
+    const original = D.passages.find((x) => x.id === originalId);
+    return original ? { original, easy: p } : null;
+  }
+  const easy = D.passages.find((x) => x.adaptation?.basedOn === p.id);
+  return easy ? { original: p, easy } : null;
+}
 
+/* The tap ladder is taught once, by a tip that floats where the sentence actions will appear
+ * and goes away for good when dismissed — never permanent prose above the text. */
+const READER_TIP_KEY = 'kairo-tip-reader-v1';
+function renderReaderTip(main) {
+  let seen = !!S.readerTipSeen;
+  try { seen ||= localStorage.getItem(READER_TIP_KEY) === '1'; } catch { /* the session flag stands in */ }
+  if (seen) return;
+  const tip = el('aside', 'reader-tip');
+  tip.id = 'reader-tip';
+  tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
+  tip.append(el('p', 'reader-tip-text', readingsAlwaysOn()
+    ? tx('語に触れると英語。もう一度で元どおり。長押しで辞書。', 'Tap a word for its English; tap again to clear. Hold for the dictionary.')
+    : tx('語に触れると読み、もう一度で英語、三度目で元どおり。長押しで辞書。', 'Tap a word: its reading, then English, then clear. Hold for the dictionary.')));
+  const close = el('button', 'icon-button reader-tip-close');
+  close.type = 'button';
+  close.setAttribute('aria-label', tx('ヒントを閉じる', 'dismiss this tip'));
+  close.append(uiIcon('close'));
+  close.addEventListener('click', () => {
+    S.readerTipSeen = true;
+    try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
+    tip.remove();
+  });
+  tip.append(close);
+  main.append(tip);
+}
+
+/** One shelf card: a topic kicker, the Japanese headline, one English line and the level — and
+ * nothing else (design pass 2026-09-30). Source, licence, review detail and the grader's signals
+ * live in the article's own footer. A card is ONE door (the whole card opens the reading).
+ * rank: 'lead' carries art and the largest headline, 'second' the next size, 'teaser' is the
+ * compact form used by 今日の６本. */
+function shelfCard(p, rank = 'grid') {
+  const item = el('article', `shelf-item story-card story-${rank}`);
+  item.dataset.passage = p.id;
   const open = el('button', 'shelf-open');
   open.type = 'button';
+  if (rank === 'lead') open.append(storyArt(p));
   const head = el('div', 'shelf-head');
+  head.append(storyKicker(p));
   head.append(el('div', 'shelf-title', p.title));
   // the English title travels with the record (titleEn + titleEnSource in
   // data/articles/index.json), never in a code-side map
-  if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
-  const lv = levelPhrase(p.grading);
-  const levelLine = el('div', 'level-line');
-  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
-  if (p.grading.disagreement.flag) {
-    levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
+  if (bi() && p.titleEn && rank !== 'teaser') head.append(el('div', 'shelf-title-en', p.titleEn));
+  if (rank !== 'teaser') {
+    const foot = el('div', 'story-foot');
+    foot.append(levelChip(p));
+    if (reviewPending(p)) foot.append(unreviewedChip(p));
+    // the shelf remembers with you: finished, or open to your bookmark
+    if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', '読了 finished')));
+    else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', '途中 in progress')));
+    head.append(foot);
   }
-  head.append(levelLine);
   open.append(head);
-
-  const meta = el('div', 'shelf-meta');
-  // the date leads, so freshness reads at a glance (2026-09-28)
-  const day = shelfDay(p);
-  if (day) meta.append(dateStamp(day, 'shelf-date'));
-  meta.append(el('span', null, p.sourceLabel));
-  // an absent date stays absent — a stringified null ("None") is data rot,
-  // never provenance, and must not stand in the card's meta line (R3-E);
-  // a publication note that is not a calendar day stays as written
-  if (!day && p.date && p.date !== 'None') meta.append(el('span', null, p.date));
-  meta.append(el('span', 'pool-tag', p.licence));
-  // an honest kind on the rows that are not articles
-  if (p.source === 'isa-yasashii-glossary') {
-    meta.append(el('span', 'pool-tag', tx('用語集の項目', '用語集 glossary entry')));
-  }
-  // the shelf remembers with you: finished, or open to your bookmark
-  if (owns(S.readDone, p.id)) meta.append(el('span', 'pool-tag read-tag', tx('読了', '読了 finished')));
-  else if ((S.readerPos[p.id] || 0) > 300) meta.append(el('span', 'pool-tag read-tag', tx('途中', '途中 in progress')));
-  open.append(meta);
-  open.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
   open.addEventListener('click', () => openPassage(p.id));
   item.append(open);
-
-  // the instrument stays one tap away: 詳細 unfolds the raw three signals
-  const details = el('button', 'details-toggle');
-  details.setAttribute('aria-expanded', String(!!S.detailsOpen?.has(p.id)));
-  details.type = 'button';
-  details.dataset.details = p.id;
-  details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
-  details.addEventListener('click', () => {
-    (S.detailsOpen ||= new Set());
-    if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
-    else S.detailsOpen.add(p.id);
-    render();
-  });
-  item.append(details);
-  if (S.detailsOpen?.has(p.id)) item.append(renderSignals(p.grading, { compact: true }));
   return item;
+}
+
+/** The lead story's art: one kanji from its own headline, brushed large in washi white on the
+ * indigo field — the same hand as the shelf's 永 (Yuji Syuku, the app's shodō face). The quoted
+ * term leads (「連帯の畑」 → 畑); otherwise the headline's densest kanji. */
+function storyArtGlyph(p) {
+  const title = String(p.title || '');
+  const quoted = title.match(/「([^」]+)」/u)?.[1] || '';
+  const kanji = (text) => [...text].filter((ch) => /\p{Script=Han}/u.test(ch));
+  const fromQuote = kanji(quoted);
+  if (fromQuote.length) return fromQuote.at(-1);
+  const strokes = (ch) => D.strokes?.[ch]?.length || 0;
+  const all = kanji(title);
+  return all.reduce((best, ch) => (strokes(ch) >= strokes(best) ? ch : best), all[0] || '読');
+}
+function storyArt(p) {
+  const art = el('div', 'story-art');
+  art.setAttribute('aria-hidden', 'true');
+  art.append(el('span', 'story-art-glyph', storyArtGlyph(p)));
+  art.append(el('span', 'story-art-seal', storyTopic(p)[0].slice(0, 1)));
+  return art;
 }
 
 function dialRow(labelJa, labelEn, key, options) {
@@ -8059,35 +8213,50 @@ function renderReader(main) {
     main.append(door);
     }
   }
-  main.append(el('p', 'eyebrow', p.sourceLabel));
+  // One compact line of provenance — source · date · level — then the headline. Settings are one
+  // icon; nothing else stands between the reader and the first sentence (design pass 2026-09-30).
+  const head = el('div', 'reader-head');
+  const meta = el('p', 'eyebrow reader-meta');
+  meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
+  if (shelfDay(p)) meta.append(dateStamp(shelfDay(p), 'shelf-date'));
+  meta.append(levelChip(p));
+  if (reviewPending(p)) meta.append(unreviewedChip(p));
+  // the dials fold away — the text is the point, the settings one tap away
+  const dialsToggle = el('button', 'icon-button dials-toggle');
+  dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
+  dialsToggle.setAttribute('aria-label', tx('文字設定', 'text settings 文字設定'));
+  dialsToggle.title = tx('文字設定', 'text settings');
+  dialsToggle.type = 'button';
+  dialsToggle.id = 'dials-toggle';
+  dialsToggle.append(uiIcon('sliders'));
+  dialsToggle.addEventListener('click', () => {
+    S.dialsOpen = !S.dialsOpen;
+    render();
+  });
+  head.append(meta, dialsToggle);
+  main.append(head);
   // the reader was the one view in bi mode that dropped the English title —
   // the handle the learner chose the text by (E3 round-A, reader lens). It
   // rides BESIDE the heading, the way the shelf card carries it, so the
   // heading itself still reads as the Japanese title alone.
   main.append(el('h1', 'view-title', p.title));
   if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
-  if (shelfDay(p)) {
-    const dated = el('p', 'reader-date');
-    dated.append(dateStamp(shelfDay(p), 'shelf-date'));
-    main.append(dated);
+  const versions = storyVersions(p);
+  if (versions) {
+    // one story, two texts: the original and Bunki's N3 rewrite are a toggle, never two cards
+    const toggle = el('div', 'version-toggle');
+    toggle.setAttribute('role', 'group');
+    toggle.setAttribute('aria-label', tx('版', 'version'));
+    for (const [version, ja, en] of [[versions.original, '原文', 'original'], [versions.easy, 'やさしい版', 'easier N3']]) {
+      const b = biLabel('button', 'version-choice', ja, en);
+      b.type = 'button';
+      b.dataset.version = version.id;
+      b.setAttribute('aria-pressed', String(version.id === p.id));
+      b.addEventListener('click', () => { if (version.id !== p.id) openPassage(version.id); });
+      toggle.append(b);
+    }
+    main.append(toggle);
   }
-  const lv = levelPhrase(p.grading);
-  const levelLine = el('div', 'level-line');
-  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
-  main.append(levelLine);
-
-  // the dials fold away — the text is the point, the settings one tap away
-  const dialsToggle = el('button', 'details-toggle');
-  dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
-  dialsToggle.type = 'button';
-  dialsToggle.id = 'dials-toggle';
-  dialsToggle.textContent = (S.dialsOpen ? '▾ ' : '▸ ') + tx('文字設定', 'text settings 文字設定');
-  dialsToggle.addEventListener('click', () => {
-    S.dialsOpen = !S.dialsOpen;
-    render();
-  });
-  main.append(dialsToggle);
   if (S.dialsOpen) {
     const dials = el('div', 'dials');
     dials.append(
@@ -8114,23 +8283,22 @@ function renderReader(main) {
     main.append(dials);
   }
 
-  // the listen door rides beside the settings fold — one tap to hear the
-  // article, one tap to stop; the voice names itself 仮 (interim) until
-  // the judged voice of PR 五 replaces it
+  // the play bar: the locked narration voice only; hidden while no clip exists for this article
   main.append(buildListenRow(p));
+  // the sentence actions float in only once a word is chosen — never a row of greyed buttons
   renderTeacherDoor(main, () => {
     const current = readerTakeCurrent();
     return current ? readerTakeNode(current) : null;
   }, true);
-
-  const grammarHint = el('p', 'gesture-hint');
-  grammarHint.textContent = tapLadderHint();
-  main.append(grammarHint);
+  renderReaderTip(main);
 
   const reader = el('div', 'reader');
   reader.id = 'reader';
   if (S.dials.spacing === 1) reader.classList.add('sp-word');
   if (S.dials.spacing === 2) reader.classList.add('sp-bunsetsu');
+  // readings always on keep true ruby layout; otherwise a reading floats over its word and never
+  // pries the line apart (the gaps in 「ダマスカス 郊外」 were hidden readings still taking width)
+  if (S.dials.furigana === 2) reader.classList.add('fg-always');
 
   if (!p.tokens) {
     // the article body is still arriving from its own file
@@ -8223,6 +8391,8 @@ function renderReader(main) {
       span.setAttribute('aria-label', namedAccessibleLabel(token, index));
     }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
+    // the word the sentence bar is about wears the one vermilion accent: current
+    if (S.readerTake?.p === p.id && S.readerTake.index === index) span.classList.add('tok-current');
     span.append(
       wordRow(displayPairs(token), {
         // a per-word reveal survives a full re-render even at ふりがな なし
@@ -8282,23 +8452,9 @@ function renderReader(main) {
   main.append(reader);
   main.append(renderReadingPlaces(p));
 
-  if (p.truncated) {
-    const note = el('div', 'note');
-    note.textContent = tx(
-      `原典からの抜粋（先頭 ${p.text.length} 字、文単位）。`,
-      `Excerpt — the first ${p.text.length} characters of the source, cut at a sentence boundary.`,
-    );
-    if (p.url) {
-      const a = el('a', null, tx(' 原典', ' source 原典'));
-      a.href = p.url;
-      a.rel = 'noreferrer';
-      a.target = '_blank';
-      a.className = 'inline-link';
-      note.append(a);
-    }
-    main.append(note);
-  }
-  // the quiet close of a reading: mark it finished, or take the mark back
+  // The article's foot: finish the reading, then everything about the text itself — source,
+  // licence, level detail, review state, the grader's signals — which the shelf no longer wears.
+  const footer = el('footer', 'article-footer');
   const fin = el('div', 'read-done');
   const done = owns(S.readDone, p.id);
   const finBtn = biLabel(
@@ -8320,24 +8476,61 @@ function renderReader(main) {
     returnScroll();
   });
   fin.append(finBtn);
-  main.append(fin);
+  footer.append(fin);
 
-  // A row marked 検収前 explains itself wherever the mark shows. The note was gated on
+  const about = el('section', 'article-about');
+  about.setAttribute('aria-label', tx('この読み物について', 'About this reading'));
+  about.append(withEn(el('h2', 'article-about-head', 'この読み物について'), 'About this reading', 'en-inline'));
+  const facts = el('dl', 'article-facts');
+  const fact = (ja, en, ...value) => {
+    const dt = withEn(el('dt', null, ja), en);
+    const dd = el('dd');
+    dd.append(...value);
+    facts.append(dt, dd);
+  };
+  fact('出典', 'source', learnerSourceLabel(p) || p.source);
+  if (shelfDay(p)) fact('日付', 'date', dateStamp(shelfDay(p), 'shelf-date'));
+  const lv = levelPhrase(p.grading);
+  fact('レベル', 'level', levelChip(p), el('span', 'level-note', bi() ? ` ${lv.level} · ${lv.ja}${lv.note}` : ` ${lv.ja}${lv.noteJa}`));
+  const licence = p.licenceUrl ? el('a', 'inline-link', p.licence) : el('span', null, p.licence);
+  if (p.licenceUrl) { licence.href = p.licenceUrl; licence.rel = 'noreferrer'; licence.target = '_blank'; }
+  fact('利用条件', 'licence', licence);
+  if (reviewPending(p)) fact('確認', 'review', unreviewedChip(p), el('span', 'review-reason', ` ${reviewReason(p)}`));
+  about.append(facts);
+
+  if (p.truncated) {
+    const note = el('div', 'note');
+    note.textContent = tx(
+      `原典からの抜粋（先頭 ${p.text.length} 字、文単位）。`,
+      `Excerpt — the first ${p.text.length} characters of the source, cut at a sentence boundary.`,
+    );
+    if (p.url) {
+      const a = el('a', null, tx(' 原典', ' source 原典'));
+      a.href = p.url;
+      a.rel = 'noreferrer';
+      a.target = '_blank';
+      a.className = 'inline-link';
+      note.append(a);
+    }
+    about.append(note);
+  }
+
+  // A row marked unreviewed explains itself wherever the mark shows. The note was gated on
   // pendingVerification, which few marked rows carry, so the rest wore the mark with no reason,
   // and the rights-held glossary rows told the Wikinews archive-freeze story, false of them
   // (PR #77 d9f0b984, with round B's per-row reasons).
   const rightsHeld = p.review === 'rights-review-pending';
-  if (p.pendingVerification || rightsHeld || p.review === 'human-review-pending' || /検収前/.test(p.sourceLabel || '')) {
+  if (reviewPending(p)) {
     const pv = el('div', 'note');
     pv.textContent = rightsHeld
-      ? tx('出典の利用条件がまだ確認されていない。検収前。', 'The terms this source may be used under are not yet verified. Pending review.')
+      ? tx('出典の利用条件がまだ確認されていない。', 'The terms this source may be used under are not yet verified. Pending review.')
       : p.pendingVerification
         ? tx(
           '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
           'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
         )
-        : tx('人手による確認がまだ済んでいない。検収前。', 'A human review of this text is still pending.');
-    main.append(pv);
+        : tx('人による確認がまだ済んでいない。', 'A human review of this text is still pending.');
+    about.append(pv);
   }
 
   const attribution = el('div', 'note');
@@ -8350,7 +8543,26 @@ function renderReader(main) {
   } else {
     attribution.textContent = p.attribution;
   }
-  main.append(attribution);
+  about.append(attribution);
+
+  // the instrument stays one tap away: 詳細 unfolds the grader's raw signals, here and only here
+  const details = el('button', 'details-toggle');
+  details.type = 'button';
+  details.dataset.details = p.id;
+  details.setAttribute('aria-expanded', String(!!S.detailsOpen?.has(p.id)));
+  details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('難しさの内訳', 'how the level was measured');
+  details.addEventListener('click', () => {
+    (S.detailsOpen ||= new Set());
+    if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
+    else S.detailsOpen.add(p.id);
+    keepScroll();
+    render();
+    returnScroll();
+  });
+  about.append(details);
+  if (S.detailsOpen?.has(p.id)) about.append(renderSignals(p.grading, { compact: true }));
+  footer.append(about);
+  main.append(footer);
 }
 
 /* The Drift entry (Phase 2): the real 墨流し universe fills the viewport on
@@ -13097,9 +13309,15 @@ function renderTeacherDoor(container, getNode, reader = false) {
   const actions = el('div', 'teacher-actions');
   const note = el('p', 'teacher-note');
   note.setAttribute('role', 'status');
-  for (const [discuss, ja, en] of [[false, 'この文を保存', 'save this sentence'], [true, 'この文を先生と話す', 'discuss this sentence']]) {
+  // the reader's bar names its sentence in the note, so its buttons can be short: one filled
+  // primary (save), the rest outlined
+  const labels = reader
+    ? [[false, '保存', 'save'], [true, '先生と話す', 'ask the tutor']]
+    : [[false, 'この文を保存', 'save this sentence'], [true, 'この文を先生と話す', 'discuss this sentence']];
+  for (const [discuss, ja, en] of labels) {
     const button = biLabel('button', 'chip', ja, en);
     button.type = 'button';
+    if (reader) button.classList.add(discuss ? 'btn-secondary' : 'btn-primary');
     if (reader) button.id = discuss ? 'reader-teacher' : 'reader-context-save';
     else button.classList.add(discuss ? 'teacher-discuss' : 'teacher-save');
     button.disabled = !node || !recordWritable();
@@ -13135,7 +13353,8 @@ function renderTeacherDoor(container, getNode, reader = false) {
   }
   if (sentencePracticeModule && (reader || (node?.sourceContext
     ? node.sourceContext.sourceKind === 'bundled-passage' : !!node?.from))) {
-    const practice = biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
+    const practice = reader ? biLabel('button', 'chip btn-secondary', '練習する', 'practice')
+      : biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
     practice.type = 'button'; practice.id = reader ? 'reader-sentence-practice' : 'entry-sentence-practice';
     const selectedNode = () => typeof getNode === 'function' ? getNode() : getNode;
     const key = (value) => JSON.stringify([value?.t, value?.id, value?.from?.passage, value?.from?.index, value?.sourceContext?.id]);
@@ -13148,11 +13367,26 @@ function renderTeacherDoor(container, getNode, reader = false) {
     actions.append(practice);
   }
   if (quote.textContent) wrap.append(quote);
-  wrap.append(actions, note);
-  if (reader && !node) note.textContent = tx('語に触れると、その文を保存して先生と話せる。',
-    'Touch a word to save its sentence or discuss it with the tutor.');
-  if (reader) note.id = 'reader-context-note';
+  if (reader) {
+    // a floating bar that appears only once a word is chosen (syncReaderTakeSeal shows it)
+    wrap.classList.add('reader-actions');
+    wrap.hidden = !node;
+    wrap.setAttribute('role', 'region');
+    wrap.setAttribute('aria-label', tx('選んだ文', 'the chosen sentence'));
+    note.id = 'reader-context-note';
+    note.textContent = readerActionsNote(readerTakeCurrent());
+    const close = el('button', 'icon-button reader-actions-close');
+    close.type = 'button';
+    close.setAttribute('aria-label', tx('閉じる', 'close'));
+    close.append(uiIcon('close'));
+    close.addEventListener('click', () => { wrap.hidden = true; });
+    wrap.append(note, actions, close);
+  } else wrap.append(actions, note);
   container.append(wrap);
+}
+/** The bar's own label: which sentence its actions will carry. */
+function readerActionsNote(selected) {
+  return selected ? tx(`「${selected.id}」の文`, `the sentence with ${selected.id}`) : '';
 }
 function renderTeacherContexts(main) {
   const entries = S.teacherContexts?.entries || [];
@@ -17643,8 +17877,11 @@ function syncReaderTakeSeal() {
     if (control) control.disabled = !selected || !recordWritable();
   }
   const contextNote = document.getElementById('reader-context-note');
-  if (contextNote && selected) contextNote.textContent = tx(`「${selected.id}」を読んだ文を保存できる。`,
-    `Save or discuss the sentence where you met ${selected.id}.`);
+  if (contextNote && selected) contextNote.textContent = readerActionsNote(selected);
+  const bar = document.querySelector('.reader-actions');
+  if (bar) bar.hidden = !selected;
+  for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
+  if (selected) document.querySelector(`#reader .tok[data-index="${selected.index}"]`)?.classList.add('tok-current');
   const btn = document.getElementById('reader-take');
   if (!btn) return;
   const cur = readerTakeCurrent();
