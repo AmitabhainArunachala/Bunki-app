@@ -1854,7 +1854,9 @@ body .sheet .hero .cat-chip {
   cursor: pointer;
 }
 body .sheet .hero .cat-chip:hover { border-color: var(--ai); background: var(--ai-wash); }
-body .sheet .hero .kkld-chip { flex-basis: 100%; padding: 0; border: 0; background: none; font: 12px/1.5 var(--sans); color: var(--text-2); }
+body .sheet .hero .kkld-chip { flex-basis: 100%; min-width: 0; padding: 0; border: 0; background: none; font: 12px/1.5 var(--sans); color: var(--text-2); white-space: normal; overflow-wrap: anywhere; }
+body .sheet .hero-meta { min-width: 0; }
+body .sheet .hero #kanji-shape-lookup { max-width: 100%; white-space: normal; text-align: start; }
 body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
   flex-direction: row;
   gap: 6px;
