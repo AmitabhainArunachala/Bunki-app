@@ -92,6 +92,15 @@ function check(name, pass, detail = '') {
   console.log(`${mark} ${name}${detail ? `  — ${detail}` : ''}`);
 }
 
+/** Open the shelf's first text and unfold 詳細 in its footer (design pass 2026-09-30). */
+async function openFooterSignals(page) {
+  await page.locator(`${FIRST_TEXT} .shelf-open`).click();
+  await page.waitForSelector('#reader .tok');
+  await page.locator('.article-about [data-details]').click();
+  await page.waitForSelector('.article-about .sig, .article-about .band');
+  await page.waitForTimeout(150);
+}
+
 async function touchAt(page, selector, index, holdMs) {
   const target = page.locator(selector).nth(index);
   // centre, don't nudge: scrollIntoViewIfNeeded moves the minimum, which
@@ -689,19 +698,19 @@ async function main() {
 
   // the raw instrument is one 詳細 tap away, not gone — and it must include
   // the live JLPT-lexicon row plus an HONEST row for the unmeasured NINJAL
-  // pair (never a stale or faked number)
-  await page.locator(`${FIRST_TEXT} [data-details]`).click();
-  await page.waitForTimeout(200);
-  const rawSignals = await page.locator('.shelf-item:not([data-recommendation]) .sig').count();
+  // pair (never a stale or faked number). Since the design pass of 2026-09-30
+  // the shelf card carries no diagnostics: 詳細 unfolds in the article's footer.
+  await openFooterSignals(page);
+  const rawSignals = await page.locator('.article-about .sig').count();
   const sigNames = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig .sig-name')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.article-about .sig .sig-name')].map((n) => n.textContent)`,
   );
   check('the raw signals unfold behind 詳細 — separate, never averaged', rawSignals >= 3,
     `${rawSignals} signal rows on the opened card: ${sigNames.join(' · ')}`);
   check('the JLPT-lexicon signal is live on the opened card',
     sigNames.some((n) => n.includes('JLPT')), sigNames.join(' · '));
   const sigValues = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig .sig-val')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.article-about .sig .sig-val')].map((n) => n.textContent)`,
   );
   const ninjalRow = sigNames.findIndex((n) => n.includes('国語研'));
   const firstGrading = gradingTruth.articles[0].grading;
@@ -710,8 +719,9 @@ async function main() {
       ? ninjalRow === -1 || !/未測定|not measured/.test(sigValues[ninjalRow])
       : ninjalRow >= 0 && /未測定|not measured/.test(sigValues[ninjalRow]),
     ninjalRow >= 0 ? `${sigNames[ninjalRow]} → ${sigValues[ninjalRow]}` : 'no NINJAL row');
-  await page.locator(`${FIRST_TEXT} [data-details]`).click();
+  await page.locator('.article-about [data-details]').click();
   await page.waitForTimeout(150);
+  await open('?entry=shelf');
   await shoot(page, shotsDir, '01-arrive-shelf');
   report.steps.push({ step: 1, name: 'arrive', shot: '01-arrive-shelf.png' });
 
@@ -1310,15 +1320,14 @@ async function main() {
     } finally { sheetLoads.dispose(); }
   }
 
-  // B · difficulty presentation — behind 詳細 since v1.2, so open one card
+  // B · difficulty presentation — behind 詳細 since v1.2; in the article footer since 2026-09-30
   for (const mode of ['three', 'band']) {
     await open(`?entry=shelf&difficulty=${mode}`);
-    await page.locator(`${FIRST_TEXT} [data-details]`).click();
-    await page.waitForTimeout(200);
+    await openFooterSignals(page);
     const shown = await page.evaluate(`(() => ({
-      sigs: document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig').length,
-      bands: document.querySelectorAll('.shelf-item:not([data-recommendation]) .band').length,
-      uncertain: document.querySelectorAll('.shelf-item:not([data-recommendation]) .uncertain').length,
+      sigs: document.querySelectorAll('.article-about .sig').length,
+      bands: document.querySelectorAll('.article-about .band').length,
+      uncertain: document.querySelectorAll('.article-about .uncertain').length,
     }))()`);
     check(`variant B · ${mode}`,
       mode === 'three' ? shown.sigs >= 3 && shown.bands === 0 : shown.bands === 1 && shown.sigs === 0,

@@ -44,7 +44,8 @@ page.on('dialog',async d=>{observations.push({type:'native-dialog',message:d.mes
 let serial=0;
 const sleep=ms=>page.waitForTimeout(ms);
 const visible=async s=>await page.locator(s).first().isVisible().catch(()=>false);
-const click=async s=>{await page.locator(s).first().click();await sleep(280);};
+// a door inside a closed menu (the shelf's 学習ツール chip) is reached the way a learner reaches it: open the menu, then the door
+const click=async s=>{const target=page.locator(s).first();await target.evaluate(n=>{const menu=n.closest('details');if(menu&&!menu.open)menu.querySelector(':scope > summary')?.click();});await target.click();await sleep(280);};
 const role=async name=>{await page.getByRole('button',{name}).first().click();await sleep(280);};
 const text=()=>page.locator('body').innerText();
 const state=async()=>{const s=await readAppRecord(page);return Object.fromEntries(['taken','srs','revlog','obslog','lessonsDone','mockDone','assessmentLibrary','lists','suspended'].map(k=>[k,s[k]??(k==='taken'||k.endsWith('log')?[]:{})]));};
