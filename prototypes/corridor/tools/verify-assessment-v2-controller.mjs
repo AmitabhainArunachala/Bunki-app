@@ -64,6 +64,34 @@ check('same library retains exact form, all questions and safe current question'
   assert.equal(selected.question.rationale, undefined);
   assert.equal(selected.remainingMs, 60_000);
 });
+check('dictionary help is durable before an answer, never reveals a key or locks the response', () => {
+  let library = api.startAssessmentV2(api.createAssessmentLibraryV2({ scope }), form, {
+    scope, attemptId: 'attempt:study-lookup', mode: 'practice', now,
+    editorialAtStart: { status: 'unreviewed', policyVersion: null, decisionRevisionIds: [] },
+    clockSessionId: 'clock:test', monotonicMs: 0 });
+  const original = library;
+  library = command(library, { kind: 'dictionary-lookup', itemId: items[0].id }, 100);
+  assert.equal(original.attempts[0].conditions.includes('assisted'), false);
+  library = api.parseAssessmentLibraryV2(JSON.parse(JSON.stringify(library)), { scope });
+  const selected = api.selectAssessmentV2(library);
+  assert.deepEqual(api.assessmentItemAssistanceV2(selected.attempt, items[0].id), { kind: 'dictionary', at: now + 100 });
+  assert.equal(selected.attempt.answers[0].response.kind, 'unanswered');
+  assert.equal(api.selectAssessmentExplanationV2(library, selected.attempt.attemptId, items[0].id), null);
+  assert.equal(command(library, { kind: 'dictionary-lookup', itemId: items[0].id }, 200), library);
+  assert.throws(() => command(library, { kind: 'dictionary-lookup', itemId: items[1].id }, 200), /lookup-not-current-item/u);
+  assert.throws(() => command(library, { kind: 'dictionary-lookup', itemId: items[0].id }, 200,
+    { expectedRevisionId: 'stale' }), /stale-lookup/u);
+  library = command(library, { kind: 'answer', itemId: items[0].id, response: { kind: 'selected', optionId: 'b' } }, 300);
+  library = command(library, { kind: 'answer', itemId: items[0].id, response: { kind: 'selected', optionId: 'a' } }, 400);
+  assert.equal(api.selectAssessmentExplanationV2(library, selected.attempt.attemptId, items[0].id), null);
+  library = command(library, { kind: 'close-block', blockId: 'block:vocabulary' }, 500);
+  library = command(library, { kind: 'start-next-block' }, 600);
+  library = command(library, { kind: 'submit' }, 700);
+  const finished = api.selectAssessmentV2(library);
+  assert.equal(api.assessmentOutcomesV2(finished)[0].assistance.kind, 'dictionary');
+  assert.equal(api.assessmentIndependenceV2(finished).assistedCorrect, 1);
+  assert.throws(() => command(start(), { kind: 'dictionary-lookup', itemId: items[0].id }), /lookup-in-timed-mode/u);
+});
 check('deadline checkpoint persists with blanks and explicit next-block activation', () => {
   let library = start();
   const original = library;

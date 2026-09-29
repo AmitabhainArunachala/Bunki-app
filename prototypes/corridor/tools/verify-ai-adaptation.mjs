@@ -117,6 +117,9 @@ const server = createServer((request, response) => {
 const openShelf = async () => {
   await page.goto(`${origin}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1');
+  const tools = page.locator('details.shelf-study-tools');
+  if (await tools.count() && !await tools.evaluate(element => element.open))
+    await tools.locator('summary').click();
 };
 async function importFixture(name, record, { navigate = true } = {}) {
   write(`${name}-import.json`, record);

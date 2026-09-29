@@ -302,10 +302,10 @@ async function main() {
       JSON.stringify({ minimal: asleep?.minimal, chrome: asleep?.chrome }),
     );
     check(
-      'sleeping controls are the four corners and the ensō mark, nothing else',
-      asleep?.interactive.length === 5 &&
+      'sleeping controls are the four corners, ensō mark and permanent bug entry',
+      asleep?.interactive.length === 6 &&
         asleep.interactive.some((node) => node.isTrigger) &&
-        ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].every((id) =>
+        ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed-range', 'bunki-report-bug'].every((id) =>
           asleep.interactive.some((node) => node.id === id),
         ),
       JSON.stringify(asleep?.interactive),
@@ -378,7 +378,7 @@ async function main() {
           (node) =>
             node.inField ||
             node.isTrigger ||
-            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].includes(node.id),
+            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed-range', 'bunki-report-bug'].includes(node.id),
         ),
       JSON.stringify(awake?.interactive),
     );
@@ -828,7 +828,7 @@ async function main() {
         slept.interactive.every(
           (node) =>
             node.isTrigger ||
-            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].includes(node.id),
+            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed-range', 'bunki-report-bug'].includes(node.id),
         ),
       JSON.stringify(slept),
     );
@@ -885,10 +885,11 @@ async function main() {
       'a no-stroke kanji keeps the same valid dormant trigger contract',
       noData?.minimal === 'on' &&
         noData.chrome === 'sleeping' &&
-        noData.interactive.length === 3 &&
+        noData.interactive.length === 4 &&
         noData.interactive.some((node) => node.isTrigger) &&
         noData.interactive.some((node) => node.id === 'strokes-back') &&
         noData.interactive.some((node) => node.id === 'stroke-world-seal') &&
+        noData.interactive.some((node) => node.id === 'bunki-report-bug') &&
         noData.trigger?.controls === 'stroke-awake-field' &&
         noDataProse.target,
       JSON.stringify({ room: noData, noDataProse }),

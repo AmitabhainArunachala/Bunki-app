@@ -119,6 +119,37 @@ check('missing mapping and unreviewed content remain saved without false enrollm
     assert.match(followup.status, /^pending-/u);
   }
 });
+check('wrong unflagged answers survive reload and feed cross-app priorities with exact source provenance', () => {
+  const { library, followup } = finished(); const base = record(library);
+  const saved = JSON.parse(JSON.stringify({ ...base, ...learning.applyAssessmentLearning(base, followup) }));
+  assert(learning.validateAssessmentLearningRecord(saved));
+  const before = JSON.stringify(saved);
+  const priorities = learning.assessmentPracticePriorities(saved.assessmentLearning, scope);
+  assert.equal(priorities.authority, 'practice-only');
+  assert.equal(priorities.scheduling, 'unchanged'); assert.equal(priorities.mastery, 'unchanged');
+  assert.deepEqual(priorities.targets.map(row => row.subject), ['word:猫']);
+  const target = priorities.targets[0], source = target.evidence[0];
+  assert.equal(target.misses, 1); assert.equal(source.flagged, false);
+  assert.equal(source.attemptId, followup.attemptId); assert.equal(source.itemId, items[0].id);
+  assert.deepEqual(source.form, followup.form); assert.equal(source.item.sha256, items[0].sha256);
+  assert.equal(JSON.stringify(saved), before);
+  assert.deepEqual(saved.srs, {}); assert.deepEqual(saved.revlog, []);
+});
+check('provisional wrong answers remain practice suggestions without being promoted to reviewed evidence', () => {
+  const { library, followup } = finished({ reviewed: false }); const base = record(library);
+  const state = { ...base, ...learning.applyAssessmentLearning(base, followup) };
+  const target = learning.assessmentPracticePriorities(state.assessmentLearning, scope).targets[0];
+  assert.equal(target.subject, 'word:猫'); assert.equal(target.provisionalMisses, 1);
+  assert.equal(target.reviewedMisses, 0); assert.equal(target.evidence[0].editorialStatus, 'unreviewed');
+  assert.equal(target.evidence[0].provisional, true); assert.equal(target.evidence[0].flagged, false);
+  assert.deepEqual(state.taken, []); assert.deepEqual(state.srs, {});
+  assert.equal(learning.assessmentLearningSummary(state.assessmentLearning).completed, 0);
+  state.assessmentLearning.suppressions.push({ key: 'word:猫', at: now, reason: 'removed' });
+  assert.equal(learning.assessmentPracticePriorities(state.assessmentLearning).targets[0].suppressed, true);
+  const stopped = finished({ abandon: true });
+  assert.deepEqual(learning.assessmentPracticePriorities(
+    learning.applyAssessmentLearning(record(stopped.library), stopped.followup).assessmentLearning).targets, []);
+});
 check('tampered outcome and foreign scope cannot become Sensei evidence', () => {
   const { library, followup } = finished(); const state = { ...record(library), ...learning.applyAssessmentLearning(record(library), followup) };
   assert.throws(() => learning.parseAssessmentLearning(state.assessmentLearning, { ...scope, learnerId: 'other' }));

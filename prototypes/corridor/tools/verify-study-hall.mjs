@@ -121,7 +121,7 @@ await page.waitForSelector('.skip-hit', { timeout: 30000 });
 await page.click('.skip-hit');
 await page.waitForSelector('#sheet', { timeout: 15000 });
 await page.waitForTimeout(500);
-const strokeBtn = await page.$('#sheet button[aria-label*="stroke order"], #sheet button[aria-label*="筆順"]');
+const strokeBtn = await page.$('#sheet #strokes-door');
 if (!strokeBtn) failures.push('stroke-order door not found on the kanji sheet');
 else {
   await strokeBtn.click();
@@ -131,13 +131,13 @@ else {
   receipt.slider = !!slider;
   if (!slider) failures.push('stroke room: #stroke-speed-range missing');
   else {
-    await page.evaluate(`(() => { const r = document.querySelector('#stroke-speed-range'); r.value = '1.5'; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    await page.evaluate(`(() => { const r = document.querySelector('#stroke-speed-range'); r.value = '2'; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); })()`);
     await page.waitForTimeout(300);
     const stored = await page.evaluate(`localStorage.getItem('kairo-stroke-speed-v1')`);
     const readout = await page.evaluate(`document.querySelector('#stroke-speed-readout')?.textContent`);
     receipt.speed = { stored, readout };
-    if (stored !== '1.5') failures.push(`stroke speed not persisted: ${stored}`);
-    if (!/1\.5/.test(readout || '')) failures.push(`readout does not show 1.5: ${readout}`);
+    if (stored !== '1.6') failures.push(`stroke speed not persisted: ${stored}`);
+    if (!/Fast|はやく/.test(readout || '')) failures.push(`readout does not name the fast speed: ${readout}`);
     await shot('stroke-speed');
   }
 }

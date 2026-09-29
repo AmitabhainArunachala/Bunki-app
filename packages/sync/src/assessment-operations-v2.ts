@@ -266,6 +266,12 @@ const sourceSchema = z.looseObject({
     priorExposure: z.enum(['none-reported', 'reported', 'unknown']),
     conditions: conditionsSchema,
     editorialAtStart: editorialSchema,
+    // Optional for older producers. A dictionary lookup is an assistance
+    // event bound to an exact item digest, and may precede the response.
+    events: z
+      .array(z.looseObject({ kind: z.string(), at: countSchema, detail: idSchema }))
+      .max(10000)
+      .optional(),
     clock: z.looseObject({ elapsedMs: elapsed }),
     audio: z.array(audioSchema).max(256),
     answers: z
@@ -387,6 +393,20 @@ export function createAssessmentSyncIntentsV2(raw: unknown) {
         !['correct', 'incorrect'].includes(row.result))
     )
       fail('result.items.assistance');
+    const dictionary = attempt.events?.find(
+      (event) => event.kind === 'assistance' && event.detail === `dictionary:${item.sha256}`,
+    );
+    if (
+      dictionary &&
+      (attempt.mode !== 'practice' ||
+        !attempt.conditions.includes('assisted') ||
+        answer.reached !== true ||
+        dictionary.at < attempt.startedAt ||
+        dictionary.at > attempt.endedAt)
+    )
+      fail('result.items.assistance');
+    const assisted =
+      !!answer.assistance || (!!dictionary && ['correct', 'incorrect'].includes(row.result));
     return {
       item: {
         kind: 'item' as const,
@@ -402,7 +422,7 @@ export function createAssessmentSyncIntentsV2(raw: unknown) {
       elapsedMs: row.elapsedMs,
       flagged: answer.flagged,
       // Emitted only when true, so unassisted payload bytes are unchanged.
-      ...(answer.assistance ? { assisted: true as const } : {}),
+      ...(assisted ? { assisted: true as const } : {}),
     };
   });
   const exam = parseAssessmentOperationV2({

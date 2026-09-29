@@ -33,6 +33,7 @@
       overviewScroll: 0,
       overviewFocus: null,
       provenanceOpen: false,
+      guideOpen: false,
     };
     const collections = catalog.collections;
     const entriesByKey = new Map();
@@ -93,6 +94,39 @@
       return true;
     }
 
+    function levelGuide() {
+      const details = node('details', 'reference-guide');
+      details.open = state.guideOpen;
+      details.append(node('summary', null, tx('JLPT・漢検・学年のちがいは？', 'What do JLPT, Kanji Kentei and school grades mean?')));
+      details.addEventListener('toggle', () => { if (details.isConnected) state.guideOpen = details.open; });
+      const grid = node('div', 'reference-guide-grid');
+      for (const [title, description, linkText, href] of [
+        ['JLPT · N5 → N1', tx(
+          '日本語能力試験。語彙・文法・読む力・聞く力を確かめます。N5 は基礎、N1 は最も難しい級です。まず学習中の級から探せます。',
+          'The Japanese-Language Proficiency Test covers vocabulary, grammar, reading and listening. N5 starts with basic Japanese; N1 is the most advanced. Start with the level you are studying.',
+        ), tx('公式の級の説明を読む', 'Read the official level guide'), 'https://www.jlpt.jp/e/about/levelsummary.html'],
+        [tx('漢検 · 10級 → 1級', 'Kanji Kentei · 10級 → 1級'), tx(
+          '漢字の読み・書き・意味や使い方を確かめる検定です。10級から1級へ難しくなります。「準1級」は1級の前の段階。JLPT とは別の尺度です。',
+          'A test of kanji reading, writing, meaning and use. It progresses from introductory 10級 to advanced 1級. 準 means a step before a level: 準1級 comes before 1級. Its levels are separate from JLPT.',
+        ), tx('公式の級の説明を読む', 'Read the official grade guide'), 'https://www.kanken.or.jp/kanken/grades/overview/'],
+        [tx('学校の学年', 'School grades'), tx(
+          '日本の小学校で、その漢字を習う学年の目安です。1年生から6年生まであります。日本語学習者の能力や JLPT の級を示すものではありません。',
+          'Grades 1–6 refer to the years in Japanese elementary school when kanji are taught. They describe a school sequence, not your Japanese ability or a JLPT result.',
+        ), tx('文部科学省の説明を読む', 'Read the school curriculum guide'), 'https://www.mext.go.jp/a_menu/shotou/new-cs/1385768.htm'],
+      ]) {
+        const card = node('section', 'reference-guide-card');
+        const link = node('a', null, linkText);
+        link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+        card.append(node('h3', null, title), node('p', null, description), link);
+        grid.append(card);
+      }
+      details.append(grid, node('p', 'reference-guide-note', tx(
+        'どの区分でも、項目を開いて読み・意味・用例を確かめられます。覚えたいものだけ My Study に加えましょう。',
+        'Open any entry to explore its reading, meaning and examples. Add only the items you want to practise to My Study.',
+      )));
+      return details;
+    }
+
     function provenance() {
       const details = node('details', 'reference-provenance');
       details.id = 'reference-provenance';
@@ -110,7 +144,7 @@
         )),
         node('p', null, tx(
           'JLPT の級は資料ごとのタグです。現在の試験には公式の語彙・漢字・文法の網羅的な出題一覧はありません。辞書層と語彙層を合わせ、N1 も収録。級が異なる項目は各資料の級に表示し、相違を明記しています。漢字の JLPT タグは別資料です。',
-          'JLPT levels are corpus tags, not an official exam syllabus. The current test does not publish exhaustive vocabulary, kanji, or grammar lists. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
+          'Bunki groups these entries using the level labels in its dictionaries. The JLPT does not publish a complete list of the vocabulary, kanji or grammar that can appear on the exam. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
         )),
       );
       const jlptLink = node('a', null, tx('JLPT 公式ガイドブック · Q7–Q8', 'Official JLPT guidebook · Q7–Q8'));
@@ -197,16 +231,16 @@
       title.tabIndex = -1;
       head.append(title, node('p', 'reference-intro', tx(
         '級から引く、読む、確かめる。収録された語彙と漢字の全件を、手元で。',
-        'Look up a level. Read every entry. All bundled vocabulary and kanji, here on your shelf.',
+        'Choose a level to explore Japanese words and kanji. Open an entry for its reading, meaning and connections.',
       )));
-      root.append(head);
+      root.append(head, levelGuide());
       const taken = studySet();
       const jlpt = node('section', 'reference-family');
       jlpt.setAttribute('aria-labelledby', 'reference-jlpt-heading');
       const jlptHead = node('div', 'reference-family-heading');
       const heading = node('h2', null, 'JLPT');
       heading.id = 'reference-jlpt-heading';
-      jlptHead.append(heading, node('span', 'reference-family-note', tx('N5 → N1 · 資料の級タグ', 'N5 → N1 · corpus level tags')));
+      jlptHead.append(heading, node('span', 'reference-family-note', tx('N5 基礎 → N1 上級', 'N5 basics → N1 advanced')));
       jlpt.append(jlptHead);
       const tabs = node('div', 'reference-tabs');
       tabs.setAttribute('role', 'group');
@@ -233,7 +267,7 @@
       jlpt.append(grid);
       jlpt.append(node('p', 'reference-footnote', tx(
         '公式の出題一覧ではなく、収録資料の級タグです。',
-        'Source-assigned levels, not an official exam syllabus.',
+        'These groups follow the level labels in our dictionaries. The exam may include other words and kanji.',
       )));
       root.append(jlpt);
 
@@ -242,10 +276,10 @@
       const kankenHead = node('div', 'reference-family-heading');
       const kankenTitle = node('h2', null, tx('漢検', 'Kanji Kentei'));
       kankenTitle.id = 'reference-kanken-heading';
-      kankenHead.append(kankenTitle, node('span', 'reference-family-note', tx('各級に配当された字', 'Assigned to each grade')));
+      kankenHead.append(kankenTitle, node('span', 'reference-family-note', tx('10級から1級へ', 'Explore from introductory to advanced')));
       kanken.append(kankenHead, node('p', 'reference-footnote', tx(
         `級タグ付き ${number(catalog.stats.families.kanken.uniqueLabelled)} 件。異体字・字形未収録も含む資料上の区分です。公式範囲すべての保証ではありません。`,
-        `${number(catalog.stats.families.kanken.uniqueLabelled)} source-tagged records, including variant forms and missing-glyph records. Not a claim of complete official coverage.`,
+        `${number(catalog.stats.families.kanken.uniqueLabelled)} kanji records to explore by level. Some are alternative written forms or entries without a displayable character. This library may not cover every character on the exam.`,
       )));
       const grades = node('div', 'reference-level-grid reference-kanken-grid');
       collections.forEach((collection, index) => {
@@ -462,9 +496,9 @@
         `${number(collection.count)} entries · ${number(saved)} in My Study`,
       )));
       head.append(node('p', 'reference-footnote', collection.family === 'kanken'
-        ? tx('資料による級配当。公式の累計範囲とは異なります。', 'Source-assigned records, not cumulative exam scope.')
-        : tx('資料の級タグ。公式の出題一覧ではありません。', 'Corpus tags, not an official exam syllabus.')));
-      root.append(head, provenance());
+        ? tx('この級に分類された漢字です。下の級の漢字も試験範囲に含まれる場合があります。', 'Kanji listed at this level. An exam can also include characters from earlier levels.')
+        : tx('辞書の級表示を目安にまとめています。試験には、ここにない語や漢字も出る場合があります。', 'Grouped using our dictionaries’ level labels. The exam may include words or kanji beyond this list.')));
+      root.append(head, levelGuide(), provenance());
       const toolbar = node('div', 'reference-toolbar');
       const searchGroup = node('div', 'reference-search-group');
       const searchLabel = node('label', 'reference-field-label', tx('この区分の全件を検索', 'Search this entire collection'));
