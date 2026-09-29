@@ -7148,7 +7148,8 @@ function enhanceJapaneseProse(root) {
     }
     for (const node of textNodes) { const fragment = document.createDocumentFragment(); appendJapaneseLookup(fragment, node.textContent, context); node.replaceWith(fragment); }
   }
-  for (const quote of root.querySelectorAll('blockquote.sentence-original')) {
+  // an excerpt offers listening only when the locked narration voice has shipped
+  for (const quote of articleNarration ? root.querySelectorAll('blockquote.sentence-original') : []) {
     if (quote.nextElementSibling?.classList.contains('excerpt-listen')) continue;
     const text = quote.textContent;
     const listen = el('button', 'chip excerpt-listen', excerptListenLabel()); listen.type = 'button';
@@ -7783,34 +7784,39 @@ function glossaryCrossRefPlan(p) {
   return skip.size ? { skip, doors } : null;
 }
 
-/* 聞く — the interim voice (operator escalation, 2026-08-19). The judged
- * voice — PR 五's shootout, pitch-accent verified against the accent
- * dictionaries — is NOT this. This door reads the article aloud with the
- * device's own best Japanese voice so listening exists today, and it wears
- * that truth on its face (仮の声). Word-level audio stays absent until a
- * judged voice ships: a lone word's pitch teaches, a read-along sentence
- * carries its own context. Nothing here writes learner state. */
+/* 聞く — the reader's play bar. The voice is decided: the operator's blind audition
+ * (2026-09-29) locked Google Gemini TTS Kore, with Charon as the second speaker. No approved
+ * recording means no playable audio: until Kore clips ship, the bar shows a quiet 音声準備中 · Kore
+ * state and nothing plays — no device voice, no interim voice. Nothing here writes learner state. */
 // failed: null, or { pid, voice } — the failure belongs to the article and voice that failed, so a
 // different article or a new voice choice never inherits its note
-const readAloud = { on: false, timer: null, failed: null, generation: 0, usingDeviceVoice: false };
+const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0, total: 0, rate: 1 };
+/* The narration voice is locked (operator, blind audition 2026-09-29): Google Gemini TTS Kore
+ * reads, Charon is the second speaker. JVNV F1 was rated 1/5 and withdrawn; it never plays.
+ * Narration ships as audio/article-narration.json ({ v: 1, voice, articles: { id: { clips } } })
+ * and is fetched only when index.html raises __KAIRO_NARRATION__. Until the Kore clips exist the
+ * flag stays down and the reader's play bar stays hidden: no picker, no stand-in voice. */
+const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };
+const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
 let excerptPlayback = 0, excerptControl = null;
 function ensureArticleNarration() {
-  if (typeof window === 'undefined' || !window.__KAIRO_NARRATION__) return Promise.resolve(null);
+  if (typeof window === 'undefined' || !window.__KAIRO_NARRATION__) { articleNarration = null; return Promise.resolve(null); }
   if (articleNarration !== undefined) return Promise.resolve(articleNarration);
   articleNarrationWait ||= fetch('audio/article-narration.json').then(response => response.ok ? response.json() : null).catch(() => null).then(value => {
-    articleNarration = value?.v === 1 && value?.articles ? value : null;
+    articleNarration = value?.v === 1 && value?.articles && NARRATION_VOICES[value.voice] ? value : null;
     if (typeof S !== 'undefined' && S.view === 'reader') refreshListenRow();
     return articleNarration;
   });
   return articleNarrationWait;
 }
 if (typeof window !== 'undefined') void ensureArticleNarration();
+const narrationVoiceName = () => NARRATION_VOICES[articleNarration?.voice] || '';
+const narrationClips = (p) => (p && articleNarration?.articles?.[p.id]?.clips) || [];
 
 function excerptListenLabel() {
-  // This click auditions F1 for this excerpt only; it does not choose a voice
-  // for the reader or write the learner's saved voice preference.
-  return tx('F1の声で聞く（試聴版）', 'Listen · F1 audition voice');
+  // This click plays the excerpt in the locked narration voice; it writes no preference.
+  return tx(`${narrationVoiceName()}の声で聞く`, `Listen · ${narrationVoiceName()}`);
 }
 
 /** Only one excerpt plays: a handoff returns the previous control to its idle label. */
@@ -7844,7 +7850,7 @@ async function playNarratedExcerpt(text, button) {
   if (!clips?.length) { button.textContent = tx('この引用の音声を準備中', 'Narration for this excerpt is not available yet'); return; }
   stopReadAloud();
   excerptControl = button;
-  button.classList.add('is-speaking'); button.textContent = tx('止める · F1の試聴音声', 'Stop · F1 audition voice');
+  button.classList.add('is-speaking'); button.textContent = tx(`止める · ${narrationVoiceName()}`, `Stop · ${narrationVoiceName()}`);
   let failed = false;
   try {
     for (const clip of clips) {
@@ -7860,7 +7866,7 @@ async function playNarratedExcerpt(text, button) {
     if (excerptControl === button) excerptControl = null;
     button.classList.remove('is-speaking');
     button.textContent = failed
-      ? tx('再生できませんでした · F1の試聴音声で再試行', 'Playback failed · Retry F1 audition voice')
+      ? tx('再生できませんでした · もう一度', 'Playback failed · try again')
       : original;
   }
 }
@@ -7879,72 +7885,49 @@ function stopReadAloud() {
 function speakPassage(p, onDone) {
   const generation = ++readAloud.generation;
   const current = () => readAloud.on && readAloud.generation === generation;
-  // Play only the explicitly selected recorded voice, with no device fallback.
-  ensureRecManifest().then(async (m) => {
+  // Only the locked narration voice plays; there is no device fallback and no picker.
+  ensureArticleNarration().then(async () => {
     if (!current()) return;
-    if (recVoicePref() === 'f1') {
-      const narration = await ensureArticleNarration();
+    const clips = narrationClips(p);
+    readAloud.total = clips.length;
+    for (let i = readAloud.clip >= clips.length ? 0 : readAloud.clip; i < clips.length; i += 1) {
       if (!current()) return;
-      const clips = narration?.articles?.[p.id]?.clips || [];
-      for (const clip of clips) {
-        if (!current()) return;
-        const played = await playRecClip(clip.src, null);
-        if (played === false && current()) readAloud.failed = { pid: p.id, voice: 'f1' };
-        if (played !== true) break;
-      }
-      if (current()) { readAloud.on = false; onDone(); }
-      return;
+      readAloud.clip = i;
+      paintListenProgress(0);
+      const played = await playRecClip(clips[i].src, null, { rate: readAloud.rate, onTime: paintListenProgress });
+      // null is an intentional stop (the engine's contract), false a failure
+      if (!current() || played === null) return;
+      if (played === false) { readAloud.failed = { pid: p.id, voice: articleNarration?.voice }; break; }
     }
-    const rec = m && m.sentences ? m.sentences[p.id] : null;
-    // the shelf sentences exist only in アミ's recording: they play only when she was chosen
-    if (rec && rec.have && rec.have.length && recVoicePref() === 'ami') {
-      let i = 0;
-      const next = () => {
-        if (!current()) return;
-        if (i >= rec.have.length) {
-          readAloud.on = false;
-          onDone();
-          return;
-        }
-        const ix = String(rec.have[i]).padStart(3, '0');
-        playRecClip(`audio/s/ami/${p.id.replace(':', '_')}-${ix}.m4a`, null).then((played) => {
-          if (!current()) return;
-          if (played !== true) {
-            // no device-voice fallback (operator, 09-17: the computer voice must not be an option);
-            // a failure at any sentence stops the read and the note says so; a clip another
-            // playback stopped ends the read without claiming a failure
-            if (played === false) readAloud.failed = { pid: p.id, voice: 'ami' };
-            readAloud.on = false;
-            onDone();
-            return;
-          }
-          i += 1;
-          readAloud.timer = setTimeout(next, 260);
-        });
-      };
-      next();
-      return;
+    if (current()) {
+      if (!readAloud.failed) readAloud.clip = 0;
+      readAloud.on = false;
+      onDone();
     }
-    // nothing recorded in a chosen voice: stop honestly; the listen row says why
-    readAloud.on = false;
-    onDone();
   });
+}
+
+/** The play bar's progress: clips done plus the fraction of the one playing, painted in place. */
+function paintListenProgress(fraction = 0) {
+  const bar = document.getElementById('listen-progress');
+  if (!bar || !readAloud.total) return;
+  const done = Math.min(1, (readAloud.clip + Math.max(0, Math.min(1, fraction))) / readAloud.total);
+  bar.style.setProperty('--played', String(done));
+  bar.setAttribute('aria-valuenow', String(Math.round(done * 100)));
 }
 
 
 /* ------------------------------------------------ 収録の声 the recorded voice
- * Interim roster, NOT operator-chosen: 小春音アミ · F1 · 四国めたん · ずんだもん ·
- * 玄野武宏. The 11-candidate shootout was never run (docs/build-evidence/
- * tenohira/RUN_STATE.md: "shootout unrun"), and the operator has since said
- * アミ is not the voice (2026-09-19). アミ leads only because she is the one
- * voice with recordings of the shelf sentences; the UI labels it 仮の声 検収前.
- * Which voice leads waits for a real audition with his ear.
- * Real neural recordings shipped as static files (audio/manifest.json +
- * audio/w/<voice>/<id>.m4a, sentences in audio/s/ami/). There is no device-voice
- * fallback and no automatic voice. The chosen voice is a device preference in
- * its own key, never the learner store. Licences ride audio/LICENCES.md. */
+ * Interim word-clip roster, NOT operator-chosen: 小春音アミ · 四国めたん · ずんだもん ·
+ * 玄野武宏. The operator's blind audition (2026-09-29) locked Kore/Charon for
+ * narration and rated JVNV F1 1/5, so F1 is gone from the roster and the files.
+ * アミ is not the voice either (2026-09-19). The reader no longer offers a picker;
+ * a preference stored before 2026-09-30 still plays its word clips on the answer
+ * card, and nothing else does. There is no device-voice fallback and no automatic
+ * voice. The stored voice is a device preference in its own key, never the learner
+ * store. Licences ride audio/LICENCES.md. */
 const REC_VOICE_KEY = 'kairo-rec-voice-v1';
-const REC_ROSTER = ['ami', 'f1', 'metan', 'zundamon', 'takehiro'];
+const REC_ROSTER = ['ami', 'metan', 'zundamon', 'takehiro'];
 let recManifest; // undefined = not asked · null = absent · object = loaded
 let recManifestWait = null;
 let recAudioEl = null;
@@ -8002,11 +7985,13 @@ if (typeof window !== 'undefined') ensureRecManifest();
 
 /** Play one recorded clip. Resolves true when it played to the end, false when it
  * could not play, and null when it was stopped (a replay, another clip, or 止める). */
-function playRecClip(src, btn) {
+function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   return new Promise((done) => {
     stopRecAudio();
     const a = new Audio(src);
     recAudioEl = a;
+    a.playbackRate = rate;
+    if (onTime) a.ontimeupdate = () => onTime(a.duration ? a.currentTime / a.duration : 0);
     const off = () => {
       if (btn) btn.classList.remove('is-speaking');
       if (recAudioEl === a) recAudioEl = null;
@@ -8061,7 +8046,7 @@ function speakCardReading(text, btn, word) {
     // no chosen voice, or no recording in it: say so where it can be seen, never fall back to the device voice
     const reason = !m ? tx('この版には収録音声がありません', 'This build has no recorded voices')
       : pref ? tx('この語は選んだ声でまだ収録されていません', 'Not yet recorded in your chosen voice')
-        : tx('声がまだ選ばれていません（読み物の「聞く」の横で選べます）', 'No voice chosen yet — choose one beside a reading’s listen button');
+        : tx('Kore の声を準備中です', 'The Kore voice is on its way');
     if (btn) {
       btn.dataset.voiceUnavailable = !m ? 'no-recordings' : pref ? 'not-recorded' : 'no-voice';
       btn.title = reason;
@@ -8081,102 +8066,86 @@ function refreshListenRow() {
   row.replaceWith(next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
 }
-/** The reader's listen row, built on its own so a late recordings manifest can refresh just this
- * row in place — the focused token or glossary entry elsewhere in the reader is never replaced. */
+/* One drawn icon set for the reader and the shelf: a 24-unit grid, 1.6 stroke, round joins,
+ * currentColor — never a font glyph standing in for an icon. */
+const UI_ICONS = {
+  play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/>',
+  pause: '<path d="M8.5 5.5v13M15.5 5.5v13" stroke-width="2.4"/>',
+  sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="7.9" r="0.4" fill="currentColor"/>',
+  search: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>',
+  chevron: '<path d="M7 10l5 5 5-5"/>',
+  close: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  speaker: '<path d="M4.5 9.5h3l4.5-4v13l-4.5-4h-3z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6M18 6.8a7.4 7.4 0 0 1 0 10.4"/>',
+};
+function uiIcon(name, cls = 'ui-icon') {
+  const holder = document.createElement('span');
+  holder.innerHTML = `<svg class="${cls}" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${UI_ICONS[name]}</svg>`;
+  return holder.firstChild;
+}
+
+/** The reader's play bar, built on its own so a late narration manifest can refresh just this
+ * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
+ * It carries only the locked narration voice. With no clips for this article in that voice it is
+ * a quiet state, 音声準備中 · Kore: no picker, no stand-in voice, no disabled control. */
 function buildListenRow(p) {
-  const listenRow = el('div', 'listen-row');
-  const listen = biLabel('button', 'chip listen-toggle', readAloud.on ? '止める' : '聞く', readAloud.on ? 'stop' : 'listen');
+  const listenRow = el('div', 'listen-row play-bar');
+  listenRow.dataset.passage = p.id;
+  const clips = narrationClips(p);
+  if (!clips.length) {
+    listenRow.classList.add('is-pending');
+    const pending = el('p', 'play-pending');
+    pending.id = 'listen-note';
+    pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
+    if (bi()) pending.append(el('span', 'en-sub', 'voice in preparation'));
+    listenRow.append(pending);
+    return listenRow;
+  }
+  if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; }
+  readAloud.total = clips.length;
+  const listen = el('button', 'play-toggle');
   listen.type = 'button';
   listen.id = 'listen-toggle';
   listen.setAttribute('aria-pressed', String(readAloud.on));
-  const listenNote = el('span', 'listen-note');
+  listen.setAttribute('aria-label', readAloud.on ? tx('止める', 'pause') : tx('聞く', 'listen'));
+  listen.append(uiIcon(readAloud.on ? 'pause' : 'play'));
+  const track = el('div', 'play-track');
+  track.id = 'listen-progress';
+  track.setAttribute('role', 'progressbar');
+  track.setAttribute('aria-label', tx('再生位置', 'playback position'));
+  track.setAttribute('aria-valuemin', '0');
+  track.setAttribute('aria-valuemax', '100');
+  track.style.setProperty('--played', String(readAloud.clip / clips.length));
+  track.setAttribute('aria-valuenow', String(Math.round((readAloud.clip / clips.length) * 100)));
+  const failedHere = readAloud.failed?.pid === p.id;
+  const listenNote = el('span', 'play-voice', failedHere
+    ? tx('再生できませんでした', 'could not play')
+    : narrationVoiceName());
   listenNote.id = 'listen-note';
-  const voiceNames = { ami: '小春音アミ', f1: 'F1', metan: '四国めたん', zundamon: 'ずんだもん', takehiro: '玄野武宏' };
-  const pref = recVoicePref();
-  const neuralRecorded = !!articleNarration?.articles?.[p.id]?.clips?.length;
-  const passageRecorded = !!(recManifest?.sentences?.[p.id]?.have?.length);
-  // No device voice (operator, 2026-09-17: "needs to NOT BE AN OPTION AT ALL") and no automatic
-  // voice (アミ rejected, 2026-09-19). The listen door opens only for a passage recorded in the
-  // voice the learner chose; every voice here is interim until his audition.
-  const playable = (passageRecorded && pref === 'ami') || (neuralRecorded && pref === 'f1');
-  const failedHere = !!readAloud.failed && readAloud.failed.pid === p.id && readAloud.failed.voice === pref;
-  listen.disabled = !playable && !readAloud.on;
-  listenNote.dataset.recorded = String(passageRecorded);
-  listenNote.textContent = neuralRecorded && pref === 'f1'
-    ? readAloud.on ? tx('F1 のニューラル合成音声で再生中（試聴版）', 'Playing F1 neural Japanese · audition voice')
-      : failedHere ? tx('再生できませんでした。もう一度試してください。', 'Playback failed. Please try again.')
-      : tx('F1 · ニューラル合成音声（試聴版）', 'F1 · neural Japanese narration · audition voice')
-    : neuralRecorded && (!pref || !playable)
-      ? tx('F1 を選ぶと、この読み物の全文を聞けます。', 'Choose F1 below to hear this complete reading.')
-      : readAloud.on
-    ? tx('小春音アミの合成音声で再生中（仮の声・検収前）', 'playing Koharune Ami’s synthetic voice (interim, not yet reviewed)')
-    : failedHere
-      ? tx('この環境では収録を再生できませんでした', 'The recording could not play here')
-      : recManifest === undefined
-        ? tx('収録音声を確認しています…', 'Checking for recordings…')
-        : !recManifest
-          ? tx('この版には収録音声がありません', 'This build has no recorded voices')
-          : !passageRecorded
-          ? tx('この記事の収録音声はまだありません', 'No recorded voice for this article yet')
-          : pref === 'ami'
-            ? tx('合成音声：小春音アミ（仮の声・検収前）', 'synthetic voice: Koharune Ami (interim, not yet reviewed)')
-            : tx('この記事は小春音アミ（仮の声・検収前）の収録だけです。聞くには下で選んでください。',
-              'This article is recorded only in Koharune Ami (interim, not yet reviewed). Choose her below to listen.');
+  const rate = el('button', 'play-rate', `${readAloud.rate}×`);
+  rate.type = 'button';
+  rate.id = 'listen-rate';
+  rate.setAttribute('aria-label', tx(`速さ ${readAloud.rate}倍`, `speed ${readAloud.rate}×`));
+  rate.addEventListener('click', () => {
+    readAloud.rate = LISTEN_RATES[(LISTEN_RATES.indexOf(readAloud.rate) + 1) % LISTEN_RATES.length];
+    if (recAudioEl) recAudioEl.playbackRate = readAloud.rate;
+    rate.textContent = `${readAloud.rate}×`;
+    rate.setAttribute('aria-label', tx(`速さ ${readAloud.rate}倍`, `speed ${readAloud.rate}×`));
+  });
   listen.addEventListener('click', () => {
     if (readAloud.on) {
       stopReadAloud();
-      render();
+      refreshListenRow();
       return;
     }
-    if (!playable) return;
     readAloud.failed = null;
-    readAloud.usingDeviceVoice = false;
     readAloud.on = true;
     speakPassage(p, () => {
-      if (S.view === 'reader') render();
+      if (S.view === 'reader') refreshListenRow();
     });
-    render();
+    refreshListenRow();
   });
-  if (readAloud.voiceNotSaved) listenNote.textContent += tx('（この声の選択は保存できず、今回だけ有効です）', ' (this choice could not be saved; it lasts this session)');
-  listenRow.append(listen, listenNote);
-  if (recManifest) {
-    // the interim roster, chosen explicitly — never preselected, never presented as approved
-    const pick = document.createElement('select');
-    pick.className = 'listen-voice';
-    pick.id = 'listen-voice';
-    pick.setAttribute('aria-label', tx('声を選ぶ（仮の声・検収前）', 'choose a voice (interim, not yet reviewed)'));
-    if (!pref) {
-      const none = document.createElement('option');
-      none.value = '';
-      none.textContent = tx('声を選ぶ…', 'Choose a voice…');
-      none.selected = true;
-      pick.append(none);
-    }
-    for (const v of REC_ROSTER) {
-      const opt = document.createElement('option');
-      opt.value = v;
-      opt.textContent = tx(`${voiceNames[v] || v}（仮・検収前）`, `${voiceNames[v] || v} (interim)`);
-      if (v === pref) opt.selected = true;
-      pick.append(opt);
-    }
-    pick.addEventListener('change', () => {
-      sessionVoicePref = null;
-      readAloud.failed = null;
-      try {
-        if (pick.value) localStorage.setItem(REC_VOICE_KEY, pick.value);
-        else localStorage.removeItem(REC_VOICE_KEY);
-        readAloud.voiceNotSaved = false;
-      } catch {
-        // storage refused: keep the explicit choice for this session and say so
-        sessionVoicePref = pick.value || null;
-        readAloud.voiceNotSaved = true;
-      }
-      if (readAloud.on) stopReadAloud();
-      render();
-    });
-    listenRow.append(pick);
-  }
-  listenRow.classList.add('listen-row'); listenRow.dataset.passage = p.id;
+  listenRow.append(listen, track, listenNote, rate);
   return listenRow;
 }
 function renderReader(main) {
