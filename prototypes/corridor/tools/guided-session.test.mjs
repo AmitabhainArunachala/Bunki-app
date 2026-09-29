@@ -93,6 +93,55 @@ test('evidence rules survive the port', () => {
   assert.ok(!JSON.stringify(state.events).includes('自分の文'), 'the draft text is not in the log');
 });
 
+test('a word looked up before the first answer is recorded help; without help nothing is', () => {
+  let state = step(createGuidedState('set-a', ['q1', 'q2', 'q3']), { type: 'START' });
+  state = step(state, { type: 'LOOKUP', id: 'q1' });
+  assert.equal(state.answers.q1.choice, null);
+  assert.equal(state.answers.q1.correct, null, 'looking up a word never creates performance evidence');
+  assert.deepEqual(state.learn, []);
+  assert.equal(state.answers.q2.lookupBefore, false, 'help belongs only to the named question');
+  const logged = state.events.length;
+  state = step(state, { type: 'LOOKUP', id: 'q1' });
+  assert.equal(state.events.length, logged, 'a second lookup on the same question records nothing new');
+  state = step(state, { type: 'COMMIT', id: 'q1', choice: 1, correct: true });
+  assert.deepEqual(
+    [state.answers.q1.lookupBefore, state.answers.q1.helpBefore, state.answers.q1.explained],
+    [true, false, false],
+    'a lookup is help before the answer, not an opened explanation',
+  );
+  state = step(state, { type: 'COMMIT', id: 'q2', choice: 1, correct: true });
+  assert.deepEqual(
+    [state.answers.q2.lookupBefore, state.answers.q2.helpBefore],
+    [false, false],
+    'an answer given without help stays unassisted',
+  );
+  state = step(state, { type: 'LOOKUP', id: 'q2' });
+  assert.equal(state.answers.q2.lookupBefore, false, 'a lookup after the answer does not rewrite it');
+  assert.equal(state.answers.q2.correct, true);
+  assert.equal(state.events.filter((event) => event.type === 'LOOKUP').length, 1);
+  state = step(state, { type: 'HELP', id: 'q1' });
+  assert.equal(state.answers.q1.helpBefore, false, 'an explanation after the answer does not rewrite lookup provenance');
+  assert.equal(state.answers.q1.explained, true);
+  state = step(state, { type: 'HELP', id: 'q3' });
+  state = step(state, { type: 'LOOKUP', id: 'q3' });
+  assert.deepEqual([state.answers.q3.helpBefore, state.answers.q3.lookupBefore], [true, true]);
+  assert.equal(state.answers.q3.choice, null, 'both kinds of help still leave an unanswered question');
+  assert.equal(step(state, { type: 'LOOKUP', id: 'unknown' }), state);
+  const storage = memoryStorage();
+  assert.equal(saveGuidedState(storage, 'k', state).ok, true);
+  assert.equal(loadGuidedState(storage, 'k', 'set-a', ['q1', 'q2', 'q3']).state.answers.q1.lookupBefore, true);
+  // a session saved before lookups existed still loads
+  const legacy = JSON.parse(storage.getItem('k'));
+  for (const answer of Object.values(legacy.answers)) delete answer.lookupBefore;
+  storage.setItem('legacy', JSON.stringify(legacy));
+  const loaded = loadGuidedState(storage, 'legacy', 'set-a', ['q1', 'q2', 'q3']);
+  assert.equal(loaded.error, null);
+  assert.equal(loaded.state.answers.q1.choice, 1);
+  legacy.answers.q3.lookupBefore = 'yes';
+  storage.setItem('malformed', JSON.stringify(legacy));
+  assert.equal(loadGuidedState(storage, 'malformed', 'set-a', ['q1', 'q2', 'q3']).error, 'invalid-state');
+});
+
 test('saved words record their deck status and never touch answers', () => {
   let state = step(createGuidedState('set-a', ['q1', 'q2']), { type: 'START' });
   state = step(state, { type: 'COMMIT', id: 'q1', choice: 0, correct: true });

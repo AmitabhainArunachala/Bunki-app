@@ -21,6 +21,7 @@ const article=JSON.parse(readFileSync(resolve(site,'data/articles/aozora-046605.
 assert.deepEqual(article.tokens[1],{s:'谷川',b:'谷川',p:'名詞',r:'たにがわ',f:[{t:'谷川',r:'たにがわ'}],c:false});
 assert.deepEqual(article.tokens[159],{s:'五六',b:'五六',p:'名詞',r:'ごろく',f:[{t:'五六',r:'ごろく'}],c:false});
 assert.deepEqual(article.tokens[1284], {s:'イサド',b:'イサド',p:'名詞',r:'いさど',f:[{t:'イサド'}],c:false});
+assert.deepEqual(article.tokens[89], {s:'ます',b:'ます',p:'助動詞',r:'ます',f:[{t:'ます'}],c:false});
 const missing = [
   {index:159, surface:'五六', reading:'ごろく', kind:'named'},
   {index:1284, surface:'イサド', reading:'いさど', kind:'plain'},
@@ -92,6 +93,18 @@ try{
      assert.equal(shown.reading,fixture.reading,'A retained token reading must survive lookup even when the dictionary has no entry');
      assert.equal(await page.locator('#mini-take').isDisabled(),true,'Absent meanings cannot create an empty review card');return shown;
     });
+    await run('auxiliary-identity-'+dials.replaceAll(',','-'),async()=>{
+     await open(page,dials);const ending=token(page,89);
+     await click(page,ending);await page.locator('#mini').waitFor();
+     const shown=await mini(page);
+     assert.equal(shown.word,'ます');assert.equal(shown.reading,'ます');
+     assert.equal(shown.gloss,'(no gloss yet)','A polite ending must not borrow 升 or 増す');
+     assert.equal(await page.locator('#mini-take').isDisabled(),true);
+     assert.equal(await page.locator('#mini .mini-entry').isDisabled(),true,
+      'An unresolved full-entry door must not reopen the rejected dictionary row');
+     assert.equal(await page.locator('#sheet').count(),0);
+     return{dials,shown,saveHeld:true,unresolvedEntryHeld:true};
+    });
    }
    await run('particle-tap-keyboard-and-hold',async()=>{
     await open(page,'0,1,0');const particle=token(page,2);const before=await particle.textContent();
@@ -116,9 +129,9 @@ try{
  await host.close();
  const receipt={artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
   verifierSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-  scope:'Known named and dictionary-absent named/plain lookup in four dial modes; particle short tap, keyboard and long hold. No broad lexical/capture regression claim',
+  scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and long hold. No broad lexical/capture regression claim',
   instrumentation:'Unmodified staged runtime, normal DOM controls, no export shim or model calls; native audio paths run silently',results,
-  passed:results.length===engines.length*14&&results.every(row=>row.passed)};
+  passed:results.length===engines.length*18&&results.every(row=>row.passed)};
  writeFileSync(resolve(evidence,'result.json'),JSON.stringify(receipt,null,2)+'\n');
  if(!receipt.passed)process.exitCode=1;
 }

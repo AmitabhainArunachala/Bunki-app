@@ -92,6 +92,62 @@ check('dictionary help is durable before an answer, never reveals a key or locks
   assert.equal(api.assessmentIndependenceV2(finished).assistedCorrect, 1);
   assert.throws(() => command(start(), { kind: 'dictionary-lookup', itemId: items[0].id }), /lookup-in-timed-mode/u);
 });
+check('dictionary lookups stay tied to their questions beside explanations and unanswered items', () => {
+  const practice = (attemptId) => api.startAssessmentV2(api.createAssessmentLibraryV2({ scope }), form, {
+    scope, attemptId, mode: 'practice', now,
+    editorialAtStart: { status: 'unreviewed', policyVersion: null, decisionRevisionIds: [] },
+    clockSessionId: 'clock:test', monotonicMs: 0 });
+  const answer = (library, itemId, elapsed) => command(library, { kind: 'answer', itemId,
+    response: { kind: 'selected', optionId: 'a' } }, elapsed);
+  const explain = (library, itemId, elapsed) => command(library, { kind: 'assistance', itemId, reason: 'explanation' }, elapsed);
+  const secondBlock = (library, elapsed) => command(command(library, { kind: 'close-block', blockId: 'block:vocabulary' }, elapsed),
+    { kind: 'start-next-block' }, elapsed + 10);
+  const finish = (library, elapsed) => {
+    const selected = api.selectAssessmentV2(api.parseAssessmentLibraryV2(JSON.parse(JSON.stringify(
+      command(library, { kind: 'submit' }, elapsed))), { scope }));
+    return { attempt: selected.attempt, independence: { ...api.assessmentIndependenceV2(selected) } };
+  };
+  const lookup = (library, itemId, elapsed) => command(library, { kind: 'dictionary-lookup', itemId }, elapsed);
+  // Look up Q1, answer it, answer Q2 and open Q2's explanation.
+  let different = answer(lookup(practice('attempt:lookup-other'), items[0].id, 100), items[0].id, 200);
+  different = explain(answer(secondBlock(different, 300), items[1].id, 400), items[1].id, 500);
+  const other = finish(different, 600);
+  assert.equal('assistanceAttribution' in other.attempt, false);
+  assert.deepEqual(other.independence, { answered: 2, assisted: 2, assistedCorrect: 2, unanswered: 0,
+    attribution: 'complete', independent: 0 });
+  // Lookup and explanation on the same question count as one assisted question.
+  let same = explain(answer(lookup(practice('attempt:lookup-same'), items[0].id, 100), items[0].id, 200), items[0].id, 300);
+  same = answer(secondBlock(same, 400), items[1].id, 500);
+  const both = finish(same, 600);
+  assert.equal(both.attempt.events.filter(entry => entry.kind === 'assistance').length, 2);
+  assert.deepEqual(both.independence, { answered: 2, assisted: 1, assistedCorrect: 1, unanswered: 0,
+    attribution: 'complete', independent: 1 });
+  assert.deepEqual(api.assessmentOutcomesV2(api.selectAssessmentV2(command(same, { kind: 'submit' }, 600))).map(row => row.assistance?.kind ?? null),
+    ['explanation', null]);
+  // A looked-up question left unanswered is not help on an answered one.
+  const skipped = finish(answer(secondBlock(lookup(practice('attempt:lookup-unanswered'), items[0].id, 100), 200), items[1].id, 300), 400);
+  assert.deepEqual(skipped.independence, { answered: 1, assisted: 0, assistedCorrect: 0, unanswered: 1,
+    attribution: 'complete', independent: 1 });
+  // Negative control: attempt-level help that names no question keeps attribution unknown.
+  const untied = finish(secondBlock(answer(command(practice('attempt:untied-help'), { kind: 'assistance', reason: 'hint' }, 100),
+    items[0].id, 200), 300), 400);
+  assert.equal(untied.independence.attribution, 'unknown');
+  assert.equal(untied.independence.independent, null);
+  // Mixed provenance: a valid lookup cannot absorb unrelated attempt-level help.
+  let mixed = lookup(practice('attempt:mixed-help'), items[0].id, 100);
+  mixed = command(mixed, { kind: 'assistance', reason: 'hint' }, 150);
+  mixed = explain(answer(mixed, items[0].id, 200), items[0].id, 250);
+  mixed = answer(secondBlock(mixed, 300), items[1].id, 400);
+  const mixedResult = finish(mixed, 500);
+  assert.equal(mixedResult.attempt.assistanceAttribution, 'unknown');
+  assert.deepEqual(mixedResult.independence, { answered: 2, assisted: 1, assistedCorrect: 1, unanswered: 0,
+    attribution: 'unknown', independent: null });
+  // A dictionary-shaped event naming no item in this form remains unbound.
+  let foreign = command(practice('attempt:foreign-lookup'), { kind: 'assistance', reason: `dictionary:${'f'.repeat(64)}` }, 100);
+  foreign = answer(secondBlock(answer(foreign, items[0].id, 200), 300), items[1].id, 400);
+  assert.deepEqual(finish(foreign, 500).independence, { answered: 2, assisted: 0, assistedCorrect: 0, unanswered: 0,
+    attribution: 'unknown', independent: null });
+});
 check('deadline checkpoint persists with blanks and explicit next-block activation', () => {
   let library = start();
   const original = library;

@@ -35,6 +35,8 @@ const SHELL = [
   'index.html',
   'fonts.css',
   'corridor.css',
+  'editorial.css',
+  'design/ink-hoku-nami.png',
   'corridor.js',
   'maintenance/report-client.js',
   'maintenance/report-client.css',
