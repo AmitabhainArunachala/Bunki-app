@@ -337,8 +337,8 @@ export function createAssessmentView(host) {
         : kind === 'star' ? 'exam-slot exam-star-slot' : kind === 'slot' ? 'exam-slot' : kind === 'target' ? 'exam-target'
           : kind === 'box' ? 'exam-gap-box' : 'exam-word');
       if (kind === 'target' || kind === 'word') write(span, segment.text, parent);
-      else span.textContent = kind === 'underline' ? '　　　　' : kind === 'blank' ? '（　　　）'
-        : kind === 'star' ? '★' : kind === 'slot' ? '　' : String(segment.n);
+      else span.textContent = kind === 'underline' ? '\u3000\u3000\u3000\u3000' : kind === 'blank' ? '（\u3000\u3000\u3000）'
+        : kind === 'star' ? '★' : kind === 'slot' ? '\u3000' : String(segment.n);
       if (kind === 'box' && segment.n === current) span.dataset.current = 'true';
       parent.append(span);
     }
@@ -1137,7 +1137,7 @@ export function createAssessmentView(host) {
       write('instruction')(number, mondaiLabel(level, place.group.mondai), taskHeading);
       const name = node('span', 'exam-daimon');
       write('instruction')(name, DAIMON[place.group.task]?.[0] || layout.task, taskHeading);
-      taskHeading.append(number, document.createTextNode('　'), name);
+      taskHeading.append(number, document.createTextNode('\u3000'), name);
     } else appendText(taskHeading, `問題 ${layout.group}　${layout.task}`, selected, question.id, 'instruction');
     taskHeading.id = 'exam-task-title'; paperHeader.append(taskHeading);
     const officialLine = place ? officialInstruction(level, place.group.task, { passages: place.group.passageIds.length,
@@ -1204,7 +1204,7 @@ export function createAssessmentView(host) {
         const unit = deliveryUnits(selected).find(row => row.kind === 'question' && row.itemIds.includes(question.id));
         const audioOnly = question.skill === 'listening' && (!unit || !unit.printedOptions || !!unit.spokenOptionItemIds?.includes(question.id));
         const lookupChoice = attempt.mode === 'practice' && !audioOnly && !official && !!host.appendLookupText;
-        const control = button(audioOnly || lookupChoice ? String(number + 1) : official ? `${number + 1}　` : `${number + 1}　${option.text}`, null, () => {
+        const control = button(audioOnly || lookupChoice ? String(number + 1) : official ? `${number + 1}\u3000` : `${number + 1}\u3000${option.text}`, null, () => {
           // keep keyboard focus on the chosen option across the re-render (one Tab then reaches the why-door)
           focusAfterRender = `[data-exam-option="${CSS.escape(option.id)}"]`;
           return command({ kind: 'answer', itemId: question.id, response: { kind: 'selected', optionId: option.id } });
@@ -1373,7 +1373,7 @@ export function createAssessmentView(host) {
       const plain = official ? paperPlain : text => text;
       const daimon = paperMode(selected) ? DAIMON[question.task]?.[0] : null;
       // A real paper's prompt opens with its printed number; the list already numbers each question.
-      const promptLine = official ? plain(question.prompt.replace(/^\d+　?/u, '')).split('\n').at(-1) || tx('本文の空欄', 'Blank in the passage')
+      const promptLine = official ? plain(question.prompt.replace(/^\uE005\d+\uE006\u3000?/u, '')).split('\n').at(-1) || tx('本文の空欄', 'Blank in the passage')
         : question.prompt.split('\n').at(-1);
       details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
       const choice = id => { const index = question.response.options.findIndex(row => row.id === id);
