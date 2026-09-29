@@ -1131,18 +1131,20 @@ export function createAssessmentView(host) {
       : ['N1', 'N2'].includes(level) ? '言語知識（文字・語彙・文法）・読解'
         : SKILLS[question.skill]?.[0] || question.skill), selected, question.id, 'instruction'); paperHeader.append(skillHeading);
     const taskHeading = node('h2', 'exam-task-heading');
+    const printed = official ? form.sections.find(row => row.itemIds.includes(question.id)) : null;
     if (place) {
       taskHeading.dataset.mondai = String(place.group.mondai); taskHeading.dataset.task = place.group.task;
       const number = node('span', 'exam-mondai-no');
+      taskHeading.append(number, document.createTextNode('\u3000'));
       write('instruction')(number, mondaiLabel(level, place.group.mondai), taskHeading);
       const name = node('span', 'exam-daimon');
+      taskHeading.append(name);
       write('instruction')(name, DAIMON[place.group.task]?.[0] || layout.task, taskHeading);
-      taskHeading.append(number, document.createTextNode('\u3000'), name);
-    } else appendText(taskHeading, `問題 ${layout.group}　${layout.task}`, selected, question.id, 'instruction');
+    } else appendText(taskHeading, `問題 ${printed ? spec.sectionIds.indexOf(printed.id) + 1 : layout.group}\u3000${layout.task}`,
+      selected, question.id, 'instruction');
     taskHeading.id = 'exam-task-title'; paperHeader.append(taskHeading);
     const officialLine = place ? officialInstruction(level, place.group.task, { passages: place.group.passageIds.length,
       ...(place.group.gaps ? { first: place.group.numbers[0], last: place.group.numbers.at(-1) } : {}) }) : null;
-    const printed = official ? form.sections.find(row => row.itemIds.includes(question.id)) : null;
     if (printed) {
       const instruction = textNode('p', 'exam-task-instruction exam-official-instruction', printed.title, true); instruction.lang = 'ja';
       paperHeader.append(instruction);
