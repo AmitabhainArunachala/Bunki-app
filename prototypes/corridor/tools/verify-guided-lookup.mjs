@@ -46,7 +46,9 @@ async function answer(page, index) {
   await page.locator('.gs-feedback[data-verdict="correct"]').waitFor();
 }
 async function closeMini(page) {
-  await page.locator('.gs-eyebrow').first().click();
+  // Escape from inside the popup, its own dismissal: on the design pass the popup (and the sticky
+  // chrome) can lie over the room's eyebrows, so a click outside may land on the popup itself.
+  await page.locator('#mini button').first().press('Escape');
   await page.locator('#mini').waitFor({ state: 'detached' });
 }
 try {
