@@ -607,8 +607,9 @@ describe('per-item explanation after a committed practice answer', () => {
     const mixed = update(lookedUp, { kind: 'assistance', reason: 'hint' }, 75);
     const explained = explain(answer(mixed, 'one', 100), 'one', 200);
     expect(explained.assistanceAttribution).toBe('unknown');
-    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(explained))).assistanceAttribution)
-      .toBe('unknown');
+    expect(parseAttemptV2(paper, JSON.parse(JSON.stringify(explained))).assistanceAttribution).toBe(
+      'unknown',
+    );
     // Help naming no reached item of this form stays unattributed.
     for (const digest of ['f'.repeat(64), three!.sha256]) {
       const unknown = explain(

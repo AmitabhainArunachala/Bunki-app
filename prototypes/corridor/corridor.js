@@ -8250,8 +8250,8 @@ function renderReader(main) {
   }
 
   // the listen door rides beside the settings fold — one tap to hear the
-  // article, one tap to stop; the voice names itself 仮 (interim) until
-  // the judged voice of PR 五 replaces it
+  // article, one tap to stop; until the locked Kore clips ship it shows
+  // only its 音声準備中 · Kore pending state
   main.append(buildListenRow(p));
   renderTeacherDoor(main, () => {
     const current = readerTakeCurrent();
