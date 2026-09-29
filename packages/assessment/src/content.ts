@@ -51,7 +51,14 @@ export function unknownAssessmentRights(): AssessmentRights {
 
 export const provenanceSchema = z
   .strictObject({
-    kind: z.enum(['original-human', 'original-ai', 'licensed-adaptation', 'legacy-unverified']),
+    /** `official-private`: a real exam paper imported on one device for personal study only. */
+    kind: z.enum([
+      'original-human',
+      'original-ai',
+      'licensed-adaptation',
+      'legacy-unverified',
+      'official-private',
+    ]),
     authorRef: idSchema.nullable(),
     processRef: idSchema.nullable(),
     sources: z
@@ -68,7 +75,27 @@ export const provenanceSchema = z
   })
   .refine((value) => value.kind !== 'original-human' || value.authorRef !== null)
   .refine((value) => value.kind !== 'original-ai' || value.processRef !== null)
-  .refine((value) => value.kind !== 'licensed-adaptation' || value.sources.length > 0);
+  .refine((value) => value.kind !== 'licensed-adaptation' || value.sources.length > 0)
+  .refine((value) => value.kind !== 'official-private' || value.sources.length > 0);
+
+/** Official private content never leaves the device and never gets synthetic audio. */
+export function isOfficialPrivate(value: {
+  readonly provenance: { readonly kind: string };
+  readonly rights: AssessmentRights;
+}): boolean {
+  return value.provenance.kind === 'official-private';
+}
+function assertOfficialPrivateRights(value: {
+  readonly provenance: { readonly kind: string };
+  readonly rights: AssessmentRights;
+}): void {
+  if (
+    isOfficialPrivate(value) &&
+    (value.rights.sync.status !== 'denied' || value.rights['synthesize-audio'].status !== 'denied')
+  ) {
+    throw new AssessmentValidationError('invalid-input', ['rights.official-private']);
+  }
+}
 const commonFields = {
   v: z.literal(ASSESSMENT_CONTENT_VERSION),
   id: idSchema,
@@ -123,6 +150,7 @@ export type ItemPayload = DeepReadonly<z.infer<typeof itemPayloadSchema>>;
 
 export function createItemVersion(raw: unknown): ItemVersion {
   const item = parse(itemPayloadSchema, raw);
+  assertOfficialPrivateRights(item);
   assertUnique(
     item.passages.map((reference) => reference.id),
     'passages',
@@ -183,6 +211,7 @@ const passageVersionSchema = passagePayloadSchema.extend(versionFields);
 export type PassageVersion = DeepReadonly<z.infer<typeof passageVersionSchema>>;
 export function createPassageVersion(raw: unknown): PassageVersion {
   const passage = parse(passagePayloadSchema, raw);
+  assertOfficialPrivateRights(passage);
   if (passage.textSha256 !== sha256Hex(passage.text)) {
     throw new AssessmentValidationError('invalid-input', ['textSha256']);
   }
@@ -230,6 +259,7 @@ export type ImageMediaVersion = DeepReadonly<z.infer<typeof imageVersionSchema>>
 export type MediaVersion = AudioMediaVersion | ImageMediaVersion;
 export function createMediaVersion(raw: unknown): MediaVersion {
   const media = parse(mediaPayloadSchema, raw);
+  assertOfficialPrivateRights(media);
   if (media.kind === 'audio') {
     if (
       (media.transcript === null) !== (media.transcriptSha256 === null) ||
@@ -330,6 +360,7 @@ export type FormPayload = DeepReadonly<z.infer<typeof formPayloadSchema>>;
 
 export function createFormVersion(raw: unknown): FormVersion {
   const form = parse(formPayloadSchema, raw);
+  assertOfficialPrivateRights(form);
   form.items = form.items.map((item) => parseItemVersion(item)) as z.infer<
     typeof itemVersionSchema
   >[];
@@ -378,6 +409,14 @@ export function createFormVersion(raw: unknown): FormVersion {
     form.sections.some((section) => !sectionIds.includes(section.id))
   ) {
     throw new AssessmentValidationError('invalid-input', ['timingBlocks.sectionIds']);
+  }
+  // One form is never mixed from real and written-for-Kairo content.
+  if (
+    [...form.items, ...form.passages, ...form.media].some(
+      (part) => isOfficialPrivate(part) !== isOfficialPrivate(form),
+    )
+  ) {
+    throw new AssessmentValidationError('invalid-input', ['provenance.official-private']);
   }
   const referencedPassages = new Set<string>();
   const referencedMedia = new Set<string>();
