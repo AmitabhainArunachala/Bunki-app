@@ -10711,6 +10711,7 @@ function createAssessmentRoom() {
     machineCheckLabel: selected => assessmentDeliveryModule?.machineCheckedEditorial(selected?.attempt?.editorialAtStart)
       ? assessmentDeliveryModule.MACHINE_CHECK_LABEL : null,
     itemCheck: (selected, itemId) => assessmentDeliveries.get(selected.form.sha256)?.itemChecks?.find(row => row.itemId === itemId) || null,
+    officialFacts: level => assessmentV2Module?.jlptOfficialFacts?.(level) || null,
     ensureDelivery: ensureAssessmentDelivery,
     remaining: selected => {
       if (!selected.block || selected.remainingMs === null) return 0;
