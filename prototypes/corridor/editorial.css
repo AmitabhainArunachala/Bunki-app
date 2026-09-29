@@ -617,7 +617,7 @@ body:not([data-view='drift'])::before {
 
 /* 3 · chrome — deep indigo lacquer that floats above the page */
 body:not(.zen):not([data-view='drift']) #app > .chrome {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 58%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 58%), var(--chrome);
   box-shadow: 0 1px 0 rgb(0 0 0 / 22%), 0 10px 24px -14px color-mix(in srgb, var(--chrome) 80%, transparent);
 }
 
