@@ -1594,7 +1594,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   body[data-view='reader'] .listen-row.play-bar.is-pending { bottom: env(safe-area-inset-bottom); height: 56px; align-items: center; }
   body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
   /* a bottom sheet owns the foot: the bug steps up to the top corner */
-  body:has(#sheet) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
+  body:has(#sheet):not(:has(#stroke-page)) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
   /* the bar and the tip rise above the dock, clear of the bug and the voice state */
   .teacher-door.reader-actions, .reader-tip {
     left: var(--s1);
@@ -1809,4 +1809,116 @@ body .sheet > button.take.taken, body .sheet > button.take[aria-pressed='true'] 
 body:has(#sheet) :is(.teacher-door.reader-actions, .reader-tip) { display: none !important; }
 @media (max-width: 520px) {
   body:has(#sheet)[data-view='reader'] #app::after, body:has(#sheet)[data-view='reader'] .listen-row.play-bar { display: none; }
+}
+
+/* ------------------------------------------------------------------ step 3b
+   The kanji page and the writing room. The kanji is printed on its own washi
+   tile; its facts are chips that open the library; the radical and the
+   stroke order are raised doors, not striped boxes. The writing room keeps
+   its living ink: the square is a raised sheet on the desk, and its few
+   controls are legible paper pills instead of faded glyphs. */
+body .sheet .hero { align-items: flex-start; gap: var(--s3); margin: var(--s1) 0 var(--s3); }
+body .sheet .hero-glyph {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 136px;
+  height: 136px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
+  box-shadow: var(--raised-shadow);
+  font: 400 104px/1 var(--serif);
+  color: var(--accent);
+}
+body .sheet .hero-meta { display: grid; gap: 12px; padding-top: 6px; }
+body .sheet .hero-mean { margin: 0; font: 800 28px/1.35 var(--display); color: var(--text); }
+body .sheet .hero .shelf-meta { display: flex; flex-wrap: wrap; gap: var(--s1); margin: 0; }
+body .sheet .hero .cat-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ai) 7%, var(--raised));
+  color: var(--ai);
+  font: 700 13px/1 var(--sans);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+body .sheet .hero .cat-chip:hover { border-color: var(--ai); background: var(--ai-wash); }
+body .sheet .hero .kkld-chip { flex-basis: 100%; padding: 0; border: 0; background: none; font: 12px/1.5 var(--sans); color: var(--text-2); }
+body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
+  flex-direction: row;
+  gap: 6px;
+  min-height: 40px;
+  padding: 4px 14px;
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ai);
+  font: 600 14px/1.3 var(--sans);
+}
+body .sheet .teacher-door .chip { flex-direction: column; }
+body .sheet .teacher-door .chip .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.9; }
+body .sheet .kv { margin: var(--s2) 0; padding: var(--s2) 0; border-block: 1px solid var(--hairline); }
+body .sheet .kv dt { font: 700 14px/1.8 var(--sans); color: var(--text); }
+body .sheet .kv dd { font: 20px/1.7 var(--serif); letter-spacing: 0.04em; color: var(--accent); }
+body .sheet .rad-door {
+  gap: var(--s2);
+  min-height: 72px;
+  margin: 0 0 var(--s2);
+  padding: 12px var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+@media (hover: hover) { body .sheet .rad-door:hover { box-shadow: var(--raised-shadow-hover); } }
+body .sheet .rad-glyph { font-size: 36px; color: var(--text); }
+body .sheet .rad-name { font: 600 17px/1.4 var(--sans); color: var(--text); }
+body .sheet .rad-sub { font: 13px/1.5 var(--sans); color: var(--text-2); }
+body .sheet .stroke-door {
+  padding: 10px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
+  box-shadow: var(--raised-shadow);
+}
+@media (hover: hover) { body .sheet .stroke-door:hover { box-shadow: var(--raised-shadow-hover); } }
+
+/* the writing room */
+#stroke-page .ink-sheet {
+  border-radius: 6px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 16%, transparent), 0 24px 60px -28px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+#stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back, #stroke-page .stroke-btn.stroke-corner, #stroke-page .stroke-chrome-trigger {
+  opacity: 0.92;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--raised) 92%, transparent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent), 0 8px 18px -12px color-mix(in srgb, var(--ink) 40%, transparent);
+  color: var(--text);
+}
+#stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 15px/1 var(--sans); }
+#stroke-page .stroke-back .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+#stroke-page .stroke-btn.stroke-corner { padding: 6px 16px; }
+#stroke-page .stroke-btn.stroke-corner .l-ja { font: 600 14px/1.3 var(--sans); color: var(--text); }
+#stroke-page .stroke-btn.stroke-corner .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+#stroke-page :is(.stroke-back, .stroke-btn, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
+#stroke-page .stroke-speed-wrap, #stroke-page .stroke-speed-wrap.stroke-corner {
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+#stroke-page .stroke-speed-label { font: 600 14px/1.5 var(--sans); color: var(--text); }
+#stroke-page .stroke-speed-labels { font: 12px/1.5 var(--sans); color: var(--text-2); }
+@media (max-width: 520px) {
+  body .sheet .hero { gap: var(--s2); }
+  body .sheet .hero-glyph { width: 104px; height: 104px; font-size: 80px; }
+  body .sheet .hero-mean { font-size: 23px; }
 }
