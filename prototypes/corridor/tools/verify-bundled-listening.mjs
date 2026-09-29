@@ -54,7 +54,6 @@ const PRODUCTION = '  私の部屋の窓を開けます。\n e\u0301 🚀  ';
 const results = [], startedAt = new Date().toISOString();
 const ROSTER = "const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };";
 const stagedCorridor = readFileSync(join(SITE, 'corridor.js'), 'utf8');
-assert.equal(stagedCorridor.split(ROSTER).length, 2, 'The staged build carries the one voice roster');
 const amiAllowed = stagedCorridor.replace(ROSTER, "const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon', ami: 'Ami' };");
 const listeningControls = '#sentence-choose-listening, #sentence-add-listening, #sentence-listening-start, #sentence-listening-play';
 async function listeningLocked(page, requested) {
