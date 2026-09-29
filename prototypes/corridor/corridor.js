@@ -25226,7 +25226,8 @@ function renderSheet(root) {
       notes.append(el('p', null, `${source.source}: ${source.level}`));
     }
     renderReferenceMetadata(notes, node.referenceEntry);
-    notes.append(el('p', null, tx('収録資料によるタグです。公式の出題一覧や習得状況ではありません。', 'Bundled-source tags, not an official exam syllabus or mastery evidence.')));
+    notes.append(el('p', null, tx('辞書についている級の目安です。公式の出題一覧でも、あなたが覚えたかどうかの記録でもありません。',
+      'These levels come from our dictionaries: a guide, not the official exam list, and not a record of what you know.')));
     notes.open = !!node.referenceNotesOpen;
     notes.addEventListener('toggle', () => { if (notes.isConnected) node.referenceNotesOpen = notes.open; });
     sheet.append(notes);
