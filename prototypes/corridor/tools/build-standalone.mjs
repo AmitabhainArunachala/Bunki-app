@@ -173,7 +173,11 @@ const guidedStyles = { session: read('guided-session.css'), moments: read('guide
 assert.equal(guidedStyles.moments.split(GUIDED_SPRITE_REF).length - 1, 1, 'Standalone moments sprite reference changed');
 assert(!/url\(/u.test(guidedStyles.session), 'Standalone guided stylesheet gained a sibling reference');
 const guidedSprite = readFileSync(resolve(CORRIDOR, 'guided/samurai-sprites-v2.png'));
-assert(!/url\(/u.test(read('editorial.css')), 'Standalone editorial stylesheet gained a sibling reference');
+// A data: URI is self-contained (the design pass's washi textures); any other url() names a sibling
+// file the single-file build would not carry.
+const cssSiblingRefs = (css) => [...css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gu)].map((match) => match[2])
+  .filter((ref) => !ref.startsWith('data:'));
+assert.deepEqual(cssSiblingRefs(read('editorial.css')), [], 'Standalone editorial stylesheet gained a sibling reference');
 const shelfArt = readFileSync(resolve(CORRIDOR, 'design/ink-hoku-nami.png'));
 function moduleUrlExpression(dataUrl) {
   const prefix = 'data:text/javascript;base64,';
