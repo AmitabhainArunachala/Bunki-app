@@ -5238,7 +5238,10 @@ function renderShelfBody() {
   help.append(helpSummary);
   help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose a reading. JLPT uses its vocabulary; school grade describes its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
   main.append(controls);
-  const toolsBox = el('details', 'shelf-study-tools'); const toolsSummary = el('summary', 'filter-chip tools-chip'); const toolsFace = el('span', 'filter-chip-label'); toolsFace.append(el('span', 'l-ja', '学習ツール')); if (bi()) toolsFace.append(el('span', 'en-sub', 'Study tools')); toolsSummary.append(toolsFace, uiIcon('chevron', 'ui-icon filter-chip-caret')); toolsBox.append(toolsSummary); const tools=el('div','shelf-tools-grid');
+  // the study tools: one slim row of text doors under the filters, every door always reachable
+  const toolsBox = el('nav', 'shelf-study-tools'); toolsBox.setAttribute('aria-label', tx('学習ツール', 'Study tools'));
+  const toolsLabel = el('span', 'shelf-tools-label'); toolsLabel.append(el('span', 'l-ja', '学習ツール')); if (bi()) toolsLabel.append(el('span', 'en-sub', 'study tools'));
+  toolsBox.append(toolsLabel); const tools=el('div','shelf-tools-grid');
   const news = biLabel('button', 'grammar-link', 'いまの日本を読む', 'news & magazines');
   news.type = 'button'; news.id = 'feed-link';
   news.addEventListener('click', () => {
@@ -5372,10 +5375,16 @@ function renderShelfBody() {
     tools.append(aread);
   }
 
+  // the row shows each door's Japanese name; its English rides as the tooltip and accessible name
+  for (const door of tools.querySelectorAll('button')) {
+    const en = door.querySelector('.en-sub')?.textContent;
+    if (en) { door.title = en; door.setAttribute('aria-label', `${door.querySelector('.l-ja')?.textContent || ''} · ${en}`); }
+  }
   toolsBox.append(tools);
   const mastTools = el('div', 'shelf-mast-side');
-  mastTools.append(toolsBox, art);
+  mastTools.append(art);
   masthead.append(mastTools);
+  controls.after(toolsBox);
   // A small shelf of real encounters. These selections use saved mistakes to
   // choose context; browsing them never changes a card's grade or due date.
   const priorities = allAssessmentEvidence().priorities.targets
