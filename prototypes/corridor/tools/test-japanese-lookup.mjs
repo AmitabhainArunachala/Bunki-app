@@ -92,7 +92,7 @@ function app({ withIndex = true } = {}) {
     document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 },
     tx: (_ja, en) => en, el: (tag, cls, value) => new Element(tag, cls, value),
     biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
-    removeMini: () => body.querySelector('#mini')?.remove(), activeTokenAlternatives: null,
+    removeMini: () => body.querySelector('#mini')?.remove(), activeTokenAlternatives: null, articleNarration: null,
     ensureDictionaryRowsForForm: async () => [], wordCaptureState: () => 'take',
     readerCaptureReasonText: () => 'No confirmed meaning to save', readerGlossMissText: () => 'No confirmed meaning',
     openVocabularyListChooser: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),
