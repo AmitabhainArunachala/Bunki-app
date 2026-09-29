@@ -374,7 +374,10 @@ const tokenState = (page, index) => page.evaluate((i) => {
     ruby: rts.map((rt) => rt.textContent).join(''),
     visibleRuby: rts.filter((rt) => !rt.classList.contains('hidden-rt')).map((rt) => rt.textContent).join(''),
     gloss: en ? en.textContent : null, lit: node.classList.contains('lit'), hasEn: node.classList.contains('has-en'),
-    focused: document.activeElement === node, label: node.getAttribute('aria-label') || '', cursor: getComputedStyle(node).cursor };
+    // R4 (2026-09-30): a word is named by itself and described by the rest — read together, in order
+    focused: document.activeElement === node, label: [node.getAttribute('aria-label') || '',
+      ...(node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')]
+      .filter(Boolean).join(' · '), cursor: getComputedStyle(node).cursor };
 }, String(index));
 const classes = (state) => String(state?.cls || '').split(/\s+/);
 // a real click at the token's centre; `own` records whether that point is the token itself (the click is made either way)
