@@ -603,7 +603,7 @@ body, body.v-contrast-wcag {
   --text-2: color-mix(in srgb, var(--ink) 78%, var(--raised));
   --hairline: color-mix(in srgb, var(--ink) 16%, transparent);
   --rule-strong: color-mix(in srgb, var(--ink) 90%, transparent);
-  --washi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.24 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.14'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.16'/%3E%3C/svg%3E");
+  --washi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.24 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.085'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.1'/%3E%3C/svg%3E");
   --washi-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.14'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.12'/%3E%3C/svg%3E");
 
 }
@@ -620,6 +620,9 @@ body:not(.zen):not([data-view='drift']) #app > .chrome {
   background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 58%), var(--chrome);
   box-shadow: 0 1px 0 rgb(0 0 0 / 22%), 0 10px 24px -14px color-mix(in srgb, var(--chrome) 80%, transparent);
 }
+
+/* chrome never shows a greyed control: an unavailable one steps out of sight in its own slot */
+body:not(.zen):not([data-view='drift']) #app > .chrome > button:disabled { visibility: hidden; }
 
 /* the three button tiers */
 body .btn-primary, body .chip.btn-primary {
@@ -767,6 +770,8 @@ html[data-room='shelf'] .search-field {
   vertical-align: 0.5em;
 }
 #shelf-body .shelf-dateline .dateline-sep { color: var(--text-2); }
+#shelf-body .shelf-dateline .tally-short { display: none; }
+#shelf-body .shelf-review-note { margin: 4px 0 0; font: 500 13px/1.5 var(--sans); color: var(--text-2); }
 #shelf-body .shelf-dateline {
   display: block;
   max-width: none;
@@ -1495,6 +1500,9 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .shelf-dateline { margin-top: 6px; font-size: 13px; }
   #shelf-body .shelf-dateline .dateline-sep { display: none; }
   #shelf-body .shelf-dateline .dateline-tally { display: block; }
+  #shelf-body .shelf-dateline .tally-long { display: none; }
+  #shelf-body .shelf-dateline .tally-short { display: inline; }
+  #shelf-body .shelf-review-note { font-size: 12px; }
   .shelf-masthead { align-items: flex-start; }
   .shelf-mast-side { flex-direction: column-reverse; align-items: flex-end; gap: var(--s1); }
   .shelf-masthead .shelf-art { width: 44px; height: 44px; }
@@ -1542,7 +1550,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   :root body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
     width: 100%;
     margin: 0 0 var(--s6);
-    padding: 20px 18px 104px;
+    padding: 20px 18px 120px;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -1551,18 +1559,47 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   body[data-view='reader'] #app > main .reader-meta { flex-wrap: nowrap; gap: 4px 10px; }
   .reader-meta .reader-source { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .reader-meta .shelf-date, .reader-meta .level-chip, .reader-meta .status-chip { flex: 0 0 auto; white-space: nowrap; }
-  .reader-meta .date-rel { display: none; }
+  .reader-meta .date-rel, .reader-meta .date-year.is-current { display: none; }
   #reader:not(.fg-always) ruby::before, .reader rt, #reader rt { font-size: 0.63em; }
   body[data-view='reader'] #app > main > h1.view-title { font-size: 26px; line-height: 1.45; }
   body[data-view='reader'] #app > main > .view-title-en { margin-bottom: var(--s2); font-size: 15px; }
   .listen-row.play-bar.is-pending { margin-bottom: var(--s2); }
   body.v-depth-layered #reader, #reader.reader { font-size: 19px; line-height: 2.15; }
   .reader .tok-en { font-size: 15px; }
-  /* the bar and the tip leave the corner to the bug: nothing fixed floats over the text column */
+  /* the phone reader's dock: a slim paper strip at the foot where the bug rests in its corner and
+     the voice state lives (the Kore player's home); the sentence bar and the tip rise over it, beside
+     the bug. Nothing fixed floats over the reading column. */
+  body[data-view='reader']:not(.zen) #app::after {
+    content: '';
+    position: fixed;
+    z-index: 40;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(56px + env(safe-area-inset-bottom));
+    background: var(--raised);
+    border-top: 1px solid var(--raised-edge);
+    box-shadow: 0 -10px 24px -18px color-mix(in srgb, var(--ink) 45%, transparent);
+  }
+  body.v-depth-layered[data-view='reader'] .listen-row.play-bar, body[data-view='reader'] .listen-row.play-bar {
+    position: fixed;
+    z-index: 45;
+    left: var(--s2);
+    right: 64px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    max-width: none;
+    min-height: 40px;
+    margin: 0;
+  }
+  body[data-view='reader'] .listen-row.play-bar.is-pending { bottom: env(safe-area-inset-bottom); height: 56px; align-items: center; }
+  body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  /* a bottom sheet owns the foot: the bug steps up to the top corner */
+  body:has(#sheet) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
+  /* the bar and the tip rise above the dock, clear of the bug and the voice state */
   .teacher-door.reader-actions, .reader-tip {
     left: var(--s1);
-    width: calc(100vw - 2 * var(--s1) - 48px);
-    bottom: calc(var(--s1) + env(safe-area-inset-bottom));
+    width: calc(100vw - 2 * var(--s1));
+    bottom: calc(64px + env(safe-area-inset-bottom));
     transform: none;
     animation-name: float-in-phone;
   }
@@ -1571,7 +1608,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: 14px; }
   .reader-actions-close { grid-column: 2; grid-row: 1; }
   .reader-tip { padding-left: 14px; }
-  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 188px; }
+  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
   .article-about { padding: var(--s2); }
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
