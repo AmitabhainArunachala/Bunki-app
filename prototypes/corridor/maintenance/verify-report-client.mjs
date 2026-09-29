@@ -87,6 +87,10 @@ try {
   if (process.env.BUNKI_REPORT_SCENARIO === 'preview') {
     stage = 'preview-feedback'; await verifyPreviewFeedback();
     terminalResult = { passed: true, cases: ['preview_local_no_session', 'clipped_native_modal_bug', 'lavish_context_queue_after_save', 'lavish_queue_failure_preserves_report'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'static 404 and local Lavish bridge fixture', errors };
+  } else if (process.env.BUNKI_REPORT_SCENARIO === 'config-retry') {
+    stage = 'transient-config-retry'; await verifyTransientConfigRetry();
+    assert.deepEqual(errors, []);
+    terminalResult = { passed: true, cases: ['transient_config_failure_schedules_same_id_retry'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'synthetic 503 config then synthetic receipt', errors };
   } else {
   stage = 'existing-browser-contracts';
   await page.goto('https://bunki.test');
@@ -285,8 +289,9 @@ try {
   stage = 'hostile-config'; await verifyHostileConfig(png);
   stage = 'no-service-durable-save'; await verifyNoServiceDurability();
   stage = 'preview-feedback'; await verifyPreviewFeedback();
+  stage = 'transient-config-retry'; await verifyTransientConfigRetry();
   assert.deepEqual(errors, []);
-  terminalResult = { passed: true, cases: ['preview_local_no_session', 'clipped_native_modal_bug', 'lavish_context_queue_after_save', 'lavish_queue_failure_preserves_report', 'idle_mount', 'idempotent_mount', 'allowlisted_context', 'attachment_preview_remove', 'mobile_320', 'focus_scroll_return', 'offline_atomic_outbox', 'reload_recovery', 'timeout_after_persistence', 'stable_wire_retry', 'honest_ai', 'inert_untrusted_text', 'proposal_export', 'followup', 'reopen', 'protected_answers', 'host_rerender', 'native_host_modal', 'same_origin_lazy_build', 'same_origin_offline_unknown', 'cross_origin_build_not_substituted', 'unicode_codepoint_bounds', 'unicode_stable_wire_receipt', 'followup_ack_preserves_new_draft', 'followup_pending_retry_preserves_new_draft', 'two_tab_draft_attachment_isolation', 'duplicated_tab_revision_fork', 'orphan_draft_recovery', 'legacy_draft_retained', 'hostile_config_limits', 'no_service_capability_before_save', 'durable_save_ack_boundary', 'equal_revision_duplicate_first_report', 'equal_revision_duplicate_first_followup', 'unmount_drains_accepted_followup_ack_and_saves', 'unmount_failed_flush_retains_editor', 'attachment_validation_blocks_recovery', 'attachment_validation_checks_draft_identity', 'native_modal_keyboard_frozen_during_unmount', 'native_modal_keyboard_restored_after_failed_unmount', 'ack_cleanup_abort_preserves_pending_and_next_draft', 'ack_cleanup_abort_retry_same_request_once', 'ack_cleanup_abort_preserves_newer_input', 'ack_refresh_abort_is_not_a_delivery_or_draft_failure'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'synthetic, no live AI', received_reports: received.size, post_attempts: postBodies.length, errors };
+  terminalResult = { passed: true, cases: ['transient_config_failure_schedules_same_id_retry', 'preview_local_no_session', 'clipped_native_modal_bug', 'lavish_context_queue_after_save', 'lavish_queue_failure_preserves_report', 'idle_mount', 'idempotent_mount', 'allowlisted_context', 'attachment_preview_remove', 'mobile_320', 'focus_scroll_return', 'offline_atomic_outbox', 'reload_recovery', 'timeout_after_persistence', 'stable_wire_retry', 'honest_ai', 'inert_untrusted_text', 'proposal_export', 'followup', 'reopen', 'protected_answers', 'host_rerender', 'native_host_modal', 'same_origin_lazy_build', 'same_origin_offline_unknown', 'cross_origin_build_not_substituted', 'unicode_codepoint_bounds', 'unicode_stable_wire_receipt', 'followup_ack_preserves_new_draft', 'followup_pending_retry_preserves_new_draft', 'two_tab_draft_attachment_isolation', 'duplicated_tab_revision_fork', 'orphan_draft_recovery', 'legacy_draft_retained', 'hostile_config_limits', 'no_service_capability_before_save', 'durable_save_ack_boundary', 'equal_revision_duplicate_first_report', 'equal_revision_duplicate_first_followup', 'unmount_drains_accepted_followup_ack_and_saves', 'unmount_failed_flush_retains_editor', 'attachment_validation_blocks_recovery', 'attachment_validation_checks_draft_identity', 'native_modal_keyboard_frozen_during_unmount', 'native_modal_keyboard_restored_after_failed_unmount', 'ack_cleanup_abort_preserves_pending_and_next_draft', 'ack_cleanup_abort_retry_same_request_once', 'ack_cleanup_abort_preserves_newer_input', 'ack_refresh_abort_is_not_a_delivery_or_draft_failure'], source: sourceIdentity, browser: engineIdentity, service_fixture: 'synthetic, no live AI', received_reports: received.size, post_attempts: postBodies.length, errors };
   terminalResult.ackCleanupEvidence = ackCleanupEvidence;
   }
 } catch (error) { console.error(await page.locator('.br-body').innerText().catch(() => '')); throw error; }
@@ -1020,6 +1025,63 @@ async function verifyNoServiceDurability() {
     assert.equal(await target.evaluate(() => window.__reportTransactionAck), true, 'Saved UI follows the actual IndexedDB completion event');
     assert.equal((await localState(target)).records.length, 1);
     await target.getByText('Saved on this device. It has not been sent.', { exact: true }).first().waitFor();
+  } finally { await isolated.close(); }
+}
+
+async function verifyTransientConfigRetry() {
+  const isolated = await browser.newContext();
+  const configStatuses = [], posts = [];
+  let configDown = true;
+  isolated.on('page', target => target.on('pageerror', error => errors.push(error.message)));
+  // Only the client's 30 s delivery retry is shortened; every other timer keeps its own delay.
+  await isolated.addInitScript(() => {
+    const schedule = window.setTimeout;
+    window.__reportRetriesArmed = 0;
+    window.setTimeout = (callback, delay, ...rest) => {
+      if (delay !== 30000) return schedule(callback, delay, ...rest);
+      window.__reportRetriesArmed++;
+      return schedule(callback, 100, ...rest);
+    };
+  });
+  await isolated.route('**/*', route => {
+    const request = route.request(), url = new URL(request.url());
+    if (url.hostname === 'bunki.test' && request.isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: html });
+    const headers = { 'Access-Control-Allow-Origin': 'https://bunki.test', 'Access-Control-Allow-Headers': 'Authorization,Content-Type', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS' };
+    const send = data => route.fulfill({ contentType: 'application/json', headers, body: JSON.stringify(data) });
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+    if (url.pathname === '/api/config') {
+      configStatuses.push(configDown ? 503 : 200);
+      return configDown ? route.fulfill({ status: 503, headers, contentType: 'application/json', body: '{}' })
+        : send({ schema_version: 'bunki.maintenance/v1', build: { git_sha: 'a'.repeat(40), artifact_sha256: 'b'.repeat(64) } });
+    }
+    if (url.pathname === '/api/session') return send({ token: 'synthetic-guest-token', actor_ref: 'guest_retry_fixture' });
+    if (url.pathname === '/api/reports' && request.method() === 'POST') {
+      const report = request.postDataJSON().report;
+      posts.push(report.id);
+      return send({ receipt: { receipt_id: 'receipt_retry_fixture', report_id: report.id, received_at: new Date().toISOString(), payload_sha256: createHash('sha256').update(request.postData()).digest('hex') }, report, status: 'received', conversation: [], triage: { state: 'pending' }, proposals: [] });
+    }
+    return route.fulfill({ status: 404, headers, contentType: 'application/json', body: '{}' });
+  });
+  try {
+    const target = await isolated.newPage();
+    await openDraft(target);
+    await target.getByText('The report service is unavailable (503). Your report stays on this device.', { exact: true }).waitFor();
+    await target.locator('#br-actual').fill('Transient outage: deliver this later with the same report ID.');
+    await target.getByRole('button', { name: /^(?:Send report|Save on this device)$/ }).click();
+    await target.getByRole('heading', { name: 'Saved on this device', exact: true }).waitFor();
+    await pollNativeState(() => configStatuses.length >= 2, { timeoutMs: 10000, description: 'delivery meeting the unavailable config' });
+    const [saved] = await readReportStoreRows(target, 'records');
+    assert(saved && !saved.view?.receipt, 'The report is kept on this device while config is unavailable');
+    assert.deepEqual(posts, [], 'Nothing is sent before config recovers');
+    configDown = false;
+    await pollNativeState(async () => Boolean((await readReportStoreRows(target, 'records'))[0]?.view?.receipt),
+      { timeoutMs: 10000, description: 'scheduled retry delivering after config recovers' });
+    const rows = await readReportStoreRows(target, 'records');
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].id, saved.id);
+    assert.deepEqual(posts, [saved.id], 'The scheduled retry delivers the durable report once, with its original ID');
+    assert.deepEqual([configStatuses[0], configStatuses[1], configStatuses.at(-1)], [503, 503, 200]);
+    assert(await target.evaluate(() => window.__reportRetriesArmed) >= 1, 'A transient config failure arms the scheduled retry');
   } finally { await isolated.close(); }
 }
 

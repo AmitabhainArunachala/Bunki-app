@@ -631,6 +631,11 @@ try {
       initialInventory.length > 0,
       `${totalBytes} bytes`,
     );
+    for (const path of ['editorial.css', 'design/ink-hoku-nami.png']) {
+      check(`install precaches ${path} before any app page opens`,
+        initialInventory.some(cache => cache.entries.some(entry => entry.url === `${base}${APP}${path}` &&
+          entry.bytes === INITIAL.entries.get(path).bytes)));
+    }
     check(
       'activation preserves other applications caches',
       await probe.evaluate(async () => {
@@ -665,6 +670,46 @@ try {
       'offline startup uses the installed worker',
       await app.evaluate(() => Boolean(navigator.serviceWorker.controller)),
     );
+    if (booted) await app.waitForFunction(() => document.querySelector('.shelf-art')?.complete,
+      null, { timeout: 15000 }).catch(() => {});
+    const offlineLook = booted
+      ? await app.evaluate(() => {
+          const art = document.querySelector('.shelf-art');
+          const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => {
+            let rules;
+            try {
+              rules = link.sheet?.cssRules.length || 0;
+            } catch {
+              rules = 0;
+            }
+            return { path: new URL(link.href).pathname.split('/').pop(), rules };
+          });
+          const word = document.querySelector('#shelf-body .japanese-lookup-word');
+          const style = word && getComputedStyle(word);
+          return { sheets, art: art?.naturalWidth || 0,
+            grid: getComputedStyle(document.getElementById('shelf-reading-results')).display,
+            word: style && { display: style.display, border: style.borderTopStyle, background: style.backgroundColor,
+              padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
+        })
+      : { sheets: [], art: null };
+    check(
+      'every linked stylesheet, including editorial.css, and the shelf art load on a cold offline start',
+      offlineLook.sheets.length > 0 &&
+        offlineLook.sheets.every((sheet) => sheet.rules > 0) &&
+        offlineLook.sheets.some((sheet) => sheet.path === 'editorial.css') &&
+        offlineLook.art > 0,
+      JSON.stringify(offlineLook),
+    );
+    check('cold offline shelf and lookup words retain their packaged styles',
+      offlineLook.grid === 'grid' && ['inline', 'inline-block'].includes(offlineLook.word?.display) &&
+        offlineLook.word.border === 'none' && offlineLook.word.background === 'rgba(0, 0, 0, 0)' &&
+        offlineLook.word.padding === '0px' && offlineLook.word.minWidth === '0px' && offlineLook.word.minHeight === '0px',
+      JSON.stringify(offlineLook));
+    for (const path of ['editorial.css', 'design/ink-hoku-nami.png']) {
+      const cached = await fetchOutcome(app, `${base}${APP}${path}`);
+      check(`offline ${path} bytes match the installed artifact`,
+        cached.status === 200 && cached.sha256 === INITIAL.entries.get(path).sha256, JSON.stringify(cached));
+    }
     check(
       'uncached network request really fails offline',
       await app.evaluate(async () => {

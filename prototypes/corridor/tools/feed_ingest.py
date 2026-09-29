@@ -60,6 +60,7 @@ sys.path.insert(0, str(HERE))
 
 import build_articles as ba  # noqa: E402  (the minting machinery — imported, not forked)
 import build_corridor as bc  # noqa: E402
+from reading_facets import attach_reading_facets  # noqa: E402
 
 REPO = bc.REPO
 CORRIDOR = bc.CORRIDOR
@@ -514,6 +515,7 @@ def main() -> int:
     promoted = {row["id"] for row in minted_rows}
     archive_index["articles"] = [r for r in archive_index["articles"] if r["id"] not in promoted]
 
+    attach_reading_facets(index, ARTICLES)
     INDEX_PATH.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", "utf-8")
     ARCHIVE_INDEX_PATH.write_text(
         json.dumps(archive_index, ensure_ascii=False, separators=(",", ":")), "utf-8"

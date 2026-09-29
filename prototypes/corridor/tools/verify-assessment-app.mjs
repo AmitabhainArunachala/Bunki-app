@@ -625,26 +625,32 @@ try {
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Assessment context fits the review card without horizontal overflow');
         await page.screenshot({ path: resolve(evidence, `${engine}-${source}-revealed-context.png`), fullPage: true });
       });
-      // G1: an assisted card's back names where its help was recorded. A local card says this learner opened the
-      // explanation after answering; a received card says only what its synced result records, with no event on
-      // this device and no time. The word back and the sentence back are both read, for each origin.
+      // G1: an assisted card's back names where its help was recorded and, locally, what it was. A local
+      // explanation card says this learner opened the explanation after answering; a local dictionary card
+      // says only that a word was looked up on that question, with no timing claim; a received card says only
+      // what its synced result records, with no kind of help, no event on this device and no time. The word
+      // back and the sentence back are both read, for each source.
       const assistedWording = { local: 'Assisted · you opened the explanation after answering',
+        dictionary: 'Assisted · you looked up a word on this question',
         received: 'Assisted · the synced result records help on this question' };
-      for (const source of ['local', 'received']) await run(engine, `${source}-assisted-card-backs-name-where-help-was-recorded`, async page => {
+      const assistedKind = { local: 'explanation', dictionary: 'dictionary', received: null };
+      for (const source of ['local', 'dictionary', 'received']) await run(engine, `${source}-assisted-card-backs-name-where-help-was-recorded`, async page => {
         await page.evaluate(() => { D.dict['assessment-fixture-word'] = { r: 'ご', m: ['Synthetic dictionary sense differs from test context'] }; });
-        if (source === 'local') {
-          const local = await page.evaluate(async () => {
+        if (source !== 'received') {
+          const local = await page.evaluate(async lookup => {
             const catalog = await loadAssessmentCatalog();
             if (!await startAssessmentRoom(catalog.entries[0], 'practice')) throw new Error('Assisted fixture start');
             const itemId = currentAssessmentV2().form.items[0].id;
-            for (const action of [{ kind: 'answer', itemId, response: { kind: 'selected', optionId: 'a' } },
-              { kind: 'assistance', itemId, reason: 'explanation' }, { kind: 'submit' }])
+            const answer = { kind: 'answer', itemId, response: { kind: 'selected', optionId: 'a' } };
+            for (const action of lookup ? [{ kind: 'dictionary-lookup', itemId }, answer, { kind: 'submit' }]
+              : [answer, { kind: 'assistance', itemId, reason: 'explanation' }, { kind: 'submit' }])
               if (!await applyAssessmentV2(action)) throw new Error(`Assisted fixture ${action.kind}`);
             const attempt = S.assessmentLibraryV2.attempts.at(-1);
-            return { status: attempt.status, marked: attempt.answers.filter(row => row.assistance).map(row => row.item.id) };
-          });
-          // setup: a submitted practice sitting whose one correct answer carries the mark
-          assert.deepEqual(local, { status: 'submitted', marked: [item.id] });
+            return { status: attempt.status, assistance: attempt.answers.map(row =>
+              [row.item.id, assessmentV2Module.assessmentItemAssistanceV2(attempt, row.item.id)?.kind ?? null]) };
+          }, source === 'dictionary');
+          // setup: a submitted practice sitting whose one correct answer carries exactly this kind of help
+          assert.deepEqual(local, { status: 'submitted', assistance: [[item.id, assistedKind[source]]] });
         } else {
           const received = await receive(page, true, true);
           // setup: the synced result carries the flag on its one correct answer, and it was reconciled
@@ -654,21 +660,23 @@ try {
           const card = S.taken.find(row => row.t === t && (t === 'sentence' || row.id === 'assessment-fixture-word'));
           const context = card ? assessmentReviewContext(card, t === 'sentence') : null;
           return { t, id: card?.id ?? null, local: !!card?.assessmentRef, received: !!card?.assessmentReceivedRef,
-            assisted: context?.assisted ?? null, origin: context?.assistedOrigin ?? null };
+            assisted: context?.assisted ?? null, origin: context?.assistedOrigin ?? null, kind: context?.assistedKind ?? null };
         }));
-        // setup: both cards came from this source, and the transient context names its origin
+        // setup: both cards came from this source, and the transient context names its origin and kind
         for (const card of cards) assert.deepEqual(card, { t: card.t, id: card.id,
-          local: source === 'local', received: source === 'received', assisted: true, origin: source });
+          local: source !== 'received', received: source === 'received', assisted: true,
+          origin: source === 'received' ? 'received' : 'local', kind: assistedKind[source] });
         await page.evaluate(() => startReview([{ t: 'word', id: 'assessment-fixture-word' }]));
         await page.locator('#reveal').click(); await page.locator('.assessment-review-context').waitFor();
         const word = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
         await page.evaluate(id => startReview([{ t: 'sentence', id }]), cards.find(card => card.t === 'sentence').id);
         await page.locator('#sentence-recall-reveal').click(); await page.locator('.grade.g-again').waitFor();
         const sentence = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
-        // K9c's permitted failing row (received case): each back shows exactly its origin's wording, never the other
+        // K9c's permitted failing row (received case): each back shows exactly its source's wording, never another
         assert.deepEqual({ word, sentence }, { word: [assistedWording[source]], sentence: [assistedWording[source]] },
           `${source} backs name where the help was recorded`);
-        assert(![...word, ...sentence].includes(assistedWording[source === 'local' ? 'received' : 'local']));
+        for (const [other, wording] of Object.entries(assistedWording))
+          if (other !== source) assert(![...word, ...sentence].includes(wording), `${source} backs never claim ${other} help`);
       });
       // "Return to this sentence" for a test question once called openPassage(undefined) and went
       // nowhere (PLAN D20). Both real callers must open the JLPT room on THAT attempt with THAT
