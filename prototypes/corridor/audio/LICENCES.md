@@ -28,7 +28,9 @@ F1 audio ships or plays. The locked narration voice is Google Gemini TTS
 yet; until they are, the reader's play bar shows a visible 音声準備中 · Kore
 (voice in preparation) state and nothing plays.
 
-Word clips follow the same lock: only a Kore or Charon recording may play for
-a word. The interim word clips credited above remain in the repository but no
-longer play; until approved word clips exist, the answer card stays silent and
-says the Kore voice is on its way.
+Word and sentence clips follow the same lock: only a Kore or Charon recording
+may play for a word or a shelf sentence. The interim clips credited above remain
+in the repository but no longer play. Until approved word clips exist, the
+answer card stays silent and says the Kore voice is on its way; until approved
+sentence clips exist, sentence practice offers no listening mode and shows the
+same 音声準備中 · Kore state.
