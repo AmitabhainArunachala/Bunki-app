@@ -195,7 +195,8 @@ try {
     const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
     await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
     const listed = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-legacy-set]')]
-      .map((door) => ({ id: door.dataset.legacySet, pending: door.textContent.includes('検収前'), text: door.textContent })));
+      // the learner-facing mark is 未確認 since the design pass of 2026-09-30 (it was 検収前)
+      .map((door) => ({ id: door.dataset.legacySet, pending: /未確認|検収前/u.test(door.textContent), text: door.textContent })));
     // expected identities and counts come from the artifact's own data, never from this file
     const expected = (await (await page.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
     const matches = listed.length === expected.length && expected.every((set, i) => listed[i]?.id === set.setId && listed[i].text.includes(String(set.items)));
@@ -203,7 +204,7 @@ try {
       JSON.stringify({ listed: listed.map((row) => row.id), expected: expected.map((set) => `${set.setId}:${set.items}`) }));
     const limits = await page.evaluate(() => document.querySelector('[data-exam-older="N1"] .exam-older-limits')?.textContent || '');
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the room says what these sets lack (no listening, no timer)`, /no listening|聴解/u.test(limits), limits);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked 検収前 (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked 未確認 (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
     if (listed.length) {
       await doors.first().click();
       const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
