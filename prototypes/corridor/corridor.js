@@ -8255,6 +8255,8 @@ function buildListenRow(p) {
     listenRow.classList.add('is-pending');
     const pending = el('p', 'play-pending');
     pending.id = 'listen-note';
+    // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
+    pending.dataset.japaneseLookup = 'off';
     pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
     if (bi()) pending.append(el('span', 'en-sub', 'voice in preparation'));
     listenRow.append(pending);
