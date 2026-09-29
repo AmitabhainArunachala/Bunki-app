@@ -5186,8 +5186,17 @@ function renderShelfBody() {
   const now = new Date(), localDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const sep = el('span', 'dateline-sep', ' · ');
   sep.setAttribute('aria-hidden', 'true');
-  dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, el('span', 'dateline-tally', shelfTallyText(stories)));
+  // the tally in full on a desk, in short on a phone (「110本 · 用語10」)
+  const tally = el('span', 'dateline-tally');
+  const glossaryCount = stories.filter((p) => p.source === 'isa-yasashii-glossary').length;
+  tally.append(el('span', 'tally-long', shelfTallyText(stories)),
+    el('span', 'tally-short', `${stories.length - glossaryCount}本${glossaryCount ? ` · 用語${glossaryCount}` : ''}`));
+  dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
   title.append(dateline);
+  // 未確認 is said once, here, not on every card; each article still wears it in its meta line
+  const unreviewed = stories.filter(reviewPending).length;
+  if (unreviewed) title.append(el('p', 'shelf-review-note', tx(`未確認 ${unreviewed} 本 · 人による確認の前`,
+    `未確認 · ${unreviewed} of ${stories.length} not yet reviewed by a person`)));
   const art = el('img', 'shelf-art'); art.src = 'design/ink-hoku-nami.png'; art.alt = tx('藍の地に白い筆の「永」', 'Bunki brush study: 永 in white ink on indigo'); art.width = 640; art.height = 640;
   masthead.append(title);
   main.append(masthead);
@@ -6974,7 +6983,13 @@ function readerDateStamp(day) {
   const stamp = el('time', 'shelf-date');
   stamp.dateTime = day;
   const [whole, ago] = shelfDateLabel(day).split(' · ');
-  stamp.append(el('span', 'date-abs', whole));
+  const [y] = day.split('-');
+  const thisYear = String(new Date().getFullYear()) === y;
+  // the day, with its year in a span a phone may drop when it is this year
+  const abs = el('span', 'date-abs');
+  if (bi()) abs.append(whole.replace(` ${y}`, ''), el('span', thisYear ? 'date-year is-current' : 'date-year', ` ${y}`));
+  else abs.append(el('span', thisYear ? 'date-year is-current' : 'date-year', `${y}年`), whole.replace(`${y}年`, ''));
+  stamp.append(abs);
   if (ago) stamp.append(el('span', 'date-rel', ` · ${ago}`));
   return stamp;
 }
@@ -7090,7 +7105,6 @@ function shelfCard(p, rank = 'grid') {
   if (rank !== 'teaser') {
     const foot = el('div', 'story-foot');
     foot.append(levelChip(p));
-    if (reviewPending(p)) foot.append(unreviewedChip(p));
     // the shelf remembers with you: finished, or open to your bookmark
     if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', '読了 finished')));
     else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', '途中 in progress')));
