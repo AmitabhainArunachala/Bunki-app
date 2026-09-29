@@ -52,6 +52,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 import build_corridor as bc  # noqa: E402  (tokeniser + furigana + sample loaders)
+from reading_facets import attach_reading_facets  # noqa: E402
 
 REPO = bc.REPO
 CORRIDOR = bc.CORRIDOR
@@ -525,6 +526,7 @@ def regrade_jlpt(out: Path) -> int:
         row["grading"] = body["grading"]
         if fix_date(row):
             dates_fixed += 1
+    attach_reading_facets(index, out)
     index_path.write_text(json.dumps(index, ensure_ascii=False, indent=1), "utf-8")
     print(f"· regraded jlpt_lexicon on {len(index['articles'])} curated articles" + (f" · {dates_fixed} stringified-None date(s) cleared" if dates_fixed else ""))
 
@@ -645,6 +647,7 @@ def main() -> int:
         "sources": SOURCES,
         "articles": index_rows,
     }
+    attach_reading_facets(index, out)
     (out / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), "utf-8")
     print(f"· index: {len(index_rows)} articles, ninjal live on {ninjal_live}")
     return 0
