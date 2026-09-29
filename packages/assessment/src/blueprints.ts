@@ -148,3 +148,88 @@ export const OFFICIAL_BLUEPRINTS: readonly BlueprintFacts[] = immutable([
 export function getOfficialBlueprint(id: string): BlueprintFacts | undefined {
   return OFFICIAL_BLUEPRINTS.find((blueprint) => blueprint.id === id);
 }
+
+/** Official JLPT result facts: 得点区分, ranges, 合格点 and 基準点. Scaled scores come from
+ * item-response-theory equating, so a raw count is never converted into any of them.
+ * Kept apart from OFFICIAL_BLUEPRINTS so reviewed requests that quote those stay unchanged. */
+export interface JlptScoreFacts {
+  readonly track: Extract<Exam, { family: 'jlpt' }>['track'];
+  readonly checkedAt: '2026-09-29';
+  readonly sources: readonly string[];
+  readonly totalRange: readonly [0, 180];
+  readonly passMark: number;
+  readonly sections: readonly {
+    readonly id: string;
+    readonly label: string;
+    readonly skills: readonly ('vocabulary' | 'grammar' | 'reading' | 'listening')[];
+    readonly range: readonly [number, number];
+    readonly sectionalMinimum: number;
+  }[];
+  /** 試験科目: the papers sat, by the blueprint timing-block id. */
+  readonly papers: Readonly<Record<string, string>>;
+}
+
+const scoreSources = [
+  'https://www.jlpt.jp/guideline/results.html',
+  'https://www.jlpt.jp/e/guideline/testsections.html',
+  'https://www.jlpt.jp/e/about/pdf/scaledscore_e.pdf',
+];
+function jlptScores(track: JlptScoreFacts['track'], passMark: number): JlptScoreFacts {
+  const combined = track === 'N4' || track === 'N5';
+  const listening = {
+    id: 'listening',
+    label: '聴解',
+    skills: ['listening'] as const,
+    range: [0, 60] as const,
+    sectionalMinimum: 19,
+  };
+  return immutable({
+    track,
+    checkedAt: '2026-09-29',
+    sources: scoreSources,
+    totalRange: [0, 180],
+    passMark,
+    sections: combined
+      ? [
+          {
+            id: 'language-reading',
+            label: '言語知識（文字・語彙・文法）・読解',
+            skills: ['vocabulary', 'grammar', 'reading'],
+            range: [0, 120],
+            sectionalMinimum: 38,
+          },
+          listening,
+        ]
+      : [
+          {
+            id: 'language',
+            label: '言語知識（文字・語彙・文法）',
+            skills: ['vocabulary', 'grammar'],
+            range: [0, 60],
+            sectionalMinimum: 19,
+          },
+          {
+            id: 'reading',
+            label: '読解',
+            skills: ['reading'],
+            range: [0, 60],
+            sectionalMinimum: 19,
+          },
+          listening,
+        ],
+    papers: {
+      'language-reading': '言語知識（文字・語彙・文法）・読解',
+      vocabulary: '言語知識（文字・語彙）',
+      'grammar-reading': '言語知識（文法）・読解',
+      listening: '聴解',
+    },
+  });
+}
+
+export const JLPT_SCORE_FACTS: readonly JlptScoreFacts[] = immutable([
+  jlptScores('N5', 80),
+  jlptScores('N4', 90),
+  jlptScores('N3', 95),
+  jlptScores('N2', 90),
+  jlptScores('N1', 100),
+]);
