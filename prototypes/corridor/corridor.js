@@ -2794,7 +2794,7 @@ function recordDraftsSettled(record = publishedRecord) {
 }
 function preserveVisibleDrafts() {
   const captureKept = !document.getElementById('source-capture-form') || rememberCaptureDraft();
-  return [...document.querySelectorAll('#note-input, #chat-input, #personal-note-input, .record-note-edit-input, #sentence-production-text, #sentence-listening-text')]
+  return [...document.querySelectorAll('#note-input, #chat-input, #personal-note-input, .record-note-edit-input, #sentence-production-text, #sentence-listening-text, #vocabulary-list-name')]
     .map((input) => input.id === 'chat-input' ? rememberTeacherDraft(input)
       : sentenceDraftBindings.has(input) ? rememberSentenceDraft(input)
       : recordNoteEditStates.has(input) ? rememberRecordNoteEdit(recordNoteEditStates.get(input)) : rememberRecordDraft(input))
@@ -7165,15 +7165,26 @@ function openVocabularyListChooser(node, label, invoker) {
   const heading = el('h2', '', tx(`「${label}」を覚える`, `Save ${label}`)); heading.id = 'vocabulary-list-title';
   dialog.setAttribute('aria-labelledby', heading.id);
   const close = el('button', 'chip', tx('閉じる', 'Done')); close.type = 'button'; close.id = 'vocabulary-list-close';
-  close.addEventListener('click', () => dialog.close());
+  close.addEventListener('click', () => { if (rememberRecordDraft(name)) dialog.close(); });
   const choices = el('div', 'vocabulary-list-choices');
   const management = el('div', 'teacher-actions');
   const context = el('div');
   const notice = el('p', 'vocabulary-list-status'); notice.setAttribute('role', 'status');
   const name = el('input', 'search-field'); name.placeholder = tx('新しいリストの名前', 'Name a new vocabulary list'); name.maxLength = 80;
+  name.id = 'vocabulary-list-name';
+  name.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
+  attachRecordDraft(name);
   name.setAttribute('aria-label', name.placeholder);
   const create = el('button', 'chip', tx('リストを作って保存', 'Create list & save')); create.type = 'submit';
   const form = el('form', 'vocabulary-list-form'); form.append(name, create);
+  const failed = (ja, en) => {
+    if (!rememberRecordDraft(name)) {
+      notice.textContent = tx('下書きを保存できません。このリスト名をコピーしてから、閉じて再読み込みしてください。',
+        'The draft could not be preserved. Copy this list name, then close and reload.');
+    } else notice.textContent = recordWritable() ? tx(ja, en)
+      : tx('記録を保護しています。リスト名の下書きはこの窓に残ります。閉じて再読み込みしてから、もう一度試してください。',
+        'Your record is protected. The list name is kept in this window. Close and reload before retrying.');
+  };
   let busy = false;
   const setBusy = (value) => {
     busy = value; create.disabled = value || !recordWritable(); name.readOnly = value;
@@ -7204,7 +7215,7 @@ function openVocabularyListChooser(node, label, invoker) {
     setBusy(true);
     try {
       if (!S.taken.some(row => row.t === node.t && row.id === node.id) && !(await toggleTaken(node, label))) {
-        notice.textContent = tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return;
+        failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return;
       }
       if (listName) {
         const saved = await commitStorePatch(latest => {
@@ -7218,12 +7229,12 @@ function openVocabularyListChooser(node, label, invoker) {
               ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
           return { lists };
         });
-        if (!saved) { notice.textContent = tx('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'); return; }
+        if (!saved) { failed('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'); return; }
       }
       notice.textContent = listName ? tx(`「${listName}」に保存しました。`, `Saved to ${listName}.`) : tx('復習に保存しました。', 'Saved for review.');
-      name.value = ''; paint(); refreshCapture();
+      name.value = ''; rememberRecordDraft(name); paint(); refreshCapture();
     } catch {
-      notice.textContent = tx('保存できませんでした。リスト名を残したまま、もう一度試せます。', 'Could not finish saving. Your list name is still here so you can retry.');
+      failed('保存できませんでした。リスト名を残したまま、もう一度試せます。', 'Could not finish saving. Your list name is still here so you can retry.');
     } finally { setBusy(false); }
   };
   const paint = () => {
@@ -7248,11 +7259,11 @@ function openVocabularyListChooser(node, label, invoker) {
             notice.textContent = wordCaptureHeldText(node, { route: false }); return;
           }
           const saved = await toggleTaken(node, label);
-          if (!saved) { notice.textContent = tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'); return; }
+          if (!saved) { failed('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'); return; }
           notice.textContent = tx('復習の対象から外しました。リストとこれまでの復習記録は残ります。', 'Stopped memorizing. Your lists and previous reviews are kept.');
           paint(); refreshCapture();
         } catch {
-          notice.textContent = tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.');
+          failed('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.');
         } finally { setBusy(false); }
       });
       management.append(undo);
@@ -7262,13 +7273,14 @@ function openVocabularyListChooser(node, label, invoker) {
           paint(); refreshCapture();
           dialog.querySelector(`[data-ctx-scope="${scope ?? 'word'}"]`)?.focus({ preventScroll: true });
         },
-        onFailed: () => { notice.textContent = tx('文脈の変更を保存できませんでした。もう一度試してください。', 'Could not save the context change. Please try again.'); },
+        onFailed: () => failed('文脈の変更を保存できませんでした。もう一度試してください。', 'Could not save the context change. Please try again.'),
       });
     }
     setBusy(busy);
   };
   form.addEventListener('submit', event => { event.preventDefault(); const value = name.value.trim(); if (!value) { name.focus(); return; } void save(value); });
   dialog.append(heading, el('p', '', tx('リストを選ぶか、新しいリストを作ってください。複数のリストに保存できます。', 'Choose a list or make a new one. A word can belong to several lists.')), choices, form, management, context, notice, close);
+  dialog.addEventListener('cancel', event => { if (!rememberRecordDraft(name)) event.preventDefault(); });
   dialog.addEventListener('close', () => { dialog.remove(); if (invoker?.isConnected) invoker.focus({ preventScroll: true }); });
   for (const event of ['pointerdown','pointermove','pointerup','pointercancel']) dialog.addEventListener(event, ev => ev.stopPropagation());
   paint(); document.body.append(dialog); dialog.showModal();
@@ -7800,11 +7812,23 @@ const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };
 const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
 let excerptPlayback = 0, excerptControl = null;
+/** The shipped manifest may name only local clips belonging to its approved
+ * voice. A renamed legacy manifest must not revive a withdrawn recording. */
+function approvedNarrationManifest(value) {
+  if (value?.v !== 1 || !Object.hasOwn(NARRATION_VOICES, value.voice) ||
+      !value.articles || typeof value.articles !== 'object' || Array.isArray(value.articles)) return null;
+  const clipPath = new RegExp(`^audio/narration/${value.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u');
+  for (const article of Object.values(value.articles)) {
+    if (!Array.isArray(article?.clips) || article.clips.some(clip =>
+      typeof clip?.text !== 'string' || !clip.text.trim() || typeof clip.src !== 'string' || !clipPath.test(clip.src))) return null;
+  }
+  return value;
+}
 function ensureArticleNarration() {
   if (typeof window === 'undefined' || !window.__KAIRO_NARRATION__) { articleNarration = null; return Promise.resolve(null); }
   if (articleNarration !== undefined) return Promise.resolve(articleNarration);
   articleNarrationWait ||= fetch('audio/article-narration.json').then(response => response.ok ? response.json() : null).catch(() => null).then(value => {
-    articleNarration = value?.v === 1 && value?.articles && NARRATION_VOICES[value.voice] ? value : null;
+    articleNarration = approvedNarrationManifest(value);
     if (typeof S !== 'undefined' && S.view === 'reader') refreshListenRow();
     return articleNarration;
   });
@@ -7918,30 +7942,25 @@ function paintListenProgress(fraction = 0) {
 
 
 /* ------------------------------------------------ 収録の声 the recorded voice
- * Interim word-clip roster, NOT operator-chosen: 小春音アミ · 四国めたん · ずんだもん ·
- * 玄野武宏. The operator's blind audition (2026-09-29) locked Kore/Charon for
- * narration and rated JVNV F1 1/5, so F1 is gone from the roster and the files.
- * アミ is not the voice either (2026-09-19). The reader no longer offers a picker;
- * a preference stored before 2026-09-30 still plays its word clips on the answer
- * card, and nothing else does. There is no device-voice fallback and no automatic
- * voice. The stored voice is a device preference in its own key, never the learner
- * store. Licences ride audio/LICENCES.md. */
+ * Word clips follow the same approved roster as narration: Kore is the main
+ * voice and Charon the second. A stale interim preference cannot authorize it
+ * to play. The old device preference is left intact; the learner record never
+ * changes here. Without an approved clip the answer card explains its absence
+ * and stays silent. Licences ride audio/LICENCES.md. */
 const REC_VOICE_KEY = 'kairo-rec-voice-v1';
-const REC_ROSTER = ['ami', 'metan', 'zundamon', 'takehiro'];
+const REC_ROSTER = Object.keys(NARRATION_VOICES);
 let recManifest; // undefined = not asked · null = absent · object = loaded
 let recManifestWait = null;
 let recAudioEl = null;
 
 let sessionVoicePref = null; // the explicit choice for this session when storage cannot keep it
 function recVoicePref() {
-  if (sessionVoicePref) return sessionVoicePref;
+  if (REC_ROSTER.includes(sessionVoicePref)) return sessionVoicePref;
   try {
-    // no automatic voice: アミ and the device voice were both rejected by the operator
-    // (09-19, 09-17); a recorded voice plays only once the learner has chosen it
     const v = localStorage.getItem(REC_VOICE_KEY);
-    return REC_ROSTER.includes(v) ? v : null;
+    return REC_ROSTER.includes(v) ? v : 'kore';
   } catch {
-    return null;
+    return 'kore';
   }
 }
 
@@ -8028,14 +8047,20 @@ function retireCardAudioOnFaceChange() {
 function speakCardReading(text, btn, word) {
   // the clip belongs to the card face that asked: a grade, undo, reveal change or leave before
   // the manifest answers retires it, and a playing clip stops when the face changes
-  const serial = cardAudioSerial;
+  const serial = ++cardAudioSerial;
   ensureRecManifest().then((m) => {
     if (serial !== cardAudioSerial) return;
     const entry = m && word && m.words ? m.words[word] : null;
     const pref = recVoicePref();
     if (entry && pref && entry.voices.includes(pref)) {
+      if (btn) {
+        btn.title = '';
+        delete btn.dataset.voiceUnavailable;
+        const note = btn.parentElement?.querySelector('.say-note');
+        if (note) note.textContent = '';
+      }
       playRecClip(`audio/w/${pref}/${entry.id}.m4a`, btn).then((played) => {
-        if (played !== false || !btn) return;
+        if (serial !== cardAudioSerial || played !== false || !btn) return;
         const reason = tx('この環境では再生できませんでした', 'This recording could not play here');
         btn.title = reason;
         const note = btn.parentElement?.querySelector('.say-note');
@@ -18851,11 +18876,8 @@ function renderReview(main) {
       if (assessment.assisted) context.append(assessmentAssistedMark(assessment.assistedOrigin));
       face.append(context);
     }
-    // 読み — the answer line wears the brush hand and carries the 音 door
-    // (operator, 2026-08-20: audio on every answer card; their word
-    // supersedes the word-audio hold until PR 五's judged voice — the door
-    // names itself 仮 in its label). The reading speaks, not the kanji:
-    // kana is deterministic where rare kanji misread.
+    // The reading's audio door follows the locked approved voices. A missing
+    // recording is explained on activation; it never borrows an interim voice.
     const spoken = backc.reading || (item.t === 'kanji' ? '' : item.label);
     const row = el('div', 'review-reading-row reveal r-1');
     if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
@@ -18863,8 +18885,7 @@ function renderReview(main) {
       const say = el('button', 'say');
       say.type = 'button';
       say.id = 'card-say';
-      // recorded clips only, in the voice the learner chose (interim until the audition)
-      say.setAttribute('aria-label', tx('読み上げ — 選んだ仮の声（収録）', 'speak the reading (your chosen interim recorded voice)'));
+      say.setAttribute('aria-label', tx('読み上げ — Kore・Charon の収録音声', 'speak the reading (Kore or Charon recording)'));
       say.innerHTML =
         '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
       say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
