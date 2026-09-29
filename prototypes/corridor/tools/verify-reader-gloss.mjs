@@ -419,7 +419,10 @@ const tokenState = (page, fixture) => page.evaluate((index) => {
   const lines = node.querySelectorAll('.tok-en');
   return { surface: bare.textContent, visibleRuby: [...node.querySelectorAll('rt')].filter((rt) => !rt.classList.contains('hidden-rt'))
     .map((rt) => rt.textContent).join(''), lines: lines.length, line: lines[0]?.outerHTML ?? null,
-    hasEn: node.classList.contains('has-en'), label: node.getAttribute('aria-label') || '' };
+    // R4 (2026-09-30): the name is the word, the rest is its description — read together, in order
+    hasEn: node.classList.contains('has-en'), label: [node.getAttribute('aria-label') || '',
+      ...(node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')]
+      .filter(Boolean).join(' · ') };
 }, fixture.index);
 
 const miniState = (page) => page.evaluate(() => {

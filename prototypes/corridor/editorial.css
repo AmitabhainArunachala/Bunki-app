@@ -598,6 +598,9 @@ body, body.v-contrast-wcag {
   --art-field: color-mix(in srgb, var(--ai) 58%, #07101d);
   --art-ink: #f3ecdc;
   --accent: var(--red);
+  /* keyboard focus: an ink underline over a soft vermilion wash, never the browser blue */
+  --focus-wash: color-mix(in srgb, var(--red) 16%, transparent);
+  --focus-ring: inset 0 -2px 0 var(--ink);
   --accent-wash: color-mix(in srgb, var(--red) 9%, transparent);
   --text: var(--ink);
   --text-2: color-mix(in srgb, var(--ink) 78%, var(--raised));
@@ -2380,3 +2383,51 @@ html[data-room='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s
   html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
   html[data-room='attempt'] .exam-option-text { font-size: 19px; }
 }
+
+/* ------------------------------------------------------------------ R4 focus
+   The reader's keyboard model: one Tab stop per paragraph, arrows between
+   words. The focused word wears the focus token; the pill shows its keys. */
+#reader .tok:focus-visible { outline: none; background: transparent; }
+#reader .tok:focus-visible > .tok-word { background: var(--focus-wash); box-shadow: var(--focus-ring); border-radius: 2px 2px 0 0; }
+.token-actions .tok-kbd {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 4px;
+  font: 600 11px/1.2 var(--sans);
+  color: var(--text-2);
+}
+@media (hover: none) { .token-actions .tok-kbd { display: none; } }
+
+/* the list chooser's Done: an outlined secondary that reads on its paper */
+body .vocabulary-list-dialog > .chip {
+  border: 1px solid var(--ink);
+  background: var(--raised);
+  color: var(--ink);
+  font-weight: 600;
+}
+body .vocabulary-list-dialog > .chip:hover { background: var(--ai-wash); }
+body .token-actions {
+  max-width: calc(100vw - 16px);
+  width: max-content;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+}
+body .token-actions button {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--ai);
+  font: 700 14px/1 var(--sans);
+  white-space: nowrap;
+}
+body .token-actions button .en-sub { display: inline; font-size: 12px; font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+body .token-actions button:hover { background: var(--ai-wash); }

@@ -16,6 +16,10 @@
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
+ *   K1 keyboard (R4)    — from the end of the title block to the article's close (読み終えた), a 3-paragraph
+ *                         article costs at most paragraphs + 3 Tab presses: one stop per paragraph;
+ *                         ←/→ move between words and Home/End reach a paragraph's ends; a word is
+ *                         named by itself (control: bfb7ed50, where every word is a Tab stop).
  *   A1 no F1            — with a stored F1 preference and the listen control pressed where one
  *                         exists, no F1 clip is requested and no narration manifest naming F1 loads.
  *
@@ -44,7 +48,8 @@ assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 const withControl = process.argv.includes('--control');
 
 const ARTICLE = 'global-voices:2026-09-28-65726'; // 「ダマスカス 郊外 ジャラマナ」, 「正 反対」, 「「 連帯 の 畑 」」
-const NARRATED = 'aozora:000628'; // ごん狐: the pre-pass build carried F1 narration for it
+const NARRATED = 'aozora:000628';
+const THREE_PARAS = 'real-hojoki'; // 方丈記 · 冒頭: three paragraphs // ごん狐: the pre-pass build carried F1 narration for it
 const DESK = { width: 1368, height: 900 }, PHONE = { width: 390, height: 844 };
 const GAP_MAX = 1.5; // px between one token's last glyph and the next token's first
 const DIAGNOSTIC = /signals disagree|不一致|awaiting John/iu;
@@ -311,6 +316,41 @@ try {
       return { chips: room.chips, levels: room.levels };
     });
 
+    await run('K1-keyboard-roving', DESK, async (page) => {
+      await openArticle(page, THREE_PARAS);
+      const paragraphs = await page.evaluate(() => document.querySelectorAll('#reader .para-break').length + 1);
+      assert.equal(paragraphs, 3, `fixture has ${paragraphs} paragraphs`);
+      // start at the end of the title block: the title's own lookup words are prose lookup (Codex's
+      // prose R4, one stop per block when it lands); this counts the reader from there to its close
+      await page.evaluate(() => {
+        const t = document.querySelector('h1.view-title');
+        const last = [...t.querySelectorAll('button, a[href], [tabindex]')].at(-1);
+        if (last) last.focus(); else { t.tabIndex = -1; t.focus(); }
+      });
+      let presses = 0;
+      for (; presses < 400; presses += 1) {
+        if (await page.evaluate(() => document.activeElement?.id === 'read-fin')) break;
+        await page.keyboard.press('Tab');
+      }
+      assert(presses <= paragraphs + 3, `${presses} Tab presses from the title to 読み終えた for ${paragraphs} paragraphs`);
+      const first = page.locator('#reader button.tok[tabindex="0"]').first();
+      await first.focus();
+      const walk = await page.evaluate(() => {
+        const a = document.activeElement;
+        return { index: a.dataset.index, name: a.getAttribute('aria-label'), word: a.querySelector('.tok-word')?.textContent.replace(/\s/gu, '') ?? '' };
+      });
+      await page.keyboard.press('ArrowRight');
+      const right = await page.evaluate(() => document.activeElement?.dataset.index);
+      await page.keyboard.press('End');
+      const end = await page.evaluate(() => ({ index: document.activeElement?.dataset.index, para: document.activeElement?.dataset.para }));
+      await page.keyboard.press('Home');
+      const home = await page.evaluate(() => document.activeElement?.dataset.index);
+      assert(Number(right) > Number(walk.index), `→ did not move forward (${walk.index} → ${right})`);
+      assert(Number(end.index) > Number(right) && home === walk.index, `Home/End: ${JSON.stringify({ end, home, start: walk.index })}`);
+      assert(walk.name && !/activation|word ·|読みと意味/u.test(walk.name), `a word is named by more than itself: "${walk.name}"`);
+      return { paragraphs, presses, name: walk.name };
+    });
+
     await run('A1-no-f1-audio', DESK, async (page) => {
       const requests = [];
       page.on('request', (r) => requests.push(r.url()));
@@ -341,7 +381,7 @@ try {
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
     scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording and first story; no F1 audio',
     results,
-    passed: results.length === engines.length * 11 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 12 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
