@@ -1530,20 +1530,20 @@ async function main() {
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
-  await page.waitForSelector('#listen-toggle', { timeout: 15000 });
+  // 2026-09-30: the voice is locked (Kore; Charon second). With no Kore clip for this article
+  // the play bar is a quiet 音声準備中 · Kore state: no play control, no picker, no device voice.
+  await page.waitForSelector('#listen-note', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
-    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
+    toggles: document.querySelectorAll('#listen-toggle, #listen-voice').length,
     note: document.querySelector('#listen-note')?.textContent ?? '',
   })`);
   // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
-  const shut = await page.evaluate(`document.querySelector('#listen-toggle')?.disabled === true`);
-  check('reader · the 聞く door stands shut with an honest reason until a voice is chosen',
-    listenBefore.pressed === 'false' && shut &&
-      /収録音声|recorded voice|recorded only in Koharune Ami|小春音アミ（仮の声・検収前）|Checking for recordings|この版には収録音声/u.test(listenBefore.note) &&
-      !/device voice|端末の声/u.test(listenBefore.note),
-    `${JSON.stringify(listenBefore)} shut=${shut}`);
+  check('reader · with no approved recording the listen row says so and offers nothing to play',
+    listenBefore.toggles === 0 && /音声準備中/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
+      !/device voice|端末の声|F1/u.test(listenBefore.note),
+    JSON.stringify(listenBefore));
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
