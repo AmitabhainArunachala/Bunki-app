@@ -2874,13 +2874,14 @@ async function main() {
       backProbe.row[11] === Date.parse(backProbe.rec.due),
     `t=${backProbe.row[0]} (raw, before the anchor) · elapsed=${backProbe.row[4]}`);
 
-  // (e) bounded standard review: 25 overdue cards + 3 started fresh rows;
-  // an ordinary sitting freezes 20 and says あと N on the goodbye screen.
+  // (e) the number is the truth (card-system slice 1, replacing the 20-card freeze): 25
+  // overdue cards + 3 started fresh rows. The button, the three counts and the session are
+  // one queue — the sitting serves every card the button counted, and says done after them.
   // Let the clamp probe's observation settle before importing the next fixture.
   await page.waitForTimeout(1400);
-  // 25 overdue + 3 started fresh: real N5 core words (the fixture and the zero-new probe below share them)
+  // 25 overdue + 3 started fresh: real N5 core words (the fixture and the pacing probe below share them)
   const R2A_WORDS = ["お兄さん", "お姉さん", "お弁当", "お手洗い", "お母さん", "お父さん", "お皿", "お腹", "お茶", "お菓子", "お酒", "お金", "お風呂", "ご飯", "一", "一つ", "一人", "一日", "一昨年", "一昨日", "一月", "一番", "一緒", "七", "七つ", "万", "万年筆", "丈夫"];
-  await restoreAppFixture(page, await page.evaluate(`(() => {
+  const r2aFixture = () => page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
     const taken = [];
@@ -2895,67 +2896,91 @@ async function main() {
     }
     for (const id of WORDS.slice(25)) taken.push({ t: 'word', id, label: id, ts: T - 9e5, started: T - 9e5 });
     return { v: 1, taken, srs };
-  })()`));
+  })()`);
+  await restoreAppFixture(page, await r2aFixture());
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
-  const boundedBtn = await page.locator('#review-start').textContent();
+  const truthBtn = await page.locator('#review-start').textContent();
+  const truthCounts = await page.evaluate(`[...document.querySelectorAll('#deck-counts .deck-count-n')].map((n) => Number(n.textContent))`);
   await tap(page, '#review-start');
   await page.waitForSelector('#reveal');
   const session = await page.evaluate(`window.__KAIRO_SRS__.session()`);
-  check('R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest',
-    /28/.test(boundedBtn) && session.queue === 20 && session.deferred === 8,
-    `button "${boundedBtn.trim()}" · frozen ${session.queue} · deferred ${session.deferred}`);
-  for (let i = 0; i < 20; i++) {
+  const truthN = Number((truthBtn.match(/[0-9]+/) || ['-1'])[0]);
+  check('R2-A · the button, the three counts and the sitting are one number (28), nothing frozen',
+    truthN === 28 && truthCounts.reduce((a, b) => a + b, 0) === 28 && session.queue === truthN && session.deferred === 0,
+    `button "${truthBtn.trim()}" · counts ${truthCounts.join('/')} · session ${session.queue} · held ${session.deferred}`);
+  for (let i = 0; i < truthN; i++) {
     await page.waitForSelector('#reveal', { timeout: 8000 });
     await page.evaluate(`document.querySelector('#reveal')?.click()`);
     await page.waitForSelector('.grade.g-easy', { timeout: 8000 });
     await page.evaluate(`document.querySelector('.grade.g-easy')?.click()`);
     await waitForAppRecord(page, (record) => record.revlog?.length === i + 1,
-      { description: 'committed bounded-review grade' });
+      { description: 'committed review grade' });
   }
-  await page.waitForSelector('.review-deferred');
-  const boundedEnd = await page.evaluate(`(() => ({
+  await page.waitForSelector('.close-doors');
+  const truthEnd = await page.evaluate(`(() => ({
     title: document.querySelector('.view-title')?.textContent ?? '',
-    deferredLine: document.querySelector('.review-deferred')?.textContent ?? '',
+    held: document.querySelectorAll('.review-deferred').length,
+    reveal: document.querySelectorAll('#reveal').length,
   }))()`);
-  check('R2-A · the goodbye screen carries the honest remainder — あと N, quietly',
-    /20/.test(boundedEnd.title) && /8/.test(boundedEnd.deferredLine),
-    `"${boundedEnd.title}" · "${boundedEnd.deferredLine}"`);
+  check('R2-A · the sitting says done after exactly the counted cards, with nothing held back',
+    /28/.test(truthEnd.title) && truthEnd.held === 0 && truthEnd.reveal === 0,
+    JSON.stringify(truthEnd));
   await shoot(page, shotsDir, '20-r2a-bounded-summary');
 
   // (f) ペース: the learner's own numbers persist, hold their bounds, and
-  // rule the queue after a full reboot
-  await page.locator('button.take').first().click();
+  // rule today's queue after a full reboot — reviews a day caps the button
+  await restoreAppFixture(page, await r2aFixture());
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
   await page.waitForSelector('#srs-prefs-toggle');
   await page.locator('#srs-prefs-toggle').click();
-  await page.waitForSelector('[data-pref-down="reviewLimit"]');
-  for (let i = 0; i < 2; i++) {
-    await page.locator('[data-pref-down="reviewLimit"]').click(); // 20 → 10
-    await page.waitForTimeout(160);
-  }
-  for (let i = 0; i < 4; i++) {
-    await page.locator('[data-pref-down="newPerDay"]').click(); // 20 → 0
-    await page.waitForTimeout(160);
-  }
+  await page.waitForSelector('[data-pref-down="reviewsPerDay"]');
+  // each press waits for its own committed number before the next, so no press lands on a
+  // stepper still disabled by the previous commit
+  const stepDown = async (key, times) => {
+    for (let i = 0; i < times; i++) {
+      const before = await page.locator(`[data-pref-val="${key}"]`).textContent();
+      await page.locator(`[data-pref-down="${key}"]`).click();
+      await page.waitForFunction(({ key, before }) =>
+        document.querySelector(`[data-pref-val="${key}"]`)?.textContent !== before, { key, before });
+      if (i + 1 < times) {
+        await page.waitForFunction((key) => !document.querySelector(`[data-pref-down="${key}"]`)?.disabled, key);
+      }
+    }
+  };
+  await stepDown('reviewsPerDay', 11); // 200 → 150 → 100 → 90 … → 10
+  await stepDown('newPerDay', 4); // 20 → 0
   const prefsStored = await evaluateAppRecord(page,
     `record.srsPrefs`,
   );
-  const minusDisabled = await page.evaluate(
-    `document.querySelector('[data-pref-down="newPerDay"]').disabled`,
-  );
-  check('R2-A · ペース persists the learner\'s numbers and holds its bounds',
-    prefsStored.reviewLimit === 10 && prefsStored.newPerDay === 0 && minusDisabled === true,
-    `stored ${JSON.stringify(prefsStored)} · minus disabled at 0`);
+  const stepBounds = await page.evaluate(`({
+    newMinus: document.querySelector('[data-pref-down="newPerDay"]').disabled,
+    reviewsMinus: document.querySelector('[data-pref-down="reviewsPerDay"]').disabled,
+    now: document.querySelector('#srs-preset-now')?.textContent ?? '',
+  })`);
+  check('R2-A · ペース persists the learner\'s numbers, holds its bounds, and calls it Custom',
+    prefsStored.reviewsPerDay === 10 && prefsStored.newPerDay === 0 && prefsStored.preset === 'custom:standard' &&
+      stepBounds.newMinus === true && stepBounds.reviewsMinus === true && /Custom|カスタム/.test(stepBounds.now),
+    `stored ${JSON.stringify(prefsStored)} · ${JSON.stringify(stepBounds)}`);
   await shoot(page, shotsDir, '21-r2a-pace-settings');
   await open('?entry=shelf');
   const prefsAfterReload = await page.evaluate(`window.__KAIRO_SRS__.prefs()`);
+  const todayAfterReload = await page.evaluate(`window.__KAIRO_SRS__.today()`);
   const dueWithZeroNew = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
-  check('R2-A · the chosen pacing survives reboot and rules the queue',
-    prefsAfterReload.newPerDay === 0 && prefsAfterReload.reviewLimit === 10 &&
-      dueWithZeroNew.length === 5 && !dueWithZeroNew.some((k) => R2A_WORDS.slice(25).map((w) => 'word:' + w).includes(k)),
-    `prefs ${JSON.stringify(prefsAfterReload)} · ${dueWithZeroNew.length} due, no fresh admitted`);
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  const cappedBtn = await page.locator('#review-start').textContent();
+  check('R2-A · the chosen pacing survives reboot and rules today\'s queue',
+    prefsAfterReload.newPerDay === 0 && prefsAfterReload.reviewsPerDay === 10 &&
+      todayAfterReload.review === 10 && todayAfterReload.new === 0 && todayAfterReload.held === 15 &&
+      /(^|[^0-9])10([^0-9]|$)/.test(cappedBtn) &&
+      dueWithZeroNew.length === 25 && !dueWithZeroNew.some((k) => R2A_WORDS.slice(25).map((w) => 'word:' + w).includes(k)),
+    `prefs ${JSON.stringify(prefsAfterReload)} · today ${JSON.stringify(todayAfterReload)} · "${cappedBtn.trim()}"`);
   check('R2-A · the probes leave no console errors',
     consoleErrors.length === errsBeforeR2A,
     consoleErrors.slice(errsBeforeR2A).join(' | ') || 'clean');

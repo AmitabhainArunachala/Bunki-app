@@ -541,11 +541,12 @@ const S = {
   /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
    * from the first graded card onward; nothing is backfilled or invented */
   stats: {},
-  /** the learner's own review pacing (R2-A): how many never-seen cards a day
-   * may introduce, and how many due cards one ordinary sitting holds. Both
-   * are learner-chosen on the lists surface, persisted, and validated
-   * fail-closed like every other root. */
-  srsPrefs: { newPerDay: 20, reviewLimit: 20 },
+  /** the learner's own review pacing (R2-A, card-system slice 1): how many
+   * never-seen cards and how many reviews a day, the desired retention, the
+   * preset they came from, and an optional pause every N cards. Chosen on the
+   * lists surface, persisted, and validated fail-closed like every other root;
+   * an absent field reads as the Standard preset's value. */
+  srsPrefs: { newPerDay: 20 },
   /** whether the quiet ペース row on the lists surface is unfolded */
   srsPrefsOpen: false,
   /** articles marked finished: { passageId: ts } */
@@ -819,7 +820,11 @@ function validObservationRow(row) {
   if (row[1] === 'params') {
     // R3-D · the scheduler-parameter note: [t, 'params', 'fsrs', reason] —
     // a stored learner parameter set could not drive the scheduler, and why
-    return row.length === 4 && row[2] === 'fsrs' && nonEmptyString(row[3]);
+    if (row[2] === 'fsrs') return row.length === 4 && nonEmptyString(row[3]);
+    // card-system slice 1 · the learner's schedule policy from t on:
+    // [t, 'params', 'schedule', requestRetention, learningSteps] — written when a
+    // preset changes either, so a replay knows which policy priced each due date
+    return row.length === 5 && row[2] === 'schedule' && validRetention(row[3]) && validLearningSteps(row[4]);
   }
   if (row[1] === 'reveal') return row.length === 4 && [0, 1].includes(row[3]);
   if (row[1] === 'lesson') {
@@ -1179,23 +1184,78 @@ function validAiConfig(config) {
   );
 }
 
-/** Review pacing the learner may choose (R2-A). The bounds are part of the
+/** Review pacing the learner may choose (R2-A, card-system slice 1). The bounds are part of the
  * envelope's fail-closed contract, so the validator and the ペース surface
  * read the same numbers and can never drift apart. */
 const NEW_PER_DAY_DEFAULT = 20;
-const NEW_PER_DAY_MAX = 50;
-const REVIEW_LIMIT_DEFAULT = 20;
+const NEW_PER_DAY_MAX = 500;
+const REVIEWS_PER_DAY_DEFAULT = 200;
+const REVIEWS_PER_DAY_MIN = 10;
+const REVIEWS_PER_DAY_MAX = 9999;
+const RETENTION_MIN = 0.8;
+const RETENTION_MAX = 0.95;
+/* reviewLimit was the per-sitting freeze until slice 1. It is now inert: a record that carries
+ * it stays valid, and nothing reads it. The optional break is pauseEvery (off unless set). */
 const REVIEW_LIMIT_MIN = 5;
 const REVIEW_LIMIT_MAX = 100;
+const PAUSE_EVERY_MIN = 5;
+const PAUSE_EVERY_MAX = 100;
+/** The three presets (card-system spec §4). A preset is a starting point: any manual change
+ * turns it into 'custom:<base>'. newPerDay, reviewsPerDay, retention and learningSteps drive the
+ * queue and the scheduler today; `later` holds the rest of §4 for the slices that wire it
+ * (buttons, leech action, skills, faces, English, furigana, answer mode, audio, sentence length,
+ * MCD share, unknowns per sentence, new/review mix, review sort). */
+const SRS_PRESETS = {
+  gentle: {
+    ja: 'やさしい', en: 'Gentle', newPerDay: 10, reviewsPerDay: 100, retention: 0.85,
+    learningSteps: ['10m'], relearningSteps: ['10m'],
+    later: { buttons: 2, leech: { lapses: 8, action: 'offer-rest' }, order: { mix: 'mixed', reviewSort: 'due' },
+      skills: ['recog'], faces: ['R1', 'R2', 'R5'], english: 'on', furiganaFront: 'all', answerMode: 'think',
+      audio: { back: 'auto' }, sentenceLength: 'short', mcdShare: 0, unknownsAllowed: 0 },
+  },
+  standard: {
+    ja: 'ふつう', en: 'Standard', newPerDay: 20, reviewsPerDay: 200, retention: 0.9,
+    learningSteps: ['1m', '10m'], relearningSteps: ['10m'],
+    later: { buttons: 4, leech: { lapses: 8, action: 'tag' }, order: { mix: 'mixed', reviewSort: 'due' },
+      skills: ['recog', 'listen', 'produce'],
+      faces: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'L1', 'L2', 'L3', 'P1', 'P2', 'P3', 'P5', 'P6'],
+      english: 'back', furiganaFront: 'unknown', answerMode: 'mixed', audio: { front: 'listen', back: 'auto' },
+      sentenceLength: 'medium', mcdShare: 0.25, unknownsAllowed: 1 },
+  },
+  hardcore: {
+    ja: '本気', en: 'Hardcore', newPerDay: 30, reviewsPerDay: REVIEWS_PER_DAY_MAX, retention: 0.9,
+    learningSteps: ['1m', '10m'], relearningSteps: ['10m'],
+    later: { buttons: 2, leech: { lapses: 5, action: 'suspend' }, order: { mix: 'reviews-first', reviewSort: 'due-then-retrievability' },
+      skills: ['recog', 'listen', 'produce', 'write'], faces: 'all', mainProduceFace: 'P2', english: 'off',
+      furiganaFront: 'none', answerMode: 'type', audio: { front: 'auto' }, sentenceLength: 'long', mcdShare: 0.75,
+      unknownsAllowed: 2 },
+  },
+};
+const SRS_PRESET_IDS = Object.keys(SRS_PRESETS);
 const validNewPerDay = (value) => Number.isInteger(value) && value >= 0 && value <= NEW_PER_DAY_MAX;
+const validReviewsPerDay = (value) =>
+  Number.isInteger(value) && value >= REVIEWS_PER_DAY_MIN && value <= REVIEWS_PER_DAY_MAX;
+const validRetention = (value) => finiteNumber(value) && value >= RETENTION_MIN && value <= RETENTION_MAX;
+const validPreset = (value) =>
+  typeof value === 'string' && SRS_PRESET_IDS.some((id) => value === id || value === `custom:${id}`);
 const validReviewLimit = (value) =>
   Number.isInteger(value) && value >= REVIEW_LIMIT_MIN && value <= REVIEW_LIMIT_MAX;
+/** Learning steps a schedule row may name: one to four steps, each under a day (Anki's FSRS advice). */
+const validLearningSteps = (value) =>
+  Array.isArray(value) && value.length >= 1 && value.length <= 4 &&
+  value.every((step) => typeof step === 'string' && /^([1-9][0-9]?m|([1-9]|1[0-9]|2[0-3])h)$/u.test(step));
+const validPauseEvery = (value) =>
+  value === null || (Number.isInteger(value) && value >= PAUSE_EVERY_MIN && value <= PAUSE_EVERY_MAX);
 
 function validSrsPrefs(prefs) {
   return (
     plainRecord(prefs) &&
     safeJsonValue(prefs) &&
     optional(prefs, 'newPerDay', validNewPerDay) &&
+    optional(prefs, 'reviewsPerDay', validReviewsPerDay) &&
+    optional(prefs, 'retention', validRetention) &&
+    optional(prefs, 'preset', validPreset) &&
+    optional(prefs, 'pauseEvery', validPauseEvery) &&
     optional(prefs, 'reviewLimit', validReviewLimit)
   );
 }
@@ -1267,6 +1327,8 @@ function validStats(stats) {
       optional(value, 'n', finiteNumber) &&
       optional(value, 'again', finiteNumber) &&
       optional(value, 'nnew', finiteNumber) &&
+      // card-system slice 1 · today only: raise the limit — extra reviews granted for that day
+      optional(value, 'extra', (extra) => Number.isInteger(extra) && extra >= 0) &&
       safeJsonValue(value)
     );
   });
@@ -1515,6 +1577,10 @@ function hydrateStore(s) {
   if (plainRecord(s.stats)) S.stats = s.stats;
   if (plainRecord(s.srsPrefs)) {
     if (validNewPerDay(s.srsPrefs.newPerDay)) S.srsPrefs.newPerDay = s.srsPrefs.newPerDay;
+    if (validReviewsPerDay(s.srsPrefs.reviewsPerDay)) S.srsPrefs.reviewsPerDay = s.srsPrefs.reviewsPerDay;
+    if (validRetention(s.srsPrefs.retention)) S.srsPrefs.retention = s.srsPrefs.retention;
+    if (validPreset(s.srsPrefs.preset)) S.srsPrefs.preset = s.srsPrefs.preset;
+    if (owns(s.srsPrefs, 'pauseEvery') && validPauseEvery(s.srsPrefs.pauseEvery)) S.srsPrefs.pauseEvery = s.srsPrefs.pauseEvery;
     if (validReviewLimit(s.srsPrefs.reviewLimit)) S.srsPrefs.reviewLimit = s.srsPrefs.reviewLimit;
     // the learner's fitted weights ride verbatim — validity is judged where
     // the scheduler is built (srsParamsProblem), never by dropping bytes here
@@ -1588,11 +1654,15 @@ function publishRecordSnapshot(snapshot) {
   S.storeVersion = next.v;
   const before = publishedRecord;
   const effective = { ...DEFAULT_LEARNER_RECORD, ...next };
+  let schedulePrefsChanged = false;
   for (const key of STORE_KNOWN_KEYS) {
     if (key === 'v' || key === 'ai') continue;
     if (before && canonicalRecordJson(before[key]) === canonicalRecordJson(next[key])) continue;
     let value = JSON.parse(JSON.stringify(effective[key]));
-    if (key === 'srsPrefs') value = { ...DEFAULT_LEARNER_RECORD.srsPrefs, ...value };
+    if (key === 'srsPrefs') {
+      value = { ...DEFAULT_LEARNER_RECORD.srsPrefs, ...value };
+      schedulePrefsChanged = true;
+    }
     if (key === 'dials') {
       value = { ...DEFAULT_LEARNER_RECORD.dials, ...value };
       if (S.dialsUrlOverride) { S.dialsStored = value; continue; }
@@ -1600,6 +1670,8 @@ function publishRecordSnapshot(snapshot) {
     S[key] = value;
   }
   S.storeExtras = Object.fromEntries(Object.entries(next).filter(([key]) => !STORE_KNOWN_KEYS.includes(key)));
+  // a retention or preset change reaches the scheduler the moment the record commits it
+  if (schedulePrefsChanged) syncSrsScheduler();
   publishedRecord = next;
   publishedNoteSnapshot = noteSnapshot;
   refreshRecordNotesSurface();
@@ -4008,20 +4080,7 @@ async function boot() {
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
-    // R3-D · the learner's own fitted weights (srsPrefs.fsrs, written by the
-    // import door from a tools/fsrs-optimize.mjs run) drive the scheduler
-    // when — and only when — they pass the fail-closed gate srsParamsProblem.
-    // Anything else is IGNORED: the pinned defaults rule, nothing crashes,
-    // and one quiet obslog row says why. Everything but the weight vector
-    // stays the pin's (fuzz OFF, retention, steps): one scheduler policy.
-    const fitted = S.srsPrefs?.fsrs;
-    const fittedProblem = fitted === undefined ? 'absent' : srsParamsProblem(fitted);
-    if (fitted !== undefined && fittedProblem) noteIgnoredSrsParams(fittedProblem);
-    srsCustom = fittedProblem
-      ? null
-      : { source: fitted.source ?? null, basedOnReviews: fitted.basedOnReviews ?? null };
-    srsParams = fsrsApi.generatorParameters(pinnedSchedulerInput(pin, srsCustom ? fitted.w.slice() : null));
-    scheduler = fsrsApi.fsrs(srsParams);
+    buildSrsScheduler(pin, true);
   } catch (err) {
     console.warn('FSRS unavailable', err);
   }
@@ -8996,11 +9055,86 @@ function renderEntry(main) {
 }
 
 /* ペース — the learner's own review pacing, folded away until asked for (the
- * dials idiom): how many never-seen cards a day may introduce (0–50) and how
- * many due cards one ordinary sitting holds (5–100). Persisted as srsPrefs in
- * the envelope, validated fail-closed like every other root. LEECH_LAPSES
- * stays a constant — the rest offer is a design law, not a preference. */
+ * dials idiom). Card-system slice 1: three presets up top (spec §4), each one
+ * plain line on what it does, then the two numbers that rule today's queue —
+ * new cards a day (0–500) and reviews a day (10–9999, 9999 = no cap) — and the
+ * optional break every N cards (off by default). Any manual number turns the
+ * preset into "Custom (from X)". Persisted as srsPrefs in the envelope,
+ * validated fail-closed like every other root. LEECH_LAPSES stays a constant
+ * here — the leech settings are a later slice. */
 const srsPrefsPending = new Set();
+const SRS_PRESET_LINES = {
+  gentle: ['疲れた日・再開の日に。新規 10・復習 100／日・ステップ 10分・保持率 85%',
+    'For tired or returning days: 10 new, 100 reviews a day, one 10-min step, 85% recall.'],
+  standard: ['Anki の標準。新規 20・復習 200／日・ステップ 1分 10分・保持率 90%',
+    "Anki's own defaults: 20 new, 200 reviews a day, steps 1m 10m, 90% recall."],
+  hardcore: ['AJATT 流、全力。新規 30・期日の札はすべて・ステップ 1分 10分・保持率 90%・復習が先',
+    'All in, AJATT-style: 30 new, every due review, steps 1m 10m, 90% recall, reviews before new.'],
+};
+/** Which preset the record is on: { base, custom, label }. A record that never chose reads as
+ * Standard — or Custom (from Standard) when its own numbers already differ from Standard's. */
+function srsPresetState(prefs = S.srsPrefs) {
+  if (validPreset(prefs?.preset)) {
+    return { base: prefs.preset.replace(/^custom:/u, ''), custom: prefs.preset.startsWith('custom:'), label: prefs.preset };
+  }
+  const std = SRS_PRESETS.standard;
+  const custom = (validNewPerDay(prefs?.newPerDay) && prefs.newPerDay !== std.newPerDay) ||
+    (validReviewsPerDay(prefs?.reviewsPerDay) && prefs.reviewsPerDay !== std.reviewsPerDay) ||
+    (validRetention(prefs?.retention) && prefs.retention !== std.retention);
+  return { base: 'standard', custom, label: custom ? 'custom:standard' : 'standard' };
+}
+/** The number a pacing key holds in a record (absent → the Standard default). */
+function srsPrefValue(prefs, key) {
+  if (key === 'newPerDay') return validNewPerDay(prefs?.newPerDay) ? prefs.newPerDay : NEW_PER_DAY_DEFAULT;
+  if (key === 'reviewsPerDay') return validReviewsPerDay(prefs?.reviewsPerDay) ? prefs.reviewsPerDay : REVIEWS_PER_DAY_DEFAULT;
+  return Number.isInteger(prefs?.pauseEvery) && validPauseEvery(prefs.pauseEvery) ? prefs.pauseEvery : null;
+}
+/** The stepper ladders: fine steps where the numbers are small, then the 9999 "no cap". */
+const SRS_PREF_LADDERS = {
+  newPerDay: Array.from({ length: NEW_PER_DAY_MAX / 5 + 1 }, (_, i) => i * 5),
+  reviewsPerDay: [
+    ...Array.from({ length: 10 }, (_, i) => (i + 1) * 10),
+    ...Array.from({ length: 8 }, (_, i) => 150 + i * 50),
+    ...Array.from({ length: 5 }, (_, i) => 600 + i * 100),
+    REVIEWS_PER_DAY_MAX,
+  ],
+  pauseEvery: [null, ...Array.from({ length: 10 }, (_, i) => (i + 1) * 10)],
+};
+function srsPrefStep(key, value, direction) {
+  const ladder = SRS_PREF_LADDERS[key];
+  const rank = (v) => (v === null ? -1 : v);
+  if (direction > 0) return ladder.find((v) => rank(v) > rank(value)) ?? value;
+  const lower = ladder.filter((v) => rank(v) < rank(value));
+  return lower.length ? lower[lower.length - 1] : value;
+}
+/** One preset press: its numbers and retention into srsPrefs, and — when the schedule policy
+ * (retention or learning steps) changes — one params row in the same commit, so a replay knows
+ * which policy priced every later due date. The scheduler rebuilds when the record publishes. */
+async function chooseSrsPreset(id) {
+  const preset = SRS_PRESETS[id];
+  if (!preset || srsPrefsPending.has('preset') || !recordWritable() || !D.pin) return false;
+  const epoch = recordEpoch;
+  srsPrefsPending.add('preset');
+  try {
+    return await commitStorePatch((latest) => {
+      const prefs = latest.srsPrefs || {};
+      const next = { ...prefs, preset: id, newPerDay: preset.newPerDay, reviewsPerDay: preset.reviewsPerDay, retention: preset.retention };
+      const before = srsSchedulePolicy(D.pin, prefs);
+      const after = srsSchedulePolicy(D.pin, next);
+      const policyChanged = before.retention !== after.retention ||
+        JSON.stringify(before.learningSteps) !== JSON.stringify(after.learningSteps);
+      return {
+        srsPrefs: next,
+        ...(policyChanged
+          ? { obslog: [...(latest.obslog || []), [Date.now(), 'params', 'schedule', after.retention, after.learningSteps]] }
+          : {}),
+      };
+    });
+  } finally {
+    srsPrefsPending.delete('preset');
+    if (recordReady(epoch) && S.view === 'tray') render();
+  }
+}
 function renderSrsPrefs(main) {
   const toggle = el('button', 'details-toggle');
   toggle.type = 'button';
@@ -9014,18 +9148,48 @@ function renderSrsPrefs(main) {
   main.append(toggle);
   if (!S.srsPrefsOpen) return;
   const rows = el('div', 'srs-prefs');
-  const stepper = (labelJa, labelEn, key, value, min, max, step) => {
+  rows.id = 'srs-prefs';
+  const state = srsPresetState();
+  const presets = el('div', 'srs-presets');
+  presets.setAttribute('role', 'group');
+  presets.setAttribute('aria-label', tx('プリセット', 'presets'));
+  for (const id of SRS_PRESET_IDS) {
+    const preset = SRS_PRESETS[id];
+    const btn = el('button', 'srs-preset');
+    btn.type = 'button';
+    btn.dataset.preset = id;
+    btn.setAttribute('aria-pressed', String(state.base === id && !state.custom));
+    btn.disabled = srsPrefsPending.size > 0 || !recordWritable();
+    btn.append(withEn(el('span', 'srs-preset-name', preset.ja), preset.en, 'en-inline'),
+      el('span', 'srs-preset-line', tx(...SRS_PRESET_LINES[id])));
+    btn.addEventListener('click', () => chooseSrsPreset(id));
+    presets.append(btn);
+  }
+  rows.append(presets);
+  const base = SRS_PRESETS[state.base];
+  const now = el('p', 'srs-preset-now');
+  now.id = 'srs-preset-now';
+  now.textContent = state.custom
+    ? tx(`いま — カスタム（${base.ja}から）`, `now — Custom (from ${base.en})`)
+    : tx(`いま — ${base.ja}`, `now — ${base.en}`);
+  rows.append(now);
+  const stepper = (labelJa, labelEn, key) => {
+    const value = srsPrefValue(S.srsPrefs, key);
     const row = el('div', 'srs-pref-row');
     row.append(withEn(el('span', 'srs-pref-name', labelJa), labelEn, 'en-inline'));
-    const commit = async (delta) => {
+    const commit = async (direction) => {
       if (srsPrefsPending.has(key) || !recordWritable()) return;
       const epoch = recordEpoch;
       srsPrefsPending.add(key);
       minus.disabled = plus.disabled = true;
       try {
-        await commitStorePatch((latest) => ({
-          srsPrefs: { ...latest.srsPrefs, [key]: Math.min(max, Math.max(min, latest.srsPrefs[key] + delta)) },
-        }));
+        await commitStorePatch((latest) => {
+          const prefs = latest.srsPrefs || {};
+          const next = { ...prefs, [key]: srsPrefStep(key, srsPrefValue(prefs, key), direction) };
+          // a hand-set number is a custom schedule; the break is not part of any preset
+          if (key !== 'pauseEvery') next.preset = `custom:${srsPresetState(prefs).base}`;
+          return { srsPrefs: next };
+        });
       } finally {
         srsPrefsPending.delete(key);
         if (recordReady(epoch) && S.view === 'tray') render();
@@ -9034,22 +9198,24 @@ function renderSrsPrefs(main) {
     const minus = el('button', 'rest-toggle srs-pref-step', '−');
     minus.type = 'button';
     minus.dataset.prefDown = key;
-    minus.disabled = value <= min || srsPrefsPending.has(key);
+    minus.disabled = srsPrefStep(key, value, -1) === value || srsPrefsPending.has(key);
     minus.setAttribute('aria-label', tx(`${labelJa} を減らす`, `lower ${labelEn}`));
-    minus.addEventListener('click', () => commit(-step));
-    const val = el('span', 'srs-pref-val', String(value));
+    minus.addEventListener('click', () => commit(-1));
+    const shown = value === null ? tx('なし', 'off') : value === REVIEWS_PER_DAY_MAX ? tx('上限なし', 'no cap') : String(value);
+    const val = el('span', 'srs-pref-val', shown);
     val.dataset.prefVal = key;
     const plus = el('button', 'rest-toggle srs-pref-step', '＋');
     plus.type = 'button';
     plus.dataset.prefUp = key;
-    plus.disabled = value >= max || srsPrefsPending.has(key);
+    plus.disabled = srsPrefStep(key, value, 1) === value || srsPrefsPending.has(key);
     plus.setAttribute('aria-label', tx(`${labelJa} を増やす`, `raise ${labelEn}`));
-    plus.addEventListener('click', () => commit(step));
+    plus.addEventListener('click', () => commit(1));
     row.append(minus, val, plus);
     rows.append(row);
   };
-  stepper('新規 / 日', 'new cards a day', 'newPerDay', srsNewPerDay(), 0, NEW_PER_DAY_MAX, 5);
-  stepper('一回の枚数', 'cards a sitting', 'reviewLimit', srsReviewLimit(), REVIEW_LIMIT_MIN, REVIEW_LIMIT_MAX, 5);
+  stepper('新規 / 日', 'new a day', 'newPerDay');
+  stepper('復習 / 日', 'reviews a day', 'reviewsPerDay');
+  stepper('一息', 'pause every', 'pauseEvery');
   // R3-D · when the learner's own fitted weights rule the scheduler, this
   // fold — the scheduler-preferences surface — names it quietly, with the
   // honest basis. The raw parameter-set slug stays in exports/debug.
@@ -9773,24 +9939,43 @@ function renderTray(main) {
   );
   // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
-    const due = srsDueItems();
+    // card-system slice 1 · the number is the truth: the button, the three counts and every
+    // deck row read todayQueue, the same function the session serves
+    const today = todayQueue();
+    const due = today.order;
     const f = srsForecast();
     // the two lines must tell one story: when nothing is due at this moment
     // but cards still ripen before midnight, the quiet door says "right now"
     // and the forecast's first bucket says WHEN — never a flat 予定なし
-    // sitting directly above a bare 今日 2
-    const laterToday = !due.length && f.today > 0;
+    // sitting directly above a bare 今日 2. Cards held back by the day's
+    // limit are not "later today": the door says the limit is met.
+    const capped = !due.length && today.held > 0;
+    const laterToday = !due.length && !capped && f.today > 0;
     const btn = biLabel(
       'button',
       due.length ? 'take review-start' : 'take review-start quiet',
-      due.length ? `復習する — ${due.length} 件` : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
-      due.length ? `review now — ${due.length} due` : laterToday ? 'nothing due right now' : 'nothing due yet',
+      due.length
+        ? `復習する — ${due.length} 件`
+        : capped ? '復習する — 今日の上限まで済んだ' : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
+      due.length
+        ? `review now — ${due.length} due`
+        : capped ? "today's limit reached" : laterToday ? 'nothing due right now' : 'nothing due yet',
     );
     btn.type = 'button';
     btn.id = 'review-start';
     btn.disabled = !due.length;
-    btn.addEventListener('click', startReview);
-    main.append(deckCounts(due), btn);
+    btn.addEventListener('click', () => startReview());
+    main.append(deckCounts(today), btn);
+    if (today.held) {
+      main.append(
+        el(
+          'p',
+          'srs-forecast srs-held',
+          tx(`あと ${today.held} 件は明日へ — 今日の上限（1日 ${srsReviewsPerDay()} 件）`,
+            `${today.held} more due, held back by today's limit (${srsReviewsPerDay()} a day)`),
+        ),
+      );
+    }
     if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
       // 未着手 appears only when no-debt rows exist: the backlog is named,
       // never hidden and never turned into due cards by anyone but the learner
@@ -9823,7 +10008,7 @@ function renderTray(main) {
         ),
       );
     }
-    renderDeckTable(main, due);
+    renderDeckTable(main, today);
     renderDeckDoors(main);
     renderSrsPrefs(main);
     // one layer of the tutor's testing — absent without a key, and folded
@@ -10030,8 +10215,8 @@ function renderTray(main) {
     });
     head.append(openList);
     if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'named list' : 'auto · monthly'));
-    // the filtered deck, one tap wide: review only what is due in this list
-    const dueHere = sec.items.filter((i) => dueKeys.has(srsKey(i.t, i.id)));
+    // the filtered deck, one tap wide: review only what today serves in this list
+    const dueHere = scheduler ? todayQueue(new Date(), sec.items).order : [];
     if (dueHere.length && scheduler) {
       const only = el('button', 'chip list-review', tx(`この組だけ ${dueHere.length}`, `just these — ${dueHere.length}`));
       only.type = 'button';
@@ -10326,7 +10511,7 @@ function renderListPage(main) {
   );
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   const ops = el('div', 'list-page-ops');
-  const dueHere = items.filter((i) => dueKeys.has(srsKey(i.t, i.id)));
+  const dueHere = scheduler ? todayQueue(new Date(), items).order : [];
   if (dueHere.length && scheduler) {
     const only = el('button', 'chip list-review', tx(`この組だけ復習 — ${dueHere.length}`, `review just these — ${dueHere.length}`));
     only.type = 'button';
@@ -17453,7 +17638,7 @@ function renderKanjiReadingPractice(main, context, state, entry) {
   if (item) {
     const button = biLabel('button', 'chip', 'この読みを復習する', 'review this reading');
     button.type = 'button'; button.id = 'sentence-review-start';
-    button.disabled = !recordWritable() || !srsDueItems().some(row => row.t === 'sentence' && row.id === item.id);
+    button.disabled = !recordWritable() || !todayQueue(new Date(), [item]).order.length;
     button.addEventListener('click', () => { if (preserveVisibleDrafts()) startReview([item]); });
     main.append(el('p', 'teacher-note', srsWhen(item)), button);
   } else main.append(el('p', 'teacher-note', tx('この札は復習から外れている。出典と前の記録は残っている。',
@@ -17543,7 +17728,7 @@ function renderSentencePractice(main) {
     const section = el('section', 'sentence-practice-section');
     section.append(el('h2', '', tx('元の語句を思い出す', 'Recall the original phrase')), preview);
     if (item) {
-      const due = srsDueItems().some((row) => row.t === 'sentence' && row.id === item.id);
+      const due = todayQueue(new Date(), [item]).order.length > 0;
       const review = biLabel('button', 'chip', 'この札を復習する', 'review this card'); review.type = 'button'; review.id = 'sentence-review-start';
       review.disabled = !due || !recordWritable();
       review.addEventListener('click', () => { if (preserveVisibleDrafts()) startReview([item]); });
@@ -18557,11 +18742,12 @@ function srsCardOf(item, now) {
   return c;
 }
 /** The scheduler policy the pin declares, with the learner's fitted weights when they passed the
- * gate. Kept as its own function so the reference verifier runs this exact construction. */
-function pinnedSchedulerInput(pin, fittedW = null) {
+ * gate and the learner's retention and learning steps when a preset chose them. Kept as its own
+ * function so the reference verifier runs this exact construction. */
+function pinnedSchedulerInput(pin, fittedW = null, policy = null) {
   return {
     w: fittedW || pin.w,
-    request_retention: pin.requestRetention,
+    request_retention: policy ? policy.retention : pin.requestRetention,
     maximum_interval: pin.maximumInterval,
     // One scheduler policy in both engines (ADR-003): fuzz is OFF, exactly
     // as the domain pin says. Any randomness inside the scheduler would
@@ -18570,9 +18756,50 @@ function pinnedSchedulerInput(pin, fittedW = null) {
     // session planning, where it changes presentation, not memory state.
     enable_fuzz: pin.enableFuzz,
     enable_short_term: pin.enableShortTerm,
-    learning_steps: pin.learningSteps,
+    learning_steps: policy ? policy.learningSteps : pin.learningSteps,
     relearning_steps: pin.relearningSteps,
   };
+}
+/** The learner's schedule choices the scheduler reads (card-system slice 1): desired retention
+ * from srsPrefs.retention and learning steps from the preset's base. Absent or invalid → the
+ * pin's own, so a record that never chose keeps exactly the pinned policy. */
+function srsSchedulePolicy(pin, prefs = S.srsPrefs) {
+  const base = validPreset(prefs?.preset) ? prefs.preset.replace(/^custom:/u, '') : null;
+  return {
+    retention: validRetention(prefs?.retention) ? prefs.retention : pin.requestRetention,
+    learningSteps: base ? SRS_PRESETS[base].learningSteps.slice() : pin.learningSteps.slice(),
+  };
+}
+/** Build (or rebuild) the one scheduler. R3-D · the learner's own fitted weights (srsPrefs.fsrs,
+ * written by the import door from a tools/fsrs-optimize.mjs run) drive it when — and only when —
+ * they pass the fail-closed gate srsParamsProblem. Anything else is IGNORED: the pinned defaults
+ * rule, nothing crashes, and one quiet obslog row says why (on boot only). Retention and learning
+ * steps are the learner's schedule policy; everything else stays the pin's (fuzz OFF, maximum
+ * interval, relearning steps): one scheduler policy, rebuilt in place when the policy changes. */
+function buildSrsScheduler(pin, boot = false) {
+  const fitted = S.srsPrefs?.fsrs;
+  const fittedProblem = fitted === undefined ? 'absent' : srsParamsProblem(fitted);
+  if (boot && fitted !== undefined && fittedProblem) noteIgnoredSrsParams(fittedProblem);
+  srsCustom = fittedProblem
+    ? null
+    : { source: fitted.source ?? null, basedOnReviews: fitted.basedOnReviews ?? null };
+  srsParams = fsrsApi.generatorParameters(
+    pinnedSchedulerInput(pin, srsCustom ? fitted.w.slice() : null, srsSchedulePolicy(pin)),
+  );
+  scheduler = fsrsApi.fsrs(srsParams);
+}
+/** Rebuild the scheduler when the record's schedule policy no longer matches the one in force —
+ * after a preset, an undo, an import, anything that rewrote srsPrefs. */
+function syncSrsScheduler() {
+  if (!fsrsApi || !srsParams || !D.pin) return false;
+  const want = srsSchedulePolicy(D.pin);
+  if (
+    srsParams.request_retention === want.retention &&
+    JSON.stringify(Array.from(srsParams.learning_steps)) === JSON.stringify(want.learningSteps)
+  )
+    return false;
+  buildSrsScheduler(D.pin);
+  return true;
 }
 function srsStoredRecord(card) {
   return {
@@ -18779,13 +19006,19 @@ async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
  * ペース), so a long list arrives as days of honest work instead of one
  * avalanche. The count of cards introduced today lives in S.stats[day].nnew,
  * written on a card's first grade and honoured across every session of the
- * day. */
+ * day. srsDueItems answers "is this card due"; how much of it TODAY serves is
+ * todayQueue below, the one source for every count and every session. */
 const srsNewPerDay = () =>
   validNewPerDay(S.srsPrefs?.newPerDay) ? S.srsPrefs.newPerDay : NEW_PER_DAY_DEFAULT;
-/** How many due cards one ordinary sitting freezes (PR70-P1-2). The timed
- * dojo keeps its own refill and never reads this. */
-const srsReviewLimit = () =>
-  validReviewLimit(S.srsPrefs?.reviewLimit) ? S.srsPrefs.reviewLimit : REVIEW_LIMIT_DEFAULT;
+/** Maximum reviews a day (card-system slice 1; Anki's default 200). */
+const srsReviewsPerDay = () =>
+  validReviewsPerDay(S.srsPrefs?.reviewsPerDay) ? S.srsPrefs.reviewsPerDay : REVIEWS_PER_DAY_DEFAULT;
+/** The optional break: pause every N graded cards; null = off (the default). The timed dojo
+ * never reads it. */
+const srsPauseEvery = () =>
+  Number.isInteger(S.srsPrefs?.pauseEvery) && validPauseEvery(S.srsPrefs.pauseEvery) ? S.srsPrefs.pauseEvery : null;
+/** Anki's learn-ahead limit: when nothing else waits, a learning card due within 20 minutes is served. */
+const SRS_LEARN_AHEAD_MS = 20 * 60000;
 /** How many pool items a dojo refill draws at once — session pacing only,
  * unrelated to the daily new-card cap. */
 const FOCUS_BATCH = 20;
@@ -18830,6 +19063,84 @@ function srsDueItems(now = new Date()) {
   const introducedToday = S.stats[dayKey(now)]?.nnew || 0;
   const room = Math.max(0, srsNewPerDay() - introducedToday);
   return [...reviews, ...fresh.slice(0, room)];
+}
+/** Review-state grades already given today (revlog stBefore = 2, undone rows excluded): what
+ * the day's review room has spent. */
+let srsDoneMemo = null;
+function srsReviewsDoneToday(now = new Date()) {
+  const today = dayKey(now);
+  const rows = S.revlog || [];
+  const memo = srsDoneMemo;
+  if (memo && memo.rows === rows && memo.length === rows.length && memo.day === today) return memo.n;
+  const revoked = new Set();
+  for (const row of rows) if (row[2] === 0) revoked.add(row[3]);
+  let n = 0;
+  rows.forEach((row, i) => {
+    if (row[2] >= 1 && row[3] === 2 && !revoked.has(i) && dayKey(new Date(row[0])) === today) n += 1;
+  });
+  srsDoneMemo = { rows, length: rows.length, day: today, n };
+  return n;
+}
+/** Today's queue, like Anki's (card-system spec §9): the ONE source for the home pill, the
+ * tray's button and three counts, every deck row and every session. Learning cards due now
+ * are all served; reviews are served up to the day's room (reviews a day, plus any "today
+ * only" raise, minus the reviews already given today), most overdue first; new cards fill
+ * what the daily new limit and the review room both leave (Anki: the review limit also caps
+ * new cards). A scope (one list) narrows the cards, never the room. `order` is the exact
+ * sequence a session serves; `held` counts the due reviews the room held back. Button and
+ * session read this at the same instant, so they cannot disagree. */
+function todayQueue(now = new Date(), scope = null) {
+  const inScope = Array.isArray(scope) ? new Set(scope.map((i) => srsKey(i.t, i.id))) : null;
+  const due = [];
+  const fresh = [];
+  const ahead = [];
+  const nowMs = now.getTime();
+  for (const item of S.taken) {
+    const key = srsKey(item.t, item.id);
+    if (S.suspended[key] || (inScope && !inScope.has(key))) continue;
+    const rec = S.srs[key];
+    if (!rec) {
+      if (finiteNumber(item.started)) fresh.push(item);
+      continue;
+    }
+    const dueMs = Date.parse(rec.due);
+    if (dueMs <= nowMs) due.push(item);
+    else if (rec.state !== 2 && dueMs <= nowMs + SRS_LEARN_AHEAD_MS) ahead.push(item);
+  }
+  // most overdue first, the scheduler key breaking ties — srsDueItems' own total order
+  const byDue = (a, b) => {
+    const keyA = srsKey(a.t, a.id);
+    const keyB = srsKey(b.t, b.id);
+    const dueA = Date.parse(S.srs[keyA].due);
+    const dueB = Date.parse(S.srs[keyB].due);
+    if (dueA !== dueB) return dueA - dueB;
+    return keyA < keyB ? -1 : keyA > keyB ? 1 : 0;
+  };
+  due.sort(byDue);
+  const day = dayKey(now);
+  const reviewRoom = Math.max(0, srsReviewsPerDay() + (S.stats[day]?.extra || 0) - srsReviewsDoneToday(now));
+  const learn = [];
+  const review = [];
+  const order = [];
+  let held = 0;
+  for (const item of due) {
+    if (S.srs[srsKey(item.t, item.id)].state !== 2) {
+      learn.push(item);
+      order.push(item);
+    } else if (review.length < reviewRoom) {
+      review.push(item);
+      order.push(item);
+    } else held += 1;
+  }
+  const newRoom = Math.max(0, Math.min(srsNewPerDay() - (S.stats[day]?.nnew || 0), reviewRoom - review.length));
+  const fresher = fresh.slice(0, newRoom);
+  order.push(...fresher);
+  if (!order.length && ahead.length) {
+    ahead.sort(byDue);
+    learn.push(...ahead);
+    order.push(...ahead);
+  }
+  return { learn, review, new: fresher, order, held, reviewRoom };
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
 function startOfDay(d) {
@@ -18882,22 +19193,17 @@ function srsForecast(now = new Date()) {
 }
 /* Anki's filtered deck, simplified: pass a scope (one list's items) and
  * the session holds only what is due inside it — same cards, same FSRS
- * schedule, just a narrower door. No scope reviews everything due. */
+ * schedule, just a narrower door. No scope reviews everything due.
+ * Card-system slice 1: the session serves exactly todayQueue — the number the
+ * button showed — until it runs out. Nothing is frozen behind the glass: the
+ * only cards it leaves are the reviews the day's limit held back, and the
+ * goodbye screen names them (`deferred`) with a door to raise today's limit. */
 function startReview(scope) {
-  let queue = srsDueItems();
-  if (Array.isArray(scope)) {
-    const keys = new Set(scope.map((i) => srsKey(i.t, i.id)));
-    queue = queue.filter((i) => keys.has(srsKey(i.t, i.id)));
-  }
-  // bounded standard review (PR70-P1-2): an ordinary sitting freezes at most
-  // the learner's own bound — the most overdue cards, since the queue is
-  // already ordered — and the rest is an honest count on the goodbye screen,
-  // never a queue growing behind the glass. The timed dojo keeps its refill.
-  const limit = srsReviewLimit();
-  const deferred = Math.max(0, queue.length - limit);
-  if (deferred) queue = queue.slice(0, limit);
+  const today = todayQueue(new Date(), Array.isArray(scope) ? scope : null);
+  const queue = today.order;
   if (!queue.length) return;
-  S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [], deferred };
+  S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [],
+    deferred: today.held, scope: Array.isArray(scope) ? scope : null, breakAt: 0 };
   S.view = 'review';
   render();
   focusKanjiReadingReview(S.review);
@@ -18919,6 +19225,9 @@ window.__KAIRO_SRS__ = Object.freeze({
     source: srsCustom ? srsCustom.source : null,
     basedOnReviews: srsCustom ? srsCustom.basedOnReviews : null,
     w: srsParams ? Array.from(srsParams.w) : null,
+    // the desired retention and learning steps the live scheduler was built with
+    retention: srsParams ? srsParams.request_retention : null,
+    learningSteps: srsParams ? Array.from(srsParams.learning_steps) : null,
   }),
   schedulerInstant: (lastReviewIso, nowMs) =>
     srsSchedulerInstant(
@@ -18926,7 +19235,15 @@ window.__KAIRO_SRS__ = Object.freeze({
       new Date(nowMs),
     ).toISOString(),
   dueKeys: () => srsDueItems().map((i) => srsKey(i.t, i.id)),
-  prefs: () => ({ newPerDay: srsNewPerDay(), reviewLimit: srsReviewLimit() }),
+  // card-system slice 1 · today's queue as every surface reads it: the three counts, the exact
+  // order a session would serve, and the due reviews the day's limit holds back
+  today: () => {
+    const q = todayQueue();
+    return { learn: q.learn.length, review: q.review.length, new: q.new.length, held: q.held,
+      keys: q.order.map((i) => srsKey(i.t, i.id)) };
+  },
+  prefs: () => ({ newPerDay: srsNewPerDay(), reviewsPerDay: srsReviewsPerDay(), pauseEvery: srsPauseEvery(),
+    preset: srsPresetState().label }),
   current: () => {
     const item = S.review?.queue[S.review.ix];
     return item ? srsKey(item.t, item.id) : null;
@@ -19078,12 +19395,41 @@ function renderReview(main) {
         sum.append(cell);
       }
     main.append(sum);
-    // the bounded sitting's honest remainder: what the freeze left for the
-    // next sitting, said quietly, never queued behind the glass
-    if (!S.focus && rv.deferred) {
+    // card-system slice 1 · the day's limit, said out loud: the due reviews it
+    // held back, and Anki's custom-study door to take them on today anyway
+    // (only a sitting startReview opened carries a scope key; a one-card review from a sheet does not)
+    const held = S.focus || rv.scope === undefined ? 0 : todayQueue(new Date(), rv.scope).held;
+    if (held) {
+      const limit = srsReviewsPerDay();
       main.append(
-        el('p', 'srs-forecast review-deferred', tx(`あと ${rv.deferred} 件`, `${rv.deferred} more waiting`)),
+        el(
+          'p',
+          'srs-forecast review-deferred',
+          tx(`あと ${held} 件は明日へ — 今日の上限（1日 ${limit} 件）`,
+            `${held} more due, held back by today's limit (${limit} a day)`),
+        ),
       );
+      const raise = biLabel('button', 'chip review-raise', `今日だけ上限を上げる ＋${held}`, `today only: raise the limit +${held}`);
+      raise.type = 'button';
+      raise.id = 'review-raise-limit';
+      raise.disabled = !!rv.pending || !recordWritable();
+      raise.addEventListener('click', async () => {
+        if (!recordWritable() || S.review !== rv) return;
+        const epoch = recordEpoch;
+        const day = dayKey();
+        raise.disabled = true;
+        const saved = await commitStorePatch((latest) => {
+          const stats = latest.stats || {};
+          const cur = stats[day] || { n: 0, again: 0 };
+          return { stats: { ...stats, [day]: { ...cur, extra: (cur.extra || 0) + held } } };
+        });
+        if (!saved || !recordReady(epoch) || S.review !== rv) {
+          if (recordReady(epoch) && S.view === 'review') render();
+          return;
+        }
+        startReview(rv.scope);
+      });
+      main.append(raise);
     }
     // the struggling cards, by name (each once) — a rest offered, never imposed
     const leechSeen = new Set();
@@ -19144,6 +19490,14 @@ function renderReview(main) {
     doors.append(out);
     renderReviewUndo(doors, rv);
     main.append(doors);
+    return;
+  }
+  // card-system slice 1 · the optional break (ペース 一息, off by default): every N graded
+  // cards the glass rests — the count so far, what is left, and the way on
+  const pauseEvery = srsPauseEvery();
+  const graded = rv.done.again + rv.done.hard + rv.done.good + rv.done.easy;
+  if (!S.focus && pauseEvery && !rv.revealed && !rv.pending && graded > 0 && graded - (rv.breakAt || 0) >= pauseEvery) {
+    renderReviewBreak(main, rv, graded);
     return;
   }
   // A re-inserted learning card may not have ripened yet. The nearest-ripening
@@ -19621,9 +19975,8 @@ function reviewCounts(rv) {
   }
   return box;
 }
-function deckCounts(due) {
-  const n = { new: 0, learn: 0, due: 0 };
-  for (const item of due) n[srsCardKind(item)] += 1;
+function deckCounts(today) {
+  const n = { new: today.new.length, learn: today.learn.length, due: today.review.length };
   const row = el('div', 'deck-counts');
   row.id = 'deck-counts';
   for (const [kind, ja, en] of SRS_KINDS) {
@@ -19647,8 +20000,8 @@ function srsDecks() {
     ...[...buckets.entries()].map(([name, items]) => ({ name, items })),
   ];
 }
-function renderDeckTable(main, due) {
-  const kindByKey = new Map(due.map((i) => [srsKey(i.t, i.id), srsCardKind(i)]));
+function renderDeckTable(main, today) {
+  const now = new Date();
   const table = el('div', 'deck-table');
   table.id = 'deck-table';
   const head = el('div', 'deck-row deck-head');
@@ -19659,11 +20012,9 @@ function renderDeckTable(main, due) {
   }
   table.append(head);
   for (const deck of [{ name: tx('すべての札', 'All cards'), items: null }, ...srsDecks()]) {
-    const n = { new: 0, learn: 0, due: 0 };
-    for (const item of deck.items || S.taken) {
-      const kind = kindByKey.get(srsKey(item.t, item.id));
-      if (kind) n[kind] += 1;
-    }
+    // a deck row is todayQueue scoped to that deck, under the same day's room — the session it opens
+    const q = deck.items ? todayQueue(now, deck.items) : today;
+    const n = { new: q.new.length, learn: q.learn.length, due: q.review.length };
     const total = n.new + n.learn + n.due;
     const row = el('button', 'deck-row' + (deck.items ? '' : ' deck-all'));
     row.type = 'button';
@@ -19945,13 +20296,40 @@ function reviewKeys(ev) {
     return;
   }
   if (!S.review.revealed) {
-    if (plainKey) press(document.getElementById('reveal'));
+    if (plainKey) press(document.getElementById('reveal') || document.getElementById('review-continue'));
     return;
   }
   const grade = { 1: 'again', 2: 'hard', 3: 'good', 4: 'easy' }[ev.key] || (plainKey ? 'good' : null);
   if (grade) press(document.querySelector(`.grade-row .grade.g-${grade}`));
 }
 document.addEventListener('keydown', reviewKeys);
+/** The optional break between cards (srsPrefs.pauseEvery). Nothing is hidden: the queue
+ * waits whole, and leaving to the lists keeps today's number on the 復習する button. */
+function renderReviewBreak(main, rv, graded) {
+  const left = rv.queue.length - rv.ix;
+  main.append(withEn(el('p', 'eyebrow', '一息'), 'break', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(`一息 — ${graded} 枚すんだ`, `Take a breath — ${graded} done`)));
+  main.append(el('p', 'srs-forecast review-break-left', tx(`あと ${left} 枚`, `${left} to go`)));
+  const doors = el('div', 'close-doors review-break');
+  const go = biLabel('button', 'take', '続ける', 'keep going');
+  go.type = 'button';
+  go.id = 'review-continue';
+  go.addEventListener('click', () => {
+    if (S.review !== rv) return;
+    rv.breakAt = rv.done.again + rv.done.hard + rv.done.good + rv.done.easy;
+    render();
+    focusKanjiReadingReview(rv);
+  });
+  const out = biLabel('button', 'chip', 'リストへ', 'back to lists');
+  out.type = 'button';
+  out.addEventListener('click', () => {
+    S.review = null;
+    S.view = 'tray';
+    render();
+  });
+  doors.append(go, out);
+  main.append(doors);
+}
 /* The quiet beat between learning steps: every remaining card is a short
  * step that hasn't ripened. The glass keeps its zen — a soft count, one way
  * out — and turns the next card over by itself the moment the step matures.
@@ -20232,7 +20610,8 @@ function guidedCardStatus(node) {
   return { state: 'take' };
 }
 function guidedCardInfo(nodes) {
-  const ready = new Set(scheduler ? srsDueItems().map((item) => srsKey(item.t, item.id)) : []);
+  const rows = nodes.map(guidedTaken).filter(Boolean);
+  const ready = new Set(scheduler ? todayQueue(new Date(), rows).order.map((item) => srsKey(item.t, item.id)) : []);
   return nodes.map((node) => {
     const key = srsKey(node.t, node.id);
     const row = guidedTaken(node);
@@ -20281,9 +20660,10 @@ function guidedHost() {
       },
       review: (nodes) => {
         const keys = new Set(nodes.map((node) => srsKey(node.t, node.id)));
-        if (!scheduler || !srsDueItems().some((item) => keys.has(srsKey(item.t, item.id)))) return false;
+        const scope = S.taken.filter((row) => keys.has(srsKey(row.t, row.id)));
+        if (!scheduler || !todayQueue(new Date(), scope).order.length) return false;
         S.trayFrom = { view: 'guided', scroll: 0 };
-        startReview(S.taken.filter((row) => keys.has(srsKey(row.t, row.id))));
+        startReview(scope);
         return S.view === 'review';
       },
       open: () => {
@@ -26689,7 +27069,7 @@ function buildGingaChrome(root) {
   // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
   // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
   if (S.view === 'drift' && S.taken.length && scheduler) {
-    const waiting = srsDueItems().length;
+    const waiting = todayQueue().order.length;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
       waiting ? `復習 ${waiting}` : '復習', waiting ? `review · ${waiting} due` : 'review');
     pill.type = 'button';
