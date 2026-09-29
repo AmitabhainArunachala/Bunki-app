@@ -8,6 +8,7 @@ import {
   createPassageVersion,
   getOfficialBlueprint,
   inspectFormStructure,
+  JLPT_SCORE_FACTS,
   OFFICIAL_BLUEPRINTS,
   parseFormVersion,
   parseItemVersion,
@@ -263,6 +264,56 @@ describe('official facts versus authored coverage', () => {
     ).toBe(true);
     expect(OFFICIAL_BLUEPRINTS.every((entry) => entry.fixedUniversalItemCount === null)).toBe(true);
     expect(getOfficialBlueprint('jlpt-n1-facts-20260910')?.forbiddenTasks).toEqual(['orthography']);
+  });
+  it('records the published JLPT pass marks, score sections and sectional minimums', () => {
+    expect(
+      JLPT_SCORE_FACTS.map((facts) => [
+        facts.track,
+        facts.passMark,
+        facts.sections.map((section) => [section.label, section.range, section.sectionalMinimum]),
+      ]),
+    ).toEqual([
+      [
+        'N5',
+        80,
+        [
+          ['言語知識（文字・語彙・文法）・読解', [0, 120], 38],
+          ['聴解', [0, 60], 19],
+        ],
+      ],
+      [
+        'N4',
+        90,
+        [
+          ['言語知識（文字・語彙・文法）・読解', [0, 120], 38],
+          ['聴解', [0, 60], 19],
+        ],
+      ],
+      ...(['N3', 'N2', 'N1'] as const).map((track, index) => [
+        track,
+        [95, 90, 100][index],
+        [
+          ['言語知識（文字・語彙・文法）', [0, 60], 19],
+          ['読解', [0, 60], 19],
+          ['聴解', [0, 60], 19],
+        ],
+      ]),
+    ]);
+    for (const facts of JLPT_SCORE_FACTS) {
+      // every skill is reported in exactly one section, and the ranges add up to the official total
+      expect(facts.sections.flatMap((section) => section.skills).sort()).toEqual([
+        'grammar',
+        'listening',
+        'reading',
+        'vocabulary',
+      ]);
+      expect(facts.sections.reduce((total, section) => total + section.range[1]!, 0)).toBe(180);
+      // each paper name belongs to a timing block this level's blueprint really has
+      const blueprint = OFFICIAL_BLUEPRINTS.find(
+        (entry) => entry.exam.family === 'jlpt' && entry.exam.track === facts.track,
+      )!;
+      for (const block of blueprint.timingBlocks) expect(facts.papers[block.id]).toBeTruthy();
+    }
   });
   it('records distinct J.TEST tracks and written-response requirements without inventing item counts', () => {
     const jtest = OFFICIAL_BLUEPRINTS.filter((entry) => entry.exam.family === 'jtest');

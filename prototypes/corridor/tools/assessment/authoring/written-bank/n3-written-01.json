@@ -75,12 +75,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n引っ越しの前に、使わない物を【せいり】しておいた。",
       "options": [
-        "正理",
-        "整理",
         "整里",
-        "政理"
+        "政理",
+        "正理",
+        "整理"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "物をきちんと片付けることは「整理」と書く。ほかの書き方の言葉はない。\nTo sort out and tidy things is written 整理.",
       "target": "整理"
     },
@@ -103,12 +103,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n部長は、試合の結果を先生に【ほうこく】した。",
       "options": [
-        "方告",
-        "報刻",
         "法告",
-        "報告"
+        "報告",
+        "方告",
+        "報刻"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "起きたことや結果を知らせることは「報告」と書く。\nTo report a result to someone is written 報告.",
       "target": "報告"
     },
@@ -117,12 +117,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい部屋は日当たりがよくて、とても（　）だ。",
       "options": [
-        "豊富",
-        "快適",
         "正確",
-        "丁寧"
+        "丁寧",
+        "豊富",
+        "快適"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "部屋が気持ちよく過ごせる様子は「快適」で表す。ほかの言葉は部屋の住みやすさには使わない。\nA room that is pleasant to live in is 快適 (comfortable); the other words do not describe rooms.",
       "target": "快適"
     },
@@ -145,12 +145,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n家庭の（　）で、アルバイトをやめることになった。",
       "options": [
-        "状態",
         "事情",
-        "条件",
-        "様子"
+        "状態",
+        "様子",
+        "条件"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「家庭の事情」は、家の中の理由や都合を表す決まった言い方だ。\nThe set phrase 家庭の事情 means family circumstances, a reason at home.",
       "target": "事情"
     },
@@ -159,12 +159,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n久しぶりに会った兄は、【相変わらず】忙しそうだった。",
       "options": [
-        "前と同じように",
-        "前よりもっと",
         "急に",
-        "少しだけ"
+        "少しだけ",
+        "前と同じように",
+        "前よりもっと"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「相変わらず」は、前と変わらずに同じ様子が続いていることを表す。\nThe word 相変わらず means as before, unchanged.",
       "target": "相変わらず"
     },
@@ -173,12 +173,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n引っ越しの荷物を【一度に】運ぶのは無理だ。",
       "options": [
-        "少しずつ",
         "何回かに分けて",
-        "全部まとめて",
-        "急いで"
+        "少しずつ",
+        "急いで",
+        "全部まとめて"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「一度に」は、分けないで全部を同時に、という意味だ。\nThe word 一度に means all at once, not split up.",
       "target": "一度に"
     },
@@ -187,12 +187,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【慌てる】",
       "options": [
-        "疲れたときは、家で慌てて休むのがいちばんだ。",
-        "電車に遅れそうになって、慌てて駅まで走った。",
         "試験に合格して、慌てるほどうれしかった。",
-        "約束の時間までまだ一時間あるので、慌てて待つことにした。"
+        "約束の時間までまだ一時間あるので、慌てて待つことにした。",
+        "疲れたときは、家で慌てて休むのがいちばんだ。",
+        "電車に遅れそうになって、慌てて駅まで走った。"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「慌てる」は、急なことで落ち着きをなくし、急いで行動する様子に使う。\nThe verb 慌てる describes losing composure and rushing, as when nearly missing a train.",
       "target": "慌てる"
     },
@@ -215,12 +215,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n天気予報（　）、午後から雨が降るそうだ。",
       "options": [
-        "にとって",
-        "によると",
+        "について",
         "に対して",
-        "について"
+        "によると",
+        "にとって"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "情報の出どころを示して「〜そうだ」と続けるときは「によると」を使う。\nThe pattern によると marks the source of information before 〜そうだ (I hear that).",
       "subject": "grammar:niyoruto"
     },
@@ -229,12 +229,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n父の仕事の都合で、来月大阪へ引っ越す（　）。",
       "options": [
-        "ことがある",
-        "ようになった",
         "ことになった",
-        "ばかりだ"
+        "ばかりだ",
+        "ことがある",
+        "ようになった"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "自分の意志ではなく、事情によって決まったことは「ことになった」で表す。\nThe pattern ことになった expresses a decision brought about by circumstances, not one's own choice.",
       "subject": "grammar:kotoninaru"
     },
@@ -257,12 +257,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの公園は、子ども（　）大人にも人気がある。",
       "options": [
-        "によって",
-        "にとって",
         "として",
-        "ばかりでなく"
+        "ばかりでなく",
+        "によって",
+        "にとって"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「AばかりでなくBも」で、AだけでなくBもそうだと言う。後ろの「大人にも」と合う。\nAばかりでなくBも means not only A but also B, matching 大人にも.",
       "subject": "grammar:bakaridenaku"
     },
@@ -271,12 +271,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n兄は、たくさん食べる（　）あまり太らない。",
       "options": [
-        "ために",
-        "わりに",
         "までに",
-        "とおりに"
+        "とおりに",
+        "ために",
+        "わりに"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「〜わりに」は、予想される結果と違うことを表す。たくさん食べるのに太らない、という意味になる。\nThe pattern わりに marks an unexpected result: he eats a lot yet does not gain weight.",
       "subject": "grammar:warini"
     },
@@ -285,12 +285,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n傘を持た（　）出かけたら、途中で雨が降ってきた。",
       "options": [
-        "ないと",
-        "なければ",
         "ずに",
-        "なくては"
+        "なくては",
+        "ないと",
+        "なければ"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「〜ずに」は「〜ないで」と同じ意味で、傘を持たない状態で出かけたことを表す。\nThe pattern ずに means without doing, like ないで: he went out without an umbrella.",
       "subject": "grammar:zuni"
     },
@@ -299,12 +299,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこのアパートは　＿＿＿　＿★＿　＿＿＿　＿＿＿　安い。",
       "options": [
-        "うえに",
-        "家賃も",
         "近い",
-        "駅から"
+        "駅から",
+        "うえに",
+        "家賃も"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "正しい順番は「駅から　近い　うえに　家賃も」で、★には「近い」が入る。\nThe order is 駅から 近い うえに 家賃も (close to the station and cheap too), so 近い fills the star.",
       "subject": "grammar:ueni"
     },
@@ -327,12 +327,12 @@
       "passage": "tg",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "答えるつもりでした",
-        "すぐに答えられませんでした",
+        "答えたことがありました",
         "すぐに答えてしまいました",
-        "答えたことがありました"
+        "すぐに答えられませんでした",
+        "答えるつもりでした"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "パンの名前を覚えられなかったので、聞かれても答えられなかったという流れになる。\nShe could not remember the names, so she could not answer when asked."
     },
     {
@@ -341,12 +341,12 @@
       "passage": "tg",
       "prompt": "文章の（２）に入る最もよいものを選んでください。",
       "options": [
-        "それなのに",
         "そのかわりに",
-        "そのおかげで",
-        "それとも"
+        "それなのに",
+        "それとも",
+        "そのおかげで"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "店長が表を作ってくれたことが、覚えられた理由になっているので「そのおかげで」が合う。\nThe manager's chart is the good reason she could learn them, so そのおかげで (thanks to that) fits."
     },
     {
@@ -355,12 +355,12 @@
       "passage": "tg",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "始めてから",
-        "始める前に",
+        "始めないで",
         "始めるために",
-        "始めないで"
+        "始める前に",
+        "始めてから"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "アルバイトを始めたあとに気持ちが変わったので「始めてから」が合う。\nHer feelings changed after she started the job, so 始めてから (since starting) fits."
     },
     {
@@ -369,12 +369,12 @@
       "passage": "s1",
       "prompt": "山田さんは、土曜日に何をしますか。",
       "options": [
-        "トラックで荷物を新しいアパートへ運ぶ。",
         "部屋で箱を開けて、本や食器を棚に並べる。",
-        "昼ご飯を作って、新しいアパートへ持っていく。",
-        "朝九時に、林さんの前の家へ行く。"
+        "トラックで荷物を新しいアパートへ運ぶ。",
+        "朝九時に、林さんの前の家へ行く。",
+        "昼ご飯を作って、新しいアパートへ持っていく。"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "林さんは山田さんに、部屋の中で箱を開けて本や食器を棚に並べてほしいと頼んでいる。\nHayashi asks Yamada to unpack boxes and put books and dishes on the shelves."
     },
     {
@@ -383,12 +383,12 @@
       "passage": "s2",
       "prompt": "この人が三年間部活動を続けたのは、なぜか。",
       "options": [
-        "試合にたくさん出られたから",
-        "仲間と一緒に練習する時間が好きだったから",
+        "先生にやめないように言われたから",
         "背が高くなりたかったから",
-        "先生にやめないように言われたから"
+        "仲間と一緒に練習する時間が好きだったから",
+        "試合にたくさん出られたから"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「三年間やめなかったのは、仲間と一緒に練習する時間が好きだったからだ」と書いてある。\nThe writer says they stayed because they loved practicing with teammates."
     },
     {
@@ -397,12 +397,12 @@
       "passage": "s3",
       "prompt": "このお知らせによると、来月から公園はどう変わるか。",
       "options": [
-        "ボール遊びは、東側の広場でしかできなくなる。",
-        "西側の広場でも、ボール遊びができるようになる。",
         "夜九時以降は、公園に入れなくなる。",
-        "小さな子どもは、東側の広場で遊べなくなる。"
+        "小さな子どもは、東側の広場で遊べなくなる。",
+        "ボール遊びは、東側の広場でしかできなくなる。",
+        "西側の広場でも、ボール遊びができるようになる。"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "ボール遊びは東側の広場だけでできることになった、と書いてある。\nThe notice says ball games will be allowed only in the east square."
     },
     {
@@ -411,12 +411,12 @@
       "passage": "m1",
       "prompt": "「わたし」は最初、おじいさんのことをどう思っていたか。",
       "options": [
-        "近所に住んでいる人だと思っていた。",
         "公園を管理している市の人だと思っていた。",
-        "子どもたちの親だと思っていた。",
-        "毎朝散歩をしている人だと思っていた。"
+        "近所に住んでいる人だと思っていた。",
+        "毎朝散歩をしている人だと思っていた。",
+        "子どもたちの親だと思っていた。"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「最初は、公園を管理している市の人だと思っていた」とある。\nAt first the writer thought he was a city worker who managed the park."
     },
     {
@@ -439,12 +439,12 @@
       "passage": "m1",
       "prompt": "最近、公園はどうなったか。",
       "options": [
-        "子どもたちが公園であまり遊ばなくなった。",
-        "市の人が毎朝掃除をするようになった。",
+        "おじいさんが一人でごみを拾うようになった。",
         "手伝う人が増えて、以前よりきれいになった。",
-        "おじいさんが一人でごみを拾うようになった。"
+        "市の人が毎朝掃除をするようになった。",
+        "子どもたちが公園であまり遊ばなくなった。"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "子どもたちの親も手伝うようになり、以前より公園がきれいになったとある。\nParents started helping too, and the park is cleaner than before."
     },
     {
@@ -453,12 +453,12 @@
       "passage": "l1",
       "prompt": "引っ越してきたばかりのころ、「わたし」は近所の人に声をかけられて、どう感じたか。",
       "options": [
-        "都会と同じだと思って、安心した。",
-        "うれしくて、すぐに友だちになった。",
         "どう返事をすればいいか分からず、面倒だと思うこともあった。",
-        "失礼だと思って、返事をしなかった。"
+        "失礼だと思って、返事をしなかった。",
+        "都会と同じだと思って、安心した。",
+        "うれしくて、すぐに友だちになった。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「どう返事をすればいいのか分からず、少し面倒だと感じることもあった」と書いてある。\nAt first the writer did not know how to reply and sometimes found it bothersome."
     },
     {

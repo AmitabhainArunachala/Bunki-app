@@ -22,12 +22,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n規制が【緩和】されたことで、新しい事業に参入する企業が増えた。",
       "options": [
-        "えんわ",
         "かんわ",
-        "かんお",
-        "かんな"
+        "えんわ",
+        "かんな",
+        "かんお"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "緩和は「かんわ」と読み、厳しさをゆるめることを表す。\n緩和 is read kanwa and means easing or relaxing (rules, tension).",
       "target": "緩和"
     },
@@ -36,12 +36,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n天候が悪化しそうなので、ここで引き返すのが【賢明】だ。",
       "options": [
-        "けんみょう",
         "げんめい",
-        "けんめい",
-        "けんべい"
+        "けんみょう",
+        "けんべい",
+        "けんめい"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "賢明は「けんめい」と読み、判断が賢く適切である様子を表す。\n賢明 is read kenmei: wise, sensible (a judgment).",
       "target": "賢明"
     },
@@ -50,12 +50,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n説明会の【趣旨】を参加者に改めて伝えた。",
       "options": [
-        "しゅうし",
         "しゅじ",
-        "しゅうじ",
-        "しゅし"
+        "しゅうし",
+        "しゅし",
+        "しゅうじ"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "趣旨は「しゅし」と読み、目的やねらいを表す。長音や濁音は入らない。\n趣旨 is read shushi (purpose, main aim), with no long vowel or voicing.",
       "target": "趣旨"
     },
@@ -78,12 +78,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n新しい市長は、前任者の方針を大きく（　）、財政の立て直しを最優先にした。",
       "options": [
-        "促し",
-        "覆し",
+        "凌ぎ",
         "賄い",
-        "凌ぎ"
+        "覆し",
+        "促し"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「方針を覆す」で、それまでの方針をすっかり変えるという意味になる。\n方針を覆す means to overturn a policy; the other verbs do not take 方針 this way.",
       "target": "覆す"
     },
@@ -92,12 +92,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n予算が限られているので、会場の飾りつけは（　）簡素にした。",
       "options": [
-        "断じて",
-        "辛うじて",
         "終始",
-        "極力"
+        "極力",
+        "断じて",
+        "辛うじて"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「極力」は「できるかぎり」という意味で、簡素にするという努力に合う。\n極力 means as far as possible, which fits making the decorations simple on a small budget.",
       "target": "極力"
     },
@@ -106,12 +106,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n両社の交渉は難航したが、最終的には互いに（　）し、合意に至った。",
       "options": [
-        "譲歩",
-        "還元",
+        "干渉",
         "模倣",
-        "干渉"
+        "還元",
+        "譲歩"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「譲歩する」は自分の主張を一部ゆずること。互いにゆずって合意したという文脈に合う。\n譲歩する means to make concessions, which is how two sides reach agreement.",
       "target": "譲歩"
     },
@@ -120,12 +120,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n彼の説明は（　）で、専門外の人にもすぐに理解できた。",
       "options": [
-        "婉曲",
         "煩雑",
-        "簡潔",
-        "難解"
+        "婉曲",
+        "難解",
+        "簡潔"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「簡潔」は短く要点がまとまっている様子で、すぐに理解できたことと合う。\n簡潔 means concise and to the point, which is why non-specialists understood at once.",
       "target": "簡潔"
     },
@@ -134,12 +134,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\nその件については、【かねて】から社内で検討を重ねてきた。",
       "options": [
-        "最近",
         "急きょ",
-        "以前",
-        "ひそかに"
+        "最近",
+        "ひそかに",
+        "以前"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「かねてから」は「以前から・前々から」という意味である。\nかねてから means for some time now, i.e. since earlier (以前から).",
       "target": "かねて"
     },
@@ -176,12 +176,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【手際】",
       "options": [
-        "駅までの手際を地図で調べておいた。",
-        "彼女は手際よく料理を仕上げ、客を待たせなかった。",
         "手際が悪い天気が続いて、洗濯物が乾かない。",
-        "彼の話は手際が長くて、要点がわかりにくい。"
+        "彼の話は手際が長くて、要点がわかりにくい。",
+        "駅までの手際を地図で調べておいた。",
+        "彼女は手際よく料理を仕上げ、客を待たせなかった。"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "手際は物事を処理する腕前や段取りのことで、「手際よく仕上げる」が自然な使い方である。\n手際 is skill in handling a task; 手際よく仕上げる (finish deftly) is the natural use.",
       "target": "手際"
     },
@@ -190,12 +190,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【見地】",
       "options": [
-        "このレポートは見地が多すぎて読みにくい。",
-        "山の見地に立つと、町全体が見渡せた。",
         "彼は旅行の見地をまだ決めていない。",
-        "環境保護の見地から、この計画には慎重な検討が必要だ。"
+        "環境保護の見地から、この計画には慎重な検討が必要だ。",
+        "このレポートは見地が多すぎて読みにくい。",
+        "山の見地に立つと、町全体が見渡せた。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "見地は物事を考えたり判断したりする立場のことで、「〜の見地から」の形で使う。\n見地 is a standpoint for judging something, used as 〜の見地から (from the standpoint of).",
       "target": "見地"
     },
@@ -204,12 +204,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【促す】",
       "options": [
-        "市は住民に節水を促すため、ポスターを配布した。",
-        "彼は料理に塩を少し促して、味を整えた。",
+        "彼女は腕時計を促して、時間を確かめた。",
         "彼は重い荷物を棚の上に促した。",
-        "彼女は腕時計を促して、時間を確かめた。"
+        "彼は料理に塩を少し促して、味を整えた。",
+        "市は住民に節水を促すため、ポスターを配布した。"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "促すは、ある行動をするように働きかけることで、「節水を促す」が自然である。\n促す means to urge or encourage an action, as in urging residents to save water.",
       "target": "促す"
     },
@@ -218,12 +218,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n開演のベルが鳴る（　）、客席のざわめきがぴたりとやんだ。",
       "options": [
-        "とはいえ",
-        "や否や",
+        "だに",
         "にもまして",
-        "だに"
+        "や否や",
+        "とはいえ"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「〜や否や」は、ある事が起こるとすぐに次の事が起こることを表す。\n〜や否や means the moment something happens, something else follows at once.",
       "subject": "grammar:yainaya"
     },
@@ -232,12 +232,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの病気は、専門医（　）正確に診断するのは難しい。",
       "options": [
-        "ならでは",
         "をよそに",
-        "といえども",
-        "にひきかえ"
+        "ならでは",
+        "にひきかえ",
+        "といえども"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "「〜といえども」は「〜であっても」という意味で、専門医であっても難しいことを表す。\n〜といえども means even (someone like) a specialist finds it hard.",
       "subject": "grammar:toiedomo"
     },
@@ -246,12 +246,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n締め切りに間に合わないなら、徹夜してでも仕上げる（　）。",
       "options": [
-        "にすぎない",
-        "きらいがある",
+        "までだ",
         "にかたくない",
-        "までだ"
+        "きらいがある",
+        "にすぎない"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「〜までだ」は、ほかに方法がないのでそうするだけだという決意を表す。\n〜までだ says there is nothing else to do but this: I'll just finish it even if it takes all night.",
       "subject": "grammar:madenokotoda"
     },
@@ -260,12 +260,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n長年支えてくれた恩師の突然の訃報に、驚きを（　）。",
       "options": [
-        "禁じ得なかった",
         "余儀なくされた",
-        "皮切りにした",
-        "経ていた"
+        "禁じ得なかった",
+        "経ていた",
+        "皮切りにした"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「〜を禁じ得ない」は、ある感情をおさえられないことを表す。\n〜を禁じ得ない means one cannot help feeling an emotion, here shock at sad news.",
       "subject": "grammar:n1-o-kinji-enai"
     },
@@ -288,12 +288,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n一言相談してくれれば手伝った（　）、彼は一人ですべて抱え込んでしまった。",
       "options": [
-        "ものの",
-        "もので",
+        "ものなら",
         "ものを",
-        "ものなら"
+        "もので",
+        "ものの"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "「〜ものを」は「〜のに」という意味で、そうしなかったことへの不満や残念さを表す。\n〜ものを expresses regret: I would have helped, yet he took it all on himself.",
       "subject": "grammar:monowo"
     },
@@ -316,12 +316,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n来月の東京公演 ＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 予定だ。",
       "options": [
-        "回る",
-        "十の都市を",
+        "全国",
         "を皮切りに",
-        "全国"
+        "十の都市を",
+        "回る"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「東京公演を皮切りに全国十の都市を回る予定だ」となり、★には「全国」が入る。\nThe order is を皮切りに・全国・十の都市を・回る, so 全国 fills the ★ slot.",
       "subject": "grammar:n1-o-kawakiri-ni"
     },
@@ -330,12 +330,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの店では、食材 ＿＿＿ ＿＿＿ ＿＿＿ ＿★＿ こだわっている。",
       "options": [
-        "照明",
         "に至るまで",
-        "はもちろん",
-        "店内の"
+        "照明",
+        "店内の",
+        "はもちろん"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "「食材はもちろん店内の照明に至るまでこだわっている」となり、★には「に至るまで」が入る。\nThe order is はもちろん・店内の・照明・に至るまで, so に至るまで fills the ★ slot.",
       "subject": "grammar:n1-ni-itaru-made"
     },
@@ -345,12 +345,12 @@
       "passage": "tg",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "ところが",
         "それゆえ",
-        "たとえば",
-        "そのうえ"
+        "ところが",
+        "そのうえ",
+        "たとえば"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "前の文の主張を「よろしくお願いします」という具体例で説明しているので「たとえば」が入る。\nThe next sentence gives a concrete example of the claim, so たとえば (for example) fits."
     },
     {
@@ -359,12 +359,12 @@
       "passage": "tg",
       "prompt": "文章の（２）に入る最もよいものを選んでください。",
       "options": [
-        "ほかない",
-        "べきではない",
         "わけがない",
-        "どころではない"
+        "どころではない",
+        "ほかない",
+        "べきではない"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "一語で訳せない以上、読み手に合う言い方を探すしかないという意味で「ほかない」が入る。\nSince no one-word equivalent exists, the translator has no choice but to search: 探すほかない."
     },
     {
@@ -373,12 +373,12 @@
       "passage": "tg",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "さえ",
-        "ばかりか",
+        "こそが",
         "ならでは",
-        "こそが"
+        "ばかりか",
+        "さえ"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「その線引きこそが難しさであり面白さだ」と、線引きを強く取り立てているので「こそが」が入る。\nこそが singles out the line-drawing itself as both the difficulty and the pleasure."
     },
     {
@@ -387,12 +387,12 @@
       "passage": "s1",
       "prompt": "筆者によると、休日はどのように過ごすのがよいか。",
       "options": [
-        "平日の不足分を取り戻すため、できるだけ長く眠る。",
-        "起きる時刻は平日と大きく変えず、少し早めに寝る。",
+        "月曜に備えて、日曜の夜は遅くまで起きておく。",
         "体内時計を整えるため、昼寝をして睡眠を補う。",
-        "月曜に備えて、日曜の夜は遅くまで起きておく。"
+        "起きる時刻は平日と大きく変えず、少し早めに寝る。",
+        "平日の不足分を取り戻すため、できるだけ長く眠る。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "本文の最後に、起きる時刻は平日と変えず、早めに床に就くほうがよいとある。\nThe last sentence advises keeping the weekday wake-up time and going to bed a little earlier."
     },
     {
@@ -401,12 +401,12 @@
       "passage": "s2",
       "prompt": "筆者の考えに最も近いものはどれか。",
       "options": [
-        "古い商店街は、そのまま残すべきだ。",
-        "再開発では、建物を新しくすることを最優先にすべきだ。",
+        "高層ビルは、人と人とのつながりを生み出す場所になる。",
         "再開発を進める際には、住民のつながりを残すことも考えるべきだ。",
-        "高層ビルは、人と人とのつながりを生み出す場所になる。"
+        "再開発では、建物を新しくすることを最優先にすべきだ。",
+        "古い商店街は、そのまま残すべきだ。"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "筆者は再開発自体は否定せず、人のつながりまで壊さないよう、何を残すかを考えてほしいと述べている。\nThe writer accepts redevelopment but wants planners to preserve the ties between people."
     },
     {
@@ -457,12 +457,12 @@
       "passage": "m2",
       "prompt": "筆者の店では、どのような工夫をしているか。",
       "options": [
-        "大型店に負けないように、品ぞろえを増やしている。",
-        "客が探している本を、すぐに取り寄せている。",
         "インターネットでも本を販売している。",
-        "置く本を絞り、一冊ずつ手書きの紹介文を添えている。"
+        "置く本を絞り、一冊ずつ手書きの紹介文を添えている。",
+        "大型店に負けないように、品ぞろえを増やしている。",
+        "客が探している本を、すぐに取り寄せている。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "品ぞろえではかなわないので、置く本を絞り、手書きの紹介文を添えていると書かれている。\nThe shop stocks fewer books and adds a handwritten note to each one."
     },
     {
@@ -471,12 +471,12 @@
       "passage": "m2",
       "prompt": "筆者は、町の本屋の役割をどのように考えているか。",
       "options": [
-        "客が思いがけない本と出会う機会を作ること",
         "客が求める本を、確実に届けること",
-        "ネット書店より安く本を売ること",
-        "町の人々が集まって話せる場所を作ること"
+        "客が思いがけない本と出会う機会を作ること",
+        "町の人々が集まって話せる場所を作ること",
+        "ネット書店より安く本を売ること"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "確実に届けるのはネットの強みで、探してもいなかった本との出会いを用意するのが町の本屋の役割だと述べている。\nThe writer sees the local shop's role as arranging encounters with books people were not looking for."
     },
     {
@@ -488,12 +488,12 @@
       ],
       "prompt": "美術館での写真撮影について、ＡとＢはどのように述べているか。",
       "options": [
-        "ＡもＢも、撮影を全面的に禁止すべきだと述べている。",
-        "Ａは撮影を歓迎する立場で、Ｂは一律に認めることに慎重な立場である。",
+        "ＡもＢも、撮影は美術館の宣伝になると述べている。",
         "Ａは撮影に慎重な立場で、Ｂは撮影を歓迎する立場である。",
-        "ＡもＢも、撮影は美術館の宣伝になると述べている。"
+        "Ａは撮影を歓迎する立場で、Ｂは一律に認めることに慎重な立場である。",
+        "ＡもＢも、撮影を全面的に禁止すべきだと述べている。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "Ａはルールを守れば撮影を歓迎してよいとし、Ｂは一律に認めることには慎重であるべきだとしている。\nA welcomes photography under rules; B is cautious about allowing it across the board."
     },
     {
@@ -505,12 +505,12 @@
       ],
       "prompt": "ＡとＢが共通して述べていることは何か。",
       "options": [
-        "撮影は、作品をじっくり見る妨げになる。",
-        "地方の美術館ほど、撮影を認めるべきだ。",
         "撮影を認める場合にも、何らかの制限や工夫が必要だ。",
-        "撮影された写真がSNSで広まることは避けられない。"
+        "撮影された写真がSNSで広まることは避けられない。",
+        "撮影は、作品をじっくり見る妨げになる。",
+        "地方の美術館ほど、撮影を認めるべきだ。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "Ａはフラッシュ等の禁止を、Ｂは作品ごとに可否を決める工夫を挙げ、どちらも条件付きで考えている。\nBoth attach conditions: A bans flash and disruption, B decides work by work."
     },
     {
@@ -519,12 +519,12 @@
       "passage": "c1",
       "prompt": "筆者によると、散歩中などに問題の答えがふと浮かぶのはなぜか。",
       "options": [
-        "外からの情報が途切れた時間に、頭が得たものを組み立て直しているから",
         "体を動かすことで、頭の働きが活発になるから",
-        "長く悩んだ結果、偶然答えにたどり着くから",
-        "周りの景色から、新しい情報を得られるから"
+        "外からの情報が途切れた時間に、頭が得たものを組み立て直しているから",
+        "周りの景色から、新しい情報を得られるから",
+        "長く悩んだ結果、偶然答えにたどり着くから"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "情報が途切れた時間に、頭はそれまでに得たものを静かに組み立て直していると述べている。\nThe writer says that when outside input stops, the mind quietly reassembles what it has taken in."
     },
     {
@@ -547,12 +547,12 @@
       "passage": "c1",
       "prompt": "筆者の主張に最も近いものはどれか。",
       "options": [
-        "予定を減らして、できるだけ多く休むべきだ。",
-        "移動中の時間も、学習に活用すべきだ。",
         "何もしない時間を、考えを深めるために意識して確保すべきだ。",
-        "空き時間は、新しい情報を得るために使うべきだ。"
+        "空き時間は、新しい情報を得るために使うべきだ。",
+        "予定を減らして、できるだけ多く休むべきだ。",
+        "移動中の時間も、学習に活用すべきだ。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "怠けることを勧めるのではなく、考えを熟成させる時間を意識的に確保すべきだと主張している。\nThe claim is to deliberately keep idle time for letting thoughts mature, not simply to rest more."
     },
     {
@@ -561,12 +561,12 @@
       "passage": "i1",
       "prompt": "市外に住み、市内の会社に勤めているキムさん（35歳）は、平日は18時まで仕事がある。平日の夜か週末に受けられる講座に申し込みたい。キムさんが申し込める組み合わせはどれか。",
       "options": [
-        "ＡとＣ",
-        "ＢとＣ",
         "ＡとＤ",
-        "ＡとＢとＤ"
+        "ＡとＢとＤ",
+        "ＡとＣ",
+        "ＢとＣ"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "Ｃは平日の昼なので受けられず、申し込みは2講座までなので、ＡとＤが当てはまる。\nC meets on a weekday afternoon and the limit is two courses, so A and D is the valid choice."
     },
     {
@@ -575,12 +575,12 @@
       "passage": "i1",
       "prompt": "市内に住む70歳の山田さんは、講座Ｂと講座Ｄに申し込むつもりだ。受講料は合わせていくらで、申し込みの際に何が必要か。",
       "options": [
-        "7,000円で、特に必要な書類はない。",
         "3,500円で、特に必要な書類はない。",
-        "7,000円で、年齢のわかる書類の写しが必要だ。",
-        "3,500円で、年齢のわかる書類の写しが必要だ。"
+        "7,000円で、特に必要な書類はない。",
+        "3,500円で、年齢のわかる書類の写しが必要だ。",
+        "7,000円で、年齢のわかる書類の写しが必要だ。"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "4,000円と3,000円の合計7,000円が65歳以上は半額で3,500円になり、年齢のわかる書類の写しが必要である。\n7,000 yen halves to 3,500 yen for those 65 and over, and a copy of proof of age is required."
     }
   ]

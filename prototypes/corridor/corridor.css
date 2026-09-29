@@ -7624,7 +7624,43 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .assessment-room .exam-item-provenance { font-size: .8rem; line-height: 1.6; color: var(--ink-2); }
 .exam-written { margin-bottom: 1.5rem; }
 .exam-image { max-width: 100%; height: auto; }
+/* The printed JLPT paper on the question sheet (editorial.css owns the sheet): 問題 in its ink box
+   beside the 大問 name, underlined targets, （　） blanks, the ★ row and numbered gaps. */
+.exam-mondai-no { display: inline-block; padding: .04em .45em; border-radius: 3px; background: var(--ink, #1c2b3a);
+  color: var(--ground-0, #faf6ec); font-size: .78em; line-height: 1.5; letter-spacing: .06em; vertical-align: .1em; }
+.exam-mondai-instruction { overflow-wrap: anywhere; }
+.exam-underline-blank { display: inline-block; min-width: 3.2em; border-bottom: 1.5px solid currentColor;
+  margin-inline: .1em; line-height: 1.2; vertical-align: baseline; }
+.exam-target { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .28em; }
+.exam-blank { white-space: pre; }
+.exam-slot { display: inline-block; min-width: 3.1em; margin-inline: .18em; border-bottom: 1.5px solid currentColor;
+  text-align: center; line-height: 1.3; }
+.exam-star-slot { font-size: .95em; }
+.exam-gap-box { display: inline-block; min-width: 1.9em; margin-inline: .15em; padding: 0 .3em; border: 1.5px solid currentColor;
+  font-family: var(--sans, system-ui, sans-serif); font-size: .82em; line-height: 1.55; text-align: center;
+  font-variant-numeric: tabular-nums; text-indent: 0; }
+.exam-gap-box[data-current="true"] { background: var(--ink, #1c2b3a); color: var(--ground-0, #faf6ec); border-color: var(--ink, #1c2b3a); }
+.exam-word { font-weight: 700; }
+.exam-passage-label { margin: 0 0 .3rem; font-weight: 700; }
+.assessment-room .mock-opts.exam-opts-row { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: .4rem; }
+.assessment-room .exam-opts-row .mock-opt { border-top: 0; }
+.exam-form-timing, .exam-paper-note, .exam-practice-note, .exam-next-paper { font-size: .86rem; line-height: 1.7; }
+.exam-practice-note { border-inline-start: 3px solid var(--line, #76808066); padding-inline-start: .75rem; }
+.exam-paper-list { margin: .4rem 0; padding-inline-start: 1.4rem; line-height: 1.8; }
+.exam-paper-name { font-family: var(--serif, "Noto Serif JP", serif); font-weight: 600; }
+.exam-official { margin: 0 0 14px; }
+.exam-official-title { font-size: 1rem; margin: 0 0 .6rem; }
+.exam-official-row { padding: .7rem 0; border-top: 1px solid var(--line-soft, #76808033); }
+.exam-official-row:first-of-type { border-top: 0; }
+.exam-official-label { margin: 0; font-family: var(--serif, "Noto Serif JP", serif); font-weight: 600; line-height: 1.6; }
+.exam-official-raw { margin: .15rem 0; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.exam-official-fact, .exam-official-pass, .exam-official-note { margin: .15rem 0; font-size: .82rem; line-height: 1.6; color: var(--ink-2, #4a5d70); }
+.exam-official-daimon { display: flex; flex-wrap: wrap; gap: .2rem 1rem; margin: .35rem 0 0; padding: 0; list-style: none;
+  font-size: .85rem; line-height: 1.6; }
+.exam-daimon-count { font-variant-numeric: tabular-nums; }
+.exam-official-pass { margin-top: .8rem; }
 @media (max-width: 480px) {
+  .assessment-room .mock-opts.exam-opts-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .exam-lengths { gap: .4rem; }
   .exam-length { flex-basis: calc(33% - .4rem); padding: .75rem .4rem; font-size: .85rem; }
   .exam-score { font-size: 1.6rem; }

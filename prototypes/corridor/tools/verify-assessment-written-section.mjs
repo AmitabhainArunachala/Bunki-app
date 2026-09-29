@@ -445,6 +445,8 @@ async function start(page, section, mode, screenshotPrefix = null) {
   await page.locator('.exam-prompt').waitFor();
   assert.equal(await page.locator('.exam-heading').textContent(), `${pin.level} practice`);
   assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(items[0]));
+  // the official paper facts (問題 numbers per 試験科目, paper numbering) belong to the machine-checked class only
+  assert.equal(await page.locator('.exam-mondai-no, .exam-paper-question').count(), 0);
   assert.match(
     await page.locator('.exam-progress').innerText(),
     new RegExp(`Question 1 of ${items.length}`, 'u'),
@@ -513,6 +515,70 @@ async function tabToFirstAnswer(page, limit) {
     assert(presses <= limit, `Tab did not reach the first answer within ${limit} presses`);
   }
   return presses;
+}
+// A machine-checked N3 test sits the real paper on the one question sheet: two 試験科目 with their official minutes, 問題
+// headers in the official wording, numbers that restart with the second booklet, underlined
+// targets, and results by the official 得点区分 beside the published marks.
+const paperEntry = catalog.entries.find((row) => row.id === 'kairo-original-jlpt-n3-written-01:written-review');
+const paperForm = paperEntry && JSON.parse(readFileSync(resolve(site, 'data/assessment', paperEntry.formPath), 'utf8'));
+async function officialPaperCase(page, engine) {
+  assert(paperEntry?.timingAuthority === 'official-fact', 'The N3 written test is bound to the official papers');
+  await page.locator('#mock-link').click();
+  await selectLevel(page, 'N3');
+  const card = page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}]`);
+  assert.match(await card.locator('.exam-form-timing').innerText(), /言語知識（文字・語彙） 30 min \/ 言語知識（文法）・読解 70 min/u);
+  await card.locator('[data-exam-start]').click();
+  const papers = page.locator('[data-exam-papers="2"] .exam-paper-list li');
+  assert.deepEqual(await papers.allInnerTexts(), [
+    `言語知識（文字・語彙） 30 min · ${paperEntry.skillCounts.vocabulary} questions`,
+    `言語知識（文法）・読解 70 min · ${paperEntry.skillCounts.grammar + paperEntry.skillCounts.reading} questions`,
+  ]);
+  await page.locator('#exam-confirm-start').click();
+  await page.locator('.exam-paper-question').waitFor();
+  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), '言語知識（文字・語彙）');
+  assert.match(await page.locator('#exam-timer').textContent(), /^(30:00|29:\d\d)$/u);
+  assert.equal(await page.locator('.exam-mondai-no').textContent(), '問題１');
+  assert.match(await page.locator('.exam-mondai-instruction').textContent(), /のことばの読み方として最もよいものを、１・２・３・４から一つえらびなさい。$/u);
+  assert.equal(await page.locator('.exam-mondai-instruction .exam-underline-blank').count(), 1);
+  const first = paperForm.items[0];
+  assert.equal(first.task, 'kanji-reading');
+  // the stem prints without its authored instruction line; its 【target】 is underlined, not bracketed
+  assert.equal(await page.locator('.exam-paper-question').textContent(),
+    `1${first.prompt.split('\n').slice(1).join('\n').replace(/[【】]/gu, '')}`);
+  const target = page.locator('.exam-paper-question .exam-target');
+  assert.equal(await target.count(), 1);
+  assert.match(await target.evaluate((node) => getComputedStyle(node).textDecorationLine), /underline/u);
+  await fit(page, 'Official paper first page');
+  await page.screenshot({ path: resolve(evidence, `${engine}-official-paper-n3-320.png`), fullPage: true });
+  // Finish the first paper; the second booklet names itself, restarts at 問題１ and item 1.
+  const vocabulary = paperForm.sections.find((section) => section.skill === 'vocabulary').itemIds;
+  await page.locator('.exam-question-map summary').click();
+  await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(vocabulary.at(-1))}]`).click();
+  await page.locator('#exam-finish-block').click();
+  await page.locator('#exam-confirm-finish').click();
+  await page.locator('[data-exam-next-paper="grammar-reading"]').waitFor();
+  await page.locator('#exam-next-block').click();
+  await page.locator('.exam-paper-question').waitFor();
+  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), '言語知識（文法）・読解');
+  assert.equal(await page.locator('.exam-mondai-no').textContent(), '問題１');
+  assert.equal(await page.locator('.exam-paper-question .exam-question-number').textContent(), '1');
+  assert.match(await page.locator('#exam-timer').textContent(), /^(70:00|69:\d\d)$/u);
+  const reading = paperForm.sections.find((section) => section.skill === 'reading').itemIds;
+  await page.locator('.exam-question-map summary').click();
+  await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(reading.at(-1))}]`).click();
+  await page.locator('#exam-finish-block').click();
+  await page.locator('#exam-confirm-finish').click();
+  await page.locator('[data-exam-official="N3"]').waitFor();
+  assert.deepEqual(await page.locator('[data-score-section]').evaluateAll((rows) => rows.map((row) => row.dataset.scoreSection)),
+    ['language', 'reading', 'listening']);
+  assert.equal(await page.locator('[data-score-section="listening"] [data-raw]').getAttribute('data-raw'), 'none');
+  assert.equal(await page.locator('[data-score-section="reading"] [data-raw]').getAttribute('data-raw'), `0/${reading.length}`);
+  assert.match(await page.locator('.exam-official-pass').innerText(), /pass mark is 95 of 180/u);
+  assert.match(await page.locator('.exam-official-note').innerText(), /cannot be converted/u);
+  assert.equal(await page.locator('.exam-results-skills').count(), 0);
+  await fit(page, 'Official paper results');
+  await page.screenshot({ path: resolve(evidence, `${engine}-official-paper-n3-results-320.png`), fullPage: true });
+  return { papers: 2, sections: 3 };
 }
 // Every case this invocation could run, and whether the filter selected it: the receipt
 // compares this plan with the observed results.
@@ -1876,6 +1942,7 @@ try {
       console.log(`SKIP ${engine}/assisted-why${suffix}: ${form.id} is not the pinned G1 ledger form`);
     }
     }
+    await run(engine, 'machine-checked-form-sits-as-the-official-paper', (page) => officialPaperCase(page, engine));
   }
 } finally {
   if (server.listening) await new Promise((done) => server.close(done));

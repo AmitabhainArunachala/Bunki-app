@@ -29,9 +29,6 @@ async function mediaSource(bytes, mimeType) {
 }
 const minutes = ms => Math.max(0, Math.ceil(ms / 60_000));
 const clockText = ms => `${Math.floor(ms / 60_000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
-const TASKS = { 'kanji-reading': '漢字読み', 'orthography': '表記', 'contextual-expression': '文脈規定',
-  paraphrase: '言い換え類義', usage: '用法', 'grammar-form': '文法形式の判断',
-  'sentence-composition': '文の組み立て', 'text-grammar': '文章の文法' };
 /** Display structure comes from the retained item; no answer key is read. */
 export function assessmentQuestionLayout(form, question) {
   const groups = [];
@@ -43,9 +40,189 @@ export function assessmentQuestionLayout(form, question) {
   const lines = question.prompt.split('\n');
   return { group: groups.findIndex(row => row.ids.includes(question.id)) + 1,
     number: form.items.findIndex(item => item.id === question.id) + 1,
-    task: TASKS[question.task] || SKILLS[question.skill]?.[0] || '',
+    task: DAIMON[question.task]?.[0] || SKILLS[question.skill]?.[0] || '',
     instruction: lines.length > 1 ? lines.shift().replace(/【[\s\u3000]*】/gu, '＿＿＿') : '',
     text: lines.join('\n'), fullLength: form.scope === 'full-candidate' };
+}
+
+/* ---------------------------------------------------------------- the paper
+ * A JLPT form sits the way the printed paper does: its 試験科目 (paper), 問題 headers with the
+ * official instruction, one continuous item number per paper, underlined targets, （ ） blanks
+ * and the ★ row. Wording is the 2018 公式問題集 booklets' (N1–N3 〜なさい, N4/N5 〜てください,
+ * their spacing kept). Only an information-retrieval header is ours: the paper names its own
+ * document (右のページは、…である。). Rendering never changes an item: its prompt, options and
+ * key stay the exact form version. */
+export const DAIMON = Object.freeze({
+  'kanji-reading': ['漢字読み', 'Kanji reading'], orthography: ['表記', 'Orthography'],
+  'word-formation': ['語形成', 'Word formation'], 'contextual-expression': ['文脈規定', 'Words in context'],
+  paraphrase: ['言い換え類義', 'Paraphrase'], usage: ['用法', 'Usage'],
+  'grammar-form': ['文法形式の判断', 'Grammar form'], 'sentence-composition': ['文の組み立て', 'Sentence building (★)'],
+  'text-grammar': ['文章の文法', 'Text grammar'], 'short-reading': ['内容理解（短文）', 'Short passages'],
+  'mid-reading': ['内容理解（中文）', 'Mid-size passages'], 'long-reading': ['内容理解（長文）', 'Long passage'],
+  'integrated-reading': ['統合理解', 'Integrated reading'], 'claim-reading': ['主張理解（長文）', 'Thematic reading'],
+  'information-retrieval': ['情報検索', 'Information retrieval'],
+});
+const ONE_TO_FOUR = '１・２・３・４';
+const WIDE = n => String(n).replace(/[0-9]/gu, d => String.fromCharCode(0xff10 + Number(d)));
+// segments: strings are text; {u} an underlined blank, {b} a （ ） blank, {star} the ★ slot, {box} a numbered gap
+const U = { kind: 'underline' }, B = { kind: 'blank' }, STAR = { kind: 'star' };
+const box = n => ({ kind: 'box', n });
+const counted = (ctx, one, two, many) => ctx.passages <= 1 ? one : ctx.passages === 2 ? two : many(ctx.passages);
+// text grammar names its numbered gaps: [41]から[45]の中に…; one gap [41]に…; a gap printed in the stem （ ）に…
+const gapRange = (ctx, from, within) => ctx.first === undefined ? [B] : ctx.first === ctx.last ? [box(ctx.first)]
+  : [box(ctx.first), from, box(ctx.last), ...(within ? [within] : [])];
+const INSTRUCTIONS = {
+  // N1 and N2 share the paper's wording; N1 text grammar reads 趣旨を踏まえて, N2 内容を考えて.
+  upper: (level) => ({
+    'kanji-reading': () => [U, `の言葉の読み方として最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    orthography: () => [U, `の言葉を漢字で書くとき、最もよいものを${ONE_TO_FOUR}から一つ選びなさい。`],
+    'word-formation': () => [B, `に入れるのに最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'contextual-expression': () => [B, `に入れるのに最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    paraphrase: () => [U, `の言葉に意味が最も近いものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    usage: () => [`次の言葉の使い方として最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'grammar-form': () => ['次の文の', B, `に入れるのに最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'sentence-composition': () => ['次の文の', STAR, `に入る最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'text-grammar': ctx => [`次の文章を読んで、文章全体の${level === 'N1' ? '趣旨を踏まえて' : '内容を考えて'}、`,
+      ...gapRange(ctx, 'から', 'の中'), `に入る最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'short-reading': ctx => [`${counted(ctx, '次の文章', '次の（１）と（２）の文章', n => `次の（１）から（${WIDE(n)}）の文章`)}を読んで、後の問いに対する答えとして最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'mid-reading': ctx => [`${counted(ctx, '次の文章', '次の（１）と（２）の文章', n => `次の（１）から（${WIDE(n)}）の文章`)}を読んで、後の問いに対する答えとして最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'long-reading': () => [`次の文章を読んで、後の問いに対する答えとして最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'integrated-reading': () => [`次のＡとＢの文章を読んで、後の問いに対する答えとして最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'claim-reading': () => [`次の文章を読んで、後の問いに対する答えとして最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+    'information-retrieval': () => [`次の文書を読んで、下の問いに対する答えとして最もよいものを、${ONE_TO_FOUR}から一つ選びなさい。`],
+  }),
+  N3: () => ({
+    'kanji-reading': () => [U, `のことばの読み方として最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    orthography: () => [U, `のことばを漢字で書くとき、最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    'contextual-expression': () => [B, `に入れるのに最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    paraphrase: () => [U, `に意味が最も近いものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    usage: () => [`つぎのことばの使い方として最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    'grammar-form': () => ['つぎの文の', B, `に入れるのに最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    'sentence-composition': () => ['つぎの文の', STAR, `に入る最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    'text-grammar': ctx => ['つぎの文章を読んで、文章全体の内容を考えて、', ...gapRange(ctx, 'から', 'の中'),
+      `に入る最もよいものを、${ONE_TO_FOUR}から一つえらびなさい。`],
+    'short-reading': ctx => [`${counted(ctx, 'つぎの文章', 'つぎの（１）と（２）の文章', n => `つぎの（１）から（${WIDE(n)}）の文章`)}を読んで、質問に答えなさい。答えは、${ONE_TO_FOUR}から最もよいものを一つえらびなさい。`],
+    'mid-reading': ctx => [`${counted(ctx, 'つぎの文章', 'つぎの（１）と（２）の文章', n => `つぎの（１）から（${WIDE(n)}）の文章`)}を読んで、質問に答えなさい。答えは、${ONE_TO_FOUR}から最もよいものを一つえらびなさい。`],
+    'long-reading': () => [`つぎの文章を読んで、質問に答えなさい。答えは、${ONE_TO_FOUR}から最もよいものを一つえらびなさい。`],
+    'information-retrieval': () => [`つぎの文書を読んで、下の質問に答えなさい。答えは、${ONE_TO_FOUR}から最もよいものを一つえらびなさい。`],
+  }),
+  lower: (level) => ({
+    'kanji-reading': () => [U, `の ことばは ひらがなで どう かきますか。${ONE_TO_FOUR}から いちばん いい ものを ひとつ えらんで ください。`],
+    orthography: () => [U, `の ことばは どう かきますか。${ONE_TO_FOUR}から いちばん いい ものを ひとつ えらんで ください。`],
+    'contextual-expression': () => [B, `に ${level === 'N5' ? 'なにが はいりますか' : 'なにを いれますか'}。${ONE_TO_FOUR}から いちばん いい ものを ひとつ えらんで ください。`],
+    paraphrase: () => [U, `の ぶんと だいたい おなじ いみの ぶんが あります。${ONE_TO_FOUR}から いちばん いい ものを ひとつ えらんで ください。`],
+    usage: () => [`つぎの ことばの つかいかたで いちばん いい ものを ${ONE_TO_FOUR}から ひとつ えらんで ください。`],
+    'grammar-form': () => [B, `に 何を 入れますか。${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`],
+    'sentence-composition': () => [STAR, `に 入る ものは どれですか。${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`],
+    'text-grammar': ctx => [...gapRange(ctx, 'から', ''), level === 'N5'
+      ? `に 何を 入れますか。ぶんしょうの いみを かんがえて、${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`
+      : `に 何を 入れますか。文章の 意味を 考えて、${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`],
+    'short-reading': ctx => [level === 'N5'
+      ? `${counted(ctx, 'つぎの', 'つぎの （１）と（２）の', n => `つぎの （１）から（${WIDE(n)}）の`)} ぶんしょうを 読んで、しつもんに こたえて ください。こたえは、${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`
+      : `${counted(ctx, 'つぎの文章', 'つぎの（１）と（２）の文章', n => `つぎの（１）から（${WIDE(n)}）の文章`)}を読んで、質問に答えてください。答えは、${ONE_TO_FOUR}から、いちばんいいものを一つえらんでください。`],
+    'mid-reading': () => [level === 'N5'
+      ? `つぎの ぶんしょうを 読んで、しつもんに こたえて ください。こたえは、${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`
+      : `つぎの文章を読んで、質問に答えてください。答えは、${ONE_TO_FOUR}から、いちばんいいものを一つえらんでください。`],
+    'information-retrieval': () => [level === 'N5'
+      ? `つぎの ページを 見て、下の しつもんに こたえて ください。こたえは、${ONE_TO_FOUR}から いちばん いい ものを 一つ えらんで ください。`
+      : `つぎのページを見て、下の質問に答えてください。答えは、${ONE_TO_FOUR}から、いちばんいいものを一つえらんでください。`],
+  }),
+};
+/** The official instruction for one 大問, as segments; null for a task this level's paper lacks. */
+export function officialInstruction(level, task, context = {}) {
+  const table = level === 'N1' || level === 'N2' ? INSTRUCTIONS.upper(level)
+    : level === 'N3' ? INSTRUCTIONS.N3() : level === 'N4' || level === 'N5' ? INSTRUCTIONS.lower(level) : null;
+  // a compact practice task (not an official 大問) reads like one passage with its questions
+  const make = table?.[task] ?? (/^compact-/u.test(task) ? table?.['claim-reading'] ?? table?.['mid-reading'] : null);
+  return make ? make({ passages: 1, ...context }) : null;
+}
+export const mondaiLabel = (level, number) => `${level === 'N4' || level === 'N5' ? 'もんだい' : '問題'}${WIDE(number)}`;
+
+/** Marks in authored text, as segments: 【X】 an underlined target (【 】 an underlined
+ * blank), （ ） a blank, ＿★＿ the star slot, ＿＿＿ a slot, and （n） a numbered gap when
+ * `gaps` maps it to a paper number. */
+export function paperSegments(text, { gaps = null } = {}) {
+  const segments = [];
+  const pattern = /【([^】]*)】|（[\u3000 ]+）|＿★＿|＿＿＿|_{2,}|★|（([０-９0-9]+)）/gu;
+  let at = 0;
+  for (const match of text.matchAll(pattern)) {
+    const [whole, target, gap] = match;
+    let segment;
+    if (target !== undefined) segment = target.trim() ? { kind: 'target', text: target } : U;
+    else if (whole === '＿★＿' || whole === '★') segment = STAR;
+    else if (whole === '＿＿＿' || whole.startsWith('_')) segment = { kind: 'slot' };
+    else if (gap !== undefined) {
+      const n = Number(gap.normalize('NFKC'));
+      if (!gaps?.has(n)) continue;
+      segment = box(gaps.get(n));
+    } else segment = B;
+    if (match.index > at) segments.push(text.slice(at, match.index));
+    segments.push(segment);
+    at = match.index + whole.length;
+  }
+  if (at < text.length) segments.push(text.slice(at));
+  return segments;
+}
+const PASSAGE_TASKS = new Set(['text-grammar', 'short-reading', 'mid-reading', 'long-reading',
+  'integrated-reading', 'claim-reading', 'information-retrieval']);
+/** The printed stem: an item's own instruction line is replaced by its 問題 header. */
+export function paperStem(item) {
+  // a gap numbered in its passage prints as the item number alone
+  if (item.task === 'text-grammar' && item.passages.length) return [];
+  const lines = item.prompt.split('\n');
+  const stem = (PASSAGE_TASKS.has(item.task) && item.passages.length) || /^compact-/u.test(item.task) || lines.length < 2
+    ? item.prompt : lines.slice(1).join('\n');
+  // 用法 prints the word itself as the stem, not underlined: 【手際】, or 「携わる」の使い方として…
+  if (item.task === 'usage')
+    return [{ kind: 'word', text: stem.match(/^「(.+?)」の使い方/u)?.[1] ?? stem.replace(/^【(.*)】$/u, '$1') }];
+  return paperSegments(stem);
+}
+/** Whether the printed stem leaves out the item's own first line, its authored instruction. */
+const paperStemDropsLine = item => !(item.task === 'text-grammar' && item.passages.length) &&
+  !((PASSAGE_TASKS.has(item.task) && item.passages.length) || /^compact-/u.test(item.task) || item.prompt.split('\n').length < 2);
+/** The text-grammar gap an item asks about: 「文章の（２）に…」 → 2. */
+export const textGrammarGap = item => {
+  const gap = item.task === 'text-grammar' ? item.prompt.match(/（([０-９0-9]+)）/u)?.[1] : null;
+  return gap ? Number(gap.normalize('NFKC')) : null;
+};
+
+/** One paper (試験科目) laid out: 問題 groups in order and each item's continuous number. */
+export function paperLayout(form, blockId) {
+  const block = form.timingBlocks.find(row => row.id === blockId);
+  if (!block) throw new Error(`paper-layout: no block ${blockId}`);
+  const items = block.sectionIds.flatMap(id => form.sections.find(row => row.id === id).itemIds)
+    .map(id => form.items.find(row => row.id === id));
+  const groups = [], byItem = new Map();
+  items.forEach((item, index) => {
+    let group = groups.at(-1);
+    if (group?.task !== item.task) {
+      group = { mondai: groups.length + 1, task: item.task, itemIds: [], numbers: [], passageIds: [] };
+      groups.push(group);
+    }
+    group.itemIds.push(item.id); group.numbers.push(index + 1);
+    for (const reference of item.passages) if (!group.passageIds.includes(reference.id)) group.passageIds.push(reference.id);
+    byItem.set(item.id, { number: index + 1, group });
+  });
+  for (const group of groups) {
+    if (group.task !== 'text-grammar' || !group.passageIds.length) continue;
+    group.gaps = new Map(group.itemIds.map((id, index) => [textGrammarGap(form.items.find(row => row.id === id)), group.numbers[index]]));
+  }
+  return { blockId, paper: block.authority.kind === 'official-fact' ? block.authority.blockId : null, groups, byItem };
+}
+
+/** Raw results by the official 得点区分, with the published facts beside them. No conversion. */
+export function officialSectionResults(facts, form, scoreItems) {
+  return facts.sections.map(section => {
+    const rows = scoreItems.filter(row => section.skills.includes(row.skill));
+    const byTask = [];
+    for (const row of rows) {
+      const task = form.items.find(item => item.id === row.itemId)?.task;
+      let entry = byTask.find(value => value.task === task);
+      if (!entry) byTask.push(entry = { task, correct: 0, total: 0 });
+      entry.total += 1; if (row.result === 'correct') entry.correct += 1;
+    }
+    return { ...section, total: rows.length, correct: rows.filter(row => row.result === 'correct').length, byTask };
+  });
 }
 
 export function createAssessmentView(host) {
@@ -110,6 +287,38 @@ export function createAssessmentView(host) {
     }
     appendText(container, text.slice(cursor), selected, itemId, role);
   }
+  // The printed-paper facts belong to the machine-checked JLPT forms; other classes keep the plain sheet.
+  const paperMode = selected => !!host.machineCheckLabel?.(selected) && selected.form.exam.family === 'jlpt';
+  const officialFacts = level => host.officialFacts?.(level) || null;
+  // Paper segments onto the sheet. Words go through `write` (the study-mode lookup, plain text when
+  // timed); a target or printed word stays part of its parent's one keyboard stop.
+  function appendSegments(parent, segments, current = null, write = (into, text) => into.append(document.createTextNode(text))) {
+    for (const segment of segments) {
+      if (typeof segment === 'string') { write(parent, segment, parent); continue; }
+      const kind = segment.kind;
+      const span = node('span', kind === 'underline' ? 'exam-underline-blank' : kind === 'blank' ? 'exam-blank'
+        : kind === 'star' ? 'exam-slot exam-star-slot' : kind === 'slot' ? 'exam-slot' : kind === 'target' ? 'exam-target'
+          : kind === 'box' ? 'exam-gap-box' : 'exam-word');
+      if (kind === 'target' || kind === 'word') write(span, segment.text, parent);
+      else span.textContent = kind === 'underline' ? '　　　　' : kind === 'blank' ? '（　　　）'
+        : kind === 'star' ? '★' : kind === 'slot' ? '　' : String(segment.n);
+      if (kind === 'box' && segment.n === current) span.dataset.current = 'true';
+      parent.append(span);
+    }
+    return parent;
+  }
+  // 試験科目: a written paper's official name and its minutes and questions, from the entry
+  function entryPapers(entry) {
+    const facts = officialFacts(entry.level);
+    if (entry.timingAuthority !== 'official-fact' || !facts?.blueprint) return [];
+    return facts.blueprint.timingBlocks.filter(block => block.duration === 'fixed' && !block.skills.includes('listening'))
+      .map(block => ({ label: facts.score.papers[block.id], minutes: block.minutes,
+        questions: block.skills.reduce((total, skill) => total + Number(entry.skillCounts?.[skill] || 0), 0) }));
+  }
+  const paperName = (selected, blockId) => {
+    const spec = selected.form.timingBlocks.find(row => row.id === blockId);
+    return spec?.authority.kind === 'official-fact' ? officialFacts(selected.form.exam.track)?.score.papers[spec.authority.blockId] || null : null;
+  };
   function blockUnits(selected) {
     const open = selected.attempt.blocks.find(row => row.status === 'open');
     const spec = selected.form.timingBlocks.find(row => row.id === open?.blockId);
@@ -337,6 +546,12 @@ export function createAssessmentView(host) {
     card.append(node('h2', '', titleOf(entry)), node('p', 'exam-form-meta',
       tx(`${entry.questionCount}問 · 約${entry.durationMinutes}分`, `${entry.questionCount} questions · about ${entry.durationMinutes} min`)));
     if (entry.review?.status === 'machine-checked') card.append(reviewMark(entry.review.label));
+    const papers = entryPapers(entry);
+    if (papers.length) card.append(node('p', 'exam-form-timing', tx(
+      `本試験と同じ時間割：${papers.map(row => `${row.label} ${row.minutes}分`).join('／')}`,
+      `Official paper times: ${papers.map(row => `${row.label} ${row.minutes} min`).join(' / ')}`)));
+    else if (entry.review?.status === 'machine-checked') card.append(node('p', 'exam-form-timing', tx(
+      `${entry.questionCount}問の練習（模試ではありません）`, `${entry.questionCount}-question practice, not a mock test`)));
     card.append(node('p', 'exam-skills', Object.entries(SKILLS)
       .filter(([skill]) => Number(entry.skillCounts?.[skill]) > 0)
       .map(([, labels]) => tx(...labels)).join(' · ')));
@@ -362,7 +577,27 @@ export function createAssessmentView(host) {
       if (writtenSection) section.append(node('p', 'exam-scope-note', tx(
         `${value.entry.questionCount}問・${value.entry.durationMinutes}分の短縮練習です。JLPT本試験の全問題・全科目ではありません。${audio ? '' : '聴解は含みません。'}`,
         `${value.entry.questionCount} questions · ${value.entry.durationMinutes} minutes: a shorter practice set, not a complete JLPT examination.${audio ? '' : ' Listening is not included.'}`)));
-      if (value.entry.level === 'N1') {
+      // the official papers this test sits (its 試験科目 and their real minutes); a level without them
+      // still names the real format, so a short set is never mistaken for the whole examination
+      const papers = entryPapers(value.entry);
+      if (papers.length) {
+        const sitting = node('div', 'exam-papers'); sitting.dataset.examPapers = String(papers.length);
+        sitting.append(node('p', '', papers.length > 1
+          ? tx(`本試験と同じく、筆記は${papers.length}つの試験科目に分かれています。1つ目が終わると2つ目の時間が始まります。`,
+            `As in the real test, the written part is ${papers.length} papers. The second paper's time starts when the first ends.`)
+          : tx('本試験と同じ試験科目・時間です。', 'The same paper and time as the real test.')));
+        const list = node(papers.length > 1 ? 'ol' : 'ul', 'exam-paper-list');
+        for (const row of papers) {
+          const line = node('li', ''); line.lang = 'ja';
+          line.append(node('span', 'exam-paper-name', row.label), node('span', 'exam-paper-time',
+            tx(` ${row.minutes}分 · ${row.questions}問`, ` ${row.minutes} min · ${row.questions} questions`)));
+          list.append(line);
+        }
+        sitting.append(list, node('p', 'exam-paper-note', tx(
+          '時間は本試験と同じですが、問題数は本試験のおよそ半分です。聴解はまだありません。',
+          'The time is the real test’s; the number of questions is about half the real paper’s. Listening is not included yet.')));
+        section.append(sitting);
+      } else if (value.entry.level === 'N1') {
         const official = node('p', 'exam-official-format', tx('本試験N1：言語知識・読解110分、聴解55分。',
           'Official N1: Language Knowledge / Reading 110 min; Listening 55 min.'));
         const source = node('a', '', tx('公式の試験構成', 'Official test structure'));
@@ -636,6 +871,47 @@ export function createAssessmentView(host) {
       ? host.explanation?.(selected.attempt.attemptId, question.id) : null;
     if (explanation) renderWhySheet(main, explanation, selected, question);
   }
+  function renderOfficialSections(main, selected, facts, assistedItem) {
+    const { form, score } = selected;
+    const rows = officialSectionResults(facts, form, score.items);
+    const box = node('section', 'exam-official'); box.dataset.examOfficial = form.exam.track;
+    box.append(node('h2', 'exam-official-title', tx('得点区分別の結果（素点）', 'By official score section (raw count)')));
+    for (const row of rows) {
+      const part = node('div', 'exam-official-row'); part.dataset.scoreSection = row.id;
+      const label = node('p', 'exam-official-label', row.label); label.lang = 'ja';
+      const helped = score.items.filter(item => row.skills.includes(item.skill) && assistedItem(item.itemId)).length;
+      const spent = minutes(score.items.filter(item => row.skills.includes(item.skill)).reduce((n, item) => n + item.elapsedMs, 0));
+      const raw = node('p', 'exam-official-raw', row.total
+        ? tx(`${row.correct} / ${row.total} 問正解${helped ? `（助けあり ${helped}）` : ''} · ${spent}分`,
+          `${row.correct} of ${row.total} correct${helped ? ` (${helped} assisted)` : ''} · ${spent} min`)
+        : tx('この練習にはありません', 'Not in this practice'));
+      raw.dataset.raw = row.total ? `${row.correct}/${row.total}` : 'none';
+      const fact = node('p', 'exam-official-fact', tx(
+        `本試験：尺度得点 ${row.range[0]}〜${row.range[1]}点 · 基準点 ${row.sectionalMinimum}点`,
+        `Real test: scaled ${row.range[0]}–${row.range[1]} · sectional minimum ${row.sectionalMinimum}`));
+      part.append(label, raw, fact);
+      if (row.byTask.length) {
+        const list = node('ul', 'exam-official-daimon');
+        for (const entry of row.byTask) {
+          const line = node('li', ''); line.dataset.task = entry.task;
+          const title = node('span', 'exam-daimon-name', DAIMON[entry.task]?.[0] || entry.task); title.lang = 'ja';
+          line.append(title, node('span', 'exam-daimon-count', ` ${entry.correct}/${entry.total}`));
+          list.append(line);
+        }
+        part.append(list);
+      }
+      box.append(part);
+    }
+    const ranges = facts.sections.every(row => row.range[1] === 60) ? tx('各0〜60点', 'each 0–60')
+      : facts.sections.map(row => `${row.label} ${row.range[0]}〜${row.range[1]}`).join(tx('、', ', '));
+    box.append(node('p', 'exam-official-pass', tx(
+      `本試験の合格点は ${facts.passMark}点（0〜180点）で、すべての得点区分が基準点以上であることも必要です。`,
+      `The real test's pass mark is ${facts.passMark} of 180, and every score section must also reach its minimum.`)),
+    node('p', 'exam-official-note', tx(
+      `本試験の得点は項目応答理論による尺度得点（${ranges}）で、素点からは換算できません。この結果は合否の予測ではありません。`,
+      `Real scores are scaled by item response theory (${ranges}); a raw count cannot be converted into them. This is not a pass prediction.`)));
+    main.append(box);
+  }
   function renderQuestion(main, selected) {
     const { form, attempt } = selected;
     main.dataset.examMode = attempt.mode;
@@ -654,6 +930,13 @@ export function createAssessmentView(host) {
       const pending = attempt.blocks.find(row => row.status === 'pending');
       main.append(node('p', '', tx('このパートは終了しました。準備ができたら次のパートへ進んでください。',
         'This section is finished. Start the next section when you’re ready.')));
+      const nextPaper = pending && paperName(selected, pending.blockId);
+      if (nextPaper && paperMode(selected)) {
+        const spec = form.timingBlocks.find(row => row.id === pending.blockId);
+        const line = node('p', 'exam-next-paper', tx(`次の試験科目：${nextPaper}（${minutes(spec.durationMs)}分）`,
+          `Next paper: ${nextPaper} (${minutes(spec.durationMs)} min)`)); line.dataset.examNextPaper = spec.authority.blockId;
+        main.append(line);
+      }
       if (pending) main.append(button(tx('次のパートを始める', 'Start next section'), 'exam-next-block', () => command({ kind: 'start-next-block' }), 'take'));
       return;
     }
@@ -691,18 +974,37 @@ export function createAssessmentView(host) {
       renderAudio(main, selected, form.media.find(row => row.sha256 === example.media.sha256), true);
       renderLeaveControls(main); return;
     }
+    // One sheet for every form. A machine-checked JLPT form sits the real paper on it: the official
+    // 試験科目 name, 問題 numbers and item numbers that restart with each paper, the official
+    // instruction wording, underlined targets, blanks, ★ and numbered gaps. Other forms keep
+    // their retained instruction line and whole-form numbering.
+    const level = form.exam.track;
+    const place = paperMode(selected) ? paperLayout(form, block.blockId).byItem.get(question.id) || null : null;
+    const layout = assessmentQuestionLayout(form, question);
+    const write = role => (into, text, stop) => appendText(into, text, selected, question.id, role, stop);
     const paper = node('article', 'exam-paper'); paper.lang = 'ja';
     paper.setAttribute('aria-labelledby', 'exam-task-title'); main.append(paper);
-    const layout = assessmentQuestionLayout(form, question);
     const paperHeader = node('header', 'exam-paper-header');
     const skillHeading = node('p', 'exam-skill');
-    appendText(skillHeading, question.skill === 'listening' ? '聴解'
-      : ['N1', 'N2'].includes(form.exam.track) ? '言語知識（文字・語彙・文法）・読解'
-        : SKILLS[question.skill]?.[0] || question.skill, selected, question.id, 'instruction'); paperHeader.append(skillHeading);
+    appendText(skillHeading, (place && paperName(selected, block.blockId)) || (question.skill === 'listening' ? '聴解'
+      : ['N1', 'N2'].includes(level) ? '言語知識（文字・語彙・文法）・読解'
+        : SKILLS[question.skill]?.[0] || question.skill), selected, question.id, 'instruction'); paperHeader.append(skillHeading);
     const taskHeading = node('h2', 'exam-task-heading');
-    appendText(taskHeading, `問題 ${layout.group}　${layout.task}`, selected, question.id, 'instruction');
+    if (place) {
+      taskHeading.dataset.mondai = String(place.group.mondai); taskHeading.dataset.task = place.group.task;
+      const number = node('span', 'exam-mondai-no');
+      write('instruction')(number, mondaiLabel(level, place.group.mondai), taskHeading);
+      const name = node('span', 'exam-daimon');
+      write('instruction')(name, DAIMON[place.group.task]?.[0] || layout.task, taskHeading);
+      taskHeading.append(number, document.createTextNode('　'), name);
+    } else appendText(taskHeading, `問題 ${layout.group}　${layout.task}`, selected, question.id, 'instruction');
     taskHeading.id = 'exam-task-title'; paperHeader.append(taskHeading);
-    if (layout.instruction) {
+    const officialLine = place ? officialInstruction(level, place.group.task, { passages: place.group.passageIds.length,
+      ...(place.group.gaps ? { first: place.group.numbers[0], last: place.group.numbers.at(-1) } : {}) }) : null;
+    if (officialLine) {
+      const instruction = node('p', 'exam-task-instruction exam-mondai-instruction');
+      appendSegments(instruction, officialLine, null, write('instruction')); paperHeader.append(instruction);
+    } else if (layout.instruction && (!place || paperStemDropsLine(question))) {
       const instruction = node('p', 'exam-task-instruction');
       appendText(instruction, layout.instruction, selected, question.id, 'instruction'); paperHeader.append(instruction);
     }
@@ -710,13 +1012,19 @@ export function createAssessmentView(host) {
     for (const reference of question.passages) {
       const passage = form.passages.find(row => row.sha256 === reference.sha256);
       const text = node('section', 'exam-passage'); text.lang = 'ja';
+      if (place && ['short-reading', 'mid-reading'].includes(place.group.task) && place.group.passageIds.length > 1)
+        text.append(node('p', 'exam-passage-label', `（${place.group.passageIds.indexOf(reference.id) + 1}）`));
       if (passage?.title) { const heading = node('h3', ''); appendText(heading, passage.title, selected, question.id, 'passage'); text.append(heading); }
-      const body = node('p', ''); appendText(body, passage?.text || '', selected, question.id, 'passage');
+      const body = node('p', '');
+      if (place?.group.gaps) appendSegments(body, paperSegments(passage?.text || '', { gaps: place.group.gaps }), place.number, write('passage'));
+      else appendText(body, passage?.text || '', selected, question.id, 'passage');
       text.append(body); paper.append(text);
     }
-    const prompt = node('p', 'mock-question exam-prompt'); prompt.lang = 'ja';
-    prompt.append(node('span', 'exam-question-number', String(layout.number)));
-    questionText(prompt, layout.text, selected, question.id, 'prompt'); paper.append(prompt);
+    const prompt = node('p', place ? 'mock-question exam-prompt exam-paper-question' : 'mock-question exam-prompt'); prompt.lang = 'ja';
+    prompt.append(node('span', 'exam-question-number', String(place ? place.number : layout.number)));
+    if (place) { prompt.dataset.paperNumber = String(place.number); appendSegments(prompt, paperStem(question), null, write('prompt')); }
+    else questionText(prompt, layout.text, selected, question.id, 'prompt');
+    paper.append(prompt);
     if (attempt.mode === 'practice' && host.english() && question.translatedInstruction)
       paper.append(node('p', 'exam-instruction', question.translatedInstruction));
     for (const reference of question.media) {
@@ -738,6 +1046,8 @@ export function createAssessmentView(host) {
     }
     if (question.response.kind === 'selected') {
       const options = node('div', 'mock-opts'); options.setAttribute('role', 'group'); options.setAttribute('aria-label', tx('解答', 'Answer choices'));
+      // short choices print across the page, as on the paper
+      if (paperMode(selected) && question.response.options.every(option => [...option.text].length <= 9)) options.classList.add('exam-opts-row');
       question.response.options.forEach((option, number) => {
         const unit = deliveryUnits(selected).find(row => row.kind === 'question' && row.itemIds.includes(question.id));
         const audioOnly = question.skill === 'listening' && (!unit || !unit.printedOptions);
@@ -814,13 +1124,17 @@ export function createAssessmentView(host) {
       for (const [label, count] of [[tx('不正解', 'Incorrect'), score.incorrect], [tx('未回答', 'Unanswered'), score.unanswered], [tx('未到達', 'Not reached'), score.notReached]]) {
         const item = node('div'); item.append(node('dt', '', label), node('dd', '', String(count))); counts.append(item);
       } main.append(counts);
-      const skills = node('div', 'exam-results-skills');
-      for (const [skill, labels] of Object.entries(SKILLS)) {
-        const rows = score.items.filter(row => row.skill === skill); if (!rows.length) continue;
-        const correct = rows.filter(row => row.result === 'correct').length;
-        const helped = rows.filter(row => assistedItem(row.itemId)).length;
-        skills.append(node('p', '', `${tx(...labels)} · ${correct}/${rows.length}${helped ? tx(`（助けあり ${helped}）`, ` (${helped} assisted)`) : ''} · ${minutes(rows.reduce((n, row) => n + row.elapsedMs, 0))} ${tx('分', 'min')}`));
-      } main.append(skills);
+      const facts = paperMode(selected) ? officialFacts(form.exam.track)?.score : null;
+      if (facts) renderOfficialSections(main, selected, facts, assistedItem);
+      else {
+        const skills = node('div', 'exam-results-skills');
+        for (const [skill, labels] of Object.entries(SKILLS)) {
+          const rows = score.items.filter(row => row.skill === skill); if (!rows.length) continue;
+          const correct = rows.filter(row => row.result === 'correct').length;
+          const helped = rows.filter(row => assistedItem(row.itemId)).length;
+          skills.append(node('p', '', `${tx(...labels)} · ${correct}/${rows.length}${helped ? tx(`（助けあり ${helped}）`, ` (${helped} assisted)`) : ''} · ${minutes(rows.reduce((n, row) => n + row.elapsedMs, 0))} ${tx('分', 'min')}`));
+        } main.append(skills);
+      }
       const conditions = node('details', 'exam-conditions');
       conditions.append(node('summary', '', tx('受験時の状況', 'Test conditions')));
       conditions.append(node('p', '', attempt.mode === 'timed' ? tx('時間制限あり', 'Timed attempt') : tx('時間制限なし', 'Untimed practice')));
@@ -869,7 +1183,8 @@ export function createAssessmentView(host) {
       }
       const helped = assistedItem(result.itemId);
       if (helped) details.dataset.examAssisted = 'true';
-      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${question.prompt.split('\n').at(-1)}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
+      const daimon = paperMode(selected) ? DAIMON[question.task]?.[0] : null;
+      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${question.prompt.split('\n').at(-1)}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
       const selectedOption = question.response.kind === 'selected' && result.response.kind === 'selected'
         ? question.response.options.find(row => row.id === result.response.optionId)?.text : tx('未回答', 'No answer');
       const sourcePrompt = node('p', 'exam-result-prompt');
