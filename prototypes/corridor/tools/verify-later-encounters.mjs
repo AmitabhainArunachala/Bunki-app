@@ -48,6 +48,21 @@ const ORIGIN = `https://127.0.0.1:${server.address().port}`;
 const results = [], startedAt = new Date().toISOString();
 const stableRoots = ['sentencePractice', 'teacherContexts', 'teacherDrafts', 'taken', 'srs', 'revlog', 'stats'];
 function unchanged(before, after, keys = stableRoots) { for (const key of keys) assert.deepEqual(after[key], before[key], key); }
+// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
+// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+async function againReturns(page, cue, session) {
+  await page.waitForFunction(() => !document.querySelector('.grade')
+    && document.getElementById('sentence-recall-answer')?.value === '');
+  assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');
+  assert.equal(await page.locator('.sentence-recall-cue').textContent(), cue, 'Again shows the same card again');
+  assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()),
+    { queue: session.queue + 1, ix: session.ix + 1, deferred: session.deferred }, 'Again reinserts the card as the next item');
+}
+async function gradeAgain(page) {
+  const cue = await page.locator('.sentence-recall-cue').textContent();
+  const session = await page.evaluate(() => window.__KAIRO_SRS__.session());
+  await page.locator('.grade.g-again').click(); await againReturns(page, cue, session);
+}
 function exportMetadataOnly(before, after, earliest, latest) {
   const timestamp = after.record.stats.lastExportTs;
   assert(Number.isSafeInteger(timestamp) && timestamp >= earliest && timestamp <= latest,
@@ -239,8 +254,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.deepEqual(enrolled.sentencePractice.entries.find(entry => entry.plan.id === first.plan.id), original);
     assert.deepEqual(second.plan.confirmation, first.plan.confirmation);
     await page.locator('#sentence-review-start').click(); await page.locator('#sentence-recall-answer').fill('戸');
-    await page.locator('#sentence-recall-check').click(); await page.locator('.grade.g-again').click();
-    await page.locator('#zen-wait-skip').waitFor();
+    await page.locator('#sentence-recall-check').click(); await gradeAgain(page);
     const beforeUndo = await snapshot('later-difficulty-before-undo');
     await page.locator('.review-undo').click();
     await waitForAppRecord(page, record => record.revlog.length === beforeUndo.revlog.length + 1 && record.revlog.at(-1)[2] === 0,
@@ -259,7 +273,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await suggestion('revisit').count(), 0, 'An undone grade must not request remedial reading');
     await openSaved(second.plan.id); await page.locator('#sentence-review-start').click();
     await page.locator('#sentence-recall-answer').fill('戸'); await page.locator('#sentence-recall-check').click();
-    await page.locator('.grade.g-again').click(); await page.locator('#zen-wait-skip').waitFor();
+    await gradeAgain(page);
     const difficult = await snapshot('later-recall-needed-another-try');
     assert.equal(difficult.sentencePractice.grades.length, firstGrades + 2);
     assert.equal(difficult.sentencePractice.grades.at(-1).observation.grade, 'again');
