@@ -568,7 +568,7 @@ async function officialPaperCase(page, engine) {
   await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(reading.at(-1))}]`).click();
   await page.locator('#exam-finish-block').click();
   await page.locator('#exam-confirm-finish').click();
-  await page.locator('[data-exam-official="N3"]').waitFor();
+  await page.locator('[data-exam-official-results="N3"]').waitFor();
   assert.deepEqual(await page.locator('[data-score-section]').evaluateAll((rows) => rows.map((row) => row.dataset.scoreSection)),
     ['language', 'reading', 'listening']);
   assert.equal(await page.locator('[data-score-section="listening"] [data-raw]').getAttribute('data-raw'), 'none');

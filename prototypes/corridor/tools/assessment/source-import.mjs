@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, realpath, stat, writeFile } from 'node:fs/promises';
-import { isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir } from 'node:os';
 
 export const MAX_SOURCE_BYTES = 32 * 1024 * 1024;
@@ -115,23 +115,45 @@ async function fetchBounded(url, fetchImpl, timeoutMs = 30_000) {
   return Buffer.concat(chunks);
 }
 
+/** Creates `directory` and refuses it when it resolves inside this repository (and so the site). */
+export async function privateDirectory(directory) {
+  const repositoryRoot = resolve(new URL('../../../../', import.meta.url).pathname);
+  const resolvedRepository = await realpath(repositoryRoot);
+  const outside = (path) => {
+    const inRepository = relative(resolvedRepository, path);
+    return (
+      !!inRepository &&
+      (inRepository.startsWith(`..${sep}`) || inRepository === '..' || isAbsolute(inRepository))
+    );
+  };
+  // Refuse before creating anything: resolve the nearest existing ancestor first.
+  let existing = resolve(directory);
+  const missing = [];
+  for (;;) {
+    try {
+      existing = await realpath(existing);
+      break;
+    } catch (error) {
+      if (error.code !== 'ENOENT' || dirname(existing) === existing) throw error;
+      missing.unshift(basename(existing));
+      existing = dirname(existing);
+    }
+  }
+  const refusal = 'Source store must be outside the repository and public site';
+  if (!outside(join(existing, ...missing))) throw new Error(refusal);
+  await mkdir(directory, { recursive: true, mode: 0o700 });
+  const resolvedStore = await realpath(directory);
+  if (!outside(resolvedStore)) throw new Error(refusal);
+  return resolvedStore;
+}
+
 /** Source bytes stay in a private store. Extraction is separate from editorial admission. */
 export async function importSource(raw, options = {}) {
   const request = validateSourceRequest(raw);
   const store = resolve(
     options.store ?? join(homedir(), '.dharma/bunki_assessment/private-sources'),
   );
-  const repositoryRoot = resolve(new URL('../../../../', import.meta.url).pathname);
-  await mkdir(store, { recursive: true, mode: 0o700 });
-  const resolvedStore = await realpath(store);
-  const resolvedRepository = await realpath(repositoryRoot);
-  const inRepository = relative(resolvedRepository, resolvedStore);
-  if (
-    !inRepository ||
-    (!inRepository.startsWith(`..${sep}`) && inRepository !== '..' && !isAbsolute(inRepository))
-  ) {
-    throw new Error('Source store must be outside the repository and public site');
-  }
+  const resolvedStore = await privateDirectory(store);
   let bytes;
   if (request.url)
     bytes = await fetchBounded(request.url, options.fetchImpl ?? fetch, options.timeoutMs);
