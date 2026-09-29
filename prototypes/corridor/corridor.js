@@ -7083,25 +7083,106 @@ function japaneseLookupRecord(text, { reading = '', pos = '' } = {}) {
   return kept && fits(kept.r) ? kept : null;
 }
 
+/* Each prose block (a paragraph, heading, prompt or answer choice) is one Tab stop; its words are
+ * reached with ←/→ and Home/End. ↑/↓ are left to the page so it still scrolls. */
+function lookupBlockWords(block) {
+  return [...block.querySelectorAll('.japanese-lookup-word')].filter(word => word.closest('[data-lookup-block]') === block);
+}
+
+function setLookupStop(word) {
+  const block = word.closest('[data-lookup-block]');
+  for (const other of block ? lookupBlockWords(block) : [word]) other.tabIndex = other === word ? 0 : -1;
+}
+
+/** The keyboard help every lookup word shares. It lives outside the prose so that no question
+ * text, excerpt or narration source ever contains it. */
+function japaneseLookupHelpId() {
+  let help = document.getElementById('japanese-lookup-help');
+  if (!help) {
+    help = el('span');
+    help.id = 'japanese-lookup-help';
+    help.hidden = true;
+    document.body.append(help);
+  }
+  help.textContent = tx('Enter: 読みと意味 · ←→: 次の語', 'Enter: reading and meaning · ←/→: next word');
+  return help.id;
+}
+
+/** Where a question's word sits — which of that question's blocks, which word in it — so a
+ * re-render that commits assistance returns to this occurrence, never an earlier repeat. */
+function lookupOccurrence(word) {
+  const item = word.dataset.lookupItem, block = word.closest('[data-lookup-block]');
+  if (!item || !block) return null;
+  const twins = lookupItemBlocks(item).filter(other => other.textContent === block.textContent);
+  return { item, text: word.dataset.lookupText, blockText: block.textContent, block: twins.indexOf(block),
+    word: lookupBlockWords(block).indexOf(word) };
+}
+
+function lookupItemBlocks(item) {
+  const words = [...document.querySelectorAll('[data-lookup-item]')].filter(word => word.dataset.lookupItem === item);
+  return [...new Set(words.map(word => word.closest('[data-lookup-block]')).filter(Boolean))];
+}
+
+function findLookupOccurrence(occurrence) {
+  if (!occurrence) return null;
+  const block = lookupItemBlocks(occurrence.item).filter(other => other.textContent === occurrence.blockText)[occurrence.block];
+  const word = block && lookupBlockWords(block)[occurrence.word];
+  return word?.dataset.lookupText === occurrence.text ? word : null;
+}
+
+let japaneseLookupMini = null;
+
+function lookupWordKey(event, word) {
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.key === 'Escape') {
+    // Only this word's own popup: otherwise Escape still belongs to the sheet or room around it.
+    if (japaneseLookupMini?.anchor !== word || !japaneseLookupMini.mini.isConnected) return;
+    event.preventDefault(); event.stopPropagation();
+    removeMini();
+    return;
+  }
+  const block = word.closest('[data-lookup-block]');
+  const words = block ? lookupBlockWords(block) : [word], at = words.indexOf(word);
+  const moves = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: words.length - 1 };
+  if (!Object.hasOwn(moves, event.key)) return;
+  event.preventDefault();
+  words[moves[event.key]]?.focus();
+}
+
 /** A shared lookup door for Japanese prose, including questions and source quotations.
  * Assistance is committed by the caller before any reading or gloss is revealed. */
 async function openJapaneseLookup(anchor, text, context = {}) {
+  const occurrence = anchor.dataset?.lookupItem ? lookupOccurrence(anchor) : null;
+  const hadFocus = document.activeElement === anchor;
   if (context.beforeOpen && !(await context.beforeOpen())) return;
-  if (!anchor.isConnected && context.itemId) anchor = [...document.querySelectorAll('[data-lookup-item]')].find(word => word.dataset.lookupItem === context.itemId && word.dataset.lookupText === text);
+  if (!anchor.isConnected && occurrence) {
+    anchor = findLookupOccurrence(occurrence);
+    // A re-render that saved the help took the focused word with it; keyboard users stay put.
+    if (anchor && hadFocus && (!document.activeElement || document.activeElement === document.body)) anchor.focus({ preventScroll: true });
+  }
   if (!anchor?.isConnected) return;
+  if (anchor.classList.contains('japanese-lookup-word')) setLookupStop(anchor);
   await ensureDictionaryRowsForForm(text).catch(() => {});
   if (!anchor.isConnected) return;
   const record = japaneseLookupRecord(text, context);
   const hasKanjiEntry = [...text].length === 1 && !!D.kanji[text];
   const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
     ...(record?.seq ? { seq: record.seq } : {}) };
-  showMini(anchor, token, () => {
+  const mini = showMini(anchor, token, () => {
     // An unresolved spelling must not reopen lookup(text)'s rejected first row.
     if (!record && !hasKanjiEntry) return;
     removeMini();
     if (hasKanjiEntry) go({ t: 'kanji', id: text }, { invoker: anchor });
     else go({ t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: anchor });
   }, { record, entryAvailable: !!record || hasKanjiEntry });
+  japaneseLookupMini = { mini, anchor };
+  mini.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault(); event.stopPropagation();
+    removeMini();
+    const origin = anchor.isConnected ? anchor : findLookupOccurrence(occurrence);
+    origin?.focus({ preventScroll: true });
+  });
 }
 
 function appendJapaneseLookup(container, text, context = {}) {
@@ -7110,17 +7191,27 @@ function appendJapaneseLookup(container, text, context = {}) {
     : String(text).split(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+)/u);
   const wrapper = el('span', 'japanese-lookup-text');
   wrapper.dataset.japaneseLookup = 'true';
+  // A caller whose block is split across several calls (a prompt around its underlined
+  // target) names it, so the block still keeps exactly one Tab stop.
+  const block = context.block || (container.dataset ? container : wrapper);
+  block.dataset.lookupBlock = 'true';
+  let stopPlaced = !!block.querySelector('.japanese-lookup-word');
+  const help = japaneseLookupHelpId();
   for (const segment of segments) {
     if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
       wrapper.append(document.createTextNode(segment)); continue;
     }
+    // The visible word is its own accessible name; the shared help says what it does.
     const word = el('button', 'japanese-lookup-word', segment);
     word.type = 'button'; word.lang = 'ja';
     word.dataset.lookupText = segment;
     if (context.itemId) word.dataset.lookupItem = context.itemId;
-    word.setAttribute('aria-label', tx(`${segment} の読みと意味`, `Reading and meaning of ${segment}`));
+    word.tabIndex = stopPlaced ? -1 : 0; stopPlaced = true;
+    word.setAttribute('aria-describedby', help);
     word.setAttribute('aria-haspopup', 'dialog');
     word.addEventListener('click', event => { event.stopPropagation(); void openJapaneseLookup(word, segment, context); });
+    word.addEventListener('keydown', event => lookupWordKey(event, word));
+    word.addEventListener('focus', () => setLookupStop(word));
     wrapper.append(word);
   }
   container.append(wrapper);
@@ -7137,7 +7228,7 @@ function enhanceJapaneseProse(root) {
     if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
     // A word looked up in a guided question is saved as help on that question before it shows.
     const question = S.view === 'guided' ? parent.closest('.guided-room [data-question]')?.dataset.question : null;
-    const context = question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {};
+    const context = { ...(question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent };
     const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
     const textNodes = [];
     while (walker.nextNode()) {

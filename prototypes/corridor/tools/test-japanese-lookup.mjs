@@ -14,7 +14,8 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'dictionaryReadingSupportsForm', 'dictionarySummaryFor', 'dictionaryRowsForForm', 'dictionaryRowBySeq',
   'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD',
   'LOOKUP_HELPER_POS', 'japaneseLookupRecord', 'openJapaneseLookup', 'appendJapaneseLookup',
-  'enhanceJapaneseProse', 'showMini'];
+  'enhanceJapaneseProse', 'showMini', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
+  'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -51,6 +52,7 @@ class Element {
     if (selector.startsWith('#')) return this.id === selector.slice(1);
     if (selector === '[data-japanese-lookup]') return this.dataset.japaneseLookup !== undefined;
     if (selector === '[data-lookup-item]') return this.dataset.lookupItem !== undefined;
+    if (selector === '[data-lookup-block]') return this.dataset.lookupBlock !== undefined;
     return this.tag === selector;
   }
   closest(selectors) {
@@ -81,6 +83,7 @@ function app({ withIndex = true } = {}) {
   const D = { dict, words, kanji: {}, dictionaryIndex: withIndex ? index : null,
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
   const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
+    getElementById: id => body.querySelector(`#${id}`),
     createTextNode: text, createDocumentFragment: () => new Element('#fragment'),
     createTreeWalker(parent) {
       const nodes = [];
@@ -186,4 +189,25 @@ test('The prose enhancer skips writing-room instructions while keeping existing 
   assert.equal(unavailable.querySelectorAll('button').length, 0);
   assert.equal(meta.querySelectorAll('button').length, 1); await kanji.click(); assert.equal(presses, 1);
   assert.equal(prose.querySelectorAll('.japanese-lookup-word').length, 1, 'Content prose remains a lookup door');
+});
+
+test('Each prose block is one Tab stop of plain-word names sharing one keyboard help', () => {
+  const f = app(), root = new Element('section');
+  const first = new Element('p'); first.append(text('谷川で会議を始めました。'));
+  const second = new Element('p'); second.append(text('分かりました。'));
+  root.append(first, second); f.body.append(root);
+  f.context.enhanceJapaneseProse(root);
+  for (const block of [first, second]) {
+    const words = block.querySelectorAll('.japanese-lookup-word');
+    assert(words.length > 1, 'The fixture block has several words');
+    assert.deepEqual(words.map(word => word.tabIndex), [0, ...words.slice(1).map(() => -1)]);
+    for (const word of words) {
+      assert.equal(word.getAttribute('aria-label'), null, 'The visible word is its own name');
+      assert.equal(word.getAttribute('aria-describedby'), 'japanese-lookup-help');
+    }
+  }
+  const help = f.body.querySelectorAll('#japanese-lookup-help');
+  assert.equal(help.length, 1);
+  assert.equal(help[0].hidden, true);
+  assert(!root.textContent.includes(help[0].textContent), 'The help stays outside the prose it describes');
 });

@@ -135,8 +135,7 @@ python3 -m venv .venv && .venv/bin/pip install --upgrade setuptools wheel
 mkdir -p corpus/data/ninjal && curl -o corpus/data/ninjal/rokusyutaisyo.csv \
   https://mmsrv.ninjal.ac.jp/brfvep/rokusyutaisyo.csv
 
-PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_articles.py
-python3 scripts/build-reading-facets.py   # re-attach the shelf's topic/JLPT/grade facets to index.json
+PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_articles.py   # also attaches the shelf's topic/JLPT/grade facets
 PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_corridor.py
 node prototypes/corridor/tools/build_fsrs_pin.mjs
 node prototypes/corridor/tools/build-standalone.mjs

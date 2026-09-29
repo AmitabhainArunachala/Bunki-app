@@ -481,6 +481,39 @@ async function wrongAnswer(page, item) {
   );
   return wrong.id;
 }
+const passageChars = (form, item) => item.passages.reduce((sum, reference) =>
+  sum + (form.passages.find((row) => row.sha256 === reference.sha256)?.text.length || 0), 0);
+async function visitQuestion(page, item) {
+  await page.locator('.exam-question-map > summary').click();
+  await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(item.id)}]`).click();
+  await atQuestion(page, item);
+}
+// Focus the last Tab stop before the question paper. Prose blocks are found from the paper's
+// own structure and the lookup word class, both older than one-stop-per-block.
+async function focusBeforePaper(page) {
+  return page.evaluate(() => {
+    const paper = document.querySelector('.exam-paper');
+    const answer = paper.querySelector('[data-exam-option]');
+    const prose = [...paper.querySelectorAll('.exam-skill, .exam-task-heading, .exam-task-instruction, .exam-passage h3, .exam-passage p, .exam-prompt, .exam-option-text')]
+      .filter((block) => block.querySelector('.japanese-lookup-word') &&
+        block.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const tabbable = [...document.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]')]
+      .filter((node) => node.tabIndex >= 0 && !node.disabled && node.getClientRects().length && !node.closest('[inert]'));
+    const before = tabbable.filter((node) => !paper.contains(node) &&
+      node.compareDocumentPosition(paper) & Node.DOCUMENT_POSITION_FOLLOWING).at(-1);
+    before.focus();
+    return { prose: prose.length, words: paper.querySelectorAll('.japanese-lookup-word').length };
+  });
+}
+async function tabToFirstAnswer(page, limit) {
+  let presses = 0;
+  while (!(await page.evaluate(() => !!document.activeElement?.matches('.exam-paper [data-exam-option]')))) {
+    await page.keyboard.press('Tab');
+    presses += 1;
+    assert(presses <= limit, `Tab did not reach the first answer within ${limit} presses`);
+  }
+  return presses;
+}
 // Every case this invocation could run, and whether the filter selected it: the receipt
 // compares this plan with the observed results.
 const planned = [];
@@ -1424,6 +1457,158 @@ try {
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-study-missed-without-bookmark.png`), fullPage: true });
       return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
         unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
+    });
+    // R4 · a long 読解 question: each prose block is ONE Tab stop, reached word by word with
+    // ←/→ and Home/End; the word is its own name; Esc returns to the same occurrence. The Tab
+    // budget runs first and reads only markup that predates this change, so the prior per-word
+    // build fails it for the right reason.
+    const longReading = [...items].filter((item) => item.passages.length).sort((a, b) =>
+      passageChars(form, b) - passageChars(form, a))[0];
+    if (longReading) await run(engine, `prose-roving-accessibility${suffix}`, async (page) => {
+      await start(page, section, 'practice');
+      await visitQuestion(page, longReading);
+      const budget = await focusBeforePaper(page);
+      const presses = await tabToFirstAnswer(page, budget.words + 20);
+      assert(presses <= budget.prose + 3,
+        `Tab stops from the question start to the first answer: ${presses}; prose blocks: ${budget.prose}`);
+
+      const blocks = await page.evaluate(() => [...document.querySelectorAll('.exam-paper [data-lookup-block]')].map((block) => {
+        const words = [...block.querySelectorAll('.japanese-lookup-word')].filter((word) => word.closest('[data-lookup-block]') === block);
+        return { words: words.map((word) => word.textContent), stops: words.filter((word) => word.tabIndex === 0).length,
+          labels: words.filter((word) => word.hasAttribute('aria-label')).length,
+          described: [...new Set(words.map((word) => word.getAttribute('aria-describedby')))] };
+      }).filter((block) => block.words.length));
+      assert(blocks.length >= budget.prose, 'Every prose block is a lookup block');
+      const help = await page.evaluate(() => {
+        const node = document.getElementById('japanese-lookup-help');
+        return node && { text: node.textContent, hidden: node.hidden, inPaper: !!node.closest('.exam-paper') };
+      });
+      assert.deepEqual(help, { text: 'Enter: reading and meaning · ←/→: next word', hidden: true, inPaper: false });
+      for (const block of blocks) {
+        assert.equal(block.stops, 1, `One Tab stop per block: ${block.words.join('')}`);
+        assert.equal(block.labels, 0);
+        assert.deepEqual(block.described, ['japanese-lookup-help']);
+      }
+      const names = [];
+      for (const block of await page.locator('.exam-paper [data-lookup-block]').all()) {
+        for (const line of (await block.ariaSnapshot()).split('\n')) {
+          const match = /^\s*- button "(.*)"/u.exec(line);
+          if (match) names.push(JSON.parse(`"${match[1]}"`));
+        }
+      }
+      assert.deepEqual(names, blocks.flatMap((block) => block.words), 'Each word is named by exactly its visible text');
+      assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(longReading));
+
+      const passage = page.locator('.exam-passage p');
+      const passageWords = passage.locator('.japanese-lookup-word');
+      const passageCount = await passageWords.count();
+      assert(passageCount > 4);
+      const activeIndex = () => page.evaluate(() => {
+        const block = document.querySelector('.exam-passage p');
+        return [...block.querySelectorAll('.japanese-lookup-word')].indexOf(document.activeElement);
+      });
+      await passage.locator('.japanese-lookup-word[tabindex="0"]').focus();
+      await page.keyboard.press('End');
+      assert.equal(await activeIndex(), passageCount - 1);
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await activeIndex(), passageCount - 1, '→ never leaves its block');
+      await page.keyboard.press('Home');
+      assert.equal(await activeIndex(), 0);
+      await page.keyboard.press('ArrowLeft');
+      assert.equal(await activeIndex(), 0, '← never leaves its block');
+      for (let step = 0; step < 3; step++) await page.keyboard.press('ArrowRight');
+      assert.equal(await activeIndex(), 3);
+      await page.evaluate(() => {
+        window.__proseKeys = [];
+        window.addEventListener('keydown', (event) => window.__proseKeys.push([event.key, event.defaultPrevented]));
+      });
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('ArrowUp');
+      assert.deepEqual(await page.evaluate(() => window.__proseKeys), [['ArrowDown', false], ['ArrowUp', false]],
+        '↑/↓ stay with the page');
+      assert.equal(await activeIndex(), 3);
+      await page.keyboard.press('Tab');
+      assert.equal(await page.evaluate(() => !!document.activeElement.closest('.exam-prompt')), true);
+      await page.keyboard.press('Shift+Tab');
+      assert.equal(await activeIndex(), 3, 'The block remembers the last-visited word');
+      assert.equal(await page.locator('#mini').count(), 0, 'Moving between words never opens or records help');
+      assert.equal(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, longReading.id), null);
+
+      // A repeated word: the later occurrence is opened by Enter, which saves the help and
+      // re-renders the question. The same occurrence keeps focus and the Tab stop.
+      const repeat = await page.evaluate(() => {
+        const words = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')];
+        const counts = new Map();
+        for (const word of words) counts.set(word.textContent, (counts.get(word.textContent) || 0) + 1);
+        const text = [...counts].filter(([value, count]) => count > 1 && /\p{Script=Han}/u.test(value))
+          .sort((a, b) => b[1] - a[1])[0]?.[0];
+        const same = words.filter((word) => word.textContent === text);
+        window.__proseOld = same.at(-1);
+        return { text, occurrence: same.length - 1, count: same.length };
+      });
+      assert(repeat.text, 'The long question repeats a word');
+      const atOccurrence = () => page.evaluate(({ text, occurrence }) => {
+        const same = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')].filter((word) => word.textContent === text);
+        const active = document.activeElement;
+        return { focused: same.indexOf(active) === occurrence, stop: same[occurrence]?.tabIndex === 0,
+          replaced: !!window.__proseOld && !window.__proseOld.isConnected && active !== window.__proseOld };
+      }, repeat);
+      await page.evaluate(() => window.__proseOld.focus());
+      await page.keyboard.press('Enter');
+      await page.locator('#mini').waitFor();
+      const assisted = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(assessmentItemAssistanceV2(assisted.attempt, longReading.id)?.kind, 'dictionary',
+        'Enter passes through the same save-before-reveal guard as a tap');
+      assert.deepEqual(await atOccurrence(), { focused: true, stop: true, replaced: true });
+      assert.equal(await page.locator('#mini .mini-word').textContent(), repeat.text);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mini').count(), 0, 'Esc on the word closes its popup');
+      assert.equal((await atOccurrence()).focused, true);
+      assert.equal(await page.locator('.exam-paper').count(), 1, 'Esc closed only the popup');
+
+      await page.keyboard.press('Enter');
+      await page.locator('#mini').waitFor();
+      await page.locator('#mini .mini-entry').focus();
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mini').count(), 0);
+      assert.equal((await atOccurrence()).focused, true, 'Esc inside the popup returns to the same occurrence');
+
+      await page.keyboard.press('Space');
+      await page.locator('#mini').waitFor();
+      await page.locator('#mini-take').click();
+      await page.locator('#vocabulary-list-dialog[open]').waitFor();
+      await page.keyboard.press('Escape');
+      // the dialog's close event (a later task) removes it and hands focus back to its invoker
+      await page.waitForFunction(() => !document.getElementById('vocabulary-list-dialog'));
+      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the list window closes only that window');
+      assert.equal((await atOccurrence()).focused, true);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mini').count(), 0);
+      const focusStyle = await page.evaluate(() => {
+        const style = getComputedStyle(document.activeElement);
+        return { outline: style.outlineColor, line: style.textDecorationLine, thickness: style.textDecorationThickness };
+      });
+      assert.equal(focusStyle.outline, 'rgba(0, 0, 0, 0)', 'Never the browser ring on a prose word');
+      assert.match(focusStyle.line, /underline/u);
+      assert.equal(focusStyle.thickness, '2px');
+      await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-prose-roving-focus.png`) });
+      const final = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(final.attempt.answers.find((row) => row.item.id === longReading.id).response.kind, 'unanswered');
+      return { question: longReading.id, presses, proseBlocks: budget.prose, words: budget.words, repeat, focusStyle };
+    });
+    if (longReading) await run(engine, `prose-timed-plain-text${suffix}`, async (page) => {
+      await start(page, section, 'timed');
+      await visitQuestion(page, longReading);
+      assert.equal(await page.locator('.exam-paper .japanese-lookup-word, .exam-paper [data-lookup-block]').count(), 0,
+        'Timed prose is plain text');
+      const budget = await focusBeforePaper(page);
+      const presses = await tabToFirstAnswer(page, 20);
+      assert.equal(presses, 1, 'Nothing in timed prose takes focus');
+      await page.locator('.exam-passage p').click();
+      assert.equal(await page.locator('#mini').count(), 0);
+      const timed = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(assessmentItemAssistanceV2(timed.attempt, longReading.id), null);
+      return { question: longReading.id, presses, words: budget.words };
     });
     await run(engine, `timed-written-completion-to-learn-review-and-sensei${suffix}`, async (page) => {
       const baseline = await disk(page);

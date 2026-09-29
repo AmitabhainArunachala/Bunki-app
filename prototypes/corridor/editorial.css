@@ -477,7 +477,16 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   touch-action: manipulation;
 }
 .japanese-lookup-word:hover { text-decoration: underline; text-decoration-color: var(--ai); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
-.japanese-lookup-word:focus-visible { outline-offset: 2px; text-decoration: underline; text-underline-offset: 0.18em; }
+/* Keyboard focus on a prose word: an ink underline and a soft vermilion wash, never the
+ * browser's ring. The transparent outline still draws in forced-colors mode. */
+.japanese-lookup-word:focus-visible {
+  outline: 2px solid transparent;
+  text-decoration-line: underline;
+  text-decoration-color: var(--ink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+}
 .japanese-lookup-word rt { font-size: 0.63em; color: var(--red); }
 .vocabulary-list-dialog {
   width: min(520px, calc(100vw - 32px));
