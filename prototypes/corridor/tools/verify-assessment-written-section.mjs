@@ -580,6 +580,25 @@ async function officialPaperCase(page, engine) {
   await page.screenshot({ path: resolve(evidence, `${engine}-official-paper-n3-results-320.png`), fullPage: true });
   return { papers: 2, sections: 3 };
 }
+// Study mode on the same paper: the 問題 heading's number and 大問 name are lookup words, and the
+// heading is still ONE Tab stop (R4), the same as every other prose block.
+async function officialPaperStudyHeading(page) {
+  await page.locator('#mock-link').click();
+  await selectLevel(page, 'N3');
+  await page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}] [data-exam-start]`).click();
+  await page.locator('#exam-practice-start').click();
+  await page.locator('.exam-paper-question').waitFor();
+  const heading = await page.locator('.exam-task-heading').evaluate((node) => {
+    const words = [...node.querySelectorAll('.japanese-lookup-word')];
+    return { text: node.textContent, words: words.length, stops: words.filter((word) => word.tabIndex === 0).length,
+      numberWords: node.querySelectorAll('.exam-mondai-no .japanese-lookup-word').length,
+      nameWords: node.querySelectorAll('.exam-daimon .japanese-lookup-word').length };
+  });
+  assert.equal(heading.text, '問題１\u3000漢字読み');
+  assert(heading.numberWords >= 1 && heading.nameWords >= 1, 'The 問題 number and the 大問 name are lookup words in study mode');
+  assert.equal(heading.stops, 1, 'The 問題 heading is one Tab stop');
+  return heading;
+}
 // Every case this invocation could run, and whether the filter selected it: the receipt
 // compares this plan with the observed results.
 const planned = [];
@@ -1943,6 +1962,7 @@ try {
     }
     }
     await run(engine, 'machine-checked-form-sits-as-the-official-paper', (page) => officialPaperCase(page, engine));
+    await run(engine, 'machine-checked-heading-is-one-tab-stop', (page) => officialPaperStudyHeading(page));
   }
 } finally {
   if (server.listening) await new Promise((done) => server.close(done));

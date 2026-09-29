@@ -8528,6 +8528,16 @@ function uiIcon(name, cls = 'ui-icon') {
   return holder.firstChild;
 }
 
+function voicePendingNote(id) {
+  const pending = el('p', 'play-pending');
+  pending.id = id;
+  // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
+  pending.dataset.japaneseLookup = 'off';
+  pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
+  if (bi()) pending.append(el('span', 'en-sub', 'voice in preparation'));
+  return pending;
+}
+
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
  * It carries only the locked narration voice. With no clips for this article in that voice it is
@@ -8538,13 +8548,7 @@ function buildListenRow(p) {
   const clips = narrationClips(p);
   if (!clips.length) {
     listenRow.classList.add('is-pending');
-    const pending = el('p', 'play-pending');
-    pending.id = 'listen-note';
-    // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
-    pending.dataset.japaneseLookup = 'off';
-    pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
-    if (bi()) pending.append(el('span', 'en-sub', 'voice in preparation'));
-    listenRow.append(pending);
+    listenRow.append(voicePendingNote('listen-note'));
     return listenRow;
   }
   if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; }
@@ -17229,9 +17233,16 @@ function ensureSentenceListeningCatalog() {
     });
   return sentenceListeningCatalogWait;
 }
+const approvedSentenceCue = cue => !!cue && Object.hasOwn(NARRATION_VOICES, cue.voice) &&
+  typeof cue.path === 'string' && cue.path.startsWith(`audio/s/${cue.voice}/`);
 function currentSentenceListeningCue(context) {
-  return sentencePracticeModule.selectBundledListeningCue(context,
+  const cue = sentencePracticeModule.selectBundledListeningCue(context,
     D.passages.find(p => p.id === context.sourceId)?.tokens?.map(token => token.s), sentenceListeningCatalog);
+  if (!approvedSentenceCue(cue)) throw new Error('listening-cue-unavailable');
+  return cue;
+}
+function availableSentenceListeningCue(context) {
+  try { return currentSentenceListeningCue(context); } catch { return null; }
 }
 async function resolveSentenceListeningCue(context) {
   await resolveTeacherSource(context); await ensureSentenceListeningCatalog();
@@ -17331,7 +17342,7 @@ function openSentencePractice(id, mode = null) {
   if (mode && !entry.plan.contracts.some(contract => contract.contractId.endsWith(`:${mode}`))) return;
   keepScroll();
   S.sentencePracticeView = { entryId: id, returnView: S.view, returnScroll: window.scrollY };
-  if (mode === 'listening' && entry.plan.listeningCue) {
+  if (mode === 'listening' && approvedSentenceCue(entry.plan.listeningCue)) {
     stopReadAloud();
     S.sentencePracticeView.listeningRun = { startedAt: performance.now(), completedPlays: 0, revealed: false, pending: false };
   }
@@ -17354,6 +17365,7 @@ function renderSentencePracticeLibrary(main) {
   if (!entries.length) return;
   const drafts = new Map(entries.map(entry => [entry.plan.id, ['production', 'listening'].filter(mode => {
     if (!entry.plan.contracts.some(contract => contract.contractId.endsWith(`:${mode}`))) return false;
+    if (mode === 'listening' && !approvedSentenceCue(entry.plan.listeningCue)) return false;
     const view = sentenceDraftController?.view({ entryId: entry.plan.id, mode });
     return (view?.draft && !view.draft.consumed && (view.text || view.draft.transcriptOpened)) ||
       (view?.state === 'conflict' && (view.recoveryDraft?.text || view.recoveryDraft?.transcriptOpened));
@@ -17740,7 +17752,7 @@ function renderSentencePractice(main) {
   if (entry?.plan.kind === 'kanji-reading' || state.kind === 'kanji-reading') {
     renderKanjiReadingPractice(main, context, state, entry); return;
   }
-  if (entry?.plan.listeningCue && state.listeningRun) { renderSentenceListening(main, entry, state); return; }
+  if (approvedSentenceCue(entry?.plan.listeningCue) && state.listeningRun) { renderSentenceListening(main, entry, state); return; }
   main.append(el('p', 'eyebrow', tx('出会った文から', 'From a sentence I met')),
     el('h1', 'view-title', entry ? tx('この文を使ってみる', 'Make this sentence useful') : tx('この文をどう練習する？', 'How would you like to practice?')),
     el('p', 'teacher-source-credit', context.title));
@@ -17860,22 +17872,26 @@ function renderSentencePractice(main) {
   }
   if (context.sourceKind === 'bundled-passage') {
     const section = el('section', 'sentence-practice-section');
-    section.append(el('h2', '', tx('聞いて、分かったことを書く', 'Listen and explain what I understood')),
-      el('p', 'teacher-note', tx('この文の合成音声を聞き、自分の言葉で意味を残す。回答は未確認で、復習予定は変わらない。',
+    section.append(el('h2', '', tx('聞いて、分かったことを書く', 'Listen and explain what I understood')));
+    const hasListening = approvedSentenceCue(entry.plan.listeningCue);
+    if (!hasListening && !availableSentenceListeningCue(context)) section.append(voicePendingNote('sentence-listening-pending'));
+    else {
+      section.append(el('p', 'teacher-note', tx('この文の合成音声を聞き、自分の言葉で意味を残す。回答は未確認で、復習予定は変わらない。',
         'Hear this sentence’s synthetic recording and explain its meaning in your own words. Responses stay unchecked; review timing stays the same.')));
-    const hasListening = !!entry.plan.listeningCue;
-    const button = biLabel('button', 'chip', hasListening ? 'この文を聞いて練習する' : '身につける — 聞く練習を追加',
-      hasListening ? 'practice listening to this sentence' : 'Master · add listening practice');
-    button.type = 'button'; button.id = hasListening ? 'sentence-listening-start' : 'sentence-add-listening';
-    button.disabled = !!state.pending || !recordWritable();
-    button.addEventListener('click', () => {
-      if (!hasListening) { void commitSentenceChoice(state, context, start, end, ['listening']); return; }
-      if (!preserveVisibleDrafts()) return;
-      stopReadAloud();
-      state.listeningRun = { startedAt: performance.now(), completedPlays: 0, revealed: false, pending: false };
-      render(); window.scrollTo(0, 0); document.getElementById('sentence-listening-play')?.focus();
-    });
-    section.append(button); main.append(section);
+      const button = biLabel('button', 'chip', hasListening ? 'この文を聞いて練習する' : '身につける — 聞く練習を追加',
+        hasListening ? 'practice listening to this sentence' : 'Master · add listening practice');
+      button.type = 'button'; button.id = hasListening ? 'sentence-listening-start' : 'sentence-add-listening';
+      button.disabled = !!state.pending || !recordWritable();
+      button.addEventListener('click', () => {
+        if (!hasListening) { void commitSentenceChoice(state, context, start, end, ['listening']); return; }
+        if (!preserveVisibleDrafts()) return;
+        stopReadAloud();
+        state.listeningRun = { startedAt: performance.now(), completedPlays: 0, revealed: false, pending: false };
+        render(); window.scrollTo(0, 0); document.getElementById('sentence-listening-play')?.focus();
+      });
+      section.append(button);
+    }
+    main.append(section);
   }
   renderLearningSource(main, { t: 'sentence', id: entry.plan.id, sourceContextRef: entry.context.id }, false, state);
   const responses = (S.sentencePractice?.responses || []).filter((row) => row.entryId === entry.plan.id);
@@ -17917,7 +17933,7 @@ function renderSentencePractice(main) {
   }
 }
 function renderSentenceListening(main, entry, state) {
-  const run = state.listeningRun, epoch = recordEpoch;
+  const run = state.listeningRun, epoch = recordEpoch, voice = NARRATION_VOICES[entry.plan.listeningCue.voice];
   const draftKey = { entryId: entry.plan.id, mode: 'listening' };
   const restoredDraft = sentenceDraftController?.view(draftKey).draft;
   if (restoredDraft && !restoredDraft.consumed && restoredDraft.transcriptOpened) run.revealed = true;
@@ -17927,8 +17943,8 @@ function renderSentenceListening(main, entry, state) {
   surface.append(el('p', 'sentence-production-prompt', tx(
     '前に出会った文を聞き直して、分かったことを自分の言葉で書く。日本語でも、使いやすい言語でもよい。',
     'Listen again to a sentence you have met. Explain what you understood in Japanese or a language you are comfortable with.')),
-  el('p', 'teacher-note', tx('小春音アミの合成音声。音声と本文の照合は検収前。回答は未確認のまま保存する。',
-    'Synthetic voice: Koharune Ami. The recording and transcript still need review. Your response will stay unchecked.')));
+  el('p', 'teacher-note', tx(`${voice}の合成音声。音声と本文の照合は検収前。回答は未確認のまま保存する。`,
+    `Synthetic voice: ${voice}. The recording and transcript still need review. Your response will stay unchecked.`)));
   const audioStatus = el('p', 'teacher-note'); audioStatus.id = 'sentence-listening-audio-status'; audioStatus.setAttribute('role', 'status');
   audioStatus.textContent = run.completedPlays ? tx('この練習で、文を最後まで再生した。', 'The sentence finished playing during this exercise.')
     : tx('まず文を最後まで聞く。何度でも聞き直せる。', 'Play the sentence to the end first. You can listen again.');
@@ -17972,7 +17988,7 @@ function renderSentenceListening(main, entry, state) {
           'This device could not play the recording. You can try again.'); stopSentenceListening();
       };
       await audio.play();
-      if (active()) audioStatus.textContent = tx('小春音アミの合成音声で再生中', 'Playing Koharune Ami’s synthetic voice');
+      if (active()) audioStatus.textContent = tx(`${voice}の合成音声で再生中`, `Playing ${voice}’s synthetic voice`);
     } catch (error) {
       if (active()) { owner.failed = true; audioStatus.textContent = sentencePracticeError(error); stopSentenceListening(); }
     }

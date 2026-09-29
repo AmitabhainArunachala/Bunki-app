@@ -438,13 +438,20 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
     `${oneInCensus.size} distinct 1-in-N values, largest share ${censusMax}/${censusTotal}`,
   );
 }
-// The shelf must render EXACTLY the curated index — no extras, none missing.
+// The shelf must render EXACTLY the curated index — no extras, none missing —
+// one card per story: an N3 rewrite whose original stands folds into it, and
+// a story in today's six stands in that band inside the grid, not twice.
 // The count itself is data: the feed (R2-D) grows it 検収前-marked and
 // queue-covered, and tools/verify-feed.mjs pins the composition (the
 // inherited 70 plus the review queue's live mints) against the queue file.
-const CURATED_COUNT = index.articles.filter(
+const curatedRows = index.articles.filter(
   (record) => !String(record.file || '').startsWith('archive/'),
+);
+const standingIds = new Set(curatedRows.map((record) => record.id));
+const STORY_COUNT = curatedRows.filter(
+  (record) => !(record.adaptation?.basedOn && standingIds.has(record.adaptation.basedOn)),
 ).length;
+const STORY_CARDS = '#shelf-reading-results .shelf-item';
 const bodies = new Map(
   IDS.map((id) => {
     const row = rows.get(id);
@@ -643,8 +650,8 @@ try {
   await page.waitForFunction(
     (expected) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item:not([data-recommendation])').length === expected,
-    CURATED_COUNT,
+      document.querySelectorAll(expected.cards).length === expected.count,
+    { cards: STORY_CARDS, count: STORY_COUNT },
     { timeout: 30_000 },
   );
   // Minimal CI Chromium images often ship without CJK fonts. These optional
@@ -661,9 +668,9 @@ try {
   }
 
   check(
-    'the one native shelf renders exactly the curated index rows',
-    (await page.locator('.shelf-item:not([data-recommendation])').count()) === CURATED_COUNT,
-    `${await page.locator('.shelf-item:not([data-recommendation])').count()}/${CURATED_COUNT}`,
+    'the one native shelf renders every curated story once, across the grid and today’s six',
+    (await page.locator(STORY_CARDS).count()) === STORY_COUNT,
+    `${await page.locator(STORY_CARDS).count()}/${STORY_COUNT}`,
   );
   const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]:not([data-recommendation])').evaluate((node) => {
     const style = getComputedStyle(node);
@@ -962,8 +969,8 @@ try {
   await page.waitForFunction(
     (want) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item:not([data-recommendation])').length === want,
-    CURATED_COUNT,
+      document.querySelectorAll(want.cards).length === want.count,
+    { cards: STORY_CARDS, count: STORY_COUNT },
     { timeout: 30_000 },
   );
   const reloadedRecord = await readAppRecord(page);

@@ -168,6 +168,7 @@ async function runEngine(engine) {
     assert.equal(await page.locator('.exam-official-badge').count(), 1);
     assert((await page.locator('.exam-prompt .paper-underline').count()) >= 1, 'printed underline rendered');
     assert.equal(await page.locator('.exam-official-instruction').count(), 1);
+    assert.match(await page.locator('.exam-task-heading').textContent(), /^問題 1\u3000/u);
     step('question-1-rendered', { underline: true, instruction: true });
     await shot(page, 'question-1', engine);
     await page.locator('.exam-official-pages > summary').click();
@@ -196,6 +197,9 @@ async function runEngine(engine) {
     await page.locator('#exam-confirm-finish').click();
     await page.locator('#exam-next-block').click();
     await page.locator('#exam-audio-play').waitFor({ timeout: 60_000 });
+    // The listening paper numbers its own 問題 again from 1, under its printed section title.
+    assert.equal(await page.locator('.exam-task-heading').textContent(), '問題 1\u3000聴解');
+    assert.equal(await page.locator('.exam-official-instruction').count(), 1);
     await page.locator('#exam-audio-play').click();
     await page.waitForFunction(() => window.__lastMedia && !window.__lastMedia.paused && window.__lastMedia.currentTime > 1, null, { timeout: 60_000 });
     assert(await page.locator('#exam-audio-play').isDisabled(), 'no replay or restart while playing');
