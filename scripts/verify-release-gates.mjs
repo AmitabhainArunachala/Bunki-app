@@ -581,6 +581,9 @@ export function batteryGates(out, env = process.env) {
       requiredPath: tool('guided-session.test'),
     },
     node('guided-offline', tool('verify-guided-offline')),
+    // the reader's and the room's Japanese lookup: exact entry identity, help attribution, capture
+    // context and undo, and a failed list write kept as a draft (with its negative control)
+    { ...node('annotation-lookup', tool('verify-annotation-lookup')), env: { KAIRO_BROWSER: 'all' } },
     node('reading-candidates', tool('verify-reading-candidates')),
     {
       ...node('reading-candidates-webkit', tool('verify-reading-candidates')),
@@ -2435,6 +2438,7 @@ async function verifyRunner(out) {
     'playback',
     'guided-session-contract',
     'guided-offline',
+    'annotation-lookup',
     'reading-candidates',
     'reading-candidates-webkit',
     'personal-reading',

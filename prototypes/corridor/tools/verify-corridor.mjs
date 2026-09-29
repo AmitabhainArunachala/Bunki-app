@@ -597,49 +597,50 @@ async function main() {
     shelfData.every((s) => s.titleEn && s.level && /^[A-Za-z]/.test(s.level)),
     `${shelfData.length} texts, e.g. "${shelfData[0]?.titleEn}" — ${shelfData[0]?.level}${shelfData[0]?.levelNote}`);
 
-  // The editorial collection replaces the old static category sections.
-  // Every text remains reachable once, with the requested filter controls.
+  // The editorial collection replaces the old static category sections. One card per story: today's
+  // six stand inside the grid in place of their ordinary cards, so the census covers both.
   const sectionProbe = await page.evaluate(`(() => {
     const ids = [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map(n => n.dataset.passage);
     return {
       ids, unique: new Set(ids).size,
+      today: document.querySelectorAll('#shelf-reading-results .shelf-item[data-recommendation]').length,
       controls: ['sort', 'topic', 'jlpt', 'grade'].every(key => !!document.getElementById('shelf-filter-' + key)),
       search: !!document.getElementById('shelf-reading-search'),
     };
   })()`);
-  check('the editorial collection contains every text once and exposes sort/topic/level/grade/search',
-    sectionProbe.controls && sectionProbe.search && sectionProbe.unique === shelfData.length &&
-      sectionProbe.ids.length === shelfData.length,
-    `${sectionProbe.unique}/${shelfData.length} unique collection entries`);
+  check('the editorial collection holds every story once, across the grid and today’s six, and exposes sort/topic/level/grade/search',
+    sectionProbe.controls && sectionProbe.search && sectionProbe.unique === sectionProbe.ids.length &&
+      sectionProbe.ids.length === shelfData.length + sectionProbe.today,
+    `${sectionProbe.unique}/${sectionProbe.ids.length} unique stories · ${shelfData.length} grid cards + ${sectionProbe.today} of today’s six`);
 
-  // the glossary is billed as itself: one-line definitions are labeled
-  // 用語集 on the card and are never counted among the "real texts"
+  // the glossary is billed as itself: one-line definitions wear the 用語集 kicker, and the shelf's
+  // one tally counts every story and says how many of them are glossary entries
   const glossaryProbe = await page.evaluate(`(() => {
-    const cards = [...document.querySelectorAll('.shelf-item:not([data-recommendation])')];
-    const glossary = cards.filter((n) =>
-      (n.querySelector('.shelf-meta')?.textContent ?? '').includes('用語集'));
-    const labeled = glossary.filter((n) =>
-      [...n.querySelectorAll('.shelf-meta .pool-tag')].some((t) => t.textContent.includes('用語集')));
-    const intro = document.querySelector('.shelf-count')?.textContent ?? '';
+    const cards = [...document.querySelectorAll('#shelf-reading-results .shelf-item')];
+    const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === '用語集');
+    // the masthead prints the tally twice (long on a desk, short on a phone): read the long copy
+    const intro = document.querySelector('.dateline-tally .tally-long')?.textContent ?? '';
     const results = document.querySelector('.shelf-results-count')?.textContent ?? '';
-    return { cards: cards.length, glossary: glossary.length, labeled: labeled.length, intro, results };
+    return { cards: cards.length, glossary: glossary.length, intro, results };
   })()`);
-  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) readings?|([0-9]+) 本の読み物/)?.slice(1).find(Boolean) ?? NaN);
-  const resultTexts = Number(glossaryProbe.results.match(/([0-9]+) readings?|([0-9]+) 本の読み物/)?.slice(1).find(Boolean) ?? NaN);
-  check('glossary rows are labeled 用語集 and stand outside the real-text count',
-    glossaryProbe.glossary > 0 && glossaryProbe.labeled === glossaryProbe.glossary &&
-      billedTexts === glossaryProbe.cards - glossaryProbe.glossary &&
-      resultTexts === billedTexts && /用語集|glossary/.test(glossaryProbe.intro) && /用語集|glossary/.test(glossaryProbe.results),
-    `${glossaryProbe.labeled}/${glossaryProbe.glossary} labeled · intro bills ${billedTexts} texts for ${glossaryProbe.cards - glossaryProbe.glossary} non-glossary cards`);
+  const readTally = (text) => {
+    const m = text.match(/読み物 ([0-9]+) 本(?:（うち用語集 ([0-9]+)）)?|([0-9]+) readings?(?:, including ([0-9]+) glossary)?/u);
+    return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
+  };
+  const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);
+  check('glossary rows wear 用語集, and the one tally counts every story and names its glossary entries',
+    glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
+      JSON.stringify(resulted) === JSON.stringify(billed),
+    `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
   await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
   await page.locator('#shelf-reading-search').press('Enter');
   await page.waitForFunction(() => document.querySelectorAll('#shelf-reading-results .shelf-item').length === 0);
   check('editorial search applies an empty filter without inventing readings',
-    /0 (?:readings|本の読み物)/.test(await page.locator('.shelf-results-count').innerText()),
+    readTally(await page.locator('.shelf-results-count').innerText())?.total === 0,
     await page.locator('.shelf-results-count').innerText());
   await page.locator('#shelf-reading-search').fill('');
   await page.locator('#shelf-reading-search').press('Enter');
-  await page.waitForFunction(count => document.querySelectorAll('#shelf-reading-results .shelf-item').length === count, shelfData.length);
+  await page.waitForFunction(count => document.querySelectorAll('#shelf-reading-results .shelf-item').length === count, sectionProbe.ids.length);
   const restoredCollection = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(n => n.dataset.passage).sort());
   check('clearing search restores the complete collection without duplicates',
     JSON.stringify(restoredCollection) === JSON.stringify([...sectionProbe.ids].sort()), `${restoredCollection.length} entries restored`);
