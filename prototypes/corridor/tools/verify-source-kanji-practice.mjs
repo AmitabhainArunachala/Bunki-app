@@ -363,6 +363,10 @@ async function startReview(fixture, entry) {
   const before = await readAppRecordSnapshot(fixture.page);
   await fixture.page.locator('#sentence-review-start').click(); await fixture.page.locator('#sentence-recall-answer').waitFor();
   assert.deepEqual(await fixture.page.evaluate(() => window.__KAIRO_SRS__.session()), { queue: 1, ix: 0, deferred: 0 });
+  await faceDown(fixture, entry);
+  retained(before, await readAppRecordSnapshot(fixture.page));
+}
+async function faceDown(fixture, entry) {
   const { origin } = entry.plan;
   assert.equal(await fixture.page.locator('.sentence-recall-cue').textContent(), entry.plan.kind === 'kanji-reading'
     ? origin.text : `${origin.text.slice(0, origin.start)}［ … ］${origin.text.slice(origin.end)}`);
@@ -372,7 +376,17 @@ async function startReview(fixture, entry) {
     assert.match(await fixture.page.locator('.sentence-recall').innerText(), /whole word[\s\S]*unreviewed/u);
   }
   assert.equal(await fixture.page.locator('#sentence-recall-check').isDisabled(), true);
-  retained(before, await readAppRecordSnapshot(fixture.page));
+}
+// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
+// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+async function againReturns(fixture, entry, session) {
+  const page = fixture.page;
+  await page.waitForFunction(() => !document.querySelector('.grade')
+    && document.getElementById('sentence-recall-answer')?.value === '');
+  assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');
+  await faceDown(fixture, entry);
+  assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()),
+    { queue: session.queue + 1, ix: session.ix + 1, deferred: session.deferred }, 'Again reinserts the card as the next item');
 }
 async function answer(fixture, entry, text, { revealed = false, mustRepeat = false, label } = {}) {
   const page = fixture.page, before = await readAppRecordSnapshot(page);
@@ -408,8 +422,9 @@ function siblingUnchanged(fixture, before, after) {
 }
 async function grade(fixture, entry, response, chosen, label) {
   const page = fixture.page, before = await readAppRecordSnapshot(page), earliest = Date.now(), key = `sentence:${entry.plan.id}`;
+  const session = await page.evaluate(() => window.__KAIRO_SRS__.session());
   await page.locator(`.grade.g-${chosen}`).click();
-  await page.locator(chosen === 'again' ? '#zen-wait-skip' : '.review-summary').waitFor();
+  if (chosen === 'again') await againReturns(fixture, entry, session); else await page.locator('.review-summary').waitFor();
   const after = await snapshot(fixture, `${label}-graded`), observed = after.record.sentencePractice.grades.at(-1), event = observed.observation;
   assert.equal(observed.responseId, response.id); assert.equal(observed.revlogIndex, before.record.revlog.length);
   assert.equal(event.type, 'ReviewGraded'); assert.equal(event.contractId, entry.plan.contracts[0].contractId);

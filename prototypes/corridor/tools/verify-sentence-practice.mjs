@@ -76,6 +76,16 @@ async function selectTown(page) {
 function unchanged(before, after, keys = ['taken', 'srs', 'revlog', 'stats', 'lists']) {
   for (const key of keys) assert.deepEqual(after[key], before[key], `${key} remains unchanged`);
 }
+// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
+// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+async function againReturns(page, cue, session) {
+  await page.waitForFunction(() => !document.querySelector('.grade')
+    && document.getElementById('sentence-recall-answer')?.value === '');
+  assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');
+  assert.equal(await page.locator('.sentence-recall-cue').textContent(), cue, 'Again shows the same card again');
+  assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()),
+    { queue: session.queue + 1, ix: session.ix + 1, deferred: session.deferred }, 'Again reinserts the card as the next item');
+}
 for (const engine of engines) for (const width of sizes) {
   const out = join(OUT, `${engine}-${width}`); mkdirSync(out, { recursive: true });
   const result = { engine, width, passed: false, observations: [], screenshots: [], videos: [], errors: [], externalRequests: [] };
@@ -191,11 +201,12 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(undone.sentencePractice.grades.length, 1);
     await page.locator('#sentence-recall-answer').fill('町'); await page.locator('#sentence-recall-reveal').click();
     await page.locator('.grade.g-again').waitFor(); assert.equal(await page.locator('.grade').count(), 1);
-    await page.locator('.grade.g-again').click(); await page.locator('#zen-wait-skip').waitFor();
+    const beforeAgain = await page.evaluate(() => window.__KAIRO_SRS__.session());
+    await page.locator('.grade.g-again').click(); await againReturns(page, '［ … ］の図書館で本を読みます。', beforeAgain);
     const revealed = (await readAppRecordSnapshot(page)).record;
     assert.equal(revealed.sentencePractice.grades.at(-1).observation.grade, 'again');
     assert.equal(revealed.sentencePractice.grades.at(-1).observation.revealedBeforeRecall, true);
-    await page.locator('#zen-wait-skip').click(); await page.locator('#sentence-recall-answer').fill('町');
+    await page.locator('#sentence-recall-answer').fill('町');
     await page.locator('#sentence-recall-check').click(); await page.locator('.grade.g-easy').click();
     await page.locator('.review-summary').waitFor(); await page.locator('.close-doors .take').click();
     await page.locator('#sentence-practice-library summary').click(); await page.locator('[data-sentence-practice-id]').first().click();
