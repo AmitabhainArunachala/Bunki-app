@@ -8559,7 +8559,7 @@ function voicePendingNote(id) {
   // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
   pending.dataset.japaneseLookup = 'off';
   pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
-  if (bi()) pending.append(el('span', 'en-sub', 'read-aloud audio coming soon'));
+  if (bi()) pending.append(el('span', 'en-sub', 'audio coming soon'));
   return pending;
 }
 

@@ -193,7 +193,7 @@
       nav.setAttribute('aria-label', tx('参考書庫の移動', 'Reference navigation'));
       nav.append(button('reference-back', getReturnLabel?.() || (state.collectionId
         ? tx('← 参考書庫', '← Library')
-        : tx('← 本棚', '← Reading shelf')), onExit, 'reference-text-button'));
+        : tx('← 本棚', '← Bookshelf')), onExit, 'reference-text-button'));
       const others = node('div', 'reference-other-rooms');
       others.append(
         button('reference-global-search', tx('辞書で検索 →', 'Dictionary search →'), () => onSearch(state.query), 'reference-text-button'),

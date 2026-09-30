@@ -2241,6 +2241,9 @@ html[data-room='jlpt'] .exam-official .exam-official-import,
 }
 .assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
 html[data-room='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
+/* the real-paper section is ruled by its heading like every other section, not boxed in hairlines too */
+html[data-room='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
+html[data-room='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
 @media (max-width: 760px) {
   html[data-room='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
 }
