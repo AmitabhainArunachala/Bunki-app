@@ -27291,7 +27291,7 @@ function buildGingaChrome(root) {
     render();
     window.scrollTo(0, S.shelfScroll);
   });
-  const sensei = biLabel('button', 'corner-bubble bubble-sensei', '先生', 'sensei');
+  const sensei = biLabel('button', 'corner-bubble bubble-sensei', '先生', 'tutor');
   sensei.type = 'button';
   sensei.setAttribute('data-drift-chrome', '');
   sensei.addEventListener('click', () => {
