@@ -266,6 +266,8 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   box-decoration-break: clone;
 }
 .japanese-lookup-word rt { font-size: 0.63em; color: var(--red); }
+/* A source you quote from stays selectable: a drag across its words picks an excerpt to keep. */
+.publisher-body .japanese-lookup-word { -webkit-user-select: text; user-select: text; }
 .vocabulary-list-dialog {
   width: min(520px, calc(100vw - 32px));
   max-height: calc(100dvh - 48px);
