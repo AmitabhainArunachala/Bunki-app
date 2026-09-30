@@ -476,15 +476,21 @@ async function main() {
     await openReader(page, base);
     const particle = page.locator('#reader .tok.particle').first();
     await touchAt(page, '#reader .tok.particle');
+    // R4 (09b5e2a7): a particle uses the same quick-lookup door as every word — a tap opens its
+    // role and 助詞へ; it never opens the sheet and never lights a reading
     const particleTap = {
       sheet: await page.locator('#sheet').count(),
       reveal: await particle.evaluate((node) => node.classList.contains('lit')),
+      quickLook: await page.locator('#mini [data-action="entry.open"][data-target-kind="particle"]').count(),
     };
     check(
-      'particle pointer tap stays inert in reading rhythm',
-      particleTap.sheet === 0 && !particleTap.reveal,
+      'particle pointer tap opens its quick look, never the sheet or a reveal',
+      particleTap.sheet === 0 && !particleTap.reveal && particleTap.quickLook === 1,
       JSON.stringify(particleTap),
     );
+    // Escape on the particle puts its quick look away, as a learner would, before the next door
+    await particle.press('Escape');
+    check('Escape on the particle closes its quick look', (await page.locator('#mini').count()) === 0);
     // a fresh particle: focus arriving within a beat of the SAME token's own
     // tap is treated as the press and suppresses the pill (review P2 fix) —
     // a switch/AT user does not press the token they are navigating to
