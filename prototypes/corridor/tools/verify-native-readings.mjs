@@ -724,8 +724,9 @@ try {
     const body = bodies.get(id);
     const beforeNoise = noise.length;
     const item = page.locator(storyCard(id));
-    // The design's card: a topic kicker, the headline and, except on a teaser in today's six, a foot
-    // with the JLPT level chip (and 読了 once finished). Source, licence and 未確認 live in the reader.
+    // The design's card: a topic kicker, the headline and a foot with the JLPT level chip (and 読了
+    // once finished; since the 2026-10-01 polish pass a teaser in today's six carries the same foot).
+    // Source, licence and 未確認 live in the reader.
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
@@ -895,7 +896,7 @@ try {
       !shelfState.forbidden &&
       shelfState.kicker.trim().length > 0 &&
       shelfState.title === row.title &&
-      (teaser ? !shelfState.foot : !!expectedLevel && shelfState.level === expectedLevel) &&
+      !!expectedLevel && shelfState.level === expectedLevel &&
       readerShape.title === row.title &&
       readerShape.source === learnerSource &&
       readerShape.facts['出典'] === learnerSource &&
@@ -1030,10 +1031,9 @@ try {
       reloadedRecord.readerPos?.[id] === savedRecord.readerPos?.[id]),
   );
   const biCards = await readShelfCards();
-  const wrongEn = storyRows.filter((record) => !biCards[record.id] ||
-    (biCards[record.id].teaser ? biCards[record.id].en !== null : biCards[record.id].en !== record.titleEn));
+  const wrongEn = storyRows.filter((record) => !biCards[record.id] || biCards[record.id].en !== record.titleEn);
   check(
-    'the bilingual shelf renders every English title from the records themselves (a teaser in today’s six is headline only)',
+    'the bilingual shelf renders every English title from the records themselves, today’s six included',
     wrongEn.length === 0,
     wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${storyRows.length} titles`,
   );

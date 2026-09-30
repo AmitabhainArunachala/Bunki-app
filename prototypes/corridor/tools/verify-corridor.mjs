@@ -624,7 +624,7 @@ async function main() {
     return { cards: cards.length, glossary: glossary.length, intro, results };
   })()`);
   const readTally = (text) => {
-    const m = text.match(/読み物 ([0-9]+) 本(?:（うち用語集 ([0-9]+)）)?|([0-9]+) readings?(?:, including ([0-9]+) glossary)?/u);
+    const m = text.match(/読み物 ([0-9]+) 本(?:（うち用語集 ([0-9]+)）)?|([0-9]+) (?:readings?|articles?)(?:, (?:including )?([0-9]+) (?:glossary|of them short word definitions))?/u);
     return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
   };
   const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);

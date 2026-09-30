@@ -5161,8 +5161,8 @@ function shelfStories(curated) {
 /** One number for the shelf: every card counts, and the line says what it includes. */
 function shelfTallyText(list) {
   const glossary = list.filter((p) => p.source === 'isa-yasashii-glossary').length;
-  if (!glossary) return tx(`読み物 ${list.length} 本`, `${list.length} readings`);
-  return tx(`読み物 ${list.length} 本（うち用語集 ${glossary}）`, `${list.length} readings, including ${glossary} glossary entries`);
+  if (!glossary) return tx(`読み物 ${list.length} 本`, `${list.length} articles`);
+  return tx(`読み物 ${list.length} 本（うち用語集 ${glossary}）`, `${list.length} articles, ${glossary} of them short word definitions`);
 }
 function shelfDateline(day) {
   const [y, m, d] = day.split('-').map(Number);
@@ -5239,7 +5239,13 @@ function renderShelfBody() {
   // results line below come from the same tally, so they cannot disagree.
   const masthead = el('header', 'shelf-masthead');
   const title = el('div', 'shelf-mast-title');
-  title.append(withEn(el('h1', 'view-title', '本棚'), 'The reading room', 'en-inline'));
+  // the 永 brush mark is the bookshelf's own small seal, set with its name — never a picture apart.
+  // The standalone build inlines the artwork and names it here; a literal path would break it.
+  const art = el('img', 'shelf-art'); art.src = window.__KAIRO_SHELF_ART_URL__ || 'design/ink-hoku-nami.png'; art.alt = ''; art.width = 640; art.height = 640;
+  art.setAttribute('aria-hidden', 'true');
+  const name = el('div', 'shelf-mast-name');
+  name.append(art, withEn(el('h1', 'view-title', '本棚'), 'bookshelf', 'en-inline'));
+  title.append(name);
   const dateline = el('p', 'shelf-snippet intro shelf-dateline');
   // the masthead shows the reader's own date; the verifier's day seam overrides it
   const now = new Date(), localDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -5249,15 +5255,13 @@ function renderShelfBody() {
   const tally = el('span', 'dateline-tally');
   const glossaryCount = stories.filter((p) => p.source === 'isa-yasashii-glossary').length;
   tally.append(el('span', 'tally-long', shelfTallyText(stories)),
-    el('span', 'tally-short', `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
+    el('span', 'tally-short', bi() ? `${stories.length} articles` : `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
   dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
   title.append(dateline);
   // 未確認 is said once, here, not on every card; each article still wears it in its meta line
   const unreviewed = stories.filter(reviewPending).length;
-  if (unreviewed) title.append(el('p', 'shelf-review-note', tx(`このうち ${unreviewed} 本は未確認（人による確認の前）`,
-    `未確認 · ${unreviewed} of these ${stories.length} are not yet reviewed by a person`)));
-  // the standalone build inlines the artwork and names it here; a literal path would break it
-  const art = el('img', 'shelf-art'); art.src = window.__KAIRO_SHELF_ART_URL__ || 'design/ink-hoku-nami.png'; art.alt = tx('藍の地に白い筆の「永」', 'Bunki brush study: 永 in white ink on indigo'); art.width = 640; art.height = 640;
+  if (unreviewed) title.append(el('p', 'shelf-review-note', tx(`このうち ${unreviewed} 本は未確認（人による確認の前）。ふりがなや英訳に誤りがあるかもしれない。`,
+    `未確認 · ${unreviewed} of these ${stories.length} haven't been checked by a person yet, so their furigana or English may have mistakes.`)));
   masthead.append(title);
   main.append(masthead);
   const filters = S.shelfFilters ||= { sort: 'latest', topic: '', jlpt: '', grade: '', text: '' };
@@ -5265,7 +5269,7 @@ function renderShelfBody() {
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
   const controls = el('div', 'shelf-controls shelf-chipbar');
   controls.setAttribute('role', 'toolbar');
-  controls.setAttribute('aria-label', tx('読み物の絞り込み', 'filter the readings'));
+  controls.setAttribute('aria-label', tx('読み物の絞り込み', 'filter the articles'));
   const change = (key, value) => { filters[key] = value; refreshShelfBody(); };
   const select = (key, label, options) => {
     const chip = el('label', 'filter-chip');
@@ -5288,7 +5292,7 @@ function renderShelfBody() {
   const searchLabel = el('label', 'shelf-reading-search filter-search');
   searchLabel.append(uiIcon('search'));
   const find = el('input'); find.type='search'; find.value=filters.text; find.placeholder=tx('探す','Search'); find.id='shelf-reading-search';
-  find.setAttribute('aria-label', tx('読み物を探す（見出し・話題・キーワード）', 'Find a reading by title, topic or keyword'));
+  find.setAttribute('aria-label', tx('読み物を探す（見出し・話題・キーワード）', 'Find an article by title, topic or keyword'));
   find.addEventListener('change',()=>change('text',find.value)); find.addEventListener('keydown',event=>{if(event.key==='Enter')change('text',find.value);}); searchLabel.append(find);controls.append(searchLabel);
   const help = el('details','shelf-filter-help');
   const helpSummary = el('summary', 'icon-button');
@@ -5296,7 +5300,7 @@ function renderShelfBody() {
   helpSummary.title = tx('レベルの見方', 'How the level filters work');
   helpSummary.append(uiIcon('info'));
   help.append(helpSummary);
-  help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose a reading. JLPT uses its vocabulary; school grade describes its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
+  help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose an article. JLPT level comes from its vocabulary; school grade from its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
   main.append(controls);
   // the study tools: one slim row of text doors under the filters, every door always reachable
   const toolsBox = el('nav', 'shelf-study-tools'); toolsBox.setAttribute('aria-label', tx('学習ツール', 'Study tools'));
@@ -5441,9 +5445,6 @@ function renderShelfBody() {
     if (en) { door.title = en; door.setAttribute('aria-label', `${door.querySelector('.l-ja')?.textContent || ''} · ${en}`); }
   }
   toolsBox.append(tools);
-  const mastTools = el('div', 'shelf-mast-side');
-  mastTools.append(art);
-  masthead.append(mastTools);
   controls.after(toolsBox);
   // A small shelf of real encounters. These selections use saved mistakes to
   // choose context; browsing them never changes a card's grade or due date.
@@ -5512,7 +5513,7 @@ function renderShelfBody() {
     }
     const selection = el('section', 'shelf-daily-selection shelf-band');
     selection.setAttribute('aria-labelledby', 'shelf-today-head');
-    const todayHead = withEn(el('h2', 'shelf-band-head', '今日の６本'), 'Today’s six', 'en-inline');
+    const todayHead = withEn(el('h2', 'shelf-band-head', '今日の６本'), 'six picks for today', 'en-inline');
     todayHead.id = 'shelf-today-head';
     selection.append(todayHead);
     bands.unshift(selection);
@@ -5550,7 +5551,7 @@ function renderShelfBody() {
     rank += 1;
   }
   grid.append(...bands);
-  if(!matches.length)grid.append(el('p','note',tx('この条件の読み物はありません。絞り込みを減らしてください。','No readings match these filters. Try a wider level or another topic.')));
+  if(!matches.length)grid.append(el('p','note',tx('この条件の読み物はありません。絞り込みを減らしてください。','No articles match these filters. Try a wider level or another topic.')));
   main.append(grid);
   main.append(renderReadingPlaces()); renderSentenceReadingSuggestions(main);
   // the deep stack: the frozen wikinews archive, its own quiet room —
@@ -7158,56 +7159,69 @@ function renderReaderTip(main) {
   main.append(tip);
 }
 
-/** One shelf card: a topic kicker, the Japanese headline, one English line and the level — and
- * nothing else (design pass 2026-09-30). Source, licence, review detail and the grader's signals
- * live in the article's own footer. A card is ONE door (the whole card opens the reading).
- * rank: 'lead' carries art and the largest headline, 'second' the next size, 'teaser' is the
- * compact form used by 今日の６本. */
+/** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
+ * read as a random symbol to anyone who is not already a learner). A topic kicker, the Japanese
+ * headline, one English line, the level and the date, and nothing that does not carry meaning.
+ * Hierarchy comes from type size, spacing and card depth: 'lead' has the largest headline and the
+ * first sentence as a teaser, 'second' the next size, 'teaser' is the compact form used by
+ * 今日の６本. Source, licence, review detail and the grader's signals live in the article's own
+ * footer. A card is ONE door (the whole card opens the reading). */
 function shelfCard(p, rank = 'grid') {
   const item = el('article', `shelf-item story-card story-${rank}`);
   item.dataset.passage = p.id;
   const open = el('button', 'shelf-open');
   open.type = 'button';
-  if (rank === 'lead' || rank === 'second') open.append(storyArt(p));
   const head = el('div', 'shelf-head');
   head.append(storyKicker(p));
-  head.append(el('div', 'shelf-title', p.title));
+  const headline = el('div', 'shelf-title', p.title);
+  headline.lang = 'ja'; // so a headline breaks between phrases, never inside a word (word-break: auto-phrase)
+  head.append(headline);
   // the English title travels with the record (titleEn + titleEnSource in
   // data/articles/index.json), never in a code-side map
-  if (bi() && p.titleEn && rank !== 'teaser') head.append(el('div', 'shelf-title-en', p.titleEn));
-  if (rank !== 'teaser') {
-    const foot = el('div', 'story-foot');
-    foot.append(levelChip(p));
-    // the shelf remembers with you: finished, or open to your bookmark
-    if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', '読了 finished')));
-    else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', '途中 in progress')));
-    head.append(foot);
+  if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
+  if (rank === 'lead') {
+    const lede = storyLede(p);
+    if (lede) {
+      const line = el('p', 'story-lede', lede);
+      line.lang = 'ja';
+      head.append(line);
+    }
   }
+  const foot = el('div', 'story-foot');
+  foot.append(levelChip(p));
+  const date = storyDate(p, rank === 'teaser');
+  if (date) foot.append(date);
+  // the shelf remembers with you: finished, or open to your bookmark
+  if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', '読了 finished')));
+  else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', '途中 in progress')));
+  head.append(foot);
   open.append(head);
   open.addEventListener('click', () => openPassage(p.id));
   item.append(open);
   return item;
 }
 
-/** The lead story's art: one kanji from its own headline, brushed large in washi white on the
- * indigo field — the same hand as the shelf's 永 (Yuji Syuku, the app's shodō face). The quoted
- * term leads (「連帯の畑」 → 畑); otherwise the headline's densest kanji. */
-function storyArtGlyph(p) {
-  const title = String(p.title || '');
-  const quoted = title.match(/「([^」]+)」/u)?.[1] || '';
-  const kanji = (text) => [...text].filter((ch) => /\p{Script=Han}/u.test(ch));
-  const fromQuote = kanji(quoted);
-  if (fromQuote.length) return fromQuote.at(-1);
-  const strokes = (ch) => D.strokes?.[ch]?.length || 0;
-  const all = kanji(title);
-  return all.reduce((best, ch) => (strokes(ch) >= strokes(best) ? ch : best), all[0] || '読');
+/** The lead's teaser: the story's own first sentence, from the snippet the record carries. */
+function storyLede(p) {
+  const text = String(p.snippet || '').replace(/\s+/gu, ' ').trim();
+  if (!text) return '';
+  const end = text.search(/[。！？]/u);
+  return end >= 0 ? text.slice(0, end + 1) : `${text}…`;
 }
-function storyArt(p) {
-  const art = el('div', 'story-art');
-  art.setAttribute('aria-hidden', 'true');
-  art.append(el('span', 'story-art-glyph', storyArtGlyph(p)));
-  art.append(el('span', 'story-art-seal', storyTopic(p)[0].slice(0, 1)));
-  return art;
+
+/** A card's date: the day with how long ago while it is fresh; a teaser keeps the day alone. */
+function storyDate(p, short = false) {
+  const day = shelfDay(p);
+  if (!day) return null;
+  const stamp = el('time', 'story-date');
+  stamp.dateTime = day;
+  if (!short) stamp.textContent = shelfDateLabel(day);
+  else {
+    const [y, m, d] = day.split('-').map(Number);
+    const thisYear = new Date().getFullYear() === y;
+    stamp.textContent = bi() ? `${d} ${MONTHS_EN[m - 1]}${thisYear ? '' : ` ${y}`}` : `${thisYear ? '' : `${y}年`}${m}月${d}日`;
+  }
+  return stamp;
 }
 
 function dialRow(labelJa, labelEn, key, options) {
