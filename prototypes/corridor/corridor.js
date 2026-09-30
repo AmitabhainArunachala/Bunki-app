@@ -9086,12 +9086,18 @@ function renderEntry(main) {
  * here — the leech settings are a later slice. */
 const srsPrefsPending = new Set();
 const SRS_PRESET_LINES = {
-  gentle: ['疲れた日・再開の日に。新規 10・復習 100／日・ステップ 10分・保持率 85%',
-    'For tired or returning days: 10 new, 100 reviews a day, one 10-min step, 85% recall.'],
-  standard: ['Anki の標準。新規 20・復習 200／日・ステップ 1分 10分・保持率 90%',
-    "Anki's own defaults: 20 new, 200 reviews a day, steps 1m 10m, 90% recall."],
-  hardcore: ['AJATT 流、全力。新規 30・期日の札はすべて・ステップ 1分 10分・保持率 90%・復習が先',
-    'All in, AJATT-style: 30 new, every due review, steps 1m 10m, 90% recall, reviews before new.'],
+  gentle: ['疲れた日・再開の日に。1日に新しい語 10、復習は 100 まで。',
+    'For tired or returning days: 10 new words and up to 100 reviews a day.'],
+  standard: ['ふだんの日に（Anki の標準）。1日に新しい語 20、復習は 200 まで。',
+    'For most days (Anki’s usual settings): 20 new words and up to 200 reviews a day.'],
+  hardcore: ['全力の日に。1日に新しい語 30、期日の復習はすべて、復習が先。',
+    'All in: 30 new words a day, every review that is due, reviews first.'],
+};
+/* the scheduler's own numbers, for the learner who knows Anki: the preset's tooltip */
+const SRS_PRESET_DETAIL = {
+  gentle: ['ステップ 10分・保持率 85%', 'one 10-min learning step · 85% target recall'],
+  standard: ['ステップ 1分 10分・保持率 90%', 'learning steps 1m 10m · 90% target recall'],
+  hardcore: ['ステップ 1分 10分・保持率 90%・AJATT 流', 'learning steps 1m 10m · 90% target recall · AJATT-style'],
 };
 /** Which preset the record is on: { base, custom, label }. A record that never chose reads as
  * Standard — or Custom (from Standard) when its own numbers already differ from Standard's. */
@@ -9162,7 +9168,7 @@ function renderSrsPrefs(main) {
   toggle.type = 'button';
   toggle.id = 'srs-prefs-toggle';
   toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
-  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース', 'pacing ペース');
+  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース — 1日に覚える数', 'ペース pace · how many cards a day');
   toggle.addEventListener('click', () => {
     S.srsPrefsOpen = !S.srsPrefsOpen;
     render();
@@ -9184,6 +9190,7 @@ function renderSrsPrefs(main) {
     btn.disabled = srsPrefsPending.size > 0 || !recordWritable();
     btn.append(withEn(el('span', 'srs-preset-name', preset.ja), preset.en, 'en-inline'),
       el('span', 'srs-preset-line', tx(...SRS_PRESET_LINES[id])));
+    btn.title = tx(...SRS_PRESET_DETAIL[id]);
     btn.addEventListener('click', () => chooseSrsPreset(id));
     presets.append(btn);
   }
@@ -9237,7 +9244,7 @@ function renderSrsPrefs(main) {
   };
   stepper('新規 / 日', 'new a day', 'newPerDay');
   stepper('復習 / 日', 'reviews a day', 'reviewsPerDay');
-  stepper('一息', 'pause every', 'pauseEvery');
+  stepper('一息', 'a short break every … cards', 'pauseEvery');
   // R3-D · when the learner's own fitted weights rule the scheduler, this
   // fold — the scheduler-preferences surface — names it quietly, with the
   // honest basis. The raw parameter-set slug stays in exports/debug.
@@ -9731,7 +9738,7 @@ function updateRecordSyncSurface(container) {
     'Sync is paused while this record is protected. Check the storage warning.');
   else if (slot?.pending === 'register') message = tx('同期を利用できるか確認している。', 'Checking sync availability…');
   else if (state === 'unavailable') message = tx('この環境では記録の同期を利用できない。記録は下の「書き出す」から持ち出せる。',
-    'Record sync is unavailable in this host. You can export your record below.');
+    'Syncing between devices isn’t available here. You can export your record below.');
   else if (state === 'connecting') message = tx('接続を確認している。アプリの案内に従ってください。', 'Connecting. Follow any confirmation shown by the app.');
   else if (state === 'syncing') message = tx('記録を同期している。', 'Syncing records…');
   else if (state === 'error') message = tx('同期を完了できなかった。接続を確認して、もう一度試す。', 'Sync could not finish. Check the connection and try again.');
@@ -9762,8 +9769,8 @@ function renderRecordSync() {
   const status = el('p', 'airead-note record-sync-status');
   status.setAttribute('aria-live', 'polite');
   const scope = el('p', 'airead-note', tx(
-    '保存したメモと読書の栞、本文や独自の題名を付けずに保存したリンクを送受信する。提出・中断した練習の回答も、練習の記録で読める。問題は同じ版がこの端末で利用できるときに表示する。貼り付けた文章、単語カード、読了履歴、設定など、ほかの記録はこの端末に残る。',
-    'Saved notes, reading places and links saved without pasted text or a custom title can transfer. Submitted and stopped practice responses appear in Practice history; questions appear only when the exact version is available here. Pasted passages, cards, completed-reading history, settings and other records remain on this device.'));
+    'メモ、読書の栞、そのまま保存したリンク、提出・中断した練習の回答を同期する。単語カード、設定、貼り付けた文章、読了履歴はこの端末に残る。',
+    'Sync carries your notes, reading places, plain saved links, and finished or stopped practice answers. Cards, settings, pasted text and reading history stay on this device.'));
   const row = el('div', 'port-row');
   for (const [method, id, ja, en] of [['connect', 'record-sync-connect', '接続する', 'Connect'],
     ['sync', 'record-sync-now', '今すぐ同期', 'Sync now'], ['disconnect', 'record-sync-disconnect', '接続を切る', 'Disconnect']]) {
@@ -10008,8 +10015,8 @@ function renderTray(main) {
           'p',
           'srs-forecast',
           tx(
-            `${laterToday ? '今日このあと' : '今日'} ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
-            `${laterToday ? 'later today' : 'today'} ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
+            `復習の予定 — ${laterToday ? '今日このあと' : '今日'} ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
+            `coming up: ${laterToday ? 'later today' : 'today'} ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
           ),
         ),
       );
@@ -10084,12 +10091,12 @@ function renderTray(main) {
           'store-nudge',
           last
             ? tx(
-                '最後の書き出しから二週間以上。下の「書き出す」で記録をひとつのファイルに。',
-                'It has been over two weeks since your last export — 書き出す below keeps the whole record in one file.',
+                '最後の書き出しから二週間以上。下の「書き出す」で、記録の控えをひとつのファイルに残せる。',
+                'It has been over two weeks since you last saved a copy. 書き出す (export) below saves everything to one file.',
               )
             : tx(
-                '記録はこの端末だけにある。下の「書き出す」でひとつのファイルに残せる。',
-                'Your record lives only on this device so far — 書き出す below keeps it all in one file.',
+                '記録はこの端末だけにある。下の「書き出す」で、控えをひとつのファイルに残せる。',
+                'Your cards are saved only on this device. To keep a copy, use 書き出す (export) below.',
               ),
         ),
       );
@@ -10236,11 +10243,11 @@ function renderTray(main) {
       window.scrollTo(0, 0);
     });
     head.append(openList);
-    if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'named list' : 'auto · monthly'));
+    if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'your list' : 'words saved that month'));
     // the filtered deck, one tap wide: review only what today serves in this list
     const dueHere = scheduler ? todayQueue(new Date(), sec.items).order : [];
     if (dueHere.length && scheduler) {
-      const only = el('button', 'chip list-review', tx(`この組だけ ${dueHere.length}`, `just these — ${dueHere.length}`));
+      const only = el('button', 'chip list-review', tx(`この組だけ復習 ${dueHere.length}`, `review these ${dueHere.length}`));
       only.type = 'button';
       only.dataset.listReview = sec.name;
       only.addEventListener('click', () => startReview(sec.items));
@@ -10432,6 +10439,7 @@ function trayLine(item, dueKeys) {
     const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
     rest.type = 'button';
     rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
+    rest.title = S.suspended[key] ? tx('この札を復習にもどす', 'resume this card in reviews') : tx('この札を休ませる（復習で出さない）', 'pause this card: reviews skip it');
     rest.disabled = trayItemPending.has(key) || !recordWritable();
     const wasSuspended = !!S.suspended[key];
     rest.addEventListener('click', async (ev) => {
@@ -10522,7 +10530,7 @@ function renderListPage(main) {
   });
   main.append(back);
   main.append(
-    withEn(el('p', 'eyebrow', open.manual ? 'リスト' : 'リスト — 月別・自動'), open.manual ? 'named list' : 'auto · monthly', 'en-inline'),
+    withEn(el('p', 'eyebrow', open.manual ? 'リスト' : 'リスト — 月別・自動'), open.manual ? 'your list' : 'words saved that month', 'en-inline'),
   );
   main.append(
     el(
@@ -10535,7 +10543,7 @@ function renderListPage(main) {
   const ops = el('div', 'list-page-ops');
   const dueHere = scheduler ? todayQueue(new Date(), items).order : [];
   if (dueHere.length && scheduler) {
-    const only = el('button', 'chip list-review', tx(`この組だけ復習 — ${dueHere.length}`, `review just these — ${dueHere.length}`));
+    const only = el('button', 'chip list-review', tx(`この組だけ復習 ${dueHere.length}`, `review these ${dueHere.length}`));
     only.type = 'button';
     only.addEventListener('click', () => startReview(items));
     ops.append(only);

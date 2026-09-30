@@ -2457,3 +2457,17 @@ body .token-actions button:hover { background: var(--ai-wash); }
 /* reference pages: the pager wraps rather than pushing past a 320px screen */
 .reference-library .reference-page-controls { flex-wrap: wrap; row-gap: var(--s1); min-width: 0; }
 .reference-library .reference-pagination { flex-wrap: wrap; min-width: 0; }
+
+/* the review screen's group rows (polish pass 2026-10-01): the name never breaks, its plain gloss
+   takes the room that is left, and the per-group review is a sans pill like the room's doors */
+#app .list-head { flex-wrap: wrap; row-gap: 4px; }
+#app .list-head .list-open { white-space: nowrap; }
+#app .list-head > .en-inline { flex: 1 1 auto; min-width: 0; }
+#app .list-head .list-review {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font: 600 13px/1 var(--sans);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
