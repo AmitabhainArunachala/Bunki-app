@@ -13,7 +13,7 @@
  * localStorage/IndexedDB, outside HTTP caching entirely. */
 
 // v2: dict-v2 went schema 3 (sense tags) — the cache-first shards must drop
-const VERSION = 'kairo-v3-skip';
+const VERSION = 'kairo-v4-context-deck';
 const SHELL = [
   '.',
   'index.html',
@@ -35,6 +35,11 @@ const SHELL = [
   'reference-ui.js',
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
+  'decks/context-dense/mount.js',
+  'decks/context-dense/engine.js',
+  'decks/context-dense/deck.json',
+  'decks/context-dense/context-deck.css',
+  'decks/context-dense/standalone.html',
 ];
 
 self.addEventListener('install', (event) => {

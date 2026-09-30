@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>文脈札 — context deck</title>
+    <link rel="stylesheet" href="context-deck.css" />
+    <style>
+      body {
+        margin: 0;
+        background: #f3ecdf;
+        color: #1c1612;
+      }
+      main {
+        padding: 1.25rem 1rem 3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app"></main>
+    <script type="module">
+      import { render } from './mount.js';
+      render(document.querySelector('#app'), {
+        bilingual: true,
+        storage: localStorage,
+        standalone: true,
+      });
+    </script>
+  </body>
+</html>
