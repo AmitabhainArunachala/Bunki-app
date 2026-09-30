@@ -735,7 +735,8 @@ body .btn-tertiary, body .chip.btn-tertiary {
 
 /* ------------------------------------------------------------------ step 2
    The bookshelf as a magazine: a compact masthead, one slim chip bar, a lead
-   story with art, then a ranked grid of raised cards on the washi ground. */
+   story, then a ranked grid of raised cards on the washi ground. Text first:
+   rank shows in type size, spacing and depth, never in decoration. */
 body[data-view='shelf'] main > .eyebrow:first-child { display: none; }
 :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main {
   width: calc(100% - 2 * var(--s3));
@@ -795,14 +796,16 @@ html[data-room='shelf'] .search-field {
   color: var(--text-2);
   -webkit-line-clamp: none;
 }
-.shelf-mast-side { display: flex; align-items: center; gap: var(--s2); }
+.shelf-mast-name { display: flex; align-items: center; gap: 12px; }
 .shelf-results-count.is-quiet { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* the 永 seal is the bookshelf's own mark, sized to sit with its name */
 .shelf-masthead .shelf-art {
   display: block;
-  width: 64px;
-  height: 64px;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
   border-radius: 4px;
-  box-shadow: var(--raised-shadow);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent);
 }
 
 /* the chip bar: sort, three filters, search, the level note, the count */
@@ -1012,6 +1015,7 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--ai); outlin
   letter-spacing: -0.005em;
   color: var(--text);
   text-wrap: pretty;
+  word-break: auto-phrase;
 }
 #shelf-body .story-card .shelf-title-en {
   font: 400 15px/1.5 var(--sans);
@@ -1027,58 +1031,32 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--ai); outlin
   margin-top: auto;
   padding-top: var(--s2);
 }
+/* the date rides the foot beside the level, quieter than both headlines */
+.story-date { font: 500 13px/1.3 var(--sans); letter-spacing: 0.01em; color: var(--text-2); font-variant-numeric: tabular-nums; }
 #shelf-body .story-second .shelf-title { font-size: 27px; line-height: 1.45; }
 #shelf-body .story-second .shelf-title-en { font-size: 16px; }
-#shelf-body .story-second .shelf-open { padding: 0; }
-#shelf-body .story-second .shelf-head { padding: var(--s3) var(--s4) var(--s4); }
-#shelf-body .story-second .story-art { min-height: 0; height: 132px; border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0 0; }
-#shelf-body .story-second .story-art-glyph { font-size: 96px; }
-#shelf-body .story-second .story-art-seal { width: 28px; height: 28px; font-size: 16px; right: 12px; bottom: 12px; }
+#shelf-body .story-second .shelf-open { padding: var(--s3) var(--s4) var(--s3); }
 
-/* the lead: its own art, the largest headline, a vermilion rule of rank */
-#shelf-body .story-lead .shelf-open {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  padding: 0;
-}
-.story-art {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 340px;
-  overflow: hidden;
-  border-radius: 0 0 0 calc(var(--radius-card) - 1px);
-  background:
-    var(--washi-dark) 0 0 / 300px 300px repeat,
-    radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--art-field) 78%, #fff) 0%, var(--art-field) 62%, color-mix(in srgb, var(--art-field) 80%, #000) 100%);
-  isolation: isolate;
-}
-.story-art-glyph {
-  font-family: 'Yuji Syuku', var(--display);
-  font-size: clamp(170px, 17vw, 236px);
-  line-height: 1;
-  color: var(--art-ink);
-  text-shadow: 0 2px 0 rgb(0 0 0 / 18%), 0 18px 40px rgb(0 0 0 / 30%);
-  transform: rotate(-3deg);
-}
-.story-art-seal {
-  position: absolute;
-  right: var(--s2);
-  bottom: var(--s2);
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  background: var(--accent);
-  color: #fff8ee;
-  font: 800 20px/1 var(--display);
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, #fff 26%, transparent);
-}
-#shelf-body .story-lead .shelf-head { justify-content: center; gap: var(--s2); padding: var(--s5); }
-#shelf-body .story-lead .shelf-title { font-size: clamp(30px, 3.1vw, 40px); line-height: 1.42; letter-spacing: -0.015em; }
-#shelf-body .story-lead .shelf-title-en { font-size: 18px; line-height: 1.5; }
+/* the lead: the whole width, the largest headline, its first sentence as the teaser, and a
+   vermilion rule of rank along its top edge */
+body #shelf-body .story-lead { border-top: 3px solid var(--accent); }
+#shelf-body .story-lead .shelf-open { padding: var(--s4) var(--s5) var(--s4); }
+#shelf-body .story-lead .shelf-head { gap: var(--s2); }
+#shelf-body .story-lead :is(.shelf-title-en, .story-lede) { max-width: 820px; }
+#shelf-body .story-lead .shelf-title { font-size: clamp(30px, 3.1vw, 42px); line-height: 1.4; letter-spacing: -0.015em; }
+#shelf-body .story-lead .shelf-title-en { font-size: 19px; line-height: 1.5; color: var(--text); }
 #shelf-body .story-lead .story-kicker { font-size: 14px; }
+#shelf-body .story-lead .story-lede {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: var(--s1) 0 0;
+  padding: var(--s2) 0 0;
+  border-top: 1px solid var(--hairline);
+  font: 400 17px/1.8 var(--serif);
+  color: var(--text-2);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 #shelf-body .story-lead .story-foot { margin-top: var(--s1); padding-top: 0; }
 
 /* bands between the seconds and the grid: today's six, words met again */
@@ -1118,7 +1096,19 @@ body #shelf-body .story-teaser:hover { transform: none; box-shadow: none; backgr
   -webkit-box-orient: vertical;
 }
 #shelf-body .story-teaser .story-kicker { font-size: 12px; }
-#shelf-body .story-teaser .story-kicker .en-sub { display: none; }
+#shelf-body .story-teaser .story-kicker .en-sub { font-size: 11px; }
+#shelf-body .story-teaser .shelf-head { gap: 6px; }
+#shelf-body .story-teaser .shelf-title-en {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+#shelf-body .story-teaser .story-foot { padding-top: 6px; gap: 6px; }
+#shelf-body .story-teaser .level-chip { min-height: 20px; padding: 0 5px; font-size: 12px; }
+#shelf-body .story-teaser .story-date { font-size: 12px; }
 .shelf-encounters > .note { margin: 0 0 var(--s2); padding: 0; border: 0; background: transparent; font: 14px/1.7 var(--sans); color: var(--text-2); }
 .shelf-encounter-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
 .shelf-encounter {
@@ -1491,17 +1481,14 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
 
 /* the magazine and the page, narrowed */
 @media (max-width: 1000px) {
-  #shelf-body .story-lead .shelf-open { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   #shelf-today.shelf-today-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s2); }
 }
 @media (max-width: 760px) {
   #shelf-reading-results.shelf-story-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
   #shelf-reading-results > *, #shelf-reading-results > .story-second { grid-column: 1 / -1; }
-  #shelf-body .story-lead .shelf-open { grid-template-columns: minmax(0, 1fr); }
-  .story-art { min-height: 0; aspect-ratio: 16 / 8; border-radius: 0; }
-  .story-art-glyph { font-size: 132px; }
-  #shelf-body .story-lead .shelf-head { padding: var(--s3); gap: var(--s1); }
-  #shelf-body .story-second .shelf-head { padding: var(--s3); }
+  #shelf-body .story-lead .shelf-open { padding: var(--s3); }
+  #shelf-body .story-lead .shelf-head { gap: var(--s1); }
+  #shelf-body .story-second .shelf-open { padding: var(--s3); }
   #shelf-body .story-second .shelf-title { font-size: 23px; }
   .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
 }
@@ -1518,8 +1505,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .shelf-dateline .tally-short { display: inline; }
   #shelf-body .shelf-review-note { font-size: 12px; }
   .shelf-masthead { align-items: flex-start; }
-  .shelf-mast-side { flex-direction: column-reverse; align-items: flex-end; gap: var(--s1); }
-  .shelf-masthead .shelf-art { width: 44px; height: 44px; }
+  .shelf-masthead .shelf-art { width: 36px; height: 36px; }
   .shelf-controls.shelf-chipbar {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -1539,19 +1525,14 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .shelf-tools-grid button.grammar-link .en-sub, #shelf-body .shelf-tools-grid button.grammar-link[data-grade] .en-sub, .shelf-tools-label .en-sub { display: none; }
   #shelf-body .shelf-tools-grid button.grammar-link { padding: 0 8px; }
   #shelf-body .story-card .shelf-open { padding: var(--s2) var(--s2) 20px; }
-  #shelf-body :is(.story-lead, .story-second) .shelf-open { padding: 0; }
-  #shelf-body .story-second .shelf-head { padding: var(--s2) var(--s2) 20px; }
-  #shelf-body .story-second .story-art { height: 112px; }
-  #shelf-body .story-second .story-art-glyph { font-size: 80px; }
+  #shelf-body .story-second .shelf-open { padding: var(--s2) var(--s2) 20px; }
   #shelf-body .story-teaser .shelf-title { font-size: 17px; }
   #shelf-body .story-card .shelf-title { font-size: 20px; }
   #shelf-body .story-second .shelf-title { font-size: 22px; }
   #shelf-body .story-lead .shelf-title { font-size: 26px; line-height: 1.45; }
   #shelf-body .story-lead .shelf-title-en { font-size: 16px; }
-  #shelf-body .story-lead .shelf-head { padding: 20px var(--s2) var(--s2); }
-  .story-art { aspect-ratio: 16 / 7; }
-  .story-art-glyph { font-size: 112px; }
-  .story-art-seal { width: 30px; height: 30px; font-size: 17px; right: 12px; bottom: 12px; }
+  #shelf-body .story-lead .shelf-open { padding: 20px var(--s2) var(--s2); }
+  #shelf-body .story-lead .story-lede { font-size: 15px; line-height: 1.75; }
   #shelf-today.shelf-today-strip {
     grid-auto-flow: column;
     grid-template-columns: none;

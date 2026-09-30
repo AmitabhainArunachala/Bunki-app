@@ -13,6 +13,11 @@
  *   S2 first story      — the first shelf card's headline is inside 390×844 and not covered.
  *   S3 one count        — every number the unfiltered shelf states about its size is the same
  *                         number, and it equals the stories on the shelf (grid + today's band).
+ *   S4 text-first cards — (polish pass 2026-10-01) no card anywhere on the shelf carries a picture
+ *                         or a brushed headline kanji: every card is a kicker, the headline, the
+ *                         level chip, and in English its English line; the lead adds its first
+ *                         sentence. The masthead's 永 seal sits inside the 本棚 title, ≤ 48 px.
+ *                         Control: 13fe096d, whose lead and seconds wore the .story-art tile.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -283,9 +288,9 @@ try {
           .map((n) => n.closest('[data-passage]').dataset.passage)).size;
         const lines = [...document.querySelectorAll('.shelf-masthead p, .shelf-results-count')]
           .filter((n) => n.offsetParent !== null || n.classList.contains('shelf-results-count')).map((n) => n.innerText);
-        // a size is "N readings" / "N本" / "of these N"; "N of these" is a subset (the unreviewed count)
+        // a size is "N articles" / "N本" / "of these N"; "N of these" is a subset (the unreviewed count)
         const numbers = lines.flatMap((t) => [
-          ...[...t.matchAll(/(\d+)\s*(?:readings|本)/gu)].map((m) => Number(m[1])),
+          ...[...t.matchAll(/(\d+)\s*(?:readings|articles|本)/gu)].map((m) => Number(m[1])),
           ...[...t.matchAll(/of these (\d+)/gu)].map((m) => Number(m[1])),
         ]);
         return { cards, lines, numbers };
@@ -294,6 +299,30 @@ try {
       assert(probe.numbers.every((n) => n === probe.cards), `stated ${JSON.stringify(probe.numbers)} for ${probe.cards} stories: ${JSON.stringify(probe.lines)}`);
       return probe;
     });
+
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`S4-text-first-cards-${label}`, viewport, async (page) => {
+        await open(page);
+        const probe = await page.evaluate(() => {
+          const cards = [...document.querySelectorAll('#shelf-body .story-card')];
+          const pictures = cards.filter((card) => card.querySelector('img, svg, canvas, picture, [class*="art"]')).map((card) => card.dataset.passage);
+          const incomplete = cards.filter((card) => !card.querySelector('.story-kicker') || !card.querySelector('.shelf-title')?.textContent.trim() ||
+            !card.querySelector('.story-foot .level-chip') || !card.querySelector('.shelf-title-en')?.textContent.trim()).map((card) => card.dataset.passage);
+          const lead = document.querySelector('#shelf-reading-results .story-lead');
+          const seal = document.querySelector('.shelf-masthead .shelf-art');
+          const sealBox = seal?.getBoundingClientRect();
+          return { cards: cards.length, pictures: pictures.slice(0, 4), pictureCount: pictures.length, incomplete: incomplete.slice(0, 4), incompleteCount: incomplete.length,
+            lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
+            seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
+        });
+        assert(probe.cards > 20, `only ${probe.cards} cards`);
+        assert.equal(probe.pictureCount, 0, `cards carrying a picture or art tile: ${probe.pictures.join(', ')}`);
+        assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
+        assert(/[。！？…]$/u.test(probe.lede), `the lead has no first-sentence teaser: "${probe.lede}"`);
+        assert(probe.sealInTitle && probe.seal > 0 && probe.seal <= 48, `the 永 seal is not a small mark inside the title: ${JSON.stringify(probe)}`);
+        return { cards: probe.cards, lede: probe.lede.slice(0, 24), seal: probe.seal };
+      });
+    }
 
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);
@@ -379,9 +408,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording and first story; no F1 audio',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio',
     results,
-    passed: results.length === engines.length * 12 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 14 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
