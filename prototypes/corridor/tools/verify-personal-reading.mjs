@@ -190,6 +190,9 @@ try {
   assert(readingY > 400, 'the lookup begins inside the long reading');
   await wordNearEnd.click();
   await page.locator('#sheet-close').waitFor();
+  // the entry finishes opening its complete senses first: a slow runner otherwise leaves the
+  // dictionary shard in flight into the later reload, which WebKit reports as a page error
+  await page.waitForFunction(() => document.querySelector('#sheet') && !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 20000 });
   await page.locator('#sheet-close').click();
   await page.waitForFunction((expected) => Math.abs(window.scrollY - expected) < 3, readingY);
   assert.equal(await page.locator('#airead-title').textContent(), replacement.aiReading.readingVersion.candidate.article.title);
