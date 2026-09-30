@@ -2153,6 +2153,7 @@ html[data-room='jlpt'] h2.exam-section-heading {
   font: 800 24px/1.35 var(--display);
   color: var(--text);
 }
+html[data-room='jlpt'] h2.exam-section-heading .en-inline { margin-left: var(--s1); font: 500 15px/1.4 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 html[data-room='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
 html[data-room='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
 html[data-room='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
@@ -2211,6 +2212,31 @@ html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
   text-underline-offset: 0.25em;
 }
 .exam-review-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
+/* one secondary-button look for the room's quieter actions: the real-test import and the
+   confirm sheet's alternatives sit beside the navy Start as outlined buttons, not serif chips */
+html[data-room='jlpt'] .exam-official .exam-official-import,
+.assessment-room .exam-confirm > button:not(.take) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: var(--s1) var(--s1) 0 0;
+  padding: 0 var(--s3);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ai);
+  box-shadow: none;
+  font: 700 15px/1 var(--sans);
+  letter-spacing: 0;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  html[data-room='jlpt'] .exam-official .exam-official-import:hover,
+  .assessment-room .exam-confirm > button:not(.take):hover { background: var(--ai-wash); }
+}
+.assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
+html[data-room='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
 @media (max-width: 760px) {
   html[data-room='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
 }
@@ -2226,6 +2252,7 @@ html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
   html[data-room='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
   html[data-room='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
   html[data-room='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
+  html[data-room='jlpt'] h2.exam-section-heading .en-inline { display: block; margin: 4px 0 0; font-size: 14px; }
 }
 
 /* ------------------------------------------------------------------ step 4b

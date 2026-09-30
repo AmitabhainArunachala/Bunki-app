@@ -194,9 +194,14 @@ try {
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: after a reload the room opens at the level he chose (N1)`, remembered === 'N1', `opened at ${remembered}`);
     const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
     await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
-    const listed = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-legacy-set]')]
-      // the learner-facing mark is 未確認 since the design pass of 2026-09-30 (it was 検収前)
-      .map((door) => ({ id: door.dataset.legacySet, pending: /未確認|検収前/u.test(door.textContent), text: door.textContent })));
+    const listed = await page.evaluate(() => {
+      // the learner-facing mark is 未確認 since the design pass of 2026-09-30 (it was 検収前); since the
+      // polish pass of 2026-10-01 a section whose sets are all unchecked says it once, in its header
+      const block = document.querySelector('[data-exam-older="N1"]');
+      const sectionMarked = !!block?.querySelector('[data-older-mark] .status-chip');
+      return [...(block?.querySelectorAll('[data-legacy-set]') || [])]
+        .map((door) => ({ id: door.dataset.legacySet, pending: sectionMarked || /未確認|検収前/u.test(door.textContent), text: door.textContent }));
+    });
     // expected identities and counts come from the artifact's own data, never from this file
     const expected = (await (await page.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
     const matches = listed.length === expected.length && expected.every((set, i) => listed[i]?.id === set.setId && listed[i].text.includes(String(set.items)));
