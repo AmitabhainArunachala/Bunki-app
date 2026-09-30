@@ -925,14 +925,14 @@ html[data-room='shelf'] .search-field {
 /* study tools: one slim row of quiet text doors under the filters */
 #shelf-body .shelf-study-tools {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--s2);
   margin: calc(-1 * var(--s1)) 0 var(--s3);
   padding: 0;
   border: 0;
 }
 .shelf-tools-label { display: inline-flex; align-items: baseline; gap: 6px; flex: 0 0 auto; font: 700 13px/1 var(--sans); letter-spacing: 0.04em; color: var(--text-2); }
-.shelf-tools-label .en-sub { display: none; }
+.shelf-tools-label .en-sub { display: inline; font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; }
 #shelf-body .shelf-study-tools .shelf-tools-grid { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; min-width: 0; padding: 0; }
 #shelf-body .shelf-study-tools { gap: var(--s1); }
 #shelf-body .shelf-tools-grid button.grammar-link, #shelf-body .shelf-tools-grid button.grammar-link[data-grade] {
@@ -958,8 +958,9 @@ html[data-room='shelf'] .search-field {
 }
 #shelf-body .shelf-tools-grid button.grammar-link:hover { background: var(--ai-wash); }
 #shelf-body .shelf-tools-grid button.grammar-link[data-grade] :is(.l-ja, .en-sub) { font-size: inherit; margin: 0; }
+/* each door says what it is: Japanese first, its short English gloss after (polish pass 2026-10-01) */
 #shelf-body .shelf-tools-grid button.grammar-link .en-sub, #shelf-body .shelf-tools-grid button.grammar-link[data-grade] .en-sub {
-  display: none;
+  display: inline;
   margin: 0;
   font: 500 12px/1 var(--sans);
   letter-spacing: 0.01em;
@@ -1515,14 +1516,14 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   }
   .shelf-controls.shelf-chipbar::-webkit-scrollbar { display: none; }
   .shelf-controls .filter-chip { flex: 0 0 auto; padding: 0 8px 0 12px; }
-  .shelf-controls .filter-chip-label .en-sub { display: none; }
+  /* the chip bar scrolls sideways on a phone, so each chip keeps its English gloss */
   .shelf-controls .filter-search { flex: 0 0 auto; }
   .shelf-controls .shelf-results-count { flex: 0 0 auto; margin-left: var(--s1); }
   .shelf-filter-help[open] > p { position: fixed; top: auto; bottom: var(--s2); left: var(--s2); right: var(--s2); width: auto; transform: none; }
   #shelf-body .shelf-study-tools { margin: calc(-1 * var(--s1)) calc(-1 * var(--s2)) var(--s2); padding: 0 var(--s2); overflow-x: auto; scrollbar-width: none; }
   #shelf-body .shelf-study-tools::-webkit-scrollbar { display: none; }
   #shelf-body .shelf-study-tools .shelf-tools-grid { flex-wrap: nowrap; }
-  #shelf-body .shelf-tools-grid button.grammar-link .en-sub, #shelf-body .shelf-tools-grid button.grammar-link[data-grade] .en-sub, .shelf-tools-label .en-sub { display: none; }
+  #shelf-body .shelf-study-tools .shelf-tools-label .en-sub { display: none; }
   #shelf-body .shelf-tools-grid button.grammar-link { padding: 0 8px; }
   #shelf-body .story-card .shelf-open { padding: var(--s2) var(--s2) 20px; }
   #shelf-body .story-second .shelf-open { padding: var(--s2) var(--s2) 20px; }
