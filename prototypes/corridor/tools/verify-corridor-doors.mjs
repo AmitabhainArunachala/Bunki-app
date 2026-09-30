@@ -176,7 +176,7 @@ try {
   }
 
   // T10 — N1 is not a dead end: with no checked N1 test, the room names the older N1 sets
-  // (each marked 検収前) and one of them opens into a real question.
+  // (each marked 未確認) and one of them opens into a real question.
   for (const [viewport, fromDoor] of [[{ width: 1728, height: 996 }, false], [{ width: 1728, height: 996 }, true],
     [{ width: 390, height: 844 }, false], [{ width: 390, height: 844 }, true]]) {
     const context = await browser.newContext({ viewport });

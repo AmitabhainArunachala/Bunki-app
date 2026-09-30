@@ -475,7 +475,7 @@ export function createAssessmentView(host) {
     container.append(details);
   }
   // A level with no checked test is not a dead end: its older sets are named here, each
-  // marked 検収前 (answers not yet checked). No date is promised; nothing is called reviewed.
+  // marked 未確認 (answers not yet checked). No date is promised; nothing is called reviewed.
   function renderOlderSets(main, hasTests = false) {
     const older = host.olderSets?.(level) || { state: 'failed', sets: [] };
     const sets = older.sets;
