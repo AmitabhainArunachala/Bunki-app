@@ -4108,13 +4108,16 @@ async function main() {
     midPick.why === 'because two' && midPick.marked === 1,
     JSON.stringify(midPick));
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
-  await page.waitForTimeout(150);
-  await page.waitForSelector('.lesson-option', { state: 'attached', timeout: 15000 });
-  await page.evaluate(`[...document.querySelectorAll('.lesson-option')][0].click()`);
-  await page.waitForTimeout(150);
-  await page.waitForSelector('#aiq-next', { state: 'attached', timeout: 15000 });
+  await page.waitForFunction(() =>
+    (document.querySelector('.aiq-q')?.textContent ?? '').includes('RELOAD-Q3') &&
+      !!document.querySelector('.lesson-option:not([disabled])'), null, { timeout: 15000 });
+  await page.evaluate(`document.querySelector('.lesson-option:not([disabled])').click()`);
+  await page.waitForSelector('#aiq-next:not([disabled])', { state: 'attached', timeout: 15000 });
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
-  await page.waitForTimeout(250);
+  await page.waitForFunction(() =>
+    document.body.dataset.view === 'aiquiz' &&
+      !!document.querySelector('h1.view-title') &&
+      !document.querySelector('.aiq-q'), null, { timeout: 15000 });
   const quizScore = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
@@ -4130,9 +4133,11 @@ async function main() {
       quizScore.taken === 0 &&
       quizScore.srsKeys === 0,
     `title "${quizScore.title.trim()}" · stored ${quizScore.stored}`);
-  await page.waitForSelector('#aiq-close', { state: 'attached', timeout: 15000 });
+  await page.waitForSelector('#aiq-close:not([disabled])', { state: 'attached', timeout: 15000 });
   await page.evaluate(`document.querySelector('#aiq-close').click()`);
-  await page.waitForTimeout(250);
+  await page
+    .waitForFunction(() => document.body.dataset.view === 'tray', null, { timeout: 15000 })
+    .catch(() => {});
   const quizClosed = await evaluateAppRecord(page,
     `record.aiQuiz`,
   );
