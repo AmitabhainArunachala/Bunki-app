@@ -4093,7 +4093,7 @@ async function main() {
     resumed.q.includes('RELOAD-Q2') && /2\s*\/\s*3/.test(resumed.at),
     `"${resumed.q}" at "${resumed.at.trim()}"`);
   await page.evaluate(`[...document.querySelectorAll('.lesson-option')][1].click()`);
-  await page.waitForTimeout(250);
+  await page.waitForSelector('#aiq-next:not([disabled])', { state: 'attached', timeout: 15000 });
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
