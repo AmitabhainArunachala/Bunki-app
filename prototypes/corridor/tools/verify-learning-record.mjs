@@ -53,7 +53,7 @@ const names = new Set([
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
   // card-system slice 1: the preset buttons, the pacing steppers and the optional break
   'NEW_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_MIN', 'REVIEWS_PER_DAY_MAX', 'RETENTION_MIN', 'RETENTION_MAX',
-  'PAUSE_EVERY_MIN', 'PAUSE_EVERY_MAX', 'SRS_PRESETS', 'SRS_PRESET_IDS', 'SRS_PRESET_LINES', 'SRS_PREF_LADDERS',
+  'PAUSE_EVERY_MIN', 'PAUSE_EVERY_MAX', 'SRS_PRESETS', 'SRS_PRESET_IDS', 'SRS_PRESET_LINES', 'SRS_PRESET_DETAIL', 'SRS_PREF_LADDERS',
   'validNewPerDay', 'validReviewsPerDay', 'validRetention', 'validPreset', 'validPauseEvery',
   'srsPresetState', 'srsPrefValue', 'srsPrefStep', 'chooseSrsPreset', 'srsSchedulePolicy', 'srsPauseEvery', 'renderReviewBreak',
   'canonicalRecordJson',
