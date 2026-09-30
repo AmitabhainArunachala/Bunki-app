@@ -222,9 +222,10 @@ async function main() {
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
-    return { rows: rows.length, pending: document.querySelectorAll('.mock-pending').length };
+    const marked = rows.filter((r) => [...r.querySelectorAll('.status-chip')].some((c) => c.textContent.trim() === '未確認'));
+    return { rows: rows.length, pending: marked.length };
   })()`);
-  check('earlier exercises retain all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
+  check('earlier exercises retain all 25 papers, each wearing the 未確認 chip', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time
   await page.click('[data-mock-set="n5-01"]');
