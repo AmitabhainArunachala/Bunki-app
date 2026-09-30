@@ -5323,7 +5323,7 @@ function renderShelfBody() {
     render(); window.scrollTo(0, 0);
   });
   tools.append(news);
-  const inbox = biLabel('button', 'grammar-link', '日本語を持ち込む', 'source inbox · paste or link');
+  const inbox = biLabel('button', 'grammar-link', '日本語を持ち込む', 'bring your own text');
   inbox.type = 'button'; inbox.id = 'source-inbox-link';
   inbox.addEventListener('click', () => { keepScroll(); S.view = 'source-inbox'; render(); window.scrollTo(0, 0); });
   tools.append(inbox);
@@ -5332,7 +5332,7 @@ function renderShelfBody() {
   const lanes = el('button', 'grammar-link');
   lanes.type = 'button';
   lanes.id = 'levels-link';
-  lanes.append(el('span', 'l-ja', '参考書庫'), el('span', 'en-sub', bi() ? 'Reference library · JLPT & Kanji Kentei' : 'JLPT・漢検'));
+  lanes.append(el('span', 'l-ja', '参考書庫'), el('span', 'en-sub', bi() ? 'reference library' : 'JLPT・漢検'));
   lanes.addEventListener('click', () => {
     keepScroll();
     pendingReferenceCollection = null;
@@ -5367,7 +5367,7 @@ function renderShelfBody() {
   const mirror = el('button', 'grammar-link');
   mirror.type = 'button';
   mirror.id = 'kagami-link';
-  mirror.append(el('span', 'l-ja', '鏡'), el('span', 'en-sub', bi() ? 'the mirror' : ''));
+  mirror.append(el('span', 'l-ja', '鏡'), el('span', 'en-sub', bi() ? 'your progress' : ''));
   mirror.addEventListener('click', () => {
     keepScroll();
     S.view = 'kagami';
@@ -5389,7 +5389,7 @@ function renderShelfBody() {
   const thes = el('button', 'grammar-link');
   thes.type = 'button';
   thes.id = 'thesaurus-link';
-  thes.append(el('span', 'l-ja', '類語'), el('span', 'en-sub', bi() ? 'synonyms, side by side' : ''));
+  thes.append(el('span', 'l-ja', '類語'), el('span', 'en-sub', bi() ? 'synonyms' : ''));
   thes.addEventListener('click', () => {
     keepScroll();
     S.view = 'thesaurus';
@@ -5400,7 +5400,7 @@ function renderShelfBody() {
   const yj = el('button', 'grammar-link');
   yj.type = 'button';
   yj.id = 'yoji-link';
-  yj.append(el('span', 'l-ja', '四字熟語'), el('span', 'en-sub', bi() ? 'four-character idioms' : ''));
+  yj.append(el('span', 'l-ja', '四字熟語'), el('span', 'en-sub', bi() ? 'idioms' : ''));
   yj.addEventListener('click', () => {
     keepScroll();
     S.view = 'yoji';
@@ -5411,7 +5411,7 @@ function renderShelfBody() {
   const kdx = el('button', 'grammar-link');
   kdx.type = 'button';
   kdx.id = 'kanjidex-link';
-  kdx.append(el('span', 'l-ja', '字引'), el('span', 'en-sub', bi() ? 'find a kanji by shape' : ''));
+  kdx.append(el('span', 'l-ja', '字引'), el('span', 'en-sub', bi() ? 'kanji by shape' : ''));
   kdx.addEventListener('click', () => {
     keepScroll();
     S.view = 'kanjidex';
@@ -5422,7 +5422,7 @@ function renderShelfBody() {
   const ai = el('button', 'grammar-link');
   ai.type = 'button';
   ai.id = 'ai-link';
-  ai.append(el('span', 'l-ja', aiKey() ? '先生' : '先生を招く'), el('span', 'en-sub', bi() ? (aiKey() ? 'the tutor is here' : 'invite the tutor') : ''));
+  ai.append(el('span', 'l-ja', aiKey() ? '先生' : '先生を招く'), el('span', 'en-sub', bi() ? (aiKey() ? 'tutor' : 'set up the tutor') : ''));
   ai.addEventListener('click', () => {
     keepScroll();
     S.view = 'ai';
@@ -5439,7 +5439,7 @@ function renderShelfBody() {
     aread.id = 'airead-link';
     const hasReading = aiKey() || S.aiReading || S.aiReadings.length;
     aread.append(el('span', 'l-ja', hasReading ? '私の読み物' : '読み物の好み'),
-      el('span', 'en-sub', bi() ? (hasReading ? 'a reading written for you' : 'reading preferences') : ''));
+      el('span', 'en-sub', bi() ? (hasReading ? 'an article written for you' : 'reading preferences') : ''));
     aread.addEventListener('click', () => {
       keepScroll();
       S.view = 'airead';
