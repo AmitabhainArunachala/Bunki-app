@@ -3801,6 +3801,16 @@ function dictionaryDetailsFor(node) {
 function dictionaryTag(tag) {
   return D.dictionaryIndex?.tags?.[tag] || tag;
 }
+/* the core record's part of speech is plain words already, bar a few JMdict codes it kept */
+const CORE_POS_PLAIN = {
+  'adj-pn': 'pre-noun adjective', 'adj-f': 'used before a noun', 'n-suf': 'noun suffix', 'n-pref': 'noun prefix',
+  'vs-s': 'suru verb', 'vs-c': 'su verb', vz: 'zuru verb', aux: 'auxiliary', 'aux-adj': 'auxiliary adjective',
+  'adj-ix': 'i-adjective (いい/よい)', 'adj-ku': 'ku-adjective', v5aru: 'godan verb', 'v1-s': 'ichidan verb',
+  'v2a-s': 'nidan verb', cop: 'copula',
+};
+function plainPos(p) {
+  return String(p).split(' · ').map((part) => CORE_POS_PLAIN[part] || part).join(' · ');
+}
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -7665,6 +7675,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const seal = el('button', 'mini-take', '覚');
   seal.type = 'button';
   seal.id = 'mini-take';
+  if (bi()) seal.append(el('span', 'mini-take-en', 'save'));
   const paintSeal = () => {
     const on = miniTaken();
     seal.classList.toggle('taken', on);
@@ -23256,8 +23267,8 @@ function renderDictionaryDetails(container, details, node) {
           .join('; ');
         body.append(el('p', 'dictionary-info', tx(`語源 ${sources}`, `source ${sources}`)));
       }
-      renderDictionaryRelations(body, '辞書内の関連項目', 'dictionary cross-references', related, node);
-      renderDictionaryRelations(body, '対義語', 'antonyms', antonym, node);
+      renderDictionaryRelations(body, '関連する語', 'related words', related, node);
+      renderDictionaryRelations(body, '対義語', 'opposites', antonym, node);
       section.append(body);
       block.append(section);
     });
@@ -23767,13 +23778,13 @@ function renderWordNode(sheet, node) {
   // restrictions, usage fields, cross-references and antonyms. Until then the
   // immediate record stays useful instead of becoming a spinner.
   if (details.length) {
+    // each full sense names its own part of speech, so the core record's summary line would repeat it
     const box = el('div', 'senses dictionary-senses');
-    if (rec?.p) box.append(el('p', 'sense-pos', rec.p));
     renderDictionaryDetails(box, details, node);
     sheet.append(box);
   } else if (rec?.m?.length) {
     const box = el('div', 'senses');
-    if (rec.p) box.append(el('p', 'sense-pos', rec.p));
+    if (rec.p) box.append(el('p', 'sense-pos', plainPos(rec.p)));
     const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
     if (immediate.length === 1) {
       box.append(el('p', 'gloss', immediate[0]));
