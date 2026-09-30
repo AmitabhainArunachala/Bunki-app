@@ -1480,6 +1480,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   }
   body:not([data-view='drift']) #bunki-reports-root .br-rail .br-bug { width: 40px; height: 40px; padding: 8px; }
   body:not([data-view='drift']) #bunki-reports-root .br-bug svg { width: 22px; height: 22px; }
+  /* the page's last line scrolls clear of the bug: its 12px inset + 40px + a 16px breath */
+  body:not([data-view='drift']) .report-line-page { margin-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* the magazine and the page, narrowed */
