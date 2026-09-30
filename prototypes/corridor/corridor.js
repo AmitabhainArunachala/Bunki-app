@@ -12572,8 +12572,8 @@ function renderMock(main) {
         'p',
         'gloss',
         tx(
-          '現在の問題集は検収前の短い練習用。時間制限と聴解はなく、本番一回分の模試ではない。解答にも確認が必要。合否の予測には使わない。',
-          'These earlier exercises cover vocabulary, grammar and reading. Their answer keys still need checking. They don’t include listening or a time limit.',
+          '語彙・文法・読解の短い練習用。時間制限と聴解はなく、本番一回分の模試ではない。合否の予測には使わない。',
+          'Short sets of vocabulary, grammar and reading questions, made automatically by the app. No listening and no time limit.',
         ),
       ),
     );
@@ -12592,6 +12592,17 @@ function renderMock(main) {
       main.append(el('p', 'gloss mock-legacy-notice', tx('以前の要約と回答も記録に残している。元の問題の版が不明なため、古い途中の練習は再開せず、新しい練習を始める。',
         'Earlier summaries and answers are preserved. Their original question versions are unknown, so an old unfinished run cannot be resumed. Start a new attempt below.')));
     }
+    // 未確認 is said once for the page when no set in it is checked, never on all 25 rows
+    const allUnchecked = D.mock.length > 0 && D.mock.every((set) => !set.approved);
+    if (allUnchecked) {
+      const mark = el('p', 'exam-machine-label mock-review-mark');
+      const reason = tx('答えはまだ人が確認していない', 'answers not yet checked by a person');
+      const chip = el('span', 'status-chip', '未確認');
+      chip.title = reason;
+      chip.setAttribute('aria-label', `未確認 — ${reason}`);
+      mark.append(chip, ' ', el('span', 'exam-review-reason', reason));
+      main.append(mark);
+    }
     renderPracticeHistory(main);
     const latest = latestPracticeBySet();
     for (const level of ['N5', 'N4', 'N3', 'N2', 'N1']) {
@@ -12609,7 +12620,7 @@ function renderMock(main) {
         row.append(el('span', 'row-glyph', String(set.setId.split('-')[1] || '')));
         const mid = el('span', 'row-main');
         mid.append(document.createTextNode(`${set.title.ja} — ${set.items} 問`));
-        if (!set.approved) mid.append(el('span', 'status-chip', '未確認'));
+        if (!set.approved && !allUnchecked) mid.append(el('span', 'status-chip', '未確認'));
         const prior = latest.get(set.setId);
         const latestRun = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).run : null;
         const pinned = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).flat : null;
@@ -20804,7 +20815,7 @@ function guidedDoorInJlptRoom(main) {
   door.type = 'button';
   door.dataset.guidedDoor = 'mock';
   door.append(withEn(el('span', 'study-door-t', '案内つきの稽古'), 'a guided session', 'en-inline'));
-  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors as you go')));
+  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の意味つき', 'N2 written · 6 questions · about 15 min · explanations and word meanings as you go')));
   door.addEventListener('click', () => openGuidedRoom('mock'));
   row.append(door);
   lengths.after(row);

@@ -266,6 +266,12 @@ export function createAssessmentView(host) {
   const imageUrls = new Map();
   let confirmation = null;
   const tx = (ja, en) => host.english() ? en : ja;
+  // A section heading reads like the room's title: Japanese first, a short English gloss after.
+  const sectionHeading = (ja, en, jaAlone = ja) => {
+    const heading = node('h2', 'exam-section-heading', host.english() ? ja : jaAlone); heading.lang = 'ja';
+    if (host.english()) { const gloss = node('span', 'en-inline', en); gloss.lang = 'en'; heading.append(gloss); }
+    return heading;
+  };
   // 未確認 — one quiet chip where no person has reviewed the questions yet, its reason in the
   // tooltip (and, with withReason, beside it). The review label stays in the record, not on screen.
   const reviewMark = (label, withReason = false, className = 'exam-machine-label') => {
@@ -480,7 +486,7 @@ export function createAssessmentView(host) {
     const older = host.olderSets?.(level) || { state: 'failed', sets: [] };
     const sets = older.sets;
     const block = node('section', 'exam-older'); block.dataset.examOlder = level; block.dataset.olderState = older.state;
-    if (hasTests) block.append(node('h2', 'exam-section-heading', tx('以前の練習セット', 'Older practice sets')));
+    if (hasTests) block.append(sectionHeading('以前の練習セット', 'Older practice sets'));
     if (older.state === 'loading') { block.append(node('p', 'exam-status', tx('以前の練習セットを読み込み中…', 'Loading the older practice sets…'))); main.append(block); return; }
     if (older.state === 'failed') {
       block.append(node('p', 'exam-status', hasTests
@@ -489,19 +495,28 @@ export function createAssessmentView(host) {
       block.append(button(tx('もう\u4E00度読み込む', 'Try loading again'), 'exam-older-retry', () => host.retryOlderIndex?.()));
       main.append(block); return;
     }
+    // 未確認 is said once for the section when none of its sets is checked; a mixed list marks rows
+    const allUnchecked = sets.length > 0 && sets.every(set => !set.approved);
+    if (allUnchecked) {
+      const mark = node('p', 'exam-machine-label exam-older-mark'); mark.dataset.olderMark = '';
+      const reason = tx('答えはまだ人が確認していません', 'answers not yet checked by a person');
+      const chip = node('span', 'status-chip', '未確認'); chip.title = reason; chip.setAttribute('aria-label', `未確認 — ${reason}`);
+      mark.append(chip, node('span', 'exam-review-reason', reason));
+      block.append(mark);
+    }
     block.append(node('p', '', hasTests
-      ? tx(`コーパスから自動で作った${level}の短い練習セットです（${sets.length}つ）。答えは未確認です。`,
-        `${sets.length} short ${level} sets built automatically from the corpus. Their answers haven't been checked.`)
+      ? tx(`アプリの単語表と例文から自動で作った、${level}の短い練習セットです（${sets.length}つ）。`,
+        `${sets.length} short ${level} sets, made automatically from the app’s word lists and example sentences.`)
       : sets.length
-        ? tx(`${level}の確認済みテストは、まだありません。以前の${level}練習セットが${sets.length}つあり、今すぐ使えます。答えは未確認です。`,
-          `No checked ${level} tests yet. ${sets.length} older ${level} sets are ready now. Their answers haven't been checked.`)
-        : tx(`${level}の確認済みテストは、まだありません。`, `No checked ${level} tests yet.`)));
+        ? tx(`${level}の確認済みテストは、まだありません。アプリの単語表と例文から自動で作った${level}の短い練習セットが${sets.length}つあり、今すぐ使えます。`,
+          `No reviewed ${level} tests yet. ${sets.length} short ${level} sets, made automatically from the app’s word lists and example sentences, are ready now.`)
+        : tx(`${level}の確認済みテストは、まだありません。`, `No reviewed ${level} tests yet.`)));
     if (sets.length) block.append(node('p', 'exam-older-limits', tx('語彙・文法・読解のみ。聴解と時間制限はありません。', 'Vocabulary, grammar and reading only — no listening, no timer.')));
     for (const set of sets) {
       const door = button(host.english() ? (set.title.en || set.title.ja) : set.title.ja, null, () => host.startOlder(set.setId), 'entry-row exam-older-set');
       door.dataset.legacySet = set.setId;
       door.append(node('span', 'exam-older-meta', tx(`${set.items}問`, `${set.items} questions`)));
-      if (!set.approved) door.append(node('span', 'status-chip', '未確認'));
+      if (!set.approved && !allUnchecked) door.append(node('span', 'status-chip', '未確認'));
       door.disabled = !!host.olderSetLoading?.(set.setId);
       block.append(door);
       if (host.olderSetFailed?.(set.setId)) {
@@ -558,11 +573,11 @@ export function createAssessmentView(host) {
     const written = catalog.entries.filter(entry => entry.level === level && entry.mode === 'written' && !isOfficial(entry));
     if (written.length) {
       const group = node('section', 'exam-written'); group.dataset.examWritten = level;
-      group.append(node('h2', 'exam-section-heading', tx('筆記テスト（文字・語彙・文法・読解）', 'Written tests (vocabulary, grammar, reading)')));
+      group.append(sectionHeading('筆記テスト', 'Written tests: vocabulary, grammar, reading', '筆記テスト（文字・語彙・文法・読解）'));
       group.append(reviewMark(written[0].review.label, true));
       group.append(node('p', 'exam-status', tx('オリジナル問題です。聴解はありません。出典と確認方法は各テストの下にあります。',
         'Original questions, no listening. Each test lists its sources and how it was checked.')));
-      for (const entry of written) renderCard(group, entry);
+      for (const entry of written) renderCard(group, entry, { marked: written.every(row => row.review?.status === 'machine-checked') });
       main.append(group);
     }
     const entries = catalog.entries.filter(entry => entry.level === level && entry.mode === length && !isOfficial(entry));
@@ -570,25 +585,25 @@ export function createAssessmentView(host) {
     const levelChecked = catalog.entries.some(entry => entry.level === level && entry.mode !== 'written' && !isOfficial(entry));
     if (levelChecked && !entries.length) main.append(node('p', '', tx('この長さの確認済みテストは、まだありません。', 'No checked test of this length yet.')));
     for (const [index, entry] of [...entries, ...sections].entries()) {
-      if (index === entries.length && sections.length) main.append(node('h2', 'exam-section-heading', tx('分野別の練習', 'Practice by skill')));
+      if (index === entries.length && sections.length) main.append(sectionHeading('分野別の練習', 'Practice by skill'));
       renderCard(main, entry);
     }
     // The older corpus-built sets stay reachable below every level's tests.
     if (!levelChecked || written.length) renderOlderSets(main, written.length > 0);
     const attempts = host.library()?.attempts || [];
     if (attempts.length || host.received?.().length) main.append(button(tx('これまでの結果', 'Test history'), 'exam-history', () => { historyOpen = true; refresh(); }));
-    main.append(button(tx('以前の短い練習問題', 'Earlier practice exercises'), 'exam-legacy', () => { legacyOpen = true; refresh(); }));
+    main.append(button(tx('以前の短い練習セット（全レベル）', 'All older practice sets, every level'), 'exam-legacy', () => { legacyOpen = true; refresh(); }));
   }
   // Real JLPT papers the learner imported on this device. Never mixed with the original tests.
   function renderOfficial(main) {
     const group = node('section', 'exam-official'); group.dataset.examOfficial = level;
-    group.append(node('h2', 'exam-section-heading', tx('本物の試験（この端末だけ）', 'Real JLPT papers (this device only)')));
+    group.append(sectionHeading('本物の試験', 'Real JLPT papers, this device only', '本物の試験（この端末だけ）'));
     const imported = catalog.entries.filter(entry => isOfficial(entry) && entry.level === level);
     group.append(node('p', 'exam-status', imported.length
       ? tx('日本語能力試験の公式問題集から、この端末に読み込んだ問題です。個人学習用で、バックアップ・同期・外部のAIには送りません。',
         'Questions from the official JLPT workbooks, imported on this device for personal study. They never go into backups, sync or an outside AI.')
-      : tx(`${level}の本物の試験は、まだ読み込まれていません。Macで作った .kairo-private-pack ファイルを選んでください。`,
-        `No real ${level} paper imported yet. Choose the .kairo-private-pack file made on your Mac.`)));
+      : tx(`${level}の本物の試験は、まだありません。公式問題集から Mac で作ったファイル（.kairo-private-pack）を読み込むと、この端末だけで使えます。`,
+        `No real ${level} paper added yet. Add one from the file you make on your Mac from an official workbook (.kairo-private-pack); it stays on this device.`)));
     for (const entry of imported) renderOfficialCard(group, entry);
     const label = node('label', 'chip exam-official-import');
     label.append(node('span', '', importing ? tx('確認して保存しています…', 'Checking and saving…') : tx('本物の試験を読み込む', 'Import a real test')));
@@ -634,15 +649,16 @@ export function createAssessmentView(host) {
     remove.dataset.officialRemove = entry.id; card.append(remove);
     main.append(card);
   }
-  function renderCard(main, entry) {
+  function renderCard(main, entry, { marked = false } = {}) {
     const card = node('article', 'exam-form'); card.dataset.examForm = entry.id;
     card.append(node('h2', '', titleOf(entry)), node('p', 'exam-form-meta',
       tx(`${entry.questionCount}問 · 約${entry.durationMinutes}分`, `${entry.questionCount} questions · about ${entry.durationMinutes} min`)));
-    if (entry.review?.status === 'machine-checked') card.append(reviewMark(entry.review.label));
+    // a section that already says 未確認 in its header does not repeat it on every card
+    if (entry.review?.status === 'machine-checked' && !marked) card.append(reviewMark(entry.review.label));
     const papers = entryPapers(entry);
     if (papers.length) card.append(node('p', 'exam-form-timing', tx(
       `本試験と同じ時間割：${papers.map(row => `${row.label} ${row.minutes}分`).join('／')}`,
-      `Official paper times: ${papers.map(row => `${row.label} ${row.minutes} min`).join(' / ')}`)));
+      `Timed like the real exam: ${papers.map(row => `${row.label} ${row.minutes} min`).join(' / ')}`)));
     else if (entry.review?.status === 'machine-checked') card.append(node('p', 'exam-form-timing', tx(
       `${entry.questionCount}問の練習（模試ではありません）`, `${entry.questionCount}-question practice, not a mock test`)));
     card.append(node('p', 'exam-skills', Object.entries(SKILLS)
@@ -728,8 +744,8 @@ export function createAssessmentView(host) {
         '本番形式モードでは時間制限があり、辞書・ふりがな・訳・解説は表示しません。終了したパートには戻れません。',
         'Timed exam mode has no dictionary, furigana, translations or explanations. A finished section cannot be reopened.')));
       section.append(node('p', 'exam-bookmark-note', tx(
-        '不正解は「あとで見直す」を押さなくても自動保存し、ほかの学習で再会する手がかりになります。「あとで見直す」は目印です。検収前の問題の結果は、仮の手がかりとして区別します。',
-        'Wrong answers are saved automatically, even without a bookmark, and guide later encounters across Bunki. A bookmark is your reminder. Results from provisional questions stay labelled as provisional.')));
+        '不正解は「あとで見直す」を押さなくても自動保存し、ほかの練習でその語にまた出会えるようにします。「あとで見直す」は目印です。未確認の問題の結果は、仮のものとして区別します。',
+        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder. Results from unchecked (未確認) questions are kept apart as provisional.')));
       section.append(node('p', 'exam-download-note', host.pending()
         ? audio ? tx('問題と音声を保存しています…', 'Downloading questions and audio…') : tx('問題を保存しています…', 'Downloading questions…')
         : audio ? tx('始める前に問題と音声を保存します。保存が終わってから計時を始めます。', 'Questions and audio download before the timer starts.')
