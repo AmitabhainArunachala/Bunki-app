@@ -1260,7 +1260,7 @@ export function createAssessmentView(host) {
     for (const control of nav.querySelectorAll('button')) control.disabled = host.pending() || advancingAudio ||
       (!!control.dataset.examVisit && !canVisit(selected, control.dataset.examVisit)) ||
       (control.id === 'exam-finish-block' && attempt.mode === 'timed' && !!nextUnit(selected)); main.append(nav);
-    const map = node('details', 'exam-question-map'); map.append(node('summary', '', tx('解答\u4E00覧・見直し', 'Questions and flags')));
+    const map = node('details', 'exam-question-map'); map.append(node('summary', '', tx('解答\u4E00覧・見直し', 'All questions and your bookmarks')));
     const grid = node('div', 'exam-question-grid');
     ids.forEach((id, i) => {
       const saved = attempt.answers.find(row => row.item.id === id);
