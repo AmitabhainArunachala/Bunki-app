@@ -67,7 +67,7 @@
       requestAnimationFrame(() => document.getElementById(id)?.focus({ preventScroll: true }));
     };
     const collectionName = (collection) => {
-      const level = collection.level === 'unknown' ? tx('級未設定', 'Unassigned') : collection.level;
+      const level = collection.level === 'unknown' ? tx('級未設定', 'No level given') : collection.level;
       if (collection.family === 'kanken') return `${tx('漢検', 'Kanji Kentei')} · ${level}`;
       return `JLPT · ${level} · ${collection.kind === 'kanji' ? tx('漢字', 'Kanji') : tx('語彙', 'Vocabulary')}`;
     };
@@ -198,7 +198,7 @@
       others.append(
         button('reference-global-search', tx('辞書で検索 →', 'Dictionary search →'), () => onSearch(state.query), 'reference-text-button'),
         button('reference-study', tx('My Study →', 'My Study →'), onStudy, 'reference-text-button'),
-        button('reference-mock', tx('模試 →', 'Mock papers →'), onMock, 'reference-text-button'),
+        button('reference-mock', tx('JLPT の練習 →', 'JLPT practice →'), onMock, 'reference-text-button'),
       );
       nav.append(others);
       return nav;
@@ -211,10 +211,10 @@
       if (collection.level === 'unknown') card.classList.add('reference-level-unknown');
       // the level's own colour (shared with the JLPT room): N5 green → N1 crimson
       if (/^N[1-5]$/u.test(collection.level)) card.dataset.level = collection.level;
-      const name = collection.level === 'unknown' ? tx('級未設定', 'Unassigned') : collection.level;
+      const name = collection.level === 'unknown' ? tx('級未設定', 'No level given') : collection.level;
       const heading = node('span', 'reference-level-name', name);
       const count = node('span', 'reference-level-count', number(collection.count));
-      count.append(node('span', 'reference-count-unit', collection.kind === 'kanji' ? tx('件', 'entries') : tx('語', 'words')));
+      count.append(node('span', 'reference-count-unit', collection.kind === 'kanji' ? tx('件', 'kanji') : tx('語', 'words')));
       const saved = inStudy(collection, taken);
       card.dataset.studyCount = String(saved);
       card.append(
@@ -223,7 +223,7 @@
         node('span', 'reference-level-study', tx(`My Study に登録 ${number(saved)}`, `${number(saved)} in My Study`)),
         node('span', 'reference-level-arrow', '↗'),
       );
-      card.setAttribute('aria-label', `${collectionName(collection)}; ${number(collection.count)} ${tx('件', 'entries')}; ${number(saved)} ${tx('My Study に登録', 'in My Study')}`);
+      card.setAttribute('aria-label', `${collectionName(collection)}; ${number(collection.count)} ${collection.kind === 'kanji' ? tx('件', 'kanji') : tx('語', 'words')}; ${number(saved)} ${tx('My Study に登録', 'in My Study')}`);
       return card;
     }
 
@@ -283,7 +283,7 @@
       kankenHead.append(kankenTitle, node('span', 'reference-family-note', tx('10級から1級へ', 'Explore from introductory to advanced')));
       kanken.append(kankenHead, kankenExplainer(), node('p', 'reference-footnote', tx(
         `級で探せる漢字は ${number(catalog.stats.families.kanken.uniqueLabelled)} 件。古い字体や表示できない字も含みます。試験に出る字をすべて収めているとは限りません。`,
-        `${number(catalog.stats.families.kanken.uniqueLabelled)} kanji records to explore by level. Some are alternative written forms or entries without a displayable character. This library may not cover every character on the exam.`,
+        `${number(catalog.stats.families.kanken.uniqueLabelled)} kanji, grouped by Kanji Kentei level. A few are old or variant forms. The exam may include characters not listed here.`,
       )));
       const grades = node('div', 'reference-level-grid reference-kanken-grid');
       collections.forEach((collection, index) => {
@@ -472,7 +472,7 @@
       if (!result.total) {
         const empty = node('div', 'reference-empty');
         empty.append(
-          node('h2', null, state.query ? tx('一致する項目がありません', 'No matching entries') : tx('この区分に収録はありません', 'No bundled entries in this bin')),
+          node('h2', null, state.query ? tx('一致する項目がありません', 'No matching entries') : tx('この区分に収録はありません', 'Nothing in this group yet')),
           node('p', null, state.query ? tx(
             'この区分の全件を検索しました。字・かな・英語の意味で、別の語をお試しください。',
             'Searched the entire collection. Try another headword, kana reading, or English meaning.',
@@ -497,7 +497,7 @@
       const saved = inStudy(collection, studySet());
       head.append(title, node('p', 'reference-collection-meta', tx(
         `${number(collection.count)} 件収録 · My Study に登録 ${number(saved)}`,
-        `${number(collection.count)} entries · ${number(saved)} in My Study`,
+        `${number(collection.count)} ${collection.kind === 'kanji' ? 'kanji' : 'words'} · ${number(saved)} in My Study`,
       )));
       head.append(node('p', 'reference-footnote', collection.family === 'kanken'
         ? tx('この級に分類された漢字です。下の級の漢字も試験範囲に含まれる場合があります。', 'Kanji listed at this level. An exam can also include characters from earlier levels.')
@@ -533,7 +533,7 @@
       toolbar.append(searchGroup);
       root.append(toolbar, results(collection), node('p', 'reference-search-hint', tx(
         '100 件ずつ表示。詳しい語釈は各項目へ。「覚える」は学習用データがある項目で使えます。',
-        '100 entries per page. Open an entry for details; Memorize is available where study data is bundled.',
+        '100 per page. Open one for its details; some also have a Memorize button.',
       )));
     }
 
