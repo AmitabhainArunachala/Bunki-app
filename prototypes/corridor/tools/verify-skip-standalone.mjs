@@ -54,7 +54,8 @@ try {
   assert.deepEqual({ ...shelfLook.word, display: undefined },
     { display: undefined, border: 'none', background: 'rgba(0, 0, 0, 0)', padding: '0px', minWidth: '0px', minHeight: '0px' },
     'Lookup words must read as prose, not default buttons');
-  await page.locator('.shelf-study-tools > summary').click();
+  // the study tools are one always-visible row (f2acab5f); the dictionary door must be reachable as is
+  assert(await kanjidex.isVisible(), 'The dictionary door is visible on the shelf without opening a menu');
   assert.equal(await kanjidex.and(page.getByRole('button',{name:/^字引/u})).count(),1,
     'Dictionary tool includes its label in the accessible name');
   await kanjidex.click();
