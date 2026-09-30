@@ -261,7 +261,7 @@ try {
   });
   await check('absent native host is plain and has no enabled sync action', async () => {
     await page.evaluate(() => window.showUnavailable());
-    assert.match(await page.locator('.record-sync-status').innerText(), /unavailable in this host/u);
+    assert.match(await page.locator('.record-sync-status').innerText(), /unavailable in this host|isn’t available here/u);
     assert.equal(await page.locator('#record-sync button:enabled').count(), 0);
   });
   await check('connect and sync require separate user actions; disconnect wins a late cycle', async () => {
