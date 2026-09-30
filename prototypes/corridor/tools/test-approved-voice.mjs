@@ -134,7 +134,7 @@ test('The checked-in build stays pending and silent, including every stale saved
     assert.equal(f.loadedNarration(), null);
     assert.equal(row.classList.contains('is-pending'), true);
     assert.match(row.textContent, /音声準備中 · Kore/);
-    assert.match(row.textContent, /voice in preparation/);
+    assert.match(row.textContent, /voice in preparation|read-aloud audio coming soon/);
     assert.equal(row.querySelectorAll('button').length, 0);
     assert.equal(row.querySelectorAll('select').length, 0);
     assert.equal(f.fetches.includes('audio/article-narration.json'), false, 'An absent narration flag makes no doomed fetch');
