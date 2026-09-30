@@ -690,7 +690,8 @@ async function ui() {
     const paragraphs = details.locator('.feed-meta');
     assert.equal(await paragraphs.count(), 4);
     for (const paragraph of await paragraphs.all()) assert(await paragraph.isVisible());
-    assert.equal(await paragraphs.nth(0).locator('span').innerText(),
+    // the credit line's own span; its Japanese words are lookup doors nested inside it
+    assert.equal(await paragraphs.nth(0).locator(':scope > span').innerText(),
       `Source: ${original.candidate.article.source.name}`);
     const policy = paragraphs.nth(0).locator('a.publisher-policy');
     assert.equal(await policy.count(), 1);
@@ -717,9 +718,12 @@ async function ui() {
     // A real pointer double-click chooses the browser's word boundary. Reads
     // below observe that selection; no DOM selection or record is injected.
     const point = await page.locator('#publisher-body').evaluate((node) => {
-      const offset = node.textContent.indexOf('町');
-      if (offset < 0 || node.firstChild?.nodeType !== Node.TEXT_NODE) throw new Error('Missing late-word fixture');
-      const range = document.createRange(); range.setStart(node.firstChild, offset); range.setEnd(node.firstChild, offset + 1);
+      // the body's Japanese words are lookup doors, so the late word sits in one of its text nodes
+      const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      let text, offset = -1;
+      while ((text = walker.nextNode()) && (offset = text.textContent.indexOf('町')) < 0);
+      if (!text || offset < 0) throw new Error('Missing late-word fixture');
+      const range = document.createRange(); range.setStart(text, offset); range.setEnd(text, offset + 1);
       const glyph = range.getBoundingClientRect(), body = node.getBoundingClientRect();
       return { x: glyph.x - body.x + glyph.width / 2, y: glyph.y - body.y + glyph.height / 2 };
     });
