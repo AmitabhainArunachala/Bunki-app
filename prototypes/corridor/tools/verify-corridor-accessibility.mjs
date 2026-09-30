@@ -71,26 +71,56 @@ function startServer() {
   });
 }
 
+// The reader's own hold threshold (GESTURE.MINI_MS in corridor.js): a press this long is a hold.
+const APP_HOLD_MS = 430;
+const tapAttempts = [];
+
 async function touchAt(page, selector, index = 0, holdMs = 0) {
-  const target = page.locator(selector).nth(index);
-  await target.scrollIntoViewIfNeeded();
-  const box = await target.evaluate((node) => {
-    const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-  });
-  const cdp = await page.context().newCDPSession(page);
-  const point = {
-    x: box.x + box.width / 2,
-    y: box.y + Math.min(box.height / 2, 12),
-    radiusX: 5,
-    radiusY: 5,
-    force: 1,
-  };
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
-  if (holdMs > 0) await page.waitForTimeout(holdMs);
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await cdp.detach();
-  await page.waitForTimeout(160);
+  for (let attempt = 1; ; attempt += 1) {
+    const target = page.locator(selector).nth(index);
+    await target.scrollIntoViewIfNeeded();
+    const box = await target.evaluate((node) => {
+      const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    });
+    const [clicks, ups] = await page.evaluate(() => [window.__a11yClicks ?? 0, window.__a11yPointerUps ?? 0]);
+    const cdp = await page.context().newCDPSession(page);
+    const point = {
+      x: box.x + box.width / 2,
+      y: box.y + Math.min(box.height / 2, 12),
+      radiusX: 5,
+      radiusY: 5,
+      force: 1,
+    };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+    if (holdMs > 0) await page.waitForTimeout(holdMs);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await cdp.detach();
+    if (holdMs > 0) {
+      await page.waitForTimeout(160);
+      return;
+    }
+    await page.waitForFunction((before) => (window.__a11yPointerUps ?? 0) > before, ups, { timeout: 5000 });
+    const pressed = await lastPressMs(page);
+    tapAttempts.push({ selector, index, attempt, pressedMs: pressed });
+    if (pressed >= APP_HOLD_MS) {
+      // A slow runner delivered the release only after the app's hold threshold: that press was a
+      // hold (the quick look), not the tap under test, and it changed no reveal state. Tap again.
+      await page.waitForTimeout(250);
+      if (attempt < 3) continue;
+      return;
+    }
+    // A tap has landed when its click has been dispatched (the app activates on the click),
+    // not after a fixed sleep a slow runner can outlast.
+    await page.waitForFunction((before) => (window.__a11yClicks ?? 0) > before, clicks, { timeout: 5000 });
+    await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    return;
+  }
+}
+
+/** How long the page held the last touch down (pointerdown → pointerup), as the app measures it. */
+async function lastPressMs(page) {
+  return page.evaluate(() => window.__a11yLastPressMs ?? null);
 }
 
 async function openReader(page, base) {
@@ -151,6 +181,17 @@ async function main() {
       deviceScaleFactor: 2,
       hasTouch: true,
       isMobile: true,
+    });
+    // a passive observer: how long each press was held, as the app's own Date.now() clock sees it
+    await context.addInitScript(() => {
+      let downAt = 0;
+      addEventListener('pointerdown', () => { downAt = Date.now(); }, true);
+      // a press ends in pointerup, or pointercancel where the browser takes the touch for scrolling
+      for (const kind of ['pointerup', 'pointercancel']) addEventListener(kind, () => {
+        window.__a11yLastPressMs = Date.now() - downAt;
+        window.__a11yPointerUps = (window.__a11yPointerUps ?? 0) + 1;
+      }, true);
+      addEventListener('click', () => { window.__a11yClicks = (window.__a11yClicks ?? 0) + 1; }, true);
     });
     const page = await context.newPage();
     page.on('console', (message) => {
@@ -365,7 +406,7 @@ async function main() {
     check(
       'pointer action one reveals reading and action two reveals English',
       afterFirst.lit && !afterFirst.gloss && afterSecond.gloss,
-      JSON.stringify({ afterFirst, afterSecond }),
+      JSON.stringify({ afterFirst, afterSecond, taps: tapAttempts.slice(-4) }),
     );
     check(
       'second-action English preserves the glyph anchor within 2px',
