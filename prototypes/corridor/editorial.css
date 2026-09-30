@@ -1652,6 +1652,9 @@ body #mini .mini-take {
   font: 800 18px/1 var(--display);
 }
 body #mini .mini-take.taken { background: var(--accent); color: var(--raised); }
+/* 覚 with its plain word under it, so a first-time reader knows the red seal saves the word */
+body #mini .mini-take:has(.mini-take-en) { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 44px; min-height: 46px; padding: 4px 6px; }
+body #mini .mini-take-en { font: 700 10px/1 var(--sans); letter-spacing: 0.04em; }
 body #mini .mini-take-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
 body #mini .mini-entry {
   display: flex;
