@@ -164,7 +164,10 @@ async function requireCommand(page, evidence) {
 async function assertUiNotes(page, state) {
   await page.waitForFunction((revision) => document.querySelector('#record-notes')?.dataset.revision === String(revision), state.snapshot.revision);
   const rows = await exact(page, () => [...document.querySelectorAll('article.record-note')].map((row) => ({
-    id: row.dataset.noteId, segments: [...row.querySelectorAll('.record-note-segment')].map((node) => ({ kind: node.dataset.segmentKind, text: node.textContent, childElements: node.childElementCount })),
+    // childElements counts elements the note's own bytes could have made: the app's lookup doors on its
+    // Japanese words (a wrapper holding text-only word buttons) are chrome, not markup from the note
+    id: row.dataset.noteId, segments: [...row.querySelectorAll('.record-note-segment')].map((node) => ({ kind: node.dataset.segmentKind, text: node.textContent,
+      childElements: [...node.querySelectorAll('*')].filter((child) => !(child.matches('span.japanese-lookup-text') && child.parentElement === node) && !(child.matches('button.japanese-lookup-word') && child.parentElement?.matches('span.japanese-lookup-text') && !child.childElementCount)).length })),
   })));
   assert.equal(rows.length, state.snapshot.replica.operations.length);
   for (const operation of state.snapshot.replica.operations) {
