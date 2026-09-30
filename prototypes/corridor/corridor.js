@@ -57,13 +57,13 @@ function levelPhrase(grading) {
     // average (the #42 law). Below one-in-two the ratio phrasing stops
     // being true — say plainly that most words fall outside instead.
     const oneIn = Math.round(1 / (1 - cov));
-    const outside = ninjal != null ? 'the core' : 'JLPT vocab';
+    const outside = ninjal != null ? 'the everyday core vocabulary' : 'the JLPT word lists';
     const outsideJa = ninjal != null ? '基本語彙の外' : 'JLPT語彙の外';
     if (oneIn < 2) {
-      vocabNote = ` · most words beyond ${outside}`;
+      vocabNote = ` · most words are outside ${outside}`;
       vocabNoteJa = `・大半が${outsideJa}`;
     } else {
-      vocabNote = ` · ~1 in ${oneIn} words beyond ${outside}`;
+      vocabNote = ` · about 1 word in ${oneIn} is outside ${outside}`;
       vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
     }
   }
@@ -7086,7 +7086,7 @@ function reviewPending(p) {
 }
 function reviewReason(p) {
   if (p.review === 'rights-review-pending') return tx('出典の利用条件を確認中', 'the source’s terms are still being checked');
-  if (p.pendingVerification) return tx('凍結アーカイブとの最終照合の前', 'the final check against the frozen archive is pending');
+  if (p.pendingVerification) return tx('最終版との照合の前', 'not yet checked against the final saved version');
   return tx('人による確認の前', 'not yet checked by a person');
 }
 /** 未確認 — one small chip for unreviewed text, its reason in the tooltip. */
@@ -8559,7 +8559,7 @@ function voicePendingNote(id) {
   // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
   pending.dataset.japaneseLookup = 'off';
   pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
-  if (bi()) pending.append(el('span', 'en-sub', 'voice in preparation'));
+  if (bi()) pending.append(el('span', 'en-sub', 'read-aloud audio coming soon'));
   return pending;
 }
 
@@ -8912,8 +8912,8 @@ function renderReader(main) {
   footer.append(fin);
 
   const about = el('section', 'article-about');
-  about.setAttribute('aria-label', tx('この読み物について', 'About this reading'));
-  about.append(withEn(el('h2', 'article-about-head', 'この読み物について'), 'About this reading', 'en-inline'));
+  about.setAttribute('aria-label', tx('この読み物について', 'About this article'));
+  about.append(withEn(el('h2', 'article-about-head', 'この読み物について'), 'About this article', 'en-inline'));
   const facts = el('dl', 'article-facts');
   const fact = (ja, en, ...value) => {
     const dt = withEn(el('dt', null, ja), en);
@@ -8959,10 +8959,11 @@ function renderReader(main) {
       ? tx('出典の利用条件がまだ確認されていない。', 'The terms this source may be used under are not yet verified. Pending review.')
       : p.pendingVerification
         ? tx(
-          '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
-          'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
+          'ウィキニュース閉鎖の前日の記事。最終版との照合はまだ済んでいない。',
+          'Published the day before Wikinews closed; it has not yet been checked against the final saved version.',
         )
-        : tx('人による確認がまだ済んでいない。', 'A human review of this text is still pending.');
+        : tx('人による確認がまだ済んでいない。ふりがなや英訳に誤りがあるかもしれない。',
+          'A person hasn’t reviewed this text yet, so its furigana or English may have mistakes.');
     about.append(pv);
   }
 
