@@ -4109,8 +4109,10 @@ async function main() {
     JSON.stringify(midPick));
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
   await page.waitForTimeout(150);
+  await page.waitForSelector('.lesson-option', { state: 'attached', timeout: 15000 });
   await page.evaluate(`[...document.querySelectorAll('.lesson-option')][0].click()`);
   await page.waitForTimeout(150);
+  await page.waitForSelector('#aiq-next', { state: 'attached', timeout: 15000 });
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
   await page.waitForTimeout(250);
   const quizScore = await evaluateAppRecord(page, `(() => {
@@ -4128,6 +4130,7 @@ async function main() {
       quizScore.taken === 0 &&
       quizScore.srsKeys === 0,
     `title "${quizScore.title.trim()}" · stored ${quizScore.stored}`);
+  await page.waitForSelector('#aiq-close', { state: 'attached', timeout: 15000 });
   await page.evaluate(`document.querySelector('#aiq-close').click()`);
   await page.waitForTimeout(250);
   const quizClosed = await evaluateAppRecord(page,
