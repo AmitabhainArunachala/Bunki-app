@@ -13944,6 +13944,14 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
     });
     controls.push(lookup); actions.prepend(lookup);
   }
+  // The body's words are lookup buttons, and WebKit never selects text inside a button: a tapped
+  // word also becomes the selection, so this sentence's actions answer a tap in every engine.
+  body.addEventListener('click', (event) => {
+    const word = event.target.closest?.('.japanese-lookup-word');
+    if (!word || !body.contains(word)) return;
+    const range = document.createRange(); range.selectNodeContents(word);
+    const selected = window.getSelection(); selected.removeAllRanges(); selected.addRange(range);
+  }, true);
   publisherSelectionSurface = { connected: () => section.isConnected, update };
   refresh();
 }
