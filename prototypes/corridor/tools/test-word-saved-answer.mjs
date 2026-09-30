@@ -93,6 +93,8 @@ function defineRows() {
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureHeldText', 'showMini',
+    // the seal opens the list chooser (09b5e2a7); its 覚えるのをやめる door is the mini's remove route
+    'openVocabularyListChooser',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -182,6 +184,14 @@ function defineRows() {
       };
     }
     append(...nodes) { this.children.push(...nodes); }
+    replaceChildren(...nodes) { this.children = [...nodes]; }
+    querySelectorAll(selector) {
+      assert.match(selector, /^[a-z]+$/u, 'the fake DOM answers tag selectors only');
+      const found = [], walk = (node) => { for (const child of node.children || []) { if (child.tag === selector) found.push(child); walk(child); } };
+      walk(this); return found;
+    }
+    showModal() { this.open = true; }
+    close() { this.open = false; this.listeners.close?.(); }
     setAttribute(name, value) { this.attributes[name] = String(value); }
     getAttribute(name) { return this.attributes[name] ?? null; }
     addEventListener(kind, run) { this.listeners[kind] = run; }
@@ -225,7 +235,9 @@ function defineRows() {
       el: (tag, cls, text) => new FakeElement(tag, cls, text),
       // a button's text is its English label; the Japanese label rides along for the rows that read it
       biLabel: (tag, cls, ja, en) => Object.assign(new FakeElement(tag, cls, en), { labelJa: ja }),
-      document: { querySelectorAll: () => [], body: { append: () => {} }, getElementById: () => null,
+      // the list chooser's peripheral doors (typed-name draft, context picker) are not under test here
+      dialogs: [], attachRecordDraft: () => {}, rememberRecordDraft: () => true, renderContextPicker: () => {},
+      document: { querySelectorAll: () => [], body: { append: (node) => { context.dialogs.push(node); } }, getElementById: () => null,
         createTextNode: (text) => new FakeElement('#text', '', text) },
       window: { innerWidth: 400 }, removeMini: () => {}, activeTokenAlternatives: null,
       sealSyncs: 0, syncReaderTakeSeal: () => { context.sealSyncs += 1; },
@@ -275,9 +287,20 @@ function defineRows() {
   const openMini = (ctx, b, from = { passage: 'synthetic-passage', index: 3 }) => {
     const span = new FakeElement('span', 'tok');
     const mini = ctx.showMini(span, { b, s: b, r: '' }, () => {}, { from, reader: true });
-    return { span, mini, seal: find(mini, (node) => node.id === 'mini-take') };
+    const seal = find(mini, (node) => node.id === 'mini-take');
+    if (seal) Object.defineProperty(seal, 'ctx', { value: ctx });
+    return { span, mini, seal };
   };
-  const clickSeal = (seal) => seal.listeners.click({ stopPropagation() {}, detail: 1 });
+  /** The seal, then — when it opened the list chooser on a saved card — that chooser's own
+   * 覚えるのをやめる door, the one route by which the mini removes a card. */
+  const clickSeal = async (seal) => {
+    const ctx = seal.ctx;
+    const shown = ctx ? ctx.dialogs.length : 0;
+    await seal.listeners.click({ stopPropagation() {}, detail: 1 });
+    const dialog = ctx?.dialogs.length > shown ? ctx.dialogs.at(-1) : null;
+    const stop = dialog && find(dialog, (node) => node.id === 'vocabulary-list-stop');
+    if (stop) await stop.listeners.click({ stopPropagation() {}, detail: 1 });
+  };
 
   const NODES = {
     mekuru: { t: 'word', id: '捲る', seq: '1257810', reading: 'めくる', matchedGloss: 'to turn over' },
