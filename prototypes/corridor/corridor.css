@@ -619,6 +619,36 @@ body.ginga #drift-layer #hint.first-cue {
   opacity: 0.85;
 }
 
+/* the torii strip's report entry: a quiet outlined button like its neighbours, never the
+ * browser's bare default (polish pass 2026-10-01); on a phone it folds to two short lines */
+.nav-report {
+  flex: 0 1 auto;
+  min-height: 38px;
+  padding: 6px 10px;
+  font: 600 12px/1.2 var(--sans, system-ui, sans-serif);
+  color: var(--ink-2, #4a5d70);
+  background: transparent;
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.nav-report:hover {
+  color: var(--ink, #23303f);
+  border-color: var(--ink-2, #4a5d70);
+}
+@media (max-width: 520px) {
+  .nav-report {
+    max-width: 64px;
+    padding: 4px 6px;
+    font-size: 10.5px;
+    line-height: 1.15;
+    white-space: normal;
+  }
+  /* the history arrows give back the few pixels the report entry needs inside the strip */
+  .nav-arrow { width: 30px; }
+}
+
 /* EN⇄日本語 sliding pill */
 .lang-slide {
   position: relative;
@@ -836,6 +866,10 @@ body.ginga #drift-layer #hint.first-cue {
 .bubble-sensei {
   right: 18px;
   background: #6a3b52; /* a warmer pigment for the tutor, distinct from the shelf */
+}
+/* while the corner bubbles stand, the report bug steps up out of 先生's way (it sat on top of it) */
+body:has(.bubble-sensei) #bunki-reports-root .br-rail {
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 @keyframes bubble-rise {
   from {
