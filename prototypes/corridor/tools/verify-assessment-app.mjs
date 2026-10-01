@@ -729,6 +729,9 @@ try {
         await page.locator(`[data-srs-start=${JSON.stringify(`word:${word.id}`)}]`).click();
         const started = await waitForAppRecord(page, record => Number.isFinite(record.taken.find(row => row.t === 'word' && row.id === word.id)?.started));
         assert.equal(started.srs[`word:${word.id}`], undefined, 'explicit start makes the word eligible without grading it');
+        // the durable record can show the start before the page's own state has taken the acknowledged patch (WebKit,
+        // glance-lane battery 92362bed): wait for that state change, then assert on it exactly as before
+        await page.waitForFunction(id => window.__KAIRO_SRS__.dueKeys().includes(`word:${id}`), word.id, { timeout: 5_000 }).catch(() => {});
         const review = await page.evaluate(id => {
           const eligible = window.__KAIRO_SRS__.dueKeys().includes(`word:${id}`);
           startReview([{ t: 'word', id }]);
