@@ -9,7 +9,7 @@ name: pages-app
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, cursor/context-dense-srs-deck-15c1]
     paths:
       - 'prototypes/drift/drift-artifact.html'
       - 'prototypes/corridor/**'
