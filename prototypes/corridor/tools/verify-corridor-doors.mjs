@@ -194,14 +194,31 @@ try {
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: after a reload the room opens at the level he chose (N1)`, remembered === 'N1', `opened at ${remembered}`);
     const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
     await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
-    const listed = await page.evaluate(() => {
-      // the learner-facing mark is 未確認 since the design pass of 2026-09-30 (it was 検収前); since the
-      // polish pass of 2026-10-01 a section whose sets are all unchecked says it once, in its header
+    // the learner-facing mark is 未確認 (since the design pass of 2026-09-30); since the polish pass of
+    // 2026-10-01 a section whose sets are all unchecked says it once, in its header. A mark counts only as
+    // verify-mock reads it: a VISIBLE status chip whose text is exactly 未確認 (gate review on 8dea3c2e:
+    // any chip, or the bare word anywhere in a row, let a hidden or reworded mark pass)
+    const olderSets = () => page.evaluate(() => {
+      const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden' && Number(getComputedStyle(n).opacity) > 0;
+      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === '未確認' && shown(chip));
       const block = document.querySelector('[data-exam-older="N1"]');
-      const sectionMarked = !!block?.querySelector('[data-older-mark] .status-chip');
+      const sectionMarked = marked(block?.querySelector('[data-older-mark]'));
       return [...(block?.querySelectorAll('[data-legacy-set]') || [])]
-        .map((door) => ({ id: door.dataset.legacySet, pending: sectionMarked || /未確認|検収前/u.test(door.textContent), text: door.textContent }));
+        .map((door) => ({ id: door.dataset.legacySet, pending: sectionMarked || marked(door), text: door.textContent }));
     });
+    const listed = await olderSets();
+    // its own controls, on this page: the section's chip hidden, then reworded, must leave every set unmarked
+    const hide = await page.addStyleTag({ content: '[data-exam-older="N1"] [data-older-mark] .status-chip { visibility: hidden !important; }' });
+    const hidden = await olderSets();
+    await hide.evaluate((node) => node.remove());
+    const original = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
+      .map((chip) => { const text = chip.textContent; chip.textContent = '確認済'; return text; }));
+    const reworded = await olderSets();
+    await page.evaluate((texts) => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
+      .forEach((chip, i) => { chip.textContent = texts[i]; }), original);
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the 未確認 mark is read only from a visible chip saying exactly 未確認 (controls: hidden, reworded)`,
+      original.length > 0 && hidden.length > 0 && hidden.every((row) => !row.pending) && reworded.every((row) => !row.pending),
+      JSON.stringify({ chips: original, hiddenMarked: hidden.filter((row) => row.pending).length, rewordedMarked: reworded.filter((row) => row.pending).length }));
     // expected identities and counts come from the artifact's own data, never from this file
     const expected = (await (await page.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
     const matches = listed.length === expected.length && expected.every((set, i) => listed[i]?.id === set.setId && listed[i].text.includes(String(set.items)));
