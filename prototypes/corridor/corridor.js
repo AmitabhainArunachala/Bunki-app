@@ -2213,6 +2213,9 @@ async function boot() {
   }
   if (S.variants.entry === 'field') S.view = 'entry';
   if (S.variants.entry === 'drift') S.view = 'drift';
+  // Phone reps: ?deck=context opens 文脈札 directly. It does not change the
+  // stored front door, and it does not open the operator variant strip.
+  if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
 
   render();
 
@@ -2784,7 +2787,7 @@ function back() {
   }
   // Device Back and the chrome arrow walk list → overview → reading shelf.
   if (S.view === 'levels' && referenceLibrary?.back()) return;
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji' || S.view === 'contextdeck') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
@@ -3282,6 +3285,44 @@ function renderSignals(grading, { compact = false } = {}) {
 }
 
 /* ---------------------------------------------------------------- views */
+/** Context-dense deck. Its schedule is its own ledger, loaded on demand. */
+let contextDeckMod = null;
+let contextDeckLoading = false;
+let contextDeckError = false;
+function renderContextDeck(main) {
+  if (contextDeckError) {
+    main.append(el('p', 'shelf-snippet intro', tx('文脈札を開けませんでした。', 'The context deck could not be opened.')));
+    return;
+  }
+  if (!contextDeckMod) {
+    main.append(el('p', 'shelf-snippet intro', tx('文脈札を開いています。', 'Opening the context deck.')));
+    if (!contextDeckLoading) {
+      contextDeckLoading = true;
+      import('./decks/context-dense/mount.js')
+        .then((mod) => {
+          contextDeckMod = mod;
+          contextDeckLoading = false;
+          if (S.view === 'contextdeck') render();
+        })
+        .catch(() => {
+          contextDeckLoading = false;
+          contextDeckError = true;
+          if (S.view === 'contextdeck') render();
+        });
+    }
+    return;
+  }
+  contextDeckMod.render(main, {
+    bilingual: S.lang !== 'ja',
+    storage: localStorage,
+    onLeave() {
+      S.view = 'shelf';
+      render();
+      window.scrollTo(0, S.shelfScroll || 0);
+    },
+  });
+}
+
 function renderShelf(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
 
@@ -3414,6 +3455,17 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(gram);
+  const contextDeck = el('button', 'grammar-link');
+  contextDeck.type = 'button';
+  contextDeck.id = 'context-deck-link';
+  contextDeck.append(el('span', 'l-ja', '文脈札'), el('span', 'en-sub', bi() ? 'context deck' : ''));
+  contextDeck.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'contextdeck';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(contextDeck);
   const thes = el('button', 'grammar-link');
   thes.type = 'button';
   thes.id = 'thesaurus-link';
@@ -15968,6 +16020,7 @@ function render() {
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
   if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
+  if (S.view === 'contextdeck') parts.push(tx('文脈札', 'context deck'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   crumb.setAttribute('aria-label', crumb.title);
@@ -16159,6 +16212,7 @@ function render() {
   else if (S.view === 'kanjidex') renderKanjidex(main);
   else if (S.view === 'yoji') renderYoji(main);
   else if (S.view === 'grammar') renderGrammar(main);
+  else if (S.view === 'contextdeck') renderContextDeck(main);
   else if (S.view === 'search') renderSearchPage(main);
   else renderShelf(main);
 

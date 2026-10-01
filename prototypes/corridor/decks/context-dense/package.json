@@ -1,0 +1,6 @@
+{
+  "name": "bunki-context-dense-deck",
+  "private": true,
+  "type": "module",
+  "description": "Standalone context-dense SRS deck. Content and scheduler are usable outside the corridor."
+}
