@@ -3,6 +3,7 @@
  * reads are observations; the one negative write test uses the existing host
  * transaction fault. This does not establish provider quality or JLPT ability.
  */
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -117,9 +118,8 @@ const server = createServer((request, response) => {
 const openShelf = async () => {
   await page.goto(`${origin}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  const tools = page.locator('details.shelf-study-tools');
-  if (await tools.count() && !await tools.evaluate(element => element.open))
-    await tools.locator('summary').click();
+  // the study tools open from the shelf's one 学習ツール button (shared helper)
+  await openShelfTools(page);
 };
 async function importFixture(name, record, { navigate = true } = {}) {
   write(`${name}-import.json`, record);
@@ -134,7 +134,7 @@ async function importFixture(name, record, { navigate = true } = {}) {
   return snapshot;
 }
 async function configure(model = modelName) {
-  if (!await page.locator('#ai-base-url').count()) await page.locator('#ai-link').click();
+  if (!await page.locator('#ai-base-url').count()) await openShelfDoor(page, '#ai-link');
   await page.locator('#ai-base-url').fill(endpoint);
   await page.locator('#ai-model-input').fill(model);
   await page.locator('#ai-key-input').fill('SYNTHETIC_TEST_KEY');
@@ -258,7 +258,7 @@ try {
     await page.locator('.aiq-q').waitFor();
     const learningAfterQuiz = learning(await readAppRecord(page));
     check('quiz request uses the vector without a scheduled grade', () => { teaching(quiz); assert.deepEqual(learningAfterQuiz, before); });
-    await openShelf(); await page.locator('#airead-link').click();
+    await openShelf(); await openShelfDoor(page, '#airead-link');
     before = learning(await readAppRecord(page));
     const reading = await send('reading', () => page.locator('#airead-make').click());
     const readState = await waitForAppRecord(page, (record) => !!record.aiReading);
@@ -266,7 +266,7 @@ try {
       assert.ok(!reading.body.system.includes(LABEL)); assert.equal(JSON.parse(reading.body.messages.at(-1).content).schemaVersion, 1);
       assert.deepEqual(learning(readState), before);
     });
-    await openShelf(); await page.locator('#ai-link').click();
+    await openShelf(); await openShelfDoor(page, '#ai-link');
     before = learning(await readAppRecord(page));
     const cards = await send('cards', () => page.locator('#ai-cards-make').click());
     const curated = await waitForAppRecord(page, (record) => ['散歩', '音楽'].every((form) => record.taken.some((entry) => entry.id === form)));
@@ -353,7 +353,7 @@ try {
   });
 
   await runCase('failed-write', async () => {
-    await importFixture('failed-outbound', fixture()); await openShelf(); await page.locator('#ai-link').click();
+    await importFixture('failed-outbound', fixture()); await openShelf(); await openShelfDoor(page, '#ai-link');
     const question = '保存失敗でもこの質問を残してください。';
     await page.locator('#chat-input').fill(question);
     await waitForAppRecord(page, (record) => JSON.stringify(record.teacherDrafts).includes(question));
@@ -372,7 +372,7 @@ try {
   });
 
   await runCase('provider-change', async () => {
-    await importFixture('pending-provider', fixture()); await openShelf(); await page.locator('#ai-link').click();
+    await importFixture('pending-provider', fixture()); await openShelf(); await openShelfDoor(page, '#ai-link');
     const question = '接続が変わる間の質問です。', count = requests.length;
     await page.locator('#chat-input').fill(question); holdNextChat = true; await page.locator('#chat-send').click();
     await poll(() => held, 'held chat transport');
@@ -391,7 +391,7 @@ try {
 
   await runCase('import-epoch', async () => {
     await importFixture('epoch-before', fixture([], lessonRows(words.n5, [true, true, true, true])));
-    await openShelf(); await page.locator('#ai-link').click(); await configure();
+    await openShelf(); await openShelfDoor(page, '#ai-link'); await configure();
     const count = requests.length; await page.locator('#chat-input').fill('取り込む前の質問です。');
     holdNextChat = true; await page.locator('#chat-send').click(); await poll(() => held, 'held pre-import request');
     const old = requests[count]; assert.equal(band(teaching(old), 'lexis').workingBand, 'N5');

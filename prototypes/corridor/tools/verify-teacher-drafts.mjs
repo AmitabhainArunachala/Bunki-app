@@ -1,6 +1,7 @@
 /** Actual teacher UI in persistent Chromium/WebKit profiles. Native IndexedDB
  * is read only as output. Provider responses and fault timing, where named,
  * are explicit synthetic fixtures; no external request is allowed to leave. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -126,7 +127,7 @@ async function shelf(fixture, { protectedState = false } = {}) {
   await fixture.page.waitForFunction(() => document.body.dataset.view === 'shelf');
 }
 async function tutor(fixture, options) {
-  await shelf(fixture, options); await fixture.page.locator('#ai-link').click();
+  await shelf(fixture, options); await openShelfDoor(fixture.page, '#ai-link');
   await fixture.page.locator('#chat-input').waitFor({ state: 'visible' });
 }
 async function selectTopic(fixture, contextRef) {

@@ -4,6 +4,7 @@
  * the configured fake HTTPS endpoint is fulfilled and every other external
  * request is aborted. These checks do not establish live teaching acceptance.
  */
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -200,6 +201,7 @@ async function shelf(page) {
     }
   }
   await page.waitForFunction(() => document.body.dataset.view === 'shelf');
+  await openShelfTools(page);
   await page.locator('#ai-link').waitFor({ state: 'visible' });
 }
 
@@ -366,7 +368,7 @@ async function reopenTutor(page) {
   await page.reload();
   await ready(page);
   await shelf(page);
-  await page.locator('#ai-link').click();
+  await openShelfDoor(page, '#ai-link');
   await page.waitForFunction(() => document.body.dataset.view === 'ai');
 }
 
@@ -402,7 +404,7 @@ async function configureProvider(page) {
   await page.locator('#ai-key-input').fill(FAKE_KEY);
   await page.locator('#ai-key-save').click();
   await shelf(page);
-  await page.locator('#ai-link').click();
+  await openShelfDoor(page, '#ai-link');
   await page.waitForFunction(
     () => document.querySelector('#chat-send') && !document.querySelector('#chat-send').disabled,
   );
@@ -735,7 +737,7 @@ try {
     await returnToSource(page, context);
     await screenshot(fixture, 'returned-token-nine');
     await shelf(page);
-    await page.locator('#ai-link').click();
+    await openShelfDoor(page, '#ai-link');
     await selected(page, context);
     await page.locator('#teacher-target-open').click();
     await page.locator('#sheet[data-node="word:窓"] #take').waitFor();

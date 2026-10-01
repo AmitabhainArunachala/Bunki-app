@@ -10,6 +10,7 @@
  * clock (fast-forwarded) because the real recordings run for an hour. Real content is never
  * printed: the report holds counts and verdicts only. */
 /* global recordWritable, currentAssessmentV2, buildExportRecord, assessmentV2Pending, recordApp, buildImportPlan, recordInstallation */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -131,7 +132,7 @@ async function runEngine(engine) {
     await page.goto(`${origin}/?entry=shelf&ui=bi`);
     await page.waitForFunction(() => typeof recordWritable === 'function' && recordWritable(), null, { timeout: 60_000 });
     if (realPack) await page.clock.resume();
-    await page.locator('#mock-link').click();
+    await openShelfDoor(page, '#mock-link');
     await page.locator('[data-exam-level="N1"]').click();
     await page.locator('[data-exam-official="N1"]').waitFor();
     // A changed pack is refused before anything is stored.

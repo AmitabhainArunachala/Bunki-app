@@ -23,6 +23,7 @@
  * Usage: node verify-corridor-ai.mjs
  */
 
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
 import { isDeepStrictEqual } from 'node:util';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
@@ -441,7 +442,7 @@ async function main() {
   // ------------------------------------------- surface 5 · the reading room
   console.log('\n— the custom reading room');
   await open('?entry=shelf');
-  await page.click('#airead-link');
+  await openShelfDoor(page, '#airead-link');
   await page.waitForSelector('#airead-make', { timeout: 8000 });
   await page.click('#airead-make');
   await page.waitForSelector('.airead-body', { timeout: 8000 });
@@ -500,7 +501,7 @@ async function main() {
   // ---------------------------- the 札を頼む door: curation on demand
   console.log('\n— the tutor curates cards on demand');
   await open('?entry=shelf');
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await page.waitForSelector('#ai-cards-make', { timeout: 8000 });
   await page.click('#ai-cards-make');
   await page.waitForFunction(
@@ -531,7 +532,7 @@ async function main() {
   // ------------------------- surface 6 · chat, and the end of the 24-turn cap
   console.log('\n— chat: turn 25 destroys nothing');
   await open('?entry=shelf');
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   await sendChat(MARKER);
   const chatFirst = await waitRows(page, 'chat', 2);
@@ -576,7 +577,7 @@ async function main() {
 
   // A fresh boot reconstructs visible history from the durable transcript.
   await open('?entry=shelf');
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await page.waitForFunction(() => document.querySelectorAll('.chat-turn').length > 24, null, {
     timeout: 8000,
   });
@@ -639,8 +640,8 @@ async function main() {
   await page.click('#chat-send');
   await page.waitForSelector('.chat-turn.thinking', { timeout: 4000 });
   await page.click('#back');
-  await page.waitForSelector('#ai-link', { timeout: 8000 });
-  await page.click('#ai-link');
+  await page.waitForSelector('#ai-link', { state: 'attached', timeout: 8000 });
+  await openShelfDoor(page, '#ai-link');
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   const backOnPage = await page.evaluate(`({
     thinking: document.querySelectorAll('.chat-turn.thinking').length,
@@ -734,7 +735,7 @@ async function main() {
   const broken = await brokenContext.newPage();
   await broken.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await broken.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await broken.click('#ai-link');
+  await openShelfDoor(broken, '#ai-link');
   await broken.fill('#chat-input', '記録が壊れていても');
   await broken.press('#chat-input', 'Enter');
   check('missing IndexedDB refuses the learner write and keeps the question draft',
@@ -757,7 +758,7 @@ async function main() {
   // ------------------------- 鏡 KAGAMI PR 一 · the ledger's ear
   console.log('\n— 鏡: the sensei mines its own exchanges into the ledger');
   await open('?entry=shelf');
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   await sendChat('天気の言葉を教えて');
   const mineRows = await waitRows(page, 'mine', 2);
@@ -830,7 +831,7 @@ async function main() {
   // one exchange, one identity: refs are distinct per exchange and every
   // one resolves to an archived exchange carrying that xid (PR #86 review)
   await open('?entry=shelf');
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   await sendChat('もう一度、天気の言葉');
   await waitRows(page, 'mine', 4);
@@ -871,7 +872,7 @@ async function main() {
   const emptyImported = await importThroughUi(page, JSON.stringify({ v: 1, taken: [] }), 'synthetic-empty-legacy.json');
   check('a legacy import replaces the archive and declares historical incompleteness',
     emptyImported.archive.turns.length === 0 && emptyImported.record.aiEvidenceIncomplete === true);
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await sendChat('RECORD-A の秘密');
   await waitForAppRecord(page, (record) => (record.obslog || []).some((row) => row[1] === 'sensei'),
     { description: 'synthetic foreign conversation mining' });
@@ -1032,7 +1033,7 @@ async function main() {
 
   // The real import port also clears a populated archive when the file has none.
   await open('?entry=shelf');
-  await page.click('#ai-link');
+  await openShelfDoor(page, '#ai-link');
   await sendChat('RECORD-A の秘密');
   await waitForAppRecord(page, (record) => (record.obslog || []).some((row) => row[1] === 'sensei'));
   const archiveBefore = await logAll(page);

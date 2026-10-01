@@ -30,6 +30,7 @@
  *   (exits non-zero on station, startup or cleanup failure; screenshots and
  *   results.json are retained in the fresh evidence directory)
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -306,7 +307,7 @@ try {
   });
 
   await step('7 JLPT lesson end to end', async () => {
-    await page.click('#lessons-link');
+    await openShelfDoor(page, '#lessons-link');
     await page.waitForSelector('.lesson-row', { timeout: 5000 });
     await page.click('.lesson-row');
     await page.waitForSelector('#lesson-next', { timeout: 5000 });
@@ -371,21 +372,21 @@ try {
   await step('10 levels · grammar(100+) · thesaurus · 字引', async () => {
     await page.click('#back');
     await page.waitForTimeout(300);
-    await page.click('#levels-link');
+    await openShelfDoor(page, '#levels-link');
     await page.waitForTimeout(400);
     await page.click('#back');
     await page.waitForTimeout(300);
-    await page.click('#grammar-link');
+    await openShelfDoor(page, '#grammar-link');
     await page.waitForTimeout(400);
     const g = await page.evaluate(() => document.querySelectorAll('[data-grammar]').length);
     if (g < 100) throw new Error('grammar rows: ' + g);
     await page.click('#back');
     await page.waitForTimeout(300);
-    await page.click('#thesaurus-link');
+    await openShelfDoor(page, '#thesaurus-link');
     await page.waitForSelector('.thes-block', { timeout: 5000 });
     await page.click('#back');
     await page.waitForTimeout(300);
-    await page.click('#kanjidex-link');
+    await openShelfDoor(page, '#kanjidex-link');
     await page.waitForSelector('.kdx-row', { timeout: 5000 });
     await page.click('[data-kdx-part="木"]');
     await page.waitForTimeout(400);
@@ -438,7 +439,7 @@ try {
     await page.waitForTimeout(400);
     await page.tap('.bubble-shelf');
     await page.waitForSelector('.shelf-item', { timeout: 10000 });
-    await page.click('#kanjidex-link');
+    await openShelfDoor(page, '#kanjidex-link');
     await page.waitForSelector('.kdx-row', { timeout: 5000 });
     await page.click('[data-kdx-part="木"]');
     await page.waitForSelector('.kdx-glyph', { timeout: 5000 });

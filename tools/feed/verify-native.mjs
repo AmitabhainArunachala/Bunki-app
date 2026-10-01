@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* global document, window, localStorage -- evaluated inside the isolated Electron renderer */
+import { openShelfDoor } from '../../prototypes/corridor/tools/shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import console from 'node:console';
 import process from 'node:process';
@@ -246,7 +247,7 @@ try {
       url.searchParams.set('ui', 'bi');
       await current.page.goto(url.href);
       await current.page.waitForFunction(() => document.body.dataset.ready === '1');
-      await current.page.locator('#feed-link').click();
+      await openShelfDoor(current.page, '#feed-link');
       await current.page.waitForFunction(
         () => document.querySelector('#feed-refresh-all')?.disabled === false,
       );
@@ -510,7 +511,7 @@ try {
       url.searchParams.set('ui', 'bi');
       await current.page.goto(url.href);
       await current.page.waitForFunction(() => document.body.dataset.ready === '1');
-      await current.page.locator('#feed-link').click();
+      await openShelfDoor(current.page, '#feed-link');
       await current.page.waitForFunction(
         () => document.querySelector('#feed-refresh-all')?.disabled === false,
       );

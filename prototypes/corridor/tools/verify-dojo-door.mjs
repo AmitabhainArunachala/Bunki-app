@@ -13,6 +13,7 @@
  * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
  *        node prototypes/corridor/tools/verify-dojo-door.mjs
  */
+import { openShelfTools } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
@@ -92,6 +93,8 @@ async function walk(width, height, hasTouch) {
       receipt.checks.push({ width, room, skipped: `shelf link ${sel} absent` });
       continue;
     }
+    // every one of these doors sits in the shelf's 学習ツール panel: open it, as a learner does
+    await openShelfTools(page);
     await link.click();
     await page.waitForTimeout(400);
     await expectDoorThenDojo(room);

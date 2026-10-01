@@ -18,6 +18,7 @@
  * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
  *        node prototypes/corridor/tools/verify-relief.mjs
  */
+import { openShelfTools } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
@@ -71,6 +72,7 @@ const rule = async (name, sel) => {
 
 await page.goto(`${base}/?entry=shelf`);
 await page.waitForSelector('#tray', { timeout: 30000 });
+await openShelfTools(page); // the room doors live in the shelf's 学習ツール panel
 await check('shelf room door', '#levels-link');
 await rule('shelf section eyebrow', '.eyebrow.shelf-section');
 await page.click('#chrome-search');

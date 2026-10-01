@@ -4,6 +4,7 @@
  * Native IDB faults are scoped to the actual host-command transaction, and each
  * assertion reads committed rows independently of the app's publication state.
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -204,7 +205,7 @@ async function reload(page) {
 }
 
 async function openCapture(page) {
-  await page.locator('#thesaurus-link').click();
+  await openShelfDoor(page, '#thesaurus-link');
   const head = page.locator('.thes-head').filter({ has: page.locator('.thes-word', { hasText: '時間' }) }).first();
   await head.click();
   await page.locator('#sheet #take').waitFor();

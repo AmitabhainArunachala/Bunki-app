@@ -3,6 +3,7 @@
  * KAIRO_SITE_DIR may name the staged release; evidence stays outside the repo.
  * --boundary-only runs the two original P0 reproductions before/after a patch.
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -121,7 +122,7 @@ async function seedArchive(page) {
 }
 
 async function ask(page, text = 'Synthetic learner message.') {
-  if (!(await page.locator('#chat-input').count())) await page.click('#ai-link');
+  if (!(await page.locator('#chat-input').count())) await openShelfDoor(page, '#ai-link');
   await page.fill('#chat-input', text);
   await page.click('#chat-send');
   await page.waitForFunction(() => document.querySelector('#chat-send') && !document.querySelector('#chat-send').disabled, null, { timeout: 15000 });
@@ -195,7 +196,7 @@ try {
       const origin = kind === 'custom' ? 'https://pre-upgrade-custom.invalid' : DEFAULT_ORIGIN;
       const key = kind === 'custom' ? CUSTOM_CREDENTIAL : DEFAULT_CREDENTIAL;
       await test(`legacy-${kind}-credential-requires-binding`, async ({ page, calls }) => {
-        await page.click('#ai-link');
+        await openShelfDoor(page, '#ai-link');
         await disconnectedDraft(page, calls, 'Synthetic post-upgrade question kept without transport.');
         assert.deepEqual(calls, [], 'an unbound legacy key cannot be assigned to any provider');
         assert.equal(await page.inputValue('#ai-key-input'), '');
@@ -296,7 +297,7 @@ try {
       assert.ok(restored.archive.every((row) => imported.aiEvidence[row.xid][0].content === row.content));
     });
     await test('explicit-custom-provider-and-origin-switch', async ({ page, calls }) => {
-      await page.click('#ai-link');
+      await openShelfDoor(page, '#ai-link');
       assert.equal(await page.inputValue('#ai-key-input'), DEFAULT_CREDENTIAL);
       await page.fill('#ai-base-url', 'https://custom-provider.invalid/proxy/');
       assert.equal(await page.inputValue('#ai-key-input'), '', 'switching origin clears the previous key');
@@ -314,7 +315,7 @@ try {
       await page.fill('#ai-base-url', 'https://second-provider.invalid');
       assert.equal(await page.inputValue('#ai-key-input'), '');
       await page.click('#ai-key-save');
-      if (!await page.locator('#chat-input').count()) await page.click('#ai-link');
+      if (!await page.locator('#chat-input').count()) await openShelfDoor(page, '#ai-link');
       await disconnectedDraft(page, calls, 'Synthetic question kept while the new origin needs its own key.');
       await page.fill('#ai-key-input', SECOND_CREDENTIAL);
       await page.click('#ai-key-save');
@@ -323,7 +324,7 @@ try {
       assert.ok(calls.every((call) => call.origin !== 'https://second-provider.invalid' || call.credential === 'second-synthetic'));
     });
     await test('malformed-provider-settings-preserve-configuration', async ({ page }) => {
-      await page.click('#ai-link');
+      await openShelfDoor(page, '#ai-link');
       const before = await page.evaluate((key) => localStorage.getItem(key), DEVICE_KEY);
       for (const url of ['http://unsafe.invalid', 'https://user:secret@unsafe.invalid', '/relative', 'https://unsafe.invalid?key=x', 'https://unsafe.invalid#route', 'https://unsafe.invalid\\elsewhere']) {
         await page.fill('#ai-base-url', url);
@@ -340,7 +341,7 @@ try {
       assert.match(await page.locator('.chat-log').textContent(), /reply could not be received/);
     });
     await test('mismatched-device-credential-origin-fails-closed', async ({ page, calls }) => {
-      await page.click('#ai-link');
+      await openShelfDoor(page, '#ai-link');
       await disconnectedDraft(page, calls, 'Synthetic question kept with a mismatched credential origin.');
       assert.equal(await page.inputValue('#ai-key-input'), '');
       assert.deepEqual(calls, []);

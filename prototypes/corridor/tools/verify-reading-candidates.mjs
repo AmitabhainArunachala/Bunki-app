@@ -1,5 +1,6 @@
 /** Real generated-reading UI with synthetic provider responses. Generation
  * and exposure must not promote cards, grade recall, or create review debt. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -60,7 +61,7 @@ function unchangedLearning(value) {
 try {
   await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#airead-link').click();
+  await openShelfDoor(page, '#airead-link');
   for (let n = 1; n <= 20; n += 1) {
     await page.locator('#airead-make').click();
     await page.waitForFunction((prefix) => document.querySelector('.airead-body')?.textContent.startsWith(prefix), `第${n}話です。`, { timeout: 15000 });
@@ -79,7 +80,7 @@ try {
   assert.deepEqual(afterReload.aiReading, beforeReload.aiReading);
   assert.deepEqual(afterReload.aiReadings, beforeReload.aiReadings);
   results.push({ name: 'all-twenty-passages-survive-reload-without-promotion', pass: true });
-  await page.locator('#airead-link').click();
+  await openShelfDoor(page, '#airead-link');
   await page.locator('[data-airead-take="犬"]').click();
   const promoted = await waitForAppRecord(page, (record) => record.taken?.length === 1);
   assert.deepEqual(promoted.taken.map((item) => item.id), ['犬']);
@@ -90,7 +91,7 @@ try {
   results.push({ name: 'one-explicit-suggestion-promotion-creates-only-that-review', pass: true });
   await page.locator('#back').click();
   // Asking specifically for cards remains an explicit learner action.
-  await page.locator('#ai-link').click();
+  await openShelfDoor(page, '#ai-link');
   await page.locator('#ai-cards-make').click();
   const explicit = await waitForAppRecord(page, (record) => record.taken?.length === 2);
   assert.deepEqual(explicit.taken.map((item) => item.id).sort(), ['犬', '猫'].sort());

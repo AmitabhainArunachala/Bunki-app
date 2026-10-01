@@ -1,5 +1,6 @@
 /** Selected publisher-original contracts and actual UI journeys. Fixtures are
  * synthetic; a full wrapper is never promoted to editorial approval. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import { execFileSync } from 'node:child_process';
@@ -660,7 +661,7 @@ async function ui() {
   }
   const record = readAppRecord;
   async function shelf(page, native = true) {
-    await page.locator('#feed-link').click();
+    await openShelfDoor(page, '#feed-link');
     if (native) await page.waitForSelector('[data-feed-read]');
     else await page.waitForSelector('#feed-panel-articles');
   }
@@ -785,7 +786,7 @@ async function ui() {
     assert(focused.y >= 0 && focused.y < page.viewportSize().height);
     await page.screenshot({ path: resolve(out, `publisher-selected-source-return-${suffix}.png`), fullPage: true });
     await page.reload(); await ready(page);
-    await page.locator('#ai-link').click();
+    await openShelfDoor(page, '#ai-link');
     assert.equal(await page.locator('#chat-input').inputValue(), question);
     assert.equal(await page.locator('.teacher-context .teacher-source-quote').textContent(), text);
     await page.locator('#teacher-source-return').click();

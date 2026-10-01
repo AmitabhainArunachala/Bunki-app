@@ -21,6 +21,7 @@
  * Usage: node verify-kagami.mjs
  */
 
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
@@ -277,7 +278,7 @@ async function openMirror(context, base) {
   const page = await context.newPage();
   await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await page.click('#kagami-link');
+  await openShelfDoor(page, '#kagami-link');
   await page.waitForSelector('[data-band="lexis"]', { timeout: 15000 });
   return page;
 }
@@ -380,7 +381,7 @@ async function main() {
 
   // derived, never stored: the envelope gains nothing from the mirror
   const envelopeBefore = await readAppRecordSnapshot(page);
-  await page.click('#kagami-link');
+  await openShelfDoor(page, '#kagami-link');
   await page.waitForSelector('[data-band="lexis"]', { timeout: 15000 });
   await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
   await page.waitForTimeout(400);
@@ -481,7 +482,7 @@ async function main() {
   const gpage = await grammar.newPage();
   await gpage.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await gpage.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await gpage.click('#kagami-link');
+  await openShelfDoor(gpage, '#kagami-link');
   await gpage.waitForSelector('[data-band="syntax"]', { timeout: 15000 });
   const routed = await gpage.evaluate(`(() => {
     const m = window.__KAIRO_KAGAMI__.model();
@@ -543,7 +544,7 @@ async function main() {
   const ponly = await pairsOnly.newPage();
   await ponly.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await ponly.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await ponly.click('#kagami-link');
+  await openShelfDoor(ponly, '#kagami-link');
   await ponly.waitForSelector('[data-kagami-edge]', { timeout: 15000 });
   const shown = await ponly.evaluate(`(() => ({
     edges: document.querySelectorAll('[data-kagami-edge]').length,
@@ -629,7 +630,7 @@ async function main() {
   const mp = await modal.newPage();
   await mp.goto(`${base}/index.html?entry=shelf`);
   await mp.waitForFunction(() => document.body.dataset.ready === '1');
-  await mp.click('#kagami-link');
+  await openShelfDoor(mp, '#kagami-link');
   const modalRows = (await readAppRecord(mp)).obslog.length;
   const byKind = await mp.evaluate(`(() => {
     const m = window.__KAIRO_KAGAMI__.model();
@@ -674,7 +675,7 @@ async function main() {
   const bare = await empty.newPage();
   await bare.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await bare.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await bare.click('#kagami-link');
+  await openShelfDoor(bare, '#kagami-link');
   await bare.waitForTimeout(500);
   const bareState = await bare.evaluate(`(() => ({
     bands: document.querySelectorAll('[data-band]').length,

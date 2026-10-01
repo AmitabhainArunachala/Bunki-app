@@ -4,6 +4,7 @@
  * This neither authenticates devices nor establishes live Apple synchronization.
  * Ordinary rendered controls and synthetic host/fault actions are recorded apart.
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -259,7 +260,7 @@ function assertViews(state) {
 async function inbox(f) {
   if (await f.page.locator('#source-capture-form').count()) return;
   await f.page.goto(`${ORIGIN}/index.html?entry=shelf&ui=bi`); await ready(f);
-  await f.page.locator('#source-inbox-link').click(); await f.page.locator('#source-capture-form').waitFor();
+  await openShelfDoor(f.page, '#source-inbox-link'); await f.page.locator('#source-capture-form').waitFor();
 }
 async function ordinaryCapture(f, { url, title = '', text = '' }, label) {
   await inbox(f); await f.page.locator('#source-capture-title').fill(title); await f.page.locator('#source-capture-url').fill(url); await f.page.locator('#source-capture-text').fill(text);

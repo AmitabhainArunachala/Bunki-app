@@ -14,6 +14,7 @@
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-pr77-ports.mjs [--only probe,probe]
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -444,7 +445,7 @@ const oneOfPressed = (rows) => rows.length > 1 && rows.filter((r) => r === 'true
 PROBES['chip-state'] = async () => {
   const { context, page } = await learner({ seed: envelope() });
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#kanjidex-link');
+  await openShelfDoor(page, '#kanjidex-link');
   const part = page.locator('#kdx-partgrid .kdx-part:not([disabled])').first();
   const partText = (await part.textContent()).trim();
   await part.click();
@@ -465,7 +466,7 @@ PROBES['chip-state'] = async () => {
   check('007479d0 · 字引\'s lenses state which one is chosen', oneOfPressed(kdx.lenses), JSON.stringify(kdx.lenses));
 
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#grammar-link');
+  await openShelfDoor(page, '#grammar-link');
   await page.waitForSelector('[data-glevel]');
   const levels = await page.evaluate(() => [...document.querySelectorAll('[data-glevel]')].map((n) => n.getAttribute('aria-pressed')));
   check('f7cd297c · 文法\'s level filter states which level it is showing', oneOfPressed(levels), JSON.stringify(levels));
@@ -500,10 +501,10 @@ PROBES['chip-focus'] = async () => {
     }, { selector, text });
   };
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#kanjidex-link');
+  await openShelfDoor(page, '#kanjidex-link');
   const part = await pressKeeps('#kdx-partgrid .kdx-part:not([disabled])', 2);
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#grammar-link');
+  await openShelfDoor(page, '#grammar-link');
   const level = await pressKeeps('[data-glevel]', 3);
   await open(page, '');
   await page.click('.nav-symbol');
@@ -578,7 +579,7 @@ PROBES['thinking-durable'] = async () => {
 
   stub.delay = 0;
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#airead-link');
+  await openShelfDoor(page, '#airead-link');
   await page.waitForSelector('#airead-make');
   stub.delay = 2500;
   await page.click('#airead-make');
@@ -757,7 +758,7 @@ PROBES['kdx-chip-state'] = async () => {
   const seen = {};
   for (const [lens, attr] of [['画数', 'data-kdx-st'], ['部首', 'data-kdx-rad'], ['頻度', 'data-kdx-freq'], ['漢検', 'data-kdx-kk']]) {
     await open(page, '?entry=shelf&ui=bi');
-    await page.click('#kanjidex-link');
+    await openShelfDoor(page, '#kanjidex-link');
     await page.locator('main .kdx-lens', { hasText: lens }).first().click();
     const chip = page.locator(`main [${attr}]`).nth(1);
     await chip.waitFor();

@@ -3,6 +3,7 @@
  * No application internals are patched or exposed to the test.
  * Usage: node prototypes/corridor/tools/verify-reference.mjs [--shots DIR] [--case pending-route]
  */
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -78,7 +79,7 @@ page.on('pageerror', (error) => errors.push(String(error)));
 const boot = async (p, url = `${base}/index.html?entry=shelf`) => {
   await p.goto(url, { waitUntil: 'load' });
   await p.waitForFunction(() => document.body.dataset.ready === '1');
-  await p.click('#levels-link');
+  await openShelfDoor(p, '#levels-link');
 };
 const overview = async () => {
   if (await page.locator('.sheet').count()) {
@@ -260,7 +261,7 @@ try {
     await page.evaluate(() => localStorage.setItem('kairo-theme', 'yoru'));
     await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
     await page.waitForFunction(() => document.body.dataset.ready === '1');
-    await page.click('#levels-link');
+    await openShelfDoor(page, '#levels-link');
     await page.waitForSelector('#reference-library');
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'yoru');
     await capture('dark-overview');
@@ -288,7 +289,7 @@ try {
     await boot(p);
     await p.waitForSelector('#reference-unavailable');
     await p.click('#reference-back');
-    await p.waitForSelector('#levels-link');
+    await p.waitForSelector('#levels-link', { state: 'attached' });
     await p.close();
   });
 
@@ -310,11 +311,12 @@ try {
     try {
       await p.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
       await p.waitForFunction(() => document.body.dataset.ready === '1');
+      await openShelfTools(p); // the reference door sits in the shelf's 学習ツール panel
       assert.ok(await p.locator('#levels-link').isVisible());
       assert.ok(await p.locator('[data-passage]').count() > 0);
       assert.ok(held, 'The optional request must still be pending at this observation');
       await held.fulfill({ status: 503, body: '{}' }); held = null;
-      await p.click('#levels-link');
+      await openShelfDoor(p, '#levels-link');
       await p.waitForSelector('#reference-unavailable');
       await p.unroute('**/reference-extra.json');
       await p.click('#reference-retry');
@@ -345,12 +347,12 @@ try {
       await p.waitForSelector('.sheet[data-node="kanji:学"]');
       await p.click('#sheet-close');
       await p.click('#back');
-      await p.waitForSelector('#levels-link');
+      await p.waitForSelector('#levels-link', { state: 'attached' });
       const response = p.waitForResponse(reply => reply.url().endsWith('/reference-extra.json') && reply.ok());
       await held.continue(); held = null;
       await (await response).finished();
       await p.unroute('**/reference-extra.json');
-      await p.click('#levels-link');
+      await openShelfDoor(p, '#levels-link');
       await p.waitForSelector('#reference-library');
       if (shots) await p.screenshot({ path: resolve(shots, 'cancelled-loading-library-destination.png') });
       assert.equal(await p.locator('#reference-library').getAttribute('data-view'), 'overview',

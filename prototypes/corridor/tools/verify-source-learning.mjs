@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -57,7 +58,7 @@ async function frontDoor(page) {
   if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
     await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
   }
-  await page.locator('#source-inbox-link').click(); await page.locator('#source-capture-text').waitFor();
+  await openShelfDoor(page, '#source-inbox-link'); await page.locator('#source-capture-text').waitFor();
 }
 async function assertSourceReadable(page) {
   // Inspect the generated texture actually painted beneath the text, not just

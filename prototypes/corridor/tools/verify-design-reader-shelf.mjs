@@ -18,6 +18,13 @@
  *                         level chip, and in English its English line; the lead adds its first
  *                         sentence. The masthead's 永 seal sits inside the 本棚 title, ≤ 48 px.
  *                         Control: 13fe096d, whose lead and seconds wore the .story-art tile.
+ *   T1 tools (glance)   — (glance pass 2026-10-01) the shelf's study tools sit behind ONE visible
+ *                         学習ツール Tools button in the title row: as served no tool door is visible,
+ *                         and the first story follows the filter chips with no other control between.
+ *                         The button opens one panel in which every door keeps its id, is visible
+ *                         inside the viewport and names itself in Japanese with its English gloss (the
+ *                         accessible name says both); a door in it still opens its room.
+ *                         Control: 7ef0e985, whose thirteen text doors stood in a row under the filters.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -34,6 +41,7 @@
  * Usage: KAIRO_SITE_DIR=<artifact> KAIRO_ARTIFACT_SHA256=<digest> node verify-design-reader-shelf.mjs
  *        KAIRO_BROWSER=chromium|webkit limits the engines; --control adds the injected control.
  */
+import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
@@ -324,9 +332,62 @@ try {
       });
     }
 
+    const TOOL_DOORS = ['feed', 'source-inbox', 'levels', 'lessons', 'mock', 'kagami', 'grammar', 'thesaurus', 'yoji', 'kanjidex', 'ai', 'airead'].map((d) => `${d}-link`);
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`T1-tools-behind-one-button-${label}`, viewport, async (page) => {
+        await open(page);
+        const served = await page.evaluate((ids) => {
+          const shown = (n) => !!n && n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden';
+          const toggle = document.getElementById('shelf-tools-toggle');
+          const chips = document.querySelector('#shelf-body .shelf-chipbar');
+          const first = document.querySelector('#shelf-reading-results > [data-passage]');
+          // every control drawn between the chip bar's foot and the first story's top
+          const between = chips && first ? [...document.querySelectorAll('#shelf-body button, #shelf-body a[href], #shelf-body summary')].filter((n) => {
+            if (!shown(n) || chips.contains(n) || first.contains(n)) return false;
+            const r = n.getBoundingClientRect();
+            return r.top >= chips.getBoundingClientRect().bottom - 1 && r.bottom <= first.getBoundingClientRect().top + 1;
+          }).map((n) => n.id || n.textContent.trim().slice(0, 16)) : ['(no chip bar or story)'];
+          return {
+            toggle: toggle && { shown: shown(toggle), expanded: toggle.getAttribute('aria-expanded'), controls: toggle.getAttribute('aria-controls'),
+              text: toggle.textContent.replace(/\s+/gu, ' ').trim(), inTitle: !!toggle.closest('.shelf-masthead') },
+            doors: ids.filter((id) => document.getElementById(id)).length,
+            visibleDoors: ids.filter((id) => shown(document.getElementById(id))),
+            between,
+          };
+        }, TOOL_DOORS);
+        assert(served.toggle?.shown && served.toggle.inTitle && /^学習ツール/u.test(served.toggle.text), `no 学習ツール button in the title block: ${JSON.stringify(served.toggle)}`);
+        assert.equal(served.toggle.expanded, 'false', 'the tools panel is open on arrival');
+        assert.equal(served.visibleDoors.length, 0, `tool doors visible before the button is pressed: ${served.visibleDoors.join(', ')}`);
+        assert.equal(served.between.length, 0, `controls between the filters and the first story: ${served.between.join(', ')}`);
+        await page.locator('#shelf-tools-toggle').click();
+        const opened = await page.evaluate((ids) => {
+          const panel = document.getElementById(document.getElementById('shelf-tools-toggle').getAttribute('aria-controls'));
+          const doors = ids.map((id) => document.getElementById(id)).filter(Boolean);
+          return {
+            expanded: document.getElementById('shelf-tools-toggle').getAttribute('aria-expanded'),
+            panel: !!panel && panel.getClientRects().length > 0,
+            tiles: doors.map((door) => {
+              const r = door.getBoundingClientRect();
+              return { id: door.id, inPanel: !!panel?.contains(door), inView: r.width > 0 && r.left >= 0 && r.right <= innerWidth + 0.5,
+                ja: door.querySelector('.l-ja')?.textContent.trim() || '', en: door.querySelector('.en-sub')?.textContent.trim() || '',
+                name: door.getAttribute('aria-label') || '' };
+            }),
+          };
+        }, TOOL_DOORS);
+        assert.equal(opened.expanded, 'true', 'the button does not report the panel open');
+        assert(opened.panel && opened.tiles.length >= 10, `the panel shows ${opened.tiles.length} doors`);
+        const bad = opened.tiles.filter((t) => !t.inPanel || !t.inView || !t.ja || !t.en || !t.name.startsWith(t.ja) || !t.name.includes(t.en));
+        assert.equal(bad.length, 0, `tiles not in the panel, off screen, or missing their Japanese/English names: ${JSON.stringify(bad.slice(0, 3))}`);
+        await page.locator('#grammar-link').click();
+        await page.waitForFunction(() => document.body.dataset.view === 'grammar');
+        return { doors: served.doors, tiles: opened.tiles.length, toggle: served.toggle.text };
+      });
+    }
+
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);
-      await page.evaluate(() => { const door = document.getElementById('mock-link'); door.closest('details')?.setAttribute('open', ''); door.click(); });
+      await openShelfTools(page);
+      await page.evaluate(() => document.getElementById('mock-link').click());
       await page.waitForSelector('[data-exam-start]');
       const room = await page.evaluate(() => ({
         text: document.querySelector('#app main').innerText,
@@ -408,9 +469,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button',
     results,
-    passed: results.length === engines.length * 14 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 16 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

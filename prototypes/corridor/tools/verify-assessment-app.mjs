@@ -9,6 +9,7 @@
    toggleTaken, commitStorePatch, publishRecordSnapshot, reconcileAssessmentResults,
    resolveTeacherSource, assertLearningSource, enrichAssessmentCards, assessmentV2Notice,
    allAssessmentEvidence, assessmentReviewContext, startReview, render, captureRetryRoute, assessmentV2Pending */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -279,7 +280,7 @@ async function clickAssessmentRetry(page, previous) {
   return waitRetryBoot(page, previous);
 }
 async function terminalRetryFixture(page, proof, withItem) {
-  await page.locator('#mock-link').click();
+  await openShelfDoor(page, '#mock-link');
   const attemptId = await page.evaluate(async () => {
     const catalog = await loadAssessmentCatalog();
     if (!await startAssessmentRoom(catalog.entries.find(row => row.id === 'question-app:form'), 'timed')) throw new Error('AR fixture start');
@@ -1004,7 +1005,7 @@ try {
       // leaving the kept room and coming back to the catalog is a new visit, not the old target
       // (control: delete the render() line that drops a retained target on any other view)
       await run(engine, 'retry-route-kept-target-yields-to-a-deliberate-return', async (page, context) => {
-        await page.locator('#mock-link').click();
+        await openShelfDoor(page, '#mock-link');
         const attemptId = await submittedAttempt(page);
         assert.equal(await page.evaluate(() => reconcileAssessmentResults()), true, 'terminal fixture reconciliation acknowledged');
         await page.waitForFunction(id => document.querySelector('#app main')?.dataset.examAttempt === id, attemptId);

@@ -1,6 +1,7 @@
 /** Listening intake through normal controls in persistent profiles. External
  * navigation is intercepted with a synthetic page; actual media seeking is not
  * claimed. Storage faults are separate from the ordinary subjourney. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -64,7 +65,7 @@ async function shelf(page) {
       continue;
     }
     if (view === 'shelf') {
-      await page.locator('#source-inbox-link').waitFor();
+      await page.locator('#source-inbox-link').waitFor({ state: 'attached' });
       return;
     }
     if (await page.locator('#ginga-symbol').isVisible()) {
@@ -83,7 +84,7 @@ async function shelf(page) {
 async function inbox(page) {
   if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
     await shelf(page);
-    await page.locator('#source-inbox-link').click();
+    await openShelfDoor(page, '#source-inbox-link');
   }
   await page.locator('#source-capture-save').waitFor();
 }

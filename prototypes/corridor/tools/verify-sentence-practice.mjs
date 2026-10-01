@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -130,7 +131,7 @@ for (const engine of engines) for (const width of sizes) {
   try {
     await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     result.observations.push({ frontDoor: 'Normal navigation activated by keyboard; source selection and practice through pointer/field controls', source: 'root-authored synthetic Japanese; no provider responses or injected learner state' });
-    await page.locator('#source-inbox-link').click();
+    await openShelfDoor(page, '#source-inbox-link');
     const before = (await readAppRecordSnapshot(page)).record;
     await page.locator('#source-capture-title').fill('図書館での一日'); await page.locator('#source-capture-text').fill(TEXT);
     await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
@@ -150,7 +151,7 @@ for (const engine of engines) for (const width of sizes) {
     assert(await page.locator('#sentence-choose-production').isChecked()); await screenshot('failed-confirmation-keeps-choice');
     assert(await page.locator('#sentence-practice-confirm').isDisabled(), 'The existing native record failure requires a fresh document');
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
-    await page.locator('#source-inbox-link').click(); await page.locator('[data-source-capture]').first().click();
+    await openShelfDoor(page, '#source-inbox-link'); await page.locator('[data-source-capture]').first().click();
     await selectTown(page); await page.locator('#source-sentence-practice').click();
     const productionFirst = width === 390;
     if (productionFirst) { await page.locator('#sentence-choose-cloze').uncheck(); await page.locator('#sentence-choose-production').check(); }

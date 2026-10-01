@@ -393,6 +393,9 @@ const S = {
    * offset, returning puts it back. Session-only: the store persists what you
    * took, never where you were. */
   shelfScroll: 0,
+  /** Whether the shelf's 学習ツール panel is open. Session-only, like shelfScroll: coming back
+   * from a tool finds the shelf as you left it; a fresh visit starts with it closed. */
+  shelfToolsOpen: false,
   /** The archive's analog of shelfScroll: the year-list offset when you last
    * walked into an article (or out to the shelf). Session-only, like its
    * sibling — 93 rows of 2016 keep their place while one of them is read. */
@@ -5312,21 +5315,44 @@ function renderShelfBody() {
   help.append(helpSummary);
   help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose an article. JLPT level comes from its vocabulary; school grade from its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
   main.append(controls);
-  // the study tools: one slim row of text doors under the filters, every door always reachable
-  const toolsBox = el('nav', 'shelf-study-tools'); toolsBox.setAttribute('aria-label', tx('学習ツール', 'Study tools'));
-  const toolsLabel = el('span', 'shelf-tools-label'); toolsLabel.append(el('span', 'l-ja', '学習ツール')); if (bi()) toolsLabel.append(el('span', 'en-sub', 'study tools'));
-  toolsBox.append(toolsLabel); const tools=el('div','shelf-tools-grid');
+  // The study tools (glance pass, 2026-10-01): thirteen bare text links between the filters and
+  // the first story read as clutter. They now sit behind ONE 学習ツール Tools button in the title
+  // block, which opens a panel of labelled tiles in four plain groups. Every door keeps its id
+  // and its behaviour; only where it is drawn changed.
+  const toolsBox = el('nav', 'shelf-study-tools');
+  toolsBox.id = 'shelf-tools-panel';
+  toolsBox.setAttribute('aria-label', tx('学習ツール', 'Study tools'));
+  // tile and group names are the app's chrome, not prose to look up
+  toolsBox.dataset.japaneseLookup = 'off';
+  const toolGroups = [];
+  const toolGroup = (key, ja, en) => {
+    const section = el('section', 'shelf-tools-group');
+    section.dataset.toolsGroup = key;
+    const heading = el('h2', 'shelf-tools-heading');
+    heading.id = `shelf-tools-${key}`;
+    heading.append(el('span', 'l-ja', ja));
+    if (bi()) heading.append(el('span', 'en-sub', en));
+    const grid = el('div', 'shelf-tools-grid');
+    section.setAttribute('aria-labelledby', heading.id);
+    section.append(heading, grid);
+    toolGroups.push(section);
+    return grid;
+  };
+  const readTools = toolGroup('read', '読む', 'Read');
+  const practiceTools = toolGroup('practice', '練習', 'Practice');
+  const referenceTools = toolGroup('reference', '調べる', 'Reference');
+  const settingTools = toolGroup('settings', '設定', 'Settings');
   const news = biLabel('button', 'grammar-link', 'いまの日本を読む', 'news & magazines');
   news.type = 'button'; news.id = 'feed-link';
   news.addEventListener('click', () => {
     keepScroll(); S.view = 'feed'; feedRequestedThisVisit = false;
     render(); window.scrollTo(0, 0);
   });
-  tools.append(news);
+  readTools.append(news);
   const inbox = biLabel('button', 'grammar-link', '日本語を持ち込む', 'bring your own text');
   inbox.type = 'button'; inbox.id = 'source-inbox-link';
   inbox.addEventListener('click', () => { keepScroll(); S.view = 'source-inbox'; render(); window.scrollTo(0, 0); });
-  tools.append(inbox);
+  readTools.append(inbox);
 
   // Reference is separate from lessons, mock papers, and My Study.
   const lanes = el('button', 'grammar-link');
@@ -5341,7 +5367,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(lanes);
+  referenceTools.append(lanes);
   const les = el('button', 'grammar-link');
   les.type = 'button';
   les.id = 'lessons-link';
@@ -5352,7 +5378,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(les);
+  practiceTools.append(les);
   const mock = el('button', 'grammar-link');
   mock.type = 'button';
   mock.id = 'mock-link';
@@ -5363,7 +5389,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(mock);
+  practiceTools.append(mock);
   const mirror = el('button', 'grammar-link');
   mirror.type = 'button';
   mirror.id = 'kagami-link';
@@ -5374,7 +5400,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(mirror);
+  practiceTools.append(mirror);
   const gram = el('button', 'grammar-link');
   gram.type = 'button';
   gram.id = 'grammar-link';
@@ -5385,7 +5411,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(gram);
+  referenceTools.append(gram);
   const thes = el('button', 'grammar-link');
   thes.type = 'button';
   thes.id = 'thesaurus-link';
@@ -5396,7 +5422,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(thes);
+  referenceTools.append(thes);
   const yj = el('button', 'grammar-link');
   yj.type = 'button';
   yj.id = 'yoji-link';
@@ -5407,7 +5433,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(yj);
+  referenceTools.append(yj);
   const kdx = el('button', 'grammar-link');
   kdx.type = 'button';
   kdx.id = 'kanjidex-link';
@@ -5418,7 +5444,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(kdx);
+  referenceTools.append(kdx);
   const ai = el('button', 'grammar-link');
   ai.type = 'button';
   ai.id = 'ai-link';
@@ -5429,7 +5455,7 @@ function renderShelfBody() {
     render();
     window.scrollTo(0, 0);
   });
-  tools.append(ai);
+  (aiKey() ? practiceTools : settingTools).append(ai);
 
   // Starting preferences are local choices. They remain reachable before a
   // provider is connected, as do readings already accepted on another device.
@@ -5446,16 +5472,39 @@ function renderShelfBody() {
       render();
       window.scrollTo(0, 0);
     });
-    tools.append(aread);
+    (hasReading ? readTools : settingTools).append(aread);
   }
 
-  // the row shows each door's Japanese name; its English rides as the tooltip and accessible name
-  for (const door of tools.querySelectorAll('button')) {
+  toolsBox.append(...toolGroups.filter((section) => section.querySelector('button')));
+  // each tile names its door in Japanese with its English underneath; the accessible name says both
+  for (const door of toolsBox.querySelectorAll('button')) {
     const en = door.querySelector('.en-sub')?.textContent;
-    if (en) { door.title = en; door.setAttribute('aria-label', `${door.querySelector('.l-ja')?.textContent || ''} · ${en}`); }
+    if (en) door.setAttribute('aria-label', `${door.querySelector('.l-ja')?.textContent || ''} · ${en}`);
   }
-  toolsBox.append(tools);
-  controls.after(toolsBox);
+  const toolsToggle = el('button', 'shelf-tools-toggle');
+  toolsToggle.type = 'button';
+  toolsToggle.id = 'shelf-tools-toggle';
+  toolsToggle.setAttribute('aria-controls', toolsBox.id);
+  const toolsFace = el('span', 'shelf-tools-toggle-label');
+  toolsFace.append(el('span', 'l-ja', '学習ツール'));
+  if (bi()) toolsFace.append(el('span', 'en-sub', 'Tools'));
+  toolsToggle.append(uiIcon('tools'), toolsFace, uiIcon('chevron', 'ui-icon shelf-tools-caret'));
+  const showTools = (open) => {
+    S.shelfToolsOpen = open;
+    toolsBox.hidden = !open;
+    toolsToggle.setAttribute('aria-expanded', String(open));
+  };
+  showTools(!!S.shelfToolsOpen);
+  toolsToggle.addEventListener('click', () => showTools(!S.shelfToolsOpen));
+  toolsBox.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    showTools(false);
+    toolsToggle.focus();
+  });
+  // the button rides the title's own row, so the page reads: search, title, filters, stories
+  name.append(toolsToggle);
+  masthead.after(toolsBox);
   // A small shelf of real encounters. These selections use saved mistakes to
   // choose context; browsing them never changes a card's grade or due date.
   const priorities = allAssessmentEvidence().priorities.targets
@@ -8570,6 +8619,7 @@ const UI_ICONS = {
   play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/>',
   pause: '<path d="M8.5 5.5v13M15.5 5.5v13" stroke-width="2.4"/>',
   sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  tools: '<rect x="4.5" y="4.5" width="6" height="6" rx="1.2"/><rect x="13.5" y="4.5" width="6" height="6" rx="1.2"/><rect x="4.5" y="13.5" width="6" height="6" rx="1.2"/><rect x="13.5" y="13.5" width="6" height="6" rx="1.2"/>',
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="7.9" r="0.4" fill="currentColor"/>',
   search: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>',
   chevron: '<path d="M7 10l5 5 5-5"/>',

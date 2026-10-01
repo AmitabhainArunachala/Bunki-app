@@ -1,6 +1,7 @@
 /** Ordinary reading choices, new-source practice and changed follow-up. Can
  * continue preserved real test profiles; no injected state, provider replies,
  * fake clock or forced scheduler transition. Scoped technical evidence only. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -219,7 +220,7 @@ for (const engine of engines) for (const width of sizes) {
       assert(currentRuntime, 'The retained profile must execute the exact R31 script, module and style bytes');
     } else {
       assert.equal(initial.taken.length, 0); await shelf(page);
-      await page.locator('#airead-link').click(); await page.locator('#airead-startingLevel').selectOption('N5');
+      await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
       await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
       const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
       await item.locator('.shelf-open').click(); await page.locator('#reader .tok[data-index="9"][data-word="窓"]').click();
