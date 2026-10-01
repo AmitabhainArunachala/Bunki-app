@@ -1013,7 +1013,9 @@ html[data-room='shelf'] .search-field {
   transition: border-color 120ms ease-out, background-color 120ms ease-out;
 }
 #shelf-body .shelf-study-tools button.grammar-link:hover { border-color: var(--ai); background: var(--ai-wash); }
-#shelf-body .shelf-study-tools button.grammar-link .l-ja { margin: 0; font: inherit; color: inherit; word-break: auto-phrase; }
+/* register.css spaces a door's last span out (0.12em) and can hide it; a tile's name is always shown, set tight */
+#shelf-body .shelf-study-tools button.grammar-link .l-ja,
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] .l-ja { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; word-break: auto-phrase; }
 #shelf-body .shelf-study-tools button.grammar-link .en-sub,
 #shelf-body .shelf-study-tools button.grammar-link[data-grade] .en-sub {
   display: block;
@@ -1555,6 +1557,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   /* on the narrowest phones each of today's six takes the whole width (this block precedes the
      520px one, so it carries one more selector to win) */
   body #shelf-today.shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
+  /* …and the tools panel's tiles one to a row, so no tile's name breaks inside a word */
+  body #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
   :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
@@ -1585,7 +1589,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   /* the tools panel on a phone: the groups stack, two tiles to a row */
   #shelf-body .shelf-study-tools { grid-template-columns: minmax(0, 1fr); gap: var(--s2); margin-bottom: var(--s2); padding: var(--s2); }
   #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  #shelf-body .shelf-study-tools button.grammar-link { padding: 8px 10px; }
+  #shelf-body .shelf-study-tools button.grammar-link,
+  #shelf-body .shelf-study-tools button.grammar-link[data-grade] { padding: 8px 10px; }
   #shelf-body .story-card .shelf-open { padding: var(--s2) var(--s2) 20px; }
   #shelf-body .story-second .shelf-open { padding: var(--s2) var(--s2) 20px; }
   #shelf-body .story-teaser .shelf-title { font-size: 17px; }
