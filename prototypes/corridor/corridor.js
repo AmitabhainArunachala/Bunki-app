@@ -5271,10 +5271,23 @@ function renderShelfBody() {
     el('span', 'tally-short', bi() ? `${stories.length} articles` : `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
   dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
   title.append(dateline);
-  // 未確認 is said once, here, not on every card; each article still wears it in its meta line
+  // 未確認 is said once, here, not on every card; each article still wears it in its meta line.
+  // One short line (glance pass 2026-10-01); what it means waits behind its ⓘ.
   const unreviewed = stories.filter(reviewPending).length;
-  if (unreviewed) title.append(el('p', 'shelf-review-note', tx(`このうち ${unreviewed} 本は未確認（人による確認の前）。ふりがなや英訳に誤りがあるかもしれない。`,
-    `未確認 · ${unreviewed} of these ${stories.length} haven't been checked by a person yet, so their furigana or English may have mistakes.`)));
+  if (unreviewed) {
+    const note = el('div', 'shelf-review-note');
+    note.append(el('span', 'shelf-review-text', tx(`このうち ${unreviewed} 本は未確認（人の確認前）`,
+      `未確認 · ${unreviewed} of ${stories.length} not yet checked by a person`)));
+    const why = el('details', 'shelf-filter-help shelf-review-help');
+    const whySummary = el('summary', 'icon-button');
+    whySummary.setAttribute('aria-label', tx('未確認とは', 'What 未確認 means'));
+    whySummary.title = tx('未確認とは', 'What 未確認 means');
+    whySummary.append(uiIcon('info'));
+    why.append(whySummary, el('p', '', tx('人がまだ確認していない読み物です。ふりがなや英訳に誤りがあるかもしれません。記事の見出しの上にも「未確認」と出ます。',
+      'A person has not checked these articles yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says 未確認 at its top.')));
+    note.append(why);
+    title.append(note);
+  }
   masthead.append(title);
   main.append(masthead);
   const filters = S.shelfFilters ||= { sort: 'latest', topic: '', jlpt: '', grade: '', text: '' };

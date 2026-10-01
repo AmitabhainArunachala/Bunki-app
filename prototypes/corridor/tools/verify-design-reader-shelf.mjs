@@ -25,6 +25,11 @@
  *                         inside the viewport and names itself in Japanese with its English gloss (the
  *                         accessible name says both); a door in it still opens its room.
  *                         Control: 7ef0e985, whose thirteen text doors stood in a row under the filters.
+ *   M1 title block      — (glance pass) at 1368 and 390 the date and the article count stand on one
+ *                         line; the 未確認 note is one short line that still counts the pending stories
+ *                         against the total, and its ⓘ opens the longer explanation; the 永 seal stays
+ *                         ≤ 48 px inside the title. Control: 7ef0e985, whose phone dateline broke the
+ *                         count onto a second line and whose note ran to three lines.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -294,12 +299,12 @@ try {
       const probe = await page.evaluate(() => {
         const cards = new Set([...document.querySelectorAll('#shelf-body [data-passage] .shelf-open')]
           .map((n) => n.closest('[data-passage]').dataset.passage)).size;
-        const lines = [...document.querySelectorAll('.shelf-masthead p, .shelf-results-count')]
+        const lines = [...document.querySelectorAll('.shelf-masthead p, .shelf-masthead .shelf-review-text, .shelf-results-count')]
           .filter((n) => n.offsetParent !== null || n.classList.contains('shelf-results-count')).map((n) => n.innerText);
-        // a size is "N articles" / "N本" / "of these N"; "N of these" is a subset (the unreviewed count)
+        // a size is "N articles" / "N本" / "of (these) N"; "N of" is a subset (the unreviewed count)
         const numbers = lines.flatMap((t) => [
           ...[...t.matchAll(/(\d+)\s*(?:readings|articles|本)/gu)].map((m) => Number(m[1])),
-          ...[...t.matchAll(/of these (\d+)/gu)].map((m) => Number(m[1])),
+          ...[...t.matchAll(/of (?:these )?(\d+)/gu)].map((m) => Number(m[1])),
         ]);
         return { cards, lines, numbers };
       });
@@ -381,6 +386,48 @@ try {
         await page.locator('#grammar-link').click();
         await page.waitForFunction(() => document.body.dataset.view === 'grammar');
         return { doors: served.doors, tiles: opened.tiles.length, toggle: served.toggle.text };
+      });
+    }
+
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`M1-title-block-${label}`, viewport, async (page) => {
+        await open(page);
+        const probe = await page.evaluate(() => {
+          const lines = (node) => {
+            if (!node) return 0;
+            const tops = new Set();
+            const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+            while (walker.nextNode()) {
+              const text = walker.currentNode;
+              if (!text.textContent.trim() || !text.parentElement.getClientRects().length || text.parentElement.closest('details:not([open]) > :not(summary)')) continue;
+              const range = document.createRange();
+              range.selectNodeContents(text);
+              for (const r of range.getClientRects()) if (r.width > 0) tops.add(Math.round(r.top / 4));
+            }
+            return tops.size;
+          };
+          const date = document.querySelector('.shelf-dateline .dateline-date');
+          const tally = [...document.querySelectorAll('.shelf-dateline :is(.tally-long, .tally-short)')].find((n) => n.getClientRects().length);
+          const note = document.querySelector('.shelf-review-note');
+          const seal = document.querySelector('.shelf-masthead .shelf-art')?.getBoundingClientRect();
+          const why = note?.querySelector('details');
+          return { dateTop: Math.round(date?.getBoundingClientRect().top ?? -1), tallyTop: Math.round(tally?.getBoundingClientRect().top ?? -99),
+            datelineLines: lines(document.querySelector('.shelf-dateline')), noteLines: lines(note), note: note?.innerText.trim() ?? '',
+            why: !!why?.querySelector('summary'), seal: seal ? Math.round(Math.max(seal.width, seal.height)) : 0 };
+        });
+        assert(Math.abs(probe.dateTop - probe.tallyTop) <= 2 && probe.datelineLines === 1, `date and count are not one line: ${JSON.stringify(probe)}`);
+        assert(/未確認/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the 未確認 note does not count the pending stories against the total: "${probe.note}"`);
+        assert.equal(probe.noteLines, 1, `the 未確認 note runs to ${probe.noteLines} lines: "${probe.note}"`);
+        assert(probe.why, 'the 未確認 note has no ⓘ for its longer explanation');
+        await page.locator('.shelf-review-note summary').click();
+        const explained = await page.evaluate(() => {
+          const p = document.querySelector('.shelf-review-note details[open] > p');
+          const r = p?.getBoundingClientRect();
+          return p ? { text: p.innerText.trim(), inView: r.left >= 0 && r.right <= innerWidth + 0.5 && r.bottom <= innerHeight } : null;
+        });
+        assert(explained && explained.text.length > 40 && explained.inView, `the ⓘ opens no readable explanation: ${JSON.stringify(explained)}`);
+        assert(probe.seal > 0 && probe.seal <= 48, `the 永 seal is ${probe.seal}px`);
+        return { note: probe.note, explanation: explained.text.slice(0, 40), seal: probe.seal };
       });
     }
 
@@ -469,9 +516,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block',
     results,
-    passed: results.length === engines.length * 16 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 18 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

@@ -794,11 +794,15 @@ html[data-room='shelf'] .search-field {
 }
 #shelf-body .shelf-dateline .dateline-sep { color: var(--text-2); }
 #shelf-body .shelf-dateline .tally-short { display: none; }
-#shelf-body .shelf-review-note { margin: 4px 0 0; font: 500 13px/1.5 var(--sans); color: var(--text-2); }
+#shelf-body .shelf-review-note { display: flex; align-items: center; gap: 2px; margin: 2px 0 0; font: 500 13px/1.5 var(--sans); color: var(--text-2); }
+/* the ⓘ is a 44px door that sits on the note's own line without making it taller */
+#shelf-body .shelf-review-help { margin: -12px 0; }
+#shelf-body .shelf-review-help > summary { width: 44px; justify-content: center; }
+#shelf-body .shelf-review-help > summary .ui-icon { width: 18px; height: 18px; }
 #shelf-body .shelf-dateline {
   display: block;
   max-width: none;
-  margin: var(--s1) 0 0;
+  margin: 6px 0 0;
   font: 500 14px/1.5 var(--sans);
   letter-spacing: 0.02em;
   color: var(--text-2);
@@ -1560,9 +1564,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .shelf-masthead { gap: var(--s2); padding-bottom: 12px; }
   #shelf-body .shelf-masthead h1 { font-size: 34px; }
   #shelf-body .shelf-masthead h1 .en-inline { display: block; margin: 4px 0 0; font-size: 13px; vertical-align: 0; }
+  /* the date and the count share one line on a phone too, the count in its short form */
   #shelf-body .shelf-dateline { margin-top: 6px; font-size: 13px; }
-  #shelf-body .shelf-dateline .dateline-sep { display: none; }
-  #shelf-body .shelf-dateline .dateline-tally { display: block; }
   #shelf-body .shelf-dateline .tally-long { display: none; }
   #shelf-body .shelf-dateline .tally-short { display: inline; }
   #shelf-body .shelf-review-note { font-size: 12px; }
