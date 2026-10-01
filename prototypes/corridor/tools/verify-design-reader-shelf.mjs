@@ -36,6 +36,12 @@
  *                         itself does not, and the look-up field's hint fits inside the field.
  *                         Control: 7ef0e985, whose phone chip bar and today's six scrolled sideways
  *                         with a chip and a card cut mid-word at the edge.
+ *   P1 tip in the page  — (glance pass) at 1368 and 390, on a first visit, the tap-ladder tip is a note
+ *                         in the page's flow (never fixed, sticky or absolute) that ends above the
+ *                         article's first word, and at four scroll depths no on-screen word of the
+ *                         article is covered by it. Choosing a word leaves it in place (the text does
+ *                         not move) and remembers it, so the next visit opens without it; its × removes
+ *                         it at once and for good. Control: 7ef0e985, whose tip floated over the text.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -477,6 +483,55 @@ try {
       });
     }
 
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`P1-tip-in-the-page-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        const tip = await page.evaluate(() => {
+          const node = document.getElementById('reader-tip');
+          if (!node) return null;
+          const first = document.querySelector('#reader .tok').getBoundingClientRect();
+          return { position: getComputedStyle(node).position, bottom: Math.round(node.getBoundingClientRect().bottom), firstTop: Math.round(first.top),
+            text: node.innerText.trim() };
+        });
+        assert(tip, 'no first-visit tip on a first visit');
+        assert(['static', 'relative'].includes(tip.position), `the tip is ${tip.position}, not part of the page`);
+        assert(tip.bottom <= tip.firstTop, `the tip ends at ${tip.bottom}px, below the first word's top ${tip.firstTop}px`);
+        const covered = [];
+        for (const depth of [0, 300, 700, 1200]) {
+          await page.evaluate((y) => window.scrollTo(0, y), depth);
+          await page.waitForTimeout(120);
+          covered.push(...await page.evaluate((y) => [...document.querySelectorAll('#reader .tok')].flatMap((t) => {
+            const r = t.getClientRects()[0];
+            if (!r || r.bottom <= 0 || r.top >= innerHeight) return [];
+            const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+            return hit?.closest('#reader-tip') ? [`${t.textContent}@${y}`] : [];
+          }), depth));
+        }
+        assert.equal(covered.length, 0, `words covered by the tip: ${covered.slice(0, 5).join(', ')}`);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        // the word's distance below the tip: the header may change height when a word is chosen
+        // (that is the header's business); the tip must neither leave nor move the text
+        const gap = () => {
+          const t = document.getElementById('reader-tip');
+          const w = document.querySelector('#reader .tok[data-index="1"]').getBoundingClientRect();
+          return t ? Math.round(w.top - t.getBoundingClientRect().bottom) : null;
+        };
+        const before = await page.evaluate(gap);
+        await tapToken(page, 1);
+        const after = { gap: await page.evaluate(gap), remembered: await page.evaluate(() => localStorage.getItem('kairo-tip-reader-v1')) };
+        assert(after.gap !== null && Math.abs(after.gap - before) <= 1, `choosing a word took the tip away or moved the text under it: ${JSON.stringify({ before, ...after })}`);
+        assert.equal(after.remembered, '1', 'choosing a word did not remember the tip as seen');
+        await openArticle(page, ARTICLE);
+        assert.equal(await page.locator('#reader-tip').count(), 0, 'the tip came back on the next visit');
+        await page.evaluate(() => localStorage.removeItem('kairo-tip-reader-v1'));
+        await openArticle(page, THREE_PARAS);
+        await page.locator('#reader-tip .reader-tip-close').click();
+        const dismissed = await page.evaluate((key) => ({ tip: !!document.getElementById('reader-tip'), remembered: localStorage.getItem(key) }), 'kairo-tip-reader-v1');
+        assert(!dismissed.tip && dismissed.remembered === '1', `the × did not dismiss and remember the tip: ${JSON.stringify(dismissed)}`);
+        return { position: tip.position, gapAboveText: tip.firstTop - tip.bottom, text: tip.text };
+      });
+    }
+
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);
       await openShelfTools(page);
@@ -562,9 +617,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page',
     results,
-    passed: results.length === engines.length * 21 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 23 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

@@ -1441,26 +1441,21 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
 }
 .reader-actions .teacher-actions .en-sub { font-size: 12px; letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
 .reader-tip {
-  position: fixed;
-  z-index: 55;
-  left: 50%;
-  bottom: calc(var(--s2) + env(safe-area-inset-bottom));
+  /* a note in the page, above the article's text: it never floats over the words (glance pass) */
   display: flex;
   align-items: center;
   gap: var(--s1);
-  width: min(560px, calc(100vw - 2 * var(--s2)));
-  padding: 10px 6px 10px var(--s3);
-  transform: translateX(-50%);
-  border-radius: var(--radius-float);
-  color: var(--chrome-ink);
-  background: var(--chrome);
-  box-shadow: var(--float-shadow);
-  animation: float-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms both;
+  max-width: 40em;
+  margin: 0 0 var(--s3);
+  padding: 4px 2px 4px var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-left: 3px solid var(--ai);
+  border-radius: 6px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--ai) 6%, var(--raised));
 }
 .reader-tip-text { flex: 1 1 auto; margin: 0; font: 500 14px/1.55 var(--sans); }
-.reader-tip .icon-button { color: inherit; }
-.reader-tip .icon-button:hover { background: rgb(255 255 255 / 12%); color: inherit; }
-body:has(.reader-actions:not([hidden])) .reader-tip { display: none; }
+.reader-tip .icon-button { flex: 0 0 auto; color: var(--text-2); }
 
 /* the article's foot: finish, then everything about the text */
 .article-footer { margin: var(--s5) 0 0; padding: var(--s3) 0 0; border-top: 2px solid var(--rule-strong); }
@@ -1505,8 +1500,8 @@ body .article-about .note .inline-link:hover { color: var(--ai); text-decoration
 .article-about .details-toggle { min-height: 44px; margin: var(--s1) 0 0; padding: 0; font: 600 13px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--ai); }
 
 /* a fixed bar never hides the page's last lines */
-body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-:root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
+body[data-view='reader']:has(.reader-actions:not([hidden])) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+:root body[data-view='reader']:has(.reader-actions:not([hidden])):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
 body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pending {
   display: flex;
   max-width: none;
@@ -1652,8 +1647,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
   /* a bottom sheet owns the foot: the bug steps up to the top corner */
   body:has(#sheet):not(:has(#stroke-page)) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
-  /* the bar and the tip rise above the dock, clear of the bug and the voice state */
-  .teacher-door.reader-actions, .reader-tip {
+  /* the sentence bar rises above the dock, clear of the bug and the voice state */
+  .teacher-door.reader-actions {
     left: var(--s1);
     width: calc(100vw - 2 * var(--s1));
     bottom: calc(72px + env(safe-area-inset-bottom));
@@ -1664,14 +1659,14 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .reader-actions .teacher-actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: 14px; }
   .reader-actions-close { grid-column: 2; grid-row: 1; }
-  .reader-tip { padding-left: 14px; }
-  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
+  .reader-tip { margin-bottom: var(--s2); padding-left: 12px; }
+  :root body[data-view='reader']:has(.reader-actions:not([hidden])):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
   .article-about { padding: var(--s2); }
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .teacher-door.reader-actions, .reader-tip { animation: none; }
+  .teacher-door.reader-actions { animation: none; }
   #reader:not(.fg-always) ruby::before { transition: none; }
   body #shelf-body .story-card, .shelf-controls .filter-search input { transition: none; }
   body #shelf-body .story-card:hover { transform: none; }
@@ -1866,7 +1861,7 @@ body .sheet > button.take.taken, body .sheet > button.take[aria-pressed='true'] 
   body #mini .mini-word { font-size: 27px; }
 }
 /* an open sheet is the top layer: the reader's bar, tip and dock step back under it */
-body:has(#sheet) :is(.teacher-door.reader-actions, .reader-tip) { display: none !important; }
+body:has(#sheet) .teacher-door.reader-actions { display: none !important; }
 @media (max-width: 520px) {
   body:has(#sheet)[data-view='reader'] #app::after, body:has(#sheet)[data-view='reader'] .listen-row.play-bar { display: none; }
 }
