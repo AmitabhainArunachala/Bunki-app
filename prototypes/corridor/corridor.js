@@ -8093,6 +8093,37 @@ function paintTok(span, token, index) {
   nameReaderToken(span, token, index, 'word');
 }
 
+/** Opening sentence actions must not cover the word whose reveal just began.
+ * Measure after the seal and token have changed, and move only an obstructed
+ * selection. Repeated reveals of the same word keep their glyph anchor. */
+function keepReaderTokenClear(span, index, passageId) {
+  const selected = readerTakeCurrent();
+  if (!span.isConnected || selected?.p !== passageId || selected.index !== index || S.stack.length) return;
+  const rect = span.getBoundingClientRect();
+  const viewport = window.visualViewport;
+  const viewportTop = viewport?.offsetTop ?? 0;
+  let top = viewportTop + 8;
+  let bottom = viewportTop + (viewport?.height ?? window.innerHeight) - 8;
+  const chrome = document.querySelector('#app > .chrome');
+  if (chrome && ['fixed', 'sticky'].includes(getComputedStyle(chrome).position)) {
+    const bounds = chrome.getBoundingClientRect();
+    if (bounds.height && rect.left < bounds.right && rect.right > bounds.left) top = Math.max(top, bounds.bottom + 8);
+  }
+  const bar = document.querySelector('.reader-actions:not([hidden])');
+  if (bar) {
+    const bounds = bar.getBoundingClientRect();
+    if (bounds.height && rect.left < bounds.right && rect.right > bounds.left) {
+      // Its entrance starts 14px lower; reserve the final resting position.
+      const transform = getComputedStyle(bar).transform;
+      const offset = transform === 'none' ? 0 : new window.DOMMatrixReadOnly(transform).m42;
+      bottom = Math.min(bottom, bounds.top - offset - 8);
+    }
+  }
+  if (bottom - top < rect.height) return;
+  const delta = rect.bottom > bottom ? rect.bottom - bottom : rect.top < top ? rect.top - top : 0;
+  if (Math.abs(delta) > 0.5) window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
+}
+
 function wireTokenGestures(span, token, index, p) {
   let miniTimer = null;
   let fullTimer = null;
@@ -8124,6 +8155,8 @@ function wireTokenGestures(span, token, index, p) {
   };
   const activate = (modality) => {
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
+    const previous = readerTakeCurrent();
+    const selectionChanged = previous?.p !== p.id || previous?.index !== index;
     setReaderTake(token.b, index, p.id);
     (S.revealed ||= new Set());
     (S.glossed ||= new Set());
@@ -8132,21 +8165,18 @@ function wireTokenGestures(span, token, index, p) {
     if (!hasReading) {
       S.revealed.add(index);
       obsLog('tap', obsKey, 1, p.id);
-      paintTok(span, token, index);
-      return;
-    }
-    if (!hasEn) {
+    } else if (!hasEn) {
       S.glossed.add(index);
       obsLog('tap', obsKey, 2, p.id);
-      paintTok(span, token, index);
-      return;
+    } else {
+      // the third tap closes the circle (operator, 2026-08-12): back to plain
+      // kanji, ladder reset. Definitions live on the holds — a short hold for
+      // the mini, a long hold (or a tap on the mini) for the full entry.
+      S.revealed.delete(index);
+      S.glossed.delete(index);
     }
-    // the third tap closes the circle (operator, 2026-08-12): back to plain
-    // kanji, ladder reset. Definitions live on the holds — a short hold for
-    // the mini, a long hold (or a tap on the mini) for the full entry.
-    S.revealed.delete(index);
-    S.glossed.delete(index);
     paintTok(span, token, index);
+    if (selectionChanged) keepReaderTokenClear(span, index, p.id);
   };
   const clear = () => {
     clearTimeout(miniTimer);
@@ -8170,25 +8200,23 @@ function wireTokenGestures(span, token, index, p) {
     clear();
     down = null;
   });
-  let heldAt = 0;
   span.addEventListener('pointerup', () => {
     if (!down) return;
     const held = Date.now() - down.at;
     down = null;
     clear();
-    // a hold's release still synthesises a click — mark it inert
-    if (held >= GESTURE.MINI_MS) heldAt = Date.now();
+    // Quick lookup can put its entry button under the original finger when
+    // selecting the word grows the header. Own the release at document level,
+    // even when its compatibility click lands outside this token. The next
+    // deliberate pointerdown clears this one-click guard.
+    if (held >= GESTURE.MINI_MS) swallowClickUntil = Date.now() + 700;
   });
   span.addEventListener('click', (event) => {
     // Activation lives on the CLICK: inside scrollable surfaces iOS
     // pointercancels a plain tap and pointerup never arrives — activating
     // there left real fingers dead (operator's phone, 2026-08-12). The
     // click still fires after a cancel; scrolls fire no click at all.
-    if (Date.now() < swallowClickUntil) return;
-    if (heldAt && Date.now() - heldAt < 800) {
-      heldAt = 0;
-      return;
-    }
+    if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
     activate(event.detail === 0 ? 'keyboard' : 'pointer');
   });
   return {

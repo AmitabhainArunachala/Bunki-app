@@ -118,17 +118,33 @@ function startServer(rootDir) {
   });
 }
 
+const touchAttempts = [];
+
 async function touchAt(page, locator, holdMs = 0) {
   await locator.scrollIntoViewIfNeeded();
   await page.waitForTimeout(35);
   const box = await locator.evaluate((node) => {
     const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    const x = rect.x + rect.width / 2;
+    const y = rect.y + Math.min(rect.height / 2, 20);
+    const hit = document.elementFromPoint(x, y);
+    window.__nativeIntendedTouch = node;
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+      target: { tag: node.tagName, id: node.id, passage: node.dataset.passage },
+      hit: hit ? { tag: hit.tagName, id: hit.id } : null,
+      reachesTarget: hit === node || node.contains(hit),
+      offsetLeft: window.visualViewport?.offsetLeft ?? 0,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+    };
   });
+  const attempt = { box, holdMs };
+  touchAttempts.push(attempt);
   if (!box?.width || !box?.height) throw new Error('touch target has no rendered box');
+  if (!box.reachesTarget) throw new Error(`touch target is obstructed: ${JSON.stringify(box)}`);
+  const before = await page.evaluate(() => window.__nativeTargetClicks ?? 0);
   const point = {
-    x: box.x + box.width / 2,
-    y: box.y + Math.min(box.height / 2, 20),
+    x: box.x + box.width / 2 - box.offsetLeft,
+    y: box.y + Math.min(box.height / 2, 20) - box.offsetTop,
     radiusX: 6,
     radiusY: 6,
     force: 1,
@@ -141,6 +157,13 @@ async function touchAt(page, locator, holdMs = 0) {
   if (holdMs) await page.waitForTimeout(holdMs);
   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await session.detach();
+  if (!holdMs) {
+    try {
+      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: 5000 });
+    } finally {
+      attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
+    }
+  } else attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
   await page.waitForTimeout(90);
 }
 
@@ -199,6 +222,9 @@ async function openQuickLook(page, preferredIndex = 0) {
   );
   for (const index of candidates) {
     await touchAt(page, tokens.nth(index), 560);
+    if (await page.locator('#sheet').count()) {
+      throw new Error(`a quick-lookup hold must not open a full entry on release: ${JSON.stringify(touchAttempts.at(-1))}`);
+    }
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;
@@ -620,6 +646,8 @@ let browser;
 let browserVersion = null;
 let activeArticleId = null;
 let journeyCompleted = false;
+let page;
+let failureEvidence = null;
 try {
   browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
   browserVersion = await browser.version();
@@ -634,8 +662,21 @@ try {
   });
   await context.addInitScript((day) => {
     try { localStorage.setItem('kairo-shelf-day', day); } catch { /* storage refused: the census below still runs */ }
+    window.__nativeTouchTrace = [];
+    for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'click']) {
+      addEventListener(type, (event) => {
+        const intended = window.__nativeIntendedTouch;
+        const reachesTarget = Boolean(intended && (event.target === intended || intended.contains(event.target)));
+        if (type === 'click' && reachesTarget) window.__nativeTargetClicks = (window.__nativeTargetClicks ?? 0) + 1;
+        window.__nativeTouchTrace.push({ type, at: performance.now(), reachesTarget,
+          tag: event.target.tagName, id: event.target.id, classes: String(event.target.className),
+          mini: Boolean(event.target.closest('#mini')), sheet: Boolean(event.target.closest('#sheet')),
+          x: event.clientX, y: event.clientY, offsetTop: window.visualViewport?.offsetTop ?? 0 });
+        window.__nativeTouchTrace = window.__nativeTouchTrace.slice(-24);
+      }, true);
+    }
   }, SHELF_DAY);
-  const page = await context.newPage();
+  page = await context.newPage();
   const responses = new Map();
   page.on('console', (message) => {
     if (message.type() === 'error' || message.type() === 'warning') {
@@ -763,6 +804,10 @@ try {
 
     await touchAt(page, item);
     await settleReader(page);
+    await page.waitForFunction(({ id, title }) =>
+      document.querySelector('.listen-row[data-passage]')?.dataset.passage === id &&
+        document.querySelector('.view-title')?.textContent === title,
+    { id, title: row.title }, { timeout: 5000 });
     await page.waitForTimeout(80);
 
     const readerShape = await page.evaluate(() => {
@@ -850,12 +895,20 @@ try {
       // touching the sheet's own Back control.
       await page.waitForTimeout(720);
       await touchAt(page, page.locator('#sheet-back'));
-      await page.waitForSelector('#reader .tok');
+      await page.waitForSelector('#sheet', { state: 'detached', timeout: 5000 });
+      await page.waitForFunction(() => document.querySelector('#reader .tok') &&
+        !document.querySelector('#reader')?.closest('[inert]'), null, { timeout: 5000 });
     }
 
     // Completion and exact per-article bookmark are both persisted. Back must
     // return to this shelf location, then reopening must restore the reader.
+    const beforeCompletion = await readAppRecord(page);
+    if (beforeCompletion.readDone?.[id] || await page.locator('#read-fin.finished').count()) {
+      throw new Error(`expected an unfinished article before its single completion touch: ${id}`);
+    }
     await touchAt(page, page.locator('#read-fin'));
+    await waitForAppRecord(page, (record) => !!record.readDone?.[id],
+      { description: `one acknowledged completion write for ${id}` });
     await page.waitForSelector('#read-fin.finished');
     await page.evaluate(() =>
       window.scrollTo(0, Math.min(620, document.body.scrollHeight - innerHeight)),
@@ -1058,6 +1111,27 @@ try {
   journeyCompleted = true;
   await context.close();
 } catch (error) {
+  if (page && !page.isClosed()) {
+    failureEvidence = await page.evaluate(() => ({
+      view: document.body.dataset.view,
+      passage: document.querySelector('.listen-row[data-passage]')?.dataset.passage,
+      title: document.querySelector('.view-title')?.textContent,
+      sheet: Boolean(document.getElementById('sheet')),
+      readerInert: Boolean(document.getElementById('reader')?.closest('[inert]')),
+      finish: (() => { const node = document.getElementById('read-fin'); return node ? {
+        disabled: node.disabled, finished: node.classList.contains('finished'), text: node.textContent,
+        rect: node.getBoundingClientRect().toJSON(),
+      } : null; })(),
+      storeAlert: document.getElementById('store-alert')?.textContent,
+      scrollY: window.scrollY,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+      events: window.__nativeTouchTrace ?? [],
+    })).catch((captureError) => ({ captureError: captureError.message }));
+    const record = await readAppRecord(page).catch(() => null);
+    failureEvidence.persisted = record ? { done: record.readDone?.[activeArticleId] ?? null,
+      position: record.readerPos?.[activeArticleId] ?? null } : null;
+    await page.screenshot({ path: join(shotsDir, 'failure.png') }).catch(() => {});
+  }
   check('browser harness', false, error.stack || String(error), activeArticleId);
   console.error(error);
 } finally {
@@ -1081,6 +1155,8 @@ writeFileSync(
       touchEmulation: true,
       browser: browserVersion,
       completed: journeyCompleted,
+      failureEvidence,
+      touchAttempts,
       pass: journeyCompleted && failures.length === 0,
       completedAt: new Date().toISOString(),
       artifact: {

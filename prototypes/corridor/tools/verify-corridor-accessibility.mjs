@@ -75,19 +75,38 @@ function startServer() {
 const APP_HOLD_MS = 430;
 const tapAttempts = [];
 
-async function touchAt(page, selector, index = 0, holdMs = 0) {
+async function tapGeometry(page, selector, index = 0) {
+  return page.locator(selector).nth(index).evaluate((node) => {
+    const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
+    const x = rect.x + rect.width / 2;
+    const y = rect.y + Math.min(rect.height / 2, 12);
+    const hit = document.elementFromPoint(x, y);
+    return {
+      x, y, reachesTarget: hit === node || node.contains(hit),
+      hit: hit ? { tag: hit.tagName, id: hit.id, tokenIndex: hit.closest('.tok')?.dataset.index } : null,
+      scrollY: window.scrollY,
+      offsetLeft: window.visualViewport?.offsetLeft ?? 0,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+    };
+  });
+}
+
+async function touchAt(page, selector, index = 0, holdMs = 0, scroll = true) {
   for (let attempt = 1; ; attempt += 1) {
     const target = page.locator(selector).nth(index);
-    await target.scrollIntoViewIfNeeded();
-    const box = await target.evaluate((node) => {
-      const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
-      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-    });
-    const [clicks, ups] = await page.evaluate(() => [window.__a11yClicks ?? 0, window.__a11yPointerUps ?? 0]);
+    if (scroll) await target.scrollIntoViewIfNeeded();
+    const geometry = await tapGeometry(page, selector, index);
+    if (!geometry.reachesTarget) {
+      tapAttempts.push({ selector, index, attempt, geometry, obstructed: true });
+      check('a pointer touch reaches its intended control', false, JSON.stringify(tapAttempts.at(-1)));
+      return;
+    }
+    await target.evaluate((node) => { window.__a11yIntendedTarget = node; });
+    const [clicks, ups] = await page.evaluate(() => [window.__a11yTargetClicks ?? 0, window.__a11yPointerUps ?? 0]);
     const cdp = await page.context().newCDPSession(page);
     const point = {
-      x: box.x + box.width / 2,
-      y: box.y + Math.min(box.height / 2, 12),
+      x: geometry.x - geometry.offsetLeft,
+      y: geometry.y - geometry.offsetTop,
       radiusX: 5,
       radiusY: 5,
       force: 1,
@@ -102,7 +121,7 @@ async function touchAt(page, selector, index = 0, holdMs = 0) {
     }
     await page.waitForFunction((before) => (window.__a11yPointerUps ?? 0) > before, ups, { timeout: 5000 });
     const pressed = await lastPressMs(page);
-    tapAttempts.push({ selector, index, attempt, pressedMs: pressed });
+    tapAttempts.push({ selector, index, attempt, pressedMs: pressed, geometry });
     if (pressed >= APP_HOLD_MS) {
       // A slow runner delivered the release only after the app's hold threshold: that press was a
       // hold (the quick look), not the tap under test, and it changed no reveal state. Tap again.
@@ -110,9 +129,9 @@ async function touchAt(page, selector, index = 0, holdMs = 0) {
       if (attempt < 3) continue;
       return;
     }
-    // A tap has landed when its click has been dispatched (the app activates on the click),
-    // not after a fixed sleep a slow runner can outlast.
-    await page.waitForFunction((before) => (window.__a11yClicks ?? 0) > before, clicks, { timeout: 5000 });
+    // A click elsewhere on the page is not delivery to the intended control.
+    await page.waitForFunction((before) => (window.__a11yTargetClicks ?? 0) > before, clicks, { timeout: 5000 });
+    tapAttempts.at(-1).click = await page.evaluate(() => window.__a11yLastClick);
     await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
     return;
   }
@@ -191,7 +210,13 @@ async function main() {
         window.__a11yLastPressMs = Date.now() - downAt;
         window.__a11yPointerUps = (window.__a11yPointerUps ?? 0) + 1;
       }, true);
-      addEventListener('click', () => { window.__a11yClicks = (window.__a11yClicks ?? 0) + 1; }, true);
+      addEventListener('click', (event) => {
+        const intended = window.__a11yIntendedTarget;
+        const reachesTarget = Boolean(intended && (event.target === intended || intended.contains(event.target)));
+        if (reachesTarget) window.__a11yTargetClicks = (window.__a11yTargetClicks ?? 0) + 1;
+        window.__a11yLastClick = { reachesTarget, tag: event.target.tagName, id: event.target.id,
+          tokenIndex: event.target.closest('.tok')?.dataset.index };
+      }, true);
     });
     const page = await context.newPage();
     page.on('console', (message) => {
@@ -392,17 +417,25 @@ async function main() {
     await setRevealOnTouch(page);
     const tokenIndex = 2;
     await touchAt(page, '#reader .tok.content', tokenIndex);
+    await page.locator('.reader-actions').evaluate(async (node) => {
+      await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
+    });
+    const firstReach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+    check('the newly selected word stays reachable after sentence actions open, without harness scrolling',
+      firstReach.reachesTarget, JSON.stringify(firstReach));
     const afterFirst = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
       lit: node.classList.contains('lit'),
       gloss: Boolean(node.querySelector('.tok-en')),
     }));
     const beforeGlossBottom = await glyphBottom(page, tokenIndex);
-    await touchAt(page, '#reader .tok.content', tokenIndex);
+    const beforeGlossScroll = await page.evaluate(() => window.scrollY);
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
     const afterSecond = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
       lit: node.classList.contains('lit'),
       gloss: Boolean(node.querySelector('.tok-en')),
     }));
     const afterGlossBottom = await glyphBottom(page, tokenIndex);
+    const afterGlossScroll = await page.evaluate(() => window.scrollY);
     check(
       'pointer action one reveals reading and action two reveals English',
       afterFirst.lit && !afterFirst.gloss && afterSecond.gloss,
@@ -410,10 +443,10 @@ async function main() {
     );
     check(
       'second-action English preserves the glyph anchor within 2px',
-      Math.abs(afterGlossBottom - beforeGlossBottom) < 2,
-      `${beforeGlossBottom.toFixed(1)}px → ${afterGlossBottom.toFixed(1)}px`,
+      afterSecond.gloss && Math.abs(afterGlossBottom - beforeGlossBottom) < 2 && afterGlossScroll === beforeGlossScroll,
+      `${beforeGlossBottom.toFixed(1)}px → ${afterGlossBottom.toFixed(1)}px; scroll ${beforeGlossScroll} → ${afterGlossScroll}`,
     );
-    await touchAt(page, '#reader .tok.content', tokenIndex);
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
     // the circle grammar (2026-08-12): the third activation folds the word
     // back to plain kanji — the full entry lives on the holds and the
     // focus-alternatives door, both covered elsewhere in this suite
@@ -438,6 +471,28 @@ async function main() {
     );
     if (pointerThird) await page.keyboard.press('Escape');
 
+    for (const scenario of [{ width: 320, settingsOpen: true }, { width: 390, settingsOpen: false }]) {
+      await page.setViewportSize({ width: scenario.width, height: VIEWPORT.height });
+      await openReader(page, base);
+      await setRevealOnTouch(page);
+      if (!scenario.settingsOpen) await page.locator('#dials-toggle').click();
+      const before = await page.evaluate(() => window.scrollY);
+      await touchAt(page, '#reader .tok.content', tokenIndex);
+      await page.locator('.reader-actions').evaluate(async (node) => {
+        await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
+      });
+      const reach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+      check(`${scenario.width}px settings-${scenario.settingsOpen ? 'open' : 'closed'} selection stays reachable`,
+        reach.reachesTarget && (scenario.settingsOpen || reach.scrollY === before), JSON.stringify({ before, reach }));
+      const anchor = await glyphBottom(page, tokenIndex);
+      await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+      const gloss = await page.locator('#reader .tok.content').nth(tokenIndex).locator('.tok-en').count();
+      const after = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+      check(`${scenario.width}px second reveal keeps its anchor and remains reachable`,
+        gloss > 0 && after.reachesTarget && after.scrollY === reach.scrollY &&
+          Math.abs(await glyphBottom(page, tokenIndex) - anchor) < 2, JSON.stringify({ gloss, reach, after }));
+    }
+    await page.setViewportSize(VIEWPORT);
     await openReader(page, base);
     await setRevealOnTouch(page);
     const keyboardWord = page.locator('#reader .tok.content').nth(tokenIndex);
