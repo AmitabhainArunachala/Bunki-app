@@ -665,7 +665,7 @@ body .btn-secondary, body .chip.btn-secondary {
 }
 body .btn-secondary:hover:not(:disabled) { background: var(--ai-wash); border-color: var(--ai); }
 body .btn-tertiary, body .chip.btn-tertiary {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 var(--s1);
   color: var(--ai);
   background: transparent;
@@ -680,8 +680,8 @@ body .btn-tertiary, body .chip.btn-tertiary {
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid transparent;
   border-radius: 999px;
@@ -832,7 +832,8 @@ html[data-room='shelf'] .search-field {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 40px;
+  /* The native select fills the inside of this 1px border: 44px to tap. */
+  min-height: 46px;
   padding: 0 10px 0 14px;
   border: 1px solid var(--raised-edge-strong);
   border-radius: 999px;
@@ -879,7 +880,7 @@ html[data-room='shelf'] .search-field {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 40px;
+  min-height: 46px;
   padding: 0 12px;
   border: 1px solid var(--raised-edge-strong);
   border-radius: 999px;
@@ -892,7 +893,7 @@ html[data-room='shelf'] .search-field {
 .shelf-controls .filter-search input {
   width: 72px;
   min-width: 0;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -903,7 +904,7 @@ html[data-room='shelf'] .search-field {
 }
 .shelf-controls .filter-search input:focus, .shelf-controls .filter-search input:not(:placeholder-shown) { width: 200px; }
 .shelf-filter-help { position: relative; margin: 0; border: 0; }
-.shelf-filter-help > summary { min-height: 40px; padding: 0; color: var(--text-2); }
+.shelf-filter-help > summary { min-height: 44px; padding: 0; color: var(--text-2); }
 .shelf-filter-help[open] > p {
   position: absolute;
   z-index: 40;
@@ -1219,7 +1220,7 @@ body[data-view='reader'] #app > main > .view-title-en {
   flex-direction: row;
   align-items: baseline;
   gap: 6px;
-  min-height: 36px;
+  min-height: 44px;
   padding: 4px 16px;
   border: 0;
   border-radius: 999px;
@@ -1251,8 +1252,10 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
 .play-toggle {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -1279,7 +1282,8 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
 .play-voice { font: 600 12px/1 var(--sans); letter-spacing: 0.04em; color: var(--text-2); }
 .play-rate {
   min-width: 52px;
-  height: 32px;
+  height: 44px;
+  flex-shrink: 0;
   border: 1px solid var(--raised-edge-strong);
   border-radius: 999px;
   background: transparent;
@@ -1585,7 +1589,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
     left: 0;
     right: 0;
     bottom: 0;
-    height: calc(56px + env(safe-area-inset-bottom));
+    height: calc(64px + env(safe-area-inset-bottom));
     background: var(--raised);
     border-top: 1px solid var(--raised-edge);
     box-shadow: 0 -10px 24px -18px color-mix(in srgb, var(--ink) 45%, transparent);
@@ -1599,8 +1603,9 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
     max-width: none;
     min-height: 40px;
     margin: 0;
+    padding: 4px;
   }
-  body[data-view='reader'] .listen-row.play-bar.is-pending { bottom: env(safe-area-inset-bottom); height: 56px; align-items: center; }
+  body[data-view='reader'] .listen-row.play-bar.is-pending { bottom: env(safe-area-inset-bottom); height: 64px; align-items: center; }
   body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
   /* a bottom sheet owns the foot: the bug steps up to the top corner */
   body:has(#sheet):not(:has(#stroke-page)) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
@@ -1608,7 +1613,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .teacher-door.reader-actions, .reader-tip {
     left: var(--s1);
     width: calc(100vw - 2 * var(--s1));
-    bottom: calc(64px + env(safe-area-inset-bottom));
+    bottom: calc(72px + env(safe-area-inset-bottom));
     transform: none;
     animation-name: float-in-phone;
   }
@@ -1653,8 +1658,8 @@ body #mini .mini-gloss.mini-miss { color: var(--text-2); }
 body #mini .mini-take {
   top: 14px;
   right: 14px;
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0;
   border: 1.5px solid var(--accent);
   border-radius: 6px;
@@ -1866,7 +1871,7 @@ body .sheet .hero #kanji-shape-lookup { max-width: 100%; white-space: normal; te
 body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
   flex-direction: row;
   gap: 6px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 4px 14px;
   border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
   border-radius: 8px;
@@ -1979,7 +1984,7 @@ body, body.v-contrast-wcag {
   display: inline-flex;
   align-items: center;
   gap: var(--s1);
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 var(--s2) 0 12px;
   border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
   border-radius: 999px;
@@ -2202,7 +2207,7 @@ html[data-room='jlpt'] .exam-form button.take {
 }
 html[data-room='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
 html[data-room='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
-html[data-room='jlpt'] .exam-form .exam-sources > summary { min-height: 36px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
+html[data-room='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
 html[data-room='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
 html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
   min-height: 56px;
@@ -2398,7 +2403,7 @@ html[data-room='attempt'] .exam-paper .exam-option-number:is([aria-checked='true
 }
 html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
 html[data-room='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
-html[data-room='attempt'] #exam-flag { min-height: 40px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
+html[data-room='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
 html[data-room='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
 html[data-room='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
 html[data-room='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
@@ -2461,7 +2466,7 @@ body .token-actions button {
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 12px;
   border-radius: 8px;
   color: var(--ai);
@@ -2481,7 +2486,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
 #app .list-head .list-open { white-space: nowrap; }
 #app .list-head > .en-inline { flex: 1 1 auto; min-width: 0; }
 #app .list-head .list-review {
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 14px;
   border-radius: 999px;
   font: 600 13px/1 var(--sans);
