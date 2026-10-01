@@ -30,6 +30,12 @@
  *                         against the total, and its ⓘ opens the longer explanation; the 永 seal stays
  *                         ≤ 48 px inside the title. Control: 7ef0e985, whose phone dateline broke the
  *                         count onto a second line and whose note ran to three lines.
+ *   O1 no clipped row   — (glance pass) at 320, 390 and 1368 the shelf as served, and with its tools
+ *                         panel open, never runs past the screen's side: no element of the shelf
+ *                         crosses the viewport's left or right edge, no row scrolls sideways, the page
+ *                         itself does not, and the look-up field's hint fits inside the field.
+ *                         Control: 7ef0e985, whose phone chip bar and today's six scrolled sideways
+ *                         with a chip and a card cut mid-word at the edge.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -69,6 +75,7 @@ const ARTICLE = 'global-voices:2026-09-28-65726'; // 「ダマスカス 郊外 �
 const NARRATED = 'aozora:000628';
 const THREE_PARAS = 'real-hojoki'; // 方丈記 · 冒頭: three paragraphs // ごん狐: the pre-pass build carried F1 narration for it
 const DESK = { width: 1368, height: 900 }, PHONE = { width: 390, height: 844 };
+const NARROW = { width: 320, height: 700 };
 const GAP_MAX = 1.5; // px between one token's last glyph and the next token's first
 const DIAGNOSTIC = /signals disagree|不一致|awaiting John/iu;
 
@@ -431,6 +438,45 @@ try {
       });
     }
 
+    /** Everything on the shelf that crosses the screen's side, scrolls sideways, or is cut. */
+    const clippedRows = () => {
+      const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden';
+      const label = (n) => `${n.tagName.toLowerCase()}${n.id ? `#${n.id}` : ''}.${[...n.classList].slice(0, 2).join('.')}`;
+      const crossing = [...document.querySelectorAll('#shelf-body *')].filter((n) => {
+        if (!shown(n) || n.closest('.is-quiet')) return false;
+        const r = n.getBoundingClientRect();
+        return r.width > 0 && (r.left < -0.5 || r.right > innerWidth + 0.5);
+      }).map((n) => `${label(n)} ${Math.round(n.getBoundingClientRect().left)}→${Math.round(n.getBoundingClientRect().right)}`);
+      const sideways = [...document.querySelectorAll('#shelf-body, #shelf-body *')].filter((n) => shown(n) &&
+        ['auto', 'scroll'].includes(getComputedStyle(n).overflowX) && n.scrollWidth > n.clientWidth + 1).map(label);
+      const field = document.querySelector('#search');
+      let hint = null;
+      if (field) {
+        const style = getComputedStyle(field);
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        const room = field.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        hint = { text: field.placeholder, width: Math.ceil(ctx.measureText(field.placeholder).width), room: Math.floor(room) };
+      }
+      return { crossing: crossing.slice(0, 4), crossingCount: crossing.length, sideways, pageScroll: document.documentElement.scrollWidth > innerWidth + 1, hint };
+    };
+    for (const [label, viewport] of [['320', NARROW], ['390', PHONE], ['1368', DESK]]) {
+      await run(`O1-no-clipped-row-${label}`, viewport, async (page) => {
+        await open(page);
+        const served = await page.evaluate(clippedRows);
+        const toggle = page.locator('#shelf-tools-toggle');
+        if (await toggle.count()) await toggle.click();
+        const tools = await page.evaluate(clippedRows);
+        for (const [state, probe] of [['as served', served], ['tools open', tools]]) {
+          assert.equal(probe.crossingCount, 0, `${state}: ${probe.crossingCount} shelf elements cross the screen's side: ${probe.crossing.join(' | ')}`);
+          assert.equal(probe.sideways.length, 0, `${state}: rows that scroll sideways: ${probe.sideways.join(', ')}`);
+          assert(!probe.pageScroll, `${state}: the page scrolls sideways`);
+          assert(probe.hint && probe.hint.width <= probe.hint.room, `${state}: the look-up hint is cut: ${JSON.stringify(probe.hint)}`);
+        }
+        return { hint: served.hint.text, toolsOpened: await toggle.count() > 0 };
+      });
+    }
+
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);
       await openShelfTools(page);
@@ -516,9 +562,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368',
     results,
-    passed: results.length === engines.length * 18 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 21 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

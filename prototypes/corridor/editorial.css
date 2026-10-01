@@ -1557,6 +1557,9 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
 }
 @media (max-width: 360px) {
   .shelf-tools-toggle > .ui-icon:first-child { display: none; }
+  /* on the narrowest phones each of today's six takes the whole width (this block precedes the
+     520px one, so it carries one more selector to win) */
+  body #shelf-today.shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
   :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
@@ -1571,18 +1574,15 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .shelf-review-note { font-size: 12px; }
   .shelf-masthead { align-items: flex-start; }
   .shelf-masthead .shelf-art { width: 36px; height: 36px; }
-  .shelf-controls.shelf-chipbar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    margin: 0 calc(-1 * var(--s2)) var(--s2);
-    padding: 2px var(--s2) 4px;
-    scrollbar-width: none;
-  }
-  .shelf-controls.shelf-chipbar::-webkit-scrollbar { display: none; }
-  .shelf-controls .filter-chip { flex: 0 0 auto; padding: 0 8px 0 12px; }
-  /* the chip bar scrolls sideways on a phone, so each chip keeps its English gloss */
-  .shelf-controls .filter-search { flex: 0 0 auto; }
-  .shelf-controls .shelf-results-count { flex: 0 0 auto; margin-left: var(--s1); }
+  /* the chip bar wraps on a phone (glance pass 2026-10-01): every chip keeps its English gloss
+     and nothing runs off the right edge. Chips share each row's width, so the rows end flush. */
+  .shelf-controls.shelf-chipbar { flex-wrap: wrap; margin: 0 0 var(--s2); padding: 0; }
+  .shelf-controls .filter-chip { flex: 1 0 auto; justify-content: space-between; padding: 0 8px 0 12px; }
+  .shelf-controls .filter-search { flex: 1 0 auto; }
+  .shelf-controls .filter-search input, .shelf-controls .filter-search input:focus,
+  .shelf-controls .filter-search input:not(:placeholder-shown) { flex: 1 1 auto; width: 56px; }
+  .shelf-controls .shelf-filter-help { flex: 0 0 auto; }
+  .shelf-controls .shelf-results-count { flex: 1 0 100%; margin: 0; }
   .shelf-filter-help[open] > p { position: fixed; top: auto; bottom: var(--s2); left: var(--s2); right: var(--s2); width: auto; transform: none; }
   /* the tools button keeps its words and drops its icon on the narrowest phones */
   .shelf-mast-name { gap: 10px; }
@@ -1600,17 +1600,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .story-lead .shelf-title-en { font-size: 16px; }
   #shelf-body .story-lead .shelf-open { padding: 20px var(--s2) var(--s2); }
   #shelf-body .story-lead .story-lede { font-size: 15px; line-height: 1.75; }
-  #shelf-today.shelf-today-strip {
-    grid-auto-flow: column;
-    grid-template-columns: none;
-    grid-auto-columns: 62%;
-    overflow-x: auto;
-    margin: 0 calc(-1 * var(--s2));
-    padding: 0 var(--s2) 4px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-  #shelf-today .story-teaser { scroll-snap-align: start; }
+  /* today's six stand two to a row on a phone: no card is cut off at the edge */
+  #shelf-today.shelf-today-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s2); }
 
   :root body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
     width: 100%;

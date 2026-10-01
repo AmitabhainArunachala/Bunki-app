@@ -5192,7 +5192,9 @@ function renderShelf(main) {
   const search = el('input', 'search-field');
   search.id = 'search';
   search.type = 'search';
-  search.placeholder = tx('ことばをさがす', 'Look up a word — kanji · kana · romaji · English');
+  // a phone shows the short form: the long one was cut off mid-word at the field's edge
+  search.placeholder = tx('ことばをさがす', matchMedia('(max-width: 520px)').matches
+    ? 'Look up a word' : 'Look up a word — kanji · kana · romaji · English');
   search.autocomplete = 'off';
   search.value = S.query || '';
   const openFullDictionary = () => ensureDictionaryIndex().catch(() => {});
