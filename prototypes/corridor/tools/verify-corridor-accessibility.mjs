@@ -495,6 +495,44 @@ async function main() {
     await page.setViewportSize(VIEWPORT);
     await openReader(page, base);
     await setRevealOnTouch(page);
+    await touchAt(page, '#reader .tok.content', tokenIndex);
+    await page.locator('.reader-actions').evaluate(async (node) => {
+      await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
+    });
+    const actionsBand = await page.locator('.reader-actions').boundingBox();
+    await page.locator('.reader-actions-close').click();
+    const closedSelection = await page.locator('#reader .tok.content').nth(tokenIndex)
+      .evaluate((node) => node.classList.contains('tok-current'));
+    check('closing sentence actions retains the selected word',
+      await page.locator('.reader-actions').isHidden() && closedSelection);
+    const beforeReposition = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+    await page.mouse.wheel(0, beforeReposition.y - (actionsBand.y + 40));
+    await page.waitForTimeout(200);
+    const beforeReopen = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+    check('a closed-bar word is reachable inside the former sentence-action band',
+      beforeReopen.reachesTarget && beforeReopen.y > actionsBand.y &&
+        beforeReopen.y < actionsBand.y + actionsBand.height, JSON.stringify({ actionsBand, beforeReopen }));
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    await page.locator('.reader-actions').evaluate(async (node) => {
+      await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
+    });
+    const afterReopen = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+    const reopenedWord = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
+      gloss: Boolean(node.querySelector('.tok-en')), selected: node.classList.contains('tok-current'),
+    }));
+    check('reopening sentence actions for the same word keeps it reachable without harness scrolling',
+      afterReopen.reachesTarget && reopenedWord.gloss && reopenedWord.selected &&
+        await page.locator('.reader-actions').isVisible() && await page.locator('#sheet').count() === 0,
+      JSON.stringify({ beforeReopen, afterReopen, reopenedWord }));
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    const reopenedThird = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
+      lit: node.classList.contains('lit'), gloss: Boolean(node.querySelector('.tok-en')),
+    }));
+    check('a third tap after reopening sentence actions closes the reveal circle',
+      !reopenedThird.lit && !reopenedThird.gloss, JSON.stringify(reopenedThird));
+
+    await openReader(page, base);
+    await setRevealOnTouch(page);
     const keyboardWord = page.locator('#reader .tok.content').nth(tokenIndex);
     await keyboardWord.focus();
     const keyboardFocusable = await page.evaluate(

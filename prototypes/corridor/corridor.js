@@ -8095,7 +8095,7 @@ function paintTok(span, token, index) {
 
 /** Opening sentence actions must not cover the word whose reveal just began.
  * Measure after the seal and token have changed, and move only an obstructed
- * selection. Repeated reveals of the same word keep their glyph anchor. */
+ * selection. Repeated reveals while the bar stays open keep their glyph anchor. */
 function keepReaderTokenClear(span, index, passageId) {
   const selected = readerTakeCurrent();
   if (!span.isConnected || selected?.p !== passageId || selected.index !== index || S.stack.length) return;
@@ -8157,6 +8157,7 @@ function wireTokenGestures(span, token, index, p) {
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
     const previous = readerTakeCurrent();
     const selectionChanged = previous?.p !== p.id || previous?.index !== index;
+    const actionsWereHidden = document.querySelector('.reader-actions')?.hidden === true;
     setReaderTake(token.b, index, p.id);
     (S.revealed ||= new Set());
     (S.glossed ||= new Set());
@@ -8176,7 +8177,7 @@ function wireTokenGestures(span, token, index, p) {
       S.glossed.delete(index);
     }
     paintTok(span, token, index);
-    if (selectionChanged) keepReaderTokenClear(span, index, p.id);
+    if (selectionChanged || actionsWereHidden) keepReaderTokenClear(span, index, p.id);
   };
   const clear = () => {
     clearTimeout(miniTimer);
