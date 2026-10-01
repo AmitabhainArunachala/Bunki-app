@@ -92,7 +92,7 @@ function defineRows() {
     'dictionaryRowsForForm', 'readerReadingFits', 'readerSummaryFor', 'readerQuickRecord', 'readerGlossMissText', 'readerCaptureReasonText',
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
-    'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureHeldText', 'showMini',
+    'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
     // the seal opens the list chooser (09b5e2a7); its 覚えるのをやめる door is the mini's remove route
     'openVocabularyListChooser',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
