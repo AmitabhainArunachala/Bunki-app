@@ -1502,8 +1502,10 @@ body .article-about .note .inline-link:hover { color: var(--ai); text-decoration
 .article-about .details-toggle { min-height: 44px; margin: var(--s1) 0 0; padding: 0; font: 600 13px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--ai); }
 
 /* a fixed bar never hides the page's last lines */
-body[data-view='reader']:has(.reader-actions:not([hidden])) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-:root body[data-view='reader']:has(.reader-actions:not([hidden])):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
+/* the room the sentence bar needs at the page's foot is reserved from the first visit's tip on, so
+   the page does not grow under the reader when the first word is chosen (the tip itself is inline) */
+body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+:root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
 body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pending {
   display: flex;
   max-width: none;
@@ -1665,7 +1667,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: 14px; }
   .reader-actions-close { grid-column: 2; grid-row: 1; }
   .reader-tip { margin-bottom: var(--s2); padding-left: 12px; }
-  :root body[data-view='reader']:has(.reader-actions:not([hidden])):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
+  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
   .article-about { padding: var(--s2); }
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
