@@ -17076,9 +17076,40 @@ function wordNodeIdentity(node, record = S) {
   return rec ? { kind: 'text', reading: rec.r || '', gloss: nonBlankMeanings(rec.m)[0] ?? null } : { kind: 'unknown' };
 }
 
+/** A reading set aside from its script, for comparing one reading with another: katakana as
+ * hiragana, and a long-vowel ー as the vowel it lengthens (ダマスカス and だますかす, コーヒー and
+ * こおひい, read alike). Nothing else is folded: せい is never なま, and ウ is never ヴ. */
+const KANA_VOWEL_ROWS = [['あ', 'あかがさざただなはばぱまやらわぁゃゎ'], ['い', 'いきぎしじちぢにひびぴみりぃ'],
+  ['う', 'うくぐすずつづぬふぶぷむゆるぅゅゔ'], ['え', 'えけげせぜてでねへべぺめれぇ'], ['お', 'おこごそぞとどのほぼぽもよろをぉょ']];
+function kanaReadingKey(reading) {
+  let out = '';
+  for (const ch of kataToHira(String(reading || ''))) {
+    const vowel = ch === 'ー' && out ? KANA_VOWEL_ROWS.find(([, row]) => row.includes(out.at(-1)))?.[0] : null;
+    out += vowel || ch;
+  }
+  return out;
+}
+
+/** Which of an entry's kana forms (index-row cell 5) a word's reading names: the form itself when
+ * the entry lists it, byte for byte; otherwise the ONE form that reads alike once script is set
+ * aside (kanaReadingKey). The article's reader spells every reading in hiragana, so ダマスカス
+ * arrives read だますかす beside an entry whose forms are all katakana (glance pass 2026-10-01). An
+ * exact form is never passed over for an alike one, so ウブ written 産 still refuses rather than
+ * borrowing うぶ's restriction; two alike forms and no exact one is ambiguous and refuses; and a
+ * genuinely different reading (生 read せい against なま) matches nothing. -1 when none. */
+function entryKanaIndex(row, reading) {
+  if (!Array.isArray(row?.[5]) || !nonEmptyString(reading)) return -1;
+  const exact = row[5].indexOf(reading);
+  if (exact >= 0) return exact;
+  const key = kanaReadingKey(reading);
+  const alike = row[5].flatMap((form, index) => (kanaReadingKey(form) === key ? [index] : []));
+  return alike.length === 1 ? alike[0] : -1;
+}
+
 /** The answer an explicit door selected, validated against that entry's own index
  * row. The rules:
- *   - The reading must be one of the entry's kana forms, byte for byte.
+ *   - The reading must name one of the entry's kana forms: that form byte for byte, or, when
+ *     the entry does not list it, the one form that reads alike across scripts (entryKanaIndex).
  *   - Both the card's spelling and the head shown must be printable with THAT
  *     reading, by its own restriction (readerReadingFits). Normalised kana never
  *     lends one reading's restriction to another: 産 is read うぶ, never ウブ.
@@ -17094,7 +17125,7 @@ function explicitWordSnapshot(node, record = S) {
   const head = nonEmptyString(node.matchedHead) ? node.matchedHead : node.id;
   const row = dictionaryRowBySeq(seq);
   const indexed = Array.isArray(row) && String(row[0]) === seq ? row : null;
-  const kana = indexed ? indexed[5].indexOf(node.reading) : -1;
+  const kana = indexed ? entryKanaIndex(indexed, node.reading) : -1;
   if (indexed && !(kana >= 0 && readerReadingFits(indexed, kana, node.id) && readerReadingFits(indexed, kana, head))) {
     return null;
   }
@@ -18397,15 +18428,14 @@ function wordCaptureState(node, record = S) {
 }
 
 /** Why an explicit entry's answer is unavailable, in the learner's terms, when its dictionary row
- * is at hand: the reading this word carries here is not one of the entry's own kana forms
- * (explicitWordSnapshot's rule, unchanged). The article's reader spells every reading in hiragana,
- * so a katakana word such as ダマスカス, read だますかす there, meets an entry whose forms are all
- * katakana. Returns both readings to name, or null when the row is not at hand or the reading is
+ * is at hand: the reading this word carries here names none of the entry's own kana forms, even
+ * across scripts (entryKanaIndex) — a genuinely different reading, such as 生 read せい at an entry
+ * read なま. Returns both readings to name, or null when the row is not at hand or the reading names
  * one of its forms (the answer is then held for another reason, said in the older words). */
 function wordCaptureReadingMismatch(node) {
   if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return null;
   const row = dictionaryRowBySeq(node.seq);
-  if (!Array.isArray(row) || String(row[0]) !== String(node.seq) || !Array.isArray(row[5]) || row[5].includes(node.reading)) return null;
+  if (!Array.isArray(row) || String(row[0]) !== String(node.seq) || !Array.isArray(row[5]) || entryKanaIndex(row, node.reading) >= 0) return null;
   return { here: node.reading, dictionary: row[5][0] || row[1] };
 }
 

@@ -93,6 +93,8 @@ function defineRows() {
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
+    // glance pass 2026-10-01: the reading names an entry's kana form across scripts
+    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex',
     // the seal opens the list chooser (09b5e2a7); its 覚えるのをやめる door is the mini's remove route
     'openVocabularyListChooser',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
@@ -1586,5 +1588,48 @@ function defineRows() {
       const { main } = render(core);
       assert.equal(all(main, (node) => String(node.className || '').includes('enroll-held-open')).length, 0, `self-enrolled 上手: no route · ${screen}`);
     }
+  });
+  // glance pass 2026-10-01 (design lead, approved engine change): the article's reader spells every reading in hiragana, so a
+  // katakana word reached ダマスカス 2834901 read だますかす and 覚 refused it ("the article reads it だますかす, the dictionary
+  // ダマスカス"). A reading now names the entry's kana form across scripts and ー; a genuinely different reading is still held.
+  const DAMASCUS = { t: 'word', id: 'ダマスカス', seq: '2834901', reading: 'だますかす' };
+  const NAMA = { t: 'word', id: '生', seq: '1378450', reading: 'せい' };
+  /** The shared lookup door's own mini (openJapaneseLookup → showMini): the token carries the article's reading. */
+  const lookupMini = (ctx, node, record) => {
+    const span = new FakeElement('span', 'japanese-lookup-word');
+    const mini = ctx.showMini(span, { s: node.id, b: node.id, r: node.reading, c: true, seq: node.seq }, () => {}, { record });
+    return { mini, seal: find(mini, (n) => n.id === 'mini-take'), reason: find(mini, (n) => n.id === 'mini-take-reason') };
+  };
+  row('K1.setup', 'ダマスカス 2834901 lists only katakana forms, kana-only; ケーキ 1047860 is ケーキ; 生 1378450 is read なま only', () => {
+    assert.deepEqual([rowOf.get('2834901')[1], rowOf.get('2834901')[5], rowOf.get('2834901')[11], rowOf.get('2834901')[6][0]],
+      ['ダマスカス', ['ダマスカス', 'ダマスクス'], [1, 1], 'Damascus (Syria)']);
+    assert.deepEqual([rowOf.get('1047860')[1], rowOf.get('1047860')[5]], ['ケーキ', ['ケーキ']]);
+    assert.deepEqual([rowOf.get('1378450')[1], rowOf.get('1378450')[5], rowOf.get('1378450')[6][0]], ['生', ['なま'], 'raw']);
+    fixtures.set('K1', true);
+  });
+  row('K1', 'a reading names its entry across scripts and ー: ダマスカス read だますかす saves; 生 read せい (the entry reads なま) is still held, in plain words', async () => {
+    need('K1');
+    const ctx = app({ mode: 'main' });
+    assert.equal(ctx.kanaReadingKey('ダマスカス'), ctx.kanaReadingKey('だますかす'));
+    assert.equal(ctx.kanaReadingKey('ケーキ'), ctx.kanaReadingKey('けえき'));
+    assert.notEqual(ctx.kanaReadingKey('せい'), ctx.kanaReadingKey('なま'));
+    // (a) savable: the state, the capture and the popup's seal
+    assert.equal(ctx.wordCaptureState(DAMASCUS, blank()), 'take');
+    const patch = ctx.captureStorePatch(blank(), DAMASCUS, 'ダマスカス', 1000);
+    assert.deepEqual([patch.taken[0].entrySeq, patch.taken[0].cueReading, patch.deepWords['ダマスカス'].m[0]], ['2834901', 'だますかす', 'Damascus (Syria)']);
+    assert.equal(ctx.wordCaptureState(DAMASCUS, { ...blank(), ...patch }), 'taken', 'the saved card is this door’s own');
+    for (const reading of ['けえき', 'けーき']) {
+      assert.equal(ctx.wordCaptureState({ t: 'word', id: 'ケーキ', seq: '1047860', reading }, blank()), 'take', `ケーキ read ${reading}`);
+    }
+    const open = lookupMini(ctx, DAMASCUS, { seq: '2834901', head: 'ダマスカス', r: 'ダマスカス', m: ['Damascus (Syria)'] });
+    assert.deepEqual([open.seal?.disabled ?? null, open.reason ?? null], [false, null], 'the popup’s 覚 is live, with no held reason');
+    // (b) a genuinely different reading stays held, said plainly
+    assert.equal(ctx.wordCaptureState(NAMA, blank()), 'unavailable');
+    assert.throws(() => ctx.captureStorePatch(blank(), NAMA, '生', 1000), (error) => error.code === 'word-answer-unavailable');
+    const plain = ['この語は保存できない。記事の読み「せい」が辞書の読み「なま」と一致しないため。',
+      'Can’t save this word: the article reads it せい, the dictionary なま.'];
+    for (const [lang, at] of LANGS) assert.equal(app({ mode: 'main', lang }).wordCaptureHeldText(NAMA), plain[at], `held line · ${lang}`);
+    const held = lookupMini(ctx, NAMA, { seq: '1378450', head: '生', r: 'なま', m: ['raw'] });
+    assert.deepEqual([held.seal?.disabled, held.reason?.textContent], [true, plain[1]], 'the popup holds 覚 and says why');
   });
 }
