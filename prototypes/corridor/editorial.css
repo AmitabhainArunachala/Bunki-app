@@ -63,6 +63,8 @@ body:not(.zen) #app > .chrome .crumb {
 }
 body:not(.zen) #app > .chrome .crumb b { color: inherit; }
 body:not(.zen) #app > .chrome > button {
+  min-width: 44px;
+  flex-shrink: 0;
   padding-inline: 8px;
   font-size: 17px;
   transition: background-color 120ms ease-out;
@@ -76,7 +78,7 @@ body:not(.zen) #app > .chrome .lang-seg {
   border-radius: 3px;
   padding: 2px;
 }
-body:not(.zen) #app > .chrome .lang-seg button { min-height: 36px; padding: 4px 11px; border-radius: 1px; font-size: 12px; }
+body:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; min-height: 44px; padding: 4px 11px; border-radius: 1px; font-size: 12px; white-space: nowrap; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--ed-mast); background: var(--ed-mast-ink); }
 body:not(.zen) #app > .chrome :focus-visible { outline-color: var(--ed-mast-ink); }
 
@@ -110,6 +112,7 @@ body.v-depth-layered main > .eyebrow { padding-top: 0; }
 .note { font-size: 14px; line-height: 1.75; border-left-width: 1px; }
 .gesture-hint { font-size: 13px; line-height: 1.65; color: var(--ed-muted); }
 .pool-tag { font-size: 11px; line-height: 1.7; letter-spacing: 0.01em; color: var(--ed-muted); }
+body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
 .level-chip { font-size: 12px; letter-spacing: 0.025em; border-radius: 2px; padding: 4px 9px; }
 .level-note { font-size: 13px; line-height: 1.6; }
 .details-toggle { font-size: 13px; letter-spacing: 0.015em; }
@@ -946,7 +949,7 @@ html[data-room='shelf'] .search-field {
   align-items: baseline;
   gap: 5px;
   min-width: 0;
-  min-height: 36px;
+  min-height: 44px;
   margin: 0;
   padding: 0 9px;
   border: 0;
@@ -1475,13 +1478,13 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   body:not([data-view='drift']) #bunki-reports-root .br-rail {
     right: var(--s1);
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
-  body:not([data-view='drift']) #bunki-reports-root .br-rail .br-bug { width: 40px; height: 40px; padding: 8px; }
+  body:not([data-view='drift']) #bunki-reports-root .br-rail .br-bug { width: 44px; height: 44px; padding: 8px; }
   body:not([data-view='drift']) #bunki-reports-root .br-bug svg { width: 22px; height: 22px; }
-  /* the page's last line scrolls clear of the bug: its 12px inset + 40px + a 16px breath */
-  body:not([data-view='drift']) .report-line-page { margin-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  /* the page's last line scrolls clear of the bug: its 12px inset + 44px + a 16px breath */
+  body:not([data-view='drift']) .report-line-page { margin-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* the magazine and the page, narrowed */
