@@ -299,11 +299,46 @@ async function walkToSemPanel(page, tapFn) {
   return page.locator('#sheet .sem-row').count();
 }
 
+function hasApprovedPhoneHierarchy(probe) {
+  const reader = probe.text.find(t => t.label === 'reading body (focused)');
+  return reader?.fontSize === 19 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
+}
+
+function articleSummaries(probe) {
+  return probe.filter(m => ['article English title', 'article teaser'].includes(m.label));
+}
+
+function summariesMeetAA(rows) {
+  return rows.length === 2 && rows.every(m => m.contrast >= WCAG_AA);
+}
+
+async function measureChromeTargets(page) {
+  return page.evaluate(() => {
+    const rows = [...document.querySelectorAll('.chrome button')].filter(n => {
+      const r = n.getBoundingClientRect();
+      return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
+    }).map(n => {
+      const r = n.getBoundingClientRect();
+      const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return { id: n.id || n.textContent.trim(), x: r.x, y: r.y, width: r.width, height: r.height,
+        reachable: !!hit && (hit === n || n.contains(hit)), right: r.right, bottom: r.bottom };
+    });
+    const overlaps = [];
+    for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) {
+      const a = rows[i], b = rows[j];
+      if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
+          Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
+    }
+    return { width: innerWidth, rows, overlaps, valid: rows.length >= 7 && !overlaps.length &&
+      rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
+  });
+}
+
 /* measurement helpers evaluated in the page */
 export const MEASURE_FN = `(() => {
   const visible = (node) => {
     const r = node.getBoundingClientRect(), cs = getComputedStyle(node);
-    return r.width > 1 && r.height > 1 && cs.visibility !== 'hidden' && cs.clipPath === 'none' && node.checkVisibility();
+    return r.width > 1 && r.height > 1 && cs.visibility !== 'hidden' && node.checkVisibility();
   };
   const lum = (rgb) => {
     const [r, g, b] = rgb.map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
@@ -1365,11 +1400,17 @@ async function main() {
   // The approved editorial pass keeps readable ink even on old contrast URLs.
   // Check the actual story summaries; the former per-card snippets are gone.
   for (const mode of ['wcag', 'current']) {
-    const summaries = contrastByVariant[mode].filter((m) => ['article English title', 'article teaser'].includes(m.label));
+    const summaries = articleSummaries(contrastByVariant[mode]);
     check(`variant C · ${mode} keeps article summaries at AA`,
-      summaries.length === 2 && summaries.every((m) => m.contrast >= WCAG_AA),
+      summariesMeetAA(summaries),
       JSON.stringify(summaries));
   }
+  await open('?entry=shelf&contrast=wcag');
+  const fadedSummaries = await page.addStyleTag({ content: '.shelf-item .shelf-title-en, .shelf-item .story-lede { color: #faf6ea !important; }' });
+  const fadedProbe = articleSummaries((await page.evaluate(MEASURE_FN)).text);
+  check('variant C · faded article summaries fail the same rendered contrast check',
+    fadedProbe.length === 2 && !summariesMeetAA(fadedProbe), JSON.stringify(fadedProbe));
+  await fadedSummaries.evaluate(n => n.remove());
 
   // D · entry
   for (const mode of ['field', 'shelf']) {
@@ -1414,7 +1455,7 @@ async function main() {
     if (!mergedText.has(row.label)) mergedText.set(row.label, row);
   }
   const m = { ...panelProbe, text: [...mergedText.values()] };
-  m.targets = [...panelProbe.targets, ...shelfProbe.targets];
+  m.targets = [...panelProbe.targets, ...shelfProbe.targets, ...readerProbe.targets];
   report.measurements.text = m.text;
   report.measurements.targets = m.targets;
   report.measurements.semRowsOnProbePanel = semRows;
@@ -1425,7 +1466,7 @@ async function main() {
   const reader = m.text.find((t) => t.label.startsWith('reading body'));
   const navigationLabelSize = readerProbe.navigationLabelSize;
   check('the approved reader body is legible and larger than visible navigation labels',
-    reader && reader.fontSize >= 19 && navigationLabelSize > 0 && reader.fontSize > navigationLabelSize,
+    hasApprovedPhoneHierarchy(readerProbe),
     `reader ${reader?.fontSize}px vs visible navigation ${navigationLabelSize}px; clipped breadcrumbs are not visible text`);
 
   const note = m.text.find((t) => t.label.startsWith('discrimination note'));
@@ -1445,6 +1486,45 @@ async function main() {
     `scrollWidth ${m.docScrollWidth} vs viewport ${m.innerWidth}`);
   check('no console errors during the walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
+
+  // Phone navigation must remain usable before and after selection adds the
+  // capture door. Check actual hit testing as well as document overflow.
+  await open('?entry=shelf');
+  await tap(page, FIRST_TEXT);
+  await settleReader(page);
+  const chromeGeometry = [];
+  for (const selected of [false, true]) {
+    if (selected) {
+      await tap(page, '#reader .tok.content', 1);
+      await page.waitForFunction(() => !document.querySelector('#reader-take').disabled);
+    }
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: VIEWPORT.height });
+      await page.evaluate(() => { window.scrollTo(0, 0); });
+      await waitForFiniteMotion(page, '.chrome');
+      const geometry = await measureChromeTargets(page);
+      chromeGeometry.push({ selected, ...geometry });
+      check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable`,
+        geometry.valid, JSON.stringify(geometry));
+      await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
+    }
+  }
+  report.measurements.readerChrome = chromeGeometry;
+  const narrowControl = await page.addStyleTag({ content: '#chrome-search { min-width: 20px !important; width: 20px !important; max-width: 20px !important; clip-path: inset(0); }' });
+  const narrowProbe = await measureChromeTargets(page);
+  const narrowSweep = await page.evaluate(MEASURE_FN);
+  check('reader navigation · an undersized clipped control fails both geometry and the 44px sweep',
+    !narrowProbe.valid && narrowSweep.targets.some(t => t.id === 'chrome-search' && t.hitW < MIN_TAP));
+  await narrowControl.evaluate(n => n.remove());
+  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 18px !important; }' });
+  const smallProbe = await page.evaluate(MEASURE_FN);
+  check('reader hierarchy · a smaller reading body fails the approved 19px fixture',
+    !hasApprovedPhoneHierarchy(smallProbe));
+  await smallReading.evaluate(n => n.remove());
+  const largeNavigation = await page.addStyleTag({ content: '.chrome .l-ja { font-size: 19px !important; }' });
+  const largeProbe = await page.evaluate(MEASURE_FN);
+  check('reader hierarchy · enlarged navigation fails the approved 17px fixture', !hasApprovedPhoneHierarchy(largeProbe));
+  await largeNavigation.evaluate(n => n.remove());
 
   // the radical picker is the densest tap grid in the app, and the shelf/panel
   // sweep above never enters the kanjidex — its chips are measured by name

@@ -642,6 +642,9 @@ body:not(.zen):not([data-view='drift']) #app > .chrome {
 
 /* chrome never shows a greyed control: an unavailable one steps out of sight in its own slot */
 body:not(.zen):not([data-view='drift']) #app > .chrome > button:disabled { visibility: hidden; }
+/* The reader adds a capture door only after a word is selected. Its empty
+ * slot must not push the visible navigation onto a second row on a phone. */
+body:not(.zen) #app > .chrome > #reader-take:disabled { display: none; }
 
 /* the three button tiers */
 body .btn-primary, body .chip.btn-primary {

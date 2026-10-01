@@ -973,7 +973,7 @@ try {
     for (const mutation of ['hidden', 'wrong-chip', 'missing-reason', 'repeated-on-row']) {
       await page.evaluate(mutation => {
         const mark = document.querySelector('main > .mock-review-mark');
-        if (mutation === 'hidden') mark.hidden = true;
+        if (mutation === 'hidden') mark.style.display = 'none';
         if (mutation === 'wrong-chip') mark.querySelector('.status-chip').textContent = 'Reviewed';
         if (mutation === 'missing-reason') mark.querySelector('.exam-review-reason').textContent = '';
         if (mutation === 'repeated-on-row') {
