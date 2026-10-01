@@ -41,6 +41,28 @@ test('committed deck.json and basic.tsv match the source cards', () => {
   assert.equal(readFileSync(join(root, 'basic.tsv'), 'utf8'), basicTsv(deck));
 });
 
+test('the blank is not always in the opening sentence', () => {
+  const deck = assembleDeck(CARDS, DECK_META);
+  const indexOf = [];
+  let early = 0;
+  let mid = 0;
+  let late = 0;
+  for (const card of deck.cards) {
+    const at = card.sentences.findIndex((sentence) => sentence.includes(card.target));
+    indexOf[at] = (indexOf[at] || 0) + 1;
+    const text = card.sentences.join('');
+    const ratio = text.indexOf(card.target) / text.length;
+    if (ratio < 0.28) early += 1;
+    else if (ratio < 0.62) mid += 1;
+    else late += 1;
+  }
+  assert.ok(indexOf[0] < deck.cards.length * 0.15, `opening blanks ${indexOf[0]}`);
+  assert.ok((indexOf[2] || 0) + (indexOf[3] || 0) > deck.cards.length * 0.5);
+  assert.ok(early > 10);
+  assert.ok(mid > deck.cards.length * 0.3);
+  assert.ok(late > deck.cards.length * 0.3);
+});
+
 test('a cloze hides the target and the back still has it', () => {
   const deck = assembleDeck(CARDS, DECK_META);
   const card = deck.cards[0];

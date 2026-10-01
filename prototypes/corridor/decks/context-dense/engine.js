@@ -206,6 +206,48 @@ export function validateDeck(deck) {
   return errors;
 }
 
+function stableHash(text) {
+  let hash = 2166136261;
+  for (const char of text) hash = Math.imul(hash ^ char.codePointAt(0), 16777619);
+  return hash >>> 0;
+}
+
+/**
+ * The authored sentence always introduced the word first, so every gap sat
+ * on the opening line. Slide that sentence later. Sentences that point
+ * backward (その, この, …) stay after the word. The cut is stable per card.
+ */
+export function placeCloze(card) {
+  const sentences = [...card.sentences];
+  const targetAt = sentences.findIndex((sentence) => sentence.includes(card.target));
+  if (targetAt < 0) return { ...card, sentences };
+  const others = sentences.filter((_, index) => index !== targetAt);
+  const backward = /^(その|この|それ|これ|本人|前者|後者|同じ|そこでは|その後|それでも)/;
+  const leadable = others.filter((sentence) => !backward.test(sentence));
+  const tied = others.filter((sentence) => backward.test(sentence));
+  const weights = [];
+  for (let i = 0; i <= leadable.length; i += 1) weights.push(i === 0 ? 1 : (i + 1) * (i + 1));
+  const sum = weights.reduce((total, weight) => total + weight, 0);
+  let roll = stableHash(card.id) % sum;
+  let before = leadable.length;
+  for (let i = 0; i < weights.length; i += 1) {
+    roll -= weights[i];
+    if (roll < 0) {
+      before = i;
+      break;
+    }
+  }
+  return {
+    ...card,
+    sentences: [
+      ...leadable.slice(0, before),
+      sentences[targetAt],
+      ...leadable.slice(before),
+      ...tied,
+    ],
+  };
+}
+
 export function assembleDeck(cards, meta) {
   const deck = {
     format: DECK_FORMAT,
@@ -216,17 +258,20 @@ export function assembleDeck(cards, meta) {
     style: 'mcd-paragraph',
     newPerDay: meta.newPerDay,
     provenance: meta.provenance,
-    cards: cards.map((card) => ({
-      id: card.id,
-      target: card.target,
-      reading: card.reading,
-      readings: card.readings ? [...card.readings] : [card.reading],
-      glossJa: card.glossJa,
-      glossEn: card.glossEn,
-      sentences: [...card.sentences],
-      note: card.note ?? null,
-      seeAlso: card.seeAlso ? [...card.seeAlso] : [],
-    })),
+    cards: cards.map((card) => {
+      const placed = placeCloze(card);
+      return {
+        id: placed.id,
+        target: placed.target,
+        reading: placed.reading,
+        readings: placed.readings ? [...placed.readings] : [placed.reading],
+        glossJa: placed.glossJa,
+        glossEn: placed.glossEn,
+        sentences: [...placed.sentences],
+        note: placed.note ?? null,
+        seeAlso: placed.seeAlso ? [...placed.seeAlso] : [],
+      };
+    }),
   };
   const errors = validateDeck(deck);
   if (errors.length) {
