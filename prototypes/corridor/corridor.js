@@ -7207,15 +7207,22 @@ function storyVersions(p) {
   return easy ? { original: p, easy } : null;
 }
 
-/* The tap ladder is taught once, by a tip that floats where the sentence actions will appear
- * and goes away for good when dismissed — never permanent prose above the text. */
+/* The tap ladder is taught once, by a short note set in the page just above the article's text
+ * (glance pass 2026-10-01: a tip floating over the text covered the very words it was about). It
+ * is remembered as seen once dismissed or once a word is chosen, and does not come back. Choosing a
+ * word leaves the note where it is for the rest of that visit, so the text under the finger never
+ * jumps; the next article opens without it. */
 const READER_TIP_KEY = 'kairo-tip-reader-v1';
+let readerTipVisit = null; // the article whose visit is still showing the note
 function renderReaderTip(main) {
   let seen = !!S.readerTipSeen;
   try { seen ||= localStorage.getItem(READER_TIP_KEY) === '1'; } catch { /* the session flag stands in */ }
-  if (seen) return;
+  if (seen && readerTipVisit !== S.passageId) return;
+  readerTipVisit = S.passageId;
   const tip = el('aside', 'reader-tip');
   tip.id = 'reader-tip';
+  // the note is the app speaking about itself, not prose to look up
+  tip.dataset.japaneseLookup = 'off';
   tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
   tip.append(el('p', 'reader-tip-text', readingsAlwaysOn()
     ? tx('語に触れると英語。もう一度で元どおり。長押しで辞書。', 'Tap a word for its English; tap again to clear. Hold for the dictionary.')
@@ -7226,6 +7233,7 @@ function renderReaderTip(main) {
   close.append(uiIcon('close'));
   close.addEventListener('click', () => {
     S.readerTipSeen = true;
+    readerTipVisit = null;
     try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
     tip.remove();
   });
@@ -18642,11 +18650,11 @@ function syncReaderTakeSeal() {
   if (contextNote && selected) contextNote.textContent = readerActionsNote(selected);
   const bar = document.querySelector('.reader-actions');
   if (bar) bar.hidden = !selected;
-  // the tip has done its work once a word is chosen: it does not come back
-  if (selected && document.getElementById('reader-tip')) {
+  // the tip has done its work once a word is chosen: it does not come back, but it stays in
+  // place for this visit so the text never moves under the finger (renderReaderTip)
+  if (selected && document.getElementById('reader-tip') && !S.readerTipSeen) {
     S.readerTipSeen = true;
     try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
-    document.getElementById('reader-tip').remove();
   }
   for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
   if (selected) document.querySelector(`#reader .tok[data-index="${selected.index}"]`)?.classList.add('tok-current');
@@ -27847,7 +27855,7 @@ function render() {
   }
 
   // the interim voice belongs to the reader: leaving the room ends it
-  if (S.view !== 'reader') stopReadAloud();
+  if (S.view !== 'reader') { stopReadAloud(); readerTipVisit = null; }
 
   // A room that throws must never leave an empty page: that is how a blank
   // room reached the learner with no message (2026-09-24).
