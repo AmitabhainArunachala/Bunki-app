@@ -22,8 +22,8 @@
  *                         学習ツール Tools button in the title row: as served no tool door is visible,
  *                         and the first story follows the filter chips with no other control between.
  *                         The button opens one panel in which every door keeps its id, is visible
- *                         inside the viewport and names itself in Japanese with its English gloss (the
- *                         accessible name says both); a door in it still opens its room.
+ *                         inside the viewport and names itself in Japanese, on one line, with its English
+ *                         gloss (the accessible name says both); a door in it still opens its room.
  *                         Control: 7ef0e985, whose thirteen text doors stood in a row under the filters.
  *   M1 title block      — (glance pass) at 1368 and 390 the date and the article count stand on one
  *                         line; the 未確認 note is one short line that still counts the pending stories
@@ -392,16 +392,20 @@ try {
             panel: !!panel && panel.getClientRects().length > 0,
             tiles: doors.map((door) => {
               const r = door.getBoundingClientRect();
+              const ja = door.querySelector('.l-ja');
+              const range = document.createRange();
+              if (ja) range.selectNodeContents(ja);
+              const lines = ja ? new Set([...range.getClientRects()].filter((b) => b.width > 0).map((b) => Math.round(b.top))).size : 0;
               return { id: door.id, inPanel: !!panel?.contains(door), inView: r.width > 0 && r.left >= 0 && r.right <= innerWidth + 0.5,
-                ja: door.querySelector('.l-ja')?.textContent.trim() || '', en: door.querySelector('.en-sub')?.textContent.trim() || '',
+                ja: ja?.textContent.trim() || '', oneLine: lines === 1, en: door.querySelector('.en-sub')?.textContent.trim() || '',
                 name: door.getAttribute('aria-label') || '' };
             }),
           };
         }, TOOL_DOORS);
         assert.equal(opened.expanded, 'true', 'the button does not report the panel open');
         assert(opened.panel && opened.tiles.length >= 10, `the panel shows ${opened.tiles.length} doors`);
-        const bad = opened.tiles.filter((t) => !t.inPanel || !t.inView || !t.ja || !t.en || !t.name.startsWith(t.ja) || !t.name.includes(t.en));
-        assert.equal(bad.length, 0, `tiles not in the panel, off screen, or missing their Japanese/English names: ${JSON.stringify(bad.slice(0, 3))}`);
+        const bad = opened.tiles.filter((t) => !t.inPanel || !t.inView || !t.ja || !t.oneLine || !t.en || !t.name.startsWith(t.ja) || !t.name.includes(t.en));
+        assert.equal(bad.length, 0, `tiles not in the panel, off screen, broken over two lines, or missing their Japanese/English names: ${JSON.stringify(bad.slice(0, 3))}`);
         await page.locator('#grammar-link').click();
         await page.waitForFunction(() => document.body.dataset.view === 'grammar');
         return { doors: served.doors, tiles: opened.tiles.length, toggle: served.toggle.text };
