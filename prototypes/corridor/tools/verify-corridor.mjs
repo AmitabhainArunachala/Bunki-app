@@ -1445,6 +1445,9 @@ async function main() {
   console.log('\n— measurements');
   await open('?entry=shelf');
   const shelfProbe = await page.evaluate(MEASURE_FN);
+  // the 学習ツール tiles are controls too: measure them with their panel open (gate review on 8dea3c2e)
+  await openShelfTools(page);
+  const toolsProbe = await page.evaluate(MEASURE_FN);
   const semRows = await walkToSemPanel(page, tap);
   const panelProbe = await page.evaluate(MEASURE_FN);
   // walkToSemPanel arrives via the thesaurus since 2026-08-27, so the sheet
@@ -1459,7 +1462,10 @@ async function main() {
     if (!mergedText.has(row.label)) mergedText.set(row.label, row);
   }
   const m = { ...panelProbe, text: [...mergedText.values()] };
-  m.targets = [...panelProbe.targets, ...shelfProbe.targets, ...readerProbe.targets];
+  m.targets = [...panelProbe.targets, ...shelfProbe.targets, ...toolsProbe.targets, ...readerProbe.targets];
+  const toolTiles = toolsProbe.targets.filter((t) => /^(feed|source-inbox|levels|lessons|mock|kagami|grammar|thesaurus|yoji|kanjidex|ai|airead)-link$/u.test(String(t.id)));
+  check('the sweep measures the 学習ツール tiles with their panel open', toolTiles.length >= 10,
+    `${toolTiles.length} tool tiles measured: ${toolTiles.map((t) => `${t.id} ${t.hitW}×${t.hitH}`).join(', ')}`);
   report.measurements.text = m.text;
   report.measurements.targets = m.targets;
   report.measurements.semRowsOnProbePanel = semRows;
