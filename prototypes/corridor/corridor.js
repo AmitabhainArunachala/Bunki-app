@@ -18396,11 +18396,30 @@ function wordCaptureState(node, record = S) {
   return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
 }
 
+/** Why an explicit entry's answer is unavailable, in the learner's terms, when its dictionary row
+ * is at hand: the reading this word carries here is not one of the entry's own kana forms
+ * (explicitWordSnapshot's rule, unchanged). The article's reader spells every reading in hiragana,
+ * so a katakana word such as ダマスカス, read だますかす there, meets an entry whose forms are all
+ * katakana. Returns both readings to name, or null when the row is not at hand or the reading is
+ * one of its forms (the answer is then held for another reason, said in the older words). */
+function wordCaptureReadingMismatch(node) {
+  if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return null;
+  const row = dictionaryRowBySeq(node.seq);
+  if (!Array.isArray(row) || String(row[0]) !== String(node.seq) || !Array.isArray(row[5]) || row[5].includes(node.reading)) return null;
+  return { here: node.reading, dictionary: row[5][0] || row[1] };
+}
+
 /** The one-line reason a word control is held (D23), for surfaces without the full note. It
  * claims only what the door's and the card's identities establish (wordIdentityRelation). A
  * surface that cannot offer the card's route (route: false) says only what cannot be done here. */
 function wordCaptureHeldText(node, { route = true } = {}) {
   if (wordCaptureState(node) === 'unavailable') {
+    // glance pass 2026-10-01: a learner reads why in plain words, never "the entry's answer"
+    const mismatch = wordCaptureReadingMismatch(node);
+    if (mismatch) {
+      return tx(`この語は保存できない。記事の読み「${mismatch.here}」が辞書の読み「${mismatch.dictionary}」と一致しないため。`,
+        `Can’t save this word: the article reads it ${mismatch.here}, the dictionary ${mismatch.dictionary}.`);
+    }
     return tx('この項目の答えをまだ確かめられないため、覚えられない。', 'This entry’s answer cannot be confirmed yet, so it cannot be memorized.');
   }
   const relation = wordIdentityRelation(wordNodeIdentity(node, S), wordCardIdentity(S, node.id));
@@ -18505,8 +18524,9 @@ function renderWordCaptureNote(container, node, label = node.id) {
   note.id = 'word-capture-note';
   note.setAttribute('role', 'status');
   if (state === 'unavailable') {
-    note.append(el('p', null, tx('この項目の答えをまだ確かめられないため、ここでは覚えられない。',
-      'This entry’s answer cannot be confirmed yet, so it cannot be memorized here.')));
+    note.append(el('p', null, wordCaptureReadingMismatch(node) ? wordCaptureHeldText(node)
+      : tx('この項目の答えをまだ確かめられないため、ここでは覚えられない。',
+        'This entry’s answer cannot be confirmed yet, so it cannot be memorized here.')));
     container.append(note);
     return;
   }

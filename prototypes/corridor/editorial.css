@@ -1710,6 +1710,11 @@ body #mini .mini-take.taken { background: var(--accent); color: var(--raised); }
 body #mini .mini-take:has(.mini-take-en) { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 44px; min-height: 46px; padding: 4px 6px; }
 body #mini .mini-take-en { font: 700 10px/1 var(--sans); letter-spacing: 0.04em; }
 body #mini .mini-take-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
+/* a held 覚 reads as "not here", never as a faded, broken button: plain ink on a dashed edge, at
+   full strength, with its reason in readable words under the meaning (glance pass 2026-10-01) */
+body #mini .mini-take.reader-capture-held { opacity: 1; border-style: dashed; border-color: var(--raised-edge-strong); color: var(--text-2); cursor: help; }
+body #mini .mini-take.reader-capture-held .mini-take-en { color: inherit; }
+body #mini .mini-take-reason { display: block; margin-top: 6px; color: var(--text); word-break: keep-all; overflow-wrap: anywhere; }
 body #mini .mini-entry {
   display: flex;
   flex-direction: row;

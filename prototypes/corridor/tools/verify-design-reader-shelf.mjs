@@ -42,6 +42,12 @@
  *                         article is covered by it. Choosing a word leaves it in place (the text does
  *                         not move) and remembers it, so the next visit opens without it; its × removes
  *                         it at once and for good. Control: 7ef0e985, whose tip floated over the text.
+ *   W1 held 覚 says why — (glance pass) at 1368 and 390, the word popup for ダマスカス (Damascus, the
+ *                         fixture article's first word) holds its 覚 save seal; the seal is drawn at full
+ *                         strength (not faded like a broken button), and a reason a learner can read
+ *                         stands under the meaning: ≥ 13 px at ≥ 4.5:1, naming the two readings that
+ *                         disagree, never "the entry's answer cannot be confirmed". Control: 7ef0e985,
+ *                         whose seal was faded to 0.45 over that jargon line.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -532,6 +538,32 @@ try {
       });
     }
 
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`W1-held-save-says-why-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        await page.locator('#reader .tok[data-index="0"]').click();
+        await page.waitForSelector('#mini #mini-take');
+        const probe = await page.evaluate(() => {
+          const seal = document.querySelector('#mini #mini-take');
+          const reason = document.getElementById(seal.getAttribute('aria-describedby') || 'mini-take-reason');
+          const r = reason?.getBoundingClientRect();
+          return { word: document.querySelector('#mini .mini-word')?.textContent, disabled: seal.disabled, opacity: Number(getComputedStyle(seal).opacity),
+            reason: reason?.textContent.trim() ?? '', size: reason ? parseFloat(getComputedStyle(reason).fontSize) : 0,
+            visible: !!r && r.width > 0 && r.top >= 0 && r.bottom <= innerHeight };
+        });
+        assert.equal(probe.word, 'ダマスカス', `the fixture's first word is ${probe.word}`);
+        if (!probe.disabled) return { saveable: true };
+        assert(probe.opacity >= 0.9, `the held 覚 is faded to ${probe.opacity}, like a broken button`);
+        assert(probe.reason && probe.visible, `the held 覚 shows no reason: ${JSON.stringify(probe)}`);
+        assert(!/entry.s answer|cannot be confirmed|答えをまだ確かめられない/u.test(probe.reason), `the reason is engine jargon: "${probe.reason}"`);
+        assert(/だますかす/u.test(probe.reason) && /ダマスカス/u.test(probe.reason), `the reason does not name the readings that disagree: "${probe.reason}"`);
+        assert(probe.size >= 13, `the reason is ${probe.size}px`);
+        const contrast = await page.evaluate(contrastOf, '#mini .mini-take-reason');
+        assert(contrast >= 4.5, `the reason's contrast is ${contrast}:1`);
+        return { reason: probe.reason, size: probe.size, contrast, opacity: probe.opacity };
+      });
+    }
+
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);
       await openShelfTools(page);
@@ -617,9 +649,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, a held 覚 that says why',
     results,
-    passed: results.length === engines.length * 23 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 25 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
