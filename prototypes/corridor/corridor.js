@@ -2213,6 +2213,9 @@ async function boot() {
   }
   if (S.variants.entry === 'field') S.view = 'entry';
   if (S.variants.entry === 'drift') S.view = 'drift';
+  // Phone reps: ?deck=context opens 文脈札 directly. It does not change the
+  // stored front door, and it does not open the operator variant strip.
+  if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
 
   render();
 

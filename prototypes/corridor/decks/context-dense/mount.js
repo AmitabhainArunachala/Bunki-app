@@ -194,8 +194,8 @@ function paintCard(room, opts, state, bi) {
   room.append(front);
   room.append(h('p', 'cd-hint', `${codePoints(card.target).length}字`));
   if (ui.phase === 'declare') {
-    const actions = h('div', 'cd-actions');
-    const got = button('思い出せた', 'cd-primary', () => showAnswer(opts.host, opts, state, card, false));
+  const actions = h('div', 'cd-actions cd-dock');
+  const got = button('思い出せた', 'cd-primary', () => showAnswer(opts.host, opts, state, card, false));
     const miss = button('まだ', '', () => showAnswer(opts.host, opts, state, card, true));
     got.id = 'cd-got';
     miss.id = 'cd-miss';
@@ -216,7 +216,7 @@ function paintCard(room, opts, state, bi) {
     const names = card.seeAlso.map((id) => cardById(id)?.target).filter(Boolean);
     if (names.length) room.append(h('p', 'cd-meta', `同じ読み・関連: ${names.join('、')}`));
   }
-  const grades = h('div', 'cd-grades');
+  const grades = h('div', 'cd-grades cd-dock');
   if (ui.missed) {
     const next = button('次へ', 'cd-primary', () => commit(opts.host, opts, state, RATINGS.again));
     next.id = 'cd-again';

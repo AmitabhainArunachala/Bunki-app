@@ -4,7 +4,11 @@
   font-family: var(--serif, "Iowan Old Style", "Hiragino Mincho ProN", serif);
   max-width: 40rem;
   margin: 0 auto;
-  padding: 0.5rem 0 2.5rem;
+  padding: 0.25rem 0 1.5rem;
+}
+
+.cd-room:has(.cd-dock) {
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
 }
 
 .cd-kicker,
@@ -40,6 +44,7 @@
 .cd-front,
 .cd-full {
   font-size: 1.2rem;
+  overflow-wrap: anywhere;
 }
 
 .cd-blank,
@@ -152,4 +157,42 @@
   height: 1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
+}
+
+@media (max-width: 720px) {
+  .cd-front,
+  .cd-full {
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+
+  .cd-actions:not(.cd-dock) {
+    flex-direction: column;
+  }
+
+  .cd-actions:not(.cd-dock) .cd-btn {
+    width: 100%;
+  }
+
+  .cd-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    margin: 0;
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.55rem 0.7rem calc(0.55rem + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--ground, #f3ecdf) 94%, transparent);
+    border-top: 1px solid var(--line, rgba(28, 22, 18, 0.22));
+    backdrop-filter: blur(8px);
+  }
+
+  .cd-dock .cd-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0.45rem 0.2rem;
+  }
 }

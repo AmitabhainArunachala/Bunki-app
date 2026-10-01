@@ -2,7 +2,10 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f3ecdf" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>文脈札 — context deck</title>
     <link rel="stylesheet" href="context-deck.css" />
     <style>
@@ -12,7 +15,10 @@
         color: #1c1612;
       }
       main {
-        padding: 1.25rem 1rem 3rem;
+        padding: calc(0.75rem + env(safe-area-inset-top))
+          calc(1rem + env(safe-area-inset-right))
+          calc(1rem + env(safe-area-inset-bottom))
+          calc(1rem + env(safe-area-inset-left));
       }
     </style>
   </head>
