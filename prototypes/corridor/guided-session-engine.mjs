@@ -10,8 +10,10 @@
  *
  * Evidence rules, unchanged from the prototype
  *   COMMIT is the only event that records performance; its first valid response wins.
- *   HELP and navigation never grade a question. FINISH gathers at most one Learn row per
- *   wrong or flagged question. REVIEW is the only event that marks practice, and UNDO
+ *   HELP, LOOKUP and navigation never grade a question. A word looked up before the first
+ *   answer (LOOKUP) marks that answer assisted, as an explanation opened first does.
+ *   FINISH gathers at most one Learn row per wrong or flagged question.
+ *   REVIEW is the only event that marks practice, and UNDO
  *   cannot remove a row after REVIEW. FRESH_SELECT freezes the first practice response.
  *
  * What the port adds
@@ -52,6 +54,7 @@ const answer = () => ({
   choice: null,
   correct: null,
   helpBefore: false,
+  lookupBefore: false,
   explained: false,
   flagged: false,
 });
@@ -155,6 +158,12 @@ export function reduceGuidedState(state, event) {
       if (item) {
         if (item.choice === null) item.helpBefore = true;
         item.explained = true;
+        changed = true;
+      }
+      break;
+    case 'LOOKUP':
+      if (item && item.choice === null && item.lookupBefore !== true) {
+        item.lookupBefore = true;
         changed = true;
       }
       break;
@@ -326,7 +335,9 @@ function validAnswer(value) {
     plain(value) &&
     (value.choice === null || Number.isInteger(value.choice)) &&
     (value.correct === null || typeof value.correct === 'boolean') &&
-    ['helpBefore', 'explained', 'flagged'].every((key) => typeof value[key] === 'boolean')
+    ['helpBefore', 'explained', 'flagged'].every((key) => typeof value[key] === 'boolean') &&
+    // sessions saved before word lookup existed carry no lookupBefore
+    (value.lookupBefore === undefined || typeof value.lookupBefore === 'boolean')
   );
 }
 const validAttempt = (attempt) =>

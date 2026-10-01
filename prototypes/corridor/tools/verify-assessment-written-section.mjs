@@ -1,6 +1,7 @@
 /** Walk the public written pack through the unmodified staged app. All learner
  * actions use DOM controls; storage is observed independently through real IDB.
  * No catalog replacement, export shim, source mutation, or model call is used. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -64,10 +65,10 @@ assert.equal(
 );
 const core = await import(pathToFileURL(resolve(site, 'modules/assessment-core.mjs')));
 const recordCore = await import(pathToFileURL(resolve(site, 'modules/record-core.mjs')));
-const { selectAssessmentV2 } = await import(
+const { selectAssessmentV2, assessmentItemAssistanceV2 } = await import(
   pathToFileURL(resolve(site, 'assessment-v2-controller.mjs'))
 );
-const { assessmentLearningSummary } = await import(
+const { assessmentLearningSummary, assessmentPracticePriorities } = await import(
   pathToFileURL(resolve(site, 'assessment-learning.mjs'))
 );
 for (const section of sections) {
@@ -366,13 +367,36 @@ async function fit(page, label) {
   );
 }
 /** The room lists one level at a time; press this section's level only if it is not current. */
+async function openAssessmentDoor(page) {
+  // the JLPT door sits in the shelf's 学習ツール panel; the shared helper opens it, then the door
+  await openShelfDoor(page, '#mock-link');
+}
 async function selectLevel(page, level) {
   const control = page.locator(`[data-exam-level="${level}"]`);
   if ((await control.getAttribute('aria-pressed')) !== 'true') await control.click();
 }
+// The paper separates the source instruction and numeric label from the
+// question. Retained target brackets become typographic underlining.
+const expectedQuestionText = item => {
+  const lines = item.prompt.split('\n');
+  if (lines.length > 1) lines.shift();
+  return lines.join('\n').replace(/【([^】]+)】/gu, '$1');
+};
+const readQuestionText = node => {
+  const question = node.cloneNode(true);
+  question.querySelector('.exam-question-number')?.remove();
+  return question.textContent;
+};
+async function atQuestion(page, item) {
+  await page.waitForFunction(expected => {
+    const question = document.querySelector('.exam-prompt')?.cloneNode(true);
+    question?.querySelector('.exam-question-number')?.remove();
+    return question?.textContent === expected;
+  }, expectedQuestionText(item));
+}
 async function catalogDoor(page, section, screenshotPrefix = null) {
   const { entry, pin } = section;
-  await page.locator('#mock-link').click();
+  await openAssessmentDoor(page);
   await selectLevel(page, pin.level);
   const card = page
     .locator('[data-exam-form]')
@@ -419,7 +443,9 @@ async function start(page, section, mode, screenshotPrefix = null) {
   await page.locator(mode === 'timed' ? '#exam-confirm-start' : '#exam-practice-start').click();
   await page.locator('.exam-prompt').waitFor();
   assert.equal(await page.locator('.exam-heading').textContent(), `${pin.level} practice`);
-  assert.equal(await page.locator('.exam-prompt').textContent(), items[0].prompt);
+  assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(items[0]));
+  // the official paper facts (問題 numbers per 試験科目, paper numbering) belong to the machine-checked class only
+  assert.equal(await page.locator('.exam-mondai-no, .exam-paper-question').count(), 0);
   assert.match(
     await page.locator('.exam-progress').innerText(),
     new RegExp(`Question 1 of ${items.length}`, 'u'),
@@ -445,7 +471,7 @@ async function start(page, section, mode, screenshotPrefix = null) {
   return record;
 }
 async function wrongAnswer(page, item) {
-  assert.equal(await page.locator('.exam-prompt').textContent(), item.prompt);
+  assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(item));
   const wrong = item.response.options.find((option) => option.id !== item.response.answerOptionId);
   const choice = page.locator(`[data-exam-option=${JSON.stringify(wrong.id)}]`);
   await choice.click();
@@ -455,6 +481,122 @@ async function wrongAnswer(page, item) {
     wrong.id,
   );
   return wrong.id;
+}
+const passageChars = (form, item) => item.passages.reduce((sum, reference) =>
+  sum + (form.passages.find((row) => row.sha256 === reference.sha256)?.text.length || 0), 0);
+async function visitQuestion(page, item) {
+  await page.locator('.exam-question-map > summary').click();
+  await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(item.id)}]`).click();
+  await atQuestion(page, item);
+}
+// Focus the last Tab stop before the question paper. Prose blocks are found from the paper's
+// own structure and the lookup word class, both older than one-stop-per-block.
+async function focusBeforePaper(page) {
+  return page.evaluate(() => {
+    const paper = document.querySelector('.exam-paper');
+    const answer = paper.querySelector('[data-exam-option]');
+    const prose = [...paper.querySelectorAll('.exam-skill, .exam-task-heading, .exam-task-instruction, .exam-passage h3, .exam-passage p, .exam-prompt, .exam-option-text')]
+      .filter((block) => block.querySelector('.japanese-lookup-word') &&
+        block.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const tabbable = [...document.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]')]
+      .filter((node) => node.tabIndex >= 0 && !node.disabled && node.getClientRects().length && !node.closest('[inert]'));
+    const before = tabbable.filter((node) => !paper.contains(node) &&
+      node.compareDocumentPosition(paper) & Node.DOCUMENT_POSITION_FOLLOWING).at(-1);
+    before.focus();
+    return { prose: prose.length, words: paper.querySelectorAll('.japanese-lookup-word').length };
+  });
+}
+async function tabToFirstAnswer(page, limit) {
+  let presses = 0;
+  while (!(await page.evaluate(() => !!document.activeElement?.matches('.exam-paper [data-exam-option]')))) {
+    await page.keyboard.press('Tab');
+    presses += 1;
+    assert(presses <= limit, `Tab did not reach the first answer within ${limit} presses`);
+  }
+  return presses;
+}
+// A machine-checked N3 test sits the real paper on the one question sheet: two 試験科目 with their official minutes, 問題
+// headers in the official wording, numbers that restart with the second booklet, underlined
+// targets, and results by the official 得点区分 beside the published marks.
+const paperEntry = catalog.entries.find((row) => row.id === 'kairo-original-jlpt-n3-written-01:written-review');
+const paperForm = paperEntry && JSON.parse(readFileSync(resolve(site, 'data/assessment', paperEntry.formPath), 'utf8'));
+async function officialPaperCase(page, engine) {
+  assert(paperEntry?.timingAuthority === 'official-fact', 'The N3 written test is bound to the official papers');
+  await openShelfDoor(page, '#mock-link');
+  await selectLevel(page, 'N3');
+  const card = page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}]`);
+  assert.match(await card.locator('.exam-form-timing').innerText(), /言語知識（文字・語彙） 30 min \/ 言語知識（文法）・読解 70 min/u);
+  await card.locator('[data-exam-start]').click();
+  const papers = page.locator('[data-exam-papers="2"] .exam-paper-list li');
+  assert.deepEqual(await papers.allInnerTexts(), [
+    `言語知識（文字・語彙） 30 min · ${paperEntry.skillCounts.vocabulary} questions`,
+    `言語知識（文法）・読解 70 min · ${paperEntry.skillCounts.grammar + paperEntry.skillCounts.reading} questions`,
+  ]);
+  await page.locator('#exam-confirm-start').click();
+  await page.locator('.exam-paper-question').waitFor();
+  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), '言語知識（文字・語彙）');
+  assert.match(await page.locator('#exam-timer').textContent(), /^(30:00|29:\d\d)$/u);
+  assert.equal(await page.locator('.exam-mondai-no').textContent(), '問題１');
+  assert.match(await page.locator('.exam-mondai-instruction').textContent(), /のことばの読み方として最もよいものを、１・２・３・４から一つえらびなさい。$/u);
+  assert.equal(await page.locator('.exam-mondai-instruction .exam-underline-blank').count(), 1);
+  const first = paperForm.items[0];
+  assert.equal(first.task, 'kanji-reading');
+  // the stem prints without its authored instruction line; its 【target】 is underlined, not bracketed
+  assert.equal(await page.locator('.exam-paper-question').textContent(),
+    `1${first.prompt.split('\n').slice(1).join('\n').replace(/[【】]/gu, '')}`);
+  const target = page.locator('.exam-paper-question .exam-target');
+  assert.equal(await target.count(), 1);
+  assert.match(await target.evaluate((node) => getComputedStyle(node).textDecorationLine), /underline/u);
+  await fit(page, 'Official paper first page');
+  await page.screenshot({ path: resolve(evidence, `${engine}-official-paper-n3-320.png`), fullPage: true });
+  // Finish the first paper; the second booklet names itself, restarts at 問題１ and item 1.
+  const vocabulary = paperForm.sections.find((section) => section.skill === 'vocabulary').itemIds;
+  await page.locator('.exam-question-map summary').click();
+  await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(vocabulary.at(-1))}]`).click();
+  await page.locator('#exam-finish-block').click();
+  await page.locator('#exam-confirm-finish').click();
+  await page.locator('[data-exam-next-paper="grammar-reading"]').waitFor();
+  await page.locator('#exam-next-block').click();
+  await page.locator('.exam-paper-question').waitFor();
+  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), '言語知識（文法）・読解');
+  assert.equal(await page.locator('.exam-mondai-no').textContent(), '問題１');
+  assert.equal(await page.locator('.exam-paper-question .exam-question-number').textContent(), '1');
+  assert.match(await page.locator('#exam-timer').textContent(), /^(70:00|69:\d\d)$/u);
+  const reading = paperForm.sections.find((section) => section.skill === 'reading').itemIds;
+  await page.locator('.exam-question-map summary').click();
+  await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(reading.at(-1))}]`).click();
+  await page.locator('#exam-finish-block').click();
+  await page.locator('#exam-confirm-finish').click();
+  await page.locator('[data-exam-official-results="N3"]').waitFor();
+  assert.deepEqual(await page.locator('[data-score-section]').evaluateAll((rows) => rows.map((row) => row.dataset.scoreSection)),
+    ['language', 'reading', 'listening']);
+  assert.equal(await page.locator('[data-score-section="listening"] [data-raw]').getAttribute('data-raw'), 'none');
+  assert.equal(await page.locator('[data-score-section="reading"] [data-raw]').getAttribute('data-raw'), `0/${reading.length}`);
+  assert.match(await page.locator('.exam-official-pass').innerText(), /pass mark is 95 of 180/u);
+  assert.match(await page.locator('.exam-official-note').innerText(), /cannot be converted/u);
+  assert.equal(await page.locator('.exam-results-skills').count(), 0);
+  await fit(page, 'Official paper results');
+  await page.screenshot({ path: resolve(evidence, `${engine}-official-paper-n3-results-320.png`), fullPage: true });
+  return { papers: 2, sections: 3 };
+}
+// Study mode on the same paper: the 問題 heading's number and 大問 name are lookup words, and the
+// heading is still ONE Tab stop (R4), the same as every other prose block.
+async function officialPaperStudyHeading(page) {
+  await openShelfDoor(page, '#mock-link');
+  await selectLevel(page, 'N3');
+  await page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}] [data-exam-start]`).click();
+  await page.locator('#exam-practice-start').click();
+  await page.locator('.exam-paper-question').waitFor();
+  const heading = await page.locator('.exam-task-heading').evaluate((node) => {
+    const words = [...node.querySelectorAll('.japanese-lookup-word')];
+    return { text: node.textContent, words: words.length, stops: words.filter((word) => word.tabIndex === 0).length,
+      numberWords: node.querySelectorAll('.exam-mondai-no .japanese-lookup-word').length,
+      nameWords: node.querySelectorAll('.exam-daimon .japanese-lookup-word').length };
+  });
+  assert.equal(heading.text, '問題１\u3000漢字読み');
+  assert(heading.numberWords >= 1 && heading.nameWords >= 1, 'The 問題 number and the 大問 name are lookup words in study mode');
+  assert.equal(heading.stops, 1, 'The 問題 heading is one Tab stop');
+  return heading;
 }
 // Every case this invocation could run, and whether the filter selected it: the receipt
 // compares this plan with the observed results.
@@ -644,7 +786,7 @@ async function g1Reload(page) {
   await page.reload();
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 60000 });
   assert.notEqual(await page.evaluate(() => performance.timeOrigin), origin, 'A real reload is a new document');
-  await page.locator('#mock-link').click();
+  await openAssessmentDoor(page);
 }
 // A refused host write either leaves a notice in the room or protects the window
 // (recordFailure → read-only → .room-state). Returns whether the window was protected.
@@ -661,7 +803,7 @@ async function g1RecoverProtected(page) {
   ]);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 60000 });
   assert.notEqual(await page.evaluate(() => performance.timeOrigin), origin, 'Recovery reload is a new document');
-  await page.locator('#mock-link').click();
+  await openAssessmentDoor(page);
 }
 // Scoped read-only native observation: store revision, raw rows, this attempt's
 // operations and finalize receipts. No app code is called.
@@ -791,8 +933,7 @@ async function assistedWhyCase(page, section, log) {
     const answer = answerOf(record, q);
     return { item: answer.item, response: answer.response, assistance: answer.assistance };
   };
-  const atPrompt = (q) =>
-    page.waitForFunction((prompt) => document.querySelector('.exam-prompt')?.textContent === prompt, byQ[q].prompt);
+  const atPrompt = q => atQuestion(page, byQ[q]);
   const choicesLocked = () =>
     page.locator('[data-exam-option]').evaluateAll((nodes) => nodes.length > 0 && nodes.every((node) => node.disabled));
   const bodyText = () => page.locator('body').innerText();
@@ -1138,8 +1279,7 @@ async function existingCardCase(page, section, log) {
   const answerOf = (record, attemptId, q) =>
     selectAssessmentV2(record.assessmentLibraryV2, attemptId).attempt.answers.find((row) => row.item.id === byQ[q].id);
   const cards = (record) => record.taken.filter((row) => row.t === 'word' && row.id === '点検');
-  const atPrompt = (q) =>
-    page.waitForFunction((prompt) => document.querySelector('.exam-prompt')?.textContent === prompt, byQ[q].prompt);
+  const atPrompt = q => atQuestion(page, byQ[q]);
   // finish one sitting: jump to the last question with the real map, then Finish and confirm
   const finishFromMap = async () => {
     await page.locator('.exam-question-map summary').click();
@@ -1329,10 +1469,7 @@ try {
       });
       await wrongAnswer(page, items[0]);
       await page.locator('#exam-next').click();
-      await page.waitForFunction(
-        (prompt) => document.querySelector('.exam-prompt')?.textContent === prompt,
-        items[1].prompt,
-      );
+      await atQuestion(page, items[1]);
       await fit(page, 'Next written question');
       const advanced = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(advanced.attempt.cursor.itemId, items[1].id);
@@ -1350,6 +1487,214 @@ try {
         nextQuestion: advanced.attempt.cursor.itemId,
       };
     });
+    await run(engine, `study-word-lookup-persists-and-unbookmarked-error-feeds-practice${suffix}`, async (page) => {
+      const baseline = await disk(page);
+      await start(page, section, 'practice');
+      const initial = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      const item = items[0];
+      assert.equal(initial.attempt.answers[0].response.kind, 'unanswered');
+      assert.equal(assessmentItemAssistanceV2(initial.attempt, item.id), null);
+      assert.equal(await page.locator('.exam-paper button button').count(), 0);
+      const lookupWord = page.locator('.exam-prompt .japanese-lookup-word').first();
+      assert(await lookupWord.count(), 'A real study question has lookup controls');
+      const lookupText = await lookupWord.textContent();
+      await lookupWord.click();
+      await page.locator('#mini').waitFor();
+      const assistedRecord = await disk(page);
+      const assisted = selectAssessmentV2(assistedRecord.assessmentLibraryV2);
+      const mark = assessmentItemAssistanceV2(assisted.attempt, item.id);
+      assert.equal(mark?.kind, 'dictionary', 'Native assistance must be committed before the reading popup');
+      assert.equal(assisted.attempt.answers[0].response.kind, 'unanswered');
+      assert.equal(await page.locator('#exam-why-sheet').count(), 0);
+      assert.equal(await page.locator('[data-exam-option]').first().isEnabled(), true);
+      await page.locator('.exam-heading').click();
+      await wrongAnswer(page, item);
+      const chosen = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(chosen.attempt.answers[0].flagged, false, 'No bookmark was needed');
+      await g1Reload(page);
+      await page.locator('.exam-lookup-assisted').waitFor();
+      const reloaded = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.deepEqual(assessmentItemAssistanceV2(reloaded.attempt, item.id), mark);
+      assert.equal(await page.locator('#exam-why-sheet').count(), 0);
+      await page.locator('.exam-question-map > summary').click();
+      await page.locator(`.exam-question-grid [data-exam-visit=${JSON.stringify(items.at(-1).id)}]`).click();
+      await atQuestion(page, items.at(-1));
+      await page.locator('#exam-finish-block').click();
+      await page.locator('#exam-confirm-finish').click();
+      await page.locator('.exam-score').waitFor();
+      const completed = await pollRecord(page, row => row.assessmentLearning?.followups.length === 1);
+      const followup = completed.assessmentLearning.followups[0];
+      const mistake = followup.evidence.find(row => row.item.id === item.id);
+      assert.equal(mistake.outcome, 'incorrect');
+      assert.equal(mistake.flagged, false);
+      assert.deepEqual(mistake.assistance, mark);
+      assert(followup.actions.some(row => row.evidenceId === mistake.id), 'Wrong unbookmarked answers automatically enter the real review workflow');
+      const priorities = assessmentPracticePriorities(completed.assessmentLearning);
+      assert.equal(priorities.authority, 'practice-only');
+      assert.equal(priorities.scheduling, 'unchanged');
+      assert.equal(priorities.mastery, 'unchanged');
+      assert(priorities.targets.some(target => target.evidence.some(row => row.evidenceId === mistake.id && row.assisted && !row.flagged)),
+        'The same retained mistake becomes a cross-app practice priority with assistance and bookmark provenance');
+      assert.deepEqual(completed.srs, baseline.srs, 'A missed test answer cannot fabricate an FSRS grade');
+      assert.deepEqual(completed.revlog, baseline.revlog);
+      assert.match(await page.locator('.exam-bookmark-note').innerText(), /1 wrong answers saved, with or without bookmarks/u);
+      await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-study-missed-without-bookmark.png`), fullPage: true });
+      return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
+        unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
+    });
+    // R4 · a long 読解 question: each prose block is ONE Tab stop, reached word by word with
+    // ←/→ and Home/End; the word is its own name; Esc returns to the same occurrence. The Tab
+    // budget runs first and reads only markup that predates this change, so the prior per-word
+    // build fails it for the right reason.
+    const longReading = [...items].filter((item) => item.passages.length).sort((a, b) =>
+      passageChars(form, b) - passageChars(form, a))[0];
+    if (longReading) await run(engine, `prose-roving-accessibility${suffix}`, async (page) => {
+      await start(page, section, 'practice');
+      await visitQuestion(page, longReading);
+      const budget = await focusBeforePaper(page);
+      const presses = await tabToFirstAnswer(page, budget.words + 20);
+      assert(presses <= budget.prose + 3,
+        `Tab stops from the question start to the first answer: ${presses}; prose blocks: ${budget.prose}`);
+
+      const blocks = await page.evaluate(() => [...document.querySelectorAll('.exam-paper [data-lookup-block]')].map((block) => {
+        const words = [...block.querySelectorAll('.japanese-lookup-word')].filter((word) => word.closest('[data-lookup-block]') === block);
+        return { words: words.map((word) => word.textContent), stops: words.filter((word) => word.tabIndex === 0).length,
+          labels: words.filter((word) => word.hasAttribute('aria-label')).length,
+          described: [...new Set(words.map((word) => word.getAttribute('aria-describedby')))] };
+      }).filter((block) => block.words.length));
+      assert(blocks.length >= budget.prose, 'Every prose block is a lookup block');
+      const help = await page.evaluate(() => {
+        const node = document.getElementById('japanese-lookup-help');
+        return node && { text: node.textContent, hidden: node.hidden, inPaper: !!node.closest('.exam-paper') };
+      });
+      assert.deepEqual(help, { text: 'Enter: reading and meaning · ←/→: next word', hidden: true, inPaper: false });
+      for (const block of blocks) {
+        assert.equal(block.stops, 1, `One Tab stop per block: ${block.words.join('')}`);
+        assert.equal(block.labels, 0);
+        assert.deepEqual(block.described, ['japanese-lookup-help']);
+      }
+      const names = [];
+      for (const block of await page.locator('.exam-paper [data-lookup-block]').all()) {
+        for (const line of (await block.ariaSnapshot()).split('\n')) {
+          const match = /^\s*- button "(.*)"/u.exec(line);
+          if (match) names.push(JSON.parse(`"${match[1]}"`));
+        }
+      }
+      assert.deepEqual(names, blocks.flatMap((block) => block.words), 'Each word is named by exactly its visible text');
+      assert.equal(await page.locator('.exam-prompt').evaluate(readQuestionText), expectedQuestionText(longReading));
+
+      const passage = page.locator('.exam-passage p');
+      const passageWords = passage.locator('.japanese-lookup-word');
+      const passageCount = await passageWords.count();
+      assert(passageCount > 4);
+      const activeIndex = () => page.evaluate(() => {
+        const block = document.querySelector('.exam-passage p');
+        return [...block.querySelectorAll('.japanese-lookup-word')].indexOf(document.activeElement);
+      });
+      await passage.locator('.japanese-lookup-word[tabindex="0"]').focus();
+      await page.keyboard.press('End');
+      assert.equal(await activeIndex(), passageCount - 1);
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await activeIndex(), passageCount - 1, '→ never leaves its block');
+      await page.keyboard.press('Home');
+      assert.equal(await activeIndex(), 0);
+      await page.keyboard.press('ArrowLeft');
+      assert.equal(await activeIndex(), 0, '← never leaves its block');
+      for (let step = 0; step < 3; step++) await page.keyboard.press('ArrowRight');
+      assert.equal(await activeIndex(), 3);
+      await page.evaluate(() => {
+        window.__proseKeys = [];
+        window.addEventListener('keydown', (event) => window.__proseKeys.push([event.key, event.defaultPrevented]));
+      });
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('ArrowUp');
+      assert.deepEqual(await page.evaluate(() => window.__proseKeys), [['ArrowDown', false], ['ArrowUp', false]],
+        '↑/↓ stay with the page');
+      assert.equal(await activeIndex(), 3);
+      await page.keyboard.press('Tab');
+      assert.equal(await page.evaluate(() => !!document.activeElement.closest('.exam-prompt')), true);
+      await page.keyboard.press('Shift+Tab');
+      assert.equal(await activeIndex(), 3, 'The block remembers the last-visited word');
+      assert.equal(await page.locator('#mini').count(), 0, 'Moving between words never opens or records help');
+      assert.equal(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, longReading.id), null);
+
+      // A repeated word: the later occurrence is opened by Enter, which saves the help and
+      // re-renders the question. The same occurrence keeps focus and the Tab stop.
+      const repeat = await page.evaluate(() => {
+        const words = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')];
+        const counts = new Map();
+        for (const word of words) counts.set(word.textContent, (counts.get(word.textContent) || 0) + 1);
+        const text = [...counts].filter(([value, count]) => count > 1 && /\p{Script=Han}/u.test(value))
+          .sort((a, b) => b[1] - a[1])[0]?.[0];
+        const same = words.filter((word) => word.textContent === text);
+        window.__proseOld = same.at(-1);
+        return { text, occurrence: same.length - 1, count: same.length };
+      });
+      assert(repeat.text, 'The long question repeats a word');
+      const atOccurrence = () => page.evaluate(({ text, occurrence }) => {
+        const same = [...document.querySelectorAll('.exam-paper .japanese-lookup-word')].filter((word) => word.textContent === text);
+        const active = document.activeElement;
+        return { focused: same.indexOf(active) === occurrence, stop: same[occurrence]?.tabIndex === 0,
+          replaced: !!window.__proseOld && !window.__proseOld.isConnected && active !== window.__proseOld };
+      }, repeat);
+      await page.evaluate(() => window.__proseOld.focus());
+      await page.keyboard.press('Enter');
+      await page.locator('#mini').waitFor();
+      const assisted = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(assessmentItemAssistanceV2(assisted.attempt, longReading.id)?.kind, 'dictionary',
+        'Enter passes through the same save-before-reveal guard as a tap');
+      assert.deepEqual(await atOccurrence(), { focused: true, stop: true, replaced: true });
+      assert.equal(await page.locator('#mini .mini-word').textContent(), repeat.text);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mini').count(), 0, 'Esc on the word closes its popup');
+      assert.equal((await atOccurrence()).focused, true);
+      assert.equal(await page.locator('.exam-paper').count(), 1, 'Esc closed only the popup');
+
+      await page.keyboard.press('Enter');
+      await page.locator('#mini').waitFor();
+      await page.locator('#mini .mini-entry').focus();
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mini').count(), 0);
+      assert.equal((await atOccurrence()).focused, true, 'Esc inside the popup returns to the same occurrence');
+
+      await page.keyboard.press('Space');
+      await page.locator('#mini').waitFor();
+      await page.locator('#mini-take').click();
+      await page.locator('#vocabulary-list-dialog[open]').waitFor();
+      await page.keyboard.press('Escape');
+      // the dialog's close event (a later task) removes it and hands focus back to its invoker
+      await page.waitForFunction(() => !document.getElementById('vocabulary-list-dialog'));
+      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the list window closes only that window');
+      assert.equal((await atOccurrence()).focused, true);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mini').count(), 0);
+      const focusStyle = await page.evaluate(() => {
+        const style = getComputedStyle(document.activeElement);
+        return { outline: style.outlineColor, shadow: style.boxShadow, wash: style.backgroundColor };
+      });
+      // the app's one focus token (--focus-ring over --focus-wash), the same look as a reader word
+      assert.equal(focusStyle.outline, 'rgba(0, 0, 0, 0)', 'Never the browser ring on a prose word');
+      assert.match(focusStyle.shadow, /inset/u, 'The focus token draws its ink underline');
+      assert.notEqual(focusStyle.wash, 'rgba(0, 0, 0, 0)', 'The focus token lays its vermilion wash');
+      await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-prose-roving-focus.png`) });
+      const final = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(final.attempt.answers.find((row) => row.item.id === longReading.id).response.kind, 'unanswered');
+      return { question: longReading.id, presses, proseBlocks: budget.prose, words: budget.words, repeat, focusStyle };
+    });
+    if (longReading) await run(engine, `prose-timed-plain-text${suffix}`, async (page) => {
+      await start(page, section, 'timed');
+      await visitQuestion(page, longReading);
+      assert.equal(await page.locator('.exam-paper .japanese-lookup-word, .exam-paper [data-lookup-block]').count(), 0,
+        'Timed prose is plain text');
+      const budget = await focusBeforePaper(page);
+      const presses = await tabToFirstAnswer(page, 20);
+      assert.equal(presses, 1, 'Nothing in timed prose takes focus');
+      await page.locator('.exam-passage p').click();
+      assert.equal(await page.locator('#mini').count(), 0);
+      const timed = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
+      assert.equal(assessmentItemAssistanceV2(timed.attempt, longReading.id), null);
+      return { question: longReading.id, presses, words: budget.words };
+    });
     await run(engine, `timed-written-completion-to-learn-review-and-sensei${suffix}`, async (page) => {
       const baseline = await disk(page);
       assert.deepEqual(baseline.taken, []);
@@ -1361,10 +1706,7 @@ try {
         await fit(page, `Question ${index + 1}`);
         if (index < items.length - 1) {
           await page.locator('#exam-next').click();
-          await page.waitForFunction(
-            (prompt) => document.querySelector('.exam-prompt')?.textContent === prompt,
-            items[index + 1].prompt,
-          );
+          await atQuestion(page, items[index + 1]);
         }
       }
       await page.locator('#exam-finish-block').click();
@@ -1560,7 +1902,7 @@ try {
       await page.waitForFunction(() => document.body.dataset.ready === '1', null, {
         timeout: 60000,
       });
-      await page.locator('#mock-link').click();
+      await openAssessmentDoor(page);
       await page.locator('.exam-prompt').waitFor();
       assert.equal(await page.locator('#exam-timer').textContent(), 'Untimed');
       assert.equal(
@@ -1570,10 +1912,7 @@ try {
         'true',
       );
       await page.locator('#exam-next').click();
-      await page.waitForFunction(
-        (prompt) => document.querySelector('.exam-prompt')?.textContent === prompt,
-        items[1].prompt,
-      );
+      await atQuestion(page, items[1]);
       await wrongAnswer(page, items[1]);
       await page.locator('#exam-stop').click();
       await page.locator('#exam-confirm-stop').click();
@@ -1621,6 +1960,8 @@ try {
       console.log(`SKIP ${engine}/assisted-why${suffix}: ${form.id} is not the pinned G1 ledger form`);
     }
     }
+    await run(engine, 'machine-checked-form-sits-as-the-official-paper', (page) => officialPaperCase(page, engine));
+    await run(engine, 'machine-checked-heading-is-one-tab-stop', (page) => officialPaperStudyHeading(page));
   }
 } finally {
   if (server.listening) await new Promise((done) => server.close(done));

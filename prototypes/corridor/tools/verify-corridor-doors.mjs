@@ -176,7 +176,7 @@ try {
   }
 
   // T10 — N1 is not a dead end: with no checked N1 test, the room names the older N1 sets
-  // (each marked 検収前) and one of them opens into a real question.
+  // (each marked 未確認) and one of them opens into a real question.
   for (const [viewport, fromDoor] of [[{ width: 1728, height: 996 }, false], [{ width: 1728, height: 996 }, true],
     [{ width: 390, height: 844 }, false], [{ width: 390, height: 844 }, true]]) {
     const context = await browser.newContext({ viewport });
@@ -194,8 +194,31 @@ try {
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: after a reload the room opens at the level he chose (N1)`, remembered === 'N1', `opened at ${remembered}`);
     const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
     await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
-    const listed = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-legacy-set]')]
-      .map((door) => ({ id: door.dataset.legacySet, pending: door.textContent.includes('検収前'), text: door.textContent })));
+    // the learner-facing mark is 未確認 (since the design pass of 2026-09-30); since the polish pass of
+    // 2026-10-01 a section whose sets are all unchecked says it once, in its header. A mark counts only as
+    // verify-mock reads it: a VISIBLE status chip whose text is exactly 未確認 (gate review on 8dea3c2e:
+    // any chip, or the bare word anywhere in a row, let a hidden or reworded mark pass)
+    const olderSets = () => page.evaluate(() => {
+      const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden' && Number(getComputedStyle(n).opacity) > 0;
+      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === '未確認' && shown(chip));
+      const block = document.querySelector('[data-exam-older="N1"]');
+      const sectionMarked = marked(block?.querySelector('[data-older-mark]'));
+      return [...(block?.querySelectorAll('[data-legacy-set]') || [])]
+        .map((door) => ({ id: door.dataset.legacySet, pending: sectionMarked || marked(door), text: door.textContent }));
+    });
+    const listed = await olderSets();
+    // its own controls, on this page: the section's chip hidden, then reworded, must leave every set unmarked
+    const hide = await page.addStyleTag({ content: '[data-exam-older="N1"] [data-older-mark] .status-chip { visibility: hidden !important; }' });
+    const hidden = await olderSets();
+    await hide.evaluate((node) => node.remove());
+    const original = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
+      .map((chip) => { const text = chip.textContent; chip.textContent = '確認済'; return text; }));
+    const reworded = await olderSets();
+    await page.evaluate((texts) => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
+      .forEach((chip, i) => { chip.textContent = texts[i]; }), original);
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the 未確認 mark is read only from a visible chip saying exactly 未確認 (controls: hidden, reworded)`,
+      original.length > 0 && hidden.length > 0 && hidden.every((row) => !row.pending) && reworded.every((row) => !row.pending),
+      JSON.stringify({ chips: original, hiddenMarked: hidden.filter((row) => row.pending).length, rewordedMarked: reworded.filter((row) => row.pending).length }));
     // expected identities and counts come from the artifact's own data, never from this file
     const expected = (await (await page.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
     const matches = listed.length === expected.length && expected.every((set, i) => listed[i]?.id === set.setId && listed[i].text.includes(String(set.items)));
@@ -203,7 +226,7 @@ try {
       JSON.stringify({ listed: listed.map((row) => row.id), expected: expected.map((set) => `${set.setId}:${set.items}`) }));
     const limits = await page.evaluate(() => document.querySelector('[data-exam-older="N1"] .exam-older-limits')?.textContent || '');
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the room says what these sets lack (no listening, no timer)`, /no listening|聴解/u.test(limits), limits);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked 検収前 (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked 未確認 (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
     if (listed.length) {
       await doors.first().click();
       const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);

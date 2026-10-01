@@ -15,6 +15,7 @@
  * Usage: node verify-corridor.mjs [--shots DIR] [--keep-open]
  */
 
+import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -90,6 +91,15 @@ function check(name, pass, detail = '') {
   if (!pass) failures += 1;
   const mark = pass ? '  ok  ' : ' FAIL ';
   console.log(`${mark} ${name}${detail ? `  — ${detail}` : ''}`);
+}
+
+/** Open the shelf's first text and unfold 詳細 in its footer (design pass 2026-09-30). */
+async function openFooterSignals(page) {
+  await page.locator(`${FIRST_TEXT} .shelf-open`).click();
+  await page.waitForSelector('#reader .tok');
+  await page.locator('.article-about [data-details]').click();
+  await page.waitForSelector('.article-about .sig, .article-about .band');
+  await page.waitForTimeout(150);
 }
 
 async function touchAt(page, selector, index, holdMs) {
@@ -270,6 +280,7 @@ async function walkToSemPanel(page, tapFn) {
   // kanji 時 is graph-rich. dispatchEvent rather than a CDP touch — this hop
   // is navigation plumbing (the dial probe sets the precedent), and the
   // thesaurus list's post-paint settle has landed touches on the wrong row.
+  await openShelfTools(page);
   await tapFn(page, '#thesaurus-link');
   await page.waitForSelector('.thes-head');
   await page.evaluate(`(() => {
@@ -290,8 +301,47 @@ async function walkToSemPanel(page, tapFn) {
   return page.locator('#sheet .sem-row').count();
 }
 
+function hasApprovedPhoneHierarchy(probe) {
+  const reader = probe.text.find(t => t.label === 'reading body (focused)');
+  return reader?.fontSize === 19 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
+}
+
+function articleSummaries(probe) {
+  return probe.filter(m => ['article English title', 'article teaser'].includes(m.label));
+}
+
+function summariesMeetAA(rows) {
+  return rows.length === 2 && rows.every(m => m.contrast >= WCAG_AA);
+}
+
+async function measureChromeTargets(page) {
+  return page.evaluate(() => {
+    const rows = [...document.querySelectorAll('.chrome button')].filter(n => {
+      const r = n.getBoundingClientRect();
+      return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
+    }).map(n => {
+      const r = n.getBoundingClientRect();
+      const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return { id: n.id || n.textContent.trim(), x: r.x, y: r.y, width: r.width, height: r.height,
+        reachable: !!hit && (hit === n || n.contains(hit)), right: r.right, bottom: r.bottom };
+    });
+    const overlaps = [];
+    for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) {
+      const a = rows[i], b = rows[j];
+      if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
+          Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
+    }
+    return { width: innerWidth, rows, overlaps, valid: rows.length >= 7 && !overlaps.length &&
+      rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
+  });
+}
+
 /* measurement helpers evaluated in the page */
-const MEASURE_FN = `(() => {
+export const MEASURE_FN = `(() => {
+  const visible = (node) => {
+    const r = node.getBoundingClientRect(), cs = getComputedStyle(node);
+    return r.width > 1 && r.height > 1 && cs.visibility !== 'hidden' && node.checkVisibility();
+  };
   const lum = (rgb) => {
     const [r, g, b] = rgb.map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -333,13 +383,17 @@ const MEASURE_FN = `(() => {
     return Math.round(((Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05)) * 100) / 100;
   };
   const measure = (sel, label) => {
-    const node = document.querySelector(sel);
+    const node = [...document.querySelectorAll(sel)].find(visible);
     if (!node) return null;
     const cs = getComputedStyle(node);
     return { label, selector: sel, contrast: ratio(node), fontSize: Math.round(parseFloat(cs.fontSize) * 10) / 10, color: cs.color };
   };
-  const targets = [...document.querySelectorAll('button, [role=button], a')]
-    .filter((n) => n.offsetParent !== null)
+  const targets = [...document.querySelectorAll('button, [role=button], a, summary, select')]
+    // Inline prose lookups and bibliographic links retain their text-shaped
+    // regions. Standalone controls, including transparent native filter
+    // selects over their visible labels, must meet the 44px floor.
+    .filter((n) => visible(n) && !n.matches('.japanese-lookup-word') &&
+      !(n.matches('.article-about a.inline-link[href]') && getComputedStyle(n).display === 'inline'))
     .map((n) => {
       const r = n.getBoundingClientRect();
       const expanded = n.matches('button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
@@ -360,15 +414,16 @@ const MEASURE_FN = `(() => {
       measure('.shelf-title', 'shelf title'),
       measure('.gloss', 'gloss'),
       measure('.sem-note', 'discrimination note'),
-      // the faint preview itself, per the local r4 walk's diagnostics (not CI): the first .shelf-snippet is the shelf's
-      // intro line (5.11:1 in both variant-C modes); the previews a learner skims sit inside the shelf items (2.38:1 current, 7.34:1 wcag)
-      measure('.shelf-item:not([data-recommendation]) .shelf-snippet', 'faint / snippet'),
+      measure('.shelf-item .shelf-title-en', 'article English title'),
+      measure('.shelf-item .story-lede', 'article teaser'),
       measure('.sig-name', 'faint / signal label'),
       measure('.crumb', 'chrome breadcrumb (background)'),
       measure('.eyebrow', 'eyebrow label'),
       measure('.reading', 'reading, the one red'),
     ].filter(Boolean),
     targets,
+    navigationLabelSize: Math.max(0, ...[...document.querySelectorAll('.chrome .l-ja, .chrome .lang-seg button, .chrome-dojo')]
+      .filter(visible).map((n) => parseFloat(getComputedStyle(n).fontSize))),
     // B4 diagnostics (PR #99 CI), measurement only: every faint snippet with its context, and every
     // chrome child with its visible box — the crumb is clipped (register.css), the mast labels are not
     diagnostics: {
@@ -588,54 +643,53 @@ async function main() {
     shelfData.every((s) => s.titleEn && s.level && /^[A-Za-z]/.test(s.level)),
     `${shelfData.length} texts, e.g. "${shelfData[0]?.titleEn}" — ${shelfData[0]?.level}${shelfData[0]?.levelNote}`);
 
-  // the shelf stands in quiet sections: every card under exactly one
-  // eyebrow, every category one contiguous run — never split across the
-  // shelf in disconnected stretches
+  // The editorial collection replaces the old static category sections. One card per story: today's
+  // six stand inside the grid in place of their ordinary cards, so the census covers both.
   const sectionProbe = await page.evaluate(`(() => {
-    const kids = [...document.querySelectorAll('#shelf-body > *')];
-    const runs = [];
-    let stray = 0;
-    for (const kid of kids) {
-      // 今日の棚 is a recommendation strip, not a section of the collection
-      if (kid.matches('p.eyebrow.shelf-section:not(.shelf-today)')) {
-        runs.push({ header: kid.childNodes[0]?.textContent?.trim() ?? '', items: 0 });
-      } else if (kid.matches('.shelf-item:not([data-recommendation])')) {
-        if (!runs.length) stray += 1;
-        else runs[runs.length - 1].items += 1;
-      }
-    }
-    const headers = runs.map((r) => r.header);
+    const ids = [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map(n => n.dataset.passage);
     return {
-      stray,
-      headers,
-      empty: runs.filter((r) => r.items === 0).length,
-      duplicated: headers.length !== new Set(headers).size,
-      grouped: runs.reduce((a, r) => a + r.items, 0),
+      ids, unique: new Set(ids).size,
+      today: document.querySelectorAll('#shelf-reading-results .shelf-item[data-recommendation]').length,
+      controls: ['sort', 'topic', 'jlpt', 'grade'].every(key => !!document.getElementById('shelf-filter-' + key)),
+      search: !!document.getElementById('shelf-reading-search'),
     };
   })()`);
-  check('the shelf gathers into quiet sections — each category one run, no card outside one',
-    sectionProbe.stray === 0 && sectionProbe.headers.length >= 4 &&
-      !sectionProbe.duplicated && sectionProbe.empty === 0 &&
-      sectionProbe.grouped === shelfData.length,
-    `${sectionProbe.headers.length} sections: ${sectionProbe.headers.join(' · ')} — ${sectionProbe.grouped}/${shelfData.length} cards housed`);
+  check('the editorial collection holds every story once, across the grid and today’s six, and exposes sort/topic/level/grade/search',
+    sectionProbe.controls && sectionProbe.search && sectionProbe.unique === sectionProbe.ids.length &&
+      sectionProbe.ids.length === shelfData.length + sectionProbe.today,
+    `${sectionProbe.unique}/${sectionProbe.ids.length} unique stories · ${shelfData.length} grid cards + ${sectionProbe.today} of today’s six`);
 
-  // the glossary is billed as itself: one-line definitions are labeled
-  // 用語集 on the card and are never counted among the "real texts"
+  // the glossary is billed as itself: one-line definitions wear the 用語集 kicker, and the shelf's
+  // one tally counts every story and says how many of them are glossary entries
   const glossaryProbe = await page.evaluate(`(() => {
-    const cards = [...document.querySelectorAll('.shelf-item:not([data-recommendation])')];
-    const glossary = cards.filter((n) =>
-      (n.querySelector('.shelf-meta')?.textContent ?? '').includes('用語集'));
-    const labeled = glossary.filter((n) =>
-      [...n.querySelectorAll('.shelf-meta .pool-tag')].some((t) => t.textContent.includes('用語集')));
-    const intro = document.querySelector('.shelf-snippet.intro')?.textContent ?? '';
-    return { cards: cards.length, glossary: glossary.length, labeled: labeled.length, intro };
+    const cards = [...document.querySelectorAll('#shelf-reading-results .shelf-item')];
+    const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === '用語集');
+    // the masthead prints the tally twice (long on a desk, short on a phone): read the long copy
+    const intro = document.querySelector('.dateline-tally .tally-long')?.textContent ?? '';
+    const results = document.querySelector('.shelf-results-count')?.textContent ?? '';
+    return { cards: cards.length, glossary: glossary.length, intro, results };
   })()`);
-  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) readings|読み物 ([0-9]+) 本/)?.slice(1).find(Boolean) ?? NaN);
-  check('glossary rows are labeled 用語集 and stand outside the real-text count',
-    glossaryProbe.glossary > 0 && glossaryProbe.labeled === glossaryProbe.glossary &&
-      billedTexts === glossaryProbe.cards - glossaryProbe.glossary &&
-      /用語集|glossary/.test(glossaryProbe.intro),
-    `${glossaryProbe.labeled}/${glossaryProbe.glossary} labeled · intro bills ${billedTexts} texts for ${glossaryProbe.cards - glossaryProbe.glossary} non-glossary cards`);
+  const readTally = (text) => {
+    const m = text.match(/読み物 ([0-9]+) 本(?:（うち用語集 ([0-9]+)）)?|([0-9]+) (?:readings?|articles?)(?:, (?:including )?([0-9]+) (?:glossary|of them short word definitions))?/u);
+    return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
+  };
+  const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);
+  check('glossary rows wear 用語集, and the one tally counts every story and names its glossary entries',
+    glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
+      JSON.stringify(resulted) === JSON.stringify(billed),
+    `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
+  await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
+  await page.locator('#shelf-reading-search').press('Enter');
+  await page.waitForFunction(() => document.querySelectorAll('#shelf-reading-results .shelf-item').length === 0);
+  check('editorial search applies an empty filter without inventing readings',
+    readTally(await page.locator('.shelf-results-count').innerText())?.total === 0,
+    await page.locator('.shelf-results-count').innerText());
+  await page.locator('#shelf-reading-search').fill('');
+  await page.locator('#shelf-reading-search').press('Enter');
+  await page.waitForFunction(count => document.querySelectorAll('#shelf-reading-results .shelf-item').length === count, sectionProbe.ids.length);
+  const restoredCollection = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(n => n.dataset.passage).sort());
+  check('clearing search restores the complete collection without duplicates',
+    JSON.stringify(restoredCollection) === JSON.stringify([...sectionProbe.ids].sort()), `${restoredCollection.length} entries restored`);
   // Disagreement may only fire where >=2 ordinal-capable signals were
   // measured on the displayed text. With the NINJAL pair unavailable to this
   // build environment, zero flags is the honest state — a flag with fewer
@@ -689,19 +743,19 @@ async function main() {
 
   // the raw instrument is one 詳細 tap away, not gone — and it must include
   // the live JLPT-lexicon row plus an HONEST row for the unmeasured NINJAL
-  // pair (never a stale or faked number)
-  await page.locator(`${FIRST_TEXT} [data-details]`).click();
-  await page.waitForTimeout(200);
-  const rawSignals = await page.locator('.shelf-item:not([data-recommendation]) .sig').count();
+  // pair (never a stale or faked number). Since the design pass of 2026-09-30
+  // the shelf card carries no diagnostics: 詳細 unfolds in the article's footer.
+  await openFooterSignals(page);
+  const rawSignals = await page.locator('.article-about .sig').count();
   const sigNames = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig .sig-name')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.article-about .sig .sig-name')].map((n) => n.textContent)`,
   );
   check('the raw signals unfold behind 詳細 — separate, never averaged', rawSignals >= 3,
     `${rawSignals} signal rows on the opened card: ${sigNames.join(' · ')}`);
   check('the JLPT-lexicon signal is live on the opened card',
     sigNames.some((n) => n.includes('JLPT')), sigNames.join(' · '));
   const sigValues = await page.evaluate(
-    `[...document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig .sig-val')].map((n) => n.textContent)`,
+    `[...document.querySelectorAll('.article-about .sig .sig-val')].map((n) => n.textContent)`,
   );
   const ninjalRow = sigNames.findIndex((n) => n.includes('国語研'));
   const firstGrading = gradingTruth.articles[0].grading;
@@ -710,8 +764,9 @@ async function main() {
       ? ninjalRow === -1 || !/未測定|not measured/.test(sigValues[ninjalRow])
       : ninjalRow >= 0 && /未測定|not measured/.test(sigValues[ninjalRow]),
     ninjalRow >= 0 ? `${sigNames[ninjalRow]} → ${sigValues[ninjalRow]}` : 'no NINJAL row');
-  await page.locator(`${FIRST_TEXT} [data-details]`).click();
+  await page.locator('.article-about [data-details]').click();
   await page.waitForTimeout(150);
+  await open('?entry=shelf');
   await shoot(page, shotsDir, '01-arrive-shelf');
   report.steps.push({ step: 1, name: 'arrive', shot: '01-arrive-shelf.png' });
 
@@ -893,7 +948,9 @@ async function main() {
       const e = en.getBoundingClientRect();
       for (const other of document.querySelectorAll('#reader .tok')) {
         if (other === tok || tok.contains(other)) continue;
-        const r = other.getClientRects()[0];
+        // The button has a 44px touch box; only its word row paints ink.
+        // Counting the empty lower hit area mislabels a clear gloss as overlap.
+        const r = (other.querySelector('.tok-word') ?? other).getClientRects()[0];
         if (!r) continue;
         // a collision is visible ink over ink: require a real bite in both
         // axes, not a sub-4px graze of a neighbour's empty descent space
@@ -1102,7 +1159,7 @@ async function main() {
   await page.waitForSelector('#sheet', { state: 'detached' });
   check('phone kanji close dismisses the full entry', await page.locator('#sheet').count() === 0);
 
-  // Desktop control: retain the existing centred 820px measure and working
+  // Desktop control: retain the design pass's centred 900px measure and working
   // close path. This is another page in the same already-headless browser.
   const desktopSheetContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
@@ -1115,8 +1172,8 @@ async function main() {
     const desktopSheet = await sheetViewportGeometry(desktopPage);
     report.measurements.kanjiDesktopViewport = desktopSheet;
     check('desktop kanji keeps its centred measure and reachable close',
-      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.width === 820 &&
-      desktopSheet.sheet.left === 230 && desktopSheet.close.right <= 1280,
+      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.width === 900 &&
+      desktopSheet.sheet.left === 190 && desktopSheet.close.right <= 1280,
       JSON.stringify(desktopSheet));
     await shoot(desktopPage, shotsDir, '04b-kanji-desktop-settled');
     await desktopPage.locator('#sheet-back').focus();
@@ -1310,15 +1367,14 @@ async function main() {
     } finally { sheetLoads.dispose(); }
   }
 
-  // B · difficulty presentation — behind 詳細 since v1.2, so open one card
+  // B · difficulty presentation — behind 詳細 since v1.2; in the article footer since 2026-09-30
   for (const mode of ['three', 'band']) {
     await open(`?entry=shelf&difficulty=${mode}`);
-    await page.locator(`${FIRST_TEXT} [data-details]`).click();
-    await page.waitForTimeout(200);
+    await openFooterSignals(page);
     const shown = await page.evaluate(`(() => ({
-      sigs: document.querySelectorAll('.shelf-item:not([data-recommendation]) .sig').length,
-      bands: document.querySelectorAll('.shelf-item:not([data-recommendation]) .band').length,
-      uncertain: document.querySelectorAll('.shelf-item:not([data-recommendation]) .uncertain').length,
+      sigs: document.querySelectorAll('.article-about .sig').length,
+      bands: document.querySelectorAll('.article-about .band').length,
+      uncertain: document.querySelectorAll('.article-about .uncertain').length,
     }))()`);
     check(`variant B · ${mode}`,
       mode === 'three' ? shown.sigs >= 3 && shown.bands === 0 : shown.bands === 1 && shown.sigs === 0,
@@ -1345,14 +1401,20 @@ async function main() {
   }
   report.measurements.contrast = contrastByVariant;
 
-  const faintCurrent = contrastByVariant.current.find((m) => m.label.startsWith('faint / snippet'));
-  const faintWcag = contrastByVariant.wcag.find((m) => m.label.startsWith('faint / snippet'));
-  check('variant C · the WCAG side actually reaches AA',
-    faintWcag && faintWcag.contrast >= WCAG_AA,
-    `faint text: current ${faintCurrent?.contrast}:1 → wcag ${faintWcag?.contrast}:1 (AA needs ${WCAG_AA})`);
-  check('variant C · the current side is honestly below AA (that is the cost being shown)',
-    faintCurrent && faintCurrent.contrast < WCAG_AA,
-    `${faintCurrent?.contrast}:1`);
+  // The approved editorial pass keeps readable ink even on old contrast URLs.
+  // Check the actual story summaries; the former per-card snippets are gone.
+  for (const mode of ['wcag', 'current']) {
+    const summaries = articleSummaries(contrastByVariant[mode]);
+    check(`variant C · ${mode} keeps article summaries at AA`,
+      summariesMeetAA(summaries),
+      JSON.stringify(summaries));
+  }
+  await open('?entry=shelf&contrast=wcag');
+  const fadedSummaries = await page.addStyleTag({ content: '.shelf-item .shelf-title-en, .shelf-item .story-lede { color: #faf6ea !important; }' });
+  const fadedProbe = articleSummaries((await page.evaluate(MEASURE_FN)).text);
+  check('variant C · faded article summaries fail the same rendered contrast check',
+    fadedProbe.length === 2 && !summariesMeetAA(fadedProbe), JSON.stringify(fadedProbe));
+  await fadedSummaries.evaluate(n => n.remove());
 
   // D · entry
   for (const mode of ['field', 'shelf']) {
@@ -1383,6 +1445,9 @@ async function main() {
   console.log('\n— measurements');
   await open('?entry=shelf');
   const shelfProbe = await page.evaluate(MEASURE_FN);
+  // the 学習ツール tiles are controls too: measure them with their panel open (gate review on 8dea3c2e)
+  await openShelfTools(page);
+  const toolsProbe = await page.evaluate(MEASURE_FN);
   const semRows = await walkToSemPanel(page, tap);
   const panelProbe = await page.evaluate(MEASURE_FN);
   // walkToSemPanel arrives via the thesaurus since 2026-08-27, so the sheet
@@ -1397,7 +1462,10 @@ async function main() {
     if (!mergedText.has(row.label)) mergedText.set(row.label, row);
   }
   const m = { ...panelProbe, text: [...mergedText.values()] };
-  m.targets = [...panelProbe.targets, ...shelfProbe.targets];
+  m.targets = [...panelProbe.targets, ...shelfProbe.targets, ...toolsProbe.targets, ...readerProbe.targets];
+  const toolTiles = toolsProbe.targets.filter((t) => /^(feed|source-inbox|levels|lessons|mock|kagami|grammar|thesaurus|yoji|kanjidex|ai|airead)-link$/u.test(String(t.id)));
+  check('the sweep measures the 学習ツール tiles with their panel open', toolTiles.length >= 10,
+    `${toolTiles.length} tool tiles measured: ${toolTiles.map((t) => `${t.id} ${t.hitW}×${t.hitH}`).join(', ')}`);
   report.measurements.text = m.text;
   report.measurements.targets = m.targets;
   report.measurements.semRowsOnProbePanel = semRows;
@@ -1406,10 +1474,10 @@ async function main() {
   await shoot(page, shotsDir, '07-measurement-probe');
 
   const reader = m.text.find((t) => t.label.startsWith('reading body'));
-  const chrome = m.text.find((t) => t.label.startsWith('chrome breadcrumb'));
-  check('focused content dominates the background chrome',
-    reader && chrome && reader.fontSize >= chrome.fontSize * 1.5,
-    `reader ${reader?.fontSize}px vs chrome ${chrome?.fontSize}px (Drift's inverted case was 11px vs 22–43px)`);
+  const navigationLabelSize = readerProbe.navigationLabelSize;
+  check('the approved reader body is legible and larger than visible navigation labels',
+    hasApprovedPhoneHierarchy(readerProbe),
+    `reader ${reader?.fontSize}px vs visible navigation ${navigationLabelSize}px; clipped breadcrumbs are not visible text`);
 
   const note = m.text.find((t) => t.label.startsWith('discrimination note'));
   check('discrimination notes are legible (AA)', note && note.contrast >= WCAG_AA,
@@ -1421,7 +1489,7 @@ async function main() {
   check(`every visible control is at least ${MIN_TAP}px`, small.length === 0,
     small.length
       ? small.map((t) => `${t.id || t.text} visual ${t.w}×${t.h}, hit ${t.hitW}×${t.hitH}`).join(', ')
-      : `${m.targets.length} controls checked, including inline token hit regions`);
+      : `${m.targets.length} controls checked; inline prose uses its own roving lookup checks`);
 
   check('the page never scrolls sideways at 390px',
     m.docScrollWidth <= m.innerWidth,
@@ -1429,9 +1497,49 @@ async function main() {
   check('no console errors during the walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
 
+  // Phone navigation must remain usable before and after selection adds the
+  // capture door. Check actual hit testing as well as document overflow.
+  await open('?entry=shelf');
+  await tap(page, FIRST_TEXT);
+  await settleReader(page);
+  const chromeGeometry = [];
+  for (const selected of [false, true]) {
+    if (selected) {
+      await tap(page, '#reader .tok.content', 1);
+      await page.waitForFunction(() => !document.querySelector('#reader-take').disabled);
+    }
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: VIEWPORT.height });
+      await page.evaluate(() => { window.scrollTo(0, 0); });
+      await waitForFiniteMotion(page, '.chrome');
+      const geometry = await measureChromeTargets(page);
+      chromeGeometry.push({ selected, ...geometry });
+      check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable`,
+        geometry.valid, JSON.stringify(geometry));
+      await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
+    }
+  }
+  report.measurements.readerChrome = chromeGeometry;
+  const narrowControl = await page.addStyleTag({ content: '#chrome-search { min-width: 20px !important; width: 20px !important; max-width: 20px !important; clip-path: inset(0); }' });
+  const narrowProbe = await measureChromeTargets(page);
+  const narrowSweep = await page.evaluate(MEASURE_FN);
+  check('reader navigation · an undersized clipped control fails both geometry and the 44px sweep',
+    !narrowProbe.valid && narrowSweep.targets.some(t => t.id === 'chrome-search' && t.hitW < MIN_TAP));
+  await narrowControl.evaluate(n => n.remove());
+  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 18px !important; }' });
+  const smallProbe = await page.evaluate(MEASURE_FN);
+  check('reader hierarchy · a smaller reading body fails the approved 19px fixture',
+    !hasApprovedPhoneHierarchy(smallProbe));
+  await smallReading.evaluate(n => n.remove());
+  const largeNavigation = await page.addStyleTag({ content: '.chrome .l-ja { font-size: 19px !important; }' });
+  const largeProbe = await page.evaluate(MEASURE_FN);
+  check('reader hierarchy · enlarged navigation fails the approved 17px fixture', !hasApprovedPhoneHierarchy(largeProbe));
+  await largeNavigation.evaluate(n => n.remove());
+
   // the radical picker is the densest tap grid in the app, and the shelf/panel
   // sweep above never enters the kanjidex — its chips are measured by name
   await open('?entry=shelf');
+  await openShelfTools(page);
   await tap(page, '#kanjidex-link');
   await page.waitForSelector('.kdx-row', { timeout: 5000 });
   // The entrance translation can round a 44px box below 44; measure the settled grid.
@@ -1521,20 +1629,20 @@ async function main() {
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
-  await page.waitForSelector('#listen-toggle', { timeout: 15000 });
+  // 2026-09-30: the voice is locked (Kore; Charon second). With no Kore clip for this article
+  // the play bar is a quiet 音声準備中 · Kore state: no play control, no picker, no device voice.
+  await page.waitForSelector('#listen-note', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
-    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
+    toggles: document.querySelectorAll('#listen-toggle, #listen-voice').length,
     note: document.querySelector('#listen-note')?.textContent ?? '',
   })`);
   // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
-  const shut = await page.evaluate(`document.querySelector('#listen-toggle')?.disabled === true`);
-  check('reader · the 聞く door stands shut with an honest reason until a voice is chosen',
-    listenBefore.pressed === 'false' && shut &&
-      /収録音声|recorded voice|recorded only in Koharune Ami|小春音アミ（仮の声・検収前）|Checking for recordings|この版には収録音声/u.test(listenBefore.note) &&
-      !/device voice|端末の声/u.test(listenBefore.note),
-    `${JSON.stringify(listenBefore)} shut=${shut}`);
+  check('reader · with no approved recording the listen row says so and offers nothing to play',
+    listenBefore.toggles === 0 && /音声準備中/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
+      !/device voice|端末の声|F1/u.test(listenBefore.note),
+    JSON.stringify(listenBefore));
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
@@ -1611,6 +1719,7 @@ async function main() {
   // ------------------------------------------------- v1.2 operator round 3
   console.log('\n— v1.2 · dictionary depth, grammar, lists, quiet surfaces');
   await open('?entry=shelf');
+  await openShelfTools(page);
   await tap(page, '#grammar-link');
   await page.waitForTimeout(250);
   const grammarIndex = await page.locator('[data-grammar]').count();
@@ -1863,8 +1972,12 @@ async function main() {
     d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
     JSON.stringify(d23Taken));
   // the core card leaves through its own door
-  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  await tap(page, '#mini-take');
+  await page.waitForSelector('#vocabulary-list-stop');
+  await tap(page, '#vocabulary-list-stop');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
+  await tap(page, '#vocabulary-list-close');
+  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
 
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
   await d23PageSearch();
@@ -1905,7 +2018,7 @@ async function main() {
   // the action and its DOM observation, in one guard: a failure is latched in the report at once, the bounded after
   // snapshot is still attempted and kept, and the row is incomplete
   let d23ActionError = null;
-  let d23Opened = null;
+  let d23Opened;
   // the post-open page as it stands: the sheet's own identity and its 覚 control, plus the homograph doors as a
   // diagnostic only (a cold explicit sheet holds its row by number and need not draw the same-form list)
   const d23OpenFacts = () => page.evaluate(() => {
@@ -2579,8 +2692,8 @@ async function main() {
     armed.armedBtn && armed.still === 1 && deleted.lists === 0 && deleted.taken === 1 && deleted.revlog === 1 && deleted.srsKept,
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
-  // the reader's top-right door: quiet until a word is touched, then one
-  // tap takes the current thing with the sentence it was met in
+  // The reader's capture door now opens the named-list chooser. Opening is
+  // reversible without enrollment; an explicit save keeps its source context.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
@@ -2606,7 +2719,12 @@ async function main() {
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   await tap(page, '#reader-take');
-  await page.waitForSelector('#capture-panel');
+  await page.waitForSelector('#vocabulary-list-dialog[open]');
+  check('R2-B · opening the list chooser does not enroll the word',
+    (await readAppRecord(page)).taken.length === envBefore.taken);
+  await tap(page, '#vocabulary-list-save');
+  await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
+    { description: 'explicit reader save' });
   const captured = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
@@ -2616,31 +2734,37 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
-  // the list drawer's contents wait behind its head since 2026-08-27 —
-  // open リストへ the way a finger does before probing what's inside
-  await page.evaluate(
-    `document.querySelector('#capture-panel .list-picker .fold-head')?.click()`,
-  );
-  await page.waitForTimeout(120);
   const panelBits = await page.evaluate(`(() => ({
-    take: !!document.querySelector('#capture-panel #take'),
-    scopes: document.querySelectorAll('#capture-panel [data-ctx-scope]').length,
-    lists: !!document.querySelector('#capture-panel .list-picker'),
-    newList: !!document.querySelector('#capture-panel #new-list'),
+    take: !!document.querySelector('#vocabulary-list-stop'),
+    scopes: document.querySelectorAll('#vocabulary-list-dialog [data-ctx-scope]').length,
+    lists: !!document.querySelector('#vocabulary-list-dialog .vocabulary-list-choices'),
+    newList: !!document.querySelector('#vocabulary-list-dialog .vocabulary-list-form input'),
   }))()`);
-  check('R2-B · the panel holds the undo, the scope stages, and the lists',
+  check('R2-B · the chooser preserves undo, context scopes, and named lists',
     panelBits.take && panelBits.scopes === 3 && panelBits.lists && panelBits.newList,
     JSON.stringify(panelBits));
+  for (const scope of ['word', 'para', 'sent']) {
+    await tap(page, `#vocabulary-list-dialog [data-ctx-scope="${scope}"]`);
+    const record = await waitForAppRecord(page, record => {
+      const row = record.taken.find(row => row.t === 'word' && row.id === touched.word);
+      return row && (row.ctx?.scope ?? 'word') === scope;
+    }, { description: `saved ${scope} capture context` });
+    check(`R2-B · the chooser durably saves ${scope} context without another enrollment or review`,
+      record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
+  }
   await shoot(page, shotsDir, '19-capture-sovereignty');
-  await tap(page, '#capture-panel #take');
-  await page.waitForTimeout(250);
+  await tap(page, '#vocabulary-list-stop');
+  await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === touched.word),
+    { description: 'explicit stop memorizing' });
   const undone = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  check('R2-B · a mis-tap leaves in one gesture; the revlog length never moves',
+  check('R2-B · explicit stop restores the deck size without changing the revlog',
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
+  await tap(page, '#vocabulary-list-close');
+  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
 
   // the mini carries the same door, repainting in place — the mini never blinks.
   // D11 (8d0fbccf) holds the mini's seal for a reader token the core dictionary lacks, and D23 for a
@@ -2665,19 +2789,31 @@ async function main() {
     await page.waitForTimeout(120);
   }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
-  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
-  await page.waitForTimeout(250);
+  await tap(page, '#mini-take');
+  await page.waitForSelector('#vocabulary-list-dialog[open]');
+  await tap(page, '#vocabulary-list-save');
+  await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === miniWordText),
+    { description: 'mini chooser save' });
+  await tap(page, '#vocabulary-list-close');
+  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
   const miniCap = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     const seal = document.querySelector('#mini-take');
     return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
   })()`);
-  check('R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up',
+  check('R2-B · saving through the mini chooser keeps its seal inked and sentence context',
     miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
-  if (miniIx >= 0) await page.evaluate(`document.querySelector('#mini-take')?.click()`);
-  await page.waitForTimeout(250);
+  if (miniIx >= 0) {
+    await tap(page, '#mini-take');
+    await page.waitForSelector('#vocabulary-list-stop');
+    await tap(page, '#vocabulary-list-stop');
+    await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
+      { description: 'mini chooser stop memorizing' });
+    await tap(page, '#vocabulary-list-close');
+    await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
+  }
   const miniUndone = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, sealTaken: document.querySelector('#mini-take')?.classList.contains('taken') ?? null };
@@ -2840,13 +2976,14 @@ async function main() {
       backProbe.row[11] === Date.parse(backProbe.rec.due),
     `t=${backProbe.row[0]} (raw, before the anchor) · elapsed=${backProbe.row[4]}`);
 
-  // (e) bounded standard review: 25 overdue cards + 3 started fresh rows;
-  // an ordinary sitting freezes 20 and says あと N on the goodbye screen.
+  // (e) the number is the truth (card-system slice 1, replacing the 20-card freeze): 25
+  // overdue cards + 3 started fresh rows. The button, the three counts and the session are
+  // one queue — the sitting serves every card the button counted, and says done after them.
   // Let the clamp probe's observation settle before importing the next fixture.
   await page.waitForTimeout(1400);
-  // 25 overdue + 3 started fresh: real N5 core words (the fixture and the zero-new probe below share them)
+  // 25 overdue + 3 started fresh: real N5 core words (the fixture and the pacing probe below share them)
   const R2A_WORDS = ["お兄さん", "お姉さん", "お弁当", "お手洗い", "お母さん", "お父さん", "お皿", "お腹", "お茶", "お菓子", "お酒", "お金", "お風呂", "ご飯", "一", "一つ", "一人", "一日", "一昨年", "一昨日", "一月", "一番", "一緒", "七", "七つ", "万", "万年筆", "丈夫"];
-  await restoreAppFixture(page, await page.evaluate(`(() => {
+  const r2aFixture = () => page.evaluate(`(() => {
     const T = Date.now();
     const iso = (ms) => new Date(ms).toISOString();
     const taken = [];
@@ -2861,67 +2998,91 @@ async function main() {
     }
     for (const id of WORDS.slice(25)) taken.push({ t: 'word', id, label: id, ts: T - 9e5, started: T - 9e5 });
     return { v: 1, taken, srs };
-  })()`));
+  })()`);
+  await restoreAppFixture(page, await r2aFixture());
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
-  const boundedBtn = await page.locator('#review-start').textContent();
+  const truthBtn = await page.locator('#review-start').textContent();
+  const truthCounts = await page.evaluate(`[...document.querySelectorAll('#deck-counts .deck-count-n')].map((n) => Number(n.textContent))`);
   await tap(page, '#review-start');
   await page.waitForSelector('#reveal');
   const session = await page.evaluate(`window.__KAIRO_SRS__.session()`);
-  check('R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest',
-    /28/.test(boundedBtn) && session.queue === 20 && session.deferred === 8,
-    `button "${boundedBtn.trim()}" · frozen ${session.queue} · deferred ${session.deferred}`);
-  for (let i = 0; i < 20; i++) {
+  const truthN = Number((truthBtn.match(/[0-9]+/) || ['-1'])[0]);
+  check('R2-A · the button, the three counts and the sitting are one number (28), nothing frozen',
+    truthN === 28 && truthCounts.reduce((a, b) => a + b, 0) === 28 && session.queue === truthN && session.deferred === 0,
+    `button "${truthBtn.trim()}" · counts ${truthCounts.join('/')} · session ${session.queue} · held ${session.deferred}`);
+  for (let i = 0; i < truthN; i++) {
     await page.waitForSelector('#reveal', { timeout: 8000 });
     await page.evaluate(`document.querySelector('#reveal')?.click()`);
     await page.waitForSelector('.grade.g-easy', { timeout: 8000 });
     await page.evaluate(`document.querySelector('.grade.g-easy')?.click()`);
     await waitForAppRecord(page, (record) => record.revlog?.length === i + 1,
-      { description: 'committed bounded-review grade' });
+      { description: 'committed review grade' });
   }
-  await page.waitForSelector('.review-deferred');
-  const boundedEnd = await page.evaluate(`(() => ({
+  await page.waitForSelector('.close-doors');
+  const truthEnd = await page.evaluate(`(() => ({
     title: document.querySelector('.view-title')?.textContent ?? '',
-    deferredLine: document.querySelector('.review-deferred')?.textContent ?? '',
+    held: document.querySelectorAll('.review-deferred').length,
+    reveal: document.querySelectorAll('#reveal').length,
   }))()`);
-  check('R2-A · the goodbye screen carries the honest remainder — あと N, quietly',
-    /20/.test(boundedEnd.title) && /8/.test(boundedEnd.deferredLine),
-    `"${boundedEnd.title}" · "${boundedEnd.deferredLine}"`);
+  check('R2-A · the sitting says done after exactly the counted cards, with nothing held back',
+    /28/.test(truthEnd.title) && truthEnd.held === 0 && truthEnd.reveal === 0,
+    JSON.stringify(truthEnd));
   await shoot(page, shotsDir, '20-r2a-bounded-summary');
 
   // (f) ペース: the learner's own numbers persist, hold their bounds, and
-  // rule the queue after a full reboot
-  await page.locator('button.take').first().click();
+  // rule today's queue after a full reboot — reviews a day caps the button
+  await restoreAppFixture(page, await r2aFixture());
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
   await page.waitForSelector('#srs-prefs-toggle');
   await page.locator('#srs-prefs-toggle').click();
-  await page.waitForSelector('[data-pref-down="reviewLimit"]');
-  for (let i = 0; i < 2; i++) {
-    await page.locator('[data-pref-down="reviewLimit"]').click(); // 20 → 10
-    await page.waitForTimeout(160);
-  }
-  for (let i = 0; i < 4; i++) {
-    await page.locator('[data-pref-down="newPerDay"]').click(); // 20 → 0
-    await page.waitForTimeout(160);
-  }
+  await page.waitForSelector('[data-pref-down="reviewsPerDay"]');
+  // each press waits for its own committed number before the next, so no press lands on a
+  // stepper still disabled by the previous commit
+  const stepDown = async (key, times) => {
+    for (let i = 0; i < times; i++) {
+      const before = await page.locator(`[data-pref-val="${key}"]`).textContent();
+      await page.locator(`[data-pref-down="${key}"]`).click();
+      await page.waitForFunction(({ key, before }) =>
+        document.querySelector(`[data-pref-val="${key}"]`)?.textContent !== before, { key, before });
+      if (i + 1 < times) {
+        await page.waitForFunction((key) => !document.querySelector(`[data-pref-down="${key}"]`)?.disabled, key);
+      }
+    }
+  };
+  await stepDown('reviewsPerDay', 11); // 200 → 150 → 100 → 90 … → 10
+  await stepDown('newPerDay', 4); // 20 → 0
   const prefsStored = await evaluateAppRecord(page,
     `record.srsPrefs`,
   );
-  const minusDisabled = await page.evaluate(
-    `document.querySelector('[data-pref-down="newPerDay"]').disabled`,
-  );
-  check('R2-A · ペース persists the learner\'s numbers and holds its bounds',
-    prefsStored.reviewLimit === 10 && prefsStored.newPerDay === 0 && minusDisabled === true,
-    `stored ${JSON.stringify(prefsStored)} · minus disabled at 0`);
+  const stepBounds = await page.evaluate(`({
+    newMinus: document.querySelector('[data-pref-down="newPerDay"]').disabled,
+    reviewsMinus: document.querySelector('[data-pref-down="reviewsPerDay"]').disabled,
+    now: document.querySelector('#srs-preset-now')?.textContent ?? '',
+  })`);
+  check('R2-A · ペース persists the learner\'s numbers, holds its bounds, and calls it Custom',
+    prefsStored.reviewsPerDay === 10 && prefsStored.newPerDay === 0 && prefsStored.preset === 'custom:standard' &&
+      stepBounds.newMinus === true && stepBounds.reviewsMinus === true && /Custom|カスタム/.test(stepBounds.now),
+    `stored ${JSON.stringify(prefsStored)} · ${JSON.stringify(stepBounds)}`);
   await shoot(page, shotsDir, '21-r2a-pace-settings');
   await open('?entry=shelf');
   const prefsAfterReload = await page.evaluate(`window.__KAIRO_SRS__.prefs()`);
+  const todayAfterReload = await page.evaluate(`window.__KAIRO_SRS__.today()`);
   const dueWithZeroNew = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
-  check('R2-A · the chosen pacing survives reboot and rules the queue',
-    prefsAfterReload.newPerDay === 0 && prefsAfterReload.reviewLimit === 10 &&
-      dueWithZeroNew.length === 5 && !dueWithZeroNew.some((k) => R2A_WORDS.slice(25).map((w) => 'word:' + w).includes(k)),
-    `prefs ${JSON.stringify(prefsAfterReload)} · ${dueWithZeroNew.length} due, no fresh admitted`);
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  const cappedBtn = await page.locator('#review-start').textContent();
+  check('R2-A · the chosen pacing survives reboot and rules today\'s queue',
+    prefsAfterReload.newPerDay === 0 && prefsAfterReload.reviewsPerDay === 10 &&
+      todayAfterReload.review === 10 && todayAfterReload.new === 0 && todayAfterReload.held === 15 &&
+      /(^|[^0-9])10([^0-9]|$)/.test(cappedBtn) &&
+      dueWithZeroNew.length === 25 && !dueWithZeroNew.some((k) => R2A_WORDS.slice(25).map((w) => 'word:' + w).includes(k)),
+    `prefs ${JSON.stringify(prefsAfterReload)} · today ${JSON.stringify(todayAfterReload)} · "${cappedBtn.trim()}"`);
   check('R2-A · the probes leave no console errors',
     consoleErrors.length === errsBeforeR2A,
     consoleErrors.slice(errsBeforeR2A).join(' | ') || 'clean');
@@ -3186,7 +3347,8 @@ async function main() {
 
   // (c) back from a lesson run restores the learner's place in the long list
   await open('?entry=shelf');
-  await page.waitForSelector('#lessons-link');
+  await page.waitForSelector('#lessons-link', { state: 'attached' });
+  await openShelfTools(page);
   await tap(page, '#lessons-link');
   await page.waitForSelector('.lesson-row');
   await page.evaluate(`(() => {
@@ -3836,7 +3998,8 @@ async function main() {
   // holds the one explicit door — per word or all — and only that choice mints
   await restoreAppFixture(page, { v: 1, taken: [] });
   await open('?entry=shelf');
-  await page.waitForSelector('#lessons-link');
+  await page.waitForSelector('#lessons-link', { state: 'attached' });
+  await openShelfTools(page);
   await tap(page, '#lessons-link');
   await page.waitForSelector('.lesson-row');
   const lessonBreadth = await page.evaluate(`({
@@ -4033,7 +4196,7 @@ async function main() {
     resumed.q.includes('RELOAD-Q2') && /2\s*\/\s*3/.test(resumed.at),
     `"${resumed.q}" at "${resumed.at.trim()}"`);
   await page.evaluate(`[...document.querySelectorAll('.lesson-option')][1].click()`);
-  await page.waitForTimeout(250);
+  await page.waitForSelector('#aiq-next:not([disabled])', { state: 'attached', timeout: 15000 });
   await open('?entry=shelf');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
@@ -4048,11 +4211,16 @@ async function main() {
     midPick.why === 'because two' && midPick.marked === 1,
     JSON.stringify(midPick));
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
-  await page.waitForTimeout(150);
-  await page.evaluate(`[...document.querySelectorAll('.lesson-option')][0].click()`);
-  await page.waitForTimeout(150);
+  await page.waitForFunction(() =>
+    (document.querySelector('.aiq-q')?.textContent ?? '').includes('RELOAD-Q3') &&
+      !!document.querySelector('.lesson-option:not([disabled])'), null, { timeout: 15000 });
+  await page.evaluate(`document.querySelector('.lesson-option:not([disabled])').click()`);
+  await page.waitForSelector('#aiq-next:not([disabled])', { state: 'attached', timeout: 15000 });
   await page.evaluate(`document.querySelector('#aiq-next').click()`);
-  await page.waitForTimeout(250);
+  await page.waitForFunction(() =>
+    document.body.dataset.view === 'aiquiz' &&
+      !!document.querySelector('h1.view-title') &&
+      !document.querySelector('.aiq-q'), null, { timeout: 15000 });
   const quizScore = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
@@ -4068,8 +4236,11 @@ async function main() {
       quizScore.taken === 0 &&
       quizScore.srsKeys === 0,
     `title "${quizScore.title.trim()}" · stored ${quizScore.stored}`);
+  await page.waitForSelector('#aiq-close:not([disabled])', { state: 'attached', timeout: 15000 });
   await page.evaluate(`document.querySelector('#aiq-close').click()`);
-  await page.waitForTimeout(250);
+  await page
+    .waitForFunction(() => document.body.dataset.view === 'tray', null, { timeout: 15000 })
+    .catch(() => {});
   const quizClosed = await evaluateAppRecord(page,
     `record.aiQuiz`,
   );

@@ -8,6 +8,7 @@ import {
   createPassageVersion,
   getOfficialBlueprint,
   inspectFormStructure,
+  JLPT_SCORE_FACTS,
   OFFICIAL_BLUEPRINTS,
   parseFormVersion,
   parseItemVersion,
@@ -92,6 +93,47 @@ describe('immutable assessment content', () => {
         provenance: { kind: 'licensed-adaptation', authorRef: null, processRef: null, sources: [] },
       }),
     ).toThrow();
+  });
+  it('keeps an official private paper whole, sourced and on this device', () => {
+    const official = {
+      kind: 'official-private' as const,
+      authorRef: null,
+      processRef: null,
+      sources: [
+        {
+          id: 'fixture-official-paper',
+          label: 'Synthetic official-paper fixture',
+          uri: null,
+          licenseClaim: 'personal study',
+        },
+      ],
+    };
+    const privateRights = {
+      ...rights,
+      sync: { status: 'denied' as const, reason: 'personal-study only' },
+      'synthesize-audio': { status: 'denied' as const, reason: 'use the official recording' },
+    };
+    const real = item('official:q1', { provenance: official, rights: privateRights });
+    expect(parseItemVersion(real)).toEqual(real);
+    expect(
+      parseFormVersion(form([real], { provenance: official, rights: privateRights })),
+    ).toBeTruthy();
+    expect(() =>
+      item('official:unsourced', {
+        provenance: { ...official, sources: [] },
+        rights: privateRights,
+      }),
+    ).toThrow();
+    expect(() => item('official:syncable', { provenance: official, rights })).toThrow();
+    expect(() =>
+      item('official:voice', {
+        provenance: official,
+        rights: { ...privateRights, 'synthesize-audio': rights['synthesize-audio'] },
+      }),
+    ).toThrow();
+    // one form never mixes a real question with one written for Kairo
+    expect(() => form([real, item()], { provenance: official, rights: privateRights })).toThrow();
+    expect(() => form([real])).toThrow();
   });
   it('requires an exact ordered answer permutation, without inferring language correctness', () => {
     const ordered = item('ordered', {
@@ -263,6 +305,56 @@ describe('official facts versus authored coverage', () => {
     ).toBe(true);
     expect(OFFICIAL_BLUEPRINTS.every((entry) => entry.fixedUniversalItemCount === null)).toBe(true);
     expect(getOfficialBlueprint('jlpt-n1-facts-20260910')?.forbiddenTasks).toEqual(['orthography']);
+  });
+  it('records the published JLPT pass marks, score sections and sectional minimums', () => {
+    expect(
+      JLPT_SCORE_FACTS.map((facts) => [
+        facts.track,
+        facts.passMark,
+        facts.sections.map((section) => [section.label, section.range, section.sectionalMinimum]),
+      ]),
+    ).toEqual([
+      [
+        'N5',
+        80,
+        [
+          ['言語知識（文字・語彙・文法）・読解', [0, 120], 38],
+          ['聴解', [0, 60], 19],
+        ],
+      ],
+      [
+        'N4',
+        90,
+        [
+          ['言語知識（文字・語彙・文法）・読解', [0, 120], 38],
+          ['聴解', [0, 60], 19],
+        ],
+      ],
+      ...(['N3', 'N2', 'N1'] as const).map((track, index) => [
+        track,
+        [95, 90, 100][index],
+        [
+          ['言語知識（文字・語彙・文法）', [0, 60], 19],
+          ['読解', [0, 60], 19],
+          ['聴解', [0, 60], 19],
+        ],
+      ]),
+    ]);
+    for (const facts of JLPT_SCORE_FACTS) {
+      // every skill is reported in exactly one section, and the ranges add up to the official total
+      expect(facts.sections.flatMap((section) => section.skills).sort()).toEqual([
+        'grammar',
+        'listening',
+        'reading',
+        'vocabulary',
+      ]);
+      expect(facts.sections.reduce((total, section) => total + section.range[1]!, 0)).toBe(180);
+      // each paper name belongs to a timing block this level's blueprint really has
+      const blueprint = OFFICIAL_BLUEPRINTS.find(
+        (entry) => entry.exam.family === 'jlpt' && entry.exam.track === facts.track,
+      )!;
+      for (const block of blueprint.timingBlocks) expect(facts.papers[block.id]).toBeTruthy();
+    }
   });
   it('records distinct J.TEST tracks and written-response requirements without inventing item counts', () => {
     const jtest = OFFICIAL_BLUEPRINTS.filter((entry) => entry.exam.family === 'jtest');

@@ -3,7 +3,7 @@
  * schedules a review nor calls a model: a test answer is not an FSRS grade. */
 import { encodeLocalJson } from './modules/record-core.mjs';
 import { selectAssessmentV2, parseAssessmentLibraryV2, assessmentEvidenceEligible,
-  validAssessmentAssistanceMark } from './assessment-v2-controller.mjs';
+  validAssessmentAssistanceMark, assessmentItemAssistanceV2 } from './assessment-v2-controller.mjs';
 import { deriveAssessmentCloze, createAssessmentClozePractice } from './assessment-cloze.mjs';
 import { acceptSentencePractice } from './sentence-practice.mjs';
 import { selectTeacherContext } from './teacher-context.mjs';
@@ -105,12 +105,14 @@ export function validateAssessmentLearningRecord(record) {
       const item = selected.form.items.find(row => row.id === evidence.item.id);
       const result = selected.score.items.find(row => row.itemId === evidence.item.id);
       const answer = selected.attempt.answers.find(row => row.item.id === evidence.item.id);
+      const assistance = ['correct', 'incorrect'].includes(result?.result)
+        ? assessmentItemAssistanceV2(selected.attempt, evidence.item.id) : null;
       if (!item || item.revisionId !== evidence.item.revisionId || item.sha256 !== evidence.item.sha256 ||
           result.result !== evidence.outcome || !same(result.response, evidence.response) ||
           result.elapsedMs !== evidence.elapsedMs || answer.flagged !== evidence.flagged ||
           item.skill !== evidence.skill || item.task !== evidence.task || !same(item.subjects, evidence.subjects) ||
-          (answer.assistance == null) !== (evidence.assistance == null) ||
-          answer.assistance && (evidence.assistance.kind !== answer.assistance.kind || evidence.assistance.at !== answer.assistance.at))
+          (assistance == null) !== (evidence.assistance == null) ||
+          assistance && (evidence.assistance.kind !== assistance.kind || evidence.assistance.at !== assistance.at))
         fail('evidence-mismatch');
     }
     for (const action of followup.actions) {
@@ -297,4 +299,47 @@ export function assessmentLearningSummary(raw, scope) {
     if (followup.status === 'pending-mapping') pending++;
   }
   return { completed, stopped, skills, pending, focus: [...focus.values()].sort((a, b) => b.misses - a.misses || a.subject.localeCompare(b.subject)).slice(0, 24) };
+}
+
+/** Re-encounter priorities, never grades, mastery or permission to enroll.
+ * A provisional key can suggest another encounter but cannot establish a
+ * weakness. Keep its editorial status and exact source attached all the way
+ * to the consumer. Flagging is a bookmark; an incorrect unflagged answer is
+ * included identically. Unanswered and abandoned work cannot manufacture a
+ * lexical weakness. Explicit removals remain a surfaced suppression. */
+export function assessmentPracticePriorities(raw, scope) {
+  const result = { kind: 'assessment-practice-priorities', authority: 'practice-only',
+    scheduling: 'unchanged', mastery: 'unchanged', targets: [] };
+  if (!raw) return result;
+  const root = parseAssessmentLearning(raw, scope), targets = new Map(), seen = new Set();
+  const suppressed = new Set(root.suppressions.map(row => row.key));
+  for (const followup of root.followups) {
+    if (followup.status === 'stopped') continue;
+    const provisional = followup.editorialAtStart.status === 'unreviewed' ||
+      followup.editorialAtStart.policyVersion === 'bunki-machine-check/1';
+    for (const evidence of followup.evidence) {
+      if (evidence.outcome !== 'incorrect') continue;
+      for (const subject of new Set(evidence.subjects)) {
+        if (!/^(word|kanji|grammar|particle):[^\s].{0,199}$/u.test(subject)) continue;
+        const identity = `${evidence.id}\n${subject}`;
+        if (seen.has(identity)) continue; seen.add(identity);
+        const target = targets.get(subject) || { subject, misses: 0, reviewedMisses: 0,
+          provisionalMisses: 0, lastMissAt: 0, suppressed: suppressed.has(subject), evidence: [] };
+        const at = typeof followup.completedAt === 'number' ? followup.completedAt : Date.parse(followup.completedAt);
+        target.misses++; target[provisional ? 'provisionalMisses' : 'reviewedMisses']++;
+        if (Number.isFinite(at)) target.lastMissAt = Math.max(target.lastMissAt, at);
+        target.evidence.push({ evidenceId: evidence.id, attemptId: followup.attemptId,
+          attemptRevisionId: followup.attemptRevisionId, itemId: evidence.item.id,
+          item: copy(evidence.item), form: copy(followup.form), completedAt: followup.completedAt,
+          editorialStatus: followup.editorialAtStart.status,
+          editorialPolicy: followup.editorialAtStart.policyVersion, provisional,
+          mode: followup.mode, assisted: validAssessmentAssistanceMark(evidence.assistance),
+          priorExposure: followup.priorExposure, flagged: evidence.flagged === true });
+        targets.set(subject, target);
+      }
+    }
+  }
+  result.targets = [...targets.values()].sort((a, b) => b.lastMissAt - a.lastMissAt ||
+    b.misses - a.misses || a.subject.localeCompare(b.subject));
+  return result;
 }

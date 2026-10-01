@@ -31,7 +31,23 @@ import {
 import { WRITTEN_SPECS, prepareWrittenOriginal } from './assessment/prepare-originals.mjs';
 import { importSource, sourceURL, validateSourceRequest } from './assessment/source-import.mjs';
 import { learningTargets } from './assessment/learning-targets.mjs';
-import { verifyMachineCheckedCatalog } from './assessment/written-bank.mjs';
+import { assertPermutedRevision, verifyMachineCheckedCatalog } from './assessment/written-bank.mjs';
+import {
+  answerBalanceProblems,
+  applyBalance,
+  assertAnswerBalance,
+  formAnswerKeys,
+  pinReason,
+  planBalance,
+} from './assessment/answer-balance.mjs';
+import {
+  DAIMON,
+  officialInstruction,
+  officialSectionResults,
+  paperLayout,
+  paperSegments,
+  paperStem,
+} from '../assessment-view.mjs';
 import {
   MACHINE_CHECK_LABEL,
   MACHINE_CHECK_POLICY,
@@ -1329,6 +1345,207 @@ await check('Machine-checked records reject self-review, disagreement, flags, on
   form.items[0].response.options.reverse();
   await writeFile(join(site, entry.formPath), JSON.stringify(form));
   await assert.rejects(verifyMachineCheckedCatalog(site, { entries: [entry] }));
+});
+const machineForms = async (catalog = shippedCatalog) => Promise.all(
+  catalog.entries.filter((entry) => isMachineCheckedEntry(entry)).map(async (entry) => ({
+    entry,
+    form: api.parseFormVersion(await read(join(PUBLIC_BANK, entry.formPath))),
+  })),
+);
+await check('answer-balance: every machine-checked form keys each position evenly, and a skewed form fails', async () => {
+  const rows = await machineForms();
+  assert.equal(rows.length, 26);
+  for (const { form } of rows) assertAnswerBalance(form);
+  const pooled = [0, 0, 0, 0];
+  for (const { form } of rows) for (const key of formAnswerKeys(form).keys) pooled[key - 1] += 1;
+  const total = pooled.reduce((a, b) => a + b, 0);
+  assert(pooled.every((count) => Math.abs(count - total / 4) <= 26), `pooled keys ${pooled.join('/')}`);
+  // Negative control: the same real form with 60% of its keys moved to position 2 must fail.
+  const skewed = structuredClone(rows.find(({ form }) => form.items.length === 40).form);
+  skewed.items.slice(0, 24).forEach((item) => { item.response.answerOptionId = item.response.options[1].id; });
+  assert.throws(() => assertAnswerBalance(skewed), /answer-balance .*key 2 is 2\d of 40/u);
+  // …and each rule fails on its own.
+  const flat = Array.from({ length: 16 }, (_, index) => (index % 4) + 1);
+  const tasks = Array(16).fill('grammar-form');
+  assert.deepEqual(answerBalanceProblems(flat, tasks), []);
+  assert.match(answerBalanceProblems([1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 2, 3], tasks).join(), /repeats more than 3/u);
+  assert.match(answerBalanceProblems([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [...Array(4).fill('usage'), ...Array(12).fill('x')]).join(), /^$/u);
+  assert.match(answerBalanceProblems([1, 3, 1, 2, 3, 4, 2, 4, 2, 3, 4, 1, 2, 3, 4, 1], [...Array(4).fill('usage'), ...Array(12).fill('x')]).join(), /^$/u);
+  assert.match(answerBalanceProblems([1, 1, 2, 1, 3, 4, 2, 4, 2, 3, 4, 3, 2, 3, 4, 1], [...Array(4).fill('usage'), ...Array(12).fill('x')]).join(), /usage: key 1 is 3 of 4, above 2/u);
+  assert.match(answerBalanceProblems([1, 2, 3, 2, 3, 4, 2, 4, 2, 3, 4, 3, 2, 3, 4, 1], tasks).join(), /key 1 is 2 of 16/u);
+});
+await check('Balancing moves options only: a skewed manuscript comes out balanced with every key text and pinned order kept', () => {
+  const entry = (task, options, answer, rationale = 'せつめい。\nThis is the English line here.') => ({ task, options, answer, rationale });
+  const items = [
+    ...Array.from({ length: 12 }, (_, index) => entry('grammar-form', [`あ${index}`, `い${index}`, `う${index}`, `え${index}`], 1)),
+    ...Array.from({ length: 6 }, (_, index) => entry('usage', [`か${index}`, `き${index}`, `く${index}`, `け${index}`], 1)),
+    entry('usage', ['一', '二', '三', '四'], 1, '「似合う」を使う。1は「似ている」、3は「合う」が正しい。\nThe English line names positions.'),
+    entry('information-retrieval', ['100円', '200円', '300円', '400円'], 1),
+  ];
+  const manuscript = { level: 'N3', items };
+  const plan = planBalance(manuscript, { stem: 'fixture-skewed' });
+  const next = applyBalance(manuscript, plan);
+  const keys = next.items.map((row) => row.answer + 1);
+  assert.deepEqual(answerBalanceProblems(keys, next.items.map((row) => row.task)), []);
+  assert.deepEqual(answerBalanceProblems(items.map((row) => row.answer + 1), items.map((row) => row.task)).length > 0, true);
+  next.items.forEach((row, index) => {
+    assert.equal(row.options[row.answer], items[index].options[items[index].answer], `q${index + 1} key text`);
+    assert.deepEqual([...row.options].sort(), [...items[index].options].sort());
+    assert.equal(row.rationale, items[index].rationale);
+  });
+  assert.equal(pinReason(items[18]), 'rationale-names-positions');
+  assert.equal(pinReason(items[19]), 'ascending-numbers');
+  assert.equal(pinReason(items[0]), null);
+  assert.deepEqual(next.items[18].options, items[18].options);
+  assert.deepEqual(next.items[19].options, items[19].options);
+  // pairs stay pairs: an XOR move keeps options 1–2 and 3–4 together
+  for (const row of next.items.slice(0, 18)) {
+    const original = items[next.items.indexOf(row)].options;
+    const pairOf = (list, text) => Math.floor(list.indexOf(text) / 2);
+    assert.equal(pairOf(row.options, original[0]) === pairOf(row.options, original[1]), true);
+  }
+});
+await check('Revised machine-checked forms keep every question and key text; the prior revision stays addressable', async () => {
+  const rows = await machineForms();
+  const archived = shippedCatalog.archivedEntries.filter((entry) => entry.publicationRoute === MACHINE_CHECK_ROUTE);
+  const revised = rows.filter(({ entry }) => archived.some((prior) => prior.id === entry.id));
+  assert.equal(revised.length, 25, 'the 25 balanced forms each archive their prior revision');
+  let moved = 0;
+  for (const { entry, form } of revised) {
+    const prior = archived.find((row) => row.id === entry.id);
+    assert.notEqual(prior.formSha256, entry.formSha256);
+    for (const path of [prior.formPath, prior.deliveryPath, prior.review.evidencePath]) await readFile(join(PUBLIC_BANK, path));
+    const before = api.parseFormVersion(await read(join(PUBLIC_BANK, prior.formPath)));
+    assert.equal(before.sha256, prior.formSha256);
+    moved += assertPermutedRevision(before, form);
+    assert.equal(entry.review.label, MACHINE_CHECK_LABEL, 'a permutation is not a review: 検収前 stays');
+    assert.equal(entry.review.acceptance, 'awaiting-john');
+  }
+  assert(moved > 500, `only ${moved} keys moved`);
+  // Negative control: one changed option text, or a changed key, is not a permutation.
+  const [{ form }] = revised;
+  const prior = api.parseFormVersion(await read(join(PUBLIC_BANK, archived.find((row) => row.id === form.id).formPath)));
+  const edited = structuredClone(form);
+  edited.items[0].response.options[0].text += '。';
+  assert.throws(() => assertPermutedRevision(prior, edited), /options changed/u);
+  const rekeyed = structuredClone(form);
+  rekeyed.items[0].response.answerOptionId = rekeyed.items[0].response.options.find((option) => option.id !== rekeyed.items[0].response.answerOptionId).id;
+  assert.throws(() => assertPermutedRevision(prior, rekeyed), /key text changed/u);
+});
+await check('Machine-checked tests sit the official written papers and times; practice sets declare none', async () => {
+  const rows = await machineForms();
+  const official = { N1: [110], N2: [105], N3: [30, 70], N4: [25, 55], N5: [20, 40] };
+  for (const { entry, form } of rows) {
+    const practice = entry.questionCount < 20;
+    assert.equal(entry.timingAuthority, practice ? undefined : 'official-fact', entry.id);
+    if (practice) {
+      assert.deepEqual(form.timingBlocks.map((block) => block.authority.kind), ['authoring-rule']);
+      continue;
+    }
+    assert.deepEqual(form.timingBlocks.map((block) => block.durationMs / 60_000), official[entry.level], entry.id);
+    assert.equal(entry.durationMinutes, official[entry.level].reduce((a, b) => a + b, 0));
+    for (const block of form.timingBlocks) assert.equal(block.authority.blueprintId, form.blueprintId);
+    if (official[entry.level].length === 2) {
+      assert.deepEqual(form.timingBlocks.map((block) => block.authority.blockId), ['vocabulary', 'grammar-reading']);
+      assert.deepEqual(form.timingBlocks[0].sectionIds, ['section-vocabulary']);
+    }
+  }
+  // Negative control: an entry that claims official timing for its authored practice time fails.
+  const practice = rows.find(({ entry }) => entry.questionCount < 20).entry;
+  const site = join(evidence, 'fixture-timing-claim');
+  for (const path of [practice.formPath, practice.deliveryPath, practice.review.evidencePath]) {
+    await mkdir(dirname(join(site, path)), { recursive: true });
+    await copyFile(join(PUBLIC_BANK, path), join(site, path));
+  }
+  await writeFile(join(site, 'sources.json'), JSON.stringify(shippedSources));
+  assert.equal((await verifyMachineCheckedCatalog(site, { entries: [practice] })).length, 1);
+  await assert.rejects(
+    verifyMachineCheckedCatalog(site, { entries: [{ ...practice, timingAuthority: 'official-fact' }] }),
+    /timing authority/u,
+  );
+  // …and official timing is taken only from the form's own level.
+  await assert.rejects(
+    (async () => prepareWrittenOriginal({ ...n1Spec(), officialTiming: api.getOfficialBlueprint('jlpt-n2-facts-20260910') }))(),
+    /blueprint at its level/u,
+  );
+});
+await check('Machine-checked forms lay out as the official paper: 問題, continuous numbers, official wording, marks', async () => {
+  const rows = await machineForms();
+  let marked = 0, stars = 0, gaps = 0;
+  for (const { entry, form } of rows) {
+    for (const block of form.timingBlocks) {
+      const layout = paperLayout(form, block.id);
+      const numbers = [...layout.byItem.values()].map((row) => row.number);
+      assert.deepEqual(numbers, numbers.map((_, index) => index + 1), `${entry.id} numbers run on`);
+      assert.deepEqual(layout.groups.map((group) => group.mondai), layout.groups.map((_, index) => index + 1));
+      assert.equal(new Set(layout.groups.map((group) => group.task)).size, layout.groups.length, `${entry.id}: one 問題 per 大問`);
+      for (const group of layout.groups) {
+        // the N1 practice set's two compact tasks are not official 大問 and carry no official name
+        if (!(entry.questionCount < 20 && group.task.startsWith('compact-')))
+          assert(DAIMON[group.task], `${group.task} has an official 大問 name`);
+        const instruction = officialInstruction(form.exam.track, group.task, { passages: group.passageIds.length,
+          ...(group.gaps ? { first: group.numbers[0], last: group.numbers.at(-1) } : {}) });
+        assert(instruction, `${form.exam.track} ${group.task} has official wording`);
+        const text = instruction.filter((part) => typeof part === 'string').join('');
+        assert.match(text, ['N4', 'N5'].includes(form.exam.track) ? /ください。$/u : /なさい。$/u);
+        if (group.gaps) {
+          for (const [gap, number] of group.gaps) {
+            assert(Number.isInteger(gap) && group.numbers.includes(number), `${entry.id} gap ${gap}`);
+            const passage = form.passages.find((row) => row.id === group.passageIds[0]);
+            assert(paperSegments(passage.text, { gaps: group.gaps }).some((part) => part.kind === 'box' && part.n === number));
+            gaps++;
+          }
+        }
+      }
+      for (const id of layout.groups.flatMap((group) => group.itemIds)) {
+        const item = form.items.find((row) => row.id === id);
+        const stem = paperStem(item);
+        const words = stem.filter((part) => typeof part === 'string').join('');
+        assert(!/[【】]/u.test(words), `${id}: every 【】 becomes a mark`);
+        assert(!/選んでください|選びなさい|いれますか。$|かきますか。$|どれですか。$/u.test(words.split('\n')[0]) || item.skill === 'reading',
+          `${id}: the authored instruction line is replaced by the 問題 header`);
+        if (item.task === 'sentence-composition') {
+          assert.equal(stem.filter((part) => part.kind === 'slot').length, 3, id);
+          assert.equal(stem.filter((part) => part.kind === 'star').length, 1, id);
+          stars++;
+        }
+        if (['kanji-reading', 'paraphrase', 'orthography'].includes(item.task)) {
+          assert.equal(stem.filter((part) => part.kind === 'target').length, 1, `${id}: one underlined target`);
+          marked++;
+        }
+      }
+    }
+    if (['N3', 'N4', 'N5'].includes(entry.level) && entry.questionCount >= 20) {
+      const second = paperLayout(form, form.timingBlocks[1].id);
+      assert.equal([...second.byItem.values()][0].number, 1, 'the second paper numbers from 1, as its booklet does');
+    }
+  }
+  assert(marked > 150 && stars > 50 && gaps > 50, `${marked} targets, ${stars} ★ rows, ${gaps} gaps`);
+  // Negative controls: an unknown 大問 has no wording; an unmapped gap stays text; an item
+  // whose gap is not in its passage leaves no box.
+  assert.equal(officialInstruction('N1', 'made-up-task'), null);
+  assert.deepEqual(paperSegments('前（１）後'), ['前（１）後']);
+  assert.deepEqual(paperSegments('前（１）後', { gaps: new Map([[2, 9]]) }), ['前（１）後']);
+  assert.deepEqual(paperSegments('【緩和】（　）＿★＿＿＿＿'), [
+    { kind: 'target', text: '緩和' }, { kind: 'blank' }, { kind: 'star' }, { kind: 'slot' }]);
+});
+await check('Results report the official 得点区分 with raw counts; published marks are facts, never a conversion', async () => {
+  const [{ form }] = (await machineForms()).filter(({ entry }) => entry.level === 'N1');
+  const score = form.items.map((item, index) => ({ itemId: item.id, skill: item.skill, result: index % 2 ? 'correct' : 'incorrect', elapsedMs: 1000 }));
+  const n1 = officialSectionResults(api.JLPT_SCORE_FACTS.find((row) => row.track === 'N1'), form, score);
+  assert.deepEqual(n1.map((row) => [row.label, row.total, row.range, row.sectionalMinimum]), [
+    ['言語知識（文字・語彙・文法）', form.items.filter((item) => item.skill !== 'reading').length, [0, 60], 19],
+    ['読解', form.items.filter((item) => item.skill === 'reading').length, [0, 60], 19],
+    ['聴解', 0, [0, 60], 19],
+  ]);
+  assert.equal(n1.reduce((total, row) => total + row.correct, 0), score.filter((row) => row.result === 'correct').length);
+  assert(n1[0].byTask.every((row) => DAIMON[row.task]));
+  const n5 = officialSectionResults(api.JLPT_SCORE_FACTS.find((row) => row.track === 'N5'), form, score);
+  assert.deepEqual(n5.map((row) => [row.total, row.sectionalMinimum]), [[form.items.length, 38], [0, 19]]);
+  // Negative control: a listening answer is never counted as language knowledge or reading.
+  const heard = officialSectionResults(api.JLPT_SCORE_FACTS.find((row) => row.track === 'N1'), form,
+    [{ itemId: 'x', skill: 'listening', result: 'correct', elapsedMs: 1 }]);
+  assert.deepEqual(heard.map((row) => row.total), [0, 0, 1]);
 });
 await check('A native rebuild keeps every machine-checked entry exactly', async () => {
   const site = join(evidence, 'fixture-machine-checked-rebuild');

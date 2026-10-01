@@ -15,6 +15,7 @@ import { homedir } from 'node:os';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LEVEL_PROFILES } from './prepare-expanded-bank-jobs.mjs';
+import { answerBalanceProblems, assertAnswerBalance, formAnswerKeys } from './answer-balance.mjs';
 import {
   MACHINE_CHECK_DECISION,
   MACHINE_CHECK_LABEL,
@@ -29,11 +30,11 @@ export const MANUSCRIPTS = fileURLToPath(new URL('./authoring/written-bank/', im
 export const MANUSCRIPT_SCHEMA = 'bunki-written-bank-manuscript/1';
 
 /** Per-test task allocation. Local authoring rules scaled from the official written sections
- * (LEVEL_PROFILES) — not official fixed counts. Minutes follow the official written-section
- * minutes per item at each level, rounded: an author-selected practice allocation. */
+ * (LEVEL_PROFILES) — not official fixed counts. Timing is not authored here: every test runs
+ * the official written papers of its level, with their official times (OFFICIAL_BLUEPRINTS):
+ * N1 110, N2 105 minutes in one paper; N3 30+70, N4 25+55, N5 20+40 in two. */
 export const WRITTEN_BANK_LEVELS = Object.freeze({
   N1: {
-    minutes: 60,
     blueprint: {
       'kanji-reading': 4, 'contextual-expression': 4, paraphrase: 3, usage: 3,
       'grammar-form': 6, 'sentence-composition': 3, 'text-grammar': 3,
@@ -42,7 +43,6 @@ export const WRITTEN_BANK_LEVELS = Object.freeze({
     },
   },
   N2: {
-    minutes: 60,
     blueprint: {
       'kanji-reading': 3, orthography: 2, 'word-formation': 2, 'contextual-expression': 3,
       paraphrase: 3, usage: 2,
@@ -52,7 +52,6 @@ export const WRITTEN_BANK_LEVELS = Object.freeze({
     },
   },
   N3: {
-    minutes: 50,
     blueprint: {
       'kanji-reading': 4, orthography: 3, 'contextual-expression': 3, paraphrase: 2, usage: 2,
       'grammar-form': 6, 'sentence-composition': 2, 'text-grammar': 3,
@@ -60,7 +59,6 @@ export const WRITTEN_BANK_LEVELS = Object.freeze({
     },
   },
   N4: {
-    minutes: 35,
     blueprint: {
       'kanji-reading': 3, orthography: 2, 'contextual-expression': 3, paraphrase: 2, usage: 1,
       'grammar-form': 6, 'sentence-composition': 2, 'text-grammar': 2,
@@ -68,7 +66,6 @@ export const WRITTEN_BANK_LEVELS = Object.freeze({
     },
   },
   N5: {
-    minutes: 30,
     blueprint: {
       'kanji-reading': 3, orthography: 3, 'contextual-expression': 2, paraphrase: 2,
       'grammar-form': 5, 'sentence-composition': 2, 'text-grammar': 2,
@@ -283,7 +280,8 @@ const LEGACY_N1_SOURCE = Object.freeze({
   processRef: 'claude-original-n1-practice-20260925',
   rightsBasis: 'bunki-original-authoring-20260923',
 });
-const HOST_EVIDENCE = join(homedir(), '.dharma/bunki_review/2026-09-28/jlpt/publish');
+const HOST_EVIDENCE = process.env.BUNKI_WRITTEN_BANK_EVIDENCE ??
+  join(homedir(), '.dharma/bunki_review/2026-09-28/jlpt/publish');
 
 /** The bank spec for one manuscript; the prepared form carries every value below. */
 export function writtenBankSpec(manuscript, bytes) {
@@ -303,7 +301,7 @@ export function writtenBankSpec(manuscript, bytes) {
       processRef: WRITTEN_BANK_SOURCE.processRef,
       rightsBasis: WRITTEN_BANK_SOURCE.rightsBasis,
       blueprintId: `jlpt-${level.toLowerCase()}-facts-20260910`,
-      minutes: WRITTEN_BANK_LEVELS[level].minutes,
+      timing: 'official',
       policyVersion: `${level.toLowerCase()}-written-bank-allocation-20260928`,
       authorModelFamily: manuscript.authorModelFamily,
       forbiddenTasks: [],
@@ -356,6 +354,13 @@ const skillCountsOf = (form) =>
     ]),
   );
 
+/** 'official-fact' when every block is an official written paper, else 'authoring-rule'. */
+export function timingAuthorityOf(form) {
+  const kinds = new Set(form.timingBlocks.map((block) => block.authority.kind));
+  if (kinds.size !== 1) throw new Error(`${form.id}: mixed timing authority`);
+  return [...kinds][0];
+}
+
 /** Build one immutable form, its media-free delivery with per-item provenance, its public
  * machine-check record and its catalog entry. Every item must already be kept. */
 export async function buildWrittenBankEntry(unit, verdicts) {
@@ -374,7 +379,9 @@ export async function buildWrittenBankEntry(unit, verdicts) {
     throw new Error(
       `${unit.stem}: items not kept by the machine check: ${blocked.map(({ index, decision }) => `q${index + 1} ${decision.status}`).join(', ')}`,
     );
-  const prepared = prepareWrittenOriginal(spec);
+  const officialTiming = spec.timing === 'official' ? api.getOfficialBlueprint(spec.blueprintId) : null;
+  if (spec.timing === 'official' && !officialTiming) throw new Error(`${unit.stem}: no official blueprint ${spec.blueprintId}`);
+  const prepared = prepareWrittenOriginal({ ...spec, officialTiming });
   const section = await materializeWrittenSection(prepared, {
     bytes,
     items: manuscript.items,
@@ -383,6 +390,7 @@ export async function buildWrittenBankEntry(unit, verdicts) {
   const { form } = section;
   const formBytes = section.files['form.json'];
   if (form.items.length !== manuscript.items.length) throw new Error(`${unit.stem}: item count changed in mapping`);
+  assertAnswerBalance(form);
   const label = (family) => VERIFIER_FAMILIES.find((row) => row.family === family)?.label ?? family;
   const reviewItems = decisions.map(({ index, entry, decision }) => {
     const item = form.items[index];
@@ -442,6 +450,8 @@ export async function buildWrittenBankEntry(unit, verdicts) {
     titleEn: unit.titleEn,
     questionCount: form.items.length,
     durationMinutes: form.timingBlocks.reduce((total, block) => total + block.durationMs, 0) / 60_000,
+    // Only official timing is declared; an entry without it keeps its authored practice time.
+    ...(timingAuthorityOf(form) === 'official-fact' ? { timingAuthority: 'official-fact' } : {}),
     skillCounts: skillCountsOf(form),
     sourceClass: 'original-ai',
     sourceIds: [unit.source.id],
@@ -554,6 +564,32 @@ export async function publishWrittenBank(units, { publicDirectory = PUBLIC_DIREC
   return { catalog: nextCatalog, built, removed, archived: archived.length - (catalog.archivedEntries ?? []).length };
 }
 
+/** A balanced revision moves options only: the same items in the same order, each with its
+ * prompt, passages, rationale, subjects and option texts unchanged, and its key text
+ * byte-identical. Returns how many keys moved. */
+export function assertPermutedRevision(prior, next) {
+  const fail = (why) => { throw new Error(`Permuted revision ${next.id}: ${why}`); };
+  if (prior.id !== next.id || prior.items.length !== next.items.length) fail('is not the same form');
+  if (JSON.stringify(prior.passages.map((row) => [row.id, row.textSha256])) !==
+      JSON.stringify(next.passages.map((row) => [row.id, row.textSha256])))
+    fail('passages changed');
+  let moved = 0;
+  prior.items.forEach((before, index) => {
+    const after = next.items[index];
+    for (const field of ['id', 'skill', 'task', 'prompt', 'rationale', 'translatedInstruction'])
+      if (before[field] !== after[field]) fail(`q${index + 1} ${field} changed`);
+    for (const field of ['subjects', 'passages'])
+      if (JSON.stringify(before[field].map((row) => row.id ?? row)) !== JSON.stringify(after[field].map((row) => row.id ?? row)))
+        fail(`q${index + 1} ${field} changed`);
+    const texts = (item) => item.response.options.map((option) => option.text);
+    if (JSON.stringify([...texts(before)].sort()) !== JSON.stringify([...texts(after)].sort())) fail(`q${index + 1} options changed`);
+    const key = (item) => item.response.options.find((option) => option.id === item.response.answerOptionId).text;
+    if (key(before) !== key(after)) fail(`q${index + 1} key text changed`);
+    if (texts(before).indexOf(key(before)) !== texts(after).indexOf(key(after))) moved++;
+  });
+  return moved;
+}
+
 /** Public-file verification of every machine-checked entry: no personal runtime files needed. */
 export async function verifyMachineCheckedCatalog(publicDirectory = PUBLIC_DIRECTORY, catalog = null) {
   const { assessmentAPI, boundedAsset } = await import('./bank.mjs');
@@ -576,6 +612,22 @@ export async function verifyMachineCheckedCatalog(publicDirectory = PUBLIC_DIREC
         JSON.stringify(skillCountsOf(form)) !== JSON.stringify(entry.skillCounts) ||
         form.timingBlocks.reduce((total, block) => total + block.durationMs, 0) !== entry.durationMinutes * 60_000)
       fail('declared counts or time differ from the form');
+    // Official timing: exactly the level's written papers, in order, with their official minutes.
+    const timing = timingAuthorityOf(form);
+    if (timing !== (entry.timingAuthority ?? 'authoring-rule')) fail('declared timing authority differs from the form');
+    if (timing === 'official-fact') {
+      const blueprint = api.getOfficialBlueprint(form.blueprintId);
+      const papers = blueprint?.timingBlocks.filter((fact) => fact.duration === 'fixed' && !fact.skills.includes('listening')) ?? [];
+      if (blueprint?.exam.track !== entry.level || papers.length !== form.timingBlocks.length ||
+          form.timingBlocks.some((block, index) => block.authority.blockId !== papers[index].id ||
+            block.durationMs !== papers[index].minutes * 60_000 ||
+            block.sectionIds.some((id) => !papers[index].skills.includes(form.sections.find((section) => section.id === id)?.skill))))
+        fail('timing is not the official written papers of its level');
+    }
+    // answer-balance: flat key positions, as on the official papers.
+    const { keys, tasks } = formAnswerKeys(form);
+    const balance = answerBalanceProblems(keys, tasks);
+    if (balance.length) fail(`answer-balance: ${balance.join('; ')}`);
     const source = sources.sources.find((row) => row.id === entry.sourceIds[0]);
     if (entry.sourceIds.length !== 1 || source?.sourceClass !== 'original-ai' || source.distribution !== 'public-candidate')
       fail('source is not a registered original');

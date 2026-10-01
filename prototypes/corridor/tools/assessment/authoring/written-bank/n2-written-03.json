@@ -22,12 +22,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nスマートフォンの電池の【寿命】は、使い方によって大きく変わる。",
       "options": [
-        "じゅめい",
-        "じゅうめい",
+        "すみょう",
         "じゅみょう",
-        "すみょう"
+        "じゅうめい",
+        "じゅめい"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "寿命は「じゅみょう」と読む。「命」を「みょう」と読む言葉だ。\nThe word 寿命 (lifespan) is read jumyō.",
       "target": "寿命"
     },
@@ -50,12 +50,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n昔、この遊歩道の下には【線路】が通っていたそうだ。",
       "options": [
-        "せいろ",
-        "ぜんろ",
         "せんじ",
-        "せんろ"
+        "せんろ",
+        "せいろ",
+        "ぜんろ"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "線路は「せんろ」と読み、列車が走る道のことだ。\nThe word 線路 (railway track) is read senro.",
       "target": "線路"
     },
@@ -64,12 +64,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nこの駅は、古いホームの【せいび】のため、しばらく一部が使えない。",
       "options": [
-        "正備",
-        "整備",
         "整美",
-        "生備"
+        "生備",
+        "正備",
+        "整備"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "設備などを整えて、いつでも使える状態にすることを「整備」と書く。\nSeibi, putting facilities in good working order, is written 整備.",
       "target": "整備"
     },
@@ -78,12 +78,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nこの町には、JRのほかに【してつ】の路線も二本通っている。",
       "options": [
-        "支鉄",
-        "市鉄",
         "私徹",
-        "私鉄"
+        "私鉄",
+        "支鉄",
+        "市鉄"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "民間の会社が経営する鉄道を「私鉄」と書く。\nShitetsu, a privately owned railway, is written 私鉄.",
       "target": "私鉄"
     },
@@ -92,12 +92,12 @@
       "task": "word-formation",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこのまくらは通気（　）がよく、夏でも快適に眠れる。",
       "options": [
-        "力",
         "性",
-        "式",
-        "型"
+        "力",
+        "型",
+        "式"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "性質を表す「性」がつき、「通気性」で空気の通りやすさを表す。\nThe suffix 性 marks a property, so tsūkisei means breathability."
     },
     {
@@ -118,12 +118,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n大雨の被害があった地域に、全国から多くのボランティアが（　）。",
       "options": [
-        "駆けつけた",
         "追いついた",
-        "呼び止めた",
-        "立ち寄った"
+        "駆けつけた",
+        "立ち寄った",
+        "呼び止めた"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "急いでその場所に行くことを「駆けつける」という。\nKaketsukeru means to rush to a place to help.",
       "target": "駆けつける"
     },
@@ -174,12 +174,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n箱の中には、古い駅の写真が【ぎっしり】詰まっていた。",
       "options": [
-        "すきまなく",
         "きれいに",
-        "少しだけ",
-        "ばらばらに"
+        "すきまなく",
+        "ばらばらに",
+        "少しだけ"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「ぎっしり」は、すきまがないほどいっぱいに詰まっている様子を表す。\nGisshiri means packed tightly with no gaps.",
       "target": "ぎっしり"
     },
@@ -188,12 +188,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n【いよいよ】明日から、新しい駅舎が使えるようになる。",
       "options": [
-        "もしかすると",
-        "ついに",
         "相変わらず",
-        "いつの間にか"
+        "いつの間にか",
+        "もしかすると",
+        "ついに"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "ここでの「いよいよ」は、待っていた時がとうとう来たことを表し、「ついに」に近い。\nHere iyoiyo means at last, close to tsui ni.",
       "target": "いよいよ"
     },
@@ -216,12 +216,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【取り消す】",
       "options": [
-        "美容院の予約を、電話で取り消した。",
-        "駅の古い線路を取り消して、公園にした。",
         "寝る前に、スマートフォンの電源を取り消した。",
-        "ボランティアで、公園のごみを取り消した。"
+        "ボランティアで、公園のごみを取り消した。",
+        "美容院の予約を、電話で取り消した。",
+        "駅の古い線路を取り消して、公園にした。"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "「取り消す」は、一度決めた約束や予定をなかったことにするという意味だ。\nTorikesu means to cancel something that was already arranged.",
       "target": "取り消す"
     },
@@ -230,12 +230,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n長年この駅を利用してきた（　）、駅舎がなくなるのはさびしい。",
       "options": [
-        "くせに",
         "だけに",
-        "ばかりか",
-        "ものの"
+        "くせに",
+        "ものの",
+        "ばかりか"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "長年利用してきたから、なおさらさびしいという意味で「だけに」が合う。\nDake ni means all the more because.",
       "subject": "grammar:dakeni"
     },
@@ -244,12 +244,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nスマートフォンの普及（　）、寝る前に画面を見る人が増えた。",
       "options": [
-        "にこたえて",
         "に沿って",
-        "に伴って",
-        "にわたって"
+        "にこたえて",
+        "にわたって",
+        "に伴って"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "一方の変化につれて、もう一方も変化することを表す「に伴って」が合う。\nNi tomonatte means along with a change.",
       "subject": "grammar:nitomonatte"
     },
@@ -258,12 +258,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n美容院で髪を切ってもらっている（　）、急に電話が鳴った。",
       "options": [
-        "最中に",
-        "たびに",
+        "ついでに",
         "とたんに",
-        "ついでに"
+        "たびに",
+        "最中に"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "ちょうど何かをしている途中にという意味の「最中に」が合う。\nSaichū ni means right in the middle of doing something.",
       "subject": "grammar:saichuuni"
     },
@@ -272,12 +272,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこのボランティアには、学生（　）、会社員や高齢者も参加している。",
       "options": [
-        "にしては",
         "に限って",
-        "に反して",
-        "はもちろん"
+        "にしては",
+        "はもちろん",
+        "に反して"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "学生は当然として、それ以外の人もという意味の「はもちろん」が合う。\nWa mochiron means not to mention.",
       "subject": "grammar:hamochiron"
     },
@@ -286,12 +286,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n寝る前に強い光を浴びると、眠りが浅くなる（　）。",
       "options": [
-        "ことがない",
         "恐れがある",
-        "わけがない",
-        "どころではない"
+        "ことがない",
+        "どころではない",
+        "わけがない"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "悪いことが起こる可能性があることを表す「恐れがある」が合う。\nOsore ga aru warns that something bad may happen.",
       "subject": "grammar:osoregaaru"
     },
@@ -314,12 +314,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n寝る前に＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ ようになった。",
       "options": [
-        "よく眠れる",
-        "やめてから",
         "スマートフォンを",
-        "見るのを"
+        "見るのを",
+        "よく眠れる",
+        "やめてから"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "正しい順は「スマートフォンを・見るのを・やめてから・よく眠れる」で、★には「やめてから」が入る。\nThe order is sumātofon o / miru no o / yamete kara / yoku nemureru."
     },
     {
@@ -327,12 +327,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの鉄道が＿★＿ ＿＿＿ ＿＿＿ ＿＿＿ 百年がたつ。",
       "options": [
-        "足として",
         "から",
-        "町の人々の",
-        "走り始めて"
+        "足として",
+        "走り始めて",
+        "町の人々の"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "正しい順は「町の人々の・足として・走り始めて・から」で、★には「町の人々の」が入る。\nThe order is machi no hitobito no / ashi to shite / hashirihajimete / kara."
     },
     {
@@ -353,12 +353,12 @@
       "task": "text-grammar",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "ところが",
         "たとえば",
-        "それとも",
-        "ただし"
+        "ところが",
+        "ただし",
+        "それとも"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "前の文の「土地の名物を使った駅弁」の具体例を挙げているので「たとえば」が合う。\nTatoeba introduces concrete examples of the statement before it.",
       "passage": "tg"
     },
@@ -367,12 +367,12 @@
       "task": "text-grammar",
       "prompt": "文章の（２）に入る最もよいものを選んでください。",
       "options": [
-        "以前より増えている",
-        "一人もいない",
         "以前より減っている",
-        "前からいなかった"
+        "前からいなかった",
+        "以前より増えている",
+        "一人もいない"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "移動時間が短くなったことと、後の「それでも」から、車内で食べる人は減っていると考えられる。\nShorter journeys and the following soredemo imply that fewer people eat on board.",
       "passage": "tg"
     },
@@ -381,12 +381,12 @@
       "task": "text-grammar",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "毎日の昼食",
-        "旅の気分を味わうもの",
+        "急いで食べるもの",
         "列車の中だけで食べるもの",
-        "急いで食べるもの"
+        "旅の気分を味わうもの",
+        "毎日の昼食"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "デパートの催しに人が集まることから、駅弁は旅の気分を味わうものとして楽しまれていると考えられる。\nEkiben are now enjoyed as a way to taste the feeling of travel.",
       "passage": "tg"
     },
@@ -395,12 +395,12 @@
       "task": "short-reading",
       "prompt": "「きれいになったのは公園だけではなかったのかもしれない」とあるが、筆者が言いたいのはどのようなことか。",
       "options": [
-        "公園の周りの道もきれいになったこと",
-        "自分の家も掃除するようになったこと",
+        "公園を訪れる人が増えたこと",
         "地域の人たちの関係もよくなったこと",
-        "公園を訪れる人が増えたこと"
+        "自分の家も掃除するようになったこと",
+        "公園の周りの道もきれいになったこと"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "清掃を続けるうちに、地域の人たちと顔見知りになっていったことを指している。\nThe writer means that relationships among neighbours also improved.",
       "passage": "s1"
     },
@@ -409,12 +409,12 @@
       "task": "short-reading",
       "prompt": "筆者が勧めていることは何か。",
       "options": [
-        "夜はスマートフォンを一切使わないこと",
-        "画面を暗くしてから寝ること",
+        "寝る一時間前には画面を見るのをやめること",
         "部屋の明かりを明るくしておくこと",
-        "寝る一時間前には画面を見るのをやめること"
+        "画面を暗くしてから寝ること",
+        "夜はスマートフォンを一切使わないこと"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "せめて寝る一時間前には画面を見るのをやめ、部屋を少し暗くしてはどうかと勧めている。\nThe writer suggests stopping screen use at least an hour before bed.",
       "passage": "s2"
     },
@@ -423,12 +423,12 @@
       "task": "short-reading",
       "prompt": "この駅について、本文の内容と合うものはどれか。",
       "options": [
-        "鉄道会社が町のために無料で造った。",
         "最初から町を通る計画になっていた。",
-        "町の人々の働きかけによって造られた。",
-        "隣の町の人々がお金を出して造った。"
+        "鉄道会社が町のために無料で造った。",
+        "隣の町の人々がお金を出して造った。",
+        "町の人々の働きかけによって造られた。"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "町の人々がお金を出し合い、鉄道会社に何度も頼んで線路を通してもらったと書かれている。\nThe townspeople paid for it and persuaded the railway company to route the line there.",
       "passage": "s3"
     },
@@ -437,12 +437,12 @@
       "task": "mid-reading",
       "prompt": "筆者がおばあさんにどう答えていいかわからなかったのはなぜか。",
       "options": [
-        "自分のした作業が小さすぎると感じていたから",
-        "おばあさんの話す言葉がわからなかったから",
         "作業で疲れて、話す元気がなかったから",
-        "先輩に話さないように言われていたから"
+        "先輩に話さないように言われていたから",
+        "自分のした作業が小さすぎると感じていたから",
+        "おばあさんの話す言葉がわからなかったから"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "自分がしたことは小さすぎると思い、どう答えていいかわからなかったと書かれている。\nThe writer felt their own contribution had been far too small.",
       "passage": "m1"
     },
@@ -451,12 +451,12 @@
       "task": "mid-reading",
       "prompt": "先輩の言葉の内容と合うものはどれか。",
       "options": [
-        "泥をかき出す作業は、専門家に任せるべきだ。",
-        "一人の力は小さいので、ボランティアには意味がない。",
         "大変な作業は、若い人がするべきだ。",
-        "誰かが来てくれたこと自体が、住んでいる人の支えになる。"
+        "誰かが来てくれたこと自体が、住んでいる人の支えになる。",
+        "泥をかき出す作業は、専門家に任せるべきだ。",
+        "一人の力は小さいので、ボランティアには意味がない。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "先輩は、誰かが来てくれたということ自体があの人の支えになったと言っている。\nThe senior said that simply coming had supported the resident.",
       "passage": "m1"
     },
@@ -465,12 +465,12 @@
       "task": "mid-reading",
       "prompt": "住民たちが行ったこととして、本文で挙げられているものはどれか。",
       "options": [
-        "鉄道会社に運賃を下げるよう頼んだ。",
-        "列車を使った観光ツアーを企画した。",
+        "新しい駅を造るためにお金を集めた。",
         "車を使わないよう町の人に呼びかけた。",
-        "新しい駅を造るためにお金を集めた。"
+        "列車を使った観光ツアーを企画した。",
+        "鉄道会社に運賃を下げるよう頼んだ。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "駅の掃除や花壇の手入れのほか、列車を使った観光ツアーを企画したと書かれている。\nThe residents planned sightseeing tours that used the trains.",
       "passage": "m2"
     },
@@ -479,12 +479,12 @@
       "task": "mid-reading",
       "prompt": "この路線について、本文の内容と合うものはどれか。",
       "options": [
-        "利用者が以前のように増え、経営が安定した。",
-        "観光客が増えすぎて、住民が困っている。",
         "廃止されたが、観光用に一部が残された。",
-        "廃止を免れたが、経営は今も苦しい。"
+        "廃止を免れたが、経営は今も苦しい。",
+        "利用者が以前のように増え、経営が安定した。",
+        "観光客が増えすぎて、住民が困っている。"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "路線は廃止を免れたが、利用者は以前ほど増えておらず、経営が苦しい状況は変わっていないとある。\nThe line was saved, but its finances remain difficult.",
       "passage": "m2"
     },
@@ -510,12 +510,12 @@
       "task": "integrated-reading",
       "prompt": "美容院での会話について、AとBはどのように考えているか。",
       "options": [
-        "AもBも、会話はしないほうがよいと考えている。",
-        "Aは会話が必要だと考え、Bは会話は不要だと考えている。",
         "Aは客が選べることを評価し、Bは会話によって伝わることもあると考えている。",
-        "AもBも、会話はただの世間話だと考えている。"
+        "AもBも、会話はただの世間話だと考えている。",
+        "AもBも、会話はしないほうがよいと考えている。",
+        "Aは会話が必要だと考え、Bは会話は不要だと考えている。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "Aは会話の有無を客が選べることをよいとし、Bは話すことで伝わることもあると述べている。\nA values the customer's choice, and B values what conversation can convey.",
       "passages": [
         "a",
@@ -527,12 +527,12 @@
       "task": "claim-reading",
       "prompt": "筆者によると、睡眠を削って作った時間はどのような時間になるか。",
       "options": [
-        "集中して作業できる時間",
-        "効率の悪い時間",
+        "記憶を整理する時間",
         "自由に使える時間",
-        "記憶を整理する時間"
+        "効率の悪い時間",
+        "集中して作業できる時間"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "睡眠を削って作った時間は、効率の悪い時間になってしまうと述べている。\nTime gained by cutting sleep turns into inefficient time.",
       "passage": "c"
     },
@@ -541,12 +541,12 @@
       "task": "claim-reading",
       "prompt": "筆者が最も言いたいことは何か。",
       "options": [
-        "睡眠時間を削ってでも努力することが大切だ。",
-        "忙しい人は、昼寝をして睡眠不足を補うべきだ。",
+        "必要な睡眠の長さは、人によって違う。",
         "睡眠は次の日によい仕事をするための準備であり、まず確保するべきだ。",
-        "必要な睡眠の長さは、人によって違う。"
+        "忙しい人は、昼寝をして睡眠不足を補うべきだ。",
+        "睡眠時間を削ってでも努力することが大切だ。"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "睡眠はよい仕事をするための準備の時間であり、まず睡眠時間を確保するべきだと述べている。\nThe writer argues that sleep prepares us for good work and should be secured first.",
       "passage": "c"
     },

@@ -22,12 +22,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n冬でも、一日に数回は部屋の【換気】をしたほうがいい。",
       "options": [
-        "かんけ",
-        "かんぎ",
         "かんき",
-        "かいき"
+        "かいき",
+        "かんけ",
+        "かんぎ"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "換気は「かんき」と読み、部屋の空気を入れかえることを表す。\nThe word 換気 (ventilation) is read kanki.",
       "target": "換気"
     },
@@ -36,12 +36,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの本には、日常生活でよく使う【熟語】がたくさん載っている。",
       "options": [
-        "じゅくご",
-        "じゅっご",
+        "じゅくごう",
         "しゅくご",
-        "じゅくごう"
+        "じゅっご",
+        "じゅくご"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "熟語は「じゅくご」と読み、二つ以上の漢字が結びついた言葉を指す。\nThe word 熟語 (kanji compound) is read jukugo.",
       "target": "熟語"
     },
@@ -64,12 +64,12 @@
       "task": "orthography",
       "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nインターネットで中古品を【ばいばい】する人が増えている。",
       "options": [
-        "買売",
-        "売買",
+        "倍買",
         "売倍",
-        "倍買"
+        "売買",
+        "買売"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "売ることと買うことを表す「ばいばい」は「売買」と書く。\nBaibai, buying and selling, is written 売買.",
       "target": "売買"
     },
@@ -92,12 +92,12 @@
       "task": "word-formation",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの大会の完走（　）は、毎年九割を超えている。",
       "options": [
-        "率",
-        "割",
         "度",
-        "数"
+        "数",
+        "率",
+        "割"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "割合を表す「率」がつき、「完走率」で完走した人の割合を表す。\nThe suffix 率 means rate, so kansōritsu is the finishing rate."
     },
     {
@@ -105,12 +105,12 @@
       "task": "word-formation",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\nこの窓ガラスは（　）性能で、冬でも部屋の暖かさを保てる。",
       "options": [
-        "上",
-        "多",
+        "大",
         "高",
-        "大"
+        "多",
+        "上"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "性能がすぐれていることを「高性能」という。\nThe prefix 高 gives kōseinō, high performance."
     },
     {
@@ -132,12 +132,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n大会の前日は、体調を（　）ために、早めに寝ることにしている。",
       "options": [
-        "揃える",
-        "整える",
         "片付ける",
-        "備える"
+        "備える",
+        "揃える",
+        "整える"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "体の調子をよい状態にすることを「体調を整える」という。\nTaichō o totonoeru means to get one's body into good condition.",
       "target": "整える"
     },
@@ -146,12 +146,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に入れるのに最もよいものを選んでください。\n毎日練習してきた（　）が出て、英語で話すことに自信がついた。",
       "options": [
-        "結末",
-        "結論",
         "成立",
-        "成果"
+        "成果",
+        "結末",
+        "結論"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "努力して得られたよい結果を「成果」という。\nSeika means the good results that come from effort.",
       "target": "成果"
     },
@@ -160,12 +160,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\nマラソン大会の申し込みは、【とっくに】締め切られていた。",
       "options": [
-        "ちょうど今",
-        "ずっと前に",
+        "何度も",
         "もうすぐ",
-        "何度も"
+        "ずっと前に",
+        "ちょうど今"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「とっくに」は、ずっと前にそうなっていることを表す。\nTokku ni means long ago, the same as zutto mae ni.",
       "target": "とっくに"
     },
@@ -174,12 +174,12 @@
       "task": "paraphrase",
       "prompt": "【　】に意味が最も近いものを選んでください。\n大会に向けて、毎朝【ひたすら】走り続けた。",
       "options": [
-        "ただ一生懸命に",
         "ときどき休みながら",
-        "友人と楽しく",
-        "ゆっくりと"
+        "ただ一生懸命に",
+        "ゆっくりと",
+        "友人と楽しく"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「ひたすら」は、ほかのことを考えず、そのことだけを一生懸命にする様子を表す。\nHitasura means doing one thing single-mindedly.",
       "target": "ひたすら"
     },
@@ -202,12 +202,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【処分】",
       "options": [
-        "引っ越しの前に、使わなくなった家具を処分した。",
         "マラソンの途中で、足の痛みを処分した。",
-        "先生に、作文の間違いを処分してもらった。",
-        "断熱工事をして、部屋の寒さが処分された。"
+        "引っ越しの前に、使わなくなった家具を処分した。",
+        "断熱工事をして、部屋の寒さが処分された。",
+        "先生に、作文の間違いを処分してもらった。"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「処分」は、いらなくなった物を捨てたり売ったりして片付けることを表す。\nShobun here means getting rid of things no longer needed.",
       "target": "処分"
     },
@@ -216,12 +216,12 @@
       "task": "usage",
       "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【上達】",
       "options": [
-        "マラソンの途中で、気温がどんどん上達した。",
-        "中古の自転車の値段が、去年より上達した。",
         "毎日話す練習をしたおかげで、英語の会話が上達した。",
-        "階段を上達して、三階の教室に行った。"
+        "階段を上達して、三階の教室に行った。",
+        "マラソンの途中で、気温がどんどん上達した。",
+        "中古の自転車の値段が、去年より上達した。"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「上達」は、技術や能力が進歩してうまくなることを表す。\nJōtatsu means improving in a skill.",
       "target": "上達"
     },
@@ -258,12 +258,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n驚いた（　）、フリマアプリに出した古い本が一時間で売れた。",
       "options": [
-        "ことに",
-        "ことで",
+        "ことか",
         "ことから",
-        "ことか"
+        "ことで",
+        "ことに"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「驚いたことに」で、話し手の驚きの気持ちを先に述べる。\nOdoroita koto ni means to my surprise.",
       "subject": "grammar:kotoni"
     },
@@ -272,12 +272,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n断熱性の高い住宅は、少しずつ増え（　）。",
       "options": [
-        "かねない",
-        "ようがない",
         "っこない",
-        "つつある"
+        "つつある",
+        "かねない",
+        "ようがない"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "変化が進んでいる途中であることを表す「つつある」が合う。\nTsutsu aru means a change is in progress.",
       "subject": "grammar:tsutsuaru"
     },
@@ -300,12 +300,12 @@
       "task": "grammar-form",
       "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n仕事で英語を使うことになったので、苦手でも勉強せ（　）。",
       "options": [
-        "ずにすむ",
         "ずじまいだ",
-        "ざるを得ない",
-        "ずにはおかない"
+        "ずにすむ",
+        "ずにはおかない",
+        "ざるを得ない"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "したくなくても、そうするしかないという意味の「ざるを得ない」が合う。\nZaru o enai means to have no choice but to.",
       "subject": "grammar:n2-zaru-o-enai"
     },
@@ -314,12 +314,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n単語は、＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 記憶に残りやすい。",
       "options": [
-        "ほうが",
-        "覚えた",
         "例文と",
-        "一緒に"
+        "一緒に",
+        "ほうが",
+        "覚えた"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "正しい順は「例文と・一緒に・覚えた・ほうが」で、★には「覚えた」が入る。\nThe order is reibun to / issho ni / oboeta / hō ga."
     },
     {
@@ -327,12 +327,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nマラソンは、＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ スポーツだと思う。",
       "options": [
-        "向き合う",
-        "ことのできる",
         "自分の",
-        "限界と"
+        "限界と",
+        "向き合う",
+        "ことのできる"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "正しい順は「自分の・限界と・向き合う・ことのできる」で、★には「限界と」が入る。\nThe order is jibun no / genkai to / mukiau / koto no dekiru."
     },
     {
@@ -340,12 +340,12 @@
       "task": "sentence-composition",
       "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nフリマアプリで服を買う＿＿＿ ＿＿＿ ＿＿＿ ＿★＿ ことにしている。",
       "options": [
-        "必ず",
         "から決める",
-        "ときは",
-        "サイズを確かめて"
+        "必ず",
+        "サイズを確かめて",
+        "ときは"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "正しい順は「ときは・必ず・サイズを確かめて・から決める」で、★には「から決める」が入る。\nThe order is toki wa / kanarazu / saizu o tashikamete / kara kimeru."
     },
     {
@@ -353,12 +353,12 @@
       "task": "text-grammar",
       "prompt": "文章の（１）に入る最もよいものを選んでください。",
       "options": [
-        "自信があった",
-        "半信半疑だった",
         "期待していた",
-        "安心していた"
+        "安心していた",
+        "自信があった",
+        "半信半疑だった"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "「こんな古い物を買う人がいるのだろうか」と疑っているので、「半信半疑だった」が合う。\nThe writer doubted anyone would buy it, so hanshin-hangi, half in doubt, fits.",
       "passage": "tg"
     },
@@ -381,12 +381,12 @@
       "task": "text-grammar",
       "prompt": "文章の（３）に入る最もよいものを選んでください。",
       "options": [
-        "うれしく感じられた",
-        "残念に思えた",
         "面倒に感じられた",
-        "当然だと思えた"
+        "当然だと思えた",
+        "うれしく感じられた",
+        "残念に思えた"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "お金を得ることより、物が誰かの役に立つことのほうがうれしいという流れなので「うれしく感じられた」が合う。\nThe writer found it more gratifying that the item helped someone.",
       "passage": "tg"
     },
@@ -395,12 +395,12 @@
       "task": "short-reading",
       "prompt": "筆者が何よりうれしいと感じていることは何か。",
       "options": [
-        "暖房費が減ったこと",
-        "窓の水滴がなくなったこと",
+        "朝、布団から出るのがつらくなくなったこと",
         "工事の費用が安かったこと",
-        "朝、布団から出るのがつらくなくなったこと"
+        "窓の水滴がなくなったこと",
+        "暖房費が減ったこと"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「何より、朝、布団から出るのがつらくなくなったのがうれしい」と書かれている。\nAbove all, the writer is glad that getting out of bed is no longer hard.",
       "passage": "s1"
     },
@@ -409,12 +409,12 @@
       "task": "short-reading",
       "prompt": "このお知らせで最も伝えたいことは何か。",
       "options": [
-        "気温が高くなるので、大会を中止すること",
-        "暑さに備えて、スタートを早め、給水所を増やしたこと",
+        "体調に不安がある人も、必ず出場してほしいこと",
         "受付の場所が変わったこと",
-        "体調に不安がある人も、必ず出場してほしいこと"
+        "暑さに備えて、スタートを早め、給水所を増やしたこと",
+        "気温が高くなるので、大会を中止すること"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "暑さが予想されるため、スタート時刻を早め、給水所を増やしたことを知らせている。\nBecause of the expected heat, the start is earlier and more water stations were added.",
       "passage": "s2"
     },
@@ -423,12 +423,12 @@
       "task": "short-reading",
       "prompt": "筆者によると、外国語を話せるようになるために大切なことは何か。",
       "options": [
-        "完璧な文を作れるまで話さないこと",
         "単語や文法をたくさん覚えること",
-        "間違いを恐れずに実際に使ってみること",
-        "相手の言葉をよく聞いて理解すること"
+        "完璧な文を作れるまで話さないこと",
+        "相手の言葉をよく聞いて理解すること",
+        "間違いを恐れずに実際に使ってみること"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "間違いを恐れずに口に出すようになってから、話せるようになったと述べている。\nThe writer improved after starting to speak without fear of mistakes.",
       "passage": "s3"
     },
@@ -437,12 +437,12 @@
       "task": "mid-reading",
       "prompt": "筆者がマラソンを始めたきっかけは何か。",
       "options": [
-        "健康診断で運動不足を指摘されたこと",
         "友人にマラソン大会に誘われたこと",
-        "若いころから走るのが好きだったこと",
-        "沿道の人たちの声援に励まされたこと"
+        "健康診断で運動不足を指摘されたこと",
+        "沿道の人たちの声援に励まされたこと",
+        "若いころから走るのが好きだったこと"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "健康診断で運動不足を指摘されたことがきっかけだと書かれている。\nThe trigger was being told at a checkup that the writer lacked exercise.",
       "passage": "m1"
     },
@@ -451,12 +451,12 @@
       "task": "mid-reading",
       "prompt": "筆者が「完走したこと以上の収穫だった」と言っているのは、どのようなことか。",
       "options": [
-        "記録がとてもよかったこと",
-        "沿道の人たちと知り合いになれたこと",
         "年を取ってからでも人は変われると実感できたこと",
-        "若いころより速く走れるようになったこと"
+        "若いころより速く走れるようになったこと",
+        "記録がとてもよかったこと",
+        "沿道の人たちと知り合いになれたこと"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "年を取ってからでも人は変わることができると実感できたことを指している。\nThe writer realized that people can change even later in life.",
       "passage": "m1"
     },
@@ -465,12 +465,12 @@
       "task": "mid-reading",
       "prompt": "個人同士の取引で起こりうることとして、本文で挙げられているものはどれか。",
       "options": [
-        "届いた品物が説明と違うことがある。",
-        "店より値段が高いことが多い。",
         "品物がなかなか届かないことが多い。",
-        "売る人と連絡が取れなくなる。"
+        "売る人と連絡が取れなくなる。",
+        "届いた品物が説明と違うことがある。",
+        "店より値段が高いことが多い。"
       ],
-      "answer": 0,
+      "answer": 2,
       "rationale": "届いた品物に傷があったり、説明と違う部分があったりすることがあると書かれている。\nThe item may arrive damaged or differ from its description.",
       "passage": "m2"
     },
@@ -479,12 +479,12 @@
       "task": "mid-reading",
       "prompt": "筆者の考えに合うものはどれか。",
       "options": [
-        "中古品は、店で買うほうが安全だ。",
-        "新品を買うときは、あとで売ることを考えるべきだ。",
+        "個人同士の取引では、売る人も買う人も相手の立場に立つことが大切だ。",
         "傷のある品物は、売りに出さないほうがいい。",
-        "個人同士の取引では、売る人も買う人も相手の立場に立つことが大切だ。"
+        "新品を買うときは、あとで売ることを考えるべきだ。",
+        "中古品は、店で買うほうが安全だ。"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "最後に、売る人も買う人も相手の立場に立つことが求められていると述べている。\nThe writer says both sellers and buyers should consider the other side.",
       "passage": "m2"
     },
@@ -493,12 +493,12 @@
       "task": "integrated-reading",
       "prompt": "AとBのどちらの文章でも述べられていることは何か。",
       "options": [
-        "断熱性能の高い家には利点があること",
         "断熱工事には多額の費用がかかること",
-        "高齢者は断熱工事をするべきではないこと",
-        "住宅の断熱性能を義務づけるべきだということ"
+        "断熱性能の高い家には利点があること",
+        "住宅の断熱性能を義務づけるべきだということ",
+        "高齢者は断熱工事をするべきではないこと"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "Aは健康や省エネの利点を挙げ、Bも断熱性能の高い家が快適なのは間違いないと述べている。\nBoth texts recognize the advantages of well-insulated homes.",
       "passages": [
         "a",
@@ -527,12 +527,12 @@
       "task": "claim-reading",
       "prompt": "筆者によると、外国語を学ぶことで、どのようなことに気づくか。",
       "options": [
-        "翻訳アプリのほうが正確だということ",
         "自分が当たり前だと思っていた考え方も、一つの見方にすぎないということ",
-        "外国語は一語で多くの感情を表せるということ",
-        "情報のやり取りには外国語が欠かせないということ"
+        "翻訳アプリのほうが正確だということ",
+        "情報のやり取りには外国語が欠かせないということ",
+        "外国語は一語で多くの感情を表せるということ"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "言葉の違いに触れることで、自分の考え方も一つの見方にすぎないと知ると述べている。\nLearning a language shows that one's own view is just one perspective.",
       "passage": "c"
     },
@@ -569,12 +569,12 @@
       "task": "information-retrieval",
       "prompt": "70歳の父親と一緒にみなと市内の自宅で暮らしている吉田さんは、自宅の90万円の断熱工事をすでに終えている。これから補助金を申し込んだ場合、どうなるか。",
       "options": [
-        "45万円の補助金を受け取れる。",
-        "40万円の補助金を受け取れる。",
+        "補助金を受け取ることはできない。",
         "30万円の補助金を受け取れる。",
-        "補助金を受け取ることはできない。"
+        "40万円の補助金を受け取れる。",
+        "45万円の補助金を受け取れる。"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "申し込みは工事を始める前に限られ、工事の後に申し込むことはできないので、補助金は受け取れない。\nApplications must be made before work starts, so no subsidy is possible.",
       "passage": "info"
     }

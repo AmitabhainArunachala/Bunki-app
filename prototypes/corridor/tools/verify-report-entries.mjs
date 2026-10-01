@@ -1,14 +1,13 @@
 /**
- * Report entries live in the page's own flow and never cover a learner's control.
+ * Reporting stays reachable through one permanent corner bug and in-flow entries.
  *
- * The floating report rail (fixed, max z-index, re-parented into open dialogs)
- * intercepted taps on Undo, まだ/思い出した, reveal and sheet fold-heads across four
- * suites (2026-09-25). The app now mounts the report client with rail:false and
- * offers in-flow entries. Each case below proves both halves: the entry opens the
- * report dialog, AND the host control beside it still takes a real click.
+ * The bug must survive room changes and overlays while leaving learning controls
+ * usable. Every case proves that reporting opens and the host control still takes
+ * a real click. The report client contract fixture separately covers clipped
+ * native dialogs, local durability and Lavish forwarding.
  *
  *   R0 identity: the served build names the commit under test (same rule as doors).
- *   R1 no floating rail is visible anywhere in the app (shelf, reader, sheet, door).
+ *   R1 the permanent bug is visible anywhere in the app (shelf, reader, sheet, door).
  *   R2 shelf: the footer entry opens the report dialog; closing returns; a shelf
  *      reading door still opens its passage.
  *   R3 word sheet: the entry at the end of the sheet opens the dialog; the sheet's
@@ -39,6 +38,7 @@ import { resolve } from 'node:path';
 
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord } from './record-test-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -116,7 +116,13 @@ try {
 
     // R2 shelf footer
     await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
-    check(`R1 ${w}px shelf: no floating report rail is visible`, !(await railVisible(page)));
+    check(`R1 ${w}px shelf: the permanent bug entry is visible`, (await railVisible(page)));
+    check(`R1 ${w}px shelf: the entry has one recognizable SVG bug and an accessible name`,
+      await page.locator('#bunki-report-bug svg').count() === 1 &&
+      (await page.locator('#bunki-report-bug').getAttribute('aria-label')).includes('this screen'));
+    const bugHit = await fingerClick(page, '#bunki-report-bug');
+    check(`R1 ${w}px shelf: the bug is uncovered and opens reporting`, bugHit.uncovered && await reportOpen(page));
+    if (await reportOpen(page)) await closeReport(page);
     const footer = page.locator(PAGE_ENTRY);
     check(`R2 ${w}px shelf: the page entry exists in the page's own flow`, (await footer.count()) === 1);
     if (await footer.count()) {
@@ -138,7 +144,7 @@ try {
       const settled = n > 0 && window.__reportTokN === n; window.__reportTokN = n; return settled;
     }, null, { timeout: 15_000, polling: 250 }).then(() => true, () => false);
     check(`R2 ${w}px shelf: a reading door still opens its passage (host control clickable)`, inReader);
-    check(`R1 ${w}px reader: no floating report rail is visible`, !(await railVisible(page)));
+    check(`R1 ${w}px reader: the permanent bug entry is visible`, (await railVisible(page)));
 
     // R3 word sheet
     const token = page.locator('#reader .tok.content').nth(3);
@@ -151,10 +157,12 @@ try {
       const opened = await page.waitForSelector('#sheet', { timeout: 10_000 }).then(() => true, () => false);
       check(`R3 ${w}px sheet: a press-and-hold opens the word sheet`, opened);
       const sheetEntry = page.locator('#sheet .report-line [data-report-entry="open"]');
-      check(`R1 ${w}px sheet: no floating report rail is visible`, !(await railVisible(page)));
+      check(`R1 ${w}px sheet: the permanent bug entry is visible`, (await railVisible(page)));
       check(`R3 ${w}px sheet: the entry sits at the end of the sheet`, (await sheetEntry.count()) === 1);
       if (await sheetEntry.count()) {
-        await sheetEntry.scrollIntoViewIfNeeded();
+        // Dictionary details can replace the sheet while it settles. A locator
+        // click reacquires the current entry and performs its own real scroll,
+        // visibility, stability and hit-target checks before pressing it.
         await sheetEntry.click();
         check(`R3 ${w}px sheet: the entry opens the report dialog`, await reportOpen(page));
         await closeReport(page);
@@ -167,7 +175,7 @@ try {
 
     // R4 front door navigation strip
     await page.goto(origin); await ready(page);
-    check(`R1 ${w}px front door: no floating report rail is visible`, !(await railVisible(page)));
+    check(`R1 ${w}px front door: the permanent bug entry is visible`, (await railVisible(page)));
     await page.locator('#ginga-symbol').click();
     const navEntry = page.locator('button.nav-report[data-report-entry="open"]');
     check(`R4 ${w}px front door: the navigation strip carries the entry`, (await navEntry.count()) === 1);
@@ -199,7 +207,7 @@ try {
     const inProbe = await page.waitForSelector('.review-front', { timeout: 20_000 }).then(() => true, () => false);
     const zen = await page.evaluate(() => document.body.classList.contains('zen'));
     check(`R5 ${w}px probe: the focused stage is up (body.zen)`, inProbe && zen);
-    check(`R1 ${w}px probe: no floating report rail is visible`, !(await railVisible(page)));
+    check(`R1 ${w}px probe: the permanent bug entry is visible`, (await railVisible(page)));
     const probeEntry = page.locator(PAGE_ENTRY);
     check(`R5 ${w}px probe: the page entry exists after the stage`, (await probeEntry.count()) === 1);
     if (await probeEntry.count()) {
@@ -232,11 +240,22 @@ try {
       await kp.locator('#review-start').click();
       const unavailable = await kp.waitForSelector('#review-answer-unavailable', { timeout: 15_000 }).then(() => true, () => false);
       check(`R9 ${w}px unavailable kanji: the real unavailable state is up`, unavailable);
-      const state = () => kp.evaluate(() => ({ ix: S.review?.ix, queue: S.review?.queue.map((row) => `${row.t}:${row.id}`),
-        revealed: S.review?.revealed, declared: S.review?.declared, srs: JSON.stringify(S.srs), revlog: S.revlog.length,
-        text: document.querySelector('#review-answer-unavailable')?.innerText || null,
-        grades: document.querySelectorAll('.grade, #reveal').length }));
+      // The staged app keeps its state inside a module. Verify the learner's
+      // actual card/counts and native durable record, without exporting or
+      // replacing private application state for this journey.
+      const state = async () => ({
+        visible: await kp.evaluate(() => ({ view: document.body.dataset.view,
+          card: document.querySelector('#review-answer-unavailable .review-front')?.textContent || null,
+          counts: ['new', 'learn', 'due'].map(kind => document.querySelector(`#review-counts .c-${kind}`)?.textContent || null),
+          progress: document.querySelector('.zen-progress i')?.style.width || null,
+          text: document.querySelector('#review-answer-unavailable')?.innerText || null,
+          grades: document.querySelectorAll('.grade, #reveal').length })),
+        record: await readAppRecord(kp),
+      });
       const before = await state();
+      check(`R9 ${w}px unavailable kanji: the seeded card is the only queued card`,
+        before.visible.card === '㐆' && JSON.stringify(before.visible.counts) === JSON.stringify(['1', '0', '0']) &&
+        before.record.taken.length === 1 && before.record.taken[0].id === '㐆', JSON.stringify(before.visible));
       check(`R9 ${w}px unavailable kanji: the page entry exists`, (await kp.locator(PAGE_ENTRY).count()) === 1);
       if (await kp.locator(PAGE_ENTRY).count()) {
         const hit = await fingerClick(kp, PAGE_ENTRY);
@@ -244,12 +263,18 @@ try {
         if (await reportOpen(kp)) await closeReport(kp);
       }
       const after = await state();
-      check(`R9 ${w}px unavailable kanji: reporting changed nothing (state, queue, record, no grade controls)`,
-        JSON.stringify(after) === JSON.stringify(before) && after.grades === 0, JSON.stringify({ before, after }));
-      await fingerClick(kp, '#review-unavailable-next');
-      const moved = await kp.waitForFunction((ix) => S.review && S.review.ix > ix, before.ix, { timeout: 5_000 }).then(() => true, () => false);
-      const graded = await kp.evaluate(() => ({ srs: JSON.stringify(S.srs), revlog: S.revlog.length }));
-      check(`R9 ${w}px unavailable kanji: continuing advances without writing a grade`, moved && graded.srs === before.srs && graded.revlog === before.revlog, JSON.stringify(graded));
+      check(`R9 ${w}px unavailable kanji: reporting changed nothing (card, queue counts, durable record, no grade controls)`,
+        JSON.stringify(after) === JSON.stringify(before) && after.visible.grades === 0,
+        JSON.stringify({ before: before.visible, after: after.visible, durableRecordUnchanged: JSON.stringify(after.record) === JSON.stringify(before.record) }));
+      const nextHit = await fingerClick(kp, '#review-unavailable-next');
+      const moved = await kp.waitForFunction(() => document.body.dataset.view === 'review' &&
+        !document.querySelector('#review-answer-unavailable') && !!document.querySelector('.review-summary') &&
+        document.querySelectorAll('.review-summary .sum-seal').length === 0,
+      null, { timeout: 5_000 }).then(() => true, () => false);
+      const finalRecord = await readAppRecord(kp);
+      check(`R9 ${w}px unavailable kanji: continuing reaches the zero-grade summary without changing the durable record`,
+        nextHit.uncovered && moved && JSON.stringify(finalRecord) === JSON.stringify(before.record),
+        JSON.stringify({ hit: nextHit, zeroGradeSummary: moved, durableRecordUnchanged: JSON.stringify(finalRecord) === JSON.stringify(before.record) }));
       await kanjiContext.close();
     }
 

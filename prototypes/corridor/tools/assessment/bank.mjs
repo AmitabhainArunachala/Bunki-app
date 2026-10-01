@@ -63,7 +63,7 @@ export function assessmentAPI() {
     const compiled = await build({
       stdin: {
         contents:
-          "export * from './packages/assessment/src/content.ts'; export { encodeLocalJson } from './packages/persistence/src/replication/json.ts';",
+          "export * from './packages/assessment/src/content.ts'; export { OFFICIAL_BLUEPRINTS, JLPT_SCORE_FACTS, getOfficialBlueprint } from './packages/assessment/src/blueprints.ts'; export { encodeLocalJson } from './packages/persistence/src/replication/json.ts';",
         resolveDir: REPOSITORY,
       },
       bundle: true,
@@ -589,11 +589,21 @@ export async function materializeWrittenSection(prepared, manuscript) {
       sha256: hash(files['authoring-notes.json']),
     },
     intent: { path: 'intent.json', sha256: hash(files['intent.json']) },
-    timing: {
-      minutes: intent.durationMinutes,
-      authority: block.authority,
-      basis: 'author-selected practice allocation; not official timing',
-    },
+    timing: intent.formPayload.timingBlocks.every((entry) => entry.authority.kind === 'official-fact')
+      ? {
+          minutes: intent.durationMinutes,
+          papers: intent.formPayload.timingBlocks.map((entry) => ({
+            id: entry.id,
+            minutes: entry.durationMs / 60_000,
+            authority: entry.authority,
+          })),
+          basis: 'official written papers and fixed times (OFFICIAL_BLUEPRINTS); item counts are not official',
+        }
+      : {
+          minutes: intent.durationMinutes,
+          authority: block.authority,
+          basis: 'author-selected practice allocation; not official timing',
+        },
     items: itemMap,
     passages: passageMap,
     form: {

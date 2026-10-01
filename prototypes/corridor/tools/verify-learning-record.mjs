@@ -1,6 +1,7 @@
 /** Controlled acknowledgment tests of the actual authored learning handlers.
  * Frozen synthetic roots detect premature mutation. This verifies the UI save
  * contract; RecordApp/Host suites separately exercise real browser storage. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -51,6 +52,11 @@ const names = new Set([
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
   'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem',
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
+  // card-system slice 1: the preset buttons, the pacing steppers and the optional break
+  'NEW_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_MIN', 'REVIEWS_PER_DAY_MAX', 'RETENTION_MIN', 'RETENTION_MAX',
+  'PAUSE_EVERY_MIN', 'PAUSE_EVERY_MAX', 'SRS_PRESETS', 'SRS_PRESET_IDS', 'SRS_PRESET_LINES', 'SRS_PRESET_DETAIL', 'SRS_PREF_LADDERS',
+  'validNewPerDay', 'validReviewsPerDay', 'validRetention', 'validPreset', 'validPauseEvery',
+  'srsPresetState', 'srsPrefValue', 'srsPrefStep', 'chooseSrsPreset', 'srsSchedulePolicy', 'srsPauseEvery', 'renderReviewBreak',
   'canonicalRecordJson',
   // D23: the saved word answer, the shown-answer binding both grade producers check, and the capture plan
   'reviewAnswerAvailable', 'reviewCardBack', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'owns',
@@ -396,6 +402,25 @@ await check('preference-step-merges-latest-pacing-without-publishing-unacknowled
   const promise = plus.fire(); await plus.fire(); assert.equal(f.queue.length, 1); assert.equal(f.S.srsPrefs.newPerDay, 20);
   f.external({ srsPrefs: { newPerDay: 25, reviewLimit: 50 } }); f.ack(); await promise;
   assert.equal(f.S.srsPrefs.newPerDay, 30); assert.equal(f.S.srsPrefs.reviewLimit, 50);
+});
+
+await check('pace-panel-offers-three-presets-and-names-a-hand-set-schedule-custom', async () => {
+  const find_all = (node, predicate, out = []) => { if (predicate(node)) out.push(node); node.children?.forEach((child) => find_all(child, predicate, out)); return out; };
+  let f = fixture({ view: 'tray', srsPrefsOpen: true, srsPrefs: { newPerDay: 20 } });
+  let root = f.render('renderSrsPrefs');
+  const presets = find_all(root, (node) => node.dataset?.preset);
+  assert.deepEqual(presets.map((node) => node.dataset.preset), ['gentle', 'standard', 'hardcore']);
+  assert.equal(byId(root, 'srs-preset-now').textContent, 'now — Standard');
+  assert.equal(find(root, (node) => node.dataset?.prefVal === 'reviewsPerDay').textContent, '200');
+  assert.equal(find(root, (node) => node.dataset?.prefVal === 'pauseEvery').textContent, 'off');
+  f = fixture({ view: 'tray', srsPrefsOpen: true, srsPrefs: { newPerDay: 35, preset: 'custom:hardcore', reviewsPerDay: 9999 } });
+  root = f.render('renderSrsPrefs');
+  assert.equal(byId(root, 'srs-preset-now').textContent, 'now — Custom (from Hardcore)');
+  assert.equal(find(root, (node) => node.dataset?.prefVal === 'reviewsPerDay').textContent, 'no cap');
+  assert(find(root, (node) => node.dataset?.prefUp === 'reviewsPerDay').disabled, 'no cap is the top of the ladder');
+  const plus = find(root, (node) => node.dataset?.prefUp === 'newPerDay');
+  const promise = plus.fire(); f.ack(); await promise;
+  assert.deepEqual({ ...f.S.srsPrefs }, { newPerDay: 40, preset: 'custom:hardcore', reviewsPerDay: 9999 });
 });
 
 /* Opt-in generated handler histories. Storage is deliberately a small controlled
@@ -1024,7 +1049,7 @@ async function browserChecks() {
     assert.fail('Expected native persisted learner state did not arrive');
   };
   const finishLesson = async (page, reject = false) => {
-    await page.locator('#lessons-link').click(); await page.locator('.lesson-row').first().click();
+    await openShelfDoor(page, '#lessons-link'); await page.locator('.lesson-row').first().click();
     let learned = 0;
     while (await page.locator('.lesson-option').count() === 0) {
       assert(learned++ < 12); await page.locator('#lesson-next').click();
@@ -1108,14 +1133,14 @@ async function browserChecks() {
           assert.deepEqual(enrolled.srs, before.srs); assert.deepEqual(enrolled.revlog, before.revlog); assert.deepEqual(enrolled.futureRoot, before.futureRoot);
         });
         await journey('practice-answer-rejection-keeps-the-question-unanswered', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await openShelfDoor(page, '#mock-link'); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').waitFor(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('[data-mock-opt="0"]').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
           assert.equal(await page.locator('#mock-next').isDisabled(), true);
           assert.equal(await page.locator('[data-mock-opt][aria-pressed="true"]').count(), 0);
         });
         await journey('practice-navigation-rejection-keeps-the-acknowledged-answer-and-question', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await openShelfDoor(page, '#mock-link'); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').click(); await page.locator('[data-mock-opt="0"][aria-pressed="true"]').waitFor();
           const question = await page.locator('.mock-q').textContent(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('#mock-next').click(); await failed(page, before);

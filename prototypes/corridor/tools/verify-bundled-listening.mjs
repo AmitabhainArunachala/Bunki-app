@@ -1,6 +1,10 @@
-/** Bundled reading, explicit text practice and native recorded listening through normal
- * controls. Persistent profiles, real record output, no injected learner state
- * or provider responses. This is a scoped technical subjourney. */
+/** Bundled reading and explicit text practice through normal controls, and the sentence
+ * listening lock: the voice is Kore (Charon second), so a bundled Ami cue is never offered or
+ * requested and the listening mode shows the reader's quiet 音声準備中 · Kore state. A negative
+ * control re-allows Ami in a copy of the staged corridor.js and must fail the same lock check.
+ * Persistent profiles, real record output, no injected learner state or provider responses.
+ * This is a scoped technical subjourney. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -47,10 +51,19 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const ORIGIN = `https://127.0.0.1:${server.address().port}`;
 const TITLE = '静かな朝', WORD = '窓', INDEX = 9;
 const QUESTION = '「窓」の読み方と、この文での使い方を教えてください。';
-const LISTENING = '  I understood an open window, a blue sky and a cool breeze.\n e\u0301 🚀  ';
-const LISTENING_LATER = '聞こえたことを自分の言葉で説明したいです。';
 const PRODUCTION = '  私の部屋の窓を開けます。\n e\u0301 🚀  ';
 const results = [], startedAt = new Date().toISOString();
+const ROSTER = "const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };";
+const stagedCorridor = readFileSync(join(SITE, 'corridor.js'), 'utf8');
+const amiAllowed = stagedCorridor.replace(ROSTER, "const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon', ami: 'Ami' };");
+const listeningControls = '#sentence-choose-listening, #sentence-add-listening, #sentence-listening-start, #sentence-listening-play';
+async function listeningLocked(page, requested) {
+  const pending = page.locator('#sentence-listening-pending');
+  await pending.waitFor({ timeout: 5000 });
+  assert.match(await pending.innerText(), /音声準備中 · Kore/u);
+  assert.equal(await page.locator(listeningControls).count(), 0, 'No listening control is offered');
+  assert.deepEqual(requested.filter(path => path.startsWith('/audio/s/')), [], 'No sentence recording is requested');
+}
 async function ready(page) {
   await page.waitForFunction(() => document.body?.dataset.ready === '1', null, { timeout: 30000 });
   assert.equal(await page.locator('#store-alert').isVisible(), false);
@@ -96,6 +109,7 @@ for (const engine of engines) for (const width of sizes) {
   const out = join(OUT, `${engine}-${width}`); mkdirSync(out, { recursive: true });
   const result = { engine, width, passed: false, observations: [], screenshots: [], videos: [], nativeAudio: [], errors: [], externalRequests: [] };
   results.push(result); let context, page, episode = 0, profile = 'profile';
+  const requested = [];
   const open = async () => {
     const videos = join(out, `video-${++episode}`); mkdirSync(videos, { recursive: true });
     context = await ({ chromium, webkit }[engine]).launchPersistentContext(join(out, profile), {
@@ -121,6 +135,7 @@ for (const engine of engines) for (const width of sizes) {
       const url = new URL(route.request().url()); if (url.origin === ORIGIN) return route.continue();
       result.externalRequests.push({ origin: url.origin, pathname: url.pathname }); return route.abort();
     });
+    context.on('request', request => { const url = new URL(request.url()); if (url.origin === ORIGIN) requested.push(url.pathname); });
     page = context.pages()[0] || await context.newPage(); page.setDefaultTimeout(15000);
     page.on('pageerror', error => result.errors.push({ episode, message: error.message }));
   };
@@ -145,7 +160,7 @@ for (const engine of engines) for (const width of sizes) {
   try {
     await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     const initial = await snapshot('initial'); assert.deepEqual(initial.taken, []); assert.deepEqual(initial.srs, {});
-    await page.locator('#airead-link').click(); await page.locator('#airead-startingLevel').selectOption('N5');
+    await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
     await waitForAppRecord(page, record => record.readingSettings?.startingLevel === 'N5');
     assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
     await page.locator('#back').click();
@@ -187,6 +202,7 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#sentence-practice-back').click(); await page.locator('#chat-input').waitFor();
     assert.equal(await page.locator('#chat-input').inputValue(), QUESTION);
     await page.locator('#teacher-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
+    assert.equal(await page.locator('#sentence-choose-listening').count(), 0, 'The Ami cue is not offered as a practice');
     await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
     const chosen = await snapshot('explicit-choice'); const entry = chosen.sentencePractice.entries[0];
     assert.equal(chosen.taken.length, 1); assert.equal(chosen.sentencePractice.entries.length, 1);
@@ -213,74 +229,24 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(graded.sentencePractice.grades[0].observation.grade, 'easy'); assert.equal(graded.srs[`sentence:${entry.plan.id}`].reps, 1);
     await page.locator('.close-doors .take').click(); await openSaved();
     await page.locator('[data-sentence-teacher-response]').first().click(); await page.locator('#chat-input').waitFor();
-    let prepared = await page.locator('#chat-input').inputValue(); assert(prepared.startsWith(`${QUESTION}\n\n`)); assert(prepared.includes(PRODUCTION));
+    const prepared = await page.locator('#chat-input').inputValue(); assert(prepared.startsWith(`${QUESTION}\n\n`)); assert(prepared.includes(PRODUCTION));
     await savedQuestion(page, ref, prepared); assert(await page.locator('#chat-send').isDisabled());
     await page.locator('#teacher-source-return').click(); await returned(page);
     assert.match(await page.locator('#reader-source-back').textContent(), /Back to tutor/u);
     await page.locator('#reader-source-back').click(); await page.locator('#chat-input').waitFor(); assert.equal(await page.locator('#chat-input').inputValue(), prepared);
     await screenshot('saved-writing-question-and-return');
-    let completed = await snapshot('connected-segment'); unchanged(graded, completed, ['taken', 'srs', 'revlog', 'sentencePractice']);
+    const completed = await snapshot('connected-segment'); unchanged(graded, completed, ['taken', 'srs', 'revlog', 'sentencePractice']);
     assert.equal(completed.aiChat.length, 0); assert.equal(completed.readingSettings.startingLevel, 'N5');
     result.observations.push({ name: 'one-profile-connected-segment', reading: result.passageId, contextRef: ref,
       explicitChoices: 1, exactToken: INDEX, recursiveCallerRestored: true, finiteRecall: true, uncheckedProduction: true,
       questionPreparedWithoutSending: true, sourceCallerReturns: ['practice', 'review', 'teacher'] });
 
-    await openSaved(); const beforeListening = await snapshot('before-listening-choice');
-    await page.locator('#sentence-add-listening').click(); await page.locator('#sentence-listening-start').waitFor();
-    const chosenListening = await snapshot('listening-confirmed'); unchanged(beforeListening, chosenListening);
-    assert.deepEqual(chosenListening.sentencePractice.responses, beforeListening.sentencePractice.responses);
-    assert.deepEqual(chosenListening.sentencePractice.entries[0].plan.contracts.slice(0, 2), beforeListening.sentencePractice.entries[0].plan.contracts);
-    assert.equal(chosenListening.sentencePractice.entries[0].plan.contracts[2].cueModality, 'audio');
-    assert.equal(chosenListening.sentencePractice.entries[0].plan.listeningCue.transcriptStatus, 'unreviewed');
-    await page.locator('#sentence-listening-start').click();
-    assert(!(await page.locator('main').textContent()).includes(entry.context.quote), 'the listening exercise hides its transcript');
-    await page.locator('#sentence-listening-text').fill(LISTENING); assert(await page.locator('#sentence-listening-save').isDisabled());
-    await page.locator('#sentence-listening-play').click();
-    await page.waitForFunction(() => window.__observedNativeAudio.some(row => row.event === 'playing' && row.src.startsWith('blob:')));
-    await page.locator('#sentence-listening-play').click();
-    assert(await page.locator('#sentence-listening-save').isDisabled(), 'stopped playback does not become completed listening');
-    unchanged(chosenListening, await snapshot('listening-interrupted'), ['taken', 'srs', 'revlog', 'sentencePractice']);
-    await page.locator('#sentence-practice-back').click(); await page.locator('#sentence-listening-start').click();
-    assert.equal(await page.locator('#sentence-listening-text').inputValue(), LISTENING);
-    const completedPlays = async () => page.evaluate(() => window.__observedNativeAudio.filter(row => row.event === 'ended' && row.src.startsWith('blob:')).length);
-    const playToEnd = async () => {
-      const before = await completedPlays(); await page.locator('#sentence-listening-play').click();
-      await page.waitForFunction(count => window.__observedNativeAudio.filter(row => row.event === 'ended' && row.src.startsWith('blob:')).length > count, before, {timeout:30000});
-      assert.match(await page.locator('#sentence-listening-audio-status').textContent(), /sentence finished/u);
-    };
-    await playToEnd(); await screenshot('listening-response-before-transcript');
-    await page.locator('#sentence-listening-source').click(); await returned(page);
-    await page.locator('#reader-source-back').click(); await page.locator('#sentence-listening-text').waitFor();
-    assert.equal(await page.locator('#sentence-listening-text').inputValue(), LISTENING);
-    assert.equal(await page.locator('#sentence-listening-transcript').textContent(), entry.context.quote);
-    assert(await page.locator('#sentence-listening-reveal').isDisabled());
-    await page.locator('#sentence-listening-save').click(); await page.locator('#sentence-listening-start').waitFor();
-    const listened = await snapshot('listening-response-saved'); unchanged(chosenListening, listened);
-    const response = listened.sentencePractice.responses.at(-1);
-    assert.equal(response.mode, 'listening'); assert.equal(response.text, LISTENING); assert.equal(response.revealed, true);
-    assert.equal(response.observation.tier, 'B'); assert.equal(response.observation.rubricId, 'kairo-source-listening');
-    assert.equal(response.listening.completedPlays, 1);
-    assert.deepEqual(listened.sentencePractice.grades, chosenListening.sentencePractice.grades);
-    await screenshot('listening-history-and-tutor-door');
-    await page.locator('#sentence-listening-start').click();
-    assert.equal(await page.locator('#sentence-listening-text').inputValue(), '');
-    assert.equal(await page.locator('#sentence-listening-transcript').count(), 0);
-    await playToEnd(); await page.locator('#sentence-listening-text').fill(LISTENING_LATER);
-    await page.locator('#sentence-listening-save').click(); await page.locator('#sentence-listening-start').waitFor();
-    const laterListening = (await snapshot('second-listening-response')).sentencePractice.responses.at(-1);
-    assert.equal(laterListening.revealed, false); assert.equal(laterListening.text, LISTENING_LATER);
-    await page.locator(`[data-sentence-teacher-response="${laterListening.id}"]`).click(); await page.locator('#chat-input').waitFor();
-    const listeningQuestion = await page.locator('#chat-input').inputValue();
-    assert(listeningQuestion.startsWith(`${prepared}\n\n`)); assert(listeningQuestion.includes(LISTENING_LATER));
-    prepared = listeningQuestion; await savedQuestion(page, ref, prepared); assert(await page.locator('#chat-send').isDisabled());
-    await page.locator('#teacher-source-return').click(); await returned(page); await page.locator('#reader-source-back').click();
-    await page.locator('#chat-input').waitFor(); assert.equal(await page.locator('#chat-input').inputValue(), prepared);
-    await screenshot('listening-question-and-original-source');
-    completed = await snapshot('listening-connected-segment'); unchanged(graded, completed);
-    assert.equal(completed.sentencePractice.responses.filter(row => row.mode === 'listening').length, 2);
-    result.observations.push({name:'recorded-listening-connected-to-existing-practice', actualPlayback:true,
-      interruptedPlaybackNeutral:true, completedNativePlays:await completedPlays(), savedListeningResponses:2,
-      transcriptUseRecorded:true, ownWritingPreserved:true, questionPreserved:true, listeningGraded:false});
+    await openSaved(); const beforeListening = await snapshot('before-listening-pending');
+    await listeningLocked(page, requested); await screenshot('listening-pending-kore');
+    unchanged(beforeListening, await snapshot('listening-pending'), ['taken', 'srs', 'revlog', 'sentencePractice']);
+    assert(requested.includes('/audio/sentence-cues.json'), 'The bundled cue catalog was consulted');
+    result.observations.push({ name: 'sentence-listening-locked-to-kore-charon', pendingKoreVisible: true,
+      listeningOffered: false, sentenceRecordingRequests: 0 });
 
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await openSaved();
     const restarted = await snapshot('restarted'); unchanged(completed, restarted,
@@ -296,7 +262,7 @@ for (const engine of engines) for (const width of sizes) {
     // Warm the original source through its actual action before disconnecting.
     await openSaved(); await page.locator('.learning-source summary').click(); await page.locator('#learning-source-return').click(); await returned(page);
     await page.locator('#reader-source-back').click(); await page.locator('#sentence-production-text').waitFor();
-    await page.locator('#sentence-listening-start').click(); await playToEnd(); await page.locator('#sentence-practice-back').click();
+    await listeningLocked(page, requested);
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
     if (engine === 'webkit') disconnected = true; else await context.setOffline(true);
@@ -306,13 +272,13 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#teacher-source-return').click(); await returned(page); await page.locator('#reader-source-back').click();
     await page.locator('#chat-input').waitFor(); assert.equal(await page.locator('#chat-input').inputValue(), prepared);
     await page.locator('#teacher-practice-return').click(); await page.locator('#sentence-production-text').waitFor();
-    await page.locator('#sentence-listening-start').click(); await playToEnd(); await screenshot('offline-native-listening');
-    await page.locator('#sentence-practice-back').click();
+    await listeningLocked(page, requested); await screenshot('offline-listening-pending');
     const restored = await snapshot('restored-offline'); unchanged(completed, restored,
       ['taken', 'srs', 'revlog', 'sentencePractice', 'teacherContexts', 'teacherDrafts', 'readingSettings']);
     assert.equal(await page.locator('#sentence-review-start').isDisabled(), true);
     await screenshot('restored-offline-practice'); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
     assert.equal(result.errors.length, 0); assert.equal(result.externalRequests.length, 0);
+    assert.deepEqual(requested.filter(path => path.startsWith('/audio/s/')), [], 'No sentence recording was requested in any episode');
     result.passed = true; result.entryId = entry.plan.id; result.contextRef = ref;
     result.offline = engine === 'webkit' ? 'local HTTPS listener disconnected; actual worker-controlled reload' : 'Chromium context offline; actual worker-controlled reload';
   } catch (error) {
@@ -320,11 +286,48 @@ for (const engine of engines) for (const width of sizes) {
     try { if (page) await screenshot('failure'); } catch { /* Preserve the original failure. */ }
   } finally { disconnected = false; await close(); }
 }
+// Negative control: the same lock check against a copy of the staged corridor.js whose roster
+// re-allows Ami must fail, and that copy must request an Ami recording.
+for (const engine of engines) {
+  const out = join(OUT, `${engine}-ami-allowed-control`); mkdirSync(out, { recursive: true });
+  const result = { engine, width: 1440, negativeControl: true, passed: false, errors: [] };
+  results.push(result);
+  const context = await ({ chromium, webkit }[engine]).launchPersistentContext(join(out, 'profile'), {
+    headless: true, viewport: { width: 1440, height: 1050 }, locale: 'en-US', serviceWorkers: 'block', ignoreHTTPSErrors: true,
+    ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
+  });
+  try {
+    await silenceBrowserAudio(context);
+    const requested = [];
+    context.on('request', request => { const url = new URL(request.url()); if (url.origin === ORIGIN) requested.push(url.pathname); });
+    await context.route('**/*', route => {
+      const url = new URL(route.request().url());
+      if (url.origin !== ORIGIN) return route.abort();
+      if (url.pathname === '/corridor.js') return route.fulfill({ status: 200, contentType: 'text/javascript', body: amiAllowed });
+      return route.continue();
+    });
+    const page = context.pages()[0] || await context.newPage(); page.setDefaultTimeout(15000);
+    page.on('pageerror', error => result.errors.push(error.message));
+    await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
+    await page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) }).locator('.shelf-open').click();
+    await sourceToken(page).click(); await page.locator('#reader-sentence-practice').click();
+    await page.locator('#sentence-choose-listening').check();
+    await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-listening-start').waitFor();
+    let lockFailure = null;
+    try { await listeningLocked(page, requested); } catch (error) { lockFailure = error.message; }
+    assert(lockFailure, 'The lock check fails when the roster re-allows Ami');
+    const amiRequests = requested.filter(path => path.startsWith('/audio/s/ami/'));
+    assert(amiRequests.length > 0, 'Re-allowing Ami requests an Ami recording');
+    result.lockFailure = lockFailure; result.amiRequests = amiRequests; result.passed = true;
+  } catch (error) {
+    result.failure = error?.stack || String(error);
+  } finally { await context.close(); }
+}
 await new Promise(done => server.close(done));
 const receipt = { version: 1, startedAt, finishedAt: new Date().toISOString(), artifactSha256: manifest.artifactSha256,
   sourceAssetSha256: manifest.sourceAssetSha256, site: SITE, verifierSha256,
   audioOutput: TEST_AUDIO_OUTPUT, audioSilenceHelperSha256,
-  qualification: 'Ordinary controls on bundled authored text and root-authored writing in headless persistent profiles. Connected segment with actual pinned synthetic audio and observed native Audio events, plus restarts, UI restore and worker offline. Written understanding is root-authored test input, not proof of hearing/comprehension. Recording/transcript alignment remains unreviewed. No provider response, native GUI, physical device or complete learner acceptance.',
+  qualification: 'Ordinary controls on bundled authored text and root-authored writing in headless persistent profiles, plus restarts, UI restore and worker offline. Sentence listening is locked to the Kore/Charon roster: the bundled Ami cues are never offered or requested, and a negative control that re-allows Ami in a copy of the staged corridor.js fails the same lock check. No provider response, native GUI, physical device or complete learner acceptance.',
   passed: results.filter(result => result.passed).length, failed: results.filter(result => !result.passed).length, results };
 writeFileSync(join(OUT, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
 console.log(JSON.stringify({ passed: receipt.passed, failed: receipt.failed, failures: results.filter(result => !result.passed)

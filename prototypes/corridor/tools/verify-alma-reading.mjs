@@ -1,4 +1,5 @@
 /** Actual canonical-artifact publisher reading, durable save, and reload in both engines. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -141,7 +142,7 @@ async function journey(browser, engine, selected, core, now) {
     result.snapshots.push(before.evidence);
     if (before.state.record.publisherLibrary !== undefined)
       assert.deepEqual(before.state.record.publisherLibrary.readings, []);
-    await page.locator('#feed-link').click();
+    await openShelfDoor(page, '#feed-link');
     await page.waitForSelector('[data-feed-read]');
     await page.locator('[data-feed-read]').click();
     await page.waitForSelector('#publisher-body');
@@ -230,7 +231,7 @@ async function journey(browser, engine, selected, core, now) {
     assert.equal((await page.evaluate(() => window.publisherCalls)).length, 1);
     await page.reload();
     await page.waitForFunction(() => document.body.dataset.ready === '1');
-    await page.locator('#feed-link').click();
+    await openShelfDoor(page, '#feed-link');
     await page.locator('#feed-panel-articles').click();
     await page.locator('[data-publisher-article]').click();
     await page.waitForSelector('#publisher-body');

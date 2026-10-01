@@ -4,8 +4,8 @@
  * A control is a set of literal edits to corridor.js. Each edit must match exactly once; the
  * edited source is then lifted by the test it is run against. This module declares:
  *   - the exact test inventory;
- *   - every control, with its witnesses and the collateral it may cause: 32 WORD_CONTROLS and 2
- *     LEARNING_RECORD_CONTROLS, 34 controls, run as 36 children with the two baselines;
+ *   - every control, with its witnesses and the collateral it may cause: 34 WORD_CONTROLS and 2
+ *     LEARNING_RECORD_CONTROLS, 36 controls, run as 38 children with the two baselines;
  *   - the admission rules;
  *   - the runner, and the evidence it keeps for every child.
  *
@@ -30,7 +30,7 @@
  *
  * Bounds: each child has timeoutMs (300 s, then SIGKILL) and CHILD_MAX_BUFFER (16 MiB) per stream.
  * These are per-child bounds only; the phase has no separately admitted total bound (worst case:
- * the assessment staging plus 36 × 300 s).
+ * the assessment staging plus 38 × 300 s).
  *
  *   node prototypes/corridor/tools/test-word-saved-answer.mjs --controls   runs every control below
  */
@@ -46,7 +46,10 @@ export const CHILD_MAX_BUFFER = 16 * 1024 * 1024;
 
 export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7r', 'T7s', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15',
   // D23 search stand-in: relation copy (X), search presentation (S), the core sheet's live door (N), the preservation table (V), P3
-  'X1', 'X2', 'X3', 'X4', 'X5', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'N1', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r']);
+  'X1', 'X2', 'X3', 'X4', 'X5', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'N1', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r',
+  // glance pass 2026-10-01: a reading names an entry's kana form across scripts (ダマスカス read だますかす), never a different reading;
+  // and the quick look and the full entry make ONE card (the cue keeps the entry's own form)
+  'K1', 'K2']);
 /** The exact rows test-word-saved-answer.mjs must report: F0, then a setup row and a behaviour row per case. */
 export const INVENTORY = Object.freeze(['F0', ...WORD_CASES.flatMap((id) => [`${id}.setup`, id])]);
 
@@ -92,9 +95,11 @@ export const WORD_CONTROLS = Object.freeze({
     ["suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null)", "suppressAssessmentCards({ kind: 'remove', key }, null)"]] },
   C10: { note: 'shown-answer binding removed: availability alone authorizes a grade', witnesses: ['T8'], collateral: [], edits: [
     ['  if (!bound || bound.item !== item || bound.ix !== rv.ix || bound.key !== wordPresentationKey(item, answer)) {', '  if (false) {']] },
-  C11: { note: 'exact reading index relaxed to normalised kana (lends ウブ’s restriction to うぶ)', witnesses: ['T4'], collateral: [], edits: [
-    ['  const kana = indexed ? indexed[5].indexOf(node.reading) : -1;',
-      '  const kana = indexed ? indexed[5].findIndex((form) => kataToHira(form) === kataToHira(node.reading)) : -1;']] },
+  // the reading match is kana-insensitive since the glance pass (entryKanaIndex); this mutant passes over an exact form
+  // for the first kana-alike one, so うぶ borrows ウブ's restriction again
+  C11: { note: 'exact form passed over for the first normalised-kana form (lends ウブ’s restriction to うぶ)', witnesses: ['T4'], collateral: [], edits: [
+    ['  const exact = row[5].indexOf(reading);\n  if (exact >= 0) return exact;\n', ''],
+    ['  return alike.length === 1 ? alike[0] : -1;', '  return alike.length ? alike[0] : -1;']] },
   C12: { note: 'reading restriction removed: ウブ may be written 産', witnesses: ['T4'], collateral: [], edits: [
     ['  if (indexed && !(kana >= 0 && readerReadingFits(indexed, kana, node.id) && readerReadingFits(indexed, kana, head))) {',
       '  if (indexed && !(kana >= 0)) {']] },
@@ -108,6 +113,13 @@ export const WORD_CONTROLS = Object.freeze({
   C16: { note: 'present row cue excused when the snapshot has no reading (the typeof conjunct restored)', witnesses: ['T14'], collateral: [], edits: [
     ['    if (nonEmptyString(row?.cueReading) && snap.r !== row.cueReading) {',
       "    if (nonEmptyString(row?.cueReading) && typeof snap.r === 'string' && snap.r !== row.cueReading) {"]] },
+  // K2 then fails too: the quick look's door is refused before there is one card to agree on
+  C18: { note: 'the reading match made byte-exact again, as on 7ef0e985: ダマスカス read だますかす is refused', witnesses: ['K1'], collateral: ['K2'], edits: [
+    ['  return alike.length === 1 ? alike[0] : -1;', '  return -1;']] },
+  C19: { note: 'the cue keeps the door’s own script again (8dea3c2e): the quick look saves だますかす, the full entry reads ダマスカス, and each calls the other’s card another reading',
+    witnesses: ['K2'], collateral: ['K1'], edits: [
+      ['  return kana >= 0 ? row[5][kana] : node.reading;\n}', '  return node.reading;\n}'],
+      ['  const reading = indexed ? indexed[5][kana] : node.reading;', '  const reading = node.reading;']] },
   C17: { note: 'absent row cue made a wildcard again (the matching snapshot’s reading ignored)', witnesses: ['T15'], collateral: ['T7r', 'T7s'], edits: [
     ["    const known = nonEmptyString(row.cueReading) ? row.cueReading\n      : snap?.seq === row.entrySeq && nonEmptyString(snap.r) ? snap.r : null;",
       '    const known = nonEmptyString(row.cueReading) ? row.cueReading : null;']] },
@@ -374,11 +386,11 @@ export function childRecord({ id, kind, role, control = null, table = null, edit
   };
 }
 
-/** Run every control and write controls-report.json. The 33 children run one at a time: the TAP
+/** Run every control and write controls-report.json. The 35 children run one at a time: the TAP
  * baseline, the 29 WORD_CONTROLS, the learning-record baseline and its 2 controls. Each child is
  * bounded (timeoutMs, then SIGKILL; CHILD_MAX_BUFFER per stream), and its raw bytes and evidence
  * record are kept under children/, referenced by path and sha256 from the report, whatever its
- * outcome. There is no total bound for the phase: the worst case is the staging plus 33 × timeoutMs. */
+ * outcome. There is no total bound for the phase: the worst case is the staging plus 35 × timeoutMs. */
 export async function runControls({ root, testFile, learningRecordFile, evidence, timeoutMs = CHILD_TIMEOUT_MS }) {
   const phaseStartedAt = new Date().toISOString();
   const phaseStart = performance.now();

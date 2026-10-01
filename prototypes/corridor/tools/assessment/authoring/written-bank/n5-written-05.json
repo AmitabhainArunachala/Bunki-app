@@ -18,12 +18,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nあたまが　いたいので、【病院】へ　いきます。",
       "options": [
-        "びよういん",
-        "びょうい",
+        "びょういん",
         "ぴょういん",
-        "びょういん"
+        "びょうい",
+        "びよういん"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "「病院」は「びょういん」と読む。「びよういん」は「美容院」だ。\nThe word 病院 is read byouin and means hospital.",
       "target": "病院"
     },
@@ -46,12 +46,12 @@
       "task": "kanji-reading",
       "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　【薬】を　一日に　三かい　のんで　ください。",
       "options": [
-        "くすり",
         "くずり",
-        "くさり",
-        "すくり"
+        "くすり",
+        "すくり",
+        "くさり"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「薬」は「くすり」と読む。\nThe word 薬 is read kusuri and means medicine.",
       "target": "薬"
     },
@@ -74,12 +74,12 @@
       "task": "orthography",
       "prompt": "【　】の　ことばは　どう　かきますか。\nばんごはんに　【さかな】を　やきました。",
       "options": [
-        "鳥",
-        "馬",
         "魚",
-        "黒"
+        "黒",
+        "鳥",
+        "馬"
       ],
-      "answer": 2,
+      "answer": 0,
       "rationale": "「さかな」は「魚」と書く。「鳥」は「とり」、「馬」は「うま」だ。\nThe word sakana (fish) is written 魚.",
       "target": "魚"
     },
@@ -102,12 +102,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nほんやで　（　）を　かいました。",
       "options": [
-        "くつ",
-        "じしょ",
+        "さかな",
         "やさい",
-        "さかな"
+        "じしょ",
+        "くつ"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "ほんやでうっているのは「じしょ」だ。\nJisho means dictionary, which is sold at a bookstore.",
       "target": "辞書"
     },
@@ -116,12 +116,12 @@
       "task": "contextual-expression",
       "prompt": "（　）に　なにを　いれますか。\nこの　スープは　すこし　（　）です。しおを　いれすぎました。",
       "options": [
-        "あまい",
         "つめたい",
-        "ひくい",
-        "からい"
+        "あまい",
+        "からい",
+        "ひくい"
       ],
-      "answer": 3,
+      "answer": 2,
       "rationale": "しおをいれすぎると「からい」あじになる。\nKarai here means salty, because too much salt was added.",
       "target": "辛い"
     },
@@ -130,12 +130,12 @@
       "task": "paraphrase",
       "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nあには　【病気】です。",
       "options": [
-        "あには　げんきです。",
-        "あには　げんきじゃ　ありません。",
+        "あには　ひまです。",
         "あには　いそがしいです。",
-        "あには　ひまです。"
+        "あには　げんきじゃ　ありません。",
+        "あには　げんきです。"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "「病気」は「げんきじゃない」と同じ意味だ。\nByouki means sick, so he is not well.",
       "target": "病気"
     },
@@ -144,12 +144,12 @@
       "task": "paraphrase",
       "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nこの　くつは　【ちょっと】　大きいです。",
       "options": [
-        "この　くつは　すこし　大きいです。",
-        "この　くつは　とても　大きいです。",
+        "この　くつは　いちばん　大きいです。",
         "この　くつは　ぜんぜん　大きく　ないです。",
-        "この　くつは　いちばん　大きいです。"
+        "この　くつは　とても　大きいです。",
+        "この　くつは　すこし　大きいです。"
       ],
-      "answer": 0,
+      "answer": 3,
       "rationale": "「ちょっと」は「すこし」と同じ意味だ。\nChotto means a little, the same as sukoshi.",
       "target": "ちょっと"
     },
@@ -158,12 +158,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nまいにち　七時（　）　おきます。",
       "options": [
-        "に",
         "で",
-        "を",
-        "が"
+        "に",
+        "が",
+        "を"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "じかんには「に」をつかう。\nNi marks a specific time: I get up at seven.",
       "subject": "particle:ni"
     },
@@ -186,12 +186,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nわたしの　いえは　あの　大きい　ビル（　）　となりです。",
       "options": [
-        "の",
         "が",
-        "に",
-        "を"
+        "の",
+        "を",
+        "に"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "「AのとなりのB」で、ばしょを言う。\nNo links the two nouns: next to that big building.",
       "subject": "particle:no"
     },
@@ -200,12 +200,12 @@
       "task": "grammar-form",
       "prompt": "（　）に　なにを　いれますか。\nおもそうですね。にもつを　もち（　）。",
       "options": [
-        "ました",
-        "ましょうか",
+        "たいです",
         "ませんか",
-        "たいです"
+        "ましょうか",
+        "ました"
       ],
-      "answer": 1,
+      "answer": 2,
       "rationale": "あいてのためにすることを言うときは「〜ましょうか」をつかう。\nMashou ka offers help: shall I carry your bag?",
       "subject": "grammar:mashou"
     },
@@ -228,12 +228,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nくだものの　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
       "options": [
-        "りんご",
         "いちばん",
-        "すきなのは",
-        "なかで"
+        "りんご",
+        "なかで",
+        "すきなのは"
       ],
-      "answer": 2,
+      "answer": 3,
       "rationale": "ただしいじゅんばんは「なかで　いちばん　すきなのは　りんご　です」で、★には「すきなのは」が入る。\nThe order is なかで いちばん すきなのは りんご です, so すきなのは fills the star."
     },
     {
@@ -241,12 +241,12 @@
       "task": "sentence-composition",
       "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　ほんやは　＿＿＿　＿＿＿　＿★＿　＿＿＿　あいて　います。",
       "options": [
-        "十時まで",
         "よる",
-        "九時から",
-        "あさ"
+        "十時まで",
+        "あさ",
+        "九時から"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "ただしいじゅんばんは「あさ　九時から　よる　十時まで　あいて　います」で、★には「よる」が入る。\nThe order is あさ 九時から よる 十時まで あいて います, so よる fills the star."
     },
     {
@@ -254,12 +254,12 @@
       "task": "text-grammar",
       "prompt": "（１）に　なにを　いれますか。",
       "options": [
-        "でも",
         "それから",
-        "だから",
-        "では"
+        "でも",
+        "では",
+        "だから"
       ],
-      "answer": 1,
+      "answer": 0,
       "rationale": "やさいをきったあとにしたことなので「それから」が入る。\nSore kara (then) shows the next step in cooking.",
       "passage": "tg"
     },
@@ -268,12 +268,12 @@
       "task": "text-grammar",
       "prompt": "（２）に　なにを　いれますか。",
       "options": [
-        "みました",
-        "いきました",
         "しまいました",
-        "みたいです"
+        "みたいです",
+        "みました",
+        "いきました"
       ],
-      "answer": 3,
+      "answer": 1,
       "rationale": "「こんどは」とこれからのことを言うので「つくってみたいです」がいい。\nTsukutte mitai desu expresses a wish for next time.",
       "passage": "tg",
       "subject": "grammar:tai"
@@ -297,12 +297,12 @@
       "task": "short-reading",
       "prompt": "ボールペンを　もらいたい　人は　どう　しますか。",
       "options": [
-        "カードを　もって、ざっしを　かう",
         "レジで　ボールペンを　かう",
-        "みせで　ざっしを　よむ",
-        "カードを　みせに　かえす"
+        "カードを　もって、ざっしを　かう",
+        "カードを　みせに　かえす",
+        "みせで　ざっしを　よむ"
       ],
-      "answer": 0,
+      "answer": 1,
       "rationale": "カードをもっている人がざっしをかうと、ボールペンをもらえる。\nPeople with the store card get a ballpoint pen when they buy a magazine.",
       "passage": "s2"
     },
@@ -311,12 +311,12 @@
       "task": "short-reading",
       "prompt": "この　人は　たまごやきに　なにを　いれますか。",
       "options": [
-        "しお",
-        "しょうゆ",
+        "みず",
         "さとう",
-        "みず"
+        "しょうゆ",
+        "しお"
       ],
-      "answer": 2,
+      "answer": 1,
       "rationale": "「さとうを　すこし　いれると、あまくて　おいしい」とある。\nThe writer adds a little sugar to the rolled omelet.",
       "passage": "s3"
     },
@@ -325,12 +325,12 @@
       "task": "mid-reading",
       "prompt": "おいしゃさんは　なんと　いいましたか。",
       "options": [
-        "まいにち　病院へ　きて　ください",
-        "三日ぐらい　うちで　ねて　いて　ください",
         "すぐ　がっこうへ　いって　ください",
-        "ハナさんに　でんわして　ください"
+        "ハナさんに　でんわして　ください",
+        "まいにち　病院へ　きて　ください",
+        "三日ぐらい　うちで　ねて　いて　ください"
       ],
-      "answer": 1,
+      "answer": 3,
       "rationale": "おいしゃさんは「三日ぐらい…うちで　ねて　いて　ください」と言った。\nThe doctor said to stay home in bed for about three days.",
       "passage": "m1"
     },
@@ -339,12 +339,12 @@
       "task": "mid-reading",
       "prompt": "ハナさんは　なにを　しましたか。",
       "options": [
-        "いっしょに　病院へ　いった",
-        "この　人の　うちへ　きた",
+        "まいにち　でんわで　じゅぎょうの　ことを　おしえた",
         "おいしゃさんと　はなした",
-        "まいにち　でんわで　じゅぎょうの　ことを　おしえた"
+        "この　人の　うちへ　きた",
+        "いっしょに　病院へ　いった"
       ],
-      "answer": 3,
+      "answer": 0,
       "rationale": "ハナさんはまいにちでんわをくれて、じゅぎょうのことをおしえてくれた。\nHana phoned every day and told the writer about the lessons.",
       "passage": "m1"
     },

@@ -1,4 +1,5 @@
 /** Actual rest/wake controls must refresh the mirror when only card identities change. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
@@ -51,7 +52,7 @@ try {
     try {
       await page.goto(`${origin}/index.html?entry=shelf&ui=bi`);
       await page.waitForFunction(() => document.body.dataset.ready === '1');
-      await page.locator('#kagami-link').click();
+      await openShelfDoor(page, '#kagami-link');
       assert.deepEqual(await displayed(page), ['word:天気']);
       const before = await snapshot(page, engine, 'before');
       result.initial = { displayed: await displayed(page), native: before.file, sha256: before.sha256 };
@@ -80,7 +81,7 @@ try {
       await page.screenshot({ path: result.screenshot, fullPage: true });
       await page.reload();
       await page.waitForFunction(() => document.body.dataset.ready === '1');
-      await page.locator('#kagami-link').click();
+      await openShelfDoor(page, '#kagami-link');
       assert.deepEqual(await displayed(page), ['word:学校']);
       const reopened = await snapshot(page, engine, 'reopened');
       assert.deepEqual(reopened.state.rows, after.state.rows);

@@ -3,6 +3,7 @@
  * explicitly provision synthetic native admission/operation-only transport;
  * adversarial operation, network and storage premises are labeled separately.
  * No test pairing establishes real account or cross-device authority. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import { execFileSync } from 'node:child_process';
@@ -298,7 +299,7 @@ async function waitSelected(page, predicate, description) {
   return value;
 }
 async function door(page) {
-  await page.locator('#mock-link').click();
+  await openShelfDoor(page, '#mock-link');
   await page.waitForSelector('#exam-legacy, button[data-mock-set="n5-01"], #mock-next, #mock-done');
   if (await page.locator('#exam-legacy').count()) await page.locator('#exam-legacy').click();
   await page.waitForSelector('button[data-mock-set="n5-01"], #mock-next, #mock-done');
@@ -958,8 +959,38 @@ try {
   await check('two-completed-attempts-and-failed-save-actions', async ({ page }) => {
     await door(page);
     assert.match(await page.locator('main').innerText(), /Short practice sets/u);
-    assert.match(await page.locator('main').innerText(), /answer keys still need checking/u);
-    assert.match(await page.locator('main').innerText(), /don’t include listening or a time limit/u);
+    const assertIntro = async () => {
+      const mark = page.locator('main > .mock-review-mark');
+      assert.equal(await mark.count(), 1);
+      assert.equal(await mark.isVisible(), true);
+      assert.equal(await mark.locator('.status-chip').innerText(), '未確認');
+      assert.equal(await mark.locator('.exam-review-reason').innerText(), 'answers not yet checked by a person');
+      assert.equal(await page.locator('[data-mock-set] .status-chip').count(), 0);
+      assert.match(await page.locator('main').innerText(), /No listening and no time limit\./u);
+    };
+    await assertIntro();
+    const introRecord = await readAppRecord(page);
+    const originalMark = await page.locator('main > .mock-review-mark').evaluate(n => n.outerHTML);
+    for (const mutation of ['hidden', 'wrong-chip', 'missing-reason', 'repeated-on-row']) {
+      await page.evaluate(mutation => {
+        const mark = document.querySelector('main > .mock-review-mark');
+        if (mutation === 'hidden') mark.style.display = 'none';
+        if (mutation === 'wrong-chip') mark.querySelector('.status-chip').textContent = 'Reviewed';
+        if (mutation === 'missing-reason') mark.querySelector('.exam-review-reason').textContent = '';
+        if (mutation === 'repeated-on-row') {
+          const duplicate = mark.querySelector('.status-chip').cloneNode(true);
+          duplicate.dataset.introNegativeControl = '1';
+          document.querySelector('button[data-mock-set]').append(duplicate);
+        }
+      }, mutation);
+      await assert.rejects(assertIntro, { name: 'AssertionError' }, `intro must reject ${mutation}`);
+      await page.evaluate(original => {
+        document.querySelector('main > .mock-review-mark').outerHTML = original;
+        document.querySelectorAll('[data-intro-negative-control]').forEach(n => n.remove());
+      }, originalMark);
+      await assertIntro();
+    }
+    assert.deepEqual(await readAppRecord(page), introRecord, 'warning probes leave the learner record unchanged');
     await start(page);
     const firstId = (await selected(page)).attempt.attemptId;
     const firstQuestion = await page.locator('.mock-q').innerText();

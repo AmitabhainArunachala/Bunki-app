@@ -3,6 +3,7 @@
  * Crash boundaries instrument browser APIs only; no app source override, public
  * fixture seeding, or localStorage projection substitutes for the active record.
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -142,7 +143,7 @@ async function submitNote(page, text, { refused = false } = {}) {
 }
 async function ask(page, text) {
   const before = await readAppRecordSnapshot(page);
-  if (!(await page.locator('#chat-input').count())) await page.click('#ai-link');
+  if (!(await page.locator('#chat-input').count())) await openShelfDoor(page, '#ai-link');
   await page.fill('#chat-input', text); await page.click('#chat-send');
   await waitForAppRecord(page, (record) => record.aiChat?.some((turn) => turn.role === 'tutor' && turn.text === `Synthetic reply to ${text}`), { description: 'real chat reply commit' });
   await page.waitForFunction(() => document.querySelector('#chat-send')?.disabled === false);
@@ -307,7 +308,7 @@ try {
   }, { turns: Array.from({ length: 32 }, (_, i) => ({ surface: i % 2 ? 'word-tutor' : 'chat', role: i % 3 ? 'assistant' : 'tutor', content: `Synthetic retained turn ${i}.`, model: 'fixture', ts: 1700000001000 + i, xid: i % 2 ? `exchange-${i}` : 'unreferenced', contextRef: `word:学校-${i}`, future: { keep: i } })) });
   await test('durable-chat-and-readings-survive-save-export-and-reselection', async ({ page }) => {
     await submitNote(page, 'Synthetic save without truncation.'); await boot(page);
-    await page.click('#airead-link'); await page.click('[data-airead-past="13"]');
+    await openShelfDoor(page, '#airead-link'); await page.click('[data-airead-past="13"]');
     const selected = await waitForAppRecord(page, (record) => record.aiReading?.text === 'Synthetic original reading 13.');
     assert.equal(selected.aiReadings.length, 14);
     const value = await exported(page); assert.equal(value.record.aiChat.length, 40); assert.equal(value.record.aiReadings.length, 14);

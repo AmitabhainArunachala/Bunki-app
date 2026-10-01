@@ -1,6 +1,7 @@
 /** Real shelf input, current-query results, and delayed real worker replies.
  * Local browser timing is diagnostic evidence; it never certifies an iPhone.
  * A missed strict 100ms lookup budget is a failing row and a nonzero exit. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -259,7 +260,7 @@ const cases = [
       row.departureHeld = await holdQuery(next.page);
       // Clearing restores a real navigation door while the old response stays held.
       await clear(next.page);
-      await next.page.locator('#levels-link').click();
+      await openShelfDoor(next.page, '#levels-link');
       await next.page.waitForFunction(() => document.body.dataset.view === 'levels');
       const destination = await next.page.evaluate(() => {
         window.__shelfSearchTest.destinationFocus = document.activeElement;

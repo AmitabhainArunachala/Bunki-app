@@ -1,6 +1,7 @@
 /** Actual teacher UI in persistent Chromium/WebKit profiles. Native IndexedDB
  * is read only as output. Provider responses and fault timing, where named,
  * are explicit synthetic fixtures; no external request is allowed to leave. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -126,7 +127,7 @@ async function shelf(fixture, { protectedState = false } = {}) {
   await fixture.page.waitForFunction(() => document.body.dataset.view === 'shelf');
 }
 async function tutor(fixture, options) {
-  await shelf(fixture, options); await fixture.page.locator('#ai-link').click();
+  await shelf(fixture, options); await openShelfDoor(fixture.page, '#ai-link');
   await fixture.page.locator('#chat-input').waitFor({ state: 'visible' });
 }
 async function selectTopic(fixture, contextRef) {
@@ -579,8 +580,10 @@ define('synthetic-backup-missing-context-draft-preserved-as-unavailable', async 
   assert.equal(await fixture.page.locator(`#teacher-context-select option[value="${topic.id}"]`).count(), 0);
   const unavailable = fixture.page.locator(`#teacher-unavailable-drafts [data-teacher-draft-topic="${topic.id}"]`);
   assert.equal(await unavailable.locator('.teacher-draft-quote').textContent(), text);
-  assert.equal(await unavailable.locator('button').count(), 1, 'The unavailable topic offers only manual copy');
-  assert.match(await unavailable.locator('button').textContent(), /copy|コピー/iu);
+  // the quoted draft's Japanese words are lookup doors; the topic's only action is still manual copy
+  const actions = unavailable.locator('button:not(.japanese-lookup-word)');
+  assert.equal(await actions.count(), 1, 'The unavailable topic offers only manual copy');
+  assert.match(await actions.textContent(), /copy|コピー/iu);
   assert.equal(await unavailable.locator('#chat-send,[data-teacher-send]').count(), 0);
   assert.equal(await fixture.page.locator('#chat-input').inputValue(), '', 'Unavailable draft text must not become a general-conversation send');
   await screenshot(fixture, 'unavailable-source-question-retained-visibly');

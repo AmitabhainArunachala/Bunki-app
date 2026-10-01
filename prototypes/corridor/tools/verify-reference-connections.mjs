@@ -2,6 +2,7 @@
  * node prototypes/corridor/tools/verify-reference-connections.mjs [--shots DIR] [--case source-return]
  * Covers returns, not full corpus correctness (verify-reference.mjs owns that).
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -61,7 +62,7 @@ const boot = async () => {
   await page.waitForFunction(() => document.body.dataset.ready === '1');
 };
 const library = async (id = 'jlpt:N5', query = '') => {
-  await boot(); await page.click('#levels-link');
+  await boot(); await openShelfDoor(page, '#levels-link');
   if (id.startsWith('jlpt-kanji:')) await page.click('#reference-tab-kanji');
   await page.locator(`[data-reference-collection="${id}"]`).click();
   if (query) await page.fill('#reference-search', query);
@@ -99,7 +100,7 @@ const catalog = createRequire(import.meta.url)(resolve(root, 'reference-core.js'
 let initial;
 try {
   await check('library names the current room, exposes dictionary search, and starts without study debt', async () => {
-    await boot(); initial = await evidence(); await page.click('#levels-link');
+    await boot(); initial = await evidence(); await openShelfDoor(page, '#levels-link');
     assert.equal(await page.locator('.crumb b').innerText(), 'reference library');
     assert.match(await page.locator('.crumb').getAttribute('aria-label'), /bookshelf.*reference library/);
     assert.ok(await page.locator('#reference-global-search').isVisible());
@@ -173,7 +174,7 @@ try {
   });
   await check('source sentence → real article → return restores sentence, word, library and focus', async () => {
     await boot(); await page.locator('[data-passage="wikinews:1403"]').first().click(); await page.waitForSelector('#reader .tok');
-    await page.click('#back'); await page.click('#levels-link'); await page.click('[data-reference-collection="jlpt:N4"]');
+    await page.click('#back'); await openShelfDoor(page, '#levels-link'); await page.click('[data-reference-collection="jlpt:N4"]');
     await page.fill('#reference-search', '世界'); await page.click('[data-entry-id="世界"]'); await nodeIs('word:世界');
     await page.locator('.sent-door').first().click(); await page.waitForSelector('#sent-home');
     const sentence = await page.locator('.sent-reader').innerText(); await page.click('#sent-home');
@@ -220,7 +221,7 @@ try {
     await boot(); assert.equal(await page.locator('#lang').getAttribute('role'), 'group');
     assert.equal(await page.locator('#lang').getAttribute('aria-pressed'), null);
     await page.click('#lang [data-lang="ja"]'); assert.equal(await page.locator('#lang [data-lang="ja"]').getAttribute('aria-pressed'), 'true');
-    await page.click('#levels-link'); await capture('after-japanese-overview');
+    await openShelfDoor(page, '#levels-link'); await capture('after-japanese-overview');
     await page.click('#lang [data-lang="bi"]'); assert.equal(await page.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed'), 'true');
   });
   await check('all passive recursive browsing leaves enrollment and learning evidence unchanged', async () => {
@@ -237,7 +238,7 @@ try {
   });
   for (const width of [320, 390, 1280]) {
     await check(`${width}px library, word and source-tag disclosure fit their viewport`, async () => {
-      await page.setViewportSize({ width, height: 844 }); await boot(); await page.click('#levels-link');
+      await page.setViewportSize({ width, height: 844 }); await boot(); await openShelfDoor(page, '#levels-link');
       await capture(`after-overview-${width}`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
       await page.click('[data-reference-collection="jlpt:N5"]'); await page.fill('#reference-search', '学校'); await page.click('[data-entry-id="学校"]');

@@ -11,6 +11,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'fonts.css',
   'fonts',
   'corridor.css',
+  'editorial.css',
   'corridor.js',
   'maintenance/report-client.js',
   'maintenance/report-client.css',

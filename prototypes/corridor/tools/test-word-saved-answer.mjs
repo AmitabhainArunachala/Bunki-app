@@ -92,7 +92,11 @@ function defineRows() {
     'dictionaryRowsForForm', 'readerReadingFits', 'readerSummaryFor', 'readerQuickRecord', 'readerGlossMissText', 'readerCaptureReasonText',
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
-    'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureHeldText', 'showMini',
+    'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
+    // glance pass 2026-10-01: the reading names an entry's kana form across scripts
+    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
+    // the seal opens the list chooser (09b5e2a7); its 覚えるのをやめる door is the mini's remove route
+    'openVocabularyListChooser',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -182,6 +186,14 @@ function defineRows() {
       };
     }
     append(...nodes) { this.children.push(...nodes); }
+    replaceChildren(...nodes) { this.children = [...nodes]; }
+    querySelectorAll(selector) {
+      assert.match(selector, /^[a-z]+$/u, 'the fake DOM answers tag selectors only');
+      const found = [], walk = (node) => { for (const child of node.children || []) { if (child.tag === selector) found.push(child); walk(child); } };
+      walk(this); return found;
+    }
+    showModal() { this.open = true; }
+    close() { this.open = false; this.listeners.close?.(); }
     setAttribute(name, value) { this.attributes[name] = String(value); }
     getAttribute(name) { return this.attributes[name] ?? null; }
     addEventListener(kind, run) { this.listeners[kind] = run; }
@@ -225,7 +237,9 @@ function defineRows() {
       el: (tag, cls, text) => new FakeElement(tag, cls, text),
       // a button's text is its English label; the Japanese label rides along for the rows that read it
       biLabel: (tag, cls, ja, en) => Object.assign(new FakeElement(tag, cls, en), { labelJa: ja }),
-      document: { querySelectorAll: () => [], body: { append: () => {} }, getElementById: () => null,
+      // the list chooser's peripheral doors (typed-name draft, context picker) are not under test here
+      dialogs: [], attachRecordDraft: () => {}, rememberRecordDraft: () => true, renderContextPicker: () => {},
+      document: { querySelectorAll: () => [], body: { append: (node) => { context.dialogs.push(node); } }, getElementById: () => null,
         createTextNode: (text) => new FakeElement('#text', '', text) },
       window: { innerWidth: 400 }, removeMini: () => {}, activeTokenAlternatives: null,
       sealSyncs: 0, syncReaderTakeSeal: () => { context.sealSyncs += 1; },
@@ -275,9 +289,20 @@ function defineRows() {
   const openMini = (ctx, b, from = { passage: 'synthetic-passage', index: 3 }) => {
     const span = new FakeElement('span', 'tok');
     const mini = ctx.showMini(span, { b, s: b, r: '' }, () => {}, { from, reader: true });
-    return { span, mini, seal: find(mini, (node) => node.id === 'mini-take') };
+    const seal = find(mini, (node) => node.id === 'mini-take');
+    if (seal) Object.defineProperty(seal, 'ctx', { value: ctx });
+    return { span, mini, seal };
   };
-  const clickSeal = (seal) => seal.listeners.click({ stopPropagation() {}, detail: 1 });
+  /** The seal, then — when it opened the list chooser on a saved card — that chooser's own
+   * 覚えるのをやめる door, the one route by which the mini removes a card. */
+  const clickSeal = async (seal) => {
+    const ctx = seal.ctx;
+    const shown = ctx ? ctx.dialogs.length : 0;
+    await seal.listeners.click({ stopPropagation() {}, detail: 1 });
+    const dialog = ctx?.dialogs.length > shown ? ctx.dialogs.at(-1) : null;
+    const stop = dialog && find(dialog, (node) => node.id === 'vocabulary-list-stop');
+    if (stop) await stop.listeners.click({ stopPropagation() {}, detail: 1 });
+  };
 
   const NODES = {
     mekuru: { t: 'word', id: '捲る', seq: '1257810', reading: 'めくる', matchedGloss: 'to turn over' },
@@ -1563,5 +1588,71 @@ function defineRows() {
       const { main } = render(core);
       assert.equal(all(main, (node) => String(node.className || '').includes('enroll-held-open')).length, 0, `self-enrolled 上手: no route · ${screen}`);
     }
+  });
+  // glance pass 2026-10-01 (design lead, approved engine change): the article's reader spells every reading in hiragana, so a
+  // katakana word reached ダマスカス 2834901 read だますかす and 覚 refused it ("the article reads it だますかす, the dictionary
+  // ダマスカス"). A reading now names the entry's kana form across scripts and ー; a genuinely different reading is still held.
+  const DAMASCUS = { t: 'word', id: 'ダマスカス', seq: '2834901', reading: 'だますかす' };
+  const NAMA = { t: 'word', id: '生', seq: '1378450', reading: 'せい' };
+  /** The shared lookup door's own mini (openJapaneseLookup → showMini): the token carries the article's reading. */
+  const lookupMini = (ctx, node, record) => {
+    const span = new FakeElement('span', 'japanese-lookup-word');
+    const mini = ctx.showMini(span, { s: node.id, b: node.id, r: node.reading, c: true, seq: node.seq }, () => {}, { record });
+    return { mini, seal: find(mini, (n) => n.id === 'mini-take'), reason: find(mini, (n) => n.id === 'mini-take-reason') };
+  };
+  row('K1.setup', 'ダマスカス 2834901 lists only katakana forms, kana-only; ケーキ 1047860 is ケーキ; 生 1378450 is read なま only', () => {
+    assert.deepEqual([rowOf.get('2834901')[1], rowOf.get('2834901')[5], rowOf.get('2834901')[11], rowOf.get('2834901')[6][0]],
+      ['ダマスカス', ['ダマスカス', 'ダマスクス'], [1, 1], 'Damascus (Syria)']);
+    assert.deepEqual([rowOf.get('1047860')[1], rowOf.get('1047860')[5]], ['ケーキ', ['ケーキ']]);
+    assert.deepEqual([rowOf.get('1378450')[1], rowOf.get('1378450')[5], rowOf.get('1378450')[6][0]], ['生', ['なま'], 'raw']);
+    fixtures.set('K1', true);
+  });
+  row('K1', 'a reading names its entry across scripts and ー: ダマスカス read だますかす saves; 生 read せい (the entry reads なま) is still held, in plain words', async () => {
+    need('K1');
+    const ctx = app({ mode: 'main' });
+    assert.equal(ctx.kanaReadingKey('ダマスカス'), ctx.kanaReadingKey('だますかす'));
+    assert.equal(ctx.kanaReadingKey('ケーキ'), ctx.kanaReadingKey('けえき'));
+    assert.notEqual(ctx.kanaReadingKey('せい'), ctx.kanaReadingKey('なま'));
+    // (a) savable: the state, the capture and the popup's seal
+    assert.equal(ctx.wordCaptureState(DAMASCUS, blank()), 'take');
+    const patch = ctx.captureStorePatch(blank(), DAMASCUS, 'ダマスカス', 1000);
+    // the card keeps the entry's own form of the reading (one word, one card: K2)
+    assert.deepEqual([patch.taken[0].entrySeq, patch.taken[0].cueReading, patch.deepWords['ダマスカス'].r, patch.deepWords['ダマスカス'].m[0]],
+      ['2834901', 'ダマスカス', 'ダマスカス', 'Damascus (Syria)']);
+    assert.equal(ctx.wordCaptureState(DAMASCUS, { ...blank(), ...patch }), 'taken', 'the saved card is this door’s own');
+    for (const reading of ['けえき', 'けーき']) {
+      assert.equal(ctx.wordCaptureState({ t: 'word', id: 'ケーキ', seq: '1047860', reading }, blank()), 'take', `ケーキ read ${reading}`);
+    }
+    const open = lookupMini(ctx, DAMASCUS, { seq: '2834901', head: 'ダマスカス', r: 'ダマスカス', m: ['Damascus (Syria)'] });
+    assert.deepEqual([open.seal?.disabled ?? null, open.reason ?? null], [false, null], 'the popup’s 覚 is live, with no held reason');
+    // (b) a genuinely different reading stays held, said plainly
+    assert.equal(ctx.wordCaptureState(NAMA, blank()), 'unavailable');
+    assert.throws(() => ctx.captureStorePatch(blank(), NAMA, '生', 1000), (error) => error.code === 'word-answer-unavailable');
+    const plain = ['この語は保存できない。記事の読み「せい」が辞書の読み「なま」と一致しないため。',
+      'Can’t save this word: the article reads it せい, the dictionary なま.'];
+    for (const [lang, at] of LANGS) assert.equal(app({ mode: 'main', lang }).wordCaptureHeldText(NAMA), plain[at], `held line · ${lang}`);
+    const held = lookupMini(ctx, NAMA, { seq: '1378450', head: '生', r: 'なま', m: ['raw'] });
+    assert.deepEqual([held.seal?.disabled, held.reason?.textContent], [true, plain[1]], 'the popup holds 覚 and says why');
+  });
+  // gate review on 8dea3c2e: the quick look kept だますかす as the card's cue while 全項目 reads ダマスカス, so each door called
+  // the other's card "another reading" and offered to replace it with itself. One word, one card (John).
+  const FULL_ENTRY = { t: 'word', id: 'ダマスカス', seq: '2834901', reading: 'ダマスカス' };
+  row('K2.setup', 'the two doors to Damascus: the quick look (read だますかす, the article’s) and 全項目 (read ダマスカス, the entry’s)', () => {
+    need('K1');
+    fixtures.set('K2', { quick: DAMASCUS, full: FULL_ENTRY });
+  });
+  row('K2', 'one word, one card: saved through either door, the other door shows it saved, with no conflict and no replace offer', () => {
+    const { quick, full } = need('K2');
+    const ctx = app({ mode: 'main' });
+    for (const [first, second, label] of [[quick, full, 'quick look, then 全項目'], [full, quick, '全項目, then quick look']]) {
+      const record = { ...blank(), ...ctx.captureStorePatch(blank(), first, 'ダマスカス', 1000) };
+      assert.equal(record.taken[0].cueReading, 'ダマスカス', `the cue keeps the entry's form · ${label}`);
+      assert.deepEqual(ctx.wordNodeIdentity(second, record), ctx.wordCardIdentity(record, 'ダマスカス'), `one identity · ${label}`);
+      assert.equal(ctx.wordCaptureState(second, record), 'taken', `the other door shows it saved · ${label}`);
+      // taking it again through the other door is the existing no-op re-take: no second card, no replace, no conflict
+      assert.deepEqual(Object.keys(ctx.captureStorePatch(record, second, 'ダマスカス', 2000)), [], `the other door's take is the same card · ${label}`);
+    }
+    // a genuinely different reading is still another entry's business (K1): 生 read せい never names なま
+    assert.equal(ctx.wordCaptureState(NAMA, blank()), 'unavailable');
   });
 }

@@ -15,8 +15,12 @@
  *      ("谷川 · activate to show or hide the reading", with たにがわ as its only middle segment while
  *      shown: no other reading, gloss or word); no painted English; focus kept; the neighbour and
  *      the passage unchanged. Control r1 (below).
- *   D3 readings always on (0,2,0) or already kana (2,1,0): names are plain text without a
- *      pointer cursor. Control: 10125f16 renders a button at 2,1,0 that reveals nothing.
+ *   D3 readings always on (0,2,0) or already kana (2,1,0): every name is a door, and the door does
+ *      something. Since c97f1757 every Japanese token opens the shared lookup ("names already shown
+ *      in kana" included), so the old oracle here (names as plain text) was retired with that design
+ *      (glance pass 2026-10-01). In a fresh document per setting, やまなし's names are all buttons
+ *      that show the pointer, and a click on its 谷川 (token 1, D2's fixture) opens the lookup popup
+ *      for 谷川 without leaving the article: never a button that reveals nothing. Control m8.
  *   D4 reveal/gloss marks stay with their passage (the Codex D11-NAME-DOOR-REVIEW schedule),
  *      walked in ONE document: shelf → aozora:000628 (ごん狐), whose token 1 これ (content) two
  *      taps leave revealed and glossed → 戻る (#back) → shelf → aozora:046605. A marker set on the
@@ -112,6 +116,9 @@
  *       having come back with no marks at all. Allowed: nothing else.
  *       D6's English row has no control of its own here: the painter's English defect is controlled
  *       on D4 (m2) and D5 (m4).
+ *   m8  the reader's lookup click on non-content tokens stripped: names stay buttons that do
+ *       nothing — the 10125f16 defect the old D3 guarded against → D3.k0f2.opens-lookup and
+ *       D3.k2f1.opens-lookup fail. Allowed: nothing else (the names are still buttons with a pointer).
  *   r1  aozora:046605 token 1 served read たにかわ (r and ruby): a consistent wrong reading, the
  *       kind the old oracle (any ruby, toggled consistently) accepted → D2.f1/f0
  *       visible-reading and accessible-reading all fail, having shown たにかわ as ruby and as the
@@ -211,8 +218,12 @@ const D6 = Object.freeze({ home: D5.home, away: D5.away, word: D5.word, savedAt:
 // aozora-046605.json; the served bytes are edited, never the checkout.
 const EDITS = Object.freeze({
   reset: Object.freeze({ file: 'corridor.js', from: '    S.revealed = new Set();\n    S.glossed = new Set();\n', to: '' }),
+  // the label today's painter applies (87086bf3 retired namedAccessibleLabel for nameReaderToken)
   paint: Object.freeze({ file: 'corridor.js', from: '    paintNamedTok(span, token, index);\n',
-    to: "    paintTok(span, token, index);\n    span.setAttribute('aria-label', namedAccessibleLabel(token, index));\n" }),
+    to: "    paintTok(span, token, index);\n    nameReaderToken(span, token, index, 'named');\n" }),
+  // the reader's lookup door on every non-content token, counted exactly once in corridor.js (c97f1757 onward)
+  lookupClick: Object.freeze({ file: 'corridor.js',
+    from: '        span.addEventListener(\'click\', () => void openJapaneseLookup(span, token.b || token.s, lookupContext));\n', to: '' }),
   reading: Object.freeze({ file: DOOR.file, from: JSON.stringify(DOOR.token),
     to: JSON.stringify({ ...DOOR.token, r: WRONG_READING, f: [{ t: SURFACE, r: WRONG_READING }] }) }),
   // counted exactly once in 1561ff95's corridor.js (0bf1afdb); absent from e21160fe's, the return before D22
@@ -241,9 +252,10 @@ const RUN_ROWS = Object.freeze({
     'D5.away-index-not-lit', 'D5.named-toggle', 'D5.named-no-english']),
   d6: Object.freeze(['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned', 'D6.home-marks-restored',
     'D6.away-index-not-lit', 'D6.named-toggle', 'D6.named-no-english']),
+  d3: Object.freeze(['k0f2', 'k2f1'].flatMap((key) => ['names', 'pointer', 'opens-lookup'].map((row) => `D3.${key}.${row}`))),
 });
 // The candidate-only fixture row each schedule's controls stand on: it must have passed exactly once before any kill counts.
-const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d4: 'D4.fixture', d5: 'D5.fixture', d6: 'D6.fixture' });
+const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d3: 'D3.fixture', d4: 'D4.fixture', d5: 'D5.fixture', d6: 'D6.fixture' });
 // requires: rows that establish the schedule. kills: witness rows that must fail, as `witness` describes.
 // allowed: the only other rows that may fail. Every remaining row of the run must pass.
 const CONTROLS = Object.freeze([
@@ -262,6 +274,13 @@ const CONTROLS = Object.freeze([
     allowed: ['D4.no-inherited-state', 'D4.toggle-shows', 'D4.toggle-hides'],
     witness: (rows) => ((rows.get('D4.never-english')?.observed?.glosses || []).some((gloss) => typeof gloss === 'string' && gloss.trim())
       ? '' : 'no English text appeared') }),
+  Object.freeze({ name: 'm8', title: "the reader's lookup click on names stripped: buttons that do nothing", edits: ['lookupClick'], run: 'd3',
+    requires: ['D3.k0f2.names', 'D3.k2f1.names'],
+    kills: ['D3.k0f2.opens-lookup', 'D3.k2f1.opens-lookup'],
+    // the names stay buttons with a pointer: only the lookup is gone
+    allowed: [],
+    witness: (rows) => (['k0f2', 'k2f1'].every((key) => rows.get(`D3.${key}.opens-lookup`)?.observed?.mini === null)
+      ? '' : 'a lookup popup still opened') }),
   Object.freeze({ name: 'r1', title: `${PASSAGE_B} token ${DOOR.index} served read ${WRONG_READING}`, edits: ['reading'], run: 'd2',
     requires: ['D2.f1.door', 'D2.f0.door', 'D2.f1.no-navigation', 'D2.f0.no-navigation'],
     kills: ['D2.f1.visible-reading', 'D2.f1.accessible-reading', 'D2.f0.visible-reading', 'D2.f0.accessible-reading'],
@@ -374,7 +393,10 @@ const tokenState = (page, index) => page.evaluate((i) => {
     ruby: rts.map((rt) => rt.textContent).join(''),
     visibleRuby: rts.filter((rt) => !rt.classList.contains('hidden-rt')).map((rt) => rt.textContent).join(''),
     gloss: en ? en.textContent : null, lit: node.classList.contains('lit'), hasEn: node.classList.contains('has-en'),
-    focused: document.activeElement === node, label: node.getAttribute('aria-label') || '', cursor: getComputedStyle(node).cursor };
+    // R4 (2026-09-30): a word is named by itself and described by the rest — read together, in order
+    focused: document.activeElement === node, label: [node.getAttribute('aria-label') || '',
+      ...(node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')]
+      .filter(Boolean).join(' · '), cursor: getComputedStyle(node).cursor };
 }, String(index));
 const classes = (state) => String(state?.cls || '').split(/\s+/);
 // a real click at the token's centre; `own` records whether that point is the token itself (the click is made either way)
@@ -445,6 +467,29 @@ const readerMarks = (page) => page.evaluate(() => ({
     .map((node) => Number(node.dataset.index)).sort((a, b) => a - b),
 }));
 const markSets = (marks) => (marks ? { lit: marks.lit, glossed: marks.glossed } : null);
+
+/** D3: with readings always on (0,2,0) or the text already in kana (2,1,0), each in a fresh document, やまなし's names are
+ * doors with a pointer, and a click on 谷川 (token 1) opens the shared lookup popup for 谷川 and stays in the article. */
+async function d3Names(page, rec) {
+  for (const [key, dials] of [['k0f2', '0,2,0'], ['k2f1', '2,1,0']]) {
+    await openArticle(page, `dials=${dials}`, PASSAGE_B);
+    const state = await page.evaluate((index) => {
+      const door = document.querySelector(`#reader .tok[data-index="${index}"]`);
+      return { named: document.querySelectorAll('#reader .tok.named').length, buttons: document.querySelectorAll('#reader button.tok.named').length,
+        door: door ? `${door.tagName.toLowerCase()}.${[...door.classList].join('.')}` : null, cursor: door ? getComputedStyle(door).cursor : null };
+    }, DOOR.index);
+    rec(`D3.${key}.names`, `D3 dials ${dials}: every name in ${PASSAGE_B} is a door, ${SURFACE} among them`,
+      state.named > 0 && state.buttons === state.named && state.door === 'button.tok.named', JSON.stringify(state));
+    rec(`D3.${key}.pointer`, `D3 dials ${dials}: a name's door shows the pointer it answers to`, state.cursor === 'pointer', String(state.cursor));
+    const tap = await tapCentre(page, DOOR.index);
+    const mini = await page.waitForFunction(() => document.querySelector('#mini .mini-word')?.textContent.trim() || null, null, { timeout: 5_000 })
+      .then((handle) => handle.jsonValue(), () => null);
+    const after = await page.evaluate(() => ({ view: document.body.dataset.view, passage: document.querySelector('.listen-row')?.dataset.passage ?? null }));
+    rec(`D3.${key}.opens-lookup`, `D3 dials ${dials}: a click on ${SURFACE} opens its lookup, in the article: never a button that reveals nothing`,
+      tap.done && tap.own && mini === SURFACE && after.view === 'reader' && after.passage === PASSAGE_B,
+      JSON.stringify({ tap, mini, ...after }), { mini });
+  }
+}
 
 /** D2 at one furigana setting: the fixture door, tap/Enter/Space, against the literal reading. */
 async function d2Door(page, rec, furigana) {
@@ -812,9 +857,10 @@ async function runControl(spec) {
   };
   let context = null;
   try {
-    const opened = await openPage(DESK, spec.run === 'd2' ? '?entry=shelf' : D4_QUERY, { control, edits });
+    const opened = await openPage(DESK, ['d2', 'd3'].includes(spec.run) ? '?entry=shelf' : D4_QUERY, { control, edits });
     context = opened.context;
-    if (spec.run === 'd4') await d4Walk(opened.page, rec);
+    if (spec.run === 'd3') await d3Names(opened.page, rec);
+    else if (spec.run === 'd4') await d4Walk(opened.page, rec);
     else if (spec.run === 'd5') await d5Detour(opened.page, rec);
     else if (spec.run === 'd6') await d6Visit(opened.page, rec);
     else for (const furigana of [1, 0]) await d2Door(opened.page, rec, furigana);
@@ -889,14 +935,10 @@ try {
   currentCase = 'D3';
   {
     const { context, page } = await openPage(DESK, '?entry=shelf');
-    for (const dials of ['0,2,0', '2,1,0']) {
-      await openArticle(page, `dials=${dials}`, PASSAGE_B);
-      const state = await page.evaluate(() => ({ named: document.querySelectorAll('#reader .tok.named').length,
-        buttons: document.querySelectorAll('#reader button.tok.named').length,
-        cursor: [...document.querySelectorAll('#reader span.tok.named')].slice(0, 1).map((n) => getComputedStyle(n).cursor)[0] || null }));
-      check(`D3 dials ${dials}: names are plain text, not buttons that reveal nothing`, state.named > 0 && state.buttons === 0, JSON.stringify(state));
-      check(`D3 dials ${dials}: plain names do not advertise a click`, state.cursor !== 'pointer', String(state.cursor));
-    }
+    const served = await servedToken(page, DOOR.file, DOOR.index);
+    check(`D3 fixture: ${PASSAGE_B} still serves token ${DOOR.index} as the name ${SURFACE} (c:false, read ${READING})`,
+      canonical(served) === canonical(DOOR.token), JSON.stringify(served), { id: 'D3.fixture' });
+    await d3Names(page, record);
     await context.close();
   }
 

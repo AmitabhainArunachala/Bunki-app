@@ -1,8 +1,9 @@
 /**
  * Browser acceptance for every one of the 30 added native 本棚 readings.
  *
- * This drives the real served corridor at 390×844 with touch input. Each
- * article is opened from its ordinary `.shelf-item`, then exercises its own
+ * This drives the real served corridor at 390×844 with touch input, on a
+ * pinned shelf day. Each article is opened from its one `.shelf-item` card
+ * (in the grid or today's six), then exercises its own
  * JSON load, reader/ruby/paragraphs, text settings, quick look, full entry,
  * completion, bookmark, Back, shelf scroll return, and article-position
  * restoration. No representative-only shortcut and no alternate reader.
@@ -11,7 +12,8 @@
  * non-empty titleEn with a titleEnSource provenance marker, the code-side
  * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
  * must render each English title from the record itself, and every
- * human-review-pending row must stay visibly 検収前 on the shelf.
+ * human-review-pending story must be counted in the masthead's 未確認 note
+ * and wear 未確認 in its reader meta line.
  *
  * R3-A (furigana truth): the reading-override lexicon
  * (docs/content/reading-overrides.json) must be minted into every curated
@@ -116,17 +118,33 @@ function startServer(rootDir) {
   });
 }
 
+const touchAttempts = [];
+
 async function touchAt(page, locator, holdMs = 0) {
   await locator.scrollIntoViewIfNeeded();
   await page.waitForTimeout(35);
   const box = await locator.evaluate((node) => {
     const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    const x = rect.x + rect.width / 2;
+    const y = rect.y + Math.min(rect.height / 2, 20);
+    const hit = document.elementFromPoint(x, y);
+    window.__nativeIntendedTouch = node;
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+      target: { tag: node.tagName, id: node.id, passage: node.dataset.passage },
+      hit: hit ? { tag: hit.tagName, id: hit.id } : null,
+      reachesTarget: hit === node || node.contains(hit),
+      offsetLeft: window.visualViewport?.offsetLeft ?? 0,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+    };
   });
+  const attempt = { box, holdMs };
+  touchAttempts.push(attempt);
   if (!box?.width || !box?.height) throw new Error('touch target has no rendered box');
+  if (!box.reachesTarget) throw new Error(`touch target is obstructed: ${JSON.stringify(box)}`);
+  const before = await page.evaluate(() => window.__nativeTargetClicks ?? 0);
   const point = {
-    x: box.x + box.width / 2,
-    y: box.y + Math.min(box.height / 2, 20),
+    x: box.x + box.width / 2 - box.offsetLeft,
+    y: box.y + Math.min(box.height / 2, 20) - box.offsetTop,
     radiusX: 6,
     radiusY: 6,
     force: 1,
@@ -139,6 +157,13 @@ async function touchAt(page, locator, holdMs = 0) {
   if (holdMs) await page.waitForTimeout(holdMs);
   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await session.detach();
+  if (!holdMs) {
+    try {
+      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: 5000 });
+    } finally {
+      attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
+    }
+  } else attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
   await page.waitForTimeout(90);
 }
 
@@ -197,6 +222,9 @@ async function openQuickLook(page, preferredIndex = 0) {
   );
   for (const index of candidates) {
     await touchAt(page, tokens.nth(index), 560);
+    if (await page.locator('#sheet').count()) {
+      throw new Error(`a quick-lookup hold must not open a full entry on release: ${JSON.stringify(touchAttempts.at(-1))}`);
+    }
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;
@@ -438,13 +466,27 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
     `${oneInCensus.size} distinct 1-in-N values, largest share ${censusMax}/${censusTotal}`,
   );
 }
-// The shelf must render EXACTLY the curated index — no extras, none missing.
+// The shelf must render EXACTLY the curated index — no extras, none missing —
+// one card per story: an N3 rewrite whose original stands folds into it, and
+// a story in today's six stands in that band inside the grid, not twice.
 // The count itself is data: the feed (R2-D) grows it 検収前-marked and
 // queue-covered, and tools/verify-feed.mjs pins the composition (the
 // inherited 70 plus the review queue's live mints) against the queue file.
-const CURATED_COUNT = index.articles.filter(
+const curatedRows = index.articles.filter(
   (record) => !String(record.file || '').startsWith('archive/'),
-).length;
+);
+const standingIds = new Set(curatedRows.map((record) => record.id));
+const storyRows = curatedRows.filter(
+  (record) => !(record.adaptation?.basedOn && standingIds.has(record.adaptation.basedOn)),
+);
+const STORY_COUNT = storyRows.length;
+const STORY_CARDS = '#shelf-reading-results .shelf-item';
+const storyCard = (id) => `${STORY_CARDS}[data-passage="${id}"]`;
+const storyVariant = (className) => className.match(/\bstory-(lead|second|grid|teaser)\b/u)?.[1] ?? null;
+// Today's six change with the date. The shelf's own day seam pins a day whose six hold existing
+// teasers beside added ones, so every added card has an existing card of its variant to match.
+const SHELF_DAY = '2026-10-01';
+const pendingStories = storyRows.filter((record) => reviewRows.includes(record));
 const bodies = new Map(
   IDS.map((id) => {
     const row = rows.get(id);
@@ -604,6 +646,8 @@ let browser;
 let browserVersion = null;
 let activeArticleId = null;
 let journeyCompleted = false;
+let page;
+let failureEvidence = null;
 try {
   browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
   browserVersion = await browser.version();
@@ -616,7 +660,23 @@ try {
     userAgent:
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
   });
-  const page = await context.newPage();
+  await context.addInitScript((day) => {
+    try { localStorage.setItem('kairo-shelf-day', day); } catch { /* storage refused: the census below still runs */ }
+    window.__nativeTouchTrace = [];
+    for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'click']) {
+      addEventListener(type, (event) => {
+        const intended = window.__nativeIntendedTouch;
+        const reachesTarget = Boolean(intended && (event.target === intended || intended.contains(event.target)));
+        if (type === 'click' && reachesTarget) window.__nativeTargetClicks = (window.__nativeTargetClicks ?? 0) + 1;
+        window.__nativeTouchTrace.push({ type, at: performance.now(), reachesTarget,
+          tag: event.target.tagName, id: event.target.id, classes: String(event.target.className),
+          mini: Boolean(event.target.closest('#mini')), sheet: Boolean(event.target.closest('#sheet')),
+          x: event.clientX, y: event.clientY, offsetTop: window.visualViewport?.offsetTop ?? 0 });
+        window.__nativeTouchTrace = window.__nativeTouchTrace.slice(-24);
+      }, true);
+    }
+  }, SHELF_DAY);
+  page = await context.newPage();
   const responses = new Map();
   page.on('console', (message) => {
     if (message.type() === 'error' || message.type() === 'warning') {
@@ -643,8 +703,8 @@ try {
   await page.waitForFunction(
     (expected) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item:not([data-recommendation])').length === expected,
-    CURATED_COUNT,
+      document.querySelectorAll(expected.cards).length === expected.count,
+    { cards: STORY_CARDS, count: STORY_COUNT },
     { timeout: 30_000 },
   );
   // Minimal CI Chromium images often ship without CJK fonts. These optional
@@ -661,27 +721,42 @@ try {
   }
 
   check(
-    'the one native shelf renders exactly the curated index rows',
-    (await page.locator('.shelf-item:not([data-recommendation])').count()) === CURATED_COUNT,
-    `${await page.locator('.shelf-item:not([data-recommendation])').count()}/${CURATED_COUNT}`,
+    'the one native shelf renders every curated story once, across the grid and today’s six',
+    (await page.locator(STORY_CARDS).count()) === STORY_COUNT,
+    `${await page.locator(STORY_CARDS).count()}/${STORY_COUNT}`,
   );
-  const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]:not([data-recommendation])').evaluate((node) => {
+  // Added readings wear the same native card as the existing ones: each card is compared with an
+  // existing reading's card of the same variant (lead, second, grid, or a teaser in today's six).
+  const cardStyles = await page.locator(STORY_CARDS).evaluateAll((nodes) => nodes.map((node) => {
     const style = getComputedStyle(node);
     const title = getComputedStyle(node.querySelector('.shelf-title'));
-    const snippet = getComputedStyle(node.querySelector('.shelf-snippet'));
     return {
+      id: node.dataset.passage,
       className: node.className,
       background: style.backgroundColor,
       border: style.border,
       radius: style.borderRadius,
       titleFamily: title.fontFamily,
       titleSize: title.fontSize,
-      snippetClamp: snippet.webkitLineClamp,
     };
-  });
+  }));
+  const addedIds = new Set(IDS);
+  const existingStyles = new Map();
+  for (const card of cardStyles.filter((row) => !addedIds.has(row.id))) {
+    const variant = storyVariant(card.className);
+    if (!existingStyles.has(variant)) existingStyles.set(variant, card);
+  }
+  const addedVariants = [...new Set(cardStyles.filter((row) => addedIds.has(row.id)).map((row) => storyVariant(row.className)))];
+  const unmatchedVariants = addedVariants.filter((variant) => !existingStyles.has(variant));
+  check(
+    `on ${SHELF_DAY} every added card's variant has an existing reading's card to match, today's six included`,
+    unmatchedVariants.length === 0 && existingStyles.has('teaser'),
+    `added ${addedVariants.join('/')} · existing ${[...existingStyles.keys()].join('/')}` +
+      (unmatchedVariants.length ? ` · no existing ${unmatchedVariants.join('/')}` : ''),
+  );
 
   // A shelf screenshot at the boundary between the preserved 40 and additions.
-  await page.locator(`[data-passage="${IDS[0]}"]:not([data-recommendation])`).scrollIntoViewIfNeeded();
+  await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-first-added.png') });
 
   for (const id of IDS) {
@@ -689,29 +764,31 @@ try {
     const row = rows.get(id);
     const body = bodies.get(id);
     const beforeNoise = noise.length;
-    const item = page.locator(`[data-passage="${id}"]:not([data-recommendation])`);
+    const item = page.locator(storyCard(id));
+    // The design's card: a topic kicker, the headline and a foot with the JLPT level chip (and 読了
+    // once finished; since the 2026-10-01 polish pass a teaser in today's six carries the same foot).
+    // Source, licence and 未確認 live in the reader.
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
-      const snippet = node.querySelector('.shelf-snippet');
       const titleStyle = getComputedStyle(title);
-      const snippetStyle = getComputedStyle(snippet);
       return {
         className: node.className,
+        kicker: node.querySelector('.story-kicker .l-ja')?.textContent ?? '',
         title: title?.textContent ?? '',
-        source: node.querySelector('.shelf-meta span')?.textContent ?? '',
-        licence: [...node.querySelectorAll('.shelf-meta .pool-tag')].map((n) => n.textContent),
-        snippet: snippet?.textContent ?? '',
-        level: node.querySelector('.level-chip')?.textContent ?? '',
+        foot: !!node.querySelector('.story-foot'),
+        level: node.querySelector('.story-foot .level-chip')?.textContent ?? '',
         background: style.backgroundColor,
         border: style.border,
         radius: style.borderRadius,
         titleFamily: titleStyle.fontFamily,
         titleSize: titleStyle.fontSize,
-        snippetClamp: snippetStyle.webkitLineClamp,
         forbidden: !!node.querySelector('.draft-tag, [class*="editorial"], [class*="pack"]'),
       };
     });
+    const teaser = storyVariant(shelfState.className) === 'teaser';
+    const expectedLevel = row.readingFacets?.jlpt ?? null;
+    const learnerSource = row.sourceLabel.replace(/\s*·\s*検収前/gu, '').trim();
     const nativeStyle = [
       'className',
       'background',
@@ -719,8 +796,7 @@ try {
       'radius',
       'titleFamily',
       'titleSize',
-      'snippetClamp',
-    ].every((key) => shelfState[key] === existingStyle[key]);
+    ].every((key) => shelfState[key] === existingStyles.get(storyVariant(shelfState.className))?.[key]);
     await item.scrollIntoViewIfNeeded();
     await page.waitForTimeout(35);
     const shelfY = await page.evaluate(() => window.scrollY);
@@ -728,6 +804,10 @@ try {
 
     await touchAt(page, item);
     await settleReader(page);
+    await page.waitForFunction(({ id, title }) =>
+      document.querySelector('.listen-row[data-passage]')?.dataset.passage === id &&
+        document.querySelector('.view-title')?.textContent === title,
+    { id, title: row.title }, { timeout: 5000 });
     await page.waitForTimeout(80);
 
     const readerShape = await page.evaluate(() => {
@@ -735,8 +815,11 @@ try {
       const style = getComputedStyle(reader);
       return {
         title: document.querySelector('.view-title')?.textContent ?? '',
-        source: document.querySelector('main .eyebrow')?.textContent ?? '',
-        level: document.querySelector('main .level-chip')?.textContent ?? '',
+        source: document.querySelector('main .reader-meta .reader-source')?.textContent ?? '',
+        level: document.querySelector('main .reader-meta .level-chip')?.textContent ?? '',
+        unreviewed: document.querySelector('main .reader-meta .status-chip')?.textContent ?? null,
+        facts: Object.fromEntries([...document.querySelectorAll('main .article-facts dt')].map((dt) =>
+          [dt.firstChild?.textContent ?? '', dt.nextElementSibling?.textContent ?? ''])),
         tokens: reader?.querySelectorAll('.tok').length ?? 0,
         ruby: reader?.querySelectorAll('ruby rt').length ?? 0,
         paragraphs: reader?.querySelectorAll('.para-break').length ?? 0,
@@ -812,12 +895,20 @@ try {
       // touching the sheet's own Back control.
       await page.waitForTimeout(720);
       await touchAt(page, page.locator('#sheet-back'));
-      await page.waitForSelector('#reader .tok');
+      await page.waitForSelector('#sheet', { state: 'detached', timeout: 5000 });
+      await page.waitForFunction(() => document.querySelector('#reader .tok') &&
+        !document.querySelector('#reader')?.closest('[inert]'), null, { timeout: 5000 });
     }
 
     // Completion and exact per-article bookmark are both persisted. Back must
     // return to this shelf location, then reopening must restore the reader.
+    const beforeCompletion = await readAppRecord(page);
+    if (beforeCompletion.readDone?.[id] || await page.locator('#read-fin.finished').count()) {
+      throw new Error(`expected an unfinished article before its single completion touch: ${id}`);
+    }
     await touchAt(page, page.locator('#read-fin'));
+    await waitForAppRecord(page, (record) => !!record.readDone?.[id],
+      { description: `one acknowledged completion write for ${id}` });
     await page.waitForSelector('#read-fin.finished');
     await page.evaluate(() =>
       window.scrollTo(0, Math.min(620, document.body.scrollHeight - innerHeight)),
@@ -825,7 +916,7 @@ try {
     await page.waitForTimeout(80);
     const intendedPosition = await page.evaluate(() => Math.round(window.scrollY));
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]:not([data-recommendation])`);
+    await page.waitForSelector(storyCard(id));
     const returnedShelfY = await page.evaluate(() => window.scrollY);
     const state = await waitForAppRecord(page,
       (record) => record.readDone?.[id] && record.readerPos?.[id] === intendedPosition,
@@ -834,15 +925,16 @@ try {
       position: state.readerPos?.[id] ?? null,
       done: !!state.readDone?.[id],
     };
-    const completionTag = await page
-      .locator(`[data-passage="${id}"]:not([data-recommendation]) .read-tag`)
+    const completionTag = teaser ? '' : await page
+      .locator(`${storyCard(id)} .read-tag`)
       .textContent()
       .catch(() => '');
 
-    await touchAt(page, page.locator(`[data-passage="${id}"]:not([data-recommendation])`));
+    await touchAt(page, page.locator(storyCard(id)));
     await settleReader(page);
     await page.waitForTimeout(120);
     const restoredPosition = await page.evaluate(() => Math.round(window.scrollY));
+    const finishedInReader = (await page.locator('#read-fin.finished').count()) === 1;
 
     if (SHOT_IDS.has(id)) {
       await page.screenshot({
@@ -855,14 +947,15 @@ try {
     const pass =
       nativeStyle &&
       !shelfState.forbidden &&
+      shelfState.kicker.trim().length > 0 &&
       shelfState.title === row.title &&
-      shelfState.source === row.sourceLabel &&
-      shelfState.licence.includes('Bunki original') &&
-      shelfState.snippet === row.snippet &&
-      shelfState.level === row.grading.signals.jreadability.band &&
+      !!expectedLevel && shelfState.level === expectedLevel &&
       readerShape.title === row.title &&
-      readerShape.source === row.sourceLabel &&
-      readerShape.level === row.grading.signals.jreadability.band &&
+      readerShape.source === learnerSource &&
+      readerShape.facts['出典'] === learnerSource &&
+      readerShape.facts['利用条件']?.includes('Bunki original') &&
+      readerShape.level === expectedLevel &&
+      readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? '未確認' : null) &&
       readerShape.tokens === body.tokens.length &&
       readerShape.ruby > 0 &&
       readerShape.paragraphs === body.paras.length &&
@@ -877,7 +970,8 @@ try {
       !!fullEntry?.headword &&
       persisted.done &&
       persisted.position === intendedPosition &&
-      /読了/.test(completionTag) &&
+      (teaser || /読了/.test(completionTag)) &&
+      finishedInReader &&
       Math.abs(returnedShelfY - shelfY) <= 4 &&
       Math.abs(restoredPosition - intendedPosition) <= 4 &&
       ownFileLoaded &&
@@ -903,7 +997,7 @@ try {
     });
 
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]:not([data-recommendation])`);
+    await page.waitForSelector(storyCard(id));
   }
   activeArticleId = null;
 
@@ -922,8 +1016,8 @@ try {
     IDS.every((id) => savedRecord.readDone?.[id] && Number.isFinite(savedRecord.readerPos?.[id])),
   );
 
-  // B3 — the shelf's English titles come from the record itself, and the
-  // 検収前 marking stays visible in both chrome languages
+  // B3 — the shelf's English titles come from the record itself, and 未確認 is said once in the
+  // masthead and worn in each unreviewed article's reader meta, in both chrome languages
   check(
     'the 日本語のみ chrome renders no English titles',
     (await page.locator('.shelf-title-en').count()) === 0,
@@ -931,29 +1025,47 @@ try {
   const readShelfCards = () =>
     page.evaluate(() =>
       Object.fromEntries(
-        [...document.querySelectorAll('.shelf-item:not([data-recommendation])')].map((item) => [
+        [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map((item) => [
           item.dataset.passage,
           {
             en: item.querySelector('.shelf-title-en')?.textContent ?? null,
-            meta: item.querySelector('.shelf-meta')?.textContent ?? '',
+            teaser: item.classList.contains('story-teaser'),
           },
         ]),
       ),
     );
-  const jaCards = await readShelfCards();
-  const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
+  const reviewNote = async () => {
+    const notes = await page.locator('.shelf-review-note').count();
+    if (!notes) return { notes, text: '', count: 0, total: null };
+    const text = (await page.locator('.shelf-review-note').first().textContent()) ?? '';
+    // the bilingual note is one short line since the glance pass: 「未確認 · 54 of 120 not yet checked by a person」
+    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|未確認 · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
+    return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
+  };
+  const jaNote = await reviewNote();
   check(
-    'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
-    // this check owns only the marking of what IS pending — the queue-pairing
-    // check above owns lift legitimacy, and a wrongly-emptied pending set is
-    // ITS conviction. The old reviewRows.length > 0 floor made a legitimately
-    // finished review queue (every row decided by the operator or the rubric)
-    // read as a failure; the marking law is vacuously satisfied when nothing
-    // is pending, and inventing a pending row to satisfy a floor would be the
-    // actual lie
-    jaUnmarked.length === 0,
-    jaUnmarked.map((record) => record.id).slice(0, 4).join(', ') ||
-      `${reviewRows.length} pending rows marked`,
+    'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
+    pendingStories.length === 0 ? jaNote.notes === 0 : jaNote.notes === 1 && jaNote.count === pendingStories.length,
+    jaNote.text || `no review note for ${pendingStories.length} pending stories`,
+  );
+  const pendingNoiseBefore = noise.length;
+  const unmarkedInReader = [];
+  for (const record of pendingStories) {
+    activeArticleId = record.id;
+    await page.locator(`${storyCard(record.id)} .shelf-open`).click();
+    await page.waitForSelector('main .reader-meta .reader-source', { state: 'attached' });
+    const chip = await page.locator('main .reader-meta .status-chip').textContent().catch(() => null);
+    if (chip !== '未確認') unmarkedInReader.push(record.id);
+    await page.locator('#back').click();
+    await page.waitForSelector(storyCard(record.id));
+  }
+  activeArticleId = null;
+  check(
+    'every human-review-pending story wears 未確認 in its reader meta line',
+    unmarkedInReader.length === 0 && noise.length === pendingNoiseBefore,
+    unmarkedInReader.slice(0, 4).join(', ') ||
+      `${pendingStories.length} pending stories marked` +
+        (noise.length === pendingNoiseBefore ? '' : ` · ${noise.length - pendingNoiseBefore} errors`),
   );
   const biNoiseBefore = noise.length;
   await page.goto(`${base}/index.html?entry=shelf&ui=bi&cachebust=${Date.now()}`, {
@@ -962,8 +1074,8 @@ try {
   await page.waitForFunction(
     (want) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item:not([data-recommendation])').length === want,
-    CURATED_COUNT,
+      document.querySelectorAll(want.cards).length === want.count,
+    { cards: STORY_CARDS, count: STORY_COUNT },
     { timeout: 30_000 },
   );
   const reloadedRecord = await readAppRecord(page);
@@ -973,19 +1085,20 @@ try {
       reloadedRecord.readerPos?.[id] === savedRecord.readerPos?.[id]),
   );
   const biCards = await readShelfCards();
-  const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
+  const wrongEn = storyRows.filter((record) => !biCards[record.id] || biCards[record.id].en !== record.titleEn);
   check(
-    'the bilingual shelf renders every English title from the records themselves',
+    'the bilingual shelf renders every English title from the records themselves, today’s six included',
     wrongEn.length === 0,
-    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${index.articles.length} titles`,
+    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${storyRows.length} titles`,
   );
-  const biUnmarked = reviewRows.filter((record) => !/検収前/.test(biCards[record.id]?.meta ?? ''));
+  const biNote = await reviewNote();
   check(
-    'every human-review-pending row stays visibly 検収前 on the bilingual shelf',
-    biUnmarked.length === 0,
-    biUnmarked.map((record) => record.id).slice(0, 4).join(', '),
+    'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
+    pendingStories.length === 0 ? biNote.notes === 0
+      : biNote.notes === 1 && biNote.count === pendingStories.length && biNote.total === STORY_COUNT,
+    biNote.text || `no review note for ${pendingStories.length} pending stories`,
   );
-  await page.locator(`[data-passage="${IDS[0]}"]:not([data-recommendation])`).scrollIntoViewIfNeeded();
+  await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
   check(
     'the bilingual shelf pass added no request, console, or page errors',
@@ -999,6 +1112,27 @@ try {
   journeyCompleted = true;
   await context.close();
 } catch (error) {
+  if (page && !page.isClosed()) {
+    failureEvidence = await page.evaluate(() => ({
+      view: document.body.dataset.view,
+      passage: document.querySelector('.listen-row[data-passage]')?.dataset.passage,
+      title: document.querySelector('.view-title')?.textContent,
+      sheet: Boolean(document.getElementById('sheet')),
+      readerInert: Boolean(document.getElementById('reader')?.closest('[inert]')),
+      finish: (() => { const node = document.getElementById('read-fin'); return node ? {
+        disabled: node.disabled, finished: node.classList.contains('finished'), text: node.textContent,
+        rect: node.getBoundingClientRect().toJSON(),
+      } : null; })(),
+      storeAlert: document.getElementById('store-alert')?.textContent,
+      scrollY: window.scrollY,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+      events: window.__nativeTouchTrace ?? [],
+    })).catch((captureError) => ({ captureError: captureError.message }));
+    const record = await readAppRecord(page).catch(() => null);
+    failureEvidence.persisted = record ? { done: record.readDone?.[activeArticleId] ?? null,
+      position: record.readerPos?.[activeArticleId] ?? null } : null;
+    await page.screenshot({ path: join(shotsDir, 'failure.png') }).catch(() => {});
+  }
   check('browser harness', false, error.stack || String(error), activeArticleId);
   console.error(error);
 } finally {
@@ -1022,6 +1156,8 @@ writeFileSync(
       touchEmulation: true,
       browser: browserVersion,
       completed: journeyCompleted,
+      failureEvidence,
+      touchAttempts,
       pass: journeyCompleted && failures.length === 0,
       completedAt: new Date().toISOString(),
       artifact: {

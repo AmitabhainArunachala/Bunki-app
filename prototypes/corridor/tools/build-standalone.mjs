@@ -173,12 +173,19 @@ const guidedStyles = { session: read('guided-session.css'), moments: read('guide
 assert.equal(guidedStyles.moments.split(GUIDED_SPRITE_REF).length - 1, 1, 'Standalone moments sprite reference changed');
 assert(!/url\(/u.test(guidedStyles.session), 'Standalone guided stylesheet gained a sibling reference');
 const guidedSprite = readFileSync(resolve(CORRIDOR, 'guided/samurai-sprites-v2.png'));
+// A data: URI is self-contained (the design pass's washi textures); any other url() names a sibling
+// file the single-file build would not carry.
+const cssSiblingRefs = (css) => [...css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gu)].map((match) => match[2])
+  .filter((ref) => !ref.startsWith('data:'));
+assert.deepEqual(cssSiblingRefs(read('editorial.css')), [], 'Standalone editorial stylesheet gained a sibling reference');
+const shelfArt = readFileSync(resolve(CORRIDOR, 'design/ink-hoku-nami.png'));
 function moduleUrlExpression(dataUrl) {
   const prefix = 'data:text/javascript;base64,';
   assert(dataUrl.startsWith(prefix), 'Standalone modules must contain inline JavaScript bytes');
   return `standaloneModuleUrl(${JSON.stringify(dataUrl.slice(prefix.length))})`;
 }
 let appScript = read('corridor.js');
+assert(appScript.includes('window.__KAIRO_SHELF_ART_URL__'), 'Standalone shelf art requires the application asset URL hook');
 for (const [specifier, name] of recordImports) {
   const original = `import('${specifier}')`;
   assert.equal(appScript.split(original).length - 1, 1, `Standalone record import changed: ${specifier}`);
@@ -339,6 +346,7 @@ window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
 <script type="application/octet-stream" id="standalone-record-module">${recordRuntimeBase64}</script>
 <script type="application/json" id="standalone-assessment-assets">${JSON.stringify(assessmentPack).replace(/</g, '\\u003c')}</script>
 <script type="application/octet-stream" id="standalone-guided-sprite">${guidedSprite.toString('base64')}</script>
+<script type="application/octet-stream" id="standalone-shelf-art">${shelfArt.toString('base64')}</script>
 <script type="application/json" id="standalone-guided-styles">${JSON.stringify(guidedStyles).replace(/</g, '\\u003c')}</script>
 <script type="module">
 // Local module URLs avoid the Chromium full-page boot/reload crashes seen
@@ -400,6 +408,11 @@ const guidedSpriteUrl = URL.createObjectURL(new Blob([
   Uint8Array.from(atob(guidedSpriteNode.textContent), character => character.charCodeAt(0)),
 ], { type: 'image/png' }));
 guidedSpriteNode.remove();
+const shelfArtNode = document.getElementById('standalone-shelf-art');
+window.__KAIRO_SHELF_ART_URL__ = URL.createObjectURL(new Blob([
+  Uint8Array.from(atob(shelfArtNode.textContent), character => character.charCodeAt(0)),
+], { type: 'image/png' }));
+shelfArtNode.remove();
 const guidedStylesNode = document.getElementById('standalone-guided-styles');
 const guidedStyles = JSON.parse(guidedStylesNode.textContent);
 guidedStylesNode.remove();
@@ -423,6 +436,7 @@ ${read('drift-layer.css')}
 ${read('skip-ui.css')}
 ${read('register.css')}
 ${read('maintenance/report-client.css')}
+${read('editorial.css')}
 </style>
 ${BODY}
 `;
@@ -444,6 +458,7 @@ ${read('drift-layer.css')}
 ${read('skip-ui.css')}
 ${read('register.css')}
 ${read('maintenance/report-client.css')}
+${read('editorial.css')}
 </style>
 </head>
 <body>
@@ -468,6 +483,7 @@ writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORR
   recordModuleTransport: 'blob', inlinedModuleTransport: 'blob', driftSharesRecordRuntime: true,
   inkModuleSha256: digest(inkBytes), builderSha256: digest(readFileSync(fileURLToPath(import.meta.url))),
   guidedSessionSha256: digest(guidedSessionBytes), guidedMomentsSha256: digest(guidedMomentsBytes),
+  editorialStyleSha256: digest(read('editorial.css')), shelfArtSha256: digest(shelfArt),
   guidedSets: guidedIndex.sets.map((entry) => entry.path),
   compiler: { name: 'esbuild', version }, selfContainedController: true,
   scope: 'Standalone corpus, shared controllers, durable record and writing engine; no live-provider, native account or whole-audio-library claim.' }, null, 2) + '\n', { flag: 'wx' });

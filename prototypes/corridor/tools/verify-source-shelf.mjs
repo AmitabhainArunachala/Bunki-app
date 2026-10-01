@@ -1,6 +1,7 @@
 /** Actual source-shelf journeys with a synthetic native port. Network policy
  * and live feeds have separate native tests; this suite sends no publisher
  * requests and never treats fixture headlines as a content-quality sample. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import console from 'node:console';
 import process from 'node:process';
@@ -78,7 +79,7 @@ async function fresh(native) {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#feed-link').click();
+  await openShelfDoor(page, '#feed-link');
   if (native) await idle();
 }
 async function idle() {
@@ -106,7 +107,7 @@ try {
     assert.deepEqual(before.feedLibrary.mutedSourceIds, [active[0].id]);
     assert.equal(before.futureRoot.preserve, 'private-sentinel-not-a-headline');
     await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');
-    await page.locator('#feed-link').click(); await page.locator('#feed-panel-sources').click();
+    await openShelfDoor(page, '#feed-link'); await page.locator('#feed-panel-sources').click();
     assert.equal(await page.locator(`[data-feed-follow="${active[0].id}"]`).getAttribute('aria-pressed'), 'false');
     assert.deepEqual((await record()).feedLibrary, before.feedLibrary);
   });
@@ -173,7 +174,7 @@ try {
   });
   await page.evaluate(() => sessionStorage.setItem('feed-fixture-mode', 'deferred-empty'));
   await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#feed-link').click(); await idle();
+  await openShelfDoor(page, '#feed-link'); await idle();
   await check('restart-retains-bookmarks-and-truthfully-shows-cadence-without-cached-headlines', async () => {
     assert.equal(await page.locator('.feed-entry').count(), 0);
     await page.locator('#feed-panel-saved').click();

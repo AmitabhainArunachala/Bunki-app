@@ -212,14 +212,40 @@ export const WRITTEN_SPECS = Object.freeze({
   }),
 });
 
-/** Three written sections, one authored timing block, no listening; doubts go to notes. */
+/** The written papers of an official blueprint (試験科目), each with its official fixed time:
+ * one paper at N1/N2, two at N3–N5. Listening is not part of a written form. */
+export function officialWrittenBlocks(blueprint, sections) {
+  const blocks = blueprint.timingBlocks
+    .filter((fact) => fact.duration === 'fixed' && !fact.skills.includes('listening'))
+    .map((fact) => ({
+      id: `block-${fact.id}`,
+      sectionIds: sections.filter((section) => fact.skills.includes(section.skill)).map((section) => section.id),
+      durationMs: fact.minutes * 60_000,
+      clock: 'elapsed-including-interruptions',
+      authority: { kind: 'official-fact', blueprintId: blueprint.id, blockId: fact.id },
+    }));
+  if (blocks.some((block) => !block.sectionIds.length) ||
+      blocks.flatMap((block) => block.sectionIds).length !== sections.length)
+    throw new Error(`Written sections do not fill the official papers of ${blueprint.id}`);
+  return blocks;
+}
+export const officialWrittenMinutes = (blueprint) =>
+  blueprint.timingBlocks
+    .filter((fact) => fact.duration === 'fixed' && !fact.skills.includes('listening'))
+    .reduce((total, fact) => total + fact.minutes, 0);
+
+/** Three written sections, no listening; doubts go to notes. The timing is one authored block,
+ * or, with `officialTiming` (the level's OFFICIAL_BLUEPRINTS facts), the official written papers. */
 export function prepareWrittenOriginal(spec) {
   const { level, id, items: entries, passages: passageTexts, status } = spec;
   if (typeof level !== 'string' || !/^N[1-5]$/u.test(level) || !Object.hasOwn(LEVEL_PROFILES, level))
     throw new Error(`Unknown written level: ${String(level)}`);
   if (!/^[a-z0-9][a-z0-9-]{0,119}$/u.test(id ?? '')) throw new Error('Unsafe written form ID');
-  if (!Number.isSafeInteger(spec.minutes) || spec.minutes <= 0)
+  const official = spec.officialTiming ?? null;
+  if (official === null && (!Number.isSafeInteger(spec.minutes) || spec.minutes <= 0))
     throw new Error('Written timing must be a positive whole-minute authoring allocation');
+  if (official !== null && (official.id !== spec.blueprintId || official.exam?.track !== level))
+    throw new Error('Official timing must come from the form blueprint at its level');
   for (const key of ['sourceId', 'processRef', 'rightsBasis', 'blueprintId', 'policyVersion'])
     if (typeof spec[key] !== 'string' || !/^\S+$/u.test(spec[key]))
       throw new Error(`Written spec lacks ${key}`);
@@ -231,7 +257,7 @@ export function prepareWrittenOriginal(spec) {
     status.authorModelFamily !== spec.authorModelFamily
   )
     throw new Error('Manuscript status does not match the written spec level or author family');
-  const official = new Map(
+  const officialTasks = new Map(
     LEVEL_PROFILES[level].allocation
       .filter(([skill]) => skill !== 'listening')
       .map(([skill, task]) => [task, skill]),
@@ -239,7 +265,7 @@ export function prepareWrittenOriginal(spec) {
   const forbidden = new Set(spec.forbiddenTasks ?? []);
   const nonOfficial = new Map(Object.entries(spec.nonOfficialTasks ?? {}));
   for (const [task, skill] of nonOfficial)
-    if (official.has(task) || forbidden.has(task) || !WRITTEN_SKILLS.includes(skill))
+    if (officialTasks.has(task) || forbidden.has(task) || !WRITTEN_SKILLS.includes(skill))
       throw new Error(`Non-official task cannot reuse an official or excluded task: ${task}`);
   if (!Array.isArray(entries) || !entries.length || !passageTexts || typeof passageTexts !== 'object')
     throw new Error('Written manuscript needs items and passages');
@@ -251,7 +277,7 @@ export function prepareWrittenOriginal(spec) {
     if (!WRITTEN_SKILLS.includes(entry.skill)) throw new Error(`${label} is not a written skill`);
     if (forbidden.has(entry.task))
       throw new Error(`Excluded ${level} task by authoring policy: ${entry.task} (${label})`);
-    const skill = official.get(entry.task) ?? nonOfficial.get(entry.task);
+    const skill = officialTasks.get(entry.task) ?? nonOfficial.get(entry.task);
     if (skill === undefined) throw new Error(`Undeclared ${level} task: ${entry.task} (${label})`);
     if (skill !== entry.skill) throw new Error(`${label} task ${entry.task} is not a ${entry.skill} task`);
     if (
@@ -342,7 +368,7 @@ export function prepareWrittenOriginal(spec) {
       mode: 'section',
       titleJa: spec.titleJa,
       titleEn: spec.titleEn,
-      durationMinutes: spec.minutes,
+      durationMinutes: official ? officialWrittenMinutes(official) : spec.minutes,
       sourceIds: [spec.sourceId],
       formPayload: {
         v: 1,
@@ -358,15 +384,17 @@ export function prepareWrittenOriginal(spec) {
         passages,
         media: [],
         sections,
-        timingBlocks: [
-          {
-            id: 'block-language-reading',
-            sectionIds: sections.map((section) => section.id),
-            durationMs: spec.minutes * 60_000,
-            clock: 'elapsed-including-interruptions',
-            authority: { kind: 'authoring-rule', ruleId: spec.policyVersion },
-          },
-        ],
+        timingBlocks: official
+          ? officialWrittenBlocks(official, sections)
+          : [
+              {
+                id: 'block-language-reading',
+                sectionIds: sections.map((section) => section.id),
+                durationMs: spec.minutes * 60_000,
+                clock: 'elapsed-including-interruptions',
+                authority: { kind: 'authoring-rule', ruleId: spec.policyVersion },
+              },
+            ],
         authoring: {
           policyVersion: spec.policyVersion,
           countsAre: 'authoring-rules',

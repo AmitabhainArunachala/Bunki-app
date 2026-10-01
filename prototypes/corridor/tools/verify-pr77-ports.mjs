@@ -14,6 +14,7 @@
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-pr77-ports.mjs [--only probe,probe]
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -226,24 +227,25 @@ async function openRow(page, id) {
 }
 
 /* d9f0b984 — rows wearing 検収前 offered no reason: the reason block was gated
- * on pendingVerification, which few of them carry. */
+ * on pendingVerification, which few of them carry. Since the design pass of 2026-09-30 the
+ * learner-facing mark is the 未確認 chip (its reason in the tooltip and the article's footer). */
 PROBES['review-reason'] = async () => {
   const { context, page } = await learner();
   await open(page, '?entry=shelf&ui=bi');
   const freeze = /archive froze/;
   const human = await openRow(page, 'env:press-press_05591');
-  check('d9f0b984 · a row marked 検収前 for human review says so, and not with another source\'s story',
-    /検収前/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
+  check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
+    /未確認/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
     JSON.stringify(human).slice(0, 400));
   await page.click('#back');
   const rights = await openRow(page, 'yasashii:1');
   check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /検収前/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
+    /未確認/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
     JSON.stringify(rights).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
   check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/検収前/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
+    !/未確認/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
     JSON.stringify(approved).slice(0, 300));
   await context.close();
 };
@@ -443,7 +445,7 @@ const oneOfPressed = (rows) => rows.length > 1 && rows.filter((r) => r === 'true
 PROBES['chip-state'] = async () => {
   const { context, page } = await learner({ seed: envelope() });
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#kanjidex-link');
+  await openShelfDoor(page, '#kanjidex-link');
   const part = page.locator('#kdx-partgrid .kdx-part:not([disabled])').first();
   const partText = (await part.textContent()).trim();
   await part.click();
@@ -464,7 +466,7 @@ PROBES['chip-state'] = async () => {
   check('007479d0 · 字引\'s lenses state which one is chosen', oneOfPressed(kdx.lenses), JSON.stringify(kdx.lenses));
 
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#grammar-link');
+  await openShelfDoor(page, '#grammar-link');
   await page.waitForSelector('[data-glevel]');
   const levels = await page.evaluate(() => [...document.querySelectorAll('[data-glevel]')].map((n) => n.getAttribute('aria-pressed')));
   check('f7cd297c · 文法\'s level filter states which level it is showing', oneOfPressed(levels), JSON.stringify(levels));
@@ -499,10 +501,10 @@ PROBES['chip-focus'] = async () => {
     }, { selector, text });
   };
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#kanjidex-link');
+  await openShelfDoor(page, '#kanjidex-link');
   const part = await pressKeeps('#kdx-partgrid .kdx-part:not([disabled])', 2);
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#grammar-link');
+  await openShelfDoor(page, '#grammar-link');
   const level = await pressKeeps('[data-glevel]', 3);
   await open(page, '');
   await page.click('.nav-symbol');
@@ -577,7 +579,7 @@ PROBES['thinking-durable'] = async () => {
 
   stub.delay = 0;
   await open(page, '?entry=shelf&ui=bi');
-  await page.click('#airead-link');
+  await openShelfDoor(page, '#airead-link');
   await page.waitForSelector('#airead-make');
   stub.delay = 2500;
   await page.click('#airead-make');
@@ -651,16 +653,17 @@ PROBES['speed-corner'] = async () => {
     const poll = () => (room.dataset.state === 'done' ? done(Math.round(performance.now() - t0)) : requestAnimationFrame(poll));
     requestAnimationFrame(poll);
   }));
-  const corner = await page.locator('#stroke-speed').count();
+  const corner = await page.locator('#stroke-speed-range').count();
   let pace = null;
   if (corner) {
     const normal = await writeOnce();
-    await page.click('#stroke-speed');
+    await page.locator('#stroke-speed-range').focus();
+    await page.keyboard.press('Home');
     const slow = await writeOnce();
-    pace = { normal, slow, pressed: await page.locator('#stroke-speed').getAttribute('aria-pressed') };
+    pace = { normal, slow, selected: await page.locator('#stroke-speed-range').inputValue() };
   }
   check('007479d0 · with no living ink, ゆっくり either governs the writing or is not offered',
-    !corner || (pace.pressed === 'true' && pace.slow >= pace.normal * 1.3), JSON.stringify({ living: 'fallback', corner, pace }));
+    !corner || (pace.selected === '0' && pace.slow >= pace.normal * 1.3), JSON.stringify({ living: 'fallback', corner, pace }));
   await fallback.context.close();
 
   const still = await learner({ reducedMotion: true });
@@ -755,7 +758,7 @@ PROBES['kdx-chip-state'] = async () => {
   const seen = {};
   for (const [lens, attr] of [['画数', 'data-kdx-st'], ['部首', 'data-kdx-rad'], ['頻度', 'data-kdx-freq'], ['漢検', 'data-kdx-kk']]) {
     await open(page, '?entry=shelf&ui=bi');
-    await page.click('#kanjidex-link');
+    await openShelfDoor(page, '#kanjidex-link');
     await page.locator('main .kdx-lens', { hasText: lens }).first().click();
     const chip = page.locator(`main [${attr}]`).nth(1);
     await chip.waitFor();
@@ -805,11 +808,15 @@ PROBES['sheet-summary-tab'] = async () => {
 
 /* chip-focus-fallback-crosses-rooms — 680aa4de's last-resort focus (class and place) also ran
  * when a press changed rooms: Enter on the review summary's リストへ put the keyboard on the
- * tray's 復習する, so a second Enter started a new review. Five of seven due cards per sitting,
- * so the tray still offers a review after the summary. */
+ * tray's 復習する, so a second Enter started a new review. Five cards due now and two learning
+ * cards ripening in ten minutes: the sitting serves the five, and after the summary Anki's
+ * learn-ahead (20 minutes, card-system slice 1) still offers the two on the tray. */
 PROBES['chip-focus-rooms'] = async () => {
   const seed = envelope({ words: ['学校', '電話', '先生', '時間', '天気', '友達', '映画'] });
-  seed.srsPrefs = { reviewLimit: 5 };
+  for (const word of ['友達', '映画']) {
+    Object.assign(seed.srs[`word:${word}`], { state: 1, due: new Date(Date.now() + 10 * 60000).toISOString(),
+      scheduled_days: 0, learning_steps: 1 });
+  }
   const { context, page } = await learner({ seed });
   await open(page);
   await reachSummary(page);

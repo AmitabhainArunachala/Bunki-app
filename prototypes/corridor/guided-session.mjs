@@ -224,6 +224,8 @@ export function createGuidedSession(host) {
 
   const current = () => Q[Math.max(0, Math.min(state.index, Q.length - 1))];
   const answer = (q) => state.answers[q.id];
+  /** Help before the first answer: an explanation opened, or a word looked up. */
+  const assisted = (a) => a.helpBefore || a.lookupBefore === true;
   const activeLearn = () => state.learn.filter((row) => !row.removed);
   const learnRow = (id) => state.learn.find((row) => row.id === id);
   const target = () => Q.find((q) => q.id === state.selectedTarget) || preferred();
@@ -684,9 +686,11 @@ export function createGuidedSession(host) {
     const detail = locked
       ? a.helpBefore
         ? t('答える前に解説をひらいた。', 'You opened an explanation before answering.')
-        : ''
+        : a.lookupBefore
+          ? t('答える前に語を調べた。', 'You looked up a word before answering.')
+          : ''
       : '';
-    return `${sessionTop()}<div class="gs-thread">${rail('question')}<article class="gs-sheet" data-question="${esc(q.id)}"><span class="gs-eyebrow">${bi('出会い', 'encounter')} ${String(state.index + 1).padStart(2, '0')}</span><h1 class="gs-title" tabindex="-1">${heading}</h1>${q.passage ? `<div class="gs-passage" lang="ja">${esc(q.passage)}</div>` : ''}${parts.length > 1 ? `<p class="gs-instruction" lang="ja">${esc(parts[0])}</p>` : ''}<p class="gs-question" lang="ja">${esc(prompt)}</p>${choices(q.options, locked ? a.choice : selected[q.id], locked, 'answer', q.correct)}${locked ? verdict(q.options, a.choice, q.correct, detail) : a.helpBefore ? `<p class="gs-side-note">${t('解説をひらいた · この答えは「助けあり」と記録される。', 'Explanation opened · this answer will be marked as assisted.')}</p>` : ''}<div class="gs-actions">${actions}</div>${state.index > 0 ? `<div class="gs-return-link">${textBtn(`← ${bi('前の問題', 'previous')}`, 'previous')}</div>` : ''}</article>${aside(q)}</div>`;
+    return `${sessionTop()}<div class="gs-thread">${rail('question')}<article class="gs-sheet" data-question="${esc(q.id)}"><span class="gs-eyebrow">${bi('出会い', 'encounter')} ${String(state.index + 1).padStart(2, '0')}</span><h1 class="gs-title" tabindex="-1">${heading}</h1>${q.passage ? `<div class="gs-passage" lang="ja">${esc(q.passage)}</div>` : ''}${parts.length > 1 ? `<p class="gs-instruction" lang="ja">${esc(parts[0])}</p>` : ''}<p class="gs-question" lang="ja">${esc(prompt)}</p>${choices(q.options, locked ? a.choice : selected[q.id], locked, 'answer', q.correct)}${locked ? verdict(q.options, a.choice, q.correct, detail) : a.helpBefore ? `<p class="gs-side-note">${t('解説をひらいた · この答えは「助けあり」と記録される。', 'Explanation opened · this answer will be marked as assisted.')}</p>` : a.lookupBefore ? `<p class="gs-side-note">${t('語を調べた · この答えは「助けあり」と記録される。', 'Word looked up · this answer will be marked as assisted.')}</p>` : ''}<div class="gs-actions">${actions}</div>${state.index > 0 ? `<div class="gs-return-link">${textBtn(`← ${bi('前の問題', 'previous')}`, 'previous')}</div>` : ''}</article>${aside(q)}</div>`;
   }
 
   function teachingText(text, q = current()) {
@@ -722,7 +726,7 @@ export function createGuidedSession(host) {
             `問${state.index + 1} · 答える前の解説`,
             `Question ${state.index + 1} · Explanation before answering`,
           )
-        : `${t(`問${state.index + 1} · 最初の答え`, `Question ${state.index + 1} · Your first answer`)}: <strong lang="ja">${esc(q.options[a.choice])}</strong>${a.helpBefore ? t(' · 助けあり', ' · assisted') : ''}`;
+        : `${t(`問${state.index + 1} · 最初の答え`, `Question ${state.index + 1} · Your first answer`)}: <strong lang="ja">${esc(q.options[a.choice])}</strong>${assisted(a) ? t(' · 助けあり', ' · assisted') : ''}`;
     const primary =
       a.choice === null
         ? btn(bi('問題に戻る', 'return to your answer'), 'question', 'primary')
@@ -765,7 +769,7 @@ export function createGuidedSession(host) {
             : a.correct
               ? bi('正解', 'correct')
               : bi('不正解', 'incorrect');
-        return `<div class="gs-row ${a.correct === false ? 'missed' : ''}"><span class="gs-row-number">${String(i + 1).padStart(2, '0')}</span><div><h2 class="gs-row-title">${bi(kindLabel(q)[0], kindLabel(q)[1])}</h2><p>${outcome}${a.helpBefore ? ` · ${bi('助けあり', 'assisted')}` : ''}${a.flagged ? ` · ${bi('旗', 'flagged')}` : ''}</p></div><div class="gs-row-actions">${textBtn(bi('見直す', 'revisit'), 'source', `data-index="${i}"`)}</div></div>`;
+        return `<div class="gs-row ${a.correct === false ? 'missed' : ''}"><span class="gs-row-number">${String(i + 1).padStart(2, '0')}</span><div><h2 class="gs-row-title">${bi(kindLabel(q)[0], kindLabel(q)[1])}</h2><p>${outcome}${assisted(a) ? ` · ${bi('助けあり', 'assisted')}` : ''}${a.flagged ? ` · ${bi('旗', 'flagged')}` : ''}</p></div><div class="gs-row-actions">${textBtn(bi('見直す', 'revisit'), 'source', `data-index="${i}"`)}</div></div>`;
       },
     ).join(
       '',
@@ -850,9 +854,9 @@ export function createGuidedSession(host) {
 
   function results() {
     const q = preferred();
-    const help = Q.filter((entry) => answer(entry).helpBefore).length;
+    const help = Q.filter((entry) => assisted(answer(entry))).length;
     const wrong = Q.filter(
-      (entry) => answer(entry).correct === false && !answer(entry).helpBefore,
+      (entry) => answer(entry).correct === false && !assisted(answer(entry)),
     ).length;
     return `<section class="gs-results"><div><span class="gs-eyebrow">${bi('今日の結果', 'what you met today')}</span><h1 class="gs-title gs-score" tabindex="-1">${countRight()} <span class="gs-of">${t(`/ ${answered()}`, `of ${answered()}`)}</span><small class="gs-h-sub">${bi('最初の答えが正解', 'correct first answers')}</small></h1><p class="gs-lede">${activeLearn().length ? t('見直したいところを下に集めた。文脈がまだ近いうちに、一つから始めよう。', 'The places that need another look are gathered below. Begin with one, while the context is still close.') : t('小さな問題のまとまり。もっと深く行ける。文法を、違う場面でもう一度試してみよう。', 'A small set of questions, with room to go deeper. Try the grammar once more in a different situation.')}</p><div class="gs-results-facts"><div><strong>${wrong}</strong><span>${bi('不正解', 'incorrect')}</span></div><div><strong>${help}</strong><span>${bi('助けあり', 'assisted')}</span></div><div><strong>${Q.length - answered()}</strong><span>${bi('未回答', 'unanswered')}</span></div></div>${gapLine()}<p class="gs-side-note">${t('案内つきの筆記練習で、JLPT の得点やレベルの判定ではない。', 'This is guided written practice, not a JLPT score or level estimate.')}</p><div class="gs-spaced"><h2>${bi('覚に入ったもの', 'kept in Learn')}</h2>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}${followups()}</div><div class="gs-actions">${textBtn(bi('場へ', 'your return field'), 'field')}</div></div><aside class="gs-focus"><span class="gs-eyebrow">${bi('次の一歩', 'one useful next step')}</span><div class="gs-focus-target" lang="ja">${esc(q.target.label)}</div><p>${esc(q.target.meaning)}. ${t('解説なしで、違う文で試してみよう。', 'Try it in a different context, without the explanation beside you.')}</p>${btn(bi('新しい文で試す', 'try a fresh context'), 'practice', 'primary', `data-id="${esc(q.id)}"`)}<div class="gs-spaced gs-rule"><p>${t('先生と話してみる？', 'Want to talk it through?')}</p>${textBtn(bi('先生への質問を用意する', 'prepare a question for Sensei'), 'sensei-target', `data-id="${esc(q.id)}"`)}</div></aside></section>`;
   }
@@ -918,7 +922,7 @@ export function createGuidedSession(host) {
   function senseiText() {
     const q = target();
     const a = answer(q);
-    return `Help me understand this ${set.level} practice question.\n\n${q.passage ? `${q.passage}\n\n` : ''}${q.prompt}\n${q.options.map((option, i) => `${i + 1}. ${option}`).join('\n')}\n\nMy first answer: ${a.choice === null ? 'Not answered' : q.options[a.choice]}.\nExplanation before answering: ${a.helpBefore ? 'yes' : 'no'}.\nExplanation opened: ${a.explained ? 'yes' : 'no'}.\nSource: ${q.source.ref}\n\nPlease explain the distinction, then invite me to try a different sentence. Do not infer my JLPT level from this question.`;
+    return `Help me understand this ${set.level} practice question.\n\n${q.passage ? `${q.passage}\n\n` : ''}${q.prompt}\n${q.options.map((option, i) => `${i + 1}. ${option}`).join('\n')}\n\nMy first answer: ${a.choice === null ? 'Not answered' : q.options[a.choice]}.\nExplanation before answering: ${a.helpBefore ? 'yes' : 'no'}.\nWord looked up before answering: ${a.lookupBefore ? 'yes' : 'no'}.\nExplanation opened: ${a.explained ? 'yes' : 'no'}.\nSource: ${q.source.ref}\n\nPlease explain the distinction, then invite me to try a different sentence. Do not infer my JLPT level from this question.`;
   }
   function sensei() {
     const q = target();
@@ -1364,6 +1368,25 @@ export function createGuidedSession(host) {
     /** Arriving through a door: the room opens at its top with the heading focused. */
     enter() {
       after = { top: true };
+    },
+    /** A word looked up inside an unanswered question is help before its first answer. The
+     * app shows the reading only once this returns true: the help is saved on that question. */
+    recordLookup(questionId) {
+      const q = Q.find((entry) => entry.id === questionId);
+      if (!state || !q || !root?.isConnected || current().id !== questionId ||
+          !['question', 'insight'].includes(root.dataset.stage)) return false;
+      const next = answer(q).choice === null
+        ? reduceGuidedState(state, { type: 'LOOKUP', id: q.id })
+        : state;
+      if (next === state && !saveError) return true;
+      // Commit the help before exposing it. A refused write leaves the answer untouched,
+      // and a later tap can retry once storage recovers without inventing another event.
+      const saved = saveGuidedState(storage, storageKey, next);
+      saveError = saved.error;
+      if (saved.ok) state = next;
+      redraw();
+      return saved.ok && root?.isConnected && current().id === questionId &&
+        ['question', 'insight'].includes(root.dataset.stage);
     },
     render(main) {
       if (!set || !state) {

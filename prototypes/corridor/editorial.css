@@ -1,0 +1,2545 @@
+/* Bunki · annotated refinement, 29 September 2026.
+ * The existing worlds supply the pigments and the living washi supplies the
+ * texture. This last stylesheet gives those materials a print hierarchy:
+ * an ink mast, a paper page, open editorial columns, and ruled reference work.
+ * No state, navigation, gesture, or writing-clock behavior lives here. */
+
+body, body.v-contrast-wcag {
+  --ed-paper: var(--ground-0, #faf6ea);
+  --ed-ink: var(--ink);
+  --ed-muted: color-mix(in srgb, var(--ink) 84%, var(--ground-0, #faf6ea));
+  --ed-rule: color-mix(in srgb, var(--ink) 38%, var(--ground-0, #faf6ea));
+  --ed-rule-light: color-mix(in srgb, var(--ink) 18%, var(--ground-0, #faf6ea));
+  --ed-mast: var(--ink);
+  --ed-mast-ink: var(--ground-0, #faf6ea);
+  --ed-shadow: 0 16px 42px -24px rgb(13 22 30 / 46%);
+  --ink-2: color-mix(in srgb, var(--ink) 84%, var(--ground-0, #faf6ea));
+  --faint: color-mix(in srgb, var(--ink) 80%, var(--ground-0, #faf6ea));
+  --faint-2: color-mix(in srgb, var(--ink) 76%, var(--ground-0, #faf6ea));
+  --t-label: 13px;
+  --t-chrome: 14px;
+  --t-read: 23px;
+  --t-hero: 38px;
+  --t-display: 34px;
+  --t-section: 24px;
+  caret-color: var(--red);
+  scrollbar-color: var(--ed-muted) var(--ground);
+  scrollbar-width: thin;
+}
+
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body {
+  --ed-mast: color-mix(in srgb, var(--ground) 72%, #000);
+  --ed-mast-ink: var(--ink);
+  --ed-shadow: 0 18px 48px -22px rgb(0 0 0 / 70%);
+}
+
+::selection { background: var(--ink); color: var(--ground-0, #faf6ea); }
+:is(input, textarea, select) { accent-color: var(--ai); caret-color: var(--red); }
+:is(input, textarea)::placeholder { color: var(--faint); opacity: 1; }
+:is(button, a, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 4px;
+}
+a { text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+button:disabled { cursor: not-allowed; }
+.en-sub { font-size: 12px; line-height: 1.45; letter-spacing: 0.025em; opacity: 1; }
+.en-inline { font-size: 14px; line-height: 1.5; letter-spacing: 0.01em; opacity: 1; }
+
+/* The navigation mast remains separate from the page underneath it. */
+body:not(.zen) #app > .chrome {
+  gap: 20px;
+  min-height: 72px;
+  padding: calc(10px + env(safe-area-inset-top)) max(20px, calc((100vw - 1160px) / 2)) 10px;
+  color: var(--ed-mast-ink);
+  background: var(--ed-mast);
+  border: 0;
+  border-bottom: 3px solid var(--red);
+  box-shadow: none;
+}
+body:not(.zen) #app > .chrome :is(button, .theme-seal, .chrome-search, .chrome-dojo),
+body:not(.zen) #app > .chrome > button :is(.l-ja, .en-sub),
+body:not(.zen) #app > .chrome .crumb {
+  color: var(--ed-mast-ink);
+}
+body:not(.zen) #app > .chrome .crumb b { color: inherit; }
+body:not(.zen) #app > .chrome > button {
+  min-width: 44px;
+  flex-shrink: 0;
+  padding-inline: 8px;
+  font-size: 17px;
+  transition: background-color 120ms ease-out;
+}
+body:not(.zen) #app > .chrome > button:hover { background: rgb(255 255 255 / 10%); }
+body:not(.zen) #app > .chrome > button:first-child .l-ja { font-size: 20px; }
+body:not(.zen) #app > .chrome > button .en-sub { font-size: 12px; letter-spacing: 0.03em; }
+body:not(.zen) #app > .chrome .theme-seal { font-size: 20px; }
+body:not(.zen) #app > .chrome .lang-seg {
+  border: 1px solid color-mix(in srgb, var(--ed-mast-ink) 56%, transparent);
+  border-radius: 3px;
+  padding: 2px;
+}
+body:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; min-height: 44px; padding: 4px 11px; border-radius: 1px; font-size: 12px; white-space: nowrap; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--ed-mast); background: var(--ed-mast-ink); }
+body:not(.zen) #app > .chrome :focus-visible { outline-color: var(--ed-mast-ink); }
+
+/* A single page, rather than a stack of undifferentiated cards. Landscape
+ * and recall keep their own full-viewport composition. */
+body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+  width: calc(100% - 48px);
+  max-width: 920px;
+  margin: 28px auto 64px;
+  padding: 34px clamp(24px, 4vw, 52px) 72px;
+  background: var(--ed-paper);
+  border: 0;
+  box-shadow: var(--ed-shadow);
+}
+body:not(.zen):is([data-view='shelf'], [data-view='levels']) #app > main { max-width: 1160px; }
+main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
+  font-family: var(--display);
+  font-size: clamp(29px, 3.5vw, 38px);
+  font-weight: 800;
+  line-height: 1.42;
+  letter-spacing: -0.015em;
+  margin: 0 0 16px;
+  text-wrap: pretty;
+}
+.view-title > .en-inline { display: block; margin: 8px 0 0; font-size: 17px; font-weight: 400; color: var(--ed-muted); }
+main h2 { margin-top: 32px; margin-bottom: 12px; font-weight: 800; line-height: 1.5; }
+.eyebrow { font-size: 13px; letter-spacing: 0.04em; color: var(--ed-muted); }
+body.v-depth-layered main > .eyebrow::before,
+body.v-depth-layered .eyebrow.shelf-section::before { content: none; }
+body.v-depth-layered main > .eyebrow { padding-top: 0; }
+.note { font-size: 14px; line-height: 1.75; border-left-width: 1px; }
+.gesture-hint { font-size: 13px; line-height: 1.65; color: var(--ed-muted); }
+.pool-tag { font-size: 11px; line-height: 1.7; letter-spacing: 0.01em; color: var(--ed-muted); }
+body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
+.level-chip { font-size: 12px; letter-spacing: 0.025em; border-radius: 2px; padding: 4px 9px; }
+.level-note { font-size: 13px; line-height: 1.6; }
+.details-toggle { font-size: 13px; letter-spacing: 0.015em; }
+
+/* Room doors read as a directory. Controls keep their familiar locations. */
+body.v-depth-layered :is(.search-page, .search-finder, .kdx-lenses, .list-page-ops, .record-note, .archive-row) {
+  border: 1px solid var(--ed-rule);
+  border-radius: 3px;
+  box-shadow: none;
+}
+body.v-depth-layered :is(.study-door, .focus-mode, .grammar-link) { box-shadow: none; border-radius: 3px; }
+.study-hall { gap: 0 24px; border-top: 2px solid var(--ed-ink); margin: 24px 0; }
+body.v-depth-layered .study-door {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ed-rule);
+  border-radius: 0;
+  padding: 20px 0;
+}
+.study-door-t { font-family: var(--display); font-size: 23px; }
+.study-door-sub { font-size: 15px; line-height: 1.7; }
+body.v-depth-layered .study-door:hover { background: var(--ai-wash); }
+
+
+/* The dictionary is a distinct raised sheet, with a fixed heading and open
+ * rows. Its depth comes from one shadow, not repeated inset cards. */
+body.v-depth-layered .scrim, .scrim { background: rgb(9 18 27 / 52%); }
+body.v-depth-layered .sheet, .sheet {
+  max-width: 900px;
+  max-height: min(90dvh, 1100px);
+  padding: 0 32px calc(32px + env(safe-area-inset-bottom));
+  background: var(--ed-paper);
+  color: var(--ed-ink);
+  border: 0;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -18px 60px rgb(7 15 23 / 34%);
+}
+.sheet-grip { width: 44px; height: 4px; margin: 10px auto; background: var(--ed-rule); }
+.sheet-bar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  margin: 0 -32px 24px;
+  padding: 12px 24px;
+  gap: 12px;
+  background: var(--ed-mast);
+  border: 0;
+  border-bottom: 2px solid var(--red);
+  color: var(--ed-mast-ink);
+}
+.sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) {
+  color: var(--ed-mast-ink);
+  border: 1px solid color-mix(in srgb, var(--ed-mast-ink) 50%, transparent);
+  border-radius: 3px;
+  background: transparent;
+  min-height: 44px;
+  font-size: 15px;
+}
+.sheet-bar .sheet-take[aria-pressed='true'] { background: var(--ed-mast-ink); color: var(--ed-mast); border-color: var(--ed-mast-ink); }
+.sheet-bar .sheet-depth { color: var(--ed-mast-ink); font-size: 14px; }
+.sheet-bar :focus-visible { outline-color: var(--ed-mast-ink); }
+.sheet .headword { font-family: var(--display); font-size: 42px; line-height: 1.65; letter-spacing: -0.02em; margin: 4px 0 2px; }
+.sheet .headword rt { font-family: var(--serif); font-size: 18px; }
+.sheet .reading { font-size: 20px; letter-spacing: 0.03em; line-height: 1.65; margin-bottom: 14px; }
+.sheet :is(.gloss, .sense-list) { color: var(--ed-ink); font-size: 18px; line-height: 1.75; }
+.sheet .sense-list { padding-left: 26px; }
+.sheet .sense-list li { padding: 3px 0; }
+.sheet .sense-list li::marker { font: 14px var(--sans); color: var(--red); }
+.sheet .sense-pos { font-size: 13px; letter-spacing: 0.04em; }
+.sheet .sem-head {
+  margin: 26px 0 12px;
+  padding-top: 14px;
+  border-top: 2px solid var(--ed-ink);
+  font-family: var(--display);
+  font-size: 20px;
+  letter-spacing: 0;
+  color: var(--ed-ink);
+}
+body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background: transparent; padding: 0; }
+.sheet .entry-rows { border-top-color: var(--ed-rule); }
+.sheet .entry-row { border-bottom-color: var(--ed-rule-light); padding: 14px 2px; gap: 16px; }
+.sheet .entry-row:hover { background: var(--ai-wash); }
+.sheet .row-glyph { font-size: 32px; min-width: 42px; }
+.sheet .row-main { font-size: 17px; line-height: 1.7; color: var(--ed-ink); }
+.sheet .row-word { font-size: 22px; line-height: 1.6; }
+.sheet .row-word .row-reading { font-size: 16px; }
+.sheet .row-gloss { font-size: 15px; line-height: 1.6; white-space: normal; color: var(--ed-muted); }
+.sheet .hero-glyph { font-size: clamp(82px, 12vw, 112px); color: var(--red); }
+.sheet .hero-mean { font-size: 25px; line-height: 1.6; }
+.sheet .kv { grid-template-columns: minmax(72px, 100px) minmax(0, 1fr); gap: 10px 18px; margin: 20px 0; padding: 18px 0; border-block: 1px solid var(--ed-rule); }
+.sheet .kv dt { font-size: 14px; line-height: 1.8; letter-spacing: 0; }
+.sheet .kv dd { font-size: 18px; line-height: 1.7; color: var(--ed-ink); }
+.sheet .example { padding: 14px 0; border-left: 0; border-bottom: 1px solid var(--ed-rule-light); }
+.sheet .example-ja { font-size: 21px; line-height: 2.1; }
+.sheet .example-en { font-size: 16px; line-height: 1.7; }
+.sheet :is(.example-src, .reader-choice-note, .reader-choice-more, .reader-choice-capture) { font-size: 13px; }
+.sheet .reader-choice-title { font-size: 15px; color: var(--ed-ink); }
+.sheet .reader-choice-row { padding-block: 10px; font-size: 16px; }
+.sheet :is(.note, .formation) { font-size: 15px; line-height: 1.75; border-left-width: 1px; }
+
+#mini {
+  width: max-content;
+  max-width: min(340px, calc(100vw - 24px));
+  padding: 20px;
+  gap: 7px;
+  background: var(--ed-paper);
+  color: var(--ed-ink);
+  border: 0;
+  border-top: 4px solid var(--ed-ink);
+  border-radius: 0;
+  box-shadow: 0 12px 36px rgb(7 15 23 / 28%);
+  cursor: auto;
+}
+#mini .mini-word { padding-right: 64px; font: 800 29px/1.45 var(--display); }
+#mini .mini-reading { font-size: 18px; line-height: 1.5; }
+#mini .mini-gloss { font-size: 16px; line-height: 1.6; color: var(--ed-ink); }
+#mini .mini-take { top: 12px; right: 12px; padding: 6px 10px; border-radius: 3px; font-size: 15px; border-color: var(--ed-rule); }
+#mini .mini-entry { margin-top: 10px; padding: 10px 14px; border: 0; border-radius: 2px; background: var(--ed-ink); color: var(--ed-paper); font-size: 14px; }
+#mini .mini-entry:hover { background: var(--ai); }
+#mini .mini-hint { font-size: 12px; letter-spacing: 0; color: var(--ed-muted); }
+
+/* All inline Japanese uses the same lookup affordance, including quoted
+ * passages and practice papers. These are words, never button-shaped chips. */
+.japanese-lookup-text { font: inherit; line-height: inherit; letter-spacing: inherit; }
+.japanese-lookup-word {
+  display: inline;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  vertical-align: baseline;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.japanese-lookup-word:hover { text-decoration: underline; text-decoration-color: var(--ai); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+/* Keyboard focus on a prose word wears the app's one focus token, the same ink underline and
+ * vermilion wash as a reader word; never the browser's ring. The transparent outline still
+ * draws in forced-colors mode. */
+.japanese-lookup-word:focus-visible {
+  outline: 2px solid transparent;
+  text-decoration: none;
+  background: var(--focus-wash);
+  box-shadow: var(--focus-ring);
+  border-radius: 2px 2px 0 0;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.japanese-lookup-word rt { font-size: 0.63em; color: var(--red); }
+/* A source you quote from stays selectable: a drag across its words picks an excerpt to keep. */
+.publisher-body .japanese-lookup-word { -webkit-user-select: text; user-select: text; }
+.vocabulary-list-dialog {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 28px;
+  border: 0;
+  border-top: 4px solid var(--red);
+  border-radius: 0;
+  background: var(--ed-paper);
+  color: var(--ed-ink);
+  box-shadow: 0 18px 64px rgb(7 15 23 / 35%);
+}
+.vocabulary-list-dialog::backdrop { background: rgb(9 18 27 / 58%); }
+.vocabulary-list-dialog h2 { margin: 0 0 12px; font: 800 28px/1.5 var(--display); overflow-wrap: anywhere; }
+.vocabulary-list-dialog > p { font: 16px/1.75 var(--sans); color: var(--ed-muted); }
+.vocabulary-list-choices { display: grid; margin: 22px 0; border-top: 2px solid var(--ed-ink); }
+.vocabulary-list-choices .chip {
+  width: 100%;
+  min-height: 54px;
+  justify-content: flex-start;
+  padding: 14px 12px;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--ed-rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ed-ink);
+  box-shadow: none;
+  font: 18px/1.6 var(--sans);
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.vocabulary-list-choices .chip:hover { background: var(--ai-wash); }
+.vocabulary-list-choices .chip[aria-pressed='true'] { background: var(--ed-ink); color: var(--ed-paper); }
+.vocabulary-list-form { display: grid; gap: 12px; }
+.vocabulary-list-form .search-field { width: 100%; min-width: 0; min-height: 50px; margin: 0; padding: 12px; border: 1px solid var(--ed-rule); border-radius: 3px; font: 16px/1.5 var(--sans); color: var(--ed-ink); background: var(--ed-paper); }
+.vocabulary-list-form .chip, .vocabulary-list-dialog > .chip { min-height: 46px; padding: 10px 16px; border: 1px solid var(--ed-ink); border-radius: 3px; background: var(--ed-paper); color: var(--ed-ink); font-size: 15px; box-shadow: none; }
+.vocabulary-list-dialog > .chip { display: block; margin-left: auto; background: var(--ed-ink); color: var(--ed-paper); }
+.vocabulary-list-dialog .vocabulary-list-status { min-height: 1.7em; font-size: 15px; color: var(--ai); }
+
+/* Reference work: navigation, collection information, then an index table. */
+.reference-library { --reference-small: 14px; --reference-body: 16px; --reference-title: clamp(28px, 3.5vw, 38px); --reference-headword: 27px; padding-top: 0; }
+.reference-navigation { gap: 4px 20px; padding-bottom: 10px; margin-bottom: 28px; border-bottom: 2px solid var(--ed-ink); }
+.reference-other-rooms { flex-wrap: wrap; gap: 4px 20px; }
+.reference-library .reference-text-button { color: var(--ai); font-size: 14px; }
+.reference-heading { margin: 0 0 28px; }
+.reference-title { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; }
+.reference-intro { max-width: 68ch; font-size: 17px; line-height: 1.8; color: var(--ed-muted); }
+.reference-collection-meta { font-size: 16px; color: var(--ed-ink); margin: 12px 0 8px; }
+.reference-footnote { font-size: 14px; line-height: 1.75; color: var(--ed-muted); }
+.reference-family { margin: 34px 0; }
+.reference-family-heading { padding-top: 16px; border-top: 3px solid var(--ed-ink); align-items: baseline; gap: 14px; }
+.reference-family-heading h2 { font-family: var(--display); font-size: 28px; margin: 0; }
+.reference-family-note { font-size: 14px; color: var(--ed-muted); }
+.reference-tabs { gap: 24px; margin-top: 18px; border-bottom: 1px solid var(--ed-rule); }
+.reference-tabs button { padding: 10px 1px 12px; font-size: 16px; }
+.reference-level-grid { border-color: var(--ed-rule); margin-top: 16px; }
+.reference-library .reference-level { padding: 20px; min-height: 150px; border-color: var(--ed-rule); background: transparent; }
+.reference-level:hover { background: var(--ai-wash); }
+.reference-level-name { font-family: var(--display); font-size: 32px; color: var(--ed-ink); }
+.reference-level-count { font-size: 16px; line-height: 1.6; margin-top: 8px; }
+.reference-level-saved { font-size: 13px; line-height: 1.6; color: var(--ed-muted); }
+.reference-guide { margin: 24px 0 30px; border-block: 1px solid var(--ed-rule); }
+.reference-guide > summary { padding: 15px 0; cursor: pointer; font-size: 16px; font-weight: 600; color: var(--ai); }
+.reference-guide[open] > summary { border-bottom: 1px solid var(--ed-rule-light); }
+.reference-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; padding: 22px 0; }
+.reference-guide-grid > * { min-width: 0; padding: 0; }
+.reference-guide-grid :is(h2, h3) { font-family: var(--display); font-size: 23px; margin: 0 0 12px; }
+.reference-guide-grid p { font-size: 15px; line-height: 1.8; color: var(--ed-muted); margin: 0 0 12px; }
+.reference-guide-grid a { color: var(--ai); font-size: 14px; }
+.reference-guide-note { margin: 0 0 18px; font-size: 14px; line-height: 1.75; color: var(--ed-muted); }
+.reference-provenance { border-color: var(--ed-rule); font-size: 14px; line-height: 1.8; }
+.reference-toolbar {
+  padding: 22px;
+  margin-top: 24px;
+  background: color-mix(in srgb, var(--ed-ink) 6%, var(--ed-paper));
+  border-block: 1px solid var(--ed-rule);
+}
+.reference-field-label { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--ed-ink); }
+.reference-library :is(input, select) { min-height: 46px; border: 1px solid var(--ed-rule); background: var(--ed-paper); color: var(--ed-ink); border-radius: 2px; font-size: 16px; padding: 10px 12px; }
+.reference-library .reference-button { padding: 9px 14px; border-color: var(--ed-rule); border-radius: 2px; font-size: 14px; background: var(--ed-paper); }
+.reference-library .reference-button:hover:not(:disabled) { border-color: var(--ed-ink); background: var(--ai-wash); }
+.reference-results-header { margin-top: 20px; }
+.reference-results-count { font-size: 15px; font-weight: 600; color: var(--ed-ink); }
+.reference-pagination { margin: 18px 0; }
+.reference-list { border-top: 3px solid var(--ed-ink); }
+.reference-library .reference-entry {
+  grid-template-columns: 42px minmax(0, 1fr) 18px;
+  gap: 18px;
+  padding: 20px 14px;
+  border-bottom: 1px solid var(--ed-rule);
+  align-items: start;
+}
+.reference-entry:nth-child(even) { background: color-mix(in srgb, var(--ed-ink) 3%, var(--ed-paper)); }
+.reference-entry:hover { background: var(--ai-wash); }
+.reference-entry-number { font-size: 14px; line-height: 2.8; color: var(--ed-muted); }
+.reference-entry-content { grid-template-columns: minmax(140px, 0.8fr) minmax(0, 1fr); column-gap: 24px; row-gap: 4px; }
+.reference-entry-headword { line-height: 1.7; }
+.reference-entry-reading { font-size: 18px; line-height: 1.8; }
+.reference-entry-meaning { font-size: 17px; line-height: 1.7; margin-top: 4px; color: var(--ed-ink); }
+.reference-entry-source { font-size: 13px; border-left-width: 1px; color: var(--ed-muted); }
+.reference-entry-saved { font-size: 13px; }
+.reference-entry-arrow { padding-top: 8px; color: var(--ai); }
+.reference-empty { padding: 36px 16px; border-block: 1px solid var(--ed-rule); }
+
+/* Practice uses a paper and answer register, with the mode clearly outside
+ * the question. The source text and official-task sequence stay in the DOM. */
+html[data-room='attempt'] body:not(.zen) #app > main { padding-top: 28px; }
+html[data-room='attempt'] h1.exam-heading { font: 800 26px/1.45 var(--display); color: var(--ed-ink); letter-spacing: 0; margin-bottom: 10px; }
+html[data-room='attempt'] .exam-progress { font: 15px/1.6 var(--sans); color: var(--ed-ink); padding: 12px 0; border-bottom: 1px solid var(--ed-rule); }
+html[data-room='attempt'] .exam-timer { font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; }
+html[data-room='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color: var(--ed-muted); }
+.exam-mode-badge { display: inline-flex; align-items: center; padding: 5px 10px; border: 1px solid var(--ed-rule); font: 600 13px/1.5 var(--sans); color: var(--ed-ink); background: var(--ai-wash); }
+.exam-scope-note, .exam-study-help, .exam-bookmark-note { max-width: 68ch; font: 14px/1.75 var(--sans); color: var(--ed-muted); }
+.exam-lookup-assisted { padding: 10px 0; border-bottom: 1px solid var(--ed-rule); font-size: 14px; color: var(--ai); }
+.exam-study-help { padding: 12px 0; margin: 12px 0 0; border-bottom: 1px solid var(--ed-rule); }
+.assessment-room .exam-paper {
+  padding: 28px 0 12px;
+  margin: 22px 0 20px;
+  border-top: 3px solid var(--ed-ink);
+  border-bottom: 1px solid var(--ed-rule);
+  color: var(--ed-ink);
+  background: var(--ed-paper);
+}
+.exam-paper-header { margin: 0 0 24px; }
+.assessment-room .exam-task-heading { font: 700 21px/1.6 var(--serif); letter-spacing: 0; margin: 0 0 10px; }
+.exam-task-instruction { font: 17px/1.85 var(--serif); margin: 0; color: var(--ed-ink); }
+.exam-question-number { display: inline-block; margin-right: 12px; font: 700 20px/1.5 var(--sans); font-variant-numeric: tabular-nums; }
+.exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em; }
+html[data-room='attempt'] .exam-paper :is(.exam-prompt, .mock-q),
+html[data-room='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)) {
+  font: 21px/2 var(--serif);
+  color: var(--ed-ink);
+  padding: 12px 0 20px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+html[data-room='attempt'] .exam-paper .exam-passage {
+  padding: 20px 24px;
+  margin: 8px 0 24px;
+  border: 1px solid var(--ed-rule);
+  border-radius: 0;
+  font: 20px/2 var(--serif);
+  color: var(--ed-ink);
+  background: transparent;
+  box-shadow: none;
+}
+html[data-room='attempt'] .exam-paper .exam-instruction { background: transparent; border: 0; padding: 0 0 12px; color: var(--ed-muted); font-size: 14px; }
+html[data-room='attempt'] .exam-paper .mock-opts,
+html[data-room='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .mock-opts {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 0;
+}
+.exam-option-row { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 16px; align-items: start; min-height: 66px; padding: 12px 0; border-top: 1px solid var(--ed-rule-light); }
+.exam-option-number {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px;
+  border: 1px solid var(--ed-rule);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ed-ink);
+  font: 600 18px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.exam-option-number:hover { border-color: var(--ed-ink); background: var(--ai-wash); }
+.exam-option-number:is([aria-checked='true'], [aria-pressed='true']),
+.exam-option-row:is(.selected, .chosen) .exam-option-number { color: var(--ed-paper); background: var(--ed-ink); border-color: var(--ed-ink); }
+.exam-option-text { min-width: 0; padding: 3px 0; font: 20px/1.9 var(--serif); color: var(--ed-ink); }
+.exam-paper rt { font-size: 0.63em; color: var(--red); }
+html[data-room='attempt'] .exam-paper .mock-opt {
+  padding: 16px 12px;
+  border: 0;
+  border-top: 1px solid var(--ed-rule-light);
+  border-radius: 0;
+  font: 20px/1.8 var(--serif);
+  color: var(--ed-ink);
+  min-height: 62px;
+  background: transparent;
+}
+html[data-room='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: 2px; }
+html[data-room='attempt'] .exam-paper .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
+html[data-room='attempt'] .exam-paper .mock-opt.right { box-shadow: none; border-bottom: 2px solid var(--ai); }
+html[data-room='attempt'] .exam-paper .mock-opt:hover:not(:disabled):not([aria-pressed='true']) { background: var(--ai-wash); }
+html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number {
+  width: 44px;
+  min-height: 44px;
+  padding: 4px;
+  border: 1px solid var(--ed-rule);
+  border-radius: 3px;
+  font: 600 18px/1 var(--sans);
+}
+html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
+html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
+html[data-room='attempt'] .mock-nav { gap: 16px; margin: 24px 0 16px; }
+html[data-room='attempt'] #exam-flag, html[data-room='attempt'] .chip#exam-flag { min-height: 44px; font-size: 14px; color: var(--ai); }
+html[data-room='attempt'] :is(.exam-question-map summary, .exam-leave-controls .chip) { font-size: 14px; }
+.assessment-room .exam-form { padding: 22px 0; margin: 0; background: transparent; border: 0; border-top: 1px solid var(--ed-rule); border-radius: 0; box-shadow: none; }
+.assessment-room .exam-form h2 { font-size: 26px; }
+.assessment-room .exam-form :is(.exam-skills, .exam-status) { font-size: 14px; line-height: 1.7; letter-spacing: 0; }
+.assessment-room h2.exam-section-heading { font-family: var(--display); font-size: 22px; color: var(--ed-ink); letter-spacing: 0; margin-top: 30px; }
+.exam-length { border-radius: 3px; box-shadow: none; }
+.exam-length-time { font-size: 13px; letter-spacing: 0; }
+.exam-levels .chip { border-radius: 3px; box-shadow: none; }
+
+/* The writing surface retains its living brush. The one speed control has
+ * enough room to show all three positions without a second hidden control. */
+.stroke-speed-wrap, .stroke-speed-wrap.stroke-corner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  width: 224px;
+  padding: 13px 16px;
+  border: 1px solid var(--ed-rule);
+  border-radius: 4px;
+  background: var(--ed-paper);
+  box-shadow: none;
+  color: var(--ed-ink);
+}
+.stroke-speed-label { font: 14px/1.5 var(--sans); }
+.stroke-speed-wrap .stroke-speed-range { grid-column: 1 / -1; width: 100%; height: 44px; margin: 0; accent-color: var(--ai); }
+.stroke-speed-labels { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; font: 12px/1.5 var(--sans); color: var(--ed-muted); }
+.stroke-speed-readout { font: 13px/1.5 var(--sans); color: var(--ed-ink); font-variant-numeric: tabular-nums; }
+.stroke-page .stroke-speed-wrap.stroke-corner { opacity: 1; }
+
+/* The tutor's existing lacquer surface owns local pigments, so the page
+ * frame must inherit those instead of placing pale text on a paper ground. */
+html[data-room='tutor'] body:not(.zen) #app > main {
+  --ed-paper: var(--sheet-ground);
+  --ed-ink: var(--sheet-ink);
+  --ed-muted: var(--sheet-ink-2);
+  --ed-rule: var(--sheet-line);
+  --ed-rule-light: var(--sheet-line-soft);
+  background: var(--sheet-ground);
+}
+html[data-room='tutor'] main button.japanese-lookup-word { border: 0; background: transparent; color: inherit; }
+
+/* Narrow pages keep the same hierarchy, with a one-column reading measure. */
+@media (min-width: 900px) {
+  body:not(.zen) #app > .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--ed-mast-ink); font-size: 15px; }
+  .reference-entry-content { grid-template-columns: minmax(160px, 0.8fr) minmax(120px, 0.8fr) minmax(0, 1.5fr); }
+  .reference-entry-meaning { grid-column: auto; margin: 0; padding-top: 5px; }
+}
+@media (max-width: 760px) {
+  body:not(.zen) #app > .chrome { gap: 8px; padding-inline: 12px; }
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: calc(100% - 24px); margin-top: 16px; padding: 26px 24px 64px; }
+  .reference-guide-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
+@media (max-width: 520px) {
+  body { --t-read: 21px; --t-display: 29px; }
+  body:not(.zen) #app > .chrome { min-height: 64px; gap: 3px; padding: calc(7px + env(safe-area-inset-top)) 8px 7px; }
+  body:not(.zen) #app > .chrome > button { padding-inline: 4px; font-size: 15px; }
+  body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 7px; }
+  body:not(.zen) #app > .chrome > button:first-child .l-ja { font-size: 17px; }
+  body:not(.zen) #app > .chrome > button .en-sub { font-size: 11px; }
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; margin: 0 auto 44px; padding: 24px 18px 72px; box-shadow: none; }
+  main h1.view-title { font-size: 29px; }
+  body.v-depth-layered .sheet, .sheet { padding-inline: 20px; max-height: 91dvh; }
+  .sheet-bar { margin-inline: -20px; padding: 10px 14px; gap: 8px; }
+  .sheet-bar .sheet-depth { font-size: 13px; }
+  .sheet-bar .sheet-back { padding-inline: 10px; }
+  .sheet .headword { font-size: 36px; }
+  .sheet .headword rt { font-size: 16px; }
+  .sheet .kv { grid-template-columns: 70px minmax(0, 1fr); gap: 8px 12px; }
+  .sheet .kv dd { font-size: 17px; }
+  .sheet .row-word { font-size: 20px; }
+  .reference-library .reference-entry { grid-template-columns: 28px minmax(0, 1fr) 12px; padding: 18px 2px; gap: 10px; }
+  .reference-entry-content { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+  .reference-entry-meaning { grid-column: 1 / -1; font-size: 16px; }
+  .reference-entry-reading { font-size: 17px; }
+  .reference-toolbar { padding: 14px 12px; }
+  .reference-results-header { align-items: flex-start; }
+  .reference-library .reference-level { padding: 16px; min-height: 135px; }
+  .reference-guide-grid { padding: 18px 0; }
+  .reference-other-rooms { gap: 4px 14px; }
+  .assessment-room .exam-paper { padding-top: 22px; }
+  .assessment-room .exam-task-heading { font-size: 19px; }
+  .exam-task-instruction { font-size: 16px; }
+  html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
+  html[data-room='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: 19px; }
+  .exam-option-row { gap: 12px; }
+  .exam-option-text { font-size: 19px; }
+  .stroke-speed-wrap.stroke-corner { width: min(196px, calc((100vw - 88px) / 2)); padding: 10px 8px; gap: 4px 8px; }
+  .stroke-speed-wrap.stroke-corner .stroke-speed-labels { gap: 0; }
+}
+@media (max-width: 360px) {
+  body:not(.zen) #app > .chrome { flex-wrap: wrap; }
+  .reference-other-rooms { width: 100%; justify-content: space-between; }
+  .sheet-bar .sheet-depth { min-width: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:not(.zen) #app > .chrome > button { transition: none; }
+  #mini, .sheet { animation: none; }
+}
+
+/* ==========================================================================
+   Design pass · 30 September 2026 — the depth system, then the reader (step 1)
+   and the bookshelf as a magazine (step 2).
+
+   Three layers and one accent, written as tokens so step 3 can roll them out:
+     1 ground  — the world's own paper plus a faint washi fibre (--washi)
+     2 raised  — smooth paper: a hairline ink edge and a two-step shadow
+     3 chrome  — deep indigo lacquer over a vermilion rule
+   Vermilion (--accent) marks only what is current or important: a chosen
+   word, an active filter, a story's topic, the lead. Spacing is an 8-pt grid
+   (--s1 … --s8). One filled primary per screen (.btn-primary, indigo);
+   secondary actions are outlined (.btn-secondary); tertiary are text links.
+   The word-sky home (data-view='drift') is left exactly as it was.
+   ========================================================================== */
+body, body.v-contrast-wcag {
+  --s-half: 4px;
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 40px;
+  --s6: 48px;
+  --s8: 64px;
+  --raised: var(--ground-0, #faf6ea);
+  --raised-edge: color-mix(in srgb, var(--ink) 14%, transparent);
+  --raised-edge-strong: color-mix(in srgb, var(--ink) 28%, transparent);
+  --raised-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 12%, transparent),
+    0 12px 28px -16px color-mix(in srgb, var(--ink) 45%, transparent);
+  --raised-shadow-hover: 0 2px 4px color-mix(in srgb, var(--ink) 14%, transparent),
+    0 22px 40px -18px color-mix(in srgb, var(--ink) 55%, transparent);
+  --float-shadow: 0 2px 6px color-mix(in srgb, var(--ink) 16%, transparent),
+    0 22px 52px -14px color-mix(in srgb, var(--ink) 55%, transparent);
+  --radius-card: 6px;
+  --radius-float: 14px;
+  --chrome: color-mix(in srgb, var(--ed-mast) 86%, #081020);
+  --chrome-ink: var(--ed-mast-ink);
+  --art-field: color-mix(in srgb, var(--ai) 58%, #07101d);
+  --art-ink: #f3ecdc;
+  --accent: var(--red);
+  /* keyboard focus: an ink underline over a soft vermilion wash, never the browser blue */
+  --focus-wash: color-mix(in srgb, var(--red) 16%, transparent);
+  --focus-ring: inset 0 -2px 0 var(--ink);
+  --accent-wash: color-mix(in srgb, var(--red) 9%, transparent);
+  --text: var(--ink);
+  --text-2: color-mix(in srgb, var(--ink) 78%, var(--raised));
+  --hairline: color-mix(in srgb, var(--ink) 16%, transparent);
+  --rule-strong: color-mix(in srgb, var(--ink) 90%, transparent);
+  --washi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.24 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.085'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.1'/%3E%3C/svg%3E");
+  --washi-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 1.0 0 0 0 -0.3'/%3E%3C/filter%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='300' height='300' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.93 0 0 0 0 0.86 2.0 0 0 0 -1.0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23a)' opacity='0.14'/%3E%3Crect width='300' height='300' filter='url(%23b)' opacity='0.12'/%3E%3C/svg%3E");
+
+}
+
+/* 1 · ground — washi fibre over the living paper, never on the home sky */
+body:not([data-view='drift'])::before {
+  background:
+    var(--washi) 0 0 / 300px 300px repeat,
+    var(--paper-url, none) center / cover no-repeat;
+}
+
+/* 3 · chrome — deep indigo lacquer that floats above the page */
+body:not(.zen):not([data-view='drift']) #app > .chrome {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 58%), var(--chrome);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 22%), 0 10px 24px -14px color-mix(in srgb, var(--chrome) 80%, transparent);
+}
+
+/* chrome never shows a greyed control: an unavailable one steps out of sight in its own slot */
+body:not(.zen):not([data-view='drift']) #app > .chrome > button:disabled { visibility: hidden; }
+/* The reader adds a capture door only after a word is selected. Its empty
+ * slot must not push the visible navigation onto a second row on a phone. */
+body:not(.zen) #app > .chrome > #reader-take:disabled { display: none; }
+
+/* the three button tiers */
+body .btn-primary, body .chip.btn-primary {
+  color: var(--raised);
+  background: var(--ai);
+  border: 1px solid var(--ai);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
+  font-weight: 600;
+}
+body .btn-primary .en-sub { color: inherit; opacity: 0.86; }
+body .btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 84%, #000); }
+body .btn-secondary, body .chip.btn-secondary {
+  color: var(--ai);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+  box-shadow: none;
+  font-weight: 600;
+}
+body .btn-secondary:hover:not(:disabled) { background: var(--ai-wash); border-color: var(--ai); }
+body .btn-tertiary, body .chip.btn-tertiary {
+  min-height: 44px;
+  padding: 0 var(--s1);
+  color: var(--ai);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  font: 600 14px/1.4 var(--sans);
+}
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--text-2);
+  background: transparent;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+.icon-button::-webkit-details-marker { display: none; }
+.icon-button:hover { color: var(--ai); background: var(--ai-wash); }
+.icon-button[aria-expanded='true'], details[open] > .icon-button { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-wash); }
+.ui-icon { display: block; width: 20px; height: 20px; flex: 0 0 auto; }
+
+/* the learner's labels: level, review state, topic */
+.level-chip, .reader-meta .level-chip, .story-foot .level-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 3px;
+  color: var(--ai);
+  background: color-mix(in srgb, var(--ai) 7%, var(--raised));
+  font: 700 13px/1 var(--sans);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border: 1px dashed color-mix(in srgb, var(--ink) 45%, transparent);
+  border-radius: 3px;
+  color: var(--text-2);
+  font: 600 13px/1 var(--sans);
+  letter-spacing: 0.04em;
+  cursor: help;
+}
+.story-kicker {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s1);
+  color: var(--accent);
+  font: 700 13px/1.3 var(--sans);
+  letter-spacing: 0.08em;
+}
+.story-kicker .en-sub {
+  display: inline;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.9;
+}
+.read-tag { font: 600 12px/1 var(--sans); color: var(--text-2); letter-spacing: 0.04em; }
+
+/* ------------------------------------------------------------------ step 2
+   The bookshelf as a magazine: a compact masthead, one slim chip bar, a lead
+   story, then a ranked grid of raised cards on the washi ground. Text first:
+   rank shows in type size, spacing and depth, never in decoration. */
+body[data-view='shelf'] main > .eyebrow:first-child { display: none; }
+:root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 1160px;
+  margin: 0 auto var(--s8);
+  padding: var(--s3) 0 var(--s8);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+html[data-room='shelf'] .search-field {
+  min-height: 44px;
+  padding: 8px 14px 8px 42px;
+  margin: 0 0 var(--s3);
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  color: var(--text);
+  background: var(--raised) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5d70' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") 14px 50% / 18px 18px no-repeat;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+  font: 16px/1.5 var(--sans);
+}
+#shelf-body { display: block; }
+#shelf-body > * { grid-column: auto; }
+
+.shelf-masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: 0 0 var(--s2);
+  margin: 0 0 var(--s2);
+  border-bottom: 4px double var(--rule-strong);
+}
+#shelf-body .shelf-masthead h1 {
+  margin: 0;
+  font: 800 48px/1.1 var(--display);
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+#shelf-body .shelf-masthead h1 .en-inline {
+  display: inline-block;
+  margin: 0 0 0 var(--s2);
+  font: 400 16px/1.4 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--text-2);
+  vertical-align: 0.5em;
+}
+#shelf-body .shelf-dateline .dateline-sep { color: var(--text-2); }
+#shelf-body .shelf-dateline .tally-short { display: none; }
+#shelf-body .shelf-review-note { display: flex; align-items: center; gap: 2px; margin: 2px 0 0; font: 500 13px/1.5 var(--sans); color: var(--text-2); }
+/* the ⓘ is a 44px door that sits on the note's own line without making it taller */
+#shelf-body .shelf-review-help { margin: -12px 0; }
+#shelf-body .shelf-review-help > summary { width: 44px; justify-content: center; }
+#shelf-body .shelf-review-help > summary .ui-icon { width: 18px; height: 18px; }
+#shelf-body .shelf-dateline {
+  display: block;
+  max-width: none;
+  margin: 6px 0 0;
+  font: 500 14px/1.5 var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  -webkit-line-clamp: none;
+}
+.shelf-mast-name { display: flex; align-items: center; gap: 12px; }
+.shelf-mast-title { flex: 1 1 auto; min-width: 0; }
+.shelf-mast-name .shelf-tools-toggle { margin-left: auto; }
+.shelf-results-count.is-quiet { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* the 永 seal is the bookshelf's own mark, sized to sit with its name */
+.shelf-masthead .shelf-art {
+  display: block;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+/* the chip bar: sort, three filters, search, the level note, the count */
+.shelf-controls.shelf-chipbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s1);
+  padding: 0;
+  margin: 0 0 var(--s3);
+  background: none;
+  border: 0;
+}
+.filter-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* The native select fills the inside of this 1px border: 44px to tap. */
+  min-height: 46px;
+  padding: 0 10px 0 14px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  color: var(--text);
+  background: var(--raised);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+  font: 600 14px/1 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  list-style: none;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+.filter-chip::-webkit-details-marker { display: none; }
+.filter-chip:hover { border-color: var(--ink); }
+.filter-chip:focus-within, summary.filter-chip:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+.filter-chip-label { display: inline-flex; align-items: baseline; gap: 6px; }
+.filter-chip-label .en-sub {
+  display: inline;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--text-2);
+}
+.filter-chip-caret { width: 16px; height: 16px; color: var(--text-2); }
+.filter-chip select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.filter-chip.is-set { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+.filter-chip.is-set .en-sub, .filter-chip.is-set .filter-chip-caret { color: inherit; }
+.filter-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  color: var(--text-2);
+  background: var(--raised);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+  cursor: text;
+}
+.filter-search:focus-within { outline: 2px solid var(--ai); outline-offset: 2px; color: var(--ai); }
+.shelf-controls .filter-search input {
+  width: 72px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: 15px/1.4 var(--sans);
+  outline: none;
+  transition: width 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.shelf-controls .filter-search input:focus, .shelf-controls .filter-search input:not(:placeholder-shown) { width: 200px; }
+.shelf-filter-help { position: relative; margin: 0; border: 0; }
+.shelf-filter-help > summary { min-height: 44px; padding: 0; color: var(--text-2); }
+.shelf-filter-help[open] > p {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + var(--s1));
+  left: 50%;
+  width: min(360px, calc(100vw - 32px));
+  margin: 0;
+  padding: var(--s2);
+  transform: translateX(-50%);
+  border: 1px solid var(--raised-edge);
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+  font: 14px/1.7 var(--sans);
+  color: var(--text);
+}
+.shelf-controls .shelf-results-count {
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  font: 500 13px/1.4 var(--sans);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.shelf-controls .shelf-clear { order: 9; }
+
+/* study tools (glance pass 2026-10-01): one 学習ツール Tools button in the title block, and one
+   panel of labelled tiles in plain groups that it opens below the title. Nothing else of the
+   shelf moves: search, title, filters, stories. */
+.shelf-tools-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  color: var(--ai);
+  background: var(--raised);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+  font: 700 14px/1 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+.shelf-tools-toggle:hover { border-color: var(--ai); }
+.shelf-tools-toggle[aria-expanded='true'] { border-color: var(--ai); background: var(--ai-wash); }
+.shelf-tools-toggle .ui-icon { width: 18px; height: 18px; }
+.shelf-tools-toggle-label { display: inline-flex; align-items: baseline; gap: 6px; color: var(--text); }
+.shelf-tools-toggle-label .en-sub { font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+.shelf-tools-toggle .shelf-tools-caret { width: 16px; height: 16px; color: var(--text-2); transition: transform 160ms ease-out; }
+.shelf-tools-toggle[aria-expanded='true'] .shelf-tools-caret { transform: rotate(180deg); }
+
+#shelf-body .shelf-study-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--s3);
+  margin: 0 0 var(--s3);
+  padding: var(--s3);
+  border: 1px solid var(--raised-edge);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+#shelf-body .shelf-study-tools[hidden] { display: none; }
+.shelf-tools-group { min-width: 0; margin: 0; }
+#shelf-body .shelf-tools-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0 0 var(--s1);
+  font: 700 13px/1.3 var(--sans);
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+}
+#shelf-body .shelf-tools-heading .en-sub { font: 600 11px/1.3 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+#shelf-body .shelf-study-tools .shelf-tools-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
+#shelf-body .shelf-study-tools button.grammar-link,
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] {
+  grid-column: auto;
+  transform: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 52px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ink) 2%, var(--raised));
+  box-shadow: 0 1px 1px color-mix(in srgb, var(--ink) 7%, transparent);
+  color: var(--ai);
+  font: 700 15px/1.3 var(--sans);
+  text-align: start;
+  white-space: normal;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+#shelf-body .shelf-study-tools button.grammar-link:hover { border-color: var(--ai); background: var(--ai-wash); }
+/* register.css spaces a door's last span out (0.12em) and can hide it; a tile's name is always shown, set tight */
+#shelf-body .shelf-study-tools button.grammar-link .l-ja,
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] .l-ja { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; word-break: auto-phrase; }
+#shelf-body .shelf-study-tools button.grammar-link .en-sub,
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] .en-sub {
+  display: block;
+  margin: 0;
+  font: 500 12px/1.3 var(--sans);
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--text-2);
+}
+#shelf-body .shelf-study-tools button.grammar-link .en-sub:empty { display: none; }
+
+/* the story grid: lead across, two seconds, then three to a row */
+#shelf-reading-results.shelf-story-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s3);
+  margin: 0 0 var(--s5);
+}
+#shelf-reading-results > * { grid-column: span 2; min-width: 0; }
+#shelf-reading-results > :is(.story-lead, .shelf-band, .note) { grid-column: 1 / -1; }
+#shelf-reading-results > .story-second { grid-column: span 3; }
+body #shelf-body .story-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--raised-edge);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+}
+@media (hover: hover) { body #shelf-body .story-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+body #shelf-body .story-card:focus-within { outline: 2px solid var(--ai); outline-offset: 3px; }
+#shelf-body .story-card .shelf-open {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--s3);
+  border-radius: inherit;
+  text-align: start;
+}
+#shelf-body .story-card .shelf-open:focus-visible { outline: 0; }
+#shelf-body .story-card .shelf-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#shelf-body .story-card .shelf-title {
+  margin: 0;
+  font: 800 21px/1.5 var(--display);
+  letter-spacing: -0.005em;
+  color: var(--text);
+  text-wrap: pretty;
+  word-break: auto-phrase;
+}
+#shelf-body .story-card .shelf-title-en {
+  font: 400 15px/1.5 var(--sans);
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+@media (hover: hover) { #shelf-body .story-card:hover .shelf-title { color: var(--ai); } }
+.story-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s1);
+  margin-top: auto;
+  padding-top: var(--s2);
+}
+/* the date rides the foot beside the level, quieter than both headlines */
+.story-date { font: 500 13px/1.3 var(--sans); letter-spacing: 0.01em; color: var(--text-2); font-variant-numeric: tabular-nums; }
+#shelf-body .story-second .shelf-title { font-size: 27px; line-height: 1.45; }
+#shelf-body .story-second .shelf-title-en { font-size: 16px; }
+#shelf-body .story-second .shelf-open { padding: var(--s3) var(--s4) var(--s3); }
+
+/* the lead: the whole width, the largest headline, its first sentence as the teaser, and a
+   vermilion rule of rank along its top edge */
+body #shelf-body .story-lead { border-top: 3px solid var(--accent); }
+#shelf-body .story-lead .shelf-open { padding: var(--s4) var(--s5) var(--s4); }
+#shelf-body .story-lead .shelf-head { gap: var(--s2); }
+#shelf-body .story-lead :is(.shelf-title-en, .story-lede) { max-width: 820px; }
+#shelf-body .story-lead .shelf-title { font-size: clamp(30px, 3.1vw, 42px); line-height: 1.4; letter-spacing: -0.015em; }
+#shelf-body .story-lead .shelf-title-en { font-size: 19px; line-height: 1.5; color: var(--text); }
+#shelf-body .story-lead .story-kicker { font-size: 14px; }
+#shelf-body .story-lead .story-lede {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: var(--s1) 0 0;
+  padding: var(--s2) 0 0;
+  border-top: 1px solid var(--hairline);
+  font: 400 17px/1.8 var(--serif);
+  color: var(--text-2);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+#shelf-body .story-lead .story-foot { margin-top: var(--s1); padding-top: 0; }
+
+/* bands between the seconds and the grid: today's six, words met again */
+#shelf-reading-results > .shelf-band {
+  margin: var(--s1) 0;
+  padding: var(--s3) 0 var(--s1);
+  border-top: 2px solid var(--rule-strong);
+}
+#shelf-body .shelf-band-head, .shelf-encounters > h2 {
+  margin: 0 0 var(--s2);
+  font: 800 22px/1.4 var(--display);
+  letter-spacing: -0.005em;
+  color: var(--text);
+}
+#shelf-body .shelf-band-head .en-inline { margin-left: var(--s1); font: 500 14px/1.4 var(--sans); color: var(--text-2); }
+#shelf-today.shelf-today-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s2);
+  margin: 0;
+}
+body #shelf-body .story-teaser {
+  border: 0;
+  border-left: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body #shelf-body .story-teaser:hover { transform: none; box-shadow: none; background: var(--ai-wash); }
+#shelf-body .story-teaser .shelf-open { padding: 2px 0 var(--s1) var(--s2); }
+#shelf-body .story-teaser .shelf-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+#shelf-body .story-teaser .story-kicker { font-size: 12px; }
+#shelf-body .story-teaser .story-kicker .en-sub { font-size: 11px; }
+#shelf-body .story-teaser .shelf-head { gap: 6px; }
+#shelf-body .story-teaser .shelf-title-en {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+#shelf-body .story-teaser .story-foot { padding-top: 6px; gap: 6px; }
+#shelf-body .story-teaser .level-chip { min-height: 20px; padding: 0 5px; font-size: 12px; }
+#shelf-body .story-teaser .story-date { font-size: 12px; }
+.shelf-encounters > .note { margin: 0 0 var(--s2); padding: 0; border: 0; background: transparent; font: 14px/1.7 var(--sans); color: var(--text-2); }
+.shelf-encounter-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
+.shelf-encounter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s1);
+  min-width: 0;
+  padding: var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+  color: var(--text);
+  font: 600 15px/1.55 var(--sans);
+  text-align: start;
+  cursor: pointer;
+}
+.shelf-encounter > strong { font-weight: 600; overflow-wrap: anywhere; }
+.shelf-encounter > span { font: 18px/1.7 var(--serif); color: var(--accent); overflow-wrap: anywhere; }
+.shelf-encounter:hover { border-color: var(--ai); }
+
+/* the shelf's foot: the archive door and sources stay quiet text */
+#shelf-body > button#archive-link.grammar-link {
+  display: block;
+  width: 100%;
+  margin: var(--s2) 0 0;
+  padding: var(--s3) 0 0;
+  border: 0;
+  border-top: 2px solid var(--rule-strong);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font: 800 20px/1.4 var(--display);
+  text-align: start;
+  color: var(--text);
+}
+#shelf-body > button#archive-link.grammar-link .en-sub { font: 500 13px/1.5 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
+
+/* ------------------------------------------------------------------ step 1
+   The reader: a raised sheet of paper; one line of provenance; the headline;
+   the Japanese from the first screen. Controls appear only when asked for. */
+:root body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 800px;
+  margin: var(--s3) auto var(--s8);
+  padding: var(--s4) clamp(24px, 5.5vw, 72px) calc(var(--s8) + var(--s4));
+  border: 1px solid var(--raised-edge);
+  border-radius: 4px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+.reader-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin: 0 0 var(--s3);
+  padding: 0 0 var(--s1);
+  border-bottom: 1px solid var(--hairline);
+}
+body[data-view='reader'] #app > main .reader-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: 500 13px/1.5 var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+}
+.reader-meta > .level-chip { margin-left: 2px; }
+body[data-view='reader'] #app > main > h1.view-title {
+  margin: 0 0 var(--s1);
+  font: 800 clamp(28px, 3.3vw, 36px)/1.45 var(--display);
+  letter-spacing: -0.012em;
+  color: var(--text);
+  text-wrap: pretty;
+}
+body[data-view='reader'] #app > main > .view-title-en {
+  margin: 0 0 var(--s3);
+  font: 400 16px/1.55 var(--sans);
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+.version-toggle {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 0 var(--s3);
+  padding: 3px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+}
+.version-toggle .version-choice {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-2);
+  font: 600 14px/1.2 var(--sans);
+  cursor: pointer;
+}
+.version-toggle .version-choice .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; }
+.version-toggle { background: color-mix(in srgb, var(--ink) 5%, var(--raised)); }
+.version-toggle .version-choice[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
+.dials-hint { margin: var(--s1) 0 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
+body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 1px solid var(--raised-edge); border-radius: 8px; background: color-mix(in srgb, var(--ink) 3%, var(--raised)); box-shadow: none; padding: var(--s2); }
+
+/* the play bar — only when the locked voice has clips for this article */
+.listen-row[hidden], .reader-actions[hidden], .teacher-door.reader-actions[hidden] { display: none !important; }
+body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 0 var(--s3);
+  padding: 6px 8px 6px 6px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 3%, var(--raised));
+  box-shadow: none;
+}
+.play-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: var(--raised);
+  background: var(--ai);
+  cursor: pointer;
+}
+.play-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--hairline);
+}
+.play-track::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--played, 0) * 100%);
+  background: var(--accent);
+  transition: width 240ms linear;
+}
+.play-voice { font: 600 12px/1 var(--sans); letter-spacing: 0.04em; color: var(--text-2); }
+.play-rate {
+  min-width: 52px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: 600 13px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+/* the Japanese itself: flush tokens; a reading floats over its word */
+body.v-depth-layered #reader, #reader.reader {
+  margin: var(--s1) 0 0;
+  padding: var(--s1) 0 var(--s4);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 22px;
+  line-height: 2.15;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+#reader .tok { padding: 0; }
+/* Off or on-touch readings float over their word and never widen it. A hidden <rt> still takes
+ * layout width (that was every gap in 「ダマスカス 郊外」), and WebKit will not position an <rt>,
+ * so the <rt> stays in the DOM as the reading's record while ::before draws it. Always-on keeps
+ * true ruby layout, where the reading is on the page and its space is earned. */
+#reader:not(.fg-always) ruby { display: inline-block; position: relative; }
+#reader:not(.fg-always) rt { display: none; }
+#reader:not(.fg-always) ruby::before {
+  content: attr(data-r);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 0.1em);
+  transform: translateX(-50%);
+  font-size: 0.6em;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--accent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; }
+.reader rt, #reader rt { font-size: 0.6em; letter-spacing: 0.02em; color: var(--accent); pointer-events: none; }
+.reader .para-break { height: 1.5em; }
+.reader .tok-en {
+  margin-top: 0.1em;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+/* segmentation shows only under the finger or the pointer, hugging the glyphs */
+#reader .tok:hover, #reader .tok:focus-visible { background: transparent; }
+@media (hover: hover) { #reader .tok:hover > .tok-word { background: var(--ai-wash); border-radius: 2px; } }
+#reader .tok.tok-current > .tok-word { background: var(--accent-wash); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 2px 2px 0 0; }
+body[data-view='reader'] main > blockquote {
+  margin: var(--s4) 0;
+  padding: var(--s3) var(--s4);
+  border: 0;
+  border-block: 1px solid var(--hairline);
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+  font: 21px/2.25 var(--serif);
+  color: var(--text);
+}
+body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--accent); }
+
+/* the floating sentence bar, and the one-time tip that holds its place */
+.teacher-door.reader-actions {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: calc(var(--s2) + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--s1) var(--s2);
+  width: min(680px, calc(100vw - 2 * var(--s2)));
+  margin: 0;
+  padding: 10px 10px 10px var(--s3);
+  transform: translateX(-50%);
+  border: 1px solid var(--raised-edge);
+  border-radius: var(--radius-float);
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+  animation: float-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes float-in { from { opacity: 0; transform: translate(-50%, 14px); } }
+@keyframes float-in-phone { from { opacity: 0; transform: translateY(14px); } }
+.reader-actions #reader-context-note.teacher-note {
+  min-height: 0;
+  margin: 0;
+  font: 700 15px/1.4 var(--sans);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.reader-actions .teacher-actions { flex-wrap: nowrap; gap: var(--s1); }
+.reader-actions .teacher-actions .chip {
+  flex-direction: column;
+  min-height: 48px;
+  padding: 4px var(--s2);
+  border-radius: 8px;
+  font: 700 15px/1.2 var(--sans);
+  white-space: nowrap;
+}
+.reader-actions .teacher-actions .en-sub { font-size: 12px; letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
+.reader-tip {
+  /* a note in the page, above the article's text: it never floats over the words (glance pass) */
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  max-width: 40em;
+  margin: 0 0 var(--s3);
+  padding: 4px 2px 4px var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-left: 3px solid var(--ai);
+  border-radius: 6px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--ai) 6%, var(--raised));
+}
+.reader-tip-text { flex: 1 1 auto; margin: 0; font: 500 14px/1.55 var(--sans); }
+.reader-tip .icon-button { flex: 0 0 auto; color: var(--text-2); }
+
+/* the article's foot: finish, then everything about the text */
+.article-footer { margin: var(--s5) 0 0; padding: var(--s3) 0 0; border-top: 2px solid var(--rule-strong); }
+.article-footer .read-done { margin: 0 0 var(--s4); }
+.article-footer .read-fin.chip {
+  flex-direction: row;
+  gap: var(--s1);
+  min-height: 44px;
+  padding: 0 var(--s3);
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+  border-radius: 8px;
+  color: var(--ai);
+  background: transparent;
+  box-shadow: none;
+  font: 700 15px/1.2 var(--sans);
+}
+.article-footer .read-fin .en-sub { display: inline; font-size: 12px; text-transform: none; letter-spacing: 0.01em; }
+.article-footer .read-fin.finished { color: var(--raised); background: var(--ai); border-color: var(--ai); }
+.article-about {
+  padding: var(--s3);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ink) 3%, var(--raised));
+}
+.article-about-head { margin: 0 0 var(--s2); font: 800 18px/1.4 var(--display); color: var(--text); }
+.article-about-head .en-inline { margin-left: var(--s1); font: 500 13px/1.4 var(--sans); color: var(--text-2); }
+.article-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--s1) var(--s3);
+  margin: 0 0 var(--s2);
+  font: 14px/1.6 var(--sans);
+}
+.article-facts dt { font-weight: 700; color: var(--text); }
+.article-facts dt .en-sub { display: inline; margin-left: 6px; font-size: 12px; font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+.article-facts dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.article-facts dd .level-note, .article-facts dd .review-reason { font-size: 14px; color: var(--text-2); }
+body .article-about .note { margin: var(--s1) 0 0; padding: 0; border: 0; border-radius: 0; background: transparent; font: 13px/1.7 var(--sans); color: var(--text-2); }
+.article-about .inline-link { display: inline; min-width: 0; min-height: 0; padding: 0; line-height: inherit; text-align: start; color: var(--ai); }
+body .article-about .note .inline-link { color: var(--text-2); text-decoration-color: var(--hairline); }
+body .article-about .note .inline-link:hover { color: var(--ai); text-decoration-color: currentColor; }
+.article-about .details-toggle { min-height: 44px; margin: var(--s1) 0 0; padding: 0; font: 600 13px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--ai); }
+
+/* a fixed bar never hides the page's last lines */
+/* the room the sentence bar needs at the page's foot is reserved from the first visit's tip on, so
+   the page does not grow under the reader when the first word is chosen (the tip itself is inline) */
+body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+:root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
+body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pending {
+  display: flex;
+  max-width: none;
+  margin: 0 0 var(--s3);
+  padding: 0;
+  border: 0;
+  border-radius: 0; /* a plain label: no pill corners for a tap to fall through */
+  background: transparent;
+}
+.play-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font: 500 13px/1.4 var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+}
+.play-pending .ui-icon { width: 18px; height: 18px; }
+.play-pending .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; }
+
+/* bug report: smaller on a phone, and it steps above a floating bar */
+@media (max-width: 520px) {
+  body:not([data-view='drift']) #bunki-reports-root .br-rail {
+    right: var(--s1);
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    width: 44px;
+    height: 44px;
+  }
+  body:not([data-view='drift']) #bunki-reports-root .br-rail .br-bug { width: 44px; height: 44px; padding: 8px; }
+  body:not([data-view='drift']) #bunki-reports-root .br-bug svg { width: 22px; height: 22px; }
+  /* the page's last line scrolls clear of the bug: its 12px inset + 44px + a 16px breath */
+  body:not([data-view='drift']) .report-line-page { margin-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* the magazine and the page, narrowed */
+@media (max-width: 1000px) {
+  #shelf-today.shelf-today-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s2); }
+}
+@media (max-width: 760px) {
+  #shelf-reading-results.shelf-story-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+  #shelf-reading-results > *, #shelf-reading-results > .story-second { grid-column: 1 / -1; }
+  #shelf-body .story-lead .shelf-open { padding: var(--s3); }
+  #shelf-body .story-lead .shelf-head { gap: var(--s1); }
+  #shelf-body .story-second .shelf-open { padding: var(--s3); }
+  #shelf-body .story-second .shelf-title { font-size: 23px; }
+  .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 360px) {
+  .shelf-tools-toggle > .ui-icon:first-child { display: none; }
+  /* on the narrowest phones each of today's six takes the whole width (this block precedes the
+     520px one, so it carries one more selector to win) */
+  body #shelf-today.shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
+  /* …and the tools panel's tiles one to a row, so no tile's name breaks inside a word */
+  body #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  html[data-room='shelf'] .search-field { margin-bottom: var(--s2); }
+  .shelf-masthead { gap: var(--s2); padding-bottom: 12px; }
+  #shelf-body .shelf-masthead h1 { font-size: 34px; }
+  #shelf-body .shelf-masthead h1 .en-inline { display: block; margin: 4px 0 0; font-size: 13px; vertical-align: 0; }
+  /* the date and the count share one line on a phone too, the count in its short form */
+  #shelf-body .shelf-dateline { margin-top: 6px; font-size: 13px; }
+  #shelf-body .shelf-dateline .tally-long { display: none; }
+  #shelf-body .shelf-dateline .tally-short { display: inline; }
+  #shelf-body .shelf-review-note { font-size: 12px; }
+  .shelf-masthead { align-items: flex-start; }
+  .shelf-masthead .shelf-art { width: 36px; height: 36px; }
+  /* the chip bar wraps on a phone (glance pass 2026-10-01): every chip keeps its English gloss
+     and nothing runs off the right edge. Chips share each row's width, so the rows end flush. */
+  .shelf-controls.shelf-chipbar { flex-wrap: wrap; margin: 0 0 var(--s2); padding: 0; }
+  .shelf-controls .filter-chip { flex: 1 0 auto; justify-content: space-between; padding: 0 8px 0 12px; }
+  .shelf-controls .filter-search { flex: 1 0 auto; }
+  .shelf-controls .filter-search input, .shelf-controls .filter-search input:focus,
+  .shelf-controls .filter-search input:not(:placeholder-shown) { flex: 1 1 auto; width: 56px; }
+  .shelf-controls .shelf-filter-help { flex: 0 0 auto; }
+  .shelf-controls .shelf-results-count { flex: 1 0 100%; margin: 0; }
+  .shelf-filter-help[open] > p { position: fixed; top: auto; bottom: var(--s2); left: var(--s2); right: var(--s2); width: auto; transform: none; }
+  /* the tools button keeps its words and drops its icon on the narrowest phones */
+  .shelf-mast-name { gap: 10px; }
+  .shelf-tools-toggle { gap: 6px; padding: 0 8px 0 10px; }
+  /* the tools panel on a phone: the groups stack, two tiles to a row */
+  #shelf-body .shelf-study-tools { grid-template-columns: minmax(0, 1fr); gap: var(--s2); margin-bottom: var(--s2); padding: var(--s2); }
+  #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #shelf-body .shelf-study-tools button.grammar-link,
+  #shelf-body .shelf-study-tools button.grammar-link[data-grade] { padding: 8px 10px; }
+  #shelf-body .story-card .shelf-open { padding: var(--s2) var(--s2) 20px; }
+  #shelf-body .story-second .shelf-open { padding: var(--s2) var(--s2) 20px; }
+  #shelf-body .story-teaser .shelf-title { font-size: 17px; }
+  #shelf-body .story-card .shelf-title { font-size: 20px; }
+  #shelf-body .story-second .shelf-title { font-size: 22px; }
+  #shelf-body .story-lead .shelf-title { font-size: 26px; line-height: 1.45; }
+  #shelf-body .story-lead .shelf-title-en { font-size: 16px; }
+  #shelf-body .story-lead .shelf-open { padding: 20px var(--s2) var(--s2); }
+  #shelf-body .story-lead .story-lede { font-size: 15px; line-height: 1.75; }
+  /* today's six stand two to a row on a phone: no card is cut off at the edge */
+  #shelf-today.shelf-today-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s2); }
+
+  :root body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
+    width: 100%;
+    margin: 0 0 var(--s6);
+    padding: 20px 18px 120px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .reader-head { margin-bottom: var(--s2); }
+  body[data-view='reader'] #app > main .reader-meta { flex-wrap: nowrap; gap: 4px 10px; }
+  .reader-meta .reader-source { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .reader-meta .shelf-date, .reader-meta .level-chip, .reader-meta .status-chip { flex: 0 0 auto; white-space: nowrap; }
+  .reader-meta .date-rel, .reader-meta .date-year.is-current { display: none; }
+  #reader:not(.fg-always) ruby::before, .reader rt, #reader rt { font-size: 0.63em; }
+  body[data-view='reader'] #app > main > h1.view-title { font-size: 26px; line-height: 1.45; }
+  body[data-view='reader'] #app > main > .view-title-en { margin-bottom: var(--s2); font-size: 15px; }
+  .listen-row.play-bar.is-pending { margin-bottom: var(--s2); }
+  body.v-depth-layered #reader, #reader.reader { font-size: 19px; line-height: 2.15; }
+  .reader .tok-en { font-size: 15px; }
+  /* the phone reader's dock: a slim paper strip at the foot where the bug rests in its corner and
+     the voice state lives (the Kore player's home); the sentence bar and the tip rise over it, beside
+     the bug. Nothing fixed floats over the reading column. */
+  body[data-view='reader']:not(.zen) #app::after {
+    content: '';
+    position: fixed;
+    z-index: 40;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(64px + env(safe-area-inset-bottom));
+    background: var(--raised);
+    border-top: 1px solid var(--raised-edge);
+    box-shadow: 0 -10px 24px -18px color-mix(in srgb, var(--ink) 45%, transparent);
+  }
+  body.v-depth-layered[data-view='reader'] .listen-row.play-bar, body[data-view='reader'] .listen-row.play-bar {
+    position: fixed;
+    z-index: 45;
+    left: var(--s2);
+    right: 64px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    max-width: none;
+    min-height: 40px;
+    margin: 0;
+    padding: 4px;
+  }
+  body[data-view='reader'] .listen-row.play-bar.is-pending { bottom: env(safe-area-inset-bottom); height: 64px; align-items: center; }
+  body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  /* a bottom sheet owns the foot: the bug steps up to the top corner */
+  body:has(#sheet):not(:has(#stroke-page)) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
+  /* the sentence bar rises above the dock, clear of the bug and the voice state */
+  .teacher-door.reader-actions {
+    left: var(--s1);
+    width: calc(100vw - 2 * var(--s1));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    transform: none;
+    animation-name: float-in-phone;
+  }
+  .teacher-door.reader-actions { grid-template-columns: minmax(0, 1fr) auto; padding: 10px 6px 10px 14px; }
+  .reader-actions .teacher-actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: 14px; }
+  .reader-actions-close { grid-column: 2; grid-row: 1; }
+  .reader-tip { margin-bottom: var(--s2); padding-left: 12px; }
+  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
+  .article-about { padding: var(--s2); }
+  .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .article-facts dd { margin-bottom: var(--s1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .teacher-door.reader-actions { animation: none; }
+  #reader:not(.fg-always) ruby::before { transition: none; }
+  body #shelf-body .story-card, .shelf-controls .filter-search input { transition: none; }
+  body #shelf-body .story-card:hover { transform: none; }
+}
+
+/* ------------------------------------------------------------------ step 3a
+   The word popup and the word sheet on the depth system. The popup is a
+   floating paper card: headword, reading, one meaning, one way deeper. The
+   sheet is the top layer: a lacquer bar over raised paper, sections under
+   hairline rules, kanji on washi tiles, one filled primary (覚える). */
+body #mini {
+  gap: 4px;
+  width: max-content;
+  min-width: 220px;
+  max-width: min(340px, calc(100vw - 2 * var(--s2)));
+  padding: var(--s2) var(--s2) var(--s2) 20px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+  color: var(--text);
+}
+body #mini .mini-word { padding-right: 56px; font: 800 30px/1.35 var(--display); letter-spacing: -0.01em; color: var(--text); }
+body #mini .mini-reading { font: 500 18px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--accent); }
+body #mini .mini-gloss { margin: 2px 0 0; font: 16px/1.55 var(--sans); color: var(--text); }
+body #mini .mini-gloss.mini-miss { color: var(--text-2); }
+body #mini .mini-take {
+  top: 14px;
+  right: 14px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font: 800 18px/1 var(--display);
+}
+body #mini .mini-take.taken { background: var(--accent); color: var(--raised); }
+/* 覚 with its plain word under it, so a first-time reader knows the red seal saves the word */
+body #mini .mini-take:has(.mini-take-en) { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 44px; min-height: 46px; padding: 4px 6px; }
+body #mini .mini-take-en { font: 700 10px/1 var(--sans); letter-spacing: 0.04em; }
+body #mini .mini-take-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
+/* a held 覚 reads as "not here", never as a faded, broken button: plain ink on a dashed edge, at
+   full strength, with its reason in readable words under the meaning (glance pass 2026-10-01) */
+body #mini .mini-take.reader-capture-held { opacity: 1; border-style: dashed; border-color: var(--raised-edge-strong); color: var(--text-2); cursor: help; }
+body #mini .mini-take.reader-capture-held .mini-take-en { color: inherit; }
+body #mini .mini-take-reason { display: block; margin-top: 6px; color: var(--text); word-break: keep-all; overflow-wrap: anywhere; }
+body #mini .mini-entry {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--s1);
+  min-height: 44px;
+  margin-top: var(--s1);
+  padding: 8px var(--s2);
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ai);
+  font: 700 15px/1.2 var(--sans);
+}
+body #mini .mini-entry .en-sub { display: inline; font-size: 12px; letter-spacing: 0.02em; text-transform: none; color: inherit; }
+body #mini .mini-entry::after { content: '›'; font-weight: 700; }
+body #mini .mini-entry:hover { background: var(--ai-wash); border-color: var(--ai); }
+
+/* the sheet: lacquer bar, raised paper */
+body.v-depth-layered .scrim, body .scrim { background: color-mix(in srgb, var(--chrome) 62%, transparent); }
+body.v-depth-layered .sheet, body .sheet {
+  border: 1px solid var(--raised-edge);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--raised);
+  box-shadow: 0 -2px 6px color-mix(in srgb, var(--ink) 14%, transparent), 0 -28px 64px -20px color-mix(in srgb, var(--ink) 55%, transparent);
+}
+body .sheet .sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--raised-edge-strong); }
+body .sheet .sheet-bar {
+  gap: var(--s1);
+  padding: 10px var(--s3);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 60%), var(--chrome);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 8px 18px -14px color-mix(in srgb, var(--chrome) 90%, transparent);
+}
+body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) {
+  min-width: 44px;
+  border: 1px solid color-mix(in srgb, var(--chrome-ink) 34%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, #fff 6%, transparent);
+  transition: background-color 120ms ease-out;
+}
+body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search):hover { background: color-mix(in srgb, #fff 14%, transparent); }
+body .sheet .sheet-bar .sheet-take[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff8ee; }
+
+/* the word's head: headword, reading, then everything under rules */
+body .sheet .headword { margin: var(--s1) 0 0; font: 800 46px/1.3 var(--display); letter-spacing: -0.02em; color: var(--text); }
+body .sheet .reading { margin: 2px 0 var(--s3); font: 500 21px/1.5 var(--serif); letter-spacing: 0.06em; color: var(--accent); }
+body .sheet > p.eyebrow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s1);
+  margin: var(--s4) 0 var(--s1);
+  padding: 12px 0 0;
+  border-top: 1px solid var(--hairline);
+  font: 700 14px/1.4 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+body .sheet > p.eyebrow .en-inline, body .sheet > p.eyebrow .en-sub {
+  display: inline;
+  font: 500 12px/1.4 var(--sans);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-2);
+}
+body .sheet .dictionary-homographs {
+  padding: 12px var(--s2);
+  border: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+}
+body .sheet .entry-rows { border-top: 0; }
+body .sheet .entry-row {
+  gap: var(--s2);
+  min-height: 64px;
+  padding: 10px 6px;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  transition: background-color 120ms ease-out;
+}
+body .sheet .entry-row .row-glyph {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 8px;
+  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 4%, var(--raised));
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent);
+  font: 400 30px/1 var(--serif);
+  color: var(--text);
+}
+body .sheet .entry-row .row-main { font: 16px/1.5 var(--sans); color: var(--text); }
+body .sheet .entry-row .row-go, body .sheet .entry-row > span:last-child { color: var(--text-2); }
+@media (hover: hover) { body .sheet .entry-row:hover { background: var(--ai-wash); } }
+body .sheet .senses { margin: var(--s2) 0 0; }
+body .sheet .sense-list li::marker { font: 700 14px var(--sans); color: var(--accent); }
+body .sheet .dictionary-credit { margin: var(--s2) 0 var(--s1); font: 12px/1.6 var(--sans); color: var(--text-2); }
+body .sheet > .shelf-meta { gap: var(--s1); margin: 0 0 var(--s2); }
+body .sheet > .shelf-meta > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ai) 7%, var(--raised));
+  color: var(--ai);
+  font: 700 13px/1 var(--sans);
+  letter-spacing: 0.04em;
+}
+body .sheet .teacher-door {
+  margin: var(--s3) 0;
+  padding: var(--s2) 20px;
+  border: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+}
+body .sheet .teacher-door .teacher-source-quote { font: 18px/1.9 var(--serif); color: var(--text); }
+body .sheet .example { padding: var(--s2) 0; border: 0; border-bottom: 1px solid var(--hairline); }
+body .sheet .example-ja { font: 20px/2 var(--serif); color: var(--text); }
+body .sheet .example-en { font: 15px/1.6 var(--sans); color: var(--text-2); }
+body .sheet > button.take {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--s1);
+  width: 100%;
+  min-height: 52px;
+  margin: var(--s3) 0 var(--s1);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: var(--ai);
+  color: var(--raised);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
+  font: 700 17px/1.2 var(--sans);
+}
+body .sheet > button.take .en-sub { display: inline; font-size: 13px; letter-spacing: 0.02em; text-transform: none; color: inherit; opacity: 0.88; }
+body .sheet > button.take.taken, body .sheet > button.take[aria-pressed='true'] { background: transparent; color: var(--ai); }
+@media (max-width: 520px) {
+  body .sheet .sheet-bar { padding: 8px 12px; }
+  body .sheet .headword { font-size: 38px; }
+  body .sheet .reading { font-size: 19px; }
+  body #mini .mini-word { font-size: 27px; }
+}
+/* an open sheet is the top layer: the reader's bar, tip and dock step back under it */
+body:has(#sheet) .teacher-door.reader-actions { display: none !important; }
+@media (max-width: 520px) {
+  body:has(#sheet)[data-view='reader'] #app::after, body:has(#sheet)[data-view='reader'] .listen-row.play-bar { display: none; }
+}
+
+/* ------------------------------------------------------------------ step 3b
+   The kanji page and the writing room. The kanji is printed on its own washi
+   tile; its facts are chips that open the library; the radical and the
+   stroke order are raised doors, not striped boxes. The writing room keeps
+   its living ink: the square is a raised sheet on the desk, and its few
+   controls are legible paper pills instead of faded glyphs. */
+body .sheet .hero { align-items: flex-start; gap: var(--s3); margin: var(--s1) 0 var(--s3); }
+body .sheet .hero-glyph {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 136px;
+  height: 136px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
+  box-shadow: var(--raised-shadow);
+  font: 400 104px/1 var(--serif);
+  color: var(--accent);
+}
+body .sheet .hero-meta { display: grid; gap: 12px; padding-top: 6px; }
+body .sheet .hero-mean { margin: 0; font: 800 28px/1.35 var(--display); color: var(--text); }
+body .sheet .hero .shelf-meta { display: flex; flex-wrap: wrap; gap: var(--s1); margin: 0; }
+body .sheet .hero .cat-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* a catalog door is a real 44px target */
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ai) 7%, var(--raised));
+  color: var(--ai);
+  font: 700 13px/1 var(--sans);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+body .sheet .hero .cat-chip:hover { border-color: var(--ai); background: var(--ai-wash); }
+body .sheet .hero .kkld-chip { flex-basis: 100%; min-width: 0; padding: 0; border: 0; background: none; font: 12px/1.5 var(--sans); color: var(--text-2); white-space: normal; overflow-wrap: anywhere; }
+body .sheet .hero-meta { min-width: 0; }
+body .sheet .hero #kanji-shape-lookup { max-width: 100%; white-space: normal; text-align: start; }
+body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
+  flex-direction: row;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 14px;
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ai);
+  font: 600 14px/1.3 var(--sans);
+}
+body .sheet .teacher-door .chip { flex-direction: column; }
+body .sheet .teacher-door .chip .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.9; }
+body .sheet .kv { margin: var(--s2) 0; padding: var(--s2) 0; border-block: 1px solid var(--hairline); }
+body .sheet .kv dt { font: 700 14px/1.8 var(--sans); color: var(--text); }
+body .sheet .kv dd { font: 20px/1.7 var(--serif); letter-spacing: 0.04em; color: var(--accent); }
+body .sheet .rad-door {
+  gap: var(--s2);
+  min-height: 72px;
+  margin: 0 0 var(--s2);
+  padding: 12px var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+@media (hover: hover) { body .sheet .rad-door:hover { box-shadow: var(--raised-shadow-hover); } }
+body .sheet .rad-glyph { font-size: 36px; color: var(--text); }
+body .sheet .rad-name { font: 600 17px/1.4 var(--sans); color: var(--text); }
+body .sheet .rad-sub { font: 13px/1.5 var(--sans); color: var(--text-2); }
+body .sheet .stroke-door {
+  padding: 10px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
+  box-shadow: var(--raised-shadow);
+}
+@media (hover: hover) { body .sheet .stroke-door:hover { box-shadow: var(--raised-shadow-hover); } }
+
+/* the writing room */
+#stroke-page .ink-sheet {
+  border-radius: 6px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 16%, transparent), 0 24px 60px -28px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+#stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back, #stroke-page .stroke-btn.stroke-corner, #stroke-page .stroke-chrome-trigger {
+  opacity: 0.92;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--raised) 92%, transparent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent), 0 8px 18px -12px color-mix(in srgb, var(--ink) 40%, transparent);
+  color: var(--text);
+}
+#stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 15px/1 var(--sans); }
+#stroke-page .stroke-back .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+#stroke-page .stroke-btn.stroke-corner { padding: 6px 16px; }
+#stroke-page .stroke-btn.stroke-corner .l-ja { font: 600 14px/1.3 var(--sans); color: var(--text); }
+#stroke-page .stroke-btn.stroke-corner .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+#stroke-page :is(.stroke-back, .stroke-btn, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
+#stroke-page .stroke-speed-wrap, #stroke-page .stroke-speed-wrap.stroke-corner {
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+#stroke-page .stroke-speed-label { font: 600 14px/1.5 var(--sans); color: var(--text); }
+#stroke-page .stroke-speed-labels { font: 12px/1.5 var(--sans); color: var(--text-2); }
+@media (max-width: 520px) {
+  body .sheet .hero { gap: var(--s2); }
+  body .sheet .hero-glyph { width: 104px; height: 104px; font-size: 80px; }
+  body .sheet .hero-mean { font-size: 23px; }
+}
+
+/* ------------------------------------------------------------------ step 3c
+   The level palette (the library and the JLPT room share it) and the
+   reference library as a hall: level doors raised on the washi ground, the
+   JLPT levels in their own colours, and a plain "what is this?" under each
+   family that opens with the official page. */
+body, body.v-contrast-wcag {
+  --lv-n5: #4c7a47;
+  --lv-n4: #2d7080;
+  --lv-n3: #2e4d6e;
+  --lv-n2: #69446f;
+  --lv-n1: #7c2a3b;
+}
+[data-level='N5'] { --lv: var(--lv-n5); }
+[data-level='N4'] { --lv: var(--lv-n4); }
+[data-level='N3'] { --lv: var(--lv-n3); }
+[data-level='N2'] { --lv: var(--lv-n2); }
+[data-level='N1'] { --lv: var(--lv-n1); }
+
+:root body[data-view='levels']:not(.zen):not([data-view='entry']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 1160px;
+  margin: 0 auto var(--s8);
+  padding: var(--s3) 0 var(--s8);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.reference-library .reference-navigation { border-bottom: 2px solid var(--rule-strong); }
+.reference-library .reference-eyebrow { font: 700 13px/1.4 var(--sans); letter-spacing: 0.08em; color: var(--accent); }
+.reference-library .reference-title { font: 800 clamp(34px, 4vw, 46px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+.reference-library .reference-intro { max-width: 60ch; font: 17px/1.75 var(--sans); color: var(--text-2); }
+.reference-library .reference-family { margin: var(--s5) 0; }
+.reference-library .reference-family-heading { padding-top: var(--s2); border-top: 2px solid var(--rule-strong); }
+.reference-library .reference-family-heading h2 { font: 800 30px/1.3 var(--display); color: var(--text); }
+.reference-library .reference-family-note { font: 14px/1.5 var(--sans); color: var(--text-2); }
+
+/* the explainer: a pill that opens into a paper well */
+.reference-explainer { margin: var(--s2) 0; }
+.reference-explainer > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  min-height: 44px;
+  padding: 0 var(--s2) 0 12px;
+  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border-radius: 999px;
+  background: var(--raised);
+  color: var(--ai);
+  font: 700 14px/1.2 var(--sans);
+  list-style: none;
+  cursor: pointer;
+}
+.reference-explainer > summary::-webkit-details-marker { display: none; }
+.reference-explainer > summary::before {
+  content: 'i';
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font: 700 12px/1 var(--serif);
+}
+.reference-explainer[open] > summary { background: var(--ai); color: var(--raised); border-color: var(--ai); }
+.reference-explainer > p {
+  max-width: 68ch;
+  margin: 0;
+  padding: 12px var(--s3) 0;
+  font: 15px/1.75 var(--sans);
+  color: var(--text);
+}
+.reference-explainer[open] {
+  padding-bottom: var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+.reference-explainer[open] > summary { margin: var(--s2) 0 0 var(--s2); }
+.reference-explainer .reference-explainer-links { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); padding-top: var(--s2); }
+.reference-explainer-links a { color: var(--ai); font-weight: 600; text-underline-offset: 0.2em; }
+.reference-explainer-links a::after { content: ' ↗'; }
+
+/* level doors: raised cards, JLPT in their level colours */
+.reference-library .reference-tabs { border-bottom: 1px solid var(--hairline); }
+.reference-library .reference-level-grid { gap: var(--s2); border: 0; background: none; }
+body .reference-library .reference-level {
+  position: relative;
+  min-height: 148px;
+  padding: 20px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+}
+body .reference-library .reference-level[data-level] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 9%, var(--raised)) 0%, var(--raised) 70%);
+  border-color: color-mix(in srgb, var(--lv) 30%, var(--raised-edge));
+}
+@media (hover: hover) { body .reference-library .reference-level:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+body .reference-library .reference-level-name { font: 800 34px/1.1 var(--display); color: var(--text); }
+body .reference-library .reference-level[data-level] .reference-level-name { color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
+body .reference-library .reference-level-count { margin-top: 12px; font: 600 17px/1.4 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
+body .reference-library .reference-level-study { font: 13px/1.5 var(--sans); color: var(--text-2); }
+body .reference-library .reference-level-arrow { color: var(--text-2); }
+body .reference-library .reference-level-unknown { min-height: 0; }
+.reference-library .reference-footnote { max-width: 70ch; font: 14px/1.7 var(--sans); color: var(--text-2); }
+@media (max-width: 520px) {
+  :root body[data-view='levels']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  body .reference-library .reference-level { min-height: 120px; padding: var(--s2); }
+  body .reference-library .reference-level-name { font-size: 28px; }
+  .reference-explainer > p { padding-inline: var(--s2); }
+}
+
+/* ------------------------------------------------------------------ step 4a
+   The JLPT room: a hall of tests on the washi ground. Five level cards in the
+   level colours carry how many tests each level holds, the last score there
+   and a progress line; the lengths are one segmented control; each test is a
+   raised tile; unreviewed tests wear one 未確認 chip. */
+html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 1040px;
+  margin: 0 auto var(--s8);
+  padding: var(--s3) 0 var(--s8);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+html[data-room='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(32px, 4vw, 44px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+html[data-room='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 16px/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
+html[data-room='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: 16px/1.6 var(--sans); color: var(--text-2); }
+
+/* the level cards */
+html[data-room='jlpt'] .exam-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); margin: 0 0 var(--s3); }
+html[data-room='jlpt'] .exam-levels .chip.exam-level-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 4px;
+  min-width: 0;
+  min-height: 132px;
+  padding: var(--s2) var(--s2) 20px;
+  border: 1px solid color-mix(in srgb, var(--lv) 28%, var(--raised-edge));
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 8%, var(--raised)) 0%, var(--raised) 75%);
+  box-shadow: var(--raised-shadow);
+  color: var(--text);
+  text-align: start;
+  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+}
+@media (hover: hover) { html[data-room='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+html[data-room='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
+html[data-room='jlpt'] .exam-level-tests { font: 600 14px/1.4 var(--sans); color: var(--text); }
+html[data-room='jlpt'] .exam-level-last { font: 13px/1.4 var(--sans); color: var(--text-2); font-variant-numeric: tabular-nums; }
+html[data-room='jlpt'] .exam-level-progress {
+  position: absolute;
+  left: var(--s2);
+  right: var(--s2);
+  bottom: 12px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--lv) 16%, transparent);
+}
+html[data-room='jlpt'] .exam-level-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--done, 0) * 100%);
+  background: var(--lv);
+}
+html[data-room='jlpt'] .exam-levels .chip.exam-level-card[aria-pressed='true'] {
+  border-color: var(--lv);
+  background: var(--lv);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--lv) 30%, transparent), 0 16px 32px -16px color-mix(in srgb, var(--lv) 70%, transparent);
+  color: #fbf7ee;
+}
+html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: #fbf7ee; }
+html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress { background: rgb(255 255 255 / 26%); }
+html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: #fbf7ee; }
+
+/* the lengths: one segmented control */
+html[data-room='jlpt'] .exam-lengths {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  width: min(640px, 100%);
+  margin: 0 0 var(--s4);
+  padding: 4px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--raised));
+}
+html[data-room='jlpt'] .exam-length {
+  display: grid;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-2);
+  font: 700 16px/1.3 var(--sans);
+  text-align: center;
+}
+html[data-room='jlpt'] .exam-length-time { margin: 0; font: 12px/1.3 var(--sans); letter-spacing: 0.01em; color: inherit; opacity: 0.9; }
+html[data-room='jlpt'] .exam-length[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
+
+/* the guided session: the recommended first step */
+html[data-room='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); border: 0; }
+html[data-room='jlpt'] .study-hall.guided-entry .study-door {
+  padding: 20px var(--s3);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+@media (hover: hover) { html[data-room='jlpt'] .study-hall.guided-entry .study-door:hover { box-shadow: var(--raised-shadow-hover); background: var(--raised); } }
+
+/* sections and test tiles */
+html[data-room='jlpt'] h2.exam-section-heading {
+  margin: var(--s5) 0 var(--s1);
+  padding-top: var(--s2);
+  border-top: 2px solid var(--rule-strong);
+  font: 800 24px/1.35 var(--display);
+  color: var(--text);
+}
+html[data-room='jlpt'] h2.exam-section-heading .en-inline { margin-left: var(--s1); font: 500 15px/1.4 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+html[data-room='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
+html[data-room='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
+html[data-room='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
+html[data-room='jlpt'] .exam-machine-label { display: flex; align-items: center; gap: var(--s1); margin: 0; font: 13px/1.5 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .exam-written > .exam-status { margin: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .assessment-room .exam-form {
+  display: grid;
+  align-content: start;
+  gap: var(--s1);
+  margin: 0 0 var(--s2);
+  padding: 20px var(--s3) var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+html[data-room='jlpt'] .exam-written .exam-form { margin: 0; }
+html[data-room='jlpt'] .assessment-room .exam-form h2 { margin: 0; font: 800 22px/1.35 var(--display); color: var(--text); }
+html[data-room='jlpt'] .exam-form-meta { margin: 0; font: 600 15px/1.5 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
+html[data-room='jlpt'] .exam-form .exam-skills, html[data-room='jlpt'] .exam-form .exam-status { margin: 0; font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .exam-form button.take {
+  justify-self: start;
+  min-height: 44px;
+  margin-top: var(--s1);
+  padding: 0 var(--s3);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: var(--ai);
+  color: var(--raised);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
+  font: 700 15px/1 var(--sans);
+}
+html[data-room='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
+html[data-room='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
+html[data-room='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
+html[data-room='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
+html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
+  min-height: 56px;
+  margin: 0;
+  padding: 10px var(--s2);
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+}
+html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
+  min-height: 44px;
+  margin: var(--s2) var(--s2) 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ai);
+  font: 600 15px/1.4 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+.exam-review-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
+/* one secondary-button look for the room's quieter actions: the real-test import and the
+   confirm sheet's alternatives sit beside the navy Start as outlined buttons, not serif chips */
+html[data-room='jlpt'] .exam-official .exam-official-import,
+.assessment-room .exam-confirm > button:not(.take) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: var(--s1) var(--s1) 0 0;
+  padding: 0 var(--s3);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ai);
+  box-shadow: none;
+  font: 700 15px/1 var(--sans);
+  letter-spacing: 0;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  html[data-room='jlpt'] .exam-official .exam-official-import:hover,
+  .assessment-room .exam-confirm > button:not(.take):hover { background: var(--ai-wash); }
+}
+.assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
+html[data-room='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
+/* the real-paper section is ruled by its heading like every other section, not boxed in hairlines too */
+html[data-room='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
+html[data-room='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
+@media (max-width: 760px) {
+  html[data-room='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  /* five compact cards in one row: the level, its tests, and the last score once there is one */
+  html[data-room='jlpt'] .exam-levels { gap: 6px; }
+  html[data-room='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
+  html[data-room='jlpt'] .exam-level-name { font-size: 24px; }
+  html[data-room='jlpt'] .exam-level-tests { font-size: 12px; }
+  html[data-room='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
+  html[data-room='jlpt'] .exam-level-last { font-size: 11.5px; }
+  html[data-room='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
+  html[data-room='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
+  html[data-room='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
+  html[data-room='jlpt'] h2.exam-section-heading .en-inline { display: block; margin: 4px 0 0; font-size: 14px; }
+}
+
+/* ------------------------------------------------------------------ step 4b
+   The question: a real test sheet on the desk. The status strip (level,
+   mode, question count, timer) sits above the sheet; the sheet itself is
+   raised paper carrying the 問題 header, the instruction and the numbered
+   question; the answer numbers are calm outlined squares that fill indigo
+   when chosen. Study and timed behaviour are unchanged. */
+html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+  width: calc(100% - 2 * var(--s3));
+  max-width: 860px;
+  margin: 0 auto var(--s8);
+  padding: var(--s3) 0 var(--s8);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+html[data-room='attempt'] .assessment-room > h1.exam-heading { margin: 0 0 var(--s1); font: 800 28px/1.3 var(--display); color: var(--text); }
+html[data-room='attempt'] .exam-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin: 0 var(--s1) 0 0;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--ai) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ai) 8%, var(--raised));
+  color: var(--ai);
+  font: 700 13px/1 var(--sans);
+}
+html[data-room='attempt'][data-exam-mode='timed'] .exam-mode-badge, html[data-room='attempt'] main[data-exam-mode='timed'] .exam-mode-badge {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+html[data-room='attempt'] .exam-scope-note { display: inline; margin: 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
+html[data-room='attempt'] .exam-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin: var(--s2) 0 0;
+  padding: 10px var(--s2) 10px 20px;
+  border: 1px solid var(--raised-edge);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: color-mix(in srgb, var(--ink) 5%, var(--raised));
+  font: 600 15px/1.4 var(--sans);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+html[data-room='attempt'] .exam-timer {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: var(--chrome);
+  color: var(--chrome-ink);
+  font: 700 18px/1 var(--sans);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+html[data-room='attempt'] .exam-timer:not(:has(*)):is(:empty) { display: none; }
+html[data-room='attempt'] .assessment-room { display: flex; }
+html[data-room='attempt'] .assessment-room { flex-flow: row wrap; align-items: center; column-gap: var(--s1); }
+html[data-room='attempt'] .assessment-room > * { flex: 1 1 100%; }
+html[data-room='attempt'] .assessment-room > :is(.exam-mode-badge, .exam-scope-note, .exam-machine-label) { flex: 0 0 auto; align-self: center; margin-block: 0; }
+html[data-room='attempt'] .assessment-room > .exam-scope-note { flex: 0 1 auto; min-width: 0; }
+html[data-room='attempt'] .assessment-room > #exam-flag { flex: 0 0 auto; }
+html[data-room='attempt'] .exam-save { order: 1; margin: -16px 0 var(--s2); font: 12px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--text-2); text-align: end; }
+html[data-room='attempt'] .assessment-room > :is(#exam-flag, .exam-bookmark-note, .mock-nav, .exam-question-map, .exam-leave-controls) { order: 2; }
+html[data-room='attempt'] .assessment-room .exam-paper {
+  margin: 0 0 var(--s3);
+  padding: var(--s4) clamp(20px, 5vw, 56px) var(--s3);
+  border: 1px solid var(--raised-edge);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: var(--washi) 0 0 / 300px 300px, var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+html[data-room='attempt'] .exam-paper-header {
+  margin: 0 0 var(--s3);
+  padding: 0 0 var(--s2);
+  border-bottom: 2px solid var(--rule-strong);
+}
+html[data-room='attempt'] .exam-paper .exam-skill { margin: 0 0 var(--s1); padding: 0; border: 0; font: 600 13px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--text-2); }
+html[data-room='attempt'] .assessment-room .exam-task-heading { margin: 0 0 var(--s1); font: 800 24px/1.45 var(--display); letter-spacing: 0.02em; color: var(--text); }
+html[data-room='attempt'] .exam-task-instruction { margin: 0; font: 17px/1.9 var(--serif); color: var(--text); }
+html[data-room='attempt'] .exam-paper .exam-prompt { font: 22px/2 var(--serif); color: var(--text); }
+html[data-room='attempt'] .exam-question-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  margin-right: 14px;
+  border: 1.5px solid var(--text);
+  border-radius: 4px;
+  font: 700 18px/1 var(--sans);
+  vertical-align: 4px;
+}
+html[data-room='attempt'] .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.28em; text-decoration-color: var(--text); }
+html[data-room='attempt'] .exam-paper .exam-instruction { padding: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); background: transparent; box-shadow: none; }
+html[data-room='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
+html[data-room='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: 6px; }
+html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number, html[data-room='attempt'] .exam-paper .mock-opt.exam-option-number {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 40%, transparent);
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--text);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent);
+  font: 700 18px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+@media (hover: hover) { html[data-room='attempt'] .exam-paper .exam-option-number:hover { border-color: var(--ai); color: var(--ai); background: var(--ai-wash); } }
+html[data-room='attempt'] .exam-paper .exam-option-number:is([aria-checked='true'], [aria-pressed='true']) {
+  border-color: var(--ai);
+  background: var(--ai);
+  color: var(--raised);
+}
+html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
+html[data-room='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
+html[data-room='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
+html[data-room='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+html[data-room='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
+html[data-room='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
+html[data-room='attempt'] .mock-nav .take, html[data-room='attempt'] #exam-finish-block {
+  min-height: 48px;
+  padding: 0 var(--s4);
+  border: 1px solid var(--ai);
+  border-radius: 10px;
+  background: var(--ai);
+  color: var(--raised);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
+  font: 700 16px/1 var(--sans);
+}
+html[data-room='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: 10px; background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
+@media (max-width: 520px) {
+  html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  html[data-room='attempt'] .assessment-room .exam-paper { padding: var(--s3) var(--s2) var(--s2); }
+  html[data-room='attempt'] .exam-progress { padding: 8px 10px 8px 14px; font-size: 14px; }
+  html[data-room='attempt'] .exam-timer { font-size: 16px; min-height: 30px; padding: 0 10px; }
+  html[data-room='attempt'] .assessment-room .exam-task-heading { font-size: 21px; }
+  html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
+  html[data-room='attempt'] .exam-option-text { font-size: 19px; }
+}
+
+/* ------------------------------------------------------------------ R4 focus
+   The reader's keyboard model: one Tab stop per paragraph, arrows between
+   words. The focused word wears the focus token; the pill shows its keys. */
+#reader .tok:focus-visible { outline: none; background: transparent; }
+#reader .tok:focus-visible > .tok-word { background: var(--focus-wash); box-shadow: var(--focus-ring); border-radius: 2px 2px 0 0; }
+.token-actions .tok-kbd {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 4px;
+  font: 600 11px/1.2 var(--sans);
+  color: var(--text-2);
+}
+@media (hover: none) { .token-actions .tok-kbd { display: none; } }
+
+/* the list chooser's Done: an outlined secondary that reads on its paper */
+body .vocabulary-list-dialog > .chip {
+  border: 1px solid var(--ink);
+  background: var(--raised);
+  color: var(--ink);
+  font-weight: 600;
+}
+body .vocabulary-list-dialog > .chip:hover { background: var(--ai-wash); }
+body .token-actions {
+  max-width: calc(100vw - 16px);
+  width: max-content;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+}
+body .token-actions button {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--ai);
+  font: 700 14px/1 var(--sans);
+  white-space: nowrap;
+}
+body .token-actions button .en-sub { display: inline; font-size: 12px; font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+body .token-actions button:hover { background: var(--ai-wash); }
+
+/* reference pages: the pager wraps rather than pushing past a 320px screen */
+.reference-library .reference-page-controls { flex-wrap: wrap; row-gap: var(--s1); min-width: 0; }
+.reference-library .reference-pagination { flex-wrap: wrap; min-width: 0; }
+
+/* the review screen's group rows (polish pass 2026-10-01): the name never breaks, its plain gloss
+   takes the room that is left, and the per-group review is a sans pill like the room's doors */
+#app .list-head { flex-wrap: wrap; row-gap: 4px; }
+#app .list-head .list-open { white-space: nowrap; }
+#app .list-head > .en-inline { flex: 1 1 auto; min-width: 0; }
+#app .list-head .list-review {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font: 600 13px/1 var(--sans);
+  letter-spacing: 0;
+  white-space: nowrap;
+}

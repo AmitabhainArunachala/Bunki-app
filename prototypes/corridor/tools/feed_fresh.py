@@ -76,6 +76,7 @@ sys.path.insert(0, str(HERE))
 import build_articles as ba  # noqa: E402  (the minting machinery — imported, not forked)
 import build_corridor as bc  # noqa: E402
 import fresh_sources as fs  # noqa: E402
+from reading_facets import attach_reading_facets  # noqa: E402
 from feed_ingest import (  # noqa: E402
     ARTICLES,
     INDEX_PATH,
@@ -499,6 +500,7 @@ def main() -> int:
         if restaged:
             DATASET.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in dataset), "utf-8")
         if ready or retitled or restaged:
+            attach_reading_facets(index, ARTICLES)
             INDEX_PATH.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", "utf-8")
             write_json_keeping_indent(QUEUE_PATH, queue)
         print(f"· minted {len(minted)}; {len(untitled)} staged items wait for an authored English title"

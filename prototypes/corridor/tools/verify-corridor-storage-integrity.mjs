@@ -269,6 +269,7 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       [13, 'dojo', 'word:海', 0],
       [14, 'dojo', 'kanji:海', 3, 'kanji'],
       [15, 'params', 'fsrs', 'length'],
+      [15, 'params', 'schedule', 0.85, ['10m']],
       [15, 'reveal', 'word:海', 1],
       [16, 'reveal', 'word:海', 0],
       [17, 'lesson', 'word:海', 3, 'N5-1'],
@@ -293,10 +294,14 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       correct: 2,
       ts: 10,
     },
-    stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1 } },
+    stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1, extra: 40 } },
     srsPrefs: {
       newPerDay: 35,
       reviewLimit: 45,
+      reviewsPerDay: 300,
+      retention: 0.85,
+      preset: 'custom:gentle',
+      pauseEvery: null,
       fsrs: { w: PIN.w, source: 'bunki-fsrs6-r090-personal-v1 @ 2026-08-16', basedOnReviews: 500 },
     },
     readDone: { article: 10 },
@@ -321,6 +326,11 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
   assert.equal(storeContext.S.aiQuiz.correct, 2);
   assert.equal(storeContext.S.srsPrefs.newPerDay, 35);
   assert.equal(storeContext.S.srsPrefs.reviewLimit, 45);
+  // card-system slice 1 · reviews a day, retention, the preset and the break hydrate as stored
+  assert.equal(storeContext.S.srsPrefs.reviewsPerDay, 300);
+  assert.equal(storeContext.S.srsPrefs.retention, 0.85);
+  assert.equal(storeContext.S.srsPrefs.preset, 'custom:gentle');
+  assert.equal(storeContext.S.srsPrefs.pauseEvery, null);
   // R3-D · the learner's fitted weights hydrate VERBATIM alongside pacing
   assert.equal(storeContext.S.srsPrefs.fsrs.w.length, 21);
   assert.equal(storeContext.S.srsPrefs.fsrs.basedOnReviews, 500);
@@ -422,6 +432,11 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog params off-key', { v: 1, obslog: [[1, 'params', 'other', 'length']] }],
     ['obslog params reason type', { v: 1, obslog: [[1, 'params', 'fsrs', 7]] }],
     ['obslog overlong params row', { v: 1, obslog: [[1, 'params', 'fsrs', 'length', 'extra']] }],
+    ['obslog schedule retention range', { v: 1, obslog: [[1, 'params', 'schedule', 0.97, ['1m', '10m']]] }],
+    ['obslog schedule retention type', { v: 1, obslog: [[1, 'params', 'schedule', '0.9', ['1m', '10m']]] }],
+    ['obslog schedule steps empty', { v: 1, obslog: [[1, 'params', 'schedule', 0.9, []]] }],
+    ['obslog schedule step a day long', { v: 1, obslog: [[1, 'params', 'schedule', 0.9, ['1d']]] }],
+    ['obslog short schedule row', { v: 1, obslog: [[1, 'params', 'schedule', 0.9]] }],
     ['obslog malformed reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', 2]] }],
     ['obslog non-integer reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', '1']] }],
     ['obslog short reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海']] }],
@@ -478,11 +493,22 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['stats root', { v: 1, stats: [] }],
     ['stats nested day', { v: 1, stats: { day: [] } }],
     ['stats nested count', { v: 1, stats: { day: { n: 'one' } } }],
+    ['stats raised limit negative', { v: 1, stats: { day: { extra: -1 } } }],
+    ['stats raised limit fractional', { v: 1, stats: { day: { extra: 1.5 } } }],
     ['srsPrefs root', { v: 1, srsPrefs: [] }],
     ['srsPrefs newPerDay type', { v: 1, srsPrefs: { newPerDay: '20' } }],
     ['srsPrefs newPerDay fractional', { v: 1, srsPrefs: { newPerDay: 12.5 } }],
     ['srsPrefs newPerDay below range', { v: 1, srsPrefs: { newPerDay: -1 } }],
-    ['srsPrefs newPerDay above range', { v: 1, srsPrefs: { newPerDay: 51 } }],
+    ['srsPrefs newPerDay above range', { v: 1, srsPrefs: { newPerDay: 501 } }],
+    ['srsPrefs reviewsPerDay type', { v: 1, srsPrefs: { reviewsPerDay: '200' } }],
+    ['srsPrefs reviewsPerDay below range', { v: 1, srsPrefs: { reviewsPerDay: 9 } }],
+    ['srsPrefs reviewsPerDay above range', { v: 1, srsPrefs: { reviewsPerDay: 10000 } }],
+    ['srsPrefs retention below range', { v: 1, srsPrefs: { retention: 0.79 } }],
+    ['srsPrefs retention above range', { v: 1, srsPrefs: { retention: 0.96 } }],
+    ['srsPrefs preset unknown', { v: 1, srsPrefs: { preset: 'turbo' } }],
+    ['srsPrefs custom preset unknown base', { v: 1, srsPrefs: { preset: 'custom:turbo' } }],
+    ['srsPrefs pauseEvery below range', { v: 1, srsPrefs: { pauseEvery: 4 } }],
+    ['srsPrefs pauseEvery type', { v: 1, srsPrefs: { pauseEvery: 'off' } }],
     ['srsPrefs reviewLimit type', { v: 1, srsPrefs: { reviewLimit: null } }],
     ['srsPrefs reviewLimit below range', { v: 1, srsPrefs: { reviewLimit: 4 } }],
     ['srsPrefs reviewLimit above range', { v: 1, srsPrefs: { reviewLimit: 101 } }],
@@ -710,7 +736,7 @@ verified('scheduler-clock-clamp-and-raw-audit-truth', () => {
   assert.equal(forwardRow[4], 6);
 });
 
-verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
+verified('due-queue-overdueness-order-no-debt-daily-caps-and-today-queue', () => {
   const srsBlock = between(
     '/** Items ready to review:',
     '/** Midnight at the start of a date',
@@ -726,7 +752,7 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
     window: { addEventListener: () => {} },
   });
   vm.runInContext(
-    `${legacySchemaBlock}\n${srsBlock}\n;globalThis.__srsApi = { srsDueItems, srsNewPerDay, srsReviewLimit };`,
+    `${legacySchemaBlock}\n${srsBlock}\n;globalThis.__srsApi = { srsDueItems, srsNewPerDay, srsReviewsPerDay, todayQueue };`,
     dueContext,
     { filename: 'corridor-due-block.js' },
   );
@@ -788,15 +814,77 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
     ['oldest', 'tieA', 'tieB', 'recent'],
   );
   // out-of-range or mistyped prefs fall back to the defaults, never crash
-  dueContext.S.srsPrefs = { newPerDay: 999, reviewLimit: 'ten' };
+  dueContext.S.srsPrefs = { newPerDay: 999, reviewsPerDay: 'ten' };
   assert.equal(api.srsNewPerDay(), 20);
-  assert.equal(api.srsReviewLimit(), 20);
+  assert.equal(api.srsReviewsPerDay(), 200);
   // a clock behind every due date empties the reviews and never throws
   dueContext.S.srsPrefs = { newPerDay: 20, reviewLimit: 20 };
   assert.deepEqual(
     Array.from(api.srsDueItems(new Date('2000-01-01T00:00:00.000Z')), (i) => i.id),
     ['fresh1', 'fresh2'],
   );
+  // card-system slice 1 · todayQueue, the one queue every count and every session reads
+  const ids = (items) => Array.from(items, (i) => i.id);
+  const graded = (key, stBefore) => [1, key, 3, stBefore, 1, 0.9, 5, 5, 6, 5, 3, 2];
+  dueContext.S.srsPrefs = { newPerDay: 20, reviewsPerDay: 10 };
+  dueContext.S.stats = {};
+  dueContext.S.revlog = [];
+  let q = api.todayQueue(now);
+  // under the room: every due review, then the new cards the day and the review room allow
+  assert.deepEqual(ids(q.order), ['oldest', 'tieA', 'tieB', 'recent', 'fresh1', 'fresh2']);
+  assert.deepEqual([q.learn.length, q.review.length, q.new.length, q.held], [0, 4, 2, 0]);
+  // eight review-state grades today leave room for two: the most overdue two, two held back,
+  // and no new card (the review limit also caps new cards); learning and new grades spend nothing
+  dueContext.S.revlog = [
+    ...Array.from({ length: 8 }, () => graded('word:x', 2)),
+    graded('word:y', 0),
+    graded('word:z', 1),
+  ];
+  q = api.todayQueue(now);
+  assert.deepEqual(ids(q.order), ['oldest', 'tieA']);
+  assert.deepEqual([q.review.length, q.new.length, q.held], [2, 0, 2]);
+  // an undone grade gives its room back
+  dueContext.S.revlog = [...dueContext.S.revlog, [2, 'word:x', 0, 0]];
+  q = api.todayQueue(now);
+  assert.deepEqual(ids(q.order), ['oldest', 'tieA', 'tieB']);
+  assert.equal(q.held, 1);
+  // today only: a raised limit admits the held reviews, then new cards into what is left
+  dueContext.S.stats = { '2026-08-16': { extra: 3 } };
+  q = api.todayQueue(now);
+  assert.deepEqual(ids(q.order), ['oldest', 'tieA', 'tieB', 'recent', 'fresh1', 'fresh2']);
+  assert.equal(q.held, 0);
+  // a scope narrows the cards, never the room (three reviews left today: one review in scope,
+  // so two new places remain for the scope's new card)
+  dueContext.S.stats = {};
+  q = api.todayQueue(now, [{ t: 'word', id: 'recent' }, { t: 'word', id: 'fresh2' }]);
+  assert.deepEqual(ids(q.order), ['recent', 'fresh2']);
+  assert.equal(q.reviewRoom, 3);
+  // learning cards are never capped; with nothing else, one ripening within 20 minutes is served
+  dueContext.S = {
+    taken: [
+      { t: 'word', id: 'relearn', started: 1 },
+      { t: 'word', id: 'review', started: 1 },
+      { t: 'word', id: 'soon', started: 1 },
+      { t: 'word', id: 'later', started: 1 },
+    ],
+    srs: {
+      'word:relearn': { ...card(HOUR), state: 3 },
+      'word:review': card(HOUR),
+      'word:soon': { ...card(-10 * 60000), state: 1 },
+      'word:later': { ...card(-30 * 60000), state: 1 },
+    },
+    suspended: {},
+    stats: {},
+    revlog: Array.from({ length: 10 }, () => graded('word:x', 2)),
+    srsPrefs: { newPerDay: 0, reviewsPerDay: 10 },
+  };
+  q = api.todayQueue(now);
+  assert.deepEqual(ids(q.order), ['relearn']);
+  assert.deepEqual([q.learn.length, q.review.length, q.held], [1, 0, 1]);
+  dueContext.S.srs['word:relearn'] = card(-DAY);
+  q = api.todayQueue(now);
+  assert.deepEqual(ids(q.order), ['soon']);
+  assert.deepEqual([q.learn.length, q.held], [1, 1]);
 });
 
 await verifiedAsync('learner-fsrs-params-fail-closed-gate', async () => {
@@ -973,7 +1061,9 @@ function actionContext({ dict = {}, dictionaryIndex = null, rows = [] } = {}) {
     // D23: the word capture plan and what it reads (the saved answer and the explicit-cue validation)
     'plainRecord', 'nonEmptyString', 'srsKey', 'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity',
     'sameWordIdentity', 'wordStudied', 'wordCardIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'dictionaryRowBySeq',
-    'readerReadingFits', 'readerSummaryFor', 'dictionaryReadingSummaries', 'kataToHira', 'KATA_TO_HIRA_OFFSET'), context);
+    'readerReadingFits', 'readerSummaryFor', 'dictionaryReadingSummaries', 'kataToHira', 'KATA_TO_HIRA_OFFSET',
+    // e9bf1eba: the explicit-cue validation names the entry's kana form across scripts (entryKanaIndex)
+    'entryKanaIndex', 'kanaReadingKey', 'KANA_VOWEL_ROWS'), context);
   return { context, queued, acknowledge(save = true) {
     const next = queued.shift(); assert(next, 'An actual application action queued a save');
     const patch = next.produce(context.S);
@@ -1123,19 +1213,41 @@ await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-per
   assert.equal(PIN.enableFuzz, false); assert.equal(PIN.reviewTimePolicyId, 'append-order-monotonic-clamp-v1');
   const init = between('fsrsApi = window.__TSFSRS__', '  } catch (err) {');
   const tuned = { w: PIN.w.map((value, index) => index === 0 ? value + 0.01 : value), source: 'synthetic-personal', basedOnReviews: 50 };
+  const schedulerDefinitions = definitions('pinnedSchedulerInput', 'srsSchedulePolicy', 'buildSrsScheduler',
+    'syncSrsScheduler', 'SRS_PRESETS', 'SRS_PRESET_IDS', 'validPreset', 'validRetention', 'finiteNumber',
+    'RETENTION_MIN', 'RETENTION_MAX', 'REVIEWS_PER_DAY_MAX');
   for (const fitted of [undefined, tuned, { w: PIN.w.slice(0, 20) }]) {
     const notes = [];
     const context = vm.createContext({ fsrsApi: null, scheduler: null, srsParams: null, srsCustom: null,
       window: { __TSFSRS__: fsrs }, pin: clone(PIN), S: { srsPrefs: fitted === undefined ? {} : { fsrs: clone(fitted) } },
       srsParamsProblem: storeApi.srsParamsProblem, noteIgnoredSrsParams: (reason) => notes.push(reason),
+      D: { pin: clone(PIN) },
     });
-    vm.runInContext(definitions('pinnedSchedulerInput'), context);
+    vm.runInContext(schedulerDefinitions, context);
     await vm.runInContext('(async () => { ' + init + ' })()', context);
     assert(context.scheduler); assert.equal(context.srsParams.enable_fuzz, false);
     assert.equal(context.srsParams.request_retention, PIN.requestRetention);
     assert.equal(context.srsParams.maximum_interval, PIN.maximumInterval);
     assert.deepEqual(clone(context.srsParams.learning_steps), PIN.learningSteps);
     assert.deepEqual(clone(context.srsParams.relearning_steps), PIN.relearningSteps);
+    // card-system slice 1 · a preset's retention and learning steps rebuild the one scheduler in
+    // place; the weights (fitted or pinned), fuzz, maximum interval and relearning steps stay
+    const weights = clone(context.srsParams.w);
+    context.S.srsPrefs = { ...context.S.srsPrefs, preset: 'gentle', retention: 0.85 };
+    assert.equal(context.syncSrsScheduler(), true);
+    assert.equal(context.srsParams.request_retention, 0.85);
+    assert.deepEqual(clone(context.srsParams.learning_steps), ['10m']);
+    assert.deepEqual(clone(context.srsParams.w), weights);
+    assert.equal(context.srsParams.enable_fuzz, false);
+    assert.deepEqual(clone(context.srsParams.relearning_steps), PIN.relearningSteps);
+    assert.equal(context.syncSrsScheduler(), false, 'An unchanged policy never rebuilds');
+    context.S.srsPrefs = { ...context.S.srsPrefs, preset: 'custom:standard', retention: 0.9 };
+    assert.equal(context.syncSrsScheduler(), true);
+    assert.equal(context.srsParams.request_retention, 0.9);
+    assert.deepEqual(clone(context.srsParams.learning_steps), ['1m', '10m']);
+    assert.deepEqual(notes, fitted && fitted !== tuned ? ['length'] : [], 'A rebuild never re-notes ignored weights');
+    delete context.S.srsPrefs.preset; delete context.S.srsPrefs.retention;
+    context.syncSrsScheduler();
     assert.deepEqual(clone(context.srsParams.w), fitted === tuned ? tuned.w : PIN.w);
     if (fitted === tuned) assert.deepEqual(clone(context.srsCustom), { source: tuned.source, basedOnReviews: 50 });
     else assert.equal(context.srsCustom, null);
@@ -1146,17 +1258,29 @@ await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-per
   }
 });
 
-verified('bounded-standard-review-executes-a-frozen-scoped-sitting', () => {
+// card-system slice 1 replaced the frozen 20-card sitting: a session serves exactly todayQueue's
+// order — the number the button showed — and carries the day's held-back reviews as `deferred`.
+verified('standard-review-serves-exactly-today-queue-and-names-the-held-back', () => {
   const pool = Array.from({ length: 8 }, (_, id) => ({ t: 'word', id: String(id) }));
-  const context = vm.createContext({ S: { view: 'tray' }, srsDueItems: () => pool, srsReviewLimit: () => 3,
+  const calls = [];
+  const context = vm.createContext({ S: { view: 'tray' },
+    todayQueue: (now, scope) => {
+      calls.push(scope);
+      const order = scope ? pool.filter((row) => scope.some((item) => item.id === row.id)) : pool.slice(0, 5);
+      return { order, held: scope ? 0 : 3 };
+    },
     srsKey: (type, id) => type + ':' + id, render: () => {},
     // a DOM focus helper startReview calls after rendering; no scheduling effect
     focusKanjiReadingReview: () => {} });
   vm.runInContext(definitions('startReview'), context);
-  context.startReview(); assert.equal(context.S.review.queue.length, 3); assert.equal(context.S.review.deferred, 5);
+  context.startReview(); assert.equal(context.S.review.queue.length, 5); assert.equal(context.S.review.deferred, 3);
   assert.equal(pool.length, 8); assert.equal(context.S.review.declared, null); assert.equal(context.S.view, 'review');
-  context.startReview(pool.slice(4, 6)); assert.deepEqual(Array.from(context.S.review.queue, (row) => row.id), ['4', '5']);
-  assert.equal(context.S.review.deferred, 0);
+  assert.equal(context.S.review.scope, null); assert.equal(calls[0], null);
+  const scope = pool.slice(4, 6);
+  context.startReview(scope); assert.deepEqual(Array.from(context.S.review.queue, (row) => row.id), ['4', '5']);
+  assert.equal(context.S.review.deferred, 0); assert.equal(context.S.review.scope, scope); assert.equal(calls[1], scope);
+  // a click event is not a scope
+  context.startReview({ type: 'click' }); assert.equal(calls[2], null);
 });
 
 const evidenceDir = resolveCorridorEvidence();

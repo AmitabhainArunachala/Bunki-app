@@ -5,6 +5,7 @@
  * --require-skip / EXPERIENCE_REQUIRE_SKIP=1 makes combined SKIP coverage required.
  * Evaluation is READ ONLY: storage/DOM observations, never application interaction.
  */
+import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
@@ -44,7 +45,9 @@ page.on('dialog',async d=>{observations.push({type:'native-dialog',message:d.mes
 let serial=0;
 const sleep=ms=>page.waitForTimeout(ms);
 const visible=async s=>await page.locator(s).first().isVisible().catch(()=>false);
-const click=async s=>{await page.locator(s).first().click();await sleep(280);};
+// a door inside a closed menu, or inside the shelf's 学習ツール panel, is reached the way a learner reaches it: open the menu or
+// the panel's one Tools button (shared helper), then the door
+const click=async s=>{const target=page.locator(s).first();const where=await target.evaluate(n=>{const menu=n.closest('details');if(menu&&!menu.open)menu.querySelector(':scope > summary')?.click();return n.closest('#shelf-tools-panel')?'tools':'';});if(where==='tools')await openShelfTools(page);await target.click();await sleep(280);};
 const role=async name=>{await page.getByRole('button',{name}).first().click();await sleep(280);};
 const text=()=>page.locator('body').innerText();
 const state=async()=>{const s=await readAppRecord(page);return Object.fromEntries(['taken','srs','revlog','obslog','lessonsDone','mockDone','assessmentLibrary','lists','suspended'].map(k=>[k,s[k]??(k==='taken'||k.endsWith('log')?[]:{})]));};
@@ -232,7 +235,7 @@ try{
   assert.deepEqual(submittedAttempts(dismissed).find(attempt=>attempt.attemptId===pinned.attemptId),
    savedMockAttempt,'Done preserves the exact submitted practice attempt');
   await page.locator('main button[data-mock-set]').first().waitFor();
-  await click('#back');await page.locator('#levels-link').waitFor();
+  await click('#back');await page.locator('#levels-link').waitFor({ state: 'attached' });
  });
  await segment('E10-reference',async()=>{
   const before=await state();await click('#levels-link');await page.locator('#reference-library').waitFor();await shot('reference-overview','Reference includes complete bundled level collections independently of lessons');
@@ -262,7 +265,7 @@ try{
  });
  await segment('E16-settings',async()=>{
   await click('#theme-seal');await shot('world-picker','Exactly ten public worlds in consistent order');await page.locator('.world-picker .world-stone').nth(4).click();await sleep(450);await shot('shelf-dark','Dark world changes the whole shelf with legible controls');
-  await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.ok((await text()).includes('the bookshelf'));assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
+  await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.equal(await page.locator('.shelf-mast-title .en-inline').innerText(),'bookshelf');assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
   await page.keyboard.press('Tab');await shot('keyboard-focus-dark','Keyboard focus remains perceivable in dark palette');await page.setViewportSize({width:1280,height:900});await shot('shelf-desktop-dark','Desktop dark shelf has coherent hierarchy');await noOverflow('E19-shelf-desktop');await page.setViewportSize({width:390,height:844});
   await page.reload({waitUntil:'load'});await sleep(1200);await check('E18-palette-reload','Chosen dark world survives reload',async()=>assert.equal(await page.locator('html').getAttribute('data-theme'),'yoru'));await recoverShelf();await click('#tray');await shot('study-reloaded','Personal evidence and cards survive normal reload');
   await check('E18-state-reload','Review, lesson, exact submitted practice attempt and chosen card persist',async()=>{const s=await state();assert.equal(s.taken.length,1);assert.equal(s.revlog.length,afterReview.revlog.length);assert.ok(Object.keys(s.lessonsDone).length);assert.ok(savedMockAttempt);assert.deepEqual(submittedAttempts(s).find(attempt=>attempt.attemptId===savedMockAttempt.attemptId),savedMockAttempt);return `1 chosen item, ${s.revlog.length} review, ${Object.keys(s.lessonsDone).length} lesson, ${submittedAttempts(s).length} exact submitted practice attempt`;});await click('#back');

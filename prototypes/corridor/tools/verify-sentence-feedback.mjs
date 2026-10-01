@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -88,7 +89,7 @@ function unchanged(before, after, keys = ['taken', 'srs', 'revlog', 'stats', 'li
 }
 
 async function tutor(page) {
-  await shelf(page); await page.locator('#ai-link').click(); await page.locator('#chat-input').waitFor();
+  await shelf(page); await openShelfDoor(page, '#ai-link'); await page.locator('#chat-input').waitFor();
 }
 function draftFor(record, ref) { return record.teacherDrafts?.entries.find((draft) => draft.contextRef === ref); }
 async function savedDraft(page, ref, text) {
@@ -172,7 +173,7 @@ for (const engine of engines) for (const width of sizes) {
 
   try {
     await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
-    await page.locator('#source-inbox-link').click();
+    await openShelfDoor(page, '#source-inbox-link');
     const before = (await readAppRecordSnapshot(page)).record;
     await page.locator('#source-capture-title').fill('図書館での一日'); await page.locator('#source-capture-text').fill(TEXT);
     await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();

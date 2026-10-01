@@ -4,6 +4,8 @@
  */
 import {
   beginAttemptV2,
+  JLPT_SCORE_FACTS,
+  OFFICIAL_BLUEPRINTS,
   parseAttemptV2,
   parseFormVersion,
   scoreAttemptV2,
@@ -11,6 +13,13 @@ import {
 } from './modules/assessment-core.mjs';
 
 export { parseFormVersion };
+/** Published JLPT facts for one level: the result sections, pass mark and paper names, and the
+ * blueprint's official papers and times. Facts only; nothing here converts a raw score. */
+export function jlptOfficialFacts(level) {
+  const score = JLPT_SCORE_FACTS.find((row) => row.track === level);
+  const blueprint = OFFICIAL_BLUEPRINTS.find((row) => row.exam.family === 'jlpt' && row.exam.track === level);
+  return score && blueprint ? { score, blueprint } : null;
+}
 
 export const ASSESSMENT_LIBRARY_V2_LIMITS = Object.freeze({
   forms: 128, attempts: 5000, jsonCharacters: 96_000_000, jsonNodes: 4_000_000,
@@ -172,6 +181,20 @@ export function commandAssessmentV2(raw, options) {
   if (!attempt) fail('missing-attempt');
   const form = library.forms.find((candidate) => sameRef(candidate, attempt.form));
   const input = { ...options }; delete input.scope; delete input.attemptId;
+  if (input.action?.kind === 'dictionary-lookup') {
+    fields(input.action, ['kind', 'itemId']);
+    if (attempt.mode !== 'practice') fail('lookup-in-timed-mode');
+    if (attempt.status !== 'in-progress' || attempt.cursor.itemId !== input.action.itemId)
+      fail('lookup-not-current-item');
+    const answer = attempt.answers.find(row => row.item.id === input.action.itemId);
+    if (!answer?.reached) fail('lookup-before-visit');
+    if (options.expectedRevisionId !== attempt.revisionId) fail('stale-lookup');
+    if (assessmentDictionaryAssistanceV2(attempt, input.action.itemId)) return library;
+    // The existing event schema retains an exact item digest, including before
+    // an answer exists. Dictionary help does not disclose the key or lock an
+    // answer. This event survives export/reload without inventing a response.
+    input.action = { kind: 'assistance', reason: `dictionary:${answer.item.sha256}` };
+  }
   const updated = updateAttemptV2(form, attempt, input);
   // An unchanged revision is a no-op (terminal, or an explanation already recorded).
   if (updated === attempt || updated.revisionId === attempt.revisionId) return library;
@@ -212,10 +235,25 @@ export function selectAssessmentV2(raw, attemptId) {
   });
 }
 
-/** A local item mark (attempt answer) or its evidence copy. Nothing else is assistance. */
+/** Dictionary assistance is bound to the exact retained question digest. */
+function dictionaryEventFor(attempt, answer, event) {
+  return attempt?.mode === 'practice' && !!answer?.reached && attempt.conditions.includes('assisted') &&
+    event.kind === 'assistance' && event.detail === `dictionary:${answer.item.sha256}` &&
+    event.at >= attempt.startedAt && event.at <= attempt.recordedAt;
+}
+export function assessmentDictionaryAssistanceV2(attempt, itemId) {
+  const answer = attempt?.answers?.find(row => row.item.id === itemId);
+  const event = answer && attempt.events.find(row => dictionaryEventFor(attempt, answer, row));
+  return event ? { kind: 'dictionary', at: event.at } : null;
+}
+export function assessmentItemAssistanceV2(attempt, itemId) {
+  const mark = attempt?.answers?.find(row => row.item.id === itemId)?.assistance;
+  return mark ? { kind: mark.kind, at: mark.at } : assessmentDictionaryAssistanceV2(attempt, itemId);
+}
+/** A local mark or its evidence copy. Truthy stand-ins never count as help. */
 export function validAssessmentAssistanceMark(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value) &&
-    value.kind === 'explanation' && Number.isSafeInteger(value.at) && value.at >= 0;
+    ['explanation', 'dictionary'].includes(value.kind) && Number.isSafeInteger(value.at) && value.at >= 0;
 }
 /** The one enrollment rule: wrong, or correct and flagged or assisted. */
 export function assessmentFollowupEligible({ outcome, flagged, assisted }) {
@@ -235,8 +273,10 @@ export function assessmentResultItemEligible(item) {
 export function assessmentOutcomesV2(selected) {
   return selected.score.items.map(row => {
     const answer = selected.attempt.answers.find(entry => entry.item.id === row.itemId);
+    const assistance = ['correct', 'incorrect'].includes(row.result)
+      ? assessmentItemAssistanceV2(selected.attempt, row.itemId) : null;
     return { ...row, outcome: row.result, flagged: answer?.flagged === true,
-      ...(answer?.assistance ? { assistance: { kind: answer.assistance.kind, at: answer.assistance.at } } : {}) };
+      ...(assistance ? { assistance } : {}) };
   });
 }
 /** The why-sheet for one item. Null until that item's assistance is durably
@@ -261,24 +301,28 @@ export function selectAssessmentExplanationV2(raw, attemptId, itemId) {
 }
 /** Results partition over questions. A missing item mark is not proof of
  * independence. Assistance recorded without item attribution (the retained
- * aggregate `assisted` condition with no item mark, more assistance events than
- * marks, or the engine's carried `assistanceAttribution: 'unknown'` record from
- * a later explanation) makes attribution unknown, and the independent count is
- * then withheld (null). Only question counts are reported: an event count is not
- * a number of questions, and no missing count is invented. */
+ * aggregate `assisted` condition with no item mark or item-bound lookup, more
+ * assistance events than marks and item-bound lookups, or the engine's carried
+ * `assistanceAttribution: 'unknown'` record from a later explanation) makes
+ * attribution unknown, and the independent count is then withheld (null). Only
+ * question counts are reported: an event count is not a number of questions,
+ * and no missing count is invented. */
 export function assessmentIndependenceV2(selected) {
   if (!selected?.score) return null;
   let answered = 0, assisted = 0, assistedCorrect = 0, unanswered = 0;
   for (const row of selected.score.items) {
     if (['unanswered', 'not-reached'].includes(row.result)) { unanswered++; continue; }
     answered++;
-    if (selected.attempt.answers.find(entry => entry.item.id === row.itemId)?.assistance) {
+    if (assessmentItemAssistanceV2(selected.attempt, row.itemId)) {
       assisted++; if (row.result === 'correct') assistedCorrect++;
     }
   }
-  const events = selected.attempt.events.filter(entry => entry.kind === 'assistance').length;
-  const unknown = selected.attempt.assistanceAttribution === 'unknown' || events > assisted ||
-    selected.attempt.conditions.includes('assisted') && assisted === 0;
+  const { attempt } = selected;
+  const events = attempt.events.filter(entry => entry.kind === 'assistance');
+  const lookups = events.filter(entry => attempt.answers.some(answer => dictionaryEventFor(attempt, answer, entry))).length;
+  const marks = attempt.answers.filter(entry => entry.assistance).length;
+  const unknown = attempt.assistanceAttribution === 'unknown' || events.length - lookups > marks ||
+    attempt.conditions.includes('assisted') && marks === 0 && lookups === 0;
   return Object.freeze({ answered, assisted, assistedCorrect, unanswered,
     attribution: unknown ? 'unknown' : 'complete', independent: unknown ? null : answered - assisted });
 }

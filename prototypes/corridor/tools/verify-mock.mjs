@@ -17,6 +17,7 @@
  * Usage: node verify-mock.mjs
  */
 
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -215,16 +216,22 @@ async function main() {
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
 
   // the door stands on the shelf, beside the lessons
-  await page.waitForSelector('#mock-link', { timeout: 8000 });
-  await page.click('#mock-link');
+  await page.waitForSelector('#mock-link', { state: 'attached', timeout: 8000 });
+  await openShelfDoor(page, '#mock-link');
   await page.waitForSelector('.assessment-room #exam-legacy');
   await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
+  // since the 2026-10-01 polish pass 未確認 is said once for the page (every set is unchecked),
+  // not on each of the 25 rows; a row still wears it when the list mixes checked and unchecked
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
-    return { rows: rows.length, pending: document.querySelectorAll('.mock-pending').length };
+    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === '未確認');
+    const marked = rows.filter((r) => chips(r).length);
+    const page = chips(document.querySelector('#app main')).filter((c) => !c.closest('[data-mock-set]')).length;
+    return { rows: rows.length, rowMarks: marked.length, pageMarks: page };
   })()`);
-  check('earlier exercises retain all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
+  check('earlier exercises retain all 25 papers, and 未確認 is said once for the page, not on every row',
+    listing.rows === 25 && listing.pageMarks === 1 && listing.rowMarks === 0, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time
   await page.click('[data-mock-set="n5-01"]');
@@ -249,7 +256,7 @@ async function main() {
     { description: 'first saved practice question transition' });
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await page.click('#mock-link');
+  await openShelfDoor(page, '#mock-link');
   await page.waitForSelector('#mock-next', { timeout: 15000 });
   // The running paper also carries data-mock-set for identity; only buttons are catalog doors.
   const reentry = await page.evaluate(() => {
@@ -362,7 +369,7 @@ async function main() {
     quarantined: await quarantined(),
   };
   check('full submitted answers cross a reload whole without measured legacy grades', survived.rows === 0 && survived.responses === 18 && survived.done === true && survived.quarantined === false, JSON.stringify(survived));
-  await page.click('#mock-link');
+  await openShelfDoor(page, '#mock-link');
   await page.click('#mock-done');
   await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-history]');
@@ -390,7 +397,7 @@ async function main() {
   const lonely = await offline.newPage();
   await lonely.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await lonely.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await lonely.click('#mock-link');
+  await openShelfDoor(lonely, '#mock-link');
   await lonely.click('#exam-legacy');
   await lonely.waitForSelector('#mock-retry', { timeout: 10000 });
   const settledAt = attempts;

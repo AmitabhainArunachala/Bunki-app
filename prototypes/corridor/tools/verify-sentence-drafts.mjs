@@ -1,9 +1,11 @@
-/** Durable sentence drafts through the ordinary UI and real browser restarts.
+/** Durable sentence writing drafts through the ordinary UI and real browser restarts. Sentence
+ * listening waits for approved Kore/Charon clips, so its pending state is asserted instead.
  * Native records are output only. The separately named synthetic cases inject
  * storage/timing/recovery faults, never a reducer, successful write, playback
  * completion, learner response, or writer grant. This is bounded technical
  * evidence; it does not establish hearing, comprehension or learner acceptance.
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -46,7 +48,7 @@ const define = (name, body, fault = false) => definitions.push({ name, body, fau
 const SOURCE = { id: 'bunki-graded-n5-morning', title: '静かな朝', index: 9, word: '窓' };
 const LATER_SOURCE = { id: 'bunki-graded-n5-station', title: '駅で待つ時間', index: 120, word: '窓' };
 const PRODUCTION = '  私の部屋の窓を開けます。\n e\u0301 🚀　<draft>  ';
-const LISTENING = '  An open window, a blue sky and a cool breeze.\n e\u0301 🚀　<draft>  ';
+const OTHER = '  An open window, a blue sky and a cool breeze.\n e\u0301 🚀　<draft>  ';
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png', '.m4a': 'audio/mp4' };
 const privateKey = join(OUT, 'synthetic-localhost-key.pem'), certificate = join(OUT, 'synthetic-localhost-cert.pem');
@@ -211,10 +213,13 @@ async function resumeDraft(fixture, entryId, mode) {
   fixture.observations.push({ name: 'ordinary-library-draft-resume', key: [entryId, mode], focusedEditor: `sentence-${mode}-text`,
     nativeRootsUnchanged: true, focusedEditorInViewport: true });
 }
-async function listening(fixture) {
-  await fixture.page.locator('#sentence-listening-start').click(); await fixture.page.locator('#sentence-listening-text').waitFor();
+async function listeningPending(page) {
+  const pending = page.locator('#sentence-listening-pending'); await pending.waitFor();
+  assert.match(await pending.innerText(), /音声準備中 · Kore/u);
+  assert.equal(await page.locator('#sentence-add-listening, #sentence-listening-start').count(), 0,
+    'No listening control is offered before approved Kore/Charon sentence clips exist');
 }
-async function practiceFromSource(fixture, source = SOURCE, { addListening = true, savePlace = false } = {}) {
+async function practiceFromSource(fixture, source = SOURCE, { savePlace = false } = {}) {
   const page = fixture.page; await shelf(fixture);
   const sourceDoor = page.locator(`.shelf-item[data-passage="${source.id}"]:not([data-recommendation]) .shelf-open`);
   assert.equal(await sourceDoor.count(), 1, 'Source has one canonical bookshelf entry');
@@ -229,12 +234,18 @@ async function practiceFromSource(fixture, source = SOURCE, { addListening = tru
   await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
   await page.locator('#sentence-choose-cloze').uncheck(); await page.locator('#sentence-choose-production').check();
   await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
-  if (addListening) { await page.locator('#sentence-add-listening').click(); await page.locator('#sentence-listening-start').waitFor(); }
+  await listeningPending(page);
   const state = await readAppRecordSnapshot(page);
   const entry = state.record.sentencePractice.entries.find(row => row.context.sourceId === source.id && row.context.index === source.index);
   assert(entry); assert.equal(entry.context.title, source.title);
-  assert.deepEqual(entry.plan.contracts.map(row => row.skill), addListening ? ['meaning_to_production', 'audio_to_meaning'] : ['meaning_to_production']);
+  assert.deepEqual(entry.plan.contracts.map(row => row.skill), ['meaning_to_production']);
   return entry;
+}
+async function otherDraft(fixture, entryId) {
+  const other = await practiceFromSource(fixture, LATER_SOURCE);
+  const draft = await edit(fixture, other.plan.id, 'production', OTHER);
+  await openSaved(fixture, entryId);
+  return { entryId: other.plan.id, draft };
 }
 async function sourceDetour(fixture, mode, source = SOURCE) {
   const page = fixture.page, caller = mode === 'listening' ? 'sentence-listening-source' : 'learning-source-return';
@@ -360,19 +371,6 @@ function uncheckedResponse(state, submitted) {
   }
   return response;
 }
-async function playToEnd(fixture) {
-  const page = fixture.page;
-  const before = await page.evaluate(() => window.__sentenceDraftNativeAudio.filter(row => row.event === 'ended').length);
-  await page.locator('#sentence-listening-play').click();
-  await page.waitForFunction(count => window.__sentenceDraftNativeAudio.filter(row => row.event === 'ended' && row.src.startsWith('blob:') &&
-    row.trusted && row.ended && row.duration > 0).length > count, before, { timeout: 30000 });
-  const events = await page.evaluate(() => window.__sentenceDraftNativeAudio);
-  const ended = events.filter(row => row.event === 'ended').at(-1);
-  assert(ended.trusted && ended.ended && ended.currentTime >= ended.duration - 0.1);
-  assert(events.some(row => row.event === 'playing' && row.trusted && row.src === ended.src && row.at < ended.at));
-  assert.match(await page.locator('#sentence-listening-audio-status').textContent(), /sentence finished/u);
-  fixture.observations.push({ name: 'real-trusted-native-playback-ended', episode: fixture.episode, ended });
-}
 async function exportUi(fixture, label) {
   await tray(fixture);
   const before = await readAppRecordSnapshot(fixture.page), earliest = Date.now();
@@ -402,7 +400,7 @@ async function importUi(fixture, file) {
 
 define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   await shelf(fixture);
-  await fixture.page.locator('#airead-link').click(); await fixture.page.locator('#airead-startingLevel').selectOption('N5');
+  await openShelfDoor(fixture.page, '#airead-link'); await fixture.page.locator('#airead-startingLevel').selectOption('N5');
   await waitForAppRecord(fixture.page, record => record.readingSettings?.startingLevel === 'N5'); await fixture.page.locator('#back').click();
   const entry = await practiceFromSource(fixture, SOURCE, { savePlace: true }), id = entry.plan.id;
   fixture.entryId = id;
@@ -417,45 +415,17 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   // Subsequent draft neutrality starts after that ordinary navigation effect.
   unchangedExcept(baseline, productionReturned, ['sentenceDrafts', 'readerPos']); baseline = productionReturned;
 
-  await listening(fixture);
-  assert.equal(await fixture.page.locator('#sentence-listening-text').inputValue(), '');
-  assert.equal(await fixture.page.locator('#sentence-listening-transcript').count(), 0);
-  await fixture.page.locator('#sentence-listening-reveal').click();
-  const exposureOnly = await durableDraft(fixture, id, 'listening', '', { transcriptOpened: true });
-  const exposed = await snapshot(fixture, 'transcript-opened-without-typing');
-  unchangedExcept(baseline, exposed, ['sentenceDrafts']);
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), true);
-  await shot(fixture, 'transcript-opened-without-typing');
   await close(fixture); await launch(fixture); await resumeDraft(fixture, id, 'production');
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), PRODUCTION);
-  checkDraft(await snapshot(fixture, 'production-restored-before-any-save'), id, 'production', PRODUCTION, { revision: production.revision });
-  await listening(fixture);
-  await durableDraft(fixture, id, 'listening', '', { transcriptOpened: true, revision: exposureOnly.revision });
-  assert.equal(await fixture.page.locator('#sentence-listening-transcript').textContent(), entry.context.quote);
-  assert.match(await fixture.page.locator('main').textContent(), /transcript was opened while drafting this response/iu);
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), true);
-  assert.equal((await uiState(fixture)).nativeAudio.filter(row => row.event === 'ended').length, 0);
-  const listeningDraft = await edit(fixture, id, 'listening', LISTENING, { transcriptOpened: true });
-  assert.notEqual(listeningDraft.revision, exposureOnly.revision, 'Typing after exposure-only revision creates its own identity');
-  await sourceDetour(fixture, 'listening');
-  assert.equal(await fixture.page.locator('#sentence-listening-text').inputValue(), LISTENING);
-  await playToEnd(fixture);
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), false);
-  const beforeRestart = await snapshot(fixture, 'both-exact-drafts-and-real-playback-before-close');
+  const beforeRestart = await snapshot(fixture, 'production-restored-before-any-save');
   checkDraft(beforeRestart, id, 'production', PRODUCTION, { revision: production.revision });
-  checkDraft(beforeRestart, id, 'listening', LISTENING, { revision: listeningDraft.revision, transcriptOpened: true });
-  unchangedExcept(baseline, beforeRestart, ['sentenceDrafts']); await shot(fixture, 'listening-draft-before-browser-close');
+  unchangedExcept(baseline, beforeRestart); await listeningPending(fixture.page);
+  await shot(fixture, 'production-draft-and-pending-listening-before-browser-close');
   await close(fixture); await launch(fixture); await openSaved(fixture, id);
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), PRODUCTION);
-  await resumeDraft(fixture, id, 'listening');
-  assert.equal(await fixture.page.locator('#sentence-listening-text').inputValue(), LISTENING);
-  assert.equal(await fixture.page.locator('#sentence-listening-transcript').textContent(), entry.context.quote);
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), true, 'A real pre-close completed play gives no post-restart credit');
-  const restoredDrafts = await snapshot(fixture, 'listening-restored-text-exposure-and-zero-playback');
-  assert.equal(restoredDrafts.ui.nativeAudio.filter(row => row.event === 'ended').length, 0);
-  unchangedExcept(beforeRestart, restoredDrafts); await shot(fixture, 'restored-listening-requires-new-completed-play');
+  const restoredDrafts = await snapshot(fixture, 'production-restored-after-full-browser-close');
+  unchangedExcept(beforeRestart, restoredDrafts);
 
-  await fixture.page.locator('#sentence-practice-back').click(); await fixture.page.locator('#sentence-production-text').waitFor();
   await fixture.page.locator('#sentence-production-save').click();
   await waitForAppRecord(fixture.page, record => record.sentencePractice.responses.some(row => row.id === production.revision));
   await fixture.page.waitForFunction(() => document.getElementById('sentence-production-text')?.value === '');
@@ -464,53 +434,24 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   const written = await snapshot(fixture, 'explicit-production-save-consumes-submitted-identity');
   const writtenResponse = uncheckedResponse(written, production);
   checkDraft(written, id, 'production', PRODUCTION, { consumed: true, revision: production.revision });
-  checkDraft(written, id, 'listening', LISTENING, { revision: listeningDraft.revision, transcriptOpened: true });
   assert.equal(written.record.sentencePractice.responses.length, 1);
   unchangedExcept(restoredDrafts, written, ['sentenceDrafts', 'sentencePractice']);
   assert.deepEqual(written.record.sentencePractice.entries, baseline.record.sentencePractice.entries);
   assert.deepEqual(written.record.sentencePractice.grades, []);
   const nextProduction = await edit(fixture, id, 'production', PRODUCTION);
   assert.notEqual(nextProduction.revision, production.revision, 'A new same-text response draft is a distinct edit');
-  await listening(fixture);
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), true);
-  await playToEnd(fixture);
-  await fixture.page.locator('#sentence-listening-save').click(); await fixture.page.locator('#sentence-listening-start').waitFor();
-  assert.equal(await fixture.page.locator('#sentence-response-history-heading').getAttribute('tabindex'), '-1');
-  await focusedInViewport(fixture.page, 'sentence-response-history-heading');
-  fixture.observations.push({ name: 'ordinary-explicit-save-focus', mode: 'listening', newerListeningDraft: false,
-    target: 'sentence-response-history-heading', inViewport: true });
-  const listened = await snapshot(fixture, 'explicit-listening-save-preserves-production-mode');
-  uncheckedResponse(listened, listeningDraft);
-  assert.deepEqual(listened.record.sentencePractice.responses.find(row => row.id === writtenResponse.id), writtenResponse);
-  checkDraft(listened, id, 'listening', LISTENING, { consumed: true, revision: listeningDraft.revision, transcriptOpened: true });
-  checkDraft(listened, id, 'production', PRODUCTION, { revision: nextProduction.revision });
-  assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), PRODUCTION);
-  assert.equal(listened.record.sentencePractice.responses.length, 2); assert.deepEqual(listened.record.sentencePractice.grades, []);
-  unchangedExcept(written, listened, ['sentenceDrafts', 'sentencePractice']); await shot(fixture, 'unchecked-saves-preserve-the-other-mode');
+  await shot(fixture, 'unchecked-save-then-new-draft');
 
   const emptyProduction = await edit(fixture, id, 'production', '');
   assert.notEqual(emptyProduction.revision, nextProduction.revision);
-  await listening(fixture);
-  assert.equal(await fixture.page.locator('#sentence-listening-text').inputValue(), '');
-  assert.equal(await fixture.page.locator('#sentence-listening-transcript').count(), 0, 'A consumed response starts a fresh exercise without inherited exposure');
-  const nextListening = await edit(fixture, id, 'listening', '  A deliberately removed listening draft e\u0301 🚀  ');
-  await fixture.page.locator('#sentence-listening-reveal').click();
-  const reexposed = await durableDraft(fixture, id, 'listening', nextListening.text, { transcriptOpened: true });
-  assert.notEqual(reexposed.revision, nextListening.revision, 'Exposure participates in edit identity');
-  const emptyListening = await edit(fixture, id, 'listening', '', { transcriptOpened: true });
-  assert.notEqual(emptyListening.revision, reexposed.revision);
-  const cleared = await snapshot(fixture, 'deliberate-empty-revisions-before-close');
-  unchangedExcept(listened, cleared, ['sentenceDrafts']);
+  const cleared = await snapshot(fixture, 'deliberate-empty-revision-before-close');
+  unchangedExcept(written, cleared, ['sentenceDrafts']);
   await close(fixture); await launch(fixture); await openSaved(fixture, id);
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), '');
   assert.equal(await fixture.page.locator('#sentence-production-save').isDisabled(), true);
-  checkDraft(await snapshot(fixture, 'production-empty-restored'), id, 'production', '', { revision: emptyProduction.revision });
-  await listening(fixture);
-  assert.equal(await fixture.page.locator('#sentence-listening-text').inputValue(), '');
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), true);
   const recoveryBaseline = await snapshot(fixture, 'closed-profile-recovery-point-record');
-  checkDraft(recoveryBaseline, id, 'listening', '', { revision: emptyListening.revision, transcriptOpened: true });
-  unchangedExcept(cleared, recoveryBaseline); await shot(fixture, 'explicit-empty-listening-draft-survives-close');
+  checkDraft(recoveryBaseline, id, 'production', '', { revision: emptyProduction.revision });
+  unchangedExcept(cleared, recoveryBaseline); await shot(fixture, 'explicit-empty-production-draft-survives-close');
   assert.equal(recoveryBaseline.rows.filter(row => row.kind === 'operation').length, 1);
   await close(fixture);
   // This is a closed copy of one ordinarily evolved installation, containing
@@ -519,9 +460,7 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   cpSync(join(fixture.out, fixture.profile), join(fixture.out, 'profile-recovery-point'), { recursive: true, errorOnExist: true, force: false });
   await launch(fixture); await openSaved(fixture, id);
   await edit(fixture, id, 'production', '  Exported production after the local checkpoint.\n e\u0301 🚀  ');
-  await listening(fixture);
-  await edit(fixture, id, 'listening', '  Exported listening after the local checkpoint.\n e\u0301 🚀  ', { transcriptOpened: true });
-  const later = await practiceFromSource(fixture, LATER_SOURCE, { addListening: false });
+  const later = await practiceFromSource(fixture, LATER_SOURCE);
   const laterText = '  A previously absent sentence draft comes from the backup.\n 新しい文 e\u0301 🚀  ';
   const laterDraft = await edit(fixture, later.plan.id, 'production', laterText);
   const exported = await exportUi(fixture, 'sentence-drafts-actual-ui-backup');
@@ -552,10 +491,9 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   for (const kind of ['operation', 'actor', 'outbox']) assert.deepEqual(restored.rows.filter(row => row.kind === kind),
     recoveryBaseline.rows.filter(row => row.kind === kind), `Restore preserves the already authored ${kind} history without allocating it twice`);
   checkDraft(restored, id, 'production', '', { revision: emptyProduction.revision });
-  checkDraft(restored, id, 'listening', '', { revision: emptyListening.revision, transcriptOpened: true });
   checkDraft(restored, later.plan.id, 'production', laterText, { revision: laterDraft.revision });
   fixture.observations.push({ name: 'legitimate-same-installation-local-restore', checkpointRevision: recoveryBaseline.revision,
-    currentEmptyRowsRetained: 2, absentDraftImported: later.plan.id, existingOperationRetainedOnce: true, freshDeviceRecovery: 'not exercised' });
+    currentEmptyRowsRetained: 1, absentDraftImported: later.plan.id, existingOperationRetainedOnce: true, freshDeviceRecovery: 'not exercised' });
   await openSaved(fixture, later.plan.id); assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), laterText);
   const warmedSource = await sourceDetour(fixture, 'production', LATER_SOURCE);
   const expectedOfflineRecord = { ...expectedRecord, readerPos: { ...expectedRecord.readerPos, [LATER_SOURCE.id]: warmedSource.click.scroll } };
@@ -568,20 +506,16 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
     'Full offline startup retains every post-warmup record root exactly');
   await openSaved(fixture, id);
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), '');
-  await listening(fixture);
-  assert.equal(await fixture.page.locator('#sentence-listening-text').inputValue(), '');
-  assert.equal(await fixture.page.locator('#sentence-listening-transcript').textContent(), entry.context.quote);
-  assert.equal(await fixture.page.locator('#sentence-listening-save').isDisabled(), true);
+  await listeningPending(fixture.page);
   await openSaved(fixture, later.plan.id);
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), laterText);
   const offlineSource = await sourceDetour(fixture, 'production', LATER_SOURCE); await shot(fixture, 'full-browser-offline-restart-restored-draft');
   const offline = await snapshot(fixture, 'restored-offline-exact-record');
   assert.deepEqual(offline.record, { ...expectedOfflineRecord, readerPos: { ...expectedOfflineRecord.readerPos, [LATER_SOURCE.id]: offlineSource.click.scroll } });
-  assert.deepEqual(offline.record.sentencePractice.responses, listened.record.sentencePractice.responses);
+  assert.deepEqual(offline.record.sentencePractice.responses, written.record.sentencePractice.responses);
   assert.deepEqual(offline.record.sentencePractice.grades, []); assert.deepEqual(offline.record.srs, {}); assert.deepEqual(offline.record.revlog, []);
-  fixture.observations.push({ name: 'ordinary-draft-boundary', exactMultilineUnicode: true, modesIndependent: true,
-    transcriptOpenedWithoutTypingSurvivedRestart: true, completedPlayNotPersisted: true, explicitUncheckedSaves: 2,
-    stableResponseIds: [production.revision, listeningDraft.revision], currentEmptyRevisions: [emptyProduction.revision, emptyListening.revision],
+  fixture.observations.push({ name: 'ordinary-draft-boundary', exactMultilineUnicode: true, listeningPendingKore: true,
+    explicitUncheckedSaves: 1, stableResponseIds: [production.revision], currentEmptyRevisions: [emptyProduction.revision],
     offline: fixture.engine === 'webkit' ? 'HTTPS listener disconnected before full browser reopen' : 'Chromium offline before full browser reopen',
     noGradesOrScheduling: true, fullLearnerJourney: 'not claimed', hearingOrComprehension: 'not claimed' });
 });
@@ -644,8 +578,7 @@ function pendingRecovery(ui, entryId, mode) {
 }
 define('synthetic-delayed-response-a-b-a-and-empty', async fixture => {
   const entry = await practiceFromSource(fixture), id = entry.plan.id;
-  await listening(fixture); const other = await edit(fixture, id, 'listening', LISTENING);
-  await fixture.page.locator('#sentence-practice-back').click(); await fixture.page.locator('#sentence-production-text').waitFor();
+  const other = await otherDraft(fixture, id);
   const aText = '  A submitted sentence returns to the same exact bytes.\n 窓 e\u0301 🚀  ';
   for (const [label, finalText] of [['same-text', aText], ['explicit-empty', '']]) {
     const submitted = await edit(fixture, id, 'production', aText);
@@ -656,7 +589,7 @@ define('synthetic-delayed-response-a-b-a-and-empty', async fixture => {
     const held = await responseFault(fixture); assert.equal(held.durable, false); assert.equal(held.aborted, false);
     uncheckedResponse({ record: held.record }, submitted);
     checkDraft({ record: held.record }, id, 'production', aText, { consumed: true, revision: submitted.revision });
-    assert.deepEqual(held.record.sentenceDrafts.entries.find(row => row.entryId === id && row.mode === 'listening'), other);
+    assert.deepEqual(held.record.sentenceDrafts.entries.find(row => row.entryId === other.entryId && row.mode === 'production'), other.draft);
     assert.equal(await fixture.page.locator('#sentence-production-text').evaluate(node => node.readOnly), false,
       'New draft edits must remain real UI input while the explicit response is pending');
     await shot(fixture, `${label}-actual-native-save-held`);
@@ -718,7 +651,7 @@ define('synthetic-delayed-response-a-b-a-and-empty', async fixture => {
     const response = uncheckedResponse(reopened, submitted);
     assert.deepEqual(response, committed.record.sentencePractice.responses.find(row => row.id === submitted.revision));
     assert.equal(reopened.record.sentencePractice.responses.length, before.record.sentencePractice.responses.length + 1);
-    checkDraft(reopened, id, 'listening', LISTENING, { revision: other.revision });
+    checkDraft(reopened, other.entryId, 'production', OTHER, { revision: other.draft.revision });
     unchangedExcept(before, reopened, ['sentencePractice', 'sentenceDrafts']);
     assert.deepEqual(reopened.record.sentencePractice.grades, []);
     await shot(fixture, `${label}-newer-draft-preserved-after-held-save`);
@@ -728,8 +661,7 @@ define('synthetic-delayed-response-a-b-a-and-empty', async fixture => {
 define('synthetic-draft-quota-retains-recovery-and-other-mode', async fixture => {
   const entry = await practiceFromSource(fixture), id = entry.plan.id;
   const production = await edit(fixture, id, 'production', PRODUCTION);
-  await listening(fixture); const other = await edit(fixture, id, 'listening', LISTENING);
-  await fixture.page.locator('#sentence-practice-back').click(); await fixture.page.locator('#sentence-production-text').waitFor();
+  const other = await otherDraft(fixture, id);
   const before = await snapshot(fixture, 'quota-before-native-write-fault');
   await armRecordWriteFailure(fixture.page, 'quota', { roots: ['sentenceDrafts'] });
   const text = '  Draft kept through a real native quota failure.\n 窓 e\u0301 🚀  ';
@@ -741,7 +673,7 @@ define('synthetic-draft-quota-retains-recovery-and-other-mode', async fixture =>
   const failed = await snapshot(fixture, 'quota-failed-native-record-and-retained-journal');
   assert.deepEqual(failed.rows, before.rows, 'The real failed draft transaction leaves every native row unchanged');
   checkDraft(failed, id, 'production', PRODUCTION, { revision: production.revision });
-  checkDraft(failed, id, 'listening', LISTENING, { revision: other.revision });
+  checkDraft(failed, other.entryId, 'production', OTHER, { revision: other.draft.revision });
   const latest = pendingRecovery(failed.ui, id, 'production').latest;
   assert.equal(latest.text, text); assert.equal(failed.ui.editors.production.text, text);
   assert.equal(failed.ui.editors.production.status.state, 'unavailable');
@@ -751,7 +683,7 @@ define('synthetic-draft-quota-retains-recovery-and-other-mode', async fixture =>
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), text);
   await durableDraft(fixture, id, 'production', text, { revision: latest.revision });
   const reopened = await snapshot(fixture, 'quota-recovery-acknowledged-after-new-browser-owner');
-  checkDraft(reopened, id, 'listening', LISTENING, { revision: other.revision });
+  checkDraft(reopened, other.entryId, 'production', OTHER, { revision: other.draft.revision });
   unchangedExcept(before, reopened, ['sentenceDrafts']); await shot(fixture, 'quota-recovered-draft-after-close');
 }, true);
 
@@ -832,8 +764,7 @@ async function resolveRecovery(fixture, entryId, mode, choice) {
 define('synthetic-recovery-conflicts-and-unavailable-slots', async fixture => {
   const entry = await practiceFromSource(fixture), id = entry.plan.id;
   await edit(fixture, id, 'production', '  The original durable sentence draft.  ');
-  await listening(fixture); const other = await edit(fixture, id, 'listening', LISTENING);
-  await fixture.page.locator('#sentence-practice-back').click(); await fixture.page.locator('#sentence-production-text').waitFor();
+  const other = await otherDraft(fixture, id);
   const candidateText = '  An older unfinished recovery candidate.\n 窓 e\u0301 🚀  ';
   await fixture.page.locator('#sentence-production-text').fill(candidateText);
   const candidateUi = await uiState(fixture), candidate = pendingRecovery(candidateUi, id, 'production').latest;
@@ -857,9 +788,9 @@ define('synthetic-recovery-conflicts-and-unavailable-slots', async fixture => {
   await durableDraft(fixture, id, 'production', candidateText);
   assert.equal(await fixture.page.locator('#sentence-production-text').inputValue(), candidateText);
   const resolved = await snapshot(fixture, 'explicit-use-only-resolves-selected-tuple');
-  checkDraft(resolved, id, 'listening', LISTENING, { revision: other.revision }); unchangedExcept(beforeUse, resolved, ['sentenceDrafts']);
+  checkDraft(resolved, other.entryId, 'production', OTHER, { revision: other.draft.revision }); unchangedExcept(beforeUse, resolved, ['sentenceDrafts']);
   fixture.observations.push({ name: 'explicit-conflict-choices', key: [id, 'production'], olderCandidateRevision: candidate.revision,
-    retainedSavedRevision: current.revision, unrelatedListeningRevision: other.revision, noLearningEffects: true });
+    retainedSavedRevision: current.revision, unrelatedDraftRevision: other.draft.revision, noLearningEffects: true });
   const foreign = JSON.parse(stale); foreign.installation = 'synthetic-foreign-installation-not-a-writer-grant';
   for (const [label, raw] of [['foreign', JSON.stringify(foreign)], ['malformed', '{"version":1,"entries":[ retain these malformed bytes']]) {
     const beforeFault = await injectRecovery(fixture, raw, label); await openSaved(fixture, id);
@@ -871,7 +802,7 @@ define('synthetic-recovery-conflicts-and-unavailable-slots', async fixture => {
     await close(fixture); await launch(fixture, { protectedState: true }); await openSaved(fixture, id);
     const reopened = await snapshot(fixture, `${label}-slot-after-full-browser-restart`);
     assert.equal(reopened.ui.recovery.text, raw); assert.deepEqual(reopened.rows, beforeFault.rows);
-    checkDraft(reopened, id, 'listening', LISTENING, { revision: other.revision });
+    checkDraft(reopened, other.entryId, 'production', OTHER, { revision: other.draft.revision });
   }
 }, true);
 
@@ -933,7 +864,7 @@ try {
     limitations: ['Headless persistent Chromium/WebKit profiles at the recorded viewport sizes. Actual browser close/reopen is distinct from a page reload.',
       'Ordinary cases use actual visible source/practice/export/import controls. IndexedDB and local recovery are read as output; no learner roots are seeded.',
       'Only separately named fault profiles inject native write timing/quota or exact local recovery bytes. Those controls are not ordinary-user observations.',
-      'Native trusted ended events follow real recorded playback. The verifier never injects ended, changes playback rate, seeks, or substitutes a clock.',
+      'Sentence listening is locked to the Kore/Charon roster; until approved clips exist its drafts are not reachable through the UI, and the pending state is asserted instead.',
       'Local restore uses a closed checkpoint of the same installation after one real reading-place operation. It does not exercise fresh-device enrollment or recovery.',
       'Root-authored text is test input. These checks do not establish hearing, comprehension, recording/transcript alignment, a full human journey, or learner acceptance.',
       'Only assertions reached before a recorded failure phase executed in a failing case.'] };

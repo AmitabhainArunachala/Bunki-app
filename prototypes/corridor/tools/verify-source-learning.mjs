@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -57,7 +58,7 @@ async function frontDoor(page) {
   if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
     await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
   }
-  await page.locator('#source-inbox-link').click(); await page.locator('#source-capture-text').waitFor();
+  await openShelfDoor(page, '#source-inbox-link'); await page.locator('#source-capture-text').waitFor();
 }
 async function assertSourceReadable(page) {
   // Inspect the generated texture actually painted beneath the text, not just
@@ -70,21 +71,31 @@ async function assertSourceReadable(page) {
     const paper = getComputedStyle(document.body, '::before');
     const body = getComputedStyle(document.body), text = getComputedStyle(document.querySelector('#source-reader-body'));
     const rgb = (value) => value.match(/[\d.]+/gu).slice(0, 3).map(Number);
-    let pixel = [...rgb(body.backgroundColor), 255];
-    if (paper.backgroundImage !== 'none') {
-      const source = paper.backgroundImage.slice(4, -1).replace(/^['"]|['"]$/gu, '');
+    // Every url() layer of the paper (washi fibre over the living paper since a6810094), each
+    // averaged over its own pixels and composited top over bottom as CSS paints them.
+    const sources = [...paper.backgroundImage.matchAll(/url\("((?:[^"\\]|\\.)*)"\)/gu)]
+      .map((match) => match[1].replace(/\\(.)/gu, '$1'));
+    let pixel = [0, 0, 0, 0];
+    for (const source of sources.reverse()) {
       const image = new Image(); image.src = source; await image.decode();
-      const canvas = document.createElement('canvas'); canvas.width = 1; canvas.height = 1;
-      const draw = canvas.getContext('2d'); draw.drawImage(image, 0, 0, 1, 1);
-      pixel = [...draw.getImageData(0, 0, 1, 1).data];
+      const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
+      const draw = canvas.getContext('2d'); draw.drawImage(image, 0, 0, 64, 64);
+      const data = draw.getImageData(0, 0, 64, 64).data, sum = [0, 0, 0, 0];
+      for (let i = 0; i < data.length; i += 4) {
+        const a = data[i + 3] / 255;
+        sum[0] += data[i] * a; sum[1] += data[i + 1] * a; sum[2] += data[i + 2] * a; sum[3] += a;
+      }
+      const layerAlpha = sum[3] / (data.length / 4), under = pixel[3] * (1 - layerAlpha), total = layerAlpha + under;
+      pixel = total ? [0, 1, 2].map((c) => ((sum[3] ? sum[c] / sum[3] : 0) * layerAlpha + pixel[c] * under) / total).concat(total)
+        : [0, 0, 0, 0];
     }
-    const alpha = Number(paper.opacity) * pixel[3] / 255, ground = rgb(body.backgroundColor);
+    const alpha = Number(paper.opacity) * pixel[3], ground = rgb(body.backgroundColor);
     const background = ground.map((channel, index) => channel * (1 - alpha) + pixel[index] * alpha);
     const luminance = (color) => color.map((c) => c / 255).map((c) => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
       .reduce((sum, c, index) => sum + c * [.2126, .7152, .0722][index], 0);
     const a = luminance(rgb(text.color)), b = luminance(background);
     return { text: text.color, nominalGround: body.backgroundColor, paperPixel: pixel,
-      paperOpacity: paper.opacity, texturePresent: paper.backgroundImage !== 'none', background, contrast: (Math.max(a, b) + .05) / (Math.min(a, b) + .05) };
+      paperOpacity: paper.opacity, texturePresent: sources.length > 0, layers: sources.length, background, contrast: (Math.max(a, b) + .05) / (Math.min(a, b) + .05) };
   });
   assert(rendered.contrast >= 4.5, `Saved-source text contrast is ${rendered.contrast.toFixed(2)}:1 against its actual paper`);
   return rendered;

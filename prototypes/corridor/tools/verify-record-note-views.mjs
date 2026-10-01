@@ -162,7 +162,9 @@ async function rendered(page) {
       versions: [...article.querySelectorAll('.record-note-version')].map((version) => ({
         payloadSha256: version.dataset.payloadSha256, copyCount: version.dataset.copyCount,
         segments: [...version.querySelectorAll('.record-note-segment')].map((segment) => ({
-          kind: segment.dataset.segmentKind, text: segment.textContent, childElements: segment.childElementCount,
+          // elements the note's own bytes could have made; the app's lookup doors on Japanese words are chrome
+          kind: segment.dataset.segmentKind, text: segment.textContent,
+          childElements: [...segment.querySelectorAll('*')].filter((child) => !(child.matches('span.japanese-lookup-text') && child.parentElement === segment) && !(child.matches('button.japanese-lookup-word') && child.parentElement?.matches('span.japanese-lookup-text') && !child.childElementCount)).length,
         })),
       })),
     })) };
