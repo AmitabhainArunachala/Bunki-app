@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -64,7 +65,7 @@ async function shelf(page) {
       continue;
     }
     if (view === 'shelf') {
-      await page.locator('#source-inbox-link').waitFor();
+      await page.locator('#source-inbox-link').waitFor({ state: 'attached' });
       return;
     }
     if (await page.locator('#ginga-symbol').isVisible()) {
@@ -83,7 +84,7 @@ async function shelf(page) {
 async function inbox(page) {
   if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
     await shelf(page);
-    await page.locator('#source-inbox-link').click();
+    await openShelfDoor(page, '#source-inbox-link');
   }
   await page.locator('#source-capture-save').waitFor();
 }

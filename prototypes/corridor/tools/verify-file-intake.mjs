@@ -1,4 +1,5 @@
 /** Persistent normal-control file intake checks. Native chooser and viewer are explicit fixtures; the compiled Vision/PDFKit helper processes real synthetic file bytes. No native GUI or full learner acceptance. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -63,7 +64,7 @@ async function frontDoor(page) {
   if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
     await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
   }
-  await page.locator('#source-inbox-link').click(); await page.locator('#source-capture-text').waitFor();
+  await openShelfDoor(page, '#source-inbox-link'); await page.locator('#source-capture-text').waitFor();
 }
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
@@ -94,7 +95,7 @@ async function inbox(page) {
     if (!await page.locator('#source-inbox-link').count()) {
       await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
     }
-    await page.locator('#source-inbox-link').click();
+    await openShelfDoor(page, '#source-inbox-link');
   }
   await page.locator('#source-capture-save').waitFor();
 }

@@ -1,6 +1,7 @@
 /** Bundled reading, recursive exploration and explicit practice through normal
  * controls. Persistent profiles, real record output, no injected learner state
  * or provider responses. This is a scoped technical subjourney. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -127,7 +128,7 @@ for (const engine of engines) for (const width of sizes) {
   try {
     await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     const initial = await snapshot('initial'); assert.deepEqual(initial.taken, []); assert.deepEqual(initial.srs, {});
-    await page.locator('#airead-link').click(); await page.locator('#airead-startingLevel').selectOption('N5');
+    await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
     await waitForAppRecord(page, record => record.readingSettings?.startingLevel === 'N5');
     assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
     await page.locator('#back').click();

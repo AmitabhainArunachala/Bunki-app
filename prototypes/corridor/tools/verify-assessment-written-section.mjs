@@ -1,6 +1,7 @@
 /** Walk the public written pack through the unmodified staged app. All learner
  * actions use DOM controls; storage is observed independently through real IDB.
  * No catalog replacement, export shim, source mutation, or model call is used. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -367,10 +368,8 @@ async function fit(page, label) {
 }
 /** The room lists one level at a time; press this section's level only if it is not current. */
 async function openAssessmentDoor(page) {
-  const tools = page.locator('details.shelf-study-tools');
-  if (await tools.count() && !await tools.evaluate(element => element.open))
-    await tools.locator('summary').click();
-  await page.locator('#mock-link').click();
+  // the JLPT door sits in the shelf's 学習ツール panel; the shared helper opens it, then the door
+  await openShelfDoor(page, '#mock-link');
 }
 async function selectLevel(page, level) {
   const control = page.locator(`[data-exam-level="${level}"]`);
@@ -523,7 +522,7 @@ const paperEntry = catalog.entries.find((row) => row.id === 'kairo-original-jlpt
 const paperForm = paperEntry && JSON.parse(readFileSync(resolve(site, 'data/assessment', paperEntry.formPath), 'utf8'));
 async function officialPaperCase(page, engine) {
   assert(paperEntry?.timingAuthority === 'official-fact', 'The N3 written test is bound to the official papers');
-  await page.locator('#mock-link').click();
+  await openShelfDoor(page, '#mock-link');
   await selectLevel(page, 'N3');
   const card = page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}]`);
   assert.match(await card.locator('.exam-form-timing').innerText(), /言語知識（文字・語彙） 30 min \/ 言語知識（文法）・読解 70 min/u);
@@ -583,7 +582,7 @@ async function officialPaperCase(page, engine) {
 // Study mode on the same paper: the 問題 heading's number and 大問 name are lookup words, and the
 // heading is still ONE Tab stop (R4), the same as every other prose block.
 async function officialPaperStudyHeading(page) {
-  await page.locator('#mock-link').click();
+  await openShelfDoor(page, '#mock-link');
   await selectLevel(page, 'N3');
   await page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}] [data-exam-start]`).click();
   await page.locator('#exam-practice-start').click();

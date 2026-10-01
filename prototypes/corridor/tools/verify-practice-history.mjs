@@ -3,6 +3,7 @@
  * explicitly provision synthetic native admission/operation-only transport;
  * adversarial operation, network and storage premises are labeled separately.
  * No test pairing establishes real account or cross-device authority. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import { execFileSync } from 'node:child_process';
@@ -298,7 +299,7 @@ async function waitSelected(page, predicate, description) {
   return value;
 }
 async function door(page) {
-  await page.locator('#mock-link').click();
+  await openShelfDoor(page, '#mock-link');
   await page.waitForSelector('#exam-legacy, button[data-mock-set="n5-01"], #mock-next, #mock-done');
   if (await page.locator('#exam-legacy').count()) await page.locator('#exam-legacy').click();
   await page.waitForSelector('button[data-mock-set="n5-01"], #mock-next, #mock-done');

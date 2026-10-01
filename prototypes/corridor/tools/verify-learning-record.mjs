@@ -1,6 +1,7 @@
 /** Controlled acknowledgment tests of the actual authored learning handlers.
  * Frozen synthetic roots detect premature mutation. This verifies the UI save
  * contract; RecordApp/Host suites separately exercise real browser storage. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -1048,7 +1049,7 @@ async function browserChecks() {
     assert.fail('Expected native persisted learner state did not arrive');
   };
   const finishLesson = async (page, reject = false) => {
-    await page.locator('#lessons-link').click(); await page.locator('.lesson-row').first().click();
+    await openShelfDoor(page, '#lessons-link'); await page.locator('.lesson-row').first().click();
     let learned = 0;
     while (await page.locator('.lesson-option').count() === 0) {
       assert(learned++ < 12); await page.locator('#lesson-next').click();
@@ -1132,14 +1133,14 @@ async function browserChecks() {
           assert.deepEqual(enrolled.srs, before.srs); assert.deepEqual(enrolled.revlog, before.revlog); assert.deepEqual(enrolled.futureRoot, before.futureRoot);
         });
         await journey('practice-answer-rejection-keeps-the-question-unanswered', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await openShelfDoor(page, '#mock-link'); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').waitFor(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('[data-mock-opt="0"]').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
           assert.equal(await page.locator('#mock-next').isDisabled(), true);
           assert.equal(await page.locator('[data-mock-opt][aria-pressed="true"]').count(), 0);
         });
         await journey('practice-navigation-rejection-keeps-the-acknowledged-answer-and-question', async (page) => {
-          await boot(page); await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
+          await boot(page); await openShelfDoor(page, '#mock-link'); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
           await page.locator('[data-mock-opt="0"]').click(); await page.locator('[data-mock-opt="0"][aria-pressed="true"]').waitFor();
           const question = await page.locator('.mock-q').textContent(); const before = await fault(page, 'assessmentLibrary');
           await page.locator('#mock-next').click(); await failed(page, before);

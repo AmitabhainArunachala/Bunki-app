@@ -15,6 +15,7 @@
  * Usage: node verify-corridor.mjs [--shots DIR] [--keep-open]
  */
 
+import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -279,6 +280,7 @@ async function walkToSemPanel(page, tapFn) {
   // kanji 時 is graph-rich. dispatchEvent rather than a CDP touch — this hop
   // is navigation plumbing (the dial probe sets the precedent), and the
   // thesaurus list's post-paint settle has landed touches on the wrong row.
+  await openShelfTools(page);
   await tapFn(page, '#thesaurus-link');
   await page.waitForSelector('.thes-head');
   await page.evaluate(`(() => {
@@ -1531,6 +1533,7 @@ async function main() {
   // the radical picker is the densest tap grid in the app, and the shelf/panel
   // sweep above never enters the kanjidex — its chips are measured by name
   await open('?entry=shelf');
+  await openShelfTools(page);
   await tap(page, '#kanjidex-link');
   await page.waitForSelector('.kdx-row', { timeout: 5000 });
   // The entrance translation can round a 44px box below 44; measure the settled grid.
@@ -1710,6 +1713,7 @@ async function main() {
   // ------------------------------------------------- v1.2 operator round 3
   console.log('\n— v1.2 · dictionary depth, grammar, lists, quiet surfaces');
   await open('?entry=shelf');
+  await openShelfTools(page);
   await tap(page, '#grammar-link');
   await page.waitForTimeout(250);
   const grammarIndex = await page.locator('[data-grammar]').count();
@@ -3337,7 +3341,8 @@ async function main() {
 
   // (c) back from a lesson run restores the learner's place in the long list
   await open('?entry=shelf');
-  await page.waitForSelector('#lessons-link');
+  await page.waitForSelector('#lessons-link', { state: 'attached' });
+  await openShelfTools(page);
   await tap(page, '#lessons-link');
   await page.waitForSelector('.lesson-row');
   await page.evaluate(`(() => {
@@ -3987,7 +3992,8 @@ async function main() {
   // holds the one explicit door — per word or all — and only that choice mints
   await restoreAppFixture(page, { v: 1, taken: [] });
   await open('?entry=shelf');
-  await page.waitForSelector('#lessons-link');
+  await page.waitForSelector('#lessons-link', { state: 'attached' });
+  await openShelfTools(page);
   await tap(page, '#lessons-link');
   await page.waitForSelector('.lesson-row');
   const lessonBreadth = await page.evaluate(`({

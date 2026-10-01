@@ -1,5 +1,6 @@
 /** Actual reader/provider/storage journeys. Synthetic output demonstrates the
  * integration contract, not Japanese editorial quality or live model quality. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -86,7 +87,7 @@ const preservedLearning = (value) => {
 try {
   await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#airead-link').click();
+  await openShelfDoor(page, '#airead-link');
   await page.locator('#airead-interests').fill('科学、歴史、自然');
   await page.locator('#airead-startingLevel').selectOption('N2');
   await page.locator('#airead-genre').selectOption('essay');
@@ -130,7 +131,7 @@ try {
   const reloaded = await record();
   assert.deepEqual(reloaded.aiReading, first.aiReading);
   assert.deepEqual(reloaded.readingSettings, first.readingSettings);
-  await page.locator('#airead-link').click();
+  await openShelfDoor(page, '#airead-link');
   await page.locator('#airead-preferences').evaluate((element) => { element.open = true; });
   assert.equal(await page.locator('#airead-interests').inputValue(), '科学、歴史、自然');
   assert.equal(await page.locator('#airead-startingLevel').inputValue(), 'N2');
@@ -178,7 +179,7 @@ try {
   await page.reload();
   await page.waitForFunction(() => document.body.dataset.ready === '1');
   assert.equal(await page.locator('#airead-link').count(), 1, 'saved readings remain reachable without a provider key');
-  await page.locator('#airead-link').click();
+  await openShelfDoor(page, '#airead-link');
   assert.equal(await page.locator('#airead-make').isDisabled(), true);
   assert.equal(await page.locator('#airead-title').textContent(), replacement.aiReading.readingVersion.candidate.article.title);
   assert.equal(requests.length, callsBeforeKeyRemoval, 'reopening saved content makes no provider request');

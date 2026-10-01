@@ -1,5 +1,6 @@
 /** Real origin Web Locks, RecordController and IndexedDB. Every profile and
  * command below is an isolated synthetic fixture, never account authorization. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import process from 'node:process';
@@ -483,7 +484,7 @@ async function uiNative(page) {
 async function openUiPractice(page) {
   await page.goto(`${origin}/index.html?entry=shelf&ui=bi`);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#mock-link').click(); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
+  await openShelfDoor(page, '#mock-link'); await page.locator('#exam-legacy').click(); await page.locator('[data-mock-set="n5-01"]').click();
   await page.locator('[data-mock-opt="0"]').waitFor();
   await waitForAppRecord(page, (record) => record.assessmentLibrary?.attempts.some((attempt) => attempt.status === 'in-progress'));
 }
@@ -508,7 +509,7 @@ test('rendered-new-library-owned-scope-and-submission', async (page) => {
   assert.deepEqual(recordOf(after).obslog, recordOf(before).obslog); assert.deepEqual(recordOf(after).srs, recordOf(before).srs);
   await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1'); const reopened = await uiNative(page);
   assert.deepEqual(reopened, after);
-  await page.locator('#mock-link').click(); await page.locator('#mock-done').click();
+  await openShelfDoor(page, '#mock-link'); await page.locator('#mock-done').click();
   await page.locator('#exam-legacy').click();
   const attemptId = after.replica.operations[0].payload.attemptId;
   await page.locator(`[data-mock-history="${attemptId}"]`).waitFor();
@@ -526,7 +527,7 @@ test('rendered-abandonment-dismiss-and-rollback-preserve-ui', async (page) => {
   await page.waitForFunction(() => document.querySelector('#mock-drop')?.disabled === false);
   const fault = await clearRecordWriteFailure(page); assert.equal(fault.fired, 1);
   assert.equal(await page.locator('[data-mock-opt="0"]').count(), 1); assert.deepEqual(await uiNative(page), before);
-  await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1'); await page.locator('#mock-link').click();
+  await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1'); await openShelfDoor(page, '#mock-link');
   await page.locator('#mock-drop').waitFor(); await page.waitForFunction(() => document.querySelector('#mock-drop')?.disabled === false);
   const resumed = await uiNative(page); await page.locator('#mock-drop').click();
   await waitForAppRecord(page, (record) => record.assessmentLibrary.activeAttemptId === null && record.assessmentLibrary.attempts[0].status === 'abandoned');
@@ -547,7 +548,7 @@ test('rendered-historical-mismatch-remains-local', async (page) => {
     localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [], assessmentLibrary: library }));
   }, { smallSet, time });
   await page.goto(`${origin}/index.html?entry=shelf&ui=bi`); await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.locator('#mock-link').click(); await page.locator('#mock-drop').waitFor();
+  await openShelfDoor(page, '#mock-link'); await page.locator('#mock-drop').waitFor();
   await page.waitForFunction(() => document.querySelector('#mock-drop')?.disabled === false);
   const before = await uiNative(page); assert.notEqual(recordOf(before).assessmentLibrary.scope.accountId, before.policy.binding.accountId);
   await page.locator('#mock-drop').click(); await waitForAppRecord(page, (record) => record.assessmentLibrary.activeAttemptId === null);

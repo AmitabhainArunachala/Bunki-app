@@ -4,6 +4,7 @@
  * Usage: node prototypes/corridor/tools/verify-skip-ui.mjs [--shots DIR]
  * Requires playwright-core + its Chromium (or CHROMIUM_PATH).
  */
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -52,6 +53,7 @@ async function open(context) {
   p.on('requestfailed', request => failedRequests.push({ url: request.url(), method: request.method(), failure: request.failure(), afterCheck: checks.at(-1)?.name || 'boot' }));
   await p.goto(`${base}/?entry=shelf`);
   const kanjidex = p.locator('#kanjidex-link');
+  await openShelfTools(p); // the dictionary door sits in the shelf's 学習ツール panel
   await kanjidex.waitFor();
   check('dictionary tool includes its label in the accessible name',
     await kanjidex.and(p.getByRole('button', { name: /^字引/u })).count() === 1);
@@ -75,7 +77,7 @@ try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   page = await open(context);
   check('JSON sidecar absent at boot', await page.evaluate(() => !performance.getEntriesByType('resource').some((e) => e.name.endsWith('/skip.json'))));
-  await page.locator('#kanjidex-link').click();
+  await openShelfDoor(page, '#kanjidex-link');
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-hit').first().waitFor();
   check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === '字引' &&
@@ -273,7 +275,7 @@ try {
     return route.continue();
   });
   page = await open(failureContext);
-  await page.locator('#kanjidex-link').click();
+  await openShelfDoor(page, '#kanjidex-link');
   await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
   await page.locator('.skip-retry').waitFor();
   check('fresh-context load failure is recoverable', await page.locator('.skip-error').count() === 1);

@@ -1,6 +1,7 @@
 /** Source approval through ordinary controls in fresh persistent profiles.
  * Provider replies and separate native-storage/lifecycle failures are synthetic.
  * No actual provider endpoint is contacted and no learner record is seeded. */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -72,7 +73,7 @@ async function shelf(page) {
       continue;
     }
     if (view === 'shelf') {
-      await page.locator('#source-inbox-link').waitFor();
+      await page.locator('#source-inbox-link').waitFor({ state: 'attached' });
       return;
     }
     if (await page.locator('#ginga-symbol').isVisible()) {
@@ -91,7 +92,7 @@ async function shelf(page) {
 async function inbox(page) {
   if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
     await shelf(page);
-    await page.locator('#source-inbox-link').click();
+    await openShelfDoor(page, '#source-inbox-link');
   }
   await page.locator('#source-capture-save').waitFor();
 }
@@ -168,7 +169,7 @@ const FAKE_KEY = 'synthetic-fixture-credential-not-a-real-key';
 async function tutor(page) {
   if (await page.locator('#chat-input').isVisible()) return;
   await shelf(page);
-  await page.locator('#ai-link').click(); await page.locator('#chat-input').waitFor();
+  await openShelfDoor(page, '#ai-link'); await page.locator('#chat-input').waitFor();
 }
 async function configure(page, model = FAKE_MODEL) {
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN); await page.locator('#ai-model-input').fill(model);

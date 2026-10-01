@@ -5,6 +5,7 @@
  * completion, learner response, or writer grant. This is bounded technical
  * evidence; it does not establish hearing, comprehension or learner acceptance.
  */
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -399,7 +400,7 @@ async function importUi(fixture, file) {
 
 define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   await shelf(fixture);
-  await fixture.page.locator('#airead-link').click(); await fixture.page.locator('#airead-startingLevel').selectOption('N5');
+  await openShelfDoor(fixture.page, '#airead-link'); await fixture.page.locator('#airead-startingLevel').selectOption('N5');
   await waitForAppRecord(fixture.page, record => record.readingSettings?.startingLevel === 'N5'); await fixture.page.locator('#back').click();
   const entry = await practiceFromSource(fixture, SOURCE, { savePlace: true }), id = entry.plan.id;
   fixture.entryId = id;

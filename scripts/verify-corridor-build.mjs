@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** Behavioral controls for canonical staging and the supported web dev command. */
 /* global document, window */
+import { openShelfDoor } from '../prototypes/corridor/tools/shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -228,7 +229,7 @@ try {
       assert.equal(result.publisherLibrary, 1);
       assert(result.sources >= 5);
       assert(result.articles >= 24);
-      await page.locator('#feed-link').click();
+      await openShelfDoor(page, '#feed-link');
       await page.locator('#feed-panel-sources').click();
       assert.equal(await page.locator('.feed-source').count(), result.sources);
       assert.deepEqual(errors, []);
@@ -305,7 +306,7 @@ try {
         assessmentLibrary: 1,
         publisherLibrary: 1,
       });
-      await page.locator('#feed-link').click();
+      await openShelfDoor(page, '#feed-link');
       await page.locator('#feed-panel-sources').click();
       assert((await page.locator('.feed-source').count()) >= 5);
       assert.deepEqual(errors, []);

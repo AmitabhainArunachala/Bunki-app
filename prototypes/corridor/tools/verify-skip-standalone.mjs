@@ -1,3 +1,4 @@
+import { openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -54,8 +55,11 @@ try {
   assert.deepEqual({ ...shelfLook.word, display: undefined },
     { display: undefined, border: 'none', background: 'rgba(0, 0, 0, 0)', padding: '0px', minWidth: '0px', minHeight: '0px' },
     'Lookup words must read as prose, not default buttons');
-  // the study tools are one always-visible row (f2acab5f); the dictionary door must be reachable as is
-  assert(await kanjidex.isVisible(), 'The dictionary door is visible on the shelf without opening a menu');
+  // the study tools sit behind the shelf's one 学習ツール button (glance pass 2026-10-01): the door
+  // is closed away until that button opens the panel, and then it is visible and reachable
+  assert(!(await kanjidex.isVisible()), 'The dictionary door waits behind the 学習ツール button');
+  await openShelfTools(page);
+  assert(await kanjidex.isVisible(), 'The dictionary door is visible once the 学習ツール panel is open');
   assert.equal(await kanjidex.and(page.getByRole('button',{name:/^字引/u})).count(),1,
     'Dictionary tool includes its label in the accessible name');
   await kanjidex.click();

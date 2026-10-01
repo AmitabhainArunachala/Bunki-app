@@ -805,6 +805,8 @@ html[data-room='shelf'] .search-field {
   -webkit-line-clamp: none;
 }
 .shelf-mast-name { display: flex; align-items: center; gap: 12px; }
+.shelf-mast-title { flex: 1 1 auto; min-width: 0; }
+.shelf-mast-name .shelf-tools-toggle { margin-left: auto; }
 .shelf-results-count.is-quiet { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* the 永 seal is the bookshelf's own mark, sized to sit with its name */
 .shelf-masthead .shelf-art {
@@ -931,51 +933,93 @@ html[data-room='shelf'] .search-field {
 }
 .shelf-controls .shelf-clear { order: 9; }
 
-/* study tools: one slim row of quiet text doors under the filters */
+/* study tools (glance pass 2026-10-01): one 学習ツール Tools button in the title block, and one
+   panel of labelled tiles in plain groups that it opens below the title. Nothing else of the
+   shelf moves: search, title, filters, stories. */
+.shelf-tools-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 999px;
+  color: var(--ai);
+  background: var(--raised);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+  font: 700 14px/1 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+.shelf-tools-toggle:hover { border-color: var(--ai); }
+.shelf-tools-toggle[aria-expanded='true'] { border-color: var(--ai); background: var(--ai-wash); }
+.shelf-tools-toggle .ui-icon { width: 18px; height: 18px; }
+.shelf-tools-toggle-label { display: inline-flex; align-items: baseline; gap: 6px; color: var(--text); }
+.shelf-tools-toggle-label .en-sub { font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+.shelf-tools-toggle .shelf-tools-caret { width: 16px; height: 16px; color: var(--text-2); transition: transform 160ms ease-out; }
+.shelf-tools-toggle[aria-expanded='true'] .shelf-tools-caret { transform: rotate(180deg); }
+
 #shelf-body .shelf-study-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--s3);
+  margin: 0 0 var(--s3);
+  padding: var(--s3);
+  border: 1px solid var(--raised-edge);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  box-shadow: var(--raised-shadow);
+}
+#shelf-body .shelf-study-tools[hidden] { display: none; }
+.shelf-tools-group { min-width: 0; margin: 0; }
+#shelf-body .shelf-tools-heading {
   display: flex;
   align-items: baseline;
-  gap: var(--s2);
-  margin: calc(-1 * var(--s1)) 0 var(--s3);
-  padding: 0;
-  border: 0;
+  gap: 6px;
+  margin: 0 0 var(--s1);
+  font: 700 13px/1.3 var(--sans);
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
-.shelf-tools-label { display: inline-flex; align-items: baseline; gap: 6px; flex: 0 0 auto; font: 700 13px/1 var(--sans); letter-spacing: 0.04em; color: var(--text-2); }
-.shelf-tools-label .en-sub { display: inline; font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; }
-#shelf-body .shelf-study-tools .shelf-tools-grid { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; min-width: 0; padding: 0; }
-#shelf-body .shelf-study-tools { gap: var(--s1); }
-#shelf-body .shelf-tools-grid button.grammar-link, #shelf-body .shelf-tools-grid button.grammar-link[data-grade] {
+#shelf-body .shelf-tools-heading .en-sub { font: 600 11px/1.3 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+#shelf-body .shelf-study-tools .shelf-tools-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
+#shelf-body .shelf-study-tools button.grammar-link,
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] {
   grid-column: auto;
-  flex: 0 0 auto;
   transform: none;
-  display: inline-flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
   min-width: 0;
-  min-height: 44px;
+  min-height: 52px;
   margin: 0;
-  padding: 0 9px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  box-shadow: none;
+  padding: 8px 12px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ink) 2%, var(--raised));
+  box-shadow: 0 1px 1px color-mix(in srgb, var(--ink) 7%, transparent);
   color: var(--ai);
-  font: 700 14px/1 var(--sans);
+  font: 700 15px/1.3 var(--sans);
   text-align: start;
-  white-space: nowrap;
+  white-space: normal;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
 }
-#shelf-body .shelf-tools-grid button.grammar-link:hover { background: var(--ai-wash); }
-#shelf-body .shelf-tools-grid button.grammar-link[data-grade] :is(.l-ja, .en-sub) { font-size: inherit; margin: 0; }
-/* each door says what it is: Japanese first, its short English gloss after (polish pass 2026-10-01) */
-#shelf-body .shelf-tools-grid button.grammar-link .en-sub, #shelf-body .shelf-tools-grid button.grammar-link[data-grade] .en-sub {
-  display: inline;
+#shelf-body .shelf-study-tools button.grammar-link:hover { border-color: var(--ai); background: var(--ai-wash); }
+#shelf-body .shelf-study-tools button.grammar-link .l-ja { margin: 0; font: inherit; color: inherit; word-break: auto-phrase; }
+#shelf-body .shelf-study-tools button.grammar-link .en-sub,
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] .en-sub {
+  display: block;
   margin: 0;
-  font: 500 12px/1 var(--sans);
+  font: 500 12px/1.3 var(--sans);
   letter-spacing: 0.01em;
   text-transform: none;
   color: var(--text-2);
 }
+#shelf-body .shelf-study-tools button.grammar-link .en-sub:empty { display: none; }
 
 /* the story grid: lead across, two seconds, then three to a row */
 #shelf-reading-results.shelf-story-grid {
@@ -1507,6 +1551,9 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .story-second .shelf-title { font-size: 23px; }
   .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
 }
+@media (max-width: 360px) {
+  .shelf-tools-toggle > .ui-icon:first-child { display: none; }
+}
 @media (max-width: 520px) {
   :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
   html[data-room='shelf'] .search-field { margin-bottom: var(--s2); }
@@ -1534,11 +1581,13 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .shelf-controls .filter-search { flex: 0 0 auto; }
   .shelf-controls .shelf-results-count { flex: 0 0 auto; margin-left: var(--s1); }
   .shelf-filter-help[open] > p { position: fixed; top: auto; bottom: var(--s2); left: var(--s2); right: var(--s2); width: auto; transform: none; }
-  #shelf-body .shelf-study-tools { margin: calc(-1 * var(--s1)) calc(-1 * var(--s2)) var(--s2); padding: 0 var(--s2); overflow-x: auto; scrollbar-width: none; }
-  #shelf-body .shelf-study-tools::-webkit-scrollbar { display: none; }
-  #shelf-body .shelf-study-tools .shelf-tools-grid { flex-wrap: nowrap; }
-  #shelf-body .shelf-study-tools .shelf-tools-label .en-sub { display: none; }
-  #shelf-body .shelf-tools-grid button.grammar-link { padding: 0 8px; }
+  /* the tools button keeps its words and drops its icon on the narrowest phones */
+  .shelf-mast-name { gap: 10px; }
+  .shelf-tools-toggle { gap: 6px; padding: 0 8px 0 10px; }
+  /* the tools panel on a phone: the groups stack, two tiles to a row */
+  #shelf-body .shelf-study-tools { grid-template-columns: minmax(0, 1fr); gap: var(--s2); margin-bottom: var(--s2); padding: var(--s2); }
+  #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #shelf-body .shelf-study-tools button.grammar-link { padding: 8px 10px; }
   #shelf-body .story-card .shelf-open { padding: var(--s2) var(--s2) 20px; }
   #shelf-body .story-second .shelf-open { padding: var(--s2) var(--s2) 20px; }
   #shelf-body .story-teaser .shelf-title { font-size: 17px; }
