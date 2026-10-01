@@ -17063,7 +17063,8 @@ function wordCardIdentity(record, id) {
 function wordNodeIdentity(node, record = S) {
   if (node?.t !== 'word') return null;
   if (node.seq != null && node.seq !== '') {
-    return { kind: 'seq', seq: String(node.seq), reading: nonEmptyString(node.reading) ? node.reading : null };
+    // the entry's own kana form when the door's reading names it only across scripts: one word, one card
+    return { kind: 'seq', seq: String(node.seq), reading: nonEmptyString(node.reading) ? entryCueReading(node) : null };
   }
   if (D.dict?.[node.id]) return { kind: 'core' };
   const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
@@ -17106,6 +17107,19 @@ function entryKanaIndex(row, reading) {
   return alike.length === 1 ? alike[0] : -1;
 }
 
+/** The reading a word door stands for, as its card keeps it: the entry's own kana form that the
+ * door's reading names (entryKanaIndex), so the reader's quick look (ダマスカス read だますかす) and
+ * the full entry (read ダマスカス) are one identity and make one card. One word, one card (John,
+ * 2026-10-01). When the row is not at hand, or the reading names no form, it is the door's reading
+ * as given. The reader may still show the article's own reading. */
+function entryCueReading(node) {
+  if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return node?.reading;
+  const row = dictionaryRowBySeq(node.seq);
+  if (!Array.isArray(row) || String(row[0]) !== String(node.seq)) return node.reading;
+  const kana = entryKanaIndex(row, node.reading);
+  return kana >= 0 ? row[5][kana] : node.reading;
+}
+
 /** The answer an explicit door selected, validated against that entry's own index
  * row. The rules:
  *   - The reading must name one of the entry's kana forms: that form byte for byte, or, when
@@ -17114,6 +17128,7 @@ function entryKanaIndex(row, reading) {
  *     reading, by its own restriction (readerReadingFits). Normalised kana never
  *     lends one reading's restriction to another: 産 is read うぶ, never ウブ.
  *   - A matched gloss must be one of the entry's own glosses.
+ * The snapshot (and so the card's cue) keeps the entry's own form of the reading.
  * A saved answer for the same entry and exact reading is kept exactly as saved,
  * text and provenance included, and is never rewritten by a door that chose another
  * gloss. It is reused in two cases: when the row is cached and permits the cue, or,
@@ -17129,11 +17144,13 @@ function explicitWordSnapshot(node, record = S) {
   if (indexed && !(kana >= 0 && readerReadingFits(indexed, kana, node.id) && readerReadingFits(indexed, kana, head))) {
     return null;
   }
+  // the card keeps the entry's own form of the reading (entryCueReading): one word, one card
+  const reading = indexed ? indexed[5][kana] : node.reading;
   const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
   const saved = snapshots && owns(snapshots, node.id) && plainRecord(snapshots[node.id]) ? snapshots[node.id] : null;
   const held = (record.taken || []).some((entry) => entry.t === 'word' && entry.id === node.id) ||
     wordStudied(record, node.id);
-  if (saved && saved.seq === seq && saved.r === node.reading && nonBlankMeanings(saved.m).length &&
+  if (saved && saved.seq === seq && saved.r === reading && nonBlankMeanings(saved.m).length &&
     (indexed || wordSelection(saved) || held)) {
     return saved;
   }
@@ -17144,11 +17161,11 @@ function explicitWordSnapshot(node, record = S) {
   const meanings = [first, ...glosses.filter((gloss) => gloss !== first)]
     .filter((gloss) => nonEmptyString(gloss) && gloss.trim().length > 0).slice(0, 8);
   if (!meanings.length) return null;
-  const snapshot = { r: node.reading, m: meanings, seq };
+  const snapshot = { r: reading, m: meanings, seq };
   const kanji = [...head].filter((c) => /[一-鿌々]/.test(c));
   if (kanji.length) snapshot.k = kanji;
   const source = D.dictionaryIndex?.source;
-  const selection = { v: 1, seq, r: node.reading, head, src: { release: source?.pin, archiveSha256: source?.jmdict?.sha256 } };
+  const selection = { v: 1, seq, r: reading, head, src: { release: source?.pin, archiveSha256: source?.jmdict?.sha256 } };
   if (wordSelection({ ...snapshot, selection })) snapshot.selection = selection;
   return snapshot;
 }
