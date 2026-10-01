@@ -49,6 +49,11 @@
  *                         genuinely different reading stays held, in plain words (test-word-saved-answer
  *                         K1). Control: 7ef0e985, whose seal was disabled and faded to 0.45 over "This
  *                         entry's answer cannot be confirmed yet".
+ *   W2 one word, one card — (gate review on 8dea3c2e) at 1368, ダマスカス saved from the quick look
+ *                         and then opened in 全項目 shows "memorizing" there, with no conflict note and no
+ *                         replace offer; saved in 全項目 first, the quick look's 覚 is live and pressed with
+ *                         no held reason and no "open that card". Control: 8dea3c2e, where the quick look
+ *                         kept だますかす as the card's reading and 全項目 called it "another reading".
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -564,6 +569,55 @@ try {
       });
     }
 
+    // the quick look's 覚 → the list chooser's "Save for review"; then 全項目 from the same popup
+    const saveFromQuickLook = async (page) => {
+      await page.locator('#reader .tok[data-index="0"]').click();
+      await page.waitForSelector('#mini #mini-take:not([disabled])');
+      await page.locator('#mini #mini-take').click();
+      await page.waitForSelector('#vocabulary-list-dialog[open]');
+      await page.locator('#vocabulary-list-save').click();
+      await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
+      await page.locator('#vocabulary-list-close').click();
+    };
+    const fullEntryState = (page) => page.evaluate(() => {
+      const take = document.querySelector('#sheet #take');
+      return { take: take && { pressed: take.getAttribute('aria-pressed'), disabled: take.disabled, held: take.classList.contains('word-capture-held') },
+        note: document.querySelector('#word-capture-note')?.textContent.trim() ?? null, replace: !!document.querySelector('#word-capture-replace') };
+    });
+    await run('W2-one-word-one-card', DESK, async (page) => {
+      // quick look first, then 全項目
+      await openArticle(page, ARTICLE);
+      await saveFromQuickLook(page);
+      await page.locator('#mini .mini-entry').click();
+      await page.waitForSelector('#sheet #take');
+      const full = await fullEntryState(page);
+      assert(full.take?.pressed === 'true' && !full.take.disabled && !full.take.held && full.note === null && !full.replace,
+        `saved from the quick look, 全項目 does not show it saved: ${JSON.stringify(full)}`);
+      return { full };
+    });
+    // 全項目 first, then the quick look (a fresh context: a fresh record)
+    await run('W2-one-word-one-card-reverse', DESK, async (page) => {
+      await openArticle(page, ARTICLE);
+      await page.locator('#reader .tok[data-index="0"]').click();
+      await page.waitForSelector('#mini .mini-entry');
+      await page.locator('#mini .mini-entry').click();
+      await page.waitForSelector('#sheet #take:not([disabled])');
+      await page.locator('#sheet #take').click();
+      await page.waitForFunction(() => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
+      await page.locator('#sheet-close').click();
+      await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 });
+      await page.locator('#reader .tok[data-index="0"]').click();
+      await page.waitForSelector('#mini #mini-take');
+      const quick = await page.evaluate(() => {
+        const seal = document.querySelector('#mini #mini-take');
+        return { pressed: seal.getAttribute('aria-pressed'), disabled: seal.disabled, held: seal.classList.contains('reader-capture-held'),
+          reason: document.querySelector('#mini #mini-take-reason')?.textContent.trim() ?? null, open: !!document.querySelector('#mini #mini-take-open') };
+      });
+      assert(quick.pressed === 'true' && !quick.disabled && !quick.held && quick.reason === null && !quick.open,
+        `saved in 全項目, the quick look does not show it saved: ${JSON.stringify(quick)}`);
+      return { quick };
+    });
+
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);
       await openShelfTools(page);
@@ -649,9 +703,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card',
     results,
-    passed: results.length === engines.length * 25 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 27 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

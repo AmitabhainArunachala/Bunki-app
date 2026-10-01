@@ -94,7 +94,7 @@ function defineRows() {
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
-    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex',
+    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
     // the seal opens the list chooser (09b5e2a7); its 覚えるのをやめる door is the mini's remove route
     'openVocabularyListChooser',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
@@ -1616,7 +1616,9 @@ function defineRows() {
     // (a) savable: the state, the capture and the popup's seal
     assert.equal(ctx.wordCaptureState(DAMASCUS, blank()), 'take');
     const patch = ctx.captureStorePatch(blank(), DAMASCUS, 'ダマスカス', 1000);
-    assert.deepEqual([patch.taken[0].entrySeq, patch.taken[0].cueReading, patch.deepWords['ダマスカス'].m[0]], ['2834901', 'だますかす', 'Damascus (Syria)']);
+    // the card keeps the entry's own form of the reading (one word, one card: K2)
+    assert.deepEqual([patch.taken[0].entrySeq, patch.taken[0].cueReading, patch.deepWords['ダマスカス'].r, patch.deepWords['ダマスカス'].m[0]],
+      ['2834901', 'ダマスカス', 'ダマスカス', 'Damascus (Syria)']);
     assert.equal(ctx.wordCaptureState(DAMASCUS, { ...blank(), ...patch }), 'taken', 'the saved card is this door’s own');
     for (const reading of ['けえき', 'けーき']) {
       assert.equal(ctx.wordCaptureState({ t: 'word', id: 'ケーキ', seq: '1047860', reading }, blank()), 'take', `ケーキ read ${reading}`);
@@ -1631,5 +1633,26 @@ function defineRows() {
     for (const [lang, at] of LANGS) assert.equal(app({ mode: 'main', lang }).wordCaptureHeldText(NAMA), plain[at], `held line · ${lang}`);
     const held = lookupMini(ctx, NAMA, { seq: '1378450', head: '生', r: 'なま', m: ['raw'] });
     assert.deepEqual([held.seal?.disabled, held.reason?.textContent], [true, plain[1]], 'the popup holds 覚 and says why');
+  });
+  // gate review on 8dea3c2e: the quick look kept だますかす as the card's cue while 全項目 reads ダマスカス, so each door called
+  // the other's card "another reading" and offered to replace it with itself. One word, one card (John).
+  const FULL_ENTRY = { t: 'word', id: 'ダマスカス', seq: '2834901', reading: 'ダマスカス' };
+  row('K2.setup', 'the two doors to Damascus: the quick look (read だますかす, the article’s) and 全項目 (read ダマスカス, the entry’s)', () => {
+    need('K1');
+    fixtures.set('K2', { quick: DAMASCUS, full: FULL_ENTRY });
+  });
+  row('K2', 'one word, one card: saved through either door, the other door shows it saved, with no conflict and no replace offer', () => {
+    const { quick, full } = need('K2');
+    const ctx = app({ mode: 'main' });
+    for (const [first, second, label] of [[quick, full, 'quick look, then 全項目'], [full, quick, '全項目, then quick look']]) {
+      const record = { ...blank(), ...ctx.captureStorePatch(blank(), first, 'ダマスカス', 1000) };
+      assert.equal(record.taken[0].cueReading, 'ダマスカス', `the cue keeps the entry's form · ${label}`);
+      assert.deepEqual(ctx.wordNodeIdentity(second, record), ctx.wordCardIdentity(record, 'ダマスカス'), `one identity · ${label}`);
+      assert.equal(ctx.wordCaptureState(second, record), 'taken', `the other door shows it saved · ${label}`);
+      // taking it again through the other door is the existing no-op re-take: no second card, no replace, no conflict
+      assert.deepEqual(Object.keys(ctx.captureStorePatch(record, second, 'ダマスカス', 2000)), [], `the other door's take is the same card · ${label}`);
+    }
+    // a genuinely different reading is still another entry's business (K1): 生 read せい never names なま
+    assert.equal(ctx.wordCaptureState(NAMA, blank()), 'unavailable');
   });
 }
