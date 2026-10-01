@@ -386,10 +386,12 @@ export const MEASURE_FN = `(() => {
     const cs = getComputedStyle(node);
     return { label, selector: sel, contrast: ratio(node), fontSize: Math.round(parseFloat(cs.fontSize) * 10) / 10, color: cs.color };
   };
-  const targets = [...document.querySelectorAll('button, [role=button], a')]
-    // Inline prose lookups retain their word-shaped hit regions and roving
-    // keyboard model. The 44px floor applies to separate navigation controls.
-    .filter((n) => visible(n) && !n.matches('.japanese-lookup-word'))
+  const targets = [...document.querySelectorAll('button, [role=button], a, summary, select')]
+    // Inline prose lookups and bibliographic links retain their text-shaped
+    // regions. Standalone controls, including transparent native filter
+    // selects over their visible labels, must meet the 44px floor.
+    .filter((n) => visible(n) && !n.matches('.japanese-lookup-word') &&
+      !(n.matches('.article-about a.inline-link[href]') && getComputedStyle(n).display === 'inline'))
     .map((n) => {
       const r = n.getBoundingClientRect();
       const expanded = n.matches('button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;

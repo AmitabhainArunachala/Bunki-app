@@ -30,7 +30,7 @@ import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright-core';
 // verify-corridor.mjs resolves the site when it loads, so it is imported inside the receipt's try
-let CORRIDOR_DIR = null, startCorridorServer = null;
+let CORRIDOR_DIR = null, startCorridorServer;
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/playback'));
@@ -124,7 +124,7 @@ async function fixture(mode) {
     // queued when the fetch itself settles, after the app's synchronous null path has run.
     await context.addInitScript(() => {
       const signal = (key) => {
-        const channel = new MessageChannel();
+        const channel = new window.MessageChannel();
         channel.port1.onmessage = () => { window[key] = (window[key] || 0) + 1; channel.port1.close(); };
         channel.port2.postMessage(0);
       };
@@ -312,6 +312,45 @@ try {
   });
 
   // --- the bar's lifecycle, on the synthetic Kore manifest ---
+  await check('approved-player-is-touch-sized-and-clear-of-sentence-actions-on-phones', 'narration', async ({ page }) => {
+    const measure = () => page.evaluate(() => {
+      const bar = document.querySelector('.listen-row.play-bar').getBoundingClientRect();
+      const actions = document.querySelector('.reader-actions:not([hidden])').getBoundingClientRect();
+      const buttons = [...document.querySelectorAll('#listen-toggle, #listen-rate')].map(node => {
+        const r = node.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        return { id: node.id, width: r.width, height: r.height, left: r.left, right: r.right,
+          top: r.top, bottom: r.bottom, reachable: hit === node || node.contains(hit) };
+      });
+      return { viewport: innerWidth, bar: { top: bar.top, bottom: bar.bottom }, actionsBottom: actions.bottom, buttons,
+        valid: buttons.length === 2 && buttons.every(r => r.width >= 44 && r.height >= 44 &&
+          r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && r.reachable) &&
+          actions.bottom <= bar.top && bar.bottom <= innerHeight };
+    });
+    const measurements = [];
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.locator('#reader .tok').first().click();
+      const actions = page.locator('.reader-actions:not([hidden])');
+      await actions.waitFor({ state: 'visible' });
+      await actions.evaluate(async node => {
+        await Promise.all(node.getAnimations().filter(a => Number.isFinite(a.effect?.getComputedTiming().endTime))
+          .map(a => a.finished.catch(() => {})));
+      });
+      const observed = await measure();
+      measurements.push(observed);
+      writeFileSync(resolve(out, 'phone-player-geometry.json'), JSON.stringify(measurements, null, 2));
+      assert.equal(observed.valid, true, JSON.stringify(observed));
+      await page.screenshot({ path: resolve(out, `phone-player-${width}.png`) });
+    }
+    const small = await page.addStyleTag({ content: '#listen-toggle { width:20px!important; min-width:20px!important; height:20px!important; min-height:20px!important; }' });
+    assert.equal((await measure()).valid, false, 'the same check rejects a small play target');
+    await small.evaluate(node => node.remove());
+    const overlap = await page.addStyleTag({ content: '.teacher-door.reader-actions { bottom:0!important; }' });
+    assert.equal((await measure()).valid, false, 'the same check rejects an action bar covering the player');
+    await overlap.evaluate(node => node.remove());
+    assert.equal((await measure()).valid, true, 'removing the controls restores the usable layout');
+  });
   await check('stale-clip-events-cannot-change-a-restarted-read', 'narration', async ({ page }) => {
     await press(page);
     await started(page, 'clips');
