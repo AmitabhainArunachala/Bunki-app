@@ -1061,7 +1061,9 @@ function actionContext({ dict = {}, dictionaryIndex = null, rows = [] } = {}) {
     // D23: the word capture plan and what it reads (the saved answer and the explicit-cue validation)
     'plainRecord', 'nonEmptyString', 'srsKey', 'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity',
     'sameWordIdentity', 'wordStudied', 'wordCardIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'dictionaryRowBySeq',
-    'readerReadingFits', 'readerSummaryFor', 'dictionaryReadingSummaries', 'kataToHira', 'KATA_TO_HIRA_OFFSET'), context);
+    'readerReadingFits', 'readerSummaryFor', 'dictionaryReadingSummaries', 'kataToHira', 'KATA_TO_HIRA_OFFSET',
+    // e9bf1eba: the explicit-cue validation names the entry's kana form across scripts (entryKanaIndex)
+    'entryKanaIndex', 'kanaReadingKey', 'KANA_VOWEL_ROWS'), context);
   return { context, queued, acknowledge(save = true) {
     const next = queued.shift(); assert(next, 'An actual application action queued a save');
     const patch = next.produce(context.S);
