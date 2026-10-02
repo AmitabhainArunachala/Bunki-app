@@ -14,7 +14,7 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'dictionaryReadingSupportsForm', 'dictionarySummaryFor', 'dictionaryRowsForForm', 'dictionaryRowBySeq',
   'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD',
   'LOOKUP_HELPER_POS', 'japaneseLookupRecord', 'openJapaneseLookup', 'appendJapaneseLookup',
-  'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'placeFloating', 'miniAnchor', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
+  'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'placeFloating', 'keepFloatingBeside', 'miniAnchor', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
   'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey'];
 const declarations = new Map();
 for (const statement of ast.statements) {

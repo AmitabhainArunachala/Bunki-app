@@ -538,6 +538,8 @@ async function ordinary(fixture) {
   // one tap shows the meaning (reader lane 2026-10-02): the observation's depth is 2, gloss shown
   assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
   assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog']);
+  // the tap's popup floats over the page: a second tap on the same word puts it away (and records nothing)
+  await page.locator(`#reader .tok[data-index="${source.index}"]`).click(); await page.waitForFunction(() => !document.getElementById('mini'));
   await page.locator('#reader-place-save').click();
   await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));
   const savedPlace = await snapshot(fixture, 'ordinary-reading-place');

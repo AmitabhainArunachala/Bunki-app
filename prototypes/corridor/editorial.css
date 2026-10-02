@@ -2749,9 +2749,14 @@ body #mini .mini-status:empty { display: none; }
   .reader-toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
   /* the list sheet owns the foot: the bug steps up to the top corner, as it does for a sheet */
   body:has(#vocabulary-list-popover) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
-  body #mini { padding-left: var(--s2); }
-  body #mini .mini-actions { column-gap: 2px; }
-  body #mini :is(.mini-lists, .mini-entry) { padding: 0 4px; }
+  /* a phone keeps the popup short, so it fits above or below its word and clear of the play bar */
+  body #mini { padding: 12px var(--s2) 8px; }
+  body #mini .mini-word { font-size: 28px; }
+  body #mini .mini-actions { column-gap: 2px; margin-top: 8px; }
+  body #mini .mini-take { min-width: 64px; padding: 0 12px; }
+  body #mini :is(.mini-lists, .mini-entry) { padding: 0 4px; font-size: 14px; }
+  body #mini .mini-sentence-wrap { margin-top: 6px; }
+  body #mini .mini-sentence-label { flex: 1 0 100%; margin: 4px 0 0; font-size: 12px; line-height: 1.2; }
   body #mini .mini-sentence, body #mini .mini-sentence-action { font-size: 13px; }
   .version-block .version-toggle { display: flex; width: 100%; }
   .version-toggle .version-choice { flex: 1 1 0; flex-wrap: wrap; justify-content: center; column-gap: 4px; row-gap: 0; padding: 4px 8px; font-size: 13px; }
