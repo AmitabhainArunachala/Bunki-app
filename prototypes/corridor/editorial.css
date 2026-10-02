@@ -2543,3 +2543,222 @@ body .token-actions button:hover { background: var(--ai-wash); }
   letter-spacing: 0;
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   The reader's word doors (reader lane, 2026-10-02 — John's notes 8, 9, 11, 17, 18).
+   One tap opens the popup: the word large, its reading, its meaning, then Save, "Add to list…" and
+   "Full entry ›", and a quiet last row for the sentence. A right-click or a hold opens the word menu;
+   Save answers with a small toast; lists open in a compact popover (a short sheet on a phone).
+   Structure and states only: the button skin is the app's three tiers.
+   ========================================================================== */
+body #mini { gap: 2px; min-width: 248px; max-width: min(400px, calc(100vw - 2 * var(--s2))); padding: var(--s2) var(--s2) 12px 20px; }
+body #mini .mini-word { padding-right: 0; font-size: 32px; line-height: 1.25; }
+body #mini .mini-gloss { margin-top: 4px; font-size: 17px; line-height: 1.5; }
+body #mini .mini-take-reason { margin-top: 8px; }
+body #mini .mini-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--s1); margin-top: 12px; }
+body #mini .mini-take {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  min-height: 44px;
+  padding: 0 var(--s2);
+  border: 1px solid var(--ai);
+  border-radius: 8px;
+  background: var(--ai);
+  color: var(--raised);
+  font: 600 15px/1 var(--sans);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+body #mini .mini-take:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 84%, #000); }
+body #mini .mini-take.taken { background: color-mix(in srgb, var(--ai) 9%, var(--raised)); color: var(--ai); border-color: color-mix(in srgb, var(--ai) 45%, transparent); box-shadow: none; }
+body #mini .mini-take.taken:hover:not(:disabled) { background: var(--ai-wash); }
+body #mini .mini-take.reader-capture-held { background: transparent; color: var(--text-2); border: 1px dashed var(--raised-edge-strong); box-shadow: none; cursor: help; }
+body #mini :is(.mini-lists, .mini-entry) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ai);
+  font: 600 15px/1.2 var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+}
+body #mini .mini-entry { margin-left: auto; }
+body #mini .mini-entry::after { content: none; }
+body #mini .mini-entry-chevron { font-weight: 700; }
+body #mini :is(.mini-lists, .mini-entry):hover:not(:disabled) { background: transparent; text-decoration: underline; text-underline-offset: 0.2em; }
+body #mini .mini-entry:disabled { color: var(--text-2); cursor: default; }
+body #mini :is(button, [tabindex]):focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+body #mini .mini-sentence-wrap { margin-top: 10px; padding-top: 4px; border-top: 1px solid var(--hairline); }
+body #mini .mini-sentence { display: flex; flex-wrap: wrap; align-items: center; column-gap: 2px; font: 14px/1.3 var(--sans); color: var(--text-2); }
+body #mini .mini-sentence-label { margin-right: 4px; }
+body #mini .mini-sentence-dot { color: var(--text-2); }
+body #mini .mini-sentence-action {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ai);
+  font: 600 14px/1.2 var(--sans);
+  cursor: pointer;
+}
+body #mini .mini-sentence-action:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 0.2em; }
+body #mini .mini-sentence-action:disabled { color: var(--text-2); cursor: default; }
+body #mini .mini-status { margin: 0; font: 13px/1.5 var(--sans); color: var(--text); }
+body #mini .mini-status:empty { display: none; }
+
+.reader-word-menu {
+  position: fixed;
+  z-index: 90;
+  display: grid;
+  min-width: 232px;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+  border: 1px solid var(--raised-edge);
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: var(--float-shadow);
+}
+.reader-word-menu:focus { outline: none; }
+.reader-word-menu-item {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: 500 15px/1.25 var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+.reader-word-menu-item:hover, .reader-word-menu-item:focus { outline: none; background: var(--ai-wash); }
+.reader-word-menu-item:focus-visible { background: var(--focus-wash); box-shadow: var(--focus-ring); }
+.reader-word-menu-item[aria-disabled='true'] { color: var(--text-2); background: transparent; cursor: default; }
+.reader-word-menu-item[aria-disabled='true']:focus-visible { background: var(--focus-wash); }
+
+.reader-toast {
+  position: fixed;
+  z-index: 140;
+  left: 50%;
+  bottom: calc(var(--s3) + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  max-width: calc(100vw - 2 * var(--s2));
+  padding: 4px 4px 4px var(--s2);
+  transform: translateX(-50%);
+  border-radius: 10px;
+  background: var(--chrome);
+  color: var(--chrome-ink);
+  box-shadow: var(--float-shadow);
+  font: 500 15px/1.4 var(--sans);
+}
+.reader-toast[hidden] { display: none; }
+.reader-toast-text { padding: 10px 0; }
+.reader-toast-action {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: 700 15px/1 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.reader-toast-action:hover { background: color-mix(in srgb, var(--chrome-ink) 14%, transparent); }
+.reader-toast-action:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+
+.vocabulary-list-popover {
+  position: fixed;
+  z-index: 85;
+  width: min(300px, calc(100vw - 16px));
+  padding: 12px var(--s2) var(--s2);
+  border: 1px solid var(--raised-edge);
+  border-radius: 12px;
+  background: var(--raised);
+  color: var(--text);
+  box-shadow: var(--float-shadow);
+}
+.vocabulary-list-popover:focus { outline: none; }
+.vocabulary-list-title { margin: 0 0 4px; font: 700 15px/1.4 var(--sans); overflow-wrap: anywhere; }
+.vocabulary-list-popover .vocabulary-list-choices { display: grid; max-height: 40vh; margin: 0 0 8px; overflow: auto; border: 0; }
+.vocabulary-list-choice { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 4px; border-radius: 6px; font: 15px/1.3 var(--sans); cursor: pointer; }
+.vocabulary-list-choice:hover { background: var(--ai-wash); }
+.vocabulary-list-choice input { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; accent-color: var(--ai); }
+.vocabulary-list-choice:has(input:focus-visible) { background: var(--focus-wash); box-shadow: var(--focus-ring); }
+.vocabulary-list-name { min-width: 0; overflow-wrap: anywhere; }
+.vocabulary-list-count { margin-left: auto; color: var(--text-2); font-size: 13px; }
+.vocabulary-list-empty { margin: 2px 0 6px; color: var(--text-2); font: 14px/1.5 var(--sans); }
+.vocabulary-list-popover .vocabulary-list-form { display: flex; gap: var(--s1); }
+.vocabulary-list-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--raised-edge-strong);
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--text);
+  font: 15px/1.2 var(--sans);
+}
+.vocabulary-list-field:focus-visible { outline: 2px solid var(--ai); outline-offset: 1px; }
+.vocabulary-list-popover .vocabulary-list-create { min-height: 44px; padding: 0 14px; border-radius: 8px; font: 600 15px/1 var(--sans); }
+.vocabulary-list-popover .vocabulary-list-status { min-height: 0; margin: 6px 0 0; font: 13px/1.5 var(--sans); color: var(--ai); }
+.vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
+
+/* the one-time hint fades where it stands once the first word opens, keeping its room for that visit */
+.reader-tip.is-done { visibility: hidden; opacity: 0; transition: opacity 200ms ease, visibility 0s linear 200ms; }
+
+/* 原文 / やさしい版: a two-sided switch that says what each side is and its level, and one line on what the
+   simplified version is */
+.version-block { margin: 0 0 var(--s3); }
+.version-block .version-toggle { margin: 0; }
+.version-toggle .version-choice .version-name { font-weight: 500; }
+.version-toggle .version-choice .version-level { font: 600 13px/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }
+.version-toggle .version-choice[aria-pressed='true'] .version-level { color: var(--accent); }
+.version-toggle .version-choice:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+.version-caption { max-width: 40em; margin: 6px 0 0 6px; font: 13px/1.5 var(--sans); color: var(--text-2); }
+.version-toggle .version-choice > span { white-space: nowrap; }
+
+@media (max-width: 560px) {
+  .vocabulary-list-popover {
+    top: auto !important;
+    right: 0;
+    bottom: 0;
+    left: 0 !important;
+    width: auto;
+    max-height: 62vh;
+    overflow: auto;
+    padding-bottom: calc(var(--s2) + env(safe-area-inset-bottom));
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+  }
+  .reader-toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  /* the list sheet owns the foot: the bug steps up to the top corner, as it does for a sheet */
+  body:has(#vocabulary-list-popover) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
+  body #mini { padding-left: var(--s2); }
+  body #mini .mini-actions { column-gap: 2px; }
+  body #mini :is(.mini-lists, .mini-entry) { padding: 0 4px; }
+  body #mini .mini-sentence, body #mini .mini-sentence-action { font-size: 13px; }
+  .version-block .version-toggle { display: flex; width: 100%; }
+  .version-toggle .version-choice { flex: 1 1 0; flex-wrap: wrap; justify-content: center; column-gap: 4px; row-gap: 0; padding: 4px 8px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reader-toast:not([hidden]) { animation: reader-toast-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in 120ms ease-out; }
+}
+@keyframes reader-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+@keyframes reader-pop-in { from { opacity: 0; } }
