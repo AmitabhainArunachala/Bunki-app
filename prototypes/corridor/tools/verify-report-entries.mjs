@@ -149,13 +149,13 @@ try {
     // R3 word sheet
     const token = page.locator('#reader .tok.content').nth(3);
     if (await token.count()) {
-      // a word's full sheet opens on a press-and-hold, as a finger does it (2.4 s)
+      // a word's full sheet opens from its popup: one tap, then "Full entry ›" (reader lane 2026-10-02)
       await token.scrollIntoViewIfNeeded();
       const box = await token.boundingBox();
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down(); await page.waitForTimeout(2400); await page.mouse.up();
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await page.locator('#mini .mini-entry').click({ timeout: 10_000 }).catch(() => {});
       const opened = await page.waitForSelector('#sheet', { timeout: 10_000 }).then(() => true, () => false);
-      check(`R3 ${w}px sheet: a press-and-hold opens the word sheet`, opened);
+      check(`R3 ${w}px sheet: the word's Full entry opens the word sheet`, opened);
       const sheetEntry = page.locator('#sheet .report-line [data-report-entry="open"]');
       check(`R1 ${w}px sheet: the permanent bug entry is visible`, (await railVisible(page)));
       check(`R3 ${w}px sheet: the entry sits at the end of the sheet`, (await sheetEntry.count()) === 1);

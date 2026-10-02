@@ -21,12 +21,12 @@ const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), '
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const original = readFileSync(resolve(site, 'corridor.js'));
 const expose = ['S', 'D', 'openJapaneseLookup', 'appendJapaneseLookup', 'enhanceJapaneseProse',
-  'openVocabularyListChooser', 'showMini', 'removeMini', 'ensureDictionaryRowsForForm',
+  'openVocabularyListPopover', 'showMini', 'removeMini', 'ensureDictionaryRowsForForm',
   'toggleTaken', 'wordCaptureState', 'wordCardIdentity', 'recordWritable'];
 const shim = '\nObject.defineProperty(window,"annotationFixture",{value:{' + expose.map(name => `get ${name}(){return ${name}}`).join(',') + '}});\n';
 const fixture = Buffer.concat([original, Buffer.from(shim)]);
 // Negative control: a build that re-enables the list form before reload must fail the read-only case.
-const reenable = ['create.disabled = value || !recordWritable();', 'create.disabled = value;'];
+const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
 const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/]];
@@ -50,17 +50,24 @@ async function openLookup(page, text = '電車') {
   }, text);
   await page.locator('#mini').waitFor();
 }
+// Lists open from the popup's "Add to list…" in a compact popover (reader lane 2026-10-02); Save is the popup's own
+// one-tap button. The big list window is gone.
 async function chooser(page, text = '電車') {
-  await openLookup(page, text); await page.locator('#mini-take').click();
-  await page.locator('#vocabulary-list-dialog[open]').waitFor();
+  await openLookup(page, text); await page.locator('#mini #mini-lists').click();
+  await page.locator('#vocabulary-list-popover').waitFor();
+  assert.equal(await page.locator('#vocabulary-list-dialog, dialog[open]').count(), 0, 'Lists must not open a modal window');
+}
+async function saveInPopup(page) {
+  await page.locator('#mini #mini-take').click();
+  await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true');
 }
 async function createList(page, name) {
-  await page.locator('#vocabulary-list-dialog .search-field').fill(name);
-  await page.locator('#vocabulary-list-dialog [type="submit"]').click();
+  await page.locator('#vocabulary-list-popover #vocabulary-list-name').fill(name);
+  await page.locator('#vocabulary-list-popover [type="submit"]').click();
 }
 async function closeChooser(page) {
-  await page.locator('#vocabulary-list-dialog').getByRole('button', { name: 'Done', exact: true }).click();
-  await page.locator('#vocabulary-list-dialog').waitFor({ state: 'detached' });
+  await page.locator('#vocabulary-list-popover').press('Escape');
+  await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached' });
 }
 const member = (record, list, word) => record.lists?.[list]?.some(row => row.t === 'word' && row.id === word);
 const cases = [
@@ -69,14 +76,19 @@ const cases = [
     await waitForAppRecord(page, record => member(record, 'Morning Japanese', '電車'));
     const enrolled = await state(page);
     assert.equal(enrolled.record.taken.filter(row => row.t === 'word' && row.id === '電車').length, 1);
-    await page.locator('.vocabulary-list-choices').getByRole('button', { name: 'Save for review', exact: true }).click();
-    assert.deepEqual(targetRows((await state(page)).record), targetRows(enrolled.record), 'Saving an already enrolled card must not unenroll or reset it');
+    // the list's own tick on an enrolled card: off and on again, it never unenrolls or resets the card
+    const tick = page.locator('#vocabulary-list-popover input[data-list="Morning Japanese"]');
+    assert.equal(await tick.isChecked(), true, 'The new list is ticked for the word');
+    await tick.uncheck(); await waitForAppRecord(page, record => !member(record, 'Morning Japanese', '電車'));
+    await tick.check(); await waitForAppRecord(page, record => member(record, 'Morning Japanese', '電車'));
+    assert.deepEqual(targetRows((await state(page)).record), targetRows(enrolled.record), 'A list tick on an enrolled card must not unenroll or reset it');
+    assert.equal(await page.locator('#mini #mini-take').getAttribute('aria-pressed'), 'true', 'The popup shows the word saved');
     await createList(page, 'Evening Japanese');
     await waitForAppRecord(page, record => member(record, 'Evening Japanese', '電車'));
     assert.deepEqual(targetRows((await state(page)).record), targetRows(enrolled.record));
     await closeChooser(page);
     await chooser(page, '駅');
-    await page.locator('.vocabulary-list-choices').getByRole('button', { name: 'Morning Japanese', exact: true }).click();
+    await page.locator('#vocabulary-list-popover input[data-list="Morning Japanese"]').check();
     const withStation = await waitForAppRecord(page, record => member(record, 'Morning Japanese', '駅'));
     assert(member(withStation, 'Morning Japanese', '電車'));
     const beforeReload = await state(page);
@@ -87,21 +99,21 @@ const cases = [
     assert.deepEqual(afterReload.installation, beforeReload.installation);
   }],
   ['failed-list-write-is-honest-and-recoverable', async page => {
-    await chooser(page);
-    await page.locator('.vocabulary-list-choices').getByRole('button', { name: 'Save for review', exact: true }).click();
+    await openLookup(page); await saveInPopup(page);
     await waitForAppRecord(page, record => record.taken.some(row => row.id === '電車'));
+    await page.locator('#mini #mini-lists').click(); await page.locator('#vocabulary-list-popover').waitFor();
     const before = await state(page);
     await armRecordWriteFailure(page, 'abort', { roots: ['lists'] });
     await createList(page, 'Retry this list');
     await page.waitForFunction(() => /protected/i.test(document.querySelector('.vocabulary-list-status')?.textContent || ''));
     assert.match(await page.locator('.vocabulary-list-status').textContent(), /reload/i, 'The notice must say a reload comes before any retry');
-    assert.equal(await page.locator('.vocabulary-list-form input').inputValue(), 'Retry this list');
+    assert.equal(await page.locator('#vocabulary-list-popover .vocabulary-list-form input').inputValue(), 'Retry this list');
     assert.deepEqual((await state(page)).record, before.record, 'Failed list commit cannot claim or keep an optimistic membership');
     const fault = await clearRecordWriteFailure(page); assert(fault.fired > 0, 'The native transaction fault must actually fire');
     // A native write fault protects the record until reload, even once the fault is gone.
     assert.equal(await page.evaluate(() => window.annotationFixture.recordWritable()), false, 'The record must stay read-only until reload');
-    assert.equal(await page.locator('.vocabulary-list-form [type="submit"]').isDisabled(), true, 'The list form must stay disabled until reload');
-    // The modal must remain dismissible so the real store recovery control can be reached.
+    assert.equal(await page.locator('#vocabulary-list-popover .vocabulary-list-form [type="submit"]').isDisabled(), true, 'The list form must stay disabled until reload');
+    // The popover must remain dismissible so the real store recovery control can be reached.
     await closeChooser(page);
     await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
     await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
@@ -109,7 +121,7 @@ const cases = [
     assert.deepEqual((await state(page)).record, before.record);
     await chooser(page);
     assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list', 'The typed list name survives the reload as a session draft');
-    await page.locator('#vocabulary-list-dialog [type="submit"]').click();
+    await page.locator('#vocabulary-list-popover [type="submit"]').click();
     await waitForAppRecord(page, record => member(record, 'Retry this list', '電車'));
     await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');
     assert.deepEqual(targetRows((await state(page)).record), targetRows(before.record));
@@ -124,7 +136,7 @@ const cases = [
     });
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'うわて', 'The explicit JMdict entry must survive the quick look');
     assert.match(await page.locator('#mini .mini-gloss').textContent(), /upper part/);
-    await page.locator('#mini-take').click(); await createList(page, 'Exact reading');
+    await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
     const saved = await waitForAppRecord(page, record => member(record, 'Exact reading', '上手'));
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');
@@ -133,8 +145,8 @@ const cases = [
     await openLookup(page, '上手');
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'じょうず');
     assert.equal(await page.locator('#mini-take').isDisabled(), true, 'The different core homograph cannot overwrite the existing card');
-    // Also exercise the chooser’s own guard; a stale caller cannot bypass it.
-    await page.evaluate(() => window.annotationFixture.openVocabularyListChooser({ t: 'word', id: '上手' }, '上手', document.getElementById('annotation-anchor')));
+    // Also exercise the list popover's own guard; a stale caller cannot bypass it.
+    await page.evaluate(() => window.annotationFixture.openVocabularyListPopover({ t: 'word', id: '上手' }, '上手', document.getElementById('annotation-anchor')));
     await createList(page, 'Wrong homograph');
     assert.match(await page.locator('.vocabulary-list-status').textContent(), /different|another|reading|entry|saved|cannot|not/i);
     assert.deepEqual((await state(page)).record, before.record);
