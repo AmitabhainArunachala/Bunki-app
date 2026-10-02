@@ -22,7 +22,8 @@ Usage (run from anywhere; the corpus grading stack must be importable —
   python feed_fresh.py --restage --since D     re-fetch with today's adapters; an item still
                                                PENDING review whose text changed is replaced
                                                in the dataset (its previous content hash kept)
-                                               and re-minted in place. Approved or rejected
+                                               and re-minted in place, keeping its index.json
+                                               picture and accent. Approved or rejected
                                                items are never touched.
 
 It installs no schedule. Running it daily is the operator's decision.
@@ -46,9 +47,10 @@ What one run does
            English titles are authored, never generated: they come from
            docs/content/feed-fresh-titles-en.json (titleEnSource names who
            wrote them; a per-row "sources" entry names a publisher headline
-           or a cross-checked translation and wins over it). Every mint enters the shelf as review
-           "human-review-pending" with 検収前 in its sourceLabel, and gets a
-           kind:"fresh" row in docs/content/feed-review-queue.json; only the
+           or a cross-checked translation and wins over it). Every mint
+           enters the shelf as review "human-review-pending" with 検収前 in
+           its sourceLabel, and gets a kind:"fresh" row in
+           docs/content/feed-review-queue.json; only the
            operator's decision there (applied by feed_apply_review.py) lifts it.
   adapt    docs/content/feed-fresh-adaptations.json holds authored N3 rewrites of
            fresh readings (Bunki adaptations — never presented as the source).

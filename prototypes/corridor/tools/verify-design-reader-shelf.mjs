@@ -775,7 +775,7 @@ try {
       // the browser keeps its own menu off the words
       const offWord = await page.evaluate(() => {
         const title = document.querySelector('h1.view-title');
-        const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 10, clientY: 10 });
+        const event = new window.MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 10, clientY: 10 });
         return title.dispatchEvent(event);
       });
       assert.equal(offWord, true, 'a right-click off the words lost the browser menu');
