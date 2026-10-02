@@ -135,7 +135,7 @@ try{
  await host.close();
  const receipt={artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
   verifierSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-  scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and the word menu's full entry. No broad lexical/capture regression claim',
+  scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and the word menu full entry. No broad lexical/capture regression claim',
   instrumentation:'Unmodified staged runtime, normal DOM controls, no export shim or model calls; native audio paths run silently',results,
   passed:results.length===engines.length*18&&results.every(row=>row.passed)};
  writeFileSync(resolve(evidence,'result.json'),JSON.stringify(receipt,null,2)+'\n');
