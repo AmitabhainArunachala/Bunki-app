@@ -7913,6 +7913,7 @@ function openVocabularyListPopover(node, label, invoker) {
  * plain "Full entry ›". In an article the last, quiet row acts on the word's sentence (it replaced the
  * floating sentence bar). Escape, or a tap outside, puts it away. */
 let miniAnchor = null;
+const SAVE_PRESS_MS = 600;
 function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null } = {}) {
   removeMini();
   const { g, held, node: captureNode, state: miniState, identityHeld } = wordSaveFacts(token, { reader, from, record });
@@ -7934,11 +7935,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     seal.classList.add('reader-capture-held');
     seal.setAttribute('aria-describedby', 'mini-take-reason');
   }
-  // one press saves, a press on "Saved ✓" takes it back out; the second click of a double-click is not
-  // a second press (it would undo the save it just made)
+  // one press saves, a press on "Saved ✓" takes it back out; a second press within a breath of the first
+  // (a double-click, a bounced tap) is the same press, never an undo of the save it just made
+  let pressedAt = -Infinity;
   seal.addEventListener('click', (event) => {
     event.stopPropagation();
-    if (seal.disabled || event.detail > 1) return undefined;
+    if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
+    pressedAt = Date.now();
     return toggleWordSave(captureNode, token.b);
   });
   if (held || identityHeld) {
@@ -22059,23 +22062,18 @@ async function ensureBankExamples(word) {
   return job;
 }
 
-/* ---------------------------------- the reader's ladder, outside the reader
+/* ---------------------------------- the reader's grammar, outside the reader
  * Any sentence the app shows — a sheet's 用例, a review cloze, a probe's
  * context line — carries the reader's click grammar, and starts BARE:
  * no furigana until it is asked for (operator's law, 2026-08-12 — the
  * sentence is the exercise; readings on request only, whatever the
- * reader's own dial says). Taps circle exactly as in the reader: first
- * tap ふりがな, second tap the English gloss beneath, third tap closes
- * the circle back to plain kanji. The full entry lives on the holds —
- * a short hold floats the simple definition, a long hold (or a tap on
- * the mini) opens the entry. Each sentence keeps its own quiet ladder
- * state; taps land in the obslog. */
+ * reader's own dial says). One tap opens the word's popup, as in the
+ * reader (reader lane 2026-10-02): the reading and the meaning at once,
+ * Save, and Full entry ›. Taps land in the obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
   const source = sentenceSource(tokens, contextId, opts.start);
-  const revealed = new Set();
-  const glossed = new Set();
   tokens.forEach((token, index) => {
     if (!token.c || !token.f?.length) {
       // 禁則処理 — a line must never open with a closing mark. WebKit
@@ -22121,96 +22119,25 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     span.setAttribute('aria-haspopup', 'dialog');
     span.setAttribute(
       'aria-label',
-      tx(
-        `${token.s} · 語 · もう一度で戻る、長押しで全項目`,
-        `${token.s} · word · a third activation clears; hold for the full entry`,
-      ),
+      tx(`${token.s} · 語 · 押すと読みと意味`, `${token.s} · word · activate for the reading and meaning`),
     );
-    const paint = () => {
-      span.textContent = '';
-      span.append(
-        wordRow(displayPairs(token), {
-          furigana: revealed.has(index) ? 1 : 0,
-          revealed: revealed.has(index),
-        }),
-      );
-      if (glossed.has(index)) {
-        const g = lookup(token.b);
-        if (g?.m?.length) span.append(el('span', 'tok-en', inlineGloss(g)));
-      }
-    };
-    paint();
-    // the reader's full gesture grammar, in miniature: taps circle
-    // ふりがな → English → plain again; a short hold floats the simple
-    // definition, a long hold (or a tap on it) opens the full entry
+    span.append(wordRow(displayPairs(token), { furigana: 0, revealed: false }));
+    // the reader's grammar (reader lane 2026-10-02): one tap opens the word's popup — reading and meaning
+    // at once, Save, and Full entry ›, which opens the entry with this sentence as its provenance
+    const from = source ? { passage: source.passage, index: source.index + index } : null;
     const openEntry = () => {
       removeMini();
-      if (down) swallowClickUntil = Date.now() + 700; // held release → one ghost click
       obsLog('tap', srsKey('word', token.b), 3, contextId);
-      go({ t: 'word', id: token.b, ...(source ? {
-        from: { passage: source.passage, index: source.index + index }, ctxScope: 'sent',
-      } : {}) });
-    };
-    const cycle = () => {
-      if (!revealed.has(index)) {
-        revealed.add(index);
-        obsLog('tap', srsKey('word', token.b), 1, contextId);
-        paint();
-        return;
-      }
-      if (!glossed.has(index)) {
-        glossed.add(index);
-        obsLog('tap', srsKey('word', token.b), 2, contextId);
-        paint();
-        return;
-      }
-      revealed.delete(index);
-      glossed.delete(index);
-      paint();
-    };
-    let miniTimer = null;
-    let fullTimer = null;
-    let down = null;
-    const clearHold = () => {
-      clearTimeout(miniTimer);
-      clearTimeout(fullTimer);
-      miniTimer = fullTimer = null;
+      go({ t: 'word', id: token.b, ...(from ? { from, ctxScope: 'sent' } : {}) });
     };
     span.addEventListener('contextmenu', (ev) => ev.preventDefault());
-    span.addEventListener('pointerdown', (ev) => {
-      down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
-      miniTimer = setTimeout(() => showMini(span, token, openEntry), GESTURE.MINI_MS);
-      fullTimer = setTimeout(openEntry, GESTURE.FULL_MS);
-    });
-    span.addEventListener('pointermove', (ev) => {
-      if (!down) return;
-      if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > GESTURE.MOVE_PX) {
-        clearHold();
-        down = null;
-      }
-    });
-    span.addEventListener('pointercancel', () => {
-      clearHold();
-      down = null;
-    });
-    let heldAt = 0;
-    span.addEventListener('pointerup', () => {
-      if (!down) return;
-      const held = Date.now() - down.at;
-      down = null;
-      clearHold();
-      if (held >= GESTURE.MINI_MS) heldAt = Date.now(); // release click stays inert
-    });
     span.addEventListener('click', (ev) => {
       ev.stopPropagation();
-      // activation on the CLICK — it survives the pointercancel a scrollable
-      // sheet hands a plain tap on iOS (the pointerup path never fires there)
-      if (Date.now() < swallowClickUntil) return;
-      if (heldAt && Date.now() - heldAt < 800) {
-        heldAt = 0;
-        return;
-      }
-      cycle();
+      if (ev.detail !== 0 && Date.now() < swallowClickUntil) return;
+      // a press on the word whose popup is open put it away; its click does not open it again
+      if (ev.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+      obsLog('tap', srsKey('word', token.b), 2, contextId);
+      showMini(span, token, openEntry, { focusEntry: ev.detail === 0, from });
     });
     container.append(span);
   });
@@ -24242,8 +24169,8 @@ function renderWordNode(sheet, node) {
     // opens the dictionary was the ladder's unspoken rung (review P2)
     sheet.append(
       withEn(
-        el('p', 'eyebrow', '用例 — ことばは長押しで辞書へ'),
-        'examples — tap a word to climb its ladder; hold it to open the dictionary',
+        el('p', 'eyebrow', '用例 — ことばに触れると意味'),
+        'examples — tap a word for its meaning',
         'en-inline',
       ),
     );

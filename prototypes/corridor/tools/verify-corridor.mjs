@@ -1292,8 +1292,15 @@ async function main() {
   // scroll), THEN record the place the reader is actually at when touching
   await page.locator('#reader .tok.content').nth(23).evaluate((n) => n.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(150);
+  // choose the word first (its popup): a phone's sticky header grows by the chrome's 覚える door when a word is
+  // chosen, and the browser's scroll anchoring moves scrollY to keep the text still. The place the reader leaves
+  // from is the place once the word is chosen; then the popup's Full entry opens the entry.
+  await tap(page, '#reader .tok.content', 23);
+  await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
+  await page.waitForTimeout(150);
   const scrollBefore = await page.evaluate('window.scrollY');
-  await holdWord(page, '#reader .tok.content', 23);
+  const entryBox = await page.locator('#mini .mini-entry').boundingBox();
+  await page.mouse.click(entryBox.x + entryBox.width / 2, entryBox.y + entryBox.height / 2);
   await page.waitForSelector('#sheet');
   // the deep tier's one-time re-render replaces the sheet body moments after
   // it opens — tapping a kanji row mid-swap dies with it (same settle as
@@ -2328,27 +2335,26 @@ async function main() {
   check('a common word carries at least 4 example sentences',
     bankSheet.n >= 4 && bankSheet.en >= 1,
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
-  // the eyebrow teaches the whole gesture: the hold that opens the
-  // dictionary must be said, not left for the reader to discover
+  // the eyebrow teaches the gesture: one tap gives the meaning (reader lane 2026-10-02)
   const exampleEyebrow = await page.evaluate(
     `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t.includes('用例')) ?? ''`,
   );
-  check('the 用例 eyebrow says that holding a word opens the dictionary',
-    /長押しで辞書/.test(exampleEyebrow) || /hold it to open the dictionary/.test(exampleEyebrow),
+  check('the 用例 eyebrow says that a tap on a word gives its meaning',
+    /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
     `eyebrow: "${exampleEyebrow}"`);
   const ladderProof = await page.evaluate(`(() => {
     const tok = document.querySelector('#sheet .example .sentence-tok');
     if (!tok) return null;
-    const fire = () => tok.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    fire();
-    const rt = tok.querySelectorAll('rt').length;
-    fire();
-    const gloss = !!tok.querySelector('.tok-en');
-    return { rt, gloss };
+    tok.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const mini = document.querySelector('#mini');
+    return { word: tok.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
+      gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: !!tok.querySelector('.tok-en') };
   })()`);
-  check('example tokens climb the reader ladder — ふりがな, then English',
-    !!ladderProof && ladderProof.gloss,
+  check('example tokens open the word popup — the reading and the meaning at once, nothing under the word',
+    !!ladderProof && !!ladderProof.popup && ladderProof.word.includes(ladderProof.popup.slice(0, 1)) && !!ladderProof.gloss && !ladderProof.under,
     JSON.stringify(ladderProof));
+  // the keyboard-shaped click put focus in the popup; Escape there puts away the popup only
+  await page.keyboard.press('Escape');
   // every example sentence carries a door into its own minimum reader —
   // and 戻る from there returns exactly one step, to the word's entry
   await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
@@ -2379,15 +2385,13 @@ async function main() {
   await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
   await page.waitForSelector('#sheet .sent-reader .sentence-tok.example-hit', { timeout: 8000 });
   await tap(page, '#sheet .sent-reader .sentence-tok.example-hit');
-  await page.waitForTimeout(200);
-  await tap(page, '#sheet .sent-reader .sentence-tok.example-hit');
   await page.waitForTimeout(300);
   const hantoGloss = await page.evaluate(
-    `document.querySelector('#sheet .sent-reader .sentence-tok.example-hit .tok-en')?.textContent ?? null`,
+    `document.querySelector('#mini .mini-gloss')?.textContent ?? null`,
   );
   check('the first sense wins — 半島 glosses peninsula, never Korea',
-    hantoGloss === 'peninsula',
-    `inline gloss: "${hantoGloss}" (real taps on the sentence page)`);
+    /^peninsula\b/u.test(hantoGloss ?? ''),
+    `popup gloss: "${hantoGloss}" (a real tap on the sentence page)`);
 
   // capture scope: 語だけ · この文 · 段落 — the choice rides the card
   await open('?entry=shelf');

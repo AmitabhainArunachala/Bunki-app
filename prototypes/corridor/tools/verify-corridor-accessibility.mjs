@@ -484,17 +484,16 @@ async function main() {
       !secondState.popup && !secondState.sheet && !secondState.gloss && secondState.current,
       JSON.stringify(secondState),
     );
-    await touchAt(page, '#reader .tok.content', tokenIndex + 1, 0, false);
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
     const reopened = await popupProbe();
     check('a third action opens it again: one tap is always the meaning', reopened.open && reopened.gloss, JSON.stringify(reopened));
     const pointerReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
-    // three taps opened a popup (the closing tap only puts one away)
+    // two taps opened the popup (the closing tap between them only put it away)
     check(
       'pointer route emits target.activate envelopes with pointer provenance',
-      pointerReceipts.length >= 3 && pointerReceipts.slice(-3).every((r) => r.provenance.modality === 'pointer'),
+      pointerReceipts.length >= 2 && pointerReceipts.slice(-2).every((r) => r.provenance.modality === 'pointer'),
       `${pointerReceipts.length} receipt(s)`,
     );
     await page.keyboard.press('Escape');
