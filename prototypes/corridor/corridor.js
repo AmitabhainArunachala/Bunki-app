@@ -5617,14 +5617,28 @@ function renderShelfBody() {
   // rank sets the headline size: the lead, two seconds, then the grid; the bands follow the seconds.
   // A story in today's six stands in that band, not a second time in the grid (one card per story).
   const inBand = new Set(picks.map((p) => p.id));
+  // the short word definitions are not articles: they never lead, and they stand together in
+  // their own band of compact text cards after the stories (FEEL pass 2026-10-02)
+  const definitions = matches.filter((p) => p.source === 'isa-yasashii-glossary');
   let rank = 0;
   for (const p of matches) {
+    if (p.source === 'isa-yasashii-glossary') continue;
     if (rank >= 3 && inBand.has(p.id)) continue;
     if (rank === 3) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
     rank += 1;
   }
   grid.append(...bands);
+  if (definitions.length) {
+    const band = el('section', 'shelf-definitions shelf-band');
+    band.setAttribute('aria-labelledby', 'shelf-definitions-head');
+    const head = withEn(el('h2', 'shelf-band-head', 'ことばの解説'), 'short word definitions', 'en-inline');
+    head.id = 'shelf-definitions-head';
+    const list = el('div', 'shelf-definition-grid');
+    for (const p of definitions) list.append(shelfCard(p, 'definition'));
+    band.append(head, list);
+    grid.append(band);
+  }
   if(!matches.length)grid.append(el('p','note',tx('この条件の読み物はありません。絞り込みを減らしてください。','No articles match these filters. Try a wider level or another topic.')));
   main.append(grid);
   main.append(renderReadingPlaces()); renderSentenceReadingSuggestions(main);
@@ -7162,10 +7176,10 @@ function unreviewedChip(p) {
   return chip;
 }
 /** The level a learner filters by: the JLPT vocabulary estimate, with the sentence band beside it. */
-function levelChip(p) {
+function levelChip(p, extra = '') {
   const jlpt = p.readingFacets?.jlpt;
   const lv = levelPhrase(p.grading);
-  const chip = el('span', 'level-chip', jlpt || (bi() ? lv.level : lv.ja));
+  const chip = el('span', `level-chip${extra ? ` ${extra}` : ''}`, jlpt || (bi() ? lv.level : lv.ja));
   if (jlpt) chip.dataset.level = jlpt;
   chip.title = jlpt
     ? tx(`JLPT ${jlpt} 程度の語彙（目安）· 文の難しさ ${lv.ja}`, `JLPT ${jlpt} vocabulary (estimate) · sentences ${lv.level}`)
@@ -7181,13 +7195,72 @@ const TOPIC_KICKERS = {
 };
 const TOPIC_ORDER = ['politics', 'economy', 'science', 'technology', 'international', 'environment', 'health', 'society',
   'culture', 'sports', 'weather', 'disaster', 'local', 'news digest', 'literature', 'news'];
+/* Each topic's colour (FEEL pass 2026-10-02): the kicker, the calm block that stands in for a
+ * picture not yet drawn, and the lead's mark. Matte print colours, each dark enough for small
+ * text on white (≥ 4.5:1). A record's own "accent" wins over its topic's. */
+const TOPIC_COLOURS = {
+  politics: '#3b4a6b', economy: '#1f6b5c', science: '#3d4f9c', technology: '#36587a', international: '#1f6491',
+  environment: '#3f6d33', health: '#2a7466', society: '#6a4a7a', culture: '#9a4a2a', sports: '#a8461c',
+  literature: '#7a2e44', weather: '#2f6c9a', disaster: '#8f5300', local: '#5b6628', 'news digest': '#4a4f57',
+  news: '#4a4f57', essay: '#7a5a2e', graded: '#5b4a8a', primary: '#5a5148', glossary: '#4a5d70', reading: '#4a5d70',
+};
+/** The key a story's topic is known by: its own topic, its first facet in the filter's order, or its lane. */
+function storyTopicKey(p) {
+  if (p.source === 'isa-yasashii-glossary') return 'glossary';
+  if (TOPIC_KICKERS[p.topic]) return p.topic;
+  const topics = p.readingFacets?.topics || [];
+  for (const topic of TOPIC_ORDER) if (topics.includes(topic)) return topic;
+  return ['essay', 'graded', 'primary'].includes(p.lane) ? p.lane : 'reading';
+}
 /** One topic per story, from the facets the 分野 filter already uses. */
 function storyTopic(p) {
-  if (p.source === 'isa-yasashii-glossary') return ['用語集', 'Glossary'];
-  if (TOPIC_KICKERS[p.topic]) return TOPIC_KICKERS[p.topic];
-  const topics = p.readingFacets?.topics || [];
-  for (const topic of TOPIC_ORDER) if (topics.includes(topic)) return TOPIC_KICKERS[topic];
-  return { essay: ['随筆', 'Essay'], graded: ['読み物', 'Graded reading'], primary: ['資料', 'Source'] }[p.lane] || ['読み物', 'Reading'];
+  const key = storyTopicKey(p);
+  if (key === 'glossary') return ['用語集', 'Glossary'];
+  if (TOPIC_KICKERS[key]) return TOPIC_KICKERS[key];
+  return { essay: ['随筆', 'Essay'], graded: ['読み物', 'Graded reading'], primary: ['資料', 'Source'] }[key] || ['読み物', 'Reading'];
+}
+function storyAccent(p) {
+  return /^#[0-9a-f]{6}$/iu.test(p.accent || '') ? p.accent : TOPIC_COLOURS[storyTopicKey(p)] || TOPIC_COLOURS.reading;
+}
+/* A story's picture (FEEL pass 2026-10-02): data/articles/index.json may carry
+ *   "picture": { "src": "articles/pictures/<file>.webp", "alt": "…", "w": 1200, "h": 800 }
+ * (src relative to data/), and an optional "srcSmall" with "wSmall" for a narrow screen. The slot
+ * is always a fixed 3:2 box, so nothing jumps while a picture loads. Until a picture exists — or
+ * if it cannot load, or in the single-file build that carries no pictures — the slot is a calm
+ * block in the story's colour with its topic word, never a big decorative kanji. */
+function storyPictureSource(p) {
+  const pic = p.picture;
+  if (!pic || typeof pic.src !== 'string' || !/^articles\/pictures\/[\w.-]+\.(webp|jpe?g|png|avif)$/u.test(pic.src)) return null;
+  if (window.__CORRIDOR_STANDALONE__ === true) return null;
+  return pic;
+}
+function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
+  const frame = el('span', cls);
+  const [ja, en] = storyTopic(p);
+  const placeholder = () => {
+    frame.classList.add('is-placeholder');
+    frame.textContent = '';
+    // the topic's word, small and set in small capitals: it says what kind of story this is
+    const word = el('span', 'story-picture-word', bi() ? en : ja);
+    word.setAttribute('aria-hidden', 'true');
+    frame.append(word);
+  };
+  const pic = storyPictureSource(p);
+  if (!pic) { placeholder(); return frame; }
+  const img = el('img', 'story-img');
+  img.src = `data/${pic.src}`;
+  if (pic.srcSmall && /^articles\/pictures\/[\w.-]+$/u.test(pic.srcSmall) && pic.wSmall && pic.w) {
+    img.srcset = `data/${pic.srcSmall} ${pic.wSmall}w, data/${pic.src} ${pic.w}w`;
+    img.sizes = '(max-width: 520px) 100vw, 50vw';
+  }
+  // inside a card the headline already names the story, so the picture is quiet to a screen reader
+  img.alt = '';
+  if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
+  img.loading = eager ? 'eager' : 'lazy';
+  img.decoding = 'async';
+  img.addEventListener('error', placeholder, { once: true });
+  frame.append(img);
+  return frame;
 }
 function storyKicker(p) {
   const [ja, en] = storyTopic(p);
@@ -7241,6 +7314,38 @@ function renderReaderTip(main) {
   main.append(tip);
 }
 
+/** The kanji school grade an article's characters reach (the 学年 filter's measure), as a quiet tag. */
+function gradeTag(p) {
+  const grade = p.readingFacets?.schoolGrade;
+  if (!grade) return document.createTextNode('');
+  const ja = grade === 'secondary' ? '中学以上' : `小${grade}`;
+  const en = grade === 'secondary' ? 'secondary+' : `grade ${grade}`;
+  const tag = el('span', 'grade-tag', `漢字 ${ja}`);
+  // a label, like the level beside it: not prose to look up
+  tag.dataset.japaneseLookup = 'off';
+  tag.title = tx(`使われている漢字の学年: ${ja}`, `kanji up to school ${en}`);
+  return tag;
+}
+/** The article's picture under its headline, when one has been drawn (FEEL pass 2026-10-02): the
+ * same picture as its shelf card, full text width, captioned. An N3 rewrite shows its original's. */
+function readerPicture(p) {
+  const versions = storyVersions(p);
+  const owner = storyPictureSource(p) ? p : versions && storyPictureSource(versions.original) ? versions.original : null;
+  if (!owner) return null;
+  const pic = storyPictureSource(owner);
+  const figure = el('figure', 'reader-picture');
+  figure.dataset.japaneseLookup = 'off';
+  figure.style.setProperty('--topic', storyAccent(owner));
+  const img = el('img', 'reader-picture-img');
+  img.src = `data/${pic.src}`;
+  img.alt = String(pic.alt || '');
+  if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
+  img.decoding = 'async';
+  img.addEventListener('error', () => figure.remove(), { once: true });
+  figure.append(img, el('figcaption', 'reader-picture-caption', tx('挿絵 · Bunki', 'Illustration · Bunki')));
+  return figure;
+}
+
 /** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
  * read as a random symbol to anyone who is not already a learner). A topic kicker, the Japanese
  * headline, one English line, the level and the date, and nothing that does not carry meaning.
@@ -7249,12 +7354,25 @@ function renderReaderTip(main) {
  * 今日の６本. Source, licence, review detail and the grader's signals live in the article's own
  * footer. A card is ONE door (the whole card opens the reading). */
 function shelfCard(p, rank = 'grid') {
-  const item = el('article', `shelf-item story-card story-${rank}`);
+  // the short word definitions are not articles: a compact text card, no picture (FEEL pass)
+  const glossary = p.source === 'isa-yasashii-glossary';
+  const item = el('article', `shelf-item story-card story-${rank}${glossary ? ' story-glossary' : ''}`);
   item.dataset.passage = p.id;
+  item.style.setProperty('--topic', storyAccent(p));
   const open = el('button', 'shelf-open');
   open.type = 'button';
+  // every article wears a picture slot, its level badge at the picture's top-right
+  if (!glossary) {
+    const picture = storyPicture(p, { eager: rank === 'lead' || rank === 'second' });
+    picture.append(levelChip(p, 'level-badge'));
+    open.append(picture);
+  }
   const head = el('div', 'shelf-head');
-  head.append(storyKicker(p));
+  if (glossary) {
+    const top = el('div', 'story-topline');
+    top.append(storyKicker(p), levelChip(p));
+    head.append(top);
+  } else head.append(storyKicker(p));
   const headline = el('div', 'shelf-title', p.title);
   headline.lang = 'ja'; // so a headline breaks between phrases, never inside a word (word-break: auto-phrase)
   head.append(headline);
@@ -7270,7 +7388,6 @@ function shelfCard(p, rank = 'grid') {
     }
   }
   const foot = el('div', 'story-foot');
-  foot.append(levelChip(p));
   const date = storyDate(p, rank === 'teaser');
   if (date) foot.append(date);
   // the shelf remembers with you: finished, or open to your bookmark
@@ -8750,7 +8867,7 @@ function renderReader(main) {
   const meta = el('p', 'eyebrow reader-meta');
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
   if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
-  meta.append(levelChip(p));
+  meta.append(levelChip(p), gradeTag(p));
   if (reviewPending(p)) meta.append(unreviewedChip(p));
   // the dials fold away — the text is the point, the settings one tap away
   const dialsToggle = el('button', 'icon-button dials-toggle');
@@ -8772,6 +8889,8 @@ function renderReader(main) {
   // heading itself still reads as the Japanese title alone.
   main.append(el('h1', 'view-title', p.title));
   if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
+  const picture = readerPicture(p);
+  if (picture) main.append(picture);
   const versions = storyVersions(p);
   if (versions) {
     // one story, two texts: the original and Bunki's N3 rewrite are a toggle, never two cards
@@ -27063,6 +27182,49 @@ function navBackFromGinga() {
 }
 
 /** The EN⇄日本語 pill: a sliding knob, not two buttons. */
+/** The torii bar's look-up field (operator, 2026-10-02: "the search bar is too narrow here"): a real
+ * field, wide, ready to type. The first keystroke (or a finished IME composition, or Enter) carries
+ * the text into the search room — the same lookup and rows as everywhere — with the caret where the
+ * typing left it; a click or a Tab only focuses it, so the keyboard is never moved on focus alone. */
+function buildNavSearchField() {
+  const wrap = el('label', 'nav-search-field');
+  wrap.innerHTML = SEARCH_SVG;
+  const input = el('input', 'nav-search-door');
+  input.type = 'search';
+  input.id = 'nav-search-door';
+  // a phone shows the short form, as the shelf's field does: the long one would be cut mid-word
+  input.placeholder = tx('ことばを引く：漢字・かな・ローマ字・英語', matchMedia('(max-width: 600px)').matches
+    ? 'Look up a word' : 'Look up a word: kanji · kana · romaji · English');
+  input.setAttribute('aria-label', tx('ことばを引く — 漢字・かな・ローマ字・英語', 'Look up a word: kanji, kana, romaji or English'));
+  input.autocomplete = 'off';
+  input.spellcheck = false;
+  input.enterKeyHint = 'search';
+  input.addEventListener('focus', () => ensureDictionaryIndex().catch(() => {}), { once: true });
+  const carry = () => {
+    const q = input.value;
+    S.navSourceContext = null;
+    S.navQ = q;
+    openSearchPage();
+    const room = document.getElementById('nav-search-input');
+    if (room && q) {
+      if (room.value !== q) room.value = q;
+      room.setSelectionRange(q.length, q.length);
+    }
+  };
+  input.addEventListener('input', (event) => {
+    if (event.isComposing || !input.value.trim()) return;
+    carry();
+  });
+  input.addEventListener('compositionend', () => { if (input.value.trim()) carry(); });
+  input.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.isComposing) return;
+    event.preventDefault();
+    carry();
+  });
+  wrap.append(input);
+  return wrap;
+}
+
 function buildLangSlider() {
   const seg = el('button', 'lang-slide');
   seg.type = 'button';
@@ -27367,7 +27529,7 @@ function buildGingaChrome(root) {
 
   // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
   // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
-  if (S.view === 'drift' && S.taken.length && scheduler) {
+  if (S.view === 'drift' && S.taken.length && scheduler && !S.navOpen) {
     const waiting = todayQueue().order.length;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
       waiting ? `復習 ${waiting}` : '復習', waiting ? `review · ${waiting} due` : 'review');
@@ -27425,18 +27587,26 @@ function buildGingaChrome(root) {
   fwdB.addEventListener('click', navForward);
   arrows.append(backB, fwdB);
   bar.append(arrows);
-  bar.append(buildLangSlider());
-  // the search door — a field-shaped threshold into the search room, in the
-  // place the squeezed 71px field used to stand (operator, 2026-08-20)
-  const searchDoor = el('button', 'nav-search-door');
-  searchDoor.type = 'button';
-  searchDoor.id = 'nav-search-door';
-  searchDoor.setAttribute('aria-label', tx('検索', 'search'));
-  searchDoor.innerHTML =
-    SEARCH_SVG;
-  searchDoor.append(el('span', 'nsd-word', '検索'));
-  searchDoor.addEventListener('click', openSearchPage);
-  bar.append(searchDoor);
+  // the bar (operator, 2026-10-02, note 1): ‹ › · a real, wide look-up field · 復習 N · 集中道場 ·
+  // EN/日本語. Reporting lives on the bug alone; the strip's own "Report a problem" is gone.
+  bar.append(buildNavSearchField());
+  // 復習 with today's due count, one tap into review; at 0 the count steps away, the door stays
+  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const review = biLabel('button', 'nav-review', '復習', 'review');
+  review.type = 'button';
+  review.id = 'nav-review';
+  if (due) review.append(el('span', 'nav-count', String(due)));
+  review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `復習 review — ${due} due today`) : tx('復習', '復習 review'));
+  review.addEventListener('click', () => {
+    S.navOpen = false;
+    keepScroll();
+    S.stack = [];
+    S.trayFrom = { view: 'drift', scroll: 0 };
+    S.view = 'tray';
+    render();
+    window.scrollTo(0, 0);
+  });
+  bar.append(review);
   const dojo = biLabel('button', 'nav-dojo', '集中道場', 'focus');
   dojo.type = 'button';
   dojo.addEventListener('click', () => {
@@ -27446,17 +27616,7 @@ function buildGingaChrome(root) {
     render();
   });
   bar.append(dojo);
-  if (maintenanceReports) {
-    const report = el('button', 'nav-report', tx('問題を報告', 'Report a problem')); report.type = 'button';
-    report.dataset.reportEntry = 'open';
-    report.addEventListener('click', () => {
-      S.navOpen = false; render();
-      // the initiating control leaves with the nav; closing the report returns to the symbol that opened it
-      document.getElementById('ginga-symbol')?.focus({ preventScroll: true });
-      maintenanceReports.openReport();
-    });
-    bar.append(report);
-  }
+  bar.append(buildLangSlider());
   root.append(bar);
 
   const shelf = biLabel('button', 'corner-bubble bubble-shelf', '本棚', 'bookshelf');
@@ -27710,6 +27870,8 @@ function render() {
   crumb.setAttribute('aria-label', crumb.title);
   crumb.append(el('b', null, parts.at(-1) || ''));
   crumb.dataset.currentRoom = S.view;
+  // the reader names the level it is at in its own bar, beside the title (FEEL pass 2026-10-02)
+  if (S.view === 'reader' && passage()) chrome.append(levelChip(passage(), 'chrome-level'));
   chrome.append(crumb);
 
   // the search door — on EVERY surface, one tap from hearing a word to
