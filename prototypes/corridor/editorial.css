@@ -2651,6 +2651,7 @@ body #mini .mini-status:empty { display: none; }
   position: fixed;
   z-index: 140;
   left: 50%;
+  width: max-content;
   bottom: calc(var(--s3) + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
@@ -2742,13 +2743,12 @@ body #mini .mini-status:empty { display: none; }
     width: auto;
     max-height: 62vh;
     overflow: auto;
-    padding-bottom: calc(var(--s2) + env(safe-area-inset-bottom));
+    /* the bug button rests in the corner of the foot: the sheet keeps that strip empty */
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
     border-bottom: 0;
     border-radius: 16px 16px 0 0;
   }
   .reader-toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
-  /* the list sheet owns the foot: the bug steps up to the top corner, as it does for a sheet */
-  body:has(#vocabulary-list-popover) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
   /* a phone keeps the popup short, so it fits above or below its word and clear of the play bar */
   body #mini { padding: 12px var(--s2) 8px; }
   body #mini .mini-word { font-size: 28px; }
