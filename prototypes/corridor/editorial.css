@@ -1991,6 +1991,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 360px) {
+  /* on the narrowest phones the open text settings take the picture's place entirely */
+  body[data-view='reader'] #app > main:has(> .dials) > .reader-picture { display: none; }
   .shelf-tools-toggle > .ui-icon:first-child { display: none; }
   /* on the narrowest phones each of today's six takes the whole width (this block precedes the
      520px one, so it carries one more selector to win) */
