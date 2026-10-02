@@ -1655,15 +1655,14 @@ body[data-view='reader'] #app > main > .view-title-en {
   pointer-events: none;
 }
 @media (max-width: 520px) {
-  .reader-picture-img { max-height: max(96px, calc(100svh - 724px)); transition: max-height var(--dur) var(--ease); }
+  .reader-picture-img { max-height: max(96px, calc(100svh - 724px)); }
   .reader-picture { margin-bottom: 16px; }
-  /* while the text settings are open on a phone the picture folds to a slim band, so the panel
-     does not push the article's opening words down under the dock; it unfolds when they close */
-  body[data-view='reader'] #app > main:has(> .dials) .reader-picture-img { max-height: 44px; }
-  body[data-view='reader'] #app > main:has(> .dials) .reader-picture-caption { display: none; }
-  body.v-depth-layered .dials { padding: 12px; gap: 6px; }
+  /* while the text settings are open on a phone they take the picture's place, so the panel does not
+     push the article's opening words down under the dock; the picture returns when they close */
+  body[data-view='reader'] #app > main:has(> .dials) > .reader-picture { display: none; }
+  body.v-depth-layered .dials { margin-bottom: var(--s2); padding: 10px 12px; gap: 4px; }
+  body.v-depth-layered .dials .dials-hint { margin-top: 4px; }
 }
-@media (max-width: 520px) and (prefers-reduced-motion: reduce) { .reader-picture-img { transition: none; } }
 /* the level in the reader's bar, beside the title */
 body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align-self: center; margin: 0 6px 0 4px; min-height: 22px; padding: 0 8px; font-size: 12px; }
 .version-toggle {
@@ -2047,19 +2046,19 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   :root body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
     width: 100%;
     margin: 0 0 var(--s6);
-    padding: 20px 18px 120px;
+    padding: 16px 18px 120px;
     border: 0;
     border-radius: 0;
     box-shadow: none;
   }
-  .reader-head { margin-bottom: var(--s2); }
+  .reader-head { margin-bottom: 12px; }
   body[data-view='reader'] #app > main .reader-meta { flex-wrap: nowrap; gap: 4px 10px; }
   .reader-meta .reader-source { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .reader-meta .shelf-date, .reader-meta .level-chip, .reader-meta .status-chip { flex: 0 0 auto; white-space: nowrap; }
   .reader-meta .date-rel, .reader-meta .date-year.is-current { display: none; }
   #reader:not(.fg-always) ruby::before, .reader rt, #reader rt { font-size: 0.63em; }
   body[data-view='reader'] #app > main > h1.view-title { font-size: 26px; line-height: 1.45; }
-  body[data-view='reader'] #app > main > .view-title-en { margin-bottom: var(--s2); font-size: 15px; }
+  body[data-view='reader'] #app > main > .view-title-en { margin-bottom: 12px; font-size: 15px; }
   .listen-row.play-bar.is-pending { margin-bottom: var(--s2); }
   body.v-depth-layered #reader, #reader.reader { font-size: 19px; line-height: 2.15; }
   .reader .tok-en { font-size: 15px; }
