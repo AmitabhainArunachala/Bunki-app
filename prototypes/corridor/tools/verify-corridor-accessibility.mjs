@@ -159,11 +159,25 @@ async function setRevealOnTouch(page) {
 
 async function glyphBottom(page, index) {
   return page.locator('#reader .tok.content').nth(index).evaluate((node) => {
-    // English is a sibling row; the whole button is not a glyph anchor.
-    const glyph = node.querySelector('ruby') ?? node.querySelector(':scope > .tok-word');
-    if (!glyph) throw new Error('Reader token is missing its glyph row');
-    return glyph.getBoundingClientRect().bottom;
+    // the base glyphs themselves: a reading (rt) is not the anchor, nor is the button's touch box
+    const row = node.querySelector(':scope > .tok-word') ?? node;
+    const walker = document.createTreeWalker(row, NodeFilter.SHOW_TEXT, {
+      acceptNode: (text) => (text.parentElement.closest('rt') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    let bottom = null;
+    while (walker.nextNode()) {
+      const range = document.createRange();
+      range.selectNodeContents(walker.currentNode);
+      for (const rect of range.getClientRects()) if (rect.width > 0) bottom = Math.max(bottom ?? rect.bottom, rect.bottom);
+    }
+    if (bottom === null) throw new Error('Reader token is missing its glyph row');
+    return bottom;
   });
+}
+/** Put a reader word mid-screen, clear of the phone's foot dock, before a no-scroll gesture is measured. */
+async function centreWord(page, index) {
+  await page.locator('#reader .tok.content').nth(index).evaluate((node) => node.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(120);
 }
 
 async function openWordDialog(page) {
@@ -439,7 +453,7 @@ async function main() {
     })()`);
     await openReader(page, base);
     await setRevealOnTouch(page);
-    await page.locator('#reader .tok.content').nth(tokenIndex).scrollIntoViewIfNeeded();
+    await centreWord(page, tokenIndex);
     const anchorBefore = await glyphBottom(page, tokenIndex);
     const scrollBefore = await page.evaluate(() => window.scrollY);
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
@@ -450,11 +464,13 @@ async function main() {
       firstPopup.open && firstPopup.reading && firstPopup.gloss && firstPopup.save === 'Save' && firstPopup.under === 0 && firstPopup.inside,
       JSON.stringify({ firstPopup, taps: tapAttempts.slice(-2) }),
     );
+    // the word stays where it is on the screen. (A phone's sticky header grows by the chrome's 覚える door when a
+    // word is chosen; the browser's scroll anchoring moves scrollY to keep the text still, so scrollY is not the measure.)
+    const anchorAfter = await glyphBottom(page, tokenIndex);
     check(
-      'the touched word stays reachable beside its popup, its glyph anchor within 2px, without scrolling',
-      firstReach.reachesTarget && Math.abs(await glyphBottom(page, tokenIndex) - anchorBefore) < 2 &&
-        await page.evaluate(() => window.scrollY) === scrollBefore,
-      JSON.stringify({ firstReach, anchorBefore, scrollBefore }),
+      'the touched word stays reachable beside its popup, its glyph anchor on screen within 2px',
+      firstReach.reachesTarget && Math.abs(anchorAfter - anchorBefore) < 2,
+      JSON.stringify({ firstReach, anchorBefore, anchorAfter, scrollBefore }),
     );
     check('no sentence bar floats over the text; the sentence actions ride in the popup', firstPopup.bar === 0 && firstPopup.sentence,
       JSON.stringify(firstPopup));
@@ -475,9 +491,10 @@ async function main() {
     const pointerReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
+    // three taps opened a popup (the closing tap only puts one away)
     check(
       'pointer route emits target.activate envelopes with pointer provenance',
-      pointerReceipts.length >= 4 && pointerReceipts.slice(-4).every((r) => r.provenance.modality === 'pointer'),
+      pointerReceipts.length >= 3 && pointerReceipts.slice(-3).every((r) => r.provenance.modality === 'pointer'),
       `${pointerReceipts.length} receipt(s)`,
     );
     await page.keyboard.press('Escape');
@@ -487,12 +504,14 @@ async function main() {
       await openReader(page, base);
       await setRevealOnTouch(page);
       if (!scenario.settingsOpen) await page.locator('#dials-toggle').click();
-      const before = await page.evaluate(() => window.scrollY);
-      await touchAt(page, '#reader .tok.content', tokenIndex);
+      await centreWord(page, tokenIndex);
+      const before = await glyphBottom(page, tokenIndex);
+      await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
       const reach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
       const shown = await popupProbe();
-      check(`${scenario.width}px settings-${scenario.settingsOpen ? 'open' : 'closed'} selection stays reachable and its popup fits the screen`,
-        reach.reachesTarget && (scenario.settingsOpen || reach.scrollY === before) && shown.open && shown.inside, JSON.stringify({ before, reach, shown }));
+      const held = await glyphBottom(page, tokenIndex);
+      check(`${scenario.width}px settings-${scenario.settingsOpen ? 'open' : 'closed'} selection stays reachable and still, and its popup fits the screen`,
+        reach.reachesTarget && Math.abs(held - before) < 2 && shown.open && shown.inside, JSON.stringify({ before, held, reach, shown }));
       const anchor = await glyphBottom(page, tokenIndex);
       await touchAt(page, '#reader .tok.content', tokenIndex + 1, 0, false);
       const moved = await popupProbe();

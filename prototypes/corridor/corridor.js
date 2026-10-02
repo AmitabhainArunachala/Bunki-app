@@ -8001,17 +8001,47 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   });
   document.body.append(mini);
   miniAnchor = span;
-  placeFloating(mini, span.getBoundingClientRect());
+  keepFloatingBeside(mini, span);
   if (focusEntry) ([seal, entry].find((button) => !button.disabled) || mini).focus({ preventScroll: true });
   return mini;
 }
 
-/** A floating card beside the word it belongs to: above when there is room, otherwise below. */
+/** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
+function keepFloatingBeside(card, anchor) {
+  placeFloating(card, anchor.getBoundingClientRect());
+  if (typeof ResizeObserver !== 'function') return;
+  let last = card.getBoundingClientRect().height;
+  const watch = new ResizeObserver(() => {
+    if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); return; }
+    const now = card.getBoundingClientRect().height;
+    if (Math.abs(now - last) < 1) return;
+    last = now;
+    placeFloating(card, anchor.getBoundingClientRect());
+  });
+  watch.observe(card);
+}
+
+/** A floating card beside the word it belongs to: above when it fits there, otherwise below, and never
+ * under the fixed chrome at the top or the reader's foot (the play bar's dock on a phone). When neither
+ * side holds it whole it takes the roomier side, clamped inside those edges. */
 function placeFloating(card, r) {
   const m = card.getBoundingClientRect();
-  const above = r.top > m.height + 70;
+  const fixedEdge = (selector, edge) => {
+    const node = document.querySelector?.(selector);
+    if (!node || typeof getComputedStyle !== 'function' || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null;
+    const box = node.getBoundingClientRect();
+    return box.height ? box[edge] : null;
+  };
+  const height = window.innerHeight || Infinity;
+  const ceiling = Math.max(8, (fixedEdge('#app > .chrome', 'bottom') ?? 0) + 8);
+  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height) - 8;
+  const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
+  let top;
+  if (m.height <= roomAbove) top = r.top - 10 - m.height;
+  else if (m.height <= roomBelow) top = r.bottom + 10;
+  else top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - m.height) : Math.max(ceiling, Math.min(r.bottom + 10, floor - m.height));
   card.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
-  card.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
+  card.style.top = `${top}px`;
 }
 
 /* The popup's quiet last row in an article acts on the word's sentence (John #18: the floating sentence bar
@@ -16118,7 +16148,7 @@ function wireParticleGestures(span, particle, index, p) {
     });
     document.body.append(mini);
     miniAnchor = span;
-    placeFloating(mini, span.getBoundingClientRect());
+    keepFloatingBeside(mini, span);
     if (modality === 'keyboard') entry.focus({ preventScroll: true });
     if (!restore) retireReaderTip();
   };

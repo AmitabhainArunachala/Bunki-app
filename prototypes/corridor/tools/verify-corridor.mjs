@@ -157,7 +157,9 @@ async function holdWord(page, selector, index = 0) {
   await touchAt(page, selector, index, 0);
   await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
   await page.waitForTimeout(120);
-  await page.locator('#mini .mini-entry').click();
+  // a press where the link is painted: the popup floats, so nothing may scroll the page to reach it
+  const box = await page.locator('#mini .mini-entry').boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await page.waitForTimeout(200);
 }
 
@@ -2798,6 +2800,8 @@ async function main() {
     miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent' && !miniCap.window,
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
   if (miniIx >= 0) {
+    // a deliberate second press, not the second half of a double-tap (which the Save ignores, so it cannot undo itself)
+    await page.waitForTimeout(700);
     await tap(page, '#mini-take');
     await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
       { description: 'popup stop memorizing' });

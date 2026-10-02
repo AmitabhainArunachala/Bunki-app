@@ -227,11 +227,13 @@ async function practiceFromSource(fixture, source = SOURCE, { savePlace = false 
   const word = page.locator(`#reader .tok[data-index="${source.index}"][data-word="${source.word}"]`);
   await word.click();
   if (savePlace) {
+    // the word's popup floats over the page (reader lane 2026-10-02): a second tap on the word puts it away first
+    await word.click(); await page.waitForFunction(() => !document.getElementById('mini'));
     await page.locator('#reader-place-save').click();
     await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));
     const saved = await readAppRecordSnapshot(page);
     assert.equal(saved.rows.filter(row => row.kind === 'operation').length, 1, 'One ordinary reading-place save supplies the existing actor sequence for local restore');
-    // a press elsewhere put the word's popup away (reader lane 2026-10-02): one tap opens it again
+    // one tap opens the word's popup again
     await word.click();
   }
   await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
