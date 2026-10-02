@@ -95,8 +95,10 @@ function defineRows() {
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
     'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
-    // the seal opens the list chooser (09b5e2a7); its 覚えるのをやめる door is the mini's remove route
-    'openVocabularyListChooser',
+    // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
+    // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
+    'wordSaveFacts', 'paintWordSave', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
+    'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -293,15 +295,10 @@ function defineRows() {
     if (seal) Object.defineProperty(seal, 'ctx', { value: ctx });
     return { span, mini, seal };
   };
-  /** The seal, then — when it opened the list chooser on a saved card — that chooser's own
-   * 覚えるのをやめる door, the one route by which the mini removes a card. */
+  /** One press on the seal: it saves the word, and on a saved card ("Saved ✓") it is the one route by
+   * which the mini removes it (reader lane, 2026-10-02). */
   const clickSeal = async (seal) => {
-    const ctx = seal.ctx;
-    const shown = ctx ? ctx.dialogs.length : 0;
     await seal.listeners.click({ stopPropagation() {}, detail: 1 });
-    const dialog = ctx?.dialogs.length > shown ? ctx.dialogs.at(-1) : null;
-    const stop = dialog && find(dialog, (node) => node.id === 'vocabulary-list-stop');
-    if (stop) await stop.listeners.click({ stopPropagation() {}, detail: 1 });
   };
 
   const NODES = {

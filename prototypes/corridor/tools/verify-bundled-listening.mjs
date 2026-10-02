@@ -167,7 +167,8 @@ for (const engine of engines) for (const width of sizes) {
     const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
-    assert(await page.locator('#reader-sentence-practice').isDisabled()); await sourceToken(page).click();
+    // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup
+    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await sourceToken(page).click();
     await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('reader-choice-neutral')); await page.locator('#sentence-practice-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
@@ -175,9 +176,9 @@ for (const engine of engines) for (const width of sizes) {
       const copy = (node.querySelector('.tok-word') || node).cloneNode(true); copy.querySelectorAll('rt,rp,.tok-en').forEach(node => node.remove());
       return copy.textContent;
     }));
-    const token = sourceToken(page); await token.scrollIntoViewIfNeeded(); const box = await token.boundingBox();
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down();
-    try { await page.locator('#sheet[data-node="word:窓"] .dictionary-entry').waitFor(); } finally { await page.mouse.up(); }
+    // back from practice, the word's popup is open again with Practice focused; its Full entry opens the word
+    assert.equal(await page.locator('#mini .mini-word').textContent(), WORD);
+    await page.locator('#mini .mini-entry').click(); await page.locator('#sheet[data-node="word:窓"] .dictionary-entry').waitFor();
     await settled(page); await page.waitForTimeout(800); // The real sheet's same-gesture guard.
     await page.locator('#sheet [data-kanjirow="窓"]').click(); await page.locator('#sheet[data-node="kanji:窓"]').waitFor();
     await settled(page); await page.waitForTimeout(800); await page.locator('#entry-sentence-practice').click();

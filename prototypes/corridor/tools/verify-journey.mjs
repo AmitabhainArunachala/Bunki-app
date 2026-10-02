@@ -267,8 +267,8 @@ try {
       await page.waitForTimeout(400);
     }
     if (!stable) throw new Error('Reader tokens did not settle before the gesture');
-    // the click grammar (v1.2): the full entry opens by HOLDING a word — the
-    // old double-tap stops at the gloss rung and never reaches the sheet
+    // the click grammar (reader lane 2026-10-02): a press and hold on a word opens its menu, and
+    // "Save word" there makes its review card — the reader's own capture, no sheet in between
     const tok = await page.$('.reader .tok.content');
     await tok.scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
@@ -276,18 +276,16 @@ try {
     const cdp = await page.context().newCDPSession(page);
     const point = { x: box.x + box.width / 2, y: box.y + box.height / 2, radiusX: 6, radiusY: 6, force: 1 };
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
-    await page.waitForTimeout(2400);
+    await page.waitForTimeout(900);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await cdp.detach();
-    await page.waitForSelector('.sheet .headword', { timeout: 8000 });
-    await page.waitForTimeout(800); // the sheet's same-gesture click guard
-    const take = await page.$('.sheet .take:not(.taken)');
-    if (!take) throw new Error('no take button on sheet');
-    await take.click();
+    await page.waitForSelector('#reader-word-menu [data-menu-action="save-word"]', { timeout: 8000 });
     await page.waitForTimeout(400);
+    if (await page.$('#sheet')) throw new Error('the hold opened a sheet, not the word menu');
+    await page.click('#reader-word-menu [data-menu-action="save-word"]');
     const taken = (await waitForAppRecord(page, record => record.taken.length > 0)).taken.length;
-    if (!taken) throw new Error('take did not persist');
-    await page.keyboard.press('Escape');
+    if (taken !== 1) throw new Error(`the menu's Save word made ${taken} cards`);
+    await page.waitForTimeout(400);
     await page.waitForTimeout(500);
     await page.mouse.wheel(0, 900);
     await page.waitForTimeout(1400); // the bookmark debounce

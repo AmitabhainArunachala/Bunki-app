@@ -246,6 +246,8 @@ for (const engine of engines) for (const width of sizes) {
     await atToken(120, '駅で待つ時間'); await page.locator('#reader-source-back').click();
     assert.equal(await page.locator('#sentence-production-text').inputValue(), draft);
     await suggestion('new-context').click(); await atToken(120, '駅で待つ時間');
+    // the reader opens on the focused word; Enter opens its popup, whose last row practises the sentence (reader lane 2026-10-02)
+    await page.keyboard.press('Enter'); await page.locator('#mini').waitFor();
     await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('later-choice-neutral')); await page.locator('#sentence-practice-confirm').click();
     await page.locator('#sentence-review-start').waitFor();

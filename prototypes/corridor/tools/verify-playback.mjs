@@ -312,31 +312,31 @@ try {
   });
 
   // --- the bar's lifecycle, on the synthetic Kore manifest ---
-  await check('approved-player-is-touch-sized-and-clear-of-sentence-actions-on-phones', 'narration', async ({ page }) => {
+  // reader lane 2026-10-02: the floating sentence bar is gone; what floats over the text now is the tapped word's popup
+  await check('approved-player-is-touch-sized-and-clear-of-the-word-popup-on-phones', 'narration', async ({ page }) => {
     const measure = () => page.evaluate(() => {
       const bar = document.querySelector('.listen-row.play-bar').getBoundingClientRect();
-      const actions = document.querySelector('.reader-actions:not([hidden])').getBoundingClientRect();
+      const popup = document.querySelector('#mini').getBoundingClientRect();
       const buttons = [...document.querySelectorAll('#listen-toggle, #listen-rate')].map(node => {
         const r = node.getBoundingClientRect();
         const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
         return { id: node.id, width: r.width, height: r.height, left: r.left, right: r.right,
           top: r.top, bottom: r.bottom, reachable: hit === node || node.contains(hit) };
       });
-      return { viewport: innerWidth, bar: { top: bar.top, bottom: bar.bottom }, actionsBottom: actions.bottom, buttons,
+      return { viewport: innerWidth, bar: { top: bar.top, bottom: bar.bottom }, popup: { top: popup.top, bottom: popup.bottom }, buttons,
         valid: buttons.length === 2 && buttons.every(r => r.width >= 44 && r.height >= 44 &&
           r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && r.reachable) &&
-          actions.bottom <= bar.top && bar.bottom <= innerHeight };
+          popup.bottom <= bar.top && bar.bottom <= innerHeight };
     });
     const measurements = [];
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });
+      // a popup left from the wider screen goes first: Escape on its word
+      await page.locator('#reader .tok').first().focus();
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.getElementById('mini'));
       await page.locator('#reader .tok').first().click();
-      const actions = page.locator('.reader-actions:not([hidden])');
-      await actions.waitFor({ state: 'visible' });
-      await actions.evaluate(async node => {
-        await Promise.all(node.getAnimations().filter(a => Number.isFinite(a.effect?.getComputedTiming().endTime))
-          .map(a => a.finished.catch(() => {})));
-      });
+      await page.locator('#mini').waitFor({ state: 'visible' });
       const observed = await measure();
       measurements.push(observed);
       writeFileSync(resolve(out, 'phone-player-geometry.json'), JSON.stringify(measurements, null, 2));
@@ -346,8 +346,8 @@ try {
     const small = await page.addStyleTag({ content: '#listen-toggle { width:20px!important; min-width:20px!important; height:20px!important; min-height:20px!important; }' });
     assert.equal((await measure()).valid, false, 'the same check rejects a small play target');
     await small.evaluate(node => node.remove());
-    const overlap = await page.addStyleTag({ content: '.teacher-door.reader-actions { bottom:0!important; }' });
-    assert.equal((await measure()).valid, false, 'the same check rejects an action bar covering the player');
+    const overlap = await page.addStyleTag({ content: '#mini { top:auto!important; bottom:0!important; }' });
+    assert.equal((await measure()).valid, false, 'the same check rejects a popup covering the player');
     await overlap.evaluate(node => node.remove());
     assert.equal((await measure()).valid, true, 'removing the controls restores the usable layout');
   });

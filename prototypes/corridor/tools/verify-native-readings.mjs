@@ -221,9 +221,10 @@ async function openQuickLook(page, preferredIndex = 0) {
     (value, index, values) => value < count && values.indexOf(value) === index,
   );
   for (const index of candidates) {
-    await touchAt(page, tokens.nth(index), 560);
+    // one tap is the quick look (reader lane 2026-10-02); a press and hold opens the word menu instead
+    await touchAt(page, tokens.nth(index));
     if (await page.locator('#sheet').count()) {
-      throw new Error(`a quick-lookup hold must not open a full entry on release: ${JSON.stringify(touchAttempts.at(-1))}`);
+      throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
     }
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');

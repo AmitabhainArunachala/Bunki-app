@@ -254,15 +254,12 @@ async function holdEntry(page, index, word) {
   await token.scrollIntoViewIfNeeded();
   const box = await token.boundingBox();
   assert(box && box.width > 0 && box.height > 0, 'Word has a real pointer target');
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  try {
-    await page
-      .locator(`#sheet[data-node="word:${word}"]`)
-      .waitFor({ state: 'visible', timeout: 10_000 });
-  } finally {
-    await page.mouse.up();
-  }
+  // reader lane 2026-10-02: one tap opens the word's popup, whose "Full entry ›" opens the entry
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.locator('#mini .mini-entry').click();
+  await page
+    .locator(`#sheet[data-node="word:${word}"]`)
+    .waitFor({ state: 'visible', timeout: 10_000 });
   await page.waitForFunction(
     () => {
       const sheet = document.querySelector('#sheet');
