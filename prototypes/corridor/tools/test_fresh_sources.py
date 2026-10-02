@@ -399,6 +399,28 @@ def test_restage_replaces_the_reading_once_the_mint_succeeds(tmp_path, monkeypat
     assert json.loads(body.read_text("utf-8"))["text"] == changed["text"]
 
 
+def test_restage_keeps_the_picture_drawn_for_the_reading(tmp_path, monkeypatch):
+    import json
+    import types
+
+    ff, paths, body, old, _changed = restage_shelf(tmp_path, monkeypatch)
+    picture = {"src": "articles/pictures/env-press-press_99999.webp", "alt": "Ants on a dock.", "w": 1200, "h": 800}
+    paths["INDEX_PATH"].write_text(json.dumps({"sources": {}, "articles": [
+        {"id": old["id"], "file": body.name, "addedAt": "2026-09-26", "picture": picture, "accent": "#2F4A5C"}]}, indent=1) + "\n", "utf-8")
+    monkeypatch.setitem(sys.modules, "corpus.grading._mecab", types.SimpleNamespace(get_tagger=lambda: None))
+
+    def fake_mint(row, title_en, _title_source, _topic, as_of, _tagger, _maps):
+        shared = {"id": row["id"], "addedAt": as_of, "date": row["date"], "titleEn": title_en}
+        grading = {"signals": {"jreadability": {"band": "中級"}}}
+        return (dict(shared, text=row["text"]), dict(shared, file=body.name, chars=len(row["text"]), grading=grading),
+                dict(shared, kind="fresh", decision="pending"))
+
+    monkeypatch.setattr(ff, "mint", fake_mint)
+    assert ff.main() == 0
+    shelf = json.loads(paths["INDEX_PATH"].read_text("utf-8"))["articles"]
+    assert [(r["id"], r.get("picture"), r.get("accent")) for r in shelf] == [(old["id"], picture, "#2F4A5C")]
+
+
 def test_global_voices_byline_and_preface_move_to_the_attribution():
     adapter = fs.PublisherReaderAdapter("global-voices")
     row = {
