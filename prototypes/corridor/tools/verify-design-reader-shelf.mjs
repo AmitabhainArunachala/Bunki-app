@@ -4,8 +4,8 @@
  *                         (base text only, readings excluded), before and after a reading shows;
  *                         and no whitespace text node stands between token elements.
  *   R2 readability      — Japanese body 21–22 px at 1368 / 18–19 px at 390; a shown reading is
- *                         ≥ 0.55 × the body; an English gloss is ≥ 15 px at ≥ 4.5:1; the body text
- *                         itself is ≥ 4.5:1 (no light-grey reading text).
+ *                         ≥ 0.55 × the body; the tap's English (in the word popup, reader lane
+ *                         2026-10-02) is ≥ 15 px at ≥ 4.5:1; the body text itself is ≥ 4.5:1.
  *   R3 first sentence   — every token of the first sentence is inside the first viewport, and
  *                         nothing fixed (tip, bar, bug) covers it, at 390×844 and 1368×900.
  *   S1 learner wording  — no visible "signals disagree", 不一致 or "awaiting John" on the shelf or
@@ -41,24 +41,58 @@
  *                         itself does not, and the look-up field's hint fits inside the field.
  *                         Control: 7ef0e985, whose phone chip bar and today's six scrolled sideways
  *                         with a chip and a card cut mid-word at the edge.
- *   P1 tip in the page  — (glance pass) at 1368 and 390, on a first visit, the tap-ladder tip is a note
- *                         in the page's flow (never fixed, sticky or absolute) that ends above the
- *                         article's first word, and at four scroll depths no on-screen word of the
- *                         article is covered by it. Choosing a word leaves it in place (the text does
- *                         not move) and remembers it, so the next visit opens without it; its × removes
- *                         it at once and for good. Control: 7ef0e985, whose tip floated over the text.
- *   W1 ダマスカス saves  — (glance pass) at 1368 and 390, the word popup for ダマスカス (Damascus, the
- *                         fixture article's first word, read だますかす by the article and ダマスカス by the
- *                         dictionary: one reading in two scripts) offers a live 覚 save seal at full
- *                         strength with no held reason, and pressing it opens the list chooser. A
- *                         genuinely different reading stays held, in plain words (test-word-saved-answer
- *                         K1). Control: 7ef0e985, whose seal was disabled and faded to 0.45 over "This
- *                         entry's answer cannot be confirmed yet".
- *   W2 one word, one card — (gate review on 8dea3c2e) at 1368, ダマスカス saved from the quick look
- *                         and then opened in 全項目 shows "memorizing" there, with no conflict note and no
- *                         replace offer; saved in 全項目 first, the quick look's 覚 is live and pressed with
- *                         no held reason and no "open that card". Control: 8dea3c2e, where the quick look
- *                         kept だますかす as the card's reading and 全項目 called it "another reading".
+ *   P1 tip in the page  — (glance pass; reader lane 2026-10-02) at 1368 and 390, on a first visit, the
+ *                         one-time hint says, in plain words, "Tap any word to see what it means.
+ *                         Right-click (or press and hold) for more." It is a note in the page's flow
+ *                         (never fixed, sticky or absolute) that ends above the article's first word,
+ *                         and at four scroll depths no on-screen word is covered by it. The first word
+ *                         that opens its popup makes it disappear without moving the text, and it is
+ *                         remembered, so the next visit opens without it; its × removes it at once and
+ *                         for good. Control: 3166ded3, whose tip taught the three-tap ladder and stayed.
+ *   W1 ダマスカス saves  — (glance pass; reader lane 2026-10-02) at 1368 and 390, the word popup for
+ *                         ダマスカス (Damascus, the fixture article's first word, read だますかす by the
+ *                         article and ダマスカス by the dictionary: one reading in two scripts) offers a live
+ *                         Save at full strength with no held reason, and one press saves it: the button
+ *                         reads "Saved ✓", the record holds exactly one ダマスカス card, and no list window
+ *                         opens. A genuinely different reading stays held, in plain words
+ *                         (test-word-saved-answer K1). Control: 7ef0e985 (seal disabled) and 3166ded3
+ *                         (the press opened the list window and saved nothing).
+ *   W2 one word, one card — (gate review on 8dea3c2e) at 1368, ダマスカス saved from the popup and then
+ *                         opened in 全項目 shows "memorizing" there, with no conflict note and no replace
+ *                         offer; saved in 全項目 first, the popup's Save is live and pressed ("Saved ✓")
+ *                         with no held reason and no "open that card". Control: 8dea3c2e, where the quick
+ *                         look kept だますかす as the card's reading and 全項目 called it "another reading".
+ *   G1 one tap, the meaning — (reader lane 2026-10-02, John #8/#11) at 1368 and 390, ONE tap on 郊外 opens
+ *                         the popup with the word, its reading こうがい, its meaning "suburb", a filled
+ *                         Save and "Full entry ›", inside the screen; nothing is written under the word.
+ *                         A tap on another word moves the popup; Escape puts it away and gives focus back
+ *                         to the word. Control: 3166ded3, whose first tap showed only the reading.
+ *   G2 menu → one card  — (John #11 "right click and choose save") a right-click on 郊外 opens the word menu
+ *                         at the pointer: Save word · Save the sentence · Full entry · Ask the tutor about
+ *                         this sentence · Copy. Save word makes exactly one 郊外 card carrying its sentence
+ *                         (the capture path's ctx), the menu closes, a polite toast says so, and the menu
+ *                         then shows "Saved ✓" unavailable. A right-click off the words keeps the browser's
+ *                         own menu. Control: 3166ded3, which had no word menu.
+ *   G3 Save + Undo      — (John #17) at 1368 and 390, the popup's Save makes one card in one press, no list
+ *                         window opens, the button reads "Saved ✓" and a role=status toast reads "Saved to
+ *                         review · Undo"; Undo takes the card back out and the button reads "Save" again.
+ *                         Control: 3166ded3, whose Save opened dialog#vocabulary-list-dialog.
+ *   G4 keyboard menu    — the focused word's Shift+F10 (and the ContextMenu key) opens the menu with the
+ *                         first item focused; ↓ moves; Escape closes it and focus returns to the word.
+ *                         Enter on the word opens the popup with focus on Save; Escape returns to the word.
+ *                         Control: 3166ded3 (no menu).
+ *   G5 lists popover    — (John #17) at 1368 "Add to list…" opens a compact non-modal popover beside the
+ *                         link (no dialog#vocabulary-list-dialog), whose inline "New list" field makes a
+ *                         list holding the word and whose checkbox takes it off again while the card stays;
+ *                         at 390 the popover is a short sheet on the screen's foot. Control: 3166ded3.
+ *   G6 sentence row     — (John #18) no sentence bar shows when a word is chosen (.reader-actions never
+ *                         visible); the popup's last row reads "This sentence: Save · Ask the tutor ·
+ *                         Practice", and Ask the tutor opens the tutor with that sentence as its active
+ *                         context. Control: 3166ded3, whose bar floated in on the first tap.
+ *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
+ *                         · N1", "やさしい版 Simplified · N3") with the caption "The simplified version
+ *                         retells the same article in easier Japanese.", and an article without a
+ *                         simplified version shows no switch. Control: 3166ded3 ("easier N3", no caption).
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -84,6 +118,7 @@ import { resolve } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -259,13 +294,13 @@ try {
         });
         assert(rt && rt.opacity > 0.9 && rt.text === rt.expected, `the first tap shows no reading: ${JSON.stringify(rt)}`);
         assert(rt.size / body >= 0.55, `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body`);
-        await tapToken(page, 1);
+        // one tap is the meaning (reader lane 2026-10-02): the English stands in the word's popup
         const gloss = await page.evaluate(() => {
-          const node = document.querySelector('#reader .tok[data-index="1"] .tok-en');
+          const node = document.querySelector('#mini .mini-gloss');
           return node ? { size: parseFloat(getComputedStyle(node).fontSize), text: node.textContent } : null;
         });
-        assert(gloss, 'the second tap shows no English');
-        const glossContrast = await page.evaluate(contrastOf, '#reader .tok[data-index="1"] .tok-en');
+        assert(gloss, 'the tap shows no English in its popup');
+        const glossContrast = await page.evaluate(contrastOf, '#mini .mini-gloss');
         assert(gloss.size >= 15, `English gloss ${gloss.size}px`);
         assert(glossContrast >= 4.5, `English gloss contrast ${glossContrast}:1`);
         return { body, bodyContrast, furigana: rt.size, carrier: rt.carrier, ratio: Math.round((rt.size / body) * 100) / 100, gloss: gloss.size, glossContrast };
@@ -557,6 +592,7 @@ try {
             text: node.innerText.trim() };
         });
         assert(tip, 'no first-visit tip on a first visit');
+        assert.equal(tip.text, 'Tap any word to see what it means. Right-click (or press and hold) for more.', 'the hint is not the plain wording');
         assert(['static', 'relative'].includes(tip.position), `the tip is ${tip.position}, not part of the page`);
         assert(tip.bottom <= tip.firstTop, `the tip ends at ${tip.bottom}px, below the first word's top ${tip.firstTop}px`);
         const covered = [];
@@ -581,8 +617,12 @@ try {
         };
         const before = await page.evaluate(gap);
         await tapToken(page, 1);
-        const after = { gap: await page.evaluate(gap), remembered: await page.evaluate(() => localStorage.getItem('kairo-tip-reader-v1')) };
-        assert(after.gap !== null && Math.abs(after.gap - before) <= 1, `choosing a word took the tip away or moved the text under it: ${JSON.stringify({ before, ...after })}`);
+        const after = { gap: await page.evaluate(gap), remembered: await page.evaluate(() => localStorage.getItem('kairo-tip-reader-v1')),
+          popup: await page.locator('#mini').count(),
+          visible: await page.evaluate(() => { const t = document.getElementById('reader-tip'); return !!t && getComputedStyle(t).visibility !== 'hidden' && Number(getComputedStyle(t).opacity) > 0.01; }) };
+        assert.equal(after.popup, 1, 'the first tap opened no popup');
+        assert(after.gap !== null && Math.abs(after.gap - before) <= 1, `the first tap moved the text under the tip: ${JSON.stringify({ before, ...after })}`);
+        assert(!after.visible, 'the hint still shows after the first successful tap');
         assert.equal(after.remembered, '1', 'choosing a word did not remember the tip as seen');
         await openArticle(page, ARTICLE);
         assert.equal(await page.locator('#reader-tip').count(), 0, 'the tip came back on the next visit');
@@ -610,21 +650,23 @@ try {
         assert(!probe.disabled && !probe.held && probe.opacity >= 0.9 && probe.reason === null,
           `ダマスカス (read だますかす in the article, ダマスカス in the dictionary: one reading) cannot be saved: ${JSON.stringify(probe)}`);
         await page.locator('#mini #mini-take').click();
-        await page.waitForSelector('#vocabulary-list-dialog[open]');
-        const chooser = await page.evaluate(() => document.querySelector('#vocabulary-list-dialog h2')?.textContent ?? '');
-        return { reading: probe.reading, chooser };
+        const record = await waitForAppRecord(page, (r) => r.taken.some((t) => t.t === 'word' && t.id === 'ダマスカス'), { description: 'ダマスカス saved in one press' });
+        // the durable write lands a beat before the app repaints its button: wait for the page, then read it
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 }).catch(() => {});
+        const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
+          window: !!document.querySelector('#vocabulary-list-dialog') }));
+        const cards = record.taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
+        assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window && cards === 1, `one press did not save ダマスカス once: ${JSON.stringify({ ...saved, cards })}`);
+        return { reading: probe.reading, saved: saved.label, cards };
       });
     }
 
-    // the quick look's 覚 → the list chooser's "Save for review"; then 全項目 from the same popup
+    // the popup's one-tap Save; then 全項目 from the same popup
     const saveFromQuickLook = async (page) => {
       await page.locator('#reader .tok[data-index="0"]').click();
       await page.waitForSelector('#mini #mini-take:not([disabled])');
       await page.locator('#mini #mini-take').click();
-      await page.waitForSelector('#vocabulary-list-dialog[open]');
-      await page.locator('#vocabulary-list-save').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-      await page.locator('#vocabulary-list-close').click();
     };
     const fullEntryState = (page) => page.evaluate(() => {
       const take = document.querySelector('#sheet #take');
@@ -663,6 +705,196 @@ try {
       assert(quick.pressed === 'true' && !quick.disabled && !quick.held && quick.reason === null && !quick.open,
         `saved in 全項目, the quick look does not show it saved: ${JSON.stringify(quick)}`);
       return { quick };
+    });
+
+    // the reader's word doors (reader lane, 2026-10-02): one tap is the meaning, the menu saves, Save is one tap
+    const SUBURB = 1; // 郊外, the fixture's second word: a core dictionary word read こうがい, "suburb"
+    const popupState = (page) => page.evaluate(() => {
+      const mini = document.getElementById('mini');
+      if (!mini) return null;
+      const box = mini.getBoundingClientRect(), take = mini.querySelector('#mini-take'), entry = mini.querySelector('.mini-entry');
+      return { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent,
+        gloss: mini.querySelector('.mini-gloss')?.textContent, save: take && { label: take.textContent, disabled: take.disabled,
+          filled: getComputedStyle(take).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(take).backgroundColor !== 'transparent' },
+        entry: entry && { label: entry.textContent, disabled: entry.disabled },
+        inside: box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight,
+        underWord: document.querySelectorAll('#reader .tok-en').length };
+    });
+    const cardsFor = (record, id) => record.taken.filter((t) => t.t === 'word' && t.id === id);
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`G1-one-tap-meaning-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        await tapToken(page, SUBURB);
+        const one = await popupState(page);
+        assert(one, 'one tap opened no popup');
+        assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `one tap does not show the word, reading and meaning: ${JSON.stringify(one)}`);
+        assert(one.save?.label === 'Save' && !one.save.disabled && one.save.filled, `no filled Save: ${JSON.stringify(one.save)}`);
+        assert(/^Full entry\s*›$/u.test(one.entry?.label ?? '') && !one.entry.disabled, `no Full entry › link: ${JSON.stringify(one.entry)}`);
+        assert(one.inside && one.underWord === 0, `the popup is off screen, or English was written under the word: ${JSON.stringify(one)}`);
+        await tapToken(page, 2);
+        const moved = await page.evaluate(() => ({ count: document.querySelectorAll('#mini').length, word: document.querySelector('#mini .mini-word')?.textContent }));
+        const third = await page.evaluate(() => document.querySelector('#reader .tok[data-index="2"] .tok-word')?.textContent.replace(/\s/gu, ''));
+        assert(moved.count === 1 && moved.word && moved.word !== '郊外' && third.includes(moved.word.slice(0, 1)), `another word did not move the popup: ${JSON.stringify({ moved, third })}`);
+        await page.locator('#reader .tok[data-index="2"]').focus();
+        await page.keyboard.press('Escape');
+        const closed = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), focus: document.activeElement?.dataset.index }));
+        assert(!closed.mini && closed.focus === '2', `Escape did not put the popup away and keep the word: ${JSON.stringify(closed)}`);
+        return { popup: [one.word, one.reading, one.gloss], moved: moved.word };
+      });
+    }
+
+    await run('G2-menu-save-one-card', DESK, async (page) => {
+      await openArticle(page, ARTICLE);
+      const tok = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
+      await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
+      const at = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+      await page.mouse.click(at.x, at.y, { button: 'right' });
+      await page.waitForSelector('#reader-word-menu');
+      const menu = await page.evaluate(() => {
+        const node = document.getElementById('reader-word-menu'), box = node.getBoundingClientRect();
+        return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[role="menuitem"]')].map((item) => item.textContent), left: box.left, top: box.top };
+      });
+      assert.deepEqual(menu.items, ['Save word', 'Save the sentence', 'Full entry', 'Ask the tutor about this sentence', 'Copy'], `the word menu: ${JSON.stringify(menu.items)}`);
+      assert(menu.role === 'menu' && Math.abs(menu.left - at.x) <= 2 && Math.abs(menu.top - at.y) <= 2, `the menu is not at the pointer: ${JSON.stringify({ menu, at })}`);
+      await page.locator('#reader-word-menu [data-menu-action="save-word"]').click();
+      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 saved from the menu' });
+      await page.waitForFunction(() => !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
+      await page.waitForTimeout(300);
+      const after = await readAppRecord(page);
+      const cards = cardsFor(after, '郊外');
+      assert.equal(cards.length, 1, `the menu made ${cards.length} 郊外 cards`);
+      assert(cards[0].ctx?.scope === 'sent' && cards[0].ctx.p === ARTICLE && cards[0].ctx.i === SUBURB, `the card lost its sentence: ${JSON.stringify(cards[0])}`);
+      const toast = await page.evaluate(() => { const t = document.querySelector('#reader-toast:not([hidden])'); return t && { text: t.innerText.replace(/\s+/gu, ' ').trim(), role: t.getAttribute('role'), live: t.getAttribute('aria-live') }; });
+      assert(toast && /^Saved to review\b/u.test(toast.text) && toast.role === 'status' && toast.live === 'polite', `no polite toast: ${JSON.stringify(toast)}`);
+      assert.equal(await page.locator('#reader-word-menu').count(), 0, 'the menu stayed open after Save word');
+      await page.mouse.click(at.x, at.y, { button: 'right' });
+      await page.waitForSelector('#reader-word-menu');
+      const again = await page.evaluate(() => { const item = document.querySelector('#reader-word-menu [data-menu-action="save-word"]'); return { label: item.textContent, disabled: item.getAttribute('aria-disabled') }; });
+      assert.deepEqual(again, { label: 'Saved ✓', disabled: 'true' }, `the menu does not show the word saved: ${JSON.stringify(again)}`);
+      await page.keyboard.press('Escape');
+      // the browser keeps its own menu off the words
+      const offWord = await page.evaluate(() => {
+        const title = document.querySelector('h1.view-title');
+        const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 10, clientY: 10 });
+        return title.dispatchEvent(event);
+      });
+      assert.equal(offWord, true, 'a right-click off the words lost the browser menu');
+      return { items: menu.items.length, cards: cards.length, ctx: cards[0].ctx, srs: !!record.srs, toast: toast.text };
+    });
+
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`G3-save-and-undo-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        await tapToken(page, SUBURB);
+        await page.locator('#mini #mini-take').click();
+        await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 1, { description: 'one press saves 郊外' });
+        // the durable write lands a beat before the app repaints its button and raises the toast: wait for the page
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true'
+          && !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
+        const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
+          window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]'),
+          toast: document.querySelector('#reader-toast:not([hidden])')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
+          role: document.querySelector('#reader-toast')?.getAttribute('role') }));
+        assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window, `one press did not save in place: ${JSON.stringify(saved)}`);
+        assert(saved.toast === 'Saved to review Undo' && saved.role === 'status', `the toast: ${JSON.stringify(saved)}`);
+        await page.locator('#reader-toast-action').click();
+        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Undo takes the card out' });
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 }).catch(() => {});
+        const label2 = await page.locator('#mini #mini-take').textContent();
+        assert.equal(label2, 'Save', 'after Undo the button does not read Save');
+        return { saved: saved.label, toast: saved.toast, afterUndo: cardsFor(undone, '郊外').length };
+      });
+    }
+
+    await run('G4-keyboard-menu', DESK, async (page) => {
+      await openArticle(page, ARTICLE);
+      const word = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
+      await word.focus();
+      await page.keyboard.press('Shift+F10');
+      await page.waitForSelector('#reader-word-menu');
+      const first = await page.evaluate(() => document.activeElement?.dataset.menuAction);
+      await page.keyboard.press('ArrowDown');
+      const second = await page.evaluate(() => document.activeElement?.dataset.menuAction);
+      await page.keyboard.press('Escape');
+      const back = await page.evaluate(() => ({ menu: !!document.getElementById('reader-word-menu'), focus: document.activeElement?.dataset.index }));
+      assert.deepEqual([first, second, back.menu, back.focus], ['save-word', 'save-sentence', false, String(1)], `Shift+F10, ↓, Escape: ${JSON.stringify({ first, second, back })}`);
+      await page.keyboard.press('ContextMenu');
+      const byKey = await page.evaluate(() => document.activeElement?.closest('#reader-word-menu') ? document.activeElement.dataset.menuAction : null);
+      assert.equal(byKey, 'save-word', 'the ContextMenu key did not open the menu');
+      await page.keyboard.press('Escape');
+      await page.keyboard.press('Enter');
+      await page.waitForSelector('#mini');
+      const popup = await page.evaluate(() => document.activeElement?.id);
+      await page.keyboard.press('Escape');
+      const after = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), focus: document.activeElement?.dataset.index }));
+      assert(popup === 'mini-take' && !after.mini && after.focus === String(1), `Enter, then Escape: ${JSON.stringify({ popup, after })}`);
+      return { first, second, popupFocus: popup };
+    });
+
+    for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
+      await run(`G5-lists-popover-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        await tapToken(page, SUBURB);
+        await page.locator('#mini #mini-lists').click();
+        await page.waitForSelector('#vocabulary-list-popover');
+        const shape = await page.evaluate(() => {
+          const pop = document.getElementById('vocabulary-list-popover'), box = pop.getBoundingClientRect(), link = document.getElementById('mini-lists').getBoundingClientRect();
+          return { modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'), width: Math.round(box.width), height: Math.round(box.height),
+            bottom: Math.round(box.bottom), left: Math.round(box.left), right: Math.round(box.right), top: Math.round(box.top), linkBottom: Math.round(link.bottom),
+            viewport: [innerWidth, innerHeight], fixed: getComputedStyle(pop).position };
+        });
+        assert(!shape.modal && shape.fixed === 'fixed', `the lists open as a window: ${JSON.stringify(shape)}`);
+        if (label === '1368') assert(shape.width <= 340 && Math.abs(shape.top - shape.linkBottom) <= 12, `not a compact popover beside its link: ${JSON.stringify(shape)}`);
+        else assert(shape.left === 0 && shape.right === shape.viewport[0] && Math.abs(shape.bottom - shape.viewport[1]) <= 1 && shape.height <= shape.viewport[1] * 0.62 + 1,
+          `not a short sheet at the foot: ${JSON.stringify(shape)}`);
+        await page.locator('#vocabulary-list-name').fill('Syria');
+        await page.locator('#vocabulary-list-create').click();
+        await waitForAppRecord(page, (r) => r.lists?.Syria?.some((m) => m.t === 'word' && m.id === '郊外') && cardsFor(r, '郊外').length === 1,
+          { description: 'a new list holding 郊外, and its one card' });
+        const box = page.locator('#vocabulary-list-popover input[data-list="Syria"]');
+        assert(await box.isChecked(), 'the new list is not ticked');
+        await box.uncheck();
+        const off = await waitForAppRecord(page, (r) => r.lists?.Syria && !r.lists.Syria.some((m) => m.id === '郊外'), { description: '郊外 off the list' });
+        assert.equal(cardsFor(off, '郊外').length, 1, 'taking it off a list removed the card');
+        await page.keyboard.press('Escape');
+        assert.equal(await page.locator('#vocabulary-list-popover').count(), 0, 'Escape left the popover open');
+        return shape;
+      });
+    }
+
+    await run('G6-sentence-row', DESK, async (page) => {
+      await openArticle(page, ARTICLE);
+      await tapToken(page, SUBURB);
+      const row = await page.evaluate(() => ({
+        bar: [...document.querySelectorAll('.reader-actions, .teacher-door')].filter((n) => n.getClientRects().length && getComputedStyle(n).visibility !== 'hidden').length,
+        text: document.querySelector('#mini .mini-sentence')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
+      }));
+      assert.equal(row.bar, 0, 'a sentence bar shows when a word is chosen');
+      assert.equal(row.text, 'This sentence: Save · Ask the tutor · Practice', `the popup's sentence row: ${row.text}`);
+      await page.locator('#mini #reader-teacher').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'ai');
+      const record = await readAppRecord(page);
+      const active = record.teacherContexts?.entries?.find((entry) => entry.id === record.teacherContexts.activeRef);
+      assert(active?.sourceId === ARTICLE && active.quote.startsWith('ダマスカス郊外') && active.target?.id === '郊外',
+        `the tutor did not open on that sentence: ${JSON.stringify(active)}`);
+      return { row: row.text, quote: active.quote.slice(0, 20) };
+    });
+
+    await run('G7-version-switch', DESK, async (page) => {
+      await openArticle(page, ARTICLE);
+      const read = () => page.evaluate(() => ({
+        choices: [...document.querySelectorAll('.version-toggle .version-choice')].map((b) => [b.innerText.replace(/\s+/gu, ' ').trim(), b.getAttribute('aria-pressed')]),
+        caption: document.querySelector('.version-caption')?.textContent ?? null,
+      }));
+      const shown = await read();
+      assert.deepEqual(shown.choices, [['原文 Original · N1', 'true'], ['やさしい版 Simplified · N3', 'false']], `the switch: ${JSON.stringify(shown.choices)}`);
+      assert.equal(shown.caption, 'The simplified version retells the same article in easier Japanese.');
+      await page.locator('.version-toggle .version-choice[aria-pressed="false"]').click();
+      await page.waitForFunction(() => document.querySelector('.version-toggle .version-choice[aria-pressed="true"]')?.innerText.includes('やさしい'));
+      await openArticle(page, THREE_PARAS);
+      const none = await read();
+      assert(none.choices.length === 0 && none.caption === null, `an article without a simplified version shows the switch: ${JSON.stringify(none)}`);
+      return shown;
     });
 
     await run('J1-jlpt-room-wording', DESK, async (page) => {
@@ -750,9 +982,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row, the version switch',
     results,
-    passed: results.length === engines.length * 27 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 37 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
