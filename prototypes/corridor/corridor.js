@@ -6199,8 +6199,20 @@ function restoreLearningSourceCaller(visit) {
   if (S.stack.length) S.sheetFocus = visit.focusId;
   render(); window.scrollTo(0, visit.scroll);
   if (visit.view === 'sentence-practice') focusSentencePracticeTarget(visit.focusId);
-  else requestAnimationFrame(() => document.getElementById(visit.focusId)?.focus({ preventScroll: true }));
+  else requestAnimationFrame(() => focusLearningSourceCaller(visit.focusId));
   return true;
+}
+/** Focus the control that opened a learning visit. A control in a reader word's popup
+ * (reader-word:<index>:<id>) reopens that word's popup first, so the reader lands where it left. */
+function focusLearningSourceCaller(focusId) {
+  const popup = /^reader-word:(\d+):(.+)$/u.exec(focusId || '');
+  if (popup) {
+    const word = document.querySelector(`#reader .tok[data-index="${popup[1]}"]`);
+    if (word) readerTokenDoors.get(word)?.reopen();
+    (document.getElementById(popup[2]) || word)?.focus({ preventScroll: true });
+    return;
+  }
+  document.getElementById(focusId)?.focus({ preventScroll: true });
 }
 function resumeLearningSource() {
   const visit = learningSourceVisit; learningSourceVisit = null;
@@ -7207,38 +7219,56 @@ function storyVersions(p) {
   return easy ? { original: p, easy } : null;
 }
 
-/* The tap ladder is taught once, by a short note set in the page just above the article's text
- * (glance pass 2026-10-01: a tip floating over the text covered the very words it was about). It
- * is remembered as seen once dismissed or once a word is chosen, and does not come back. Choosing a
- * word leaves the note where it is for the rest of that visit, so the text under the finger never
- * jumps; the next article opens without it. */
+/* How to read here is said once, in plain words, by a short note set in the page just above the article's
+ * text (glance pass 2026-10-01: a tip floating over the text covered the very words it was about; John
+ * 2026-10-02 #8: the old tap-ladder wording was "weird, awkward, not clear"). The first word that opens
+ * its popup retires it for good: it fades where it stands, keeping its room for the rest of that visit so
+ * the text never jumps under the finger, and the next article opens without it. */
 const READER_TIP_KEY = 'kairo-tip-reader-v1';
-let readerTipVisit = null; // the article whose visit is still showing the note
-function renderReaderTip(main) {
+let readerTipVisit = null; // the article whose visit still holds the note's place
+function readerTipSeen() {
   let seen = !!S.readerTipSeen;
   try { seen ||= localStorage.getItem(READER_TIP_KEY) === '1'; } catch { /* the session flag stands in */ }
-  if (seen && readerTipVisit !== S.passageId) return;
+  return seen;
+}
+function renderReaderTip(main) {
+  const seen = readerTipSeen();
+  if (seen && readerTipVisit !== S.passageId) { readerTipVisit = null; return; }
   readerTipVisit = S.passageId;
-  const tip = el('aside', 'reader-tip');
+  const tip = el('aside', seen ? 'reader-tip is-done' : 'reader-tip');
   tip.id = 'reader-tip';
   // the note is the app speaking about itself, not prose to look up
   tip.dataset.japaneseLookup = 'off';
   tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
-  tip.append(el('p', 'reader-tip-text', readingsAlwaysOn()
-    ? tx('語に触れると英語。もう一度で元どおり。長押しで辞書。', 'Tap a word for its English; tap again to clear. Hold for the dictionary.')
-    : tx('語に触れると読み、もう一度で英語、三度目で元どおり。長押しで辞書。', 'Tap a word: its reading, then English, then clear. Hold for the dictionary.')));
+  if (seen) tip.setAttribute('aria-hidden', 'true');
+  tip.append(el('p', 'reader-tip-text', tapLadderHint()));
   const close = el('button', 'icon-button reader-tip-close');
   close.type = 'button';
   close.setAttribute('aria-label', tx('ヒントを閉じる', 'dismiss this tip'));
+  if (seen) close.tabIndex = -1;
   close.append(uiIcon('close'));
   close.addEventListener('click', () => {
-    S.readerTipSeen = true;
+    rememberReaderTipSeen();
     readerTipVisit = null;
-    try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
     tip.remove();
   });
   tip.append(close);
   main.append(tip);
+}
+function rememberReaderTipSeen() {
+  S.readerTipSeen = true;
+  try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
+}
+/** The first successful tap: the note has done its work. */
+function retireReaderTip() {
+  if (readerTipSeen()) return;
+  rememberReaderTipSeen();
+  const tip = document.getElementById('reader-tip');
+  if (!tip) return;
+  tip.classList.add('is-done');
+  tip.setAttribute('aria-hidden', 'true');
+  const close = tip.querySelector('.reader-tip-close');
+  if (close) close.tabIndex = -1;
 }
 
 /** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
@@ -7333,20 +7363,18 @@ function dialRow(labelJa, labelEn, key, options) {
 }
 
 /* ------------------------------------------- the reader's click grammar
- * One discipline, carried from Drift (§8 of the design-language doc), tuned
- * by operator rounds 3–4 (2026-08-07) and the circle ruling (2026-08-12).
- * Taps are PROGRESSIVE, not timed, and they close a circle:
- *   1st tap        → furigana above           (instant — no double-tap wait)
- *   2nd tap        → English beneath          (a later tap, not a fast pair)
- *   3rd tap        → back to plain kanji      (the circle closes; no one-way reveals)
- * With ふりがな on つねに the first rung is already climbed, so the circle is
- * two taps: English, then plain again. tapLadderHint() says which.
- *   long-press     → floating mini-dictionary (the simple definition)
- *   keep holding   → the mini window morphs into the full entry
- *   tap the mini   → the full entry
- * A moved pointer is a scroll, never a gesture. Every action applies to the
- * DOM directly — no full re-render, so the reader never stutters. */
-const GESTURE = { MINI_MS: 430, FULL_MS: 2100, MOVE_PX: 9 };
+ * One tap is the meaning (John, 2026-10-02: the old tap ladder — reading, then English, then clear —
+ * was "weird, awkward, not clear"):
+ *   tap              → the popup: the word, its reading, its meaning, Save, Full entry ›
+ *   tap another word → the popup moves there; a tap outside or Escape puts it away
+ *   right-click, or press and hold on a touch screen, or ContextMenu / Shift+F10
+ *                    → the word menu: Save word · Save the sentence · Full entry ·
+ *                      Ask the tutor about this sentence · Copy
+ * Readings on the text belong to the ふりがな setting, not to taps; with 触れて (on touch) the word
+ * you touched shows its reading. Sentences outside the reader (renderSentenceTokens) keep the older
+ * holds. A moved pointer is a scroll, never a gesture. Every action applies to the DOM directly — no
+ * full re-render, so the reader never stutters. */
+const GESTURE = { MINI_MS: 430, FULL_MS: 2100, MENU_MS: 500, MOVE_PX: 9 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
  * when the finger lifts — and it lands on whatever the new sheet put under
@@ -7392,15 +7420,28 @@ document.addEventListener(
 );
 
 function removeMini() {
+  closeVocabularyListPopover();
   document.getElementById('mini')?.remove();
+  miniAnchor = null;
 }
 
-/* a tap anywhere outside the mini puts it away — easy to back out of */
+/* a tap anywhere outside the mini puts it away — easy to back out of. A press on the word the popup
+ * belongs to puts it away too, and that press's click does not open it again (miniClosedOnAnchor). The
+ * word menu and the list popover close the same way; the toast never closes anything. */
+let miniClosedOnAnchor = null;
 document.addEventListener(
   'pointerdown',
   (ev) => {
+    miniClosedOnAnchor = null;
+    const target = ev.target;
+    if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
+    const pop = document.getElementById('vocabulary-list-popover');
+    if (pop && !pop.contains(target) && !target.closest?.('#mini-lists')) closeVocabularyListPopover();
     const mini = document.getElementById('mini');
-    if (mini && !mini.contains(ev.target) && !ev.target.closest?.('#vocabulary-list-dialog')) removeMini();
+    if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
+      if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) miniClosedOnAnchor = miniAnchor;
+      removeMini();
+    }
   },
   true,
 );
@@ -7518,7 +7559,8 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     removeMini();
     if (hasKanjiEntry) go({ t: 'kanji', id: text }, { invoker: anchor });
     else go({ t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: anchor });
-  }, { record, entryAvailable: !!record || hasKanjiEntry });
+  }, { record, entryAvailable: !!record || hasKanjiEntry, from: context.from || null, sentence: context.sentence?.() || null,
+    focusEntry: !!context.focusPopup });
   japaneseLookupMini = { mini, anchor };
   mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
@@ -7592,195 +7634,313 @@ function enhanceJapaneseProse(root) {
   }
 }
 
-/** Lists are chosen in their own focused window; closing never removes a saved card. */
-function openVocabularyListChooser(node, label, invoker) {
-  document.getElementById('vocabulary-list-dialog')?.remove();
-  const dialog = el('dialog', 'vocabulary-list-dialog'); dialog.id = 'vocabulary-list-dialog';
-  dialog.dataset.driftChrome = 'true';
-  const heading = el('h2', '', tx(`「${label}」を覚える`, `Save ${label}`)); heading.id = 'vocabulary-list-title';
-  dialog.setAttribute('aria-labelledby', heading.id);
-  const close = el('button', 'chip', tx('閉じる', 'Done')); close.type = 'button'; close.id = 'vocabulary-list-close';
-  close.addEventListener('click', () => { if (rememberRecordDraft(name)) dialog.close(); });
-  const choices = el('div', 'vocabulary-list-choices');
-  const management = el('div', 'teacher-actions');
-  const context = el('div');
-  const notice = el('p', 'vocabulary-list-status'); notice.setAttribute('role', 'status');
-  const name = el('input', 'search-field'); name.placeholder = tx('新しいリストの名前', 'Name a new vocabulary list'); name.maxLength = 80;
-  name.id = 'vocabulary-list-name';
-  name.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
-  attachRecordDraft(name);
-  name.setAttribute('aria-label', name.placeholder);
-  const create = el('button', 'chip', tx('リストを作って保存', 'Create list & save')); create.type = 'submit';
-  const form = el('form', 'vocabulary-list-form'); form.append(name, create);
-  const failed = (ja, en) => {
-    if (!rememberRecordDraft(name)) {
-      notice.textContent = tx('下書きを保存できません。このリスト名をコピーしてから、閉じて再読み込みしてください。',
-        'The draft could not be preserved. Copy this list name, then close and reload.');
-    } else notice.textContent = recordWritable() ? tx(ja, en)
-      : tx('記録を保護しています。リスト名の下書きはこの窓に残ります。閉じて再読み込みしてから、もう一度試してください。',
-        'Your record is protected. The list name is kept in this window. Close and reload before retrying.');
-  };
-  let busy = false;
-  const setBusy = (value) => {
-    busy = value; create.disabled = value || !recordWritable(); name.readOnly = value;
-    for (const container of [choices, management, context]) {
-      for (const button of container.querySelectorAll('button')) button.disabled = value || !recordWritable();
-    }
-  };
-  const refreshCapture = () => {
-    syncReaderTakeSeal();
-    const taken = S.taken.some(row => row.t === node.t && row.id === node.id);
-    document.querySelectorAll('[data-word]').forEach(word => {
-      if (node.t === 'word' && word.dataset.word === node.id) word.classList.toggle('tok-learning', taken);
-    });
-    const mini = document.getElementById('mini');
-    const seal = mini?.querySelector('#mini-take');
-    if (node.t === 'word' && seal && mini.querySelector('.mini-word')?.textContent === label) {
-      seal.classList.toggle('taken', taken); seal.setAttribute('aria-pressed', String(taken));
-      seal.setAttribute('aria-label', taken ? tx(`「${label}」の保存先を選ぶ`, `choose lists for ${label}`)
-        : tx(`「${label}」をリストに保存`, `save ${label} to a list`));
-    }
-  };
-  const save = async (listName, typed = false) => {
-    if (busy) return;
-    if (!recordWritable()) { notice.textContent = tx('記録を読み込んでから、もう一度試してください。', 'Your record is not ready to save. Please try again once it is available.'); return; }
-    if (node.t === 'word' && ['conflict', 'unavailable'].includes(wordCaptureState(node))) {
-      notice.textContent = wordCaptureHeldText(node, { route: false }); return;
-    }
-    setBusy(true);
-    try {
-      if (!S.taken.some(row => row.t === node.t && row.id === node.id) && !(await toggleTaken(node, label))) {
-        failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return;
-      }
-      if (listName) {
-        const saved = await commitStorePatch(latest => {
-          const item = latest.taken.find(row => row.t === node.t && row.id === node.id);
-          if (!item) throw new Error('captured-item-no-longer-available');
-          if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
-          const lists = { ...latest.lists };
-          const members = owns(lists, listName) ? lists[listName] : [];
-          setOwnRecordValue(lists, listName, members.some(row => row.t === node.t && row.id === node.id) ? members : [...members,
-            { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts,
-              ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
-          return { lists };
-        });
-        if (!saved) { failed('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'); return; }
-      }
-      notice.textContent = listName ? tx(`「${listName}」に保存しました。`, `Saved to ${listName}.`) : tx('復習に保存しました。', 'Saved for review.');
-      if (typed) { name.value = ''; rememberRecordDraft(name); }
-      paint(); refreshCapture();
-    } catch {
-      failed('保存できませんでした。リスト名を残したまま、もう一度試せます。', 'Could not finish saving. Your list name is still here so you can retry.');
-    } finally { setBusy(false); }
-  };
-  const paint = () => {
-    choices.replaceChildren();
-    management.replaceChildren(); context.replaceChildren();
-    const review = el('button', 'chip', tx('復習だけに保存', 'Save for review')); review.type = 'button'; review.id = 'vocabulary-list-save'; review.addEventListener('click', () => void save(null)); choices.append(review);
-    for (const listName of Object.keys(S.lists)) {
-      const present = S.lists[listName].some(row => row.t === node.t && row.id === node.id);
-      const button = el('button', present ? 'chip on-list' : 'chip', `${present ? '✓ ' : ''}${listName}`);
-      button.type = 'button'; button.setAttribute('aria-pressed', String(present)); button.addEventListener('click', () => void save(listName)); choices.append(button);
-    }
-    const taken = S.taken.some(row => row.t === node.t && row.id === node.id);
-    const held = node.t === 'word' && wordCaptureState(node) !== 'taken';
-    if (taken && !held) {
-      const undo = biLabel('button', 'chip', '覚えるのをやめる', 'stop memorizing');
-      undo.type = 'button'; undo.id = 'vocabulary-list-stop';
-      undo.addEventListener('click', async () => {
-        if (busy || !recordWritable()) return;
-        setBusy(true);
-        try {
-          if (node.t === 'word' && wordCaptureState(node) !== 'taken') {
-            notice.textContent = wordCaptureHeldText(node, { route: false }); return;
-          }
-          const saved = await toggleTaken(node, label);
-          if (!saved) { failed('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'); return; }
-          notice.textContent = tx('復習の対象から外しました。リストとこれまでの復習記録は残ります。', 'Stopped memorizing. Your lists and previous reviews are kept.');
-          paint(); refreshCapture();
-        } catch {
-          failed('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.');
-        } finally { setBusy(false); }
-      });
-      management.append(undo);
-      renderContextPicker(context, node, {
-        currentSurface: () => dialog.isConnected && dialog.open,
-        onSaved: (scope) => {
-          paint(); refreshCapture();
-          dialog.querySelector(`[data-ctx-scope="${scope ?? 'word'}"]`)?.focus({ preventScroll: true });
-        },
-        onFailed: () => failed('文脈の変更を保存できませんでした。もう一度試してください。', 'Could not save the context change. Please try again.'),
-      });
-    }
-    setBusy(busy);
-  };
-  form.addEventListener('submit', event => { event.preventDefault(); const value = name.value.trim(); if (!value) { name.focus(); return; } void save(value, true); });
-  dialog.append(heading, el('p', '', tx('リストを選ぶか、新しいリストを作ってください。複数のリストに保存できます。', 'Choose a list or make a new one. A word can belong to several lists.')), choices, form, management, context, notice, close);
-  dialog.addEventListener('cancel', event => { if (!rememberRecordDraft(name)) event.preventDefault(); });
-  dialog.addEventListener('close', () => { dialog.remove(); if (invoker?.isConnected) invoker.focus({ preventScroll: true }); });
-  for (const event of ['pointerdown','pointermove','pointerup','pointercancel']) dialog.addEventListener(event, ev => ev.stopPropagation());
-  paint(); document.body.append(dialog); dialog.showModal();
+/* Save is one tap (John, 2026-10-02, notes 11 and 17: the save window was "big unwieldy, untasteful").
+ * Save makes the review card exactly as "Save for review" did: the same guarded capture (toggleTaken →
+ * commitCapture), so the same FSRS ledger path and the same one-word-one-card identity (wordCaptureState).
+ * A held word stays held and says why. The button then reads "Saved ✓"; pressing it again, or the
+ * toast's Undo, takes the card back out, its review history kept (the door swings both ways, §3). */
+function paintWordSave(button, on) {
+  button.textContent = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  button.classList.toggle('taken', on);
+  button.setAttribute('aria-pressed', String(on));
+  button.title = on ? tx('もう一度押すと復習から外す', 'Press again to remove it from review') : '';
 }
 
-function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true } = {}) {
-  removeMini();
-  activeTokenAlternatives = null;
-  // the mini owns the moment: any lingering token-actions pill from an
-  // earlier focus would double 全項目 beside it
-  for (const pill of document.querySelectorAll('.token-actions:not([hidden])')) {
-    pill.hidden = true;
-    pill.remove();
-  }
-  // a reader token reads through the reader's quick look (D11); sentence
-  // tokens elsewhere keep lookup() and their old wording
+/** What a word's Save stands for: the entry it would capture, and whether it is held (D11: a reader
+ * word the core dictionary lacks; D23: another entry's card holds the spelling). The popup and the
+ * word menu read the same facts, so they can never disagree about what Save does. */
+function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
   // a caller that already chose the entry (the shared lookup door) hands it over as is
   const g = record !== undefined ? record : reader ? readerQuickRecord(token) : lookup(token.b, token.seq, token.r);
+  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
+  const node = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
+    ...(from ? { from, ctxScope: 'sent' } : {}) };
+  const state = held ? null : wordCaptureState(node);
+  return { g, held, node, state, identityHeld: state === 'conflict' || state === 'unavailable' };
+}
+
+/** After a save or an undo: the open popup's Save, the reader's learning marks and the chrome seal repaint
+ * in place, so nothing under the finger moves. */
+function refreshWordSaveControls(node, label) {
+  syncReaderTakeSeal();
+  const taken = S.taken.some(row => row.t === node.t && row.id === node.id);
+  for (const word of document.querySelectorAll('[data-word]')) {
+    if (node.t === 'word' && word.dataset.word === node.id) word.classList.toggle('tok-learning', taken);
+  }
+  const mini = document.getElementById('mini');
+  const seal = mini?.querySelector('#mini-take');
+  if (seal && !seal.disabled && mini.querySelector('.mini-word')?.textContent === label) {
+    paintWordSave(seal, wordCaptureState(node) === 'taken');
+  }
+}
+
+async function toggleWordSave(node, label) {
+  if (capturePending.has(srsKey(node.t, node.id))) return false;
+  if (!recordWritable()) {
+    showReaderToast(tx('記録の準備ができていません。少し待ってから、もう一度試してください。', 'Your record is not ready yet. Please try again in a moment.'));
+    return false;
+  }
+  const state = wordCaptureState(node);
+  if (state === 'conflict' || state === 'unavailable') {
+    showReaderToast(wordCaptureHeldText(node, { route: false }));
+    return false;
+  }
+  const taking = state !== 'taken';
+  if (!(await toggleTaken(node, label))) {
+    showReaderToast(taking ? tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.')
+      : tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'));
+    return false;
+  }
+  refreshWordSaveControls(node, label);
+  showReaderToast(taking ? tx('復習に保存しました', 'Saved to review') : tx('復習から外しました', 'Removed from review'),
+    [tx('元に戻す', 'Undo'), () => toggleWordSave(node, label)]);
+  return true;
+}
+
+/* One small toast at the foot of the screen, announced politely: what just happened, and a way back. It
+ * stays about four seconds, longer while a pointer or the keyboard is on it. */
+const READER_TOAST_MS = 4000;
+let readerToastTimer = null;
+function hideReaderToast() {
+  clearTimeout(readerToastTimer);
+  const toast = document.getElementById('reader-toast');
+  if (toast) toast.hidden = true;
+}
+function showReaderToast(message, action = null) {
+  let toast = document.getElementById('reader-toast');
+  if (!toast) {
+    toast = el('div', 'reader-toast');
+    toast.id = 'reader-toast';
+    toast.dataset.driftChrome = 'true';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    const hold = () => clearTimeout(readerToastTimer);
+    const resume = () => { clearTimeout(readerToastTimer); readerToastTimer = setTimeout(hideReaderToast, READER_TOAST_MS / 2); };
+    toast.addEventListener('pointerenter', hold);
+    toast.addEventListener('focusin', hold);
+    toast.addEventListener('pointerleave', resume);
+    toast.addEventListener('focusout', resume);
+    document.body.append(toast);
+  }
+  toast.replaceChildren(el('span', 'reader-toast-text', message));
+  if (action) {
+    const [label, run] = action;
+    const button = el('button', 'reader-toast-action', label);
+    button.type = 'button';
+    button.id = 'reader-toast-action';
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      hideReaderToast();
+      void run();
+    });
+    toast.append(button);
+  }
+  toast.hidden = false;
+  clearTimeout(readerToastTimer);
+  readerToastTimer = setTimeout(hideReaderToast, READER_TOAST_MS);
+  return toast;
+}
+
+/* Lists are optional. The popup's small "Add to list…" opens this compact popover beside it (on a phone, a
+ * short sheet at the foot of the screen): one checkbox per list and an inline field for a new one. Ticking
+ * a list saves the word first when it is not saved yet, by the same capture as Save; unticking takes the
+ * word off that list only. Closing never removes a saved card. It replaced the big list window. */
+let vocabularyListInvoker = null;
+function closeVocabularyListPopover({ restoreFocus = false } = {}) {
+  const pop = document.getElementById('vocabulary-list-popover');
+  if (!pop) return true;
+  const field = pop.querySelector('#vocabulary-list-name');
+  if (field && !rememberRecordDraft(field)) {
+    const notice = pop.querySelector('.vocabulary-list-status');
+    if (notice) notice.textContent = tx('下書きを保存できません。このリスト名をコピーしてから、閉じて再読み込みしてください。',
+      'The draft could not be preserved. Copy this list name, then close and reload.');
+    return false;
+  }
+  pop.remove();
+  const invoker = vocabularyListInvoker;
+  vocabularyListInvoker = null;
+  invoker?.setAttribute('aria-expanded', 'false');
+  if (restoreFocus && invoker?.isConnected) invoker.focus({ preventScroll: true });
+  return true;
+}
+
+function openVocabularyListPopover(node, label, invoker) {
+  if (document.getElementById('vocabulary-list-popover')) {
+    const same = vocabularyListInvoker === invoker;
+    if (!closeVocabularyListPopover({ restoreFocus: same }) || same) return;
+  }
+  hideReaderToast();
+  const pop = el('div', 'vocabulary-list-popover');
+  pop.id = 'vocabulary-list-popover';
+  pop.dataset.driftChrome = 'true';
+  pop.tabIndex = -1;
+  pop.setAttribute('role', 'dialog');
+  const title = el('p', 'vocabulary-list-title', tx(`「${label}」をリストに追加`, `Add ${label} to a list`));
+  title.id = 'vocabulary-list-title';
+  pop.setAttribute('aria-labelledby', title.id);
+  const choices = el('div', 'vocabulary-list-choices');
+  choices.setAttribute('role', 'group');
+  choices.setAttribute('aria-labelledby', title.id);
+  const notice = el('p', 'vocabulary-list-status');
+  notice.setAttribute('role', 'status');
+  const name = el('input', 'vocabulary-list-field');
+  name.type = 'text';
+  name.id = 'vocabulary-list-name';
+  name.maxLength = 80;
+  name.placeholder = tx('新しいリスト', 'New list');
+  name.setAttribute('aria-label', tx('新しいリストの名前', 'Name a new list'));
+  name.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
+  attachRecordDraft(name);
+  const create = el('button', 'chip btn-secondary vocabulary-list-create', tx('作る', 'Add'));
+  create.type = 'submit';
+  create.id = 'vocabulary-list-create';
+  const form = el('form', 'vocabulary-list-form');
+  form.append(name, create);
+  let busy = false;
+  const member = (listName) => (S.lists[listName] || []).some(row => row.t === node.t && row.id === node.id);
+  // a repaint keeps the keyboard where it was: on the same list's box, or on the field
+  let focusList = null;
+  const paint = () => {
+    const focused = document.activeElement;
+    if (focused?.dataset?.list != null && choices.contains(focused)) focusList = focused.dataset.list;
+    choices.replaceChildren();
+    const names = Object.keys(S.lists);
+    if (!names.length) choices.append(el('p', 'vocabulary-list-empty', tx('リストはまだありません。', 'No lists yet.')));
+    for (const listName of names) {
+      const row = el('label', 'vocabulary-list-choice');
+      const box = el('input');
+      box.type = 'checkbox';
+      box.dataset.list = listName;
+      box.checked = member(listName);
+      box.disabled = busy || !recordWritable();
+      box.addEventListener('change', () => void setMembership(listName, box.checked));
+      row.append(box, el('span', 'vocabulary-list-name', listName), el('span', 'vocabulary-list-count', String(S.lists[listName].length)));
+      choices.append(row);
+    }
+    create.disabled = busy || !recordWritable();
+    name.readOnly = busy;
+    if (!busy && focusList != null) {
+      const box = [...choices.querySelectorAll('input[type="checkbox"]')].find((input) => input.dataset.list === focusList);
+      focusList = null;
+      if (pop.contains(document.activeElement) && document.activeElement !== document.body) return;
+      (box || pop).focus({ preventScroll: true });
+    }
+  };
+  const failed = (ja, en) => {
+    notice.textContent = recordWritable() ? tx(ja, en)
+      : tx('記録を保護しています。リスト名の下書きはここに残ります。再読み込みしてから、もう一度試してください。',
+        'Your record is protected. The list name is kept here. Reload before retrying.');
+  };
+  const setMembership = async (listName, on, typed = false) => {
+    if (busy) return;
+    if (!recordWritable()) {
+      notice.textContent = tx('記録を読み込んでから、もう一度試してください。', 'Your record is not ready to save. Please try again once it is available.');
+      paint();
+      return;
+    }
+    if (['conflict', 'unavailable'].includes(wordCaptureState(node))) {
+      notice.textContent = wordCaptureHeldText(node, { route: false });
+      paint();
+      return;
+    }
+    busy = true;
+    paint();
+    try {
+      if (on && !S.taken.some(row => row.t === node.t && row.id === node.id)) {
+        if (!(await toggleTaken(node, label))) { failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return; }
+        refreshWordSaveControls(node, label);
+      }
+      const saved = await commitStorePatch(latest => {
+        const lists = { ...latest.lists };
+        const members = owns(lists, listName) ? lists[listName] : [];
+        if (!on) {
+          if (!owns(lists, listName)) return {};
+          setOwnRecordValue(lists, listName, members.filter(row => !(row.t === node.t && row.id === node.id)));
+          return { lists };
+        }
+        const item = latest.taken.find(row => row.t === node.t && row.id === node.id);
+        if (!item) throw new Error('captured-item-no-longer-available');
+        if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
+        setOwnRecordValue(lists, listName, members.some(row => row.t === node.t && row.id === node.id) ? members : [...members,
+          { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts,
+            ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
+        return { lists };
+      });
+      if (!saved) {
+        if (on) failed('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.');
+        else failed('リストから外せませんでした。もう一度試してください。', 'Could not take it off the list. Please try again.');
+        return;
+      }
+      notice.textContent = on ? tx(`「${listName}」に追加しました。`, `Added to ${listName}.`) : tx(`「${listName}」から外しました。`, `Taken off ${listName}.`);
+      if (typed) { name.value = ''; rememberRecordDraft(name); }
+    } catch {
+      failed('保存できませんでした。もう一度試してください。', 'Could not finish saving. Please try again.');
+    } finally {
+      busy = false;
+      paint();
+    }
+  };
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const value = name.value.trim();
+    if (!value) { name.focus(); return; }
+    void setMembership(value, true, true);
+  });
+  pop.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeVocabularyListPopover({ restoreFocus: true });
+  });
+  pop.append(title, choices, form, notice);
+  paint();
+  vocabularyListInvoker = invoker;
+  invoker?.setAttribute('aria-expanded', 'true');
+  document.body.append(pop);
+  const anchor = invoker?.getBoundingClientRect();
+  const box = pop.getBoundingClientRect();
+  if (anchor) {
+    const below = anchor.bottom + 6;
+    const top = below + box.height <= window.innerHeight - 8 ? below : Math.max(8, anchor.top - box.height - 6);
+    pop.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, anchor.left))}px`;
+    pop.style.top = `${top}px`;
+  }
+  (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
+}
+
+/* The word popup (John, 2026-10-02, notes 8, 11, 17 and 18). One tap shows everything at once: the word
+ * large, its reading under it, its meaning, then the actions — a filled Save, a small "Add to list…" and a
+ * plain "Full entry ›". In an article the last, quiet row acts on the word's sentence (it replaced the
+ * floating sentence bar). Escape, or a tap outside, puts it away. */
+let miniAnchor = null;
+function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null } = {}) {
+  removeMini();
+  const { g, held, node: captureNode, state: miniState, identityHeld } = wordSaveFacts(token, { reader, from, record });
   const mini = el('div', null);
   mini.id = 'mini';
+  mini.tabIndex = -1;
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
   mini.append(el('span', 'mini-word', token.b));
-  // 覚 — the capture door rides the mini too (directive §3): one tap takes
-  // the word (with its sentence when held inside an article), one more tap
-  // undoes a mis-take. The seal repaints in place so the mini never blinks.
-  const miniTaken = () => S.taken.some((t) => t.t === 'word' && t.id === token.b);
-  const seal = el('button', 'mini-take', '覚');
+  if (g?.r || token.r) mini.append(el('span', 'mini-reading', g?.r || token.r));
+  if (reader && !g?.m?.[0]) mini.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
+  else mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  const seal = el('button', 'mini-take btn-primary');
   seal.type = 'button';
   seal.id = 'mini-take';
-  if (bi()) seal.append(el('span', 'mini-take-en', 'save'));
-  const paintSeal = () => {
-    const on = miniTaken();
-    seal.classList.toggle('taken', on);
-    seal.setAttribute('aria-pressed', String(on));
-    seal.setAttribute(
-      'aria-label',
-      on ? tx(`「${token.b}」の保存先を選ぶ`, `choose lists for ${token.b}`) : tx(`「${token.b}」をリストに保存`, `save ${token.b} to a list`),
-    );
-  };
-  paintSeal();
-  // D11: a reader token the core dictionary lacks is never captured from the
-  // mini — the capture path would store an empty or first-row answer for it
-  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
-  // D23: nor is a spelling whose card is another entry's (上手 saved as うわて): the
-  // mini's spelling-only toggle would remove or suppress that card
-  const captureNode = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
-    ...(from ? { from, ctxScope: 'sent' } : {}) };
-  const miniState = held ? null : wordCaptureState(captureNode);
-  const identityHeld = miniState === 'conflict' || miniState === 'unavailable';
+  paintWordSave(seal, held ? S.taken.some((t) => t.t === 'word' && t.id === token.b) : miniState === 'taken');
   if (held || identityHeld) {
     seal.disabled = true;
     seal.classList.add('reader-capture-held');
     seal.setAttribute('aria-describedby', 'mini-take-reason');
   }
+  // one press saves, a press on "Saved ✓" takes it back out; the second click of a double-click is not
+  // a second press (it would undo the save it just made)
   seal.addEventListener('click', (event) => {
     event.stopPropagation();
-    if (seal.disabled) return;
-    openVocabularyListChooser(captureNode, token.b, span);
+    if (seal.disabled || event.detail > 1) return undefined;
+    return toggleWordSave(captureNode, token.b);
   });
-  mini.append(seal);
-  if (g?.r || token.r) mini.append(el('span', 'mini-reading', g?.r || token.r));
-  if (reader && !g?.m?.[0]) mini.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
-  else mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
   if (held || identityHeld) {
     const reason = el('span', 'mini-take-reason', held ? readerCaptureReasonText(token.b)
       : wordCaptureHeldText(captureNode));
@@ -7801,8 +7961,26 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
     mini.append(open);
   }
-  const entry = biLabel('button', 'mini-entry', '全項目', 'full entry');
+  const actions = el('div', 'mini-actions');
+  actions.append(seal);
+  if (!held && !identityHeld) {
+    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加…', 'Add to list…'));
+    lists.type = 'button';
+    lists.id = 'mini-lists';
+    lists.setAttribute('aria-haspopup', 'dialog');
+    lists.setAttribute('aria-expanded', 'false');
+    lists.addEventListener('click', (event) => {
+      event.stopPropagation();
+      openVocabularyListPopover(captureNode, token.b, lists);
+    });
+    actions.append(lists);
+  }
+  const entry = el('button', 'mini-entry btn-tertiary');
   entry.type = 'button';
+  entry.append(el('span', 'mini-entry-label', tx('全項目', 'Full entry')));
+  const chevron = el('span', 'mini-entry-chevron', '›');
+  chevron.setAttribute('aria-hidden', 'true');
+  entry.append(chevron);
   entry.disabled = !entryAvailable;
   entry.dataset.action = 'entry.open';
   entry.dataset.targetKind = 'word';
@@ -7811,7 +7989,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (entry.disabled) return;
     onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
   });
-  mini.append(entry);
+  actions.append(entry);
+  mini.append(actions);
+  if (sentence) mini.append(sentence);
   mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     event.preventDefault();
@@ -7820,144 +8000,261 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     span.focus({ preventScroll: true });
   });
   document.body.append(mini);
-  const r = span.getBoundingClientRect();
-  const m = mini.getBoundingClientRect();
-  const above = r.top > m.height + 70;
-  mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
-  mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
-  if (focusEntry) entry.focus({ preventScroll: true });
+  miniAnchor = span;
+  placeFloating(mini, span.getBoundingClientRect());
+  if (focusEntry) ([seal, entry].find((button) => !button.disabled) || mini).focus({ preventScroll: true });
   return mini;
 }
 
-let activeTokenAlternatives = null;
-
-function refreshTokenAlternatives() {
-  if (!activeTokenAlternatives) return;
-  const { wrapper, actions, position } = activeTokenAlternatives;
-  if (!actions.isConnected || actions.hidden || !wrapper.contains(document.activeElement)) {
-    activeTokenAlternatives = null;
-    return;
-  }
-  position();
+/** A floating card beside the word it belongs to: above when there is room, otherwise below. */
+function placeFloating(card, r) {
+  const m = card.getBoundingClientRect();
+  const above = r.top > m.height + 70;
+  card.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
+  card.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
 }
 
-// Track only the focused token's controls. Browser focus scrolling can finish
-// after the initial animation frame, and later scrolling must keep the anchor.
-addEventListener('scroll', refreshTokenAlternatives, { capture: true, passive: true });
-addEventListener('resize', refreshTokenAlternatives);
-
-function installTokenAlternatives(wrapper, span, target, { quickLook, openEntry }) {
-  const actions = el('span', 'token-actions');
-  actions.hidden = true;
-  actions.setAttribute('role', 'group');
-  actions.setAttribute('aria-label', tx(`${span.textContent} の操作`, `${span.textContent} actions`));
-
-  if (quickLook) {
-    const quick = biLabel('button', null, '語釈', 'quick look');
-    quick.type = 'button';
-    quick.dataset.action = 'quickLook.open';
-    quick.dataset.targetKind = target.kind;
-    quick.addEventListener('click', (event) => {
+/* The popup's quiet last row in an article acts on the word's sentence (John #18: the floating sentence bar
+ * "what is the purpose??"). Save keeps the sentence on the tutor page; Ask the tutor opens the tutor with
+ * that sentence; Practice opens the sentence practice. Each carries exactly the sentence the bar did. */
+function readerSentenceRow(node, index) {
+  const row = el('div', 'mini-sentence');
+  row.setAttribute('role', 'group');
+  const label = el('span', 'mini-sentence-label', tx('この文：', 'This sentence:'));
+  label.id = 'mini-sentence-label';
+  row.setAttribute('aria-labelledby', label.id);
+  const note = el('p', 'mini-status');
+  note.id = 'reader-context-note';
+  note.setAttribute('role', 'status');
+  const say = (text) => { note.textContent = ''; showReaderToast(text); };
+  const action = (id, text, aria) => {
+    const button = el('button', 'mini-sentence-action', text);
+    button.type = 'button';
+    button.id = id;
+    button.setAttribute('aria-label', aria);
+    button.disabled = !recordWritable();
+    return button;
+  };
+  const save = action('reader-context-save', tx('保存', 'Save'), tx('この文を先生のページに保存', 'Save this sentence for the tutor'));
+  const ask = action('reader-teacher', tx('先生に聞く', 'Ask the tutor'), tx('この文について先生に聞く', 'Ask the tutor about this sentence'));
+  const buttons = [save, ask];
+  for (const [button, discuss] of [[save, false], [ask, true]]) {
+    button.addEventListener('click', async (event) => {
       event.stopPropagation();
-      const modality = event.detail === 0 ? 'keyboard' : 'pointer';
-      interaction({ kind: 'quickLook.open', target }, modality, 'reader-alternative');
-      quickLook(modality);
+      if (button.disabled) return;
+      for (const control of buttons) control.disabled = true;
+      try { await sendSentenceToTutor(node, discuss, () => button.isConnected, say); }
+      finally { for (const control of buttons) control.disabled = !recordWritable(); }
     });
-    quick.tabIndex = -1;
-    actions.append(quick);
   }
-
-  const full = biLabel('button', null, target.kind === 'particle' ? '助詞へ' : '全項目', 'full entry');
-  full.type = 'button';
-  full.dataset.action = 'entry.open';
-  full.dataset.targetKind = target.kind;
-  full.addEventListener('click', (event) => {
-    event.stopPropagation();
-    const modality = event.detail === 0 ? 'keyboard' : 'pointer';
-    interaction({ kind: 'entry.open', target }, modality, 'reader-alternative');
-    openEntry(modality);
-  });
-  full.tabIndex = -1;
-  actions.append(full);
-
-  const position = () => {
-    const targetBox = span.getBoundingClientRect();
-    const actionBox = actions.getBoundingClientRect();
-    const half = actionBox.width / 2;
-    const centre = Math.max(half + 8, Math.min(window.innerWidth - half - 8, targetBox.left + targetBox.width / 2));
-    const below = targetBox.bottom + 4;
-    const preferredTop = below + actionBox.height <= window.innerHeight - 8
-      ? below
-      : targetBox.top - actionBox.height - 4;
-    const top = Math.max(8, Math.min(window.innerHeight - actionBox.height - 8, preferredTop));
-    actions.style.left = `${centre}px`;
-    actions.style.top = `${top}px`;
-    actions.style.visibility = '';
-  };
-  const show = () => {
-    if (!actions.isConnected) wrapper.append(actions);
-    actions.hidden = false;
-    // the pill's buttons stay out of the Tab order (one stop per paragraph, R4): pointer and assistive
-    // technology reach them here, the keyboard through Shift+Enter and Ctrl+Enter on the word
-    actions.style.visibility = 'hidden';
-    const active = { wrapper, actions, position };
-    activeTokenAlternatives = active;
-    position();
-    requestAnimationFrame(() => {
-      if (activeTokenAlternatives === active) refreshTokenAlternatives();
+  row.append(label, save);
+  const dot = () => { const mark = el('span', 'mini-sentence-dot', '·'); mark.setAttribute('aria-hidden', 'true'); return mark; };
+  row.append(dot(), ask);
+  if (sentencePracticeModule) {
+    const practice = action('reader-sentence-practice', tx('練習', 'Practice'), tx('この文を練習する', 'Practice this sentence'));
+    // coming back from practice reopens this popup with Practice focused (focusLearningSourceCaller)
+    practice.dataset.returnFocus = `reader-word:${index}:reader-sentence-practice`;
+    practice.addEventListener('click', (event) => {
+      event.stopPropagation();
+      void openBundledSentenceChoice(() => contextFromTeacherNode(node), practice, note, () => practice.isConnected);
     });
-  };
-  const hideAfterFocusLeaves = () => {
-    setTimeout(() => {
-      if (!wrapper.contains(document.activeElement)) {
-        if (activeTokenAlternatives?.actions === actions) activeTokenAlternatives = null;
-        for (const button of actions.querySelectorAll('button')) button.tabIndex = -1;
-        actions.hidden = true;
-        actions.remove();
-      }
-    }, 0);
-  };
-  // focus caused by PRESSING THIS TOKEN follows its own pointerdown within
-  // a beat (touch focuses after release; a long-press after ~750ms). That
-  // focus is the press — showing the pill there popped it over the next
-  // prose line after every tap, doubled 全項目 beside the long-press mini,
-  // and put a button under the lifting finger (P2 ×2, review). Keyboard,
-  // switch, and screen-reader focus arrives with no press on this token
-  // (AT cursor flicks target the screen, not the span) and keeps the pill.
-  span.setAttribute('aria-keyshortcuts', quickLook ? 'Shift+Enter Control+Enter' : 'Control+Enter');
-  for (const [button, keys, hint] of [[actions.querySelector('[data-action="quickLook.open"]'), 'Shift+Enter', '⇧↵'],
-    [actions.querySelector('[data-action="entry.open"]'), 'Control+Enter', '⌃↵']]) {
-    if (!button) continue;
-    button.setAttribute('aria-keyshortcuts', keys);
-    const kbd = el('kbd', 'tok-kbd', hint); kbd.setAttribute('aria-hidden', 'true'); button.append(kbd);
+    buttons.push(practice);
+    row.append(dot(), practice);
   }
-  span.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      // Escape puts away what the word opened and leaves focus on the word itself
-      const mini = document.getElementById('mini');
-      if (!mini && actions.hidden) return;
+  const wrap = el('div', 'mini-sentence-wrap');
+  wrap.append(row, note);
+  return wrap;
+}
+
+/** Keep a sentence on the tutor page, or (discuss) open the tutor with it. One guarded write; the
+ * navigation happens only while the surface that asked is still there. */
+async function sendSentenceToTutor(node, discuss, currentSurface, say) {
+  const epoch = recordEpoch;
+  const selectionSerial = discuss ? ++teacherContextSelectionSerial : null;
+  try {
+    const context = await contextFromTeacherNode(node);
+    if (!recordWritable(epoch)) return false;
+    const saved = await commitStorePatch((latest) => {
+      const selectedRoot = teacherContextModule.selectTeacherContext(latest.teacherContexts, context);
+      const activate = discuss && currentSurface() && selectionSerial === teacherContextSelectionSerial;
+      return { teacherContexts: activate ? selectedRoot : teacherContextModule.activateTeacherContext(
+        selectedRoot, latest.teacherContexts?.activeRef || null) };
+    });
+    if (!saved || !recordWritable(epoch) || !currentSurface()) return false;
+    if (discuss && selectionSerial === teacherContextSelectionSerial) {
+      keepScroll(); stopReadAloud(); S.stack = []; S.captureOpen = false;
+      S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
+      render(); window.scrollTo(0, 0);
+    } else say(tx('先生のページに保存した。覚えるかどうかは、あとで選べる。',
+      'Saved on the tutor page. You can choose whether to memorize it later.'));
+    return true;
+  } catch (error) {
+    if (recordReady(epoch)) say(teacherSourceError(error));
+    return false;
+  }
+}
+
+/* The word menu (John #11: "I want to be able to 'right click' and choose save"). A right-click, a press and
+ * hold on a touch screen, or the menu key (ContextMenu, Shift+F10) on the focused word opens it at the
+ * pointer: Save word · Save the sentence · Full entry · Ask the tutor about this sentence · Copy. ↑/↓ move,
+ * Enter picks, Escape closes and gives focus back to the word. Only words lose the browser's own menu. */
+let readerWordMenu = null;
+function closeReaderWordMenu({ restoreFocus = false } = {}) {
+  const open = readerWordMenu;
+  readerWordMenu = null;
+  if (!open) return;
+  open.menu.remove();
+  if (restoreFocus && open.anchor.isConnected) open.anchor.focus({ preventScroll: true });
+}
+
+async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard = false } = {}) {
+  if (readerWordMenu?.anchor === anchor) return;
+  removeMini();
+  closeReaderWordMenu();
+  const serial = ++readerWordMenuSerial;
+  await door.prepare?.();
+  if (serial !== readerWordMenuSerial || !anchor.isConnected) return;
+  const menu = el('div', 'reader-word-menu');
+  menu.id = 'reader-word-menu';
+  menu.dataset.driftChrome = 'true';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', tx(`「${door.label}」の操作`, `${door.label}: actions`));
+  const items = [];
+  const add = (action, text, run, { disabled = false, hint = '' } = {}) => {
+    const item = el('button', 'reader-word-menu-item', text);
+    item.type = 'button';
+    item.tabIndex = -1;
+    item.dataset.menuAction = action;
+    item.setAttribute('role', 'menuitem');
+    if (disabled) item.setAttribute('aria-disabled', 'true');
+    if (hint) item.title = hint;
+    item.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (item.getAttribute('aria-disabled') === 'true') return;
+      closeReaderWordMenu({ restoreFocus: true });
+      void run();
+    });
+    items.push(item);
+    menu.append(item);
+  };
+  const save = door.save?.();
+  if (save) {
+    const saved = save.state === 'taken';
+    add('save-word', saved ? tx('保存済み ✓', 'Saved ✓') : tx('この語を保存', 'Save word'), () => toggleWordSave(save.node, door.label),
+      { disabled: saved || save.held || save.identityHeld, hint: save.held ? readerCaptureReasonText(door.label)
+        : save.identityHeld ? wordCaptureHeldText(save.node, { route: false }) : '' });
+  }
+  const sentence = door.sentence?.();
+  const here = { view: S.view, passageId: S.passageId };
+  const stillHere = () => S.view === here.view && S.passageId === here.passageId && !S.stack.length;
+  if (sentence) add('save-sentence', tx('この文を保存', 'Save the sentence'), () => sendSentenceToTutor(sentence, false, stillHere, showReaderToast),
+    { disabled: !recordWritable() });
+  add('entry', tx('全項目', 'Full entry'), () => door.openEntry('keyboard'), { disabled: door.entryAvailable === false });
+  if (sentence) add('ask-tutor', tx('この文について先生に聞く', 'Ask the tutor about this sentence'),
+    () => sendSentenceToTutor(sentence, true, stillHere, showReaderToast), { disabled: !recordWritable() });
+  add('copy', tx('コピー', 'Copy'), () => copyReaderText(door.copyText));
+  menu.addEventListener('keydown', (event) => {
+    const at = items.indexOf(document.activeElement);
+    const moves = { ArrowDown: at + 1, ArrowUp: at < 0 ? items.length - 1 : at - 1, Home: 0, End: items.length - 1 };
+    if (Object.hasOwn(moves, event.key)) {
       event.preventDefault();
-      removeMini();
-      actions.hidden = true;
+      items[(moves[event.key] + items.length) % items.length].focus({ preventScroll: true });
       return;
     }
-    if (event.key !== 'Enter') return;
-    if (event.shiftKey && quickLook) {
+    if (event.key === 'Escape' || event.key === 'Tab') {
       event.preventDefault();
-      interaction({ kind: 'quickLook.open', target }, 'keyboard', 'reader-alternative');
-      quickLook('keyboard');
-    } else if (event.ctrlKey || event.metaKey) {
-      event.preventDefault();
-      interaction({ kind: 'entry.open', target }, 'keyboard', 'reader-alternative');
-      openEntry('keyboard');
+      event.stopPropagation();
+      closeReaderWordMenu({ restoreFocus: true });
     }
   });
-  let ownPressAt = 0;
-  wrapper.addEventListener('pointerdown', () => (ownPressAt = Date.now()), true);
-  span.addEventListener('focus', () => {
-    if (Date.now() - ownPressAt > 900 && !document.getElementById('mini')) show();
+  document.body.append(menu);
+  readerWordMenu = { menu, anchor };
+  const box = menu.getBoundingClientRect();
+  const r = anchor.getBoundingClientRect();
+  const left = x ?? r.left, top = y ?? r.bottom + 4;
+  menu.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, left))}px`;
+  menu.style.top = `${top + box.height <= window.innerHeight - 8 ? top : Math.max(8, top - box.height)}px`;
+  // the keyboard lands on the first item it can use; a pointer opens the menu without marking an item,
+  // and ↓ then walks it from the top
+  menu.tabIndex = -1;
+  if (keyboard) (items.find((item) => item.getAttribute('aria-disabled') !== 'true') || items[0]).focus({ preventScroll: true });
+  else menu.focus({ preventScroll: true });
+}
+let readerWordMenuSerial = 0;
+
+/** The selection route, for an older engine or a page without clipboard permission. */
+function copyBySelection(text) {
+  const area = el('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.append(area);
+  area.select();
+  try { return document.execCommand('copy'); } catch { return false; } finally { area.remove(); }
+}
+async function copyReaderText(text) {
+  let copied;
+  try { await navigator.clipboard.writeText(text); copied = true; } catch { copied = copyBySelection(text); }
+  showReaderToast(copied ? tx(`「${text}」をコピーしました`, `Copied ${text}`) : tx('コピーできませんでした', 'Could not copy'));
+}
+
+/** The reader's word doors share one keyboard: Enter opens the popup (a click), Shift+Enter too, Ctrl+Enter
+ * the full entry, the menu key or Shift+F10 the word menu, Escape puts away whatever the word opened. */
+function readerWordKey(event, span, door) {
+  if (event.altKey) return;
+  if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
+    event.preventDefault();
+    void openReaderWordMenu(span, door, { keyboard: true });
+    return;
+  }
+  if (event.key === 'Escape') {
+    if (!document.getElementById('mini') && !readerWordMenu) return;
+    event.preventDefault();
+    removeMini();
+    closeReaderWordMenu();
+    return;
+  }
+  if (event.key !== 'Enter') return;
+  if (event.ctrlKey || event.metaKey) {
+    event.preventDefault();
+    door.openEntry('keyboard');
+  } else if (event.shiftKey) {
+    event.preventDefault();
+    interaction({ kind: 'quickLook.open', target: door.target }, 'keyboard', 'reader-alternative');
+    door.quickLook('keyboard');
+  }
+}
+
+/** Press-and-hold (touch and pen) and right-click open the word menu; a hold that moves is a scroll. */
+function wireReaderWordMenu(span, door) {
+  span.setAttribute('aria-keyshortcuts', 'Shift+F10 Control+Enter');
+  let hold = null;
+  const clear = () => { if (hold) clearTimeout(hold.timer); hold = null; };
+  span.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    clear();
+    // a contextmenu the keyboard raised has no pointer position: the menu opens under the word
+    const keyboard = !event.clientX && !event.clientY;
+    void openReaderWordMenu(span, door, keyboard ? { keyboard } : { x: event.clientX, y: event.clientY });
   });
-  wrapper.addEventListener('focusout', hideAfterFocusLeaves);
+  span.addEventListener('pointerdown', (event) => {
+    clear();
+    if (event.pointerType === 'mouse' || event.isPrimary === false) return;
+    const start = { x: event.clientX, y: event.clientY };
+    hold = { start, timer: setTimeout(() => {
+      hold = null;
+      // the finger's release will synthesise a click on the word: it belongs to the hold
+      swallowClickUntil = Date.now() + 700;
+      void openReaderWordMenu(span, door, start);
+    }, GESTURE.MENU_MS) };
+  });
+  span.addEventListener('pointermove', (event) => {
+    if (hold && Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  });
+  span.addEventListener('pointerup', clear);
+  span.addEventListener('pointercancel', clear);
+  span.addEventListener('keydown', (event) => readerWordKey(event, span, door));
 }
 
 /** The inline gloss under a word must NEVER truncate (operator, morning
@@ -8004,7 +8301,7 @@ function readerQuickRecord(token) {
 }
 
 function readerGlossMissText() {
-  return tx('この語は簡易辞書にありません・長押しで全辞書', 'Not in the quick dictionary — hold for the full dictionary');
+  return tx('この語は簡易辞書にありません。「全項目」で全辞書を引けます。', 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.');
 }
 
 /** The line under a content word on the ladder's English rung: its gloss
@@ -8016,32 +8313,19 @@ function readerGlossLine(token) {
     : el('span', 'tok-en tok-en-miss', '—');
 }
 
-/** The tap ladder has one rung fewer when the ふりがな dial is つねに: the
- * reading is already on the page, so the first activation cannot reveal it and
- * goes straight to the English gloss (see activate(), below). The hint has to
- * describe the ladder the reader actually has under their finger. */
-const readingsAlwaysOn = () => S.dials.furigana === 2;
-
+/** How the reader's words work, in plain words: the one-time hint above the text and the text settings
+ * say the same thing (John, 2026-10-02 #8). */
 function tapLadderHint() {
-  if (readingsAlwaysOn()) {
-    return tx(
-      'ことばに触れると英語、もう一度で元どおり。長押しで辞書。',
-      'tap a word for English — again to clear it; hold for the dictionary',
-    );
-  }
-  return tx(
-    '触れるとふりがな、もう一度で英語、三回目で元どおり。長押しで辞書。',
-    'tap for the reading, again for English, a third time to clear — hold for the dictionary',
-  );
+  return tx('語をタップすると意味が出ます。右クリック（または長押し）で、ほかの操作も。',
+    'Tap any word to see what it means. Right-click (or press and hold) for more.');
 }
 
 /* R4 (2026-09-30) — a reader word is named by the word itself. How to work it and what it shows now
- * ride as its description: the kind and the tap-ladder help are shared by the whole reader
- * (#reader-help-*); only a word that shows its reading or English carries a state line of its own. */
+ * ride as its description: the kind and the keyboard help are shared by the whole reader
+ * (#reader-help-*); only a word that shows its reading carries a state line of its own. */
 function readerWordHint() {
-  return readingsAlwaysOn()
-    ? tx('もう一度で元どおり。長押しで全項目。フォーカスで別の操作。', 'a further activation clears; hold for the full entry; focus for more actions')
-    : tx('三回目で元どおり。長押しで全項目。フォーカスで別の操作。', 'a third activation clears; hold for the full entry; focus for more actions');
+  return tx('Enterで読みと意味。Shift+F10でほかの操作。Ctrl+Enterで全項目。',
+    'Enter: reading and meaning · Shift+F10: more actions · Ctrl+Enter: full entry');
 }
 function readerTokenState(token, index, kind) {
   if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
@@ -8068,7 +8352,7 @@ function nameReaderToken(span, token, index, kind) {
 function readerHelp() {
   const help = el('div', 'visually-hidden reader-help');
   for (const [id, text] of [['reader-help-kind', tx('語', 'word')], ['reader-help-word', readerWordHint()],
-    ['reader-help-named', tx('押すと読みを表示・非表示', 'activate to show or hide the reading')],
+    ['reader-help-named', tx('Enterで読みと意味。Shift+F10でほかの操作。', 'Enter: reading and meaning · Shift+F10: more actions')],
     ['reader-help-lookup', tx('読みと意味', 'reading and meaning')]]) {
     const line = el('span', null, text); line.id = id; help.append(line);
   }
@@ -8115,16 +8399,6 @@ function paintNamedTok(span, token, index) {
   span.classList.toggle('lit', shown);
   nameReaderToken(span, token, index, 'named');
 }
-function wireNamedToken(span, token, index) {
-  span.addEventListener('click', () => {
-    if (Date.now() < swallowClickUntil) return;
-    (S.revealed ||= new Set());
-    if (S.revealed.has(index)) S.revealed.delete(index);
-    else S.revealed.add(index);
-    paintNamedTok(span, token, index);
-  });
-}
-
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -8165,138 +8439,108 @@ function paintTok(span, token, index) {
   nameReaderToken(span, token, index, 'word');
 }
 
-/** Opening sentence actions must not cover the word whose reveal just began.
- * Measure after the seal and token have changed, and move only an obstructed
- * selection. Repeated reveals while the bar stays open keep their glyph anchor. */
-function keepReaderTokenClear(span, index, passageId) {
-  const selected = readerTakeCurrent();
-  if (!span.isConnected || selected?.p !== passageId || selected.index !== index || S.stack.length) return;
-  const rect = span.getBoundingClientRect();
-  const viewport = window.visualViewport;
-  const viewportTop = viewport?.offsetTop ?? 0;
-  let top = viewportTop + 8;
-  let bottom = viewportTop + (viewport?.height ?? window.innerHeight) - 8;
-  const chrome = document.querySelector('#app > .chrome');
-  if (chrome && ['fixed', 'sticky'].includes(getComputedStyle(chrome).position)) {
-    const bounds = chrome.getBoundingClientRect();
-    if (bounds.height && rect.left < bounds.right && rect.right > bounds.left) top = Math.max(top, bounds.bottom + 8);
-  }
-  const bar = document.querySelector('.reader-actions:not([hidden])');
-  if (bar) {
-    const bounds = bar.getBoundingClientRect();
-    if (bounds.height && rect.left < bounds.right && rect.right > bounds.left) {
-      // Its entrance starts 14px lower; reserve the final resting position.
-      const transform = getComputedStyle(bar).transform;
-      const offset = transform === 'none' ? 0 : new window.DOMMatrixReadOnly(transform).m42;
-      bottom = Math.min(bottom, bounds.top - offset - 8);
-    }
-  }
-  if (bottom - top < rect.height) return;
-  const delta = rect.bottom > bottom ? rect.bottom - bottom : rect.top < top ? rect.top - top : 0;
-  if (Math.abs(delta) > 0.5) window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
+/* ふりがな 触れて (on touch): the word you touched shows its reading, and touching another moves it
+ * there. つねに shows every reading, なし none. Taps never cycle the text: the popup carries the reading and
+ * the meaning. Each rendered reader word registers how it repaints itself. */
+const readerTokenPainters = new Map();
+const readerTokenDoors = new WeakMap();
+function markReaderReading(index) {
+  if (S.dials.furigana !== 1) return;
+  const before = S.revealed ? [...S.revealed] : [];
+  S.revealed = new Set([index]);
+  for (const at of new Set([...before, index])) readerTokenPainters.get(at)?.();
 }
 
+/** A reader content word: one tap opens the popup (the meaning), the word menu does the rest. */
 function wireTokenGestures(span, token, index, p) {
-  let miniTimer = null;
-  let fullTimer = null;
-  let down = null;
   const target = { kind: 'word', id: token.b };
   const obsKey = srsKey('word', token.b);
-  const openFull = (modality = 'pointer', emitAction = true) => {
+  const from = { passage: p.id, index };
+  const openFull = (modality = 'pointer') => {
     removeMini();
     setReaderTake(token.b, index, p.id);
-    // a held finger's release will synthesize one click onto the new sheet —
-    // arm the swallow only then (arming on a button click would eat the
-    // user's NEXT real tap instead)
-    if (down) swallowClickUntil = Date.now() + 700;
     obsLog('tap', obsKey, 3, p.id);
-    if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-token');
+    interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     // a core hit opens exactly as before; a spelling the core lacks is
     // matched by this token's reading first (D11, readerEntryNode)
     go(readerEntryNode(token, index, p), { invoker: span });
   };
-  const quickLook = (modality = 'pointer', emitAction = false) => {
+  const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
+  const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     setReaderTake(token.b, index, p.id);
-    obsLog('tap', obsKey, 2, p.id);
-    if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-token');
-    showMini(span, token, (entryModality) => openFull(entryModality, true), {
-      focusEntry: modality !== 'pointer',
-      from: { passage: p.id, index },
-      reader: true,
+    // the meaning is shown: the observation log's depth 2, as the mini always wrote it
+    if (!restore) obsLog('tap', obsKey, 2, p.id);
+    markReaderReading(index);
+    showMini(span, token, (entryModality) => openFull(entryModality), {
+      focusEntry: modality === 'keyboard', from, reader: true, sentence: readerSentenceRow(sentence(), index),
     });
+    if (!restore) retireReaderTip();
   };
-  const activate = (modality) => {
-    interaction({ kind: 'target.activate', target }, modality, 'reader-token');
-    const previous = readerTakeCurrent();
-    const selectionChanged = previous?.p !== p.id || previous?.index !== index;
-    const actionsWereHidden = document.querySelector('.reader-actions')?.hidden === true;
-    setReaderTake(token.b, index, p.id);
-    (S.revealed ||= new Set());
-    (S.glossed ||= new Set());
-    const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
-    const hasEn = S.glossed.has(index);
-    if (!hasReading) {
-      S.revealed.add(index);
-      obsLog('tap', obsKey, 1, p.id);
-    } else if (!hasEn) {
-      S.glossed.add(index);
-      obsLog('tap', obsKey, 2, p.id);
-    } else {
-      // the third tap closes the circle (operator, 2026-08-12): back to plain
-      // kanji, ladder reset. Definitions live on the holds — a short hold for
-      // the mini, a long hold (or a tap on the mini) for the full entry.
-      S.revealed.delete(index);
-      S.glossed.delete(index);
-    }
-    paintTok(span, token, index);
-    if (selectionChanged || actionsWereHidden) keepReaderTokenClear(span, index, p.id);
-  };
-  const clear = () => {
-    clearTimeout(miniTimer);
-    clearTimeout(fullTimer);
-    miniTimer = fullTimer = null;
-  };
-  span.addEventListener('contextmenu', (ev) => ev.preventDefault());
-  span.addEventListener('pointerdown', (ev) => {
-    down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
-    miniTimer = setTimeout(() => quickLook('pointer', true), GESTURE.MINI_MS);
-    fullTimer = setTimeout(() => openFull('pointer', true), GESTURE.FULL_MS);
-  });
-  span.addEventListener('pointermove', (ev) => {
-    if (!down) return;
-    if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > GESTURE.MOVE_PX) {
-      clear();
-      down = null;
-    }
-  });
-  span.addEventListener('pointercancel', () => {
-    clear();
-    down = null;
-  });
-  span.addEventListener('pointerup', () => {
-    if (!down) return;
-    const held = Date.now() - down.at;
-    down = null;
-    clear();
-    // Quick lookup can put its entry button under the original finger when
-    // selecting the word grows the header. Own the release at document level,
-    // even when its compatibility click lands outside this token. The next
-    // deliberate pointerdown clears this one-click guard.
-    if (held >= GESTURE.MINI_MS) swallowClickUntil = Date.now() + 700;
-  });
   span.addEventListener('click', (event) => {
     // Activation lives on the CLICK: inside scrollable surfaces iOS
     // pointercancels a plain tap and pointerup never arrives — activating
     // there left real fingers dead (operator's phone, 2026-08-12). The
     // click still fires after a cancel; scrolls fire no click at all.
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
-    activate(event.detail === 0 ? 'keyboard' : 'pointer');
+    // a press on the word whose popup is open put it away; its click does not open it again
+    if (event.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+    const modality = event.detail === 0 ? 'keyboard' : 'pointer';
+    interaction({ kind: 'target.activate', target }, modality, 'reader-token');
+    quickLook(modality);
   });
-  return {
-    target,
-    quickLook: (modality) => quickLook(modality, false),
-    openEntry: (modality) => openFull(modality, false),
+  const door = {
+    target, label: token.b, copyText: token.s || token.b, entryAvailable: true, sentence,
+    save: () => wordSaveFacts(token, { reader: true, from }),
+    quickLook: (modality) => quickLook(modality), openEntry: (modality) => openFull(modality),
+    reopen: () => quickLook('programmatic', { restore: true }),
   };
+  wireReaderWordMenu(span, door);
+  readerTokenPainters.set(index, () => paintTok(span, token, index));
+  readerTokenDoors.set(span, door);
+  return door;
+}
+
+/** A reader word the grader does not count — a name, a kana run, an ending — opens the shared lookup
+ * door, with the same popup, sentence row and word menu as every other reader word. */
+function wireLookupToken(span, token, index, p, lookupContext, named) {
+  const text = token.b || token.s;
+  const from = { passage: p.id, index };
+  const sentence = () => ({ t: 'word', id: text, from });
+  let record = null;
+  const hasKanjiEntry = () => [...text].length === 1 && !!D.kanji[text];
+  const prepare = async () => {
+    await ensureDictionaryRowsForForm(text).catch(() => {});
+    record = japaneseLookupRecord(text, lookupContext);
+  };
+  const quickLook = (modality = 'pointer', { restore = false } = {}) => {
+    if (named) markReaderReading(index);
+    void openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index),
+      focusPopup: modality === 'keyboard' }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
+  };
+  span.addEventListener('click', (event) => {
+    if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
+    if (event.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+    quickLook(event.detail === 0 ? 'keyboard' : 'pointer');
+  });
+  const door = {
+    target: { kind: 'word', id: text }, copyText: token.s || text, sentence, prepare,
+    get label() { return record?.head || text; },
+    get entryAvailable() { return !!record || hasKanjiEntry(); },
+    save: () => wordSaveFacts({ s: text, b: record?.head || text, r: lookupContext.reading || record?.r || '', c: !!record,
+      ...(record?.seq ? { seq: record.seq } : {}) }, { from, record }),
+    quickLook: (modality) => quickLook(modality),
+    openEntry: () => {
+      if (!record && !hasKanjiEntry()) return;
+      removeMini();
+      if (hasKanjiEntry()) go({ t: 'kanji', id: text }, { invoker: span });
+      else go({ t: 'word', id: record.head || text, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span });
+    },
+    reopen: () => quickLook('programmatic', { restore: true }),
+  };
+  wireReaderWordMenu(span, door);
+  if (named) readerTokenPainters.set(index, () => paintNamedTok(span, token, index));
+  readerTokenDoors.set(span, door);
+  return door;
 }
 
 const readDonePending = new Set();
@@ -8726,6 +8970,7 @@ function buildListenRow(p) {
   return listenRow;
 }
 function renderReader(main) {
+  readerTokenPainters.clear();
   const p = passage();
   if (!p) {
     S.view = 'shelf';
@@ -8774,19 +9019,30 @@ function renderReader(main) {
   if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
   const versions = storyVersions(p);
   if (versions) {
-    // one story, two texts: the original and Bunki's N3 rewrite are a toggle, never two cards
+    // one story, two texts: the original and Bunki's N3 rewrite are one switch, never two cards. Each side
+    // says what it is and its level, and one line says what the simplified version is (John #9).
     const toggle = el('div', 'version-toggle');
     toggle.setAttribute('role', 'group');
-    toggle.setAttribute('aria-label', tx('版', 'version'));
-    for (const [version, ja, en] of [[versions.original, '原文', 'original'], [versions.easy, 'やさしい版', 'easier N3']]) {
-      const b = biLabel('button', 'version-choice', ja, en);
+    toggle.setAttribute('aria-label', tx('記事の版', 'Article version'));
+    const caption = el('p', 'version-caption', tx('やさしい版は、同じ記事をやさしい日本語で書き直したものです。',
+      'The simplified version retells the same article in easier Japanese.'));
+    caption.id = 'version-caption';
+    toggle.setAttribute('aria-describedby', caption.id);
+    for (const [version, ja, en] of [[versions.original, '原文', 'Original'], [versions.easy, 'やさしい版', 'Simplified']]) {
+      const b = el('button', 'version-choice');
       b.type = 'button';
       b.dataset.version = version.id;
       b.setAttribute('aria-pressed', String(version.id === p.id));
+      b.append(el('span', 'l-ja', ja));
+      if (bi()) b.append(el('span', 'version-name', en));
+      const level = version.readingFacets?.jlpt || levelPhrase(version.grading).level;
+      if (level) b.append(el('span', 'version-level', `· ${level}`));
       b.addEventListener('click', () => { if (version.id !== p.id) openPassage(version.id); });
       toggle.append(b);
     }
-    main.append(toggle);
+    const block = el('div', 'version-block');
+    block.append(toggle, caption);
+    main.append(block);
   }
   if (S.dialsOpen) {
     const dials = el('div', 'dials');
@@ -8820,11 +9076,7 @@ function renderReader(main) {
   // article, one tap to stop; until the locked Kore clips ship it shows
   // only its 音声準備中 · Kore pending state
   main.append(buildListenRow(p));
-  // the sentence actions float in only once a word is chosen — never a row of greyed buttons
-  renderTeacherDoor(main, () => {
-    const current = readerTakeCurrent();
-    return current ? readerTakeNode(current) : null;
-  }, true);
+  // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
   renderReaderTip(main);
 
   const reader = el('div', 'reader');
@@ -8892,7 +9144,7 @@ function renderReader(main) {
     // whatever the grader thinks of it; punctuation and bare kana are not.
     const namedReading =
       !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
-    // Preserve the inline reading toggle when the dial leaves a reading to reveal.
+    // A name whose reading the dial leaves to reveal shows it while it is the touched word (触れて).
     // Every Japanese token still opens lookup, including names already shown in kana.
     const namedDoor = namedReading && S.dials.furigana !== 2 && displayPairs(token).some((pair) => pair.r);
     const interactive = !!token.c || !!particle || namedDoor || /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s || '');
@@ -8922,7 +9174,7 @@ function renderReader(main) {
     }
     if (interactive) span.dataset.para = String(para);
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
-    // the word the sentence bar is about wears the one vermilion accent: current
+    // the word last tapped wears the one vermilion accent: current
     if (S.readerTake?.p === p.id && S.readerTake.index === index) span.classList.add('tok-current');
     span.append(
       wordRow(displayPairs(token), {
@@ -8942,22 +9194,17 @@ function renderReader(main) {
       const wrapper = el('span', 'token-door');
       wrapper.append(span);
       if (token.c) {
-        const adapter = wireTokenGestures(span, token, index, p);
-        installTokenAlternatives(wrapper, span, adapter.target, adapter);
+        wireTokenGestures(span, token, index, p);
         nameReaderToken(span, token, index, 'word');
       } else if (particle) {
-        const adapter = wireParticleGestures(span, particle);
-        installTokenAlternatives(wrapper, span, adapter.target, adapter);
+        wireParticleGestures(span, particle, index, p);
         nameReaderToken(span, token, index, 'lookup');
       } else {
         // The supplied reading belongs to the surface; an inflected ending (まし of ます) looks
         // up its dictionary form without it. The part of speech keeps helpers to exact entries.
         const lookupContext = { reading: !token.b || token.b === token.s ? token.r : '', pos: token.p };
-        if (namedDoor) {
-          wireNamedToken(span, token, index);
-          nameReaderToken(span, token, index, 'named');
-        } else nameReaderToken(span, token, index, 'lookup');
-        span.addEventListener('click', () => void openJapaneseLookup(span, token.b || token.s, lookupContext));
+        wireLookupToken(span, token, index, p, lookupContext, namedDoor);
+        nameReaderToken(span, token, index, namedDoor ? 'named' : 'lookup');
       }
       rendered = wrapper;
     }
@@ -14057,61 +14304,35 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   publisherSelectionSurface = { connected: () => section.isConnected, update };
   refresh();
 }
-function renderTeacherDoor(container, getNode, reader = false) {
+function renderTeacherDoor(container, getNode) {
   const node = typeof getNode === 'function' ? getNode() : getNode;
   const wrap = el('div', 'teacher-door');
   const quote = el('p', 'teacher-source-quote');
-  if (!reader) quote.textContent = node?.sourceContext?.quote || teacherSentence(node)?.quote || '';
+  quote.textContent = node?.sourceContext?.quote || teacherSentence(node)?.quote || '';
   const actions = el('div', 'teacher-actions');
   const note = el('p', 'teacher-note');
   note.setAttribute('role', 'status');
-  // the reader's bar names its sentence in the note, so its buttons can be short: one filled
-  // primary (save), the rest outlined
-  const labels = reader
-    ? [[false, '保存', 'save'], [true, '先生と話す', 'ask the tutor']]
-    : [[false, 'この文を保存', 'save this sentence'], [true, 'この文を先生と話す', 'discuss this sentence']];
-  for (const [discuss, ja, en] of labels) {
+  for (const [discuss, ja, en] of [[false, 'この文を保存', 'save this sentence'], [true, 'この文を先生と話す', 'discuss this sentence']]) {
     const button = biLabel('button', 'chip', ja, en);
     button.type = 'button';
-    if (reader) button.classList.add(discuss ? 'btn-secondary' : 'btn-primary');
-    if (reader) button.id = discuss ? 'reader-teacher' : 'reader-context-save';
-    else button.classList.add(discuss ? 'teacher-discuss' : 'teacher-save');
+    button.classList.add(discuss ? 'teacher-discuss' : 'teacher-save');
     button.disabled = !node || !recordWritable();
     button.addEventListener('click', async () => {
       const selected = typeof getNode === 'function' ? getNode() : getNode;
       if (!selected || button.disabled) return;
-      const epoch = recordEpoch, currentSurface = retainActionSurface(button);
-      const selectionSerial = discuss ? ++teacherContextSelectionSerial : null;
+      const currentSurface = retainActionSurface(button);
       for (const control of actions.children) control.disabled = true;
-      try {
-        const context = await contextFromTeacherNode(selected);
-        if (!recordWritable(epoch)) return;
-        const saved = await commitStorePatch((latest) => {
-          const selectedRoot = teacherContextModule.selectTeacherContext(latest.teacherContexts, context);
-          const activate = discuss && currentSurface() && selectionSerial === teacherContextSelectionSerial;
-          return { teacherContexts: activate ? selectedRoot : teacherContextModule.activateTeacherContext(
-            selectedRoot, latest.teacherContexts?.activeRef || null) };
-        });
-        if (!saved || !recordWritable(epoch)) return;
-        if (!currentSurface()) return;
-        if (discuss && selectionSerial === teacherContextSelectionSerial) {
-          keepScroll(); stopReadAloud(); S.stack = []; S.captureOpen = false;
-          S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
-          render(); window.scrollTo(0, 0);
-        } else note.textContent = tx('先生のページに保存した。覚えるかどうかは、あとで選べる。',
-          'Saved on the tutor page. You can choose whether to memorize it later.');
-      } catch (error) { if (recordReady(epoch)) note.textContent = teacherSourceError(error); }
+      try { await sendSentenceToTutor(selected, discuss, currentSurface, (text) => { note.textContent = text; }); }
       finally {
         for (const control of actions.children) control.disabled = !recordWritable();
       }
     });
     actions.append(button);
   }
-  if (sentencePracticeModule && (reader || (node?.sourceContext
-    ? node.sourceContext.sourceKind === 'bundled-passage' : !!node?.from))) {
-    const practice = reader ? biLabel('button', 'chip btn-secondary', '練習する', 'practice')
-      : biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
-    practice.type = 'button'; practice.id = reader ? 'reader-sentence-practice' : 'entry-sentence-practice';
+  if (sentencePracticeModule && (node?.sourceContext
+    ? node.sourceContext.sourceKind === 'bundled-passage' : !!node?.from)) {
+    const practice = biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
+    practice.type = 'button'; practice.id = 'entry-sentence-practice';
     const selectedNode = () => typeof getNode === 'function' ? getNode() : getNode;
     const key = (value) => JSON.stringify([value?.t, value?.id, value?.from?.passage, value?.from?.index, value?.sourceContext?.id]);
     practice.disabled = !node || !recordWritable();
@@ -14123,26 +14344,8 @@ function renderTeacherDoor(container, getNode, reader = false) {
     actions.append(practice);
   }
   if (quote.textContent) wrap.append(quote);
-  if (reader) {
-    // a floating bar that appears only once a word is chosen (syncReaderTakeSeal shows it)
-    wrap.classList.add('reader-actions');
-    wrap.hidden = !node;
-    wrap.setAttribute('role', 'region');
-    wrap.setAttribute('aria-label', tx('選んだ文', 'the chosen sentence'));
-    note.id = 'reader-context-note';
-    note.textContent = readerActionsNote(readerTakeCurrent());
-    const close = el('button', 'icon-button reader-actions-close');
-    close.type = 'button';
-    close.setAttribute('aria-label', tx('閉じる', 'close'));
-    close.append(uiIcon('close'));
-    close.addEventListener('click', () => { wrap.hidden = true; });
-    wrap.append(note, actions, close);
-  } else wrap.append(actions, note);
+  wrap.append(actions, note);
   container.append(wrap);
-}
-/** The bar's own label: which sentence its actions will carry. */
-function readerActionsNote(selected) {
-  return selected ? tx(`「${selected.id}」の文`, `the sentence with ${selected.id}`) : '';
 }
 function renderTeacherContexts(main) {
   const entries = S.teacherContexts?.entries || [];
@@ -15866,85 +16069,68 @@ function renderParticleNode(sheet, node) {
 }
 
 /** Particles use the same quick-lookup door; holding still opens their grammar entry. */
-function wireParticleGestures(span, particle) {
-  let miniTimer = null;
-  let fullTimer = null;
-  let down = null;
+function wireParticleGestures(span, particle, index, p) {
   const target = { kind: 'particle', id: particle.id };
-  const openFull = (modality = 'pointer', emitAction = true) => {
+  const openFull = (modality = 'pointer') => {
     removeMini();
-    // arm only while a finger is down — its release ghosts one click
-    if (down) swallowClickUntil = Date.now() + 700;
-    if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-particle');
+    interaction({ kind: 'entry.open', target }, modality, 'reader-particle');
     go({ t: 'particle', id: particle.id }, { invoker: span });
   };
-  const quickLook = (modality = 'pointer', emitAction = false) => {
-    if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-particle');
+  const sentence = () => ({ t: 'particle', id: particle.id, from: { passage: p.id, index } });
+  const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     removeMini();
     const mini = el('div', null);
     mini.id = 'mini';
+    mini.tabIndex = -1;
     mini.setAttribute('role', 'dialog');
     mini.setAttribute('aria-label', tx(`${particle.p} の語釈`, `${particle.p} particle quick look`));
     mini.append(el('span', 'mini-word', particle.p));
     mini.append(el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
-    const entry = biLabel('button', 'mini-entry', '助詞へ', 'full entry');
+    const actions = el('div', 'mini-actions');
+    const entry = el('button', 'mini-entry btn-tertiary');
     entry.type = 'button';
+    entry.append(el('span', 'mini-entry-label', tx('助詞の項目', 'Full entry')));
+    const chevron = el('span', 'mini-entry-chevron', '›');
+    chevron.setAttribute('aria-hidden', 'true');
+    entry.append(chevron);
     entry.dataset.action = 'entry.open';
     entry.dataset.targetKind = 'particle';
     entry.addEventListener('click', (event) => {
       event.stopPropagation();
-      openFull(event.detail === 0 ? 'keyboard' : 'pointer', true);
+      openFull(event.detail === 0 ? 'keyboard' : 'pointer');
     });
-    mini.append(entry);
+    actions.append(entry);
+    mini.append(actions, readerSentenceRow(sentence(), index));
+    mini.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
+      removeMini();
+      span.focus({ preventScroll: true });
+    });
     document.body.append(mini);
-    const r = span.getBoundingClientRect();
-    const m = mini.getBoundingClientRect();
-    const above = r.top > m.height + 70;
-    mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
-    mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
-    if (modality !== 'pointer') entry.focus({ preventScroll: true });
-  };
-  const clear = () => {
-    clearTimeout(miniTimer);
-    clearTimeout(fullTimer);
-    miniTimer = fullTimer = null;
+    miniAnchor = span;
+    placeFloating(mini, span.getBoundingClientRect());
+    if (modality === 'keyboard') entry.focus({ preventScroll: true });
+    if (!restore) retireReaderTip();
   };
   span.classList.add('particle');
-  span.addEventListener('contextmenu', (ev) => ev.preventDefault());
-  span.addEventListener('pointerdown', (ev) => {
-    down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
-    miniTimer = setTimeout(() => quickLook('pointer', true), GESTURE.MINI_MS);
-    fullTimer = setTimeout(() => openFull('pointer', true), GESTURE.FULL_MS);
-  });
-  span.addEventListener('pointermove', (ev) => {
-    if (!down) return;
-    if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > GESTURE.MOVE_PX) {
-      clear();
-      down = null;
-    }
-  });
-  span.addEventListener('pointercancel', () => {
-    clear();
-    down = null;
-  });
-  span.addEventListener('pointerup', () => {
-    if (down && Date.now() - down.at < GESTURE.MINI_MS) {
-      interaction({ kind: 'target.activate', target }, 'pointer', 'reader-particle');
-    }
-    clear();
-    down = null;
-  });
   span.addEventListener('click', (event) => {
-    if (Date.now() < swallowClickUntil) return;
+    if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
+    if (event.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
     const modality = event.detail === 0 ? 'keyboard' : 'pointer';
-    if (modality === 'keyboard') interaction({ kind: 'target.activate', target }, modality, 'reader-particle');
-    quickLook(modality, true);
+    interaction({ kind: 'target.activate', target }, modality, 'reader-particle');
+    interaction({ kind: 'quickLook.open', target }, modality, 'reader-particle');
+    quickLook(modality);
   });
-  return {
-    target,
-    quickLook: (modality) => quickLook(modality, false),
-    openEntry: (modality) => openFull(modality, false),
+  const door = {
+    target, label: particle.p, copyText: particle.p, entryAvailable: true, sentence, save: null,
+    quickLook: (modality) => quickLook(modality), openEntry: (modality) => openFull(modality),
+    reopen: () => quickLook('programmatic', { restore: true }),
   };
+  wireReaderWordMenu(span, door);
+  readerTokenDoors.set(span, door);
+  return door;
 }
 
 /* --------------------------------------------------------------- search
@@ -17490,7 +17676,7 @@ async function openBundledSentenceChoice(getContext, button, note, stillCurrent)
     const listeningCue = await resolveSentenceListeningCue(context).catch(() => null);
     assertLearningSource(S, context);
     if (!recordWritable(epoch) || serial !== sentenceChoiceSerial || !currentSurface() || !stillCurrent() || !preserveVisibleDrafts()) return;
-    const returnCaller = learningSourceCaller(button.id);
+    const returnCaller = learningSourceCaller(button.dataset.returnFocus || button.id);
     keepScroll(); stopReadAloud();
     S.sentencePracticeView = { ...choice, cloze: true, production: false, listening: false, listeningCue, returnCaller,
       returnView: S.view, returnScroll: window.scrollY };
@@ -18695,7 +18881,7 @@ function holdReaderTakeSeal(btn, cur) {
 function readerTakeLabel(cur, takenNow) {
   if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
   return takenNow
-    ? tx(`「${cur.id}」を覚えている — ひらいて調整・やめる`, `memorizing ${cur.id} — open to adjust or stop`)
+    ? tx(`「${cur.id}」を覚えている — 押すと復習から外す`, `memorizing ${cur.id} — press to remove it from review`)
     : tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`);
 }
 
@@ -18709,20 +18895,6 @@ function setReaderTake(id, index, passageId) {
 function syncReaderTakeSeal() {
   updateReaderPlaceSave();
   const selected = readerTakeCurrent();
-  for (const id of ['reader-teacher', 'reader-context-save', 'reader-sentence-practice']) {
-    const control = document.getElementById(id);
-    if (control) control.disabled = !selected || !recordWritable();
-  }
-  const contextNote = document.getElementById('reader-context-note');
-  if (contextNote && selected) contextNote.textContent = readerActionsNote(selected);
-  const bar = document.querySelector('.reader-actions');
-  if (bar) bar.hidden = !selected;
-  // the tip has done its work once a word is chosen: it does not come back, but it stays in
-  // place for this visit so the text never moves under the finger (renderReaderTip)
-  if (selected && document.getElementById('reader-tip') && !S.readerTipSeen) {
-    S.readerTipSeen = true;
-    try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
-  }
   for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
   if (selected) document.querySelector(`#reader .tok[data-index="${selected.index}"]`)?.classList.add('tok-current');
   const btn = document.getElementById('reader-take');
@@ -27549,7 +27721,8 @@ function render() {
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.
   if (S.view !== 'levels') pendingReferenceCollection = null;
-  activeTokenAlternatives = null;
+  // the word menu belongs to a word this render replaces
+  closeReaderWordMenu();
   stopSentenceListening();
   stopAssessmentQuestionForRender();
   syncPracticeClock();
@@ -27819,7 +27992,8 @@ function render() {
         return;
       }
       S.captureOpen = false;
-      openVocabularyListChooser(readerTakeNode(now), now.id, capBtn);
+      // one press saves, as the popup's Save does; a press while saved takes it back out
+      await toggleWordSave(readerTakeNode(now), now.id);
     });
     chrome.append(capBtn);
   }
