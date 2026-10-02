@@ -20,7 +20,7 @@ body, body.v-contrast-wcag {
   --fill-strong: rgb(120 120 128 / 20%);
   --tint: var(--ai);
   --tint-wash: color-mix(in srgb, var(--ai) 12%, transparent);
-  --glass: rgb(250 250 248 / 75%);
+  --glass: rgb(250 250 248 / 80%);
   --glass-solid: #fafaf8;
   --glass-line: rgb(0 0 0 / 16%);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 8%);
@@ -56,11 +56,16 @@ body, body.v-contrast-wcag {
   scrollbar-width: thin;
 }
 
+/* a night world lifts each topic's colour toward its own light ink, so a kicker or a calm block's
+   word still reads on a dark card */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(.story-kicker, .story-picture-word) {
+  color: color-mix(in srgb, var(--topic, var(--tint)) 45%, var(--ink));
+}
 /* the default world (ベロ藍・浪) stands on the exact near-white */
 :root:is(:not([data-theme]), [data-theme='']) body { --page: #f6f5f1; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body {
   --page: var(--ground);
-  --surface: color-mix(in srgb, var(--ground-0) 88%, #fff);
+  --surface: var(--ground-0);
   --surface-sunk: color-mix(in srgb, var(--ground-0) 70%, var(--ground));
   --separator: color-mix(in srgb, var(--ink) 16%, transparent);
   --fill: rgb(120 120 128 / 24%);
@@ -219,9 +224,10 @@ body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   border-radius: var(--r-card);
   box-shadow: var(--shadow-card);
 }
-/* the page ground: clean near-white, no fibre (the paper grain is the reader's alone) */
-body:not([data-view='drift']) { background-color: var(--page); }
-body:not([data-view='drift'])::before { content: none; }
+/* the page ground: clean near-white, no fibre (the paper grain is the reader's alone). It is laid
+   in the fixed layer the living paper used to hang in; the body keeps its world's ground beneath,
+   the colour that paper is still grown against and measured by (the S1 amplitude law). */
+body:not([data-view='drift'])::before { background: var(--page); }
 body:not(.zen):is([data-view='shelf'], [data-view='levels']) #app > main { max-width: 1160px; }
 /* a room's title is an iOS large title in the UI sans (FEEL); an article's headline keeps the Mincho */
 main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
@@ -898,14 +904,14 @@ html:not([data-room='tutor']) body .search-field,
 html:not([data-room='tutor']) body .record-note-input {
   border: 0;
   border-radius: var(--r-control);
-  background: var(--fill);
+  background-color: var(--fill);
   color: var(--label);
   font-family: var(--sans);
   box-shadow: none;
   transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 html:not([data-room='tutor']) body .search-field:focus,
-html:not([data-room='tutor']) body .record-note-input:focus { outline: none; background: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
+html:not([data-room='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
 body .chip:has(> .l-ja) { flex-direction: row; align-items: baseline; gap: 6px; }
 body .chip > .l-ja { font-weight: inherit; }
 body .chip > .en-sub { display: inline; font: 500 12px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.78; }
@@ -991,12 +997,14 @@ body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
 }
 .story-kicker {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 6px;
+  gap: 0 6px;
   color: var(--topic, var(--tint));
   font: 700 13px/1.3 var(--sans);
   letter-spacing: 0.04em;
 }
+.story-kicker .l-ja { white-space: nowrap; }
 .story-kicker .en-sub {
   display: inline;
   font-size: 11px;
@@ -1668,7 +1676,26 @@ body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align
 .version-toggle { background: color-mix(in srgb, var(--ink) 5%, var(--raised)); }
 .version-toggle .version-choice[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
 .dials-hint { margin: var(--s1) 0 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
-body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 1px solid var(--raised-edge); border-radius: 8px; background: color-mix(in srgb, var(--ink) 3%, var(--raised)); box-shadow: none; padding: var(--s2); }
+body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 0; border-radius: var(--r-card); background: var(--surface-sunk); box-shadow: none; padding: var(--s2); animation: feel-pop var(--dur) var(--ease); transform-origin: top right; }
+/* every segmented choice is an iOS segmented control: a grey track, the chosen segment a white knob */
+body .seg { gap: 2px; padding: 2px; border: 0; border-radius: 10px; background: var(--fill); overflow: visible; }
+body .seg button {
+  min-height: 44px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--label);
+  font: 500 14px/1.25 var(--sans);
+  letter-spacing: 0;
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+body .seg button :is(.l-ja, .en-sub) { color: inherit; }
+body .seg button .en-sub { font: 500 11px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
+body .seg button:hover:not([aria-pressed='true']) { background: rgb(255 255 255 / 45%); }
+body .seg button[aria-pressed='true'] { background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 0 0 0.5px rgb(0 0 0 / 5%); color: var(--label); font-weight: 600; }
+body .dial-label { font-family: var(--sans); color: var(--label-2); letter-spacing: 0; }
+@media (prefers-reduced-motion: reduce) { body.v-depth-layered .dials { animation: none; } }
 
 /* the play bar — only when the locked voice has clips for this article */
 .listen-row[hidden], .reader-actions[hidden], .teacher-door.reader-actions[hidden] { display: none !important; }
@@ -1852,12 +1879,12 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   gap: var(--s1);
   min-height: 44px;
   padding: 0 var(--s3);
-  border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
-  border-radius: 8px;
-  color: var(--ai);
-  background: transparent;
+  border: 0;
+  border-radius: var(--r-control);
+  color: var(--tint);
+  background: var(--tint-wash);
   box-shadow: none;
-  font: 700 15px/1.2 var(--sans);
+  font: 600 15px/1.2 var(--sans);
 }
 .article-footer .read-fin .en-sub { display: inline; font-size: 12px; text-transform: none; letter-spacing: 0.01em; }
 .article-footer .read-fin.finished { color: var(--raised); background: var(--ai); border-color: var(--ai); }
@@ -2169,8 +2196,8 @@ body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search
   font: 600 16px/1.2 var(--sans);
   transition: background-color var(--dur) var(--ease);
 }
-body .sheet .sheet-bar .sheet-back { display: inline-flex; flex-direction: row; align-items: baseline; gap: 5px; padding: 0 10px 0 6px; }
-body .sheet .sheet-bar .sheet-back :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; }
+body .sheet .sheet-bar .sheet-back { display: inline-flex; flex-direction: row; align-items: baseline; gap: 5px; padding: 0 10px 0 6px; line-height: 44px; }
+body .sheet .sheet-bar .sheet-back :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; line-height: 44px; }
 body .sheet .sheet-bar .sheet-back .en-sub { font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
 body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search):hover { background: var(--fill); }
 body .sheet .sheet-bar .sheet-take { background: var(--tint-wash); color: var(--tint); font: 700 17px/1 var(--display); }
@@ -2447,11 +2474,11 @@ body, body.v-contrast-wcag {
   gap: var(--s1);
   min-height: 44px;
   padding: 0 var(--s2) 0 12px;
-  border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
+  border: 0;
   border-radius: 999px;
-  background: var(--raised);
-  color: var(--ai);
-  font: 700 14px/1.2 var(--sans);
+  background: var(--tint-wash);
+  color: var(--tint);
+  font: 600 14px/1.2 var(--sans);
   list-style: none;
   cursor: pointer;
 }
@@ -2702,18 +2729,18 @@ html[data-room='jlpt'] .exam-official .exam-official-import,
   min-height: 44px;
   margin: var(--s1) var(--s1) 0 0;
   padding: 0 var(--s3);
-  border: 1px solid var(--ai);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--ai);
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--tint-wash);
+  color: var(--tint);
   box-shadow: none;
-  font: 700 15px/1 var(--sans);
+  font: 600 15px/1 var(--sans);
   letter-spacing: 0;
   cursor: pointer;
 }
 @media (hover: hover) {
   html[data-room='jlpt'] .exam-official .exam-official-import:hover,
-  .assessment-room .exam-confirm > button:not(.take):hover { background: var(--ai-wash); }
+  .assessment-room .exam-confirm > button:not(.take):hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 }
 .assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
 html[data-room='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
