@@ -23179,7 +23179,14 @@
           "頃"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-5238864-s63.webp",
+        "alt": "Placeholder: a pale-to-deep sky wash, standing in for an illustration of Typhoon No. 25.",
+        "w": 1200,
+        "h": 800
+      },
+      "accent": "#2f6c9a"
     },
     {
       "id": "jawiki:5294446",
@@ -23511,7 +23518,14 @@
           "魅力"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-radio-3743.webp",
+        "alt": "Placeholder: a warm clay wash, standing in for an illustration of a registered heritage building.",
+        "w": 1200,
+        "h": 800
+      },
+      "accent": "#9a4a2a"
     },
     {
       "id": "env:press-press_05591",
@@ -24934,7 +24948,14 @@
           "％"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/global-voices-2026-09-28-65726.webp",
+        "alt": "Placeholder: a soft green-to-blue wash, standing in for an illustration of the solidarity fields near Damascus.",
+        "w": 1200,
+        "h": 800
+      },
+      "accent": "#1f6491"
     },
     {
       "id": "jawiki-news:2026-09-21",

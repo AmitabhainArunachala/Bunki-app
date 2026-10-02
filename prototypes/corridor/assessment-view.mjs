@@ -1070,8 +1070,14 @@ export function createAssessmentView(host) {
     const { form, attempt } = selected;
     main.dataset.examMode = attempt.mode;
     const block = attempt.blocks.find(row => row.status === 'open');
-    main.append(node('h1', 'exam-heading', `${form.exam.track} ${form.scope === 'full-candidate'
-      ? tx('模試', 'mock test') : tx('練習', 'practice')}`));
+    // the level the paper is at stands in its own colour at the head of the sheet (FEEL pass
+    // 2026-10-02: "the level displayed on each screen"); the heading's words are unchanged
+    const heading = node('h1', 'exam-heading');
+    const track = String(form.exam.track || '');
+    const trackChip = node('span', /^N[1-5]$/u.test(track) ? 'level-chip exam-level-chip' : 'exam-level-text', track);
+    if (/^N[1-5]$/u.test(track)) trackChip.dataset.level = track;
+    heading.append(trackChip, ` ${form.scope === 'full-candidate' ? tx('模試', 'mock test') : tx('練習', 'practice')}`);
+    main.append(heading);
     main.append(node('p', 'exam-mode-badge', attempt.mode === 'practice'
       ? tx('学習モード · 辞書と読みの確認', 'Study mode · lookup available')
       : tx('本番形式 · 時間制限あり · ヒントなし', 'Timed exam mode · no hints')));
