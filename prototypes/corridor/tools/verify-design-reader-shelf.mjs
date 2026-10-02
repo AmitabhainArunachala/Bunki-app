@@ -13,11 +13,16 @@
  *   S2 first story      — the first shelf card's headline is inside 390×844 and not covered.
  *   S3 one count        — every number the unfiltered shelf states about its size is the same
  *                         number, and it equals the stories on the shelf (grid + today's band).
- *   S4 text-first cards — (polish pass 2026-10-01) no card anywhere on the shelf carries a picture
- *                         or a brushed headline kanji: every card is a kicker, the headline, the
- *                         level chip, and in English its English line; the lead adds its first
- *                         sentence. The masthead's 永 seal sits inside the 本棚 title, ≤ 48 px.
- *                         Control: 13fe096d, whose lead and seconds wore the .story-art tile.
+ *   S4 picture cards    — (FEEL pass 2026-10-02, John: "there are now NO pictures at all… we want
+ *                         this to be like a magazine") every article card on the shelf carries ONE
+ *                         picture slot, a fixed 3:2 box: the record's own picture (index.json
+ *                         "picture".src, loaded, decorative inside the card) where it has one, else a
+ *                         calm block whose only words are its topic in small type (never a kanji, no
+ *                         larger than 16 px). Every card has a kicker, the headline, a level chip and
+ *                         in English its English line; the lead adds its first sentence. The short
+ *                         word definitions carry no picture and stand in their own band. The 永 seal
+ *                         sits inside the 本棚 title, ≤ 48 px. Control: 2ae957bb, whose cards had no
+ *                         picture slot at all.
  *   T1 tools (glance)   — (glance pass 2026-10-01) the shelf's study tools sit behind ONE visible
  *                         学習ツール Tools button in the title row: as served no tool door is visible,
  *                         and the first story follows the filter chips with no other control between.
@@ -339,26 +344,68 @@ try {
     });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
-      await run(`S4-text-first-cards-${label}`, viewport, async (page) => {
+      await run(`S4-picture-cards-${label}`, viewport, async (page) => {
         await open(page);
-        const probe = await page.evaluate(() => {
+        // let every picture the index names arrive (they are lazy below the fold)
+        await page.evaluate(async () => {
+          for (const img of document.querySelectorAll('#shelf-body img.story-img')) img.loading = 'eager';
+          await Promise.all([...document.querySelectorAll('#shelf-body img.story-img')].map((img) => img.decode().catch(() => {})));
+        });
+        const probe = await page.evaluate(async () => {
+          const index = await (await fetch('data/articles/index.json')).json();
+          const byId = new Map(index.articles.map((row) => [row.id, row]));
           const cards = [...document.querySelectorAll('#shelf-body .story-card')];
-          const pictures = cards.filter((card) => card.querySelector('img, svg, canvas, picture, [class*="art"]')).map((card) => card.dataset.passage);
+          const glossary = (card) => byId.get(card.dataset.passage)?.source === 'isa-yasashii-glossary';
+          const articles = cards.filter((card) => !glossary(card)), definitions = cards.filter(glossary);
+          const bad = [];
+          let pictured = 0;
+          for (const card of articles) {
+            const slots = card.querySelectorAll('.story-picture');
+            const slot = slots[0];
+            const row = byId.get(card.dataset.passage) || {};
+            if (slots.length !== 1) { bad.push(`${card.dataset.passage}: ${slots.length} picture slots`); continue; }
+            const box = slot.getBoundingClientRect();
+            const ratio = box.width / box.height;
+            // the lead's spread on a wide screen lets its picture fill the story's height; every other slot is 3:2
+            if (!card.classList.contains('story-lead') || innerWidth < 900) {
+              if (Math.abs(ratio - 1.5) > 0.02) bad.push(`${card.dataset.passage}: picture box ${Math.round(box.width)}×${Math.round(box.height)}`);
+            }
+            const img = slot.querySelector('img');
+            if (row.picture?.src) {
+              const src = img ? new URL(img.getAttribute('src'), location.href).pathname : '';
+              if (!img || src !== `/data/${row.picture.src}`) bad.push(`${card.dataset.passage}: picture ${src || 'missing'} for ${row.picture.src}`);
+              else if (!(img.complete && img.naturalWidth > 0)) bad.push(`${card.dataset.passage}: picture did not load`);
+              else if (img.alt !== '') bad.push(`${card.dataset.passage}: picture inside the card is not decorative`);
+              else pictured += 1;
+            } else {
+              const words = slot.textContent.trim();
+              const size = parseFloat(getComputedStyle(slot.querySelector('.story-picture-word') || slot).fontSize);
+              if (img || !slot.classList.contains('is-placeholder')) bad.push(`${card.dataset.passage}: a picture slot with no picture is not the calm block`);
+              else if (/[\p{Script=Han}]/u.test(words) || size > 16 || !words) bad.push(`${card.dataset.passage}: the calm block reads "${words}" at ${size}px`);
+            }
+          }
+          for (const card of definitions) {
+            if (card.querySelector('.story-picture, img')) bad.push(`${card.dataset.passage}: a word definition carries a picture`);
+            if (!card.closest('.shelf-definitions')) bad.push(`${card.dataset.passage}: a word definition stands among the articles`);
+          }
           const incomplete = cards.filter((card) => !card.querySelector('.story-kicker') || !card.querySelector('.shelf-title')?.textContent.trim() ||
-            !card.querySelector('.story-foot .level-chip') || !card.querySelector('.shelf-title-en')?.textContent.trim()).map((card) => card.dataset.passage);
+            !card.querySelector('.level-chip')?.textContent.trim() || !card.querySelector('.shelf-title-en')?.textContent.trim()).map((card) => card.dataset.passage);
           const lead = document.querySelector('#shelf-reading-results .story-lead');
           const seal = document.querySelector('.shelf-masthead .shelf-art');
           const sealBox = seal?.getBoundingClientRect();
-          return { cards: cards.length, pictures: pictures.slice(0, 4), pictureCount: pictures.length, incomplete: incomplete.slice(0, 4), incompleteCount: incomplete.length,
+          const named = index.articles.filter((row) => row.picture?.src && cards.some((card) => card.dataset.passage === row.id)).length;
+          return { cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, bad: bad.slice(0, 4), badCount: bad.length,
+            incomplete: incomplete.slice(0, 4), incompleteCount: incomplete.length,
             lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
             seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
         });
-        assert(probe.cards > 20, `only ${probe.cards} cards`);
-        assert.equal(probe.pictureCount, 0, `cards carrying a picture or art tile: ${probe.pictures.join(', ')}`);
+        assert(probe.cards > 20 && probe.articles > 20, `only ${probe.cards} cards`);
+        assert.equal(probe.badCount, 0, `picture slots wrong: ${probe.bad.join(' | ')}`);
+        assert(probe.named > 0 && probe.pictured === probe.named, `${probe.pictured} of the ${probe.named} pictures the index names stand on their cards`);
         assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
         assert(/[。！？…]$/u.test(probe.lede), `the lead has no first-sentence teaser: "${probe.lede}"`);
         assert(probe.sealInTitle && probe.seal > 0 && probe.seal <= 48, `the 永 seal is not a small mark inside the title: ${JSON.stringify(probe)}`);
-        return { cards: probe.cards, lede: probe.lede.slice(0, 24), seal: probe.seal };
+        return { cards: probe.cards, pictured: probe.pictured, definitions: probe.definitions, lede: probe.lede.slice(0, 24), seal: probe.seal };
       });
     }
 
