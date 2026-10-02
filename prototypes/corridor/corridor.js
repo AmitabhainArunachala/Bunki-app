@@ -28055,6 +28055,8 @@ function render() {
   }
 
   const main = el('main');
+  // a page change cross-fades in (FEEL pass 2026-10-02); a re-render of the same room never fades
+  if (lastRenderedView && lastRenderedView !== S.view) main.dataset.enter = '1';
   root.append(main);
 
   if (!S.ready) {
