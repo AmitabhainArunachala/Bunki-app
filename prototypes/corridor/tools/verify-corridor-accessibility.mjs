@@ -1,9 +1,9 @@
 /**
  * KAIRO A0.5 accessibility verifier.
  *
- * Proves the reader's pointer/keyboard/switch-shaped routes, the staged reveal
- * geometry, non-hold alternatives, dialog focus lifecycle, hidden-control tab
- * discipline, and meaningful reduced motion in real Chromium.
+ * Proves the reader's pointer/keyboard/switch-shaped routes, the one-tap popup's
+ * geometry, non-hold alternatives (the word menu), dialog focus lifecycle,
+ * hidden-control tab discipline, and meaningful reduced motion in real Chromium.
  *
  * Usage:
  *   CHROMIUM_PATH=/path/to/chromium node verify-corridor-accessibility.mjs
@@ -71,8 +71,8 @@ function startServer() {
   });
 }
 
-// The reader's own hold threshold (GESTURE.MINI_MS in corridor.js): a press this long is a hold.
-const APP_HOLD_MS = 430;
+// The reader's own hold threshold (GESTURE.MENU_MS in corridor.js): a touch this long opens the word menu.
+const APP_HOLD_MS = 500;
 const tapAttempts = [];
 
 async function tapGeometry(page, selector, index = 0) {
@@ -124,7 +124,8 @@ async function touchAt(page, selector, index = 0, holdMs = 0, scroll = true) {
     tapAttempts.push({ selector, index, attempt, pressedMs: pressed, geometry });
     if (pressed >= APP_HOLD_MS) {
       // A slow runner delivered the release only after the app's hold threshold: that press was a
-      // hold (the quick look), not the tap under test, and it changed no reveal state. Tap again.
+      // hold (the word menu), not the tap under test. Put the menu away and tap again.
+      await page.keyboard.press('Escape');
       await page.waitForTimeout(250);
       if (attempt < 3) continue;
       return;
@@ -158,22 +159,32 @@ async function setRevealOnTouch(page) {
 
 async function glyphBottom(page, index) {
   return page.locator('#reader .tok.content').nth(index).evaluate((node) => {
-    // English is a sibling row; the whole button is not a glyph anchor.
-    const glyph = node.querySelector('ruby') ?? node.querySelector(':scope > .tok-word');
-    if (!glyph) throw new Error('Reader token is missing its glyph row');
-    return glyph.getBoundingClientRect().bottom;
+    // the base glyphs themselves: a reading (rt) is not the anchor, nor is the button's touch box
+    const row = node.querySelector(':scope > .tok-word') ?? node;
+    const walker = document.createTreeWalker(row, NodeFilter.SHOW_TEXT, {
+      acceptNode: (text) => (text.parentElement.closest('rt') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    let bottom = null;
+    while (walker.nextNode()) {
+      const range = document.createRange();
+      range.selectNodeContents(walker.currentNode);
+      for (const rect of range.getClientRects()) if (rect.width > 0) bottom = Math.max(bottom ?? rect.bottom, rect.bottom);
+    }
+    if (bottom === null) throw new Error('Reader token is missing its glyph row');
+    return bottom;
   });
+}
+/** Put a reader word mid-screen, clear of the phone's foot dock, before a no-scroll gesture is measured. */
+async function centreWord(page, index) {
+  await page.locator('#reader .tok.content').nth(index).evaluate((node) => node.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(120);
 }
 
 async function openWordDialog(page) {
+  // the full entry's non-hold door from the word itself: Ctrl+Enter (the word menu's Full entry is the other)
   const token = page.locator('#reader .tok.content').nth(2);
   await token.focus();
-  const direct = page.locator('.token-actions:not([hidden]) [data-action="entry.open"]');
-  if ((await direct.count()) > 0) {
-    await direct.click();
-  } else {
-    await touchAt(page, '#reader .tok.content', 2, 2_250);
-  }
+  await page.keyboard.press('Control+Enter');
   await page.waitForSelector('#sheet');
 }
 
@@ -361,15 +372,26 @@ async function main() {
     await word.focus();
     const focusProbe = await page.evaluate(`(() => ({
       tokenFocused: document.activeElement?.matches('#reader .tok.content') ?? false,
-      alternatives: document.querySelectorAll('.token-actions:not([hidden]) button').length,
+      shortcuts: document.activeElement?.getAttribute('aria-keyshortcuts') ?? '',
       hiddenTabStops: [...document.querySelectorAll('#app [hidden]')].flatMap((root) =>
         [...root.querySelectorAll('button, a, input, [tabindex]')]
       ).filter((node) => node.tabIndex >= 0 && !node.disabled && node.offsetParent !== null).length,
     }))()`);
+    // reader lane 2026-10-02: the press-and-hold's non-hold doors are the word menu (Shift+F10 or the
+    // ContextMenu key) and the full entry (Ctrl+Enter), declared on the word itself
+    await page.keyboard.press('Shift+F10');
+    const menuProbe = await page.evaluate(`(() => ({
+      menu: document.getElementById('reader-word-menu')?.getAttribute('role') ?? null,
+      items: [...document.querySelectorAll('#reader-word-menu [role="menuitem"]')].map((node) => node.textContent),
+      focusInMenu: !!document.activeElement?.closest('#reader-word-menu'),
+    }))()`);
+    await page.keyboard.press('Escape');
+    const menuBack = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.getElementById("reader-word-menu")');
     check(
-      'focused word exposes quick-look and full-entry non-hold alternatives',
-      focusProbe.tokenFocused && focusProbe.alternatives >= 2,
-      JSON.stringify(focusProbe),
+      'focused word exposes the word menu (Shift+F10) and the full entry (Ctrl+Enter) as non-hold alternatives',
+      focusProbe.tokenFocused && /Shift\+F10/.test(focusProbe.shortcuts) && /Control\+Enter/.test(focusProbe.shortcuts) &&
+        menuProbe.menu === 'menu' && menuProbe.focusInMenu && menuProbe.items.includes('Full entry') && menuProbe.items.includes('Save word') && menuBack,
+      JSON.stringify({ ...focusProbe, ...menuProbe, menuBack }),
     );
     check(
       'hidden Corridor controls leave the tab order',
@@ -392,144 +414,112 @@ async function main() {
     );
     if (await page.locator('#sheet').count()) await page.keyboard.press('Escape');
     await word.focus();
+    await page.keyboard.press('Shift+F10');
+    await page.waitForSelector('#reader-word-menu');
     const accessibilitySession = await page.context().newCDPSession(page);
     const accessibilityTree = await accessibilitySession.send('Accessibility.getFullAXTree');
     await accessibilitySession.detach();
-    const namedButtons = accessibilityTree.nodes
-      .filter((node) => node.role?.value === 'button' && node.name?.value)
+    const menuItems = accessibilityTree.nodes
+      .filter((node) => node.role?.value === 'menuitem' && node.name?.value)
       .map((node) => node.name.value);
-    // R4: a word is named by itself; the ladder help is its shared description
+    // R4: a word is named by itself; how to work it (Enter, Shift+F10, Ctrl+Enter) is its shared description
     const describedButtons = accessibilityTree.nodes
       .filter((node) => node.role?.value === 'button' && node.description?.value)
       .map((node) => node.description.value);
     check(
-      'screen-reader tree exposes named token and non-hold action buttons',
-      describedButtons.some((text) => /further activation|third activation|三回目/.test(text)) &&
-        namedButtons.some((name) => /quick look|語釈/.test(name)) &&
-        namedButtons.some((name) => /full entry|全項目/.test(name)),
-      `${namedButtons.length} named button(s) in the accessibility tree`,
+      'screen-reader tree exposes named token, its keyboard help and the word menu items',
+      describedButtons.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) &&
+        menuItems.includes('Save word') && menuItems.includes('Full entry') &&
+        menuItems.includes('Ask the tutor about this sentence'),
+      `${menuItems.length} menu item(s): ${menuItems.join(' · ')}`,
     );
+    await page.keyboard.press('Escape');
+    await word.focus();
     await page.waitForTimeout(80);
     await page.screenshot({ path: resolve(SHOTS_DIR, '01-reader-focus-alternatives.png') });
 
-    console.log('\n— progressive action parity and geometry');
+    console.log('\n— one action, the meaning: parity and geometry');
+    // reader lane 2026-10-02 (John #8): one tap opens the word's popup — reading and meaning at once;
+    // there is no tap ladder, no English line under the word and no floating sentence bar
+    const tokenIndex = 2;
+    const popupProbe = () => page.evaluate(`(() => {
+      const mini = document.getElementById('mini');
+      const box = mini?.getBoundingClientRect();
+      return { open: !!mini, reading: mini?.querySelector('.mini-reading')?.textContent ?? '', gloss: mini?.querySelector('.mini-gloss')?.textContent ?? '',
+        save: mini?.querySelector('#mini-take')?.textContent ?? null, sentence: !!mini?.querySelector('.mini-sentence'),
+        inside: !!box && box.left >= 0 && box.right <= innerWidth && box.top >= 0 && box.bottom <= innerHeight,
+        under: document.querySelectorAll('#reader .tok-en').length,
+        bar: [...document.querySelectorAll('.reader-actions, .teacher-door')].filter((node) => node.getClientRects().length).length };
+    })()`);
     await openReader(page, base);
     await setRevealOnTouch(page);
-    const tokenIndex = 2;
-    await touchAt(page, '#reader .tok.content', tokenIndex);
-    await page.locator('.reader-actions').evaluate(async (node) => {
-      await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
-    });
+    await centreWord(page, tokenIndex);
+    const anchorBefore = await glyphBottom(page, tokenIndex);
+    const scrollBefore = await page.evaluate(() => window.scrollY);
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    const firstPopup = await popupProbe();
     const firstReach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
-    check('the newly selected word stays reachable after sentence actions open, without harness scrolling',
-      firstReach.reachesTarget, JSON.stringify(firstReach));
-    const afterFirst = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
-      lit: node.classList.contains('lit'),
-      gloss: Boolean(node.querySelector('.tok-en')),
-    }));
-    const beforeGlossBottom = await glyphBottom(page, tokenIndex);
-    const beforeGlossScroll = await page.evaluate(() => window.scrollY);
+    check(
+      'pointer action one opens the popup with the reading and the meaning, and writes nothing under the word',
+      firstPopup.open && firstPopup.reading && firstPopup.gloss && firstPopup.save === 'Save' && firstPopup.under === 0 && firstPopup.inside,
+      JSON.stringify({ firstPopup, taps: tapAttempts.slice(-2) }),
+    );
+    // the word stays where it is on the screen. (A phone's sticky header grows by the chrome's 覚える door when a
+    // word is chosen; the browser's scroll anchoring moves scrollY to keep the text still, so scrollY is not the measure.)
+    const anchorAfter = await glyphBottom(page, tokenIndex);
+    check(
+      'the touched word stays reachable beside its popup, its glyph anchor on screen within 2px',
+      firstReach.reachesTarget && Math.abs(anchorAfter - anchorBefore) < 2,
+      JSON.stringify({ firstReach, anchorBefore, anchorAfter, scrollBefore }),
+    );
+    check('no sentence bar floats over the text; the sentence actions ride in the popup', firstPopup.bar === 0 && firstPopup.sentence,
+      JSON.stringify(firstPopup));
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
-    const afterSecond = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
-      lit: node.classList.contains('lit'),
-      gloss: Boolean(node.querySelector('.tok-en')),
+    const secondState = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
+      popup: Boolean(document.querySelector('#mini')), sheet: Boolean(document.querySelector('#sheet')),
+      current: node.classList.contains('tok-current'), gloss: Boolean(node.querySelector('.tok-en')),
     }));
-    const afterGlossBottom = await glyphBottom(page, tokenIndex);
-    const afterGlossScroll = await page.evaluate(() => window.scrollY);
     check(
-      'pointer action one reveals reading and action two reveals English',
-      afterFirst.lit && !afterFirst.gloss && afterSecond.gloss,
-      JSON.stringify({ afterFirst, afterSecond, taps: tapAttempts.slice(-4) }),
-    );
-    check(
-      'second-action English preserves the glyph anchor within 2px',
-      afterSecond.gloss && Math.abs(afterGlossBottom - beforeGlossBottom) < 2 && afterGlossScroll === beforeGlossScroll,
-      `${beforeGlossBottom.toFixed(1)}px → ${afterGlossBottom.toFixed(1)}px; scroll ${beforeGlossScroll} → ${afterGlossScroll}`,
+      'a second action on the same word puts its popup away — no sheet, no English, the word still the chosen one',
+      !secondState.popup && !secondState.sheet && !secondState.gloss && secondState.current,
+      JSON.stringify(secondState),
     );
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
-    // the circle grammar (2026-08-12): the third activation folds the word
-    // back to plain kanji — the full entry lives on the holds and the
-    // focus-alternatives door, both covered elsewhere in this suite
-    const pointerThirdState = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
-      lit: node.classList.contains('lit'),
-      gloss: Boolean(node.querySelector('.tok-en')),
-      sheet: Boolean(document.querySelector('#sheet')),
-    }));
-    check(
-      'pointer third target.activate closes the circle — plain kanji, no sheet',
-      !pointerThirdState.lit && !pointerThirdState.gloss && !pointerThirdState.sheet,
-      JSON.stringify(pointerThirdState),
-    );
-    const pointerThird = 0;
+    const reopened = await popupProbe();
+    check('a third action opens it again: one tap is always the meaning', reopened.open && reopened.gloss, JSON.stringify(reopened));
     const pointerReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
+    // two taps opened the popup (the closing tap between them only put it away)
     check(
       'pointer route emits target.activate envelopes with pointer provenance',
-      pointerReceipts.length >= 3 && pointerReceipts.slice(-3).every((r) => r.provenance.modality === 'pointer'),
+      pointerReceipts.length >= 2 && pointerReceipts.slice(-2).every((r) => r.provenance.modality === 'pointer'),
       `${pointerReceipts.length} receipt(s)`,
     );
-    if (pointerThird) await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
 
     for (const scenario of [{ width: 320, settingsOpen: true }, { width: 390, settingsOpen: false }]) {
       await page.setViewportSize({ width: scenario.width, height: VIEWPORT.height });
       await openReader(page, base);
       await setRevealOnTouch(page);
       if (!scenario.settingsOpen) await page.locator('#dials-toggle').click();
-      const before = await page.evaluate(() => window.scrollY);
-      await touchAt(page, '#reader .tok.content', tokenIndex);
-      await page.locator('.reader-actions').evaluate(async (node) => {
-        await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
-      });
-      const reach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
-      check(`${scenario.width}px settings-${scenario.settingsOpen ? 'open' : 'closed'} selection stays reachable`,
-        reach.reachesTarget && (scenario.settingsOpen || reach.scrollY === before), JSON.stringify({ before, reach }));
-      const anchor = await glyphBottom(page, tokenIndex);
+      await centreWord(page, tokenIndex);
+      const before = await glyphBottom(page, tokenIndex);
       await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
-      const gloss = await page.locator('#reader .tok.content').nth(tokenIndex).locator('.tok-en').count();
-      const after = await tapGeometry(page, '#reader .tok.content', tokenIndex);
-      check(`${scenario.width}px second reveal keeps its anchor and remains reachable`,
-        gloss > 0 && after.reachesTarget && after.scrollY === reach.scrollY &&
-          Math.abs(await glyphBottom(page, tokenIndex) - anchor) < 2, JSON.stringify({ gloss, reach, after }));
+      const reach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
+      const shown = await popupProbe();
+      const held = await glyphBottom(page, tokenIndex);
+      check(`${scenario.width}px settings-${scenario.settingsOpen ? 'open' : 'closed'} selection stays reachable and still, and its popup fits the screen`,
+        reach.reachesTarget && Math.abs(held - before) < 2 && shown.open && shown.inside, JSON.stringify({ before, held, reach, shown }));
+      const anchor = await glyphBottom(page, tokenIndex);
+      await touchAt(page, '#reader .tok.content', tokenIndex + 1, 0, false);
+      const moved = await popupProbe();
+      const after = await tapGeometry(page, '#reader .tok.content', tokenIndex + 1);
+      check(`${scenario.width}px a tap on the next word moves the popup there and keeps both words still`,
+        moved.open && moved.inside && after.reachesTarget && after.scrollY === reach.scrollY &&
+          Math.abs(await glyphBottom(page, tokenIndex) - anchor) < 2, JSON.stringify({ moved, reach, after }));
     }
     await page.setViewportSize(VIEWPORT);
-    await openReader(page, base);
-    await setRevealOnTouch(page);
-    await touchAt(page, '#reader .tok.content', tokenIndex);
-    await page.locator('.reader-actions').evaluate(async (node) => {
-      await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
-    });
-    const actionsBand = await page.locator('.reader-actions').boundingBox();
-    await page.locator('.reader-actions-close').click();
-    const closedSelection = await page.locator('#reader .tok.content').nth(tokenIndex)
-      .evaluate((node) => node.classList.contains('tok-current'));
-    check('closing sentence actions retains the selected word',
-      await page.locator('.reader-actions').isHidden() && closedSelection);
-    const beforeReposition = await tapGeometry(page, '#reader .tok.content', tokenIndex);
-    await page.mouse.wheel(0, beforeReposition.y - (actionsBand.y + 40));
-    await page.waitForTimeout(200);
-    const beforeReopen = await tapGeometry(page, '#reader .tok.content', tokenIndex);
-    check('a closed-bar word is reachable inside the former sentence-action band',
-      beforeReopen.reachesTarget && beforeReopen.y > actionsBand.y &&
-        beforeReopen.y < actionsBand.y + actionsBand.height, JSON.stringify({ actionsBand, beforeReopen }));
-    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
-    await page.locator('.reader-actions').evaluate(async (node) => {
-      await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
-    });
-    const afterReopen = await tapGeometry(page, '#reader .tok.content', tokenIndex);
-    const reopenedWord = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
-      gloss: Boolean(node.querySelector('.tok-en')), selected: node.classList.contains('tok-current'),
-    }));
-    check('reopening sentence actions for the same word keeps it reachable without harness scrolling',
-      afterReopen.reachesTarget && reopenedWord.gloss && reopenedWord.selected &&
-        await page.locator('.reader-actions').isVisible() && await page.locator('#sheet').count() === 0,
-      JSON.stringify({ beforeReopen, afterReopen, reopenedWord }));
-    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
-    const reopenedThird = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
-      lit: node.classList.contains('lit'), gloss: Boolean(node.querySelector('.tok-en')),
-    }));
-    check('a third tap after reopening sentence actions closes the reveal circle',
-      !reopenedThird.lit && !reopenedThird.gloss, JSON.stringify(reopenedThird));
 
     await openReader(page, base);
     await setRevealOnTouch(page);
@@ -538,32 +528,28 @@ async function main() {
     const keyboardFocusable = await page.evaluate(
       `document.activeElement?.matches('#reader .tok.content') ?? false`,
     );
+    let keyboardPopup = null;
     if (keyboardFocusable) {
       await page.keyboard.press('Enter');
-      await page.keyboard.press('Enter');
-      await page.keyboard.press('Enter');
-      await page.waitForTimeout(180);
+      await page.waitForSelector('#mini');
+      keyboardPopup = await page.evaluate(`({ focus: document.activeElement?.id ?? null, gloss: document.querySelector('#mini .mini-gloss')?.textContent ?? '' })`);
+      await page.keyboard.press('Escape');
     }
-    const keyboardThird = await page.locator('#sheet').count();
-    const keyboardCircle = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
-      lit: node.classList.contains('lit'),
-      gloss: Boolean(node.querySelector('.tok-en')),
-    }));
+    const keyboardBack = await page.evaluate(`({ word: document.activeElement?.matches('#reader .tok.content') ?? false,
+      popup: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet') })`);
     const keyboardReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
     check(
-      'keyboard/switch-shaped activation walks the same circle — three activations end plain',
-      keyboardFocusable && keyboardThird === 0 && !keyboardCircle.lit && !keyboardCircle.gloss,
-      `focusable=${keyboardFocusable} sheet=${keyboardThird} state=${JSON.stringify(keyboardCircle)}`,
+      'keyboard/switch-shaped activation opens the same popup, focus on Save; Escape returns to the word',
+      keyboardFocusable && keyboardPopup?.focus === 'mini-take' && keyboardPopup.gloss && keyboardBack.word && !keyboardBack.popup && !keyboardBack.sheet,
+      `focusable=${keyboardFocusable} popup=${JSON.stringify(keyboardPopup)} back=${JSON.stringify(keyboardBack)}`,
     );
     check(
       'keyboard route differs only in provenance',
-      keyboardReceipts.length >= 3 &&
-        keyboardReceipts.slice(-3).every((r) => r.provenance.modality === 'keyboard'),
+      keyboardReceipts.length >= 1 && keyboardReceipts.at(-1).provenance.modality === 'keyboard',
       `${keyboardReceipts.length} receipt(s)`,
     );
-    if (keyboardThird) await page.keyboard.press('Escape');
 
     console.log('\n— particle rhythm and direct accessible door');
     await openReader(page, base);
@@ -584,13 +570,10 @@ async function main() {
     // Escape on the particle puts its quick look away, as a learner would, before the next door
     await particle.press('Escape');
     check('Escape on the particle closes its quick look', (await page.locator('#mini').count()) === 0);
-    // a fresh particle: focus arriving within a beat of the SAME token's own
-    // tap is treated as the press and suppresses the pill (review P2 fix) —
-    // a switch/AT user does not press the token they are navigating to
+    // a fresh particle, from the keyboard: the word menu (Shift+F10) carries its full entry
     await page.locator('#reader .tok.particle').nth(1).focus();
-    const particleDoor = page.locator(
-      '.token-actions:not([hidden]) [data-action="entry.open"][data-target-kind="particle"]',
-    );
+    await page.keyboard.press('Shift+F10');
+    const particleDoor = page.locator('#reader-word-menu [data-menu-action="entry"]');
     const hasParticleDoor = (await particleDoor.count()) === 1;
     if (hasParticleDoor) await particleDoor.click();
     check(

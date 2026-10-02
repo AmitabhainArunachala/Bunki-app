@@ -1,7 +1,7 @@
 /** Actual lookup/mini/prose functions over the bundled dictionary, lifted by the repository's
  * existing TypeScript-AST seam. The small DOM below supplies events/tree walking only; no browser,
  * record persistence, network, audio, or grading is simulated. A resolved save is observed at the
- * list-chooser boundary, including its exact word/sequence/reading. */
+ * one-tap save boundary (toggleWordSave), including its exact word/sequence/reading. */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
@@ -14,7 +14,7 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'dictionaryReadingSupportsForm', 'dictionarySummaryFor', 'dictionaryRowsForForm', 'dictionaryRowBySeq',
   'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD',
   'LOOKUP_HELPER_POS', 'japaneseLookupRecord', 'openJapaneseLookup', 'appendJapaneseLookup',
-  'enhanceJapaneseProse', 'showMini', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
+  'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'placeFloating', 'keepFloatingBeside', 'miniAnchor', 'SAVE_PRESS_MS', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
   'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey'];
 const declarations = new Map();
 for (const statement of ast.statements) {
@@ -98,7 +98,7 @@ function app({ withIndex = true } = {}) {
     removeMini: () => body.querySelector('#mini')?.remove(), activeTokenAlternatives: null, articleNarration: null,
     ensureDictionaryRowsForForm: async () => [], wordCaptureState: () => 'take',
     readerCaptureReasonText: () => 'No confirmed meaning to save', readerGlossMissText: () => 'No confirmed meaning',
-    openVocabularyListChooser: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),
+    toggleWordSave: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),
     excerptListenLabel: () => { throw new Error('This lookup suite must not enter audio controls'); } });
   vm.runInContext(program, context);
   const open = async (surface, details = {}) => {
