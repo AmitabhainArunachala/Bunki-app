@@ -285,13 +285,13 @@ async function openSource(fixture) {
   await shelf(fixture); await fixture.page.locator(`[data-passage="${fixture.source.id}"] .shelf-open`).click(); await atSource(fixture);
 }
 async function openWord(fixture) {
-  // The existing focus alternatives suppress the token's own pointer focus
-  // for 900ms. Wait in real time before the native baseline so that guard
-  // expires and the preceding reader bookmark debounce can settle.
+  // Wait in real time before the native baseline so that the preceding reader
+  // bookmark debounce can settle.
   await delay(950);
   const { page, source } = fixture, before = await readAppRecordSnapshot(page), earliest = Date.now();
+  // the full entry's keyboard door on the word itself (Ctrl+Enter; reader lane 2026-10-02 retired the focus pill)
   const token = page.locator(`#reader .tok[data-index="${source.index}"]`); await token.focus();
-  await token.locator('..').locator('[data-action="entry.open"][data-target-kind="word"]').click();
+  await page.keyboard.press('Control+Enter');
   await page.locator(`#sheet[data-node="word:${source.token.b}"]`).waitFor();
   await waitForAppRecord(page, record => record.obslog.length === before.record.obslog.length + 1);
   const after = await snapshot(fixture, `word-drawer-${++fixture.wordVisits}`), row = after.record.obslog.at(-1);
@@ -535,7 +535,8 @@ async function ordinary(fixture) {
   await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1);
   const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
   assert(tap[0] >= tapStarted && tap[0] <= Date.now());
-  assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 1, source.id]);
+  // one tap shows the meaning (reader lane 2026-10-02): the observation's depth is 2, gloss shown
+  assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
   assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog']);
   await page.locator('#reader-place-save').click();
   await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));

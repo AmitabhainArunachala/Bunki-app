@@ -106,7 +106,7 @@ try{
      return{dials,shown,saveHeld:true,unresolvedEntryHeld:true};
     });
    }
-   await run('particle-tap-keyboard-and-hold',async()=>{
+   await run('particle-tap-keyboard-and-menu',async()=>{
     await open(page,'0,1,0');const particle=token(page,2);const before=await particle.textContent();
     for(const modality of ['pointer','Enter','Space']){
      if(modality==='pointer')await click(page,particle);else{await particle.focus();await page.keyboard.press(modality);}
@@ -115,12 +115,18 @@ try{
      assert.equal(await page.locator('#sheet').count(),0);assert.equal(await particle.textContent(),before);
      await page.locator('.listen-row').click({position:{x:2,y:2}});
     }
-    const at=await center(particle);await page.mouse.move(at.x,at.y);await page.mouse.down();await page.waitForTimeout(2200);await page.mouse.up();
+    // the grammar entry is one choice in the word menu (reader lane 2026-10-02): a right-click, then Full entry
+    const at=await center(particle);await page.mouse.click(at.x,at.y,{button:'right'});
+    await page.locator('#reader-word-menu').waitFor();
+    const items=await page.locator('#reader-word-menu [role="menuitem"]').allTextContents();
+    assert.deepEqual(items,['Save the sentence','Full entry','Ask the tutor about this sentence','Copy'],'A particle offers its menu without a word save');
+    assert.equal(await page.locator('#mini').count(),0,'The menu replaces a quick look, never sits over one');
+    await page.locator('#reader-word-menu [data-menu-action="entry"]').click();
     await page.locator('#sheet[data-node="particle:no"]').waitFor();
-    assert.equal(await page.locator('#mini').count(),0,'Long-hold release must not reopen a quick look over grammar');
+    assert.equal(await page.locator('#mini').count(),0,'Opening grammar must not leave a quick look over it');
     assert.match(await page.locator('#sheet .headword').textContent(),/^の/u);
     assert.match(await page.locator('#sheet').innerText(),/Ties two nouns/u);
-    return{shortTap:'lookup',keyboard:['Enter','Space'],hold:'particle:no'};
+    return{shortTap:'lookup',keyboard:['Enter','Space'],menu:items,entry:'particle:no'};
    });
    results.push({engine,name:'no-page-errors',passed:errors.length===0,errors});
   }finally{await context.close();await browser.close();}
@@ -129,7 +135,7 @@ try{
  await host.close();
  const receipt={artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
   verifierSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-  scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and long hold. No broad lexical/capture regression claim',
+  scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and the word menu's full entry. No broad lexical/capture regression claim',
   instrumentation:'Unmodified staged runtime, normal DOM controls, no export shim or model calls; native audio paths run silently',results,
   passed:results.length===engines.length*18&&results.every(row=>row.passed)};
  writeFileSync(resolve(evidence,'result.json'),JSON.stringify(receipt,null,2)+'\n');

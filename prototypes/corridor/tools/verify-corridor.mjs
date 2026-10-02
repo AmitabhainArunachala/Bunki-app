@@ -151,10 +151,13 @@ async function chooseDial(page, key, value) {
   { key, value });
 }
 
-/** The reader's click grammar (v1.2): a full dictionary entry opens by
- * holding a word past the mini-dictionary stage. */
+/** The reader's click grammar (reader lane 2026-10-02): a full dictionary entry opens from the word's
+ * popup — one tap, then "Full entry ›" (the hold that used to open it now opens the word menu). */
 async function holdWord(page, selector, index = 0) {
-  await touchAt(page, selector, index, 2400);
+  await touchAt(page, selector, index, 0);
+  await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
+  await page.waitForTimeout(120);
+  await page.locator('#mini .mini-entry').click();
   await page.waitForTimeout(200);
 }
 
@@ -919,60 +922,41 @@ async function main() {
     return 2;
   })()`);
 
-  // 1st tap → furigana, instantly, and nothing else
-  await tap(page, '#reader .tok.content', tapIdx);
-  await page.waitForTimeout(120);
-  const afterTap = await page.evaluate(`(() => ({
-    lit: document.querySelectorAll('#reader .tok.lit').length,
-    en: document.querySelectorAll('#reader .tok-en').length,
-    sheet: !!document.querySelector('#sheet'),
-  }))()`);
-  check('grammar · the first tap reveals furigana instantly, opening nothing',
-    afterTap.lit >= 1 && afterTap.en === 0 && !afterTap.sheet,
-    `lit=${afterTap.lit}, sheet=${afterTap.sheet}`);
-
-  // 2nd tap (a later tap, not a timed double) → English beneath, word unmoved.
-  // The visual anchor is the glyph box (the ruby base), not the wrapper's
-  // rect — the wrapper legitimately changes box type when the gloss mounts.
+  // reader lane 2026-10-02 (John #8): ONE tap is the meaning. The popup shows the word, its reading and
+  // its meaning at once; the word does not move, nothing is written under it, and no sheet opens.
   const glyphBox = `(el) => (el.querySelector('ruby') ?? el).getBoundingClientRect().bottom`;
+  await page.locator('#reader .tok.content').nth(tapIdx).evaluate((n) => n.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(80);
   const wordTopBefore = await page.evaluate(
     `(${glyphBox})(document.querySelectorAll('#reader .tok.content')[${tapIdx}])`,
   );
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
-  const afterSecond = await page.evaluate(`(() => {
+  const afterTap = await page.evaluate(`(() => {
     const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
-    const en = tok.querySelector('.tok-en');
-    let collisions = 0;
-    if (en) {
-      const e = en.getBoundingClientRect();
-      for (const other of document.querySelectorAll('#reader .tok')) {
-        if (other === tok || tok.contains(other)) continue;
-        // The button has a 44px touch box; only its word row paints ink.
-        // Counting the empty lower hit area mislabels a clear gloss as overlap.
-        const r = (other.querySelector('.tok-word') ?? other).getClientRects()[0];
-        if (!r) continue;
-        // a collision is visible ink over ink: require a real bite in both
-        // axes, not a sub-4px graze of a neighbour's empty descent space
-        const ox = Math.min(e.right, r.right) - Math.max(e.left, r.left);
-        const oy = Math.min(e.bottom, r.bottom) - Math.max(e.top, r.top);
-        if (ox >= 4 && oy >= 4) collisions += 1;
-      }
-    }
+    const mini = document.querySelector('#mini');
+    const box = mini?.getBoundingClientRect(), word = tok.getBoundingClientRect();
     return {
-      en: tok.querySelectorAll('.tok-en').length,
-      top: (tok.querySelector('ruby') ?? tok).getBoundingClientRect().bottom,
-      collisions,
+      lit: tok.classList.contains('lit'),
+      en: document.querySelectorAll('#reader .tok-en').length,
       sheet: !!document.querySelector('#sheet'),
+      popup: mini ? { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
+        gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', save: mini.querySelector('#mini-take')?.textContent ?? null,
+        entry: !!mini.querySelector('.mini-entry') } : null,
+      covers: !!box && box.left < word.right && box.right > word.left && box.top < word.bottom && box.bottom > word.top,
+      top: (tok.querySelector('ruby') ?? tok).getBoundingClientRect().bottom,
+      dataWord: tok.dataset.word,
     };
   })()`);
-  check('grammar · a second tap sets English beneath — and the word does not move',
-    afterSecond.en === 1 && !afterSecond.sheet && Math.abs(afterSecond.top - wordTopBefore) < 2,
-    `gloss on, glyph bottom ${wordTopBefore.toFixed(1)} → ${afterSecond.top.toFixed(1)}px`);
-  check('grammar · the gloss collides with nothing — on any font, by construction',
-    afterSecond.collisions === 0, `${afterSecond.collisions} overlapping token(s)`);
+  check('grammar · one tap opens the popup — the word, its reading and its meaning at once, no sheet',
+    !!afterTap.popup && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
+      ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.entry && !afterTap.sheet,
+    JSON.stringify(afterTap.popup));
+  check('grammar · the tapped word does not move, nothing is written under it, and its popup leaves it uncovered',
+    afterTap.en === 0 && !afterTap.covers && Math.abs(afterTap.top - wordTopBefore) < 2,
+    `glyph bottom ${wordTopBefore.toFixed(1)} → ${afterTap.top.toFixed(1)}px · covered=${afterTap.covers} · reading shown=${afterTap.lit}`);
 
-  // the worst long-gloss word on the shelf must render its gloss WHOLE
+  // the worst long-gloss word on the shelf must render its meaning WHOLE in the popup
   await open('?entry=shelf');
   await tap(page, shelfText('wikinews:12024')); // JR おおさか東線 — carries 沿線
   await settleReader(page);
@@ -980,18 +964,17 @@ async function main() {
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
   );
   if (enIdx >= 0) {
-    // furigana defaults to タップで — first tap reads, second sets English
-    await tap(page, '#reader .tok.content', enIdx);
-    await page.waitForTimeout(150);
     await tap(page, '#reader .tok.content', enIdx);
     await page.waitForTimeout(150);
     const glossFit = await page.evaluate(`(() => {
-      const en = document.querySelectorAll('#reader .tok.content')[${enIdx}].querySelector('.tok-en');
+      const en = document.querySelector('#mini .mini-gloss');
       if (!en) return null;
-      return { text: en.textContent, whole: en.scrollHeight <= en.clientHeight + 2 && en.scrollWidth <= en.clientWidth + 2 };
+      const box = document.querySelector('#mini').getBoundingClientRect();
+      return { text: en.textContent, whole: en.scrollHeight <= en.clientHeight + 2 && en.scrollWidth <= en.clientWidth + 2 &&
+        box.left >= 0 && box.right <= innerWidth };
     })()`);
     check('grammar · even the longest gloss renders whole — never truncated',
-      !!glossFit && glossFit.whole, glossFit ? `沿線 → "${glossFit.text}"` : 'no gloss mounted');
+      !!glossFit && glossFit.whole, glossFit ? `沿線 → "${glossFit.text}"` : 'no popup gloss');
   } else {
     check('grammar · even the longest gloss renders whole — never truncated', false, '沿線 not found in text 3');
   }
@@ -1004,44 +987,43 @@ async function main() {
   await page.waitForTimeout(150);
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
-  await tap(page, '#reader .tok.content', tapIdx);
-  await page.waitForTimeout(120);
+  const popupUp = (await page.locator('#mini').count()) === 1;
 
-  // 3rd tap → the circle closes: plain kanji again, no sheet (operator
-  // ruling 2026-08-12 — the entry moved to the holds)
+  // a second tap on the same word puts the popup away: no ladder, no sheet, nothing under the word
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
-  const afterThird = await page.evaluate(`(() => {
+  const afterSecond = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
-    return {
-      sheet: document.querySelector('#sheet')?.dataset.node ?? '',
-      rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length,
-      gloss: !!t.querySelector('.tok-en'),
-    };
+    return { sheet: document.querySelector('#sheet')?.dataset.node ?? '', popup: !!document.querySelector('#mini'),
+      gloss: !!t.querySelector('.tok-en'), current: t.classList.contains('tok-current') };
   })()`);
-  check('grammar · a third tap closes the circle — plain kanji, no sheet',
-    afterThird.sheet === '' && afterThird.rt === 0 && !afterThird.gloss,
-    JSON.stringify(afterThird));
+  check('grammar · a second tap on the same word puts its popup away — no sheet, nothing under the word',
+    popupUp && afterSecond.sheet === '' && !afterSecond.popup && !afterSecond.gloss && afterSecond.current,
+    JSON.stringify({ popupUp, ...afterSecond }));
 
-  // long press → the floating mini-dictionary; a tap anywhere else puts it away
+  // press and hold → the word menu (John #11: "right click and choose save"); a tap anywhere else puts it away
   await touchAt(page, '#reader .tok.content', 6, 700);
   await page.waitForTimeout(200);
-  const mini = await page.evaluate(`(() => {
-    const m = document.querySelector('#mini');
-    return m ? { word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent } : null;
+  const menu = await page.evaluate(`(() => {
+    const m = document.querySelector('#reader-word-menu');
+    return m ? { role: m.getAttribute('role'), items: [...m.querySelectorAll('[role="menuitem"]')].map((n) => n.dataset.menuAction) } : null;
   })()`);
-  check('grammar · a long press floats the mini-dictionary', !!mini && !!mini.word,
-    mini ? `${mini.word} — ${String(mini.gloss).slice(0, 30)}` : 'no #mini');
-  // "anywhere else" must be outside the mini by construction: the floating
-  // mini grew a full-entry row and now reaches the title above a first-line
-  // word, so the title is not elsewhere any more — the context note beneath
-  // the text is (it never carries a handler of its own)
-  await tap(page, (await page.locator('#reader-context-note').count()) ? '#reader-context-note' : '.view-title');
+  check('grammar · a press and hold opens the word menu', !!menu && menu.role === 'menu' &&
+    menu.items.join(',') === 'save-word,save-sentence,entry,ask-tutor,copy', JSON.stringify(menu));
+  // "anywhere else": a point on the page's own margin, beside the text, that carries no control
+  const elsewhere = await page.evaluate(`(() => {
+    for (const x of [innerWidth - 3, 3]) for (const y of [0.35, 0.5, 0.65].map((f) => Math.round(innerHeight * f))) {
+      const hit = document.elementFromPoint(x, y);
+      if (hit && !hit.closest('button, a, input, [role="menu"], #mini, .tok')) return { x, y };
+    }
+    return null;
+  })()`);
+  if (elsewhere) await page.mouse.click(elsewhere.x, elsewhere.y);
   await page.waitForTimeout(120);
-  check('grammar · one tap anywhere else backs out of the mini',
-    (await page.locator('#mini').count()) === 0, 'mini dismissed');
+  check('grammar · one tap anywhere else puts the menu away',
+    !!elsewhere && (await page.locator('#reader-word-menu').count()) === 0, elsewhere ? 'menu dismissed' : 'no empty margin found');
 
-  // keep holding → the full entry (from a clean slate: whatever the mini
+  // the popup's Full entry → the full entry (from a clean slate: whatever the menu
   // interlude did, close it and re-aim)
   if (await page.locator('#sheet').count()) {
     await page.locator('#sheet-close').dispatchEvent('click');
@@ -1068,7 +1050,7 @@ async function main() {
       hasClose: !!s.querySelector('#sheet-close'),
     };
   })()`);
-  check('grammar · holding opens the full entry',
+  check('grammar · the popup\'s Full entry opens the full entry',
     panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
     `${panel.headword}（${panel.reading}）`);
   check('the sheet carries its own back and close', panel.hasBack && panel.hasClose,
@@ -1919,7 +1901,8 @@ async function main() {
     await open('?entry=shelf');
     await page.locator(d23Letter).first().click();
     await settleReader(page);
-    await touchAt(page, d23Token, 0, 700);
+    // one tap is the popup (reader lane 2026-10-02); a hold opens the word menu instead
+    await touchAt(page, d23Token, 0, 0);
     await page.waitForSelector('#mini #mini-take');
   };
   const d23Start = d23Cards(await readAppRecord(page));
@@ -1971,13 +1954,9 @@ async function main() {
   check('D23 · the reader’s 上手 door is taken: the mini seal is inked and live, nothing held',
     d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
     JSON.stringify(d23Taken));
-  // the core card leaves through its own door
+  // the core card leaves through its own door: a press on the popup's "Saved ✓"
   await tap(page, '#mini-take');
-  await page.waitForSelector('#vocabulary-list-stop');
-  await tap(page, '#vocabulary-list-stop');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
-  await tap(page, '#vocabulary-list-close');
-  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
 
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card
   await d23PageSearch();
@@ -2111,11 +2090,11 @@ async function main() {
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
   );
-  await tap(page, '#reader .tok.content', 3);
+  await tap(page, '#reader .tok.content', 3); // the popup: the meaning shown
   await page.waitForTimeout(250);
-  await tap(page, '#reader .tok.content', 3);
+  await tap(page, '#reader .tok.content', 3); // the same word again puts it away: no look, no row
   await page.waitForTimeout(250);
-  await holdWord(page, '#reader .tok.content', 3); // the entry lives on the hold now
+  await holdWord(page, '#reader .tok.content', 3); // the popup again, then its Full entry
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
   const obs = await evaluateAppRecord(page, `(() => {
@@ -2124,11 +2103,11 @@ async function main() {
     return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
   })()`);
   const ladder = obs.rows.filter((r) => r[1] === 'tap');
-  const sameWord = ladder.length === 4 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
-  // 1,2 from the taps; the hold passes THROUGH the mini (its gloss is real
-  // assistance — an honest 2) on the way to the full entry's 3
-  check('two taps and a hold — ふりがな, gloss, mini, entry — every rung logged',
-    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,2,3',
+  const sameWord = ladder.length === 3 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
+  // reader lane 2026-10-02: one tap shows the meaning (an honest 2), a tap that puts the popup away logs
+  // nothing, and the Full entry is the 3
+  check('a tap, a closing tap, then the popup and its Full entry — meaning, meaning, entry — every look logged',
+    sameWord && ladder.map((r) => r[3]).join(',') === '2,2,3',
     ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows');
   check('rows persist inside the exported envelope with ms timestamps',
     ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
@@ -2467,8 +2446,11 @@ async function main() {
   const cycleState = () => page.evaluate(`(() => {
     const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')) ||
       [...document.querySelectorAll('#reader .tok.content')][0];
-    return { rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length, gloss: !!t.querySelector('.tok-en') };
+    return { rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length, gloss: !!t.querySelector('.tok-en'),
+      popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null };
   })()`);
+  // reader lane 2026-10-02: one tap is the meaning — the popup, with the touched word's reading on the text
+  // (ふりがな 触れて); the same word again puts it away; nothing is ever written under the word
   await cycleTap();
   await page.waitForTimeout(150);
   const cyc1 = await cycleState();
@@ -2478,19 +2460,16 @@ async function main() {
   await cycleTap();
   await page.waitForTimeout(200);
   const cyc3 = await cycleState();
-  check('the tap circle closes — ふりがな · gloss · plain kanji again',
-    cyc1.rt >= 1 && cyc2.gloss && cyc3.rt === 0 && !cyc3.gloss,
-    `rt=${cyc1.rt} → gloss=${cyc2.gloss} → back to rt=${cyc3.rt} gloss=${cyc3.gloss}`);
-  // definitions live on the holds: a short hold floats the mini, a tap on it
-  // (or a long hold) opens the full entry — and 戻る works IMMEDIATELY
-  await touchAt(page, '#reader .tok.content', 4, 700); // past MINI_MS, short of FULL_MS
-  await page.waitForSelector('#mini', { timeout: 6000 });
-  const miniUp = await page.evaluate(`(() => ({
-    word: document.querySelector('#mini .mini-word')?.textContent ?? '',
-    gloss: !!document.querySelector('#mini .mini-gloss'),
-  }))()`);
-  check('a short hold floats the simple definition', miniUp.word.length > 0 && miniUp.gloss, `mini: ${miniUp.word}`);
-  await page.evaluate(`document.querySelector('#mini .mini-entry')?.click()`);
+  check('one tap shows the meaning and the reading at once; the same word again puts the popup away',
+    cyc1.rt >= 1 && !!cyc1.popup && !cyc1.gloss && cyc2.popup === null && !cyc2.gloss && !!cyc3.popup && !cyc3.gloss,
+    `tap 1: rt=${cyc1.rt} popup="${cyc1.popup}" → tap 2: popup=${cyc2.popup} → tap 3: popup="${cyc3.popup}"`);
+  // the full entry is one choice in the word menu a press and hold opens — and 戻る works IMMEDIATELY
+  await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
+  await page.waitForSelector('#reader-word-menu', { timeout: 6000 });
+  const menuUp = await page.evaluate(`[...document.querySelectorAll('#reader-word-menu [role="menuitem"]')].map((n) => n.dataset.menuAction)`);
+  check('a press and hold opens the word menu, the full entry in it', menuUp.includes('entry') && menuUp.includes('save-word'),
+    `menu: ${menuUp.join(' · ')}`);
+  await page.evaluate(`document.querySelector('#reader-word-menu [data-menu-action="entry"]')?.click()`);
   await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.evaluate(`document.querySelector('#sheet-back')?.click()`); // immediately — no dead window
   await page.waitForTimeout(300);
@@ -2692,8 +2671,7 @@ async function main() {
     armed.armedBtn && armed.still === 1 && deleted.lists === 0 && deleted.taken === 1 && deleted.revlog === 1 && deleted.srsKept,
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
-  // The reader's capture door now opens the named-list chooser. Opening is
-  // reversible without enrollment; an explicit save keeps its source context.
+  // The reader's capture doors save in one tap and keep their source context; lists are a popover away.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
@@ -2718,11 +2696,22 @@ async function main() {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
+  // reader lane 2026-10-02 (John #17): lists open from the word popup's "Add to list…" in a small popover;
+  // opening it enrolls nothing. Save — here the chrome's 覚える, the popup's Save or the menu's Save word — is one tap.
+  await page.waitForSelector('#mini #mini-lists');
+  await tap(page, '#mini-lists');
+  await page.waitForSelector('#vocabulary-list-popover');
+  const popoverBits = await page.evaluate(`(() => ({
+    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
+    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
+  }))()`);
+  check('R2-B · opening the lists does not enroll the word, and they open as a small popover, not a window',
+    (await readAppRecord(page)).taken.length === envBefore.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
+    JSON.stringify(popoverBits));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   await tap(page, '#reader-take');
-  await page.waitForSelector('#vocabulary-list-dialog[open]');
-  check('R2-B · opening the list chooser does not enroll the word',
-    (await readAppRecord(page)).taken.length === envBefore.taken);
-  await tap(page, '#vocabulary-list-save');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit reader save' });
   const captured = await evaluateAppRecord(page, `(() => {
@@ -2734,26 +2723,33 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
+  // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
+  await holdWord(page, '#reader .tok.content', 9);
+  await page.waitForSelector('#sheet [data-ctx-scope]');
   const panelBits = await page.evaluate(`(() => ({
-    take: !!document.querySelector('#vocabulary-list-stop'),
-    scopes: document.querySelectorAll('#vocabulary-list-dialog [data-ctx-scope]').length,
-    lists: !!document.querySelector('#vocabulary-list-dialog .vocabulary-list-choices'),
-    newList: !!document.querySelector('#vocabulary-list-dialog .vocabulary-list-form input'),
+    take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
+    scopes: document.querySelectorAll('#sheet [data-ctx-scope]').length,
+    lists: !!document.querySelector('#sheet .list-picker'),
   }))()`);
-  check('R2-B · the chooser preserves undo, context scopes, and named lists',
-    panelBits.take && panelBits.scopes === 3 && panelBits.lists && panelBits.newList,
+  check('R2-B · the full entry keeps the way back out, the context scopes, and named lists',
+    panelBits.take && panelBits.scopes === 3 && panelBits.lists,
     JSON.stringify(panelBits));
   for (const scope of ['word', 'para', 'sent']) {
-    await tap(page, `#vocabulary-list-dialog [data-ctx-scope="${scope}"]`);
+    await tap(page, `#sheet [data-ctx-scope="${scope}"]`);
     const record = await waitForAppRecord(page, record => {
       const row = record.taken.find(row => row.t === 'word' && row.id === touched.word);
       return row && (row.ctx?.scope ?? 'word') === scope;
     }, { description: `saved ${scope} capture context` });
-    check(`R2-B · the chooser durably saves ${scope} context without another enrollment or review`,
+    check(`R2-B · the full entry durably saves ${scope} context without another enrollment or review`,
       record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
   }
   await shoot(page, shotsDir, '19-capture-sovereignty');
-  await tap(page, '#vocabulary-list-stop');
+  await page.locator('#sheet-close').dispatchEvent('click');
+  await page.waitForSelector('#sheet', { state: 'detached' });
+  // the popup's "Saved ✓" takes the card back out
+  await tap(page, '#reader .tok.content', 9);
+  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
+  await tap(page, '#mini-take');
   await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit stop memorizing' });
   const undone = await evaluateAppRecord(page, `(() => {
@@ -2763,20 +2759,19 @@ async function main() {
   check('R2-B · explicit stop restores the deck size without changing the revlog',
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
-  await tap(page, '#vocabulary-list-close');
-  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
+  await tap(page, '#reader .tok.content', 9); // the same word again puts its popup away
 
-  // the mini carries the same door, repainting in place — the mini never blinks.
-  // D11 (8d0fbccf) holds the mini's seal for a reader token the core dictionary lacks, and D23 for a
-  // spelling another entry's card holds: the take runs on the first token from 12 on whose mini offers
-  // an enabled, not-yet-taken seal; each other mini is put away with one tap elsewhere, as a finger would
+  // the popup's Save repaints in place — the popup never blinks.
+  // D11 (8d0fbccf) holds the popup's Save for a reader token the core dictionary lacks, and D23 for a
+  // spelling another entry's card holds: the save runs on the first token from 12 on whose popup offers
+  // an enabled, not-yet-saved Save; each other popup is put away with a second tap on its word, as a finger would
   const miniCandidates = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].flatMap((t, i) => (i >= 12 && t.dataset.word !== '学校' ? [i] : []))`,
   );
   let miniIx = -1;
   const miniSkipped = [];
   for (const ix of miniCandidates.slice(0, 16)) {
-    await touchAt(page, '#reader .tok.content', ix, 700);
+    await tap(page, '#reader .tok.content', ix);
     await page.waitForSelector('#mini #mini-take');
     const seal = await page.evaluate(`(() => {
       const s = document.querySelector('#mini-take');
@@ -2785,40 +2780,33 @@ async function main() {
     })()`);
     if (!seal.disabled && !seal.taken) { miniIx = ix; break; }
     miniSkipped.push(`${seal.word}:${seal.disabled ? 'held' : 'taken'}`);
-    await tap(page, (await page.locator('#reader-context-note').count()) ? '#reader-context-note' : '.view-title');
+    await tap(page, '#reader .tok.content', ix);
     await page.waitForTimeout(120);
   }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
   await tap(page, '#mini-take');
-  await page.waitForSelector('#vocabulary-list-dialog[open]');
-  await tap(page, '#vocabulary-list-save');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === miniWordText),
-    { description: 'mini chooser save' });
-  await tap(page, '#vocabulary-list-close');
-  await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
+    { description: 'popup one-tap save' });
   const miniCap = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     const seal = document.querySelector('#mini-take');
-    return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
+    return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini'),
+      label: seal?.textContent ?? null, window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]') };
   })()`);
-  check('R2-B · saving through the mini chooser keeps its seal inked and sentence context',
-    miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
+  check('R2-B · one tap on the popup\'s Save keeps it in place, marked saved, with the sentence context',
+    miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent' && !miniCap.window,
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
   if (miniIx >= 0) {
     await tap(page, '#mini-take');
-    await page.waitForSelector('#vocabulary-list-stop');
-    await tap(page, '#vocabulary-list-stop');
     await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
-      { description: 'mini chooser stop memorizing' });
-    await tap(page, '#vocabulary-list-close');
-    await page.waitForSelector('#vocabulary-list-dialog', { state: 'detached' });
+      { description: 'popup stop memorizing' });
   }
   const miniUndone = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, sealTaken: document.querySelector('#mini-take')?.classList.contains('taken') ?? null };
   })()`);
-  check('R2-B · the mini lets it go again — reversible where the state shows',
+  check('R2-B · the popup lets it go again — reversible where the state shows',
     miniUndone.taken === envBefore.taken && miniUndone.sealTaken === false,
     JSON.stringify(miniUndone));
 

@@ -8238,21 +8238,29 @@ function wireReaderWordMenu(span, door) {
     const keyboard = !event.clientX && !event.clientY;
     void openReaderWordMenu(span, door, keyboard ? { keyboard } : { x: event.clientX, y: event.clientY });
   });
+  let heldOpen = false;
   span.addEventListener('pointerdown', (event) => {
     clear();
+    heldOpen = false;
     if (event.pointerType === 'mouse' || event.isPrimary === false) return;
     const start = { x: event.clientX, y: event.clientY };
     hold = { start, timer: setTimeout(() => {
       hold = null;
-      // the finger's release will synthesise a click on the word: it belongs to the hold
+      heldOpen = true;
+      // the finger's release may synthesise a click: it belongs to the hold, never to the menu under it
       swallowClickUntil = Date.now() + 700;
-      void openReaderWordMenu(span, door, start);
+      // just below and beside the finger, so the first choice is not under it
+      void openReaderWordMenu(span, door, { x: start.x + 8, y: start.y + 16 });
     }, GESTURE.MENU_MS) };
   });
   span.addEventListener('pointermove', (event) => {
     if (hold && Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
   });
-  span.addEventListener('pointerup', clear);
+  span.addEventListener('pointerup', () => {
+    clear();
+    if (heldOpen) swallowClickUntil = Date.now() + 700;
+    heldOpen = false;
+  });
   span.addEventListener('pointercancel', clear);
   span.addEventListener('keydown', (event) => readerWordKey(event, span, door));
 }
