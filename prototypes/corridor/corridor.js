@@ -7374,7 +7374,7 @@ function dialRow(labelJa, labelEn, key, options) {
  * you touched shows its reading. Sentences outside the reader (renderSentenceTokens) keep the older
  * holds. A moved pointer is a scroll, never a gesture. Every action applies to the DOM directly — no
  * full re-render, so the reader never stutters. */
-const GESTURE = { MINI_MS: 430, FULL_MS: 2100, MENU_MS: 500, MOVE_PX: 9 };
+const GESTURE = { MENU_MS: 500, MOVE_PX: 9 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
  * when the finger lifts — and it lands on whatever the new sheet put under
@@ -7945,8 +7945,10 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     return toggleWordSave(captureNode, token.b);
   });
   if (held || identityHeld) {
-    const reason = el('span', 'mini-take-reason', held ? readerCaptureReasonText(token.b)
-      : wordCaptureHeldText(captureNode));
+    // when the meaning line already says the word is not in the quick dictionary, the reason only finishes it
+    const missShown = reader && !g?.m?.[0];
+    const reason = el('span', 'mini-take-reason', held ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
+      : readerCaptureReasonText(token.b)) : wordCaptureHeldText(captureNode));
     reason.id = 'mini-take-reason';
     mini.append(reason);
   }
@@ -8016,18 +8018,19 @@ function keepFloatingBeside(card, anchor) {
   let last = card.getBoundingClientRect().height;
   const watch = new ResizeObserver(() => {
     if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); return; }
-    const now = card.getBoundingClientRect().height;
-    if (Math.abs(now - last) < 1) return;
-    last = now;
+    if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
     placeFloating(card, anchor.getBoundingClientRect());
+    last = card.getBoundingClientRect().height;
   });
   watch.observe(card);
 }
 
 /** A floating card beside the word it belongs to: above when it fits there, otherwise below, and never
- * under the fixed chrome at the top or the reader's foot (the play bar's dock on a phone). When neither
- * side holds it whole it takes the roomier side, clamped inside those edges. */
+ * under the fixed chrome at the top or the reader's foot (the play bar's dock on a phone). It never covers
+ * its own word: when neither side holds it whole it takes the roomier side and scrolls inside itself. */
 function placeFloating(card, r) {
+  card.style.maxHeight = '';
+  card.style.overflowY = '';
   const m = card.getBoundingClientRect();
   const fixedEdge = (selector, edge) => {
     const node = document.querySelector?.(selector);
@@ -8042,7 +8045,12 @@ function placeFloating(card, r) {
   let top;
   if (m.height <= roomAbove) top = r.top - 10 - m.height;
   else if (m.height <= roomBelow) top = r.bottom + 10;
-  else top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - m.height) : Math.max(ceiling, Math.min(r.bottom + 10, floor - m.height));
+  else {
+    const room = Math.max(roomAbove, roomBelow, 96);
+    card.style.maxHeight = `${room}px`;
+    card.style.overflowY = 'auto';
+    top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - room) : r.bottom + 10;
+  }
   card.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   card.style.top = `${top}px`;
 }
@@ -23897,8 +23905,8 @@ function resolveReaderChoice(node) {
  * the mini, the chrome seal). A core hit captures exactly as before. */
 function readerCaptureReasonText(spelling) {
   return tx(
-    `この語はここで覚えられない。簡易辞書に項目がないため、綴り「${spelling}」で保存したカードは、復習で答えが空になるか別の語の意味になることがある。`,
-    `覚 is off for this word: it has no quick-dictionary entry, so a card saved under the spelling ${spelling} could be answered on review with no meaning or another word's.`,
+    `「${spelling}」は簡易辞書にないため、ここでは保存できません。全項目で全辞書を引けます。`,
+    `${spelling} isn't in the quick dictionary, so it can't be saved here. Full entry looks it up in the whole dictionary.`,
   );
 }
 
