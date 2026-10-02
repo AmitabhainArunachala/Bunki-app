@@ -604,6 +604,8 @@ try {
           `ダマスカス (read だますかす in the article, ダマスカス in the dictionary: one reading) cannot be saved: ${JSON.stringify(probe)}`);
         await page.locator('#mini #mini-take').click();
         const record = await waitForAppRecord(page, (r) => r.taken.some((t) => t.t === 'word' && t.id === 'ダマスカス'), { description: 'ダマスカス saved in one press' });
+        // the durable write lands a beat before the app repaints its button: wait for the page, then read it
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
           window: !!document.querySelector('#vocabulary-list-dialog') }));
         const cards = record.taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
@@ -709,6 +711,7 @@ try {
       assert(menu.role === 'menu' && Math.abs(menu.left - at.x) <= 2 && Math.abs(menu.top - at.y) <= 2, `the menu is not at the pointer: ${JSON.stringify({ menu, at })}`);
       await page.locator('#reader-word-menu [data-menu-action="save-word"]').click();
       const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 saved from the menu' });
+      await page.waitForFunction(() => !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
       await page.waitForTimeout(300);
       const after = await readAppRecord(page);
       const cards = cardsFor(after, '郊外');
@@ -738,6 +741,9 @@ try {
         await tapToken(page, SUBURB);
         await page.locator('#mini #mini-take').click();
         await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 1, { description: 'one press saves 郊外' });
+        // the durable write lands a beat before the app repaints its button and raises the toast: wait for the page
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true'
+          && !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
           window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]'),
           toast: document.querySelector('#reader-toast:not([hidden])')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
@@ -746,6 +752,7 @@ try {
         assert(saved.toast === 'Saved to review Undo' && saved.role === 'status', `the toast: ${JSON.stringify(saved)}`);
         await page.locator('#reader-toast-action').click();
         const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Undo takes the card out' });
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 }).catch(() => {});
         const label2 = await page.locator('#mini #mini-take').textContent();
         assert.equal(label2, 'Save', 'after Undo the button does not read Save');
         return { saved: saved.label, toast: saved.toast, afterUndo: cardsFor(undone, '郊外').length };
