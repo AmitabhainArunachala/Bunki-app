@@ -7251,11 +7251,11 @@ function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
   const [ja, en] = storyTopic(p);
   const placeholder = () => {
     frame.classList.add('is-placeholder');
-    frame.textContent = '';
+    frame.querySelector('.story-img')?.remove();
     // the topic's word, small and set in small capitals: it says what kind of story this is
     const word = el('span', 'story-picture-word', bi() ? en : ja);
     word.setAttribute('aria-hidden', 'true');
-    frame.append(word);
+    frame.prepend(word);
   };
   const pic = storyPictureSource(p);
   if (!pic) { placeholder(); return frame; }
@@ -8031,6 +8031,7 @@ function openVocabularyListPopover(node, label, invoker) {
  * floating sentence bar). Escape, or a tap outside, puts it away. */
 let miniAnchor = null;
 const SAVE_PRESS_MS = 600;
+let readerTakePressedAt = -Infinity;
 function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null } = {}) {
   removeMini();
   const { g, held, node: captureNode, state: miniState, identityHeld } = wordSaveFacts(token, { reader, from, record });
@@ -28137,6 +28138,8 @@ function render() {
       }
       S.captureOpen = false;
       // one press saves, as the popup's Save does; a press while saved takes it back out
+      if (Date.now() - readerTakePressedAt < SAVE_PRESS_MS) return;
+      readerTakePressedAt = Date.now();
       await toggleWordSave(readerTakeNode(now), now.id);
     });
     chrome.append(capBtn);

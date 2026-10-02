@@ -85,10 +85,10 @@
  *                         link (no dialog#vocabulary-list-dialog), whose inline "New list" field makes a
  *                         list holding the word and whose checkbox takes it off again while the card stays;
  *                         at 390 the popover is a short sheet on the screen's foot. Control: 3166ded3.
- *   G6 sentence row     — (John #18) no sentence bar shows when a word is chosen (.reader-actions never
- *                         visible); the popup's last row reads "This sentence: Save · Ask the tutor ·
- *                         Practice", and Ask the tutor opens the tutor with that sentence as its active
- *                         context. Control: 3166ded3, whose bar floated in on the first tap.
+ *   G6 sentence row     — (John #18) no sentence bar shows when a word is chosen (no sentence action
+ *                         shows outside the popup); the popup's last row reads "This sentence: Save ·
+ *                         Ask the tutor · Practice", and Ask the tutor opens the tutor with that sentence
+ *                         as its active context. Control: 3166ded3, whose bar floated in on the first tap.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "The simplified version
  *                         retells the same article in easier Japanese.", and an article without a
@@ -434,7 +434,7 @@ try {
             lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
             seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
         });
-        assert(probe.cards > 20 && probe.articles > 20, `only ${probe.cards} cards`);
+        assert(probe.cards > 20 && probe.articles > 20 && probe.definitions > 0, `only ${probe.cards} cards, ${probe.definitions} word definitions`);
         assert.equal(probe.badCount, 0, `picture slots wrong: ${probe.bad.join(' | ')}`);
         assert(probe.named > 0 && probe.pictured === probe.named, `${probe.pictured} of the ${probe.named} pictures the index names stand on their cards`);
         assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
@@ -654,7 +654,7 @@ try {
         // the durable write lands a beat before the app repaints its button: wait for the page, then read it
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
-          window: !!document.querySelector('#vocabulary-list-dialog') }));
+          window: [...document.querySelectorAll('dialog[open], [role="dialog"]:not(#mini)')].some((n) => n.getClientRects().length > 0) }));
         const cards = record.taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
         assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window && cards === 1, `one press did not save ダマスカス once: ${JSON.stringify({ ...saved, cards })}`);
         return { reading: probe.reading, saved: saved.label, cards };
@@ -866,7 +866,8 @@ try {
       await openArticle(page, ARTICLE);
       await tapToken(page, SUBURB);
       const row = await page.evaluate(() => ({
-        bar: [...document.querySelectorAll('.reader-actions, .teacher-door')].filter((n) => n.getClientRects().length && getComputedStyle(n).visibility !== 'hidden').length,
+        bar: [...document.querySelectorAll('.teacher-door, #reader-context-save, #reader-teacher, #reader-sentence-practice')]
+          .filter((n) => !n.closest('#mini') && n.getClientRects().length && getComputedStyle(n).visibility !== 'hidden').length,
         text: document.querySelector('#mini .mini-sentence')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
       }));
       assert.equal(row.bar, 0, 'a sentence bar shows when a word is chosen');

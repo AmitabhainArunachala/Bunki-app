@@ -449,7 +449,8 @@ async function main() {
         save: mini?.querySelector('#mini-take')?.textContent ?? null, sentence: !!mini?.querySelector('.mini-sentence'),
         inside: !!box && box.left >= 0 && box.right <= innerWidth && box.top >= 0 && box.bottom <= innerHeight,
         under: document.querySelectorAll('#reader .tok-en').length,
-        bar: [...document.querySelectorAll('.reader-actions, .teacher-door')].filter((node) => node.getClientRects().length).length };
+        bar: [...document.querySelectorAll('.teacher-door, #reader-context-save, #reader-teacher, #reader-sentence-practice')]
+          .filter((node) => !node.closest('#mini') && node.getClientRects().length).length };
     })()`);
     await openReader(page, base);
     await setRevealOnTouch(page);

@@ -14,7 +14,8 @@
  *      own back control still closes the sheet.
  *   R4 front door: (FEEL pass 2026-10-02, John: "report a problem takes up too much space, and is
  *      redundant with the bug button") the navigation strip carries no second report entry; with
- *      the strip open the permanent bug stays visible and uncovered, and it opens the dialog.
+ *      the strip open the permanent bug stays visible and uncovered, and it opens the dialog;
+ *      closing it returns focus to the bug.
  *   R5 focused stage (読み探査 probe, body.zen): the page entry sits after the stage,
  *      opens the dialog, and the probe's reveal still takes a real click.
  *   R6 a room that failed to draw still carries the entry.
@@ -185,7 +186,12 @@ try {
     const navBug = await fingerClick(page, '#bunki-report-bug');
     check(`R4 ${w}px front door: the bug is uncovered beside the open strip and opens reporting`, navBug.uncovered && await reportOpen(page),
       JSON.stringify(navBug));
-    if (await reportOpen(page)) await closeReport(page);
+    if (await reportOpen(page)) {
+      await closeReport(page);
+      const backOnBug = await page.waitForFunction(() => !!document.activeElement?.matches('#bunki-report-bug'), null, { timeout: 5_000 })
+        .then(() => true, () => false);
+      check(`R4 ${w}px front door: closing returns focus to the bug that opened it`, backOnBug);
+    }
 
     // R8 the field entry (?entry=field) is a front door too; it carries the page entry
     await page.goto(`${origin}/index.html?entry=field`); await ready(page);

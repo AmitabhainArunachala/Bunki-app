@@ -389,6 +389,7 @@ def main() -> int:
     fetched: list[dict] = []
     restaged: list[dict] = []
     first_added: dict[str, str] = {}  # a restaged reading keeps the day it first reached the shelf
+    kept_pictures: dict[str, dict] = {}
     report: dict = {"terms": [], "sources": {}, "skipped": []}
     # only a reading nobody has decided on may be re-extracted
     pending_fresh = {row["id"] for row in queue if row.get("kind") == QUEUE_KIND and row.get("decision") == "pending"}
@@ -434,6 +435,8 @@ def main() -> int:
             replacement = {row["id"]: row for row in restaged}
             dataset = [replacement.get(row["id"], row) for row in dataset]
             first_added = {row["id"]: row["addedAt"] for row in queue if row["id"] in replacement and row.get("addedAt")}
+            kept_pictures = {row["id"]: {key: row[key] for key in ("picture", "accent") if key in row}
+                             for row in index["articles"] if row["id"] in replacement}
             index["articles"] = [row for row in index["articles"] if row["id"] not in replacement]
             queue = [row for row in queue if row["id"] not in replacement]
             shelf_ids -= set(replacement)
@@ -493,6 +496,7 @@ def main() -> int:
                 (ARTICLES / index_row["file"]).write_text(
                     json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
                 )
+                index_row.update(kept_pictures.get(index_row["id"], {}))
                 index["articles"].append(index_row)
                 queue.append(queue_row)
                 minted.append(queue_row)
