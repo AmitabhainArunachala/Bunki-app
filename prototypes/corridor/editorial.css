@@ -1633,7 +1633,7 @@ body[data-view='reader'] #app > main > .view-title-en {
   width: 100%;
   height: auto;
   aspect-ratio: 3 / 2;
-  max-height: max(120px, calc(100svh - 690px));
+  max-height: max(120px, calc(100svh - 740px));
   object-fit: cover;
   border-radius: 12px;
   background: color-mix(in srgb, var(--topic, var(--tint)) 16%, var(--surface));
@@ -1655,7 +1655,7 @@ body[data-view='reader'] #app > main > .view-title-en {
   pointer-events: none;
 }
 @media (max-width: 520px) {
-  .reader-picture-img { max-height: max(96px, calc(100svh - 724px)); }
+  .reader-picture-img { max-height: max(72px, calc(100svh - 800px)); }
   .reader-picture { margin-bottom: 16px; }
   /* while the text settings are open on a phone the picture folds to a slim band, so the panel does
      not push the article's opening words down under the dock; it returns when they close */
