@@ -149,6 +149,10 @@ body:not(.zen) #app > .chrome > button :is(.l-ja, .en-sub) { display: inline; ma
 body:not(.zen) #app > .chrome > button .en-sub { font: 500 12px/1 var(--sans); color: var(--label-2); }
 body:not(.zen) #app > .chrome > button.chrome-search { align-items: center; padding: 0; }
 body:not(.zen) #app > .chrome > button.chrome-search svg { width: 20px; height: 20px; }
+/* during an attempt the bar still collapses to 戻る · progress · seal (register.css T8): the glass
+   doors above must not bring the search, the dojo, the language or the lists back into a test */
+html[data-room='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
+html[data-room='attempt'] body:not(.zen) #app > .chrome > button:last-child { display: none; }
 /* 戻る wears the iOS back chevron */
 body:not(.zen) #app > .chrome > button#back { padding-left: 6px; }
 body:not(.zen) #app > .chrome > button#back::before {
@@ -912,7 +916,10 @@ html:not([data-room='tutor']) body .record-note-input {
 }
 html:not([data-room='tutor']) body .search-field:focus,
 html:not([data-room='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
-body .chip:has(> .l-ja) { flex-direction: row; align-items: baseline; gap: 6px; }
+/* the two words of a label centre in the door; the English drops a pixel to sit on the Japanese line */
+body .chip:has(> .l-ja) { flex-direction: row; align-items: center; gap: 6px; }
+body .chip:has(> .l-ja) > .en-sub { position: relative; top: 1px; }
+.mock-level-row { margin: 0 0 6px; }
 body .chip > .l-ja { font-weight: inherit; }
 body .chip > .en-sub { display: inline; font: 500 12px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.78; }
 body .chip .big { font-family: var(--serif); }
@@ -1648,6 +1655,11 @@ body[data-view='reader'] #app > main > .view-title-en {
   pointer-events: none;
 }
 @media (max-width: 520px) { .reader-picture-img { max-height: max(96px, calc(100svh - 724px)); } .reader-picture { margin-bottom: 16px; } }
+/* a word brought into view — by a keyboard's focus, a find, or a reader's own scroll-into-view —
+   stops clear of the glass bar above and of the floating sentence bar below (the picture moved the
+   article's opening lines down to where that bar rises) */
+html:has(> body[data-view='reader']) { scroll-padding-top: 64px; scroll-padding-bottom: 120px; }
+@media (max-width: 520px) { html:has(> body[data-view='reader']) { scroll-padding-bottom: calc(200px + env(safe-area-inset-bottom)); } }
 /* the level in the reader's bar, beside the title */
 body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align-self: center; margin: 0 6px 0 4px; min-height: 22px; padding: 0 8px; font-size: 12px; }
 .version-toggle {

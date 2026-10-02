@@ -12922,6 +12922,15 @@ function renderMockItem(main, set, flat, run) {
     return saved;
   };
   const sectionLabel = { '文字・語彙': 'Vocabulary', '文法': 'Grammar', '読解': 'Reading' }[section.title.ja] || section.title.en;
+  // the level this paper is at, in its own colour, above the counter (FEEL pass 2026-10-02); the
+  // counter line keeps its words, and stays the element the stage bar reads
+  if (/^N[1-5]$/u.test(String(set.level))) {
+    const levelRow = el('div', 'mock-level-row');
+    const chip = el('span', 'level-chip', set.level);
+    chip.dataset.level = set.level;
+    levelRow.append(chip);
+    main.append(levelRow);
+  }
   main.append(
     el(
       'p',
