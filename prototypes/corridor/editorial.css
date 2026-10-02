@@ -84,6 +84,9 @@ body, body.v-contrast-wcag {
 @keyframes feel-pop-centred { from { opacity: 0; transform: translateX(-50%) scale(0.96); } to { transform: translateX(-50%); } }
 @keyframes feel-rise { from { opacity: 0; transform: translateY(18px); } }
 @keyframes feel-fade { from { opacity: 0; } }
+body:not([data-view='drift']) #app > main[data-enter] { animation: feel-fade 240ms var(--ease) both; }
+@media (prefers-reduced-motion: reduce) { body:not([data-view='drift']) #app > main[data-enter] { animation: none; } }
+
 ::selection { background: var(--ink); color: var(--ground-0, #faf6ea); }
 :is(input, textarea, select) { accent-color: var(--ai); caret-color: var(--red); }
 :is(input, textarea)::placeholder { color: var(--faint); opacity: 1; }
@@ -210,7 +213,8 @@ body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   max-width: 920px;
   margin: 24px auto 64px;
   padding: 34px clamp(24px, 4vw, 52px) 72px;
-  background: var(--surface);
+  /* --ed-paper is the white surface, unless a room's own material (the tutor's lacquer) rescopes it */
+  background: var(--ed-paper);
   border: 0;
   border-radius: var(--r-card);
   box-shadow: var(--shadow-card);
@@ -219,17 +223,19 @@ body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
 body:not([data-view='drift']) { background-color: var(--page); }
 body:not([data-view='drift'])::before { content: none; }
 body:not(.zen):is([data-view='shelf'], [data-view='levels']) #app > main { max-width: 1160px; }
+/* a room's title is an iOS large title in the UI sans (FEEL); an article's headline keeps the Mincho */
 main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
-  font-family: var(--display);
-  font-size: clamp(29px, 3.5vw, 38px);
-  font-weight: 800;
-  line-height: 1.42;
-  letter-spacing: -0.015em;
-  margin: 0 0 16px;
+  font-family: var(--sans);
+  font-size: clamp(28px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+  margin: 0 0 14px;
   text-wrap: pretty;
 }
-.view-title > .en-inline { display: block; margin: 8px 0 0; font-size: 17px; font-weight: 400; color: var(--ed-muted); }
-main h2 { margin-top: 32px; margin-bottom: 12px; font-weight: 800; line-height: 1.5; }
+.view-title > .en-inline { display: block; margin: 6px 0 0; font: 400 17px/1.4 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ed-muted); opacity: 1; }
+main h2 { margin-top: 32px; margin-bottom: 12px; font-family: var(--sans); font-weight: 700; line-height: 1.35; letter-spacing: -0.005em; }
+html[data-room='tutor'] body:not(.zen) #app > .chrome { background: var(--glass-solid); }
 .eyebrow { font-size: 13px; letter-spacing: 0.04em; color: var(--ed-muted); }
 body.v-depth-layered main > .eyebrow::before,
 body.v-depth-layered .eyebrow.shelf-section::before { content: none; }
@@ -242,21 +248,112 @@ body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
 .level-note { font-size: 13px; line-height: 1.6; }
 .details-toggle { font-size: 13px; letter-spacing: 0.015em; }
 
-/* Room doors read as a directory. Controls keep their familiar locations. */
-body.v-depth-layered :is(.search-page, .search-finder, .kdx-lenses, .list-page-ops, .record-note, .archive-row) {
-  border: 1px solid var(--ed-rule);
-  border-radius: 3px;
+/* Room doors read as a directory. Controls keep their familiar locations. FEEL (2026-10-02): no
+ * outlined boxes or cream fills — a room's groups sit in the page, its working areas in a soft
+ * sunken fill, its rows in white grouped lists on hairline separators. */
+body.v-depth-layered :is(.search-page, .search-finder, .kdx-lenses, .skip-ui) {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
-body.v-depth-layered :is(.study-door, .focus-mode, .grammar-link) { box-shadow: none; border-radius: 3px; }
-.study-hall { gap: 0 24px; border-top: 2px solid var(--ed-ink); margin: 24px 0; }
+body.v-depth-layered :is(.list-page-ops, .record-note, .record-note-editor, .list-maker, .archive-row) {
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--surface-sunk);
+  box-shadow: none;
+}
+body.v-depth-layered :is(.study-door, .focus-mode, .grammar-link) { box-shadow: none; border-radius: var(--r-control); }
+/* the search room: a large iOS search field, capsule lenses, results as one grouped list */
+.search-page { max-width: 640px; }
+body .search-page .nav-search-input {
+  min-height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  color: var(--label);
+  font: 400 19px/1.3 var(--sans);
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+body .search-page .nav-search-input:focus { outline: none; background: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
+body .search-page .kdx-lenses { gap: 8px; margin: 14px 0 10px; }
+body .kdx-lens {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  box-shadow: none;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+body .kdx-lens:hover { background: var(--fill-strong); }
+body .kdx-lens .l-ja { display: inline; font: 600 15px/44px var(--sans); color: var(--label); }
+body .kdx-lens .en-sub { display: inline; font: 500 12px/44px var(--sans); letter-spacing: 0.01em; color: var(--label-2); }
+body .kdx-lens.on { background: var(--tint); border: 0; }
+body .kdx-lens.on .l-ja, body .kdx-lens.on .en-sub { color: #fff; }
+body .skip-search-opener {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--tint-wash);
+  color: var(--tint);
+  font: 600 15px/1.2 var(--sans);
+}
+body .skip-search-opener[aria-expanded='true'] { background: var(--tint); color: #fff; }
+body .search-page-hint { color: var(--label-2); }
+body .search-page-results {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--r-float);
+  background: var(--surface);
+  box-shadow: 0 0 0 0.5px var(--separator), var(--shadow-card);
+}
+body.v-depth-layered .search-page-results .nav-search-row,
+body .search-page-results .nav-search-row {
+  min-height: 60px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 0.5px solid var(--separator);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: background-color 140ms var(--ease);
+}
+body .search-page-results .nav-search-row:last-child { border-bottom: 0; }
+body .search-page-results .nav-search-row:hover { background: var(--fill); }
+body .search-page-results .nsr-gloss { color: var(--label-2); }
+.study-hall { gap: 0 24px; border-top: 0.5px solid var(--separator); margin: 24px 0; }
 body.v-depth-layered .study-door {
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--ed-rule);
+  border-bottom: 0.5px solid var(--separator);
   border-radius: 0;
   padding: 20px 0;
 }
+/* the dojo's choices: grey capsule tiles, the chosen one filled in the accent */
+body .focus-chip, body.v-depth-layered .focus-mode {
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  box-shadow: none;
+  color: var(--label);
+  transition: background-color var(--dur) var(--ease), transform 140ms var(--ease);
+}
+body .focus-chip:hover, body.v-depth-layered .focus-mode:hover { background: var(--fill-strong); }
+body .focus-chip.on { background: var(--tint); box-shadow: none; color: #fff; }
+body .focus-chip.on :is(.focus-chip-n, .focus-chip-u) { color: inherit; }
+body .focus-chip-n { font-family: var(--sans); font-weight: 600; }
+body .focus-chip-u { color: inherit; opacity: 0.75; }
 .study-door-t { font-family: var(--display); font-size: 23px; }
 .study-door-sub { font-size: 15px; line-height: 1.7; }
 body.v-depth-layered .study-door:hover { background: var(--ai-wash); }
@@ -775,7 +872,7 @@ body:not(.zen) #app > .chrome > #reader-take:disabled { display: none; }
    secondary = an accent-tinted fill with accent text and no border (every plain .chip is one);
    tertiary = a plain text button. 12px radius, 44px tall, a press scales to .97. Bilingual labels
    sit on one baseline: Japanese at full weight, English smaller and lighter. */
-body .chip {
+body .chip, body.v-depth-layered .chip {
   min-height: 44px;
   padding: 0 16px;
   border: 0;
@@ -789,7 +886,26 @@ body .chip {
 }
 body .chip:hover:not(:disabled) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 body .chip:active:not(:disabled) { transform: scale(0.97); }
-body .chip:disabled { opacity: 0.5; }
+body .chip:disabled, body.v-depth-layered .chip:disabled { opacity: 1; background: var(--fill); color: color-mix(in srgb, var(--label) 42%, transparent); }
+/* a graph's node kinds keep their own quiet tint instead of coloured, dashed or doubled edges */
+body.v-depth-layered .chip:is(.t-kanji, .t-word, .t-radical, .t-idiom) { border: 0; }
+body.v-depth-layered .chip.t-kanji { background: color-mix(in srgb, var(--red) 10%, transparent); color: color-mix(in srgb, var(--red) 88%, var(--ink)); }
+body.v-depth-layered .chip.t-radical { background: var(--fill); color: var(--label); }
+body.v-depth-layered .chip.t-idiom { background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
+/* fields: one quiet iOS look — a grey fill, 12px corners, no outline until focus (the tutor's
+   lacquer room keeps its own) */
+html:not([data-room='tutor']) body .search-field,
+html:not([data-room='tutor']) body .record-note-input {
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  color: var(--label);
+  font-family: var(--sans);
+  box-shadow: none;
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+html:not([data-room='tutor']) body .search-field:focus,
+html:not([data-room='tutor']) body .record-note-input:focus { outline: none; background: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
 body .chip:has(> .l-ja) { flex-direction: row; align-items: baseline; gap: 6px; }
 body .chip > .l-ja { font-weight: inherit; }
 body .chip > .en-sub { display: inline; font: 500 12px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.78; }
@@ -2020,32 +2136,48 @@ body #mini .mini-entry .en-sub { display: inline; font-size: 12px; letter-spacin
 body #mini .mini-entry::after { content: '›'; font-weight: 700; }
 body #mini .mini-entry:hover { background: var(--ai-wash); border-color: var(--ai); }
 
-/* the sheet: lacquer bar, raised paper */
-body.v-depth-layered .scrim, body .scrim { background: color-mix(in srgb, var(--chrome) 62%, transparent); }
+/* the sheet (FEEL pass 2026-10-02): white, 14px corners, rising from the foot over a soft dim; its
+   bar is light glass on a hairline with plain tinted controls — no lacquer slab, no red rule */
+body.v-depth-layered .scrim, body .scrim { background: rgb(0 0 0 / 30%); animation: feel-fade var(--dur) var(--ease); }
 body.v-depth-layered .sheet, body .sheet {
-  border: 1px solid var(--raised-edge);
-  border-bottom: 0;
-  border-radius: 16px 16px 0 0;
-  background: var(--raised);
-  box-shadow: 0 -2px 6px color-mix(in srgb, var(--ink) 14%, transparent), 0 -28px 64px -20px color-mix(in srgb, var(--ink) 55%, transparent);
+  border: 0;
+  border-radius: var(--r-float) var(--r-float) 0 0;
+  background: var(--surface);
+  box-shadow: 0 0 0 0.5px var(--separator), 0 -12px 48px rgb(0 0 0 / 16%);
+  animation: feel-rise 280ms var(--ease);
 }
-body .sheet .sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--raised-edge-strong); }
+body .sheet .sheet-grip { width: 36px; height: 5px; border-radius: 3px; background: var(--fill-strong); }
 body .sheet .sheet-bar {
-  gap: var(--s1);
-  padding: 10px var(--s3);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 88%, #fff) 0%, var(--chrome) 60%), var(--chrome);
-  border-bottom: 2px solid var(--accent);
-  box-shadow: 0 8px 18px -14px color-mix(in srgb, var(--chrome) 90%, transparent);
+  gap: 4px;
+  padding: 6px var(--s2);
+  background: var(--glass);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border: 0;
+  border-bottom: 0.5px solid var(--separator);
+  box-shadow: none;
+  color: var(--label);
 }
 body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) {
   min-width: 44px;
-  border: 1px solid color-mix(in srgb, var(--chrome-ink) 34%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, #fff 6%, transparent);
-  transition: background-color 120ms ease-out;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--tint);
+  font: 600 16px/1.2 var(--sans);
+  transition: background-color var(--dur) var(--ease);
 }
-body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search):hover { background: color-mix(in srgb, #fff 14%, transparent); }
-body .sheet .sheet-bar .sheet-take[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff8ee; }
+body .sheet .sheet-bar .sheet-back { display: inline-flex; flex-direction: row; align-items: baseline; gap: 5px; padding: 0 10px 0 6px; }
+body .sheet .sheet-bar .sheet-back :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; }
+body .sheet .sheet-bar .sheet-back .en-sub { font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
+body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search):hover { background: var(--fill); }
+body .sheet .sheet-bar .sheet-take { background: var(--tint-wash); color: var(--tint); font: 700 17px/1 var(--display); }
+body .sheet .sheet-bar .sheet-take[aria-pressed='true'] { background: var(--tint); border: 0; color: #fff; }
+body .sheet .sheet-bar .sheet-depth { color: var(--label-2); }
+body .sheet .sheet-bar :focus-visible { outline-color: var(--tint); }
+@media (prefers-reduced-motion: reduce) { body .sheet, body .scrim { animation: none; } }
 
 /* the word's head: headword, reading, then everything under rules */
 body .sheet .headword { margin: var(--s1) 0 0; font: 800 46px/1.3 var(--display); letter-spacing: -0.02em; color: var(--text); }

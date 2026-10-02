@@ -765,9 +765,9 @@ try {
     const body = bodies.get(id);
     const beforeNoise = noise.length;
     const item = page.locator(storyCard(id));
-    // The design's card: a topic kicker, the headline and a foot with the JLPT level chip (and 読了
-    // once finished; since the 2026-10-01 polish pass a teaser in today's six carries the same foot).
-    // Source, licence and 未確認 live in the reader.
+    // The design's card: a topic kicker, the headline and the JLPT level chip — since the FEEL pass
+    // (2026-10-02) the level stands on the card's picture slot, top-right, and the foot keeps the date
+    // (and 読了 once finished). Source, licence and 未確認 live in the reader.
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
@@ -777,7 +777,7 @@ try {
         kicker: node.querySelector('.story-kicker .l-ja')?.textContent ?? '',
         title: title?.textContent ?? '',
         foot: !!node.querySelector('.story-foot'),
-        level: node.querySelector('.story-foot .level-chip')?.textContent ?? '',
+        level: node.querySelector('.level-chip')?.textContent ?? '',
         background: style.backgroundColor,
         border: style.border,
         radius: style.borderRadius,
