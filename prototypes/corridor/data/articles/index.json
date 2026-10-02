@@ -377,7 +377,16 @@
           "鯨"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-1403.webp",
+        "alt": "Snow-dusted forested mountains of the Shiretoko Peninsula rising above a sea scattered with drift ice.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-1403-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F4A5C"
     },
     {
       "id": "wikinews:6460",
@@ -505,7 +514,16 @@
           "開く"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-6460.webp",
+        "alt": "A baseball flying over the green outfield of a floodlit major-league ballpark at dusk.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-6460-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2E5A3A"
     },
     {
       "id": "wikinews:12024",
@@ -704,7 +722,16 @@
           "駅"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-12024.webp",
+        "alt": "A silver commuter train on a new elevated railway line above the rooftops of eastern Osaka.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-12024-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A5568"
     },
     {
       "id": "wikinews:20090",
@@ -892,7 +919,16 @@
           "高原"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-20090.webp",
+        "alt": "A small one-car train on a single-track line through wooded hills under a grey sky.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-20090-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#46504F"
     },
     {
       "id": "wikinews:45227",
@@ -1128,7 +1164,16 @@
           "際"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-45227.webp",
+        "alt": "A laptop showing a dimmed web page on a desk at night beside a stack of printed news pages.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-45227-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3B4252"
     },
     {
       "id": "aozora:051034",
@@ -1505,7 +1550,16 @@
           "黙礼"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/aozora-051034.webp",
+        "alt": "An old soldier and a young soldier sitting by a stone marker on a mountain pass next to a blooming wild rose.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/aozora-051034-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#7A3E4F"
     },
     {
       "id": "aozora:000628",
@@ -2094,7 +2148,16 @@
           "黒子"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/aozora-000628.webp",
+        "alt": "A small fox hiding in wet autumn grass, watching a man fishing with a net in a muddy stream.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/aozora-000628-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#8A4520"
     },
     {
       "id": "aozora:046605",
@@ -2476,7 +2539,16 @@
           "黒い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/aozora-046605.webp",
+        "alt": "Two small crabs on the bed of a clear stream with bubbles rising and sunlight rippling on the stones.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/aozora-046605-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#1F5A63"
     },
     {
       "id": "yasashii:1",
@@ -3423,7 +3495,16 @@
           "鳥"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n5-morning.webp",
+        "alt": "A bread roll and an open notebook on a park bench on a clear morning.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n5-morning-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2E5D86"
     },
     {
       "id": "bunki-graded-n4-bookshop",
@@ -3570,7 +3651,16 @@
           "駅"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n4-bookshop.webp",
+        "alt": "The inside of a small second-hand bookshop on a rainy day, with an old travel book open on the counter.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n4-bookshop-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A4632"
     },
     {
       "id": "bunki-graded-n3-town",
@@ -3728,7 +3818,16 @@
           "霊場"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-town.webp",
+        "alt": "Mossy stone steps climbing a wooded hillside towards a small shrine.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-town-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4B5B34"
     },
     {
       "id": "bunki-essay-n2-mountain",
@@ -3908,7 +4007,16 @@
           "風"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-mountain.webp",
+        "alt": "A hiker walking alone on a misty forest trail among tall cedars.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-mountain-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#34503F"
     },
     {
       "id": "bunki-essay-n1-ai",
@@ -4107,7 +4215,16 @@
           "顔"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-ai.webp",
+        "alt": "A desk with an open paper dictionary, a laptop and a handwritten notebook under a lamp.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-ai-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4660"
     },
     {
       "id": "real-gokajo",
@@ -4260,7 +4377,16 @@
           "陋習"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/real-gokajo.webp",
+        "alt": "A rolled scroll on a lacquered stand in a formal tatami hall with gilded screens.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/real-gokajo-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6B2E22"
     },
     {
       "id": "real-hojoki",
@@ -4404,7 +4530,16 @@
           "高し"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/real-hojoki.webp",
+        "alt": "A clear river flowing over stones, with bubbles in an eddy and wooden houses on the far bank.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/real-hojoki-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2D5560"
     },
     {
       "id": "real-tsurezure",
@@ -4544,7 +4679,16 @@
           "願"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/real-tsurezure.webp",
+        "alt": "An inkstone, a brush and blank paper on a low desk by a window in an old Japanese room.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/real-tsurezure-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A3530"
     },
     {
       "id": "bunki-graded-n5-station",
@@ -4666,7 +4810,16 @@
           "駅"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n5-station.webp",
+        "alt": "Commuters and students waiting on a station platform as a morning train arrives.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n5-station-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5873"
     },
     {
       "id": "bunki-graded-n5-kitchen",
@@ -4780,7 +4933,16 @@
           "魚"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n5-kitchen.webp",
+        "alt": "A woman cooking in a warm kitchen at night beside a table set with fish, vegetables and rice.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n5-kitchen-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6A3F25"
     },
     {
       "id": "bunki-graded-n5-neighbour",
@@ -4893,7 +5055,16 @@
           "長い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n5-neighbour.webp",
+        "alt": "An elderly man and a young neighbour at their doors in an apartment corridor at dawn.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n5-neighbour-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E4A5A"
     },
     {
       "id": "bunki-graded-n4-letter",
@@ -5025,7 +5196,16 @@
           "間"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n4-letter.webp",
+        "alt": "An old envelope and folded letter in an open desk drawer in a room full of moving boxes.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n4-letter-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6E4B3A"
     },
     {
       "id": "bunki-graded-n4-market",
@@ -5152,7 +5332,16 @@
           "魚屋"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n4-market.webp",
+        "alt": "Vegetable stalls and a fish counter at a small morning market.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n4-market-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A6230"
     },
     {
       "id": "bunki-graded-n4-bicycle",
@@ -5281,7 +5470,16 @@
           "駅"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n4-bicycle.webp",
+        "alt": "A row of parked bicycles outside a station with one empty space, a small police box across the street.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n4-bicycle-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3C4F6B"
     },
     {
       "id": "bunki-graded-n3-river",
@@ -5424,7 +5622,16 @@
           "高い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-river.webp",
+        "alt": "A person walking along a grassy riverside path towards a low bridge in the morning.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-river-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5B57"
     },
     {
       "id": "bunki-graded-n3-radio",
@@ -5565,7 +5772,16 @@
           "飛ばす"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-radio.webp",
+        "alt": "A small radio with a glowing dial on a bedside table in a dark bedroom.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-radio-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2C2F4A"
     },
     {
       "id": "bunki-essay-n2-handwriting",
@@ -5703,7 +5919,16 @@
           "順序"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-handwriting.webp",
+        "alt": "A hand holding a pencil over an empty squared practice notebook.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-handwriting-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A4036"
     },
     {
       "id": "bunki-essay-n2-notebook",
@@ -5866,7 +6091,16 @@
           "頭"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-notebook.webp",
+        "alt": "An open notebook with a few short lines and wide empty margins on a café table.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-notebook-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3D4A3E"
     },
     {
       "id": "bunki-essay-n2-rain",
@@ -6033,7 +6267,16 @@
           "音"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-rain.webp",
+        "alt": "An open book on a café table by a rain-streaked window overlooking people with umbrellas at a crossing.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-rain-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#34495E"
     },
     {
       "id": "bunki-essay-n2-translation",
@@ -6200,7 +6443,16 @@
           "電話"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-translation.webp",
+        "alt": "Two colleagues nodding goodbye to each other in an office at dusk.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-translation-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4B3F5C"
     },
     {
       "id": "bunki-essay-n1-memory",
@@ -6406,7 +6658,16 @@
           "項目"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-memory.webp",
+        "alt": "A stack of flashcards, some face down, beside a desk calendar with circled days.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-memory-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3B4A6B"
     },
     {
       "id": "bunki-essay-n1-city",
@@ -6626,7 +6887,16 @@
           "驚く"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-city.webp",
+        "alt": "A traveller at a row of ticket machines in a crowded station concourse.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-city-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A3F4E"
     },
     {
       "id": "bunki-graded-n3-zoka-sanjin-morning",
@@ -6869,7 +7139,16 @@
           "順番"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-zoka-sanjin-morning.webp",
+        "alt": "An old book open on a library desk in morning sunlight.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-zoka-sanjin-morning-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A4A2E"
     },
     {
       "id": "bunki-graded-n3-nakaima-diary",
@@ -7134,7 +7413,16 @@
           "駅"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-nakaima-diary.webp",
+        "alt": "A steaming cup of green tea next to a face-down phone on a kitchen counter in the morning.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-nakaima-diary-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F5A3A"
     },
     {
       "id": "bunki-graded-n3-world-beginning",
@@ -7375,7 +7663,16 @@
           "順番"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-world-beginning.webp",
+        "alt": "Young reed shoots rising from still water in a misty marsh at dawn.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-world-beginning-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E5A4C"
     },
     {
       "id": "bunki-graded-n3-hidden-deity",
@@ -7600,7 +7897,16 @@
           "首"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-hidden-deity.webp",
+        "alt": "A teacher and a student talking over an open book in an empty classroom in the afternoon.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-hidden-deity-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A5868"
     },
     {
       "id": "bunki-graded-n3-kojiki-book",
@@ -7873,7 +8179,16 @@
           "集める"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-kojiki-book.webp",
+        "alt": "Three old thread-bound manuscript volumes in a museum display case.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-kojiki-book-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5B3E2E"
     },
     {
       "id": "bunki-graded-n3-hashira-counter",
@@ -8095,7 +8410,16 @@
           "高貴"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-hashira-counter.webp",
+        "alt": "Plain wooden pillars supporting the roof of a shrine hall.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-hashira-counter-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6B4A2B"
     },
     {
       "id": "bunki-graded-n3-feel-jingu-forest",
@@ -8376,7 +8700,16 @@
           "風景"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-feel-jingu-forest.webp",
+        "alt": "A wide gravel path through a forest of huge cedar trees with light falling through.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-feel-jingu-forest-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F4A35"
     },
     {
       "id": "bunki-graded-n3-musubi-visual",
@@ -8641,7 +8974,16 @@
           "高い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-musubi-visual.webp",
+        "alt": "A clear river flowing over smooth stones under tall trees.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-musubi-visual-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2B5560"
     },
     {
       "id": "bunki-graded-n3-gratitude-week",
@@ -8887,7 +9229,16 @@
           "駅員"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-gratitude-week.webp",
+        "alt": "An open diary, a pen, a train pass and a wallet on a desk under a lamp.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-gratitude-week-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A3F5E"
     },
     {
       "id": "bunki-graded-n3-thanks-before-help",
@@ -9138,7 +9489,16 @@
           "願い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-graded-n3-thanks-before-help.webp",
+        "alt": "Two students talking over iced tea at a café table.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-graded-n3-thanks-before-help-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6A4A35"
     },
     {
       "id": "bunki-essay-n2-zoka-as-one",
@@ -9410,7 +9770,16 @@
           "魅力"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-zoka-as-one.webp",
+        "alt": "Three overlapping sheets of tracing paper on a desk beside a pencil and an open book.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-zoka-as-one-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#44506A"
     },
     {
       "id": "bunki-essay-n2-nakaima-time",
@@ -9712,7 +10081,16 @@
           "食事"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-nakaima-time.webp",
+        "alt": "A person looking at a phone while a meal of rice and soup sits untouched on the table.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-nakaima-time-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A4030"
     },
     {
       "id": "bunki-essay-n2-creator-god",
@@ -9987,7 +10365,16 @@
           "類比"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-creator-god.webp",
+        "alt": "A Japanese book and an English book open side by side on a desk with a pencil.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-creator-god-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3D3F5C"
     },
     {
       "id": "bunki-essay-n2-silent-amenominakanushi",
@@ -10266,7 +10653,16 @@
           "願い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-silent-amenominakanushi.webp",
+        "alt": "A small wooden shrine with one lit lantern on a wooded hill at dusk.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-silent-amenominakanushi-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A3448"
     },
     {
       "id": "bunki-essay-n2-kojiki-myth-history",
@@ -10556,7 +10952,16 @@
           "順番"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-kojiki-myth-history.webp",
+        "alt": "An old manuscript book beside pottery shards and a bronze mirror on a museum table.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-kojiki-myth-history-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5C4630"
     },
     {
       "id": "bunki-essay-n2-myth-to-book",
@@ -10844,7 +11249,16 @@
           "黙読"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-myth-to-book.webp",
+        "alt": "A brush, an inkstone and blank paper on a low desk lit by an oil lamp.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-myth-to-book-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A3A2A"
     },
     {
       "id": "bunki-essay-n2-feel-jingu-musubi",
@@ -11146,7 +11560,16 @@
           "題名"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-feel-jingu-musubi.webp",
+        "alt": "A craftsman's hands planing a block of pale wood, shavings curling off.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-feel-jingu-musubi-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6B4F2E"
     },
     {
       "id": "bunki-essay-n2-prayer-on-screen",
@@ -11444,7 +11867,16 @@
           "高い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-prayer-on-screen.webp",
+        "alt": "A priest in white robes walking along a gravel path through a forest shrine at dawn.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-prayer-on-screen-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F4A3A"
     },
     {
       "id": "bunki-essay-n2-thanks-first",
@@ -11723,7 +12155,16 @@
           "魔法"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-thanks-first.webp",
+        "alt": "A shop clerk wrapping a small box while a customer waits at the counter.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-thanks-first-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6A3E3E"
     },
     {
       "id": "bunki-essay-n2-testimony-literacy",
@@ -12014,7 +12455,16 @@
           "題名"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n2-testimony-literacy.webp",
+        "alt": "One person talking and another listening at a kitchen table in the evening.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n2-testimony-literacy-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4E4A3A"
     },
     {
       "id": "bunki-essay-n1-cosmic-analogy",
@@ -12349,7 +12799,16 @@
           "魅力"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-cosmic-analogy.webp",
+        "alt": "The Milky Way above the dark roof of a small shrine in the mountains.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-cosmic-analogy-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#1E2A44"
     },
     {
       "id": "bunki-essay-n1-nakaima-time-theory",
@@ -12673,7 +13132,16 @@
           "音楽"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-nakaima-time-theory.webp",
+        "alt": "A hand holding a steaming teacup on a wooden table next to a clock.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-nakaima-time-theory-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4D3F33"
     },
     {
       "id": "bunki-essay-n1-first-versus-supreme",
@@ -12992,7 +13460,16 @@
           "領域"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-first-versus-supreme.webp",
+        "alt": "A hand tracing a hand-drawn family-tree diagram on a table among open books.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-first-versus-supreme-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F3A55"
     },
     {
       "id": "bunki-essay-n1-silent-god-theology",
@@ -13317,7 +13794,16 @@
           "魅力"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-silent-god-theology.webp",
+        "alt": "An empty shrine prayer hall with its doors open at dawn.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-silent-god-theology-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F3440"
     },
     {
       "id": "bunki-essay-n1-kojiki-power",
@@ -13669,7 +14155,16 @@
           "額面"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-kojiki-power.webp",
+        "alt": "A large red-pillared palace hall on a wide gravel plain under a clear sky.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-kojiki-power-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#7A2E26"
     },
     {
       "id": "bunki-essay-n1-beyond-fact-fiction",
@@ -14014,7 +14509,16 @@
           "風土"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-beyond-fact-fiction.webp",
+        "alt": "Students discussing around a seminar table covered with books and papers.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-beyond-fact-fiction-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E4C5E"
     },
     {
       "id": "bunki-essay-n1-sacred-media",
@@ -14367,7 +14871,16 @@
           "額縁"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-sacred-media.webp",
+        "alt": "Plain wooden shrine buildings deep in a green forest, seen from above.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-sacred-media-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2E4634"
     },
     {
       "id": "bunki-essay-n1-ise-time",
@@ -14716,7 +15229,16 @@
           "高い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-ise-time.webp",
+        "alt": "A new shrine building of pale wood beside an empty gravel plot in a forest.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-ise-time-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A4B2E"
     },
     {
       "id": "bunki-essay-n1-miracle-testimony",
@@ -15035,7 +15557,16 @@
           "限界"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-miracle-testimony.webp",
+        "alt": "A small group sitting in a circle of chairs in a community hall, one person speaking.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-miracle-testimony-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A3B4F"
     },
     {
       "id": "bunki-essay-n1-prayer-reality",
@@ -15340,7 +15871,16 @@
           "黙る"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/bunki-essay-n1-prayer-reality.webp",
+        "alt": "Three people at a small table with a sheet of paper and mugs of tea.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/bunki-essay-n1-prayer-reality-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F4B5A"
     },
     {
       "id": "wikinews:44381",
@@ -15484,7 +16024,16 @@
           "閲覧"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-44381.webp",
+        "alt": "An empty floodlit football stadium at dusk.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-44381-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#1F3F7A"
     },
     {
       "id": "wikinews:45208",
@@ -15634,7 +16183,16 @@
           "高騰"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-45208.webp",
+        "alt": "A white car ferry leaving port on a hazy morning with gulls following.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-45208-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2C4F6E"
     },
     {
       "id": "wikinews:45095",
@@ -15800,7 +16358,16 @@
           "願う"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-45095.webp",
+        "alt": "Four microphone stands on a softly lit concert stage with glow sticks in the dark crowd.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-45095-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6A2E55"
     },
     {
       "id": "wikinews:45098",
@@ -15915,7 +16482,16 @@
           "閣僚"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-45098.webp",
+        "alt": "The National Diet Building in Tokyo under a clear winter sky.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-45098-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4A5E"
     },
     {
       "id": "wikinews:44384",
@@ -16078,7 +16654,16 @@
           "黒星"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-44384.webp",
+        "alt": "A referee's hand holding up a red card under stadium floodlights.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-44384-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#8A1F24"
     },
     {
       "id": "wikinews:45089",
@@ -16315,7 +16900,16 @@
           "首相"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-45089.webp",
+        "alt": "A ballot box at the front of a meeting room set with rows of empty chairs.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-45089-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E4A5C"
     },
     {
       "id": "wikinews:42478",
@@ -16425,7 +17019,16 @@
           "達成"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/wikinews-42478.webp",
+        "alt": "A runner's foot and hand sliding into second base in a spray of dirt.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/wikinews-42478-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#34506B"
     },
     {
       "id": "govonline:article-202609-radio-3739",
@@ -16595,7 +17198,16 @@
           "面"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-radio-3739.webp",
+        "alt": "The empty UN General Assembly hall with rows of desks facing the podium.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-radio-3739-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2B4C7E"
     },
     {
       "id": "env:press-press_05463",
@@ -16745,7 +17357,16 @@
           "閣僚"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05463.webp",
+        "alt": "Rows of young shrubs planted in straw grids on dry, sandy Mongolian steppe.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05463-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6E5228"
     },
     {
       "id": "env:press-press_05585",
@@ -17083,7 +17704,16 @@
           "Ｒ"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05585.webp",
+        "alt": "Visitors in hard hats watching a recycling conveyor belt from a walkway.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05585-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F5A4A"
     },
     {
       "id": "kantei:jp-105-actions-202609-15hyousyou",
@@ -17323,7 +17953,16 @@
           "願う"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/kantei-jp-105-actions-202609-15hyousyou.webp",
+        "alt": "Volunteer firefighters carrying a stretcher during a neighbourhood disaster drill.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/kantei-jp-105-actions-202609-15hyousyou-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2E3F5C"
     },
     {
       "id": "env:press-press_05575",
@@ -17627,7 +18266,16 @@
           "．"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05575.webp",
+        "alt": "A home-energy report with a bar chart and an electricity bill on a kitchen table.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05575-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5A4A"
     },
     {
       "id": "env:press-press_04591",
@@ -17808,7 +18456,16 @@
           "高い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-04591.webp",
+        "alt": "Scientists on a small boat lowering a water-sampling bottle into the sea.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-04591-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2A4A5E"
     },
     {
       "id": "env:press-press_05584",
@@ -18082,7 +18739,16 @@
           "高校"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05584.webp",
+        "alt": "Children in hard hats watching a bulldozer at a landfill among green hills.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05584-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A5A3A"
     },
     {
       "id": "env:press-press_05589",
@@ -18326,7 +18992,16 @@
           "％"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05589.webp",
+        "alt": "Stacked bales of compressed bottles, cans and cardboard at a recycling centre.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05589-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3B5B47"
     },
     {
       "id": "govonline:article-202609-tv-6623",
@@ -18520,7 +19195,16 @@
           "闇"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-tv-6623.webp",
+        "alt": "A teenager in a dark room looking at a glowing smartphone.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-tv-6623-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2C2A45"
     },
     {
       "id": "env:press-press_05582",
@@ -18709,7 +19393,16 @@
           "顕著"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05582.webp",
+        "alt": "A technician holding up a water sample beside the basins of a water treatment plant.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05582-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#23566A"
     },
     {
       "id": "kantei:jp-105-actions-202609-18fukudaijin",
@@ -18994,7 +19687,16 @@
           "高める"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/kantei-jp-105-actions-202609-18fukudaijin.webp",
+        "alt": "An empty red-carpeted staircase inside the Prime Minister's Office.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/kantei-jp-105-actions-202609-18fukudaijin-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6B2A2A"
     },
     {
       "id": "kantei:jp-105-actions-202609-19seimukan",
@@ -19292,7 +19994,16 @@
           "高める"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/kantei-jp-105-actions-202609-19seimukan.webp",
+        "alt": "A long meeting table with chairs and microphones in a government room at night.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/kantei-jp-105-actions-202609-19seimukan-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#34404F"
     },
     {
       "id": "mhlw:stf-newpage_76100",
@@ -19459,7 +20170,16 @@
           "項"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76100.webp",
+        "alt": "Two inspectors with clipboards walking along a hospital corridor.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76100-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2E5A66"
     },
     {
       "id": "mhlw:stf-newpage_76233",
@@ -19652,7 +20372,16 @@
           "順次"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76233.webp",
+        "alt": "People walking into a convention hall in Toyama with mountains in the distance.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76233-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F5266"
     },
     {
       "id": "mhlw:stf-newpage_76330",
@@ -19808,7 +20537,16 @@
           "％"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76330.webp",
+        "alt": "A hospital building with diagonal steel earthquake braces on its outside walls.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76330-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4A5A"
     },
     {
       "id": "sports:sports-b_menu-houdou-31-09-1421070_00039",
@@ -20001,7 +20739,16 @@
           "顕著"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/sports-sports-b-menu-houdou-31-09-1421070-00039.webp",
+        "alt": "A volunteer in a tracksuit leading residents of all ages in exercises in a school gym.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/sports-sports-b-menu-houdou-31-09-1421070-00039-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5D50"
     },
     {
       "id": "govonline:article-202609-radio-3741",
@@ -20163,7 +20910,16 @@
           "違い"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-radio-3741.webp",
+        "alt": "A sign-language interpreter signing beside a concert stage under a spotlight.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-radio-3741-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4B2E6B"
     },
     {
       "id": "kantei:jp-105-discourse-20260923message",
@@ -20418,7 +21174,16 @@
           "ＰＰＭ"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/kantei-jp-105-discourse-20260923message.webp",
+        "alt": "A reception table of wagyu, sashimi, scallops, melon and sake bottles.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/kantei-jp-105-discourse-20260923message-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6B3A2A"
     },
     {
       "id": "env:press-press_05569",
@@ -20738,7 +21503,16 @@
           "１日"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05569.webp",
+        "alt": "Volunteers in waders planting seagrass on a tidal flat at low tide.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05569-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2B5A5C"
     },
     {
       "id": "env:press-press_05603",
@@ -20915,7 +21689,16 @@
           "．"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05603.webp",
+        "alt": "Two pens on closed document folders on a signing table, the city beyond the window.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05603-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F4A5A"
     },
     {
       "id": "govonline:article-202609-tv-6628",
@@ -21123,7 +21906,16 @@
           "頼る"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-tv-6628.webp",
+        "alt": "Haul trucks on the terraces of a red-earth open-pit mine under a blue sky.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-tv-6628-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#7E3A1E"
     },
     {
       "id": "mext:b_menu-houdou-mext_01683",
@@ -21473,7 +22265,16 @@
           "高等"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mext-b-menu-houdou-mext-01683.webp",
+        "alt": "Students steering a home-made robot across a competition course in an arena.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mext-b-menu-houdou-mext-01683-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4F7A"
     },
     {
       "id": "env:press-press_05614",
@@ -21646,7 +22447,16 @@
           "順"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05614.webp",
+        "alt": "A factory with solar panels on its roofs and a belt of young trees around it, seen from above.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05614-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3D5A3A"
     },
     {
       "id": "env:press-press_05616",
@@ -21914,7 +22724,16 @@
           "１日"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05616.webp",
+        "alt": "A technician lifting the lid of a septic tank beside a house.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05616-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E5560"
     },
     {
       "id": "env:press-press_05643",
@@ -22195,7 +23014,16 @@
           "餌"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05643.webp",
+        "alt": "A close-up of golden-yellow ants on sandy soil beside a container yard.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05643-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#6B4A1E"
     },
     {
       "id": "kantei:jp-105-actions-202609-25startup",
@@ -22423,7 +23251,16 @@
           "Ｍｕｊｉｎ"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/kantei-jp-105-actions-202609-25startup.webp",
+        "alt": "A robot arm stacking mixed cardboard boxes onto a pallet in a warehouse.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/kantei-jp-105-actions-202609-25startup-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#34406A"
     },
     {
       "id": "mhlw:stf-houdou-newpage_75698",
@@ -22614,7 +23451,16 @@
           "項目"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-houdou-newpage-75698.webp",
+        "alt": "A person at a laptop looking at a map of nearby clinics, an insurance card on the table.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-houdou-newpage-75698-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5A6E"
     },
     {
       "id": "mhlw:stf-newpage_76360",
@@ -22820,7 +23666,16 @@
           "防止"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76360.webp",
+        "alt": "A chest X-ray on a lit viewing screen in a quiet clinic room.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76360-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2E4F63"
     },
     {
       "id": "jawiki:3492442",
@@ -22971,7 +23826,16 @@
           "項目"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-3492442.webp",
+        "alt": "An empty athletics stadium with a red track under evening floodlights.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-3492442-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#7A2E35"
     },
     {
       "id": "jawiki:5238864-s63",
@@ -23182,11 +24046,13 @@
       },
       "picture": {
         "src": "articles/pictures/jawiki-5238864-s63.webp",
-        "alt": "Placeholder: a pale-to-deep sky wash, standing in for an illustration of Typhoon No. 25.",
+        "alt": "A satellite view of a large typhoon spiral south of Japan.",
         "w": 1200,
-        "h": 800
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-5238864-s63-600.webp",
+        "wSmall": 600
       },
-      "accent": "#2f6c9a"
+      "accent": "#3B4A5A"
     },
     {
       "id": "jawiki:5294446",
@@ -23362,7 +24228,16 @@
           "頃"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-5294446.webp",
+        "alt": "The Prime Minister's Office in Tokyo, with its bamboo garden and cars at the entrance.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-5294446-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4D44"
     },
     {
       "id": "govonline:article-202609-radio-3743",
@@ -23521,11 +24396,13 @@
       },
       "picture": {
         "src": "articles/pictures/govonline-article-202609-radio-3743.webp",
-        "alt": "Placeholder: a warm clay wash, standing in for an illustration of a registered heritage building.",
+        "alt": "An old wooden bathhouse with a curved tiled roof, now a café.",
         "w": 1200,
-        "h": 800
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-radio-3743-600.webp",
+        "wSmall": 600
       },
-      "accent": "#9a4a2a"
+      "accent": "#5A3A2A"
     },
     {
       "id": "env:press-press_05591",
@@ -23839,7 +24716,16 @@
           "２人"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05591.webp",
+        "alt": "A small group with a guide walking along a riverbank among autumn hills.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05591-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3D5A45"
     },
     {
       "id": "mhlw:stf-newpage_76340",
@@ -24147,7 +25033,16 @@
           "Ｗ"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76340.webp",
+        "alt": "A pharmacist handing a bag of medicines to a patient across the counter.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76340-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5E5A"
     },
     {
       "id": "jawiki-news:2026-09-14",
@@ -24336,7 +25231,16 @@
           "首相"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-news-2026-09-14.webp",
+        "alt": "The stone front of the Bank of Japan building in Tokyo in the morning.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-news-2026-09-14-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#4A4A3A"
     },
     {
       "id": "sports:sports-b_menu-houdou-jsa_00246",
@@ -24552,7 +25456,16 @@
           "願う"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/sports-sports-b-menu-houdou-jsa-00246.webp",
+        "alt": "A new arena with a curved roof near the harbour, mountains in the distance.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/sports-sports-b-menu-houdou-jsa-00246-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F5070"
     },
     {
       "id": "global-voices:2026-09-28-65726",
@@ -24951,11 +25864,13 @@
       },
       "picture": {
         "src": "articles/pictures/global-voices-2026-09-28-65726.webp",
-        "alt": "Placeholder: a soft green-to-blue wash, standing in for an illustration of the solidarity fields near Damascus.",
+        "alt": "Syrian volunteers planting rows of seeds in a small green field at the edge of a town of flat-roofed houses.",
         "w": 1200,
-        "h": 800
+        "h": 800,
+        "srcSmall": "articles/pictures/global-voices-2026-09-28-65726-600.webp",
+        "wSmall": 600
       },
-      "accent": "#1f6491"
+      "accent": "#3E5A2E"
     },
     {
       "id": "jawiki-news:2026-09-21",
@@ -25135,7 +26050,16 @@
           "ｍ"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-news-2026-09-21.webp",
+        "alt": "Swimmers racing breaststroke in an indoor pool.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-news-2026-09-21-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#1F5A7A"
     },
     {
       "id": "adapt-n3:govonline:article-202609-radio-3741",
@@ -25302,7 +26226,16 @@
           "顔"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-radio-3741.webp",
+        "alt": "A sign-language interpreter signing beside a concert stage under a spotlight.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-radio-3741-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A3A6B"
     },
     {
       "id": "adapt-n3:govonline:article-202609-tv-6628",
@@ -25476,7 +26409,16 @@
           "頼る"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/govonline-article-202609-tv-6628.webp",
+        "alt": "Haul trucks on the terraces of a red-earth open-pit mine under a blue sky.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/govonline-article-202609-tv-6628-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4A5E"
     },
     {
       "id": "adapt-n3:env:press-press_05643",
@@ -25633,7 +26575,16 @@
           "頼む"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/env-press-press-05643.webp",
+        "alt": "A close-up of golden-yellow ants on sandy soil beside a container yard.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/env-press-press-05643-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3D4F5A"
     },
     {
       "id": "adapt-n3:jawiki:3492442",
@@ -25774,7 +26725,16 @@
           "開く"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-3492442.webp",
+        "alt": "An empty athletics stadium with a red track under evening floodlights.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-3492442-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A3F6A"
     },
     {
       "id": "adapt-n3:jawiki:5238864-s63",
@@ -25931,7 +26891,16 @@
           "雨"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/jawiki-5238864-s63.webp",
+        "alt": "A satellite view of a large typhoon spiral south of Japan.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/jawiki-5238864-s63-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3A4550"
     },
     {
       "id": "adapt-n3:global-voices:2026-09-28-65726",
@@ -26106,7 +27075,16 @@
           "食べる"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/global-voices-2026-09-28-65726.webp",
+        "alt": "Syrian volunteers planting rows of seeds in a small green field at the edge of a town of flat-roofed houses.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/global-voices-2026-09-28-65726-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A4626"
     },
     {
       "id": "mhlw:stf-newpage_76095",
@@ -26297,7 +27275,16 @@
           "％"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76095.webp",
+        "alt": "An inspector checking the safety guard of a factory machine while a worker watches.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76095-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E4A52"
     },
     {
       "id": "mhlw:stf-newpage_76126",
@@ -26554,7 +27541,16 @@
           "鵜飼"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76126.webp",
+        "alt": "An older worker showing a younger colleague a task at a workbench.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76126-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#5A4A3A"
     },
     {
       "id": "mhlw:stf-newpage_76152",
@@ -26795,7 +27791,16 @@
           "ＳＮＳ"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mhlw-stf-newpage-76152.webp",
+        "alt": "A workshop owner and an employee going over papers at a desk.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mhlw-stf-newpage-76152-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3E4E5E"
     },
     {
       "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
@@ -27017,7 +28022,16 @@
           "顕著"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/sports-sports-b-menu-houdou-31-09-1420919-00007.webp",
+        "alt": "Older residents playing ground golf on a riverside field.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/sports-sports-b-menu-houdou-31-09-1420919-00007-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#3F5F3A"
     },
     {
       "id": "mext:b_menu-houdou-2025-mext_00009",
@@ -27251,7 +28265,16 @@
           "高等"
         ],
         "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
-      }
+      },
+      "picture": {
+        "src": "articles/pictures/mext-b-menu-houdou-2025-mext-00009.webp",
+        "alt": "Small wheeled robots carrying crates between warehouse shelves.",
+        "w": 1200,
+        "h": 800,
+        "srcSmall": "articles/pictures/mext-b-menu-houdou-2025-mext-00009-600.webp",
+        "wSmall": 600
+      },
+      "accent": "#2F4A6A"
     }
   ]
 }
