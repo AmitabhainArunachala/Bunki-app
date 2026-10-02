@@ -256,6 +256,31 @@ def test_gate_windows_dedupes_and_applies_t1():
     assert "T1" in ff.gate(fake_item(title="男性が殺害された事件"), since, until, set())
 
 
+def test_a_per_row_title_source_wins_over_the_file_default(tmp_path, monkeypatch):
+    import json
+    import types
+
+    ff, paths, body, old, _changed = restage_shelf(tmp_path, monkeypatch)
+    paths["TITLES_PATH"].write_text(json.dumps({
+        "titleEnSource": "test", "titles": {old["id"]: "New ants at Kobe"},
+        "sources": {old["id"]: "publisher: https://example.org/new-ants-at-kobe"}}), "utf-8")
+    monkeypatch.setitem(sys.modules, "corpus.grading._mecab", types.SimpleNamespace(get_tagger=lambda: None))
+    seen = []
+
+    def fake_mint(row, title_en, title_source, _topic, as_of, _tagger, _maps):
+        seen.append(title_source)
+        shared = {"id": row["id"], "addedAt": as_of, "date": row["date"], "titleEn": title_en, "titleEnSource": title_source}
+        grading = {"signals": {"jreadability": {"band": "中級"}}}
+        return (dict(shared, text=row["text"]), dict(shared, file=body.name, chars=len(row["text"]), grading=grading),
+                dict(shared, kind="fresh", decision="pending"))
+
+    monkeypatch.setattr(ff, "mint", fake_mint)
+    assert ff.main() == 0
+    assert seen == ["publisher: https://example.org/new-ants-at-kobe"]
+    shelf = json.loads(paths["INDEX_PATH"].read_text("utf-8"))["articles"]
+    assert [r["titleEnSource"] for r in shelf] == ["publisher: https://example.org/new-ants-at-kobe"]
+
+
 def test_mint_writes_the_shelf_grammar_through_build_articles():
     pytest.importorskip("fugashi")
     import build_articles as ba
