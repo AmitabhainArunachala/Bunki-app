@@ -282,7 +282,18 @@ const rows = new Map(index.articles.map((record) => [record.id, record]));
 const FRESH_TITLES = JSON.parse(
   readFileSync(new URL('../../../docs/content/feed-fresh-titles-en.json', import.meta.url), 'utf8'),
 );
-const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08', FRESH_TITLES.titleEnSource]);
+const FEED_TITLES = JSON.parse(
+  readFileSync(new URL('../../../docs/content/feed-titles-en.json', import.meta.url), 'utf8'),
+);
+// 2026-10-02 (owner note 5): a shelf title is either the publisher's own
+// English headline, with its URL, or a faithful translation checked by a
+// second model family. The feeds' authoring markers still name rows a later
+// feed run mints before anyone checks them; the archive keeps its wrapper.
+const PUBLISHER_SOURCE = /^publisher: https:\/\/\S+$/;
+const CHECKED_SOURCE = (source) => source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
+const FEED_TITLE_MARKERS = new Set([FEED_TITLES.titleEnSource, FRESH_TITLES.titleEnSource]);
+const ARCHIVE_TITLE_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08', FRESH_TITLES.titleEnSource]);
+const titleSourceFor = (map, id) => map.sources?.[id] ?? map.titleEnSource;
 // rows still WAITING on a human — an 'approved' review value is a decided
 // row (TENOHIRA Decision 4: the rubric may lift 検収前 where the committed
 // queue says approved), and a decided row no longer wears the mark
@@ -298,26 +309,28 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
       ? missingEn.map((record) => record.id).join(', ')
       : `${index.articles.length}/${index.articles.length}`,
   );
-  const unsourced = index.articles.filter((record) => !TITLE_EN_SOURCES.has(record.titleEnSource));
+  const unsourced = index.articles.filter(
+    (record) => !CHECKED_SOURCE(record.titleEnSource) && !FEED_TITLE_MARKERS.has(record.titleEnSource),
+  );
   check(
     'every titleEn names its provenance in titleEnSource',
     unsourced.length === 0,
     unsourced.map((record) => record.id).join(', '),
   );
-  // 検収前 no longer means one thing: the 30 recovered originals and the feed
-  // mints wear AI-authored titles, while a row held for UNVERIFIED RIGHTS or
-  // an unverified source text keeps whatever title it already had. The rule
-  // is about who wrote the title, not about who is waiting.
-  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt && r.feed !== 'fresh').map((r) => r.id)]);
-  const wrongMarker = index.articles.filter((record) =>
-    record.feed === 'fresh'
-      ? record.titleEnSource !== FRESH_TITLES.titleEnSource || FRESH_TITLES.titles?.[record.id] !== record.titleEn
-      : aiTitled.has(record.id)
-        ? record.titleEnSource !== 'renkan-ai-2026-08'
-        : record.titleEnSource !== 'shelf-map-2026',
-  );
+  // The rule is about where the English came from, not about who is
+  // waiting: a feed row's title and provenance are whatever its titles file
+  // says (a per-row source wins over the file's authoring marker), and every
+  // other shelf row is a publisher headline or a cross-checked translation.
+  const feedMap = (record) =>
+    record.feed === 'fresh' ? FRESH_TITLES : Object.hasOwn(FEED_TITLES.titles ?? {}, record.id) ? FEED_TITLES : null;
+  const wrongMarker = index.articles.filter((record) => {
+    const map = feedMap(record);
+    return map
+      ? record.titleEnSource !== titleSourceFor(map, record.id) || map.titles?.[record.id] !== record.titleEn
+      : !CHECKED_SOURCE(record.titleEnSource);
+  });
   check(
-    'the title marker names its author: AI for the recovered and minted rows, the fresh-shelf titles file for fresh readings, the shelf map for the rest',
+    'every title says where its English came from: the publisher headline with its URL or a cross-checked translation, and a feed row matches its titles file',
     wrongMarker.length === 0,
     wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
   );
@@ -351,7 +364,7 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
     'every archive row carries a non-empty titleEn with wrapper provenance',
     archive.articles.length > 0 &&
       archiveMissingEn.length === 0 &&
-      TITLE_EN_SOURCES.has(archive.titleEnSource),
+      ARCHIVE_TITLE_SOURCES.has(archive.titleEnSource),
     archiveMissingEn.length
       ? archiveMissingEn
           .slice(0, 5)

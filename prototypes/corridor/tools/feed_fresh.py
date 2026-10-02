@@ -45,7 +45,8 @@ What one run does
            apart — the #42 law), the provenance pool of the source licence.
            English titles are authored, never generated: they come from
            docs/content/feed-fresh-titles-en.json (titleEnSource names who
-           wrote them). Every mint enters the shelf as review
+           wrote them; a per-row "sources" entry names a publisher headline
+           or a cross-checked translation and wins over it). Every mint enters the shelf as review
            "human-review-pending" with 検収前 in its sourceLabel, and gets a
            kind:"fresh" row in docs/content/feed-review-queue.json; only the
            operator's decision there (applied by feed_apply_review.py) lifts it.
@@ -112,6 +113,7 @@ def load_titles() -> dict:
     return {
         "titleEnSource": data.get("titleEnSource", ""),
         "titles": dict(data.get("titles", {})),
+        "sources": dict(data.get("sources", {})),
         "topics": dict(data.get("topics", {})),
         "skip": dict(data.get("skip", {})),
     }
@@ -456,7 +458,7 @@ def main() -> int:
             for record in (qrow, shelf_row, body):
                 record["titleEn"] = title_en
             for record in (shelf_row, body):
-                record["titleEnSource"] = titles["titleEnSource"]
+                record["titleEnSource"] = titles["sources"].get(qrow["id"], titles["titleEnSource"])
             body_path.write_text(json.dumps(body, ensure_ascii=False, separators=(",", ":")), "utf-8")
             retitled.append(qrow["id"])
         if retitled:
@@ -470,7 +472,7 @@ def main() -> int:
         for row in candidates:
             title_en = str(titles["titles"].get(row["id"], "")).strip()
             if title_en:
-                ready.append((row, title_en, titles["titleEnSource"]))
+                ready.append((row, title_en, titles["sources"].get(row["id"], titles["titleEnSource"])))
             elif args.allow_untitled:
                 ready.append((row, "", "untitled-pending"))
             else:

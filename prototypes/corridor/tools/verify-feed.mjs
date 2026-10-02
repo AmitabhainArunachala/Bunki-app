@@ -97,6 +97,14 @@ const recoveredIds = readFileSync(RECOVERED_SOURCE, 'utf8')
   .map((line) => JSON.parse(line).id);
 
 const curated = index.articles.filter((row) => !String(row.file || '').startsWith('archive/'));
+// who authored a shelf row's English title is data: the feed's titles maps
+// and the recovered-originals list name the rows the feed wrote, whatever
+// later provenance (a publisher headline, a cross-checked translation)
+// replaced the authoring marker in titleEnSource
+const feedAuthoredIds = new Set([...Object.keys(titles.titles ?? {}), ...Object.keys(freshTitles.titles ?? {}), ...recoveredIds]);
+const feedAuthored = (row) => row.titleEnSource === TITLE_EN_SOURCE || feedAuthoredIds.has(row.id);
+// the per-row provenance a titles file names wins over its authoring marker
+const titleSourceFor = (map, id) => map.sources?.[id] ?? map.titleEnSource;
 const curatedById = new Map(curated.map((row) => [row.id, row]));
 const archiveIds = new Set(archiveIndex.articles.map((row) => row.id));
 
@@ -159,7 +167,7 @@ check(
   `${curated.length} = ${PRE_FEED_SHELF} + ${liveMints.length} + ${liveFresh.length} fresh`,
 );
 const orphanFeedRows = curated.filter(
-  (row) => row.titleEnSource === TITLE_EN_SOURCE && !queue.some((entry) => entry.id === row.id),
+  (row) => feedAuthored(row) && !queue.some((entry) => entry.id === row.id),
 );
 check('no feed-authored row stands outside the queue — nothing minted without review cover', orphanFeedRows.length === 0, orphanFeedRows.map((row) => row.id).join(', '));
 
@@ -223,7 +231,7 @@ check(
 // --------------------------------------------------- nothing self-approves
 const selfApproved = curated.filter(
   (row) =>
-    row.titleEnSource === TITLE_EN_SOURCE &&
+    feedAuthored(row) &&
     row.review !== 'human-review-pending' &&
     queue.find((entry) => entry.id === row.id)?.decision !== 'approved',
 );
@@ -337,7 +345,7 @@ for (const mint of mintRows) {
 
   if (body.licence !== 'CC BY 2.5' || body.pool !== 'proprietary_safe') problems.push('licence/pool');
   if (!body.attribution || !body.url || !ISO_DATE.test(String(body.date))) problems.push('attribution/url/date');
-  if (body.titleEn !== mint.titleEn || body.titleEnSource !== TITLE_EN_SOURCE) problems.push('titleEn');
+  if (body.titleEn !== mint.titleEn || body.titleEnSource !== titleSourceFor({ ...titles, titleEnSource: TITLE_EN_SOURCE }, mint.id)) problems.push('titleEn');
   if (titles.titles?.[mint.id] !== mint.titleEn) problems.push('titleEn≠authored-map');
   if (body.addedAt !== mint.addedAt) problems.push('addedAt');
   const expectedReview = mint.decision === 'approved' ? 'approved' : 'human-review-pending';
@@ -401,7 +409,7 @@ for (const fresh of freshRows) {
   if (!freshSourceOk(body.licence) || body.pool !== FRESH_POOL(body.licence)) problems.push('licence/pool');
   if (!body.attribution || !/^https:\/\//.test(body.url ?? '') || !ISO_DATE.test(String(body.date)) || !body.termsUrl || !body.licenceUrl)
     problems.push('attribution/url/date/terms');
-  if (body.titleEn !== fresh.titleEn || body.titleEnSource !== freshTitles.titleEnSource || freshTitles.titles?.[fresh.id] !== fresh.titleEn)
+  if (body.titleEn !== fresh.titleEn || body.titleEnSource !== titleSourceFor(freshTitles, fresh.id) || freshTitles.titles?.[fresh.id] !== fresh.titleEn)
     problems.push('titleEn');
   if (body.date !== fresh.date || body.addedAt !== fresh.addedAt) problems.push('date/addedAt');
   const expectedReview = fresh.decision === 'approved' ? 'approved' : 'human-review-pending';
