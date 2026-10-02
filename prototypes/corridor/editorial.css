@@ -1654,12 +1654,16 @@ body[data-view='reader'] #app > main > .view-title-en {
   text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
   pointer-events: none;
 }
-@media (max-width: 520px) { .reader-picture-img { max-height: max(96px, calc(100svh - 724px)); } .reader-picture { margin-bottom: 16px; } }
-/* a word brought into view — by a keyboard's focus, a find, or a reader's own scroll-into-view —
-   stops clear of the glass bar above and of the floating sentence bar below (the picture moved the
-   article's opening lines down to where that bar rises) */
-html:has(> body[data-view='reader']) { scroll-padding-top: 64px; scroll-padding-bottom: 120px; }
-@media (max-width: 520px) { html:has(> body[data-view='reader']) { scroll-padding-bottom: calc(200px + env(safe-area-inset-bottom)); } }
+@media (max-width: 520px) {
+  .reader-picture-img { max-height: max(96px, calc(100svh - 724px)); transition: max-height var(--dur) var(--ease); }
+  .reader-picture { margin-bottom: 16px; }
+  /* while the text settings are open on a phone the picture folds to a slim band, so the panel
+     does not push the article's opening words down under the dock; it unfolds when they close */
+  body[data-view='reader'] #app > main:has(> .dials) .reader-picture-img { max-height: 44px; }
+  body[data-view='reader'] #app > main:has(> .dials) .reader-picture-caption { display: none; }
+  body.v-depth-layered .dials { padding: 12px; gap: 6px; }
+}
+@media (max-width: 520px) and (prefers-reduced-motion: reduce) { .reader-picture-img { transition: none; } }
 /* the level in the reader's bar, beside the title */
 body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align-self: center; margin: 0 6px 0 4px; min-height: 22px; padding: 0 8px; font-size: 12px; }
 .version-toggle {
@@ -1688,15 +1692,17 @@ body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align
 .version-toggle { background: color-mix(in srgb, var(--ink) 5%, var(--raised)); }
 .version-toggle .version-choice[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
 .dials-hint { margin: var(--s1) 0 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
-body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 0; border-radius: var(--r-card); background: var(--surface-sunk); box-shadow: none; padding: var(--s2); animation: feel-pop var(--dur) var(--ease); transform-origin: top right; }
-/* every segmented choice is an iOS segmented control: a grey track, the chosen segment a white knob */
-body .seg { gap: 2px; padding: 2px; border: 0; border-radius: 10px; background: var(--fill); overflow: visible; }
+body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 0; border-radius: var(--r-card); background: var(--surface-sunk); box-shadow: none; padding: var(--s2); }
+/* every segmented choice is an iOS segmented control: a grey track, the chosen segment a white knob
+   inset 2px inside its own 44px door (the track adds no height to the row) */
+body .seg { gap: 0; padding: 0; border: 0; border-radius: 10px; background: var(--fill); overflow: visible; }
 body .seg button {
   min-height: 44px;
-  padding: 2px 4px;
-  border: 0;
-  border-radius: 8px;
+  padding: 0 4px;
+  border: 2px solid transparent;
+  border-radius: 10px;
   background: transparent;
+  background-clip: padding-box;
   color: var(--label);
   font: 500 14px/1.25 var(--sans);
   letter-spacing: 0;
@@ -1707,7 +1713,6 @@ body .seg button .en-sub { font: 500 11px/1.2 var(--sans); letter-spacing: 0.01e
 body .seg button:hover:not([aria-pressed='true']) { background: rgb(255 255 255 / 45%); }
 body .seg button[aria-pressed='true'] { background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 0 0 0.5px rgb(0 0 0 / 5%); color: var(--label); font-weight: 600; }
 body .dial-label { font-family: var(--sans); color: var(--label-2); letter-spacing: 0; }
-@media (prefers-reduced-motion: reduce) { body.v-depth-layered .dials { animation: none; } }
 
 /* the play bar — only when the locked voice has clips for this article */
 .listen-row[hidden], .reader-actions[hidden], .teacher-door.reader-actions[hidden] { display: none !important; }
