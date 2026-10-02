@@ -34,7 +34,9 @@ which mode ran. The selection NEVER depends on the probe, so two runs over the
 same repo state pick the same tranche.
 
 English titles are authored, not generated: the mint refuses any candidate
-missing from docs/content/feed-titles-en.json (titleEnSource renkan-ai-2026-08).
+missing from docs/content/feed-titles-en.json (titleEnSource renkan-ai-2026-08,
+unless the file's per-row "sources" entry names a publisher headline or a
+cross-checked translation).
 
 Usage:
   python feed_ingest.py                 # one full loop, tranche of 6
