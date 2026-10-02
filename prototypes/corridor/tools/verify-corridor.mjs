@@ -2472,8 +2472,8 @@ async function main() {
     `tap 1: rt=${cyc1.rt} popup="${cyc1.popup}" → tap 2: popup=${cyc2.popup} → tap 3: popup="${cyc3.popup}"`);
   // the full entry is one choice in the word menu a press and hold opens — and 戻る works IMMEDIATELY.
   // The third tap above left the popup open, and a finger can't hold a word the popup covers, so
-  // put it away first, the way a reader would (Escape is the popup's own close).
-  await page.keyboard.press('Escape');
+  // put it away first, the way a reader would: the same word once more (checked just above).
+  await cycleTap();
   await page.waitForSelector('#mini', { state: 'hidden', timeout: 4000 });
   await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
   await page.waitForSelector('#reader-word-menu', { timeout: 6000 });
