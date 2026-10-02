@@ -14,13 +14,17 @@
 #bunki-reports-root button:hover { background: color-mix(in srgb, var(--br-ink) 8%, transparent); }
 #bunki-reports-root button:disabled { cursor: wait; opacity: .58; }
 #bunki-reports-root :focus-visible { outline: 2px solid var(--br-ink); outline-offset: 3px; }
-#bunki-reports-root .br-rail { position: fixed; z-index: 2147483000; inset: auto 18px calc(18px + env(safe-area-inset-bottom, 0px)) auto; margin: 0; padding: 0; display: flex; width: 52px; height: 52px; max-width: calc(100vw - 24px); overflow: visible; border: 0; background: transparent; color: var(--br-ink); }
+#bunki-reports-root .br-rail { position: fixed; z-index: 2147483000; inset: auto 14px calc(14px + env(safe-area-inset-bottom, 0px)) auto; margin: 0; padding: 0; display: flex; width: 44px; height: 44px; max-width: calc(100vw - 24px); overflow: visible; border: 0; background: transparent; color: var(--br-ink); }
 #bunki-reports-root .br-rail[popover]:not(:popover-open) { display: none; }
 #bunki-reports-root .br-rail::backdrop { background: transparent; pointer-events: none; }
-#bunki-reports-root .br-rail .br-bug { position: relative; display: grid; place-items: center; width: 52px; height: 52px; padding: 12px; border: 1.5px solid var(--br-ink); border-radius: 50%; background: var(--br-paper); color: var(--br-ink); box-shadow: 0 3px 0 color-mix(in srgb, var(--br-ink) 24%, transparent), 0 7px 20px rgba(20, 30, 40, .2); }
-#bunki-reports-root .br-rail .br-bug:hover { color: var(--br-paper); background: var(--br-ink); }
-#bunki-reports-root .br-bug svg { display: block; width: 26px; height: 26px; overflow: visible; pointer-events: none; }
-#bunki-reports-root .br-count { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid var(--br-paper); border-radius: 50%; font: 600 11px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; background: var(--br-ink); color: var(--br-paper); }
+/* the bug (FEEL pass, 2026-10-02: "far more subtle"): a small plain glyph in soft grey inside its
+   44px door — no disc, no outline — that gains contrast and a quiet 32px circle on hover or focus */
+#bunki-reports-root .br-rail .br-bug { position: relative; display: grid; place-items: center; width: 44px; height: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: rgb(110 110 118 / 88%); box-shadow: none; transition: color .2s ease; }
+#bunki-reports-root .br-rail .br-bug::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: transparent; transition: background-color .2s ease, box-shadow .2s ease; }
+#bunki-reports-root .br-rail .br-bug:is(:hover, :focus-visible) { color: var(--br-ink); background: transparent; }
+#bunki-reports-root .br-rail .br-bug:is(:hover, :focus-visible)::before { background: rgb(255 255 255 / 82%); box-shadow: 0 0 0 0.5px rgb(0 0 0 / 10%), 0 2px 8px rgb(0 0 0 / 10%); }
+#bunki-reports-root .br-bug svg { position: relative; display: block; width: 20px; height: 20px; overflow: visible; pointer-events: none; }
+#bunki-reports-root .br-count { position: absolute; top: 2px; right: 2px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid var(--br-paper); border-radius: 50%; font: 600 11px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; background: var(--br-ink); color: var(--br-paper); }
 #bunki-reports-root .br-count[hidden] { display: none; }
 #stroke-page #bunki-reports-root .br-rail, body.zen #bunki-reports-root .br-rail { top: calc(86px + env(safe-area-inset-top, 0px)); bottom: auto; }
 #bunki-reports-root .br-context-summary { padding: 12px 14px; border: 1px solid var(--br-line); border-left: 3px solid var(--br-ink); background: color-mix(in srgb, var(--br-paper) 93%, var(--br-ink)); font-size: 13px; }

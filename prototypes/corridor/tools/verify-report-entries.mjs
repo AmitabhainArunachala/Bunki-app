@@ -12,8 +12,9 @@
  *      reading door still opens its passage.
  *   R3 word sheet: the entry at the end of the sheet opens the dialog; the sheet's
  *      own back control still closes the sheet.
- *   R4 front door: the navigation strip carries the entry and it opens the dialog;
- *      closing it returns focus to the 回廊 symbol that opened the navigation.
+ *   R4 front door: (FEEL pass 2026-10-02, John: "report a problem takes up too much space, and is
+ *      redundant with the bug button") the navigation strip carries no second report entry; with
+ *      the strip open the permanent bug stays visible and uncovered, and it opens the dialog.
  *   R5 focused stage (読み探査 probe, body.zen): the page entry sits after the stage,
  *      opens the dialog, and the probe's reveal still takes a real click.
  *   R6 a room that failed to draw still carries the entry.
@@ -177,14 +178,14 @@ try {
     await page.goto(origin); await ready(page);
     check(`R1 ${w}px front door: the permanent bug entry is visible`, (await railVisible(page)));
     await page.locator('#ginga-symbol').click();
-    const navEntry = page.locator('button.nav-report[data-report-entry="open"]');
-    check(`R4 ${w}px front door: the navigation strip carries the entry`, (await navEntry.count()) === 1);
-    if (await navEntry.count()) {
-      await navEntry.click();
-      check(`R4 ${w}px front door: the entry opens the report dialog`, await reportOpen(page));
-      await closeReport(page);
-      check(`R4 ${w}px front door: closing returns focus to the 回廊 symbol`, await focusedIs(page, '#ginga-symbol'));
-    }
+    await page.waitForSelector('.nav-bar');
+    check(`R4 ${w}px front door: the navigation strip carries no second report entry`,
+      (await page.locator('.nav-bar [data-report-entry], .nav-bar .nav-report').count()) === 0);
+    check(`R4 ${w}px front door: with the strip open the permanent bug is still visible`, await railVisible(page));
+    const navBug = await fingerClick(page, '#bunki-report-bug');
+    check(`R4 ${w}px front door: the bug is uncovered beside the open strip and opens reporting`, navBug.uncovered && await reportOpen(page),
+      JSON.stringify(navBug));
+    if (await reportOpen(page)) await closeReport(page);
 
     // R8 the field entry (?entry=field) is a front door too; it carries the page entry
     await page.goto(`${origin}/index.html?entry=field`); await ready(page);

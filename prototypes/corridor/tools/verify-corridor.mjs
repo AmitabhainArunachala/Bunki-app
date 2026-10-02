@@ -1934,7 +1934,8 @@ async function main() {
   await page.waitForTimeout(1600);
   await page.tap('.nav-symbol');
   await page.waitForSelector('#nav-search-door');
-  await page.tap('#nav-search-door');
+  // the bar's field is a real field (FEEL pass 2026-10-02): typing carries the text into the room
+  await page.locator('#nav-search-door').fill('上手');
   await page.waitForSelector('#nav-search-input');
   await page.locator('#nav-search-input').fill('上手');
   await page.waitForFunction(() => [...document.querySelectorAll('.nav-search-row')].some((row) =>
@@ -3579,11 +3580,18 @@ async function main() {
   await page.waitForTimeout(1600);
   await page.tap('.nav-symbol');
   await page.waitForSelector('#nav-search-door');
+  // the bar's look-up field is a real field (FEEL pass 2026-10-02, John: "the search bar is too
+  // narrow here"): a tap only focuses it where it stands, and the first keystroke carries the text
+  // into the search room with the caret after it
   await page.tap('#nav-search-door');
+  const stayed = await page.evaluate(`({ view: document.body.dataset.view, focused: document.activeElement?.id ?? null })`);
+  await page.locator('#nav-search-door').fill('水');
   await page.waitForSelector('#nav-search-input');
-  const searchRoom = await page.evaluate(`document.body.dataset.view`);
-  check('R3-B · the bar’s search door opens the search room, a page of its own',
-    searchRoom === 'search', `view=${searchRoom}`);
+  const searchRoom = await page.evaluate(`({ view: document.body.dataset.view, q: document.getElementById('nav-search-input')?.value ?? null,
+    focused: document.activeElement?.id ?? null, caret: document.getElementById('nav-search-input')?.selectionStart ?? null })`);
+  check('R3-B · the bar’s look-up field takes a tap in place, and typing carries the text into the search room, a page of its own',
+    stayed.view === 'drift' && stayed.focused === 'nav-search-door' && searchRoom.view === 'search' && searchRoom.q === '水' &&
+      searchRoom.focused === 'nav-search-input' && searchRoom.caret === 1, JSON.stringify({ stayed, searchRoom }));
   await page.locator('#nav-search-input').fill('水');
   await page.waitForSelector('.nav-search-row', { timeout: 10000 });
   const rowsBefore = await page.locator('.nav-search-row').count();

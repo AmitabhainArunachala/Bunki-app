@@ -49,6 +49,11 @@ const esc = (value) =>
     /[&<>"']/gu,
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
   );
+/** The set's level as the app's level capsule, in its own colour (FEEL pass 2026-10-02). */
+const levelChip = (level) =>
+  /^N[1-5]$/u.test(String(level))
+    ? `<span class="level-chip" data-level="${esc(level)}">${esc(level)}</span>`
+    : esc(level);
 const keyOf = (node) => `${node.t}:${node.id}`;
 const nodeOf = (key) => {
   const at = key.indexOf(':');
@@ -616,7 +621,7 @@ export function createGuidedSession(host) {
 
   function setup() {
     const perKind = Q.length / 3;
-    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi(`案内つきの ${set.level} 稽古`, `a guided ${set.level} session`)}</span><h1 class="gs-title" tabindex="-1">${t('わかるための、<br>小さな部屋。', 'A little room<br>to understand.')}</h1><p class="gs-lede">${t('言葉、文法、短いお知らせ。先に答えても、必要なときに解説をひらいてもいい。', 'Words, grammar, and a short notice. Answer first, or ask for an explanation whenever you need one.')}</p><div class="gs-facts"><div><strong>${t(`${Q.length}問`, `${Q.length} questions`)}</strong><span>${Number.isInteger(perKind) ? t(`各分野${perKind}問`, `${perKind === 2 ? 'Two' : perKind} of each kind`) : t('三つの分野', 'Three kinds')}</span></div><div><strong>${t(`${set.minutes}分`, `${set.minutes} minutes`)}</strong><span>${t('目安で、時間制限ではない', 'A guide, not a timer')}</span></div><div><strong>${t('一本の糸', 'One thread')}</strong><span>${t('次へ持っていく', 'To carry forward')}</span></div></div><p>${t('終わると、間違えた問題と旗を立てた問題が「覚」に入り、その言葉は実際の覚えるデッキの札になる。外すことも、元の問題に戻ることも、新しい例で試すこともできる。', 'At the end, missed and flagged questions go into Learn, and their words become cards in your real 覚える deck. You can remove them, revisit the source, or try a new example.')}</p><details class="gs-details"><summary>${bi('この問題について', 'about these questions')}</summary><p>${esc(t(set.sourceNote.ja, set.sourceNote.en))}</p></details><div class="gs-actions">${btn(bi('最初の問題へ', 'start with the first question'), 'start', 'primary')}${textBtn(bi('戻る', 'back'), 'home')}</div></section>`;
+    return `<section class="gs-narrow"><span class="gs-eyebrow">${levelChip(set.level)} ${bi('案内つきの稽古', 'a guided session')}</span><h1 class="gs-title" tabindex="-1">${t('わかるための、<br>小さな部屋。', 'A little room<br>to understand.')}</h1><p class="gs-lede">${t('言葉、文法、短いお知らせ。先に答えても、必要なときに解説をひらいてもいい。', 'Words, grammar, and a short notice. Answer first, or ask for an explanation whenever you need one.')}</p><div class="gs-facts"><div><strong>${t(`${Q.length}問`, `${Q.length} questions`)}</strong><span>${Number.isInteger(perKind) ? t(`各分野${perKind}問`, `${perKind === 2 ? 'Two' : perKind} of each kind`) : t('三つの分野', 'Three kinds')}</span></div><div><strong>${t(`${set.minutes}分`, `${set.minutes} minutes`)}</strong><span>${t('目安で、時間制限ではない', 'A guide, not a timer')}</span></div><div><strong>${t('一本の糸', 'One thread')}</strong><span>${t('次へ持っていく', 'To carry forward')}</span></div></div><p>${t('終わると、間違えた問題と旗を立てた問題が「覚」に入り、その言葉は実際の覚えるデッキの札になる。外すことも、元の問題に戻ることも、新しい例で試すこともできる。', 'At the end, missed and flagged questions go into Learn, and their words become cards in your real 覚える deck. You can remove them, revisit the source, or try a new example.')}</p><details class="gs-details"><summary>${bi('この問題について', 'about these questions')}</summary><p>${esc(t(set.sourceNote.ja, set.sourceNote.en))}</p></details><div class="gs-actions">${btn(bi('最初の問題へ', 'start with the first question'), 'start', 'primary')}${textBtn(bi('戻る', 'back'), 'home')}</div></section>`;
   }
 
   function rail(phase) {
@@ -625,7 +630,7 @@ export function createGuidedSession(host) {
 
   function sessionTop() {
     const [ja, en] = kindLabel(current());
-    return `<div class="gs-session-top"><span class="gs-eyebrow">${set.level} · ${ja}${english() ? `<small class="gs-gloss">${en}</small>` : ''}</span><p class="exam-progress gs-count"><span>${state.index + 1} / ${Q.length}</span></p><nav class="gs-progress" aria-label="${esc(t('問題', 'Questions'))}">${Q.map((q, i) => `<button type="button" data-action="source" data-index="${i}" class="${answer(q).choice !== null ? 'done' : ''}" ${i === state.index ? 'aria-current="step"' : ''} aria-label="${esc(t(`問${i + 1}${answer(q).choice !== null ? '・回答済み' : ''}`, `Question ${i + 1}${answer(q).choice !== null ? ', answered' : ''}`))}">${i + 1}</button>`).join('')}</nav></div>`;
+    return `<div class="gs-session-top"><span class="gs-eyebrow">${levelChip(set.level)} · ${ja}${english() ? `<small class="gs-gloss">${en}</small>` : ''}</span><p class="exam-progress gs-count"><span>${state.index + 1} / ${Q.length}</span></p><nav class="gs-progress" aria-label="${esc(t('問題', 'Questions'))}">${Q.map((q, i) => `<button type="button" data-action="source" data-index="${i}" class="${answer(q).choice !== null ? 'done' : ''}" ${i === state.index ? 'aria-current="step"' : ''} aria-label="${esc(t(`問${i + 1}${answer(q).choice !== null ? '・回答済み' : ''}`, `Question ${i + 1}${answer(q).choice !== null ? ', answered' : ''}`))}">${i + 1}</button>`).join('')}</nav></div>`;
   }
 
   function aside(q) {
