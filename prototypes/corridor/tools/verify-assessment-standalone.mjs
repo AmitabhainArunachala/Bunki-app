@@ -77,7 +77,10 @@ const instrument = html => {
   return html.slice(0, cut) + '\n' + exposed.map(name => `Object.defineProperty(window,${JSON.stringify(name)},{get:()=>${name}});`).join('\n') + html.slice(cut);
 };
 const synthetic = instrument(original.replace(packPattern, (_all, open, _json, close) => open + JSON.stringify(fixture) + close));
-writeFileSync(resolve(evidence, 'synthetic-standalone.html'), synthetic);
+const documents = { public: resolve(evidence, 'public-instrumented-standalone.html'),
+  synthetic: resolve(evidence, 'synthetic-standalone.html') };
+writeFileSync(documents.public, instrument(original));
+writeFileSync(documents.synthetic, synthetic);
 // Observation only: no command wrapper, extra action, retry, or changed predicate.
 const clickDiagnostics = process.env.KAIRO_ASSESSMENT_CLICK_DIAGNOSTICS === '1';
 const results = [], failures = [];
@@ -86,17 +89,23 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
   const profile = mkdtempSync(resolve(evidence, `${engine}-${variant}-`));
   const browser = await ({ chromium, webkit }[engine]).launchPersistentContext(profile, { headless: true });
   const page = browser.pages()[0], errors = [], requests = [];
+  const documentURL = pathToFileURL(documents[variant]);
+  documentURL.search = '?entry=shelf&ui=bi';
   let publicWritten = null, stage = 'boot';
   page.on('pageerror', error => errors.push(error.message));
   await browser.route('**/*', route => {
-    if (route.request().isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: variant === 'public' ? instrument(original) : synthetic });
+    const request = route.request();
+    // Exercise the on-disk handoff without base64-encoding the full document
+    // through route.fulfill and exceeding Chromium's DevTools pipe limit.
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame() && request.url() === documentURL.href)
+      return route.continue();
     // WebKit routes document-local Blob modules through Playwright; Chromium
     // does not. They are embedded bytes, not external subresource requests.
-    if (/^(blob|data):/u.test(route.request().url())) return route.continue();
-    requests.push(route.request().url()); return route.abort();
+    if (!request.isNavigationRequest() && /^(blob|data):/u.test(request.url())) return route.continue();
+    requests.push(request.url()); return route.abort();
   });
   try {
-    await page.goto('http://127.0.0.1:3000/?entry=shelf&ui=bi', { waitUntil: 'domcontentloaded' });
+    await page.goto(documentURL.href, { waitUntil: 'domcontentloaded' });
     // Completed boot, not just a writable flag: recordRecovered can turn true before
     // createRecordApp resolves and before boot marks the body ready (Codex STANDALONE-FAILURE-REVIEW).
     await page.waitForFunction(() => document.body.dataset.ready === '1' && typeof recordWritable === 'function' && recordWritable()
@@ -111,6 +120,8 @@ for (const engine of engines) for (const variant of ['public', 'synthetic']) {
         entries: catalog.entries.length, fileCache: await (await cache.match('file:///public-test.json')).text() };
     });
     assert(runtime.methods); assert.equal(runtime.fileCache, 'fixture');
+    assert.equal(await page.locator('#standalone-assessment-assets').count(), 0,
+      'Loading the assessment catalog consumes the lazily parsed asset pack');
     stage = 'runtime-ready';
     if (variant === 'public') {
       stage = 'start';

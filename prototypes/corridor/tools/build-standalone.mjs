@@ -27,89 +27,24 @@ assert(fromCheckout === '..' || fromCheckout.startsWith('..' + sep) || isAbsolut
 assert(!existsSync(out + '.build.json'), 'Standalone receipt already exists; choose a fresh output.');
 const CORRIDOR = resolveCorridorSite();
 const read = (p) => readFileSync(resolve(CORRIDOR, p), 'utf8');
-const controllerBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['reading-controller.mjs'],
-  outfile: 'standalone-reading-controller.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(controllerBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(controllerBuild.metafile.outputs)[0].imports, [], 'Standalone controller must not depend on external modules');
-const controllerBytes = Buffer.from(controllerBuild.outputFiles[0].contents);
-const controllerUrl = 'data:text/javascript;base64,' + controllerBytes.toString('base64');
-const feedBytes = Buffer.from(read('modules/feed-core.mjs'));
-const feedUrl = 'data:text/javascript;base64,' + feedBytes.toString('base64');
-const feedControllerBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['feed-controller.mjs'],
-  outfile: 'standalone-feed-controller.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(feedControllerBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(feedControllerBuild.metafile.outputs)[0].imports, [], 'Standalone source controller must have no external imports');
-const feedControllerBytes = Buffer.from(feedControllerBuild.outputFiles[0].contents);
-const feedControllerUrl = 'data:text/javascript;base64,' + feedControllerBytes.toString('base64');
-const assessmentControllerBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['assessment-controller.mjs'],
-  outfile: 'standalone-assessment-controller.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(assessmentControllerBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(assessmentControllerBuild.metafile.outputs)[0].imports, [], 'Standalone assessment controller must have no external imports');
-const assessmentControllerBytes = Buffer.from(assessmentControllerBuild.outputFiles[0].contents);
-const assessmentControllerUrl = 'data:text/javascript;base64,' + assessmentControllerBytes.toString('base64');
-const publisherControllerBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['publisher-controller.mjs'],
-  outfile: 'standalone-publisher-controller.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(publisherControllerBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(publisherControllerBuild.metafile.outputs)[0].imports, [], 'Standalone publisher controller must have no external imports');
-const publisherControllerBytes = Buffer.from(publisherControllerBuild.outputFiles[0].contents);
-const publisherControllerUrl = 'data:text/javascript;base64,' + publisherControllerBytes.toString('base64');
-const sourceInboxBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['source-inbox.mjs'],
-  outfile: 'standalone-source-inbox.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(sourceInboxBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(sourceInboxBuild.metafile.outputs)[0].imports, [], 'Standalone source inbox must have no external imports');
-const sourceInboxUrl = 'data:text/javascript;base64,' + Buffer.from(sourceInboxBuild.outputFiles[0].contents).toString('base64');
-const teacherDraftControllerBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['teacher-draft-controller.mjs'],
-  outfile: 'standalone-teacher-draft-controller.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(teacherDraftControllerBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(teacherDraftControllerBuild.metafile.outputs)[0].imports, [], 'Standalone draft controller must have no external imports');
-const teacherDraftControllerBytes = Buffer.from(teacherDraftControllerBuild.outputFiles[0].contents);
-const teacherDraftControllerUrl = 'data:text/javascript;base64,' + teacherDraftControllerBytes.toString('base64');
-const sentenceDraftControllerBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['sentence-draft-controller.mjs'],
-  outfile: 'standalone-sentence-draft-controller.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(sentenceDraftControllerBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(sentenceDraftControllerBuild.metafile.outputs)[0].imports, [], 'Standalone sentence draft controller must have no external imports');
-const sentenceDraftControllerUrl = 'data:text/javascript;base64,' + Buffer.from(sentenceDraftControllerBuild.outputFiles[0].contents).toString('base64');
-const sentencePracticeBuild = buildSync({
-  absWorkingDir: CORRIDOR, entryPoints: ['sentence-practice.mjs'],
-  outfile: 'standalone-sentence-practice.mjs', bundle: true, format: 'esm',
-  platform: 'browser', target: ['safari17', 'chrome120'], charset: 'utf8',
-  minify: true, legalComments: 'inline', metafile: true, write: false,
-});
-assert.equal(sentencePracticeBuild.outputFiles.length, 1);
-assert.deepEqual(Object.values(sentencePracticeBuild.metafile.outputs)[0].imports, []);
-const sentencePracticeUrl = 'data:text/javascript;base64,' + Buffer.from(sentencePracticeBuild.outputFiles[0].contents).toString('base64');
-
-// The learner record is needed even when this file has no sibling assets.
-// Bundle its entry points together so their shared classes and module state
-// retain one identity; bundling each facade independently would duplicate them.
+// Bundle the app controllers together with the learner record. Independent
+// bundles repeated the reading/feed/assessment cores several times; one module
+// preserves their shared classes and state as well as carrying each byte once.
+const controllerImports = new Map([
+  ['READING_CONTROLLER', ['./reading-controller.mjs', 'readingController']],
+  ['READING_POSITION', ['./reading-position.mjs', 'readingPosition']],
+  ['TEACHER_CONTEXT', ['./teacher-context.mjs', 'teacherContext']],
+  ['TEACHER_DRAFTS', ['./teacher-drafts.mjs', 'teacherDrafts']],
+  ['TEACHER_DRAFT_CONTROLLER', ['./teacher-draft-controller.mjs', 'teacherDraftController']],
+  ['SENTENCE_DRAFTS', ['./sentence-drafts.mjs', 'sentenceDrafts']],
+  ['SENTENCE_DRAFT_CONTROLLER', ['./sentence-draft-controller.mjs', 'sentenceDraftController']],
+  ['ASSESSMENT_CONTROLLER', ['./assessment-controller.mjs', 'assessmentController']],
+  ['FEED_CONTROLLER', ['./feed-controller.mjs', 'feedController']],
+  ['PUBLISHER_CONTROLLER', ['./publisher-controller.mjs', 'publisherController']],
+  ['SOURCE_INBOX', ['./source-inbox.mjs', 'sourceInbox']],
+  ['SENTENCE_PRACTICE', ['./sentence-practice.mjs', 'sentencePractice']],
+  ['SOURCE_PROCESSING', ['./source-processing.mjs', 'sourceProcessing']],
+]);
 const recordImports = new Map([
   ['./record-controller.mjs', 'controller'],
   ['./record-binding.mjs', 'binding'],
@@ -131,7 +66,7 @@ const assessmentImports = new Map([
 ]);
 const recordRuntimeBuild = buildSync({
   absWorkingDir: CORRIDOR,
-  stdin: { contents: [...recordImports, ...assessmentImports].map(([specifier, name]) =>
+  stdin: { contents: [...recordImports, ...assessmentImports, ...controllerImports.values()].map(([specifier, name]) =>
     `export * as ${name} from ${JSON.stringify(specifier)};`).join('\n'),
   resolveDir: CORRIDOR, sourcefile: 'standalone-record-entry.mjs', loader: 'js' },
   outfile: 'standalone-record-runtime.mjs', bundle: true, format: 'esm',
@@ -186,14 +121,14 @@ function moduleUrlExpression(dataUrl) {
 }
 let appScript = read('corridor.js');
 assert(appScript.includes('window.__KAIRO_SHELF_ART_URL__'), 'Standalone shelf art requires the application asset URL hook');
-for (const [specifier, name] of recordImports) {
+for (const [specifier, name] of [...recordImports, ...assessmentImports]) {
   const original = `import('${specifier}')`;
-  assert.equal(appScript.split(original).length - 1, 1, `Standalone record import changed: ${specifier}`);
+  assert.equal(appScript.split(original).length - 1, 1, `Standalone runtime import changed: ${specifier}`);
   appScript = appScript.replace(original, `import(window.__KAIRO_RECORD_RUNTIME_URL__).then(module => module.${name})`);
 }
-for (const [specifier, name] of assessmentImports) {
-  const original = `import('${specifier}')`;
-  assert.equal(appScript.split(original).length - 1, 1, `Standalone assessment import changed: ${specifier}`);
+for (const [hook, [specifier, name]] of controllerImports) {
+  const original = `import(window.__KAIRO_${hook}_URL__ || '${specifier}')`;
+  assert.equal(appScript.split(original).length - 1, 1, `Standalone controller import changed: ${specifier}`);
   appScript = appScript.replace(original, `import(window.__KAIRO_RECORD_RUNTIME_URL__).then(module => module.${name})`);
 }
 assert.equal(appScript.split("import('./corridor-ink.js')").length - 1, 1, 'Standalone writing import changed');
@@ -343,10 +278,6 @@ ${driftScript}
 ${read('skip-core.js')}
 ${read('skip-ui.js')}
 </script>
-<script>
-${read('skip-core.js')}
-${read('skip-ui.js')}
-</script>
 <script type="module">
 ${tsfsrs}
 window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
@@ -366,14 +297,24 @@ function standaloneModuleUrl(base64) {
   ], { type: 'text/javascript' }));
 }
 window.__CORRIDOR_STANDALONE__ = true;
-window.__CORRIDOR_BUNDLE__ = JSON.parse(document.getElementById('corridor-bundle').textContent);
-const assessmentPackNode = document.getElementById('standalone-assessment-assets');
-const assessmentPack = new Map(Object.entries(JSON.parse(assessmentPackNode.textContent)).map(([path, value]) =>
-  [new URL(path, document.baseURI).href, value]));
-assessmentPackNode.remove();
+const corridorBundleNode = document.getElementById('corridor-bundle');
+window.__CORRIDOR_BUNDLE__ = JSON.parse(corridorBundleNode.textContent);
+corridorBundleNode.remove();
+// The public forms remain part of the handoff, including archived versions
+// referenced by saved work. Leave their JSON inert until assessment is used.
+let assessmentPack;
+function standaloneAssessmentPack() {
+  if (!assessmentPack) {
+    const node = document.getElementById('standalone-assessment-assets');
+    assessmentPack = new Map(Object.entries(JSON.parse(node.textContent)).map(([path, value]) =>
+      [new URL(path, document.baseURI).href, value]));
+    node.remove();
+  }
+  return assessmentPack;
+}
 const assessmentAddress = input => new URL(typeof input === 'string' || input instanceof URL ? input : input.url, document.baseURI).href;
 window.__KAIRO_ASSESSMENT_FETCH__ = async (input, init) => {
-  const entry = assessmentPack.get(assessmentAddress(input));
+  const entry = standaloneAssessmentPack().get(assessmentAddress(input));
   if (!entry || (init?.method || input?.method || 'GET') !== 'GET') return fetch(input, init);
   const bytes = Uint8Array.from(atob(entry.base64), character => character.charCodeAt(0));
   return new Response(bytes, { headers: { 'Content-Type': entry.mimeType } });
@@ -391,20 +332,6 @@ window.__KAIRO_ASSESSMENT_CACHE__ = {
     };
   },
 };
-window.__KAIRO_READING_CONTROLLER_URL__ = ${moduleUrlExpression(controllerUrl)};
-window.__KAIRO_TEACHER_CONTEXT_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'teacher-context.mjs')).toString('base64'))};
-window.__KAIRO_TEACHER_DRAFTS_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'teacher-drafts.mjs')).toString('base64'))};
-window.__KAIRO_TEACHER_DRAFT_CONTROLLER_URL__ = ${moduleUrlExpression(teacherDraftControllerUrl)};
-window.__KAIRO_SENTENCE_DRAFTS_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'sentence-drafts.mjs')).toString('base64'))};
-window.__KAIRO_SENTENCE_DRAFT_CONTROLLER_URL__ = ${moduleUrlExpression(sentenceDraftControllerUrl)};
-window.__KAIRO_READING_POSITION_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'reading-position.mjs')).toString('base64'))};
-window.__KAIRO_ASSESSMENT_CONTROLLER_URL__ = ${moduleUrlExpression(assessmentControllerUrl)};
-window.__KAIRO_FEED_CORE_URL__ = ${moduleUrlExpression(feedUrl)};
-window.__KAIRO_FEED_CONTROLLER_URL__ = ${moduleUrlExpression(feedControllerUrl)};
-window.__KAIRO_PUBLISHER_CONTROLLER_URL__ = ${moduleUrlExpression(publisherControllerUrl)};
-window.__KAIRO_SOURCE_INBOX_URL__ = ${moduleUrlExpression(sourceInboxUrl)};
-window.__KAIRO_SENTENCE_PRACTICE_URL__ = ${moduleUrlExpression(sentencePracticeUrl)};
-window.__KAIRO_SOURCE_PROCESSING_URL__ = ${moduleUrlExpression('data:text/javascript;base64,' + readFileSync(join(CORRIDOR, 'source-processing.mjs')).toString('base64'))};
 // App and Drift share one record module identity, including its classes/state.
 const standaloneRecordData = document.getElementById('standalone-record-module');
 window.__KAIRO_RECORD_RUNTIME_URL__ = standaloneModuleUrl(standaloneRecordData.textContent);
@@ -483,11 +410,8 @@ writeFileSync(out, emitted, { flag: 'wx' });
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORRIDOR,
   artifactSha256: JSON.parse(read('build-identity.json')).artifactSha256,
-  output: out, standaloneSha256: digest(readFileSync(out)), controllerSha256: digest(controllerBytes), feedSha256: digest(feedBytes),
-  assessmentControllerSha256: digest(assessmentControllerBytes),
-  feedControllerSha256: digest(feedControllerBytes),
-  publisherControllerSha256: digest(publisherControllerBytes),
-  teacherDraftControllerSha256: digest(teacherDraftControllerBytes),
+  output: out, standaloneSha256: digest(readFileSync(out)),
+  inlinedControllerModules: [...controllerImports.values()].map(([specifier]) => specifier),
   recordRuntimeSha256: digest(recordRuntimeBytes), inlinedRecordModules: [...recordImports.keys()],
   inlinedAssessmentModules: [...assessmentImports.keys()],
   assessmentAssets: [...assessmentAssets].map(([path, { bytes, sha256 }]) => ({ path, bytes, sha256 })),
