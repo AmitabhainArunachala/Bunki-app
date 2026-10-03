@@ -56,3 +56,9 @@ def test_a_freshly_minted_reading_reaches_the_shelf_with_facets(tmp_path, monkey
     assert row["readingFacets"]["jlpt"] == "N3"
     assert "environment" in row["readingFacets"]["topics"]
     assert row["readingFacets"]["forms"] == ["環境省"]
+
+
+def test_every_shelf_row_carries_the_facets_its_filters_read():
+    index = json.loads((ARTICLES / "index.json").read_text("utf-8"))
+    bare = [row["id"] for row in index["articles"] if "source-and-text-topics" not in row.get("readingFacets", {}).get("method", "")]
+    assert bare == []
