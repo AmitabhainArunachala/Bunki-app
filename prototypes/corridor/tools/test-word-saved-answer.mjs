@@ -1655,8 +1655,8 @@ function defineRows() {
       { n: 2, w: '生', r: 'せい', g: 'raw', d: '生', i: 1 },
       { n: 3, w: '架空の鉱脈語', r: 'カクウノコウミャクゴ', g: 'bundled answer', d: '束の語', i: 2 },
     ] };
-    const deck = { id: 'kotoba-mine', modules: [module] };
-    ctx.D.decks = new Map([[deck.id, deck]]);
+    const deck = { deckId: 'kotoba-mine', modules: [module] };
+    ctx.D.decks = new Map([[deck.deckId, deck]]);
     const deckDoor = ctx.deckWordNode(deck, module, module.cards[0]);
     for (const [first, second] of [[quick, deckDoor], [deckDoor, quick]]) {
       const record = apply(blank(), ctx.captureStorePatch(blank(), first, first.id, 1000));
@@ -1665,8 +1665,8 @@ function defineRows() {
     }
     const coreData = { ...SERVED, dict: { ...SERVED.dict, 生: { r: 'なま', m: ['raw'] } } };
     const coreCtx = app({ mode: 'main', data: coreData });
-    coreCtx.D.decks = new Map([[deck.id, deck]]);
-    const differentReading = { t: 'word', id: '生', deckSource: { deckId: deck.id, moduleId: module.id, card: 2 } };
+    coreCtx.D.decks = new Map([[deck.deckId, deck]]);
+    const differentReading = { t: 'word', id: '生', deckSource: { deckId: deck.deckId, moduleId: module.id, card: 2 } };
     assert.equal(coreCtx.wordCaptureState(differentReading, blank()), 'unavailable', 'the deck cannot silently borrow なま');
     assert.throws(() => coreCtx.captureStorePatch(blank(), differentReading, '生', 1000), (error) => error.code === 'word-answer-unavailable');
     assert.match(coreCtx.wordCaptureHeldText(differentReading), /せい.*なま/u, 'the held reason names both readings');
