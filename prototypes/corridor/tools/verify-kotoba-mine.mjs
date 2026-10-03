@@ -102,7 +102,7 @@ function verifyDeck() {
   check('every module passage stands on the shelf as an original-lane text', shapeProblems.length === 0, shapeProblems.slice(0, 4).join(' | ') || `${deck.modules.length} passages`);
   check('every card is anchored on a live token whose base form is its headword (the cloze can blank it)', anchorProblems.length === 0, anchorProblems.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
   const source = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
-  check('the room enrolls through the guarded store path only', source.includes('const patch = deckEnrollPatch(deck, mod, fresh);') && source.includes('commitStorePatch(patch)'));
+  check('the room enrolls through the guarded store path only', source.includes('const patch = deckEnrollPatch(deck, mod, mod.cards);') && source.includes('commitStorePatch(patch)'));
   return deck;
 }
 
@@ -111,6 +111,11 @@ async function main() {
   console.log('— 単語帳: the deck as data');
   const deck = verifyDeck();
   const m1 = deck.modules[0];
+  const m12 = deck.modules.find((m) => m.id === 'm12-kanji');
+  // a word already in the record before the deck existed (a legacy row that
+  // still waits for 始める, so the module review opens on a sentence card)
+  const pre = m1.cards[1].w;
+  const preRow = { t: 'word', id: pre, label: pre, kind: '語', kindEn: 'word', from: null, ts: 1 };
 
   console.log('\n— 単語帳: the room, in a real browser');
   const { server, base } = await startServer();
@@ -118,7 +123,7 @@ async function main() {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(`try {
     if (!localStorage.getItem('__deck_seeded')) {
-      localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(JSON.stringify({ v: 1, taken: [], srs: {} }))});
+      localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(JSON.stringify({ v: 1, taken: [preRow], srs: {} }))});
       localStorage.setItem('__deck_seeded', '1');
     }
   } catch {}`);
@@ -143,7 +148,7 @@ async function main() {
     await page.waitForSelector('#deck-enroll-all', { timeout: 8000 });
     const before = await store();
     const words = await page.evaluate(`document.querySelectorAll('[data-deck-enroll]').length`);
-    check('a module lists every word, and opening it enrolls nothing', words === m1.cards.length && before.taken.length === 0, `${words} words · ${before.taken.length} taken`);
+    check('a module lists every word, and opening it enrolls nothing', words === m1.cards.length && before.taken.length === 1, `${words} words · ${before.taken.length} taken`);
     const readDoor = await page.evaluate(`!!document.getElementById('deck-read')`);
     check('the module’s passage is one tap away', readDoor);
 
@@ -151,12 +156,16 @@ async function main() {
     await page.waitForFunction(`document.querySelectorAll('[data-deck-enroll]:disabled').length === ${m1.cards.length}`, null, { timeout: 8000 });
     const after = await store();
     const rows = after.taken.filter((t) => m1.cards.some((c) => c.w === t.id));
-    const withCtx = rows.filter((t) => t.t !== 'word' || (t.ctx?.p === m1.article && t.ctx.scope === 'sent' && Number.isInteger(t.ctx.i)));
+    const fresh = rows.filter((t) => t.id !== pre);
+    const withCtx = fresh.filter((t) => t.t === 'word' && t.ctx?.p === m1.article && t.ctx.scope === 'sent' && Number.isInteger(t.ctx.i));
+    const kept = rows.find((t) => t.id === pre);
     const listName = Object.keys(after.lists || {}).find((n) => n.includes(m1.title.ja.split(' — ')[0]));
-    check('ぜんぶ覚える enrolls every word as a started row with its mined sentence as context',
-      rows.length === m1.cards.length && rows.every((t) => Number.isFinite(t.started)) && withCtx.length === rows.length,
-      `${rows.length} rows · ${withCtx.length} with ctx`);
-    check('the module becomes a named list (the filtered-review scope)', !!listName && after.lists[listName].length === m1.cards.length, listName || 'no list');
+    check('ぜんぶ覚える enrolls every new word as a started row with its mined sentence as context',
+      rows.length === m1.cards.length && fresh.every((t) => Number.isFinite(t.started)) && withCtx.length === fresh.length,
+      `${rows.length} rows · ${withCtx.length}/${fresh.length} new rows with ctx`);
+    check('a word already taken from the reader keeps its own row untouched', JSON.stringify(kept) === JSON.stringify(preRow), JSON.stringify(kept));
+    check('the module list holds every word, the earlier-taken one included', !!listName && after.lists[listName].length === m1.cards.length &&
+      after.lists[listName].some((x) => x.id === pre), listName || 'no list');
 
     await page.waitForSelector('#deck-review', { timeout: 8000 });
     await page.click('#deck-review');
@@ -176,6 +185,17 @@ async function main() {
       return { taken: s.taken.length, quarantined: !!(alert && !alert.hidden && alert.textContent) };
     })()`);
     check('the enrolled rows survive a reload with no quarantine', reloaded.taken === m1.cards.length && !reloaded.quarantined, JSON.stringify(reloaded));
+
+    // single-kanji cards are asked inside a compound in their passage too
+    await page.click('#decks-link');
+    await page.waitForSelector(`[data-deck-module="${m12.id}"]`, { timeout: 15000 });
+    await page.click(`[data-deck-module="${m12.id}"]`);
+    await page.waitForSelector('#deck-enroll-all', { timeout: 8000 });
+    await page.click('#deck-enroll-all');
+    await page.waitForFunction(`document.querySelectorAll('[data-deck-enroll]:disabled').length === ${m12.cards.length}`, null, { timeout: 8000 });
+    const k = (await store()).taken.filter((t) => m12.cards.some((c) => c.w === t.id));
+    check('single-kanji cards enroll as sentence-anchored word rows, never bare-character rows',
+      k.length === m12.cards.length && k.every((t) => t.t === 'word' && t.ctx?.p === m12.article), `${k.filter((t) => t.ctx).length}/${m12.cards.length} anchored`);
     check('no console errors in the room', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
   } finally {
     await browser.close();

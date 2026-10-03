@@ -18,7 +18,7 @@
     "ja": "お金の時間 — 利息・返済・景気",
     "en": "Money over time: interest, repayment and the economy"
    },
-   "article": null,
+   "article": "kotoba-mine-m01-money",
    "passage": {
     "title": "足し算で増えるお金、掛け算で増えるお金 — 祖父の帳簿から",
     "title_en": "Money that grows by addition, money that grows by multiplication: from my grandfather's ledgers",
@@ -1179,7 +1179,7 @@
     "ja": "覇権の盤面 — 冷戦と半導体摩擦",
     "en": "The hegemony board: the Cold War and chip trade friction"
    },
-   "article": null,
+   "article": "kotoba-mine-m02-hegemony",
    "passage": {
     "title": "半導体をめぐる覇権の盤面 ― 日米摩擦から何を読むか",
     "title_en": "The Board of Chip Hegemony: What the US–Japan Friction Teaches",
@@ -2240,7 +2240,7 @@
     "ja": "砂から回路へ — 半導体ができるまで",
     "en": "From sand to circuits: how a chip is made"
    },
-   "article": null,
+   "article": "kotoba-mine-m03-fab",
    "passage": {
     "title": "砂から回路へ — 半導体ができるまで",
     "title_en": "From sand to circuits: how a chip is made",
@@ -3033,7 +3033,7 @@
     "ja": "事件の夜 — 捜索・証言・立件",
     "en": "The night of the incident: search, testimony, prosecution"
    },
-   "article": null,
+   "article": "kotoba-mine-m04-incident",
    "passage": {
     "title": "戻らなかったボート ― 三浦沖の捜索と、消えた証人",
     "title_en": "The Boat That Never Came Back: A Search off Miura and a Missing Witness",
@@ -4215,7 +4215,7 @@
     "ja": "議事堂の一日 — 国会・皇室・会見",
     "en": "A day at the Diet: parliament, the imperial house, press conferences"
    },
-   "article": null,
+   "article": "kotoba-mine-m05-politics",
    "passage": {
     "title": "議事堂の長い一日",
     "title_en": "A Long Day at the Diet",
@@ -5186,7 +5186,7 @@
     "ja": "橋が落ちた日 — 公共工事の検証",
     "en": "The day the bridge fell: auditing a public works project"
    },
-   "article": null,
+   "article": "kotoba-mine-m06-works",
    "passage": {
     "title": "橋が落ちた日 — 浜里町歩道橋崩落、県議会が検証",
     "title_en": "The day the bridge fell: the prefectural assembly audits the Hamasato footbridge collapse",
@@ -6013,7 +6013,7 @@
     "ja": "盤上の神童 — 勝負の言葉",
     "en": "The prodigy at the board: the language of competition"
    },
-   "article": null,
+   "article": "kotoba-mine-m07-board",
    "passage": {
     "title": "盤上の十七歳 — 朝霧湊、初のタイトル挑戦",
     "title_en": "Seventeen at the Board: Minato Asagiri's First Title Challenge",
@@ -7357,7 +7357,7 @@
     "ja": "脳と言葉の科学 — 習得・検証・身体",
     "en": "Brain and language science: acquisition, verification, the body"
    },
-   "article": null,
+   "article": "kotoba-mine-m08-mind",
    "passage": {
     "title": "大人の脳は第二言語をどう覚えるか",
     "title_en": "How the Adult Brain Learns a Second Language",
@@ -8467,7 +8467,7 @@
     "ja": "計算機と形式言語 — 理系の語彙",
     "en": "Computers and formal languages: STEM vocabulary"
    },
-   "article": null,
+   "article": "kotoba-mine-m09-math",
    "passage": {
     "title": "記号で世界を書く ― 引力から文法まで",
     "title_en": "Writing the World in Symbols: From Gravity to Grammar",
@@ -8884,7 +8884,7 @@
     "ja": "台所と旅の宿 — 食・暮らし・季節",
     "en": "Kitchen and inn: food, daily life, seasons"
    },
-   "article": null,
+   "article": "kotoba-mine-m10-table",
    "passage": {
     "title": "讃岐の秋、台所の音",
     "title_en": "Autumn in Sanuki, Sounds from the Kitchen",
@@ -9969,7 +9969,7 @@
     "ja": "人の顔つき — 態度・口癖・オノマトペ",
     "en": "Faces and attitudes: temperament, slang, onomatopoeia"
    },
-   "article": null,
+   "article": "kotoba-mine-m11-people",
    "passage": {
     "title": "銀髪の部長と、なんくるない夜",
     "title_en": "The Silver-Haired Boss and a Nankurunai Night",
@@ -11517,7 +11517,7 @@
     "ja": "単漢字 — 字の手ざわり",
     "en": "Single kanji: the feel of the character"
    },
-   "article": null,
+   "article": "kotoba-mine-m12-kanji",
    "passage": {
     "title": "一字の住まい — 漢字は熟語の中で暮らしている",
     "title_en": "Where a single kanji lives: characters at home in their compounds",

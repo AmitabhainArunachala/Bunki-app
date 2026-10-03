@@ -13,7 +13,7 @@ One source, four outputs:
       (renderSentenceTokens targetId === token.b) blanks exactly that word.
   prototypes/corridor/data/share_alike/decks/kotoba-mine.json
       the compact deck the corridor's 単語帳 room reads (cards + token index).
-  decks/kotoba-mine/dist/
+  decks/kotoba-mine/release/
       kotoba-mine.apkg  — Anki package (one note type, two card templates,
                           one subdeck per module); needs `pip install genanki`
       kotoba-mine.tsv   — plain tab-separated export for any other SRS
@@ -37,7 +37,7 @@ HERE = Path(__file__).resolve().parent
 DECK = HERE.parent
 REPO = DECK.parents[1]
 SRC = DECK / "source"
-DIST = DECK / "dist"
+DIST = DECK / "release"  # not dist/: the repo ignores every dist/ directory
 CORRIDOR = REPO / "prototypes" / "corridor"
 ARTICLES = CORRIDOR / "data" / "articles"
 CORRIDOR_DECK = CORRIDOR / "data" / "share_alike" / "decks" / "kotoba-mine.json"

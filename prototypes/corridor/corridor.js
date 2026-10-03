@@ -6210,39 +6210,49 @@ function ensureDeck(deckId) {
   return pending;
 }
 
-/** the SRS kind a deck card enrolls as: a single kanji the kanji layer holds
- * is a kanji card; everything else is a word */
-const deckCardKind = (card) => (card.kanji && [...card.w].length === 1 && D.kanji?.[card.w] ? 'kanji' : 'word');
+/** every deck card enrolls as a word row anchored in its passage — the
+ * single-kanji cards too, so they are asked inside a compound in a sentence
+ * rather than as a bare character (the kanji-row review has no cloze) */
+const deckHas = (card) => S.taken.some((t) => t.t === 'word' && t.id === card.w);
 const deckListName = (deck, mod) => `${deck.title.ja} · ${mod.title.ja.split(' — ')[0]}`;
 
 function deckEnrollPatch(deck, mod, cards) {
   const now = Date.now();
-  const inDeck = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
+  const inDeck = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
   const rows = [];
   const deep = { ...(S.deepWords || {}) };
   let deepTouched = false;
   for (const card of cards) {
-    const t = deckCardKind(card);
-    if (inDeck.has(srsKey(t, card.w))) continue;
-    inDeck.add(srsKey(t, card.w));
-    const row = { t, id: card.w, label: card.w, kind: NODE_KIND[t][0], kindEn: NODE_KIND[t][1], from: null, ts: now, started: now };
-    if (t === 'word' && Number.isInteger(card.i) && mod.article) {
+    if (inDeck.has(card.w)) continue;
+    inDeck.add(card.w);
+    const row = { t: 'word', id: card.w, label: card.w, kind: NODE_KIND.word[0], kindEn: NODE_KIND.word[1], from: null, ts: now, started: now };
+    if (Number.isInteger(card.i) && mod.article) {
       row.from = { passage: mod.article, index: card.i };
       row.ctx = { p: mod.article, i: card.i, scope: 'sent' };
       if (/^[ぁ-ゖー]+$/.test(card.r)) row.cueReading = card.r;
-      if (!D.dict[card.w] && !deep[card.w]) {
-        deep[card.w] = { r: /^[ぁ-ゖァ-ヺー]+$/.test(card.r) ? card.r : '', m: [card.g, card.d] };
-        deepTouched = true;
-      }
+    }
+    if (!D.dict[card.w] && !deep[card.w]) {
+      deep[card.w] = { r: /^[ぁ-ゖァ-ヺー]+$/.test(card.r) ? card.r : '', m: [card.g, card.d] };
+      deepTouched = true;
     }
     rows.push(row);
   }
-  if (!rows.length) return null;
+  // the module list holds every chosen word of the module — the ones just
+  // enrolled AND any the learner had already taken from the reader, whose
+  // rows (and their own chosen context) stay exactly as they were
   const name = deckListName(deck, mod);
   const list = [...(S.lists[name] || [])];
-  const listed = new Set(list.map((x) => srsKey(x.t, x.id)));
-  for (const r of rows) if (!listed.has(srsKey(r.t, r.id))) list.push({ t: r.t, id: r.id, label: r.label, ts: now });
-  const patch = { taken: [...S.taken, ...rows], lists: { ...S.lists, [name]: list } };
+  const listed = new Set(list.filter((x) => x.t === 'word').map((x) => x.id));
+  for (const card of cards) {
+    if (!inDeck.has(card.w) || listed.has(card.w)) continue;
+    listed.add(card.w);
+    list.push({ t: 'word', id: card.w, label: card.w, ts: now });
+  }
+  const listGrew = list.length !== (S.lists[name] || []).length;
+  if (!rows.length && !listGrew) return null;
+  const patch = {};
+  if (rows.length) patch.taken = [...S.taken, ...rows];
+  if (listGrew) patch.lists = { ...S.lists, [name]: list };
   if (deepTouched) patch.deepWords = deep;
   return patch;
 }
@@ -6281,7 +6291,7 @@ function renderDecks(main) {
       ),
     );
     for (const m of deck.modules) {
-      const have = m.cards.filter((c) => S.taken.some((t) => t.t === deckCardKind(c) && t.id === c.w)).length;
+      const have = m.cards.filter(deckHas).length;
       const row = el('button', 'entry-row deck-row');
       row.type = 'button';
       row.dataset.deckModule = m.id;
@@ -6311,13 +6321,18 @@ function renderDecks(main) {
     read.addEventListener('click', () => openPassage(mod.article));
     actions.append(read);
   }
-  const fresh = mod.cards.filter((c) => !S.taken.some((t) => t.t === deckCardKind(c) && t.id === c.w));
-  if (fresh.length) {
-    const all = biLabel('button', 'chip lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`);
+  const fresh = mod.cards.filter((c) => !deckHas(c));
+  // words taken earlier from the reader still belong to this module's list
+  const listedIds = new Set((S.lists[deckListName(deck, mod)] || []).map((x) => x.id));
+  const unlisted = mod.cards.some((c) => deckHas(c) && !listedIds.has(c.w));
+  if (fresh.length || unlisted) {
+    const all = fresh.length
+      ? biLabel('button', 'chip lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
+      : biLabel('button', 'chip lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
     all.type = 'button';
     all.id = 'deck-enroll-all';
     all.addEventListener('click', () => {
-      const patch = deckEnrollPatch(deck, mod, fresh);
+      const patch = deckEnrollPatch(deck, mod, mod.cards);
       if (patch && commitStorePatch(patch)) render();
     });
     actions.append(all);
@@ -6334,8 +6349,7 @@ function renderDecks(main) {
   }
   main.append(actions);
   for (const c of mod.cards) {
-    const t = deckCardKind(c);
-    const have = S.taken.some((x) => x.t === t && x.id === c.w);
+    const have = deckHas(c);
     const row = el('div', 'lesson-enroll-row deck-card');
     const word = el('span', 'lesson-enroll-word');
     word.append(document.createTextNode(c.w));

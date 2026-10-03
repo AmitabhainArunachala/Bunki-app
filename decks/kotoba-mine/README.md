@@ -11,10 +11,10 @@ The same deck runs in three places:
 | Where                    | File                                                                              | What you get                                                                                                                                                                                                                                   |
 | ------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Bunki** (the corridor) | `prototypes/corridor/data/share_alike/decks/kotoba-mine.json` + 12 shelf articles | Shelf → **単語帳**. Each module opens its passage in the reader, enrolls its words in one press (ぜんぶ覚える) and reviews only that module (この鉱脈だけ復習). Cards are reviewed with Bunki's own FSRS-6, blanked inside the mined sentence. |
-| **Anki**                 | `dist/kotoba-mine.apkg`                                                           | One note type, two card templates, one subdeck per module, tags per module and register.                                                                                                                                                       |
-| **Direct study, no app** | `dist/study.html`                                                                 | One self-contained page: open it in any browser. FSRS-6 scheduling, module toggles, reader with tappable mined words, word index, progress backup.                                                                                             |
+| **Anki**                 | `release/kotoba-mine.apkg`                                                        | One note type, two card templates, one subdeck per module, tags per module and register.                                                                                                                                                       |
+| **Direct study, no app** | `release/study.html`                                                              | One self-contained page: open it in any browser. FSRS-6 scheduling, module toggles, reader with tappable mined words, word index, progress backup.                                                                                             |
 
-A plain `dist/kotoba-mine.tsv` (Anki text-import headers, HTML fields) is there for
+A plain `release/kotoba-mine.tsv` (Anki text-import headers, HTML fields) is there for
 any other SRS.
 
 ## Method
@@ -86,7 +86,7 @@ semiconductor agreement, the Imperial House Law's male-line rule) are stated neu
 session, or only that module via この鉱脈だけ復習. Each module is also a named list
 (`言葉の鉱脈 · <module>`) in the lists tray.
 
-**Anki.** Import `dist/kotoba-mine.apkg`. You get the subdecks `言葉の鉱脈 Kotoba
+**Anki.** Import `release/kotoba-mine.apkg`. You get the subdecks `言葉の鉱脈 Kotoba
 Mine::01 …` to `::12 …`. Suspend modules you aren't ready for, or study them one by
 one. To turn on production cards, fill the `Production` field: in the Browser, select
 the notes, then _Notes → Find and Replace_ on field `Production`, regex `^$` → `y`.
@@ -108,7 +108,7 @@ source/AUTHORING_BRIEF.md  the authoring rules every module was written to
 tools/check_module.py      validator for one or more modules
 tools/build_deck.py        builds everything below
 deck.json                  canonical full deck (generated)
-dist/                      apkg, tsv, study.html, build-report.json (generated)
+release/                      apkg, tsv, study.html, build-report.json (generated)
 ```
 
 ```bash

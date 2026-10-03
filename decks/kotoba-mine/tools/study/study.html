@@ -943,6 +943,7 @@
       ),
     );
     if (!queue.length) queue = buildQueue();
+    else pullDueLearning();
     if (!cur || !queue.includes(cur.face))
       cur = queue.length ? { face: queue[0], revealed: false } : null;
     view.append(cur ? renderCard() : renderDone());
@@ -956,8 +957,41 @@
     view.append(renderVeins());
   }
 
+  /** learning faces whose step has come due join the front of the sitting */
+  function pullDueLearning(now = Date.now()) {
+    const due = [];
+    for (const [f, s] of Object.entries(st.cards)) {
+      const c = byKey.get(f.split(':')[0]);
+      if (
+        c &&
+        modOn(c.mod) &&
+        faces(c).includes(f) &&
+        s.s !== 'review' &&
+        s.due <= now &&
+        !queue.includes(f)
+      )
+        due.push(f);
+    }
+    due.sort((a, b) => st.cards[a].due - st.cards[b].due);
+    queue = [...due, ...queue];
+  }
+
+  let learnTimer = null;
   function renderDone() {
     const nd = nextLearnDue();
+    clearTimeout(learnTimer);
+    if (nd) {
+      // come back on our own when the next learning step is due
+      learnTimer = setTimeout(
+        () => {
+          if (tab === 'study' && !cur) {
+            queue = [];
+            render();
+          }
+        },
+        Math.max(0, nd - Date.now()) + 500,
+      );
+    }
     const box = h('section', { class: 'bench empty' });
     box.append(h('h2', {}, '今日の分は掘り終えた'));
     box.append(
@@ -1211,11 +1245,10 @@
     st.log.push([f, g, now]);
     if (st.log.length > 5000) st.log = st.log.slice(-5000);
     save();
+    // a graded face leaves the sitting; a learning step re-enters only once
+    // it is actually due (pullDueLearning, or the timer renderDone arms)
     queue = queue.filter((x) => x !== f);
-    if (next.s !== 'review' && next.due - now < 30 * MIN) {
-      // learning steps come back inside the sitting, after a few other cards
-      queue.splice(Math.min(queue.length, 3), 0, f);
-    }
+    pullDueLearning(now);
     cur = queue.length ? { face: queue[0], revealed: false } : null;
     render();
   }
