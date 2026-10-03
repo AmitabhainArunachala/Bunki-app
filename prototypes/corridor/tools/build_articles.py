@@ -63,6 +63,7 @@ NINJAL_UNAVAILABLE_REASON = (
     "build environment (egress policy); run the build where "
     "mmsrv.ninjal.ac.jp is reachable to fill this pair in"
 )
+CURATED_ROW_FIELDS = ("titleEn", "titleEnSource", "picture", "accent")
 
 
 # --------------------------------------------------------------------------
@@ -600,6 +601,16 @@ def main() -> int:
     articles = collect_articles()
     print(f"· {len(articles)} articles through the pipeline")
 
+    # no source carries the authored English titles or the drawn pictures —
+    # a rebuilt row keeps them from the index it replaces
+    previous = out / "index.json"
+    curated = {}
+    if previous.exists():
+        curated = {
+            row["id"]: {k: row[k] for k in CURATED_ROW_FIELDS if k in row}
+            for row in json.loads(previous.read_text("utf-8"))["articles"]
+        }
+
     ninjal_live = 0
     index_rows: list[dict] = []
     for a in articles:
@@ -631,6 +642,7 @@ def main() -> int:
         row["grading"] = grading
         row["seeds"] = seeds
         row["truncated"] = False
+        row.update(curated.get(a["id"], {}))
         index_rows.append(row)
 
         jr = grading["signals"]["jreadability"]

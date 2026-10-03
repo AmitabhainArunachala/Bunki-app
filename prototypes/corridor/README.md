@@ -139,6 +139,14 @@ node prototypes/corridor/tools/build_fsrs_pin.mjs
 node prototypes/corridor/tools/build-standalone.mjs
 ```
 
+No source carries a row's authored English title (`titleEn`,
+`titleEnSource`) or its drawn picture (`picture`, `accent`), so
+`build_articles.py` copies those four fields from the `index.json` it replaces
+onto every row it rebuilds (`tools/test_build_articles.py`). It rebuilds only
+the rows it collects from the sources above; rows from any other source (the
+fresh readings, the native originals, the WP9b catalog) are not re-emitted,
+and their pictures leave the index with them.
+
 Debian's patched setuptools cannot build `unidic-lite`'s sdist
 (`AttributeError: install_layout`); a plain venv with upstream setuptools can.
 
