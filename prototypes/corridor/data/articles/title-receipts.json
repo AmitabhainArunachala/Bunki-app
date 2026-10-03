@@ -1,0 +1,1643 @@
+{
+  "about": "Where each shelf title's English came from (owner note 5, decision 2026-10-03). Publisher rows record the page headline compared against; translations record the independent model-family checks. verify-native-readings.mjs reads this file.",
+  "publisher": {
+    "wikinews:45227": {
+      "label": "publisher",
+      "url": "https://en.wikinews.org/wiki/Wikimedia_Foundation_closes_Wikinews_after_21_years",
+      "pageHeadline": "Wikimedia Foundation closes Wikinews after 21 years",
+      "checkedOn": "2026-10-03"
+    },
+    "aozora:051034": {
+      "label": "established English title",
+      "url": "https://books.google.com/books/about/Wild_roses.html?id=Ukj6MAAACAAJ",
+      "pageHeadline": "Wild Roses",
+      "checkedOn": "2026-10-03"
+    },
+    "aozora:000628": {
+      "label": "established English title",
+      "url": "https://www.kodomo.go.jp/jcl/e/person/niimi.html",
+      "pageHeadline": "Japanese Authors of Children's Literature: A Special-Feature Section of Outstanding Authors",
+      "checkedOn": "2026-10-03"
+    },
+    "aozora:046605": {
+      "label": "established English title",
+      "url": "https://www.kodomo.go.jp/jcl/e/person/miyazawa.html",
+      "pageHeadline": "Japanese Authors of Children's Literature: A Special-Feature Section of Outstanding Authors",
+      "checkedOn": "2026-10-03"
+    },
+    "real-gokajo": {
+      "label": "established English title",
+      "url": "https://www.ndl.go.jp/modern/e/cha1/index.html",
+      "pageHeadline": "Initial Steps toward a Constitutional State : Outline | Modern Japan in archives",
+      "checkedOn": "2026-10-03"
+    },
+    "real-hojoki": {
+      "label": "established English title, adapted",
+      "url": "https://www.penguinrandomhouse.com/books/316262/essays-in-idleness-and-hojoki-by-kenko-and-chomei/",
+      "pageHeadline": "Essays in Idleness and Hojoki",
+      "checkedOn": "2026-10-03"
+    },
+    "real-tsurezure": {
+      "label": "established English title, adapted",
+      "url": "https://www.penguinrandomhouse.com/books/316262/essays-in-idleness-and-hojoki-by-kenko-and-chomei/",
+      "pageHeadline": "Essays in Idleness and Hojoki",
+      "checkedOn": "2026-10-03"
+    },
+    "env:press-press_05463": {
+      "label": "publisher, shortened",
+      "url": "https://www.env.go.jp/en/press/press_02698.html",
+      "pageHeadline": "Outcomes of the 17th Session of the Conference of the Parties to the United Nations Convention to Combat Desertification (UNCCD COP17) in Ulanbaatar, Mongolia",
+      "checkedOn": "2026-10-03"
+    },
+    "env:press-press_04591": {
+      "label": "publisher",
+      "url": "https://www.env.go.jp/en/press/press_02003.html",
+      "pageHeadline": "Publication of a report on Interlaboratory Comparison conducted by IAEA",
+      "checkedOn": "2026-10-03"
+    },
+    "kantei:jp-105-actions-202609-18fukudaijin": {
+      "label": "publisher",
+      "url": "https://japan.kantei.go.jp/105/actions/202609/0918state.html",
+      "pageHeadline": "First Meeting of State Ministers and Commemorative Photograph Session",
+      "checkedOn": "2026-10-03"
+    },
+    "kantei:jp-105-actions-202609-19seimukan": {
+      "label": "publisher",
+      "url": "https://japan.kantei.go.jp/105/actions/202609/0918seimu.html",
+      "pageHeadline": "First Meeting of Parliamentary Vice-Ministers and Commemorative Photograph Session",
+      "checkedOn": "2026-10-03"
+    },
+    "env:press-press_05603": {
+      "label": "publisher, shortened",
+      "url": "https://www.env.go.jp/en/press_00017.html",
+      "pageHeadline": "Renewal of the Memorandum of Cooperation on Environmental Matters between the Ministry of the Environment of Japan and the Ministry of Sustainability and the Environment of the Republic of Singapore",
+      "checkedOn": "2026-10-03"
+    },
+    "kantei:jp-105-actions-202609-25startup": {
+      "label": "publisher",
+      "url": "https://japan.kantei.go.jp/105/actions/202609/25startup.html",
+      "pageHeadline": "Commendation Ceremony for the Nippon Startup Awards 2026",
+      "checkedOn": "2026-10-03"
+    },
+    "jawiki:3492442": {
+      "label": "publisher",
+      "url": "https://en.wikipedia.org/wiki/2026_Asian_Games",
+      "pageHeadline": "2026 Asian Games",
+      "checkedOn": "2026-10-03"
+    },
+    "jawiki:5238864-s63": {
+      "label": "publisher, shortened",
+      "url": "https://en.wikipedia.org/wiki/2026_Pacific_typhoon_season#Typhoon_Dujuan",
+      "pageHeadline": "2026 Pacific typhoon season",
+      "checkedOn": "2026-10-03"
+    },
+    "global-voices:2026-09-28-65726": {
+      "label": "publisher",
+      "url": "https://globalvoices.org/2026/05/21/solidarity-fields-in-syria-reviving-local-seed-production/",
+      "pageHeadline": "Solidarity fields in Syria: Reviving local seed production",
+      "checkedOn": "2026-10-03"
+    }
+  },
+  "translations": {
+    "adapt-n3:env:press-press_05643": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Golden Fire Ants Found at Kobe Port"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Golden Fire Ants Found at Kobe Port"
+      }
+    ],
+    "adapt-n3:global-voices:2026-09-28-65726": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Solidarity Fields in Syria"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Solidarity Fields in Syria"
+      }
+    ],
+    "adapt-n3:govonline:article-202609-radio-3741": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Sign Language Is a 'Language' Too"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Sign Language Is a 'Language' Too"
+      }
+    ],
+    "adapt-n3:govonline:article-202609-tv-6628": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The 'Critical Minerals' Needed for Smartphones and Electric Cars"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The 'Critical Minerals' Needed for Smartphones and Electric Cars"
+      }
+    ],
+    "adapt-n3:jawiki:3492442": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Asian Games in Aichi and Nagoya"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Asian Games in Aichi and Nagoya"
+      }
+    ],
+    "adapt-n3:jawiki:5238864-s63": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Typhoon No. 25 and Record Rainfall"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Typhoon No. 25 and Record Rainfall"
+      }
+    ],
+    "bunki-essay-n1-ai": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Knowledge and Judgment in the Age of AI"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Knowledge and Judgment in the Age of AI"
+      }
+    ],
+    "bunki-essay-n1-beyond-fact-fiction": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Not Judging Myth Simply as 'Fact or Fiction'"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Not Judging Myth by 'Fact or Fiction'"
+      }
+    ],
+    "bunki-essay-n1-city": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Urban Anonymity and Language"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Urban Anonymity and Language"
+      }
+    ],
+    "bunki-essay-n1-cosmic-analogy": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Temptation to Read the Three Deities of Creation as Cosmology"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Temptation to Read the Three Deities of Creation as Cosmology"
+      }
+    ],
+    "bunki-essay-n1-first-versus-supreme": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Problem with Calling the First God the 'Supreme God'"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Problem with Calling the First God the 'Supreme God'"
+      }
+    ],
+    "bunki-essay-n1-ise-time": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Musuhi, Nature, Repetition: Time at Ise"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Musuhi, Nature, Repetition: Time at Ise"
+      }
+    ],
+    "bunki-essay-n1-kojiki-power": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Compiling the Kojiki: A Story of Power"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Compiling the Kojiki: A Story of Power"
+      }
+    ],
+    "bunki-essay-n1-memory": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Designing for Forgetting"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Designing for Forgetting"
+      }
+    ],
+    "bunki-essay-n1-miracle-testimony": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Miracle Stories and the Responsibility of Knowing"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Miracle Stories and the Responsibility of Knowing"
+      }
+    ],
+    "bunki-essay-n1-nakaima-time-theory": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Can Nakaima Become a Theory of Time?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Can Nakaima Become a Theory of Time?"
+      }
+    ],
+    "bunki-essay-n1-prayer-reality": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Whose Reality Do Words of Prayer Change?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Whose Reality Do Words of Prayer Change?"
+      }
+    ],
+    "bunki-essay-n1-sacred-media": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "How Film Made to Be 'Felt' Constructs the Sacred"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Film Meant to Be 'Felt' Constructs the Sacred"
+      }
+    ],
+    "bunki-essay-n1-silent-god-theology": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Silent God and a Theology of Absence"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Silent God and a Theology of Absence"
+      }
+    ],
+    "bunki-essay-n2-creator-god": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Accurate Is the Term 'Creator God'?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Accurate Is the Term 'Creator God'?"
+      }
+    ],
+    "bunki-essay-n2-feel-jingu-musubi": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Musuhi as the Film Conveys It"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Musuhi as the Film Conveys It"
+      }
+    ],
+    "bunki-essay-n2-handwriting": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "On Writing by Hand"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "On Writing by Hand"
+      }
+    ],
+    "bunki-essay-n2-kojiki-myth-history": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Kojiki: Myth or History?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Kojiki: Myth or History?"
+      }
+    ],
+    "bunki-essay-n2-mountain": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Thoughts While Walking in the Mountains"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Thoughts While Walking in the Mountains"
+      }
+    ],
+    "bunki-essay-n2-myth-to-book": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "From Storytelling to Book: Compiling the Myths"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "From Storytelling to Book: Compiling the Myths"
+      }
+    ],
+    "bunki-essay-n2-nakaima-time": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Past, Present, Future, and Nakaima"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Past, Present, Future, and Nakaima"
+      }
+    ],
+    "bunki-essay-n2-notebook": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Notebook for the Margins"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Notebook for the Margins"
+      }
+    ],
+    "bunki-essay-n2-prayer-on-screen": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Prayer Looks on Screen"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Prayer Looks on Screen"
+      }
+    ],
+    "bunki-essay-n2-rain": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Speed of a Rainy Day"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Speed of a Rainy Day"
+      }
+    ],
+    "bunki-essay-n2-silent-amenominakanushi": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Amenominakanushi: How to Read a God the Text Says Almost Nothing About"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Amenominakanushi: How to Read a God the Text Says Almost Nothing About"
+      }
+    ],
+    "bunki-essay-n2-testimony-literacy": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Should We Take a Personal Testimony?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "How Should We Take a Personal Testimony?"
+      }
+    ],
+    "bunki-essay-n2-thanks-first": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Psychology of Saying 'Thank You' First"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Psychology of Saying 'Thank You' First"
+      }
+    ],
+    "bunki-essay-n2-translation": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "On Words That Can't Be Translated"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "On Words That Can't Be Translated"
+      }
+    ],
+    "bunki-essay-n2-zoka-as-one": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Reading the Three Deities as One Force at Work"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Reading the Three Deities as One Force at Work"
+      }
+    ],
+    "bunki-graded-n3-feel-jingu-forest": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Walking the Forest of Ise Jingū Through Film"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Walking the Forest of Ise Jingū Through Film"
+      }
+    ],
+    "bunki-graded-n3-gratitude-week": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "I Tried Reciting Words of Thanks for a Week"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "I Tried Reciting Words of Thanks for a Week"
+      }
+    ],
+    "bunki-graded-n3-hashira-counter": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Why Gods Are Counted in 'Hashira' (Pillars)"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Why Gods Are Counted with 'Hashira', the Word for Pillar"
+      }
+    ],
+    "bunki-graded-n3-hidden-deity": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Gods Who Hid Themselves"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Gods Who Hid Themselves"
+      }
+    ],
+    "bunki-graded-n3-kojiki-book": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "What Kind of Book Is the Kojiki?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "What Kind of Book Is the Kojiki?"
+      }
+    ],
+    "bunki-graded-n3-musubi-visual": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Musuhi, Which Connects Heaven, Earth and Prayer"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Musuhi, Which Connects Heaven, Earth and Prayer"
+      }
+    ],
+    "bunki-graded-n3-nakaima-diary": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Day of Feeling Nakaima, the Present Moment"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Day of Feeling Nakaima, the Present Moment"
+      }
+    ],
+    "bunki-graded-n3-radio": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Late-night Radio"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Late-night Radio"
+      }
+    ],
+    "bunki-graded-n3-river": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Path Along the River"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Path Along the River"
+      }
+    ],
+    "bunki-graded-n3-thanks-before-help": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "'Thank You' Before 'Help Me'?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "'Thank You' Before 'Help Me'?"
+      }
+    ],
+    "bunki-graded-n3-town": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Walking Through an Unfamiliar Town"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Walking Through an Unfamiliar Town"
+      }
+    ],
+    "bunki-graded-n3-world-beginning": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Three Gods Who Appeared at the Beginning of the World"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Three Gods Who Appeared at the Beginning of the World"
+      }
+    ],
+    "bunki-graded-n3-zoka-sanjin-morning": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Morning Encounter with the Three Deities of Creation"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Morning Encounter with the Three Deities of Creation"
+      }
+    ],
+    "bunki-graded-n4-bicycle": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Day I Lost My Bicycle"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Day I Lost My Bicycle"
+      }
+    ],
+    "bunki-graded-n4-bookshop": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Second-hand Bookshop on a Rainy Day"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Second-hand Bookshop on a Rainy Day"
+      }
+    ],
+    "bunki-graded-n4-letter": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Letter in the Drawer"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Letter in the Drawer"
+      }
+    ],
+    "bunki-graded-n4-market": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Morning Market"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Morning Market"
+      }
+    ],
+    "bunki-graded-n5-kitchen": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Sounds from the Kitchen"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Sounds from the Kitchen"
+      }
+    ],
+    "bunki-graded-n5-morning": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Quiet Morning"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A Quiet Morning"
+      }
+    ],
+    "bunki-graded-n5-neighbour": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Neighbour Next Door"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Neighbour Next Door"
+      }
+    ],
+    "bunki-graded-n5-station": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Waiting at the Station"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Time Spent Waiting at the Station"
+      }
+    ],
+    "env:press-press_05569": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "A 'satoumi' help desk opens: free expert advice on restoring coastal seas"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "A 'satoumi' help desk opens: free expert advice on creating satoumi"
+      }
+    ],
+    "env:press-press_05575": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Environment Ministry publishes the combined results of its 'nudge' trials"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Environment Ministry publishes the combined results of its 'nudge' trials"
+      }
+    ],
+    "env:press-press_05582": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "FY2026 Environment Minister's awards for service to the water supply: recipients chosen"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "FY2026 Environment Minister's awards for service to the water supply: recipients chosen"
+      }
+    ],
+    "env:press-press_05584": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Tsunemi's industrial-waste landfill newly certified as a hands-on environmental-learning site"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Tsunemi's industrial-waste landfill newly certified as a place for hands-on environmental learning"
+      }
+    ],
+    "env:press-press_05585": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "FY2026 environmental-education leader training for teachers, at a waste-recycling site"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Environmental-education leader training for teachers at sites that support a circular society"
+      }
+    ],
+    "env:press-press_05589": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "First progress review of Japan's Fifth Fundamental Plan for a Sound Material-Cycle Society"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "First progress review of the Fifth Fundamental Plan for Establishing a Sound Material-Cycle Society"
+      }
+    ],
+    "env:press-press_05591": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Regional Circular and Ecological Sphere study tours 2026: Kameoka and Ishinomaki"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Regional Circular and Ecological Sphere Study Tour 2026: Kameoka and Ishinomaki"
+      }
+    ],
+    "env:press-press_05614": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Companies chosen for the FY2026 model project on solving environmental issues together"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Companies chosen for the FY2026 model project for integrated solutions to environmental issues"
+      }
+    ],
+    "env:press-press_05616": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "The 40th National Septic Tank Convention, held on Septic Tank Day"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "The 40th National Septic Tank Convention on Septic Tank Day"
+      }
+    ],
+    "env:press-press_05643": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Golden fire ants confirmed at Kobe Port"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Golden fire ants confirmed at Kobe Port"
+      }
+    ],
+    "govonline:article-202609-radio-3739": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Uniting the World: What Is the United Nations Like?"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Uniting the World: What Is the United Nations Like?"
+      }
+    ],
+    "govonline:article-202609-radio-3741": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Richer Communication: Sign Language Is a Language"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Richer Communication: Sign Language Is a Language"
+      }
+    ],
+    "govonline:article-202609-radio-3743": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "This Building Is a Cultural Property Too? Japan's Registered Tangible Cultural Properties"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Wait, This Is a Cultural Property Too? Local Heritage, Registered Tangible Cultural Properties"
+      }
+    ],
+    "govonline:article-202609-tv-6623": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "'Dark part-time jobs' are a crime!"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "'Dark part-time jobs' are a crime!"
+      }
+    ],
+    "govonline:article-202609-tv-6628": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Critical Minerals, Essential to Advanced Industries"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Critical Minerals, Essential to Advanced Industries"
+      }
+    ],
+    "jawiki-news:2026-09-14": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Events of 14–20 September"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Events of 14–20 September"
+      }
+    ],
+    "jawiki-news:2026-09-21": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Events of 21–27 September"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Events of 21–27 September"
+      }
+    ],
+    "jawiki:5294446": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Reshuffled Second Takaichi Cabinet"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The Reshuffled Second Takaichi Cabinet"
+      }
+    ],
+    "kantei:jp-105-actions-202609-15hyousyou": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Prime Minister's commendation ceremony for contributors to disaster prevention"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Prime Minister's commendation ceremony for contributors to disaster prevention"
+      }
+    ],
+    "kantei:jp-105-discourse-20260923message": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "US–Japan Tourism and Food Culture Exchange Evening: Prime Minister Takaichi's video message"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "US–Japan Tourism and Food Culture Exchange Evening: Prime Minister Takaichi's video message"
+      }
+    ],
+    "mext:b_menu-houdou-2025-mext_00009": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Nippon Startup Awards 2026: winners announced"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Nippon Startup Awards 2026: winners announced"
+      }
+    ],
+    "mext:b_menu-houdou-mext_01683": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The 36th National Industrial Education Fair comes to Saga (San-Fair SAGA2026)"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The 36th National Industrial Education Fair comes to Saga (San-Fair SAGA2026)"
+      }
+    ],
+    "mhlw:stf-houdou-newpage_75698": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Family-doctor information now on the Medical Information Net (Navii)"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Information on family-doctor functions now on the Medical Information Net (Navii)"
+      }
+    ],
+    "mhlw:stf-newpage_76095": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "2025 inspections and prosecutions at workplaces employing foreign trainees and skilled workers"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "2025 inspections and prosecutor referrals at workplaces employing foreign interns and skilled workers"
+      }
+    ],
+    "mhlw:stf-newpage_76100": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Results of on-site inspections of Advanced Treatment Hospitals (FY2025)"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Results of on-site inspections of Advanced Treatment Hospitals (FY2025)"
+      }
+    ],
+    "mhlw:stf-newpage_76126": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Winners chosen in the FY2026 contest for companies where older workers thrive"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Winners chosen in the FY2026 contest for companies where older workers thrive"
+      }
+    ],
+    "mhlw:stf-newpage_76152": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "October is enrolment month for the small-business retirement allowance scheme"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "October is enrolment promotion month for the small-business retirement allowance scheme"
+      }
+    ],
+    "mhlw:stf-newpage_76233": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "The 73rd Mental Health and Welfare Awareness Campaign is under way"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Japan holds its 73rd Mental Health and Welfare Awareness Campaign"
+      }
+    ],
+    "mhlw:stf-newpage_76330": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Results of the survey on earthquake-proofing of hospitals"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Results of the survey on the seismic retrofitting of hospitals"
+      }
+    ],
+    "mhlw:stf-newpage_76340": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Health ministry teams up with the WOWOW drama 'MR: Medical Representative'"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Health ministry teams up with the WOWOW drama 'MR: Medical Representative'"
+      }
+    ],
+    "mhlw:stf-newpage_76360": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Japan to begin pre-entry tuberculosis screening in Indonesia"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Japan to begin pre-entry tuberculosis screening in Indonesia"
+      }
+    ],
+    "sports:sports-b_menu-houdou-31-09-1420919_00007": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "FY2026 lifelong-sports awards: individual and group recipients chosen"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "FY2026 lifelong-sports awards: individual and group recipients chosen"
+      }
+    ],
+    "sports:sports-b_menu-houdou-31-09-1421070_00039": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "FY2026 awards for distinguished sports promotion officers: recipients chosen"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "FY2026 awards for distinguished sports promotion officers: recipients chosen"
+      }
+    ],
+    "sports:sports-b_menu-houdou-jsa_00246": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "issue",
+        "proposedEn": "Sports Agency Commissioner Kawai visits Toyama for talks with the governor and mayor"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Sports Agency Commissioner Kawai to visit Toyama for talks with Governor Nitta and Mayor Fujii"
+      }
+    ],
+    "wikinews:12024": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "JR Osaka Higashi Line partly opens"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "JR Osaka Higashi Line partly opens"
+      }
+    ],
+    "wikinews:1403": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Seven sites added to the World Natural Heritage list, including the Shiretoko Peninsula"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Seven sites added to the World Natural Heritage list, including the Shiretoko Peninsula"
+      }
+    ],
+    "wikinews:20090": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Shigaraki Kōgen Railway collision: Osaka District Court finds JR West 30% at fault"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Shigaraki Kōgen Railway collision: Osaka District Court finds JR West 30% at fault"
+      }
+    ],
+    "wikinews:42478": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Shohei Ohtani becomes the sixth player ever with 40 steals and 40 home runs"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Shohei Ohtani becomes the sixth player ever with 40 steals and 40 home runs"
+      }
+    ],
+    "wikinews:44381": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Japan national team announces shirt numbers for the Kirin Challenge Cup"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Japan national team announces shirt numbers for the Kirin Challenge Cup"
+      }
+    ],
+    "wikinews:44384": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Cristiano Ronaldo sent off for a violent elbow, may miss the World Cup opener"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Cristiano Ronaldo sent off for a violent elbow, may miss the World Cup opener"
+      }
+    ],
+    "wikinews:45089": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Centrist Reform Alliance leadership election: Junya Ogawa becomes new leader"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Centrist Reform Alliance leadership election: Junya Ogawa becomes new leader"
+      }
+    ],
+    "wikinews:45095": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "AiScReam: Ruby leaves the group and two new members join"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "AiScReam: Ruby leaves the group and two new members join"
+      }
+    ],
+    "wikinews:45098": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The second Takaichi cabinet takes office"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "The second Takaichi cabinet takes office"
+      }
+    ],
+    "wikinews:45208": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Nankai to withdraw from its ferry business"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Nankai to withdraw from its ferry business"
+      }
+    ],
+    "wikinews:6460": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Mariners' Ichiro reaches 2,500 career hits"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Mariners' Ichiro reaches 2,500 career hits"
+      }
+    ],
+    "yasashii:1": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Childcare leave"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Childcare leave"
+      }
+    ],
+    "yasashii:10": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Long-term care"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Long-term care"
+      }
+    ],
+    "yasashii:2": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Childcare leave benefit"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Childcare leave benefit"
+      }
+    ],
+    "yasashii:3": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Survivors' Basic Pension"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Survivors' Basic Pension"
+      }
+    ],
+    "yasashii:4": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Survivors' Employees' Pension"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Survivors' Employees' Pension"
+      }
+    ],
+    "yasashii:5": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Medical insurance"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Medical insurance"
+      }
+    ],
+    "yasashii:6": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Seal registration certificate"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Seal registration certificate"
+      }
+    ],
+    "yasashii:7": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Seal registration card"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Seal registration card"
+      }
+    ],
+    "yasashii:8": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Overstay"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Overstay"
+      }
+    ],
+    "yasashii:9": [
+      {
+        "model": "deepseek-v4.1-flash",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Landlord"
+      },
+      {
+        "model": "glm-5.3",
+        "provider": "ollama.com cloud",
+        "verdict": "ok",
+        "proposedEn": "Landlord"
+      }
+    ]
+  }
+}
