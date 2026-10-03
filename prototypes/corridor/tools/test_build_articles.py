@@ -10,6 +10,8 @@ import sys
 import types
 from pathlib import Path
 
+import pytest
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
@@ -18,7 +20,7 @@ import build_articles as ba  # noqa: E402
 PICTURE = {"src": "articles/pictures/wikinews-1.webp", "alt": "A harbour at dawn.", "w": 1200, "h": 800}
 
 
-def rebuild(out, monkeypatch, previous_rows=None):
+def rebuild(out, monkeypatch, previous_rows=None, *flags):
     if previous_rows is not None:
         (out / "index.json").write_text(json.dumps({"sources": {}, "articles": previous_rows}), "utf-8")
     articles = [
@@ -34,7 +36,7 @@ def rebuild(out, monkeypatch, previous_rows=None):
     monkeypatch.setattr(ba, "collect_articles", lambda: articles)
     monkeypatch.setattr(ba, "tokenise_paragraphs", lambda text, _tagger, ruby_markup=None: ([{"s": text, "b": text, "c": True}], []))
     monkeypatch.setattr(ba, "grade_article", lambda *_args: grading)
-    monkeypatch.setattr(sys, "argv", ["build_articles.py", "--out", str(out)])
+    monkeypatch.setattr(sys, "argv", ["build_articles.py", "--out", str(out), *flags])
     assert ba.main() == 0
     return {row["id"]: row for row in json.loads((out / "index.json").read_text("utf-8"))["articles"]}
 
@@ -58,3 +60,21 @@ def test_a_first_build_has_nothing_to_carry(tmp_path, monkeypatch):
     rows = rebuild(tmp_path, monkeypatch)
     assert sorted(rows) == ["wikinews:1", "wikinews:2"]
     assert not any(set(ba.CURATED_ROW_FIELDS) & set(row) for row in rows.values())
+
+
+FRESH_ROW = {"id": "fresh:nhk-1", "file": "fresh-nhk-1.json", "title": "新しい記事",
+             "titleEn": "A new article", "picture": PICTURE}
+
+
+def test_a_rebuild_refuses_to_drop_rows_it_cannot_recollect(tmp_path, monkeypatch):
+    previous = [{"id": "wikinews:1", "file": "wikinews-1.json"}, FRESH_ROW]
+    with pytest.raises(SystemExit) as refused:
+        rebuild(tmp_path, monkeypatch, previous)
+    assert "fresh:nhk-1" in str(refused.value) and "--allow-drop" in str(refused.value)
+    assert json.loads((tmp_path / "index.json").read_text("utf-8"))["articles"] == previous
+    assert not (tmp_path / "wikinews-1.json").exists()
+
+
+def test_allow_drop_writes_the_index_without_them(tmp_path, monkeypatch):
+    rows = rebuild(tmp_path, monkeypatch, [{"id": "wikinews:1", "file": "wikinews-1.json"}, FRESH_ROW], "--allow-drop")
+    assert sorted(rows) == ["wikinews:1", "wikinews:2"]
