@@ -13342,7 +13342,7 @@ function deckWordSnapshot(node) {
 
 function deckWordNode(deck, mod, card) {
   const node = { t: 'word', id: card.w, from: { passage: mod.article, index: card.i }, ctxScope: 'sent',
-    deckSource: { deckId: deck.id, moduleId: mod.id, card: card.n } };
+    deckSource: { deckId: deck.deckId, moduleId: mod.id, card: card.n } };
   const snapshot = deckWordSnapshot(node);
   const reading = snapshot?.r || '';
   if (reading) node.reading = reading;
@@ -13364,7 +13364,7 @@ function deckWordNode(deck, mod, card) {
 const deckModuleLoading = new Map();
 const deckModuleReady = new Set();
 function prepareDeckModule(deck, mod) {
-  const key = `${deck.id}:${mod.id}`;
+  const key = `${deck.deckId}:${mod.id}`;
   if (deckModuleReady.has(key)) return Promise.resolve();
   if (deckModuleLoading.has(key)) return deckModuleLoading.get(key);
   const pending = Promise.all(mod.cards.filter((card) => {
@@ -13432,7 +13432,7 @@ function renderDecks(main) {
     }
     return;
   }
-  const moduleKey = `${deck.id}:${mod.id}`;
+  const moduleKey = `${deck.deckId}:${mod.id}`;
   if (!deckModuleReady.has(moduleKey)) {
     main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
     prepareDeckModule(deck, mod).then(() => {
