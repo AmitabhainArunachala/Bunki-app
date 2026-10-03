@@ -1,0 +1,676 @@
+{
+  "id": "m06-works",
+  "passage": {
+    "title": "橋が落ちた日 — 浜里町歩道橋崩落、県議会が検証",
+    "title_en": "The day the bridge fell: the prefectural assembly audits the Hamasato footbridge collapse",
+    "level": "N1",
+    "text": "今年3月、浜里町の駅前で県道をまたぐ歩道橋が崩落した。深夜だったため通行人はおらず、けが人は出なかったが、朝の通勤時間帯であれば大惨事になっていたおそれがある。県議会の建設委員会は今月、原因と責任をめぐる本格的な審議を始めた。\n\n問題の歩道橋は1998年に完成した。駅の改札と商店街、そして高台の住宅地を立体的に結ぶ構造で、駅前再開発の動線計画の要とされてきた。設計は県が委託した建設コンサルタント会社が、施工は地元の建設会社が担当した。歩道橋は2010年に町道から県道に編入され、管理者も町から県に移った。\n\n崩落を受けて県が設けた調査委員会は、まず崩れ残った橋脚や橋桁など各部の状態を一つずつ記録した。さらにレーザー測量で数千か所の座標を求め、座標幾何学の手法で構造全体のゆがみを計算した。その結果、本来は垂直に立っているべき橋脚が、川側へ約2度傾いていたことが分かった。\n\n傾きに誰も気づかなかったのはなぜか。橋脚の根元は化粧板で覆われており、内部のさびは外から見えなかった。しかも、県道への編入後、歩道橋は県の点検台帳に登載されておらず、定期点検が一度も行われていなかった。「強い風の日には橋が上下に揺れる」という住民の声も、町には以前から寄せられていたという。\n\n県は、設計と施工の双方に問題があったとして、コンサルタント会社と建設会社に損害賠償を求める訴えを起こす方針だ。ただし、自治体が訴訟を起こすには、議会の議決が事前に必要となる。訴額は約4億2千万円で、橋の撤去費や仮設通路の設置費のほか、崩落で傷んだ県道や信号機の修繕費も含まれている。\n\n委員会では、この訴額の妥当性をめぐって質問が相次いだ。ある委員は「新しい橋の建設費のうち、どこまでが崩落による損害と言えるのか、精査が必要だ」と指摘した。これに対し県は、残った橋桁の一部に重りを載せる検証試験を行い、設計どおりの強度があったかを確かめると答えた。\n\nなお、県が4月に公表した中間報告では、橋脚の傾きを「約0.2度」としていた。しかし計算に誤りがあり、県は今月、これを「約2度」に訂正した。委員長は「設計、施工、点検のどこに問題があったのか、徹底的に検証したい」と話す。駅前には現在、仮設の横断歩道が設けられ、高齢者の負担を軽減するため誘導員も配置されている。"
+  },
+  "cards": [
+    {
+      "n": 307,
+      "term": "施工",
+      "reading": "せこう",
+      "gloss": "construction work; carrying out (building) works",
+      "pos": "noun · suru verb",
+      "register": "専門・報道",
+      "def_ja": "建物や道路、橋などの工事を、実際に行うこと。",
+      "sentences": [
+        {
+          "ja": "設計は県が委託した建設コンサルタント会社が、施工は地元の建設会社が担当した。",
+          "form": "施工",
+          "en": "The design was handled by a consulting firm commissioned by the prefecture, and the construction by a local builder."
+        },
+        {
+          "ja": "このマンションは、大手ゼネコンが施工を手がけた。",
+          "form": "施工",
+          "en": "This condominium was built by a major general contractor."
+        }
+      ],
+      "collocations": ["施工業者", "施工不良", "施工管理", "設計・施工"],
+      "confusables": [
+        {
+          "term": "施行",
+          "note": "施行 (しこう, also せこう) = putting a law into effect; the construction industry says せこう for 施工 partly to keep them apart."
+        },
+        {
+          "term": "竣工",
+          "note": "竣工 = completion of construction; 施工 = the construction work itself."
+        }
+      ],
+      "note": "しこう is also a dictionary reading of 施工, but in practice せこう dominates."
+    },
+    {
+      "n": 309,
+      "term": "設計",
+      "reading": "せっけい",
+      "gloss": "design; plan; layout",
+      "pos": "noun · suru verb",
+      "register": "日常・専門",
+      "def_ja": "物を作る前に、形やしくみ、大きさなどを考えて図などに表すこと。",
+      "sentences": [
+        {
+          "ja": "設計は県が委託した建設コンサルタント会社が、施工は地元の建設会社が担当した。",
+          "form": "設計",
+          "en": "The design was handled by a consulting firm commissioned by the prefecture, and the construction by a local builder."
+        },
+        {
+          "ja": "若いうちから、人生設計をしっかり考えておいたほうがいい。",
+          "form": "設計",
+          "en": "You'd better think your life plan through while you're young."
+        }
+      ],
+      "collocations": ["設計図", "設計ミス", "人生設計", "制度設計"],
+      "confusables": [
+        {
+          "term": "計画",
+          "note": "計画 = a plan of action/schedule; 設計 = designing a structure or system (also figurative: 人生設計, 制度設計)."
+        },
+        {
+          "term": "デザイン",
+          "note": "デザイン leans toward appearance/style; 設計 toward structure and engineering."
+        }
+      ],
+      "note": "Figurative uses (人生設計, 制度設計) are very common in news and conversation."
+    },
+    {
+      "n": 310,
+      "term": "崩落",
+      "reading": "ほうらく",
+      "gloss": "collapse, cave-in (of a structure, slope, ceiling)",
+      "pos": "noun · suru verb",
+      "register": "報道・書き言葉",
+      "def_ja": "崖や建物の一部などが、くずれて落ちること。",
+      "sentences": [
+        {
+          "ja": "今年3月、浜里町の駅前で県道をまたぐ歩道橋が崩落した。",
+          "form": "崩落",
+          "en": "This March, a footbridge spanning the prefectural road in front of Hamasato Station collapsed."
+        },
+        {
+          "ja": "大雨の影響で山道の斜面が崩落し、通行止めになっている。",
+          "form": "崩落",
+          "en": "Heavy rain caused the slope along the mountain road to give way, and it is closed to traffic."
+        }
+      ],
+      "collocations": ["崩落事故", "天井が崩落する", "トンネル崩落", "斜面の崩落"],
+      "confusables": [
+        {
+          "term": "倒壊",
+          "note": "倒壊 = a building toppling over; 崩落 = something crumbling and falling down."
+        },
+        {
+          "term": "崩壊",
+          "note": "崩壊 = collapse in general, incl. abstract (体制の崩壊); 崩落 is physical falling."
+        }
+      ],
+      "note": "Typical news word for bridges, tunnels, ceilings and cliffs. The '(market) decline' sense in the source gloss is rare."
+    },
+    {
+      "n": 311,
+      "term": "修繕費",
+      "reading": "しゅうぜんひ",
+      "gloss": "repair costs; maintenance expenses",
+      "pos": "noun",
+      "register": "書き言葉・報道",
+      "def_ja": "建物や設備の傷んだところを直すためにかかるお金。",
+      "sentences": [
+        {
+          "ja": "訴額は約4億2千万円で、橋の撤去費や仮設通路の設置費のほか、崩落で傷んだ県道や信号機の修繕費も含まれている。",
+          "form": "修繕費",
+          "en": "The claim amount is about 420 million yen and includes, besides demolition and a temporary walkway, the cost of repairing the road and traffic lights damaged in the collapse."
+        },
+        {
+          "ja": "古いマンションは修繕費がかさみ、住民の負担が増えている。",
+          "form": "修繕費",
+          "en": "In older condos, repair costs pile up and residents' burden keeps growing."
+        }
+      ],
+      "collocations": ["修繕費がかさむ", "修繕費を積み立てる", "修繕積立金", "大規模修繕"],
+      "confusables": [
+        {
+          "term": "修理費",
+          "note": "修理費 = fixing a broken machine/car/device; 修繕費 = repairing buildings and facilities, also an accounting term."
+        }
+      ],
+      "note": "Standard term in real estate and accounting (修繕費 vs 資本的支出)."
+    },
+    {
+      "n": 312,
+      "term": "精査",
+      "reading": "せいさ",
+      "gloss": "close examination; scrutiny",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "細かいところまで、くわしく調べること。",
+      "sentences": [
+        {
+          "ja": "ある委員は「新しい橋の建設費のうち、どこまでが崩落による損害と言えるのか、精査が必要だ」と指摘した。",
+          "form": "精査",
+          "en": "One member pointed out, 'We need to scrutinize how much of the cost of the new bridge can be called damage caused by the collapse.'"
+        },
+        {
+          "ja": "いただいた書類を精査したうえで、改めてご連絡いたします。",
+          "form": "精査",
+          "en": "We will contact you again after carefully reviewing the documents you sent."
+        }
+      ],
+      "collocations": ["内容を精査する", "精査が必要だ", "精査中"],
+      "confusables": [
+        {
+          "term": "審査",
+          "note": "審査 = judging/screening against criteria (入学審査); 精査 = examining closely."
+        },
+        {
+          "term": "調査",
+          "note": "調査 = investigation/survey in general; 精査 stresses thoroughness."
+        }
+      ],
+      "note": "Business and political stock phrase: 精査したうえで回答する is a polite way to delay an answer."
+    },
+    {
+      "n": 314,
+      "term": "訴額",
+      "reading": "そがく",
+      "gloss": "amount in controversy; value of a lawsuit's claim",
+      "pos": "noun",
+      "register": "法律",
+      "def_ja": "裁判で相手に求める金額など、訴えの対象の価値を金額で表したもの。",
+      "sentences": [
+        {
+          "ja": "委員会では、この訴額の妥当性をめぐって質問が相次いだ。",
+          "form": "訴額",
+          "en": "In committee, one question after another was raised about whether the claim amount was justified."
+        },
+        {
+          "ja": "訴額が140万円を超える民事訴訟は、地方裁判所で扱われる。",
+          "form": "訴額",
+          "en": "Civil suits where the amount in controversy exceeds 1.4 million yen are heard in district court."
+        }
+      ],
+      "collocations": ["訴額を算定する", "訴額に応じた手数料", "訴額は～円"],
+      "confusables": [
+        {
+          "term": "請求額",
+          "note": "請求額 = the amount demanded (any bill or claim); news often uses it for lawsuits. 訴額 is the legal term that sets court fees and jurisdiction."
+        }
+      ],
+      "note": "Legal jargon (short for 訴訟物の価額). Determines filing fees (印紙代) and which court hears the case."
+    },
+    {
+      "n": 315,
+      "term": "妥当性",
+      "reading": "だとうせい",
+      "gloss": "validity; appropriateness, reasonableness",
+      "pos": "noun",
+      "register": "書き言葉・学術",
+      "def_ja": "考えや判断、数字などが、その場合に合っていて正しいと言える度合い。",
+      "sentences": [
+        {
+          "ja": "委員会では、この訴額の妥当性をめぐって質問が相次いだ。",
+          "form": "妥当性",
+          "en": "In committee, one question after another was raised about whether the claim amount was justified."
+        },
+        {
+          "ja": "この調査方法の妥当性については、専門家の間でも意見が分かれている。",
+          "form": "妥当性",
+          "en": "Experts are divided over the validity of this research method."
+        }
+      ],
+      "collocations": ["妥当性を検証する", "妥当性に疑問がある", "妥当性が高い"],
+      "confusables": [
+        {
+          "term": "正当性",
+          "note": "正当性 = legitimacy/justification (right or wrong); 妥当性 = whether it is reasonable/fitting."
+        },
+        { "term": "信頼性", "note": "In statistics, 妥当性 = validity and 信頼性 = reliability." }
+      ],
+      "note": "Source gloss lists 'verification', which is misleading: 妥当性 is the quality being checked (validity), not the act of checking (検証)."
+    },
+    {
+      "n": 304,
+      "term": "訂正",
+      "reading": "ていせい",
+      "gloss": "correction (of an error)",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "言葉や文章、数字などの間違いを、正しく直すこと。",
+      "sentences": [
+        {
+          "ja": "しかし計算に誤りがあり、県は今月、これを「約2度」に訂正した。",
+          "form": "訂正",
+          "en": "However, the calculation contained an error, and this month the prefecture corrected the figure to 'about 2 degrees.'"
+        },
+        {
+          "ja": "先ほどの発言を、一部訂正させていただきます。",
+          "form": "訂正",
+          "en": "Allow me to partly correct what I said a moment ago."
+        }
+      ],
+      "collocations": ["誤りを訂正する", "訂正記事", "訂正してお詫びします", "訂正印"],
+      "confusables": [
+        {
+          "term": "修正",
+          "note": "修正 = adjusting/amending (plans, drafts) even when not wrong; 訂正 = fixing a mistake."
+        },
+        { "term": "改訂", "note": "改訂 = revising a book/edition (改訂版)." }
+      ],
+      "note": "Newspapers end correction notices with 訂正しておわびします."
+    },
+    {
+      "n": 306,
+      "term": "事前に必要",
+      "reading": "じぜんにひつよう",
+      "gloss": "required beforehand; (as a) prerequisite",
+      "pos": "expression",
+      "register": "書き言葉",
+      "def_ja": "何かをする前に、あらかじめそろえたり済ませたりしなければならないこと。",
+      "sentences": [
+        {
+          "ja": "ただし、自治体が訴訟を起こすには、議会の議決が事前に必要となる。",
+          "form": "事前に必要",
+          "en": "However, before a local government can file a lawsuit, it needs a vote by the assembly."
+        },
+        {
+          "ja": "このセミナーの受講に事前に必要な知識は、特にありません。",
+          "form": "事前に必要",
+          "en": "No prior knowledge is required to take this seminar."
+        }
+      ],
+      "collocations": ["事前に必要な手続き", "事前に必要な知識", "事前予約が必要"],
+      "confusables": [
+        {
+          "term": "前提条件",
+          "note": "前提条件 or 履修条件 is the actual noun for 'prerequisite' (e.g. for a course)."
+        }
+      ],
+      "note": "Not a lexicalized word, just 事前に + 必要. 'Prerequisite' is a loose gloss; translate by context."
+    },
+    {
+      "n": 170,
+      "term": "動線計画",
+      "reading": "どうせんけいかく",
+      "gloss": "circulation/flow planning (how people move through a space)",
+      "pos": "noun",
+      "register": "専門",
+      "def_ja": "建物や町の中を人や物がどう動くかを考えて、通り道を決めること。",
+      "sentences": [
+        {
+          "ja": "駅の改札と商店街、そして高台の住宅地を立体的に結ぶ構造で、駅前再開発の動線計画の要とされてきた。",
+          "form": "動線計画",
+          "en": "Linking the ticket gates, the shopping street and the hillside housing in three dimensions, it was seen as the linchpin of the station-area redevelopment's pedestrian flow plan."
+        },
+        {
+          "ja": "家事を楽にするには、キッチンと洗面所の動線計画が大切だ。",
+          "form": "動線計画",
+          "en": "To make housework easier, planning the routes between kitchen and washroom is key."
+        }
+      ],
+      "collocations": ["動線計画を立てる", "生活動線", "家事動線", "動線を考える"],
+      "confusables": [
+        {
+          "term": "導線",
+          "note": "Homophone どうせん: 導線 = electrical lead wire; often mis-typed for 動線 'circulation path'."
+        }
+      ],
+      "note": "Architecture/urban-planning term. The source gloss ran two glosses together; 動線 alone (家事動線, 生活動線) is common in home-design talk."
+    },
+    {
+      "n": 303,
+      "term": "立体的",
+      "reading": "りったいてき",
+      "gloss": "three-dimensional; multi-level; (fig.) multifaceted",
+      "pos": "na-adj",
+      "register": "書き言葉・日常",
+      "def_ja": "高さや奥行きがあるようす。物事をいろいろな面から見るようす。",
+      "sentences": [
+        {
+          "ja": "駅の改札と商店街、そして高台の住宅地を立体的に結ぶ構造で、駅前再開発の動線計画の要とされてきた。",
+          "form": "立体的",
+          "en": "Linking the ticket gates, the shopping street and the hillside housing in three dimensions, it was seen as the linchpin of the station-area redevelopment's pedestrian flow plan."
+        },
+        {
+          "ja": "この画家は、影を使って物を立体的に見せるのがうまい。",
+          "form": "立体的",
+          "en": "This painter is good at using shadows to make objects look three-dimensional."
+        }
+      ],
+      "collocations": ["立体的に見る", "立体的な構造", "立体的にとらえる"],
+      "confusables": [
+        { "term": "平面的", "note": "Antonym: flat, two-dimensional; figuratively 'superficial'." },
+        {
+          "term": "多角的",
+          "note": "多角的 = from many angles (analysis); 立体的 in the figurative sense is close but more visual."
+        }
+      ],
+      "note": "Related: 立体交差 (grade-separated crossing), 立体駐車場 (multi-storey car park)."
+    },
+    {
+      "n": 135,
+      "term": "垂直",
+      "reading": "すいちょく",
+      "gloss": "vertical; perpendicular",
+      "pos": "noun · na-adj",
+      "register": "書き言葉・学術",
+      "def_ja": "地面に対してまっすぐ立っていること。線や面が直角に交わること。",
+      "sentences": [
+        {
+          "ja": "その結果、本来は垂直に立っているべき橋脚が、川側へ約2度傾いていたことが分かった。",
+          "form": "垂直",
+          "en": "As a result, it emerged that a pier that should have stood vertical was leaning about 2 degrees toward the river."
+        },
+        {
+          "ja": "点Cを通り、直線ABに垂直な直線を引きなさい。",
+          "form": "垂直",
+          "en": "Draw a line through point C perpendicular to line AB."
+        }
+      ],
+      "collocations": ["垂直に立つ", "垂直方向", "垂直に交わる", "垂直落下"],
+      "confusables": [
+        {
+          "term": "鉛直",
+          "note": "鉛直 = strictly along the direction of gravity (physics/surveying); 垂直 also covers 'perpendicular to any line or plane'."
+        },
+        {
+          "term": "直角",
+          "note": "直角 = a right angle itself; 垂直 = the relationship of meeting at one."
+        }
+      ],
+      "note": "Opposite: 水平. Business jargon: 垂直統合 'vertical integration'."
+    },
+    {
+      "n": 128,
+      "term": "座標",
+      "reading": "ざひょう",
+      "gloss": "coordinates",
+      "pos": "noun",
+      "register": "学術・専門",
+      "def_ja": "点の位置を、基準からの数の組で表したもの。",
+      "sentences": [
+        {
+          "ja": "さらにレーザー測量で数千か所の座標を求め、座標幾何学の手法で構造全体のゆがみを計算した。",
+          "form": "座標",
+          "en": "They then obtained coordinates for thousands of points by laser survey and calculated the distortion of the whole structure using coordinate geometry."
+        },
+        {
+          "ja": "地図アプリで、待ち合わせ場所の座標を友達に送った。",
+          "form": "座標",
+          "en": "I sent my friend the coordinates of our meeting spot from my map app."
+        }
+      ],
+      "collocations": ["座標を求める", "x座標", "座標軸", "座標系"],
+      "confusables": [],
+      "note": "Math/surveying/GPS word. 座標軸 is also used figuratively for a frame of reference."
+    },
+    {
+      "n": 129,
+      "term": "座標幾何学",
+      "reading": "ざひょうきかがく",
+      "gloss": "coordinate (analytic) geometry",
+      "pos": "noun",
+      "register": "学術",
+      "def_ja": "図形を数や式で表し、計算によって性質を調べる数学の分野。",
+      "sentences": [
+        {
+          "ja": "さらにレーザー測量で数千か所の座標を求め、座標幾何学の手法で構造全体のゆがみを計算した。",
+          "form": "座標幾何学",
+          "en": "They then obtained coordinates for thousands of points by laser survey and calculated the distortion of the whole structure using coordinate geometry."
+        },
+        {
+          "ja": "座標幾何学を使えば、図形の問題を計算だけで解くことができる。",
+          "form": "座標幾何学",
+          "en": "With coordinate geometry, you can solve geometry problems by calculation alone."
+        }
+      ],
+      "collocations": ["座標幾何学の手法"],
+      "confusables": [
+        {
+          "term": "解析幾何学",
+          "note": "Same field; 解析幾何学 is the far more common name in Japanese."
+        }
+      ],
+      "note": "Fairly rare term; Japanese school math calls this 図形と方程式 and academics say 解析幾何学."
+    },
+    {
+      "n": 19,
+      "term": "各部",
+      "reading": "かくぶ",
+      "gloss": "each part; every section (of a whole)",
+      "pos": "noun",
+      "register": "書き言葉",
+      "def_ja": "全体をつくっている、それぞれの部分。",
+      "sentences": [
+        {
+          "ja": "崩落を受けて県が設けた調査委員会は、まず崩れ残った橋脚や橋桁など各部の状態を一つずつ記録した。",
+          "form": "各部",
+          "en": "The investigative committee set up after the collapse first recorded the condition of each surviving part, such as piers and girders, one by one."
+        },
+        {
+          "ja": "この説明書では、各部の名称と働きを図で紹介しています。",
+          "form": "各部",
+          "en": "This manual uses diagrams to show the name and function of each part."
+        }
+      ],
+      "collocations": ["各部の名称", "体の各部", "各部を点検する"],
+      "confusables": [
+        {
+          "term": "各部署",
+          "note": "For 'each department' of an organization, 各部署 or 各部門 is more usual than 各部."
+        }
+      ],
+      "note": "Typical of manuals and reports. Pattern: 各 + noun = each (各国, 各地, 各自)."
+    },
+    {
+      "n": 81,
+      "term": "上下",
+      "reading": "じょうげ",
+      "gloss": "up and down; top and bottom; rising and falling; both directions",
+      "pos": "noun · suru verb",
+      "register": "日常・報道",
+      "def_ja": "上と下。上がったり下がったりすること。行きと帰りの両方向。",
+      "sentences": [
+        {
+          "ja": "「強い風の日には橋が上下に揺れる」という住民の声も、町には以前から寄せられていたという。",
+          "form": "上下",
+          "en": "Residents had reportedly been telling the town for some time that 'on windy days the bridge bounces up and down.'"
+        },
+        {
+          "ja": "事故の影響で、新幹線は上下線とも運転を見合わせている。",
+          "form": "上下",
+          "en": "Because of the accident, shinkansen services are suspended in both directions."
+        },
+        {
+          "ja": "このところ、気温が大きく上下する日が続いている。",
+          "form": "上下",
+          "en": "Lately we've had a run of days with big swings in temperature."
+        }
+      ],
+      "collocations": ["上下に揺れる", "上下線", "上下関係", "上下する"],
+      "confusables": [],
+      "note": "上下線 = inbound and outbound lines (rail/road). 上下関係 = hierarchy (senior/junior). The colloquial reading うえした is used for physical top/bottom."
+    },
+    {
+      "n": 82,
+      "term": "覆う",
+      "reading": "おおう",
+      "gloss": "to cover; to shroud; to conceal",
+      "pos": "godan verb (tr.)",
+      "register": "書き言葉・日常",
+      "def_ja": "上からかぶせて、見えないようにしたり守ったりする。",
+      "sentences": [
+        {
+          "ja": "橋脚の根元は化粧板で覆われており、内部のさびは外から見えなかった。",
+          "form": "覆わ",
+          "en": "The base of the pier was covered with decorative panels, so the rust inside couldn't be seen from outside."
+        },
+        {
+          "ja": "目を覆いたくなるような事故の映像が、何度も流れた。",
+          "form": "覆い",
+          "en": "Footage of the accident, so awful you'd want to cover your eyes, was shown over and over."
+        }
+      ],
+      "collocations": ["雲に覆われる", "目を覆う", "顔を覆う", "覆い隠す"],
+      "confusables": [
+        {
+          "term": "覆す",
+          "note": "Same kanji, くつがえす = to overturn (a ruling, common sense)."
+        },
+        {
+          "term": "被せる",
+          "note": "被せる (かぶせる) = to put something on top of; more everyday and hands-on than 覆う."
+        }
+      ],
+      "note": "目を覆う = to be unable to bear looking (目を覆うばかりの惨状). Passive 覆われる is very frequent (雪に覆われた山)."
+    },
+    {
+      "n": 84,
+      "term": "編入",
+      "reading": "へんにゅう",
+      "gloss": "incorporation (into a larger body); transfer admission (school)",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "すでにある組織や区分などに、あとから組み入れること。",
+      "sentences": [
+        {
+          "ja": "歩道橋は2010年に町道から県道に編入され、管理者も町から県に移った。",
+          "form": "編入",
+          "en": "In 2010 the footbridge was reclassified from a town road to a prefectural road, and its management passed from the town to the prefecture."
+        },
+        {
+          "ja": "高専を卒業したあと、大学の三年生に編入した。",
+          "form": "編入",
+          "en": "After graduating from technical college, I transferred into the third year of university."
+        }
+      ],
+      "collocations": ["編入試験", "編入学", "編入合併", "～に編入される"],
+      "confusables": [
+        {
+          "term": "転入",
+          "note": "転入 = moving in (residence) or transferring to another school at the same level; 編入 = being incorporated into an existing group/grade."
+        },
+        { "term": "加入", "note": "加入 = joining (insurance, a union) as a member." }
+      ],
+      "note": "Municipal mergers: 編入合併 = one town absorbed into another, vs 新設合併 creating a new one."
+    },
+    {
+      "n": 88,
+      "term": "軽減",
+      "reading": "けいげん",
+      "gloss": "reduction, lightening (of a burden, pain, damage)",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "負担や痛み、被害などを、減らして軽くすること。",
+      "sentences": [
+        {
+          "ja": "駅前には現在、仮設の横断歩道が設けられ、高齢者の負担を軽減するため誘導員も配置されている。",
+          "form": "軽減",
+          "en": "A temporary crosswalk has been set up in front of the station, and guides are stationed there to ease the burden on elderly people."
+        },
+        {
+          "ja": "食料品には、消費税の軽減税率が適用されている。",
+          "form": "軽減",
+          "en": "A reduced consumption-tax rate applies to food."
+        }
+      ],
+      "collocations": ["負担を軽減する", "軽減税率", "痛みを軽減する", "被害の軽減"],
+      "confusables": [
+        {
+          "term": "削減",
+          "note": "削減 = cutting a quantity (costs, staff); 軽減 = lightening a burden or suffering."
+        },
+        { "term": "緩和", "note": "緩和 = easing/relaxing (rules, congestion, symptoms)." }
+      ],
+      "note": "Very frequent in policy news; the object is almost always something unpleasant (負担, 痛み, 被害, リスク)."
+    },
+    {
+      "n": 179,
+      "term": "登載",
+      "reading": "とうさい",
+      "gloss": "entering (in a register or list); listing",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "名簿や台帳などに、名前や項目を書き入れて載せること。",
+      "sentences": [
+        {
+          "ja": "しかも、県道への編入後、歩道橋は県の点検台帳に登載されておらず、定期点検が一度も行われていなかった。",
+          "form": "登載",
+          "en": "Moreover, after the reclassification the footbridge was never entered in the prefecture's inspection register, and not a single routine inspection was carried out."
+        },
+        {
+          "ja": "党は、元市長を比例代表の名簿に登載すると発表した。",
+          "form": "登載",
+          "en": "The party announced it would put the former mayor on its proportional-representation list."
+        }
+      ],
+      "collocations": ["名簿に登載する", "台帳に登載", "名簿登載順位"],
+      "confusables": [
+        {
+          "term": "搭載",
+          "note": "Homophone とうさい: 搭載 = equipped with/loaded on (AI搭載のスマホ)."
+        },
+        { "term": "掲載", "note": "掲載 = publishing in a newspaper/magazine/site." },
+        { "term": "記載", "note": "記載 = writing something down in a document." }
+      ],
+      "note": "Mostly used for official lists: candidate lists, registers, ledgers."
+    },
+    {
+      "n": 287,
+      "term": "検証",
+      "reading": "けんしょう",
+      "gloss": "verification; examination (to establish facts); review",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "本当かどうか、正しいかどうかを、調べて確かめること。",
+      "sentences": [
+        {
+          "ja": "委員長は「設計、施工、点検のどこに問題があったのか、徹底的に検証したい」と話す。",
+          "form": "検証",
+          "en": "The committee chair says, 'We want to examine thoroughly whether the problem lay in design, construction or inspection.'"
+        },
+        {
+          "ja": "その説が正しいかどうか、実験で検証してみよう。",
+          "form": "検証",
+          "en": "Let's test with an experiment whether that theory is right."
+        }
+      ],
+      "collocations": ["原因を検証する", "検証結果", "事後検証", "検証番組"],
+      "confusables": [
+        {
+          "term": "検討",
+          "note": "検討 = considering/deliberating on options; 検証 = checking facts or hypotheses against evidence."
+        },
+        { "term": "検査", "note": "検査 = inspection/test (健康診断, product checks)." }
+      ],
+      "note": "Also a legal term (現場検証 = on-site inspection by police/court)."
+    },
+    {
+      "n": 288,
+      "term": "検証試験",
+      "reading": "けんしょうしけん",
+      "gloss": "verification test",
+      "pos": "noun",
+      "register": "専門",
+      "def_ja": "性能や安全性が予定どおりかどうかを、実際に試して確かめること。",
+      "sentences": [
+        {
+          "ja": "これに対し県は、残った橋桁の一部に重りを載せる検証試験を行い、設計どおりの強度があったかを確かめると答えた。",
+          "form": "検証試験",
+          "en": "In response, the prefecture said it would run a verification test loading weights onto part of the remaining girders to check whether they had the designed strength."
+        },
+        {
+          "ja": "新しい自動運転システムの検証試験が、来月から始まる。",
+          "form": "検証試験",
+          "en": "Verification testing of the new self-driving system starts next month."
+        }
+      ],
+      "collocations": ["検証試験を行う", "検証試験の結果", "検証試験に合格する"],
+      "confusables": [
+        {
+          "term": "実証実験",
+          "note": "実証実験 = a pilot/field trial of a new technology in real conditions; 検証試験 = a test confirming specified performance."
+        }
+      ],
+      "note": "Engineering/IT term; in medicine the equivalent is 臨床試験."
+    }
+  ]
+}
