@@ -1062,6 +1062,9 @@ async function assistedWhyCase(page, section, log) {
           o.doorAfterClose = await page.locator('#exam-why').innerText();
           await page.locator('#exam-why').click();
           await page.locator('#exam-why-sheet').waitFor();
+          // Reopening schedules title focus on the next frame, which also scrolls.
+          // Finish that handoff before the disabled-answer pointer check below.
+          await page.waitForFunction(() => document.activeElement?.id === 'exam-why-title');
         } finally {
           o.puts = await page.evaluate(() => {
             const counter = window.__g1Puts;
@@ -1080,7 +1083,14 @@ async function assistedWhyCase(page, section, log) {
       });
       await stage('A3-ui-lock', 'behavior', async (o) => {
         // a forced tap on another choice changes nothing; flag and unflag stay legal
-        await page.locator('[data-exam-option="choice-2"]').click({ force: true });
+        const lockedChoice = page.locator('[data-exam-option="choice-2"]');
+        assert(await lockedChoice.isDisabled());
+        // Hover checks stability and the hit target without requiring enabledness.
+        // A bare forced click can hit the fixed bookshelf control during scrolling.
+        await lockedChoice.hover();
+        await lockedChoice.click({ force: true });
+        await atPrompt('q05');
+        assert.deepEqual(lockOf(await disk(page), 'q05'), kept.q05);
         await page.locator('#exam-flag').click();
         await pollRecord(page, (record) => answerOf(record, 'q05').flagged === true);
         await page.locator('#exam-flag').click();
