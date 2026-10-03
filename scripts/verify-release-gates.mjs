@@ -1462,7 +1462,8 @@ const NATIVE_GATE_CASES = [
   ...[
     'every primary index row carries a non-empty titleEn',
     'every titleEn names its provenance in titleEnSource',
-    'the title marker names its author: AI for the recovered and minted rows, the fresh-shelf titles file for fresh readings, the shelf map for the rest',
+    'every title says where its English came from: the publisher headline with its URL, a cross-checked translation or an authored original, and a feed row matches its titles file',
+    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one says so, a translation carries two model-family checks, and an original matches its authored bilingual title',
     'the 30 authored records answer to the queue: approved rows lifted, pending rows still 検収前',
     'every archive row carries a non-empty titleEn with wrapper provenance',
     'the code-side TITLES_EN map is gone from corridor.js — titles live in data only',

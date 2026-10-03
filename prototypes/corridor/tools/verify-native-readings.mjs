@@ -221,9 +221,10 @@ async function openQuickLook(page, preferredIndex = 0) {
     (value, index, values) => value < count && values.indexOf(value) === index,
   );
   for (const index of candidates) {
-    await touchAt(page, tokens.nth(index), 560);
+    // one tap is the quick look (reader lane 2026-10-02); a press and hold opens the word menu instead
+    await touchAt(page, tokens.nth(index));
     if (await page.locator('#sheet').count()) {
-      throw new Error(`a quick-lookup hold must not open a full entry on release: ${JSON.stringify(touchAttempts.at(-1))}`);
+      throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
     }
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');
@@ -282,7 +283,70 @@ const rows = new Map(index.articles.map((record) => [record.id, record]));
 const FRESH_TITLES = JSON.parse(
   readFileSync(new URL('../../../docs/content/feed-fresh-titles-en.json', import.meta.url), 'utf8'),
 );
-const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08', FRESH_TITLES.titleEnSource]);
+const FEED_TITLES = JSON.parse(
+  readFileSync(new URL('../../../docs/content/feed-titles-en.json', import.meta.url), 'utf8'),
+);
+// 2026-10-02 (owner note 5): a shelf title is either the publisher's own
+// English headline, with its URL, or a faithful translation checked by a
+// second model family. The feeds' authoring markers still name rows a later
+// feed run mints before anyone checks them; the archive keeps its wrapper.
+// 2026-10-03 (owner decision): the label must be honest — 'publisher' only when the title IS the
+// page's headline, 'publisher, shortened' when we trimmed it, 'publisher, adapted' when it is built
+// from the page but no shorter, 'established English title' for a
+// literary work's known English name (', adapted' when we added to it, e.g. ': the opening'),
+// 'Bunki original, bilingual title' for an authored deck passage — and every label is backed by a
+// receipt in data/articles/title-receipts.json (the page headline compared against; the
+// model-family checks; the authored module).
+const PUBLISHER_SOURCE = /^(publisher|publisher, shortened|publisher, adapted|established English title|established English title, adapted): (https:\/\/\S+)$/;
+const CHECKED_SOURCE = (source) => source === 'Bunki original, bilingual title' || source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
+const TITLE_RECEIPTS = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/title-receipts.json'), 'utf8'));
+// a publisher's English edition lives on its own host; a headline from anywhere else is not theirs
+const ENGLISH_EDITIONS = {
+  'jp.globalvoices.org': ['globalvoices.org'],
+  'www.env.go.jp': ['www.env.go.jp'],
+  'www.kantei.go.jp': ['japan.kantei.go.jp'],
+  'ja.wikinews.org': ['en.wikinews.org'],
+  'ja.wikipedia.org': ['en.wikipedia.org'],
+};
+const normalHeadline = (s) => String(s ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
+const sameHeadline = (a, b) => normalHeadline(a) === normalHeadline(b);
+function titleReceiptProblem(record) {
+  const source = record.titleEnSource ?? '';
+  if (source === 'Bunki original, bilingual title') {
+    const receipt = TITLE_RECEIPTS.authored?.[record.id];
+    const moduleId = record.id.replace(/^kotoba-mine-/u, '');
+    const path = `decks/kotoba-mine/source/modules/${moduleId}.json`;
+    if (record.pool !== 'original' || record.licence !== 'Bunki original' || record.lane !== 'deck' ||
+        !receipt || receipt.path !== path || receipt.titleJa !== record.title || receipt.titleEn !== record.titleEn)
+      return `${record.id}: no matching authored bilingual title receipt`;
+    const authored = JSON.parse(readFileSync(new URL('../../../' + path, import.meta.url), 'utf8')).passage;
+    return authored.title === record.title && authored.title_en === record.titleEn
+      ? null : `${record.id}: title differs from its authored module`;
+  }
+  if (source === 'translation, cross-checked') {
+    const families = new Set((TITLE_RECEIPTS.translations?.[record.id] ?? []).filter((c) => c.verdict).map((c) => c.model));
+    return families.size >= 2 ? null : `${record.id}: ${families.size} model-family check(s) on file`;
+  }
+  const match = PUBLISHER_SOURCE.exec(source);
+  if (!match) return null;
+  const [, label, url] = match;
+  const receipt = TITLE_RECEIPTS.publisher?.[record.id];
+  if (!receipt || receipt.url !== url || receipt.label !== label) return `${record.id}: no receipt for "${label}"`;
+  if (label.startsWith('established')) return null;
+  let home, there;
+  try { home = new URL(record.url).host; there = new URL(url).host; } catch { return `${record.id}: unreadable URL`; }
+  if (!(ENGLISH_EDITIONS[home] ?? []).includes(there)) return `${record.id}: ${there} is not ${home}'s English edition`;
+  const same = sameHeadline(receipt.pageHeadline, record.titleEn);
+  const shorter = normalHeadline(record.titleEn).length < normalHeadline(receipt.pageHeadline).length;
+  if (label === 'publisher' && !same) return `${record.id}: labelled the publisher's headline, but the page says "${receipt.pageHeadline}"`;
+  if (label === 'publisher, shortened' && !shorter) return `${record.id}: labelled shortened, but the title is no shorter than the page headline on file`;
+  if (label === 'publisher, adapted' && (!receipt.pageHeadline || same || shorter))
+    return `${record.id}: labelled adapted, but the title is ${same ? 'the page headline' : shorter ? 'shorter than it' : 'without a page headline on file'}`;
+  return null;
+}
+const FEED_TITLE_MARKERS = new Set([FEED_TITLES.titleEnSource, FRESH_TITLES.titleEnSource]);
+const ARCHIVE_TITLE_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08', FRESH_TITLES.titleEnSource]);
+const titleSourceFor = (map, id) => map.sources?.[id] ?? map.titleEnSource;
 // rows still WAITING on a human — an 'approved' review value is a decided
 // row (TENOHIRA Decision 4: the rubric may lift 検収前 where the committed
 // queue says approved), and a decided row no longer wears the mark
@@ -298,28 +362,36 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
       ? missingEn.map((record) => record.id).join(', ')
       : `${index.articles.length}/${index.articles.length}`,
   );
-  const unsourced = index.articles.filter((record) => !TITLE_EN_SOURCES.has(record.titleEnSource));
+  const unsourced = index.articles.filter(
+    (record) => !CHECKED_SOURCE(record.titleEnSource) && !FEED_TITLE_MARKERS.has(record.titleEnSource),
+  );
   check(
     'every titleEn names its provenance in titleEnSource',
     unsourced.length === 0,
     unsourced.map((record) => record.id).join(', '),
   );
-  // 検収前 no longer means one thing: the 30 recovered originals and the feed
-  // mints wear AI-authored titles, while a row held for UNVERIFIED RIGHTS or
-  // an unverified source text keeps whatever title it already had. The rule
-  // is about who wrote the title, not about who is waiting.
-  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt && r.feed !== 'fresh').map((r) => r.id)]);
-  const wrongMarker = index.articles.filter((record) =>
-    record.feed === 'fresh'
-      ? record.titleEnSource !== FRESH_TITLES.titleEnSource || FRESH_TITLES.titles?.[record.id] !== record.titleEn
-      : aiTitled.has(record.id)
-        ? record.titleEnSource !== 'renkan-ai-2026-08'
-        : record.titleEnSource !== 'shelf-map-2026',
-  );
+  // The rule is about where the English came from, not about who is
+  // waiting: a feed row's title and provenance are whatever its titles file
+  // says (a per-row source wins over the file's authoring marker), and every
+  // other shelf row is a publisher headline, a cross-checked translation, or an original bilingual title.
+  const feedMap = (record) =>
+    record.feed === 'fresh' ? FRESH_TITLES : Object.hasOwn(FEED_TITLES.titles ?? {}, record.id) ? FEED_TITLES : null;
+  const wrongMarker = index.articles.filter((record) => {
+    const map = feedMap(record);
+    return map
+      ? record.titleEnSource !== titleSourceFor(map, record.id) || map.titles?.[record.id] !== record.titleEn
+      : !CHECKED_SOURCE(record.titleEnSource);
+  });
   check(
-    'the title marker names its author: AI for the recovered and minted rows, the fresh-shelf titles file for fresh readings, the shelf map for the rest',
+    'every title says where its English came from: the publisher headline with its URL, a cross-checked translation or an authored original, and a feed row matches its titles file',
     wrongMarker.length === 0,
     wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
+  );
+  const unbacked = index.articles.map(titleReceiptProblem).filter(Boolean);
+  check(
+    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one is shorter, an adapted one says so, a translation carries two model-family checks, and an original matches its authored bilingual title',
+    unbacked.length === 0,
+    unbacked.slice(0, 4).join(' · ') || `${index.articles.length} rows backed`,
   );
   // TENOHIRA Decision 4: the committed queue may lift an authored record out
   // of 検収前. Each of the 30 is paired to its queue row — approved means
@@ -351,7 +423,7 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
     'every archive row carries a non-empty titleEn with wrapper provenance',
     archive.articles.length > 0 &&
       archiveMissingEn.length === 0 &&
-      TITLE_EN_SOURCES.has(archive.titleEnSource),
+      ARCHIVE_TITLE_SOURCES.has(archive.titleEnSource),
     archiveMissingEn.length
       ? archiveMissingEn
           .slice(0, 5)
@@ -765,9 +837,9 @@ try {
     const body = bodies.get(id);
     const beforeNoise = noise.length;
     const item = page.locator(storyCard(id));
-    // The design's card: a topic kicker, the headline and a foot with the JLPT level chip (and 読了
-    // once finished; since the 2026-10-01 polish pass a teaser in today's six carries the same foot).
-    // Source, licence and 未確認 live in the reader.
+    // The design's card: a topic kicker, the headline and the JLPT level chip — since the FEEL pass
+    // (2026-10-02) the level stands on the card's picture slot, top-right, and the foot keeps the date
+    // (and 読了 once finished). Source, licence and 未確認 live in the reader.
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
@@ -777,7 +849,7 @@ try {
         kicker: node.querySelector('.story-kicker .l-ja')?.textContent ?? '',
         title: title?.textContent ?? '',
         foot: !!node.querySelector('.story-foot'),
-        level: node.querySelector('.story-foot .level-chip')?.textContent ?? '',
+        level: node.querySelector('.level-chip')?.textContent ?? '',
         background: style.backgroundColor,
         border: style.border,
         radius: style.borderRadius,

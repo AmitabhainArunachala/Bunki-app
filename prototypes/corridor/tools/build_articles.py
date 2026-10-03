@@ -36,8 +36,9 @@ Level signals (stored separately, never averaged — the #42 law):
                     Signals shown are always true of the text displayed.
 
 Usage:
-  python build_articles.py            # build the full shelf
-  python build_articles.py --out DIR  # elsewhere (tests)
+  python build_articles.py               # build the full shelf
+  python build_articles.py --out DIR     # elsewhere (tests)
+  python build_articles.py --allow-drop  # let the rebuild lose rows no source here re-collects
 """
 
 from __future__ import annotations
@@ -63,6 +64,7 @@ NINJAL_UNAVAILABLE_REASON = (
     "build environment (egress policy); run the build where "
     "mmsrv.ninjal.ac.jp is reachable to fill this pair in"
 )
+CURATED_ROW_FIELDS = ("titleEn", "titleEnSource", "picture", "accent")
 
 
 # --------------------------------------------------------------------------
@@ -581,6 +583,11 @@ def main() -> int:
         action="store_true",
         help="recompute only the jlpt_lexicon signal on every committed body + index row from the tokens already on disk",
     )
+    ap.add_argument(
+        "--allow-drop",
+        action="store_true",
+        help="write the index even though it loses rows the current index.json holds that no source here re-collects",
+    )
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -599,6 +606,27 @@ def main() -> int:
 
     articles = collect_articles()
     print(f"· {len(articles)} articles through the pipeline")
+
+    # other writers (feed_fresh, the WP9b builder, the native readings) add
+    # rows to the same index; a rebuild that cannot re-collect them must not
+    # silently take them, their pictures and their titles off the shelf
+    previous = out / "index.json"
+    previous_rows = json.loads(previous.read_text("utf-8"))["articles"] if previous.exists() else []
+    collected = {a["id"] for a in articles}
+    dropped = [row["id"] for row in previous_rows if row["id"] not in collected]
+    if dropped and not args.allow_drop:
+        raise SystemExit(
+            f"refusing to rewrite {previous}: no source here re-collects {len(dropped)} of its rows, "
+            f"so the rebuild would drop them — {', '.join(dropped)}. "
+            "Pass --allow-drop to write the index without them."
+        )
+
+    # no source carries the authored English titles or the drawn pictures —
+    # a rebuilt row keeps them from the index it replaces
+    curated = {
+        row["id"]: {k: row[k] for k in CURATED_ROW_FIELDS if k in row}
+        for row in previous_rows
+    }
 
     ninjal_live = 0
     index_rows: list[dict] = []
@@ -631,6 +659,7 @@ def main() -> int:
         row["grading"] = grading
         row["seeds"] = seeds
         row["truncated"] = False
+        row.update(curated.get(a["id"], {}))
         index_rows.append(row)
 
         jr = grading["signals"]["jreadability"]

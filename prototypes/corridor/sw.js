@@ -13,7 +13,7 @@
 // The release builder prepends the SHA-256 of its sorted source asset paths
 // and digests. Every packaged change then gets a distinct atomic boot cache.
 // Unstaged development installs retain an explicit manually bumped fallback.
-const DEVELOPMENT_VERSION = 'kairo-v8-dev';
+const DEVELOPMENT_VERSION = 'kairo-v9-dev';
 const assetVersion = self.KAIRO_ASSET_VERSION;
 if (
   assetVersion !== undefined &&
@@ -87,6 +87,13 @@ const SHELL = [
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
   'data/share_alike/kkld.json',
+  // 単語帳 opens offline from install, like the context deck
+  'data/share_alike/decks/kotoba-mine.json',
+  'decks/context-dense/mount.js',
+  'decks/context-dense/engine.js',
+  'decks/context-dense/deck.json',
+  'decks/context-dense/context-deck.css',
+  'decks/context-dense/standalone.html',
 ];
 
 // Keep this in step with boot()'s awaited data and scheduler import. Testing

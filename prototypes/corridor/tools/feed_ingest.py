@@ -34,7 +34,9 @@ which mode ran. The selection NEVER depends on the probe, so two runs over the
 same repo state pick the same tranche.
 
 English titles are authored, not generated: the mint refuses any candidate
-missing from docs/content/feed-titles-en.json (titleEnSource renkan-ai-2026-08).
+missing from docs/content/feed-titles-en.json (titleEnSource renkan-ai-2026-08,
+unless the file's per-row "sources" entry names a publisher headline or a
+cross-checked translation).
 
 Usage:
   python feed_ingest.py                 # one full loop, tranche of 6
@@ -123,6 +125,16 @@ def load_titles() -> dict[str, str]:
     if data.get("titleEnSource") != TITLE_EN_SOURCE:
         raise SystemExit(f"{TITLES_PATH}: titleEnSource must be {TITLE_EN_SOURCE!r}")
     return dict(data.get("titles", {}))
+
+
+def load_title_sources() -> dict[str, str]:
+    """Per-row provenance for titles that were checked after authoring (a
+    publisher label with its URL, or translation, cross-checked;
+    verify-native-readings.mjs owns the label set); a row without one keeps
+    the file's titleEnSource."""
+    if not TITLES_PATH.exists():
+        return {}
+    return dict(json.loads(TITLES_PATH.read_text("utf-8")).get("sources", {}))
 
 
 def write_pretty_json(path: Path, payload) -> None:
@@ -264,7 +276,7 @@ def live_probe(timeout: float = 8.0) -> dict:
 
 
 # --------------------------------------------------------------- minting
-def mint_candidate(candidate: dict, title_en: str, as_of: str, tagger, jlpt_maps) -> tuple[dict, dict, dict]:
+def mint_candidate(candidate: dict, title_en: str, as_of: str, tagger, jlpt_maps, title_source: str = TITLE_EN_SOURCE) -> tuple[dict, dict, dict]:
     """One candidate through the build_articles machinery. Returns
     (body record, index row, queue row) in the exact shelf grammar."""
     text = candidate["text"]
@@ -272,7 +284,7 @@ def mint_candidate(candidate: dict, title_en: str, as_of: str, tagger, jlpt_maps
         "id": candidate["id"],
         "title": candidate["title"],
         "titleEn": title_en,
-        "titleEnSource": TITLE_EN_SOURCE,
+        "titleEnSource": title_source,
         "source": "ja.wikinews",
         "sourceLabel": "ウィキニュース · 検収前",
         "pool": "proprietary_safe",
@@ -475,6 +487,7 @@ def main() -> int:
         print(f"    fill {step['band']} ({step['bandCountBefore']} on shelf) ← {step['picked']}  {step['date']}  {step['chars']}字")
 
     titles = load_titles()
+    title_sources = load_title_sources()
     missing = [c["id"] for c in picks if not str(titles.get(c["id"], "")).strip()]
     if missing:
         print("REFUSED — these candidates have no authored English title in "
@@ -498,7 +511,8 @@ def main() -> int:
     archive_index = json.loads(ARCHIVE_INDEX_PATH.read_text("utf-8"))
     minted_rows: list[dict] = []
     for candidate in picks:
-        record, row, queue_row = mint_candidate(candidate, titles[candidate["id"]], args.as_of, tagger, jlpt_maps)
+        record, row, queue_row = mint_candidate(candidate, titles[candidate["id"]], args.as_of, tagger, jlpt_maps,
+                                                title_sources.get(candidate["id"], TITLE_EN_SOURCE))
         (ARTICLES / row["file"]).write_text(
             json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
         )

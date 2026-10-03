@@ -1,0 +1,25 @@
+<div class="km">
+  <div class="mod">{{Module}}</div>
+  <div class="sent">{{Sentence}}</div>
+  <hr id="answer" />
+  <div class="head"><span class="term">{{Term}}</span><span class="reading">{{Reading}}</span></div>
+  <div class="meta">{{POS}} · {{Register}}</div>
+  <div class="def">{{DefJA}}</div>
+  <div class="gloss">{{Gloss}}</div>
+  <details class="tr">
+    <summary>English</summary>
+    {{SentenceEN}}
+  </details>
+  {{#MoreSentences}}
+  <div class="more">{{MoreSentences}}</div>
+  {{/MoreSentences}} {{#Collocations}}
+  <div class="col"><span class="lbl">よく使う形</span>{{Collocations}}</div>
+  {{/Collocations}} {{#Confusables}}
+  <div class="conf"><span class="lbl">紛らわしい語</span>{{Confusables}}</div>
+  {{/Confusables}} {{#Kanji}}
+  <div class="kanji"><span class="lbl">字</span>{{Kanji}}</div>
+  {{/Kanji}} {{#Note}}
+  <div class="note">{{Note}}</div>
+  {{/Note}}
+  <div class="src">『{{Passage}}』 · {{Key}}</div>
+</div>

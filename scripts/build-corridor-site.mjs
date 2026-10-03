@@ -110,6 +110,8 @@ try {
     'skip-ui.js',
     'reference-core.js',
     'reference-ui.js',
+    'decks/context-dense/engine.js',
+    'decks/context-dense/mount.js',
     'sw.js',
   ]) {
     execFileSync(process.execPath, ['--check', join(source, path)], { stdio: 'pipe' });

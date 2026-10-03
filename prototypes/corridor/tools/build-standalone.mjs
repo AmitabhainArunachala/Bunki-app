@@ -295,6 +295,14 @@ for (const entry of [...assessmentCatalog.entries, ...(assessmentCatalog.archive
 }
 const assessmentPack = Object.fromEntries([...assessmentAssets].map(([path, asset]) =>
   [path, { mimeType: asset.mimeType, base64: asset.base64 }]));
+// 単語帳 — the deck room reads its decks from the bundle the same way
+const decksDir = resolve(CORRIDOR, 'data/share_alike/decks');
+if (existsSync(decksDir)) {
+  for (const file of readdirSync(decksDir).sort()) {
+    if (!file.endsWith('.json')) continue;
+    bundle[`decks/${file.replace(/\.json$/, '')}`] = JSON.parse(read(`data/share_alike/decks/${file}`));
+  }
+}
 
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
 const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
@@ -467,8 +475,11 @@ ${BODY}
 </html>
 `;
 
+const emitted = fragment ? fragmentHtml : html;
+// story pictures are served-build only (storyPictureSource), so a WebP in the single file is dead weight
+assert(!/data:image\/webp|UklGR[A-Za-z0-9+/]{6}XRUJQ/u.test(emitted), 'Standalone must carry no WebP payload');
 mkdirSync(dirname(out), { recursive: true });
-writeFileSync(out, fragment ? fragmentHtml : html, { flag: 'wx' });
+writeFileSync(out, emitted, { flag: 'wx' });
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORRIDOR,
   artifactSha256: JSON.parse(read('build-identity.json')).artifactSha256,

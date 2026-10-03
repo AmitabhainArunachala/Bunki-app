@@ -1062,6 +1062,9 @@ async function assistedWhyCase(page, section, log) {
           o.doorAfterClose = await page.locator('#exam-why').innerText();
           await page.locator('#exam-why').click();
           await page.locator('#exam-why-sheet').waitFor();
+          // Reopening schedules title focus on the next frame, which also scrolls.
+          // Finish that handoff before the disabled-answer pointer check below.
+          await page.waitForFunction(() => document.activeElement?.id === 'exam-why-title');
         } finally {
           o.puts = await page.evaluate(() => {
             const counter = window.__g1Puts;
@@ -1080,7 +1083,14 @@ async function assistedWhyCase(page, section, log) {
       });
       await stage('A3-ui-lock', 'behavior', async (o) => {
         // a forced tap on another choice changes nothing; flag and unflag stay legal
-        await page.locator('[data-exam-option="choice-2"]').click({ force: true });
+        const lockedChoice = page.locator('[data-exam-option="choice-2"]');
+        assert(await lockedChoice.isDisabled());
+        // Hover checks stability and the hit target without requiring enabledness.
+        // A bare forced click can hit the fixed bookshelf control during scrolling.
+        await lockedChoice.hover();
+        await lockedChoice.click({ force: true });
+        await atPrompt('q05');
+        assert.deepEqual(lockOf(await disk(page), 'q05'), kept.q05);
         await page.locator('#exam-flag').click();
         await pollRecord(page, (record) => answerOf(record, 'q05').flagged === true);
         await page.locator('#exam-flag').click();
@@ -1659,15 +1669,16 @@ try {
 
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
-      await page.locator('#mini-take').click();
-      await page.locator('#vocabulary-list-dialog[open]').waitFor();
+      // lists open in a small popover from the popup's "Add to list…" (reader lane 2026-10-02), never a window
+      await page.locator('#mini-lists').click();
+      await page.locator('#vocabulary-list-popover').waitFor();
       await page.keyboard.press('Escape');
-      // the dialog's close event (a later task) removes it and hands focus back to its invoker
-      await page.waitForFunction(() => !document.getElementById('vocabulary-list-dialog'));
-      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the list window closes only that window');
-      assert.equal((await atOccurrence()).focused, true);
+      await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
+      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the list popover closes only the popover');
+      assert.equal(await page.evaluate(() => document.activeElement?.id), 'mini-lists', 'Esc hands focus back to Add to list…');
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0);
+      assert.equal((await atOccurrence()).focused, true, 'Esc in the popup returns to the same occurrence');
       const focusStyle = await page.evaluate(() => {
         const style = getComputedStyle(document.activeElement);
         return { outline: style.outlineColor, shadow: style.boxShadow, wash: style.backgroundColor };

@@ -51,12 +51,10 @@ first act of the #36 harvest: the sites-v11 kotobako dictionary rides in as
 first) and `strokes.json` (2,136 KanjiVG stroke-path sets, drawn on the
 kanji page). Word entries carry senses / kanji-in-word rows / real examples
 from the shelf; kanji pages carry 音訓, stroke order, components, and glossed
-compounds. The reader now uses a staged activation grammar: first activation
-reveals the reading, second reveals the English gloss, and third carries the
-word into its full named entry. Keyboard, switch, and screen-reader users get
-the same sequence plus discoverable quick-look and full-entry controls on
-focus, without a hold gesture. Particles remain inert under pointer activation
-but expose an explicit full-entry alternative to assistive input. 取る became
+compounds. The reader's staged activation grammar (reading, then gloss, then
+full entry) was replaced on 2026-10-02 by one tap for the meaning and a
+right-click / press-and-hold / ContextMenu word menu; "the reader's click
+grammar" comment in `corridor.js` owns the current grammar. 取る became
 覚える; items land in an automatic monthly list (the operator's Renzo habit)
 plus named lists, persisted in localStorage. A 12-entry original-content
 grammar dictionary seeds the DoJG-class index (文法 on the shelf). Reader
@@ -140,6 +138,19 @@ PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_corridor.
 node prototypes/corridor/tools/build_fsrs_pin.mjs
 node prototypes/corridor/tools/build-standalone.mjs
 ```
+
+No source carries a row's authored English title (`titleEn`,
+`titleEnSource`) or its drawn picture (`picture`, `accent`), so
+`build_articles.py` copies those four fields from the `index.json` it replaces
+onto every row it rebuilds. It re-collects only the wikinews, aozora,
+やさしい日本語 and v11 rows from the sources above. Every other row in the index
+(the fresh readings and their N3 adaptations, the native originals, the WP9b
+catalog) has no source here, so the build refuses to rewrite an index that
+holds any of them, names each row it would drop, and exits non-zero before
+writing anything; `--allow-drop` writes the index without them, pictures and
+titles included. On the committed shelf most rows are of that kind, so a plain
+run of the command above stops at this check. `tools/test_build_articles.py`
+pins both behaviours.
 
 Debian's patched setuptools cannot build `unidic-lite`'s sdist
 (`AttributeError: install_layout`); a plain venv with upstream setuptools can.

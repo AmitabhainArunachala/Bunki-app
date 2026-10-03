@@ -22,7 +22,8 @@ Usage (run from anywhere; the corpus grading stack must be importable —
   python feed_fresh.py --restage --since D     re-fetch with today's adapters; an item still
                                                PENDING review whose text changed is replaced
                                                in the dataset (its previous content hash kept)
-                                               and re-minted in place. Approved or rejected
+                                               and re-minted in place, keeping its index.json
+                                               picture and accent. Approved or rejected
                                                items are never touched.
 
 It installs no schedule. Running it daily is the operator's decision.
@@ -45,9 +46,12 @@ What one run does
            apart — the #42 law), the provenance pool of the source licence.
            English titles are authored, never generated: they come from
            docs/content/feed-fresh-titles-en.json (titleEnSource names who
-           wrote them). Every mint enters the shelf as review
-           "human-review-pending" with 検収前 in its sourceLabel, and gets a
-           kind:"fresh" row in docs/content/feed-review-queue.json; only the
+           wrote them; a per-row "sources" entry names a publisher label or a
+           cross-checked translation, as verify-native-readings.mjs defines
+           them, and wins over it). Every mint
+           enters the shelf as review "human-review-pending" with 検収前 in
+           its sourceLabel, and gets a kind:"fresh" row in
+           docs/content/feed-review-queue.json; only the
            operator's decision there (applied by feed_apply_review.py) lifts it.
   adapt    docs/content/feed-fresh-adaptations.json holds authored N3 rewrites of
            fresh readings (Bunki adaptations — never presented as the source).
@@ -112,6 +116,7 @@ def load_titles() -> dict:
     return {
         "titleEnSource": data.get("titleEnSource", ""),
         "titles": dict(data.get("titles", {})),
+        "sources": dict(data.get("sources", {})),
         "topics": dict(data.get("topics", {})),
         "skip": dict(data.get("skip", {})),
     }
@@ -387,6 +392,7 @@ def main() -> int:
     fetched: list[dict] = []
     restaged: list[dict] = []
     first_added: dict[str, str] = {}  # a restaged reading keeps the day it first reached the shelf
+    kept_pictures: dict[str, dict] = {}
     report: dict = {"terms": [], "sources": {}, "skipped": []}
     # only a reading nobody has decided on may be re-extracted
     pending_fresh = {row["id"] for row in queue if row.get("kind") == QUEUE_KIND and row.get("decision") == "pending"}
@@ -432,6 +438,8 @@ def main() -> int:
             replacement = {row["id"]: row for row in restaged}
             dataset = [replacement.get(row["id"], row) for row in dataset]
             first_added = {row["id"]: row["addedAt"] for row in queue if row["id"] in replacement and row.get("addedAt")}
+            kept_pictures = {row["id"]: {key: row[key] for key in ("picture", "accent") if key in row}
+                             for row in index["articles"] if row["id"] in replacement}
             index["articles"] = [row for row in index["articles"] if row["id"] not in replacement]
             queue = [row for row in queue if row["id"] not in replacement]
             shelf_ids -= set(replacement)
@@ -456,7 +464,7 @@ def main() -> int:
             for record in (qrow, shelf_row, body):
                 record["titleEn"] = title_en
             for record in (shelf_row, body):
-                record["titleEnSource"] = titles["titleEnSource"]
+                record["titleEnSource"] = titles["sources"].get(qrow["id"], titles["titleEnSource"])
             body_path.write_text(json.dumps(body, ensure_ascii=False, separators=(",", ":")), "utf-8")
             retitled.append(qrow["id"])
         if retitled:
@@ -470,7 +478,7 @@ def main() -> int:
         for row in candidates:
             title_en = str(titles["titles"].get(row["id"], "")).strip()
             if title_en:
-                ready.append((row, title_en, titles["titleEnSource"]))
+                ready.append((row, title_en, titles["sources"].get(row["id"], titles["titleEnSource"])))
             elif args.allow_untitled:
                 ready.append((row, "", "untitled-pending"))
             else:
@@ -491,6 +499,7 @@ def main() -> int:
                 (ARTICLES / index_row["file"]).write_text(
                     json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
                 )
+                index_row.update(kept_pictures.get(index_row["id"], {}))
                 index["articles"].append(index_row)
                 queue.append(queue_row)
                 minted.append(queue_row)

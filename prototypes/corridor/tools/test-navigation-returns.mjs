@@ -21,7 +21,7 @@ function app() {
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
     requestAnimationFrame() {}, passage: () => null,
@@ -30,6 +30,7 @@ function app() {
     stopSentenceListening() { throw drawingBoundary; },
   });
   vm.runInContext(actualFunction('syncSheetActionVisit'), context);
+  vm.runInContext(actualFunction('closeReaderWordMenu'), context);
   vm.runInContext(actualFunction('render').replace('function render(', 'function renderUntilDOM('), context);
   context.render = () => {
     try { context.renderUntilDOM(); }

@@ -1,4 +1,6 @@
-/** Real reader vocabulary chooser journeys against one immutable artifact.
+/** Real reader popup and optional list-popover journeys against one immutable artifact.
+ * Round 1 retired the modal chooser: Save captures immediately; Add to list opens
+ * checkboxes, and card context remains available in Full entry.
  * Uses native learner records; review history is a labelled synthetic fixture
  * restored only into this verifier's isolated loopback browser through import.
  * Faults abort real native record writes. No voice or design acceptance claim. */
@@ -31,10 +33,11 @@ assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
 const row = record => record.taken?.find(item => item.t === 'word' && item.id === word);
 const learning = record => ({ taken: record.taken || [], lists: record.lists || {}, srs: record.srs || {}, revlog: record.revlog || [] });
 const history = record => ({ lists: record.lists || {}, srs: record.srs || {}, revlog: record.revlog || [] });
-const dialog = page => page.locator('#vocabulary-list-dialog');
-const status = page => page.locator('#vocabulary-list-dialog .vocabulary-list-status');
-const listName = page => page.getByRole('textbox', { name: 'Name a new vocabulary list', exact: true });
-const create = page => page.getByRole('button', { name: 'Create list & save', exact: true });
+const dialog = page => page.locator('#vocabulary-list-popover');
+const status = page => page.locator('#vocabulary-list-popover .vocabulary-list-status');
+const listName = page => page.getByRole('textbox', { name: 'Name a new list', exact: true });
+const create = page => page.locator('#vocabulary-list-create');
+const listBox = (page, name) => dialog(page).locator('input[type="checkbox"]').filter({ visible: true }).and(page.locator(`[data-list=${JSON.stringify(name)}]`));
 const token = page => page.locator(`#reader .tok.content[data-index="${tokenIndex}"]`);
 async function shelf(page) {
   await page.goto(`${host.origin}/?entry=shelf&ui=bi&dials=0,1,0`);
@@ -48,48 +51,54 @@ async function reader(page) {
   await page.locator(`#shelf-reading-results [data-passage="${passageId}"] .shelf-open`).click();
   await token(page).waitFor();
 }
-async function openChooser(page, { mini = false } = {}) {
-  if (mini) {
-    await token(page).scrollIntoViewIfNeeded();
-    const box = await token(page).boundingBox();
-    assert(box);
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.waitForTimeout(650);
-    await page.mouse.up();
-    await page.locator('#mini-take').waitFor();
-    assert.equal(await page.locator('#mini .mini-word').textContent(), word);
-    assert.equal(await page.locator('#mini-take').isDisabled(), false);
-    await page.locator('#mini-take').click();
-  } else {
-    await token(page).click();
-    await page.locator('#reader-take').click();
-  }
+async function openPopup(page) {
+  if (!await page.locator('#mini').count()) await token(page).click();
+  await page.locator('#mini-take').waitFor();
+  assert.equal(await page.locator('#mini .mini-word').textContent(), word);
+  assert.equal(await page.locator('#mini-take').isDisabled(), false);
+}
+async function openChooser(page) {
+  await openPopup(page);
+  await page.locator('#mini-lists').click();
   await dialog(page).waitFor();
-  assert.equal(await dialog(page).evaluate(node => node.open), true);
-  assert.equal(await page.locator('#capture-panel').count(), 0, 'Normal capture uses the focused chooser');
+  assert.equal(await dialog(page).getAttribute('role'), 'dialog');
+  assert.equal(await page.locator('#mini-lists').getAttribute('aria-expanded'), 'true');
+  assert.equal(await page.locator('#vocabulary-list-dialog, #capture-panel').count(), 0, 'Optional lists use the compact popover');
 }
 async function closeChooser(page) {
-  await page.locator('#vocabulary-list-close').click();
+  await dialog(page).press('Escape');
   await dialog(page).waitFor({ state: 'detached' });
+  assert.equal(await page.locator('#mini-lists').getAttribute('aria-expanded'), 'false');
+  assert.equal(await page.locator('#mini-lists').evaluate(node => node === document.activeElement), true, 'Escape returns focus to Add to list');
 }
-async function recoverProtectedChooser(page) {
-  assert.match(await status(page).textContent(), /reload/iu, 'The failure explains the protected record recovery path');
-  await closeChooser(page);
+async function recoverRecord(page) {
+  if (await dialog(page).count()) await closeChooser(page);
+  await page.locator('#record-reload').waitFor();
   await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
   await reader(page);
-  await openChooser(page, { mini: true });
+}
+async function recoverProtectedChooser(page) {
+  assert.match(await status(page).textContent(), /reload/iu, 'The failure explains the protected record recovery path');
+  await recoverRecord(page);
+  await openChooser(page);
 }
 async function saved(page) {
   const record = await waitForAppRecord(page, record => !!row(record), { description: 'captured reader word' });
-  await page.locator('#vocabulary-list-stop').waitFor();
+  await page.waitForFunction(() => document.querySelector('#mini-take')?.getAttribute('aria-pressed') === 'true');
   return record;
 }
+async function openContext(page) {
+  await openPopup(page);
+  await page.locator('#mini .mini-entry').click();
+  await page.locator('#sheet [data-ctx-scope="sent"]').waitFor();
+}
 async function chooseScope(page, scope) {
-  await page.locator(`#vocabulary-list-dialog [data-ctx-scope="${scope}"]`).click();
-  return waitForAppRecord(page, record => scope === 'word' ? !row(record)?.ctx : row(record)?.ctx?.scope === scope,
+  await page.locator(`#sheet [data-ctx-scope="${scope}"]`).click();
+  const record = await waitForAppRecord(page, record => scope === 'word' ? !row(record)?.ctx : row(record)?.ctx?.scope === scope,
     { description: `durable ${scope} card context` });
+  await page.locator(`#sheet [data-ctx-scope="${scope}"].on-list`).waitFor();
+  return record;
 }
 function contextIs(record, scope) {
   assert(row(record), 'The same word remains captured');
@@ -113,7 +122,7 @@ try {
         console.log(`PASS ${engine}/${name}`);
       } catch (error) {
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
-        await page.screenshot({ path: screenshot, fullPage: true }).catch(() => {});
+        await page.screenshot({ path: screenshot, fullPage: false }).catch(() => {});
         results.push({ engine, name, passed: false, error: error.stack || String(error), errors, screenshot });
         console.log(`FAIL ${engine}/${name}: ${error.message}`);
       } finally { await context.close(); }
@@ -132,8 +141,8 @@ try {
         assert.equal(glossaryIds.size, 10);
         // the shelf's one tally counts every story and says how many are glossary entries
         const tally = (total, glossary) => glossary
-          ? [`読み物 ${total} 本（うち用語集 ${glossary}）`, `${total} readings, including ${glossary} glossary entries`]
-          : [`読み物 ${total} 本`, `${total} ${total === 1 ? 'reading' : 'readings'}`];
+          ? [`読み物 ${total} 本（うち用語集 ${glossary}）`, `${total} articles, ${glossary} of them short word definitions`]
+          : [`読み物 ${total} 本`, `${total} articles`];
         assert(tally(stories.length, glossaryIds.size).includes((await page.locator('.shelf-results-count').textContent()).trim()));
         await page.locator('#shelf-reading-search').fill('育児休業');
         await page.locator('#shelf-reading-search').press('Enter');
@@ -145,48 +154,60 @@ try {
         assert(tally(filtered.length, glossary).includes((await page.locator('.shelf-results-count').textContent()).trim()));
         return { stories: stories.length, glossary: glossaryIds.size, uniqueCards: ids.length, search: filtered };
       });
-      await check('cancel-default-and-three-context-scopes', async page => {
+      await check('popup-cancel-direct-save-and-three-context-scopes', async page => {
         await reader(page);
         const before = learning(await readAppRecord(page));
         await openChooser(page);
-        assert.deepEqual(learning(await readAppRecord(page)), before, 'Opening is not capture');
+        const mini = await page.locator('#mini').elementHandle();
+        assert.deepEqual(learning(await readAppRecord(page)), before, 'Opening optional lists is not capture');
         await closeChooser(page);
         assert.deepEqual(learning(await readAppRecord(page)), before, 'Closing without saving changes no learning roots');
-        await openChooser(page);
-        await page.locator('#vocabulary-list-save').click();
+        assert.equal(await mini.evaluate(node => node.isConnected), true, 'Closing lists preserves the word popup');
+        await page.locator('#mini-take').click();
         const initial = await saved(page);
+        assert.equal(await dialog(page).count(), 0, 'One Save captures directly without opening lists');
         contextIs(initial, 'sent');
         assert.deepEqual(initial.srs || {}, before.srs);
         assert.deepEqual(initial.revlog || [], before.revlog);
+        assert.deepEqual(initial.lists || {}, before.lists);
+        assert.equal(initial.taken.filter(item => item.id === word).length, 1);
         const original = { ...row(initial) }; delete original.ctx;
+        await openContext(page);
         for (const scope of ['word', 'sent', 'para']) {
           contextIs(await chooseScope(page, scope), scope);
-          await closeChooser(page);
-          await reader(page); // a new document reloads the native record
+          await reader(page); // reload the durable native record
           const restored = await readAppRecord(page);
           contextIs(restored, scope);
           const rest = { ...row(restored) }; delete rest.ctx;
-          assert.deepEqual(rest, original, 'Changing scope does not rewrite capture identity or its start time');
-          await openChooser(page);
-          assert.equal(await page.locator(`[data-ctx-scope="${scope}"]`).evaluate(node => node.classList.contains('on-list')), true);
+          assert.deepEqual(rest, original, 'Changing scope preserves capture identity and start time');
+          await openContext(page);
+          assert.equal(await page.locator(`#sheet [data-ctx-scope="${scope}"]`).evaluate(node => node.classList.contains('on-list')), true);
         }
-        return { word, defaultScope: 'sent', restoredScopes: ['word', 'sent', 'para'] };
+        return { word, defaultScope: 'sent', restoredScopes: ['word', 'sent', 'para'], directSave: true };
       });
-      await check('named-list-mini-reuse-and-history-preserving-undo', async page => {
+      await check('list-checkboxes-popup-reuse-and-history-preserving-undo', async page => {
         await reader(page);
-        await openChooser(page, { mini: true });
+        await openChooser(page);
         const mini = await page.locator('#mini').elementHandle();
         await listName(page).fill('Chooser history fixture');
         await create(page).click();
         await waitForAppRecord(page, value => value.lists?.['Chooser history fixture']?.some(item => item.id === word));
-        await status(page).filter({ hasText: 'Saved to Chooser history fixture.' }).waitFor();
-        assert.equal(await mini.evaluate(node => node.isConnected), true, 'The original mini survives the modal and save');
+        await status(page).filter({ hasText: 'Added to Chooser history fixture.' }).waitFor();
+        assert.equal(await mini.evaluate(node => node.isConnected), true, 'The original popup survives list capture');
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'true');
-        assert.match(await status(page).textContent(), /Saved to Chooser history fixture/u);
+        assert.equal(await listBox(page, 'Chooser history fixture').isChecked(), true);
+        const captured = row(await readAppRecord(page));
+        await listBox(page, 'Chooser history fixture').uncheck();
+        await status(page).filter({ hasText: 'Taken off Chooser history fixture.' }).waitFor();
+        const off = await waitForAppRecord(page, value => value.lists?.['Chooser history fixture']?.length === 0);
+        assert.deepEqual(row(off), captured, 'Unticking a list does not remove or restart the saved card');
+        await listBox(page, 'Chooser history fixture').focus();
+        await page.keyboard.press('Space');
+        await status(page).filter({ hasText: 'Added to Chooser history fixture.' }).waitFor();
+        assert.equal(await listBox(page, 'Chooser history fixture').evaluate(node => node === document.activeElement), true, 'Checkbox repaint retains keyboard focus');
         await closeChooser(page);
         assert.equal(await mini.evaluate(node => node.isConnected), true);
-        await page.locator('#mini-take').click();
-        await dialog(page).waitFor();
+        await openChooser(page);
         assert.equal((await readAppRecord(page)).taken.filter(item => item.id === word).length, 1, 'Reopening never duplicates or removes the card');
         await closeChooser(page);
         // Explicitly synthetic reviewed history, isolated to this verifier browser.
@@ -197,55 +218,61 @@ try {
           revlog: [[1754000000000, `word:${word}`, 3, 0, null, null, null, null, 3, 5, 1, 1200]] };
         await restoreAppFixture(page, fixture);
         await reader(page);
-        await openChooser(page, { mini: true });
+        await openPopup(page);
         const prior = history(await readAppRecord(page));
         assert(Object.keys(prior.srs).length && prior.revlog.length && Object.keys(prior.lists).length);
-        await page.locator('#vocabulary-list-stop').click();
-        const removed = await waitForAppRecord(page, value => !row(value), { description: 'explicit stop memorizing' });
-        await status(page).filter({ hasText: /Stopped memorizing/u }).waitFor();
-        assert.deepEqual(history(removed), prior, 'Undo preserves non-empty schedules, review history, and list membership');
+        await page.locator('#mini-take').click();
+        const removed = await waitForAppRecord(page, value => !row(value), { description: 'explicit removal from review' });
+        await page.locator('#reader-toast').filter({ hasText: 'Removed from review' }).waitFor();
+        assert.deepEqual(history(removed), prior, 'Removing from review preserves schedules, review history, and lists');
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false');
-        assert.match(await status(page).textContent(), /Stopped memorizing/u);
-        await closeChooser(page);
-        assert.equal(await page.locator('#mini').count(), 1);
+        await page.locator('#reader-toast-action').click();
+        await saved(page);
+        assert.deepEqual(history(await readAppRecord(page)), prior, 'Toast Undo restores the card without rewriting its history');
         await reader(page);
-        assert.equal(row(await readAppRecord(page)), undefined);
+        assert(row(await readAppRecord(page)), 'Undo survives reload');
         assert.deepEqual(history(await readAppRecord(page)), prior);
-        return { list: 'Chooser history fixture', retainedReviewRows: prior.revlog.length, retainedScheduleKeys: Object.keys(prior.srs), miniReused: true };
+        return { list: 'Chooser history fixture', retainedReviewRows: prior.revlog.length, retainedScheduleKeys: Object.keys(prior.srs), popupReused: true, checkboxKeyboard: true };
       });
-      await check('only-a-named-save-clears-the-typed-list-name', async page => {
+      await check('only-a-named-add-clears-the-typed-list-name', async page => {
         await reader(page);
         await openChooser(page);
         await listName(page).fill('Existing chooser list');
         await create(page).click();
         await waitForAppRecord(page, value => value.lists?.['Existing chooser list']?.some(item => item.id === word));
-        await status(page).filter({ hasText: 'Saved to Existing chooser list.' }).waitFor();
-        assert.equal(await listName(page).inputValue(), '', 'Saving the typed name clears that draft');
+        await status(page).filter({ hasText: 'Added to Existing chooser list.' }).waitFor();
+        assert.equal(await listName(page).inputValue(), '', 'Adding the typed name clears that draft');
         await listName(page).fill('N1 読解');
-        await page.locator('#vocabulary-list-save').click();
-        await status(page).filter({ hasText: 'Saved for review.' }).waitFor();
-        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Save for review keeps the unrelated typed name');
-        await dialog(page).getByRole('button', { name: /Existing chooser list$/u }).click();
-        await status(page).filter({ hasText: 'Saved to Existing chooser list.' }).waitFor();
-        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Tapping an existing list keeps the unrelated typed name');
+        await closeChooser(page);
+        await page.locator('#mini-take').click();
+        await waitForAppRecord(page, value => !row(value));
+        await page.locator('#reader-toast-action').click();
+        await saved(page);
+        await openChooser(page);
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Review Save/Undo keeps the unrelated typed name');
+        await listBox(page, 'Existing chooser list').uncheck();
+        await status(page).filter({ hasText: 'Taken off Existing chooser list.' }).waitFor();
+        await listBox(page, 'Existing chooser list').check();
+        await status(page).filter({ hasText: 'Added to Existing chooser list.' }).waitFor();
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Changing existing list membership keeps the typed name');
         assert.equal((await readAppRecord(page)).lists?.['N1 読解'], undefined, 'An unsubmitted name creates no list');
         await closeChooser(page);
         await reader(page);
         await openChooser(page);
-        assert.equal(await listName(page).inputValue(), 'N1 読解', 'The kept name survives close and reload as a session draft');
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'The draft survives close and reload');
         await create(page).click();
         await waitForAppRecord(page, value => value.lists?.['N1 読解']?.some(item => item.id === word));
-        await status(page).filter({ hasText: 'Saved to N1 読解.' }).waitFor();
+        await status(page).filter({ hasText: 'Added to N1 読解.' }).waitFor();
         assert.equal(await listName(page).inputValue(), '');
         await closeChooser(page);
         await reader(page);
         await openChooser(page);
-        assert.equal(await listName(page).inputValue(), '', 'The explicitly saved name does not return as a draft');
-        return { kept: ['Save for review', 'existing list'], cleared: 'form submit of the typed name' };
+        assert.equal(await listName(page).inputValue(), '', 'The saved name does not return as a draft');
+        return { kept: ['review Save/Undo', 'existing list checkbox'], cleared: 'form submit of the typed name' };
       });
       await check('native-write-failures-preserve-draft-and-retry', async page => {
         await reader(page);
-        await openChooser(page, { mini: true });
+        await openChooser(page);
         await listName(page).fill('Retry vocabulary');
         const before = learning(await readAppRecord(page));
         await armRecordWriteFailure(page, 'quota', { roots: ['taken'] });
@@ -261,7 +288,7 @@ try {
         assert.equal(await listName(page).inputValue(), 'Retry vocabulary', 'The required recovery reload preserves the unsaved list name');
         await create(page).click();
         await waitForAppRecord(page, value => value.lists?.['Retry vocabulary']?.some(item => item.id === word));
-        await status(page).filter({ hasText: 'Saved to Retry vocabulary.' }).waitFor();
+        await status(page).filter({ hasText: 'Added to Retry vocabulary.' }).waitFor();
         assert.equal(await listName(page).inputValue(), '');
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'true');
         const captured = learning(await readAppRecord(page));
@@ -277,19 +304,24 @@ try {
         assert.equal(await listName(page).inputValue(), 'Second retry list', 'List-only recovery also preserves the unsaved list name');
         await create(page).click();
         await waitForAppRecord(page, value => value.lists?.['Second retry list']?.some(item => item.id === word));
-        await status(page).filter({ hasText: 'Saved to Second retry list.' }).waitFor();
+        await status(page).filter({ hasText: 'Added to Second retry list.' }).waitFor();
+        await closeChooser(page);
+        await openContext(page);
         const priorScope = await readAppRecord(page);
         contextIs(priorScope, 'sent');
         await armRecordWriteFailure(page, 'abort', { roots: ['taken'] });
         await page.locator('[data-ctx-scope="para"]').click();
-        await status(page).filter({ hasText: /Could not save the context change|reload/iu }).waitFor();
+        await page.locator('#record-reload').waitFor();
         const contextFault = await clearRecordWriteFailure(page);
         assert(contextFault.fired > 0);
         assert.deepEqual(learning(await readAppRecord(page)), learning(priorScope));
         assert.equal(await page.locator('[data-ctx-scope="sent"]').evaluate(node => node.classList.contains('on-list')), true);
-        await recoverProtectedChooser(page);
+        await recoverRecord(page);
+        await openChooser(page);
         contextIs(await readAppRecord(page), 'sent');
         assert.equal(await listName(page).inputValue(), '', 'A successfully saved list name does not reappear as a recovery draft');
+        await closeChooser(page);
+        await openContext(page);
         contextIs(await chooseScope(page, 'para'), 'para');
         return { captureFault: captureFault.fired, listFault: listFault.fired, contextFault: contextFault.fired, retries: 'saved once after each failure' };
       });
@@ -301,7 +333,7 @@ try {
   writeFileSync(resolve(evidence, 'vocabulary-chooser.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    scope: 'Chooser lifecycle, native record durability, three context scopes, named lists, typed-name draft kept across unrelated saves, preserved synthetic review history, refusal/retry, mini reuse, and distinct shelf reading/glossary census',
+    scope: 'One-tap popup, direct Save, optional checkbox lists with keyboard focus, native durability, Full entry context scopes, typed-name drafts, preserved synthetic history, toast Undo, native failure/retry, popup reuse, and shelf article/definition census',
     results, passed,
   }, null, 2) + '\n');
   if (!passed) process.exitCode = 1;

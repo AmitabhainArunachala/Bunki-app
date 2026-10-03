@@ -4,12 +4,12 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 126,
-  "tokens": 64925
+  "articles": 138,
+  "tokens": 74503
  },
  "statusCounts": {
-  "lexicon-fixed": 368,
-  "accepted": 30
+  "lexicon-fixed": 372,
+  "accepted": 31
  },
  "openCount": 0,
  "rows": [
@@ -3534,6 +3534,176 @@
    "note": "都道府県"
   },
   {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 133,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "主催厚生労働省、都道府県及び市",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 216,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "ます。（２）都道府県及び市",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 262,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "２の行事が各都道府県及び市",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 337,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "の取組のみ（各都道府県の取組",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76330",
+   "token": 125,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "年10月に各都道府県に対し",
+   "note": "都道府県"
+  },
+  {
+   "article": "mext:b_menu-houdou-mext_01683",
+   "token": 108,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "場として、都道府県教育委員",
+   "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 362,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "市ヶ谷(住所：東京都新宿区市谷本村町",
+   "note": "東京都"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 544,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "作成のほか、各都道府県、市",
+   "note": "都道府県"
+  },
+  {
+   "article": "jawiki:3492442",
+   "token": 31,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "および名古屋市・東京都において2026年",
+   "note": "東京都"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 75,
+   "rule": "override-site",
+   "surface": "自",
+   "reading": "じ",
+   "status": "lexicon-fixed",
+   "context": "とする連立内閣（自維連立政権）で",
+   "note": "自維連立"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 76,
+   "rule": "override-site",
+   "surface": "維連",
+   "reading": "いれん",
+   "status": "lexicon-fixed",
+   "context": "する連立内閣（自維連立政権）で、",
+   "note": "自維連立"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 77,
+   "rule": "override-site",
+   "surface": "立",
+   "reading": "りつ",
+   "status": "lexicon-fixed",
+   "context": "連立内閣（自維連立政権）で、初めて",
+   "note": "自維連立"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
+   "token": 250,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "師会をはじめ、都道府県や地方",
+   "note": "都道府県"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 85,
+   "rule": "override-site",
+   "surface": "習近",
+   "reading": "しゅうきん",
+   "status": "lexicon-fixed",
+   "context": "国最高指導者の習近平（総書記）",
+   "note": "習近平"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 86,
+   "rule": "override-site",
+   "surface": "平",
+   "reading": "ぺい",
+   "status": "lexicon-fixed",
+   "context": "最高指導者の習近平（総書記）と",
+   "note": "習近平"
+  },
+  {
+   "article": "adapt-n3:jawiki:3492442",
+   "token": 28,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "名古屋市です。東京都など、愛知県の",
+   "note": "東京都"
+  },
+  {
+   "article": "mhlw:stf-newpage_76126",
+   "token": 573,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "HALL&CONFERENCE（東京都中央区日本橋兜町7",
+   "note": "東京都"
+  },
+  {
    "article": "mhlw:stf-newpage_76152",
    "token": 358,
    "rule": "override-site",
@@ -3814,146 +3984,6 @@
    "note": "都道府県"
   },
   {
-   "article": "mhlw:stf-newpage_76233",
-   "token": 133,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "主催厚生労働省、都道府県及び市",
-   "note": "都道府県"
-  },
-  {
-   "article": "mhlw:stf-newpage_76233",
-   "token": 216,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "ます。（２）都道府県及び市",
-   "note": "都道府県"
-  },
-  {
-   "article": "mhlw:stf-newpage_76233",
-   "token": 262,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "２の行事が各都道府県及び市",
-   "note": "都道府県"
-  },
-  {
-   "article": "mhlw:stf-newpage_76233",
-   "token": 337,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "の取組のみ（各都道府県の取組",
-   "note": "都道府県"
-  },
-  {
-   "article": "mhlw:stf-newpage_76330",
-   "token": 125,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "年10月に各都道府県に対し",
-   "note": "都道府県"
-  },
-  {
-   "article": "mext:b_menu-houdou-mext_01683",
-   "token": 108,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "場として、都道府県教育委員",
-   "note": "都道府県"
-  },
-  {
-   "article": "env:press-press_05616",
-   "token": 362,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "市ヶ谷(住所：東京都新宿区市谷本村町",
-   "note": "東京都"
-  },
-  {
-   "article": "env:press-press_05616",
-   "token": 544,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "作成のほか、各都道府県、市",
-   "note": "都道府県"
-  },
-  {
-   "article": "jawiki:3492442",
-   "token": 31,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "および名古屋市・東京都において2026年",
-   "note": "東京都"
-  },
-  {
-   "article": "jawiki:5294446",
-   "token": 75,
-   "rule": "override-site",
-   "surface": "自",
-   "reading": "じ",
-   "status": "lexicon-fixed",
-   "context": "とする連立内閣（自維連立政権）で",
-   "note": "自維連立"
-  },
-  {
-   "article": "jawiki:5294446",
-   "token": 76,
-   "rule": "override-site",
-   "surface": "維連",
-   "reading": "いれん",
-   "status": "lexicon-fixed",
-   "context": "する連立内閣（自維連立政権）で、",
-   "note": "自維連立"
-  },
-  {
-   "article": "jawiki:5294446",
-   "token": 77,
-   "rule": "override-site",
-   "surface": "立",
-   "reading": "りつ",
-   "status": "lexicon-fixed",
-   "context": "連立内閣（自維連立政権）で、初めて",
-   "note": "自維連立"
-  },
-  {
-   "article": "mhlw:stf-newpage_76126",
-   "token": 573,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "HALL&CONFERENCE（東京都中央区日本橋兜町7",
-   "note": "東京都"
-  },
-  {
-   "article": "mhlw:stf-newpage_76340",
-   "token": 250,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
-   "status": "accepted",
-   "context": "師会をはじめ、都道府県や地方",
-   "note": "都道府県"
-  },
-  {
    "article": "sports:sports-b_menu-houdou-31-09-1420919_00007",
    "token": 88,
    "rule": "miyako",
@@ -3964,34 +3994,54 @@
    "note": "都道府県"
   },
   {
-   "article": "jawiki-news:2026-09-21",
-   "token": 85,
+   "article": "kotoba-mine-m08-mind",
+   "token": 515,
    "rule": "override-site",
-   "surface": "習近",
-   "reading": "しゅうきん",
+   "surface": "日本",
+   "reading": "にほん",
    "status": "lexicon-fixed",
-   "context": "国最高指導者の習近平（総書記）",
-   "note": "習近平"
+   "context": "が重要である。日本語には特有の",
+   "note": "日本語"
   },
   {
-   "article": "jawiki-news:2026-09-21",
+   "article": "kotoba-mine-m08-mind",
+   "token": 516,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "重要である。日本語には特有の事情",
+   "note": "日本語"
+  },
+  {
+   "article": "kotoba-mine-m09-math",
+   "token": 615,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "いるのかは、日本語学でも長く",
+   "note": "日本語"
+  },
+  {
+   "article": "kotoba-mine-m09-math",
+   "token": 616,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "のかは、日本語学でも長く議論",
+   "note": "日本語"
+  },
+  {
+   "article": "kotoba-mine-m12-kanji",
    "token": 86,
-   "rule": "override-site",
-   "surface": "平",
-   "reading": "ぺい",
-   "status": "lexicon-fixed",
-   "context": "最高指導者の習近平（総書記）と",
-   "note": "習近平"
-  },
-  {
-   "article": "adapt-n3:jawiki:3492442",
-   "token": 28,
-   "rule": "miyako",
-   "surface": "都",
-   "reading": "と",
+   "rule": "unk-kanji",
+   "surface": "稽",
+   "reading": "けい",
    "status": "accepted",
-   "context": "名古屋市です。東京都など、愛知県の",
-   "note": "東京都"
+   "context": "みたい。たとえば「稽」という字。",
+   "note": "「稽」"
   }
  ]
 }
