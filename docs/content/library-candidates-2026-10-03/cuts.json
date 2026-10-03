@@ -1,0 +1,1925 @@
+{
+ "generated": "2026-10-03",
+ "stage": "1 (proposal only; no repo changes)",
+ "counts": {
+  "keep": 17,
+  "cut": 109
+ },
+ "notes": {
+  "pipeline": "build_articles.py re-collects rows from corpus/samples/{wikinews,aozora,yasashii} and the 8-text v11 catalog (it exits unless it finds exactly 8 v11 texts), and refuses to drop index rows without --allow-drop; feed_ingest.py/feed_fresh.py re-add the corpus/datasets/fresh rows. Removing rows in stage 2 needs a curated shelf filter (or --allow-drop plus source edits), not just deleting files.",
+  "shintoTests": "prototypes/corridor/tools/verify-native-readings.py asserts all 30 Shinto originals (docs/content/bunki-originals-zoka-sanjin.jsonl + editorial sidecar + first40 baseline) and scripts/verify-release-gates.mjs lists the same 30; both must be reduced to the 3 kept before the other 27 leave the shelf. verify-native-readings.mjs names silent-amenominakanushi and prayer-reality; verify-pr77-ports.mjs names miracle-testimony; verify-reader-gloss.mjs names feel-jingu-musubi and musubi-visual.",
+  "yasashiiTests": "verify-corridor.mjs (refProbe target yasashii:6), verify-playback.mjs (yasashii:6, yasashii:7 narration fixture), verify-vocabulary-chooser.mjs (yasashii:1, yasashii:2), verify-pr77-ports.mjs (openRow yasashii:1). If the glossary stays reachable as dictionary entries, these may only need the shelf assertion changed.",
+  "govTests": "verify-pr77-ports.mjs reads tokens of govonline:article-202609-radio-3739 and opens env:press-press_05591; repoint before cutting."
+ },
+ "rows": [
+  {
+   "id": "wikinews:1403",
+   "title": "世界自然遺産に7箇所を追加 知床半島も",
+   "titleEn": "Seven sites added to the World Natural Heritage list, including the Shiretoko Peninsula",
+   "source": "ja.wikinews",
+   "chars": 1237,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "keep",
+   "reason": "Complete 1,237-char nature story (Shiretoko joins World Heritage); dated 2005 but readable, and seven verifiers open it.",
+   "testRefs": [
+    "prototypes/corridor/tools/sentence-practice.test.mjs",
+    "prototypes/corridor/tools/verify-ai-adaptation.mjs",
+    "prototypes/corridor/tools/verify-corridor.mjs",
+    "prototypes/corridor/tools/verify-journey.mjs",
+    "prototypes/corridor/tools/verify-kagami.mjs",
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "prototypes/corridor/tools/verify-reference-connections.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:6460",
+   "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+   "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+   "source": "ja.wikinews",
+   "chars": 397,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "397-character 2009 sports brief (Ichiro hit total); a fragment.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:12024",
+   "title": "JRおおさか東線部分開業",
+   "titleEn": "JR Osaka Higashi Line partly opens",
+   "source": "ja.wikinews",
+   "chars": 779,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "keep",
+   "reason": "Dry 2008 rail-opening notice, kept only because verify-corridor and verify-reader-gloss open it; replace once they point elsewhere.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-corridor.mjs",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:20090",
+   "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+   "titleEn": "Shigaraki Kōgen Railway collision: Osaka District Court finds JR West 30% at fault",
+   "source": "ja.wikinews",
+   "chars": 813,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "2009 court ruling on a train crash; grim legal news, jreadability 上級後半.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:45227",
+   "title": "ウィキニュース、21年の歴史に幕を閉じる",
+   "titleEn": "Wikimedia Foundation closes Wikinews after 21 years",
+   "source": "ja.wikinews",
+   "chars": 1304,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "News about Wikinews itself closing; no value to a learner (verify-feed.mjs only mentions it in a comment).",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "aozora:051034",
+   "title": "野ばら",
+   "titleEn": "Wild Roses — Ogawa Mimei",
+   "source": "aozorabunko-clean",
+   "chars": 2350,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "keep",
+   "reason": "野ばら, complete Ogawa Mimei story (2,350); good N3 literature.",
+   "testRefs": [
+    "corpus/tests/test_aozora.py",
+    "prototypes/corridor/tools/verify-native-readings.mjs",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "aozora:000628",
+   "title": "ごん狐",
+   "titleEn": "Gon, the Little Fox — Niimi Nankichi",
+   "source": "aozorabunko-clean",
+   "chars": 4934,
+   "facet_jlpt": "N3",
+   "jreadability": "初級後半",
+   "decision": "keep",
+   "reason": "ごん狐, the classic, complete (4,934).",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+    "prototypes/corridor/tools/verify-reader-doors.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "aozora:046605",
+   "title": "やまなし",
+   "titleEn": "Wild Pear — Miyazawa Kenji",
+   "source": "aozorabunko-clean",
+   "chars": 2722,
+   "facet_jlpt": "N3",
+   "jreadability": "初級後半",
+   "decision": "keep",
+   "reason": "やまなし, complete Kenji story (2,722).",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "prototypes/corridor/tools/verify-reader-doors.mjs",
+    "prototypes/corridor/tools/verify-reader-lookup.mjs",
+    "prototypes/corridor/tools/verify-vocabulary-chooser.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "yasashii:1",
+   "title": "育児休業",
+   "titleEn": "Childcare leave",
+   "source": "isa-yasashii-glossary",
+   "chars": 22,
+   "facet_jlpt": "N4",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "prototypes/corridor/tools/verify-vocabulary-chooser.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "prototypes/corridor/tools/verify-vocabulary-chooser.mjs"
+   ]
+  },
+  {
+   "id": "yasashii:2",
+   "title": "育児休業給付金",
+   "titleEn": "Childcare leave benefit",
+   "source": "isa-yasashii-glossary",
+   "chars": 45,
+   "facet_jlpt": "N2",
+   "jreadability": "初級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-vocabulary-chooser.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-vocabulary-chooser.mjs"
+   ]
+  },
+  {
+   "id": "yasashii:3",
+   "title": "遺族基礎年金",
+   "titleEn": "Survivors' Basic Pension",
+   "source": "isa-yasashii-glossary",
+   "chars": 46,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "yasashii:4",
+   "title": "遺族厚生年金",
+   "titleEn": "Survivors' Employees' Pension",
+   "source": "isa-yasashii-glossary",
+   "chars": 50,
+   "facet_jlpt": "N1",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "yasashii:5",
+   "title": "医療保険",
+   "titleEn": "Medical insurance",
+   "source": "isa-yasashii-glossary",
+   "chars": 31,
+   "facet_jlpt": "N3",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "yasashii:6",
+   "title": "印鑑登録証明書",
+   "titleEn": "Seal registration certificate",
+   "source": "isa-yasashii-glossary",
+   "chars": 48,
+   "facet_jlpt": "N4",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-corridor.mjs",
+    "prototypes/corridor/tools/verify-playback.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-corridor.mjs",
+    "prototypes/corridor/tools/verify-playback.mjs"
+   ]
+  },
+  {
+   "id": "yasashii:7",
+   "title": "印鑑登録証",
+   "titleEn": "Seal registration card",
+   "source": "isa-yasashii-glossary",
+   "chars": 71,
+   "facet_jlpt": "N2",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-playback.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-playback.mjs"
+   ]
+  },
+  {
+   "id": "yasashii:8",
+   "title": "オーバーステイ",
+   "titleEn": "Overstay",
+   "source": "isa-yasashii-glossary",
+   "chars": 24,
+   "facet_jlpt": "N3",
+   "jreadability": "初級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "yasashii:9",
+   "title": "大家",
+   "titleEn": "Landlord",
+   "source": "isa-yasashii-glossary",
+   "chars": 6,
+   "facet_jlpt": "N5",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "yasashii:10",
+   "title": "介護",
+   "titleEn": "Long-term care",
+   "source": "isa-yasashii-glossary",
+   "chars": 62,
+   "facet_jlpt": "N4",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Glossary definition (6-71 characters), not an article; leaves the shelf, stays in the dictionary. Licence also still 未検証.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n5-morning",
+   "title": "静かな朝",
+   "titleEn": "A Quiet Morning",
+   "source": "bunki-v11-reading-catalog",
+   "chars": 301,
+   "facet_jlpt": "N4",
+   "jreadability": "初級後半",
+   "decision": "keep",
+   "reason": "301-character sketch, too short, but ten tests across apps/, packages/ and the corridor pin it; extend in stage 2 only together with those tests.",
+   "testRefs": [
+    "apps/app/e2e/golden-source.spec.ts",
+    "apps/app/test/golden-source-flow.test.ts",
+    "packages/domain/test/contracts/source-kanji-reading.test.ts",
+    "packages/seed/test/dataset.test.ts",
+    "prototypes/corridor/tools/reading-position.test.mjs",
+    "prototypes/corridor/tools/sentence-reading.test.mjs",
+    "prototypes/corridor/tools/source-kanji-practice.test.mjs",
+    "prototypes/corridor/tools/verify-ai-adaptation.mjs",
+    "prototypes/corridor/tools/verify-later-encounters.mjs",
+    "prototypes/corridor/tools/verify-sentence-drafts.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n4-bookshop",
+   "title": "雨の日の古本屋",
+   "titleEn": "A Second-hand Bookshop on a Rainy Day",
+   "source": "bunki-v11-reading-catalog",
+   "chars": 335,
+   "facet_jlpt": "N4",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "335-character sketch; too short to be a read.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-town",
+   "title": "知らない町を歩く",
+   "titleEn": "Walking Through an Unfamiliar Town",
+   "source": "bunki-v11-reading-catalog",
+   "chars": 349,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "349-character sketch; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n2-mountain",
+   "title": "山を歩きながら考えたこと",
+   "titleEn": "Thoughts While Walking in the Mountains",
+   "source": "bunki-v11-reading-catalog",
+   "chars": 448,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "448-character abstract musing; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n1-ai",
+   "title": "AI時代の知識と判断",
+   "titleEn": "Knowledge and Judgment in the Age of AI",
+   "source": "bunki-v11-reading-catalog",
+   "chars": 570,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "570-character abstract essay on AI and knowledge; thin.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "real-gokajo",
+   "title": "五箇条の御誓文",
+   "titleEn": "The Charter Oath",
+   "source": "bunki-v11-historical",
+   "chars": 288,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "keep",
+   "reason": "288 characters of the Charter Oath with commentary; short and political, kept because verify-pr77-ports reads its tokens.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "real-hojoki",
+   "title": "方丈記 · 冒頭",
+   "titleEn": "Hōjōki: the opening",
+   "source": "bunki-v11-historical",
+   "chars": 270,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "keep",
+   "reason": "方丈記 opening (270) with commentary; short but a real classic, and two verifiers open it.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "real-tsurezure",
+   "title": "徒然草 · 序段",
+   "titleEn": "Essays in Idleness: the opening passage",
+   "source": "bunki-v11-historical",
+   "chars": 250,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "徒然草 序段 in 250 characters; too short. Keep only if a classical corner is wanted.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n5-station",
+   "title": "駅で待つ時間",
+   "titleEn": "Time Spent Waiting at the Station",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 255,
+   "facet_jlpt": "N5",
+   "jreadability": "初級後半",
+   "decision": "keep",
+   "reason": "255-character sketch, too short, but five tests pin it (sentence reading, kanji practice).",
+   "testRefs": [
+    "prototypes/corridor/tools/sentence-reading.test.mjs",
+    "prototypes/corridor/tools/source-kanji-practice.test.mjs",
+    "prototypes/corridor/tools/verify-later-encounters.mjs",
+    "prototypes/corridor/tools/verify-sentence-drafts.mjs",
+    "prototypes/corridor/tools/verify-source-kanji-practice.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n5-kitchen",
+   "title": "台所の音",
+   "titleEn": "Sounds from the Kitchen",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 244,
+   "facet_jlpt": "N4",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "244-character sketch; replaced by longer N5 originals.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n5-neighbour",
+   "title": "となりの部屋の人",
+   "titleEn": "The Neighbour Next Door",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 244,
+   "facet_jlpt": "N4",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "244-character sketch; replaced by longer N5 originals.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n4-letter",
+   "title": "引き出しの中の手紙",
+   "titleEn": "A Letter in the Drawer",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 310,
+   "facet_jlpt": "N4",
+   "jreadability": "中級前半",
+   "decision": "keep",
+   "reason": "310-character sketch, too short, but verify-corridor (d23Letter) opens it.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-corridor.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n4-market",
+   "title": "朝の市場",
+   "titleEn": "The Morning Market",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 281,
+   "facet_jlpt": "N4",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "281-character sketch; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n4-bicycle",
+   "title": "自転車をなくした日",
+   "titleEn": "The Day I Lost My Bicycle",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 288,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "288-character sketch; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-river",
+   "title": "川沿いの道",
+   "titleEn": "The Path Along the River",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 313,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "keep",
+   "reason": "313-character sketch, too short, but three verifiers (reading position, kanji practice, teacher drafts) pin it.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-record-reading-position.mjs",
+    "prototypes/corridor/tools/verify-source-kanji-practice.mjs",
+    "prototypes/corridor/tools/verify-teacher-drafts.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-radio",
+   "title": "深夜のラジオ",
+   "titleEn": "Late-night Radio",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 313,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "313-character sketch; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n2-handwriting",
+   "title": "手で書くということ",
+   "titleEn": "On Writing by Hand",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 303,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "keep",
+   "reason": "303-character essay, too short, but verify-reader-gloss pins token #139.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-reader-gloss.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n2-notebook",
+   "title": "余白のためのノート",
+   "titleEn": "A Notebook for the Margins",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 417,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "417-character musing; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n2-rain",
+   "title": "雨の日の速度",
+   "titleEn": "The Speed of a Rainy Day",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 428,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "428-character musing; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n2-translation",
+   "title": "訳せない言葉について",
+   "titleEn": "On Words That Can't Be Translated",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 481,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "481-character musing; too short.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n1-memory",
+   "title": "忘却を前提とした設計",
+   "titleEn": "Designing for Forgetting",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 628,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "628-character abstract essay; thin.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-essay-n1-city",
+   "title": "都市の匿名性と言語",
+   "titleEn": "Urban Anonymity and Language",
+   "source": "bunki-wp9b-reading-catalog",
+   "chars": 624,
+   "facet_jlpt": "N3",
+   "jreadability": "上級前半",
+   "decision": "keep",
+   "reason": "624-character essay, short, but verify-pr77-ports and verify-source-kanji-practice pin it.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "prototypes/corridor/tools/verify-source-kanji-practice.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-zoka-sanjin-morning",
+   "title": "造化三神に出会う朝",
+   "titleEn": "A Morning Encounter with the Three Deities of Creation",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1052,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "keep",
+   "reason": "Gentle first meeting with the Kojiki's opening in a library (1,052); also the Shinto row most verifiers open.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.mjs",
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-nakaima-diary",
+   "title": "「中今」を感じる一日",
+   "titleEn": "A Day of Feeling Nakaima, the Present Moment",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1081,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (「中今」を感じる一日); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-graded-n3-world-beginning",
+   "title": "世界のはじまりに現れた三柱",
+   "titleEn": "The Three Gods Who Appeared at the Beginning of the World",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1067,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (世界のはじまりに現れた三柱); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-graded-n3-hidden-deity",
+   "title": "姿を隠した神さま",
+   "titleEn": "The Gods Who Hid Themselves",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1126,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (姿を隠した神さま); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-graded-n3-kojiki-book",
+   "title": "『古事記』はどんな本？",
+   "titleEn": "What Kind of Book Is the Kojiki?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1108,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "keep",
+   "reason": "A clear classroom introduction to what the Kojiki is (1,108); cultural and self-contained.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-hashira-counter",
+   "title": "神さまを「一柱」と数えるわけ",
+   "titleEn": "Why Gods Are Counted with 'Hashira', the Word for Pillar",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1002,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "keep",
+   "reason": "Best of the Shinto set for a learner: why gods are counted with 柱, a real language question (1,002).",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "bunki-graded-n3-feel-jingu-forest",
+   "title": "伊勢神宮の森を映像で歩く",
+   "titleEn": "Walking the Forest of Ise Jingū on Video",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1114,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (伊勢神宮の森を映像で歩く); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-graded-n3-musubi-visual",
+   "title": "天・地・祈りをつなぐ「むすひ」",
+   "titleEn": "Musuhi, Which Connects Heaven, Earth and Prayer",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1056,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (天・地・祈りをつなぐ「むすひ」); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-graded-n3-gratitude-week",
+   "title": "一週間、感謝の言葉を唱えてみた",
+   "titleEn": "I Tried Reciting Words of Thanks for a Week",
+   "source": "bunki-original-reading-catalog",
+   "chars": 986,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (一週間、感謝の言葉を唱えてみた); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-graded-n3-thanks-before-help",
+   "title": "「助けて」より先に「ありがとう」？",
+   "titleEn": "'Thank You' Before 'Help Me'?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1167,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (「助けて」より先に「ありがとう」？); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-zoka-as-one",
+   "title": "三柱の神を一つの働きとして読む",
+   "titleEn": "Reading the Three Deities as One Force at Work",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1184,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (三柱の神を一つの働きとして読む); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-nakaima-time",
+   "title": "過去・現在・未来と「中今」",
+   "titleEn": "Past, Present, Future, and Nakaima",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1253,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (過去・現在・未来と「中今」); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-creator-god",
+   "title": "「創造神」という言葉はどこまで正しいか",
+   "titleEn": "How Accurate Is the Term 'Creator God'?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1223,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (「創造神」という言葉はどこまで正しいか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-silent-amenominakanushi",
+   "title": "天之御中主神――語られない神をどう読むか",
+   "titleEn": "Amenominakanushi: How to Read a God the Text Says Almost Nothing About",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1187,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (天之御中主神――語られない神をどう読むか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.mjs",
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.mjs",
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-kojiki-myth-history",
+   "title": "『古事記』は神話か、歴史か",
+   "titleEn": "The Kojiki: Myth or History?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1166,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (『古事記』は神話か、歴史か); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-myth-to-book",
+   "title": "語りから書物へ――神話を編む",
+   "titleEn": "From Storytelling to Book: Compiling the Myths",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1139,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (語りから書物へ――神話を編む); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-feel-jingu-musubi",
+   "title": "映像が伝える「むすひ」",
+   "titleEn": "Musuhi as the Video Conveys It",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1223,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (映像が伝える「むすひ」); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-reader-gloss.mjs",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-prayer-on-screen",
+   "title": "映像の中で祈りはどう見えるか",
+   "titleEn": "How Prayer Looks on Screen",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1277,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (映像の中で祈りはどう見えるか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-thanks-first",
+   "title": "「ありがとうございます」を先に言う心理",
+   "titleEn": "The Psychology of Saying 'Thank You' First",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1250,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (「ありがとうございます」を先に言う心理); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n2-testimony-literacy",
+   "title": "体験談をどう受け取るか",
+   "titleEn": "How Should We Take a Personal Testimony?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1226,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (体験談をどう受け取るか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-cosmic-analogy",
+   "title": "造化三神を宇宙論として読む誘惑",
+   "titleEn": "The Temptation to Read the Three Deities of Creation as Cosmology",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1454,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (造化三神を宇宙論として読む誘惑); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-nakaima-time-theory",
+   "title": "「中今」は時間論になり得るか",
+   "titleEn": "Can Nakaima Become a Theory of Time?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1395,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (「中今」は時間論になり得るか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-first-versus-supreme",
+   "title": "原初神を「最高神」と呼ぶときの問題",
+   "titleEn": "The Problem with Calling the First God the 'Supreme God'",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1443,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (原初神を「最高神」と呼ぶときの問題); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-silent-god-theology",
+   "title": "沈黙する神と不在の神学",
+   "titleEn": "The Silent God and a Theology of Absence",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1425,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (沈黙する神と不在の神学); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-kojiki-power",
+   "title": "『古事記』編纂と権力の物語",
+   "titleEn": "Compiling the Kojiki: A Story of Power",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1404,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (『古事記』編纂と権力の物語); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-beyond-fact-fiction",
+   "title": "神話を「事実か虚構か」で裁かないために",
+   "titleEn": "Not Judging Myth by 'Fact or Fiction'",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1472,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (神話を「事実か虚構か」で裁かないために); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-sacred-media",
+   "title": "「感じる」映像は神聖さをどう構成するか",
+   "titleEn": "How Video Meant to Be 'Felt' Constructs the Sacred",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1482,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (「感じる」映像は神聖さをどう構成するか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-ise-time",
+   "title": "産霊・自然・反復――伊勢の時間",
+   "titleEn": "Musuhi, Nature, Repetition: Time at Ise",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1441,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (産霊・自然・反復――伊勢の時間); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-miracle-testimony",
+   "title": "奇跡の体験談と認識の責任",
+   "titleEn": "Miracle Stories and the Responsibility of Knowing",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1427,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (奇跡の体験談と認識の責任); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "prototypes/corridor/tools/verify-pr77-ports.mjs",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "bunki-essay-n1-prayer-reality",
+   "title": "祈りの言葉は誰の現実を変えるのか",
+   "titleEn": "Whose Reality Do Words of Prayer Change?",
+   "source": "bunki-original-reading-catalog",
+   "chars": 1460,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "One of 30 Shinto-theology originals (祈りの言葉は誰の現実を変えるのか); most are commentary on YouTube videos the text admits it could not watch. Keeping only 3.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-native-readings.mjs",
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-native-readings.mjs",
+    "prototypes/corridor/tools/verify-native-readings.py",
+    "scripts/verify-release-gates.mjs"
+   ]
+  },
+  {
+   "id": "wikinews:44381",
+   "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+   "titleEn": "Japan national team announces shirt numbers for the Kirin Challenge Cup",
+   "source": "ja.wikinews",
+   "chars": 900,
+   "facet_jlpt": "N3",
+   "jreadability": "初級前半",
+   "decision": "cut",
+   "reason": "Squad-number list for a 2026 football friendly; a roster, not a read.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:45208",
+   "title": "南海 フェリー事業から撤退へ",
+   "titleEn": "Nankai to withdraw from its ferry business",
+   "source": "ja.wikinews",
+   "chars": 390,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "390-character business brief (Nankai leaves ferry business); jreadability 上級後半.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:45095",
+   "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+   "titleEn": "AiScReam: Ruby leaves the group and two new members join",
+   "source": "ja.wikinews",
+   "chars": 570,
+   "facet_jlpt": "N3",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "Idol-group member change; celebrity filler.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:45098",
+   "title": "第2次高市内閣が始動",
+   "titleEn": "The second Takaichi cabinet takes office",
+   "source": "ja.wikinews",
+   "chars": 480,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Cabinet launch, 480 characters of political names; jreadability 上級後半.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:44384",
+   "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+   "titleEn": "Cristiano Ronaldo sent off for a violent elbow, may miss the World Cup opener",
+   "source": "ja.wikinews",
+   "chars": 480,
+   "facet_jlpt": "N2",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "Ronaldo red card, 480 characters; sports filler.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:45089",
+   "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+   "titleEn": "Centrist Reform Alliance leadership election: Junya Ogawa becomes new leader",
+   "source": "ja.wikinews",
+   "chars": 863,
+   "facet_jlpt": "N3",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Opposition party leadership vote; politics, 上級後半.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "wikinews:42478",
+   "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+   "titleEn": "Shohei Ohtani becomes the sixth player ever with 40 steals and 40 home runs",
+   "source": "ja.wikinews",
+   "chars": 355,
+   "facet_jlpt": "N1",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "Ohtani 40-40 in 355 characters; a fragment.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "govonline:article-202609-radio-3739",
+   "title": "世界をひとつに！国連ってどんなところ？",
+   "titleEn": "Uniting the World: What Is the United Nations Like?",
+   "source": "gov-online.go.jp",
+   "chars": 350,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Government press release (政府広報オンライン · 検収前, 350 characters): 「世界をひとつに！国連ってどんなところ？」. Bureaucratic, not for a learner.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs"
+   ]
+  },
+  {
+   "id": "env:press-press_05463",
+   "title": "「国連砂漠化対処条約（UNCCD）第17回締約国会議（COP17）」の結果について",
+   "titleEn": "Outcomes of COP17 of the UN Convention to Combat Desertification, in Ulaanbaatar",
+   "source": "env.go.jp",
+   "chars": 390,
+   "facet_jlpt": "N1",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 390 characters): 「「国連砂漠化対処条約（UNCCD）第17回締約国会議（COP」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05585",
+   "title": "令和８年度「体験の機会の場」と連携した教職員等環境教育・学習推進リーダー養成研修の開催～「循環型社会を支える現場から学ぶ環境教育」①－サステナブルな未来を拓く環境学習の実践－～",
+   "titleEn": "Environmental-education leader training for teachers: learning from sites that support a circular society",
+   "source": "env.go.jp",
+   "chars": 1601,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1601 characters): 「令和８年度「体験の機会の場」と連携した教職員等環境教育・学習」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-15hyousyou",
+   "title": "防災功労者内閣総理大臣表彰式",
+   "titleEn": "Prime Minister's commendation ceremony for contributors to disaster prevention",
+   "source": "kantei.go.jp",
+   "chars": 730,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (首相官邸 · 検収前, 730 characters): 「防災功労者内閣総理大臣表彰式」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05575",
+   "title": "環境省ナッジ実証事業の取りまとめ結果の公表について",
+   "titleEn": "Environment Ministry publishes the combined results of its 'nudge' trials",
+   "source": "env.go.jp",
+   "chars": 1460,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1460 characters): 「環境省ナッジ実証事業の取りまとめ結果の公表について」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_04591",
+   "title": "国際原子力機関（IAEA）による分析機関間比較の報告書の公表について",
+   "titleEn": "Publication of a report on Interlaboratory Comparison conducted by IAEA",
+   "source": "env.go.jp",
+   "chars": 609,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 609 characters): 「国際原子力機関（IAEA）による分析機関間比較の報告書の公表」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05584",
+   "title": "環境教育等促進法に基づく「体験の機会の場」の新規認定について（株式会社ツネミ「産業廃棄物最終処分場」）",
+   "titleEn": "Tsunemi's industrial-waste landfill newly certified as a place for hands-on environmental learning",
+   "source": "env.go.jp",
+   "chars": 1332,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1332 characters): 「環境教育等促進法に基づく「体験の機会の場」の新規認定について」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05589",
+   "title": "第五次循環型社会形成推進基本計画の進捗状況の第１回点検結果について",
+   "titleEn": "First progress review of the Fifth Fundamental Plan for Establishing a Sound Material-Cycle Society",
+   "source": "env.go.jp",
+   "chars": 1067,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1067 characters): 「第五次循環型社会形成推進基本計画の進捗状況の第１回点検結果に」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "govonline:article-202609-tv-6623",
+   "title": "闇バイトは犯罪!",
+   "titleEn": "'Dark part-time jobs' are a crime!",
+   "source": "gov-online.go.jp",
+   "chars": 484,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (政府広報オンライン · 検収前, 484 characters): 「闇バイトは犯罪!」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05582",
+   "title": "令和８年度水道関係功労者環境大臣表彰の受賞者の決定",
+   "titleEn": "FY2026 Environment Minister's awards for service to the water supply: recipients chosen",
+   "source": "env.go.jp",
+   "chars": 463,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 463 characters): 「令和８年度水道関係功労者環境大臣表彰の受賞者の決定」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-18fukudaijin",
+   "title": "初副大臣会議・記念撮影",
+   "titleEn": "First Meeting of State Ministers and Commemorative Photograph Session",
+   "source": "kantei.go.jp",
+   "chars": 896,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (首相官邸 · 検収前, 896 characters): 「初副大臣会議・記念撮影」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-19seimukan",
+   "title": "初大臣政務官会合・記念撮影",
+   "titleEn": "First Meeting of Parliamentary Vice-Ministers and Commemorative Photograph Session",
+   "source": "kantei.go.jp",
+   "chars": 966,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (首相官邸 · 検収前, 966 characters): 「初大臣政務官会合・記念撮影」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76100",
+   "title": "特定機能病院に対する立入検査結果について（令和７年度）",
+   "titleEn": "Results of on-site inspections of Advanced Treatment Hospitals (FY2025)",
+   "source": "mhlw.go.jp",
+   "chars": 340,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 340 characters): 「特定機能病院に対する立入検査結果について（令和７年度）」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76233",
+   "title": "第73回精神保健福祉普及運動を実施します",
+   "titleEn": "Japan holds its 73rd Mental Health and Welfare Awareness Campaign",
+   "source": "mhlw.go.jp",
+   "chars": 550,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 550 characters): 「第73回精神保健福祉普及運動を実施します」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76330",
+   "title": "病院の耐震改修状況調査の結果",
+   "titleEn": "Results of the survey on the seismic retrofitting of hospitals",
+   "source": "mhlw.go.jp",
+   "chars": 406,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 406 characters): 「病院の耐震改修状況調査の結果」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "sports:sports-b_menu-houdou-31-09-1421070_00039",
+   "title": "令和8年度「スポーツ推進委員功労者表彰」受賞者を決定しました",
+   "titleEn": "FY2026 awards for distinguished sports promotion officers: recipients chosen",
+   "source": "mext.go.jp/sports",
+   "chars": 466,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (スポーツ庁 · 検収前, 466 characters): 「令和8年度「スポーツ推進委員功労者表彰」受賞者を決定しました」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "govonline:article-202609-radio-3741",
+   "title": "「伝える」をもっと豊かに！手話は言語です。",
+   "titleEn": "Richer Communication: Sign Language Is a Language",
+   "source": "gov-online.go.jp",
+   "chars": 347,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (政府広報オンライン · 検収前, 347 characters): 「「伝える」をもっと豊かに！手話は言語です。」. Bureaucratic, not for a learner. The topic (sign language is a language) is good, but 347 characters of radio-script summary is not a read.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "kantei:jp-105-discourse-20260923message",
+   "title": "日米観光・食文化交流の夕べ　高市総理ビデオメッセージ",
+   "titleEn": "US–Japan Tourism and Food Culture Exchange Evening: Prime Minister Takaichi's video message",
+   "source": "kantei.go.jp",
+   "chars": 841,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (首相官邸 · 検収前, 841 characters): 「日米観光・食文化交流の夕べ　高市総理ビデオメッセージ」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05569",
+   "title": "「里海づくり相談窓口」の開設について～里海づくりの疑問・課題を専門家に無料で相談できます～",
+   "titleEn": "A 'satoumi' help desk opens: free expert advice on creating satoumi",
+   "source": "env.go.jp",
+   "chars": 1623,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1623 characters): 「「里海づくり相談窓口」の開設について～里海づくりの疑問・課題」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05603",
+   "title": "シンガポール共和国持続可能性・環境省との環境協力に関する協力覚書の更新について",
+   "titleEn": "Renewal of the Memorandum of Cooperation on Environmental Matters with Singapore",
+   "source": "env.go.jp",
+   "chars": 638,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 638 characters): 「シンガポール共和国持続可能性・環境省との環境協力に関する協力」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "govonline:article-202609-tv-6628",
+   "title": "先端産業に必須“重要鉱物”",
+   "titleEn": "Critical Minerals, Essential to Advanced Industries",
+   "source": "gov-online.go.jp",
+   "chars": 550,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (政府広報オンライン · 検収前, 550 characters): 「先端産業に必須“重要鉱物”」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mext:b_menu-houdou-mext_01683",
+   "title": "第36回全国産業教育フェア佐賀大会（さんフェア SAGA2026）を開催します！",
+   "titleEn": "The 36th National Industrial Education Fair comes to Saga (San-Fair SAGA2026)",
+   "source": "mext.go.jp",
+   "chars": 1584,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (文部科学省 · 検収前, 1584 characters): 「第36回全国産業教育フェア佐賀大会（さんフェア SAGA20」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05614",
+   "title": "「令和８年度環境課題の統合的解決に向けたモデル支援事業」参加企業の決定について",
+   "titleEn": "Companies chosen for the FY2026 model support project for integrated solutions to environmental issues",
+   "source": "env.go.jp",
+   "chars": 592,
+   "facet_jlpt": "N1",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 592 characters): 「「令和８年度環境課題の統合的解決に向けたモデル支援事業」参加」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05616",
+   "title": "「浄化槽の日」における「第40回全国浄化槽大会」の開催について",
+   "titleEn": "The 40th National Septic Tank Convention to be held on Septic Tank Day",
+   "source": "env.go.jp",
+   "chars": 1126,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1126 characters): 「「浄化槽の日」における「第40回全国浄化槽大会」の開催につい」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05643",
+   "title": "神戸港におけるコガネヒアリの確認について",
+   "titleEn": "Golden fire ants confirmed at Kobe Port",
+   "source": "env.go.jp",
+   "chars": 1565,
+   "facet_jlpt": "N2",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1565 characters): 「神戸港におけるコガネヒアリの確認について」. Bureaucratic, not for a learner. Fire ants found at Kobe port is the most interesting of the set, but it is a press release and the shelf copy is truncated.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "kantei:jp-105-actions-202609-25startup",
+   "title": "日本スタートアップ大賞２０２６表彰式",
+   "titleEn": "Commendation Ceremony for the Nippon Startup Awards 2026",
+   "source": "kantei.go.jp",
+   "chars": 736,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Government press release (首相官邸 · 検収前, 736 characters): 「日本スタートアップ大賞２０２６表彰式」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-houdou-newpage_75698",
+   "title": "かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について",
+   "titleEn": "Information on family-doctor functions now on the Medical Information Net (Navii)",
+   "source": "mhlw.go.jp",
+   "chars": 598,
+   "facet_jlpt": "N3",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 598 characters): 「かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76360",
+   "title": "インドネシアにおける入国前結核スクリーニングを開始します",
+   "titleEn": "Japan to begin pre-entry tuberculosis screening in Indonesia",
+   "source": "mhlw.go.jp",
+   "chars": 740,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 740 characters): 「インドネシアにおける入国前結核スクリーニングを開始します」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "jawiki:3492442",
+   "title": "2026年アジア競技大会",
+   "titleEn": "2026 Asian Games",
+   "source": "ja.wikipedia",
+   "chars": 305,
+   "facet_jlpt": "N2",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "305-character stub on the 2026 Asian Games.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "jawiki:5238864-s63",
+   "title": "2026年の台風（台風25号（ドゥージェン））",
+   "titleEn": "2026 Pacific typhoon season: Typhoon Dujuan",
+   "source": "ja.wikipedia",
+   "chars": 759,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Typhoon data section (759); weather statistics.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "jawiki:5294446",
+   "title": "第2次高市内閣 (改造)",
+   "titleEn": "The Reshuffled Second Takaichi Cabinet",
+   "source": "ja.wikipedia",
+   "chars": 377,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Cabinet reshuffle list (377); names and posts.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "govonline:article-202609-radio-3743",
+   "title": "えっ、この建物も文化財！？地域の遺産・登録有形文化財",
+   "titleEn": "Wait, This Building Is a Cultural Property Too? Local Heritage, Registered Tangible Cultural Properties",
+   "source": "gov-online.go.jp",
+   "chars": 304,
+   "facet_jlpt": "N1",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (政府広報オンライン · 検収前, 304 characters): 「えっ、この建物も文化財！？地域の遺産・登録有形文化財」. Bureaucratic, not for a learner. Topic (registered cultural buildings) is nice, but it is 304 characters.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "env:press-press_05591",
+   "title": "地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石巻市）の開催について",
+   "titleEn": "Regional Circular and Ecological Sphere Study Tour 2026 in Kameoka, Kyoto, and Ishinomaki, Miyagi",
+   "source": "env.go.jp",
+   "chars": 1561,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (環境省 · 検収前, 1561 characters): 「地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石」. Bureaucratic, not for a learner.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs"
+   ],
+   "testsToUpdateIfCut": [
+    "prototypes/corridor/tools/verify-pr77-ports.mjs"
+   ]
+  },
+  {
+   "id": "mhlw:stf-newpage_76340",
+   "title": "ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします",
+   "titleEn": "Health ministry teams up with the WOWOW drama 'MR: Medical Representative'",
+   "source": "mhlw.go.jp",
+   "chars": 1615,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 1615 characters): 「ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイア」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "jawiki-news:2026-09-14",
+   "title": "9月14日〜9月20日のできごと",
+   "titleEn": "Events of 14–20 September",
+   "source": "ja.wikipedia",
+   "chars": 469,
+   "facet_jlpt": "N1",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "Weekly list of headlines (469 characters); a list, not a read.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "sports:sports-b_menu-houdou-jsa_00246",
+   "title": "河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山市藤井市長との意見交換～",
+   "titleEn": "Sports Agency Commissioner Kawai to visit Toyama for talks with Governor Nitta and Mayor Fujii",
+   "source": "mext.go.jp/sports",
+   "chars": 1105,
+   "facet_jlpt": "N2",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Government press release (スポーツ庁 · 検収前, 1105 characters): 「河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "global-voices:2026-09-28-65726",
+   "title": "シリアの「連帯の畑」で在来種子の再生を目指す",
+   "titleEn": "Solidarity fields in Syria: Reviving local seed production",
+   "source": "jp.globalvoices.org",
+   "chars": 1939,
+   "facet_jlpt": "N1",
+   "jreadability": "中級後半",
+   "decision": "keep",
+   "reason": "A real human story (Syrian farmers saving native seeds) that verify-design-reader-shelf opens, but it is a partner piece (first published by Lahlah, republished by Global Voices under a content-sharing agreement), so its CC BY licence is not established. Keep only after Global Voices confirms; otherwise cut and update that test. The shelf copy is also truncated at 1,939 characters.",
+   "testRefs": [
+    "prototypes/corridor/tools/verify-design-reader-shelf.mjs"
+   ],
+   "testsToUpdateIfCut": [],
+   "licenceDoubt": true
+  },
+  {
+   "id": "jawiki-news:2026-09-21",
+   "title": "9月21日〜9月27日のできごと",
+   "titleEn": "Events of 21–27 September",
+   "source": "ja.wikipedia",
+   "chars": 356,
+   "facet_jlpt": "N1",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "Weekly list of headlines (356 characters); a list, not a read.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "adapt-n3:govonline:article-202609-radio-3741",
+   "title": "手話も「言語」です",
+   "titleEn": "Sign Language Is a 'Language' Too",
+   "source": "gov-online.go.jp",
+   "chars": 281,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "281-character AI adaptation of a row that is itself being cut; too short to read as a piece.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "adapt-n3:govonline:article-202609-tv-6628",
+   "title": "スマホや電気自動車に必要な「重要鉱物」",
+   "titleEn": "The 'Critical Minerals' Needed for Smartphones and Electric Cars",
+   "source": "gov-online.go.jp",
+   "chars": 365,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "365-character AI adaptation of a row that is itself being cut; too short to read as a piece.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "adapt-n3:env:press-press_05643",
+   "title": "神戸港で「コガネヒアリ」が見つかった",
+   "titleEn": "Golden Fire Ants Found at Kobe Port",
+   "source": "env.go.jp",
+   "chars": 334,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "334-character AI adaptation of a row that is itself being cut; too short to read as a piece.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "adapt-n3:jawiki:3492442",
+   "title": "アジア競技大会が愛知・名古屋で",
+   "titleEn": "The Asian Games in Aichi and Nagoya",
+   "source": "ja.wikipedia",
+   "chars": 258,
+   "facet_jlpt": "N3",
+   "jreadability": "初級後半",
+   "decision": "cut",
+   "reason": "258-character AI adaptation of a row that is itself being cut; too short to read as a piece.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "adapt-n3:jawiki:5238864-s63",
+   "title": "台風25号と記録的な大雨",
+   "titleEn": "Typhoon No. 25 and Record Rainfall",
+   "source": "ja.wikipedia",
+   "chars": 341,
+   "facet_jlpt": "N3",
+   "jreadability": "中級前半",
+   "decision": "cut",
+   "reason": "341-character AI adaptation of a row that is itself being cut; too short to read as a piece.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "adapt-n3:global-voices:2026-09-28-65726",
+   "title": "シリアの「連帯の畑」",
+   "titleEn": "Solidarity Fields in Syria",
+   "source": "jp.globalvoices.org",
+   "chars": 320,
+   "facet_jlpt": "N3",
+   "jreadability": "中級後半",
+   "decision": "cut",
+   "reason": "320-character AI adaptation of a row that is itself being cut; too short to read as a piece.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76095",
+   "title": "外国人技能実習生又は特定技能外国人を使用する事業場に対して行った令和７年の監督指導、送検等の状況を公表します",
+   "titleEn": "2025 inspections and prosecutor referrals at workplaces employing technical interns or specified skilled workers",
+   "source": "mhlw.go.jp",
+   "chars": 796,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 796 characters): 「外国人技能実習生又は特定技能外国人を使用する事業場に対して行」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76126",
+   "title": "令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました",
+   "titleEn": "Winners chosen in the FY2026 contest for companies where older workers thrive",
+   "source": "mhlw.go.jp",
+   "chars": 1189,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 1189 characters): 「令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しま」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mhlw:stf-newpage_76152",
+   "title": "10月は中小企業退職金共済制度の加入促進強化月間",
+   "titleEn": "October is enrolment promotion month for the small-business retirement allowance scheme",
+   "source": "mhlw.go.jp",
+   "chars": 1285,
+   "facet_jlpt": "N1",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (厚生労働省 · 検収前, 1285 characters): 「10月は中小企業退職金共済制度の加入促進強化月間」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+   "title": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました",
+   "titleEn": "FY2026 lifelong-sports awards: individual and group recipients chosen",
+   "source": "mext.go.jp/sports",
+   "chars": 1073,
+   "facet_jlpt": "N2",
+   "jreadability": "上級後半",
+   "decision": "cut",
+   "reason": "Government press release (スポーツ庁 · 検収前, 1073 characters): 「令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  },
+  {
+   "id": "mext:b_menu-houdou-2025-mext_00009",
+   "title": "「日本スタートアップ大賞2026」受賞者を決定しました",
+   "titleEn": "Nippon Startup Awards 2026: winners announced",
+   "source": "mext.go.jp",
+   "chars": 1110,
+   "facet_jlpt": "N1",
+   "jreadability": "上級前半",
+   "decision": "cut",
+   "reason": "Government press release (文部科学省 · 検収前, 1110 characters): 「「日本スタートアップ大賞2026」受賞者を決定しました」. Bureaucratic, not for a learner.",
+   "testRefs": [],
+   "testsToUpdateIfCut": []
+  }
+ ]
+}
