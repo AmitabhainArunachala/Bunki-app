@@ -2,7 +2,7 @@ import { openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
@@ -25,20 +25,29 @@ page.setDefaultTimeout(15000);
 const errors = [];
 const requests = [];
 page.on('pageerror', e => errors.push(e.message));
-const contents = readFileSync(bundle,'utf8');
-const html = fragment ? `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${contents}</body></html>` : contents;
+const documentPath = fragment ? resolve(temporary, 'fragment-host.html') : bundle;
+if (fragment) writeFileSync(documentPath, `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${readFileSync(bundle, 'utf8')}</body></html>`);
+const documentURL = pathToFileURL(documentPath);
+documentURL.search = '?entry=shelf&ui=bi';
 await context.route('**/*', route => {
-  if (route.request().isNavigationRequest()) return route.fulfill({contentType:'text/html',body:html});
-  requests.push(route.request().url());
+  const request = route.request();
+  // Open the actual handoff from disk. Sending a large HTML body through
+  // route.fulfill base64-encodes it and can exceed Chromium's DevTools pipe limit.
+  if (request.isNavigationRequest() && request.frame() === page.mainFrame() && request.url() === documentURL.href)
+    return route.continue();
+  if (!request.isNavigationRequest() && /^(blob|data):/u.test(request.url())) return route.continue();
+  requests.push(request.url());
   return route.abort();
 });
 try {
-  await page.goto('http://127.0.0.1:3000/?entry=shelf&ui=bi',{waitUntil:'domcontentloaded'});
+  await page.goto(documentURL.href,{waitUntil:'domcontentloaded'});
   const kanjidex = page.locator('#kanjidex-link');
   await kanjidex.waitFor({state:'attached'});
   // The single file carries the editorial layer and the shelf art itself: no sibling request can supply them.
   await page.locator('#shelf-reading-results .shelf-item').first().waitFor();
   await page.waitForFunction(() => document.querySelector('.shelf-art')?.complete, null, { timeout: 15000 });
+  assert.equal(await page.locator('#standalone-assessment-assets').count(), 1,
+    'The assessment asset pack stays unparsed until an assessment is requested');
   const shelfLook = await page.evaluate(() => {
     const art = document.querySelector('.shelf-art');
     const word = document.querySelector('#shelf-body .japanese-lookup-word');
