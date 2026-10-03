@@ -262,6 +262,32 @@ async function verifyResponsiveScreens(browser, base, deck) {
       await page.locator('#cd-got').click();
       await page.locator('#cd-good').waitFor({ timeout: 8000 });
       await screenshot(page, `${prefix}-context-answer`);
+      // Leaving a card through the now-visible app header must release the
+      // deck's focus flag, so ordinary navigation still works afterwards.
+      await page.locator('#back').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'shelf');
+      const header = await page.locator('.chrome').evaluate((node) => {
+        const style = getComputedStyle(node);
+        const search = node.querySelector('#chrome-search');
+        const box = search.getBoundingClientRect();
+        return {
+          focus: document.documentElement.dataset.cdFocus ?? null,
+          opacity: Number(style.opacity), pointerEvents: style.pointerEvents,
+          searchHit: search.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)),
+        };
+      });
+      check(`${prefix} leaving a context card restores a visible and clickable app header`,
+        header.focus !== '1' && header.opacity > 0 && header.pointerEvents !== 'none' && header.searchHit,
+        JSON.stringify(header));
+      await page.locator('#chrome-search').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'search');
+      await page.locator('#back').click();
+      await page.waitForFunction(() => document.body.dataset.view === 'shelf');
+      await openShelfTools(page);
+      await page.locator('#context-deck-link').click();
+      await page.locator('#cd-good').waitFor({ timeout: 8000 });
+      check(`${prefix} context review resumes its current answer after using the app header`,
+        await page.locator('#cd-good').isVisible());
       // Complete the fresh daily queue through real controls so its end screen
       // must keep the same visible, explicitly ungraded level label.
       for (let card = 0; card < 40; card += 1) {

@@ -13287,9 +13287,9 @@ function renderMock(main) {
  *      the very sentence it was mined in (takenContext → cloze).
  *   3. A module is also a named list, so その鉱脈だけ復習 is the existing
  *      filtered review (startReview(scope)), never a second scheduler.
- *   4. A headword the boot dictionary does not hold keeps a compact
- *      deepWords snapshot from the deck (reading + gloss), exactly as a
- *      deep-tier capture does, so its card answers on any device. */
+ *   4. A headword bound to one matching dictionary entry uses that entry's
+ *      answer. Unbound headwords keep the deck's reading, gloss and definition
+ *      in deepWords, so their cards also answer without a dictionary download. */
 const DECK_DIR = 'data/share_alike/decks';
 const DECK_IDS = ['kotoba-mine'];
 const deckFailed = (key) => !!D.deckFailed?.has(key);
@@ -28628,6 +28628,8 @@ function render() {
 
   // the interim voice belongs to the reader: leaving the room ends it
   if (S.view !== 'reader') { stopReadAloud(); readerTipVisit = null; }
+  // The context deck's focus state belongs only to its own room.
+  if (S.view !== 'contextdeck') delete document.documentElement.dataset.cdFocus;
 
   // A room that throws must never leave an empty page: that is how a blank
   // room reached the learner with no message (2026-09-24).
