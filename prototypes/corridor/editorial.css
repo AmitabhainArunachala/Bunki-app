@@ -894,9 +894,9 @@ body .chip, body.v-depth-layered .chip {
   letter-spacing: 0;
   transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), transform 140ms var(--ease);
 }
-body .chip:hover:not(:disabled) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
-body .chip:active:not(:disabled) { transform: scale(0.97); }
-body .chip:disabled, body.v-depth-layered .chip:disabled { opacity: 1; background: var(--fill); color: color-mix(in srgb, var(--label) 42%, transparent); }
+body .chip:hover:not(:disabled):not([aria-disabled='true']) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
+body .chip:active:not(:disabled):not([aria-disabled='true']) { transform: scale(0.97); }
+body .chip:disabled, body.v-depth-layered .chip:disabled, body .chip[aria-disabled='true'] { opacity: 1; background: var(--fill); color: color-mix(in srgb, var(--label) 42%, transparent); }
 /* a graph's node kinds keep their own quiet tint instead of coloured, dashed or doubled edges */
 body.v-depth-layered .chip:is(.t-kanji, .t-word, .t-radical, .t-idiom) { border: 0; }
 body.v-depth-layered .chip.t-kanji { background: color-mix(in srgb, var(--red) 10%, transparent); color: color-mix(in srgb, var(--red) 88%, var(--ink)); }

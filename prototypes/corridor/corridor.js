@@ -13398,12 +13398,17 @@ const deckModuleReady = new Set();
 const deckModuleDegraded = new Map();
 const deckModuleOpen = (deck, mod) =>
   S.view === 'decks' && S.deckModule === mod.id && (S.deckId || DECK_IDS[0]) === deck.deckId;
+/** Whether the screen showing needs a module's rows: the module itself, or its deck's list counting
+ * a word the learner saved from the reader. */
+const deckModuleWanted = (deck, mod) => deckModuleOpen(deck, mod) ||
+  (S.view === 'decks' && !S.deckModule && (S.deckId || DECK_IDS[0]) === deck.deckId &&
+    mod.cards.some((card) => deckCardAwaitsIndex(card, deckWordNode(deck, mod, card))));
 addEventListener('online', () => {
-  for (const { deck, mod } of [...deckModuleDegraded.values()]) if (deckModuleOpen(deck, mod)) retryDeckModule(deck, mod);
+  for (const { deck, mod } of [...deckModuleDegraded.values()]) if (deckModuleWanted(deck, mod)) retryDeckModule(deck, mod);
 });
 /** Loads a module's dictionary rows and resolves whether they are at hand. A failed load holds the
- * module's enrollment and is tried again with backoff while the module stays open; whichever
- * deck screen is showing re-renders once the rows arrive. */
+ * module's enrollment and is tried again with backoff while a deck screen still needs the rows;
+ * whichever deck screen is showing re-renders once they arrive. */
 function prepareDeckModule(deck, mod) {
   const key = `${deck.deckId}:${mod.id}`;
   if (deckModuleReady.has(key)) return Promise.resolve(true);
@@ -13419,7 +13424,7 @@ function prepareDeckModule(deck, mod) {
       const held = { deck, mod, failures, timer: null };
       held.timer = setTimeout(() => {
         held.timer = null;
-        if (deckModuleOpen(deck, mod)) retryDeckModule(deck, mod);
+        if (deckModuleWanted(deck, mod)) retryDeckModule(deck, mod);
       }, DECK_RETRY_MS[Math.min(failures, DECK_RETRY_MS.length) - 1]);
       deckModuleDegraded.set(key, held);
       return false;
@@ -13475,7 +13480,8 @@ function renderDecks(main) {
     for (const m of deck.modules) {
       const nodes = m.cards.map((c) => deckWordNode(deck, m, c));
       const key = `${deck.deckId}:${m.id}`;
-      if (!deckModuleReady.has(key) && !deckModuleDegraded.has(key) && m.cards.some((c, i) => deckCardAwaitsIndex(c, nodes[i]))) {
+      if (!deckModuleReady.has(key) && !deckModuleLoading.has(key) && !deckModuleDegraded.get(key)?.timer &&
+          m.cards.some((c, i) => deckCardAwaitsIndex(c, nodes[i]))) {
         prepareDeckModule(deck, m);
       }
       const have = nodes.filter((node) => wordCaptureState(node) === 'taken').length;
@@ -13537,8 +13543,9 @@ function renderDecks(main) {
         : biLabel('button', 'chip btn-secondary lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
     all.type = 'button';
     all.id = 'deck-enroll-all';
-    all.disabled = waiting ? fetching : learningEnrollmentPending.has(owner);
-    all.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll(mod.cards)));
+    all.disabled = !waiting && learningEnrollmentPending.has(owner);
+    if (waiting && fetching) all.setAttribute('aria-disabled', 'true');
+    else all.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll(mod.cards)));
     actions.append(all);
   }
   const listed = S.lists[deckListName(deck, mod)] || [];
@@ -13572,8 +13579,9 @@ function renderDecks(main) {
         : biLabel('button', 'chip btn-secondary lesson-enroll-one', '覚える', 'memorize');
     b.type = 'button';
     b.dataset.deckEnroll = c.w;
-    b.disabled = have || (waiting ? fetching : !!heldText || learningEnrollmentPending.has(owner));
-    if (!b.disabled) b.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll([c])));
+    b.disabled = have || (!waiting && (!!heldText || learningEnrollmentPending.has(owner)));
+    if (!have && waiting && fetching) b.setAttribute('aria-disabled', 'true');
+    else if (!b.disabled) b.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll([c])));
     if (heldText) {
       b.classList.add('word-capture-held');
       const reason = el('p', 'enroll-held', heldText);
