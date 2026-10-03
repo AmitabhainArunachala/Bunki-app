@@ -4,6 +4,7 @@ import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { createServer } from 'node:http';
 import assert from 'node:assert/strict';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
@@ -27,13 +28,18 @@ const requests = [];
 page.on('pageerror', e => errors.push(e.message));
 const contents = readFileSync(bundle,'utf8');
 const html = fragment ? `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${contents}</body></html>` : contents;
+// Served from loopback, not route.fulfill: Chromium drops any DevTools message over
+// 100 MiB, and the base64-encoded single file (~75 MiB) no longer fits in one.
+const server = createServer((_request, response) => response.writeHead(200,{'content-type':'text/html; charset=utf-8'}).end(html));
+await new Promise(listening => server.listen(0,'127.0.0.1',listening));
+const origin = `http://127.0.0.1:${server.address().port}`;
 await context.route('**/*', route => {
-  if (route.request().isNavigationRequest()) return route.fulfill({contentType:'text/html',body:html});
+  if (route.request().isNavigationRequest() && route.request().url().startsWith(`${origin}/`)) return route.continue();
   requests.push(route.request().url());
   return route.abort();
 });
 try {
-  await page.goto('http://127.0.0.1:3000/?entry=shelf&ui=bi',{waitUntil:'domcontentloaded'});
+  await page.goto(`${origin}/?entry=shelf&ui=bi`,{waitUntil:'domcontentloaded'});
   const kanjidex = page.locator('#kanjidex-link');
   await kanjidex.waitFor({state:'attached'});
   // The single file carries the editorial layer and the shelf art itself: no sibling request can supply them.
@@ -79,4 +85,5 @@ try {
   console.log(`PASS embedded editorial layer and shelf art: ${JSON.stringify(shelfLook)}`);
 } finally {
   await browser.close();
+  server.close();
 }
