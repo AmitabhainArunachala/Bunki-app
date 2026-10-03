@@ -142,10 +142,15 @@ node prototypes/corridor/tools/build-standalone.mjs
 No source carries a row's authored English title (`titleEn`,
 `titleEnSource`) or its drawn picture (`picture`, `accent`), so
 `build_articles.py` copies those four fields from the `index.json` it replaces
-onto every row it rebuilds (`tools/test_build_articles.py`). It rebuilds only
-the rows it collects from the sources above; rows from any other source (the
-fresh readings, the native originals, the WP9b catalog) are not re-emitted,
-and their pictures leave the index with them.
+onto every row it rebuilds. It re-collects only the wikinews, aozora,
+やさしい日本語 and v11 rows from the sources above. Every other row in the index
+(the fresh readings and their N3 adaptations, the native originals, the WP9b
+catalog) has no source here, so the build refuses to rewrite an index that
+holds any of them, names each row it would drop, and exits non-zero before
+writing anything; `--allow-drop` writes the index without them, pictures and
+titles included. On the committed shelf most rows are of that kind, so a plain
+run of the command above stops at this check. `tools/test_build_articles.py`
+pins both behaviours.
 
 Debian's patched setuptools cannot build `unidic-lite`'s sdist
 (`AttributeError: install_layout`); a plain venv with upstream setuptools can.
