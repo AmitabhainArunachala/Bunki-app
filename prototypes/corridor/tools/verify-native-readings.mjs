@@ -291,10 +291,11 @@ const FEED_TITLES = JSON.parse(
 // second model family. The feeds' authoring markers still name rows a later
 // feed run mints before anyone checks them; the archive keeps its wrapper.
 // 2026-10-03 (owner decision): the label must be honest — 'publisher' only when the title IS the
-// page's headline, 'publisher, shortened' when we trimmed it, 'established English title' for a
+// page's headline, 'publisher, shortened' when we trimmed it, 'publisher, adapted' when it is built
+// from the page but no shorter, 'established English title' for a
 // literary work's known English name — and every label is backed by a receipt in
 // data/articles/title-receipts.json (the page headline compared against; the model-family checks).
-const PUBLISHER_SOURCE = /^(publisher|publisher, shortened|established English title|established English title, adapted): (https:\/\/\S+)$/;
+const PUBLISHER_SOURCE = /^(publisher|publisher, shortened|publisher, adapted|established English title|established English title, adapted): (https:\/\/\S+)$/;
 const CHECKED_SOURCE = (source) => source === 'Bunki original, bilingual title' || source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
 const TITLE_RECEIPTS = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/title-receipts.json'), 'utf8'));
 // a publisher's English edition lives on its own host; a headline from anywhere else is not theirs
@@ -305,10 +306,8 @@ const ENGLISH_EDITIONS = {
   'ja.wikinews.org': ['en.wikinews.org'],
   'ja.wikipedia.org': ['en.wikipedia.org'],
 };
-const sameHeadline = (a, b) => {
-  const n = (s) => String(s ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
-  return n(a) === n(b);
-};
+const normalHeadline = (s) => String(s ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
+const sameHeadline = (a, b) => normalHeadline(a) === normalHeadline(b);
 function titleReceiptProblem(record) {
   const source = record.titleEnSource ?? '';
   if (source === 'Bunki original, bilingual title') {
@@ -336,8 +335,11 @@ function titleReceiptProblem(record) {
   try { home = new URL(record.url).host; there = new URL(url).host; } catch { return `${record.id}: unreadable URL`; }
   if (!(ENGLISH_EDITIONS[home] ?? []).includes(there)) return `${record.id}: ${there} is not ${home}'s English edition`;
   const same = sameHeadline(receipt.pageHeadline, record.titleEn);
+  const shorter = normalHeadline(record.titleEn).length < normalHeadline(receipt.pageHeadline).length;
   if (label === 'publisher' && !same) return `${record.id}: labelled the publisher's headline, but the page says "${receipt.pageHeadline}"`;
-  if (label === 'publisher, shortened' && (same || !receipt.pageHeadline)) return `${record.id}: labelled shortened, but no longer headline is on file`;
+  if (label === 'publisher, shortened' && !shorter) return `${record.id}: labelled shortened, but the title is no shorter than the page headline on file`;
+  if (label === 'publisher, adapted' && (!receipt.pageHeadline || same || shorter))
+    return `${record.id}: labelled adapted, but the title is ${same ? 'the page headline' : shorter ? 'shorter than it' : 'without a page headline on file'}`;
   return null;
 }
 const FEED_TITLE_MARKERS = new Set([FEED_TITLES.titleEnSource, FRESH_TITLES.titleEnSource]);
@@ -385,7 +387,7 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
   );
   const unbacked = index.articles.map(titleReceiptProblem).filter(Boolean);
   check(
-    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one says so, a translation carries two model-family checks, and an original matches its authored bilingual title',
+    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one is shorter, an adapted one says so, a translation carries two model-family checks, and an original matches its authored bilingual title',
     unbacked.length === 0,
     unbacked.slice(0, 4).join(' · ') || `${index.articles.length} rows backed`,
   );

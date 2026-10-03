@@ -13395,6 +13395,9 @@ function deckCardAwaitsIndex(card, node, record = S) {
 const deckModuleLoading = new Map();
 const deckModuleReady = new Set();
 const deckModuleDegraded = new Set();
+addEventListener('online', () => {
+  if (S.view === 'decks' && deckModuleDegraded.size) render();
+});
 function prepareDeckModule(deck, mod) {
   const key = `${deck.deckId}:${mod.id}`;
   if (deckModuleReady.has(key)) return Promise.resolve();
@@ -13485,6 +13488,7 @@ function renderDecks(main) {
       return;
     }
   }
+  const waiting = !deckModuleReady.has(moduleKey);
   const owner = `deck:${moduleKey}`;
   const nodeFor = (card) => deckWordNode(deck, mod, card);
   const stateFor = (card) => wordCaptureState(nodeFor(card));
@@ -13505,12 +13509,14 @@ function renderDecks(main) {
   const listedIds = new Set((S.lists[deckListName(deck, mod)] || []).map((x) => x.id));
   const unlisted = mod.cards.some((c) => stateFor(c) === 'taken' && !listedIds.has(c.w));
   if (fresh.length || unlisted) {
-    const all = fresh.length
-      ? biLabel('button', 'chip btn-primary lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
-      : biLabel('button', 'chip btn-secondary lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
+    const all = waiting
+      ? biLabel('button', 'chip btn-secondary lesson-enroll-all', '辞書を読み込み中…', 'dictionary still loading')
+      : fresh.length
+        ? biLabel('button', 'chip btn-primary lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
+        : biLabel('button', 'chip btn-secondary lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
     all.type = 'button';
     all.id = 'deck-enroll-all';
-    all.disabled = learningEnrollmentPending.has(owner);
+    all.disabled = waiting || learningEnrollmentPending.has(owner);
     all.addEventListener('click', () => enroll(mod.cards));
     actions.append(all);
   }
@@ -13527,8 +13533,8 @@ function renderDecks(main) {
   main.append(actions);
   for (const c of mod.cards) {
     const node = nodeFor(c);
-    const heldText = learningEnrollHeldText(node);
     const have = stateFor(c) === 'taken';
+    const heldText = have || waiting ? null : learningEnrollHeldText(node);
     const row = el('div', 'lesson-enroll-row deck-card');
     const word = el('span', 'lesson-enroll-word');
     word.append(document.createTextNode(c.w));
@@ -13538,10 +13544,14 @@ function renderDecks(main) {
     body.append(el('span', 'deck-def', c.d));
     if (bi()) body.append(el('span', 'en-sub', c.g));
     row.append(body);
-    const b = biLabel('button', have ? 'chip btn-secondary lesson-enroll-one on' : 'chip btn-secondary lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
+    const b = have
+      ? biLabel('button', 'chip btn-secondary lesson-enroll-one on', '覚える ✓', 'memorizing')
+      : waiting
+        ? biLabel('button', 'chip btn-secondary lesson-enroll-one', '辞書を読み込み中…', 'dictionary still loading')
+        : biLabel('button', 'chip btn-secondary lesson-enroll-one', '覚える', 'memorize');
     b.type = 'button';
     b.dataset.deckEnroll = c.w;
-    b.disabled = have || !!heldText || learningEnrollmentPending.has(owner);
+    b.disabled = have || waiting || !!heldText || learningEnrollmentPending.has(owner);
     if (!b.disabled) b.addEventListener('click', () => enroll([c]));
     if (heldText) {
       b.classList.add('word-capture-held');

@@ -78,6 +78,13 @@ function startServer(rootDir = CORRIDOR_DIR, refuse = () => false) {
 }
 
 let failures = 0;
+const pageErrors = [];
+function watchErrors(context, expected = () => false) {
+  context.on('console', (m) => {
+    if (m.type() === 'error' && !expected(m)) pageErrors.push(m.text());
+  });
+  context.on('weberror', (e) => pageErrors.push(e.error().stack || String(e.error())));
+}
 function check(name, pass, detail = '') {
   if (!pass) failures += 1;
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
@@ -152,6 +159,7 @@ async function openModule(page, mod) {
 
 async function seedRecord(context, record) {
   await context.addInitScript((record) => {
+    if (location.protocol === 'about:') return;
     if (!localStorage.getItem('__deck_seeded')) {
       localStorage.setItem('kairo-corridor-v1', JSON.stringify(record));
       localStorage.setItem('__deck_seeded', '1');
@@ -241,6 +249,7 @@ async function screenshot(page, name) {
 async function verifyResponsiveScreens(browser, base, deck) {
   for (const viewport of [{ width: 1368, height: 900 }, { width: 390, height: 844 }]) {
     const context = await browser.newContext({ viewport });
+    watchErrors(context);
     await silenceBrowserAudio(context);
     const page = await context.newPage();
     const prefix = `kotoba-mine-${viewport.width}x${viewport.height}`;
@@ -319,6 +328,7 @@ async function verifyResponsiveScreens(browser, base, deck) {
 async function verifyGuardedEnrollment(browser, base, deck, preRow) {
   for (const choice of ['one', 'all']) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    watchErrors(context);
     await silenceBrowserAudio(context);
     await seedLegacyRow(context, preRow);
     const page = await context.newPage();
@@ -359,10 +369,11 @@ async function verifyGuardedEnrollment(browser, base, deck, preRow) {
 
 /* A word saved from the reader names its dictionary entry. The deck matches that card through
  * its module's dictionary rows: the module list counts it before the module is opened, and a
- * module whose rows once failed to load tries them again on its next render. */
+ * module whose rows failed to load holds enrollment until they load on a later render. */
 async function verifyReaderEntryCards(browser, deck) {
   const mod = deck.modules.find((m) => m.cards.some((c) => c.w === '新体制'));
   const card = mod.cards.find((c) => c.w === '新体制');
+  const other = { w: '県議会', seq: '1809820' };
   const record = { v: 1, srs: {},
     taken: [{ t: 'word', id: card.w, label: card.w, kind: '語', kindEn: 'word', from: null, ts: 1, entrySeq: '1362140', cueReading: card.r }],
     deepWords: { [card.w]: { r: card.r, m: ['new order', 'new system'], seq: '1362140' } } };
@@ -371,11 +382,10 @@ async function verifyReaderEntryCards(browser, deck) {
   try {
     for (const phase of ['count', 'retry']) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      watchErrors(context, (m) => phase === 'retry' && m.location().url.includes('/data/share_alike/dict-v2/'));
       await silenceBrowserAudio(context);
       await seedRecord(context, record);
       const page = await context.newPage();
-      const errors = [];
-      page.on('pageerror', (e) => errors.push(String(e)));
       try {
         refusing = phase === 'retry';
         await moduleOverview(page, base, deck);
@@ -388,14 +398,28 @@ async function verifyReaderEntryCards(browser, deck) {
           continue;
         }
         await openModule(page, mod);
-        const button = page.locator(`[data-deck-enroll="${card.w}"]`);
-        const offline = await button.textContent();
+        const held = await page.locator('[data-deck-enroll], #deck-enroll-all').evaluateAll((buttons) =>
+          buttons.map((b) => ({ id: b.id || b.dataset.deckEnroll, disabled: b.disabled, text: b.textContent })));
+        check('a module whose dictionary rows failed to load holds every 覚える and ぜんぶ覚える, saying the dictionary is still loading',
+          held.length === mod.cards.length + 1 && held.every((b) => b.disabled && b.text.includes('辞書を読み込み中')),
+          JSON.stringify(held.filter((b) => !b.disabled || !b.text.includes('辞書を読み込み中')).slice(0, 3)));
         refusing = false;
-        await page.locator('#lang [data-lang="ja"]').click();
-        const matched = await page.waitForFunction((w) => document.querySelector(`[data-deck-enroll="${w}"]`)?.textContent.includes('✓'),
-          card.w, { timeout: 15000 }).then(() => true, () => false);
-        check('a module whose dictionary rows failed to load matches the reader’s card once they load on a later render',
-          !offline.includes('✓') && matched && errors.length === 0, JSON.stringify({ offline, now: await button.textContent(), errors }));
+        await context.setOffline(true);
+        await context.setOffline(false);
+        const recovered = await page.waitForFunction(([w, o]) => {
+          const mine = document.querySelector(`[data-deck-enroll="${w}"]`);
+          const next = document.querySelector(`[data-deck-enroll="${o}"]`);
+          return !!mine?.textContent.includes('✓') && !!next && !next.disabled && !next.textContent.includes('辞書');
+        }, [card.w, other.w], { timeout: 15000 }).then(() => true, () => false);
+        check('reconnecting loads the module’s rows: the reader’s card is matched and 覚える is offered again', recovered,
+          JSON.stringify({ mine: await page.locator(`[data-deck-enroll="${card.w}"]`).textContent(),
+            next: await page.locator(`[data-deck-enroll="${other.w}"]`).textContent() }));
+        await page.locator(`[data-deck-enroll="${other.w}"]`).click();
+        const saved = await waitForAppRecord(page, (r) => r.taken.some((row) => row.id === other.w),
+          { description: `${other.w} enrolled after the rows loaded` });
+        const row = saved.taken.find((t) => t.id === other.w);
+        check('a word enrolled after the rows load is saved as its dictionary entry, one identity with the reader',
+          row?.entrySeq === other.seq, JSON.stringify(row));
       } finally {
         await context.close();
       }
@@ -420,14 +444,10 @@ async function main() {
   const { server, base } = await startServer();
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  watchErrors(context);
   await silenceBrowserAudio(context);
   await seedLegacyRow(context, preRow);
   const page = await context.newPage();
-  const consoleErrors = [];
-  page.on('console', (m) => {
-    if (m.type() === 'error') consoleErrors.push(m.text());
-  });
-  page.on('pageerror', (e) => consoleErrors.push(String(e)));
   const store = () => readAppRecord(page);
 
   try {
@@ -486,13 +506,13 @@ async function main() {
     const k = kanjiRecord.taken.filter((t) => m12.cards.some((c) => c.w === t.id));
     check('single-kanji cards enroll as sentence-anchored word rows, never bare-character rows',
       k.length === m12.cards.length && k.every((t) => t.t === 'word' && t.ctx?.p === m12.article), `${k.filter((t) => t.ctx).length}/${m12.cards.length} anchored`);
-    check('no console errors in the room', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
     console.log('\n— 単語帳: cards saved from the reader');
     await verifyReaderEntryCards(browser, deck);
     console.log('\n— 単語帳: native enrollment guard');
     await verifyGuardedEnrollment(browser, base, deck, preRow);
     console.log('\n— 単語帳 and 文脈札: desktop and phone screens');
     await verifyResponsiveScreens(browser, base, deck);
+    check('no console or page errors in any browser context', pageErrors.length === 0, pageErrors.slice(0, 2).join(' | '));
   } finally {
     await browser.close();
     server.close();
