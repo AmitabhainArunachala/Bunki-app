@@ -13340,6 +13340,19 @@ function deckWordSnapshot(node) {
   return { r: /^[ぁ-ゖァ-ヺー]+$/u.test(card.r) ? card.r : '', m: [card.g, card.d] };
 }
 
+/** Reuse a bundled answer only by its source-card binding, or the exact legacy text
+ * identity. A matching reading alone never turns another dictionary entry into this card. */
+function deckSavedSnapshot(node, record) {
+  const expected = deckWordSnapshot(node);
+  const saved = record.deepWords?.[node.id];
+  if (!expected || !plainRecord(saved) || !nonBlankMeanings(saved.m).length ||
+      kanaReadingKey(saved.r) !== kanaReadingKey(expected.r)) return null;
+  const a = node.deckSource, b = saved.deckSource;
+  const bound = b && a.deckId === b.deckId && a.moduleId === b.moduleId && a.card === b.card;
+  const legacy = !nonEmptyString(saved.seq) && saved.m[0] === expected.m[0];
+  return bound || legacy ? saved : null;
+}
+
 function deckWordNode(deck, mod, card) {
   const node = { t: 'word', id: card.w, from: { passage: mod.article, index: card.i }, ctxScope: 'sent',
     deckSource: { deckId: deck.deckId, moduleId: mod.id, card: card.n } };
@@ -13349,6 +13362,11 @@ function deckWordNode(deck, mod, card) {
   const core = D.dict[card.w];
   // The reader's core identity stays the same, including old spelling-only cards.
   if (core && (!reading || kanaReadingKey(core.r) === kanaReadingKey(reading))) return node;
+  const saved = deckSavedSnapshot(node, S);
+  if (saved) {
+    if (saved.seq) { node.seq = saved.seq; node.reading = saved.r; }
+    return node;
+  }
   if (!reading) return node;
   const matches = dictionaryRowsForForm(card.w).filter((row) => {
     const kana = entryKanaIndex(row, reading);
@@ -13382,6 +13400,10 @@ function renderDecks(main) {
   main.append(withEn(el('p', 'eyebrow', '単語帳'), 'decks', 'en-inline'));
   const deckId = S.deckId || DECK_IDS[0];
   const deck = D.decks?.get(deckId);
+  const level = el('span', 'level-chip deck-level', 'N1');
+  level.dataset.level = 'N1';
+  level.title = tx('作者による対象レベルの目安', 'Author’s intended level');
+  main.append(level);
   if (!deck) {
     if (!deckFailed(deckId)) {
       ensureDeck(deckId).then(() => render(), () => render());
@@ -17759,9 +17781,7 @@ function wordNodeIdentity(node, record = S) {
     const snapshot = deckWordSnapshot(node);
     if (!snapshot) return { kind: 'unknown' };
     if (!D.dict?.[node.id]) {
-      const saved = savedAnswerFor({ t: 'word', id: node.id }, record);
-      if (saved?.status === 'available' && kanaReadingKey(saved.reading) === kanaReadingKey(snapshot.r))
-        return wordCardIdentity(record, node.id);
+      if (deckSavedSnapshot(node, record)) return wordCardIdentity(record, node.id);
       return { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
     }
   }
@@ -17893,6 +17913,7 @@ function wordCapturePlan(latest, node, { replace = false } = {}) {
   if (node.seq != null && node.seq !== '') {
     snapshot = explicitWordSnapshot(node, latest);
     if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
+    if (node.deckSource && !deckSavedSnapshot(node, latest)) snapshot = { ...snapshot, deckSource: { ...node.deckSource } };
     identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };
   } else if (D.dict[id]) {
     const bundled = node.deckSource ? deckWordSnapshot(node) : null;
@@ -17902,11 +17923,14 @@ function wordCapturePlan(latest, node, { replace = false } = {}) {
   } else if (node.deckSource) {
     snapshot = deckWordSnapshot(node);
     if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
-    const kept = savedAnswerFor({ t: 'word', id }, latest);
-    if (saved && kept?.status === 'available' && kanaReadingKey(kept.reading) === kanaReadingKey(snapshot.r)) {
-      snapshot = saved;
+    const kept = deckSavedSnapshot(node, latest);
+    if (kept) {
+      snapshot = kept;
       identity = wordCardIdentity(latest, id);
-    } else identity = { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
+    } else {
+      snapshot = { ...snapshot, deckSource: { ...node.deckSource } };
+      identity = { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
+    }
   } else {
     const kept = savedAnswerFor({ t: 'word', id }, { taken: [], deepWords: snapshots });
     if (saved && kept?.status === 'available') {

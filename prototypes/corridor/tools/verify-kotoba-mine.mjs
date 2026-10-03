@@ -26,6 +26,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { chromium } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
@@ -158,17 +159,74 @@ async function screenshot(page, name) {
     await document.fonts.ready;
     await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
   });
-  const layout = await page.evaluate(() => ({
-    width: innerWidth, height: innerHeight,
-    documentWidth: document.documentElement.scrollWidth,
-    view: document.body.dataset.view,
-    outside: [...document.querySelectorAll('main button, main h1, main p')].filter((node) => {
+  const layout = await page.evaluate(() => {
+    const rect = (box) => ({ left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height });
+    const visible = (node) => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
       const box = node.getBoundingClientRect();
-      return box.width > 0 && box.height > 0 && (box.left < -1 || box.right > innerWidth + 1);
-    }).map((node) => ({ tag: node.tagName, className: node.className, text: node.textContent.slice(0, 60) })),
-  }));
+      return style.display !== 'none' && style.visibility === 'visible' && Number(style.opacity) > 0 && box.width > 0 && box.height > 0;
+    };
+    const context = document.body.dataset.view === 'contextdeck';
+    const level = document.querySelector(context ? '.level-chip.cd-level' : '.level-chip.deck-level');
+    const levelBox = level?.getBoundingClientRect();
+    const hit = levelBox && document.elementFromPoint(levelBox.left + levelBox.width / 2, levelBox.top + levelBox.height / 2);
+    const levelState = {
+      text: level?.textContent.trim() || '',
+      visible: visible(level) && levelBox.left >= -1 && levelBox.right <= innerWidth + 1 &&
+        levelBox.top >= -1 && levelBox.bottom <= innerHeight + 1 && !!hit && level.contains(hit),
+      bounds: levelBox ? rect(levelBox) : null,
+    };
+    const column = document.querySelector('.cd-column');
+    const dock = document.querySelector('.cd-dock');
+    let textDock = null;
+    if (column && dock) {
+      const columnBox = column.getBoundingClientRect();
+      const dockBox = dock.getBoundingClientRect();
+      const walker = document.createTreeWalker(column, NodeFilter.SHOW_TEXT);
+      const overlaps = [];
+      let textRects = 0;
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.textContent.trim() || !visible(node.parentElement)) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const box of range.getClientRects()) {
+          // Ranges retain off-screen parts of a scrolling column. Probe only
+          // their painted intersection with the column and the viewport.
+          const painted = {
+            left: Math.max(box.left, columnBox.left, 0), top: Math.max(box.top, columnBox.top, 0),
+            right: Math.min(box.right, columnBox.right, innerWidth), bottom: Math.min(box.bottom, columnBox.bottom, innerHeight),
+          };
+          if (painted.right <= painted.left || painted.bottom <= painted.top) continue;
+          textRects += 1;
+          if (painted.right > dockBox.left + 1 && painted.left < dockBox.right - 1 &&
+              painted.bottom > dockBox.top + 1 && painted.top < dockBox.bottom - 1) {
+            overlaps.push({ text: node.textContent.trim().slice(0, 60), bounds: rect(box), painted });
+          }
+        }
+      }
+      textDock = { column: rect(columnBox), dock: rect(dockBox), dockVisible: visible(dock), textRects, overlaps };
+    }
+    return {
+      width: innerWidth, height: innerHeight,
+      documentWidth: document.documentElement.scrollWidth,
+      view: document.body.dataset.view, level: levelState, textDock,
+      outside: [...document.querySelectorAll('main button, main h1, main p')].filter((node) => {
+        const box = node.getBoundingClientRect();
+        return box.width > 0 && box.height > 0 && (box.left < -1 || box.right > innerWidth + 1);
+      }).map((node) => ({ tag: node.tagName, className: node.className, text: node.textContent.slice(0, 60) })),
+    };
+  });
   check(`${name} has no horizontal overflow`, layout.documentWidth <= layout.width + 1 && layout.outside.length === 0,
     JSON.stringify(layout));
+  check(`${name} shows its level without inventing a grade`, layout.level.visible &&
+    (layout.view === 'contextdeck' ? /級未判定|Level ungraded/u.test(layout.level.text) : layout.level.text === 'N1'),
+    JSON.stringify(layout.level));
+  if (/-context-(front|answer)$/u.test(name)) {
+    check(`${name} keeps visible context text clear of the grading dock`,
+      !!layout.textDock?.dockVisible && layout.textDock.textRects > 0 && layout.textDock.overlaps.length === 0,
+      JSON.stringify(layout.textDock));
+  }
   writeFileSync(resolve(EVIDENCE_DIR, `${name}-layout.json`), JSON.stringify(layout, null, 2) + '\n');
   await page.screenshot({ path: resolve(EVIDENCE_DIR, `${name}.png`), fullPage: true, animations: 'disabled' });
 }
@@ -189,13 +247,31 @@ async function verifyResponsiveScreens(browser, base, deck) {
       await page.locator('#cd-start').waitFor({ timeout: 15000 });
       await page.waitForFunction(() => !!document.querySelector('link[data-context-deck]')?.sheet, null, { timeout: 8000 });
       await screenshot(page, `${prefix}-context-home`);
+      await page.locator('.cd-room').getByRole('button', { name: '目次', exact: true }).click();
+      await page.locator('.cd-toc-row').first().waitFor();
+      await screenshot(page, `${prefix}-context-index`);
+      await page.locator('.cd-toc-row').first().click();
+      await page.locator('.cd-backline').waitFor();
+      await screenshot(page, `${prefix}-context-preview`);
+      await page.locator('.cd-room').getByRole('button', { name: '目次へ', exact: true }).click();
+      await page.locator('.cd-room').getByRole('button', { name: '戻る', exact: true }).click();
+      await page.locator('#cd-start').waitFor();
       await page.locator('#cd-start').click();
       await page.locator('#cd-got').waitFor({ timeout: 8000 });
       await screenshot(page, `${prefix}-context-front`);
       await page.locator('#cd-got').click();
       await page.locator('#cd-good').waitFor({ timeout: 8000 });
       await screenshot(page, `${prefix}-context-answer`);
-      check(`${prefix} opening and revealing context cards enrolls no corridor words`, (await readAppRecord(page)).taken.length === 0);
+      // Complete the fresh daily queue through real controls so its end screen
+      // must keep the same visible, explicitly ungraded level label.
+      for (let card = 0; card < 40; card += 1) {
+        await page.locator('#cd-good').click();
+        if (await page.getByRole('heading', { name: '今日の分はここまで', exact: true }).count()) break;
+        await page.locator('#cd-got').click();
+      }
+      await page.getByRole('heading', { name: '今日の分はここまで', exact: true }).waitFor({ timeout: 8000 });
+      await screenshot(page, `${prefix}-context-done`);
+      check(`${prefix} opening, revealing and grading context cards enrolls no corridor words`, (await readAppRecord(page)).taken.length === 0);
     } finally {
       await context.close();
     }
@@ -292,7 +368,7 @@ async function main() {
     check('ぜんぶ覚える enrolls every new word as a started row with its mined sentence as context',
       rows.length === m1.cards.length && fresh.every((t) => Number.isFinite(t.started)) && withCtx.length === fresh.length,
       `${rows.length} rows · ${withCtx.length}/${fresh.length} new rows with ctx`);
-    check('a word already taken from the reader keeps its own row untouched', JSON.stringify(kept) === JSON.stringify(preRow), JSON.stringify(kept));
+    check('a word already taken from the reader keeps its own row untouched', isDeepStrictEqual(kept, preRow), JSON.stringify(kept));
     check('the module list holds every word, the earlier-taken one included', !!listName && after.lists[listName].length === m1.cards.length &&
       after.lists[listName].some((x) => x.id === pre), listName || 'no list');
 

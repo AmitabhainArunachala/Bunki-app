@@ -249,6 +249,10 @@ function paint(host, opts, state) {
   applyLook(room, look, writing);
   document.documentElement.dataset.cdFocus = ui.screen === 'card' ? '1' : '0';
 
+  const level = h('span', 'level-chip cd-level', opts.bilingual ? '級未判定 · Level ungraded' : '級未判定');
+  level.title = opts.bilingual ? 'This deck has no assigned JLPT level.' : 'この札にはJLPTの級がまだ付いていない。';
+  room.append(level);
+
   if (ui.screen === 'home') paintHome(room, opts, state, look);
   else if (ui.screen === 'card') paintCard(room, opts, state, look);
   else if (ui.screen === 'done') paintDone(room, opts);

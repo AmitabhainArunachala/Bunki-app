@@ -444,7 +444,7 @@ try {
       });
     }
 
-    const TOOL_DOORS = ['feed', 'source-inbox', 'levels', 'lessons', 'mock', 'kagami', 'grammar', 'thesaurus', 'yoji', 'kanjidex', 'ai', 'airead'].map((d) => `${d}-link`);
+    const TOOL_DOORS = ['feed', 'source-inbox', 'levels', 'lessons', 'mock', 'decks', 'kagami', 'grammar', 'thesaurus', 'yoji', 'kanjidex', 'ai', 'airead', 'context-deck'].map((d) => `${d}-link`);
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`T1-tools-behind-one-button-${label}`, viewport, async (page) => {
         await open(page);
