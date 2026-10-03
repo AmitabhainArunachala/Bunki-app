@@ -3224,3 +3224,61 @@ body #mini .mini-status:empty { display: none; }
 }
 @keyframes reader-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @keyframes reader-pop-in { from { opacity: 0; } }
+
+/* Main's deck rooms share round one's page, controls and chrome. The context deck's
+ * standalone paper themes remain available; inside Bunki its content uses the current world. */
+body[data-view='contextdeck'] .cd-room {
+  --cd-paper: var(--surface);
+  --cd-ink: var(--label);
+  --cd-faint: var(--label-2);
+  --cd-indigo: var(--tint);
+  --cd-rule: var(--separator);
+  min-height: 0;
+  padding: 0;
+}
+body[data-view='contextdeck'] .cd-title { font: 700 34px/1.25 var(--sans); letter-spacing: -0.012em; }
+body[data-view='contextdeck'] .cd-sheet { padding-inline: 0; }
+body[data-view='contextdeck'] :is(.cd-rule, .cd-stack) { display: none; }
+html[data-cd-focus='1'] body[data-view='contextdeck'] .chrome { opacity: 1; pointer-events: auto; }
+body[data-view='contextdeck'] :is(.cd-btn, .cd-choice, .cd-seal) {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--r-control);
+  padding: 10px 16px;
+  font-family: var(--sans);
+}
+body[data-view='contextdeck'] .cd-dock {
+  background: var(--glass);
+  border-top: 0.5px solid var(--glass-line);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+body[data-view='contextdeck'] :is(.cd-btn, .cd-choice, .cd-seal, .cd-swatch):focus-visible {
+  outline: 2px solid var(--tint);
+  box-shadow: var(--focus-ring);
+  outline-offset: 3px;
+}
+body[data-view='decks'] .vocabulary-module-row {
+  display: flex;
+  width: 100%;
+  border: 0;
+  border-bottom: 0.5px solid var(--separator);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body[data-view='decks'] .vocabulary-module-row:hover { background: var(--fill); }
+body[data-view='decks'] .deck-card {
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 0.5px solid var(--separator);
+  font-family: var(--sans);
+}
+body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: 6.5em; }
+body[data-view='decks'] .deck-actions .chip { max-width: 100%; white-space: normal; padding-block: 10px; }
+@media (max-width: 720px) {
+  body[data-view='contextdeck'] .cd-title { font-size: 28px; }
+  body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-sheet { padding-right: 0; }
+  body[data-view='decks'] .deck-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
+  body[data-view='decks'] .deck-card .deck-card-body { grid-column: 1 / -1; grid-row: 2; }
+  body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: auto; }
+}

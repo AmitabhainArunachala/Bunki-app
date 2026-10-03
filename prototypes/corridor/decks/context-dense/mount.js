@@ -85,7 +85,9 @@ function h(tag, className, text) {
 }
 
 function button(label, className, onClick) {
-  const node = h('button', className || '', label);
+  const role = /(?:^|\s)(?:cd-btn|cd-choice|cd-seal)(?:\s|$)/u.test(className || '')
+    ? (className.includes('cd-primary') || className.includes('cd-seal-good') ? 'chip btn-primary' : 'chip btn-secondary') : '';
+  const node = h('button', `${className || ''} ${role}`.trim(), label);
   node.type = 'button';
   node.addEventListener('click', onClick);
   return node;

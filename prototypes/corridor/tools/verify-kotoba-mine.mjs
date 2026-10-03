@@ -16,19 +16,26 @@
  *     the word blanked;
  *   · the record survives a reload without quarantine.
  *
+ * Checks one immutable built artifact (KAIRO_SITE_DIR), including native
+ * storage failure and responsive screenshots. No source-text assertion.
  * Usage: node verify-kotoba-mine.mjs   (regenerate data: python3 decks/kotoba-mine/tools/build_deck.py)
  */
 
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { openShelfTools } from './shelf-tools-support.mjs';
+import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecord, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
-const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+const CORRIDOR_DIR = resolveCorridorSite();
+const EVIDENCE_DIR = resolveCorridorEvidence();
+const REPO_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
 const DECK_PATH = resolve(DATA_DIR, 'share_alike/decks/kotoba-mine.json');
 
@@ -38,6 +45,8 @@ const MIME = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
 };
 
 function startServer(rootDir = CORRIDOR_DIR) {
@@ -74,6 +83,7 @@ function verifyDeck() {
   const deck = readJson(DECK_PATH);
   const index = readJson(resolve(DATA_DIR, 'articles/index.json'));
   const rows = new Map(index.articles.map((a) => [a.id, a]));
+  const receipts = readJson(resolve(DATA_DIR, 'articles/title-receipts.json'));
   check('the deck is schema 1, names its law and both licences', deck.schemaVersion === 1 && /door, not a schedule/u.test(deck.law) &&
     /JMdict/u.test(deck.licence.english_glosses) && /Bunki original/u.test(deck.licence.passages_sentences_definitions));
   const cards = deck.modules.flatMap((m) => m.cards);
@@ -81,16 +91,27 @@ function verifyDeck() {
   check('every mined word is one card — 323 in all, none twice', cards.length === 323 && heads.size === 323, `${cards.length} cards, ${heads.size} distinct`);
   const anchorProblems = [];
   const shapeProblems = [];
+  const titleProblems = [];
   for (const m of deck.modules) {
     const row = rows.get(m.article);
     if (!row) {
       anchorProblems.push(`${m.id}: article ${m.article} not on the shelf index`);
       continue;
     }
-    if (row.pool !== 'original' || row.licence !== 'Bunki original' || row.titleEnSource !== 'shelf-map-2026' || row.review) {
+    if (row.pool !== 'original' || row.licence !== 'Bunki original' || row.review) {
       shapeProblems.push(`${m.article}: index row provenance`);
     }
     const body = readJson(resolve(DATA_DIR, 'articles', row.file));
+    const receipt = receipts.authored?.[m.article];
+    const sourceModule = readJson(resolve(REPO_DIR, `decks/kotoba-mine/source/modules/${m.id}.json`));
+    if (row.titleEnSource !== 'Bunki original, bilingual title' ||
+        receipt?.path !== `decks/kotoba-mine/source/modules/${m.id}.json` ||
+        !receipt.titleJa || !receipt.titleEn || receipt.titleJa !== row.title ||
+        receipt.titleEn !== row.titleEn || body.title !== receipt.titleJa ||
+        m.passageTitle !== receipt.titleJa || sourceModule.passage.title !== receipt.titleJa ||
+        sourceModule.passage.title_en !== receipt.titleEn) {
+      titleProblems.push(`${m.article}: bilingual title does not match its exact authored receipt`);
+    }
     for (const c of m.cards) {
       if (!c.w || !c.r || !c.g || !c.d || !Array.isArray(c.s) || c.s.length < 2) shapeProblems.push(`${m.id}#${c.n}: fields`);
       for (const [ja, form, en] of c.s || []) if (!ja.includes(form) || !en) shapeProblems.push(`${m.id}#${c.n}: sentence`);
@@ -100,10 +121,126 @@ function verifyDeck() {
     }
   }
   check('every module passage stands on the shelf as an original-lane text', shapeProblems.length === 0, shapeProblems.slice(0, 4).join(' | ') || `${deck.modules.length} passages`);
+  check('every module’s bilingual shelf title matches its authored title receipt and built passage', titleProblems.length === 0,
+    titleProblems.slice(0, 4).join(' | ') || `${deck.modules.length} exact receipts`);
   check('every card is anchored on a live token whose base form is its headword (the cloze can blank it)', anchorProblems.length === 0, anchorProblems.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
-  const source = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
-  check('the room enrolls through the guarded store path only', source.includes('const patch = deckEnrollPatch(deck, mod, mod.cards);') && source.includes('commitStorePatch(patch)'));
   return deck;
+}
+
+async function shelf(page, base) {
+  await page.goto(`${base}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+  await openShelfTools(page);
+}
+
+async function moduleOverview(page, base, deck) {
+  await shelf(page, base);
+  await page.locator('#decks-link').click();
+  await page.locator(`[data-deck-module="${deck.modules[0].id}"]`).waitFor({ timeout: 15000 });
+}
+
+async function openModule(page, mod) {
+  await page.locator(`[data-deck-module="${mod.id}"]`).click();
+  await page.locator('#deck-enroll-all').waitFor({ timeout: 8000 });
+}
+
+async function seedLegacyRow(context, row) {
+  await context.addInitScript((row) => {
+    if (!localStorage.getItem('__deck_seeded')) {
+      localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [row], srs: {} }));
+      localStorage.setItem('__deck_seeded', '1');
+    }
+  }, row);
+}
+
+async function screenshot(page, name) {
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+  });
+  const layout = await page.evaluate(() => ({
+    width: innerWidth, height: innerHeight,
+    documentWidth: document.documentElement.scrollWidth,
+    view: document.body.dataset.view,
+    outside: [...document.querySelectorAll('main button, main h1, main p')].filter((node) => {
+      const box = node.getBoundingClientRect();
+      return box.width > 0 && box.height > 0 && (box.left < -1 || box.right > innerWidth + 1);
+    }).map((node) => ({ tag: node.tagName, className: node.className, text: node.textContent.slice(0, 60) })),
+  }));
+  check(`${name} has no horizontal overflow`, layout.documentWidth <= layout.width + 1 && layout.outside.length === 0,
+    JSON.stringify(layout));
+  writeFileSync(resolve(EVIDENCE_DIR, `${name}-layout.json`), JSON.stringify(layout, null, 2) + '\n');
+  await page.screenshot({ path: resolve(EVIDENCE_DIR, `${name}.png`), fullPage: true, animations: 'disabled' });
+}
+
+async function verifyResponsiveScreens(browser, base, deck) {
+  for (const viewport of [{ width: 1368, height: 900 }, { width: 390, height: 844 }]) {
+    const context = await browser.newContext({ viewport });
+    await silenceBrowserAudio(context);
+    const page = await context.newPage();
+    const prefix = `kotoba-mine-${viewport.width}x${viewport.height}`;
+    try {
+      await moduleOverview(page, base, deck);
+      await screenshot(page, `${prefix}-overview`);
+      await openModule(page, deck.modules[0]);
+      await screenshot(page, `${prefix}-module`);
+      await shelf(page, base);
+      await page.locator('#context-deck-link').click();
+      await page.locator('#cd-start').waitFor({ timeout: 15000 });
+      await page.waitForFunction(() => !!document.querySelector('link[data-context-deck]')?.sheet, null, { timeout: 8000 });
+      await screenshot(page, `${prefix}-context-home`);
+      await page.locator('#cd-start').click();
+      await page.locator('#cd-got').waitFor({ timeout: 8000 });
+      await screenshot(page, `${prefix}-context-front`);
+      await page.locator('#cd-got').click();
+      await page.locator('#cd-good').waitFor({ timeout: 8000 });
+      await screenshot(page, `${prefix}-context-answer`);
+      check(`${prefix} opening and revealing context cards enrolls no corridor words`, (await readAppRecord(page)).taken.length === 0);
+    } finally {
+      await context.close();
+    }
+  }
+}
+
+async function verifyGuardedEnrollment(browser, base, deck, preRow) {
+  for (const choice of ['one', 'all']) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await silenceBrowserAudio(context);
+    await seedLegacyRow(context, preRow);
+    const page = await context.newPage();
+    try {
+      const mod = deck.modules[0];
+      await moduleOverview(page, base, deck);
+      await openModule(page, mod);
+      const before = await readAppRecordSnapshot(page);
+      await armRecordWriteFailure(page, 'quota', { roots: ['taken'] });
+      const selector = choice === 'all' ? '#deck-enroll-all' : `[data-deck-enroll="${mod.cards[0].w}"]`;
+      await page.locator(selector).click();
+      await page.waitForFunction(() => window.__recordTestFault?.fired > 0, null, { timeout: 10000 });
+      await page.locator('#record-reload').waitFor({ state: 'visible', timeout: 8000 });
+      const after = await readAppRecordSnapshot(page);
+      const fault = await clearRecordWriteFailure(page);
+      const claimed = await page.locator('[data-deck-enroll]').evaluateAll((buttons) =>
+        buttons.filter((button) => button.textContent.includes('✓')).map((button) => button.dataset.deckEnroll));
+      check(`${choice}-word enrollment rejects a real native storage failure without changing the record or claiming new words`,
+        fault.fired > 0 && JSON.stringify(after.record) === JSON.stringify(before.record) &&
+        JSON.stringify(after.archive) === JSON.stringify(before.archive) && after.revision === before.revision &&
+        claimed.length === 1 && claimed[0] === preRow.id, JSON.stringify({ fault, claimed, revision: after.revision }));
+      writeFileSync(resolve(EVIDENCE_DIR, `kotoba-mine-${choice}-failed-write.json`), JSON.stringify({
+        syntheticFault: 'QuotaExceededError after real native IndexedDB puts', fault, before, after, claimed,
+      }, null, 2) + '\n');
+      await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
+      await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+      await moduleOverview(page, base, deck);
+      await openModule(page, mod);
+      await page.locator(selector).click();
+      const expected = choice === 'all' ? mod.cards.length : 2;
+      const recovered = await waitForAppRecord(page, (record) => record.taken.length === expected, { description: `${choice} enrollment after reload` });
+      check(`${choice}-word enrollment recovers after the app’s reload control`, recovered.taken.length === expected);
+    } finally {
+      await context.close();
+    }
+  }
 }
 
 /* --------------------------------------------------- half two: the room */
@@ -121,31 +258,22 @@ async function main() {
   const { server, base } = await startServer();
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  await context.addInitScript(`try {
-    if (!localStorage.getItem('__deck_seeded')) {
-      localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(JSON.stringify({ v: 1, taken: [preRow], srs: {} }))});
-      localStorage.setItem('__deck_seeded', '1');
-    }
-  } catch {}`);
+  await silenceBrowserAudio(context);
+  await seedLegacyRow(context, preRow);
   const page = await context.newPage();
   const consoleErrors = [];
   page.on('console', (m) => {
     if (m.type() === 'error') consoleErrors.push(m.text());
   });
   page.on('pageerror', (e) => consoleErrors.push(String(e)));
-  const store = () => page.evaluate(`JSON.parse(localStorage.getItem('kairo-corridor-v1'))`);
+  const store = () => readAppRecord(page);
 
   try {
-    await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
-    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-    await page.waitForSelector('#decks-link', { timeout: 8000 });
-    await page.click('#decks-link');
-    await page.waitForSelector(`[data-deck-module="${m1.id}"]`, { timeout: 15000 });
+    await moduleOverview(page, base, deck);
     const listed = await page.evaluate(`document.querySelectorAll('[data-deck-module]').length`);
     check('the shelf door opens the deck and lists every module', listed === deck.modules.length, `${listed}/${deck.modules.length}`);
 
-    await page.click(`[data-deck-module="${m1.id}"]`);
-    await page.waitForSelector('#deck-enroll-all', { timeout: 8000 });
+    await openModule(page, m1);
     const before = await store();
     const words = await page.evaluate(`document.querySelectorAll('[data-deck-enroll]').length`);
     check('a module lists every word, and opening it enrolls nothing', words === m1.cards.length && before.taken.length === 1, `${words} words · ${before.taken.length} taken`);
@@ -154,7 +282,8 @@ async function main() {
 
     await page.click('#deck-enroll-all');
     await page.waitForFunction(`document.querySelectorAll('[data-deck-enroll]:disabled').length === ${m1.cards.length}`, null, { timeout: 8000 });
-    const after = await store();
+    const after = await waitForAppRecord(page, (record) => record.taken.length === m1.cards.length,
+      { description: 'every module word durably enrolled' });
     const rows = after.taken.filter((t) => m1.cards.some((c) => c.w === t.id));
     const fresh = rows.filter((t) => t.id !== pre);
     const withCtx = fresh.filter((t) => t.t === 'word' && t.ctx?.p === m1.article && t.ctx.scope === 'sent' && Number.isInteger(t.ctx.i));
@@ -179,24 +308,27 @@ async function main() {
 
     await page.reload({ waitUntil: 'load' });
     await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-    const reloaded = await page.evaluate(`(() => {
-      const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const reloaded = { taken: (await store()).taken.length, quarantined: await page.evaluate(() => {
       const alert = document.getElementById('store-alert');
-      return { taken: s.taken.length, quarantined: !!(alert && !alert.hidden && alert.textContent) };
-    })()`);
+      return !!(alert && !alert.hidden && alert.textContent);
+    }) };
     check('the enrolled rows survive a reload with no quarantine', reloaded.taken === m1.cards.length && !reloaded.quarantined, JSON.stringify(reloaded));
 
     // single-kanji cards are asked inside a compound in their passage too
-    await page.click('#decks-link');
-    await page.waitForSelector(`[data-deck-module="${m12.id}"]`, { timeout: 15000 });
-    await page.click(`[data-deck-module="${m12.id}"]`);
-    await page.waitForSelector('#deck-enroll-all', { timeout: 8000 });
+    await moduleOverview(page, base, deck);
+    await openModule(page, m12);
     await page.click('#deck-enroll-all');
     await page.waitForFunction(`document.querySelectorAll('[data-deck-enroll]:disabled').length === ${m12.cards.length}`, null, { timeout: 8000 });
-    const k = (await store()).taken.filter((t) => m12.cards.some((c) => c.w === t.id));
+    const kanjiRecord = await waitForAppRecord(page, (record) => m12.cards.every((card) => record.taken.some((row) => row.t === 'word' && row.id === card.w)),
+      { description: 'single-kanji words durably enrolled' });
+    const k = kanjiRecord.taken.filter((t) => m12.cards.some((c) => c.w === t.id));
     check('single-kanji cards enroll as sentence-anchored word rows, never bare-character rows',
       k.length === m12.cards.length && k.every((t) => t.t === 'word' && t.ctx?.p === m12.article), `${k.filter((t) => t.ctx).length}/${m12.cards.length} anchored`);
     check('no console errors in the room', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
+    console.log('\n— 単語帳: native enrollment guard');
+    await verifyGuardedEnrollment(browser, base, deck, preRow);
+    console.log('\n— 単語帳 and 文脈札: desktop and phone screens');
+    await verifyResponsiveScreens(browser, base, deck);
   } finally {
     await browser.close();
     server.close();

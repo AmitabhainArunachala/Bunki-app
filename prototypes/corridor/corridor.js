@@ -11614,14 +11614,14 @@ function lessonChoices(run) {
   return { right, opts };
 }
 const learningEnrollmentPending = new Set();
-async function commitLearningEnrollment(owner, nodes, isCurrent) {
+async function commitLearningEnrollment(owner, nodes, isCurrent, { listName = null } = {}) {
   if (learningEnrollmentPending.has(owner) || !recordWritable() || !isCurrent()) return false;
   const epoch = recordEpoch;
   const now = Date.now();
   learningEnrollmentPending.add(owner);
   try {
     render();
-    if (nodes.length === 1) return await commitCapture(nodes[0], nodes[0].label || nodes[0].id, now);
+    if (nodes.length === 1 && !listName) return await commitCapture(nodes[0], nodes[0].label || nodes[0].id, now);
     return await commitStorePatch((latest) => {
       let current = latest;
       const patch = {};
@@ -11629,9 +11629,16 @@ async function commitLearningEnrollment(owner, nodes, isCurrent) {
         let change;
         // D23: a word whose spelling holds another entry's card is skipped, as a duplicate is
         try { change = captureStorePatch(current, node, node.label || node.id, now); }
-        catch (error) { if (error?.code === 'word-identity-conflict') continue; throw error; }
+        catch (error) { if (error?.code === 'word-identity-conflict' || (listName && error?.code === 'word-answer-unavailable')) continue; throw error; }
         Object.assign(patch, change);
         current = { ...current, ...change };
+        if (listName && current.taken.some((row) => row.t === node.t && row.id === node.id)) {
+          const list = current.lists?.[listName] || [];
+          if (!list.some((row) => row.t === node.t && row.id === node.id)) {
+            patch.lists = { ...current.lists, [listName]: [...list, { t: node.t, id: node.id, label: node.id, ts: now }] };
+            current = { ...current, lists: patch.lists };
+          }
+        }
       }
       return patch;
     });
@@ -11820,7 +11827,7 @@ function renderLessons(main) {
     const heldText = learningEnrollHeldText({ t: kt, id: w, from: null });
     if (heldText) held.add(w);
     const have = !heldText && inDeck.has(srsKey(kt, w));
-    const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
+    const b = biLabel('button', have ? 'chip btn-secondary lesson-enroll-one on' : 'chip btn-secondary lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
     b.type = 'button';
     b.dataset.enroll = w;
     b.disabled = have || !!heldText || learningEnrollmentPending.has(run);
@@ -13319,48 +13326,56 @@ function ensureDeck(deckId) {
 /** every deck card enrolls as a word row anchored in its passage — the
  * single-kanji cards too, so they are asked inside a compound in a sentence
  * rather than as a bare character (the kanji-row review has no cloze) */
-const deckHas = (card) => S.taken.some((t) => t.t === 'word' && t.id === card.w);
 const deckListName = (deck, mod) => `${deck.title.ja} · ${mod.title.ja.split(' — ')[0]}`;
 
-function deckEnrollPatch(deck, mod, cards) {
-  const now = Date.now();
-  const inDeck = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
-  const rows = [];
-  const deep = { ...(S.deepWords || {}) };
-  let deepTouched = false;
-  for (const card of cards) {
-    if (inDeck.has(card.w)) continue;
-    inDeck.add(card.w);
-    const row = { t: 'word', id: card.w, label: card.w, kind: NODE_KIND.word[0], kindEn: NODE_KIND.word[1], from: null, ts: now, started: now };
-    if (Number.isInteger(card.i) && mod.article) {
-      row.from = { passage: mod.article, index: card.i };
-      row.ctx = { p: mod.article, i: card.i, scope: 'sent' };
-      if (/^[ぁ-ゖー]+$/.test(card.r)) row.cueReading = card.r;
-    }
-    if (!D.dict[card.w] && !deep[card.w]) {
-      deep[card.w] = { r: /^[ぁ-ゖァ-ヺー]+$/.test(card.r) ? card.r : '', m: [card.g, card.d] };
-      deepTouched = true;
-    }
-    rows.push(row);
+/** The bundled answer is resolved from the shipped card, never from caller-supplied text.
+ * Single-kanji cards show several readings; that display is not one lexical cue. */
+function deckWordSnapshot(node) {
+  const source = node?.deckSource;
+  if (!source || !DECK_IDS.includes(source.deckId)) return null;
+  const deck = D.decks?.get(source.deckId);
+  const mod = deck?.modules.find((m) => m.id === source.moduleId);
+  const card = mod?.cards.find((c) => c.n === source.card);
+  if (!card || card.w !== node.id || !nonBlankMeanings([card.g, card.d]).length) return null;
+  return { r: /^[ぁ-ゖァ-ヺー]+$/u.test(card.r) ? card.r : '', m: [card.g, card.d] };
+}
+
+function deckWordNode(deck, mod, card) {
+  const node = { t: 'word', id: card.w, from: { passage: mod.article, index: card.i }, ctxScope: 'sent',
+    deckSource: { deckId: deck.id, moduleId: mod.id, card: card.n } };
+  const snapshot = deckWordSnapshot(node);
+  const reading = snapshot?.r || '';
+  if (reading) node.reading = reading;
+  const core = D.dict[card.w];
+  // The reader's core identity stays the same, including old spelling-only cards.
+  if (core && (!reading || kanaReadingKey(core.r) === kanaReadingKey(reading))) return node;
+  if (!reading) return node;
+  const matches = dictionaryRowsForForm(card.w).filter((row) => {
+    const kana = entryKanaIndex(row, reading);
+    return kana >= 0 && readerReadingFits(row, kana, card.w);
+  });
+  if (matches.length === 1) {
+    node.seq = String(matches[0][0]);
+    node.reading = matches[0][5][entryKanaIndex(matches[0], reading)];
   }
-  // the module list holds every chosen word of the module — the ones just
-  // enrolled AND any the learner had already taken from the reader, whose
-  // rows (and their own chosen context) stay exactly as they were
-  const name = deckListName(deck, mod);
-  const list = [...(S.lists[name] || [])];
-  const listed = new Set(list.filter((x) => x.t === 'word').map((x) => x.id));
-  for (const card of cards) {
-    if (!inDeck.has(card.w) || listed.has(card.w)) continue;
-    listed.add(card.w);
-    list.push({ t: 'word', id: card.w, label: card.w, ts: now });
-  }
-  const listGrew = list.length !== (S.lists[name] || []).length;
-  if (!rows.length && !listGrew) return null;
-  const patch = {};
-  if (rows.length) patch.taken = [...S.taken, ...rows];
-  if (listGrew) patch.lists = { ...S.lists, [name]: list };
-  if (deepTouched) patch.deepWords = deep;
-  return patch;
+  return node;
+}
+
+const deckModuleLoading = new Map();
+const deckModuleReady = new Set();
+function prepareDeckModule(deck, mod) {
+  const key = `${deck.id}:${mod.id}`;
+  if (deckModuleReady.has(key)) return Promise.resolve();
+  if (deckModuleLoading.has(key)) return deckModuleLoading.get(key);
+  const pending = Promise.all(mod.cards.filter((card) => {
+    const simple = /^[ぁ-ゖァ-ヺー]+$/u.test(card.r);
+    const core = D.dict[card.w];
+    return simple && (!core || kanaReadingKey(core.r) !== kanaReadingKey(card.r));
+  }).map((card) => ensureDictionaryRowsForForm(card.w)))
+    .then(() => { deckModuleReady.add(key); })
+    .finally(() => { deckModuleLoading.delete(key); });
+  deckModuleLoading.set(key, pending);
+  return pending;
 }
 
 function renderDecks(main) {
@@ -13397,8 +13412,8 @@ function renderDecks(main) {
       ),
     );
     for (const m of deck.modules) {
-      const have = m.cards.filter(deckHas).length;
-      const row = el('button', 'entry-row deck-row');
+      const have = m.cards.filter((c) => wordCaptureState(deckWordNode(deck, m, c)) === 'taken').length;
+      const row = el('button', 'entry-row vocabulary-module-row');
       row.type = 'button';
       row.dataset.deckModule = m.id;
       row.append(el('span', 'row-glyph', m.id.slice(1, 3)));
@@ -13417,37 +13432,52 @@ function renderDecks(main) {
     }
     return;
   }
+  const moduleKey = `${deck.id}:${mod.id}`;
+  if (!deckModuleReady.has(moduleKey)) {
+    main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+    prepareDeckModule(deck, mod).then(() => {
+      if (S.view === 'decks' && S.deckModule === mod.id) render();
+    }, () => {
+      // Bundled answers remain usable offline when the optional index is unavailable.
+      deckModuleReady.add(moduleKey);
+      if (S.view === 'decks' && S.deckModule === mod.id) render();
+    });
+    return;
+  }
+  const owner = `deck:${moduleKey}`;
+  const nodeFor = (card) => deckWordNode(deck, mod, card);
+  const stateFor = (card) => wordCaptureState(nodeFor(card));
+  const enroll = (cards) => commitLearningEnrollment(owner, cards.map(nodeFor),
+    () => S.view === 'decks' && S.deckModule === mod.id, { listName: deckListName(deck, mod) });
   main.append(el('h1', 'view-title', mod.title.ja.split(' — ')[0]));
   main.append(el('p', 'gloss', tx(mod.title.ja.split(' — ')[1] || '', mod.title.en)));
   const actions = el('div', 'deck-actions');
   if (mod.article && D.passages.some((p) => p.id === mod.article)) {
-    const read = biLabel('button', 'chip', `読み物 —『${mod.passageTitle}』`, 'read the passage');
+    const read = biLabel('button', 'chip btn-secondary', `読み物 —『${mod.passageTitle}』`, 'read the passage');
     read.type = 'button';
     read.id = 'deck-read';
     read.addEventListener('click', () => openPassage(mod.article));
     actions.append(read);
   }
-  const fresh = mod.cards.filter((c) => !deckHas(c));
+  const fresh = mod.cards.filter((c) => stateFor(c) === 'take');
   // words taken earlier from the reader still belong to this module's list
   const listedIds = new Set((S.lists[deckListName(deck, mod)] || []).map((x) => x.id));
-  const unlisted = mod.cards.some((c) => deckHas(c) && !listedIds.has(c.w));
+  const unlisted = mod.cards.some((c) => stateFor(c) === 'taken' && !listedIds.has(c.w));
   if (fresh.length || unlisted) {
     const all = fresh.length
-      ? biLabel('button', 'chip lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
-      : biLabel('button', 'chip lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
+      ? biLabel('button', 'chip btn-primary lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
+      : biLabel('button', 'chip btn-secondary lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
     all.type = 'button';
     all.id = 'deck-enroll-all';
-    all.addEventListener('click', () => {
-      const patch = deckEnrollPatch(deck, mod, mod.cards);
-      if (patch && commitStorePatch(patch)) render();
-    });
+    all.disabled = learningEnrollmentPending.has(owner);
+    all.addEventListener('click', () => enroll(mod.cards));
     actions.append(all);
   }
   const listed = S.lists[deckListName(deck, mod)] || [];
   const due = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   const dueHere = listed.filter((x) => due.has(srsKey(x.t, x.id))).length;
   if (dueHere) {
-    const rev = biLabel('button', 'chip', `この鉱脈だけ復習 — ${dueHere}`, `review this module — ${dueHere}`);
+    const rev = biLabel('button', 'chip btn-secondary', `この鉱脈だけ復習 — ${dueHere}`, `review this module — ${dueHere}`);
     rev.type = 'button';
     rev.id = 'deck-review';
     rev.addEventListener('click', () => startReview(listed));
@@ -13455,7 +13485,9 @@ function renderDecks(main) {
   }
   main.append(actions);
   for (const c of mod.cards) {
-    const have = deckHas(c);
+    const node = nodeFor(c);
+    const heldText = learningEnrollHeldText(node);
+    const have = stateFor(c) === 'taken';
     const row = el('div', 'lesson-enroll-row deck-card');
     const word = el('span', 'lesson-enroll-word');
     word.append(document.createTextNode(c.w));
@@ -13465,20 +13497,24 @@ function renderDecks(main) {
     body.append(el('span', 'deck-def', c.d));
     if (bi()) body.append(el('span', 'en-sub', c.g));
     row.append(body);
-    const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
+    const b = biLabel('button', have ? 'chip btn-secondary lesson-enroll-one on' : 'chip btn-secondary lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
     b.type = 'button';
     b.dataset.deckEnroll = c.w;
-    b.disabled = have;
-    if (!have) {
-      b.addEventListener('click', () => {
-        const patch = deckEnrollPatch(deck, mod, [c]);
-        if (patch && commitStorePatch(patch)) render();
-      });
+    b.disabled = have || !!heldText || learningEnrollmentPending.has(owner);
+    if (!b.disabled) b.addEventListener('click', () => enroll([c]));
+    if (heldText) {
+      b.classList.add('word-capture-held');
+      const reason = el('p', 'enroll-held', heldText);
+      reason.id = `deck-enroll-held-${c.n}`;
+      b.setAttribute('aria-describedby', reason.id);
+      body.append(reason);
+      const open = heldEnrollRoute(node, `deck-enroll-open-${c.n}`);
+      if (open) body.append(open);
     }
     row.append(b);
     main.append(row);
   }
-  const back = biLabel('button', 'take', '単語帳の一覧へ', 'all modules');
+  const back = biLabel('button', 'chip btn-tertiary', '単語帳の一覧へ', 'all modules');
   back.type = 'button';
   back.addEventListener('click', () => {
     S.deckModule = null;
@@ -17719,6 +17755,16 @@ function wordNodeIdentity(node, record = S) {
     // the entry's own kana form when the door's reading names it only across scripts: one word, one card
     return { kind: 'seq', seq: String(node.seq), reading: nonEmptyString(node.reading) ? entryCueReading(node) : null };
   }
+  if (node.deckSource) {
+    const snapshot = deckWordSnapshot(node);
+    if (!snapshot) return { kind: 'unknown' };
+    if (!D.dict?.[node.id]) {
+      const saved = savedAnswerFor({ t: 'word', id: node.id }, record);
+      if (saved?.status === 'available' && kanaReadingKey(saved.reading) === kanaReadingKey(snapshot.r))
+        return wordCardIdentity(record, node.id);
+      return { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
+    }
+  }
   if (D.dict?.[node.id]) return { kind: 'core' };
   const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
   if ((record.taken || []).some((entry) => entry.t === 'word' && entry.id === node.id) ||
@@ -17849,7 +17895,18 @@ function wordCapturePlan(latest, node, { replace = false } = {}) {
     if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
     identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };
   } else if (D.dict[id]) {
+    const bundled = node.deckSource ? deckWordSnapshot(node) : null;
+    if (node.deckSource && (!bundled || (bundled.r && kanaReadingKey(bundled.r) !== kanaReadingKey(D.dict[id].r))))
+      throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
     identity = { kind: 'core' };
+  } else if (node.deckSource) {
+    snapshot = deckWordSnapshot(node);
+    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
+    const kept = savedAnswerFor({ t: 'word', id }, latest);
+    if (saved && kept?.status === 'available' && kanaReadingKey(kept.reading) === kanaReadingKey(snapshot.r)) {
+      snapshot = saved;
+      identity = wordCardIdentity(latest, id);
+    } else identity = { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
   } else {
     const kept = savedAnswerFor({ t: 'word', id }, { taken: [], deepWords: snapshots });
     if (saved && kept?.status === 'available') {
@@ -19091,6 +19148,10 @@ function wordCaptureState(node, record = S) {
   const row = (record.taken || []).some((entry) => entry.t === node.t && entry.id === node.id);
   if (node.t !== 'word') return row ? 'taken' : 'take';
   const explicit = node.seq != null && node.seq !== '';
+  if (node.deckSource) {
+    try { return wordCapturePlan(record, node).dedupe ? 'taken' : 'take'; }
+    catch (error) { return error?.code === 'word-identity-conflict' ? 'conflict' : 'unavailable'; }
+  }
   if (!row && !wordStudied(record, node.id)) return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
   if (!sameWordIdentity(wordNodeIdentity(node, record), wordCardIdentity(record, node.id))) return 'conflict';
   if (row) return 'taken';
@@ -19103,6 +19164,12 @@ function wordCaptureState(node, record = S) {
  * read なま. Returns both readings to name, or null when the row is not at hand or the reading names
  * one of its forms (the answer is then held for another reason, said in the older words). */
 function wordCaptureReadingMismatch(node) {
+  if (node?.deckSource && !node.seq) {
+    const reading = deckWordSnapshot(node)?.r;
+    const core = D.dict?.[node.id];
+    if (reading && core?.r && kanaReadingKey(reading) !== kanaReadingKey(core.r))
+      return { here: reading, dictionary: core.r };
+  }
   if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return null;
   const row = dictionaryRowBySeq(node.seq);
   if (!Array.isArray(row) || String(row[0]) !== String(node.seq) || !Array.isArray(row[5]) || entryKanaIndex(row, node.reading) >= 0) return null;
