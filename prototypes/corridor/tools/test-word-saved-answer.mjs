@@ -94,7 +94,7 @@ function defineRows() {
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
-    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading', 'DECK_IDS', 'deckWordSnapshot', 'deckWordNode',
+    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading', 'DECK_IDS', 'deckWordSnapshot', 'deckSavedSnapshot', 'deckWordNode',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
     // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
     'wordSaveFacts', 'paintWordSave', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
@@ -1673,7 +1673,34 @@ function defineRows() {
     const bundled = ctx.deckWordNode(deck, module, module.cards[2]);
     const captured = apply(blank(), ctx.captureStorePatch(blank(), bundled, bundled.id, 1000));
     assert.deepEqual(captured.taken[0].ctx, { p: module.article, i: 2, scope: 'sent' });
-    assert.deepEqual(captured.deepWords[bundled.id], { r: module.cards[2].r, m: ['bundled answer', '束の語'] });
+    assert.deepEqual(captured.deepWords[bundled.id], { r: module.cards[2].r, m: ['bundled answer', '束の語'], deckSource: { deckId: deck.deckId, moduleId: module.id, card: 3 } });
+    // An unrelated homograph never becomes the bundled card just because the reading matches.
+    const homograph = { ...captured, deepWords: { [bundled.id]: { r: module.cards[2].r, m: ['unrelated meaning'], seq: '1402170' } },
+      taken: [{ ...captured.taken[0], entrySeq: '1402170' }] };
+    assert.equal(ctx.wordCaptureState(bundled, homograph), 'conflict');
+    assert.throws(() => ctx.captureStorePatch(homograph, bundled, bundled.id, 2000), (error) => error.code === 'word-identity-conflict');
+    const shippedDeck = JSON.parse(readFileSync(here('../data/share_alike/decks/kotoba-mine.json'), 'utf8'));
+    ctx.D.decks.set(shippedDeck.deckId, shippedDeck);
+    for (const [word, unrelatedSeq] of [['そうそう', '1402170'], ['がち', '1197950']]) {
+      const mod = shippedDeck.modules.find((m) => m.cards.some((c) => c.w === word));
+      const card = mod.cards.find((c) => c.w === word);
+      const door = ctx.deckWordNode(shippedDeck, mod, card);
+      const entry = rowOf.get(unrelatedSeq);
+      const unrelated = { ...blank(), taken: [{ t: 'word', id: word, label: word, ts: 10, started: 10,
+        entrySeq: unrelatedSeq, cueReading: card.r }], deepWords: { [word]: { seq: unrelatedSeq, r: card.r, m: entry[6] } } };
+      assert.equal(ctx.wordCaptureState(door, unrelated), 'conflict', `${word} holds its unrelated existing entry`);
+      assert.throws(() => ctx.captureStorePatch(unrelated, door, word, 2000), (error) => error.code === 'word-identity-conflict');
+    }
+    ctx.D.decks.set(deck.deckId, deck);
+    // Warming the dictionary must not change an already captured bundled text identity.
+    ctx.S = captured;
+    const fakeRow = [...rowOf.get('2834901')];
+    fakeRow[1] = bundled.id; fakeRow[4] = [bundled.id]; fakeRow[5] = [module.cards[2].r]; fakeRow[11] = [0];
+    ctx.D.dictionaryByForm.set(bundled.id, [fakeRow]); ctx.D.dictionaryCompleteForms.add(bundled.id);
+    const warmed = ctx.deckWordNode(deck, module, module.cards[2]);
+    assert.equal(warmed.seq, undefined, 'a fallback card keeps its established bundled identity after index load');
+    assert.equal(ctx.wordCaptureState(warmed, captured), 'taken');
+    assert.deepEqual(Object.keys(ctx.captureStorePatch(captured, warmed, warmed.id, 2000)), []);
     const readerDoor = { t: 'word', id: bundled.id };
     assert.equal(ctx.wordCaptureState(readerDoor, captured), 'taken', 'the reader sees the bundled card');
     assert.deepEqual(Object.keys(ctx.captureStorePatch(captured, readerDoor, bundled.id, 2000)), []);

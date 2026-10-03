@@ -3282,3 +3282,11 @@ body[data-view='decks'] .deck-actions .chip { max-width: 100%; white-space: norm
   body[data-view='decks'] .deck-card .deck-card-body { grid-column: 1 / -1; grid-row: 2; }
   body[data-view='decks'] .deck-card .lesson-enroll-word { flex-basis: auto; }
 }
+
+body[data-view='decks'] .deck-level,
+body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px; }
+@media (max-width: 720px) {
+  body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-column {
+    max-height: calc(100dvh - 15rem);
+  }
+}

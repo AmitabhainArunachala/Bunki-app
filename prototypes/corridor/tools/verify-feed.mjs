@@ -33,9 +33,11 @@ import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+
 const HERE = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR = resolve(HERE, '..');
-const REPO = resolve(CORRIDOR, '..', '..');
+const CORRIDOR = resolveCorridorSite();
+const REPO = resolve(HERE, '../../..');
 const ARTICLES = resolve(CORRIDOR, 'data/articles');
 
 const QUEUE_PATH = resolve(REPO, 'docs/content/feed-review-queue.json');
@@ -62,7 +64,7 @@ const argValue = (name, fallback) => {
   const index = process.argv.indexOf(name);
   return index >= 0 ? resolve(process.argv[index + 1]) : fallback;
 };
-const reportPath = argValue('--report', resolve(EVIDENCE_DIR, 'verify-feed-report.json'));
+const reportPath = argValue('--report', resolve(resolveCorridorEvidence(), 'verify-feed-report.json'));
 
 const results = [];
 const failures = [];
