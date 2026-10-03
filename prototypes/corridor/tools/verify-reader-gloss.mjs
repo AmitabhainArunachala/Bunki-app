@@ -1,146 +1,20 @@
-/**
- * Reader gloss doors (D11 r3, corridor.js cbfaa121): what a reader content token without a core-dictionary entry
- * shows, what its full-entry door opens, and what may capture it.
- *   quick look   A core hit is lookup() itself. A miss says so (the 「—」 line, the mini, the label) instead of silence.
- *   full entry   The deep rows of the token's base form are matched by lexical fact: a kana base by EVERY listed
- *                reading; a kanji base by a reading that spelling permits (cell 11, exact kana index); an uninflected
- *                kanji token also by its own reading. One row opens by its seq, several are an explicit chooser, none
- *                is said plainly. A chosen or single entry is displayed by the head and exact reading it was matched
- *                by (the r3 overlay), and its first sense is the dictionary's own.
- *   capture      Never for a token the core lacks: the mini's 覚, the chrome seal and this path's sheets hold it and
- *                say why. A core hit still captures, proven by a real capture through each of its four doors.
- * Why 覚 is held even where one row opens directly ("open it as today" in the spec): the capture path stores the
- * entry's seq, but a card is keyed by the spelling and reviewBack() looks that spelling up WITHOUT the seq. Once
- * the index holds the form's rows it answers with their first row, so a いう card would be reviewed as 結う.
- * reviewBack() is not changed here.
+/** Reader popup and full-entry behavior against one immutable artifact.
+ * Round 1 retired the tap ladder and timed hold-to-entry: one tap opens the
+ * word, reading, meaning and Save together; Full entry opens the dictionary.
+ * The lexical fixtures, exact candidate/head/reading/sense assertions, all four
+ * durable capture doors, miss-state holds, dictionary failure/retry/stale-answer
+ * checks and eight executable mutation controls remain independently asserted.
+ * G2 also checks popup dismissal, keyboard reopening and unchanged prose in bi/ja.
  *
- * Fixtures: literal tokens, copied with every key from the committed articles by a read-only script (2026-09-25). F0
- * re-reads them from the served bytes, with the lexical facts each oracle stands on, taken from the served index and
- * shards rather than from the matcher. A fact that no longer holds fails. None is skipped.
- *   wikinews:12024 #445 厳しい (core; きびしい, first sense "severe") · #447 いう · #443 見込
- *   aozora:051034 (野ばら) #256 だれ · #656 いっ (base いう) · #992 ゆけ (base ゆく; …私の首を持って【ゆけ】ば)
- *   real-hojoki #167 ひ (a tokenizer split of ならひ, left open) · bunki-essay-n2-handwriting #139 分かっ (base 分かる)
- *   bunki-essay-n2-feel-jingu-musubi #621 産 read さん, the 産巣日 fragment (twin: bunki-graded-n3-musubi-visual #118)
- * Lexical facts (F0): いう is listed by 結う#1254600 (ゆう, いう) and 言う#1587040 (いう, ゆう), and by no other row
- * carrying the form. だれ by 垂れ/たれ#1370860 (たれ, だれ, タレ, ダレ; だれ may be written 垂れ), 誰#1416830 and
- * ダレ#2665140 (kana only). ゆく by 行く#1578850 alone (いく, ゆく, イク). 産's one row #2036160 reads ウブ/うぶ only,
- * never さん. ひ by 10 rows. 分かる by #1606560, 見込 by 見込み#1604480. The first senses asserted below are the served
- * shards' own.
+ * Fixtures are checked against served articles, core dictionary, index and shards
+ * before a control can count as killed. Mutations affect served bytes only, must
+ * match exactly once and must fail their declared rows with the declared witness;
+ * missing rows, unrelated failures and page errors never count as a kill.
  *
- * Rows. Those in a control schedule (core, match, capture, held) are recorded exactly once per run, and a control
- * can only differ from a candidate that passes each of them exactly once.
- *   G0 identity: the served build is the expected clean commit, and corridor.js/corridor.css hash to its
- *      build-identity.json (which also pins every mutant's base bytes). A failure stops the run. F0: the fixtures above.
- *   core     G1.tap2   厳しい at tap 2: surface 厳しい, ruby きび, <span class="tok-en">severe</span>, and the label names
- *                      厳しい, きびしい and severe.
- *            G1.seal   with it selected, the chrome seal is enabled and not held.
- *            G1.mini   mini word 厳しい, reading きびしい, gloss <span class="mini-gloss">severe</span>; its 覚 enabled.
- *            G1.entry  the full sheet displays exactly 厳しい / きびしい / first sense "severe", its senses in, with no
- *                      absence or warning line, no chooser, no match note, and both 覚 doors enabled.
- *   match    M.iu.*    いう: a chooser of exactly 結う/いう "to do up (hair)" then 言う/いう "to say" (nothing opens by
- *                      itself; 結う is never auto-opened). A real click on 言う opens #1587040 displayed 言う／云う・謂う
- *                      read いう, first sense "to say". 戻る (pointer) returns focus to 言う's button.
- *            M.itt.*   いっ (inflected, base いう): the same chooser, and the same 言う.
- *            M.iu.yuu  a real click on 結う/いう opens #1254600 displayed exactly 結う read いう (r4: no repeated alternate).
- *            M.dare.*  だれ: exactly 垂れ/だれ "sauce (esp. soy or mirin-based dipping sauce)", 誰/だれ "who",
- *                      ダレ/ダレ "undercut (of a machined edge)". A real click on 垂れ shows 垂れ／垂 read だれ; 戻る
- *                      returns focus to it. By keyboard, Enter on 誰 shows exactly 誰 read だれ, "who", and Enter on
- *                      戻る returns focus to 誰's button.
- *            M.yuke.single  ゆけ: the one row opens directly, #1578850 displayed 行く／往く read ゆく, "to go".
- *            M.hi.cap  ひ: exactly the first six of the ten rows that list ひ, in the index's order, then "Showing 6 of 10
- *                      candidates".
- *            M.wakat.single  分かっ: #1606560 by spelling, 分かる／解る・判る・分る・理解る read わかる, "to understand".
- *            M.san.offered  産 read さん: no entry of 産 is read さん, so its one entry is offered under its own reading,
- *                      産/うぶ #2036160, the mismatch named (#reader-choice-mismatch); nothing opens by itself, nothing
- *                      says absent, 覚 held (r4).
- *   capture  G7.<door>.door + .captured, each door in its own fresh context: the mini's 覚, the chrome seal, the entry
- *            sheet bar's 覚 and the entry foot's 覚える, four separately wired handlers. A real click on the enabled
- *            door captures 厳しい durably (tools/record-test-support.mjs) as exactly {t:'word', id:'厳しい',
- *            label:'厳しい', kind:'語', kindEn:'word', from:{passage:'wikinews:12024', index:445},
- *            ctx:{p:'wikinews:12024', i:445, scope:'sent'}}, with started = ts. Nothing else changes in the learning
- *            roots, and there is no deepWords snapshot: the answer stays the core record.
- *   held     G5, the no-capture baseline, one document: the miss-state mini's 覚 (disabled, the reason shown in the
- *            mini) and the chrome seal while いう is selected (aria-disabled, so it can open a reason-only panel with no
- *            capture control). Then いう's chooser and its chosen 言う, and だれ's chosen 垂れ, with real clicks on
- *            every held 覚 (sheet bar and foot). Taken, lists, srs, revlog, deepWords, suspended, teacherContexts,
- *            assessmentLearning and sentencePractice equal the first snapshot after いう and again after だれ. The only
- *            new record rows are the reader's own 'tap' observations.
- *   G2 bi/ja  (candidate only) いう's tap 2 marks the honest miss (<span class="tok-en tok-en-miss">—</span>); the
- *            label and the mini say "Not in the quick dictionary — hold for the full dictionary" (ja:
- *            この語は簡易辞書にありません・長押しで全辞書); tap 3 clears it.
- *   G4       (candidate only) the index answers 500: いう's hold is honestly unavailable (no entry, no candidate, 覚
- *            held). The fault demonstrably fired, 厳しい still glosses, and いう still says its miss. With the fault
- *            cleared, the retry lists いう's two candidates. Stale: with the index held, いう's sheet is closed and
- *            見込's opened. The release paints 見込's own entry, #1604480 displayed 見込／見込み・見こみ read みこみ,
- *            and never 言う.
- *
- * Controls: executable, never prose. Each runs after the candidate, against the SAME served candidate, one schedule
- * in fresh contexts with service workers blocked. corridor.js is fetched from the host, its bytes must equal the
- * build-identity digest, every literal edit must match exactly once, and the edited bytes are served in its place
- * (tools/reader-gloss-mutants.mjs). A control is `killed` only when its run records exactly the schedule, once per
- * row, the declared kills fail as their witness says, and only the allowed rows fail beside them. Anything else is
- * `incomplete` or `contaminated`, never a kill. Each control adds one C row (pass = killed). Its own rows are
- * evidence kept in the receipt, and do not enter the verdict. Every edit below was counted exactly once in cbfaa121's
- * corridor.js (f94f0359…).
- *   c1  the kana branch admits a row only by its PRIMARY reading (8d0fbccf's rule). いう/いっ open 言う directly, and
- *       ゆけ is absent. Kills M.iu.chooser, M.itt.chooser and M.yuke.single. Allowed: what hangs on those choosers
- *       (M.iu.choose, M.iu.back, M.itt.choose), だれ without 垂れ (M.dare.chooser, M.dare.tare, M.dare.back), and ひ
- *       counted as 8 (M.hi.cap).
- *   c2  the uninflected token's own reading no longer required: 産 opens ウブ. Kills M.san.offered (産 opens ウブ directly); nothing else may fail.
- *   c3  a kana match headed by the entry's head (row[1]): だれ lists たれ. Kills M.dare.chooser. Allowed: M.dare.tare,
- *       which shows たれ／垂れ・垂.
- *   c4  retired at r4. Its only visible effect was 誰's headword 誰／誰, the alt repetition r4 fixed; matchedGloss has no
- *       displayed effect on these fixtures now, so c4 is not a claimed guard.
- *   c5  the r4 overlay removed (lookup()'s own head and reading); M.iu.yuu then shows いう／結う and is a declared kill. ゆけ shows ゆく／行く・往く, and 垂れ shows だれ／垂れ・垂.
- *       Kills M.yuke.single and M.dare.tare. 言う and 誰 display alike either way, so their rows are not witnesses and
- *       must pass.
- *   c6  a core hit's full entry opened on a wrong row (seq 1254600). The quick look stays "severe", and the sheet shows
- *       結う's "to do up (hair)". Kills G1.entry; nothing else may fail.
- *   c7  toggleTaken() inert: every door still looks enabled. Kills the four G7 .captured rows; the .door rows must pass.
- *   c8  the mini's hold removed: いう's mini 覚 is enabled and captures it with an empty deepWords snapshot. Kills
- *       G5.mini-held and G5.after-iu. Allowed: G5.mini-click (now pressed) and G5.after-dare (the capture still stands).
- *   c9  lookup()'s alt kept beside the chosen head (r4's alt fix reverted): choosing 結う shows 結う／結う. Kills M.iu.yuu.
- *       Allowed: M.dare.tare, M.dare.key, M.yuke.single, M.wakat.single (other chosen displays the same alt may reach).
- *
- * Census (node tools/reader-gloss-mutants.mjs measure). readerChoiceMatch and dictionary-worker.js's rowsForForm are
- * lifted from the product files and run as they are, never re-typed. Inputs: corridor.js 10ca6c8f… (r4b, a4dabec4),
- * dictionary-worker.js 316ff6fd…, dict-v2 index adac33df…, dict.json a752529a…, articles/index.json 0459ae82….
- *   2,206 core-miss content tokens: 741 open one row, 559 a chooser, 23 are offered with a reading mismatch, and 883
- *   are absent (no entry writes the form at all).
- *   Against the first row the door opened before D11 (the worker's rows[0]). This compares seq MEMBERSHIP only (is the
- *   old first row's seq still among the rows opened or offered); it says nothing of reading, gloss or contextual
- *   correctness, reads the checkout rather than a served artifact, and is an author-side run, not independent evidence.
- *   Its receipt binds every input it parsed, article bodies included, as flat inputs['data/articles/<file>'] digests:
- *     883 had no row then either.
- *     736 open that same row.
- *     559 get a chooser containing it; 0 a chooser without it.
- *     23 are offered under other readings, the old row among them; 0 offers without it (r4: 少い/すくない, 話声/はなしごえ,
- *       環/わ, 小家/こいえ, 禍/わざわい, 官/つかさ, 其/それ, 栖/す, 産/うぶ, and the rest; never opened by themselves).
- *     5 open a different row, both forms fixes: 代 read だい ×4 (1960-70年代) opens 代/だい#1982860 where 代/しろ#1411560
- *       was first; 証し read あかし ×1 opens 証/あかし#1351580 where 印/しるし#1168060 was first.
- *     None becomes empty. Of the 1,323 occurrences with an old first row, 1,318 keep that seq among the rows opened or
- *     offered, and 5 open a different seq (the author reads these as fixes; that is not independently established).
- *     Codex reproduced the counts independently (evidence/d11-census-independent/run-20260925T120549Z).
- *   Coverage limit: 15 occurrences have more than six candidates (at most ten); none of their old first seqs falls
- *   outside the visible six, but the omitted choices are not reachable from that chooser, whose count line says so.
- *
- * Scope: desktop Chromium, mouse at coordinates, keyboard Enter; ui=bi except G2's ja pass; dials 0,1,0. Every gesture
- * on a token or a sheet control is a real pointer at that element's own centre (elementFromPoint-checked), never
- * locator.click. Not covered:
- *   - touch and WebKit; the standalone build (embedded index, main-thread matcher);
- *   - capture from surfaces other than the reader (search, examples, tutor page, lists);
- *   - contextual correctness of any candidate: a chooser is an explicit choice, not a reviewed binding.
- * Choosing 結う is asserted (M.iu.yuu): at cbfaa121 it rendered 結う／結う, the overlay keeping lookup()'s alt for いう;
- * r4 (fc6a3e50) drops an alt equal to the chosen head, and c9 reverts exactly that.
- *
- * Receipt: reader-gloss.json is written from `finally`, with every row (and its observations), each control's record
- * (literal edits with digests, served base and mutant digests, rows, page errors, verdict), the faults, and the
- * candidate's page errors, which are aggregated last. SITE and EVIDENCE are resolved at module top level, before the
- * terminal try. A resolver or evidence failure therefore ends with no reader-gloss.json: classify that as
- * setup/incomplete, never as a behavioural verdict. Pin KAIRO_EXPECT_GITSHA to the served candidate when it is not this
- * checkout's HEAD.
- *
- * Usage: node verify-reader-gloss.mjs   (KAIRO_SITE_DIR may pin a staged artifact)
+ * Scope: desktop Chromium or WebKit (KAIRO_BROWSER); real pointer gestures and keyboard Enter/Escape.
+ * This does not claim touch, contextual correctness, or voice acceptance.
+ * Audio is silenced and no audio action is invoked. Evidence is written in finally.
+ * Pin KAIRO_SITE_DIR, KAIRO_ARTIFACT_SHA256 and KAIRO_EXPECT_GITSHA for a prior build.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -150,9 +24,10 @@ import { resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { isDeepStrictEqual } from 'node:util';
 
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord } from './record-test-support.mjs';
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { adjudicate, canonical, serveMutation, sha256 } from './reader-gloss-mutants.mjs';
 
 const require = createRequire(import.meta.url);
@@ -160,6 +35,8 @@ const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 
 const SITE = resolveCorridorSite();
 const EVIDENCE = resolveCorridorEvidence();
+const ENGINE = process.env.KAIRO_BROWSER || 'chromium';
+if (!['chromium', 'webkit'].includes(ENGINE)) throw new Error('KAIRO_BROWSER must be chromium or webkit');
 const results = [];
 const pageErrors = [];
 const controls = [];
@@ -233,18 +110,18 @@ const FIRST_SENSES = { 1262530: 'severe', 1587040: 'to say', 1370860: DARE_TARE.
   1606560: 'to understand', 1604480: 'hope' };
 
 /* the app's own words, bilingual chrome (ui=bi) unless a check says ja */
-const MISS = { bi: 'Not in the quick dictionary — hold for the full dictionary', ja: 'この語は簡易辞書にありません・長押しで全辞書' };
+const MISS = { bi: 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.', ja: 'この語は簡易辞書にありません。「全項目」で全辞書を引けます。' };
 const WORD = { bi: 'word', ja: '語' };
-const HINT = { bi: 'a third activation clears; hold for the full entry; focus for more actions', ja: '三回目で元どおり。長押しで全項目。フォーカスで別の操作。' };
+const HINT = { bi: 'Enter: reading and meaning · Shift+F10: more actions · Ctrl+Enter: full entry', ja: 'Enterで読みと意味。Shift+F10でほかの操作。Ctrl+Enterで全項目。' };
 const CHOOSER_TITLE = { ja: '候補から選ぶ（この文での意味は確かめてください）', en: 'Choose the word — check it fits this sentence' };
 const UNAVAILABLE = 'The full dictionary could not be opened, so no entry can be matched to this word. The reader and its quick dictionary still work.';
-const CAPTURE_REASON = (spelling) => `覚 is off for this word: it has no quick-dictionary entry, so a card saved under the spelling ${spelling} could be answered on review with no meaning or another word's.`;
+const CAPTURE_REASON = (spelling) => `${spelling} isn't in the quick dictionary, so it can't be saved here. Full entry looks it up in the whole dictionary.`;
 const LEARNING_ROOTS = ['taken', 'lists', 'srs', 'revlog', 'deepWords', 'suspended', 'teacherContexts', 'assessmentLearning', 'sentencePractice'];
 const INDEX_PATH = '/data/share_alike/dict-v2/index.json';
 const isIndex = (url) => url.pathname === INDEX_PATH;
 
 /* ------------------------------------------------------------------ controls */
-// Each `from` was counted exactly once in cbfaa121's corridor.js (f94f0359…); the served bytes are edited, never the checkout.
+// Each mutation must match exactly once in the pinned served bytes; the checkout is never edited.
 const EDITS = Object.freeze({
   primaryOnly: Object.freeze({ file: 'corridor.js', from: 'collect((row, kana) => kataToHira(kana) === reading)',
     to: "collect((row, kana) => kataToHira(String(row[2] || '')) === reading && kataToHira(kana) === reading)" }),
@@ -262,10 +139,10 @@ const EDITS = Object.freeze({
     to: "  if (D.dict[token.b]) return { ...node, seq: '1254600' };\n" }),
   captureInert: Object.freeze({ file: 'corridor.js', from: 'async function toggleTaken(node, label) {\n',
     to: 'async function toggleTaken(node, label) {\n  return false;\n' }),
-  miniUnheld: Object.freeze({ file: 'corridor.js', from: '  const held = reader && !D.dict[token.b];\n', to: '  const held = false;\n' }),
+  miniUnheld: Object.freeze({ file: 'corridor.js', from: "  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());\n", to: '  const held = false;\n' }),
 });
 const RUN_ROWS = Object.freeze({
-  core: Object.freeze(['G1.tap2', 'G1.seal', 'G1.mini', 'G1.entry']),
+  core: Object.freeze(['G1.popup', 'G1.seal', 'G1.mini', 'G1.entry']),
   match: Object.freeze(['M.iu.chooser', 'M.iu.choose', 'M.iu.back', 'M.itt.chooser', 'M.itt.choose', 'M.dare.chooser', 'M.dare.tare',
     'M.dare.back', 'M.dare.key', 'M.yuke.single', 'M.hi.cap', 'M.wakat.single', 'M.san.offered', 'M.iu.yuu']),
   capture: Object.freeze(['mini', 'seal', 'sheet', 'foot'].flatMap((door) => [`G7.${door}.door`, `G7.${door}.captured`])),
@@ -305,7 +182,7 @@ const CONTROLS = Object.freeze([
     allowed: ['M.dare.tare', 'M.dare.key', 'M.yuke.single', 'M.wakat.single'],
     witness: (rows) => (seen(rows, 'M.iu.yuu').headword === '結う／結う' ? '' : '結う was not displayed 結う／結う') }),
   Object.freeze({ name: 'c6', title: "a core hit's full entry opened on a wrong row (seq 1254600)", edits: ['coreWrongEntry'], run: 'core',
-    requires: ['G1.tap2', 'G1.mini'],
+    requires: ['G1.popup', 'G1.mini'],
     kills: ['G1.entry'],
     allowed: [],
     witness: (rows) => (seen(rows, 'G1.entry').firstGloss === 'to do up (hair)' ? '' : 'the core sheet did not show 結う\'s first sense') }),
@@ -331,6 +208,7 @@ let manifest = null; // path → sha256 from the served build-identity.json, rea
 /** A fresh context, service workers blocked; a control's contexts serve its edited corridor.js. */
 async function newContext(sink, mutation = null) {
   const context = await browser.newContext({ viewport: DESK, deviceScaleFactor: 2, serviceWorkers: 'block' });
+  await silenceBrowserAudio(context);
   context.on('page', (page) => page.on('pageerror', (error) => {
     if (sink.length < 20) sink.push({ case: currentCase, message: error.message });
   }));
@@ -345,7 +223,7 @@ async function openArticle(page, passage, query = 'dials=0,1,0&ui=bi') {
   await door.click();
   await page.waitForFunction((pid) => document.querySelector('.listen-row')?.dataset.passage === pid && document.querySelector('#reader .tok'),
     passage.id, { timeout: 15_000 });
-  // the article text arrives on its own and re-renders once: a hold begun on the first render dies
+  // Article loading can replace the first token render; wait until the token population settles.
   let previous = -1;
   for (let attempt = 0; attempt < 40; attempt++) {
     const count = await page.locator('#reader .tok').count();
@@ -386,17 +264,17 @@ async function tap(page, fixture) {
   await page.mouse.click(x, y);
   await delay(150);
 }
-async function hold(page, fixture, ms) {
-  const { x, y } = await tokenCentre(page, fixture);
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.waitForTimeout(ms);
-  await page.mouse.up();
+/** One real tap opens the popup; a second tap would dismiss it. */
+async function openPopup(page, fixture) {
+  if (await page.locator('#mini .mini-word').count() && await page.locator('#mini .mini-word').textContent() === fixture.token.b) return;
+  await tap(page, fixture);
+  await page.locator('#mini .mini-word').filter({ hasText: fixture.token.b }).waitFor();
 }
-/** past the mini (430 ms), short of the entry (2100 ms); the release click is inert for 800 ms */
-const quickHold = async (page, fixture) => { await hold(page, fixture, 800); await delay(900); };
-/** a word sheet opens on a 2.4 s press-and-hold, as a finger does it */
-const longHold = (page, fixture) => hold(page, fixture, 2400);
+async function fullEntry(page, fixture) {
+  await openPopup(page, fixture);
+  await press(page, '#mini .mini-entry');
+  await page.locator('#sheet').waitFor();
+}
 async function press(page, selector, options) {
   const { x, y } = await ownCentre(page.locator(selector), selector, options);
   await page.mouse.click(x, y);
@@ -485,6 +363,8 @@ const sheetState = (page) => page.evaluate(() => {
   const firstGloss = firstSense?.querySelector('.dictionary-glosses li, p.gloss') || sheet.querySelector('.senses p.gloss');
   const take = sheet.querySelector('#sheet-take'), foot = sheet.querySelector('#take');
   const headword = sheet.querySelector('.headword');
+  const primaryHead = headword?.cloneNode(true);
+  primaryHead?.querySelectorAll('.headword-alt').forEach(node => node.remove());
   const visible = (node) => {
     if (!node) return false;
     const box = node.getBoundingClientRect();
@@ -497,7 +377,7 @@ const sheetState = (page) => page.evaluate(() => {
     noteState: note?.dataset.state ?? null,
     noteBy: note?.dataset.by ?? null,
     headword: headword?.textContent ?? null,
-    headLabel: headword?.firstChild?.nodeType === 3 ? headword.firstChild.textContent : null,
+    headLabel: primaryHead?.textContent ?? null,
     reading: sheet.querySelector('p.reading')?.textContent ?? null,
     firstGloss: firstGloss?.textContent ?? null,
     senses: !!sheet.querySelector('.senses'),
@@ -591,27 +471,26 @@ async function block(rec, ids, body) {
 }
 
 /* ---------------------------------------------------------------- schedules */
-/** G1: a core hit, exact at tap 2, in the mini, and on its full sheet. */
+/** G1: one tap shows the complete quick look without inserting a gloss into prose. */
 async function coreRun(open, rec) {
   const page = await (await open()).newPage();
   await block(rec, RUN_ROWS.core, async (once) => {
     await openArticle(page, CORE.passage);
-    await tap(page, CORE);
-    await tap(page, CORE);
+    await openPopup(page, CORE);
     const token = await tokenState(page, CORE);
-    once('G1.tap2', `G1 ${at(CORE)} at tap 2: surface ${CORE.token.s}, ruby ${CORE_ENTRY.ruby}, the line exactly "${CORE_ENTRY.gloss}", the label naming ${CORE.token.s}, ${CORE_ENTRY.reading} and ${CORE_ENTRY.gloss}`,
-      token?.surface === CORE.token.s && token.visibleRuby === CORE_ENTRY.ruby && token.lines === 1 && token.hasEn
-        && token.line === `<span class="tok-en">${CORE_ENTRY.gloss}</span>`
-        && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${CORE_ENTRY.gloss} · ${HINT.bi}`, JSON.stringify(token), { token });
+    once('G1.popup', `G1 ${at(CORE)}: one tap preserves the word, reveals its ruby, and leaves meaning in the popup`,
+      token?.surface === CORE.token.s && token.visibleRuby === CORE_ENTRY.ruby && token.lines === 0 && !token.hasEn
+        && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${HINT.bi}`,
+      JSON.stringify(token), { token });
     const seal = (await captureState(page)).seal;
     once('G1.seal', `G1 with ${CORE.token.s} selected, the chrome seal is enabled and not held`,
       !!seal && seal.disabled === false && seal.ariaDisabled === null && !seal.held, JSON.stringify(seal), { seal });
-    await quickHold(page, CORE);
+    await openPopup(page, CORE);
     const mini = await miniState(page), take = (await captureState(page)).mini;
     once('G1.mini', `G1 its mini: word ${CORE.token.s}, reading ${CORE_ENTRY.reading}, gloss exactly "${CORE_ENTRY.gloss}"; its 覚 enabled and not held`,
       mini?.word === CORE.token.s && mini.reading === CORE_ENTRY.reading && mini.gloss === `<span class="mini-gloss">${CORE_ENTRY.gloss}</span>`
         && take?.takeDisabled === false && !take.held && take.reason === null, JSON.stringify({ mini, take }), { mini, take });
-    await longHold(page, CORE);
+    await fullEntry(page, CORE);
     await settleSheet(page);
     const entry = await sheetState(page);
     once('G1.entry', `G1 its full sheet displays exactly ${CORE_ENTRY.headword} / ${CORE_ENTRY.reading} / first sense "${CORE_ENTRY.gloss}", complete (senses in, no absence, no warning), the ordinary door (no chooser, no match note, both 覚 enabled)`,
@@ -622,9 +501,9 @@ async function coreRun(open, rec) {
   });
 }
 
-/** A chooser fixture: the hold lists exactly `choices`; a real click on `pick` opens it as displayed; 戻る, and the keyboard. */
+/** A chooser fixture: Full entry lists exactly `choices`; a real click on `pick` opens it as displayed; 戻る, and the keyboard. */
 async function chooserFixture(page, once, { fixture, id, choices, pick, pickRow, back = false, keyboard = null }) {
-  await longHold(page, fixture);
+  await fullEntry(page, fixture);
   await settleSheet(page);
   const state = await sheetState(page);
   const listed = state ? state.candidates.map(({ seq, head, reading, gloss }) => ({ seq, head, reading, gloss })) : null;
@@ -674,9 +553,9 @@ async function chooserFixture(page, once, { fixture, id, choices, pick, pickRow,
   await closeIfOpen(page);
 }
 
-/** A one-row fixture: the hold opens the entry directly, by the rule named in `entry.by`, as displayed. */
+/** A one-row fixture: Full entry opens the entry directly, by the rule named in `entry.by`, as displayed. */
 async function singleFixture(page, once, id, fixture, entry) {
-  await longHold(page, fixture);
+  await fullEntry(page, fixture);
   await settleSheet(page);
   const state = await sheetState(page);
   once(id, `${at(fixture)}: the one row opens directly, #${entry.seq} matched by ${entry.by}, displayed ${entry.headword} (head ${entry.head}) read ${entry.reading}, first sense "${entry.gloss}"`,
@@ -694,7 +573,7 @@ async function matchRun(open, rec) {
   await block(rec, ['M.iu.yuu'], async (once) => {
     // r4: lookup()'s alt was computed for いう; beside the chosen head 結う it may never repeat it (結う／結う)
     await openArticle(page, IU.passage);
-    await longHold(page, IU);
+    await fullEntry(page, IU);
     await settleSheet(page);
     const yuu = IU_CHOICES.find((choice) => choice.head === '結う');
     let entry = null;
@@ -722,7 +601,7 @@ async function matchRun(open, rec) {
   });
   await block(rec, ['M.hi.cap'], async (once) => {
     await openArticle(page, HI.passage);
-    await longHold(page, HI);
+    await fullEntry(page, HI);
     await settleSheet(page);
     const state = await sheetState(page);
     const listed = state ? state.candidates.map(({ seq, head, reading, gloss }) => ({ seq, head, reading, gloss })) : null;
@@ -737,7 +616,7 @@ async function matchRun(open, rec) {
   });
   await block(rec, ['M.san.offered'], async (once) => {
     await openArticle(page, SAN.passage);
-    await longHold(page, SAN);
+    await fullEntry(page, SAN);
     await settleSheet(page);
     const state = await sheetState(page);
     const listed = state ? state.candidates.map(({ seq, head, reading }) => ({ seq, head, reading })) : null;
@@ -754,10 +633,10 @@ async function matchRun(open, rec) {
 /** G7: a real capture of the core hit through each of its four separately wired doors, each in its own context. */
 async function captureRun(open, rec) {
   const doors = [
-    { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => quickHold(page, CORE) },
+    { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => openPopup(page, CORE) },
     { door: 'seal', name: 'the chrome seal 覚える', selector: '#reader-take', seal: true, prepare: (page) => tap(page, CORE) },
-    { door: 'sheet', name: "the entry sheet bar's 覚", selector: '#sheet-take', prepare: async (page) => { await longHold(page, CORE); await settleSheet(page); } },
-    { door: 'foot', name: "the entry foot's 覚える", selector: '#take', prepare: async (page) => { await longHold(page, CORE); await settleSheet(page); } },
+    { door: 'sheet', name: "the entry sheet bar's 覚", selector: '#sheet-take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
+    { door: 'foot', name: "the entry foot's 覚える", selector: '#take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
   ];
   for (const { door, name, selector, seal = false, prepare } of doors) {
     await block(rec, [`G7.${door}.door`, `G7.${door}.captured`], async (once) => {
@@ -793,12 +672,10 @@ async function heldRun(open, rec) {
   await block(rec, RUN_ROWS.held, async (once) => {
     await openArticle(page, IU.passage);
     const before = await installedRecord(page);
-    await tap(page, IU);
-    await tap(page, IU);
-    await quickHold(page, IU);
+    await openPopup(page, IU);
     const mini = (await captureState(page)).mini;
     once('G5.mini-held', `G5 ${at(IU)}: the miss-state mini holds its 覚 and shows why`, mini?.takeDisabled === true && mini.held
-      && mini.describedBy === 'mini-take-reason' && mini.reasonVisible && mini.reason === CAPTURE_REASON(IU.token.b), JSON.stringify(mini), { mini });
+      && mini.describedBy === 'mini-take-reason' && mini.reasonVisible && mini.reason === 'So it can’t be saved here.', JSON.stringify(mini), { mini });
     await press(page, '#mini-take');
     const miniAfter = (await captureState(page)).mini;
     once('G5.mini-click', 'G5 a real click on that 覚 leaves it held and unpressed', miniAfter?.takeDisabled === true && miniAfter.held
@@ -811,9 +688,8 @@ async function heldRun(open, rec) {
     once('G5.seal-panel', 'G5 a real click on the held seal opens only the reason, with no capture control in the panel',
       !!opened.panel?.reasonVisible && opened.panel.reason === CAPTURE_REASON(IU.token.b) && opened.panel.captureControls === 0,
       JSON.stringify(opened.panel), { panel: opened.panel });
-    await pressSeal(page);
+    await fullEntry(page, IU);
     await page.waitForFunction(() => !document.getElementById('capture-panel'), null, { timeout: 5_000 });
-    await longHold(page, IU);
     await settleSheet(page);
     await press(page, '#sheet-take');
     const chooser = await sheetState(page);
@@ -835,7 +711,7 @@ async function heldRun(open, rec) {
       afterIu.live && afterIu.changed.length === 0 && afterIu.added.length > 0 && afterIu.added.every((kind) => kind === 'tap'),
       JSON.stringify(afterIu), afterIu);
     await openArticle(page, DARE.passage);
-    await longHold(page, DARE);
+    await fullEntry(page, DARE);
     await settleSheet(page);
     await press(page, '#sheet-take');
     let tare = null;
@@ -907,7 +783,7 @@ async function runControl(spec) {
 try {
   host = await startStaticHost({ site: SITE, port: 0 });
   origin = host.origin;
-  browser = await chromium.launch();
+  browser = await ({ chromium, webkit })[ENGINE].launch();
 
   currentCase = 'G0';
   {
@@ -1002,21 +878,27 @@ try {
       const page = await (await open()).newPage();
       await openArticle(page, IU.passage, `dials=0,1,0&ui=${lang}`);
       await tap(page, IU);
-      const one = await tokenState(page, IU);
+      const one = await tokenState(page, IU), mini = await miniState(page);
+      check(`G2 ${lang}: one tap shows the honest dictionary miss in the popup`,
+        mini?.word === IU.token.b && mini.reading === IU.token.r
+          && mini.gloss === `<span class="mini-gloss mini-miss">${MISS[lang]}</span>`
+          && !/no gloss yet|語釈なし/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
+      check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
+        one?.surface === IU.token.s && one.lines === 0 && !one.hasEn
+          && one.label === `${IU.token.s} · ${WORD[lang]} · ${HINT[lang]}`, JSON.stringify(one), { id: `G2.${lang}.prose` });
       await tap(page, IU);
-      const two = await tokenState(page, IU);
-      check(`G2 ${lang}: tap 1 shows the reading and no English line`, one?.lines === 0, JSON.stringify(one), { id: `G2.${lang}.tap1` });
-      check(`G2 ${lang}: tap 2 marks the honest miss instead of adding nothing`, two?.lines === 1 && two.hasEn
-        && two.line === '<span class="tok-en tok-en-miss">—</span>', JSON.stringify(two), { id: `G2.${lang}.tap2` });
-      check(`G2 ${lang}: the label says the same`, two?.label === `${IU.token.s} · ${WORD[lang]} · ${MISS[lang]} · ${HINT[lang]}`, two?.label,
-        { id: `G2.${lang}.label` });
-      await quickHold(page, IU);
-      const mini = await miniState(page);
-      check(`G2 ${lang}: the mini says it plainly, never "(no gloss yet)"`, mini?.gloss === `<span class="mini-gloss mini-miss">${MISS[lang]}</span>`
-        && !/no gloss yet|語釈なし/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.mini` });
-      await tap(page, IU);
-      const three = await tokenState(page, IU);
-      check(`G2 ${lang}: tap 3 closes the circle, marker and all`, three?.lines === 0 && !three.hasEn, JSON.stringify(three), { id: `G2.${lang}.tap3` });
+      check(`G2 ${lang}: tapping the same word dismisses its popup without a gloss rung`,
+        await page.locator('#mini').count() === 0 && (await tokenState(page, IU))?.lines === 0, '', { id: `G2.${lang}.dismiss` });
+      const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
+      await word.focus();
+      await page.keyboard.press('Enter');
+      await page.locator('#mini').waitFor();
+      check(`G2 ${lang}: Enter reopens the popup and focuses Full entry for an unsavable word`,
+        await page.locator('#mini .mini-entry').evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.keyboard` });
+      await page.keyboard.press('Escape');
+      await page.locator('#mini').waitFor({ state: 'detached' });
+      check(`G2 ${lang}: Escape returns focus to the original word`,
+        await word.evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.escape` });
     });
   }
 
@@ -1029,30 +911,28 @@ try {
     await context.route(isIndex, fail);
     const page = await context.newPage();
     await openArticle(page, IU.passage);
-    await longHold(page, IU);
+    await fullEntry(page, IU);
     await settleSheet(page);
     const down = await sheetState(page);
     check('G4 the 500 on the index demonstrably fired', faults.index500 > 0, `index 500s: ${faults.index500}`, { id: 'G4.fired' });
-    check('G4 the long hold on いう shows the honest unavailable state with a retry', down?.choiceState === 'unavailable'
+    check('G4 Full entry on いう shows the honest unavailable state with a retry', down?.choiceState === 'unavailable'
       && down.unavailable === UNAVAILABLE && down.retry, brief(down), { id: 'G4.unavailable' });
     check('G4 nothing opens and nothing is offered; 覚 is held and says why', down?.noteSeq === null && down.candidates.length === 0
       && !down.senses && down.takeDisabled === true && down.reasonVisible, brief(down), { id: 'G4.nothing' });
     await closeIfOpen(page);
-    await tap(page, CORE);
-    await tap(page, CORE);
-    const core = await tokenState(page, CORE);
-    check('G4 with the index down, the core hit still glosses', core?.line === `<span class="tok-en">${CORE_ENTRY.gloss}</span>`, JSON.stringify(core),
+    await openPopup(page, CORE);
+    const core = await miniState(page);
+    check('G4 with the index down, the core hit still glosses', core?.gloss === `<span class="mini-gloss">${CORE_ENTRY.gloss}</span>`, JSON.stringify(core),
       { id: 'G4.core' });
-    await tap(page, IU);
-    await tap(page, IU);
-    const miss = await tokenState(page, IU);
-    check('G4 with the index down, いう still says its honest miss', miss?.line === '<span class="tok-en tok-en-miss">—</span>', JSON.stringify(miss),
+    await openPopup(page, IU);
+    const miss = await miniState(page);
+    check('G4 with the index down, いう still says its honest miss', miss?.gloss === `<span class="mini-gloss mini-miss">${MISS.bi}</span>`, JSON.stringify(miss),
       { id: 'G4.miss' });
     const seenFaults = faults.index500;
-    await longHold(page, IU);
+    await fullEntry(page, IU);
     await settleSheet(page);
     const again = await sheetState(page);
-    check('G4 a second hold asks the index again and is still honestly unavailable', again?.choiceState === 'unavailable'
+    check('G4 reopening Full entry asks the index again and is still honestly unavailable', again?.choiceState === 'unavailable'
       && faults.index500 > seenFaults, `${brief(again)} · index 500s: ${faults.index500}`, { id: 'G4.again' });
     await context.unroute(isIndex, fail);
     await press(page, '#reader-choice-retry');
@@ -1075,14 +955,14 @@ try {
     try {
       const page = await context.newPage();
       await openArticle(page, IU.passage);
-      await longHold(page, IU);
+      await fullEntry(page, IU);
       for (let attempt = 0; attempt < 60 && !faults.indexHeld; attempt++) await delay(250);
       must(faults.indexHeld > 0, 'the index request reached the held route');
       const pending = await sheetState(page);
       check('G4 stale: いう waits on the held index (the existing opening line)', pending?.choiceState === 'pending', brief(pending), { id: 'G4s.pending' });
       await press(page, '#sheet-back');
       await page.waitForFunction(() => !document.getElementById('sheet'), null, { timeout: 5_000 });
-      await longHold(page, MIKOMI);
+      await fullEntry(page, MIKOMI);
       await page.waitForFunction(() => document.querySelector('#sheet')?.dataset.node === 'word:見込'
         && document.querySelector('#sheet #reader-choice')?.dataset.state === 'pending', null, { timeout: 5_000 });
       release();
@@ -1109,7 +989,7 @@ try {
   await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
   if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
   writeFileSync(resolve(EVIDENCE, 'reader-gloss.json'), JSON.stringify({
-    origin, fixtures: { FIXTURES, IU_CHOICES, IU_PICK, DARE_CHOICES, DARE_TARE, DARE_WHO, YUKE_ENTRY, WAKARU_ENTRY, MIKOMI_ENTRY, HI_FIRST_SIX,
+    origin, engine: ENGINE, fixtures: { FIXTURES, IU_CHOICES, IU_PICK, DARE_CHOICES, DARE_TARE, DARE_WHO, YUKE_ENTRY, WAKARU_ENTRY, MIKOMI_ENTRY, HI_FIRST_SIX,
       HI_TOTAL, SAN_ROW, CORE_ENTRY, CAPTURED_ROW, FIRST_SENSES },
     faults, results, controls, pageErrors, lastCase: currentCase,
   }, null, 2) + '\n');

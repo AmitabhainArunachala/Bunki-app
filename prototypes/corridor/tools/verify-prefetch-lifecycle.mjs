@@ -291,6 +291,11 @@ const firstArticles = articleIndex.articles
 assert.equal(firstArticles.length, 4);
 const target = '/data/articles/' + firstArticles[3].file;
 const predecessors = firstArticles.slice(0, 3).map((p) => '/data/articles/' + p.file);
+// Pictures share this directory with article bodies. Only JSON body requests
+// participate in the warming queue; keep archive bodies visible too so an
+// unintended archive prefetch still fails the exact request-order assertions.
+const isArticleBody = (path) => path.startsWith('/data/articles/') &&
+  path.endsWith('.json') && !path.endsWith('/index.json');
 const MIME = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -324,7 +329,7 @@ const server = createServer((request, response) => {
     const file = resolve(SITE, path === '/' ? 'index.html' : path.slice(1));
     assert(file.startsWith(SITE + sep) && statSync(file).isFile());
     const body = path === '/corridor.js' ? Buffer.from(runtime) : readFileSync(file);
-    if (path === '/corridor.js' || path.startsWith('/data/articles/'))
+    if (path === '/corridor.js' || isArticleBody(path))
       row?.serverEvents.push({ kind: 'body', path, sha256: sha(body) });
     const send = () => {
       if (response.destroyed || response.writableEnded) return;
@@ -548,9 +553,7 @@ async function nativeDepartureCase(browser, engine, mode) {
     row.serverEvents
       .filter(
         (event) =>
-          event.kind === 'request' &&
-          event.path.startsWith('/data/articles/') &&
-          !event.path.endsWith('/index.json'),
+          event.kind === 'request' && isArticleBody(event.path),
       )
       .map((event) => event.path);
   try {
@@ -679,7 +682,7 @@ async function nativeDepartureCase(browser, engine, mode) {
         row.events.filter(
           (event) =>
             event.kind === 'request' &&
-            event.url.includes('/data/articles/') &&
+            isArticleBody(new URL(event.url).pathname) &&
             event.at >= leaving.browserAt &&
             event.at < hidden.browserAt,
         ),
@@ -808,9 +811,7 @@ try {
             row.events
               .filter(
                 (event) =>
-                  event.kind === 'request' &&
-                  event.url.includes('/data/articles/') &&
-                  !event.url.endsWith('/index.json'),
+                  event.kind === 'request' && isArticleBody(new URL(event.url).pathname),
               )
               .map((event) => new URL(event.url).pathname);
           const targetRequests = () =>

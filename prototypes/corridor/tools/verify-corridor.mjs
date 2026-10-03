@@ -2683,6 +2683,7 @@ async function main() {
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
   // The reader's capture doors save in one tap and keep their source context; lists are a popover away.
+  const captureSheetLoads = observeWordSheetLoads(page);
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
@@ -2737,6 +2738,7 @@ async function main() {
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
+  await waitForWordSheetBody(page, captureSheetLoads);
   const panelBits = await page.evaluate(`(() => ({
     take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
     scopes: document.querySelectorAll('#sheet [data-ctx-scope]').length,
@@ -2746,14 +2748,24 @@ async function main() {
     panelBits.take && panelBits.scopes === 3 && panelBits.lists,
     JSON.stringify(panelBits));
   for (const scope of ['word', 'para', 'sent']) {
+    // Saving replaces the sheet; a durable record can arrive before its new
+    // controls finish rendering and rising. Aim the next real touch only at
+    // settled ink, including any late dictionary/example publication.
+    await waitForWordSheetBody(page, captureSheetLoads);
+    await waitForFiniteMotion(page, '#sheet');
     await tap(page, `#sheet [data-ctx-scope="${scope}"]`);
     const record = await waitForAppRecord(page, record => {
       const row = record.taken.find(row => row.t === 'word' && row.id === touched.word);
       return row && (row.ctx?.scope ?? 'word') === scope;
     }, { description: `saved ${scope} capture context` });
+    await page.waitForFunction(scope => {
+      const chip = document.querySelector(`#sheet [data-ctx-scope="${scope}"]`);
+      return chip?.classList.contains('on-list') && !chip.disabled;
+    }, scope);
     check(`R2-B · the full entry durably saves ${scope} context without another enrollment or review`,
       record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
   }
+  captureSheetLoads.dispose();
   await shoot(page, shotsDir, '19-capture-sovereignty');
   await page.locator('#sheet-close').dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
