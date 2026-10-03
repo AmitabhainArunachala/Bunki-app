@@ -293,8 +293,10 @@ const FEED_TITLES = JSON.parse(
 // 2026-10-03 (owner decision): the label must be honest — 'publisher' only when the title IS the
 // page's headline, 'publisher, shortened' when we trimmed it, 'publisher, adapted' when it is built
 // from the page but no shorter, 'established English title' for a
-// literary work's known English name — and every label is backed by a receipt in
-// data/articles/title-receipts.json (the page headline compared against; the model-family checks).
+// literary work's known English name (', adapted' when we added to it, e.g. ': the opening'),
+// 'Bunki original, bilingual title' for an authored deck passage — and every label is backed by a
+// receipt in data/articles/title-receipts.json (the page headline compared against; the
+// model-family checks; the authored module).
 const PUBLISHER_SOURCE = /^(publisher|publisher, shortened|publisher, adapted|established English title|established English title, adapted): (https:\/\/\S+)$/;
 const CHECKED_SOURCE = (source) => source === 'Bunki original, bilingual title' || source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
 const TITLE_RECEIPTS = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/title-receipts.json'), 'utf8'));
@@ -331,7 +333,7 @@ function titleReceiptProblem(record) {
   const receipt = TITLE_RECEIPTS.publisher?.[record.id];
   if (!receipt || receipt.url !== url || receipt.label !== label) return `${record.id}: no receipt for "${label}"`;
   if (label.startsWith('established')) return null;
-  let home = '', there = '';
+  let home, there;
   try { home = new URL(record.url).host; there = new URL(url).host; } catch { return `${record.id}: unreadable URL`; }
   if (!(ENGLISH_EDITIONS[home] ?? []).includes(there)) return `${record.id}: ${there} is not ${home}'s English edition`;
   const same = sameHeadline(receipt.pageHeadline, record.titleEn);

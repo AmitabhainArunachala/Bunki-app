@@ -46,8 +46,9 @@ What one run does
            apart — the #42 law), the provenance pool of the source licence.
            English titles are authored, never generated: they come from
            docs/content/feed-fresh-titles-en.json (titleEnSource names who
-           wrote them; a per-row "sources" entry names a publisher headline
-           or a cross-checked translation and wins over it). Every mint
+           wrote them; a per-row "sources" entry names a publisher label or a
+           cross-checked translation, as verify-native-readings.mjs defines
+           them, and wins over it). Every mint
            enters the shelf as review "human-review-pending" with 検収前 in
            its sourceLabel, and gets a kind:"fresh" row in
            docs/content/feed-review-queue.json; only the
