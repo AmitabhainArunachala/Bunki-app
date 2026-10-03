@@ -1,0 +1,574 @@
+/* 文脈札 — a page, not a form.
+   Light papers, one column, furigana on the back, seals for the grade.
+   Patterns borrowed from Core/Yomitan backs (full ruby), MCD (one gap),
+   and the corridor's own 再難良易 seals. */
+
+html[data-cd-theme] {
+  background: var(--cd-paper);
+  color: var(--cd-ink);
+}
+
+html[data-cd-focus='1'] .chrome,
+html[data-cd-focus='1'] .ginga-search,
+html[data-cd-focus='1'] .nav-symbol,
+html[data-cd-focus='1'] .ginga-seal {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cd-room {
+  --cd-paper: #f3ecdf;
+  --cd-ink: #1c1612;
+  --cd-faint: #6d6256;
+  --cd-vermilion: #9e2b25;
+  --cd-indigo: #1c3a5f;
+  --cd-gold: #8a6a2f;
+  --cd-persimmon: #c4622d;
+  --cd-moss: #2f6a45;
+  --cd-rule: rgba(28, 22, 18, 0.28);
+  --serif: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  --brush: 'Yuji Syuku', 'Shippori Mincho B1', serif;
+  --sans: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --seal: 'Kaisei Tokumin', 'Shippori Mincho B1', serif;
+  color: var(--cd-ink);
+  background: transparent;
+  font-family: var(--serif);
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0.2rem 0 1.25rem;
+  min-height: 70vh;
+}
+
+.cd-room[data-theme='kinari'] {
+  --cd-paper: #f3ecdf;
+  --cd-ink: #1c1612;
+  --cd-faint: #6d6256;
+  --cd-vermilion: #9e2b25;
+  --cd-indigo: #1c3a5f;
+  --cd-gold: #8a6a2f;
+  --cd-persimmon: #c4622d;
+  --cd-moss: #2f6a45;
+}
+.cd-room[data-theme='torinoko'] {
+  --cd-paper: #f8f1dc;
+  --cd-ink: #2a2118;
+  --cd-faint: #7a6854;
+  --cd-vermilion: #a33b2b;
+  --cd-indigo: #3a4a68;
+  --cd-gold: #9a7040;
+  --cd-persimmon: #c56a3a;
+  --cd-moss: #4a6a38;
+}
+.cd-room[data-theme='gekkou'] {
+  --cd-paper: #f3f5f4;
+  --cd-ink: #1a2744;
+  --cd-faint: #5c6b7a;
+  --cd-vermilion: #8e3a4a;
+  --cd-indigo: #24506e;
+  --cd-gold: #6e7c4a;
+  --cd-persimmon: #b86a32;
+  --cd-moss: #2e6a62;
+}
+.cd-room[data-theme='sakura'] {
+  --cd-paper: #fbf4f4;
+  --cd-ink: #3a2430;
+  --cd-faint: #8a6570;
+  --cd-vermilion: #c45c6a;
+  --cd-indigo: #5a3d6a;
+  --cd-gold: #a67c52;
+  --cd-persimmon: #d4786a;
+  --cd-moss: #6a4a58;
+}
+.cd-room[data-theme='wakakusa'] {
+  --cd-paper: #f2f6ec;
+  --cd-ink: #1e2a1a;
+  --cd-faint: #5e6b56;
+  --cd-vermilion: #8d4030;
+  --cd-indigo: #2a4a3a;
+  --cd-gold: #6a7040;
+  --cd-persimmon: #b86a32;
+  --cd-moss: #2f6a45;
+}
+.cd-room[data-theme='aijiro'] {
+  --cd-paper: #eef3f6;
+  --cd-ink: #1a2c3a;
+  --cd-faint: #5a7080;
+  --cd-vermilion: #8e3d48;
+  --cd-indigo: #1f4f6b;
+  --cd-gold: #6a7a4a;
+  --cd-persimmon: #c46a3a;
+  --cd-moss: #2a6a68;
+}
+.cd-room[data-theme='gofun'] {
+  --cd-paper: #f7f5f1;
+  --cd-ink: #22211e;
+  --cd-faint: #6a6660;
+  --cd-vermilion: #8c3a32;
+  --cd-indigo: #243044;
+  --cd-gold: #7a6840;
+  --cd-persimmon: #c46a3a;
+  --cd-moss: #3a5a40;
+}
+.cd-room[data-theme='tan'] {
+  --cd-paper: #fbf6e4;
+  --cd-ink: #3a2e12;
+  --cd-faint: #7a6a40;
+  --cd-vermilion: #a33b2b;
+  --cd-indigo: #3a4a28;
+  --cd-gold: #a67c2d;
+  --cd-persimmon: #c46a3a;
+  --cd-moss: #5a6a28;
+}
+.cd-room[data-theme='asagi'] {
+  --cd-paper: #e7f2ef;
+  --cd-ink: #14302c;
+  --cd-faint: #4e6e68;
+  --cd-vermilion: #8e4038;
+  --cd-indigo: #1f5f66;
+  --cd-gold: #6a7848;
+  --cd-persimmon: #c46a3a;
+  --cd-moss: #1f6f5c;
+}
+.cd-room[data-theme='momo'] {
+  --cd-paper: #fff5ee;
+  --cd-ink: #4a2a22;
+  --cd-faint: #8a6558;
+  --cd-vermilion: #d4654a;
+  --cd-indigo: #6a3a48;
+  --cd-gold: #c48a48;
+  --cd-persimmon: #e07a48;
+  --cd-moss: #6a5040;
+}
+
+.cd-room:has(.cd-dock) {
+  padding-bottom: calc(7.2rem + env(safe-area-inset-bottom));
+}
+
+.cd-sheet {
+  position: relative;
+  padding: 1.6rem 1.35rem 0.4rem 1.6rem;
+}
+
+.cd-stack {
+  position: absolute;
+  top: 1.2rem;
+  right: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 10px;
+}
+
+.cd-stack i {
+  display: block;
+  height: 2px;
+  background: var(--cd-rule);
+  border-radius: 1px;
+}
+
+.cd-column {
+  font-size: 1.22rem;
+  line-height: 2.05;
+  max-width: 38rem;
+}
+
+.cd-room[data-writing='vertical'] .cd-sheet {
+  min-height: calc(100dvh - 8.5rem);
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 1.6rem;
+}
+
+.cd-room[data-writing='vertical'] .cd-column {
+  writing-mode: vertical-rl;
+  max-height: calc(100dvh - 10rem);
+  overflow: auto;
+  line-height: 2.2;
+  padding-left: 1.5rem;
+}
+
+.cd-rule {
+  position: absolute;
+  top: 1.2rem;
+  bottom: 0.4rem;
+  right: 0.95rem;
+  width: 1px;
+  background: var(--cd-rule);
+}
+
+.cd-room[data-writing='vertical'] .cd-rule {
+  right: auto;
+  left: 0.7rem;
+  top: 1rem;
+  bottom: 1rem;
+}
+
+.cd-front,
+.cd-backline {
+  margin: 0;
+}
+
+.cd-gap {
+  display: inline-block;
+  position: relative;
+  vertical-align: baseline;
+  color: var(--cd-vermilion);
+}
+
+.cd-sizer {
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.cd-gap-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.12em;
+  border-bottom: 1px solid var(--cd-vermilion);
+}
+
+.cd-footnote {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - 0.15em);
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: var(--cd-faint);
+  font-style: normal;
+}
+
+.cd-room[data-writing='vertical'] .cd-footnote {
+  writing-mode: horizontal-tb;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: -0.2rem;
+  width: 3rem;
+}
+
+ruby.cd-ruby {
+  ruby-position: over;
+  ruby-align: center;
+}
+
+ruby.cd-ruby rt {
+  font-family: var(--brush);
+  font-size: 0.58em;
+  letter-spacing: 0.04em;
+  color: var(--cd-indigo);
+  line-height: 1;
+  user-select: text;
+}
+
+.cd-ink {
+  font-family: var(--brush);
+}
+
+.cd-write .cd-ink {
+  animation: cd-write 0.42s ease both;
+}
+
+@keyframes cd-write {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.cd-room[data-writing='vertical'] .cd-write .cd-ink {
+  animation-name: cd-write-v;
+}
+
+@keyframes cd-write-v {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.cd-miss .cd-ink,
+.cd-miss rt {
+  color: var(--cd-vermilion);
+}
+
+.cd-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin: 0 0.35rem;
+  border: 1.5px solid var(--cd-vermilion);
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.cd-pair {
+  font-family: var(--seal);
+  color: var(--cd-indigo);
+  font-size: 0.85rem;
+  margin-right: 0.35rem;
+}
+
+.cd-readings {
+  margin: 0.9rem 0 0.35rem;
+  font-family: var(--brush);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: var(--cd-indigo);
+}
+
+.cd-gloss {
+  margin: 0.45rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.cd-en {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: 'Iowan Old Style', Palatino, 'Palatino Linotype', serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--cd-faint);
+}
+
+.cd-note,
+.cd-meta {
+  margin: 0.55rem 0 0;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--cd-faint);
+}
+
+.cd-plate {
+  margin: 1rem 0 0;
+  font-family: var(--brush);
+  font-size: 3.2rem;
+  line-height: 1.4;
+}
+
+.cd-plate rt {
+  font-size: 0.28em;
+}
+
+.cd-title {
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0 0 0.55rem;
+}
+
+.cd-lead {
+  margin: 0 0 0.8rem;
+  line-height: 1.7;
+}
+
+.cd-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.9rem;
+  font-size: 0.92rem;
+}
+
+.cd-swatches,
+.cd-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.9rem;
+}
+
+.cd-swatch {
+  width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
+  min-width: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--cd-rule);
+  padding: 0;
+  cursor: pointer;
+}
+
+.cd-swatch[aria-pressed='true'] {
+  outline: 2px solid var(--cd-ink);
+  outline-offset: 2px;
+}
+
+.cd-actions,
+.cd-grades,
+.cd-dock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.cd-btn,
+.cd-choice,
+.cd-seal {
+  font: inherit;
+  cursor: pointer;
+  color: var(--cd-ink);
+  background: transparent;
+}
+
+.cd-btn {
+  border: 1px solid var(--cd-rule);
+  border-radius: 8px;
+  min-height: 48px;
+  padding: 0.4rem 0.9rem;
+}
+
+.cd-btn.cd-primary,
+.cd-choice.cd-primary {
+  background: var(--cd-ink);
+  color: var(--cd-paper);
+  border-color: var(--cd-ink);
+}
+
+.cd-choice {
+  border: 0;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  min-height: 52px;
+  padding: 0.2rem 0.4rem;
+}
+
+.cd-seal {
+  border: 1px solid var(--cd-rule);
+  border-radius: 12px;
+  min-width: 3.1rem;
+  min-height: 3.4rem;
+  font-family: var(--seal);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.cd-seal-again {
+  color: var(--cd-vermilion);
+  border-color: var(--cd-vermilion);
+}
+.cd-seal-hard {
+  color: var(--cd-persimmon);
+  border-color: var(--cd-persimmon);
+}
+.cd-seal-good {
+  background: var(--cd-indigo);
+  color: var(--cd-paper);
+  border-color: var(--cd-indigo);
+}
+.cd-seal-easy {
+  color: var(--cd-gold);
+  border-color: var(--cd-gold);
+}
+
+.cd-toc {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cd-toc li {
+  border-bottom: 1px solid var(--cd-rule);
+}
+
+.cd-toc-row {
+  width: 100%;
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  min-height: 48px;
+  padding: 0.55rem 0;
+  cursor: pointer;
+}
+
+.cd-toc-n {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  color: var(--cd-faint);
+  min-width: 2rem;
+}
+
+.cd-toc-due {
+  margin-left: auto;
+  color: var(--cd-vermilion);
+  font-size: 0.75rem;
+}
+
+.cd-unseen .cd-toc-word {
+  color: var(--cd-faint);
+}
+
+.cd-due .cd-toc-word {
+  color: var(--cd-ink);
+  font-weight: 600;
+}
+
+.cd-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.cd-btn:focus-visible,
+.cd-choice:focus-visible,
+.cd-seal:focus-visible,
+.cd-swatch:focus-visible {
+  outline: 3px solid var(--cd-indigo);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .cd-sheet {
+    padding-left: 1.05rem;
+    padding-right: 1.15rem;
+  }
+
+  .cd-actions:not(.cd-dock) {
+    flex-direction: column;
+  }
+
+  .cd-actions:not(.cd-dock) .cd-btn {
+    width: 100%;
+  }
+
+  .cd-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    margin: 0;
+    justify-content: stretch;
+    gap: 0.35rem;
+    padding: 0.45rem 0.7rem calc(0.5rem + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--cd-paper) 94%, transparent);
+    border-top: 1px solid var(--cd-rule);
+    backdrop-filter: blur(8px);
+  }
+
+  .cd-dock .cd-choice,
+  .cd-dock .cd-seal,
+  .cd-dock .cd-btn {
+    flex: 1 1 0;
+  }
+}
