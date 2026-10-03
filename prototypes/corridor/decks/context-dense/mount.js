@@ -47,6 +47,8 @@ const ui = {
   previewId: null,
   missed: false,
 };
+let paintedHost = null;
+let paintedTurn = null;
 
 function loadState(storage) {
   try {
@@ -239,6 +241,8 @@ function writingMode(look) {
 }
 
 function paint(host, opts, state) {
+  const turn = `${ui.screen}:${ui.screen === 'card' ? ui.queue[ui.index]?.id : ui.screen === 'preview' ? ui.previewId : ''}`;
+  const resetScroll = host !== paintedHost || turn !== paintedTurn;
   const storage = opts.storage;
   const look = loadLook(storage);
   const writing = writingMode(look);
@@ -259,6 +263,10 @@ function paint(host, opts, state) {
   else if (ui.screen === 'index') paintIndex(room, opts, state);
   else if (ui.screen === 'preview') paintPreview(room, opts, look);
   host.append(room);
+  paintedHost = host;
+  paintedTurn = turn;
+  // A new page or card starts below the app header, even after a long index.
+  if (resetScroll) window.scrollTo(0, 0);
 }
 
 function paintHome(room, opts, state, look) {

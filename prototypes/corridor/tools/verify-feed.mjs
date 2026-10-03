@@ -13,7 +13,7 @@
  *     LINK-SAFE cleanliness gate held (the wikinews-1483 lesson);
  *   · the curation report proposes, never performs: every pending cull
  *     proposal still has its artifacts in place;
- *   · the regenerated standalone carries the new shelf (builder-only artifact);
+ *   · the published site's manifest pins every live candidate's index/body bytes;
  *   · every feed_fresh.py reading (queue kind "fresh") is minted in the full
  *     schema, dated, attributed and linked, carries the pool its source
  *     licence requires (CC BY-SA → share_alike, PDL1.0/CC BY → proprietary_safe),
@@ -494,13 +494,27 @@ const prematureCulls = cullRows.filter(
 );
 check('nothing proposed for culling has been removed while pending — proposals never act', prematureCulls.length === 0, prematureCulls.map((row) => row.id).join(', '));
 
-// ----------------------------------------------- double-listing + standalone
+// ------------------------------------------- double-listing + release bytes
 const doubled = curated.filter((row) => archiveIds.has(row.id));
 check('no article is listed on both the shelf and the archive', doubled.length === 0, doubled.map((row) => row.id).join(', '));
 
-const standalone = readFileSync(resolve(CORRIDOR, 'corridor-standalone.html'), 'utf8');
-const missingFromBundle = liveMints.filter((mint) => !standalone.includes(`"id":"${mint.id}"`));
-check('the regenerated standalone bundles every live feed candidate (builder-only artifact)', missingFromBundle.length === 0, missingFromBundle.map((mint) => mint.id).join(', '));
+const manifestPath = resolve(CORRIDOR, 'build-identity.json');
+const manifest = readJson(manifestPath);
+const packagedFiles = new Map(manifest.files.map((file) => [file.path, file]));
+const matchesPackage = (path) => {
+  const file = packagedFiles.get(path);
+  if (!file || !existsSync(resolve(CORRIDOR, path))) return false;
+  const bytes = readFileSync(resolve(CORRIDOR, path));
+  return file.bytes === bytes.length && file.sha256 === createHash('sha256').update(bytes).digest('hex');
+};
+const missingFromPackage = liveMints.filter((mint) => {
+  const row = curatedById.get(mint.id);
+  const path = row?.file && `data/articles/${row.file}`;
+  return !path || !matchesPackage(path) || readJson(resolve(CORRIDOR, path)).id !== mint.id;
+});
+check('the published site manifest pins the index and body bytes of every live feed candidate',
+  manifest.schemaVersion === 1 && liveMints.length > 0 && matchesPackage('data/articles/index.json') && missingFromPackage.length === 0,
+  missingFromPackage.map((mint) => mint.id).join(', ') || `${liveMints.length} live candidates`);
 
 // ------------------------------------------------------------------ evidence
 const runLogs = existsSync(EVIDENCE_DIR)
@@ -525,7 +539,7 @@ writeFileSync(
         queue: fileSha256(QUEUE_PATH),
         titles: fileSha256(TITLES_PATH),
         curationReport: fileSha256(REPORT_JSON),
-        standalone: fileSha256(resolve(CORRIDOR, 'corridor-standalone.html')),
+        buildManifest: fileSha256(manifestPath),
       },
       counts: {
         curated: curated.length,
