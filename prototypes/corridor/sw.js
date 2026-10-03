@@ -87,6 +87,8 @@ const SHELL = [
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
   'data/share_alike/kkld.json',
+  // 単語帳 opens offline from install, like the context deck
+  'data/share_alike/decks/kotoba-mine.json',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

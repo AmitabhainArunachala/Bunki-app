@@ -295,6 +295,14 @@ for (const entry of [...assessmentCatalog.entries, ...(assessmentCatalog.archive
 }
 const assessmentPack = Object.fromEntries([...assessmentAssets].map(([path, asset]) =>
   [path, { mimeType: asset.mimeType, base64: asset.base64 }]));
+// 単語帳 — the deck room reads its decks from the bundle the same way
+const decksDir = resolve(CORRIDOR, 'data/share_alike/decks');
+if (existsSync(decksDir)) {
+  for (const file of readdirSync(decksDir).sort()) {
+    if (!file.endsWith('.json')) continue;
+    bundle[`decks/${file.replace(/\.json$/, '')}`] = JSON.parse(read(`data/share_alike/decks/${file}`));
+  }
+}
 
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
 const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
