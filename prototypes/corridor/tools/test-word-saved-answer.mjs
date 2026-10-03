@@ -94,7 +94,7 @@ function defineRows() {
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
-    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
+    'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading', 'DECK_IDS', 'deckWordSnapshot', 'deckSavedSnapshot', 'deckWordNode',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
     // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
     'wordSaveFacts', 'paintWordSave', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
@@ -1649,6 +1649,64 @@ function defineRows() {
       // taking it again through the other door is the existing no-op re-take: no second card, no replace, no conflict
       assert.deepEqual(Object.keys(ctx.captureStorePatch(record, second, 'ダマスカス', 2000)), [], `the other door's take is the same card · ${label}`);
     }
+    // The deck uses the same capture plan, with its card's answer resolved from the bundle.
+    const module = { id: 'identity-fixture', article: 'fixture-article', cards: [
+      { n: 1, w: 'ダマスカス', r: 'だますかす', g: 'Damascus (Syria)', d: '都市', i: 0 },
+      { n: 2, w: '生', r: 'せい', g: 'raw', d: '生', i: 1 },
+      { n: 3, w: '架空の鉱脈語', r: 'カクウノコウミャクゴ', g: 'bundled answer', d: '束の語', i: 2 },
+    ] };
+    const deck = { deckId: 'kotoba-mine', modules: [module] };
+    ctx.D.decks = new Map([[deck.deckId, deck]]);
+    const deckDoor = ctx.deckWordNode(deck, module, module.cards[0]);
+    for (const [first, second] of [[quick, deckDoor], [deckDoor, quick]]) {
+      const record = apply(blank(), ctx.captureStorePatch(blank(), first, first.id, 1000));
+      assert.equal(ctx.wordCaptureState(second, record), 'taken', 'reader and vocabulary share Damascus');
+      assert.deepEqual(Object.keys(ctx.captureStorePatch(record, second, second.id, 2000)), [], 'one Damascus card');
+    }
+    const coreData = { ...SERVED, dict: { ...SERVED.dict, 生: { r: 'なま', m: ['raw'] } } };
+    const coreCtx = app({ mode: 'main', data: coreData });
+    coreCtx.D.decks = new Map([[deck.deckId, deck]]);
+    const differentReading = { t: 'word', id: '生', deckSource: { deckId: deck.deckId, moduleId: module.id, card: 2 } };
+    assert.equal(coreCtx.wordCaptureState(differentReading, blank()), 'unavailable', 'the deck cannot silently borrow なま');
+    assert.throws(() => coreCtx.captureStorePatch(blank(), differentReading, '生', 1000), (error) => error.code === 'word-answer-unavailable');
+    assert.match(coreCtx.wordCaptureHeldText(differentReading), /せい.*なま/u, 'the held reason names both readings');
+    const bundled = ctx.deckWordNode(deck, module, module.cards[2]);
+    const captured = apply(blank(), ctx.captureStorePatch(blank(), bundled, bundled.id, 1000));
+    assert.deepEqual(captured.taken[0].ctx, { p: module.article, i: 2, scope: 'sent' });
+    assert.deepEqual(captured.deepWords[bundled.id], { r: module.cards[2].r, m: ['bundled answer', '束の語'], deckSource: { deckId: deck.deckId, moduleId: module.id, card: 3 } });
+    // An unrelated homograph never becomes the bundled card just because the reading matches.
+    const homograph = { ...captured, deepWords: { [bundled.id]: { r: module.cards[2].r, m: ['unrelated meaning'], seq: '1402170' } },
+      taken: [{ ...captured.taken[0], entrySeq: '1402170' }] };
+    assert.equal(ctx.wordCaptureState(bundled, homograph), 'conflict');
+    assert.throws(() => ctx.captureStorePatch(homograph, bundled, bundled.id, 2000), (error) => error.code === 'word-identity-conflict');
+    const shippedDeck = JSON.parse(readFileSync(here('../data/share_alike/decks/kotoba-mine.json'), 'utf8'));
+    ctx.D.decks.set(shippedDeck.deckId, shippedDeck);
+    for (const [word, unrelatedSeq] of [['そうそう', '1402170'], ['がち', '1197950']]) {
+      const mod = shippedDeck.modules.find((m) => m.cards.some((c) => c.w === word));
+      const card = mod.cards.find((c) => c.w === word);
+      const door = ctx.deckWordNode(shippedDeck, mod, card);
+      const entry = rowOf.get(unrelatedSeq);
+      const unrelated = { ...blank(), taken: [{ t: 'word', id: word, label: word, ts: 10, started: 10,
+        entrySeq: unrelatedSeq, cueReading: card.r }], deepWords: { [word]: { seq: unrelatedSeq, r: card.r, m: entry[6] } } };
+      assert.equal(ctx.wordCaptureState(door, unrelated), 'conflict', `${word} holds its unrelated existing entry`);
+      assert.throws(() => ctx.captureStorePatch(unrelated, door, word, 2000), (error) => error.code === 'word-identity-conflict');
+    }
+    ctx.D.decks.set(deck.deckId, deck);
+    // Warming the dictionary must not change an already captured bundled text identity.
+    ctx.S = captured;
+    const fakeRow = [...rowOf.get('2834901')];
+    fakeRow[1] = bundled.id; fakeRow[4] = [bundled.id]; fakeRow[5] = [module.cards[2].r]; fakeRow[11] = [0];
+    ctx.D.dictionaryByForm.set(bundled.id, [fakeRow]); ctx.D.dictionaryCompleteForms.add(bundled.id);
+    const warmed = ctx.deckWordNode(deck, module, module.cards[2]);
+    assert.equal(warmed.seq, undefined, 'a fallback card keeps its established bundled identity after index load');
+    assert.equal(ctx.wordCaptureState(warmed, captured), 'taken');
+    assert.deepEqual(Object.keys(ctx.captureStorePatch(captured, warmed, warmed.id, 2000)), []);
+    const readerDoor = { t: 'word', id: bundled.id };
+    assert.equal(ctx.wordCaptureState(readerDoor, captured), 'taken', 'the reader sees the bundled card');
+    assert.deepEqual(Object.keys(ctx.captureStorePatch(captured, readerDoor, bundled.id, 2000)), []);
+    const held = { ...captured, deepWords: { [bundled.id]: { r: 'ちがうよみ', m: ['other answer'] } } };
+    assert.equal(ctx.wordCaptureState(bundled, held), 'conflict', 'a different saved reading stays held');
+    assert.throws(() => ctx.captureStorePatch(held, bundled, bundled.id, 2000), (error) => error.code === 'word-identity-conflict');
     // a genuinely different reading is still another entry's business (K1): 生 read せい never names なま
     assert.equal(ctx.wordCaptureState(NAMA, blank()), 'unavailable');
   });

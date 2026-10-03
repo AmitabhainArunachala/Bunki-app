@@ -1,0 +1,1940 @@
+[
+  {
+    "n": 1,
+    "term": "なぞかけ",
+    "reading": null,
+    "gloss": "telling a riddle"
+  },
+  {
+    "n": 2,
+    "term": "かつお節",
+    "reading": "かつおぶし",
+    "gloss": "katsuobushi, small pieces of sliced dried bonito"
+  },
+  {
+    "n": 3,
+    "term": "語呂合わせ",
+    "reading": "ごろあわせ",
+    "gloss": "rhyming game, play on words, pun"
+  },
+  {
+    "n": 4,
+    "term": "なんくるない",
+    "reading": null,
+    "gloss": "don't worry, be happy"
+  },
+  {
+    "n": 5,
+    "term": "反射的に",
+    "reading": "はんしゃてきに",
+    "gloss": "reflexively, reflectively, by reflex"
+  },
+  {
+    "n": 6,
+    "term": "相乗",
+    "reading": "そうじょう",
+    "gloss": "multiplication, synergism"
+  },
+  {
+    "n": 7,
+    "term": "箇所",
+    "reading": "かしょ",
+    "gloss": "passage, place, point, part"
+  },
+  {
+    "n": 8,
+    "term": "落脱",
+    "reading": "らくだつ",
+    "gloss": "dropping out, falling behind, falling by the wayside, desertion; omission, being left out, missing part; falling off, coming off, shedding"
+  },
+  {
+    "n": 9,
+    "term": "いざという時",
+    "reading": "いざというとき",
+    "gloss": "when it's important, when it comes to the crunch, when push comes to shove, when it comes to the point, in one's hour of need, at the critical moment"
+  },
+  {
+    "n": 10,
+    "term": "見分ける",
+    "reading": "みわける",
+    "gloss": "to distinguish, to recognize, to recognise, to tell apart, to differentiate (both figuratively and visually); to identify (whether an object is positive or negative in some aspect), to know the difference between something of superior and inferior quality (on sight or figuratively)"
+  },
+  {
+    "n": 11,
+    "term": "突入",
+    "reading": "とつにゅう",
+    "gloss": "rushing into, breaking into, storming; plunging into (war, etc.), embarking on (a new venture)"
+  },
+  {
+    "n": 12,
+    "term": "勝ち残る",
+    "reading": "かちのこる",
+    "gloss": "to win and advance to the next round"
+  },
+  {
+    "n": 13,
+    "term": "ひらめく",
+    "reading": null,
+    "gloss": "to flash (e.g. lightning), to flicker, to glitter, to sparkle, to gleam; to flutter (e.g. flag), to wave, to undulate; to flash into one's mind (e.g. an idea), to come to one suddenly"
+  },
+  {
+    "n": 14,
+    "term": "最善",
+    "reading": "さいぜん",
+    "gloss": "the very best, utmost"
+  },
+  {
+    "n": 15,
+    "term": "新体制",
+    "reading": "しんたいせい",
+    "gloss": "new order, new system"
+  },
+  {
+    "n": 16,
+    "term": "身体性",
+    "reading": "しんたいせい",
+    "gloss": "embodiment, physicality"
+  },
+  {
+    "n": 17,
+    "term": "霊魂不滅",
+    "reading": "れいこんふめつ",
+    "gloss": "immortality of the soul"
+  },
+  {
+    "n": 18,
+    "term": "見地",
+    "reading": "けんち",
+    "gloss": "point of view"
+  },
+  {
+    "n": 19,
+    "term": "各部",
+    "reading": "かくぶ",
+    "gloss": "all parts, various parts, every department"
+  },
+  {
+    "n": 20,
+    "term": "攪拌",
+    "reading": "かくはん",
+    "gloss": "agitation, stirring, whipping, beating"
+  },
+  {
+    "n": 21,
+    "term": "床の間",
+    "reading": "とこのま",
+    "gloss": "tokonoma (alcove where art or flowers are displayed)"
+  },
+  {
+    "n": 22,
+    "term": "分留",
+    "reading": "ぶんりゅう",
+    "gloss": "fractional distillation, fractionation"
+  },
+  {
+    "n": 23,
+    "term": "自ずと",
+    "reading": "おのずと",
+    "gloss": "naturally, in due course, by itself"
+  },
+  {
+    "n": 24,
+    "term": "正直",
+    "reading": "しょうじき",
+    "gloss": "honest, frank, candid, straightforward; honestly, frankly"
+  },
+  {
+    "n": 25,
+    "term": "率直に言って",
+    "reading": "そっちょくにいって",
+    "gloss": "frankly speaking"
+  },
+  {
+    "n": 26,
+    "term": "迷信",
+    "reading": "めいしん",
+    "gloss": "superstition, superstitious belief"
+  },
+  {
+    "n": 27,
+    "term": "背く",
+    "reading": "そむく",
+    "gloss": "to run counter to, to go against, to disobey, to infringe"
+  },
+  {
+    "n": 28,
+    "term": "定量的",
+    "reading": "ていりょうてき",
+    "gloss": "quantitative"
+  },
+  {
+    "n": 29,
+    "term": "断続的",
+    "reading": "だんぞくてき",
+    "gloss": "intermittent"
+  },
+  {
+    "n": 30,
+    "term": "下敷き",
+    "reading": "したじき",
+    "gloss": "desk pad, sheet of plastic (or cardboard, felt, etc.) placed under writing paper, underlay; being pinned under, being caught under, being trapped under, being buried under, being crushed beneath; model, pattern"
+  },
+  {
+    "n": 31,
+    "term": "下敷きになる",
+    "reading": "したじきになる",
+    "gloss": "to be squashed by, to be pinned under"
+  },
+  {
+    "n": 32,
+    "term": "帰納的関数",
+    "reading": "きのうてきかんすう",
+    "gloss": "recursive function"
+  },
+  {
+    "n": 33,
+    "term": "帰納的",
+    "reading": "きのうてき",
+    "gloss": "inductive, recursive"
+  },
+  {
+    "n": 34,
+    "term": "機能的",
+    "reading": "きのうてき",
+    "gloss": "functional, efficient"
+  },
+  {
+    "n": 35,
+    "term": "磁気共鳴",
+    "reading": "じききょうめい",
+    "gloss": "magnetic resonance"
+  },
+  {
+    "n": 36,
+    "term": "磁気共鳴断層撮影",
+    "reading": "じききょうめいだんそうさつえい",
+    "gloss": "magnetic resonance tomography"
+  },
+  {
+    "n": 37,
+    "term": "石版",
+    "reading": "せきばん",
+    "gloss": "lithograph, lithography"
+  },
+  {
+    "n": 38,
+    "term": "刈り込む",
+    "reading": "かりこむ",
+    "gloss": "to prune, to trim, to cut back, to clip; to reap (a crop) and put into storage, to harvest; to prune (a manuscript), to cut down"
+  },
+  {
+    "n": 39,
+    "term": "滑稽",
+    "reading": "こっけい",
+    "gloss": "funny, comical, humorous, laughable; ridiculous, silly, absurd"
+  },
+  {
+    "n": 40,
+    "term": "稽",
+    "reading": "かんがえる、ケイ",
+    "gloss": "think, consider, quarrel"
+  },
+  {
+    "n": 41,
+    "term": "失読症",
+    "reading": "しつどくしょう",
+    "gloss": "dyslexia"
+  },
+  {
+    "n": 42,
+    "term": "難読",
+    "reading": "なんどく",
+    "gloss": "difficult to read (e.g. obscure kanji)"
+  },
+  {
+    "n": 43,
+    "term": "格闘",
+    "reading": "かくとう",
+    "gloss": "hand-to-hand fighting, grappling, scuffling"
+  },
+  {
+    "n": 44,
+    "term": "格闘家",
+    "reading": "かくとうか",
+    "gloss": "martial artist, fighter"
+  },
+  {
+    "n": 45,
+    "term": "演習",
+    "reading": "えんしゅう",
+    "gloss": "practice, practising; exercises, manoeuvres, maneuvers; seminar (student debates, presentations, etc.), practicum"
+  },
+  {
+    "n": 46,
+    "term": "模索",
+    "reading": "もさく",
+    "gloss": "groping (for), exploring for a solution"
+  },
+  {
+    "n": 47,
+    "term": "まな板",
+    "reading": "まないた",
+    "gloss": "chopping board, cutting board"
+  },
+  {
+    "n": 48,
+    "term": "たくらむ",
+    "reading": null,
+    "gloss": "to scheme, to plan, to play a trick, to invent, to conspire, to frame up"
+  },
+  {
+    "n": 49,
+    "term": "途切れ途切れ",
+    "reading": "とぎれとぎれ",
+    "gloss": "broken, intermittent, disconnected"
+  },
+  {
+    "n": 50,
+    "term": "俯瞰",
+    "reading": "ふかん",
+    "gloss": "overlooking, looking down at, having an overhead view, having a bird's-eye view, having a high-angle view"
+  },
+  {
+    "n": 51,
+    "term": "照準",
+    "reading": "しょうじゅん",
+    "gloss": "sight (e.g. of a gun), aim, alignment"
+  },
+  {
+    "n": 52,
+    "term": "浮き立つ",
+    "reading": "うきたつ",
+    "gloss": "to be enlivened, to be exhilarated"
+  },
+  {
+    "n": 53,
+    "term": "灼熱",
+    "reading": "しゃくねつ",
+    "gloss": "becoming red hot, red heat, scorching heat, incandescence; running high (of emotions), burning (with passion, enthusiasm, etc.)"
+  },
+  {
+    "n": 54,
+    "term": "反抗的",
+    "reading": "はんこうてき",
+    "gloss": "rebellious, defiant"
+  },
+  {
+    "n": 55,
+    "term": "一層",
+    "reading": "いっそう",
+    "gloss": "much more, still more, all the more, more than ever; single layer (or storey, etc.); rather, sooner, preferably"
+  },
+  {
+    "n": 56,
+    "term": "軈",
+    "reading": "やがて",
+    "gloss": "soon after, presently, almost, all but, no more than, after all"
+  },
+  {
+    "n": 57,
+    "term": "起点",
+    "reading": "きてん",
+    "gloss": "starting point, origin"
+  },
+  {
+    "n": 58,
+    "term": "分業",
+    "reading": "ぶんぎょう",
+    "gloss": "division of labor, division of labour, specialization, specialisation, assembly-line production"
+  },
+  {
+    "n": 59,
+    "term": "共謀",
+    "reading": "きょうぼう",
+    "gloss": "conspiracy, collusion, complicity"
+  },
+  {
+    "n": 60,
+    "term": "かなめ",
+    "reading": null,
+    "gloss": "pivot; vital point, cornerstone, keystone; Japanese photinia"
+  },
+  {
+    "n": 61,
+    "term": "命運",
+    "reading": "めいうん",
+    "gloss": "fate, doom"
+  },
+  {
+    "n": 62,
+    "term": "理学",
+    "reading": "りがく",
+    "gloss": "physical science, natural science; physics; lixue (Song-era Chinese philosophy); philosophy"
+  },
+  {
+    "n": 63,
+    "term": "量産",
+    "reading": "りょうさん",
+    "gloss": "mass production"
+  },
+  {
+    "n": 64,
+    "term": "財政",
+    "reading": "ざいせい",
+    "gloss": "public finance; financial affairs, financial situation"
+  },
+  {
+    "n": 65,
+    "term": "資金",
+    "reading": "しきん",
+    "gloss": "funds, capital"
+  },
+  {
+    "n": 66,
+    "term": "利回り",
+    "reading": "りまわり",
+    "gloss": "interest, (investment) yield, profits"
+  },
+  {
+    "n": 67,
+    "term": "妨害",
+    "reading": "ぼうがい",
+    "gloss": "disturbance, obstruction, hindrance, jamming, interference"
+  },
+  {
+    "n": 68,
+    "term": "立ち位置",
+    "reading": "たちいち",
+    "gloss": "position (where one is standing), place where one stands; position (in society), status, role, station"
+  },
+  {
+    "n": 69,
+    "term": "悲観",
+    "reading": "ひかん",
+    "gloss": "pessimism, disappointment"
+  },
+  {
+    "n": 70,
+    "term": "冷戦",
+    "reading": "れいせん",
+    "gloss": "cold war"
+  },
+  {
+    "n": 71,
+    "term": "覇権",
+    "reading": "はけん",
+    "gloss": "hegemony"
+  },
+  {
+    "n": 72,
+    "term": "覇権安定論",
+    "reading": "はけんあんていろん",
+    "gloss": "hegemonic stability theory"
+  },
+  {
+    "n": 73,
+    "term": "当然ながら",
+    "reading": "とうぜんながら",
+    "gloss": "naturally, of course, understandably"
+  },
+  {
+    "n": 74,
+    "term": "還元",
+    "reading": "かんげん",
+    "gloss": "restoration, return; reduction, resolution, deoxidization, deoxidation"
+  },
+  {
+    "n": 75,
+    "term": "財物",
+    "reading": "ざいぶつ",
+    "gloss": "property"
+  },
+  {
+    "n": 76,
+    "term": "罰則",
+    "reading": "ばっそく",
+    "gloss": "punishment, penalty; penal regulations, penal code"
+  },
+  {
+    "n": 77,
+    "term": "自意識過剰",
+    "reading": "じいしきかじょう",
+    "gloss": "excessive self-consciousness, excessively self-conscious person"
+  },
+  {
+    "n": 78,
+    "term": "集積",
+    "reading": "しゅうせき",
+    "gloss": "accumulation"
+  },
+  {
+    "n": 79,
+    "term": "集積回路",
+    "reading": "しゅうせきかいろ",
+    "gloss": "integrated-circuit"
+  },
+  {
+    "n": 80,
+    "term": "係助",
+    "reading": "けいじょ",
+    "gloss": "binding particle"
+  },
+  {
+    "n": 81,
+    "term": "上下",
+    "reading": "じょうげ",
+    "gloss": "top and bottom, high and low, above and below, upper and lower ends, up and down; going up and down, rising and falling, fluctuating; going and coming back; upper and lower classes, ruler and ruled, the government and the people; first and second volumes"
+  },
+  {
+    "n": 82,
+    "term": "覆う",
+    "reading": "おおう",
+    "gloss": "to cover, to hide, to conceal, to wrap, to disguise"
+  },
+  {
+    "n": 83,
+    "term": "配線",
+    "reading": "はいせん",
+    "gloss": "wiring"
+  },
+  {
+    "n": 84,
+    "term": "編入",
+    "reading": "へんにゅう",
+    "gloss": "admission, incorporation"
+  },
+  {
+    "n": 85,
+    "term": "威張り散らす",
+    "reading": "いばりちらす",
+    "gloss": "to domineer"
+  },
+  {
+    "n": 86,
+    "term": "威張りくさる",
+    "reading": "いばりくさる",
+    "gloss": "to throw one's weight around, to be puffed up"
+  },
+  {
+    "n": 87,
+    "term": "歩留まり",
+    "reading": "ぶどまり",
+    "gloss": "yield, yield rate"
+  },
+  {
+    "n": 88,
+    "term": "軽減",
+    "reading": "けいげん",
+    "gloss": "abatement, reduction"
+  },
+  {
+    "n": 89,
+    "term": "屈強",
+    "reading": "くっきょう",
+    "gloss": "robust, brawny, muscular, strong, sturdy"
+  },
+  {
+    "n": 90,
+    "term": "ビンビン",
+    "reading": null,
+    "gloss": "hard (e.g. penis), strong (e.g. beat of music), throbbing (e.g. headache), blaring (e.g. rock music)"
+  },
+  {
+    "n": 91,
+    "term": "ギンギン",
+    "reading": null,
+    "gloss": "ecstatic, ecstatically; splitting headache"
+  },
+  {
+    "n": 92,
+    "term": "殴り書き",
+    "reading": "なぐりがき",
+    "gloss": "scribble, scrawl"
+  },
+  {
+    "n": 93,
+    "term": "節制",
+    "reading": "せっせい",
+    "gloss": "moderation, self-restraint, temperance"
+  },
+  {
+    "n": 94,
+    "term": "せせら笑い",
+    "reading": "せせらわらい",
+    "gloss": "sardonic laugh, scornful smile"
+  },
+  {
+    "n": 95,
+    "term": "言語道断",
+    "reading": "ごんごどうだん",
+    "gloss": "outrageous, preposterous, scandalous, inexcusable, absurd, execrable"
+  },
+  {
+    "n": 96,
+    "term": "値札",
+    "reading": "ねふだ",
+    "gloss": "price tag, price label"
+  },
+  {
+    "n": 97,
+    "term": "耐える",
+    "reading": "たえる",
+    "gloss": "to bear, to stand, to endure, to put up with; to support, to withstand, to resist, to brave; to be fit for, to be equal to"
+  },
+  {
+    "n": 98,
+    "term": "忍び",
+    "reading": "しのび",
+    "gloss": "stealth; travelling incognito (traveling); ninjutsu; ninja; sneak theft, sneak thief; tolerance"
+  },
+  {
+    "n": 99,
+    "term": "眼前",
+    "reading": "がんぜん",
+    "gloss": "before one's eyes"
+  },
+  {
+    "n": 100,
+    "term": "鼓膜",
+    "reading": "こまく",
+    "gloss": "eardrum, tympanic membrane"
+  },
+  {
+    "n": 101,
+    "term": "淵",
+    "reading": "エン",
+    "gloss": "abyss, edge, deep pool, the depths"
+  },
+  {
+    "n": 102,
+    "term": "秒速",
+    "reading": "びょうそく",
+    "gloss": "per second"
+  },
+  {
+    "n": 103,
+    "term": "ぞっと",
+    "reading": null,
+    "gloss": "shuddering, shivering, trembling, being horrified, being disgusted"
+  },
+  {
+    "n": 104,
+    "term": "ぞっとしない",
+    "reading": null,
+    "gloss": "not very appealing, pretty disgusting"
+  },
+  {
+    "n": 105,
+    "term": "等比",
+    "reading": "とうひ",
+    "gloss": "equal ratio"
+  },
+  {
+    "n": 106,
+    "term": "数列",
+    "reading": "すうれつ",
+    "gloss": "progression, sequence"
+  },
+  {
+    "n": 107,
+    "term": "返済",
+    "reading": "へんさい",
+    "gloss": "repayment, reimbursement, refund, redemption"
+  },
+  {
+    "n": 108,
+    "term": "預金",
+    "reading": "よきん",
+    "gloss": "deposit, bank account"
+  },
+  {
+    "n": 109,
+    "term": "金利",
+    "reading": "きんり",
+    "gloss": "interest rate, interest"
+  },
+  {
+    "n": 110,
+    "term": "利率",
+    "reading": "りりつ",
+    "gloss": "interest rate"
+  },
+  {
+    "n": 111,
+    "term": "初項",
+    "reading": "しょこう",
+    "gloss": "first term (e.g. of sequence), initial term"
+  },
+  {
+    "n": 112,
+    "term": "運用",
+    "reading": "うんよう",
+    "gloss": "making use of, application, practical use, effective management (e.g. of funds); operation, handling, steering (esp. a boat)"
+  },
+  {
+    "n": 113,
+    "term": "利息",
+    "reading": "りそく",
+    "gloss": "interest (on a loan, deposit, etc.)"
+  },
+  {
+    "n": 114,
+    "term": "元金",
+    "reading": "がんきん",
+    "gloss": "capital, principal"
+  },
+  {
+    "n": 115,
+    "term": "単利",
+    "reading": "たんり",
+    "gloss": "simple interest"
+  },
+  {
+    "n": 116,
+    "term": "歴然",
+    "reading": "れきぜん",
+    "gloss": "evident, plain, distinct, clear"
+  },
+  {
+    "n": 117,
+    "term": "ごとく",
+    "reading": null,
+    "gloss": "like, as if, the same as"
+  },
+  {
+    "n": 118,
+    "term": "なお",
+    "reading": null,
+    "gloss": "still, yet; more, still more, greater, further; as ..., like ...; furthermore, in addition, moreover, note that ..."
+  },
+  {
+    "n": 119,
+    "term": "なおかつ",
+    "reading": null,
+    "gloss": "besides, furthermore, on top of that; and yet, nevertheless, even so"
+  },
+  {
+    "n": 120,
+    "term": "足し算",
+    "reading": "たしざん",
+    "gloss": "addition"
+  },
+  {
+    "n": 121,
+    "term": "万有引力",
+    "reading": "ばんゆういんりょく",
+    "gloss": "universal gravitation"
+  },
+  {
+    "n": 122,
+    "term": "自転軸",
+    "reading": "じてんじく",
+    "gloss": "rotating shaft, axle"
+  },
+  {
+    "n": 123,
+    "term": "遠心力",
+    "reading": "えんしんりょく",
+    "gloss": "centrifugal force"
+  },
+  {
+    "n": 124,
+    "term": "分布",
+    "reading": "ぶんぷ",
+    "gloss": "distribution, allocation"
+  },
+  {
+    "n": 125,
+    "term": "棚卸",
+    "reading": "たなおろし",
+    "gloss": "stocktaking, inventory count"
+  },
+  {
+    "n": 126,
+    "term": "棚卸資産",
+    "reading": "たなおろししさん",
+    "gloss": "inventory, inventories, inventory asset"
+  },
+  {
+    "n": 127,
+    "term": "自由自在",
+    "reading": "じゆうじざい",
+    "gloss": "free, unrestricted, (with) complete mastery, completely in control"
+  },
+  {
+    "n": 128,
+    "term": "座標",
+    "reading": "ざひょう",
+    "gloss": "coordinate, coordinates"
+  },
+  {
+    "n": 129,
+    "term": "座標幾何学",
+    "reading": "ざひょうきかがく",
+    "gloss": "coordinate geometry"
+  },
+  {
+    "n": 130,
+    "term": "実装",
+    "reading": "じっそう",
+    "gloss": "implementation (e.g. of a feature), installation (of equipment), mounting, packaging"
+  },
+  {
+    "n": 131,
+    "term": "電卓",
+    "reading": "でんたく",
+    "gloss": "calculator (electronic), pocket calculator"
+  },
+  {
+    "n": 132,
+    "term": "電卓を叩く",
+    "reading": "でんたくをたたく",
+    "gloss": "to use a calculator; to calculate cost-benefit, to calculate profitability"
+  },
+  {
+    "n": 133,
+    "term": "卓越",
+    "reading": "たくえつ",
+    "gloss": "preeminence, excellence, superiority, transcendence"
+  },
+  {
+    "n": 134,
+    "term": "計算機",
+    "reading": "けいさんき",
+    "gloss": "calculator; computer"
+  },
+  {
+    "n": 135,
+    "term": "垂直",
+    "reading": "すいちょく",
+    "gloss": "vertical; perpendicular"
+  },
+  {
+    "n": 136,
+    "term": "索引",
+    "reading": "さくいん",
+    "gloss": "index (in a book)"
+  },
+  {
+    "n": 137,
+    "term": "被告人",
+    "reading": "ひこくにん",
+    "gloss": "accused, defendant, prisoner at the bar"
+  },
+  {
+    "n": 138,
+    "term": "万引き",
+    "reading": "まんびき",
+    "gloss": "shoplifting, shoplifter"
+  },
+  {
+    "n": 139,
+    "term": "返却",
+    "reading": "へんきゃく",
+    "gloss": "return of something, repayment"
+  },
+  {
+    "n": 140,
+    "term": "立件",
+    "reading": "りっけん",
+    "gloss": "assembling a criminal case"
+  },
+  {
+    "n": 141,
+    "term": "既存",
+    "reading": "きそん",
+    "gloss": "existing"
+  },
+  {
+    "n": 142,
+    "term": "既存装置",
+    "reading": "きそんそうち",
+    "gloss": "existing equipment"
+  },
+  {
+    "n": 143,
+    "term": "見出し",
+    "reading": "みだし",
+    "gloss": "heading, headline, title, caption; index; headword"
+  },
+  {
+    "n": 144,
+    "term": "異例",
+    "reading": "いれい",
+    "gloss": "exceptional, unusual, extraordinary, unprecedented, singular"
+  },
+  {
+    "n": 145,
+    "term": "抹殺",
+    "reading": "まっさつ",
+    "gloss": "erasure, denial, obliteration, ignoring (an opinion)"
+  },
+  {
+    "n": 146,
+    "term": "夕べ",
+    "reading": "ゆうべ",
+    "gloss": "evening; last night, yesterday evening"
+  },
+  {
+    "n": 147,
+    "term": "脱出",
+    "reading": "だっしゅつ",
+    "gloss": "escape, break-out; prolapse, proptosis"
+  },
+  {
+    "n": 148,
+    "term": "捜索",
+    "reading": "そうさく",
+    "gloss": "search (esp. for someone or something missing), manhunt; legally authorized search of a person, building, etc."
+  },
+  {
+    "n": 149,
+    "term": "神奈川県",
+    "reading": "かながわけん",
+    "gloss": "Kanagawa prefecture (Kanto area)"
+  },
+  {
+    "n": 150,
+    "term": "行方不明",
+    "reading": "ゆくえふめい",
+    "gloss": "missing, lost, unaccounted for, whereabouts unknown"
+  },
+  {
+    "n": 151,
+    "term": "海上",
+    "reading": "かいじょう",
+    "gloss": "on the sea, surface of the sea"
+  },
+  {
+    "n": 152,
+    "term": "気象庁",
+    "reading": "きしょうちょう",
+    "gloss": "(Japanese) Meteorological Agency, JMA"
+  },
+  {
+    "n": 153,
+    "term": "出勤",
+    "reading": "しゅっきん",
+    "gloss": "going to work, leaving for work, attendance (at work), being at work, presence (in the office), reporting for work"
+  },
+  {
+    "n": 154,
+    "term": "収納家具",
+    "reading": "しゅうのうかぐ",
+    "gloss": "closet, cabinet"
+  },
+  {
+    "n": 155,
+    "term": "鑑定",
+    "reading": "かんてい",
+    "gloss": "judgement, judgment, expert opinion, appraisal"
+  },
+  {
+    "n": 156,
+    "term": "目撃証言",
+    "reading": "もくげきしょうげん",
+    "gloss": "eyewitness testimony"
+  },
+  {
+    "n": 157,
+    "term": "画像",
+    "reading": "がぞう",
+    "gloss": "image, picture, portrait"
+  },
+  {
+    "n": 158,
+    "term": "死刑囚",
+    "reading": "しけいしゅう",
+    "gloss": "criminal condemned to death, convict on death row"
+  },
+  {
+    "n": 159,
+    "term": "決定的",
+    "reading": "けっていてき",
+    "gloss": "definite, final, decisive, conclusive"
+  },
+  {
+    "n": 160,
+    "term": "決定的文脈自由文法",
+    "reading": "けっていてきぶんみゃくじゆうぶんぽう",
+    "gloss": "deterministic context-free grammar"
+  },
+  {
+    "n": 161,
+    "term": "起爆剤",
+    "reading": "きばくざい",
+    "gloss": "triggering explosive"
+  },
+  {
+    "n": 162,
+    "term": "開業",
+    "reading": "かいぎょう",
+    "gloss": "opening a business, opening a practice"
+  },
+  {
+    "n": 163,
+    "term": "創開",
+    "reading": "そうかい",
+    "gloss": "grand opening"
+  },
+  {
+    "n": 164,
+    "term": "迅速",
+    "reading": "じんそく",
+    "gloss": "quick, fast, rapid, swift, prompt, streamlined, expedited, expeditious"
+  },
+  {
+    "n": 165,
+    "term": "警視庁",
+    "reading": "けいしちょう",
+    "gloss": "Metropolitan Police Department (esp. Tokyo)"
+  },
+  {
+    "n": 166,
+    "term": "仕分け",
+    "reading": "しわけ",
+    "gloss": "classification, assortment; assortment journalizing (in bookkeeping)"
+  },
+  {
+    "n": 167,
+    "term": "切り札",
+    "reading": "きりふだ",
+    "gloss": "trump card; ace up one's sleeve, secret weapon"
+  },
+  {
+    "n": 168,
+    "term": "導体",
+    "reading": "どうたい",
+    "gloss": "conductor (electricity)"
+  },
+  {
+    "n": 169,
+    "term": "銅線",
+    "reading": "どうせん",
+    "gloss": "copper line, copper wire"
+  },
+  {
+    "n": 170,
+    "term": "動線計画",
+    "reading": "どうせんけいかく",
+    "gloss": "circulation planning flow planning"
+  },
+  {
+    "n": 171,
+    "term": "絶縁体",
+    "reading": "ぜつえんたい",
+    "gloss": "insulator"
+  },
+  {
+    "n": 172,
+    "term": "記号",
+    "reading": "きごう",
+    "gloss": "symbol, code, sign, notation"
+  },
+  {
+    "n": 173,
+    "term": "侮る",
+    "reading": "あなどる",
+    "gloss": "to disdain, to look down on, to make light of, to hold in contempt, to scorn, to despise"
+  },
+  {
+    "n": 174,
+    "term": "礎",
+    "reading": "いしずえ、ソ",
+    "gloss": "cornerstone, foundation stone"
+  },
+  {
+    "n": 175,
+    "term": "礎を築く",
+    "reading": "いしずえをきずく",
+    "gloss": "to lay the foundation (for)"
+  },
+  {
+    "n": 176,
+    "term": "膨大",
+    "reading": "ぼうだい",
+    "gloss": "huge, vast, enormous, colossal, extensive, large; swelling, expansion"
+  },
+  {
+    "n": 177,
+    "term": "製法",
+    "reading": "せいほう",
+    "gloss": "manufacturing method, recipe, formula"
+  },
+  {
+    "n": 178,
+    "term": "高度",
+    "reading": "こうど",
+    "gloss": "altitude, height, elevation; high-degree, high-grade, advanced, sophisticated, strong"
+  },
+  {
+    "n": 179,
+    "term": "登載",
+    "reading": "とうさい",
+    "gloss": "register, record, printing"
+  },
+  {
+    "n": 180,
+    "term": "縮小",
+    "reading": "しゅくしょう",
+    "gloss": "reduction, curtailment"
+  },
+  {
+    "n": 181,
+    "term": "真空管",
+    "reading": "しんくうかん",
+    "gloss": "vacuum tube"
+  },
+  {
+    "n": 182,
+    "term": "貿易摩擦",
+    "reading": "ぼうえきまさつ",
+    "gloss": "trade friction"
+  },
+  {
+    "n": 183,
+    "term": "由々しき",
+    "reading": "ゆゆしき",
+    "gloss": "grave, serious, alarming"
+  },
+  {
+    "n": 184,
+    "term": "指数関数",
+    "reading": "しすうかんすう",
+    "gloss": "exponential function"
+  },
+  {
+    "n": 185,
+    "term": "凄まじい",
+    "reading": "すさまじい",
+    "gloss": "terrific, fierce, terrible, tremendous, dreadful, awful, amazing, absurd, cutthroat, intense"
+  },
+  {
+    "n": 186,
+    "term": "協定",
+    "reading": "きょうてい",
+    "gloss": "arrangement, pact, agreement"
+  },
+  {
+    "n": 187,
+    "term": "性能",
+    "reading": "せいのう",
+    "gloss": "ability, performance, efficiency"
+  },
+  {
+    "n": 188,
+    "term": "財閥",
+    "reading": "ざいばつ",
+    "gloss": "zaibatsu, financial conglomerate, industrial group"
+  },
+  {
+    "n": 189,
+    "term": "制圧",
+    "reading": "せいあつ",
+    "gloss": "gaining total control (of people or counties), suppression, oppression, control, mastery, ascendancy, supremacy"
+  },
+  {
+    "n": 190,
+    "term": "決裂",
+    "reading": "けつれつ",
+    "gloss": "breakdown, rupture"
+  },
+  {
+    "n": 191,
+    "term": "中枢",
+    "reading": "ちゅうすう",
+    "gloss": "centre, center, pivot, mainstay, nucleus, backbone, central figure, pillar, key man"
+  },
+  {
+    "n": 192,
+    "term": "製造工程",
+    "reading": "せいぞうこうてい",
+    "gloss": "manufacturing process"
+  },
+  {
+    "n": 193,
+    "term": "現像",
+    "reading": "げんぞう",
+    "gloss": "development (of film), photographic processing"
+  },
+  {
+    "n": 194,
+    "term": "削り",
+    "reading": "けずり",
+    "gloss": "shaving, planing, cutting; shavings, flakes"
+  },
+  {
+    "n": 195,
+    "term": "国策",
+    "reading": "こくさく",
+    "gloss": "national policy"
+  },
+  {
+    "n": 196,
+    "term": "共学",
+    "reading": "きょうがく",
+    "gloss": "coeducation"
+  },
+  {
+    "n": 197,
+    "term": "驚愕",
+    "reading": "きょうがく",
+    "gloss": "astonishment, amazement, surprise, fright, shock"
+  },
+  {
+    "n": 198,
+    "term": "湧出",
+    "reading": "ゆうしゅつ",
+    "gloss": "gushing out, welling up, springing up"
+  },
+  {
+    "n": 199,
+    "term": "放逸",
+    "reading": "ほういつ",
+    "gloss": "self-indulgence, looseness, dissoluteness"
+  },
+  {
+    "n": 200,
+    "term": "追い上げる",
+    "reading": "おいあげる",
+    "gloss": "to gain on, to put pressure on, to close in on"
+  },
+  {
+    "n": 201,
+    "term": "劣勢",
+    "reading": "れっせい",
+    "gloss": "inferiority (e.g. numerical), inferior position, disadvantage, unfavorable situation, unfavourable situation"
+  },
+  {
+    "n": 202,
+    "term": "速やか",
+    "reading": "すみやか",
+    "gloss": "quick, speedy, prompt, rapid, swift"
+  },
+  {
+    "n": 203,
+    "term": "要石",
+    "reading": "かなめいし",
+    "gloss": "keystone"
+  },
+  {
+    "n": 204,
+    "term": "牛耳る",
+    "reading": "ぎゅうじる",
+    "gloss": "to control, to take the lead in, to have under one's thumb"
+  },
+  {
+    "n": 205,
+    "term": "讃岐うどん",
+    "reading": "さぬきうどん",
+    "gloss": "Sanuki udon, thick udon from Kagawa prefecture"
+  },
+  {
+    "n": 206,
+    "term": "寄付",
+    "reading": "きふ",
+    "gloss": "contribution, donation"
+  },
+  {
+    "n": 207,
+    "term": "宛先",
+    "reading": "あてさき",
+    "gloss": "address, destination"
+  },
+  {
+    "n": 208,
+    "term": "あて先変更",
+    "reading": "あてさきへんこう",
+    "gloss": "redirection"
+  },
+  {
+    "n": 209,
+    "term": "芸術家",
+    "reading": "げいじゅつか",
+    "gloss": "artist"
+  },
+  {
+    "n": 210,
+    "term": "顔つき",
+    "reading": "かおつき",
+    "gloss": "(outward) looks, features, face, countenance, expression"
+  },
+  {
+    "n": 211,
+    "term": "争う",
+    "reading": "あらそう",
+    "gloss": "to compete, to contest, to contend; to quarrel, to argue, to dispute, to be at variance, to oppose; to deny (e.g. evidence)"
+  },
+  {
+    "n": 212,
+    "term": "競う",
+    "reading": "きそう",
+    "gloss": "to compete, to contend, to vie, to contest"
+  },
+  {
+    "n": 213,
+    "term": "素肌",
+    "reading": "すはだ",
+    "gloss": "bare (naked) body, complexion (e.g. face)"
+  },
+  {
+    "n": 214,
+    "term": "素泊り",
+    "reading": "すどまり",
+    "gloss": "staying overnight without meals"
+  },
+  {
+    "n": 215,
+    "term": "首相",
+    "reading": "しゅしょう",
+    "gloss": "Prime Minister, Chancellor (Germany, Austria, etc.), Premier"
+  },
+  {
+    "n": 216,
+    "term": "国会",
+    "reading": "こっかい",
+    "gloss": "National Diet, legislative assembly of Japan (1947-); Imperial Diet, legislative assembly of Japan (1889-1947); legislative assembly, parliament, congress"
+  },
+  {
+    "n": 217,
+    "term": "診る",
+    "reading": "みる",
+    "gloss": "to examine (medically)"
+  },
+  {
+    "n": 218,
+    "term": "回復",
+    "reading": "かいふく",
+    "gloss": "restoration, rehabilitation, recovery, return, replevin, improvement; recovery (from an illness), recuperation, convalescence"
+  },
+  {
+    "n": 219,
+    "term": "景気",
+    "reading": "けいき",
+    "gloss": "business conditions, the market, economic activity, economic climate; good (economic) times, prosperity, boom; liveliness, energy, vigour, vigor, spirit"
+  },
+  {
+    "n": 220,
+    "term": "健全",
+    "reading": "けんぜん",
+    "gloss": "healthy, sound, wholesome"
+  },
+  {
+    "n": 221,
+    "term": "双方",
+    "reading": "そうほう",
+    "gloss": "both parties, both sides"
+  },
+  {
+    "n": 222,
+    "term": "無常",
+    "reading": "むじょう",
+    "gloss": "uncertainty, transiency, impermanence, mutability"
+  },
+  {
+    "n": 223,
+    "term": "非常識",
+    "reading": "ひじょうしき",
+    "gloss": "lack of common sense, thoughtlessness, senselessness, irrationality, absurdity"
+  },
+  {
+    "n": 224,
+    "term": "風",
+    "reading": "かぜ、かざ〜、フウ、フ",
+    "gloss": "wind, air, style, manner"
+  },
+  {
+    "n": 225,
+    "term": "率",
+    "reading": "リツ、ひきいる、ソツ",
+    "gloss": "ratio, rate, proportion, %, coefficient"
+  },
+  {
+    "n": 226,
+    "term": "潔い",
+    "reading": "いさぎよい",
+    "gloss": "manly, sportsmanlike, gracious, gallant, resolute, brave; pure (heart, actions, etc.), upright, blameless; unsullied (e.g. scenery or object), pure, clean"
+  },
+  {
+    "n": 227,
+    "term": "報告",
+    "reading": "ほうこく",
+    "gloss": "report, information"
+  },
+  {
+    "n": 228,
+    "term": "盛大",
+    "reading": "せいだい",
+    "gloss": "grand, magnificent, lavish, large scale, prosperous, thriving, lively; forceful, powerful, vigorous"
+  },
+  {
+    "n": 229,
+    "term": "医療",
+    "reading": "いりょう",
+    "gloss": "medical care, medical treatment"
+  },
+  {
+    "n": 230,
+    "term": "幸運",
+    "reading": "こううん",
+    "gloss": "good luck, fortune"
+  },
+  {
+    "n": 231,
+    "term": "具体性",
+    "reading": "ぐたいせい",
+    "gloss": "concreteness, feasibility"
+  },
+  {
+    "n": 232,
+    "term": "具体的",
+    "reading": "ぐたいてき",
+    "gloss": "concrete, definite, specific, material, substantial"
+  },
+  {
+    "n": 233,
+    "term": "反面",
+    "reading": "はんめん",
+    "gloss": "on the other hand, opposite side, reverse"
+  },
+  {
+    "n": 234,
+    "term": "つべこべ",
+    "reading": null,
+    "gloss": "complaining, nitpicking"
+  },
+  {
+    "n": 235,
+    "term": "一握り",
+    "reading": "ひとにぎり",
+    "gloss": "handful; small amount, small number"
+  },
+  {
+    "n": 236,
+    "term": "言及",
+    "reading": "げんきゅう",
+    "gloss": "reference, allusion"
+  },
+  {
+    "n": 237,
+    "term": "仮に",
+    "reading": "かりに",
+    "gloss": "supposing, even if, granting that, for argument's sake; temporarily, provisionally, for the time being"
+  },
+  {
+    "n": 238,
+    "term": "話者",
+    "reading": "わしゃ",
+    "gloss": "speaker, narrator"
+  },
+  {
+    "n": 239,
+    "term": "対価",
+    "reading": "たいか",
+    "gloss": "compensation, equivalent value, consideration"
+  },
+  {
+    "n": 240,
+    "term": "習得",
+    "reading": "しゅうとく",
+    "gloss": "learning, acquisition (of a skill, knowledge, etc.)"
+  },
+  {
+    "n": 241,
+    "term": "銀髪",
+    "reading": "ぎんぱつ",
+    "gloss": "silver hair, gray hair, grey hair"
+  },
+  {
+    "n": 242,
+    "term": "視覚系",
+    "reading": "しかくけい",
+    "gloss": "visual system, ophthalmencephalon"
+  },
+  {
+    "n": 243,
+    "term": "ぎいぎい",
+    "reading": null,
+    "gloss": "creak, squeak, rasping sound"
+  },
+  {
+    "n": 244,
+    "term": "さりげない",
+    "reading": null,
+    "gloss": "nonchalant, unconcerned, in a casual manner"
+  },
+  {
+    "n": 245,
+    "term": "栞",
+    "reading": "しおり、カン",
+    "gloss": "bookmark, guidebook"
+  },
+  {
+    "n": 246,
+    "term": "しおり",
+    "reading": null,
+    "gloss": "bookmark; guidebook"
+  },
+  {
+    "n": 247,
+    "term": "がち",
+    "reading": null,
+    "gloss": "serious, diligent, honest, earnest"
+  },
+  {
+    "n": 248,
+    "term": "可決",
+    "reading": "かけつ",
+    "gloss": "approval, adoption (of a motion, bill, etc.), passage"
+  },
+  {
+    "n": 249,
+    "term": "残留",
+    "reading": "ざんりゅう",
+    "gloss": "staying behind, remaining, residual"
+  },
+  {
+    "n": 250,
+    "term": "皇族",
+    "reading": "こうぞく",
+    "gloss": "imperial family, royalty"
+  },
+  {
+    "n": 251,
+    "term": "離脱",
+    "reading": "りだつ",
+    "gloss": "withdrawal, secession, separation, breakaway"
+  },
+  {
+    "n": 252,
+    "term": "皇室",
+    "reading": "こうしつ",
+    "gloss": "Imperial household"
+  },
+  {
+    "n": 253,
+    "term": "危ぶむ",
+    "reading": "あやぶむ",
+    "gloss": "to fear, to doubt, to have misgivings about, to worry about, to be anxious about, to be apprehensive about"
+  },
+  {
+    "n": 254,
+    "term": "男系",
+    "reading": "だんけい",
+    "gloss": "male lineage"
+  },
+  {
+    "n": 255,
+    "term": "相続",
+    "reading": "そうぞく",
+    "gloss": "succession, inheritance"
+  },
+  {
+    "n": 256,
+    "term": "規定",
+    "reading": "きてい",
+    "gloss": "stipulation, prescription, provision, regulation, rule"
+  },
+  {
+    "n": 257,
+    "term": "羽目になる",
+    "reading": "はめになる",
+    "gloss": "to get stuck with (some job), to end up with (something unpleasant)"
+  },
+  {
+    "n": 258,
+    "term": "費え",
+    "reading": "ついえ",
+    "gloss": "wasteful expenses"
+  },
+  {
+    "n": 259,
+    "term": "余",
+    "reading": "ヨ、あまる",
+    "gloss": "too much, surplus, remainder; other; myself"
+  },
+  {
+    "n": 260,
+    "term": "吟味",
+    "reading": "ぎんみ",
+    "gloss": "close examination, careful selection, testing, scrutiny; examination of criminal charges; reciting and appreciating traditional poetry"
+  },
+  {
+    "n": 261,
+    "term": "割",
+    "reading": "わり、わる、さく、カツ",
+    "gloss": "proportion; comparatively; divide, cut, separate, split"
+  },
+  {
+    "n": 262,
+    "term": "逸失利益",
+    "reading": "いっしつりえき",
+    "gloss": "lost profit"
+  },
+  {
+    "n": 263,
+    "term": "採点",
+    "reading": "さいてん",
+    "gloss": "marking, grading, scoring"
+  },
+  {
+    "n": 264,
+    "term": "肌寒い",
+    "reading": "はださむい",
+    "gloss": "chilly, unpleasantly cold"
+  },
+  {
+    "n": 265,
+    "term": "鋭敏",
+    "reading": "えいびん",
+    "gloss": "sharp, keen, acute"
+  },
+  {
+    "n": 266,
+    "term": "集結",
+    "reading": "しゅうけつ",
+    "gloss": "massing (of troops), gathering"
+  },
+  {
+    "n": 267,
+    "term": "盤上",
+    "reading": "ばんじょう",
+    "gloss": "on the board (shogi, go, etc.)"
+  },
+  {
+    "n": 268,
+    "term": "秒針",
+    "reading": "びょうしん",
+    "gloss": "second hand (of clock)"
+  },
+  {
+    "n": 269,
+    "term": "制覇",
+    "reading": "せいは",
+    "gloss": "conquest, domination, mastery"
+  },
+  {
+    "n": 270,
+    "term": "盤面",
+    "reading": "ばんめん",
+    "gloss": "surface of a board or record"
+  },
+  {
+    "n": 271,
+    "term": "神童",
+    "reading": "しんどう",
+    "gloss": "prodigy, wonder child"
+  },
+  {
+    "n": 272,
+    "term": "揺さぶる",
+    "reading": "ゆさぶる",
+    "gloss": "to shake, to jolt, to rock, to swing, to sway; to shake (e.g. the political world), to disturb, to shock, to upset; to put off a batter (by varying one's type of pitch)"
+  },
+  {
+    "n": 273,
+    "term": "たぐいまれ",
+    "reading": null,
+    "gloss": "unique, rare, exceptional, unparalleled, incomparable"
+  },
+  {
+    "n": 274,
+    "term": "特訓",
+    "reading": "とっくん",
+    "gloss": "special training, intensive training, crash course"
+  },
+  {
+    "n": 275,
+    "term": "持て余す",
+    "reading": "もてあます",
+    "gloss": "to be too much for one, to find unmanageable, to be beyond one's control, to not know what to do with"
+  },
+  {
+    "n": 276,
+    "term": "検討",
+    "reading": "けんとう",
+    "gloss": "consideration, examination, investigation, study, scrutiny, discussion, analysis, review"
+  },
+  {
+    "n": 277,
+    "term": "健闘",
+    "reading": "けんとう",
+    "gloss": "fighting bravely, strenuous efforts"
+  },
+  {
+    "n": 278,
+    "term": "互角",
+    "reading": "ごかく",
+    "gloss": "equal (in ability), even, evenly matched, well-matched, on par (with)"
+  },
+  {
+    "n": 279,
+    "term": "快挙",
+    "reading": "かいきょ",
+    "gloss": "brilliant achievement, spectacular feat, splendid accomplishment, remarkable deed"
+  },
+  {
+    "n": 280,
+    "term": "そうそう",
+    "reading": null,
+    "gloss": "eminent, prominent, distinguished; ringing (of metal), resonant (of a musical instrument)"
+  },
+  {
+    "n": 281,
+    "term": "千差万別",
+    "reading": "せんさばんべつ",
+    "gloss": "an infinite variety of, multifarious, being extremely varied and wide-ranging"
+  },
+  {
+    "n": 282,
+    "term": "犯",
+    "reading": "ハン、おかす",
+    "gloss": "crime, sin, offense"
+  },
+  {
+    "n": 283,
+    "term": "生得的",
+    "reading": "せいとくてき",
+    "gloss": "innate, inherent, natural, inborn"
+  },
+  {
+    "n": 284,
+    "term": "先天的",
+    "reading": "せんてんてき",
+    "gloss": "inborn, innate, inherent, congenital, hereditary; a priori"
+  },
+  {
+    "n": 285,
+    "term": "従来",
+    "reading": "じゅうらい",
+    "gloss": "up to now, so far; traditional, conventional, usual, existing"
+  },
+  {
+    "n": 286,
+    "term": "手法",
+    "reading": "しゅほう",
+    "gloss": "technique, method"
+  },
+  {
+    "n": 287,
+    "term": "検証",
+    "reading": "けんしょう",
+    "gloss": "verification, inspection"
+  },
+  {
+    "n": 288,
+    "term": "検証試験",
+    "reading": "けんしょうしけん",
+    "gloss": "verification test"
+  },
+  {
+    "n": 289,
+    "term": "丹念",
+    "reading": "たんねん",
+    "gloss": "painstaking, careful, meticulous, scrupulous, detailed, elaborate"
+  },
+  {
+    "n": 290,
+    "term": "加勢",
+    "reading": "かせい",
+    "gloss": "assistance, backing, reinforcements"
+  },
+  {
+    "n": 291,
+    "term": "巧む",
+    "reading": "たくむ",
+    "gloss": "to devise, to plot, to plan"
+  },
+  {
+    "n": 292,
+    "term": "率先",
+    "reading": "そっせん",
+    "gloss": "taking the initiative"
+  },
+  {
+    "n": 293,
+    "term": "舵を取る",
+    "reading": "かじをとる",
+    "gloss": "to steer a ship; to manage, to take command, to take the helm"
+  },
+  {
+    "n": 294,
+    "term": "凋落",
+    "reading": "ちょうらく",
+    "gloss": "decline, fall, decay, withering"
+  },
+  {
+    "n": 295,
+    "term": "折半",
+    "reading": "せっぱん",
+    "gloss": "halving, splitting evenly, sharing equally"
+  },
+  {
+    "n": 296,
+    "term": "甚だしい",
+    "reading": "はなはだしい",
+    "gloss": "extreme, excessive, terrible, intense, severe, serious, tremendous, heavy (damage)"
+  },
+  {
+    "n": 297,
+    "term": "不況",
+    "reading": "ふきょう",
+    "gloss": "recession, depression, slump"
+  },
+  {
+    "n": 298,
+    "term": "ザーサイ",
+    "reading": null,
+    "gloss": "Szechuan pickles, Sichuan vegetables, zha cai, pickled mustard plant stem"
+  },
+  {
+    "n": 299,
+    "term": "万が一",
+    "reading": "まんがいち",
+    "gloss": "if by any chance, just in case, in the worst case, in the unlikely event that, 10000 to 1"
+  },
+  {
+    "n": 300,
+    "term": "北上",
+    "reading": "ほくじょう",
+    "gloss": "going north"
+  },
+  {
+    "n": 301,
+    "term": "自民党",
+    "reading": "じみんとう",
+    "gloss": "Liberal Democratic Party, LDP"
+  },
+  {
+    "n": 302,
+    "term": "並立",
+    "reading": "へいりつ",
+    "gloss": "standing abreast"
+  },
+  {
+    "n": 303,
+    "term": "立体的",
+    "reading": "りったいてき",
+    "gloss": "three-dimensional"
+  },
+  {
+    "n": 304,
+    "term": "訂正",
+    "reading": "ていせい",
+    "gloss": "correction, revision, amendment"
+  },
+  {
+    "n": 305,
+    "term": "審議",
+    "reading": "しんぎ",
+    "gloss": "deliberation"
+  },
+  {
+    "n": 306,
+    "term": "事前に必要",
+    "reading": "じぜんにひつよう",
+    "gloss": "prerequisite"
+  },
+  {
+    "n": 307,
+    "term": "施工",
+    "reading": "せこう",
+    "gloss": "construction, constructing, carrying out, work, formation, workmanship, execution"
+  },
+  {
+    "n": 308,
+    "term": "会見",
+    "reading": "かいけん",
+    "gloss": "interview, audience, meeting, (viewing) party"
+  },
+  {
+    "n": 309,
+    "term": "設計",
+    "reading": "せっけい",
+    "gloss": "plan, design, layout"
+  },
+  {
+    "n": 310,
+    "term": "崩落",
+    "reading": "ほうらく",
+    "gloss": "collapse, break, cave-in, crash, (market) decline"
+  },
+  {
+    "n": 311,
+    "term": "修繕費",
+    "reading": "しゅうぜんひ",
+    "gloss": "repair expense"
+  },
+  {
+    "n": 312,
+    "term": "精査",
+    "reading": "せいさ",
+    "gloss": "close investigation, careful examination, scrutiny"
+  },
+  {
+    "n": 313,
+    "term": "県議会",
+    "reading": "けんぎかい",
+    "gloss": "prefectural assembly"
+  },
+  {
+    "n": 314,
+    "term": "訴額",
+    "reading": "そがく",
+    "gloss": "amount in controversy"
+  },
+  {
+    "n": 315,
+    "term": "妥当性",
+    "reading": "だとうせい",
+    "gloss": "validity, verification, propriety"
+  },
+  {
+    "n": 316,
+    "term": "経費",
+    "reading": "けいひ",
+    "gloss": "expenses, cost, outlay"
+  },
+  {
+    "n": 317,
+    "term": "定例",
+    "reading": "ていれい",
+    "gloss": "regular, ordinary (e.g. session of parliament); established usage, precedent, regular practice"
+  },
+  {
+    "n": 318,
+    "term": "原子力発電所",
+    "reading": "げんしりょくはつでんしょ",
+    "gloss": "nuclear power plant, nuclear power station"
+  },
+  {
+    "n": 319,
+    "term": "交わす",
+    "reading": "かわす",
+    "gloss": "to exchange (messages, greetings, arguments, etc.); to intersect, to cross, to interlace; ... with one another, ... to each other"
+  },
+  {
+    "n": 320,
+    "term": "顕著",
+    "reading": "けんちょ",
+    "gloss": "remarkable, striking, obvious"
+  },
+  {
+    "n": 321,
+    "term": "空爆",
+    "reading": "くうばく",
+    "gloss": "aerial bombing"
+  },
+  {
+    "n": 322,
+    "term": "纏",
+    "reading": "まつわる、まとう、まとめる、テン",
+    "gloss": "wear, wrap, tie, follow around, collect"
+  },
+  {
+    "n": 323,
+    "term": "濁る",
+    "reading": "にごる",
+    "gloss": "to become muddy, to become cloudy, to get impure (of a liquid, gas, etc.); to become dull (of a sound, color, etc.), to become hoarse; to become impure (of a heart, society, etc.), to be corrupted, to be polluted; to become voiced, to add voiced consonant marks"
+  }
+]

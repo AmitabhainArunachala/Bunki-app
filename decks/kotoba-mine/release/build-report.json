@@ -1,0 +1,86 @@
+{
+ "m01-money": {
+  "chars": 1261,
+  "jread": 2.78,
+  "band": "中級後半",
+  "placed": 32,
+  "unplaced": []
+ },
+ "m02-hegemony": {
+  "chars": 1296,
+  "jread": 2.02,
+  "band": "上級前半",
+  "placed": 29,
+  "unplaced": []
+ },
+ "m03-fab": {
+  "chars": 1407,
+  "jread": 2.25,
+  "band": "上級前半",
+  "placed": 22,
+  "unplaced": []
+ },
+ "m04-incident": {
+  "chars": 1304,
+  "jread": 2.78,
+  "band": "中級後半",
+  "placed": 31,
+  "unplaced": []
+ },
+ "m05-politics": {
+  "chars": 1178,
+  "jread": 2.02,
+  "band": "上級前半",
+  "placed": 26,
+  "unplaced": []
+ },
+ "m06-works": {
+  "chars": 967,
+  "jread": 2.01,
+  "band": "上級前半",
+  "placed": 22,
+  "unplaced": []
+ },
+ "m07-board": {
+  "chars": 1159,
+  "jread": 2.77,
+  "band": "中級後半",
+  "placed": 38,
+  "unplaced": []
+ },
+ "m08-mind": {
+  "chars": 1392,
+  "jread": 2.39,
+  "band": "上級前半",
+  "placed": 30,
+  "unplaced": []
+ },
+ "m09-math": {
+  "chars": 1180,
+  "jread": 2.5,
+  "band": "上級前半",
+  "placed": 11,
+  "unplaced": []
+ },
+ "m10-table": {
+  "chars": 1124,
+  "jread": 3.41,
+  "band": "中級後半",
+  "placed": 31,
+  "unplaced": []
+ },
+ "m11-people": {
+  "chars": 1540,
+  "jread": 3.32,
+  "band": "中級後半",
+  "placed": 43,
+  "unplaced": []
+ },
+ "m12-kanji": {
+  "chars": 1078,
+  "jread": 3.7,
+  "band": "中級前半",
+  "placed": 8,
+  "unplaced": []
+ }
+}

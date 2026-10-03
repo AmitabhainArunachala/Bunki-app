@@ -1,0 +1,822 @@
+{
+  "id": "m05-politics",
+  "passage": {
+    "title": "議事堂の長い一日",
+    "title_en": "A Long Day at the Diet",
+    "level": "N1",
+    "text": "午前九時、国会議事堂の周辺には報道陣が詰めかけていた。この日は、衆議院本会議で重要な法案の採決が予定されていたうえ、夕方には首相の記者会見も控えていたからだ。採決されるのは、親から相続した空き家の管理を所有者に促す法案である。\n\n審議の過程では、所有者の負担が重すぎるとの指摘も出た。それでも与党と野党が修正協議で歩み寄り、正午過ぎ、法案は賛成多数で可決された。法案は参議院に送られ、今国会中に成立する見通しだ。\n\n午後の会見で、首相はまず先週発足した党の新体制について「若手を積極的に登用した」と説明した。記者の質問は、党を離脱するとみられていた議員が一転してとどまることを決めた件にも及んだ。首相は「党内で議論を尽くしてほしい」と述べるにとどめた。当の議員は会見の後、記者団に「党に残留して、内側から変えていきたい」と語った。\n\n会見では、皇室をめぐる質問も相次いだ。現行の皇室典範は、皇位を継ぐのは「皇統に属する男系の男子」に限ると定めている。さらに、女性の皇族が皇族以外の人と結婚した場合は皇族の身分を離れるという規定もある。実際、ここ数十年の間に何人もの女性皇族が結婚を機に皇籍を離れ、皇族の数は減り続けている。\n\nこうした状況から、安定的な皇位継承を危ぶむ声は以前から根強い。政府の有識者会議は二〇二一年、女性皇族が結婚後も皇族の身分を保つ案と、旧皇族の男系男子を養子に迎える案を主に示した。国会では、この二つの案が並立したまま、各党の協議が続いている。自民党を含む各党の立ち位置には微妙な違いがあり、合意への道筋はまだ見えていない。皇室の将来をどう描くかは、国のかたちにもかかわる問題だ。首相は「静かな環境の中で、丁寧に議論を進めるべきだ」と述べ、具体的な制度への言及は避けた。\n\n同じころ、北陸のある県では県議会の定例会が開かれていた。焦点は、県内にある原子力発電所の再稼働をめぐる問題だ。知事は、電力会社から安全対策工事が完了したとの報告を受けたことを明らかにした。そのうえで「県民の理解が前提だ」と繰り返した。再稼働に賛成・反対双方の議員から質問が相次ぎ、議場は夕方まで緊張に包まれた。定例会の最終日には、関連する意見書の採決も予定されている。\n\n夕方になると、ニュースの話題は天気に移った。気象庁によると、大型の台風十四号は沖縄の南の海上を北上している。週明けにも西日本に接近するおそれがあるという。当然ながら、週明けに予定されている国会の委員会の日程にも影響が出るかもしれない。\n\n夜のニュースは、中東のある国で起きた空爆により多くの市民が犠牲になったと伝えた。外務省は、現地に滞在する日本人の安全確認を急いでいる。国内の課題に追われた一日の終わりに、遠い国の出来事が重くのしかかる。議事堂の明かりは、その夜も遅くまで消えなかった。"
+  },
+  "cards": [
+    {
+      "n": 15,
+      "term": "新体制",
+      "reading": "しんたいせい",
+      "gloss": "new system; new setup; new leadership lineup",
+      "pos": "noun",
+      "register": "報道",
+      "def_ja": "組織や国などで、新しく作り直された仕組みや顔ぶれ。",
+      "sentences": [
+        {
+          "ja": "午後の会見で、首相はまず先週発足した党の新体制について「若手を積極的に登用した」と説明した。",
+          "form": "新体制",
+          "en": "At the afternoon press conference, the prime minister first explained the party's new leadership, launched last week, saying he had actively promoted younger members."
+        },
+        {
+          "ja": "四月から新体制となった営業部は、まだ少し手探りの状態だ。",
+          "form": "新体制",
+          "en": "The sales department, reorganized in April, is still finding its feet."
+        }
+      ],
+      "collocations": ["新体制が発足する", "新体制に移行する", "新体制のもとで"],
+      "confusables": [
+        {
+          "term": "身体性",
+          "note": "Homophone しんたいせい: 'embodiment, physicality' (philosophy, cognitive science). Context always decides."
+        }
+      ],
+      "note": "Everyday news word for a reshuffled lineup or structure of a party, company, team or government. Historically 新体制運動 was the 1940 movement under Prime Minister Konoe."
+    },
+    {
+      "n": 215,
+      "term": "首相",
+      "reading": "しゅしょう",
+      "gloss": "prime minister; premier; chancellor (of Germany, Austria)",
+      "pos": "noun",
+      "register": "報道",
+      "def_ja": "内閣の一番上に立ち、国の政治を率いる人。",
+      "sentences": [
+        {
+          "ja": "この日は、衆議院本会議で重要な法案の採決が予定されていたうえ、夕方には首相の記者会見も控えていたからだ。",
+          "form": "首相",
+          "en": "That was because a vote on an important bill was scheduled in the plenary session of the House of Representatives, and the prime minister's press conference was coming up in the evening."
+        },
+        {
+          "ja": "隣の国では首相が辞任し、新しい内閣が発足した。",
+          "form": "首相",
+          "en": "In the neighboring country the prime minister resigned and a new cabinet was formed."
+        }
+      ],
+      "collocations": ["首相官邸", "首相に就任する", "首相の座", "首相動静"],
+      "confusables": [
+        {
+          "term": "総理",
+          "note": "総理/総理大臣 is the formal or spoken form (official title 内閣総理大臣; in the Diet you hear 総理). 首相 is the standard newspaper word, and it is also used for foreign heads of government."
+        }
+      ],
+      "note": "Headlines prefer 首相. It is also used for the German or Austrian Chancellor (ドイツの首相)."
+    },
+    {
+      "n": 216,
+      "term": "国会",
+      "reading": "こっかい",
+      "gloss": "the National Diet (Japan's parliament); parliament, congress",
+      "pos": "noun",
+      "register": "報道・法律",
+      "def_ja": "選挙で選ばれた議員が集まり、法律や予算を決める国の機関。",
+      "sentences": [
+        {
+          "ja": "午前九時、国会議事堂の周辺には報道陣が詰めかけていた。",
+          "form": "国会",
+          "en": "At 9 a.m., reporters were crowding around the National Diet Building."
+        },
+        {
+          "ja": "「今の国会で決めるのは無理じゃないかな」と父はテレビを見ながら言った。",
+          "form": "国会",
+          "en": "\"I doubt they can settle it in this Diet session,\" my father said while watching TV."
+        }
+      ],
+      "collocations": ["国会議員", "国会を召集する", "今国会", "通常国会"],
+      "confusables": [
+        {
+          "term": "議会",
+          "note": "議会 is any assembly (prefectural, city, foreign). 国会 is the national legislature, specifically Japan's Diet when no country is named."
+        }
+      ],
+      "note": "The Diet has two houses: 衆議院 (House of Representatives) and 参議院 (House of Councillors). 今国会 (こんこっかい) means 'the current session'."
+    },
+    {
+      "n": 248,
+      "term": "可決",
+      "reading": "かけつ",
+      "gloss": "approval, passage (of a bill or motion)",
+      "pos": "noun · suru verb",
+      "register": "報道・法律",
+      "def_ja": "会議で、出された案をよいと認めて決めること。",
+      "sentences": [
+        {
+          "ja": "それでも与党と野党が修正協議で歩み寄り、正午過ぎ、法案は賛成多数で可決された。",
+          "form": "可決",
+          "en": "Even so, the ruling and opposition parties met halfway in talks on amendments, and shortly after noon the bill passed by a majority."
+        },
+        {
+          "ja": "マンションの管理組合の総会で、エレベーター修理の案が可決された。",
+          "form": "可決",
+          "en": "At the condo owners' general meeting, the proposal to repair the elevator was approved."
+        }
+      ],
+      "collocations": ["賛成多数で可決する", "法案を可決する", "可決・成立", "全会一致で可決"],
+      "confusables": [
+        {
+          "term": "成立",
+          "note": "A bill is 可決 by one house, and it becomes 成立 (enacted) once both houses have passed it."
+        },
+        {
+          "term": "否決",
+          "note": "Opposite of 可決: the motion is voted down. 採決 is the act of voting."
+        }
+      ],
+      "note": "Typically passive in news: 可決された. The headline formula is 〜法が可決・成立."
+    },
+    {
+      "n": 249,
+      "term": "残留",
+      "reading": "ざんりゅう",
+      "gloss": "staying on, remaining; residue (of chemicals)",
+      "pos": "noun · suru verb",
+      "register": "報道・専門",
+      "def_ja": "ほかの人やものが去ったあとも、その場や組織にとどまること。",
+      "sentences": [
+        {
+          "ja": "当の議員は会見の後、記者団に「党に残留して、内側から変えていきたい」と語った。",
+          "form": "残留",
+          "en": "After the press conference, the lawmaker in question told reporters, \"I'll stay in the party and try to change it from within.\""
+        },
+        {
+          "ja": "J1残留をかけた最終戦に、サポーターが大勢詰めかけた。",
+          "form": "残留",
+          "en": "Fans packed the stadium for the final match, with the team's place in J1 on the line."
+        },
+        {
+          "ja": "野菜に残留する農薬の基準が見直された。",
+          "form": "残留",
+          "en": "The limits on pesticide residues in vegetables were revised."
+        }
+      ],
+      "collocations": ["党に残留する", "J1残留", "残留農薬", "残留を決める"],
+      "confusables": [
+        {
+          "term": "在留",
+          "note": "在留 (ざいりゅう) means residing abroad or in Japan as a foreigner (在留資格, 在留外国人). 残留 means staying behind when others leave."
+        },
+        {
+          "term": "離脱",
+          "note": "Opposite in party or league contexts: 離脱 means leaving, 残留 means staying."
+        }
+      ],
+      "note": "Used in sport for avoiding relegation (残留争い), in politics for staying in a party or bloc, and in science for residues (残留放射能)."
+    },
+    {
+      "n": 250,
+      "term": "皇族",
+      "reading": "こうぞく",
+      "gloss": "member(s) of the imperial family",
+      "pos": "noun",
+      "register": "報道",
+      "def_ja": "天皇の一族として、皇室に属する人々。",
+      "sentences": [
+        {
+          "ja": "実際、ここ数十年の間に何人もの女性皇族が結婚を機に皇籍を離れ、皇族の数は減り続けている。",
+          "form": "皇族",
+          "en": "In fact, several female members of the imperial family have left it on marrying over recent decades, and the number of imperial family members keeps falling."
+        },
+        {
+          "ja": "皇族の方々が被災地を訪れ、住民を励まされた。",
+          "form": "皇族",
+          "en": "Members of the imperial family visited the disaster area and encouraged the residents."
+        }
+      ],
+      "collocations": ["女性皇族", "皇族の身分", "皇族数", "皇族方"],
+      "confusables": [
+        {
+          "term": "皇室",
+          "note": "皇室 is the imperial house as an institution, including the Emperor. 皇族 are its members; under the Imperial House Law the Emperor himself is not counted as a 皇族."
+        }
+      ],
+      "note": "News speaks about the imperial family in honorific language (励まされた, お出ましになる)."
+    },
+    {
+      "n": 251,
+      "term": "離脱",
+      "reading": "りだつ",
+      "gloss": "leaving, withdrawal, breakaway (from a group or alliance)",
+      "pos": "noun · suru verb",
+      "register": "報道",
+      "def_ja": "それまで入っていた組織や集まりから抜けること。",
+      "sentences": [
+        {
+          "ja": "記者の質問は、党を離脱するとみられていた議員が一転してとどまることを決めた件にも及んだ。",
+          "form": "離脱",
+          "en": "Reporters' questions also touched on the lawmaker who had been expected to leave the party but suddenly decided to stay."
+        },
+        {
+          "ja": "イギリスのEU離脱は、世界経済にも大きな影響を与えた。",
+          "form": "離脱",
+          "en": "Britain's exit from the EU had a big impact on the global economy as well."
+        }
+      ],
+      "collocations": ["党を離脱する", "EU離脱", "皇籍離脱", "戦線離脱"],
+      "confusables": [
+        {
+          "term": "脱退",
+          "note": "脱退 is formally quitting an organization or treaty you belonged to. 離脱 is broader: also breaking away from a front line (戦線離脱) or a course, and medical 離脱症状 (withdrawal symptoms)."
+        }
+      ],
+      "note": "Brexit = 英国のEU離脱. A female imperial family member leaving the family on marriage is 皇籍離脱."
+    },
+    {
+      "n": 252,
+      "term": "皇室",
+      "reading": "こうしつ",
+      "gloss": "the Imperial Household; the imperial family (as an institution)",
+      "pos": "noun",
+      "register": "報道",
+      "def_ja": "天皇とその一族をまとめていう言葉。",
+      "sentences": [
+        {
+          "ja": "皇室の将来をどう描くかは、国のかたちにもかかわる問題だ。",
+          "form": "皇室",
+          "en": "How to envision the future of the imperial family is a question that bears on the very shape of the nation."
+        },
+        {
+          "ja": "皇室に関するニュースは、海外でも関心を集めることが多い。",
+          "form": "皇室",
+          "en": "News about the imperial family often draws interest abroad as well."
+        }
+      ],
+      "collocations": ["皇室典範", "皇室行事", "皇室の伝統", "皇室外交"],
+      "confusables": [
+        {
+          "term": "皇族",
+          "note": "皇族 are the individual members; 皇室 is the house as a whole."
+        },
+        {
+          "term": "王室",
+          "note": "王室 is used for foreign royal families (イギリス王室). 皇室 is used for Japan's imperial house."
+        }
+      ],
+      "note": "皇室典範 (the Imperial House Law, 1947) governs succession and membership."
+    },
+    {
+      "n": 253,
+      "term": "危ぶむ",
+      "reading": "あやぶむ",
+      "gloss": "to fear for; to have misgivings about (whether something will happen)",
+      "pos": "godan verb (tr.)",
+      "register": "書き言葉・報道",
+      "def_ja": "うまくいかないのではないかと心配する。",
+      "sentences": [
+        {
+          "ja": "こうした状況から、安定的な皇位継承を危ぶむ声は以前から根強い。",
+          "form": "危ぶむ",
+          "en": "Given this situation, concern over whether a stable imperial succession can be secured has long been strong."
+        },
+        {
+          "ja": "雨が続き、明日の運動会の開催が危ぶまれている。",
+          "form": "危ぶまれ",
+          "en": "With the rain continuing, people fear tomorrow's sports day may not go ahead."
+        }
+      ],
+      "collocations": ["〜を危ぶむ声", "開催が危ぶまれる", "存続が危ぶまれる", "先行きを危ぶむ"],
+      "confusables": [
+        {
+          "term": "危うい",
+          "note": "危うい is an adjective (dangerous, precarious). 危ぶむ is the verb: to worry that something is at risk."
+        },
+        {
+          "term": "案じる",
+          "note": "案じる is to worry about someone's welfare (身を案じる). 危ぶむ doubts whether something will succeed or survive."
+        }
+      ],
+      "note": "Very common in the passive 危ぶまれる ('is in doubt'). Rare in casual speech; people say 心配だ instead."
+    },
+    {
+      "n": 254,
+      "term": "男系",
+      "reading": "だんけい",
+      "gloss": "male line (descent traced through fathers)",
+      "pos": "noun",
+      "register": "報道・専門",
+      "def_ja": "父から子へと、父方の血筋をたどって続く家系。",
+      "sentences": [
+        {
+          "ja": "現行の皇室典範は、皇位を継ぐのは「皇統に属する男系の男子」に限ると定めている。",
+          "form": "男系",
+          "en": "The current Imperial House Law limits succession to the throne to 'males in the male line belonging to the imperial lineage'."
+        },
+        {
+          "ja": "その老舗は、代々男系で家業を受け継いできた。",
+          "form": "男系",
+          "en": "That long-established shop has been handed down through the male line for generations."
+        }
+      ],
+      "collocations": ["男系男子", "男系継承", "男系の血筋"],
+      "confusables": [
+        {
+          "term": "女系",
+          "note": "女系 is descent traced through the mother. A 女性天皇 (female emperor) is not the same as a 女系天皇: all eight reigning empresses in history belonged to the male line."
+        },
+        {
+          "term": "男性",
+          "note": "男系 is about lineage, not the person's sex. 男系の男子 means a man whose father's line goes back to the imperial line."
+        }
+      ],
+      "note": "Key term in the succession debate. Keep 男系/女系 (lineage) separate from 男性/女性 (sex)."
+    },
+    {
+      "n": 255,
+      "term": "相続",
+      "reading": "そうぞく",
+      "gloss": "inheritance (of property or rights)",
+      "pos": "noun · suru verb",
+      "register": "法律・日常",
+      "def_ja": "亡くなった人の財産や権利を、家族などが受け継ぐこと。",
+      "sentences": [
+        {
+          "ja": "採決されるのは、親から相続した空き家の管理を所有者に促す法案である。",
+          "form": "相続",
+          "en": "The bill being voted on urges owners to look after empty houses they have inherited from their parents."
+        },
+        {
+          "ja": "「祖母の家、誰が相続するかで親戚がもめてるらしいよ」",
+          "form": "相続",
+          "en": "\"Apparently the relatives are fighting over who inherits Grandma's house.\""
+        }
+      ],
+      "collocations": ["遺産を相続する", "相続税", "相続人", "相続放棄"],
+      "confusables": [
+        {
+          "term": "継承",
+          "note": "継承 is succession to a title, position or tradition. The throne is 皇位継承, never 相続."
+        }
+      ],
+      "note": "Source gloss lists 'succession', but in modern Japanese 相続 is almost always legal inheritance of property. For succession to a position, use 継承."
+    },
+    {
+      "n": 256,
+      "term": "規定",
+      "reading": "きてい",
+      "gloss": "provision, stipulation (in a law or rule); to stipulate",
+      "pos": "noun · suru verb",
+      "register": "法律・書き言葉",
+      "def_ja": "決まりとして、内容をはっきり定めること。また、その定め。",
+      "sentences": [
+        {
+          "ja": "さらに、女性の皇族が皇族以外の人と結婚した場合は皇族の身分を離れるという規定もある。",
+          "form": "規定",
+          "en": "There is also a provision that a female member of the imperial family who marries someone outside it leaves imperial status."
+        },
+        {
+          "ja": "規定の時間を過ぎたので、受付はもう締め切られていた。",
+          "form": "規定",
+          "en": "The set time had passed, so registration was already closed."
+        }
+      ],
+      "collocations": ["規定に従う", "法律で規定する", "規定違反", "規定の料金"],
+      "confusables": [
+        {
+          "term": "規程",
+          "note": "Same reading. 規程 is an organization's set of internal rules as a whole (就業規程). 規定 is an individual provision, or the act of stipulating."
+        },
+        {
+          "term": "既定",
+          "note": "既定 (きてい) means 'already decided' (既定路線, 既定の方針)."
+        }
+      ],
+      "note": "規定の〜 also means 'the prescribed/standard ~' (規定の用紙). Three homophones (規定/規程/既定) are worth keeping apart."
+    },
+    {
+      "n": 301,
+      "term": "自民党",
+      "reading": "じみんとう",
+      "gloss": "Liberal Democratic Party (LDP), Japan",
+      "pos": "noun (proper noun)",
+      "register": "報道",
+      "def_ja": "一九五五年にできた日本の政党、自由民主党を短くした呼び名。",
+      "sentences": [
+        {
+          "ja": "自民党を含む各党の立ち位置には微妙な違いがあり、合意への道筋はまだ見えていない。",
+          "form": "自民党",
+          "en": "The positions of the parties, the LDP included, differ in subtle ways, and there is still no clear path to agreement."
+        },
+        {
+          "ja": "祖父は若いころから、ずっと自民党に投票してきたそうだ。",
+          "form": "自民党",
+          "en": "I hear my grandfather has voted LDP ever since he was young."
+        }
+      ],
+      "collocations": ["自民党総裁", "自民党政権", "自民党内"],
+      "confusables": [
+        {
+          "term": "民主党",
+          "note": "民主党 was a separate party (1996–2016) that held power from 2009 to 2012. Don't mix it up with the 自由民主党 (LDP)."
+        }
+      ],
+      "note": "Short for 自由民主党, formed in 1955. Its leader is the 総裁 (president), not 党首."
+    },
+    {
+      "n": 302,
+      "term": "並立",
+      "reading": "へいりつ",
+      "gloss": "coexistence side by side; standing in parallel",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "二つ以上のものが、同じ立場で並んで存在すること。",
+      "sentences": [
+        {
+          "ja": "国会では、この二つの案が並立したまま、各党の協議が続いている。",
+          "form": "並立",
+          "en": "In the Diet, the two proposals still stand side by side, and talks among the parties continue."
+        },
+        {
+          "ja": "衆議院の選挙には、小選挙区比例代表並立制が採用されている。",
+          "form": "並立",
+          "en": "House of Representatives elections use a parallel system that combines single-seat districts and proportional representation."
+        }
+      ],
+      "collocations": ["二案が並立する", "並立制", "小選挙区比例代表並立制"],
+      "confusables": [
+        {
+          "term": "両立",
+          "note": "両立 is managing two things at once (仕事と育児の両立). 並立 is two things existing side by side, often as competing alternatives."
+        }
+      ],
+      "note": "Source gloss 'standing abreast' is literal. In practice the word means coexistence or parallel alternatives, and it is best known from the electoral-system name 並立制 (in place since the 1994 reform)."
+    },
+    {
+      "n": 305,
+      "term": "審議",
+      "reading": "しんぎ",
+      "gloss": "deliberation (of a bill or proposal by a formal body)",
+      "pos": "noun · suru verb",
+      "register": "報道・法律",
+      "def_ja": "会議で案の中身をくわしく話し合い、よいかどうかを考えること。",
+      "sentences": [
+        {
+          "ja": "審議の過程では、所有者の負担が重すぎるとの指摘も出た。",
+          "form": "審議",
+          "en": "During the deliberations, some pointed out that the burden on owners was too heavy."
+        },
+        {
+          "ja": "この件は、来週の委員会で改めて審議される予定です。",
+          "form": "審議",
+          "en": "This matter is scheduled to be deliberated again at next week's committee meeting."
+        }
+      ],
+      "collocations": ["審議入り", "審議を尽くす", "審議会", "慎重審議"],
+      "confusables": [
+        {
+          "term": "検討",
+          "note": "検討 is examining or considering something in general. 審議 is formal deliberation by a body such as the Diet or a council."
+        },
+        {
+          "term": "審査",
+          "note": "審査 is screening or judging (入学審査). 審議 is discussion leading to a decision."
+        }
+      ],
+      "note": "審議会 = government advisory council. 審議拒否 = the opposition boycotting deliberations."
+    },
+    {
+      "n": 308,
+      "term": "会見",
+      "reading": "かいけん",
+      "gloss": "press conference; formal meeting, audience",
+      "pos": "noun · suru verb",
+      "register": "報道",
+      "def_ja": "決まった場で人と会うこと。特に、記者に向けて話す場。",
+      "sentences": [
+        {
+          "ja": "会見では、皇室をめぐる質問も相次いだ。",
+          "form": "会見",
+          "en": "There was also a string of questions about the imperial family at the press conference."
+        },
+        {
+          "ja": "優勝した選手は、試合後の会見で涙を見せた。",
+          "form": "会見",
+          "en": "The winner was in tears at the post-match press conference."
+        }
+      ],
+      "collocations": ["記者会見", "会見を開く", "定例会見", "共同会見"],
+      "confusables": [
+        {
+          "term": "会談",
+          "note": "会談 is talks between leaders or officials. 会見 is mainly facing the press, or a formal audience."
+        },
+        {
+          "term": "面会",
+          "note": "面会 is visiting or meeting someone (in hospital, prison or an office)."
+        }
+      ],
+      "note": "On its own in news, 会見 almost always means 記者会見 (press conference)."
+    },
+    {
+      "n": 313,
+      "term": "県議会",
+      "reading": "けんぎかい",
+      "gloss": "prefectural assembly",
+      "pos": "noun",
+      "register": "報道",
+      "def_ja": "県の予算や条例を決める、県民が選んだ議員の集まり。",
+      "sentences": [
+        {
+          "ja": "同じころ、北陸のある県では県議会の定例会が開かれていた。",
+          "form": "県議会",
+          "en": "Around the same time, a prefecture in the Hokuriku region was holding the regular session of its prefectural assembly."
+        },
+        {
+          "ja": "「うちのおじさん、今度の県議会選挙に出るんだって」",
+          "form": "県議会",
+          "en": "\"Apparently my uncle is running in the next prefectural assembly election.\""
+        }
+      ],
+      "collocations": ["県議会議員", "県議会選挙", "県議会で可決する"],
+      "confusables": [
+        {
+          "term": "都議会・道議会・府議会",
+          "note": "Tokyo, Hokkaido, Osaka and Kyoto use 都議会, 道議会 and 府議会. The other 43 prefectures use 県議会."
+        },
+        {
+          "term": "市議会",
+          "note": "市議会 is the city council."
+        }
+      ],
+      "note": "Members are colloquially 県議 (けんぎ)."
+    },
+    {
+      "n": 317,
+      "term": "定例",
+      "reading": "ていれい",
+      "gloss": "regular, routine (meeting or session held on a fixed schedule)",
+      "pos": "noun",
+      "register": "報道・書き言葉",
+      "def_ja": "いつも決まった時期に行うことになっているもの。",
+      "sentences": [
+        {
+          "ja": "定例会の最終日には、関連する意見書の採決も予定されている。",
+          "form": "定例",
+          "en": "A vote on a related written opinion is also scheduled for the last day of the regular session."
+        },
+        {
+          "ja": "毎週月曜の朝は、部署の定例ミーティングがある。",
+          "form": "定例",
+          "en": "Every Monday morning there is the department's regular meeting."
+        }
+      ],
+      "collocations": ["定例会", "定例会見", "定例会議", "定例化する"],
+      "confusables": [
+        {
+          "term": "恒例",
+          "note": "恒例 is a custom or annual tradition (毎年恒例の花火大会). 定例 is a meeting held on a fixed schedule."
+        },
+        {
+          "term": "臨時",
+          "note": "Opposite: 定例会 is a regular session, 臨時会 an extraordinary one."
+        }
+      ],
+      "note": "Local assemblies hold 定例会 (usually four a year). The national Diet's equivalent is 通常国会."
+    },
+    {
+      "n": 221,
+      "term": "双方",
+      "reading": "そうほう",
+      "gloss": "both sides; both parties",
+      "pos": "noun",
+      "register": "書き言葉・報道",
+      "def_ja": "向かい合っている二つの側の、どちらも。",
+      "sentences": [
+        {
+          "ja": "再稼働に賛成・反対双方の議員から質問が相次ぎ、議場は夕方まで緊張に包まれた。",
+          "form": "双方",
+          "en": "Questions came one after another from members both for and against the restart, and the chamber stayed tense until evening."
+        },
+        {
+          "ja": "事故の原因については、双方の言い分が食い違っている。",
+          "form": "双方",
+          "en": "On the cause of the accident, the two sides' accounts contradict each other."
+        }
+      ],
+      "collocations": ["双方の主張", "双方が合意する", "双方向"],
+      "confusables": [
+        {
+          "term": "両方",
+          "note": "両方 is everyday 'both' for any two things (両方ほしい). 双方 is for two parties facing each other in talks, disputes or trade."
+        }
+      ],
+      "note": "Formal. In speech 両方 or お互い is more common."
+    },
+    {
+      "n": 73,
+      "term": "当然ながら",
+      "reading": "とうぜんながら",
+      "gloss": "naturally, of course, as one would expect",
+      "pos": "expression",
+      "register": "書き言葉",
+      "def_ja": "言うまでもなく、そうなるのが当たり前だが。",
+      "sentences": [
+        {
+          "ja": "当然ながら、週明けに予定されている国会の委員会の日程にも影響が出るかもしれない。",
+          "form": "当然ながら",
+          "en": "Naturally, it may also affect the schedule of the Diet committee meetings planned for early next week."
+        },
+        {
+          "ja": "当然ながら、練習しなければ上手にはならない。",
+          "form": "当然ながら",
+          "en": "Needless to say, you won't get better without practice."
+        }
+      ],
+      "collocations": ["当然ながら〜", "当然のことながら"],
+      "confusables": [
+        {
+          "term": "もちろん",
+          "note": "もちろん is neutral and very common in speech. 当然ながら is more written and stresses that the result follows logically."
+        }
+      ],
+      "note": "ながら here means 'although/while' (as in 残念ながら). The longer form 当然のことながら is also common in writing."
+    },
+    {
+      "n": 236,
+      "term": "言及",
+      "reading": "げんきゅう",
+      "gloss": "mention, reference (to a topic)",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・報道",
+      "def_ja": "話や文章の中で、あることに触れること。",
+      "sentences": [
+        {
+          "ja": "首相は「静かな環境の中で、丁寧に議論を進めるべきだ」と述べ、具体的な制度への言及は避けた。",
+          "form": "言及",
+          "en": "The prime minister said the discussion 'should proceed carefully in a calm environment', and avoided referring to any specific system."
+        },
+        {
+          "ja": "先生は授業で、この小説の結末にも少しだけ言及した。",
+          "form": "言及",
+          "en": "In class, the teacher briefly mentioned the novel's ending too."
+        }
+      ],
+      "collocations": ["〜に言及する", "言及を避ける", "直接の言及はない"],
+      "confusables": [
+        {
+          "term": "触れる",
+          "note": "触れる is the everyday way to say 'touch on' a topic. 言及 is the formal noun, typical of news and academic writing."
+        }
+      ],
+      "note": "Typical news pattern: 〜への言及は避けた ('declined to comment on ~')."
+    },
+    {
+      "n": 227,
+      "term": "報告",
+      "reading": "ほうこく",
+      "gloss": "report; informing someone (of results or news)",
+      "pos": "noun · suru verb",
+      "register": "日常・報道",
+      "def_ja": "起きたことや調べたことを、関係する人に知らせること。",
+      "sentences": [
+        {
+          "ja": "知事は、電力会社から安全対策工事が完了したとの報告を受けたことを明らかにした。",
+          "form": "報告",
+          "en": "The governor revealed that the power company had reported that the safety upgrade work was complete."
+        },
+        {
+          "ja": "「実は来月結婚することになりました」と、友人から報告があった。",
+          "form": "報告",
+          "en": "A friend let me know, 'Actually, I'm getting married next month.'"
+        }
+      ],
+      "collocations": ["報告を受ける", "報告書", "結果を報告する", "中間報告"],
+      "confusables": [
+        {
+          "term": "報道",
+          "note": "報道 is news coverage by the media. 報告 is informing the people concerned (a boss, an authority, friends)."
+        },
+        {
+          "term": "連絡",
+          "note": "連絡 is getting in touch or passing on information. 報告 reports results or what happened."
+        }
+      ],
+      "note": "Part of the workplace mantra 報連相 (報告・連絡・相談). Announcing personal news (marriage, a pass) is also ご報告."
+    },
+    {
+      "n": 321,
+      "term": "空爆",
+      "reading": "くうばく",
+      "gloss": "aerial bombing, airstrike",
+      "pos": "noun · suru verb",
+      "register": "報道",
+      "def_ja": "飛行機などから爆弾を落として、空から攻撃すること。",
+      "sentences": [
+        {
+          "ja": "夜のニュースは、中東のある国で起きた空爆により多くの市民が犠牲になったと伝えた。",
+          "form": "空爆",
+          "en": "The evening news reported that many civilians had been killed in an airstrike in a country in the Middle East."
+        },
+        {
+          "ja": "空爆で家を失った人々が、国境近くの避難所に身を寄せている。",
+          "form": "空爆",
+          "en": "People who lost their homes in the airstrikes are sheltering near the border."
+        }
+      ],
+      "collocations": ["空爆を行う", "空爆を受ける", "無差別空爆"],
+      "confusables": [
+        {
+          "term": "空襲",
+          "note": "空襲 is 'air raid', usually seen from the side being attacked and tied to WWII (東京大空襲). 空爆 is the neutral current-news word."
+        },
+        {
+          "term": "爆撃",
+          "note": "爆撃 means bombing in general. 空爆 specifies that it comes from the air."
+        }
+      ],
+      "note": "Matter-of-fact news vocabulary. 空爆 is also the word for drone strikes (ドローンによる空爆)."
+    },
+    {
+      "n": 318,
+      "term": "原子力発電所",
+      "reading": "げんしりょくはつでんしょ",
+      "gloss": "nuclear power plant",
+      "pos": "noun",
+      "register": "報道・専門",
+      "def_ja": "核分裂で生まれる熱を使って電気を作る施設。",
+      "sentences": [
+        {
+          "ja": "焦点は、県内にある原子力発電所の再稼働をめぐる問題だ。",
+          "form": "原子力発電所",
+          "en": "The focus is the question of restarting the nuclear power plant in the prefecture."
+        },
+        {
+          "ja": "海沿いの原子力発電所では、毎年定期検査が行われている。",
+          "form": "原子力発電所",
+          "en": "Regular inspections are carried out every year at the seaside nuclear power plant."
+        }
+      ],
+      "collocations": ["原発", "原発の再稼働", "原子力発電所の廃炉"],
+      "confusables": [
+        {
+          "term": "火力発電所",
+          "note": "火力発電所 is a thermal (fossil-fuel) power plant. 水力 means hydro, 風力 wind."
+        }
+      ],
+      "note": "Almost always shortened to 原発 in speech and headlines. 発電所 is read はつでんしょ, though はつでんじょ is also widely heard."
+    },
+    {
+      "n": 300,
+      "term": "北上",
+      "reading": "ほくじょう",
+      "gloss": "moving north, heading north",
+      "pos": "noun · suru verb",
+      "register": "報道",
+      "def_ja": "北の方角へ向かって進むこと。",
+      "sentences": [
+        {
+          "ja": "気象庁によると、大型の台風十四号は沖縄の南の海上を北上している。",
+          "form": "北上",
+          "en": "According to the Japan Meteorological Agency, the large Typhoon No. 14 is moving north over the sea south of Okinawa."
+        },
+        {
+          "ja": "桜前線は、三月下旬から少しずつ北上していく。",
+          "form": "北上",
+          "en": "The cherry-blossom front gradually moves north from late March."
+        }
+      ],
+      "collocations": ["台風が北上する", "北上を続ける", "桜前線の北上"],
+      "confusables": [
+        {
+          "term": "北上（きたかみ）",
+          "note": "Same kanji, read きたかみ: a city and river in Iwate (北上川)."
+        },
+        {
+          "term": "南下",
+          "note": "Opposite: moving south (南下する)."
+        }
+      ],
+      "note": "Standard weather-report verb (北上する). Also used for travel or migration northward."
+    },
+    {
+      "n": 68,
+      "term": "立ち位置",
+      "reading": "たちいち",
+      "gloss": "position, role relative to others; (lit.) where one stands",
+      "pos": "noun",
+      "register": "日常・報道",
+      "def_ja": "その人や組織が、周りとの関係の中でしめる場所や役割。",
+      "sentences": [
+        {
+          "ja": "自民党を含む各党の立ち位置には微妙な違いがあり、合意への道筋はまだ見えていない。",
+          "form": "立ち位置",
+          "en": "The positions of the parties, the LDP included, differ in subtle ways, and there is still no clear path to agreement."
+        },
+        {
+          "ja": "舞台の上で、自分の立ち位置を間違えないように床に印をつけた。",
+          "form": "立ち位置",
+          "en": "I put a mark on the stage floor so I wouldn't stand in the wrong place."
+        }
+      ],
+      "collocations": ["立ち位置を確認する", "自分の立ち位置", "微妙な立ち位置"],
+      "confusables": [
+        {
+          "term": "立場",
+          "note": "立場 is a formal standpoint or position, often carrying responsibility (立場上). 立ち位置 is more casual and relational: where you fit compared with others."
+        }
+      ],
+      "note": "Originally a stage or TV term for an actor's mark. The figurative sense (one's role in a group) is now very common in conversation and commentary."
+    }
+  ]
+}
