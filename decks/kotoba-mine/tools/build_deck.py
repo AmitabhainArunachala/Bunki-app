@@ -199,6 +199,7 @@ def build_corridor(mods: list[dict]) -> dict:
     import build_articles as ba  # noqa: E402
     import build_corridor as bc  # noqa: E402
     from corpus.grading._mecab import get_tagger  # noqa: E402
+    from reading_facets import attach_reading_facets  # noqa: E402
 
     tagger = get_tagger()
     jlpt_maps = ba.load_jlpt_lexicon()
@@ -260,6 +261,7 @@ def build_corridor(mods: list[dict]) -> dict:
         print(f"  {aid:<34} {len(text):>5}字  jread={jr['score']:.2f} ({jr['band']})  "
               f"cloze-anchored {len(tok_index)}/{len(m['cards'])}"
               + (f"  unplaced: {', '.join(unplaced)}" if unplaced else ""))
+    attach_reading_facets({"articles": [r for r in rows if r["id"].startswith(ARTICLE_PREFIX)]}, ARTICLES)
     receipts_path = ARTICLES / "title-receipts.json"
     receipts = json.loads(receipts_path.read_text("utf-8"))
     authored = receipts.setdefault("authored", {})

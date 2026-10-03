@@ -13379,17 +13379,27 @@ function deckWordNode(deck, mod, card) {
   return node;
 }
 
+/** A card whose entry only the dictionary can name: a kana reading the core record does not give. */
+function deckCardNeedsIndex(card) {
+  const core = D.dict[card.w];
+  return /^[ぁ-ゖァ-ヺー]+$/u.test(card.r) && (!core || kanaReadingKey(core.r) !== kanaReadingKey(card.r));
+}
+
+/** The learner already holds an entry card for this spelling that only the module's rows can
+ * match to the bundled card (a word saved from the reader). */
+function deckCardAwaitsIndex(card, node, record = S) {
+  return deckCardNeedsIndex(card) && !node.seq && nonEmptyString(record.deepWords?.[card.w]?.seq) &&
+    !deckSavedSnapshot(node, record);
+}
+
 const deckModuleLoading = new Map();
 const deckModuleReady = new Set();
+const deckModuleDegraded = new Set();
 function prepareDeckModule(deck, mod) {
   const key = `${deck.deckId}:${mod.id}`;
   if (deckModuleReady.has(key)) return Promise.resolve();
   if (deckModuleLoading.has(key)) return deckModuleLoading.get(key);
-  const pending = Promise.all(mod.cards.filter((card) => {
-    const simple = /^[ぁ-ゖァ-ヺー]+$/u.test(card.r);
-    const core = D.dict[card.w];
-    return simple && (!core || kanaReadingKey(core.r) !== kanaReadingKey(card.r));
-  }).map((card) => ensureDictionaryRowsForForm(card.w)))
+  const pending = Promise.all(mod.cards.filter(deckCardNeedsIndex).map((card) => ensureDictionaryRowsForForm(card.w)))
     .then(() => { deckModuleReady.add(key); })
     .finally(() => { deckModuleLoading.delete(key); });
   deckModuleLoading.set(key, pending);
@@ -13434,7 +13444,11 @@ function renderDecks(main) {
       ),
     );
     for (const m of deck.modules) {
-      const have = m.cards.filter((c) => wordCaptureState(deckWordNode(deck, m, c)) === 'taken').length;
+      const nodes = m.cards.map((c) => deckWordNode(deck, m, c));
+      if (!deckModuleReady.has(`${deck.deckId}:${m.id}`) && m.cards.some((c, i) => deckCardAwaitsIndex(c, nodes[i]))) {
+        prepareDeckModule(deck, m).then(() => { if (S.view === 'decks') render(); }, () => {});
+      }
+      const have = nodes.filter((node) => wordCaptureState(node) === 'taken').length;
       const row = el('button', 'entry-row vocabulary-module-row');
       row.type = 'button';
       row.dataset.deckModule = m.id;
@@ -13456,15 +13470,20 @@ function renderDecks(main) {
   }
   const moduleKey = `${deck.deckId}:${mod.id}`;
   if (!deckModuleReady.has(moduleKey)) {
-    main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+    const degraded = deckModuleDegraded.has(moduleKey);
     prepareDeckModule(deck, mod).then(() => {
+      deckModuleDegraded.delete(moduleKey);
       if (S.view === 'decks' && S.deckModule === mod.id) render();
     }, () => {
+      if (degraded) return;
       // Bundled answers remain usable offline when the optional index is unavailable.
-      deckModuleReady.add(moduleKey);
+      deckModuleDegraded.add(moduleKey);
       if (S.view === 'decks' && S.deckModule === mod.id) render();
     });
-    return;
+    if (!degraded) {
+      main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+      return;
+    }
   }
   const owner = `deck:${moduleKey}`;
   const nodeFor = (card) => deckWordNode(deck, mod, card);
@@ -28263,7 +28282,7 @@ function render() {
   // for a same-view re-render of either reading surface — every view CHANGE
   // keeps its existing behaviour (callers set their own scroll, and cards
   // like review want the top of each new face).
-  const restoreY = lastRenderedView === S.view && ['reader', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'].includes(S.view) ? window.scrollY : null;
+  const restoreY = lastRenderedView === S.view && ['reader', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader', 'contextdeck'].includes(S.view) ? window.scrollY : null;
   // The same rebuild that clamps the scroll also throws focus back to
   // <body>, so a keyboard walker lost their place on EVERY state-changing
   // press — a dial, a grade, a capture (E3 round-A, a11y lens). Controls

@@ -50,10 +50,15 @@ const MIME = {
   '.woff2': 'font/woff2',
 };
 
-function startServer(rootDir = CORRIDOR_DIR) {
+function startServer(rootDir = CORRIDOR_DIR, refuse = () => false) {
   const server = createServer((request, response) => {
     const path = decodeURIComponent((request.url ?? '/').split('?')[0]);
     const rel = path === '/' ? 'index.html' : path.replace(/^\/+/, '');
+    if (refuse(rel)) {
+      response.writeHead(503, { 'cache-control': 'no-store', 'content-type': 'text/plain' });
+      response.end('unavailable');
+      return;
+    }
     const file = resolve(rootDir, rel);
     if (!file.startsWith(rootDir) || !existsSync(file)) {
       response.writeHead(404, { 'content-type': 'text/plain' });
@@ -145,14 +150,16 @@ async function openModule(page, mod) {
   await page.locator('#deck-enroll-all').waitFor({ timeout: 8000 });
 }
 
-async function seedLegacyRow(context, row) {
-  await context.addInitScript((row) => {
+async function seedRecord(context, record) {
+  await context.addInitScript((record) => {
     if (!localStorage.getItem('__deck_seeded')) {
-      localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [row], srs: {} }));
+      localStorage.setItem('kairo-corridor-v1', JSON.stringify(record));
       localStorage.setItem('__deck_seeded', '1');
     }
-  }, row);
+  }, record);
 }
+
+const seedLegacyRow = (context, row) => seedRecord(context, { v: 1, taken: [row], srs: {} });
 
 async function screenshot(page, name) {
   await page.evaluate(async () => {
@@ -250,6 +257,11 @@ async function verifyResponsiveScreens(browser, base, deck) {
       await page.locator('.cd-room').getByRole('button', { name: '目次', exact: true }).click();
       await page.locator('.cd-toc-row').first().waitFor();
       await screenshot(page, `${prefix}-context-index`);
+      const scrolled = await page.evaluate(() => { window.scrollTo(0, 400); return window.scrollY; });
+      await page.locator('#lang [data-lang="bi"]').click();
+      const kept = await page.evaluate(() => window.scrollY);
+      check(`${prefix} the context index keeps its place when the app header re-renders the room`,
+        scrolled > 0 && Math.abs(kept - scrolled) <= 1, `${scrolled} → ${kept}`);
       await page.locator('.cd-toc-row').first().click();
       await page.locator('.cd-backline').waitFor();
       await screenshot(page, `${prefix}-context-preview`);
@@ -345,6 +357,54 @@ async function verifyGuardedEnrollment(browser, base, deck, preRow) {
   }
 }
 
+/* A word saved from the reader names its dictionary entry. The deck matches that card through
+ * its module's dictionary rows: the module list counts it before the module is opened, and a
+ * module whose rows once failed to load tries them again on its next render. */
+async function verifyReaderEntryCards(browser, deck) {
+  const mod = deck.modules.find((m) => m.cards.some((c) => c.w === '新体制'));
+  const card = mod.cards.find((c) => c.w === '新体制');
+  const record = { v: 1, srs: {},
+    taken: [{ t: 'word', id: card.w, label: card.w, kind: '語', kindEn: 'word', from: null, ts: 1, entrySeq: '1362140', cueReading: card.r }],
+    deepWords: { [card.w]: { r: card.r, m: ['new order', 'new system'], seq: '1362140' } } };
+  let refusing = false;
+  const { server, base } = await startServer(CORRIDOR_DIR, (rel) => refusing && rel.startsWith('data/share_alike/dict-v2/'));
+  try {
+    for (const phase of ['count', 'retry']) {
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      await silenceBrowserAudio(context);
+      await seedRecord(context, record);
+      const page = await context.newPage();
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(String(e)));
+      try {
+        refusing = phase === 'retry';
+        await moduleOverview(page, base, deck);
+        if (phase === 'count') {
+          const score = `[data-deck-module="${mod.id}"] .mock-score`;
+          const counted = await page.waitForFunction(([sel, want]) => document.querySelector(sel)?.textContent === want,
+            [score, `1 / ${mod.cards.length}`], { timeout: 15000 }).then(() => true, () => false);
+          check('the module list counts a word saved from the reader before its module is opened', counted,
+            await page.locator(score).textContent());
+          continue;
+        }
+        await openModule(page, mod);
+        const button = page.locator(`[data-deck-enroll="${card.w}"]`);
+        const offline = await button.textContent();
+        refusing = false;
+        await page.locator('#lang [data-lang="ja"]').click();
+        const matched = await page.waitForFunction((w) => document.querySelector(`[data-deck-enroll="${w}"]`)?.textContent.includes('✓'),
+          card.w, { timeout: 15000 }).then(() => true, () => false);
+        check('a module whose dictionary rows failed to load matches the reader’s card once they load on a later render',
+          !offline.includes('✓') && matched && errors.length === 0, JSON.stringify({ offline, now: await button.textContent(), errors }));
+      } finally {
+        await context.close();
+      }
+    }
+  } finally {
+    server.close();
+  }
+}
+
 /* --------------------------------------------------- half two: the room */
 async function main() {
   console.log('— 単語帳: the deck as data');
@@ -427,6 +487,8 @@ async function main() {
     check('single-kanji cards enroll as sentence-anchored word rows, never bare-character rows',
       k.length === m12.cards.length && k.every((t) => t.t === 'word' && t.ctx?.p === m12.article), `${k.filter((t) => t.ctx).length}/${m12.cards.length} anchored`);
     check('no console errors in the room', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
+    console.log('\n— 単語帳: cards saved from the reader');
+    await verifyReaderEntryCards(browser, deck);
     console.log('\n— 単語帳: native enrollment guard');
     await verifyGuardedEnrollment(browser, base, deck, preRow);
     console.log('\n— 単語帳 and 文脈札: desktop and phone screens');

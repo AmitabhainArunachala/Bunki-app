@@ -478,6 +478,7 @@ try {
           return {
             expanded: document.getElementById('shelf-tools-toggle').getAttribute('aria-expanded'),
             panel: !!panel && panel.getClientRects().length > 0,
+            missing: ids.filter((id) => !document.getElementById(id)),
             tiles: doors.map((door) => {
               const r = door.getBoundingClientRect();
               const ja = door.querySelector('.l-ja');
@@ -491,7 +492,8 @@ try {
           };
         }, TOOL_DOORS);
         assert.equal(opened.expanded, 'true', 'the button does not report the panel open');
-        assert(opened.panel && opened.tiles.length >= 10, `the panel shows ${opened.tiles.length} doors`);
+        assert(opened.panel, 'the tools panel is not shown');
+        assert.deepEqual(opened.missing, [], `the panel is missing doors: ${opened.missing.join(', ')}`);
         const bad = opened.tiles.filter((t) => !t.inPanel || !t.inView || !t.ja || !t.oneLine || !t.en || !t.name.startsWith(t.ja) || !t.name.includes(t.en));
         assert.equal(bad.length, 0, `tiles not in the panel, off screen, broken over two lines, or missing their Japanese/English names: ${JSON.stringify(bad.slice(0, 3))}`);
         await page.locator('#grammar-link').click();
