@@ -276,6 +276,13 @@
       "surfaces": ["東京", "都"],
       "readings": ["とうきょう", "と"],
       "note": "Reviewed CORRECT — administrative suffix 都(と) after 東京 (wikinews:45089). Recorded so the checker's 都(と) probe can tell it from the 野ばら/方丈記 defects; bytes untouched."
+    },
+    {
+      "word": "「稽」",
+      "reading": "けい",
+      "surfaces": ["「", "稽", "」"],
+      "readings": [null, "けい", null],
+      "note": "Reviewed CORRECT — the 言葉の鉱脈 kanji passage (kotoba-mine-m12-kanji) names the character itself in quotes, 「稽」という字, and a character named on its own is read by its on-reading けい. UniDic files the bare kanji as 記号; the reading it guessed is the right one, so the bytes stay untouched."
     }
   ]
 }

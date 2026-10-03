@@ -122,10 +122,23 @@ const poolBreach = [...curated, ...archiveIndex.articles].filter(
 check('share-alike stays confined to its bundles — no article row claims it', poolBreach.length === 0, poolBreach.map((row) => `${row.id}:${row.pool}`).slice(0, 4).join(', '));
 
 // ------------------------------------------------------- shelf composition
+// 単語帳 passages (lane 'deck') are Bunki-original texts built with a deck
+// (decks/*/tools/build_deck.py), never feed mints: they stand outside the
+// feed's census, and the exclusion is pinned so it cannot hide a feed row.
+const deckRows = curated.filter((row) => row.lane === 'deck');
+const feedShelf = curated.filter((row) => row.lane !== 'deck');
+const strayDeckRows = deckRows.filter(
+  (row) => row.pool !== 'original' || row.licence !== 'Bunki original' || row.review || row.addedAt || !/^bunki-/.test(row.source),
+);
 check(
-  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints`,
-  curated.length === PRE_FEED_SHELF + liveMints.length,
-  `${curated.length} = ${PRE_FEED_SHELF} + ${liveMints.length}`,
+  'deck-lane passages are Bunki originals outside the feed — none carries a feed mark',
+  strayDeckRows.length === 0,
+  strayDeckRows.map((row) => row.id).slice(0, 4).join(', ') || `${deckRows.length} deck passages`,
+);
+check(
+  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints (deck passages aside)`,
+  feedShelf.length === PRE_FEED_SHELF + liveMints.length,
+  `${feedShelf.length} = ${PRE_FEED_SHELF} + ${liveMints.length} · ${deckRows.length} deck passages`,
 );
 const orphanFeedRows = curated.filter(
   (row) => row.titleEnSource === TITLE_EN_SOURCE && !queue.some((entry) => entry.id === row.id),
@@ -335,10 +348,10 @@ check(
   'the curation report is present, typed, and counts the real artifacts',
   curation.kind === 'feed-curation-report' &&
     curation.criteria &&
-    curation.counts?.shelf === curated.length &&
+    curation.counts?.shelf === feedShelf.length &&
     curation.counts?.archive === archiveIndex.articles.length &&
     Array.isArray(curation.cullProposals),
-  `shelf ${curation.counts?.shelf}/${curated.length} · archive ${curation.counts?.archive}/${archiveIndex.articles.length}`,
+  `shelf ${curation.counts?.shelf}/${feedShelf.length} · archive ${curation.counts?.archive}/${archiveIndex.articles.length}`,
 );
 const proposalIds = new Set(curation.cullProposals.map((proposal) => proposal.id));
 const unmatchedCulls = cullRows.filter(

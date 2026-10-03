@@ -78,6 +78,9 @@ def load_modules() -> list[dict]:
             {
                 "id": mid,
                 "order": i,
+                # deterministic, so a --no-corridor build still links each
+                # module to the shelf article the full build writes
+                "article": ARTICLE_PREFIX + mid,
                 "title": {"ja": meta["ja"], "en": meta["en"]},
                 "passage": doc["passage"],
                 # the module's word order is the learner's own mining order
@@ -210,6 +213,10 @@ def build_corridor(mods: list[dict]) -> dict:
         tokens, paras = ba.tokenise_paragraphs(text, tagger)
         grading = ba.grade_article(text, tokens, tagger, jlpt_maps)
         tokens, paras, tok_index, unplaced = merge_targets(tokens, paras, text, m["cards"], bc)
+        # the JLPT-lexicon signal is a count over the tokens actually shipped,
+        # so it is recomputed on the merged tokens (jreadability reads the
+        # text, which the merge never changes)
+        grading["signals"]["jlpt_lexicon"] = ba.jlpt_signal(tokens, *jlpt_maps)
         m["article"] = aid
         m["tokenIndex"] = tok_index
         record = {
@@ -328,10 +335,15 @@ def mark(sentence: str, form: str, cls: str = "t") -> str:
     return esc(sentence[:i]) + f'<b class="{cls}">' + esc(form) + "</b>" + esc(sentence[i + len(form):])
 
 
-def blank(sentence: str, form: str) -> str:
-    i = sentence.find(form)
-    esc = html.escape
-    return esc(sentence[:i]) + '<span class="blank">［　　］</span>' + esc(sentence[i + len(form):])
+def blank(sentence: str, form: str, also: str | None = None) -> str:
+    # every occurrence is masked: a second 座標 later in the sentence would
+    # otherwise hand the production card its own answer. A kanji card also
+    # masks the bare character (`also`) wherever another compound shows it.
+    parts = sentence.split(form)
+    if also:
+        parts = [p.replace(also, "\0") for p in parts]
+    out = '<span class="blank">［　　］</span>'.join(html.escape(p) for p in parts)
+    return out.replace("\0", '<span class="blank">［］</span>')
 
 
 def note_fields(m: dict, c: dict) -> dict:
@@ -354,7 +366,7 @@ def note_fields(m: dict, c: dict) -> dict:
         "Term": html.escape(c["term"]),
         "Reading": html.escape(c["reading"]),
         "Sentence": mark(s[0]["ja"], s[0]["form"]),
-        "SentenceCloze": blank(s[0]["ja"], s[0]["form"]),
+        "SentenceCloze": blank(s[0]["ja"], s[0]["form"], c["term"] if c.get("kanji") else None),
         "SentenceEN": html.escape(s[0]["en"]),
         "MoreSentences": extra,
         "DefJA": html.escape(c["def_ja"]),

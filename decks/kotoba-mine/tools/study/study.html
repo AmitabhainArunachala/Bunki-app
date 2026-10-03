@@ -830,7 +830,19 @@
         e.append(k.nodeType ? k : document.createTextNode(String(k)));
     return e;
   }
-  function marked(ja, form, cls = 't', blank = false) {
+  function marked(ja, form, cls = 't', blank = false, kanjiOf = null) {
+    // a production prompt masks every occurrence, or a repeat gives it away;
+    // a kanji card also masks its bare character inside other compounds
+    if (blank && ja.includes(form))
+      return ja.split(form).flatMap((part, i) => {
+        const bits =
+          kanjiOf && part.includes(kanjiOf)
+            ? part
+                .split(kanjiOf)
+                .flatMap((x, j) => (j ? [h('span', { class: 'blank' }, '［］'), x] : [x]))
+            : [part];
+        return i ? [h('span', { class: 'blank' }, '［　　］'), ...bits] : bits;
+      });
     const i = ja.indexOf(form);
     if (i < 0) return [ja];
     return [
@@ -870,8 +882,11 @@
     else renderSettings();
   }
 
+  /** the face that measures a word's progress: recognition, or production
+   * when that is the only face being studied */
+  const progressOf = (c) => st.cards[c.key + (st.mode === 'production' ? ':p' : ':r')];
   function stateLabel(c) {
-    const s = st.cards[c.key + ':r'];
+    const s = progressOf(c);
     if (!s) return ['new', '未'];
     if (s.s !== 'review') return ['learn', '学習中'];
     return ['review', fmtIvl(Math.max(0, s.due - Date.now())) + '後'];
@@ -882,9 +897,9 @@
     for (const m of MODS) {
       const c = counts(m.cards.map((x) => byKey.get(x.key)));
       const total = m.cards.length;
-      const known = m.cards.filter((x) => st.cards[x.key + ':r']?.s === 'review').length;
+      const known = m.cards.filter((x) => progressOf(x)?.s === 'review').length;
       const learning = m.cards.filter((x) => {
-        const s = st.cards[x.key + ':r'];
+        const s = progressOf(x);
         return s && s.s !== 'review';
       }).length;
       const id = 'vein-' + m.id;
@@ -1073,7 +1088,7 @@
       h(
         'p',
         { class: 'sentence', lang: 'ja' },
-        marked(ja, form, 't', side === 'p' && !cur.revealed),
+        marked(ja, form, 't', side === 'p' && !cur.revealed, c.kanji ? c.term : null),
       ),
     );
     if (side === 'p' && !cur.revealed)
@@ -1298,15 +1313,18 @@
       (a, b) => b.sentences[0].form.length - a.sentences[0].form.length,
     )) {
       const s0 = c.sentences[0];
-      let at = flat.indexOf(s0.ja);
-      while (at >= 0) {
-        const a = at + s0.ja.indexOf(s0.form),
-          b = a + s0.form.length;
-        if (!marks.some((x) => a < x.b && b > x.a)) {
-          marks.push({ a, b, c });
-          break;
+      // every occurrence of the form in every copy of the sentence is tried,
+      // so a compound that claimed the first 磁気共鳴 leaves the later one free
+      let placed = false;
+      for (let at = flat.indexOf(s0.ja); at >= 0 && !placed; at = flat.indexOf(s0.ja, at + 1)) {
+        for (let f = s0.ja.indexOf(s0.form); f >= 0 && !placed; f = s0.ja.indexOf(s0.form, f + 1)) {
+          const a = at + f,
+            b = a + s0.form.length;
+          if (!marks.some((x) => a < x.b && b > x.a)) {
+            marks.push({ a, b, c });
+            placed = true;
+          }
         }
-        at = flat.indexOf(s0.ja, at + 1);
       }
     }
     marks.sort((x, y) => x.a - y.a);
@@ -1324,7 +1342,7 @@
     };
     for (const mk of marks) {
       flush(flat.slice(pos, mk.a));
-      const known = st.cards[mk.c.key + ':r']?.s === 'review';
+      const known = progressOf(mk.c)?.s === 'review';
       para.append(
         h(
           'button',

@@ -4,12 +4,12 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 77,
-  "tokens": 41266
+  "articles": 89,
+  "tokens": 50844
  },
  "statusCounts": {
   "lexicon-fixed": 303,
-  "accepted": 8
+  "accepted": 9
  },
  "openCount": 0,
  "rows": [
@@ -3122,6 +3122,16 @@
    "status": "accepted",
    "context": "月13日に東京都永田町にある党本部",
    "note": "東京都"
+  },
+  {
+   "article": "kotoba-mine-m12-kanji",
+   "token": 86,
+   "rule": "unk-kanji",
+   "surface": "稽",
+   "reading": "けい",
+   "status": "accepted",
+   "context": "みたい。たとえば「稽」という字。",
+   "note": "「稽」"
   }
  ]
 }
