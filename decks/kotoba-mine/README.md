@@ -8,11 +8,11 @@ every card asks its word inside a sentence from that passage.
 
 The same deck runs in three places:
 
-| Where                    | File                                                                              | What you get                                                                                                                                                                                                                                   |
-| ------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Bunki** (the corridor) | `prototypes/corridor/data/share_alike/decks/kotoba-mine.json` + 12 shelf articles | Shelf → **単語帳**. Each module opens its passage in the reader, enrolls its words in one press (ぜんぶ覚える) and reviews only that module (この鉱脈だけ復習). Cards are reviewed with Bunki's own FSRS-6, blanked inside the mined sentence. |
-| **Anki**                 | `release/kotoba-mine.apkg`                                                        | One note type, two card templates, one subdeck per module, tags per module and register.                                                                                                                                                       |
-| **Direct study, no app** | `release/study.html`                                                              | One self-contained page: open it in any browser. FSRS-6 scheduling, module toggles, reader with tappable mined words, word index, progress backup.                                                                                             |
+| Where                    | File                                                                              | What you get                                                                                                                                                                                                                                                |
+| ------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bunki** (the corridor) | `prototypes/corridor/data/share_alike/decks/kotoba-mine.json` + 12 shelf articles | Shelf → 学習ツール → **単語帳**. Each module opens its passage in the reader, enrolls its words in one press (ぜんぶ覚える) and reviews only that module (この鉱脈だけ復習). Cards are reviewed with Bunki's own FSRS-6, blanked inside the mined sentence. |
+| **Anki**                 | `release/kotoba-mine.apkg`                                                        | One note type, two card templates, one subdeck per module, tags per module and register.                                                                                                                                                                    |
+| **Direct study, no app** | `release/study.html`                                                              | One self-contained page: open it in any browser. FSRS-6 scheduling, module toggles, reader with tappable mined words, word index, progress backup.                                                                                                          |
 
 A plain `release/kotoba-mine.tsv` (Anki text-import headers, HTML fields) is there for
 any other SRS.
@@ -81,7 +81,7 @@ semiconductor agreement, the Imperial House Law's male-line rule) are stated neu
 
 ## Using it
 
-**Bunki.** Open the shelf → 単語帳 → a module. Read the passage (読み物), then press
+**Bunki.** Open the shelf → 学習ツール → 単語帳 → a module. Read the passage (読み物), then press
 ぜんぶ覚える, or press 覚える on single words. Enrolled words review in the normal 復習
 session, or only that module via この鉱脈だけ復習. Each module is also a named list
 (`言葉の鉱脈 · <module>`) in the lists tray.
@@ -115,7 +115,7 @@ release/                      apkg, tsv, study.html, build-report.json (generate
 pip install fugashi unidic-lite==1.0.8 jreadability==1.1.5 genanki   # once
 python3 decks/kotoba-mine/tools/check_module.py m01-money            # validate
 python3 decks/kotoba-mine/tools/build_deck.py                         # rebuild all
-node prototypes/corridor/tools/build-standalone.mjs                   # refresh the single-file corridor
+node prototypes/corridor/tools/build-standalone.mjs                   # build the single-file corridor (written outside the checkout)
 node prototypes/corridor/tools/verify-kotoba-mine.mjs                 # data + real-browser check
 ```
 

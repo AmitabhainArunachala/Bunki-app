@@ -226,7 +226,7 @@ const bodyDrift = [];
 for (const row of curated) {
   if (!row.review && !row.pendingVerification) continue;
   const bodyPath = new URL(`../data/articles/${row.file}`, import.meta.url);
-  let body = null;
+  let body;
   try {
     body = JSON.parse(readFileSync(bodyPath, 'utf8'));
   } catch {

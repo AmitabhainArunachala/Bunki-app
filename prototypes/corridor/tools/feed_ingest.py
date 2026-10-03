@@ -128,9 +128,10 @@ def load_titles() -> dict[str, str]:
 
 
 def load_title_sources() -> dict[str, str]:
-    """Per-row provenance for titles that were checked after authoring
-    (publisher: <url>, or translation, cross-checked); a row without one
-    keeps the file's titleEnSource."""
+    """Per-row provenance for titles that were checked after authoring (a
+    publisher label with its URL, or translation, cross-checked;
+    verify-native-readings.mjs owns the label set); a row without one keeps
+    the file's titleEnSource."""
     if not TITLES_PATH.exists():
         return {}
     return dict(json.loads(TITLES_PATH.read_text("utf-8")).get("sources", {}))
