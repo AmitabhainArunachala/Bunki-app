@@ -247,7 +247,7 @@ def build_corridor(mods: list[dict]) -> dict:
                 break
         row = {k: v for k, v in record.items() if k != "text"}
         row["titleEn"] = p.get("title_en") or m["title"]["en"]
-        row["titleEnSource"] = "shelf-map-2026"
+        row["titleEnSource"] = "Bunki original, bilingual title"
         row["chars"] = len(text)
         row["snippet"] = text.replace("\n", " ")[:64]
         row["grading"] = grading
@@ -260,6 +260,17 @@ def build_corridor(mods: list[dict]) -> dict:
         print(f"  {aid:<34} {len(text):>5}字  jread={jr['score']:.2f} ({jr['band']})  "
               f"cloze-anchored {len(tok_index)}/{len(m['cards'])}"
               + (f"  unplaced: {', '.join(unplaced)}" if unplaced else ""))
+    receipts_path = ARTICLES / "title-receipts.json"
+    receipts = json.loads(receipts_path.read_text("utf-8"))
+    authored = receipts.setdefault("authored", {})
+    for row in rows:
+        if row["id"].startswith(ARTICLE_PREFIX):
+            module_id = row["id"][len(ARTICLE_PREFIX):]
+            authored[row["id"]] = {
+                "path": f"decks/kotoba-mine/source/modules/{module_id}.json",
+                "titleJa": row["title"], "titleEn": row["titleEn"],
+            }
+    receipts_path.write_text(json.dumps(receipts, ensure_ascii=False, indent=2) + "\n", "utf-8")
     index["articles"] = rows
     names = [s["name"] for s in index["sources"].setdefault("original", [])]
     if SOURCE_ROW["name"] not in names:
