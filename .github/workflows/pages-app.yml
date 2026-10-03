@@ -93,6 +93,12 @@ jobs:
              prototypes/corridor/decks/context-dense/basic.tsv \
              "$SITE/decks/context-dense/"
 
+          # 言葉の鉱脈's study cards: one self-contained page beside the app, same
+          # origin, so 単語帳 and the cards read one ledger (built by
+          # decks/kotoba-mine/tools/build_deck.py, byte-identical to release/study.html)
+          mkdir -p "$SITE/decks/kotoba-mine"
+          cp prototypes/corridor/decks/kotoba-mine/index.html "$SITE/decks/kotoba-mine/"
+
           # the recorded voices ride along when the branch carries them
           if [ -d prototypes/corridor/audio ]; then cp -r prototypes/corridor/audio "$SITE"/; fi
 
@@ -133,7 +139,8 @@ jobs:
                       'decks/context-dense/engine.js' \
                       'decks/context-dense/deck.json' \
                       'decks/context-dense/context-deck.css' \
-                      'decks/context-dense/standalone.html'; do
+                      'decks/context-dense/standalone.html' \
+                      'decks/kotoba-mine/' 'decks/kotoba-mine/index.html'; do
             code=""
             for attempt in 1 2 3 4 5; do
               code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8765/$path" || true)

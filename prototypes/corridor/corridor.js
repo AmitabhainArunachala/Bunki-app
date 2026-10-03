@@ -2216,6 +2216,13 @@ async function boot() {
   // Phone reps: ?deck=context opens 文脈札 directly. It does not change the
   // stored front door, and it does not open the operator variant strip.
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
+  // ?deck=kotoba-mine[&module=m01-money] opens 単語帳 on that deck (and module):
+  // the study cards' "Bunki" door lands here
+  else if (DECK_IDS.includes(params.get('deck'))) {
+    S.view = 'decks';
+    S.deckId = params.get('deck');
+    S.deckModule = params.get('module') || null;
+  }
 
   render();
 
@@ -6180,6 +6187,40 @@ function renderMock(main) {
 const DECK_DIR = 'data/share_alike/decks';
 const DECK_IDS = ['kotoba-mine'];
 const deckFailed = (key) => !!D.deckFailed?.has(key);
+/* The deck's study cards (decks/kotoba-mine/release/study.html, published at
+ * decks/kotoba-mine/ beside this app) keep their own FSRS ledger under
+ * kotoba-mine.v1 on this same origin. 単語帳 reads it so both doors agree on
+ * what is known; it never writes it. The single-file build has no neighbour
+ * directory, so it links to the published copy. */
+const KOTOBA_STUDY_KEY = 'kotoba-mine.v1';
+const KOTOBA_STUDY_URL = 'https://amitabhainarunachala.github.io/Bunki-app/decks/kotoba-mine/';
+const kotobaStudyHref = (moduleId) =>
+  (window.__CORRIDOR_BUNDLE__ ? KOTOBA_STUDY_URL : 'decks/kotoba-mine/') + (moduleId ? `#${moduleId}` : '');
+function kotobaStudyLedger() {
+  try {
+    return JSON.parse(localStorage.getItem(KOTOBA_STUDY_KEY) || 'null')?.cards || {};
+  } catch {
+    return {};
+  }
+}
+/** the card ledger's word for one deck card: 定着 (21 days+), 復習中, 学習中, or nothing */
+function kotobaCardState(ledger, card) {
+  const s = ledger[`km-${String(card.n).padStart(3, '0')}:r`];
+  if (!s) return null;
+  if (s.s !== 'review') return ['学習中', 'learning'];
+  return (s.ivl || 0) >= 21 ? ['定着', 'settled'] : ['復習中', 'reviewing'];
+}
+function kotobaStudyDoor(moduleId) {
+  const a = el('a', 'chip deck-study-door');
+  a.href = kotobaStudyHref(moduleId);
+  a.id = moduleId ? 'deck-study-module' : 'deck-study';
+  a.style.textDecoration = 'none';
+  a.append(
+    el('span', 'l-ja', moduleId ? 'この鉱脈をカードで学ぶ' : 'カードで学ぶ — 文脈クローズ'),
+    el('span', 'en-sub', bi() ? (moduleId ? 'study this module as cards' : 'study as context cards') : ''),
+  );
+  return a;
+}
 
 function ensureDeck(deckId) {
   D.decks ||= new Map();
@@ -6290,8 +6331,11 @@ function renderDecks(main) {
         ),
       ),
     );
+    if (deckId === 'kotoba-mine') main.append(kotobaStudyDoor(null));
+    const ledger = kotobaStudyLedger();
     for (const m of deck.modules) {
       const have = m.cards.filter(deckHas).length;
+      const carded = m.cards.filter((c) => kotobaCardState(ledger, c)).length;
       const row = el('button', 'entry-row deck-row');
       row.type = 'button';
       row.dataset.deckModule = m.id;
@@ -6300,6 +6344,7 @@ function renderDecks(main) {
       mid.append(document.createTextNode(m.title.ja.split(' — ')[0]));
       if (bi()) mid.append(el('span', 'en-sub', m.title.en));
       mid.append(el('span', 'mock-score', `${have} / ${m.cards.length}`));
+      if (carded) mid.append(el('span', 'en-sub deck-carded', tx(`カード ${carded}`, `${carded} on cards`)));
       row.append(mid);
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => {
@@ -6347,7 +6392,9 @@ function renderDecks(main) {
     rev.addEventListener('click', () => startReview(listed));
     actions.append(rev);
   }
+  if (deckId === 'kotoba-mine') actions.append(kotobaStudyDoor(mod.id));
   main.append(actions);
+  const ledger = kotobaStudyLedger();
   for (const c of mod.cards) {
     const have = deckHas(c);
     const row = el('div', 'lesson-enroll-row deck-card');
@@ -6358,6 +6405,8 @@ function renderDecks(main) {
     const body = el('span', 'deck-card-body');
     body.append(el('span', 'deck-def', c.d));
     if (bi()) body.append(el('span', 'en-sub', c.g));
+    const carded = kotobaCardState(ledger, c);
+    if (carded) body.append(el('span', 'en-sub deck-card-state', tx(`カード · ${carded[0]}`, `cards · ${carded[1]}`)));
     row.append(body);
     const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
     b.type = 'button';
