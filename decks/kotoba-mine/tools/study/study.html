@@ -1,0 +1,1573 @@
+<title>言葉の鉱脈 Kotoba Mine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+<style>
+  /* Layout: one working column — a vein map of modules up top, the card bench below; tabs switch bench ↔ passage ↔ index. */
+  :root {
+    --bg: #e9eeec; /* slate paper */
+    --panel: #f6f8f7;
+    --ink: #18242a; /* graphite ink */
+    --muted: #5b6b70;
+    --line: #c9d3d1;
+    --ore: #1f7a5c; /* malachite */
+    --ore-soft: #d3e8df;
+    --gold: #a7741a; /* ochre — due */
+    --rust: #a33a2b; /* again */
+    --target: #0f5f8a; /* the mined word */
+    --f-display: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    --f-ui:
+      'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+    --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #12171a;
+      --panel: #1a2125;
+      --ink: #dfe7e4;
+      --muted: #8d9c9f;
+      --line: #2c373b;
+      --ore: #5cc79e;
+      --ore-soft: #1d3a31;
+      --gold: #d9a54a;
+      --rust: #e0735f;
+      --target: #7cc4ec;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #12171a;
+    --panel: #1a2125;
+    --ink: #dfe7e4;
+    --muted: #8d9c9f;
+    --line: #2c373b;
+    --ore: #5cc79e;
+    --ore-soft: #1d3a31;
+    --gold: #d9a54a;
+    --rust: #e0735f;
+    --target: #7cc4ec;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--f-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+    padding-inline: 16px;
+    padding-block: 12px 48px;
+  }
+  .wrap {
+    max-width: 44rem;
+    margin: 0 auto;
+    display: grid;
+    gap: 18px;
+  }
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .brand h1 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 1.7rem;
+    margin: 0;
+    letter-spacing: 0.04em;
+  }
+  .brand span {
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+  }
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  nav.tabs button {
+    font: inherit;
+    font-size: 0.85rem;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    padding: 4px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  nav.tabs button[aria-selected='true'] {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  button {
+    font-family: inherit;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--ore);
+    outline-offset: 2px;
+  }
+
+  /* vein map */
+  .veins {
+    display: grid;
+    gap: 6px;
+  }
+  .vein {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 2px;
+    border-bottom: 1px solid var(--line);
+  }
+  .vein input {
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: var(--ore);
+  }
+  .vein .name {
+    min-width: 0;
+  }
+  .vein .name b {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .vein .name small {
+    display: block;
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+  .vein .bar {
+    display: flex;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--line);
+    margin-top: 4px;
+  }
+  .vein .bar i {
+    display: block;
+    height: 100%;
+  }
+  .vein .bar .m {
+    background: var(--ore);
+  }
+  .vein .bar .l {
+    background: var(--gold);
+  }
+  .vein .count {
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .vein.off {
+    opacity: 0.5;
+  }
+  .summary {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-family: var(--f-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .summary b {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .summary .due b {
+    color: var(--gold);
+  }
+  .summary .new b {
+    color: var(--target);
+  }
+  .lead {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0;
+    max-width: 62ch;
+  }
+
+  /* card bench */
+  .bench {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 20px 18px;
+    display: grid;
+    gap: 14px;
+  }
+  .bench .kind {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    flex-wrap: wrap;
+  }
+  .sentence {
+    font-family: var(--f-display);
+    font-size: clamp(1.3rem, 4.6vw, 1.75rem);
+    line-height: 1.75;
+    margin: 0;
+    text-wrap: pretty;
+  }
+  .sentence .t {
+    color: var(--target);
+    font-weight: 700;
+    border-bottom: 2px solid currentColor;
+  }
+  .sentence .blank {
+    color: var(--target);
+    letter-spacing: 0.15em;
+  }
+  .hint {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  .hint small {
+    color: var(--muted);
+  }
+  .reveal-btn {
+    justify-self: start;
+    font: inherit;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 4px;
+    padding: 8px 18px;
+    cursor: pointer;
+  }
+  .answer {
+    display: grid;
+    gap: 10px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .head .term {
+    font-family: var(--f-display);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .head .reading {
+    font-size: 1.15rem;
+    color: var(--muted);
+  }
+  .chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 0.72rem;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0 6px;
+    color: var(--muted);
+  }
+  .def {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  .gloss {
+    margin: 0;
+    color: var(--muted);
+  }
+  details.en {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  details.en summary {
+    cursor: pointer;
+  }
+  .ex {
+    display: grid;
+    gap: 2px;
+  }
+  .ex .ja {
+    font-family: var(--f-display);
+    font-size: 1.08rem;
+  }
+  .ex .ja .t {
+    color: var(--target);
+    font-weight: 700;
+  }
+  .ex .en {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .lbl {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-family: var(--f-display);
+  }
+  .conf {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.9rem;
+  }
+  .note {
+    font-size: 0.85rem;
+    color: var(--muted);
+    border-left: 2px solid var(--line);
+    padding-left: 10px;
+    margin: 0;
+  }
+  .grades {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .grades button {
+    font: inherit;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 8px 4px 6px;
+    cursor: pointer;
+    display: grid;
+    gap: 0;
+  }
+  .grades button span {
+    font-size: 0.9rem;
+  }
+  .grades button small {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .grades .g1 {
+    border-color: var(--rust);
+  }
+  .grades .g1 span {
+    color: var(--rust);
+  }
+  .grades .g3 {
+    border-color: var(--ore);
+  }
+  .grades .g3 span {
+    color: var(--ore);
+  }
+  .tools {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+  }
+  .linkish {
+    font: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .empty {
+    text-align: left;
+    display: grid;
+    gap: 8px;
+  }
+  .empty h2 {
+    font-family: var(--f-display);
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  /* reader */
+  .passage h2 {
+    font-family: var(--f-display);
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+    text-wrap: balance;
+  }
+  .passage .sub {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 0 0 14px;
+  }
+  .passage p.sub {
+    font-family: var(--f-ui);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .passage p {
+    font-family: var(--f-display);
+    font-size: 1.12rem;
+    line-height: 2;
+    margin: 0 0 1em;
+    max-width: 34em;
+  }
+  .passage .w {
+    font: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--target);
+    border-bottom: 1px dotted currentColor;
+    cursor: pointer;
+  }
+  .passage .w.known {
+    color: var(--ore);
+  }
+  .pop {
+    position: sticky;
+    bottom: 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: grid;
+    gap: 4px;
+  }
+  select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 4px 8px;
+    max-width: 100%;
+  }
+
+  /* index */
+  .search {
+    width: 100%;
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    color: var(--ink);
+  }
+  .rows {
+    display: grid;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+    cursor: pointer;
+  }
+  .row .w {
+    font-family: var(--f-display);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .row .w small {
+    display: block;
+    font-family: var(--f-ui);
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .row .g {
+    font-size: 0.85rem;
+    min-width: 0;
+  }
+  .st {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .st.review {
+    color: var(--ore);
+  }
+  .st.learn {
+    color: var(--gold);
+  }
+
+  /* settings */
+  .settings {
+    display: grid;
+    gap: 14px;
+  }
+  .field {
+    display: grid;
+    gap: 4px;
+  }
+  .field label {
+    font-size: 0.85rem;
+  }
+  .field input[type='number'] {
+    width: 6rem;
+    font: inherit;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    color: var(--ink);
+  }
+  textarea {
+    width: 100%;
+    min-height: 6rem;
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 8px;
+  }
+  .btn {
+    font: inherit;
+    font-size: 0.85rem;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  .btn.danger {
+    color: var(--rust);
+    border-color: var(--rust);
+  }
+  .row-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .fine {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  @media (max-width: 480px) {
+    .row {
+      grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
+    }
+    .row .st {
+      grid-column: 2;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .answer {
+      animation: rise 0.18s ease-out;
+    }
+    @keyframes rise {
+      from {
+        opacity: 0.4;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>言葉の鉱脈</h1>
+      <span>KOTOBA MINE · 文で覚える</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button role="tab" data-tab="study" id="tab-study">学ぶ</button>
+      <button role="tab" data-tab="read" id="tab-read">読む</button>
+      <button role="tab" data-tab="index" id="tab-index">一覧</button>
+      <button role="tab" data-tab="settings" id="tab-settings">設定</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+
+<script>
+  const DECK = /*__DECK__*/ null;
+  // FSRS-6 weights — Bunki's pinned set (prototypes/corridor/data/fsrs-pin.json, request retention 0.9)
+  const W = [
+    0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835,
+    0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542,
+  ];
+  const RETENTION = 0.9;
+  const DECAY = -W[20];
+  const FACTOR = Math.pow(0.9, 1 / DECAY) - 1;
+  const MIN = 60e3,
+    DAY = 864e5;
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  const retr = (t, S) => Math.pow(1 + (FACTOR * t) / S, DECAY);
+  const ivlDays = (S) =>
+    clamp(Math.round((S / FACTOR) * (Math.pow(RETENTION, 1 / DECAY) - 1)), 1, 36500);
+  const D0 = (g) => clamp(W[4] - Math.exp(W[5] * (g - 1)) + 1, 1, 10);
+  const S0 = (g) => Math.max(W[g - 1], 0.1);
+  const nextD = (D, g) => {
+    const dp = D + (-W[6] * (g - 3) * (10 - D)) / 9;
+    return clamp(W[7] * D0(4) + (1 - W[7]) * dp, 1, 10);
+  };
+  const recallS = (D, S, R, g) =>
+    S *
+    (1 +
+      Math.exp(W[8]) *
+        (11 - D) *
+        Math.pow(S, -W[9]) *
+        (Math.exp(W[10] * (1 - R)) - 1) *
+        (g === 2 ? W[15] : 1) *
+        (g === 4 ? W[16] : 1));
+  const forgetS = (D, S, R) =>
+    Math.min(
+      W[11] * Math.pow(D, -W[12]) * (Math.pow(S + 1, W[13]) - 1) * Math.exp(W[14] * (1 - R)),
+      S / Math.exp(W[17] * W[18]),
+    );
+  const shortS = (S, g) => {
+    let inc = Math.exp(W[17] * (g - 3 + W[18])) * Math.pow(S, -W[19]);
+    if (g >= 3) inc = Math.max(inc, 1);
+    return S * inc;
+  };
+
+  /** one grade, pure: returns the next card state */
+  function schedule(c, g, now) {
+    const n = { ...c, reps: (c.reps || 0) + 1, last: now };
+    if (!c.s || c.s === 'new') {
+      n.S = S0(g);
+      n.D = D0(g);
+      if (g === 4) return { ...n, s: 'review', due: now + ivlDays(n.S) * DAY };
+      return {
+        ...n,
+        s: 'learn',
+        step: g === 3 ? 1 : 0,
+        due: now + (g === 1 ? 1 : g === 2 ? 6 : 10) * MIN,
+      };
+    }
+    if (c.s === 'learn' || c.s === 'relearn') {
+      n.S = shortS(c.S, g);
+      n.D = nextD(c.D, g);
+      if (g === 1) return { ...n, step: 0, due: now + (c.s === 'relearn' ? 10 : 1) * MIN };
+      if (g === 2) return { ...n, due: now + (c.s === 'relearn' ? 10 : 6) * MIN };
+      if (g === 3 && c.s === 'learn' && (c.step || 0) < 1)
+        return { ...n, step: 1, due: now + 10 * MIN };
+      return { ...n, s: 'review', due: now + Math.max(ivlDays(n.S), g === 4 ? 2 : 1) * DAY };
+    }
+    const t = Math.max(0, (now - c.last) / DAY);
+    n.D = nextD(c.D, g);
+    if (t < 1) {
+      n.S = shortS(c.S, g);
+    } else {
+      const R = retr(t, c.S);
+      if (g === 1) {
+        n.S = forgetS(c.D, c.S, R);
+        n.lapses = (c.lapses || 0) + 1;
+        return { ...n, s: 'relearn', step: 0, due: now + 10 * MIN };
+      }
+      n.S = recallS(c.D, c.S, R, g);
+    }
+    if (g === 1) {
+      n.lapses = (c.lapses || 0) + 1;
+      return { ...n, s: 'relearn', step: 0, due: now + 10 * MIN };
+    }
+    let d = ivlDays(n.S);
+    const prev = c.ivl || 0;
+    if (g === 3) d = Math.max(d, prev + 1);
+    if (g === 4) d = Math.max(d, ivlDays(recallS(c.D, c.S, retr(t, c.S), 3)) + 1, prev + 2);
+    if (g === 2) d = Math.max(1, Math.min(d, ivlDays(recallS(c.D, c.S, retr(t, c.S), 3))));
+    return { ...n, s: 'review', ivl: d, due: now + d * DAY };
+  }
+  const fmtIvl = (ms) =>
+    ms < 60 * MIN
+      ? `${Math.max(1, Math.round(ms / MIN))}分`
+      : ms < DAY
+        ? `${Math.round(ms / 36e5)}時間`
+        : ms < 30 * DAY
+          ? `${Math.round(ms / DAY)}日`
+          : ms < 365 * DAY
+            ? `${(ms / DAY / 30).toFixed(1)}か月`
+            : `${(ms / DAY / 365).toFixed(1)}年`;
+
+  // ---------- state ----------
+  const KEY = 'kotoba-mine.v1';
+  const today = () => new Date().toDateString();
+  const DEFAULTS = {
+    cards: {},
+    on: {},
+    newPerDay: 15,
+    mode: 'recognition',
+    showEn: false,
+    newToday: { d: '', n: 0 },
+    log: [],
+  };
+  let st = load();
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) return { ...DEFAULTS, ...JSON.parse(raw) };
+    } catch (e) {}
+    return structuredClone(DEFAULTS);
+  }
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(st));
+    } catch (e) {}
+  }
+
+  const MODS = DECK ? DECK.modules : [];
+  const CARDS = [];
+  for (const m of MODS) for (const c of m.cards) CARDS.push({ ...c, mod: m });
+  const byKey = new Map(CARDS.map((c) => [c.key, c]));
+  const modOn = (m) => st.on[m.id] !== false;
+  /** a study item = one card face: `${key}:r` recognition, `${key}:p` production */
+  function faces(c) {
+    const out = [];
+    if (st.mode !== 'production') out.push(c.key + ':r');
+    if (st.mode !== 'recognition') {
+      // production opens only once the word can be recognised (comprehension first)
+      const r = st.cards[c.key + ':r'];
+      if (st.mode === 'production' || (r && r.s === 'review')) out.push(c.key + ':p');
+    }
+    return out;
+  }
+  function counts(cardsList, now = Date.now()) {
+    const eod = new Date();
+    eod.setHours(23, 59, 59, 999);
+    let fresh = 0,
+      due = 0,
+      learn = 0,
+      mature = 0;
+    for (const c of cardsList)
+      for (const f of faces(c)) {
+        const s = st.cards[f];
+        if (!s) fresh++;
+        else if (s.s === 'review') {
+          if (s.due <= eod.getTime()) due++;
+          if ((s.ivl || 0) >= 21) mature++;
+        } else {
+          learn++;
+          if (s.due <= now) due++;
+        }
+      }
+    return { fresh, due, learn, mature };
+  }
+  function newLeft() {
+    if (st.newToday.d !== today()) st.newToday = { d: today(), n: 0 };
+    return Math.max(0, st.newPerDay - st.newToday.n);
+  }
+
+  function buildQueue(now = Date.now()) {
+    const eod = new Date();
+    eod.setHours(23, 59, 59, 999);
+    const learn = [],
+      review = [],
+      fresh = [];
+    for (const c of CARDS) {
+      if (!modOn(c.mod)) continue;
+      for (const f of faces(c)) {
+        const s = st.cards[f];
+        if (!s) fresh.push(f);
+        else if (s.s === 'review') {
+          if (s.due <= eod.getTime()) review.push(f);
+        } else if (s.due <= now) learn.push(f);
+      }
+    }
+    review.sort((a, b) => st.cards[a].due - st.cards[b].due);
+    learn.sort((a, b) => st.cards[a].due - st.cards[b].due);
+    return [...learn, ...review, ...fresh.slice(0, newLeft())];
+  }
+  function nextLearnDue() {
+    let best = null;
+    for (const [f, s] of Object.entries(st.cards)) {
+      const c = byKey.get(f.split(':')[0]);
+      if (c && modOn(c.mod) && s.s !== 'review' && (best === null || s.due < best)) best = s.due;
+    }
+    return best;
+  }
+
+  // ---------- tiny DOM helper ----------
+  function h(tag, attrs = {}, ...kids) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (k === 'class') e.className = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+      else if (k === 'html') e.innerHTML = v;
+      else if (v !== null && v !== undefined && v !== false) e.setAttribute(k, v === true ? '' : v);
+    }
+    for (const k of kids.flat())
+      if (k !== null && k !== undefined && k !== false)
+        e.append(k.nodeType ? k : document.createTextNode(String(k)));
+    return e;
+  }
+  function marked(ja, form, cls = 't', blank = false) {
+    const i = ja.indexOf(form);
+    if (i < 0) return [ja];
+    return [
+      ja.slice(0, i),
+      blank ? h('span', { class: 'blank' }, '［　　］') : h('span', { class: cls }, form),
+      ja.slice(i + form.length),
+    ];
+  }
+
+  // ---------- views ----------
+  let tab = 'study';
+  let cur = null; // { face, revealed }
+  let queue = [];
+  let undo = null;
+  let readMod = MODS[0]?.id;
+  let readPick = null;
+  let q = '';
+  const view = document.getElementById('view');
+
+  function render() {
+    for (const b of document.querySelectorAll('nav.tabs button'))
+      b.setAttribute('aria-selected', String(b.dataset.tab === tab));
+    view.replaceChildren();
+    if (!DECK) {
+      view.append(
+        h(
+          'p',
+          { class: 'lead' },
+          'Deck data missing — build with decks/kotoba-mine/tools/build_deck.py.',
+        ),
+      );
+      return;
+    }
+    if (tab === 'study') renderStudy();
+    else if (tab === 'read') renderRead();
+    else if (tab === 'index') renderIndex();
+    else renderSettings();
+  }
+
+  function stateLabel(c) {
+    const s = st.cards[c.key + ':r'];
+    if (!s) return ['new', '未'];
+    if (s.s !== 'review') return ['learn', '学習中'];
+    return ['review', fmtIvl(Math.max(0, s.due - Date.now())) + '後'];
+  }
+
+  function renderVeins() {
+    const box = h('section', { class: 'veins', 'aria-label': 'Modules' });
+    for (const m of MODS) {
+      const c = counts(m.cards.map((x) => byKey.get(x.key)));
+      const total = m.cards.length;
+      const known = m.cards.filter((x) => st.cards[x.key + ':r']?.s === 'review').length;
+      const learning = m.cards.filter((x) => {
+        const s = st.cards[x.key + ':r'];
+        return s && s.s !== 'review';
+      }).length;
+      const id = 'vein-' + m.id;
+      const row = h(
+        'div',
+        { class: 'vein' + (modOn(m) ? '' : ' off') },
+        h('input', {
+          type: 'checkbox',
+          id,
+          checked: modOn(m),
+          'aria-label': `study ${m.title.en}`,
+          onchange: (e) => {
+            st.on[m.id] = e.target.checked;
+            save();
+            queue = [];
+            cur = null;
+            render();
+          },
+        }),
+        h(
+          'label',
+          { class: 'name', for: id },
+          h('b', {}, m.title.ja.split(' — ')[0]),
+          h('small', {}, m.title.ja.split(' — ')[1] || m.title.en),
+          h(
+            'span',
+            { class: 'bar', 'aria-hidden': 'true' },
+            h('i', { class: 'm', style: `width:${(known / total) * 100}%` }),
+            h('i', { class: 'l', style: `width:${(learning / total) * 100}%` }),
+          ),
+        ),
+        h('span', { class: 'count' }, `${known}/${total}`, h('br'), c.due ? `復習 ${c.due}` : ''),
+      );
+      box.append(row);
+    }
+    return box;
+  }
+
+  function renderStudy() {
+    const all = counts(CARDS.filter((c) => modOn(c.mod)));
+    const nl = newLeft();
+    view.append(
+      h(
+        'div',
+        { class: 'summary' },
+        h('span', { class: 'due' }, '復習 ', h('b', {}, all.due)),
+        h(
+          'span',
+          { class: 'new' },
+          '新しい語 ',
+          h('b', {}, Math.min(nl, all.fresh)),
+          ` / ${all.fresh}`,
+        ),
+        h('span', {}, '定着 ', h('b', {}, all.mature)),
+        h('span', {}, `${CARDS.length}語 · ${MODS.length}鉱脈`),
+      ),
+    );
+    if (!queue.length) queue = buildQueue();
+    if (!cur || !queue.includes(cur.face))
+      cur = queue.length ? { face: queue[0], revealed: false } : null;
+    view.append(cur ? renderCard() : renderDone());
+    view.append(
+      h(
+        'p',
+        { class: 'lead', style: 'margin-top:18px' },
+        '鉱脈を選んで掘る — tick the modules to study. Read a module’s passage first (読む), then mine its words here: the sentence asks, the word answers.',
+      ),
+    );
+    view.append(renderVeins());
+  }
+
+  function renderDone() {
+    const nd = nextLearnDue();
+    const box = h('section', { class: 'bench empty' });
+    box.append(h('h2', {}, '今日の分は掘り終えた'));
+    box.append(
+      h(
+        'p',
+        { class: 'lead' },
+        nd
+          ? `Next learning step in ${fmtIvl(Math.max(0, nd - Date.now()))}.`
+          : 'Nothing due. Read a passage, or raise new words per day in 設定.',
+      ),
+    );
+    const btns = h('div', { class: 'row-btns' });
+    if (nd)
+      btns.append(
+        h(
+          'button',
+          {
+            class: 'btn',
+            onclick: () => {
+              for (const s of Object.values(st.cards))
+                if (s.s !== 'review' && s.due > Date.now()) s.due = Date.now();
+              save();
+              queue = [];
+              render();
+            },
+          },
+          '学習中の語を今やる',
+        ),
+      );
+    btns.append(
+      h(
+        'button',
+        {
+          class: 'btn',
+          onclick: () => {
+            st.newToday.n = Math.max(0, st.newToday.n - 10);
+            save();
+            queue = [];
+            render();
+          },
+        },
+        '新しい語をあと10',
+      ),
+    );
+    box.append(btns);
+    return box;
+  }
+
+  function preview(face) {
+    const s = st.cards[face] || {};
+    const now = Date.now();
+    return [1, 2, 3, 4].map((g) => fmtIvl(schedule(s, g, now).due - now));
+  }
+
+  function renderCard() {
+    const [key, side] = cur.face.split(':');
+    const c = byKey.get(key);
+    const { ja, form, en } = c.sentences[0];
+    const box = h('section', { class: 'bench', 'aria-live': 'polite' });
+    const s = st.cards[cur.face];
+    box.append(
+      h(
+        'div',
+        { class: 'kind' },
+        h(
+          'span',
+          {},
+          `${c.mod.title.ja.split(' — ')[0]} · ${side === 'r' ? '認識 recognition' : '産出 production'}`,
+        ),
+        h(
+          'span',
+          {},
+          s ? (s.s === 'review' ? `間隔 ${s.ivl || 1}日` : '学習中') : '新しい語',
+          ` · 残り ${queue.length}`,
+        ),
+      ),
+    );
+    box.append(
+      h(
+        'p',
+        { class: 'sentence', lang: 'ja' },
+        marked(ja, form, 't', side === 'p' && !cur.revealed),
+      ),
+    );
+    if (side === 'p' && !cur.revealed)
+      box.append(h('p', { class: 'hint', lang: 'ja' }, c.def_ja, h('br'), h('small', {}, c.gloss)));
+    if (!cur.revealed) {
+      box.append(
+        h('button', { class: 'reveal-btn', id: 'reveal', onclick: reveal }, '答えを見る  ␣'),
+      );
+    } else {
+      box.append(renderAnswer(c, en));
+      const pv = preview(cur.face);
+      const names = ['もう一度', '難しい', '正解', '簡単'];
+      box.append(
+        h(
+          'div',
+          { class: 'grades', role: 'group', 'aria-label': 'Grade' },
+          [1, 2, 3, 4].map((g) =>
+            h(
+              'button',
+              { class: 'g' + g, id: 'grade-' + g, onclick: () => grade(g) },
+              h('span', {}, `${g} ${names[g - 1]}`),
+              h('small', {}, pv[g - 1]),
+            ),
+          ),
+        ),
+      );
+    }
+    const tools = h('div', { class: 'tools' });
+    if (undo) tools.append(h('button', { class: 'linkish', onclick: doUndo }, '取り消す (u)'));
+    tools.append(
+      h(
+        'button',
+        {
+          class: 'linkish',
+          onclick: () => {
+            readMod = c.mod.id;
+            readPick = c.key;
+            tab = 'read';
+            render();
+          },
+        },
+        '読み物で見る',
+      ),
+    );
+    tools.append(
+      h(
+        'button',
+        {
+          class: 'linkish',
+          onclick: () => {
+            queue = queue.filter((f) => f !== cur.face);
+            queue.push(cur.face);
+            cur = null;
+            render();
+          },
+        },
+        '後回し',
+      ),
+    );
+    box.append(tools);
+    return box;
+  }
+
+  function renderAnswer(c, en) {
+    const a = h('div', { class: 'answer', lang: 'ja' });
+    a.append(
+      h(
+        'div',
+        { class: 'head' },
+        h('span', { class: 'term' }, c.term),
+        h('span', { class: 'reading' }, c.reading),
+      ),
+    );
+    a.append(
+      h(
+        'div',
+        { class: 'chips' },
+        h('span', { class: 'chip' }, c.pos),
+        ...c.register.split('・').map((r) => h('span', { class: 'chip' }, r)),
+      ),
+    );
+    a.append(h('p', { class: 'def' }, c.def_ja));
+    a.append(h('p', { class: 'gloss', lang: 'en' }, c.gloss));
+    const d = h('details', { class: 'en', lang: 'en' }, h('summary', {}, 'English'), en);
+    if (st.showEn) d.open = true;
+    a.append(d);
+    if (c.sentences.length > 1) {
+      const more = h('div', {}, h('div', { class: 'lbl' }, '別の文脈'));
+      for (const x of c.sentences.slice(1))
+        more.append(
+          h(
+            'div',
+            { class: 'ex' },
+            h('span', { class: 'ja' }, marked(x.ja, x.form)),
+            h('span', { class: 'en', lang: 'en' }, x.en),
+          ),
+        );
+      a.append(more);
+    }
+    if (c.collocations?.length)
+      a.append(
+        h(
+          'div',
+          {},
+          h('div', { class: 'lbl' }, 'よく使う形'),
+          h(
+            'div',
+            { class: 'cols' },
+            c.collocations.map((x) => h('span', {}, x)),
+          ),
+        ),
+      );
+    if (c.confusables?.length)
+      a.append(
+        h(
+          'div',
+          {},
+          h('div', { class: 'lbl' }, '紛らわしい語'),
+          h(
+            'ul',
+            { class: 'conf' },
+            c.confusables.map((x) =>
+              h('li', {}, h('b', {}, x.term), ' — ', h('span', { lang: 'en' }, x.note)),
+            ),
+          ),
+        ),
+      );
+    if (c.kanji)
+      a.append(
+        h(
+          'div',
+          {},
+          h('div', { class: 'lbl' }, '字'),
+          h(
+            'p',
+            { class: 'gloss' },
+            `音 ${(c.kanji.on || []).join('・')}　訓 ${(c.kanji.kun || []).join('・')} — ${c.kanji.meaning || ''}`,
+          ),
+          h(
+            'div',
+            { class: 'cols' },
+            (c.kanji.compounds || []).map((x) => h('span', {}, `${x.w}（${x.r}）`)),
+          ),
+        ),
+      );
+    if (c.note) a.append(h('p', { class: 'note', lang: 'en' }, c.note));
+    return a;
+  }
+
+  function reveal() {
+    if (cur && !cur.revealed) {
+      cur.revealed = true;
+      render();
+      document.getElementById('grade-3')?.focus({ preventScroll: true });
+    }
+  }
+  function grade(g) {
+    if (!cur?.revealed) return;
+    const f = cur.face,
+      now = Date.now();
+    const before = st.cards[f];
+    undo = { f, before: before ? { ...before } : null, nt: { ...st.newToday }, queue: [...queue] };
+    if (!before) {
+      newLeft();
+      st.newToday.n++;
+    }
+    const next = schedule(before || {}, g, now);
+    st.cards[f] = next;
+    st.log.push([f, g, now]);
+    if (st.log.length > 5000) st.log = st.log.slice(-5000);
+    save();
+    queue = queue.filter((x) => x !== f);
+    if (next.s !== 'review' && next.due - now < 30 * MIN) {
+      // learning steps come back inside the sitting, after a few other cards
+      queue.splice(Math.min(queue.length, 3), 0, f);
+    }
+    cur = queue.length ? { face: queue[0], revealed: false } : null;
+    render();
+  }
+  function doUndo() {
+    if (!undo) return;
+    if (undo.before) st.cards[undo.f] = undo.before;
+    else delete st.cards[undo.f];
+    st.newToday = undo.nt;
+    st.log.pop();
+    queue = undo.queue;
+    cur = { face: undo.f, revealed: true };
+    undo = null;
+    save();
+    render();
+  }
+
+  function renderRead() {
+    const m = MODS.find((x) => x.id === readMod) || MODS[0];
+    const sel = h(
+      'select',
+      {
+        id: 'read-module',
+        'aria-label': 'Module',
+        onchange: (e) => {
+          readMod = e.target.value;
+          readPick = null;
+          render();
+        },
+      },
+      MODS.map((x) => h('option', { value: x.id, selected: x.id === m.id }, x.title.ja)),
+    );
+    view.append(sel);
+    const art = h('article', { class: 'passage', lang: 'ja' });
+    art.append(
+      h('h2', {}, m.passage.title),
+      h(
+        'p',
+        { class: 'sub', lang: 'en' },
+        (m.passage.title_en || m.title.en) +
+          ` · ${m.cards.length} mined words, underlined — tap one`,
+      ),
+    );
+    // place each card on its sentences[0] occurrence; longer forms first so compounds win
+    const flat = m.passage.text;
+    const marks = [];
+    for (const c of [...m.cards].sort(
+      (a, b) => b.sentences[0].form.length - a.sentences[0].form.length,
+    )) {
+      const s0 = c.sentences[0];
+      let at = flat.indexOf(s0.ja);
+      while (at >= 0) {
+        const a = at + s0.ja.indexOf(s0.form),
+          b = a + s0.form.length;
+        if (!marks.some((x) => a < x.b && b > x.a)) {
+          marks.push({ a, b, c });
+          break;
+        }
+        at = flat.indexOf(s0.ja, at + 1);
+      }
+    }
+    marks.sort((x, y) => x.a - y.a);
+    let pos = 0,
+      para = h('p');
+    const flush = (txt) => {
+      const parts = txt.split(/\n+/);
+      parts.forEach((p, i) => {
+        if (i > 0) {
+          if (para.childNodes.length) art.append(para);
+          para = h('p');
+        }
+        if (p) para.append(p);
+      });
+    };
+    for (const mk of marks) {
+      flush(flat.slice(pos, mk.a));
+      const known = st.cards[mk.c.key + ':r']?.s === 'review';
+      para.append(
+        h(
+          'button',
+          {
+            class: 'w' + (known ? ' known' : ''),
+            onclick: () => {
+              readPick = mk.c.key;
+              render();
+            },
+          },
+          flat.slice(mk.a, mk.b),
+        ),
+      );
+      pos = mk.b;
+    }
+    flush(flat.slice(pos));
+    if (para.childNodes.length) art.append(para);
+    view.append(art);
+    if (readPick) {
+      const c = byKey.get(readPick);
+      if (c) {
+        const [cls, lbl] = stateLabel(c);
+        view.append(
+          h(
+            'div',
+            { class: 'pop', lang: 'ja' },
+            h(
+              'div',
+              { class: 'head' },
+              h('span', { class: 'term', style: 'font-size:1.4rem' }, c.term),
+              h('span', { class: 'reading' }, c.reading),
+              h('span', { class: 'st ' + cls }, lbl),
+            ),
+            h('p', { class: 'def' }, c.def_ja),
+            h('p', { class: 'gloss', lang: 'en' }, c.gloss),
+            h(
+              'button',
+              {
+                class: 'linkish',
+                onclick: () => {
+                  readPick = null;
+                  render();
+                },
+              },
+              '閉じる',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  function renderIndex() {
+    const inp = h('input', {
+      class: 'search',
+      id: 'index-search',
+      type: 'search',
+      placeholder: '検索 — kanji, kana or English',
+      value: q,
+      oninput: (e) => {
+        q = e.target.value;
+        drawRows();
+      },
+    });
+    view.append(inp);
+    const rows = h('div', { class: 'rows' });
+    view.append(rows);
+    const drawRows = () => {
+      rows.replaceChildren();
+      const k = q.trim().toLowerCase();
+      for (const c of CARDS) {
+        if (
+          k &&
+          !(c.term + c.reading + c.gloss + c.def_ja + c.mod.title.ja).toLowerCase().includes(k)
+        )
+          continue;
+        const [cls, lbl] = stateLabel(c);
+        rows.append(
+          h(
+            'div',
+            {
+              class: 'row',
+              role: 'button',
+              tabindex: '0',
+              onclick: () => {
+                readMod = c.mod.id;
+                readPick = c.key;
+                tab = 'read';
+                render();
+              },
+            },
+            h('span', { class: 'w', lang: 'ja' }, c.term, h('small', {}, c.reading)),
+            h('span', { class: 'g' }, c.gloss),
+            h('span', { class: 'st ' + cls }, lbl),
+          ),
+        );
+      }
+      if (!rows.childNodes.length)
+        rows.append(h('p', { class: 'fine' }, 'No word matches that search.'));
+    };
+    drawRows();
+  }
+
+  function renderSettings() {
+    const box = h('section', { class: 'settings' });
+    box.append(
+      h(
+        'div',
+        { class: 'field' },
+        h('label', { for: 'set-new' }, '一日の新しい語 · new words per day'),
+        h('input', {
+          type: 'number',
+          id: 'set-new',
+          min: '0',
+          max: '200',
+          value: st.newPerDay,
+          onchange: (e) => {
+            st.newPerDay = clamp(parseInt(e.target.value, 10) || 0, 0, 200);
+            save();
+            queue = [];
+          },
+        }),
+      ),
+    );
+    box.append(
+      h(
+        'div',
+        { class: 'field' },
+        h('label', { for: 'set-mode' }, 'カードの種類 · card faces'),
+        h(
+          'select',
+          {
+            id: 'set-mode',
+            onchange: (e) => {
+              st.mode = e.target.value;
+              save();
+              queue = [];
+              cur = null;
+            },
+          },
+          [
+            ['recognition', '認識のみ — sentence → meaning (recommended start)'],
+            ['both', '認識＋産出 — production unlocks after a word is recognised'],
+            ['production', '産出のみ — cloze + Japanese definition → word'],
+          ].map(([v, t]) => h('option', { value: v, selected: st.mode === v }, t)),
+        ),
+      ),
+    );
+    box.append(
+      h(
+        'div',
+        { class: 'field' },
+        h(
+          'label',
+          {},
+          h('input', {
+            type: 'checkbox',
+            id: 'set-en',
+            checked: st.showEn,
+            onchange: (e) => {
+              st.showEn = e.target.checked;
+              save();
+            },
+          }),
+          ' 英訳を最初から開く · open the English translation by default',
+        ),
+      ),
+    );
+    const ta = h('textarea', {
+      id: 'progress',
+      'aria-label': 'Progress JSON',
+      spellcheck: 'false',
+    });
+    box.append(
+      h(
+        'div',
+        { class: 'field' },
+        h('label', { for: 'progress' }, '進み具合の保存 · back up or move your progress'),
+        h(
+          'p',
+          { class: 'fine' },
+          'Progress lives in this browser only. Copy it out to keep it; paste a copy back in and press 読み込む to restore it.',
+        ),
+        ta,
+        h(
+          'div',
+          { class: 'row-btns' },
+          h(
+            'button',
+            {
+              class: 'btn',
+              onclick: () => {
+                ta.value = JSON.stringify(st);
+                ta.select();
+                navigator.clipboard?.writeText(ta.value).then(
+                  () => (msg.textContent = 'Copied.'),
+                  () => (msg.textContent = 'Selected — copy it with your keyboard.'),
+                );
+              },
+            },
+            '書き出す · copy',
+          ),
+          h(
+            'button',
+            {
+              class: 'btn',
+              onclick: () => {
+                try {
+                  const v = JSON.parse(ta.value);
+                  if (!v || typeof v.cards !== 'object') throw 0;
+                  st = { ...DEFAULTS, ...v };
+                  save();
+                  queue = [];
+                  cur = null;
+                  msg.textContent = 'Progress restored.';
+                } catch (e) {
+                  msg.textContent =
+                    'That text is not a Kotoba Mine backup. Paste the whole copied block.';
+                }
+              },
+            },
+            '読み込む · restore',
+          ),
+          h(
+            'button',
+            {
+              class: 'btn danger',
+              onclick: (e) => {
+                if (e.target.dataset.arm) {
+                  st = structuredClone(DEFAULTS);
+                  save();
+                  queue = [];
+                  cur = null;
+                  render();
+                } else {
+                  e.target.dataset.arm = '1';
+                  e.target.textContent = 'もう一度押すと全消去';
+                }
+              },
+            },
+            'リセット · reset',
+          ),
+        ),
+      ),
+    );
+    const msg = h('p', { class: 'fine', 'aria-live': 'polite' });
+    box.append(msg);
+    const reviews = st.log.length;
+    box.append(
+      h(
+        'p',
+        { class: 'fine' },
+        `Scheduler: FSRS-6 with Bunki's pinned weights, 90% target retention. ${reviews} reviews logged. ` +
+          `Sentences, passages and Japanese definitions are Bunki originals; English glosses are edited from JMdict (EDRDG, CC BY-SA 4.0).`,
+      ),
+    );
+    view.append(box);
+  }
+
+  document.querySelector('nav.tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-tab]');
+    if (b) {
+      tab = b.dataset.tab;
+      render();
+      window.scrollTo(0, 0);
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (tab !== 'study' || e.target.closest('input, textarea, select')) return;
+    if ((e.key === ' ' || e.key === 'Enter') && cur && !cur.revealed) {
+      e.preventDefault();
+      reveal();
+    } else if (cur?.revealed && ['1', '2', '3', '4'].includes(e.key)) {
+      e.preventDefault();
+      grade(Number(e.key));
+    } else if (e.key === 'u' && undo) doUndo();
+  });
+  render();
+</script>

@@ -72,6 +72,12 @@
     "licence": "Bunki original",
     "attribution": "Bunki original text",
     "url": ""
+   },
+   {
+    "name": "bunki-kotoba-mine",
+    "licence": "Bunki original",
+    "attribution": "Bunki original passages written around a learner's mined-word list",
+    "url": ""
    }
   ]
  },
@@ -4868,6 +4874,750 @@
     "する",
     "史上",
     "なる"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m01-money",
+   "title": "足し算で増えるお金、掛け算で増えるお金 — 祖父の帳簿から",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m01-money.json",
+   "titleEn": "Money that grows by addition, money that grows by multiplication: from my grandfather's ledgers",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1261,
+   "snippet": "大学二年の春、私は祖父が四十年営んできた小さな文具店の帳簿を整理することになった。古いノートには、毎月の売り上げや経費が几帳面な",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.7758224804022618,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7065217391304348,
+      "band_vector": {
+       "n5": 0.23369565217391305,
+       "n4": 0.15217391304347827,
+       "n3": 0.21467391304347827,
+       "n2": 0.029891304347826088,
+       "n1": 0.07608695652173914,
+       "oov": 0.29347826086956524
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 368
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "大学",
+    "祖父",
+    "営む",
+    "小さな",
+    "文具",
+    "帳簿"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m02-hegemony",
+   "title": "半導体をめぐる覇権の盤面 ― 日米摩擦から何を読むか",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m02-hegemony.json",
+   "titleEn": "The Board of Chip Hegemony: What the US–Japan Friction Teaches",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1296,
+   "snippet": "一九八〇年代、半導体は「産業のコメ」と呼ばれた。あらゆる電子機器に組み込まれ、計算機から兵器までを動かす部品である。その生産能力",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.0214072639225193,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6535433070866141,
+      "band_vector": {
+       "n5": 0.14698162729658792,
+       "n4": 0.11023622047244094,
+       "n3": 0.2335958005249344,
+       "n2": 0.04199475065616798,
+       "n1": 0.12073490813648294,
+       "oov": 0.3464566929133858
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 381
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "導体",
+    "産業",
+    "コメ",
+    "呼ぶ",
+    "あらゆる",
+    "電子"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m03-fab",
+   "title": "砂から回路へ — 半導体ができるまで",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m03-fab.json",
+   "titleEn": "From sand to circuits: how a chip is made",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1407,
+   "snippet": "私たちが毎日使うスマートフォンの中では、爪ほどの大きさのチップに何十億個ものトランジスタが詰め込まれている。その起点をたどると、",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.2452525059665867,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.694300518134715,
+      "band_vector": {
+       "n5": 0.19170984455958548,
+       "n4": 0.10621761658031088,
+       "n3": 0.24611398963730569,
+       "n2": 0.06735751295336788,
+       "n1": 0.08290155440414508,
+       "oov": 0.30569948186528495
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 386
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "毎日",
+    "使う",
+    "スマート",
+    "フォン",
+    "大きい",
+    "チップ"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m04-incident",
+   "title": "戻らなかったボート ― 三浦沖の捜索と、消えた証人",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m04-incident.json",
+   "titleEn": "The Boat That Never Came Back: A Search off Miura and a Missing Witness",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1304,
+   "snippet": "神奈川県三浦市の小さなマリーナで、一隻の貸しボートが戻らなかったのは、九月最後の日曜日のことだった。借りたのは東京都内に住む会社",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.7776798697775362,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7020725388601037,
+      "band_vector": {
+       "n5": 0.20984455958549222,
+       "n4": 0.12694300518134716,
+       "n3": 0.23316062176165803,
+       "n2": 0.031088082901554404,
+       "n1": 0.10103626943005181,
+       "oov": 0.2979274611398964
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 386
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "神奈川県",
+    "小さな",
+    "マリーナ",
+    "貸す",
+    "ボート",
+    "戻る"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m05-politics",
+   "title": "議事堂の長い一日",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m05-politics.json",
+   "titleEn": "A Long Day at the Diet",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1178,
+   "snippet": "午前九時、国会議事堂の周辺には報道陣が詰めかけていた。この日は、衆議院本会議で重要な法案の採決が予定されていたうえ、夕方には首相",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.024770963704631,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7744565217391304,
+      "band_vector": {
+       "n5": 0.19021739130434784,
+       "n4": 0.11413043478260869,
+       "n3": 0.32608695652173914,
+       "n2": 0.051630434782608696,
+       "n1": 0.09239130434782608,
+       "oov": 0.22554347826086957
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 368
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "午前",
+    "国会",
+    "議事",
+    "周辺",
+    "報道",
+    "詰めかける"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m06-works",
+   "title": "橋が落ちた日 — 浜里町歩道橋崩落、県議会が検証",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m06-works.json",
+   "titleEn": "The day the bridge fell: the prefectural assembly audits the Hamasato footbridge collapse",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 967,
+   "snippet": "今年3月、浜里町の駅前で県道をまたぐ歩道橋が崩落した。深夜だったため通行人はおらず、けが人は出なかったが、朝の通勤時間帯であれば",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.0051552511415522,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7474747474747474,
+      "band_vector": {
+       "n5": 0.17845117845117844,
+       "n4": 0.09427609427609428,
+       "n3": 0.30303030303030304,
+       "n2": 0.07407407407407407,
+       "n1": 0.09764309764309764,
+       "oov": 0.25252525252525254
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 297
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "今年",
+    "駅前",
+    "県道",
+    "またぐ",
+    "歩道",
+    "崩落"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m07-board",
+   "title": "盤上の十七歳 — 朝霧湊、初のタイトル挑戦",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m07-board.json",
+   "titleEn": "Seventeen at the Board: Minato Asagiri's First Title Challenge",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1159,
+   "snippet": "対局室には、壁の時計の秒針が進む音だけが響いていた。盤上に駒を置く乾いた音が、ときおりそれに重なる。十七歳の朝霧湊七段が挑むのは",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.7744221343873523,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.665625,
+      "band_vector": {
+       "n5": 0.19375,
+       "n4": 0.121875,
+       "n3": 0.234375,
+       "n2": 0.046875,
+       "n1": 0.06875,
+       "oov": 0.334375
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 320
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "対局",
+    "時計",
+    "秒針",
+    "進む",
+    "響く",
+    "盤上"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m08-mind",
+   "title": "大人の脳は第二言語をどう覚えるか",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m08-mind.json",
+   "titleEn": "How the Adult Brain Learns a Second Language",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1392,
+   "snippet": "「語学には才能が要る」「大人になってからでは遅い」。外国語を学ぶ人なら、こうした言葉を一度は耳にしたことがあるだろう。しかし、そ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.3942298744673494,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7715617715617715,
+      "band_vector": {
+       "n5": 0.26107226107226106,
+       "n4": 0.1258741258741259,
+       "n3": 0.3006993006993007,
+       "n2": 0.030303030303030304,
+       "n1": 0.053613053613053616,
+       "oov": 0.22843822843822845
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 429
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "語学",
+    "才能",
+    "要る",
+    "大人",
+    "なる",
+    "遅い"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m09-math",
+   "title": "記号で世界を書く ― 引力から文法まで",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m09-math.json",
+   "titleEn": "Writing the World in Symbols: From Gravity to Grammar",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1180,
+   "snippet": "リンゴが木から落ちるのも、月が地球の周りを回り続けるのも、同じ一つの法則で説明できる。ニュートンが万有引力の法則を示したとき、人",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.4962547169811327,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7543352601156069,
+      "band_vector": {
+       "n5": 0.2023121387283237,
+       "n4": 0.10982658959537572,
+       "n3": 0.2774566473988439,
+       "n2": 0.08670520231213873,
+       "n1": 0.07803468208092486,
+       "oov": 0.24566473988439305
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 346
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "リンゴ",
+    "落ちる",
+    "地球",
+    "周り",
+    "回る",
+    "続ける"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m10-table",
+   "title": "讃岐の秋、台所の音",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m10-table.json",
+   "titleEn": "Autumn in Sanuki, Sounds from the Kitchen",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1124,
+   "snippet": "十月の終わり、高校時代からの友人の美咲が高松で店を開業したと聞き、香川へ向かった。目当てはもちろん讃岐うどんで、三日間で何軒回れ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.405226592797783,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6878980891719746,
+      "band_vector": {
+       "n5": 0.25796178343949044,
+       "n4": 0.18471337579617833,
+       "n3": 0.1464968152866242,
+       "n2": 0.06687898089171974,
+       "n1": 0.03184713375796178,
+       "oov": 0.31210191082802546
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 314
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "終わり",
+    "高校",
+    "時代",
+    "友人",
+    "開業",
+    "聞く"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m11-people",
+   "title": "銀髪の部長と、なんくるない夜",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m11-people.json",
+   "titleEn": "The Silver-Haired Boss and a Nankurunai Night",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1540,
+   "snippet": "うちの課の権田部長は、銀髪をきっちりとなでつけた五十代後半の男だ。会議では部下の報告を途中で遮り、「つべこべ言うな、結論から話せ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.3232112676056342,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6618357487922706,
+      "band_vector": {
+       "n5": 0.26811594202898553,
+       "n4": 0.178743961352657,
+       "n3": 0.1497584541062802,
+       "n2": 0.03140096618357488,
+       "n1": 0.033816425120772944,
+       "oov": 0.33816425120772947
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 414
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "うち",
+    "部長",
+    "銀髪",
+    "きっちり",
+    "なでつける",
+    "後半"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "kotoba-mine-m12-kanji",
+   "title": "一字の住まい — 漢字は熟語の中で暮らしている",
+   "source": "bunki-kotoba-mine",
+   "sourceLabel": "単語帳の読み物 · 言葉の鉱脈",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "deck",
+   "file": "kotoba-mine-m12-kanji.json",
+   "titleEn": "Where a single kanji lives: characters at home in their compounds",
+   "titleEnSource": "shelf-map-2026",
+   "chars": 1078,
+   "snippet": "辞書で漢字を一字引くと、意外なほどたくさんの読みと意味が並んでいる。けれども、私たちがふだん目にするのは、たいてい熟語の一部とし",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.69569677419355,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7638888888888888,
+      "band_vector": {
+       "n5": 0.2743055555555556,
+       "n4": 0.1840277777777778,
+       "n3": 0.2048611111111111,
+       "n2": 0.059027777777777776,
+       "n1": 0.041666666666666664,
+       "oov": 0.2361111111111111
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 288
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "辞書",
+    "漢字",
+    "引く",
+    "意外",
+    "たくさん",
+    "読み"
    ],
    "truncated": false
   }

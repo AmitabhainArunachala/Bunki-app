@@ -1,0 +1,929 @@
+{
+  "id": "m10-table",
+  "passage": {
+    "title": "讃岐の秋、台所の音",
+    "title_en": "Autumn in Sanuki, Sounds from the Kitchen",
+    "level": "N1",
+    "text": "十月の終わり、高校時代からの友人の美咲が高松で店を開業したと聞き、香川へ向かった。目当てはもちろん讃岐うどんで、三日間で何軒回れるかがひそかな課題だった。出発前に届いた彼女のはがきには、手書きの地図とおすすめの店が並び、ちょっとした旅のしおりのようだった。読んでいるだけで、もう気持ちが浮き立った。\n\n宿は町はずれの古い旅館で、食事はうどん屋で済ませるつもりで素泊りにした。通された六畳間には小さな床の間があり、柿を描いた掛け軸が下がっている。地元の芸術家の作品だと、おかみさんが教えてくれた。窓の外では、庭師がツツジの植え込みを丸く刈り込んでいた。\n\n翌日は朝から四軒のうどん屋を回った。私は麺のこしや出汁の味を手帳に殴り書きし、勝手に十点満点で採点していった。いちばん印象に残ったのは、最後に入った小さな店だ。ご主人は注文が入るたびにかつお節を削り、その香りが狭い店内に広がっていた。まな板の上でねぎを刻む音も小気味よく、待つ時間さえごちそうに思えた。\n\n午後、美咲の店を訪ねた。昆布や煮干しなどの乾物と漬物を扱う店で、棚の隅には本場のザーサイまで並んでいる。「仕入れ先を一軒ずつ吟味していたら、こうなったの」と彼女は笑った。値札はすべて彼女の手書きで、高校の頃と同じ丸い字だった。入り口のチラシには「創開記念セール」とある。開業ではなく「創開」という見慣れない言葉を選ぶあたりが、いかにも彼女らしい。\n\n私たちは同じ共学の高校に通っていた。灼熱の夏の教室で、下敷きをうちわ代わりにあおぎながら、いつか店を持ちたいと語っていたのが彼女だった。実は去年の台風で、借りる予定だった倉庫が倒れた大木の下敷きになり、開店は一年遅れたのだという。「でも、そのおかげで今の物件に出会えたんだから幸運だった」と彼女は言う。その晩の開店祝いは盛大で、商店街の人たちが入れ替わり立ち替わり顔を出した。売り上げの一部は、台風で傷んだ近くの神社の修繕に寄付するそうだ。\n\n宿に戻るころには、日が落ちてすっかり肌寒くなっていた。この旅館の自慢は、敷地内から湧出する温泉だ。湯はわずかに白く濁っていて、ほのかに硫黄のにおいがする。冷えきった素肌に湯がじんわりとしみて、思わず長いため息が出た。\n\n東京に戻ると、留守中にたまった郵便物の仕分けが待っていた。宛先が前の住所のままの封筒が、何通も交じっている。春に引っ越したのに、通販サイトや会報のあて先変更をいくつか忘れていたらしい。\n\n片づけを終えて旅の手帳を開くと、紅葉を押した栞がはさまっていた。美咲が店でお客さんに配っている手作りのものだ。殴り書きのメモを読み返しながら、次はどの季節に香川を訪ねようかと考えている。"
+  },
+  "cards": [
+    {
+      "n": 2,
+      "term": "かつお節",
+      "reading": "かつおぶし",
+      "gloss": "katsuobushi (dried bonito); bonito flakes",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "カツオの身を煮て干し、固くしたもの。削ってだしなどに使う。",
+      "sentences": [
+        {
+          "ja": "ご主人は注文が入るたびにかつお節を削り、その香りが狭い店内に広がっていた。",
+          "form": "かつお節",
+          "en": "Each time an order came in, the owner shaved katsuobushi, and its aroma filled the cramped shop."
+        },
+        {
+          "ja": "冷ややっこにかつお節をのせて、しょうゆを少したらす。",
+          "form": "かつお節",
+          "en": "Top the chilled tofu with bonito flakes and drizzle on a little soy sauce."
+        }
+      ],
+      "collocations": ["かつお節を削る", "かつお節でだしを取る", "かつお節をかける"],
+      "confusables": [
+        {
+          "term": "削り節",
+          "note": "削り節 is shaved flakes (from bonito or other fish); かつお節 is both the hard block and its flakes."
+        }
+      ],
+      "note": "Kanji spelling 鰹節. Packaged flakes are often sold as 花かつお or 削り節."
+    },
+    {
+      "n": 47,
+      "term": "まな板",
+      "reading": "まないた",
+      "gloss": "cutting board, chopping board",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "料理で、包丁を使って食材を切るときに下に置く板。",
+      "sentences": [
+        {
+          "ja": "まな板の上でねぎを刻む音も小気味よく、待つ時間さえごちそうに思えた。",
+          "form": "まな板",
+          "en": "The crisp sound of green onions being chopped on the cutting board made even the wait feel like a treat."
+        },
+        {
+          "ja": "手術を待つ間は、まさにまな板の鯉の心境だった。",
+          "form": "まな板",
+          "en": "Waiting for the operation, I felt exactly like a carp on the cutting board — completely at others' mercy."
+        }
+      ],
+      "collocations": ["まな板で切る", "まな板を洗う", "まな板の鯉"],
+      "confusables": [],
+      "note": "まな板の鯉 (a carp on the cutting board) is a common idiom for being helpless, with your fate in someone else's hands."
+    },
+    {
+      "n": 205,
+      "term": "讃岐うどん",
+      "reading": "さぬきうどん",
+      "gloss": "Sanuki udon (firm, chewy udon from Kagawa)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "香川県の名物で、こしが強いのが特徴のうどん。",
+      "sentences": [
+        {
+          "ja": "目当てはもちろん讃岐うどんで、三日間で何軒回れるかがひそかな課題だった。",
+          "form": "讃岐うどん",
+          "en": "Sanuki udon was of course the goal, and my private challenge was how many shops I could hit in three days."
+        },
+        {
+          "ja": "駅前の讃岐うどんの店は、朝七時から行列ができている。",
+          "form": "讃岐うどん",
+          "en": "The Sanuki udon place in front of the station has a line from seven in the morning."
+        }
+      ],
+      "collocations": ["本場の讃岐うどん", "讃岐うどんを食べ歩く", "讃岐うどんのこし"],
+      "confusables": [],
+      "note": "讃岐 is the old province name for present-day Kagawa, which markets itself as うどん県. こし (firm, springy bite) is the key word for praising it."
+    },
+    {
+      "n": 298,
+      "term": "ザーサイ",
+      "reading": "ザーサイ",
+      "gloss": "zha cai (Sichuan pickled mustard stem)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "中国の四川で作られる漬物。からし菜の太い茎を塩と香辛料で漬ける。",
+      "sentences": [
+        {
+          "ja": "昆布や煮干しなどの乾物と漬物を扱う店で、棚の隅には本場のザーサイまで並んでいる。",
+          "form": "ザーサイ",
+          "en": "It's a shop for dried goods like kelp and dried sardines plus pickles, and in the corner of the shelf there's even authentic zha cai."
+        },
+        {
+          "ja": "おかゆにザーサイを少し添えると、ぐっと食が進む。",
+          "form": "ザーサイ",
+          "en": "Add a little zha cai to rice porridge and you'll find yourself eating much more."
+        }
+      ],
+      "collocations": ["ザーサイを刻む", "おかゆとザーサイ", "ザーサイの炒め物"],
+      "confusables": [],
+      "note": "From Chinese 榨菜. Common in Japan as a side for rice porridge, ramen or fried rice; usually sold sliced in packets or jars."
+    },
+    {
+      "n": 214,
+      "term": "素泊り",
+      "reading": "すどまり",
+      "gloss": "staying overnight without meals; room-only stay",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "宿で食事をつけず、部屋に泊まるだけにすること。",
+      "sentences": [
+        {
+          "ja": "宿は町はずれの古い旅館で、食事はうどん屋で済ませるつもりで素泊りにした。",
+          "form": "素泊り",
+          "en": "The inn was an old ryokan on the edge of town; I planned to eat at udon shops, so I booked a room-only stay."
+        },
+        {
+          "ja": "素泊りなら、一泊四千円で泊まれますよ。",
+          "form": "素泊り",
+          "en": "If you go room-only, you can stay for 4,000 yen a night."
+        }
+      ],
+      "collocations": ["素泊りプラン", "素泊りで泊まる", "素泊り料金"],
+      "confusables": [
+        {
+          "term": "一泊二食",
+          "note": "一泊二食(付き) is the standard ryokan package with dinner and breakfast — the opposite of 素泊り."
+        }
+      ],
+      "note": "Usually spelled 素泊まり; 素泊り is a common shortened okurigana variant seen on signs and booking sites."
+    },
+    {
+      "n": 21,
+      "term": "床の間",
+      "reading": "とこのま",
+      "gloss": "tokonoma (raised alcove for a scroll or flowers)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "和室の奥を一段高くし、掛け軸や花を飾るところ。",
+      "sentences": [
+        {
+          "ja": "通された六畳間には小さな床の間があり、柿を描いた掛け軸が下がっている。",
+          "form": "床の間",
+          "en": "The six-mat room I was shown to had a small tokonoma, with a hanging scroll of persimmons."
+        },
+        {
+          "ja": "祖父は床の間に、季節ごとの花を生けていた。",
+          "form": "床の間",
+          "en": "My grandfather used to arrange seasonal flowers in the tokonoma."
+        }
+      ],
+      "collocations": ["床の間に飾る", "床の間を背にして座る", "床の間付きの和室"],
+      "confusables": [],
+      "note": "The seat with one's back to the tokonoma is the place of honor (上座), offered to guests."
+    },
+    {
+      "n": 96,
+      "term": "値札",
+      "reading": "ねふだ",
+      "gloss": "price tag, price label",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "商品につけて、いくらかを示す小さな札。",
+      "sentences": [
+        {
+          "ja": "値札はすべて彼女の手書きで、高校の頃と同じ丸い字だった。",
+          "form": "値札",
+          "en": "Every price tag was handwritten by her, in the same round letters as in high school."
+        },
+        {
+          "ja": "プレゼントだから、値札は外しておいてね。",
+          "form": "値札",
+          "en": "It's a present, so take the price tag off, okay?"
+        }
+      ],
+      "collocations": ["値札を付ける", "値札を外す", "値札を貼り替える"],
+      "confusables": [
+        {
+          "term": "値段",
+          "note": "値段 is the price itself; 値札 is the physical tag showing it."
+        }
+      ]
+    },
+    {
+      "n": 162,
+      "term": "開業",
+      "reading": "かいぎょう",
+      "gloss": "opening a business; starting a practice; opening (of a line/station)",
+      "pos": "noun · suru verb",
+      "register": "日常・報道",
+      "def_ja": "新しく商売や事業を始めること。",
+      "sentences": [
+        {
+          "ja": "十月の終わり、高校時代からの友人の美咲が高松で店を開業したと聞き、香川へ向かった。",
+          "form": "開業",
+          "en": "In late October, hearing that my high-school friend Misaki had opened a shop in Takamatsu, I headed for Kagawa."
+        },
+        {
+          "ja": "新しい駅は、来年の春に開業する予定だ。",
+          "form": "開業",
+          "en": "The new station is scheduled to open next spring."
+        }
+      ],
+      "collocations": ["開業する", "開業医", "開業祝い"],
+      "confusables": [
+        {
+          "term": "開店",
+          "note": "開店 is opening a shop (also opening for the day); 開業 is starting a business or practice as a whole."
+        },
+        {
+          "term": "創業",
+          "note": "創業 is founding a company, used for history: 創業100年."
+        },
+        {
+          "term": "創開",
+          "note": "創開 is a very rare word; normal Japanese uses 開業 or 開店."
+        }
+      ],
+      "note": "Also used for railways and facilities: 新幹線の開業. 開業医 is a doctor in private practice."
+    },
+    {
+      "n": 163,
+      "term": "創開",
+      "reading": "そうかい",
+      "gloss": "opening, founding (very rare word)",
+      "pos": "noun",
+      "register": "書き言葉",
+      "def_ja": "新しく始めること。店などを開くこと。ふつうは使わない珍しい語。",
+      "sentences": [
+        {
+          "ja": "入り口のチラシには「創開記念セール」とある。",
+          "form": "創開",
+          "en": "The flyer at the entrance says “Grand Opening Sale.”"
+        },
+        {
+          "ja": "「創開」は辞書にもほとんど載っていない、珍しい言葉だ。",
+          "form": "創開",
+          "en": "“Sōkai” (創開) is an unusual word that hardly appears even in dictionaries."
+        }
+      ],
+      "collocations": ["創開記念"],
+      "confusables": [
+        {
+          "term": "開業",
+          "note": "開業/開店 are what people actually say for opening a business."
+        },
+        {
+          "term": "爽快",
+          "note": "Homophone そうかい: refreshing, exhilarating (気分爽快)."
+        },
+        {
+          "term": "総会",
+          "note": "Homophone そうかい: general meeting (株主総会)."
+        }
+      ],
+      "note": "Very rare: most natives would not recognize it, and it is easily heard as 爽快 or 総会. Learn to read it, but use 開業・開店・創業 yourself. Source gloss “grand opening” overstates how established it is."
+    },
+    {
+      "n": 207,
+      "term": "宛先",
+      "reading": "あてさき",
+      "gloss": "address; destination; recipient (of mail, email)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "手紙や荷物、メールなどを届ける相手や、その住所。",
+      "sentences": [
+        {
+          "ja": "宛先が前の住所のままの封筒が、何通も交じっている。",
+          "form": "宛先",
+          "en": "Mixed in were several envelopes still addressed to my old address."
+        },
+        {
+          "ja": "メールの宛先を間違えて、別の人に送ってしまった。",
+          "form": "宛先",
+          "en": "I got the email recipient wrong and sent it to someone else."
+        }
+      ],
+      "collocations": ["宛先を書く", "宛先不明", "宛先を確認する"],
+      "confusables": [
+        {
+          "term": "宛名",
+          "note": "宛名 is the addressee's name; 宛先 is the destination/address (or recipient field in email)."
+        }
+      ],
+      "note": "Also written あて先. In email software, 宛先 is the “To:” field."
+    },
+    {
+      "n": 208,
+      "term": "あて先変更",
+      "reading": "あてさきへんこう",
+      "gloss": "change of (delivery) address; redirection",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "郵便物などを届けてもらう住所を、新しいものに変えること。",
+      "sentences": [
+        {
+          "ja": "春に引っ越したのに、通販サイトや会報のあて先変更をいくつか忘れていたらしい。",
+          "form": "あて先変更",
+          "en": "I moved in spring, yet it seems I forgot to update my address with a few online shops and newsletters."
+        },
+        {
+          "ja": "引っ越したので、カード会社にあて先変更を届け出た。",
+          "form": "あて先変更",
+          "en": "Since I moved, I notified the card company of my change of address."
+        }
+      ],
+      "collocations": ["あて先変更の手続き", "あて先変更届", "あて先変更をする"],
+      "confusables": [
+        {
+          "term": "転送",
+          "note": "転送 is forwarding mail to a new address (Japan Post does this after a 転居届); あて先変更 is updating the address itself."
+        },
+        {
+          "term": "住所変更",
+          "note": "住所変更 is the general term for changing one's registered address; あて先変更 focuses on where items are sent."
+        }
+      ],
+      "note": "Source gloss “redirection” is misleading: in everyday use it means updating the delivery address with a sender. Also written 宛先変更."
+    },
+    {
+      "n": 206,
+      "term": "寄付",
+      "reading": "きふ",
+      "gloss": "donation, contribution",
+      "pos": "noun · suru verb",
+      "register": "日常・報道",
+      "def_ja": "お金や品物を、学校や団体などに見返りなしで差し出すこと。",
+      "sentences": [
+        {
+          "ja": "売り上げの一部は、台風で傷んだ近くの神社の修繕に寄付するそうだ。",
+          "form": "寄付",
+          "en": "She says part of the proceeds will be donated to repair a nearby shrine damaged in the typhoon."
+        },
+        {
+          "ja": "卒業生からの寄付で、図書館に新しい本棚が入った。",
+          "form": "寄付",
+          "en": "Thanks to donations from alumni, the library got new bookshelves."
+        }
+      ],
+      "collocations": ["寄付する", "寄付金", "寄付を募る"],
+      "confusables": [
+        {
+          "term": "募金",
+          "note": "募金 is collecting money (often small sums, street collections); 寄付 is the act of giving."
+        },
+        {
+          "term": "寄附",
+          "note": "寄附 is the same word in official/legal spelling."
+        }
+      ]
+    },
+    {
+      "n": 264,
+      "term": "肌寒い",
+      "reading": "はださむい",
+      "gloss": "chilly, a little cold",
+      "pos": "i-adj",
+      "register": "日常",
+      "def_ja": "体に少しひんやりとした寒さを感じるようす。",
+      "sentences": [
+        {
+          "ja": "宿に戻るころには、日が落ちてすっかり肌寒くなっていた。",
+          "form": "肌寒く",
+          "en": "By the time I got back to the inn, the sun had set and it had turned quite chilly."
+        },
+        {
+          "ja": "朝晩は肌寒いから、上着を一枚持っていくといいよ。",
+          "form": "肌寒い",
+          "en": "Mornings and evenings are chilly, so you should bring a jacket."
+        }
+      ],
+      "collocations": ["肌寒い朝", "肌寒くなる", "肌寒い季節"],
+      "confusables": [
+        {
+          "term": "寒い",
+          "note": "寒い is plainly cold; 肌寒い is a mild chill felt on the skin, typical of autumn or early spring."
+        }
+      ],
+      "note": "Source gloss “unpleasantly cold” overstates it: 肌寒い is a light, seasonal chill, a staple of autumn weather talk."
+    },
+    {
+      "n": 228,
+      "term": "盛大",
+      "reading": "せいだい",
+      "gloss": "grand, lavish, lively; (casual) spectacularly",
+      "pos": "na-adj",
+      "register": "日常・報道",
+      "def_ja": "集まりなどに人が多く、にぎやかで立派なようす。",
+      "sentences": [
+        {
+          "ja": "その晩の開店祝いは盛大で、商店街の人たちが入れ替わり立ち替わり顔を出した。",
+          "form": "盛大",
+          "en": "The opening party that evening was a big affair, with people from the shopping street dropping in one after another."
+        },
+        {
+          "ja": "彼は段差につまずいて、みんなの前で盛大に転んだ。",
+          "form": "盛大に",
+          "en": "He tripped on a step and took a spectacular fall in front of everyone."
+        }
+      ],
+      "collocations": ["盛大な拍手", "盛大に祝う", "盛大なパーティー"],
+      "confusables": [],
+      "note": "Standard use is for celebrations and applause. In casual speech 盛大に〜 jokingly means “in a big way”: 盛大に転ぶ, 盛大にこぼす."
+    },
+    {
+      "n": 230,
+      "term": "幸運",
+      "reading": "こううん",
+      "gloss": "good luck, good fortune",
+      "pos": "noun · na-adj",
+      "register": "日常",
+      "def_ja": "運がよいこと。よいめぐり合わせ。",
+      "sentences": [
+        {
+          "ja": "「でも、そのおかげで今の物件に出会えたんだから幸運だった」と彼女は言う。",
+          "form": "幸運",
+          "en": "“But because of that I found this place, so it was a stroke of luck,” she says."
+        },
+        {
+          "ja": "試験の前日、友人から「幸運を祈る」とメッセージが届いた。",
+          "form": "幸運",
+          "en": "The day before the exam, a friend messaged me: “Good luck.”"
+        }
+      ],
+      "collocations": ["幸運を祈る", "幸運にも", "幸運に恵まれる"],
+      "confusables": [
+        {
+          "term": "幸福",
+          "note": "幸福 is happiness or well-being; 幸運 is luck."
+        },
+        {
+          "term": "好運",
+          "note": "好運 is an alternative spelling of the same word."
+        }
+      ]
+    },
+    {
+      "n": 198,
+      "term": "湧出",
+      "reading": "ゆうしゅつ",
+      "gloss": "welling up, gushing out (of springs, oil)",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・専門",
+      "def_ja": "地中から水や湯、油などがわき出ること。",
+      "sentences": [
+        {
+          "ja": "この旅館の自慢は、敷地内から湧出する温泉だ。",
+          "form": "湧出",
+          "en": "This inn's pride is the hot spring that wells up on its own grounds."
+        },
+        {
+          "ja": "この源泉の湧出量は、毎分五百リットルに達する。",
+          "form": "湧出",
+          "en": "The flow rate of this hot spring source reaches 500 liters per minute."
+        }
+      ],
+      "collocations": ["湧出量", "自然湧出", "湧出する"],
+      "confusables": [
+        {
+          "term": "湧き出る",
+          "note": "湧き出る is the everyday verb; 湧出 is the technical/written word used on hot spring signs and in reports."
+        }
+      ],
+      "note": "Very common on onsen information boards (湧出量, 湧出地). In speech people say 湧き出る or 出る."
+    },
+    {
+      "n": 246,
+      "term": "しおり",
+      "reading": "しおり",
+      "gloss": "bookmark; guide booklet (旅のしおり)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "本の読みかけの所にはさむ目印。また、行事などの案内の小冊子。",
+      "sentences": [
+        {
+          "ja": "出発前に届いた彼女のはがきには、手書きの地図とおすすめの店が並び、ちょっとした旅のしおりのようだった。",
+          "form": "しおり",
+          "en": "Her postcard, which arrived before I left, had a hand-drawn map and recommended shops — like a little travel guidebook."
+        },
+        {
+          "ja": "読みかけのページにしおりをはさんで、電気を消した。",
+          "form": "しおり",
+          "en": "I slipped a bookmark into the page I was on and turned off the light."
+        }
+      ],
+      "collocations": ["しおりをはさむ", "旅のしおり", "修学旅行のしおり"],
+      "confusables": [
+        {
+          "term": "栞",
+          "note": "栞 is the kanji spelling of the same word; the guidebook sense (旅のしおり) is usually in hiragana."
+        }
+      ],
+      "note": "旅のしおり / 修学旅行のしおり is the booklet of schedule and rules every Japanese student gets before a school trip."
+    },
+    {
+      "n": 245,
+      "term": "栞",
+      "reading": "しおり",
+      "gloss": "bookmark; guide booklet",
+      "pos": "noun",
+      "register": "書き言葉",
+      "def_ja": "読みかけの本にはさんで、どこまで読んだかの目印にするもの。",
+      "sentences": [
+        {
+          "ja": "片づけを終えて旅の手帳を開くと、紅葉を押した栞がはさまっていた。",
+          "form": "栞",
+          "en": "When I finished tidying and opened my travel notebook, I found a bookmark with a pressed maple leaf tucked inside."
+        },
+        {
+          "ja": "祖母の本には、四つ葉のクローバーを押した栞が残っていた。",
+          "form": "栞",
+          "en": "In my grandmother's book was a bookmark made from a pressed four-leaf clover."
+        }
+      ],
+      "collocations": ["栞をはさむ", "押し花の栞"],
+      "confusables": [
+        {
+          "term": "しおり",
+          "note": "Same word. 栞 looks literary and suits the bookmark object; hiragana しおり is more common, especially for guide booklets."
+        }
+      ],
+      "note": "The on'yomi カン in the source is almost never used. 栞 is also a popular girl's name (Shiori)."
+    },
+    {
+      "n": 260,
+      "term": "吟味",
+      "reading": "ぎんみ",
+      "gloss": "careful examination; careful selection",
+      "pos": "noun · suru verb",
+      "register": "書き言葉",
+      "def_ja": "品物や内容をよく調べて、よいものを選ぶこと。",
+      "sentences": [
+        {
+          "ja": "「仕入れ先を一軒ずつ吟味していたら、こうなったの」と彼女は笑った。",
+          "form": "吟味",
+          "en": "“I went through my suppliers one by one, choosing carefully, and this is how it ended up,” she laughed."
+        },
+        {
+          "ja": "彼は言葉を一つひとつ吟味しながら、お礼の手紙を書いた。",
+          "form": "吟味",
+          "en": "He wrote the thank-you letter weighing every single word."
+        }
+      ],
+      "collocations": ["素材を吟味する", "吟味を重ねる", "よく吟味する"],
+      "confusables": [
+        {
+          "term": "検討",
+          "note": "検討 is considering options before deciding; 吟味 stresses scrutinizing quality and picking the best."
+        }
+      ],
+      "note": "Very common in food writing: 吟味された素材 “carefully selected ingredients.” Historical senses (Edo-period interrogation, savoring poetry) are rare today."
+    },
+    {
+      "n": 166,
+      "term": "仕分け",
+      "reading": "しわけ",
+      "gloss": "sorting, classification",
+      "pos": "noun · suru verb",
+      "register": "日常",
+      "def_ja": "物を種類や行き先ごとに分けること。",
+      "sentences": [
+        {
+          "ja": "東京に戻ると、留守中にたまった郵便物の仕分けが待っていた。",
+          "form": "仕分け",
+          "en": "Back in Tokyo, I had to sort the mail that had piled up while I was away."
+        },
+        {
+          "ja": "年末の物流センターでは、荷物の仕分けが夜通し続く。",
+          "form": "仕分け",
+          "en": "At year's end, sorting parcels at the distribution center goes on all night."
+        }
+      ],
+      "collocations": ["郵便物の仕分け", "仕分け作業", "ごみを仕分けする"],
+      "confusables": [
+        {
+          "term": "仕訳",
+          "note": "仕訳 (same reading) is the bookkeeping term: journal entry."
+        },
+        {
+          "term": "分類",
+          "note": "分類 is classification in an abstract or scholarly sense; 仕分け is hands-on sorting."
+        }
+      ],
+      "note": "事業仕分け was the 2009–10 public review of government spending programs. The bookkeeping sense in the source is normally written 仕訳."
+    },
+    {
+      "n": 213,
+      "term": "素肌",
+      "reading": "すはだ",
+      "gloss": "bare skin; skin without makeup",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "化粧や服でおおわれていない、そのままの肌。",
+      "sentences": [
+        {
+          "ja": "冷えきった素肌に湯がじんわりとしみて、思わず長いため息が出た。",
+          "form": "素肌",
+          "en": "The hot water slowly soaked into my chilled bare skin, and I let out a long sigh without meaning to."
+        },
+        {
+          "ja": "素肌に直接着ても、ちくちくしないセーターだ。",
+          "form": "素肌",
+          "en": "It's a sweater that doesn't itch even worn directly against bare skin."
+        }
+      ],
+      "collocations": ["素肌に着る", "素肌にやさしい", "素肌をさらす"],
+      "confusables": [
+        {
+          "term": "素顔",
+          "note": "素顔 is a face without makeup (also one's true self); 素肌 is bare skin in general."
+        }
+      ],
+      "note": "Frequent in cosmetics and clothing ads (素肌感, 素肌にやさしい)."
+    },
+    {
+      "n": 323,
+      "term": "濁る",
+      "reading": "にごる",
+      "gloss": "become cloudy/muddy; (of sounds) become voiced",
+      "pos": "godan verb (intr.)",
+      "register": "日常",
+      "def_ja": "水などが透き通らなくなる。また、音に濁点がつく。",
+      "sentences": [
+        {
+          "ja": "湯はわずかに白く濁っていて、ほのかに硫黄のにおいがする。",
+          "form": "濁って",
+          "en": "The water is slightly milky and gives off a faint smell of sulfur."
+        },
+        {
+          "ja": "「本」は「三本」になると、濁って「ぼん」と読む。",
+          "form": "濁って",
+          "en": "本 becomes voiced when it's 三本, and is read “bon.”"
+        },
+        {
+          "ja": "雨のあとで、川の水が茶色く濁っている。",
+          "form": "濁って",
+          "en": "After the rain, the river water has turned muddy brown."
+        }
+      ],
+      "collocations": ["水が濁る", "濁った声", "濁り湯"],
+      "confusables": [
+        {
+          "term": "濁す",
+          "note": "濁す is transitive: 言葉を濁す “to be evasive.” 濁る is intransitive."
+        }
+      ],
+      "note": "Also figurative: 目が濁る, 心が濁る (lose purity). 濁り湯 is the term for cloudy hot spring water."
+    },
+    {
+      "n": 53,
+      "term": "灼熱",
+      "reading": "しゃくねつ",
+      "gloss": "scorching heat, red heat; burning (passion)",
+      "pos": "noun",
+      "register": "書き言葉",
+      "def_ja": "焼けるように熱いこと。また、気持ちが激しく燃え上がること。",
+      "sentences": [
+        {
+          "ja": "灼熱の夏の教室で、下敷きをうちわ代わりにあおぎながら、いつか店を持ちたいと語っていたのが彼女だった。",
+          "form": "灼熱",
+          "en": "In our scorching summer classroom, fanning herself with a plastic desk pad, she was the one who talked about someday having her own shop."
+        },
+        {
+          "ja": "灼熱の恋に身を焦がす主人公を描いた小説だ。",
+          "form": "灼熱",
+          "en": "It's a novel about a heroine consumed by a burning love."
+        }
+      ],
+      "collocations": ["灼熱の太陽", "灼熱の砂漠", "灼熱地獄"],
+      "confusables": [
+        {
+          "term": "酷暑",
+          "note": "酷暑 is severe summer heat (weather term); 灼熱 is more vivid and literary, and can be figurative."
+        }
+      ],
+      "note": "Usually used as 灼熱の〜. Common in weather reports and sports headlines for brutal heat."
+    },
+    {
+      "n": 52,
+      "term": "浮き立つ",
+      "reading": "うきたつ",
+      "gloss": "be exhilarated, feel buoyant; stand out",
+      "pos": "godan verb (intr.)",
+      "register": "書き言葉",
+      "def_ja": "楽しいことを思って、心がうきうきする。",
+      "sentences": [
+        {
+          "ja": "読んでいるだけで、もう気持ちが浮き立った。",
+          "form": "浮き立った",
+          "en": "Just reading it, I was already in high spirits."
+        },
+        {
+          "ja": "春の日差しを浴びて、街全体が浮き立っているように見えた。",
+          "form": "浮き立って",
+          "en": "Bathed in spring sunlight, the whole town seemed buoyant."
+        }
+      ],
+      "collocations": ["心が浮き立つ", "気持ちが浮き立つ"],
+      "confusables": [
+        {
+          "term": "浮かれる",
+          "note": "浮かれる is getting carried away, often with a hint of criticism; 浮き立つ is a pleasant lift of mood."
+        }
+      ],
+      "note": "Can also mean “stand out” visually (白い花が浮き立って見える)."
+    },
+    {
+      "n": 92,
+      "term": "殴り書き",
+      "reading": "なぐりがき",
+      "gloss": "scribble, scrawl",
+      "pos": "noun · suru verb",
+      "register": "日常",
+      "def_ja": "字を急いで乱暴に書くこと。また、そうして書いたもの。",
+      "sentences": [
+        {
+          "ja": "私は麺のこしや出汁の味を手帳に殴り書きし、勝手に十点満点で採点していった。",
+          "form": "殴り書き",
+          "en": "I scrawled notes in my notebook on the noodles' chewiness and the broth, grading each shop out of ten on my own."
+        },
+        {
+          "ja": "電話を受けながら、メモ用紙に番号を殴り書きした。",
+          "form": "殴り書き",
+          "en": "While on the phone, I scribbled the number on a memo pad."
+        }
+      ],
+      "collocations": ["殴り書きのメモ", "殴り書きする"],
+      "confusables": [
+        {
+          "term": "走り書き",
+          "note": "走り書き is quick hasty writing; 殴り書き stresses messiness, almost illegible."
+        }
+      ]
+    },
+    {
+      "n": 30,
+      "term": "下敷き",
+      "reading": "したじき",
+      "gloss": "desk pad (sheet under writing paper); basis, model",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "字を書くとき紙の下に敷く板。また、物事のもとになるもの。",
+      "sentences": [
+        {
+          "ja": "灼熱の夏の教室で、下敷きをうちわ代わりにあおぎながら、いつか店を持ちたいと語っていたのが彼女だった。",
+          "form": "下敷き",
+          "en": "In our scorching summer classroom, fanning herself with a plastic desk pad, she was the one who talked about someday having her own shop."
+        },
+        {
+          "ja": "この映画は、古い民話を下敷きにしている。",
+          "form": "下敷き",
+          "en": "This film is based on an old folk tale."
+        },
+        {
+          "ja": "ノートに下敷きを敷くと、字がきれいに書ける。",
+          "form": "下敷き",
+          "en": "If you put a pad under the notebook page, your handwriting comes out neat."
+        }
+      ],
+      "collocations": ["下敷きを敷く", "〜を下敷きにする", "下敷きになる"],
+      "confusables": [
+        {
+          "term": "下敷きになる",
+          "note": "下敷きになる means being pinned under something heavy — a separate idiom."
+        }
+      ],
+      "note": "Japanese students all use a plastic 下敷き under notebook pages; fanning yourself with one is a classic school memory. 〜を下敷きにする = to base a work on."
+    },
+    {
+      "n": 31,
+      "term": "下敷きになる",
+      "reading": "したじきになる",
+      "gloss": "be pinned under, be crushed under",
+      "pos": "expression",
+      "register": "日常・報道",
+      "def_ja": "重い物の下に押さえつけられる。",
+      "sentences": [
+        {
+          "ja": "実は去年の台風で、借りる予定だった倉庫が倒れた大木の下敷きになり、開店は一年遅れたのだという。",
+          "form": "下敷きにな",
+          "en": "Apparently, in last year's typhoon, the warehouse she'd planned to rent was crushed under a fallen tree, so the opening was delayed a year."
+        },
+        {
+          "ja": "地震で倒れた家具の下敷きになり、けがをした人もいた。",
+          "form": "下敷きにな",
+          "en": "Some people were injured when they were pinned under furniture toppled by the earthquake."
+        }
+      ],
+      "collocations": ["車の下敷きになる", "がれきの下敷きになる", "家具の下敷きになる"],
+      "confusables": [
+        {
+          "term": "下敷き",
+          "note": "下敷き alone is a desk pad or a model; with になる it usually means being trapped underneath."
+        }
+      ],
+      "note": "A stock phrase in disaster news. Figuratively, 〜の下敷きになる can also mean something is the basis of a work, but context makes it clear."
+    },
+    {
+      "n": 38,
+      "term": "刈り込む",
+      "reading": "かりこむ",
+      "gloss": "trim, prune, clip; cut down (a text)",
+      "pos": "godan verb (tr.)",
+      "register": "日常",
+      "def_ja": "木の枝や草、髪を切って形を整える。文章を短く削る。",
+      "sentences": [
+        {
+          "ja": "窓の外では、庭師がツツジの植え込みを丸く刈り込んでいた。",
+          "form": "刈り込んで",
+          "en": "Outside the window, a gardener was trimming the azalea bushes into round shapes."
+        },
+        {
+          "ja": "原稿が長すぎるので、半分ほどに刈り込んでほしい。",
+          "form": "刈り込んで",
+          "en": "The manuscript is too long, so please cut it down to about half."
+        }
+      ],
+      "collocations": ["生け垣を刈り込む", "髪を短く刈り込む", "文章を刈り込む"],
+      "confusables": [
+        {
+          "term": "刈る",
+          "note": "刈る is simply cutting (grass, hair, crops); 刈り込む is trimming to shape or cutting down."
+        },
+        {
+          "term": "剪定",
+          "note": "剪定 (せんてい) is horticultural pruning of branches for the plant's health."
+        }
+      ]
+    },
+    {
+      "n": 263,
+      "term": "採点",
+      "reading": "さいてん",
+      "gloss": "grading, marking, scoring",
+      "pos": "noun · suru verb",
+      "register": "日常",
+      "def_ja": "答案や演技などを見て、点数をつけること。",
+      "sentences": [
+        {
+          "ja": "私は麺のこしや出汁の味を手帳に殴り書きし、勝手に十点満点で採点していった。",
+          "form": "採点",
+          "en": "I scrawled notes in my notebook on the noodles' chewiness and the broth, grading each shop out of ten on my own."
+        },
+        {
+          "ja": "先生は週末、百枚近いテストの採点に追われていた。",
+          "form": "採点",
+          "en": "The teacher spent the weekend buried in grading nearly a hundred tests."
+        }
+      ],
+      "collocations": ["採点する", "採点基準", "採点が甘い"],
+      "confusables": [
+        {
+          "term": "添削",
+          "note": "添削 is correcting someone's writing; 採点 is assigning a score."
+        },
+        {
+          "term": "評価",
+          "note": "評価 is evaluation in general; 採点 is giving points."
+        }
+      ],
+      "note": "Also used for judged sports (フィギュアスケートの採点) and karaoke scoring machines."
+    },
+    {
+      "n": 196,
+      "term": "共学",
+      "reading": "きょうがく",
+      "gloss": "coeducation; co-ed (school)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "男子と女子が、同じ学校で一緒に学ぶこと。",
+      "sentences": [
+        {
+          "ja": "私たちは同じ共学の高校に通っていた。",
+          "form": "共学",
+          "en": "We went to the same co-ed high school."
+        },
+        {
+          "ja": "その女子校は、再来年から共学になるそうだ。",
+          "form": "共学",
+          "en": "I hear that girls' school is going co-ed the year after next."
+        }
+      ],
+      "collocations": ["男女共学", "共学校", "共学化"],
+      "confusables": [
+        {
+          "term": "驚愕",
+          "note": "Homophone きょうがく: astonishment (驚愕の事実). Completely unrelated."
+        }
+      ]
+    },
+    {
+      "n": 209,
+      "term": "芸術家",
+      "reading": "げいじゅつか",
+      "gloss": "artist",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "絵や彫刻、音楽などの作品を生み出す人。",
+      "sentences": [
+        {
+          "ja": "地元の芸術家の作品だと、おかみさんが教えてくれた。",
+          "form": "芸術家",
+          "en": "The landlady told me it was the work of a local artist."
+        },
+        {
+          "ja": "祖父は、自分は職人であって芸術家ではないと言っていた。",
+          "form": "芸術家",
+          "en": "My grandfather used to say he was a craftsman, not an artist."
+        }
+      ],
+      "collocations": ["芸術家肌", "若手芸術家", "芸術家として生きる"],
+      "confusables": [
+        {
+          "term": "アーティスト",
+          "note": "アーティスト is broader and casual, often used for musicians; 芸術家 sounds weightier."
+        }
+      ],
+      "note": "芸術家肌 describes someone with an artistic, unconventional temperament."
+    }
+  ]
+}

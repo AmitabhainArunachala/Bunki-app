@@ -13,7 +13,8 @@
  * localStorage/IndexedDB, outside HTTP caching entirely. */
 
 // v2: dict-v2 went schema 3 (sense tags) — the cache-first shards must drop
-const VERSION = 'kairo-v3-skip';
+// v4: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
+const VERSION = 'kairo-v4-kotoba-mine';
 const SHELL = [
   '.',
   'index.html',
