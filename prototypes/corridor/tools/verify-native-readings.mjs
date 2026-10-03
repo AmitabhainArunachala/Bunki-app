@@ -295,7 +295,7 @@ const FEED_TITLES = JSON.parse(
 // literary work's known English name — and every label is backed by a receipt in
 // data/articles/title-receipts.json (the page headline compared against; the model-family checks).
 const PUBLISHER_SOURCE = /^(publisher|publisher, shortened|established English title|established English title, adapted): (https:\/\/\S+)$/;
-const CHECKED_SOURCE = (source) => source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
+const CHECKED_SOURCE = (source) => source === 'Bunki original, bilingual title' || source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
 const TITLE_RECEIPTS = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/title-receipts.json'), 'utf8'));
 // a publisher's English edition lives on its own host; a headline from anywhere else is not theirs
 const ENGLISH_EDITIONS = {
@@ -311,6 +311,17 @@ const sameHeadline = (a, b) => {
 };
 function titleReceiptProblem(record) {
   const source = record.titleEnSource ?? '';
+  if (source === 'Bunki original, bilingual title') {
+    const receipt = TITLE_RECEIPTS.authored?.[record.id];
+    const moduleId = record.id.replace(/^kotoba-mine-/u, '');
+    const path = `decks/kotoba-mine/source/modules/${moduleId}.json`;
+    if (record.pool !== 'original' || record.licence !== 'Bunki original' || record.lane !== 'deck' ||
+        !receipt || receipt.path !== path || receipt.titleJa !== record.title || receipt.titleEn !== record.titleEn)
+      return `${record.id}: no matching authored bilingual title receipt`;
+    const authored = JSON.parse(readFileSync(new URL('../../../' + path, import.meta.url), 'utf8')).passage;
+    return authored.title === record.title && authored.title_en === record.titleEn
+      ? null : `${record.id}: title differs from its authored module`;
+  }
   if (source === 'translation, cross-checked') {
     const families = new Set((TITLE_RECEIPTS.translations?.[record.id] ?? []).filter((c) => c.verdict).map((c) => c.model));
     return families.size >= 2 ? null : `${record.id}: ${families.size} model-family check(s) on file`;
@@ -358,7 +369,7 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
   // The rule is about where the English came from, not about who is
   // waiting: a feed row's title and provenance are whatever its titles file
   // says (a per-row source wins over the file's authoring marker), and every
-  // other shelf row is a publisher headline or a cross-checked translation.
+  // other shelf row is a publisher headline, a cross-checked translation, or an original bilingual title.
   const feedMap = (record) =>
     record.feed === 'fresh' ? FRESH_TITLES : Object.hasOwn(FEED_TITLES.titles ?? {}, record.id) ? FEED_TITLES : null;
   const wrongMarker = index.articles.filter((record) => {
@@ -368,13 +379,13 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
       : !CHECKED_SOURCE(record.titleEnSource);
   });
   check(
-    'every title says where its English came from: the publisher headline with its URL or a cross-checked translation, and a feed row matches its titles file',
+    'every title says where its English came from: the publisher headline with its URL, a cross-checked translation or an authored original, and a feed row matches its titles file',
     wrongMarker.length === 0,
     wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
   );
   const unbacked = index.articles.map(titleReceiptProblem).filter(Boolean);
   check(
-    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one says so, and a translation carries two model-family checks',
+    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one says so, a translation carries two model-family checks, and an original matches its authored bilingual title',
     unbacked.length === 0,
     unbacked.slice(0, 4).join(' · ') || `${index.articles.length} rows backed`,
   );

@@ -1,0 +1,950 @@
+{
+  "id": "m08-mind",
+  "passage": {
+    "title": "大人の脳は第二言語をどう覚えるか",
+    "title_en": "How the Adult Brain Learns a Second Language",
+    "level": "N1",
+    "text": "「語学には才能が要る」「大人になってからでは遅い」。外国語を学ぶ人なら、こうした言葉を一度は耳にしたことがあるだろう。しかし、その多くは丹念に確かめられたことのない、一種の迷信にすぎない。本稿では、脳科学と言語学の見地から、大人が第二言語を習得する仕組みを考えてみたい。\n\n言語能力がどこまで生得的なものかという問いは、長く議論されてきた。人間の脳に言語を身につけるための仕組みが備わっていることは、多くの研究者が認めている。その反面、外国語の得手不得手が先天的に決まっているという証拠は乏しい。成果の差をよく説明するのは、生まれつきの資質よりも、どれだけの量の言葉に触れたかなのである。\n\n近年は、こうした問いを定量的に扱う研究が増えてきた。ある調査では、大人の学習者数百人について、試験の成績の分布と学習時間との関係を分析している。それによると、仕事の都合で断続的にしか学べなかった人でも、触れた言葉の総量が多ければ成績は着実に伸びていた。多読や音読といった従来の学習法の効果も、ようやく数字で検証されるようになったのである。\n\n脳の中を直接のぞく技術も、この分野を大きく変えた。磁気共鳴断層撮影、いわゆるMRIは、強い磁場の中で起こる磁気共鳴という現象を利用して体の内部を画像にする。とりわけ血流の変化をとらえる機能的MRIを使えば、文字を読んでいる最中の脳の働きを観察できる。もともと医療の現場で患者を診るために発達した技術が、いまでは言語研究に欠かせない道具になった。\n\n失読症の研究は、その好例だ。文字を読むとき、脳ではまず視覚系が形をとらえ、それが音や意味と結びつけられる。失読症のある人の脳では、この結びつきを担う左半球の領域の働きが弱い傾向が報告されている。音読をしてもらうと、語の落脱や読み誤りが特定の箇所に集中することも多い。目そのものに問題があるわけではない、という点が重要である。\n\n日本語には特有の事情もある。漢字の読みが一つに決まらないため、難読の地名や人名は母語の話者にとっても手ごわい。学習者が「読めない」と感じる語の多くは、実は日本人にとっても読みにくいのだ。\n\n言葉は目と頭だけで覚えるものではない。近年注目されているのが、言語の身体性という考え方である。音はまず鼓膜を震わせ、私たちは口や舌を動かして初めて声を出す。「つかむ」「蹴る」といった動詞を聞くと、手足の運動にかかわる脳の領域が活動するという報告もある。単語を訳語と一対一で覚えるより、具体的な場面や体の動きとともに覚えたほうが定着しやすいのは、そのためだと考えられる。抽象的な説明より具体性のある例文が記憶に残るのも、同じ理屈だろう。\n\nでは、「才能」とは何なのか。仮に才能というものがあるとしても、それは十分な量の入力と練習を重ねた後で、初めて見えてくるものだろう。意味のわかる文に毎日少しずつ触れていれば、文法の感覚は自ずと身についていく。\n\n最後に、少しだけ哲学的な話をしておきたい。人の心をすべて脳の働きに還元できるのかという問いに、科学はまだ答えを出していない。古代ギリシャのプラトンは霊魂不滅を説き、仏教は万物の無常を説いた。どちらの立場をとるにせよ、脳が変わり続けることは確かだ。大人になってからの言語学習とは、この移ろう脳に新しい言葉を刻み続ける営みなのかもしれない。"
+  },
+  "cards": [
+    {
+      "n": 16,
+      "term": "身体性",
+      "reading": "しんたいせい",
+      "gloss": "embodiment; physicality",
+      "pos": "noun",
+      "register": "学術",
+      "def_ja": "心や言葉の働きが、体のあり方と深く結びついているという性質。",
+      "sentences": [
+        {
+          "ja": "近年注目されているのが、言語の身体性という考え方である。",
+          "form": "身体性",
+          "en": "One idea attracting attention recently is the embodiment of language."
+        },
+        {
+          "ja": "AIに欠けているのは身体性だ、と指摘する研究者もいる。",
+          "form": "身体性",
+          "en": "Some researchers point out that what AI lacks is a body — embodiment."
+        }
+      ],
+      "collocations": ["言語の身体性", "身体性を持つ", "身体性の欠如"],
+      "confusables": [
+        {
+          "term": "新体制",
+          "note": "Homophone しんたいせい: 'new regime/structure' (新体制で臨む). Context always disambiguates."
+        }
+      ],
+      "note": "A term from philosophy and cognitive science (cf. 身体化された認知, 'embodied cognition'); rare in casual talk."
+    },
+    {
+      "n": 17,
+      "term": "霊魂不滅",
+      "reading": "れいこんふめつ",
+      "gloss": "immortality of the soul",
+      "pos": "yojijukugo",
+      "register": "書き言葉・学術",
+      "def_ja": "人が死んで体がなくなっても、たましいは消えずに残るという考え。",
+      "sentences": [
+        {
+          "ja": "古代ギリシャのプラトンは霊魂不滅を説き、仏教は万物の無常を説いた。",
+          "form": "霊魂不滅",
+          "en": "Plato in ancient Greece taught the immortality of the soul; Buddhism taught the impermanence of all things."
+        },
+        {
+          "ja": "霊魂不滅の信仰は、多くの宗教に共通して見られる。",
+          "form": "霊魂不滅",
+          "en": "Belief in the immortality of the soul is found across many religions."
+        }
+      ],
+      "collocations": ["霊魂不滅を説く", "霊魂不滅を信じる", "霊魂不滅説"],
+      "confusables": [
+        {
+          "term": "不老不死",
+          "note": "Never aging and never dying — immortality of the body, not the soul."
+        }
+      ],
+      "note": "Philosophy/religion vocabulary. In everyday speech you'd say 魂は死なない or 死後も魂が残る."
+    },
+    {
+      "n": 18,
+      "term": "見地",
+      "reading": "けんち",
+      "gloss": "standpoint, point of view",
+      "pos": "noun",
+      "register": "書き言葉",
+      "def_ja": "物事を考えたり判断したりするときの立場。",
+      "sentences": [
+        {
+          "ja": "本稿では、脳科学と言語学の見地から、大人が第二言語を習得する仕組みを考えてみたい。",
+          "form": "見地",
+          "en": "In this essay I want to consider, from the standpoint of neuroscience and linguistics, how adults acquire a second language."
+        },
+        {
+          "ja": "医学的見地から言えば、その食事法はおすすめできません。",
+          "form": "見地",
+          "en": "From a medical point of view, I can't recommend that diet."
+        }
+      ],
+      "collocations": ["〜の見地から", "医学的見地", "大局的見地に立つ"],
+      "confusables": [
+        {
+          "term": "観点",
+          "note": "観点 is the angle or aspect you look at something from; 見地 is the (often expert) standpoint you judge from. Often interchangeable in 〜から."
+        },
+        {
+          "term": "立場",
+          "note": "立場 is the everyday word for one's position or situation; 見地 is formal and intellectual."
+        }
+      ],
+      "note": "Almost always appears as 〜(的)見地から. Formal; sounds stiff in conversation."
+    },
+    {
+      "n": 23,
+      "term": "自ずと",
+      "reading": "おのずと",
+      "gloss": "naturally, of itself, in due course",
+      "pos": "adverb",
+      "register": "書き言葉",
+      "def_ja": "わざわざ何かをしなくても、流れにまかせて自然にそうなる様子。",
+      "sentences": [
+        {
+          "ja": "意味のわかる文に毎日少しずつ触れていれば、文法の感覚は自ずと身についていく。",
+          "form": "自ずと",
+          "en": "If you're exposed every day to a little text you understand, a feel for grammar develops of its own accord."
+        },
+        {
+          "ja": "毎日練習を続けていれば、結果は自ずとついてくるよ。",
+          "form": "自ずと",
+          "en": "Keep practicing every day and results will come naturally."
+        }
+      ],
+      "collocations": ["自ずと明らかになる", "自ずと決まる", "答えは自ずと見えてくる"],
+      "confusables": [
+        {
+          "term": "自然と",
+          "note": "自然と is the everyday word; 自ずと is more literary and implies the result follows logically from the circumstances."
+        },
+        {
+          "term": "自ら",
+          "note": "Same kanji, read みずから: 'oneself, personally' — the opposite idea (deliberate action)."
+        }
+      ],
+      "note": "Also written 自ずから (おのずから), which is more formal still."
+    },
+    {
+      "n": 26,
+      "term": "迷信",
+      "reading": "めいしん",
+      "gloss": "superstition",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "理屈に合わないのに、昔から人々に信じられている言い伝え。",
+      "sentences": [
+        {
+          "ja": "しかし、その多くは丹念に確かめられたことのない、一種の迷信にすぎない。",
+          "form": "迷信",
+          "en": "But most of them have never been carefully checked; they are no more than a kind of superstition."
+        },
+        {
+          "ja": "夜に爪を切ると親の死に目に会えないというのは、有名な迷信だ。",
+          "form": "迷信",
+          "en": "That cutting your nails at night means you won't be at your parents' deathbed is a well-known superstition."
+        }
+      ],
+      "collocations": ["迷信を信じる", "迷信にすぎない", "迷信深い"],
+      "confusables": [
+        {
+          "term": "俗信",
+          "note": "Folk belief — a neutral, academic term; 迷信 carries the judgment that the belief is irrational."
+        }
+      ]
+    },
+    {
+      "n": 240,
+      "term": "習得",
+      "reading": "しゅうとく",
+      "gloss": "acquisition, learning (a skill or language)",
+      "pos": "noun · suru verb",
+      "register": "書き言葉",
+      "def_ja": "学んだり練習したりして、技術や知識を自分のものにすること。",
+      "sentences": [
+        {
+          "ja": "本稿では、脳科学と言語学の見地から、大人が第二言語を習得する仕組みを考えてみたい。",
+          "form": "習得",
+          "en": "In this essay I want to consider, from the standpoint of neuroscience and linguistics, how adults acquire a second language."
+        },
+        {
+          "ja": "手話を習得するのに、彼女は三年かかった。",
+          "form": "習得",
+          "en": "It took her three years to learn sign language."
+        }
+      ],
+      "collocations": ["言語習得", "第二言語習得", "技術を習得する"],
+      "confusables": [
+        {
+          "term": "修得",
+          "note": "Same reading; used for completing course units (単位を修得する). 習得 is mastering a skill."
+        },
+        {
+          "term": "取得",
+          "note": "Obtaining something formal — a license, qualification, data (免許を取得する), not learning a skill."
+        }
+      ],
+      "note": "第二言語習得 (SLA) is the standard academic term."
+    },
+    {
+      "n": 283,
+      "term": "生得的",
+      "reading": "せいとくてき",
+      "gloss": "innate, inborn (vs. learned)",
+      "pos": "na-adj",
+      "register": "学術",
+      "def_ja": "学んで身につけたのではなく、生まれたときから持っている様子。",
+      "sentences": [
+        {
+          "ja": "言語能力がどこまで生得的なものかという問いは、長く議論されてきた。",
+          "form": "生得的",
+          "en": "The question of how far language ability is innate has long been debated."
+        },
+        {
+          "ja": "赤ちゃんが人の顔に強く反応するのは、生得的な傾向だと考えられている。",
+          "form": "生得的",
+          "en": "Babies' strong response to human faces is thought to be an innate tendency."
+        }
+      ],
+      "collocations": ["生得的な能力", "生得的に備わる", "生得説"],
+      "confusables": [
+        {
+          "term": "先天的",
+          "note": "先天的 is the general/medical word (congenital), paired with 後天的. 生得的 belongs to philosophy and cognitive science, contrasted with 'learned' (習得的, 経験的)."
+        }
+      ],
+      "note": "The nativist position in linguistics is 生得説."
+    },
+    {
+      "n": 284,
+      "term": "先天的",
+      "reading": "せんてんてき",
+      "gloss": "congenital, inborn; (philosophy) a priori",
+      "pos": "na-adj",
+      "register": "書き言葉・専門",
+      "def_ja": "生まれる前から、体や性質に備わっている様子。",
+      "sentences": [
+        {
+          "ja": "その反面、外国語の得手不得手が先天的に決まっているという証拠は乏しい。",
+          "form": "先天的",
+          "en": "On the other hand, there's little evidence that being good or bad at foreign languages is fixed from birth."
+        },
+        {
+          "ja": "彼は先天的な心臓の病気を抱えながら、マラソンを完走した。",
+          "form": "先天的",
+          "en": "Despite a congenital heart condition, he finished the marathon."
+        }
+      ],
+      "collocations": ["先天的な病気", "先天的に決まる", "先天性疾患"],
+      "confusables": [
+        {
+          "term": "生得的",
+          "note": "See 生得的: 先天的 is broader and medical; 生得的 is the cognitive-science term for innate vs. learned."
+        },
+        {
+          "term": "後天的",
+          "note": "The antonym: acquired after birth (後天的な障害)."
+        }
+      ],
+      "note": "In medical names the prefix 先天性〜 is standard (先天性心疾患). The 'a priori' sense is old philosophy translationese; today ア・プリオリ is more common."
+    },
+    {
+      "n": 285,
+      "term": "従来",
+      "reading": "じゅうらい",
+      "gloss": "conventional, existing; until now",
+      "pos": "noun · adverb",
+      "register": "書き言葉・報道",
+      "def_ja": "今までずっとそうであったこと。これまでのもの。",
+      "sentences": [
+        {
+          "ja": "多読や音読といった従来の学習法の効果も、ようやく数字で検証されるようになったのである。",
+          "form": "従来",
+          "en": "Even the effects of conventional methods such as extensive reading and reading aloud have finally come to be verified with numbers."
+        },
+        {
+          "ja": "新しい電池は、従来より二倍長く使えるそうだ。",
+          "form": "従来",
+          "en": "Apparently the new battery lasts twice as long as before."
+        }
+      ],
+      "collocations": ["従来の方法", "従来どおり", "従来型", "従来から"],
+      "confusables": [
+        {
+          "term": "在来",
+          "note": "Native/long-established in a place (在来種, 在来線); not 'the method up to now'."
+        },
+        {
+          "term": "旧来",
+          "note": "Old, from long ago — often with a negative 'outdated' tinge (旧来の慣習)."
+        }
+      ],
+      "note": "Very common in news and product copy: 従来品 'the previous model'."
+    },
+    {
+      "n": 289,
+      "term": "丹念",
+      "reading": "たんねん",
+      "gloss": "painstaking, meticulous",
+      "pos": "na-adj",
+      "register": "書き言葉",
+      "def_ja": "細かいところまで手をぬかず、時間をかけてていねいにする様子。",
+      "sentences": [
+        {
+          "ja": "しかし、その多くは丹念に確かめられたことのない、一種の迷信にすぎない。",
+          "form": "丹念",
+          "en": "But most of them have never been carefully checked; they are no more than a kind of superstition."
+        },
+        {
+          "ja": "祖父は古い時計を一つ一つ丹念に磨いていた。",
+          "form": "丹念",
+          "en": "My grandfather was carefully polishing the old clocks one by one."
+        }
+      ],
+      "collocations": ["丹念に調べる", "丹念に仕上げる", "丹念な取材"],
+      "confusables": [
+        {
+          "term": "入念",
+          "note": "Thorough, especially careful preparation or checking (入念な準備); 丹念 stresses patient, detailed labor."
+        },
+        {
+          "term": "丁寧",
+          "note": "The everyday word for careful/polite; 丹念 is more literary and implies time spent."
+        }
+      ]
+    },
+    {
+      "n": 28,
+      "term": "定量的",
+      "reading": "ていりょうてき",
+      "gloss": "quantitative",
+      "pos": "na-adj",
+      "register": "学術",
+      "def_ja": "数や量で表して、比べたり調べたりする様子。",
+      "sentences": [
+        {
+          "ja": "近年は、こうした問いを定量的に扱う研究が増えてきた。",
+          "form": "定量的",
+          "en": "Recently there has been more research treating such questions quantitatively."
+        },
+        {
+          "ja": "効果を定量的に示さなければ、予算はつかないだろう。",
+          "form": "定量的",
+          "en": "Unless you can show the effect quantitatively, you won't get funding."
+        }
+      ],
+      "collocations": ["定量的な分析", "定量的に評価する", "定量的データ"],
+      "confusables": [
+        {
+          "term": "定性的",
+          "note": "The antonym: qualitative (定性的な調査)."
+        }
+      ]
+    },
+    {
+      "n": 29,
+      "term": "断続的",
+      "reading": "だんぞくてき",
+      "gloss": "intermittent, on and off",
+      "pos": "na-adj",
+      "register": "報道",
+      "def_ja": "途中で切れたり、また続いたりをくり返す様子。",
+      "sentences": [
+        {
+          "ja": "それによると、仕事の都合で断続的にしか学べなかった人でも、触れた言葉の総量が多ければ成績は着実に伸びていた。",
+          "form": "断続的",
+          "en": "According to it, even people who could only study on and off because of work improved steadily if their total exposure was large."
+        },
+        {
+          "ja": "明日は昼過ぎまで断続的に雨が降るでしょう。",
+          "form": "断続的",
+          "en": "Tomorrow, rain will fall on and off until early afternoon."
+        }
+      ],
+      "collocations": ["断続的な雨", "断続的に続く", "断続的に揺れる"],
+      "confusables": [
+        {
+          "term": "継続的",
+          "note": "Continuous, sustained without breaks — the opposite idea."
+        },
+        {
+          "term": "連続的",
+          "note": "Unbroken, in a continuous series; 断続的 means with gaps."
+        }
+      ],
+      "note": "A weather-forecast staple: 断続的に強い雨."
+    },
+    {
+      "n": 41,
+      "term": "失読症",
+      "reading": "しつどくしょう",
+      "gloss": "dyslexia; alexia",
+      "pos": "noun",
+      "register": "専門",
+      "def_ja": "目や知能に問題がないのに、文字を読むことがとても難しい状態。",
+      "sentences": [
+        {
+          "ja": "失読症のある人の脳では、この結びつきを担う左半球の領域の働きが弱い傾向が報告されている。",
+          "form": "失読症",
+          "en": "In people with dyslexia, the left-hemisphere regions responsible for this link have been reported to tend to be less active."
+        },
+        {
+          "ja": "息子は失読症と診断されたが、読み上げ機能を使って勉強を続けている。",
+          "form": "失読症",
+          "en": "My son was diagnosed with dyslexia, but he keeps studying using text-to-speech."
+        }
+      ],
+      "collocations": ["失読症と診断される", "発達性失読症", "失読症の子ども"],
+      "confusables": [
+        {
+          "term": "難読",
+          "note": "難読 describes a word that is hard to read (難読漢字); 失読症 is a condition of the reader."
+        },
+        {
+          "term": "ディスレクシア",
+          "note": "The loanword now more common for developmental dyslexia, along with 発達性読み書き障害."
+        }
+      ],
+      "note": "Strictly, 失読症 can also mean acquired alexia (loss of reading after brain injury); for the developmental condition ディスレクシア is more usual today."
+    },
+    {
+      "n": 42,
+      "term": "難読",
+      "reading": "なんどく",
+      "gloss": "hard to read (of kanji, names)",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "漢字などの読み方がむずかしく、正しく読める人が少ないこと。",
+      "sentences": [
+        {
+          "ja": "漢字の読みが一つに決まらないため、難読の地名や人名は母語の話者にとっても手ごわい。",
+          "form": "難読",
+          "en": "Because kanji readings aren't fixed to one, hard-to-read place names and personal names are tough even for native speakers."
+        },
+        {
+          "ja": "テレビで難読漢字クイズを見るのが、父の楽しみだ。",
+          "form": "難読",
+          "en": "Watching tricky-kanji quizzes on TV is my father's pleasure."
+        }
+      ],
+      "collocations": ["難読漢字", "難読地名", "難読駅名"],
+      "confusables": [
+        {
+          "term": "失読症",
+          "note": "A reading disorder of a person — not a property of a word."
+        }
+      ],
+      "note": "Used almost only as a prefix or with の (難読の名字). Japanese TV loves 難読地名 quizzes."
+    },
+    {
+      "n": 238,
+      "term": "話者",
+      "reading": "わしゃ",
+      "gloss": "speaker (of a language); narrator",
+      "pos": "noun",
+      "register": "学術",
+      "def_ja": "話をする人。また、ある言葉を使って話す人。",
+      "sentences": [
+        {
+          "ja": "漢字の読みが一つに決まらないため、難読の地名や人名は母語の話者にとっても手ごわい。",
+          "form": "話者",
+          "en": "Because kanji readings aren't fixed to one, hard-to-read place names and personal names are tough even for native speakers."
+        },
+        {
+          "ja": "この方言の話者は、いまでは数百人ほどしか残っていない。",
+          "form": "話者",
+          "en": "Only a few hundred speakers of this dialect remain today."
+        }
+      ],
+      "collocations": ["母語話者", "非母語話者", "話者人口"],
+      "confusables": [
+        {
+          "term": "話し手",
+          "note": "The everyday word for the person speaking; 話者 is linguistic or formal."
+        },
+        {
+          "term": "語り手",
+          "note": "Narrator of a story; 話者 for 'narrator' is mostly literary-criticism usage."
+        }
+      ],
+      "note": "母語話者 is the standard term for 'native speaker' in writing; ネイティブ is the casual equivalent."
+    },
+    {
+      "n": 242,
+      "term": "視覚系",
+      "reading": "しかくけい",
+      "gloss": "visual system (eyes + visual pathways of the brain)",
+      "pos": "noun",
+      "register": "専門",
+      "def_ja": "目から入った光の情報を受け取り、脳で処理するしくみ全体。",
+      "sentences": [
+        {
+          "ja": "文字を読むとき、脳ではまず視覚系が形をとらえ、それが音や意味と結びつけられる。",
+          "form": "視覚系",
+          "en": "When we read, the brain's visual system first captures the shapes, which are then linked to sounds and meanings."
+        },
+        {
+          "ja": "猫の視覚系は、暗い場所で動く物をとらえるのに適している。",
+          "form": "視覚系",
+          "en": "A cat's visual system is suited to catching moving things in the dark."
+        }
+      ],
+      "collocations": ["視覚系の処理", "視覚系の発達", "聴覚系"],
+      "confusables": [
+        {
+          "term": "視覚",
+          "note": "The sense of sight itself; 視覚系 is the whole anatomical/neural system behind it."
+        }
+      ],
+      "note": "Source gloss 'ophthalmencephalon' is an obscure anatomical term; 'visual system' is the sense you'll meet."
+    },
+    {
+      "n": 35,
+      "term": "磁気共鳴",
+      "reading": "じききょうめい",
+      "gloss": "magnetic resonance",
+      "pos": "noun",
+      "register": "専門",
+      "def_ja": "強い磁場の中の原子核が、決まった電波を吸ったり出したりする現象。",
+      "sentences": [
+        {
+          "ja": "磁気共鳴断層撮影、いわゆるMRIは、強い磁場の中で起こる磁気共鳴という現象を利用して体の内部を画像にする。",
+          "form": "磁気共鳴",
+          "en": "Magnetic resonance imaging, or MRI, uses a phenomenon called magnetic resonance that occurs in a strong magnetic field to image the inside of the body."
+        },
+        {
+          "ja": "核磁気共鳴は、化学の分野でも物質の構造を調べるのに使われる。",
+          "form": "磁気共鳴",
+          "en": "Nuclear magnetic resonance is also used in chemistry to study the structure of substances."
+        }
+      ],
+      "collocations": ["核磁気共鳴", "磁気共鳴画像", "磁気共鳴装置"],
+      "confusables": [
+        {
+          "term": "共鳴",
+          "note": "On its own: resonance, and figuratively 'sympathy with' an idea (考えに共鳴する)."
+        }
+      ]
+    },
+    {
+      "n": 36,
+      "term": "磁気共鳴断層撮影",
+      "reading": "じききょうめいだんそうさつえい",
+      "gloss": "magnetic resonance imaging (MRI)",
+      "pos": "noun",
+      "register": "専門",
+      "def_ja": "強い磁石と電波を使って、体の断面を画像にする検査。",
+      "sentences": [
+        {
+          "ja": "磁気共鳴断層撮影、いわゆるMRIは、強い磁場の中で起こる磁気共鳴という現象を利用して体の内部を画像にする。",
+          "form": "磁気共鳴断層撮影",
+          "en": "Magnetic resonance imaging, or MRI, uses a phenomenon called magnetic resonance that occurs in a strong magnetic field to image the inside of the body."
+        },
+        {
+          "ja": "磁気共鳴断層撮影は、放射線を使わない検査として広く普及している。",
+          "form": "磁気共鳴断層撮影",
+          "en": "MRI is widely used as an examination that involves no radiation."
+        }
+      ],
+      "collocations": ["磁気共鳴断層撮影装置", "MRI検査を受ける", "磁気共鳴断層撮影で調べる"],
+      "confusables": [
+        {
+          "term": "コンピュータ断層撮影",
+          "note": "CT: cross-sectional imaging using X-rays, not magnetism."
+        }
+      ],
+      "note": "The full term is formal/written; patients and doctors just say MRI (エムアールアイ). Also 磁気共鳴画像法."
+    },
+    {
+      "n": 100,
+      "term": "鼓膜",
+      "reading": "こまく",
+      "gloss": "eardrum",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "耳の奥にあり、音を受けて震えるうすい膜。",
+      "sentences": [
+        {
+          "ja": "音はまず鼓膜を震わせ、私たちは口や舌を動かして初めて声を出す。",
+          "form": "鼓膜",
+          "en": "Sound first vibrates the eardrum, and we produce voice only by moving the mouth and tongue."
+        },
+        {
+          "ja": "鼓膜が破れるかと思うほど、大きな音だった。",
+          "form": "鼓膜",
+          "en": "The noise was so loud I thought my eardrums would burst."
+        }
+      ],
+      "collocations": ["鼓膜が破れる", "鼓膜を震わせる", "鼓膜に響く"],
+      "confusables": [],
+      "note": "鼓 is 'drum' (太鼓), so the compound is transparent: 'drum membrane'."
+    },
+    {
+      "n": 229,
+      "term": "医療",
+      "reading": "いりょう",
+      "gloss": "medical care, healthcare",
+      "pos": "noun",
+      "register": "報道",
+      "def_ja": "病気やけがを治すこと。また、そのための仕事やしくみ。",
+      "sentences": [
+        {
+          "ja": "もともと医療の現場で患者を診るために発達した技術が、いまでは言語研究に欠かせない道具になった。",
+          "form": "医療",
+          "en": "A technology originally developed to examine patients in medical settings has become an indispensable tool in language research."
+        },
+        {
+          "ja": "地方では、十分な医療を受けられる病院が減っている。",
+          "form": "医療",
+          "en": "In rural areas, hospitals that can provide adequate medical care are decreasing."
+        }
+      ],
+      "collocations": ["医療機関", "医療費", "医療現場", "地域医療"],
+      "confusables": [
+        {
+          "term": "治療",
+          "note": "Treatment of a specific illness or injury; 医療 is medical care as a whole/system."
+        },
+        {
+          "term": "医学",
+          "note": "Medicine as a science or academic field."
+        }
+      ]
+    },
+    {
+      "n": 217,
+      "term": "診る",
+      "reading": "みる",
+      "gloss": "to examine (a patient)",
+      "pos": "ichidan verb (tr.)",
+      "register": "日常",
+      "def_ja": "医者が患者の体の具合を調べる。",
+      "sentences": [
+        {
+          "ja": "もともと医療の現場で患者を診るために発達した技術が、いまでは言語研究に欠かせない道具になった。",
+          "form": "診る",
+          "en": "A technology originally developed to examine patients in medical settings has become an indispensable tool in language research."
+        },
+        {
+          "ja": "熱が下がらないなら、一度お医者さんに診てもらったほうがいいよ。",
+          "form": "診て",
+          "en": "If your fever won't go down, you'd better get a doctor to look at you."
+        }
+      ],
+      "collocations": ["患者を診る", "医者に診てもらう", "脈を診る"],
+      "confusables": [
+        {
+          "term": "見る",
+          "note": "General 'see/look'. Also acceptable in kana or 見る for casual writing."
+        },
+        {
+          "term": "看る",
+          "note": "To look after, nurse (看病, 親を看る) — care, not diagnosis."
+        }
+      ],
+      "note": "Mostly heard as 診てもらう 'get examined'. Doctors may say 患者さんを診る."
+    },
+    {
+      "n": 231,
+      "term": "具体性",
+      "reading": "ぐたいせい",
+      "gloss": "concreteness, specificity",
+      "pos": "noun",
+      "register": "書き言葉",
+      "def_ja": "話や計画などが、はっきりした形や中身を持っていること。",
+      "sentences": [
+        {
+          "ja": "抽象的な説明より具体性のある例文が記憶に残るのも、同じ理屈だろう。",
+          "form": "具体性",
+          "en": "The same logic probably explains why concrete example sentences stick in memory better than abstract explanations."
+        },
+        {
+          "ja": "その提案は具体性に欠けると、会議で厳しく言われた。",
+          "form": "具体性",
+          "en": "At the meeting I was told bluntly that the proposal lacked specifics."
+        }
+      ],
+      "collocations": ["具体性に欠ける", "具体性を持たせる", "具体性のある"],
+      "confusables": [
+        {
+          "term": "具体的",
+          "note": "The na-adjective; 具体性 is the noun 'the quality of being concrete'."
+        },
+        {
+          "term": "実現性",
+          "note": "Feasibility proper. 具体性 only implies it — a plan 具体性に欠ける is vague, hence perhaps unrealistic."
+        }
+      ],
+      "note": "Source gloss 'feasibility' is misleading; the core meaning is concreteness/specificity. Very common as 具体性に欠ける."
+    },
+    {
+      "n": 232,
+      "term": "具体的",
+      "reading": "ぐたいてき",
+      "gloss": "concrete, specific",
+      "pos": "na-adj",
+      "register": "日常",
+      "def_ja": "形や中身がはっきりしていて、目に見えるようにわかる様子。",
+      "sentences": [
+        {
+          "ja": "単語を訳語と一対一で覚えるより、具体的な場面や体の動きとともに覚えたほうが定着しやすいのは、そのためだと考えられる。",
+          "form": "具体的",
+          "en": "That is thought to be why words stick better when learned with concrete situations and bodily movements than one-to-one with translations."
+        },
+        {
+          "ja": "「もう少し具体的に説明してもらえますか」と上司に言われた。",
+          "form": "具体的",
+          "en": "My boss said, 'Could you explain a bit more specifically?'"
+        }
+      ],
+      "collocations": ["具体的に言うと", "具体的な例", "具体的な対策"],
+      "confusables": [
+        {
+          "term": "抽象的",
+          "note": "The antonym: abstract."
+        },
+        {
+          "term": "具体性",
+          "note": "The noun form."
+        }
+      ]
+    },
+    {
+      "n": 233,
+      "term": "反面",
+      "reading": "はんめん",
+      "gloss": "on the other hand; the other side",
+      "pos": "noun · adverb",
+      "register": "書き言葉",
+      "def_ja": "ある面とは逆の、もう一方の面。",
+      "sentences": [
+        {
+          "ja": "その反面、外国語の得手不得手が先天的に決まっているという証拠は乏しい。",
+          "form": "反面",
+          "en": "On the other hand, there's little evidence that being good or bad at foreign languages is fixed from birth."
+        },
+        {
+          "ja": "この仕事は給料がいい反面、休みがほとんど取れない。",
+          "form": "反面",
+          "en": "This job pays well, but on the other hand you get almost no time off."
+        }
+      ],
+      "collocations": ["その反面", "〜反面", "反面教師"],
+      "confusables": [
+        {
+          "term": "半面",
+          "note": "Same reading: 'half (the face/surface)'; in the 'one side' sense the two are often used interchangeably."
+        },
+        {
+          "term": "一方",
+          "note": "More neutral 'meanwhile/on the other hand'; 反面 stresses a contrasting downside or opposite aspect."
+        }
+      ],
+      "note": "Pattern: [plain form] + 反面 'while X, (conversely) Y'. 反面教師 = a negative example to learn from."
+    },
+    {
+      "n": 237,
+      "term": "仮に",
+      "reading": "かりに",
+      "gloss": "supposing, even if; temporarily, provisionally",
+      "pos": "adverb",
+      "register": "日常・書き言葉",
+      "def_ja": "本当かどうかは別にして、そうだとしてみると。また、一時的に。",
+      "sentences": [
+        {
+          "ja": "仮に才能というものがあるとしても、それは十分な量の入力と練習を重ねた後で、初めて見えてくるものだろう。",
+          "form": "仮に",
+          "en": "Even supposing there is such a thing as talent, it probably only becomes visible after plenty of input and practice."
+        },
+        {
+          "ja": "仮に雨が降っても、試合は予定どおり行われます。",
+          "form": "仮に",
+          "en": "Even if it rains, the match will go ahead as planned."
+        },
+        {
+          "ja": "正式な名前が決まるまで、仮にAチームと呼んでおこう。",
+          "form": "仮に",
+          "en": "Until we settle on an official name, let's call it Team A for now."
+        }
+      ],
+      "collocations": ["仮に〜としても", "仮に〜とすれば", "仮に〜たら"],
+      "confusables": [
+        {
+          "term": "もし",
+          "note": "Plain 'if'. 仮に emphasizes a hypothetical for argument's sake and pairs with としても/とすれば."
+        },
+        {
+          "term": "万一",
+          "note": "'In the unlikely event' — stresses improbability, often of something bad."
+        }
+      ]
+    },
+    {
+      "n": 124,
+      "term": "分布",
+      "reading": "ぶんぷ",
+      "gloss": "distribution (spread over an area or range)",
+      "pos": "noun · suru verb",
+      "register": "学術",
+      "def_ja": "ある範囲の中で、物がどこにどれだけあるかという広がり方。",
+      "sentences": [
+        {
+          "ja": "ある調査では、大人の学習者数百人について、試験の成績の分布と学習時間との関係を分析している。",
+          "form": "分布",
+          "en": "One survey analyzed, for several hundred adult learners, the relation between the distribution of test scores and study time."
+        },
+        {
+          "ja": "この植物は、本州の山地に広く分布している。",
+          "form": "分布",
+          "en": "This plant is widely distributed in the mountains of Honshu."
+        }
+      ],
+      "collocations": ["分布図", "広く分布する", "正規分布", "年齢分布"],
+      "confusables": [
+        {
+          "term": "配分",
+          "note": "Allocation — deliberately dividing something up (予算の配分). 分布 is how things happen to be spread out."
+        }
+      ],
+      "note": "Source gloss 'allocation' is misleading; that's 配分. 分布 is spatial or statistical distribution."
+    },
+    {
+      "n": 222,
+      "term": "無常",
+      "reading": "むじょう",
+      "gloss": "impermanence, transience (Buddhist)",
+      "pos": "noun · na-adj",
+      "register": "書き言葉",
+      "def_ja": "この世のものはすべて移り変わり、同じままではいられないこと。",
+      "sentences": [
+        {
+          "ja": "古代ギリシャのプラトンは霊魂不滅を説き、仏教は万物の無常を説いた。",
+          "form": "無常",
+          "en": "Plato in ancient Greece taught the immortality of the soul; Buddhism taught the impermanence of all things."
+        },
+        {
+          "ja": "散っていく桜を見ると、人生の無常を感じる。",
+          "form": "無常",
+          "en": "Watching the cherry blossoms fall, I feel the transience of life."
+        }
+      ],
+      "collocations": ["諸行無常", "無常観", "無常を感じる"],
+      "confusables": [
+        {
+          "term": "無情",
+          "note": "Same reading むじょう: heartless, cruel (無情な雨)."
+        }
+      ],
+      "note": "The opening of 平家物語: 祇園精舎の鐘の声、諸行無常の響きあり."
+    },
+    {
+      "n": 7,
+      "term": "箇所",
+      "reading": "かしょ",
+      "gloss": "place, spot, part, passage; (counter) places",
+      "pos": "noun",
+      "register": "日常",
+      "def_ja": "全体の中の、ある決まった部分や場所。",
+      "sentences": [
+        {
+          "ja": "音読をしてもらうと、語の落脱や読み誤りが特定の箇所に集中することも多い。",
+          "form": "箇所",
+          "en": "When they read aloud, omitted words and misreadings often cluster in particular spots."
+        },
+        {
+          "ja": "この道路では、三箇所で工事が行われている。",
+          "form": "箇所",
+          "en": "Construction is going on at three places along this road."
+        }
+      ],
+      "collocations": ["該当箇所", "問題の箇所", "〜箇所 (counter)"],
+      "confusables": [
+        {
+          "term": "個所",
+          "note": "Alternative spelling, common in newspapers."
+        },
+        {
+          "term": "ヶ所・か所",
+          "note": "Common ways to write the counter: 3ヶ所, 3か所."
+        }
+      ]
+    },
+    {
+      "n": 8,
+      "term": "落脱",
+      "reading": "らくだつ",
+      "gloss": "omission, missing part (of a text); dropping out",
+      "pos": "noun · suru verb",
+      "register": "書き言葉",
+      "def_ja": "文章などから、文字や言葉がぬけ落ちてしまうこと。",
+      "sentences": [
+        {
+          "ja": "音読をしてもらうと、語の落脱や読み誤りが特定の箇所に集中することも多い。",
+          "form": "落脱",
+          "en": "When they read aloud, omitted words and misreadings often cluster in particular spots."
+        },
+        {
+          "ja": "この写本には数行の落脱があり、前後の意味がつながらない。",
+          "form": "落脱",
+          "en": "This manuscript is missing several lines, so the surrounding text doesn't connect."
+        }
+      ],
+      "collocations": ["文字の落脱", "落脱箇所", "落脱がある"],
+      "confusables": [
+        {
+          "term": "脱落",
+          "note": "The common word: dropping out (レースから脱落する) or something falling off/omitted. Use 脱落 by default."
+        },
+        {
+          "term": "脱字",
+          "note": "A missing character in writing (誤字脱字)."
+        }
+      ],
+      "note": "Rare and bookish — mostly seen for omissions in texts and manuscripts. For 'dropping out / falling behind' natives say 脱落."
+    },
+    {
+      "n": 74,
+      "term": "還元",
+      "reading": "かんげん",
+      "gloss": "return (of profits) to; reduction (to simpler terms); chemical reduction",
+      "pos": "noun · suru verb",
+      "register": "書き言葉・学術",
+      "def_ja": "もとの形に戻すこと。また、得た利益を人々に返すこと。",
+      "sentences": [
+        {
+          "ja": "人の心をすべて脳の働きに還元できるのかという問いに、科学はまだ答えを出していない。",
+          "form": "還元",
+          "en": "Science has not yet answered whether the mind can be wholly reduced to the workings of the brain."
+        },
+        {
+          "ja": "会社は利益の一部を地域社会に還元している。",
+          "form": "還元",
+          "en": "The company returns part of its profits to the local community."
+        },
+        {
+          "ja": "鉄鉱石を還元して、鉄を取り出す。",
+          "form": "還元",
+          "en": "Iron is extracted by reducing iron ore."
+        }
+      ],
+      "collocations": ["利益を還元する", "ポイント還元", "〜に還元する", "還元主義"],
+      "confusables": [
+        {
+          "term": "換言",
+          "note": "Homophone かんげん: rephrasing (換言すれば 'in other words')."
+        },
+        {
+          "term": "酸化",
+          "note": "Oxidation — the chemical opposite of 還元."
+        }
+      ],
+      "note": "Everyday you'll meet it in shopping (ポイント還元 'points back'); in philosophy, 還元主義 is reductionism."
+    }
+  ]
+}

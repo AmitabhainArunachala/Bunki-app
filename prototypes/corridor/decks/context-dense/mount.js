@@ -47,6 +47,8 @@ const ui = {
   previewId: null,
   missed: false,
 };
+let paintedHost = null;
+let paintedTurn = null;
 
 function loadState(storage) {
   try {
@@ -85,7 +87,9 @@ function h(tag, className, text) {
 }
 
 function button(label, className, onClick) {
-  const node = h('button', className || '', label);
+  const role = /(?:^|\s)(?:cd-btn|cd-choice|cd-seal)(?:\s|$)/u.test(className || '')
+    ? (className.includes('cd-primary') || className.includes('cd-seal-good') ? 'chip btn-primary' : 'chip btn-secondary') : '';
+  const node = h('button', `${className || ''} ${role}`.trim(), label);
   node.type = 'button';
   node.addEventListener('click', onClick);
   return node;
@@ -237,6 +241,8 @@ function writingMode(look) {
 }
 
 function paint(host, opts, state) {
+  const turn = `${ui.screen}:${ui.screen === 'card' ? ui.queue[ui.index]?.id : ui.screen === 'preview' ? ui.previewId : ''}`;
+  const resetScroll = host !== paintedHost || turn !== paintedTurn;
   const storage = opts.storage;
   const look = loadLook(storage);
   const writing = writingMode(look);
@@ -247,12 +253,20 @@ function paint(host, opts, state) {
   applyLook(room, look, writing);
   document.documentElement.dataset.cdFocus = ui.screen === 'card' ? '1' : '0';
 
+  const level = h('span', 'level-chip cd-level', opts.bilingual ? '級未判定 · Level ungraded' : '級未判定');
+  level.title = opts.bilingual ? 'This deck has no assigned JLPT level.' : 'この札にはJLPTの級がまだ付いていない。';
+  room.append(level);
+
   if (ui.screen === 'home') paintHome(room, opts, state, look);
   else if (ui.screen === 'card') paintCard(room, opts, state, look);
   else if (ui.screen === 'done') paintDone(room, opts);
   else if (ui.screen === 'index') paintIndex(room, opts, state);
   else if (ui.screen === 'preview') paintPreview(room, opts, look);
   host.append(room);
+  paintedHost = host;
+  paintedTurn = turn;
+  // A new page or card starts below the app header, even after a long index.
+  if (resetScroll) window.scrollTo(0, 0);
 }
 
 function paintHome(room, opts, state, look) {

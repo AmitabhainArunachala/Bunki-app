@@ -1,0 +1,144 @@
+.card {
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: #1d1b18;
+  background: #f7f3ea;
+  text-align: left;
+  line-height: 1.7;
+}
+.nightMode.card,
+.night_mode .card {
+  color: #e9e4d8;
+  background: #1b1a17;
+}
+.km {
+  max-width: 34em;
+  margin: 0 auto;
+  padding: 0.4em 0.2em;
+}
+.mod {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  font-family: sans-serif;
+}
+.sent {
+  font-size: 1.45em;
+  margin: 0.5em 0 0.4em;
+}
+.sent b.t {
+  color: #a3351f;
+  font-weight: 700;
+}
+.nightMode .sent b.t {
+  color: #f08b6b;
+}
+.blank {
+  color: #a3351f;
+  letter-spacing: 0.1em;
+}
+.ask {
+  font-size: 12px;
+  opacity: 0.45;
+  font-family: sans-serif;
+}
+.hint {
+  margin-top: 0.6em;
+  font-size: 0.95em;
+  opacity: 0.85;
+}
+.hint-en {
+  font-size: 0.8em;
+  font-family: sans-serif;
+}
+hr#answer {
+  border: 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.35);
+  margin: 0.8em 0;
+}
+.head .term {
+  font-size: 1.6em;
+  font-weight: 700;
+  margin-right: 0.5em;
+}
+.head .reading {
+  font-size: 1.1em;
+  opacity: 0.8;
+}
+.meta {
+  font-size: 12px;
+  font-family: sans-serif;
+  opacity: 0.6;
+}
+.def {
+  margin-top: 0.4em;
+  font-size: 1.05em;
+}
+.gloss {
+  font-family: sans-serif;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+.tr {
+  font-family: sans-serif;
+  font-size: 0.8em;
+  opacity: 0.75;
+  margin: 0.3em 0;
+}
+.tr summary {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.more {
+  margin-top: 0.8em;
+}
+.ex {
+  margin: 0.4em 0;
+}
+.ex .ja {
+  font-size: 1.05em;
+}
+.ex b.t {
+  color: #a3351f;
+}
+.nightMode .ex b.t {
+  color: #f08b6b;
+}
+.ex .en {
+  font-family: sans-serif;
+  font-size: 0.75em;
+  opacity: 0.65;
+}
+.lbl {
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 0 0.4em;
+  margin-right: 0.6em;
+  opacity: 0.6;
+}
+.col,
+.conf,
+.kanji,
+.note {
+  margin-top: 0.7em;
+  font-size: 0.9em;
+}
+.conf ul {
+  margin: 0.2em 0 0 1.2em;
+  padding: 0;
+}
+.note {
+  font-family: sans-serif;
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+.src {
+  margin-top: 1em;
+  font-size: 11px;
+  opacity: 0.4;
+  font-family: sans-serif;
+}

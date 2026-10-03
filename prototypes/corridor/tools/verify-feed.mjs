@@ -13,7 +13,7 @@
  *     LINK-SAFE cleanliness gate held (the wikinews-1483 lesson);
  *   · the curation report proposes, never performs: every pending cull
  *     proposal still has its artifacts in place;
- *   · the regenerated standalone carries the new shelf (builder-only artifact);
+ *   · the published site's manifest pins every live candidate's index/body bytes;
  *   · every feed_fresh.py reading (queue kind "fresh") is minted in the full
  *     schema, dated, attributed and linked, carries the pool its source
  *     licence requires (CC BY-SA → share_alike, PDL1.0/CC BY → proprietary_safe),
@@ -33,9 +33,11 @@ import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+
 const HERE = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR = resolve(HERE, '..');
-const REPO = resolve(CORRIDOR, '..', '..');
+const CORRIDOR = resolveCorridorSite();
+const REPO = resolve(HERE, '../../..');
 const ARTICLES = resolve(CORRIDOR, 'data/articles');
 
 const QUEUE_PATH = resolve(REPO, 'docs/content/feed-review-queue.json');
@@ -62,7 +64,7 @@ const argValue = (name, fallback) => {
   const index = process.argv.indexOf(name);
   return index >= 0 ? resolve(process.argv[index + 1]) : fallback;
 };
-const reportPath = argValue('--report', resolve(EVIDENCE_DIR, 'verify-feed-report.json'));
+const reportPath = argValue('--report', resolve(resolveCorridorEvidence(), 'verify-feed-report.json'));
 
 const results = [];
 const failures = [];
@@ -161,10 +163,23 @@ const permissiveMislabel = curated.filter((row) => freshIds.has(row.id) && /SA\b
 check('a share-alike licence never sits in a permissive pool', permissiveMislabel.length === 0, permissiveMislabel.map((row) => row.id).join(', '));
 
 // ------------------------------------------------------- shelf composition
+// 単語帳 passages (lane 'deck') are Bunki-original texts built with a deck
+// (decks/*/tools/build_deck.py), never feed mints: they stand outside the
+// feed's census, and the exclusion is pinned so it cannot hide a feed row.
+const deckRows = curated.filter((row) => row.lane === 'deck');
+const feedShelf = curated.filter((row) => row.lane !== 'deck');
+const strayDeckRows = deckRows.filter(
+  (row) => row.pool !== 'original' || row.licence !== 'Bunki original' || row.review || row.addedAt || !/^bunki-/.test(row.source),
+);
 check(
-  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints and fresh readings`,
-  curated.length === PRE_FEED_SHELF + liveMints.length + liveFresh.length,
-  `${curated.length} = ${PRE_FEED_SHELF} + ${liveMints.length} + ${liveFresh.length} fresh`,
+  'deck-lane passages are Bunki originals outside the feed — none carries a feed mark',
+  strayDeckRows.length === 0,
+  strayDeckRows.map((row) => row.id).slice(0, 4).join(', ') || `${deckRows.length} deck passages`,
+);
+check(
+  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints and fresh readings (deck passages aside)`,
+  feedShelf.length === PRE_FEED_SHELF + liveMints.length + liveFresh.length,
+  `${feedShelf.length} = ${PRE_FEED_SHELF} + ${liveMints.length} + ${liveFresh.length} fresh · ${deckRows.length} deck passages`,
 );
 const orphanFeedRows = curated.filter(
   (row) => feedAuthored(row) && !queue.some((entry) => entry.id === row.id),
@@ -464,10 +479,10 @@ check(
   'the curation report is present, typed, and counts the real artifacts',
   curation.kind === 'feed-curation-report' &&
     curation.criteria &&
-    curation.counts?.shelf === curated.length &&
+    curation.counts?.shelf === feedShelf.length &&
     curation.counts?.archive === archiveIndex.articles.length &&
     Array.isArray(curation.cullProposals),
-  `shelf ${curation.counts?.shelf}/${curated.length} · archive ${curation.counts?.archive}/${archiveIndex.articles.length}`,
+  `shelf ${curation.counts?.shelf}/${feedShelf.length} · archive ${curation.counts?.archive}/${archiveIndex.articles.length}`,
 );
 const proposalIds = new Set(curation.cullProposals.map((proposal) => proposal.id));
 const unmatchedCulls = cullRows.filter(
@@ -479,13 +494,27 @@ const prematureCulls = cullRows.filter(
 );
 check('nothing proposed for culling has been removed while pending — proposals never act', prematureCulls.length === 0, prematureCulls.map((row) => row.id).join(', '));
 
-// ----------------------------------------------- double-listing + standalone
+// ------------------------------------------- double-listing + release bytes
 const doubled = curated.filter((row) => archiveIds.has(row.id));
 check('no article is listed on both the shelf and the archive', doubled.length === 0, doubled.map((row) => row.id).join(', '));
 
-const standalone = readFileSync(resolve(CORRIDOR, 'corridor-standalone.html'), 'utf8');
-const missingFromBundle = liveMints.filter((mint) => !standalone.includes(`"id":"${mint.id}"`));
-check('the regenerated standalone bundles every live feed candidate (builder-only artifact)', missingFromBundle.length === 0, missingFromBundle.map((mint) => mint.id).join(', '));
+const manifestPath = resolve(CORRIDOR, 'build-identity.json');
+const manifest = readJson(manifestPath);
+const packagedFiles = new Map(manifest.files.map((file) => [file.path, file]));
+const matchesPackage = (path) => {
+  const file = packagedFiles.get(path);
+  if (!file || !existsSync(resolve(CORRIDOR, path))) return false;
+  const bytes = readFileSync(resolve(CORRIDOR, path));
+  return file.bytes === bytes.length && file.sha256 === createHash('sha256').update(bytes).digest('hex');
+};
+const missingFromPackage = liveMints.filter((mint) => {
+  const row = curatedById.get(mint.id);
+  const path = row?.file && `data/articles/${row.file}`;
+  return !path || !matchesPackage(path) || readJson(resolve(CORRIDOR, path)).id !== mint.id;
+});
+check('the published site manifest pins the index and body bytes of every live feed candidate',
+  manifest.schemaVersion === 1 && liveMints.length > 0 && matchesPackage('data/articles/index.json') && missingFromPackage.length === 0,
+  missingFromPackage.map((mint) => mint.id).join(', ') || `${liveMints.length} live candidates`);
 
 // ------------------------------------------------------------------ evidence
 const runLogs = existsSync(EVIDENCE_DIR)
@@ -510,7 +539,7 @@ writeFileSync(
         queue: fileSha256(QUEUE_PATH),
         titles: fileSha256(TITLES_PATH),
         curationReport: fileSha256(REPORT_JSON),
-        standalone: fileSha256(resolve(CORRIDOR, 'corridor-standalone.html')),
+        buildManifest: fileSha256(manifestPath),
       },
       counts: {
         curated: curated.length,
