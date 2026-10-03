@@ -13392,21 +13392,47 @@ function deckCardAwaitsIndex(card, node, record = S) {
     !deckSavedSnapshot(node, record);
 }
 
+const DECK_RETRY_MS = [3000, 10000, 30000, 60000];
 const deckModuleLoading = new Map();
 const deckModuleReady = new Set();
-const deckModuleDegraded = new Set();
+const deckModuleDegraded = new Map();
+const deckModuleOpen = (deck, mod) =>
+  S.view === 'decks' && S.deckModule === mod.id && (S.deckId || DECK_IDS[0]) === deck.deckId;
 addEventListener('online', () => {
-  if (S.view === 'decks' && deckModuleDegraded.size) render();
+  for (const { deck, mod } of [...deckModuleDegraded.values()]) if (deckModuleOpen(deck, mod)) retryDeckModule(deck, mod);
 });
+/** Loads a module's dictionary rows and resolves whether they are at hand. A failed load holds the
+ * module's enrollment and is tried again with backoff while the module stays open; whichever
+ * deck screen is showing re-renders once the rows arrive. */
 function prepareDeckModule(deck, mod) {
   const key = `${deck.deckId}:${mod.id}`;
-  if (deckModuleReady.has(key)) return Promise.resolve();
+  if (deckModuleReady.has(key)) return Promise.resolve(true);
   if (deckModuleLoading.has(key)) return deckModuleLoading.get(key);
+  clearTimeout(deckModuleDegraded.get(key)?.timer);
   const pending = Promise.all(mod.cards.filter(deckCardNeedsIndex).map((card) => ensureDictionaryRowsForForm(card.w)))
-    .then(() => { deckModuleReady.add(key); })
+    .then(() => {
+      deckModuleReady.add(key);
+      deckModuleDegraded.delete(key);
+      return true;
+    }, () => {
+      const failures = (deckModuleDegraded.get(key)?.failures || 0) + 1;
+      const held = { deck, mod, failures, timer: null };
+      held.timer = setTimeout(() => {
+        held.timer = null;
+        if (deckModuleOpen(deck, mod)) retryDeckModule(deck, mod);
+      }, DECK_RETRY_MS[Math.min(failures, DECK_RETRY_MS.length) - 1]);
+      deckModuleDegraded.set(key, held);
+      return false;
+    })
     .finally(() => { deckModuleLoading.delete(key); });
   deckModuleLoading.set(key, pending);
+  pending.then((ready) => { if (ready ? S.view === 'decks' : deckModuleOpen(deck, mod)) render(); });
   return pending;
+}
+
+function retryDeckModule(deck, mod) {
+  prepareDeckModule(deck, mod);
+  if (deckModuleOpen(deck, mod)) render();
 }
 
 function renderDecks(main) {
@@ -13448,8 +13474,9 @@ function renderDecks(main) {
     );
     for (const m of deck.modules) {
       const nodes = m.cards.map((c) => deckWordNode(deck, m, c));
-      if (!deckModuleReady.has(`${deck.deckId}:${m.id}`) && m.cards.some((c, i) => deckCardAwaitsIndex(c, nodes[i]))) {
-        prepareDeckModule(deck, m).then(() => { if (S.view === 'decks') render(); }, () => {});
+      const key = `${deck.deckId}:${m.id}`;
+      if (!deckModuleReady.has(key) && !deckModuleDegraded.has(key) && m.cards.some((c, i) => deckCardAwaitsIndex(c, nodes[i]))) {
+        prepareDeckModule(deck, m);
       }
       const have = nodes.filter((node) => wordCaptureState(node) === 'taken').length;
       const row = el('button', 'entry-row vocabulary-module-row');
@@ -13472,23 +13499,17 @@ function renderDecks(main) {
     return;
   }
   const moduleKey = `${deck.deckId}:${mod.id}`;
-  if (!deckModuleReady.has(moduleKey)) {
-    const degraded = deckModuleDegraded.has(moduleKey);
-    prepareDeckModule(deck, mod).then(() => {
-      deckModuleDegraded.delete(moduleKey);
-      if (S.view === 'decks' && S.deckModule === mod.id) render();
-    }, () => {
-      if (degraded) return;
-      // Bundled answers remain usable offline when the optional index is unavailable.
-      deckModuleDegraded.add(moduleKey);
-      if (S.view === 'decks' && S.deckModule === mod.id) render();
-    });
-    if (!degraded) {
-      main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
-      return;
-    }
+  const held = deckModuleDegraded.get(moduleKey);
+  if (!deckModuleReady.has(moduleKey) && !deckModuleLoading.has(moduleKey) && !held?.timer) prepareDeckModule(deck, mod);
+  if (!deckModuleReady.has(moduleKey) && !held) {
+    main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+    return;
   }
+  // A failed index load holds enrollment until the rows load: on the backoff, after reconnecting, or from a held button.
   const waiting = !deckModuleReady.has(moduleKey);
+  const fetching = deckModuleLoading.has(moduleKey);
+  const dictionaryHold = fetching ? ['辞書を読み込み中…', 'dictionary still loading']
+    : ['辞書に接続できません · 再試行', 'can’t reach the dictionary · retry'];
   const owner = `deck:${moduleKey}`;
   const nodeFor = (card) => deckWordNode(deck, mod, card);
   const stateFor = (card) => wordCaptureState(nodeFor(card));
@@ -13510,14 +13531,14 @@ function renderDecks(main) {
   const unlisted = mod.cards.some((c) => stateFor(c) === 'taken' && !listedIds.has(c.w));
   if (fresh.length || unlisted) {
     const all = waiting
-      ? biLabel('button', 'chip btn-secondary lesson-enroll-all', '辞書を読み込み中…', 'dictionary still loading')
+      ? biLabel('button', 'chip btn-secondary lesson-enroll-all', ...dictionaryHold)
       : fresh.length
         ? biLabel('button', 'chip btn-primary lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
         : biLabel('button', 'chip btn-secondary lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
     all.type = 'button';
     all.id = 'deck-enroll-all';
-    all.disabled = waiting || learningEnrollmentPending.has(owner);
-    all.addEventListener('click', () => enroll(mod.cards));
+    all.disabled = waiting ? fetching : learningEnrollmentPending.has(owner);
+    all.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll(mod.cards)));
     actions.append(all);
   }
   const listed = S.lists[deckListName(deck, mod)] || [];
@@ -13547,12 +13568,12 @@ function renderDecks(main) {
     const b = have
       ? biLabel('button', 'chip btn-secondary lesson-enroll-one on', '覚える ✓', 'memorizing')
       : waiting
-        ? biLabel('button', 'chip btn-secondary lesson-enroll-one', '辞書を読み込み中…', 'dictionary still loading')
+        ? biLabel('button', 'chip btn-secondary lesson-enroll-one', ...dictionaryHold)
         : biLabel('button', 'chip btn-secondary lesson-enroll-one', '覚える', 'memorize');
     b.type = 'button';
     b.dataset.deckEnroll = c.w;
-    b.disabled = have || waiting || !!heldText || learningEnrollmentPending.has(owner);
-    if (!b.disabled) b.addEventListener('click', () => enroll([c]));
+    b.disabled = have || (waiting ? fetching : !!heldText || learningEnrollmentPending.has(owner));
+    if (!b.disabled) b.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll([c])));
     if (heldText) {
       b.classList.add('word-capture-held');
       const reason = el('p', 'enroll-held', heldText);

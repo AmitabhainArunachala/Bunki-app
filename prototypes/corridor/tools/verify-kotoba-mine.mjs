@@ -50,13 +50,15 @@ const MIME = {
   '.woff2': 'font/woff2',
 };
 
-function startServer(rootDir = CORRIDOR_DIR, refuse = () => false) {
+function startServer(rootDir = CORRIDOR_DIR, refuse = () => false, refuseAfterMs = 0) {
   const server = createServer((request, response) => {
     const path = decodeURIComponent((request.url ?? '/').split('?')[0]);
     const rel = path === '/' ? 'index.html' : path.replace(/^\/+/, '');
     if (refuse(rel)) {
-      response.writeHead(503, { 'cache-control': 'no-store', 'content-type': 'text/plain' });
-      response.end('unavailable');
+      setTimeout(() => {
+        response.writeHead(503, { 'cache-control': 'no-store', 'content-type': 'text/plain' });
+        response.end('unavailable');
+      }, refuseAfterMs);
       return;
     }
     const file = resolve(rootDir, rel);
@@ -369,7 +371,8 @@ async function verifyGuardedEnrollment(browser, base, deck, preRow) {
 
 /* A word saved from the reader names its dictionary entry. The deck matches that card through
  * its module's dictionary rows: the module list counts it before the module is opened, and a
- * module whose rows failed to load holds enrollment until they load on a later render. */
+ * module whose rows failed to load holds enrollment, retrying on its own, from a held button,
+ * and after reconnecting, until they load. */
 async function verifyReaderEntryCards(browser, deck) {
   const mod = deck.modules.find((m) => m.cards.some((c) => c.w === '新体制'));
   const card = mod.cards.find((c) => c.w === '新体制');
@@ -378,7 +381,14 @@ async function verifyReaderEntryCards(browser, deck) {
     taken: [{ t: 'word', id: card.w, label: card.w, kind: '語', kindEn: 'word', from: null, ts: 1, entrySeq: '1362140', cueReading: card.r }],
     deepWords: { [card.w]: { r: card.r, m: ['new order', 'new system'], seq: '1362140' } } };
   let refusing = false;
-  const { server, base } = await startServer(CORRIDOR_DIR, (rel) => refusing && rel.startsWith('data/share_alike/dict-v2/'));
+  const { server, base } = await startServer(CORRIDOR_DIR, (rel) => refusing && rel.startsWith('data/share_alike/dict-v2/'), 800);
+  // every 覚える and ぜんぶ覚える in the module, all held the same way
+  const heldAs = (page, label, disabled, timeout) => page.waitForFunction(([label, disabled, count]) => {
+    const buttons = [...document.querySelectorAll('[data-deck-enroll], #deck-enroll-all')];
+    return buttons.length === count && buttons.every((b) => b.disabled === disabled && b.textContent.includes(label));
+  }, [label, disabled, mod.cards.length + 1], { timeout }).then(() => true, () => false);
+  const buttons = (page) => page.locator('[data-deck-enroll], #deck-enroll-all').evaluateAll((all) =>
+    all.slice(0, 3).map((b) => ({ id: b.id || b.dataset.deckEnroll, disabled: b.disabled, text: b.textContent })));
   try {
     for (const phase of ['count', 'retry']) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -398,11 +408,16 @@ async function verifyReaderEntryCards(browser, deck) {
           continue;
         }
         await openModule(page, mod);
-        const held = await page.locator('[data-deck-enroll], #deck-enroll-all').evaluateAll((buttons) =>
-          buttons.map((b) => ({ id: b.id || b.dataset.deckEnroll, disabled: b.disabled, text: b.textContent })));
-        check('a module whose dictionary rows failed to load holds every 覚える and ぜんぶ覚える, saying the dictionary is still loading',
-          held.length === mod.cards.length + 1 && held.every((b) => b.disabled && b.text.includes('辞書を読み込み中')),
-          JSON.stringify(held.filter((b) => !b.disabled || !b.text.includes('辞書を読み込み中')).slice(0, 3)));
+        check('a module whose dictionary rows failed to load holds every 覚える and ぜんぶ覚える behind a retry',
+          await heldAs(page, '辞書に接続できません', false, 8000), JSON.stringify(await buttons(page)));
+        const retried = await heldAs(page, '辞書を読み込み中', true, 8000) && await heldAs(page, '辞書に接続できません', false, 8000);
+        check('it tries the dictionary again on its own, saying 読み込み中 only while that load is in flight',
+          retried, JSON.stringify(await buttons(page)));
+        await page.locator(`[data-deck-enroll="${other.w}"]`).click();
+        const pressed = await heldAs(page, '辞書を読み込み中', true, 2000) && await heldAs(page, '辞書に接続できません', false, 8000);
+        const untouched = !(await readAppRecord(page)).taken.some((row) => row.id === other.w);
+        check('a held button retries at once and saves nothing while the dictionary stays unreachable',
+          pressed && untouched, JSON.stringify({ pressed, untouched, buttons: await buttons(page) }));
         refusing = false;
         await context.setOffline(true);
         await context.setOffline(false);

@@ -475,8 +475,11 @@ ${BODY}
 </html>
 `;
 
+const emitted = fragment ? fragmentHtml : html;
+// story pictures are served-build only (storyPictureSource), so a WebP in the single file is dead weight
+assert(!/data:image\/webp|UklGR[A-Za-z0-9+/]{6}XRUJQ/u.test(emitted), 'Standalone must carry no WebP payload');
 mkdirSync(dirname(out), { recursive: true });
-writeFileSync(out, fragment ? fragmentHtml : html, { flag: 'wx' });
+writeFileSync(out, emitted, { flag: 'wx' });
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORRIDOR,
   artifactSha256: JSON.parse(read('build-identity.json')).artifactSha256,
