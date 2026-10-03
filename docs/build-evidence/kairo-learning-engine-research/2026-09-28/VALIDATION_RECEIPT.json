@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-28",
+  "scope": "Research deliverables only, not Bunki code tests",
+  "research_tracks": 10,
+  "comparison_products": 27,
+  "comparison_capabilities": 12,
+  "spec_words": 15512,
+  "spec_sha256": "45fb173b2a11f677514360666e99653c5ef7f3d2a32b87cebf9399cb6ced5cf2",
+  "dated_cited_url_inventory_count": 286,
+  "html_structure": {
+    "BUNKI_BUILD_SPEC.html": {
+      "tables": 18,
+      "uneven_tables": [],
+      "missing_navigation_anchors": [],
+      "external_embedded_resources": [],
+      "script_count": 0
+    },
+    "BUNKI_RESEARCH_DOSSIER.html": {
+      "tables": 53,
+      "uneven_tables": [],
+      "missing_navigation_anchors": [],
+      "external_embedded_resources": [],
+      "script_count": 0
+    }
+  },
+  "cost_decimal_recalculation": "passed",
+  "sections_A_through_J": "passed",
+  "ten_note_heading_contracts": "passed",
+  "engineering_review_findings": {
+    "initial": 9,
+    "followup": 2,
+    "disposition": "addressed in specification, not implemented/integration-tested"
+  },
+  "visual_rendering": {
+    "status": "UNVERIFIED",
+    "reason": "Headless browser attempt failed: Chromium executable not installed; no screenshot result claimed"
+  },
+  "application_implementation_or_tests": "not performed",
+  "repo_inventory_verification": "UNVERIFIED; supplied by owner",
+  "live_product_account_testing": "not performed"
+}
