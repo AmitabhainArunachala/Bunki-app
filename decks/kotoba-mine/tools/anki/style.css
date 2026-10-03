@@ -26,6 +26,18 @@
   font-size: 1.45em;
   margin: 0.5em 0 0.4em;
 }
+/* a front is the passage paragraph: the mined sentence in full ink, its neighbours dimmed */
+.sent.ctx {
+  font-size: 1.15em;
+  line-height: 1.95;
+  text-align: justify;
+}
+.ctx .p + .p {
+  margin-top: 0.5em;
+}
+.ctx .dim {
+  opacity: 0.55;
+}
 .sent b.t {
   color: #a3351f;
   font-weight: 700;

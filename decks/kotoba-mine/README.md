@@ -12,7 +12,7 @@ The same deck runs in three places:
 | ------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Bunki** (the corridor) | `prototypes/corridor/data/share_alike/decks/kotoba-mine.json` + 12 shelf articles | Shelf → **単語帳**. Each module opens its passage in the reader, enrolls its words in one press (ぜんぶ覚える) and reviews only that module (この鉱脈だけ復習). Cards are reviewed with Bunki's own FSRS-6, blanked inside the mined sentence. |
 | **Anki**                 | `release/kotoba-mine.apkg`                                                        | One note type, two card templates, one subdeck per module, tags per module and register.                                                                                                                                                       |
-| **Direct study, no app** | `release/study.html`                                                              | One self-contained page: open it in any browser. FSRS-6 scheduling, module toggles, reader with tappable mined words, word index, progress backup.                                                                                             |
+| **Study cards**          | `release/study.html` — also published beside Bunki at `decks/kotoba-mine/`        | One self-contained page, Anki-clean: today's three numbers and one button; then one card at a time, Space and 1–4. Every front is a paragraph of its passage. Inside Bunki it shares one ledger with 単語帳 and links both ways.               |
 
 A plain `release/kotoba-mine.tsv` (Anki text-import headers, HTML fields) is there for
 any other SRS.
@@ -93,9 +93,26 @@ the notes, then _Notes → Find and Replace_ on field `Production`, regex `^$` �
 Tags: `km::<module>`, `km::register::<報道|学術|…>`, `km::kanji`,
 `km::has-confusable`.
 
-**study.html.** Open the file (or its published copy). Tick modules under 学ぶ, press
-Space to reveal, then 1–4 to grade (u undoes). Progress stays in that browser. Use
-設定 → 書き出す to copy a backup and 読み込む to restore it on another device.
+**Study cards (study.html).** Open the file, or Bunki → 単語帳 → カードで学ぶ. 今日 shows
+new / learning / review and one button (Space). Each card is a **paragraph of its
+passage** (≥100 characters, median 167): the mined sentence in full ink, its neighbours
+dimmed.
+
+- **文脈で読む** (recognition): the word is lit and its reading hidden; recall reading and meaning.
+- **文脈クローズ** (Massive-Context Cloze, after AJATT): the word is blanked wherever it is
+  spelled in the paragraph; the blank never shows its length and keeps the conjugation
+  visible (【？】きになり). The Japanese definition sits under it; H adds the first kana,
+  then the English. It opens per word once recognition has graduated (設定 → カード).
+
+Keys: Space/Enter reveal (then Good) · 1–4 grade · U undo · H hint · T English ·
+F furigana (hover → all → none) · R read aloud (device voice) · − later today · Esc.
+Every word on every screen can be tapped for its reading. Two fronts in a row never
+come from the same paragraph. Progress lives in the browser (設定 → 書き出す to back
+it up); inside Bunki, 単語帳 shows each word's card state, and **Bunki** on the cards
+returns to the same module there (`?deck=kotoba-mine&module=<id>`).
+
+The Anki fronts carry the same paragraphs, with the same masking rules. The build
+refuses to finish if any cloze front would show its answer.
 
 ## Layout and rebuild
 
@@ -116,7 +133,9 @@ pip install fugashi unidic-lite==1.0.8 jreadability==1.1.5 genanki   # once
 python3 decks/kotoba-mine/tools/check_module.py m01-money            # validate
 python3 decks/kotoba-mine/tools/build_deck.py                         # rebuild all
 node prototypes/corridor/tools/build-standalone.mjs                   # refresh the single-file corridor
-node prototypes/corridor/tools/verify-kotoba-mine.mjs                 # data + real-browser check
+node prototypes/corridor/tools/verify-kotoba-mine.mjs                 # 単語帳 room: data + real browser
+node prototypes/corridor/tools/verify-kotoba-study.mjs                # study cards: 13 checks, all 323 fronts
+node prototypes/corridor/tools/verify-kotoba-study-link.mjs           # 単語帳 ⇄ cards round trip
 ```
 
 The build tokenises each passage with the corridor's own pipeline. It merges the span

@@ -346,8 +346,13 @@ def blank(sentence: str, form: str, also: str | None = None) -> str:
     return out.replace("\0", '<span class="blank">［］</span>')
 
 
+# card key → (recognition front HTML, cloze front HTML): the passage paragraph, filled by main()
+CONTEXT: dict[str, tuple[str, str]] = {}
+
+
 def note_fields(m: dict, c: dict) -> dict:
     s = c["sentences"]
+    ctx = CONTEXT.get(card_key(c))
     extra = "".join(
         f'<div class="ex"><div class="ja">{mark(x["ja"], x["form"])}</div><div class="en">{html.escape(x["en"])}</div></div>'
         for x in s[1:]
@@ -365,8 +370,8 @@ def note_fields(m: dict, c: dict) -> dict:
         "Key": card_key(c),
         "Term": html.escape(c["term"]),
         "Reading": html.escape(c["reading"]),
-        "Sentence": mark(s[0]["ja"], s[0]["form"]),
-        "SentenceCloze": blank(s[0]["ja"], s[0]["form"], c["term"] if c.get("kanji") else None),
+        "Sentence": ctx[0] if ctx else mark(s[0]["ja"], s[0]["form"]),
+        "SentenceCloze": ctx[1] if ctx else blank(s[0]["ja"], s[0]["form"], c["term"] if c.get("kanji") else None),
         "SentenceEN": html.escape(s[0]["en"]),
         "MoreSentences": extra,
         "DefJA": html.escape(c["def_ja"]),
@@ -471,17 +476,209 @@ def build_apkg(mods: list[dict]) -> Path | None:
 # --------------------------------------------------------------------------
 # Standalone study page
 # --------------------------------------------------------------------------
-def build_study(deck: dict) -> Path:
+CONTEXT_MIN = 100  # a card front is at least a short paragraph of the passage
+PUNCT_POS = {"補助記号", "記号", "空白"}
+
+
+def _tok(t: dict) -> list:
+    """Compact token for the study page: [surface] for punctuation, else
+    [surface, ruby, base] — ruby 0 when no part carries a reading, else
+    [[text, reading], …] (reading '' on okurigana); base '' when it is the surface."""
+    if t["p"] in PUNCT_POS:
+        return [t["s"]]
+    f = t.get("f") or [{"t": t["s"]}]
+    if t["s"] == "私" and f[0].get("r") == "わたくし":
+        f = [{"t": "私", "r": "わたし"}]  # UniDic reads the bare 私 formally; prose means わたし
+    ruby = [[x["t"], x.get("r") or ""] for x in f] if any(x.get("r") for x in f) else 0
+    return [t["s"], ruby, "" if t["b"] == t["s"] else t["b"]]
+
+
+def _merge_span(tokens: list[dict], a: int, b: int, card: dict, bc) -> tuple[list[dict], int]:
+    """Merge the tokens covering characters [a, b) into one token whose base is the
+    headword (the cloze blanks exactly that token). Returns (tokens, merged index)."""
+    offsets, pos = [], 0
+    for t in tokens:
+        offsets.append(pos)
+        pos += len(t["s"])
+    first = max(i for i, o in enumerate(offsets) if o <= a)
+    last = max(i for i, o in enumerate(offsets) if o < b)
+    group = tokens[first : last + 1]
+    surface = "".join(t["s"] for t in group)
+    reading = card["reading"]
+    if surface == card["term"] and re.fullmatch(r"[ぁ-ゖー]+", reading or ""):
+        furi = bc.furigana_pairs(surface, reading)
+    else:
+        furi = [f for t in group for f in t["f"]]
+    merged = {"s": surface, "b": card["term"], "p": group[0]["p"], "f": furi, "c": True}
+    return tokens[:first] + [merged] + tokens[last + 1 :], first
+
+
+def study_payload(deck: dict, mods: list[dict]) -> dict:
+    """The deck plus what the study page renders: every passage paragraph as
+    tokens with furigana, each card's anchor in it and its front window (the
+    paragraph around the mined sentence, widened to CONTEXT_MIN characters),
+    and every other example sentence tokenised with its target merged."""
+    sys.path.insert(0, str(CORRIDOR / "tools"))
+    sys.path.insert(0, str(REPO))
+    import build_corridor as bc  # noqa: E402
+    from corpus.grading._mecab import get_tagger  # noqa: E402
+
+    tagger = get_tagger()
+    if not all(m.get("tokenIndex") for m in mods):
+        # --no-corridor: take each card's anchor from the committed corridor deck
+        shipped = json.loads(CORRIDOR_DECK.read_text("utf-8"))
+        by_id = {m["id"]: {c["n"]: c["i"] for c in m["cards"] if "i" in c} for m in shipped["modules"]}
+        for m in mods:
+            m["tokenIndex"] = by_id.get(m["id"], {})
+    out = json.loads(json.dumps(deck))
+    for om, m in zip(out["modules"], mods):
+        art = json.loads((ARTICLES / f"{ARTICLE_PREFIX}{m['id']}.json").read_text("utf-8"))
+        toks, starts = art["tokens"], [0, *art["paras"], len(art["tokens"])]
+        paras = [toks[starts[i] : starts[i + 1]] for i in range(len(starts) - 1)]
+        plen = [sum(len(t["s"]) for t in p) for p in paras]
+        om["paras"] = [[_tok(t) for t in p] for p in paras]
+        for oc, c in zip(om["cards"], m["cards"]):
+            gi = m["tokenIndex"][c["n"]]
+            pi = max(i for i in range(len(paras)) if starts[i] <= gi)
+            if toks[gi]["b"] != c["term"]:
+                raise SystemExit(f"#{c['n']} {c['term']}: anchor token is {toks[gi]['s']}")
+            a = b = pi
+            while sum(plen[a : b + 1]) < CONTEXT_MIN and (a > 0 or b < len(paras) - 1):
+                if b < len(paras) - 1:
+                    b += 1
+                else:
+                    a -= 1
+            oc["at"] = [pi, gi - starts[pi]]
+            oc["ctx"] = [a, b]
+            for os_, s in zip(oc["sentences"][1:], c["sentences"][1:]):
+                stoks = bc.tokenise(s["ja"], tagger)
+                at = s["ja"].find(s["form"])
+                if at < 0:
+                    raise SystemExit(f"#{c['n']}: form {s['form']} not in {s['ja']}")
+                stoks, ti = _merge_span(stoks, at, at + len(s["form"]), c, bc)
+                os_["toks"] = [_tok(t) for t in stoks]
+                os_["at"] = ti
+        om["passage"].pop("text", None)
+    return out
+
+
+KANJI_RE = re.compile(r"[\u3400-\u9fff々]")
+ENDS_RE = re.compile(r"[。！？!?]")
+
+
+def _stem(tok: list) -> str:
+    """the written stem of a compact token: up to its last kanji with a reading (ending excluded)"""
+    if len(tok) < 2 or not isinstance(tok[1], list):
+        return tok[0]
+    last = max((i for i, (_, r) in enumerate(tok[1]) if r), default=-1)
+    return "".join(t for t, _ in tok[1][: last + 1])
+
+
+def _sentence_span(para: list, ti: int) -> tuple[int, int]:
+    a, b = 0, len(para) - 1
+    for i in range(ti - 1, -1, -1):
+        if ENDS_RE.search(para[i][0]):
+            a = i + 1
+            break
+    for i in range(ti, len(para)):
+        if ENDS_RE.search(para[i][0]):
+            b = i + (1 if i + 1 < len(para) and para[i + 1][0][:1] in "」』）" else 0)
+            break
+    return a, b
+
+
+def context_html(mp: dict, c: dict, cloze: bool) -> str:
+    """A card front for Anki, by the study page's own rules (study.html maskOf / contextEl):
+    the passage paragraph around the mined sentence, that sentence in full ink and its
+    neighbours dimmed; recognition bolds the word, the cloze hides every spelling of it."""
+    pi0, ti0 = c["at"]
+    anchor = mp["paras"][pi0][ti0]
+    out = []
+    for pi in range(c["ctx"][0], c["ctx"][1] + 1):
+        para = mp["paras"][pi]
+        text = "".join(t[0] for t in para)
+        mk = [False] * len(text)
+        if cloze:
+            off = 0
+            for ti, tok in enumerate(para):
+                size = len(tok[0])
+                if len(tok) > 1 and c["pos"] != "kanji" and ((pi, ti) == (pi0, ti0) or c["term"] in (tok[0], tok[2])):
+                    k = min(size, len(_stem(tok)) or size)
+                    mk[off : off + k] = [True] * k
+                off += size
+            needles = [c["term"]] if KANJI_RE.search(c["term"]) else []
+            if c["pos"] != "kanji":
+                st0 = _stem(anchor)
+                if len(st0) >= 2 and KANJI_RE.search(st0):
+                    needles.append(st0)
+            for nd in needles:
+                i = text.find(nd)
+                while i >= 0:
+                    mk[i : i + len(nd)] = [True] * len(nd)
+                    i = text.find(nd, i + len(nd))
+        sa, sb = _sentence_span(para, ti0) if pi == pi0 else (len(para), -1)
+        runs: list[tuple[bool, str]] = []
+        off, in_blank = 0, False
+        for ti, tok in enumerate(para):
+            dim = not (sa <= ti <= sb)
+            if cloze:
+                piece = ""
+                for i, ch in enumerate(tok[0]):
+                    if mk[off + i]:
+                        if not in_blank:
+                            piece += '<span class="blank">［？］</span>'
+                            in_blank = True
+                    else:
+                        piece += html.escape(ch)
+                        in_blank = False
+            else:
+                piece = f'<b class="t">{html.escape(tok[0])}</b>' if (pi, ti) == (pi0, ti0) else html.escape(tok[0])
+            off += len(tok[0])
+            if runs and runs[-1][0] == dim:
+                runs[-1] = (dim, runs[-1][1] + piece)
+            else:
+                runs.append((dim, piece))
+        out.append('<div class="p">' + "".join(f'<span class="dim">{t}</span>' if d else t for d, t in runs) + "</div>")
+    return "".join(out)
+
+
+def check_fronts(payload: dict) -> list[str]:
+    """No front may hand over its answer: a cloze never shows the headword (or a ≥2-character
+    written stem of it, or a kana headword of ≥3), and recognition always bolds exactly one word."""
+    leaks = []
+    for mp in payload["modules"]:
+        for c in mp["cards"]:
+            mark_html, cloze_html = CONTEXT[c["key"]]
+            seen = re.sub(r"<[^>]+>", "", cloze_html)
+            st0 = c["term"] if c["pos"] == "kanji" else _stem(mp["paras"][c["at"][0]][c["at"][1]])
+            if KANJI_RE.search(c["term"]) and c["term"] in seen:
+                leaks.append(f"{c['key']} {c['term']}")
+            elif (len(st0) >= 2 or c["pos"] == "kanji") and KANJI_RE.search(st0) and st0 in seen:
+                leaks.append(f"{c['key']} stem {st0}")
+            elif not KANJI_RE.search(c["term"]) and len(c["term"]) >= 3 and c["term"] in seen:
+                leaks.append(f"{c['key']} kana {c['term']}")
+            elif "blank" not in cloze_html or mark_html.count('<b class="t">') != 1:
+                leaks.append(f"{c['key']} shape")
+    return leaks
+
+
+def build_study(data: dict) -> Path:
     page = (HERE / "study" / "study.html").read_text("utf-8")
-    payload = json.dumps(deck, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     body = re.sub(r"/\*__DECK__\*/ ?null", lambda _: payload, page, count=1)
     # a full document so the file opens straight from disk in any browser
     head = (
         '<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
     )
+    doc = head + body + "\n</html>\n"
     out = DIST / "study.html"
-    out.write_text(head + body + "\n</html>\n", "utf-8")
+    out.write_text(doc, "utf-8")
+    # the same bytes, published beside Bunki (pages-app.yml copies the corridor's
+    # decks/kotoba-mine/) so the cards and 単語帳 share one origin and one ledger
+    bunki = CORRIDOR / "decks" / "kotoba-mine" / "index.html"
+    bunki.parent.mkdir(parents=True, exist_ok=True)
+    bunki.write_text(doc, "utf-8")
     return out
 
 
@@ -503,12 +700,20 @@ def main() -> int:
     deck = canonical(mods)
     (DECK / "deck.json").write_text(json.dumps(deck, ensure_ascii=False, indent=1) + "\n", "utf-8")
     DIST.mkdir(exist_ok=True)
+    study = study_payload(deck, mods)
+    for mp in study["modules"]:
+        for c in mp["cards"]:
+            CONTEXT[c["key"]] = (context_html(mp, c, False), context_html(mp, c, True))
+    leaks = check_fronts(study)
+    if leaks:
+        raise SystemExit(f"{len(leaks)} card front(s) give the answer away: {', '.join(leaks[:8])}")
+    print(f"· {len(CONTEXT)} paragraph fronts, no answer shown on any cloze")
     print(f"· {build_tsv(mods).relative_to(REPO)}")
     if not args.no_anki:
         p = build_apkg(mods)
         if p:
             print(f"· {p.relative_to(REPO)}")
-    print(f"· {build_study(deck).relative_to(REPO)}")
+    print(f"· {build_study(study).relative_to(REPO)}")
     if report:
         (DIST / "build-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", "utf-8")
     return 0

@@ -1,623 +1,1517 @@
 <title>言葉の鉱脈 Kotoba Mine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- never render-blocking: offline or on a slow line the page paints at once in Hiragino,
+     and the web fonts swap in when (if) they arrive -->
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+  data-webfonts
+  href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Shippori+Mincho:wght@500;600;700;800&display=swap"
+  media="print"
+  onload="this.media = 'all'"
 />
 <style>
-  /* Layout: one working column — a vein map of modules up top, the card bench below; tabs switch bench ↔ passage ↔ index. */
+  /* One quiet study tool. Three surfaces: the ground (darkest), the sheet a card is printed on
+     (raised, the brightest), and ink. Every screen is a sheet on the ground; review hides the rest. */
   :root {
-    --bg: #e9eeec; /* slate paper */
-    --panel: #f6f8f7;
-    --ink: #18242a; /* graphite ink */
-    --muted: #5b6b70;
-    --line: #c9d3d1;
-    --ore: #1f7a5c; /* malachite */
-    --ore-soft: #d3e8df;
-    --gold: #a7741a; /* ochre — due */
-    --rust: #a33a2b; /* again */
-    --target: #0f5f8a; /* the mined word */
-    --f-display: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
-    --f-ui:
-      'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
-    --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --ground: #e6e0d4;
+    --ground-2: #dcd5c7;
+    --sheet: #fffdf8;
+    --sheet-2: #f6f2e9;
+    --ink: #17140f;
+    --ink-2: #3f3a32;
+    --muted: #6f685d;
+    --rt: #3f3a32;
+    --faint: #9a9284;
+    --rule: rgba(23, 20, 15, 0.13);
+    --rule-2: rgba(23, 20, 15, 0.07);
+    --target: #1f4fd1; /* 藍 — the word being asked */
+    --target-bg: rgba(31, 79, 209, 0.1);
+    --new: #1f4fd1;
+    --learn: #c2361b;
+    --review: #17824c;
+    --again: #c2361b;
+    --hard: #8a6a1f;
+    --good: #17824c;
+    --easy: #1f4fd1;
+    --shadow:
+      0 0 0 1px rgba(23, 20, 15, 0.08), 0 1px 2px rgba(23, 20, 15, 0.08),
+      0 10px 28px -12px rgba(40, 30, 15, 0.28), 0 30px 60px -30px rgba(40, 30, 15, 0.3);
+    --shadow-sm: 0 0 0 1px rgba(23, 20, 15, 0.1), 0 1px 2px rgba(23, 20, 15, 0.1);
+    --mincho:
+      'Shippori Mincho', 'Hiragino Mincho ProN', 'YuMincho', 'Yu Mincho', 'Noto Serif JP', serif;
+    /* Kaku Gothic ProN maps 400→W3 and 700→W6 the same in Chromium and WebKit; Hiragino Sans does not */
+    --gothic:
+      'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'BIZ UDPGothic', system-ui,
+      sans-serif;
+    /* the headword in textbook strokes, the way a learner should see its shape */
+    --kyokasho: 'Klee One', var(--mincho);
+    --scale: 1;
+    color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme='light']) {
-      --bg: #12171a;
-      --panel: #1a2125;
-      --ink: #dfe7e4;
-      --muted: #8d9c9f;
-      --line: #2c373b;
-      --ore: #5cc79e;
-      --ore-soft: #1d3a31;
-      --gold: #d9a54a;
-      --rust: #e0735f;
-      --target: #7cc4ec;
+      --ground: #0e0f11;
+      --ground-2: #16181b;
+      --sheet: #1c1f23;
+      --sheet-2: #23272c;
+      --ink: #f2eee6;
+      --ink-2: #d2ccc1;
+      --muted: #9b9488;
+      --rt: #c9c2b5;
+      --faint: #6f695f;
+      --rule: rgba(255, 255, 255, 0.12);
+      --rule-2: rgba(255, 255, 255, 0.06);
+      --target: #8fb0ff;
+      --target-bg: rgba(143, 176, 255, 0.14);
+      --new: #8fb0ff;
+      --learn: #ff8a70;
+      --review: #6fd39a;
+      --again: #ff8a70;
+      --hard: #e0be6a;
+      --good: #6fd39a;
+      --easy: #8fb0ff;
+      --shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.07), 0 1px 2px rgba(0, 0, 0, 0.5),
+        0 14px 34px -14px rgba(0, 0, 0, 0.8);
+      --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.09), 0 1px 2px rgba(0, 0, 0, 0.5);
       color-scheme: dark;
     }
   }
   :root[data-theme='dark'] {
-    --bg: #12171a;
-    --panel: #1a2125;
-    --ink: #dfe7e4;
-    --muted: #8d9c9f;
-    --line: #2c373b;
-    --ore: #5cc79e;
-    --ore-soft: #1d3a31;
-    --gold: #d9a54a;
-    --rust: #e0735f;
-    --target: #7cc4ec;
+    --ground: #0e0f11;
+    --ground-2: #16181b;
+    --sheet: #1c1f23;
+    --sheet-2: #23272c;
+    --ink: #f2eee6;
+    --ink-2: #d2ccc1;
+    --muted: #9b9488;
+    --rt: #c9c2b5;
+    --faint: #6f695f;
+    --rule: rgba(255, 255, 255, 0.12);
+    --rule-2: rgba(255, 255, 255, 0.06);
+    --target: #8fb0ff;
+    --target-bg: rgba(143, 176, 255, 0.14);
+    --new: #8fb0ff;
+    --learn: #ff8a70;
+    --review: #6fd39a;
+    --again: #ff8a70;
+    --hard: #e0be6a;
+    --good: #6fd39a;
+    --easy: #8fb0ff;
+    --shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.07), 0 1px 2px rgba(0, 0, 0, 0.5),
+      0 14px 34px -14px rgba(0, 0, 0, 0.8);
+    --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.09), 0 1px 2px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
+
   * {
     box-sizing: border-box;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--f-ui);
-    font-size: 15px;
-    line-height: 1.6;
     margin: 0;
-    padding-inline: 16px;
-    padding-block: 12px 48px;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--gothic);
+    font-size: calc(15px * var(--scale));
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    line-break: strict;
+    overflow-wrap: anywhere;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--target);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* single-column grids never let one long line (a nowrap title) widen the column */
+  .wrap,
+  .stage,
+  .card,
+  .answer,
+  .today,
+  .done,
+  .hints,
+  .sect,
+  .ex,
+  .item .open,
+  .set .grp {
+    grid-template-columns: minmax(0, 1fr);
   }
   .wrap {
-    max-width: 44rem;
+    max-width: 46rem;
     margin: 0 auto;
+    padding: 20px 16px 64px;
     display: grid;
-    gap: 18px;
+    gap: 16px;
   }
+
+  /* top bar */
   header.top {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
+    padding: 4px 2px;
+  }
+  .brand-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .bunki {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--rule);
+    white-space: nowrap;
+  }
+  .bunki:hover {
+    background: var(--sheet-2);
   }
   .brand {
     display: flex;
     align-items: baseline;
     gap: 10px;
+    background: none;
+    border: 0;
+    padding: 0;
   }
-  .brand h1 {
-    font-family: var(--f-display);
-    font-weight: 700;
-    font-size: 1.7rem;
-    margin: 0;
-    letter-spacing: 0.04em;
+  .brand b {
+    font-family: var(--mincho);
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    font-feature-settings: 'palt';
   }
   .brand span {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
     color: var(--muted);
-    font-size: 0.8rem;
-    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-  nav.tabs {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
+  nav.seg {
+    display: inline-flex;
+    padding: 3px;
+    gap: 2px;
+    background: var(--ground-2);
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--rule-2);
   }
-  nav.tabs button {
-    font: inherit;
-    font-size: 0.85rem;
-    border: 1px solid var(--line);
+  nav.seg button {
+    border: 0;
     background: transparent;
     color: var(--muted);
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 999px;
-    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
-  nav.tabs button[aria-selected='true'] {
-    background: var(--ink);
-    color: var(--bg);
-    border-color: var(--ink);
-  }
-  button {
-    font-family: inherit;
-  }
-  button:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid var(--ore);
-    outline-offset: 2px;
+  nav.seg button[aria-current='page'] {
+    background: var(--sheet);
+    color: var(--ink);
+    box-shadow: var(--shadow-sm);
   }
 
-  /* vein map */
-  .veins {
+  .sheet {
+    background: var(--sheet);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+  .pad {
+    padding: 22px 22px;
+  }
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- home ---------- */
+  .today {
     display: grid;
-    gap: 6px;
+    gap: 20px;
+    padding: 26px 24px 24px;
+  }
+  .today h1 {
+    margin: 0;
+    font-family: var(--mincho);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.04em;
+  }
+  .tally {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .tally div {
+    padding: 14px 0 12px;
+    display: grid;
+    gap: 2px;
+    justify-items: start;
+  }
+  .tally div + div {
+    border-left: 1px solid var(--rule-2);
+    padding-left: 18px;
+  }
+  .tally b {
+    font-family: var(--mincho);
+    font-size: 2.6rem;
+    line-height: 1;
+    font-weight: 700;
+  }
+  .tally span {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .tally .n b {
+    color: var(--new);
+  }
+  .tally .l b {
+    color: var(--learn);
+  }
+  .tally .r b {
+    color: var(--review);
+  }
+  .tally .zero b {
+    color: var(--faint);
+  }
+  .go {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .primary {
+    border: 0;
+    background: var(--ink);
+    color: var(--sheet);
+    border-radius: 12px;
+    padding: 14px 26px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.15) inset,
+      0 6px 16px -8px rgba(0, 0, 0, 0.5);
+  }
+  .primary:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  kbd {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid currentColor;
+    opacity: 0.6;
+    letter-spacing: 0;
+  }
+  .fine {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  .ghost {
+    border: 1px solid var(--rule);
+    background: transparent;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .ghost:hover {
+    background: var(--sheet-2);
+  }
+
+  .veins {
+    padding: 6px 0;
+  }
+  .veins-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 22px 8px;
   }
   .vein {
     display: grid;
-    grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    grid-template-columns: 2.1rem minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 10px;
-    padding: 6px 2px;
-    border-bottom: 1px solid var(--line);
+    gap: 12px;
+    padding: 12px 22px;
+    border-top: 1px solid var(--rule-2);
   }
-  .vein input {
-    width: 1.05rem;
-    height: 1.05rem;
-    accent-color: var(--ore);
-  }
-  .vein .name {
-    min-width: 0;
-  }
-  .vein .name b {
-    font-family: var(--f-display);
+  .vein .no {
+    font-family: var(--mincho);
     font-weight: 700;
-    font-size: 1rem;
+    color: var(--faint);
+    font-size: 0.95rem;
   }
-  .vein .name small {
-    display: block;
+  .vein .what {
+    min-width: 0;
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    display: grid;
+    gap: 3px;
+  }
+  .vein .what b {
+    font-family: var(--mincho);
+    font-weight: 700;
+    font-size: 1.06rem;
+    letter-spacing: 0.02em;
+  }
+  .vein .what small {
     color: var(--muted);
-    font-size: 0.75rem;
-    line-height: 1.3;
+    font-size: 0.76rem;
   }
-  .vein .bar {
+  .meter {
     display: flex;
-    height: 4px;
-    border-radius: 2px;
+    height: 5px;
+    border-radius: 3px;
     overflow: hidden;
-    background: var(--line);
-    margin-top: 4px;
+    background: var(--rule-2);
+    margin-top: 6px;
+    max-width: 22rem;
   }
-  .vein .bar i {
+  .meter i {
     display: block;
     height: 100%;
   }
-  .vein .bar .m {
-    background: var(--ore);
+  .meter .m {
+    background: var(--review);
   }
-  .vein .bar .l {
-    background: var(--gold);
+  .meter .l {
+    background: var(--learn);
+    opacity: 0.75;
   }
-  .vein .count {
-    font-family: var(--f-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+  .vein .due {
+    font-size: 0.76rem;
+    font-weight: 700;
     white-space: nowrap;
-  }
-  .vein.off {
-    opacity: 0.5;
-  }
-  .summary {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
-    font-family: var(--f-mono);
-    font-size: 0.8rem;
+    text-align: right;
     color: var(--muted);
   }
-  .summary b {
-    color: var(--ink);
-    font-weight: 500;
+  .vein .due em {
+    font-style: normal;
+    color: var(--review);
   }
-  .summary .due b {
-    color: var(--gold);
+  .vein.off .what,
+  .vein.off .no,
+  .vein.off .due {
+    opacity: 0.4;
   }
-  .summary .new b {
-    color: var(--target);
+  .switch {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    flex: none;
   }
-  .lead {
-    color: var(--muted);
-    font-size: 0.85rem;
+  .switch input {
+    appearance: none;
     margin: 0;
-    max-width: 62ch;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--rule);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .switch input:checked {
+    background: var(--review);
+  }
+  .switch input::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+  }
+  .switch input:checked::after {
+    transform: translateX(16px);
+  }
+  .vein .play {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: transparent;
+    display: grid;
+    place-items: center;
+    color: var(--ink-2);
+  }
+  .vein .play:hover {
+    background: var(--sheet-2);
   }
 
-  /* card bench */
-  .bench {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 22px 20px 18px;
+  /* ---------- review ---------- */
+  .rv {
+    min-height: 100dvh;
     display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rv-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: color-mix(in srgb, var(--ground) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .rv-top .inner {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 10px 16px 8px;
+    display: flex;
+    align-items: center;
     gap: 14px;
   }
-  .bench .kind {
+  .x {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: var(--sheet);
+    display: grid;
+    place-items: center;
+    color: var(--ink-2);
+    flex: none;
+  }
+  .counts {
+    display: flex;
+    gap: 14px;
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+  .counts span {
+    padding-bottom: 1px;
+    border-bottom: 2px solid transparent;
+  }
+  .counts .n {
+    color: var(--new);
+  }
+  .counts .l {
+    color: var(--learn);
+  }
+  .counts .r {
+    color: var(--review);
+  }
+  .counts .now {
+    border-bottom-color: currentColor;
+  }
+  .counts .z {
+    color: var(--faint);
+  }
+  .rv-top .where {
+    margin-left: auto;
+    font-size: 0.74rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .progress {
+    height: 2px;
+    background: var(--rule-2);
+  }
+  .progress i {
+    display: block;
+    height: 100%;
+    background: var(--ink-2);
+    transition: width 0.25s ease;
+  }
+  .stage {
+    max-width: 46rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 18px 16px 24px;
+    display: grid;
+    gap: 14px;
+    align-content: start;
+  }
+  .card {
+    padding: 26px 26px 24px;
+    display: grid;
+    gap: 16px;
+  }
+  .card-meta > * {
+    min-width: 0;
+  }
+  .card-meta {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
+    gap: 10px;
     flex-wrap: wrap;
+    align-items: baseline;
   }
-  .sentence {
-    font-family: var(--f-display);
-    font-size: clamp(1.3rem, 4.6vw, 1.75rem);
-    line-height: 1.75;
-    margin: 0;
-    text-wrap: pretty;
+  .card-meta .src {
+    font-size: 0.76rem;
+    color: var(--muted);
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .sentence .t {
-    color: var(--target);
+  .face-tag {
+    font-size: 0.7rem;
     font-weight: 700;
-    border-bottom: 2px solid currentColor;
-  }
-  .sentence .blank {
-    color: var(--target);
-    letter-spacing: 0.15em;
-  }
-  .hint {
-    font-size: 0.95rem;
-    margin: 0;
-  }
-  .hint small {
+    letter-spacing: 0.12em;
     color: var(--muted);
   }
-  .reveal-btn {
-    justify-self: start;
-    font: inherit;
-    border: 1px solid var(--ink);
-    background: var(--ink);
-    color: var(--bg);
-    border-radius: 4px;
-    padding: 8px 18px;
-    cursor: pointer;
+  .face-tag i {
+    font-style: normal;
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 7px;
+    vertical-align: 1px;
   }
+
+  /* Japanese text: ruby rides inside a line-height tall enough that toggling it never moves a line */
+  .jp {
+    font-family: var(--mincho);
+    font-weight: 500;
+    line-height: 2;
+    letter-spacing: 0;
+    text-align: justify;
+    text-autospace: normal;
+    margin: 0;
+  }
+  .ctx {
+    font-size: calc(1.36rem * var(--scale));
+  }
+  .ctx p {
+    margin: 0;
+  }
+  .ctx .dim {
+    color: color-mix(in srgb, var(--ink) 60%, var(--sheet));
+  }
+  .ctx.answered .dim {
+    color: color-mix(in srgb, var(--ink) 74%, var(--sheet));
+  }
+  .ctx .dim .tgt,
+  .ctx .dim .blank {
+    color: var(--target);
+  }
+  .tail {
+    color: var(--ink);
+  }
+  .ctx p + p {
+    margin-top: 0.6em;
+  }
+  ruby {
+    ruby-position: over;
+    ruby-align: center;
+    ruby-overhang: auto;
+  }
+  rt {
+    font-family: var(--gothic);
+    font-size: 0.5em;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--rt);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* hover / off: a reading floats above its kanji and takes no room, so wide readings never
+     spread the text and showing one never moves a character */
+  .rb {
+    position: relative;
+  }
+  .rb::after {
+    content: attr(data-rt);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% - 0.05em);
+    transform: translateX(-50%);
+    font-family: var(--gothic);
+    font-size: 0.5em;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0;
+    white-space: nowrap;
+    color: var(--rt);
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .w:hover .rb::after,
+  .w.lit .rb::after,
+  .show-rt .rb::after {
+    visibility: visible;
+  }
+  .hide-rt .rb::after {
+    visibility: hidden !important;
+  }
+  @media (hover: none) {
+    .w:hover .rb::after {
+      visibility: hidden;
+    }
+    .w.lit .rb::after,
+    .show-rt .rb::after {
+      visibility: visible;
+    }
+  }
+  /* furigana modes: hidden rt keeps its box (visibility), so lines never jump */
+  .furi-off .jp rt,
+  .furi-hover .jp rt {
+    visibility: hidden;
+  }
+  .furi-hover .jp .w:hover rt,
+  .jp .w.lit rt,
+  .jp .show-rt rt {
+    visibility: visible;
+  }
+  .jp .hide-rt rt {
+    visibility: hidden !important;
+  }
+  /* the asked word and its blank never split across a line; ordinary text breaks anywhere,
+     as Japanese does, so justified lines never stretch into spaced-out glyphs */
+  .tgt,
+  .clz {
+    white-space: nowrap;
+  }
+  /* no keyboard, no key hints */
+  @media (hover: none), (max-width: 600px) {
+    kbd,
+    .keys {
+      display: none;
+    }
+  }
+  .w {
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.12s;
+  }
+  .w:hover,
+  .w.lit {
+    background: var(--rule-2);
+  }
+  .tgt {
+    color: var(--target);
+    font-weight: 800;
+    background: var(--target-bg);
+    box-shadow: 0 2px 0 0 var(--target);
+    border-radius: 3px 3px 0 0;
+    padding: 0 1px;
+  }
+  .tgt.filled {
+    animation: ink 0.35s ease-out;
+  }
+  @keyframes ink {
+    from {
+      background: color-mix(in srgb, var(--target) 35%, transparent);
+    }
+  }
+  .blank {
+    display: inline-block;
+    min-width: 3.2em;
+    text-align: center;
+    color: var(--target);
+    border: 1.5px dashed color-mix(in srgb, var(--target) 70%, transparent);
+    background: var(--target-bg);
+    border-radius: 6px;
+    line-height: 1.25;
+    padding: 0.08em 0.3em;
+    margin: 0 0.1em;
+    font-family: var(--gothic);
+    font-weight: 700;
+    font-size: 0.72em;
+    vertical-align: 0.12em;
+    letter-spacing: 0.04em;
+  }
+  .blank.mute {
+    font-size: 0.9em;
+    vertical-align: 0.04em;
+    font-family: var(--mincho);
+    min-width: 3.4em;
+  }
+  .hintline {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--sheet-2);
+    font-size: 1rem;
+  }
+  .hints {
+    display: grid;
+    gap: 6px;
+    justify-items: start;
+  }
+  .hints .hintline {
+    width: 100%;
+  }
+  .hd {
+    line-height: 1.8;
+    font-weight: 600;
+  }
+  .hk {
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .hintline .k {
+    flex: none;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  /* answer */
   .answer {
     display: grid;
-    gap: 10px;
-    border-top: 1px solid var(--line);
-    padding-top: 14px;
+    gap: 14px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
   }
   .head {
     display: flex;
     align-items: baseline;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
   }
   .head .term {
-    font-family: var(--f-display);
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.2;
+    font-family: var(--kyokasho);
+    font-weight: 600;
+    font-size: calc(2.5rem * var(--scale));
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    font-feature-settings: 'palt';
   }
   .head .reading {
-    font-size: 1.15rem;
-    color: var(--muted);
+    font-size: 1.12rem;
+    color: var(--ink-2);
+    font-weight: 500;
+    letter-spacing: 0.06em;
   }
-  .chips {
+  .speak {
+    border: 1px solid var(--rule);
+    background: transparent;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-grid;
+    place-items: center;
+    color: var(--ink-2);
+    align-self: center;
+  }
+  .speak:hover {
+    background: var(--sheet-2);
+  }
+  .tags {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
   }
-  .chip {
-    font-size: 0.72rem;
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    padding: 0 6px;
+  .tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--sheet-2);
     color: var(--muted);
+    box-shadow: inset 0 0 0 1px var(--rule-2);
   }
   .def {
-    font-size: 1.05rem;
+    font-family: var(--mincho);
+    font-size: calc(1.14rem * var(--scale));
+    font-weight: 600;
+    line-height: 1.85;
     margin: 0;
   }
   .gloss {
     margin: 0;
-    color: var(--muted);
+    color: var(--ink-2);
+    font-size: 0.98rem;
+    line-height: 1.55;
   }
-  details.en {
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-  details.en summary {
+  .trans {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--sheet-2);
     cursor: pointer;
+    position: relative;
+  }
+  .trans.veiled span {
+    filter: blur(5px);
+    user-select: none;
+  }
+  .trans.veiled::after {
+    content: attr(data-hint);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .deep {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 10px 26px;
+  }
+  .sect {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule-2);
+  }
+  .sect.wide {
+    grid-column: 1 / -1;
+  }
+  .sect .k {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    color: var(--muted);
   }
   .ex {
     display: grid;
     gap: 2px;
   }
-  .ex .ja {
-    font-family: var(--f-display);
-    font-size: 1.08rem;
-  }
-  .ex .ja .t {
-    color: var(--target);
-    font-weight: 700;
+  .ex .jp {
+    font-size: calc(1.08rem * var(--scale));
+    line-height: 2.1;
   }
   .ex .en {
     font-size: 0.8rem;
     color: var(--muted);
   }
-  .lbl {
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 2px;
-  }
-  .cols {
+  .colls {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 14px;
-    font-family: var(--f-display);
+    gap: 4px 16px;
+    font-family: var(--mincho);
+    font-weight: 600;
+    font-size: 1.02rem;
   }
   .conf {
+    display: grid;
+    gap: 6px;
     margin: 0;
-    padding-left: 1.1rem;
-    font-size: 0.9rem;
+    padding: 0;
+    list-style: none;
+  }
+  .conf b {
+    font-family: var(--mincho);
+    font-size: 1.05rem;
+    margin-right: 8px;
+  }
+  .conf span {
+    font-size: 0.86rem;
+    color: var(--ink-2);
   }
   .note {
-    font-size: 0.85rem;
-    color: var(--muted);
-    border-left: 2px solid var(--line);
-    padding-left: 10px;
     margin: 0;
+    font-size: 0.86rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  /* the bar at the bottom: one big reveal, or four grades */
+  .dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--ground) 72%, transparent);
+  }
+  .dock .inner {
+    max-width: 46rem;
+    margin: 0 auto;
+    display: grid;
+    gap: 8px;
+  }
+  .reveal {
+    border: 0;
+    width: 100%;
+    background: var(--ink);
+    color: var(--sheet);
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 1.04rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 8px 22px -10px rgba(0, 0, 0, 0.55);
   }
   .grades {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-  }
-  .grades button {
-    font: inherit;
-    border: 1px solid var(--line);
-    background: var(--bg);
-    color: var(--ink);
-    border-radius: 4px;
-    padding: 8px 4px 6px;
-    cursor: pointer;
-    display: grid;
-    gap: 0;
-  }
-  .grades button span {
-    font-size: 0.9rem;
-  }
-  .grades button small {
-    font-family: var(--f-mono);
-    font-size: 0.7rem;
-    color: var(--muted);
-  }
-  .grades .g1 {
-    border-color: var(--rust);
-  }
-  .grades .g1 span {
-    color: var(--rust);
-  }
-  .grades .g3 {
-    border-color: var(--ore);
-  }
-  .grades .g3 span {
-    color: var(--ore);
-  }
-  .tools {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    font-size: 0.8rem;
-  }
-  .linkish {
-    font: inherit;
-    background: none;
-    border: 0;
-    padding: 0;
-    color: var(--muted);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    cursor: pointer;
-  }
-  .empty {
-    text-align: left;
-    display: grid;
     gap: 8px;
   }
-  .empty h2 {
-    font-family: var(--f-display);
-    margin: 0;
-    font-size: 1.3rem;
-  }
-
-  /* reader */
-  .passage h2 {
-    font-family: var(--f-display);
-    font-size: 1.5rem;
-    margin: 0 0 4px;
-    text-wrap: balance;
-  }
-  .passage .sub {
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin: 0 0 14px;
-  }
-  .passage p.sub {
-    font-family: var(--f-ui);
-    font-size: 0.8rem;
-    line-height: 1.5;
-  }
-  .passage p {
-    font-family: var(--f-display);
-    font-size: 1.12rem;
-    line-height: 2;
-    margin: 0 0 1em;
-    max-width: 34em;
-  }
-  .passage .w {
-    font: inherit;
-    background: none;
+  .grades button {
     border: 0;
-    padding: 0;
-    color: var(--target);
-    border-bottom: 1px dotted currentColor;
-    cursor: pointer;
-  }
-  .passage .w.known {
-    color: var(--ore);
-  }
-  .pop {
-    position: sticky;
-    bottom: 12px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 12px 14px;
+    background: var(--sheet);
+    border-radius: 12px;
+    padding: 10px 4px 9px;
     display: grid;
-    gap: 4px;
+    gap: 1px;
+    justify-items: center;
+    box-shadow: var(--shadow-sm);
+    border-top: 3px solid var(--c);
   }
-  select {
-    font: inherit;
-    color: var(--ink);
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 4px 8px;
-    max-width: 100%;
+  .grades button:hover {
+    background: var(--sheet-2);
   }
-
-  /* index */
-  .search {
-    width: 100%;
-    font: inherit;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--panel);
-    color: var(--ink);
+  .grades button:focus-visible {
+    outline: 0;
+    box-shadow:
+      0 0 0 2px var(--sheet),
+      0 0 0 4px var(--c);
   }
-  .rows {
-    display: grid;
-  }
-  .row {
-    display: grid;
-    grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) auto;
-    gap: 10px;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--line);
-    align-items: baseline;
-    cursor: pointer;
-  }
-  .row .w {
-    font-family: var(--f-display);
+  .grades .lbl {
     font-weight: 700;
-    overflow-wrap: anywhere;
+    font-size: 0.92rem;
+    color: var(--c);
+    letter-spacing: 0.04em;
   }
-  .row .w small {
-    display: block;
-    font-family: var(--f-ui);
-    font-weight: 400;
-    font-size: 0.72rem;
+  .grades .ivl {
+    font-size: 0.74rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .grades kbd {
+    font-size: 0.6rem;
+    opacity: 0.45;
+    border-color: var(--rule);
     color: var(--muted);
   }
-  .row .g {
-    font-size: 0.85rem;
-    min-width: 0;
+  .g1 {
+    --c: var(--again);
+    margin-right: 8px;
   }
-  .st {
-    font-family: var(--f-mono);
-    font-size: 0.7rem;
-    color: var(--muted);
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(150px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 25;
+    background: var(--ink);
+    color: var(--sheet);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
+    pointer-events: none;
+    animation: toast 2.4s ease forwards;
   }
-  .st.review {
-    color: var(--ore);
+  @keyframes toast {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 6px);
+    }
+    10%,
+    80% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    100% {
+      opacity: 0;
+    }
   }
-  .st.learn {
-    color: var(--gold);
+  .g2 {
+    --c: var(--hard);
+  }
+  .g3 {
+    --c: var(--good);
+  }
+  .g4 {
+    --c: var(--easy);
+  }
+  .minor {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .link {
+    border: 0;
+    background: none;
+    padding: 2px 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .link:hover {
+    color: var(--ink);
+  }
+  .link kbd {
+    margin-left: 5px;
   }
 
-  /* settings */
-  .settings {
+  /* finished */
+  .done {
+    padding: 34px 26px 28px;
     display: grid;
-    gap: 14px;
+    gap: 18px;
+    justify-items: start;
   }
-  .field {
+  .done h2 {
+    margin: 0;
+    font-family: var(--mincho);
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+  .stats {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .stats div {
     display: grid;
-    gap: 4px;
   }
-  .field label {
-    font-size: 0.85rem;
+  .stats b {
+    font-family: var(--mincho);
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
   }
-  .field input[type='number'] {
-    width: 6rem;
-    font: inherit;
-    padding: 4px 8px;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--panel);
-    color: var(--ink);
-  }
-  textarea {
-    width: 100%;
-    min-height: 6rem;
-    font-family: var(--f-mono);
-    font-size: 0.72rem;
-    background: var(--panel);
-    color: var(--ink);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 8px;
-  }
-  .btn {
-    font: inherit;
-    font-size: 0.85rem;
-    border: 1px solid var(--line);
-    background: var(--panel);
-    color: var(--ink);
-    border-radius: 4px;
-    padding: 5px 12px;
-    cursor: pointer;
-  }
-  .btn.danger {
-    color: var(--rust);
-    border-color: var(--rust);
+  .stats span {
+    font-size: 0.76rem;
+    color: var(--muted);
+    font-weight: 600;
   }
   .row-btns {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
   }
-  .fine {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin: 0;
+
+  /* ---------- reader ---------- */
+  .chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 2px 8px;
+    scrollbar-width: thin;
   }
-  @media (max-width: 480px) {
-    .row {
-      grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
+  .chips button {
+    flex: none;
+    border: 0;
+    background: var(--ground-2);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--rule-2);
+  }
+  .chips button[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--sheet);
+  }
+  .article {
+    padding: 30px 30px 34px;
+  }
+  .article h2 {
+    margin: 0;
+    font-family: var(--mincho);
+    font-weight: 800;
+    font-size: calc(1.6rem * var(--scale));
+    line-height: 1.5;
+    text-wrap: balance;
+    letter-spacing: 0.03em;
+  }
+  .article .sub {
+    margin: 6px 0 22px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .article .body {
+    font-size: calc(1.2rem * var(--scale));
+    max-width: 36em;
+  }
+  .article .body p {
+    margin: 0 0 1em;
+    text-indent: 1em;
+  }
+  .article .mined {
+    box-shadow: 0 2px 0 0 color-mix(in srgb, var(--st, var(--new)) 80%, transparent);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .article .mined.st-learn {
+    --st: var(--learn);
+  }
+  .article .mined.st-review {
+    --st: var(--review);
+  }
+  .reader-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- word list ---------- */
+  .search {
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: var(--sheet);
+    box-shadow: var(--shadow-sm);
+    font-size: 1rem;
+  }
+  .filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .list {
+    padding: 4px 0;
+  }
+  .item {
+    border-top: 1px solid var(--rule-2);
+  }
+  .item:first-child {
+    border-top: 0;
+  }
+  .item > button {
+    width: 100%;
+    border: 0;
+    background: none;
+    text-align: left;
+    display: grid;
+    grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: baseline;
+    padding: 11px 22px;
+  }
+  .item > button:hover {
+    background: var(--sheet-2);
+  }
+  .item .t {
+    font-family: var(--mincho);
+    font-weight: 700;
+    font-size: 1.12rem;
+  }
+  .item .t small {
+    display: block;
+    font-family: var(--gothic);
+    font-weight: 500;
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+  .item .g {
+    font-size: 0.86rem;
+    color: var(--ink-2);
+    min-width: 0;
+  }
+  .pill {
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--faint);
+  }
+  .pill.learn {
+    color: var(--learn);
+  }
+  .pill.review {
+    color: var(--review);
+  }
+  .item .open {
+    padding: 4px 22px 18px;
+    display: grid;
+    gap: 10px;
+  }
+
+  /* ---------- settings ---------- */
+  .set {
+    display: grid;
+  }
+  .set .grp {
+    padding: 18px 22px;
+    border-top: 1px solid var(--rule-2);
+    display: grid;
+    gap: 10px;
+  }
+  .set .grp:first-child {
+    border-top: 0;
+  }
+  .set h3 {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .opts {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .opts button {
+    border: 0;
+    background: var(--sheet-2);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--rule-2);
+    text-align: left;
+  }
+  .opts button small {
+    display: block;
+    font-weight: 500;
+    color: var(--muted);
+    font-size: 0.72rem;
+  }
+  .opts button[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--sheet);
+  }
+  .opts button[aria-pressed='true'] small {
+    color: color-mix(in srgb, var(--sheet) 70%, transparent);
+  }
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px var(--rule);
+    overflow: hidden;
+  }
+  .stepper button {
+    border: 0;
+    background: var(--sheet-2);
+    width: 38px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+  .stepper output {
+    min-width: 3.4rem;
+    text-align: center;
+    font-weight: 700;
+  }
+  textarea {
+    width: 100%;
+    min-height: 5rem;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.72rem;
+    background: var(--sheet-2);
+    border: 0;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  .danger {
+    color: var(--again);
+  }
+
+  /* ---------- word popover ---------- */
+  .pop {
+    position: absolute;
+    z-index: 20;
+    width: max-content;
+    min-width: 13rem;
+    max-width: min(22rem, calc(100vw - 24px));
+    background: var(--sheet);
+    border-radius: 14px;
+    box-shadow:
+      var(--shadow),
+      0 0 0 1px var(--rule);
+    padding: 16px 18px 14px;
+    display: grid;
+    gap: 8px;
+  }
+  .pop .pw {
+    font-family: var(--mincho);
+    font-weight: 800;
+    font-size: 1.7rem;
+    line-height: 1.2;
+  }
+  .pop .pr {
+    color: var(--ink-2);
+    font-size: 0.95rem;
+  }
+  .pop .base {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .pop .pd {
+    font-family: var(--mincho);
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.75;
+  }
+  .pop .pg {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--ink-2);
+  }
+  .pop .acts {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+  }
+  .pop a {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  @media (max-width: 600px) {
+    .pop {
+      position: fixed;
+      left: 0 !important;
+      right: 0;
+      top: auto !important;
+      bottom: 0;
+      width: 100%;
+      border-radius: 18px 18px 0 0;
+      padding: 18px 20px calc(18px + env(safe-area-inset-bottom));
     }
-    .row .st {
+  }
+
+  .help {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(0, 0, 0, 0.35);
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .help .sheet {
+    padding: 22px 24px;
+    width: min(26rem, 100%);
+    display: grid;
+    gap: 6px;
+  }
+  .help dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+  }
+  .help dt {
+    text-align: right;
+  }
+
+  @media (max-width: 600px) {
+    .wrap {
+      padding: 14px 12px 48px;
+      gap: 12px;
+    }
+    .pad,
+    .today {
+      padding: 20px 18px;
+    }
+    .card {
+      padding: 20px 18px 18px;
+      gap: 14px;
+    }
+    .ctx {
+      font-size: calc(1.2rem * var(--scale));
+    }
+    .tally b {
+      font-size: 2.1rem;
+    }
+    .vein {
+      padding: 12px 16px;
+      gap: 10px;
+      grid-template-columns: 1.6rem minmax(0, 1fr) auto auto;
+    }
+    .vein .due {
+      display: none;
+    }
+    .article {
+      padding: 22px 18px 26px;
+    }
+    .item > button {
+      grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr);
+      padding: 10px 16px;
+    }
+    .item .pill {
       grid-column: 2;
     }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .answer {
-      animation: rise 0.18s ease-out;
+    .stage {
+      padding: 12px 10px 20px;
     }
-    @keyframes rise {
-      from {
-        opacity: 0.4;
-        transform: translateY(4px);
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
+    .head .term {
+      font-size: calc(2.1rem * var(--scale));
+    }
+    .grades {
+      gap: 6px;
+    }
+    .grades kbd {
+      display: none;
+    }
+    .rv-top .where {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
     }
   }
 </style>
 
-<div class="wrap">
-  <header class="top">
-    <div class="brand">
-      <h1>言葉の鉱脈</h1>
-      <span>KOTOBA MINE · 文で覚える</span>
-    </div>
-    <nav class="tabs" role="tablist" aria-label="Views">
-      <button role="tab" data-tab="study" id="tab-study">学ぶ</button>
-      <button role="tab" data-tab="read" id="tab-read">読む</button>
-      <button role="tab" data-tab="index" id="tab-index">一覧</button>
-      <button role="tab" data-tab="settings" id="tab-settings">設定</button>
-    </nav>
-  </header>
-  <main id="view"></main>
-</div>
+<div id="app"></div>
 
 <script>
   const DECK = /*__DECK__*/ null;
@@ -719,23 +1613,30 @@
             ? `${(ms / DAY / 30).toFixed(1)}か月`
             : `${(ms / DAY / 365).toFixed(1)}年`;
 
-  // ---------- state ----------
+  // ---------- state (same key and shape as before: earlier progress carries over) ----------
   const KEY = 'kotoba-mine.v1';
   const today = () => new Date().toDateString();
   const DEFAULTS = {
     cards: {},
     on: {},
     newPerDay: 15,
-    mode: 'recognition',
+    mode: 'both',
     showEn: false,
     newToday: { d: '', n: 0 },
     log: [],
+    furi: 'hover',
+    hint: 'def',
+    theme: 'auto',
+    size: 1,
+    voice: '',
+    autoplay: false,
+    buried: {},
   };
   let st = load();
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) return { ...DEFAULTS, ...JSON.parse(raw) };
+      if (raw) return { ...structuredClone(DEFAULTS), ...JSON.parse(raw) };
     } catch (e) {}
     return structuredClone(DEFAULTS);
   }
@@ -747,73 +1648,107 @@
 
   const MODS = DECK ? DECK.modules : [];
   const CARDS = [];
-  for (const m of MODS) for (const c of m.cards) CARDS.push({ ...c, mod: m });
+  for (const m of MODS)
+    for (const c of m.cards) {
+      c.mod = m;
+      CARDS.push(c);
+    }
   const byKey = new Map(CARDS.map((c) => [c.key, c]));
+  const byTerm = new Map(CARDS.map((c) => [c.term, c]));
+  // new words come module by module, but spread across each passage's paragraphs,
+  // so two fronts in a row rarely show the same paragraph
+  const NEW_ORDER = new Map();
+  {
+    let i = 0;
+    for (const m of MODS) {
+      const seen = {};
+      const ranked = m.cards.map((c) => {
+        const p = c.at[0];
+        seen[p] = (seen[p] || 0) + 1;
+        return [seen[p], p, c.key];
+      });
+      ranked.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+      for (const r of ranked) NEW_ORDER.set(r[2], i++);
+    }
+  }
   const modOn = (m) => st.on[m.id] !== false;
-  /** a study item = one card face: `${key}:r` recognition, `${key}:p` production */
+  /** a study item = one face of a word: `${key}:r` recognition, `${key}:p` context cloze */
   function faces(c) {
     const out = [];
     if (st.mode !== 'production') out.push(c.key + ':r');
     if (st.mode !== 'recognition') {
-      // production opens only once the word can be recognised (comprehension first)
+      // the cloze opens once the word can be recognised (comprehension first)
       const r = st.cards[c.key + ':r'];
       if (st.mode === 'production' || (r && r.s === 'review')) out.push(c.key + ':p');
     }
     return out;
   }
-  function counts(cardsList, now = Date.now()) {
-    const eod = new Date();
-    eod.setHours(23, 59, 59, 999);
-    let fresh = 0,
-      due = 0,
-      learn = 0,
-      mature = 0;
-    for (const c of cardsList)
-      for (const f of faces(c)) {
-        const s = st.cards[f];
-        if (!s) fresh++;
-        else if (s.s === 'review') {
-          if (s.due <= eod.getTime()) due++;
-          if ((s.ivl || 0) >= 21) mature++;
-        } else {
-          learn++;
-          if (s.due <= now) due++;
-        }
-      }
-    return { fresh, due, learn, mature };
-  }
+  const eod = () => {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d.getTime();
+  };
+  const buriedToday = (f) => st.buried[f] === today();
   function newLeft() {
     if (st.newToday.d !== today()) st.newToday = { d: today(), n: 0 };
     return Math.max(0, st.newPerDay - st.newToday.n);
   }
-
+  function inScope(c) {
+    return focus ? c.mod.id === focus : modOn(c.mod);
+  }
   function buildQueue(now = Date.now()) {
-    const eod = new Date();
-    eod.setHours(23, 59, 59, 999);
+    const end = eod();
     const learn = [],
       review = [],
       fresh = [];
     for (const c of CARDS) {
-      if (!modOn(c.mod)) continue;
+      if (!inScope(c)) continue;
       for (const f of faces(c)) {
+        if (buriedToday(f)) continue;
         const s = st.cards[f];
         if (!s) fresh.push(f);
         else if (s.s === 'review') {
-          if (s.due <= eod.getTime()) review.push(f);
+          if (s.due <= end) review.push(f);
         } else if (s.due <= now) learn.push(f);
       }
     }
     review.sort((a, b) => st.cards[a].due - st.cards[b].due);
     learn.sort((a, b) => st.cards[a].due - st.cards[b].due);
+    fresh.sort(
+      (a, b) =>
+        NEW_ORDER.get(a.split(':')[0]) - NEW_ORDER.get(b.split(':')[0]) ||
+        (a.endsWith(':r') ? -1 : 1),
+    );
     return [...learn, ...review, ...fresh.slice(0, newLeft())];
+  }
+  function tallyOf(list) {
+    let n = 0,
+      l = 0,
+      r = 0;
+    for (const f of list) {
+      const s = st.cards[f];
+      if (!s) n++;
+      else if (s.s === 'review') r++;
+      else l++;
+    }
+    return { n, l, r };
   }
   function nextLearnDue() {
     let best = null;
     for (const [f, s] of Object.entries(st.cards)) {
       const c = byKey.get(f.split(':')[0]);
-      if (c && modOn(c.mod) && s.s !== 'review' && (best === null || s.due < best)) best = s.due;
+      if (c && inScope(c) && s.s !== 'review' && (best === null || s.due < best)) best = s.due;
     }
     return best;
+  }
+  /** the face that measures a word's progress */
+  const progressOf = (c) => st.cards[c.key + (st.mode === 'production' ? ':p' : ':r')];
+  function stateOf(c) {
+    const s = progressOf(c);
+    if (!s) return ['new', '未学習'];
+    if (s.s !== 'review') return ['learn', '学習中'];
+    if ((s.ivl || 0) >= 21) return ['review', '定着'];
+    return ['review', fmtIvl(Math.max(0, s.due - Date.now())) + '後'];
   }
 
   // ---------- tiny DOM helper ----------
@@ -830,148 +1765,570 @@
         e.append(k.nodeType ? k : document.createTextNode(String(k)));
     return e;
   }
-  function marked(ja, form, cls = 't', blank = false, kanjiOf = null) {
-    // a production prompt masks every occurrence, or a repeat gives it away;
-    // a kanji card also masks its bare character inside other compounds
-    if (blank && ja.includes(form))
-      return ja.split(form).flatMap((part, i) => {
-        const bits =
-          kanjiOf && part.includes(kanjiOf)
-            ? part
-                .split(kanjiOf)
-                .flatMap((x, j) => (j ? [h('span', { class: 'blank' }, '［］'), x] : [x]))
-            : [part];
-        return i ? [h('span', { class: 'blank' }, '［　　］'), ...bits] : bits;
+  const svg = (d, size = 16) => {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', size);
+    s.setAttribute('height', size);
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '2');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = d;
+    return s;
+  };
+  const I = {
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    play: '<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>',
+    sound:
+      '<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/>',
+  };
+
+  // ---------- Japanese text: tokens → ruby ----------
+  // token: [surface] punctuation · [surface, ruby, base] word; ruby 0 or [[text, reading], …]
+  const readingOf = (tok) => (tok[1] ? tok[1].map(([t, r]) => r || t).join('') : tok[0]);
+  function rubyInto(el, tok) {
+    if (!tok[1]) {
+      el.append(tok[0]);
+      return el;
+    }
+    const native = st.furi === 'on';
+    for (const [t, r] of tok[1])
+      el.append(
+        !r
+          ? t
+          : native
+            ? h('ruby', {}, t, h('rt', {}, r))
+            : h('span', { class: 'rb', 'data-rt': r }, t),
+      );
+    return el;
+  }
+  /** a tappable word (or plain punctuation) */
+  function wordEl(tok, extra = '') {
+    if (tok.length === 1) return document.createTextNode(tok[0]);
+    const el = h('span', { class: 'w ' + extra });
+    el._tok = tok;
+    return rubyInto(el, tok);
+  }
+  const KANJI = /[\u3400-\u9fff々]/;
+  /** the blank never shows the answer's length; a word's trailing kana (its ending) stays visible */
+  function stemSplit(tok) {
+    if (!tok || !Array.isArray(tok[1])) return { stem: tok ? tok[0] : '', reading: '', tail: '' };
+    const pairs = tok[1];
+    let last = -1;
+    pairs.forEach(([t, r], i) => {
+      if (r) last = i;
+    });
+    const head = pairs.slice(0, last + 1);
+    return {
+      stem: head.map(([t]) => t).join(''),
+      reading: head.map(([t, r]) => r || t).join(''),
+      tail: pairs
+        .slice(last + 1)
+        .map(([t]) => t)
+        .join(''),
+    };
+  }
+  /**
+   * which characters of paragraph pi a cloze must hide: the asked word's stem wherever the word
+   * occurs (any conjugation), and every spelling of it in the running text even when the
+   * tokenizer split it (真空 + 管). A kanji card hides only its kanji (【？】古 for 稽古).
+   */
+  function maskOf(c, pi) {
+    const toks = c.mod.paras[pi];
+    const text = toks.map((t) => t[0]).join('');
+    const mk = new Uint8Array(text.length);
+    let off = 0;
+    toks.forEach((tok, ti) => {
+      const L = tok[0].length;
+      const anchor = pi === c.at[0] && ti === c.at[1];
+      if (tok.length > 1 && c.pos !== 'kanji' && (anchor || tok[2] === c.term || tok[0] === c.term))
+        mk.fill(1, off, off + Math.min(L, stemSplit(tok).stem.length || L));
+      off += L;
+    });
+    const needles = [];
+    if (KANJI.test(c.term)) needles.push(c.term);
+    if (c.pos !== 'kanji') {
+      const st0 = stemSplit(c.mod.paras[c.at[0]][c.at[1]]).stem;
+      if (st0.length >= 2 && KANJI.test(st0)) needles.push(st0);
+    }
+    for (const nd of needles)
+      for (let i = text.indexOf(nd); i >= 0; i = text.indexOf(nd, i + nd.length))
+        mk.fill(1, i, i + nd.length);
+    return mk;
+  }
+  function blankBox(c, hint, isAnchor) {
+    const showReading = hint === 'reading' && isAnchor && c.pos !== 'kanji';
+    const b = h('span', { class: 'blank' + (showReading ? '' : ' mute') });
+    b.textContent = showReading
+      ? stemSplit(c.mod.paras[c.at[0]][c.at[1]]).reading || c.reading
+      : '？';
+    b.setAttribute('aria-label', '空欄');
+    return b;
+  }
+  const ENDS = /[。！？!?]/;
+  /** token range [start, end] of the sentence holding the anchor */
+  function sentenceSpan(c) {
+    const para = c.mod.paras[c.at[0]];
+    let a = 0,
+      b = para.length - 1;
+    for (let i = c.at[1] - 1; i >= 0; i--)
+      if (ENDS.test(para[i][0])) {
+        a = i + 1;
+        break;
+      }
+    for (let i = c.at[1]; i < para.length; i++)
+      if (ENDS.test(para[i][0])) {
+        b = i + (para[i + 1] && /^[」』）]/.test(para[i + 1][0]) ? 1 : 0);
+        break;
+      }
+    return [a, b];
+  }
+  function contextEl(c, mode, hint) {
+    const box = h('div', { class: 'jp ctx' + (mode === 'fill' ? ' answered' : ''), lang: 'ja' });
+    const m = c.mod;
+    const [sa, sb] = sentenceSpan(c);
+    for (let pi = c.ctx[0]; pi <= c.ctx[1]; pi++) {
+      const p = h('p');
+      let dim = null;
+      const dimOn = (yes) => {
+        if (yes && !dim) {
+          dim = h('span', { class: 'dim' });
+          p.append(dim);
+        } else if (!yes) dim = null;
+      };
+      const put = (node) => (dim || p).append(node);
+      const mk = mode === 'blank' ? maskOf(c, pi) : null;
+      let off = 0,
+        inRun = false;
+      m.paras[pi].forEach((tok, ti) => {
+        dimOn(pi !== c.at[0] || ti < sa || ti > sb);
+        const a = off;
+        off += tok[0].length;
+        if (mk) {
+          let hit = false;
+          for (let i = a; i < off; i++) if (mk[i]) hit = true;
+          if (!hit) {
+            inRun = false;
+            put(wordEl(tok));
+            return;
+          }
+          const anchor = pi === c.at[0] && ti === c.at[1];
+          const el = h('span', { class: 'clz' });
+          for (let i = a; i < off; i++) {
+            if (!mk[i]) {
+              el.append(tok[0][i - a]);
+              inRun = false;
+            } else if (!inRun) {
+              el.append(blankBox(c, hint, anchor));
+              inRun = true;
+            }
+          }
+          put(el);
+          return;
+        }
+        const isAnchor = pi === c.at[0] && ti === c.at[1];
+        if (isAnchor) {
+          const el = wordEl(tok, 'tgt ' + (mode === 'fill' ? 'show-rt filled' : 'hide-rt'));
+          if (mode !== 'fill') el._tok = null; // tapping the asked word must not answer it
+          put(el);
+        } else put(wordEl(tok));
       });
-    const i = ja.indexOf(form);
-    if (i < 0) return [ja];
-    return [
-      ja.slice(0, i),
-      blank ? h('span', { class: 'blank' }, '［　　］') : h('span', { class: cls }, form),
-      ja.slice(i + form.length),
-    ];
+      box.append(p);
+    }
+    return box;
+  }
+  function sentenceEl(s, c) {
+    const p = h('p', { class: 'jp', lang: 'ja' });
+    s.toks.forEach((tok, i) => p.append(i === s.at ? wordEl(tok, 'tgt show-rt') : wordEl(tok)));
+    return p;
   }
 
-  // ---------- views ----------
-  let tab = 'study';
-  let cur = null; // { face, revealed }
+  // ---------- speech (the device's own Japanese voice; nothing is downloaded) ----------
+  const canSpeak = 'speechSynthesis' in window;
+  let voices = [];
+  function loadVoices() {
+    if (!canSpeak) return;
+    voices = speechSynthesis
+      .getVoices()
+      .filter(
+        (v) =>
+          /^ja(-|_|$)/i.test(v.lang) &&
+          !/^(Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley)\b/.test(v.name),
+      );
+  }
+  if (canSpeak) {
+    loadVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', loadVoices);
+  }
+  function bestVoice() {
+    if (st.voice) {
+      const v = voices.find((x) => x.name === st.voice);
+      if (v) return v;
+    }
+    const rank = (v) =>
+      (/premium|プレミアム/i.test(v.voiceURI + v.name) ? 4 : 0) +
+      (/enhanced|拡張|高品質/i.test(v.voiceURI + v.name) ? 3 : 0) +
+      (/o-ren|kyoko|otoya|hattori/i.test(v.name) ? 1 : 0) +
+      (v.localService ? 0.5 : 0);
+    return [...voices].sort((a, b) => rank(b) - rank(a))[0] || null;
+  }
+  function speak(text) {
+    if (!canSpeak || !text) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ja-JP';
+    const v = bestVoice();
+    if (v) u.voice = v;
+    u.rate = 0.9;
+    speak.u = u; // a live reference, or some engines drop the utterance mid-sentence
+    speechSynthesis.speak(u);
+  }
+  const sentenceOf = (c) => c.sentences[0].ja;
+
+  // ---------- word popover: every word in the app can be tapped ----------
+  let popEl = null;
+  function closePop() {
+    popEl?.remove();
+    popEl = null;
+    document.querySelectorAll('.w.lit').forEach((x) => x.classList.remove('lit'));
+  }
+  function openPop(anchor) {
+    const tok = anchor._tok;
+    if (!tok) return;
+    closePop();
+    anchor.classList.add('lit');
+    const base = tok[2] || tok[0];
+    const card = byTerm.get(base) || byTerm.get(tok[0]);
+    const pop = h('div', { class: 'pop', role: 'dialog', 'aria-label': base });
+    pop.append(
+      h(
+        'div',
+        { class: 'head' },
+        h('span', { class: 'pw', lang: 'ja' }, tok[0]),
+        tok[1] ? h('span', { class: 'pr', lang: 'ja' }, readingOf(tok)) : null,
+        canSpeak && voices.length
+          ? h(
+              'button',
+              { class: 'speak', 'aria-label': '読み上げ', onclick: () => speak(base) },
+              svg(I.sound),
+            )
+          : null,
+      ),
+    );
+    if (tok[2]) pop.append(h('div', { class: 'base', lang: 'ja' }, `辞書形 ${tok[2]}`));
+    if (card) {
+      const [cls, lbl] = stateOf(card);
+      pop.append(
+        h('p', { class: 'pd', lang: 'ja' }, card.def_ja),
+        h('p', { class: 'pg' }, card.gloss),
+        h(
+          'div',
+          { class: 'base' },
+          `この単語帳の語 · ${card.mod.title.ja.split(' — ')[0]} · `,
+          h('span', { class: 'pill ' + cls }, lbl),
+        ),
+      );
+    }
+    const q = encodeURIComponent(base);
+    pop.append(
+      h(
+        'div',
+        { class: 'acts' },
+        h(
+          'a',
+          { href: `https://jisho.org/search/${q}`, target: '_blank', rel: 'noopener' },
+          'Jisho ↗',
+        ),
+        h(
+          'a',
+          {
+            href: `https://dictionary.goo.ne.jp/srch/all/${q}/m0u/`,
+            target: '_blank',
+            rel: 'noopener',
+          },
+          'goo辞書 ↗',
+        ),
+      ),
+    );
+    document.body.append(pop);
+    const r = anchor.getBoundingClientRect();
+    const pw = pop.offsetWidth;
+    pop.style.left =
+      clamp(
+        r.left + window.scrollX + r.width / 2 - pw / 2,
+        12,
+        document.documentElement.clientWidth - pw - 12,
+      ) + 'px';
+    pop.style.top = r.bottom + window.scrollY + 8 + 'px';
+    popEl = pop;
+  }
+  document.addEventListener('click', (e) => {
+    const w = e.target.closest('.w');
+    if (w && w._tok) {
+      e.stopPropagation();
+      if (w.classList.contains('lit')) closePop();
+      else openPop(w);
+      return;
+    }
+    if (popEl && !e.target.closest('.pop')) closePop();
+  });
+
+  // ---------- Bunki: published beside the app at decks/kotoba-mine/, or opened as a lone file ----------
+  const IN_BUNKI = /\/decks\/kotoba-mine\/(index\.html)?$/.test(location.pathname);
+  const BUNKI = IN_BUNKI ? '../../' : 'https://amitabhainarunachala.github.io/Bunki-app/';
+  /** Bunki's 単語帳 on this deck (and module): enrol words into Bunki's own review there */
+  const bunkiHref = (moduleId) =>
+    `${BUNKI}?deck=kotoba-mine${moduleId ? '&module=' + moduleId : ''}`;
+  function bunkiLink(moduleId, label = 'Bunki', id = 'bunki') {
+    return h(
+      'a',
+      {
+        class: 'bunki',
+        href: bunkiHref(moduleId),
+        target: IN_BUNKI ? null : '_blank',
+        rel: IN_BUNKI ? null : 'noopener',
+        id,
+      },
+      IN_BUNKI ? '← ' : '',
+      label,
+      IN_BUNKI ? '' : ' ↗',
+    );
+  }
+
+  // ---------- app shell ----------
+  const app = document.getElementById('app');
+  let screen = 'home'; // home · review · read · list · settings
+  let focus = null; // a module id when studying one passage only
+  let cur = null; // { face, revealed, hint }
   let queue = [];
   let undo = null;
+  let sess = null; // { start, done, again, seen }
   let readMod = MODS[0]?.id;
-  let readPick = null;
   let q = '';
-  const view = document.getElementById('view');
+  let qFilter = 'all';
+  let openItem = null;
+
+  function applyPrefs() {
+    const root = document.documentElement;
+    if (st.theme === 'auto') delete root.dataset.theme;
+    else root.dataset.theme = st.theme;
+    root.style.setProperty('--scale', st.size);
+    root.classList.remove('furi-on', 'furi-off', 'furi-hover');
+    root.classList.add('furi-' + st.furi);
+  }
+
+  function go(to) {
+    closePop();
+    screen = to;
+    if (to !== 'review') {
+      cur = null;
+      queue = [];
+    }
+    render();
+    window.scrollTo(0, 0);
+  }
 
   function render() {
-    for (const b of document.querySelectorAll('nav.tabs button'))
-      b.setAttribute('aria-selected', String(b.dataset.tab === tab));
-    view.replaceChildren();
+    applyPrefs();
+    app.replaceChildren();
     if (!DECK) {
-      view.append(
+      app.append(
         h(
           'p',
-          { class: 'lead' },
+          { class: 'fine wrap' },
           'Deck data missing — build with decks/kotoba-mine/tools/build_deck.py.',
         ),
       );
       return;
     }
-    if (tab === 'study') renderStudy();
-    else if (tab === 'read') renderRead();
-    else if (tab === 'index') renderIndex();
-    else renderSettings();
+    if (screen === 'review') return renderReview();
+    const wrap = h('div', { class: 'wrap' });
+    wrap.append(topBar());
+    if (screen === 'home') renderHome(wrap);
+    else if (screen === 'read') renderRead(wrap);
+    else if (screen === 'list') renderList(wrap);
+    else renderSettings(wrap);
+    app.append(wrap);
   }
 
-  /** the face that measures a word's progress: recognition, or production
-   * when that is the only face being studied */
-  const progressOf = (c) => st.cards[c.key + (st.mode === 'production' ? ':p' : ':r')];
-  function stateLabel(c) {
-    const s = progressOf(c);
-    if (!s) return ['new', '未'];
-    if (s.s !== 'review') return ['learn', '学習中'];
-    return ['review', fmtIvl(Math.max(0, s.due - Date.now())) + '後'];
-  }
-
-  function renderVeins() {
-    const box = h('section', { class: 'veins', 'aria-label': 'Modules' });
-    for (const m of MODS) {
-      const c = counts(m.cards.map((x) => byKey.get(x.key)));
-      const total = m.cards.length;
-      const known = m.cards.filter((x) => progressOf(x)?.s === 'review').length;
-      const learning = m.cards.filter((x) => {
-        const s = progressOf(x);
-        return s && s.s !== 'review';
-      }).length;
-      const id = 'vein-' + m.id;
-      const row = h(
+  function topBar() {
+    const tabs = [
+      ['home', '今日'],
+      ['read', '読む'],
+      ['list', '単語'],
+      ['settings', '設定'],
+    ];
+    return h(
+      'header',
+      { class: 'top' },
+      h(
         'div',
-        { class: 'vein' + (modOn(m) ? '' : ' off') },
-        h('input', {
-          type: 'checkbox',
-          id,
-          checked: modOn(m),
-          'aria-label': `study ${m.title.en}`,
-          onchange: (e) => {
-            st.on[m.id] = e.target.checked;
-            save();
-            queue = [];
-            cur = null;
-            render();
-          },
-        }),
+        { class: 'brand-row' },
         h(
-          'label',
-          { class: 'name', for: id },
-          h('b', {}, m.title.ja.split(' — ')[0]),
-          h('small', {}, m.title.ja.split(' — ')[1] || m.title.en),
+          'button',
+          { class: 'brand', onclick: () => go('home'), 'aria-label': 'Kotoba Mine — home' },
+          h('b', { lang: 'ja' }, '言葉の鉱脈'),
+          h('span', {}, 'Kotoba Mine'),
+        ),
+        bunkiLink(screen === 'read' ? readMod : null),
+      ),
+      h(
+        'nav',
+        { class: 'seg', 'aria-label': 'Views' },
+        tabs.map(([id, label]) =>
           h(
-            'span',
-            { class: 'bar', 'aria-hidden': 'true' },
-            h('i', { class: 'm', style: `width:${(known / total) * 100}%` }),
-            h('i', { class: 'l', style: `width:${(learning / total) * 100}%` }),
+            'button',
+            {
+              'data-tab': id,
+              'aria-current': screen === id ? 'page' : null,
+              onclick: () => go(id),
+            },
+            label,
           ),
         ),
-        h('span', { class: 'count' }, `${known}/${total}`, h('br'), c.due ? `復習 ${c.due}` : ''),
-      );
-      box.append(row);
-    }
-    return box;
+      ),
+    );
   }
 
-  function renderStudy() {
-    const all = counts(CARDS.filter((c) => modOn(c.mod)));
-    const nl = newLeft();
-    view.append(
+  // ---------- home ----------
+  function renderHome(wrap) {
+    focus = null;
+    const qd = buildQueue();
+    const t = tallyOf(qd);
+    const total = qd.length;
+    const mins = Math.max(1, Math.round((t.n * 25 + t.l * 10 + t.r * 12) / 60));
+    const today = h('section', { class: 'sheet today', 'aria-label': '今日' });
+    today.append(
       h(
         'div',
-        { class: 'summary' },
-        h('span', { class: 'due' }, '復習 ', h('b', {}, all.due)),
+        {},
         h(
-          'span',
-          { class: 'new' },
-          '新しい語 ',
-          h('b', {}, Math.min(nl, all.fresh)),
-          ` / ${all.fresh}`,
+          'div',
+          { class: 'eyebrow' },
+          new Date().toLocaleDateString('ja-JP', {
+            month: 'long',
+            day: 'numeric',
+            weekday: 'short',
+          }),
         ),
-        h('span', {}, '定着 ', h('b', {}, all.mature)),
-        h('span', {}, `${CARDS.length}語 · ${MODS.length}鉱脈`),
+        h('h1', { lang: 'ja' }, total ? '今日のカード' : '今日の分はおしまい'),
       ),
-    );
-    if (!queue.length) queue = buildQueue();
-    else pullDueLearning();
-    if (!cur || !queue.includes(cur.face))
-      cur = queue.length ? { face: queue[0], revealed: false } : null;
-    view.append(cur ? renderCard() : renderDone());
-    view.append(
       h(
-        'p',
-        { class: 'lead', style: 'margin-top:18px' },
-        '鉱脈を選んで掘る — tick the modules to study. Read a module’s passage first (読む), then mine its words here: the sentence asks, the word answers.',
+        'div',
+        { class: 'tally num' },
+        h('div', { class: 'n' + (t.n ? '' : ' zero') }, h('b', {}, t.n), h('span', {}, '新しい語')),
+        h('div', { class: 'l' + (t.l ? '' : ' zero') }, h('b', {}, t.l), h('span', {}, '学習中')),
+        h('div', { class: 'r' + (t.r ? '' : ' zero') }, h('b', {}, t.r), h('span', {}, '復習')),
+      ),
+      h(
+        'div',
+        { class: 'go' },
+        h(
+          'button',
+          { class: 'primary', id: 'start', disabled: !total, onclick: () => startReview(null) },
+          '学習をはじめる',
+          h('kbd', {}, 'Space'),
+        ),
+        h(
+          'p',
+          { class: 'fine' },
+          total
+            ? `約${mins}分 · ${CARDS.length}語 · 文脈の中で問う`
+            : nextLearnDue()
+              ? `次の学習中カードは${fmtIvl(Math.max(0, nextLearnDue() - Date.now()))}後`
+              : '明日また。読み物を読むのもいい。',
+        ),
       ),
     );
-    view.append(renderVeins());
+    wrap.append(today);
+
+    const veins = h('section', { class: 'sheet veins', 'aria-label': '鉱脈' });
+    veins.append(
+      h(
+        'div',
+        { class: 'veins-head' },
+        h('div', { class: 'eyebrow' }, '12の鉱脈 · Modules'),
+        h('span', { class: 'fine' }, 'スイッチで出題範囲'),
+      ),
+    );
+    for (const m of MODS) {
+      const total = m.cards.length;
+      let known = 0,
+        learning = 0,
+        due = 0;
+      const end = eod();
+      for (const c of m.cards) {
+        const s = progressOf(c);
+        if (s?.s === 'review') known++;
+        else if (s) learning++;
+        for (const f of faces(c)) {
+          const x = st.cards[f];
+          if (x && x.due <= end && !buriedToday(f)) due++;
+        }
+      }
+      const [ja, sub] = m.title.ja.split(' — ');
+      const id = 'sw-' + m.id;
+      veins.append(
+        h(
+          'div',
+          { class: 'vein' + (modOn(m) ? '' : ' off') },
+          h('span', { class: 'no num' }, String(m.order).padStart(2, '0')),
+          h(
+            'button',
+            {
+              class: 'what',
+              onclick: () => {
+                readMod = m.id;
+                go('read');
+              },
+              title: '読み物を開く',
+            },
+            h('b', { lang: 'ja' }, ja),
+            h('small', {}, `${sub || ''} · ${known}/${total}語`),
+            h(
+              'span',
+              { class: 'meter', 'aria-hidden': 'true' },
+              h('i', { class: 'm', style: `width:${(known / total) * 100}%` }),
+              h('i', { class: 'l', style: `width:${(learning / total) * 100}%` }),
+            ),
+          ),
+          h('span', { class: 'due num' }, due ? h('em', {}, `復習 ${due}`) : ''),
+          h(
+            'span',
+            { class: 'switch' },
+            h('input', {
+              type: 'checkbox',
+              id,
+              role: 'switch',
+              checked: modOn(m),
+              'aria-label': `${ja} を出題する`,
+              onchange: (e) => {
+                st.on[m.id] = e.target.checked;
+                save();
+                render();
+              },
+            }),
+          ),
+        ),
+      );
+    }
+    wrap.append(veins);
   }
 
+  // ---------- review ----------
+  function startReview(mod) {
+    focus = mod;
+    sess = { start: Date.now(), done: 0, again: 0 };
+    undo = null;
+    queue = buildQueue();
+    cur = null;
+    screen = 'review';
+    render();
+    window.scrollTo(0, 0);
+  }
   /** learning faces whose step has come due join the front of the sitting */
   function pullDueLearning(now = Date.now()) {
     const due = [];
@@ -979,10 +2336,11 @@
       const c = byKey.get(f.split(':')[0]);
       if (
         c &&
-        modOn(c.mod) &&
+        inScope(c) &&
         faces(c).includes(f) &&
         s.s !== 'review' &&
         s.due <= now &&
+        !buriedToday(f) &&
         !queue.includes(f)
       )
         due.push(f);
@@ -990,32 +2348,384 @@
     due.sort((a, b) => st.cards[a].due - st.cards[b].due);
     queue = [...due, ...queue];
   }
-
+  /** what a cloze front starts with: 'def' (Japanese definition below), 'reading' (in the blank), 'none' */
+  function hintFor(face) {
+    return ['def', 'reading', 'none'].includes(st.hint) ? st.hint : 'def';
+  }
+  const HINTS = ['def', 'kana', 'gloss'];
+  function moreHint() {
+    if (!cur || cur.revealed || !cur.face.endsWith(':p')) return;
+    cur.step = Math.min(HINTS.length, (cur.step ?? (cur.hint === 'def' ? 1 : 0)) + 1);
+    render();
+  }
+  let lastCtx = null;
+  function ctxOf(face) {
+    const c = byKey.get(face.split(':')[0]);
+    return c ? [c.mod.id, c.ctx[0], c.ctx[1]] : null;
+  }
+  const overlaps = (x, y) => x && y && x[0] === y[0] && x[1] <= y[2] && y[1] <= x[2];
+  function pickNext() {
+    if (!queue.length) return null;
+    const i = queue.findIndex((f) => !overlaps(ctxOf(f), lastCtx));
+    if (i > 0) queue.unshift(queue.splice(i, 1)[0]);
+    return { face: queue[0], revealed: false, hint: hintFor(queue[0]) };
+  }
   let learnTimer = null;
+  function renderReview() {
+    pullDueLearning();
+    if (!cur || !queue.includes(cur.face)) cur = pickNext();
+    const shell = h('div', { class: 'rv' });
+    const t = tallyOf(queue);
+    const kind = cur
+      ? st.cards[cur.face]
+        ? st.cards[cur.face].s === 'review'
+          ? 'r'
+          : 'l'
+        : 'n'
+      : '';
+    const doneN = sess?.done || 0;
+    const pct = doneN + queue.length ? (doneN / (doneN + queue.length)) * 100 : 100;
+    const c0 = cur ? byKey.get(cur.face.split(':')[0]) : null;
+    shell.append(
+      h(
+        'div',
+        { class: 'rv-top' },
+        h(
+          'div',
+          { class: 'inner' },
+          h(
+            'button',
+            {
+              class: 'x',
+              'aria-label': '終える (Esc)',
+              title: '終える (Esc)',
+              onclick: () => go('home'),
+            },
+            svg(I.x),
+          ),
+          h(
+            'div',
+            { class: 'counts num', 'aria-label': `新 ${t.n} · 学習中 ${t.l} · 復習 ${t.r}` },
+            h('span', { class: 'n' + (t.n ? '' : ' z') + (kind === 'n' ? ' now' : '') }, t.n),
+            h('span', { class: 'l' + (t.l ? '' : ' z') + (kind === 'l' ? ' now' : '') }, t.l),
+            h('span', { class: 'r' + (t.r ? '' : ' z') + (kind === 'r' ? ' now' : '') }, t.r),
+          ),
+          h(
+            'span',
+            { class: 'where', lang: 'ja' },
+            c0 ? `${c0.mod.title.ja.split(' — ')[0]}　『${c0.mod.passage.title}』` : '',
+          ),
+        ),
+        h('div', { class: 'progress', 'aria-hidden': 'true' }, h('i', { style: `width:${pct}%` })),
+      ),
+    );
+    const stage = h('main', { class: 'stage' });
+    shell.append(stage);
+    if (!cur) {
+      stage.append(renderDone());
+      shell.append(h('div'));
+      app.append(shell);
+      return;
+    }
+    clearTimeout(learnTimer);
+    const [key, side] = cur.face.split(':');
+    const c = byKey.get(key);
+    const card = h('section', { class: 'sheet card', 'aria-live': 'polite', id: 'card' });
+    const cloze = side === 'p';
+    card.append(
+      h(
+        'div',
+        { class: 'card-meta' },
+        h(
+          'span',
+          { class: 'face-tag' },
+          h('i', {
+            style: `background:var(--${kind === 'n' ? 'new' : kind === 'l' ? 'learn' : 'review'})`,
+          }),
+          cloze ? '文脈クローズ · 言葉を思い出す' : '文脈で読む · 意味を思い出す',
+        ),
+        h('span', { class: 'src', lang: 'ja' }, `『${c.mod.passage.title}』より`),
+      ),
+    );
+    card.append(contextEl(c, cur.revealed ? 'fill' : cloze ? 'blank' : 'mark', cur.hint));
+    if (cloze && !cur.revealed) {
+      const step = cur.step ?? (cur.hint === 'def' ? 1 : 0);
+      const shown = HINTS.slice(0, step);
+      const hb = h('div', { class: 'hints' });
+      if (shown.includes('def'))
+        hb.append(
+          h(
+            'div',
+            { class: 'hintline', lang: 'ja' },
+            h('span', { class: 'k' }, '定義'),
+            h('span', { class: 'jp hd' }, c.def_ja),
+          ),
+        );
+      if (shown.includes('kana'))
+        hb.append(
+          h(
+            'div',
+            { class: 'hintline', lang: 'ja' },
+            h('span', { class: 'k' }, '読み'),
+            h('span', { class: 'hk' }, [...c.reading][0] + '…'),
+          ),
+        );
+      if (shown.includes('gloss'))
+        hb.append(
+          h(
+            'div',
+            { class: 'hintline', lang: 'en' },
+            h('span', { class: 'k' }, '英語'),
+            h('span', {}, c.gloss),
+          ),
+        );
+      if (step < HINTS.length)
+        hb.append(
+          h(
+            'button',
+            { class: 'link hint-more', id: 'hint', onclick: moreHint },
+            step ? 'もうひとつヒント' : 'ヒント',
+            h('kbd', {}, 'H'),
+          ),
+        );
+      card.append(hb);
+    }
+    if (cur.revealed) card.append(renderAnswer(c));
+    stage.append(card);
+
+    const dock = h('div', { class: 'dock' });
+    const inner = h('div', { class: 'inner' });
+    if (!cur.revealed) {
+      inner.append(
+        h(
+          'button',
+          { class: 'reveal', id: 'reveal', onclick: reveal },
+          '答えを見る',
+          h('kbd', {}, 'Space'),
+        ),
+      );
+    } else {
+      const now = Date.now();
+      const s = st.cards[cur.face] || {};
+      const names = ['もう一度', '難しい', '正解', '簡単'];
+      inner.append(
+        h(
+          'div',
+          { class: 'grades', role: 'group', 'aria-label': '評価' },
+          [1, 2, 3, 4].map((g) =>
+            h(
+              'button',
+              {
+                class: 'g' + g,
+                id: 'grade-' + g,
+                onclick: () => grade(g),
+                title: ['忘れていた', '思い出せたが、苦労した', '思い出せた', 'すぐに分かった'][
+                  g - 1
+                ],
+              },
+              h('span', { class: 'lbl' }, names[g - 1]),
+              h('span', { class: 'ivl' }, fmtIvl(schedule(s, g, now).due - now)),
+              h('kbd', {}, g),
+            ),
+          ),
+        ),
+      );
+    }
+    const minor = h('div', { class: 'minor' });
+    if (undo)
+      minor.append(h('button', { class: 'link', onclick: doUndo }, '取り消す', h('kbd', {}, 'U')));
+    if (canSpeak && voices.length && (cur.revealed || !cloze))
+      minor.append(
+        h(
+          'button',
+          { class: 'link', onclick: () => speak(sentenceOf(c)) },
+          '読み上げ',
+          h('kbd', {}, 'R'),
+        ),
+      );
+    minor.append(
+      h(
+        'button',
+        { class: 'link', onclick: cycleFuri },
+        `ふりがな: ${{ off: 'なし', hover: 'ホバー', on: 'あり' }[st.furi]}`,
+        h('kbd', {}, 'F'),
+      ),
+      h('button', { class: 'link', onclick: bury }, '今日は後で', h('kbd', {}, '-')),
+      h(
+        'button',
+        { class: 'link keys', onclick: () => ((showHelp = true), render()) },
+        'キー',
+        h('kbd', {}, '?'),
+      ),
+    );
+    inner.append(minor);
+    dock.append(inner);
+    shell.append(dock);
+    app.append(shell);
+    if (showHelp) app.append(helpEl());
+    if (cur.revealed && st.autoplay && !cur.spoke) {
+      cur.spoke = true;
+      speak(sentenceOf(c));
+    }
+  }
+
+  function renderAnswer(c) {
+    const a = h('div', { class: 'answer', lang: 'ja' });
+    a.append(
+      h(
+        'div',
+        { class: 'head' },
+        h('span', { class: 'term' }, c.term),
+        h('span', { class: 'reading' }, c.reading),
+        canSpeak && voices.length
+          ? h(
+              'button',
+              {
+                class: 'speak',
+                'aria-label': '発音',
+                onclick: () => speak(c.pos === 'kanji' ? c.sentences[0].form : c.term),
+              },
+              svg(I.sound),
+            )
+          : null,
+      ),
+      h(
+        'div',
+        { class: 'tags' },
+        h('span', { class: 'tag' }, c.pos),
+        ...c.register.split('・').map((r) => h('span', { class: 'tag' }, r)),
+      ),
+      h('p', { class: 'def' }, c.def_ja),
+      h('p', { class: 'gloss', lang: 'en' }, c.gloss),
+    );
+    const tr = h(
+      'p',
+      {
+        class: 'trans' + (st.showEn || cur?.showEn ? '' : ' veiled'),
+        lang: 'en',
+        'data-hint': 'タップで英訳  T',
+        onclick: (e) => {
+          e.currentTarget.classList.toggle('veiled');
+        },
+      },
+      h('span', {}, c.sentences[0].en),
+    );
+    tr.id = 'trans';
+    a.append(tr);
+    const deep = h('div', { class: 'deep' });
+    if (c.sentences.length > 1) {
+      const sect = h('div', { class: 'sect wide' }, h('div', { class: 'k' }, '別の文脈'));
+      for (const s of c.sentences.slice(1))
+        sect.append(
+          h('div', { class: 'ex' }, sentenceEl(s, c), h('span', { class: 'en', lang: 'en' }, s.en)),
+        );
+      deep.append(sect);
+    }
+    if (c.collocations?.length)
+      deep.append(
+        h(
+          'div',
+          { class: 'sect' },
+          h('div', { class: 'k' }, 'よく使う形'),
+          h(
+            'div',
+            { class: 'colls' },
+            c.collocations.map((x) => h('span', {}, x)),
+          ),
+        ),
+      );
+    if (c.confusables?.length)
+      deep.append(
+        h(
+          'div',
+          { class: 'sect' },
+          h('div', { class: 'k' }, '紛らわしい語'),
+          h(
+            'ul',
+            { class: 'conf' },
+            c.confusables.map((x) =>
+              h('li', {}, h('b', {}, x.term), h('span', { lang: 'en' }, x.note)),
+            ),
+          ),
+        ),
+      );
+    if (c.kanji)
+      deep.append(
+        h(
+          'div',
+          { class: 'sect' },
+          h('div', { class: 'k' }, '字'),
+          h(
+            'p',
+            { class: 'note' },
+            `音 ${(c.kanji.on || []).join('・') || '—'}　訓 ${(c.kanji.kun || []).join('・') || '—'}　${c.kanji.meaning || ''}`,
+          ),
+          h(
+            'div',
+            { class: 'colls' },
+            (c.kanji.compounds || []).map((x) => h('span', {}, `${x.w}（${x.r}）`)),
+          ),
+        ),
+      );
+    if (c.note)
+      deep.append(
+        h(
+          'div',
+          { class: 'sect wide' },
+          h('div', { class: 'k' }, 'メモ'),
+          h('p', { class: 'note', lang: 'en' }, c.note),
+        ),
+      );
+    if (deep.childNodes.length) a.append(deep);
+    return a;
+  }
+
+  function tomorrowDue() {
+    const end = eod() + DAY;
+    let n = 0;
+    for (const c of CARDS)
+      if (inScope(c))
+        for (const f of faces(c)) {
+          const s = st.cards[f];
+          if (s && s.due <= end) n++;
+        }
+    return n;
+  }
   function renderDone() {
     const nd = nextLearnDue();
     clearTimeout(learnTimer);
-    if (nd) {
-      // come back on our own when the next learning step is due
+    if (nd)
       learnTimer = setTimeout(
         () => {
-          if (tab === 'study' && !cur) {
-            queue = [];
-            render();
-          }
+          if (screen === 'review' && !cur) render();
         },
         Math.max(0, nd - Date.now()) + 500,
       );
-    }
-    const box = h('section', { class: 'bench empty' });
-    box.append(h('h2', {}, '今日の分は掘り終えた'));
+    const mins = sess ? Math.max(1, Math.round((Date.now() - sess.start) / 60000)) : 0;
+    const right = sess?.done ? Math.round(((sess.done - sess.again) / sess.done) * 100) : null;
+    const box = h('section', { class: 'sheet done', id: 'done' });
     box.append(
       h(
+        'div',
+        { class: 'eyebrow' },
+        focus ? MODS.find((m) => m.id === focus)?.title.ja.split(' — ')[0] : '今日',
+      ),
+      h('h2', { lang: 'ja' }, nd ? 'ひと区切り' : 'おつかれさま'),
+      sess?.done
+        ? h(
+            'div',
+            { class: 'stats num' },
+            h('div', {}, h('b', {}, sess.done), h('span', {}, '枚')),
+            h('div', {}, h('b', {}, right + '%'), h('span', {}, '正答')),
+            h('div', {}, h('b', {}, mins), h('span', {}, '分')),
+          )
+        : null,
+      h(
         'p',
-        { class: 'lead' },
+        { class: 'fine' },
         nd
-          ? `Next learning step in ${fmtIvl(Math.max(0, nd - Date.now()))}.`
-          : 'Nothing due. Read a passage, or raise new words per day in 設定.',
+          ? `学習中のカードがあと${fmtIvl(Math.max(0, nd - Date.now()))}で戻ってきます。このまま待てば自動で続きます。`
+          : `今日のカードはすべて終わりました。明日の復習は${tomorrowDue()}枚。`,
       ),
     );
     const btns = h('div', { class: 'row-btns' });
@@ -1024,222 +2734,43 @@
         h(
           'button',
           {
-            class: 'btn',
+            class: 'ghost',
             onclick: () => {
-              for (const s of Object.values(st.cards))
-                if (s.s !== 'review' && s.due > Date.now()) s.due = Date.now();
+              for (const [f, s] of Object.entries(st.cards)) {
+                const c = byKey.get(f.split(':')[0]);
+                if (c && inScope(c) && s.s !== 'review' && s.due > Date.now()) s.due = Date.now();
+              }
               save();
-              queue = [];
               render();
             },
           },
-          '学習中の語を今やる',
+          '学習中を今すぐ',
         ),
       );
     btns.append(
       h(
         'button',
         {
-          class: 'btn',
+          class: 'ghost',
           onclick: () => {
+            newLeft();
             st.newToday.n = Math.max(0, st.newToday.n - 10);
             save();
-            queue = [];
+            queue = buildQueue();
             render();
           },
         },
         '新しい語をあと10',
       ),
+      h('button', { class: 'ghost', onclick: () => go('home') }, '戻る'),
     );
     box.append(btns);
     return box;
   }
 
-  function preview(face) {
-    const s = st.cards[face] || {};
-    const now = Date.now();
-    return [1, 2, 3, 4].map((g) => fmtIvl(schedule(s, g, now).due - now));
-  }
-
-  function renderCard() {
-    const [key, side] = cur.face.split(':');
-    const c = byKey.get(key);
-    const { ja, form, en } = c.sentences[0];
-    const box = h('section', { class: 'bench', 'aria-live': 'polite' });
-    const s = st.cards[cur.face];
-    box.append(
-      h(
-        'div',
-        { class: 'kind' },
-        h(
-          'span',
-          {},
-          `${c.mod.title.ja.split(' — ')[0]} · ${side === 'r' ? '認識 recognition' : '産出 production'}`,
-        ),
-        h(
-          'span',
-          {},
-          s ? (s.s === 'review' ? `間隔 ${s.ivl || 1}日` : '学習中') : '新しい語',
-          ` · 残り ${queue.length}`,
-        ),
-      ),
-    );
-    box.append(
-      h(
-        'p',
-        { class: 'sentence', lang: 'ja' },
-        marked(ja, form, 't', side === 'p' && !cur.revealed, c.kanji ? c.term : null),
-      ),
-    );
-    if (side === 'p' && !cur.revealed)
-      box.append(h('p', { class: 'hint', lang: 'ja' }, c.def_ja, h('br'), h('small', {}, c.gloss)));
-    if (!cur.revealed) {
-      box.append(
-        h('button', { class: 'reveal-btn', id: 'reveal', onclick: reveal }, '答えを見る  ␣'),
-      );
-    } else {
-      box.append(renderAnswer(c, en));
-      const pv = preview(cur.face);
-      const names = ['もう一度', '難しい', '正解', '簡単'];
-      box.append(
-        h(
-          'div',
-          { class: 'grades', role: 'group', 'aria-label': 'Grade' },
-          [1, 2, 3, 4].map((g) =>
-            h(
-              'button',
-              { class: 'g' + g, id: 'grade-' + g, onclick: () => grade(g) },
-              h('span', {}, `${g} ${names[g - 1]}`),
-              h('small', {}, pv[g - 1]),
-            ),
-          ),
-        ),
-      );
-    }
-    const tools = h('div', { class: 'tools' });
-    if (undo) tools.append(h('button', { class: 'linkish', onclick: doUndo }, '取り消す (u)'));
-    tools.append(
-      h(
-        'button',
-        {
-          class: 'linkish',
-          onclick: () => {
-            readMod = c.mod.id;
-            readPick = c.key;
-            tab = 'read';
-            render();
-          },
-        },
-        '読み物で見る',
-      ),
-    );
-    tools.append(
-      h(
-        'button',
-        {
-          class: 'linkish',
-          onclick: () => {
-            queue = queue.filter((f) => f !== cur.face);
-            queue.push(cur.face);
-            cur = null;
-            render();
-          },
-        },
-        '後回し',
-      ),
-    );
-    box.append(tools);
-    return box;
-  }
-
-  function renderAnswer(c, en) {
-    const a = h('div', { class: 'answer', lang: 'ja' });
-    a.append(
-      h(
-        'div',
-        { class: 'head' },
-        h('span', { class: 'term' }, c.term),
-        h('span', { class: 'reading' }, c.reading),
-      ),
-    );
-    a.append(
-      h(
-        'div',
-        { class: 'chips' },
-        h('span', { class: 'chip' }, c.pos),
-        ...c.register.split('・').map((r) => h('span', { class: 'chip' }, r)),
-      ),
-    );
-    a.append(h('p', { class: 'def' }, c.def_ja));
-    a.append(h('p', { class: 'gloss', lang: 'en' }, c.gloss));
-    const d = h('details', { class: 'en', lang: 'en' }, h('summary', {}, 'English'), en);
-    if (st.showEn) d.open = true;
-    a.append(d);
-    if (c.sentences.length > 1) {
-      const more = h('div', {}, h('div', { class: 'lbl' }, '別の文脈'));
-      for (const x of c.sentences.slice(1))
-        more.append(
-          h(
-            'div',
-            { class: 'ex' },
-            h('span', { class: 'ja' }, marked(x.ja, x.form)),
-            h('span', { class: 'en', lang: 'en' }, x.en),
-          ),
-        );
-      a.append(more);
-    }
-    if (c.collocations?.length)
-      a.append(
-        h(
-          'div',
-          {},
-          h('div', { class: 'lbl' }, 'よく使う形'),
-          h(
-            'div',
-            { class: 'cols' },
-            c.collocations.map((x) => h('span', {}, x)),
-          ),
-        ),
-      );
-    if (c.confusables?.length)
-      a.append(
-        h(
-          'div',
-          {},
-          h('div', { class: 'lbl' }, '紛らわしい語'),
-          h(
-            'ul',
-            { class: 'conf' },
-            c.confusables.map((x) =>
-              h('li', {}, h('b', {}, x.term), ' — ', h('span', { lang: 'en' }, x.note)),
-            ),
-          ),
-        ),
-      );
-    if (c.kanji)
-      a.append(
-        h(
-          'div',
-          {},
-          h('div', { class: 'lbl' }, '字'),
-          h(
-            'p',
-            { class: 'gloss' },
-            `音 ${(c.kanji.on || []).join('・')}　訓 ${(c.kanji.kun || []).join('・')} — ${c.kanji.meaning || ''}`,
-          ),
-          h(
-            'div',
-            { class: 'cols' },
-            (c.kanji.compounds || []).map((x) => h('span', {}, `${x.w}（${x.r}）`)),
-          ),
-        ),
-      );
-    if (c.note) a.append(h('p', { class: 'note', lang: 'en' }, c.note));
-    return a;
-  }
-
   function reveal() {
     if (cur && !cur.revealed) {
+      closePop();
       cur.revealed = true;
       render();
       document.getElementById('grade-3')?.focus({ preventScroll: true });
@@ -1247,25 +2778,42 @@
   }
   function grade(g) {
     if (!cur?.revealed) return;
+    closePop();
     const f = cur.face,
       now = Date.now();
     const before = st.cards[f];
-    undo = { f, before: before ? { ...before } : null, nt: { ...st.newToday }, queue: [...queue] };
+    undo = {
+      f,
+      before: before ? { ...before } : null,
+      nt: { ...st.newToday },
+      queue: [...queue],
+      sess: { ...sess },
+    };
     if (!before) {
       newLeft();
       st.newToday.n++;
     }
-    const next = schedule(before || {}, g, now);
-    st.cards[f] = next;
+    st.cards[f] = schedule(before || {}, g, now);
+    toast(
+      `${['もう一度', '難しい', '正解', '簡単'][g - 1]} · ${fmtIvl(st.cards[f].due - now)}後 · 取り消す U`,
+    );
+    lastCtx = ctxOf(f);
     st.log.push([f, g, now]);
     if (st.log.length > 5000) st.log = st.log.slice(-5000);
     save();
-    // a graded face leaves the sitting; a learning step re-enters only once
-    // it is actually due (pullDueLearning, or the timer renderDone arms)
+    sess.done++;
+    if (g === 1) sess.again++;
+    // a graded face leaves the sitting; a learning step re-enters only once it is due
     queue = queue.filter((x) => x !== f);
-    pullDueLearning(now);
-    cur = queue.length ? { face: queue[0], revealed: false } : null;
+    cur = null;
     render();
+    window.scrollTo(0, 0);
+  }
+  let toastEl = null;
+  function toast(text) {
+    toastEl?.remove();
+    toastEl = h('div', { class: 'toast', role: 'status' }, text);
+    document.body.append(toastEl);
   }
   function doUndo() {
     if (!undo) return;
@@ -1274,257 +2822,363 @@
     st.newToday = undo.nt;
     st.log.pop();
     queue = undo.queue;
-    cur = { face: undo.f, revealed: true };
+    sess = undo.sess;
+    cur = { face: undo.f, revealed: true, hint: hintFor(undo.f) };
     undo = null;
     save();
     render();
   }
-
-  function renderRead() {
-    const m = MODS.find((x) => x.id === readMod) || MODS[0];
-    const sel = h(
-      'select',
+  function bury() {
+    if (!cur) return;
+    st.buried[cur.face] = today();
+    for (const [f, d] of Object.entries(st.buried)) if (d !== today()) delete st.buried[f];
+    save();
+    queue = queue.filter((x) => x !== cur.face);
+    cur = null;
+    render();
+  }
+  function cycleFuri() {
+    st.furi = { hover: 'on', on: 'off', off: 'hover' }[st.furi] || 'hover';
+    save();
+    render();
+  }
+  let showHelp = false;
+  function helpEl() {
+    const keys = [
+      ['Space / Enter', '答えを見る · 正解'],
+      ['1 2 3 4', 'もう一度 · 難しい · 正解 · 簡単'],
+      ['U', '取り消す'],
+      ['R', '読み上げ'],
+      ['H', 'ヒント（定義 → 最初のかな → 英語）'],
+      ['T / C', '英訳を開く'],
+      ['F', 'ふりがな なし → ホバー → あり'],
+      ['-', '今日は後で'],
+      ['Esc', '終える'],
+    ];
+    return h(
+      'div',
       {
-        id: 'read-module',
-        'aria-label': 'Module',
-        onchange: (e) => {
-          readMod = e.target.value;
-          readPick = null;
-          render();
+        class: 'help',
+        onclick: (e) => {
+          if (e.target === e.currentTarget) {
+            showHelp = false;
+            render();
+          }
         },
       },
-      MODS.map((x) => h('option', { value: x.id, selected: x.id === m.id }, x.title.ja)),
-    );
-    view.append(sel);
-    const art = h('article', { class: 'passage', lang: 'ja' });
-    art.append(
-      h('h2', {}, m.passage.title),
       h(
-        'p',
-        { class: 'sub', lang: 'en' },
-        (m.passage.title_en || m.title.en) +
-          ` · ${m.cards.length} mined words, underlined — tap one`,
+        'div',
+        { class: 'sheet' },
+        h('div', { class: 'eyebrow' }, 'キーボード'),
+        h(
+          'dl',
+          {},
+          keys.flatMap(([k, v]) => [
+            h('dt', {}, h('kbd', {}, k)),
+            h('dd', { style: 'margin:0' }, v),
+          ]),
+        ),
       ),
     );
-    // place each card on its sentences[0] occurrence; longer forms first so compounds win
-    const flat = m.passage.text;
-    const marks = [];
-    for (const c of [...m.cards].sort(
-      (a, b) => b.sentences[0].form.length - a.sentences[0].form.length,
-    )) {
-      const s0 = c.sentences[0];
-      // every occurrence of the form in every copy of the sentence is tried,
-      // so a compound that claimed the first 磁気共鳴 leaves the later one free
-      let placed = false;
-      for (let at = flat.indexOf(s0.ja); at >= 0 && !placed; at = flat.indexOf(s0.ja, at + 1)) {
-        for (let f = s0.ja.indexOf(s0.form); f >= 0 && !placed; f = s0.ja.indexOf(s0.form, f + 1)) {
-          const a = at + f,
-            b = a + s0.form.length;
-          if (!marks.some((x) => a < x.b && b > x.a)) {
-            marks.push({ a, b, c });
-            placed = true;
-          }
-        }
-      }
-    }
-    marks.sort((x, y) => x.a - y.a);
-    let pos = 0,
-      para = h('p');
-    const flush = (txt) => {
-      const parts = txt.split(/\n+/);
-      parts.forEach((p, i) => {
-        if (i > 0) {
-          if (para.childNodes.length) art.append(para);
-          para = h('p');
-        }
-        if (p) para.append(p);
-      });
-    };
-    for (const mk of marks) {
-      flush(flat.slice(pos, mk.a));
-      const known = progressOf(mk.c)?.s === 'review';
-      para.append(
-        h(
-          'button',
-          {
-            class: 'w' + (known ? ' known' : ''),
-            onclick: () => {
-              readPick = mk.c.key;
-              render();
-            },
-          },
-          flat.slice(mk.a, mk.b),
-        ),
-      );
-      pos = mk.b;
-    }
-    flush(flat.slice(pos));
-    if (para.childNodes.length) art.append(para);
-    view.append(art);
-    if (readPick) {
-      const c = byKey.get(readPick);
-      if (c) {
-        const [cls, lbl] = stateLabel(c);
-        view.append(
-          h(
-            'div',
-            { class: 'pop', lang: 'ja' },
-            h(
-              'div',
-              { class: 'head' },
-              h('span', { class: 'term', style: 'font-size:1.4rem' }, c.term),
-              h('span', { class: 'reading' }, c.reading),
-              h('span', { class: 'st ' + cls }, lbl),
-            ),
-            h('p', { class: 'def' }, c.def_ja),
-            h('p', { class: 'gloss', lang: 'en' }, c.gloss),
-            h(
-              'button',
-              {
-                class: 'linkish',
-                onclick: () => {
-                  readPick = null;
-                  render();
-                },
-              },
-              '閉じる',
-            ),
-          ),
-        );
-      }
-    }
   }
 
-  function renderIndex() {
+  // ---------- reader ----------
+  function renderRead(wrap) {
+    const m = MODS.find((x) => x.id === readMod) || MODS[0];
+    wrap.append(
+      h(
+        'div',
+        { class: 'chips', role: 'toolbar', 'aria-label': '鉱脈' },
+        MODS.map((x) =>
+          h(
+            'button',
+            {
+              'aria-pressed': String(x.id === m.id),
+              onclick: () => {
+                readMod = x.id;
+                render();
+              },
+            },
+            `${String(x.order).padStart(2, '0')} ${x.title.ja.split(' — ')[0]}`,
+          ),
+        ),
+      ),
+    );
+    const art = h('article', { class: 'sheet article', lang: 'ja' });
+    const mined = new Map(m.cards.map((c) => [c.at[0] + ':' + c.at[1], c]));
+    art.append(
+      h('div', { class: 'eyebrow' }, `${m.passage.level || ''} · ${m.cards.length}語`),
+      h('h2', {}, m.passage.title),
+      h('p', { class: 'sub', lang: 'en' }, m.passage.title_en || m.title.en),
+      h(
+        'div',
+        { class: 'reader-top', style: 'margin-bottom:18px' },
+        h(
+          'div',
+          { class: 'row-btns', style: 'align-items:center' },
+          h('button', { class: 'primary', onclick: () => startReview(m.id) }, 'この鉱脈を学ぶ'),
+          bunkiLink(m.id, 'Bunkiの単語帳で開く', 'bunki-module'),
+        ),
+        h('span', { class: 'fine' }, '下線の語がこの鉱脈のカード。どの語もタップで読みと意味。'),
+      ),
+    );
+    const body = h('div', { class: 'jp body' });
+    m.paras.forEach((para, pi) => {
+      const p = h('p');
+      para.forEach((tok, ti) => {
+        const c = mined.get(pi + ':' + ti);
+        p.append(c ? wordEl(tok, 'mined st-' + stateOf(c)[0]) : wordEl(tok));
+      });
+      body.append(p);
+    });
+    art.append(body);
+    wrap.append(art);
+  }
+
+  // ---------- word list ----------
+  function renderList(wrap) {
     const inp = h('input', {
       class: 'search',
-      id: 'index-search',
+      id: 'list-search',
       type: 'search',
-      placeholder: '検索 — kanji, kana or English',
+      placeholder: '検索 — 漢字・かな・English',
       value: q,
       oninput: (e) => {
         q = e.target.value;
-        drawRows();
+        draw();
       },
     });
-    view.append(inp);
-    const rows = h('div', { class: 'rows' });
-    view.append(rows);
-    const drawRows = () => {
-      rows.replaceChildren();
+    const filters = h('div', { class: 'opts filters', role: 'group', 'aria-label': '絞り込み' });
+    const F = [
+      ['all', 'すべて'],
+      ['new', '未学習'],
+      ['learn', '学習中'],
+      ['review', '復習中'],
+    ];
+    for (const [id, label] of F)
+      filters.append(
+        h(
+          'button',
+          {
+            'aria-pressed': String(qFilter === id),
+            onclick: () => {
+              qFilter = id;
+              render();
+            },
+          },
+          label,
+        ),
+      );
+    const list = h('section', { class: 'sheet list' });
+    wrap.append(inp, filters, list);
+    const draw = () => {
+      list.replaceChildren();
       const k = q.trim().toLowerCase();
+      let shown = 0;
       for (const c of CARDS) {
+        const [cls, lbl] = stateOf(c);
+        if (qFilter !== 'all' && cls !== qFilter) continue;
         if (
           k &&
           !(c.term + c.reading + c.gloss + c.def_ja + c.mod.title.ja).toLowerCase().includes(k)
         )
           continue;
-        const [cls, lbl] = stateLabel(c);
-        rows.append(
+        shown++;
+        const item = h('div', { class: 'item' });
+        item.append(
           h(
-            'div',
+            'button',
             {
-              class: 'row',
-              role: 'button',
-              tabindex: '0',
+              'aria-expanded': String(openItem === c.key),
               onclick: () => {
-                readMod = c.mod.id;
-                readPick = c.key;
-                tab = 'read';
+                openItem = openItem === c.key ? null : c.key;
+                draw();
+              },
+            },
+            h('span', { class: 't', lang: 'ja' }, c.term, h('small', {}, c.reading)),
+            h('span', { class: 'g' }, c.gloss),
+            h('span', { class: 'pill ' + cls }, lbl),
+          ),
+        );
+        if (openItem === c.key)
+          item.append(
+            h(
+              'div',
+              { class: 'open' },
+              h('p', { class: 'def', lang: 'ja' }, c.def_ja),
+              contextEl(c, 'fill'),
+              h(
+                'div',
+                { class: 'row-btns' },
+                h(
+                  'button',
+                  {
+                    class: 'ghost',
+                    onclick: () => {
+                      readMod = c.mod.id;
+                      go('read');
+                    },
+                  },
+                  '読み物で見る',
+                ),
+              ),
+            ),
+          );
+        list.append(item);
+      }
+      if (!shown) list.append(h('p', { class: 'fine pad' }, '該当する語はありません。'));
+    };
+    draw();
+  }
+
+  // ---------- settings ----------
+  function opts(label, key, choices, after) {
+    return h(
+      'div',
+      { class: 'grp' },
+      h('h3', {}, label),
+      h(
+        'div',
+        { class: 'opts', role: 'group', 'aria-label': label },
+        choices.map(([v, t, sub]) =>
+          h(
+            'button',
+            {
+              'aria-pressed': String(st[key] === v),
+              'data-set': key + ':' + v,
+              onclick: () => {
+                st[key] = v;
+                save();
+                after?.();
                 render();
               },
             },
-            h('span', { class: 'w', lang: 'ja' }, c.term, h('small', {}, c.reading)),
-            h('span', { class: 'g' }, c.gloss),
-            h('span', { class: 'st ' + cls }, lbl),
+            t,
+            sub ? h('small', {}, sub) : null,
           ),
-        );
-      }
-      if (!rows.childNodes.length)
-        rows.append(h('p', { class: 'fine' }, 'No word matches that search.'));
-    };
-    drawRows();
+        ),
+      ),
+    );
   }
-
-  function renderSettings() {
-    const box = h('section', { class: 'settings' });
+  function renderSettings(wrap) {
+    const box = h('section', { class: 'sheet set' });
+    const out = h('output', { class: 'num' }, st.newPerDay);
+    const step = (d) => {
+      st.newPerDay = clamp(st.newPerDay + d, 0, 200);
+      out.textContent = st.newPerDay;
+      save();
+    };
     box.append(
       h(
         'div',
-        { class: 'field' },
-        h('label', { for: 'set-new' }, '一日の新しい語 · new words per day'),
-        h('input', {
-          type: 'number',
-          id: 'set-new',
-          min: '0',
-          max: '200',
-          value: st.newPerDay,
+        { class: 'grp' },
+        h('h3', {}, '一日の新しい語'),
+        h(
+          'div',
+          { style: 'display:flex;gap:14px;align-items:center;flex-wrap:wrap' },
+          h(
+            'span',
+            { class: 'stepper' },
+            h('button', { 'aria-label': '減らす', onclick: () => step(-5) }, '−'),
+            out,
+            h('button', { 'aria-label': '増やす', onclick: () => step(5) }, '+'),
+          ),
+          h('span', { class: 'fine' }, '新しい語ひとつは、のちの復習でおよそ10回分の手間になる。'),
+        ),
+      ),
+      opts('カード', 'mode', [
+        ['both', '文脈で読む → クローズ', '意味が分かったら、空欄で言葉を思い出す（おすすめ）'],
+        ['recognition', '文脈で読むだけ', '下線の語の意味を思い出す'],
+        ['production', 'クローズだけ', '最初から空欄（MCD）'],
+      ]),
+      opts('クローズの最初のヒント', 'hint', [
+        ['def', '日本語の定義', '空欄の下に（おすすめ）'],
+        ['none', 'なし', '文脈だけ — 純粋なMCD'],
+        ['reading', '読み', '空欄の中に'],
+      ]),
+      opts('ふりがな', 'furi', [
+        ['hover', 'ホバー/タップ', '触れた語だけ'],
+        ['on', 'すべて', ''],
+        ['off', 'なし', ''],
+      ]),
+      opts('英訳', 'showEn', [
+        [false, '隠す', 'タップで開く'],
+        [true, '最初から見せる', ''],
+      ]),
+      opts('文字の大きさ', 'size', [
+        [0.9, '小'],
+        [1, '中'],
+        [1.15, '大'],
+        [1.3, '特大'],
+      ]),
+      opts('テーマ', 'theme', [
+        ['auto', '自動'],
+        ['light', '明'],
+        ['dark', '暗'],
+      ]),
+    );
+    if (canSpeak) {
+      const sel = h(
+        'select',
+        {
+          'aria-label': '声',
+          style:
+            'padding:8px 10px;border-radius:10px;border:0;background:var(--sheet-2);box-shadow:inset 0 0 0 1px var(--rule)',
           onchange: (e) => {
-            st.newPerDay = clamp(parseInt(e.target.value, 10) || 0, 0, 200);
+            st.voice = e.target.value;
             save();
-            queue = [];
+            speak('財政支援を受けて、町に人が戻ってきた。');
           },
-        }),
-      ),
-    );
-    box.append(
-      h(
-        'div',
-        { class: 'field' },
-        h('label', { for: 'set-mode' }, 'カードの種類 · card faces'),
+        },
         h(
-          'select',
-          {
-            id: 'set-mode',
-            onchange: (e) => {
-              st.mode = e.target.value;
-              save();
-              queue = [];
-              cur = null;
-            },
-          },
-          [
-            ['recognition', '認識のみ — sentence → meaning (recommended start)'],
-            ['both', '認識＋産出 — production unlocks after a word is recognised'],
-            ['production', '産出のみ — cloze + Japanese definition → word'],
-          ].map(([v, t]) => h('option', { value: v, selected: st.mode === v }, t)),
+          'option',
+          { value: '' },
+          voices.length ? `自動（${bestVoice()?.name || ''}）` : 'この端末に日本語の声がありません',
         ),
-      ),
-    );
-    box.append(
-      h(
-        'div',
-        { class: 'field' },
+        voices.map((v) => h('option', { value: v.name, selected: st.voice === v.name }, v.name)),
+      );
+      box.append(
         h(
-          'label',
-          {},
-          h('input', {
-            type: 'checkbox',
-            id: 'set-en',
-            checked: st.showEn,
-            onchange: (e) => {
-              st.showEn = e.target.checked;
-              save();
-            },
-          }),
-          ' 英訳を最初から開く · open the English translation by default',
+          'div',
+          { class: 'grp' },
+          h('h3', {}, '声'),
+          h(
+            'div',
+            { style: 'display:flex;gap:10px;flex-wrap:wrap;align-items:center' },
+            sel,
+            h(
+              'button',
+              { class: 'ghost', onclick: () => speak('財政支援を受けて、町に人が戻ってきた。') },
+              '試す',
+            ),
+          ),
+          h(
+            'p',
+            { class: 'fine' },
+            'この端末の読み上げ音声を使います（録音ではありません）。macOS/iOSの設定で「拡張」「プレミアム」の日本語音声を入れると自然になります。',
+          ),
         ),
-      ),
-    );
+        opts('答えで自動読み上げ', 'autoplay', [
+          [false, 'しない'],
+          [true, 'する'],
+        ]),
+      );
+    }
     const ta = h('textarea', {
       id: 'progress',
       'aria-label': 'Progress JSON',
       spellcheck: 'false',
     });
+    const msg = h('p', { class: 'fine', 'aria-live': 'polite' });
     box.append(
       h(
         'div',
-        { class: 'field' },
-        h('label', { for: 'progress' }, '進み具合の保存 · back up or move your progress'),
+        { class: 'grp' },
+        h('h3', {}, '進み具合の保存'),
         h(
           'p',
           { class: 'fine' },
-          'Progress lives in this browser only. Copy it out to keep it; paste a copy back in and press 読み込む to restore it.',
+          '進み具合はこのブラウザの中だけにあります。書き出して保存し、別の端末では貼り付けて読み込みます。',
         ),
         ta,
         h(
@@ -1533,92 +3187,135 @@
           h(
             'button',
             {
-              class: 'btn',
+              class: 'ghost',
               onclick: () => {
                 ta.value = JSON.stringify(st);
                 ta.select();
                 navigator.clipboard?.writeText(ta.value).then(
-                  () => (msg.textContent = 'Copied.'),
-                  () => (msg.textContent = 'Selected — copy it with your keyboard.'),
+                  () => (msg.textContent = 'コピーしました。'),
+                  () => (msg.textContent = '選択しました。キーボードでコピーしてください。'),
                 );
               },
             },
-            '書き出す · copy',
+            '書き出す',
           ),
           h(
             'button',
             {
-              class: 'btn',
+              class: 'ghost',
+              onclick: () => {
+                const blob = new Blob([JSON.stringify(st)], { type: 'application/json' });
+                const a = h('a', {
+                  href: URL.createObjectURL(blob),
+                  download: `kotoba-mine-progress-${new Date().toISOString().slice(0, 10)}.json`,
+                });
+                a.click();
+                URL.revokeObjectURL(a.href);
+              },
+            },
+            'ファイルに保存',
+          ),
+          h(
+            'button',
+            {
+              class: 'ghost',
               onclick: () => {
                 try {
                   const v = JSON.parse(ta.value);
                   if (!v || typeof v.cards !== 'object') throw 0;
-                  st = { ...DEFAULTS, ...v };
+                  st = { ...structuredClone(DEFAULTS), ...v };
                   save();
-                  queue = [];
-                  cur = null;
-                  msg.textContent = 'Progress restored.';
+                  msg.textContent = '読み込みました。';
                 } catch (e) {
                   msg.textContent =
-                    'That text is not a Kotoba Mine backup. Paste the whole copied block.';
+                    'Kotoba Mine の書き出しではありません。全体を貼り付けてください。';
                 }
               },
             },
-            '読み込む · restore',
+            '読み込む',
           ),
           h(
             'button',
             {
-              class: 'btn danger',
+              class: 'ghost danger',
               onclick: (e) => {
-                if (e.target.dataset.arm) {
+                if (e.currentTarget.dataset.arm) {
                   st = structuredClone(DEFAULTS);
                   save();
-                  queue = [];
-                  cur = null;
                   render();
                 } else {
-                  e.target.dataset.arm = '1';
-                  e.target.textContent = 'もう一度押すと全消去';
+                  e.currentTarget.dataset.arm = '1';
+                  e.currentTarget.textContent = 'もう一度押すと全消去';
                 }
               },
             },
-            'リセット · reset',
+            'リセット',
           ),
+        ),
+        msg,
+      ),
+      h(
+        'div',
+        { class: 'grp' },
+        h(
+          'p',
+          { class: 'fine' },
+          `スケジューラ: FSRS-6（Bunkiの固定パラメータ、目標保持率90%）。記録 ${st.log.length}回。文・読み物・日本語の定義はBunkiのオリジナル。英語の語釈はJMdict（EDRDG, CC BY-SA 4.0）を編集したもの。`,
         ),
       ),
     );
-    const msg = h('p', { class: 'fine', 'aria-live': 'polite' });
-    box.append(msg);
-    const reviews = st.log.length;
-    box.append(
-      h(
-        'p',
-        { class: 'fine' },
-        `Scheduler: FSRS-6 with Bunki's pinned weights, 90% target retention. ${reviews} reviews logged. ` +
-          `Sentences, passages and Japanese definitions are Bunki originals; English glosses are edited from JMdict (EDRDG, CC BY-SA 4.0).`,
-      ),
-    );
-    view.append(box);
+    wrap.append(box);
   }
 
-  document.querySelector('nav.tabs').addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-tab]');
-    if (b) {
-      tab = b.dataset.tab;
-      render();
-      window.scrollTo(0, 0);
-    }
-  });
+  // ---------- keys ----------
   document.addEventListener('keydown', (e) => {
-    if (tab !== 'study' || e.target.closest('input, textarea, select')) return;
-    if ((e.key === ' ' || e.key === 'Enter') && cur && !cur.revealed) {
+    if (e.target.closest('input, textarea, select') || (e.metaKey && e.key !== 'z') || e.altKey)
+      return;
+    if (e.key === 'Escape') {
+      if (popEl) return closePop();
+      if (showHelp) return ((showHelp = false), render());
+      if (screen === 'review') return go('home');
+    }
+    if (screen === 'home' && (e.key === ' ' || e.key === 'Enter') && !e.target.closest('button')) {
       e.preventDefault();
-      reveal();
+      if (buildQueue().length) startReview(null);
+      return;
+    }
+    if (screen !== 'review') return;
+    if (e.key === '?') return ((showHelp = !showHelp), render());
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (cur && !cur.revealed) reveal();
+      else if (cur?.revealed) grade(3);
     } else if (cur?.revealed && ['1', '2', '3', '4'].includes(e.key)) {
       e.preventDefault();
       grade(Number(e.key));
-    } else if (e.key === 'u' && undo) doUndo();
+    } else if ((e.key === 'u' || (e.key === 'z' && (e.metaKey || e.ctrlKey))) && undo) {
+      e.preventDefault();
+      doUndo();
+    } else if (e.key === 'r' && cur) {
+      const c = byKey.get(cur.face.split(':')[0]);
+      if (cur.revealed || cur.face.endsWith(':r')) speak(sentenceOf(c));
+    } else if (e.key === 'h') moreHint();
+    else if ((e.key === 't' || e.key === 'c') && cur?.revealed) {
+      document.getElementById('trans')?.classList.toggle('veiled');
+    } else if (e.key === 'f') cycleFuri();
+    else if (e.key === '-') bury();
+  });
+  window.addEventListener('resize', closePop);
+  // #m01-money opens that module's passage (Bunki's 単語帳 links here per module)
+  function fromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (MODS.some((m) => m.id === id)) {
+      readMod = id;
+      screen = 'read';
+    }
+  }
+  fromHash();
+  window.addEventListener('hashchange', () => {
+    fromHash();
+    render();
+    window.scrollTo(0, 0);
   });
   render();
 </script>
