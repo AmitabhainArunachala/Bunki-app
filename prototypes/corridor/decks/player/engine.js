@@ -42,7 +42,9 @@ export function validateDeck(deck) {
       ids.add(card.id);
       const text = card.ruby.map((seg) => seg[0]).join('');
       if (text !== card.ja) problems.push(`${card.id}: ruby does not spell the sentence`);
+      // marker 1 is the target; 2 marks the rest of the word on a 字 card; 3 is a repeat of the word, blanked with it
       if (card.ruby.filter((seg) => seg[2] === 1).length !== 1) problems.push(`${card.id}: needs exactly one target segment`);
+      if (card.ruby.some((seg) => seg.length > 2 && ![1, 2, 3].includes(seg[2]))) problems.push(`${card.id}: unknown segment marker`);
     }
   }
   return problems;

@@ -6,7 +6,6 @@
     "km-064|word|b729f82187b5": "km-064-m04",
     "km-064|word|be2d0c90f819": "km-064-m05",
     "km-065|word|d1c6de95a78f": "km-065-m01",
-    "km-065|kanji|d1c6de95a78f|0": "km-065-m02",
     "km-065|kanji|d1c6de95a78f|1": "km-065-m03",
     "km-065|word|ce73909d1593": "km-065-m04",
     "km-065|word|2051b2b7c735": "km-065-m05",
@@ -17,17 +16,13 @@
     "km-066|word|00e7a25745d2": "km-066-m05",
     "km-105|word|6d44320356c4": "km-105-m01",
     "km-105|kanji|6d44320356c4|0": "km-105-m02",
-    "km-105|kanji|6d44320356c4|1": "km-105-m03",
     "km-105|word|125c377fff44": "km-105-m04",
     "km-105|word|1aaa66b4b9c8": "km-105-m05",
     "km-106|word|3882456aec7d": "km-106-m01",
-    "km-106|kanji|3882456aec7d|0": "km-106-m02",
     "km-106|kanji|3882456aec7d|1": "km-106-m03",
     "km-106|word|d64ed91b30b1": "km-106-m04",
     "km-106|word|7ab042663fff": "km-106-m05",
     "km-107|word|43366fb662b4": "km-107-m01",
-    "km-107|kanji|43366fb662b4|0": "km-107-m02",
-    "km-107|kanji|43366fb662b4|1": "km-107-m03",
     "km-107|word|8952cc63d749": "km-107-m04",
     "km-107|word|5da69ab1a690": "km-107-m05",
     "km-108|word|fdbab4edce69": "km-108-m01",
@@ -46,8 +41,6 @@
     "km-110|word|4d264ee3bc42": "km-110-m04",
     "km-110|word|f5f3f9bccc5f": "km-110-m05",
     "km-111|word|e721e71fee59": "km-111-m01",
-    "km-111|kanji|e721e71fee59|0": "km-111-m02",
-    "km-111|kanji|e721e71fee59|1": "km-111-m03",
     "km-111|word|21a850eb0229": "km-111-m04",
     "km-111|word|5bca08b03dd6": "km-111-m05",
     "km-112|word|ffb185a6fc22": "km-112-m01",
@@ -62,12 +55,10 @@
     "km-113|word|26ab4b1f75b2": "km-113-m05",
     "km-114|word|60578e3a1114": "km-114-m01",
     "km-114|kanji|60578e3a1114|0": "km-114-m02",
-    "km-114|kanji|60578e3a1114|1": "km-114-m03",
     "km-114|word|ea27a2e496be": "km-114-m04",
     "km-114|word|6616f7639220": "km-114-m05",
     "km-115|word|7d9b70455256": "km-115-m01",
     "km-115|kanji|7d9b70455256|0": "km-115-m02",
-    "km-115|kanji|7d9b70455256|1": "km-115-m03",
     "km-115|word|51d7684d318b": "km-115-m04",
     "km-115|word|b72017a94d4a": "km-115-m05",
     "km-116|word|5ae2ff7ced1f": "km-116-m01",
@@ -77,13 +68,9 @@
     "km-116|word|8c6cab30b4c6": "km-116-m05",
     "km-184|word|d7d5d6661ac5": "km-184-m01",
     "km-184|kanji|d7d5d6661ac5|0": "km-184-m02",
-    "km-184|kanji|d7d5d6661ac5|1": "km-184-m03",
     "km-184|kanji|d7d5d6661ac5|2": "km-184-m04",
-    "km-184|kanji|d7d5d6661ac5|3": "km-184-m05",
     "km-184|word|a0f225983f92": "km-184-m06",
     "km-120|word|27d511129d8b": "km-120-m01",
-    "km-120|kanji|27d511129d8b|0": "km-120-m02",
-    "km-120|kanji|27d511129d8b|2": "km-120-m03",
     "km-120|word|5d6cf4facdbb": "km-120-m04",
     "km-120|word|b9bc103b9b27": "km-120-m05",
     "km-131|word|de9f683c3eb0": "km-131-m01",
@@ -97,7 +84,6 @@
     "km-132|word|59363f755e27": "km-132-m05",
     "km-132|word|f87d7bab3245": "km-132-m06",
     "km-134|word|d827932b4888": "km-134-m01",
-    "km-134|kanji|d827932b4888|0": "km-134-m02",
     "km-134|kanji|d827932b4888|1": "km-134-m03",
     "km-134|kanji|d827932b4888|2": "km-134-m04",
     "km-134|word|948cafe615a0": "km-134-m05",
@@ -108,12 +94,10 @@
     "km-006|word|0610069dc18e": "km-006-m04",
     "km-006|word|918fd0cbce4c": "km-006-m05",
     "km-239|word|1d3008fb0e1a": "km-239-m01",
-    "km-239|kanji|1d3008fb0e1a|0": "km-239-m02",
     "km-239|kanji|1d3008fb0e1a|1": "km-239-m03",
     "km-239|word|b866264a61ab": "km-239-m04",
     "km-239|word|12c6a83db593": "km-239-m05",
     "km-258|word|201792d19ec5": "km-258-m01",
-    "km-258|kanji|201792d19ec5|0": "km-258-m02",
     "km-258|word|557fa0d0d48c": "km-258-m03",
     "km-258|word|4ae55a36e0f7": "km-258-m04",
     "km-262|word|0fefbb3a0980": "km-262-m01",
@@ -134,7 +118,6 @@
     "km-316|word|e000d83ae86b": "km-316-m04",
     "km-316|word|60954111cdc5": "km-316-m05",
     "km-125|word|4fdf8029276e": "km-125-m01",
-    "km-125|kanji|4fdf8029276e|0": "km-125-m02",
     "km-125|kanji|4fdf8029276e|1": "km-125-m03",
     "km-125|word|3aeea903eeba": "km-125-m04",
     "km-125|word|09f0a4bae52c": "km-125-m05",
@@ -178,8 +161,6 @@
     "km-072|word|7a45ed16d8e6": "km-072-m01",
     "km-072|kanji|7a45ed16d8e6|0": "km-072-m02",
     "km-072|kanji|7a45ed16d8e6|1": "km-072-m03",
-    "km-072|kanji|7a45ed16d8e6|2": "km-072-m04",
-    "km-072|kanji|7a45ed16d8e6|3": "km-072-m05",
     "km-072|kanji|7a45ed16d8e6|4": "km-072-m06",
     "km-072|word|86b654f4e604": "km-072-m07",
     "km-182|word|b91384aad4bf": "km-182-m01",
@@ -190,8 +171,6 @@
     "km-182|word|e92623cc54c3": "km-182-m06",
     "km-182|word|458f4200d4f3": "km-182-m07",
     "km-183|word|5744457284ad": "km-183-m01",
-    "km-183|kanji|5744457284ad|0": "km-183-m02",
-    "km-183|kanji|5744457284ad|1": "km-183-m03",
     "km-183|word|d4e60ff07f98": "km-183-m04",
     "km-186|word|b8a9ba7562d2": "km-186-m01",
     "km-186|kanji|b8a9ba7562d2|0": "km-186-m02",
@@ -237,13 +216,10 @@
     "km-204|word|98ef482f3ade": "km-204-m04",
     "km-204|word|6d4d77f8085a": "km-204-m05",
     "km-294|word|070005302197": "km-294-m01",
-    "km-294|kanji|070005302197|0": "km-294-m02",
-    "km-294|kanji|070005302197|1": "km-294-m03",
     "km-294|word|8425e3807c98": "km-294-m04",
     "km-294|word|863f1fcfd548": "km-294-m05",
     "km-061|word|1f4f0710fb11": "km-061-m01",
     "km-061|kanji|1f4f0710fb11|0": "km-061-m02",
-    "km-061|kanji|1f4f0710fb11|1": "km-061-m03",
     "km-061|word|37c5f1848b12": "km-061-m04",
     "km-061|word|1955235c79eb": "km-061-m05",
     "km-167|word|ab2472b3977a": "km-167-m01",
@@ -273,7 +249,6 @@
     "km-133|word|f88c56e4303d": "km-133-m05",
     "km-203|word|87d199c8951a": "km-203-m01",
     "km-203|kanji|87d199c8951a|0": "km-203-m02",
-    "km-203|kanji|87d199c8951a|1": "km-203-m03",
     "km-203|word|6eadcbb6dcba": "km-203-m04",
     "km-203|word|98767f2569bf": "km-203-m05",
     "km-060|word|02b4c3e331d1": "km-060-m01",
@@ -299,7 +274,6 @@
     "km-180|word|9e40c9516470": "km-180-m05",
     "km-063|word|c2262fac6294": "km-063-m01",
     "km-063|kanji|c2262fac6294|0": "km-063-m02",
-    "km-063|kanji|c2262fac6294|1": "km-063-m03",
     "km-063|word|a11a5df41336": "km-063-m04",
     "km-063|word|ccb533607965": "km-063-m05",
     "km-058|word|081a91f99031": "km-058-m01",
@@ -322,7 +296,6 @@
     "km-181|word|d81456f72600": "km-181-m01",
     "km-181|kanji|d81456f72600|0": "km-181-m02",
     "km-181|kanji|d81456f72600|1": "km-181-m03",
-    "km-181|kanji|d81456f72600|2": "km-181-m04",
     "km-181|word|6a92cc1534ec": "km-181-m05",
     "km-181|word|038989bd680e": "km-181-m06",
     "km-187|word|a0e620085dba": "km-187-m01",
@@ -333,7 +306,6 @@
     "km-192|word|880846d62e52": "km-192-m01",
     "km-192|kanji|880846d62e52|0": "km-192-m02",
     "km-192|kanji|880846d62e52|1": "km-192-m03",
-    "km-192|kanji|880846d62e52|2": "km-192-m04",
     "km-192|kanji|880846d62e52|3": "km-192-m05",
     "km-192|word|04ca8f973f05": "km-192-m06",
     "km-192|word|49f6d635133d": "km-192-m07",
@@ -376,12 +348,9 @@
     "km-083|word|b358414a6f09": "km-083-m05",
     "km-168|word|5016967e2e72": "km-168-m01",
     "km-168|kanji|5016967e2e72|0": "km-168-m02",
-    "km-168|kanji|5016967e2e72|1": "km-168-m03",
     "km-168|word|487e5633a6fe": "km-168-m04",
     "km-168|word|b02852b17624": "km-168-m05",
     "km-169|word|635a1710f26c": "km-169-m01",
-    "km-169|kanji|635a1710f26c|0": "km-169-m02",
-    "km-169|kanji|635a1710f26c|1": "km-169-m03",
     "km-169|word|18f57ef77f29": "km-169-m04",
     "km-169|word|9c9b420a124b": "km-169-m05",
     "km-171|word|eddd7570578c": "km-171-m01",
@@ -391,7 +360,6 @@
     "km-171|word|d9a9352305ae": "km-171-m05",
     "km-171|word|82d232fdf225": "km-171-m06",
     "km-037|word|197ceda37705": "km-037-m01",
-    "km-037|kanji|197ceda37705|0": "km-037-m02",
     "km-037|kanji|197ceda37705|1": "km-037-m03",
     "km-037|word|12f23a2e4894": "km-037-m04",
     "km-037|word|b49d615f83bd": "km-037-m05",
@@ -405,7 +373,6 @@
     "km-194|word|e699c31ebf98": "km-194-m03",
     "km-194|word|51228dc33e93": "km-194-m04",
     "km-022|word|a4ea5d53d39a": "km-022-m01",
-    "km-022|kanji|a4ea5d53d39a|0": "km-022-m02",
     "km-022|kanji|a4ea5d53d39a|1": "km-022-m03",
     "km-022|word|3a07b0cc6d04": "km-022-m04",
     "km-020|word|638b24d39418": "km-020-m01",
@@ -413,7 +380,6 @@
     "km-020|word|792e53b6aea0": "km-020-m03",
     "km-062|word|9e781aff4434": "km-062-m01",
     "km-062|kanji|9e781aff4434|0": "km-062-m02",
-    "km-062|kanji|9e781aff4434|1": "km-062-m03",
     "km-062|word|4770c0b381c7": "km-062-m04",
     "km-062|word|2e92ca6efe20": "km-062-m05",
     "km-057|word|411f78c06811": "km-057-m01",
@@ -439,7 +405,6 @@
     "km-139|word|02ef0a1bd252": "km-139-m05",
     "km-140|word|ad0585fcdecc": "km-140-m01",
     "km-140|kanji|ad0585fcdecc|0": "km-140-m02",
-    "km-140|kanji|ad0585fcdecc|1": "km-140-m03",
     "km-140|word|8f2e941e46aa": "km-140-m04",
     "km-143|word|6b8abb32b58e": "km-143-m01",
     "km-143|kanji|6b8abb32b58e|0": "km-143-m02",
@@ -476,7 +441,6 @@
     "km-150|word|0dfe01c1fb4a": "km-150-m02",
     "km-150|word|48978f01f3b4": "km-150-m03",
     "km-151|word|94ecf7e938ac": "km-151-m01",
-    "km-151|kanji|94ecf7e938ac|0": "km-151-m02",
     "km-151|kanji|94ecf7e938ac|1": "km-151-m03",
     "km-151|word|6d868a913588": "km-151-m04",
     "km-151|word|da9a6080cbbd": "km-151-m05",
@@ -491,7 +455,6 @@
     "km-153|kanji|5e44718a6848|1": "km-153-m03",
     "km-153|word|26f6f3dd003e": "km-153-m04",
     "km-154|word|755928623549": "km-154-m01",
-    "km-154|kanji|755928623549|0": "km-154-m02",
     "km-154|kanji|755928623549|1": "km-154-m03",
     "km-154|kanji|755928623549|2": "km-154-m04",
     "km-154|kanji|755928623549|3": "km-154-m05",
@@ -506,7 +469,6 @@
     "km-156|kanji|1640d47ddec6|0": "km-156-m02",
     "km-156|kanji|1640d47ddec6|1": "km-156-m03",
     "km-156|kanji|1640d47ddec6|2": "km-156-m04",
-    "km-156|kanji|1640d47ddec6|3": "km-156-m05",
     "km-156|word|6f01fc4ae785": "km-156-m06",
     "km-156|word|dd2621215f1c": "km-156-m07",
     "km-157|word|d8a701aa4817": "km-157-m01",
@@ -527,7 +489,6 @@
     "km-159|word|4cc11993a44b": "km-159-m05",
     "km-159|word|c4831f155132": "km-159-m06",
     "km-165|word|ee17f0eb900c": "km-165-m01",
-    "km-165|kanji|ee17f0eb900c|0": "km-165-m02",
     "km-165|kanji|ee17f0eb900c|1": "km-165-m03",
     "km-165|kanji|ee17f0eb900c|2": "km-165-m04",
     "km-165|word|f89eb4ecd527": "km-165-m05",
@@ -539,7 +500,6 @@
     "km-059|word|8728e04d7a53": "km-059-m05",
     "km-075|word|20f5273f4036": "km-075-m01",
     "km-075|kanji|20f5273f4036|0": "km-075-m02",
-    "km-075|kanji|20f5273f4036|1": "km-075-m03",
     "km-075|word|3cc2dde440b6": "km-075-m04",
     "km-075|word|e85e408cf83e": "km-075-m05",
     "km-076|word|96c84957a9d8": "km-076-m01",
@@ -577,7 +537,6 @@
     "km-266|word|b7fee3b62cd7": "km-266-m04",
     "km-266|word|10aaef84116a": "km-266-m05",
     "km-015|word|a551c2e1ca15": "km-015-m01",
-    "km-015|kanji|a551c2e1ca15|0": "km-015-m02",
     "km-015|kanji|a551c2e1ca15|1": "km-015-m03",
     "km-015|kanji|a551c2e1ca15|2": "km-015-m04",
     "km-015|word|6a993a898184": "km-015-m05",
@@ -589,7 +548,6 @@
     "km-215|word|f4158b760968": "km-215-m05",
     "km-216|word|3d621e11c8f6": "km-216-m01",
     "km-216|kanji|3d621e11c8f6|0": "km-216-m02",
-    "km-216|kanji|3d621e11c8f6|1": "km-216-m03",
     "km-216|word|4b66ad5a403e": "km-216-m04",
     "km-216|word|4adcdfa5d896": "km-216-m05",
     "km-248|word|9effc3284092": "km-248-m01",
@@ -603,7 +561,6 @@
     "km-249|word|09df83eed425": "km-249-m04",
     "km-249|word|295a1311a36f": "km-249-m05",
     "km-250|word|6747db1dafec": "km-250-m01",
-    "km-250|kanji|6747db1dafec|0": "km-250-m02",
     "km-250|kanji|6747db1dafec|1": "km-250-m03",
     "km-250|word|685a0cc43753": "km-250-m04",
     "km-250|word|ba87b58679ea": "km-250-m05",
@@ -622,7 +579,6 @@
     "km-253|word|97be87a77360": "km-253-m03",
     "km-253|word|80da8c685d78": "km-253-m04",
     "km-254|word|dbcd6c414f89": "km-254-m01",
-    "km-254|kanji|dbcd6c414f89|0": "km-254-m02",
     "km-254|kanji|dbcd6c414f89|1": "km-254-m03",
     "km-254|word|5203502fcb72": "km-254-m04",
     "km-254|word|6cde0c66bbc1": "km-254-m05",
@@ -639,7 +595,6 @@
     "km-301|word|26c377da4ce9": "km-301-m01",
     "km-301|kanji|26c377da4ce9|0": "km-301-m02",
     "km-301|kanji|26c377da4ce9|1": "km-301-m03",
-    "km-301|kanji|26c377da4ce9|2": "km-301-m04",
     "km-301|word|21602ad8ecac": "km-301-m05",
     "km-301|word|6c61a793fb6c": "km-301-m06",
     "km-302|word|9b2d5515fea7": "km-302-m01",
@@ -649,22 +604,18 @@
     "km-302|word|68daa85a09c7": "km-302-m05",
     "km-305|word|a0c43600c4e2": "km-305-m01",
     "km-305|kanji|a0c43600c4e2|0": "km-305-m02",
-    "km-305|kanji|a0c43600c4e2|1": "km-305-m03",
     "km-305|word|330017e55e25": "km-305-m04",
     "km-305|word|71e3c78c8aa6": "km-305-m05",
     "km-308|word|bb826268fc95": "km-308-m01",
-    "km-308|kanji|bb826268fc95|0": "km-308-m02",
     "km-308|kanji|bb826268fc95|1": "km-308-m03",
     "km-308|word|7a121ce542fe": "km-308-m04",
     "km-308|word|146ae5058b47": "km-308-m05",
     "km-313|word|c288c174f37c": "km-313-m01",
     "km-313|kanji|c288c174f37c|0": "km-313-m02",
-    "km-313|kanji|c288c174f37c|1": "km-313-m03",
     "km-313|kanji|c288c174f37c|2": "km-313-m04",
     "km-313|word|dd5063a0b8e8": "km-313-m05",
     "km-313|word|2b86cc2d7417": "km-313-m06",
     "km-317|word|5793dc33ae8d": "km-317-m01",
-    "km-317|kanji|5793dc33ae8d|0": "km-317-m02",
     "km-317|kanji|5793dc33ae8d|1": "km-317-m03",
     "km-317|word|1ec07ee565c6": "km-317-m04",
     "km-317|word|c6d3ebea3bf7": "km-317-m05",
@@ -690,7 +641,6 @@
     "km-227|word|a6225343a197": "km-227-m05",
     "km-321|word|3cb3df564899": "km-321-m01",
     "km-321|kanji|3cb3df564899|0": "km-321-m02",
-    "km-321|kanji|3cb3df564899|1": "km-321-m03",
     "km-321|word|88c77f896757": "km-321-m04",
     "km-321|word|8558b10674be": "km-321-m05",
     "km-318|word|d9c3c5c242e5": "km-318-m01",
@@ -715,7 +665,6 @@
     "km-068|word|7df3ce6d111f": "km-068-m06",
     "km-307|word|ca101fe5ceac": "km-307-m01",
     "km-307|kanji|ca101fe5ceac|0": "km-307-m02",
-    "km-307|kanji|ca101fe5ceac|1": "km-307-m03",
     "km-307|word|c69632c520ab": "km-307-m04",
     "km-307|word|588f53716323": "km-307-m05",
     "km-309|word|42da41e43e9f": "km-309-m01",
@@ -725,7 +674,6 @@
     "km-309|word|37e7e401a827": "km-309-m05",
     "km-310|word|3b86138db1c2": "km-310-m01",
     "km-310|kanji|3b86138db1c2|0": "km-310-m02",
-    "km-310|kanji|3b86138db1c2|1": "km-310-m03",
     "km-310|word|c8363f1f3b8f": "km-310-m04",
     "km-310|word|537e4b3c0e60": "km-310-m05",
     "km-311|word|7b344e9dfd50": "km-311-m01",
@@ -736,12 +684,10 @@
     "km-311|word|83d4361a3932": "km-311-m06",
     "km-312|word|f9c73403bc2b": "km-312-m01",
     "km-312|kanji|f9c73403bc2b|0": "km-312-m02",
-    "km-312|kanji|f9c73403bc2b|1": "km-312-m03",
     "km-312|word|ad27ebcbbbe9": "km-312-m04",
     "km-312|word|e45f48345b85": "km-312-m05",
     "km-314|word|f377c1efd0bb": "km-314-m01",
     "km-314|kanji|f377c1efd0bb|0": "km-314-m02",
-    "km-314|kanji|f377c1efd0bb|1": "km-314-m03",
     "km-314|word|8c0254f6181b": "km-314-m04",
     "km-314|word|4e032d691e49": "km-314-m05",
     "km-315|word|e79d7a62f752": "km-315-m01",
@@ -757,14 +703,12 @@
     "km-304|word|39e87bc4e0a6": "km-304-m05",
     "km-306|word|059cbecc95eb": "km-306-m01",
     "km-306|kanji|059cbecc95eb|0": "km-306-m02",
-    "km-306|kanji|059cbecc95eb|1": "km-306-m03",
     "km-306|kanji|059cbecc95eb|3": "km-306-m04",
     "km-306|kanji|059cbecc95eb|4": "km-306-m05",
     "km-306|word|2cdeead59766": "km-306-m06",
     "km-306|word|2ee9ac0440eb": "km-306-m07",
     "km-170|word|b290dd437c51": "km-170-m01",
     "km-170|kanji|b290dd437c51|0": "km-170-m02",
-    "km-170|kanji|b290dd437c51|1": "km-170-m03",
     "km-170|kanji|b290dd437c51|2": "km-170-m04",
     "km-170|kanji|b290dd437c51|3": "km-170-m05",
     "km-170|word|c058a6793427": "km-170-m06",
@@ -789,12 +733,10 @@
     "km-129|kanji|f4800d53d757|1": "km-129-m03",
     "km-129|kanji|f4800d53d757|2": "km-129-m04",
     "km-129|kanji|f4800d53d757|3": "km-129-m05",
-    "km-129|kanji|f4800d53d757|4": "km-129-m06",
     "km-129|word|638ccffdbe22": "km-129-m07",
     "km-129|word|213fad2e41ce": "km-129-m08",
     "km-019|word|133de825ca53": "km-019-m01",
     "km-019|kanji|133de825ca53|0": "km-019-m02",
-    "km-019|kanji|133de825ca53|1": "km-019-m03",
     "km-019|word|7c7ce3f42663": "km-019-m04",
     "km-019|word|dd02dd30d2e7": "km-019-m05",
     "km-081|word|bf9634280f78": "km-081-m01",
@@ -834,7 +776,6 @@
     "km-288|word|f3cffc54b309": "km-288-m06",
     "km-288|word|8327ca05b24e": "km-288-m07",
     "km-267|word|e4e70afc1dee": "km-267-m01",
-    "km-267|kanji|e4e70afc1dee|0": "km-267-m02",
     "km-267|kanji|e4e70afc1dee|1": "km-267-m03",
     "km-267|word|cbdac74fed74": "km-267-m04",
     "km-268|word|fc37aa2d8e06": "km-268-m01",
@@ -948,7 +889,6 @@
     "km-099|word|8f7e71b24214": "km-099-m05",
     "km-102|word|40ed8b8ea292": "km-102-m01",
     "km-102|kanji|40ed8b8ea292|0": "km-102-m02",
-    "km-102|kanji|40ed8b8ea292|1": "km-102-m03",
     "km-102|word|fb1de9d861c0": "km-102-m04",
     "km-102|word|3648c0eca9ae": "km-102-m05",
     "km-009|word|6e8ef85c594e": "km-009-m01",
@@ -972,8 +912,6 @@
     "km-292|word|a3f61d3b9389": "km-292-m04",
     "km-292|word|ebf4c138b514": "km-292-m05",
     "km-293|word|f20439721c62": "km-293-m01",
-    "km-293|kanji|f20439721c62|0": "km-293-m02",
-    "km-293|kanji|f20439721c62|2": "km-293-m03",
     "km-293|word|eda3f9f90136": "km-293-m04",
     "km-293|word|dcb3e504e02a": "km-293-m05",
     "km-290|word|c707003ddb79": "km-290-m01",
@@ -987,8 +925,6 @@
     "km-043|word|7b321a93e9d6": "km-043-m04",
     "km-043|word|9df656362668": "km-043-m05",
     "km-044|word|b2efafc7f5c0": "km-044-m01",
-    "km-044|kanji|b2efafc7f5c0|0": "km-044-m02",
-    "km-044|kanji|b2efafc7f5c0|1": "km-044-m03",
     "km-044|kanji|b2efafc7f5c0|2": "km-044-m04",
     "km-044|word|751d04db3d30": "km-044-m05",
     "km-044|word|4858764565c5": "km-044-m06",
@@ -1013,13 +949,10 @@
     "km-286|word|edb2d1dedb98": "km-286-m04",
     "km-286|word|da6b7a6c21ba": "km-286-m05",
     "km-016|word|13f28f32a442": "km-016-m01",
-    "km-016|kanji|13f28f32a442|0": "km-016-m02",
-    "km-016|kanji|13f28f32a442|1": "km-016-m03",
     "km-016|kanji|13f28f32a442|2": "km-016-m04",
     "km-016|word|aa0a63ce9a05": "km-016-m05",
     "km-017|word|c4750d9a7585": "km-017-m01",
     "km-017|kanji|c4750d9a7585|0": "km-017-m02",
-    "km-017|kanji|c4750d9a7585|1": "km-017-m03",
     "km-017|kanji|c4750d9a7585|2": "km-017-m04",
     "km-017|kanji|c4750d9a7585|3": "km-017-m05",
     "km-017|word|1590c3a1e569": "km-017-m06",
@@ -1030,12 +963,10 @@
     "km-018|word|c56a758bc2f7": "km-018-m04",
     "km-018|word|3c9b63c9515f": "km-018-m05",
     "km-023|word|13463a4c3c71": "km-023-m01",
-    "km-023|kanji|13463a4c3c71|0": "km-023-m02",
     "km-023|word|392534b3f947": "km-023-m03",
     "km-023|word|424fabd5c23b": "km-023-m04",
     "km-026|word|8c0434be499d": "km-026-m01",
     "km-026|kanji|8c0434be499d|0": "km-026-m02",
-    "km-026|kanji|8c0434be499d|1": "km-026-m03",
     "km-026|word|28720d440360": "km-026-m04",
     "km-026|word|c15d2d19feac": "km-026-m05",
     "km-240|word|f5bd5c58c00c": "km-240-m01",
@@ -1044,7 +975,6 @@
     "km-240|word|a91047c83295": "km-240-m04",
     "km-240|word|201678336760": "km-240-m05",
     "km-283|word|3e081f54f91d": "km-283-m01",
-    "km-283|kanji|3e081f54f91d|0": "km-283-m02",
     "km-283|kanji|3e081f54f91d|1": "km-283-m03",
     "km-283|kanji|3e081f54f91d|2": "km-283-m04",
     "km-283|word|ecc21b04246d": "km-283-m05",
@@ -1068,46 +998,38 @@
     "km-028|word|1bcb7aa1aec8": "km-028-m01",
     "km-028|kanji|1bcb7aa1aec8|0": "km-028-m02",
     "km-028|kanji|1bcb7aa1aec8|1": "km-028-m03",
-    "km-028|kanji|1bcb7aa1aec8|2": "km-028-m04",
     "km-028|word|0290d983fc27": "km-028-m05",
     "km-028|word|e522092d8ea7": "km-028-m06",
     "km-029|word|05c8fd197a6d": "km-029-m01",
     "km-029|kanji|05c8fd197a6d|0": "km-029-m02",
-    "km-029|kanji|05c8fd197a6d|1": "km-029-m03",
     "km-029|kanji|05c8fd197a6d|2": "km-029-m04",
     "km-029|word|fc8baac036f1": "km-029-m05",
     "km-029|word|38d6280601bd": "km-029-m06",
     "km-041|word|10528c3c4a6b": "km-041-m01",
     "km-041|kanji|10528c3c4a6b|0": "km-041-m02",
-    "km-041|kanji|10528c3c4a6b|1": "km-041-m03",
     "km-041|kanji|10528c3c4a6b|2": "km-041-m04",
     "km-041|word|ea8ef193c49c": "km-041-m05",
     "km-041|word|3e9edcbb4ab6": "km-041-m06",
     "km-042|word|d8151bbdeb18": "km-042-m01",
     "km-042|kanji|d8151bbdeb18|0": "km-042-m02",
-    "km-042|kanji|d8151bbdeb18|1": "km-042-m03",
     "km-042|word|be42dc34c0a3": "km-042-m04",
     "km-042|word|4c2a51373b51": "km-042-m05",
     "km-238|word|81c7f2662ecb": "km-238-m01",
-    "km-238|kanji|81c7f2662ecb|0": "km-238-m02",
     "km-238|kanji|81c7f2662ecb|1": "km-238-m03",
     "km-238|word|c22eceb6814e": "km-238-m04",
     "km-238|word|9a0650959e68": "km-238-m05",
     "km-242|word|314fd07477f4": "km-242-m01",
-    "km-242|kanji|314fd07477f4|0": "km-242-m02",
     "km-242|kanji|314fd07477f4|1": "km-242-m03",
     "km-242|kanji|314fd07477f4|2": "km-242-m04",
     "km-242|word|8cf86b85cdb2": "km-242-m05",
     "km-242|word|0aa593f3cb80": "km-242-m06",
     "km-035|word|20fa23c082a5": "km-035-m01",
-    "km-035|kanji|20fa23c082a5|0": "km-035-m02",
     "km-035|kanji|20fa23c082a5|1": "km-035-m03",
     "km-035|kanji|20fa23c082a5|2": "km-035-m04",
     "km-035|kanji|20fa23c082a5|3": "km-035-m05",
     "km-035|word|e2099692558d": "km-035-m06",
     "km-035|word|b5202ff36637": "km-035-m07",
     "km-036|word|60d248e6ab69": "km-036-m01",
-    "km-036|kanji|60d248e6ab69|0": "km-036-m02",
     "km-036|kanji|60d248e6ab69|1": "km-036-m03",
     "km-036|kanji|60d248e6ab69|2": "km-036-m04",
     "km-036|kanji|60d248e6ab69|3": "km-036-m05",
@@ -1119,16 +1041,12 @@
     "km-036|word|c444f2af99fc": "km-036-m11",
     "km-100|word|b4134167b8a4": "km-100-m01",
     "km-100|kanji|b4134167b8a4|0": "km-100-m02",
-    "km-100|kanji|b4134167b8a4|1": "km-100-m03",
     "km-100|word|b386e54e6079": "km-100-m04",
     "km-100|word|e8768cdff4f6": "km-100-m05",
     "km-229|word|0fd51c7621a9": "km-229-m01",
-    "km-229|kanji|0fd51c7621a9|0": "km-229-m02",
-    "km-229|kanji|0fd51c7621a9|1": "km-229-m03",
     "km-229|word|4a166f7b634d": "km-229-m04",
     "km-229|word|588319e00362": "km-229-m05",
     "km-217|word|9ab1955d2314": "km-217-m01",
-    "km-217|kanji|9ab1955d2314|0": "km-217-m02",
     "km-217|word|e8a2801aa2c9": "km-217-m03",
     "km-217|word|6a052a7554cd": "km-217-m04",
     "km-231|word|3389c25fee1c": "km-231-m01",
@@ -1168,25 +1086,20 @@
     "km-007|word|a2584bcb3368": "km-007-m04",
     "km-007|word|cc6331a78000": "km-007-m05",
     "km-008|word|25983e17fd4c": "km-008-m01",
-    "km-008|kanji|25983e17fd4c|0": "km-008-m02",
     "km-008|kanji|25983e17fd4c|1": "km-008-m03",
     "km-008|word|55a42612006c": "km-008-m04",
     "km-008|word|0802b0307512": "km-008-m05",
     "km-074|word|31478567895b": "km-074-m01",
     "km-074|kanji|31478567895b|0": "km-074-m02",
-    "km-074|kanji|31478567895b|1": "km-074-m03",
     "km-074|word|823f7323d3c3": "km-074-m04",
     "km-074|word|22f603cca157": "km-074-m05",
     "km-121|word|1f3f3b0aff37": "km-121-m01",
     "km-121|kanji|1f3f3b0aff37|0": "km-121-m02",
     "km-121|kanji|1f3f3b0aff37|1": "km-121-m03",
-    "km-121|kanji|1f3f3b0aff37|2": "km-121-m04",
-    "km-121|kanji|1f3f3b0aff37|3": "km-121-m05",
     "km-121|word|ed2f05c46cb6": "km-121-m06",
     "km-121|word|c73a154a73bc": "km-121-m07",
     "km-122|word|df81b583852c": "km-122-m01",
     "km-122|kanji|df81b583852c|0": "km-122-m02",
-    "km-122|kanji|df81b583852c|1": "km-122-m03",
     "km-122|kanji|df81b583852c|2": "km-122-m04",
     "km-122|word|d33c71afc0db": "km-122-m05",
     "km-122|word|1fd10b1b9dbf": "km-122-m06",
@@ -1197,9 +1110,7 @@
     "km-123|word|03d8530ee8ff": "km-123-m05",
     "km-123|word|88fbc827f584": "km-123-m06",
     "km-127|word|30a3e5231fee": "km-127-m01",
-    "km-127|kanji|30a3e5231fee|0": "km-127-m02",
     "km-127|kanji|30a3e5231fee|1": "km-127-m03",
-    "km-127|kanji|30a3e5231fee|2": "km-127-m04",
     "km-127|kanji|30a3e5231fee|3": "km-127-m05",
     "km-127|word|b6bfd75414b6": "km-127-m06",
     "km-127|word|c40cd5ee9a3f": "km-127-m07",
@@ -1207,13 +1118,10 @@
     "km-032|kanji|2b15b9ed52f4|0": "km-032-m02",
     "km-032|kanji|2b15b9ed52f4|1": "km-032-m03",
     "km-032|kanji|2b15b9ed52f4|2": "km-032-m04",
-    "km-032|kanji|2b15b9ed52f4|3": "km-032-m05",
-    "km-032|kanji|2b15b9ed52f4|4": "km-032-m06",
     "km-032|word|7d8f7ae2286e": "km-032-m07",
     "km-033|word|bdba1065e50a": "km-033-m01",
     "km-033|kanji|bdba1065e50a|0": "km-033-m02",
     "km-033|kanji|bdba1065e50a|1": "km-033-m03",
-    "km-033|kanji|bdba1065e50a|2": "km-033-m04",
     "km-033|word|9e159e299506": "km-033-m05",
     "km-033|word|f2ca135f667f": "km-033-m06",
     "km-034|word|303c21421488": "km-034-m01",
@@ -1226,17 +1134,13 @@
     "km-160|kanji|ab759fae05fe|0": "km-160-m02",
     "km-160|kanji|ab759fae05fe|1": "km-160-m03",
     "km-160|kanji|ab759fae05fe|2": "km-160-m04",
-    "km-160|kanji|ab759fae05fe|3": "km-160-m05",
     "km-160|kanji|ab759fae05fe|4": "km-160-m06",
     "km-160|kanji|ab759fae05fe|5": "km-160-m07",
     "km-160|kanji|ab759fae05fe|6": "km-160-m08",
-    "km-160|kanji|ab759fae05fe|7": "km-160-m09",
-    "km-160|kanji|ab759fae05fe|8": "km-160-m10",
     "km-160|word|1198a3d06d11": "km-160-m11",
     "km-160|word|10e13f4b793a": "km-160-m12",
     "km-172|word|f395132187c3": "km-172-m01",
     "km-172|kanji|f395132187c3|0": "km-172-m02",
-    "km-172|kanji|f395132187c3|1": "km-172-m03",
     "km-172|word|c686166aaa03": "km-172-m04",
     "km-172|word|48b29151602d": "km-172-m05",
     "km-136|word|4419a0721e1a": "km-136-m01",
@@ -1245,8 +1149,6 @@
     "km-136|word|9d370ca6f968": "km-136-m04",
     "km-136|word|c2fe181eed49": "km-136-m05",
     "km-080|word|f430f92966a7": "km-080-m01",
-    "km-080|kanji|f430f92966a7|0": "km-080-m02",
-    "km-080|kanji|f430f92966a7|1": "km-080-m03",
     "km-080|word|7208767c6d1c": "km-080-m04",
     "km-080|word|65c8413d89f3": "km-080-m05",
     "km-002|word|968ffa8462df": "km-002-m01",
@@ -1258,8 +1160,6 @@
     "km-047|word|353388be37f5": "km-047-m03",
     "km-047|word|6cc043a4f463": "km-047-m04",
     "km-205|word|6f48a64e9fbe": "km-205-m01",
-    "km-205|kanji|6f48a64e9fbe|0": "km-205-m02",
-    "km-205|kanji|6f48a64e9fbe|1": "km-205-m03",
     "km-205|word|3977a7401697": "km-205-m04",
     "km-205|word|89203c791197": "km-205-m05",
     "km-298|word|f06120b3f1ba": "km-298-m01",
@@ -1267,7 +1167,6 @@
     "km-298|word|9b3828c6b617": "km-298-m03",
     "km-214|word|3610410fe741": "km-214-m01",
     "km-214|kanji|3610410fe741|0": "km-214-m02",
-    "km-214|kanji|3610410fe741|1": "km-214-m03",
     "km-214|word|8d2a7d5fe63b": "km-214-m04",
     "km-214|word|85bd281b2b96": "km-214-m05",
     "km-021|word|f3e6363a860f": "km-021-m01",
@@ -1292,7 +1191,6 @@
     "km-163|word|4a77779fcc40": "km-163-m05",
     "km-207|word|a8fc64fb9a14": "km-207-m01",
     "km-207|kanji|a8fc64fb9a14|0": "km-207-m02",
-    "km-207|kanji|a8fc64fb9a14|1": "km-207-m03",
     "km-207|word|ec7f5221772e": "km-207-m04",
     "km-207|word|7a9c04b3bb53": "km-207-m05",
     "km-208|word|ac663afb6a8c": "km-208-m01",
@@ -1339,7 +1237,6 @@
     "km-260|word|e6e58f982ca5": "km-260-m05",
     "km-166|word|517443c1fe47": "km-166-m01",
     "km-166|kanji|517443c1fe47|0": "km-166-m02",
-    "km-166|kanji|517443c1fe47|1": "km-166-m03",
     "km-166|word|af75c75e293d": "km-166-m04",
     "km-166|word|1fb3e00ec698": "km-166-m05",
     "km-213|word|b45dc70244b7": "km-213-m01",
@@ -1352,8 +1249,6 @@
     "km-323|word|98c6edd3f887": "km-323-m03",
     "km-323|word|9743b1449ab6": "km-323-m04",
     "km-053|word|b09d910ff047": "km-053-m01",
-    "km-053|kanji|b09d910ff047|0": "km-053-m02",
-    "km-053|kanji|b09d910ff047|1": "km-053-m03",
     "km-053|word|3962f1af11d9": "km-053-m04",
     "km-052|word|8fb0a66f665f": "km-052-m01",
     "km-052|kanji|8fb0a66f665f|0": "km-052-m02",
@@ -1366,7 +1261,6 @@
     "km-092|word|9304901c6e99": "km-092-m04",
     "km-092|word|c71de3c29d4e": "km-092-m05",
     "km-030|word|0a7f01e6ac20": "km-030-m01",
-    "km-030|kanji|0a7f01e6ac20|0": "km-030-m02",
     "km-030|kanji|0a7f01e6ac20|1": "km-030-m03",
     "km-030|word|cc6b336837cd": "km-030-m04",
     "km-030|word|734934d1fb66": "km-030-m05",
@@ -1386,13 +1280,11 @@
     "km-263|word|e4d619210df5": "km-263-m05",
     "km-196|word|5e0f10ecb8f4": "km-196-m01",
     "km-196|kanji|5e0f10ecb8f4|0": "km-196-m02",
-    "km-196|kanji|5e0f10ecb8f4|1": "km-196-m03",
     "km-196|word|31eebe6b5319": "km-196-m04",
     "km-196|word|8e5193cbc0ed": "km-196-m05",
     "km-209|word|7b7cfeb9c1fd": "km-209-m01",
     "km-209|kanji|7b7cfeb9c1fd|0": "km-209-m02",
     "km-209|kanji|7b7cfeb9c1fd|1": "km-209-m03",
-    "km-209|kanji|7b7cfeb9c1fd|2": "km-209-m04",
     "km-209|word|826abc4dae57": "km-209-m05",
     "km-209|word|20b8473db897": "km-209-m06",
     "km-001|word|5376be1024d9": "km-001-m01",
@@ -1424,10 +1316,6 @@
     "km-048|word|b49f0cc22216": "km-048-m02",
     "km-048|word|90f869c10171": "km-048-m03",
     "km-049|word|712bbd02db31": "km-049-m01",
-    "km-049|kanji|712bbd02db31|0": "km-049-m02",
-    "km-049|kanji|712bbd02db31|1": "km-049-m03",
-    "km-049|kanji|712bbd02db31|3": "km-049-m04",
-    "km-049|kanji|712bbd02db31|4": "km-049-m05",
     "km-049|word|0c75cfe0e0d1": "km-049-m06",
     "km-049|word|0614267311fe": "km-049-m07",
     "km-054|word|55249733b153": "km-054-m01",
@@ -1499,8 +1387,6 @@
     "km-173|word|fe5ee19c735a": "km-173-m03",
     "km-173|word|25ab2949a660": "km-173-m04",
     "km-197|word|899c8cd3e8da": "km-197-m01",
-    "km-197|kanji|899c8cd3e8da|0": "km-197-m02",
-    "km-197|kanji|899c8cd3e8da|1": "km-197-m03",
     "km-197|word|01d1475febaa": "km-197-m04",
     "km-197|word|50d8c243c545": "km-197-m05",
     "km-199|word|a19a6e36880b": "km-199-m01",
@@ -1542,7 +1428,6 @@
     "km-247|word|8a422ca765b9": "km-247-m03",
     "km-257|word|218e47b68ffe": "km-257-m01",
     "km-257|kanji|218e47b68ffe|0": "km-257-m02",
-    "km-257|kanji|218e47b68ffe|1": "km-257-m03",
     "km-257|word|31f76b22c388": "km-257-m04",
     "km-257|word|f26cb2167557": "km-257-m05",
     "km-291|word|ac28dd70ecad": "km-291-m01",
@@ -1571,7 +1456,6 @@
     "km-027|word|358abb7a922e": "km-027-m03",
     "km-027|word|0a5ac3551dc4": "km-027-m04",
     "km-056|word|820d3f5bbd61": "km-056-m01",
-    "km-056|kanji|820d3f5bbd61|0": "km-056-m02",
     "km-056|word|c726c2e74a80": "km-056-m03",
     "km-056|word|8ea20ca0294c": "km-056-m04",
     "km-040|word|1bd567da353a": "km-040-m01",
@@ -2104,7 +1988,472 @@
     "km-322|sentence|781663680e7a": "km-322-2"
   },
   "reserved": {
-    "kotoba-mcd": [],
+    "kotoba-mcd": [
+      {
+        "key": "km-065|kanji|d1c6de95a78f|0",
+        "id": "km-065-m02"
+      },
+      {
+        "key": "km-105|kanji|6d44320356c4|1",
+        "id": "km-105-m03"
+      },
+      {
+        "key": "km-106|kanji|3882456aec7d|0",
+        "id": "km-106-m02"
+      },
+      {
+        "key": "km-107|kanji|43366fb662b4|0",
+        "id": "km-107-m02"
+      },
+      {
+        "key": "km-107|kanji|43366fb662b4|1",
+        "id": "km-107-m03"
+      },
+      {
+        "key": "km-111|kanji|e721e71fee59|0",
+        "id": "km-111-m02"
+      },
+      {
+        "key": "km-111|kanji|e721e71fee59|1",
+        "id": "km-111-m03"
+      },
+      {
+        "key": "km-114|kanji|60578e3a1114|1",
+        "id": "km-114-m03"
+      },
+      {
+        "key": "km-115|kanji|7d9b70455256|1",
+        "id": "km-115-m03"
+      },
+      {
+        "key": "km-184|kanji|d7d5d6661ac5|1",
+        "id": "km-184-m03"
+      },
+      {
+        "key": "km-184|kanji|d7d5d6661ac5|3",
+        "id": "km-184-m05"
+      },
+      {
+        "key": "km-120|kanji|27d511129d8b|0",
+        "id": "km-120-m02"
+      },
+      {
+        "key": "km-120|kanji|27d511129d8b|2",
+        "id": "km-120-m03"
+      },
+      {
+        "key": "km-134|kanji|d827932b4888|0",
+        "id": "km-134-m02"
+      },
+      {
+        "key": "km-239|kanji|1d3008fb0e1a|0",
+        "id": "km-239-m02"
+      },
+      {
+        "key": "km-258|kanji|201792d19ec5|0",
+        "id": "km-258-m02"
+      },
+      {
+        "key": "km-125|kanji|4fdf8029276e|0",
+        "id": "km-125-m02"
+      },
+      {
+        "key": "km-072|kanji|7a45ed16d8e6|2",
+        "id": "km-072-m04"
+      },
+      {
+        "key": "km-072|kanji|7a45ed16d8e6|3",
+        "id": "km-072-m05"
+      },
+      {
+        "key": "km-183|kanji|5744457284ad|0",
+        "id": "km-183-m02"
+      },
+      {
+        "key": "km-183|kanji|5744457284ad|1",
+        "id": "km-183-m03"
+      },
+      {
+        "key": "km-294|kanji|070005302197|0",
+        "id": "km-294-m02"
+      },
+      {
+        "key": "km-294|kanji|070005302197|1",
+        "id": "km-294-m03"
+      },
+      {
+        "key": "km-061|kanji|1f4f0710fb11|1",
+        "id": "km-061-m03"
+      },
+      {
+        "key": "km-203|kanji|87d199c8951a|1",
+        "id": "km-203-m03"
+      },
+      {
+        "key": "km-063|kanji|c2262fac6294|1",
+        "id": "km-063-m03"
+      },
+      {
+        "key": "km-181|kanji|d81456f72600|2",
+        "id": "km-181-m04"
+      },
+      {
+        "key": "km-192|kanji|880846d62e52|2",
+        "id": "km-192-m04"
+      },
+      {
+        "key": "km-168|kanji|5016967e2e72|1",
+        "id": "km-168-m03"
+      },
+      {
+        "key": "km-169|kanji|635a1710f26c|0",
+        "id": "km-169-m02"
+      },
+      {
+        "key": "km-169|kanji|635a1710f26c|1",
+        "id": "km-169-m03"
+      },
+      {
+        "key": "km-037|kanji|197ceda37705|0",
+        "id": "km-037-m02"
+      },
+      {
+        "key": "km-022|kanji|a4ea5d53d39a|0",
+        "id": "km-022-m02"
+      },
+      {
+        "key": "km-062|kanji|9e781aff4434|1",
+        "id": "km-062-m03"
+      },
+      {
+        "key": "km-140|kanji|ad0585fcdecc|1",
+        "id": "km-140-m03"
+      },
+      {
+        "key": "km-151|kanji|94ecf7e938ac|0",
+        "id": "km-151-m02"
+      },
+      {
+        "key": "km-154|kanji|755928623549|0",
+        "id": "km-154-m02"
+      },
+      {
+        "key": "km-156|kanji|1640d47ddec6|3",
+        "id": "km-156-m05"
+      },
+      {
+        "key": "km-165|kanji|ee17f0eb900c|0",
+        "id": "km-165-m02"
+      },
+      {
+        "key": "km-075|kanji|20f5273f4036|1",
+        "id": "km-075-m03"
+      },
+      {
+        "key": "km-015|kanji|a551c2e1ca15|0",
+        "id": "km-015-m02"
+      },
+      {
+        "key": "km-216|kanji|3d621e11c8f6|1",
+        "id": "km-216-m03"
+      },
+      {
+        "key": "km-250|kanji|6747db1dafec|0",
+        "id": "km-250-m02"
+      },
+      {
+        "key": "km-254|kanji|dbcd6c414f89|0",
+        "id": "km-254-m02"
+      },
+      {
+        "key": "km-301|kanji|26c377da4ce9|2",
+        "id": "km-301-m04"
+      },
+      {
+        "key": "km-305|kanji|a0c43600c4e2|1",
+        "id": "km-305-m03"
+      },
+      {
+        "key": "km-308|kanji|bb826268fc95|0",
+        "id": "km-308-m02"
+      },
+      {
+        "key": "km-313|kanji|c288c174f37c|1",
+        "id": "km-313-m03"
+      },
+      {
+        "key": "km-317|kanji|5793dc33ae8d|0",
+        "id": "km-317-m02"
+      },
+      {
+        "key": "km-321|kanji|3cb3df564899|1",
+        "id": "km-321-m03"
+      },
+      {
+        "key": "km-307|kanji|ca101fe5ceac|1",
+        "id": "km-307-m03"
+      },
+      {
+        "key": "km-310|kanji|3b86138db1c2|1",
+        "id": "km-310-m03"
+      },
+      {
+        "key": "km-312|kanji|f9c73403bc2b|1",
+        "id": "km-312-m03"
+      },
+      {
+        "key": "km-314|kanji|f377c1efd0bb|1",
+        "id": "km-314-m03"
+      },
+      {
+        "key": "km-306|kanji|059cbecc95eb|1",
+        "id": "km-306-m03"
+      },
+      {
+        "key": "km-170|kanji|b290dd437c51|1",
+        "id": "km-170-m03"
+      },
+      {
+        "key": "km-129|kanji|f4800d53d757|4",
+        "id": "km-129-m06"
+      },
+      {
+        "key": "km-019|kanji|133de825ca53|1",
+        "id": "km-019-m03"
+      },
+      {
+        "key": "km-267|kanji|e4e70afc1dee|0",
+        "id": "km-267-m02"
+      },
+      {
+        "key": "km-102|kanji|40ed8b8ea292|1",
+        "id": "km-102-m03"
+      },
+      {
+        "key": "km-293|kanji|f20439721c62|0",
+        "id": "km-293-m02"
+      },
+      {
+        "key": "km-293|kanji|f20439721c62|2",
+        "id": "km-293-m03"
+      },
+      {
+        "key": "km-044|kanji|b2efafc7f5c0|0",
+        "id": "km-044-m02"
+      },
+      {
+        "key": "km-044|kanji|b2efafc7f5c0|1",
+        "id": "km-044-m03"
+      },
+      {
+        "key": "km-016|kanji|13f28f32a442|0",
+        "id": "km-016-m02"
+      },
+      {
+        "key": "km-016|kanji|13f28f32a442|1",
+        "id": "km-016-m03"
+      },
+      {
+        "key": "km-017|kanji|c4750d9a7585|1",
+        "id": "km-017-m03"
+      },
+      {
+        "key": "km-023|kanji|13463a4c3c71|0",
+        "id": "km-023-m02"
+      },
+      {
+        "key": "km-026|kanji|8c0434be499d|1",
+        "id": "km-026-m03"
+      },
+      {
+        "key": "km-283|kanji|3e081f54f91d|0",
+        "id": "km-283-m02"
+      },
+      {
+        "key": "km-028|kanji|1bcb7aa1aec8|2",
+        "id": "km-028-m04"
+      },
+      {
+        "key": "km-029|kanji|05c8fd197a6d|1",
+        "id": "km-029-m03"
+      },
+      {
+        "key": "km-041|kanji|10528c3c4a6b|1",
+        "id": "km-041-m03"
+      },
+      {
+        "key": "km-042|kanji|d8151bbdeb18|1",
+        "id": "km-042-m03"
+      },
+      {
+        "key": "km-238|kanji|81c7f2662ecb|0",
+        "id": "km-238-m02"
+      },
+      {
+        "key": "km-242|kanji|314fd07477f4|0",
+        "id": "km-242-m02"
+      },
+      {
+        "key": "km-035|kanji|20fa23c082a5|0",
+        "id": "km-035-m02"
+      },
+      {
+        "key": "km-036|kanji|60d248e6ab69|0",
+        "id": "km-036-m02"
+      },
+      {
+        "key": "km-100|kanji|b4134167b8a4|1",
+        "id": "km-100-m03"
+      },
+      {
+        "key": "km-229|kanji|0fd51c7621a9|0",
+        "id": "km-229-m02"
+      },
+      {
+        "key": "km-229|kanji|0fd51c7621a9|1",
+        "id": "km-229-m03"
+      },
+      {
+        "key": "km-217|kanji|9ab1955d2314|0",
+        "id": "km-217-m02"
+      },
+      {
+        "key": "km-008|kanji|25983e17fd4c|0",
+        "id": "km-008-m02"
+      },
+      {
+        "key": "km-074|kanji|31478567895b|1",
+        "id": "km-074-m03"
+      },
+      {
+        "key": "km-121|kanji|1f3f3b0aff37|2",
+        "id": "km-121-m04"
+      },
+      {
+        "key": "km-121|kanji|1f3f3b0aff37|3",
+        "id": "km-121-m05"
+      },
+      {
+        "key": "km-122|kanji|df81b583852c|1",
+        "id": "km-122-m03"
+      },
+      {
+        "key": "km-127|kanji|30a3e5231fee|0",
+        "id": "km-127-m02"
+      },
+      {
+        "key": "km-127|kanji|30a3e5231fee|2",
+        "id": "km-127-m04"
+      },
+      {
+        "key": "km-032|kanji|2b15b9ed52f4|3",
+        "id": "km-032-m05"
+      },
+      {
+        "key": "km-032|kanji|2b15b9ed52f4|4",
+        "id": "km-032-m06"
+      },
+      {
+        "key": "km-033|kanji|bdba1065e50a|2",
+        "id": "km-033-m04"
+      },
+      {
+        "key": "km-160|kanji|ab759fae05fe|3",
+        "id": "km-160-m05"
+      },
+      {
+        "key": "km-160|kanji|ab759fae05fe|7",
+        "id": "km-160-m09"
+      },
+      {
+        "key": "km-160|kanji|ab759fae05fe|8",
+        "id": "km-160-m10"
+      },
+      {
+        "key": "km-172|kanji|f395132187c3|1",
+        "id": "km-172-m03"
+      },
+      {
+        "key": "km-080|kanji|f430f92966a7|0",
+        "id": "km-080-m02"
+      },
+      {
+        "key": "km-080|kanji|f430f92966a7|1",
+        "id": "km-080-m03"
+      },
+      {
+        "key": "km-205|kanji|6f48a64e9fbe|0",
+        "id": "km-205-m02"
+      },
+      {
+        "key": "km-205|kanji|6f48a64e9fbe|1",
+        "id": "km-205-m03"
+      },
+      {
+        "key": "km-214|kanji|3610410fe741|1",
+        "id": "km-214-m03"
+      },
+      {
+        "key": "km-207|kanji|a8fc64fb9a14|1",
+        "id": "km-207-m03"
+      },
+      {
+        "key": "km-166|kanji|517443c1fe47|1",
+        "id": "km-166-m03"
+      },
+      {
+        "key": "km-053|kanji|b09d910ff047|0",
+        "id": "km-053-m02"
+      },
+      {
+        "key": "km-053|kanji|b09d910ff047|1",
+        "id": "km-053-m03"
+      },
+      {
+        "key": "km-030|kanji|0a7f01e6ac20|0",
+        "id": "km-030-m02"
+      },
+      {
+        "key": "km-196|kanji|5e0f10ecb8f4|1",
+        "id": "km-196-m03"
+      },
+      {
+        "key": "km-209|kanji|7b7cfeb9c1fd|2",
+        "id": "km-209-m04"
+      },
+      {
+        "key": "km-049|kanji|712bbd02db31|0",
+        "id": "km-049-m02"
+      },
+      {
+        "key": "km-049|kanji|712bbd02db31|1",
+        "id": "km-049-m03"
+      },
+      {
+        "key": "km-049|kanji|712bbd02db31|3",
+        "id": "km-049-m04"
+      },
+      {
+        "key": "km-049|kanji|712bbd02db31|4",
+        "id": "km-049-m05"
+      },
+      {
+        "key": "km-257|kanji|218e47b68ffe|1",
+        "id": "km-257-m03"
+      },
+      {
+        "key": "km-056|kanji|820d3f5bbd61|0",
+        "id": "km-056-m02"
+      },
+      {
+        "key": "km-197|kanji|899c8cd3e8da|0",
+        "id": "km-197-m02"
+      },
+      {
+        "key": "km-197|kanji|899c8cd3e8da|1",
+        "id": "km-197-m03"
+      }
+    ],
     "kotoba-mine": []
   }
 }

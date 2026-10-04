@@ -171,6 +171,11 @@ function sentenceNodes(card, { blank, ruby }) {
       out.append(el('span', 'kp-blank', card.hint ? `〔${card.hint}〕` : '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
       return;
     }
+    if (isTarget === 3 && blank) {
+      // the word again later in the passage: blanked too, without the hint
+      out.append(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
+      return;
+    }
     const hasRuby = reading && KANJI.test(text);
     let node;
     if (hasRuby && (ruby === 'all' || (ruby === 'tap' && ui.shown.has(i)))) {
