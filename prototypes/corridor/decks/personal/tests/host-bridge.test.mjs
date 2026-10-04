@@ -154,7 +154,7 @@ test('dictionary worker error is canceled while pending requests reject and the 
   assert.equal(retryWorker.terminated,false);
 });
 
-test('service worker resolves an uncached offline shard to a network-error response and serves cached core without network',async () => {
+test('service worker returns an uncached 503 for missing offline content and serves cached core without network',async () => {
   const source = readFileSync(new URL('../../../sw.js',import.meta.url),'utf8');
   const handlers = new Map();
   let cacheHit, networkRequests = 0;
@@ -181,12 +181,13 @@ test('service worker resolves an uncached offline shard to a network-error respo
     assert.ok(responsePromise,'The actual service worker must handle same-origin content');
     return responsePromise;
   };
-  // A failed optional index remains a real network error for the consumer,
-  // while the service worker's own respondWith promise no longer rejects.
+  // A missing optional index is explicitly unsuccessful. A 503 lets the
+  // consumer show its retry UI without WebKit reporting a SW response error.
   const unavailable = await requestContent('https://example.invalid/data/share_alike/dict-v2/index.json');
-  assert.equal(unavailable.type,'error');
-  assert.equal(unavailable.status,0);
+  assert.equal(unavailable.status,503);
   assert.equal(unavailable.ok,false);
+  assert.equal(unavailable.headers.get('Cache-Control'),'no-store');
+  assert.match(await unavailable.text(),/not available offline/);
   assert.equal(networkRequests,1);
   cacheHit = new Response(JSON.stringify({words:{'本':{r:'ほん',m:['book']}}}),{
     headers:{'Content-Type':'application/json'},

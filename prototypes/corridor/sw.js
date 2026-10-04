@@ -111,7 +111,10 @@ self.addEventListener('fetch', (event) => {
             }
             return res;
           }),
-      ).catch(() => Response.error()),
+      ).catch(() => new Response('This file is not available offline.', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
+      })),
     );
     return;
   }
