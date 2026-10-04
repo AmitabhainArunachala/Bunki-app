@@ -2201,6 +2201,25 @@ async function boot() {
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
   loadStore();
   setKairoTheme(themeId());
+  // A private collection boots from the cached app shell alone. Its content
+  // arrives through the learner's file picker, never a public repository URL.
+  if (params.get('deck') === 'personal') {
+    document.body.dataset.view = 'personaldeck';
+    window.__DRIFT__?.hide();
+    const personal = await import('./decks/personal/mount.mjs');
+    await personal.mount($('#app'), {
+      themes: PUBLIC_THEME_IDS.map((id) => THEME_UI.find((t) => t.id === id)),
+      currentTheme: themeId(),
+      onTheme: setKairoTheme,
+      onLeave() {
+        const url = new URL(location.href);
+        url.searchParams.delete('deck');
+        url.searchParams.set('dojo', '1');
+        location.assign(url);
+      },
+    });
+    return;
+  }
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) {
@@ -2213,6 +2232,7 @@ async function boot() {
   }
   if (S.variants.entry === 'field') S.view = 'entry';
   if (S.variants.entry === 'drift') S.view = 'drift';
+  if (params.get('dojo') === '1') S.view = 'dojo';
   // Phone reps: ?deck=context opens 文脈札 directly. It does not change the
   // stored front door, and it does not open the operator variant strip.
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
@@ -10690,6 +10710,11 @@ function renderDojoDecks(main) {
     b.addEventListener('click', onClick);
     list.append(b);
   };
+  row('personal', '私の文脈', tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
+    const url = new URL(location.href);
+    url.searchParams.set('deck', 'personal');
+    location.assign(url);
+  });
   for (const d of DOJO_DECKS) {
     const sum = deckSummaries[d.id];
     if (!sum && window.__CORRIDOR_STANDALONE__ !== true) {

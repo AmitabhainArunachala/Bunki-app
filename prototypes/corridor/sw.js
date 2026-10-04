@@ -16,13 +16,15 @@
 // v4: the context deck (文脈札) joined the shell
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
 // v6: those passages left the shelf; the deck player joined the shell
-const VERSION = 'kairo-v9-two-decks';
+const VERSION = 'kairo-v11-personal-collections';
 const SHELL = [
   '.',
   'index.html',
   'corridor.css',
   'corridor.js',
   'corridor-ink.js',
+  'fonts.css',
+  'vendor/ts-fsrs.mjs',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',
@@ -42,6 +44,12 @@ const SHELL = [
   'decks/player/engine.js',
   'decks/player/mount.js',
   'decks/player/player.css',
+  // Private data lives in IndexedDB; only the reader and scheduler are cached.
+  'decks/personal/mount.mjs',
+  'decks/personal/engine.mjs',
+  'decks/personal/schema.mjs',
+  'decks/personal/store.mjs',
+  'decks/personal/personal.css',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
   'decks/context-dense/mount.js',
