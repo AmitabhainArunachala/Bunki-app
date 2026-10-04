@@ -3,23 +3,39 @@
     <span class="chip lvchip">{{Source}}</span><span class="chip">{{Topic}}</span>
   </div>
   <div class="sentence">{{furigana:SentenceFurigana}}</div>
+  <!-- the back's tiers (docs/srs/CARD_CONTRACT_V2.md §3), as in the player: tier one is the
+  word, reading, part of speech and the Japanese definition; tier two is folds, in order -->
   <div class="answer">
     <div class="word">
-      <span class="term">{{Word}}</span><span class="reading">{{Reading}}</span>
+      <span class="term">{{Word}}</span><span class="reading">{{Reading}}</span
+      ><span class="posbadge"></span>
     </div>
-    {{#Kanji}}
-    <div class="kanji">{{Kanji}}</div>
-    {{/Kanji}}
     <div class="def">{{DefJA}}</div>
-    <div class="meaning">{{Meaning}}</div>
-    {{#SentenceEN}}
-    <details class="en">
-      <summary>英訳</summary>
-      {{SentenceEN}}
-    </details>
-    {{/SentenceEN}} {{#Tip}}
-    <div class="tip">{{Tip}}</div>
-    {{/Tip}}
+    <div class="folds">
+      <details class="fold gloss">
+        <summary>英語</summary>
+        <div class="meaning">{{Meaning}}</div>
+        {{#Tip}}
+        <div class="tip"><span class="tip-label">注 </span>{{Tip}}</div>
+        {{/Tip}}
+      </details>
+      {{#SentenceEN}}
+      <details class="fold en">
+        <summary>英訳</summary>
+        {{SentenceEN}}
+      </details>
+      {{/SentenceEN}} {{#Kanji}} {{#Hint}}
+      <details class="fold kfold">
+        <summary>漢字の形と意味</summary>
+        <div class="kanji">{{Kanji}}</div>
+      </details>
+      {{/Hint}} {{^Hint}}
+      <details class="fold kfold" open>
+        <summary>漢字の形と意味</summary>
+        <div class="kanji">{{Kanji}}</div>
+      </details>
+      {{/Hint}} {{/Kanji}}
+    </div>
     <div class="src">
       出典 {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
       >{{/SourceURL}}

@@ -104,27 +104,67 @@
 .def {
   font-size: 17px;
 }
+/* tier two: one tap each; English is never coloured, never bold */
+.folds {
+  margin-top: 6px;
+  border-top: 1px solid rgba(128, 128, 128, 0.35);
+}
+.fold {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+  padding: 8px 0;
+}
+.fold summary {
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.8;
+}
+.fold[open] summary {
+  margin-bottom: 6px;
+}
 .meaning {
   font-size: 15px;
-  font-weight: 600;
-  color: #0e8f53;
-}
-.nightMode .meaning {
-  color: #3ee391;
+  opacity: 0.8;
 }
 .en {
   font-size: 14px;
-  opacity: 0.75;
+}
+.fold.en {
+  opacity: 0.85;
 }
 .tip {
   font-size: 13px;
-  border-left: 3px solid #b86e00;
-  padding-left: 10px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+.tip-label {
+  opacity: 0.7;
+}
+.posbadge {
+  font-size: 12px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin-left: 4px;
+  vertical-align: middle;
   opacity: 0.85;
 }
-details.en summary {
-  cursor: pointer;
-  font-size: 12px;
+.pos-noun .posbadge::after {
+  content: '名詞';
+}
+.pos-verb .posbadge::after {
+  content: '動詞';
+}
+.pos-adj .posbadge::after {
+  content: '形容詞';
+}
+.pos-adv .posbadge::after {
+  content: '副詞';
+}
+.pos-expr .posbadge::after {
+  content: '表現';
+}
+.pos-sound .posbadge::after {
+  content: '擬音語';
 }
 .src {
   font-size: 12px;

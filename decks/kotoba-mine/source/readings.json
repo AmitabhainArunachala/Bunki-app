@@ -75,6 +75,38 @@
       "before": "",
       "cards": ["km-098-m01", "km-098-m02", "km-098-1"],
       "note": "the source passage spells it 甲賀（こうか） (source/review/b4.json)"
+    },
+    {
+      "surface": "璃",
+      "reading": "り",
+      "after": "斉藤愛",
+      "before": "",
+      "cards": ["km-149-m03"],
+      "note": "the golfer 斉藤愛璃 (あいり); UniDic gives 璃 no reading"
+    },
+    {
+      "surface": "豆",
+      "reading": "とう",
+      "after": "鹹",
+      "before": "漿",
+      "cards": ["km-298-m02"],
+      "note": "鹹豆漿 (かんとうしょう, Taiwanese salty soy milk), not まめ"
+    },
+    {
+      "surface": "漿",
+      "reading": "しょう",
+      "after": "鹹豆",
+      "before": "",
+      "cards": ["km-298-m02"],
+      "note": "鹹豆漿; UniDic gives 漿 no reading"
+    },
+    {
+      "surface": "元",
+      "reading": "げん",
+      "after": "（25",
+      "before": "）",
+      "cards": ["km-298-m02"],
+      "note": "25元, the Taiwanese yuan, not もと"
     }
   ]
 }
