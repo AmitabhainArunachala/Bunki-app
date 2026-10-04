@@ -80,7 +80,22 @@ export function cardTokens(card, file = null) {
   if (!rows && file?.format === TOKENS_FORMAT && card && Object.hasOwn(file.cards || {}, card.id)) {
     rows = file.passages?.[file.cards[card.id]] || null;
   }
-  if (!rows) return null;
+  return decodeTokens(rows, card?.ja, file);
+}
+
+/**
+ * A word's Japanese definition as tokens, decoded like a passage: from the side file's defs
+ * (build.py tokens_file) or, for a deck that carries its tokens inline, deck.defTokens; null
+ * when neither holds this word or the rows do not spell word.defJa.
+ */
+export function defTokens(word, file = null, deck = null) {
+  const own = (table) => (table && word && Object.hasOwn(table, word.id) ? table[word.id] : null);
+  const rows = (file?.format === TOKENS_FORMAT ? own(file.defs) : null) || own(deck?.defTokens);
+  return decodeTokens(rows, word?.defJa, file);
+}
+
+function decodeTokens(rows, text, file) {
+  if (!Array.isArray(rows) || typeof text !== 'string') return null;
   let at = 0;
   const out = rows.map(([s, b = '', r = '', k = '', ref = '']) => {
     const kind = TOKEN_KINDS.includes(k) ? k : 'other';
@@ -89,7 +104,7 @@ export function cardTokens(card, file = null) {
     at += s.length;
     return tok;
   });
-  return out.map((t) => t.s).join('') === card.ja ? out : null;
+  return out.map((t) => t.s).join('') === text ? out : null;
 }
 
 export function createScheduler(fsrsApi, pin) {
@@ -114,9 +129,32 @@ export function createScheduler(fsrsApi, pin) {
  *   repairs    { [cardId]: { at, lapses, hint?, swap?, keep? } } — what the repair ladder did
  *              to a leech: a front hint, the card that replaced it, or 'carry on as it is'
  *   repairLog  [[cardId, action, iso, detail?]] — every delete, restore and ladder choice
+ *   lookups    [[iso, cardId, where, surface, key, depth]] — the words the learner tapped on a
+ *              back to look up (STANDARD A44), for the sensei: where 'p' the passage, 'd' the
+ *              definition, 's' a definition inside the entry sheet; key 'deck:<word id>' for a
+ *              word of this deck, else the host entry 'word:<id>' | 'kanji:<c>' | 'grammar:<id>',
+ *              '' when nothing was found; depth 1 from the card, 2 from a sheet. Capture, never
+ *              evidence: nothing schedules from it, and a lookup changes no other key.
  */
 export function emptyState(deckId) {
-  return { format: STATE_FORMAT, version: VERSION, deckId, cards: {}, groupsOff: [], log: [], suspended: {}, repairs: {}, repairLog: [] };
+  return { format: STATE_FORMAT, version: VERSION, deckId, cards: {}, groupsOff: [], log: [], suspended: {}, repairs: {}, repairLog: [], lookups: [] };
+}
+
+export const LOOKUP_KEEP = 2000;
+const LOOKUP_WHERE = ['p', 'd', 's'];
+const isLookup = (row) =>
+  Array.isArray(row) &&
+  isIso(row[0]) &&
+  typeof row[1] === 'string' &&
+  LOOKUP_WHERE.includes(row[2]) &&
+  typeof row[3] === 'string' &&
+  typeof row[4] === 'string' &&
+  Number.isInteger(row[5]);
+
+/** the ledger with one more lookup row; every other key, the FSRS records first, is the same object */
+export function logLookup(state, { cardId, where, surface, key = '', depth = 1 }, now) {
+  const row = [now.toISOString(), String(cardId || ''), LOOKUP_WHERE.includes(where) ? where : 'p', String(surface || ''), String(key || ''), Math.max(1, Math.trunc(depth) || 1)];
+  return { ...state, lookups: [...(Array.isArray(state.lookups) ? state.lookups : []).slice(-(LOOKUP_KEEP - 1)), row] };
 }
 
 const SUSPEND_BY = ['delete', 'swap', 'leech'];
@@ -205,6 +243,8 @@ export function normalizeState(raw, deck) {
     groupsOff: Array.isArray(raw.groupsOff) ? raw.groupsOff.filter((g) => typeof g === 'string') : [],
     log: Array.isArray(raw.log) ? raw.log.slice(-LOG_KEEP) : [],
     ...cleanRepairs(raw),
+    // absent in ledgers from before the tap (A44): read as none
+    lookups: (Array.isArray(raw.lookups) ? raw.lookups : []).filter(isLookup).slice(-LOOKUP_KEEP),
   };
 }
 

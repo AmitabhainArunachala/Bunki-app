@@ -272,3 +272,50 @@ describe('kotoba player engine: 読んで思い出す leaves 字 cards out witho
     expect(engine.learningSoon(mcd, s, T, 0).map((x) => x.id)).toEqual(['p1k']);
   });
 });
+
+describe('kotoba player engine: lookups[] (the tap on the back, STANDARD A44) is capture, never evidence', () => {
+  const tap = { cardId: 'c1', where: 'p', surface: '人口', key: 'word:人口', depth: 1 };
+
+  it('a ledger from before the tap reads as no lookups; well-formed rows are kept, malformed ones dropped', () => {
+    const old = { ...emptyState('demo') };
+    delete old.lookups;
+    expect(normalizeState(old, deck).lookups).toEqual([]);
+    const row = [T.toISOString(), 'c1', 'd', '利息', 'deck:w', 2];
+    const kept = normalizeState(
+      {
+        ...emptyState('demo'),
+        lookups: [row, ['x'], [T.toISOString(), 'c1', 'q', 'a', '', 1], 'bad'],
+      },
+      deck,
+    );
+    expect(kept.lookups).toEqual([row]);
+  });
+
+  it('logLookup adds one row and leaves every scheduler key the same object', () => {
+    const before = firstGood();
+    const after = engine.logLookup(before, tap, T);
+    expect(after.lookups).toEqual([[T.toISOString(), 'c1', 'p', '人口', 'word:人口', 1]]);
+    for (const key of ['cards', 'log', 'groupsOff', 'suspended', 'repairs', 'repairLog'])
+      expect(after[key]).toBe(before[key]);
+    expect(engine.buildQueue(deck, after, T, 5)).toEqual(engine.buildQueue(deck, before, T, 5));
+    expect(normalizeState(JSON.parse(JSON.stringify(after)), deck).lookups).toEqual(after.lookups);
+  });
+
+  it('keeps the last LOOKUP_KEEP rows', () => {
+    let s = emptyState('demo');
+    s = {
+      ...s,
+      lookups: Array.from({ length: engine.LOOKUP_KEEP }, () => [
+        T.toISOString(),
+        'c1',
+        'p',
+        'a',
+        '',
+        1,
+      ]),
+    };
+    const next = engine.logLookup(s, { ...tap, surface: 'last' }, T);
+    expect(next.lookups).toHaveLength(engine.LOOKUP_KEEP);
+    expect(next.lookups.at(-1)[3]).toBe('last');
+  });
+});

@@ -17,11 +17,13 @@ import {
   buildQueue,
   cardTokens,
   createScheduler,
+  defTokens,
   grade,
   indexDeck,
   inspectState,
   isLeech,
   learningSoon,
+  logLookup,
   normalizeState,
   preview,
   repairCard,
@@ -59,6 +61,8 @@ async function loadDeck(deckId) {
 /* the deck's tokens side file (deck.tokens, build.py with_tokens), fetched once, on demand:
  * only a host lexicon has anything to do with them, so nothing loads them at start */
 const tokenFiles = new Map();
+/** deck → its tokens once they have arrived, so a repaint draws the back's taps at once */
+const tokensReady = new Map();
 function loadTokens(deckId, deck) {
   if (typeof deck?.tokens !== 'string') return Promise.resolve(null);
   if (!tokenFiles.has(deckId)) {
@@ -106,8 +110,8 @@ export function hostAdapter() {
 const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0 };
-let ctx = null; // { root, deck, index, storage, onLeave, openEntry, host, state, prefs, notice }
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
+let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
 /** the ledger as it was just before a restore replaced it */
@@ -263,12 +267,16 @@ function sentenceEnds(ja) {
  * 'none' (what the front forces); split: wrap each sentence of a passage in .kp-s, the one
  * holding the target marked data-focus, so the back can dim the others (zoom); clamp (the back
  * only): the sentences before and after the target each in a .kp-ctx group that 焦点 folds to
- * two dimmed lines with a ⋯ to open it (STANDARD A38) */
-export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false }) {
+ * two dimmed lines with a ⋯ to open it (STANDARD A38); taps (the back only, STANDARD A44):
+ * { units, onTap } — each unit ({ at, len }, tapUnits) becomes one .kp-tok tap target over its
+ * characters, and the target itself opens the card's own word (unit { self: true }) */
+export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
     ruby = 'none';
     clamp = false;
+    taps = null; // the front has nothing to tap, whatever is asked
   }
+  const cover = taps ? coverOf(card.ja.length, taps.units) : null;
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
@@ -281,14 +289,28 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     out.append(host);
   };
   open();
-  const put = (node, isTarget, len) => {
+  // a piece inside a tap unit goes into that unit's .kp-tok, which continues across segments
+  // (one word, several ruby segments) until a sentence starts a new host
+  const put = (node, isTarget, len, unit = null) => {
     if (split && isTarget === 1) host.dataset.focus = '1';
-    host.append(node);
+    if (unit) {
+      let tok = host.lastChild;
+      if (!(tok && tok.kpUnit === unit)) {
+        tok = tapNode(el('span', 'kp-tok'), unit, taps.onTap);
+        host.append(tok);
+      }
+      tok.append(node);
+    } else host.append(node);
     at += len;
     while (split && k < ends.length - 1 && at >= ends[k]) {
       k++;
       open();
     }
+  };
+  /** the unit that covers [a, a + len) whole, or null */
+  const unitOver = (a, len) => {
+    const u = cover?.[a];
+    return u && u.at + u.len >= a + len ? u : null;
   };
   card.ruby.forEach(([text, reading, isTarget]) => {
     const len = text.length;
@@ -298,17 +320,26 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     const hasRuby = reading && KANJI.test(text) && ruby === 'all';
     if (isTarget) {
       const wrap = el('span', 'kp-target', hasRuby ? el('ruby', null, text, el('rt', null, reading)) : text);
+      // the card's own word: its tap says it is in this deck (no 覚える)
+      if (taps) tapNode(wrap, SELF_UNIT, taps.onTap);
       return put(wrap, isTarget, len);
     }
-    if (hasRuby) return put(el('ruby', null, text, el('rt', null, reading)), 0, len);
-    // plain text may hold a sentence end: cut it there so each sentence keeps its own words
+    if (hasRuby) return put(el('ruby', null, text, el('rt', null, reading)), 0, len, unitOver(at, len));
+    // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
+    // own words and each word its own tap target
     let rest = text;
-    while (split && rest && k < ends.length - 1 && at + rest.length > ends[k]) {
-      const cut = ends[k] - at;
-      put(document.createTextNode(rest.slice(0, cut)), 0, cut);
+    while (rest) {
+      let cut = rest.length;
+      if (split && k < ends.length - 1 && at + cut > ends[k]) cut = ends[k] - at;
+      if (cover) {
+        const u = cover[at];
+        let j = 1;
+        while (j < cut && cover[at + j] === u) j++;
+        cut = j;
+      }
+      put(document.createTextNode(rest.slice(0, cut)), 0, cut, cover ? cover[at] : null);
       rest = rest.slice(cut);
     }
-    if (rest) put(document.createTextNode(rest), 0, rest.length);
   });
   if (clamp && split) clampContext(out);
   return out;
@@ -370,6 +401,8 @@ function paint() {
   root.append((screens[ui.screen] || homeScreen)());
   fitBar();
   fitClamps(root);
+  ui.pop = null; // its word was just redrawn
+  if (ui.sheet) drawSheet({ focus: false });
 }
 /** on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card */
 function fitBar() {
@@ -457,6 +490,7 @@ function homeScreen() {
 function go(screen) {
   ui.screen = screen;
   ui.toast = '';
+  ui.sheet = null;
   paint();
   window.scrollTo(0, 0);
 }
@@ -476,6 +510,7 @@ function startSession() {
   ui.rail = 0;
   refill();
   resetCard();
+  wantTokens();
   go('study');
 }
 
@@ -483,6 +518,8 @@ function resetCard() {
   ui.revealed = false;
   ui.seen = false;
   ui.picked = null;
+  ui.sheet = null;
+  ui.pop = null;
 }
 
 /** pull learning steps that came due back into the sitting, right after the
@@ -560,7 +597,7 @@ function studyScreen() {
     chips.append(zoomToggle(zoom));
   }
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
-  face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
+  face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
   const repaired = ctx.state.repairs?.[id]?.hint;
   if (repaired) face.dataset.repaired = 'hint';
 
@@ -721,7 +758,8 @@ function answerBlock(card, word) {
   a.lang = 'ja';
   const pos = (POS[word.pos] || ['', ''])[1] || word.pos;
   a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
-  a.append(el('p', 'kp-def', word.defJa));
+  // the definition's words are tap targets like the passage's (STANDARD A44)
+  a.append(defLine(card, word));
   // a usage note in Japanese stays in tier one; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
   if (jaNote) a.append(el('p', 'kp-note', word.tip));
@@ -873,6 +911,440 @@ function seeAlsoLine(card, word) {
     }
   }
   return line;
+}
+
+/* ------------------------------------------------ tap → define → 覚える (CARD_CONTRACT_V2 §3, STANDARD A44)
+ * After the reveal only, every word of the passage and of the Japanese definition is a tap
+ * target (a word, a kanji, a grammar cue as one, and any word of this deck; particles, endings
+ * and punctuation are not words and stay plain). With a host lexicon (the corridor) a tap opens
+ * the entry sheet: the reading, the Japanese sense, English behind 英語, and the reader's 覚える
+ * chooser; a word of this deck says 「このデッキにあります」 and offers no chooser (A17). A word in
+ * the sheet's definition opens one more sheet, and that second one says 「ここで止めよう」 and offers
+ * no further tap (Khatz's cut-off). Without a host (the standalone study pages) only this deck's
+ * own words are tappable, from the page's built-in gloss map, and a tap shows a small popover with
+ * no 覚える. A tap is capture, never evidence: it never grades, never changes a card's schedule and
+ * never adds a card; it is written to the ledger's lookups[] for the sensei and nowhere else. */
+const SHEET_DEPTH = 2;
+const IN_DECK = 'このデッキにあります';
+const STOP_HERE = 'ここで止めよう';
+const NO_JA = 'この語の日本語の語釈は、まだ辞書にありません';
+const NOT_FOUND = 'この語は辞書にありません';
+const NO_TAKE_HERE = 'ここでは覚えるに保存できません（回廊でできます）';
+const TAKE_NOTE = '覚えるの札に入ります — このデッキの予定は変わりません';
+const SELF_UNIT = Object.freeze({ self: true });
+const GLOSS_FORMAT = 'bunki-cloze-gloss';
+const ENTRY_KIND = { word: '語', kanji: '字', grammar: '文法' };
+
+/** the standalone page's built-in gloss map (build.py gloss_map), or null */
+function glossFor(deckId, deck) {
+  const g = window.__CORRIDOR_BUNDLE__?.[`decks/${deckId}/gloss`];
+  return g?.format === GLOSS_FORMAT && g.deck === deck.id ? g : null;
+}
+
+/** with a host: fetch the deck's tokens once a sitting starts (never at the deck home) and, if
+ * the card on screen is already turned over, give its back its tap targets */
+function wantTokens() {
+  if (!ctx.host || ctx.tokenFile || typeof ctx.deck.tokens !== 'string') return;
+  const { deck, deckKey } = ctx;
+  loadTokens(deckKey, deck).then((file) => {
+    if (!file) return;
+    tokensReady.set(deckKey, file);
+    if (ctx?.deck !== deck || ctx.tokenFile) return;
+    ctx.tokenFile = file;
+    if (ui.screen === 'study' && ui.revealed) upgradeTaps();
+  });
+}
+
+/** character offset → the unit covering it, or null */
+function coverOf(n, units) {
+  const out = new Array(n).fill(null);
+  for (const u of units || []) for (let i = Math.max(0, u.at); i < Math.min(n, u.at + u.len); i++) out[i] = u;
+  return out;
+}
+
+const termMaps = new WeakMap();
+/** the word of this deck a token stands for: its lemma, its ref or its surface is a deck term
+ * (build.py gloss_map follows the same rule) */
+function deckWordOf(t) {
+  let map = termMaps.get(ctx.deck);
+  if (!map) {
+    map = new Map(ctx.deck.words.map((w) => [w.term, w]));
+    termMaps.set(ctx.deck, map);
+  }
+  for (const key of [t?.b, t?.ref, t?.s]) if (key && map.has(key)) return map.get(key);
+  return null;
+}
+
+/** tokens → tap units { at, len, tok, word }: a 語, a 字, a 文法 cue (its tokens joined), or any
+ * token that is a word of this deck */
+function unitsOfTokens(tokens) {
+  const out = [];
+  for (const t of tokens) {
+    const word = deckWordOf(t);
+    if (t.k === 'other' && !word) continue;
+    const last = out.at(-1);
+    if (!word && t.k === '文法' && last && !last.word && last.tok.k === '文法' && last.tok.ref === t.ref && last.at + last.len === t.at) {
+      last.len += t.s.length;
+      last.tok = { ...last.tok, s: last.tok.s + t.s, b: last.tok.b + t.s };
+      continue;
+    }
+    out.push({ at: t.at, len: t.s.length, tok: t, word });
+  }
+  return out;
+}
+/** the gloss map's spans → tap units { at, len, word } */
+function unitsOfSpans(spans) {
+  return (Array.isArray(spans) ? spans : []).map(([at, len, wi]) => ({ at, len, word: ctx.deck.words[wi] })).filter((u) => u.word && Number.isInteger(u.at) && u.len > 0);
+}
+/** the passage's tap units, or null: nothing to look words up in (no host and no gloss map), or
+ * the tokens are still on their way */
+function passageUnits(card) {
+  if (ctx.host) {
+    const toks = cardTokens(card, ctx.tokenFile);
+    return toks ? unitsOfTokens(toks) : null;
+  }
+  return ctx.gloss ? unitsOfSpans(ctx.gloss.cards?.[card.id]) : null;
+}
+function defUnits(word) {
+  if (ctx.host) {
+    const toks = defTokens(word, ctx.tokenFile, ctx.deck);
+    return toks ? unitsOfTokens(toks) : null;
+  }
+  return ctx.gloss ? unitsOfSpans(ctx.gloss.defs?.[word.id]) : null;
+}
+
+/** the back's passage taps for sentenceNodes, or null */
+function backTaps(card, word) {
+  const units = passageUnits(card);
+  if (!units) return null;
+  return { units, onTap: (unit, node) => tapped(unit === SELF_UNIT ? { word } : unit, node, { card, where: 'p', depth: 1 }) };
+}
+
+let downAt = null;
+/** a click that ends a drag (a swipe, a scroll) is not a tap */
+function dragged(e) {
+  return e.detail > 0 && !!downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 10;
+}
+function onDown(e) {
+  downAt = { x: e.clientX, y: e.clientY };
+  // a press anywhere outside the popover closes it
+  if (ui.pop && !e.target.closest?.('.kp-pop')) closePop();
+}
+
+/** make node one tap target: role button, in the tab order, no look of its own until hover or focus */
+function tapNode(node, unit, onTap) {
+  node.classList.add('kp-tok');
+  node.kpUnit = unit;
+  node.setAttribute('role', 'button');
+  node.tabIndex = 0;
+  node.setAttribute('aria-haspopup', 'dialog');
+  if (unit.word) node.dataset.deckWord = unit.word.id;
+  node.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!dragged(e)) onTap(unit, node);
+  });
+  node.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    onTap(unit, node);
+  });
+  return node;
+}
+
+/** text with its units as tap targets (a definition) */
+function tapText(text, units, onTap) {
+  if (!units?.length) return [text];
+  const out = [];
+  let at = 0;
+  for (const u of [...units].sort((a, b) => a.at - b.at)) {
+    if (u.at < at || u.at + u.len > text.length) continue;
+    if (u.at > at) out.push(text.slice(at, u.at));
+    out.push(tapNode(el('span', 'kp-tok', text.slice(u.at, u.at + u.len)), u, onTap));
+    at = u.at + u.len;
+  }
+  if (at < text.length) out.push(text.slice(at));
+  return out;
+}
+
+/** tier one's Japanese definition, its words tappable on the back */
+function defLine(card, word) {
+  const p = el('p', 'kp-def');
+  p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  return p;
+}
+
+/** the back's sentence and definition gain their tap targets in place, once the tokens arrive */
+function upgradeTaps() {
+  const id = ui.queue[ui.pos];
+  const face = ctx.root.querySelector('#kp-card');
+  if (!id || !face || face.dataset.card !== id || face.querySelector('.kp-tok')) return;
+  const { card, word } = ctx.index.cards.get(id);
+  const taps = backTaps(card, word);
+  if (!taps) return;
+  const passage = !!card.type;
+  const old = face.querySelector('.kp-sentence');
+  const opened = [...old.querySelectorAll('.kp-ctx')].map((b) => b.dataset.open || '');
+  const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps });
+  [...sentence.querySelectorAll('.kp-ctx')].forEach((b, i) => {
+    if (!opened[i]) return;
+    b.dataset.open = opened[i];
+    b.querySelector('.kp-more')?.setAttribute('aria-expanded', String(opened[i] === '1'));
+  });
+  old.replaceWith(sentence);
+  face.querySelector('.kp-answer > .kp-def')?.replaceWith(defLine(card, word));
+  fitClamps(face);
+}
+
+/** what a tap shows: a word of this deck from the deck, anything else from the host lexicon */
+function frameOf(unit) {
+  const tok = unit.tok || null;
+  const word = unit.word || (tok ? deckWordOf(tok) : null);
+  if (word) return { word, label: word.term, reading: word.reading, ja: word.defJa || '', en: word.meaning || '', key: `deck:${word.id}`, kind: '語', level: word.level || '', surface: tok?.s || word.term };
+  const entry = safely(() => ctx.host?.lookup(tok) || null, null);
+  if (entry) return { entry, label: entry.label || entry.id, reading: entry.reading || '', ja: entry.ja || '', en: entry.en || entry.gloss || '', key: `${entry.t}:${entry.id}`, kind: ENTRY_KIND[entry.t] || '', level: entry.level || '', surface: tok.s };
+  return { label: tok?.b || tok?.s || '', reading: tok?.r || '', ja: '', en: '', key: '', kind: '', level: '', surface: tok?.s || '' };
+}
+
+/** one lookup row in the ledger (engine logLookup); the card's schedule is not touched. Not stored
+ * (storage full) only means the row is missing: the tap still opens. */
+function logTap(card, where, frame, depth) {
+  const cardId = card?.id || ui.queue[ui.pos] || '';
+  const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date());
+  if (save(next)) ctx.state = next;
+}
+
+function tapped(unit, node, { card, where, depth }) {
+  const frame = frameOf(unit);
+  logTap(card, where, frame, depth);
+  if (ctx.host) openSheet(frame, node, depth);
+  else openPop(frame, node);
+}
+
+/** what the host answers, or fallback when it throws: a host fault never breaks the card */
+function safely(fn, fallback) {
+  try {
+    return fn();
+  } catch {
+    return fallback;
+  }
+}
+const currentCard = () => ctx.index.cards.get(ui.queue[ui.pos])?.card || null;
+function englishLine(cls, text) {
+  const n = el('p', cls, text);
+  n.lang = 'en';
+  return n;
+}
+
+/* -------- the entry sheet (with a host) */
+function openSheet(frame, node, depth) {
+  const prior = ui.sheet;
+  const stack = depth > 1 && prior ? [...prior.stack.slice(0, depth - 1), frame] : [frame];
+  ui.sheet = { stack, pick: null, note: '', returnTo: depth > 1 && prior ? prior.returnTo : node };
+  drawSheet();
+}
+function closeSheet() {
+  const back = ui.sheet?.returnTo;
+  ui.sheet = null;
+  ctx.root.querySelector('.kp-sheet-wrap')?.remove();
+  if (back?.isConnected) back.focus({ preventScroll: true });
+}
+/** (re)draw the sheet over the card; the card itself is not repainted, so its folds stay as they are */
+function drawSheet({ focus = true } = {}) {
+  const old = ctx.root.querySelector('.kp-sheet-wrap');
+  const scroll = old?.querySelector('.kp-sheet')?.scrollTop || 0;
+  old?.remove();
+  if (!ui.sheet || ui.screen !== 'study') return;
+  const wrap = sheetNode();
+  ctx.root.append(wrap);
+  const sheet = wrap.querySelector('.kp-sheet');
+  if (focus) sheet.querySelector('.kp-sheet-term')?.focus({ preventScroll: true });
+  else sheet.scrollTop = scroll;
+}
+function sheetNode() {
+  const { stack } = ui.sheet;
+  const depth = stack.length;
+  const f = stack[depth - 1];
+  const wrap = el('div', 'kp-sheet-wrap');
+  wrap.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (e.target === wrap) closeSheet();
+  });
+  const sheet = el('div', 'kp-sheet');
+  sheet.id = 'kp-sheet';
+  sheet.lang = 'ja';
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-labelledby', 'kp-sheet-term');
+  sheet.dataset.depth = String(depth);
+  sheet.dataset.key = f.key;
+  const top = el('div', 'kp-sheet-top');
+  if (depth > 1) {
+    top.append(btn('kp-icon kp-sheet-back', '←', () => {
+      ui.sheet = { ...ui.sheet, stack: stack.slice(0, -1), pick: null, note: '' };
+      drawSheet();
+    }, { id: 'kp-sheet-back', 'aria-label': '前の語に戻る' }));
+  }
+  const term = el('h2', 'kp-sheet-term', f.label);
+  term.id = 'kp-sheet-term';
+  term.tabIndex = -1;
+  const head = el('div', 'kp-sheet-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-sheet-reading', f.reading) : null);
+  const chips = el('div', 'kp-sheet-chips', f.kind ? el('span', 'kp-chip', f.kind) : null, f.level ? levelChip(f.level) : null);
+  top.append(head, chips, btn('kp-icon kp-sheet-x', '×', closeSheet, { id: 'kp-sheet-close', 'aria-label': '閉じる' }));
+  sheet.append(top);
+  // the Japanese sense first; its words open one more sheet, down to SHEET_DEPTH
+  if (f.ja) {
+    const def = el('p', 'kp-sheet-def');
+    const units = depth < SHEET_DEPTH && f.word ? defUnits(f.word) : null;
+    def.append(...tapText(f.ja, units, (u, node) => tapped(u, node, { card: currentCard(), where: 's', depth: depth + 1 })));
+    sheet.append(def);
+  } else sheet.append(el('p', 'kp-sheet-none', f.word || f.entry ? NO_JA : NOT_FOUND));
+  if (f.en) sheet.append(fold('kp-f-gloss kp-sheet-en', '英語', ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
+  if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', STOP_HERE));
+  if (f.word) sheet.append(el('p', 'kp-sheet-indeck', IN_DECK));
+  else if (f.entry) {
+    sheet.append(takeBlock(f));
+    // the corridor's own entry: every sense, examples, its kanji (it leaves the card for a moment)
+    sheet.append(btn('kp-link kp-sheet-full', '辞書の全項目を開く', () => {
+      const entry = f.entry;
+      closeSheet();
+      ctx.host.open(entry);
+    }, { id: 'kp-sheet-full' }));
+  }
+  wrap.append(sheet);
+  return wrap;
+}
+
+/** 覚える, as the reader asks it: one tap opens どこに保存しますか？ — 覚えるの札 always, any named
+ * lists, a new list — and nothing is saved until 保存する */
+function takeBlock(f) {
+  const box = el('div', 'kp-take-box');
+  if (safely(() => !!ctx.host.isTaken(f.entry), false)) {
+    box.append(el('p', 'kp-sheet-taken', '✓ 覚えるの札にあります'));
+    return box;
+  }
+  if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
+  const pick = ui.sheet.pick;
+  if (!pick) {
+    box.append(btn('kp-take', '覚える', () => {
+      ui.sheet.pick = { lists: [] };
+      ui.sheet.note = '';
+      drawSheet({ focus: false });
+      ctx.root.querySelector('#kp-chooser')?.scrollIntoView({ block: 'nearest' });
+    }, { id: 'kp-take', 'aria-expanded': 'false' }));
+    return box;
+  }
+  const ch = el('div', 'kp-chooser');
+  ch.id = 'kp-chooser';
+  ch.append(el('p', 'kp-chooser-q', 'どこに保存しますか？'));
+  const chips = el('div', 'kp-chooser-chips');
+  const always = el('button', 'kp-pick is-on', el('b', null, '✓ 覚えるの札'), el('small', null, '毎日の復習'));
+  always.type = 'button';
+  always.disabled = true;
+  chips.append(always);
+  const lists = safely(() => ctx.host.lists() || [], []);
+  const names = [...new Set([...lists.filter((l) => !l.always).map((l) => l.id), ...pick.lists])];
+  for (const name of names) {
+    const on = pick.lists.includes(name);
+    const size = lists.find((l) => l.id === name)?.size;
+    chips.append(btn(`kp-pick${on ? ' is-on' : ''}`, [el('b', null, `${on ? '✓ ' : ''}${name}`), el('small', null, size != null ? String(size) : '新規')], () => {
+      pick.lists = on ? pick.lists.filter((n) => n !== name) : [...pick.lists, name];
+      drawSheet({ focus: false });
+    }, { 'data-pick-list': name, 'aria-pressed': String(on) }));
+  }
+  const field = el('input', 'kp-chooser-field');
+  field.type = 'text';
+  field.id = 'kp-new-list';
+  field.placeholder = '＋ 新しいリストの名前';
+  field.setAttribute('aria-label', '新しいリストの名前');
+  const addNew = () => {
+    const name = field.value.trim();
+    if (!name) return;
+    if (!pick.lists.includes(name)) pick.lists = [...pick.lists, name];
+    drawSheet({ focus: false });
+  };
+  field.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addNew();
+    }
+  });
+  chips.append(el('div', 'kp-chooser-new', field, btn('kp-pick kp-chooser-add', '追加', addNew, { id: 'kp-new-list-add' })));
+  ch.append(chips, el('p', 'kp-chooser-note', TAKE_NOTE));
+  const saveBtn = btn('kp-take kp-take-save', pick.lists.length ? `保存する — 覚えるの札＋${pick.lists.length}` : '保存する', () => {
+    const typed = field.value.trim();
+    const chosen = typed && !pick.lists.includes(typed) ? [...pick.lists, typed] : pick.lists;
+    const ok = takeEntry(f.entry, chosen);
+    ui.sheet.pick = null;
+    ui.sheet.note = ok ? '' : '保存できませんでした';
+    drawSheet({ focus: false });
+  }, { id: 'kp-take-save' });
+  const cancel = btn('kp-pick kp-take-cancel', 'やめる', () => {
+    ui.sheet.pick = null;
+    drawSheet({ focus: false });
+  }, { id: 'kp-take-cancel' });
+  ch.append(el('div', 'kp-chooser-actions', saveBtn, cancel));
+  box.append(ch);
+  return box;
+}
+/** 覚えるの札, then each chosen list, through the host (the corridor's guarded commit) */
+function takeEntry(entry, names) {
+  try {
+    if (!names.length) return !!ctx.host.take(entry);
+    let ok = true;
+    for (const name of names) ok = !!ctx.host.take(entry, name) && ok;
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/* -------- the popover (no host: the standalone study pages) */
+function openPop(frame, node) {
+  ui.pop = { frame, node };
+  drawPop();
+}
+function closePop() {
+  ui.pop = null;
+  ctx.root.querySelector('.kp-pop')?.remove();
+}
+function drawPop() {
+  ctx.root.querySelector('.kp-pop')?.remove();
+  if (!ui.pop) return;
+  const f = ui.pop.frame;
+  const pop = el('div', 'kp-pop');
+  pop.id = 'kp-pop';
+  pop.lang = 'ja';
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-labelledby', 'kp-pop-term');
+  pop.dataset.key = f.key;
+  const term = el('b', 'kp-pop-term', f.label);
+  term.id = 'kp-pop-term';
+  pop.append(el('div', 'kp-pop-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-pop-reading', f.reading) : null, btn('kp-pop-x', '×', closePop, { id: 'kp-pop-close', 'aria-label': '閉じる' })));
+  if (f.ja) pop.append(el('p', 'kp-pop-def', f.ja));
+  if (f.en) pop.append(fold('kp-pop-en', '英語', ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
+  pop.append(el('p', 'kp-pop-note', NO_TAKE_HERE));
+  pop.addEventListener('click', (e) => e.stopPropagation());
+  pop.addEventListener('toggle', placePop, true);
+  ctx.root.append(pop);
+  placePop();
+}
+/** under the tapped word (above it when the grade bar is in the way), inside the screen */
+function placePop() {
+  const pop = ctx?.root?.querySelector('.kp-pop');
+  const node = ui.pop?.node;
+  if (!pop) return;
+  if (!node?.isConnected) return closePop();
+  const r = node.getBoundingClientRect();
+  const w = pop.offsetWidth;
+  const h = pop.offsetHeight;
+  const bar = ctx.root.querySelector('.kp-grades');
+  const floor = Math.min(innerHeight, bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().top : innerHeight) - 8;
+  let top = r.bottom + 8;
+  if (top + h > floor && r.top - 8 - h >= 8) top = r.top - 8 - h;
+  pop.style.left = `${Math.max(16, Math.min(innerWidth - 16 - w, r.left + r.width / 2 - w / 2))}px`;
+  pop.style.top = `${Math.max(8, top)}px`;
 }
 
 /* ------------------------------------------------ delete and the leech ladder (CARD_CONTRACT_V2 §4) */
@@ -1134,7 +1606,7 @@ function revealInPlace() {
     face.dataset.zoom = zoom;
     face.querySelector('.kp-chips').append(zoomToggle(zoom));
   }
-  const sentence = sentenceNodes(card, { split: passage, clamp: passage });
+  const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) });
   face.querySelector('.kp-sentence').replaceWith(sentence);
   for (const n of face.querySelectorAll('.kp-taphint, .kp-rhint')) n.remove();
   face.removeEventListener('click', reveal);
@@ -1252,9 +1724,11 @@ function arrive(ghost, dir) {
 
 function undo() {
   if (!ui.undo) return;
-  if (!save(ui.undo.state)) return saveFailed();
+  // the words looked up since stay looked up: undo takes back answers and repairs, not lookups
+  const restored = { ...ui.undo.state, lookups: ctx.state.lookups || [] };
+  if (!save(restored)) return saveFailed();
   ui.toast = '';
-  ctx.state = ui.undo.state;
+  ctx.state = restored;
   ui.queue = ui.undo.queue;
   ui.pos = ui.undo.pos;
   ui.done = ui.undo.done;
@@ -1288,11 +1762,6 @@ function attachSwipe(face) {
   face.addEventListener('pointerdown', (e) => {
     if ((x0 !== null && e.pointerId !== pid) || e.target.closest?.('button, a, summary, input, textarea')) return;
     pid = e.pointerId;
-    try {
-      face.setPointerCapture(pid); // a release outside the card still ends the swipe here
-    } catch {
-      /* a pointer the browser no longer tracks */
-    }
     x0 = e.clientX;
     y0 = e.clientY;
     dx = 0;
@@ -1302,6 +1771,15 @@ function attachSwipe(face) {
     if (x0 === null || e.pointerId !== pid) return;
     dx = e.clientX - x0;
     dy = e.clientY - y0;
+    // captured once the finger travels, not on the press: a tap on a word of the back stays a
+    // click on that word (STANDARD A44), and a release outside the card still ends the swipe here
+    if (Math.hypot(dx, dy) > 8 && !face.hasPointerCapture?.(pid)) {
+      try {
+        face.setPointerCapture(pid);
+      } catch {
+        /* a pointer the browser no longer tracks */
+      }
+    }
     const sideways = Math.abs(dx) > 2 * Math.abs(dy);
     // reduced motion: the card stays put, only its edge says which way (the buttons do the work)
     face.style.transform = sideways && motionOk() ? `translateX(${dx}px) rotate(${dx / 40}deg)` : '';
@@ -1556,6 +2034,15 @@ function restoreButton(ta, msg) {
 
 function onKey(e) {
   if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
+  // an open sheet or popover takes the keys: Escape closes it, and nothing grades behind it
+  if (ui.sheet || ui.pop) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (ui.sheet) closeSheet();
+      else closePop();
+    }
+    return;
+  }
   const mode = cardMode();
   if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
@@ -1593,22 +2080,31 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   ctx = {
     root,
     deck,
+    deckKey: deckId,
     index,
     storage,
     onLeave,
     openEntry: typeof openEntry === 'function' ? openEntry : lexicon ? (node) => lexicon.open(node) : null,
     host: lexicon,
+    // the tap source: with a host, the tokens side file (fetched once a sitting starts); without
+    // one, the page's built-in gloss map of this deck's own words (STANDARD A44)
+    tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
+    gloss: lexicon ? null : glossFor(deckId, deck),
     prefs: prefsFor(storage, deck),
   };
+  root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
   if (!sameDeck) {
     ui.screen = 'home';
     ui.queue = [];
+    ui.sheet = null;
   }
   if (!keyBound) {
     document.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', () => ui.pop && placePop(), { passive: true });
     keyBound = true;
   }
+  if (ui.screen === 'study') wantTokens();
   paint();
 }
 

@@ -59,6 +59,16 @@ class Element {
   get children() {
     return this.childNodes.filter((n) => n.nodeType === 1);
   }
+  get lastChild() {
+    return this.childNodes.at(-1) || null;
+  }
+  get classList() {
+    return {
+      add: (c) => {
+        this.className = this.className ? `${this.className} ${c}` : c;
+      },
+    };
+  }
   get textContent() {
     return this.childNodes.map((n) => n.textContent).join('');
   }
@@ -75,6 +85,7 @@ class Element {
 }
 
 let sentenceNodes;
+let cardTokens;
 beforeAll(async () => {
   globalThis.window = {
     __TSFSRS__: fsrsApi,
@@ -85,6 +96,7 @@ beforeAll(async () => {
     createTextNode: (text) => new Text(text),
   };
   ({ sentenceNodes } = await import('../prototypes/corridor/decks/player/mount.js'));
+  ({ cardTokens } = await import('../prototypes/corridor/decks/player/engine.js'));
 });
 
 const decks = [readJson('decks/kotoba-mcd/deck.json'), readJson('decks/kotoba-mine/deck.json')];
@@ -101,7 +113,8 @@ function frontProblems(node, card, blank) {
   if (els.some((n) => n.attributes.role || n.attributes.tabindex != null || n.attributes.href))
     out.push('has a tap target');
   if (els.some((n) => n.lang && n.lang !== 'ja')) out.push('has non-Japanese text');
-  if (els.some((n) => /kp-(ctx|more|tapword)/.test(n.className))) out.push('has a back-only part');
+  if (els.some((n) => /kp-(ctx|more|tapword|tok)/.test(n.className)))
+    out.push('has a back-only part');
   const text = node.textContent;
   if (!blank && text !== card.ja) out.push(`text is not the passage: ${text.slice(0, 30)}`);
   if (blank) {
@@ -140,10 +153,44 @@ describe('kotoba player: the front is the passage and nothing else (unit pin)', 
     });
   }
 
-  it('front: true wins over a ruby or clamp option passed with it', () => {
+  it('front: true wins over a ruby, clamp or taps option passed with it', () => {
     const { c } = cards.find((x) => x.c.type === 'word' && x.c.ruby.some((seg) => seg[1]));
-    const node = sentenceNodes(c, { front: true, ruby: 'all', clamp: true, split: true });
+    const taps = { units: [{ at: 0, len: 2 }], onTap() {} };
+    const node = sentenceNodes(c, { front: true, ruby: 'all', clamp: true, split: true, taps });
     expect(frontProblems(node, c, false)).toEqual([]);
+  });
+
+  it('the back with taps (STANDARD A44): each word outside the target is one tap target with its own text, the target is one, the passage reads the same', () => {
+    const side = readJson('decks/kotoba-mcd/tokens.json');
+    const bad = [];
+    for (const { c } of cards.filter((x) => x.deck === 'kotoba-mcd').slice(0, 300)) {
+      const toks = cardTokens(c, side);
+      const marks = [];
+      let at = 0;
+      for (const [t, , m] of c.ruby) {
+        if (m) marks.push([at, at + t.length]);
+        at += t.length;
+      }
+      const units = toks
+        .filter((t) => t.k !== 'other')
+        .map((t) => ({ at: t.at, len: t.s.length, text: t.s }));
+      const node = sentenceNodes(c, { split: true, taps: { units, onTap() {} } });
+      const tapped = node.all().filter((n) => /\bkp-tok\b/.test(n.className));
+      const words = tapped.filter((n) => !/kp-target/.test(n.className)).map(strip);
+      const outside = units.filter((u) => !marks.some(([a, b]) => u.at < b && u.at + u.len > a));
+      if (strip(node) !== c.ja) bad.push(`${c.id}: text changed`);
+      if (
+        !tapped.every(
+          (n) => n.attributes.role === 'button' && n.tabIndex === 0 && n.listeners === 2,
+        )
+      )
+        bad.push(`${c.id}: a tap target is not a button`);
+      if (!tapped.some((n) => /kp-target/.test(n.className)))
+        bad.push(`${c.id}: the target is not tappable`);
+      const missing = outside.filter((u) => !words.includes(u.text));
+      if (missing.length) bad.push(`${c.id}: ${missing.map((u) => u.text).join(' ')} not tappable`);
+    }
+    expect(bad.slice(0, 5)).toEqual([]);
   });
 
   it('the back reads every kanji, and its 焦点 groups keep every sentence in order around the target', () => {
