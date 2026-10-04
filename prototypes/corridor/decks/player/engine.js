@@ -1,8 +1,8 @@
 /**
  * Cloze-deck engine for the 集中道場 deck player.
  *
- * A deck is a list of words; each word has up to three sentence cards
- * (lv 1 → 3, short and plain → full and natural). One blank per card.
+ * A deck is a list of words; each word has one or more real sentences
+ * (best first). The target word is marked in each one.
  * A word's next sentence opens only after the previous one has settled
  * into review, so the same word comes back in a new sentence instead of
  * three times in one day. No DOM here; the host supplies time and storage.
@@ -14,8 +14,11 @@ export const VERSION = 1;
 
 /** FSRS card states (ts-fsrs): 0 new · 1 learning · 2 review · 3 relearning */
 const REVIEW = 2;
-/** a sibling opens once the one before it is in review with this much stability */
-const UNLOCK_STABILITY_DAYS = 2;
+/** a sibling opens once the one before it is in review with this much stability
+ * (about two weeks: the word comes back in a new sentence once the first one is known) */
+const UNLOCK_STABILITY_DAYS = 14;
+/** …or sooner when the sentence before it keeps failing: a fresh context helps a leech */
+const UNLOCK_AFTER_LAPSES = 3;
 export const LEECH_LAPSES = 6;
 export const RATINGS = { again: 1, hard: 2, good: 3, easy: 4 };
 
@@ -126,7 +129,9 @@ function nextNewCard(word, state) {
     if (!stored) {
       if (i === 0) return card;
       const prev = state.cards[word.cards[i - 1].id];
-      return prev && prev.state === REVIEW && prev.stability >= UNLOCK_STABILITY_DAYS ? card : null;
+      if (!prev) return null;
+      if (prev.state === REVIEW && prev.stability >= UNLOCK_STABILITY_DAYS) return card;
+      return (prev.lapses || 0) >= UNLOCK_AFTER_LAPSES ? card : null;
     }
   }
   return null;

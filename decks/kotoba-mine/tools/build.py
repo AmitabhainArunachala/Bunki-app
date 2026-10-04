@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Build 言葉の鉱脈 from source/v2/*.json.
+"""Build 言葉の鉱脈 from source/mined.json (real sentences) and source/v2/*.json
+(meanings, definitions, notes, and a written sentence for words nothing was mined for).
 
 Outputs
   prototypes/corridor/decks/kotoba-mine/deck.json   the 集中道場 player deck
@@ -67,12 +68,28 @@ def load() -> list[dict]:
         for m, errs in bad.items():
             print(f"✗ {m}: {errs[:3]}")
         raise SystemExit(f"{len(bad)} module(s) fail check_v2")
+    mined_path = SRC / "mined.json"
+    mined = json.loads(mined_path.read_text("utf-8")) if mined_path.exists() else {}
     mods = []
     for mid in order:
         doc = json.loads((SRC / "v2" / f"{mid}.json").read_text("utf-8"))
         by_n = {c["n"]: c for c in doc["cards"]}
-        mods.append({"id": mid, "cards": [by_n[n] for n in order[mid]["n"]]})
+        mods.append({"id": mid, "cards": [with_mined(by_n[n], mined.get(str(n))) for n in order[mid]["n"]]})
     return mods
+
+
+def with_mined(card: dict, picks: list[dict] | None) -> dict:
+    """real sentences when mining found any; otherwise the best written one, labelled as such"""
+    if picks:
+        sentences = [
+            {"lv": i + 1, "ja": p["ja"], "form": p["form"], "en": p.get("en", ""), "kind": p["kind"],
+             "src": {k: p[k] for k in ("site", "url", "licence") if p.get(k)}}
+            for i, p in enumerate(picks)
+        ]
+    else:
+        s0 = card["sentences"][0]
+        sentences = [{**s0, "lv": 1, "kind": "original", "src": {"site": "書き下ろし（このデッキ用）"}}]
+    return {**card, "sentences": sentences}
 
 
 # ------------------------------------------------------------------ ruby
@@ -134,7 +151,10 @@ def build_deck(mods: list[dict]) -> dict:
                 ruby = _ordered_for(s, c, tagger, bc)
                 if "".join(seg[0] for seg in ruby) != s["ja"]:
                     raise SystemExit(f"{wid} lv{s['lv']}: ruby does not spell the sentence")
-                cards.append({"id": f"{wid}-{s['lv']}", "lv": s["lv"], "ja": s["ja"], "form": s["form"], "en": s["en"], "ruby": ruby})
+                card = {"id": f"{wid}-{s['lv']}", "lv": s["lv"], "ja": s["ja"], "form": s["form"], "en": s["en"], "ruby": ruby, "kind": s["kind"]}
+                if s.get("src"):
+                    card["src"] = s["src"]
+                cards.append(card)
             word = {
                 "id": wid,
                 "group": m["id"],
@@ -156,7 +176,7 @@ def build_deck(mods: list[dict]) -> dict:
         "titleEn": TITLE_EN,
         "groups": [{"id": m["id"], "titleJa": GROUPS[m["id"]][0], "titleEn": GROUPS[m["id"]][1]} for m in mods],
         "words": words,
-        "provenance": "Sentences, definitions and notes are Bunki originals written for this word list.",
+        "provenance": "Sentences are real Japanese mined from the web, Tatoeba (CC BY 2.0 FR), ja.wikinews and Aozora Bunko; each card names its source. Web sentences are short quotations kept for personal study. Definitions, notes and the few sentences marked 書き下ろし were written for this word list.",
     }
 
 
@@ -202,13 +222,22 @@ def anki_furigana(ruby: list[list]) -> str:
     return "".join(out).strip()
 
 
+def front_html(card: dict) -> str:
+    """the sentence as written, target in bold, no readings (reading it is the test)"""
+    return "".join(f"<b>{html.escape(seg[0])}</b>" if len(seg) > 2 else html.escape(seg[0]) for seg in card["ruby"])
+
+
+KIND_JA = {"news": "ニュース", "blog": "ブログ", "qa": "Q&A", "company": "企業サイト", "gov": "公的機関", "literature": "文学",
+           "tatoeba": "Tatoeba", "example-bank": "例文集", "other": "ウェブ", "original": "書き下ろし"}
+
+
 def blank_html(card: dict) -> str:
     return "".join(
         '<span class="blank">［　　］</span>' if len(seg) > 2 else html.escape(seg[0]) for seg in card["ruby"]
     )
 
 
-FIELDS = ["Key", "Sort", "Topic", "Level", "Word", "Reading", "Meaning", "DefJA", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip"]
+FIELDS = ["Key", "Sort", "Topic", "Level", "Kind", "Word", "Reading", "Meaning", "DefJA", "SentenceFront", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip", "Source", "SourceURL"]
 
 
 def note_rows(deck: dict) -> list[dict]:
@@ -218,8 +247,8 @@ def note_rows(deck: dict) -> list[dict]:
         for card in w["cards"]:
             rows.append({
                 "Key": card["id"],
-                # all level-1 sentences first (in mining order), then level 2, then 3:
-                # a word comes back in a new sentence days later, never twice at once
+                # every word's best sentence first (in mining order), then second sentences …:
+                # a word comes back in a new sentence weeks later, never twice at once
                 "Sort": f"{card['lv']}-{wi:04d}",
                 "Topic": groups[w["group"]]["titleJa"],
                 "Level": str(card["lv"]),
@@ -227,7 +256,11 @@ def note_rows(deck: dict) -> list[dict]:
                 "Reading": html.escape(w["reading"]),
                 "Meaning": html.escape(w["meaning"]),
                 "DefJA": html.escape(w["defJa"]),
+                "Kind": card["kind"],
+                "SentenceFront": front_html(card),
                 "SentenceBlank": blank_html(card),
+                "Source": html.escape(card.get("src", {}).get("site") or KIND_JA.get(card["kind"], "")),
+                "SourceURL": html.escape(card.get("src", {}).get("url", "")),
                 "SentenceFurigana": anki_furigana(card["ruby"]),
                 "SentenceEN": html.escape(card["en"]),
                 "Tip": html.escape(w.get("tip", "")),
@@ -246,11 +279,11 @@ def build_anki(deck: dict) -> None:
 
     tdir = HERE / "anki"
     model = genanki.Model(
-        stable_id("kotoba-mine-cloze-v2"),
-        "Kotoba Mine Cloze",
+        stable_id("kotoba-mine-sentence-v3"),
+        "Kotoba Mine Sentence",
         fields=[{"name": f} for f in FIELDS],
         templates=[{
-            "name": "Cloze",
+            "name": "Read",
             "qfmt": (tdir / "front.html").read_text("utf-8"),
             "afmt": (tdir / "back.html").read_text("utf-8"),
         }],
@@ -266,11 +299,11 @@ def build_anki(deck: dict) -> None:
     root = f"{TITLE_JA} Kotoba Mine"
     decks = {}
     for g in deck["groups"]:
-        d = genanki.Deck(stable_id(f"kotoba-mine-v2-{g['id']}"), f"{root}::{g['titleJa']}")
+        d = genanki.Deck(stable_id(f"kotoba-mine-v3-{g['id']}"), f"{root}::{g['titleJa']}")
         d.description = html.escape(g["titleEn"])
         decks[g["id"]] = d
     for i, r in enumerate(note_rows(deck)):
-        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[DECK_ID, f"level{r['Level']}", f"topic::{r['_group']}"], sort_field=r["Sort"], due=i)
+        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[DECK_ID, f"sentence{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}"], sort_field=r["Sort"], due=i)
         decks[r["_group"]].add_note(note)
     genanki.Package(list(decks.values())).write_to_file(str(RELEASE / "kotoba-mine.apkg"))
 
@@ -278,7 +311,7 @@ def build_anki(deck: dict) -> None:
 def build_tsv(deck: dict) -> None:
     lines = ["#separator:tab", "#html:true", f"#columns:{chr(9).join(FIELDS)}\tTags"]
     for r in note_rows(deck):
-        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{DECK_ID} level{r['Level']}"]))
+        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{DECK_ID} sentence{r['Level']} source::{r['Kind']}"]))
     (RELEASE / "kotoba-mine.tsv").write_text("\n".join(lines) + "\n", "utf-8")
 
 

@@ -1,6 +1,6 @@
-<div class="km lv{{Level}}">
+<div class="km kind-{{Kind}}">
   <div class="chips">
-    <span class="chip lvchip">文 {{Level}}/3</span><span class="chip">{{Topic}}</span>
+    <span class="chip lvchip">{{Source}}</span><span class="chip">{{Topic}}</span>
   </div>
   <div class="sentence">{{furigana:SentenceFurigana}}</div>
   <div class="answer">
@@ -9,9 +9,17 @@
     </div>
     <div class="def">{{DefJA}}</div>
     <div class="meaning">{{Meaning}}</div>
-    <div class="en">{{SentenceEN}}</div>
-    {{#Tip}}
+    {{#SentenceEN}}
+    <details class="en">
+      <summary>英訳</summary>
+      {{SentenceEN}}
+    </details>
+    {{/SentenceEN}} {{#Tip}}
     <div class="tip">{{Tip}}</div>
     {{/Tip}}
+    <div class="src">
+      出典 {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
+      >{{/SourceURL}}
+    </div>
   </div>
 </div>

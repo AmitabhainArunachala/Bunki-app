@@ -19,20 +19,31 @@
   border-left: 4px solid #0e8f53;
   padding-left: 14px;
 }
-.km.lv2 {
+/* edge colour = kind of writing: news blue, blog/Q&A green, literature violet, written-for-deck amber */
+.km.kind-news,
+.km.kind-gov,
+.km.kind-company {
   border-left-color: #0074b8;
 }
-.km.lv3 {
+.km.kind-literature {
   border-left-color: #6a4fd8;
+}
+.km.kind-original {
+  border-left-color: #b86e00;
 }
 .nightMode .km {
   border-left-color: #3ee391;
 }
-.nightMode .km.lv2 {
+.nightMode .km.kind-news,
+.nightMode .km.kind-gov,
+.nightMode .km.kind-company {
   border-left-color: #3fd0ff;
 }
-.nightMode .km.lv3 {
+.nightMode .km.kind-literature {
   border-left-color: #a58bff;
+}
+.nightMode .km.kind-original {
+  border-left-color: #ffb547;
 }
 .chips {
   display: flex;
@@ -110,4 +121,16 @@
   border-left: 3px solid #b86e00;
   padding-left: 10px;
   opacity: 0.85;
+}
+details.en summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+.src {
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+}
+.src a {
+  color: inherit;
 }

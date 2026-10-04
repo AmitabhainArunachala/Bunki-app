@@ -127,6 +127,8 @@
 .kp-meaning { margin: 0; font-size: 15px; color: var(--kp-green); font-weight: 600; }
 .kp-en { margin: 0; font-size: 14px; color: var(--kp-ink-2); line-height: 1.5; }
 .kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); border-left: 3px solid var(--kp-amber); padding-left: 10px; line-height: 1.5; }
+.kp-src { margin: 2px 0 0; font-size: 12px; color: var(--kp-ink-2); letter-spacing: .02em; }
+.kp-src a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 
 .kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: 16px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 17px; font-weight: 700; }
 .kp-grades { display: grid; grid-template-columns: 1fr 0.8fr 1.2fr 0.8fr; gap: 8px; }

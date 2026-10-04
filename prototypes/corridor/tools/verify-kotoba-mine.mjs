@@ -1,13 +1,15 @@
 /**
  * 言葉の鉱脈 deck + 覚える save-chooser verifier. Done = this is green.
  *
- * Half one reads the shipped deck as DATA: 323 words, three sentence cards
- * each, every card's ruby spells its sentence with exactly one asked word,
- * and the asked word carries a kana reading.
+ * Half one reads the shipped deck as DATA: 323 words, each with one or more
+ * sentences (mostly mined from real Japanese, each naming its source), every
+ * card's ruby spells its sentence with exactly one marked word, and the
+ * marked word carries a kana reading.
  *
  * Half two drives the corridor in real Chromium:
  *   · 集中道場 › デッキ lists the deck; opening it shows the deck home;
- *   · a card asks with a blank, reveals with readings, and a grade lands in
+ *   · a card shows the sentence with the word marked, reveals readings,
+ *     meaning and source, and a grade lands in
  *     the deck's own ledger (bunki-cloze:kotoba-mine), never the word queue;
  *   · the ledger survives a reload; the 4-choice mode answers in one tap;
  *   · 覚える asks where to save: nothing is written until 保存する, and a new
@@ -71,14 +73,15 @@ function verifyDeck() {
   const deck = readJson(DECK_PATH);
   check('the deck is a bunki-cloze-deck v1 with 12 topics', deck.format === 'bunki-cloze-deck' && deck.version === 1 && deck.groups.length === 12);
   const cards = deck.words.flatMap((w) => w.cards.map((c) => ({ ...c, word: w })));
-  check('323 words, three sentences each — 969 cards', deck.words.length === 323 && cards.length === 969 && deck.words.every((w) => w.cards.map((c) => c.lv).join() === '1,2,3'), `${deck.words.length} words · ${cards.length} cards`);
+  check('323 words, each with one or more sentences, best first', deck.words.length === 323 && deck.words.every((w) => w.cards.length && w.cards.map((c) => c.lv).join() === w.cards.map((_, i) => i + 1).join()), `${deck.words.length} words · ${cards.length} cards`);
+  const real = cards.filter((c) => c.kind !== 'original');
+  check('every sentence names its source, and most are real Japanese mined from use', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / cards.length >= 0.8, `${real.length}/${cards.length} mined · ${cards.length - real.length} written for the deck`);
   const bad = [];
   for (const c of cards) {
     const target = c.ruby.filter((seg) => seg[2] === 1);
     if (c.ruby.map((seg) => seg[0]).join('') !== c.ja) bad.push(`${c.id}: ruby ≠ sentence`);
     if (target.length !== 1 || target[0][0] !== c.form) bad.push(`${c.id}: target`);
     else if (!/^[ぁ-ゖー]+$/.test(target[0][1])) bad.push(`${c.id}: reading ${target[0][1]}`);
-    if (c.ja.split(c.form).length !== 2) bad.push(`${c.id}: the word appears more than once`);
     if (!c.en) bad.push(`${c.id}: no English`);
   }
   check('every card spells its sentence, asks exactly one word, and gives it a kana reading', bad.length === 0, bad.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
@@ -128,12 +131,12 @@ async function main() {
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
 
     await page.click('#kp-start');
-    await page.waitForSelector('#kp-card .kp-blank');
-    check('a card asks with one blank and no readings', (await page.locator('#kp-card .kp-blank').count()) === 1 && (await page.locator('#kp-card rt').count()) === 0);
+    await page.waitForSelector('#kp-card .kp-target');
+    check('a card shows the real sentence with the word marked, and no readings, blank or English', (await page.locator('#kp-card .kp-target').count()) === 1 && (await page.locator('#kp-card .kp-blank, #kp-card rt, #kp-card .kp-hint').count()) === 0);
     await page.click('#kp-reveal');
     await page.waitForSelector('#kp-grade-good');
-    const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent })`);
-    check('the answer fills the word in colour and puts readings over the kanji', back.rt > 0 && back.target && !!back.term, JSON.stringify(back));
+    const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
+    check('the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
     const takenBefore = (await ls('kairo-corridor-v1')).taken.length;
     await page.click('#kp-grade-good');
     const ledger = await ls('bunki-cloze:kotoba-mine');

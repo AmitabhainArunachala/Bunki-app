@@ -42,12 +42,12 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'en', mode: 'self', look: 'dark', furigana: 'tap' };
+const PREFS_DEFAULT = { newPerDay: 15, hint: 'en', mode: 'read', look: 'dark', furigana: 'tap' };
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
-const prefsKey = 'bunki-cloze:prefs';
+const prefsKey = 'bunki-cloze:prefs:v2'; // v2: reading cards became the default
 function readJson(storage, key) {
   try {
     return JSON.parse(storage.getItem(key) || 'null');
@@ -97,7 +97,7 @@ function fmtWait(ms) {
   if (ms < 365 * DAY) return `${Math.round(ms / (30 * DAY))}か月`;
   return `${(ms / (365 * DAY)).toFixed(1)}年`;
 }
-const LV_NAME = { 1: 'やさしい文', 2: 'ふつうの文', 3: 'しっかりした文' };
+const KIND_NAME = { news: 'ニュース', blog: 'ブログ', qa: 'Q&A', company: '企業サイト', gov: '公的機関', literature: '文学', tatoeba: 'Tatoeba', 'example-bank': '例文集', other: 'ウェブ', original: '書き下ろし' };
 const STATUS = {
   new: ['未', 'kp-st-new'],
   learning: ['学習中', 'kp-st-learn'],
@@ -281,15 +281,15 @@ function studyScreen() {
     el(
       'div',
       'kp-chips',
-      el('span', `kp-chip kp-lvchip`, `${LV_NAME[card.lv]} ${card.lv}/${word.cards.length}`),
+      el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`),
       el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
       el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
     ),
   );
-  face.append(sentenceNodes(card, { blank: !ui.revealed, ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none' }));
+  face.append(sentenceNodes(card, { blank: !ui.revealed && ctx.prefs.mode !== 'read', ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none' }));
 
   if (!ui.revealed) {
-    if (ctx.prefs.hint !== 'none') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
+    if (ctx.prefs.hint !== 'none' && ctx.prefs.mode !== 'read') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
     if (ctx.prefs.mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
@@ -303,7 +303,7 @@ function studyScreen() {
       }
       face.append(opts);
     } else {
-      face.append(el('p', 'kp-taphint', 'タップして答えを見る'));
+      face.append(el('p', 'kp-taphint', ctx.prefs.mode === 'read' ? '意味を思い出してからタップ' : 'タップして答えを見る'));
       face.addEventListener('click', reveal);
     }
   } else {
@@ -341,9 +341,24 @@ function answerBlock(card, word) {
   a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading)));
   a.append(el('p', 'kp-def', word.defJa));
   a.append(el('p', 'kp-meaning', word.meaning));
-  a.append(el('p', 'kp-en', card.en));
+  if (card.en) a.append(el('p', 'kp-en', card.en));
+  if (card.src) a.append(sourceLine(card));
   if (word.tip) a.append(el('p', 'kp-tip', word.tip));
   return a;
+}
+
+function sourceLine(card) {
+  const p = el('p', 'kp-src');
+  const label = card.src.site || card.src.label || '';
+  if (card.src.url) {
+    const a = el('a', null, label);
+    a.href = card.src.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.addEventListener('click', (e) => e.stopPropagation());
+    p.append('出典 ', a);
+  } else p.append(`出典 ${label}`);
+  return p;
 }
 
 function gradeBar(id) {
@@ -474,7 +489,7 @@ function listScreen() {
       if (ui.open === w.id) {
         const det = el('div', 'kp-detail');
         det.append(el('p', 'kp-def', w.defJa));
-        for (const c of w.cards) det.append(el('div', 'kp-ex', sentenceNodes(c, { blank: false, ruby: 'all' }), el('p', 'kp-en', c.en)));
+        for (const c of w.cards) det.append(el('div', 'kp-ex', sentenceNodes(c, { blank: false, ruby: 'all' }), ...(c.en ? [el('p', 'kp-en', c.en)] : [])));
         if (w.tip) det.append(el('p', 'kp-tip', w.tip));
         rows.append(det);
       }
@@ -507,8 +522,8 @@ function settingsScreen() {
     return wrap;
   };
   box.append(seg('一日の新しい文', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
-  box.append(seg('答え方', 'mode', [['self', '自分で判定'], ['choice', '4択']]));
-  box.append(seg('ヒント', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
+  box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
+  box.append(seg('ヒント（穴埋め・4択）', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
   box.append(seg('ふりがな（問題）', 'furigana', [['tap', 'タップで表示'], ['none', 'なし']]));
   box.append(seg('画面', 'look', [['dark', 'ダーク'], ['light', 'ライト']]));
 
