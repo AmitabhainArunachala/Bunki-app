@@ -81,10 +81,14 @@ await test('long history is never truncated and export replay is deterministic',
 });
 await test('private route and all module dependencies are packaged and precached',()=>{
   const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
-  const pipeline=readFileSync(new URL('../../../.github/workflows/pages-app.yml',import.meta.url),'utf8');
+  // Packaging lives in the release builder's required asset roots (round-1
+  // architecture: ci.yml builds the artifact through build-corridor-site.mjs;
+  // pages-app.yml only deploys it).
+  const pipeline=readFileSync(new URL('../../../scripts/corridor-assets.mjs',import.meta.url),'utf8');
+  const smoke=readFileSync(new URL('../../../.github/workflows/ci.yml',import.meta.url),'utf8');
   const corridor=readFileSync(new URL('../corridor.js',import.meta.url),'utf8');
   for(const file of ['mount.mjs','engine.mjs','schema.mjs','store.mjs','personal.css']) {
-    assert(sw.includes(`decks/personal/${file}`)); assert(pipeline.includes(`decks/personal/${file}`));
+    assert(sw.includes(`decks/personal/${file}`)); assert(pipeline.includes(`decks/personal/${file}`)); assert(smoke.includes(`decks/personal/${file}`));
   }
   assert(sw.includes('vendor/ts-fsrs.mjs')); assert(sw.includes('fonts.css'));
   assert(corridor.indexOf("params.get('deck') === 'personal'") < corridor.indexOf('const loadArticleIndex'));
