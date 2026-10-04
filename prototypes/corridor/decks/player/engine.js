@@ -122,7 +122,7 @@ function revive(stored) {
 }
 
 /** the next sentence of a word that may be introduced, or null */
-function nextNewCard(word, state) {
+function nextNewCard(word, state, unlockDays = UNLOCK_STABILITY_DAYS) {
   for (let i = 0; i < word.cards.length; i++) {
     const card = word.cards[i];
     const stored = state.cards[card.id];
@@ -130,7 +130,7 @@ function nextNewCard(word, state) {
       if (i === 0) return card;
       const prev = state.cards[word.cards[i - 1].id];
       if (!prev) return null;
-      if (prev.state === REVIEW && prev.stability >= UNLOCK_STABILITY_DAYS) return card;
+      if (prev.state === REVIEW && prev.stability >= unlockDays) return card;
       return (prev.lapses || 0) >= UNLOCK_AFTER_LAPSES ? card : null;
     }
   }
@@ -177,7 +177,7 @@ export function buildQueue(deck, state, now, newPerDay) {
   for (const word of deck.words) {
     if (!room) break;
     if (off.has(word.group) || seen.has(word.id) || busyWords.has(word.id)) continue;
-    const card = nextNewCard(word, state);
+    const card = nextNewCard(word, state, deck.unlockDays);
     if (card) {
       fresh.push(card.id);
       room--;

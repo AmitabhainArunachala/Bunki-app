@@ -86,12 +86,13 @@ jobs:
                 prototypes/corridor/reference-ui.css \
                 "$SITE"/
 
-          mkdir -p "$SITE/decks/player" "$SITE/decks/kotoba-mine"
+          mkdir -p "$SITE/decks/player" "$SITE/decks/kotoba-mine" "$SITE/decks/kotoba-mcd"
           cp prototypes/corridor/decks/player/engine.js \
              prototypes/corridor/decks/player/mount.js \
              prototypes/corridor/decks/player/player.css \
              "$SITE/decks/player/"
           cp prototypes/corridor/decks/kotoba-mine/deck.json "$SITE/decks/kotoba-mine/"
+          cp prototypes/corridor/decks/kotoba-mcd/deck.json "$SITE/decks/kotoba-mcd/"
 
           mkdir -p "$SITE/decks/context-dense"
           cp prototypes/corridor/decks/context-dense/mount.js \
@@ -142,6 +143,7 @@ jobs:
                       'decks/player/engine.js' \
                       'decks/player/player.css' \
                       'decks/kotoba-mine/deck.json' \
+                      'decks/kotoba-mcd/deck.json' \
                       'decks/context-dense/mount.js' \
                       'decks/context-dense/engine.js' \
                       'decks/context-dense/deck.json' \

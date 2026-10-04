@@ -29,7 +29,8 @@ import { chromium } from 'playwright-core';
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
 const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
-const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
+const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mcd/deck.json');
+const SENTENCE_DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -74,13 +75,16 @@ function verifyDeck() {
   check('the deck is a bunki-cloze-deck v1 with 12 topics', deck.format === 'bunki-cloze-deck' && deck.version === 1 && deck.groups.length === 12);
   const cards = deck.words.flatMap((w) => w.cards.map((c) => ({ ...c, word: w })));
   check('323 words, each with one or more sentences, best first', deck.words.length === 323 && deck.words.every((w) => w.cards.length && w.cards.map((c) => c.lv).join() === w.cards.map((_, i) => i + 1).join()), `${deck.words.length} words · ${cards.length} cards`);
-  const real = cards.filter((c) => c.kind !== 'original');
-  check('every sentence names its source, and most are real Japanese mined from use', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / cards.length >= 0.8, `${real.length}/${cards.length} mined · ${cards.length - real.length} written for the deck`);
+  const passages = new Map(cards.map((c) => [`${c.word.id}:${c.ja}`, c]));
+  const real = [...passages.values()].filter((c) => c.kind !== 'original');
+  check('every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / passages.size >= 0.4, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
+  const mcd = cards.filter((c) => c.type);
+  check('MCD: one gap per card — 語 cards blank the word, 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
   const bad = [];
   for (const c of cards) {
     const target = c.ruby.filter((seg) => seg[2] === 1);
     if (c.ruby.map((seg) => seg[0]).join('') !== c.ja) bad.push(`${c.id}: ruby ≠ sentence`);
-    if (target.length !== 1 || target[0][0] !== c.form) bad.push(`${c.id}: target`);
+    if (target.length !== 1 || (c.type !== 'kanji' && target[0][0] !== c.form)) bad.push(`${c.id}: target`);
     else if (!/^[ぁ-ゖー]+$/.test(target[0][1])) bad.push(`${c.id}: reading ${target[0][1]}`);
     if (!c.en) bad.push(`${c.id}: no English`);
   }
@@ -91,7 +95,11 @@ function verifyDeck() {
 /* --------------------------------------------------- half two: the app */
 async function main() {
   console.log('— 言葉の鉱脈: the deck as data');
-  verifyDeck();
+  const deck = verifyDeck();
+  const sentences = readJson(SENTENCE_DECK_PATH);
+  const sc = sentences.words.flatMap((w) => w.cards);
+  check('言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source', sentences.id === 'kotoba-mine' && sentences.words.length === 323 && sc.every((c) => !c.type && c.src && c.ruby.filter((g) => g[2] === 1).length === 1), `${sc.length} sentence cards`);
+  check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');
   const { server, base } = await startServer();
@@ -123,30 +131,31 @@ async function main() {
     await page.click('.nav-dojo');
     await page.waitForSelector('[data-deck="kotoba-mine"]', { timeout: 8000 });
     const rows = await page.evaluate(`[...document.querySelectorAll('.dojo-deck')].map((b) => b.dataset.deck)`);
-    check('集中道場 opens with the deck list: 言葉の鉱脈, 文脈札, and the saved-word queue', rows[0] === 'kotoba-mine' && rows.includes('context') && rows.includes('mine'), rows.join(', '));
+    check('集中道場 opens with the deck list: 言葉の鉱脈・MCD and ・文 side by side, 文脈札, and the saved-word queue', rows[0] === 'kotoba-mcd' && rows[1] === 'kotoba-mine' && rows.includes('context') && rows.includes('mine'), rows.join(', '));
 
-    await page.click('[data-deck="kotoba-mine"]');
+    await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
+    check('the deck home explains the method (このデッキのしくみ)', (await page.locator('#kp-method').count()) === 1);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
 
     await page.click('#kp-start');
-    await page.waitForSelector('#kp-card .kp-target');
-    check('a card shows the real sentence with the word marked, and no readings, blank or English', (await page.locator('#kp-card .kp-target').count()) === 1 && (await page.locator('#kp-card .kp-blank, #kp-card rt, #kp-card .kp-hint').count()) === 0);
+    await page.waitForSelector('#kp-card .kp-blank');
+    check('a card is a passage with one gap and a Japanese hint — no readings, no English', (await page.locator('#kp-card .kp-blank').count()) === 1 && (await page.locator('#kp-card rt').count()) === 0 && (await page.locator('#kp-card .kp-endetails').count()) === 0);
     await page.click('#kp-reveal');
     await page.waitForSelector('#kp-grade-good');
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
     check('the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
     const takenBefore = (await ls('kairo-corridor-v1')).taken.length;
     await page.click('#kp-grade-good');
-    const ledger = await ls('bunki-cloze:kotoba-mine');
+    const ledger = await ls('bunki-cloze:kotoba-mcd');
     const after = await ls('kairo-corridor-v1');
     check('a grade lands in the deck’s own ledger and never in the word queue', Object.keys(ledger?.cards || {}).length === 1 && after.taken.length === takenBefore && (after.revlog || []).length === 0, `${Object.keys(ledger?.cards || {}).length} card · ${after.taken.length} taken`);
 
-    await boot('?deck=kotoba');
+    await boot('?deck=mcd');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
-    const kept = await ls('bunki-cloze:kotoba-mine');
-    check('?deck=kotoba opens the deck directly and the ledger survived the reload', Object.keys(kept?.cards || {}).length === 1);
+    const kept = await ls('bunki-cloze:kotoba-mcd');
+    check('?deck=mcd opens the MCD deck directly and the ledger survived the reload', Object.keys(kept?.cards || {}).length === 1);
     await page.click('#kp-to-settings');
     await page.click('[data-pref="mode:choice"]');
     await page.click('.kp-icon');
@@ -155,7 +164,13 @@ async function main() {
     const choices = await page.locator('.kp-choice').count();
     await page.click('.kp-choice');
     await page.waitForSelector('.kp-verdict');
-    check('4-choice mode: four words, one tap answers and grades', choices === 4 && (await ls('bunki-cloze:kotoba-mine')).log.length === 2);
+    check('4-choice mode: four words, one tap answers and grades', choices === 4 && (await ls('bunki-cloze:kotoba-mcd')).log.length === 2);
+    await boot('?deck=kotoba');
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card .kp-target');
+    const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
+    check('?deck=kotoba opens 言葉の鉱脈・文: a real sentence with the word marked, in its own theme', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
 
     // 覚える asks where to save
     await boot();

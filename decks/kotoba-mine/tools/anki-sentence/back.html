@@ -1,7 +1,6 @@
 <div class="km kind-{{Kind}} pos-{{POS}}">
   <div class="chips">
-    <span class="chip lvchip">{{Type}}</span><span class="chip">{{Source}}</span
-    ><span class="chip">{{Topic}}</span>
+    <span class="chip lvchip">{{Source}}</span><span class="chip">{{Topic}}</span>
   </div>
   <div class="sentence">{{furigana:SentenceFurigana}}</div>
   <div class="answer">
@@ -12,10 +11,10 @@
     <div class="kanji">{{Kanji}}</div>
     {{/Kanji}}
     <div class="def">{{DefJA}}</div>
+    <div class="meaning">{{Meaning}}</div>
     {{#SentenceEN}}
     <details class="en">
-      <summary>英語</summary>
-      {{Meaning}}<br />
+      <summary>英訳</summary>
       {{SentenceEN}}
     </details>
     {{/SentenceEN}} {{#Tip}}

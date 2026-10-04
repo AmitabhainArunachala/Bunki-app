@@ -1,33 +1,58 @@
 # 言葉の鉱脈 — Kotoba Mine
 
-A sentence deck built from one learner's own list of 323 looked-up words
-(`source/raw-export.txt`, exported from the _Japanese_ iOS dictionary app).
+A massive-context cloze (MCD) deck built from one learner's own list of 323 looked-up
+words (`source/raw-export.txt`, exported from the _Japanese_ iOS dictionary app).
 
-Every card is **a real Japanese sentence** that uses one of the words, mined from how
-people actually write: news, blogs, Q&A sites, company and government pages,
-Wikipedia, literature, and example-sentence corpora. Each card names where its
-sentence came from. Only 11 of 503 sentences were written for the deck, for words
-nothing usable could be found for; those are labelled **書き下ろし**.
+## Two decks, side by side
 
-## The card
+Both decks are built from the same 323 words and sit next to each other in 集中道場 › デッキ.
+Each has its own progress and its own colour theme.
 
-- **Front:** the sentence, with the word in colour. No blank, no English, no readings.
-  Read it, recall what the word means, then tap. Kanji are underlined: tap one to
-  see its reading.
-- **Back:** readings over every kanji, the word with its reading, a short Japanese
-  definition, the meaning, the translation, an occasional usage note, and the source.
-- **Grading:** swipe right for 覚えた (Good) or left for もう一度 (Again).
-  難しい and 簡単 are there as buttons if you want them.
+| Deck                | What it is                                                               | Theme     | Open with      | Offline file     | Anki               |
+| ------------------- | ------------------------------------------------------------------------ | --------- | -------------- | ---------------- | ------------------ |
+| **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (1,597 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
+| **言葉の鉱脈・文**  | one real sentence per card, the word marked, read and recall (503 cards) | 墨 (Sumi) | `?deck=kotoba` | `study.html`     | `kotoba-mine.apkg` |
 
-How many sentences a word gets depends on how useful it is: common words have up to
-three (each in a different situation and from a different kind of source), rarer and
-literary words have one. A word's next sentence only appears once the first one is
-solid (about two weeks of stability), so the same word comes back later in new
-surroundings. If a sentence keeps failing (3 lapses), the next one opens early: a
-fresh context often fixes a word that will not stick.
+## Seeing it: colour, depth and shape
 
-Other ways to study, in settings: **穴埋め** (the word blanked, with an English or
-Japanese hint) and **4択** (pick the word from four).
+- **Themes:** 設定 › 色 offers 墨, 藍, 抹茶, 黒板, 和紙, 桜, 白 and 高 (high contrast). Each deck
+  remembers its own. Every theme keeps the same colour meanings.
+- **Colour = part of speech:** the asked word is blue/accent for nouns, orange for verbs,
+  gold for adjectives, violet for adverbs, green for expressions, and pink for sound words.
+- **Card edge = topic:** each of the 12 topics owns a hue on the card's left edge and in the
+  topic list, so a word is also remembered by "where" it lives.
+- **Kanji anatomy on the back:** each kanji large, with its meaning, its top-level parts
+  (財 = 貝 + 才) and its stroke count. Turn the parts into a little picture or story.
+- **Depth and texture:** cards are lifted panels with a shadow. 和紙 adds paper fibres,
+  黒板 chalk grain, and 藍 and 桜 a soft light wash.
+- **見て覚えるコツ:** the deck home lists the visual memory tips in a fold.
+- **Anki:** the same part-of-speech colours and the kanji anatomy are on the cards.
+
+## The method
+
+This follows Khatzumoto's AJATT **MCD (Massive-Context Cloze Deletion)** method: "instead
+of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
+
+- **Front:** a real passage of 2–4 connected sentences with **one gap**. Readings stay
+  hidden, and there's no English.
+  - **語 card:** the whole word is blanked, with a short Japanese definition under the
+    passage as the hint. Recall the word from its context.
+  - **字 card:** one kanji of the word is blanked, with its reading in the gap
+    (〔ざい〕政難…). Recall the character in context. These come from the word's first
+    passage, one card per kanji.
+- **Back:** the whole passage with furigana, the word with its reading, and the Japanese
+  definition. The English meaning and translation sit behind a tap. The source is shown.
+- **Many passages per word.** Each word has 2–4 passages in different situations: news,
+  daily life, work, stories. When one card is settled (3 days' stability), the next opens,
+  so the word keeps coming back in new surroundings.
+- **Passages:**
+  - **Real:** mined from livedoor news, Japanese Wikinews, Wikipedia, Aozora Bunko, the web
+    and Tatoeba.
+  - **Written for the deck:** natural, dense passages labelled 書き下ろし, built around the
+    word's typical partners (財政が悪化する, 金利を引き上げる).
+  - Today the split is 454 real and 489 written, across 943 passages and 1,597 cards.
+- **Grading:** Again/Good (もう一度／覚えた) is all FSRS needs. Swipe left or right.
+- **On screen:** the deck home explains all this under **このデッキのしくみ**.
 
 ## Where to study
 
@@ -44,17 +69,34 @@ readings on tap, dark or light screen, backup/restore.
 
 ## Anki
 
-- **Note type:** `Kotoba Mine Sentence`, one note per sentence, one card (`Read`).
-- **Fields:** `Key`, `Sort`, `Topic`, `Level`, `Kind`, `Word`, `Reading`, `Meaning`, `DefJA`,
-  `SentenceFront` (word in bold), `SentenceBlank` (for a cloze template of your own),
-  `SentenceFurigana` (`漢字[かんじ]` syntax), `SentenceEN`, `Tip`, `Source`, `SourceURL`.
-- **Order:** every word's first sentence comes first (in mining order), then second
-  sentences, then third, so a word's sentences arrive weeks apart.
-- **Subdecks and tags:** one subdeck per topic; tags `sentence1`–`sentence3`,
-  `source::<kind>`, `topic::<id>`. The card edge is coloured by source kind.
-- **Settings:** turn on FSRS in the deck options, and grade with Again/Good.
+- **Note type:** `Kotoba Mine MCD`, one note per gap, one card (`Cloze`).
+- **Front:** the passage with its gap (`SentenceBlank`), plus `Hint` (the Japanese
+  definition) on 語 cards. **Back:** `{{furigana:SentenceFurigana}}`, the word, the
+  definition, and English behind a fold.
+- **Fields:** `Key`, `Sort`, `Topic`, `Level`, `Type` (語/字), `Hint`, `Kind`, `Word`,
+  `Reading`, `Meaning`, `DefJA`, `SentenceFront`, `SentenceBlank`, `SentenceFurigana`,
+  `SentenceEN`, `Tip`, `Source`, `SourceURL`.
+- **Order:** every word's first card comes first, then every word's second card, and so on,
+  so one word's cards are spread out.
+- **Subdecks and tags:** one subdeck per topic. The card edge colour shows the source kind.
+- **Settings:** turn on FSRS, and grade with Again/Good.
 
-## How the sentences were chosen
+## How the passages were made
+
+**Passages (MCD).**
+
+- `tools/mine_passages.py` takes 2–4 sentence stretches around each word from full texts:
+  livedoor and Wikinews articles, Wikipedia paragraphs and Aozora prose (9,252 candidates).
+- `tools/rank_passages.py` ranks them with the filters below, applied to the whole passage.
+- Writers then:
+  - chose up to 2 real passages per word, checked so that they make sense on their own and
+    that the gap has one answer;
+  - wrote 1–2 natural passages per word to the rules in `source/REVIEW_MCD.md`;
+  - put the clearest passage first, and translated every passage.
+- The writers' choices are in `source/mcd/*.json`; `tools/export_mcd.py` merges them into
+  `source/mcd.json`, which `tools/build.py` turns into cards.
+
+**Single sentences** (fallback, and the earlier sentence deck):
 
 1. **Mining.** Candidate sentences for every word (and its other spellings) from:
    - the live web via Firecrawl search and scrape (`mining/web/`, about 2,200 lines);

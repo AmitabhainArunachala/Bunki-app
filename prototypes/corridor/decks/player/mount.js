@@ -42,12 +42,13 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'en', mode: 'read', look: 'dark', furigana: 'tap' };
+const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap' };
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
-const prefsKey = 'bunki-cloze:prefs:v2'; // v2: reading cards became the default
+const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
+const prefsFor = (storage, deck) => ({ ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) });
 function readJson(storage, key) {
   try {
     return JSON.parse(storage.getItem(key) || 'null');
@@ -67,7 +68,7 @@ function save() {
   writeJson(ctx.storage, stateKey(ctx.deck.id), ctx.state);
 }
 function savePrefs() {
-  writeJson(ctx.storage, prefsKey, ctx.prefs);
+  writeJson(ctx.storage, prefsKey(ctx.deck.id), ctx.prefs);
 }
 
 /* ------------------------------------------------------------- helpers */
@@ -111,8 +112,8 @@ function sentenceNodes(card, { blank, ruby }) {
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
   card.ruby.forEach(([text, reading, isTarget], i) => {
-    if (isTarget && blank) {
-      out.append(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
+    if (isTarget === 1 && blank) {
+      out.append(el('span', 'kp-blank', card.hint ? `〔${card.hint}〕` : '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
       return;
     }
     const hasRuby = reading && KANJI.test(text);
@@ -165,17 +166,31 @@ function homeScreen() {
   const hard = statuses.filter((s) => s.key === 'hard').length;
   const box = el('section', 'kp-home');
   box.append(topBar(deck.titleJa, ctx.onLeave ? () => ctx.onLeave() : null));
-  box.append(el('p', 'kp-sub', `${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}文 · ${deck.titleEn}`));
+  box.append(el('p', 'kp-sub', `${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚 · ${deck.titleEn}`));
 
   const tiles = el('div', 'kp-tiles');
   const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
-  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しい文', 'kp-c-new'), tile(known, '覚えた語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
+  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しいカード', 'kp-c-new'), tile(known, '覚えた語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
   box.append(tiles);
 
   const total = q.queue.length;
   const start = btn('kp-start', total ? `始める — ${total}枚` : '今日はここまで', () => startSession(), { id: 'kp-start' });
   start.disabled = !total;
   box.append(start);
+
+  const tips = el('details', 'kp-tips');
+  tips.id = 'kp-tips';
+  tips.append(el('summary', null, '見て覚えるコツ（色・形・場所）'));
+  for (const line of VISUAL_TIPS) tips.append(el('p', null, line));
+  box.append(tips);
+
+  if (deck.method?.length) {
+    const how = el('details', 'kp-method');
+    how.id = 'kp-method';
+    how.append(el('summary', null, 'このデッキのしくみ'));
+    for (const line of deck.method) how.append(el('p', null, line));
+    box.append(how);
+  }
 
   box.append(el('h2', 'kp-h2', 'テーマ'));
   const off = new Set(state.groupsOff);
@@ -185,6 +200,7 @@ function homeScreen() {
     const st = words.map((w) => wordStatus(w, state).key);
     const share = (k) => (st.filter((x) => x === k).length / words.length) * 100;
     const row = el('label', 'kp-group' + (off.has(g.id) ? ' is-off' : ''));
+    row.style.setProperty('--kp-topic', topicColour(g.id));
     const box2 = el('input');
     box2.type = 'checkbox';
     box2.checked = !off.has(g.id);
@@ -275,13 +291,16 @@ function studyScreen() {
   box.append(top);
 
   const stored = ctx.state.cards[id];
-  const face = el('article', `kp-card kp-lv${card.lv}`);
+  const face = el('article', `kp-card kp-lv${card.lv} kp-topic kp-pos-${posKey(word.pos)}`);
+  face.style.setProperty('--kp-topic', topicColour(word.group));
   face.id = 'kp-card';
   face.append(
     el(
       'div',
       'kp-chips',
-      el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`),
+      ...(card.type
+        ? [el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'), el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'} · 文章${card.passage}`)]
+        : [el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`)]),
       el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
       el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
     ),
@@ -289,7 +308,7 @@ function studyScreen() {
   face.append(sentenceNodes(card, { blank: !ui.revealed && ctx.prefs.mode !== 'read', ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none' }));
 
   if (!ui.revealed) {
-    if (ctx.prefs.hint !== 'none' && ctx.prefs.mode !== 'read') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
+    if (ctx.prefs.hint !== 'none' && ctx.prefs.mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
     if (ctx.prefs.mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
@@ -335,13 +354,56 @@ function studyScreen() {
   return box;
 }
 
+const THEMES = [
+  ['dark', '墨', '#0a0e13', '#3fd0ff'],
+  ['ai', '藍', '#121a46', '#f2c14e'],
+  ['matcha', '抹茶', '#13261a', '#a6e06a'],
+  ['kokuban', '黒板', '#1f2f28', '#ffe066'],
+  ['washi', '和紙', '#fbf6ea', '#b23a1e'],
+  ['sakura', '桜', '#fde7ec', '#d1416a'],
+  ['light', '白', '#ffffff', '#0074b8'],
+  ['contrast', '高', '#000000', '#ffff00'],
+];
+const VISUAL_TIPS = [
+  '色＝品詞：答えの語の色は品詞で決まる（名詞・動詞・形容詞・副詞・表現・擬音語）。色ごと覚えると、文の中での働きも一緒に残る。',
+  'カードの左端の色＝テーマ。お金は同じ色、ニュースは別の色。「あの色の札にあった言葉」と場所で思い出せる。',
+  '裏の「漢字の解剖」：一字ずつ、意味と部品と画数。部品で小さな絵や物語を作ると忘れにくい（財＝貝＋才 → 貝はお金）。',
+  '思い出せなかった語は、文章の場面を頭の中で一枚の絵にしてから「もう一度」。次に会うとき、その絵が手がかりになる。',
+  '色テーマは気分で変えてよい。ただし一つのデッキは同じテーマで続けると、色と記憶が結びつきやすい。',
+  '答えを見る前に一秒、空所の形（字数・送り仮名）と前後の言葉を見る。形と場所で記憶が引き出される。',
+];
+const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
+const posKey = (pos) => (POS[pos] || ['noun'])[0];
+/** each topic owns a hue, spread evenly round the colour wheel */
+function topicColour(groupId) {
+  const i = Math.max(0, ctx.deck.groups.findIndex((g) => g.id === groupId));
+  return `hsl(${Math.round((i * 360) / Math.max(1, ctx.deck.groups.length) + 200) % 360} 70% 58%)`;
+}
+
+function kanjiAnatomy(word) {
+  if (!word.kanji?.length) return null;
+  const box = el('div', 'kp-kanji');
+  for (const k of word.kanji) {
+    box.append(el('div', 'kp-kj', el('b', null, k.c), el('span', null, k.m || ''), el('small', null, [k.parts?.length ? k.parts.join(' ') : '', k.st ? `${k.st}画` : ''].filter(Boolean).join(' · '))));
+  }
+  return box;
+}
+
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
-  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading)));
+  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), el('span', 'kp-posbadge', (POS[word.pos] || ['', ''])[1] || word.pos)));
+  const anatomy = kanjiAnatomy(word);
+  if (anatomy) a.append(anatomy);
   a.append(el('p', 'kp-def', word.defJa));
-  a.append(el('p', 'kp-meaning', word.meaning));
-  if (card.en) a.append(el('p', 'kp-en', card.en));
+  // reading cards test the meaning, so it shows; cloze cards keep English behind a tap
+  if (ctx.prefs.mode === 'read') a.append(el('p', 'kp-meaning', word.meaning));
+  const en = el('details', 'kp-endetails');
+  en.append(el('summary', null, '英語'));
+  if (ctx.prefs.mode !== 'read') en.append(el('p', 'kp-meaning', word.meaning));
+  if (card.en) en.append(el('p', 'kp-en', card.en));
+  en.addEventListener('click', (e) => e.stopPropagation());
+  a.append(en);
   if (card.src) a.append(sourceLine(card));
   if (word.tip) a.append(el('p', 'kp-tip', word.tip));
   return a;
@@ -525,7 +587,18 @@ function settingsScreen() {
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
   box.append(seg('ヒント（穴埋め・4択）', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
   box.append(seg('ふりがな（問題）', 'furigana', [['tap', 'タップで表示'], ['none', 'なし']]));
-  box.append(seg('画面', 'look', [['dark', 'ダーク'], ['light', 'ライト']]));
+  const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
+  const sw = el('div', 'kp-swatches');
+  for (const [value, label, bg, ink] of THEMES) {
+    const b = btn(`kp-swatch${ctx.prefs.look === value ? ' is-on' : ''}`, label, () => {
+      ctx.prefs = { ...ctx.prefs, look: value };
+      savePrefs();
+      paint();
+    }, { 'data-pref': `look:${value}`, 'aria-label': label, style: `background:${bg};color:${ink}` });
+    sw.append(b);
+  }
+  themes.append(sw);
+  box.append(themes);
 
   const ta = el('textarea', 'kp-backup');
   ta.id = 'kp-backup';
@@ -605,7 +678,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     storage,
     onLeave,
     state: normalizeState(readJson(storage, stateKey(deck.id)), deck),
-    prefs: { ...PREFS_DEFAULT, ...(readJson(storage, prefsKey) || {}) },
+    prefs: prefsFor(storage, deck),
   };
   if (!sameDeck) {
     ui.screen = 'home';
@@ -622,7 +695,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
 export async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const state = normalizeState(readJson(storage, stateKey(deck.id)), deck);
-  const prefs = { ...PREFS_DEFAULT, ...(readJson(storage, prefsKey) || {}) };
+  const prefs = prefsFor(storage, deck);
   const q = buildQueue(deck, state, new Date(), prefs.newPerDay);
   return { due: q.due.length, fresh: q.fresh.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

@@ -2218,9 +2218,9 @@ async function boot() {
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
   // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
   // shortcut that lands on the deck instead of the galaxy
-  if (params.get('deck') === 'kotoba' || location.hash === '#kotoba') {
+  if (['kotoba', 'mcd'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
     S.view = 'deckplay';
-    S.deckPlay = 'kotoba-mine';
+    S.deckPlay = params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
   }
 
   render();
@@ -10648,7 +10648,7 @@ function renderFocusHud(root) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'kotoba-mine', ja: '言葉の鉱脈', en: 'your mined words · 3 sentences each' }];
+const DOJO_DECKS = [{ id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;
