@@ -94,6 +94,11 @@ def load_pools(entries):
             for r in rows:
                 kind = "news" if "wikinews" in r["src"] else ("literature" if "aozora" in r["src"] else "example-bank")
                 pools[int(n)].append({**r, "kind": kind})
+    # open corpora mirrored on GitHub (livedoor, Wikinews, Wikipedia, GSD, WRIME)
+    for f in sorted((MINING / "corpora").glob("*.json")) if (MINING / "corpora").exists() else []:
+        doc = json.loads(f.read_text("utf-8"))
+        for c in doc.get("candidates", []):
+            pools.setdefault(doc["n"], []).append({**c, "src": c.get("site", "")})
     # aozora
     for f in sorted((MINING / "aozora").glob("*.json")) if (MINING / "aozora").exists() else []:
         doc = json.loads(f.read_text("utf-8"))
@@ -153,6 +158,8 @@ def score(c: dict, e: dict, keys, tagger, joyo, jlpt) -> tuple[float, dict] | No
         return None
     if ja.count("「") != ja.count("」") or ja.count("（") != ja.count("）"):
         return None
+    if ja[0] in "・-–—*※(（[［【〈<>＞" or re.match(r"(画面|写真|図|表|動画)\s?[0-9０-９]", ja):
+        return None  # list bullet or a picture caption
     if ja.startswith(CONNECTIVE_START):
         return None
     tokens = list(tagger(ja))
@@ -200,7 +207,9 @@ def score(c: dict, e: dict, keys, tagger, joyo, jlpt) -> tuple[float, dict] | No
     s *= 0.6 ** rare_kanji
     # source prior: real native writing > Tanaka-era Tatoeba (error-prone) ; archaic literature flagged
     kind = c.get("kind", "")
-    s *= {"tatoeba": 0.85, "literature": 0.8}.get(kind, 1.0)
+    s *= {"tatoeba": 0.85, "literature": 0.8, "wiki": 0.9, "social": 0.85}.get(kind, 1.0)
+    if "KFTT" in c.get("site", ""):
+        s *= 0.85  # Kyoto history and temples: heavy with names
     if kind == "tatoeba" and not c.get("en"):
         s *= 0.9
     # the word should be in the sentence's own predicate area, not a list or title

@@ -97,7 +97,7 @@ function fmtWait(ms) {
   if (ms < 365 * DAY) return `${Math.round(ms / (30 * DAY))}か月`;
   return `${(ms / (365 * DAY)).toFixed(1)}年`;
 }
-const KIND_NAME = { news: 'ニュース', blog: 'ブログ', qa: 'Q&A', company: '企業サイト', gov: '公的機関', literature: '文学', tatoeba: 'Tatoeba', 'example-bank': '例文集', other: 'ウェブ', original: '書き下ろし' };
+const KIND_NAME = { news: 'ニュース', blog: 'ブログ', qa: 'Q&A', company: '企業サイト', gov: '公的機関', literature: '文学', tatoeba: 'Tatoeba', wiki: 'Wikipedia', social: 'SNS', 'example-bank': '例文集', other: 'ウェブ', original: '書き下ろし' };
 const STATUS = {
   new: ['未', 'kp-st-new'],
   learning: ['学習中', 'kp-st-learn'],

@@ -228,7 +228,7 @@ def front_html(card: dict) -> str:
 
 
 KIND_JA = {"news": "ニュース", "blog": "ブログ", "qa": "Q&A", "company": "企業サイト", "gov": "公的機関", "literature": "文学",
-           "tatoeba": "Tatoeba", "example-bank": "例文集", "other": "ウェブ", "original": "書き下ろし"}
+           "tatoeba": "Tatoeba", "wiki": "Wikipedia", "social": "SNS", "example-bank": "例文集", "other": "ウェブ", "original": "書き下ろし"}
 
 
 def blank_html(card: dict) -> str:
