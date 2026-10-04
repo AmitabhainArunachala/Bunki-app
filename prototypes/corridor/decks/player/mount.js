@@ -3,7 +3,10 @@
  * word list and settings. The schedule is this deck's own ledger in
  * localStorage (`bunki-cloze:<deck id>`), never the corridor's word queue.
  *
- *   render(main, { deckId, storage, onLeave })
+ *   render(main, { deckId, storage, onLeave, openEntry })
+ *
+ * openEntry({ t: 'grammar', id }) is optional: a host that can show a grammar entry passes it,
+ * and the back's 文法 links call it; without it they are plain labels.
  */
 import {
   RATINGS,
@@ -13,9 +16,15 @@ import {
   grade,
   indexDeck,
   inspectState,
+  isLeech,
   learningSoon,
   normalizeState,
   preview,
+  repairCard,
+  restoreSuspended,
+  suspendCard,
+  swapCard,
+  swapTarget,
   validateDeck,
   wordStatus,
 } from './engine.js';
@@ -47,8 +56,8 @@ async function loadDeck(deckId) {
  * "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one) or the
  * learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown once */
 const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false };
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, toast: '', rail: 0 };
-let ctx = null; // { root, deck, index, storage, onLeave, state, prefs, notice }
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0 };
+let ctx = null; // { root, deck, index, storage, onLeave, openEntry, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
 /** the ledger as it was just before a restore replaced it */
@@ -259,9 +268,12 @@ function paint() {
   root.dataset.look = ctx.prefs.look;
   const screens = { home: homeScreen, study: studyScreen, list: listScreen, settings: settingsScreen };
   if (ui.toast) {
-    const toast = el('div', 'kp-toast', ui.toast);
-    toast.setAttribute('role', 'alert');
+    const undoable = UNDOABLE.includes(ui.toast) && ui.undo && ui.screen === 'study';
+    const toast = el('div', `kp-toast${undoable ? ' is-info' : ''}`, el('span', null, ui.toast));
+    toast.setAttribute('role', undoable ? 'status' : 'alert');
     if (ui.toast === SAVE_FAILED && ui.screen !== 'settings') toast.append(btn('kp-toast-btn', 'バックアップへ', () => go('settings'), { id: 'kp-to-backup' }));
+    // a delete or a ladder step is reversible for the rest of the sitting (CARD_CONTRACT_V2 §4)
+    if (undoable) toast.append(btn('kp-toast-btn', '元に戻す', undo, { id: 'kp-toast-undo' }));
     root.append(toast);
   }
   root.append((screens[ui.screen] || homeScreen)());
@@ -449,9 +461,13 @@ function studyScreen() {
   }
   // the front: no readings, no English, nothing to tap in the passage (CARD_CONTRACT_V2 §2)
   face.append(sentenceNodes(card, { blank: !ui.revealed && mode !== 'read', ruby: ui.revealed ? 'all' : 'none', split: passage }));
+  const repaired = ctx.state.repairs?.[id]?.hint;
+  if (repaired) face.dataset.repaired = 'hint';
 
   if (!ui.revealed) {
     if (ctx.prefs.hint !== 'none' && mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', word.defJa));
+    // a leech repaired with a hint (§4 ladder step two): this card only, marked as repaired
+    if (repaired) face.append(el('p', 'kp-rhint', el('span', 'kp-rhint-label', 'ヒント'), repaired));
     if (mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
@@ -470,7 +486,7 @@ function studyScreen() {
       face.addEventListener('click', reveal);
     }
   } else {
-    face.append(answerBlock(card, word));
+    face.append(...backParts(card, word).nodes);
   }
   box.append(face);
 
@@ -625,7 +641,10 @@ function answerBlock(card, word) {
   const en = card.type ? card.enTarget : card.en;
   if (en || card.type) folds.append(fold('kp-f-en', '英訳', false, en ? english('p', 'kp-en', en) : el('p', 'kp-en kp-en-none', EN_NONE)));
   const anatomy = kanjiAnatomy(word);
-  if (anatomy) folds.append(fold('kp-f-kanji', '漢字の形と意味', card.type === 'kanji', anatomy));
+  if (anatomy) folds.append(fold('kp-f-kanji', '漢字の形と意味', card.type === 'kanji', anatomy, kanjiFamily(word)));
+  // see-also and grammar from the deck, as one link line after the kanji fold; no data, no line
+  const see = seeAlsoLine(card, word);
+  if (see) folds.append(see);
   // synonyms interfere with a word still being learned (R13): only on a card in review state
   if (word.sem?.length && ctx.state.cards[card.id]?.state === 2) {
     const list = el('ul', 'kp-sem');
@@ -641,6 +660,224 @@ function answerBlock(card, word) {
   a.append(folds);
   if (card.src) a.append(sourceLine(card));
   return a;
+}
+
+/* ------------------------------------------------ kanji family, see-also (CARD_CONTRACT_V2 §3.7) */
+/** per deck: glyph → words that contain it; reading of one kanji → [{ word, c }] (deck.json
+ * kanji[].r is the kanji's reading inside that word, from build.py's alignment) */
+const families = new WeakMap();
+function familyIndex(deck) {
+  if (families.has(deck)) return families.get(deck);
+  const byGlyph = new Map();
+  const byReading = new Map();
+  for (const w of deck.words) {
+    for (const k of w.kanji || []) {
+      if (!byGlyph.has(k.c)) byGlyph.set(k.c, []);
+      byGlyph.get(k.c).push(w);
+      if (!k.r) continue;
+      if (!byReading.has(k.r)) byReading.set(k.r, []);
+      byReading.get(k.r).push({ word: w, c: k.c });
+    }
+  }
+  const out = { byGlyph, byReading };
+  families.set(deck, out);
+  return out;
+}
+const FAMILY_READ_MAX = 8;
+/**
+ * The learner's own words in this deck (a card of the word is in the ledger) that share a kanji
+ * of the target (同) or a reading of one of its kanji written with another kanji (読): the
+ * JPMN/Kiku model, deck-relative. No etymology, no mnemonics. Words not yet met are left out,
+ * so the fold never shows a word before its own card does.
+ */
+function familyOf(word) {
+  const { byGlyph, byReading } = familyIndex(ctx.deck);
+  const learned = (w) => w.id !== word.id && w.cards.some((c) => ctx.state.cards[c.id]);
+  const rows = [];
+  for (const k of word.kanji || []) {
+    const same = [...new Set((byGlyph.get(k.c) || []).filter(learned))];
+    const read = [...new Set((k.r ? byReading.get(k.r) || [] : []).filter((x) => x.c !== k.c && learned(x.word) && !same.includes(x.word)).map((x) => x.word))];
+    if (same.length || read.length) rows.push({ k, same, read });
+  }
+  return rows;
+}
+function kanjiFamily(word) {
+  const rows = familyOf(word);
+  if (!rows.length) return null;
+  const list = el('ul', 'kp-kfam');
+  list.setAttribute('aria-label', '同じ字・同じ読みの、学習中の語');
+  for (const { k, same, read } of rows) {
+    const li = el('li', null, el('b', 'kp-kfam-c', k.c, k.r ? el('small', null, k.r) : null));
+    for (const w of same) li.append(familyLink(w, '同', `${k.c}を含む`));
+    for (const w of read.slice(0, FAMILY_READ_MAX)) li.append(familyLink(w, '読', `${k.r}と読む字を含む`));
+    if (read.length > FAMILY_READ_MAX) li.append(el('span', 'kp-fam-more', `ほか${read.length - FAMILY_READ_MAX}語`));
+    list.append(li);
+  }
+  return list;
+}
+function familyLink(w, mark, why) {
+  return btn('kp-fam', [el('span', 'kp-fam-mark', mark), w.term], (e) => {
+    e.stopPropagation();
+    openWord(w.id);
+  }, { 'data-word': w.id, 'data-mark': mark, 'aria-label': `${mark} ${w.term}（${why}）・語の一覧で開く` });
+}
+/** open a word in 語の一覧; its ← comes back to the card on screen */
+function openWord(wid) {
+  ui.from = ui.screen === 'study' ? 'study' : null;
+  ui.q = '';
+  ui.open = wid;
+  go('list');
+  ctx.root.querySelector(`.kp-row[data-word="${wid}"]`)?.scrollIntoView({ block: 'center' });
+}
+
+/** 参照 (deck words named by word.seeAlso) and 文法 (grammar ids on the card or the word, as
+ * { id, p } or a bare id), one line; null when the deck gives neither */
+function seeAlsoLine(card, word) {
+  const see = (Array.isArray(word.seeAlso) ? word.seeAlso : []).filter((t) => typeof t === 'string' && t && t !== word.term);
+  const grammar = [...(Array.isArray(card.grammar) ? card.grammar : []), ...(Array.isArray(word.grammar) ? word.grammar : [])]
+    .map((g) => (typeof g === 'string' ? { id: g } : g))
+    .filter((g, i, all) => g?.id && all.findIndex((x) => x.id === g.id) === i);
+  if (!see.length && !grammar.length) return null;
+  const line = el('p', 'kp-see');
+  line.id = 'kp-see';
+  if (see.length) {
+    line.append(el('span', 'kp-see-label', '参照'));
+    for (const t of see) {
+      const w = ctx.deck.words.find((x) => x.term === t);
+      line.append(
+        w
+          ? btn('kp-see-link', t, (e) => {
+              e.stopPropagation();
+              openWord(w.id);
+            }, { 'data-word': w.id })
+          : el('span', 'kp-see-item', t),
+      );
+    }
+  }
+  if (grammar.length) {
+    line.append(el('span', 'kp-see-label', '文法'));
+    for (const g of grammar) {
+      line.append(
+        ctx.openEntry
+          ? btn('kp-see-link', g.p || g.id, (e) => {
+              e.stopPropagation();
+              ctx.openEntry({ t: 'grammar', id: g.id });
+            }, { 'data-grammar': g.id })
+          : Object.assign(el('span', 'kp-see-item', g.p || g.id), { title: g.id }),
+      );
+    }
+  }
+  return line;
+}
+
+/* ------------------------------------------------ delete and the leech ladder (CARD_CONTRACT_V2 §4) */
+const DELETED = 'このカードを削除しました（設定 › 保留中のカード から戻せます）。';
+const SWAPPED = '別の文に替えました。前の文は保留にしました。';
+const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
+const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
+
+/** the back's nodes in order: the ladder (a leech only), the answer, the card's tools */
+function backParts(card, word) {
+  const answer = answerBlock(card, word);
+  return { answer, nodes: [isLeech(ctx.state, card.id) ? leechLadder(card, word) : null, answer, cardTools()].filter(Boolean) };
+}
+
+/** under the answer: 削除, one tap, undone from the toast or ↶ for the rest of the sitting */
+function cardTools() {
+  const row = el('div', 'kp-tools');
+  row.append(btn('kp-delete', '削除', (e) => {
+    e.stopPropagation();
+    deleteCard();
+  }, { id: 'kp-delete', 'aria-label': 'このカードを削除（保留にする・あとで戻せる）' }));
+  return row;
+}
+
+/** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the
+ * blanked kanji's parts (its reading is already the card's hint) */
+function repairHint(card, word) {
+  if (card.type === 'kanji') {
+    const glyph = card.ruby.find((seg) => seg[2] === 1)?.[0];
+    const k = word.kanji?.find((x) => x.c === glyph);
+    if (k?.parts?.length) return k.parts.join('＋');
+    return k?.st ? `${k.st}画` : '';
+  }
+  const kana = [...(word.reading || '')];
+  return kana.length ? kana[0] + '○'.repeat(kana.length - 1) : '';
+}
+
+function leechLadder(card, word) {
+  const box = el('div', 'kp-ladder');
+  box.id = 'kp-ladder';
+  box.setAttribute('role', 'group');
+  const lapses = ctx.state.cards[card.id]?.lapses ?? 0;
+  const head = `この文で${lapses}回つまずいています`;
+  box.setAttribute('aria-label', head);
+  box.append(el('p', 'kp-ladder-head', head));
+  const target = swapTarget(word, card, ctx.state);
+  const hint = ctx.state.repairs?.[card.id]?.hint ? '' : repairHint(card, word);
+  const steps = el('ol', 'kp-ladder-steps');
+  const step = (name, label, sub, onClick) => {
+    const b = btn(`kp-ladder-step`, [el('b', null, label), el('small', null, sub)], (e) => {
+      e.stopPropagation();
+      onClick();
+    }, { id: `kp-ladder-${name}`, 'data-step': name });
+    if (!onClick) b.disabled = true;
+    steps.append(el('li', null, b));
+  };
+  step('swap', '別の文に替える', target ? `${target.type ? `文章${target.passage}` : `例文${target.lv}`}へ（進み具合はそのまま）` : '替えられる文がありません', target && (() => ladderSwap(card, word)));
+  step('hint', 'ヒントを付ける', hint ? `表に「${hint}」` : 'ヒントはもう付いています', hint && (() => ladderHint(card, hint)));
+  step('suspend', '保留', 'このカードを休ませる', () => ladderSuspend(card));
+  box.append(steps, btn('kp-link kp-ladder-keep', 'このまま続ける', (e) => {
+    e.stopPropagation();
+    ladderKeep(card);
+  }, { id: 'kp-ladder-keep' }));
+  return box;
+}
+
+/** adopt a ledger change made on the card on screen: stored first, then one undo step */
+function adoptRepair(nextState) {
+  if (!save(nextState)) return saveFailed();
+  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
+  ctx.state = nextState;
+  return true;
+}
+/** the card leaves the sitting: this and every later place it held in the queue */
+function dropFromQueue(id) {
+  ui.queue = [...ui.queue.slice(0, ui.pos), ...ui.queue.slice(ui.pos).filter((x) => x !== id)];
+}
+function deleteCard() {
+  const id = ui.queue[ui.pos];
+  if (!id || !adoptRepair(suspendCard(ctx.state, id, 'delete', new Date()))) return;
+  dropFromQueue(id);
+  ui.toast = DELETED;
+  resetCard();
+  paint();
+}
+function ladderSwap(card, word) {
+  const done = swapCard(word, card, ctx.state, new Date());
+  if (!done || !adoptRepair(done.state)) return;
+  dropFromQueue(card.id);
+  ui.queue.splice(ui.pos, 0, done.to); // the new passage takes the card's place, front first
+  ui.toast = SWAPPED;
+  resetCard();
+  paint();
+}
+function ladderHint(card, hint) {
+  if (!adoptRepair(repairCard(ctx.state, card.id, 'hint', new Date(), hint))) return;
+  ui.toast = '';
+  paint();
+}
+function ladderSuspend(card) {
+  if (!adoptRepair(suspendCard(ctx.state, card.id, 'leech', new Date()))) return;
+  dropFromQueue(card.id);
+  ui.toast = SUSPENDED;
+  resetCard();
+  paint();
+}
+function ladderKeep(card) {
+  if (!adoptRepair(repairCard(ctx.state, card.id, 'keep', new Date()))) return;
+  ui.toast = '';
+  paint();
 }
 
 /** the word's other passages, one per passage (a passage's 字 cards share it): titles only,
@@ -721,10 +958,10 @@ function revealInPlace() {
   }
   const sentence = sentenceNodes(card, { blank: false, ruby: 'all', split: passage });
   face.querySelector('.kp-sentence').replaceWith(sentence);
-  for (const n of face.querySelectorAll('.kp-hint, .kp-taphint')) n.remove();
+  for (const n of face.querySelectorAll('.kp-hint, .kp-taphint, .kp-rhint')) n.remove();
   face.removeEventListener('click', reveal);
-  const answer = answerBlock(card, word);
-  face.append(answer);
+  const { nodes, answer } = backParts(card, word);
+  face.append(...nodes);
   if (motionOk()) {
     sentence.classList.add('kp-enter');
     answer.classList.add('kp-enter');
@@ -919,7 +1156,14 @@ function doneScreen() {
 
 function listScreen() {
   const box = el('section', 'kp-list');
-  box.append(topBar('語の一覧', () => go('home')));
+  // opened from a card (the kanji family, 参照): ← goes back to that card, as it was
+  box.append(
+    topBar('語の一覧', () => {
+      const back = ui.from === 'study' && ui.queue[ui.pos] ? 'study' : 'home';
+      ui.from = null;
+      go(back);
+    }),
+  );
   const input = el('input', 'kp-search');
   input.type = 'search';
   input.id = 'kp-search';
@@ -943,7 +1187,8 @@ function listScreen() {
       ], () => {
         ui.open = ui.open === w.id ? null : w.id;
         draw();
-      });
+      }, { 'data-word': w.id, 'aria-expanded': String(ui.open === w.id) });
+      if (ui.open === w.id) row.classList.add('is-open');
       rows.append(row);
       if (ui.open === w.id) {
         const det = el('div', 'kp-detail');
@@ -1005,6 +1250,7 @@ function settingsScreen() {
   }
   themes.append(sw);
   box.append(themes);
+  box.append(suspendedField());
 
   const ta = el('textarea', 'kp-backup');
   ta.id = 'kp-backup';
@@ -1042,6 +1288,26 @@ function settingsScreen() {
       ), msg),
   );
   return box;
+}
+
+/** 保留中のカード: how many cards a delete or the leech ladder took out, and 復元 for all of them */
+const SUSPEND_WHY = { delete: '削除', swap: '別の文に替えた', leech: '保留' };
+function suspendedField() {
+  const ids = Object.keys(ctx.state.suspended || {}).filter((id) => ctx.index.cards.has(id));
+  const why = {};
+  for (const id of ids) why[ctx.state.suspended[id].by] = (why[ctx.state.suspended[id].by] || 0) + 1;
+  const count = el('p', 'kp-sub', ids.length ? `${ids.length}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）` : 'ありません');
+  count.id = 'kp-suspended';
+  const back = btn('', '復元', () => {
+    const nextState = restoreSuspended(ctx.state, new Date(), ids);
+    if (!save(nextState)) return saveFailed();
+    ctx.state = nextState;
+    ui.undo = null;
+    ui.toast = '';
+    paint();
+  }, { id: 'kp-unsuspend', 'aria-label': `保留中の${ids.length}枚をすべて戻す` });
+  back.disabled = !ids.length;
+  return el('div', 'kp-field', el('h2', 'kp-h2', '保留中のカード'), el('p', 'kp-sub', '削除したカードと、つまずきが続いて休ませたカード。記録は消えていません。'), count, el('div', 'kp-seg', back));
 }
 
 const RESTORE_REFUSED = {
@@ -1144,7 +1410,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry } = {}) {
   ensureCss();
   const root = el('div', 'kp');
   root.append(el('p', 'kp-sub', '読み込み中…'));
@@ -1157,6 +1423,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     index,
     storage,
     onLeave,
+    openEntry: typeof openEntry === 'function' ? openEntry : null,
     prefs: prefsFor(storage, deck),
   };
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));

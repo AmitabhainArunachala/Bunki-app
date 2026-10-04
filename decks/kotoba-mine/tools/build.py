@@ -541,9 +541,15 @@ RADICAL_TWINS = {"手": "扌", "攴": "攵", "襾": "覀", "人": "亻", "水": 
                  "示": "礻", "衣": "衤", "艸": "艹", "辵": "辶", "言": "訁", "食": "飠", "糸": "糹", "玉": "王", "老": "耂", "网": "罒"}
 
 
-def kanji_anatomy(term: str) -> list[dict]:
-    """each kanji of the word: meaning, up to three parts, stroke count (for the visual back)"""
+def kanji_anatomy(term: str, reading: str = "") -> list[dict]:
+    """each kanji of the word: meaning, up to three parts, stroke count (for the visual back),
+    and r, its reading inside this word when the kanji table can split the word's reading
+    (財政/ざいせい: 財 ざい, 政 せい) — the kanji family's 読 marker joins on it"""
     _readings("一")  # loads the table
+    split = {}
+    for ch, r in (align(term, reading) or []) if reading else []:
+        if KANJI.match(ch) and r:
+            split.setdefault(ch, r)
     out = []
     for ch in dict.fromkeys(ch for ch in term if KANJI.match(ch) and ch not in "々〆ヵヶ"):
         k = _KANJI_DB.get(ch)
@@ -555,8 +561,22 @@ def kanji_anatomy(term: str) -> list[dict]:
                 if x != ch and twin not in kept and not any(x in _KANJI_DB.get(y, {}).get("parts", []) for y in kept):
                     kept.append(x)
             parts = kept[:3]
-            out.append({"c": ch, "m": (k.get("m") or "").lower(), "parts": parts, "st": k.get("st")})
+            out.append({"c": ch, "m": (k.get("m") or "").lower(), "parts": parts, "st": k.get("st"), **({"r": split[ch]} if ch in split else {})})
     return out
+
+
+# ------------------------------------------------------------------ see-also, grammar
+_GRAMMAR: dict | None = None
+
+
+def grammar_refs(ids: list) -> list[dict]:
+    """grammar ids named by the source, labelled from data/original/grammar-v11.json; an id the
+    table does not know is dropped, never guessed"""
+    global _GRAMMAR
+    if _GRAMMAR is None:
+        path = CORRIDOR / "data" / "original" / "grammar-v11.json"
+        _GRAMMAR = {e["id"]: e for e in json.loads(path.read_text("utf-8")).get("entries", [])} if path.exists() else {}
+    return [{"id": g, "p": _GRAMMAR[g]["p"]} for g in dict.fromkeys(ids) if isinstance(g, str) and g in _GRAMMAR]
 
 
 def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
@@ -593,7 +613,7 @@ def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
                 "meaning": c["meaning"],
                 "defJa": c["def_ja"],
                 "pos": c["pos"],
-                "kanji": kanji_anatomy(c["term"]),
+                "kanji": kanji_anatomy(c["term"], c["reading"]),
                 "cards": cards,
             }
             if c.get("tip"):
@@ -602,6 +622,11 @@ def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
                 word["level"] = level
             if sem := sem_for(c["term"]):
                 word["sem"] = sem
+            # the back's 参照・文法 line shows only what the source names (none of the words does yet)
+            if see := [t for t in c.get("seeAlso", []) if isinstance(t, str) and t and t != c["term"]]:
+                word["seeAlso"] = see
+            if grammar := grammar_refs(c.get("grammar", [])):
+                word["grammar"] = grammar
             words.append(word)
     return {
         "format": "bunki-cloze-deck",
@@ -827,6 +852,38 @@ POS_KEY = {"noun": "noun", "verb": "verb", "い-adjective": "adj", "な-adjectiv
            "expression": "expr", "sound word": "sound", "kanji": "noun"}
 
 
+def kanji_family(words: list[dict], wi: int) -> list[tuple[dict, list[dict], list[dict]]]:
+    """the player's kanji family (mount.js familyOf) for Anki, which cannot read the learner's
+    ledger: the words before this one in deck order stand for the learner's own words, since
+    Anki introduces each word's first card in that order (note due = position). Per kanji of
+    the word: words sharing the kanji (同), then words with another kanji read the same (読)."""
+    w = words[wi]
+    earlier = words[:wi]
+    out = []
+    for k in w.get("kanji", []):
+        same = [x for x in earlier if any(j["c"] == k["c"] for j in x.get("kanji", []))]
+        read = [x for x in earlier if x not in same and k.get("r")
+                and any(j.get("r") == k["r"] and j["c"] != k["c"] for j in x.get("kanji", []))]
+        if same or read:
+            out.append((k, same, read))
+    return out
+
+
+FAMILY_READ_MAX = 8  # as mount.js: more than this many 読 words end in ほかN語
+
+
+def kanji_family_html(words: list[dict], wi: int) -> str:
+    rows = []
+    for k, same, read in kanji_family(words, wi):
+        items = [f'<span class="fam"><i>同</i>{html.escape(x["term"])}</span>' for x in same]
+        items += [f'<span class="fam rd"><i>読</i>{html.escape(x["term"])}</span>' for x in read[:FAMILY_READ_MAX]]
+        if len(read) > FAMILY_READ_MAX:
+            items.append(f'<span class="more">ほか{len(read) - FAMILY_READ_MAX}語</span>')
+        r = f'<small>{html.escape(k["r"])}</small>' if k.get("r") else ""
+        rows.append(f'<li><b>{k["c"]}{r}</b>{"".join(items)}</li>')
+    return f'<ul class="kfam">{"".join(rows)}</ul>' if rows else ""
+
+
 def note_rows(deck: dict) -> list[dict]:
     rows = []
     groups = {g["id"]: g for g in deck["groups"]}
@@ -857,7 +914,7 @@ def note_rows(deck: dict) -> list[dict]:
                 "POS": POS_KEY.get(w["pos"], "noun"),
                 "Kanji": "".join(
                     f'<div class="kj"><b>{k["c"]}</b><span>{html.escape(k["m"])}</span><small>{" ".join(k["parts"])}{" · " + str(k["st"]) + "画" if k.get("st") else ""}</small></div>'
-                    for k in w.get("kanji", [])),
+                    for k in w.get("kanji", [])) + kanji_family_html(deck["words"], wi),
                 "_group": w["group"],
                 "_level": w.get("level", ""),
             })

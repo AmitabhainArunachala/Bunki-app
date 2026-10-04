@@ -19,7 +19,9 @@ const REVIEW = 2;
 const UNLOCK_STABILITY_DAYS = 14;
 /** …or sooner when the sentence before it keeps failing: a fresh context helps a leech */
 const UNLOCK_AFTER_LAPSES = 3;
-export const LEECH_LAPSES = 6;
+/** a card that has lapsed this often is a leech: the back offers the repair ladder
+ * (CARD_CONTRACT_V2 §4: swap the passage, add a hint, suspend) */
+export const LEECH_LAPSES = 5;
 export const RATINGS = { again: 1, hard: 2, good: 3, easy: 4 };
 
 export function dayKey(date) {
@@ -75,8 +77,43 @@ export function createScheduler(fsrsApi, pin) {
   );
 }
 
+/**
+ * The ledger. Besides the FSRS records (cards) and the answer log, three optional keys
+ * (absent in older ledgers, read as empty):
+ *   suspended  { [cardId]: { at, by: 'delete' | 'swap' | 'leech' } } — out of every queue,
+ *              its FSRS record kept untouched; 設定 › 復元 brings it back
+ *   repairs    { [cardId]: { at, lapses, hint?, swap?, keep? } } — what the repair ladder did
+ *              to a leech: a front hint, the card that replaced it, or 'carry on as it is'
+ *   repairLog  [[cardId, action, iso, detail?]] — every delete, restore and ladder choice
+ */
 export function emptyState(deckId) {
-  return { format: STATE_FORMAT, version: VERSION, deckId, cards: {}, groupsOff: [], log: [] };
+  return { format: STATE_FORMAT, version: VERSION, deckId, cards: {}, groupsOff: [], log: [], suspended: {}, repairs: {}, repairLog: [] };
+}
+
+const SUSPEND_BY = ['delete', 'swap', 'leech'];
+export const REPAIR_ACTIONS = ['delete', 'restore', 'swap', 'hint', 'suspend', 'keep'];
+const isPlain = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+const isIso = (v) => typeof v === 'string' && !Number.isNaN(Date.parse(v));
+
+/** suspended, repairs and repairLog as stored, keeping only well-formed entries */
+function cleanRepairs(raw) {
+  const suspended = {};
+  for (const [id, s] of Object.entries(isPlain(raw.suspended) ? raw.suspended : {})) {
+    if (isPlain(s) && isIso(s.at) && SUSPEND_BY.includes(s.by)) suspended[id] = { at: s.at, by: s.by };
+  }
+  const repairs = {};
+  for (const [id, r] of Object.entries(isPlain(raw.repairs) ? raw.repairs : {})) {
+    if (!isPlain(r) || !isIso(r.at) || !Number.isFinite(r.lapses)) continue;
+    const out = { at: r.at, lapses: r.lapses };
+    if (typeof r.hint === 'string' && r.hint) out.hint = r.hint;
+    if (typeof r.swap === 'string' && r.swap) out.swap = r.swap;
+    if (r.keep === true) out.keep = true;
+    repairs[id] = out;
+  }
+  const repairLog = (Array.isArray(raw.repairLog) ? raw.repairLog : [])
+    .filter((row) => Array.isArray(row) && typeof row[0] === 'string' && REPAIR_ACTIONS.includes(row[1]) && isIso(row[2]))
+    .slice(-LOG_KEEP);
+  return { suspended, repairs, repairLog };
 }
 
 /** a stored card that the scheduler can read back: a parseable due date, finite
@@ -138,7 +175,90 @@ export function normalizeState(raw, deck) {
     cards,
     groupsOff: Array.isArray(raw.groupsOff) ? raw.groupsOff.filter((g) => typeof g === 'string') : [],
     log: Array.isArray(raw.log) ? raw.log.slice(-LOG_KEEP) : [],
+    ...cleanRepairs(raw),
   };
+}
+
+/* ------------------------------------------------ delete, leech repair (CARD_CONTRACT_V2 §4) */
+export const isSuspended = (state, cardId) => !!state.suspended?.[cardId];
+
+const logRepair = (state, row) => [...(state.repairLog || []).slice(-(LOG_KEEP - 1)), row];
+
+/** take a card out of every queue without touching its FSRS record or id; by: delete | swap | leech */
+export function suspendCard(state, cardId, by, now, action = by === 'leech' ? 'suspend' : by) {
+  const at = now.toISOString();
+  const repairs = by === 'leech' ? { ...state.repairs, [cardId]: { ...state.repairs?.[cardId], at, lapses: state.cards[cardId]?.lapses ?? 0 } } : state.repairs || {};
+  return { ...state, suspended: { ...state.suspended, [cardId]: { at, by } }, repairs, repairLog: logRepair(state, [cardId, action, at]) };
+}
+
+/** bring suspended cards back (all of them when ids is omitted); their records were never touched */
+export function restoreSuspended(state, now, ids = Object.keys(state.suspended || {})) {
+  const at = now.toISOString();
+  const suspended = { ...state.suspended };
+  let repairLog = state.repairLog || [];
+  for (const id of ids) {
+    if (!suspended[id]) continue;
+    delete suspended[id];
+    repairLog = [...repairLog.slice(-(LOG_KEEP - 1)), [id, 'restore', at]];
+  }
+  return { ...state, suspended, repairLog };
+}
+
+/** a card the ladder should be offered for: lapsed LEECH_LAPSES times, and again since its last repair */
+export function isLeech(state, cardId) {
+  const s = state.cards[cardId];
+  if (!s || isSuspended(state, cardId)) return false;
+  const lapses = s.lapses || 0;
+  const last = state.repairs?.[cardId];
+  return lapses >= LEECH_LAPSES && (!last || lapses > last.lapses);
+}
+
+/**
+ * The passage the ladder's first step swaps in: the word's next card that has never been
+ * shown and is not suspended, of the same kind (a 語 passage for a 語 card) and from another
+ * passage. A 字 card has none (its kanji are asked in the first passage only). Null when the
+ * word has no such card left.
+ */
+export function swapTarget(word, card, state) {
+  return (
+    word.cards.find(
+      (c) => c.id !== card.id && !state.cards[c.id] && !isSuspended(state, c.id) && (c.type || null) === (card.type || null) && (!card.type || c.passage !== card.passage),
+    ) || null
+  );
+}
+
+/** ladder step one: the leech is suspended (record kept, so the word keeps its progress) and the
+ * next unseen passage of the word is due at once in its place */
+export function swapCard(word, card, state, now) {
+  const to = swapTarget(word, card, state);
+  if (!to) return null;
+  const at = now.toISOString();
+  const lapses = state.cards[card.id]?.lapses ?? 0;
+  return {
+    to: to.id,
+    state: {
+      ...state,
+      suspended: { ...state.suspended, [card.id]: { at, by: 'swap' } },
+      repairs: { ...state.repairs, [card.id]: { ...state.repairs?.[card.id], at, lapses, swap: to.id } },
+      repairLog: logRepair(state, [card.id, 'swap', at, to.id]),
+    },
+  };
+}
+
+/** ladder step two (a hint on the front of this card only) or 'keep' (carry on, ask again after the next lapse) */
+export function repairCard(state, cardId, action, now, hint = '') {
+  const at = now.toISOString();
+  const lapses = state.cards[cardId]?.lapses ?? 0;
+  const prev = state.repairs?.[cardId] || {};
+  const entry = action === 'hint' ? { ...prev, at, lapses, hint } : { ...prev, at, lapses, keep: true };
+  return { ...state, repairs: { ...state.repairs, [cardId]: entry }, repairLog: logRepair(state, action === 'hint' ? [cardId, 'hint', at, hint] : [cardId, 'keep', at]) };
+}
+
+/** swapped-in passages that have not been shown yet: card id → when the swap made them due */
+function swapDue(state) {
+  const out = new Map();
+  for (const r of Object.values(state.repairs || {})) if (r.swap && !state.cards[r.swap] && !isSuspended(state, r.swap)) out.set(r.swap, Date.parse(r.at));
+  return out;
 }
 
 const isoOf = (value) => (value ? (value instanceof Date ? value : new Date(value)).toISOString() : null);
@@ -168,12 +288,14 @@ function revive(stored) {
   };
 }
 
-/** the next sentence of a word that may be introduced, or null */
+/** the next sentence of a word that may be introduced, or null. A suspended card that was
+ * never shown holds the word there until it is restored. */
 function nextNewCard(word, state, unlockDays = UNLOCK_STABILITY_DAYS) {
   for (let i = 0; i < word.cards.length; i++) {
     const card = word.cards[i];
     const stored = state.cards[card.id];
     if (!stored) {
+      if (isSuspended(state, card.id)) return null;
       if (i === 0) return card;
       const prev = state.cards[word.cards[i - 1].id];
       if (!prev) return null;
@@ -194,20 +316,27 @@ export function introducedToday(state, now, deck) {
 /**
  * Today's work. Due cards first (most overdue first, one per word — a
  * sibling waits for tomorrow), then new sentences up to the daily cap, at
- * most one per word per day. Opening a queue writes nothing.
+ * most one per word per day. Suspended cards are never in it; a passage the
+ * repair ladder swapped in is due from the moment of the swap. Opening a
+ * queue writes nothing.
  */
 export function buildQueue(deck, state, now, newPerDay) {
   const off = new Set(state.groupsOff);
   const due = [];
   const fresh = [];
   const busyWords = new Set();
+  const swapped = swapDue(state);
   const endOfDay = new Date(now);
   endOfDay.setHours(23, 59, 59, 999);
   for (const word of deck.words) {
     if (off.has(word.group)) continue;
     for (const card of word.cards) {
+      if (isSuspended(state, card.id)) continue;
       const stored = state.cards[card.id];
-      if (!stored) continue;
+      if (!stored) {
+        if (swapped.has(card.id)) due.push({ card, word, dueAt: swapped.get(card.id) });
+        continue;
+      }
       if (stored.introducedAt && dayKey(new Date(stored.introducedAt)) === dayKey(now)) busyWords.add(word.id);
       const learning = stored.state !== REVIEW;
       const dueAt = new Date(stored.due).getTime();
@@ -243,7 +372,7 @@ export function learningSoon(deck, state, now, withinMs) {
     if (off.has(word.group)) continue;
     for (const card of word.cards) {
       const s = state.cards[card.id];
-      if (s && s.state !== REVIEW) {
+      if (s && s.state !== REVIEW && !isSuspended(state, card.id)) {
         const t = new Date(s.due).getTime();
         if (t - now.getTime() <= withinMs) out.push({ id: card.id, t });
       }
