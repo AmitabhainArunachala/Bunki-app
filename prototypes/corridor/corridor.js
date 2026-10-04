@@ -1784,6 +1784,8 @@ async function startDictionaryWorker() {
     else request.reject(new Error(message.error || `dictionary worker ${request.type} failed`));
   });
   dictionaryWorker.addEventListener('error', (event) => {
+    // Reject pending requests into the entry's retry UI instead of bubbling an uncaught worker error.
+    event.preventDefault();
     stopDictionaryWorker(new Error(event.message || 'dictionary worker failed'));
   });
   return dictionaryWorker;

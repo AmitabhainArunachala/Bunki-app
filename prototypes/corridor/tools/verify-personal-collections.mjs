@@ -182,13 +182,17 @@ try {
       assert.equal(await page.locator('#sheet .headword').innerText(),'図書館');
       await page.locator('.personal-dictionary-meaning > summary').click();
       assert((await page.locator('#sheet .senses').innerText()).includes('library'));
+      // The never-fetched full index is unavailable, while the cached core
+      // entry remains readable and a handled failure offers an explicit retry.
+      await page.locator('#sheet .dictionary-warning').waitFor();
+      assert(await page.locator('#sheet .dictionary-retry').isVisible());
       await page.locator('#sheet-close').click();await page.locator('#sheet').waitFor({state:'detached'});
       await page.locator('[data-grade="3"]').click();
       await page.waitForFunction(()=>document.querySelector('.pc-status').textContent==='Review saved.');
       assert.equal((await stored(page)).progress.events.length,4);
       await context.setOffline(false);
       checks.push(name+(name==='webkit'?': origin stopped; uncached navigation served by worker and review committed (offline emulation not claimed)':': cold offline app route opens and commits a review'));
-      assert.deepEqual(errors,[]);assert.deepEqual(outbound,[]);
+      assert.deepEqual(errors,[],`${name}: no uncaught errors, including offline dictionary fallback`);assert.deepEqual(outbound,[]);
       checks.push(name+': no JavaScript exceptions or external requests');
       await context.close();
     } finally {await browser.close();}

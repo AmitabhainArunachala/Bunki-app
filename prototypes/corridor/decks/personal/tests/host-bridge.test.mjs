@@ -106,3 +106,50 @@ test('host final write boundary rejects stale capture and every assessment/histo
   assert.deepEqual(state.srs,{original:true}); assert.deepEqual(state.revlog,[['original']]);
   assert.deepEqual(state.taken,[{id:'本'}]);
 });
+
+test('dictionary worker error is canceled while pending requests reject and the worker resets',async () => {
+  const source = readFileSync(new URL('../../../corridor.js',import.meta.url),'utf8');
+  const functionSource = name => {
+    const prefix = name === 'startDictionaryWorker' ? 'async function ' : 'function ';
+    const start = source.indexOf(prefix + name + '(');
+    assert.notEqual(start,-1,`Missing host function ${name}`);
+    const end = source.indexOf('\n}\n',start) + 2;
+    return source.slice(start,end);
+  };
+  class TestWorker extends EventTarget {
+    terminated = false;
+    postMessage() {}
+    terminate() { this.terminated = true; }
+  }
+  const requests = new Map();
+  const context = vm.createContext({
+    Worker:TestWorker, URL, dictionaryWorker:null,
+    dictionaryWorkerRequestId:0, dictionaryWorkerRequests:requests,
+  });
+  // The host functions execute unchanged; only import.meta's module URL is
+  // supplied explicitly because this isolated harness uses a classic VM script.
+  const api = vm.runInContext([
+    functionSource('stopDictionaryWorker'),
+    functionSource('dictionaryWorkerRequest'),
+    functionSource('startDictionaryWorker').replace('import.meta.url',JSON.stringify('https://example.invalid/corridor.js')),
+    '({startDictionaryWorker,dictionaryWorkerRequest})',
+  ].join('\n'),context);
+  const worker = await api.startDictionaryWorker();
+  const pending = ['init','rowsForForm'].map(type => api.dictionaryWorkerRequest(type).then(
+    () => assert.fail('A failed worker request must reject'),
+    error => error.message,
+  ));
+  assert.equal(requests.size,2);
+  const errorEvent = new Event('error',{cancelable:true});
+  Object.defineProperty(errorEvent,'message',{value:'Load failed'});
+  assert.equal(worker.dispatchEvent(errorEvent),false,'The handled worker error must cancel default reporting');
+  assert.equal(errorEvent.defaultPrevented,true);
+  assert.deepEqual(await Promise.all(pending),['Load failed','Load failed']);
+  assert.equal(requests.size,0);
+  assert.equal(worker.terminated,true);
+  assert.equal(context.dictionaryWorker,null);
+  await assert.rejects(api.dictionaryWorkerRequest('init'),/dictionary worker is unavailable/);
+  const retryWorker = await api.startDictionaryWorker();
+  assert.notEqual(retryWorker,worker,'Retry must create a fresh worker');
+  assert.equal(retryWorker.terminated,false);
+});
