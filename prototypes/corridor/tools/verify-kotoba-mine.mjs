@@ -84,14 +84,15 @@
  * Then the Phase 1 follow-ups (STANDARD A37–A41):
  *   1. long passages: after the reveal the target sentence, the word and its definition sit above
  *      the pinned bar at the resting scroll position (km-298-m02, 焦点 and 全文); 焦点 folds the
- *      sentences around the target to two dimmed lines each with a ⋯ that opens them;
+ *      sentences around the target to two dimmed lines each with a ⋯ that opens them, in a
+ *      gutter of its own (no visible glyph under the ⋯, folded or opened: km-109-m05, km-298-m02);
  *   2. kotoba-mcd opens in 読んで思い出す (the target marked, no blank, no hint); 穴埋め blanks it
  *      with no hint; 読んで思い出す leaves 字 cards out of the queue without suspending them, and
  *      穴埋め brings them back;
  *   3. 設定 has no 記録を消す (whole-deck reset is not offered);
  *   4. 出典 is the last fold: author, site (a link when there is one), licence, passage number;
  *   5. at the resting position no fold row is cut by the pinned bar, and the last fold scrolls
- *      clear of it;
+ *      clear of it; on the standalone study pages the study top bar stays on screen;
  *   6. 「タップして答えを見る」 and the swipe hint show for three sittings, then retire
  *      (prefs.sittings);
  *   7. the sentence deck says 「この語の他の文」; Anki says 形容動詞 and folds 出典; the 字 hue is
@@ -809,6 +810,47 @@ async function verifyBack(browser, base) {
     return { y: Math.round(scrollY), bar: Math.round(bar.top), term: Math.round(t.bottom), def: Math.round(d.bottom), sentenceTop: Math.round(f.top), cut: rows.filter((r) => r.top < bar.top - 0.5 && r.bottom > bar.top + 0.5).length }; })()`;
   const CLAMP = `(() => { const card = document.getElementById('kp-card'); return [...card.querySelectorAll('.kp-ctx')].map((g) => { const inner = g.querySelector('.kp-ctx-in'); const more = g.querySelector('.kp-more'); const s = g.querySelector('.kp-s');
     return { side: g.dataset.side, display: getComputedStyle(g).display, clip: g.dataset.clip, h: Math.round(inner.getBoundingClientRect().height), line: parseFloat(getComputedStyle(card.querySelector('.kp-sentence')).lineHeight), more: getComputedStyle(more).display !== 'none', expanded: more.getAttribute('aria-expanded'), dim: +getComputedStyle(s).opacity }; }); })()`;
+  // every glyph of a 焦点 context group that is visible (inside the group's clip box and the viewport)
+  // must stay clear of its ⋯: { glyphs, hits, at: the first glyph it covers }
+  const PILL_CLEAR = `(() => { const out = []; for (const g of document.querySelectorAll('#kp-card .kp-ctx')) { const more = g.querySelector('.kp-more'); if (getComputedStyle(more).display === 'none') continue;
+    const m = more.getBoundingClientRect(); const box = g.querySelector('.kp-ctx-in').getBoundingClientRect(); const walk = document.createTreeWalker(g.querySelector('.kp-ctx-flow'), NodeFilter.SHOW_TEXT); let glyphs = 0; let hits = 0; let at = null;
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) for (let i = 0; i < n.length; i++) { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1);
+      for (const q of r.getClientRects()) { if (!q.width || q.bottom <= Math.max(box.top, 0) || q.top >= Math.min(box.bottom, innerHeight)) continue; glyphs++;
+        if (q.left < m.right - 0.5 && q.right > m.left + 0.5 && q.top < m.bottom - 0.5 && q.bottom > m.top + 0.5) { hits++; at ??= n.data[i]; } } }
+    out.push({ side: g.dataset.side, glyphs, hits, at }); } return out; })()`;
+  {
+    const seen = [];
+    for (const [id, look] of [
+      ['km-109-m05', 'kokuban'],
+      ['km-109-m05', 'dark'],
+      ['km-298-m02', 'dark'],
+    ]) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, zoom: 'auto', look }, state: ledger('kotoba-mcd', id) });
+      const card = await cardId(o.page);
+      await o.page.click('#kp-reveal');
+      await o.page.waitForSelector('.kp-grade');
+      await o.page.evaluate(RESTING);
+      // the ⋯ in mid-screen, so the lines beside it are measured
+      const look1 = async (g) => { await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).evaluate((n) => n.scrollIntoView({ block: 'center' })); return o.page.evaluate(PILL_CLEAR); };
+      const pills = await o.page.locator('#kp-card .kp-ctx .kp-more:visible').count();
+      const rest = [];
+      const opened = [];
+      for (let g = 0; g < pills; g++) rest.push((await look1(g))[g]);
+      for (let g = 0; g < pills; g++) {
+        await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).click();
+        opened.push((await look1(g))[g]);
+      }
+      seen.push({ id, look, card, rest, opened });
+      await close(o);
+    }
+    const all = seen.flatMap((x) => [...x.rest, ...x.opened]);
+    check(
+      '1) in 焦点 the ⋯ never sits on the passage: no visible glyph of a folded group intersects its ⋯, at rest or opened (km-109-m05 in 黒板 and 墨, km-298-m02)',
+      seen.every((x) => x.card === x.id && x.rest.length >= 1 && x.opened.length === x.rest.length) && all.every((g) => g && g.glyphs > 0 && g.hits === 0),
+      JSON.stringify(seen.map(({ id, look, rest, opened }) => ({ id, look, rest, opened }))),
+    );
+  }
+
   {
     const seen = {};
     for (const [label, zoom] of [
@@ -875,6 +917,41 @@ async function verifyBack(browser, base) {
       '5) at the resting position after the reveal no fold row is cut by the pinned bar (each wholly above it or wholly below), the word and definition are above it, and the last fold (出典) scrolls clear of it',
       seen.every((x) => x.cut === 0 && x.term <= x.bar && x.def <= x.bar && x.end.src <= x.end.bar),
       JSON.stringify(seen.map(({ label, card, y, cut, end }) => ({ label, card, y, cut, src: end.src, bar: end.bar }))),
+    );
+  }
+
+  // 5, A39) the standalone study pages have no host header: the settling scroll never slides the
+  // study top bar (× n/N 削除) under the top edge of the screen, and tier one still sits above the bar
+  {
+    const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
+    const seen = [];
+    try {
+      for (const [page, deck] of [
+        ['study-mcd.html', 'kotoba-mcd'],
+        ['study.html', 'kotoba-mine'],
+      ]) {
+        const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+        await context.addInitScript(`try { localStorage.setItem('bunki-cloze:prefs:v3:${deck}', '{"look":"ai"}'); } catch {}`);
+        const p = await context.newPage();
+        await p.goto(`${release.base}/${page}`, { waitUntil: 'load' });
+        await p.waitForSelector('#kp-start', { timeout: 30000 });
+        await p.click('#kp-start');
+        await p.waitForSelector('#kp-card');
+        await p.click('#kp-reveal');
+        await p.waitForSelector('.kp-grade');
+        await p.evaluate(RESTING);
+        const rest = await p.evaluate(AT_REST);
+        const head = await p.evaluate(`Math.round(document.querySelector('.kp-top-study').getBoundingClientRect().top)`);
+        seen.push({ page, head, ...rest });
+        await context.close();
+      }
+    } finally {
+      release.server.close();
+    }
+    check(
+      '5, A39) standalone study pages (no host header): at rest after the reveal the study top bar is still on screen (its top ≥ 0) and the word and definition sit above the pinned bar',
+      seen.length === 2 && seen.every((x) => x.head >= 0 && x.term <= x.bar && x.def <= x.bar),
+      JSON.stringify(seen),
     );
   }
 
