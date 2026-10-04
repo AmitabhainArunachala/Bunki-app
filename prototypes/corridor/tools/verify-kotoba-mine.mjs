@@ -55,6 +55,18 @@
  *      passage never hides it) and carries the rule 「答えを見て理解が深まったなら
  *      もう一度」 once, dismissible, remembered in prefs.
  *
+ * Then the visual system (CARD_CONTRACT_V2 §9, brief-2026-10-04/aesthetics.md):
+ *   a) no 見て覚えるコツ panel, no topic hue, no level 1–3 edge, no amber tip bar; the method
+ *      text lives in 設定;
+ *   b) one hue axis per surface: the target in its part-of-speech colour, the card edge and
+ *      the first chip by item kind (語／字), state chips and grades red/green/amber only,
+ *      English in ink-2, a monochrome level chip (N1/N2/N3) only when the word has a level;
+ *   c) every (text, surface) pair of every theme clears its floor (tools/contrast-kotoba.mjs);
+ *   d) textures on the page, never on the card under the ruby;
+ *   e) the reveal keeps the card node and fades the answer in (opacity/transform, ≤ 180 ms);
+ *      a grade slides the old card out in its direction and the rail ticks on the compositor;
+ *      with prefers-reduced-motion nothing moves or fades, and a swipe does not drag the card.
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -67,6 +79,8 @@ import { fileURLToPath } from 'node:url';
 
 import { AxeBuilder } from '@axe-core/playwright';
 import { chromium } from 'playwright-core';
+
+import { contrastTable } from './contrast-kotoba.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
@@ -346,7 +360,7 @@ const CONTRAST = `(() => {
   const lum = (c) => { const [r, g, b] = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
   const mix = (a, b, t) => a.map((v, i) => Math.round(v * t + b[i] * (1 - t)));
-  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'];
+  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
   const out = {};
   const before = root.dataset.look;
   for (const look of ['light', 'sakura', 'washi']) {
@@ -452,7 +466,7 @@ async function verifyDelivery(browser, base) {
     await boot('?deck=mcd');
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card');
-    const kanji = await page.evaluate(`({ chip: document.querySelector('#kp-card .kp-lvchip')?.textContent, choices: document.querySelectorAll('.kp-choice').length, reveal: !!document.getElementById('kp-reveal'), blank: document.querySelector('#kp-card .kp-blank')?.textContent })`);
+    const kanji = await page.evaluate(`({ chip: document.querySelector('#kp-card .kp-kindchip')?.textContent, choices: document.querySelectorAll('.kp-choice').length, reveal: !!document.getElementById('kp-reveal'), blank: document.querySelector('#kp-card .kp-blank')?.textContent })`);
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     const grades = await page.locator('.kp-grade').count();
@@ -460,7 +474,7 @@ async function verifyDelivery(browser, base) {
 
     // every colour token clears 4.5:1 on the surfaces it sits on, in the light themes (F35, A20)
     const contrast = await page.evaluate(CONTRAST);
-    check('light themes: every text colour is at least 4.5:1 on the card, the second panel, the page, the 思い出せた button and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
+    check('light themes: every text colour, the kind colours included, is at least 4.5:1 on the card, the second panel, the page, the 思い出せた button and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
   } finally {
     await context.close();
   }
@@ -523,6 +537,9 @@ function verifyBackParity() {
     if (!/\{\{\^Hint\}\}\s*<details class="fold kfold" open>/.test(back) || /\{\{#Hint\}\}\s*<details class="fold kfold" open>/.test(back)) bad.push(`${dir}/back: 漢字 fold not open on 字 cards only`);
     if (/<details[^>]*class="fold (gloss|en)"[^>]* open/.test(back)) bad.push(`${dir}/back: an English fold starts open`);
     if (!/\{\{\^SentenceEN\}\}\s*<details class="fold en">\s*<summary>英訳<\/summary>[^{]*未対応/.test(back)) bad.push(`${dir}/back: no 英訳 fold when the sentence has no English`);
+    for (const [name, t] of [['front', front], ['back', back]]) if (!t.includes('<div class="km item-{{Type}}') || !t.includes('<span class="chip lvchip">{{Type}}</span>')) bad.push(`${dir}/${name}: edge and first chip not by item kind`);
+    const css = readFileSync(resolve(tools, dir, 'style.css'), 'utf8');
+    if (/\.km\.kind-/.test(css) || !css.includes('.km.item-字')) bad.push(`${dir}/style.css: the edge is not the item kind`);
     if (!back.includes('lang="en">{{Meaning}}') || !back.includes('lang="en">{{SentenceEN}}') || !back.includes('lang="en">{{Tip}}') || /<details[^>]*lang=/.test(back)) bad.push(`${dir}/back: lang="en" not on the English text alone`);
   }
   const tsv = readFileSync(resolve(release, 'kotoba-mcd.tsv'), 'utf8').trim().split('\n');
@@ -533,9 +550,9 @@ function verifyBackParity() {
   if (wrongEn.length) bad.push(`kotoba-mcd.tsv SentenceEN ≠ enTarget: ${wrongEn.slice(0, 3).join(', ')}`);
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT].every((k) => html.includes(k)) || /kp-tapword|is-four/.test(html)) bad.push(`${page}: not the current player`);
+    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
   }
-  check('parity: the study pages bundle this player; the Anki fronts show no readings or English; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards) and translate only the target sentence', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
+  check('parity: the study pages bundle this player; the Anki fronts show no readings or English; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards) and translate only the target sentence; Anki edges and first chips by item kind', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
 }
 
 async function verifyBack(browser, base) {
@@ -656,7 +673,7 @@ async function verifyBack(browser, base) {
       return { ja, en, details: [...ans.querySelectorAll('details')].every((d) => !d.hasAttribute('lang')) }; })()`);
     check('c) screen readers: the fold summaries read as Japanese, only the English text inside carries lang="en"', lang.ja && lang.en && lang.details, JSON.stringify(lang));
     // 44px touch targets on the zoom toggle and the rule's ×, though they are drawn smaller
-    const hits = await o.page.evaluate(`['kp-zoom-focus', 'kp-zoom-full', 'kp-rule-dismiss'].map((id) => { const n = document.getElementById(id); const r = n.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const hits = await o.page.evaluate(`['kp-zoom-focus', 'kp-zoom-full', 'kp-rule-dismiss'].map((id) => { const n = document.getElementById(id); if (id !== 'kp-rule-dismiss') n.scrollIntoView({ block: 'center' }); const r = n.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const at = (dy) => document.elementFromPoint(cx, cy + dy) === n; return { id, h: Math.round(r.height), reach: at(-21) && at(21) }; })`);
     check('e) the zoom toggle and the rule\'s × each have a 44px hit area on a phone without growing on screen', hits.every((h) => h.reach && h.h < 44), JSON.stringify(hits));
     await o.page.click('#kp-zoom-focus');
@@ -774,6 +791,247 @@ async function verifyBack(browser, base) {
   }
 }
 
+/* ------------------------- the visual system (CARD_CONTRACT_V2 §9, aesthetics.md) */
+const WBIG_PATH = resolve(CORRIDOR_DIR, '../drift/data/wbig.json');
+/** the colours the card actually paints, next to the theme tokens they must equal */
+const PAINT = `(() => {
+  const card = document.getElementById('kp-card');
+  const kp = document.querySelector('.kp');
+  const probe = document.createElement('i');
+  kp.append(probe);
+  const tok = (k) => { probe.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(probe).color; };
+  const color = (sel) => { const n = card.querySelector(sel) || document.querySelector(sel); return n ? getComputedStyle(n).color : null; };
+  const chips = [...card.querySelectorAll('.kp-chips > .kp-chip')];
+  const out = {
+    look: kp.dataset.look, kind: card.dataset.kind, classes: card.className, topicVar: card.style.getPropertyValue('--kp-topic'),
+    edge: getComputedStyle(card).borderLeftColor, kindChip: chips[0]?.textContent, kindChipColor: chips[0] ? getComputedStyle(chips[0]).color : null,
+    chips: chips.map((c) => c.textContent), level: card.querySelector('.kp-levelchip')?.textContent ?? null, levelLabel: card.querySelector('.kp-levelchip')?.getAttribute('aria-label') ?? null,
+    levelColor: color('.kp-levelchip'), levelBg: card.querySelector('.kp-levelchip') ? getComputedStyle(card.querySelector('.kp-levelchip')).backgroundColor : null,
+    state: color('.kp-st-new, .kp-st-learn'), target: color('.kp-target'), targetLine: card.querySelector('.kp-target') ? getComputedStyle(card.querySelector('.kp-target')).textDecorationLine : null,
+    term: color('.kp-term'), gloss: color('.kp-gloss'), en: color('.kp-en'), tip: color('.kp-tip'),
+    tipBar: card.querySelector('.kp-tip') ? getComputedStyle(card.querySelector('.kp-tip')).borderLeftWidth : null,
+    again: color('#kp-grade-again b'), good: color('#kp-grade-good b'),
+    cardTex: getComputedStyle(card).backgroundImage, pageTex: getComputedStyle(kp).backgroundImage,
+    tok: Object.fromEntries(['ink', 'ink-2', 'panel-2', 'kind-go', 'kind-ji', 'red', 'green', 'amber', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'].map((k) => [k, tok(k)])),
+  };
+  probe.style.color = 'var(--kp-panel-2)';
+  out.tok['panel-2'] = getComputedStyle(probe).color;
+  probe.remove();
+  return out;
+})()`;
+/** every animation and transition under .kp, and every element whose transform is not the identity */
+const MOTION = `(() => {
+  const kp = document.querySelector('.kp');
+  const secs = (v) => Math.max(0, ...v.split(',').map((x) => parseFloat(x) * (x.trim().endsWith('ms') ? 0.001 : 1)));
+  const moving = [];
+  let longest = 0;
+  for (const n of [kp, ...kp.querySelectorAll('*')]) {
+    const cs = getComputedStyle(n);
+    const t = secs(cs.transitionDuration);
+    const a = cs.animationName !== 'none' ? secs(cs.animationDuration) : 0;
+    longest = Math.max(longest, t, a);
+    if (cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') moving.push(n.className || n.tagName);
+  }
+  return { longest: Math.round(longest * 1000), moving: moving.slice(0, 4), running: document.getAnimations().length };
+})()`;
+/** records the cards that come and go while a grade is answered */
+const WATCH = `(() => {
+  window.__kpSeen = [];
+  new MutationObserver((list) => { for (const m of list) for (const n of m.addedNodes) if (n.classList?.contains('kp-ghost')) window.__kpSeen.push({ cls: n.className, id: n.id, ids: n.querySelectorAll('[id]').length, hidden: n.getAttribute('aria-hidden'), inert: n.inert }); })
+    .observe(document.body, { childList: true, subtree: true });
+})()`;
+
+function verifyLevels(decks) {
+  const pairs = new Map();
+  for (const [w, r, , l] of readJson(WBIG_PATH)) if (Number.isInteger(l)) pairs.set(`${w}|${r}`, new Set([...(pairs.get(`${w}|${r}`) ?? []), l]));
+  const bad = [];
+  let n = 0;
+  for (const d of decks)
+    for (const w of d.words) {
+      const found = pairs.get(`${w.term}|${w.reading}`);
+      const want = found?.size === 1 ? `N${[...found][0]}` : undefined;
+      if (w.level !== want) bad.push(`${d.id} ${w.id} ${w.term} ${w.level} ≠ ${want}`);
+      if (w.level) n++;
+    }
+  const named = decks.every((d) => (d.method ?? []).some((line) => line.includes('目安') && line.includes('open-anki-jlpt-decks')));
+  check('b) word.level comes from the public list (wbig.json, joined on headword and reading, one level only) and the method names the list as a 目安', bad.length === 0 && n > 0 && named, bad.slice(0, 3).join(' | ') || `${n / decks.length} of ${decks[0].words.length} words levelled per deck`);
+}
+
+async function verifyVisual(browser, base) {
+  const mcd = readJson(DECK_PATH);
+  const sent = readJson(SENTENCE_DECK_PATH);
+  verifyLevels([mcd, sent]);
+  const { rows, failures: low } = contrastTable();
+  check(
+    'c) contrast (tools/contrast-kotoba.mjs, read from player.css): passage ≥ 7, body, gloss, muted text, every chip, state, accent and part-of-speech colour ≥ 4.5 in all eight themes',
+    low.length === 0,
+    low.slice(0, 3).join(' | ') || rows.map((r) => `${r.look} ${Math.min(...Object.values(r).filter((v) => typeof v === 'number'))}`).join(' · '),
+  );
+
+  const due = (deck, id) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
+  const open = async (q, deck, { prefs = null, state = null, reduce = false, start = true } = {}) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(SEEDED);
+    await context.addInitScript(`try { if (!sessionStorage.getItem('__vis_seeded')) { sessionStorage.setItem('__vis_seeded', '1');
+      ${prefs ? `localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify(prefs))});` : ''}
+      ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
+    const page = await context.newPage();
+    if (reduce) await page.emulateMedia({ reducedMotion: 'reduce' });
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto(`${base}/index.html${q}`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    if (start) {
+      await page.click('#kp-start');
+      await page.waitForSelector('#kp-card');
+    }
+    return { context, page, errors };
+  };
+  const close = async (o) => {
+    if (o.errors.length) check('no page errors in the visual checks', false, o.errors.slice(0, 2).join(' | '));
+    await o.context.close();
+  };
+  const reveal = async (page) => {
+    await page.click('#kp-reveal');
+    await page.waitForSelector('.kp-grade');
+  };
+
+  // a) the home and 設定: no tips panel, no topic hue; the method moved to 設定
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd', { start: false });
+    const home = await o.page.evaluate(`({ tips: document.querySelectorAll('#kp-tips, .kp-tips').length, method: document.querySelectorAll('#kp-method').length,
+      topic: [...document.querySelectorAll('.kp-group')].filter((g) => g.style.getPropertyValue('--kp-topic') || parseFloat(getComputedStyle(g).borderLeftWidth) > 1).length })`);
+    await o.page.click('#kp-to-settings');
+    await o.page.waitForSelector('#kp-backup');
+    const set = await o.page.evaluate(`(() => { const m = document.querySelector('.kp-settings #kp-method'); return { method: !!m, summary: m?.querySelector('summary')?.textContent, lines: m ? m.querySelectorAll('p').length : 0, groups: document.querySelectorAll('.kp-settings [role="radiogroup"]').length }; })()`);
+    check(
+      'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method',
+      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'このデッキのしくみ' && set.lines === mcd.method.length && set.groups === 5,
+      JSON.stringify({ home, set }),
+    );
+    await close(o);
+  }
+
+  // b) a new MCD 語 card with a level (財政 N1), front and back, in 墨 and 白
+  for (const look of ['dark', 'light']) {
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { look } });
+    const front = await o.page.evaluate(PAINT);
+    await reveal(o.page);
+    await o.page.evaluate(`document.querySelectorAll('#kp-card details').forEach((d) => (d.open = true))`);
+    const back = await o.page.evaluate(PAINT);
+    const t = back.tok;
+    const w = mcd.words.find((x) => x.id === 'km-064');
+    check(
+      `a, b) ${look}: the 語 card's edge and first chip are the 語 colour (no level 1–3 edge, no topic hue), the target and term its noun colour and underlined, 初めて in ink-2, the level chip N1 monochrome with its 目安 label`,
+      front.kind === 'go' && !/kp-lv\d|kp-topic/.test(front.classes) && !front.topicVar && front.edge === t['kind-go'] && front.kindChip === '語' && front.kindChipColor === t['kind-go'] &&
+        back.target === t.noun && back.targetLine.includes('underline') && back.term === t.noun && front.state === t['ink-2'] &&
+        w.level === 'N1' && front.level === 'N1' && front.levelLabel === 'N1相当（公開リストによる目安）' && front.levelColor === t['ink-2'] && front.levelBg === t['panel-2'],
+      JSON.stringify({ kind: front.kind, edge: front.edge, chip: front.kindChipColor, target: back.target, state: front.state, level: front.level, chips: front.chips }),
+    );
+    check(
+      `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the grades are red and green`,
+      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && back.again === t.red && back.good === t.green,
+      JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, good: back.good }),
+    );
+    await close(o);
+  }
+
+  // b) a 字 card: its own edge and chip colour; a word without a level: no level chip; the sentence deck: 語, no "3/1"
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look: 'washi' }, state: due('kotoba-mcd', 'km-064-m02') });
+    const ji = await o.page.evaluate(PAINT);
+    await close(o);
+    const p = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: due('kotoba-mcd', 'km-066-m01') });
+    const none = await p.page.evaluate(PAINT);
+    await close(p);
+    const q = await open('?deck=kotoba', 'kotoba-mine');
+    const s = await q.page.evaluate(PAINT);
+    await close(q);
+    check(
+      'b) 字 card: edge and chip in the 字 colour; a word with no level (利回り) has no level chip; the sentence deck says 語 and its source, never a "3/1" count',
+      ji.kind === 'ji' && ji.kindChip === '字' && ji.edge === ji.tok['kind-ji'] && ji.kindChipColor === ji.tok['kind-ji'] && ji.edge !== ji.tok['kind-go'] && ji.state === ji.tok.amber &&
+        none.level === null && !none.chips.some((c) => /^N\d$/.test(c)) && s.kindChip === '語' && s.edge === s.tok['kind-go'] && !s.chips.some((c) => /\d+\/\d+/.test(c)) && s.level === 'N1',
+      JSON.stringify({ ji: [ji.kind, ji.kindChip, ji.edge], none: none.chips, sentence: s.chips }),
+    );
+  }
+
+  // d) textures: on the page, never on the card (和紙 paper, 黒板 chalk)
+  {
+    const seen = [];
+    for (const look of ['washi', 'kokuban', 'sakura']) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { look } });
+      await reveal(o.page);
+      const v = await o.page.evaluate(PAINT);
+      seen.push({ look, card: v.cardTex, page: v.pageTex !== 'none' });
+      await close(o);
+    }
+    check('d) 和紙, 黒板 and 桜 paint their texture on the page; the card under the ruby is plain', seen.every((x) => x.card === 'none' && x.page), JSON.stringify(seen));
+  }
+
+  // e) the reveal keeps the card; the answer fades in within 180 ms; a grade slides the card out its way
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd');
+    await o.page.evaluate(`window.__kpNodes = { card: document.getElementById('kp-card'), study: document.querySelector('.kp-study'), top: document.querySelector('.kp-top'), chips: document.querySelector('#kp-card .kp-chips') }`);
+    await o.page.click('#kp-reveal');
+    const kept = await o.page.evaluate(`(() => { const n = window.__kpNodes; const a = document.querySelector('#kp-card .kp-answer'); const cs = getComputedStyle(a); const rt = document.querySelector('#kp-card rt');
+      return { card: document.getElementById('kp-card') === n.card, study: document.querySelector('.kp-study') === n.study, top: document.querySelector('.kp-top') === n.top, chips: document.querySelector('#kp-card .kp-chips') === n.chips,
+        cards: document.querySelectorAll('#kp-card').length, reveal: !!document.getElementById('kp-reveal'), grades: document.querySelectorAll('.kp-grade').length,
+        answer: cs.animationName, answerMs: parseFloat(cs.animationDuration) * 1000, rt: rt ? getComputedStyle(rt).animationName : null, rtMs: rt ? (parseFloat(getComputedStyle(rt).animationDuration) + parseFloat(getComputedStyle(rt).animationDelay)) * 1000 : null }; })()`);
+    const motion = await o.page.evaluate(MOTION);
+    check(
+      'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in and the answer rises in 120–180 ms, opacity and transform only',
+      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 2 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && kept.rtMs <= 230 && motion.longest <= 180,
+      JSON.stringify({ ...kept, longest: motion.longest }),
+    );
+    await o.page.evaluate(WATCH);
+    const rail0 = await o.page.evaluate(`getComputedStyle(document.querySelector('.kp-progress i')).getPropertyValue('--kp-frac')`);
+    await o.page.click('#kp-grade-good');
+    await o.page.waitForSelector('#kp-reveal');
+    const after = await o.page.evaluate(`(() => { const i = document.querySelector('.kp-progress i'); const cs = getComputedStyle(i); const total = +document.querySelector('.kp-count').textContent.split('/')[1];
+      return { seen: window.__kpSeen, advance: document.querySelector('.kp-study').dataset.advance, arrive: document.getElementById('kp-card').classList.contains('kp-arrive'), cards: document.querySelectorAll('#kp-card').length,
+        frac: +i.style.getPropertyValue('--kp-frac'), want: 1 / total, prop: cs.transitionProperty, ms: parseFloat(cs.transitionDuration) * 1000 }; })()`);
+    await o.page.waitForTimeout(500);
+    const gone = await o.page.evaluate(`document.querySelectorAll('.kp-ghost').length`);
+    await reveal(o.page);
+    await o.page.evaluate(`window.__kpSeen = []`);
+    await o.page.click('#kp-grade-again');
+    await o.page.waitForSelector('#kp-reveal');
+    const again = await o.page.evaluate(`({ seen: window.__kpSeen, advance: document.querySelector('.kp-study').dataset.advance })`);
+    check(
+      'e) a grade slides the answered card out its way (思い出せた right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
+      after.seen.length === 1 && after.seen[0].cls.includes('kp-out-good') && !after.seen[0].id && after.seen[0].ids === 0 && after.seen[0].hidden === 'true' && after.seen[0].inert && after.advance === 'good' && after.arrive && after.cards === 1 && gone === 0 &&
+        again.seen.length === 1 && again.seen[0].cls.includes('kp-out-again') && again.advance === 'again' && rail0 === '0' && Math.abs(after.frac - after.want) < 1e-9 && after.prop === 'transform' && after.ms === 120,
+      JSON.stringify({ good: after.seen[0]?.cls, again: again.seen[0]?.cls, gone, rail: [rail0, after.frac, after.prop, after.ms] }),
+    );
+    await close(o);
+  }
+
+  // e) prefers-reduced-motion: no transform, no animation, no transition anywhere; swipe does not drag
+  {
+    const o = await open('?deck=kotoba', 'kotoba-mine', { reduce: true });
+    await o.page.evaluate(`window.__kpCard = document.getElementById('kp-card')`);
+    await o.page.click('#kp-reveal');
+    await o.page.waitForSelector('.kp-grade');
+    const still = await o.page.evaluate(`document.getElementById('kp-card') === window.__kpCard`);
+    const revealed = await o.page.evaluate(MOTION);
+    await o.page.evaluate(WATCH);
+    const drag = await o.page.evaluate(`(() => { const n = document.getElementById('kp-card'); const ev = (type, x, y) => n.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, pointerId: 9, bubbles: true }));
+      ev('pointerdown', 100, 100); ev('pointermove', 160, 102); const mid = { transform: n.style.transform, swipe: n.dataset.swipe }; ev('pointermove', 230, 104); ev('pointerup', 230, 104); return mid; })()`);
+    await o.page.waitForSelector('#kp-reveal');
+    const advanced = await o.page.evaluate(`(() => { const i = document.querySelector('.kp-progress i'); return { seen: window.__kpSeen.length, count: document.querySelector('.kp-count').textContent, total: +document.querySelector('.kp-count').textContent.split('/')[1], rail: getComputedStyle(i).transform, width: i.getBoundingClientRect().width, track: i.parentElement.getBoundingClientRect().width,
+      arrive: document.getElementById('kp-card').classList.contains('kp-arrive'), log: JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || '{"log":[]}').log.length }; })()`);
+    const moved = await o.page.evaluate(MOTION);
+    check(
+      'e) prefers-reduced-motion (emulateMedia): the reveal keeps the card, nothing animates or transitions, no element is transformed; a swipe marks the edge without dragging and still grades; no slide-out, the rail is a plain width',
+      still && revealed.longest === 0 && revealed.moving.length === 0 && revealed.running === 0 && drag.transform === '' && drag.swipe === 'good' && advanced.seen === 0 && !advanced.arrive && advanced.log === 1 && advanced.count.startsWith('2/') &&
+        advanced.rail === 'none' && Math.abs(advanced.width - advanced.track / advanced.total) < 1 && moved.longest === 0 && moved.moving.length === 0 && moved.running === 0,
+      JSON.stringify({ still, revealed, drag, advanced, moved }),
+    );
+    await close(o);
+  }
+}
+
 /* --------------------------------------------------- half two: the app */
 async function main() {
   console.log('— 言葉の鉱脈: the deck as data');
@@ -824,7 +1082,7 @@ async function main() {
 
     await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
-    check('the deck home explains the method (このデッキのしくみ)', (await page.locator('#kp-method').count()) === 1);
+    check('the deck home leads with the count and topics: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
 
@@ -893,6 +1151,9 @@ async function main() {
 
     console.log('\n— the back hierarchy (CARD_CONTRACT_V2 §2–§4): front pin, tiers, folds, zoom, grade bar');
     await verifyBack(browser, base);
+
+    console.log('\n— the visual system (CARD_CONTRACT_V2 §9): colour axes, contrast, textures, motion');
+    await verifyVisual(browser, base);
   } finally {
     await browser.close();
     server.close();
