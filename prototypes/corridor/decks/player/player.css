@@ -180,3 +180,9 @@
 @media (prefers-reduced-motion: reduce) {
   .kp-card, .kp-progress i { transition: none; }
 }
+.kp-method { margin: 16px 0 4px; border: 1px solid var(--kp-line, #26303b); border-radius: 14px; padding: 10px 14px; }
+.kp-method summary { cursor: pointer; font-weight: 700; color: var(--kp-cyan); }
+.kp-method p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
+.kp-endetails summary { cursor: pointer; font-size: 13px; color: var(--kp-ink-2); }
+.kp-endetails[open] summary { margin-bottom: 4px; }
+.kp-blank { color: var(--kp-cyan); }

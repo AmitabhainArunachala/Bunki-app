@@ -136,18 +136,108 @@ def target_reading(card: dict, form: str) -> str | None:
     return None
 
 
+# ------------------------------------------------------------------ MCD (massive-context cloze)
+_KANJI_DB: dict | None = None
+RENDAKU = {"か": "が", "き": "ぎ", "く": "ぐ", "け": "げ", "こ": "ご", "さ": "ざ", "し": "じ", "す": "ず", "せ": "ぜ", "そ": "ぞ",
+           "た": "だ", "ち": "ぢ", "つ": "づ", "て": "で", "と": "ど", "は": "ば", "ひ": "び", "ふ": "ぶ", "へ": "べ", "ほ": "ぼ"}
+HANDAKU = {"は": "ぱ", "ひ": "ぴ", "ふ": "ぷ", "へ": "ぺ", "ほ": "ぽ"}
+
+
+def _readings(ch: str) -> list[str]:
+    global _KANJI_DB
+    if _KANJI_DB is None:
+        _KANJI_DB = json.loads((CORRIDOR / "data" / "share_alike" / "kanji.json").read_text("utf-8"))["kanji"]
+    k = _KANJI_DB.get(ch, {})
+    base = {kata_to_hira(r) for r in k.get("on", [])} | {r.split(".")[0].strip("-") for r in k.get("kun", [])}
+    out = set()
+    for r in base:
+        if not r:
+            continue
+        out.add(r)
+        if r[0] in RENDAKU:
+            out.add(RENDAKU[r[0]] + r[1:])
+        if r[0] in HANDAKU:
+            out.add(HANDAKU[r[0]] + r[1:])
+        if len(r) > 1 and r[-1] in "つくちき":
+            out.add(r[:-1] + "っ")
+    return sorted(out, key=len, reverse=True)
+
+
+def align(form: str, reading: str) -> list[tuple[str, str]] | None:
+    """財政/ざいせい → [(財, ざい), (政, せい)]; 覆う/おおう → [(覆, おお), (う, '')]"""
+    if not form:
+        return [] if not reading else None
+    ch = form[0]
+    if not KANJI.match(ch):
+        if reading.startswith(kata_to_hira(ch)):
+            rest = align(form[1:], reading[1:])
+            return None if rest is None else [(ch, "")] + rest
+        return None
+    if len(form) == 1:
+        return [(ch, reading)] if reading else None
+    for r in _readings(ch):
+        if reading.startswith(r) and len(r) < len(reading):
+            rest = align(form[1:], reading[len(r):])
+            if rest is not None:
+                return [(ch, r)] + rest
+    return None
+
+
+def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]:
+    """per passage: one card blanking the whole word (hint: its Japanese definition),
+    then one card per kanji of the word, blanked with its reading as the hint."""
+    cards = []
+    for pi, p in enumerate(passages, 1):
+        ruby = _ordered_for({"ja": p["ja"], "form": p["form"]}, c, tagger, bc)
+        if "".join(seg[0] for seg in ruby) != p["ja"]:
+            raise SystemExit(f"{wid} passage {pi}: ruby does not spell the passage")
+        src = {k: p[k] for k in ("site", "url", "licence") if p.get(k)}
+        base = {"ja": p["ja"], "form": p["form"], "en": p["en"], "kind": p["kind"], "src": src, "passage": pi}
+        cards.append({**base, "type": "word", "ruby": ruby})
+        ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
+        parts = align(p["form"], ruby[ti][1])
+        kanji_parts = [i for i, (t, _) in enumerate(parts or []) if KANJI.match(t)]
+        if len(kanji_parts) < 2 and not (parts and kanji_parts and len(parts) > 1):
+            continue  # a one-kanji word with no okurigana: the word card already asks for it
+        for k in kanji_parts:
+            segs = [[t, r, 1 if i == k else 2] for i, (t, r) in enumerate(parts)]
+            cards.append({**base, "type": "kanji", "hint": parts[k][1], "ruby": ruby[:ti] + segs + ruby[ti + 1:]})
+    for i, card in enumerate(cards, 1):
+        card["lv"] = i
+        card["id"] = f"{wid}-m{i:02d}"
+    return cards
+
+
+METHOD = [
+    "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）方式です。",
+    "表：ニュース・ウィキペディア・文学から取った本物の文章（2〜4文）。穴はひとつだけ。",
+    "「語」カード：単語まるごとが穴。下の日本語の説明と文脈から思い出す。",
+    "「字」カード：単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す。",
+    "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
+    "裏：ふりがな付きの全文、読み、意味。英訳はタップで。出典つき。",
+    "判定は「もう一度／覚えた」の二択で十分（FSRS-6）。迷ったら「もう一度」。",
+]
+
+
 # ------------------------------------------------------------------ deck
 def build_deck(mods: list[dict]) -> dict:
     import build_corridor as bc
     from corpus.grading._mecab import get_tagger
 
     tagger = get_tagger()
+    mcd_path = SRC / "mcd.json"
+    mcd = json.loads(mcd_path.read_text("utf-8")) if mcd_path.exists() else {}
+    preview = "--preview" in sys.argv
     words = []
     for m in mods:
         for c in m["cards"]:
             wid = f"km-{c['n']:03d}"
+            if preview and str(c["n"]) not in mcd:
+                continue
             cards = []
-            for s in c["sentences"]:
+            if str(c["n"]) in mcd:
+                cards = mcd_cards(wid, c, mcd[str(c["n"])], tagger, bc)
+            for s in [] if cards else c["sentences"]:
                 ruby = _ordered_for(s, c, tagger, bc)
                 if "".join(seg[0] for seg in ruby) != s["ja"]:
                     raise SystemExit(f"{wid} lv{s['lv']}: ruby does not spell the sentence")
@@ -174,7 +264,10 @@ def build_deck(mods: list[dict]) -> dict:
         "id": DECK_ID,
         "titleJa": TITLE_JA,
         "titleEn": TITLE_EN,
-        "groups": [{"id": m["id"], "titleJa": GROUPS[m["id"]][0], "titleEn": GROUPS[m["id"]][1]} for m in mods],
+        "groups": [{"id": m["id"], "titleJa": GROUPS[m["id"]][0], "titleEn": GROUPS[m["id"]][1]} for m in mods
+                   if any(w["group"] == m["id"] for w in words)],
+        "unlockDays": 3,
+        "method": METHOD,
         "words": words,
         "provenance": "Sentences are real Japanese mined from the web, Tatoeba (CC BY 2.0 FR), ja.wikinews and Aozora Bunko; each card names its source. Web sentences are short quotations kept for personal study. Definitions, notes and the few sentences marked 書き下ろし were written for this word list.",
     }
@@ -316,7 +409,7 @@ def build_tsv(deck: dict) -> None:
 
 
 # ------------------------------------------------------------------ study.html
-def build_study(deck: dict) -> None:
+def build_study(deck: dict, out: Path | None = None) -> None:
     """One offline file: the player's three modules inlined as plain code
     (no runtime eval, so it also runs under a strict content policy)."""
     player = CORRIDOR / "decks" / "player"
@@ -342,12 +435,17 @@ def build_study(deck: dict) -> None:
     css = (player / "player.css").read_text("utf-8")
     page = page.replace("__CSS__", css).replace("__PIN__", pin).replace("__DECK__", deck_json)
     page = page.replace("__CODE__", code.replace("</script", "<\\/script"))
-    (RELEASE / "study.html").write_text(page, "utf-8")
+    (out or RELEASE / "study.html").write_text(page, "utf-8")
 
 
 def main() -> int:
     mods = load()
     deck = build_deck(mods)
+    if "--preview" in sys.argv:
+        out = Path(sys.argv[sys.argv.index("--preview") + 1])
+        build_study(deck, out)
+        print(f"· preview: {len(deck['words'])} words, {sum(len(w['cards']) for w in deck['words'])} cards → {out}")
+        return 0
     PLAYER_DECK.parent.mkdir(parents=True, exist_ok=True)
     PLAYER_DECK.write_text(json.dumps(deck, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
     RELEASE.mkdir(exist_ok=True)

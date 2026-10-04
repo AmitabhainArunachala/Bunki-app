@@ -42,12 +42,12 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'en', mode: 'read', look: 'dark', furigana: 'tap' };
+const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap' };
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
-const prefsKey = 'bunki-cloze:prefs:v2'; // v2: reading cards became the default
+const prefsKey = 'bunki-cloze:prefs:v3'; // v3: massive-context cloze is the default
 function readJson(storage, key) {
   try {
     return JSON.parse(storage.getItem(key) || 'null');
@@ -111,8 +111,8 @@ function sentenceNodes(card, { blank, ruby }) {
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
   card.ruby.forEach(([text, reading, isTarget], i) => {
-    if (isTarget && blank) {
-      out.append(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
+    if (isTarget === 1 && blank) {
+      out.append(el('span', 'kp-blank', card.hint ? `〔${card.hint}〕` : '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
       return;
     }
     const hasRuby = reading && KANJI.test(text);
@@ -165,17 +165,25 @@ function homeScreen() {
   const hard = statuses.filter((s) => s.key === 'hard').length;
   const box = el('section', 'kp-home');
   box.append(topBar(deck.titleJa, ctx.onLeave ? () => ctx.onLeave() : null));
-  box.append(el('p', 'kp-sub', `${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}文 · ${deck.titleEn}`));
+  box.append(el('p', 'kp-sub', `${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚 · ${deck.titleEn}`));
 
   const tiles = el('div', 'kp-tiles');
   const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
-  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しい文', 'kp-c-new'), tile(known, '覚えた語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
+  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しいカード', 'kp-c-new'), tile(known, '覚えた語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
   box.append(tiles);
 
   const total = q.queue.length;
   const start = btn('kp-start', total ? `始める — ${total}枚` : '今日はここまで', () => startSession(), { id: 'kp-start' });
   start.disabled = !total;
   box.append(start);
+
+  if (deck.method?.length) {
+    const how = el('details', 'kp-method');
+    how.id = 'kp-method';
+    how.append(el('summary', null, 'このデッキのしくみ'));
+    for (const line of deck.method) how.append(el('p', null, line));
+    box.append(how);
+  }
 
   box.append(el('h2', 'kp-h2', 'テーマ'));
   const off = new Set(state.groupsOff);
@@ -281,7 +289,8 @@ function studyScreen() {
     el(
       'div',
       'kp-chips',
-      el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`),
+      el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'),
+      el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'}${card.passage ? ` · 文章${card.passage}` : ''}`),
       el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
       el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
     ),
@@ -289,7 +298,7 @@ function studyScreen() {
   face.append(sentenceNodes(card, { blank: !ui.revealed && ctx.prefs.mode !== 'read', ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none' }));
 
   if (!ui.revealed) {
-    if (ctx.prefs.hint !== 'none' && ctx.prefs.mode !== 'read') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
+    if (ctx.prefs.hint !== 'none' && ctx.prefs.mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
     if (ctx.prefs.mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
@@ -340,8 +349,11 @@ function answerBlock(card, word) {
   a.lang = 'ja';
   a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading)));
   a.append(el('p', 'kp-def', word.defJa));
-  a.append(el('p', 'kp-meaning', word.meaning));
-  if (card.en) a.append(el('p', 'kp-en', card.en));
+  const en = el('details', 'kp-endetails');
+  en.append(el('summary', null, '英語'), el('p', 'kp-meaning', word.meaning));
+  if (card.en) en.append(el('p', 'kp-en', card.en));
+  en.addEventListener('click', (e) => e.stopPropagation());
+  a.append(en);
   if (card.src) a.append(sourceLine(card));
   if (word.tip) a.append(el('p', 'kp-tip', word.tip));
   return a;
