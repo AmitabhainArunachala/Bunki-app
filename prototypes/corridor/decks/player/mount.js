@@ -47,7 +47,7 @@ async function loadDeck(deckId) {
  * "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one) or the
  * learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown once */
 const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false };
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, toast: '' };
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, toast: '', rail: 0 };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
@@ -311,20 +311,6 @@ function homeScreen() {
   start.disabled = !total;
   box.append(start);
 
-  const tips = el('details', 'kp-tips');
-  tips.id = 'kp-tips';
-  tips.append(el('summary', null, '見て覚えるコツ（色・形・場所）'));
-  for (const line of VISUAL_TIPS) tips.append(el('p', null, line));
-  box.append(tips);
-
-  if (deck.method?.length) {
-    const how = el('details', 'kp-method');
-    how.id = 'kp-method';
-    how.append(el('summary', null, 'このデッキのしくみ'));
-    for (const line of deck.method) how.append(el('p', null, line));
-    box.append(how);
-  }
-
   box.append(el('h2', 'kp-h2', 'テーマ'));
   const off = new Set(state.groupsOff);
   const list = el('div', 'kp-groups');
@@ -333,7 +319,6 @@ function homeScreen() {
     const st = words.map((w) => wordStatus(w, state).key);
     const share = (k) => (st.filter((x) => x === k).length / words.length) * 100;
     const row = el('label', 'kp-group' + (off.has(g.id) ? ' is-off' : ''));
-    row.style.setProperty('--kp-topic', topicColour(g.id));
     const box2 = el('input');
     box2.type = 'checkbox';
     box2.checked = !off.has(g.id);
@@ -379,6 +364,7 @@ function startSession() {
   ui.done = 0;
   ui.right = 0;
   ui.undo = null;
+  ui.rail = 0;
   refill();
   resetCard();
   go('study');
@@ -432,24 +418,27 @@ function studyScreen() {
   const top = el('header', 'kp-top kp-top-study');
   top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': '終わる', id: 'kp-quit' }));
   const prog = el('div', 'kp-progress');
-  prog.append(Object.assign(el('i'), { style: `width:${(ui.pos / total) * 100}%` }));
+  prog.append(rail(ui.pos / total));
   top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`));
   box.append(top);
 
   const stored = ctx.state.cards[id];
   // a passage card (MCD) is several sentences; only those get the 全文／焦点 zoom
   const passage = !!card.type;
-  const face = el('article', `kp-card kp-lv${card.lv} kp-topic kp-pos-${posKey(word.pos)}`);
-  face.style.setProperty('--kp-topic', topicColour(word.group));
+  const [kind, kindLabel] = itemKind(card);
+  // one hue axis per surface: the edge and the first chip say the item kind, the target its part of speech
+  const face = el('article', `kp-card kp-kind-${kind} kp-pos-${posKey(word.pos)}`);
   face.id = 'kp-card';
   face.dataset.card = id;
+  face.dataset.kind = kind;
+  const source = KIND_NAME[card.kind] || '例文';
   const chips = el(
     'div',
     'kp-chips',
-    ...(card.type
-      ? [el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'), el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'} · 文章${card.passage}`)]
-      : [el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`)]),
+    el('span', 'kp-chip kp-kindchip', kindLabel),
+    el('span', 'kp-chip', card.type ? `${source} · 文章${card.passage}` : source),
     el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
+    word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
   );
   face.append(chips);
@@ -489,7 +478,7 @@ function studyScreen() {
     if (mode === 'choice') {
       const ok = ui.picked === word.id;
       box.append(el('p', `kp-verdict ${ok ? 'kp-c-known' : 'kp-c-hard'}`, ok ? '正解' : `不正解 — 正しくは ${word.term}`));
-      box.append(btn('kp-next', '次へ →', next, { id: 'kp-next' }));
+      box.append(btn('kp-next', '次へ →', () => next(), { id: 'kp-next' }));
     } else {
       box.append(gradeBar(id));
       box.classList.add('has-bar');
@@ -516,25 +505,45 @@ const THEMES = [
   ['ai', '藍', '#121a46', '#f2c14e'],
   ['matcha', '抹茶', '#13261a', '#a6e06a'],
   ['kokuban', '黒板', '#1f2f28', '#ffe066'],
-  ['washi', '和紙', '#fbf6ea', '#a7361c'],
-  ['sakura', '桜', '#fde7ec', '#b82c54'],
-  ['light', '白', '#ffffff', '#006aa9'],
+  ['washi', '和紙', '#fbf6ea', '#93301a'],
+  ['sakura', '桜', '#fde7ec', '#a1264a'],
+  ['light', '白', '#ffffff', '#005f98'],
   ['contrast', '高', '#000000', '#ffff00'],
-];
-const VISUAL_TIPS = [
-  '色＝品詞：答えの語の色は品詞で決まる（名詞・動詞・形容詞・副詞・表現・擬音語）。色ごと覚えると、文の中での働きも一緒に残る。',
-  'カードの左端の色＝テーマ。お金は同じ色、ニュースは別の色。「あの色の札にあった言葉」と場所で思い出せる。',
-  '裏の「漢字の形と意味」（タップで開く）：一字ずつ、意味と部品と画数。部品で小さな絵や物語を作ると忘れにくい（財＝貝＋才 → 貝はお金）。',
-  '思い出せなかった語は、文章の場面を頭の中で一枚の絵にしてから「もう一度」。次に会うとき、その絵が手がかりになる。',
-  '色テーマは気分で変えてよい。ただし一つのデッキは同じテーマで続けると、色と記憶が結びつきやすい。',
-  '答えを見る前に一秒、空所の形（字数・送り仮名）と前後の言葉を見る。形と場所で記憶が引き出される。',
 ];
 const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
 const posKey = (pos) => (POS[pos] || ['noun'])[0];
-/** each topic owns a hue, spread evenly round the colour wheel */
-function topicColour(groupId) {
-  const i = Math.max(0, ctx.deck.groups.findIndex((g) => g.id === groupId));
-  return `hsl(${Math.round((i * 360) / Math.max(1, ctx.deck.groups.length) + 200) % 360} 70% 58%)`;
+/** item kind → [css key, chip label]: 語 a whole word, 字 one kanji of it, 文法 a grammar point */
+function itemKind(card) {
+  if (card.type === 'kanji') return ['ji', '字'];
+  if (card.type === 'grammar') return ['bun', '文法'];
+  return ['go', '語'];
+}
+/** the word's level from a public JLPT-style list (build.py, wbig.json): text only, never a hue */
+function levelChip(level) {
+  const chip = el('span', 'kp-chip kp-levelchip', level);
+  const note = `${level}相当（公開リストによる目安）`;
+  chip.title = note;
+  chip.setAttribute('aria-label', note);
+  return chip;
+}
+/** the progress rail: drawn at where it stood, then ticked to frac on the compositor */
+function rail(frac) {
+  const bar = el('i');
+  const from = motionOk() ? ui.rail : frac;
+  bar.style.setProperty('--kp-frac', String(from));
+  ui.rail = frac;
+  if (from !== frac) {
+    queueMicrotask(() => {
+      if (!bar.isConnected) return;
+      bar.getBoundingClientRect(); // the old width is drawn first, so the change transitions
+      bar.style.setProperty('--kp-frac', String(frac));
+    });
+  }
+  return bar;
+}
+/** prefers-reduced-motion: nothing moves (aesthetics.md §5, S37) */
+function motionOk() {
+  return !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
 
 /** 全文 (every sentence bright) or 焦点 (the sentences around the target dimmed). Unless the
@@ -687,7 +696,42 @@ function reveal() {
   ui.revealed = true;
   // read before any grade of this sitting: was this card answered on an earlier pass?
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
-  paint();
+  if (!revealInPlace()) paint();
+}
+
+/**
+ * The reveal keeps the card node (no rebuild of the screen): the passage gains its readings,
+ * the answer comes in under it, and 答えを見る becomes the grade bar. Only opacity and
+ * transform animate (aesthetics.md §5); with reduced motion nothing does. False when the
+ * card on screen is not the one to reveal (the caller repaints).
+ */
+function revealInPlace() {
+  const id = ui.queue[ui.pos];
+  const face = ctx.root.querySelector('#kp-card');
+  if (!id || !face || face.dataset.card !== id || cardMode() === 'choice') return false;
+  const { card, word } = ctx.index.cards.get(id);
+  const box = face.closest('.kp-study');
+  const passage = !!card.type;
+  if (passage) {
+    const zoom = zoomFor();
+    face.dataset.zoom = zoom;
+    face.querySelector('.kp-chips').append(zoomToggle(zoom));
+  }
+  const sentence = sentenceNodes(card, { blank: false, ruby: 'all', split: passage });
+  face.querySelector('.kp-sentence').replaceWith(sentence);
+  for (const n of face.querySelectorAll('.kp-hint, .kp-taphint')) n.remove();
+  face.removeEventListener('click', reveal);
+  const answer = answerBlock(card, word);
+  face.append(answer);
+  if (motionOk()) {
+    sentence.classList.add('kp-enter');
+    answer.classList.add('kp-enter');
+  }
+  box.querySelector('#kp-reveal')?.replaceWith(gradeBar(id));
+  box.classList.add('has-bar');
+  attachSwipe(face);
+  fitBar();
+  return true;
 }
 
 /** the rule under the grade bar is shown once: answering the card it sat under retires it.
@@ -722,7 +766,7 @@ function commit(rating, { stay = false } = {}) {
     paint();
     return;
   }
-  next();
+  next(rating >= RATINGS.good ? 'good' : 'again');
 }
 
 /**
@@ -741,7 +785,9 @@ function askToKeepStorage() {
   }
 }
 
-function next() {
+/** the next card. dir ('good' | 'again'): the answered card slides out that way while the
+ * next one settles in (none with reduced motion) */
+function next(dir) {
   const id = ui.queue[ui.pos];
   refill();
   ui.pos++;
@@ -751,7 +797,39 @@ function next() {
     ui.queue.splice(Math.min(ui.queue.length, ui.pos + 4), 0, id);
   }
   resetCard();
+  const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
+  arrive(ghost, dir);
+}
+
+/** a copy of the answered card, inert and without ids, to slide out over the next one */
+function ghostOf(face, dir) {
+  if (!face) return null;
+  const rect = face.getBoundingClientRect();
+  const node = face.cloneNode(true);
+  node.removeAttribute('id');
+  for (const n of node.querySelectorAll('[id]')) n.removeAttribute('id');
+  delete node.dataset.card;
+  node.classList.remove('kp-arrive');
+  node.classList.add('kp-ghost', `kp-out-${dir}`);
+  node.style.transform = '';
+  node.setAttribute('aria-hidden', 'true');
+  node.inert = true;
+  return { node, rect };
+}
+function arrive(ghost, dir) {
+  const box = ctx.root.querySelector('.kp-study');
+  if (!box) return; // the done screen
+  if (dir) box.dataset.advance = dir;
+  if (!motionOk()) return;
+  box.querySelector('#kp-card')?.classList.add('kp-arrive');
+  if (!ghost) return;
+  const at = box.getBoundingClientRect();
+  Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
+  box.append(ghost.node);
+  const drop = () => ghost.node.remove();
+  ghost.node.addEventListener('animationend', drop, { once: true });
+  setTimeout(drop, 400);
 }
 
 function undo() {
@@ -806,7 +884,8 @@ function attachSwipe(face) {
     dx = e.clientX - x0;
     dy = e.clientY - y0;
     const sideways = Math.abs(dx) > 2 * Math.abs(dy);
-    face.style.transform = sideways ? `translateX(${dx}px) rotate(${dx / 40}deg)` : '';
+    // reduced motion: the card stays put, only its edge says which way (the buttons do the work)
+    face.style.transform = sideways && motionOk() ? `translateX(${dx}px) rotate(${dx / 40}deg)` : '';
     face.dataset.swipe = !sideways ? '' : dx > 40 ? 'good' : dx < -40 ? 'again' : '';
   });
   face.addEventListener('pointerup', (e) => {
@@ -815,7 +894,7 @@ function attachSwipe(face) {
     const right = dx > 0;
     reset();
     if (!swiped) return;
-    if (cardMode() === 'choice') next();
+    if (cardMode() === 'choice') next(right ? 'good' : 'again');
     else commit(right ? RATINGS.good : RATINGS.again);
   });
   face.addEventListener('pointercancel', (e) => {
@@ -885,6 +964,13 @@ function listScreen() {
 function settingsScreen() {
   const box = el('section', 'kp-settings');
   box.append(topBar('設定', () => go('home')));
+  if (ctx.deck.method?.length) {
+    const how = el('details', 'kp-method');
+    how.id = 'kp-method';
+    how.append(el('summary', null, 'このデッキのしくみ'));
+    for (const line of ctx.deck.method) how.append(el('p', null, line));
+    box.append(how);
+  }
   const seg = (title, key, options) => {
     const wrap = el('div', 'kp-field', el('h2', 'kp-h2', title));
     const row = el('div', 'kp-seg');

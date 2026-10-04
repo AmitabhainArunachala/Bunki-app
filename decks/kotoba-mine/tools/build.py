@@ -456,6 +456,25 @@ def sem_for(term: str) -> list[dict]:
     return [{"w": e["w"], "rel": e["rel"], **({"note": e["note"]} if e.get("note") else {})} for e in _SEM.get(term, [])]
 
 
+_LEVELS: dict[tuple[str, str], set[int]] | None = None
+# the deck's method names the list the level chip comes from (n2n1/PLAN.md §1.2, V8)
+LEVEL_NOTE = ("N1〜N3 の札は、公開の JLPT 語彙リスト（open-anki-jlpt-decks 系、2010年以前の旧基準）による目安。"
+              "JLPT は公式の語彙リストを出していない。リストに載っていない語には札がない。")
+
+
+def level_for(term: str, reading: str) -> str | None:
+    """the word's level from prototypes/drift/data/wbig.json, joined on headword and reading
+    (the surface alone is ambiguous); only when the list gives that pair exactly one level"""
+    global _LEVELS
+    if _LEVELS is None:
+        _LEVELS = {}
+        for word, kana, _gloss, level in json.loads((REPO / "prototypes" / "drift" / "data" / "wbig.json").read_text("utf-8")):
+            if isinstance(level, int):
+                _LEVELS.setdefault((word, kana), set()).add(level)
+    found = _LEVELS.get((term, reading), set())
+    return f"N{next(iter(found))}" if len(found) == 1 else None
+
+
 # 字 cards the build leaves out, reported at the end: [card id or key] and [(word, term, ids)]
 KANJI_VISIBLE: list[str] = []
 KANJI_UNALIGNED: list[tuple[str, str, list[str]]] = []
@@ -579,6 +598,8 @@ def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
             }
             if c.get("tip"):
                 word["tip"] = c["tip"]
+            if level := level_for(c["term"], c["reading"]):
+                word["level"] = level
             if sem := sem_for(c["term"]):
                 word["sem"] = sem
             words.append(word)
@@ -592,7 +613,7 @@ def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
         "groups": [{"id": m["id"], "titleJa": GROUPS[m["id"]][0], "titleEn": GROUPS[m["id"]][1]} for m in mods
                    if any(w["group"] == m["id"] for w in words)],
         **({"unlockDays": spec["unlockDays"]} if "unlockDays" in spec else {}),
-        "method": spec.get("method", METHOD),
+        "method": [*spec.get("method", METHOD), LEVEL_NOTE],
         "words": words,
         "provenance": "Sentences are real Japanese mined from the web, Tatoeba (CC BY 2.0 FR), ja.wikinews and Aozora Bunko; each card names its source. Web sentences are short quotations kept for personal study. Definitions, notes and the few sentences marked 書き下ろし were written for this word list.",
     }
@@ -838,6 +859,7 @@ def note_rows(deck: dict) -> list[dict]:
                     f'<div class="kj"><b>{k["c"]}</b><span>{html.escape(k["m"])}</span><small>{" ".join(k["parts"])}{" · " + str(k["st"]) + "画" if k.get("st") else ""}</small></div>'
                     for k in w.get("kanji", [])),
                 "_group": w["group"],
+                "_level": w.get("level", ""),
             })
     rows.sort(key=lambda r: r["Sort"])
     return rows
@@ -877,7 +899,7 @@ def build_anki(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
         d.description = html.escape(g["titleEn"])
         decks[g["id"]] = d
     for i, r in enumerate(note_rows(deck)):
-        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[deck["id"], f"card{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}"], sort_field=r["Sort"], due=i)
+        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[deck["id"], f"card{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}", *([f"level::{r['_level']}"] if r["_level"] else [])], sort_field=r["Sort"], due=i)
         decks[r["_group"]].add_note(note)
     genanki.Package(list(decks.values())).write_to_file(str(out_dir / spec["out"][0]))
 
@@ -885,7 +907,7 @@ def build_anki(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
 def build_tsv(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
     lines = ["#separator:tab", "#html:true", f"#columns:{chr(9).join(FIELDS)}\tTags"]
     for r in note_rows(deck):
-        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{deck['id']} card{r['Level']} source::{r['Kind']}"]))
+        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{deck['id']} card{r['Level']} source::{r['Kind']}" + (f" level::{r['_level']}" if r["_level"] else "")]))
     (out_dir / spec["out"][1]).write_text("\n".join(lines) + "\n", "utf-8")
 
 
