@@ -291,7 +291,7 @@
   ],
   "111": [
     {
-      "ja": "数列1, 4, 7, 10, …は、初項が1で、3ずつ増えていく等差数列だ。公差が3なので、第10項は1に3を9回足して28になる。最初の数と増え方さえわかれば、何番目の数でもすぐに求められる。",
+      "ja": "1、4、7、10と続く数列は、初項が1で、3ずつ増えていく等差数列だ。公差が3なので、第10項は1に3を9回足して28になる。最初の数と増え方さえわかれば、何番目の数でもすぐに求められる。",
       "form": "初項",
       "en": "The sequence 1, 4, 7, 10, … is an arithmetic sequence whose first term is 1 and which increases by 3 each time. Since the common difference is 3, the 10th term is 1 plus 3 added nine times, which is 28. As long as you know the first number and how it grows, you can quickly find any term.",
       "original": true
@@ -345,7 +345,7 @@
   ],
   "129": [
     {
-      "ja": "座標幾何学では、点を(2, 3)のような数の組で表す。こうすると、二点間の距離や直線の傾きを、図を描かずに計算で求めることができる。この方法を考え出したのは、フランスの哲学者デカルトだと言われている。",
+      "ja": "座標幾何学では、点を（2，3）のような数の組で表す。こうすると、二点間の距離や直線の傾きを、図を描かずに計算で求めることができる。この方法を考え出したのは、フランスの哲学者デカルトだと言われている。",
       "form": "座標幾何学",
       "en": "In coordinate geometry, a point is represented by a pair of numbers such as (2, 3). This lets you find the distance between two points or the slope of a line by calculation, without drawing a figure. The method is said to have been devised by the French philosopher Descartes.",
       "original": true

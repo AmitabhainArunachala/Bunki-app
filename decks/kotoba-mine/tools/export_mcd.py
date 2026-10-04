@@ -26,6 +26,8 @@ for f in sorted(glob.glob(str(SRC / "mcd" / "*.json"))):
         res = []
         for r in rows:
             if r.get("original"):
+                if re.search(r"\s", r["ja"]):
+                    raise SystemExit(f"{n}: a written passage has a space in it: {r['ja'][:40]}")
                 if r["form"] not in r["ja"]:
                     raise SystemExit(f"{n}: form {r['form']} not in {r['ja']}")
                 res.append({"ja": r["ja"], "form": r["form"], "en": r["en"], "kind": "original",

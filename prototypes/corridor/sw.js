@@ -16,7 +16,7 @@
 // v4: the context deck (文脈札) joined the shell
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
 // v6: those passages left the shelf; the deck player joined the shell
-const VERSION = 'kairo-v7-sentence-cards';
+const VERSION = 'kairo-v8-mcd';
 const SHELL = [
   '.',
   'index.html',

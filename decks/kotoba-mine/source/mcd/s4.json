@@ -317,7 +317,7 @@
   ],
   "128": [
     {
-      "ja": "グラフ用紙の上の点Aは、原点から右に3、上に2進んだところにある。これを座標で表すと(3, 2)になる。数学の授業では、こうして点の位置を数の組で表す方法を最初に学ぶ。",
+      "ja": "グラフ用紙の上の点Aは、原点から右に3、上に2進んだところにある。これを座標で表すと（3，2）になる。数学の授業では、こうして点の位置を数の組で表す方法を最初に学ぶ。",
       "form": "座標",
       "en": "Point A on the graph paper is 3 to the right of and 2 above the origin. Expressed in coordinates, that is (3, 2). In maths class, this way of expressing a point's position as a pair of numbers is one of the first things you learn.",
       "original": true

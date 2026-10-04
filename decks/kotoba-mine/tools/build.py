@@ -140,6 +140,7 @@ def target_reading(card: dict, form: str) -> str | None:
 _KANJI_DB: dict | None = None
 RENDAKU = {"か": "が", "き": "ぎ", "く": "ぐ", "け": "げ", "こ": "ご", "さ": "ざ", "し": "じ", "す": "ず", "せ": "ぜ", "そ": "ぞ",
            "た": "だ", "ち": "ぢ", "つ": "づ", "て": "で", "と": "ど", "は": "ば", "ひ": "び", "ふ": "ぶ", "へ": "べ", "ほ": "ぼ"}
+SMALL = set("ゃゅょぁぃぅぇぉっー")
 HANDAKU = {"は": "ぱ", "ひ": "ぴ", "ふ": "ぷ", "へ": "ぺ", "ほ": "ぽ"}
 
 
@@ -163,23 +164,40 @@ def _readings(ch: str) -> list[str]:
     return sorted(out, key=len, reverse=True)
 
 
-def align(form: str, reading: str) -> list[tuple[str, str]] | None:
+def align(form: str, reading: str, _deep: bool = True) -> list[tuple[str, str]] | None:
     """財政/ざいせい → [(財, ざい), (政, せい)]; 覆う/おおう → [(覆, おお), (う, '')]"""
     if not form:
         return [] if not reading else None
     ch = form[0]
     if not KANJI.match(ch):
         if reading.startswith(kata_to_hira(ch)):
-            rest = align(form[1:], reading[1:])
+            rest = align(form[1:], reading[1:], _deep)
             return None if rest is None else [(ch, "")] + rest
         return None
     if len(form) == 1:
-        return [(ch, reading)] if reading else None
+        if not reading or reading[0] in SMALL:
+            return None
+        known = _readings(ch)
+        if known and reading not in known:
+            return None  # a known kanji must end on one of its readings
+        if not known and not _deep:
+            return None  # two unknown kanji in a row: the split would be a guess
+        return [(ch, reading)]
     for r in _readings(ch):
         if reading.startswith(r) and len(r) < len(reading):
-            rest = align(form[1:], reading[len(r):])
+            rest = align(form[1:], reading[len(r):], _deep)
             if rest is not None:
                 return [(ch, r)] + rest
+    if not _deep or _readings(ch):
+        return None  # only a kanji the table has no readings for may be guessed
+    # a kanji the table does not know (or reads unusually): try every short split,
+    # accepting it only when the rest of the word aligns by the table
+    for k in range(1, min(4, len(reading) - 1) + 1):
+        if reading[k] in SMALL:
+            continue
+        rest = align(form[1:], reading[k:], _deep=False)
+        if rest is not None:
+            return [(ch, reading[:k])] + rest
     return None
 
 
@@ -273,11 +291,27 @@ def build_deck(mods: list[dict]) -> dict:
     }
 
 
+def _cover(ja: str, tokens: list[dict]) -> list[dict]:
+    """put back any characters the tokeniser skipped (spaces, odd symbols) as plain tokens"""
+    out, pos = [], 0
+    for t in tokens:
+        i = ja.find(t["s"], pos)
+        if i < 0:
+            continue
+        if i > pos:
+            out.append({"s": ja[pos:i], "r": "", "f": [{"t": ja[pos:i]}]})
+        out.append(t)
+        pos = i + len(t["s"])
+    if pos < len(ja):
+        out.append({"s": ja[pos:], "r": "", "f": [{"t": ja[pos:]}]})
+    return out
+
+
 def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
     ja, form = s["ja"], s["form"]
     a = ja.index(form)
     b = a + len(form)
-    tokens = bc.tokenise(ja, tagger)
+    tokens = _cover(ja, bc.tokenise(ja, tagger))
     pos = 0
     spans = []
     for t in tokens:
@@ -298,8 +332,12 @@ def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
             elif not KANJI.search(t["s"]):
                 parts.append(r[lo - s0 : hi - s0])
             else:
-                # a kanji token cut by the form: keep its full reading when the form starts it
-                parts.append(r if lo == s0 else ja[lo:hi])
+                # a kanji token cut by the form (稽 in 滑稽): split the token's reading per kanji
+                split = align(t["s"], r)
+                if split:
+                    parts.append("".join(pr for pi, (_, pr) in enumerate(split) if s0 + pi >= lo and s0 + pi < hi))
+                else:
+                    parts.append(r if lo == s0 else ja[lo:hi])
         reading = "".join(parts)
     return _ordered(ja, tokens, a, b, ts, te, form, kata_to_hira(reading))
 
