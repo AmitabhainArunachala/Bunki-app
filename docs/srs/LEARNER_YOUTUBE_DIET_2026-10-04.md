@@ -148,3 +148,41 @@ Mr. Denjiro's Happy Energy! · としおを追う【岡田斗司夫切り抜き�
   hedges, filler.
 - Everything else (surf, yoga, crypto, 解剖生理学, 宇宙) is spice: one passage per word
   at most may borrow a hobby topic for memorability.
+
+## Subscriptions, continued (batch 5)
+
+科学の解説ちゃんねる · 篠原塾長 · 米国内科専門医 安川康介の医学チャンネル · Dr. Zion Kabasawa
+(樺沢紫苑) · 苫米地英人 YouTube公式 · 苫米地英人の一言コーチング · 苫米地英人の銀河系アカデミア ·
+藤森慎吾 · 西野亮廣 · 角川シネマコレクション · 言論テレビ · 謎解き統計学 サトマイ ·
+集え！僕らの青空文庫 · 本要約チャンネル · 本要約・書評の10分解説チャンネル ·
+松永暢史スカッとラジオ · 楽待 RAKUMACHI · 歴史を面白く学ぶコテンラジオ · 潜在意識ラボ / 純 ·
+火の鳥 · 目に見える物は目に見えない物 · 真実の目 · 真相深入り！虎ノ門ニュース · 社會部部長 ·
+God Only Knows (Kami nomizo) · 神社チャンネル · 数理の弾丸 · 文学YouTuberベル ·
+文章・言語化の専門家・山口拓朗 · 日テレNEWS · 日本ヴェーダーンタ協会 Vedanta Society ·
+日本神経科学学会市民公開企画 · Japan Management Consultants Association · 日本語の森 ·
+日本語発音矯正 (Kimiko) · 曼荼羅 kaz studio · 月光夫婦のシネマ · The Asahi Shimbun Company ·
+本チャンネル · 大人の学び直しTV · 大人プロサーファー川畑邦宏 · 大愚和尚の一問一答 · 大蔵経 ·
+天の川ch · 学識サロン · 宇宙となかよし/Qさん · 宇宙の森 · 宇宙ヤバイch ·
+岡本弥子のみこみこチャンネル · OTAKING / 岡田斗司夫 · 岡田斗司夫マインド · 悟りの大仏 ·
+倹者の流儀 · 健康と好奇心の広場 · 元局アナ流話し方スクール-IAS- · 公務員対策セイウチ塾 ·
+内田博史 · 北多摩神道青年会むらさき会 · 南旅 minamitabi · 受験コーチゆうた中学受験 ·
+哲学チャンネル · 哲理学作家さとうみつろう · 堀江貴文 ホリエモン · 堀江貴文まとめ · 塾講師ヒラ
+
+### What batch 5 adds
+
+- **The Indian-philosophy seam has a native Japanese anchor:** 日本ヴェーダーンタ協会
+  (Vedanta Society of Japan) alongside 大蔵経, 大愚和尚の一問一答, 悟りの大仏, 神社チャンネル
+  and Shinto youth groups. Advaita vocabulary in Japanese (梵我一如, 不二一元, 真我, 無明)
+  can be sourced from a living community, not invented.
+- **Primary news feeds** (日テレNEWS, 朝日新聞, 言論テレビ, 虎ノ門ニュース) give the 報
+  register real anchors across the political spectrum; passages should stay factual and
+  non-partisan.
+- **Writing and speaking craft in Japanese** (山口拓朗 言語化, 元局アナ流話し方スクール,
+  日本語発音矯正, 文学YouTuberベル, 青空文庫 readings) is the YouTube-channel goal's own
+  seam: 言語化, 構成, 滑舌, 間. A sixth optional texture, 語 (craft of speaking), for words
+  about expression itself.
+- **Science and neuroscience in Japanese** (日本神経科学学会, 科学の解説ちゃんねる, 数理の弾丸,
+  宇宙ヤバイch, 安川康介, 樺沢紫苑) deepen the mind/learning topic toward real 学会 register.
+- **Thinkers with their own vocabulary** (苫米地英人, 岡田斗司夫, 堀江貴文, 西野亮廣,
+  コテンラジオ) are frequent in the diet; passages can imitate their argumentative style
+  but must not quote them at length (rights).
