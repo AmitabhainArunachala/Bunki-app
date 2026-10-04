@@ -55,6 +55,34 @@
 .nightMode .item-字 .chip.lvchip {
   color: #ff8fd8;
 }
+/* level: the note's level::Nx tag (no extra field), a monochrome chip as in the player;
+   words the public list does not cover carry no tag and show no chip */
+.chip.levelchip {
+  display: none;
+  letter-spacing: 0.04em;
+}
+.level\:\:N1 .chip.levelchip,
+.level\:\:N2 .chip.levelchip,
+.level\:\:N3 .chip.levelchip,
+.level\:\:N4 .chip.levelchip,
+.level\:\:N5 .chip.levelchip {
+  display: inline-block;
+}
+.level\:\:N1 .levelchip::after {
+  content: 'N1';
+}
+.level\:\:N2 .levelchip::after {
+  content: 'N2';
+}
+.level\:\:N3 .levelchip::after {
+  content: 'N3';
+}
+.level\:\:N4 .levelchip::after {
+  content: 'N4';
+}
+.level\:\:N5 .levelchip::after {
+  content: 'N5';
+}
 .sentence {
   font-size: 28px;
   line-height: 2.05;

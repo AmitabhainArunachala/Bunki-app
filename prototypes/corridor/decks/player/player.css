@@ -124,7 +124,7 @@
 .kp-sentence rt { font-size: 0.45em; color: var(--kp-ink-2); font-weight: 400; letter-spacing: 0; }
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: 6px 6px 0 0; margin: 0 2px; line-height: 1.3; }
 .kp-target { color: var(--kp-cyan); font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.28em; }
-.kp-target rt { color: var(--kp-cyan); }
+.kp-target rt { color: inherit; }
 .kp-hint { margin: 0; font-size: 16px; color: var(--kp-ink-2); }
 .kp-taphint { margin: 0; font-size: 12px; color: var(--kp-mute); letter-spacing: 0.08em; }
 
@@ -223,7 +223,7 @@
  * slides the old card out in its direction while the next one settles. Opacity and
  * transform only, 120–180 ms. */
 .kp-sentence.kp-enter .kp-target { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) both; }
-.kp-sentence.kp-enter rt { animation: kp-fade 0.18s cubic-bezier(0.2, 0, 0, 1) 0.04s both; }
+.kp-sentence.kp-enter rt { animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) 0.04s both; }
 .kp-answer.kp-enter { animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-card.kp-arrive { animation: kp-arrive 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-study { position: relative; }

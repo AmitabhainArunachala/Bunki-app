@@ -436,7 +436,7 @@ function studyScreen() {
     'div',
     'kp-chips',
     el('span', 'kp-chip kp-kindchip', kindLabel),
-    el('span', 'kp-chip', card.type ? `${source} · 文章${card.passage}` : source),
+    el('span', 'kp-chip', source),
     el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
     word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
@@ -661,6 +661,8 @@ function sourceLine(card) {
     a.addEventListener('click', (e) => e.stopPropagation());
     p.append('出典 ', a);
   } else p.append(`出典 ${label}`);
+  // which passage of the word this is lives here, not in the chip row (one 23px row, aesthetics.md §4)
+  if (card.type) p.append(` · 文章${card.passage}`);
   return p;
 }
 

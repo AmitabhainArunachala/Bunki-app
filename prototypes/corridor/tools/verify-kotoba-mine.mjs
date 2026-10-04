@@ -540,6 +540,8 @@ function verifyBackParity() {
     for (const [name, t] of [['front', front], ['back', back]]) if (!t.includes('<div class="km item-{{Type}}') || !t.includes('<span class="chip lvchip">{{Type}}</span>')) bad.push(`${dir}/${name}: edge and first chip not by item kind`);
     const css = readFileSync(resolve(tools, dir, 'style.css'), 'utf8');
     if (/\.km\.kind-/.test(css) || !css.includes('.km.item-字')) bad.push(`${dir}/style.css: the edge is not the item kind`);
+    for (const [name, t] of [['front', front], ['back', back]]) if (!t.includes('pos-{{POS}} {{Tags}}">') || !t.includes('<span class="chip levelchip"></span>')) bad.push(`${dir}/${name}: no level chip from the level::Nx tag`);
+    if (!css.includes(".level\\:\\:N1 .levelchip::after {\n  content: 'N1';")) bad.push(`${dir}/style.css: the level chip has no N1 label`);
     if (!back.includes('lang="en">{{Meaning}}') || !back.includes('lang="en">{{SentenceEN}}') || !back.includes('lang="en">{{Tip}}') || /<details[^>]*lang=/.test(back)) bad.push(`${dir}/back: lang="en" not on the English text alone`);
   }
   const tsv = readFileSync(resolve(release, 'kotoba-mcd.tsv'), 'utf8').trim().split('\n');
@@ -956,6 +958,47 @@ async function verifyVisual(browser, base) {
     );
   }
 
+  // b) one hue on the asked word: the reading over a verb target takes the target's part-of-speech colour, not the accent (Anki parity: .sentence rt sets only opacity)
+  {
+    const seen = [];
+    for (const look of ['dark', 'washi']) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look }, state: due('kotoba-mcd', 'km-200-m01') });
+      await reveal(o.page);
+      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const rts = t ? [...t.querySelectorAll('rt')] : [];
+        const kp = document.querySelector('.kp'); const probe = document.createElement('i'); kp.append(probe); const tok = (k) => { probe.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(probe).color; };
+        const out = { id: card.dataset.card, pos: card.className, target: t ? getComputedStyle(t).color : null, rt: rts.map((r) => getComputedStyle(r).color), verb: tok('verb'), accent: tok('cyan') }; probe.remove(); return out; })()`);
+      seen.push({ look, ...v });
+      await close(o);
+    }
+    check(
+      'b) 墨 and 和紙, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own verb colour, never the accent',
+      seen.every((v) => v.id === 'km-200-m01' && /kp-pos-verb/.test(v.pos) && v.target === v.verb && v.rt.length > 0 && v.rt.every((c) => c === v.target) && v.target !== v.accent),
+      JSON.stringify(seen.map(({ look, target, rt, accent }) => ({ look, target, rt: [...new Set(rt)], accent }))),
+    );
+  }
+
+  // b) Anki: the level chip comes from the note's level::Nx tag through {{Tags}}; a note without the tag shows none
+  {
+    const tools = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/tools');
+    const seen = [];
+    for (const dir of ['anki', 'anki-sentence']) {
+      const css = readFileSync(resolve(tools, dir, 'style.css'), 'utf8');
+      const front = readFileSync(resolve(tools, dir, 'front.html'), 'utf8');
+      const fill = (tags) => front.replace(/\{\{#\w+\}\}[\s\S]*?\{\{\/\w+\}\}/g, '').replace('{{Tags}}', tags).replace(/\{\{[^}]+\}\}/g, 'x');
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const page = await context.newPage();
+      await page.setContent(`<style>${css}</style><div class="card">${fill('kotoba-mcd card1 source::news level::N1')}${fill('kotoba-mcd card1 source::news')}</div>`);
+      const chips = await page.evaluate(`[...document.querySelectorAll('.levelchip')].map((c) => ({ display: getComputedStyle(c).display, label: getComputedStyle(c, '::after').content }))`);
+      seen.push({ dir, chips });
+      await context.close();
+    }
+    check(
+      'b) Anki (both note types): a note tagged level::N1 shows an N1 chip in the chip row, a note without a level tag shows none; no new field',
+      seen.every(({ chips }) => chips.length === 2 && chips[0].display !== 'none' && chips[0].label === '"N1"' && chips[1].display === 'none'),
+      JSON.stringify(seen),
+    );
+  }
+
   // d) textures: on the page, never on the card (和紙 paper, 黒板 chalk)
   {
     const seen = [];
@@ -980,8 +1023,8 @@ async function verifyVisual(browser, base) {
         answer: cs.animationName, answerMs: parseFloat(cs.animationDuration) * 1000, rt: rt ? getComputedStyle(rt).animationName : null, rtMs: rt ? (parseFloat(getComputedStyle(rt).animationDuration) + parseFloat(getComputedStyle(rt).animationDelay)) * 1000 : null }; })()`);
     const motion = await o.page.evaluate(MOTION);
     check(
-      'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in and the answer rises in 120–180 ms, opacity and transform only',
-      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 2 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && kept.rtMs <= 230 && motion.longest <= 180,
+      'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in (140 ms after a 40 ms delay, done by 180 ms) and the answer rises in 120–180 ms, opacity and transform only',
+      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 2 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && Math.round(kept.rtMs) <= 180 && motion.longest <= 180,
       JSON.stringify({ ...kept, longest: motion.longest }),
     );
     await o.page.evaluate(WATCH);
