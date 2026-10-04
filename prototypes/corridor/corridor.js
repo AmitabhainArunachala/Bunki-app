@@ -5478,6 +5478,19 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   practiceTools.append(mock);
+  // デッキ — the SRS decks (言葉の鉱脈・MCD and ・文, 私の文脈, 文脈札) sit in the
+  // dojo's deck list; the shelf's one-button tools keep their door to them.
+  const decks = biLabel('button', 'grammar-link', 'デッキ', 'SRS decks');
+  decks.type = 'button';
+  decks.id = 'decks-link';
+  decks.addEventListener('click', () => {
+    keepScroll();
+    S.deckPlay = null;
+    S.view = 'dojo';
+    render();
+    window.scrollTo(0, 0);
+  });
+  practiceTools.append(decks);
   const mirror = el('button', 'grammar-link');
   mirror.type = 'button';
   mirror.id = 'kagami-link';
