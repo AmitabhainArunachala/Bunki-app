@@ -920,4 +920,7 @@ The corridor mounts the player with a host lexicon adapter (`decks/player/host.j
 lookup or a take never writes the observation log or any schedule, and never enrols the word in
 the deck. The standalone study pages mount with no adapter (null) and bundle no tokens." The
 tap itself on the back is the next stage. Anki cannot carry tokens or a host: the templates
-keep furigana only. Why: learning-design.md §3, integration.md A2.
+keep furigana only. A token is a dictionary word, not a UniDic short unit: adjacent content
+units that together spell a boot-core head with the same reading are one token. A grammar cue
+that starts on a nominal (上, こと, よう) counts only after a predicate, and a cue ending in で
+does not count before ある. Why: learning-design.md §3, integration.md A2.

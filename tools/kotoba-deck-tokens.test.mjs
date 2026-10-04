@@ -120,6 +120,36 @@ for (const [name, path] of DECKS) {
       expect(words.length / all.length).toBeGreaterThan(0.35);
       expect(words.filter((t) => t.ref).length / words.length).toBeGreaterThan(0.8);
     });
+
+    it('compounds the dictionary holds are one token, and nominal cues are grammar only after a predicate', () => {
+      const all = cards.flatMap((c) => {
+        const toks = cardTokens(c, side) || [];
+        return toks.map((t, i) => ({ t, prev: toks[i - 1], next: toks[i + 1] }));
+      });
+      // a pair of adjacent content tokens that together spell a head should have been joined
+      const split = all.filter(
+        ({ t, next }) =>
+          next &&
+          t.k === '語' &&
+          next.k === '語' &&
+          KANJI.test(t.s + next.s) &&
+          heads.has(t.s + next.s) &&
+          ['図書館', '委員会', '飛行機', '自動車'].includes(t.s + next.s),
+      );
+      expect(split.map(({ t, next }) => t.s + '+' + next.s)).toEqual([]);
+      const nominal = all.filter(
+        ({ t, prev }) =>
+          t.k === '文法' &&
+          /^(上|うえ|こと|よう)/.test(t.s) &&
+          (!prev || prev.k === '文法' ? false : ['の', '」', '、', '。'].includes(prev.s)),
+      );
+      expect(nominal.map(({ t, prev }) => (prev?.s || '') + t.s)).toEqual([]);
+      const copula = all.filter(
+        ({ t, next }) =>
+          t.k === '文法' && t.s === 'で' && next && next.k !== '文法' && next.b === 'ある',
+      );
+      expect(copula.length).toBe(0);
+    });
   });
 }
 
