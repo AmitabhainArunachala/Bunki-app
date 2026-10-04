@@ -1027,7 +1027,8 @@ function settleBack() {
   const bar = ctx.root.querySelector('.kp-grades');
   const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
   const bottomLimit = barTop - SETTLE_GAP;
-  const topLimit = topInset() + SETTLE_GAP;
+  const inset = topInset();
+  const topLimit = inset + SETTLE_GAP;
   // the answer may still be rising into place (kp-rise, translateY 6px → 0): measure where it lands
   const t = getComputedStyle(answer).transform;
   const lift = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0;
@@ -1041,6 +1042,10 @@ function settleBack() {
   } else dy = bottom - bottomLimit;
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
+  // with no host header the study top bar (× n/N 削除) is the page's top edge: the fold step never
+  // slides it under the viewport edge (A39); a host header covers it either way
+  const head = inset ? null : ctx.root.querySelector('.kp-top-study')?.getBoundingClientRect().top;
+  const headOk = (more) => head == null || head - dy - more >= Math.min(topLimit, head - dy);
   for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
     const r = s.getBoundingClientRect();
     const [rTop, rBottom] = [r.top - lift - dy, r.bottom - lift - dy];
@@ -1048,7 +1053,7 @@ function settleBack() {
     // rows touch, so the edge goes exactly at the bar: the next (or the previous) row is then whole
     const intoView = rBottom - barTop + 1; // scroll down: the row just above the bar
     const underBar = barTop - rTop; // scroll up: the row wholly under the bar
-    if (top - dy - intoView >= topLimit && dy + intoView <= room.down) dy += intoView;
+    if (top - dy - intoView >= topLimit && dy + intoView <= room.down && headOk(intoView)) dy += intoView;
     else if (bottom - dy + underBar <= bottomLimit && dy - underBar >= room.up) dy -= underBar;
     break;
   }

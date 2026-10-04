@@ -745,8 +745,8 @@ and read as empty when absent.
 
 **A26 → S24.** Adds to "Front: … only cues allowed by the contract": "On both decks the
 front shows no readings, no English and no tap targets inside the passage. The tap-for-
-furigana path and the English hint are removed; a stored `furigana` pref is ignored and a
-stored `hint: 'en'` reads as `'ja'`. A hint appears on a 読んで思い出す front only after the
+furigana path and the English hint are removed; a stored `furigana` pref is ignored, and so
+is a stored `hint` (A37: no front hint in any mode). A hint appears on a 読んで思い出す front only after the
 learner added one through the repair ladder (A35), and that card is marked
 `data-repaired`." Why: contract §2 locks the front. (The MCD blank preset's Japanese
 definition under the gap, left open here, is removed by A37.)
@@ -856,7 +856,8 @@ nothing is removed or reflowed)" with: "焦点 folds the sentences before the ta
 after it, into one group each, dimmed, two lines high: the before group shows its last two
 lines, the after group its first two, each fading at its cut edge. A group longer than two
 lines carries ⋯ (44px reach, `aria-expanded`, labelled 前の文をすべて表示／後の文をすべて表示)
-that opens it in place. Nothing is removed: the passage text is whole in the DOM, and 全文 lays
+that opens it in place, in a 56px gutter the group keeps clear at its right edge (folded and
+opened), so the ⋯ never covers a glyph. Nothing is removed: the passage text is whole in the DOM, and 全文 lays
 the groups out inline as if they were not there. The front is never grouped." Why: the Phase 1
 critic found the first screen after a long reveal could be all dimmed text.
 
@@ -865,9 +866,13 @@ least scroll that does it (smooth, instant with reduced motion), the target sent
 and its definition sit between the host's pinned header and the pinned grade bar; when all three
 cannot fit, the word and definition win. At that resting position no fold row is cut by the
 bar: a row that would be is scrolled wholly above it, or wholly under it, whichever keeps the
-rest in view. The page keeps the bar's measured height free under the card, so the last fold
-(出典) always scrolls clear of the bar." Why: contract §3 (tier one is read on every pass) and
-the critic's clipped fourth fold. Verified on km-298-m02 (195 characters) in 焦点 and 全文, and
+rest in view; on a host with no pinned header (the standalone study pages) that step never
+slides the study top bar (× n/N 削除) under the top edge of the screen, so there a row may stay
+cut when the only way to un-cut it would hide the top bar. The page keeps the bar's measured
+height free under the card, so the last fold (出典) always scrolls clear of the bar." Why:
+contract §3 (tier one is read on every pass) and the critic's clipped fourth fold. In 焦点 on
+a long passage the target sentence wins the scroll, so the before group and its ⋯ can sit
+above the screen at rest; scrolling up reaches them. Verified on km-298-m02 (195 characters) in 焦点 and 全文, and
 on new, seen, unmatched and 字 backs.
 
 **A40 → S34, S35.** Adds: "The 字 hue (`--kp-kind-ji`, a 字 card's edge and kind chip) is at

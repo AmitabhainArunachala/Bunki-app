@@ -214,6 +214,8 @@
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'][data-side='after']:not([data-open='1']) .kp-ctx-in { -webkit-mask-image: linear-gradient(to top, transparent, #000 1.4em); mask-image: linear-gradient(to top, transparent, #000 1.4em); }
 .kp-card[data-zoom='focus'] .kp-ctx[data-open='1'] .kp-ctx-in { max-height: none; }
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-more { display: inline-flex; }
+/* the ⋯ keeps its own gutter (44px pill + gap), open or folded, so it never sits on a glyph */
+.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-ctx-in { padding-right: 56px; }
 .kp-more { position: absolute; right: 0; z-index: 1; align-items: center; justify-content: center; min-width: 44px; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--kp-line); background: var(--kp-panel-2); color: var(--kp-ink-2); font-size: 16px; line-height: 1; }
 .kp-ctx[data-side='before'] .kp-more { top: 0; }
 .kp-ctx[data-side='after'] .kp-more { bottom: 0; }
