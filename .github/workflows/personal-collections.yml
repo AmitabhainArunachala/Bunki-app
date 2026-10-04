@@ -1,0 +1,47 @@
+name: Personal collections
+
+on:
+  pull_request:
+    paths:
+      - 'prototypes/corridor/decks/personal/**'
+      - 'prototypes/corridor/tools/*personal*'
+      - 'prototypes/corridor/corridor.js'
+      - 'prototypes/corridor/sw.js'
+      - '.github/workflows/personal-collections.yml'
+      - '.github/workflows/pages-app.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'prototypes/corridor/decks/personal/**'
+      - 'prototypes/corridor/tools/*personal*'
+      - 'prototypes/corridor/corridor.js'
+      - 'prototypes/corridor/sw.js'
+      - '.github/workflows/personal-collections.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-deck:
+    name: Private deck / Chromium + WebKit / offline + storage
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node prototypes/corridor/tools/test-personal-collections.mjs
+      - run: node prototypes/corridor/tools/verify-personal-collections.mjs
+        env:
+          PERSONAL_QA_OUT: ${{ runner.temp }}/personal-collections
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: personal-collections-browser-evidence
+          path: ${{ runner.temp }}/personal-collections
+          if-no-files-found: ignore

@@ -498,7 +498,7 @@ async function main() {
     await page.click('.nav-dojo');
     await page.waitForSelector('[data-deck="kotoba-mine"]', { timeout: 8000 });
     const rows = await page.evaluate(`[...document.querySelectorAll('.dojo-deck')].map((b) => b.dataset.deck)`);
-    check('集中道場 opens with the deck list: 言葉の鉱脈・MCD and ・文 side by side, 文脈札, and the saved-word queue', rows[0] === 'kotoba-mcd' && rows[1] === 'kotoba-mine' && rows.includes('context') && rows.includes('mine'), rows.join(', '));
+    check('集中道場 opens with the deck list: 言葉の鉱脈・MCD then ・文, with 文脈札 and the saved-word queue', rows.indexOf('kotoba-mcd') >= 0 && rows.indexOf('kotoba-mine') === rows.indexOf('kotoba-mcd') + 1 && rows.includes('context') && rows.includes('mine'), rows.join(', '));
 
     await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });

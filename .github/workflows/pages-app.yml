@@ -58,6 +58,8 @@ jobs:
           node --check prototypes/corridor/decks/context-dense/mount.js
           node --check prototypes/corridor/decks/player/engine.js
           node --check prototypes/corridor/decks/player/mount.js
+          node --check prototypes/corridor/decks/personal/mount.mjs
+          node prototypes/corridor/tools/test-personal-collections.mjs
           node tools/test-reference-core.mjs
           node tools/build-reference-data.mjs --check
 
@@ -93,6 +95,7 @@ jobs:
              "$SITE/decks/player/"
           cp prototypes/corridor/decks/kotoba-mine/deck.json "$SITE/decks/kotoba-mine/"
           cp prototypes/corridor/decks/kotoba-mcd/deck.json "$SITE/decks/kotoba-mcd/"
+          cp -r prototypes/corridor/decks/personal "$SITE/decks/personal"
 
           mkdir -p "$SITE/decks/context-dense"
           cp prototypes/corridor/decks/context-dense/mount.js \
@@ -142,6 +145,11 @@ jobs:
                       'decks/player/mount.js' \
                       'decks/player/engine.js' \
                       'decks/player/player.css' \
+                      'decks/personal/mount.mjs' \
+                      'decks/personal/engine.mjs' \
+                      'decks/personal/schema.mjs' \
+                      'decks/personal/store.mjs' \
+                      'decks/personal/personal.css' \
                       'decks/kotoba-mine/deck.json' \
                       'decks/kotoba-mcd/deck.json' \
                       'decks/context-dense/mount.js' \
