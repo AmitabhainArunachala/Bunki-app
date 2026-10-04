@@ -153,3 +153,47 @@ test('dictionary worker error is canceled while pending requests reject and the 
   assert.notEqual(retryWorker,worker,'Retry must create a fresh worker');
   assert.equal(retryWorker.terminated,false);
 });
+
+test('service worker resolves an uncached offline shard to a network-error response and serves cached core without network',async () => {
+  const source = readFileSync(new URL('../../../sw.js',import.meta.url),'utf8');
+  const handlers = new Map();
+  let cacheHit, networkRequests = 0;
+  vm.runInNewContext(source,{
+    self:{
+      location:{origin:'https://example.invalid'},
+      addEventListener(type,handler) { handlers.set(type,handler); },
+    },
+    URL, Response,
+    caches:{
+      async match() { return cacheHit; },
+      async open() { assert.fail('An unavailable shard must not be cached'); },
+    },
+    async fetch() { networkRequests++; throw new TypeError('Load failed'); },
+  });
+  const fetchHandler = handlers.get('fetch');
+  assert.equal(typeof fetchHandler,'function');
+  const requestContent = url => {
+    let responsePromise;
+    fetchHandler({
+      request:new Request(url),
+      respondWith(response) { responsePromise = response; },
+    });
+    assert.ok(responsePromise,'The actual service worker must handle same-origin content');
+    return responsePromise;
+  };
+  // A failed optional index remains a real network error for the consumer,
+  // while the service worker's own respondWith promise no longer rejects.
+  const unavailable = await requestContent('https://example.invalid/data/share_alike/dict-v2/index.json');
+  assert.equal(unavailable.type,'error');
+  assert.equal(unavailable.status,0);
+  assert.equal(unavailable.ok,false);
+  assert.equal(networkRequests,1);
+  cacheHit = new Response(JSON.stringify({words:{'本':{r:'ほん',m:['book']}}}),{
+    headers:{'Content-Type':'application/json'},
+  });
+  const cached = await requestContent('https://example.invalid/data/share_alike/dict.json');
+  assert.equal(cached,cacheHit);
+  assert.equal(cached.status,200);
+  assert.deepEqual(await cached.json(),{words:{'本':{r:'ほん',m:['book']}}});
+  assert.equal(networkRequests,1,'A cached core dictionary must not attempt another fetch');
+});

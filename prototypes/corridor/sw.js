@@ -111,7 +111,7 @@ self.addEventListener('fetch', (event) => {
             }
             return res;
           }),
-      ),
+      ).catch(() => Response.error()),
     );
     return;
   }

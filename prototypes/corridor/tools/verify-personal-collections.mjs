@@ -47,7 +47,8 @@ try {
     try {
       const context=await browser.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Tokyo',acceptDownloads:true});
       const page=await context.newPage(),errors=[],outbound=[];
-      page.on('pageerror',e=>errors.push({message:e.message,stack:e.stack}));
+      let stage='online';
+      page.on('pageerror',e=>{const detail={message:e.message,stack:e.stack,stage};errors.push(detail);console.error(JSON.stringify({browser:name,...detail}));});
       page.on('request',r=>{if(!r.url().startsWith(origin))outbound.push(r.url());assert.equal(r.method(),'GET','no content uploads');});
       await page.goto(url);await page.locator('.pc-file').waitFor({state:'attached'});
       await importFile(page,data);
@@ -167,6 +168,7 @@ try {
       // Worker network emulation differs across engines. Also refuse the
       // optional uncached full dictionary at the origin so fallback is real.
       denyFullDictionary=true;
+      stage='offline control';
       if(name==='webkit') {
         // WebKit's offline-emulation flag rejects even literal SW responses:
         // https://github.com/microsoft/playwright/issues/42775
@@ -177,12 +179,14 @@ try {
         const bare=await browser.newContext({serviceWorkers:'block'}),barePage=await bare.newPage();
         await assert.rejects(()=>barePage.goto(url,{timeout:10000}));await bare.close();
       } else await context.setOffline(true);
+      stage='offline navigation';
       const response=await page.goto(url+'&cold=1');
       assert.equal(response.status(),200);assert.equal(response.fromServiceWorker(),true);
       await openSaved(page);
       assert(await page.locator('.pc-japanese').isVisible());
       await page.locator('[data-action="reveal"]').click();
       await page.locator('.pc-japanese [data-lookup]').first().waitFor();
+      stage='offline dictionary';
       await page.locator('.pc-answer-tools [data-lookup]').filter({hasText:'図書館'}).first().click();
       await page.locator('#sheet .headword').waitFor();
       assert.equal(await page.locator('#sheet .headword').innerText(),'図書館');
@@ -192,6 +196,7 @@ try {
       // entry remains readable and a handled failure offers an explicit retry.
       await page.locator('#sheet .dictionary-warning').waitFor().catch(error=>{throw new Error(`${name}: dictionary fallback failed; page errors=${JSON.stringify(errors)}`,{cause:error});});
       assert(await page.locator('#sheet .dictionary-retry').isVisible());
+      stage='offline grade';
       await page.locator('#sheet-close').click();await page.locator('#sheet').waitFor({state:'detached'});
       await page.locator('[data-grade="3"]').click();
       await page.waitForFunction(()=>document.querySelector('.pc-status').textContent==='Review saved.');
