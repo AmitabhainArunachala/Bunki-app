@@ -12,9 +12,11 @@ const selected=(process.env.PERSONAL_BROWSERS || 'chromium,webkit').split(',');
 assert(selected.length && selected.every(x=>['chromium','webkit'].includes(x)), 'Unknown browser selection');
 await mkdir(out,{recursive:true});
 const data=await fixture(), enrichment=await enrichmentFixture(data), checks=[];
+let denyFullDictionary=false;
 const server=createServer(async(req,res)=>{
   try {
     const requestPath=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+    if(denyFullDictionary && requestPath.includes('/dict-v2/')){res.writeHead(503);res.end('full dictionary deliberately unavailable');return;}
     const file=path.resolve(root,'.'+(requestPath.endsWith('/')?requestPath+'index.html':requestPath));
     if(!file.startsWith(root)){res.writeHead(403);res.end();return;}
     const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.webmanifest':'application/manifest+json','.woff2':'font/woff2','.png':'image/png'};
@@ -40,11 +42,12 @@ async function openSaved(page) {await page.locator('[data-open]').click();await 
 try {
   for(const [name,browserType] of [['chromium',chromium],['webkit',webkit]]) {
     if(!selected.includes(name)) continue;
+    denyFullDictionary=false;
     const browser=await browserType.launch({headless:true,...(name==='chromium'&&process.env.PERSONAL_CHROMIUM?{executablePath:process.env.PERSONAL_CHROMIUM}:{})});
     try {
       const context=await browser.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Tokyo',acceptDownloads:true});
       const page=await context.newPage(),errors=[],outbound=[];
-      page.on('pageerror',e=>errors.push(e.message));
+      page.on('pageerror',e=>errors.push({message:e.message,stack:e.stack}));
       page.on('request',r=>{if(!r.url().startsWith(origin))outbound.push(r.url());assert.equal(r.method(),'GET','no content uploads');});
       await page.goto(url);await page.locator('.pc-file').waitFor({state:'attached'});
       await importFile(page,data);
@@ -161,6 +164,9 @@ try {
       await page.reload();await openSaved(page);
       await page.waitForFunction(()=>navigator.serviceWorker.controller!==null);
       assert(await page.evaluate(async()=>Boolean(await caches.match('index.html'))));
+      // Worker network emulation differs across engines. Also refuse the
+      // optional uncached full dictionary at the origin so fallback is real.
+      denyFullDictionary=true;
       if(name==='webkit') {
         // WebKit's offline-emulation flag rejects even literal SW responses:
         // https://github.com/microsoft/playwright/issues/42775
@@ -184,7 +190,7 @@ try {
       assert((await page.locator('#sheet .senses').innerText()).includes('library'));
       // The never-fetched full index is unavailable, while the cached core
       // entry remains readable and a handled failure offers an explicit retry.
-      await page.locator('#sheet .dictionary-warning').waitFor();
+      await page.locator('#sheet .dictionary-warning').waitFor().catch(error=>{throw new Error(`${name}: dictionary fallback failed; page errors=${JSON.stringify(errors)}`,{cause:error});});
       assert(await page.locator('#sheet .dictionary-retry').isVisible());
       await page.locator('#sheet-close').click();await page.locator('#sheet').waitFor({state:'detached'});
       await page.locator('[data-grade="3"]').click();

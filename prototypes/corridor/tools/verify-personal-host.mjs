@@ -27,9 +27,13 @@ try {
  assert.equal(await page.locator('#sheet .headword').innerText(),'図書館');
  assert.equal(await page.locator('#sheet .gloss').first().isVisible(),false);
  await page.locator('.personal-dictionary-meaning > summary').click();assert((await page.locator('#sheet .senses').innerText()).includes('library'));
- await page.locator('#take').click();await page.locator('#take-new-list').fill('Synthetic host list');await page.locator('#take-save').click();
+ await page.locator('#take').click();
+ assert.match(await page.locator('.take-always .sub').innerText(),/daily review|毎日の復習/);
+ assert.equal(await page.evaluate(()=>(JSON.parse(localStorage.getItem('kairo-corridor-v1'))?.taken||[]).length),0,'opening the chooser does not enroll a card');
+ await page.locator('#take-new-list').fill('Synthetic host list');await page.locator('#take-save').click();
  const canonical=await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-corridor-v1')));
  assert(canonical.taken.some(t=>t.id==='図書館'));assert(canonical.lists['Synthetic host list'].some(t=>t.id==='図書館'));
+ assert(Number.isFinite(canonical.taken.find(t=>t.id==='図書館').started),'confirmed 覚える keeps the host explicit-review enrollment contract');
  assert.deepEqual(canonical.srs,{});assert.deepEqual(canonical.revlog,[]);
  await page.locator('[data-kanjirow="図"]').click();await page.locator('#sheet[data-node="kanji:図"]').waitFor();await page.locator('#sheet-back').click();await page.locator('#sheet[data-node="word:図書館"]').waitFor();
  await page.goBack();await page.locator('#sheet').waitFor({state:'detached'});

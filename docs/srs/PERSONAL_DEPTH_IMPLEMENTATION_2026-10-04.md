@@ -48,8 +48,11 @@ review state are the meaningful signals available today.
   assessment IDs remain unchanged. Each modality keeps its own evidence.
 - An answer reveal, English reveal, lookup, source visit, or captured word is
   not a successful review. Only an explicit grade writes a personal review.
-- Remember capture writes only the host's existing capture/list data. It does
-  not promote the item into the host review queue or change personal FSRS.
+- Opening a dictionary or its save chooser does not enroll an item. Confirming
+  **覚える** preserves Bunki's existing explicit memorization contract: it adds
+  the item to the host's review pool and selected lists. The chooser labels
+  this destination “daily review.” It writes no grade, FSRS record or review
+  log, and it does not change the personal paragraph's FSRS state.
 - Writes still commit before advancing. Failed writes retain the answer;
   concurrent stale windows fail rather than overwrite newer work. Undo remains
   append-only.
