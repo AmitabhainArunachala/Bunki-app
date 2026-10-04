@@ -43,10 +43,15 @@
         <div class="kanji">{{Kanji}}</div>
       </details>
       {{/Hint}} {{/Kanji}}
-    </div>
-    <div class="src">
-      出典 {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
-      >{{/SourceURL}}
+      <!-- 出典, the last fold as in the player; the licence of each source is listed in
+      ATTRIBUTION-<deck id>.md (a note field for it would change the note type) -->
+      <details class="fold src">
+        <summary>出典</summary>
+        <div class="srcline">
+          {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
+          >{{/SourceURL}}
+        </div>
+      </details>
     </div>
   </div>
 </div>

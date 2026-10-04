@@ -22,13 +22,13 @@
 /* edge and first chip = item kind (語 accent, 字 its own hue), as in the player; the source
    of the passage is text in the chip row, never a colour */
 .km.item-字 {
-  border-left-color: #a3237a;
+  border-left-color: #7f1f86;
 }
 .nightMode .km {
   border-left-color: #3fd0ff;
 }
 .nightMode .km.item-字 {
-  border-left-color: #ff8fd8;
+  border-left-color: #ffb0ea;
 }
 .chips {
   display: flex;
@@ -47,13 +47,13 @@
   opacity: 1;
 }
 .item-字 .chip.lvchip {
-  color: #a3237a;
+  color: #7f1f86;
 }
 .nightMode .chip.lvchip {
   color: #3fd0ff;
 }
 .nightMode .item-字 .chip.lvchip {
-  color: #ff8fd8;
+  color: #ffb0ea;
 }
 /* level: the note's level::Nx tag (no extra field), a monochrome chip as in the player;
    words the public list does not cover carry no tag and show no chip */
@@ -109,10 +109,6 @@
 }
 .blank {
   border-bottom: 3px solid currentColor;
-}
-.hint {
-  font-size: 16px;
-  opacity: 0.75;
 }
 .answer {
   border-top: 1px solid rgba(128, 128, 128, 0.35);
@@ -193,6 +189,9 @@
 .pos-adj .posbadge::after {
   content: '形容詞';
 }
+.pos-adjna .posbadge::after {
+  content: '形容動詞';
+}
 .pos-adv .posbadge::after {
   content: '副詞';
 }
@@ -202,12 +201,12 @@
 .pos-sound .posbadge::after {
   content: '擬音語';
 }
-.src {
+.srcline {
   font-size: 12px;
-  opacity: 0.65;
+  opacity: 0.75;
   overflow-wrap: anywhere;
 }
-.src a {
+.srcline a {
   color: inherit;
 }
 
@@ -217,7 +216,9 @@
   color: #c94a12;
 }
 .pos-adj .sentence b,
-.pos-adj .term {
+.pos-adjna .sentence b,
+.pos-adj .term,
+.pos-adjna .term {
   color: #9a6a00;
 }
 .pos-adv .sentence b,
@@ -237,7 +238,9 @@
   color: #ff8a5c;
 }
 .nightMode .pos-adj .sentence b,
-.nightMode .pos-adj .term {
+.nightMode .pos-adjna .sentence b,
+.nightMode .pos-adj .term,
+.nightMode .pos-adjna .term {
   color: #ffd24a;
 }
 .nightMode .pos-adv .sentence b,

@@ -12,7 +12,12 @@
  * measurement table (contrast ratios, hit targets, focused-vs-background font
  * sizes, and each shelf text's three grader signals).
  *
- * Usage: node verify-corridor.mjs [--shots DIR] [--keep-open]
+ * Usage: node verify-corridor.mjs [--shots DIR] [--report FILE] [--keep-open]
+ *
+ * The JSON report goes to FILE when --report names one, else next to the screenshots when
+ * --shots names a directory, else to the system temp directory — never into the tracked
+ * docs/prototype/verification-report.json unless that path is asked for, so a run leaves the
+ * checkout clean (refresh the tracked copy with --report docs/prototype/verification-report.json).
  */
 
 import { createServer } from 'node:http';
@@ -121,6 +126,44 @@ async function tap(page, selector, index = 0) {
 async function holdWord(page, selector, index = 0) {
   await touchAt(page, selector, index, 2400);
   await page.waitForTimeout(200);
+}
+
+/** Hold a reader word until its entry sheet is up. A hold begun while the reader re-renders
+ * (an article's text arriving, a bookmark restoring the scroll) dies with the node it pressed and
+ * no sheet opens; the walk then settles the reader and holds again, up to three times. */
+async function holdForSheet(page, selector, index = 0, tries = 3) {
+  for (let i = 1; ; i++) {
+    await holdWord(page, selector, index);
+    try {
+      await page.waitForSelector('#sheet', { timeout: 5000 });
+      return;
+    } catch (err) {
+      if (i >= tries) throw err;
+      await settleReader(page);
+    }
+  }
+}
+
+/** Open 学習の記録 on the entry sheet and wait for its card preview. The sheet swaps once or
+ * twice after it opens (deep senses, bank examples); a tap that lands mid-swap is lost or finds
+ * no box, so this waits for the swaps, taps only a closed fold (aria-expanded), and retries. */
+async function openStudyFold(page, tries = 3) {
+  for (let i = 1; ; i++) {
+    await page
+      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+      .catch(() => {});
+    try {
+      await page.waitForSelector('#sheet .study-fold .fold-head', { state: 'visible', timeout: 6000 });
+      if ((await page.locator('#sheet .study-fold .fold-head[aria-expanded="true"]').count()) === 0) {
+        await tap(page, '#sheet .study-fold .fold-head');
+      }
+      await page.waitForSelector('#sheet .card-preview', { state: 'visible', timeout: 6000 });
+      return;
+    } catch (err) {
+      if (i >= tries) throw err;
+      await page.waitForTimeout(400);
+    }
+  }
 }
 
 /** Wait until the reader's tokens stop changing. An article's text loads
@@ -265,6 +308,13 @@ async function main() {
   const shotsDir =
     shotArg >= 0 ? resolve(argv[shotArg + 1]) : resolve(REPO, 'docs/prototype/screenshots');
   mkdirSync(shotsDir, { recursive: true });
+  const reportArg = argv.indexOf('--report');
+  const reportPath =
+    reportArg >= 0
+      ? resolve(argv[reportArg + 1])
+      : shotArg >= 0
+        ? join(shotsDir, 'verification-report.json')
+        : join(tmpdir(), 'corridor-verification-report.json');
 
   const { server, base } = await startCorridorServer();
   const browser = await chromium.launch({
@@ -1094,13 +1144,11 @@ async function main() {
     await open(`?entry=shelf&cards=${mode}`);
     await tap(page, '.shelf-item');
     await settleReader(page);
-    await holdWord(page, '#reader .tok.content', 5);
-    await page.waitForSelector('#sheet');
+    await holdForSheet(page, '#reader .tok.content', 5);
     // the card preview rides inside the study fold since 2026-08-27 — open
     // 学習の記録 first (for MCD the preview appears once the source
     // article's tokens arrive; the reader has them already)
-    await tap(page, '#sheet .study-fold .fold-head');
-    await page.waitForSelector('#sheet .card-preview');
+    await openStudyFold(page);
     // two one-time sheet swaps may follow the open (deep senses, bank
     // examples) — let them land before touching located elements
     await page
@@ -3566,7 +3614,6 @@ async function main() {
 
   report.summary = { total: results.length, failed: failures };
   report.results = results;
-  const reportPath = resolve(REPO, 'docs/prototype/verification-report.json');
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 

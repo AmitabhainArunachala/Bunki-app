@@ -288,14 +288,26 @@ function revive(stored) {
   };
 }
 
+/**
+ * The cards an answer mode leaves out of every queue, as a predicate (null: none). 読んで思い出す
+ * ('read') asks the whole word, so a 字 card (one kanji of the word blanked) waits until the
+ * learner chooses a blank preset (穴埋め, 4択); nothing is suspended or deleted, its record and id
+ * are kept, and it comes back the moment the mode changes (STANDARD A37).
+ */
+export function skipFor(mode) {
+  return mode === 'read' ? (card) => card.type === 'kanji' : null;
+}
+
 /** the next sentence of a word that may be introduced, or null. A card suspended before it was
  * ever shown (削除 on its first showing) is skipped, and so are the 字 cards of a passage whose
  * word card went that way: the next passage becomes the word's first, so a cull never holds the
- * word. The unlock test reads the last card of the word that was shown. */
-function nextNewCard(word, state, unlockDays = UNLOCK_STABILITY_DAYS) {
+ * word. A card the mode skips (skipFor) is passed over as if absent. The unlock test reads the
+ * last card of the word that was shown. */
+function nextNewCard(word, state, unlockDays = UNLOCK_STABILITY_DAYS, skip = null) {
   let prev = null;
   const culled = new Set();
   for (const card of word.cards) {
+    if (skip?.(card)) continue;
     const stored = state.cards[card.id];
     if (stored) {
       prev = stored;
@@ -324,10 +336,11 @@ export function introducedToday(state, now, deck) {
  * Today's work. Due cards first (most overdue first, one per word — a
  * sibling waits for tomorrow), then new sentences up to the daily cap, at
  * most one per word per day. Suspended cards are never in it; a passage the
- * repair ladder swapped in is due from the moment of the swap. Opening a
+ * repair ladder swapped in is due from the moment of the swap; a card the
+ * answer mode skips (skip: skipFor(mode)) is neither due nor new. Opening a
  * queue writes nothing.
  */
-export function buildQueue(deck, state, now, newPerDay) {
+export function buildQueue(deck, state, now, newPerDay, { skip = null } = {}) {
   const off = new Set(state.groupsOff);
   const due = [];
   const fresh = [];
@@ -338,7 +351,7 @@ export function buildQueue(deck, state, now, newPerDay) {
   for (const word of deck.words) {
     if (off.has(word.group)) continue;
     for (const card of word.cards) {
-      if (isSuspended(state, card.id)) continue;
+      if (isSuspended(state, card.id) || skip?.(card)) continue;
       const stored = state.cards[card.id];
       if (!stored) {
         if (swapped.has(card.id)) due.push({ card, word, dueAt: swapped.get(card.id) });
@@ -362,7 +375,7 @@ export function buildQueue(deck, state, now, newPerDay) {
   for (const word of deck.words) {
     if (!room) break;
     if (off.has(word.group) || seen.has(word.id) || busyWords.has(word.id)) continue;
-    const card = nextNewCard(word, state, deck.unlockDays);
+    const card = nextNewCard(word, state, deck.unlockDays, skip);
     if (card) {
       fresh.push(card.id);
       room--;
@@ -371,15 +384,15 @@ export function buildQueue(deck, state, now, newPerDay) {
   return { due: dueOut, fresh, queue: [...dueOut, ...fresh] };
 }
 
-/** learning steps due inside the sitting (minutes away), soonest first */
-export function learningSoon(deck, state, now, withinMs) {
+/** learning steps due inside the sitting (minutes away), soonest first; skip as in buildQueue */
+export function learningSoon(deck, state, now, withinMs, { skip = null } = {}) {
   const off = new Set(state.groupsOff);
   const out = [];
   for (const word of deck.words) {
     if (off.has(word.group)) continue;
     for (const card of word.cards) {
       const s = state.cards[card.id];
-      if (s && s.state !== REVIEW && !isSuspended(state, card.id)) {
+      if (s && s.state !== REVIEW && !isSuspended(state, card.id) && !skip?.(card)) {
         const t = new Date(s.due).getTime();
         if (t - now.getTime() <= withinMs) out.push({ id: card.id, t });
       }
@@ -449,6 +462,6 @@ export function wordStatus(word, state) {
   return { key: reviewLv ? 'growing' : 'learning', lv: reviewLv, lapses };
 }
 
-export function dueCount(deck, state, now) {
-  return buildQueue(deck, state, now, 0).due.length;
+export function dueCount(deck, state, now, opts) {
+  return buildQueue(deck, state, now, 0, opts).due.length;
 }

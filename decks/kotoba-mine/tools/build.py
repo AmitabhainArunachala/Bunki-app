@@ -96,11 +96,13 @@ SENTENCE_METHOD = [
 # the two decks built from the same word list, side by side in 集中道場
 DECKS = {
     "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Real sentences · read and recall",
-                 "defaults": {"look": "dark", "mode": "read", "hint": "ja", "gloss": "tap"}, "method": SENTENCE_METHOD,
+                 "defaults": {"look": "dark", "mode": "read", "gloss": "tap"}, "method": SENTENCE_METHOD,
                  "anki": ("anki-sentence", "kotoba-mine-sentence-v3", "Kotoba Mine Sentence", "Read", "kotoba-mine-v3"),
                  "out": ("kotoba-mine.apkg", "kotoba-mine.tsv", "study.html")},
     "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Massive-context cloze · passages",
-            "defaults": {"look": "ai", "mode": "self", "hint": "ja", "gloss": "tap"}, "unlockDays": 3,
+            # 読んで思い出す by default (CARD_CONTRACT_V2 §2); 穴埋め, the MCD blank preset, is one switch
+            # away in 設定 and brings the 字 cards back into the queue (STANDARD A37)
+            "defaults": {"look": "ai", "mode": "read", "gloss": "tap"}, "unlockDays": 3,
             "anki": ("anki", "kotoba-mine-mcd-v4", "Kotoba Mine MCD", "Cloze", "kotoba-mine-v4"),
             "out": ("kotoba-mcd.apkg", "kotoba-mcd.tsv", "study-mcd.html")},
 }
@@ -481,8 +483,9 @@ KANJI_UNALIGNED: list[tuple[str, str, list[str]]] = []
 
 
 def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManifest) -> list[dict]:
-    """per passage: one card blanking the whole word (hint: its Japanese definition),
-    then (first passage only) one card per kanji, blanked with its reading as the hint.
+    """per passage: one card asking the whole word (marked in 読んで思い出す, blanked in 穴埋め;
+    no front hint, CARD_CONTRACT_V2 §2), then (first passage only) one card per kanji, blanked
+    with its reading as the hint (the player queues these in the blank presets only).
     A 字 card is left out when its kanji can be read elsewhere in the passage, and no 字
     card is made when the kanji table cannot split the word's reading.
     Ids come from the manifest by key; lv is the card's position (display order only)."""
@@ -525,12 +528,12 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
 
 
 METHOD = [
-    "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）方式です。",
-    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜4文）。穴はひとつの言葉だけ（同じ言葉が二度出てくる文章では、両方とも空欄）。",
-    "「語」カード：単語まるごとが穴。下の日本語の説明と文脈から思い出す。",
-    "「字」カード：単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。",
+    "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）の文章でできています。ふだんは「読んで思い出す」で解きます。",
+    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜4文）。覚える言葉は色つき。読み・英語・ヒントは出ない。読んで、意味と読みを思い出してからタップ。",
+    "設定 › 答え方 › 穴埋め にすると MCD の穴埋めになる。「語」カードは単語まるごとが穴（同じ言葉が二度出てくる文章では、両方とも空欄）。",
+    "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
-    "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、出典はタップで開く。",
+    "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。",
     "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。",
 ]
 
@@ -848,7 +851,9 @@ def blank_html(card: dict) -> str:
 FIELDS = ["Key", "Sort", "Topic", "Level", "Type", "Hint", "Kind", "Word", "Reading", "Meaning", "DefJA", "SentenceFront", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip", "Source", "SourceURL", "POS", "Kanji"]
 
 
-POS_KEY = {"noun": "noun", "verb": "verb", "い-adjective": "adj", "な-adjective": "adj", "adverb": "adv",
+# な-adjectives get their own key so the badge can say 形容動詞 (the player's POS map does the same);
+# the colour stays the adjective's
+POS_KEY = {"noun": "noun", "verb": "verb", "い-adjective": "adj", "な-adjective": "adjna", "adverb": "adv",
            "expression": "expr", "sound word": "sound", "kanji": "noun"}
 
 
