@@ -150,13 +150,16 @@ describe.skipIf(!!noPython)(
       const updated = readJson(idsCopy);
       const oldKey = `${wid}|word|${sha12(mcd[n][1].ja)}`;
       const newKey = `${wid}|word|${sha12(altered[n][1].ja)}`;
+      const reservedBefore = manifest.reserved?.['kotoba-mcd'] ?? [];
       const top = Math.max(
-        ...Object.values(manifest['kotoba-mcd'])
+        ...[...Object.values(manifest['kotoba-mcd']), ...reservedBefore.map((r) => r.id)]
           .filter((id) => id.startsWith(`${wid}-m`))
           .map((id) => Number(id.slice(wid.length + 2))),
       );
       expect(updated['kotoba-mcd'][newKey]).toBe(`${wid}-m${String(top + 1).padStart(2, '0')}`);
+      // ids reserved earlier stay reserved; the replaced passage's id joins them
       expect(updated.reserved['kotoba-mcd']).toEqual([
+        ...reservedBefore,
         { key: oldKey, id: manifest['kotoba-mcd'][oldKey] },
       ]);
       expect(without(updated['kotoba-mcd'], newKey)).toEqual(

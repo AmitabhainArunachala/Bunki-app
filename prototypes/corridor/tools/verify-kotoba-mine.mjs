@@ -19,6 +19,9 @@
  * ledger is untouched; a learning step that comes due while a card is open
  * waits until that card is answered, then comes next (fake clock).
  *
+ * No card shows its own answer: a repeat of the word is blanked with it, and a
+ * 字 card whose kanji is printed elsewhere in the passage is not built.
+ *
  * Every card id in both decks is the one source/ids.json gives its key
  * (word, passage text, card kind), so reordering passages never moves an id.
  *
@@ -93,7 +96,7 @@ function verifyDeck() {
   const real = [...passages.values()].filter((c) => c.kind !== 'original');
   check('every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / passages.size >= 0.4, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
   const mcd = cards.filter((c) => c.type);
-  check('MCD: one gap per card — 語 cards blank the word, 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
+  check('MCD: one word asked per card — 語 cards blank the word (and any repeat of it), 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
   const bad = [];
   for (const c of cards) {
     const target = c.ruby.filter((seg) => seg[2] === 1);
@@ -123,6 +126,21 @@ function verifyIds(decks) {
     const n = deck.words.reduce((sum, w) => sum + w.cards.length, 0);
     check(`${deck.id}: every card id is the one ids.json gives its key (word, passage, kind), not its position`, bad.length === 0 && Object.keys(ids).length === n, bad.slice(0, 3).join(' | ') || `${n}/${n} · ${(manifest.reserved?.[deck.id] ?? []).length} reserved`);
   }
+}
+
+/* ------------------------------------------ no card shows its answer (F15, F18) */
+function verifyLeaks(decks) {
+  const plain = (card, ...hidden) =>
+    card.ruby
+      .filter((seg) => !(seg.length > 2 && hidden.includes(seg[2])))
+      .map((seg) => seg[0])
+      .join('');
+  const cards = decks.flatMap((deck) => deck.words.flatMap((w) => w.cards.map((c) => ({ c, w }))));
+  const wordLeaks = cards.filter(({ c, w }) => c.type !== 'kanji' && (plain(c, 1, 3).includes(c.form) || plain(c, 1, 3).includes(w.term))).map(({ c }) => c.id);
+  const kanjiLeaks = cards.filter(({ c }) => c.type === 'kanji' && plain(c, 1).includes(c.ruby.find((seg) => seg[2] === 1)[0])).map(({ c }) => c.id);
+  const repeats = cards.filter(({ c }) => c.ruby.some((seg) => seg[2] === 3)).length;
+  check('no 語 or 文 card prints its word outside the blanks (a repeat of the word is blanked too)', wordLeaks.length === 0, wordLeaks.slice(0, 4).join(' | ') || `0 · ${repeats} cards blank a repeat`);
+  check('no 字 card prints its blanked kanji elsewhere in the passage', kanjiLeaks.length === 0, kanjiLeaks.slice(0, 4).join(' | ') || `0 of ${cards.filter(({ c }) => c.type === 'kanji').length}`);
 }
 
 /* ------------------------------------- the grade path (F01, F07, N02) */
@@ -274,6 +292,7 @@ async function main() {
   const sc = sentences.words.flatMap((w) => w.cards);
   check('言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source', sentences.id === 'kotoba-mine' && sentences.words.length === 323 && sc.every((c) => !c.type && c.src && c.ruby.filter((g) => g[2] === 1).length === 1), `${sc.length} sentence cards`);
   verifyIds([deck, sentences]);
+  verifyLeaks([deck, sentences]);
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');

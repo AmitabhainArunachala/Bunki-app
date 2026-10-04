@@ -197,6 +197,11 @@ class IdManifest:
         print(f"· new card id {ids[key]} for {key} ({deck})")
         return ids[key]
 
+    def known(self, deck: str) -> dict[str, str]:
+        """key → id for every id the deck has handed out, active or reserved"""
+        reserved = {r["key"]: r["id"] for r in self.data.get("reserved", {}).get(deck, [])}
+        return {**reserved, **self.data.get(deck, {})}
+
     def retire_unseen(self, deck: str) -> None:
         """ids whose key this build no longer produces are reserved, never reused"""
         ids = self.data.get(deck, {})
@@ -215,24 +220,39 @@ class IdManifest:
 
 
 # ------------------------------------------------------------------ ruby
-def _ordered(ja, tokens, a, b, ts, te, form, reading):
-    segs: list[list] = []
-    pos = 0
-    placed = False
+def _ordered(ja, tokens, marks):
+    """the tokens as ruby segments, each mark (a, b, reading, marker) cut out of its
+    token(s) as one segment [ja[a:b], reading, marker]; marks are in order, never overlapping"""
+    spans, pos = [], 0
     for t in tokens:
-        s, e = pos, pos + len(t["s"])
-        pos = e
-        if e <= ts:
-            segs.extend(_token_segs(t))
-        elif s >= te:
-            segs.extend(_token_segs(t))
-        elif not placed:
-            if ja[ts:a]:
-                segs.append([ja[ts:a], ""])
-            segs.append([form, reading, 1])
-            if ja[b:te]:
-                segs.append([ja[b:te], ""])
-            placed = True
+        spans.append((pos, pos + len(t["s"])))
+        pos += len(t["s"])
+    # the run of whole tokens each mark touches; marks whose runs share a token form one cluster
+    clusters: list[list] = []  # [run start, run end, [marks]]
+    for m in marks:
+        touched = [x for x in spans if x[1] > m[0] and x[0] < m[1]]
+        ts, te = touched[0][0], touched[-1][1]
+        if clusters and ts < clusters[-1][1]:
+            clusters[-1][1] = max(clusters[-1][1], te)
+            clusters[-1][2].append(m)
+        else:
+            clusters.append([ts, te, [m]])
+    segs: list[list] = []
+    ci = 0
+    for t, (s, e) in zip(tokens, spans):
+        if ci < len(clusters) and s >= clusters[ci][0]:
+            cs, ce, inside = clusters[ci]
+            if e < ce:
+                continue  # emitted with the cluster's last token
+            at = cs
+            for a, b, reading, marker in inside:
+                segs.extend(_piece_segs(ja, at, a, tokens, spans))
+                segs.append([ja[a:b], reading, marker])
+                at = b
+            segs.extend(_piece_segs(ja, at, ce, tokens, spans))
+            ci += 1
+            continue
+        segs.extend(_token_segs(t))
     # merge neighbouring plain segments
     merged: list[list] = []
     for seg in segs:
@@ -241,6 +261,25 @@ def _ordered(ja, tokens, a, b, ts, te, form, reading):
         else:
             merged.append(seg)
     return merged
+
+
+def _piece_segs(ja, lo, hi, tokens, spans) -> list[list]:
+    """ja[lo:hi], text left beside a mark inside its tokens: a whole token keeps its
+    readings, a cut kanji token keeps the readings the kanji table aligns, else none"""
+    out: list[list] = []
+    for t, (s, e) in zip(tokens, spans):
+        a, b = max(s, lo), min(e, hi)
+        if a >= b:
+            continue
+        if (a, b) == (s, e):
+            out.extend(_token_segs(t))
+            continue
+        split = align(t["s"], kata_to_hira(t["r"] or t["s"])) if KANJI.search(ja[a:b]) else None
+        if split:
+            out.extend([ch, r if KANJI.match(ch) else ""] for ch, r in split[a - s : b - s])
+        else:
+            out.append([ja[a:b], ""])
+    return out
 
 
 def _token_segs(t: dict) -> list[list]:
@@ -286,14 +325,16 @@ def _readings(ch: str) -> list[str]:
     return sorted(out, key=len, reverse=True)
 
 
-def align(form: str, reading: str, _deep: bool = True) -> list[tuple[str, str]] | None:
-    """財政/ざいせい → [(財, ざい), (政, せい)]; 覆う/おおう → [(覆, おお), (う, '')]"""
+def align(form: str, reading: str, _whole: bool = True) -> list[tuple[str, str]] | None:
+    """財政/ざいせい → [(財, ざい), (政, せい)]; 覆う/おおう → [(覆, おお), (う, '')].
+    Every kanji must take one of the readings the kanji table gives it; a kanji the
+    table does not know is aligned only when it is the whole form."""
     if not form:
         return [] if not reading else None
     ch = form[0]
     if not KANJI.match(ch):
         if reading.startswith(kata_to_hira(ch)):
-            rest = align(form[1:], reading[1:], _deep)
+            rest = align(form[1:], reading[1:], False)
             return None if rest is None else [(ch, "")] + rest
         return None
     if len(form) == 1:
@@ -302,30 +343,27 @@ def align(form: str, reading: str, _deep: bool = True) -> list[tuple[str, str]] 
         known = _readings(ch)
         if known and reading not in known:
             return None  # a known kanji must end on one of its readings
-        if not known and not _deep:
-            return None  # two unknown kanji in a row: the split would be a guess
+        if not known and not _whole:
+            return None  # an unknown kanji would take whatever reading is left: a guess
         return [(ch, reading)]
     for r in _readings(ch):
         if reading.startswith(r) and len(r) < len(reading):
-            rest = align(form[1:], reading[len(r):], _deep)
+            rest = align(form[1:], reading[len(r):], False)
             if rest is not None:
                 return [(ch, r)] + rest
-    if not _deep or _readings(ch):
-        return None  # only a kanji the table has no readings for may be guessed
-    # a kanji the table does not know (or reads unusually): try every short split,
-    # accepting it only when the rest of the word aligns by the table
-    for k in range(1, min(4, len(reading) - 1) + 1):
-        if reading[k] in SMALL:
-            continue
-        rest = align(form[1:], reading[k:], _deep=False)
-        if rest is not None:
-            return [(ch, reading[:k])] + rest
-    return None
+    return None  # a reading the table cannot split is never guessed (讃岐 is not 讃=さぬ)
+
+
+# 字 cards the build leaves out, reported at the end: [card id or key] and [(word, term, ids)]
+KANJI_VISIBLE: list[str] = []
+KANJI_UNALIGNED: list[tuple[str, str, list[str]]] = []
 
 
 def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManifest) -> list[dict]:
     """per passage: one card blanking the whole word (hint: its Japanese definition),
     then (first passage only) one card per kanji, blanked with its reading as the hint.
+    A 字 card is left out when its kanji can be read elsewhere in the passage, and no 字
+    card is made when the kanji table cannot split the word's reading.
     Ids come from the manifest by key; lv is the card's position (display order only)."""
     cards, keys = [], []
     for pi, p in enumerate(passages, 1):
@@ -338,10 +376,21 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
         keys.append(word_key(wid, p["ja"]))
         ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
         parts = align(p["form"], ruby[ti][1])
+        if pi == 1 and parts is None:
+            known = ids.known("kotoba-mcd")
+            lost = [v for k, v in known.items() if k.startswith(f"{wid}|kanji|{passage_hash(p['ja'])}|")]
+            if lost:
+                KANJI_UNALIGNED.append((wid, c["term"], sorted(lost)))
         kanji_parts = [i for i, (t, _) in enumerate(parts or []) if KANJI.match(t)]
         if pi > 1 or (len(kanji_parts) < 2 and not (parts and kanji_parts and len(parts) > 1)):
             continue  # 字 cards come from the first passage only; a lone kanji is the word card
+        start = sum(len(seg[0]) for seg in ruby[:ti])
         for k in kanji_parts:
+            at = start + k
+            if p["ja"][at] in p["ja"][:at] + p["ja"][at + 1:]:
+                key = kanji_key(wid, p["ja"], k)
+                KANJI_VISIBLE.append(ids.known("kotoba-mcd").get(key, key))
+                continue  # the blanked kanji is printed elsewhere in the passage: the card answers itself
             segs = [[t, r, 1 if i == k else 2] for i, (t, r) in enumerate(parts)]
             cards.append({**base, "type": "kanji", "hint": parts[k][1], "ruby": ruby[:ti] + segs + ruby[ti + 1:]})
             keys.append(kanji_key(wid, p["ja"], k))
@@ -353,7 +402,7 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
 
 METHOD = [
     "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）方式です。",
-    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜4文）。穴はひとつだけ。",
+    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜4文）。穴はひとつの言葉だけ（同じ言葉が二度出てくる文章では、両方とも空欄）。",
     "「語」カード：単語まるごとが穴。下の日本語の説明と文脈から思い出す。",
     "「字」カード：単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
@@ -442,6 +491,28 @@ def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
     }
 
 
+def hint_warnings(decks: list[dict]) -> list[str]:
+    """words whose definition or meaning names the answer: the term, a form a card blanks,
+    or the whole reading. A warning, not a gate: how much the hint may give is the learner's call."""
+    forms: dict[str, set[str]] = {}
+    words: dict[str, dict] = {}
+    for deck in decks:
+        for w in deck["words"]:
+            words.setdefault(w["id"], w)
+            forms.setdefault(w["id"], set()).update(card["form"] for card in w["cards"])
+    out = []
+    for wid, w in words.items():
+        reading = kata_to_hira(w["reading"])
+        for field in ("defJa", "meaning"):
+            text = w[field]
+            hits = sorted({x for x in (w["term"], *forms[wid]) if x and x in text})
+            if reading and reading in kata_to_hira(text):
+                hits.append(reading)
+            if hits:
+                out.append(f"{wid} {w['term']} {field}: {'、'.join(hits)} in 「{text}」")
+    return out
+
+
 def _cover(ja: str, tokens: list[dict]) -> list[dict]:
     """put back any characters the tokeniser skipped (spaces, odd symbols) as plain tokens"""
     out, pos = [], 0
@@ -458,20 +529,39 @@ def _cover(ja: str, tokens: list[dict]) -> list[dict]:
     return out
 
 
+def _occurrences(ja: str, form: str) -> list[int]:
+    """where each non-overlapping occurrence of form starts in ja"""
+    out, at = [], ja.find(form)
+    while at >= 0:
+        out.append(at)
+        at = ja.find(form, at + len(form))
+    return out
+
+
 def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
+    """the sentence as ruby segments. The first occurrence of the form is the target
+    (marker 1); every further one is marker 3, so no card shows its own answer."""
     ja, form = s["ja"], s["form"]
-    a = ja.index(form)
-    b = a + len(form)
     tokens = _cover(ja, bc.tokenise(ja, tagger))
-    pos = 0
-    spans = []
-    for t in tokens:
-        spans.append((pos, pos + len(t["s"]), t))
-        pos += len(t["s"])
-    touched = [x for x in spans if x[1] > a and x[0] < b]
-    ts, te = touched[0][0], touched[-1][1]
+    marks = []
+    for n, a in enumerate(_occurrences(ja, form)):
+        b = a + len(form)
+        marks.append((a, b, _form_reading(ja, tokens, a, b, c, form), 1 if n == 0 else 3))
+    if not marks:
+        raise ValueError(f"{form!r} is not in {ja!r}")
+    return _ordered(ja, tokens, marks)
+
+
+def _form_reading(ja: str, tokens: list[dict], a: int, b: int, c: dict, form: str) -> str:
+    """the reading of ja[a:b] (the form), in hiragana"""
     reading = target_reading(c, form)
     if reading is None:
+        pos = 0
+        spans = []
+        for t in tokens:
+            spans.append((pos, pos + len(t["s"]), t))
+            pos += len(t["s"])
+        touched = [x for x in spans if x[1] > a and x[0] < b]
         # tokens inside the form give its reading; a token that sticks out of
         # the form is cut by surface length (okurigana is kana, so it maps 1:1)
         parts = []
@@ -490,7 +580,7 @@ def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
                 else:
                     parts.append(r if lo == s0 else ja[lo:hi])
         reading = "".join(parts)
-    return _ordered(ja, tokens, a, b, ts, te, form, kata_to_hira(reading))
+    return kata_to_hira(reading)
 
 
 # ------------------------------------------------------------------ anki
@@ -514,11 +604,14 @@ KIND_JA = {"news": "ニュース", "blog": "ブログ", "qa": "Q&A", "company": 
 
 
 def blank_html(card: dict) -> str:
-    """the passage with its one gap (a 字 card's gap shows the kanji's reading)"""
+    """the passage with its gap (a 字 card's gap shows the kanji's reading); a repeat of
+    the word (marker 3) is blanked too, without a hint, so the front never shows the answer"""
     out = []
     for seg in card["ruby"]:
         if len(seg) > 2 and seg[2] == 1:
             out.append(f'<span class="blank">{"〔" + html.escape(card["hint"]) + "〕" if card.get("hint") else "［　　］"}</span>')
+        elif len(seg) > 2 and seg[2] == 3:
+            out.append('<span class="blank">［　　］</span>')
         elif len(seg) > 2:
             out.append(f"<b>{html.escape(seg[0])}</b>")
         else:
@@ -657,6 +750,15 @@ def main() -> int:
     ids = IdManifest(IDS_PATH, FROZEN)
     out_dir = Path(_arg("--out")) if "--out" in sys.argv else None
     decks = {kind: build_deck(mods, ids, kind) for kind in DECKS}
+    print(f"· 字 cards withheld (kanji visible elsewhere): {len(KANJI_VISIBLE)}")
+    lost = sum(len(x[2]) for x in KANJI_UNALIGNED)
+    print(f"· 字 cards withheld (no table reading for each kanji): {lost}")
+    for wid, term, gone in KANJI_UNALIGNED:
+        print(f"    {wid} {term}: {', '.join(gone)}")
+    warnings = hint_warnings(list(decks.values()))
+    print(f"! hints that name the answer (warning only): {len(warnings)}")
+    for line in warnings:
+        print(f"    {line}")
     for spec in DECKS.values():
         ids.retire_unseen(spec["id"])
     ids.save()  # before any deck is written, so no shipped id is missing from the manifest
