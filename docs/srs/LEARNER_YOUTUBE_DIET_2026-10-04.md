@@ -109,3 +109,42 @@ Adam Evans · aframe films · AI adventurer · AI Engineer · AI LABS · AIcia S
 5. **Japanese-language meta** (ゆる言語学ラジオ, 養老孟司, あび漢字, Japanese-teacher
    channels) — the learner enjoys talking _about_ Japanese in Japanese; a fifth texture
    for passages (語源, 言語学 register).
+
+## Subscriptions, continued (batch 4)
+
+Mr. Denjiro's Happy Energy! · としおを追う【岡田斗司夫切り抜き】 · にしむら先生 受験指導専門家 ·
+はじめしゃちょー · ひろゆき, hiroyuki · ひろゆきの部屋 · ひーさま · ほんタメ ·
+ますみ / 生成AIアカデミー · むすび大学チャンネル · ゆる言語学ラジオ · よしみん先生 ·
+よなたんの斬れる英語道場 · Anime Times Official · アバタロー · Japanese Ninja Kajisac TV ·
+カズレーザーの50点塾 · カネイ Kanei · ガクの本棚 · ガクの百科 · ガリレオ Ch · キズナヨガ ·
+キノコード / AI・プログラミング · クウキデザイン · ココウィズちゃんねる · コムドット ·
+ゴシップゥドル【ネットの反応】 · ゴロー/イラストで学ぶ体の仕組み · サムの本解説ch ·
+サラタメさん · サーフィン上達チャンネル joyntpark · シンプリィライフ · シンヤ / shinya ·
+ソフィー (@philosophia_111) · ソフトバンク公式ビジネスチャンネル · デイリーTips ·
+トゥラクエ TOLAND QUEST · ナゾトキラボ · ネコかん【ネコヲの解剖生理学】 ·
+ネドじゅんの三脳バランス研究所 · ハック大学 · ハッピー研究所 · ハテナ見聞録 ·
+フェルミ漫画大学 · フェルミ研究所 · ブレイクスルー佐々木 · ホンネで中学受験 ·
+マコなり社長 · ミルクティー飲みたい · MEDITERRACE · メンタリスト DaiGo ·
+ユートのチャンネル · 一瞬だけ · 三本塾 · 歴史が繋ぐ世界の現在地 · 世界史解体新書 ·
+両学長 リベラルアーツ大学 · 中学生の勉強応援『スタフリ』 · 中田敦彦のトーク ·
+久宗式 陰陽五行運命哲学 算命学 · 井上ジョー公式 · Life Changing School ·
+仮想通貨チャンネル Joe Takayama · 佐藤航陽の宇宙会議 · 倹者の流儀
+
+### What the subscription list adds
+
+- **Book-summary channels are a genre of their own** (アバタロー, サムの本解説, サラタメ,
+  ガクの本棚, フェルミ漫画大学, ほんタメ, 本要約チャンネル). This is the single most
+  useful register for passages: a book's argument retold in spoken-expository Japanese,
+  three to five sentences per idea. The "essay texture" should imitate it.
+- **World history has its own channels** (世界史解体新書, 歴史が繋ぐ世界の現在地,
+  たろーです歴史解説, 岡田斗司夫 clips), so the connective-tissue topic is already fed.
+- **Philosophy in Japanese** (ソフィー @philosophia_111, 久宗式 陰陽五行, むすび大学) sits
+  next to the Buddhist seam; Western philosophy vocabulary can enter through it.
+- **Learning and exam culture** (にしむら先生, カズレーザーの50点塾, スタフリ, ハック大学,
+  DaiGo) means 受験 vocabulary (暗記, 定着, 過去問, 偏差値) is natural passage material and
+  doubles as JLPT-preparation metalanguage.
+- **Spoken, informal register exists too** (ひろゆき, はじめしゃちょー, コムドット, Kajisac),
+  which gives the "conversation texture" an honest model: short clauses, ～じゃないですか,
+  hedges, filler.
+- Everything else (surf, yoga, crypto, 解剖生理学, 宇宙) is spice: one passage per word
+  at most may borrow a hobby topic for memorability.
