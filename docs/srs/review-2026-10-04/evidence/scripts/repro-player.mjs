@@ -69,7 +69,7 @@ const start = async (p) => {
 {
   let { c, p } = await fresh();
   await start(p);
-  await p.locator('#kp-grade-easy').click();
+  await p.locator('#kp-grade-good').click();
   await p.locator('#kp-quit').click();
   await p.locator('#kp-to-settings').click();
   await p.locator('#kp-backup').fill('{}');
@@ -94,13 +94,21 @@ const start = async (p) => {
   });
   results.pointerCancel = {
     count: await p.locator('.kp-count').textContent(),
-    ledger: await p.evaluate(() => JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine'))),
+    // nothing stored yet reads as an empty log
+    ledger: await p.evaluate(() => {
+      const raw = localStorage.getItem('bunki-cloze:kotoba-mine');
+      return { stored: raw !== null, log: raw ? JSON.parse(raw).log : [] };
+    }),
   };
   await c.close();
 }
 {
   let { c, p } = await fresh(() =>
-    localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ newPerDay: 1 })),
+    localStorage.setItem(
+      'bunki-cloze:prefs:v3:kotoba-mine',
+      // 簡単 (easy) is one of the four buttons, shown only when the learner turns them on
+      JSON.stringify({ newPerDay: 1, grades: 'four' }),
+    ),
   );
   await start(p);
   await p.locator('#kp-grade-easy').click();
@@ -122,7 +130,7 @@ const start = async (p) => {
       if (navigator.serviceWorker.controller) r();
       else navigator.serviceWorker.addEventListener('controllerchange', r, { once: true });
     });
-    let keys = await caches.open('kairo-v10-gloss').then((x) => x.keys());
+    let keys = await caches.open('kairo-v11-closure').then((x) => x.keys());
     return {
       cached: keys.map((x) => new URL(x.url).pathname),
       controlled: !!navigator.serviceWorker.controller,

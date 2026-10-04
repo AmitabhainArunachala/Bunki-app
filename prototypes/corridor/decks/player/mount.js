@@ -43,7 +43,7 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap', gloss: 'show' };
+const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap', gloss: 'show', grades: 'two' };
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs, notice }
 
@@ -158,12 +158,14 @@ const STATUS = {
   new: ['未', 'kp-st-new'],
   learning: ['学習中', 'kp-st-learn'],
   growing: ['定着中', 'kp-st-grow'],
-  known: ['覚えた', 'kp-st-known'],
+  known: ['定着', 'kp-st-known'],
   hard: ['苦手', 'kp-st-hard'],
 };
 
-/** sentence → nodes. blank: hide the target; ruby: 'all' | 'none' | 'tap' */
-function sentenceNodes(card, { blank, ruby }) {
+/** sentence → nodes. blank: hide the target; ruby: 'all' | 'none' | 'tap';
+ * front: before the answer the asked word is plain text, never a tap target (its
+ * reading is part of the answer); the other kanji words keep their tap */
+function sentenceNodes(card, { blank, ruby, front = false }) {
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
   card.ruby.forEach(([text, reading, isTarget], i) => {
@@ -174,6 +176,10 @@ function sentenceNodes(card, { blank, ruby }) {
     if (isTarget === 3 && blank) {
       // the word again later in the passage: blanked too, without the hint
       out.append(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
+      return;
+    }
+    if (front && (isTarget === 1 || isTarget === 3)) {
+      out.append(el('span', 'kp-target', text));
       return;
     }
     const hasRuby = reading && KANJI.test(text);
@@ -236,7 +242,7 @@ function homeScreen() {
 
   const tiles = el('div', 'kp-tiles');
   const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
-  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しいカード', 'kp-c-new'), tile(known, '覚えた語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
+  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しいカード', 'kp-c-new'), tile(known, '定着した語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
   box.append(tiles);
 
   const total = q.queue.length;
@@ -333,6 +339,15 @@ function refill() {
   }
 }
 
+/** the answer mode for the card on screen. 4択 offers whole words, and the rest
+ * of the host word on a 字 card would give the answer away, so a 字 card is
+ * always answered as 穴埋め */
+function cardMode() {
+  const id = ui.queue[ui.pos];
+  const card = id ? ctx.index.cards.get(id)?.card : null;
+  return ctx.prefs.mode === 'choice' && card?.type === 'kanji' ? 'self' : ctx.prefs.mode;
+}
+
 function choicesFor(word) {
   const pool = ctx.deck.words.filter((w) => w.id !== word.id && w.pos === word.pos && w.term !== word.term);
   const alt = pool.length >= 3 ? pool : ctx.deck.words.filter((w) => w.id !== word.id);
@@ -351,6 +366,7 @@ function studyScreen() {
   const id = ui.queue[ui.pos];
   if (!id) return doneScreen();
   const { card, word } = ctx.index.cards.get(id);
+  const mode = cardMode();
   const total = ui.queue.length;
   const top = el('header', 'kp-top kp-top-study');
   top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': '終わる', id: 'kp-quit' }));
@@ -374,11 +390,11 @@ function studyScreen() {
       el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
     ),
   );
-  face.append(sentenceNodes(card, { blank: !ui.revealed && ctx.prefs.mode !== 'read', ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none' }));
+  face.append(sentenceNodes(card, { blank: !ui.revealed && mode !== 'read', ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none', front: !ui.revealed }));
 
   if (!ui.revealed) {
-    if (ctx.prefs.hint !== 'none' && ctx.prefs.mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
-    if (ctx.prefs.mode === 'choice') {
+    if (ctx.prefs.hint !== 'none' && mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
+    if (mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
         opts.append(
@@ -391,7 +407,7 @@ function studyScreen() {
       }
       face.append(opts);
     } else {
-      face.append(el('p', 'kp-taphint', ctx.prefs.mode === 'read' ? '意味を思い出してからタップ' : 'タップして答えを見る'));
+      face.append(el('p', 'kp-taphint', mode === 'read' ? '意味を思い出してからタップ' : 'タップして答えを見る'));
       face.addEventListener('click', reveal);
     }
   } else {
@@ -400,7 +416,7 @@ function studyScreen() {
   box.append(face);
 
   if (ui.revealed) {
-    if (ctx.prefs.mode === 'choice') {
+    if (mode === 'choice') {
       const ok = ui.picked === word.id;
       box.append(el('p', `kp-verdict ${ok ? 'kp-c-known' : 'kp-c-hard'}`, ok ? '正解' : `不正解 — 正しくは ${word.term}`));
       box.append(btn('kp-next', '次へ →', next, { id: 'kp-next' }));
@@ -408,7 +424,7 @@ function studyScreen() {
       box.append(gradeBar(id));
     }
     attachSwipe(face);
-  } else if (ctx.prefs.mode === 'choice') {
+  } else if (mode === 'choice') {
     box.append(
       btn('kp-reveal', 'わからない', () => {
         ui.picked = null;
@@ -428,9 +444,9 @@ const THEMES = [
   ['ai', '藍', '#121a46', '#f2c14e'],
   ['matcha', '抹茶', '#13261a', '#a6e06a'],
   ['kokuban', '黒板', '#1f2f28', '#ffe066'],
-  ['washi', '和紙', '#fbf6ea', '#b23a1e'],
-  ['sakura', '桜', '#fde7ec', '#d1416a'],
-  ['light', '白', '#ffffff', '#0074b8'],
+  ['washi', '和紙', '#fbf6ea', '#a7361c'],
+  ['sakura', '桜', '#fde7ec', '#b82c54'],
+  ['light', '白', '#ffffff', '#006aa9'],
   ['contrast', '高', '#000000', '#ffff00'],
 ];
 const VISUAL_TIPS = [
@@ -494,16 +510,19 @@ function sourceLine(card) {
   return p;
 }
 
+/** もう一度／思い出せた by default; 設定 › 判定のボタン adds 難しい and 簡単 */
+const fourGrades = () => ctx.prefs.grades === 'four';
 function gradeBar(id) {
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
-  const bar = el('div', 'kp-grades');
+  const four = fourGrades();
+  const bar = el('div', four ? 'kp-grades is-four' : 'kp-grades');
   const g = (name, label, cls, key) =>
     btn(`kp-grade ${cls}`, [el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
       id: `kp-grade-${name}`,
       'aria-keyshortcuts': key,
     });
-  bar.append(g('again', 'もう一度', 'kp-again', '1'), g('hard', '難しい', 'kp-hard', '2'), g('good', '覚えた', 'kp-good', '3'), g('easy', '簡単', 'kp-easy', '4'));
-  bar.append(el('p', 'kp-swipehint', '← もう一度　　スワイプ　　覚えた →'));
+  bar.append(...[g('again', 'もう一度', 'kp-again', '1'), four && g('hard', '難しい', 'kp-hard', '2'), g('good', '思い出せた', 'kp-good', '3'), four && g('easy', '簡単', 'kp-easy', '4')].filter(Boolean));
+  bar.append(el('p', 'kp-swipehint', '← もう一度　　スワイプ　　思い出せた →'));
   return bar;
 }
 
@@ -519,23 +538,40 @@ function commit(rating, { stay = false } = {}) {
   const nextState = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
   if (!save(nextState)) {
     // not stored: the same card stays, ready to answer again
-    if (ctx.prefs.mode === 'choice') {
+    if (cardMode() === 'choice') {
       ui.revealed = false;
       ui.picked = null;
     }
     saveFailed();
     return;
   }
+  askToKeepStorage();
   ui.toast = '';
   ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
   ctx.state = nextState;
   ui.done++;
-  if (rating >= RATINGS.good) ui.right++;
+  if (rating >= RATINGS.hard) ui.right++; // 難しい is still remembered (only shown with four buttons)
   if (stay) {
     paint();
     return;
   }
   next();
+}
+
+/**
+ * Ask the browser once, after the first saved grade, to keep this site's
+ * storage (Safari may otherwise clear it after days without a visit). A refusal
+ * changes nothing; 設定 › バックアップ shows the answer.
+ */
+let storageAsked = false;
+function askToKeepStorage() {
+  if (storageAsked) return;
+  storageAsked = true;
+  try {
+    navigator.storage?.persist?.()?.catch?.(() => {});
+  } catch {
+    /* not offered here */
+  }
 }
 
 function next() {
@@ -562,44 +598,73 @@ function undo() {
   ui.right = ui.undo.right;
   ui.undo = null;
   resetCard();
-  ui.revealed = ctx.prefs.mode !== 'choice';
+  ui.revealed = cardMode() !== 'choice';
   paint();
 }
 
+/**
+ * Swipe right = 思い出せた, left = もう一度. Only the finger that started the
+ * swipe counts; it must travel more than 90px and at least twice as far
+ * sideways as up or down, and be lifted (pointerup). A cancelled gesture (the
+ * page scrolled, the system took the touch) only puts the card back.
+ */
 function attachSwipe(face) {
   let x0 = null;
+  let y0 = 0;
+  let pid = null;
   let dx = 0;
+  let dy = 0;
+  const reset = () => {
+    x0 = null;
+    pid = null;
+    face.style.transform = '';
+    face.dataset.swipe = '';
+  };
   face.addEventListener('pointerdown', (e) => {
+    if ((x0 !== null && e.pointerId !== pid) || e.target.closest?.('button, a, summary, input, textarea')) return;
+    pid = e.pointerId;
+    try {
+      face.setPointerCapture(pid); // a release outside the card still ends the swipe here
+    } catch {
+      /* a pointer the browser no longer tracks */
+    }
     x0 = e.clientX;
+    y0 = e.clientY;
     dx = 0;
+    dy = 0;
   });
   face.addEventListener('pointermove', (e) => {
-    if (x0 === null) return;
+    if (x0 === null || e.pointerId !== pid) return;
     dx = e.clientX - x0;
-    face.style.transform = `translateX(${dx}px) rotate(${dx / 40}deg)`;
-    face.dataset.swipe = dx > 40 ? 'good' : dx < -40 ? 'again' : '';
+    dy = e.clientY - y0;
+    const sideways = Math.abs(dx) > 2 * Math.abs(dy);
+    face.style.transform = sideways ? `translateX(${dx}px) rotate(${dx / 40}deg)` : '';
+    face.dataset.swipe = !sideways ? '' : dx > 40 ? 'good' : dx < -40 ? 'again' : '';
   });
-  const end = () => {
-    if (x0 === null) return;
-    x0 = null;
-    face.style.transform = '';
-    if (Math.abs(dx) > 90) {
-      if (ctx.prefs.mode === 'choice') next();
-      else commit(dx > 0 ? RATINGS.good : RATINGS.again);
-    } else face.dataset.swipe = '';
-  };
-  face.addEventListener('pointerup', end);
-  face.addEventListener('pointercancel', end);
+  face.addEventListener('pointerup', (e) => {
+    if (x0 === null || e.pointerId !== pid) return;
+    const swiped = Math.abs(dx) > 90 && Math.abs(dx) > 2 * Math.abs(dy);
+    const right = dx > 0;
+    reset();
+    if (!swiped) return;
+    if (cardMode() === 'choice') next();
+    else commit(right ? RATINGS.good : RATINGS.again);
+  });
+  face.addEventListener('pointercancel', (e) => {
+    if (x0 === null || e.pointerId !== pid) return;
+    reset();
+  });
 }
 
 function doneScreen() {
   const box = el('section', 'kp-done');
   box.append(topBar('おつかれさま', () => go('home')));
   const pct = ui.done ? Math.round((ui.right / ui.done) * 100) : 0;
-  box.append(el('div', 'kp-tiles', el('div', 'kp-tile kp-c-new', el('b', null, String(ui.done)), el('span', null, '回答')), el('div', 'kp-tile kp-c-known', el('b', null, `${pct}%`), el('span', null, '正解率'))));
+  box.append(el('div', 'kp-tiles', el('div', 'kp-tile kp-c-new', el('b', null, String(ui.done)), el('span', null, '回答')), el('div', 'kp-tile kp-c-known', el('b', null, `${pct}%`), el('span', null, '思い出せた割合'))));
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY)[0];
   box.append(el('p', 'kp-sub', soon ? `次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。` : '今日の分は終わり。また明日。'));
   box.append(btn('kp-start', 'デッキに戻る', () => go('home'), { id: 'kp-home' }));
+  if (ui.undo) box.append(btn('kp-undo', '↶ ひとつ戻す', undo, { id: 'kp-undo' }));
   return box;
 }
 
@@ -655,26 +720,35 @@ function settingsScreen() {
   const seg = (title, key, options) => {
     const wrap = el('div', 'kp-field', el('h2', 'kp-h2', title));
     const row = el('div', 'kp-seg');
+    row.setAttribute('role', 'radiogroup');
+    row.setAttribute('aria-label', title);
     for (const [value, label] of options) {
-      const b = btn(ctx.prefs[key] === value ? 'is-on' : '', label, () => {
+      const on = ctx.prefs[key] === value;
+      const b = btn(on ? 'is-on' : '', label, () => {
         savePrefs({ ...ctx.prefs, [key]: value });
-      }, { 'data-pref': `${key}:${value}` });
+      }, { 'data-pref': `${key}:${value}`, role: 'radio', 'aria-checked': String(on) });
       row.append(b);
     }
     wrap.append(row);
     return wrap;
   };
-  box.append(seg('一日の新しい文', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
+  box.append(seg('一日の新しいカード', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
   box.append(seg('ヒント（穴埋め・4択）', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
   box.append(seg('英語の意味（答え）', 'gloss', [['show', 'すぐ表示'], ['tap', 'タップで']]));
   box.append(seg('ふりがな（問題）', 'furigana', [['tap', 'タップで表示'], ['none', 'なし']]));
+  const grades = seg('判定のボタン', 'grades', [['two', 'もう一度・思い出せた'], ['four', '難しい・簡単も使う']]);
+  grades.append(el('p', 'kp-sub', 'ふだんは二つで十分です。迷ったら「もう一度」。'));
+  box.append(grades);
   const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
   const sw = el('div', 'kp-swatches');
+  sw.setAttribute('role', 'radiogroup');
+  sw.setAttribute('aria-label', '色（テーマ）');
   for (const [value, label, bg, ink] of THEMES) {
-    const b = btn(`kp-swatch${ctx.prefs.look === value ? ' is-on' : ''}`, label, () => {
+    const on = ctx.prefs.look === value;
+    const b = btn(`kp-swatch${on ? ' is-on' : ''}`, label, () => {
       savePrefs({ ...ctx.prefs, look: value });
-    }, { 'data-pref': `look:${value}`, 'aria-label': label, style: `background:${bg};color:${ink}` });
+    }, { 'data-pref': `look:${value}`, 'aria-label': label, role: 'radio', 'aria-checked': String(on), style: `background:${bg};color:${ink}` });
     sw.append(b);
   }
   themes.append(sw);
@@ -685,8 +759,16 @@ function settingsScreen() {
   ta.spellcheck = false;
   const msg = el('p', 'kp-sub');
   msg.id = 'kp-backup-msg';
+  const taLabel = el('label', 'kp-sub', 'バックアップの文字列');
+  taLabel.htmlFor = 'kp-backup';
+  const kept = el('p', 'kp-sub', '端末の保存領域：不明');
+  kept.id = 'kp-persist';
+  navigator.storage?.persisted?.().then(
+    (yes) => (kept.textContent = `端末の保存領域：${yes ? '確保済み' : '未確保'}`),
+    () => {},
+  );
   box.append(
-    el('div', 'kp-field', el('h2', 'kp-h2', 'バックアップ'), el('p', 'kp-sub', '記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。'), ta,
+    el('div', 'kp-field', el('h2', 'kp-h2', 'バックアップ'), el('p', 'kp-sub', '記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。'), kept, taLabel, ta,
       el('div', 'kp-seg',
         btn('', 'コピー', () => {
           ta.value = JSON.stringify(ctx.state);
@@ -786,13 +868,14 @@ function restoreButton(ta, msg) {
 
 function onKey(e) {
   if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
+  const mode = cardMode();
   if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
-    if (ctx.prefs.mode !== 'choice') reveal();
-  } else if (ui.revealed && ctx.prefs.mode !== 'choice' && ['1', '2', '3', '4'].includes(e.key)) {
+    if (mode !== 'choice') reveal();
+  } else if (ui.revealed && mode !== 'choice' && (fourGrades() ? ['1', '2', '3', '4'] : ['1', '3']).includes(e.key)) {
     e.preventDefault();
     commit(Number(e.key));
-  } else if (ui.revealed && ctx.prefs.mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {
+  } else if (ui.revealed && mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
     next();
   } else if (e.key === 'u' && ui.undo) undo();
