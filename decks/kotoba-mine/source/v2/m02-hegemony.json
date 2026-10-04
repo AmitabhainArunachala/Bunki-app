@@ -1,0 +1,844 @@
+{
+  "id": "m02-hegemony",
+  "cards": [
+    {
+      "n": 70,
+      "term": "冷戦",
+      "reading": "れいせん",
+      "meaning": "cold war",
+      "def_ja": "直接は戦わずに、陣営どうしがにらみ合う対立。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "冷戦は1991年に終わった。",
+          "form": "冷戦",
+          "en": "The Cold War ended in 1991."
+        },
+        {
+          "lv": 2,
+          "ja": "ベルリンの壁は、冷戦による東西分断の象徴だった。",
+          "form": "冷戦",
+          "en": "The Berlin Wall was a symbol of the East-West split caused by the Cold War."
+        },
+        {
+          "lv": 3,
+          "ja": "米中の対立が激しくなり、新たな冷戦が始まったと言う専門家もいる。",
+          "form": "冷戦",
+          "en": "As tension between the US and China grows, some experts say a new cold war has begun."
+        }
+      ],
+      "tip": "Also used casually for a frosty standoff, such as a couple who aren't speaking."
+    },
+    {
+      "n": 71,
+      "term": "覇権",
+      "reading": "はけん",
+      "meaning": "dominance, hegemony",
+      "def_ja": "圧倒的な力で地域や分野を支配すること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "二つの大国が覇権を争っている。",
+          "form": "覇権",
+          "en": "Two great powers are competing for dominance."
+        },
+        {
+          "lv": 2,
+          "ja": "スマホ市場の覇権争いは、ますます激しくなっている。",
+          "form": "覇権",
+          "en": "The fight for dominance in the smartphone market is getting fiercer."
+        },
+        {
+          "lv": 3,
+          "ja": "十九世紀に海の覇権を握っていたイギリスも、二度の世界大戦を経てその座をアメリカに譲った。",
+          "form": "覇権",
+          "en": "Britain, which ruled the seas in the nineteenth century, handed that position to America after two world wars."
+        }
+      ],
+      "tip": "覇権を握る (to seize dominance) is the usual verb; it is also used for business and sport."
+    },
+    {
+      "n": 72,
+      "term": "覇権安定論",
+      "reading": "はけんあんていろん",
+      "meaning": "hegemonic stability theory",
+      "def_ja": "強い一国が秩序を支えると世界経済が安定するという説。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "国際政治の授業で覇権安定論を学んだ。",
+          "form": "覇権安定論",
+          "en": "I studied hegemonic stability theory in an international politics class."
+        },
+        {
+          "lv": 2,
+          "ja": "覇権安定論によれば、強い一国が自由貿易のルールを支えるという。",
+          "form": "覇権安定論",
+          "en": "According to hegemonic stability theory, a single strong country upholds the rules of free trade."
+        },
+        {
+          "lv": 3,
+          "ja": "アメリカの力が弱まると世界経済が不安定になるという主張は、覇権安定論の考え方にもとづいている。",
+          "form": "覇権安定論",
+          "en": "The claim that the world economy becomes unstable when American power weakens is based on hegemonic stability theory."
+        }
+      ],
+      "tip": "An academic term from international relations; you meet it in textbooks and essays, not conversation."
+    },
+    {
+      "n": 182,
+      "term": "貿易摩擦",
+      "reading": "ぼうえきまさつ",
+      "meaning": "trade friction",
+      "def_ja": "輸出入をめぐって国の間に起きる対立。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "日米の貿易摩擦が激しくなった。",
+          "form": "貿易摩擦",
+          "en": "Trade friction between Japan and the US grew intense."
+        },
+        {
+          "lv": 2,
+          "ja": "1980年代、日本車の輸出が増えてアメリカとの貿易摩擦が起きた。",
+          "form": "貿易摩擦",
+          "en": "In the 1980s, rising exports of Japanese cars caused trade friction with America."
+        },
+        {
+          "lv": 3,
+          "ja": "関税の引き上げが続けば貿易摩擦がさらに深まり、両国の企業が損をすることになる。",
+          "form": "貿易摩擦",
+          "en": "If tariffs keep going up, trade friction will deepen and companies in both countries will lose out."
+        }
+      ]
+    },
+    {
+      "n": 183,
+      "term": "由々しき",
+      "reading": "ゆゆしき",
+      "meaning": "grave, serious",
+      "def_ja": "放っておけないほど重大な。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "食品の偽装は由々しき問題だ。",
+          "form": "由々しき",
+          "en": "Food mislabeling is a grave problem."
+        },
+        {
+          "lv": 2,
+          "ja": "若者の投票率が下がり続けているのは、由々しき事態だ。",
+          "form": "由々しき",
+          "en": "The steady fall in young people's voter turnout is a serious situation."
+        },
+        {
+          "lv": 3,
+          "ja": "機密情報が外部に漏れていたことを受け、大臣は国の安全を揺るがす由々しき事態だと述べた。",
+          "form": "由々しき",
+          "en": "After classified information was found to have leaked, the minister called it a grave situation that threatens national security."
+        }
+      ],
+      "tip": "Stiff and formal; it is only used before a noun, as in 由々しき事態."
+    },
+    {
+      "n": 186,
+      "term": "協定",
+      "reading": "きょうてい",
+      "meaning": "agreement, pact",
+      "def_ja": "国や団体が話し合って決めた約束。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "両国は自由貿易協定を結んだ。",
+          "form": "協定",
+          "en": "The two countries signed a free trade agreement."
+        },
+        {
+          "lv": 2,
+          "ja": "漁業協定によって、この海で取れる魚の量が決められている。",
+          "form": "協定",
+          "en": "A fisheries agreement sets how many fish can be caught in this sea."
+        },
+        {
+          "lv": 3,
+          "ja": "1986年の日米半導体協定で、日本は外国製の半導体をもっと買うよう求められた。",
+          "form": "協定",
+          "en": "Under the 1986 US-Japan Semiconductor Agreement, Japan was asked to buy more foreign-made chips."
+        }
+      ],
+      "tip": "Used between countries or organizations; a private deal between people is 約束 or 契約."
+    },
+    {
+      "n": 188,
+      "term": "財閥",
+      "reading": "ざいばつ",
+      "meaning": "family-run conglomerate",
+      "def_ja": "一族が多くの会社を支配する企業グループ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "戦後、日本の財閥は解体された。",
+          "form": "財閥",
+          "en": "After the war, Japan's zaibatsu were broken up."
+        },
+        {
+          "lv": 2,
+          "ja": "三井や三菱は、もともと財閥として大きくなった企業だ。",
+          "form": "財閥",
+          "en": "Mitsui and Mitsubishi are companies that first grew big as zaibatsu."
+        },
+        {
+          "lv": 3,
+          "ja": "韓国では財閥が経済の大部分を握っているため、大企業と中小企業の格差がよく問題になる。",
+          "form": "財閥",
+          "en": "In South Korea the chaebol control much of the economy, so the gap between big and small companies is often an issue."
+        }
+      ],
+      "tip": "Korean chaebol is the same word, so 韓国の財閥 is how you say it in Japanese."
+    },
+    {
+      "n": 189,
+      "term": "制圧",
+      "reading": "せいあつ",
+      "meaning": "bringing under control",
+      "def_ja": "力で相手をおさえて支配すること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "警察が犯人を制圧した。",
+          "form": "制圧",
+          "en": "The police subdued the suspect."
+        },
+        {
+          "lv": 2,
+          "ja": "軍は三日間の戦闘で首都を制圧した。",
+          "form": "制圧",
+          "en": "The army took control of the capital after three days of fighting."
+        },
+        {
+          "lv": 3,
+          "ja": "前半から相手の中盤を制圧したことで、チームは何度もゴールのチャンスを作れた。",
+          "form": "制圧",
+          "en": "By controlling the other side's midfield from the first half, the team created many scoring chances."
+        }
+      ],
+      "tip": "A military and police word, also used in sports for dominating the game."
+    },
+    {
+      "n": 190,
+      "term": "決裂",
+      "reading": "けつれつ",
+      "meaning": "breakdown of talks",
+      "def_ja": "話し合いがまとまらずに終わること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "給料をめぐる交渉が決裂した。",
+          "form": "決裂",
+          "en": "Wage negotiations broke down."
+        },
+        {
+          "lv": 2,
+          "ja": "両国の首脳会談は、領土問題で決裂に終わった。",
+          "form": "決裂",
+          "en": "The summit between the two countries broke down over the territorial dispute."
+        },
+        {
+          "lv": 3,
+          "ja": "会社と労働組合の話し合いが決裂したため、運転士たちは翌朝からストライキに入った。",
+          "form": "決裂",
+          "en": "Because talks between the company and the union broke down, the drivers went on strike the next morning."
+        }
+      ],
+      "tip": "Almost always with 交渉, 会談 or 協議 as the subject."
+    },
+    {
+      "n": 191,
+      "term": "中枢",
+      "reading": "ちゅうすう",
+      "meaning": "center, core",
+      "def_ja": "全体を動かす、いちばん大事な中心部分。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "お酒は中枢神経の働きを鈍らせる。",
+          "form": "中枢",
+          "en": "Alcohol slows down the central nervous system."
+        },
+        {
+          "lv": 2,
+          "ja": "霞が関には国の行政の中枢を担う省庁が集まっている。",
+          "form": "中枢",
+          "en": "Kasumigaseki is where the ministries at the core of the national government are gathered."
+        },
+        {
+          "lv": 3,
+          "ja": "事故で脳の言語中枢が傷ついたため、男性は言葉をうまく話せなくなった。",
+          "form": "中枢",
+          "en": "The language center of the man's brain was damaged in an accident, so he could no longer speak properly."
+        }
+      ],
+      "tip": "Also a medical word: 中枢神経 is the central nervous system."
+    },
+    {
+      "n": 195,
+      "term": "国策",
+      "reading": "こくさく",
+      "meaning": "national policy",
+      "def_ja": "国が方針として進める政策。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "原発は長く国策とされてきた。",
+          "form": "国策",
+          "en": "Nuclear power has long been treated as national policy."
+        },
+        {
+          "lv": 2,
+          "ja": "政府は国策として、国内に新しい半導体工場を誘致した。",
+          "form": "国策",
+          "en": "As a matter of national policy, the government brought a new chip factory into the country."
+        },
+        {
+          "lv": 3,
+          "ja": "企業が国策に振り回されないよう、補助金に頼りすぎない経営を目指すべきだという声もある。",
+          "form": "国策",
+          "en": "Some say companies should avoid relying too much on subsidies so they aren't pushed around by national policy."
+        }
+      ],
+      "tip": "Can sound critical, as in 国策捜査 (a politically motivated investigation)."
+    },
+    {
+      "n": 200,
+      "term": "追い上げる",
+      "reading": "おいあげる",
+      "meaning": "to close in on",
+      "def_ja": "前を行く相手との差を縮めて迫る。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "後半に相手チームが追い上げてきた。",
+          "form": "追い上げて",
+          "en": "The other team closed the gap in the second half."
+        },
+        {
+          "lv": 2,
+          "ja": "二位の候補が猛烈に追い上げ、開票は最後までもつれた。",
+          "form": "追い上げ",
+          "en": "The second-place candidate closed in fast, and the count stayed tight to the very end."
+        },
+        {
+          "lv": 3,
+          "ja": "中国や韓国のメーカーに追い上げられ、日本の家電メーカーは次々とテレビ事業から撤退した。",
+          "form": "追い上げられ",
+          "en": "Squeezed by Chinese and Korean rivals catching up, Japanese electronics makers pulled out of the TV business one after another."
+        }
+      ],
+      "tip": "The noun 追い上げ is very common in sports commentary."
+    },
+    {
+      "n": 201,
+      "term": "劣勢",
+      "reading": "れっせい",
+      "meaning": "losing position",
+      "def_ja": "相手より力が弱く、不利な立場。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "試合は前半から劣勢だった。",
+          "form": "劣勢",
+          "en": "We were on the back foot from the first half."
+        },
+        {
+          "lv": 2,
+          "ja": "選挙戦で劣勢が伝えられる候補が、最後の演説に力を入れている。",
+          "form": "劣勢",
+          "en": "A candidate reported to be trailing is putting everything into the final campaign speeches."
+        },
+        {
+          "lv": 3,
+          "ja": "序盤で劣勢に立たされた棋士は、長考の末に思い切った一手を指して形勢を逆転させた。",
+          "form": "劣勢",
+          "en": "Put at a disadvantage early on, the shogi player made a bold move after long thought and turned the game around."
+        }
+      ],
+      "tip": "The opposite is 優勢."
+    },
+    {
+      "n": 204,
+      "term": "牛耳る",
+      "reading": "ぎゅうじる",
+      "meaning": "to control, to dominate",
+      "def_ja": "組織の中心に立ち、思いどおりに動かす。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "一部の幹部が会社を牛耳っている。",
+          "form": "牛耳っ",
+          "en": "A handful of executives run the company as they please."
+        },
+        {
+          "lv": 2,
+          "ja": "この町の議会は、長年一つの一族に牛耳られてきた。",
+          "form": "牛耳られ",
+          "en": "This town's council has been controlled by a single family for years."
+        },
+        {
+          "lv": 3,
+          "ja": "数社が世界の市場を牛耳っているため、新しい企業が参入しても価格競争ではなかなか勝てない。",
+          "form": "牛耳っ",
+          "en": "Because a few companies dominate the world market, newcomers find it hard to win on price."
+        }
+      ],
+      "tip": "Usually negative; it comes from an old Chinese phrase about holding an ox's ear."
+    },
+    {
+      "n": 294,
+      "term": "凋落",
+      "reading": "ちょうらく",
+      "meaning": "decline, fall",
+      "def_ja": "勢いのあったものが、おとろえること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "かつての名門チームの凋落ぶりに驚いた。",
+          "form": "凋落",
+          "en": "I was surprised at how far the once-great team had fallen."
+        },
+        {
+          "lv": 2,
+          "ja": "日本の電機メーカーの凋落は、何度も経済誌で取り上げられた。",
+          "form": "凋落",
+          "en": "The decline of Japanese electronics makers has been covered many times in business magazines."
+        },
+        {
+          "lv": 3,
+          "ja": "一時は世界一の売り上げを誇った半導体メーカーも、投資の判断を誤ったことで凋落の一途をたどった。",
+          "form": "凋落",
+          "en": "A chipmaker that once had the world's top sales went into steady decline after poor investment decisions."
+        }
+      ],
+      "tip": "Formal and common in headlines; 凋落の一途をたどる means to keep on declining."
+    },
+    {
+      "n": 61,
+      "term": "命運",
+      "reading": "めいうん",
+      "meaning": "fate, make-or-break fortune",
+      "def_ja": "生き残るか滅びるかを決めるめぐり合わせ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "次の試合にチームの命運がかかっている。",
+          "form": "命運",
+          "en": "The team's fate depends on the next game."
+        },
+        {
+          "lv": 2,
+          "ja": "経営難の会社は、新工場の建設に命運を賭けた。",
+          "form": "命運",
+          "en": "The struggling company bet its future on building a new factory."
+        },
+        {
+          "lv": 3,
+          "ja": "交渉が決裂すれば国内工場が閉鎖されるため、従業員の命運は交渉の行方にかかっていた。",
+          "form": "命運",
+          "en": "If the talks failed, the domestic plant would close, so the workers' future depended on how the negotiations went."
+        }
+      ],
+      "tip": "Used in make-or-break situations, as in 命運を賭ける or 命運がかかる."
+    },
+    {
+      "n": 167,
+      "term": "切り札",
+      "reading": "きりふだ",
+      "meaning": "trump card",
+      "def_ja": "いざという時に使う、いちばん効く手段。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "監督は切り札の選手を後半に出した。",
+          "form": "切り札",
+          "en": "The coach sent on his ace player in the second half."
+        },
+        {
+          "lv": 2,
+          "ja": "政府は景気対策の切り札として、大型の減税を打ち出した。",
+          "form": "切り札",
+          "en": "The government announced a big tax cut as its trump card for boosting the economy."
+        },
+        {
+          "lv": 3,
+          "ja": "電気自動車は脱炭素の切り札と言われているが、電池の材料をどう確保するかが課題だ。",
+          "form": "切り札",
+          "en": "Electric cars are called the key weapon for cutting carbon, but securing battery materials is a challenge."
+        }
+      ],
+      "tip": "From card games; used for policies, players and products."
+    },
+    {
+      "n": 161,
+      "term": "起爆剤",
+      "reading": "きばくざい",
+      "meaning": "catalyst, spark",
+      "def_ja": "物事が大きく動き出すきっかけになるもの。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しい駅が町の発展の起爆剤になった。",
+          "form": "起爆剤",
+          "en": "The new station sparked the town's growth."
+        },
+        {
+          "lv": 2,
+          "ja": "政府は観光を地方経済の起爆剤にしようとしている。",
+          "form": "起爆剤",
+          "en": "The government is trying to make tourism a catalyst for regional economies."
+        },
+        {
+          "lv": 3,
+          "ja": "オリンピックの開催が景気回復の起爆剤になると期待されたが、効果は一時的なものにとどまった。",
+          "form": "起爆剤",
+          "en": "Hosting the Olympics was expected to kick-start an economic recovery, but the effect was only temporary."
+        }
+      ],
+      "tip": "Literally a detonator charge, but in news it almost always means a catalyst for growth."
+    },
+    {
+      "n": 69,
+      "term": "悲観",
+      "reading": "ひかん",
+      "meaning": "pessimism, despair",
+      "def_ja": "うまくいかないと考えて望みを失うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "そんなに悲観することはないよ。",
+          "form": "悲観",
+          "en": "There's no need to be so pessimistic."
+        },
+        {
+          "lv": 2,
+          "ja": "試験に落ちても、悲観せずにまた来年挑戦すればいい。",
+          "form": "悲観",
+          "en": "Even if you fail the exam, don't despair; just try again next year."
+        },
+        {
+          "lv": 3,
+          "ja": "景気の先行きを悲観的に見る経営者が増えたため、設備投資を控える企業が目立ってきた。",
+          "form": "悲観",
+          "en": "As more executives take a gloomy view of the economy, more companies are holding back on investment."
+        }
+      ],
+      "tip": "The opposite is 楽観; 悲観的 means pessimistic."
+    },
+    {
+      "n": 185,
+      "term": "凄まじい",
+      "reading": "すさまじい",
+      "meaning": "tremendous, fierce",
+      "def_ja": "驚くほど勢いや程度が激しい。",
+      "pos": "い-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "外は凄まじい雨だった。",
+          "form": "凄まじい",
+          "en": "The rain outside was ferocious."
+        },
+        {
+          "lv": 2,
+          "ja": "台風が近づき、凄まじい風で看板が飛ばされた。",
+          "form": "凄まじい",
+          "en": "As the typhoon approached, a fierce wind blew signs away."
+        },
+        {
+          "lv": 3,
+          "ja": "発売日には店の前に凄まじい行列ができ、新型のゲーム機は一時間で売り切れた。",
+          "form": "凄まじい",
+          "en": "On release day a huge line formed outside the store, and the new game console sold out in an hour."
+        }
+      ],
+      "tip": "Can be good or bad; often written in kana as すさまじい."
+    },
+    {
+      "n": 133,
+      "term": "卓越",
+      "reading": "たくえつ",
+      "meaning": "excellence, outstanding",
+      "def_ja": "ほかよりずっとすぐれていること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "祖父は卓越した技術を持つ職人だった。",
+          "form": "卓越",
+          "en": "My grandfather was a craftsman with outstanding skill."
+        },
+        {
+          "lv": 2,
+          "ja": "卓越した研究を続けた科学者に、国から賞が贈られた。",
+          "form": "卓越",
+          "en": "A scientist with a long record of outstanding research received an award from the state."
+        },
+        {
+          "lv": 3,
+          "ja": "東京の下町にある小さな工場は、精密加工の技術が卓越しているため、世界中から注文が集まる。",
+          "form": "卓越",
+          "en": "A small factory in an old part of Tokyo has such outstanding precision machining that orders come in from all over the world."
+        }
+      ],
+      "tip": "A formal word, almost always used as 卓越した + noun."
+    },
+    {
+      "n": 203,
+      "term": "要石",
+      "reading": "かなめいし",
+      "meaning": "keystone, linchpin",
+      "def_ja": "全体を支え、ないと成り立たない大事なもの。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "鹿島神宮には地震を抑えるという要石がある。",
+          "form": "要石",
+          "en": "Kashima Shrine has a sacred stone said to keep earthquakes in check."
+        },
+        {
+          "lv": 2,
+          "ja": "沖縄は太平洋の要石と呼ばれてきた。",
+          "form": "要石",
+          "en": "Okinawa has been called the keystone of the Pacific."
+        },
+        {
+          "lv": 3,
+          "ja": "同盟は地域の平和を支える要石だとして、両国の首脳は協力を強めることで合意した。",
+          "form": "要石",
+          "en": "Calling the alliance the keystone of peace in the region, the leaders of both countries agreed to strengthen cooperation."
+        }
+      ],
+      "tip": "Literally the keystone of an arch or a sacred shrine stone; figuratively a linchpin."
+    },
+    {
+      "n": 60,
+      "term": "かなめ",
+      "reading": "かなめ",
+      "meaning": "the key point, linchpin",
+      "def_ja": "物事のいちばん大事なところ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "キャプテンはチームのかなめだ。",
+          "form": "かなめ",
+          "en": "The captain is the heart of the team."
+        },
+        {
+          "lv": 2,
+          "ja": "守備のかなめとなる選手がけがをして、チームは苦しんでいる。",
+          "form": "かなめ",
+          "en": "The team is struggling because the player who anchors its defense got injured."
+        },
+        {
+          "lv": 3,
+          "ja": "祖母の古い扇子はかなめが緩んでいたので、職人に頼んで直してもらった。",
+          "form": "かなめ",
+          "en": "The pivot of my grandmother's old folding fan was loose, so we had a craftsman fix it."
+        }
+      ],
+      "tip": "Usually written 要; it was first the pin that holds a folding fan together."
+    },
+    {
+      "n": 174,
+      "term": "礎",
+      "reading": "いしずえ／ソ",
+      "meaning": "foundation",
+      "def_ja": "建物の土台の石。物事を支えるもと。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "基礎からしっかり勉強しよう。",
+          "form": "基礎",
+          "en": "Let's study properly from the basics."
+        },
+        {
+          "lv": 2,
+          "ja": "寺の跡には、昔の建物の礎石だけが残っている。",
+          "form": "礎石",
+          "en": "Only the foundation stones of the old buildings remain at the temple site."
+        },
+        {
+          "lv": 3,
+          "ja": "ビルの入り口の近くには、定礎と刻まれた石が置かれていることが多い。",
+          "form": "定礎",
+          "en": "There is often a stone carved with the word for cornerstone near the entrance of a building."
+        }
+      ],
+      "tip": "On its own the word is read いしずえ; in compounds it is read ソ."
+    },
+    {
+      "n": 175,
+      "term": "礎を築く",
+      "reading": "いしずえをきずく",
+      "meaning": "to lay the foundations",
+      "def_ja": "のちの発展を支える土台をつくる。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "祖父がこの店の礎を築いた。",
+          "form": "礎を築い",
+          "en": "My grandfather laid the foundations of this shop."
+        },
+        {
+          "lv": 2,
+          "ja": "創業者は、会社が世界に広がる礎を築いた人物だ。",
+          "form": "礎を築い",
+          "en": "The founder is the person who laid the groundwork for the company's global expansion."
+        },
+        {
+          "lv": 3,
+          "ja": "戦後の焼け跡から町工場を立て直した人々が、日本の製造業の礎を築いたと言われている。",
+          "form": "礎を築い",
+          "en": "The people who rebuilt small factories from the postwar ruins are said to have laid the foundations of Japanese manufacturing."
+        }
+      ],
+      "tip": "A formal phrase common in speeches, obituaries and company histories."
+    },
+    {
+      "n": 176,
+      "term": "膨大",
+      "reading": "ぼうだい",
+      "meaning": "enormous, vast",
+      "def_ja": "数や量がとても多いようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "膨大な量の資料を読んだ。",
+          "form": "膨大",
+          "en": "I read an enormous amount of material."
+        },
+        {
+          "lv": 2,
+          "ja": "新しい空港の建設には、膨大な費用がかかる。",
+          "form": "膨大",
+          "en": "Building a new airport costs an enormous amount of money."
+        },
+        {
+          "lv": 3,
+          "ja": "AIの学習には膨大なデータと電力が必要なので、各国で大きなデータセンターの建設が進んでいる。",
+          "form": "膨大",
+          "en": "Training AI needs huge amounts of data and electricity, so large data centers are being built in many countries."
+        }
+      ]
+    },
+    {
+      "n": 180,
+      "term": "縮小",
+      "reading": "しゅくしょう",
+      "meaning": "reduction, scaling down",
+      "def_ja": "規模や大きさを小さくすること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "写真を縮小して送った。",
+          "form": "縮小",
+          "en": "I made the photo smaller and sent it."
+        },
+        {
+          "lv": 2,
+          "ja": "売り上げが落ちて、会社は海外の事業を縮小した。",
+          "form": "縮小",
+          "en": "Sales fell, so the company scaled back its overseas business."
+        },
+        {
+          "lv": 3,
+          "ja": "人手不足が深刻になったため、駅前のスーパーは来月から営業時間を縮小することになった。",
+          "form": "縮小",
+          "en": "Because of a serious staff shortage, the supermarket by the station will shorten its opening hours from next month."
+        }
+      ],
+      "tip": "The opposite is 拡大."
+    },
+    {
+      "n": 63,
+      "term": "量産",
+      "reading": "りょうさん",
+      "meaning": "mass production",
+      "def_ja": "同じ製品を一度にたくさん作ること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しい車の量産が始まった。",
+          "form": "量産",
+          "en": "Mass production of the new car has begun."
+        },
+        {
+          "lv": 2,
+          "ja": "工場の自動化によって、高い品質の部品を量産できるようになった。",
+          "form": "量産",
+          "en": "Thanks to factory automation, high-quality parts can now be mass-produced."
+        },
+        {
+          "lv": 3,
+          "ja": "最先端の半導体は試作に成功しても、安定して量産できるようになるまでに何年もかかる。",
+          "form": "量産",
+          "en": "Even after a successful prototype, it takes years before cutting-edge chips can be mass-produced reliably."
+        }
+      ],
+      "tip": "Casually it also means churning something out, often a little mockingly."
+    },
+    {
+      "n": 58,
+      "term": "分業",
+      "reading": "ぶんぎょう",
+      "meaning": "division of labor",
+      "def_ja": "仕事を分けて、それぞれが受け持つこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この漫画は、話と絵を二人で分業して描いている。",
+          "form": "分業",
+          "en": "This manga is made by two people, one writing the story and the other drawing it."
+        },
+        {
+          "lv": 2,
+          "ja": "工場では分業によって、一人一人が決まった作業だけを担当する。",
+          "form": "分業",
+          "en": "In the factory, work is divided so that each person handles only a set task."
+        },
+        {
+          "lv": 3,
+          "ja": "半導体業界では設計と製造の分業が進み、工場を持たずに設計だけを行う会社も多い。",
+          "form": "分業",
+          "en": "In the chip industry, design and manufacturing have become separate, and many companies only design chips without owning factories."
+        }
+      ],
+      "tip": "In the chip industry it means the split between chip designers and the factories that make chips."
+    }
+  ]
+}

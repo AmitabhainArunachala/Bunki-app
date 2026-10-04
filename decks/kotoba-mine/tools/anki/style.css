@@ -1,144 +1,136 @@
 .card {
-  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
-  font-size: 20px;
-  color: #1d1b18;
-  background: #f7f3ea;
+  font-family:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  background: #f5f8fb;
+  color: #0b1520;
   text-align: left;
-  line-height: 1.7;
+  font-size: 18px;
+  line-height: 1.6;
 }
 .nightMode.card,
 .night_mode .card {
-  color: #e9e4d8;
-  background: #1b1a17;
+  background: #0a0e13;
+  color: #f3f7fb;
 }
 .km {
   max-width: 34em;
   margin: 0 auto;
-  padding: 0.4em 0.2em;
+  padding: 14px 6px;
+  border-left: 4px solid #0e8f53;
+  padding-left: 14px;
 }
-.mod {
+/* edge colour = kind of writing: news blue, blog/Q&A green, literature violet, written-for-deck amber */
+.km.kind-news,
+.km.kind-gov,
+.km.kind-company {
+  border-left-color: #0074b8;
+}
+.km.kind-literature {
+  border-left-color: #6a4fd8;
+}
+.km.kind-original {
+  border-left-color: #b86e00;
+}
+.nightMode .km {
+  border-left-color: #3ee391;
+}
+.nightMode .km.kind-news,
+.nightMode .km.kind-gov,
+.nightMode .km.kind-company {
+  border-left-color: #3fd0ff;
+}
+.nightMode .km.kind-literature {
+  border-left-color: #a58bff;
+}
+.nightMode .km.kind-original {
+  border-left-color: #ffb547;
+}
+.chips {
+  display: flex;
+  gap: 6px;
   font-size: 12px;
-  letter-spacing: 0.08em;
-  opacity: 0.55;
-  font-family: sans-serif;
 }
-.sent {
-  font-size: 1.45em;
-  margin: 0.5em 0 0.4em;
-}
-.sent b.t {
-  color: #a3351f;
-  font-weight: 700;
-}
-.nightMode .sent b.t {
-  color: #f08b6b;
-}
-.blank {
-  color: #a3351f;
-  letter-spacing: 0.1em;
-}
-.ask {
-  font-size: 12px;
-  opacity: 0.45;
-  font-family: sans-serif;
-}
-.hint {
-  margin-top: 0.6em;
-  font-size: 0.95em;
-  opacity: 0.85;
-}
-.hint-en {
-  font-size: 0.8em;
-  font-family: sans-serif;
-}
-hr#answer {
-  border: 0;
-  border-top: 1px solid rgba(128, 128, 128, 0.35);
-  margin: 0.8em 0;
-}
-.head .term {
-  font-size: 1.6em;
-  font-weight: 700;
-  margin-right: 0.5em;
-}
-.head .reading {
-  font-size: 1.1em;
-  opacity: 0.8;
-}
-.meta {
-  font-size: 12px;
-  font-family: sans-serif;
-  opacity: 0.6;
-}
-.def {
-  margin-top: 0.4em;
-  font-size: 1.05em;
-}
-.gloss {
-  font-family: sans-serif;
-  font-size: 0.85em;
-  opacity: 0.8;
-}
-.tr {
-  font-family: sans-serif;
-  font-size: 0.8em;
-  opacity: 0.75;
-  margin: 0.3em 0;
-}
-.tr summary {
-  cursor: pointer;
+.chip {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 8px;
   opacity: 0.7;
 }
-.more {
-  margin-top: 0.8em;
+.sentence {
+  font-size: 28px;
+  line-height: 2.05;
+  margin: 14px 0 10px;
+  font-weight: 500;
 }
-.ex {
-  margin: 0.4em 0;
+.sentence rt {
+  font-size: 0.45em;
+  opacity: 0.75;
 }
-.ex .ja {
-  font-size: 1.05em;
+.sentence b,
+.blank {
+  color: #0074b8;
+  font-weight: 700;
 }
-.ex b.t {
-  color: #a3351f;
+.nightMode .sentence b,
+.nightMode .blank {
+  color: #3fd0ff;
 }
-.nightMode .ex b.t {
-  color: #f08b6b;
+.blank {
+  border-bottom: 3px solid currentColor;
 }
-.ex .en {
-  font-family: sans-serif;
-  font-size: 0.75em;
-  opacity: 0.65;
+.hint {
+  font-size: 16px;
+  opacity: 0.75;
 }
-.lbl {
-  display: inline-block;
-  font-family: sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  border: 1px solid currentColor;
-  border-radius: 3px;
-  padding: 0 0.4em;
-  margin-right: 0.6em;
-  opacity: 0.6;
+.answer {
+  border-top: 1px solid rgba(128, 128, 128, 0.35);
+  padding-top: 12px;
+  display: grid;
+  gap: 4px;
 }
-.col,
-.conf,
-.kanji,
-.note {
-  margin-top: 0.7em;
-  font-size: 0.9em;
+.term {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0074b8;
+  margin-right: 12px;
 }
-.conf ul {
-  margin: 0.2em 0 0 1.2em;
-  padding: 0;
+.nightMode .term {
+  color: #3fd0ff;
 }
-.note {
-  font-family: sans-serif;
-  font-size: 0.8em;
+.reading {
+  font-size: 18px;
   opacity: 0.8;
 }
+.def {
+  font-size: 17px;
+}
+.meaning {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0e8f53;
+}
+.nightMode .meaning {
+  color: #3ee391;
+}
+.en {
+  font-size: 14px;
+  opacity: 0.75;
+}
+.tip {
+  font-size: 13px;
+  border-left: 3px solid #b86e00;
+  padding-left: 10px;
+  opacity: 0.85;
+}
+details.en summary {
+  cursor: pointer;
+  font-size: 12px;
+}
 .src {
-  margin-top: 1em;
-  font-size: 11px;
-  opacity: 0.4;
-  font-family: sans-serif;
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+}
+.src a {
+  color: inherit;
 }
