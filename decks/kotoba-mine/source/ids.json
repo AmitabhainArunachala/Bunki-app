@@ -560,8 +560,8 @@
     "km-249|kanji|710f86ac56e4|1": "km-249-m03",
     "km-249|word|09df83eed425": "km-249-m04",
     "km-249|word|295a1311a36f": "km-249-m05",
-    "km-250|word|6747db1dafec": "km-250-m01",
-    "km-250|kanji|6747db1dafec|1": "km-250-m03",
+    "km-250|word|40ca1458ad64": "km-250-m01",
+    "km-250|kanji|40ca1458ad64|1": "km-250-m03",
     "km-250|word|685a0cc43753": "km-250-m04",
     "km-250|word|ba87b58679ea": "km-250-m05",
     "km-251|word|c57e805365b1": "km-251-m01",
@@ -1098,9 +1098,9 @@
     "km-121|kanji|1f3f3b0aff37|1": "km-121-m03",
     "km-121|word|ed2f05c46cb6": "km-121-m06",
     "km-121|word|c73a154a73bc": "km-121-m07",
-    "km-122|word|df81b583852c": "km-122-m01",
-    "km-122|kanji|df81b583852c|0": "km-122-m02",
-    "km-122|kanji|df81b583852c|2": "km-122-m04",
+    "km-122|word|82374c2d63b2": "km-122-m01",
+    "km-122|kanji|82374c2d63b2|0": "km-122-m02",
+    "km-122|kanji|82374c2d63b2|2": "km-122-m04",
     "km-122|word|d33c71afc0db": "km-122-m05",
     "km-122|word|1fd10b1b9dbf": "km-122-m06",
     "km-123|word|18fe9b03789b": "km-123-m01",
@@ -2158,7 +2158,7 @@
         "id": "km-216-m03"
       },
       {
-        "key": "km-250|kanji|6747db1dafec|0",
+        "key": "km-250|kanji|40ca1458ad64|0",
         "id": "km-250-m02"
       },
       {
@@ -2334,7 +2334,7 @@
         "id": "km-121-m05"
       },
       {
-        "key": "km-122|kanji|df81b583852c|1",
+        "key": "km-122|kanji|82374c2d63b2|1",
         "id": "km-122-m03"
       },
       {

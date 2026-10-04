@@ -1,0 +1,80 @@
+{
+  "about": "Readings the tokeniser gets wrong in these two decks (review finding F17). build.py applies them after tokenising and before ruby is built; they do not touch the app-wide lexicon in docs/content/reading-overrides.json. A rule sets `reading` (hiragana) on `surface` where the text right before it ends with a match of `after` and the text right after it starts with a match of `before` (both regexes, empty = anything). With `cards`, it applies only to the passages those card ids (from ids.json) are built from. A rule that matches nothing fails the build. tools/kotoba-deck-ruby.fixtures.json lists the readings the shipped decks must and must not show.",
+  "rules": [
+    {
+      "surface": "人",
+      "reading": "じん",
+      "after": "(日本|外国|中国|宇宙|エジプト|文化|著名|星|オランダ|スウェーデン)",
+      "before": "",
+      "note": "nationality and kind of person: 日本人, 宇宙人, 文化人 (UniDic reads a separate 人 token as にん)"
+    },
+    {
+      "surface": "日",
+      "reading": "び",
+      "after": "曜",
+      "before": "",
+      "note": "月曜日, 土曜日 (UniDic gives 曜 and 日 as separate tokens and reads 日 as ひ)"
+    },
+    {
+      "surface": "一日",
+      "reading": "いちにち",
+      "after": "",
+      "before": "",
+      "cards": ["km-081-m01", "km-081-m02", "km-081-m03", "km-149-m01"],
+      "note": "a whole day (一日のうちでも, 一日で楽しめる), not the first of the month; listed by card because 一日 is ついたち in dates"
+    },
+    {
+      "surface": "他",
+      "reading": "ほか",
+      "after": "(^|[^自排利])",
+      "before": "[のに、]",
+      "note": "他の, 他に, 〜がある他、 mean other or besides (ほか); 自他, 排他, 利他 keep た"
+    },
+    {
+      "surface": "方",
+      "reading": "かた",
+      "after": "(読者の|薬剤師の|一般の)",
+      "before": "",
+      "note": "a polite word for a person (読者の方, 一般の方), not a direction or side"
+    },
+    {
+      "surface": "皇族方",
+      "reading": "こうぞくがた",
+      "after": "",
+      "before": "",
+      "note": "方 as an honorific plural after people"
+    },
+    {
+      "surface": "方",
+      "reading": "ほう",
+      "after": "いい",
+      "before": "",
+      "cards": ["km-039-m05"],
+      "note": "あればいい方で (it is lucky if …): ほう, not the かた of 言い方"
+    },
+    {
+      "surface": "上手",
+      "reading": "じょうず",
+      "after": "恋愛",
+      "before": "",
+      "cards": ["km-196-1"],
+      "note": "恋愛上手, someone good at romance; not かみて (upstage)"
+    },
+    {
+      "surface": "寛仁",
+      "reading": "ともひと",
+      "after": "",
+      "before": "",
+      "cards": ["km-250-m04"],
+      "note": "the given name of 寛仁親王, not the word かんにん"
+    },
+    {
+      "surface": "甲賀",
+      "reading": "こうか",
+      "after": "",
+      "before": "",
+      "cards": ["km-098-m01", "km-098-m02", "km-098-1"],
+      "note": "the source passage spells it 甲賀（こうか） (source/review/b4.json)"
+    }
+  ]
+}
