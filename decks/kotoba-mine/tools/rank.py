@@ -231,6 +231,10 @@ def main() -> int:
     FREQ.update(freq)
     entries = json.loads((SRC / "entries.json").read_text("utf-8"))
     pools = load_pools(entries)
+    reviewed: dict[str, set] = {}
+    for f in sorted((SRC / "review").glob("*.json")) if (SRC / "review").exists() else []:
+        for k, rows in json.loads(f.read_text("utf-8")).items():
+            reviewed.setdefault(k, set()).update(r["ja"] for r in rows)
     out = {}
     for e in entries:
         n, term = e["n"], e["term"]
@@ -285,6 +289,8 @@ def main() -> int:
                 continue
             picked.append(x)
         alts = [x for x in scored if x not in picked][:12]
+        # a sentence a reviewer already chose stays available after re-ranking
+        alts += [x for x in scored if x["ja"] in reviewed.get(str(n), ()) and x not in picked and x not in alts]
         out[n] = {"term": term, "zipf": round(z, 2), "tier": tier, "want": want, "pool": len(pools.get(n, [])), "passed": len(scored), "picked": picked, "alts": alts}
     (MINING / "ranked.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", "utf-8")
     short = [v["term"] for v in out.values() if len(v["picked"]) < 1]
