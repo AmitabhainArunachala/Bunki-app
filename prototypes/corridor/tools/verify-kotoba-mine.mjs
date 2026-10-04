@@ -81,6 +81,22 @@
  *      the card; the Anki back lists the same family over the words before it in deck order;
  *   d) a 参照・文法 line after the kanji fold only when the deck names one (none does yet).
  *
+ * Then the Phase 1 follow-ups (STANDARD A37–A41):
+ *   1. long passages: after the reveal the target sentence, the word and its definition sit above
+ *      the pinned bar at the resting scroll position (km-298-m02, 焦点 and 全文); 焦点 folds the
+ *      sentences around the target to two dimmed lines each with a ⋯ that opens them;
+ *   2. kotoba-mcd opens in 読んで思い出す (the target marked, no blank, no hint); 穴埋め blanks it
+ *      with no hint; 読んで思い出す leaves 字 cards out of the queue without suspending them, and
+ *      穴埋め brings them back;
+ *   3. 設定 has no 記録を消す (whole-deck reset is not offered);
+ *   4. 出典 is the last fold: author, site (a link when there is one), licence, passage number;
+ *   5. at the resting position no fold row is cut by the pinned bar, and the last fold scrolls
+ *      clear of it;
+ *   6. 「タップして答えを見る」 and the swipe hint show for three sittings, then retire
+ *      (prefs.sittings);
+ *   7. the sentence deck says 「この語の他の文」; Anki says 形容動詞 and folds 出典; the 字 hue is
+ *      at least ΔE_ok 10 from every other hue of its theme.
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -94,7 +110,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { AxeBuilder } from '@axe-core/playwright';
 import { chromium } from 'playwright-core';
 
-import { contrastTable } from './contrast-kotoba.mjs';
+import { contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
@@ -224,8 +240,8 @@ const SEEDED = `try {
     localStorage.setItem('__deck_seeded', '1');
   }
 } catch {}`;
-/** the card's sentence as written, without the readings a tap adds */
-const SENTENCE = `(() => { const p = document.querySelector('#kp-card .kp-sentence')?.cloneNode(true); p?.querySelectorAll('rt').forEach((r) => r.remove()); return p?.textContent ?? null; })()`;
+/** the card's sentence as written, without the readings of the back (and the ⋯ of a 焦点 group) */
+const SENTENCE = `(() => { const p = document.querySelector('#kp-card .kp-sentence')?.cloneNode(true); p?.querySelectorAll('rt, .kp-more').forEach((r) => r.remove()); return p?.textContent ?? null; })()`;
 
 async function verifyGradePath(browser, base) {
   const open = async (clock) => {
@@ -449,10 +465,12 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-to-settings');
     await page.waitForSelector('#kp-backup');
     await page.waitForFunction(`document.getElementById('kp-persist')?.textContent.includes('：')`);
-    const settings = await page.evaluate(`({ label: document.querySelector('label[for="kp-backup"]')?.textContent, groups: document.querySelectorAll('.kp-settings [role="radiogroup"][aria-label]').length, checked: document.querySelectorAll('.kp-settings [role="radio"][aria-checked="true"]').length, persist: document.getElementById('kp-persist').textContent, gone: document.querySelectorAll('[data-pref^="grades:"], [data-pref^="furigana:"], [data-pref="hint:en"]').length })`);
+    const settings = await page.evaluate(`({ label: document.querySelector('label[for="kp-backup"]')?.textContent, groups: document.querySelectorAll('.kp-settings [role="radiogroup"][aria-label]').length, checked: document.querySelectorAll('.kp-settings [role="radio"][aria-checked="true"]').length, persist: document.getElementById('kp-persist').textContent, gone: document.querySelectorAll('[data-pref^="grades:"], [data-pref^="furigana:"], [data-pref^="hint:"]').length,
+      reset: [...document.querySelectorAll('.kp-settings button')].filter((b) => /記録を消す|消えます/.test(b.textContent)).length + document.querySelectorAll('.kp-danger').length, backup: [...document.getElementById('kp-backup').closest('.kp-field').querySelectorAll('button')].map((b) => b.textContent) })`);
     const axe = await new AxeBuilder({ page }).include('.kp').analyze();
     const aria = axe.violations.filter((v) => v.id === 'label' || v.id.startsWith('aria-') || v.id === 'button-name').map((v) => v.id);
-    check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no English hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'バックアップの文字列' && settings.groups === 5 && settings.checked === 5 && settings.gone === 0 && /^端末の保存領域：(確保済み|未確保|不明)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
+    check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no ヒント row: the front has no hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'バックアップの文字列' && settings.groups === 4 && settings.checked === 4 && settings.gone === 0 && /^端末の保存領域：(確保済み|未確保|不明)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
+    check('3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'コピー,復元', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
 
     // the done screen keeps ↶ ひとつ戻す (F37)
     await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ ...JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine')), newPerDay: 1 }))`);
@@ -496,7 +514,7 @@ async function verifyDelivery(browser, base) {
 
 /* ------------------------- the back hierarchy (CARD_CONTRACT_V2 §2–§4) */
 const KANJI_RE = /[㐀-鿿々〆ヵヶ]/;
-const FOLD_ORDER = ['英語', '英訳', '漢字の形と意味', '類語', 'この語の他の文章'];
+const FOLD_ORDER = ['英語', '英訳', '漢字の形と意味', '類語', 'この語の他の文', '出典'];
 const RULE_TEXT = '答えを見て理解が深まったなら もう一度';
 /** where each sentence of a passage ends — the rule build.py and the player share */
 function sentenceEnds(ja) {
@@ -529,6 +547,11 @@ function verifyBackData(decks) {
   check('b) every kanji in every passage has a reading for the back (none left bare)', unread.length === 0, unread.slice(0, 4).join(' | ') || `${decks.reduce((n, d) => n + d.words.reduce((m, w) => m + w.cards.length, 0), 0)} cards`);
   check('b) no pitch is shown because the decks carry none (the back omits it)', decks.every((d) => d.words.every((w) => w.pitch == null)));
   check('c) both decks default the English gloss to a tap (deck.defaults.gloss = tap, written by build.py)', decks.every((d) => d.defaults?.gloss === 'tap'), decks.map((d) => `${d.id} ${d.defaults?.gloss}`).join(' · '));
+  check(
+    '2) both decks open in 読んで思い出す (deck.defaults.mode = read, no front hint setting); the MCD method says so and that 字 cards come with 穴埋め',
+    decks.every((d) => d.defaults?.mode === 'read' && !('hint' in d.defaults)) && decks[0].method.some((l) => l.includes('読んで思い出す')) && decks[0].method.some((l) => l.includes('字') && l.includes('穴埋め') && l.includes('記録は消えない')),
+    decks.map((d) => `${d.id} ${JSON.stringify(d.defaults)}`).join(' · '),
+  );
   const mcd = decks.find((d) => d.id === 'kotoba-mcd');
   const cards = mcd.words.flatMap((w) => w.cards);
   const bad = cards.filter((c) => c.enTarget != null && (!c.en.includes(c.enTarget) || (sentenceEnds(c.ja).length > 1 && c.enTarget === c.en))).map((c) => c.id);
@@ -546,7 +569,9 @@ function verifyBackParity() {
     const front = readFileSync(resolve(tools, dir, 'front.html'), 'utf8');
     const back = readFileSync(resolve(tools, dir, 'back.html'), 'utf8');
     if (/furigana:|\{\{(Meaning|SentenceEN|SentenceFurigana|Tip|Kanji)\}\}/.test(front)) bad.push(`${dir}/front: readings or English`);
-    const at = ['{{furigana:SentenceFurigana}}', 'class="term"', 'class="posbadge"', '{{DefJA}}', '<summary>英語</summary>', '{{Meaning}}', '<summary>英訳</summary>', '<summary>漢字の形と意味</summary>', 'class="src"'].map((k) => back.indexOf(k));
+    if (/\{\{Hint\}\}|class="hint"/.test(front)) bad.push(`${dir}/front: a hint under the blank`);
+    const at = ['{{furigana:SentenceFurigana}}', 'class="term"', 'class="posbadge"', '{{DefJA}}', '<summary>英語</summary>', '{{Meaning}}', '<summary>英訳</summary>', '<summary>漢字の形と意味</summary>', '<details class="fold src">', '<summary>出典</summary>'].map((k) => back.indexOf(k));
+    if (back.slice(back.indexOf('<summary>出典</summary>')).includes('<details') || /\{\{Source\}\}/.test(back.slice(0, back.indexOf('<summary>出典</summary>')).replace(/<div class="chips">[\s\S]*?<\/div>/, ''))) bad.push(`${dir}/back: 出典 is not the last fold, or the source shows outside it`);
     if (at.some((i) => i < 0) || at.some((i, k) => k && i < at[k - 1])) bad.push(`${dir}/back: order ${at.join(',')}`);
     if (!/\{\{\^Hint\}\}\s*<details class="fold kfold" open>/.test(back) || /\{\{#Hint\}\}\s*<details class="fold kfold" open>/.test(back)) bad.push(`${dir}/back: 漢字 fold not open on 字 cards only`);
     if (/<details[^>]*class="fold (gloss|en)"[^>]* open/.test(back)) bad.push(`${dir}/back: an English fold starts open`);
@@ -556,6 +581,8 @@ function verifyBackParity() {
     if (/\.km\.kind-/.test(css) || !css.includes('.km.item-字')) bad.push(`${dir}/style.css: the edge is not the item kind`);
     for (const [name, t] of [['front', front], ['back', back]]) if (!t.includes('pos-{{POS}} {{Tags}}">') || !t.includes('<span class="chip levelchip"></span>')) bad.push(`${dir}/${name}: no level chip from the level::Nx tag`);
     if (!css.includes(".level\\:\\:N1 .levelchip::after {\n  content: 'N1';")) bad.push(`${dir}/style.css: the level chip has no N1 label`);
+    if (!css.includes(".pos-adjna .posbadge::after {\n  content: '形容動詞';") || !/\.pos-adjna \.term \{/.test(css)) bad.push(`${dir}/style.css: no 形容動詞 badge`);
+    if (!css.includes('#7f1f86') || !css.includes('#ffb0ea') || /#a3237a|#ff8fd8/.test(css)) bad.push(`${dir}/style.css: the 字 edge is not the player's retuned 白/墨 hue`);
     if (!back.includes('lang="en">{{Meaning}}') || !back.includes('lang="en">{{SentenceEN}}') || !back.includes('lang="en">{{Tip}}') || /<details[^>]*lang=/.test(back)) bad.push(`${dir}/back: lang="en" not on the English text alone`);
     if (!/<summary>漢字の形と意味<\/summary>\s*<div class="kanji">\{\{Kanji\}\}<\/div>/.test(back) || !css.includes('.kfam {')) bad.push(`${dir}: the kanji family has no place in the 漢字 fold`);
   }
@@ -565,12 +592,16 @@ function verifyBackParity() {
   const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
   const wrongEn = tsv.slice(3).map((l) => l.split('\t')).filter((r) => r[cols.indexOf('SentenceEN')] !== esc(byId.get(r[0])?.enTarget ?? '')).map((r) => r[0]);
   if (wrongEn.length) bad.push(`kotoba-mcd.tsv SentenceEN ≠ enTarget: ${wrongEn.slice(0, 3).join(', ')}`);
+  const posOf = new Map(readJson(DECK_PATH).words.flatMap((w) => w.cards.map((c) => [c.id, w.pos])));
+  const wrongPos = tsv.slice(3).map((l) => l.split('\t')).filter((r) => (posOf.get(r[0]) === 'な-adjective') !== (r[cols.indexOf('POS')] === 'adjna')).map((r) => r[0]);
+  if (wrongPos.length) bad.push(`kotoba-mcd.tsv POS: な-adjectives are not adjna: ${wrongPos.slice(0, 3).join(', ')}`);
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
     if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
     if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
+    if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
   }
-  check('parity: the study pages bundle this player; the Anki fronts show no readings or English; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards) and translate only the target sentence; Anki edges and first chips by item kind', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
+  check('parity: the study pages bundle this player; the Anki fronts show no readings, English or hint; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards, 出典 the last fold) and translate only the target sentence; Anki edges and first chips by item kind (the retuned 字 hue), 形容動詞 on な-adjectives', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
 }
 
 async function verifyBack(browser, base) {
@@ -618,7 +649,8 @@ async function verifyBack(browser, base) {
     rest.querySelectorAll('.kp-chips, .kp-sentence').forEach((n) => n.remove());
     return { rt: card.querySelectorAll('rt, ruby').length, taps: card.querySelectorAll('.kp-sentence :is(button, a, [role="button"], [tabindex], .kp-tapword)').length, tapwords: document.querySelectorAll('.kp-tapword').length,
       rhint: card.querySelectorAll('.kp-rhint').length, repaired: card.dataset.repaired ?? null,
-      latin: /[A-Za-z]/.test(rest.textContent), folds: card.querySelectorAll('details').length, text: card.textContent, hint: card.querySelector('.kp-hint')?.textContent ?? null, zoom: !!card.querySelector('.kp-zoom') || !!card.dataset.zoom };
+      latin: /[A-Za-z]/.test(rest.textContent), folds: card.querySelectorAll('details').length, text: card.textContent, hint: card.querySelector('.kp-hint')?.textContent ?? null, zoom: !!card.querySelector('.kp-zoom') || !!card.dataset.zoom,
+      blanks: card.querySelectorAll('.kp-blank').length, marked: card.querySelectorAll('.kp-sentence .kp-target').length, ctx: card.querySelectorAll('.kp-ctx, .kp-more').length };
   })()`;
   const BACK = `(() => {
     const card = document.getElementById('kp-card');
@@ -630,7 +662,8 @@ async function verifyBack(browser, base) {
     return { order: [...ans.children].map((n) => n.className), word: [...ans.querySelector('.kp-word').children].map((n) => n.className), pitch: !!card.querySelector('.kp-pitch'),
       bare: ${KANJI_RE}.test(sentence.textContent), rt: card.querySelectorAll('.kp-sentence rt').length, tier1, def: ans.querySelector('.kp-def')?.textContent,
       summaries: [...ans.querySelectorAll('.kp-folds > details > summary')].map((s) => s.textContent), native: [...ans.querySelectorAll('.kp-folds > *')].every((n) => n.tagName === 'DETAILS' || n.id === 'kp-see'),
-      gloss: fold('kp-f-gloss'), en: fold('kp-f-en'), kanji: fold('kp-f-kanji'), sem: fold('kp-f-sem'), others: fold('kp-f-others') };
+      gloss: fold('kp-f-gloss'), en: fold('kp-f-en'), kanji: fold('kp-f-kanji'), sem: fold('kp-f-sem'), others: fold('kp-f-others'), src: fold('kp-f-src'),
+      srcLink: card.querySelector('.kp-f-src a')?.getAttribute('href') ?? null, licenceLang: card.querySelector('.kp-licence [lang]')?.lang ?? null };
   })()`;
   const inOrder = (summaries) => {
     const at = summaries.map((t) => FOLD_ORDER.findIndex((k) => t.startsWith(k)));
@@ -644,9 +677,10 @@ async function verifyBack(browser, base) {
   // a) the front pin, both decks, with old prefs that used to add tap readings and an English hint
   const fronts = [];
   for (const [label, q, deck, opts] of [
-    ['MCD 語', '?deck=mcd', 'kotoba-mcd', {}],
-    ['MCD 語, old prefs (tap ふりがな, English hint)', '?deck=mcd', 'kotoba-mcd', { prefs: { furigana: 'tap', hint: 'en' } }],
-    ['MCD 字', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-064-m02') }],
+    ['MCD 語 (読んで思い出す, the default)', '?deck=mcd', 'kotoba-mcd', {}],
+    ['MCD 語 穴埋め', '?deck=mcd', 'kotoba-mcd', { prefs: { mode: 'self' } }],
+    ['MCD 語, old prefs (穴埋め, tap ふりがな, English hint)', '?deck=mcd', 'kotoba-mcd', { prefs: { mode: 'self', furigana: 'tap', hint: 'en' } }],
+    ['MCD 字 (穴埋め)', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, mode: 'self' }, state: ledger('kotoba-mcd', 'km-064-m02') }],
     ['文 (読んで思い出す)', '?deck=kotoba', 'kotoba-mine', {}],
     ['文 穴埋め, old prefs (tap ふりがな, English hint)', '?deck=kotoba', 'kotoba-mine', { prefs: { mode: 'self', furigana: 'tap', hint: 'en' } }],
     ['MCD 語 repaired with a ladder hint (§4)', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: repairedLedger('kotoba-mcd', 'km-064-m01', 'ざ○○○') }],
@@ -658,11 +692,15 @@ async function verifyBack(browser, base) {
     const english = [w.meaning, c.en, w.tip].filter(Boolean).some((t) => f.text.includes(t));
     // a ladder hint is the one thing a repaired card adds to its front, marked as repaired; no other card shows one
     const repairOk = opts.state?.includes('"hint"') ? f.rhint === 1 && f.repaired === 'hint' : f.rhint === 0 && f.repaired === null;
-    fronts.push({ label, ok: f.rt === 0 && f.taps === 0 && f.tapwords === 0 && !f.latin && !english && f.folds === 0 && !f.zoom && (f.hint == null || !/[A-Za-z]/.test(f.hint)) && repairOk, card: c.id, ...f, text: undefined });
+    // 読んで思い出す marks the target and blanks nothing; 穴埋め blanks it (a 字 card with its 〔reading〕)
+    const read = !opts.prefs?.mode || opts.prefs.mode === 'read';
+    // (a 字 card marks the rest of its word around the blank)
+    const asked = read ? f.marked >= 1 && f.blanks === 0 : f.blanks >= 1;
+    fronts.push({ label, ok: f.rt === 0 && f.taps === 0 && f.tapwords === 0 && !f.latin && !english && f.folds === 0 && !f.zoom && f.hint === null && f.ctx === 0 && asked && repairOk, card: c.id, ...f, text: undefined });
     await close(o);
   }
   const badFront = fronts.filter((f) => !f.ok);
-  check('a) front pin, both decks: no furigana, no English, no tap targets in the passage, no folds — also with old tap-ふりがな / English-hint prefs stored; only a card repaired with a ladder hint shows one, marked data-repaired', badFront.length === 0, badFront.length ? JSON.stringify(badFront[0]) : fronts.map((f) => `${f.label} ${f.card}`).join(' · '));
+  check('a, 2) front pin, both decks: no furigana, no English, no tap targets in the passage, no folds, no hint under a blank — also with old tap-ふりがな / English-hint prefs stored; MCD opens in 読んで思い出す (target marked, nothing blanked), 穴埋め blanks it; only a card repaired with a ladder hint shows one, marked data-repaired', badFront.length === 0, badFront.length ? JSON.stringify(badFront[0]) : fronts.map((f) => `${f.label} ${f.card}`).join(' · '));
 
   // b, c) a new MCD 語 card: tier one, then the folds in order; d) zoom on a new card
   {
@@ -680,9 +718,15 @@ async function verifyBack(browser, base) {
     );
     const sibs = w.cards.filter((x) => x.type === 'word' && x.passage !== c.passage);
     check(
-      'c) tier two: native folds in order 英語 → 英訳 → 漢字の形と意味 → (類語) → other passages, then the source line last; 英語 is closed by default and holds the gloss',
-      b.native && inOrder(b.summaries) && b.summaries[0] === '英語' && b.order.at(-1) === 'kp-src' && b.order.at(-2) === 'kp-folds' && b.gloss && !b.gloss.open && b.gloss.text.startsWith(w.meaning),
+      'c) tier two: native folds in order 英語 → 英訳 → 漢字の形と意味 → (類語) → other passages → 出典, the folds last in the answer; 英語 is closed by default and holds the gloss',
+      b.native && inOrder(b.summaries) && b.summaries[0] === '英語' && b.summaries.at(-1) === '出典' && b.order.at(-1) === 'kp-folds' && b.gloss && !b.gloss.open && b.gloss.text.startsWith(w.meaning),
       JSON.stringify({ summaries: b.summaries, last: b.order.slice(-2), gloss: b.gloss?.open }),
+    );
+    const s = c.src;
+    check(
+      '4) 出典 is the last fold, closed: the site (a link when the record has a URL), the licence from card.src.licence (lang="en"), the author when there is one, and which passage of the word this is',
+      b.src && !b.src.open && b.src.text.includes(s.site) && b.src.text.includes(s.licence) && b.src.text.includes(`文章${c.passage}`) && (!s.author || b.src.text.includes(s.author)) && b.srcLink === (s.url ?? null) && b.licenceLang === 'en',
+      JSON.stringify({ card: c.id, src: b.src?.text, link: b.srcLink }),
     );
     check(
       'c) 英訳 is the target sentence only (not the passage); 漢字 closed on a 語 card; 類語 absent on a new card; other passages are titles only',
@@ -756,24 +800,162 @@ async function verifyBack(browser, base) {
     await close(o);
   }
 
-  // e) the longest passage (km-298-m02, 195 characters): the grade bar is on screen without scrolling, and the source line scrolls clear of it
+  // 1, e) the longest passage (km-298-m02, 195 characters), seen before (焦点) and with 全文 chosen: at the
+  // resting scroll position after the reveal the word and its definition sit above the pinned bar,
+  // no fold row is cut by it; 焦点 folds the other sentences to two dimmed lines each with ⋯
+  const RESTING = `new Promise((ok) => { let last = -1; let same = 0; const tick = () => { if (scrollY === last) { if (++same >= 6) return ok(Math.round(scrollY)); } else { same = 0; last = scrollY; } requestAnimationFrame(tick); }; tick(); })`;
+  const AT_REST = `(() => { const box = (s) => document.querySelector(s)?.getBoundingClientRect(); const bar = box('.kp-grades'); const t = box('#kp-card .kp-term'); const d = box('#kp-card .kp-def'); const f = box('#kp-card .kp-s[data-focus]') || box('#kp-card .kp-target');
+    const rows = [...document.querySelectorAll('#kp-card .kp-folds > details > summary')].map((n) => n.getBoundingClientRect());
+    return { y: Math.round(scrollY), bar: Math.round(bar.top), term: Math.round(t.bottom), def: Math.round(d.bottom), sentenceTop: Math.round(f.top), cut: rows.filter((r) => r.top < bar.top - 0.5 && r.bottom > bar.top + 0.5).length }; })()`;
+  const CLAMP = `(() => { const card = document.getElementById('kp-card'); return [...card.querySelectorAll('.kp-ctx')].map((g) => { const inner = g.querySelector('.kp-ctx-in'); const more = g.querySelector('.kp-more'); const s = g.querySelector('.kp-s');
+    return { side: g.dataset.side, display: getComputedStyle(g).display, clip: g.dataset.clip, h: Math.round(inner.getBoundingClientRect().height), line: parseFloat(getComputedStyle(card.querySelector('.kp-sentence')).lineHeight), more: getComputedStyle(more).display !== 'none', expanded: more.getAttribute('aria-expanded'), dim: +getComputedStyle(s).opacity }; }); })()`;
+  {
+    const seen = {};
+    for (const [label, zoom] of [
+      ['焦点', 'auto'],
+      ['全文', 'full'],
+    ]) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, zoom }, state: ledger('kotoba-mcd', 'km-298-m02') });
+      const id = await cardId(o.page);
+      await o.page.click('#kp-reveal');
+      await o.page.waitForSelector('.kp-grade');
+      await o.page.evaluate(RESTING);
+      const rest = await o.page.evaluate(AT_REST);
+      const groups = await o.page.evaluate(CLAMP);
+      const text = await o.page.evaluate(SENTENCE);
+      let opened = null;
+      if (label === '焦点') {
+        const g = groups.findIndex((x) => x.more);
+        if (g >= 0) {
+          await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).click();
+          opened = (await o.page.evaluate(CLAMP))[g];
+        }
+      }
+      seen[label] = { id, rest, groups, text, opened };
+      await close(o);
+    }
+    const f = seen['焦点'];
+    const full = seen['全文'];
+    const { c } = index.get('km-298-m02');
+    check(
+      '1) the longest passage (km-298-m02) at its resting position after the reveal, 焦点 and 全文: .kp-term and the definition sit above the pinned bar, no fold row is cut by it; in 焦点 the target sentence is on screen too',
+      f.id === 'km-298-m02' && full.id === 'km-298-m02' && [f, full].every((x) => x.rest.term <= x.rest.bar && x.rest.def <= x.rest.bar && x.rest.cut === 0) && f.rest.sentenceTop >= 0,
+      JSON.stringify({ 焦点: f.rest, 全文: full.rest }),
+    );
+    check(
+      '1) 焦点 folds the sentences before and after the target to two dimmed lines each (never removed: the passage text is whole), with ⋯ (aria-expanded) on a group that runs longer, which opens it; 全文 lays the groups out inline with no ⋯',
+      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim < 0.5 && (g.clip === '1') === g.more) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
+        f.text === c.ja && full.text === c.ja && full.groups.every((g) => g.display === 'contents' && !g.more && g.dim === 1),
+      JSON.stringify({ focus: f.groups, opened: f.opened, full: full.groups.map((g) => [g.side, g.display, g.more]) }),
+    );
+  }
+
+  // 5) a fold row is never cut by the pinned bar at the resting position (scroll-top when everything fits),
+  // and the last fold (出典) scrolls clear of it — MCD new, seen, unmatched and 字 backs, and the sentence deck
+  {
+    const seen = [];
+    for (const [label, q, deck, opts] of [
+      ['MCD new (全文)', '?deck=mcd', 'kotoba-mcd', {}],
+      ['MCD seen (焦点)', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-064-m01') }],
+      ['MCD unmatched', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-109-m05') }],
+      ['MCD 字 (穴埋め)', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, mode: 'self' }, state: ledger('kotoba-mcd', 'km-064-m02') }],
+      ['文', '?deck=kotoba', 'kotoba-mine', {}],
+    ]) {
+      const o = await open(q, deck, opts);
+      await o.page.click('#kp-reveal');
+      await o.page.waitForSelector('.kp-grade');
+      await o.page.evaluate(RESTING);
+      const rest = await o.page.evaluate(AT_REST);
+      await o.page.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)');
+      const end = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const s = document.querySelector('#kp-card .kp-f-src > summary').getBoundingClientRect(); return { src: Math.round(s.bottom), bar: Math.round(b.top) }; })()`);
+      seen.push({ label, card: await cardId(o.page), ...rest, end });
+      await close(o);
+    }
+    check(
+      '5) at the resting position after the reveal no fold row is cut by the pinned bar (each wholly above it or wholly below), the word and definition are above it, and the last fold (出典) scrolls clear of it',
+      seen.every((x) => x.cut === 0 && x.term <= x.bar && x.def <= x.bar && x.end.src <= x.end.bar),
+      JSON.stringify(seen.map(({ label, card, y, cut, end }) => ({ label, card, y, cut, src: end.src, bar: end.bar }))),
+    );
+  }
+
+  // e) the longest passage at the top of the page: the grade bar is on screen; the source fold scrolls clear of it
   {
     const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-298-m02') });
     const id = await cardId(o.page);
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
-    await o.page.evaluate('window.scrollTo(0, 0)');
+    await o.page.evaluate(RESTING);
+    await o.page.evaluate('window.scrollTo({ top: 0, behavior: "instant" })');
     const top = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const g = document.getElementById('kp-grade-again').getBoundingClientRect(); return { bottom: Math.round(b.bottom), inView: g.top >= 0 && g.bottom <= innerHeight, hit: !!document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)?.closest('#kp-grade-again') }; })()`);
-    await o.page.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)');
-    const end = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const s = document.querySelector('#kp-card .kp-src').getBoundingClientRect(); return { src: Math.round(s.bottom), bar: Math.round(b.top) }; })()`);
+    await o.page.evaluate('window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" })');
+    const end = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const s = document.querySelector('#kp-card .kp-f-src > summary').getBoundingClientRect(); return { src: Math.round(s.bottom), bar: Math.round(b.top) }; })()`);
     const z = await o.page.evaluate(`document.getElementById('kp-card').dataset.zoom`);
-    check('e) the longest passage (195 characters): the grade bar is on screen at the top of the page and the source line scrolls clear of it; a card seen before opens in 焦点', id === 'km-298-m02' && top.bottom === 844 && top.inView && top.hit && end.src <= end.bar && z === 'focus', JSON.stringify({ id, top, end, zoom: z }));
+    check('e) the longest passage (195 characters): the grade bar is on screen at the top of the page and the 出典 fold scrolls clear of it; a card seen before opens in 焦点', id === 'km-298-m02' && top.bottom === 844 && top.inView && top.hit && end.src <= end.bar && z === 'focus', JSON.stringify({ id, top, end, zoom: z }));
     await close(o);
+  }
+
+  // 6) 「タップして答えを見る」 (and 「意味を思い出してからタップ」) and the swipe hint: the first three sittings of a deck, then gone
+  {
+    const seen = [];
+    for (const [q, deck, sittings] of [
+      ['?deck=kotoba', 'kotoba-mine', null],
+      ['?deck=kotoba', 'kotoba-mine', 2],
+      ['?deck=kotoba', 'kotoba-mine', 3],
+      ['?deck=mcd', 'kotoba-mcd', 3],
+    ]) {
+      const o = await open(q, deck, { prefs: sittings == null ? null : { sittings } });
+      const front = await o.page.evaluate(`document.querySelector('#kp-card .kp-taphint')?.textContent ?? null`);
+      await o.page.click('#kp-reveal');
+      await o.page.waitForSelector('.kp-grade');
+      const swipe = await o.page.evaluate(`!!document.querySelector('.kp-swipehint')`);
+      const stored = await o.page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:${deck}') || '{}').sittings`);
+      seen.push({ deck, before: sittings ?? 0, stored, front, swipe });
+      await close(o);
+    }
+    const [first, third, fourth, mcdFourth] = seen;
+    check(
+      '6) each sitting counts (prefs.sittings); the tap hint and the swipe hint show in the first three sittings of a deck and are gone from the fourth, on both decks',
+      first.stored === 1 && first.front === '意味を思い出してからタップ' && first.swipe && third.stored === 3 && !!third.front && third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
+      JSON.stringify(seen),
+    );
+  }
+
+  // 2) 読んで思い出す leaves a due 字 card out of the queue without suspending it; 穴埋め brings it back
+  {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(SEEDED);
+    await context.addInitScript(`try { if (!sessionStorage.getItem('__ji_seeded')) { sessionStorage.setItem('__ji_seeded', '1');
+      localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', ${JSON.stringify(JSON.stringify({ newPerDay: 0 }))});
+      localStorage.setItem('bunki-cloze:kotoba-mcd', ${JSON.stringify(ledger('kotoba-mcd', 'km-064-m02'))}); } } catch {}`);
+    const page = await context.newPage();
+    try {
+      await page.goto(`${base}/index.html?deck=mcd`, { waitUntil: 'load' });
+      await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+      await page.waitForSelector('#kp-start', { timeout: 15000 });
+      const read = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, disabled: document.getElementById('kp-start').disabled, mode: document.querySelector('[data-pref="mode:read"]')?.getAttribute('aria-checked') ?? null })`);
+      await page.click('#kp-to-settings');
+      const modeRead = await page.evaluate(`document.querySelector('[data-pref="mode:read"]').getAttribute('aria-checked')`);
+      await page.click('[data-pref="mode:self"]');
+      await page.click('.kp-top .kp-icon');
+      await page.waitForSelector('#kp-start');
+      const self = await page.evaluate(`document.getElementById('kp-start').textContent`);
+      await page.click('#kp-start');
+      await page.waitForSelector('#kp-card');
+      const shown = await page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, blank: document.querySelector('#kp-card .kp-blank')?.textContent ?? null })`);
+      const l = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
+      check(
+        '2) 読んで思い出す (the MCD default) leaves a due 字 card out of the queue — nothing suspended, its record kept; choosing 穴埋め brings it back, blanked with its reading',
+        read.disabled && /今日はここまで/.test(read.start) && modeRead === 'true' && /1枚/.test(self) && shown.id === 'km-064-m02' && shown.blank === '〔ざい〕' && !Object.keys(l.suspended ?? {}).length && l.cards['km-064-m02']?.stability === 20,
+        JSON.stringify({ read, modeRead, self, shown, suspended: l.suspended ?? {} }),
+      );
+    } finally {
+      await context.close();
+    }
   }
 
   // c) a 字 card opens 漢字の形と意味; the sentence deck: 英訳 is its one sentence, no zoom, 英語 open when 設定 says always
   {
-    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-064-m02') });
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, mode: 'self' }, state: ledger('kotoba-mcd', 'km-064-m02') });
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
     const b = await o.page.evaluate(BACK);
@@ -788,9 +970,10 @@ async function verifyBack(browser, base) {
     const b = await o.page.evaluate(BACK);
     const z = await o.page.evaluate(`({ zoom: document.querySelectorAll('.kp-zoom, .kp-s').length, data: document.getElementById('kp-card').dataset.zoom ?? null })`);
     check(
-      'c, d) sentence deck: 英語 stays open with 設定 › いつも開いておく, 英訳 is the sentence, the same fold order, and no zoom',
-      b.gloss?.open === true && b.gloss.text.startsWith(w.meaning) && b.en?.text === c.en && inOrder(b.summaries) && b.order.at(-1) === 'kp-src' && z.zoom === 0 && z.data === null && !b.bare,
-      JSON.stringify({ summaries: b.summaries, gloss: b.gloss?.open, zoom: z }),
+      'c, d, 4, 7) sentence deck: 英語 stays open with 設定 › いつも開いておく, 英訳 is the sentence, the same fold order with 「この語の他の文」 and 出典 (site, licence, no passage number) last, and no zoom',
+      b.gloss?.open === true && b.gloss.text.startsWith(w.meaning) && b.en?.text === c.en && inOrder(b.summaries) && b.order.at(-1) === 'kp-folds' && b.summaries.at(-1) === '出典' &&
+        (w.cards.length > 1 ? b.others?.summary === `この語の他の文（${w.cards.length - 1}）` : !b.others) && b.src?.text.includes(c.src.site) && b.src.text.includes(c.src.licence) && !/文章\d/.test(b.src.text) && z.zoom === 0 && z.data === null && !b.bare,
+      JSON.stringify({ card: c.id, summaries: b.summaries, gloss: b.gloss?.open, src: b.src?.text, zoom: z }),
     );
     await close(o);
   }
@@ -849,6 +1032,25 @@ async function verifyReviewData(decks) {
       JSON.stringify(got),
     );
   }
+  // 2) 読んで思い出す leaves every 字 card out of the queue (due and new) and touches none of them
+  {
+    const { buildQueue, emptyState, skipFor } = await import(pathToFileURL(ENGINE_PATH).href);
+    const now = new Date('2026-10-04T09:00:00Z');
+    const [mcd] = decks;
+    const ji = mcd.words.flatMap((w) => w.cards.filter((c) => c.type === 'kanji').map((c) => c.id));
+    const rec = { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20, last_review: '2026-09-01T00:00:00.000Z', introducedAt: '2026-08-01T00:00:00.000Z' };
+    // a 字 card due, and another word's 語 card due
+    const state = { ...emptyState(mcd.id), cards: Object.fromEntries([ji[0], 'km-200-m01'].map((id) => [id, rec])) };
+    const before = JSON.stringify(state);
+    const read = buildQueue(mcd, state, now, 5000, { skip: skipFor('read') });
+    const self = buildQueue(mcd, state, now, 5000, { skip: skipFor('self') });
+    const isJi = (id) => ji.includes(id);
+    check(
+      `2) 読んで思い出す leaves all ${ji.length} 字 cards out of the queue (none due, none new) without suspending them; 穴埋め and 4択 keep them (skipFor)`,
+      ji.length > 500 && !read.queue.some(isJi) && self.due.filter(isJi).length >= 1 && self.queue.some(isJi) && skipFor('choice') === null && JSON.stringify(state) === before && !state.suspended?.length,
+      JSON.stringify({ read: { due: read.due.length, fresh: read.fresh.length, ji: read.queue.filter(isJi).length }, self: { due: self.due.length, ji: self.queue.filter(isJi).length } }),
+    );
+  }
   const constant = (name) => engine.match(new RegExp(`const ${name} = (\\d+);`))?.[1];
   check(
     'b) the leech threshold is 5 lapses (LEECH_LAPSES, contract §4); the unlock constants are unchanged (14 days, 3 lapses)',
@@ -899,11 +1101,11 @@ async function verifyReview(browser, base) {
   const card = (id, { state = 2, lapses = 0, due = '2020-01-01T00:00:00.000Z' } = {}) => ({ [id]: { due, stability: state === 2 ? 20 : 1, difficulty: 5, state, reps: 6, lapses, elapsed_days: 1, scheduled_days: 1, last_review: '2026-09-01T00:00:00.000Z' } });
   const ledger = (deck, cards, extra = {}) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: Object.assign({}, ...cards), ...extra });
   const LATER = '2099-01-01T00:00:00.000Z';
-  const open = async (q, deck, state, { inject = null } = {}) => {
+  const open = async (q, deck, state, { inject = null, prefs = {} } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__review_seeded')) { sessionStorage.setItem('__review_seeded', '1');
-      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true }))});
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true, ...prefs }))});
       localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)}); } } catch {}`);
     if (inject) {
       await context.route(`**/decks/${deck}/deck.json`, async (route) => {
@@ -1096,7 +1298,7 @@ async function verifyReview(browser, base) {
     }
   }
   {
-    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m02', { lapses: 5 })]));
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m02', { lapses: 5 })]), { prefs: { mode: 'self' } });
     try {
       await start(o.page);
       await revealCard(o.page);
@@ -1262,6 +1464,13 @@ async function verifyVisual(browser, base) {
     low.slice(0, 3).join(' | ') || rows.map((r) => `${r.look} ${Math.min(...Object.values(r).filter((v) => typeof v === 'number'))}`).join(' · '),
   );
 
+  const ji = kindJiTable();
+  check(
+    `7) the 字 hue (a 字 card's edge and chip) is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of its theme (washi and sakura no longer share the verb's blue; 墨, 白 and 抹茶 moved off the sound-word pink)`,
+    ji.failures.length === 0,
+    ji.failures.slice(0, 3).join(' | ') || ji.rows.map((r) => `${r.look} ${r.value} ΔE${r.deltaE} (${r.nearest})`).join(' · '),
+  );
+
   const due = (deck, id) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
   const open = async (q, deck, { prefs = null, state = null, reduce = false, start = true } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -1301,7 +1510,7 @@ async function verifyVisual(browser, base) {
     const set = await o.page.evaluate(`(() => { const m = document.querySelector('.kp-settings #kp-method'); return { method: !!m, summary: m?.querySelector('summary')?.textContent, lines: m ? m.querySelectorAll('p').length : 0, groups: document.querySelectorAll('.kp-settings [role="radiogroup"]').length }; })()`);
     check(
       'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method',
-      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'このデッキのしくみ' && set.lines === mcd.method.length && set.groups === 5,
+      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'このデッキのしくみ' && set.lines === mcd.method.length && set.groups === 4,
       JSON.stringify({ home, set }),
     );
     await close(o);
@@ -1333,7 +1542,7 @@ async function verifyVisual(browser, base) {
 
   // b) a 字 card: its own edge and chip colour; a word without a level: no level chip; the sentence deck: 語, no "3/1"
   {
-    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look: 'washi' }, state: due('kotoba-mcd', 'km-064-m02') });
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look: 'washi', mode: 'self' }, state: due('kotoba-mcd', 'km-064-m02') });
     const ji = await o.page.evaluate(PAINT);
     await close(o);
     const p = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: due('kotoba-mcd', 'km-066-m01') });
@@ -1522,8 +1731,8 @@ async function main() {
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
 
     await page.click('#kp-start');
-    await page.waitForSelector('#kp-card .kp-blank');
-    check('a card is a passage with one gap and a Japanese hint — no readings, no English', (await page.locator('#kp-card .kp-blank').count()) === 1 && (await page.locator('#kp-card rt').count()) === 0 && (await page.locator('#kp-card details').count()) === 0);
+    await page.waitForSelector('#kp-card .kp-target');
+    check('a card is a passage with the word marked (読んで思い出す) — no gap, no hint, no readings, no English', (await page.locator('#kp-card .kp-blank, #kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card .kp-sentence .kp-target').count()) >= 1 && (await page.locator('#kp-card rt').count()) === 0 && (await page.locator('#kp-card details').count()) === 0);
     await page.click('#kp-reveal');
     await page.waitForSelector('#kp-grade-good');
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
@@ -1547,6 +1756,14 @@ async function main() {
     await page.click('.kp-choice');
     await page.waitForSelector('.kp-verdict');
     check('4-choice mode: four words, one tap answers and grades', choices === 4 && (await ls('bunki-cloze:kotoba-mcd')).log.length === 2);
+    await boot('?deck=mcd');
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    await page.click('#kp-to-settings');
+    await page.click('[data-pref="mode:self"]');
+    await page.click('.kp-icon');
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card .kp-blank');
+    check('穴埋め (the MCD blank preset): one gap and nothing under it — no hint, no readings, no English', (await page.locator('#kp-card .kp-blank').count()) >= 1 && (await page.locator('#kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card rt').count()) === 0);
     await boot('?deck=kotoba');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
     await page.click('#kp-start');

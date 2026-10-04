@@ -748,9 +748,8 @@ front shows no readings, no English and no tap targets inside the passage. The t
 furigana path and the English hint are removed; a stored `furigana` pref is ignored and a
 stored `hint: 'en'` reads as `'ja'`. A hint appears on a 読んで思い出す front only after the
 learner added one through the repair ladder (A35), and that card is marked
-`data-repaired`." Why: contract §2 locks the front. Open: the MCD blank preset (`mode:
-'self'`, still the default) prints the Japanese definition under the gap as its hint; the
-contract scopes that preset and the hint is left for the front stage.
+`data-repaired`." Why: contract §2 locks the front. (The MCD blank preset's Japanese
+definition under the gap, left open here, is removed by A37.)
 
 **A27 → S25.** Replaces the back order with two tiers: "Tier one, under the passage with no
 taps: the target with its reading and part-of-speech badge (pitch only when the deck
@@ -760,10 +759,17 @@ two, native `<details>` folds in this order: 英語 (gloss and English note, mut
 (the target sentence only, never the whole passage; a card whose sentences cannot be
 matched to the English says 未対応 instead of dropping the fold), 漢字の形と意味 (open by
 default on a 字 card), 類語 (only dictionary or collection entries, only once the card is
-in review state), the word's other passages as titles only, then the source line. A fold
-the learner opened stays open through the zoom toggle and the rule's dismiss." Why:
-contract §3. At 390×844 the target, its reading and the definition stay on the first
-screen above the grade bar, even with the repair ladder shown.
+in review state), the word's other passages as titles only (「この語の他の文章」 on a passage
+card, 「この語の他の文」 on the one-sentence deck), then 出典 as the last fold: the author (and
+translator) when the record names one, the site (a link when the record has a URL; a passage
+written for the deck says 書き下ろし), the licence from `card.src.licence` (`lang="en"`), and
+on a passage card which of the word's passages this is. A fold the learner opened stays open
+through the zoom toggle and the rule's dismiss." Why: contract §3 (§3.10 for 出典; updated
+with the Phase 1 follow-ups, when the source line became a fold and gained its licence). Anki
+folds 出典 last too, with the site and link; the licence is not a note field (S47 keeps the
+field list), so Anki readers find it in `ATTRIBUTION-<deck id>.md`. At 390×844 the target,
+its reading and the definition stay on the first screen above the grade bar, even with the
+repair ladder shown.
 
 **A28 → S25.** Replaces "plain English gloss (recommended visible default; optional
 Japanese-first order)" with: "The English gloss sits behind the 英語 fold by default
@@ -829,3 +835,69 @@ a card in this deck's ledger count, so the fold never shows a word before its ow
 does. Each entry links to 語の一覧 and ← returns to the card. Anki, which has no card state
 in a template, uses the words before the target in the deck's new-card order. No
 etymology, no mnemonics." Why: contract §3.7 and §5 (the JPMN/Kiku model).
+
+**A37 → S24, S28 (amends A26).** Replaces the MCD deck's default task: "Both decks open in
+読んで思い出す (`deck.defaults.mode: 'read'`): the target is marked in the deck's target style,
+nothing is blanked, and the learner recalls its sense and reading. 穴埋め (the MCD blank preset)
+and 4択 stay one switch away in 設定 › 答え方. No front shows a hint in any mode: the Japanese
+definition under the gap and the 設定 › ヒント row are removed, a stored `hint` pref is ignored,
+and the only hint a front can show is a repair-ladder hint (A35). The 538 single-kanji 字 cards
+are neither suspended nor deleted: in 読んで思い出す the queue leaves them out (`skipFor(mode)` in
+`engine.js`, applied to due cards, new cards and learning steps alike), their records and ids
+stay as they are, and they return the moment the learner chooses 穴埋め or 4択 (where a 字 card
+is asked as 穴埋め). The learner may later decide to suspend them for good; that is their call,
+not a default." Why: contract §2 ("default task 読んで思い出す … never single kanji", "no hint
+unless the card has been repaired"). Anki cannot mirror the mode switch: a template cannot drop
+a note's cards, so the Anki MCD note type keeps its blank front (now without the hint line); a
+learner who wants the 字 cards out of Anki suspends them with the search `Type:字`.
+
+**A38 → S36 (amends A30).** Replaces "焦点 dims the sentences around the target (opacity only;
+nothing is removed or reflowed)" with: "焦点 folds the sentences before the target, and those
+after it, into one group each, dimmed, two lines high: the before group shows its last two
+lines, the after group its first two, each fading at its cut edge. A group longer than two
+lines carries ⋯ (44px reach, `aria-expanded`, labelled 前の文をすべて表示／後の文をすべて表示)
+that opens it in place. Nothing is removed: the passage text is whole in the DOM, and 全文 lays
+the groups out inline as if they were not there. The front is never grouped." Why: the Phase 1
+critic found the first screen after a long reveal could be all dimmed text.
+
+**A39 → S25, S36 (amends A31).** Adds: "After the reveal the player settles the page: by the
+least scroll that does it (smooth, instant with reduced motion), the target sentence, the word
+and its definition sit between the host's pinned header and the pinned grade bar; when all three
+cannot fit, the word and definition win. At that resting position no fold row is cut by the
+bar: a row that would be is scrolled wholly above it, or wholly under it, whichever keeps the
+rest in view. The page keeps the bar's measured height free under the card, so the last fold
+(出典) always scrolls clear of the bar." Why: contract §3 (tier one is read on every pass) and
+the critic's clipped fourth fold. Verified on km-298-m02 (195 characters) in 焦点 and 全文, and
+on new, seen, unmatched and 字 backs.
+
+**A40 → S34, S35.** Adds: "The 字 hue (`--kp-kind-ji`, a 字 card's edge and kind chip) is at
+least ΔE_ok 10 (OKLab distance ×100) from every other hue of its theme: the 語 and 文法 kinds,
+the six part-of-speech hues, the accent, and the grade and state colours
+(`tools/contrast-kotoba.mjs`, `kindJiTable`), as well as ≥ 4.5:1 on the card." Retuned with the
+Phase 1 follow-ups, contrast on the card before → after:
+
+| Theme       | Before    | Nearest, ΔE_ok                 | After     | Nearest, ΔE_ok | On card      |
+| ----------- | --------- | ------------------------------ | --------- | -------------- | ------------ |
+| 墨 dark     | `#ff8fd8` | sound 4.4                      | `#ffb0ea` | sound 11.6     | 8.56 → 10.65 |
+| 抹茶 matcha | `#ff9ad5` | sound 6.7                      | `#ffb3d9` | 文法 10.6      | 8.21 → 9.62  |
+| 和紙 washi  | `#1e5da4` | verb 0.0 (the verb's own blue) | `#64075b` | sound 16.0     | 6.17 → 11.30 |
+| 桜 sakura   | `#2665a7` | verb 0.0 (the verb's own blue) | `#5e0b63` | 文法 16.6      | 6.00 → 12.32 |
+| 白 light    | `#a3237a` | sound 4.4                      | `#7f1f86` | adverb 12.4    | 6.82 → 8.60  |
+
+藍, 黒板 and 高 already cleared the floor (13.5, 10.8, 10.6) and are unchanged. Anki's light
+and night 字 edges follow 白 and 墨. Why: aesthetics.md §3 (one hue axis per surface; a 字 edge
+the same blue as a verb target read as a part-of-speech mark).
+
+**A41 → S24, S28.** Adds: "「タップして答えを見る」 (and 「意味を思い出してからタップ」 in 読んで思い出す)
+and the swipe hint under the grade bar show for a deck's first three sittings and are gone from
+the fourth (`prefs.sittings`, counted when a sitting starts; an older prefs record reads as 0).
+答えを見る and the grade buttons stay. Labels: the one-sentence deck's other-sentences fold reads
+「この語の他の文」; Anki's part-of-speech badge says 形容動詞 for な-adjectives (POS field
+`adjna`, the adjective colour), as the player does." Why: aesthetics.md §6 and §9. Anki has no
+類語 fold: the player shows 類語 only once a card is in review state, which a template cannot
+read, and no deck word has 類語 entries yet; adding the field would change the note type (S47).
+
+**A42 → S37 (completes A34).** Removes 設定 › バックアップ › 記録を消す, the two-tap reset that
+wrote an empty ledger over the deck's record. バックアップ keeps コピー and 復元. A card leaves
+through 削除 (undone by 保留中のカード › 復元) and a topic through テーマ; "Whole-deck reset is not
+offered" in A34 is now true of the player and the standalone study pages. Why: contract §4.

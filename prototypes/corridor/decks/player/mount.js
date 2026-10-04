@@ -12,7 +12,6 @@ import {
   RATINGS,
   buildQueue,
   createScheduler,
-  emptyState,
   grade,
   indexDeck,
   inspectState,
@@ -22,6 +21,7 @@ import {
   preview,
   repairCard,
   restoreSuspended,
+  skipFor,
   suspendCard,
   swapCard,
   swapTarget,
@@ -52,10 +52,15 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-/* gloss: the English fold on the back starts closed ('tap') or open ('show', the per-deck
- * "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one) or the
- * learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown once */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false };
+/* mode: 'read' (読んで思い出す, the contract's default), 'self' (穴埋め, the MCD blank preset) or
+ * 'choice' (4択); gloss: the English fold on the back starts closed ('tap') or open ('show', the
+ * per-deck "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one)
+ * or the learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown
+ * once; sittings: how many sittings this deck has started (the tap and swipe hints retire after
+ * HINT_SITTINGS). A stored `hint` (the front hint, retired by STANDARD A37) is ignored. */
+const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
+/** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
+const HINT_SITTINGS = 3;
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0 };
 let ctx = null; // { root, deck, index, storage, onLeave, openEntry, state, prefs, notice }
 
@@ -66,10 +71,7 @@ const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
 const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
 function prefsFor(storage, deck) {
-  const prefs = { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
-  // the front never shows English (CARD_CONTRACT_V2 §2): an older English hint becomes the Japanese one
-  if (prefs.hint === 'en') prefs.hint = 'ja';
-  return prefs;
+  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
 }
 function readJson(storage, key) {
   try {
@@ -211,11 +213,17 @@ function sentenceEnds(ja) {
   return out;
 }
 
-/** sentence → nodes. blank: hide the target; ruby: 'all' (the back: a reading over every
- * kanji) | 'none' (the front: no readings, no tap targets, the asked word plain text);
- * split: wrap each sentence of a passage in .kp-s, the one holding the target marked
- * data-focus, so the back can dim the others (zoom) */
-function sentenceNodes(card, { blank, ruby, split = false }) {
+/** sentence → nodes. front: the card's front (CARD_CONTRACT_V2 §2): no readings, no English,
+ * nothing to tap; blank: hide the target; ruby: 'all' (the back: a reading over every kanji) |
+ * 'none' (what the front forces); split: wrap each sentence of a passage in .kp-s, the one
+ * holding the target marked data-focus, so the back can dim the others (zoom); clamp (the back
+ * only): the sentences before and after the target each in a .kp-ctx group that 焦点 folds to
+ * two dimmed lines with a ⋯ to open it (STANDARD A38) */
+export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false }) {
+  if (front) {
+    ruby = 'none';
+    clamp = false;
+  }
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
@@ -257,7 +265,45 @@ function sentenceNodes(card, { blank, ruby, split = false }) {
     }
     if (rest) put(document.createTextNode(rest), 0, rest.length);
   });
+  if (clamp && split) clampContext(out);
   return out;
+}
+
+/** 焦点 on a long passage: the sentences before the target and those after it each become one
+ * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
+ * (the before group shows its last two, the after group its first two) and fitClamps adds a ⋯
+ * that opens a group when it is longer than that */
+function clampContext(out) {
+  const parts = [...out.children];
+  const at = parts.findIndex((n) => n.dataset.focus);
+  if (at < 0) return;
+  const group = (side, nodes) => {
+    if (!nodes.length) return null;
+    const box = el('span', 'kp-ctx', el('span', 'kp-ctx-in', el('span', 'kp-ctx-flow', nodes)));
+    box.dataset.side = side;
+    const label = side === 'before' ? '前の文をすべて表示' : '後の文をすべて表示';
+    const more = btn('kp-more', '⋯', (e) => {
+      e.stopPropagation();
+      const open = box.dataset.open !== '1';
+      box.dataset.open = open ? '1' : '';
+      more.setAttribute('aria-expanded', String(open));
+    }, { 'aria-expanded': 'false', 'aria-label': label, title: label });
+    box.append(more);
+    return box;
+  };
+  const before = group('before', parts.slice(0, at));
+  const after = group('after', parts.slice(at + 1));
+  if (before) out.prepend(before);
+  if (after) out.append(after);
+}
+/** mark each context group that 焦点 clips (its text runs past two lines), so only those show ⋯ */
+function fitClamps(root) {
+  for (const box of root.querySelectorAll('.kp-ctx')) {
+    const inner = box.querySelector('.kp-ctx-in');
+    const flow = box.querySelector('.kp-ctx-flow');
+    const clipped = getComputedStyle(inner).display !== 'contents' && flow.offsetHeight > inner.clientHeight + 1;
+    box.dataset.clip = clipped ? '1' : '';
+  }
 }
 
 /* ------------------------------------------------------------- screens */
@@ -278,6 +324,7 @@ function paint() {
   }
   root.append((screens[ui.screen] || homeScreen)());
   fitBar();
+  fitClamps(root);
 }
 /** on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card */
 function fitBar() {
@@ -304,7 +351,7 @@ function topBar(title, back) {
 function homeScreen() {
   const { deck, state, prefs } = ctx;
   const now = new Date();
-  const q = buildQueue(deck, state, now, prefs.newPerDay);
+  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode) });
   const statuses = deck.words.map((w) => wordStatus(w, state));
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
@@ -370,7 +417,12 @@ function go(screen) {
 }
 
 function startSession() {
-  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay);
+  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode) });
+  // one more sitting of this deck: the tap and swipe hints count these (HINT_SITTINGS). Not stored
+  // (storage full) only means they show a little longer.
+  const prefs = { ...ctx.prefs, sittings: (Number(ctx.prefs.sittings) || 0) + 1 };
+  writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs);
+  ctx.prefs = prefs;
   ui.queue = q.queue;
   ui.pos = 0;
   ui.done = 0;
@@ -393,19 +445,22 @@ function resetCard() {
 function refill() {
   const now = new Date();
   const ahead = new Set(ui.queue.slice(ui.pos));
-  for (const { id, t } of learningSoon(ctx.deck, ctx.state, now, 0)) {
+  for (const { id, t } of learningSoon(ctx.deck, ctx.state, now, 0, { skip: skipFor(ctx.prefs.mode) })) {
     if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos + 1, 0, id);
   }
 }
 
 /** the answer mode for the card on screen. 4択 offers whole words, and the rest
  * of the host word on a 字 card would give the answer away, so a 字 card is
- * always answered as 穴埋め */
+ * always answered as 穴埋め (読んで思い出す leaves 字 cards out of its queue; one
+ * that reaches the screen anyway is asked as 穴埋め too) */
 function cardMode() {
   const id = ui.queue[ui.pos];
   const card = id ? ctx.index.cards.get(id)?.card : null;
-  return ctx.prefs.mode === 'choice' && card?.type === 'kanji' ? 'self' : ctx.prefs.mode;
+  return ctx.prefs.mode !== 'self' && card?.type === 'kanji' ? 'self' : ctx.prefs.mode;
 }
+/** the first sittings of a deck explain the gestures; after HINT_SITTINGS they retire */
+const hintsOn = () => (Number(ctx.prefs.sittings) || 0) <= HINT_SITTINGS;
 
 function choicesFor(word) {
   const pool = ctx.deck.words.filter((w) => w.id !== word.id && w.pos === word.pos && w.term !== word.term);
@@ -459,14 +514,14 @@ function studyScreen() {
     face.dataset.zoom = zoom;
     chips.append(zoomToggle(zoom));
   }
-  // the front: no readings, no English, nothing to tap in the passage (CARD_CONTRACT_V2 §2)
-  face.append(sentenceNodes(card, { blank: !ui.revealed && mode !== 'read', ruby: ui.revealed ? 'all' : 'none', split: passage }));
+  // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
+  face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
   const repaired = ctx.state.repairs?.[id]?.hint;
   if (repaired) face.dataset.repaired = 'hint';
 
   if (!ui.revealed) {
-    if (ctx.prefs.hint !== 'none' && mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', word.defJa));
-    // a leech repaired with a hint (§4 ladder step two): this card only, marked as repaired
+    // a leech repaired with a hint (§4 ladder step two): this card only, marked as repaired; the
+    // only hint a front ever shows
     if (repaired) face.append(el('p', 'kp-rhint', el('span', 'kp-rhint-label', 'ヒント'), repaired));
     if (mode === 'choice') {
       const opts = el('div', 'kp-choices');
@@ -482,7 +537,7 @@ function studyScreen() {
       }
       face.append(opts);
     } else {
-      face.append(el('p', 'kp-taphint', mode === 'read' ? '意味を思い出してからタップ' : 'タップして答えを見る'));
+      if (hintsOn()) face.append(el('p', 'kp-taphint', mode === 'read' ? '意味を思い出してからタップ' : 'タップして答えを見る'));
       face.addEventListener('click', reveal);
     }
   } else {
@@ -580,6 +635,7 @@ function zoomToggle(zoom) {
       const face = wrap.closest('.kp-card');
       if (face) face.dataset.zoom = value;
       for (const x of wrap.querySelectorAll('.kp-zoom-btn')) x.setAttribute('aria-pressed', String(x === b));
+      if (face) fitClamps(face);
     }, { id: `kp-zoom-${value}`, 'aria-pressed': String(zoom === value) });
     wrap.append(b);
   }
@@ -613,7 +669,7 @@ const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言�
  * one. Tier two, one tap each, in this order: 英語 (the gloss; open when 設定 says always),
  * 英訳 of the target sentence only, 漢字の形と意味 (open on a 字 card), 類語 (only with
  * entries, and only once the card is in review), the word's other passages (titles only),
- * then the source line.
+ * then 出典: the author or 書き下ろし, the site, the licence (§3.10).
  */
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
@@ -658,10 +714,11 @@ function answerBlock(card, word) {
   if (others.length) {
     const list = el('ul', 'kp-others');
     for (const c of others) list.append(el('li', null, c.type ? `文章${c.passage}` : `例文${c.lv}`, el('span', null, ` · ${KIND_NAME[c.kind] || '例文'}${c.src?.site ? ` · ${c.src.site}` : ''}`)));
-    folds.append(fold('kp-f-others', `この語の他の文章（${others.length}）`, false, list));
+    // a passage deck lists 文章, the one-sentence deck 文
+    folds.append(fold('kp-f-others', `${card.type ? 'この語の他の文章' : 'この語の他の文'}（${others.length}）`, false, list));
   }
+  if (card.src) folds.append(sourceFold(card));
   a.append(folds);
-  if (card.src) a.append(sourceLine(card));
   return a;
 }
 
@@ -889,20 +946,32 @@ function otherPassages(card, word) {
   return word.cards.filter((c) => c.type === 'word' && c.passage !== card.passage);
 }
 
-function sourceLine(card) {
+/** 出典, the last tier-two fold (CARD_CONTRACT_V2 §3.10, STANDARD A27): who wrote it (the author,
+ * and the translator when there is one; a passage written for the deck says so in its site
+ * label), where it is from (a link when there is one), its licence, and which passage of the
+ * word this is (kept out of the chip row: one 23px row, aesthetics.md §4) */
+function sourceFold(card) {
+  const src = card.src;
   const p = el('p', 'kp-src');
-  const label = card.src.site || card.src.label || '';
-  if (card.src.url) {
+  const who = el('span', 'kp-src-line');
+  if (src.author) who.append(src.author, src.translator ? `（訳 ${src.translator}）` : '', ' · ');
+  const label = src.site || src.label || '';
+  if (src.url) {
     const a = el('a', null, label);
-    a.href = card.src.url;
+    a.href = src.url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.addEventListener('click', (e) => e.stopPropagation());
-    p.append('出典 ', a);
-  } else p.append(`出典 ${label}`);
-  // which passage of the word this is lives here, not in the chip row (one 23px row, aesthetics.md §4)
-  if (card.type) p.append(` · 文章${card.passage}`);
-  return p;
+    who.append(a);
+  } else who.append(label);
+  if (card.type) who.append(` · 文章${card.passage}`);
+  p.append(who);
+  if (src.licence) {
+    const lic = el('span', null, src.licence);
+    lic.lang = 'en';
+    p.append(el('span', 'kp-src-line kp-licence', el('span', 'kp-src-label', 'ライセンス '), lic));
+  }
+  return fold('kp-f-src', '出典', false, p);
 }
 
 /** もう一度／思い出せた, nothing else (CARD_CONTRACT_V2 §4: Hard and Easy are not shown).
@@ -917,7 +986,7 @@ function gradeBar(id) {
       'aria-keyshortcuts': key,
     });
   bar.append(g('again', 'もう一度', 'kp-again', '1'), g('good', '思い出せた', 'kp-good', '3'));
-  bar.append(el('p', 'kp-swipehint', '← もう一度　　スワイプ　　思い出せた →'));
+  if (hintsOn()) bar.append(el('p', 'kp-swipehint', '← もう一度　　スワイプ　　思い出せた →'));
   if (!ctx.prefs.ruleSeen) {
     const rule = el('p', 'kp-rule', el('span', null, RULE));
     rule.id = 'kp-rule';
@@ -938,6 +1007,63 @@ function reveal() {
   // read before any grade of this sitting: was this card answered on an earlier pass?
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
   if (!revealInPlace()) paint();
+  settleBack();
+}
+
+const SETTLE_GAP = 12;
+/**
+ * After the reveal, at phone width (STANDARD A38, A39): the target sentence, the word and its
+ * definition in view between the host's pinned header and the pinned grade bar, by the least
+ * scroll that does it (up when the learner had scrolled past the target sentence, down when the
+ * answer is under the bar); when all three cannot fit, the word and its definition win. Then no
+ * fold row is left cut by the bar: it is scrolled wholly into view, or wholly under the bar,
+ * whichever keeps the rest in view. Smooth unless reduced motion; nothing moves when it fits.
+ */
+function settleBack() {
+  const face = ctx.root.querySelector('#kp-card');
+  const answer = face?.querySelector('.kp-answer');
+  const def = answer?.querySelector(':scope > .kp-def');
+  if (!def || ui.screen !== 'study') return;
+  const bar = ctx.root.querySelector('.kp-grades');
+  const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
+  const bottomLimit = barTop - SETTLE_GAP;
+  const topLimit = topInset() + SETTLE_GAP;
+  // the answer may still be rising into place (kp-rise, translateY 6px → 0): measure where it lands
+  const t = getComputedStyle(answer).transform;
+  const lift = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0;
+  const target = face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
+  const top = target.getBoundingClientRect().top;
+  const bottom = def.getBoundingClientRect().bottom - lift;
+  let dy = 0;
+  if (bottom - top <= bottomLimit - topLimit) {
+    if (top < topLimit) dy = top - topLimit;
+    else if (bottom > bottomLimit) dy = bottom - bottomLimit;
+  } else dy = bottom - bottomLimit;
+  const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
+  dy = Math.max(room.up, Math.min(room.down, dy));
+  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+    const r = s.getBoundingClientRect();
+    const [rTop, rBottom] = [r.top - lift - dy, r.bottom - lift - dy];
+    if (!(rTop < barTop && rBottom > barTop)) continue;
+    // rows touch, so the edge goes exactly at the bar: the next (or the previous) row is then whole
+    const intoView = rBottom - barTop + 1; // scroll down: the row just above the bar
+    const underBar = barTop - rTop; // scroll up: the row wholly under the bar
+    if (top - dy - intoView >= topLimit && dy + intoView <= room.down) dy += intoView;
+    else if (bottom - dy + underBar <= bottomLimit && dy - underBar >= room.up) dy -= underBar;
+    break;
+  }
+  if (Math.abs(dy) < 1) return;
+  window.scrollTo({ top: window.scrollY + dy, behavior: motionOk() ? 'smooth' : 'instant' });
+}
+/** the height of a header the host pins over the top of the page (the corridor's chrome), if any */
+function topInset() {
+  let n = document.elementFromPoint(innerWidth / 2, 1);
+  while (n && n !== document.body && !ctx.root.contains(n)) {
+    const pos = getComputedStyle(n).position;
+    if (pos === 'fixed' || pos === 'sticky') return Math.max(0, n.getBoundingClientRect().bottom);
+    n = n.parentElement;
+  }
+  return 0;
 }
 
 /**
@@ -958,9 +1084,9 @@ function revealInPlace() {
     face.dataset.zoom = zoom;
     face.querySelector('.kp-chips').append(zoomToggle(zoom));
   }
-  const sentence = sentenceNodes(card, { blank: false, ruby: 'all', split: passage });
+  const sentence = sentenceNodes(card, { split: passage, clamp: passage });
   face.querySelector('.kp-sentence').replaceWith(sentence);
-  for (const n of face.querySelectorAll('.kp-hint, .kp-taphint, .kp-rhint')) n.remove();
+  for (const n of face.querySelectorAll('.kp-taphint, .kp-rhint')) n.remove();
   face.removeEventListener('click', reveal);
   const { nodes, answer } = backParts(card, word);
   face.append(...nodes);
@@ -972,6 +1098,7 @@ function revealInPlace() {
   box.classList.add('has-bar');
   attachSwipe(face);
   fitBar();
+  fitClamps(face);
   return true;
 }
 
@@ -1087,6 +1214,7 @@ function undo() {
   ui.revealed = cardMode() !== 'choice';
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
   paint();
+  if (ui.revealed) settleBack();
 }
 
 /**
@@ -1149,7 +1277,7 @@ function doneScreen() {
   box.append(topBar('おつかれさま', () => go('home')));
   const pct = ui.done ? Math.round((ui.right / ui.done) * 100) : 0;
   box.append(el('div', 'kp-tiles', el('div', 'kp-tile kp-c-new', el('b', null, String(ui.done)), el('span', null, '回答')), el('div', 'kp-tile kp-c-known', el('b', null, `${pct}%`), el('span', null, '思い出せた割合'))));
-  const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY)[0];
+  const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
   box.append(el('p', 'kp-sub', soon ? `次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。` : '今日の分は終わり。また明日。'));
   box.append(btn('kp-start', 'デッキに戻る', () => go('home'), { id: 'kp-home' }));
   if (ui.undo) box.append(btn('kp-undo', '↶ ひとつ戻す', undo, { id: 'kp-undo' }));
@@ -1195,7 +1323,7 @@ function listScreen() {
       if (ui.open === w.id) {
         const det = el('div', 'kp-detail');
         det.append(el('p', 'kp-def', w.defJa));
-        for (const c of w.cards) det.append(el('div', 'kp-ex', sentenceNodes(c, { blank: false, ruby: 'all' }), ...(c.en ? [el('p', 'kp-en', c.en)] : [])));
+        for (const c of w.cards) det.append(el('div', 'kp-ex', sentenceNodes(c, {}), ...(c.en ? [el('p', 'kp-en', c.en)] : [])));
         if (w.tip) det.append(el('p', 'kp-tip', w.tip));
         rows.append(det);
       }
@@ -1237,7 +1365,6 @@ function settingsScreen() {
   };
   box.append(seg('一日の新しいカード', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
-  box.append(seg('ヒント（穴埋め・4択）', 'hint', [['ja', '日本語の説明'], ['none', 'なし']]));
   box.append(seg('英語の意味（答えの「英語」）', 'gloss', [['tap', 'タップで開く'], ['show', 'いつも開いておく']]));
   const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
   const sw = el('div', 'kp-swatches');
@@ -1275,18 +1402,9 @@ function settingsScreen() {
           ta.select();
           navigator.clipboard?.writeText(ta.value).then(() => (msg.textContent = 'コピーしました。'), () => (msg.textContent = '選択しました。手動でコピーしてください。'));
         }),
+        // whole-deck reset is not offered (CARD_CONTRACT_V2 §4, STANDARD A34): a card leaves
+        // through 削除 (undone by 保留中のカード › 復元), a topic through テーマ
         restoreButton(ta, msg),
-        btn('kp-danger', '記録を消す', (e) => {
-          if (e.currentTarget.dataset.arm) {
-            const empty = emptyState(ctx.deck.id);
-            if (!save(empty)) return saveFailed();
-            ctx.state = empty;
-            go('home');
-          } else {
-            e.currentTarget.dataset.arm = '1';
-            e.currentTarget.textContent = 'もう一度押すと消えます';
-          }
-        }),
       ), msg),
   );
   return box;
@@ -1445,6 +1563,6 @@ export async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
-  const q = buildQueue(deck, state, new Date(), prefs.newPerDay);
+  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode) });
   return { due: q.due.length, fresh: q.fresh.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

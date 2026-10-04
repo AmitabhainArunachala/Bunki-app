@@ -206,3 +206,69 @@ describe('kotoba player engine: a card deleted on its first showing does not hol
     expect(engine.buildQueue(deck, deleted(['c1']), T, 5).fresh).toEqual(['c2']);
   });
 });
+
+describe('kotoba player engine: 読んで思い出す leaves 字 cards out without touching them (A37)', () => {
+  const mcd = {
+    id: 'demo',
+    groups: [{ id: 'g' }],
+    words: [
+      {
+        id: 'w',
+        group: 'g',
+        cards: [
+          { id: 'p1', type: 'word', passage: 1 },
+          { id: 'p1k', type: 'kanji', passage: 1 },
+          { id: 'p2', type: 'word', passage: 2 },
+        ],
+      },
+    ],
+  };
+  const skip = engine.skipFor('read');
+  const record = (over) => ({
+    due: new Date(T.getTime() + 10 * DAY).toISOString(),
+    stability: 20,
+    difficulty: 5,
+    elapsed_days: 20,
+    scheduled_days: 20,
+    reps: 3,
+    lapses: 0,
+    state: 2,
+    last_review: new Date(T.getTime() - 20 * DAY).toISOString(),
+    introducedAt: new Date(T.getTime() - 40 * DAY).toISOString(),
+    ...over,
+  });
+  const settled = { ...emptyState('demo'), cards: { p1: record() } };
+
+  it('only the read mode skips, and only 字 cards', () => {
+    expect(engine.skipFor('self')).toBeNull();
+    expect(engine.skipFor('choice')).toBeNull();
+    expect([{ type: 'kanji' }, { type: 'word' }, {}].map((c) => skip(c))).toEqual([
+      true,
+      false,
+      false,
+    ]);
+  });
+
+  it('a new 字 card is passed over: the next passage opens after the word card settles', () => {
+    expect(engine.buildQueue(mcd, settled, T, 5).fresh).toEqual(['p1k']);
+    expect(engine.buildQueue(mcd, settled, T, 5, { skip }).fresh).toEqual(['p2']);
+  });
+
+  it('a due 字 card waits in read mode and is due again in 穴埋め, its record untouched', () => {
+    const s = { ...settled, cards: { ...settled.cards, p1k: record({ due: T.toISOString() }) } };
+    const before = JSON.stringify(s);
+    expect(engine.buildQueue(mcd, s, T, 0, { skip }).due).toEqual([]);
+    expect(engine.buildQueue(mcd, s, T, 0).due).toEqual(['p1k']);
+    expect(engine.dueCount(mcd, s, T, { skip })).toBe(0);
+    expect(JSON.stringify(s)).toBe(before);
+  });
+
+  it('a 字 learning step does not come back into a read sitting', () => {
+    const s = {
+      ...settled,
+      cards: { ...settled.cards, p1k: record({ state: 1, due: T.toISOString() }) },
+    };
+    expect(engine.learningSoon(mcd, s, T, 0, { skip })).toEqual([]);
+    expect(engine.learningSoon(mcd, s, T, 0).map((x) => x.id)).toEqual(['p1k']);
+  });
+});

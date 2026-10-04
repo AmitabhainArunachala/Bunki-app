@@ -19,6 +19,12 @@
  * The page surface is --kp-bg with every translucent layer of --kp-tex stacked on it (the
  * textures live on the page, never on the card: aesthetics.md §5).
  *
+ * Distinctness (STANDARD A40): the 字 hue (--kp-kind-ji, a 字 card's edge and chip) must not
+ * nearly match another hue of its theme — the 語 and 文法 kinds, the six part-of-speech hues the
+ * target wears, the accent, the grade and state colours. Measured as the OKLab
+ * distance ×100 (ΔE_ok); floor 10. Before A40 washi and sakura gave 字 the verb's own blue
+ * (ΔE 0) and 墨, 白 and 抹茶 sat 4–7 from the sound-word pink.
+ *
  * Usage: node contrast-kotoba.mjs        prints the table, exits 1 when a pair is under its floor.
  *        import { contrastTable } from … returns { rows, failures } for the verifier.
  */
@@ -164,12 +170,49 @@ export function contrastTable(css) {
   return { rows, failures, floors: Object.fromEntries(ROWS.map(([l, f]) => [l, f])) };
 }
 
+/* ---------------------------------------------------------------- distinctness of the 字 hue */
+const linear = (c) => c.slice(0, 3).map((x) => ((x /= 255) <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+/** sRGB → OKLab (Björn Ottosson, 2020) */
+function oklab(c) {
+  const [r, g, b] = linear(c);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+}
+export const deltaE = (a, b) => {
+  const [p, q] = [oklab(a), oklab(b)];
+  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 100;
+};
+export const KIND_JI_FLOOR = 10;
+const KIND_JI_OTHERS = ['kind-go', 'kind-bun', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'cyan', 'red', 'green', 'amber'];
+/** per theme: the 字 hue, its contrast on the card, and the nearest other hue with its ΔE_ok */
+export function kindJiTable(css) {
+  const tokens = themeTokens(css);
+  const rows = [];
+  const failures = [];
+  for (const look of THEMES) {
+    const t = tokens[look];
+    const c = (k) => colour(`var(--kp-${k})`, t);
+    const ji = c('kind-ji');
+    const near = KIND_JI_OTHERS.map((k) => ({ token: k, d: deltaE(ji, c(k)) })).sort((a, b) => a.d - b.d)[0];
+    const row = { look, ji: colour(t['--kp-kind-ji'], t), value: t['--kp-kind-ji'], onCard: Math.round(ratio(ji, c('panel')) * 100) / 100, nearest: near.token, deltaE: Math.round(near.d * 10) / 10 };
+    rows.push(row);
+    if (near.d < KIND_JI_FLOOR) failures.push(`${look}: kind-ji ${row.value} is ΔE ${row.deltaE} from ${near.token} (< ${KIND_JI_FLOOR})`);
+  }
+  return { rows, failures };
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { rows, failures, floors } = contrastTable();
+  const ji = kindJiTable();
+  const { rows, failures: low, floors } = contrastTable();
+  const failures = [...low, ...ji.failures];
   const cols = Object.keys(floors);
   const pad = (s, n) => String(s).padEnd(n);
   console.log(`${pad('theme', 9)}${cols.map((c) => pad(`${c} ≥${floors[c]}`, 20)).join('')}`);
   for (const r of rows) console.log(`${pad(r.look, 9)}${cols.map((c) => pad(r[c].toFixed(2), 20)).join('')}`);
+  console.log(`\n字 hue (--kp-kind-ji): nearest other hue, ΔE_ok ≥ ${KIND_JI_FLOOR}`);
+  for (const r of ji.rows) console.log(`${pad(r.look, 9)}${pad(r.value, 10)}on card ${pad(r.onCard.toFixed(2), 7)}nearest ${pad(r.nearest, 9)}ΔE ${r.deltaE.toFixed(1)}`);
   console.log(failures.length ? `\n${failures.length} pair(s) under the floor:\n  ${failures.join('\n  ')}` : '\nevery pair clears its floor');
   process.exit(failures.length ? 1 : 0);
 }
