@@ -45,6 +45,14 @@ python3 -m http.server 8000 --directory prototypes/corridor
 Its verifier battery (real Chromium) lives in `prototypes/corridor/tools/` and
 runs via `docs/build-evidence/renkan/battery.sh`.
 
+### Private paragraph collections
+
+Open **集中道場 → 私の文脈**, or use `?deck=personal`, to import a private
+collection JSON and study it inside Bunki. The collection and its review
+history stay on the device. Export a complete backup to move between the
+iPhone Home Screen app and the Mac Dock app. See the
+[import, installation, and storage contract](docs/operator/PERSONAL_COLLECTIONS_2026-10-04.md).
+
 ### SKIP kanji lookup
 
 Open **字引 → SKIP**, or open search and type `1-3-8`, `skip:1-3-8`,
