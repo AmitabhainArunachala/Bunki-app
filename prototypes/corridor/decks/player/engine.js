@@ -77,20 +77,65 @@ export function emptyState(deckId) {
   return { format: STATE_FORMAT, version: VERSION, deckId, cards: {}, groupsOff: [], log: [] };
 }
 
+/** a stored card that the scheduler can read back: a parseable due date, finite
+ * numbers and a known FSRS state */
+function isCardRecord(stored) {
+  if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return false;
+  if (typeof stored.due !== 'string' || Number.isNaN(Date.parse(stored.due))) return false;
+  if (stored.last_review != null && (typeof stored.last_review !== 'string' || Number.isNaN(Date.parse(stored.last_review)))) return false;
+  for (const key of ['stability', 'difficulty', 'reps', 'lapses']) if (!Number.isFinite(stored[key])) return false;
+  return Number.isInteger(stored.state) && stored.state >= 0 && stored.state <= 3;
+}
+
+const LOG_KEEP = 5000;
+
+/**
+ * What a pasted backup holds, without changing anything.
+ * reason: null when ok, else 'not-an-object' | 'wrong-format' | 'wrong-version' |
+ * 'wrong-deck' | 'empty' | 'bad-card'. cards = every record, known = records for
+ * cards in this deck, orphans = records for cards no longer in it, log = answers kept.
+ */
+export function inspectState(raw, deck) {
+  const out = { ok: false, reason: null, cards: 0, known: 0, orphans: 0, log: 0 };
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ...out, reason: 'not-an-object' };
+  const cards = raw.cards;
+  if (cards != null && (typeof cards !== 'object' || Array.isArray(cards))) return { ...out, reason: 'wrong-format' };
+  const entries = Object.entries(cards || {});
+  const ids = new Set(deck.words.flatMap((w) => w.cards.map((c) => c.id)));
+  out.cards = entries.length;
+  out.known = entries.filter(([id]) => ids.has(id)).length;
+  out.orphans = out.cards - out.known;
+  out.log = Array.isArray(raw.log) ? Math.min(raw.log.length, LOG_KEEP) : 0;
+  if (!entries.length) return { ...out, reason: 'empty' };
+  if (raw.format !== STATE_FORMAT) return { ...out, reason: 'wrong-format' };
+  if (raw.version !== VERSION) return { ...out, reason: 'wrong-version' };
+  if (raw.deckId !== deck.id) return { ...out, reason: 'wrong-deck' };
+  if (!entries.every(([, stored]) => isCardRecord(stored))) return { ...out, reason: 'bad-card' };
+  return { ...out, ok: true };
+}
+
+/**
+ * The stored ledger, cleaned. A ledger for another deck, format or version is
+ * not read at all. Inside it, only malformed card records are dropped: a record
+ * for a card that is no longer in the deck (an orphan) is kept, so a later deck
+ * build that brings the card back finds its history. Orphans are inert:
+ * buildQueue, introducedToday (via buildQueue), wordStatus and learningSoon
+ * all walk the deck's own cards, never state.cards.
+ */
 export function normalizeState(raw, deck) {
   if (!raw || raw.format !== STATE_FORMAT || raw.version !== VERSION || raw.deckId !== deck.id) {
     return emptyState(deck.id);
   }
-  const known = new Set(deck.words.flatMap((w) => w.cards.map((c) => c.id)));
   const cards = {};
-  for (const [id, stored] of Object.entries(raw.cards || {})) {
-    if (known.has(id) && stored && typeof stored.due === 'string') cards[id] = stored;
+  const stored = raw.cards && typeof raw.cards === 'object' && !Array.isArray(raw.cards) ? raw.cards : {};
+  for (const [id, record] of Object.entries(stored)) {
+    if (isCardRecord(record)) cards[id] = record;
   }
   return {
     ...emptyState(deck.id),
     cards,
     groupsOff: Array.isArray(raw.groupsOff) ? raw.groupsOff.filter((g) => typeof g === 'string') : [],
-    log: Array.isArray(raw.log) ? raw.log.slice(-5000) : [],
+    log: Array.isArray(raw.log) ? raw.log.slice(-LOG_KEEP) : [],
   };
 }
 
@@ -137,9 +182,11 @@ function nextNewCard(word, state, unlockDays = UNLOCK_STABILITY_DAYS) {
   return null;
 }
 
-export function introducedToday(state, now) {
+/** cards first shown today; with a deck, only that deck's cards count (orphans do not) */
+export function introducedToday(state, now, deck) {
   const day = dayKey(now);
-  return Object.values(state.cards).filter((c) => c.introducedAt && dayKey(new Date(c.introducedAt)) === day).length;
+  const records = deck ? deck.words.flatMap((w) => w.cards.map((c) => state.cards[c.id]).filter(Boolean)) : Object.values(state.cards);
+  return records.filter((c) => c.introducedAt && dayKey(new Date(c.introducedAt)) === day).length;
 }
 
 /**
@@ -173,7 +220,7 @@ export function buildQueue(deck, state, now, newPerDay) {
     seen.add(item.word.id);
     dueOut.push(item.card.id);
   }
-  let room = Math.max(0, newPerDay - introducedToday(state, now));
+  let room = Math.max(0, newPerDay - introducedToday(state, now, deck));
   for (const word of deck.words) {
     if (!room) break;
     if (off.has(word.group) || seen.has(word.id) || busyWords.has(word.id)) continue;

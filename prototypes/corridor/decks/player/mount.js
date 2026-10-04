@@ -12,6 +12,7 @@ import {
   emptyState,
   grade,
   indexDeck,
+  inspectState,
   learningSoon,
   normalizeState,
   preview,
@@ -44,9 +45,13 @@ async function loadDeck(deckId) {
 /* ------------------------------------------------------------- state */
 const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap', gloss: 'show' };
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
-let ctx = null; // { root, deck, index, storage, onLeave, state, prefs }
+let ctx = null; // { root, deck, index, storage, onLeave, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
+/** the ledger as it was just before a restore replaced it */
+const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
+/** a stored ledger this player could not read, set aside before anything is saved over it */
+const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
 const prefsFor = (storage, deck) => ({ ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) });
 function readJson(storage, key) {
@@ -63,6 +68,44 @@ function writeJson(storage, key, value) {
   } catch {
     return false;
   }
+}
+function writeRaw(storage, key, text) {
+  try {
+    storage.setItem(key, text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+const QUARANTINED = '前の記録を読み取れなかったので、別に保管しました。';
+/**
+ * The stored ledger for a deck. When the stored text is there but none of its
+ * card records can be read, the text is copied to the quarantine key first, so
+ * the next save cannot erase it; notice then says so.
+ */
+function loadState(storage, deck) {
+  let text = null;
+  try {
+    text = storage.getItem(stateKey(deck.id));
+  } catch {
+    text = null;
+  }
+  let raw = null;
+  let unreadable = false;
+  if (text != null) {
+    try {
+      raw = JSON.parse(text);
+    } catch {
+      unreadable = true;
+    }
+  }
+  const state = normalizeState(raw, deck);
+  const storedCards = raw && typeof raw === 'object' && raw.cards && typeof raw.cards === 'object' ? Object.keys(raw.cards).length : 0;
+  if (text != null && !Object.keys(state.cards).length && (unreadable || storedCards)) {
+    const kept = writeRaw(storage, quarantineKey(deck.id), text);
+    return { state, notice: kept ? QUARANTINED : '' };
+  }
+  return { state, notice: '' };
 }
 /** write a candidate ledger; the caller adopts it only when this returns true */
 function save(state) {
@@ -184,6 +227,7 @@ function homeScreen() {
   const box = el('section', 'kp-home');
   box.append(topBar(deck.titleJa, ctx.onLeave ? () => ctx.onLeave() : null));
   box.append(el('p', 'kp-sub', `${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚 · ${deck.titleEn}`));
+  if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', ctx.notice));
 
   const tiles = el('div', 'kp-tiles');
   const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
@@ -635,6 +679,7 @@ function settingsScreen() {
   ta.id = 'kp-backup';
   ta.spellcheck = false;
   const msg = el('p', 'kp-sub');
+  msg.id = 'kp-backup-msg';
   box.append(
     el('div', 'kp-field', el('h2', 'kp-h2', 'バックアップ'), el('p', 'kp-sub', '記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。'), ta,
       el('div', 'kp-seg',
@@ -643,21 +688,7 @@ function settingsScreen() {
           ta.select();
           navigator.clipboard?.writeText(ta.value).then(() => (msg.textContent = 'コピーしました。'), () => (msg.textContent = '選択しました。手動でコピーしてください。'));
         }),
-        btn('', '復元', () => {
-          try {
-            const raw = JSON.parse(ta.value);
-            const next = normalizeState(raw, ctx.deck);
-            if (!Object.keys(next.cards).length && Object.keys(raw?.cards || {}).length) throw new Error('mismatch');
-            if (!save(next)) {
-              msg.textContent = SAVE_FAILED;
-              return;
-            }
-            ctx.state = next;
-            msg.textContent = '復元しました。';
-          } catch {
-            msg.textContent = 'このデッキのバックアップではありません。';
-          }
-        }),
+        restoreButton(ta, msg),
         btn('kp-danger', '記録を消す', (e) => {
           if (e.currentTarget.dataset.arm) {
             const empty = emptyState(ctx.deck.id);
@@ -672,6 +703,80 @@ function settingsScreen() {
       ), msg),
   );
   return box;
+}
+
+const RESTORE_REFUSED = {
+  json: '読み取れません。バックアップの文字列をそのまま貼り付けてください。',
+  'not-an-object': 'このデッキのバックアップではありません。',
+  'wrong-format': 'このデッキのバックアップではありません。',
+  'wrong-version': 'このデッキのバックアップではありません。',
+  'wrong-deck': 'このデッキのバックアップではありません。',
+  empty: 'カードの記録が入っていません。',
+  'bad-card': '壊れた記録が含まれています。',
+};
+const RESTORE_NO_ROOM = '保存領域がいっぱいで、置き換えられませんでした。';
+
+/**
+ * 復元: the first tap only checks the pasted backup and shows both counts; a
+ * second tap on 置き換える keeps a copy of the current ledger under
+ * bunki-cloze:<deck>:before-restore and only then writes the backup. Anything
+ * that fails leaves the stored ledger and ctx.state as they were.
+ */
+function restoreButton(ta, msg) {
+  let staged = null;
+  const b = btn('', '復元', () => {
+    if (staged && staged.text === ta.value) return replace();
+    disarm();
+    let raw;
+    try {
+      raw = JSON.parse(ta.value);
+    } catch {
+      msg.textContent = RESTORE_REFUSED.json;
+      return;
+    }
+    const seen = inspectState(raw, ctx.deck);
+    if (!seen.ok) {
+      msg.textContent = RESTORE_REFUSED[seen.reason] || RESTORE_REFUSED['wrong-format'];
+      return;
+    }
+    const nowCards = Object.keys(ctx.state.cards).length;
+    const nowLog = ctx.state.log.length;
+    msg.textContent = `このバックアップ：${seen.cards}枚・${seen.log}回答／いまの記録：${nowCards}枚・${nowLog}回答` + (seen.cards < nowCards ? '　いまより少ない記録です。' : '');
+    staged = { text: ta.value, raw };
+    b.dataset.arm = '1';
+    b.textContent = '置き換える';
+  }, { id: 'kp-restore' });
+  function disarm() {
+    staged = null;
+    delete b.dataset.arm;
+    b.textContent = '復元';
+  }
+  function replace() {
+    const { raw } = staged;
+    disarm();
+    const key = stateKey(ctx.deck.id);
+    let current = null;
+    try {
+      current = ctx.storage.getItem(key);
+    } catch {
+      current = null;
+    }
+    if (!writeRaw(ctx.storage, beforeRestoreKey(ctx.deck.id), current ?? JSON.stringify(ctx.state))) {
+      msg.textContent = RESTORE_NO_ROOM;
+      return;
+    }
+    const next = normalizeState(raw, ctx.deck);
+    if (!save(next)) {
+      msg.textContent = RESTORE_NO_ROOM;
+      return;
+    }
+    ctx.state = next;
+    ctx.notice = '';
+    ui.undo = null;
+    msg.textContent = `復元しました（${Object.keys(next.cards).length}枚・${next.log.length}回答）。`;
+  }
+  ta.addEventListener('input', () => staged && disarm());
+  return b;
 }
 
 function onKey(e) {
@@ -712,9 +817,9 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     index,
     storage,
     onLeave,
-    state: normalizeState(readJson(storage, stateKey(deck.id)), deck),
     prefs: prefsFor(storage, deck),
   };
+  ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
   if (!sameDeck) {
     ui.screen = 'home';
     ui.queue = [];
@@ -729,7 +834,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
 /** due count for a deck chooser, without rendering anything */
 export async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
-  const state = normalizeState(readJson(storage, stateKey(deck.id)), deck);
+  const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
   const q = buildQueue(deck, state, new Date(), prefs.newPerDay);
   return { due: q.due.length, fresh: q.fresh.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
