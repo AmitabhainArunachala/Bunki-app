@@ -68,10 +68,10 @@
  *      with prefers-reduced-motion nothing moves or fades, and a swipe does not drag the card.
  *
  * Then the review loop (CARD_CONTRACT_V2 §3.7, §4), both decks where it applies:
- *   a) 削除 on the back is one tap: the card leaves the sitting and every later queue, its FSRS
+ *   a) 削除 in the study top bar is one tap: the card leaves the sitting and every later queue, its FSRS
  *      record and id untouched (ledger: suspended, repairLog); the toast's 元に戻す brings it
  *      back; 設定 › 保留中のカード counts it and 復元 returns it to the queue;
- *   b) a card that has lapsed LEECH_LAPSES (5) times shows the repair ladder on its back, in
+ *   b) a card that has lapsed LEECH_LAPSES (5) times shows the repair ladder on its back after tier one, in
  *      order 別の文に替える → ヒントを付ける → 保留, each one tap and logged: the swap suspends the
  *      card and puts the word's next unseen passage on screen (due at once, after a reload too);
  *      the hint is stored in the ledger and shown on this card's front only, marked repaired
@@ -89,7 +89,7 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AxeBuilder } from '@axe-core/playwright';
 import { chromium } from 'playwright-core';
@@ -833,8 +833,22 @@ function familyOf(deck, word, learned) {
     })
     .filter((r) => r.same.length || r.read.length);
 }
-function verifyReviewData(decks) {
+async function verifyReviewData(decks) {
   const engine = readFileSync(ENGINE_PATH, 'utf8');
+  // a card deleted on its first showing (no record) never holds its word: the next passage is the first
+  {
+    const { buildQueue, emptyState } = await import(pathToFileURL(ENGINE_PATH).href);
+    const now = new Date('2026-10-04T09:00:00Z');
+    const culled = (d, ids) => ({ ...emptyState(d.id), suspended: Object.fromEntries(ids.map((id) => [id, { at: now.toISOString(), by: 'delete' }])) });
+    const freshOf = (d, wordId, ids) => buildQueue({ ...d, words: d.words.filter((w) => w.id === wordId) }, culled(d, ids), now, 5).fresh;
+    const [mcd, mine] = decks;
+    const got = { mcd: freshOf(mcd, 'km-064', ['km-064-m01']), mcdKanji: freshOf(mcd, 'km-064', ['km-064-m02']), mine: freshOf(mine, 'km-064', ['km-064-1']) };
+    check(
+      'a) 削除 on a card never shown does not hold the word: the next passage (not that passage\'s 字 cards) becomes its first; deleting a 字 card leaves its passage first',
+      got.mcd.join() === 'km-064-m04' && got.mcdKanji.join() === 'km-064-m01' && got.mine.join() === 'km-064-2',
+      JSON.stringify(got),
+    );
+  }
   const constant = (name) => engine.match(new RegExp(`const ${name} = (\\d+);`))?.[1];
   check(
     'b) the leech threshold is 5 lapses (LEECH_LAPSES, contract §4); the unlock constants are unchanged (14 days, 3 lapses)',
@@ -937,7 +951,7 @@ async function verifyReview(browser, base) {
       const first = await onScreen(o.page);
       const before = await read(o.page, deck);
       const tools = await o.page.evaluate(`(() => { const d = document.getElementById('kp-delete'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; const at = (dy) => document.elementFromPoint(cx, cy + dy) === d;
-        return { inCard: !!d.closest('#kp-card'), afterAnswer: !!d.closest('.kp-tools')?.previousElementSibling?.classList.contains('kp-answer'), h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
+        return { inTop: !!d.closest('.kp-top-study') && !d.closest('#kp-card'), lastInTop: d.parentElement.lastElementChild === d, h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
       await o.page.click('#kp-delete');
       await o.page.waitForSelector('#kp-toast-undo');
       const gone = await onScreen(o.page);
@@ -961,8 +975,8 @@ async function verifyReview(browser, base) {
       const homeAfter = await o.page.evaluate(`document.getElementById('kp-start').textContent`);
       const lastRow = l1.repairLog?.at(-1) ?? [];
       check(
-        `a) ${deck}: 削除 under the answer (one tap, 44px reach) takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
-        tools.inCard && tools.afterAnswer && tools.reach && tools.label === '削除' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /削除しました/.test(gone.toast) &&
+        `a) ${deck}: 削除 at the right end of the study top bar (one tap, 44px reach) takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
+        tools.inTop && tools.lastInTop && tools.h >= 44 && tools.reach && tools.label === '削除' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /削除しました/.test(gone.toast) &&
           l1.suspended?.[a]?.by === 'delete' && JSON.stringify(l1.cards[a]) === JSON.stringify(before.cards[a]) && lastRow[0] === a && lastRow[1] === 'delete' && !l1.suspended?.[b] &&
           back.id === a && back.revealed && back.count === '1/2' && !l2.suspended?.[a],
         JSON.stringify({ tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
@@ -985,7 +999,10 @@ async function verifyReview(browser, base) {
       await revealCard(o.page);
       const ladder = await o.page.evaluate(`(() => { const l = document.getElementById('kp-ladder'); if (!l) return null; const steps = [...l.querySelectorAll('.kp-ladder-step')];
         return { head: l.querySelector('.kp-ladder-head').textContent, steps: steps.map((b) => b.dataset.step), labels: steps.map((b) => b.querySelector('b').textContent), enabled: steps.map((b) => !b.disabled), swapTo: steps[0].querySelector('small').textContent, hint: steps[1].querySelector('small').textContent,
-          beforeAnswer: l.nextElementSibling?.classList.contains('kp-answer'), afterPassage: l.previousElementSibling?.classList.contains('kp-sentence'), keep: !!document.getElementById('kp-ladder-keep') }; })()`);
+          afterTierOne: !!l.previousElementSibling?.matches('.kp-def, .kp-note'), beforeFolds: !!l.nextElementSibling?.matches('.kp-folds'), inAnswer: l.parentElement.classList.contains('kp-answer'), keep: !!document.getElementById('kp-ladder-keep') }; })()`);
+      // tier one stays on the first screen with the ladder shown (learning-design L0 + L1 + grade bar at 390×844)
+      const firstScreen = await o.page.evaluate(`(() => { const box = (s) => document.querySelector(s).getBoundingClientRect(); const t = box('.kp-term'), d = box('.kp-def'), g = box('.kp-grades');
+        return { vh: innerHeight, scrollY: Math.round(scrollY), term: [Math.round(t.top), Math.round(t.bottom)], def: [Math.round(d.top), Math.round(d.bottom)], bar: Math.round(g.top) }; })()`);
       await o.page.click('#kp-ladder-hint');
       await o.page.waitForSelector('.kp-grade');
       const hinted = { ladder: await o.page.locator('#kp-ladder').count(), ledger: await read(o.page, 'kotoba-mcd') };
@@ -995,9 +1012,14 @@ async function verifyReview(browser, base) {
       await revealCard(o.page);
       const noLadder = await o.page.locator('#kp-ladder').count();
       check(
-        'b) a card with 5 lapses shows the repair ladder between the passage and the answer, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
-        ladder && ladder.head === 'この文で5回つまずいています' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith('文章2へ') && ladder.afterPassage && ladder.beforeAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
+        'b) a card with 5 lapses shows the repair ladder after tier one (the definition or usage note) and before the folds, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
+        ladder && ladder.head === 'この文で5回つまずいています' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith('文章2へ') && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
         JSON.stringify({ ladder, second: second.id, noLadder }),
+      );
+      check(
+        'b) with the ladder shown on km-064-m01 at 390×844, the revealed word (.kp-term) and its definition sit inside the first screen, above the grade bar, with no scroll',
+        firstScreen.scrollY === 0 && firstScreen.vh === 844 && firstScreen.term[0] >= 0 && firstScreen.term[1] <= firstScreen.bar && firstScreen.def[1] <= firstScreen.bar,
+        JSON.stringify(firstScreen),
       );
       const r = hinted.ledger.repairs?.['km-064-m01'];
       check(
@@ -1569,7 +1591,7 @@ async function main() {
     await verifyVisual(browser, base);
 
     console.log('\n— the review loop (CARD_CONTRACT_V2 §3.7, §4): delete, leech ladder, kanji family, see-also');
-    verifyReviewData([deck, sentences]);
+    await verifyReviewData([deck, sentences]);
     await verifyReview(browser, base);
   } finally {
     await browser.close();

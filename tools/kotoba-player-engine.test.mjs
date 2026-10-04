@@ -164,3 +164,45 @@ describe('kotoba player engine: a backup is checked before it can replace anythi
     expect(engine.buildQueue(deck, state, T, 1).fresh).toEqual(['c1']);
   });
 });
+
+describe('kotoba player engine: a card deleted on its first showing does not hold the word', () => {
+  const mcd = {
+    id: 'demo',
+    groups: [{ id: 'g' }],
+    words: [
+      {
+        id: 'w',
+        group: 'g',
+        cards: [
+          { id: 'p1', type: 'word', passage: 1 },
+          { id: 'p1k', type: 'kanji', passage: 1 },
+          { id: 'p2', type: 'word', passage: 2 },
+          { id: 'p3', type: 'word', passage: 3 },
+        ],
+      },
+    ],
+  };
+  const deleted = (ids) => ({
+    ...emptyState('demo'),
+    suspended: Object.fromEntries(ids.map((id) => [id, { at: T.toISOString(), by: 'delete' }])),
+  });
+
+  it('the next passage becomes the first, skipping the culled passage’s 字 cards', () => {
+    expect(engine.buildQueue(mcd, deleted(['p1']), T, 5).fresh).toEqual(['p2']);
+    expect(engine.buildQueue(mcd, deleted(['p1', 'p2']), T, 5).fresh).toEqual(['p3']);
+  });
+
+  it('a culled 字 card alone leaves its passage in place', () => {
+    expect(engine.buildQueue(mcd, deleted(['p1k']), T, 5).fresh).toEqual(['p1']);
+  });
+
+  it('after a shown card the unlock test reads the last shown card, as before', () => {
+    const s = grade(fsrsApi, scheduler, deleted(['p1k']), 'p1', RATINGS.good, T);
+    const later = new Date(T.getTime() + 2 * DAY);
+    expect(engine.buildQueue(mcd, s, later, 5).fresh).toEqual([]);
+  });
+
+  it('the sentence deck: deleting sentence 1 unseen introduces sentence 2', () => {
+    expect(engine.buildQueue(deck, deleted(['c1']), T, 5).fresh).toEqual(['c2']);
+  });
+});

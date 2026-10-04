@@ -431,7 +431,7 @@ function studyScreen() {
   top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': '終わる', id: 'kp-quit' }));
   const prog = el('div', 'kp-progress');
   prog.append(rail(ui.pos / total));
-  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`));
+  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
   box.append(top);
 
   const stored = ctx.state.cards[id];
@@ -624,6 +624,9 @@ function answerBlock(card, word) {
   // a usage note in Japanese stays in tier one; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
   if (jaNote) a.append(el('p', 'kp-note', word.tip));
+  // a leech's repair ladder (§4) sits after tier one and before the folds, so the word, its
+  // reading and the definition stay pinned under the passage on every card (learning-design L1)
+  if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
 
   const folds = el('div', 'kp-folds');
   // English text carries lang='en'; the summaries and labels stay Japanese for screen readers
@@ -776,20 +779,19 @@ const SWAPPED = '別の文に替えました。前の文は保留にしました
 const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
 const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
 
-/** the back's nodes in order: the ladder (a leech only), the answer, the card's tools */
+/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds) */
 function backParts(card, word) {
   const answer = answerBlock(card, word);
-  return { answer, nodes: [isLeech(ctx.state, card.id) ? leechLadder(card, word) : null, answer, cardTools()].filter(Boolean) };
+  return { answer, nodes: [answer] };
 }
 
-/** under the answer: 削除, one tap, undone from the toast or ↶ for the rest of the sitting */
-function cardTools() {
-  const row = el('div', 'kp-tools');
-  row.append(btn('kp-delete', '削除', (e) => {
+/** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
+ * from the toast or ↶ for the rest of the sitting */
+function deleteButton() {
+  return btn('kp-delete', '削除', (e) => {
     e.stopPropagation();
     deleteCard();
-  }, { id: 'kp-delete', 'aria-label': 'このカードを削除（保留にする・あとで戻せる）' }));
-  return row;
+  }, { id: 'kp-delete', 'aria-label': 'このカードを削除（保留にする・あとで戻せる）' });
 }
 
 /** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the
@@ -812,7 +814,7 @@ function leechLadder(card, word) {
   const lapses = ctx.state.cards[card.id]?.lapses ?? 0;
   const head = `この文で${lapses}回つまずいています`;
   box.setAttribute('aria-label', head);
-  box.append(el('p', 'kp-ladder-head', head));
+  box.append(el('p', 'kp-ladder-head', `この文で`, el('span', 'kp-chip kp-st-learn kp-ladder-n', `${lapses}回`), 'つまずいています'));
   const target = swapTarget(word, card, ctx.state);
   const hint = ctx.state.repairs?.[card.id]?.hint ? '' : repairHint(card, word);
   const steps = el('ol', 'kp-ladder-steps');
