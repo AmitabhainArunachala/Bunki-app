@@ -53,6 +53,14 @@ Its browser verifiers live in `prototypes/corridor/tools/`; the required checks
 are registered in [the release gate runner](scripts/verify-release-gates.mjs).
 Build artifacts and executed evidence belong outside the checkout.
 
+### Private paragraph collections
+
+Open **集中道場 → 私の文脈**, or use `?deck=personal`, to import a private
+collection JSON and study it inside Bunki. The collection and its review
+history stay on the device. Export a complete backup to move between the
+iPhone Home Screen app and the Mac Dock app. See the
+[import, installation, and storage contract](docs/operator/PERSONAL_COLLECTIONS_2026-10-04.md).
+
 ### SKIP kanji lookup
 
 Open **字引 → SKIP**, or open search and type `1-3-8`, `skip:1-3-8`,

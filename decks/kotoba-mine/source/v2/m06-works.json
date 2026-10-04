@@ -1,0 +1,642 @@
+{
+  "id": "m06-works",
+  "cards": [
+    {
+      "n": 307,
+      "term": "施工",
+      "reading": "せこう",
+      "meaning": "construction work",
+      "def_ja": "建物や道路などの工事を実際に行うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この家は地元の工務店が施工した。",
+          "form": "施工",
+          "en": "This house was built by a local builder."
+        },
+        {
+          "lv": 2,
+          "ja": "施工の不備が原因で、雨漏りが起きた。",
+          "form": "施工",
+          "en": "The roof leak was caused by poor workmanship."
+        },
+        {
+          "lv": 3,
+          "ja": "設計どおりに施工されていなかったことが分かり、マンションの一部が建て直されることになった。",
+          "form": "施工",
+          "en": "It turned out the building had not been built to the design, so part of the condominium will be rebuilt."
+        }
+      ],
+      "tip": "Usually read せこう; しこう also exists in dictionaries."
+    },
+    {
+      "n": 309,
+      "term": "設計",
+      "reading": "せっけい",
+      "meaning": "design; planning",
+      "def_ja": "作る前に形やしくみを考えて図にすること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "父は橋の設計をしている。",
+          "form": "設計",
+          "en": "My father designs bridges."
+        },
+        {
+          "lv": 2,
+          "ja": "将来に備えて、早めに人生設計を考えておきたい。",
+          "form": "設計",
+          "en": "I want to plan out my life early to prepare for the future."
+        },
+        {
+          "lv": 3,
+          "ja": "車いすの人も使いやすいように、トイレの入口は広めに設計されている。",
+          "form": "設計",
+          "en": "The toilet entrance is designed to be wide so that wheelchair users can use it easily."
+        }
+      ],
+      "tip": "Also used for plans that are not buildings, such as 人生設計 and 制度設計."
+    },
+    {
+      "n": 310,
+      "term": "崩落",
+      "reading": "ほうらく",
+      "meaning": "collapse; cave-in",
+      "def_ja": "崖や建物の一部などが、くずれて落ちること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "トンネルの天井が崩落した。",
+          "form": "崩落",
+          "en": "The tunnel ceiling collapsed."
+        },
+        {
+          "lv": 2,
+          "ja": "大雨で山の斜面が崩落し、道路がふさがれた。",
+          "form": "崩落",
+          "en": "Heavy rain caused the mountainside to collapse and block the road."
+        },
+        {
+          "lv": 3,
+          "ja": "古い橋が崩落した事故を受けて、国は全国の橋の点検を急いでいる。",
+          "form": "崩落",
+          "en": "After the accident in which an old bridge collapsed, the government is rushing to inspect bridges nationwide."
+        }
+      ],
+      "tip": "A news word for bridges, tunnels, ceilings and cliffs falling down."
+    },
+    {
+      "n": 311,
+      "term": "修繕費",
+      "reading": "しゅうぜんひ",
+      "meaning": "repair costs",
+      "def_ja": "建物や設備の傷んだところを直すお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "マンションの修繕費が上がった。",
+          "form": "修繕費",
+          "en": "The repair fees for the condominium went up."
+        },
+        {
+          "lv": 2,
+          "ja": "古い家を買うと、あとで修繕費がかなりかかる。",
+          "form": "修繕費",
+          "en": "If you buy an old house, repairs end up costing quite a lot later."
+        },
+        {
+          "lv": 3,
+          "ja": "屋根や外壁の修繕費を積み立てるため、住民は毎月一定の金額を管理組合に払っている。",
+          "form": "修繕費",
+          "en": "To save up for roof and wall repairs, residents pay a fixed amount to the management association every month."
+        }
+      ],
+      "tip": "Condo owners pay into a fund called 修繕積立金."
+    },
+    {
+      "n": 312,
+      "term": "精査",
+      "reading": "せいさ",
+      "meaning": "close examination",
+      "def_ja": "細かいところまで、くわしく調べること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "資料をもう一度精査してください。",
+          "form": "精査",
+          "en": "Please examine the documents closely once more."
+        },
+        {
+          "lv": 2,
+          "ja": "内容を精査したうえで、改めて回答します。",
+          "form": "精査",
+          "en": "We will reply after carefully examining the details."
+        },
+        {
+          "lv": 3,
+          "ja": "予算の使い道を精査した結果、必要のない支出が数多く見つかった。",
+          "form": "精査",
+          "en": "A close look at how the budget was spent turned up many unnecessary expenses."
+        }
+      ],
+      "tip": "精査したうえで回答します is also a polite way of putting off an answer."
+    },
+    {
+      "n": 314,
+      "term": "訴額",
+      "reading": "そがく",
+      "meaning": "amount claimed in a lawsuit",
+      "def_ja": "裁判で相手に求める金額などの価値。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この裁判の訴額は百万円だ。",
+          "form": "訴額",
+          "en": "The amount claimed in this lawsuit is one million yen."
+        },
+        {
+          "lv": 2,
+          "ja": "訴額が百四十万円以下の裁判は、簡易裁判所で扱われる。",
+          "form": "訴額",
+          "en": "Cases where the amount claimed is 1.4 million yen or less are handled by summary courts."
+        },
+        {
+          "lv": 3,
+          "ja": "裁判所に払う手数料は訴額によって決まるので、請求額が大きいほど費用も高くなる。",
+          "form": "訴額",
+          "en": "Court fees depend on the amount claimed, so the bigger the claim, the higher the cost."
+        }
+      ],
+      "tip": "Legal term; you will rarely see it outside court documents and law guides."
+    },
+    {
+      "n": 315,
+      "term": "妥当性",
+      "reading": "だとうせい",
+      "meaning": "validity; reasonableness",
+      "def_ja": "考えや数字が、その場に合っていて正しいこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "その判断の妥当性が問われている。",
+          "form": "妥当性",
+          "en": "The soundness of that decision is being questioned."
+        },
+        {
+          "lv": 2,
+          "ja": "専門家が工事費の妥当性を調べている。",
+          "form": "妥当性",
+          "en": "Experts are checking whether the construction costs are reasonable."
+        },
+        {
+          "lv": 3,
+          "ja": "調査に使ったデータが古かったため、報告書の結論の妥当性を疑う声が上がった。",
+          "form": "妥当性",
+          "en": "Because the survey used old data, people questioned whether the report's conclusions were valid."
+        }
+      ],
+      "tip": "妥当性 is the quality being checked; the act of checking is 検証."
+    },
+    {
+      "n": 304,
+      "term": "訂正",
+      "reading": "ていせい",
+      "meaning": "correction",
+      "def_ja": "言葉や数字などの間違いを正しく直すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "名前の間違いを訂正した。",
+          "form": "訂正",
+          "en": "I corrected the mistake in the name."
+        },
+        {
+          "lv": 2,
+          "ja": "昨日の記事で数字に誤りがありましたので、訂正しておわびします。",
+          "form": "訂正",
+          "en": "Some figures in yesterday's article were wrong, so we correct them and apologize."
+        },
+        {
+          "lv": 3,
+          "ja": "大臣は会見での発言が誤りだったと認め、翌日になって正式に訂正した。",
+          "form": "訂正",
+          "en": "The minister admitted that his remark at the press conference was wrong and formally corrected it the next day."
+        }
+      ],
+      "tip": "訂正しておわびします is the fixed phrase newspapers use for corrections."
+    },
+    {
+      "n": 306,
+      "term": "事前に必要",
+      "reading": "じぜんにひつよう",
+      "meaning": "required in advance",
+      "def_ja": "何かをする前に済ませておかなければならないこと。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この店は予約が事前に必要ですか。",
+          "form": "事前に必要",
+          "en": "Do I need to book this restaurant in advance?"
+        },
+        {
+          "lv": 2,
+          "ja": "ビザの申請で事前に必要な書類を、大使館のホームページで確認した。",
+          "form": "事前に必要",
+          "en": "I checked the embassy's website for the documents I need before applying for a visa."
+        },
+        {
+          "lv": 3,
+          "ja": "工事を始めるには役所の許可が事前に必要なので、申請は早めに出しておいたほうがいい。",
+          "form": "事前に必要",
+          "en": "You need permission from the city office before starting construction, so it's best to apply early."
+        }
+      ],
+      "tip": "Not one word, just 事前に plus 必要; 事前に予約が必要です is the more common order."
+    },
+    {
+      "n": 170,
+      "term": "動線計画",
+      "reading": "どうせんけいかく",
+      "meaning": "flow planning (of movement)",
+      "def_ja": "建物の中で人がどう動くかを考えて通り道を決めること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "店の動線計画を見直した。",
+          "form": "動線計画",
+          "en": "We reviewed the store's customer flow plan."
+        },
+        {
+          "lv": 2,
+          "ja": "動線計画がよくないと、客が店の奥まで入らない。",
+          "form": "動線計画",
+          "en": "If the layout for customer flow is poor, customers won't go to the back of the store."
+        },
+        {
+          "lv": 3,
+          "ja": "新しい病院では、患者と職員がぶつからないように、設計の段階で動線計画を練り直した。",
+          "form": "動線計画",
+          "en": "For the new hospital, the flow plan was reworked at the design stage so that patients and staff would not run into each other."
+        }
+      ],
+      "tip": "An architecture term; in home talk people just say 動線, as in 家事動線."
+    },
+    {
+      "n": 303,
+      "term": "立体的",
+      "reading": "りったいてき",
+      "meaning": "three-dimensional; many-sided",
+      "def_ja": "高さや奥行きがあるようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この絵は立体的に見える。",
+          "form": "立体的",
+          "en": "This picture looks three-dimensional."
+        },
+        {
+          "lv": 2,
+          "ja": "地図を立体的に表示すると、山の高さがよく分かる。",
+          "form": "立体的",
+          "en": "Showing the map in 3D makes the height of the mountains easy to see."
+        },
+        {
+          "lv": 3,
+          "ja": "一つの事件をさまざまな立場から取材することで、問題を立体的にとらえることができた。",
+          "form": "立体的",
+          "en": "By covering one incident from many points of view, we were able to see the issue from all sides."
+        }
+      ],
+      "tip": "Related words: 立体駐車場 (multi-storey car park) and 立体交差 (overpass crossing)."
+    },
+    {
+      "n": 135,
+      "term": "垂直",
+      "reading": "すいちょく",
+      "meaning": "vertical; perpendicular",
+      "def_ja": "まっすぐ立っていること。直角に交わること。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "棒を地面に垂直に立てた。",
+          "form": "垂直",
+          "en": "I stood the pole upright on the ground."
+        },
+        {
+          "lv": 2,
+          "ja": "この崖はほぼ垂直で、登るのは難しい。",
+          "form": "垂直",
+          "en": "This cliff is almost vertical, so it is hard to climb."
+        },
+        {
+          "lv": 3,
+          "ja": "二本の直線が垂直に交わるとき、その間の角度は九十度になる。",
+          "form": "垂直",
+          "en": "When two straight lines meet perpendicularly, the angle between them is ninety degrees."
+        }
+      ],
+      "tip": "The opposite is 水平 (horizontal)."
+    },
+    {
+      "n": 128,
+      "term": "座標",
+      "reading": "ざひょう",
+      "meaning": "coordinates",
+      "def_ja": "点の位置を、数の組で表したもの。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "点Aの座標を求めなさい。",
+          "form": "座標",
+          "en": "Find the coordinates of point A."
+        },
+        {
+          "lv": 2,
+          "ja": "スマホの地図アプリで、現在地の座標を調べた。",
+          "form": "座標",
+          "en": "I looked up the coordinates of my current location on a map app."
+        },
+        {
+          "lv": 3,
+          "ja": "遭難した登山者が伝えた座標をもとに、救助隊のヘリが現場へ向かった。",
+          "form": "座標",
+          "en": "Using the coordinates sent by the stranded climber, the rescue helicopter headed to the site."
+        }
+      ]
+    },
+    {
+      "n": 129,
+      "term": "座標幾何学",
+      "reading": "ざひょうきかがく",
+      "meaning": "coordinate geometry",
+      "def_ja": "図形を式で表し、計算で調べる数学の分野。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "大学で座標幾何学を学んだ。",
+          "form": "座標幾何学",
+          "en": "I studied coordinate geometry at university."
+        },
+        {
+          "lv": 2,
+          "ja": "座標幾何学では、図形を式で表して考える。",
+          "form": "座標幾何学",
+          "en": "In coordinate geometry, you think about shapes by writing them as equations."
+        },
+        {
+          "lv": 3,
+          "ja": "デカルトが考えた座標幾何学のおかげで、図形の問題を計算で解けるようになった。",
+          "form": "座標幾何学",
+          "en": "Thanks to the coordinate geometry Descartes devised, geometry problems could be solved by calculation."
+        }
+      ],
+      "tip": "Rare; the usual academic term is 解析幾何学."
+    },
+    {
+      "n": 19,
+      "term": "各部",
+      "reading": "かくぶ",
+      "meaning": "each part",
+      "def_ja": "全体をつくっている、それぞれの部分。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "車の各部を点検した。",
+          "form": "各部",
+          "en": "I inspected each part of the car."
+        },
+        {
+          "lv": 2,
+          "ja": "この図で、機械の各部の名前を説明します。",
+          "form": "各部",
+          "en": "Using this diagram, I'll explain the name of each part of the machine."
+        },
+        {
+          "lv": 3,
+          "ja": "長く使ったエアコンは、各部にほこりがたまって効きが悪くなることがある。",
+          "form": "各部",
+          "en": "An old air conditioner can work less well because dust builds up in its parts."
+        }
+      ],
+      "tip": "Found mostly in manuals and reports; compare 各国 and 各地."
+    },
+    {
+      "n": 81,
+      "term": "上下",
+      "reading": "じょうげ",
+      "meaning": "up and down; both directions",
+      "def_ja": "上と下。上がったり下がったりすること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "一日の気温が大きく上下した。",
+          "form": "上下",
+          "en": "The temperature went up and down a lot during the day."
+        },
+        {
+          "lv": 2,
+          "ja": "事故の影響で、高速道路は上下線とも通行止めになっている。",
+          "form": "上下",
+          "en": "Because of the accident, the expressway is closed in both directions."
+        },
+        {
+          "lv": 3,
+          "ja": "部活では先輩と後輩の上下関係が厳しく、一年生は自由に意見を言えなかった。",
+          "form": "上下",
+          "en": "The club had a strict senior-junior hierarchy, so first-years could not speak freely."
+        }
+      ],
+      "tip": "上下線 means both directions of a road or line; 上下関係 means a hierarchy."
+    },
+    {
+      "n": 82,
+      "term": "覆う",
+      "reading": "おおう",
+      "meaning": "to cover",
+      "def_ja": "上からかぶせて、見えないようにする。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "山が雪に覆われている。",
+          "form": "覆われ",
+          "en": "The mountains are covered in snow."
+        },
+        {
+          "lv": 2,
+          "ja": "冬の間、畑の野菜をビニールで覆って寒さから守った。",
+          "form": "覆って",
+          "en": "Over the winter, we covered the vegetables in the field with plastic to protect them from the cold."
+        },
+        {
+          "lv": 3,
+          "ja": "地震で崩れた町の様子は、目を覆いたくなるほどひどかった。",
+          "form": "覆い",
+          "en": "The town wrecked by the earthquake was so bad it was hard to look at."
+        }
+      ],
+      "tip": "The passive 覆われる is very common, as in 雪に覆われた山."
+    },
+    {
+      "n": 84,
+      "term": "編入",
+      "reading": "へんにゅう",
+      "meaning": "incorporation; transfer (into)",
+      "def_ja": "あとから組織などに組み入れること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "村が隣の市に編入された。",
+          "form": "編入",
+          "en": "The village was merged into the neighboring city."
+        },
+        {
+          "lv": 2,
+          "ja": "短大を出たあと、四年制の大学に編入した。",
+          "form": "編入",
+          "en": "After junior college, I transferred into a four-year university."
+        },
+        {
+          "lv": 3,
+          "ja": "海外から帰国した生徒が、二学期から地元の中学校の二年生に編入することになった。",
+          "form": "編入",
+          "en": "A student who came back from abroad will join the second year of the local junior high from the second term."
+        }
+      ],
+      "tip": "Used for towns joining a city and for students transferring into a school."
+    },
+    {
+      "n": 88,
+      "term": "軽減",
+      "reading": "けいげん",
+      "meaning": "reduction (of a burden)",
+      "def_ja": "負担や痛みなどを減らして軽くすること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この薬は痛みを軽減する。",
+          "form": "軽減",
+          "en": "This medicine reduces pain."
+        },
+        {
+          "lv": 2,
+          "ja": "子育て家庭の負担を軽減するため、給付金が支給される。",
+          "form": "軽減",
+          "en": "Benefits will be paid to ease the burden on families raising children."
+        },
+        {
+          "lv": 3,
+          "ja": "食料品には軽減税率が適用されるので、消費税は十パーセントではなく八パーセントだ。",
+          "form": "軽減",
+          "en": "A reduced tax rate applies to food, so the consumption tax is eight percent instead of ten."
+        }
+      ],
+      "tip": "The thing reduced is almost always something bad: 負担, 痛み, 被害, リスク."
+    },
+    {
+      "n": 179,
+      "term": "登載",
+      "reading": "とうさい",
+      "meaning": "entry (in a register)",
+      "def_ja": "名簿や台帳に、名前などを書き入れること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "選挙人名簿に名前が登載された。",
+          "form": "登載",
+          "en": "My name was entered in the voter register."
+        },
+        {
+          "lv": 2,
+          "ja": "比例代表の名簿に、新人の候補が上位で登載された。",
+          "form": "登載",
+          "en": "A new candidate was placed near the top of the proportional representation list."
+        },
+        {
+          "lv": 3,
+          "ja": "引っ越してから三か月たたないと、新しい市の選挙人名簿に登載されないので注意が必要だ。",
+          "form": "登載",
+          "en": "Be careful: you are not added to your new city's voter register until three months after moving."
+        }
+      ],
+      "tip": "Formal and official; do not confuse it with 搭載 (equipped with), which sounds the same."
+    },
+    {
+      "n": 287,
+      "term": "検証",
+      "reading": "けんしょう",
+      "meaning": "verification; review",
+      "def_ja": "正しいかどうかを、調べて確かめること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "事故の原因を検証する。",
+          "form": "検証",
+          "en": "We will look into the cause of the accident."
+        },
+        {
+          "lv": 2,
+          "ja": "警察は現場検証を行い、事故の状況を調べた。",
+          "form": "検証",
+          "en": "The police carried out an on-site inspection to find out how the accident happened."
+        },
+        {
+          "lv": 3,
+          "ja": "新しい薬が本当に効くかどうかを検証するために、大規模な調査が行われた。",
+          "form": "検証",
+          "en": "A large study was carried out to verify whether the new drug really works."
+        }
+      ],
+      "tip": "現場検証 is the police inspection of a scene."
+    },
+    {
+      "n": 288,
+      "term": "検証試験",
+      "reading": "けんしょうしけん",
+      "meaning": "verification test",
+      "def_ja": "性能や安全性を、実際に試して確かめること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しい部品の検証試験を行った。",
+          "form": "検証試験",
+          "en": "We ran verification tests on the new part."
+        },
+        {
+          "lv": 2,
+          "ja": "検証試験の結果、ブレーキの性能に問題はなかった。",
+          "form": "検証試験",
+          "en": "The verification tests showed no problems with the brakes."
+        },
+        {
+          "lv": 3,
+          "ja": "自動運転のバスは、実際の道路で半年間の検証試験を行ってから運行を始める予定だ。",
+          "form": "検証試験",
+          "en": "The self-driving bus will start service after six months of verification tests on real roads."
+        }
+      ],
+      "tip": "An engineering term; in medicine the word is 臨床試験."
+    }
+  ]
+}

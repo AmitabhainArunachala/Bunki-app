@@ -151,7 +151,17 @@ jobs:
                       'decks/context-dense/engine.js' \
                       'decks/context-dense/deck.json' \
                       'decks/context-dense/context-deck.css' \
-                      'decks/context-dense/standalone.html'; do
+                      'decks/context-dense/standalone.html' \
+                      'decks/player/engine.js' \
+                      'decks/player/mount.js' \
+                      'decks/player/player.css' \
+                      'decks/personal/engine.mjs' \
+                      'decks/personal/mount.mjs' \
+                      'decks/personal/schema.mjs' \
+                      'decks/personal/store.mjs' \
+                      'decks/personal/personal.css' \
+                      'decks/kotoba-mine/deck.json' \
+                      'decks/kotoba-mcd/deck.json'; do
             code=""
             for _ in 1 2 3 4 5; do
               code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$port/$path" || true)

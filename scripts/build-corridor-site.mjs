@@ -112,6 +112,12 @@ try {
     'reference-ui.js',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',
+    'decks/player/engine.js',
+    'decks/player/mount.js',
+    'decks/personal/engine.mjs',
+    'decks/personal/mount.mjs',
+    'decks/personal/schema.mjs',
+    'decks/personal/store.mjs',
     'sw.js',
   ]) {
     execFileSync(process.execPath, ['--check', join(source, path)], { stdio: 'pipe' });

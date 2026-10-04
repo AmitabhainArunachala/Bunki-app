@@ -1,0 +1,641 @@
+{
+  "id": "m03-fab",
+  "cards": [
+    {
+      "n": 78,
+      "term": "集積",
+      "reading": "しゅうせき",
+      "meaning": "concentration in one place",
+      "def_ja": "多くのものを一か所に集めること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この地域には工場が集積している。",
+          "form": "集積",
+          "en": "Factories are concentrated in this area."
+        },
+        {
+          "lv": 2,
+          "ja": "九州は半導体の工場が集積していることから、シリコンアイランドと呼ばれる。",
+          "form": "集積",
+          "en": "Kyushu is called Silicon Island because so many chip factories are concentrated there."
+        },
+        {
+          "lv": 3,
+          "ja": "一枚のチップに集積できるトランジスタの数は、この五十年で何百万倍にも増えた。",
+          "form": "集積",
+          "en": "The number of transistors that can be packed onto one chip has grown millions of times over the last fifty years."
+        }
+      ],
+      "tip": "Written and technical; in speech people say 集まっている. Do not mix it up with 蓄積, building up over time."
+    },
+    {
+      "n": 79,
+      "term": "集積回路",
+      "reading": "しゅうせきかいろ",
+      "meaning": "integrated circuit",
+      "def_ja": "多くの電子部品を小さな板にまとめた回路。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "集積回路はICとも呼ばれる。",
+          "form": "集積回路",
+          "en": "Integrated circuits are also called ICs."
+        },
+        {
+          "lv": 2,
+          "ja": "集積回路の発明で、コンピューターは一気に小さくなった。",
+          "form": "集積回路",
+          "en": "With the invention of the integrated circuit, computers suddenly became much smaller."
+        },
+        {
+          "lv": 3,
+          "ja": "この工場では、自動車のエンジンを制御する集積回路を一日に何万個も作っている。",
+          "form": "集積回路",
+          "en": "This factory makes tens of thousands of integrated circuits a day that control car engines."
+        }
+      ],
+      "tip": "A formal term; in everyday talk people just say IC, チップ or 半導体."
+    },
+    {
+      "n": 181,
+      "term": "真空管",
+      "reading": "しんくうかん",
+      "meaning": "vacuum tube",
+      "def_ja": "空気を抜いたガラス管で電気の流れを操る部品。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "父は古い真空管ラジオを大事にしている。",
+          "form": "真空管",
+          "en": "My father takes good care of his old vacuum tube radio."
+        },
+        {
+          "lv": 2,
+          "ja": "真空管アンプの音が好きで、古い機械を今も使い続けている。",
+          "form": "真空管",
+          "en": "I like the sound of tube amplifiers, so I still use my old one."
+        },
+        {
+          "lv": 3,
+          "ja": "初期のコンピューターは一万本以上の真空管を使っていたので、しょっちゅう故障したそうだ。",
+          "form": "真空管",
+          "en": "Early computers used over ten thousand vacuum tubes, so they apparently broke down all the time."
+        }
+      ],
+      "tip": "Today you mostly hear it from audio fans and in computer history. The counter is 本."
+    },
+    {
+      "n": 187,
+      "term": "性能",
+      "reading": "せいのう",
+      "meaning": "performance of a machine",
+      "def_ja": "機械などがどれだけよく働くかの程度。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "このパソコンは性能がいい。",
+          "form": "性能",
+          "en": "This computer performs well."
+        },
+        {
+          "lv": 2,
+          "ja": "新しいスマホは、カメラの性能が大きく上がった。",
+          "form": "性能",
+          "en": "The camera performance of the new smartphone has improved a lot."
+        },
+        {
+          "lv": 3,
+          "ja": "値段は少し高いけど、性能を考えればこの掃除機がいちばんお得だと思う。",
+          "form": "性能",
+          "en": "It's a bit expensive, but considering its performance I think this vacuum cleaner is the best deal."
+        }
+      ],
+      "tip": "性能 is how well a machine works; 機能 is what it can do. For people's ability use 能力."
+    },
+    {
+      "n": 192,
+      "term": "製造工程",
+      "reading": "せいぞうこうてい",
+      "meaning": "manufacturing process",
+      "def_ja": "物を作るときの、材料から完成までの段階。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "工場で製造工程を見学した。",
+          "form": "製造工程",
+          "en": "I toured the manufacturing process at the factory."
+        },
+        {
+          "lv": 2,
+          "ja": "製造工程で異物が混入したとして、メーカーは商品を回収した。",
+          "form": "製造工程",
+          "en": "The maker recalled the product, saying a foreign object got in during manufacturing."
+        },
+        {
+          "lv": 3,
+          "ja": "半導体の製造工程は数百にも及ぶので、一枚のチップが完成するまでに数か月かかる。",
+          "form": "製造工程",
+          "en": "Making a semiconductor takes hundreds of steps, so it takes several months to finish one chip."
+        }
+      ]
+    },
+    {
+      "n": 87,
+      "term": "歩留まり",
+      "reading": "ぶどまり",
+      "meaning": "yield (share of good products)",
+      "def_ja": "作った物のうち、良品として使える割合。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しいラインはまだ歩留まりが低い。",
+          "form": "歩留まり",
+          "en": "The yield on the new line is still low."
+        },
+        {
+          "lv": 2,
+          "ja": "不良品が減って、歩留まりが九割を超えた。",
+          "form": "歩留まり",
+          "en": "Defects went down and the yield rose above ninety percent."
+        },
+        {
+          "lv": 3,
+          "ja": "最先端のチップは歩留まりを上げるのが難しく、作った半分以上が不良品になることもある。",
+          "form": "歩留まり",
+          "en": "Raising the yield of cutting-edge chips is hard, and sometimes more than half of them are defective."
+        }
+      ],
+      "tip": "Also used in cooking for the usable part of an ingredient, and for how many accepted students actually enroll."
+    },
+    {
+      "n": 177,
+      "term": "製法",
+      "reading": "せいほう",
+      "meaning": "method of making",
+      "def_ja": "物を作るやり方や手順。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この店は昔ながらの製法でみそを作っている。",
+          "form": "製法",
+          "en": "This shop makes miso using the traditional method."
+        },
+        {
+          "lv": 2,
+          "ja": "製法を変えたら、パンがもっと柔らかくなった。",
+          "form": "製法",
+          "en": "When we changed the method, the bread became softer."
+        },
+        {
+          "lv": 3,
+          "ja": "この酒蔵では、江戸時代から受け継がれてきた製法を今も守り続けている。",
+          "form": "製法",
+          "en": "This sake brewery still keeps to the method handed down since the Edo period."
+        }
+      ],
+      "tip": "Common in food and craft advertising, as in 昔ながらの製法."
+    },
+    {
+      "n": 178,
+      "term": "高度",
+      "reading": "こうど",
+      "meaning": "advanced; altitude",
+      "def_ja": "程度が高いこと。また、地上からの高さ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "飛行機は高度一万メートルを飛んでいる。",
+          "form": "高度",
+          "en": "The plane is flying at an altitude of ten thousand meters."
+        },
+        {
+          "lv": 2,
+          "ja": "この仕事には高度な専門知識が求められる。",
+          "form": "高度",
+          "en": "This job requires advanced specialist knowledge."
+        },
+        {
+          "lv": 3,
+          "ja": "最先端のチップの製造には高度な技術が必要なので、世界でも作れる会社は数社しかない。",
+          "form": "高度",
+          "en": "Making cutting-edge chips takes advanced technology, so only a few companies in the world can do it."
+        }
+      ],
+      "tip": "With a number it means altitude; as 高度な it means advanced or sophisticated."
+    },
+    {
+      "n": 130,
+      "term": "実装",
+      "reading": "じっそう",
+      "meaning": "implementing; mounting parts",
+      "def_ja": "部品を基板に付けること。機能を作り込むこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "アプリに新しい機能を実装した。",
+          "form": "実装",
+          "en": "We implemented a new feature in the app."
+        },
+        {
+          "lv": 2,
+          "ja": "基板に部品を実装する作業は、機械が自動で行う。",
+          "form": "実装",
+          "en": "Machines automatically mount the parts on the circuit board."
+        },
+        {
+          "lv": 3,
+          "ja": "ユーザーからの要望が多かったので、次のアップデートでダークモードを実装する予定だ。",
+          "form": "実装",
+          "en": "Many users asked for it, so we plan to add a dark mode in the next update."
+        }
+      ],
+      "tip": "Hardware people use it for mounting parts on a board; software people use it for building a feature."
+    },
+    {
+      "n": 141,
+      "term": "既存",
+      "reading": "きそん",
+      "meaning": "existing",
+      "def_ja": "前からすでにあること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "既存の道路を広げる工事が始まった。",
+          "form": "既存",
+          "en": "Work has started to widen the existing road."
+        },
+        {
+          "lv": 2,
+          "ja": "新しいアプリでも、既存のデータをそのまま使える。",
+          "form": "既存",
+          "en": "You can use your existing data as it is in the new app."
+        },
+        {
+          "lv": 3,
+          "ja": "会社は新しい工場を建てる代わりに、既存の建物を改装して生産ラインを増やすことにした。",
+          "form": "既存",
+          "en": "Instead of building a new factory, the company decided to renovate an existing building and add production lines."
+        }
+      ],
+      "tip": "Both きそん and きぞん are heard; きぞん is now very common."
+    },
+    {
+      "n": 142,
+      "term": "既存装置",
+      "reading": "きそんそうち",
+      "meaning": "existing equipment",
+      "def_ja": "前から使っている機械や設備。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "工場の既存装置をそのまま使う。",
+          "form": "既存装置",
+          "en": "We will keep using the factory's existing equipment."
+        },
+        {
+          "lv": 2,
+          "ja": "既存装置を改造して、新しい部品も作れるようにした。",
+          "form": "既存装置",
+          "en": "We modified the existing equipment so it can also make the new parts."
+        },
+        {
+          "lv": 3,
+          "ja": "新しい材料は既存装置でも加工できるため、工場は大きな投資をせずに生産を始められる。",
+          "form": "既存装置",
+          "en": "The new material can be processed on existing equipment, so the factory can start production without a big investment."
+        }
+      ],
+      "tip": "A word from technical documents; in ordinary writing 既存の装置 is more common."
+    },
+    {
+      "n": 83,
+      "term": "配線",
+      "reading": "はいせん",
+      "meaning": "wiring",
+      "def_ja": "電気が流れるように線をつなぐこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "机の裏の配線がごちゃごちゃだ。",
+          "form": "配線",
+          "en": "The wiring behind my desk is a mess."
+        },
+        {
+          "lv": 2,
+          "ja": "テレビを移動したので、配線をやり直さなければならない。",
+          "form": "配線",
+          "en": "I moved the TV, so I have to redo the wiring."
+        },
+        {
+          "lv": 3,
+          "ja": "チップの中では、髪の毛よりはるかに細い配線が何層にも重なって、トランジスタ同士をつないでいる。",
+          "form": "配線",
+          "en": "Inside a chip, layers of wiring much thinner than a hair connect the transistors to each other."
+        }
+      ]
+    },
+    {
+      "n": 168,
+      "term": "導体",
+      "reading": "どうたい",
+      "meaning": "conductor (of electricity)",
+      "def_ja": "電気や熱をよく通す物質。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "鉄や銅などの金属は導体だ。",
+          "form": "導体",
+          "en": "Metals such as iron and copper are conductors."
+        },
+        {
+          "lv": 2,
+          "ja": "電気をよく通す物質を導体、通さない物質を絶縁体という。",
+          "form": "導体",
+          "en": "A material that conducts electricity well is called a conductor, and one that does not is called an insulator."
+        },
+        {
+          "lv": 3,
+          "ja": "人の体も電気を通す導体なので、濡れた手でコンセントに触ると感電するおそれがある。",
+          "form": "導体",
+          "en": "The human body also conducts electricity, so touching a socket with wet hands can give you a shock."
+        }
+      ],
+      "tip": "A school science word. A 半導体, semiconductor, sits between a 導体 and an insulator."
+    },
+    {
+      "n": 169,
+      "term": "銅線",
+      "reading": "どうせん",
+      "meaning": "copper wire",
+      "def_ja": "銅で作った細い線。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "電線の中には銅線が入っている。",
+          "form": "銅線",
+          "en": "There is copper wire inside electric cables."
+        },
+        {
+          "lv": 2,
+          "ja": "工事現場から銅線が大量に盗まれる事件が続いている。",
+          "form": "銅線",
+          "en": "There has been a series of cases where large amounts of copper wire were stolen from construction sites."
+        },
+        {
+          "lv": 3,
+          "ja": "銅の値段が上がっているため、使わなくなった銅線を回収業者に売る人が増えている。",
+          "form": "銅線",
+          "en": "Because copper prices are rising, more people are selling unused copper wire to scrap dealers."
+        }
+      ],
+      "tip": "Inside chips the term is 銅配線; 銅線 is actual copper wire."
+    },
+    {
+      "n": 171,
+      "term": "絶縁体",
+      "reading": "ぜつえんたい",
+      "meaning": "insulator (electrical)",
+      "def_ja": "電気や熱をほとんど通さない物質。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "ゴムやガラスは絶縁体です。",
+          "form": "絶縁体",
+          "en": "Rubber and glass are insulators."
+        },
+        {
+          "lv": 2,
+          "ja": "電線の周りは、絶縁体のビニールで覆われている。",
+          "form": "絶縁体",
+          "en": "Electric wires are covered with insulating vinyl."
+        },
+        {
+          "lv": 3,
+          "ja": "絶縁体と呼ばれる物でも、非常に高い電圧がかかると電気が流れてしまうことがある。",
+          "form": "絶縁体",
+          "en": "Even materials called insulators can let electricity through when a very high voltage is applied."
+        }
+      ],
+      "tip": "The opposite is 導体. 不導体 means the same thing."
+    },
+    {
+      "n": 37,
+      "term": "石版",
+      "reading": "せきばん",
+      "meaning": "lithographic stone",
+      "def_ja": "絵を描いて印刷に使う平らな石の板。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "美術館で古い石版画を見た。",
+          "form": "石版",
+          "en": "I saw some old lithographs at the art museum."
+        },
+        {
+          "lv": 2,
+          "ja": "石版印刷は、十八世紀の終わりにドイツで発明された。",
+          "form": "石版",
+          "en": "Lithographic printing was invented in Germany at the end of the eighteenth century."
+        },
+        {
+          "lv": 3,
+          "ja": "この展覧会では、明治時代に石版で刷られたポスターや地図が展示されている。",
+          "form": "石版",
+          "en": "This exhibition shows posters and maps printed from lithographic stones in the Meiji era."
+        }
+      ],
+      "tip": "Formal and fairly rare. The printing method is 石版印刷; chipmaking lithography is リソグラフィ."
+    },
+    {
+      "n": 193,
+      "term": "現像",
+      "reading": "げんぞう",
+      "meaning": "developing (film)",
+      "def_ja": "撮ったフィルムを薬で処理して像を出すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "写真屋でフィルムを現像してもらった。",
+          "form": "現像",
+          "en": "I had my film developed at the photo shop."
+        },
+        {
+          "lv": 2,
+          "ja": "使い捨てカメラの写真は、現像するまで何が写っているかわからない。",
+          "form": "現像",
+          "en": "With a disposable camera, you don't know what's in the photos until they are developed."
+        },
+        {
+          "lv": 3,
+          "ja": "デジタルカメラで撮ったRAWデータは、パソコンで現像すると明るさや色を細かく調整できる。",
+          "form": "現像",
+          "en": "When you process RAW files from a digital camera on a computer, you can fine-tune the brightness and color."
+        }
+      ],
+      "tip": "Digital photographers also say RAW現像 for processing RAW files."
+    },
+    {
+      "n": 194,
+      "term": "削り",
+      "reading": "けずり",
+      "meaning": "shaving; cutting away",
+      "def_ja": "表面を少しずつそぎ取ること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "鉛筆削りで鉛筆をとがらせた。",
+          "form": "削り",
+          "en": "I sharpened my pencil with a pencil sharpener."
+        },
+        {
+          "lv": 2,
+          "ja": "冷ややっこに削り節としょうゆをかけて食べた。",
+          "form": "削り",
+          "en": "I ate chilled tofu topped with bonito flakes and soy sauce."
+        },
+        {
+          "lv": 3,
+          "ja": "このパソコンの本体は、アルミの塊から削り出して作られているので、とても丈夫だ。",
+          "form": "削り",
+          "en": "The body of this laptop is machined from a solid block of aluminum, so it is very strong."
+        }
+      ],
+      "tip": "Mostly met in compounds such as 鉛筆削り and 削り節; the verb is 削る."
+    },
+    {
+      "n": 22,
+      "term": "分留",
+      "reading": "ぶんりゅう",
+      "meaning": "fractional distillation",
+      "def_ja": "沸く温度の差で液体の混ざり物を分けること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "液体空気を分留して酸素を取り出す。",
+          "form": "分留",
+          "en": "Oxygen is obtained by fractionally distilling liquid air."
+        },
+        {
+          "lv": 2,
+          "ja": "化学の授業で、ワインを分留してアルコールを取り出す実験をした。",
+          "form": "分留",
+          "en": "In chemistry class we did an experiment separating alcohol from wine by fractional distillation."
+        },
+        {
+          "lv": 3,
+          "ja": "原油は沸点の違いを利用して分留され、ガソリンや灯油、重油などに分けられる。",
+          "form": "分留",
+          "en": "Crude oil is fractionally distilled using differences in boiling points and separated into gasoline, kerosene, heavy oil and so on."
+        }
+      ],
+      "tip": "A high school chemistry word. Plain distillation is 蒸留."
+    },
+    {
+      "n": 20,
+      "term": "攪拌",
+      "reading": "かくはん",
+      "meaning": "stirring",
+      "def_ja": "液体などをかき回して混ぜること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "卵と砂糖をよく攪拌する。",
+          "form": "攪拌",
+          "en": "Stir the eggs and sugar well."
+        },
+        {
+          "lv": 2,
+          "ja": "塗料は使う前に、底からしっかり攪拌してください。",
+          "form": "攪拌",
+          "en": "Before using the paint, stir it thoroughly from the bottom."
+        },
+        {
+          "lv": 3,
+          "ja": "ミキサーで長く攪拌しすぎると、生クリームが分離してバターのようになってしまう。",
+          "form": "攪拌",
+          "en": "If you whip cream too long in a mixer, it separates and turns into something like butter."
+        }
+      ],
+      "tip": "Often written 撹拌 or かくはん. In everyday speech people say かき混ぜる."
+    },
+    {
+      "n": 62,
+      "term": "理学",
+      "reading": "りがく",
+      "meaning": "natural science (as a field)",
+      "def_ja": "物理や化学など、自然のしくみを研究する学問。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "兄は大学の理学部で物理を学んでいる。",
+          "form": "理学",
+          "en": "My older brother studies physics in the university's faculty of science."
+        },
+        {
+          "lv": 2,
+          "ja": "姉は理学博士で、研究所で働いている。",
+          "form": "理学",
+          "en": "My older sister has a doctorate in science and works at a research institute."
+        },
+        {
+          "lv": 3,
+          "ja": "事故で足をけがしたので、退院後もしばらく理学療法士のもとでリハビリを続けた。",
+          "form": "理学",
+          "en": "I injured my leg in an accident, so even after leaving the hospital I kept doing rehab with a physical therapist."
+        }
+      ],
+      "tip": "Mostly seen in 理学部, faculty of science, and 理学療法, physical therapy."
+    },
+    {
+      "n": 57,
+      "term": "起点",
+      "reading": "きてん",
+      "meaning": "starting point",
+      "def_ja": "物事や道が始まるところ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "東京駅は東海道線の起点だ。",
+          "form": "起点",
+          "en": "Tokyo Station is the starting point of the Tokaido Line."
+        },
+        {
+          "lv": 2,
+          "ja": "日本橋は、日本の道路の起点として知られている。",
+          "form": "起点",
+          "en": "Nihonbashi is known as the starting point of Japan's roads."
+        },
+        {
+          "lv": 3,
+          "ja": "今回の流行は、SNSへのある投稿が起点となり、若者の間に一気に広がった。",
+          "form": "起点",
+          "en": "This trend started from a single social media post and spread quickly among young people."
+        }
+      ],
+      "tip": "The opposite is 終点."
+    }
+  ]
+}

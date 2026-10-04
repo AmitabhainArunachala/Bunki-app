@@ -71,6 +71,8 @@ const SHELL = [
   'source-inbox.mjs',
   'source-processing.mjs',
   'corridor-ink.js',
+  'fonts.css',
+  'vendor/ts-fsrs.mjs',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',
@@ -88,7 +90,18 @@ const SHELL = [
   'data/share_alike/reference-extra.json',
   'data/share_alike/kkld.json',
   // 単語帳 opens offline from install, like the context deck
-  'data/share_alike/decks/kotoba-mine.json',
+  // 集中道場 › デッキ opens offline from install
+  'decks/player/engine.js',
+  'decks/player/mount.js',
+  'decks/player/player.css',
+  // Private data lives in IndexedDB; only the reader and scheduler are cached.
+  'decks/personal/mount.mjs',
+  'decks/personal/engine.mjs',
+  'decks/personal/schema.mjs',
+  'decks/personal/store.mjs',
+  'decks/personal/personal.css',
+  'decks/kotoba-mine/deck.json',
+  'decks/kotoba-mcd/deck.json',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

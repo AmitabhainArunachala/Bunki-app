@@ -3957,6 +3957,25 @@ async function boot() {
   await resumeAssessmentV2();
   await installDriftRecord();
   setKairoTheme(themeId());
+  // A private collection boots from the cached app shell alone. Its content
+  // arrives through the learner's file picker, never a public repository URL.
+  if (params.get('deck') === 'personal') {
+    document.body.dataset.view = 'personaldeck';
+    window.__DRIFT__?.hide();
+    const personal = await import('./decks/personal/mount.mjs');
+    await personal.mount($('#app'), {
+      themes: PUBLIC_THEME_IDS.map((id) => THEME_UI.find((t) => t.id === id)),
+      currentTheme: themeId(),
+      onTheme: setKairoTheme,
+      onLeave() {
+        const url = new URL(location.href);
+        url.searchParams.delete('deck');
+        url.searchParams.set('dojo', '1');
+        location.assign(url);
+      },
+    });
+    return;
+  }
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) {
@@ -3969,9 +3988,16 @@ async function boot() {
   }
   if (S.variants.entry === 'field') S.view = 'entry';
   if (S.variants.entry === 'drift') S.view = 'drift';
+  if (params.get('dojo') === '1') S.view = 'dojo';
   // Phone reps: ?deck=context opens 文脈札 directly. It does not change the
   // stored front door, and it does not open the operator variant strip.
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
+  // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
+  // shortcut that lands on the deck instead of the galaxy
+  if (['kotoba', 'mcd'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
+    S.view = 'deckplay';
+    S.deckPlay = params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+  }
 
   render();
 
@@ -4539,6 +4565,12 @@ function back() {
     render();
     return;
   }
+  if (S.view === 'deckplay' || S.view === 'contextdeck') {
+    S.view = 'dojo';
+    render();
+    window.scrollTo(0, 0);
+    return;
+  }
   if (S.view === 'dojo') {
     S.view = 'drift';
     render();
@@ -4561,13 +4593,6 @@ function back() {
   if (S.view === 'mock' && mockHistoryBrowse) { closePracticeHistory(); return; }
   if (S.view === 'mock' && (S.assessmentLibrary?.activeAttemptId || S.mockHistoryAttemptId)) {
     leaveMockRun();
-    return;
-  }
-  // a deck module steps back to the module list before the room is left
-  if (S.view === 'decks' && S.deckModule) {
-    S.deckModule = null;
-    render();
-    window.scrollTo(0, 0);
     return;
   }
   if (S.view === 'archive') {
@@ -4605,7 +4630,7 @@ function back() {
   }
   // Device Back and the chrome arrow walk list → overview → reading shelf.
   if (S.view === 'levels' && referenceLibrary?.back()) return;
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'decks' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'feed' || S.view === 'source-inbox' || S.view === 'kanjidex' || S.view === 'yoji' || S.view === 'contextdeck') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'feed' || S.view === 'source-inbox' || S.view === 'kanjidex' || S.view === 'yoji' || S.view === 'contextdeck') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
@@ -5226,9 +5251,9 @@ function renderContextDeck(main) {
     bilingual: S.lang !== 'ja',
     storage: localStorage,
     onLeave() {
-      S.view = 'shelf';
+      S.view = 'dojo';
       render();
-      window.scrollTo(0, S.shelfScroll || 0);
+      window.scrollTo(0, 0);
     },
   });
 }
@@ -5453,17 +5478,6 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   practiceTools.append(mock);
-  const decks = el('button', 'grammar-link');
-  decks.type = 'button';
-  decks.id = 'decks-link';
-  decks.append(el('span', 'l-ja', '単語帳'), el('span', 'en-sub', bi() ? 'decks · your mined words' : ''));
-  decks.addEventListener('click', () => {
-    keepScroll();
-    S.view = 'decks';
-    render();
-    window.scrollTo(0, 0);
-  });
-  practiceTools.append(decks);
   const mirror = el('button', 'grammar-link');
   mirror.type = 'button';
   mirror.id = 'kagami-link';
@@ -13276,333 +13290,6 @@ function renderMock(main) {
   renderMockResult(main, set, flat, run, selected);
 }
 
-/* 単語帳 — bundled decks of mined words (言葉の鉱脈, decks/kotoba-mine/).
- * A deck is a DOOR, not a schedule (the mock room's law, kept):
- *   1. Every module comes with its own passage on the shelf. The words are
- *      met there first, in a real sentence — the deck only points at it.
- *   2. Nothing is enrolled until the learner chooses it — one word, or a
- *      whole module through ぜんぶ覚える. Each enrolled row is the same
- *      started 覚える row the reader mints, carrying ctx {p, i, scope:'sent'}
- *      into the module's article, so the review card asks the word inside
- *      the very sentence it was mined in (takenContext → cloze).
- *   3. A module is also a named list, so その鉱脈だけ復習 is the existing
- *      filtered review (startReview(scope)), never a second scheduler.
- *   4. A headword bound to one matching dictionary entry uses that entry's
- *      answer. Unbound headwords keep the deck's reading, gloss and definition
- *      in deepWords, so their cards also answer without a dictionary download. */
-const DECK_DIR = 'data/share_alike/decks';
-const DECK_IDS = ['kotoba-mine'];
-const deckFailed = (key) => !!D.deckFailed?.has(key);
-
-function ensureDeck(deckId) {
-  D.decks ||= new Map();
-  D.decksLoading ||= new Map();
-  if (D.decks.has(deckId)) return Promise.resolve(D.decks.get(deckId));
-  const packed = window.__CORRIDOR_BUNDLE__?.[`decks/${deckId}`];
-  if (packed) {
-    D.decks.set(deckId, packed);
-    return Promise.resolve(packed);
-  }
-  if (D.decksLoading.has(deckId)) return D.decksLoading.get(deckId);
-  const pending = fetch(`${DECK_DIR}/${deckId}.json`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`deck ${deckId} → ${res.status}`);
-      return res.json();
-    })
-    .then((deck) => {
-      D.decks.set(deckId, deck);
-      D.decksLoading.delete(deckId);
-      return deck;
-    })
-    .catch((err) => {
-      D.decksLoading.delete(deckId);
-      (D.deckFailed ||= new Set()).add(deckId);
-      throw err;
-    });
-  D.decksLoading.set(deckId, pending);
-  return pending;
-}
-
-/** every deck card enrolls as a word row anchored in its passage — the
- * single-kanji cards too, so they are asked inside a compound in a sentence
- * rather than as a bare character (the kanji-row review has no cloze) */
-const deckListName = (deck, mod) => `${deck.title.ja} · ${mod.title.ja.split(' — ')[0]}`;
-
-/** The bundled answer is resolved from the shipped card, never from caller-supplied text.
- * Single-kanji cards show several readings; that display is not one lexical cue. */
-function deckWordSnapshot(node) {
-  const source = node?.deckSource;
-  if (!source || !DECK_IDS.includes(source.deckId)) return null;
-  const deck = D.decks?.get(source.deckId);
-  const mod = deck?.modules.find((m) => m.id === source.moduleId);
-  const card = mod?.cards.find((c) => c.n === source.card);
-  if (!card || card.w !== node.id || !nonBlankMeanings([card.g, card.d]).length) return null;
-  return { r: /^[ぁ-ゖァ-ヺー]+$/u.test(card.r) ? card.r : '', m: [card.g, card.d] };
-}
-
-/** Reuse a bundled answer only by its source-card binding, or the exact legacy text
- * identity. A matching reading alone never turns another dictionary entry into this card. */
-function deckSavedSnapshot(node, record) {
-  const expected = deckWordSnapshot(node);
-  const saved = record.deepWords?.[node.id];
-  if (!expected || !plainRecord(saved) || !nonBlankMeanings(saved.m).length ||
-      kanaReadingKey(saved.r) !== kanaReadingKey(expected.r)) return null;
-  const a = node.deckSource, b = saved.deckSource;
-  const bound = b && a.deckId === b.deckId && a.moduleId === b.moduleId && a.card === b.card;
-  const legacy = !nonEmptyString(saved.seq) && saved.m[0] === expected.m[0];
-  return bound || legacy ? saved : null;
-}
-
-function deckWordNode(deck, mod, card) {
-  const node = { t: 'word', id: card.w, from: { passage: mod.article, index: card.i }, ctxScope: 'sent',
-    deckSource: { deckId: deck.deckId, moduleId: mod.id, card: card.n } };
-  const snapshot = deckWordSnapshot(node);
-  const reading = snapshot?.r || '';
-  if (reading) node.reading = reading;
-  const core = D.dict[card.w];
-  // The reader's core identity stays the same, including old spelling-only cards.
-  if (core && (!reading || kanaReadingKey(core.r) === kanaReadingKey(reading))) return node;
-  const saved = deckSavedSnapshot(node, S);
-  if (saved) {
-    if (saved.seq) { node.seq = saved.seq; node.reading = saved.r; }
-    return node;
-  }
-  if (!reading) return node;
-  const matches = dictionaryRowsForForm(card.w).filter((row) => {
-    const kana = entryKanaIndex(row, reading);
-    return kana >= 0 && readerReadingFits(row, kana, card.w);
-  });
-  if (matches.length === 1) {
-    node.seq = String(matches[0][0]);
-    node.reading = matches[0][5][entryKanaIndex(matches[0], reading)];
-  }
-  return node;
-}
-
-/** A card whose entry only the dictionary can name: a kana reading the core record does not give. */
-function deckCardNeedsIndex(card) {
-  const core = D.dict[card.w];
-  return /^[ぁ-ゖァ-ヺー]+$/u.test(card.r) && (!core || kanaReadingKey(core.r) !== kanaReadingKey(card.r));
-}
-
-/** The learner already holds an entry card for this spelling that only the module's rows can
- * match to the bundled card (a word saved from the reader). */
-function deckCardAwaitsIndex(card, node, record = S) {
-  return deckCardNeedsIndex(card) && !node.seq && nonEmptyString(record.deepWords?.[card.w]?.seq) &&
-    !deckSavedSnapshot(node, record);
-}
-
-const DECK_RETRY_MS = [3000, 10000, 30000, 60000];
-const deckModuleLoading = new Map();
-const deckModuleReady = new Set();
-const deckModuleDegraded = new Map();
-const deckModuleOpen = (deck, mod) =>
-  S.view === 'decks' && S.deckModule === mod.id && (S.deckId || DECK_IDS[0]) === deck.deckId;
-/** Whether the screen showing needs a module's rows: the module itself, or its deck's list counting
- * a word the learner saved from the reader. */
-const deckModuleWanted = (deck, mod) => deckModuleOpen(deck, mod) ||
-  (S.view === 'decks' && !S.deckModule && (S.deckId || DECK_IDS[0]) === deck.deckId &&
-    mod.cards.some((card) => deckCardAwaitsIndex(card, deckWordNode(deck, mod, card))));
-addEventListener('online', () => {
-  for (const { deck, mod } of [...deckModuleDegraded.values()]) if (deckModuleWanted(deck, mod)) retryDeckModule(deck, mod);
-});
-/** Loads a module's dictionary rows and resolves whether they are at hand. A failed load holds the
- * module's enrollment and is tried again with backoff while a deck screen still needs the rows;
- * whichever deck screen is showing re-renders once they arrive. */
-function prepareDeckModule(deck, mod) {
-  const key = `${deck.deckId}:${mod.id}`;
-  if (deckModuleReady.has(key)) return Promise.resolve(true);
-  if (deckModuleLoading.has(key)) return deckModuleLoading.get(key);
-  clearTimeout(deckModuleDegraded.get(key)?.timer);
-  const pending = Promise.all(mod.cards.filter(deckCardNeedsIndex).map((card) => ensureDictionaryRowsForForm(card.w)))
-    .then(() => {
-      deckModuleReady.add(key);
-      deckModuleDegraded.delete(key);
-      return true;
-    }, () => {
-      const failures = (deckModuleDegraded.get(key)?.failures || 0) + 1;
-      const held = { deck, mod, failures, timer: null };
-      held.timer = setTimeout(() => {
-        held.timer = null;
-        if (deckModuleWanted(deck, mod)) retryDeckModule(deck, mod);
-      }, DECK_RETRY_MS[Math.min(failures, DECK_RETRY_MS.length) - 1]);
-      deckModuleDegraded.set(key, held);
-      return false;
-    })
-    .finally(() => { deckModuleLoading.delete(key); });
-  deckModuleLoading.set(key, pending);
-  pending.then((ready) => { if (ready ? S.view === 'decks' : deckModuleOpen(deck, mod)) render(); });
-  return pending;
-}
-
-function retryDeckModule(deck, mod) {
-  prepareDeckModule(deck, mod);
-  if (deckModuleOpen(deck, mod)) render();
-}
-
-function renderDecks(main) {
-  main.append(withEn(el('p', 'eyebrow', '単語帳'), 'decks', 'en-inline'));
-  const deckId = S.deckId || DECK_IDS[0];
-  const deck = D.decks?.get(deckId);
-  const level = el('span', 'level-chip deck-level', 'N1');
-  level.dataset.level = 'N1';
-  level.title = tx('作者による対象レベルの目安', 'Author’s intended level');
-  main.append(level);
-  if (!deck) {
-    if (!deckFailed(deckId)) {
-      ensureDeck(deckId).then(() => render(), () => render());
-      main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
-      return;
-    }
-    main.append(el('p', 'card-kind', tx('単語帳を読み込めなかった。', 'The deck could not be loaded.')));
-    const again = biLabel('button', 'chip', 'もう一度', 'try again');
-    again.type = 'button';
-    again.addEventListener('click', () => {
-      D.deckFailed?.delete(deckId);
-      render();
-    });
-    main.append(again);
-    return;
-  }
-  const mod = deck.modules.find((m) => m.id === S.deckModule);
-  if (!mod) {
-    main.append(el('h1', 'view-title', deck.title.ja));
-    main.append(
-      el(
-        'p',
-        'gloss',
-        tx(
-          '自分で集めた語を、鉱脈ごとの読み物の中で覚える。読んでから選ぶ — 選ばなければ、何も増えない。',
-          'Your own mined words, each module learned inside its own passage. Read first, then choose — choose nothing, and nothing is added.',
-        ),
-      ),
-    );
-    for (const m of deck.modules) {
-      const nodes = m.cards.map((c) => deckWordNode(deck, m, c));
-      const key = `${deck.deckId}:${m.id}`;
-      if (!deckModuleReady.has(key) && !deckModuleLoading.has(key) && !deckModuleDegraded.get(key)?.timer &&
-          m.cards.some((c, i) => deckCardAwaitsIndex(c, nodes[i]))) {
-        prepareDeckModule(deck, m);
-      }
-      const have = nodes.filter((node) => wordCaptureState(node) === 'taken').length;
-      const row = el('button', 'entry-row vocabulary-module-row');
-      row.type = 'button';
-      row.dataset.deckModule = m.id;
-      row.append(el('span', 'row-glyph', m.id.slice(1, 3)));
-      const mid = el('span', 'row-main');
-      mid.append(document.createTextNode(m.title.ja.split(' — ')[0]));
-      if (bi()) mid.append(el('span', 'en-sub', m.title.en));
-      mid.append(el('span', 'mock-score', `${have} / ${m.cards.length}`));
-      row.append(mid);
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => {
-        S.deckModule = m.id;
-        render();
-        window.scrollTo(0, 0);
-      });
-      main.append(row);
-    }
-    return;
-  }
-  const moduleKey = `${deck.deckId}:${mod.id}`;
-  const held = deckModuleDegraded.get(moduleKey);
-  if (!deckModuleReady.has(moduleKey) && !deckModuleLoading.has(moduleKey) && !held?.timer) prepareDeckModule(deck, mod);
-  if (!deckModuleReady.has(moduleKey) && !held) {
-    main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
-    return;
-  }
-  // A failed index load holds enrollment until the rows load: on the backoff, after reconnecting, or from a held button.
-  const waiting = !deckModuleReady.has(moduleKey);
-  const fetching = deckModuleLoading.has(moduleKey);
-  const dictionaryHold = fetching ? ['辞書を読み込み中…', 'dictionary still loading']
-    : ['辞書に接続できません · 再試行', 'can’t reach the dictionary · retry'];
-  const owner = `deck:${moduleKey}`;
-  const nodeFor = (card) => deckWordNode(deck, mod, card);
-  const stateFor = (card) => wordCaptureState(nodeFor(card));
-  const enroll = (cards) => commitLearningEnrollment(owner, cards.map(nodeFor),
-    () => S.view === 'decks' && S.deckModule === mod.id, { listName: deckListName(deck, mod) });
-  main.append(el('h1', 'view-title', mod.title.ja.split(' — ')[0]));
-  main.append(el('p', 'gloss', tx(mod.title.ja.split(' — ')[1] || '', mod.title.en)));
-  const actions = el('div', 'deck-actions');
-  if (mod.article && D.passages.some((p) => p.id === mod.article)) {
-    const read = biLabel('button', 'chip btn-secondary', `読み物 —『${mod.passageTitle}』`, 'read the passage');
-    read.type = 'button';
-    read.id = 'deck-read';
-    read.addEventListener('click', () => openPassage(mod.article));
-    actions.append(read);
-  }
-  const fresh = mod.cards.filter((c) => stateFor(c) === 'take');
-  // words taken earlier from the reader still belong to this module's list
-  const listedIds = new Set((S.lists[deckListName(deck, mod)] || []).map((x) => x.id));
-  const unlisted = mod.cards.some((c) => stateFor(c) === 'taken' && !listedIds.has(c.w));
-  if (fresh.length || unlisted) {
-    const all = waiting
-      ? biLabel('button', 'chip btn-secondary lesson-enroll-all', ...dictionaryHold)
-      : fresh.length
-        ? biLabel('button', 'chip btn-primary lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
-        : biLabel('button', 'chip btn-secondary lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
-    all.type = 'button';
-    all.id = 'deck-enroll-all';
-    all.disabled = !waiting && learningEnrollmentPending.has(owner);
-    if (waiting && fetching) all.setAttribute('aria-disabled', 'true');
-    else all.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll(mod.cards)));
-    actions.append(all);
-  }
-  const listed = S.lists[deckListName(deck, mod)] || [];
-  const due = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
-  const dueHere = listed.filter((x) => due.has(srsKey(x.t, x.id))).length;
-  if (dueHere) {
-    const rev = biLabel('button', 'chip btn-secondary', `この鉱脈だけ復習 — ${dueHere}`, `review this module — ${dueHere}`);
-    rev.type = 'button';
-    rev.id = 'deck-review';
-    rev.addEventListener('click', () => startReview(listed));
-    actions.append(rev);
-  }
-  main.append(actions);
-  for (const c of mod.cards) {
-    const node = nodeFor(c);
-    const have = stateFor(c) === 'taken';
-    const heldText = have || waiting ? null : learningEnrollHeldText(node);
-    const row = el('div', 'lesson-enroll-row deck-card');
-    const word = el('span', 'lesson-enroll-word');
-    word.append(document.createTextNode(c.w));
-    word.append(el('span', 'deck-reading', c.r));
-    row.append(word);
-    const body = el('span', 'deck-card-body');
-    body.append(el('span', 'deck-def', c.d));
-    if (bi()) body.append(el('span', 'en-sub', c.g));
-    row.append(body);
-    const b = have
-      ? biLabel('button', 'chip btn-secondary lesson-enroll-one on', '覚える ✓', 'memorizing')
-      : waiting
-        ? biLabel('button', 'chip btn-secondary lesson-enroll-one', ...dictionaryHold)
-        : biLabel('button', 'chip btn-secondary lesson-enroll-one', '覚える', 'memorize');
-    b.type = 'button';
-    b.dataset.deckEnroll = c.w;
-    b.disabled = have || (!waiting && (!!heldText || learningEnrollmentPending.has(owner)));
-    if (!have && waiting && fetching) b.setAttribute('aria-disabled', 'true');
-    else if (!b.disabled) b.addEventListener('click', () => (waiting ? retryDeckModule(deck, mod) : enroll([c])));
-    if (heldText) {
-      b.classList.add('word-capture-held');
-      const reason = el('p', 'enroll-held', heldText);
-      reason.id = `deck-enroll-held-${c.n}`;
-      b.setAttribute('aria-describedby', reason.id);
-      body.append(reason);
-      const open = heldEnrollRoute(node, `deck-enroll-open-${c.n}`);
-      if (open) body.append(open);
-    }
-    row.append(b);
-    main.append(row);
-  }
-  const back = biLabel('button', 'chip btn-tertiary', '単語帳の一覧へ', 'all modules');
-  back.type = 'button';
-  back.addEventListener('click', () => {
-    S.deckModule = null;
-    render();
-    window.scrollTo(0, 0);
-  });
-  main.append(back);
-}
 
 /** One question, in the traditional posture: the paper does not tell you as
  * you go. Answers are recorded, changeable, and marked only at the end. */
@@ -17835,14 +17522,6 @@ function wordNodeIdentity(node, record = S) {
     // the entry's own kana form when the door's reading names it only across scripts: one word, one card
     return { kind: 'seq', seq: String(node.seq), reading: nonEmptyString(node.reading) ? entryCueReading(node) : null };
   }
-  if (node.deckSource) {
-    const snapshot = deckWordSnapshot(node);
-    if (!snapshot) return { kind: 'unknown' };
-    if (!D.dict?.[node.id]) {
-      if (deckSavedSnapshot(node, record)) return wordCardIdentity(record, node.id);
-      return { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
-    }
-  }
   if (D.dict?.[node.id]) return { kind: 'core' };
   const snapshots = plainRecord(record.deepWords) ? record.deepWords : null;
   if ((record.taken || []).some((entry) => entry.t === 'word' && entry.id === node.id) ||
@@ -17971,24 +17650,9 @@ function wordCapturePlan(latest, node, { replace = false } = {}) {
   if (node.seq != null && node.seq !== '') {
     snapshot = explicitWordSnapshot(node, latest);
     if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
-    if (node.deckSource && !deckSavedSnapshot(node, latest)) snapshot = { ...snapshot, deckSource: { ...node.deckSource } };
     identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };
   } else if (D.dict[id]) {
-    const bundled = node.deckSource ? deckWordSnapshot(node) : null;
-    if (node.deckSource && (!bundled || (bundled.r && kanaReadingKey(bundled.r) !== kanaReadingKey(D.dict[id].r))))
-      throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
     identity = { kind: 'core' };
-  } else if (node.deckSource) {
-    snapshot = deckWordSnapshot(node);
-    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });
-    const kept = deckSavedSnapshot(node, latest);
-    if (kept) {
-      snapshot = kept;
-      identity = wordCardIdentity(latest, id);
-    } else {
-      snapshot = { ...snapshot, deckSource: { ...node.deckSource } };
-      identity = { kind: 'text', reading: snapshot.r, gloss: snapshot.m[0] };
-    }
   } else {
     const kept = savedAnswerFor({ t: 'word', id }, { taken: [], deepWords: snapshots });
     if (saved && kept?.status === 'available') {
@@ -19230,10 +18894,6 @@ function wordCaptureState(node, record = S) {
   const row = (record.taken || []).some((entry) => entry.t === node.t && entry.id === node.id);
   if (node.t !== 'word') return row ? 'taken' : 'take';
   const explicit = node.seq != null && node.seq !== '';
-  if (node.deckSource) {
-    try { return wordCapturePlan(record, node).dedupe ? 'taken' : 'take'; }
-    catch (error) { return error?.code === 'word-identity-conflict' ? 'conflict' : 'unavailable'; }
-  }
   if (!row && !wordStudied(record, node.id)) return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
   if (!sameWordIdentity(wordNodeIdentity(node, record), wordCardIdentity(record, node.id))) return 'conflict';
   if (row) return 'taken';
@@ -19246,12 +18906,6 @@ function wordCaptureState(node, record = S) {
  * read なま. Returns both readings to name, or null when the row is not at hand or the reading names
  * one of its forms (the answer is then held for another reason, said in the older words). */
 function wordCaptureReadingMismatch(node) {
-  if (node?.deckSource && !node.seq) {
-    const reading = deckWordSnapshot(node)?.r;
-    const core = D.dict?.[node.id];
-    if (reading && core?.r && kanaReadingKey(reading) !== kanaReadingKey(core.r))
-      return { here: reading, dictionary: core.r };
-  }
   if (node?.seq == null || node.seq === '' || !nonEmptyString(node.reading)) return null;
   const row = dictionaryRowBySeq(node.seq);
   if (!Array.isArray(row) || String(row[0]) !== String(node.seq) || !Array.isArray(row[5]) || entryKanaIndex(row, node.reading) >= 0) return null;
@@ -19638,14 +19292,15 @@ function renderListPicker(sheet, node, label) {
   head.id = `list-picker-fold:${node.t}:${node.id}`;
   head.type = 'button';
   head.setAttribute('aria-expanded', String(open));
-  head.append(el('span', 'fold-title', tx('リストへ', 'lists')));
+  head.append(el('span', 'fold-title', tx('保存先', 'saved to')));
   head.append(
     el(
       'span',
       'fold-sub',
-      memberOf.length
-        ? memberOf.join('・')
-        : tx(`${monthKey(item.ts)} に自動追加ずみ`, `auto-filed in ${monthKey(item.ts)}`),
+      tx(
+        `保存先：覚えるの札${memberOf.length ? `・${memberOf.join('・')}` : ''}`,
+        `saved to: daily review${memberOf.length ? ` · ${memberOf.join(' · ')}` : ''}`,
+      ),
     ),
   );
   head.append(el('span', 'fold-arrow', open ? '▾' : '▸'));
@@ -19659,7 +19314,7 @@ function renderListPicker(sheet, node, label) {
     return;
   }
   wrap.append(
-    withEn(el('p', 'eyebrow', `リスト — ${monthKey(item.ts)} に自動追加ずみ`), `lists — already in ${monthKey(item.ts)}`, 'en-inline'),
+    withEn(el('p', 'eyebrow', 'リストに入れる・外す'), 'add to or remove from a list', 'en-inline'),
   );
   const chips = el('div', 'chips');
   for (const name of Object.keys(S.lists)) {
@@ -21870,6 +21525,119 @@ function renderStudyHall(main) {
 }
 
 /** The dojo lobby: choose a length and what to drill. */
+/* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
+ * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
+ * own word queue, opened as a plain review. */
+const DOJO_DECKS = [{ id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
+let deckPlayer = null;
+let deckPlayerLoading = null;
+let deckPlayerError = false;
+const deckSummaries = {};
+function loadDeckPlayer() {
+  if (deckPlayer) return Promise.resolve(deckPlayer);
+  if (!deckPlayerLoading) {
+    deckPlayerLoading = import('./decks/player/mount.js').then(
+      (mod) => {
+        deckPlayer = mod;
+        return mod;
+      },
+      (err) => {
+        deckPlayerError = true;
+        deckPlayerLoading = null;
+        throw err;
+      },
+    );
+  }
+  return deckPlayerLoading;
+}
+
+function openDeck(id) {
+  keepScroll();
+  S.deckPlay = id;
+  S.view = 'deckplay';
+  render();
+  window.scrollTo(0, 0);
+}
+
+function renderDojoDecks(main) {
+  main.append(withEn(el('p', 'eyebrow', 'デッキ'), 'SRS decks', 'en-inline'));
+  const list = el('div', 'dojo-decks');
+  const row = (id, ja, sub, onClick) => {
+    const b = el('button', 'dojo-deck');
+    b.type = 'button';
+    b.dataset.deck = id;
+    b.append(el('span', 'dojo-deck-t', ja), el('span', 'dojo-deck-sub', sub));
+    b.addEventListener('click', onClick);
+    list.append(b);
+  };
+  row('personal', '私の文脈', tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
+    const url = new URL(location.href);
+    url.searchParams.set('deck', 'personal');
+    location.assign(url);
+  });
+  for (const d of DOJO_DECKS) {
+    const sum = deckSummaries[d.id];
+    if (!sum && window.__CORRIDOR_STANDALONE__ !== true) {
+      loadDeckPlayer()
+        .then((mod) => mod.summary(d.id))
+        .then((got) => {
+          deckSummaries[d.id] = got;
+          if (S.view === 'dojo') render();
+        })
+        .catch(() => {});
+    }
+    const counts = sum ? tx(`復習 ${sum.due} ・ 新しい文 ${sum.fresh}`, `${sum.due} due · ${sum.fresh} new`) : tx(d.en, d.en);
+    row(d.id, d.ja, counts, () => openDeck(d.id));
+  }
+  row('context', '文脈札', tx('一語ごとの段落カード', 'one paragraph per word'), () => {
+    keepScroll();
+    S.view = 'contextdeck';
+    render();
+    window.scrollTo(0, 0);
+  });
+  const forecast = srsForecast();
+  row('mine', '覚えるの札', tx(`覚えた語 ・ ${forecast.today + forecast.fresh} 枚 待っている`, `words you saved · ${forecast.today + forecast.fresh} waiting`), () => startReview());
+  for (const name of Object.keys(S.lists || {})) {
+    const items = S.lists[name];
+    if (!items.length) continue;
+    const keys = new Set(items.map((x) => srsKey(x.t, x.id)));
+    const waiting = srsDueItems().filter((i) => keys.has(srsKey(i.t, i.id))).length;
+    row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語 ・ ${waiting} 枚 待っている`, `list · ${items.length} words · ${waiting} waiting`), () => startReview(items));
+  }
+  main.append(list);
+}
+
+function renderDeckPlay(main) {
+  if (deckPlayerError) {
+    main.append(el('p', 'card-kind', tx('デッキを開けませんでした。', 'The deck could not be opened.')));
+    return;
+  }
+  if (!deckPlayer) {
+    main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+    loadDeckPlayer().then(
+      () => S.view === 'deckplay' && render(),
+      () => S.view === 'deckplay' && render(),
+    );
+    return;
+  }
+  deckPlayer
+    .render(main, {
+      deckId: S.deckPlay || DOJO_DECKS[0].id,
+      storage: localStorage,
+      onLeave() {
+        delete deckSummaries[S.deckPlay];
+        S.view = 'dojo';
+        render();
+        window.scrollTo(0, 0);
+      },
+    })
+    .catch((err) => {
+      console.error(err);
+      deckPlayerError = true;
+      if (S.view === 'deckplay') render();
+    });
+}
+
 function renderFocus(main) {
   main.append(withEn(el('h1', 'view-title', '集中道場'), 'the focus dojo', 'en-inline'));
   renderStudyHall(main);
@@ -21885,6 +21653,9 @@ function renderFocus(main) {
     ),
   );
 
+  renderDojoDecks(main);
+
+  main.append(withEn(el('p', 'eyebrow', '集中ブロック'), 'timed block', 'en-inline'));
   main.append(withEn(el('p', 'eyebrow', '時間'), 'how long', 'en-inline'));
   const mins = el('div', 'focus-choices');
   S.focusMin = S.focusMin || 20;
@@ -28411,7 +28182,7 @@ function render() {
   // the crumb names the TRUE origin — the room 戻る actually reopens. The
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
-  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus) ||
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || S.view === 'deckplay' || (S.view === 'review' && S.focus) ||
     (S.view === 'guided' && guidedFrom === 'dojo');
   // the search room's door stands in the galaxy bar, and its Back walks
   // there unless it was opened from the shelf
@@ -28421,7 +28192,7 @@ function render() {
   // it said 本棚 whichever room that was (PR #77 d9f0b984)
   const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
   const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
-  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' ||
+  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' || view === 'deckplay' ||
     (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
   if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
   else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
@@ -28447,7 +28218,6 @@ function render() {
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
   if (S.view === 'mock') parts.push(tx('JLPT の練習', 'JLPT practice'));
-  if (S.view === 'decks') parts.push(tx('単語帳', 'decks'));
   if (S.view === 'kagami') parts.push(tx('鏡', 'the mirror'));
   if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
   if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
@@ -28461,6 +28231,7 @@ function render() {
     parts.push(guidedFrom === 'mock' ? tx('JLPT の練習', 'JLPT practice') : tx('集中道場', 'focus'), tx('案内つきの稽古', 'guided session'));
   }
   if (S.view === 'contextdeck') parts.push(tx('文脈札', 'context deck'));
+  if (S.view === 'deckplay') parts.push(tx('集中道場', 'focus'), tx('デッキ', 'deck'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   crumb.setAttribute('aria-label', crumb.title);
@@ -28703,12 +28474,12 @@ function render() {
     else if (S.view === 'probe') renderProbe(main);
     else if (S.view === 'archive') renderArchive(main);
     else if (S.view === 'dojo') renderFocus(main);
+    else if (S.view === 'deckplay') renderDeckPlay(main);
     else if (S.view === 'aiquiz') renderAiQuiz(main);
     else if (S.view === 'levels') renderLevels(main);
     else if (S.view === 'ai') renderAiSetup(main);
     else if (S.view === 'lessons') renderLessons(main);
     else if (S.view === 'mock') renderMock(main);
-    else if (S.view === 'decks') renderDecks(main);
     else if (S.view === 'kagami') renderKagami(main);
     else if (S.view === 'thesaurus') renderThesaurus(main);
     else if (S.view === 'airead') renderAiReading(main);
