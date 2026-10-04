@@ -288,20 +288,27 @@ function revive(stored) {
   };
 }
 
-/** the next sentence of a word that may be introduced, or null. A suspended card that was
- * never shown holds the word there until it is restored. */
+/** the next sentence of a word that may be introduced, or null. A card suspended before it was
+ * ever shown (削除 on its first showing) is skipped, and so are the 字 cards of a passage whose
+ * word card went that way: the next passage becomes the word's first, so a cull never holds the
+ * word. The unlock test reads the last card of the word that was shown. */
 function nextNewCard(word, state, unlockDays = UNLOCK_STABILITY_DAYS) {
-  for (let i = 0; i < word.cards.length; i++) {
-    const card = word.cards[i];
+  let prev = null;
+  const culled = new Set();
+  for (const card of word.cards) {
     const stored = state.cards[card.id];
-    if (!stored) {
-      if (isSuspended(state, card.id)) return null;
-      if (i === 0) return card;
-      const prev = state.cards[word.cards[i - 1].id];
-      if (!prev) return null;
-      if (prev.state === REVIEW && prev.stability >= unlockDays) return card;
-      return (prev.lapses || 0) >= UNLOCK_AFTER_LAPSES ? card : null;
+    if (stored) {
+      prev = stored;
+      continue;
     }
+    if (isSuspended(state, card.id)) {
+      if (card.type === 'word') culled.add(card.passage);
+      continue;
+    }
+    if (card.type === 'kanji' && culled.has(card.passage)) continue;
+    if (!prev) return card;
+    if (prev.state === REVIEW && prev.stability >= unlockDays) return card;
+    return (prev.lapses || 0) >= UNLOCK_AFTER_LAPSES ? card : null;
   }
   return null;
 }
