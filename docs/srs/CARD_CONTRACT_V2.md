@@ -85,7 +85,7 @@ fold, which is where "the same kanji in different contexts" lives without leakin
 | 学   | learning science / exam talk | 星友啓, PIVOT 勉強法, DaiGo, にしむら先生               | optional       |
 
 Topics rotate through the learner's four: mind and learning; Indian and Buddhist
-philosophy; AI with semiconductors; world history as connective tissue. The fifth texture,
+philosophy (anchored in Japanese by 日本ヴェーダーンタ協会, 大蔵経, 大愚和尚); AI with semiconductors; world history as connective tissue. The fifth texture,
 Japanese about Japanese (語源, 言語学), is allowed for any word whose kanji or etymology is
 interesting. Hobby topics (surf, yoga, crypto) at most once per word.
 
