@@ -10,12 +10,16 @@ A word without a review entry keeps the ranker's picks.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 DECK = Path(__file__).resolve().parent.parent
 SRC = DECK / "source"
+sys.path.insert(0, str(DECK / "tools"))
+from rights import UNVERIFIED, UNVERIFIED_AOZORA, UNVERIFIED_WEB  # noqa: E402
+
 SITE = {"tatoeba": "Tatoeba", "example-bank": "例文集（Tanaka/SNOW）", "news": "ja.wikinews.org", "literature": "青空文庫"}
-LICENCE = {"tatoeba": "CC BY 2.0 FR", "news": "CC BY 2.5 (Wikinews)", "literature": "public domain", "example-bank": "CC BY"}
+LICENCE = {"tatoeba": "CC BY 2.0 FR", "news": "CC BY 2.5 (Wikinews)", "literature": UNVERIFIED_AOZORA, "example-bank": "CC BY"}
 
 
 def entry(p: dict) -> dict:
@@ -30,7 +34,8 @@ def entry(p: dict) -> dict:
         "kind": kind,
         "site": p.get("site") or SITE.get(kind, ""),
         "url": url,
-        "licence": p.get("licence") or LICENCE.get(kind, "quotation (personal study)"),
+        "licence": p.get("licence") or LICENCE.get(kind, UNVERIFIED),
+        **{k: p[k] for k in ("author", "translator") if p.get(k)},
     }
 
 
@@ -46,7 +51,7 @@ def main() -> int:
         web = DECK / "mining" / "web" / f"{n}.json"
         if web.exists():
             for c in json.loads(web.read_text("utf-8"))["candidates"]:
-                pool.setdefault(c["ja"], {**c, "licence": "web quotation (personal study)"})
+                pool.setdefault(c["ja"], {**c, "licence": c.get("licence") or UNVERIFIED_WEB})
         rows = []
         if n in review:
             for r in review[n]:

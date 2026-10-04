@@ -84,7 +84,8 @@ def main() -> int:
             if r:
                 s, info = r
                 scored.append({**info, "score": round(s, 3), "kind": c["kind"], "site": c["site"], "url": c.get("url", ""),
-                               "licence": c["licence"], "title": c.get("title", "")})
+                               "licence": c["licence"], "title": c.get("title", ""),
+                               **{k: c[k] for k in ("author", "translator", "workId") if c.get(k)}})
         scored.sort(key=lambda x: -x["score"])
         # spread across sources: no more than 3 from one site in the shortlist
         per = Counter()

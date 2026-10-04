@@ -1,0 +1,380 @@
+{
+  "_about": "Licence of record per source, applied by tools/rights.py. Aozora keys are the site strings exactly as shipped in source/mcd.json and source/mined.json. A licence comes only from the work's own text-file trailer (`file`, `notice` quoted verbatim from the aozorahack/aozorabunko_text mirror); a work whose trailer has not been read stays unverified and is private-only.",
+  "aozora": {
+    "青空文庫『45回転の夏』第１章　ローラーコースター、１９６６年": {
+      "licence": "CC BY-NC-ND 2.1 JP",
+      "author": "鶴岡雄二",
+      "file": "cards/000113/files/4325_ruby_67522/4325_ruby_67522.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ「表示-非営利-改変禁止 2.1 日本」でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000113/card4325.html"
+    },
+    "青空文庫『「天に積む宝」のふやし方、へらし方』著作権保護期間延長が青空文庫にもたらすもの": {
+      "licence": "CC BY 2.1 JP",
+      "author": "富田倫生",
+      "file": "cards/000055/files/59489_txt_66663/59489_txt_66663.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ「表示 2.1 日本 (CC BY 2.1 JP)」でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000055/card59489.html"
+    },
+    "青空文庫『「自然」を深めよ』和辻哲郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『いたずらっ子』ハンス・クリスチャン・アンデルセン　Hans Christian Andersen": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『お墓の中の坊や』ハンス・クリスチャン・アンデルセン　Hans Christian Andersen": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『この子を残して』永井隆": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『すみだ川』永井荷風": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『わが町』織田作之助": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『アリスはふしぎの国で』ALICE IN WONDERLAND": {
+      "licence": "CC BY 4.0",
+      "author": "ルイス・キャロル",
+      "translator": "大久保ゆう",
+      "file": "cards/001393/files/57320_ruby_57182/57320_ruby_57182.txt",
+      "notice": "※この翻訳は「クリエイティブ・コモンズ 表示 4.0 国際 ライセンス」（https://creativecommons.org/licenses/by/4.0/deed.ja）の下で公開されています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/001393/card57320.html"
+    },
+    "青空文庫『ジーキル博士とハイド氏の怪事件』THE STRANGE CASE OF DR. JEKYLL AND MR. HYDE": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『パソコン創世記』富田倫生": {
+      "licence": "CC BY 2.1 JP",
+      "author": "富田倫生",
+      "file": "cards/000055/files/365_txt_185/365_txt_185.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ「表示 2.1 日本」でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000055/card365.html"
+    },
+    "青空文庫『ファラデーの伝』電気学の泰斗": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『メールストロムの旋渦』A DESCENT INTO THE MAELSTROM": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『リップ・ヴァン・ウィンクル』ディードリッヒ・ニッカボッカーの遺稿": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『ロマネスク』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『七月の水玉』片岡義男": {
+      "licence": "CC BY-NC-ND 2.1 JP",
+      "author": "片岡義男",
+      "file": "cards/001506/files/54825_txt_46746/54825_txt_46746.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ「表示-非営利-改変禁止 2.1 日本」でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/001506/card54825.html"
+    },
+    "青空文庫『不審庵』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『世界怪談名作集』北極星号の船長　医学生ジョン・マリスターレーの奇異なる日記よりの抜萃": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『世界怪談名作集』妖物": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『丸善と三越』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『九州の学生とともに』WITH KYUSHU STUDENTS": {
+      "licence": "CC BY-ND 2.1 JP",
+      "author": "ラフカディオ・ハーン（小泉八雲）",
+      "translator": "林田清明",
+      "file": "cards/000258/files/58038_ruby_59801/58038_ruby_59801.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ（http://creativecommons.org/licenses/by-nd/2.1/jp/）の下でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000258/card58038.html"
+    },
+    "青空文庫『乞食学生』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『亡霊怪猫屋敷』橘外男": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『人間失格』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『仏教人生読本』岡本かの子": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『何が私をこうさせたか』――獄中手記――": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『偉大な医師たち』伝記による医学史": {
+      "licence": "CC BY 2.1 JP",
+      "author": "ヘンリー・E・シゲリスト",
+      "translator": "水上茂樹",
+      "file": "cards/001492/files/51194_ruby_67442/51194_ruby_67442.txt",
+      "notice": "※本作品は「クリエイティブ・コモンズ 表示 2.1 日本 ライセンス」（http://creativecommons.org/licenses/by/2.1/jp/）の下に提供されています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/001492/card51194.html"
+    },
+    "青空文庫『別府温泉』高浜虚子": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『力餅』島崎藤村": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『印度の詩人』国枝史郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『去年』伊藤左千夫": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『味を知るもの鮮し』北大路魯山人": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『土の中からの話』坂口安吾": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『土曜夫人』織田作之助": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『地底戦車の怪人』海野十三": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『地獄の使者』海野十三": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『夏目漱石先生の追憶』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『大菩薩峠』女子と小人の巻": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『大菩薩峠』甲源一刀流の巻": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『好日』三好十郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『家なき子』SANS FAMILLE": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『小知恵にとらわれた現代の法律学』末弘厳太郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『山上湖』豊島与志雄": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『帰去来』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『恐怖城』佐左木俊郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『悲しい誤解』豊島与志雄": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『我が家の楽園』久生十蘭": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『或る部落の五つの話』佐左木俊郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『抗議する義務』中谷宇吉郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『放し鰻』岡本綺堂": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『断層顔』海野十三": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『日本人の自然観』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『春の潮』伊藤左千夫": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『春六題』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『本の未来』富田倫生": {
+      "licence": "CC BY 2.1 JP",
+      "author": "富田倫生",
+      "file": "cards/000055/files/56499_txt_51224/56499_txt_51224.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ「表示 2.1 日本」でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000055/card56499.html"
+    },
+    "青空文庫『東京青年』片岡義男": {
+      "licence": "CC BY-NC-ND 2.1 JP",
+      "author": "片岡義男",
+      "file": "cards/001506/files/56822_ruby_57117/56822_ruby_57117.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ「表示-非営利-改変禁止 2.1 日本」でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/001506/card56822.html"
+    },
+    "青空文庫『柿の種』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『槍ガ岳』（北鎌尾根）": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『橙の種五粒』THE FIVE ORANGE PIPS": {
+      "licence": "CC BY 2.1 JP",
+      "author": "アーサー・コナン・ドイル",
+      "translator": "加藤朝鳥（訳）、大久保ゆう（改訳）",
+      "file": "cards/000009/files/57322_ruby_57271/57322_ruby_57271.txt",
+      "notice": "※この翻訳は「クリエイティブ・コモンズ 表示 2.1 日本 ライセンス」（http://creativecommons.org/licenses/by/2.1/jp/）によって公開されています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000009/card57322.html"
+    },
+    "青空文庫『海底大陸』海野十三": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『源氏物語』若紫": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『瀕死の探偵』THE ADVENTURE OF THE DYING DETECTIVE": {
+      "licence": "CC BY 2.1 JP",
+      "author": "アーサー・コナン・ドイル",
+      "translator": "東健而（訳）、大久保ゆう（改訳）",
+      "file": "cards/000009/files/50718_ruby_36995/50718_ruby_36995.txt",
+      "notice": "※この翻訳は「クリエイティブ・コモンズ 表示 2.1 日本 ライセンス」（http://creativecommons.org/licenses/by/2.1/jp/）によって公開されています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000009/card50718.html"
+    },
+    "青空文庫『火事とポチ』有島武郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『生まれいずる悩み』有島武郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『畜犬談』―伊馬鵜平君に与える―": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『白髪鬼』岡本綺堂": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『破片』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『碁石を呑んだ八っちゃん』有島武郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『私の父』堺利彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『科学の限界』中谷宇吉郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『科学ブームへの苦言』中谷宇吉郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『納豆の茶漬け』北大路魯山人": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『緋のエチュード』A STUDY IN SCARLET": {
+      "licence": "CC BY 2.1 JP",
+      "author": "アーサー・コナン・ドイル",
+      "translator": "大久保ゆう",
+      "file": "cards/000009/files/55881_ruby_50043/55881_ruby_50043.txt",
+      "notice": "※この翻訳は「クリエイティブ・コモンズ 表示 2.1 日本 ライセンス」（http://creativecommons.org/licenses/by/2.1/jp/）によって公開されています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000009/card55881.html"
+    },
+    "青空文庫『老齢学』――長生きをする学問の存在――": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『花の咲く前』小川未明": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『花物語』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『葉』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『蒼炎石』THE ADVENTURE OF THE BLUE CARBUNCLE": {
+      "licence": "CC BY 2.1 JP",
+      "author": "アーサー・コナン・ドイル",
+      "translator": "大久保ゆう",
+      "file": "cards/000009/files/50711_ruby_36968/50711_ruby_36968.txt",
+      "notice": "※この翻訳は「クリエイティブ・コモンズ 表示 2.1 日本 ライセンス」（http://creativecommons.org/licenses/by/2.1/jp/）によって公開されています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000009/card50711.html"
+    },
+    "青空文庫『試験管』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『読書の今昔』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『誰も知らぬ』太宰治": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『赤い婚礼』RED BRIDAL": {
+      "licence": "CC BY-ND 2.1 JP",
+      "author": "ラフカディオ・ハーン（小泉八雲）",
+      "translator": "林田清明",
+      "file": "cards/000258/files/58129_ruby_60565/58129_ruby_60565.txt",
+      "notice": "この作品は、クリエイティブ・コモンズ（http://creativecommons.org/licenses/by-nd/2.1/jp/）の下でライセンスされています。",
+      "workUrl": "https://www.aozora.gr.jp/cards/000258/card58129.html"
+    },
+    "青空文庫『超人間Ｘ号』海野十三": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『連句雑俎』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『野州の石屋根』柳宗悦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『鉛筆のしん』中谷宇吉郎": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『錯覚数題』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『青春の逆説』織田作之助": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『青木の出京』菊池寛": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『青蛙堂鬼談』岡本綺堂": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『青衣童女像』寺田寅彦": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『顔を語る』宮本百合子": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『飢餓地帯を歩く』――東北農村惨状報告書――": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『魔都』久生十蘭": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『麦畑』モーリス・ルヴェル　Maurice Level": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『黒猫』THE BLACK CAT": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    },
+    "青空文庫『黴』徳田秋声": {
+      "licence": "unverified (Aozora; licence of record not yet read)"
+    }
+  },
+  "excludeDomainsPublic": [
+    "x.com",
+    "twitter.com",
+    "instagram.com",
+    "threads.net",
+    "threads.com",
+    "facebook.com",
+    "note.com",
+    "ameblo.jp",
+    "hatena",
+    "chiebukuro"
+  ],
+  "privateOnlyLicences": [
+    "CC BY-ND",
+    "CC BY-NC-ND",
+    "CC BY-NC-SA",
+    "web quotation (personal study)",
+    "quotation (personal study)",
+    "unverified"
+  ]
+}

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Aozora Bunko (public domain) → mining/aozora/<n>.json
+"""Aozora Bunko → mining/aozora/<n>.json
 
 Reads a local checkout of aozorahack/aozorabunko_text (cards/*/files/*/*.txt,
 Shift_JIS with 《ruby》 ｜ ［＃notes］ markup), strips the markup, splits
 sentences, and keeps every sentence that contains a word or one of its spellings.
+Aozora is not all public domain: each candidate carries the work's own licence,
+read from the trailer after 底本：, and its title, author, translator and work-card
+URL, parsed from the header (rights.aozora_work). A work whose trailer states no
+licence is "unverified".
 Usage: python3 tools/mine_aozora.py <path to aozorabunko_text>
 """
 from __future__ import annotations
@@ -16,6 +20,7 @@ from pathlib import Path
 DECK = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rank import VARIANTS  # noqa: E402
+from rights import TRAILER, aozora_work  # noqa: E402
 
 RUBY = re.compile(r"《[^》]*》|｜|［＃[^］]*］|〔[^〕]*〕")
 OLD = re.compile(r"[ゐゑヰヱゝゞ〳〴〵云]")
@@ -26,7 +31,7 @@ def body(raw: str) -> str:
     lines = raw.splitlines()
     dash = [i for i, l in enumerate(lines) if l.startswith("-----")]
     start = dash[1] + 1 if len(dash) >= 2 else 2
-    end = next((i for i, l in enumerate(lines) if l.startswith("底本：")), len(lines))
+    end = next((i for i, l in enumerate(lines) if TRAILER.match(l)), len(lines))  # the trailer is read by rights.aozora_licence
     return RUBY.sub("", "\n".join(lines[start:end]))
 
 
@@ -41,8 +46,7 @@ def main() -> int:
             raw = f.read_bytes().decode("cp932", errors="strict")
         except UnicodeDecodeError:
             continue
-        title = raw.splitlines()[0].strip() if raw else ""
-        author = raw.splitlines()[1].strip() if raw.count("\n") > 1 else ""
+        work = aozora_work(raw, f)
         text = body(raw)
         if len(OLD.findall(text)) > 3:
             continue  # old spelling throughout
@@ -52,10 +56,8 @@ def main() -> int:
                 continue
             for n, ks in keys.items():
                 if len(found[n]) < 60 and any(k in s for k in ks):
-                    card = f.parts[-4]
-                    found[n].append({"ja": s, "title": f"{title}（{author}）", "src": f"aozora:{card}",
-                                     "site": f"青空文庫『{title}』{author}",
-                                     "url": f"https://www.aozora.gr.jp/cards/{card}/"})
+                    found[n].append({"ja": s, "src": f"aozora:{f.parts[-4]}:{work['workId']}", **work,
+                                     "title": f"{work['title']}（{work['author']}）"})
     out = DECK / "mining" / "aozora"
     out.mkdir(exist_ok=True)
     for n, cands in found.items():

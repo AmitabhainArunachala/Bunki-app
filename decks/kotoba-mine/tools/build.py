@@ -30,6 +30,17 @@ Flags
   --mcd <path>    read the MCD passages from <path> instead of source/mcd.json
   --ids <path>    read (and update) this manifest instead of source/ids.json
   --preview <f>   write a study page of the MCD deck to <f>; ids.json is not written
+  --profile private|public
+                  private (default): the learner's own study build, today's paths
+                  (prototypes/corridor/decks/<id>/deck.json, release/*). public: the
+                  build that may be shared; cards whose source tools/rights.py does not
+                  allow are left out after ids are assigned (ids never move), and words
+                  left with no card are dropped. Writes release/public/deck-<id>.json,
+                  apkg, tsv and study page; never writes ids.json.
+
+Both profiles set every source label from source/rights.json (tools/rights.py relabel)
+and write ATTRIBUTION-<deck id>.md beside their outputs: every source not written for
+the deck, grouped by site, with licence, author/translator, URLs and passage count.
 """
 from __future__ import annotations
 
@@ -62,11 +73,16 @@ def _arg(flag: str) -> str | None:
 FROZEN = "--frozen" in sys.argv
 MCD_PATH = Path(_arg("--mcd") or SRC / "mcd.json")
 IDS_PATH = Path(_arg("--ids") or SRC / "ids.json")
+PROFILE = _arg("--profile") or "private"
 
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(CORRIDOR / "tools"))
 sys.path.insert(0, str(REPO))
 import check_v2  # noqa: E402
+import rights  # noqa: E402
+
+if PROFILE not in rights.PROFILES:
+    raise SystemExit(f"--profile must be one of {', '.join(rights.PROFILES)}, not {PROFILE!r}")
 
 DECK_ID = "kotoba-mine"
 TITLE_JA = "言葉の鉱脈"
@@ -126,12 +142,21 @@ def load() -> list[dict]:
     return mods
 
 
+SRC_KEYS = ("site", "url", "licence", "author", "translator")
+
+
+def source(record: dict) -> dict:
+    """a card's src: the record's site, url and licence with rights.json applied"""
+    r = rights.relabel(record)
+    return {k: r[k] for k in SRC_KEYS if r.get(k)}
+
+
 def with_mined(card: dict, picks: list[dict] | None) -> dict:
     """real sentences when mining found any; otherwise the best written one, labelled as such"""
     if picks:
         sentences = [
             {"lv": i + 1, "ja": p["ja"], "form": p["form"], "en": p.get("en", ""), "kind": p["kind"],
-             "src": {k: p[k] for k in ("site", "url", "licence") if p.get(k)}}
+             "src": source(p)}
             for i, p in enumerate(picks)
         ]
     else:
@@ -373,7 +398,7 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
         ruby = _ordered_for({"ja": p["ja"], "form": p["form"]}, c, tagger, bc)
         if "".join(seg[0] for seg in ruby) != p["ja"]:
             raise SystemExit(f"{wid} passage {pi}: ruby does not spell the passage")
-        src = {k: p[k] for k in ("site", "url", "licence") if p.get(k)}
+        src = source(p)
         base = {"ja": p["ja"], "form": p["form"], "en": p["en"], "kind": p["kind"], "src": src, "passage": pi}
         cards.append({**base, "type": "word", "ruby": ruby})
         keys.append(word_key(wid, p["ja"]))
@@ -742,7 +767,7 @@ def stable_id(s: str) -> int:
     return int(hashlib.sha1(s.encode()).hexdigest()[:12], 16) % (1 << 31) + (1 << 30)
 
 
-def build_anki(deck: dict, spec: dict) -> None:
+def build_anki(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
     import genanki
 
     tdir_name, model_key, model_name, card_name, deck_key = spec["anki"]
@@ -774,14 +799,14 @@ def build_anki(deck: dict, spec: dict) -> None:
     for i, r in enumerate(note_rows(deck)):
         note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[deck["id"], f"card{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}"], sort_field=r["Sort"], due=i)
         decks[r["_group"]].add_note(note)
-    genanki.Package(list(decks.values())).write_to_file(str(RELEASE / spec["out"][0]))
+    genanki.Package(list(decks.values())).write_to_file(str(out_dir / spec["out"][0]))
 
 
-def build_tsv(deck: dict, spec: dict) -> None:
+def build_tsv(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
     lines = ["#separator:tab", "#html:true", f"#columns:{chr(9).join(FIELDS)}\tTags"]
     for r in note_rows(deck):
         lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{deck['id']} card{r['Level']} source::{r['Kind']}"]))
-    (RELEASE / spec["out"][1]).write_text("\n".join(lines) + "\n", "utf-8")
+    (out_dir / spec["out"][1]).write_text("\n".join(lines) + "\n", "utf-8")
 
 
 # ------------------------------------------------------------------ study.html
@@ -814,6 +839,84 @@ def build_study(deck: dict, out: Path | None = None) -> None:
     (out or RELEASE / "study.html").write_text(page, "utf-8")
 
 
+# ------------------------------------------------------------------ profiles and attribution
+PUBLIC_REASONS = ("livedoor ND", "web quotation", "social domain", "restricted Aozora", "unverified Aozora", "no URL")
+PUBLIC_PROVENANCE = ("Passages are written for this deck (書き下ろし) or quoted from sources whose licence allows sharing: "
+                     "Tatoeba (CC BY 2.0 FR) and Aozora Bunko works under Creative Commons licences that allow changes. "
+                     "Each card names its source; ATTRIBUTION-<deck id>.md lists every source with its licence, author and link. "
+                     "Definitions, notes and the 書き下ろし passages were written for this word list.")
+
+
+def public_deck(deck: dict) -> tuple[dict, dict]:
+    """the deck without the cards rights.allowed() keeps out of the public profile; ids are
+    the ones the full build assigned. Returns (deck, report)."""
+    reasons: dict[str, dict[str, set | int]] = {}
+    words, dropped = [], []
+    for w in deck["words"]:
+        kept = []
+        for card in w["cards"]:
+            record = {**card.get("src", {}), "kind": card["kind"]}
+            if rights.allowed(record, "public"):
+                kept.append(card)
+                continue
+            r = reasons.setdefault(rights.exclusion(record), {"cards": 0, "passages": set()})
+            r["cards"] += 1
+            r["passages"].add((w["id"], card["ja"]))
+        if kept:
+            words.append({**w, "cards": kept})
+        else:
+            dropped.append(w["id"])
+    groups = [g for g in deck["groups"] if any(w["group"] == g["id"] for w in words)]
+    out = {**deck, "groups": groups, "words": words, "provenance": PUBLIC_PROVENANCE}
+    report = {"reasons": {k: (v["cards"], len(v["passages"])) for k, v in reasons.items()}, "dropped": dropped,
+              "cards": (sum(len(w["cards"]) for w in words), sum(len(w["cards"]) for w in deck["words"]))}
+    return out, report
+
+
+def attribution_md(deck: dict, profile: str) -> str:
+    """every source not written for the deck, grouped by site: licence, author/translator,
+    URLs (or "no URL recorded") and how many passages come from it"""
+    sites: dict[str, dict[tuple, dict]] = {}
+    written = set()
+    for w in deck["words"]:
+        for card in w["cards"]:
+            if card["kind"] == "original":
+                written.add((w["id"], card["ja"]))
+                continue
+            src = card.get("src", {})
+            site = src.get("site") or KIND_JA.get(card["kind"], card["kind"])
+            combo = (src.get("licence", rights.UNVERIFIED), src.get("author", ""), src.get("translator", ""))
+            g = sites.setdefault(site, {}).setdefault(combo, {"passages": set(), "urls": set(), "bare": set()})
+            g["passages"].add((w["id"], card["ja"]))
+            if src.get("url"):
+                g["urls"].add(src["url"])
+            else:
+                g["bare"].add((w["id"], card["ja"]))
+    total = sum(len(g["passages"]) for combos in sites.values() for g in combos.values())
+    use = ("the learner's own study (private build; some sources below may not be shared)" if profile == "private"
+           else "sharing (public build; sources that may not be shared are left out)")
+    lines = [f"# Sources: {deck['titleJa']} ({deck['id']})", "",
+             f"Built for {use}. {total} passages come from the {len(sites)} sources below; "
+             f"{len(written)} passages were written for this deck (書き下ろし) and are not listed.", ""]
+    order = sorted(sites, key=lambda s: (-sum(len(g["passages"]) for g in sites[s].values()), s))
+    for site in order:
+        lines += [f"## {site}", ""]
+        for (licence, author, translator), g in sorted(sites[site].items()):
+            lines.append(f"- Licence: {licence}")
+            lines.append(f"  - Author: {author or 'not recorded'}")
+            if translator:
+                lines.append(f"  - Translator: {translator}")
+            lines.append(f"  - Passages: {len(g['passages'])}")
+            if not g["urls"]:
+                lines.append("  - URL: no URL recorded")
+            else:
+                lines += [f"  - URL: <{u}>" for u in sorted(g["urls"])]
+                if g["bare"]:
+                    lines.append(f"  - URL: no URL recorded for {len(g['bare'])} passages")
+        lines.append("")
+    return "\n".join(lines)
+
+
 def main() -> int:
     mods = load()
     if "--preview" in sys.argv:
@@ -823,7 +926,8 @@ def main() -> int:
         build_study(deck, out)
         print(f"· preview: {len(deck['words'])} words, {sum(len(w['cards']) for w in deck['words'])} cards → {out}")
         return 0
-    ids = IdManifest(IDS_PATH, FROZEN)
+    public = PROFILE == "public"
+    ids = IdManifest(IDS_PATH, FROZEN or public)  # the public build never assigns or writes ids
     out_dir = Path(_arg("--out")) if "--out" in sys.argv else None
     decks = {kind: build_deck(mods, ids, kind) for kind in DECKS}
     rules = reading_rules()
@@ -845,21 +949,41 @@ def main() -> int:
     for spec in DECKS.values():
         ids.retire_unseen(spec["id"])
     ids.save()  # before any deck is written, so no shipped id is missing from the manifest
+    release = RELEASE / "public" if public else RELEASE
     if out_dir is None:
-        RELEASE.mkdir(exist_ok=True)
+        release.mkdir(parents=True, exist_ok=True)
+    print(f"· profile: {PROFILE}")
     for kind, spec in DECKS.items():
         deck = decks[kind]
-        path = (out_dir or CORRIDOR / "decks") / spec["id"] / "deck.json"
+        if public:
+            deck, report = public_deck(deck)
+            kept, total = report["cards"]
+            print(f"· public {deck['titleJa']}: {kept} of {total} cards kept; left out by reason (cards / passages):")
+            for reason in [*PUBLIC_REASONS, *sorted(set(report["reasons"]) - set(PUBLIC_REASONS))]:
+                cards, passages = report["reasons"].get(reason, (0, 0))
+                print(f"    {reason}: {cards} / {passages}")
+            print(f"    words dropped (no card left): {len(report['dropped'])}"
+                  + (f" ({', '.join(report['dropped'])})" if report["dropped"] else ""))
+        if out_dir is not None:
+            path = out_dir / spec["id"] / "deck.json"
+        elif public:
+            path = release / f"deck-{spec['id']}.json"
+        else:
+            path = CORRIDOR / "decks" / spec["id"] / "deck.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(deck, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
         n = sum(len(w["cards"]) for w in deck["words"])
         if out_dir is not None:
             print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path}")
             continue
-        build_tsv(deck, spec)
-        build_anki(deck, spec)
-        build_study(deck, RELEASE / spec["out"][2])
-        print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path.relative_to(REPO)}; release/{', '.join(spec['out'])}")
+        build_tsv(deck, spec, release)
+        build_anki(deck, spec, release)
+        build_study(deck, release / spec["out"][2])
+        attribution = release / f"ATTRIBUTION-{spec['id']}.md"
+        attribution.write_text(attribution_md(deck, PROFILE), "utf-8")
+        outs = ", ".join([*spec["out"], attribution.name])
+        print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path.relative_to(REPO)}; "
+              f"{release.relative_to(DECK_DIR)}/{{{outs}}}")
     return 0
 
 
