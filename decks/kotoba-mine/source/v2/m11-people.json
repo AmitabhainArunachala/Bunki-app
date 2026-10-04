@@ -1,0 +1,1244 @@
+{
+  "id": "m11-people",
+  "cards": [
+    {
+      "n": 1,
+      "term": "なぞかけ",
+      "reading": "なぞかけ",
+      "meaning": "riddle-pun in a fixed format",
+      "def_ja": "AとBの共通点を、しゃれで答える言葉遊び。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "落語家がなぞかけを披露した。",
+          "form": "なぞかけ",
+          "en": "The rakugo storyteller performed a riddle-pun."
+        },
+        {
+          "lv": 2,
+          "ja": "結婚式のスピーチで、新郎の友人がなぞかけをして笑いを取った。",
+          "form": "なぞかけ",
+          "en": "In his wedding speech, the groom's friend got a laugh with a riddle-pun."
+        },
+        {
+          "lv": 3,
+          "ja": "寄席でお客さんからお題をもらい、その場でなぞかけを作って答える芸人に、会場は大いに沸いた。",
+          "form": "なぞかけ",
+          "en": "At the variety hall, the audience went wild for the performer who took topics from the crowd and made up riddle-puns on the spot."
+        }
+      ],
+      "tip": "The pattern is AとかけてBと解く、その心は, with one pun that fits both A and B."
+    },
+    {
+      "n": 3,
+      "term": "語呂合わせ",
+      "reading": "ごろあわせ",
+      "meaning": "number-word pun",
+      "def_ja": "数字などの音を、別の言葉に当てること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "歴史の年号を語呂合わせで覚えた。",
+          "form": "語呂合わせ",
+          "en": "I memorized the historical dates with number puns."
+        },
+        {
+          "lv": 2,
+          "ja": "十一月二十二日は、語呂合わせでいい夫婦の日と呼ばれている。",
+          "form": "語呂合わせ",
+          "en": "November 22 is called Good Couples Day because of a pun on the numbers."
+        },
+        {
+          "lv": 3,
+          "ja": "客に電話番号を覚えてもらおうと、多くの店は語呂合わせで店の名前に近い番号を選んでいる。",
+          "form": "語呂合わせ",
+          "en": "To help customers remember their phone number, many shops choose a number that sounds like their name."
+        }
+      ],
+      "tip": "It is sound-matching, not rhyme: 4 can be read よ or し, and 9 can be く."
+    },
+    {
+      "n": 4,
+      "term": "なんくるない",
+      "reading": "なんくるない",
+      "meaning": "it'll all work out",
+      "def_ja": "沖縄の言葉で、なんとかなるという意味。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "沖縄の人はよく、なんくるないさと言う。",
+          "form": "なんくるない",
+          "en": "People in Okinawa often say it'll all work out."
+        },
+        {
+          "lv": 2,
+          "ja": "試験に落ちて落ち込んでいたら、沖縄出身の祖母になんくるないさと励まされた。",
+          "form": "なんくるない",
+          "en": "When I was down after failing an exam, my grandmother from Okinawa cheered me up by saying it would all work out."
+        },
+        {
+          "lv": 3,
+          "ja": "沖縄の言葉のなんくるないは、正しいことをしていればなんとかなるという意味で、何もしなくていいということではない。",
+          "form": "なんくるない",
+          "en": "The Okinawan phrase nankurunai means things will work out if you do what is right, not that you don't need to do anything."
+        }
+      ],
+      "tip": "Okinawan dialect, almost always said as なんくるないさ."
+    },
+    {
+      "n": 24,
+      "term": "正直",
+      "reading": "しょうじき",
+      "meaning": "honest; honestly",
+      "def_ja": "うそやごまかしがないこと。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "正直に話してくれてありがとう。",
+          "form": "正直",
+          "en": "Thank you for telling me honestly."
+        },
+        {
+          "lv": 2,
+          "ja": "正直言って、このドラマの最終回にはがっかりした。",
+          "form": "正直",
+          "en": "Honestly, I was disappointed by the last episode of this drama."
+        },
+        {
+          "lv": 3,
+          "ja": "財布を拾って交番に届けた少年の正直な行いが、地元の新聞で紹介された。",
+          "form": "正直",
+          "en": "The honest act of a boy who found a wallet and took it to the police box was reported in the local paper."
+        }
+      ],
+      "tip": "In speech a bare 正直、 at the start of a sentence means honestly."
+    },
+    {
+      "n": 25,
+      "term": "率直に言って",
+      "reading": "そっちょくにいって",
+      "meaning": "frankly speaking",
+      "def_ja": "遠慮せずに、思ったとおりに言えば。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "率直に言って、この案には反対です。",
+          "form": "率直に言って",
+          "en": "Frankly, I'm against this plan."
+        },
+        {
+          "lv": 2,
+          "ja": "率直に言って、今の給料では生活が苦しいです。",
+          "form": "率直に言って",
+          "en": "To be frank, it's hard to live on my current salary."
+        },
+        {
+          "lv": 3,
+          "ja": "率直に言って、新しいデザインは前のものよりずっと使いやすくなったと思います。",
+          "form": "率直に言って",
+          "en": "Frankly speaking, I think the new design is much easier to use than the old one."
+        }
+      ],
+      "tip": "It often comes before criticism, but it can also introduce honest praise."
+    },
+    {
+      "n": 39,
+      "term": "滑稽",
+      "reading": "こっけい",
+      "meaning": "comical; ridiculous",
+      "def_ja": "思わず笑いたくなるようなおかしさ。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "ピエロの滑稽な動きに子どもが笑った。",
+          "form": "滑稽",
+          "en": "The children laughed at the clown's comical movements."
+        },
+        {
+          "lv": 2,
+          "ja": "自分の間違いを認めずに言い訳を続ける姿は、滑稽にしか見えない。",
+          "form": "滑稽",
+          "en": "Refusing to admit your mistake and making excuse after excuse just looks ridiculous."
+        },
+        {
+          "lv": 3,
+          "ja": "大人二人が一本の小さな傘を取り合って言い争う様子があまりに滑稽で、周りの人は笑いをこらえていた。",
+          "form": "滑稽",
+          "en": "Two grown adults fighting over one small umbrella looked so ridiculous that the people around them were trying not to laugh."
+        }
+      ],
+      "tip": "In modern speech it often means ridiculous rather than simply funny."
+    },
+    {
+      "n": 48,
+      "term": "たくらむ",
+      "reading": "たくらむ",
+      "meaning": "scheme, be up to something",
+      "def_ja": "よくないことを、こっそり計画する。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "弟がにやにやしながら、何かたくらんでいる。",
+          "form": "たくらんで",
+          "en": "My little brother is grinning and up to something."
+        },
+        {
+          "lv": 2,
+          "ja": "犯人グループは、銀行の金を盗もうとたくらんでいた。",
+          "form": "たくらんで",
+          "en": "The gang was plotting to steal money from the bank."
+        },
+        {
+          "lv": 3,
+          "ja": "子どもたちが台所でこそこそ何をたくらんでいるのかと思ったら、母の日のケーキを作っていた。",
+          "form": "たくらんで",
+          "en": "I wondered what the kids were secretly plotting in the kitchen, and it turned out they were making a Mother's Day cake."
+        }
+      ],
+      "tip": "Usually negative, but used playfully for harmless mischief."
+    },
+    {
+      "n": 49,
+      "term": "途切れ途切れ",
+      "reading": "とぎれとぎれ",
+      "meaning": "in broken bits, on and off",
+      "def_ja": "続かずに、何度も切れるようす。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "電話の声が途切れ途切れに聞こえる。",
+          "form": "途切れ途切れ",
+          "en": "The voice on the phone keeps cutting out."
+        },
+        {
+          "lv": 2,
+          "ja": "山の中では電波が弱く、ラジオが途切れ途切れになった。",
+          "form": "途切れ途切れ",
+          "en": "The signal was weak in the mountains, and the radio kept cutting in and out."
+        },
+        {
+          "lv": 3,
+          "ja": "事故にあった男性は意識がもうろうとしていたが、途切れ途切れの言葉で自分の名前を伝えた。",
+          "form": "途切れ途切れ",
+          "en": "The man in the accident was barely conscious, but he managed to give his name in broken words."
+        }
+      ]
+    },
+    {
+      "n": 54,
+      "term": "反抗的",
+      "reading": "はんこうてき",
+      "meaning": "rebellious, defiant",
+      "def_ja": "目上の人に逆らおうとするようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "息子は最近、親に反抗的だ。",
+          "form": "反抗的",
+          "en": "My son has been defiant toward us lately."
+        },
+        {
+          "lv": 2,
+          "ja": "中学生の頃は、親に反抗的な態度ばかり取っていた。",
+          "form": "反抗的",
+          "en": "In junior high, I was always rebellious toward my parents."
+        },
+        {
+          "lv": 3,
+          "ja": "先生に注意されても返事をせず、反抗的な目でにらみ返したので、その生徒は職員室に呼ばれた。",
+          "form": "反抗的",
+          "en": "The student ignored the teacher's warning and glared back defiantly, so he was called to the staff room."
+        }
+      ]
+    },
+    {
+      "n": 55,
+      "term": "一層",
+      "reading": "いっそう",
+      "meaning": "even more",
+      "def_ja": "前よりもさらに。もっと。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "夜になって雨が一層強くなった。",
+          "form": "一層",
+          "en": "The rain grew even heavier at night."
+        },
+        {
+          "lv": 2,
+          "ja": "今後とも、より一層のご支援をお願い申し上げます。",
+          "form": "一層",
+          "en": "We ask for your continued and even greater support."
+        },
+        {
+          "lv": 3,
+          "ja": "昨年の優勝に続いて今年も勝つために、チームは一層厳しい練習を重ねている。",
+          "form": "一層",
+          "en": "To win again this year after last year's championship, the team is training even harder."
+        }
+      ],
+      "tip": "Do not mix it up with いっそ, which means rather or might as well."
+    },
+    {
+      "n": 77,
+      "term": "自意識過剰",
+      "reading": "じいしきかじょう",
+      "meaning": "overly self-conscious",
+      "def_ja": "人からどう見られるかを気にしすぎること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "誰も見てないよ、自意識過剰だよ。",
+          "form": "自意識過剰",
+          "en": "Nobody's looking at you, you're being too self-conscious."
+        },
+        {
+          "lv": 2,
+          "ja": "少し髪を切っただけでみんなに気づかれると思うのは、自意識過剰だ。",
+          "form": "自意識過剰",
+          "en": "Thinking everyone will notice you just got a small haircut is being too self-conscious."
+        },
+        {
+          "lv": 3,
+          "ja": "人前で話すと全員に笑われている気がしていたが、今思えばただの自意識過剰だった。",
+          "form": "自意識過剰",
+          "en": "When I spoke in public I felt everyone was laughing at me, but looking back I was just overly self-conscious."
+        }
+      ],
+      "tip": "Often used to tease someone: 自意識過剰じゃない？ means aren't you overthinking it?"
+    },
+    {
+      "n": 85,
+      "term": "威張り散らす",
+      "reading": "いばりちらす",
+      "meaning": "boss everyone around",
+      "def_ja": "周りの人に、えらそうな態度をとる。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "部長はいつも部下に威張り散らしている。",
+          "form": "威張り散らして",
+          "en": "The manager is always bossing his staff around."
+        },
+        {
+          "lv": 2,
+          "ja": "酔うと店員に威張り散らす客には、本当に困る。",
+          "form": "威張り散らす",
+          "en": "Customers who get drunk and boss the staff around are a real headache."
+        },
+        {
+          "lv": 3,
+          "ja": "新しい課長は着任した日から周りに威張り散らしてばかりいたので、部下の信頼をすぐに失った。",
+          "form": "威張り散らして",
+          "en": "The new section chief did nothing but throw his weight around from his first day, so he soon lost his staff's trust."
+        }
+      ],
+      "tip": "Plain 威張る means to act big; 〜散らす makes it aimed at everyone around."
+    },
+    {
+      "n": 86,
+      "term": "威張りくさる",
+      "reading": "いばりくさる",
+      "meaning": "act high and mighty",
+      "def_ja": "ひどくえらそうにする。悪く言う言い方。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "あの客は威張りくさっていて感じが悪い。",
+          "form": "威張りくさって",
+          "en": "That customer is so high and mighty, it's unpleasant."
+        },
+        {
+          "lv": 2,
+          "ja": "少し出世したくらいで威張りくさるなんて、みっともない。",
+          "form": "威張りくさる",
+          "en": "Acting all high and mighty just because you got a small promotion is embarrassing."
+        },
+        {
+          "lv": 3,
+          "ja": "監督は試合に勝つと威張りくさった態度を取るくせに、負けると選手のせいにばかりする。",
+          "form": "威張りくさった",
+          "en": "The coach acts all high and mighty when the team wins, but blames the players every time they lose."
+        }
+      ],
+      "tip": "〜くさる adds strong contempt, so use it about others, never to someone's face."
+    },
+    {
+      "n": 90,
+      "term": "ビンビン",
+      "reading": "びんびん",
+      "meaning": "intensely felt",
+      "def_ja": "刺激などが強く伝わってくるようす。",
+      "pos": "sound word",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "選手のやる気がビンビン伝わってくる。",
+          "form": "ビンビン",
+          "en": "You can really feel the players' drive."
+        },
+        {
+          "lv": 2,
+          "ja": "会場の後ろまで、ライブの音がビンビン響いていた。",
+          "form": "ビンビン",
+          "en": "The concert sound was booming all the way to the back of the hall."
+        },
+        {
+          "lv": 3,
+          "ja": "面接官の厳しい視線をビンビン感じたので、緊張して用意していた答えを忘れてしまった。",
+          "form": "ビンビン",
+          "en": "I could strongly feel the interviewer's stern gaze, and I got so nervous I forgot the answers I had prepared."
+        }
+      ],
+      "tip": "Casual only: ビンビン is also slang for an erection, so avoid it in formal settings."
+    },
+    {
+      "n": 91,
+      "term": "ギンギン",
+      "reading": "ぎんぎん",
+      "meaning": "to the max",
+      "def_ja": "冷たさや興奮などがとても強いようす。",
+      "pos": "sound word",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "ギンギンに冷えたビールが飲みたい。",
+          "form": "ギンギン",
+          "en": "I want an ice-cold beer."
+        },
+        {
+          "lv": 2,
+          "ja": "コーヒーを三杯も飲んだせいで、目がギンギンで眠れない。",
+          "form": "ギンギン",
+          "en": "I drank three cups of coffee, so I'm wide awake and can't sleep."
+        },
+        {
+          "lv": 3,
+          "ja": "隣の部屋の学生が夜中までロックをギンギンに鳴らすので、管理会社に苦情を入れた。",
+          "form": "ギンギン",
+          "en": "The student next door blasts rock music until midnight, so I complained to the management company."
+        }
+      ],
+      "tip": "ギンギンに冷えた is perfectly safe, but the word is slangy and can sound suggestive."
+    },
+    {
+      "n": 93,
+      "term": "節制",
+      "reading": "せっせい",
+      "meaning": "moderation in eating and drinking",
+      "def_ja": "飲み食いなどをほどほどにおさえること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "健康のために節制している。",
+          "form": "節制",
+          "en": "I'm practicing moderation for my health."
+        },
+        {
+          "lv": 2,
+          "ja": "試合前のボクサーは、厳しい節制で体重を落とす。",
+          "form": "節制",
+          "en": "Before a fight, boxers lose weight through strict self-discipline."
+        },
+        {
+          "lv": 3,
+          "ja": "医者に注意されてから、父は酒を控えて毎日の食事も節制している。",
+          "form": "節制",
+          "en": "Since the doctor warned him, my father has cut back on alcohol and eats in moderation every day."
+        }
+      ],
+      "tip": "不節制 means a lack of moderation, as in 不節制がたたる, overindulgence taking its toll."
+    },
+    {
+      "n": 94,
+      "term": "せせら笑い",
+      "reading": "せせらわらい",
+      "meaning": "sneer",
+      "def_ja": "相手をばかにして、鼻で笑うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "男は私の話を聞いて、せせら笑いを浮かべた。",
+          "form": "せせら笑い",
+          "en": "The man listened to me and gave a scornful smirk."
+        },
+        {
+          "lv": 2,
+          "ja": "将来の夢を話したら、同級生にせせら笑われた。",
+          "form": "せせら笑われ",
+          "en": "When I talked about my dream, my classmates sneered at me."
+        },
+        {
+          "lv": 3,
+          "ja": "初めての試合で空振りばかりする私を、相手チームの選手たちはせせら笑いながら見ていた。",
+          "form": "せせら笑い",
+          "en": "In my first game, the other team's players sneered as they watched me swing and miss again and again."
+        }
+      ],
+      "tip": "The verb form is せせら笑う."
+    },
+    {
+      "n": 97,
+      "term": "耐える",
+      "reading": "たえる",
+      "meaning": "endure; withstand",
+      "def_ja": "苦しさやつらさを、じっとがまんする。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "痛みに耐えて最後まで走った。",
+          "form": "耐えて",
+          "en": "I put up with the pain and ran to the end."
+        },
+        {
+          "lv": 2,
+          "ja": "この建物は、震度七の揺れにも耐えられるように設計されている。",
+          "form": "耐えられる",
+          "en": "This building is designed to withstand even the strongest level of earthquake shaking."
+        },
+        {
+          "lv": 3,
+          "ja": "毎日のように上司から理不尽な説教をされ、とうとう耐えきれなくなって会社を辞めた。",
+          "form": "耐えきれ",
+          "en": "My boss lectured me unfairly almost every day, and in the end I couldn't take it anymore and quit."
+        }
+      ],
+      "tip": "It takes に for what you endure: 寒さに耐える."
+    },
+    {
+      "n": 98,
+      "term": "忍び",
+      "reading": "しのび",
+      "meaning": "secrecy; going incognito",
+      "def_ja": "人に知られないように、こっそり動くこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "有名な俳優がお忍びで店に来た。",
+          "form": "忍び",
+          "en": "A famous actor came to the shop incognito."
+        },
+        {
+          "lv": 2,
+          "ja": "夜中に帰ってきた兄は、忍び足で自分の部屋に入った。",
+          "form": "忍び",
+          "en": "My brother came home in the middle of the night and tiptoed into his room."
+        },
+        {
+          "lv": 3,
+          "ja": "伊賀は昔から忍びの里として知られ、今では忍者屋敷を見学することができる。",
+          "form": "忍び",
+          "en": "Iga has long been known as a village of ninja, and today you can tour a ninja house there."
+        }
+      ],
+      "tip": "Today you mostly meet it in お忍び, incognito, and 忍び足, tiptoeing."
+    },
+    {
+      "n": 103,
+      "term": "ぞっと",
+      "reading": "ぞっと",
+      "meaning": "shiver with fear",
+      "def_ja": "怖さで、体が冷たくなるように感じるようす。",
+      "pos": "sound word",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "怖い話を聞いて、背中がぞっとした。",
+          "form": "ぞっと",
+          "en": "A chill ran down my spine when I heard the scary story."
+        },
+        {
+          "lv": 2,
+          "ja": "あと一秒遅かったら車にひかれていたと思うと、ぞっとする。",
+          "form": "ぞっと",
+          "en": "It makes me shudder to think I'd have been hit by the car if I'd been one second later."
+        },
+        {
+          "lv": 3,
+          "ja": "誰もいないはずの二階から足音が聞こえてきたときは、全身がぞっとして動けなくなった。",
+          "form": "ぞっと",
+          "en": "When I heard footsteps from upstairs where nobody should have been, I went cold all over and couldn't move."
+        }
+      ]
+    },
+    {
+      "n": 104,
+      "term": "ぞっとしない",
+      "reading": "ぞっとしない",
+      "meaning": "not very appealing",
+      "def_ja": "あまり感心しない。気が進まない。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "雨の中のキャンプはぞっとしない。",
+          "form": "ぞっとしない",
+          "en": "Camping in the rain doesn't appeal to me."
+        },
+        {
+          "lv": 2,
+          "ja": "真冬に冷たい川で泳ぐなんて、あまりぞっとしない話だ。",
+          "form": "ぞっとしない",
+          "en": "Swimming in a cold river in midwinter doesn't sound very appealing."
+        },
+        {
+          "lv": 3,
+          "ja": "休日にまで上司とゴルフに行くのはぞっとしないので、用事があると言って断った。",
+          "form": "ぞっとしない",
+          "en": "Playing golf with my boss even on my day off didn't appeal to me, so I said I had plans and turned it down."
+        }
+      ],
+      "tip": "Many people now misread it as not scary, so あまり気が進まない is safer in your own speech."
+    },
+    {
+      "n": 117,
+      "term": "ごとく",
+      "reading": "ごとく",
+      "meaning": "like, as (literary)",
+      "def_ja": "〜のように、という意味の書き言葉。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "月日は矢のごとく過ぎていく。",
+          "form": "ごとく",
+          "en": "Time flies like an arrow."
+        },
+        {
+          "lv": 2,
+          "ja": "前回ご報告したごとく、売り上げは順調に伸びております。",
+          "form": "ごとく",
+          "en": "As reported last time, sales are growing steadily."
+        },
+        {
+          "lv": 3,
+          "ja": "新しい市長は就任すると、まるで自分の会社であるかのごとく市役所の人事を次々に変えていった。",
+          "form": "ごとく",
+          "en": "Once in office, the new mayor reshuffled city hall staff one after another as if it were his own company."
+        }
+      ],
+      "tip": "Formal written style; in speech say のように."
+    },
+    {
+      "n": 118,
+      "term": "なお",
+      "reading": "なお",
+      "meaning": "note that; still",
+      "def_ja": "あとから言い足すときの書き言葉。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "なお、当日は駐車場がありませんのでご注意ください。",
+          "form": "なお",
+          "en": "Please note that there is no parking on the day."
+        },
+        {
+          "lv": 2,
+          "ja": "手術から一年たった今もなお、足に痛みが残っている。",
+          "form": "なお",
+          "en": "Even now, a year after the operation, I still have pain in my leg."
+        },
+        {
+          "lv": 3,
+          "ja": "薬を飲んで一晩寝たが熱はなお下がらず、朝になってから病院へ行った。",
+          "form": "なお",
+          "en": "I took medicine and slept overnight, but the fever still didn't go down, so I went to the hospital in the morning."
+        }
+      ],
+      "tip": "Sentence-initial なお、 adds a side note in notices, emails and articles."
+    },
+    {
+      "n": 119,
+      "term": "なおかつ",
+      "reading": "なおかつ",
+      "meaning": "and also; and yet",
+      "def_ja": "その上さらに。それでもまだ。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "安くて、なおかつおいしい店を探している。",
+          "form": "なおかつ",
+          "en": "I'm looking for a place that's cheap and also tasty."
+        },
+        {
+          "lv": 2,
+          "ja": "応募の条件は、英語が話せてなおかつ運転免許を持っていることだ。",
+          "form": "なおかつ",
+          "en": "To apply, you must speak English and also have a driver's license."
+        },
+        {
+          "lv": 3,
+          "ja": "大差で負けていたが、それでもなおかつ最後まで攻め続けたチームに、観客は大きな拍手を送った。",
+          "form": "なおかつ",
+          "en": "The team was far behind, but the crowd gave a big round of applause to the players who still kept attacking to the end."
+        }
+      ]
+    },
+    {
+      "n": 173,
+      "term": "侮る",
+      "reading": "あなどる",
+      "meaning": "underestimate",
+      "def_ja": "相手の力を低く見て、軽く扱う。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "相手が子どもでも侮ってはいけない。",
+          "form": "侮って",
+          "en": "Don't underestimate your opponent, even if it's a child."
+        },
+        {
+          "lv": 2,
+          "ja": "初出場のチームだと侮ったせいで、一点差で負けてしまった。",
+          "form": "侮った",
+          "en": "We underestimated them as first-timers, and lost by one point."
+        },
+        {
+          "lv": 3,
+          "ja": "駅前の小さな食堂だが、地元の人が毎日行列を作るほどで、その味はなかなか侮れない。",
+          "form": "侮れ",
+          "en": "It's just a small diner by the station, but locals line up every day and the food is not to be underestimated."
+        }
+      ],
+      "tip": "侮れない, not to be underestimated, is very common in reviews and sports."
+    },
+    {
+      "n": 197,
+      "term": "驚愕",
+      "reading": "きょうがく",
+      "meaning": "astonishment, shock",
+      "def_ja": "ひどくおどろくこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "ホテルの請求書を見て驚愕した。",
+          "form": "驚愕",
+          "en": "I was stunned when I saw the hotel bill."
+        },
+        {
+          "lv": 2,
+          "ja": "番組の最後に、驚愕の新事実が明らかになった。",
+          "form": "驚愕",
+          "en": "At the end of the program, an astonishing new fact came to light."
+        },
+        {
+          "lv": 3,
+          "ja": "古い家の床下から江戸時代の小判が百枚以上見つかり、家族は驚愕のあまり言葉を失った。",
+          "form": "驚愕",
+          "en": "Over a hundred Edo-period gold coins were found under the floor of the old house, and the family was too stunned to speak."
+        }
+      ],
+      "tip": "Stronger than 驚く and a favorite word in headlines and ads."
+    },
+    {
+      "n": 199,
+      "term": "放逸",
+      "reading": "ほういつ",
+      "meaning": "self-indulgent living",
+      "def_ja": "したい放題で、だらしなく暮らすこと。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "放逸な暮らしを改めた。",
+          "form": "放逸",
+          "en": "I changed my dissolute way of life."
+        },
+        {
+          "lv": 2,
+          "ja": "若い頃の放逸な生活が、晩年の病気の原因になったと言われる。",
+          "form": "放逸",
+          "en": "His self-indulgent life when young is said to have caused his illness in later years."
+        },
+        {
+          "lv": 3,
+          "ja": "仏教では、欲のままに生きる放逸をいましめ、怠けずに修行に励むことが説かれている。",
+          "form": "放逸",
+          "en": "Buddhism warns against living by one's desires and teaches people to practice diligently without slacking."
+        }
+      ],
+      "tip": "Rare and literary; in speech say だらしない or 好き勝手."
+    },
+    {
+      "n": 210,
+      "term": "顔つき",
+      "reading": "かおつき",
+      "meaning": "facial expression, look",
+      "def_ja": "顔の形やようす。そのときの表情。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "父は難しい顔つきで新聞を読んでいた。",
+          "form": "顔つき",
+          "en": "My father was reading the paper with a stern look."
+        },
+        {
+          "lv": 2,
+          "ja": "試合に負けた選手たちは、悔しそうな顔つきで会場を後にした。",
+          "form": "顔つき",
+          "en": "The players who lost the match left the venue looking frustrated."
+        },
+        {
+          "lv": 3,
+          "ja": "一年ぶりに会った息子は、社会人になったせいか、すっかり大人の顔つきになっていた。",
+          "form": "顔つき",
+          "en": "When I saw my son for the first time in a year, he had the face of a grown man, maybe because he'd started working."
+        }
+      ]
+    },
+    {
+      "n": 223,
+      "term": "非常識",
+      "reading": "ひじょうしき",
+      "meaning": "inconsiderate, out of line",
+      "def_ja": "世の中の当たり前のマナーから外れていること。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "夜中に電話するなんて非常識だ。",
+          "form": "非常識",
+          "en": "Calling in the middle of the night is out of line."
+        },
+        {
+          "lv": 2,
+          "ja": "結婚式に白いドレスで出席するのは、非常識だとされている。",
+          "form": "非常識",
+          "en": "Wearing a white dress to someone's wedding is considered bad manners."
+        },
+        {
+          "lv": 3,
+          "ja": "隣の家の人が毎朝五時から大きな音で掃除機をかけるので、非常識だと管理人に苦情を言った。",
+          "form": "非常識",
+          "en": "The neighbor runs a loud vacuum cleaner from five every morning, so I complained to the building manager that it was inconsiderate."
+        }
+      ],
+      "tip": "It judges manners, not intelligence."
+    },
+    {
+      "n": 234,
+      "term": "つべこべ",
+      "reading": "つべこべ",
+      "meaning": "complaining on and on",
+      "def_ja": "あれこれと文句や理屈を言うようす。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "つべこべ言わずに早く食べなさい。",
+          "form": "つべこべ",
+          "en": "Stop complaining and eat up."
+        },
+        {
+          "lv": 2,
+          "ja": "つべこべ言うなら、自分でやってみればいい。",
+          "form": "つべこべ",
+          "en": "If you're going to grumble, try doing it yourself."
+        },
+        {
+          "lv": 3,
+          "ja": "つべこべ言い訳をしている暇があったら一件でも多く客先を回れと、部長に怒られた。",
+          "form": "つべこべ",
+          "en": "My manager yelled at me that if I had time to make excuses, I should be visiting more clients."
+        }
+      ],
+      "tip": "Almost always つべこべ言う, in a rough scolding."
+    },
+    {
+      "n": 235,
+      "term": "一握り",
+      "reading": "ひとにぎり",
+      "meaning": "a handful; a tiny few",
+      "def_ja": "片手でつかめるほどの量。ごくわずか。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "公園で一握りの豆を鳩にまいた。",
+          "form": "一握り",
+          "en": "I scattered a handful of beans for the pigeons in the park."
+        },
+        {
+          "lv": 2,
+          "ja": "プロの選手になれるのは、ほんの一握りの人だけだ。",
+          "form": "一握り",
+          "en": "Only a tiny handful of people become professional athletes."
+        },
+        {
+          "lv": 3,
+          "ja": "本の収入だけで生活できる作家は一握りなので、多くの作家は別の仕事を続けている。",
+          "form": "一握り",
+          "en": "Only a handful of writers can live on book income alone, so most keep other jobs."
+        }
+      ]
+    },
+    {
+      "n": 241,
+      "term": "銀髪",
+      "reading": "ぎんぱつ",
+      "meaning": "silver hair",
+      "def_ja": "銀色に光って見える、白い髪。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "祖母の銀髪はとてもきれいだ。",
+          "form": "銀髪",
+          "en": "My grandmother's silver hair is beautiful."
+        },
+        {
+          "lv": 2,
+          "ja": "銀髪の紳士が、ホテルのロビーで新聞を読んでいた。",
+          "form": "銀髪",
+          "en": "A silver-haired gentleman was reading a newspaper in the hotel lobby."
+        },
+        {
+          "lv": 3,
+          "ja": "白髪を染めるのをやめて銀髪を生かしたおしゃれを楽しむ女性が、最近増えている。",
+          "form": "銀髪",
+          "en": "More women lately are giving up dyeing their gray hair and enjoying styles that show off their silver hair."
+        }
+      ]
+    },
+    {
+      "n": 243,
+      "term": "ぎいぎい",
+      "reading": "ぎいぎい",
+      "meaning": "creak",
+      "def_ja": "古い木や金属がこすれて出る音。",
+      "pos": "sound word",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "古いドアがぎいぎい鳴る。",
+          "form": "ぎいぎい",
+          "en": "The old door creaks."
+        },
+        {
+          "lv": 2,
+          "ja": "古い木の廊下を歩くと、床がぎいぎいと音を立てる。",
+          "form": "ぎいぎい",
+          "en": "When you walk down the old wooden hallway, the floor creaks."
+        },
+        {
+          "lv": 3,
+          "ja": "公園のブランコがさびていて、こぐたびにぎいぎいと音がするので、市に修理を頼んだ。",
+          "form": "ぎいぎい",
+          "en": "The park swing was rusty and creaked every time you swung on it, so we asked the city to fix it."
+        }
+      ],
+      "tip": "A single creak is ぎいっ."
+    },
+    {
+      "n": 244,
+      "term": "さりげない",
+      "reading": "さりげない",
+      "meaning": "casual, unforced",
+      "def_ja": "わざとらしくなく、自然なようす。",
+      "pos": "い-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "友人のさりげない気づかいがうれしかった。",
+          "form": "さりげない",
+          "en": "I was happy about my friend's quiet thoughtfulness."
+        },
+        {
+          "lv": 2,
+          "ja": "気まずい空気になったので、さりげなく話題を変えた。",
+          "form": "さりげなく",
+          "en": "Things got awkward, so I casually changed the subject."
+        },
+        {
+          "lv": 3,
+          "ja": "店員の押しつけがましくない、さりげない接客が気に入って、その店に通うようになった。",
+          "form": "さりげない",
+          "en": "I liked the staff's low-key, unpushy service, so I started going to that shop regularly."
+        }
+      ],
+      "tip": "The adverb さりげなく, casually or without fuss, is very common."
+    },
+    {
+      "n": 247,
+      "term": "がち",
+      "reading": "がち",
+      "meaning": "for real (slang)",
+      "def_ja": "本気であること。若者の言葉。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "今日はがちで眠い。",
+          "form": "がち",
+          "en": "I'm seriously sleepy today."
+        },
+        {
+          "lv": 2,
+          "ja": "文化祭のダンス、みんながちで練習してるよ。",
+          "form": "がち",
+          "en": "Everyone is practicing the school festival dance for real."
+        },
+        {
+          "lv": 3,
+          "ja": "最初は冗談だと思っていたけど、兄はがちで会社を辞めて世界一周の旅に出てしまった。",
+          "form": "がち",
+          "en": "I thought he was joking at first, but my brother really did quit his job and set off on a trip around the world."
+        }
+      ],
+      "tip": "Usually written in katakana as ガチ; casual slang, so keep it out of formal speech."
+    },
+    {
+      "n": 257,
+      "term": "羽目になる",
+      "reading": "はめになる",
+      "meaning": "end up having to",
+      "def_ja": "思ってもいなかった、困ったことになる。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "雨の中を歩いて帰る羽目になった。",
+          "form": "羽目になった",
+          "en": "I ended up having to walk home in the rain."
+        },
+        {
+          "lv": 2,
+          "ja": "寝坊したせいで、朝ご飯を抜く羽目になった。",
+          "form": "羽目になった",
+          "en": "I overslept, so I ended up skipping breakfast."
+        },
+        {
+          "lv": 3,
+          "ja": "安いからと中古車を買ったら毎月のように故障して、結局新車より高くつく羽目になった。",
+          "form": "羽目になった",
+          "en": "I bought a used car because it was cheap, but it broke down almost every month and ended up costing more than a new one."
+        }
+      ],
+      "tip": "Always for unwelcome outcomes, attached to a dictionary-form verb."
+    },
+    {
+      "n": 291,
+      "term": "巧む",
+      "reading": "たくむ",
+      "meaning": "contrive artfully",
+      "def_ja": "工夫をこらして、うまく作りあげる。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "子どもの絵には巧まざる美しさがある。",
+          "form": "巧まざる",
+          "en": "Children's drawings have an unstudied beauty."
+        },
+        {
+          "lv": 2,
+          "ja": "祖父の話には、巧まずして人を笑わせる力があった。",
+          "form": "巧まず",
+          "en": "My grandfather's stories made people laugh without him even trying."
+        },
+        {
+          "lv": 3,
+          "ja": "この推理小説はよく巧まれた筋書きで、最後のページまで犯人が分からなかった。",
+          "form": "巧まれた",
+          "en": "This mystery novel has a cleverly crafted plot, and I couldn't tell who the culprit was until the last page."
+        }
+      ],
+      "tip": "Rare: you mostly meet it as 巧まざる or 巧まずして, meaning natural and unstudied."
+    },
+    {
+      "n": 296,
+      "term": "甚だしい",
+      "reading": "はなはだしい",
+      "meaning": "extreme, gross",
+      "def_ja": "よくないことの程度が、とても大きい。",
+      "pos": "い-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この地域は人口の減少が甚だしい。",
+          "form": "甚だしい",
+          "en": "This region's population decline is severe."
+        },
+        {
+          "lv": 2,
+          "ja": "台風による農作物の被害は甚だしいものだった。",
+          "form": "甚だしい",
+          "en": "The typhoon caused severe damage to crops."
+        },
+        {
+          "lv": 3,
+          "ja": "一度会っただけで私のことを全部分かったように話すなんて、思い上がりも甚だしい。",
+          "form": "甚だしい",
+          "en": "Talking as if you know everything about me after meeting me once is the height of arrogance."
+        }
+      ],
+      "tip": "〜も甚だしい is a set pattern for indignation, as in 誤解も甚だしい."
+    },
+    {
+      "n": 299,
+      "term": "万が一",
+      "reading": "まんがいち",
+      "meaning": "in the unlikely event",
+      "def_ja": "めったにないが、もしかしたら起こる場合。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "万が一に備えて、水を買っておく。",
+          "form": "万が一",
+          "en": "I'll buy some water just in case."
+        },
+        {
+          "lv": 2,
+          "ja": "万が一、火事が起きたら、階段を使って逃げてください。",
+          "form": "万が一",
+          "en": "In the unlikely event of a fire, please use the stairs to escape."
+        },
+        {
+          "lv": 3,
+          "ja": "万が一のことがあったときのために、両親は家族あての手紙を書いて金庫にしまっている。",
+          "form": "万が一",
+          "en": "In case something happens to them, my parents have written letters to the family and kept them in the safe."
+        }
+      ],
+      "tip": "万が一のことがあったら is a soft way of referring to death or a serious accident."
+    },
+    {
+      "n": 319,
+      "term": "交わす",
+      "reading": "かわす",
+      "meaning": "exchange (words, contracts)",
+      "def_ja": "おたがいにやりとりする。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "朝、隣の人とあいさつを交わした。",
+          "form": "交わした",
+          "en": "I exchanged greetings with my neighbor this morning."
+        },
+        {
+          "lv": 2,
+          "ja": "二つの会社は、来月正式に契約を交わす予定だ。",
+          "form": "交わす",
+          "en": "The two companies plan to formally sign a contract next month."
+        },
+        {
+          "lv": 3,
+          "ja": "長年連れ添った夫婦は、言葉を交わさなくても目を見ただけで相手の気持ちが分かるという。",
+          "form": "交わさ",
+          "en": "They say a couple married for many years can tell how the other feels just from a look, without exchanging a word."
+        }
+      ]
+    },
+    {
+      "n": 320,
+      "term": "顕著",
+      "reading": "けんちょ",
+      "meaning": "striking, marked",
+      "def_ja": "はっきりと目立っていて、よく分かるようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "練習の成果が顕著に表れた。",
+          "form": "顕著",
+          "en": "The results of the practice showed clearly."
+        },
+        {
+          "lv": 2,
+          "ja": "若者の新聞離れは、ここ十年で特に顕著だ。",
+          "form": "顕著",
+          "en": "Young people's move away from newspapers has been especially marked in the last ten years."
+        },
+        {
+          "lv": 3,
+          "ja": "地球温暖化の影響は北極で最も顕著に見られ、夏の海氷の面積は年々減り続けている。",
+          "form": "顕著",
+          "en": "The effects of global warming are most visible in the Arctic, where summer sea ice keeps shrinking year after year."
+        }
+      ],
+      "tip": "A formal word common in reports and news; in speech say 目立つ."
+    },
+    {
+      "n": 27,
+      "term": "背く",
+      "reading": "そむく",
+      "meaning": "disobey, go against",
+      "def_ja": "決まりや言いつけ、期待に逆らう。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "子どもの頃、親の言いつけに背いた。",
+          "form": "背いた",
+          "en": "As a child, I disobeyed my parents."
+        },
+        {
+          "lv": 2,
+          "ja": "社長の命令に背いた社員が、地方の支店に飛ばされた。",
+          "form": "背いた",
+          "en": "The employee who disobeyed the president's order was sent off to a regional branch."
+        },
+        {
+          "lv": 3,
+          "ja": "親の期待に背いて医者にはならず、絵の勉強をするために美術大学に進んだ。",
+          "form": "背いて",
+          "en": "Going against my parents' hopes, I didn't become a doctor and went to art college to study painting."
+        }
+      ],
+      "tip": "It takes に: 命令に背く, to disobey an order."
+    },
+    {
+      "n": 56,
+      "term": "軈",
+      "reading": "やがて",
+      "meaning": "before long, eventually",
+      "def_ja": "それほど時間がたたないうちに。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "長い夜も軈て明けた。",
+          "form": "軈て",
+          "en": "Even the long night finally came to an end."
+        },
+        {
+          "lv": 2,
+          "ja": "雨は軈て雪に変わり、山の村を白く覆った。",
+          "form": "軈て",
+          "en": "Before long the rain turned to snow and covered the mountain village in white."
+        },
+        {
+          "lv": 3,
+          "ja": "遠くに聞こえていた汽車の音は軈て近づき、小さな駅のホームに黒い車体が姿を現した。",
+          "form": "軈て",
+          "en": "The sound of the distant train soon drew closer, and the black engine appeared at the platform of the little station."
+        }
+      ],
+      "tip": "Rare kanji: today this word is almost always written やがて, and 軈て appears in old novels."
+    }
+  ]
+}

@@ -339,13 +339,6 @@
       "surfaces": ["都", "道", "府", "県"],
       "readings": ["と", "どう", "ふ", "けん"],
       "note": "Reviewed CORRECT — 都(と) inside 都道府県 (prefectures) is right; it appears in most government releases on the fresh shelf (19 sites on 2026-09-28). Recorded so the checker's 都(と) probe can tell it from the 野ばら/方丈記 defects; bytes untouched."
-    },
-    {
-      "word": "「稽」",
-      "reading": "けい",
-      "surfaces": ["「", "稽", "」"],
-      "readings": [null, "けい", null],
-      "note": "Reviewed CORRECT — the 言葉の鉱脈 kanji passage (kotoba-mine-m12-kanji) names the character itself in quotes, 「稽」という字, and a character named on its own is read by its on-reading けい. UniDic files the bare kanji as 記号; the reading it guessed is the right one, so the bytes stay untouched."
     }
   ]
 }

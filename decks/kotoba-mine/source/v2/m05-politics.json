@@ -1,0 +1,759 @@
+{
+  "id": "m05-politics",
+  "cards": [
+    {
+      "n": 15,
+      "term": "新体制",
+      "reading": "しんたいせい",
+      "meaning": "new setup; new leadership",
+      "def_ja": "組織などの、新しくなった仕組みや顔ぶれ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "四月から新しい部長のもと、新体制でスタートします。",
+          "form": "新体制",
+          "en": "From April we start with a new setup under a new department head."
+        },
+        {
+          "lv": 2,
+          "ja": "社長が代わり、会社は新体制で再出発した。",
+          "form": "新体制",
+          "en": "The president changed, and the company made a fresh start under new leadership."
+        },
+        {
+          "lv": 3,
+          "ja": "監督の交代を受けて、チームは来季から新体制で優勝を目指すことになった。",
+          "form": "新体制",
+          "en": "After the change of manager, the team will aim for the title next season under a new setup."
+        }
+      ],
+      "tip": "Used for any reshuffled organization: a company, a party, a team or a government."
+    },
+    {
+      "n": 215,
+      "term": "首相",
+      "reading": "しゅしょう",
+      "meaning": "prime minister",
+      "def_ja": "内閣の一番上に立ち、国の政治を率いる人。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "首相が官邸で記者の質問に答えた。",
+          "form": "首相",
+          "en": "The prime minister answered reporters' questions at the prime minister's office."
+        },
+        {
+          "lv": 2,
+          "ja": "首相は来月、アメリカを訪問する予定だ。",
+          "form": "首相",
+          "en": "The prime minister is scheduled to visit the United States next month."
+        },
+        {
+          "lv": 3,
+          "ja": "首相が衆議院の解散を表明したため、来月にも総選挙が行われる見通しだ。",
+          "form": "首相",
+          "en": "Since the prime minister announced the dissolution of the lower house, a general election is expected as early as next month."
+        }
+      ],
+      "tip": "Headlines say 首相; the formal title is 内閣総理大臣."
+    },
+    {
+      "n": 216,
+      "term": "国会",
+      "reading": "こっかい",
+      "meaning": "the Diet (parliament)",
+      "def_ja": "選ばれた議員が法律や予算を決める国の機関。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "国会で新しい法律が成立した。",
+          "form": "国会",
+          "en": "A new law was passed in the Diet."
+        },
+        {
+          "lv": 2,
+          "ja": "今の国会では、物価対策が大きな議題になっている。",
+          "form": "国会",
+          "en": "In the current Diet session, measures against rising prices are a major topic."
+        },
+        {
+          "lv": 3,
+          "ja": "法案は衆議院を通過したものの、国会の会期末までに成立するかは分からない。",
+          "form": "国会",
+          "en": "The bill passed the lower house, but it is unclear whether it will be enacted before the end of the Diet session."
+        }
+      ],
+      "tip": "The Diet has two houses, 衆議院 and 参議院."
+    },
+    {
+      "n": 248,
+      "term": "可決",
+      "reading": "かけつ",
+      "meaning": "passage (of a bill)",
+      "def_ja": "会議で、出された案をよいと認めて決めること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "予算案が賛成多数で可決された。",
+          "form": "可決",
+          "en": "The budget bill was passed by a majority vote."
+        },
+        {
+          "lv": 2,
+          "ja": "法案は衆議院で可決され、参議院に送られた。",
+          "form": "可決",
+          "en": "The bill was passed by the lower house and sent to the upper house."
+        },
+        {
+          "lv": 3,
+          "ja": "市議会は、学校給食を無料にするための条例案を全会一致で可決した。",
+          "form": "可決",
+          "en": "The city council unanimously passed an ordinance to make school lunches free."
+        }
+      ],
+      "tip": "Mostly passive in news: 可決された. The opposite is 否決."
+    },
+    {
+      "n": 249,
+      "term": "残留",
+      "reading": "ざんりゅう",
+      "meaning": "staying on; remaining",
+      "def_ja": "ほかが去ったあとも、その場にとどまること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "最終戦に勝ってJ1残留を決めた。",
+          "form": "残留",
+          "en": "They won the final match and secured their place in J1."
+        },
+        {
+          "lv": 2,
+          "ja": "主力選手の残留が決まり、ファンはほっとしている。",
+          "form": "残留",
+          "en": "The fans are relieved that the key player has decided to stay."
+        },
+        {
+          "lv": 3,
+          "ja": "野菜から基準値を超える残留農薬が見つかったため、スーパーは商品を回収した。",
+          "form": "残留",
+          "en": "Pesticide residue above the legal limit was found in the vegetables, so the supermarket recalled them."
+        }
+      ],
+      "tip": "In sports news 残留 means avoiding relegation; in food news it means residue."
+    },
+    {
+      "n": 250,
+      "term": "皇族",
+      "reading": "こうぞく",
+      "meaning": "member of the imperial family",
+      "def_ja": "天皇の一族として、皇室に属する人。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "式典には皇族の方々も出席された。",
+          "form": "皇族",
+          "en": "Members of the imperial family also attended the ceremony."
+        },
+        {
+          "lv": 2,
+          "ja": "皇族の人数が減り、公務を分担するのが難しくなっている。",
+          "form": "皇族",
+          "en": "With fewer members of the imperial family, it is getting hard to share official duties."
+        },
+        {
+          "lv": 3,
+          "ja": "皇室の女性は結婚すると一般人になる決まりなので、皇族の数は年々減っている。",
+          "form": "皇族",
+          "en": "Because women of the imperial house become commoners when they marry, the number of imperial family members falls every year."
+        }
+      ],
+      "tip": "皇族 are the people; 皇室 is the family as an institution."
+    },
+    {
+      "n": 251,
+      "term": "離脱",
+      "reading": "りだつ",
+      "meaning": "withdrawal; leaving a group",
+      "def_ja": "入っていた組織や集まりから抜けること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "イギリスがEUから離脱した。",
+          "form": "離脱",
+          "en": "Britain left the EU."
+        },
+        {
+          "lv": 2,
+          "ja": "党の方針に反対する議員たちが党を離脱した。",
+          "form": "離脱",
+          "en": "Lawmakers who opposed the party line left the party."
+        },
+        {
+          "lv": 3,
+          "ja": "エースがけがで戦列を離脱したので、チームは苦しい戦いが続いている。",
+          "form": "離脱",
+          "en": "Since their ace left the lineup with an injury, the team has been struggling."
+        }
+      ],
+      "tip": "Brexit is 英国のEU離脱."
+    },
+    {
+      "n": 252,
+      "term": "皇室",
+      "reading": "こうしつ",
+      "meaning": "the imperial family (institution)",
+      "def_ja": "天皇とその一族をまとめていう言葉。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "雑誌で皇室の特集が組まれた。",
+          "form": "皇室",
+          "en": "A magazine ran a special feature on the imperial family."
+        },
+        {
+          "lv": 2,
+          "ja": "皇室の伝統行事として、天皇陛下が田植えをされた。",
+          "form": "皇室",
+          "en": "As a traditional imperial event, the Emperor planted rice."
+        },
+        {
+          "lv": 3,
+          "ja": "皇室の将来について話し合うため、政府は有識者会議を開いて意見を集めた。",
+          "form": "皇室",
+          "en": "To discuss the future of the imperial family, the government convened an expert panel to gather opinions."
+        }
+      ],
+      "tip": "皇室典範 is the law that governs the imperial family."
+    },
+    {
+      "n": 253,
+      "term": "危ぶむ",
+      "reading": "あやぶむ",
+      "meaning": "to fear for; to doubt",
+      "def_ja": "うまくいかないのではないかと心配する。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "台風で大会の開催が危ぶまれている。",
+          "form": "危ぶまれて",
+          "en": "Because of the typhoon, it is doubtful whether the tournament will be held."
+        },
+        {
+          "lv": 2,
+          "ja": "多くの専門家が、計画の実現を危ぶんでいる。",
+          "form": "危ぶんで",
+          "en": "Many experts doubt that the plan can be carried out."
+        },
+        {
+          "lv": 3,
+          "ja": "利用者が減り続けているため、町で唯一のバス路線の存続が危ぶまれている。",
+          "form": "危ぶまれて",
+          "en": "As passenger numbers keep falling, the town's only bus route may not survive."
+        }
+      ],
+      "tip": "Formal; most often met as 危ぶまれる. In speech people say 心配だ."
+    },
+    {
+      "n": 254,
+      "term": "男系",
+      "reading": "だんけい",
+      "meaning": "male line (of descent)",
+      "def_ja": "父から子へ、父方の血筋で続く家系。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この家は代々男系で続いている。",
+          "form": "男系",
+          "en": "This family has continued through the male line for generations."
+        },
+        {
+          "lv": 2,
+          "ja": "法律では、男系の男子だけが天皇になれると定められている。",
+          "form": "男系",
+          "en": "The law states that only males of the male line can become emperor."
+        },
+        {
+          "lv": 3,
+          "ja": "皇位の継承をめぐっては、男系を守るべきだという意見と女性天皇を認めるべきだという意見が対立している。",
+          "form": "男系",
+          "en": "On imperial succession, the view that the male line must be kept clashes with the view that a female emperor should be allowed."
+        }
+      ],
+      "tip": "男系 is about the line of descent, not about being male (男性)."
+    },
+    {
+      "n": 255,
+      "term": "相続",
+      "reading": "そうぞく",
+      "meaning": "inheritance",
+      "def_ja": "亡くなった人の財産を家族などが受け継ぐこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "父の家を相続した。",
+          "form": "相続",
+          "en": "I inherited my father's house."
+        },
+        {
+          "lv": 2,
+          "ja": "相続の手続きのために、銀行に何度も行った。",
+          "form": "相続",
+          "en": "I went to the bank many times to handle the inheritance paperwork."
+        },
+        {
+          "lv": 3,
+          "ja": "祖母が亡くなったあと、土地の相続をめぐって兄弟の間でもめごとが起きた。",
+          "form": "相続",
+          "en": "After our grandmother died, a dispute broke out between the siblings over inheriting her land."
+        }
+      ],
+      "tip": "相続 is for property; taking over a position or throne is 継承."
+    },
+    {
+      "n": 256,
+      "term": "規定",
+      "reading": "きてい",
+      "meaning": "provision; rule",
+      "def_ja": "決まりとしてはっきり定めたこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "規定の用紙に記入してください。",
+          "form": "規定",
+          "en": "Please fill in the designated form."
+        },
+        {
+          "lv": 2,
+          "ja": "会社の規定により、交通費は全額支給されます。",
+          "form": "規定",
+          "en": "Under company rules, travel expenses are paid in full."
+        },
+        {
+          "lv": 3,
+          "ja": "法律に罰則の規定がないため、違反しても処分されないのが現状だ。",
+          "form": "規定",
+          "en": "Because the law has no provision for penalties, violators currently go unpunished."
+        }
+      ],
+      "tip": "Do not confuse it with 既定 (already decided), which sounds the same."
+    },
+    {
+      "n": 301,
+      "term": "自民党",
+      "reading": "じみんとう",
+      "meaning": "Liberal Democratic Party (LDP)",
+      "def_ja": "日本の政党、自由民主党の短い呼び名。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "自民党が選挙で勝った。",
+          "form": "自民党",
+          "en": "The LDP won the election."
+        },
+        {
+          "lv": 2,
+          "ja": "自民党の総裁選挙が来月行われる。",
+          "form": "自民党",
+          "en": "The LDP leadership election will be held next month."
+        },
+        {
+          "lv": 3,
+          "ja": "長く政権を担ってきた自民党は、今回の選挙で議席を大きく減らした。",
+          "form": "自民党",
+          "en": "The LDP, which has governed for a long time, lost many seats in this election."
+        }
+      ],
+      "tip": "The LDP leader is called 総裁, not 党首."
+    },
+    {
+      "n": 302,
+      "term": "並立",
+      "reading": "へいりつ",
+      "meaning": "standing side by side; coexisting",
+      "def_ja": "二つ以上のものが同じ立場で並んであること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "衆議院選挙は小選挙区比例代表並立制で行われる。",
+          "form": "並立",
+          "en": "Lower house elections use a parallel system of single-seat districts and proportional representation."
+        },
+        {
+          "lv": 2,
+          "ja": "会議では二つの改革案が並立したまま、結論は次回に持ち越された。",
+          "form": "並立",
+          "en": "At the meeting, two reform plans stood side by side, and the decision was put off until the next meeting."
+        },
+        {
+          "lv": 3,
+          "ja": "一つの市に二つの商工会が並立していたが、効率化のために統合されることになった。",
+          "form": "並立",
+          "en": "Two chambers of commerce had existed side by side in one city, but they will merge to work more efficiently."
+        }
+      ],
+      "tip": "Formal; best known from 小選挙区比例代表並立制, Japan's lower house election system."
+    },
+    {
+      "n": 305,
+      "term": "審議",
+      "reading": "しんぎ",
+      "meaning": "deliberation (of a bill)",
+      "def_ja": "会議で案の中身をくわしく話し合うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "国会で法案の審議が始まった。",
+          "form": "審議",
+          "en": "Deliberation of the bill began in the Diet."
+        },
+        {
+          "lv": 2,
+          "ja": "野党は審議に応じず、委員会は開かれなかった。",
+          "form": "審議",
+          "en": "The opposition refused to take part in deliberations, so the committee did not meet."
+        },
+        {
+          "lv": 3,
+          "ja": "予算案の審議が長引いたため、新年度の事業の開始が一か月遅れることになった。",
+          "form": "審議",
+          "en": "Because deliberation on the budget dragged on, new projects for the fiscal year will start a month late."
+        }
+      ],
+      "tip": "審議会 is a government advisory council."
+    },
+    {
+      "n": 308,
+      "term": "会見",
+      "reading": "かいけん",
+      "meaning": "press conference",
+      "def_ja": "記者に向けて、決まった場で話すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "社長が会見を開いた。",
+          "form": "会見",
+          "en": "The company president held a press conference."
+        },
+        {
+          "lv": 2,
+          "ja": "知事は午後の会見で、新しい対策を発表した。",
+          "form": "会見",
+          "en": "The governor announced new measures at the afternoon press conference."
+        },
+        {
+          "lv": 3,
+          "ja": "記者会見では質問が相次いだが、大臣は自分の発言について詳しい説明を避けた。",
+          "form": "会見",
+          "en": "Questions poured in at the press conference, but the minister avoided explaining his remarks in detail."
+        }
+      ],
+      "tip": "In news, 会見 alone almost always means 記者会見."
+    },
+    {
+      "n": 313,
+      "term": "県議会",
+      "reading": "けんぎかい",
+      "meaning": "prefectural assembly",
+      "def_ja": "県の予算や条例を決める議員の集まり。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "県議会で来年度の予算が決まった。",
+          "form": "県議会",
+          "en": "Next year's budget was decided in the prefectural assembly."
+        },
+        {
+          "lv": 2,
+          "ja": "県議会の選挙が来年の春に行われる。",
+          "form": "県議会",
+          "en": "The prefectural assembly election will be held next spring."
+        },
+        {
+          "lv": 3,
+          "ja": "県議会で質問に立った議員は、観光客の減少への対策を知事に求めた。",
+          "form": "県議会",
+          "en": "An assembly member who spoke in the prefectural assembly asked the governor for measures against the drop in tourists."
+        }
+      ],
+      "tip": "A member is called 県議会議員, or 県議 for short."
+    },
+    {
+      "n": 317,
+      "term": "定例",
+      "reading": "ていれい",
+      "meaning": "regular (scheduled)",
+      "def_ja": "いつも決まった時期に行うもの。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "毎週月曜日に定例の会議がある。",
+          "form": "定例",
+          "en": "There is a regular meeting every Monday."
+        },
+        {
+          "lv": 2,
+          "ja": "市長は定例会見で、図書館の建て替えを発表した。",
+          "form": "定例",
+          "en": "At the regular press conference, the mayor announced the rebuilding of the library."
+        },
+        {
+          "lv": 3,
+          "ja": "市議会の六月定例会では、子育て支援の予算をめぐって活発な議論が交わされた。",
+          "form": "定例",
+          "en": "At the city council's June regular session, there was lively debate over the childcare support budget."
+        }
+      ],
+      "tip": "Local assemblies hold a 定例会 four times a year."
+    },
+    {
+      "n": 221,
+      "term": "双方",
+      "reading": "そうほう",
+      "meaning": "both sides",
+      "def_ja": "向かい合う二つの側の、どちらも。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "双方の意見をよく聞いてください。",
+          "form": "双方",
+          "en": "Please listen carefully to both sides."
+        },
+        {
+          "lv": 2,
+          "ja": "事故の原因について、双方の主張が食い違っている。",
+          "form": "双方",
+          "en": "The two sides disagree about the cause of the accident."
+        },
+        {
+          "lv": 3,
+          "ja": "長い話し合いの末、労使双方が納得できる賃上げの条件でようやく合意した。",
+          "form": "双方",
+          "en": "After long talks, they finally agreed on a pay raise that both management and labor could accept."
+        }
+      ],
+      "tip": "Formal; in conversation 両方 or お互い is more common."
+    },
+    {
+      "n": 73,
+      "term": "当然ながら",
+      "reading": "とうぜんながら",
+      "meaning": "naturally; as expected",
+      "def_ja": "言うまでもなく、当たり前のことだが。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "元日なので、当然ながら銀行は休みだ。",
+          "form": "当然ながら",
+          "en": "It is New Year's Day, so naturally the banks are closed."
+        },
+        {
+          "lv": 2,
+          "ja": "練習しなければ、当然ながら上手にはならない。",
+          "form": "当然ながら",
+          "en": "If you don't practice, of course you won't get better."
+        },
+        {
+          "lv": 3,
+          "ja": "試験の準備にほとんど時間をかけなかったので、当然ながら結果はひどいものだった。",
+          "form": "当然ながら",
+          "en": "I spent almost no time preparing for the exam, so naturally the result was terrible."
+        }
+      ],
+      "tip": "A bit written; in speech people often just say 当然 or もちろん."
+    },
+    {
+      "n": 236,
+      "term": "言及",
+      "reading": "げんきゅう",
+      "meaning": "mention; reference",
+      "def_ja": "話や文章の中で、あることに触れること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "社長は値上げには言及しなかった。",
+          "form": "言及",
+          "en": "The president did not mention the price increase."
+        },
+        {
+          "lv": 2,
+          "ja": "大臣は会見で、辞任の可能性に言及した。",
+          "form": "言及",
+          "en": "At the press conference, the minister mentioned the possibility of resigning."
+        },
+        {
+          "lv": 3,
+          "ja": "社長は新製品について詳しく話したが、売り上げの見通しへの言及は避けた。",
+          "form": "言及",
+          "en": "The president talked about the new product in detail but avoided mentioning the sales outlook."
+        }
+      ],
+      "tip": "A common news pattern is 〜への言及を避けた, meaning someone declined to comment."
+    },
+    {
+      "n": 227,
+      "term": "報告",
+      "reading": "ほうこく",
+      "meaning": "report; informing",
+      "def_ja": "起きたことや調べたことを人に知らせること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "上司に会議の結果を報告した。",
+          "form": "報告",
+          "en": "I reported the results of the meeting to my boss."
+        },
+        {
+          "lv": 2,
+          "ja": "事故が起きたら、すぐに報告してください。",
+          "form": "報告",
+          "en": "If an accident happens, please report it immediately."
+        },
+        {
+          "lv": 3,
+          "ja": "来月結婚することを、学生時代にお世話になった先生にご報告しました。",
+          "form": "報告",
+          "en": "I told the teacher who looked after me in my school days that I am getting married next month."
+        }
+      ],
+      "tip": "ご報告 is also used for sharing personal news like a marriage or a birth."
+    },
+    {
+      "n": 321,
+      "term": "空爆",
+      "reading": "くうばく",
+      "meaning": "airstrike",
+      "def_ja": "飛行機などから爆弾を落として攻撃すること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "その町は激しい空爆を受けた。",
+          "form": "空爆",
+          "en": "The town came under heavy airstrikes."
+        },
+        {
+          "lv": 2,
+          "ja": "空爆で多くの市民が犠牲になった。",
+          "form": "空爆",
+          "en": "Many civilians were killed in the airstrikes."
+        },
+        {
+          "lv": 3,
+          "ja": "停戦の合意が発表された直後にも空爆が続いたため、各国から強い非難の声が上がった。",
+          "form": "空爆",
+          "en": "Airstrikes continued even right after the ceasefire was announced, drawing strong criticism from many countries."
+        }
+      ],
+      "tip": "Drone strikes are also called 空爆."
+    },
+    {
+      "n": 318,
+      "term": "原子力発電所",
+      "reading": "げんしりょくはつでんしょ",
+      "meaning": "nuclear power plant",
+      "def_ja": "核の力で電気を作る施設。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "海の近くに原子力発電所がある。",
+          "form": "原子力発電所",
+          "en": "There is a nuclear power plant near the sea."
+        },
+        {
+          "lv": 2,
+          "ja": "大きな地震のあと、原子力発電所の安全基準が見直された。",
+          "form": "原子力発電所",
+          "en": "After the big earthquake, safety standards for nuclear power plants were revised."
+        },
+        {
+          "lv": 3,
+          "ja": "電力不足を解消するため、政府は停止中の原子力発電所の再稼働を進めている。",
+          "form": "原子力発電所",
+          "en": "To ease the power shortage, the government is pushing to restart idle nuclear power plants."
+        }
+      ],
+      "tip": "In speech and headlines it is almost always shortened to 原発."
+    },
+    {
+      "n": 300,
+      "term": "北上",
+      "reading": "ほくじょう",
+      "meaning": "moving north",
+      "def_ja": "北の方へ向かって進むこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "台風が北上している。",
+          "form": "北上",
+          "en": "The typhoon is moving north."
+        },
+        {
+          "lv": 2,
+          "ja": "桜前線が少しずつ北上している。",
+          "form": "北上",
+          "en": "The cherry blossom front is gradually moving north."
+        },
+        {
+          "lv": 3,
+          "ja": "夏休みを使って、東京から北海道までバイクで日本列島を北上する旅をした。",
+          "form": "北上",
+          "en": "During the summer holidays, I rode a motorbike north through Japan from Tokyo to Hokkaido."
+        }
+      ],
+      "tip": "A standard weather-report word; the opposite is 南下."
+    },
+    {
+      "n": 68,
+      "term": "立ち位置",
+      "reading": "たちいち",
+      "meaning": "position; role among others",
+      "def_ja": "周りとの関係の中でしめる場所や役割。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "舞台で立ち位置を確認した。",
+          "form": "立ち位置",
+          "en": "I checked my position on the stage."
+        },
+        {
+          "lv": 2,
+          "ja": "新しい職場で、自分の立ち位置がまだ分からない。",
+          "form": "立ち位置",
+          "en": "I still don't know where I stand at my new workplace."
+        },
+        {
+          "lv": 3,
+          "ja": "大手との価格競争を避けるため、その会社は高級路線という独自の立ち位置を選んだ。",
+          "form": "立ち位置",
+          "en": "To avoid a price war with big firms, the company chose its own position in the luxury market."
+        }
+      ],
+      "tip": "Literally the spot where a performer stands; now often used for one's role in a group."
+    }
+  ]
+}

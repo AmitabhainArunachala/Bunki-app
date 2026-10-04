@@ -1259,11 +1259,11 @@ async function main() {
   const taken = await page.locator('#tray').textContent();
   check('any node can be taken into study', /覚\s*[1-9]/.test(taken), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
-    const p = document.querySelector('.list-picker .eyebrow');
+    const p = document.querySelector('.list-picker .fold-sub');
     return p ? p.textContent : null;
   })()`);
-  check('覚える lands the item in this month\'s list automatically',
-    !!bucket && /\d{4}年\d{1,2}月/.test(bucket), String(bucket).slice(0, 44));
+  check('覚える lands the item in this month\'s list automatically, and the drawer says so',
+    !!bucket && (/\d{4}年\d{1,2}月/.test(bucket) || /auto-filed in \d{4}-\d{2}/.test(bucket)), String(bucket).slice(0, 44));
   // the schedule preview lives one named fold deep since 2026-08-27 —
   // open 学習の記録 the way a finger does before reading it (aim at the
   // study fold's own head: the list drawer shares the .fold-head class)

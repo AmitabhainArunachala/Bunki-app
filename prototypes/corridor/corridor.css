@@ -8254,3 +8254,40 @@ main .browse-filters .chip.browse-filter.on {
   color: var(--ground);
   border-color: var(--ink);
 }
+/* 集中道場 › デッキ — the SRS decks, one tappable row each */
+.dojo-decks {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 18px;
+}
+
+.dojo-deck {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 14px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--ground-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.dojo-deck:first-child {
+  border-color: var(--ink);
+}
+
+.dojo-deck-t {
+  font-family: var(--serif);
+  font-size: 19px;
+}
+
+.dojo-deck-sub {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
