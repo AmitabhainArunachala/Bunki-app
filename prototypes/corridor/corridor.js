@@ -9556,12 +9556,15 @@ function renderTakeChooser(sheet, node, label) {
   const field = el('input', 'list-maker-field');
   field.type = 'text';
   field.id = 'take-new-list';
+  field.value = pick.draftName || '';
+  field.addEventListener('input', () => { pick.draftName = field.value; });
   field.placeholder = tx('＋ 新しいリストの名前', '＋ name a new list');
   field.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
   const addNew = () => {
     const name = field.value.trim();
     if (!name) return;
     if (!pick.lists.includes(name)) pick.lists = [...pick.lists, name];
+    pick.draftName = '';
     render();
   };
   field.addEventListener('keydown', (ev) => {

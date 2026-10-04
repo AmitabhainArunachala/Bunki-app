@@ -7,7 +7,9 @@ import {chromium,webkit} from 'playwright-core';
 import {fileURLToPath} from 'node:url';
 import {fixture,enrichmentFixture} from './personal-fixture.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
-const server=createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost'),f=path.join(root,url.pathname==='/'?'index.html':url.pathname);const data=await readFile(f);res.setHeader('Content-Type',({'.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css'})[path.extname(f)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404);res.end('missing');}});
+let releaseDictionary;
+const dictionaryWait=new Promise(resolve=>{releaseDictionary=resolve;});
+const server=createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost'),f=path.join(root,url.pathname==='/'?'index.html':url.pathname);if(url.pathname.endsWith('/dict-v2/index.json'))await dictionaryWait;const data=await readFile(f);res.setHeader('Content-Type',({'.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css'})[path.extname(f)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404);res.end('missing');}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin=`http://127.0.0.1:${server.address().port}`;
 const browserName=process.env.PERSONAL_HOST_BROWSER || 'chromium';
@@ -30,7 +32,10 @@ try {
  await page.locator('#take').click();
  assert.match(await page.locator('.take-always .sub').innerText(),/daily review|毎日の復習/);
  assert.equal(await page.evaluate(()=>(JSON.parse(localStorage.getItem('kairo-corridor-v1'))?.taken||[]).length),0,'opening the chooser does not enroll a card');
- await page.locator('#take-new-list').fill('Synthetic host list');await page.locator('#take-save').click();
+ await page.locator('#take-new-list').fill('Synthetic host list');
+ releaseDictionary();await page.locator('#sheet .dictionary-opening').waitFor({state:'detached'});
+ assert.equal(await page.locator('#take-new-list').inputValue(),'Synthetic host list','a background dictionary refresh must preserve the typed list name');
+ await page.locator('#take-save').click();
  const canonical=await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-corridor-v1')));
  assert(canonical.taken.some(t=>t.id==='図書館'));assert(canonical.lists['Synthetic host list'].some(t=>t.id==='図書館'));
  assert(Number.isFinite(canonical.taken.find(t=>t.id==='図書館').started),'confirmed 覚える keeps the host explicit-review enrollment contract');
@@ -48,4 +53,4 @@ try {
  await page.locator('#sheet').press('Escape');await page.locator('#sheet').waitFor({state:'detached'});
  assert(reqs.every(r=>r.method==='GET'));assert(reqs.every(r=>r.url.startsWith(origin)||r.url.startsWith('data:')));assert.deepEqual(errors,[]);
  console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
-}finally{await browser.close();await new Promise(r=>server.close(r));}
+}finally{releaseDictionary();await browser.close();await new Promise(r=>server.close(r));}
