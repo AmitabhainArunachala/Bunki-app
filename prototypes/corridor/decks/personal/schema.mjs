@@ -1,4 +1,5 @@
 // Imported content is data only. Never fetch, execute, or render its markup.
+import {validateEnrichment as validateAnswers} from './enrichment.mjs';
 export const MAX_IMPORT_BYTES = 30 * 1024 * 1024;
 const check = (ok, message) => { if (!ok) throw new Error(message); };
 const object = x => x && typeof x === 'object' && !Array.isArray(x);
@@ -23,6 +24,7 @@ export async function digest(value) {
   const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical(value)));
   return Array.from(new Uint8Array(hash), n => n.toString(16).padStart(2, '0')).join('');
 }
+export const validateEnrichment = (value, collection) => validateAnswers(value, collection, digest);
 export function safeURL(value) {
   try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
   catch { return ''; }
@@ -71,18 +73,23 @@ export async function validateCollection(data) {
     check(Array.isArray(r.ids) && r.ids.length <= 1000 && r.ids.every(id => lessonIds.has(id)), 'Unknown paragraph in a route.');
   }
   check(data.contentDigest === await digest({edition:data.id, lessons}), 'The collection failed its integrity check. Nothing was imported.');
+  if (data.enrichment !== undefined) await validateEnrichment(data.enrichment, data);
   return data;
 }
 export async function parseImport(value) {
   check(object(value), 'This is not a collection or progress backup.');
+  if (value.format === 'bunki-personal-enrichment') return {enrichment:await validateEnrichment(value)};
   if (value.format === 'john-threads-progress') return {progress:value};
   if (value.format === 'bunki-personal-backup') {
     check(value.version === 1, 'Unsupported backup version.');
     check(object(value.progress) && value.progress.format === 'john-threads-progress', 'The backup has no valid review history. Nothing was imported.');
-    return {collection:await validateCollection(value.collection), progress:value.progress};
+    const collection = await validateCollection(value.collection);
+    const enrichment = value.enrichment || collection.enrichment;
+    if (enrichment) await validateEnrichment(enrichment, collection);
+    return {collection, progress:value.progress, enrichment};
   }
-  return {collection:await validateCollection(value)};
+  return {collection:await validateCollection(value), enrichment:value.enrichment};
 }
 export function backup(record) {
-  return {format:'bunki-personal-backup',version:1,exportedAt:new Date().toISOString(),collection:record.collection,progress:record.progress};
+  return {format:'bunki-personal-backup',version:1,exportedAt:new Date().toISOString(),collection:record.collection,progress:record.progress,...(record.enrichment ? {enrichment:record.enrichment} : {})};
 }
