@@ -1,5 +1,14 @@
 # What Japanese self-study / immersion communities prescribe for sentence-based vocabulary SRS cards
 
+> **Correction (2026-10-04, second research pass).** Section 1 below attributes the
+> "What is it about these MCDs?" series (Parts 1–5, BONUS) to AJATT/Khatzumoto. Those
+> posts are by guest author **rigabamboo**, rounding up AJATT+ forum members; the
+> "Never quiz yourself on two kanji at once… nine cards with one kanji" rule and the
+> 吸収 card are forum members' (安藤 / アッシュ), not Khatz's. Khatz's own public MCD
+> posts are "10,000 Sentences is Dead (Long Live MCDs)", "12 Free MCD Examples",
+> "MCDs: But What If I Don't Understand the Meaning of the Whole?" and "A New MCD Card
+> Format" (2017). See `report-ajatt-method-and-community.md` and `notes-ajatt_mcd_method.md`.
+
 **Access notes:** The network egress proxy blocked most community websites directly: animecards.site, tatsumoto.neocities.org, learnjapanese.moe, refold.la, web.archive.org, ankiweb.net, reddit, japaneselevelup.com, chinese-forums.com and kumasensei.net all returned EGRESS_BLOCKED, and alljapaneseallthetime.com no longer resolves. GitHub was reachable, so the following primary sources were read in full from their **source repositories**:
 
 - **AJATT:** the full Khatzumoto blog archive at `github.com/all-japanese-all-the-time/all-japanese-all-the-time`, an HTML mirror of alljapaneseallthetime.com/blog.
