@@ -109,3 +109,58 @@ describe('kotoba player engine: earlier review findings unchanged (F03, F05 defe
     expect(truncated.log[0]).toEqual(['c1', 3, '1']);
   });
 });
+
+describe('kotoba player engine: a backup is checked before it can replace anything (F02, A21)', () => {
+  const { inspectState } = engine;
+  const envelope = { format: engine.STATE_FORMAT, version: engine.VERSION, deckId: 'demo' };
+
+  it.each([
+    ['{}', {}, 'empty'],
+    ['[]', [], 'not-an-object'],
+    ['null', null, 'not-an-object'],
+    ['{"cards":{}}', { cards: {} }, 'empty'],
+    ['another deck', { ...envelope, deckId: 'other', cards: firstGood().cards }, 'wrong-deck'],
+    ['version 2', { ...envelope, version: 2, cards: firstGood().cards }, 'wrong-version'],
+    ['a due that is not a date', { ...envelope, cards: { c1: { due: 'not-a-date' } } }, 'bad-card'],
+  ])('inspectState refuses %s', (_, raw, reason) => {
+    const seen = inspectState(raw, deck);
+    expect(seen.ok).toBe(false);
+    expect(seen.reason).toBe(reason);
+  });
+
+  it('inspectState accepts a valid backup and counts cards, orphans and answers', () => {
+    const s1 = firstGood();
+    const s2 = grade(fsrsApi, scheduler, s1, 'c2', RATINGS.again, new Date(T.getTime() + MIN));
+    const raw = JSON.parse(JSON.stringify({ ...s2, cards: { ...s2.cards, gone: s2.cards.c1 } }));
+    const before = JSON.stringify(raw);
+    expect(inspectState(raw, deck)).toEqual({
+      ok: true,
+      reason: null,
+      cards: 3,
+      known: 2,
+      orphans: 1,
+      log: 2,
+    });
+    expect(JSON.stringify(raw)).toBe(before);
+  });
+
+  it('normalizeState keeps a record for a card no longer in the deck and drops a malformed one', () => {
+    const good = firstGood().cards.c1;
+    const state = normalizeState(
+      {
+        ...emptyState('demo'),
+        cards: { c1: good, retired: good, c2: { ...good, stability: 'x' } },
+      },
+      deck,
+    );
+    expect(Object.keys(state.cards).sort()).toEqual(['c1', 'retired']);
+    expect(state.cards.retired).toEqual(good);
+  });
+
+  it('an orphan does not take a slot from today’s new cards', () => {
+    const orphan = { ...firstGood().cards.c1 };
+    const state = { ...emptyState('demo'), cards: { retired: orphan } };
+    expect(engine.introducedToday(state, T, deck)).toBe(0);
+    expect(engine.buildQueue(deck, state, T, 1).fresh).toEqual(['c1']);
+  });
+});

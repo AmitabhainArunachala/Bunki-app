@@ -19,6 +19,11 @@
  * ledger is untouched; a learning step that comes due while a card is open
  * waits until that card is answered, then comes next (fake clock).
  *
+ * Then 復元: a pasted `{}` changes nothing and says why; an older, smaller
+ * backup needs a second tap that names both counts, and the ledger it
+ * replaces is kept under bunki-cloze:kotoba-mcd:before-restore. A stored
+ * ledger the player cannot read is set aside before anything is saved.
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -177,6 +182,66 @@ async function verifyGradePath(browser, base) {
   }
 }
 
+/* ---------------------------------------------- restore (F02, A21) */
+async function verifyRestore(browser, base) {
+  const LEDGER = 'bunki-cloze:kotoba-mcd';
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(SEEDED);
+  const page = await context.newPage();
+  const raw = (key) => page.evaluate(`localStorage.getItem(${JSON.stringify(key)})`);
+  const bootMcd = async () => {
+    await page.goto(`${base}/index.html?deck=mcd`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+  };
+  const gradeOne = async () => {
+    await page.click('#kp-start');
+    await page.click('#kp-reveal');
+    await page.click('#kp-grade-good');
+    await page.click('#kp-quit');
+  };
+  const restore = async (text) => {
+    await page.fill('#kp-backup', text);
+    await page.click('#kp-restore');
+    return page.evaluate(`({ msg: document.getElementById('kp-backup-msg').textContent, button: document.getElementById('kp-restore').textContent })`);
+  };
+  try {
+    await bootMcd();
+    await gradeOne();
+    const older = await raw(LEDGER);
+    await gradeOne();
+    const current = await raw(LEDGER);
+    await page.click('#kp-to-settings');
+
+    const empty = await restore('{}');
+    check(
+      '復元 with {} leaves the ledger bytes as they were and says no card records are in it',
+      (await raw(LEDGER)) === current && empty.msg.includes('入っていません') && !empty.msg.includes('復元しました') && empty.button === '復元',
+      empty.msg,
+    );
+
+    const first = await restore(older);
+    const untouched = (await raw(LEDGER)) === current;
+    await page.click('#kp-restore');
+    const done = await page.evaluate(`document.getElementById('kp-backup-msg').textContent`);
+    const now = JSON.parse(await raw(LEDGER));
+    check(
+      'an older backup with fewer cards: the first tap shows both counts and asks again (置き換える); the second replaces and keeps the old ledger aside',
+      first.msg.includes('このバックアップ：1枚・1回答') && first.msg.includes('いまの記録：2枚・2回答') && first.msg.includes('いまより少ない') && first.button === '置き換える' && untouched && Object.keys(now.cards).length === 1 && now.log.length === 1 && (await raw(`${LEDGER}:before-restore`)) === current && done.includes('復元しました'),
+      JSON.stringify({ first: first.msg, button: first.button, untouched, done }),
+    );
+
+    // a stored ledger whose card records cannot be read is set aside before anything is saved
+    const broken = JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: 'kotoba-mcd', cards: { x: { due: 'not-a-date' } }, log: [] });
+    await page.evaluate(`localStorage.setItem(${JSON.stringify(LEDGER)}, ${JSON.stringify(broken)})`);
+    await bootMcd();
+    const home = await page.evaluate(`document.querySelector('.kp-notice')?.textContent || ''`);
+    check('an unreadable stored ledger is copied to bunki-cloze:kotoba-mcd:quarantine and the deck home says so', (await raw(`${LEDGER}:quarantine`)) === broken && home.includes('別に保管しました'), home);
+  } finally {
+    await context.close();
+  }
+}
+
 /* --------------------------------------------------- half two: the app */
 async function main() {
   console.log('— 言葉の鉱脈: the deck as data');
@@ -280,6 +345,9 @@ async function main() {
 
     console.log('\n— a grade is saved before the card moves on');
     await verifyGradePath(browser, base);
+
+    console.log('\n— 復元 cannot erase progress');
+    await verifyRestore(browser, base);
   } finally {
     await browser.close();
     server.close();
