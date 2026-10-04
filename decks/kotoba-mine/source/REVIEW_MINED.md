@@ -53,5 +53,5 @@ has a usable real sentence.
 }
 ```
 
-Every word in your range gets an entry. Then run `python3 tools/export_mined.py` to make
+Every word in your range gets an entry. Then run `npx prettier --write source/review/<range>.json` and `python3 tools/export_mined.py` to make
 sure every `ja` is found (it stops on a sentence that is not a candidate).
