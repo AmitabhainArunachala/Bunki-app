@@ -69,3 +69,43 @@ Batch 2 confirms the semiconductor seam is deep (two 中田 lectures, PIVOT, ASM
 primary sources), AI discourse spans popular (ReHacQ, RECODE) to academic (予備校のノリ
 AI history), and the Eastern-philosophy seam widens from Buddhism to 老子 and
 Schumpeter-style history of ideas.
+
+## Batch 3 (Aug 15–17 history; first screenshot repeats batch 2)
+
+| Channel                                | Video (as shown)                                                            | Topic bucket               |
+| -------------------------------------- | --------------------------------------------------------------------------- | -------------------------- |
+| PIVOT 公式チャンネル                   | 【地震・水害に強い土地の調べ方】不動産選びで何を見ればいい？                | Japan life / geography     |
+| PIVOT 公式チャンネル                   | 【4兆円国家プロジェクトを主導】INPEX · 【AIで高まるエネルギー需要】安定供給 | energy / economics (PR)    |
+| TOLAND VLOG                            | 【閲覧注意】日本の歴史で一番〝闇の…〟 記紀 (古事記・日本書紀)               | Japanese history (popular) |
+| 予備校のノリで学ぶ「大学の数学・物理」 | 中学数学からはじめる相対性理論 (ヨビノリ)                                   | science lecture            |
+| PIVOT 公式チャンネル                   | 【勉強は才能よりやり方で決まる】メタ認知とハイパー修正効果 (星友啓)         | learning science           |
+| PIVOT 公式チャンネル                   | 【200以上の研究から評価した効果的な勉強法】線引き・読み直しはNG             | learning science           |
+| 謎解き統計学 \| サトマイ               | 【もう昔みたいに頑張れない人へ】成果を追うほど虚しくなる理由                | psychology                 |
+| Michele Torti                          | How He Made $120K With An AI Agency                                         | AI business (EN)           |
+| Dana and the Wolf                      | (EN relationship shorts)                                                    | leisure                    |
+
+## Subscriptions (partial, alphabetical screenshots)
+
+ヨガジェネレーション · 【公式】高野山の法話 · 【日本語教師になる】ももこ · あかね的日本語教室 ·
+あび / 漢字 · えば一問一答 · かずま#ゼロから英語 · Whale record (クジラレコード) ·
+KUROMARU. Mystery · こせんだ式日本語教室 · しょーてぃ仮想通貨 · たっくーTVれいでぃお ·
+たろーです【歴史解説】 · United Gratitude · 0時間目のジーニアス · 3Blue1Brown ·
+3Blue1BrownJapan · 40代からの美ボイスレッスン室 · ABEMA Prime · Actualized.org ·
+Adam Evans · aframe films · AI adventurer · AI Engineer · AI LABS · AIcia Solid Project
+
+## Seams confirmed after three batches
+
+1. **Learning science in Japanese** (PIVOT 星友啓 metacognition, "200 studies" study
+   methods, 楽待 sleep, サトマイ) — the mind/learning topic has a native lecture corpus
+   the learner already follows. Passages can quote the same findings (retrieval
+   practice, spacing) the deck itself is built on.
+2. **Buddhism and Eastern thought** (高野山の法話 subscription, 空海 ×3, 般若心経, 老子,
+   真言) — 仏教語 and 漢語 density; the Kanken seam.
+3. **AI and semiconductors** (中田 半導体 ×2, PIVOT, ASML, ReHacQ, RECODE, ヨビノリ AI史,
+   3Blue1BrownJapan, AI Engineer) — news and lecture register, katakana-heavy but with
+   the 経済・技術 kanji vocabulary N1 tests.
+4. **History and geopolitics** (中田 地政学, ウクライナ, 皇室典範, 記紀, たろーです歴史解説,
+   Schumpeter) — the connective tissue, and the register closest to N1 読解 passages.
+5. **Japanese-language meta** (ゆる言語学ラジオ, 養老孟司, あび漢字, Japanese-teacher
+   channels) — the learner enjoys talking _about_ Japanese in Japanese; a fifth texture
+   for passages (語源, 言語学 register).
