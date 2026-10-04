@@ -10,7 +10,7 @@ Each has its own progress and its own colour theme.
 
 | Deck                | What it is                                                               | Theme     | Open with      | Offline file     | Anki               |
 | ------------------- | ------------------------------------------------------------------------ | --------- | -------------- | ---------------- | ------------------ |
-| **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (1,597 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
+| **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (1,481 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
 | **言葉の鉱脈・文**  | one real sentence per card, the word marked, read and recall (503 cards) | 墨 (Sumi) | `?deck=kotoba` | `study.html`     | `kotoba-mine.apkg` |
 
 ## Seeing it: colour, depth and shape
@@ -36,10 +36,12 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 - **Front:** a real passage of 2–4 connected sentences with **one gap**. Readings stay
   hidden, and there's no English.
   - **語 card:** the whole word is blanked, with a short Japanese definition under the
-    passage as the hint. Recall the word from its context.
+    passage as the hint. Recall the word from its context. If the word appears twice in
+    the passage, both are blanked.
   - **字 card:** one kanji of the word is blanked, with its reading in the gap
     (〔ざい〕政難…). Recall the character in context. These come from the word's first
-    passage, one card per kanji.
+    passage, one card per kanji. There is no 字 card when that kanji also appears
+    elsewhere in the passage, or when the kanji table has no reading for it.
 - **Back:** the whole passage with furigana, the word with its reading, and the Japanese
   definition. The English meaning and translation sit behind a tap. The source is shown.
 - **Many passages per word.** Each word has 2–4 passages in different situations: news,
@@ -50,8 +52,9 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
     and Tatoeba.
   - **Written for the deck:** natural, dense passages labelled 書き下ろし, built around the
     word's typical partners (財政が悪化する, 金利を引き上げる).
-  - Today the split is 454 real and 489 written, across 943 passages and 1,597 cards.
-- **Grading:** Again/Good (もう一度／覚えた) is all FSRS needs. Swipe left or right.
+  - Today the split is 454 real and 489 written, across 943 passages and 1,481 cards.
+- **Grading:** もう一度／思い出せた (Again/Good) is all FSRS needs. Swipe left or right.
+  設定 › 判定のボタン adds 難しい and 簡単 for those who want four buttons.
 - **On screen:** the deck home explains all this under **このデッキのしくみ**.
 
 ## Where to study
@@ -64,8 +67,10 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 
 Scheduling is FSRS-6 with Bunki's pinned weights (90% target retention). The deck keeps
 its own record (`bunki-cloze:kotoba-mine` in the browser) and never writes the
-corridor's word queue. Settings: new sentences per day, answer mode, hint language,
-readings on tap, dark or light screen, backup/restore.
+corridor's word queue. Settings: new cards per day, answer mode, hint language,
+English on tap, readings on tap, two or four grade buttons, colour theme, backup/restore.
+復元 checks a pasted backup before it replaces anything, shows both counts, and keeps
+the old record as `bunki-cloze:<deck>:before-restore`.
 
 ## Anki
 
@@ -177,6 +182,9 @@ source/review/*.json      the reader's final choice and translation per word
 source/mined.json         the sentences the deck is built from
 tools/                    miners, rank.py, review_input.py, export_mined.py, build.py
 source/rights.json        the licence of record for every source (see above)
+source/ids.json           every card's id, keyed by word, passage text and card kind;
+                          ids of cards no longer built stay reserved and are never reused
+source/readings.json      reading fixes applied after tokenising (人 → じん, 一日 → いちにち…)
 release/                  kotoba-mine.apkg · kotoba-mine.tsv · study.html ·
                           ATTRIBUTION-<id>.md (private build)
 release/public/           the public build and its ATTRIBUTION files
