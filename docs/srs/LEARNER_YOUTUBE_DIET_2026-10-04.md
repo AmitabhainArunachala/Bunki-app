@@ -43,3 +43,29 @@ connective tissue.
 - The Buddhist thread is live (般若心経, 空海, 不動明王, 真言), which confirms
   仏教語 as a vocabulary seam for both N1 and Kanken.
 - AI and semiconductors appear in both languages (AI2027, Lisa Su, NetworkChuck).
+
+## Batch 2 (recent → Aug 17)
+
+| Channel                                   | Video (as shown)                                                              | Topic bucket                 |
+| ----------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------- |
+| 中田敦彦のYouTube大学                     | 半導体① 21世紀の「石油」 · 半導体② 米中チップ戦争と日本の未来                 | semiconductors               |
+| PIVOT 公式チャンネル                      | 【基礎から分かる半導体】21世紀の石油と呼ばれる理由／NVIDIAの設計…             | semiconductors               |
+| PIVOT 公式チャンネル                      | 【資本主義は成功するから滅びる】今こそシュンペーターを学ぶ理由                | economics / history of ideas |
+| 謎解き統計学 \| サトマイ                  | 【AI×無能＝無能】仕事ができる人は「何を解くか」が違う！AIで差がつく…          | AI / thinking                |
+| ASML                                      | Holistic lithography · Inside the machine: How a High NA system generates EUV | semiconductors (EN)          |
+| 中田敦彦のYouTube大学                     | 【地政学】なぜ紛争は同じ場所で起きるのか？                                    | world history / geopolitics  |
+| Floating Stories                          | 2500年前の宇宙論が極めて量子力学過ぎた｜『老子』が現代人の心に刺…             | Eastern philosophy (老子)    |
+| Floating Stories                          | 【現実の書き換え方】1200年前の天才・空海が到達した「この世の正…」             | Buddhism / 空海              |
+| ReHacQ－リハック－【公式】                | 【後藤達也 vs 今井翔太】AI業界大激震！世界崩壊の始まり！？                    | AI / economics               |
+| RECODE － 知性OSの再定義 －               | 【沈黙の4ヶ月】AI加速世界で「思考が化石化する人間」                           | AI / thinking                |
+| 本要約チャンネル【毎日18時更新】          | 【最高の帰宅後ルーティン】「帰宅後はすぐコレやれ！」                          | habits                       |
+| 予備校のノリで学ぶ「大学の数学・物理」    | AI(人工知能) 開発の流れを1時間でざっくりと                                    | AI history                   |
+| Ananya アナンヤ (ft. Matt vs Japan)       | How to ACTUALLY Get Fluent in Japanese                                        | language learning (EN)       |
+| WorldofAI                                 | GLM 5.3 Is INSANE!                                                            | AI (EN)                      |
+| Aurora Work · Lofi Zen · High Stereo Love | focus music · lofi · reggae                                                   | ambient / music              |
+| Foamballed                                | surf clip                                                                     | leisure                      |
+
+Batch 2 confirms the semiconductor seam is deep (two 中田 lectures, PIVOT, ASML
+primary sources), AI discourse spans popular (ReHacQ, RECODE) to academic (予備校のノリ
+AI history), and the Eastern-philosophy seam widens from Buddhism to 老子 and
+Schumpeter-style history of ideas.
