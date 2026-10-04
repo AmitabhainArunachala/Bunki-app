@@ -951,3 +951,18 @@ tap-to-define: the templates are unchanged (furigana only)." The tokens side fil
 each word's definition as tokens (format version 1, additive). The swipe now takes pointer capture
 only once the finger moves, so a tap on a word stays a click on it. The deck method text says that
 words on the back can be tapped. Why: learning-design.md §3, integration.md A2, RESEARCH #2.
+
+**A45 → S52 (Phase 2, final; amends A22's list).** Adds to the worker's install-time SHELL: "Each
+deck that names a tokens side file (A43) has that file precached beside its `deck.json`
+(`decks/kotoba-mine/tokens.json`, `decks/kotoba-mcd/tokens.json`), so a first visit followed by
+going offline still draws the back's tap targets (A44). A change to the player or to a deck's
+outputs bumps `VERSION`; this run's is `kairo-v15-tap-define`." Why: mount.js fetches the tokens
+once a sitting starts, a request the shell would otherwise miss offline, and the tap layer and
+the regenerated decks must not be served from a v14 cache. `tools/sw-shell.test.mjs` checks that
+every SHELL path exists.
+
+The Phase 2 run (2026-10-04) is recorded in A37–A45. Read default and the 字 skip: A37. Hint
+retirement: A26 and A37. Reset re-scoped to 削除 and 復元: A42. Source fold with its licence: A27.
+Bar reserve and the settling scroll: A39. 焦点 groups and the ⋯ gutter: A38. Tokens side file,
+compound joins, cue rules and the host adapter: A43. Tap to define as capture only, the `lookups`
+ledger field, the depth-2 cut-off and the standalone gloss-map fallback: A44. Service worker: A45.

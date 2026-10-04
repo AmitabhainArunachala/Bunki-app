@@ -16,30 +16,42 @@ Each has its own progress and its own colour theme.
 ## The player: what a card looks like
 
 The player follows [card contract v2](../../docs/srs/CARD_CONTRACT_V2.md) and the
-amendments A26–A36 in [STANDARD.md](../../docs/srs/STANDARD.md). The standalone study pages
+amendments A26–A45 in [STANDARD.md](../../docs/srs/STANDARD.md). The standalone study pages
 bundle the same player, and the Anki templates match it where Anki can.
 
 - **Front:** the passage and nothing else to lean on: no readings, no English, no words to
-  tap. A hint shows only on a card you repaired with one (see **Leeches** below).
+  tap. Both decks open in 読んで思い出す: the word is marked and you recall its sense and
+  reading. 穴埋め and 4択 are one switch away in 設定 › 答え方. No mode shows a hint; one
+  shows only on a card you repaired with one (see **Leeches** below).
 - **Back, tier one (no taps):** the word large, its reading and part of speech, a reading
   over every kanji in the passage, and the one Japanese definition. A Japanese usage note
   appears only when there is one.
 - **Back, tier two (one tap each, in this order):** 英語 (the English gloss, muted), 英訳
   (the target sentence only; 未対応 where the English can't be matched sentence by
   sentence), 漢字の形と意味, 類語 (once the card is in review), the word's other passages
-  (titles only), then the source line.
+  (titles only), then 出典: the author, the site or 書き下ろし, and the licence.
 - **English on tap:** 英語 is closed by default. 設定 › 英語の意味 › いつも開いておく keeps it
   open for that deck.
-- **Zoom (MCD passages):** 全文／焦点 in the card header after the reveal. 焦点 dims the
-  sentences around the target. A new card opens in 全文 and a card you've seen opens in
-  焦点, unless you choose one; the choice is kept per deck.
+- **Zoom (MCD passages):** 全文／焦点 in the card header after the reveal. 焦点 folds the
+  sentences before and after the target into two dimmed lines each; ⋯ opens a group in
+  place. A new card opens in 全文 and a card you've seen opens in 焦点, unless you choose
+  one; the choice is kept per deck.
+- **Tap to define (back only):** after the reveal, every word of the passage and of the
+  definition can be tapped. In Bunki a tap opens an entry sheet: the reading, the Japanese
+  sense, English behind 英語, and 覚える to save the word to the reader's lists. A word that
+  is already in this deck says 「このデッキにあります」. A word inside the sheet opens one
+  more sheet, and that one says 「ここで止めよう」. A tap never grades or schedules anything;
+  it is noted in the deck's record (`lookups`). The offline study pages let you tap the
+  deck's own words for a small popover, without 覚える. Anki has no taps.
+- **Settling:** after the reveal the page scrolls just enough to put the sentence, the word
+  and its definition between the header and the grade bar.
 - **Grading:** もう一度／思い出せた only, pinned to the bottom of the screen on a phone. Swipe
   left or right also works. The rule "if the answer taught you something, もう一度" shows
-  once under the bar.
+  once under the bar. The reveal and swipe hints show for a deck's first three sittings.
 - **削除:** at the right of the top bar. One tap suspends the card (its record stays) and
   the toast's 元に戻す undoes it. 設定 › 保留中のカード brings suspended cards back. A card
   deleted before you ever graded it doesn't hold up its word: the word's next passage
-  takes its place.
+  takes its place. There is no whole-deck reset: 設定 › バックアップ keeps コピー and 復元.
 - **Leeches:** after 5 lapses the back offers, in order, 別の文に替える (the word's next
   passage replaces this one), ヒントを付ける (a hint on this card's front), 保留 (suspend) or
   このまま続ける. Nothing changes unless you choose.
@@ -68,13 +80,13 @@ bundle the same player, and the Anki templates match it where Anki can.
 This follows Khatzumoto's AJATT **MCD (Massive-Context Cloze Deletion)** method: "instead
 of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 
-- **Front:** a real passage of 2–4 connected sentences with **one gap**. Readings stay
+- **Front:** a real passage of 2–4 connected sentences with **one target** (one gap in 穴埋め). Readings stay
   hidden, and there's no English.
-  - **語 card:** the whole word is blanked, with a short Japanese definition under the
-    passage as the hint. Recall the word from its context. If the word appears twice in
-    the passage, both are blanked.
-  - **字 card:** one kanji of the word is blanked, with its reading in the gap
-    (〔ざい〕政難…). Recall the character in context. These come from the word's first
+  - **語 card:** by default (読んで思い出す) the word is marked and you recall what it means
+    and how it is read. In 穴埋め the whole word is blanked, with no hint, and you recall
+    it from its context; if the word appears twice in the passage, both are blanked.
+  - **字 card** (穴埋め and 4択 only; 読んで思い出す leaves them out, records kept): one
+    kanji of the word is blanked, with its reading in the gap (〔ざい〕政難…). Recall the character in context. These come from the word's first
     passage, one card per kanji. There is no 字 card when that kanji also appears
     elsewhere in the passage, or when the kanji table has no reading for it.
 - **Back:** the whole passage with furigana, the word with its reading, and the Japanese
@@ -101,16 +113,16 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 
 Scheduling is FSRS-6 with Bunki's pinned weights (90% target retention). The deck keeps
 its own record (`bunki-cloze:kotoba-mine` in the browser) and never writes the
-corridor's word queue. Settings: new cards per day, answer mode, hint (Japanese or none),
-English on tap or always open, colour theme, suspended cards, backup/restore.
+corridor's word queue. Settings: new cards per day, answer mode, English on tap or always
+open, colour theme, suspended cards, backup/restore.
 復元 checks a pasted backup before it replaces anything, shows both counts, and keeps
 the old record as `bunki-cloze:<deck>:before-restore`.
 
 ## Anki
 
 - **Note type:** `Kotoba Mine MCD`, one note per gap, one card (`Cloze`).
-- **Front:** the passage with its gap (`SentenceBlank`), plus `Hint` (the Japanese
-  definition) on 語 cards. **Back:** `{{furigana:SentenceFurigana}}`, the word, the
+- **Front:** the passage with its gap (`SentenceBlank`) and no hint line (A37). Anki
+  cannot drop a mode's cards; to leave the 字 cards out, suspend them with `Type:字`. **Back:** `{{furigana:SentenceFurigana}}`, the word, the
   definition, and English behind a fold.
 - **Fields:** `Key`, `Sort`, `Topic`, `Level`, `Type` (語/字), `Hint`, `Kind`, `Word`,
   `Reading`, `Meaning`, `DefJA`, `SentenceFront`, `SentenceBlank`, `SentenceFurigana`,
@@ -223,10 +235,13 @@ source/readings.json      reading fixes applied after tokenising (人 → じん
 release/                  kotoba-mine.apkg · kotoba-mine.tsv · study.html ·
                           ATTRIBUTION-<id>.md (private build)
 release/public/           the public build and its ATTRIBUTION files
+                          (tokens-<id>.json and deck-<id>.json beside them)
 ```
 
 The player lives in `prototypes/corridor/decks/player/` (`engine.js`, `mount.js`,
-`player.css`); the built deck is `prototypes/corridor/decks/kotoba-mine/deck.json`.
+`player.css`, and `host.js`, the corridor's lexicon adapter); the built deck is
+`prototypes/corridor/decks/kotoba-mine/deck.json`, with its tap tokens in `tokens.json`
+beside it (the same for `kotoba-mcd/`).
 
 ```bash
 pip install fugashi unidic-lite==1.0.8 genanki wordfreq    # once

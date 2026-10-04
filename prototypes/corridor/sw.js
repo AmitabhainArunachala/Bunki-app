@@ -19,7 +19,8 @@
 // v12: the deck player's scheduler pin and the private-collection player join the shell
 // v13: the deck player moved to card contract v2 (passage card) — drop the cached player and decks
 // v14: the deck player's host lexicon adapter (host.js) joins the shell; the decks name their tokens side file
-const VERSION = 'kairo-v14-deck-host';
+// v15: the deck player's tap-to-define (entry sheet, lookups) and the regenerated decks; tokens precached
+const VERSION = 'kairo-v15-tap-define';
 const SHELL = [
   '.',
   'index.html',
@@ -58,6 +59,9 @@ const SHELL = [
   'decks/personal/personal.css',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
+  // …and their tokens side files (deck.tokens), so the back's tap targets draw offline too
+  'decks/kotoba-mine/tokens.json',
+  'decks/kotoba-mcd/tokens.json',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',
