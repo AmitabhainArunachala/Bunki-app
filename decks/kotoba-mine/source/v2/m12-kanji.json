@@ -1,0 +1,237 @@
+{
+  "id": "m12-kanji",
+  "cards": [
+    {
+      "n": 40,
+      "term": "稽",
+      "reading": "ケイ",
+      "meaning": "think (old); in 稽古 and 滑稽",
+      "def_ja": "けいこ・こっけいなどの熟語に使う字。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "毎週土曜日に剣道の稽古がある。",
+          "form": "稽古",
+          "en": "I have kendo practice every Saturday."
+        },
+        {
+          "lv": 2,
+          "ja": "小さすぎる帽子をかぶった父の姿が滑稽で、みんな笑った。",
+          "form": "滑稽",
+          "en": "My dad looked so funny in a hat that was too small that everyone laughed."
+        },
+        {
+          "lv": 3,
+          "ja": "宇宙人が町を支配しているという荒唐無稽な話を、本気で信じる人がいるのには驚いた。",
+          "form": "荒唐無稽",
+          "en": "I was surprised that some people seriously believe the absurd story that aliens are running the town."
+        }
+      ],
+      "tip": "Today this kanji is met almost only in 稽古, 滑稽 and 荒唐無稽."
+    },
+    {
+      "n": 101,
+      "term": "淵",
+      "reading": "エン／ふち",
+      "meaning": "deep pool; the depths",
+      "def_ja": "川の水が深くたまった所。深いところ。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この小説は人間の心の深淵を描いている。",
+          "form": "深淵",
+          "en": "This novel depicts the depths of the human heart."
+        },
+        {
+          "lv": 2,
+          "ja": "チャレンジャー海淵は、世界の海で最も深い場所だ。",
+          "form": "海淵",
+          "en": "The Challenger Deep is the deepest place in the world's oceans."
+        },
+        {
+          "lv": 3,
+          "ja": "日本の茶道の淵源をたどると、中国の宋の時代に禅寺で飲まれていた茶にまで行き着く。",
+          "form": "淵源",
+          "en": "If you trace the origins of the Japanese tea ceremony, you arrive at the tea drunk in Zen temples in Song dynasty China."
+        }
+      ],
+      "tip": "Read ふち on its own, as in 絶望の淵; a rim or edge is a different kanji, 縁."
+    },
+    {
+      "n": 224,
+      "term": "風",
+      "reading": "フウ／かぜ",
+      "meaning": "wind; style",
+      "def_ja": "空気の流れ。また、ものごとの様子ややり方。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "台風で電車が止まった。",
+          "form": "台風",
+          "en": "The trains stopped because of the typhoon."
+        },
+        {
+          "lv": 2,
+          "ja": "節分に豆をまく風習は、今も多くの家庭に残っている。",
+          "form": "風習",
+          "en": "The custom of throwing beans at Setsubun still survives in many homes."
+        },
+        {
+          "lv": 3,
+          "ja": "風邪をひいて熱が三十八度まで上がったので、会社を休んで一日中寝ていた。",
+          "form": "風邪",
+          "en": "I caught a cold and my fever went up to 38 degrees, so I took the day off work and stayed in bed."
+        }
+      ],
+      "tip": "風邪 is read かぜ as a whole word; as a suffix, 〜風 (ふう) means in the style of."
+    },
+    {
+      "n": 225,
+      "term": "率",
+      "reading": "リツ／ソツ",
+      "meaning": "rate; lead",
+      "def_ja": "全体に対する割合。また、先に立って導くこと。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "明日の降水確率は八十パーセントだ。",
+          "form": "確率",
+          "en": "Tomorrow's chance of rain is eighty percent."
+        },
+        {
+          "lv": 2,
+          "ja": "先生が生徒を引率して、博物館を見学した。",
+          "form": "引率",
+          "en": "The teacher took the students on a visit to the museum."
+        },
+        {
+          "lv": 3,
+          "ja": "せっかく意見を聞いてくれたので、新しい企画について感じたことを率直に伝えた。",
+          "form": "率直",
+          "en": "Since they had taken the trouble to ask my opinion, I told them frankly what I thought of the new project."
+        }
+      ],
+      "tip": "Read リツ for rates (確率, 効率) and ソツ in 引率, 率直 and 軽率."
+    },
+    {
+      "n": 259,
+      "term": "余",
+      "reading": "ヨ／あま(る)",
+      "meaning": "surplus, extra",
+      "def_ja": "必要な分をこえて残ること。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "時間に余裕を持って家を出た。",
+          "form": "余裕",
+          "en": "I left home with plenty of time to spare."
+        },
+        {
+          "lv": 2,
+          "ja": "ノートの余白に、先生の説明をメモした。",
+          "form": "余白",
+          "en": "I jotted down the teacher's explanation in the margin of my notebook."
+        },
+        {
+          "lv": 3,
+          "ja": "防犯カメラの映像がはっきり残っているので、男が犯人であることに疑いの余地はない。",
+          "form": "余地",
+          "en": "The security camera footage is clear, so there is no room for doubt that the man is the culprit."
+        }
+      ],
+      "tip": "After a number, 余 means a little over, as in 十年余."
+    },
+    {
+      "n": 261,
+      "term": "割",
+      "reading": "カツ／わ(る)",
+      "meaning": "divide; tenth",
+      "def_ja": "ものを分けること。また、十分の一。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "学生は入場料が割引になる。",
+          "form": "割引",
+          "en": "Students get a discount on admission."
+        },
+        {
+          "lv": 2,
+          "ja": "このクラスは、女子の割合が男子より少し高い。",
+          "form": "割合",
+          "en": "In this class, the proportion of girls is a little higher than boys."
+        },
+        {
+          "lv": 3,
+          "ja": "高いパソコンを一度に払えないので、十二回の分割払いで買うことにした。",
+          "form": "分割",
+          "en": "I could not pay for the expensive computer all at once, so I decided to buy it in twelve instalments."
+        }
+      ],
+      "tip": "一割 is ten percent; 率 is the more technical word for a rate."
+    },
+    {
+      "n": 282,
+      "term": "犯",
+      "reading": "ハン／おか(す)",
+      "meaning": "crime",
+      "def_ja": "法や決まりを破ること。また、それをした人。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "警察が犯人を逮捕した。",
+          "form": "犯人",
+          "en": "The police arrested the culprit."
+        },
+        {
+          "lv": 2,
+          "ja": "空き巣が増えているので、玄関に防犯カメラを付けた。",
+          "form": "防犯",
+          "en": "Break-ins have been increasing, so I put a security camera at the front door."
+        },
+        {
+          "lv": 3,
+          "ja": "盗んだ車を運転していた男に加え、車を盗むよう指示した友人も共犯として逮捕された。",
+          "form": "共犯",
+          "en": "Besides the man driving the stolen car, the friend who told him to steal it was also arrested as an accomplice."
+        }
+      ],
+      "tip": "罪を犯す means to commit a crime; 侵す and 冒す are different words read おかす."
+    },
+    {
+      "n": 322,
+      "term": "纏",
+      "reading": "テン／まと(う)",
+      "meaning": "wrap; cling to",
+      "def_ja": "身にまきつけること。また、つきまとうこと。",
+      "pos": "kanji",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "祖母は冬になると、家の中で半纏を着ている。",
+          "form": "半纏",
+          "en": "In winter my grandmother wears a padded hanten jacket indoors."
+        },
+        {
+          "lv": 2,
+          "ja": "男は元交際相手に付き纏ったとして、警察から警告を受けた。",
+          "form": "付き纏った",
+          "en": "The man was warned by police for stalking his former partner."
+        },
+        {
+          "lv": 3,
+          "ja": "纏足は、女性の足を幼い頃から布できつく縛って小さくする風習で、昔の中国で広く行われていた。",
+          "form": "纏足",
+          "en": "Foot-binding, the custom of tightly wrapping girls' feet in cloth from a young age to keep them small, was once widespread in China."
+        }
+      ],
+      "tip": "Not a standard-use kanji; まとう and つきまとう are usually written in kana."
+    }
+  ]
+}

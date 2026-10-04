@@ -1,0 +1,901 @@
+{
+  "id": "m04-incident",
+  "cards": [
+    {
+      "n": 137,
+      "term": "被告人",
+      "reading": "ひこくにん",
+      "meaning": "defendant in a criminal trial",
+      "def_ja": "刑事裁判で罪を問われている人。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "被告人は無罪を主張した。",
+          "form": "被告人",
+          "en": "The defendant pleaded not guilty."
+        },
+        {
+          "lv": 2,
+          "ja": "裁判長は被告人に懲役五年の判決を言い渡した。",
+          "form": "被告人",
+          "en": "The judge sentenced the defendant to five years in prison."
+        },
+        {
+          "lv": 3,
+          "ja": "被告人は初公判で起訴された内容を認めたうえで、被害者に謝罪の言葉を述べた。",
+          "form": "被告人",
+          "en": "At the first hearing, the defendant admitted the charges and apologized to the victim."
+        }
+      ],
+      "tip": "News puts 被告 after a name as a title; in civil cases 被告 is the person being sued."
+    },
+    {
+      "n": 138,
+      "term": "万引き",
+      "reading": "まんびき",
+      "meaning": "shoplifting",
+      "def_ja": "客のふりをして店の品物を盗むこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "万引きは犯罪です。",
+          "form": "万引き",
+          "en": "Shoplifting is a crime."
+        },
+        {
+          "lv": 2,
+          "ja": "コンビニで万引きをした男が、店員に取り押さえられた。",
+          "form": "万引き",
+          "en": "A man who shoplifted at a convenience store was caught by a clerk."
+        },
+        {
+          "lv": 3,
+          "ja": "万引きの被害が続いたため、駅前の書店は店内に防犯カメラを増やした。",
+          "form": "万引き",
+          "en": "After repeated shoplifting, the bookstore in front of the station added more security cameras."
+        }
+      ],
+      "tip": "It can also mean the shoplifter, though 万引き犯 is clearer."
+    },
+    {
+      "n": 139,
+      "term": "返却",
+      "reading": "へんきゃく",
+      "meaning": "returning a borrowed item",
+      "def_ja": "借りた物や預かった物を返すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "図書館に本を返却した。",
+          "form": "返却",
+          "en": "I returned the books to the library."
+        },
+        {
+          "lv": 2,
+          "ja": "レンタルした車は、明日の午前十時までに返却してください。",
+          "form": "返却",
+          "en": "Please return the rental car by ten tomorrow morning."
+        },
+        {
+          "lv": 3,
+          "ja": "捜査が終わったので、警察は押収していたスマートフォンを持ち主に返却した。",
+          "form": "返却",
+          "en": "Now that the investigation is over, the police returned the seized smartphone to its owner."
+        }
+      ],
+      "tip": "Use 返却 for objects; paying back money is 返済."
+    },
+    {
+      "n": 140,
+      "term": "立件",
+      "reading": "りっけん",
+      "meaning": "building a criminal case",
+      "def_ja": "証拠を集めて刑事事件として扱うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "警察は詐欺事件として立件した。",
+          "form": "立件",
+          "en": "The police built a case for fraud."
+        },
+        {
+          "lv": 2,
+          "ja": "証拠が足りず、警察は立件を見送った。",
+          "form": "立件",
+          "en": "There was not enough evidence, so the police decided not to bring a case."
+        },
+        {
+          "lv": 3,
+          "ja": "警察は会社ぐるみの不正だったとみて、社長を含む五人を立件する方針を固めた。",
+          "form": "立件",
+          "en": "Believing the whole company was involved, the police decided to build a case against five people, including the president."
+        }
+      ],
+      "tip": "A news word for police or prosecutors formally making a criminal case against someone."
+    },
+    {
+      "n": 143,
+      "term": "見出し",
+      "reading": "みだし",
+      "meaning": "headline",
+      "def_ja": "記事の内容がひと目でわかる短い言葉。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "朝は新聞の見出しだけ読む。",
+          "form": "見出し",
+          "en": "In the morning I only read the newspaper headlines."
+        },
+        {
+          "lv": 2,
+          "ja": "レポートは見出しを付けて、読みやすくまとめてください。",
+          "form": "見出し",
+          "en": "Please add headings to your report and make it easy to read."
+        },
+        {
+          "lv": 3,
+          "ja": "ネットの記事は見出しが大げさなことが多いので、本文までしっかり読むようにしている。",
+          "form": "見出し",
+          "en": "Online articles often have exaggerated headlines, so I make sure to read the whole text."
+        }
+      ],
+      "tip": "It also means a heading in a document and a headword in a dictionary."
+    },
+    {
+      "n": 144,
+      "term": "異例",
+      "reading": "いれい",
+      "meaning": "unusual; exceptional",
+      "def_ja": "いつもと違っていて、めったにないこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "十月の東京で雪が降るのは異例だ。",
+          "form": "異例",
+          "en": "Snow in Tokyo in October is unusual."
+        },
+        {
+          "lv": 2,
+          "ja": "入社二年目の社員が課長に選ばれるという、異例の人事が発表された。",
+          "form": "異例",
+          "en": "An unusual appointment was announced: an employee in their second year was made section manager."
+        },
+        {
+          "lv": 3,
+          "ja": "不祥事が続いたため、社長が自ら記者会見を開いて謝罪するという異例の事態になった。",
+          "form": "異例",
+          "en": "After a string of scandals, the president took the unusual step of holding a press conference himself to apologize."
+        }
+      ],
+      "tip": "Very common in news about decisions and procedures, as in 異例の人事."
+    },
+    {
+      "n": 145,
+      "term": "抹殺",
+      "reading": "まっさつ",
+      "meaning": "wiping out; erasing",
+      "def_ja": "存在をすっかり消し去ること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "独裁者は反対する者を次々と抹殺した。",
+          "form": "抹殺",
+          "en": "The dictator wiped out his opponents one after another."
+        },
+        {
+          "lv": 2,
+          "ja": "一度の失言で、その政治家は社会的に抹殺された。",
+          "form": "抹殺",
+          "en": "A single careless remark ended that politician's public life."
+        },
+        {
+          "lv": 3,
+          "ja": "政府に都合の悪い事実が歴史から抹殺されないよう、記者たちは資料を集め続けた。",
+          "form": "抹殺",
+          "en": "The reporters kept collecting documents so that facts inconvenient to the government would not be erased from history."
+        }
+      ],
+      "tip": "A strong written word. To ignore an opinion on purpose is 黙殺."
+    },
+    {
+      "n": 146,
+      "term": "夕べ",
+      "reading": "ゆうべ",
+      "meaning": "last night",
+      "def_ja": "きのうの夜。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "夕べはよく眠れなかった。",
+          "form": "夕べ",
+          "en": "I couldn't sleep well last night."
+        },
+        {
+          "lv": 2,
+          "ja": "夕べ遅くまでゲームをしていたので、今朝はとても眠い。",
+          "form": "夕べ",
+          "en": "I was playing games until late last night, so I'm very sleepy this morning."
+        },
+        {
+          "lv": 3,
+          "ja": "公民館で開かれた音楽の夕べには近所の人たちが大勢集まり、ジャズの演奏を楽しんだ。",
+          "form": "夕べ",
+          "en": "Many neighbors came to the music evening at the community center and enjoyed the jazz."
+        }
+      ],
+      "tip": "In conversation it means last night and is often written ゆうべ; 〜の夕べ is the name of an evening event."
+    },
+    {
+      "n": 147,
+      "term": "脱出",
+      "reading": "だっしゅつ",
+      "meaning": "escape; getting out",
+      "def_ja": "危ない所や閉じこめられた所からぬけ出すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "燃える車から運転手が脱出した。",
+          "form": "脱出",
+          "en": "The driver escaped from the burning car."
+        },
+        {
+          "lv": 2,
+          "ja": "沈みかけた船から、乗客全員が救命ボートで脱出した。",
+          "form": "脱出",
+          "en": "All the passengers escaped from the sinking ship in lifeboats."
+        },
+        {
+          "lv": 3,
+          "ja": "連敗が続いていたチームは、昨夜の試合に勝ってようやく最下位から脱出した。",
+          "form": "脱出",
+          "en": "The team, which had lost many games in a row, finally got out of last place by winning last night."
+        }
+      ]
+    },
+    {
+      "n": 148,
+      "term": "捜索",
+      "reading": "そうさく",
+      "meaning": "search (for a missing person)",
+      "def_ja": "いなくなった人や物を探すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "行方不明者の捜索が続いている。",
+          "form": "捜索",
+          "en": "The search for the missing people is continuing."
+        },
+        {
+          "lv": 2,
+          "ja": "警察は男の自宅を家宅捜索し、パソコンなどを押収した。",
+          "form": "捜索",
+          "en": "The police searched the man's home and seized his computer and other items."
+        },
+        {
+          "lv": 3,
+          "ja": "山で遭難した男性の捜索は、天候が悪化したため、今日はいったん打ち切られた。",
+          "form": "捜索",
+          "en": "The search for the man lost in the mountains was called off for today because the weather got worse."
+        }
+      ],
+      "tip": "It also means a legal search of a building, as in 家宅捜索."
+    },
+    {
+      "n": 149,
+      "term": "神奈川県",
+      "reading": "かながわけん",
+      "meaning": "Kanagawa Prefecture",
+      "def_ja": "東京都の南にあり、横浜市に県庁がある県。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "鎌倉は神奈川県にある。",
+          "form": "神奈川県",
+          "en": "Kamakura is in Kanagawa Prefecture."
+        },
+        {
+          "lv": 2,
+          "ja": "神奈川県警は、横浜市内で起きた強盗事件の捜査を進めている。",
+          "form": "神奈川県",
+          "en": "The Kanagawa Prefectural Police are investigating a robbery in Yokohama."
+        },
+        {
+          "lv": 3,
+          "ja": "東京の都心に通勤しやすいことから、神奈川県の川崎市では人口が増え続けている。",
+          "form": "神奈川県",
+          "en": "Because it is easy to commute to central Tokyo, the population of Kawasaki in Kanagawa keeps growing."
+        }
+      ],
+      "tip": "Its police force is 神奈川県警 in the news; Tokyo's police is 警視庁."
+    },
+    {
+      "n": 150,
+      "term": "行方不明",
+      "reading": "ゆくえふめい",
+      "meaning": "missing",
+      "def_ja": "どこにいるのかわからないこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "山で登山者が行方不明になった。",
+          "form": "行方不明",
+          "en": "A climber went missing in the mountains."
+        },
+        {
+          "lv": 2,
+          "ja": "台風による大雨で、川の近くに住む二人が行方不明になっている。",
+          "form": "行方不明",
+          "en": "Because of heavy rain from the typhoon, two people living near the river are missing."
+        },
+        {
+          "lv": 3,
+          "ja": "家族から行方不明者届が出されたため、警察は女性の写真を公開して情報の提供を呼びかけた。",
+          "form": "行方不明",
+          "en": "After her family reported her missing, the police released the woman's photo and asked for information."
+        }
+      ],
+      "tip": "行方 is read ゆくえ. People also use it jokingly for lost things."
+    },
+    {
+      "n": 151,
+      "term": "海上",
+      "reading": "かいじょう",
+      "meaning": "at sea",
+      "def_ja": "海の上。海の水面のあたり。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "今日は海上の風が強い。",
+          "form": "海上",
+          "en": "The wind at sea is strong today."
+        },
+        {
+          "lv": 2,
+          "ja": "海上保安庁は、沈没した漁船の乗組員を捜している。",
+          "form": "海上",
+          "en": "The Japan Coast Guard is searching for the crew of the sunken fishing boat."
+        },
+        {
+          "lv": 3,
+          "ja": "台風の接近で海上では高い波が予想されるため、漁船に早めの帰港が呼びかけられた。",
+          "form": "海上",
+          "en": "High waves are expected at sea as the typhoon approaches, so fishing boats were told to return to port early."
+        }
+      ],
+      "tip": "海上保安庁 is the Japan Coast Guard; 海上自衛隊 is the Maritime Self-Defense Force."
+    },
+    {
+      "n": 152,
+      "term": "気象庁",
+      "reading": "きしょうちょう",
+      "meaning": "Japan Meteorological Agency",
+      "def_ja": "天気や地震の情報を出す国の役所。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "気象庁が梅雨入りを発表した。",
+          "form": "気象庁",
+          "en": "The Japan Meteorological Agency announced the start of the rainy season."
+        },
+        {
+          "lv": 2,
+          "ja": "気象庁は、関東地方に大雪警報を出した。",
+          "form": "気象庁",
+          "en": "The Japan Meteorological Agency issued a heavy snow warning for the Kanto region."
+        },
+        {
+          "lv": 3,
+          "ja": "大きな地震の直後、気象庁は記者会見を開いて、今後一週間は同じ程度の揺れに注意するよう呼びかけた。",
+          "form": "気象庁",
+          "en": "Right after the big earthquake, the Japan Meteorological Agency held a press conference and warned people to watch out for similar shaking over the next week."
+        }
+      ],
+      "tip": "An advisory is 注意報, a warning is 警報, and an emergency warning is 特別警報."
+    },
+    {
+      "n": 153,
+      "term": "出勤",
+      "reading": "しゅっきん",
+      "meaning": "going to work",
+      "def_ja": "仕事のために勤め先へ行くこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "毎朝八時に出勤する。",
+          "form": "出勤",
+          "en": "I go to work at eight every morning."
+        },
+        {
+          "lv": 2,
+          "ja": "台風のため、今日は出勤しないで家で仕事をすることになった。",
+          "form": "出勤",
+          "en": "Because of the typhoon, I'm working from home today instead of going in."
+        },
+        {
+          "lv": 3,
+          "ja": "いつも八時前に出勤する部長が昼になっても来ないので、心配した社員が自宅に電話をかけた。",
+          "form": "出勤",
+          "en": "The manager, who always comes in before eight, still had not arrived by noon, so a worried employee called his home."
+        }
+      ],
+      "tip": "The opposite is 退勤. Staying away without notice is 無断欠勤."
+    },
+    {
+      "n": 154,
+      "term": "収納家具",
+      "reading": "しゅうのうかぐ",
+      "meaning": "storage furniture",
+      "def_ja": "物をしまっておくための棚やたんす。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しい部屋のために収納家具を買った。",
+          "form": "収納家具",
+          "en": "I bought storage furniture for my new room."
+        },
+        {
+          "lv": 2,
+          "ja": "この店では、本棚やたんすなどの収納家具を安く売っている。",
+          "form": "収納家具",
+          "en": "This store sells storage furniture such as bookshelves and chests of drawers at low prices."
+        },
+        {
+          "lv": 3,
+          "ja": "地震のときに倒れないよう、背の高い収納家具は金具で壁に固定しておいたほうがいい。",
+          "form": "収納家具",
+          "en": "You should fix tall storage furniture to the wall with brackets so it doesn't fall over in an earthquake."
+        }
+      ],
+      "tip": "A category word used in shops and catalogues; a built-in closet is クローゼット or 押し入れ."
+    },
+    {
+      "n": 155,
+      "term": "鑑定",
+      "reading": "かんてい",
+      "meaning": "expert appraisal; forensic test",
+      "def_ja": "専門家が物を調べ、本物かどうかや価値を決めること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "古い茶わんを鑑定してもらった。",
+          "form": "鑑定",
+          "en": "I had an old tea bowl appraised."
+        },
+        {
+          "lv": 2,
+          "ja": "祖父の家で見つかった絵は、鑑定の結果、本物の浮世絵だとわかった。",
+          "form": "鑑定",
+          "en": "The painting found at my grandfather's house was appraised and turned out to be a genuine ukiyo-e."
+        },
+        {
+          "lv": 3,
+          "ja": "現場に残された血痕をDNA鑑定したところ、逮捕された男のものと一致した。",
+          "form": "鑑定",
+          "en": "DNA testing of the blood left at the scene showed it matched the arrested man."
+        }
+      ],
+      "tip": "Used both for appraising art or antiques and for forensic tests such as DNA鑑定."
+    },
+    {
+      "n": 156,
+      "term": "目撃証言",
+      "reading": "もくげきしょうげん",
+      "meaning": "eyewitness testimony",
+      "def_ja": "事件や事故を見た人が、その様子を話すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "警察は目撃証言を集めている。",
+          "form": "目撃証言",
+          "en": "The police are collecting eyewitness accounts."
+        },
+        {
+          "lv": 2,
+          "ja": "複数の目撃証言から、犯人は若い男だとみられている。",
+          "form": "目撃証言",
+          "en": "Based on several eyewitness accounts, the culprit is thought to be a young man."
+        },
+        {
+          "lv": 3,
+          "ja": "目撃証言は記憶違いが起きやすいため、裁判では防犯カメラの映像などと合わせて慎重に判断される。",
+          "form": "目撃証言",
+          "en": "Eyewitness testimony is prone to memory errors, so courts weigh it carefully together with things like security camera footage."
+        }
+      ]
+    },
+    {
+      "n": 157,
+      "term": "画像",
+      "reading": "がぞう",
+      "meaning": "image (digital picture)",
+      "def_ja": "写真や画面に写し出された絵や姿。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "気に入った画像をスマホに保存した。",
+          "form": "画像",
+          "en": "I saved an image I liked to my phone."
+        },
+        {
+          "lv": 2,
+          "ja": "警察は防犯カメラの画像を公開して、情報を求めている。",
+          "form": "画像",
+          "en": "The police have released images from a security camera and are asking for information."
+        },
+        {
+          "lv": 3,
+          "ja": "ネットに一度投稿した画像は、あとで削除しても誰かに保存されているおそれがある。",
+          "form": "画像",
+          "en": "Once you post an image online, someone may have saved it even if you delete it later."
+        }
+      ],
+      "tip": "画像 is a still image; moving pictures are 映像 or 動画."
+    },
+    {
+      "n": 158,
+      "term": "死刑囚",
+      "reading": "しけいしゅう",
+      "meaning": "death-row inmate",
+      "def_ja": "死刑の判決が決まり、刑を待っている人。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "死刑囚の刑が執行された。",
+          "form": "死刑囚",
+          "en": "A death-row inmate was executed."
+        },
+        {
+          "lv": 2,
+          "ja": "再審で無罪になった元死刑囚が、記者会見を開いた。",
+          "form": "死刑囚",
+          "en": "A former death-row inmate who was acquitted at a retrial held a press conference."
+        },
+        {
+          "lv": 3,
+          "ja": "法務省は、東京拘置所に収容されていた死刑囚二人の刑を執行したと発表した。",
+          "form": "死刑囚",
+          "en": "The Ministry of Justice announced that it had executed two death-row inmates held at the Tokyo Detention House."
+        }
+      ],
+      "tip": "A neutral legal and news term."
+    },
+    {
+      "n": 159,
+      "term": "決定的",
+      "reading": "けっていてき",
+      "meaning": "decisive; conclusive",
+      "def_ja": "結果をはっきり決めるほど重要なさま。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "決定的な証拠が見つかった。",
+          "form": "決定的",
+          "en": "Conclusive evidence was found."
+        },
+        {
+          "lv": 2,
+          "ja": "後半のミスが、決定的な敗因になった。",
+          "form": "決定的",
+          "en": "A mistake in the second half was the decisive reason for the loss."
+        },
+        {
+          "lv": 3,
+          "ja": "防犯カメラに犯行の瞬間が映っていたことが決定的となり、男は容疑を認めた。",
+          "form": "決定的",
+          "en": "The security camera footage of the crime itself was decisive, and the man admitted the charges."
+        }
+      ]
+    },
+    {
+      "n": 165,
+      "term": "警視庁",
+      "reading": "けいしちょう",
+      "meaning": "Tokyo Metropolitan Police",
+      "def_ja": "東京都を受け持つ警察の本部。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "警視庁は詐欺の疑いで男を逮捕した。",
+          "form": "警視庁",
+          "en": "The Tokyo Metropolitan Police arrested a man on suspicion of fraud."
+        },
+        {
+          "lv": 2,
+          "ja": "警視庁は、都内で続く放火事件の捜査本部を設置した。",
+          "form": "警視庁",
+          "en": "The Tokyo Metropolitan Police set up an investigation headquarters for the series of arson cases in Tokyo."
+        },
+        {
+          "lv": 3,
+          "ja": "東京都の警察本部だけは、ほかの道府県と違って警視庁という名前で呼ばれている。",
+          "form": "警視庁",
+          "en": "Only Tokyo's police headquarters, unlike those of other prefectures, is called the Keishicho."
+        }
+      ],
+      "tip": "Only Tokyo's police has this name; other prefectures have 県警 or 府警."
+    },
+    {
+      "n": 59,
+      "term": "共謀",
+      "reading": "きょうぼう",
+      "meaning": "conspiring to commit a crime",
+      "def_ja": "二人以上で悪いことをひそかに相談すること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "二人は共謀して金を盗んだ。",
+          "form": "共謀",
+          "en": "The two of them conspired to steal the money."
+        },
+        {
+          "lv": 2,
+          "ja": "警察は、男が仲間と共謀して詐欺をした疑いで調べている。",
+          "form": "共謀",
+          "en": "The police are investigating the man on suspicion of conspiring with accomplices to commit fraud."
+        },
+        {
+          "lv": 3,
+          "ja": "男らは共謀し、高齢者の家に電話をかけて現金をだまし取った疑いで逮捕された。",
+          "form": "共謀",
+          "en": "The men were arrested on suspicion of conspiring to call elderly people's homes and swindle them out of cash."
+        }
+      ],
+      "tip": "Standard news pattern: 〜と共謀し、〜した疑い."
+    },
+    {
+      "n": 75,
+      "term": "財物",
+      "reading": "ざいぶつ",
+      "meaning": "property (legal term)",
+      "def_ja": "お金や品物など、値打ちのある物。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "刑法では、お金も財物に含まれる。",
+          "form": "財物",
+          "en": "Under the Criminal Code, money also counts as property."
+        },
+        {
+          "lv": 2,
+          "ja": "他人の財物を盗んだ者は、窃盗の罪に問われる。",
+          "form": "財物",
+          "en": "A person who steals someone else's property is charged with theft."
+        },
+        {
+          "lv": 3,
+          "ja": "暴行や脅迫を用いて他人の財物を奪った場合は、窃盗ではなく強盗の罪が成立する。",
+          "form": "財物",
+          "en": "If someone takes another person's property by violence or threats, it is robbery, not theft."
+        }
+      ],
+      "tip": "A legal word from the Criminal Code; in daily life people say お金や品物."
+    },
+    {
+      "n": 76,
+      "term": "罰則",
+      "reading": "ばっそく",
+      "meaning": "penalty (in a law or rule)",
+      "def_ja": "決まりを破った人への罰を定めた規則。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この法律には罰則がない。",
+          "form": "罰則",
+          "en": "This law has no penalties."
+        },
+        {
+          "lv": 2,
+          "ja": "運転中にスマホを使うことへの罰則が強化された。",
+          "form": "罰則",
+          "en": "The penalties for using a smartphone while driving have been made stricter."
+        },
+        {
+          "lv": 3,
+          "ja": "罰則のない努力義務だったため、ルールを守らない会社が多く、効果はほとんど出なかった。",
+          "form": "罰則",
+          "en": "Because it was only a duty to try, with no penalties, many companies ignored the rule and it had almost no effect."
+        }
+      ],
+      "tip": "罰則 are the penalty clauses of a law or rule; the Penal Code itself is 刑法."
+    },
+    {
+      "n": 67,
+      "term": "妨害",
+      "reading": "ぼうがい",
+      "meaning": "obstruction; interference",
+      "def_ja": "人の行動や物事の進行をわざとじゃますること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "工事の妨害をしないでください。",
+          "form": "妨害",
+          "en": "Please do not interfere with the construction work."
+        },
+        {
+          "lv": 2,
+          "ja": "男は公務執行妨害の疑いで、その場で逮捕された。",
+          "form": "妨害",
+          "en": "The man was arrested on the spot on suspicion of obstructing an officer."
+        },
+        {
+          "lv": 3,
+          "ja": "線路に自転車を置いて電車の運行を妨害したとして、警察は十九歳の少年を逮捕した。",
+          "form": "妨害",
+          "en": "Police arrested a nineteen-year-old for putting a bicycle on the tracks and disrupting train service."
+        }
+      ],
+      "tip": "Set phrases include 公務執行妨害, obstructing an officer, and 業務妨害, obstructing business."
+    },
+    {
+      "n": 95,
+      "term": "言語道断",
+      "reading": "ごんごどうだん",
+      "meaning": "outrageous; inexcusable",
+      "def_ja": "あまりにひどくて、言葉にならないこと。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "飲酒運転は言語道断だ。",
+          "form": "言語道断",
+          "en": "Drunk driving is outrageous."
+        },
+        {
+          "lv": 2,
+          "ja": "客の個人情報を売るなんて、言語道断の行為だ。",
+          "form": "言語道断",
+          "en": "Selling customers' personal information is an inexcusable act."
+        },
+        {
+          "lv": 3,
+          "ja": "子どもの命を預かる立場でありながら、園児をバスに置き去りにするとは言語道断だと、市長は厳しく批判した。",
+          "form": "言語道断",
+          "en": "The mayor harshly criticized leaving a child behind on the bus as inexcusable for people entrusted with children's lives."
+        }
+      ],
+      "tip": "Read ごんご, not げんご. It is used to condemn something as completely unacceptable."
+    },
+    {
+      "n": 11,
+      "term": "突入",
+      "reading": "とつにゅう",
+      "meaning": "entering a new phase; storming",
+      "def_ja": "勢いよく中へ入ること。新しい段階に入ること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "いよいよ夏休みに突入した。",
+          "form": "突入",
+          "en": "Summer vacation has finally begun."
+        },
+        {
+          "lv": 2,
+          "ja": "警察の部隊が、犯人が立てこもる建物に突入した。",
+          "form": "突入",
+          "en": "Police units stormed the building where the suspect was holed up."
+        },
+        {
+          "lv": 3,
+          "ja": "交渉がまとまらなかったため、労働組合は明日から無期限のストライキに突入すると発表した。",
+          "form": "突入",
+          "en": "Because talks broke down, the union announced it will go on an indefinite strike starting tomorrow."
+        }
+      ],
+      "tip": "Very common in news for entering a new period, as in 三日目に突入."
+    },
+    {
+      "n": 164,
+      "term": "迅速",
+      "reading": "じんそく",
+      "meaning": "swift; prompt",
+      "def_ja": "物事をとてもすばやく行うさま。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "迅速な対応に感謝します。",
+          "form": "迅速",
+          "en": "Thank you for your prompt response."
+        },
+        {
+          "lv": 2,
+          "ja": "事故の後、消防は迅速に救助活動を始めた。",
+          "form": "迅速",
+          "en": "After the accident, the fire department quickly began rescue work."
+        },
+        {
+          "lv": 3,
+          "ja": "災害時には迅速な情報の伝達が欠かせないため、市は防災アプリの導入を決めた。",
+          "form": "迅速",
+          "en": "Quick sharing of information is essential in a disaster, so the city decided to introduce a disaster app."
+        }
+      ],
+      "tip": "Formal; in speech people say すばやい or 早い."
+    },
+    {
+      "n": 202,
+      "term": "速やか",
+      "reading": "すみやか",
+      "meaning": "prompt; without delay",
+      "def_ja": "時間をおかずに、すぐ行うさま。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "速やかに避難してください。",
+          "form": "速やかに",
+          "en": "Please evacuate immediately."
+        },
+        {
+          "lv": 2,
+          "ja": "火災報知器が鳴ったら、速やかに建物の外へ出てください。",
+          "form": "速やかに",
+          "en": "If the fire alarm goes off, leave the building right away."
+        },
+        {
+          "lv": 3,
+          "ja": "落とし物を拾った人は、速やかに警察に届け出るよう法律で定められている。",
+          "form": "速やかに",
+          "en": "The law says that anyone who finds a lost item must hand it in to the police promptly."
+        }
+      ],
+      "tip": "Almost always used as 速やかに in notices and laws; in speech people say すぐに."
+    },
+    {
+      "n": 266,
+      "term": "集結",
+      "reading": "しゅうけつ",
+      "meaning": "massing; gathering in one place",
+      "def_ja": "人や船などが一か所に大勢集まること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "港に漁船が集結した。",
+          "form": "集結",
+          "en": "Fishing boats gathered at the port."
+        },
+        {
+          "lv": 2,
+          "ja": "国境の近くに、軍の部隊が集結している。",
+          "form": "集結",
+          "en": "Army units are massing near the border."
+        },
+        {
+          "lv": 3,
+          "ja": "全国から消防の応援部隊が集結し、被災地での救助活動に加わった。",
+          "form": "集結",
+          "en": "Fire department support units from all over the country gathered and joined the rescue work in the disaster area."
+        }
+      ],
+      "tip": "Do not confuse it with 終結, which means coming to an end."
+    }
+  ]
+}

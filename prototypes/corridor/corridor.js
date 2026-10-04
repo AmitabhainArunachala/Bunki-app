@@ -2216,6 +2216,12 @@ async function boot() {
   // Phone reps: ?deck=context opens 文脈札 directly. It does not change the
   // stored front door, and it does not open the operator variant strip.
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
+  // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
+  // shortcut that lands on the deck instead of the galaxy
+  if (params.get('deck') === 'kotoba' || location.hash === '#kotoba') {
+    S.view = 'deckplay';
+    S.deckPlay = 'kotoba-mine';
+  }
 
   render();
 
@@ -2737,6 +2743,12 @@ function back() {
     render();
     return;
   }
+  if (S.view === 'deckplay' || S.view === 'contextdeck') {
+    S.view = 'dojo';
+    render();
+    window.scrollTo(0, 0);
+    return;
+  }
   if (S.view === 'dojo') {
     S.view = 'drift';
     render();
@@ -2757,13 +2769,6 @@ function back() {
   // holds the way back in (the sitting resumes at the question left open)
   if (S.view === 'mock' && S.mockRun) {
     leaveMockRun();
-    return;
-  }
-  // a deck module steps back to the module list before the room is left
-  if (S.view === 'decks' && S.deckModule) {
-    S.deckModule = null;
-    render();
-    window.scrollTo(0, 0);
     return;
   }
   if (S.view === 'archive') {
@@ -2794,7 +2799,7 @@ function back() {
   }
   // Device Back and the chrome arrow walk list → overview → reading shelf.
   if (S.view === 'levels' && referenceLibrary?.back()) return;
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'decks' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji' || S.view === 'contextdeck') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'kagami' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
@@ -3323,9 +3328,9 @@ function renderContextDeck(main) {
     bilingual: S.lang !== 'ja',
     storage: localStorage,
     onLeave() {
-      S.view = 'shelf';
+      S.view = 'dojo';
       render();
-      window.scrollTo(0, S.shelfScroll || 0);
+      window.scrollTo(0, 0);
     },
   });
 }
@@ -3440,17 +3445,6 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(mock);
-  const decks = el('button', 'grammar-link');
-  decks.type = 'button';
-  decks.id = 'decks-link';
-  decks.append(el('span', 'l-ja', '単語帳'), el('span', 'en-sub', bi() ? 'decks · your mined words' : ''));
-  decks.addEventListener('click', () => {
-    keepScroll();
-    S.view = 'decks';
-    render();
-    window.scrollTo(0, 0);
-  });
-  main.append(decks);
   const mirror = el('button', 'grammar-link');
   mirror.type = 'button';
   mirror.id = 'kagami-link';
@@ -3473,17 +3467,6 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(gram);
-  const contextDeck = el('button', 'grammar-link');
-  contextDeck.type = 'button';
-  contextDeck.id = 'context-deck-link';
-  contextDeck.append(el('span', 'l-ja', '文脈札'), el('span', 'en-sub', bi() ? 'context deck' : ''));
-  contextDeck.addEventListener('click', () => {
-    keepScroll();
-    S.view = 'contextdeck';
-    render();
-    window.scrollTo(0, 0);
-  });
-  main.append(contextDeck);
   const thes = el('button', 'grammar-link');
   thes.type = 'button';
   thes.id = 'thesaurus-link';
@@ -3770,6 +3753,19 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}
   paintSeal();
   seal.addEventListener('click', (event) => {
     event.stopPropagation();
+    if (!miniTaken()) {
+      // saving asks where first: in an article the capture panel opens on
+      // this word; elsewhere the full entry opens with the chooser ready
+      S.takePick = { key: `word|${token.b}`, lists: [] };
+      S.listMenuFor = `word|${token.b}`;
+      mini.remove();
+      if (from && S.view === 'reader') {
+        S.readerTake = { id: token.b, index: from.index, p: from.passage };
+        S.captureOpen = true;
+        render();
+      } else onEntry('pointer');
+      return;
+    }
     toggleTaken(from ? { t: 'word', id: token.b, from, ctxScope: 'sent' } : { t: 'word', id: token.b }, token.b);
     paintSeal();
     // the reader's under-ink and the chrome seal follow without a re-render
@@ -6161,225 +6157,6 @@ function renderMock(main) {
     return;
   }
   renderMockResult(main, set, flat, run);
-}
-
-/* 単語帳 — bundled decks of mined words (言葉の鉱脈, decks/kotoba-mine/).
- * A deck is a DOOR, not a schedule (the mock room's law, kept):
- *   1. Every module comes with its own passage on the shelf. The words are
- *      met there first, in a real sentence — the deck only points at it.
- *   2. Nothing is enrolled until the learner chooses it — one word, or a
- *      whole module through ぜんぶ覚える. Each enrolled row is the same
- *      started 覚える row the reader mints, carrying ctx {p, i, scope:'sent'}
- *      into the module's article, so the review card asks the word inside
- *      the very sentence it was mined in (takenContext → cloze).
- *   3. A module is also a named list, so その鉱脈だけ復習 is the existing
- *      filtered review (startReview(scope)), never a second scheduler.
- *   4. A headword the boot dictionary does not hold keeps a compact
- *      deepWords snapshot from the deck (reading + gloss), exactly as a
- *      deep-tier capture does, so its card answers on any device. */
-const DECK_DIR = 'data/share_alike/decks';
-const DECK_IDS = ['kotoba-mine'];
-const deckFailed = (key) => !!D.deckFailed?.has(key);
-
-function ensureDeck(deckId) {
-  D.decks ||= new Map();
-  D.decksLoading ||= new Map();
-  if (D.decks.has(deckId)) return Promise.resolve(D.decks.get(deckId));
-  const packed = window.__CORRIDOR_BUNDLE__?.[`decks/${deckId}`];
-  if (packed) {
-    D.decks.set(deckId, packed);
-    return Promise.resolve(packed);
-  }
-  if (D.decksLoading.has(deckId)) return D.decksLoading.get(deckId);
-  const pending = fetch(`${DECK_DIR}/${deckId}.json`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`deck ${deckId} → ${res.status}`);
-      return res.json();
-    })
-    .then((deck) => {
-      D.decks.set(deckId, deck);
-      D.decksLoading.delete(deckId);
-      return deck;
-    })
-    .catch((err) => {
-      D.decksLoading.delete(deckId);
-      (D.deckFailed ||= new Set()).add(deckId);
-      throw err;
-    });
-  D.decksLoading.set(deckId, pending);
-  return pending;
-}
-
-/** every deck card enrolls as a word row anchored in its passage — the
- * single-kanji cards too, so they are asked inside a compound in a sentence
- * rather than as a bare character (the kanji-row review has no cloze) */
-const deckHas = (card) => S.taken.some((t) => t.t === 'word' && t.id === card.w);
-const deckListName = (deck, mod) => `${deck.title.ja} · ${mod.title.ja.split(' — ')[0]}`;
-
-function deckEnrollPatch(deck, mod, cards) {
-  const now = Date.now();
-  const inDeck = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
-  const rows = [];
-  const deep = { ...(S.deepWords || {}) };
-  let deepTouched = false;
-  for (const card of cards) {
-    if (inDeck.has(card.w)) continue;
-    inDeck.add(card.w);
-    const row = { t: 'word', id: card.w, label: card.w, kind: NODE_KIND.word[0], kindEn: NODE_KIND.word[1], from: null, ts: now, started: now };
-    if (Number.isInteger(card.i) && mod.article) {
-      row.from = { passage: mod.article, index: card.i };
-      row.ctx = { p: mod.article, i: card.i, scope: 'sent' };
-      if (/^[ぁ-ゖー]+$/.test(card.r)) row.cueReading = card.r;
-    }
-    if (!D.dict[card.w] && !deep[card.w]) {
-      deep[card.w] = { r: /^[ぁ-ゖァ-ヺー]+$/.test(card.r) ? card.r : '', m: [card.g, card.d] };
-      deepTouched = true;
-    }
-    rows.push(row);
-  }
-  // the module list holds every chosen word of the module — the ones just
-  // enrolled AND any the learner had already taken from the reader, whose
-  // rows (and their own chosen context) stay exactly as they were
-  const name = deckListName(deck, mod);
-  const list = [...(S.lists[name] || [])];
-  const listed = new Set(list.filter((x) => x.t === 'word').map((x) => x.id));
-  for (const card of cards) {
-    if (!inDeck.has(card.w) || listed.has(card.w)) continue;
-    listed.add(card.w);
-    list.push({ t: 'word', id: card.w, label: card.w, ts: now });
-  }
-  const listGrew = list.length !== (S.lists[name] || []).length;
-  if (!rows.length && !listGrew) return null;
-  const patch = {};
-  if (rows.length) patch.taken = [...S.taken, ...rows];
-  if (listGrew) patch.lists = { ...S.lists, [name]: list };
-  if (deepTouched) patch.deepWords = deep;
-  return patch;
-}
-
-function renderDecks(main) {
-  main.append(withEn(el('p', 'eyebrow', '単語帳'), 'decks', 'en-inline'));
-  const deckId = S.deckId || DECK_IDS[0];
-  const deck = D.decks?.get(deckId);
-  if (!deck) {
-    if (!deckFailed(deckId)) {
-      ensureDeck(deckId).then(() => render(), () => render());
-      main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
-      return;
-    }
-    main.append(el('p', 'card-kind', tx('単語帳を読み込めなかった。', 'The deck could not be loaded.')));
-    const again = biLabel('button', 'chip', 'もう一度', 'try again');
-    again.type = 'button';
-    again.addEventListener('click', () => {
-      D.deckFailed?.delete(deckId);
-      render();
-    });
-    main.append(again);
-    return;
-  }
-  const mod = deck.modules.find((m) => m.id === S.deckModule);
-  if (!mod) {
-    main.append(el('h1', 'view-title', deck.title.ja));
-    main.append(
-      el(
-        'p',
-        'gloss',
-        tx(
-          '自分で集めた語を、鉱脈ごとの読み物の中で覚える。読んでから選ぶ — 選ばなければ、何も増えない。',
-          'Your own mined words, each module learned inside its own passage. Read first, then choose — choose nothing, and nothing is added.',
-        ),
-      ),
-    );
-    for (const m of deck.modules) {
-      const have = m.cards.filter(deckHas).length;
-      const row = el('button', 'entry-row deck-row');
-      row.type = 'button';
-      row.dataset.deckModule = m.id;
-      row.append(el('span', 'row-glyph', m.id.slice(1, 3)));
-      const mid = el('span', 'row-main');
-      mid.append(document.createTextNode(m.title.ja.split(' — ')[0]));
-      if (bi()) mid.append(el('span', 'en-sub', m.title.en));
-      mid.append(el('span', 'mock-score', `${have} / ${m.cards.length}`));
-      row.append(mid);
-      row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => {
-        S.deckModule = m.id;
-        render();
-        window.scrollTo(0, 0);
-      });
-      main.append(row);
-    }
-    return;
-  }
-  main.append(el('h1', 'view-title', mod.title.ja.split(' — ')[0]));
-  main.append(el('p', 'gloss', tx(mod.title.ja.split(' — ')[1] || '', mod.title.en)));
-  const actions = el('div', 'deck-actions');
-  if (mod.article && D.passages.some((p) => p.id === mod.article)) {
-    const read = biLabel('button', 'chip', `読み物 —『${mod.passageTitle}』`, 'read the passage');
-    read.type = 'button';
-    read.id = 'deck-read';
-    read.addEventListener('click', () => openPassage(mod.article));
-    actions.append(read);
-  }
-  const fresh = mod.cards.filter((c) => !deckHas(c));
-  // words taken earlier from the reader still belong to this module's list
-  const listedIds = new Set((S.lists[deckListName(deck, mod)] || []).map((x) => x.id));
-  const unlisted = mod.cards.some((c) => deckHas(c) && !listedIds.has(c.w));
-  if (fresh.length || unlisted) {
-    const all = fresh.length
-      ? biLabel('button', 'chip lesson-enroll-all', `ぜんぶ覚える — ${fresh.length} 件`, `memorize all ${fresh.length}`)
-      : biLabel('button', 'chip lesson-enroll-all', 'この鉱脈のリストにまとめる', 'gather into this module’s list');
-    all.type = 'button';
-    all.id = 'deck-enroll-all';
-    all.addEventListener('click', () => {
-      const patch = deckEnrollPatch(deck, mod, mod.cards);
-      if (patch && commitStorePatch(patch)) render();
-    });
-    actions.append(all);
-  }
-  const listed = S.lists[deckListName(deck, mod)] || [];
-  const due = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
-  const dueHere = listed.filter((x) => due.has(srsKey(x.t, x.id))).length;
-  if (dueHere) {
-    const rev = biLabel('button', 'chip', `この鉱脈だけ復習 — ${dueHere}`, `review this module — ${dueHere}`);
-    rev.type = 'button';
-    rev.id = 'deck-review';
-    rev.addEventListener('click', () => startReview(listed));
-    actions.append(rev);
-  }
-  main.append(actions);
-  for (const c of mod.cards) {
-    const have = deckHas(c);
-    const row = el('div', 'lesson-enroll-row deck-card');
-    const word = el('span', 'lesson-enroll-word');
-    word.append(document.createTextNode(c.w));
-    word.append(el('span', 'deck-reading', c.r));
-    row.append(word);
-    const body = el('span', 'deck-card-body');
-    body.append(el('span', 'deck-def', c.d));
-    if (bi()) body.append(el('span', 'en-sub', c.g));
-    row.append(body);
-    const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
-    b.type = 'button';
-    b.dataset.deckEnroll = c.w;
-    b.disabled = have;
-    if (!have) {
-      b.addEventListener('click', () => {
-        const patch = deckEnrollPatch(deck, mod, [c]);
-        if (patch && commitStorePatch(patch)) render();
-      });
-    }
-    row.append(b);
-    main.append(row);
-  }
-  const back = biLabel('button', 'take', '単語帳の一覧へ', 'all modules');
-  back.type = 'button';
-  back.addEventListener('click', () => {
-    S.deckModule = null;
-    render();
-    window.scrollTo(0, 0);
-  });
-  main.append(back);
 }
 
 /** One question, in the traditional posture: the paper does not tell you as
@@ -9380,7 +9157,10 @@ function takenContext(item) {
   return { tokens: p.tokens.slice(start, end), source: p.sourceLabel, passage: p.id };
 }
 
-function commitCapture(node, label, now = Date.now()) {
+/** `lists`: the named lists the learner picked in the save chooser — they
+ * ride the same guarded commit as the row, so the word and its lists land
+ * together or not at all. */
+function commitCapture(node, label, now = Date.now(), lists = []) {
   const item = {
     t: node.t,
     id: node.id,
@@ -9427,6 +9207,15 @@ function commitCapture(node, label, now = Date.now()) {
   }
   const patch = { taken: [...S.taken, item] };
   if (deepWord) patch.deepWords = { ...(S.deepWords || {}), [node.id]: deepWord };
+  if (lists.length) {
+    const next = { ...S.lists };
+    for (const name of lists) {
+      const rows = owns(S.lists, name) ? next[name] : [];
+      if (rows.some((x) => x.t === node.t && x.id === node.id)) continue;
+      setOwnRecordValue(next, name, [...rows, { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: now }]);
+    }
+    patch.lists = next;
+  }
   return commitStorePatch(patch);
 }
 
@@ -9453,11 +9242,17 @@ function takeButton(node, label) {
   btn.id = 'take';
   btn.setAttribute('aria-pressed', String(already));
   btn.addEventListener('click', () => {
-    toggleTaken(node, label);
-    // taking opens the list drawer right under the finger — the "where does
-    // it go" choice arrives with the act (operator, 2026-08-27); letting go
-    // closes it
-    S.listMenuFor = already ? null : `${node.t}|${node.id}`;
+    const key = `${node.t}|${node.id}`;
+    if (already) {
+      toggleTaken(node, label);
+      S.listMenuFor = null;
+      S.takePick = null;
+    } else {
+      // nothing is saved yet: the first tap asks WHERE (operator, 2026-10-04 —
+      // "the operator has no idea where the word actually gets saved")
+      S.takePick = S.takePick?.key === key ? null : { key, lists: [] };
+      S.listMenuFor = key;
+    }
     render();
   });
   return btn;
@@ -9570,10 +9365,91 @@ function renderContextPicker(sheet, node) {
   sheet.append(wrap);
 }
 
+/** The save chooser that opens on 覚える: the daily review queue is always
+ * where the word goes; any number of the learner's lists can ride along, and
+ * a new list can be named here. Nothing is written until 保存する. */
+function renderTakeChooser(sheet, node, label) {
+  const pick = S.takePick;
+  const wrap = el('div', 'take-chooser');
+  wrap.id = 'take-chooser';
+  wrap.append(withEn(el('p', 'take-chooser-q', 'どこに保存しますか？'), 'save this word to', 'en-inline'));
+  const chips = el('div', 'chips');
+  const always = el('button', 'chip wide on-list take-always');
+  always.type = 'button';
+  always.disabled = true;
+  always.append(el('span', 'big', '✓ 覚えるの札'), el('span', 'sub', tx('毎日の復習', 'daily review')));
+  chips.append(always);
+  const names = [...new Set([...Object.keys(S.lists), ...pick.lists])];
+  for (const name of names) {
+    const on = pick.lists.includes(name);
+    const chip = el('button', on ? 'chip wide on-list' : 'chip wide');
+    chip.type = 'button';
+    chip.dataset.pickList = name;
+    chip.setAttribute('aria-pressed', String(on));
+    chip.append(el('span', 'big', `${on ? '✓ ' : ''}${name}`), el('span', 'sub', owns(S.lists, name) ? `${S.lists[name].length}` : tx('新規', 'new')));
+    chip.addEventListener('click', () => {
+      pick.lists = on ? pick.lists.filter((n) => n !== name) : [...pick.lists, name];
+      render();
+    });
+    chips.append(chip);
+  }
+  const row = el('div', 'list-maker');
+  const field = el('input', 'list-maker-field');
+  field.type = 'text';
+  field.id = 'take-new-list';
+  field.placeholder = tx('＋ 新しいリストの名前', '＋ name a new list');
+  field.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
+  const addNew = () => {
+    const name = field.value.trim();
+    if (!name) return;
+    if (!pick.lists.includes(name)) pick.lists = [...pick.lists, name];
+    render();
+  };
+  field.addEventListener('keydown', (ev) => {
+    // the sheet's own keys (Enter/Escape close it) must not see typing here
+    ev.stopPropagation();
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      addNew();
+    }
+  });
+  const make = biLabel('button', 'chip list-maker-make', '追加', 'add');
+  make.type = 'button';
+  make.addEventListener('click', addNew);
+  row.append(field, make);
+  chips.append(row);
+  wrap.append(chips);
+  const actions = el('div', 'take-chooser-actions');
+  const save = biLabel('button', 'take take-save', pick.lists.length ? `保存する — 覚えるの札＋${pick.lists.length}` : '保存する', 'save');
+  save.type = 'button';
+  save.id = 'take-save';
+  save.addEventListener('click', () => {
+    const typed = field.value.trim();
+    const lists = typed && !pick.lists.includes(typed) ? [...pick.lists, typed] : pick.lists;
+    S.takePick = null;
+    S.listMenuFor = null;
+    commitCapture(node, label, Date.now(), lists);
+    render();
+  });
+  const cancel = biLabel('button', 'chip take-cancel', 'やめる', 'cancel');
+  cancel.type = 'button';
+  cancel.addEventListener('click', () => {
+    S.takePick = null;
+    S.listMenuFor = null;
+    render();
+  });
+  actions.append(save, cancel);
+  wrap.append(actions);
+  sheet.append(wrap);
+}
+
 function renderListPicker(sheet, node, label) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
-  if (!item) return;
   const menuKey = `${node.t}|${node.id}`;
+  if (!item) {
+    if (S.takePick?.key === menuKey) renderTakeChooser(sheet, node, label);
+    return;
+  }
   const open = S.listMenuFor === menuKey;
   const memberOf = Object.keys(S.lists).filter((n) =>
     S.lists[n].some((x) => x.t === node.t && x.id === node.id),
@@ -9584,14 +9460,15 @@ function renderListPicker(sheet, node, label) {
   const head = el('button', open ? 'fold-head open' : 'fold-head');
   head.type = 'button';
   head.setAttribute('aria-expanded', String(open));
-  head.append(el('span', 'fold-title', tx('リストへ', 'lists')));
+  head.append(el('span', 'fold-title', tx('保存先', 'saved to')));
   head.append(
     el(
       'span',
       'fold-sub',
-      memberOf.length
-        ? memberOf.join('・')
-        : tx(`${monthKey(item.ts)} に自動追加ずみ`, `auto-filed in ${monthKey(item.ts)}`),
+      tx(
+        `保存先：覚えるの札${memberOf.length ? `・${memberOf.join('・')}` : ''}`,
+        `saved to: daily review${memberOf.length ? ` · ${memberOf.join(' · ')}` : ''}`,
+      ),
     ),
   );
   head.append(el('span', 'fold-arrow', open ? '▾' : '▸'));
@@ -9605,7 +9482,7 @@ function renderListPicker(sheet, node, label) {
     return;
   }
   wrap.append(
-    withEn(el('p', 'eyebrow', `リスト — ${monthKey(item.ts)} に自動追加ずみ`), `lists — already in ${monthKey(item.ts)}`, 'en-inline'),
+    withEn(el('p', 'eyebrow', 'リストに入れる・外す'), 'add to or remove from a list', 'en-inline'),
   );
   const chips = el('div', 'chips');
   for (const name of Object.keys(S.lists)) {
@@ -10768,6 +10645,114 @@ function renderFocusHud(root) {
 }
 
 /** The dojo lobby: choose a length and what to drill. */
+/* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
+ * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
+ * own word queue, opened as a plain review. */
+const DOJO_DECKS = [{ id: 'kotoba-mine', ja: '言葉の鉱脈', en: 'your mined words · 3 sentences each' }];
+let deckPlayer = null;
+let deckPlayerLoading = null;
+let deckPlayerError = false;
+const deckSummaries = {};
+function loadDeckPlayer() {
+  if (deckPlayer) return Promise.resolve(deckPlayer);
+  if (!deckPlayerLoading) {
+    deckPlayerLoading = import('./decks/player/mount.js').then(
+      (mod) => {
+        deckPlayer = mod;
+        return mod;
+      },
+      (err) => {
+        deckPlayerError = true;
+        deckPlayerLoading = null;
+        throw err;
+      },
+    );
+  }
+  return deckPlayerLoading;
+}
+
+function openDeck(id) {
+  keepScroll();
+  S.deckPlay = id;
+  S.view = 'deckplay';
+  render();
+  window.scrollTo(0, 0);
+}
+
+function renderDojoDecks(main) {
+  main.append(withEn(el('p', 'eyebrow', 'デッキ'), 'SRS decks', 'en-inline'));
+  const list = el('div', 'dojo-decks');
+  const row = (id, ja, sub, onClick) => {
+    const b = el('button', 'dojo-deck');
+    b.type = 'button';
+    b.dataset.deck = id;
+    b.append(el('span', 'dojo-deck-t', ja), el('span', 'dojo-deck-sub', sub));
+    b.addEventListener('click', onClick);
+    list.append(b);
+  };
+  for (const d of DOJO_DECKS) {
+    const sum = deckSummaries[d.id];
+    if (!sum && window.__CORRIDOR_STANDALONE__ !== true) {
+      loadDeckPlayer()
+        .then((mod) => mod.summary(d.id))
+        .then((got) => {
+          deckSummaries[d.id] = got;
+          if (S.view === 'dojo') render();
+        })
+        .catch(() => {});
+    }
+    const counts = sum ? tx(`復習 ${sum.due} ・ 新しい文 ${sum.fresh}`, `${sum.due} due · ${sum.fresh} new`) : tx(d.en, d.en);
+    row(d.id, d.ja, counts, () => openDeck(d.id));
+  }
+  row('context', '文脈札', tx('一語ごとの段落カード', 'one paragraph per word'), () => {
+    keepScroll();
+    S.view = 'contextdeck';
+    render();
+    window.scrollTo(0, 0);
+  });
+  const forecast = srsForecast();
+  row('mine', '覚えるの札', tx(`覚えた語 ・ ${forecast.today + forecast.fresh} 枚 待っている`, `words you saved · ${forecast.today + forecast.fresh} waiting`), () => startReview());
+  for (const name of Object.keys(S.lists || {})) {
+    const items = S.lists[name];
+    if (!items.length) continue;
+    const keys = new Set(items.map((x) => srsKey(x.t, x.id)));
+    const waiting = srsDueItems().filter((i) => keys.has(srsKey(i.t, i.id))).length;
+    row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語 ・ ${waiting} 枚 待っている`, `list · ${items.length} words · ${waiting} waiting`), () => startReview(items));
+  }
+  main.append(list);
+}
+
+function renderDeckPlay(main) {
+  if (deckPlayerError) {
+    main.append(el('p', 'card-kind', tx('デッキを開けませんでした。', 'The deck could not be opened.')));
+    return;
+  }
+  if (!deckPlayer) {
+    main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+    loadDeckPlayer().then(
+      () => S.view === 'deckplay' && render(),
+      () => S.view === 'deckplay' && render(),
+    );
+    return;
+  }
+  deckPlayer
+    .render(main, {
+      deckId: S.deckPlay || DOJO_DECKS[0].id,
+      storage: localStorage,
+      onLeave() {
+        delete deckSummaries[S.deckPlay];
+        S.view = 'dojo';
+        render();
+        window.scrollTo(0, 0);
+      },
+    })
+    .catch((err) => {
+      console.error(err);
+      deckPlayerError = true;
+      if (S.view === 'deckplay') render();
+    });
+}
+
 function renderFocus(main) {
   main.append(withEn(el('h1', 'view-title', '集中道場'), 'the focus dojo', 'en-inline'));
   main.append(
@@ -10781,6 +10766,9 @@ function renderFocus(main) {
     ),
   );
 
+  renderDojoDecks(main);
+
+  main.append(withEn(el('p', 'eyebrow', '集中ブロック'), 'timed block', 'en-inline'));
   main.append(withEn(el('p', 'eyebrow', '時間'), 'how long', 'en-inline'));
   const mins = el('div', 'focus-choices');
   S.focusMin = S.focusMin || 20;
@@ -16227,7 +16215,7 @@ function render() {
   // the crumb names the TRUE origin — the room 戻る actually reopens. The
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
-  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || S.view === 'deckplay' || S.view === 'contextdeck' || (S.view === 'review' && S.focus);
   // the search room's door stands in the galaxy bar, and its Back walks
   // there unless it was opened from the shelf
   const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
@@ -16251,14 +16239,14 @@ function render() {
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
   if (S.view === 'mock') parts.push(tx('模試', 'mock papers'));
-  if (S.view === 'decks') parts.push(tx('単語帳', 'decks'));
   if (S.view === 'kagami') parts.push(tx('鏡', 'the mirror'));
   if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
   if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
   if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
-  if (S.view === 'contextdeck') parts.push(tx('文脈札', 'context deck'));
+  if (S.view === 'contextdeck') parts.push(tx('集中道場', 'focus'), tx('文脈札', 'context deck'));
+  if (S.view === 'deckplay') parts.push(tx('集中道場', 'focus'), tx('デッキ', 'deck'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   crumb.setAttribute('aria-label', crumb.title);
@@ -16334,9 +16322,12 @@ function render() {
         render();
         return;
       }
-      // first touch takes the word as encountered — sentence and all; the
-      // panel that opens holds the undo, the scope stages, and the lists
-      if (!S.taken.some((t) => t.t === 'word' && t.id === now.id)) toggleTaken(readerTakeNode(now), now.id);
+      // first touch asks where to save — the word as encountered, sentence
+      // and all, is written only when the chooser's 保存する is pressed
+      if (!S.taken.some((t) => t.t === 'word' && t.id === now.id)) {
+        S.takePick = { key: `word|${now.id}`, lists: [] };
+        S.listMenuFor = `word|${now.id}`;
+      }
       S.captureOpen = true;
       render();
     });
@@ -16439,12 +16430,12 @@ function render() {
   else if (S.view === 'probe') renderProbe(main);
   else if (S.view === 'archive') renderArchive(main);
   else if (S.view === 'dojo') renderFocus(main);
+  else if (S.view === 'deckplay') renderDeckPlay(main);
   else if (S.view === 'aiquiz') renderAiQuiz(main);
   else if (S.view === 'levels') renderLevels(main);
   else if (S.view === 'ai') renderAiSetup(main);
   else if (S.view === 'lessons') renderLessons(main);
   else if (S.view === 'mock') renderMock(main);
-  else if (S.view === 'decks') renderDecks(main);
   else if (S.view === 'kagami') renderKagami(main);
   else if (S.view === 'thesaurus') renderThesaurus(main);
   else if (S.view === 'airead') renderAiReading(main);

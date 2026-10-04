@@ -15,7 +15,8 @@
 // v2: dict-v2 went schema 3 (sense tags) — the cache-first shards must drop
 // v4: the context deck (文脈札) joined the shell
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
-const VERSION = 'kairo-v5-kotoba-mine';
+// v6: those passages left the shelf; the deck player joined the shell
+const VERSION = 'kairo-v6-deck-player';
 const SHELL = [
   '.',
   'index.html',
@@ -37,8 +38,11 @@ const SHELL = [
   'reference-ui.js',
   'reference-ui.css',
   'data/share_alike/reference-extra.json',
-  // 単語帳 opens offline from install, like the context deck
-  'data/share_alike/decks/kotoba-mine.json',
+  // 集中道場 › デッキ opens offline from install
+  'decks/player/engine.js',
+  'decks/player/mount.js',
+  'decks/player/player.css',
+  'decks/kotoba-mine/deck.json',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

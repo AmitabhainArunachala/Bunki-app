@@ -6597,3 +6597,75 @@ body.zen .review-example {
   width: 17px;
   height: 17px;
 }
+
+/* 集中道場 › デッキ — the SRS decks, one tappable row each */
+.dojo-decks {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 18px;
+}
+
+.dojo-deck {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 14px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--ground-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.dojo-deck:first-child {
+  border-color: var(--ink);
+}
+
+.dojo-deck-t {
+  font-family: var(--serif);
+  font-size: 19px;
+}
+
+.dojo-deck-sub {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* 覚える › どこに保存しますか — the save chooser that opens before a word is saved */
+.take-chooser {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 4px;
+  padding: 12px;
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  background: var(--ground-0, var(--ground));
+}
+
+.take-chooser-q {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.take-chooser .take-always {
+  opacity: 1;
+  cursor: default;
+}
+
+.take-chooser-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.take-chooser .take-save {
+  flex: 1 1 auto;
+}

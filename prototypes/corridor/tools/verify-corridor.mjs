@@ -1012,14 +1012,21 @@ async function main() {
   // ------------------------------------------------------------ step 5 take
   console.log('\n— step 5 · 覚える');
   await tap(page, '#take');
+  await page.waitForSelector('#take-chooser', { timeout: 8000 });
+  const beforeSave = await page.locator('#tray').textContent();
+  check('覚える asks where to save before anything is saved',
+    !/覚\s*[1-9]/.test(beforeSave) && (await page.locator('#take-chooser .take-always').count()) === 1,
+    `chrome reads "${beforeSave.trim()}"`);
+  await tap(page, '#take-save');
+  await page.waitForTimeout(160);
   const taken = await page.locator('#tray').textContent();
   check('any node can be taken into study', /覚\s*[1-9]/.test(taken), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
-    const p = document.querySelector('.list-picker .eyebrow');
+    const p = document.querySelector('.list-picker .fold-sub');
     return p ? p.textContent : null;
   })()`);
-  check('覚える lands the item in this month\'s list automatically',
-    !!bucket && /\d{4}年\d{1,2}月/.test(bucket), String(bucket).slice(0, 44));
+  check('after saving, the sheet says plainly where the word went',
+    !!bucket && /保存先|saved to/.test(bucket), String(bucket).slice(0, 44));
   // the schedule preview lives one named fold deep since 2026-08-27 —
   // open 学習の記録 the way a finger does before reading it (aim at the
   // study fold's own head: the list drawer shares the .fold-head class)
@@ -1843,6 +1850,8 @@ async function main() {
     .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
     .catch(() => {});
   await tap(page, '#sheet #take');
+  await page.waitForSelector('#take-save', { timeout: 8000 });
+  await tap(page, '#take-save');
   await page.waitForSelector('[data-ctx-scope]', { timeout: 8000 });
   await tap(page, '[data-ctx-scope="sent"]');
   await page.waitForTimeout(300);
@@ -2135,7 +2144,12 @@ async function main() {
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   await tap(page, '#reader-take');
-  await page.waitForSelector('#capture-panel');
+  await page.waitForSelector('#capture-panel #take-chooser');
+  const unsaved = await page.evaluate(`JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').taken?.length ?? 0`);
+  check('the reader door asks where to save first — nothing is written yet',
+    unsaved === envBefore.taken, `${unsaved} rows`);
+  await tap(page, '#capture-panel #take-save');
+  await page.waitForTimeout(200);
   const captured = await page.evaluate(`(() => {
     const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
     const it = (e.taken || [])[(e.taken || []).length - 1];
@@ -2179,16 +2193,20 @@ async function main() {
   await page.waitForSelector('#mini #mini-take');
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
   await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  await page.waitForSelector('#capture-panel #take-chooser', { timeout: 8000 });
+  await tap(page, '#capture-panel #take-save');
   await page.waitForTimeout(250);
   const miniCap = await page.evaluate(`(() => {
     const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
     const it = (e.taken || [])[(e.taken || []).length - 1];
-    const seal = document.querySelector('#mini-take');
-    return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
+    return { id: it?.id, scope: it?.ctx?.scope ?? null };
   })()`);
-  check('R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up',
-    miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
+  check('R2-B · the mini’s 覚 opens the same save chooser, and saving keeps the sentence ctx',
+    miniCap.id === miniWordText && miniCap.scope === 'sent',
     JSON.stringify(miniCap));
+  await page.evaluate(`document.querySelector('#capture-panel')?.remove()`);
+  await touchAt(page, '#reader .tok.content', miniIx, 700);
+  await page.waitForSelector('#mini #mini-take');
   await page.evaluate(`document.querySelector('#mini-take')?.click()`);
   await page.waitForTimeout(250);
   const miniUndone = await page.evaluate(`(() => {
