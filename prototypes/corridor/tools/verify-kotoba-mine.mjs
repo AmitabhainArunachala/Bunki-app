@@ -19,6 +19,9 @@
  * ledger is untouched; a learning step that comes due while a card is open
  * waits until that card is answered, then comes next (fake clock).
  *
+ * Every card id in both decks is the one source/ids.json gives its key
+ * (word, passage text, card kind), so reordering passages never moves an id.
+ *
  * Then 復元: a pasted `{}` changes nothing and says why; an older, smaller
  * backup needs a second tap that names both counts, and the ledger it
  * replaces is kept under bunki-cloze:kotoba-mcd:before-restore. A stored
@@ -27,6 +30,7 @@
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
+import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
@@ -40,6 +44,7 @@ const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
 const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
 const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mcd/deck.json');
 const SENTENCE_DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
+const IDS_PATH = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/source/ids.json');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -99,6 +104,25 @@ function verifyDeck() {
   }
   check('every card spells its sentence, asks exactly one word, and gives it a kana reading', bad.length === 0, bad.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
   return deck;
+}
+
+/* ------------------------------------------- card identity (F26, A25) */
+/** the manifest key build.py gives a card: word, passage text and card kind, never position */
+function cardKey(wid, card) {
+  const h = createHash('sha1').update(card.ja, 'utf8').digest('hex').slice(0, 12);
+  if (card.type === 'word') return `${wid}|word|${h}`;
+  if (card.type === 'kanji') return `${wid}|kanji|${h}|${card.ruby.filter((seg) => seg.length > 2).findIndex((seg) => seg[2] === 1)}`;
+  return `${wid}|sentence|${h}`;
+}
+
+function verifyIds(decks) {
+  const manifest = readJson(IDS_PATH);
+  for (const deck of decks) {
+    const ids = manifest[deck.id] ?? {};
+    const bad = deck.words.flatMap((w) => w.cards.filter((c) => ids[cardKey(w.id, c)] !== c.id).map((c) => `${c.id} ${cardKey(w.id, c)}`));
+    const n = deck.words.reduce((sum, w) => sum + w.cards.length, 0);
+    check(`${deck.id}: every card id is the one ids.json gives its key (word, passage, kind), not its position`, bad.length === 0 && Object.keys(ids).length === n, bad.slice(0, 3).join(' | ') || `${n}/${n} · ${(manifest.reserved?.[deck.id] ?? []).length} reserved`);
+  }
 }
 
 /* ------------------------------------- the grade path (F01, F07, N02) */
@@ -249,6 +273,7 @@ async function main() {
   const sentences = readJson(SENTENCE_DECK_PATH);
   const sc = sentences.words.flatMap((w) => w.cards);
   check('言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source', sentences.id === 'kotoba-mine' && sentences.words.length === 323 && sc.every((c) => !c.type && c.src && c.ruby.filter((g) => g[2] === 1).length === 1), `${sc.length} sentence cards`);
+  verifyIds([deck, sentences]);
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');

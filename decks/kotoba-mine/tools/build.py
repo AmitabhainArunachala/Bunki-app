@@ -12,8 +12,21 @@ Every sentence is tokenised with the corridor's tokeniser (fugashi + UniDic,
 plus the repo's reading-override lexicon) so each kanji word carries its
 reading; the asked word is one segment whose reading comes from the card.
 
+Card IDs (and so Anki GUIDs, which are derived from them) come from the committed
+manifest source/ids.json, keyed by word, passage text and card kind, never from a
+card's position. `lv` is display order only. A card key the manifest has not seen
+gets the next free number for its word and is appended; an id whose key is no
+longer produced moves to "reserved" and is never handed out again.
+
 Run from the repo root:  python3 decks/kotoba-mine/tools/build.py
 Needs: pip install fugashi unidic-lite==1.0.8 genanki
+
+Flags
+  --frozen        never write ids.json; fail, naming the key, if a card has no id
+  --out <dir>     write only <dir>/<deck id>/deck.json for both decks (no apkg/tsv/html)
+  --mcd <path>    read the MCD passages from <path> instead of source/mcd.json
+  --ids <path>    read (and update) this manifest instead of source/ids.json
+  --preview <f>   write a study page of the MCD deck to <f>; ids.json is not written
 """
 from __future__ import annotations
 
@@ -31,6 +44,21 @@ SRC = DECK_DIR / "source"
 RELEASE = DECK_DIR / "release"  # not dist/: the repo ignores every dist/ directory
 CORRIDOR = REPO / "prototypes" / "corridor"
 PLAYER_DECK = CORRIDOR / "decks" / "kotoba-mine" / "deck.json"
+
+
+def _arg(flag: str) -> str | None:
+    """the value after `flag` on the command line, if the flag is there"""
+    if flag not in sys.argv:
+        return None
+    i = sys.argv.index(flag)
+    if i + 1 >= len(sys.argv):
+        raise SystemExit(f"{flag} needs a value")
+    return sys.argv[i + 1]
+
+
+FROZEN = "--frozen" in sys.argv
+MCD_PATH = Path(_arg("--mcd") or SRC / "mcd.json")
+IDS_PATH = Path(_arg("--ids") or SRC / "ids.json")
 
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(CORRIDOR / "tools"))
@@ -107,6 +135,83 @@ def with_mined(card: dict, picks: list[dict] | None) -> dict:
         s0 = card["sentences"][0]
         sentences = [{**s0, "lv": 1, "kind": "original", "src": {"site": "書き下ろし（このデッキ用）"}}]
     return {**card, "sentences": sentences}
+
+
+# ------------------------------------------------------------------ card identity
+def passage_hash(ja: str) -> str:
+    return hashlib.sha1(ja.encode("utf-8")).hexdigest()[:12]
+
+
+def word_key(wid: str, ja: str) -> str:
+    """an MCD 語 card: the whole word blanked in this passage"""
+    return f"{wid}|word|{passage_hash(ja)}"
+
+
+def kanji_key(wid: str, ja: str, k: int) -> str:
+    """an MCD 字 card: kanji k (its index in the word's aligned parts) blanked in this passage"""
+    return f"{wid}|kanji|{passage_hash(ja)}|{k}"
+
+
+def sentence_key(wid: str, ja: str) -> str:
+    """a 文 card: this sentence with the word marked"""
+    return f"{wid}|sentence|{passage_hash(ja)}"
+
+
+def card_key(wid: str, card: dict) -> str:
+    """the key of a card as it appears in a built deck.json (used by freeze_ids.py)"""
+    if card.get("type") == "word":
+        return word_key(wid, card["ja"])
+    if card.get("type") == "kanji":
+        parts = [seg for seg in card["ruby"] if len(seg) > 2]
+        return kanji_key(wid, card["ja"], next(i for i, seg in enumerate(parts) if seg[2] == 1))
+    return sentence_key(wid, card["ja"])
+
+
+class IdManifest:
+    """source/ids.json: {deck id: {card key: card id}, "reserved": {deck id: [{key, id}]}}"""
+
+    def __init__(self, path: Path, frozen: bool):
+        self.path, self.frozen = path, frozen
+        if not path.exists():
+            raise SystemExit(f"{path} is missing: card ids come from it (see tools/freeze_ids.py)")
+        self.data = json.loads(path.read_text("utf-8"))
+        self.emitted: dict[str, set[str]] = {}
+        self.changed = False
+
+    def assign(self, deck: str, key: str, wid: str, sentence: bool) -> str:
+        ids = self.data.setdefault(deck, {})
+        seen = self.emitted.setdefault(deck, set())
+        if key in seen:
+            raise SystemExit(f"two cards share the key {key!r} in {deck}: a passage is listed twice")
+        seen.add(key)
+        if key in ids:
+            return ids[key]
+        if self.frozen:
+            raise SystemExit(f"--frozen: {self.path.name} has no id for card key {key!r} ({deck}); "
+                             "build without --frozen to assign one")
+        pattern = re.compile(rf"{re.escape(wid)}-(\d+)$" if sentence else rf"{re.escape(wid)}-m(\d+)$")
+        used = [*ids.values(), *(r["id"] for r in self.data.setdefault("reserved", {}).get(deck, []))]
+        n = max((int(m.group(1)) for i in used if (m := pattern.match(i))), default=0) + 1
+        ids[key] = f"{wid}-{n}" if sentence else f"{wid}-m{n:02d}"
+        self.changed = True
+        print(f"· new card id {ids[key]} for {key} ({deck})")
+        return ids[key]
+
+    def retire_unseen(self, deck: str) -> None:
+        """ids whose key this build no longer produces are reserved, never reused"""
+        ids = self.data.get(deck, {})
+        gone = [k for k in ids if k not in self.emitted.get(deck, set())]
+        for key in gone:
+            if self.frozen:
+                print(f"! --frozen: {ids[key]} ({key}) is no longer built; a build without --frozen reserves it")
+                continue
+            self.data.setdefault("reserved", {}).setdefault(deck, []).append({"key": key, "id": ids.pop(key)})
+            self.changed = True
+            print(f"· card id retired: {key} ({deck})")
+
+    def save(self) -> None:
+        if self.changed and not self.frozen:
+            self.path.write_text(json.dumps(self.data, ensure_ascii=False, indent=2) + "\n", "utf-8")
 
 
 # ------------------------------------------------------------------ ruby
@@ -218,10 +323,11 @@ def align(form: str, reading: str, _deep: bool = True) -> list[tuple[str, str]] 
     return None
 
 
-def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]:
+def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManifest) -> list[dict]:
     """per passage: one card blanking the whole word (hint: its Japanese definition),
-    then (first passage only) one card per kanji, blanked with its reading as the hint."""
-    cards = []
+    then (first passage only) one card per kanji, blanked with its reading as the hint.
+    Ids come from the manifest by key; lv is the card's position (display order only)."""
+    cards, keys = [], []
     for pi, p in enumerate(passages, 1):
         ruby = _ordered_for({"ja": p["ja"], "form": p["form"]}, c, tagger, bc)
         if "".join(seg[0] for seg in ruby) != p["ja"]:
@@ -229,6 +335,7 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]
         src = {k: p[k] for k in ("site", "url", "licence") if p.get(k)}
         base = {"ja": p["ja"], "form": p["form"], "en": p["en"], "kind": p["kind"], "src": src, "passage": pi}
         cards.append({**base, "type": "word", "ruby": ruby})
+        keys.append(word_key(wid, p["ja"]))
         ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
         parts = align(p["form"], ruby[ti][1])
         kanji_parts = [i for i, (t, _) in enumerate(parts or []) if KANJI.match(t)]
@@ -237,9 +344,10 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]
         for k in kanji_parts:
             segs = [[t, r, 1 if i == k else 2] for i, (t, r) in enumerate(parts)]
             cards.append({**base, "type": "kanji", "hint": parts[k][1], "ruby": ruby[:ti] + segs + ruby[ti + 1:]})
-    for i, card in enumerate(cards, 1):
+            keys.append(kanji_key(wid, p["ja"], k))
+    for i, (card, key) in enumerate(zip(cards, keys), 1):
         card["lv"] = i
-        card["id"] = f"{wid}-m{i:02d}"
+        card["id"] = ids.assign("kotoba-mcd", key, wid, sentence=False)
     return cards
 
 
@@ -278,14 +386,13 @@ def kanji_anatomy(term: str) -> list[dict]:
     return out
 
 
-def build_deck(mods: list[dict], kind: str = "mcd") -> dict:
+def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
     spec = DECKS[kind]
     import build_corridor as bc
     from corpus.grading._mecab import get_tagger
 
     tagger = get_tagger()
-    mcd_path = SRC / "mcd.json"
-    mcd = json.loads(mcd_path.read_text("utf-8")) if mcd_path.exists() and kind == "mcd" else {}
+    mcd = json.loads(MCD_PATH.read_text("utf-8")) if MCD_PATH.exists() and kind == "mcd" else {}
     preview = "--preview" in sys.argv
     words = []
     for m in mods:
@@ -295,12 +402,13 @@ def build_deck(mods: list[dict], kind: str = "mcd") -> dict:
                 continue
             cards = []
             if str(c["n"]) in mcd:
-                cards = mcd_cards(wid, c, mcd[str(c["n"])], tagger, bc)
+                cards = mcd_cards(wid, c, mcd[str(c["n"])], tagger, bc, ids)
             for s in [] if cards else c["sentences"]:
                 ruby = _ordered_for(s, c, tagger, bc)
                 if "".join(seg[0] for seg in ruby) != s["ja"]:
                     raise SystemExit(f"{wid} lv{s['lv']}: ruby does not spell the sentence")
-                card = {"id": f"{wid}-{s['lv']}", "lv": s["lv"], "ja": s["ja"], "form": s["form"], "en": s["en"], "ruby": ruby, "kind": s["kind"]}
+                card_id = ids.assign(spec["id"], sentence_key(wid, s["ja"]), wid, sentence=True)
+                card = {"id": card_id, "lv": s["lv"], "ja": s["ja"], "form": s["form"], "en": s["en"], "ruby": ruby, "kind": s["kind"]}
                 if s.get("src"):
                     card["src"] = s["src"]
                 cards.append(card)
@@ -540,21 +648,32 @@ def build_study(deck: dict, out: Path | None = None) -> None:
 def main() -> int:
     mods = load()
     if "--preview" in sys.argv:
-        deck = build_deck(mods, "mcd")
-        out = Path(sys.argv[sys.argv.index("--preview") + 1])
+        ids = IdManifest(IDS_PATH, frozen=False)  # new passages get ids in memory; save() is never called
+        deck = build_deck(mods, ids, "mcd")
+        out = Path(_arg("--preview"))
         build_study(deck, out)
         print(f"· preview: {len(deck['words'])} words, {sum(len(w['cards']) for w in deck['words'])} cards → {out}")
         return 0
-    RELEASE.mkdir(exist_ok=True)
+    ids = IdManifest(IDS_PATH, FROZEN)
+    out_dir = Path(_arg("--out")) if "--out" in sys.argv else None
+    decks = {kind: build_deck(mods, ids, kind) for kind in DECKS}
+    for spec in DECKS.values():
+        ids.retire_unseen(spec["id"])
+    ids.save()  # before any deck is written, so no shipped id is missing from the manifest
+    if out_dir is None:
+        RELEASE.mkdir(exist_ok=True)
     for kind, spec in DECKS.items():
-        deck = build_deck(mods, kind)
-        path = CORRIDOR / "decks" / spec["id"] / "deck.json"
+        deck = decks[kind]
+        path = (out_dir or CORRIDOR / "decks") / spec["id"] / "deck.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(deck, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
+        n = sum(len(w["cards"]) for w in deck["words"])
+        if out_dir is not None:
+            print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path}")
+            continue
         build_tsv(deck, spec)
         build_anki(deck, spec)
         build_study(deck, RELEASE / spec["out"][2])
-        n = sum(len(w["cards"]) for w in deck["words"])
         print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path.relative_to(REPO)}; release/{', '.join(spec['out'])}")
     return 0
 
