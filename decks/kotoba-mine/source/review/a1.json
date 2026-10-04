@@ -1,54 +1,316 @@
 {
- "1": [{"ja": "私は彼女に謎かけをしてみた。", "en": "I tried telling her a riddle."}],
- "4": [{"ja": "失敗しても大丈夫、なんくるないさ。", "form": "なんくるない", "en": "It's okay if you fail; it'll all work out.", "original": true}],
- "12": [{"ja": "最後まで勝ち残ったチームが、決勝トーナメントへ進出するサバイバル形式となります。", "en": "It's a survival format: the teams that keep winning to the end advance to the final tournament."}],
- "17": [{"ja": "古代エジプト人は、なぜ「霊魂不滅」を信じたのですか？", "en": "Why did the ancient Egyptians believe in the immortality of the soul?"}],
- "21": [{"ja": "掛軸は床の間だけに掛けるものではありません。", "en": "Hanging scrolls aren't only for the tokonoma."}],
- "27": [{"ja": "「なに、お前は、上官の命令に背くのか」", "en": "\"What? You're disobeying your superior officer's orders?\""}],
- "33": [{"ja": "ちきりんはモノを考える時、圧倒的に帰納的に考えることが多いです。", "en": "When Chikirin thinks things through, she overwhelmingly tends to reason inductively."}],
- "36": [{"ja": "磁気共鳴断層撮影装置（MRI）は磁気によって画像検査を行う装置です。", "en": "A magnetic resonance imaging (MRI) scanner is a machine that performs imaging tests using magnetism."}],
- "41": [{"ja": "よくある誤解の一つに、失読症の人は文字や単語が逆さま、あるいは反転して見えるというものがあります。", "en": "One common misconception is that people with dyslexia see letters and words upside down or reversed."}],
- "47": [{"ja": "調理台の保護と切り易さを考えて、いつもまな板を使ってます。", "en": "I always use a cutting board to protect my countertop and make chopping easier."}],
- "51": [{"ja": "日本は東京五輪に照準を合わせ、射撃選手の若手育成に力を入れてきた。", "en": "Japan set its sights on the Tokyo Olympics and has focused on developing young shooters."},
-        {"ja": "砲手は、また照準をつけなおした。", "en": "The gunner adjusted his aim again."}],
- "56": [{"ja": "軈て幽霊は濃い霧の中に消えた。", "en": "Before long, the ghost disappeared into a thick fog."},
-        {"ja": "人々は軈て気づいた。", "en": "Eventually, people realized."}],
- "60": [{"ja": "彼は守備のかなめとしてチームを支えている。", "form": "かなめ", "en": "As the linchpin of the defense, he holds the team together.", "original": true}],
- "72": [{"ja": "覇権安定論は、ひとつの国民国家が世界的な支配的大国、すなわち覇権国であるとき、国際システムが安定すると主張する。", "en": "Hegemonic stability theory holds that the international system is stable when a single nation-state is the dominant world power, that is, a hegemon."}],
- "77": [{"ja": "自意識過剰の人は、周囲の目を異常に気にします。", "en": "Overly self-conscious people worry excessively about how others see them."}],
- "81": [{"ja": "ぶらんこが上下に動いている。", "en": "The swing is moving up and down."}],
- "87": [{"ja": "歩留まりが1％上がるだけで、工場全体の利益が大きく変わります。", "en": "Raising the yield by just 1% makes a big difference to the whole factory's profits."}],
- "91": [{"ja": "コーヒー飲んで目がギンギン。", "en": "I drank coffee and now I'm totally wired."}],
- "99": [{"ja": "美しい景色が突然眼前にあらわれた。", "en": "A beautiful view suddenly appeared before my eyes."}],
- "105": [{"ja": "標準数は等比数列を丸めたもので、機器の寸法や値などを決める場合に用いる。", "en": "Preferred numbers are rounded geometric sequences, used when deciding the dimensions and values of equipment."}],
- "114": [{"ja": "繰り上げ返済をすれば、その分だけ元金が減り、将来支払う利息も減る。", "en": "If you repay early, the principal goes down by that amount, and so does the interest you'll pay in the future."}],
- "122": [{"ja": "天王星の特徴の一つとして、自転軸の極端な傾きが挙げられる。", "en": "One of Uranus's distinctive features is the extreme tilt of its axis of rotation."}],
- "127": [{"ja": "私の秘書は英語が自由自在だ。", "en": "My secretary has a complete command of English."}],
- "130": [{"ja": "Railsで下書き機能を独自に実装した時の過程をまとめてみた。", "en": "I wrote up the process of implementing my own draft feature in Rails."},
-         {"ja": "大半のC++コンパイラはSTLを含むC++標準ライブラリの実装を提供している。", "en": "Most C++ compilers provide an implementation of the C++ standard library, including the STL."},
-         {"ja": "誤記によるバグは、プログラムの実装過程において発生する。", "en": "Bugs caused by typos arise while a program is being implemented."}],
- "142": [{"ja": "既存装置が古く、装置そのものや部品の生産が終了・中止されてしまったというケースは少なくありません。", "en": "It is not uncommon for existing equipment to be so old that the machine itself or its parts are no longer made."},
-         {"ja": "既存装置設備のPLCソフト改造は新規より難解です・・・。", "en": "Modifying the PLC software of existing equipment is harder than starting from scratch..."}],
- "156": [{"ja": "目撃証言を過度に重視すると、間違いが起こりやすいのだ。", "en": "If you rely too heavily on eyewitness testimony, mistakes are likely to happen."},
-         {"ja": "実際の刑事事件の裁判において、心理学者が目撃証言の信頼性などを鑑定することもあります。", "en": "In actual criminal trials, psychologists sometimes assess things like the reliability of eyewitness testimony."}],
- "162": [{"ja": "1年前の今日、2015年9月16日に私は税理士として独立開業しました。", "en": "A year ago today, on September 16, 2015, I went independent and opened my own practice as a tax accountant."}],
- "169": [{"ja": "近年、太陽光発電所での銅線盗難が相次ぎ、社会問題となっています。", "en": "In recent years, a string of copper wire thefts at solar power plants has become a social problem."}],
- "175": [{"ja": "創業者たちが今日の会社の礎を築いた。", "form": "礎を築いた", "en": "The founders laid the foundations of the company as it is today.", "original": true}],
- "183": [{"ja": "子どもの読書離れは由々しき問題だ。", "form": "由々しき", "en": "Children turning away from reading is a serious problem.", "original": true}],
- "188": [{"ja": "旧三井財閥は解体され、確かに消滅した。", "en": "The former Mitsui zaibatsu was broken up and did indeed disappear."}],
- "197": [{"ja": "かれの顔は、驚愕にひきつっていた。", "en": "His face was twisted with shock."},
-         {"ja": "アポロ計画の実際の映像をふんだんに使用したリアルな映像は、誰もが驚愕するだろう。", "en": "The realistic footage, which makes generous use of real film from the Apollo program, will astonish everyone."}],
- "203": [{"ja": "信頼関係はチームワークの要石だ。", "form": "要石", "en": "Trust is the keystone of teamwork.", "original": true}],
- "208": [{"ja": "差出人は郵便局へあて先変更や取戻しを相談できる。", "en": "The sender can ask the post office about redirecting an item or getting it back."}],
- "217": [{"ja": "日ごろからちょっとした病気のときに診てもらうお医者さんをお持ちですか？", "en": "Do you have a doctor who usually sees you when you have a minor illness?"}],
- "241": [{"ja": "ふさふさとしたまっすぐな銀髪をしていました。", "en": "He had thick, straight silver hair."}],
- "244": [{"ja": "さりげない気遣いはどこからくるの？", "en": "Where does unobtrusive thoughtfulness come from?"}],
- "258": [{"ja": "長引く工事は町にとって大きな費えとなった。", "form": "費え", "en": "The drawn-out construction turned into a heavy waste of money for the town.", "original": true}],
- "268": [{"ja": "時計の秒針がたまに止まって見えるのは故障ではなく目の錯覚です。", "en": "When a clock's second hand sometimes seems to stop, it isn't broken; it's an optical illusion."}],
- "274": [{"ja": "夏期講習は志望校別特訓として平日は毎日開講されます。", "en": "The summer course runs every weekday as intensive training tailored to each target school."},
-         {"ja": "夏休みに家でした“特訓”について、記録のために書き残します。", "en": "For the record, I'm writing down the \"intensive training\" we did at home over summer vacation."}],
- "283": [{"ja": "生得的なものや過去に起きてしまった履歴は変えようがありません。", "en": "What you're born with and what has already happened in the past can't be changed."}],
- "291": [{"ja": "その画家は巧まずして自然の美しさを描き出した。", "form": "巧まずして", "en": "The painter captured the beauty of nature without any artifice.", "original": true}],
- "298": [{"ja": "ザーサイは中国・四川省で生まれた発酵食品。", "en": "Zha cai is a fermented food that originated in Sichuan Province, China."}],
- "312": [{"ja": "国会で厳しい精査が求められる局面だ。", "en": "This is a moment that calls for strict scrutiny in the Diet."}]
+ "1": [
+  {
+   "ja": "私は彼女に謎かけをしてみた。",
+   "en": "I tried telling her a riddle."
+  }
+ ],
+ "4": [
+  {
+   "ja": "失敗しても大丈夫、なんくるないさ。",
+   "form": "なんくるない",
+   "en": "It's okay if you fail; it'll all work out.",
+   "original": true
+  }
+ ],
+ "12": [
+  {
+   "ja": "最後まで勝ち残ったチームが、決勝トーナメントへ進出するサバイバル形式となります。",
+   "en": "It's a survival format: the teams that keep winning to the end advance to the final tournament."
+  }
+ ],
+ "17": [
+  {
+   "ja": "古代エジプト人は、なぜ「霊魂不滅」を信じたのですか？",
+   "en": "Why did the ancient Egyptians believe in the immortality of the soul?"
+  }
+ ],
+ "21": [
+  {
+   "ja": "掛軸は床の間だけに掛けるものではありません。",
+   "en": "Hanging scrolls aren't only for the tokonoma."
+  }
+ ],
+ "27": [
+  {
+   "ja": "「なに、お前は、上官の命令に背くのか」",
+   "en": "\"What? You're disobeying your superior officer's orders?\""
+  }
+ ],
+ "33": [
+  {
+   "ja": "ちきりんはモノを考える時、圧倒的に帰納的に考えることが多いです。",
+   "en": "When Chikirin thinks things through, she overwhelmingly tends to reason inductively."
+  }
+ ],
+ "36": [
+  {
+   "ja": "磁気共鳴断層撮影装置（MRI）は磁気によって画像検査を行う装置です。",
+   "en": "A magnetic resonance imaging (MRI) scanner is a machine that performs imaging tests using magnetism."
+  }
+ ],
+ "41": [
+  {
+   "ja": "よくある誤解の一つに、失読症の人は文字や単語が逆さま、あるいは反転して見えるというものがあります。",
+   "en": "One common misconception is that people with dyslexia see letters and words upside down or reversed."
+  }
+ ],
+ "47": [
+  {
+   "ja": "調理台の保護と切り易さを考えて、いつもまな板を使ってます。",
+   "en": "I always use a cutting board to protect my countertop and make chopping easier."
+  }
+ ],
+ "51": [
+  {
+   "ja": "日本は東京五輪に照準を合わせ、射撃選手の若手育成に力を入れてきた。",
+   "en": "Japan set its sights on the Tokyo Olympics and has focused on developing young shooters."
+  },
+  {
+   "ja": "砲手は、また照準をつけなおした。",
+   "en": "The gunner adjusted his aim again."
+  }
+ ],
+ "56": [
+  {
+   "ja": "軈て幽霊は濃い霧の中に消えた。",
+   "en": "Before long, the ghost disappeared into a thick fog."
+  },
+  {
+   "ja": "人々は軈て気づいた。",
+   "en": "Eventually, people realized."
+  }
+ ],
+ "60": [
+  {
+   "ja": "彼は守備のかなめとしてチームを支えている。",
+   "form": "かなめ",
+   "en": "As the linchpin of the defense, he holds the team together.",
+   "original": true
+  }
+ ],
+ "72": [
+  {
+   "ja": "覇権安定論は、ひとつの国民国家が世界的な支配的大国、すなわち覇権国であるとき、国際システムが安定すると主張する。",
+   "en": "Hegemonic stability theory holds that the international system is stable when a single nation-state is the dominant world power, that is, a hegemon."
+  }
+ ],
+ "77": [
+  {
+   "ja": "自意識過剰の人は、周囲の目を異常に気にします。",
+   "en": "Overly self-conscious people worry excessively about how others see them."
+  }
+ ],
+ "81": [
+  {
+   "ja": "ぶらんこが上下に動いている。",
+   "en": "The swing is moving up and down."
+  }
+ ],
+ "87": [
+  {
+   "ja": "歩留まりが1％上がるだけで、工場全体の利益が大きく変わります。",
+   "en": "Raising the yield by just 1% makes a big difference to the whole factory's profits."
+  }
+ ],
+ "91": [
+  {
+   "ja": "コーヒー飲んで目がギンギン。",
+   "en": "I drank coffee and now I'm totally wired."
+  }
+ ],
+ "99": [
+  {
+   "ja": "美しい景色が突然眼前にあらわれた。",
+   "en": "A beautiful view suddenly appeared before my eyes."
+  }
+ ],
+ "105": [
+  {
+   "ja": "標準数は等比数列を丸めたもので、機器の寸法や値などを決める場合に用いる。",
+   "en": "Preferred numbers are rounded geometric sequences, used when deciding the dimensions and values of equipment."
+  }
+ ],
+ "114": [
+  {
+   "ja": "繰り上げ返済をすれば、その分だけ元金が減り、将来支払う利息も減る。",
+   "en": "If you repay early, the principal goes down by that amount, and so does the interest you'll pay in the future."
+  }
+ ],
+ "122": [
+  {
+   "ja": "天王星の特徴の一つとして、自転軸の極端な傾きが挙げられる。",
+   "en": "One of Uranus's distinctive features is the extreme tilt of its axis of rotation."
+  }
+ ],
+ "127": [
+  {
+   "ja": "私の秘書は英語が自由自在だ。",
+   "en": "My secretary has a complete command of English."
+  }
+ ],
+ "130": [
+  {
+   "ja": "Railsで下書き機能を独自に実装した時の過程をまとめてみた。",
+   "en": "I wrote up the process of implementing my own draft feature in Rails."
+  },
+  {
+   "ja": "大半のC++コンパイラはSTLを含むC++標準ライブラリの実装を提供している。",
+   "en": "Most C++ compilers provide an implementation of the C++ standard library, including the STL."
+  },
+  {
+   "ja": "誤記によるバグは、プログラムの実装過程において発生する。",
+   "en": "Bugs caused by typos arise while a program is being implemented."
+  }
+ ],
+ "142": [
+  {
+   "ja": "既存装置が古く、装置そのものや部品の生産が終了・中止されてしまったというケースは少なくありません。",
+   "en": "It is not uncommon for existing equipment to be so old that the machine itself or its parts are no longer made."
+  },
+  {
+   "ja": "既存装置設備のPLCソフト改造は新規より難解です・・・。",
+   "en": "Modifying the PLC software of existing equipment is harder than starting from scratch..."
+  }
+ ],
+ "156": [
+  {
+   "ja": "目撃証言を過度に重視すると、間違いが起こりやすいのだ。",
+   "en": "If you rely too heavily on eyewitness testimony, mistakes are likely to happen."
+  },
+  {
+   "ja": "実際の刑事事件の裁判において、心理学者が目撃証言の信頼性などを鑑定することもあります。",
+   "en": "In actual criminal trials, psychologists sometimes assess things like the reliability of eyewitness testimony."
+  }
+ ],
+ "162": [
+  {
+   "ja": "1年前の今日、2015年9月16日に私は税理士として独立開業しました。",
+   "en": "A year ago today, on September 16, 2015, I went independent and opened my own practice as a tax accountant."
+  }
+ ],
+ "169": [
+  {
+   "ja": "近年、太陽光発電所での銅線盗難が相次ぎ、社会問題となっています。",
+   "en": "In recent years, a string of copper wire thefts at solar power plants has become a social problem."
+  }
+ ],
+ "175": [
+  {
+   "ja": "創業者たちが今日の会社の礎を築いた。",
+   "form": "礎を築いた",
+   "en": "The founders laid the foundations of the company as it is today.",
+   "original": true
+  }
+ ],
+ "183": [
+  {
+   "ja": "子どもの読書離れは由々しき問題だ。",
+   "form": "由々しき",
+   "en": "Children turning away from reading is a serious problem.",
+   "original": true
+  }
+ ],
+ "188": [
+  {
+   "ja": "旧三井財閥は解体され、確かに消滅した。",
+   "en": "The former Mitsui zaibatsu was broken up and did indeed disappear."
+  }
+ ],
+ "197": [
+  {
+   "ja": "かれの顔は、驚愕にひきつっていた。",
+   "en": "His face was twisted with shock."
+  },
+  {
+   "ja": "アポロ計画の実際の映像をふんだんに使用したリアルな映像は、誰もが驚愕するだろう。",
+   "en": "The realistic footage, which makes generous use of real film from the Apollo program, will astonish everyone."
+  }
+ ],
+ "203": [
+  {
+   "ja": "地中深くまで埋まる要石が、地震を起こす鯰の頭を抑えていると古くから伝えられています。",
+   "en": "Legend has long held that the keystone buried deep underground holds down the head of the catfish that causes earthquakes."
+  },
+  {
+   "ja": "信頼関係はチームワークの要石だ。",
+   "form": "要石",
+   "en": "Trust is the keystone of teamwork.",
+   "original": true
+  }
+ ],
+ "208": [
+  {
+   "ja": "差出人は郵便局へあて先変更や取戻しを相談できる。",
+   "en": "The sender can ask the post office about redirecting an item or getting it back."
+  }
+ ],
+ "217": [
+  {
+   "ja": "日ごろからちょっとした病気のときに診てもらうお医者さんをお持ちですか？",
+   "en": "Do you have a doctor who usually sees you when you have a minor illness?"
+  }
+ ],
+ "241": [
+  {
+   "ja": "ふさふさとしたまっすぐな銀髪をしていました。",
+   "en": "He had thick, straight silver hair."
+  }
+ ],
+ "244": [
+  {
+   "ja": "さりげない気遣いはどこからくるの？",
+   "en": "Where does unobtrusive thoughtfulness come from?"
+  }
+ ],
+ "258": [
+  {
+   "ja": "長引く工事は町にとって大きな費えとなった。",
+   "form": "費え",
+   "en": "The drawn-out construction turned into a heavy waste of money for the town.",
+   "original": true
+  }
+ ],
+ "268": [
+  {
+   "ja": "時計の秒針がたまに止まって見えるのは故障ではなく目の錯覚です。",
+   "en": "When a clock's second hand sometimes seems to stop, it isn't broken; it's an optical illusion."
+  }
+ ],
+ "274": [
+  {
+   "ja": "夏期講習は志望校別特訓として平日は毎日開講されます。",
+   "en": "The summer course runs every weekday as intensive training tailored to each target school."
+  },
+  {
+   "ja": "夏休みに家でした“特訓”について、記録のために書き残します。",
+   "en": "For the record, I'm writing down the \"intensive training\" we did at home over summer vacation."
+  }
+ ],
+ "283": [
+  {
+   "ja": "生得的なものや過去に起きてしまった履歴は変えようがありません。",
+   "en": "What you're born with and what has already happened in the past can't be changed."
+  }
+ ],
+ "291": [
+  {
+   "ja": "その画家は巧まずして自然の美しさを描き出した。",
+   "form": "巧まずして",
+   "en": "The painter captured the beauty of nature without any artifice.",
+   "original": true
+  }
+ ],
+ "298": [
+  {
+   "ja": "ザーサイは中国・四川省で生まれた発酵食品。",
+   "en": "Zha cai is a fermented food that originated in Sichuan Province, China."
+  }
+ ],
+ "312": [
+  {
+   "ja": "国会で厳しい精査が求められる局面だ。",
+   "en": "This is a moment that calls for strict scrutiny in the Diet."
+  }
+ ]
 }
