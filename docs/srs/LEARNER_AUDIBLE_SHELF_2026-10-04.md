@@ -1,6 +1,6 @@
 # Learner Audible shelf (screenshots, 2026-10-04)
 
-The learner's audiobook library, Japanese editions unless noted. Currently playing:
+The learner's audiobook library (33 titles downloaded), Japanese editions unless noted. Currently playing:
 『アルゴリズム思考術』 chapter 2 探索と… (12 h left at 1.25×). The learner reads the
 physical book while listening to the narration; this is their most effective study mode
 (`LEARNER_VISION_2026-10-04.md`). Passages in the 講 register should imitate these books'
