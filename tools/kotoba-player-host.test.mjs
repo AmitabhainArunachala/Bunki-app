@@ -78,6 +78,19 @@ describe('host adapter', () => {
       id: 'teiru',
       label: '〜ている',
     });
+    // what the deck player's entry sheet shows: the Japanese the corridor holds, English apart
+    expect(host.lookup(tok('人口', '', 'じんこう', '語', '人口'))).toMatchObject({
+      ja: '',
+      en: 'population',
+    });
+    expect(host.lookup(tok('館', '', 'かん', '字', '館'))).toMatchObject({
+      ja: '音 カン　訓 やかた',
+      en: 'building',
+    });
+    expect(host.lookup(tok('いる', '', '', '文法', 'teiru'))).toMatchObject({
+      ja: '継続',
+      en: 'ongoing',
+    });
     expect(host.lookup(tok('が', '', '', 'other'))).toBeNull();
     expect(host.lookup(tok('無い語', '', 'ないご', '語', null))).toBeNull();
     expect(host.lookup(null)).toBeNull();

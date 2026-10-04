@@ -714,6 +714,244 @@ async function verifyHost(browser, base) {
   );
 }
 
+/* ------------------------------------- tap → define → 覚える (Phase 2 stage C, STANDARD A44) */
+/** the ledger's scheduler fields (an absent ledger or key read as empty, as the engine reads it):
+ * what a tap must leave exactly as it was */
+const SCHEDULE_OF = (key) => `(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}'); return JSON.stringify({ cards: s.cards || {}, log: s.log || [], groupsOff: s.groupsOff || [], suspended: s.suspended || {}, repairs: s.repairs || {}, repairLog: s.repairLog || [] }); })()`;
+const LOOKUPS_OF = (key) => `(JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}').lookups || [])`;
+/** the tap targets' reach: elementFromPoint 21px above and below each sampled word's centre lands on that word */
+const REACH = `(() => {
+  const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
+  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => { const r = t.getClientRects(); if (r.length !== 1) return false; const c = (r[0].top + r[0].bottom) / 2; return c > 80 && c < bar - 30; }).slice(0, 12);
+  const miss = [];
+  for (const t of toks) {
+    const r = t.getClientRects()[0];
+    const x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
+    for (const dy of [-21, 21]) { const hit = document.elementFromPoint(x, y + dy); if (!hit || !t.contains(hit)) miss.push(t.textContent + (dy < 0 ? '↑' : '↓')); }
+  }
+  return { sampled: toks.length, miss, height: toks[0] ? toks[0].getClientRects()[0].height : 0 };
+})()`;
+
+async function verifyTap(browser, base) {
+  const mcd = readJson(DECK_PATH);
+  const side = readJson(resolve(dirname(DECK_PATH), mcd.tokens));
+  const due = (deck, id) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
+  const open = async (q, deck, { prefs = null, state = null } = {}) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(SEEDED);
+    await context.addInitScript(`try { if (!sessionStorage.getItem('__tap_seeded')) { sessionStorage.setItem('__tap_seeded', '1');
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ ruleSeen: true, ...(prefs || {}) }))});
+      ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto(`${base}/index.html${q}`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card');
+    return { context, page, errors };
+  };
+  const env = (page) => page.evaluate(`(() => { const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}'); return { taken: (e.taken || []).map((t) => t.t + ':' + t.id), lists: e.lists || {}, obs: (e.obslog || []).length, srs: JSON.stringify(e.srs || {}) }; })()`);
+  const KEY = 'bunki-cloze:kotoba-mcd';
+
+  // 1. the corridor: a new card of 財政 (km-064-m01), then a due card of 金利 (km-109-m01), whose definition names 利息
+  let o = await open('?deck=mcd', 'kotoba-mcd');
+  try {
+    const { page } = o;
+    await page.waitForLoadState('networkidle');
+    const front = await page.evaluate(`({ toks: document.querySelectorAll('#kp-card .kp-tok').length, roles: document.querySelectorAll('#kp-card .kp-sentence [role="button"], #kp-card .kp-sentence [tabindex]').length, card: document.getElementById('kp-card').dataset.card })`);
+    check('tap: the front has no tap targets, even with the tokens loaded (front pin)', front.toks === 0 && front.roles === 0, JSON.stringify(front));
+    await page.click('#kp-reveal');
+    await page.waitForSelector('#kp-card .kp-sentence .kp-tok');
+    const rows = side.passages[side.cards[front.card]];
+    const card = mcd.words.flatMap((w) => w.cards).find((c) => c.id === front.card);
+    // the lexical tokens outside the target: each is one tap target with that text (a 文法 cue's tokens as one)
+    const marks = [];
+    let at = 0;
+    for (const [t, , m] of card.ruby) {
+      if (m) marks.push([at, at + t.length]);
+      at += t.length;
+    }
+    const want = [];
+    at = 0;
+    for (const [s, , , k = '', ref = ''] of rows) {
+      const inTarget = marks.some(([a, b]) => at < b && at + s.length > a);
+      const last = want.at(-1);
+      if (k && !inTarget) {
+        if (k === '文法' && last?.k === '文法' && last.ref === ref && last.end === at) {
+          last.s += s;
+          last.end += s.length;
+        } else want.push({ s, k, ref, end: at + s.length });
+      }
+      at += s.length;
+    }
+    const back = await page.evaluate(`(() => {
+      const plain = (n) => { const c = n.cloneNode(true); c.querySelectorAll('rt').forEach((r) => r.remove()); return c.textContent; };
+      const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].map(plain);
+      const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
+      const rest = getComputedStyle(t).textDecorationLine;
+      return { toks, def: [...document.querySelectorAll('#kp-card .kp-def .kp-tok')].map((n) => n.textContent), target: document.querySelectorAll('#kp-card .kp-sentence .kp-target.kp-tok').length, rest,
+        roles: [...document.querySelectorAll('#kp-card .kp-tok')].every((n) => n.getAttribute('role') === 'button' && n.tabIndex === 0) };
+    })()`);
+    const missing = want.filter((w) => !back.toks.includes(w.s)).map((w) => w.s);
+    check(
+      `tap: after the reveal every word of ${front.card}'s passage (語・字・文法, ${want.length}) and of its definition is a tap target, the target too; buttons by role, in the tab order`,
+      missing.length === 0 && back.toks.length >= want.length && back.def.length >= 2 && back.target >= 1 && back.roles,
+      JSON.stringify({ want: want.length, got: back.toks.length, missing: missing.slice(0, 5), def: back.def, target: back.target }),
+    );
+    const reach = await page.evaluate(REACH);
+    await page.hover('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
+    const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t); return cs.textDecorationLine + ' ' + cs.textDecorationStyle; })()`);
+    check(
+      'tap: each word reaches 44px tall (a press 21px above or below its centre lands on it), and has no underline until hover or focus, then a dotted one',
+      reach.sampled >= 5 && reach.miss.length === 0 && back.rest === 'none' && hover === 'underline dotted',
+      JSON.stringify({ ...reach, rest: back.rest, hover }),
+    );
+
+    const before = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
+    // a word of the passage that is not this deck's: 人口
+    const tok = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])').first();
+    const tokText = await tok.evaluate((n) => { const c = n.cloneNode(true); c.querySelectorAll('rt').forEach((r) => r.remove()); return c.textContent; });
+    await tok.click();
+    await page.waitForSelector('#kp-sheet');
+    await page.waitForTimeout(250);
+    const sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); const en = s.querySelector('.kp-sheet-en'); return { depth: s.dataset.depth, key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, reading: s.querySelector('.kp-sheet-reading')?.textContent || '', ja: (s.querySelector('.kp-sheet-def') || s.querySelector('.kp-sheet-none'))?.textContent, enOpen: en?.open, enText: en?.querySelector('[lang="en"]')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck'), modal: s.getAttribute('aria-modal'), focus: document.activeElement?.id }; })()`);
+    const ledger1 = await page.evaluate(LOOKUPS_OF(KEY));
+    check(
+      `tap: a word of the passage (${tokText}) opens the entry sheet through the host — its reading, the Japanese sense (or a line that says the dictionary has none), English behind 英語 (closed), 覚える`,
+      sheet.depth === '1' && /^(word|kanji|grammar):/.test(sheet.key) && !!sheet.term && !!sheet.ja && sheet.enOpen === false && !!sheet.enText && sheet.take && !sheet.inDeck && sheet.modal === 'true' && sheet.focus === 'kp-sheet-term',
+      JSON.stringify(sheet),
+    );
+    await page.click('#kp-take');
+    await page.waitForSelector('#kp-chooser');
+    const chooser = await page.evaluate(`({ q: document.querySelector('#kp-chooser .kp-chooser-q')?.textContent, always: document.querySelector('#kp-chooser .kp-pick:disabled')?.textContent, note: document.querySelector('.kp-chooser-note')?.textContent })`);
+    const pending = await env(page);
+    await page.fill('#kp-new-list', 'デッキで見た語');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('[data-pick-list="デッキで見た語"][aria-pressed="true"]');
+    await page.click('#kp-take-save');
+    await page.waitForSelector('.kp-sheet-taken');
+    const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
+    const id = sheet.key.replace(/^\w+:/, '');
+    check(
+      'tap: 覚える asks 「どこに保存しますか？」 as the reader does (覚えるの札 always, a new list), writes nothing until 保存する, then the word is in 覚えるの札 and the list, and the sheet says so',
+      chooser.q === 'どこに保存しますか？' && /覚えるの札/.test(chooser.always || '') && pending.taken.length === before.env.taken.length && after.env.taken.includes(sheet.key) && (after.env.lists['デッキで見た語'] || []).some((x) => x.id === id),
+      JSON.stringify({ chooser, taken: after.env.taken, list: (after.env.lists['デッキで見た語'] || []).map((x) => x.id) }),
+    );
+    check(
+      'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the tap is one lookups[] row',
+      before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 1 && ledger1[0][1] === front.card && ledger1[0][2] === 'p' && ledger1[0][4] === sheet.key && ledger1[0][5] === 1,
+      JSON.stringify({ same: before.sched === after.sched, obs: [before.env.obs, after.env.obs], lookups: ledger1 }),
+    );
+    // keys behind an open sheet do not grade; Escape closes it and gives focus back
+    await page.keyboard.press('3');
+    const graded = (await page.evaluate(SCHEDULE_OF(KEY))) !== before.sched;
+    await page.keyboard.press('Escape');
+    const closed = await page.evaluate(`({ sheet: !!document.getElementById('kp-sheet'), card: document.getElementById('kp-card')?.dataset.card })`);
+    check('tap: with the sheet open the grade keys do nothing; Escape closes it on the same card', !graded && !closed.sheet && closed.card === front.card, JSON.stringify({ graded, ...closed }));
+    if (o.errors.length) check('no page errors with the tap', false, o.errors.slice(0, 2).join(' | '));
+  } finally {
+    await o.context.close();
+  }
+
+  o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: due('kotoba-mcd', 'km-109-m01') });
+  try {
+    const { page } = o;
+    await page.click('#kp-reveal');
+    await page.waitForSelector('#kp-card .kp-sentence .kp-tok');
+    const sched = await page.evaluate(SCHEDULE_OF(KEY));
+    await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
+    await page.waitForSelector('#kp-sheet');
+    const self = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, indeck: s.querySelector('.kp-sheet-indeck')?.textContent, take: s.querySelectorAll('#kp-take, #kp-chooser, .kp-take').length, full: !!s.querySelector('#kp-sheet-full'), defToks: [...s.querySelectorAll('.kp-sheet-def .kp-tok')].map((n) => n.textContent), stop: !!s.querySelector('.kp-sheet-stop') }; })()`);
+    check(
+      'tap: the card’s own word (a word enrolled in this deck) shows 「このデッキにあります」 and no 覚える chooser',
+      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'このデッキにあります' && self.take === 0 && !self.full && !self.stop && self.defToks.includes('利息'),
+      JSON.stringify(self),
+    );
+    await page.click('#kp-sheet .kp-sheet-def .kp-tok[data-deck-word="km-113"]');
+    await page.waitForSelector('#kp-sheet[data-depth="2"]');
+    const deep = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, stop: s.querySelector('.kp-sheet-stop')?.textContent, toks: s.querySelectorAll('.kp-tok').length, def: s.querySelector('.kp-sheet-def')?.textContent, indeck: !!s.querySelector('.kp-sheet-indeck'), back: !!s.querySelector('#kp-sheet-back') }; })()`);
+    check(
+      'tap: a word in the sheet’s definition opens one more sheet (depth 2: 利息, also this deck’s), which says 「ここで止めよう」 and has nothing left to tap; ← goes back',
+      deep.term === '利息' && deep.stop === 'ここで止めよう' && deep.toks === 0 && !!deep.def && deep.indeck && deep.back,
+      JSON.stringify(deep),
+    );
+    await page.click('#kp-sheet-back');
+    await page.waitForSelector('#kp-sheet[data-depth="1"]');
+    await page.click('#kp-sheet-close');
+    // a word of the card's definition (お金) opens its sheet too
+    await page.click('#kp-card .kp-def .kp-tok >> nth=0');
+    await page.waitForSelector('#kp-sheet');
+    const fromDef = await page.evaluate(`document.getElementById('kp-sheet').dataset.key`);
+    const lookups = await page.evaluate(LOOKUPS_OF(KEY));
+    const same = (await page.evaluate(SCHEDULE_OF(KEY))) === sched;
+    check(
+      'tap: lookups[] keeps where and how deep each tap was (passage target, sheet definition at depth 2, card definition) and the schedule is unchanged',
+      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p1,s2,d1' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-113' && lookups[2][4] === fromDef,
+      JSON.stringify({ same, lookups }),
+    );
+    await page.keyboard.press('Escape');
+    await page.click('#kp-grade-good');
+    const graded = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
+    check('tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 3, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
+    if (o.errors.length) check('no page errors in the sheet recursion', false, o.errors.slice(0, 2).join(' | '));
+  } finally {
+    await o.context.close();
+  }
+
+  // 2. the standalone study pages: furigana, this deck's words only, a popover with no 覚える
+  const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
+  try {
+    const seen = [];
+    // a due card whose passage names another word of the deck: 返済 in km-109-m01 (金利), km-114-1 (元金)
+    for (const [file, deckId, cardId] of [['study-mcd.html', 'kotoba-mcd', 'km-109-m01'], ['study.html', 'kotoba-mine', 'km-114-1']]) {
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      await context.addInitScript(`try { if (!sessionStorage.getItem('__tap_seeded')) { sessionStorage.setItem('__tap_seeded', '1');
+        localStorage.setItem('bunki-cloze:prefs:v3:${deckId}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true }))});
+        localStorage.setItem('bunki-cloze:${deckId}', ${JSON.stringify(due(deckId, cardId))}); } } catch {}`);
+      const page = await context.newPage();
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(String(e)));
+      await page.goto(`${release.base}/${file}`, { waitUntil: 'load' });
+      await page.waitForSelector('#kp-start', { timeout: 30000 });
+      await page.click('#kp-start');
+      await page.waitForSelector('#kp-card');
+      const front = await page.evaluate(`document.querySelectorAll('#kp-card .kp-tok').length`);
+      await page.click('#kp-reveal');
+      await page.waitForSelector('#kp-card .kp-def');
+      const key = `bunki-cloze:${deckId}`;
+      const shown = await page.evaluate(`document.getElementById('kp-card').dataset.card`);
+      const sched = await page.evaluate(SCHEDULE_OF(key));
+      const toks = await page.evaluate(`({ all: document.querySelectorAll('#kp-card .kp-tok').length, other: [...document.querySelectorAll('#kp-card .kp-tok:not(.kp-target)')].map((n) => n.dataset.deckWord || ''), rt: document.querySelectorAll('#kp-card .kp-sentence rt').length })`);
+      await page.click('#kp-card .kp-sentence .kp-tok[data-deck-word]:not(.kp-target)');
+      await page.waitForSelector('#kp-pop');
+      const pop = await page.evaluate(`(() => { const p = document.getElementById('kp-pop'); const r = p.getBoundingClientRect(); const en = p.querySelector('details'); return { key: p.dataset.key, term: p.querySelector('.kp-pop-term')?.textContent, reading: p.querySelector('.kp-pop-reading')?.textContent || '', def: p.querySelector('.kp-pop-def')?.textContent || '', enOpen: en?.open, en: en?.querySelector('[lang="en"]')?.textContent || '', note: p.querySelector('.kp-pop-note')?.textContent || '', noteLines: (() => { const n = p.querySelector('.kp-pop-note'); return n ? Math.round(n.getBoundingClientRect().height / parseFloat(getComputedStyle(n).lineHeight)) : 0; })(), take: p.querySelectorAll('.kp-take, #kp-take, .kp-chooser').length, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight, sheet: !!document.getElementById('kp-sheet') }; })()`);
+      const lookups = await page.evaluate(LOOKUPS_OF(key));
+      const same = (await page.evaluate(SCHEDULE_OF(key))) === sched;
+      await page.click('#kp-card .kp-kindchip');
+      const closed = await page.evaluate(`!document.getElementById('kp-pop')`);
+      await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
+      const self = await page.evaluate(`document.getElementById('kp-pop')?.dataset.key`);
+      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed });
+      if (errors.length) check(`no page errors on ${file}`, false, errors.slice(0, 2).join(' | '));
+      await context.close();
+    }
+    check(
+      'tap, standalone (study-mcd.html, study.html): no tap target on the front; after the reveal furigana and only this deck’s own words are tappable (the built-in gloss map); a tap shows a small popover — term, reading, definition, English behind 英語 — with no 覚える and a one-line note saying so; a press elsewhere closes it; one lookups[] row, the schedule unchanged',
+      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /覚える/.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
+      JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
+    );
+  } finally {
+    release.server.close();
+  }
+  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release', f), 'utf8'));
+  check('tap: the study pages carry the gloss map of their own deck (bunki-cloze-gloss) and still no tokens', html.every((t) => t.includes('"format":"bunki-cloze-gloss"') && !t.includes('bunki-cloze-tokens","version') && t.includes('function drawPop') && t.includes('ここで止めよう')), '');
+  // 3. Anki: no tap-to-define, nothing added
+  const anki = ['anki/front.html', 'anki/back.html', 'anki-sentence/front.html', 'anki-sentence/back.html'].map((f) => resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/tools', f)).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
+  check('tap: the Anki templates add nothing for it (no tap-to-define in Anki: furigana only, STANDARD A44)', anki.length >= 2 && anki.every((t) => !/kp-tok|kp-sheet|kp-pop|tap-to-define|onclick/.test(t)), `${anki.length} templates`);
+}
+
 async function verifyBack(browser, base) {
   const mcdDeck = readJson(DECK_PATH);
   const sentDeck = readJson(SENTENCE_DECK_PATH);
@@ -1995,6 +2233,9 @@ async function main() {
 
     console.log('\n— the host lexicon adapter: tokens beside the deck, lookup in the corridor, none standalone');
     await verifyHost(browser, base);
+
+    console.log('\n— tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44)');
+    await verifyTap(browser, base);
 
     console.log('\n— the back hierarchy (CARD_CONTRACT_V2 §2–§4): front pin, tiers, folds, zoom, grade bar');
     await verifyBack(browser, base);

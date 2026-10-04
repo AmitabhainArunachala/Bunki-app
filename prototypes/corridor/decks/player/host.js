@@ -13,8 +13,11 @@
  *   host.take(entry, listId)  → boolean         覚えるの札 (TAKEN_LIST) or a named list; false when not saved
  *   host.lists()              → [{ id, label, size, always? }]
  *
- * An entry is { t: 'word' | 'kanji' | 'grammar', id, label, reading, gloss, level?, seq?, token }:
+ * An entry is { t: 'word' | 'kanji' | 'grammar', id, label, reading, gloss, ja, en, level?, seq?, token }:
  * t and id are the corridor's node, so open() and take() address the same row its reader does.
+ * ja is the Japanese the corridor holds for it (a kanji's 音・訓, a grammar point's 意味; '' for a
+ * word: its dictionary is JMdict, English only) and en its English (the first senses, a kanji's
+ * meaning, a grammar point's mEn); the deck player's entry sheet shows ja and keeps en behind a tap.
  * open() also takes a bare node { t, id, label? } (the back's 文法 links pass one).
  *
  * deps, all from the corridor:
@@ -49,6 +52,8 @@ function wordEntry(deps, token) {
         label: rec.head || id,
         reading: rec.r || '',
         gloss: rec.m?.[0] || '',
+        ja: '',
+        en: (rec.m || []).slice(0, 3).join('; '),
         ...(rec.jlpt ? { level: `N${String(rec.jlpt).replace(/^N/i, '')}` } : {}),
         ...(rec.seq ? { seq: rec.seq } : {}),
         token,
@@ -63,13 +68,17 @@ function kanjiEntry(deps, token) {
   const rec = deps.kanji(glyph);
   if (!rec) return null;
   const reading = token.r || kataToHira(rec.on?.[0]) || (rec.kun?.[0] || '').split('.')[0];
-  return { t: 'kanji', id: glyph, label: glyph, reading, gloss: String(rec.m || '').toLowerCase(), token };
+  const on = (rec.on || []).slice(0, 3).join('・');
+  const kun = (rec.kun || []).slice(0, 3).map((k) => String(k).replace('.', '-')).join('・');
+  const ja = [on && `音 ${on}`, kun && `訓 ${kun}`].filter(Boolean).join('　');
+  return { t: 'kanji', id: glyph, label: glyph, reading, gloss: String(rec.m || '').toLowerCase(), ja, en: String(rec.m || '').toLowerCase(), token };
 }
 
 function grammarEntry(deps, token) {
   const g = deps.grammar(token.ref, token.p || '');
   if (!g) return null;
-  return { t: 'grammar', id: g.id, label: g.p || g.id, reading: '', gloss: g.mJa || g.mEn || '', ...(g.lv ? { level: g.lv } : {}), token };
+  const ja = [g.mJa, g.form].filter(Boolean).join('　');
+  return { t: 'grammar', id: g.id, label: g.p || g.id, reading: '', gloss: g.mJa || g.mEn || '', ja, en: g.mEn || '', ...(g.lv ? { level: g.lv } : {}), token };
 }
 
 function nodeOf(entry, deps) {

@@ -302,6 +302,55 @@
 .kp-method p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
 .kp-blank { color: var(--kp-cyan); }
 
+/* tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44). A word of the
+ * passage or of the definition looks like the text around it: no colour, no box, no underline
+ * until hover or keyboard focus, when a dotted underline says it can be opened. Its reach is
+ * 44px tall across the word's width (the line keeps its own height). */
+.kp-tok { position: relative; cursor: pointer; border-radius: 3px; -webkit-tap-highlight-color: transparent; }
+.kp-tok::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
+.kp-tok:focus { outline: none; }
+.kp-tok:hover, .kp-tok:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 0.3em; }
+.kp-target.kp-tok:hover, .kp-target.kp-tok:focus-visible { text-decoration: underline dotted 2px; }
+/* the entry sheet (with a host): a bottom sheet over the card and the grade bar */
+.kp-sheet-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.42); }
+.kp-sheet { width: 100%; max-width: 40rem; max-height: min(78vh, 640px); overflow-y: auto; overscroll-behavior: contain; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 10px; box-shadow: var(--kp-depth); animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-sheet-top { display: flex; align-items: flex-start; gap: 10px; }
+.kp-sheet-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; min-width: 0; flex: 1; padding-top: 4px; }
+.kp-sheet-term { margin: 0; font-size: 26px; line-height: 1.25; font-weight: 700; color: var(--kp-ink); outline: none; }
+.kp-sheet-reading { font-size: 17px; color: var(--kp-ink-2); }
+.kp-sheet-chips { display: flex; gap: 6px; padding-top: 12px; }
+.kp-sheet-def { margin: 0; font-size: 18px; line-height: 1.7; }
+.kp-sheet-none { margin: 0; font-size: 14px; line-height: 1.6; color: var(--kp-ink-2); }
+.kp-sheet-stop { margin: 0; font-size: 13px; color: var(--kp-mute); letter-spacing: 0.08em; }
+.kp-sheet-indeck, .kp-sheet-taken, .kp-sheet-note { margin: 0; font-size: 15px; color: var(--kp-ink-2); padding: 10px 12px; border: 1px solid var(--kp-line); border-radius: 12px; background: var(--kp-panel-2); }
+.kp-sheet-full { justify-self: start; min-height: 44px; }
+.kp-take { min-height: 48px; width: 100%; border-radius: 14px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 16px; font-weight: 700; }
+.kp-chooser { display: grid; gap: 10px; border: 1px solid var(--kp-line); border-radius: 14px; padding: 12px; background: var(--kp-panel-2); }
+.kp-chooser-q { margin: 0; font-size: 15px; font-weight: 700; }
+.kp-chooser-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.kp-pick { min-height: 44px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); padding: 4px 12px; display: grid; justify-items: start; align-content: center; text-align: left; }
+.kp-pick b { font-size: 14px; }
+.kp-pick small { font-size: 11px; color: var(--kp-ink-2); }
+.kp-pick.is-on { border-color: var(--kp-cyan); }
+.kp-pick.is-on b { color: var(--kp-cyan); }
+.kp-pick:disabled { cursor: default; opacity: 1; }
+.kp-chooser-new { display: flex; gap: 8px; flex: 1 1 100%; }
+.kp-chooser-field { flex: 1; min-width: 0; min-height: 44px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: 15px; padding: 0 12px; }
+.kp-chooser-field::placeholder { color: var(--kp-mute); }
+.kp-chooser-note { margin: 0; font-size: 12px; color: var(--kp-ink-2); }
+.kp-chooser-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.kp-chooser-actions .kp-take-cancel { place-content: center; }
+/* the popover (no host: the standalone study pages) */
+.kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
+.kp-pop-term { font-size: 20px; }
+.kp-pop-reading { font-size: 14px; color: var(--kp-ink-2); flex: 1; }
+.kp-pop-x { margin-left: auto; position: relative; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; align-self: center; }
+.kp-pop-x::after { content: ''; position: absolute; inset: -7px; }
+.kp-pop-def { margin: 0; font-size: 15px; line-height: 1.6; }
+.kp-pop .kp-fold > summary { min-height: 36px; }
+.kp-pop-note { margin: 0; font-size: 11px; line-height: 1.5; color: var(--kp-mute); }
+
 /* ---------------------------------------------------------------- themes
  * Each deck picks its own default; 設定 › 色 switches. Every theme keeps the
  * same meaning per colour (accent = the asked word, red/green = again/good). */

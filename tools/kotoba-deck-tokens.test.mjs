@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { TOKEN_KINDS, cardTokens } from '../prototypes/corridor/decks/player/engine.js';
+import { TOKEN_KINDS, cardTokens, defTokens } from '../prototypes/corridor/decks/player/engine.js';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CORRIDOR = resolve(REPO, 'prototypes/corridor');
@@ -111,6 +111,25 @@ for (const [name, path] of DECKS) {
 
     it('every card’s tokens spell its ruby, read as its ruby reads, and every ref resolves', () => {
       const bad = cards.map((c) => problem(c, cardTokens(c, side))).filter(Boolean);
+      expect(bad.slice(0, 5)).toEqual([]);
+    });
+
+    it('every word’s Japanese definition is tokenised too (side file defs), spelling it exactly, refs resolving', () => {
+      const words = deck.words.filter((w) => w.defJa);
+      const bad = words
+        .map((w) => {
+          const toks = defTokens(w, side);
+          if (!toks) return `${w.id}: no definition tokens, or they do not spell 「${w.defJa}」`;
+          const t = toks.find(
+            (x) =>
+              (x.k === '語' && x.ref && !heads.has(x.ref)) ||
+              (x.k === '字' && !glyphs[x.ref]) ||
+              (x.k === '文法' && !grammar.has(x.ref)),
+          );
+          return t ? `${w.id}: ${t.s} ${t.k} ref ${t.ref}` : '';
+        })
+        .filter(Boolean);
+      expect(words.length).toBeGreaterThan(50);
       expect(bad.slice(0, 5)).toEqual([]);
     });
 

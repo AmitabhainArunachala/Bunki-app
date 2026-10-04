@@ -91,6 +91,7 @@ SENTENCE_METHOD = [
     "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。",
     "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。",
     "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「思い出せた」、だめなら「もう一度」。",
+    "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。",
     "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。",
 ]
 # the two decks built from the same word list, side by side in 集中道場
@@ -534,6 +535,7 @@ METHOD = [
     "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
     "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。",
+    "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。",
     "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。",
 ]
 
@@ -657,6 +659,25 @@ def _merge_compounds(tokens: list[dict], targets: list[tuple[int, int]]) -> list
 
 def encode_tokens(ja: str, form: str) -> list[list[str]]:
     tokens, targets = PASSAGE_TOKENS[(ja, form)]
+    return _encode(ja, tokens, targets)
+
+
+_DEF_TAGGER = None
+
+
+def encode_text(text: str) -> list[list[str]]:
+    """a text with no target (a word's Japanese definition) as tokens, the same rows a passage gets"""
+    global _DEF_TAGGER
+    import build_corridor as bc
+
+    if _DEF_TAGGER is None:
+        from corpus.grading._mecab import get_tagger
+
+        _DEF_TAGGER = get_tagger()
+    return _encode(text, _cover(text, apply_reading_rules(text, bc.tokenise(text, _DEF_TAGGER), bc)), [])
+
+
+def _encode(ja: str, tokens: list[dict], targets: list[tuple[int, int]]) -> list[list[str]]:
     heads = _dict_heads()
     _readings("一")  # loads the kanji table
     tokens = _merge_compounds(tokens, targets)
@@ -698,6 +719,11 @@ def tokens_file(deck: dict) -> dict:
                 passages.append(toks)
             cards[c["id"]] = seen[key]
             used.update(t[4] for t in toks if len(t) > 4 and t[3] == "文法")
+    # each word's Japanese definition, tokenised the same way: the back's 定義 and the entry sheet
+    # tap it (STANDARD A44)
+    defs = {w["id"]: encode_text(w["defJa"]) for w in deck["words"] if w.get("defJa")}
+    for toks in defs.values():
+        used.update(t[4] for t in toks if len(t) > 4 and t[3] == "文法")
     return {
         "format": "bunki-cloze-tokens",
         "version": 1,
@@ -706,6 +732,7 @@ def tokens_file(deck: dict) -> dict:
         "grammar": {g: _GRAMMAR[g]["p"] for g in sorted(used)},
         "passages": passages,
         "cards": cards,
+        "defs": defs,
     }
 
 
@@ -717,12 +744,41 @@ def with_tokens(deck: dict, name: str) -> tuple[dict, dict | None, dict]:
 
     side = tokens_file(deck)
     inline = {**deck, "words": [{**w, "cards": [{**c, "tokens": side["passages"][side["cards"][c["id"]]]} for c in w["cards"]]}
-                                for w in deck["words"]]}
+                                for w in deck["words"]], "defTokens": side["defs"]}
     before, grown = dump(deck), dump(inline)
     report = {"deck": before, "inline": grown, "growth": (grown - before) / before, "side": dump(side)}
     if report["growth"] <= TOKENS_INLINE_BUDGET:
         return inline, None, report
     return {**deck, "tokens": name}, side, report
+
+
+def gloss_map(deck: dict, side: dict) -> dict:
+    """The standalone study page's built-in gloss map (STANDARD A44): where this deck's own words
+    stand in each card's passage and in each word's definition, as [offset, length, word index]
+    into deck.words, whose term, reading, defJa and meaning are the gloss. A token stands for a
+    deck word when its lemma, its ref or its surface is a deck term (the player's rule with a host
+    lexicon too). The page has no dictionary, so nothing else is tappable there."""
+    terms = {w["term"]: i for i, w in enumerate(deck["words"])}
+
+    def spans(rows: list[list]) -> list[list[int]]:
+        out, at = [], 0
+        for r in rows:
+            s = r[0]
+            for key in (r[1] if len(r) > 1 and r[1] else s, r[4] if len(r) > 4 else "", s):
+                if key and key in terms:
+                    out.append([at, len(s), terms[key]])
+                    break
+            at += len(s)
+        return out
+
+    cards = {}
+    for w in deck["words"]:
+        for c in w["cards"]:
+            hit = spans(side["passages"][side["cards"][c["id"]]])
+            if hit:
+                cards[c["id"]] = hit
+    defs = {wid: hit for wid, rows in side.get("defs", {}).items() if (hit := spans(rows))}
+    return {"format": "bunki-cloze-gloss", "version": 1, "deck": deck["id"], "cards": cards, "defs": defs}
 
 
 # ------------------------------------------------------------------ deck
@@ -1162,7 +1218,7 @@ def build_tsv(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
 
 
 # ------------------------------------------------------------------ study.html
-def build_study(deck: dict, out: Path | None = None) -> None:
+def build_study(deck: dict, out: Path | None = None, gloss: dict | None = None) -> None:
     """One offline file: the player's three modules inlined as plain code
     (no runtime eval, so it also runs under a strict content policy)."""
     player = CORRIDOR / "decks" / "player"
@@ -1186,7 +1242,8 @@ def build_study(deck: dict, out: Path | None = None) -> None:
     deck_json = json.dumps(deck, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     pin = (CORRIDOR / "data" / "fsrs-pin.json").read_text("utf-8").strip()
     css = (player / "player.css").read_text("utf-8")
-    page = page.replace("__CSS__", css).replace("__PIN__", pin).replace("__DECK__", deck_json)
+    gloss_json = json.dumps(gloss, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    page = page.replace("__CSS__", css).replace("__PIN__", pin).replace("__GLOSS__", gloss_json).replace("__DECK__", deck_json)
     page = page.replace("__CODE__", code.replace("</script", "<\\/script"))
     (out or RELEASE / "study.html").write_text(page, "utf-8")
 
@@ -1340,7 +1397,8 @@ def main() -> int:
             continue
         build_tsv(deck, spec, release)
         build_anki(deck, spec, release)
-        build_study(study_deck, release / spec["out"][2])  # the study page has no host lexicon: no tokens
+        # the study page has no host lexicon and bundles no tokens: only the deck's own words, glossed
+        build_study(study_deck, release / spec["out"][2], gloss_map(study_deck, side if side is not None else tokens_file(study_deck)))
         attribution = release / f"ATTRIBUTION-{spec['id']}.md"
         attribution.write_text(attribution_md(deck, PROFILE), "utf-8")
         outs = ", ".join([*spec["out"], attribution.name])

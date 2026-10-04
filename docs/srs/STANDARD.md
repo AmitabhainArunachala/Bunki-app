@@ -924,3 +924,30 @@ keep furigana only. A token is a dictionary word, not a UniDic short unit: adjac
 units that together spell a boot-core head with the same reading are one token. A grammar cue
 that starts on a nominal (上, こと, よう) counts only after a predicate, and a cue ending in で
 does not count before ある. Why: learning-design.md §3, integration.md A2.
+
+**A44 → S26, S39, S49, S51 (Phase 2, stage C; completes CARD_CONTRACT_V2 §3, last paragraph).**
+Adds: "After the reveal only, every word of the passage and of the Japanese definition is a tap
+target: each 語・字 token, a grammar cue as one target, the target itself, and any token that is a
+word of this deck. Particles, endings and punctuation are not words and stay plain. A target has
+no colour, box or underline at rest; hover or keyboard focus draws a dotted underline. Its reach
+is 44px tall across the word's width. The front never has one. With a host lexicon (the corridor)
+a tap opens the player's entry sheet, filled through the adapter (A43). The sheet shows the reading,
+then the Japanese sense: a deck word's definition, a grammar point's 意味, a kanji's 音・訓. The
+corridor's dictionary is English only, so for any other word the sheet says so in Japanese. English
+waits behind 英語. Then comes the reader's 覚える chooser (どこに保存しますか？, 覚えるの札 always,
+named lists, a new list, nothing saved until 保存する) and a door to the corridor's full entry. A
+word of this deck shows 「このデッキにあります」 and no chooser (A17); the card's own word is one. A
+word in the sheet's definition opens one more sheet. That second sheet shows 「ここで止めよう」 and
+has nothing left to tap (Khatz's cut-off, depth 2). While a sheet is open, the grade keys do nothing,
+the grade bar sits under its backdrop, and Escape closes it. A tap is capture, never evidence. It
+never grades, never changes a card's schedule, never adds a card, and never writes the corridor's
+observation log. It is one row in the ledger's new `lookups` field ([iso, cardId, where p|d|s, surface,
+key, depth], last 2,000). Ledgers without the field read as empty, and undo keeps the rows. Without
+a host (the standalone study pages), the page carries a built-in gloss map (`bunki-cloze-gloss`, the
+deck's own words' offsets in each passage and definition, from build.py `gloss_map`) beside its
+furigana. Only those words are tappable. A tap shows a small popover with the term, reading,
+definition and English behind 英語, but no 覚える, and a one-line note says so. Anki has no
+tap-to-define: the templates are unchanged (furigana only)." The tokens side file gains `defs`,
+each word's definition as tokens (format version 1, additive). The swipe now takes pointer capture
+only once the finger moves, so a tap on a word stays a click on it. The deck method text says that
+words on the back can be tapped. Why: learning-design.md §3, integration.md A2, RESEARCH #2.
