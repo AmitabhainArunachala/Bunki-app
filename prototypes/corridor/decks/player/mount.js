@@ -3,14 +3,19 @@
  * word list and settings. The schedule is this deck's own ledger in
  * localStorage (`bunki-cloze:<deck id>`), never the corridor's word queue.
  *
- *   render(main, { deckId, storage, onLeave, openEntry })
+ *   render(main, { deckId, storage, onLeave, openEntry, host })
  *
  * openEntry({ t: 'grammar', id }) is optional: a host that can show a grammar entry passes it,
  * and the back's 文法 links call it; without it they are plain labels.
+ * host is optional too: the host lexicon adapter (decks/player/host.js, built by the corridor)
+ * { name, lookup(token), open(entry), isTaken(entry), take(entry, listId), lists() }. The
+ * corridor passes one; the standalone study pages have none (null), and nothing here pretends
+ * to a dictionary it does not have. With a host and no openEntry, 文法 links open through it.
  */
 import {
   RATINGS,
   buildQueue,
+  cardTokens,
   createScheduler,
   grade,
   indexDeck,
@@ -51,6 +56,46 @@ async function loadDeck(deckId) {
   return entry;
 }
 
+/* the deck's tokens side file (deck.tokens, build.py with_tokens), fetched once, on demand:
+ * only a host lexicon has anything to do with them, so nothing loads them at start */
+const tokenFiles = new Map();
+function loadTokens(deckId, deck) {
+  if (typeof deck?.tokens !== 'string') return Promise.resolve(null);
+  if (!tokenFiles.has(deckId)) {
+    const packed = window.__CORRIDOR_BUNDLE__?.[`decks/${deckId}/tokens`];
+    tokenFiles.set(
+      deckId,
+      packed
+        ? Promise.resolve(packed)
+        : fetchJson(new URL(`../${deckId}/${deck.tokens}`, import.meta.url)).catch(() => {
+            tokenFiles.delete(deckId); // a failed fetch is retried on the next ask
+            return null;
+          }),
+    );
+  }
+  return tokenFiles.get(deckId);
+}
+
+/** one card's tokens [{ s, b, r, k, ref, at, p? }] (engine cardTokens), or null when the deck has none */
+export async function tokensFor(deckId, cardId) {
+  const { deck, index } = await loadDeck(deckId);
+  const hit = index.cards.get(cardId);
+  if (!hit) return null;
+  if (Array.isArray(hit.card.tokens)) return cardTokens(hit.card);
+  return cardTokens(hit.card, await loadTokens(deckId, deck));
+}
+
+const HOST_METHODS = ['lookup', 'open', 'isTaken', 'take', 'lists'];
+/** the host adapter as given, or null when it is missing or lacks a method */
+function hostOf(host) {
+  return host && HOST_METHODS.every((m) => typeof host[m] === 'function') ? host : null;
+}
+
+/** the host lexicon adapter of the mounted player, or null (standalone, or no host passed) */
+export function hostAdapter() {
+  return ctx?.host || null;
+}
+
 /* ------------------------------------------------------------- state */
 /* mode: 'read' (読んで思い出す, the contract's default), 'self' (穴埋め, the MCD blank preset) or
  * 'choice' (4択); gloss: the English fold on the back starts closed ('tap') or open ('show', the
@@ -62,7 +107,7 @@ const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap',
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0 };
-let ctx = null; // { root, deck, index, storage, onLeave, openEntry, state, prefs, notice }
+let ctx = null; // { root, deck, index, storage, onLeave, openEntry, host, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
 /** the ledger as it was just before a restore replaced it */
@@ -821,7 +866,7 @@ function seeAlsoLine(card, word) {
         ctx.openEntry
           ? btn('kp-see-link', g.p || g.id, (e) => {
               e.stopPropagation();
-              ctx.openEntry({ t: 'grammar', id: g.id });
+              ctx.openEntry({ t: 'grammar', id: g.id, label: g.p });
             }, { 'data-grammar': g.id })
           : Object.assign(el('span', 'kp-see-item', g.p || g.id), { title: g.id }),
       );
@@ -1535,9 +1580,12 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null } = {}) {
   ensureCss();
   const root = el('div', 'kp');
+  const lexicon = hostOf(host);
+  // which lexicon this player answers taps from: the corridor's, or none (the standalone pages)
+  root.dataset.host = lexicon ? String(lexicon.name || 'host') : 'none';
   root.append(el('p', 'kp-sub', '読み込み中…'));
   main.append(root);
   const { deck, index } = await loadDeck(deckId);
@@ -1548,7 +1596,8 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     index,
     storage,
     onLeave,
-    openEntry: typeof openEntry === 'function' ? openEntry : null,
+    openEntry: typeof openEntry === 'function' ? openEntry : lexicon ? (node) => lexicon.open(node) : null,
+    host: lexicon,
     prefs: prefsFor(storage, deck),
   };
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));

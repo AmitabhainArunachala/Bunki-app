@@ -605,6 +605,115 @@ function verifyBackParity() {
   check('parity: the study pages bundle this player; the Anki fronts show no readings, English or hint; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards, 出典 the last fold) and translate only the target sentence; Anki edges and first chips by item kind (the retuned 字 hue), 形容動詞 on な-adjectives', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
 }
 
+/* ------------------------------------- the host lexicon adapter (Phase 2 stage B) */
+/** a card of the MCD deck whose tokens hold a 語, a 字 and a 文法 token, with its side file */
+function hostProbe() {
+  const deck = readJson(DECK_PATH);
+  const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
+  const has = (rows, k) => rows.some((t) => t[3] === k && t[4]);
+  const id = Object.keys(side.cards).find((cid) => ['語', '字', '文法'].every((k) => has(side.passages[side.cards[cid]], k)));
+  return { deck, side, id };
+}
+
+async function verifyHost(browser, base) {
+  const { deck, side, id } = hostProbe();
+  check('tokens: both decks name a side file (deck.tokens) that build.py wrote beside them, and a card holds 語, 字 and 文法 tokens', deck.tokens === 'tokens.json' && readJson(SENTENCE_DECK_PATH).tokens === 'tokens.json' && side.format === 'bunki-cloze-tokens' && !!id, `${deck.tokens} · probe ${id}`);
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(SEEDED);
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const fetched = [];
+  page.on('request', (r) => fetched.push(new URL(r.url()).pathname));
+  try {
+    await page.goto(`${base}/index.html?deck=mcd`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    const before = fetched.filter((p) => p.endsWith('/tokens.json')).length;
+    const ledgerBefore = await page.evaluate(`localStorage.getItem('bunki-cloze:kotoba-mcd')`);
+    const o = await page.evaluate(`(async () => {
+      const m = await import(new URL('decks/player/mount.js', location.href).href);
+      const h = m.hostAdapter();
+      const toks = await m.tokensFor('kotoba-mcd', ${JSON.stringify(id)});
+      const pick = (k) => toks.find((t) => t.k === k && t.ref);
+      const word = h.lookup(pick('語')), kanji = h.lookup(pick('字')), grammar = h.lookup(pick('文法'));
+      const other = h.lookup(toks.find((t) => t.k === 'other'));
+      const env = () => JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+      const obsBefore = (env().obslog || []).length;
+      const lists0 = h.lists();
+      const takenBefore = h.isTaken(word);
+      const took = h.take(word);
+      const listed = h.take(kanji, 'デッキで見た字');
+      const after = env();
+      return {
+        host: document.querySelector('.kp')?.dataset.host,
+        methods: ['lookup', 'open', 'isTaken', 'take', 'lists'].filter((k) => typeof h?.[k] === 'function').length,
+        tokens: toks.length, spells: toks.map((t) => t.s).join('').length,
+        word, kanji: kanji && { t: kanji.t, id: kanji.id, gloss: kanji.gloss }, grammar: grammar && { t: grammar.t, id: grammar.id, label: grammar.label },
+        other,
+        lists0: lists0.map((l) => l.id), takenBefore, took, listed,
+        takenAfter: h.isTaken(word), kanjiTaken: h.isTaken(kanji),
+        rows: after.taken.filter((t) => t.id === word.id || t.id === kanji.id).map((t) => t.t + ':' + t.id),
+        list: (after.lists?.['デッキで見た字'] || []).map((x) => x.t + ':' + x.id),
+        lists1: h.lists().map((l) => l.id + '=' + l.size),
+        obs: (after.obslog || []).length - obsBefore,
+      };
+    })()`);
+    const loaded = fetched.filter((p) => p.endsWith('/tokens.json')).length - before;
+    const ledgerAfter = await page.evaluate(`localStorage.getItem('bunki-cloze:kotoba-mcd')`);
+    check(
+      'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, lists); the tokens side file loads only when asked',
+      o.host === 'corridor' && o.methods === 5 && before === 0 && loaded === 1,
+      JSON.stringify({ host: o.host, methods: o.methods, tokensFetchedAtStart: before, onAsk: loaded }),
+    );
+    check(
+      `host: lookup of known tokens on ${id} returns entries — a 語 with its reading and gloss, a 字 from kanji.json, a 文法 point from the grammar table; a particle returns null`,
+      o.word?.t === 'word' && !!o.word.label && !!o.word.reading && !!o.word.gloss && o.kanji?.t === 'kanji' && !!o.kanji.gloss && o.grammar?.t === 'grammar' && !!o.grammar.label && o.other === null && o.spells > 0,
+      JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other }),
+    );
+    check(
+      'host: take() writes 覚えるの札 (and a named list) through the corridor store, isTaken() then says so; the deck ledger and the observation log are untouched',
+      o.lists0[0] === '@taken' && !o.takenBefore && o.took && o.listed && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && o.list.length === 1 && o.lists1.includes('デッキで見た字=1') && o.obs === 0 && ledgerAfter === ledgerBefore,
+      JSON.stringify({ lists0: o.lists0, rows: o.rows, list: o.list, lists1: o.lists1, obs: o.obs, ledgerSame: ledgerAfter === ledgerBefore }),
+    );
+    await page.evaluate(`(async () => {
+      const m = await import(new URL('decks/player/mount.js', location.href).href);
+      const toks = await m.tokensFor('kotoba-mcd', ${JSON.stringify(id)});
+      const h = m.hostAdapter();
+      h.open(h.lookup(toks.find((t) => t.k === '語' && t.ref)));
+    })()`);
+    await page.waitForSelector('#sheet', { timeout: 8000 });
+    const sheet = await page.evaluate(`({ node: document.querySelector('#sheet')?.dataset.node, take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed'), deck: !!document.querySelector('.kp') })`);
+    check('host: open(entry) shows the corridor’s own entry sheet for the word (its 覚える already on), over the deck', /^word:/.test(sheet.node || '') && sheet.take === 'true' && sheet.deck, JSON.stringify(sheet));
+    if (errors.length) check('no page errors with the host adapter', false, errors.slice(0, 2).join(' | '));
+  } finally {
+    await context.close();
+  }
+  const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
+  const seen = [];
+  try {
+    for (const page of ['study-mcd.html', 'study.html']) {
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const p = await context.newPage();
+      const asked = [];
+      p.on('request', (r) => asked.push(new URL(r.url()).pathname));
+      await p.goto(`${release.base}/${page}`, { waitUntil: 'load' });
+      await p.waitForSelector('#kp-start', { timeout: 30000 });
+      const host = await p.evaluate(`document.querySelector('.kp')?.dataset.host`);
+      seen.push({ page, host, tokens: asked.filter((a) => a.includes('tokens')).length });
+      await context.close();
+    }
+  } finally {
+    release.server.close();
+  }
+  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release', f), 'utf8'));
+  check(
+    'host: the standalone study pages mount with a null adapter (data-host none), bundle no host.js and no tokens, and fetch none',
+    seen.every((x) => x.host === 'none' && x.tokens === 0) && html.every((t) => !t.includes('createHost') && !t.includes('bunki-cloze-tokens","version') && !/"tokens":"tokens/.test(t) && t.includes('function hostAdapter')),
+    JSON.stringify(seen),
+  );
+}
+
 async function verifyBack(browser, base) {
   const mcdDeck = readJson(DECK_PATH);
   const sentDeck = readJson(SENTENCE_DECK_PATH);
@@ -1449,14 +1558,20 @@ async function verifyReview(browser, base) {
       await start(o.page);
       await revealCard(o.page);
       const see = await o.page.evaluate(`(() => { const s = document.getElementById('kp-see'); if (!s) return null; return { prev: s.previousElementSibling?.className, inFolds: s.parentElement.classList.contains('kp-folds'), labels: [...s.querySelectorAll('.kp-see-label')].map((n) => n.textContent),
-        links: [...s.querySelectorAll('.kp-see-link')].map((b) => b.dataset.word), items: [...s.querySelectorAll('.kp-see-item')].map((n) => n.textContent) }; })()`);
-      await o.page.click('#kp-see .kp-see-link');
+        links: [...s.querySelectorAll('.kp-see-link')].map((b) => b.dataset.word || 'grammar:' + b.dataset.grammar), items: [...s.querySelectorAll('.kp-see-item')].map((n) => n.textContent) }; })()`);
+      // the corridor passes its host adapter, so the grammar point opens the corridor's own grammar sheet
+      await o.page.click('#kp-see [data-grammar]');
+      await o.page.waitForSelector('#sheet', { timeout: 8000 });
+      const sheet = await o.page.evaluate(`({ node: document.querySelector('#sheet')?.dataset.node, head: document.querySelector('#sheet .headword')?.textContent })`);
+      await o.page.keyboard.press('Escape');
+      await o.page.waitForSelector('#sheet', { state: 'detached', timeout: 8000 });
+      await o.page.click('#kp-see .kp-see-link[data-word]');
       await o.page.waitForSelector('.kp-row.is-open');
       const opened = await o.page.evaluate(`document.querySelector('.kp-row.is-open')?.dataset.word`);
       check(
-        'd) a see-also and a grammar id in the deck show as one line right after the kanji fold: 参照 links to a deck word (語の一覧), a word outside the deck and the grammar point (no host entry to open) as text',
-        see && see.inFolds && see.prev === 'kp-fold kp-f-kanji' && see.labels.join() === '参照,文法' && see.links.join() === 'km-188' && see.items.join() === '国家予算,〜ながら' && opened === 'km-188',
-        JSON.stringify({ see, opened }),
+        'd) a see-also and a grammar id in the deck show as one line right after the kanji fold: 参照 links to a deck word (語の一覧) and shows a word outside the deck as text; in the corridor the grammar point opens the corridor’s grammar sheet through the host adapter',
+        see && see.inFolds && see.prev === 'kp-fold kp-f-kanji' && see.labels.join() === '参照,文法' && see.links.join() === 'km-188,grammar:n4-nagara' && see.items.join() === '国家予算' && /^grammar:/.test(sheet.node || '') && /ながら/.test(sheet.head || '') && opened === 'km-188',
+        JSON.stringify({ see, sheet, opened }),
       );
     } finally {
       await close(o);
@@ -1877,6 +1992,9 @@ async function main() {
 
     console.log('\n— answering: swipes, buttons, 設定, contrast');
     await verifyDelivery(browser, base);
+
+    console.log('\n— the host lexicon adapter: tokens beside the deck, lookup in the corridor, none standalone');
+    await verifyHost(browser, base);
 
     console.log('\n— the back hierarchy (CARD_CONTRACT_V2 §2–§4): front pin, tiers, folds, zoom, grade bar');
     await verifyBack(browser, base);

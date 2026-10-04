@@ -538,6 +538,138 @@ METHOD = [
 ]
 
 
+# ------------------------------------------------------------------ tokens (the tap source)
+# Per card, the passage as dictionary-sized tokens (CARD_CONTRACT_V2, learning-design §3):
+# ruby[] stays the display source, tokens[] are what a host taps and looks up. The token
+# surfaces spell the same string as the ruby surfaces, in order, so the player can align
+# the two by character offset. One token is [surface, lemma, reading, kind, ref], trailing
+# empty fields dropped:
+#   lemma    UniDic's dictionary form (書字形基本形) when it differs from the surface, else ""
+#   reading  hiragana, only when the surface has kanji, else ""
+#   kind     語 (a word), 字 (a lone kanji the dictionary has no head for: 的, 性 …),
+#            文法 (inside a grammar cue of data/original/grammar-v11.json), "" (other:
+#            particles, endings, punctuation)
+#   ref      what the host lexicon opens: a boot-core dictionary head (data/share_alike/
+#            dict.json) for 語, the glyph for 字, the grammar id for 文法; "" when none
+#            exists at build time (a deep-tier word the host may still resolve by lemma)
+# The tokens ride beside deck.json when they would grow it by more than TOKENS_INLINE_BUDGET.
+PASSAGE_TOKENS: dict[tuple[str, str], tuple[list[dict], list[tuple[int, int]]]] = {}
+TOKENS_INLINE_BUDGET = 0.25
+CONTENT_POS = {"名詞", "代名詞", "動詞", "形容詞", "形状詞", "副詞", "連体詞", "接続詞", "感動詞"}
+AFFIX_POS = {"接頭辞", "接尾辞"}
+_HEADS: set | None = None
+_CUES: list[tuple[str, str]] | None = None
+
+
+def _dict_heads() -> set:
+    global _HEADS
+    if _HEADS is None:
+        _HEADS = set(json.loads((CORRIDOR / "data" / "share_alike" / "dict.json").read_text("utf-8"))["words"])
+    return _HEADS
+
+
+def _grammar_cues() -> list[tuple[str, str]]:
+    """(cue, grammar id), longest cue first"""
+    global _CUES
+    if _CUES is None:
+        grammar_refs([])  # loads the table
+        _CUES = sorted(((cue, g["id"]) for g in _GRAMMAR.values() for cue in g.get("cues", []) if cue),
+                       key=lambda x: -len(x[0]))
+    return _CUES
+
+
+def _grammar_spans(tokens: list[dict], targets: list[tuple[int, int]]) -> dict[int, str]:
+    """token index → grammar id, for each run of whole tokens that spells a cue; a run that
+    touches the card's target stays lexical (the target is the card's own word)"""
+    starts, pos = [], 0
+    for t in tokens:
+        starts.append(pos)
+        pos += len(t["s"])
+    ends = {st + len(t["s"]): i for i, (t, st) in enumerate(zip(tokens, starts))}
+    text = "".join(t["s"] for t in tokens)
+    out: dict[int, str] = {}
+    for i, st in enumerate(starts):
+        if i in out:
+            continue
+        for cue, gid in _grammar_cues():
+            if not text.startswith(cue, st) or (st + len(cue)) not in ends:
+                continue
+            last = ends[st + len(cue)]
+            if any(a < st + len(cue) and st < b for a, b in targets) or any(k in out for k in range(i, last + 1)):
+                continue
+            for k in range(i, last + 1):
+                out[k] = gid
+            break
+    return out
+
+
+def encode_tokens(ja: str, form: str) -> list[list[str]]:
+    tokens, targets = PASSAGE_TOKENS[(ja, form)]
+    heads = _dict_heads()
+    _readings("一")  # loads the kanji table
+    grammar = _grammar_spans(tokens, targets)
+    out = []
+    for i, t in enumerate(tokens):
+        s, lemma, pos = t["s"], t.get("b") or t["s"], t.get("p", "")
+        reading = kata_to_hira(t.get("r") or "") if KANJI.search(s) else ""
+        kind, ref = "", ""
+        if i in grammar:
+            kind, ref = "文法", grammar[i]
+        elif pos in CONTENT_POS or pos in AFFIX_POS:
+            ref = lemma if lemma in heads else s if s in heads else ""
+            if ref or (t.get("c") and pos not in AFFIX_POS):
+                kind = "語"
+            elif len(s) == 1 and KANJI.match(s) and s in _KANJI_DB:
+                kind, ref = "字", s
+        row = [s, lemma if lemma != s else "", reading, kind, ref]
+        while len(row) > 1 and row[-1] == "":
+            row.pop()
+        out.append(row)
+    if "".join(r[0] for r in out) != ja:
+        raise SystemExit(f"tokens do not spell 「{ja[:20]}…」")
+    return out
+
+
+def tokens_file(deck: dict) -> dict:
+    """the deck's tokens: each distinct passage once, cards pointing at it by index"""
+    passages: list[list] = []
+    seen: dict[str, int] = {}
+    cards: dict[str, int] = {}
+    used: set[str] = set()
+    for w in deck["words"]:
+        for c in w["cards"]:
+            toks = encode_tokens(c["ja"], c["form"])
+            key = json.dumps(toks, ensure_ascii=False)
+            if key not in seen:
+                seen[key] = len(passages)
+                passages.append(toks)
+            cards[c["id"]] = seen[key]
+            used.update(t[4] for t in toks if len(t) > 4 and t[3] == "文法")
+    return {
+        "format": "bunki-cloze-tokens",
+        "version": 1,
+        "deck": deck["id"],
+        "fields": ["s", "b", "r", "k", "ref"],
+        "grammar": {g: _GRAMMAR[g]["p"] for g in sorted(used)},
+        "passages": passages,
+        "cards": cards,
+    }
+
+
+def with_tokens(deck: dict, name: str) -> tuple[dict, dict | None, dict]:
+    """(deck, side file or None, size report). Inline card.tokens when they grow deck.json by at
+    most TOKENS_INLINE_BUDGET; otherwise deck.tokens names the side file and the cards stay as they are."""
+    dump = lambda d: len(json.dumps(d, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) + 1
+    side = tokens_file(deck)
+    inline = {**deck, "words": [{**w, "cards": [{**c, "tokens": side["passages"][side["cards"][c["id"]]]} for c in w["cards"]]}
+                                for w in deck["words"]]}
+    before, grown = dump(deck), dump(inline)
+    report = {"deck": before, "inline": grown, "growth": (grown - before) / before, "side": dump(side)}
+    if report["growth"] <= TOKENS_INLINE_BUDGET:
+        return inline, None, report
+    return {**deck, "tokens": name}, side, report
+
+
 # ------------------------------------------------------------------ deck
 # a radical and its compressed form (手/扌, 攴/攵 …) count as one part
 RADICAL_TWINS = {"手": "扌", "攴": "攵", "襾": "覀", "人": "亻", "水": "氵", "心": "忄", "火": "灬", "刀": "刂", "犬": "犭",
@@ -778,6 +910,7 @@ def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
         marks.append((a, b, _form_reading(ja, tokens, a, b, c, form), 1 if n == 0 else 3))
     if not marks:
         raise ValueError(f"{form!r} is not in {ja!r}")
+    PASSAGE_TOKENS[(ja, form)] = (tokens, [(a, b) for a, b, _r, _m in marks])
     return _ordered(ja, tokens, marks)
 
 
@@ -1134,15 +1267,25 @@ def main() -> int:
             path = release / f"deck-{spec['id']}.json"
         else:
             path = CORRIDOR / "decks" / spec["id"] / "deck.json"
+        tokens_path = path.with_name(f"tokens-{spec['id']}.json" if public and out_dir is None else "tokens.json")
+        study_deck = deck
+        deck, side, size = with_tokens(deck, tokens_path.name)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(deck, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
+        if side is not None:
+            tokens_path.write_text(json.dumps(side, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
+        elif tokens_path.exists():
+            tokens_path.unlink()
+        print(f"· tokens {spec['id']}: inline would grow deck.json {size['deck']:,} → {size['inline']:,} bytes "
+              f"(+{size['growth']:.0%}, budget {TOKENS_INLINE_BUDGET:.0%}); "
+              + (f"side file {tokens_path.name} {size['side']:,} bytes, loaded on demand" if side is not None else "inline"))
         n = sum(len(w["cards"]) for w in deck["words"])
         if out_dir is not None:
             print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path}")
             continue
         build_tsv(deck, spec, release)
         build_anki(deck, spec, release)
-        build_study(deck, release / spec["out"][2])
+        build_study(study_deck, release / spec["out"][2])  # the study page has no host lexicon: no tokens
         attribution = release / f"ATTRIBUTION-{spec['id']}.md"
         attribution.write_text(attribution_md(deck, PROFILE), "utf-8")
         outs = ", ".join([*spec["out"], attribution.name])
