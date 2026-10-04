@@ -731,3 +731,101 @@ identity manifest keyed by word, passage text and card kind, never from array po
 card that disappears keeps its ID reserved; a new card takes the next free number for its
 word. The build fails under `--frozen` if a key has no manifest entry." Why: F26;
 `build.py:240–242,303` number cards by position and `guid_for(card id, deck id)` follows.
+
+## Amendments (card contract v2, 2026-10-04)
+
+These amendments record what [card contract v2](CARD_CONTRACT_V2.md) changed in the deck
+player (`prototypes/corridor/decks/player/`), in the standalone study pages `build.py`
+bundles from it, and, where Anki can carry it, in the `decks/kotoba-mine/tools/anki*/`
+templates. They follow the same form as A01–A25: each quotes the rule it changes, and the
+amendment applies where they conflict. None of them changes FSRS numbers, the unlock
+constants, card IDs, Anki GUIDs or model IDs, or the `bunki-cloze:<deckId>` and
+`bunki-cloze:prefs:v3:<deckId>` ledger keys; new prefs fields and ledger keys are optional
+and read as empty when absent.
+
+**A26 → S24.** Adds to "Front: … only cues allowed by the contract": "On both decks the
+front shows no readings, no English and no tap targets inside the passage. The tap-for-
+furigana path and the English hint are removed; a stored `furigana` pref is ignored and a
+stored `hint: 'en'` reads as `'ja'`. A hint appears on a 読んで思い出す front only after the
+learner added one through the repair ladder (A35), and that card is marked
+`data-repaired`." Why: contract §2 locks the front. Open: the MCD blank preset (`mode:
+'self'`, still the default) prints the Japanese definition under the gap as its hint; the
+contract scopes that preset and the hint is left for the front stage.
+
+**A27 → S25.** Replaces the back order with two tiers: "Tier one, under the passage with no
+taps: the target with its reading and part-of-speech badge (pitch only when the deck
+carries it; none does yet), a reading over every kanji of the passage, the one Japanese
+definition as the primary line, and a Japanese usage note only when there is one. Tier
+two, native `<details>` folds in this order: 英語 (gloss and English note, muted), 英訳
+(the target sentence only, never the whole passage; a card whose sentences cannot be
+matched to the English says 未対応 instead of dropping the fold), 漢字の形と意味 (open by
+default on a 字 card), 類語 (only dictionary or collection entries, only once the card is
+in review state), the word's other passages as titles only, then the source line. A fold
+the learner opened stays open through the zoom toggle and the rule's dismiss." Why:
+contract §3. At 390×844 the target, its reading and the definition stay on the first
+screen above the grade bar, even with the repair ladder shown.
+
+**A28 → S25.** Replaces "plain English gloss (recommended visible default; optional
+Japanese-first order)" with: "The English gloss sits behind the 英語 fold by default
+(`deck.defaults.gloss: 'tap'` on both decks). A per-deck switch, 設定 › 英語の意味 ›
+いつも開いておく (`prefs.gloss: 'show'`), opens it on every card. English is never coloured
+and carries `lang="en"` on the English text itself, not on the fold." Why: contract §3.5
+keeps the earlier always-show request available while making Japanese the default.
+
+**A29 → S27.** Replaces "Hard/Easy may be an advanced option with plain guidance" with:
+"The scheduled grade bar is もう一度／思い出せた only, on both decks. The four-button
+setting and keys 2 and 4 are removed. The rule 「答えを見て理解が深まったなら もう一度」
+shows once under the bar and can be dismissed (`prefs.ruleSeen`); the method text in 設定
+says 「迷ったら『もう一度』」." Why: contract §4 (TheMoeWay rule).
+
+**A30 → S24 and S36.** Adds: "A passage card (MCD) carries a 全文／焦点 toggle in its header
+after the reveal. 焦点 dims the sentences around the target (opacity only; nothing is
+removed or reflowed). `prefs.zoom` is `'auto'` by default: a new card opens in 全文, a card
+seen before opens in 焦点; choosing either stores it for that deck. The toggle's buttons
+have a 44px hit area." Why: contract §2. The one-sentence deck has no zoom.
+
+**A31 → S36 and S37.** Adds: "At phone width the grade bar is fixed to the bottom of the
+viewport, with room reserved under the card so no content sits behind it. 削除 sits at the
+right end of the study top bar, 44px high, on front and back." Why: contract §9 ("grade
+bar pinned") and §4 ("delete is one tap").
+
+**A32 → S34.** Adds: "A level is a monochrome text chip (N1, N2 or N3), never a hue or an
+edge. It comes from a public word list (`prototypes/drift/data/wbig.json`, joined on
+headword and reading) and is shown only when the list gives the word exactly one level
+(76 of 323 words); its label reads 「N1相当（公開リストによる目安）」. Anki shows the
+same chip from a `level::Nx` note tag, with no new field. The card edge and first chip say
+the item kind (語, 字, 文法); the target and its reading share one part-of-speech hue;
+state chips and grades use red, green and amber only." Why: contract §9; the list is an
+estimate, not an exam result.
+
+**A33 → S34 and S38.** Adds: "Removed from the card as clutter: the 見て覚えるコツ tips
+panel, the topic hue on the card edge, the level 1–3 edge, and every texture (paper,
+chalk, gradient) behind the card; textures paint the page only. The method panel moves
+from the deck home to 設定. The reveal is one transition finished by 180 ms; with
+`prefers-reduced-motion` nothing animates, transitions or drags." Why: contract §9 and
+`brief-2026-10-04/aesthetics.md`.
+
+**A34 → S32 and S37.** Adds: "削除 suspends the card in one tap: the record and the card ID
+stay, the card leaves the sitting at once, and the toast's 元に戻す (or ↶) undoes it. 設定 ›
+保留中のカード counts suspended cards and 復元 brings them back. A card deleted before it was
+ever graded does not hold its word: the word's next passage becomes its first, and the
+culled passage's 字 cards are skipped too. Whole-deck reset is not offered. The ledger
+gains an optional `suspended` map `{id: {at, by}}`." Why: contract §4.
+
+**A35 → S32.** Replaces "Six genuine card lapses is a provisional repair trigger" with
+"Five genuine card lapses (`LEECH_LAPSES = 5`)", and replaces the open list of offers with
+an ordered ladder: "別の文に替える (the word's next unseen passage takes the card's place,
+due at once, progress kept), ヒントを付ける (a hint on that card's front only), 保留
+(suspend), or このまま続ける. The ladder sits inside the answer, after tier one and before
+the folds, and is offered again only after further lapses. Every choice is written to
+optional ledger keys `repairs {id: {at, lapses, hint?, swap?, keep?}}` and `repairLog
+[[id, action, iso, detail?]]`. Nothing is replaced or unlocked automatically." Why:
+contract §4. A 字 card has no passage to swap to; its hint is the kanji's parts.
+
+**A36 → S28 and S38.** Adds to 漢字の形と意味: "The fold lists the learner's own words that
+share a kanji of the target (同) or a reading of one of its kanji written with another
+kanji (読, at most eight shown). The family is deck-relative: only words of this deck with
+a card in this deck's ledger count, so the fold never shows a word before its own card
+does. Each entry links to 語の一覧 and ← returns to the card. Anki, which has no card state
+in a template, uses the words before the target in the deck's new-card order. No
+etymology, no mnemonics." Why: contract §3.7 and §5 (the JPMN/Kiku model).

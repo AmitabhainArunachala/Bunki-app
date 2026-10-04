@@ -13,20 +13,55 @@ Each has its own progress and its own colour theme.
 | **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (1,481 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
 | **言葉の鉱脈・文**  | one real sentence per card, the word marked, read and recall (503 cards) | 墨 (Sumi) | `?deck=kotoba` | `study.html`     | `kotoba-mine.apkg` |
 
-## Seeing it: colour, depth and shape
+## The player: what a card looks like
+
+The player follows [card contract v2](../../docs/srs/CARD_CONTRACT_V2.md) and the
+amendments A26–A36 in [STANDARD.md](../../docs/srs/STANDARD.md). The standalone study pages
+bundle the same player, and the Anki templates match it where Anki can.
+
+- **Front:** the passage and nothing else to lean on: no readings, no English, no words to
+  tap. A hint shows only on a card you repaired with one (see **Leeches** below).
+- **Back, tier one (no taps):** the word large, its reading and part of speech, a reading
+  over every kanji in the passage, and the one Japanese definition. A Japanese usage note
+  appears only when there is one.
+- **Back, tier two (one tap each, in this order):** 英語 (the English gloss, muted), 英訳
+  (the target sentence only; 未対応 where the English can't be matched sentence by
+  sentence), 漢字の形と意味, 類語 (once the card is in review), the word's other passages
+  (titles only), then the source line.
+- **English on tap:** 英語 is closed by default. 設定 › 英語の意味 › いつも開いておく keeps it
+  open for that deck.
+- **Zoom (MCD passages):** 全文／焦点 in the card header after the reveal. 焦点 dims the
+  sentences around the target. A new card opens in 全文 and a card you've seen opens in
+  焦点, unless you choose one; the choice is kept per deck.
+- **Grading:** もう一度／思い出せた only, pinned to the bottom of the screen on a phone. Swipe
+  left or right also works. The rule "if the answer taught you something, もう一度" shows
+  once under the bar.
+- **削除:** at the right of the top bar. One tap suspends the card (its record stays) and
+  the toast's 元に戻す undoes it. 設定 › 保留中のカード brings suspended cards back. A card
+  deleted before you ever graded it doesn't hold up its word: the word's next passage
+  takes its place.
+- **Leeches:** after 5 lapses the back offers, in order, 別の文に替える (the word's next
+  passage replaces this one), ヒントを付ける (a hint on this card's front), 保留 (suspend) or
+  このまま続ける. Nothing changes unless you choose.
+- **Kanji family:** 漢字の形と意味 shows each kanji with its parts, then your own words from
+  this deck that share the kanji (同) or one of its readings (読). Only words you've already
+  met count, and each opens in 語の一覧.
+
+### Colour and shape
 
 - **Themes:** 設定 › 色 offers 墨, 藍, 抹茶, 黒板, 和紙, 桜, 白 and 高 (high contrast). Each deck
-  remembers its own. Every theme keeps the same colour meanings.
-- **Colour = part of speech:** the asked word is blue/accent for nouns, orange for verbs,
-  gold for adjectives, violet for adverbs, green for expressions, and pink for sound words.
-- **Card edge = topic:** each of the 12 topics owns a hue on the card's left edge and in the
-  topic list, so a word is also remembered by "where" it lives.
-- **Kanji anatomy on the back:** each kanji large, with its meaning, its top-level parts
-  (財 = 貝 + 才) and its stroke count. Turn the parts into a little picture or story.
-- **Depth and texture:** cards are lifted panels with a shadow. 和紙 adds paper fibres,
-  黒板 chalk grain, and 藍 and 桜 a soft light wash.
-- **見て覚えるコツ:** the deck home lists the visual memory tips in a fold.
-- **Anki:** the same part-of-speech colours and the kanji anatomy are on the cards.
+  remembers its own. Every theme keeps the same colour meanings and passes the contrast
+  table in `prototypes/corridor/tools/contrast-kotoba.mjs`.
+- **Colour = part of speech:** the asked word and its reading share one hue: blue/accent for
+  nouns, orange for verbs, gold for adjectives, violet for adverbs, green for expressions,
+  and pink for sound words. English is never coloured.
+- **Edge = item kind:** the card edge and first chip say 語, 字 or 文法.
+- **Level chip:** a plain N1/N2/N3 chip, only when a public JLPT-style word list gives the
+  word one level. It is an estimate (目安), not an exam result.
+- **Quiet card:** textures (和紙 fibres, 黒板 chalk) paint the page, never the card. The tips
+  panel and topic hues are gone; the method text lives in 設定 › このデッキのしくみ.
+- **Motion:** the reveal fades the readings and answer in by 180 ms; a grade slides the card
+  out its way. With reduced motion on, nothing moves.
 
 ## The method
 
@@ -43,7 +78,7 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
     passage, one card per kanji. There is no 字 card when that kanji also appears
     elsewhere in the passage, or when the kanji table has no reading for it.
 - **Back:** the whole passage with furigana, the word with its reading, and the Japanese
-  definition. The English meaning and translation sit behind a tap. The source is shown.
+  definition. Everything else is one tap deep (see **The player** above).
 - **Many passages per word.** Each word has 2–4 passages in different situations: news,
   daily life, work, stories. When one card is settled (3 days' stability), the next opens,
   so the word keeps coming back in new surroundings.
@@ -54,8 +89,7 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
     word's typical partners (財政が悪化する, 金利を引き上げる).
   - Today the split is 454 real and 489 written, across 943 passages and 1,481 cards.
 - **Grading:** もう一度／思い出せた (Again/Good) is all FSRS needs. Swipe left or right.
-  設定 › 判定のボタン adds 難しい and 簡単 for those who want four buttons.
-- **On screen:** the deck home explains all this under **このデッキのしくみ**.
+- **On screen:** 設定 explains all this under **このデッキのしくみ**.
 
 ## Where to study
 
@@ -67,8 +101,8 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 
 Scheduling is FSRS-6 with Bunki's pinned weights (90% target retention). The deck keeps
 its own record (`bunki-cloze:kotoba-mine` in the browser) and never writes the
-corridor's word queue. Settings: new cards per day, answer mode, hint language,
-English on tap, readings on tap, two or four grade buttons, colour theme, backup/restore.
+corridor's word queue. Settings: new cards per day, answer mode, hint (Japanese or none),
+English on tap or always open, colour theme, suspended cards, backup/restore.
 復元 checks a pasted backup before it replaces anything, shows both counts, and keeps
 the old record as `bunki-cloze:<deck>:before-restore`.
 
@@ -83,7 +117,8 @@ the old record as `bunki-cloze:<deck>:before-restore`.
   `SentenceEN`, `Tip`, `Source`, `SourceURL`.
 - **Order:** every word's first card comes first, then every word's second card, and so on,
   so one word's cards are spread out.
-- **Subdecks and tags:** one subdeck per topic. The card edge colour shows the source kind.
+- **Subdecks and tags:** one subdeck per topic. The card edge and first chip show the item
+  kind (語/字), and a `level::Nx` tag shows the level chip.
 - **Settings:** turn on FSRS, and grade with Again/Good.
 
 ## How the passages were made
