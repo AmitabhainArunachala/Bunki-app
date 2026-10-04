@@ -1,0 +1,118 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> bunki@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.10 <review-workspace>/bunki-srs-review
+
+ ✓ apps/app/test/screen-contract.test.ts (49 tests) 487ms
+ ✓ apps/app/test/a1-domain-state.test.ts (14 tests) 126ms
+ ✓ packages/ai/test/adversarial/t2-hostile-responses.test.ts (57 tests) 126ms
+ ✓ apps/app/test/closed-loop-export.test.ts (7 tests) 186ms
+ ✓ packages/domain/test/adversarial/t1-interleaving-properties.test.ts (7 tests) 1013ms
+     ✓ every permutation either fails closed or satisfies every invariant  342ms
+ ✓ apps/app/test/durable-store.test.ts (19 tests) 245ms
+ ✓ apps/app/test/evidence-inspector.test.ts (35 tests) 251ms
+ ✓ apps/app/test/session-canvas.test.ts (37 tests) 250ms
+ ✓ apps/app/test/adversarial/t2-injection-inert-and-labeled.test.ts (30 tests) 105ms
+ ✓ apps/app/test/capture-flow.test.ts (24 tests) 56ms
+ ✓ apps/app/test/session-screens.test.ts (26 tests) 46ms
+ ✓ packages/domain/test/session/repair.test.ts (28 tests) 77ms
+ ✓ packages/domain/test/session/canvas-req-sch-06.test.ts (21 tests) 80ms
+ ✓ packages/export/test/verify-export.test.ts (14 tests) 276ms
+ ✓ packages/domain/test/replay/determinism.test.ts (26 tests) 99ms
+ ✓ packages/domain/test/session/commands.test.ts (18 tests) 66ms
+ ✓ packages/export/test/ui-hooks.test.ts (24 tests) 63ms
+ ✓ packages/domain/test/events/catalog.test.ts (40 tests) 99ms
+ ✓ packages/domain/test/events/provenance.test.ts (16 tests) 41ms
+ ✓ packages/domain/test/evidence/gate.test.ts (28 tests) 34ms
+ ✓ apps/app/test/persist-minted-boundary.test.ts (14 tests) 57ms
+ ✓ packages/domain/test/session/plan.test.ts (31 tests) 168ms
+ ✓ packages/domain/test/session/t13-plan-cannot-grow.test.ts (11 tests) 1626ms
+     ✓ survives 300 random interleavings of every event family  1510ms
+ ✓ packages/persistence/test/adversarial/t1-concurrent-append.test.ts (11 tests) 188ms
+ ✓ packages/seed/test/dataset.test.ts (23 tests) 75ms
+ ✓ packages/domain/test/adversarial/t1-clock-skew.test.ts (6 tests) 497ms
+ ✓ packages/ai/test/telemetry-and-no-live-calls.test.ts (12 tests) 42ms
+ ✓ apps/app/test/adversarial/t1-concurrent-capture.test.ts (10 tests) 141ms
+ ✓ packages/seed/test/provenance.test.ts (16 tests) 159ms
+ ✓ apps/app/test/observability-ring.test.ts (16 tests) 37ms
+ ✓ packages/ai/test/t09-adapter-boundary.test.ts (15 tests) 58ms
+ ✓ packages/persistence/test/migrations.test.ts (16 tests) 51ms
+ ✓ apps/app/test/learn-lineage.test.ts (5 tests) 72ms
+ ✓ apps/app/test/candidate-offline-and-timeout.test.ts (5 tests) 83ms
+ ✓ packages/ai/test/runtime.test.ts (19 tests) 63ms
+ ✓ packages/ai/test/anthropic-provider.test.ts (17 tests) 29ms
+ ✓ apps/app/test/golden-source-flow.test.ts (7 tests) 102ms
+ ✓ packages/domain/test/contracts/thread-link.test.ts (16 tests) 30ms
+ ✓ packages/domain/test/reducers/memory-state.test.ts (17 tests) 24ms
+ ✓ apps/app/test/candidate-command-flow.test.ts (17 tests) 76ms
+ ✓ packages/seed/test/schema.test.ts (23 tests) 42ms
+ ✓ packages/domain/test/purity/seams-left-empty.test.ts (11 tests) 17ms
+ ✓ packages/domain/test/purity/no-ambient-nondeterminism.test.ts (18 tests) 78ms
+ ✓ apps/app/test/navigation-reachability.test.ts (10 tests) 21ms
+ ✓ packages/domain/test/reducers/thread.test.ts (21 tests) 46ms
+ ✓ packages/seed/test/strokes.test.ts (26 tests) 34ms
+ ✓ apps/app/test/session-budget.test.ts (30 tests) 33ms
+ ✓ apps/app/test/candidate-labeling.test.ts (15 tests) 49ms
+ ✓ packages/domain/test/contracts/bound-retrieval-contract.test.ts (7 tests) 33ms
+ ✓ apps/app/test/export-server.test.ts (20 tests) 82ms
+ ✓ packages/persistence/test/deletion.test.ts (8 tests) 53ms
+ ✓ packages/domain/test/interaction/action-contract.test.ts (61 tests) 31ms
+ ✓ packages/domain/test/evidence/mint.test.ts (15 tests) 29ms
+ ✓ apps/app/test/kanji-capture.test.ts (6 tests) 81ms
+ ✓ tools/fsrs-optimize.test.mjs (11 tests) 2984ms
+     ✓ matches the independent vendored ts-fsrs 5.4.1 recurrence and eight-decimal rounding  396ms
+     ✓ fits a deterministic 0.85-retention synthetic learner better than defaults  2111ms
+ ✓ packages/ai/test/envelope.test.ts (17 tests) 43ms
+ ✓ packages/persistence/test/t16-web-restart.test.ts (7 tests) 71ms
+ ✓ apps/app/test/view-state.test.ts (15 tests) 15ms
+ ✓ packages/domain/test/contracts/retrieval-contract.test.ts (14 tests) 46ms
+ ✓ packages/persistence/test/idempotency.test.ts (8 tests) 45ms
+ ✓ apps/app/test/capture-lookup.test.ts (7 tests) 31ms
+ ✓ packages/export/test/envelope.test.ts (15 tests) 62ms
+ ✓ test/boundaries.test.ts (36 tests) 1906ms
+     ✓ rejects static platform import  1446ms
+ ✓ apps/app/test/catalog.test.ts (17 tests) 42ms
+ ✓ packages/domain/test/events/fail-closed.test.ts (23 tests) 39ms
+ ✓ apps/app/test/ruby-accessibility.test.ts (6 tests) 19ms
+ ✓ packages/ai/test/fallback.test.ts (12 tests) 28ms
+ ✓ packages/domain/test/events/factories.test.ts (15 tests) 34ms
+ ✓ packages/domain/test/evidence/t02-capture-does-not-activate-fsrs.test.ts (8 tests) 43ms
+ ✓ apps/app/test/provenance-display.test.ts (11 tests) 111ms
+ ✓ packages/domain/test/reducers/fsrs-pin.test.ts (12 tests) 22ms
+ ✓ apps/app/test/radical-display.test.ts (17 tests) 24ms
+ ✓ packages/domain/test/evidence/t06-reveal-before-recall-grades-again.test.ts (6 tests) 52ms
+ ✓ apps/app/test/furigana.test.ts (13 tests) 26ms
+ ✓ packages/domain/test/contracts/promotion-activation.test.ts (8 tests) 40ms
+ ✓ packages/domain/test/contracts/learn-contracts.test.ts (5 tests) 54ms
+ ✓ packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts (2 tests) 28ms
+ ✓ packages/ai/test/hash-and-consent.test.ts (15 tests) 24ms
+ ✓ packages/domain/test/replay/golden.test.ts (21 tests) 52ms
+ ✓ apps/app/test/candidate-context.test.ts (12 tests) 18ms
+ ✓ apps/app/test/stroke-order.test.ts (19 tests) 20ms
+ ✓ apps/app/test/theme-contrast.test.ts (121 tests) 44ms
+ ✓ packages/domain/test/reducers/promotion.test.ts (17 tests) 23ms
+ ✓ packages/domain/test/evidence/t08-exposure-never-reaches-fsrs.test.ts (7 tests) 39ms
+ ✓ packages/domain/test/primitives.test.ts (21 tests) 19ms
+ ✓ packages/persistence/test/expo-binding.test.ts (3 tests) 8ms
+ ✓ packages/domain/test/evidence/t05-missed-reading-does-not-erase-meaning.test.ts (4 tests) 35ms
+ ✓ packages/persistence/test/hash.test.ts (16 tests) 104ms
+ ✓ apps/app/test/deferred.test.ts (11 tests) 12ms
+ ✓ apps/app/test/drift-lexicon.test.ts (10 tests) 42ms
+ ✓ apps/app/test/touch-targets.test.ts (14 tests) 10ms
+ ✓ packages/domain/test/replay/clock-skew.test.ts (2 tests) 35ms
+ ✓ packages/domain/test/evidence/t07-lookup-is-friction-not-a-grade.test.ts (5 tests) 43ms
+ ✓ packages/seed/test/scaffold.test.ts (3 tests) 5ms
+ ✓ packages/persistence/test/contract.web-provisional.test.ts (20 tests) 71ms
+ ✓ packages/persistence/test/contract.ci-substitute.test.ts (20 tests) 212ms
+ ✓ packages/ai/test/scaffold.test.ts (3 tests) 4ms
+ ✓ packages/domain/test/scaffold.test.ts (2 tests) 4ms
+ ✓ packages/persistence/test/scaffold.test.ts (2 tests) 4ms
+ ✓ packages/export/test/scaffold.test.ts (2 tests) 3ms
+
+ Test Files  100 passed (100)
+      Tests  1710 passed (1710)
+   Start at  02:14:54
+   Duration  12.50s (transform 9.96s, setup 0ms, import 40.68s, tests 14.53s, environment 20ms)

@@ -1,0 +1,4138 @@
+[
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "dark",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "dark",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "ai",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "ai",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "matcha",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "matcha",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "kokuban",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "kokuban",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "washi",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "washi",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.15 (foreground color: #3d7a2a, background color: #e4e7d3, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.06 (foreground color: #7d6d58, background color: #efe7d6, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "sakura",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "sakura",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #b26a00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.7 (foreground color: #2f8a5a, background color: #e6f1eb, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #8a6b74, background color: #fbf1f3, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "light",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-lvchip"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "light",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-lvchip"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #b86e00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.57 (foreground color: #0e8f53, background color: #e2f2ea, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "contrast",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 220,
+        "bottom": 292
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 308,
+          "width": 358,
+          "height": 56,
+          "bottom": 364
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "read",
+    "theme": "contrast",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "dark",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "dark",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "ai",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "ai",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "matcha",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "matcha",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "kokuban",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "kokuban",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "washi",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "washi",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.15 (foreground color: #3d7a2a, background color: #e4e7d3, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.06 (foreground color: #7d6d58, background color: #efe7d6, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "sakura",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "sakura",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #b26a00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.7 (foreground color: #2f8a5a, background color: #e6f1eb, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #8a6b74, background color: #fbf1f3, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "light",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-lvchip"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "light",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-lvchip"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #b86e00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.57 (foreground color: #0e8f53, background color: #e2f2ea, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "contrast",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 240.15625,
+        "bottom": 312.15625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 328.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 384.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "self",
+    "theme": "contrast",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 561.140625,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 561.140625,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 561.140625,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 625.140625
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 561.140625,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 625.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "dark",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "dark",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "ai",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "ai",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "matcha",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "matcha",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "kokuban",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "kokuban",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "washi",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "washi",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-verdict"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.25 (foreground color: #3d7a2a, background color: #efe7d6, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "sakura",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "sakura",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-verdict"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.87 (foreground color: #2f8a5a, background color: #fbf1f3, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "light",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-lvchip"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "light",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-lvchip"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-st-learn"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #b86e00, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-verdict"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.88 (foreground color: #0e8f53, background color: #f5f8fb, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "contrast",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 343.15625,
+        "bottom": 415.15625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 431.15625,
+          "width": 358,
+          "height": 56,
+          "bottom": 487.15625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mine",
+    "mode": "choice",
+    "theme": "contrast",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 473.140625,
+        "bottom": 545.140625
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 603.140625,
+          "width": 358,
+          "height": 56,
+          "bottom": 659.140625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "dark",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "dark",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "ai",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "ai",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "matcha",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "matcha",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "kokuban",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "kokuban",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "washi",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "washi",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.15 (foreground color: #3d7a2a, background color: #e4e7d3, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.06 (foreground color: #7d6d58, background color: #efe7d6, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "sakura",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "sakura",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #b26a00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.7 (foreground color: #2f8a5a, background color: #e6f1eb, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #8a6b74, background color: #fbf1f3, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "light",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "light",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #b86e00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.57 (foreground color: #0e8f53, background color: #e2f2ea, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "contrast",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 355.890625,
+        "bottom": 427.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 443.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 499.890625
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "read",
+    "theme": "contrast",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "dark",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "dark",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "ai",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "ai",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "matcha",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "matcha",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "kokuban",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "kokuban",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "washi",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "washi",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.15 (foreground color: #3d7a2a, background color: #e4e7d3, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.06 (foreground color: #7d6d58, background color: #efe7d6, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "sakura",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "sakura",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #b26a00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.7 (foreground color: #2f8a5a, background color: #e6f1eb, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-swipehint"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #8a6b74, background color: #fbf1f3, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "light",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "light",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-hard > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #b86e00, background color: #ffffff, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": ["#kp-grade-good > b"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.57 (foreground color: #0e8f53, background color: #e2f2ea, font size: 11.3pt (15px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "contrast",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 393.890625,
+        "bottom": 465.890625
+      },
+      "grade": [
+        {
+          "text": "答えを見る",
+          "x": 16,
+          "y": 481.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 537.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "self",
+    "theme": "contrast",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 848,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "もう一度1分",
+          "x": 16,
+          "y": 709.875,
+          "width": 87.890625,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "難しい6分",
+          "x": 111.890625,
+          "y": 709.875,
+          "width": 70.3125,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "覚えた10分",
+          "x": 190.203125,
+          "y": 709.875,
+          "width": 105.46875,
+          "height": 64,
+          "bottom": 773.875
+        },
+        {
+          "text": "簡単8日",
+          "x": 303.671875,
+          "y": 709.875,
+          "width": 70.328125,
+          "height": 64,
+          "bottom": 773.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "dark",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "dark",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "ai",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "ai",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "matcha",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "matcha",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "kokuban",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "kokuban",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "washi",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "washi",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #7d6d58, background color: #f3ead6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-verdict"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.25 (foreground color: #3d7a2a, background color: #efe7d6, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "sakura",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "sakura",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-kj:nth-child(1) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-kj:nth-child(2) > small"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.01 (foreground color: #8a6b74, background color: #fde7ec, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-verdict"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.87 (foreground color: #2f8a5a, background color: #fbf1f3, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "light",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "light",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [".kp-st-learn"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #b86e00, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #0e8f53, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".kp-verdict"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.88 (foreground color: #0e8f53, background color: #f5f8fb, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "contrast",
+    "face": "front",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 496.890625,
+        "bottom": 568.890625
+      },
+      "grade": [
+        {
+          "text": "わからない",
+          "x": 16,
+          "y": 584.890625,
+          "width": 358,
+          "height": 56,
+          "bottom": 640.890625
+        }
+      ],
+      "blank": "　　"
+    },
+    "errors": [],
+    "violations": []
+  },
+  {
+    "deck": "kotoba-mcd",
+    "mode": "choice",
+    "theme": "contrast",
+    "face": "back",
+    "metrics": {
+      "scrollWidth": 390,
+      "scrollHeight": 912,
+      "card": {
+        "x": 16,
+        "y": 72,
+        "width": 358,
+        "height": 621.875,
+        "bottom": 693.875
+      },
+      "term": "財政",
+      "gloss": "public finances",
+      "grade": [
+        {
+          "text": "次へ →",
+          "x": 16,
+          "y": 751.875,
+          "width": 358,
+          "height": 56,
+          "bottom": 807.875
+        }
+      ]
+    },
+    "errors": [],
+    "violations": []
+  }
+]
