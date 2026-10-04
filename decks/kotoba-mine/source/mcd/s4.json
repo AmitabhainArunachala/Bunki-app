@@ -1,0 +1,856 @@
+{
+  "4": [
+    {
+      "ja": "那覇の祖母は、私が受験に失敗して泣いていたとき、背中をさすりながら笑った。「なんくるないさ。まじめにやっていれば、道はちゃんと開けるよ」。あの一言に、何度救われたかわからない。",
+      "form": "なんくるない",
+      "en": "When I was crying after failing my entrance exams, my grandmother in Naha rubbed my back and laughed. 'Nankuru nai sa — it'll all work out. If you keep doing things properly, the way will open up.' I can't count how many times those words have saved me.",
+      "original": true
+    },
+    {
+      "ja": "沖縄に移住して三年になる。台風で船が欠航しても、約束の時間に誰も来なくても、島の人たちは「なんくるない」と言って笑っている。最初は戸惑ったが、今ではその大らかさが心地いい。",
+      "form": "なんくるない",
+      "en": "It's been three years since I moved to Okinawa. Even when a typhoon cancels the ferry or nobody turns up at the agreed time, the islanders just laugh and say 'it'll all work out'. It threw me at first, but now I find that easygoing attitude comforting.",
+      "original": true
+    }
+  ],
+  "10": [
+    {
+      "ja": "双子の姉妹は顔も声もそっくりで、担任の先生でさえなかなか見分けられない。ところが母親だけは、笑ったときにできるえくぼの位置で、一瞬でどちらかわかるそうだ。",
+      "form": "見分けられない",
+      "en": "The twin sisters look and sound exactly alike, and even their homeroom teacher has trouble telling them apart. Their mother alone, apparently, can tell which is which in an instant from where the dimple appears when they smile.",
+      "original": true
+    },
+    {
+      "ja": "市場の仲買人は、並んだマグロの断面をひと目見ただけで、脂の乗り具合を見分ける。素人には同じ赤身にしか見えないが、そのわずかな差が値段を何倍も変えるのだという。",
+      "form": "見分ける",
+      "en": "A market broker can tell how fatty a tuna is with a single glance at the cut surface. To an amateur it all looks like the same red meat, but that slight difference can change the price several times over.",
+      "original": true
+    },
+    {
+      "ja": "月の光は深い渦巻の底までも射しているようでした。しかしそれでも、そこのあらゆるものを立ちこめている濃い霧のために、なにもはっきりと見分けることができませんでした。",
+      "en": "The moonlight seemed to reach even the depths of the whirlpool. Yet because of the thick mist that hung over everything there, I could not make anything out clearly."
+    }
+  ],
+  "16": [
+    {
+      "ja": "ロボット研究の分野では近年、身体性が改めて注目されている。頭の中で計算するだけでなく、実際に体を動かし、物に触れて失敗することで、初めて身につく知能があると考えられているからだ。",
+      "form": "身体性",
+      "en": "In robotics research, embodiment has been drawing renewed attention in recent years. That is because some intelligence is thought to be acquired only by actually moving a body, touching things and failing, rather than just calculating inside a head.",
+      "original": true
+    },
+    {
+      "ja": "書道の先生はよく「字は手で覚えるもの」と言う。筆の重さや紙の手ざわりを通して身につけた感覚は、頭で理解した知識よりずっと長く残る。学びにおける身体性とは、つまりそういうことなのだろう。",
+      "form": "身体性",
+      "en": "My calligraphy teacher often says, 'You learn characters with your hand.' A feel acquired through the weight of the brush and the texture of the paper lasts far longer than knowledge understood in the head. That, I suppose, is what embodiment in learning means.",
+      "original": true
+    }
+  ],
+  "22": [
+    {
+      "ja": "原油は、そのままではほとんど使い道がない。製油所では原油を加熱し、沸点の違いを利用して分留することで、ガソリンや灯油、軽油などに分けていく。",
+      "form": "分留",
+      "en": "Crude oil is of little use as it is. At a refinery the crude is heated and separated by fractional distillation, using differences in boiling point, into gasoline, kerosene, diesel and so on.",
+      "original": true
+    },
+    {
+      "ja": "石油の成分のほとんどは炭化水素であり、色々な炭化水素の混合物から構成されている。その他、硫黄化合物、窒素化合物、金属類も含まれている。工業的に有用な石油製品を作るためには、分留によって成分を分ける。",
+      "en": "Most of the components of petroleum are hydrocarbons; it is a mixture of many different hydrocarbons. It also contains sulfur compounds, nitrogen compounds and metals. To make industrially useful petroleum products, the components are separated by fractional distillation."
+    }
+  ],
+  "28": [
+    {
+      "ja": "「なんとなく売れていない」では会議は進まない。どの商品が、いつ、何個売れたのかを数字で示し、定量的に分析して初めて、具体的な対策が見えてくる。",
+      "form": "定量的",
+      "en": "'Somehow it isn't selling' gets a meeting nowhere. Only when you show in numbers which products sold, when and how many, and analyse it quantitatively, do concrete measures come into view.",
+      "original": true
+    },
+    {
+      "ja": "集中豪雨とは、局地的で短時間の強い雨、つまり限られた地域に対して短時間に多量の雨が降ることを言う。現在の日本においては一般にも学術用語にも用いられるが、雨量などに基づいた定量的な定義はない。",
+      "en": "A localized torrential downpour means strong rain over a limited area for a short time — that is, a large amount of rain falling on a limited region in a short period. In Japan today the term is used both generally and as a technical term, but there is no quantitative definition based on rainfall or the like."
+    },
+    {
+      "ja": "痛みの強さは本人にしかわからないため、定量的に測るのが難しい。そこで病院では、まったく痛くない状態を0、想像できる最悪の痛みを10として、数字で答えてもらう方法がよく使われている。",
+      "form": "定量的",
+      "en": "Only the patient knows how strong their pain is, so it is hard to measure quantitatively. Hospitals therefore often ask patients to answer with a number, where 0 is no pain at all and 10 is the worst pain imaginable.",
+      "original": true
+    }
+  ],
+  "35": [
+    {
+      "ja": "MRIは、磁気共鳴という現象を利用して体の内部を画像にする検査だ。強い磁石と電波を使うため、X線検査のように被ばくする心配はないが、検査中はかなり大きな音がする。",
+      "form": "磁気共鳴",
+      "en": "An MRI is a scan that images the inside of the body using the phenomenon of magnetic resonance. Because it uses a strong magnet and radio waves, there is no radiation exposure as with an X-ray, but it is quite loud during the scan.",
+      "original": true
+    },
+    {
+      "ja": "電磁気学がほかの日常生活に関わっている例としては、携帯電話のアンテナの設計、磁気共鳴画像スキャナにおいて電磁石の正確な配置調整により電磁場の形成を制御することがあげられる。さらに電磁気学により実現できた技術として電子レンジがある。",
+      "en": "Other examples of electromagnetism in everyday life include the design of mobile-phone antennas and, in magnetic resonance imaging scanners, controlling the shape of the electromagnetic field by precisely positioning the electromagnets. The microwave oven is another technology made possible by electromagnetism."
+    },
+    {
+      "ja": "化学の研究室では、新しく合成した物質の構造を調べるのに核磁気共鳴装置を使う。強い磁場の中に試料を置き、原子核が電波にどう反応するかを測れば、分子の中で原子がどう並んでいるかがわかる。",
+      "form": "磁気共鳴",
+      "en": "In chemistry labs, nuclear magnetic resonance instruments are used to determine the structure of newly synthesized substances. Place a sample in a strong magnetic field and measure how its nuclei respond to radio waves, and you can tell how the atoms are arranged in the molecule.",
+      "original": true
+    }
+  ],
+  "41": [
+    {
+      "ja": "息子は話すのが得意で、算数もよくできた。ところが教科書を音読させると、一行進むのにひどく時間がかかる。専門の医師に診てもらい、失読症だとわかったのは小学三年生のときだった。",
+      "form": "失読症",
+      "en": "My son was a good talker and did well at arithmetic. But when he read his textbook aloud, it took him an awfully long time to get through a single line. It was in third grade, after seeing a specialist, that we found out he had dyslexia.",
+      "original": true
+    },
+    {
+      "ja": "失読症は知能の問題ではない。文字を音に結びつける脳の働きに特徴があるだけで、音声の読み上げ機能などを使えば、本来の学ぶ力を十分に発揮できる人は多い。",
+      "form": "失読症",
+      "en": "Dyslexia is not a matter of intelligence. It is simply a particular way the brain links letters to sounds, and many people can make full use of their ability to learn with tools such as text-to-speech.",
+      "original": true
+    },
+    {
+      "ja": "よくある誤解の一つに、失読症の人は文字や単語が逆さま、あるいは反転して見えるというものがあります。",
+      "en": "One common misconception is that people with dyslexia see letters and words upside down or reversed."
+    }
+  ],
+  "47": [
+    {
+      "ja": "生の肉を切ったあとは、まな板を熱湯でよく洗ってから野菜を切ること。料理教室の先生は、包丁の使い方よりも先に、まずこれを徹底して教えてくれた。",
+      "form": "まな板",
+      "en": "After cutting raw meat, wash the cutting board thoroughly with boiling water before cutting vegetables. The cooking-class teacher drilled this into us even before teaching us how to use a knife.",
+      "original": true
+    },
+    {
+      "ja": "まず、テーブルに着くと、目の前にはまな板と包丁、さらには20もの小皿が並べられ、さまざまな食材やハーブが準備されていた。オイルもオリーブオイルだけでヴァージン、オレンジオリーブ、クルミの油までセッティング済み。",
+      "en": "First, when we sat down at the table, there was a cutting board and knife in front of us, plus as many as twenty small dishes laid out with all kinds of ingredients and herbs. Even the oils were set out — virgin olive oil, orange olive oil and walnut oil."
+    },
+    {
+      "ja": "日曜の朝、台所からトントンと包丁の音が聞こえてきた。のぞいてみると、父がまな板の前に立ち、慣れない手つきでネギを刻んでいる。母の誕生日に、朝ごはんを作るつもりらしい。",
+      "form": "まな板",
+      "en": "On Sunday morning I heard the tap-tap of a knife coming from the kitchen. When I peeked in, my father was standing at the cutting board, chopping green onions with unpractised hands. It seems he meant to make breakfast for Mom's birthday.",
+      "original": true
+    }
+  ],
+  "53": [
+    {
+      "ja": "八月の甲子園は、まさに灼熱の戦いだ。気温は三十五度を超え、グラウンドの照り返しで体感温度はさらに上がる。それでも球児たちは、最後まで全力で白球を追い続けた。",
+      "form": "灼熱",
+      "en": "Koshien in August is truly a battle in scorching heat. The temperature tops 35 degrees, and the glare off the field makes it feel even hotter. Even so, the high-school players chased the ball with everything they had to the very end.",
+      "original": true
+    },
+    {
+      "ja": "サハラ砂漠の昼は、灼熱の太陽が容赦なく照りつけ、気温は五十度近くに達する。ところが夜になると一気に冷え込み、旅人は毛布にくるまって震えることになる。",
+      "form": "灼熱",
+      "en": "By day in the Sahara, the scorching sun beats down mercilessly and temperatures approach fifty degrees. But at night it turns cold all at once, and travellers end up shivering wrapped in blankets.",
+      "original": true
+    }
+  ],
+  "59": [
+    {
+      "ja": "元社長と経理部長が共謀し、会社の資金およそ三億円を私的に流用していた疑いが強まった。二人は架空の取引先への支払いを装い、数年にわたって金を引き出していたという。",
+      "form": "共謀",
+      "en": "Suspicion is growing that the former president and the head of accounting conspired to misappropriate about 300 million yen of company funds. The two reportedly withdrew money over several years, disguising it as payments to fictitious suppliers.",
+      "original": true
+    },
+    {
+      "ja": "汚職とマネーロンダリングの疑いで、アメリカ当局の起訴に基づいて、スイスの司法当局がFIFA・国際サッカー連盟の幹部らを逮捕。それと同時に、アメリカの司法省はFIFA・国際サッカー連盟の幹部9人と5人の企業の役員を、共謀と汚職の疑いで起訴したと発表。",
+      "en": "Acting on an American indictment on suspicion of corruption and money laundering, Swiss judicial authorities arrested senior officials of FIFA, the international football federation. At the same time, the US Department of Justice announced it had indicted nine FIFA officials and five corporate executives on charges of conspiracy and corruption."
+    },
+    {
+      "ja": "今年2月におきたラフィーク・ハリーリー元レバノン首相の暗殺事件に関して、国際連合の独立調査団は、シリアとレバノンの政府当局者の共謀によるものと結論した。安全保障理事会に20日提出された報告書で明らかになった。",
+      "en": "Regarding the assassination in February this year of former Lebanese prime minister Rafik Hariri, an independent UN investigation concluded that it was the result of collusion between Syrian and Lebanese government officials. This was revealed in a report submitted to the Security Council on the 20th."
+    }
+  ],
+  "66": [
+    {
+      "ja": "銀行の定期預金に預けても、利回りは年0.1%にも満たない。そこで最近は、少額から始められる投資信託や個人向け国債に目を向ける人が増えている。",
+      "form": "利回り",
+      "en": "Even if you put money in a bank time deposit, the yield is less than 0.1% a year. That is why more and more people are turning to investment trusts or government bonds for individuals, which you can start with small amounts.",
+      "original": true
+    },
+    {
+      "ja": "「iCompaund」は、簡単に複利計算を行い、結果をグラフ化してくれる無料アプリだ。ユーザーは元本、利回り（金利）、期間をタップして入力するだけ。",
+      "en": "iCompound is a free app that does compound-interest calculations easily and turns the results into a graph. Users simply tap in the principal, the yield (interest rate) and the period."
+    },
+    {
+      "ja": "「元本保証、しかも毎月高配当」とうたう投資話には注意したい。そんなにうまい話があるなら、誰も苦労はしない。高い利回りには、必ずそれに見合ったリスクが潜んでいる。",
+      "form": "利回り",
+      "en": "Be wary of investment pitches promising 'principal guaranteed, plus high dividends every month'. If deals that good existed, nobody would ever struggle. A high yield always hides a matching risk.",
+      "original": true
+    }
+  ],
+  "72": [
+    {
+      "ja": "十九世紀のイギリスや二十世紀後半のアメリカのように、圧倒的な力を持つ国が自由貿易のルールを守らせているとき、世界経済は安定しやすい。こうした考え方を覇権安定論という。",
+      "form": "覇権安定論",
+      "en": "When an overwhelmingly powerful country enforces the rules of free trade, as Britain did in the nineteenth century and the United States in the late twentieth, the world economy tends to be stable. This idea is called hegemonic stability theory.",
+      "original": true
+    },
+    {
+      "ja": "覇権安定論の立場からすると、アメリカの影響力が弱まりつつある今の世界は、不安定な時代に入りかけていることになる。中国の台頭で国際秩序がどう変わるのか、専門家の間でも議論が続いている。",
+      "form": "覇権安定論",
+      "en": "From the standpoint of hegemonic stability theory, today's world, with American influence waning, is entering an unstable era. How the rise of China will change the international order is still being debated among experts.",
+      "original": true
+    }
+  ],
+  "78": [
+    {
+      "ja": "豊田市の周辺には、自動車の組み立て工場だけでなく、部品を手がける中小企業が数多く集積している。必要な部品をすぐに調達できることが、この地域の大きな強みになっている。",
+      "form": "集積",
+      "en": "Around Toyota City are concentrated not only car assembly plants but also many small and medium firms that make parts. Being able to source the parts you need right away is a major strength of the region.",
+      "original": true
+    },
+    {
+      "ja": "たとえばパソコンでは、マザーボードにCPUやチップセット、メモリーなど主要な部品を個別に実装している。一方SoCではこれらの主要な部品を1チップに収めている。パソコンのマザーボードが1チップに集積されているようなものなのだ。",
+      "en": "In a PC, for example, the main components such as the CPU, chipset and memory are mounted separately on the motherboard. An SoC, by contrast, puts these main components on a single chip. It is as if a PC's motherboard were integrated onto one chip."
+    },
+    {
+      "ja": "祖父は五十年間、毎朝欠かさず庭の気温と天気を手帳に書きつけてきた。一日ごとの記録は小さくても、その集積は今や、地域の気候の移り変わりを語る貴重な資料になっている。",
+      "form": "集積",
+      "en": "For fifty years my grandfather has written down the temperature and weather in his garden in a notebook every morning without fail. Each day's record is small, but the accumulation has now become a valuable resource showing how the local climate has changed.",
+      "original": true
+    }
+  ],
+  "85": [
+    {
+      "ja": "新しく来た部長は、部下には威張り散らすくせに、社長の前ではまるで別人のように腰が低い。そんな姿を毎日見せられて、若手社員はすっかりやる気をなくしてしまった。",
+      "form": "威張り散らす",
+      "en": "The new department head bosses his subordinates around, yet in front of the president he is as humble as if he were a different person. Watching that every day, the young staff have completely lost their motivation.",
+      "original": true
+    },
+    {
+      "ja": "その居酒屋には、酔うと店員に向かって「客を誰だと思ってるんだ」と威張り散らす常連がいた。ある晩、ついに店主が静かに言った。「お代は結構です。もう来ないでください」。",
+      "form": "威張り散らす",
+      "en": "That izakaya had a regular who, once drunk, would throw his weight around with the staff: 'Who do you think you're talking to? I'm a customer!' One night the owner finally said quietly, 'No charge tonight. Please don't come back.'",
+      "original": true
+    }
+  ],
+  "91": [
+    {
+      "ja": "夜中にエナジードリンクを二本も飲んだせいで、目がギンギンに冴えて全然眠れない。明日は朝一で大事な試験なのに、時計の針はもう三時を回っている。",
+      "form": "ギンギン",
+      "en": "I drank two energy drinks in the middle of the night, so I'm totally wired and can't sleep at all. I have an important exam first thing tomorrow, and the clock already says past three.",
+      "original": true
+    },
+    {
+      "ja": "夏はやっぱり、ギンギンに冷えたビールに限る。仕事から帰って冷蔵庫を開け、一気に喉に流し込むあの瞬間のために、一日がんばっていると言ってもいい。",
+      "form": "ギンギン",
+      "en": "In summer, nothing beats an ice-cold beer. You could say I get through the day just for that moment when I get home from work, open the fridge and gulp it down.",
+      "original": true
+    }
+  ],
+  "97": [
+    {
+      "ja": "陸上部のエースだった美咲にとって、骨折した足のリハビリは想像以上につらかった。それでも、もう一度グラウンドを走る日を思い描き、毎日の痛みにじっと耐えた。",
+      "form": "耐えた",
+      "en": "For Misaki, who had been the star of the track team, rehab on her broken leg was harder than she had imagined. Still, picturing the day she would run on the track again, she quietly endured the pain every day.",
+      "original": true
+    },
+    {
+      "ja": "医学的知見によると、1,500mを超える高度で人体に影響が出始め、5,500mから6,000mを超えると恒常的に耐えることはできない。高度が増加するにつれて、気圧は低下し、酸素の分圧も下がって人体に影響が生じる。",
+      "en": "According to medical findings, effects on the human body begin above 1,500 m, and above 5,500 to 6,000 m the body cannot endure for long periods. As altitude increases, air pressure drops and the partial pressure of oxygen falls, affecting the body."
+    },
+    {
+      "ja": "自分は子供の頃から、自分の家族の者たちに対してさえ、彼等がどんなに苦しく、またどんな事を考えて生きているのか、まるでちっとも見当つかず、ただおそろしく、その気まずさに堪える事が出来ず、既に道化の上手になっていました。つまり、自分は、いつのまにやら、一言も本当の事を言わない子になっていたのです。",
+      "en": "Ever since I was a child, I had no idea at all how hard things were for even my own family, or what they were thinking as they lived; I was simply terrified, could not bear the awkwardness, and had already become good at clowning. In other words, before I knew it I had become a child who never said a single true word."
+    }
+  ],
+  "103": [
+    {
+      "ja": "夜道を一人で歩いていると、背後からずっと同じ足音がついてくる。思い切って振り返ると、そこには誰もいなかった。その瞬間、背筋がぞっとして、家まで一度も振り返らずに走った。",
+      "form": "ぞっと",
+      "en": "Walking home alone at night, I heard the same footsteps following me the whole way. When I finally turned around, there was nobody there. At that moment a chill ran down my spine, and I ran all the way home without looking back once.",
+      "original": true
+    },
+    {
+      "ja": "毎日同じ作業の繰り返し。お茶汲みコピー、データの単調な入力ばかりで、先輩たちを見ていても仕事内容に変化はなく、やりがいもなさそうです。このままずっとここで同じ作業ばかりやることになると思うとぞっとします。",
+      "en": "The same tasks every day: making tea and copies and monotonous data entry. Looking at the senior staff, their work never changes either, and it doesn't seem rewarding. The thought of doing the same work here forever makes me shudder."
+    }
+  ],
+  "110": [
+    {
+      "ja": "住宅ローンを組むときは、利率のわずかな差も軽く見てはいけない。三千万円を三十五年で借りる場合、年0.5%違うだけで、総返済額は三百万円ほど変わってくる。",
+      "form": "利率",
+      "en": "When taking out a mortgage, don't take even a small difference in interest rate lightly. If you borrow 30 million yen over 35 years, a difference of just 0.5% a year changes the total repayment by about 3 million yen.",
+      "original": true
+    },
+    {
+      "ja": "金利が1年で１％というところもありますからね。ただ、利率が他と比べてあまりにも高い場合は、それだけリスクが大きいってことも考えておかなくちゃいけません。あとは投資です。",
+      "en": "There are places where the interest is 1% a year. But if the interest rate is far higher than elsewhere, you also have to bear in mind that the risk is that much greater. Then there's investing."
+    },
+    {
+      "ja": "祖母は毎月の年金から少しずつ定期預金に回している。利率はほとんどゼロに近いが、「銀行に置いておけば安心だから」と言って、やり方を変えるつもりはないらしい。",
+      "form": "利率",
+      "en": "Every month my grandmother puts a little of her pension into a time deposit. The interest rate is close to zero, but she says, 'It's safe in the bank,' and apparently has no intention of changing her ways.",
+      "original": true
+    }
+  ],
+  "116": [
+    {
+      "ja": "プロと素人の差は歴然としていた。同じカメラで同じ花を撮ったはずなのに、写真家の一枚だけが柔らかな光をまとい、まるで別の花のように見える。腕の違いとは、こういうことなのだろう。",
+      "form": "歴然",
+      "en": "The difference between the professional and the amateurs was obvious. We had all photographed the same flower with the same camera, yet only the photographer's shot was bathed in soft light, so the flower looked like a different one entirely. That, I suppose, is what a difference in skill means.",
+      "original": true
+    },
+    {
+      "ja": "高解像度版の雑誌は、新しいiPadでみるとその効果がハッキリとわかる。細かい文字も拡大せずに読めることはもちろんだが、拡大表示でその差が歴然となった。",
+      "en": "With a new iPad, the effect of the high-resolution editions of magazines is plain to see. Of course you can read small text without zooming, but when zoomed in the difference became striking."
+    },
+    {
+      "ja": "もちろん、記者も試食してみた。食べる前はピザハットの定番生地「ふっくらパンピザ」とどう違うのだろう？と思っていたが、一口食べるとその違いは歴然。",
+      "en": "Of course, this reporter tried it too. Before eating I wondered how it would differ from Pizza Hut's standard 'fluffy pan pizza' crust, but one bite made the difference obvious."
+    }
+  ],
+  "122": [
+    {
+      "ja": "地球の自転軸は、公転面に対しておよそ23.4度傾いている。この傾きのおかげで、太陽の光が当たる角度が一年を通して変わり、日本には春夏秋冬の季節が生まれる。",
+      "form": "自転軸",
+      "en": "The Earth's axis of rotation is tilted about 23.4 degrees relative to its orbital plane. Thanks to this tilt, the angle at which sunlight strikes changes through the year, which gives Japan its four seasons.",
+      "original": true
+    },
+    {
+      "ja": "天王星の大気は、他のガス惑星と比べると雲がほとんど見られず、のっぺりとした外観を持つ。これは、横倒しになった自転軸の影響で、昼夜での気温変化がほとんどないためである。",
+      "en": "Compared with the other gas planets, Uranus's atmosphere shows almost no clouds and looks featureless. This is because, owing to its tipped-over axis of rotation, there is almost no temperature difference between day and night."
+    },
+    {
+      "ja": "木星の赤道傾斜角は、3.08°-3.12°と水星に次いで小さく、自転軸がほぼ垂直である。このため、地球などに見られるような、気象現象の季節変化はあまりないと推測されている。",
+      "en": "Jupiter's axial tilt is 3.08°–3.12°, the second smallest after Mercury, so its axis of rotation is almost vertical. For this reason it is thought to have little of the seasonal change in weather seen on Earth and elsewhere."
+    }
+  ],
+  "128": [
+    {
+      "ja": "グラフ用紙の上の点Aは、原点から右に3、上に2進んだところにある。これを座標で表すと(3, 2)になる。数学の授業では、こうして点の位置を数の組で表す方法を最初に学ぶ。",
+      "form": "座標",
+      "en": "Point A on the graph paper is 3 to the right of and 2 above the origin. Expressed in coordinates, that is (3, 2). In maths class, this way of expressing a point's position as a pair of numbers is one of the first things you learn.",
+      "original": true
+    },
+    {
+      "ja": "道に迷った登山者は、スマートフォンの地図アプリで現在地の座標を確認し、緯度と経度を電話で救助隊に伝えた。正確な位置がわかったおかげで、ヘリコプターは一時間もたたずに到着した。",
+      "form": "座標",
+      "en": "The lost climber checked the coordinates of his current position in a map app on his smartphone and gave the latitude and longitude to the rescue team by phone. Because his exact location was known, the helicopter arrived in less than an hour.",
+      "original": true
+    },
+    {
+      "ja": "GPSのシステム時刻はGPS時刻と呼ばれる。GPS衛星に搭載された原子時計は、地上からの指令でGPS時刻に合うよう校正される。GPS受信機は、複数のGPS衛星から受信地点まで電波が届いた時間を計測して各衛星と受信地点の距離を求め、それから計算で受信座標および高精度の時刻を得る。",
+      "en": "The GPS system time is called GPS time. The atomic clocks aboard GPS satellites are calibrated by commands from the ground to match GPS time. A GPS receiver measures how long radio waves take to reach it from several satellites, finds the distance to each, and from that calculates the receiver's coordinates and a highly accurate time."
+    }
+  ],
+  "134": [
+    {
+      "ja": "家計簿をつけるとき、母は今でもスマートフォンではなく、ボタンの大きな計算機を使う。レシートを一枚ずつ見ながら数字を打ち込み、合計が合うと満足そうにうなずく。",
+      "form": "計算機",
+      "en": "When she does the household accounts, my mother still uses a calculator with big buttons rather than her smartphone. She punches in the numbers one receipt at a time and nods with satisfaction when the total adds up.",
+      "original": true
+    },
+    {
+      "ja": "なんと、セルを選択するだけで、そのセルに入力されている数値の合計だけでなく、平均や、選択しているセルの個数までわかるのである。計算機を取り出して計算したり、仮にどこかのセルに計算式を入力して計算させてみたりといった手間は全然必要ない。",
+      "en": "Amazingly, just by selecting cells you can see not only the sum of the numbers entered in them but also the average and how many cells are selected. There is no need at all to pull out a calculator, or to type a formula into some cell to work it out."
+    },
+    {
+      "ja": "おそらくは文字の発明や各種の計算機など、脳の働きを強化する機能を備えた道具も、これまでに人間はいくつか手にしてきたのだろう。しかし、コンピューターは、それらとは桁違いの力を人間に与えてくれそうだ。",
+      "en": "Humans have probably acquired a few tools before now that strengthen the workings of the brain, such as the invention of writing and various calculating machines. But the computer looks set to give us power of an entirely different order."
+    }
+  ],
+  "140": [
+    {
+      "ja": "県警は、高齢者から現金をだまし取ったとして逮捕した男について、余罪の十数件もあわせて立件する方針を固めた。男の自宅から押収した名簿には、県内の高齢者約二千人の名前が並んでいたという。",
+      "form": "立件",
+      "en": "Prefectural police have decided to build cases against a man arrested for swindling cash from elderly people over a dozen further offences as well. A list seized from his home reportedly contained the names of about 2,000 elderly people in the prefecture.",
+      "original": true
+    },
+    {
+      "ja": "告発状は受理されたものの、証拠が乏しいとして、検察は最終的に立件を見送った。被害を訴えてきた住民たちは「とても納得できない」として、検察審査会に審査を申し立てる考えだ。",
+      "form": "立件",
+      "en": "The criminal complaint was accepted, but prosecutors ultimately decided not to bring charges, citing a lack of evidence. The residents who had reported the harm say they 'cannot accept this at all' and plan to apply to a prosecution review panel.",
+      "original": true
+    }
+  ],
+  "147": [
+    {
+      "ja": "エレベーターに閉じ込められて三十分。非常ボタンで呼んだ管理会社の人がようやく到着し、扉をこじ開けてくれた。狭い箱から脱出したとき、外の空気がこんなにおいしいとは思わなかった。",
+      "form": "脱出",
+      "en": "Thirty minutes trapped in the lift. The man from the management company, called with the emergency button, finally arrived and prised the doors open. When I escaped from that cramped box, I never knew outside air could taste so good.",
+      "original": true
+    },
+    {
+      "ja": "「必要は発明の父」と言うように、人は足りないからこそ、必死に考えるもの。お金だって例外ではありません。本気で貧乏から脱出しようと知恵を絞り、できることから実際にアクションを起こしてみましょう。",
+      "en": "As the saying goes, 'necessity is the mother of invention': people think hard precisely because they lack something. Money is no exception. Rack your brains in earnest to escape poverty, and actually take action, starting with what you can do."
+    },
+    {
+      "ja": "ヴァンパイアは、招待されなければ、その家に入ることができない。その時、ヴァンパイアが取った行動は、家自体を破壊してしまうことだった。パニックに陥るチャーリーたちは、命からがら脱出するも、ヴァンパイアの攻撃はまだ始まったばかり。",
+      "en": "A vampire cannot enter a house unless invited. So what the vampire did was destroy the house itself. Charlie and the others, panicking, barely escape with their lives — but the vampire's attack has only just begun."
+    }
+  ],
+  "153": [
+    {
+      "ja": "台風が近づいているため、会社は社員に自宅待機を指示した。それでも電車が動いているのを見て、律儀に出勤してきた新人が一人だけいて、部長は思わず苦笑いした。",
+      "form": "出勤",
+      "en": "With a typhoon approaching, the company told its staff to stay at home. Even so, one conscientious new hire saw that the trains were running and came in to work anyway, and the department head couldn't help a wry smile.",
+      "original": true
+    },
+    {
+      "ja": "時差出勤が導入されてから、朝の満員電車に乗らずに済むようになった。十時に会社に着いて七時に帰る毎日は、思っていた以上に体が楽で、仕事の効率まで上がった気がする。",
+      "form": "出勤",
+      "en": "Since staggered working hours were introduced, I no longer have to ride packed morning trains. Getting to the office at ten and leaving at seven every day is easier on my body than I expected, and I feel I even work more efficiently.",
+      "original": true
+    }
+  ],
+  "159": [
+    {
+      "ja": "試合は1対1のまま後半のロスタイムに入った。ゴール前でフリーになった相手フォワードのシュートを、キーパーが体を投げ出して止めた。あのセーブこそが、勝敗を分ける決定的な場面だった。",
+      "form": "決定的",
+      "en": "The match went into second-half stoppage time at 1–1. The keeper threw himself to block a shot from an opposing forward left unmarked in front of goal. That save was the decisive moment that settled the result.",
+      "original": true
+    },
+    {
+      "ja": "イーライは、知識が豊富で弁舌も立つし、判断力もある。そんな有能な弁護士でも裁判で悩むことがある。決定的な証拠を手に入れることができずに困っていると、秘書のパトリシアが相手の会社の内部資料を裏から手に入れてくれ、これを元にイーライは活路を見出すことができた。",
+      "en": "Eli is knowledgeable, eloquent and has good judgement. Yet even such a capable lawyer can struggle in court. When he is stuck, unable to get conclusive evidence, his secretary Patricia gets hold of the opposing company's internal documents behind the scenes, and with them Eli finds a way through."
+    },
+    {
+      "ja": "1970年代までは先進国の各国政府は、「スタグフレーション」に悩んでいた。フリードマンは、スタグフレーションのうちインフレーションの要素に対しての姿勢や政策を重視した。また、経済に与える貨幣供給量の役割を重視し、それが短期の景気変動および長期のインフレーションに決定的な影響を与えるとした。",
+      "en": "Until the 1970s, governments of developed countries were troubled by 'stagflation'. Friedman emphasized attitudes and policies toward its inflationary element. He also stressed the role of the money supply in the economy, holding that it has a decisive influence on short-term business cycles and long-term inflation."
+    }
+  ],
+  "165": [
+    {
+      "ja": "東京・渋谷のスクランブル交差点には、ハロウィーンの夜になると大勢の若者が集まる。警視庁は今年も数百人規模の警察官を動員し、事故やトラブルを防ぐための警備にあたる方針だ。",
+      "form": "警視庁",
+      "en": "On Halloween night, crowds of young people gather at the scramble crossing in Shibuya, Tokyo. This year again, the Tokyo Metropolitan Police plan to deploy several hundred officers to keep order and prevent accidents and trouble.",
+      "original": true
+    },
+    {
+      "ja": "都内では、息子や警察官を名乗る電話で現金をだまし取る詐欺が後を絶たない。警視庁は、電話でお金の話が出たらいったん切り、すぐに家族に相談するよう呼びかけている。",
+      "form": "警視庁",
+      "en": "In Tokyo, frauds that swindle cash through phone calls from people claiming to be someone's son or a police officer keep happening. The Tokyo Metropolitan Police are urging people to hang up as soon as money comes up on a call and talk to their family right away.",
+      "original": true
+    },
+    {
+      "ja": "2日、野球賭博事件で警視庁が押収した現役力士の携帯電話に、八百長をしていたことをうかがわせるメールが残っていたことが分かった。同日、東京・両国国技館では臨時理事会が開かれ、日本相撲協会・放駒理事長が緊急記者会見を行い、「これから調査する」と繰り返した。",
+      "en": "On the 2nd it emerged that the mobile phone of an active sumo wrestler, seized by the Tokyo Metropolitan Police over the baseball gambling case, contained emails suggesting he had fixed bouts. The same day, an emergency board meeting was held at the Ryogoku Kokugikan in Tokyo, and Japan Sumo Association chairman Hanaregoma held an emergency press conference, repeating that 'we will investigate'."
+    }
+  ],
+  "171": [
+    {
+      "ja": "電線の中の銅は電気をよく通すが、そのまま触れると感電してしまう。そこで周りをゴムやビニールなどの絶縁体で覆い、電気が外に漏れないようにしている。",
+      "form": "絶縁体",
+      "en": "The copper inside an electric wire conducts electricity well, but touch it bare and you get a shock. So it is covered in an insulator such as rubber or vinyl to keep the electricity from leaking out.",
+      "original": true
+    },
+    {
+      "ja": "ガラスや陶器は、ほとんど電気を通さない絶縁体だ。送電線の鉄塔に、白い皿を重ねたような部品がぶら下がっているのを見たことがあるだろう。あれも陶器でできていて、電線の電気が鉄塔に流れないようにしている。",
+      "form": "絶縁体",
+      "en": "Glass and porcelain are insulators that conduct almost no electricity. You have probably seen parts like stacks of white plates hanging from power-line pylons. Those are made of porcelain too, and stop the electricity in the wires from flowing into the tower.",
+      "original": true
+    },
+    {
+      "ja": "電池や静電気により発生する電気は直流である。直流電流は金属線のような導体を流れるが、半導体や絶縁体をも流れる。また、真空中であっても陰極線として流れる。",
+      "en": "The electricity produced by batteries and static is direct current. Direct current flows through conductors such as metal wires, but it also flows through semiconductors and insulators. It even flows in a vacuum, as cathode rays."
+    }
+  ],
+  "177": [
+    {
+      "ja": "創業三百年のしょうゆ蔵では、杉の大桶で一年以上かけて熟成させる昔ながらの製法を今も守っている。手間もコストもかかるが、この味を求めて全国から注文が届く。",
+      "form": "製法",
+      "en": "A soy sauce brewery founded three hundred years ago still keeps to the traditional method of ageing its sauce for over a year in large cedar vats. It takes time and money, but orders arrive from all over the country from people who want that flavour.",
+      "original": true
+    },
+    {
+      "ja": "「甲州」が原料のスパークリングワインは、瓶内二次発酵という、シャンパンと同じ製法で造られており、きめ細かい泡立ちが特徴。フレッシュな果実味、シャープで軽快な味わい、酵母由来の豊かなふくらみとなめらかなコクも楽しめます。",
+      "en": "Sparkling wine made from Koshu grapes is produced by secondary fermentation in the bottle, the same method used for champagne, and is characterized by its fine bubbles. You can enjoy its fresh fruitiness, its sharp, light taste, and the rich body and smooth depth that come from the yeast."
+    },
+    {
+      "ja": "約20万年前のホモ・サピエンスの誕生以前から、人類の祖先は石器などの道具を使っていた。最も古い製法の石器はオルドワン石器と呼ばれ、約230万年前に遡ると言われている。",
+      "en": "Even before the emergence of Homo sapiens around 200,000 years ago, human ancestors used tools such as stone implements. Stone tools made by the oldest method are called Oldowan tools and are said to date back about 2.3 million years."
+    }
+  ],
+  "183": [
+    {
+      "ja": "地方の病院では医師不足が深刻で、夜間に救急患者を受け入れられない日も出てきた。救急車が隣の市まで走ることも珍しくない。住民の命に直結する、由々しき事態だ。",
+      "form": "由々しき",
+      "en": "Doctor shortages at regional hospitals are severe, and there are now nights when they cannot accept emergency patients, and it is not unusual for ambulances to drive to the next city. It is a grave situation that bears directly on residents' lives.",
+      "original": true
+    },
+    {
+      "ja": "十年前と比べて、子どもたちが外で遊ぶ時間は半分近くに減ったという。体力の低下にもつながる由々しき問題として、教育委員会は放課後の校庭開放を広げる方針だ。",
+      "form": "由々しき",
+      "en": "Compared with ten years ago, the time children spend playing outside has reportedly fallen by nearly half. Seeing it as a serious problem that also leads to declining fitness, the board of education plans to open school playgrounds after school more widely.",
+      "original": true
+    }
+  ],
+  "189": [
+    {
+      "ja": "コンビニで刃物を振り回していた男は、通報を受けて駆けつけた警察官二人によって、間もなく制圧された。客や店員にけがはなく、男はその場で現行犯逮捕されたという。",
+      "form": "制圧",
+      "en": "The man waving a knife around in the convenience store was soon subdued by two police officers who rushed to the scene after a call. No customers or staff were hurt, and the man was reportedly arrested on the spot.",
+      "original": true
+    },
+    {
+      "ja": "夜明け前に始まった反乱軍の攻撃で、首都の空港と国営放送局が相次いで制圧された。正午には、軍の幹部がテレビに現れ、新政権の発足を一方的に宣言した。",
+      "form": "制圧",
+      "en": "In a rebel attack that began before dawn, the capital's airport and the state broadcaster were seized one after the other. By noon a senior military officer had appeared on television and unilaterally declared a new government.",
+      "original": true
+    },
+    {
+      "ja": "『メン・イン・ブラック』は、人類に紛れて地球に生息する奇想天外な宇宙人達を監視するMIBと称する極秘組織に属する黒づくめのエージェントの凸凹コンビが、宇宙人の暴走を特殊な武器で制圧していくSFアクション大作。エージェントJ役はウィル・スミス、K役はトミー・リー・ジョーンズが演じている。",
+      "en": "Men in Black is a big-budget sci-fi action film about a mismatched pair of black-clad agents in a top-secret organization called MIB, which monitors the outlandish aliens living on Earth disguised among humans, as they use special weapons to bring rampaging aliens under control. Will Smith plays Agent J and Tommy Lee Jones plays K."
+    }
+  ],
+  "195": [
+    {
+      "ja": "高度成長期、政府は重化学工業の育成を国策として掲げ、港湾や道路の整備に巨額の予算を注ぎ込んだ。その結果、太平洋沿いには大規模な工業地帯が次々と誕生した。",
+      "form": "国策",
+      "en": "During the period of high growth, the government made fostering heavy and chemical industry a national policy and poured huge budgets into building ports and roads. As a result, one large industrial zone after another sprang up along the Pacific coast.",
+      "original": true
+    },
+    {
+      "ja": "国策として建設されるため水没住民に対する補償対策は特に重視され、1973年の水源地域対策特別措置法の施行に伴い、特に大規模なダム事業に関してはほぼ例外なく法を適用し、水源地域住民への対応を行っている。さらに国土交通省は従来の閉鎖的管理からの転換を図り、直轄ダム・水資源機構管理ダムを地元の観光資源として積極的に一般に開放する方向へ転換を行った。",
+      "en": "Because dams are built as national policy, compensation for residents whose homes are flooded is given particular weight; since the 1973 Act on Special Measures for Water Source Areas came into force, the law has been applied almost without exception to large dam projects. The Ministry of Land, Infrastructure, Transport and Tourism has also moved away from its former closed management, actively opening dams it runs directly or through the Water Resources Agency to the public as local tourist attractions."
+    },
+    {
+      "ja": "1990年代末には、これまでリングに上がることを許されなかった女性にムエタイを行うことが認められ、少しずつ女子ムエタイが行われるようになっている。また、ボクシングに対するアマチュアボクシングに当たる存在としてアマチュアムエタイも行われるようになった。これらはムエタイのオリンピック種目化を目指すタイの国策だといわれている。",
+      "en": "In the late 1990s women, who had never been allowed into the ring, were permitted to do Muay Thai, and women's Muay Thai gradually began to take place. Amateur Muay Thai, the counterpart to amateur boxing, also started. These moves are said to be Thai national policy aimed at making Muay Thai an Olympic sport."
+    }
+  ],
+  "201": [
+    {
+      "ja": "前半を終えて0対2。劣勢に立たされたチームは、ハーフタイムに監督から檄を飛ばされ、後半は見違えるような動きを見せた。終了間際の同点ゴールに、スタンドは総立ちになった。",
+      "form": "劣勢",
+      "en": "0–2 at half-time. The team, now on the back foot, got a rousing talk from the coach at the break and played like a different side in the second half. When they equalized just before the final whistle, the whole stand rose to its feet.",
+      "original": true
+    },
+    {
+      "ja": "元暦2年（1185年）3月24日、関門海峡の壇ノ浦で最後の戦いが行われた（壇ノ浦の戦い）。序盤は平氏が優勢であったが、やがて劣勢となっていく。",
+      "en": "On the 24th day of the 3rd month of Genryaku 2 (1185), the final battle was fought at Dan-no-ura in the Kanmon Strait (the Battle of Dan-no-ura). The Taira had the upper hand early on, but gradually fell into a losing position."
+    },
+    {
+      "ja": "ダンケルクの引揚げ後か直前くらいのことか、あの時代の英国空軍は、ドイツにくらべては、ずいぶん劣勢にあった。それで大急ぎで飛行機を揃えて、航空兵の大量訓練を始めた時代があった。",
+      "en": "Around the time of the Dunkirk evacuation, or just before it, the British air force was badly outmatched by Germany's. So there was a period when it hurried to assemble aircraft and began training airmen on a massive scale."
+    }
+  ],
+  "207": [
+    {
+      "ja": "急いでいたせいで、取引先に送るはずの見積書を、宛先をよく確かめないまま別の会社に送ってしまった。気づいたのは送信ボタンを押した直後で、血の気が引いた。",
+      "form": "宛先",
+      "en": "I was in a hurry and sent a quote meant for a client to a different company without properly checking the address. I realized just after hitting send, and the blood drained from my face.",
+      "original": true
+    },
+    {
+      "ja": "引っ越したばかりの友人に荷物を送ったら、一週間後にこちらへ戻ってきてしまった。伝票を見直すと、宛先の部屋番号を書き忘れていた。慌てて書き直して、もう一度送り直した。",
+      "form": "宛先",
+      "en": "I sent a parcel to a friend who had just moved, and a week later it came back to me. When I checked the slip again, I had forgotten to write the room number in the address. I hurriedly corrected it and sent it again.",
+      "original": true
+    },
+    {
+      "ja": "データグラムはヘッダとペイロードで構成される。IPヘッダには、送信元IPアドレス、宛先IPアドレス、データグラムのルーティングや転送に必要なメタデータが含まれる。",
+      "en": "A datagram consists of a header and a payload. The IP header contains the source IP address, the destination IP address, and the metadata needed to route and forward the datagram."
+    }
+  ],
+  "213": [
+    {
+      "ja": "真夏の海辺では、素肌に強い日差しを浴びる時間がどうしても長くなる。日焼け止めはこまめに塗り直し、肩や首の後ろなど、塗り忘れやすいところにも気を配りたい。",
+      "form": "素肌",
+      "en": "At the beach in midsummer, your bare skin inevitably spends a long time in strong sunlight. Reapply sunscreen often, and pay attention to easily missed spots such as your shoulders and the back of your neck.",
+      "original": true
+    },
+    {
+      "ja": "ゴルフはもちろん、普段使いやビジネスシーンにも活用できるポロシャツは、何着あってもうれしいもの。色、形、価格も大切だが、まだまだ暑いこの時期、一番重要なのは、素肌に着て心地いいかどうかだろう。",
+      "en": "Polo shirts, which you can wear not only for golf but every day and in business settings too, are something you can never have too many of. Colour, cut and price matter, but in this still-hot season the most important thing is probably whether they feel good against bare skin."
+    },
+    {
+      "ja": "やはりいくつになっても、透明感あふれる素肌でいたいと願うのは女性の本音。特に「シミ」は、自分の目に見えてしまう分、美肌を目指す女性たちが、最も気にする厄介者といえるかもしれませんね。",
+      "en": "No matter how old they get, women honestly want to keep clear, translucent skin. Spots in particular, because you can see them yourself, may be the nuisance that women aiming for beautiful skin worry about most."
+    }
+  ],
+  "219": [
+    {
+      "ja": "景気が良くなると企業の業績が上がり、給料やボーナスも増える。人々の財布のひもがゆるめば物がよく売れ、それがまた企業を潤すという好循環が生まれる。",
+      "form": "景気",
+      "en": "When the economy improves, companies' earnings rise and wages and bonuses go up too. When people loosen their purse strings, goods sell well, which in turn enriches companies again — a virtuous circle.",
+      "original": true
+    },
+    {
+      "ja": "近年、景気の低迷や女性の社会進出といった世の中の変化により、共働き世帯が増加を続けている。内閣府が発表した「男女共同参画白書18年版」によると、共働き世帯は1000万世帯に迫る勢いで増えており、30年前（1980年）と比べると約2倍に増加しているとのこと。",
+      "en": "In recent years, social changes such as the sluggish economy and more women entering the workforce have kept increasing the number of dual-income households. According to the Cabinet Office's 'White Paper on Gender Equality', dual-income households are approaching ten million, roughly double the number thirty years ago (1980)."
+    },
+    {
+      "ja": "一般的に、バブル景気は1980年代後半〜1990年代前半といわれている（職種や地域によって1〜2年の差がある）。1985年のプラザ合意をきっかけに、急激な円高がおこり、1ドル240円前後だった為替相場は1年後には1ドル120円に。",
+      "en": "The bubble economy is generally said to have run from the late 1980s to the early 1990s (with a difference of a year or two by occupation and region). Triggered by the 1985 Plaza Accord, the yen rose sharply, and the exchange rate, around 240 yen to the dollar, became 120 yen a year later."
+    }
+  ],
+  "225": [
+    {
+      "ja": "若い世代ほど選挙に行かないとよく言われる。実際、前回の衆議院選挙では、二十代の投票率は三割台にとどまり、六十代のおよそ半分しかなかった。",
+      "form": "率",
+      "en": "It's said that the younger the generation, the less they vote. In fact, at the last general election, turnout among people in their twenties was only in the 30-percent range, about half that of people in their sixties.",
+      "original": true
+    },
+    {
+      "ja": "心臓のバイパス手術といえば、かつては命がけの大手術だった。今では技術や機器の進歩によって、多くの病院で成功率が九割を大きく超えるまでになっている。",
+      "form": "率",
+      "en": "Heart bypass surgery used to be a major, life-or-death operation. Now, thanks to advances in technique and equipment, the success rate at many hospitals is well over 90 percent.",
+      "original": true
+    },
+    {
+      "ja": "離職率が高い会社は、残業や休日出勤が多いなど労働環境の面で働きにくいという特徴があります。",
+      "en": "Companies with a high turnover rate tend to be hard places to work in terms of working conditions, such as a lot of overtime and working on days off."
+    }
+  ],
+  "231": [
+    {
+      "ja": "「売り上げを伸ばすために頑張ります」という目標では、具体性に欠ける。誰に、何を、いつまでに、どれだけ売るのか。そこまで決めて初めて、計画は動き出す。",
+      "form": "具体性",
+      "en": "A goal like 'I'll work hard to raise sales' lacks concreteness. To whom, what, by when and how much will you sell? Only once you've decided that does a plan get moving.",
+      "original": true
+    },
+    {
+      "ja": "私はタゴールの詩は「新月」ほか数種読んでいるし、戯曲も「郵便局」その他幾篇か読んでいる。正直のところ、その詩は、具体性が無いという点で、私にはあまり好ましくなかった。",
+      "en": "I have read several of Tagore's poetry collections, including The Crescent Moon, and several of his plays, including The Post Office. To be honest, I did not much like his poems, because they lacked concreteness."
+    },
+    {
+      "ja": "政策は具体性に欠け抽象的・理念的な話が多いという評価がある一方、演説の説得力はジョン・F・ケネディの再来とも形容される。演説では、we（我々）、you（あなた）を多用した短いフレーズを重ねていく手法を採用している。",
+      "en": "While his policies are judged to lack specifics and to be largely abstract and idealistic, his speeches are so persuasive that he has been called John F. Kennedy reborn. In his speeches he strings together short phrases that use 'we' and 'you' heavily."
+    }
+  ],
+  "237": [
+    {
+      "ja": "仮に今夜、大きな地震が起きたとしたら、家族とどこで落ち合うか決めてあるだろうか。電話がつながらないことも考えて、避難場所と連絡方法を一度話し合っておきたい。",
+      "form": "仮に",
+      "en": "Supposing a big earthquake struck tonight, have you decided where to meet up with your family? Bearing in mind that phones may not get through, it's worth talking over your evacuation site and how to contact each other at least once.",
+      "original": true
+    },
+    {
+      "ja": "パスワードが設定可能になったことで、仮にPonta IDや電話番号、誕生日が他人に知られたとしてもなりすまされるリスクは減少したといえます。ログインに関しては安心して使える仕様になったといえそうです。",
+      "en": "Now that a password can be set, the risk of being impersonated has decreased even if someone else were to learn your Ponta ID, phone number or birthday. As far as logging in goes, it seems the service can now be used with peace of mind."
+    },
+    {
+      "ja": "カメラのバッテリーは一般的に数百枚しか撮影できないので、仮に500枚撮影できるカメラの場合で、1秒間に30コマの動画を作ると約8秒の動画にしかならない。別途、バッテリーを用意したり、電源を用意できればこの問題は解消できるが、常にそのためのメンテナンスが必要になったりする。",
+      "en": "Camera batteries can generally take only a few hundred shots, so supposing a camera can take 500 shots, a video made at 30 frames a second will only be about 8 seconds long. This problem can be solved by preparing separate batteries or a power supply, but that always requires maintenance."
+    }
+  ],
+  "243": [
+    {
+      "ja": "祖父の家の古い廊下は、歩くたびにぎいぎいと音を立てる。夜中にトイレに起きると、その音がやけに大きく響いて、子どもの頃はそれが怖くてたまらなかった。",
+      "form": "ぎいぎい",
+      "en": "The old hallway at my grandfather's house creaks with every step. When I got up at night to use the toilet, the sound echoed terribly loudly, and as a child it frightened me no end.",
+      "original": true
+    },
+    {
+      "ja": "わたしたちがみんな船の上に乗ってしまうと、まもなく船をつないだ大づなは解かれて、船頭はかじを、御者は手づなを取った。引きづなの滑車がぎいぎい鳴って、馬は引き船の道をカッパカッパ歩きだした。",
+      "en": "Once we were all aboard, the hawser mooring the boat was soon cast off; the boatman took the rudder and the driver the reins. The pulley of the towrope creaked, and the horse began clip-clopping along the towpath."
+    },
+    {
+      "ja": "公園のブランコは、もう何年も油を差していないのか、こぐたびにぎいぎいときしんだ。それでも子どもたちは気にする様子もなく、夕方まで順番を待って乗っていた。",
+      "form": "ぎいぎい",
+      "en": "The park swings, perhaps not oiled in years, creaked every time someone pumped their legs. Even so, the children didn't seem to mind and waited their turn to ride until evening.",
+      "original": true
+    }
+  ],
+  "249": [
+    {
+      "ja": "最終節を前に、チームは降格圏とわずか勝ち点1差。勝てば自力でJ1残留が決まる大一番に、ホームのスタジアムには一万人を超えるサポーターが詰めかけた。",
+      "form": "残留",
+      "en": "Going into the final round, the team was just one point above the relegation zone. For the crucial match that would secure their place in J1 on their own if they won, more than ten thousand supporters packed the home stadium.",
+      "original": true
+    },
+    {
+      "ja": "スーパーに並ぶ野菜は、残留農薬が国の基準を超えていないか、定期的に検査されている。それでも気になる人は、流水でよく洗ったり、皮をむいたりすればさらに安心だ。",
+      "form": "残留",
+      "en": "Vegetables sold in supermarkets are regularly tested to make sure residual pesticides do not exceed national standards. If you're still worried, washing them well under running water or peeling them gives extra peace of mind.",
+      "original": true
+    },
+    {
+      "ja": "第二次世界大戦後、フランスが再び進駐してくると、フランス軍とベトナム民主共和国軍の間で戦争（第一次インドシナ戦争）が始まった。ベトミンに残留日本兵が多数参加し、独立に対して多大な貢献をした。",
+      "en": "After the Second World War, when France moved back in, war broke out between French forces and the army of the Democratic Republic of Vietnam (the First Indochina War). Many Japanese soldiers who had stayed behind joined the Viet Minh and contributed greatly to independence."
+    }
+  ],
+  "255": [
+    {
+      "ja": "父が亡くなって、実家の土地と家を兄と私で相続することになった。誰も住む予定のない家をどうするのか、話し合いは半年たった今もまとまっていない。",
+      "form": "相続",
+      "en": "When our father died, my brother and I were to inherit the family home and its land. Six months on, we still haven't agreed on what to do with a house nobody plans to live in.",
+      "original": true
+    },
+    {
+      "ja": "1855年春と1856年夏に、妻イェニーの伯父と母が相次いで死去した。とくに母の死はイェニーを悲しませたが、イェニーがその遺産の一部を相続したため、マルクス家の家計は楽になった。",
+      "en": "In spring 1855 and summer 1856, the uncle and the mother of Marx's wife Jenny died one after the other. Her mother's death in particular grieved Jenny, but because she inherited part of the estate, the Marx household's finances eased."
+    },
+    {
+      "ja": "事実婚のメリットは、どちらか一方にのみ改姓を強いることがない点。嫁扱い、婿扱いされにくいこと。デメリットは、相続権が無いので遺言書を夫婦二人とも作ることは必須。",
+      "en": "The advantage of a common-law marriage is that neither partner is forced to change their surname, and you are less likely to be treated as 'the bride' or 'the son-in-law' of the family. The disadvantage is that there are no inheritance rights, so it's essential for both partners to write a will."
+    }
+  ],
+  "261": [
+    {
+      "ja": "祖母は今年で九十になるが、年の割に足腰がしっかりしていて、毎朝三十分の散歩を欠かさない。近所の人からは、いつも元気の秘訣を聞かれるそうだ。",
+      "form": "割",
+      "en": "My grandmother turns ninety this year, but for her age her legs are strong, and she never misses her thirty-minute walk each morning. The neighbours are always asking her the secret of her energy, she says.",
+      "original": true
+    },
+    {
+      "ja": "駅前のスーパーでは、閉店の一時間前になると、売れ残った弁当や総菜がすべて三割引きになる。その時間帯を狙って、仕事帰りの客が次々にやって来て、店内は急に混み合う。",
+      "form": "割",
+      "en": "At the supermarket in front of the station, an hour before closing, all the leftover boxed lunches and ready-made dishes go 30 percent off. Customers on their way home from work arrive one after another, timing it for then, and the store suddenly gets crowded.",
+      "original": true
+    }
+  ],
+  "267": [
+    {
+      "ja": "対局はいよいよ終盤に入った。持ち時間を使い切った若手棋士は、盤上をじっと見つめたまま、一分ごとに迫る秒読みの中で、勝ちにつながる次の一手を探し続けた。",
+      "form": "盤上",
+      "en": "The game entered its endgame. Having used up his allotted time, the young shogi player kept staring at the board, searching for the move that would win him the game as the byoyomi counted down each minute.",
+      "original": true
+    },
+    {
+      "ja": "碁会所の奥で、二人の老人が黙々と碁を打っている。盤上はすでに白と黒の石で埋まりかけているが、どちらが優勢なのか、そばで見ている客にもまだわからない。",
+      "form": "盤上",
+      "en": "At the back of the go parlour, two old men are silently playing go. The board is already nearly filled with white and black stones, but even the onlookers beside them can't yet tell who is ahead.",
+      "original": true
+    }
+  ],
+  "273": [
+    {
+      "ja": "わずか十五歳で国際ピアノコンクールを制した少女は、たぐいまれな才能の持ち主として一躍注目を集めた。それでも本人は「毎日八時間練習しているだけです」と、照れくさそうに笑った。",
+      "form": "たぐいまれ",
+      "en": "The girl who won an international piano competition at just fifteen suddenly drew attention as someone of exceptional talent. Yet she herself just laughed shyly and said, 'I only practise eight hours a day.'",
+      "original": true
+    },
+    {
+      "ja": "彼らはただドストイェフスキイに変態心理の作家を見るにとどまるだろう。彼が著しく「神」のことに執着する所などはほとんど無意味に感ぜられるに相違ない。しかし実際はこの作家ほど深く確実に人間のあらゆる性情をつかんでいる者は、たぐいまれなのである。",
+      "en": "They will probably see in Dostoevsky nothing more than a writer of abnormal psychology. His striking fixation on 'God' will surely seem almost meaningless to them. But in fact, someone who grasps every aspect of human nature as deeply and surely as this writer is rare indeed."
+    },
+    {
+      "ja": "カリフォルニア州には7,000種の植物が生えているが、そのうちの50パーセントがシエラネバダ山脈にあり、20パーセント以上がヨセミテ公園内に見られる。160種以上の稀少植物の植生地域があり、その形成にはヨセミテのたぐいまれな地質学的形成過程と、特異な土壌が寄与している。",
+      "en": "California has 7,000 plant species, 50 percent of which grow in the Sierra Nevada and over 20 percent in Yosemite. It contains habitats for more than 160 rare plants, shaped by Yosemite's exceptional geological history and distinctive soils."
+    }
+  ],
+  "279": [
+    {
+      "ja": "県立の無名校が、甲子園で強豪校を次々と破り、初出場で初優勝という快挙を成し遂げた。地元の商店街では号外が配られ、町じゅうがお祭り騒ぎとなった。",
+      "form": "快挙",
+      "en": "An unknown prefectural school beat powerhouse after powerhouse at Koshien, achieving the remarkable feat of winning the title on its first appearance. Special editions were handed out in the local shopping street, and the whole town went wild.",
+      "original": true
+    },
+    {
+      "ja": "通常の作品では、公開2週目の週末は前週の週末成績の約50から60パーセント程度に興行収入が落ち込む。しかし、『TIME/タイム』の2週目の週末土日興行収入は、前週比約86パーセントという驚異の記録。前週からたった14パーセントしか落ちていないというこの数値はめったない快挙である。",
+      "en": "For a typical film, box-office takings on its second weekend fall to about 50–60 percent of the first weekend's. But In Time's second-weekend Saturday–Sunday takings were a remarkable 86 percent of the previous week's. Dropping only 14 percent from the week before is a rare feat."
+    },
+    {
+      "ja": "『ロード・オブ・ザ・リング』『ロード・オブ・ザ・リング／二つの塔』『ロード・オブ・ザ・リング／王の帰還』全てが世界的に大ヒットした。3作目の『ロード・オブ・ザ・リング／王の帰還』では、アカデミー賞11部門にノミネートされ、全て受賞するという快挙を成し遂げているだけに、本作への期待が高まる。",
+      "en": "The Lord of the Rings, The Two Towers and The Return of the King were all huge hits worldwide. The third film, The Return of the King, achieved the remarkable feat of being nominated in eleven Academy Award categories and winning them all, so expectations for this film are high."
+    }
+  ],
+  "285": [
+    {
+      "ja": "新しい電気自動車は、従来のモデルに比べて、一回の充電で走れる距離がおよそ一・五倍に伸びた。東京から名古屋の近くまで、途中で充電せずに行けるという。",
+      "form": "従来",
+      "en": "The new electric car can go about 1.5 times as far on a single charge as the previous model. It can reportedly get from Tokyo to near Nagoya without stopping to recharge.",
+      "original": true
+    },
+    {
+      "ja": "スマートフォンやタブレットはメールの送受信などの簡単なコンテンツ作成や、インターネットなどの利用には問題が無い。従来このような用途に使われていたのがネットブックなどのパソコンだ。",
+      "en": "Smartphones and tablets are fine for creating simple content, like sending and receiving email, and for using the internet. Until now, PCs such as netbooks were what was used for these purposes."
+    },
+    {
+      "ja": "WX100は同社の定評ある手ぶれ補正Super Steady Shot方式を踏襲しているのに、加えて新開発のジャイロセンサーを搭載して従来の手ぶれ補正機能よりも補正の精度が向上している。さらに新開発のオートフォーカス機能によって狙った被写体にピントをすばやく合わせることが可能になった。",
+      "en": "The WX100 carries over the company's well-regarded Super Steady Shot image stabilization, and adds a newly developed gyro sensor, making stabilization more accurate than the previous system. A newly developed autofocus also lets it focus quickly on the intended subject."
+    }
+  ],
+  "291": [
+    {
+      "ja": "この随筆家の文章には、巧まざるユーモアがある。笑わせようと狙った箇所はひとつもないのに、日々の失敗を淡々とつづる筆致に、読者は思わず吹き出してしまう。",
+      "form": "巧まざる",
+      "en": "This essayist's writing has an artless humour. Not one passage is aimed at getting a laugh, yet readers can't help bursting out laughing at the matter-of-fact way the essays record daily blunders.",
+      "original": true
+    },
+    {
+      "ja": "私は、どういうわけだか、家に在る時には頗る口が重い。ただ、まごまごしている。たまに私の家に訪れて来る友人は、すべて才あり学あり、巧まずして華麗高潔の芸論を展開するのであるが、私は、れいの「天候居士」ゆえ、いたずらに、あの、あの、とばかり申して膝をゆすり、稀には、へえ、などの平伏の返事まで飛び出す始末で、われながら、みっともない。",
+      "en": "For some reason I am extremely tongue-tied when at home. I just fumble about. The friends who occasionally visit me are all talented and learned, and effortlessly unfold brilliant, lofty arguments about art, whereas I, being my usual 'weather-talk hermit', merely jiggle my knees and say 'um, um', and now and then even a grovelling 'yes, sir' pops out — a sorry sight, I must say."
+    },
+    {
+      "ja": "死人に口無しで、もとより詳しい事情はわからないが、平吉に毒酒を贈ったのはこの女房であったらしい。女房は亭主の留守に平吉から七十五両の金をあずけられて、俄かに悪心を起してその金をわが物にしようと巧んだ。",
+      "en": "The dead tell no tales, so the details are of course unknown, but it seems it was this wife who sent Heikichi the poisoned sake. While her husband was away, Heikichi had entrusted seventy-five ryo to her; she was suddenly seized by an evil impulse and schemed to make the money her own."
+    }
+  ],
+  "297": [
+    {
+      "ja": "長引く不況の影響で、駅前の商店街ではシャッターを下ろしたままの店が目立つようになった。創業五十年の和菓子屋も、ついに今月いっぱいで店を閉めるという。",
+      "form": "不況",
+      "en": "Because of the prolonged recession, shops with their shutters down have become a common sight on the shopping street by the station. Even a Japanese sweets shop founded fifty years ago is finally closing at the end of this month.",
+      "original": true
+    },
+    {
+      "ja": "家電量販店大手の11月の販売額が発表された。各量販店ともに前年同月比４〜６割減となり、これは月ベースで過去最大の落ち込みとなる。過去一番家電が売れないともいえるこの危機、原因は不況に加えてネットでの通販にあるかもしれない。",
+      "en": "The November sales figures of the major electronics retailers have been announced. All were down 40–60 percent year on year, the biggest monthly drop on record. The cause of this crisis — you could call it the worst ever for selling appliances — may be online shopping on top of the recession."
+    },
+    {
+      "ja": "駅や街中で見かける数がグングン増えている1,000円カット。男性のための場所というイメージが強いのだが不況の影響もあり、普段はカット＆ブローで5,000円前後という美容院に通っている独女世代にも1,000円カットに興味を持つ女性が増えているらしい。",
+      "en": "The number of 1,000-yen haircut shops seen at stations and around town is growing fast. They have a strong image as places for men, but partly because of the recession, more women of the single-working-woman generation, who usually go to salons charging around 5,000 yen for a cut and blow-dry, are apparently becoming interested in them."
+    }
+  ],
+  "303": [
+    {
+      "ja": "鉛筆でりんごを描くとき、輪郭だけでは平らな円にしか見えない。光の当たる側を明るく残し、反対側に影をつけていくと、絵はぐっと立体的になる。美術の先生は「影を怖がらないこと」と何度も言っていた。",
+      "form": "立体的",
+      "en": "When you draw an apple in pencil, an outline alone looks like nothing more than a flat circle. Leave the side the light hits bright and add shadow to the opposite side, and the drawing suddenly becomes three-dimensional. My art teacher used to say again and again, 'Don't be afraid of shadows.'",
+      "original": true
+    },
+    {
+      "ja": "新しく開館した科学館のプラネタリウムでは、専用の眼鏡をかけると、星々が立体的に浮かび上がって見える。まるで宇宙空間を漂っているような感覚に、子どもたちから歓声が上がった。",
+      "form": "立体的",
+      "en": "At the planetarium in the newly opened science museum, when you put on the special glasses the stars appear to float out in three dimensions. The sensation of drifting through outer space drew cheers from the children.",
+      "original": true
+    }
+  ],
+  "309": [
+    {
+      "ja": "新しい市立図書館は、地元出身の建築家が設計した。大きな窓から自然光がたっぷり入るように工夫されていて、昼間は照明をつけなくても本が読めるほど明るい。",
+      "form": "設計",
+      "en": "The new city library was designed by a locally born architect. It is planned so that plenty of natural light comes in through large windows, and in the daytime it is bright enough to read without the lights on.",
+      "original": true
+    },
+    {
+      "ja": "Macは、ユーザーに対して「使いやすい」ことを徹底して意識して設計されている。そのため、ユーザーが「知る必要がない」（とアップルが判断した）ファイルやフォルダは隠され、標準の設定では見ることができない。",
+      "en": "The Mac is designed with a thorough focus on being 'easy to use' for its users. That is why files and folders that users 'don't need to know about' (as Apple has judged) are hidden and cannot be seen with the default settings."
+    },
+    {
+      "ja": "両親と同居するために家を建て替えることになり、設計の段階から段差をなくしてほしいと頼んだ。廊下の幅も、車いすが通れるように広めにとってもらった。",
+      "form": "設計",
+      "en": "We were rebuilding the house so we could live with my parents, and from the design stage I asked them to eliminate steps. We also had the hallways made wider so a wheelchair could get through.",
+      "original": true
+    }
+  ],
+  "315": [
+    {
+      "ja": "会社が示した値上げ幅について、消費者団体はその妥当性に疑問を投げかけた。原材料費の上昇分を考えても、二割もの値上げは高すぎるというのだ。会社側は近く、詳しい説明の場を設けるとしている。",
+      "form": "妥当性",
+      "en": "A consumer group has questioned the validity of the price rise the company announced. Even allowing for higher raw-material costs, it says, a rise of as much as 20 percent is too steep. The company says it will soon hold a session to explain in detail.",
+      "original": true
+    },
+    {
+      "ja": "作品を誰が書いたのかが正しく表示され、中味がオリジナルの姿を保ちつづけることは、作者と作品を評価するにあたっての、安定的な基盤を提供する。「文化の発展に寄与する」という目的に照らせば、「著作者人格権」に期限を設けないことには、妥当性がある。",
+      "en": "Having the author of a work shown correctly, and having its content keep its original form, provides a stable foundation for evaluating authors and works. In light of the aim of 'contributing to the development of culture', there is good reason not to set a time limit on authors' moral rights."
+    },
+    {
+      "ja": "新しい薬が承認されるまでには、何段階もの臨床試験を経なければならない。得られたデータの妥当性を専門家が厳しく審査し、効果と安全性が確かめられて初めて、薬は患者のもとに届く。",
+      "form": "妥当性",
+      "en": "Before a new drug is approved, it has to go through several stages of clinical trials. Only after experts have rigorously examined the validity of the data and its efficacy and safety have been confirmed does the drug reach patients.",
+      "original": true
+    }
+  ],
+  "321": [
+    {
+      "ja": "夜明け前、国境近くの軍事拠点に対して大規模な空爆が行われた。戦闘機の爆音で目を覚ました住民の多くは、着の身着のままで近くの地下壕へ避難したという。",
+      "form": "空爆",
+      "en": "Before dawn, a large-scale airstrike was carried out on a military base near the border. Many residents, woken by the roar of the fighter jets, reportedly fled to nearby underground shelters with only the clothes on their backs.",
+      "original": true
+    },
+    {
+      "ja": "第二次世界大戦中、ニュルンベルクは連合国軍による空爆の優先目標であった。イギリス空軍とアメリカ空軍の航空機による爆撃で1945年1月2日にニュルンベルク旧市街は破壊され、全市域が甚大な被害を負った。",
+      "en": "During the Second World War, Nuremberg was a priority target for Allied bombing. On 2 January 1945 the old town of Nuremberg was destroyed by bombing from Royal Air Force and US Army Air Forces aircraft, and the whole city suffered severe damage."
+    },
+    {
+      "ja": "第二次世界大戦の末期、日本の多くの都市がアメリカ軍の空爆を受けた。焼け野原となった町の写真を見ると、人々がどれほど過酷な日々を生き延びたのかが伝わってくる。",
+      "form": "空爆",
+      "en": "Toward the end of the Second World War, many Japanese cities were bombed from the air by the US military. Looking at photos of towns reduced to burnt-out wasteland, you can sense how harsh the days were that people lived through.",
+      "original": true
+    }
+  ]
+}
