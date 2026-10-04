@@ -15,6 +15,7 @@ import sys  # noqa: E402
 
 sys.path.insert(0, str(DECK / "tools"))
 from rank import VARIANTS  # noqa: E402
+from rights import UNVERIFIED  # noqa: E402
 
 out = {}
 for f in sorted(glob.glob(str(SRC / "mcd" / "*.json"))):
@@ -43,7 +44,8 @@ for f in sorted(glob.glob(str(SRC / "mcd" / "*.json"))):
             if not form:
                 raise SystemExit(f"{n}: word not found in {r['ja'][:40]}")
             res.append({"ja": r["ja"], "form": form, "en": r["en"], "kind": p.get("kind", "other"), "site": p.get("site", ""),
-                        "url": p.get("url", ""), "licence": p.get("licence", ""), "title": p.get("title", "")})
+                        "url": p.get("url", ""), "licence": p.get("licence") or UNVERIFIED, "title": p.get("title", ""),
+                        **{k: p[k] for k in ("author", "translator") if p.get(k)}})
         out[n] = res
 (SRC / "mcd.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", "utf-8")
 orig = sum(1 for rows in out.values() for r in rows if r["kind"] == "original")

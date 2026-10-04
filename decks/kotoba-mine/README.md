@@ -104,7 +104,8 @@ readings on tap, dark or light screen, backup/restore.
      (KFTT, JaQuAD, JSQuAD, WAC), UD Japanese GSD web text, WRIME posts (`tools/mine_corpora.py`);
    - Tatoeba with its English, the Tanaka/SNOW example bank and the ja.wikinews archive
      already in the repo (`tools/mine_local.py`);
-   - Aozora Bunko, public-domain literature (`tools/mine_aozora.py`).
+   - Aozora Bunko literature (`tools/mine_aozora.py`). Aozora is not all public domain:
+     the miner reads each work's licence from the end of its text file.
 2. **Ranking** (`tools/rank.py`, after GDEX "good dictionary examples"): hard filters
    drop fragments, headlines, lines that lean on an earlier sentence (opening with
    しかし, だから, が、…), classical grammar and old spellings, list bullets, captions,
@@ -120,12 +121,49 @@ The mining data itself (`mining/`) is not committed; the scripts rebuild it.
 
 ## Sources and licences
 
-Every card carries its source. Tatoeba (CC BY 2.0 FR), Wikipedia and Wikinews
-(CC BY-SA / CC BY 2.5), UD GSD (CC BY-SA 4.0) and Aozora Bunko (public domain) are
-openly licensed. livedoor news (CC BY-ND 2.1 JP) is quoted verbatim with credit.
-WRIME (CC BY-NC-ND 4.0) and sentences from web pages are short quotations kept for
-personal study, each with a link back to its page. Definitions, meanings, usage
-notes and the 書き下ろし sentences were written for this word list.
+Every card names its source. `source/rights.json` is the licence of record for each
+source, and `tools/rights.py` applies it to every card when the deck is built:
+
+- **Aozora Bunko** works are licensed one by one. A licence is recorded only after
+  someone has read it at the end of the work's text file. Read so far:
+  - CC BY 2.1 JP: 富田倫生 (『パソコン創世記』, 『本の未来』, 『「天に積む宝」のふやし方、へらし方』),
+    the Sherlock Holmes stories translated or revised by 大久保ゆう, and 『偉大な医師たち』 (tr. 水上茂樹).
+  - CC BY 4.0: 『アリスはふしぎの国で』 (tr. 大久保ゆう).
+  - No changes allowed (CC BY-ND / CC BY-NC-ND): 小泉八雲 『赤い婚礼』 and 『九州の学生とともに』,
+    片岡義男 『七月の水玉』 and 『東京青年』, 鶴岡雄二 『45回転の夏』.
+  - Every other Aozora work is labelled "unverified" until its licence has been read.
+    Nothing is labelled "public domain".
+- **Openly licensed:** Tatoeba (CC BY 2.0 FR), Wikipedia and Wikinews (CC BY-SA / CC BY 2.5)
+  and UD GSD (CC BY-SA 4.0).
+- **No changes allowed:** livedoor news (CC BY-ND 2.1 JP) and WRIME posts (CC BY-NC-ND 4.0).
+- **Web pages:** sentences quoted from web pages are kept for personal study, each with a
+  link back to its page.
+- **Written for this list:** definitions, meanings, usage notes and the 書き下ろし passages.
+
+## Private and public builds
+
+`tools/build.py` has two profiles. Both give every card the same id, so progress carries
+over between them.
+
+| Profile                 | What it is for                                                               | What it leaves out                                                                                                                                                                                                                                                                                                                         | Writes                                                                                                              |
+| ----------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `private` (the default) | the learner's own study (private copying, Japanese copyright law Article 30) | nothing                                                                                                                                                                                                                                                                                                                                    | `prototypes/corridor/decks/<id>/deck.json` and `release/` (apkg, tsv, study page, `ATTRIBUTION-<id>.md`), as before |
+| `public`                | anything shared: GitHub Pages, a shared `.apkg`, the study page              | livedoor news and other no-changes or non-commercial licences, web-page quotations, posts by private people (x.com, Instagram, Threads, Facebook, note, Ameba, Hatena, Chiebukuro), Aozora works that do not allow changes or whose licence is unread, and CC sources with no link to the exact page. A word left with no card is dropped. | `release/public/` (`deck-<id>.json`, apkg, tsv, study page, `ATTRIBUTION-<id>.md`); never `ids.json`                |
+
+Each `ATTRIBUTION-<id>.md` lists every source that is not written for the deck, grouped by
+site, with its licence, author and translator, links (or "no URL recorded") and how many
+passages come from it. The public build prints how many cards each rule left out and which
+words were dropped.
+
+The app and GitHub Pages still serve the **private** build. Switching Pages to the public
+build is the learner's decision (question 1 in
+`docs/srs/review-2026-10-04/REFINEMENT.md`); this step does not change `pages-app.yml`.
+
+```bash
+python3 decks/kotoba-mine/tools/build.py --frozen                    # private (default)
+python3 decks/kotoba-mine/tools/build.py --frozen --profile public   # public
+python3 decks/kotoba-mine/tools/test_rights.py                       # licence checks
+```
 
 ## Files
 
@@ -138,7 +176,10 @@ source/v2/<topic>.json    meaning, Japanese definition, usage note (and the
 source/review/*.json      the reader's final choice and translation per word
 source/mined.json         the sentences the deck is built from
 tools/                    miners, rank.py, review_input.py, export_mined.py, build.py
-release/                  kotoba-mine.apkg · kotoba-mine.tsv · study.html
+source/rights.json        the licence of record for every source (see above)
+release/                  kotoba-mine.apkg · kotoba-mine.tsv · study.html ·
+                          ATTRIBUTION-<id>.md (private build)
+release/public/           the public build and its ATTRIBUTION files
 ```
 
 The player lives in `prototypes/corridor/decks/player/` (`engine.js`, `mount.js`,

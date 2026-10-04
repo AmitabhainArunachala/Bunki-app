@@ -8,7 +8,7 @@ Candidate pools (all real, written by people):
   mining/tatoeba_pairs.json.bz2  Tatoeba (CC BY 2.0 FR), with English
   mining/local_candidates.json   corpora already in the repo (Tanaka/SNOW bank,
                                  ja.wikinews archive, Aozora samples)
-  mining/aozora/<n>.json         Aozora Bunko (public domain), if mined
+  mining/aozora/<n>.json         Aozora Bunko (licence per work), if mined
 
 Output: mining/ranked.json  {n: {"tier", "want", "picked": [...], "alts": [...]}}
 """
@@ -21,6 +21,9 @@ import re
 import sys
 from collections import Counter
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from rights import UNVERIFIED_AOZORA, UNVERIFIED_WEB  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 DECK = HERE.parent
@@ -87,7 +90,7 @@ def load_pools(entries):
     for f in sorted((MINING / "web").glob("*.json")):
         doc = json.loads(f.read_text("utf-8"))
         for c in doc.get("candidates", []):
-            pools.setdefault(doc["n"], []).append({**c, "src": c.get("site") or "web", "kind": c.get("kind", "web"), "licence": "web quotation (personal study)"})
+            pools.setdefault(doc["n"], []).append({**c, "src": c.get("site") or "web", "kind": c.get("kind", "web"), "licence": c.get("licence") or UNVERIFIED_WEB})
     # local corpora
     local = MINING / "local_candidates.json"
     if local.exists():
@@ -104,7 +107,7 @@ def load_pools(entries):
     for f in sorted((MINING / "aozora").glob("*.json")) if (MINING / "aozora").exists() else []:
         doc = json.loads(f.read_text("utf-8"))
         for c in doc.get("candidates", []):
-            pools.setdefault(doc["n"], []).append({**c, "kind": "literature", "licence": "public domain (Aozora Bunko)"})
+            pools.setdefault(doc["n"], []).append({**c, "kind": "literature", "licence": c.get("licence") or UNVERIFIED_AOZORA})
     # tatoeba
     tb = MINING / "tatoeba_pairs.json.bz2"
     if tb.exists():
@@ -260,7 +263,8 @@ def main() -> int:
             if info["ja"] in seen:
                 continue
             seen.add(info["ja"])
-            scored.append({**info, "score": round(s, 3), "en": c.get("en", ""), "src": c.get("src", ""), "site": c.get("site", ""), "url": c.get("url", ""), "kind": c.get("kind", ""), "licence": c.get("licence", "")})
+            scored.append({**info, "score": round(s, 3), "en": c.get("en", ""), "src": c.get("src", ""), "site": c.get("site", ""), "url": c.get("url", ""), "kind": c.get("kind", ""), "licence": c.get("licence", ""),
+                           **{k: c[k] for k in ("author", "translator", "workId") if c.get(k)}})
         # typicality: reward sentences whose frame (neighbouring characters) is common among candidates
         frames = Counter(x["frame"] for x in scored)
         for x in scored:

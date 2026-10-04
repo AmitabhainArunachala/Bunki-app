@@ -4,7 +4,7 @@ text around an occurrence (MCD fronts). Reads full texts, not single lines:
   livedoor news articles (CC BY-ND 2.1 JP, verbatim with credit)   news
   Japanese Wikinews articles, real rows only (CC BY 2.5)           news
   Wikipedia paragraphs: JaQuAD / JSQuAD / WAC (CC BY-SA)           wiki
-  Aozora Bunko prose (public domain)                               literature
+  Aozora Bunko prose (licence per work, read from its trailer)     literature
 Output: mining/passages/<n>.json  {"n", "candidates": [{ja, at, src…}]}
 Usage: python3 tools/mine_passages.py <webcorp dir> <aozora dir>
 """
@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mine_aozora import OLD, body  # noqa: E402
 from mine_corpora import LD_CAT  # noqa: E402
 from rank import VARIANTS  # noqa: E402
+from rights import aozora_work  # noqa: E402
 
 SENT = re.compile(r"[^。！？]*[。！？]」?")
 PER_WORD = 40
@@ -56,10 +57,7 @@ def paragraphs(w: str, aozora: str):
         text = body(raw)
         if len(OLD.findall(text)) > 3:
             continue
-        head = raw.splitlines()[:2]
-        card = f.parts[-4]
-        meta = {"kind": "literature", "site": f"青空文庫『{head[0].strip()}』{head[1].strip() if len(head) > 1 else ''}",
-                "url": f"https://www.aozora.gr.jp/cards/{card}/", "licence": "public domain (Aozora Bunko)"}
+        meta = aozora_work(raw, f)  # licence from the trailer; title, author, translator, work URL from the header
         for p in text.split("\n"):
             yield p.strip().lstrip("　"), meta
 
