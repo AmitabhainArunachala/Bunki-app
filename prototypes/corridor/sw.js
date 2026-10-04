@@ -18,7 +18,8 @@
 // v6: those passages left the shelf; the deck player joined the shell
 // v12: the deck player's scheduler pin and the private-collection player join the shell
 // v13: the deck player moved to card contract v2 (passage card) — drop the cached player and decks
-const VERSION = 'kairo-v13-passage-card';
+// v14: the deck player's host lexicon adapter (host.js) joins the shell; the decks name their tokens side file
+const VERSION = 'kairo-v14-deck-host';
 const SHELL = [
   '.',
   'index.html',
@@ -46,6 +47,7 @@ const SHELL = [
   'decks/player/engine.js',
   'decks/player/mount.js',
   'decks/player/player.css',
+  'decks/player/host.js',
   // …with what mount.js fetches at load, so a first visit then offline still opens a deck
   'data/fsrs-pin.json',
   // Private data lives in IndexedDB; only the reader and scheduler are cached.

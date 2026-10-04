@@ -906,3 +906,18 @@ read, and no deck word has 類語 entries yet; adding the field would change the
 wrote an empty ledger over the deck's record. バックアップ keeps コピー and 復元. A card leaves
 through 削除 (undone by 保留中のカード › 復元) and a topic through テーマ; "Whole-deck reset is not
 offered" in A34 is now true of the player and the standalone study pages. Why: contract §4.
+
+**A43 → S39, S49, S51 (Phase 2, stage B).** Adds to the `bunki-cloze-deck` v1 adapter: "A deck
+may name a tokens side file (`deck.tokens`, `tokens.json` beside `deck.json`; the public build
+writes `tokens-<deck id>.json`). It holds each card's passage as dictionary-sized tokens
+`[surface, lemma, reading, kind, ref]` (kind 語・字・文法 or other; ref a boot-core dictionary
+head, a glyph or a grammar id), whose surfaces spell the passage exactly as `ruby[]` does.
+`ruby[]` stays the display source and tokens are the tap source; card IDs and `ruby[]` do not
+change. The tokens ride in a side file because inline they would grow `deck.json` by more than
+25% (kotoba-mcd +82%, kotoba-mine +51%); the player fetches the file only when a host asks.
+The corridor mounts the player with a host lexicon adapter (`decks/player/host.js`: `lookup`,
+`open`, `isTaken`, `take`, `lists`) built from its own lexicon, entry sheets and 覚える store; a
+lookup or a take never writes the observation log or any schedule, and never enrols the word in
+the deck. The standalone study pages mount with no adapter (null) and bundle no tokens." The
+tap itself on the back is the next stage. Anki cannot carry tokens or a host: the templates
+keep furigana only. Why: learning-design.md §3, integration.md A2.

@@ -10676,7 +10676,7 @@ const deckSummaries = {};
 function loadDeckPlayer() {
   if (deckPlayer) return Promise.resolve(deckPlayer);
   if (!deckPlayerLoading) {
-    deckPlayerLoading = import('./decks/player/mount.js').then(
+    deckPlayerLoading = Promise.all([import('./decks/player/mount.js'), loadDeckHost()]).then(([mod]) => mod).then(
       (mod) => {
         deckPlayer = mod;
         return mod;
@@ -10763,7 +10763,7 @@ function renderDeckPlay(main) {
   deckPlayer
     .render(main, {
       deckId: S.deckPlay || DOJO_DECKS[0].id,
-      storage: localStorage,
+      storage: localStorage, host: deckHost(),
       onLeave() {
         delete deckSummaries[S.deckPlay];
         S.view = 'dojo';
@@ -16517,3 +16517,48 @@ window.addEventListener('DOMContentLoaded', () => {
     root.append(el('div', 'loading', `読み込めなかった could not load: ${err.message}`));
   });
 });
+
+/* ---- 集中道場 › デッキ: the host lexicon adapter the deck player receives
+ * (decks/player/host.js; learning-design §3). Kept below the storage-ledger
+ * line pins on purpose (residual-storage-callers.json): the two call sites
+ * above changed in place, so no pinned line moved. The adapter is closures
+ * over this module's own lexicon, entry sheets and 覚える store: a tap on a
+ * deck card is capture, never evidence, so nothing here writes the
+ * observation log or any schedule, and taking a word never enrols it in the
+ * deck. The single-file build cannot import it and mounts no deck anyway. */
+let deckHostModule = null;
+let deckHostAdapter = null;
+function loadDeckHost() {
+  if (deckHostModule || window.__CORRIDOR_STANDALONE__ === true) return Promise.resolve(deckHostModule);
+  return import('./decks/player/host.js').then(
+    (mod) => (deckHostModule = mod),
+    () => null, // the deck still opens, with furigana only
+  );
+}
+
+function deckHost() {
+  if (!deckHostModule) return null;
+  if (!deckHostAdapter) {
+    const norm = (p) => String(p || '').replace(/[〜～\s（）()]/g, '');
+    deckHostAdapter = deckHostModule.createHost({
+      word: (id, reading) => lookup(id, null, reading),
+      kanji: (glyph) => D.kanji?.[glyph] || null,
+      grammar: (id, pattern) =>
+        GRAMMARS().find((g) => g.id === id) || (pattern ? GRAMMARS().find((g) => norm(g.p) === norm(pattern)) : null) || null,
+      open: (node) => go(node),
+      taken: () => S.taken,
+      named: () => S.lists || {},
+      capture: (node, label, lists) => commitCapture(node, label, Date.now(), lists),
+      addToList(node, label, name) {
+        const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
+        const rows = owns(S.lists, name) ? S.lists[name] : [];
+        if (!item || !name) return false;
+        if (rows.some((x) => x.t === node.t && x.id === node.id)) return true;
+        const next = { ...S.lists };
+        setOwnRecordValue(next, name, [...rows, { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts }]);
+        return commitStorePatch({ lists: next });
+      },
+    });
+  }
+  return deckHostAdapter;
+}

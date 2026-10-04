@@ -63,6 +63,35 @@ export function indexDeck(deck) {
   return { cards, words };
 }
 
+export const TOKENS_FORMAT = 'bunki-cloze-tokens';
+/** a token's kind: 語 a word, 字 a lone kanji, 文法 part of a grammar cue, other the rest */
+export const TOKEN_KINDS = ['語', '字', '文法', 'other'];
+
+/**
+ * One card's tokens, decoded: [{ s, b, r, k, ref, at, p? }] in passage order. `source` is the
+ * card itself (inline card.tokens) or the deck's side file (tokens.json, build.py with_tokens);
+ * null when neither holds this card. A row is [surface, lemma, reading, kind, ref] with
+ * trailing empty fields dropped: b defaults to s, k '' is 'other', ref '' is null. `at` is the
+ * token's character offset in the passage, which the token surfaces spell exactly as the
+ * ruby surfaces do; a 文法 token carries its pattern as p (from the file's grammar table).
+ */
+export function cardTokens(card, file = null) {
+  let rows = Array.isArray(card?.tokens) ? card.tokens : null;
+  if (!rows && file?.format === TOKENS_FORMAT && card && Object.hasOwn(file.cards || {}, card.id)) {
+    rows = file.passages?.[file.cards[card.id]] || null;
+  }
+  if (!rows) return null;
+  let at = 0;
+  const out = rows.map(([s, b = '', r = '', k = '', ref = '']) => {
+    const kind = TOKEN_KINDS.includes(k) ? k : 'other';
+    const tok = { s, b: b || s, r, k: kind, ref: ref || null, at };
+    if (kind === '文法' && file?.grammar?.[ref]) tok.p = file.grammar[ref];
+    at += s.length;
+    return tok;
+  });
+  return out.map((t) => t.s).join('') === card.ja ? out : null;
+}
+
 export function createScheduler(fsrsApi, pin) {
   return fsrsApi.fsrs(
     fsrsApi.generatorParameters({
