@@ -558,13 +558,21 @@ TOKENS_INLINE_BUDGET = 0.25
 CONTENT_POS = {"名詞", "代名詞", "動詞", "形容詞", "形状詞", "副詞", "連体詞", "接続詞", "感動詞"}
 AFFIX_POS = {"接頭辞", "接尾辞"}
 _HEADS: set | None = None
+_WORDS: dict | None = None
 _CUES: list[tuple[str, str]] | None = None
+
+
+def _dict_words() -> dict:
+    global _WORDS
+    if _WORDS is None:
+        _WORDS = json.loads((CORRIDOR / "data" / "share_alike" / "dict.json").read_text("utf-8"))["words"]
+    return _WORDS
 
 
 def _dict_heads() -> set:
     global _HEADS
     if _HEADS is None:
-        _HEADS = set(json.loads((CORRIDOR / "data" / "share_alike" / "dict.json").read_text("utf-8"))["words"])
+        _HEADS = set(_dict_words())
     return _HEADS
 
 
@@ -578,9 +586,17 @@ def _grammar_cues() -> list[tuple[str, str]]:
     return _CUES
 
 
+# a cue that starts on one of these is a nominal (上, こと, よう) only after a predicate: 峠の上で
+# and ネット上では are places, 異例のことであった is a copula, このように is "like this"
+PREDICATE_POS = {"動詞", "形容詞", "助動詞"}
+NOMINAL_CUE_HEADS = ("上", "うえ", "こと", "よう")
+
+
 def _grammar_spans(tokens: list[dict], targets: list[tuple[int, int]]) -> dict[int, str]:
     """token index → grammar id, for each run of whole tokens that spells a cue; a run that
-    touches the card's target stays lexical (the target is the card's own word)"""
+    touches the card's target stays lexical (the target is the card's own word). A cue that
+    starts on a nominal needs a predicate before it, and a cue ending in で is not one when
+    ある follows (the copula である)."""
     starts, pos = [], 0
     for t in tokens:
         starts.append(pos)
@@ -597,9 +613,45 @@ def _grammar_spans(tokens: list[dict], targets: list[tuple[int, int]]) -> dict[i
             last = ends[st + len(cue)]
             if any(a < st + len(cue) and st < b for a, b in targets) or any(k in out for k in range(i, last + 1)):
                 continue
+            if cue.startswith(NOMINAL_CUE_HEADS) and (i == 0 or tokens[i - 1].get("p") not in PREDICATE_POS):
+                continue
+            if cue.endswith("で") and last + 1 < len(tokens) and (tokens[last + 1].get("b") or tokens[last + 1]["s"]) == "ある":
+                continue
             for k in range(i, last + 1):
                 out[k] = gid
             break
+    return out
+
+
+MERGE_SPAN = 3  # UniDic short units joined back into one dictionary word: 図書+館, 飛行+機, 語呂+合わせ
+
+
+def _merge_compounds(tokens: list[dict], targets: list[tuple[int, int]]) -> list[dict]:
+    """join up to MERGE_SPAN adjacent content tokens when together they spell a boot-core head that
+    reads as they read, the longest join first. A join never crosses a target boundary, so the
+    card's own word keeps its edges."""
+    heads, words = _dict_heads(), _dict_words()
+    bounds = {x for ab in targets for x in ab}
+    out, i, at = [], 0, 0
+    while i < len(tokens):
+        done = False
+        for n in range(min(MERGE_SPAN, len(tokens) - i), 1, -1):
+            run = tokens[i:i + n]
+            s = "".join(t["s"] for t in run)
+            if s not in heads or not KANJI.search(s) or any(t.get("p") not in CONTENT_POS | AFFIX_POS for t in run):
+                continue
+            if any(at < x < at + len(s) for x in bounds):
+                continue
+            r = "".join(kata_to_hira(t.get("r") or "") if KANJI.search(t["s"]) else kata_to_hira(t["s"]) for t in run)
+            if kata_to_hira(words[s].get("r") or "") != r:
+                continue
+            out.append({"s": s, "b": s, "r": r, "p": run[-1].get("p", ""), "c": True})
+            i, at, done = i + n, at + len(s), True
+            break
+        if not done:
+            out.append(tokens[i])
+            at += len(tokens[i]["s"])
+            i += 1
     return out
 
 
@@ -607,6 +659,7 @@ def encode_tokens(ja: str, form: str) -> list[list[str]]:
     tokens, targets = PASSAGE_TOKENS[(ja, form)]
     heads = _dict_heads()
     _readings("一")  # loads the kanji table
+    tokens = _merge_compounds(tokens, targets)
     grammar = _grammar_spans(tokens, targets)
     out = []
     for i, t in enumerate(tokens):
@@ -659,7 +712,9 @@ def tokens_file(deck: dict) -> dict:
 def with_tokens(deck: dict, name: str) -> tuple[dict, dict | None, dict]:
     """(deck, side file or None, size report). Inline card.tokens when they grow deck.json by at
     most TOKENS_INLINE_BUDGET; otherwise deck.tokens names the side file and the cards stay as they are."""
-    dump = lambda d: len(json.dumps(d, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) + 1
+    def dump(d: dict) -> int:
+        return len(json.dumps(d, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) + 1
+
     side = tokens_file(deck)
     inline = {**deck, "words": [{**w, "cards": [{**c, "tokens": side["passages"][side["cards"][c["id"]]]} for c in w["cards"]]}
                                 for w in deck["words"]]}
