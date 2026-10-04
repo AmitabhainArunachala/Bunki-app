@@ -4,12 +4,12 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 138,
-  "tokens": 74503
+  "articles": 126,
+  "tokens": 64925
  },
  "statusCounts": {
-  "lexicon-fixed": 372,
-  "accepted": 31
+  "lexicon-fixed": 368,
+  "accepted": 30
  },
  "openCount": 0,
  "rows": [
@@ -3992,56 +3992,6 @@
    "status": "accepted",
    "context": "上決定する。・都道府県・公益",
    "note": "都道府県"
-  },
-  {
-   "article": "kotoba-mine-m08-mind",
-   "token": 515,
-   "rule": "override-site",
-   "surface": "日本",
-   "reading": "にほん",
-   "status": "lexicon-fixed",
-   "context": "が重要である。日本語には特有の",
-   "note": "日本語"
-  },
-  {
-   "article": "kotoba-mine-m08-mind",
-   "token": 516,
-   "rule": "override-site",
-   "surface": "語",
-   "reading": "ご",
-   "status": "lexicon-fixed",
-   "context": "重要である。日本語には特有の事情",
-   "note": "日本語"
-  },
-  {
-   "article": "kotoba-mine-m09-math",
-   "token": 615,
-   "rule": "override-site",
-   "surface": "日本",
-   "reading": "にほん",
-   "status": "lexicon-fixed",
-   "context": "いるのかは、日本語学でも長く",
-   "note": "日本語"
-  },
-  {
-   "article": "kotoba-mine-m09-math",
-   "token": 616,
-   "rule": "override-site",
-   "surface": "語",
-   "reading": "ご",
-   "status": "lexicon-fixed",
-   "context": "のかは、日本語学でも長く議論",
-   "note": "日本語"
-  },
-  {
-   "article": "kotoba-mine-m12-kanji",
-   "token": 86,
-   "rule": "unk-kanji",
-   "surface": "稽",
-   "reading": "けい",
-   "status": "accepted",
-   "context": "みたい。たとえば「稽」という字。",
-   "note": "「稽」"
   }
  ]
 }
