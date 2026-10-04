@@ -3,6 +3,31 @@
 A massive-context cloze (MCD) deck built from one learner's own list of 323 looked-up
 words (`source/raw-export.txt`, exported from the _Japanese_ iOS dictionary app).
 
+## Two decks, side by side
+
+Both decks are built from the same 323 words and sit next to each other in 集中道場 › デッキ.
+Each has its own progress and its own colour theme.
+
+| Deck                | What it is                                                               | Theme     | Open with      | Offline file     | Anki               |
+| ------------------- | ------------------------------------------------------------------------ | --------- | -------------- | ---------------- | ------------------ |
+| **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (1,597 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
+| **言葉の鉱脈・文**  | one real sentence per card, the word marked, read and recall (503 cards) | 墨 (Sumi) | `?deck=kotoba` | `study.html`     | `kotoba-mine.apkg` |
+
+## Seeing it: colour, depth and shape
+
+- **Themes:** 設定 › 色 offers 墨, 藍, 抹茶, 黒板, 和紙, 桜, 白 and 高 (high contrast). Each deck
+  remembers its own. Every theme keeps the same colour meanings.
+- **Colour = part of speech:** the asked word is blue/accent for nouns, orange for verbs,
+  gold for adjectives, violet for adverbs, green for expressions, and pink for sound words.
+- **Card edge = topic:** each of the 12 topics owns a hue on the card's left edge and in the
+  topic list, so a word is also remembered by "where" it lives.
+- **Kanji anatomy on the back:** each kanji large, with its meaning, its top-level parts
+  (財 = 貝 + 才) and its stroke count. Turn the parts into a little picture or story.
+- **Depth and texture:** cards are lifted panels with a shadow. 和紙 adds paper fibres,
+  黒板 chalk grain, and 藍 and 桜 a soft light wash.
+- **見て覚えるコツ:** the deck home lists the visual memory tips in a fold.
+- **Anki:** the same part-of-speech colours and the kanji anatomy are on the cards.
+
 ## The method
 
 This follows Khatzumoto's AJATT **MCD (Massive-Context Cloze Deletion)** method: "instead

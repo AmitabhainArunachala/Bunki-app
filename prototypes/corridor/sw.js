@@ -16,7 +16,7 @@
 // v4: the context deck (文脈札) joined the shell
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
 // v6: those passages left the shelf; the deck player joined the shell
-const VERSION = 'kairo-v8-mcd';
+const VERSION = 'kairo-v9-two-decks';
 const SHELL = [
   '.',
   'index.html',
@@ -43,6 +43,7 @@ const SHELL = [
   'decks/player/mount.js',
   'decks/player/player.css',
   'decks/kotoba-mine/deck.json',
+  'decks/kotoba-mcd/deck.json',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

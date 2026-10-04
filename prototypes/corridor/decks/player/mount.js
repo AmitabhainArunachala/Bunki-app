@@ -47,7 +47,8 @@ const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, u
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
-const prefsKey = 'bunki-cloze:prefs:v3'; // v3: massive-context cloze is the default
+const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
+const prefsFor = (storage, deck) => ({ ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) });
 function readJson(storage, key) {
   try {
     return JSON.parse(storage.getItem(key) || 'null');
@@ -67,7 +68,7 @@ function save() {
   writeJson(ctx.storage, stateKey(ctx.deck.id), ctx.state);
 }
 function savePrefs() {
-  writeJson(ctx.storage, prefsKey, ctx.prefs);
+  writeJson(ctx.storage, prefsKey(ctx.deck.id), ctx.prefs);
 }
 
 /* ------------------------------------------------------------- helpers */
@@ -177,6 +178,12 @@ function homeScreen() {
   start.disabled = !total;
   box.append(start);
 
+  const tips = el('details', 'kp-tips');
+  tips.id = 'kp-tips';
+  tips.append(el('summary', null, '見て覚えるコツ（色・形・場所）'));
+  for (const line of VISUAL_TIPS) tips.append(el('p', null, line));
+  box.append(tips);
+
   if (deck.method?.length) {
     const how = el('details', 'kp-method');
     how.id = 'kp-method';
@@ -193,6 +200,7 @@ function homeScreen() {
     const st = words.map((w) => wordStatus(w, state).key);
     const share = (k) => (st.filter((x) => x === k).length / words.length) * 100;
     const row = el('label', 'kp-group' + (off.has(g.id) ? ' is-off' : ''));
+    row.style.setProperty('--kp-topic', topicColour(g.id));
     const box2 = el('input');
     box2.type = 'checkbox';
     box2.checked = !off.has(g.id);
@@ -283,14 +291,16 @@ function studyScreen() {
   box.append(top);
 
   const stored = ctx.state.cards[id];
-  const face = el('article', `kp-card kp-lv${card.lv}`);
+  const face = el('article', `kp-card kp-lv${card.lv} kp-topic kp-pos-${posKey(word.pos)}`);
+  face.style.setProperty('--kp-topic', topicColour(word.group));
   face.id = 'kp-card';
   face.append(
     el(
       'div',
       'kp-chips',
-      el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'),
-      el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'}${card.passage ? ` · 文章${card.passage}` : ''}`),
+      ...(card.type
+        ? [el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'), el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'} · 文章${card.passage}`)]
+        : [el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`)]),
       el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
       el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
     ),
@@ -344,13 +354,53 @@ function studyScreen() {
   return box;
 }
 
+const THEMES = [
+  ['dark', '墨', '#0a0e13', '#3fd0ff'],
+  ['ai', '藍', '#121a46', '#f2c14e'],
+  ['matcha', '抹茶', '#13261a', '#a6e06a'],
+  ['kokuban', '黒板', '#1f2f28', '#ffe066'],
+  ['washi', '和紙', '#fbf6ea', '#b23a1e'],
+  ['sakura', '桜', '#fde7ec', '#d1416a'],
+  ['light', '白', '#ffffff', '#0074b8'],
+  ['contrast', '高', '#000000', '#ffff00'],
+];
+const VISUAL_TIPS = [
+  '色＝品詞：答えの語の色は品詞で決まる（名詞・動詞・形容詞・副詞・表現・擬音語）。色ごと覚えると、文の中での働きも一緒に残る。',
+  'カードの左端の色＝テーマ。お金は同じ色、ニュースは別の色。「あの色の札にあった言葉」と場所で思い出せる。',
+  '裏の「漢字の解剖」：一字ずつ、意味と部品と画数。部品で小さな絵や物語を作ると忘れにくい（財＝貝＋才 → 貝はお金）。',
+  '思い出せなかった語は、文章の場面を頭の中で一枚の絵にしてから「もう一度」。次に会うとき、その絵が手がかりになる。',
+  '色テーマは気分で変えてよい。ただし一つのデッキは同じテーマで続けると、色と記憶が結びつきやすい。',
+  '答えを見る前に一秒、空所の形（字数・送り仮名）と前後の言葉を見る。形と場所で記憶が引き出される。',
+];
+const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
+const posKey = (pos) => (POS[pos] || ['noun'])[0];
+/** each topic owns a hue, spread evenly round the colour wheel */
+function topicColour(groupId) {
+  const i = Math.max(0, ctx.deck.groups.findIndex((g) => g.id === groupId));
+  return `hsl(${Math.round((i * 360) / Math.max(1, ctx.deck.groups.length) + 200) % 360} 70% 58%)`;
+}
+
+function kanjiAnatomy(word) {
+  if (!word.kanji?.length) return null;
+  const box = el('div', 'kp-kanji');
+  for (const k of word.kanji) {
+    box.append(el('div', 'kp-kj', el('b', null, k.c), el('span', null, k.m || ''), el('small', null, [k.parts?.length ? k.parts.join(' ') : '', k.st ? `${k.st}画` : ''].filter(Boolean).join(' · '))));
+  }
+  return box;
+}
+
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
-  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading)));
+  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), el('span', 'kp-posbadge', (POS[word.pos] || ['', ''])[1] || word.pos)));
+  const anatomy = kanjiAnatomy(word);
+  if (anatomy) a.append(anatomy);
   a.append(el('p', 'kp-def', word.defJa));
+  // reading cards test the meaning, so it shows; cloze cards keep English behind a tap
+  if (ctx.prefs.mode === 'read') a.append(el('p', 'kp-meaning', word.meaning));
   const en = el('details', 'kp-endetails');
-  en.append(el('summary', null, '英語'), el('p', 'kp-meaning', word.meaning));
+  en.append(el('summary', null, '英語'));
+  if (ctx.prefs.mode !== 'read') en.append(el('p', 'kp-meaning', word.meaning));
   if (card.en) en.append(el('p', 'kp-en', card.en));
   en.addEventListener('click', (e) => e.stopPropagation());
   a.append(en);
@@ -537,7 +587,18 @@ function settingsScreen() {
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
   box.append(seg('ヒント（穴埋め・4択）', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
   box.append(seg('ふりがな（問題）', 'furigana', [['tap', 'タップで表示'], ['none', 'なし']]));
-  box.append(seg('画面', 'look', [['dark', 'ダーク'], ['light', 'ライト']]));
+  const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
+  const sw = el('div', 'kp-swatches');
+  for (const [value, label, bg, ink] of THEMES) {
+    const b = btn(`kp-swatch${ctx.prefs.look === value ? ' is-on' : ''}`, label, () => {
+      ctx.prefs = { ...ctx.prefs, look: value };
+      savePrefs();
+      paint();
+    }, { 'data-pref': `look:${value}`, 'aria-label': label, style: `background:${bg};color:${ink}` });
+    sw.append(b);
+  }
+  themes.append(sw);
+  box.append(themes);
 
   const ta = el('textarea', 'kp-backup');
   ta.id = 'kp-backup';
@@ -617,7 +678,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     storage,
     onLeave,
     state: normalizeState(readJson(storage, stateKey(deck.id)), deck),
-    prefs: { ...PREFS_DEFAULT, ...(readJson(storage, prefsKey) || {}) },
+    prefs: prefsFor(storage, deck),
   };
   if (!sameDeck) {
     ui.screen = 'home';
@@ -634,7 +695,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
 export async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const state = normalizeState(readJson(storage, stateKey(deck.id)), deck);
-  const prefs = { ...PREFS_DEFAULT, ...(readJson(storage, prefsKey) || {}) };
+  const prefs = prefsFor(storage, deck);
   const q = buildQueue(deck, state, new Date(), prefs.newPerDay);
   return { due: q.due.length, fresh: q.fresh.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

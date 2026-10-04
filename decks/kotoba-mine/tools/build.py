@@ -40,6 +40,23 @@ import check_v2  # noqa: E402
 DECK_ID = "kotoba-mine"
 TITLE_JA = "言葉の鉱脈"
 TITLE_EN = "My mined words"
+SENTENCE_METHOD = [
+    "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。",
+    "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。",
+    "裏：ふりがな、意味、訳、出典。思い出せたら「覚えた」、だめなら「もう一度」。",
+    "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。",
+]
+# the two decks built from the same word list, side by side in 集中道場
+DECKS = {
+    "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Real sentences · read and recall",
+                 "defaults": {"look": "dark", "mode": "read", "hint": "en"}, "method": SENTENCE_METHOD,
+                 "anki": ("anki-sentence", "kotoba-mine-sentence-v3", "Kotoba Mine Sentence", "Read", "kotoba-mine-v3"),
+                 "out": ("kotoba-mine.apkg", "kotoba-mine.tsv", "study.html")},
+    "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Massive-context cloze · passages",
+            "defaults": {"look": "ai", "mode": "self", "hint": "ja"}, "unlockDays": 3,
+            "anki": ("anki", "kotoba-mine-mcd-v4", "Kotoba Mine MCD", "Cloze", "kotoba-mine-v4"),
+            "out": ("kotoba-mcd.apkg", "kotoba-mcd.tsv", "study-mcd.html")},
+}
 GROUPS = {
     "m01-money": ("お金・経済", "Money and the economy"),
     "m02-hegemony": ("国際政治・貿易", "World politics and trade"),
@@ -238,13 +255,37 @@ METHOD = [
 
 
 # ------------------------------------------------------------------ deck
-def build_deck(mods: list[dict]) -> dict:
+# a radical and its compressed form (手/扌, 攴/攵 …) count as one part
+RADICAL_TWINS = {"手": "扌", "攴": "攵", "襾": "覀", "人": "亻", "水": "氵", "心": "忄", "火": "灬", "刀": "刂", "犬": "犭",
+                 "示": "礻", "衣": "衤", "艸": "艹", "辵": "辶", "言": "訁", "食": "飠", "糸": "糹", "玉": "王", "老": "耂", "网": "罒"}
+
+
+def kanji_anatomy(term: str) -> list[dict]:
+    """each kanji of the word: meaning, up to three parts, stroke count (for the visual back)"""
+    _readings("一")  # loads the table
+    out = []
+    for ch in dict.fromkeys(ch for ch in term if KANJI.match(ch) and ch not in "々〆ヵヶ"):
+        k = _KANJI_DB.get(ch)
+        if k:
+            # the table lists parts flattened (貝, then 貝's own 目 and 八): keep only top-level ones
+            kept: list[str] = []
+            for x in k.get("parts", []):
+                twin = RADICAL_TWINS.get(x) or next((k for k, v in RADICAL_TWINS.items() if v == x), None)
+                if x != ch and twin not in kept and not any(x in _KANJI_DB.get(y, {}).get("parts", []) for y in kept):
+                    kept.append(x)
+            parts = kept[:3]
+            out.append({"c": ch, "m": (k.get("m") or "").lower(), "parts": parts, "st": k.get("st")})
+    return out
+
+
+def build_deck(mods: list[dict], kind: str = "mcd") -> dict:
+    spec = DECKS[kind]
     import build_corridor as bc
     from corpus.grading._mecab import get_tagger
 
     tagger = get_tagger()
     mcd_path = SRC / "mcd.json"
-    mcd = json.loads(mcd_path.read_text("utf-8")) if mcd_path.exists() else {}
+    mcd = json.loads(mcd_path.read_text("utf-8")) if mcd_path.exists() and kind == "mcd" else {}
     preview = "--preview" in sys.argv
     words = []
     for m in mods:
@@ -271,6 +312,7 @@ def build_deck(mods: list[dict]) -> dict:
                 "meaning": c["meaning"],
                 "defJa": c["def_ja"],
                 "pos": c["pos"],
+                "kanji": kanji_anatomy(c["term"]),
                 "cards": cards,
             }
             if c.get("tip"):
@@ -279,13 +321,14 @@ def build_deck(mods: list[dict]) -> dict:
     return {
         "format": "bunki-cloze-deck",
         "version": 1,
-        "id": DECK_ID,
-        "titleJa": TITLE_JA,
-        "titleEn": TITLE_EN,
+        "id": spec["id"],
+        "titleJa": spec["titleJa"],
+        "titleEn": spec["titleEn"],
+        "defaults": spec["defaults"],
         "groups": [{"id": m["id"], "titleJa": GROUPS[m["id"]][0], "titleEn": GROUPS[m["id"]][1]} for m in mods
                    if any(w["group"] == m["id"] for w in words)],
-        "unlockDays": 3,
-        "method": METHOD,
+        **({"unlockDays": spec["unlockDays"]} if "unlockDays" in spec else {}),
+        "method": spec.get("method", METHOD),
         "words": words,
         "provenance": "Sentences are real Japanese mined from the web, Tatoeba (CC BY 2.0 FR), ja.wikinews and Aozora Bunko; each card names its source. Web sentences are short quotations kept for personal study. Definitions, notes and the few sentences marked 書き下ろし were written for this word list.",
     }
@@ -375,7 +418,11 @@ def blank_html(card: dict) -> str:
     return "".join(out)
 
 
-FIELDS = ["Key", "Sort", "Topic", "Level", "Type", "Hint", "Kind", "Word", "Reading", "Meaning", "DefJA", "SentenceFront", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip", "Source", "SourceURL"]
+FIELDS = ["Key", "Sort", "Topic", "Level", "Type", "Hint", "Kind", "Word", "Reading", "Meaning", "DefJA", "SentenceFront", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip", "Source", "SourceURL", "POS", "Kanji"]
+
+
+POS_KEY = {"noun": "noun", "verb": "verb", "い-adjective": "adj", "な-adjective": "adj", "adverb": "adv",
+           "expression": "expr", "sound word": "sound", "kanji": "noun"}
 
 
 def note_rows(deck: dict) -> list[dict]:
@@ -404,6 +451,10 @@ def note_rows(deck: dict) -> list[dict]:
                 "SentenceFurigana": anki_furigana(card["ruby"]),
                 "SentenceEN": html.escape(card["en"]),
                 "Tip": html.escape(w.get("tip", "")),
+                "POS": POS_KEY.get(w["pos"], "noun"),
+                "Kanji": "".join(
+                    f'<div class="kj"><b>{k["c"]}</b><span>{html.escape(k["m"])}</span><small>{" ".join(k["parts"])}{" · " + str(k["st"]) + "画" if k.get("st") else ""}</small></div>'
+                    for k in w.get("kanji", [])),
                 "_group": w["group"],
             })
     rows.sort(key=lambda r: r["Sort"])
@@ -414,16 +465,17 @@ def stable_id(s: str) -> int:
     return int(hashlib.sha1(s.encode()).hexdigest()[:12], 16) % (1 << 31) + (1 << 30)
 
 
-def build_anki(deck: dict) -> None:
+def build_anki(deck: dict, spec: dict) -> None:
     import genanki
 
-    tdir = HERE / "anki"
+    tdir_name, model_key, model_name, card_name, deck_key = spec["anki"]
+    tdir = HERE / tdir_name
     model = genanki.Model(
-        stable_id("kotoba-mine-mcd-v4"),
-        "Kotoba Mine MCD",
+        stable_id(model_key),
+        model_name,
         fields=[{"name": f} for f in FIELDS],
         templates=[{
-            "name": "Cloze",
+            "name": card_name,
             "qfmt": (tdir / "front.html").read_text("utf-8"),
             "afmt": (tdir / "back.html").read_text("utf-8"),
         }],
@@ -434,25 +486,25 @@ def build_anki(deck: dict) -> None:
     class Note(genanki.Note):
         @property
         def guid(self):
-            return genanki.guid_for(self.fields[0], DECK_ID)
+            return genanki.guid_for(self.fields[0], deck["id"])
 
-    root = f"{TITLE_JA} Kotoba Mine"
+    root = f"{deck['titleJa']} Kotoba Mine"
     decks = {}
     for g in deck["groups"]:
-        d = genanki.Deck(stable_id(f"kotoba-mine-v4-{g['id']}"), f"{root}::{g['titleJa']}")
+        d = genanki.Deck(stable_id(f"{deck_key}-{g['id']}"), f"{root}::{g['titleJa']}")
         d.description = html.escape(g["titleEn"])
         decks[g["id"]] = d
     for i, r in enumerate(note_rows(deck)):
-        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[DECK_ID, f"sentence{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}"], sort_field=r["Sort"], due=i)
+        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[deck["id"], f"card{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}"], sort_field=r["Sort"], due=i)
         decks[r["_group"]].add_note(note)
-    genanki.Package(list(decks.values())).write_to_file(str(RELEASE / "kotoba-mine.apkg"))
+    genanki.Package(list(decks.values())).write_to_file(str(RELEASE / spec["out"][0]))
 
 
-def build_tsv(deck: dict) -> None:
+def build_tsv(deck: dict, spec: dict) -> None:
     lines = ["#separator:tab", "#html:true", f"#columns:{chr(9).join(FIELDS)}\tTags"]
     for r in note_rows(deck):
-        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{DECK_ID} sentence{r['Level']} source::{r['Kind']}"]))
-    (RELEASE / "kotoba-mine.tsv").write_text("\n".join(lines) + "\n", "utf-8")
+        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{deck['id']} card{r['Level']} source::{r['Kind']}"]))
+    (RELEASE / spec["out"][1]).write_text("\n".join(lines) + "\n", "utf-8")
 
 
 # ------------------------------------------------------------------ study.html
@@ -487,21 +539,23 @@ def build_study(deck: dict, out: Path | None = None) -> None:
 
 def main() -> int:
     mods = load()
-    deck = build_deck(mods)
     if "--preview" in sys.argv:
+        deck = build_deck(mods, "mcd")
         out = Path(sys.argv[sys.argv.index("--preview") + 1])
         build_study(deck, out)
         print(f"· preview: {len(deck['words'])} words, {sum(len(w['cards']) for w in deck['words'])} cards → {out}")
         return 0
-    PLAYER_DECK.parent.mkdir(parents=True, exist_ok=True)
-    PLAYER_DECK.write_text(json.dumps(deck, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
     RELEASE.mkdir(exist_ok=True)
-    build_tsv(deck)
-    build_anki(deck)
-    build_study(deck)
-    n = sum(len(w["cards"]) for w in deck["words"])
-    print(f"· {len(deck['words'])} words, {n} sentence cards → {PLAYER_DECK.relative_to(REPO)}")
-    print(f"· {RELEASE.relative_to(REPO)}/kotoba-mine.apkg, .tsv, study.html")
+    for kind, spec in DECKS.items():
+        deck = build_deck(mods, kind)
+        path = CORRIDOR / "decks" / spec["id"] / "deck.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(deck, ensure_ascii=False, separators=(",", ":")) + "\n", "utf-8")
+        build_tsv(deck, spec)
+        build_anki(deck, spec)
+        build_study(deck, RELEASE / spec["out"][2])
+        n = sum(len(w["cards"]) for w in deck["words"])
+        print(f"· {deck['titleJa']}: {len(deck['words'])} words, {n} cards → {path.relative_to(REPO)}; release/{', '.join(spec['out'])}")
     return 0
 
 
