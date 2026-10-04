@@ -17,7 +17,8 @@
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
 // v6: those passages left the shelf; the deck player joined the shell
 // v12: the deck player's scheduler pin and the private-collection player join the shell
-const VERSION = 'kairo-v12-closure-personal';
+// v13: the deck player moved to card contract v2 (passage card) — drop the cached player and decks
+const VERSION = 'kairo-v13-passage-card';
 const SHELL = [
   '.',
   'index.html',
