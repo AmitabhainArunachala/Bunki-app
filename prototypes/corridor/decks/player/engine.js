@@ -203,22 +203,44 @@ export function learningSoon(deck, state, now, withinMs) {
   return out.sort((a, b) => a.t - b.t);
 }
 
+/**
+ * The instant handed to the scheduler (append-order-monotonic-clamp-v1, named
+ * in data/fsrs-pin.json): a clock that has moved behind the card's last review
+ * is lifted to that review, so a backward device clock never throws or
+ * reorders a card's history.
+ */
+export function effectiveReviewTime(stored, now) {
+  if (stored?.last_review) {
+    const last = new Date(stored.last_review);
+    if (last.getTime() > now.getTime()) return last;
+  }
+  return now;
+}
+
+/**
+ * One answer. The log row is [cardId, rating, effectiveIso], plus the raw
+ * device time as a fourth element only when the clock was clamped.
+ */
 export function grade(fsrsApi, scheduler, state, cardId, rating, now) {
   const stored = state.cards[cardId] ?? null;
-  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(now);
-  const next = scheduler.next(before, now, rating);
+  const at = effectiveReviewTime(stored, now);
+  const atIso = at.toISOString();
+  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(at);
+  const next = scheduler.next(before, at, rating);
+  const row = at === now ? [cardId, rating, atIso] : [cardId, rating, atIso, now.toISOString()];
   return {
     ...state,
-    cards: { ...state.cards, [cardId]: freeze(next.card, stored?.introducedAt || now.toISOString()) },
-    log: [...state.log.slice(-4999), [cardId, rating, now.toISOString()]],
+    cards: { ...state.cards, [cardId]: freeze(next.card, stored?.introducedAt || atIso) },
+    log: [...state.log.slice(-4999), row],
   };
 }
 
 /** what each answer would schedule, for the button labels */
 export function preview(fsrsApi, scheduler, state, cardId, now) {
   const stored = state.cards[cardId] ?? null;
-  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(now);
-  const all = scheduler.repeat(before, now);
+  const at = effectiveReviewTime(stored, now);
+  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(at);
+  const all = scheduler.repeat(before, at);
   const out = {};
   for (const [name, r] of Object.entries(RATINGS)) out[name] = new Date(all[r].card.due).getTime() - now.getTime();
   return out;
