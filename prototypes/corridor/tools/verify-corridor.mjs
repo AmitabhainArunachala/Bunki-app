@@ -288,7 +288,15 @@ async function main() {
   const report = { viewport: VIEWPORT, steps: [], measurements: {}, shelf: [], caps: {} };
 
   const open = async (query = '') => {
-    await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
+    try {
+      await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
+    } catch (err) {
+      // a step that just reloaded the page itself (an import, a restore) can
+      // still be navigating; let that finish, then go where this step asked
+      if (!/interrupted by another navigation/.test(String(err?.message))) throw err;
+      await page.waitForLoadState('load');
+      await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
+    }
     await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   };
 

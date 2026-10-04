@@ -269,6 +269,7 @@
 .kp-pos-adv .kp-posbadge { color: var(--kp-adv); }
 .kp-pos-expr .kp-posbadge { color: var(--kp-expr); }
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
+.kp-gloss { font-size: 18px; margin-top: -4px; }
 </style>
 </head>
 <body>
@@ -2483,7 +2484,7 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap' };
+const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap', gloss: 'show' };
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs }
 
@@ -2834,17 +2835,19 @@ function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
   a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), el('span', 'kp-posbadge', (POS[word.pos] || ['', ''])[1] || word.pos)));
+  const glossShown = ctx.prefs.gloss !== 'tap';
+  if (glossShown) a.append(el('p', 'kp-meaning kp-gloss', word.meaning));
   const anatomy = kanjiAnatomy(word);
   if (anatomy) a.append(anatomy);
   a.append(el('p', 'kp-def', word.defJa));
-  // reading cards test the meaning, so it shows; cloze cards keep English behind a tap
-  if (ctx.prefs.mode === 'read') a.append(el('p', 'kp-meaning', word.meaning));
+  // the plain English meaning sits right under the word (設定 can move it behind the tap);
+  // the passage's full translation always waits behind 英語
   const en = el('details', 'kp-endetails');
-  en.append(el('summary', null, '英語'));
-  if (ctx.prefs.mode !== 'read') en.append(el('p', 'kp-meaning', word.meaning));
+  en.append(el('summary', null, glossShown ? '英訳' : '英語'));
+  if (!glossShown) en.append(el('p', 'kp-meaning', word.meaning));
   if (card.en) en.append(el('p', 'kp-en', card.en));
   en.addEventListener('click', (e) => e.stopPropagation());
-  a.append(en);
+  if (en.childElementCount > 1) a.append(en);
   if (card.src) a.append(sourceLine(card));
   if (word.tip) a.append(el('p', 'kp-tip', word.tip));
   return a;
@@ -3027,6 +3030,7 @@ function settingsScreen() {
   box.append(seg('一日の新しい文', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
   box.append(seg('ヒント（穴埋め・4択）', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
+  box.append(seg('英語の意味（答え）', 'gloss', [['show', 'すぐ表示'], ['tap', 'タップで']]));
   box.append(seg('ふりがな（問題）', 'furigana', [['tap', 'タップで表示'], ['none', 'なし']]));
   const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
   const sw = el('div', 'kp-swatches');
