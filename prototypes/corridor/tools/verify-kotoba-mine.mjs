@@ -15,6 +15,10 @@
  *   · 覚える asks where to save: nothing is written until 保存する, and a new
  *     list named in the chooser receives the word in the same commit.
  *
+ * Then the grade path: when storage refuses a write the card stays and the
+ * ledger is untouched; a learning step that comes due while a card is open
+ * waits until that card is answered, then comes next (fake clock).
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -90,6 +94,87 @@ function verifyDeck() {
   }
   check('every card spells its sentence, asks exactly one word, and gives it a kana reading', bad.length === 0, bad.slice(0, 4).join(' | ') || `${cards.length}/${cards.length}`);
   return deck;
+}
+
+/* ------------------------------------- the grade path (F01, F07, N02) */
+const SEEDED = `try {
+  if (!localStorage.getItem('__deck_seeded')) {
+    localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(JSON.stringify({ v: 1, taken: [], srs: {} }))});
+    localStorage.setItem('__deck_seeded', '1');
+  }
+} catch {}`;
+/** the card's sentence as written, without the readings a tap adds */
+const SENTENCE = `(() => { const p = document.querySelector('#kp-card .kp-sentence')?.cloneNode(true); p?.querySelectorAll('rt').forEach((r) => r.remove()); return p?.textContent ?? null; })()`;
+
+async function verifyGradePath(browser, base) {
+  const open = async (clock) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(SEEDED);
+    const page = await context.newPage();
+    if (clock) await page.clock.install({ time: new Date('2026-10-04T09:00:00') });
+    await page.goto(`${base}/index.html?deck=kotoba`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    return { context, page };
+  };
+  const LEDGER = 'bunki-cloze:kotoba-mine';
+
+  // storage refuses the write: the card stays, the ledger is untouched, the learner is told
+  {
+    const { context, page } = await open(false);
+    try {
+      await page.click('#kp-start');
+      await page.click('#kp-reveal');
+      await page.waitForSelector('#kp-grade-good');
+      const before = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count').textContent })`);
+      await page.evaluate(`Storage.prototype.setItem = () => { throw new DOMException('full', 'QuotaExceededError'); }`);
+      await page.click('#kp-grade-good');
+      const after = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count')?.textContent, card: !!document.querySelector('#kp-card'), grades: !!document.querySelector('#kp-grade-good'), backup: !!document.querySelector('#kp-to-backup'), text: document.querySelector('.kp').innerText })`);
+      check(
+        'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page says 保存できませんでした',
+        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.backup && after.ledger === before.ledger && after.text.includes('保存できませんでした'),
+        JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger }),
+      );
+    } finally {
+      await context.close();
+    }
+  }
+
+  // a learning step that comes due mid-card waits until that card is answered
+  {
+    const { context, page } = await open(true);
+    try {
+      await page.click('#kp-start');
+      await page.waitForSelector('#kp-card');
+      const a = await page.evaluate(SENTENCE);
+      await page.click('#kp-reveal');
+      await page.click('#kp-grade-good'); // card A: next step in 10 minutes
+      const due = await page.evaluate(`(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(LEDGER)})); const c = Object.values(s.cards)[0]; return (new Date(c.due) - Date.now()) / 60000; })()`);
+      // a new sitting: A is not due yet, so it is not in the queue
+      await page.click('#kp-quit');
+      await page.click('#kp-start');
+      await page.waitForSelector('#kp-card .kp-tapword');
+      const b = await page.evaluate(SENTENCE);
+      await page.locator('#kp-card .kp-tapword').first().click();
+      await page.clock.fastForward('11:00');
+      const taps = await page.locator('#kp-card .kp-tapword').count();
+      if (taps) await page.locator('#kp-card .kp-tapword').first().click();
+      else await page.locator('#kp-card rt').first().click();
+      const stillB = await page.evaluate(SENTENCE);
+      check(
+        'a learning card that comes due while another card is open does not replace it',
+        a !== b && stillB === b && due > 9 && due <= 10.1,
+        JSON.stringify({ dueInMinutes: Math.round(due * 10) / 10, secondTap: taps ? 'tapword' : 'ruby', same: stillB === b }),
+      );
+      await page.click('#kp-reveal');
+      await page.click('#kp-grade-good');
+      await page.waitForSelector('#kp-card');
+      const shown = await page.evaluate(SENTENCE);
+      check('…and it is the very next card once that one is answered', shown === a, shown?.slice(0, 24) ?? 'no card');
+    } finally {
+      await context.close();
+    }
+  }
 }
 
 /* --------------------------------------------------- half two: the app */
@@ -192,6 +277,9 @@ async function main() {
     const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
     check('the sheet then says where the word went', /覚えるの札|daily review/.test(where) && where.includes('経済ニュース'), where);
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
+
+    console.log('\n— a grade is saved before the card moves on');
+    await verifyGradePath(browser, base);
   } finally {
     await browser.close();
     server.close();

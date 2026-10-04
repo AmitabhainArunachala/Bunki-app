@@ -64,11 +64,23 @@ function writeJson(storage, key, value) {
     return false;
   }
 }
-function save() {
-  writeJson(ctx.storage, stateKey(ctx.deck.id), ctx.state);
+/** write a candidate ledger; the caller adopts it only when this returns true */
+function save(state) {
+  return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
 }
-function savePrefs() {
-  writeJson(ctx.storage, prefsKey(ctx.deck.id), ctx.prefs);
+/** adopt new settings only once they are stored */
+function savePrefs(prefs) {
+  if (!writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) return saveFailed();
+  ctx.prefs = prefs;
+  ui.toast = '';
+  paint();
+}
+const SAVE_FAILED = '保存できませんでした。設定のバックアップから記録をコピーして保管してください。';
+/** nothing changed: say so and keep the screen as it is */
+function saveFailed() {
+  ui.toast = SAVE_FAILED;
+  paint();
+  return false;
 }
 
 /* ------------------------------------------------------------- helpers */
@@ -146,8 +158,13 @@ function paint() {
   root.replaceChildren();
   root.dataset.look = ctx.prefs.look;
   const screens = { home: homeScreen, study: studyScreen, list: listScreen, settings: settingsScreen };
+  if (ui.toast) {
+    const toast = el('div', 'kp-toast', ui.toast);
+    toast.setAttribute('role', 'alert');
+    if (ui.toast === SAVE_FAILED && ui.screen !== 'settings') toast.append(btn('kp-toast-btn', 'バックアップへ', () => go('settings'), { id: 'kp-to-backup' }));
+    root.append(toast);
+  }
   root.append((screens[ui.screen] || homeScreen)());
-  if (ui.toast) root.append(el('div', 'kp-toast', ui.toast));
 }
 
 function topBar(title, back) {
@@ -209,8 +226,10 @@ function homeScreen() {
       const set = new Set(ctx.state.groupsOff);
       if (box2.checked) set.delete(g.id);
       else set.add(g.id);
-      ctx.state = { ...ctx.state, groupsOff: [...set] };
-      save();
+      const nextState = { ...ctx.state, groupsOff: [...set] };
+      if (!save(nextState)) return saveFailed();
+      ctx.state = nextState;
+      ui.toast = '';
       paint();
     });
     const bar = el('span', 'kp-bar');
@@ -244,6 +263,7 @@ function startSession() {
   ui.done = 0;
   ui.right = 0;
   ui.undo = null;
+  refill();
   resetCard();
   go('study');
 }
@@ -254,12 +274,13 @@ function resetCard() {
   ui.shown = new Set();
 }
 
-/** pull learning steps that came due back into the sitting */
+/** pull learning steps that came due back into the sitting, right after the
+ * card under the cursor (never in its place: the card on screen never changes) */
 function refill() {
   const now = new Date();
   const ahead = new Set(ui.queue.slice(ui.pos));
   for (const { id, t } of learningSoon(ctx.deck, ctx.state, now, 0)) {
-    if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos, 0, id);
+    if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos + 1, 0, id);
   }
 }
 
@@ -277,7 +298,6 @@ function choicesFor(word) {
 }
 
 function studyScreen() {
-  refill();
   const box = el('section', 'kp-study');
   const id = ui.queue[ui.pos];
   if (!id) return doneScreen();
@@ -447,9 +467,19 @@ function reveal() {
 function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
   if (!id) return;
+  const nextState = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
+  if (!save(nextState)) {
+    // not stored: the same card stays, ready to answer again
+    if (ctx.prefs.mode === 'choice') {
+      ui.revealed = false;
+      ui.picked = null;
+    }
+    saveFailed();
+    return;
+  }
+  ui.toast = '';
   ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
-  ctx.state = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
-  save();
+  ctx.state = nextState;
   ui.done++;
   if (rating >= RATINGS.good) ui.right++;
   if (stay) {
@@ -461,6 +491,7 @@ function commit(rating, { stay = false } = {}) {
 
 function next() {
   const id = ui.queue[ui.pos];
+  refill();
   ui.pos++;
   // a learning step due within the sitting comes back after a few cards
   const s = ctx.state.cards[id];
@@ -473,6 +504,8 @@ function next() {
 
 function undo() {
   if (!ui.undo) return;
+  if (!save(ui.undo.state)) return saveFailed();
+  ui.toast = '';
   ctx.state = ui.undo.state;
   ui.queue = ui.undo.queue;
   ui.pos = ui.undo.pos;
@@ -481,7 +514,6 @@ function undo() {
   ui.undo = null;
   resetCard();
   ui.revealed = ctx.prefs.mode !== 'choice';
-  save();
   paint();
 }
 
@@ -576,9 +608,7 @@ function settingsScreen() {
     const row = el('div', 'kp-seg');
     for (const [value, label] of options) {
       const b = btn(ctx.prefs[key] === value ? 'is-on' : '', label, () => {
-        ctx.prefs = { ...ctx.prefs, [key]: value };
-        savePrefs();
-        paint();
+        savePrefs({ ...ctx.prefs, [key]: value });
       }, { 'data-pref': `${key}:${value}` });
       row.append(b);
     }
@@ -594,9 +624,7 @@ function settingsScreen() {
   const sw = el('div', 'kp-swatches');
   for (const [value, label, bg, ink] of THEMES) {
     const b = btn(`kp-swatch${ctx.prefs.look === value ? ' is-on' : ''}`, label, () => {
-      ctx.prefs = { ...ctx.prefs, look: value };
-      savePrefs();
-      paint();
+      savePrefs({ ...ctx.prefs, look: value });
     }, { 'data-pref': `look:${value}`, 'aria-label': label, style: `background:${bg};color:${ink}` });
     sw.append(b);
   }
@@ -620,8 +648,11 @@ function settingsScreen() {
             const raw = JSON.parse(ta.value);
             const next = normalizeState(raw, ctx.deck);
             if (!Object.keys(next.cards).length && Object.keys(raw?.cards || {}).length) throw new Error('mismatch');
+            if (!save(next)) {
+              msg.textContent = SAVE_FAILED;
+              return;
+            }
             ctx.state = next;
-            save();
             msg.textContent = '復元しました。';
           } catch {
             msg.textContent = 'このデッキのバックアップではありません。';
@@ -629,8 +660,9 @@ function settingsScreen() {
         }),
         btn('kp-danger', '記録を消す', (e) => {
           if (e.currentTarget.dataset.arm) {
-            ctx.state = emptyState(ctx.deck.id);
-            save();
+            const empty = emptyState(ctx.deck.id);
+            if (!save(empty)) return saveFailed();
+            ctx.state = empty;
             go('home');
           } else {
             e.currentTarget.dataset.arm = '1';

@@ -179,7 +179,8 @@
 .kp-seg button.is-on { border-color: var(--kp-cyan); color: var(--kp-cyan); background: var(--kp-cyan-wash); font-weight: 700; }
 .kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: 11px; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 10px; padding: 8px; }
 .kp-danger { color: var(--kp-red) !important; border-color: var(--kp-red) !important; }
-.kp-toast { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--kp-panel-2); border: 1px solid var(--kp-line); border-radius: 12px; padding: 10px 16px; font-size: 14px; }
+.kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: 12px; padding: 10px 16px; font-size: 14px; line-height: 1.5; }
+.kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
 
 @media (max-width: 420px) {
   .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2395,22 +2396,44 @@ function learningSoon(deck, state, now, withinMs) {
   return out.sort((a, b) => a.t - b.t);
 }
 
+/**
+ * The instant handed to the scheduler (append-order-monotonic-clamp-v1, named
+ * in data/fsrs-pin.json): a clock that has moved behind the card's last review
+ * is lifted to that review, so a backward device clock never throws or
+ * reorders a card's history.
+ */
+function effectiveReviewTime(stored, now) {
+  if (stored?.last_review) {
+    const last = new Date(stored.last_review);
+    if (last.getTime() > now.getTime()) return last;
+  }
+  return now;
+}
+
+/**
+ * One answer. The log row is [cardId, rating, effectiveIso], plus the raw
+ * device time as a fourth element only when the clock was clamped.
+ */
 function grade(fsrsApi, scheduler, state, cardId, rating, now) {
   const stored = state.cards[cardId] ?? null;
-  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(now);
-  const next = scheduler.next(before, now, rating);
+  const at = effectiveReviewTime(stored, now);
+  const atIso = at.toISOString();
+  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(at);
+  const next = scheduler.next(before, at, rating);
+  const row = at === now ? [cardId, rating, atIso] : [cardId, rating, atIso, now.toISOString()];
   return {
     ...state,
-    cards: { ...state.cards, [cardId]: freeze(next.card, stored?.introducedAt || now.toISOString()) },
-    log: [...state.log.slice(-4999), [cardId, rating, now.toISOString()]],
+    cards: { ...state.cards, [cardId]: freeze(next.card, stored?.introducedAt || atIso) },
+    log: [...state.log.slice(-4999), row],
   };
 }
 
 /** what each answer would schedule, for the button labels */
 function preview(fsrsApi, scheduler, state, cardId, now) {
   const stored = state.cards[cardId] ?? null;
-  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(now);
-  const all = scheduler.repeat(before, now);
+  const at = effectiveReviewTime(stored, now);
+  const before = stored ? revive(stored) : fsrsApi.createEmptyCard(at);
+  const all = scheduler.repeat(before, at);
   const out = {};
   for (const [name, r] of Object.entries(RATINGS)) out[name] = new Date(all[r].card.due).getTime() - now.getTime();
   return out;
@@ -2438,7 +2461,7 @@ function dueCount(deck, state, now) {
   return buildQueue(deck, state, now, 0).due.length;
 }
 
-return { DECK_FORMAT, STATE_FORMAT, VERSION, LEECH_LAPSES, RATINGS, dayKey, validateDeck, indexDeck, createScheduler, emptyState, normalizeState, introducedToday, buildQueue, learningSoon, grade, preview, wordStatus, dueCount };
+return { DECK_FORMAT, STATE_FORMAT, VERSION, LEECH_LAPSES, RATINGS, dayKey, validateDeck, indexDeck, createScheduler, emptyState, normalizeState, introducedToday, buildQueue, learningSoon, effectiveReviewTime, grade, preview, wordStatus, dueCount };
 })();
 /**
  * 集中道場 deck player. One screen at a time: deck → study → done, plus the
@@ -2506,11 +2529,23 @@ function writeJson(storage, key, value) {
     return false;
   }
 }
-function save() {
-  writeJson(ctx.storage, stateKey(ctx.deck.id), ctx.state);
+/** write a candidate ledger; the caller adopts it only when this returns true */
+function save(state) {
+  return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
 }
-function savePrefs() {
-  writeJson(ctx.storage, prefsKey(ctx.deck.id), ctx.prefs);
+/** adopt new settings only once they are stored */
+function savePrefs(prefs) {
+  if (!writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) return saveFailed();
+  ctx.prefs = prefs;
+  ui.toast = '';
+  paint();
+}
+const SAVE_FAILED = '保存できませんでした。設定のバックアップから記録をコピーして保管してください。';
+/** nothing changed: say so and keep the screen as it is */
+function saveFailed() {
+  ui.toast = SAVE_FAILED;
+  paint();
+  return false;
 }
 
 /* ------------------------------------------------------------- helpers */
@@ -2588,8 +2623,13 @@ function paint() {
   root.replaceChildren();
   root.dataset.look = ctx.prefs.look;
   const screens = { home: homeScreen, study: studyScreen, list: listScreen, settings: settingsScreen };
+  if (ui.toast) {
+    const toast = el('div', 'kp-toast', ui.toast);
+    toast.setAttribute('role', 'alert');
+    if (ui.toast === SAVE_FAILED && ui.screen !== 'settings') toast.append(btn('kp-toast-btn', 'バックアップへ', () => go('settings'), { id: 'kp-to-backup' }));
+    root.append(toast);
+  }
   root.append((screens[ui.screen] || homeScreen)());
-  if (ui.toast) root.append(el('div', 'kp-toast', ui.toast));
 }
 
 function topBar(title, back) {
@@ -2651,8 +2691,10 @@ function homeScreen() {
       const set = new Set(ctx.state.groupsOff);
       if (box2.checked) set.delete(g.id);
       else set.add(g.id);
-      ctx.state = { ...ctx.state, groupsOff: [...set] };
-      save();
+      const nextState = { ...ctx.state, groupsOff: [...set] };
+      if (!save(nextState)) return saveFailed();
+      ctx.state = nextState;
+      ui.toast = '';
       paint();
     });
     const bar = el('span', 'kp-bar');
@@ -2686,6 +2728,7 @@ function startSession() {
   ui.done = 0;
   ui.right = 0;
   ui.undo = null;
+  refill();
   resetCard();
   go('study');
 }
@@ -2696,12 +2739,13 @@ function resetCard() {
   ui.shown = new Set();
 }
 
-/** pull learning steps that came due back into the sitting */
+/** pull learning steps that came due back into the sitting, right after the
+ * card under the cursor (never in its place: the card on screen never changes) */
 function refill() {
   const now = new Date();
   const ahead = new Set(ui.queue.slice(ui.pos));
   for (const { id, t } of learningSoon(ctx.deck, ctx.state, now, 0)) {
-    if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos, 0, id);
+    if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos + 1, 0, id);
   }
 }
 
@@ -2719,7 +2763,6 @@ function choicesFor(word) {
 }
 
 function studyScreen() {
-  refill();
   const box = el('section', 'kp-study');
   const id = ui.queue[ui.pos];
   if (!id) return doneScreen();
@@ -2889,9 +2932,19 @@ function reveal() {
 function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
   if (!id) return;
+  const nextState = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
+  if (!save(nextState)) {
+    // not stored: the same card stays, ready to answer again
+    if (ctx.prefs.mode === 'choice') {
+      ui.revealed = false;
+      ui.picked = null;
+    }
+    saveFailed();
+    return;
+  }
+  ui.toast = '';
   ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
-  ctx.state = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
-  save();
+  ctx.state = nextState;
   ui.done++;
   if (rating >= RATINGS.good) ui.right++;
   if (stay) {
@@ -2903,6 +2956,7 @@ function commit(rating, { stay = false } = {}) {
 
 function next() {
   const id = ui.queue[ui.pos];
+  refill();
   ui.pos++;
   // a learning step due within the sitting comes back after a few cards
   const s = ctx.state.cards[id];
@@ -2915,6 +2969,8 @@ function next() {
 
 function undo() {
   if (!ui.undo) return;
+  if (!save(ui.undo.state)) return saveFailed();
+  ui.toast = '';
   ctx.state = ui.undo.state;
   ui.queue = ui.undo.queue;
   ui.pos = ui.undo.pos;
@@ -2923,7 +2979,6 @@ function undo() {
   ui.undo = null;
   resetCard();
   ui.revealed = ctx.prefs.mode !== 'choice';
-  save();
   paint();
 }
 
@@ -3018,9 +3073,7 @@ function settingsScreen() {
     const row = el('div', 'kp-seg');
     for (const [value, label] of options) {
       const b = btn(ctx.prefs[key] === value ? 'is-on' : '', label, () => {
-        ctx.prefs = { ...ctx.prefs, [key]: value };
-        savePrefs();
-        paint();
+        savePrefs({ ...ctx.prefs, [key]: value });
       }, { 'data-pref': `${key}:${value}` });
       row.append(b);
     }
@@ -3036,9 +3089,7 @@ function settingsScreen() {
   const sw = el('div', 'kp-swatches');
   for (const [value, label, bg, ink] of THEMES) {
     const b = btn(`kp-swatch${ctx.prefs.look === value ? ' is-on' : ''}`, label, () => {
-      ctx.prefs = { ...ctx.prefs, look: value };
-      savePrefs();
-      paint();
+      savePrefs({ ...ctx.prefs, look: value });
     }, { 'data-pref': `look:${value}`, 'aria-label': label, style: `background:${bg};color:${ink}` });
     sw.append(b);
   }
@@ -3062,8 +3113,11 @@ function settingsScreen() {
             const raw = JSON.parse(ta.value);
             const next = normalizeState(raw, ctx.deck);
             if (!Object.keys(next.cards).length && Object.keys(raw?.cards || {}).length) throw new Error('mismatch');
+            if (!save(next)) {
+              msg.textContent = SAVE_FAILED;
+              return;
+            }
             ctx.state = next;
-            save();
             msg.textContent = '復元しました。';
           } catch {
             msg.textContent = 'このデッキのバックアップではありません。';
@@ -3071,8 +3125,9 @@ function settingsScreen() {
         }),
         btn('kp-danger', '記録を消す', (e) => {
           if (e.currentTarget.dataset.arm) {
-            ctx.state = emptyState(ctx.deck.id);
-            save();
+            const empty = emptyState(ctx.deck.id);
+            if (!save(empty)) return saveFailed();
+            ctx.state = empty;
             go('home');
           } else {
             e.currentTarget.dataset.arm = '1';
