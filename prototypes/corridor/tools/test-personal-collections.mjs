@@ -1,0 +1,92 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import * as api from '../vendor/ts-fsrs.mjs';
+import {createEngine} from '../decks/personal/engine.mjs';
+import {validateCollection,parseImport,backup,digest,safeURL} from '../decks/personal/schema.mjs';
+import {fixture} from './personal-fixture.mjs';
+
+const data = await fixture(), engine = createEngine(data,api), checks=[];
+const test = async (name,fn) => { await fn(); checks.push(name); };
+const now=Date.parse('2026-10-04T02:00:00.000Z');
+let counter=0; const id=()=>`test-${++counter}`, fresh=()=>engine.fresh('fixture-device');
+const first=engine.queue(fresh(),now).next;
+const one=engine.grade(fresh(),first.id,3,id(),1000,now);
+await test('original collection and exported bundle validate',async()=>{
+  assert.equal((await validateCollection(data)).id,data.id);
+  assert.equal((await parseImport(backup({collection:data,progress:one}))).progress.events.length,1);
+});
+await test('reject malformed input, tampering, duplicate identities, unsafe sources and foreign references',async()=>{
+  for (const value of [{},null,[],{...data,version:2}]) await assert.rejects(()=>parseImport(value));
+  for (const mutate of [d=>d.lessons[0].ja+='別の文。',d=>d.lessons[1].id=d.lessons[0].id,d=>d.sources[0].url='javascript:alert(1)',d=>d.routes[0].ids.push('missing'),d=>d.worlds[0].id='x" onmouseover="alert(1)']) {
+    const bad=structuredClone(data); mutate(bad); await assert.rejects(()=>validateCollection(bad));
+  }
+  assert.equal(safeURL('data:text/html,hi'),''); assert.equal(safeURL('https://user:password@example.com'),'');
+});
+await test('four modalities have stable, independent identities',()=>{
+  assert.equal(engine.cards.length,32); assert.equal(new Set(engine.cards.map(c=>c.id)).size,32);
+  assert.equal(engine.derive(one).states.size,1); assert.equal(first.id,'passage-0:meaning:v1');
+  assert.match(api.FSRSVersion,/5\.4\.1.*FSRS-6/);
+});
+await test('view and preview create no evidence; exact due time gates reviews',()=>{
+  const state=fresh(),before=JSON.stringify(state); engine.queue(state,now); engine.intervals(state,first.id,now);
+  assert.equal(JSON.stringify(state),before);
+  assert.equal(engine.derive(one).states.get(first.id).due.getTime(),now+600000);
+  assert(!engine.queue(one,now+599999).due.some(c=>c.id===first.id));
+  assert(engine.queue(one,now+600000).due.some(c=>c.id===first.id));
+  assert.throws(()=>engine.grade(one,first.id,3,id(),0,now+5000),/not due/);
+});
+await test('related-card burial survives reload and expires on the Japan study day',()=>{
+  const loaded=engine.validate(JSON.parse(JSON.stringify(one)),now);
+  assert(!engine.queue(loaded,now+1000).newCards.some(c=>c.family===first.family));
+  assert(engine.queue(loaded,now+86400000).newCards.some(c=>c.family===first.family&&c.id!==first.id));
+  assert(engine.queue(loaded,now+600000).due.some(c=>c.id===first.id));
+});
+await test('undo is append-only, replay restores the prior memory state',()=>{
+  const result=engine.undo(one,id(),now+1000);
+  assert.equal(result.events.length,2); assert.equal(result.events[0].type,'grade'); assert.equal(result.events[1].type,'undo');
+  assert.equal(engine.derive(result).states.size,0); assert.equal(engine.queue(result,now+1000).startedToday,0);
+});
+await test('daily new limit is shared across themes and task types',()=>{
+  let state=fresh(); state.settings.newLimit=2;
+  for(let i=0;i<2;i++) state=engine.grade(state,engine.queue(state,now+i).next.id,3,id(),0,now+i);
+  assert.equal(engine.queue(state,now+10).newCards.length,0);
+  state.settings.worlds=['city']; assert.equal(engine.queue(state,now+10).newCards.length,0);
+});
+await test('old or invalid backups cannot erase events; compatible history extends',()=>{
+  for(const bad of [{},null,[],{...one,deck:'wrong'},{...one,scheduler:'other'},{...one,events:null}]) assert.throws(()=>engine.previewImport(one,bad,now+1000));
+  assert.equal(engine.previewImport(one,fresh(),now+1000).result.events.length,1);
+  const local=fresh(); local.settings.newLimit=2;
+  const result=engine.previewImport(local,one,now+1000); assert.equal(result.added,1); assert.equal(result.result.settings.newLimit,2);
+  const fork=engine.grade(fresh(),first.id,1,id(),0,now);
+  assert.throws(()=>engine.previewImport(one,fork,now+1000),/branched/);
+});
+await test('invalid ratings, unknown cards, sequence gaps and backwards clocks are blocked',()=>{
+  for (const mutate of [e=>e.card='unknown',e=>e.rating=5,e=>e.seq=9,e=>e.at='not a date']) {
+    const bad=structuredClone(one);mutate(bad.events[0]);assert.throws(()=>engine.validate(bad,now));
+  }
+  assert.throws(()=>engine.pause(one,first.id,true,id(),now-600001),/clock/);
+});
+await test('six failures pause a card, explicit resume permits review',()=>{
+  let state=fresh(),at=now;
+  for(let i=0;i<6;i++){state=engine.grade(state,first.id,1,id(),0,at);at=engine.derive(state).states.get(first.id).due.getTime();}
+  assert(engine.derive(state).paused(first));state=engine.pause(state,first.id,false,id(),at);
+  assert(!engine.derive(state).paused(first));
+});
+await test('long history is never truncated and export replay is deterministic',()=>{
+  const state=fresh();
+  for(let i=0;i<5010;i++)state.events.push({type:'pause',card:first.id,value:i%2===0,id:`long-${i}`,seq:i+1,at:new Date(now+i).toISOString(),observedAt:new Date(now+i).toISOString()});
+  assert.equal(engine.pause(engine.validate(state,now+6000),first.id,false,id(),now+7000).events.length,5011);
+  const imported=engine.previewImport(fresh(),JSON.parse(JSON.stringify(one)),now).result;
+  assert.deepEqual(engine.derive(imported).states,engine.derive(one).states);
+});
+await test('private route and all module dependencies are packaged and precached',()=>{
+  const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
+  const pipeline=readFileSync(new URL('../../../.github/workflows/pages-app.yml',import.meta.url),'utf8');
+  const corridor=readFileSync(new URL('../corridor.js',import.meta.url),'utf8');
+  for(const file of ['mount.mjs','engine.mjs','schema.mjs','store.mjs','personal.css']) {
+    assert(sw.includes(`decks/personal/${file}`)); assert(pipeline.includes(`decks/personal/${file}`));
+  }
+  assert(sw.includes('vendor/ts-fsrs.mjs')); assert(sw.includes('fonts.css'));
+  assert(corridor.indexOf("params.get('deck') === 'personal'") < corridor.indexOf('const loadArticleIndex'));
+});
+console.log(JSON.stringify({suite:'personal-collections',passed:checks.length,checks},null,2));
