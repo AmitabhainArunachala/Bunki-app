@@ -266,14 +266,15 @@ try {
         timeout: 30000,
       });
       const result = await page.evaluate(async () => {
-        const url = window.__KAIRO_READING_CONTROLLER_URL__;
-        const controller = await import(url);
-        const sources = await import(window.__KAIRO_FEED_CONTROLLER_URL__);
-        const assessments = await import(window.__KAIRO_ASSESSMENT_CONTROLLER_URL__);
-        const publishers = await import(window.__KAIRO_PUBLISHER_CONTROLLER_URL__);
-        const controllerBytes = await (await window.fetch(url)).arrayBuffer();
-        const controllerSha256 = [
-          ...new Uint8Array(await window.crypto.subtle.digest('SHA-256', controllerBytes)),
+        const url = window.__KAIRO_RECORD_RUNTIME_URL__;
+        const runtime = await import(url);
+        const controller = runtime.readingController;
+        const sources = runtime.feedController;
+        const assessments = runtime.assessmentController;
+        const publishers = runtime.publisherController;
+        const runtimeBytes = await (await window.fetch(url)).arrayBuffer();
+        const recordRuntimeSha256 = [
+          ...new Uint8Array(await window.crypto.subtle.digest('SHA-256', runtimeBytes)),
         ]
           .map((byte) => byte.toString(16).padStart(2, '0'))
           .join('');
@@ -285,7 +286,7 @@ try {
         }
         return {
           embedded: url.startsWith('blob:'),
-          controllerSha256,
+          recordRuntimeSha256,
           length: controller.readingSettings().length,
           rejected,
           ready: document.body.dataset.ready,
@@ -298,7 +299,7 @@ try {
       });
       assert.deepEqual(result, {
         embedded: true,
-        controllerSha256: bundleReceipt.controllerSha256,
+        recordRuntimeSha256: bundleReceipt.recordRuntimeSha256,
         length: 'medium',
         rejected: true,
         ready: '1',
