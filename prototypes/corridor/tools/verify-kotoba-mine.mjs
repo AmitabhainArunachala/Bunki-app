@@ -67,6 +67,20 @@
  *      a grade slides the old card out in its direction and the rail ticks on the compositor;
  *      with prefers-reduced-motion nothing moves or fades, and a swipe does not drag the card.
  *
+ * Then the review loop (CARD_CONTRACT_V2 §3.7, §4), both decks where it applies:
+ *   a) 削除 on the back is one tap: the card leaves the sitting and every later queue, its FSRS
+ *      record and id untouched (ledger: suspended, repairLog); the toast's 元に戻す brings it
+ *      back; 設定 › 保留中のカード counts it and 復元 returns it to the queue;
+ *   b) a card that has lapsed LEECH_LAPSES (5) times shows the repair ladder on its back, in
+ *      order 別の文に替える → ヒントを付ける → 保留, each one tap and logged: the swap suspends the
+ *      card and puts the word's next unseen passage on screen (due at once, after a reload too);
+ *      the hint is stored in the ledger and shown on this card's front only, marked repaired
+ *      (the front pin tolerates exactly that); 保留 suspends; a 字 card has nothing to swap to;
+ *   c) 漢字の形と意味 lists the learner's own words (a card in the ledger) sharing a kanji (同) or
+ *      a reading of one (読), never a word not met yet; each opens 語の一覧, whose ← returns to
+ *      the card; the Anki back lists the same family over the words before it in deck order;
+ *   d) a 参照・文法 line after the kanji fold only when the deck names one (none does yet).
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -543,6 +557,7 @@ function verifyBackParity() {
     for (const [name, t] of [['front', front], ['back', back]]) if (!t.includes('pos-{{POS}} {{Tags}}">') || !t.includes('<span class="chip levelchip"></span>')) bad.push(`${dir}/${name}: no level chip from the level::Nx tag`);
     if (!css.includes(".level\\:\\:N1 .levelchip::after {\n  content: 'N1';")) bad.push(`${dir}/style.css: the level chip has no N1 label`);
     if (!back.includes('lang="en">{{Meaning}}') || !back.includes('lang="en">{{SentenceEN}}') || !back.includes('lang="en">{{Tip}}') || /<details[^>]*lang=/.test(back)) bad.push(`${dir}/back: lang="en" not on the English text alone`);
+    if (!/<summary>漢字の形と意味<\/summary>\s*<div class="kanji">\{\{Kanji\}\}<\/div>/.test(back) || !css.includes('.kfam {')) bad.push(`${dir}: the kanji family has no place in the 漢字 fold`);
   }
   const tsv = readFileSync(resolve(release, 'kotoba-mcd.tsv'), 'utf8').trim().split('\n');
   const cols = tsv[2].replace('#columns:', '').split('\t');
@@ -552,6 +567,7 @@ function verifyBackParity() {
   if (wrongEn.length) bad.push(`kotoba-mcd.tsv SentenceEN ≠ enTarget: ${wrongEn.slice(0, 3).join(', ')}`);
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
+    if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
     if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
   }
   check('parity: the study pages bundle this player; the Anki fronts show no readings or English; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards) and translate only the target sentence; Anki edges and first chips by item kind', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
@@ -562,6 +578,13 @@ async function verifyBack(browser, base) {
   const sentDeck = readJson(SENTENCE_DECK_PATH);
   const index = new Map([mcdDeck, sentDeck].flatMap((d) => d.words.flatMap((w) => w.cards.map((c) => [c.id, { c, w, deck: d.id }]))));
   const ledger = (deck, id, state = 2) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
+  const repairedLedger = (deck, id, hint) => {
+    const s = JSON.parse(ledger(deck, id));
+    s.cards[id].lapses = 5;
+    s.repairs = { [id]: { at: '2026-10-01T00:00:00.000Z', lapses: 5, hint } };
+    s.repairLog = [[id, 'hint', '2026-10-01T00:00:00.000Z', hint]];
+    return JSON.stringify(s);
+  };
   /** a fresh page with this deck's prefs (and ledger) stored before the player boots */
   const open = async (q, deck, { prefs = null, state = null, sem = false } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -594,6 +617,7 @@ async function verifyBack(browser, base) {
     const rest = card.cloneNode(true);
     rest.querySelectorAll('.kp-chips, .kp-sentence').forEach((n) => n.remove());
     return { rt: card.querySelectorAll('rt, ruby').length, taps: card.querySelectorAll('.kp-sentence :is(button, a, [role="button"], [tabindex], .kp-tapword)').length, tapwords: document.querySelectorAll('.kp-tapword').length,
+      rhint: card.querySelectorAll('.kp-rhint').length, repaired: card.dataset.repaired ?? null,
       latin: /[A-Za-z]/.test(rest.textContent), folds: card.querySelectorAll('details').length, text: card.textContent, hint: card.querySelector('.kp-hint')?.textContent ?? null, zoom: !!card.querySelector('.kp-zoom') || !!card.dataset.zoom };
   })()`;
   const BACK = `(() => {
@@ -605,7 +629,7 @@ async function verifyBack(browser, base) {
     const fold = (cls) => { const d = card.querySelector('.' + cls); return d ? { open: d.open, text: d.textContent.replace(d.querySelector('summary').textContent, '').trim(), summary: d.querySelector('summary').textContent } : null; };
     return { order: [...ans.children].map((n) => n.className), word: [...ans.querySelector('.kp-word').children].map((n) => n.className), pitch: !!card.querySelector('.kp-pitch'),
       bare: ${KANJI_RE}.test(sentence.textContent), rt: card.querySelectorAll('.kp-sentence rt').length, tier1, def: ans.querySelector('.kp-def')?.textContent,
-      summaries: [...ans.querySelectorAll('.kp-folds > details > summary')].map((s) => s.textContent), native: [...ans.querySelectorAll('.kp-folds > *')].every((n) => n.tagName === 'DETAILS'),
+      summaries: [...ans.querySelectorAll('.kp-folds > details > summary')].map((s) => s.textContent), native: [...ans.querySelectorAll('.kp-folds > *')].every((n) => n.tagName === 'DETAILS' || n.id === 'kp-see'),
       gloss: fold('kp-f-gloss'), en: fold('kp-f-en'), kanji: fold('kp-f-kanji'), sem: fold('kp-f-sem'), others: fold('kp-f-others') };
   })()`;
   const inOrder = (summaries) => {
@@ -625,16 +649,20 @@ async function verifyBack(browser, base) {
     ['MCD 字', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-064-m02') }],
     ['文 (読んで思い出す)', '?deck=kotoba', 'kotoba-mine', {}],
     ['文 穴埋め, old prefs (tap ふりがな, English hint)', '?deck=kotoba', 'kotoba-mine', { prefs: { mode: 'self', furigana: 'tap', hint: 'en' } }],
+    ['MCD 語 repaired with a ladder hint (§4)', '?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: repairedLedger('kotoba-mcd', 'km-064-m01', 'ざ○○○') }],
+    ['文 repaired with a ladder hint (§4)', '?deck=kotoba', 'kotoba-mine', { prefs: { newPerDay: 0 }, state: repairedLedger('kotoba-mine', 'km-064-1', 'ざ○○○') }],
   ]) {
     const o = await open(q, deck, opts);
     const f = await o.page.evaluate(FRONT);
     const { c, w } = index.get(await cardId(o.page));
     const english = [w.meaning, c.en, w.tip].filter(Boolean).some((t) => f.text.includes(t));
-    fronts.push({ label, ok: f.rt === 0 && f.taps === 0 && f.tapwords === 0 && !f.latin && !english && f.folds === 0 && !f.zoom && (f.hint == null || !/[A-Za-z]/.test(f.hint)), card: c.id, ...f, text: undefined });
+    // a ladder hint is the one thing a repaired card adds to its front, marked as repaired; no other card shows one
+    const repairOk = opts.state?.includes('"hint"') ? f.rhint === 1 && f.repaired === 'hint' : f.rhint === 0 && f.repaired === null;
+    fronts.push({ label, ok: f.rt === 0 && f.taps === 0 && f.tapwords === 0 && !f.latin && !english && f.folds === 0 && !f.zoom && (f.hint == null || !/[A-Za-z]/.test(f.hint)) && repairOk, card: c.id, ...f, text: undefined });
     await close(o);
   }
   const badFront = fronts.filter((f) => !f.ok);
-  check('a) front pin, both decks: no furigana, no English, no tap targets in the passage, no folds — also with old tap-ふりがな / English-hint prefs stored', badFront.length === 0, badFront.length ? JSON.stringify(badFront[0]) : fronts.map((f) => `${f.label} ${f.card}`).join(' · '));
+  check('a) front pin, both decks: no furigana, no English, no tap targets in the passage, no folds — also with old tap-ふりがな / English-hint prefs stored; only a card repaired with a ladder hint shows one, marked data-repaired', badFront.length === 0, badFront.length ? JSON.stringify(badFront[0]) : fronts.map((f) => `${f.label} ${f.card}`).join(' · '));
 
   // b, c) a new MCD 語 card: tier one, then the folds in order; d) zoom on a new card
   {
@@ -790,6 +818,348 @@ async function verifyBack(browser, base) {
       seen.every((x) => x.id === 'km-064-m01' && x.order) && !fresh.sem && !learning.sem && review.sem && review.closed && review.text.includes('家計') && !none.sem && fresh.zoom === 'full' && review.zoom === 'focus',
       JSON.stringify(seen.map(({ label, sem, zoom }) => ({ label, sem, zoom }))),
     );
+  }
+}
+
+/* ------------------------- the review loop (CARD_CONTRACT_V2 §3.7, §4): delete, leech ladder, kanji family */
+const ENGINE_PATH = resolve(CORRIDOR_DIR, 'decks/player/engine.js');
+/** the kanji family as data: the player reads kanji[].r (the kanji's reading in the word) for 読 */
+function familyOf(deck, word, learned) {
+  return (word.kanji || [])
+    .map((k) => {
+      const same = deck.words.filter((w) => w.id !== word.id && learned(w) && w.kanji.some((j) => j.c === k.c));
+      const read = deck.words.filter((w) => w.id !== word.id && learned(w) && !same.includes(w) && k.r && w.kanji.some((j) => j.r === k.r && j.c !== k.c));
+      return { c: k.c, same: same.map((w) => w.term), read: read.map((w) => w.term) };
+    })
+    .filter((r) => r.same.length || r.read.length);
+}
+function verifyReviewData(decks) {
+  const engine = readFileSync(ENGINE_PATH, 'utf8');
+  const constant = (name) => engine.match(new RegExp(`const ${name} = (\\d+);`))?.[1];
+  check(
+    'b) the leech threshold is 5 lapses (LEECH_LAPSES, contract §4); the unlock constants are unchanged (14 days, 3 lapses)',
+    constant('LEECH_LAPSES') === '5' && constant('UNLOCK_STABILITY_DAYS') === '14' && constant('UNLOCK_AFTER_LAPSES') === '3',
+    `LEECH_LAPSES ${constant('LEECH_LAPSES')} · UNLOCK_STABILITY_DAYS ${constant('UNLOCK_STABILITY_DAYS')} · UNLOCK_AFTER_LAPSES ${constant('UNLOCK_AFTER_LAPSES')}`,
+  );
+  // kanji[].r: kana, and for an all-kanji word whose kanji all have one, they spell the word's reading
+  const bad = [];
+  let n = 0;
+  let all = 0;
+  for (const d of decks)
+    for (const w of d.words)
+      for (const k of w.kanji) {
+        all++;
+        if (k.r == null) continue;
+        n++;
+        if (!/^[ぁ-ゖー]+$/.test(k.r)) bad.push(`${w.id} ${k.c} ${k.r}`);
+      }
+  for (const d of decks)
+    for (const w of d.words) {
+      const glyphs = [...w.term];
+      if (glyphs.every((ch) => KANJI_RE.test(ch) && ch !== '々') && new Set(glyphs).size === glyphs.length && w.kanji.length === glyphs.length && w.kanji.every((k) => k.r) && w.kanji.map((k) => k.r).join('') !== w.reading) bad.push(`${w.id} ${w.term}: ${w.kanji.map((k) => k.r).join('+')} ≠ ${w.reading}`);
+    }
+  check('c) each kanji of a word carries its reading in that word (kanji[].r, from the kanji table, never guessed): kana only, and together they spell an all-kanji word', bad.length === 0 && n / all > 0.9, bad.slice(0, 3).join(' | ') || `${n / decks.length}/${all / decks.length} kanji per deck`);
+  // the Anki back: the same family, over the words before this one in deck order (Anki's new-card order)
+  const release = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release');
+  const wrong = [];
+  let rows = 0;
+  for (const d of decks) {
+    const tsv = readFileSync(resolve(release, `${d.id}.tsv`), 'utf8').trim().split('\n');
+    const cols = tsv[2].replace('#columns:', '').split('\t');
+    const byCard = new Map(d.words.flatMap((w, i) => w.cards.map((c) => [c.id, i])));
+    for (const line of tsv.slice(3)) {
+      const r = line.split('\t');
+      const wi = byCard.get(r[0]);
+      const field = r[cols.indexOf('Kanji')];
+      const got = [...field.matchAll(/<li><b>(.)(?:<small>[^<]*<\/small>)?<\/b>(.*?)<\/li>/g)].map(([, c, body]) => ({ c, same: [...body.matchAll(/<i>同<\/i>([^<]+)/g)].map((m) => m[1]), read: [...body.matchAll(/<i>読<\/i>([^<]+)/g)].map((m) => m[1]) }));
+      const want = familyOf(d, d.words[wi], (w) => d.words.indexOf(w) < wi).map((x) => ({ ...x, read: x.read.slice(0, 8) }));
+      if (got.length) rows++;
+      if (JSON.stringify(got) !== JSON.stringify(want)) wrong.push(`${d.id} ${r[0]}`);
+    }
+  }
+  check('c) parity: the Anki 漢字 fold lists the kanji family (同 / 読) over the words before it in deck order, as the player derives it', wrong.length === 0 && rows > 0, wrong.slice(0, 3).join(' | ') || `${rows} notes with a family`);
+}
+
+async function verifyReview(browser, base) {
+  const mcdDeck = readJson(DECK_PATH);
+  const card = (id, { state = 2, lapses = 0, due = '2020-01-01T00:00:00.000Z' } = {}) => ({ [id]: { due, stability: state === 2 ? 20 : 1, difficulty: 5, state, reps: 6, lapses, elapsed_days: 1, scheduled_days: 1, last_review: '2026-09-01T00:00:00.000Z' } });
+  const ledger = (deck, cards, extra = {}) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: Object.assign({}, ...cards), ...extra });
+  const LATER = '2099-01-01T00:00:00.000Z';
+  const open = async (q, deck, state, { inject = null } = {}) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(SEEDED);
+    await context.addInitScript(`try { if (!sessionStorage.getItem('__review_seeded')) { sessionStorage.setItem('__review_seeded', '1');
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true }))});
+      localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)}); } } catch {}`);
+    if (inject) {
+      await context.route(`**/decks/${deck}/deck.json`, async (route) => {
+        const response = await route.fetch();
+        const json = await response.json();
+        inject(json);
+        await route.fulfill({ response, json });
+      });
+    }
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    const boot = async () => {
+      await page.goto(`${base}/index.html${q}`, { waitUntil: 'load' });
+      await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+      await page.waitForSelector('#kp-start', { timeout: 15000 });
+    };
+    await boot();
+    return { context, page, errors, boot };
+  };
+  const close = async (o) => {
+    if (o.errors.length) check('no page errors in the review loop', false, o.errors.slice(0, 2).join(' | '));
+    await o.context.close();
+  };
+  const read = (page, deck) => page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:${deck}'))`);
+  const onScreen = (page) => page.evaluate(`({ id: document.getElementById('kp-card')?.dataset.card ?? null, count: document.querySelector('.kp-count')?.textContent ?? null, revealed: !!document.querySelector('.kp-grade'), toast: document.querySelector('.kp-toast')?.textContent ?? null, undo: !!document.getElementById('kp-toast-undo') })`);
+  const start = async (page) => {
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card');
+  };
+  const revealCard = async (page) => {
+    await page.click('#kp-reveal');
+    await page.waitForSelector('.kp-grade');
+  };
+
+  // a) 削除: one tap, out of the sitting and the queue, record untouched; 元に戻す; 設定 › 保留中のカード › 復元
+  for (const [q, deck, a, b] of [
+    ['?deck=mcd', 'kotoba-mcd', 'km-064-m01', 'km-065-m01'],
+    ['?deck=kotoba', 'kotoba-mine', 'km-064-1', 'km-065-1'],
+  ]) {
+    const o = await open(q, deck, ledger(deck, [card(a, { due: '2020-01-01T00:00:00.000Z' }), card(b, { due: '2020-01-02T00:00:00.000Z' })]));
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const first = await onScreen(o.page);
+      const before = await read(o.page, deck);
+      const tools = await o.page.evaluate(`(() => { const d = document.getElementById('kp-delete'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; const at = (dy) => document.elementFromPoint(cx, cy + dy) === d;
+        return { inCard: !!d.closest('#kp-card'), afterAnswer: !!d.closest('.kp-tools')?.previousElementSibling?.classList.contains('kp-answer'), h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
+      await o.page.click('#kp-delete');
+      await o.page.waitForSelector('#kp-toast-undo');
+      const gone = await onScreen(o.page);
+      const l1 = await read(o.page, deck);
+      await o.page.click('#kp-toast-undo');
+      await o.page.waitForSelector('.kp-grade');
+      const back = await onScreen(o.page);
+      const l2 = await read(o.page, deck);
+      await o.page.click('#kp-delete');
+      await o.page.waitForSelector('#kp-toast-undo');
+      await o.boot();
+      const home = await o.page.evaluate(`document.getElementById('kp-start').textContent`);
+      await o.page.click('#kp-to-settings');
+      await o.page.waitForSelector('#kp-suspended');
+      const counted = await o.page.evaluate(`document.getElementById('kp-suspended').textContent`);
+      await o.page.click('#kp-unsuspend');
+      await o.page.waitForSelector('#kp-suspended');
+      const after = await o.page.evaluate(`({ text: document.getElementById('kp-suspended').textContent, disabled: document.getElementById('kp-unsuspend').disabled })`);
+      const l3 = await read(o.page, deck);
+      await o.page.click('.kp-top .kp-icon');
+      const homeAfter = await o.page.evaluate(`document.getElementById('kp-start').textContent`);
+      const lastRow = l1.repairLog?.at(-1) ?? [];
+      check(
+        `a) ${deck}: 削除 under the answer (one tap, 44px reach) takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
+        tools.inCard && tools.afterAnswer && tools.reach && tools.label === '削除' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /削除しました/.test(gone.toast) &&
+          l1.suspended?.[a]?.by === 'delete' && JSON.stringify(l1.cards[a]) === JSON.stringify(before.cards[a]) && lastRow[0] === a && lastRow[1] === 'delete' && !l1.suspended?.[b] &&
+          back.id === a && back.revealed && back.count === '1/2' && !l2.suspended?.[a],
+        JSON.stringify({ tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
+      );
+      check(
+        `a) ${deck}: after a reload the deleted card is not in the queue; 設定 › 保留中のカード counts it and 復元 puts it back (logged), with the record as it was`,
+        /1枚/.test(home) && /^1枚（削除 1）$/.test(counted) && after.text === 'ありません' && after.disabled && Object.keys(l3.suspended).length === 0 && l3.repairLog.at(-1)[1] === 'restore' && l3.repairLog.at(-1)[0] === a && JSON.stringify(l3.cards[a]) === JSON.stringify(before.cards[a]) && /2枚/.test(homeAfter),
+        JSON.stringify({ home, counted, after, homeAfter }),
+      );
+    } finally {
+      await close(o);
+    }
+  }
+
+  // b) the leech ladder: on a card with 5 lapses, in order; not on 4
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m01', { lapses: 5 }), card('km-065-m01', { lapses: 4, due: '2020-01-02T00:00:00.000Z' })]));
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const ladder = await o.page.evaluate(`(() => { const l = document.getElementById('kp-ladder'); if (!l) return null; const steps = [...l.querySelectorAll('.kp-ladder-step')];
+        return { head: l.querySelector('.kp-ladder-head').textContent, steps: steps.map((b) => b.dataset.step), labels: steps.map((b) => b.querySelector('b').textContent), enabled: steps.map((b) => !b.disabled), swapTo: steps[0].querySelector('small').textContent, hint: steps[1].querySelector('small').textContent,
+          beforeAnswer: l.nextElementSibling?.classList.contains('kp-answer'), afterPassage: l.previousElementSibling?.classList.contains('kp-sentence'), keep: !!document.getElementById('kp-ladder-keep') }; })()`);
+      await o.page.click('#kp-ladder-hint');
+      await o.page.waitForSelector('.kp-grade');
+      const hinted = { ladder: await o.page.locator('#kp-ladder').count(), ledger: await read(o.page, 'kotoba-mcd') };
+      await o.page.click('#kp-grade-good');
+      await o.page.waitForSelector('#kp-card');
+      const second = await onScreen(o.page);
+      await revealCard(o.page);
+      const noLadder = await o.page.locator('#kp-ladder').count();
+      check(
+        'b) a card with 5 lapses shows the repair ladder between the passage and the answer, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
+        ladder && ladder.head === 'この文で5回つまずいています' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith('文章2へ') && ladder.afterPassage && ladder.beforeAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
+        JSON.stringify({ ladder, second: second.id, noLadder }),
+      );
+      const r = hinted.ledger.repairs?.['km-064-m01'];
+      check(
+        'b) ヒントを付ける: one tap stores the hint for this card in the ledger (repairs, logged), the ladder closes, and the card is still graded as usual',
+        hinted.ladder === 0 && r?.hint === 'ざ○○○' && r.lapses === 5 && hinted.ledger.repairLog.at(-1).join('|').startsWith('km-064-m01|hint|') && hinted.ledger.log.length === 0 && second.id === 'km-065-m01',
+        JSON.stringify({ repairs: hinted.ledger.repairs, row: hinted.ledger.repairLog.at(-1) }),
+      );
+    } finally {
+      await close(o);
+    }
+  }
+  {
+    // the hint on the front of that card only, after a reload
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m01', { lapses: 5 }), card('km-065-m01', { due: '2020-01-02T00:00:00.000Z' })], { repairs: { 'km-064-m01': { at: '2026-10-01T00:00:00.000Z', lapses: 5, hint: 'ざ○○○' } } }));
+    try {
+      await start(o.page);
+      const f1 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelector('#kp-card .kp-rhint')?.textContent ?? null })`);
+      await revealCard(o.page);
+      const b1 = await o.page.evaluate(`({ rhint: document.querySelectorAll('#kp-card .kp-rhint').length, ladder: !!document.getElementById('kp-ladder') })`);
+      await o.page.click('#kp-grade-good');
+      await o.page.waitForSelector('#kp-card');
+      const f2 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelectorAll('#kp-card .kp-rhint').length })`);
+      check(
+        'b) the hint shows on the front of the repaired card only (marked data-repaired, gone after the reveal); the next card has none; no ladder until it lapses again',
+        f1.id === 'km-064-m01' && f1.repaired === 'hint' && f1.hint === 'ヒントざ○○○' && b1.rhint === 0 && !b1.ladder && f2.id === 'km-065-m01' && f2.repaired === null && f2.hint === 0,
+        JSON.stringify({ f1, b1, f2 }),
+      );
+    } finally {
+      await close(o);
+    }
+  }
+  {
+    // 別の文に替える: the next unseen passage of the word takes the card's place, due now (also after a reload)
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m01', { lapses: 5 }), card('km-065-m01', { due: LATER })]));
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const before = await read(o.page, 'kotoba-mcd');
+      await o.page.click('#kp-ladder-swap');
+      await o.page.waitForSelector('#kp-reveal');
+      const now = await onScreen(o.page);
+      const l = await read(o.page, 'kotoba-mcd');
+      await o.boot();
+      await start(o.page);
+      const reloaded = await onScreen(o.page);
+      const target = mcdDeck.words.find((w) => w.id === 'km-064').cards.find((c) => c.type === 'word' && c.passage === 2);
+      check(
+        'b) 別の文に替える: one tap suspends the leech (record and the word\'s other progress kept), logs the swap, and puts the word\'s next unseen passage on screen, due at once — still first after a reload',
+        now.id === target.id && !now.revealed && now.count === '1/1' && /別の文に替えました/.test(now.toast) && now.undo && l.suspended['km-064-m01']?.by === 'swap' && l.repairs['km-064-m01']?.swap === target.id && JSON.stringify(l.cards['km-064-m01']) === JSON.stringify(before.cards['km-064-m01']) && !l.cards[target.id] && l.repairLog.at(-1).join('|').startsWith(`km-064-m01|swap|`) && l.repairLog.at(-1)[3] === target.id && reloaded.id === target.id && reloaded.count === '1/1',
+        JSON.stringify({ now, reloaded: reloaded.id, target: target.id, suspended: l.suspended, repairs: l.repairs }),
+      );
+    } finally {
+      await close(o);
+    }
+  }
+  {
+    // 保留 (sentence deck), and a 字 card that has nothing to swap to
+    const o = await open('?deck=kotoba', 'kotoba-mine', ledger('kotoba-mine', [card('km-064-1', { lapses: 6 }), card('km-065-1', { due: '2020-01-02T00:00:00.000Z' })]));
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const swapTo = await o.page.evaluate(`document.querySelector('#kp-ladder-swap small').textContent`);
+      await o.page.click('#kp-ladder-suspend');
+      await o.page.waitForSelector('#kp-toast-undo');
+      const now = await onScreen(o.page);
+      const l = await read(o.page, 'kotoba-mine');
+      check(
+        'b) 保留 (sentence deck): one tap suspends the leech (by leech, logged as suspend) and the next card comes up; on a sentence card the swap names 例文2',
+        swapTo.startsWith('例文2へ') && now.id === 'km-065-1' && /保留にしました/.test(now.toast) && l.suspended['km-064-1']?.by === 'leech' && l.repairLog.at(-1)[1] === 'suspend' && l.repairs['km-064-1']?.lapses === 6,
+        JSON.stringify({ swapTo, now, suspended: l.suspended, row: l.repairLog.at(-1) }),
+      );
+    } finally {
+      await close(o);
+    }
+  }
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m02', { lapses: 5 })]));
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const ji = await o.page.evaluate(`({ swap: document.getElementById('kp-ladder-swap')?.disabled, why: document.querySelector('#kp-ladder-swap small')?.textContent, hint: document.querySelector('#kp-ladder-hint small')?.textContent })`);
+      await o.page.click('#kp-ladder-keep');
+      await o.page.waitForSelector('.kp-grade');
+      const kept = { ladder: await o.page.locator('#kp-ladder').count(), r: (await read(o.page, 'kotoba-mcd')).repairs['km-064-m02'] };
+      check(
+        'b) a 字 card has no passage to swap to (step disabled, said so) and its hint is the kanji\'s parts; このまま続ける closes the ladder until the next lapse (logged as keep)',
+        ji.swap === true && ji.why === '替えられる文がありません' && ji.hint === '表に「貝＋才」' && kept.ladder === 0 && kept.r?.keep === true && kept.r.lapses === 5,
+        JSON.stringify({ ji, kept }),
+      );
+    } finally {
+      await close(o);
+    }
+  }
+
+  // c) the kanji family: the learner's own words only; 同 and 読; a link into 語の一覧 and back
+  {
+    const state = ledger('kotoba-mcd', [card('km-064-m01'), card('km-188-m01', { due: LATER }), card('km-189-m01', { due: LATER }), card('km-127-m01', { due: LATER })]);
+    const o = await open('?deck=mcd', 'kotoba-mcd', state);
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      await o.page.click('.kp-f-kanji > summary');
+      const fam = await o.page.evaluate(`[...document.querySelectorAll('#kp-card .kp-f-kanji .kp-kfam > li')].map((li) => ({ c: li.querySelector('.kp-kfam-c').firstChild.textContent, r: li.querySelector('.kp-kfam-c small')?.textContent ?? null,
+        same: [...li.querySelectorAll('.kp-fam[data-mark="同"]')].map((b) => b.lastChild.textContent), read: [...li.querySelectorAll('.kp-fam[data-mark="読"]')].map((b) => b.lastChild.textContent) }))`);
+      const learnedIds = new Set(Object.keys(JSON.parse(state).cards).map((id) => id.replace(/-m\d+$/, '')));
+      const want = familyOf(mcdDeck, mcdDeck.words.find((w) => w.id === 'km-064'), (w) => learnedIds.has(w.id));
+      const shape = fam.map(({ c, same, read }) => ({ c, same, read }));
+      const famReach = await o.page.evaluate(`(() => { const d = document.querySelector('#kp-card .kp-fam'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; return document.elementFromPoint(cx, cy - 21) === d && document.elementFromPoint(cx, cy + 21) === d; })()`);
+      await o.page.click('#kp-card .kp-fam[data-word="km-188"]');
+      await o.page.waitForSelector('.kp-row.is-open');
+      const list = await o.page.evaluate(`({ title: document.querySelector('.kp-title')?.textContent, open: document.querySelector('.kp-row.is-open')?.dataset.word, detail: !!document.querySelector('.kp-detail') })`);
+      await o.page.click('.kp-top .kp-icon');
+      await o.page.waitForSelector('#kp-card');
+      const back = await onScreen(o.page);
+      check(
+        'c) 漢字の形と意味 lists the learner\'s own words sharing a kanji (同 財閥) or a kanji reading (読 制圧 for せい, 自由自在 for ざい), with the reading, each a 44px link; words not met yet (財物, 起爆剤…) are left out',
+        JSON.stringify(shape) === JSON.stringify(want) && JSON.stringify(shape) === JSON.stringify([{ c: '財', same: ['財閥'], read: ['自由自在'] }, { c: '政', same: [], read: ['制圧'] }]) && fam[0].r === 'ざい' && fam[1].r === 'せい' && famReach,
+        JSON.stringify(fam),
+      );
+      check('c) each family word opens its row in 語の一覧, and ← returns to the card, still revealed', list.title === '語の一覧' && list.open === 'km-188' && list.detail && back.id === 'km-064-m01' && back.revealed, JSON.stringify({ list, back }));
+    } finally {
+      await close(o);
+    }
+  }
+  {
+    // a new learner: no family yet, so the fold holds only the anatomy
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m01')]));
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const none = await o.page.evaluate(`({ kfam: document.querySelectorAll('#kp-card .kp-kfam').length, tiles: document.querySelectorAll('#kp-card .kp-kj').length, see: !!document.getElementById('kp-see') })`);
+      check('c, d) with no other word met, the kanji fold holds the anatomy only; with no see-also or grammar in the deck there is no 参照 line', none.kfam === 0 && none.tiles === 2 && !none.see, JSON.stringify(none));
+    } finally {
+      await close(o);
+    }
+  }
+
+  // d) see-also and grammar: one line right after the kanji fold, only when the deck names them
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd', ledger('kotoba-mcd', [card('km-064-m01')]), {
+      inject: (deck) => {
+        const w = deck.words.find((x) => x.id === 'km-064');
+        w.seeAlso = ['財閥', '国家予算'];
+        w.grammar = [{ id: 'n4-nagara', p: '〜ながら' }];
+      },
+    });
+    try {
+      await start(o.page);
+      await revealCard(o.page);
+      const see = await o.page.evaluate(`(() => { const s = document.getElementById('kp-see'); if (!s) return null; return { prev: s.previousElementSibling?.className, inFolds: s.parentElement.classList.contains('kp-folds'), labels: [...s.querySelectorAll('.kp-see-label')].map((n) => n.textContent),
+        links: [...s.querySelectorAll('.kp-see-link')].map((b) => b.dataset.word), items: [...s.querySelectorAll('.kp-see-item')].map((n) => n.textContent) }; })()`);
+      await o.page.click('#kp-see .kp-see-link');
+      await o.page.waitForSelector('.kp-row.is-open');
+      const opened = await o.page.evaluate(`document.querySelector('.kp-row.is-open')?.dataset.word`);
+      check(
+        'd) a see-also and a grammar id in the deck show as one line right after the kanji fold: 参照 links to a deck word (語の一覧), a word outside the deck and the grammar point (no host entry to open) as text',
+        see && see.inFolds && see.prev === 'kp-fold kp-f-kanji' && see.labels.join() === '参照,文法' && see.links.join() === 'km-188' && see.items.join() === '国家予算,〜ながら' && opened === 'km-188',
+        JSON.stringify({ see, opened }),
+      );
+    } finally {
+      await close(o);
+    }
   }
 }
 
@@ -1197,6 +1567,10 @@ async function main() {
 
     console.log('\n— the visual system (CARD_CONTRACT_V2 §9): colour axes, contrast, textures, motion');
     await verifyVisual(browser, base);
+
+    console.log('\n— the review loop (CARD_CONTRACT_V2 §3.7, §4): delete, leech ladder, kanji family, see-also');
+    verifyReviewData([deck, sentences]);
+    await verifyReview(browser, base);
   } finally {
     await browser.close();
     server.close();

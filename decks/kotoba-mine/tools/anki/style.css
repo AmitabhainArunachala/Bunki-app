@@ -277,3 +277,51 @@
   font-size: 12px;
   opacity: 0.8;
 }
+/* the kanji family (as the player's 漢字 fold): earlier words in the deck sharing a kanji (同)
+   or a reading of one (読), marked in text */
+.kfam {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.kfam li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.kfam li > b {
+  font-size: 18px;
+  min-width: 3em;
+}
+.kfam li > b small {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-left: 3px;
+}
+.kfam .fam {
+  font-size: 14px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+}
+.kfam .fam i {
+  font-style: normal;
+  font-size: 10px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 0 2px;
+  margin-right: 4px;
+  opacity: 0.8;
+}
+.kfam .fam.rd i {
+  border-style: dashed;
+}
+.kfam .more {
+  font-size: 12px;
+  opacity: 0.75;
+}
