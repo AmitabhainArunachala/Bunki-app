@@ -265,9 +265,21 @@ function paint() {
     root.append(toast);
   }
   root.append((screens[ui.screen] || homeScreen)());
-  // on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card
+  fitBar();
+}
+/** on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card */
+function fitBar() {
+  const root = ctx.root;
   const bar = root.querySelector('.kp-grades');
   if (bar && getComputedStyle(bar).position === 'fixed') root.style.setProperty('--kp-bar-h', `${bar.offsetHeight + 16}px`);
+}
+/** store a pref without repainting, so folds the learner opened stay open; false when the
+ * storage refused it (then the failure toast repaints as usual) */
+function savePrefQuiet(patch) {
+  const prefs = { ...ctx.prefs, ...patch };
+  if (!writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) return saveFailed();
+  ctx.prefs = prefs;
+  return true;
 }
 
 function topBar(title, back) {
@@ -538,7 +550,11 @@ function zoomToggle(zoom) {
   for (const [value, label] of [['full', '全文'], ['focus', '焦点']]) {
     const b = btn('kp-zoom-btn', label, (e) => {
       e.stopPropagation();
-      if (zoomFor() !== value) savePrefs({ ...ctx.prefs, zoom: value });
+      if (zoomFor() === value || !savePrefQuiet({ zoom: value })) return;
+      // in place: a repaint would close the folds the learner opened
+      const face = wrap.closest('.kp-card');
+      if (face) face.dataset.zoom = value;
+      for (const x of wrap.querySelectorAll('.kp-zoom-btn')) x.setAttribute('aria-pressed', String(x === b));
     }, { id: `kp-zoom-${value}`, 'aria-pressed': String(zoom === value) });
     wrap.append(b);
   }
@@ -562,6 +578,7 @@ function fold(cls, title, open, ...kids) {
   return d;
 }
 
+const EN_NONE = 'この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）';
 const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言い換え', col: 'よく一緒に', thm: '関連' };
 
 /**
@@ -584,18 +601,20 @@ function answerBlock(card, word) {
   if (jaNote) a.append(el('p', 'kp-note', word.tip));
 
   const folds = el('div', 'kp-folds');
-  const gloss = fold('kp-f-gloss', '英語', ctx.prefs.gloss === 'show', el('p', 'kp-gloss', word.meaning));
-  gloss.lang = 'en';
-  if (word.tip && !jaNote) gloss.append(el('p', 'kp-tip', el('span', 'kp-tip-label', '注 '), word.tip));
+  // English text carries lang='en'; the summaries and labels stay Japanese for screen readers
+  const english = (tag, cls, text) => {
+    const n = el(tag, cls, text);
+    n.lang = 'en';
+    return n;
+  };
+  const gloss = fold('kp-f-gloss', '英語', ctx.prefs.gloss === 'show', english('p', 'kp-gloss', word.meaning));
+  if (word.tip && !jaNote) gloss.append(el('p', 'kp-tip', el('span', 'kp-tip-label', '注 '), english('span', null, word.tip)));
   folds.append(gloss);
-  // a passage translates only the sentence holding the target (enTarget, from build.py); a
-  // passage whose sentences could not be matched has no 英訳 at all, never the whole passage
+  // a passage translates only the sentence holding the target (enTarget, from build.py), never
+  // the whole passage; when its sentences could not be matched the fold says so, so the slot
+  // stays in the same place on every card
   const en = card.type ? card.enTarget : card.en;
-  if (en) {
-    const f = fold('kp-f-en', '英訳', false, el('p', 'kp-en', en));
-    f.lang = 'en';
-    folds.append(f);
-  }
+  if (en || card.type) folds.append(fold('kp-f-en', '英訳', false, en ? english('p', 'kp-en', en) : el('p', 'kp-en kp-en-none', EN_NONE)));
   const anatomy = kanjiAnatomy(word);
   if (anatomy) folds.append(fold('kp-f-kanji', '漢字の形と意味', card.type === 'kanji', anatomy));
   // synonyms interfere with a word still being learned (R13): only on a card in review state
@@ -652,7 +671,12 @@ function gradeBar(id) {
   if (!ctx.prefs.ruleSeen) {
     const rule = el('p', 'kp-rule', el('span', null, RULE));
     rule.id = 'kp-rule';
-    rule.append(btn('kp-rule-x', '×', () => savePrefs({ ...ctx.prefs, ruleSeen: true }), { id: 'kp-rule-dismiss', 'aria-label': 'このヒントを閉じる' }));
+    const dismiss = () => {
+      if (!savePrefQuiet({ ruleSeen: true })) return;
+      rule.remove();
+      fitBar();
+    };
+    rule.append(btn('kp-rule-x', '×', dismiss, { id: 'kp-rule-dismiss', 'aria-label': 'このヒントを閉じる' }));
     bar.append(rule);
   }
   return bar;
@@ -879,9 +903,7 @@ function settingsScreen() {
   box.append(seg('一日の新しいカード', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
   box.append(seg('ヒント（穴埋め・4択）', 'hint', [['ja', '日本語の説明'], ['none', 'なし']]));
-  const gloss = seg('英語の意味（答えの「英語」）', 'gloss', [['tap', 'タップで開く'], ['show', 'いつも開いておく']]);
-  gloss.append(el('p', 'kp-sub', '判定は「もう一度／思い出せた」の二つ。答えを見て理解が深まったなら「もう一度」。'));
-  box.append(gloss);
+  box.append(seg('英語の意味（答えの「英語」）', 'gloss', [['tap', 'タップで開く'], ['show', 'いつも開いておく']]));
   const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
   const sw = el('div', 'kp-swatches');
   sw.setAttribute('role', 'radiogroup');

@@ -15,15 +15,22 @@
     <div class="folds">
       <details class="fold gloss">
         <summary>英語</summary>
-        <div class="meaning">{{Meaning}}</div>
+        <div class="meaning" lang="en">{{Meaning}}</div>
         {{#Tip}}
-        <div class="tip"><span class="tip-label">注 </span>{{Tip}}</div>
+        <div class="tip"><span class="tip-label">注 </span><span lang="en">{{Tip}}</span></div>
         {{/Tip}}
       </details>
       {{#SentenceEN}}
       <details class="fold en">
         <summary>英訳</summary>
-        {{SentenceEN}}
+        <div class="en" lang="en">{{SentenceEN}}</div>
+      </details>
+      {{/SentenceEN}} {{^SentenceEN}}
+      <details class="fold en">
+        <summary>英訳</summary>
+        <div class="en-none">
+          この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）
+        </div>
       </details>
       {{/SentenceEN}} {{#Kanji}} {{#Hint}}
       <details class="fold kfold">

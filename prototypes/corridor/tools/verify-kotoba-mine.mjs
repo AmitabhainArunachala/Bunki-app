@@ -522,6 +522,8 @@ function verifyBackParity() {
     if (at.some((i) => i < 0) || at.some((i, k) => k && i < at[k - 1])) bad.push(`${dir}/back: order ${at.join(',')}`);
     if (!/\{\{\^Hint\}\}\s*<details class="fold kfold" open>/.test(back) || /\{\{#Hint\}\}\s*<details class="fold kfold" open>/.test(back)) bad.push(`${dir}/back: 漢字 fold not open on 字 cards only`);
     if (/<details[^>]*class="fold (gloss|en)"[^>]* open/.test(back)) bad.push(`${dir}/back: an English fold starts open`);
+    if (!/\{\{\^SentenceEN\}\}\s*<details class="fold en">\s*<summary>英訳<\/summary>[^{]*未対応/.test(back)) bad.push(`${dir}/back: no 英訳 fold when the sentence has no English`);
+    if (!back.includes('lang="en">{{Meaning}}') || !back.includes('lang="en">{{SentenceEN}}') || !back.includes('lang="en">{{Tip}}') || /<details[^>]*lang=/.test(back)) bad.push(`${dir}/back: lang="en" not on the English text alone`);
   }
   const tsv = readFileSync(resolve(release, 'kotoba-mcd.tsv'), 'utf8').trim().split('\n');
   const cols = tsv[2].replace('#columns:', '').split('\t');
@@ -531,7 +533,7 @@ function verifyBackParity() {
   if (wrongEn.length) bad.push(`kotoba-mcd.tsv SentenceEN ≠ enTarget: ${wrongEn.slice(0, 3).join(', ')}`);
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', RULE_TEXT].every((k) => html.includes(k)) || /kp-tapword|is-four/.test(html)) bad.push(`${page}: not the current player`);
+    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT].every((k) => html.includes(k)) || /kp-tapword|is-four/.test(html)) bad.push(`${page}: not the current player`);
   }
   check('parity: the study pages bundle this player; the Anki fronts show no readings or English; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards) and translate only the target sentence', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
 }
@@ -645,10 +647,23 @@ async function verifyBack(browser, base) {
         const text = s.map((n) => { const k = n.cloneNode(true); k.querySelectorAll('rt').forEach((r) => r.remove()); return k.textContent; }).join('');
         return { zoom: card.dataset.zoom, n: s.length, focus: s.filter((n) => n.dataset.focus).length, dim: s.filter((n) => !n.dataset.focus).map((n) => +getComputedStyle(n).opacity), bright: s.filter((n) => n.dataset.focus).map((n) => +getComputedStyle(n).opacity), text,
           full: document.getElementById('kp-zoom-full')?.getAttribute('aria-pressed'), focusBtn: document.getElementById('kp-zoom-focus')?.getAttribute('aria-pressed'), inChips: !!card.querySelector('.kp-chips .kp-zoom') }; })()`);
+    // the learner opens 英訳, then switches the zoom: the fold stays open (no repaint)
+    await o.page.click('.kp-f-en > summary');
     const z1 = await zoom();
+    const lang = await o.page.evaluate(`(() => { const ans = document.querySelector('#kp-card .kp-answer');
+      const ja = [...ans.querySelectorAll('.kp-folds summary, .kp-tip-label')].every((n) => n.closest('[lang]').lang === 'ja');
+      const en = [...ans.querySelectorAll('.kp-gloss, .kp-en')].every((n) => n.lang === 'en');
+      return { ja, en, details: [...ans.querySelectorAll('details')].every((d) => !d.hasAttribute('lang')) }; })()`);
+    check('c) screen readers: the fold summaries read as Japanese, only the English text inside carries lang="en"', lang.ja && lang.en && lang.details, JSON.stringify(lang));
+    // 44px touch targets on the zoom toggle and the rule's ×, though they are drawn smaller
+    const hits = await o.page.evaluate(`['kp-zoom-focus', 'kp-zoom-full', 'kp-rule-dismiss'].map((id) => { const n = document.getElementById(id); const r = n.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const at = (dy) => document.elementFromPoint(cx, cy + dy) === n; return { id, h: Math.round(r.height), reach: at(-21) && at(21) }; })`);
+    check('e) the zoom toggle and the rule\'s × each have a 44px hit area on a phone without growing on screen', hits.every((h) => h.reach && h.h < 44), JSON.stringify(hits));
     await o.page.click('#kp-zoom-focus');
     await o.page.waitForTimeout(400);
     const z2 = await zoom();
+    const enOpen = await o.page.evaluate(`document.querySelector('#kp-card .kp-f-en').open`);
+    check('d) switching 全文／焦点 does not rebuild the screen: an open 英訳 stays open', enOpen === true, String(enOpen));
     const stored = await o.page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').zoom`);
     check(
       'd) a new passage card opens 全文 after the reveal (no zoom on the front); 焦点 in the card header dims the other sentences, keeps them, and is remembered for the deck',
@@ -661,12 +676,23 @@ async function verifyBack(browser, base) {
       const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null }; })()`);
     await o.page.click('#kp-rule-dismiss');
     await o.page.waitForSelector('#kp-grade-good');
-    const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom })`);
+    const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
     check(
-      'e) the grade bar is pinned to the bottom of the phone screen and shows 「答えを見て理解が深まったなら もう一度」 until dismissed; dismissing is remembered in prefs',
-      bar.position === 'fixed' && bar.bottom === 844 && bar.hit && bar.rule?.includes(RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus',
+      'e) the grade bar is pinned to the bottom of the phone screen and shows 「答えを見て理解が深まったなら もう一度」 until dismissed; dismissing is remembered in prefs and keeps an open fold open',
+      bar.position === 'fixed' && bar.bottom === 844 && bar.hit && bar.rule?.includes(RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
       JSON.stringify({ ...bar, dismissed }),
     );
+    await close(o);
+  }
+
+  // c) a passage whose sentences cannot be matched to the English still has its 英訳 fold, saying so
+  {
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: ledger('kotoba-mcd', 'km-109-m05') });
+    const { c } = index.get(await cardId(o.page));
+    await o.page.click('#kp-reveal');
+    await o.page.waitForSelector('.kp-grade');
+    const b = await o.page.evaluate(BACK);
+    check('c) a passage with no matched sentence (km-109-m05) keeps the 英訳 fold in its place, saying 未対応, never the whole translation', c.id === 'km-109-m05' && c.enTarget == null && b.summaries[1] === '英訳' && b.en?.text.includes('未対応') && !b.en.text.includes(c.en.slice(0, 20)) && inOrder(b.summaries), JSON.stringify({ id: c.id, summaries: b.summaries, en: b.en?.text }));
     await close(o);
   }
 
