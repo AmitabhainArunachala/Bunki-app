@@ -83,6 +83,7 @@ fold, which is where "the same kanji in different contexts" lives without leakin
 | 論   | essay / philosophy           | Floating Stories (空海・老子), ソフィー, 高野山の法話   | one if it fits |
 | 話   | spoken, informal             | ひろゆき, ゆる言語学ラジオ, コムドット, Hapa            | one if it fits |
 | 学   | learning science / exam talk | 星友啓, PIVOT 勉強法, DaiGo, にしむら先生               | optional       |
+| 語   | craft of speaking / writing  | 山口拓朗, 元局アナ流話し方スクール, 文学YouTuberベル    | optional       |
 
 Topics rotate through the learner's four: mind and learning; Indian and Buddhist
 philosophy (anchored in Japanese by 日本ヴェーダーンタ協会, 大蔵経, 大愚和尚); AI with semiconductors; world history as connective tissue. The fifth texture,
