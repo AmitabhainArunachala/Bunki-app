@@ -1,0 +1,47 @@
+// Real packaged dictionary and shared host store, synthetic public passage.
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+import path from 'node:path';
+import {chromium,webkit} from 'playwright-core';
+import {fileURLToPath} from 'node:url';
+import {fixture,enrichmentFixture} from './personal-fixture.mjs';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const server=createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost'),f=path.join(root,url.pathname==='/'?'index.html':url.pathname);const data=await readFile(f);res.setHeader('Content-Type',({'.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css'})[path.extname(f)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404);res.end('missing');}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const origin=`http://127.0.0.1:${server.address().port}`;
+const browserName=process.env.PERSONAL_HOST_BROWSER || 'chromium';
+assert(['chromium','webkit'].includes(browserName),'Unknown host browser');
+const browser=await (browserName==='webkit'?webkit:chromium).launch({headless:true});
+try {
+ const page=await browser.newPage({viewport:{width:390,height:844}}), errors=[],reqs=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>reqs.push({url:r.url(),method:r.method()}));
+ await page.goto(origin+'/?deck=personal');
+ const data=await fixture();data.enrichment=await enrichmentFixture(data);
+ await page.locator('.pc-file').setInputFiles({name:'synthetic.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(data))});
+ await page.locator('[data-action="confirm-import"]').click();await page.locator('[data-card]').waitFor();
+ assert.equal(reqs.filter(r=>r.url.includes('/data/share_alike/dict.json')).length,0);
+ const before=await page.evaluate(async id=>{window.privateRoot=document.querySelector('.pc');const {openStore}=await import('./decks/personal/store.mjs');let s=await openStore();let r=await s.get(id);s.close();return {id:document.querySelector('[data-card]').dataset.card,progress:JSON.stringify(r.progress)};},data.id);
+ await page.locator('[data-action="reveal"]').click();await page.locator('.pc-japanese [data-lookup]').first().waitFor();
+ await page.locator('.pc-answer-tools [data-lookup]').filter({hasText:'図書館'}).first().click();await page.locator('#sheet').waitFor();
+ assert.equal(await page.locator('#sheet .headword').innerText(),'図書館');
+ assert.equal(await page.locator('#sheet .gloss').first().isVisible(),false);
+ await page.locator('.personal-dictionary-meaning > summary').click();assert((await page.locator('#sheet .senses').innerText()).includes('library'));
+ await page.locator('#take').click();await page.locator('#take-new-list').fill('Synthetic host list');await page.locator('#take-save').click();
+ const canonical=await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-corridor-v1')));
+ assert(canonical.taken.some(t=>t.id==='図書館'));assert(canonical.lists['Synthetic host list'].some(t=>t.id==='図書館'));
+ assert.deepEqual(canonical.srs,{});assert.deepEqual(canonical.revlog,[]);
+ await page.locator('[data-kanjirow="図"]').click();await page.locator('#sheet[data-node="kanji:図"]').waitFor();await page.locator('#sheet-back').click();await page.locator('#sheet[data-node="word:図書館"]').waitFor();
+ await page.goBack();await page.locator('#sheet').waitFor({state:'detached'});
+ assert.equal(new URL(page.url()).searchParams.get('deck'),'personal');
+ const after=await page.evaluate(async id=>{const {openStore}=await import('./decks/personal/store.mjs');let s=await openStore();let r=await s.get(id);s.close();return {sameRoot:window.privateRoot===document.querySelector('.pc'),id:document.querySelector('[data-card]').dataset.card,progress:JSON.stringify(r.progress),inert:document.querySelector('.pc').inert};},data.id);
+ assert(after.sameRoot);assert.equal(after.id,before.id);assert.equal(after.progress,before.progress);assert.equal(after.inert,false);
+ await page.locator('.pc-answer-tools [data-lookup]').filter({hasText:'にあたって'}).first().click();await page.locator('#sheet[data-node^=\"grammar:\"]').waitFor();
+ await page.locator('#take').click();await page.locator('[data-pick-list=\"Synthetic host list\"]').click();await page.locator('#take-save').click();
+ const grammarSaved=await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-corridor-v1')));
+ assert(grammarSaved.taken.some(t=>t.t==='grammar'));assert(grammarSaved.lists['Synthetic host list'].some(t=>t.t==='grammar'));
+ assert.deepEqual(grammarSaved.srs,{});assert.deepEqual(grammarSaved.revlog,[]);
+ await page.locator('#sheet').press('Escape');await page.locator('#sheet').waitFor({state:'detached'});
+ assert(reqs.every(r=>r.method==='GET'));assert(reqs.every(r=>r.url.startsWith(origin)||r.url.startsWith('data:')));assert.deepEqual(errors,[]);
+ console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
+}finally{await browser.close();await new Promise(r=>server.close(r));}

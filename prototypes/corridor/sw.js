@@ -16,7 +16,7 @@
 // v4: the context deck (文脈札) joined the shell
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
 // v6: those passages left the shelf; the deck player joined the shell
-const VERSION = 'kairo-v11-personal-collections';
+const VERSION = 'kairo-v12-personal-depth';
 const SHELL = [
   '.',
   'index.html',
@@ -48,8 +48,21 @@ const SHELL = [
   'decks/personal/mount.mjs',
   'decks/personal/engine.mjs',
   'decks/personal/schema.mjs',
+  'decks/personal/enrichment.mjs',
+  'decks/personal/host-bridge.mjs',
   'decks/personal/store.mjs',
   'decks/personal/personal.css',
+  // The answer's shared dictionary and remember-list doors work on first
+  // offline use after installation. Full dictionary shards remain on demand.
+  'data/proprietary_safe/kanken.json',
+  'data/proprietary_safe/sem.json',
+  'data/share_alike/kanji.json',
+  'data/share_alike/words.json',
+  'data/share_alike/idioms.json',
+  'data/share_alike/dict.json',
+  'data/share_alike/strokes.json',
+  'data/share_alike/radicals214.json',
+  'data/original/grammar-v11.json',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
   'decks/context-dense/mount.js',
