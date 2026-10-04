@@ -301,9 +301,9 @@
   ],
   "122": [
     {
-      "ja": "地球の自転軸は、公転面に対しておよそ23.4度傾いている。この傾きのおかげで、太陽の光が当たる角度が一年を通して変わり、日本には春夏秋冬の季節が生まれる。",
+      "ja": "地球の自転軸は、公転面に垂直な方向からおよそ23.4度傾いている。この傾きのおかげで、太陽の光が当たる角度が一年を通して変わり、日本には春夏秋冬の季節が生まれる。",
       "form": "自転軸",
-      "en": "The Earth's axis of rotation is tilted about 23.4 degrees relative to its orbital plane. Thanks to this tilt, the angle at which sunlight strikes changes through the year, which gives Japan its four seasons.",
+      "en": "The Earth's axis of rotation is tilted about 23.4 degrees from the perpendicular to its orbital plane. Thanks to this tilt, the angle at which sunlight strikes changes through the year, which gives Japan its four seasons.",
       "original": true
     },
     {

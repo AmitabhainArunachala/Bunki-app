@@ -11,6 +11,9 @@ Outputs
 Every sentence is tokenised with the corridor's tokeniser (fugashi + UniDic,
 plus the repo's reading-override lexicon) so each kanji word carries its
 reading; the asked word is one segment whose reading comes from the card.
+source/readings.json then corrects the readings the tokeniser gets wrong in
+these passages (人 in 日本人, 一日 as a whole day …); a rule that matches
+nothing fails the build.
 
 Card IDs (and so Anki GUIDs, which are derived from them) come from the committed
 manifest source/ids.json, keyed by word, passage text and card kind, never from a
@@ -513,6 +516,79 @@ def hint_warnings(decks: list[dict]) -> list[str]:
     return out
 
 
+# ------------------------------------------------------------------ deck reading rules (F17)
+_RULES: list[dict] | None = None
+RULE_HITS: dict[int, int] = {}  # rule index → matches it was applied to
+RULE_LOG: list[str] = []  # matches a rule could not apply
+
+
+def reading_rules() -> list[dict]:
+    """source/readings.json, each rule compiled; `cards` become the passage hashes they are built from"""
+    global _RULES
+    if _RULES is None:
+        ids = json.loads(IDS_PATH.read_text("utf-8"))
+        by_id: dict[str, str] = {}
+        for deck in (spec["id"] for spec in DECKS.values()):
+            for key, cid in ids.get(deck, {}).items():
+                by_id[cid] = key
+            for r in ids.get("reserved", {}).get(deck, []):
+                by_id[r["id"]] = r["key"]
+        _RULES = []
+        for i, rule in enumerate(json.loads((SRC / "readings.json").read_text("utf-8"))["rules"]):
+            unknown = [cid for cid in rule.get("cards", []) if cid not in by_id]
+            if unknown:
+                raise SystemExit(f"readings.json rule {i} ({rule['surface']}): no card {', '.join(unknown)} in {IDS_PATH.name}")
+            if not re.fullmatch(r"[ぁ-ゖー]+", rule["reading"]):
+                raise SystemExit(f"readings.json rule {i} ({rule['surface']}): the reading must be hiragana")
+            _RULES.append({**rule, "i": i,
+                           "after_re": re.compile(f"(?:{rule.get('after') or ''})$"),
+                           "before_re": re.compile(rule.get("before") or ""),
+                           "hashes": {by_id[cid].split("|")[2] for cid in rule.get("cards", [])},
+                           "split": align(rule["surface"], rule["reading"])})
+    return _RULES
+
+
+def apply_reading_rules(ja: str, tokens: list[dict], bc) -> list[dict]:
+    """set the readings source/readings.json gives, on the tokens they cover. A token wider
+    than the rule's surface keeps its own reading outside it (split with align()); when
+    either reading cannot be split, the match is left as the tokeniser read it and logged."""
+    spans, pos = [], 0
+    for t in tokens:
+        i = ja.find(t["s"], pos)
+        spans.append((i, i + len(t["s"])) if i >= 0 else None)
+        if i >= 0:
+            pos = i + len(t["s"])
+    h = passage_hash(ja)
+    for rule in reading_rules():
+        if rule["hashes"] and h not in rule["hashes"]:
+            continue
+        surface, split = rule["surface"], rule["split"]
+        for a in _occurrences(ja, surface):
+            b = a + len(surface)
+            if not rule["after_re"].search(ja[:a]) or not rule["before_re"].match(ja[b:]):
+                continue
+            touched = [(t, s, e) for t, x in zip(tokens, spans) if x and x[1] > a and x[0] < b for s, e in [x]]
+            new: list[tuple[dict, str]] = []
+            for t, s, e in touched:
+                if (s, e) == (a, b):
+                    new.append((t, rule["reading"]))
+                    continue
+                own = align(t["s"], kata_to_hira(t["r"] or t["s"])) if (s < a or e > b) else None
+                if split is None or ((s < a or e > b) and own is None):
+                    RULE_LOG.append(f"{surface}→{rule['reading']} in 「{ja[max(0, a - 6):b + 4]}」: token {t['s']}({t['r']}) cannot be split; left as read")
+                    new = []
+                    break
+                r = "".join(split[k - a][1] or kata_to_hira(split[k - a][0]) if a <= k < b else own[k - s][1] or kata_to_hira(own[k - s][0])
+                            for k in range(s, e))
+                new.append((t, r))
+            for t, r in new:
+                if t["r"] != r:
+                    t["r"], t["f"], t["rs"] = r, bc.furigana_pairs(t["s"], r), "deck-readings"
+            if new:
+                RULE_HITS[rule["i"]] = RULE_HITS.get(rule["i"], 0) + 1
+    return tokens
+
+
 def _cover(ja: str, tokens: list[dict]) -> list[dict]:
     """put back any characters the tokeniser skipped (spaces, odd symbols) as plain tokens"""
     out, pos = [], 0
@@ -542,7 +618,7 @@ def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
     """the sentence as ruby segments. The first occurrence of the form is the target
     (marker 1); every further one is marker 3, so no card shows its own answer."""
     ja, form = s["ja"], s["form"]
-    tokens = _cover(ja, bc.tokenise(ja, tagger))
+    tokens = _cover(ja, apply_reading_rules(ja, bc.tokenise(ja, tagger), bc))
     marks = []
     for n, a in enumerate(_occurrences(ja, form)):
         b = a + len(form)
@@ -750,6 +826,13 @@ def main() -> int:
     ids = IdManifest(IDS_PATH, FROZEN)
     out_dir = Path(_arg("--out")) if "--out" in sys.argv else None
     decks = {kind: build_deck(mods, ids, kind) for kind in DECKS}
+    rules = reading_rules()
+    print(f"· reading rules (source/readings.json): {sum(RULE_HITS.values())} matches set by {len(RULE_HITS)}/{len(rules)} rules")
+    for line in RULE_LOG:
+        print(f"! {line}")
+    idle = [f"{r['i']} ({r['surface']}→{r['reading']})" for r in rules if r["i"] not in RULE_HITS]
+    if idle:
+        raise SystemExit(f"readings.json: rule {', '.join(idle)} matched nothing; fix or remove it")
     print(f"· 字 cards withheld (kanji visible elsewhere): {len(KANJI_VISIBLE)}")
     lost = sum(len(x[2]) for x in KANJI_UNALIGNED)
     print(f"· 字 cards withheld (no table reading for each kanji): {lost}")

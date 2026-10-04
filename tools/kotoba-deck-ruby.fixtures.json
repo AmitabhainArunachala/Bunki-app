@@ -1,0 +1,257 @@
+{
+  "about": "Readings the shipped 言葉の鉱脈 decks must show (review finding F17). For each entry, every ruby segment of `card` that spells `surface`, follows text ending in `after` and precedes text starting with `before`, reads `right`; at least one such segment exists; none reads `wrong`. Checked by tools/kotoba-deck-ruby.test.mjs and prototypes/corridor/tools/verify-kotoba-mine.mjs. The fixes come from decks/kotoba-mine/source/readings.json.",
+  "pairs": [
+    {
+      "card": "km-175-m01",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-277-m05",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-226-m03",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-222-m01",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-222-m04",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-158-m06",
+      "after": "外国",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-179-m04",
+      "after": "外国",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-298-m02",
+      "after": "中国",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-189-m05",
+      "after": "宇宙",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-017-m06",
+      "after": "エジプト",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-254-m04",
+      "after": "文化",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-271-m04",
+      "after": "著名",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-266-m04",
+      "after": "星",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-150-m03",
+      "after": "オランダ",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-150-m03",
+      "after": "スウェーデン",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-218-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-169-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-135-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-122-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-071-m04",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-209-m06",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-081-m01",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-081-m02",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-081-m03",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-149-m01",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-196-1",
+      "after": "恋愛",
+      "surface": "上手",
+      "right": "じょうず",
+      "wrong": "かみて"
+    },
+    {
+      "card": "km-304-m01",
+      "after": "読者の",
+      "surface": "方",
+      "right": "かた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-119-m03",
+      "after": "薬剤師の",
+      "surface": "方",
+      "right": "かた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-118-m01",
+      "after": "一般の",
+      "surface": "方",
+      "right": "かた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-118-m01",
+      "after": "曜",
+      "surface": "日",
+      "right": "び",
+      "wrong": "ひ"
+    },
+    {
+      "card": "km-250-m04",
+      "after": "",
+      "surface": "寛仁",
+      "right": "ともひと",
+      "wrong": "かんにん"
+    },
+    {
+      "card": "km-250-m04",
+      "after": "皇族",
+      "surface": "方",
+      "right": "がた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-039-m05",
+      "after": "いい",
+      "surface": "方",
+      "right": "ほう",
+      "wrong": "かた"
+    },
+    {
+      "card": "km-098-m01",
+      "after": "",
+      "surface": "甲賀",
+      "right": "こうか",
+      "wrong": "こうが"
+    },
+    {
+      "card": "km-098-m02",
+      "after": "",
+      "surface": "甲賀",
+      "right": "こうか",
+      "wrong": "こうが"
+    },
+    {
+      "card": "km-098-1",
+      "after": "",
+      "surface": "甲賀",
+      "right": "こうか",
+      "wrong": "こうが"
+    }
+  ]
+}

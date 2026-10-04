@@ -22,6 +22,9 @@
  * No card shows its own answer: a repeat of the word is blanked with it, and a
  * 字 card whose kanji is printed elsewhere in the passage is not built.
  *
+ * Readings the tokeniser gets wrong (日本人 にん, 他の た, 一日 ついたち …) read as
+ * tools/kotoba-deck-ruby.fixtures.json says, corrected by source/readings.json.
+ *
  * Every card id in both decks is the one source/ids.json gives its key
  * (word, passage text, card kind), so reordering passages never moves an id.
  *
@@ -48,6 +51,7 @@ const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
 const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mcd/deck.json');
 const SENTENCE_DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
 const IDS_PATH = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/source/ids.json');
+const RUBY_FIXTURES_PATH = resolve(CORRIDOR_DIR, '../../tools/kotoba-deck-ruby.fixtures.json');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -141,6 +145,25 @@ function verifyLeaks(decks) {
   const repeats = cards.filter(({ c }) => c.ruby.some((seg) => seg[2] === 3)).length;
   check('no 語 or 文 card prints its word outside the blanks (a repeat of the word is blanked too)', wordLeaks.length === 0, wordLeaks.slice(0, 4).join(' | ') || `0 · ${repeats} cards blank a repeat`);
   check('no 字 card prints its blanked kanji elsewhere in the passage', kanjiLeaks.length === 0, kanjiLeaks.slice(0, 4).join(' | ') || `0 of ${cards.filter(({ c }) => c.type === 'kanji').length}`);
+}
+
+/* ------------------------------------------- readings the tokeniser got wrong (F17) */
+function verifyRuby(decks) {
+  const byId = new Map(decks.flatMap((deck) => deck.words.flatMap((w) => w.cards.map((c) => [c.id, c]))));
+  const { pairs } = readJson(RUBY_FIXTURES_PATH);
+  const bad = [];
+  for (const { card: id, surface, after = '', before = '', right, wrong } of pairs) {
+    const card = byId.get(id);
+    const found = [];
+    let text = '';
+    card?.ruby.forEach((seg, i) => {
+      const rest = card.ruby.slice(i + 1).map((x) => x[0]).join('');
+      if (seg[0] === surface && text.endsWith(after) && rest.startsWith(before)) found.push(seg[1]);
+      text += seg[0];
+    });
+    if (!found.length || found.some((r) => r !== right)) bad.push(`${id}: ${after}${surface}=${found.join('/') || '(none)'}${found.includes(wrong) ? ` (${wrong})` : ''}`);
+  }
+  check('corrected readings stay corrected: 日本人 じん, 他の ほか, 一日 いちにち, 一般の方 かた, 土曜日 び, 寛仁 ともひと …', bad.length === 0, bad.slice(0, 4).join(' | ') || `${pairs.length}/${pairs.length} pairs (tools/kotoba-deck-ruby.fixtures.json)`);
 }
 
 /* ------------------------------------- the grade path (F01, F07, N02) */
@@ -293,6 +316,7 @@ async function main() {
   check('言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source', sentences.id === 'kotoba-mine' && sentences.words.length === 323 && sc.every((c) => !c.type && c.src && c.ruby.filter((g) => g[2] === 1).length === 1), `${sc.length} sentence cards`);
   verifyIds([deck, sentences]);
   verifyLeaks([deck, sentences]);
+  verifyRuby([deck, sentences]);
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');
