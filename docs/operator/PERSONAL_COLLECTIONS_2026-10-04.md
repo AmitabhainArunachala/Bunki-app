@@ -104,3 +104,12 @@ the ten existing palettes, and cold offline navigation followed by grading.
 It runs Chromium and WebKit in the dedicated **Personal collections** workflow.
 Screenshots contain only synthetic test material. This does not substitute
 for a physical iPhone acceptance run or prove native installation behavior.
+
+Chromium uses Playwright's offline flag. WebKit passed the UI and persistence
+scenarios but failed navigation with that flag, matching the upstream
+[service-worker offline-emulation issue](https://github.com/microsoft/playwright/issues/42775).
+The WebKit cache-fallback gate therefore stops the origin server, verifies
+that a fresh context without a worker cannot load, and requires an uncached
+navigation to be served by the worker before grading offline. Server
+unavailability and an emulated network outage are distinct conditions; a
+passing server-stop check does not certify physical iPhone airplane mode.

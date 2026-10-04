@@ -124,14 +124,27 @@ try {
       // Explicit localhost registration tests production's HTTPS worker path.
       await page.evaluate(async()=>{await navigator.serviceWorker.register('./sw.js');await navigator.serviceWorker.ready;});
       await page.reload();await openSaved(page);
-      await context.setOffline(true);
-      await page.goto(url+'&cold=1');await openSaved(page);
+      await page.waitForFunction(()=>navigator.serviceWorker.controller!==null);
+      assert(await page.evaluate(async()=>Boolean(await caches.match('index.html'))));
+      if(name==='webkit') {
+        // WebKit's offline-emulation flag rejects even literal SW responses:
+        // https://github.com/microsoft/playwright/issues/42775
+        // Actually stop the origin instead. This is a server-unavailability
+        // control, not a claim that WebKit's setOffline/airplane mode passed.
+        server.closeAllConnections();await new Promise(resolve=>server.close(resolve));
+        assert.equal(server.listening,false);
+        const bare=await browser.newContext({serviceWorkers:'block'}),barePage=await bare.newPage();
+        await assert.rejects(()=>barePage.goto(url,{timeout:10000}));await bare.close();
+      } else await context.setOffline(true);
+      const response=await page.goto(url+'&cold=1');
+      assert.equal(response.status(),200);assert.equal(response.fromServiceWorker(),true);
+      await openSaved(page);
       assert(await page.locator('.pc-japanese').isVisible());
       await page.locator('[data-action="reveal"]').click();await page.locator('[data-grade="3"]').click();
       await page.waitForFunction(()=>document.querySelector('.pc-status').textContent==='Review saved.');
       assert.equal((await stored(page)).progress.events.length,4);
       await context.setOffline(false);
-      checks.push(name+': cold offline app route opens and commits a review');
+      checks.push(name+(name==='webkit'?': origin stopped; uncached navigation served by worker and review committed (offline emulation not claimed)':': cold offline app route opens and commits a review'));
       assert.deepEqual(errors,[]);assert.deepEqual(outbound,[]);
       checks.push(name+': no JavaScript exceptions or external requests');
       await context.close();
@@ -139,4 +152,4 @@ try {
   }
   await writeFile(path.join(out,'results.json'),JSON.stringify({status:'passed',browsers:selected,checks},null,2));
   console.log(JSON.stringify({passed:checks.length,checks},null,2));
-} finally {server.close();}
+} finally {if(server.listening)server.close();}
