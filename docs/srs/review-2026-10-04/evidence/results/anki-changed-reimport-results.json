@@ -1,0 +1,18 @@
+[
+  {
+    "deck": "mine",
+    "count": 503,
+    "before": [1791090930777, 1791090930776, 2, 2, 30, 500, 7],
+    "after": [1791090930777, 1791090930776, 2, 2, 30, 500, 7],
+    "updated_meaning": "public finances [review-import-check]",
+    "updated_log_count": 1
+  },
+  {
+    "deck": "mcd",
+    "count": 1597,
+    "before": [1791090932648, 1791090932647, 2, 2, 30, 500, 7],
+    "after": [1791090932648, 1791090932647, 2, 2, 30, 500, 7],
+    "updated_meaning": "public finances [review-import-check]",
+    "updated_log_count": 1
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "deck": "mine",
+    "theme": "light",
+    "face": "front",
+    "scrollWidth": 390,
+    "violations": []
+  },
+  {
+    "deck": "mine",
+    "theme": "light",
+    "face": "back",
+    "scrollWidth": 390,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          {
+            "target": ["b > ruby > rt"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.1 (foreground color: #3d95c9, background color: #f5f8fb, font size: 9.4pt (12.6px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.88 (foreground color: #0e8f53, background color: #f5f8fb, font size: 11.3pt (15px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "mine",
+    "theme": "nightMode",
+    "face": "front",
+    "scrollWidth": 390,
+    "violations": []
+  },
+  {
+    "deck": "mine",
+    "theme": "nightMode",
+    "face": "back",
+    "scrollWidth": 390,
+    "violations": []
+  },
+  {
+    "deck": "mcd",
+    "theme": "light",
+    "face": "front",
+    "scrollWidth": 390,
+    "violations": []
+  },
+  {
+    "deck": "mcd",
+    "theme": "light",
+    "face": "back",
+    "scrollWidth": 390,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          {
+            "target": ["b > ruby > rt"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.1 (foreground color: #3d95c9, background color: #f5f8fb, font size: 9.4pt (12.6px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [".meaning"],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.88 (foreground color: #0e8f53, background color: #f5f8fb, font size: 11.3pt (15px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "deck": "mcd",
+    "theme": "nightMode",
+    "face": "front",
+    "scrollWidth": 390,
+    "violations": []
+  },
+  {
+    "deck": "mcd",
+    "theme": "nightMode",
+    "face": "back",
+    "scrollWidth": 390,
+    "violations": []
+  }
+]

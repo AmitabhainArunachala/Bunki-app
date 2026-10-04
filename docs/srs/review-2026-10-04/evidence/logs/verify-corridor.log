@@ -1,0 +1,297 @@
+
+— step 0 · the front door (銀河)
+  ok   銀河 · the app opens into the living galaxy  — layer active, 64 words adrift
+  ok   銀河 · the hero rests bare but for the single symbol (no top chrome)  — symbol present, top chrome receded
+  ok   Phase 2 · one door from the universe to the shelf  — 77 articles; universe asleep (display none)
+  ok   Phase 2 · 戻る returns from the shelf to the universe  — layer active again
+
+— step 0b · the bloom constellation
+  ok   Phase 2 · a kanji word stands in the field to bloom  — {"x":93.05999755859375,"y":371.67999267578125,"productive":true}
+  ok   bloom · the constellation is its own relief — three colour families  — centre rgb(235, 97, 1) · 14 satellites rgb(22, 94, 131) (floor 8) · field rgb(58, 95, 138)
+ FAIL  bloom · dragging the centre carries the whole constellation — and sticks  — centre moved 35px; mean tether 142 → 143px
+  ok   bloom · a water tap releases the constellation  — relief classes cleared
+
+— step 1 · arrive
+  ok   the shelf renders real graded texts  — 77 texts, ready in 646 ms
+  ok   every text carries an English title and a learner-readable level  — 77 texts, e.g. "Seven sites added to the World Natural Heritage list — including Shiretoko" — Upper intermediate中級後半 · ~1 in 3 words beyond JLPT vocab
+  ok   the shelf gathers into quiet sections — each category one run, no card outside one  — 6 sections: ニュース · 青空文庫 · やさしい日本語 用語集 · 段階別読み物 · 随筆 · 古典・一次資料 — 77/77 cards housed
+  ok   glossary rows are labeled 用語集 and stand outside the real-text count  — 10/10 labeled · intro bills 67 texts for 67 non-glossary cards
+  ok   disagreement fires only where two-plus ordinal signals were measured  — 0 flagged; 0 articles with >=2 ordinal signals
+  ok   the cross-referencing glossary entry stands on the shelf  — shelf index 21
+  ok   no dead (No.NN) citation survives into the read  — 住すんでいるまちの役所やくしょで印鑑いんかん登録とうろく証明しょうめい書しょ▹をもらうときに使つ…
+  ok   the in-shelf citation is a live door to its glossary entry  — doors → yasashii:6
+  ok   the glossary door opens the entry it names  — landed on "印鑑登録証明書"
+  ok   the raw signals unfold behind 詳細 — separate, never averaged  — 3 signal rows on the opened card: jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair
+  ok   the JLPT-lexicon signal is live on the opened card  — jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair
+  ok   the NINJAL pair is either measured or marked 未測定 — never faked  — 国語研語彙NINJAL pair → not measured
+
+— step 1b · Phase 1 shelf
+  ok   Phase 1 · the shelf holds dozens of articles  — 77 articles
+  ok   Phase 1 · all 8 parked v11 texts stand on the shelf  — 8/8 present
+  ok   Phase 1 · the index is lean — article bodies live in their own files  — 77 per-article files
+  ok   Phase 1 · every article carries live signals or an honest absence  — jreadability + jlpt_lexicon live; NINJAL pair measured or reason recorded
+  ok   Phase 1 · ごん狐 stands on the shelf  — shelf index 13
+  ok   Phase 1 · the story ships full-length — no 520-char excerpt  — 6144 chars rendered
+  ok   Phase 1 · the story reaches its final line  — the closing sentence is present
+  ok   Phase 1 · paragraphs survive into the reader  — 81 paragraph breaks
+  ok   Phase 1 · a v11 original carries real furigana from the pipeline  — 63 <rt> elements in 静かな朝
+
+— step 2 · read
+  ok   the reader shows real Japanese  — 2763 chars rendered
+  ok   furigana renders as real ruby  — 306 <rt> elements
+  ok   the text-settings dials fold away until asked for  — hidden by default=true, 9 dial options after one tap
+  ok   dial · furigana alone changes furigana  — rt 306 → 0, spacing class unchanged
+  ok   dial · spacing alone changes spacing  — class "reader sp-bunsetsu", rt still 0
+  ok   文節 grouping is real  — 354 文節 groups
+  ok   dial · kanji alone changes the script  — "2005
+年ねん
+7
+月がつ" → "2005
+ねん
+7
+がつ
+1"
+  ok   furigana can be held back and revealed  — 306 ruby present but hidden
+
+— step 3 · the click grammar and the dictionary entry
+  ok   grammar · the first tap reveals furigana instantly, opening nothing  — lit=1, sheet=false
+  ok   grammar · a second tap sets English beneath — and the word does not move  — gloss on, glyph bottom 431.8 → 431.8px
+  ok   grammar · the gloss collides with nothing — on any font, by construction  — 0 overlapping token(s)
+  ok   grammar · even the longest gloss renders whole — never truncated  — 沿線 → "places alongside a railway line"
+  ok   grammar · a third tap closes the circle — plain kanji, no sheet  — {"sheet":"","rt":0,"gloss":false}
+  ok   grammar · a long press floats the mini-dictionary  — 遺産 — inheritance
+  ok   grammar · one tap anywhere else backs out of the mini  — mini dismissed
+  ok   grammar · holding opens the full entry  — 年（とし）
+  ok   the sheet carries its own back and close  — back=true close=true
+  ok   the entry offers a hop into each kanji  — 年 — 1 row(s)
+  ok   real usage examples come from the shelf itself  — 6 example(s)
+  ok   the dictionary carries every sense, most common first  — 年: 3 senses
+  ok   semantic neighbours carry their discrimination notes  — 時間: 12 edges, e.g. 時刻「clock time, a point」
+
+— step 4 · walk the graph
+  ok   word → kanji lands on a real kanji page  — 時 — Time; 10 strokes / 漢検 9級 / JLPT N5
+  ok   the kanji page carries its 漢検級  — 漢検 9級
+  ok   idioms hang off the kanji page (provenance lives in the sources panel)  — 1 idiom section(s)
+  ok   kanji → a word that contains it  — word:時々
+  ok   kanji → radical lands on a real radical page with a family  — 日（ひへん） この部品を含む字 — 265 字のうち 80 字kanji that contain this part
+  ok   radical → another kanji that uses it  — kanji:旧
+
+— step 5 · 覚える
+  ok   覚える asks where to save before anything is saved  — chrome reads "覚 0lists"
+  ok   any node can be taken into study  — chrome reads "覚 1lists"
+  ok   after saving, the sheet says plainly where the word went  — saved to: daily review
+  ok   the schedule preview shows what FSRS-6 would do  — もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 8 d
+
+— step 6 · return without losing your place
+  ok   two hops deep, 戻る returns to the reader at the same place  — scrollY 208 → 208, sheet closed=true
+
+— variants
+  ok   variant A · mcd renders the target both ways  — MCD card — the whole c — face "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回　　"
+  ok   variant A · word renders the target both ways  — Word card — the front  — face "世界"
+  ok   variant B · three  — 3 signal rows / 0 bands / 0 uncertain markers (one 詳細 open)
+  ok   variant B · band  — 0 signal rows / 1 bands / 0 uncertain markers (one 詳細 open)
+  ok   variant C · the WCAG side actually reaches AA  — faint text: current 2.28:1 → wcag 6.38:1 (AA needs 4.5)
+  ok   variant C · the current side is honestly below AA (that is the cost being shown)  — 2.28:1
+  ok   variant D · field entry  — 26 drifting words, placeholder marked=true
+  ok   variant D · one gesture from the field to the shelf  — tap 棚へ → shelf
+  ok   variant D · shelf entry  — 77 texts
+
+— measurements
+  ok   focused content dominates the background chrome  — reader 21px vs chrome 13px (Drift's inverted case was 11px vs 22–43px)
+  ok   discrimination notes are legible (AA)  — 5.11:1 at 13px
+  ok   body ink clears AAA  — 10.29:1
+  ok   every visible control is at least 44px  — 508 controls checked, including inline token hit regions
+  ok   the page never scrolls sideways at 390px  — scrollWidth 485 vs viewport 485
+  ok   no console errors during the walk  — clean
+  ok   kanjidex · every radical and stroke chip is at least 44px  — 211 chips measured, 0 under 44px
+  ok   PWA · the manifest is linked, named 回廊, standalone, and carries real icons  — link=manifest.webmanifest · "回廊 KAIRO" · standalone · icons 192x192,512x512,180x180
+  ok   PWA · the worker answers offline duty, and the https guard kept it out of this run  — fetch handler true · 0 registrations on 127.0.0.1
+  ok   ひとこと · the note lands in the obslog through the guarded boundary  — {"count":1,"kind":"note","key":"op","text":"読み物のふりがなが小さい"}
+  ok   ひとこと · a reload later the note still stands in the tray  — rendered after reload: true
+  ok   reader · the 聞く door stands, names its voice honestly, and answers a tap  — before {"pressed":"false","note":"read by Koharune Ami"} → after {"pressed":"false","note":"no Japanese voice on this device yet"}
+  ok   the variant strip exposes all four open decisions, the v1.1 depth toggle and the drift tap ladder  — 7 rows (cards, difficulty, contrast, entry, depth, ladder, sattap); 4 carry ticket numbers; named rows present: E 奥行 · F 触れの段 · G 衛星の触れ
+
+— v1.1 · bilingual chrome and layered depth
+  ok   v1.1 · navigation is bilingual by default (a learner can steer)  — back carries "back", 覚 carries "lists", EN active=true
+  ok   v1.2 · the language toggle reads exactly EN | 日本語  — EN=true 日本語=true
+  ok   v1.1 · 日本語のみ strips the chrome back to immersion mode  — after toggling: back latin=false, lists latin=false
+  ok   v1.1 · layered depth and WCAG contrast are the defaults  — body classes: layered=true, wcag=true
+  ok   v1.1 · the v1.0 look survives as toggles (flat + fade + 日本語のみ)  — depth=flat&contrast=current&ui=ja
+
+— v1.2 · dictionary depth, grammar, lists, quiet surfaces
+  ok   v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)  — 240 entries in the index
+  ok   v1.8 · the v11 grammar harvest rides in (#36), N1 included  — harvested ようになる present; N1 filter chip exists
+  ok   v1.7 · the grammar index filters by level  — 17 N5 entries of 240
+  ok   v1.2 · a grammar entry carries formation + examples  — 〜ている: 2 examples
+  ok   v1.2 · the kanji page draws its stroke order (KanjiVG)  — 6 strokes rendered
+  ok   v1.2 · the shelf carries no provenance narration (sources fold away)  — quiet
+
+— v1.5 · search: four doors, one box
+  ok   search · the typed door accepts romaji  — "kaisai" → word:開催
+  ok   search · the typed door accepts kana  — "かいさい" → word:開催
+  ok   search · the typed door accepts kanji  — "開" → kanji:開
+  ok   search · the typed door accepts English  — "peninsula" → word:半島
+  ok   search · the typed door accepts grammar  — "ばかり" → grammar:bakari
+  ok   search · the canonical four doors are counted honestly (B4 gap stated)  — 1/4 canonical entry modes present (typed only today; handwriting · radical · SKIP are spec B4)
+  ok   search · a result opens its full entry  — word:開催
+
+— v1.6 · particles: no dead pixels
+  ok   particles · the search knows は  — "wa" → particle:wa
+  ok   particles · the reader marks particle tokens as doors  — 144 particle tokens wired
+  ok   particles · holding a particle opens its page with examples  — particle:de — で　particle, 2 examples
+
+— Phase A · reader taps land in the observation log
+  ok   two taps and a hold — ふりがな, gloss, mini, entry — every rung logged  — depth 1 → depth 2 → depth 2 → depth 3 (word:開催@wikinews:1403)
+  ok   rows persist inside the exported envelope with ms timestamps  — 4 rows appended after 18 existing
+  ok   a tap is friction, never a grade — no FSRS state minted  — srs["word:開催"] absent
+
+— Phase A · yomi probe: stratified sampling, honest rows
+  ok   classifier · 音訓混熟 land on the canonical compounds  — 学校/人々/手帳/大人/電話 → 音訓混熟音
+  ok   pool · thousands of untaken compounds, banded and typed  — 13713 compounds · 13 bands
+  ok   draw · a batch of 20 spreads bands, no head kanji repeats  — 20 heads · 13 bands
+  ok   the probe room keeps the zen glass  — body.zen while a compound is up
+  ok   a missed probe mints the card and logs one row — never FSRS state  — row [1791091145879,"probe","word:刺繍",1,1]
+
+— Phase A · dojo drill: evidence for practice, the deck for the taken
+  ok   dojo · a taken card keeps its honest next-due intervals  — 水 → 1 min · 6 min · 10 min · 8 d
+  ok   dojo · grading the taken card writes the deck — FSRS record, revlog row, one new-card slot  — {"srsKeys":["kanji:水"],"revlog":1,"nnew":1,"dojoRows":0}
+  ok   dojo · a never-taken card promises no schedule — every seal stamps practice  — 一 → practice · practice · practice · practice
+  ok   dojo · a drill grade writes evidence only — no FSRS state, no revlog row, no burned slot  — srs ["kanji:水"] · revlog 1 · nnew 1
+  ok   dojo · the practice row lands in the observation ledger with its room  — row [1791091150040,"dojo","kanji:一",3,"kanji"]
+
+— the newspaper archive: a deep stack behind one quiet door
+  ok   the stack opens: hundreds of articles, year-folded, rights named  — 686 real news articles · 2005–2026 · CC BY 2.5 · the frozen ja.wikinew
+  ok   an archive article reads like any shelf text — tokens, level, source link  — 888 tokens · "ja.wikinews contributors, CC BY 2.5"
+  ok   the archive read's crumb names its true origin — the archive, not the bare shelf  — crumb "bookshelf › archive › 第88回全国高等学校野球選手権大会 出場校/特集"
+  ok   back returns to the stack, not the shelf  — archive restored
+  ok   the single-file build does not embed the stack it cannot carry  — no articles/archive bundle keys in corridor-standalone.html
+
+— the example bank: ≥4 sentences, every token a door
+  ok   a common word carries at least 4 example sentences  — 6 examples · 6 with English
+  ok   the 用例 eyebrow says that holding a word opens the dictionary  — eyebrow: "用例 — ことばは長押しで辞書へexamples — tap a word to climb its ladder; hold it to open the dictionary"
+  ok   example tokens climb the reader ladder — ふりがな, then English  — {"rt":1,"gloss":true}
+  ok   the sentence opens on its own page — large, every token alive  — 2 live tokens · en=true
+  ok   戻る from the sentence page returns one step, to the word  — sheet after back: word:学校
+  ok   the first sense wins — 半島 glosses peninsula, never Korea  — inline gloss: "peninsula" (real taps on the sentence page)
+  ok   capture offers 語だけ・この文・段落 and the choice persists  — {"p":"wikinews:1403","i":19,"scope":"sent"}
+  ok   the bank indexes far beyond the core dictionary  — 40082 indexed forms vs 22934 core targets
+  ok   the reader boots bare — ふりがな waits for the tap  — 0 shown · 306 waiting
+  ok   the tap circle closes — ふりがな · gloss · plain kanji again  — rt=1 → gloss=true → back to rt=0 gloss=false
+  ok   a short hold floats the simple definition  — mini: 回
+  ok   戻る answers the very first tap after an entry opens  — sheet closed on the immediate back
+  ok   文字設定 rides the envelope — a chosen dial survives the session  — stored furigana=2
+  ok   the answer face carries living sentences behind its named fold — never a bare word where the corpus holds any  — “刺繍” · 2 sentence lines · 5 live tokens
+  ok   TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)  — card-say present on “刺繍”
+
+— R2-B · 覚える top-right · reversible capture · list management
+  ok   R2-B · the sheet seal wears taken-state where 覚える was taken  — {"taken":true,"pressed":"true"}
+  ok   R2-B · un-memorize removes the active card; revlog and FSRS state stay whole  — {"taken":0,"revlog":1,"srsKept":true}
+  ok   R2-B · the deck no longer offers the card — the tray stands honestly empty  — no review door on an empty deck
+  ok   R2-B · a re-take resumes the schedule — same card state, no invented history  — {"taken":1,"revlog":1,"reps":1,"due":"2020-01-01T00:00:00.000Z"}
+  ok   R2-B · a list is born on the lists surface; empty and dupe names are told, not swallowed  — lists=["読書"] · dupe hint "that name already exists"
+  ok   R2-B · the new list survives a reload, on the surface and in the envelope  — ["読書"]
+  ok   R2-B · rename lives where the list lives and persists  — ["精読"]
+  ok   R2-B · delete arms first, then fires — and never touches the learner history  — armed={"still":1,"armedBtn":true} → {"lists":0,"taken":1,"revlog":1,"srsKept":true}
+  ok   R2-B · 覚える waits top-right of the reader, quiet until a word is touched  — {"disabled":true,"pressed":"false"}
+  ok   R2-B · touching a word arms the door with that word, in place  — 半島 — "memorize 半島"
+  ok   the reader door asks where to save first — nothing is written yet  — 1 rows
+  ok   R2-B · capture from the reader top-right lands in S.taken with its sentence ctx  — {"p":"wikinews:1403","i":30,"scope":"sent"}
+  ok   R2-B · the panel holds the undo, the scope stages, and the lists  — {"take":true,"scopes":3,"lists":true,"newList":true}
+  ok   R2-B · a mis-tap leaves in one gesture; the revlog length never moves  — {"taken":1,"revlog":1}
+  ok   R2-B · the mini’s 覚 opens the same save chooser, and saving keeps the sentence ctx  — {"id":"カ所","scope":"sent"}
+  ok   R2-B · the mini lets it go again — reversible where the state shows  — {"taken":1,"sealTaken":false}
+  ok   R2-B · the sentence page seal names the word it captures  — {"present":true,"label":"memorize 半島"}
+  ok   R2-B · taking from the sentence page mints the word card, reversibly marked  — {"t":"word","id":"半島","pressed":"true"}
+
+— R2-A · scheduler policy, ordered/bounded review, no-debt legacy
+  ok   R2-A · fuzz is OFF in the live engine and matches the domain pin  — engine enable_fuzz=false · pin enableFuzz=false
+  ok   R2-A · the pin names append-order-monotonic-clamp-v1  — append-order-monotonic-clamp-v1
+  ok   R2-A · the per-card scheduler instant clamps up to the anchor, never back  — {"behind":true,"forward":true,"first":true}
+  ok   R2-A · real dues come most-overdue first; started fresh after; legacy absent  — word:電話 → word:手帳 → word:学校 → word:大人
+  ok   R2-A · the legacy row waits with one quiet 始める and an honest forecast  — "復習する — 4 件review now — 4 due" · forecast "today 3 · tomorrow 0 · this week 0 · new 1 · not started 1"
+  ok   R2-A · 始める promotes by hand — a mark in the row, never fabricated FSRS state  — "復習する — 5 件review now — 5 due" · started=true · srs minted=false
+  ok   R2-A · a backward device clock cannot crash or corrupt grading  — anchor held at 2026-10-07T05:19:57.550Z; due 2026-10-14T05:19:57.550Z
+  ok   R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed  — t=1791091198779 (raw, before the anchor) · elapsed=0
+  ok   R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest  — button "復習する — 28 件review now — 28 due" · frozen 20 · deferred 8
+  ok   R2-A · the goodbye screen carries the honest remainder — あと N, quietly  — "Session done — 20 cards" · "8 more waiting"
+  ok   R2-A · ペース persists the learner's numbers and holds its bounds  — stored {"newPerDay":0,"reviewLimit":10} · minus disabled at 0
+  ok   R2-A · the chosen pacing survives reboot and rules the queue  — prefs {"newPerDay":0,"reviewLimit":10} · 5 due, no fresh admitted
+  ok   R2-A · the probes leave no console errors  — clean
+
+— R3-C · declared recall: the answer never precedes the declaration
+  ok   R3-C · the zen room offers no bare reveal — only the two declarations  — {"reveal":false,"notyet":true,"recalled":true}
+  ok   R3-C · a tap on the card itself turns nothing over before a declaration  — {"grades":0,"reading":false,"stillAsking":true}
+  ok   R3-C · 思い出した turns the card with all four grades open  — {"grades":["again","hard","good","easy"],"reading":true}
+  ok   R3-C · after 思い出した the pressed grade commits as itself  — {"key":"word:学校","rating":3}
+  ok   R3-C · まだ opens the back for study with Again as the only seal  — {"grades":1,"again":true,"good":false,"hard":false,"easy":false,"reading":true}
+  ok   R3-C · a failed persist mid-grade moves nothing — card up, revlog whole, alert speaking  — {"cardStillUp":true,"revlog":1,"alertUp":true}
+  ok   R3-C · まだ commits Again — the schedule records the declaration, not a wish  — {"key":"word:先生","rating":1,"state":3}
+  ok   R3-C · undo restores the card, files a revocation, and asks the question afresh  — {"state":2,"reps":3,"revocation":true,"asking":true}
+  ok   R3-C · the declarations land in the obslog as [t,reveal,key,1|0] rows  — [["word:学校",1],["word:先生",0]]
+  ok   R3-C · the declared-recall probes leave no console errors  — clean
+
+— R3-E · small truths: crumbs, lesson scroll, the world swap
+  ok   R3-E · a stone tap recolours in place — tokens move, the room DOM stands  — {"theme":"sumi","kept":"kept","seal":"墨","stored":"sumi"}
+  ok   R3-E · the way home is the same gesture — 藍 restored, still no rebuild  — {"theme":"","kept":"kept","seal":"藍"}
+  ok   R3-E · the dojo entered from the galaxy wears a galaxy crumb  — crumb "galaxy › focus" · room "focus"
+  ok   R3-E · and its back door opens the room the crumb names — the galaxy  — {"view":"drift","layerActive":true}
+  ok   R3-E · back from a lesson run restores the learner's place in the list  — list at 520 → run at 0 → back at 520
+  ok   the tray never contradicts itself — a closed review door names its when  — {"disabled":true,"label":"復習する — いまは予定なしnothing due right now","forecast":"later today 3 · tomorrow 0 · this week 0 · new 0","todayN":3}
+
+— R3-B · device Back walks the app, not out of it
+  ok   R3-B · device Back from a word sheet walks to the reader, place intact  — {"sameDocument":true,"view":"reader","sheet":false,"y":508} (kept 508)
+  ok   R3-B · a kanji word stands in the field to dive into  — ふれる触れるto touch, to feel
+  ok   R3-B · the tap ladder carries into the dive  — drift-dived after ladder taps
+  ok   R3-B · device Back from a dive surfaces one level, never leaves the water  — {"sameDocument":true,"view":"drift","dived":false,"layerActive":true}
+  ok   R3-B · Back from an archive article lands on the year list where it was left  — view=archive y=800 (kept 800)
+  ok   R3-B · Back from the archive returns to the shelf at its door  — view=shelf y=23057 (kept 23057)
+  ok   R3-B · the bar’s search door opens the search room, a page of its own  — view=search
+  ok   R3-B · the search-room session survives the round trip — query, results, focus  — {"sameDocument":true,"view":"search","sheet":false,"q":"水","rows":24,"focusInSearch":true} (rows before: 24)
+  ok   R3-B · Back from the search room lands on the galaxy  — {"sameDocument":true,"view":"drift"}
+  ok   R3-B · the walks leave no console errors  — clean
+
+— R3-D · fitted FSRS parameters drive the real scheduler
+  ok   R3-D · the 読み込む door installs the optimizer output into the live scheduler  — custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-10-04T05:20:43.714Z
+  ok   R3-D · the entry footer says the truth about the weights in force  — "if you reviewed this now — FSRS-6 · tuned from your record"
+  ok   R3-D · a malformed parameter file is refused at the door; the record stands  — note "Those parameters could not be read — use a tools/fsrs-optimize.mjs output, unchanged." · stored w length 21
+  ok   R3-D · the graded schedule is the CUSTOM prediction to 8 dp, not the default  — stored s=24.52184027 ivl=25d · custom s=24.52184027 ivl=25d · default s=24.4728247 ivl=24d
+  ok   R3-D · an out-of-bounds stored set is ignored — defaults rule, bytes kept, one quiet note  — {"custom":false,"w20":0.1542,"kept":5,"notes":[["params","fsrs","bounds"]]}
+  ok   R3-D · a thousand boots write one note, not a thousand  — params notes after a second boot: 1
+  ok   R3-D · the probes leave no console errors  — clean
+
+— R4-C · 出会い trail · rest/wake target
+  ok   R4-C · the trail counts this item’s own encounters, not the ledger’s  — ["first met 7/31/2025 · 5 encounters so far","last 8/5/2025 — opened the full entry","2 practice records — evidence, not mastery"]
+  ok   R4-C · the last row is said in the learner’s own terms  — last 8/5/2025 — opened the full entry
+  ok   R4-C · practice is counted as evidence and named as evidence, never mastery  — 2 practice records — evidence, not mastery
+  ok   R4-C · reading the ledger writes nothing to the deck  — {"srs":0,"revlog":0}
+  ok   R4-C · the rest pill prints small and takes a whole finger  — visual 23×21, hit 44×44
+  ok   R4-C · a press at the target’s edge rests the card and never falls through to the row  — {"suspended":["word:学校"],"sheet":false}
+  ok   R4-C · the probes leave no console errors  — clean
+
+— C1 finding · the sentence page reaches its article
+  ok   C1 · a sentence with no shelf article shows no door onto nothing  — no article-backed sentence page reached in this walk — honest absence path
+
+— E3-A · the dojo honours 始める · いま見る holds for the whole card
+  ok   E3-A · a captured-but-unstarted row drills as practice — no card, no revlog, no new-card slot  — {"front":"一","practiceRow":true,"srs":0,"revlog":0,"dojo":2,"nnew":0}
+  ok   E3-A · the probes leave no console errors  — clean
+
+— R4-B · practice writes evidence; enrolling is a choice; nothing is lost
+  ok   R4-B · the lesson lanes keep their breadth — JLPT levels and the 漢検 grades  — 4 JLPT lanes · 漢検 true
+  ok   R4-B · lesson completion alone creates ZERO deck rows — the score and the evidence, nothing else  — taken 0 · srs 0 · lessonsDone ["N5-1"] · "3 of 10"
+  ok   R4-B · the run's words land as practice-evidence rows, one per word, named by the run  — 10 lesson rows for N5-1
+  ok   R4-B · one word chosen → exactly one deck row, started-marked, still cardless until reviewed  — [["ああ",true]] for choice ああ
+  ok   R4-B · ぜんぶ覚える enrolls exactly the rest — ten rows, no duplicates, every one started  — {"n":10,"unique":10,"allStarted":true,"allDoorGone":true}
+  ok   R4-B · the due-mode copy says what the refill does — after the first lap, practice  — sub "2 waiting · after the first lap, practice"
+  ok   R4-B · lap one grades for real — honest intervals, no practice stamp  — 10 min · 11 d · 16 d · 26 d
+  ok   R4-B · the first lap wrote the deck — two schedules moved, two revlog rows, zero practice rows  — revlog 2 · dojo rows 0
+  ok   R4-B · lap two stamps 稽古 on every seal — the schedule is promised nothing  — 学校 → practice · practice · practice · practice
+  ok   R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room  — row [1791091266589,"dojo","word:学校",3,"due"] · revlog 2
+  ok   R4-B · a reload later, the quiz stands where it stood — question two, running score kept  — "RELOAD-Q2 問二" at "2 / 3"
+  ok   R4-B · even the marked answer survives a reload — the why line and the mark come back  — {"why":"because two","marked":1}
+  ok   R4-B · the finished quiz shows its honest score and still grades nothing  — title "2 of 3" · stored true
+  ok   R4-B · only the learner's own door lets the quiz go  — stored aiQuiz null
+  ok   R4-B · the probes leave no console errors  — clean
+
+225/226 checks passed
+screenshots → <review-workspace>/bunki-srs-review/docs/prototype/screenshots
+report → <review-workspace>/bunki-srs-review/docs/prototype/verification-report.json

@@ -1,0 +1,16 @@
+[
+  {
+    "deck": "mine",
+    "first_count": 503,
+    "after_count": 503,
+    "ids_preserved": true,
+    "schedule_after": [2, 2, 30, 500, 7]
+  },
+  {
+    "deck": "mcd",
+    "first_count": 1597,
+    "after_count": 1597,
+    "ids_preserved": true,
+    "schedule_after": [2, 2, 30, 500, 7]
+  }
+]

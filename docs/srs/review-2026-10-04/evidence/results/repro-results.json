@@ -1,0 +1,87 @@
+{
+  "storageFailure": {
+    "count": "2/16",
+    "undoVisible": 1,
+    "ledger": null,
+    "ui": "✕\n2/16\n例文集 1/3\nお金・経済\n初めて\n\n資金不足のためわれわれの計画は挫折した。\n\n意味を思い出してからタップ\n\n答えを見る\n↶ ひとつ戻す"
+  },
+  "invalidRestore": {
+    "ui": "←\n設定\n一日の新しい文\n5\n10\n15\n20\n30\n答え方\n読んで思い出す\n穴埋め\n4択\nヒント（穴埋め・4択）\n英語\n日本語\nなし\n英語の意味（答え）\nすぐ表示\nタップで\nふりがな（問題）\nタップで表示\nなし\n色（テーマ）\n墨\n藍\n抹茶\n黒板\n和紙\n桜\n白\n高\nバックアップ\n\n記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。\n\nコピー\n復元\n記録を消す\n\n復元しました。",
+    "ledger": {
+      "format": "bunki-cloze-state",
+      "version": 1,
+      "deckId": "kotoba-mine",
+      "cards": {},
+      "groupsOff": [],
+      "log": []
+    }
+  },
+  "pointerCancel": {
+    "count": "2/16",
+    "ledger": {
+      "format": "bunki-cloze-state",
+      "version": 1,
+      "deckId": "kotoba-mine",
+      "cards": {
+        "km-064-1": {
+          "due": "2026-10-04T05:31:17.365Z",
+          "stability": 2.3065,
+          "difficulty": 2.11810397,
+          "elapsed_days": 0,
+          "scheduled_days": 0,
+          "learning_steps": 1,
+          "reps": 1,
+          "lapses": 0,
+          "state": 1,
+          "last_review": "2026-10-04T05:21:17.365Z",
+          "introducedAt": "2026-10-04T05:21:17.365Z"
+        }
+      },
+      "groupsOff": [],
+      "log": [["km-064-1", 3, "2026-10-04T05:21:17.365Z"]]
+    }
+  },
+  "doneUndo": {
+    "done": 1,
+    "undo": 0,
+    "text": "←\nおつかれさま\n1\n回答\n100%\n正解率\n\n今日の分は終わり。また明日。\n\nデッキに戻る"
+  },
+  "coldOffline": {
+    "cached": [
+      "/prototypes/corridor/",
+      "/prototypes/corridor/index.html",
+      "/prototypes/corridor/corridor.css",
+      "/prototypes/corridor/corridor.js",
+      "/prototypes/corridor/corridor-ink.js",
+      "/prototypes/corridor/dictionary-worker.js",
+      "/prototypes/corridor/skip-core.js",
+      "/prototypes/corridor/skip-ui.js",
+      "/prototypes/corridor/skip-ui.css",
+      "/prototypes/corridor/data/share_alike/skip.json",
+      "/prototypes/corridor/drift-layer.css",
+      "/prototypes/corridor/drift-layer.js",
+      "/prototypes/corridor/manifest.webmanifest",
+      "/prototypes/corridor/apple-touch-icon.png",
+      "/prototypes/corridor/icon-192.png",
+      "/prototypes/corridor/icon-512.png",
+      "/prototypes/corridor/reference-core.js",
+      "/prototypes/corridor/reference-ui.js",
+      "/prototypes/corridor/reference-ui.css",
+      "/prototypes/corridor/data/share_alike/reference-extra.json",
+      "/prototypes/corridor/decks/player/engine.js",
+      "/prototypes/corridor/decks/player/mount.js",
+      "/prototypes/corridor/decks/player/player.css",
+      "/prototypes/corridor/decks/kotoba-mine/deck.json",
+      "/prototypes/corridor/decks/kotoba-mcd/deck.json",
+      "/prototypes/corridor/decks/context-dense/mount.js",
+      "/prototypes/corridor/decks/context-dense/engine.js",
+      "/prototypes/corridor/decks/context-dense/deck.json",
+      "/prototypes/corridor/decks/context-dense/context-deck.css",
+      "/prototypes/corridor/decks/context-dense/standalone.html"
+    ],
+    "controlled": true,
+    "importResult": "TypeError: Failed to fetch dynamically imported module: http://127.0.0.1:33245/prototypes/corridor/vendor/ts-fsrs.mjs",
+    "pinFetch": "TypeError: Failed to fetch"
+  },
+  "kanjiChoice": "字\n書き下ろし · 文章1\nお金・経済\n復習\n\n人口が減り、税収も年々落ち込んでいる。市の〔ざい〕政はすでに限界に近く、来年度は図書館の開館日を減らすことになった。\n\n財政\n冷戦\n利息\n費え"
+}
