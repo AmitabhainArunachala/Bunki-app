@@ -4515,9 +4515,9 @@
   ],
   "225": [
     {
-      "ja": "若い世代ほど選挙に行かないとよく言われる。実際、前回の衆議院選挙では、二十代の投票率は三割台にとどまり、六十代のおよそ半分しかなかった。",
+      "ja": "若い世代ほど選挙に行かないと、昔からよく言われる。実際、前回の衆議院選挙では、二十代の投票率は三割台にとどまり、六十代のおよそ半分しかなかった。",
       "form": "率",
-      "en": "It's said that the younger the generation, the less they vote. In fact, at the last general election, turnout among people in their twenties was only in the 30-percent range, about half that of people in their sixties.",
+      "en": "It has long been said that the younger the generation, the less they vote. In fact, at the last general election, turnout among people in their twenties was only in the 30-percent range, about half that of people in their sixties.",
       "kind": "original",
       "site": "書き下ろし（このデッキ用）",
       "url": "",
@@ -4707,7 +4707,7 @@
   ],
   "261": [
     {
-      "ja": "祖母は今年で九十になるが、年の割に足腰がしっかりしていて、毎朝三十分の散歩を欠かさない。近所の人からは、いつも元気の秘訣を聞かれるそうだ。",
+      "ja": "祖母は今年で九十になるが、年の割に足腰がしっかりしていて、毎朝三十分の散歩を欠かさない。近所の人からは、いつも元気の秘訣を聞かれるのだそうだ。",
       "form": "割",
       "en": "My grandmother turns ninety this year, but for her age her legs are strong, and she never misses her thirty-minute walk each morning. The neighbours are always asking her the secret of her energy, she says.",
       "kind": "original",
@@ -5903,14 +5903,14 @@
       "title": ""
     },
     {
-      "ja": "国土地理院は7日、新しい地図記号の「風力発電用風車」と「老人ホーム」のデザインを小・中学生から募集すると発表した。四国新聞によると地図記号の公募は今回が初めて。",
+      "ja": "数値とパーセント記号との間にスペースを入れる流儀と入れない流儀がある（100 %か100%か）。Chicago Manual of Style（シカゴ大学出版局）ではスペースなしを奨励している。",
       "form": "記号",
-      "en": "On the 7th the Geospatial Information Authority of Japan announced that it would invite elementary and junior high school students to submit designs for new map symbols for 'wind turbine' and 'nursing home'. According to the Shikoku Shimbun, this is the first time map symbols have been chosen by public competition.",
-      "kind": "news",
-      "site": "ja.wikinews.org",
+      "en": "There are two schools of thought on whether to put a space between a number and the percent sign (100 % or 100%). The Chicago Manual of Style (University of Chicago Press) recommends no space.",
+      "kind": "wiki",
+      "site": "ja.wikipedia.org",
       "url": "",
-      "licence": "CC BY 2.5 (Wikinews)",
-      "title": ""
+      "licence": "CC BY-SA (Wikipedia)",
+      "title": "パーセント"
     },
     {
       "ja": "しばしばKg KG（キログラム）、Km KM（キロメートル）などと表記されることがあるが、これらは誤りで、正しくはkg kmである。大文字の「K」は、熱力学温度の単位であるケルビンの記号であるため、Kg, Kmと記述した場合は、「ケルビングラム」「ケルビンメートル」と誤読される可能性がある。",
@@ -6159,13 +6159,13 @@
       "title": "Mixi"
     },
     {
-      "ja": "健全な精神は健全な肉体に宿る。",
+      "ja": "業界の健全な成長のために公正な競争が確保される必要がある。",
       "form": "健全",
-      "en": "A sound mind dwells in a sound body.",
-      "kind": "example-bank",
-      "site": "例文集（Tanaka/SNOW）",
-      "url": "",
-      "licence": "CC BY 2.0 FR",
+      "en": "For the healthy growth of the industry, fair competition must be ensured.",
+      "kind": "tatoeba",
+      "site": "Tatoeba",
+      "url": "https://tatoeba.org/ja/sentences/show/180014",
+      "licence": "CC BY 2.0 FR (Tatoeba)",
       "title": ""
     }
   ],
@@ -6255,14 +6255,14 @@
       "title": ""
     },
     {
-      "ja": "総人口の4分の3に当たる都市住民の間ではベラルーシ語の母語話者は44.1%、家庭内での使用割合は11.3%に過ぎず、ロシア語化が大きく進行している事が示されている。他方、総人口の4分の1を占める農村住民の間ではベラルーシ語の話者数は79.7%に上り、家庭内での使用割合も58.7%と過半数を保っている。",
+      "ja": "トルコ語とアゼルバイジャン語の話者は、相互に意思疎通することができるが、ほとんどのアゼルバイジャン人はトルコのメディアによる流行やトレンドにさらされる機会が多いため、トルコ語を理解することはトルコ人がアゼルバイジャン語を理解することよりも優れている傾向がある。また、アゼルバイジャンにはトルコ語学校が数多く存在する。",
       "form": "話者",
-      "en": "Among urban residents, who make up three quarters of the total population, native speakers of Belarusian account for 44.1% and home use for only 11.3%, showing that Russification has advanced greatly. On the other hand, among rural residents, who make up a quarter of the population, Belarusian speakers number 79.7%, and home use keeps a majority at 58.7%.",
+      "en": "Speakers of Turkish and Azerbaijani can understand each other, but because most Azerbaijanis are often exposed to fashions and trends through Turkish media, they tend to understand Turkish better than Turks understand Azerbaijani. There are also many Turkish-language schools in Azerbaijan.",
       "kind": "wiki",
       "site": "ja.wikipedia.org",
       "url": "",
       "licence": "CC BY-SA (Wikipedia)",
-      "title": "ベラルーシ語"
+      "title": "アゼルバイジャン語"
     }
   ],
   "244": [
