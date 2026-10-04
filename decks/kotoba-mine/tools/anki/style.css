@@ -89,7 +89,7 @@
   gap: 4px;
 }
 .term {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   color: #0074b8;
   margin-right: 12px;
@@ -130,6 +130,10 @@
 }
 .fold.en {
   opacity: 0.85;
+}
+.en-none {
+  font-size: 13px;
+  opacity: 0.7;
 }
 .tip {
   font-size: 13px;
