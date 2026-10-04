@@ -547,3 +547,187 @@ probes after approximately 7 and 28 days, recording outside exposure and attriti
 Those delays and sample size are practical choices, not validated optima. Treat a
 single-learner result as personal evidence, not a population efficacy claim.
 Do not switch scheduled contracts mid-experiment or let AI supply grades.
+
+## Amendments (refinement 2026-10-04)
+
+These amendments come from the lead reviewer's
+[refinement](review-2026-10-04/REFINEMENT.md) of the review and the three critiques. Each
+quotes the rule it changes; the original text above is left as written so the change is
+visible. Where an amendment and the original conflict, the amendment applies.
+
+**A01 → S01.** Replaces "Proposed default: targeted meaning retrieval from Japanese … Offer
+selective MCD for form, construction, collocation or spelling needs." with: "Two presets
+exist: MCD (語 + 字 cloze in a passage) and 文 (read and recall). The default preset for
+newly enrolled words is a recorded learner decision; a deck ships neither as a hidden
+default. Both presets must satisfy S02–S05." Why: `RESEARCH.md:17` says no winner is
+established; the brief requires explicit choices to be challenged as questions, not
+overridden in a standing rule. The reading-first recommendation stays in FIX_PLAN.
+
+**A02 → S12.** Deletes "**Decision:** make automatic 字 generation opt-in for new
+enrollments" and adds: "字 cards are generated for every passage whose character alignment
+is verified (S08, S22), not only the first passage; the learner may switch 字 off per deck;
+the build reports the share of 字 cards built on real text. Sibling unlock chains are
+typed: a 語 card may be gated only by the previous 語 card of the same word; 字 cards form
+their own branch from the first passage; the deck records the gating parent explicitly
+(`after`) instead of relying on array order. The repair trigger counts Again in every FSRS
+state; a card that has not graduated after N consecutive Again is offered repair and does
+not block its siblings." Why: 字 is the most AJATT-faithful card type; the measured defects
+are the 100%-written 字 layer, 288 words gated behind 字 cards, and a lapse counter blind to
+learning state.
+
+**A03 → S23.** Adds to "Kanji gaps also check whether another compound reveals the same
+character.": "Measured gates: a 字 card is invalid if its blanked glyph appears anywhere
+else in the visible front. A 語 card is invalid if the form or term appears anywhere outside
+the gap; every further occurrence is masked under the same task or the excerpt is changed.
+A 語 card is flagged if a run of two or more consecutive kanji of the answer appears
+elsewhere on the front (計算 → 計算機). A 文 card's form occurs exactly once or the cloze
+modes are disabled for that card. A front cue (hint, definition, reading) must not contain
+the target's reading, the target form, a compound containing the target, or share a kanji
+with the answer; under the MCD preset a 語 card on passage ≥ 2 carries no word-level
+definition by default. The verifier reports each count and fails on any non-zero value
+without a recorded disposition." Why: 12 word cards, 103 字 cards and 6 文 cards leak today;
+131/323 hints share a kanji with the answer.
+
+**A04 → S24.** Replaces "For 文, no target reading or meaning before the attempt." with:
+"For 文, the target segment is never tappable or hoverable before reveal under any furigana
+preference; non-target tap furigana is allowed and each tap is logged as assistance (S26)."
+Why: `mount.js:119–129` makes the target tappable under the default preference.
+
+**A05 → S27.** Adds: "The deck's method text, the grade bar and the keyboard map describe
+the same button set. A two-button default means two buttons are rendered, with Hard/Easy
+behind an advanced setting." Why: `deck.json` `method[6]` promises two buttons while
+`mount.js:436` renders four.
+
+**A06 → S30.** Adds: "A learning card may be shown before its due instant only when no
+other eligible card remains in the sitting (Anki learn-ahead semantics), and the event
+records that it was early. Queue mutation during a sitting may only insert at positions
+after the current card; the card at the cursor never changes except through grade, undo or
+quit. A learning card that comes due mid-sitting is appended after the current card." Why:
+F05 is a trigger bug; `refill()` currently swaps the card under the learner.
+
+**A07 → S29.** Adds: "The player applies `reviewTimePolicyId`
+append-order-monotonic-clamp-v1: effective review time is max(now, last_review); the raw
+press time is stored alongside. A negative delta never reaches the scheduler." Why:
+`fsrs-pin.json:42` declares the policy; only `corridor.js` implements it and the player
+throws.
+
+**A08 → S31.** Adds: "New cards are introduced interleaved across groups (round-robin, or
+learner capture order when known) with a per-group daily cap; deck file order is not an
+introduction order. The daily new-card budget counts cards and the settings label says
+カード; 字 and 語 are reported separately in the home tiles." Why: `engine.js:177`
+introduces topic blocks; R13 reports more interference for related items learned together;
+"一日の新しい文" hides that most new MCD items are 字 cards.
+
+**A09 → S11 table.** Adds a row "Kanji in host word (字 card)": "Generated from any verified
+passage; the visible remainder of the host word plus the reading hint must not uniquely
+spell the answer in a choice task; choice mode is disabled for 字 cards until reviewed
+distractors exist." Why: F38.
+
+**A10 → S15.** Adds to "Report authentic, adapted, written and unresolved shares over
+unique passages": "Anchor passages (passage 1) and all 字-bearing passages are reported
+separately. A written anchor requires a per-word reason recorded in `decisions.jsonl`.
+Tatoeba/Tanaka rows without a checked/OK flag rank below edited sources and their share
+among anchors is reported." Why: 322/323 MCD anchors are written; 131/323 文 anchors are
+unchecked example-bank rows.
+
+**A11 → S17.** Adds: "For Aozora, the licence of record is the per-work notice in the text
+file's trailer after the 底本 block (for example 「この作品は、クリエイティブ・コモンズ「表示
+2.1 日本」でライセンスされています」), read and stored verbatim by the miner; the work card's
+＊著作権存続＊ flag alone is neither a permission nor a prohibition. CC BY works are
+public-profile eligible with author, translator and licence credit; CC BY-ND and BY-NC-ND
+works are private-profile only. A miner must never cut the trailer before reading it. An
+Aozora record with no stored licence of record is unverified." Why: 富田倫生 is CC BY 2.1 JP;
+片岡義男, 鶴岡雄二 and 小泉八雲『赤い婚礼』 records are ND or NC-ND; `mine_aozora.py:27–31`
+discards the deciding line.
+
+**A12 → S14.** Adds required fields: for literary sources `author`, `translator`
+(separate), `workId` and the work-card URL (`cards/<author>/card<work>.html`), parsed from
+the full Aozora header, never from a fixed line number; for example banks `corpus`
+(tanaka | snow-t15 | snow-t23 | tatoeba) and the corpus sentence ID; for Wikimedia the
+article title and revision or URL. Acceptance: a record with `url: ''` or `author: ''`
+cannot enter the public profile. Why: 15+ works are credited to a subtitle; one site label
+carries three licences; 125 Wikinews/Wikipedia records have no URL.
+
+**A13 → S16.** Adds: "Posts by private individuals on social platforms or personal blogs
+(x.com, instagram, threads, note.com, ameblo.jp, hatena, chiebukuro) are excluded from
+public artifacts regardless of licence analysis; official organisational accounts may be
+quoted under their terms with attribution. The private-study profile may keep them." Why:
+km-245 S1 and km-044 S1 publish a private person's post with the identifying URL.
+
+**A14 → S22.** Adds to "Review non-target readings too": "Readings come from the tokeniser
+only as candidates. The build applies context rules for the known unidic-lite failure
+classes (nationality or group suffix 人 → じん, 曜日 → び, adverbial 一日 → いちにち, 他の/他に
+→ ほか, 〜の方 for a person → かた, いい方/下の方 → ほう, 皇族方 → がた, 上手 → じょうず
+outside the stage sense) and every occurrence of a watchlist kanji (方・日・人・他・上手・一日・
+生・風・市・下・上) carries a reviewed disposition before release. Known wrong readings become
+negative fixtures in the verifier." Why: the five reported cases are classes with dozens of
+instances.
+
+**A15 → S21.** Adds: "Hard filters are evaluated on the text outside the matched target
+span. The classical-grammar filter exempts the target and the productive forms 〜たる /
+〜なる / 〜ざる / 〜ごとく / 〜べき / 〜しき; a target that the tokeniser tags as 文語 must
+still obtain candidates. Every rejection is logged with the filter name per candidate
+(S45)." Why: `rank.py:142–143` rejected all 24 candidates for 由々しき.
+
+**A16 → S11 and S18.** Adds: "One passage has one identity across decks (`passageId`). A
+passage already serving as a word's 文 card is not re-shipped as that word's MCD passage; if
+both decks need it they share the `passageId` and the sibling rule buries the other copy.
+One Japanese text has exactly one English translation across all artifacts." Why: 45 MCD
+passages are byte copies of the 文 card, 20 with a conflicting translation.
+
+**A17 → S20 and S39.** Adds: "Each passage binds the sense actually used in it. Learner
+lookups that are the same lexeme in different orthography (栞/しおり) or head-word plus
+fixed phrase (礎/礎を築く) may be one lexical entry with several forms; existing card IDs
+stay; whether to merge is a recorded learner decision." Why: 13 duplicate-lexeme pairs;
+km-132 P3's hint contradicts its own passage.
+
+**A18 → S10 and S24.** Adds: "The marked or blanked span is the whole inflected word as
+written (勝ち残った, たくらんでいる), never a stem cut at a tokeniser boundary (勝ち残っ)."
+Why: 16 文 and 4 MCD forms are stem-cut; the learner's requirement 5 bans truncated examples.
+
+**A19 → S19.** Adds: "Conventional elliptical phrasings that are standard in educational
+text (地軸は公転面に対して23.4度傾いている) are precision improvements, not factual errors;
+the fact-check hold is for claims that would mislead (mis-attributed laws, undated
+statistics)." Why: F16 was out of proportion; F23's 皇室典範 attribution is the real case.
+
+**A20 → S35.** Adds: "Measure each text token against the surface it actually sits on: the
+card panel, the tinted grade button (`color-mix`), the page background, and the worst 5%
+of pixels under any texture. A theme passes only if every (token, surface) pair passes."
+Why: the review's and the critique's numbers differ exactly because the surface was
+unstated.
+
+**A21 → S41.** Replaces "Wrong deck, empty object, future version, invalid dates/state,
+duplicate IDs or conflicting events fail visibly and leave current bytes untouched." with:
+"Any import that fails validation leaves current bytes untouched and says why. Any import
+whose card set is empty, or whose card count is smaller than the current ledger's, requires
+an explicit second confirmation that names both counts. A pre-import snapshot is written to
+a separate key before any replace. Ledger entries for card IDs not in the current deck are
+kept, never dropped." Why: the real-world loss is pasting an older valid backup, and
+`normalizeState` currently drops orphaned states.
+
+**A22 → S52.** Adds: "The service-worker precache list is generated from the registry and
+includes every module reachable by static or dynamic import from the shell (today
+`vendor/ts-fsrs.mjs` and `data/fsrs-pin.json`). Lazily imported modules
+(`decks/player/mount.js`, `deck.json`) are fetched with the same release version as the
+running shell; a mismatch reloads at the next safe boundary. Cache cleanup deletes only
+keys with this app's prefix. The verifier serves the app over a worker-enabled origin so
+`sw.js` runs in at least one automated test." Why: `index.html:57` registers the worker
+only over https; `sw.js:67` deletes every cache on the origin.
+
+**A23 → S46.** Adds the fifth consumer: "The registry also generates the worker precache
+(`sw.js` SHELL) and the Pages copy and smoke lists; a build check diffs each generated list
+against the committed file." Why: F52 lists four places; `sw.js` and `pages-app.yml` are
+two more that drift by hand.
+
+**A24 → Section 12, Repository row.** Replaces "targeted verifier" with:
+"`verify-kotoba-mine.mjs` runs on every pull request that touches
+`prototypes/corridor/decks/**` or `decks/**`; pure engine rules (`buildQueue`,
+`nextNewCard`, `normalizeState`, `grade` with the monotonic clamp) are vitest unit tests
+included by `vitest.config.ts`." Why: today the deck verifier is in no workflow and vitest
+excludes `prototypes/`.
+
+**A25 → S40 and S47.** Adds: "Card IDs and Anki GUIDs are assigned from a committed
+identity manifest keyed by word, passage text and card kind, never from array position. A
+card that disappears keeps its ID reserved; a new card takes the next free number for its
+word. The build fails under `--frozen` if a key has no manifest entry." Why: F26;
+`build.py:240–242,303` number cards by position and `guid_for(card id, deck id)` follows.
