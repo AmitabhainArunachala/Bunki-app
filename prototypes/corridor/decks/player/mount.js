@@ -43,8 +43,11 @@ async function loadDeck(deckId) {
 }
 
 /* ------------------------------------------------------------- state */
-const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', furigana: 'tap', gloss: 'show', grades: 'two' };
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, shown: new Set(), toast: '' };
+/* gloss: the English fold on the back starts closed ('tap') or open ('show', the per-deck
+ * "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one) or the
+ * learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown once */
+const PREFS_DEFAULT = { newPerDay: 15, hint: 'ja', mode: 'self', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false };
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, toast: '' };
 let ctx = null; // { root, deck, index, storage, onLeave, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
@@ -53,7 +56,12 @@ const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
 /** a stored ledger this player could not read, set aside before anything is saved over it */
 const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
-const prefsFor = (storage, deck) => ({ ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) });
+function prefsFor(storage, deck) {
+  const prefs = { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
+  // the front never shows English (CARD_CONTRACT_V2 §2): an older English hint becomes the Japanese one
+  if (prefs.hint === 'en') prefs.hint = 'ja';
+  return prefs;
+}
 function readJson(storage, key) {
   try {
     return JSON.parse(storage.getItem(key) || 'null');
@@ -162,45 +170,83 @@ const STATUS = {
   hard: ['苦手', 'kp-st-hard'],
 };
 
-/** sentence → nodes. blank: hide the target; ruby: 'all' | 'none' | 'tap';
- * front: before the answer the asked word is plain text, never a tap target (its
- * reading is part of the answer); the other kanji words keep their tap */
-function sentenceNodes(card, { blank, ruby, front = false }) {
+/**
+ * Where each sentence of a passage ends: after 。！？ outside brackets, with the closing
+ * marks that follow; the last sentence runs to the end. build.py (sentence_ends) cuts the
+ * passage the same way to pick the English of the target sentence.
+ */
+const JA_OPEN = '「『（(【〈《';
+const JA_CLOSE = '」』）)】〉》';
+const JA_END = '。！？!?';
+function sentenceEnds(ja) {
+  const out = [];
+  let depth = 0;
+  for (let i = 0; i < ja.length; ) {
+    const ch = ja[i];
+    if (JA_OPEN.includes(ch)) depth++;
+    else if (JA_CLOSE.includes(ch)) depth = Math.max(0, depth - 1);
+    else if (JA_END.includes(ch) && depth === 0) {
+      let j = i + 1;
+      while (j < ja.length && (JA_END.includes(ja[j]) || JA_CLOSE.includes(ja[j]))) j++;
+      out.push(j);
+      i = j;
+      continue;
+    }
+    i++;
+  }
+  const last = out.at(-1) ?? 0;
+  if (last < ja.length) {
+    if (ja.slice(last).trim() || !out.length) out.push(ja.length);
+    else out[out.length - 1] = ja.length;
+  }
+  return out;
+}
+
+/** sentence → nodes. blank: hide the target; ruby: 'all' (the back: a reading over every
+ * kanji) | 'none' (the front: no readings, no tap targets, the asked word plain text);
+ * split: wrap each sentence of a passage in .kp-s, the one holding the target marked
+ * data-focus, so the back can dim the others (zoom) */
+function sentenceNodes(card, { blank, ruby, split = false }) {
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
-  card.ruby.forEach(([text, reading, isTarget], i) => {
-    if (isTarget === 1 && blank) {
-      out.append(el('span', 'kp-blank', card.hint ? `〔${card.hint}〕` : '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
-      return;
+  const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
+  let host = out;
+  let at = 0; // offset in card.ja of the next character
+  let k = 0; // the sentence being filled
+  const open = () => {
+    if (!split) return;
+    host = el('span', 'kp-s');
+    out.append(host);
+  };
+  open();
+  const put = (node, isTarget, len) => {
+    if (split && isTarget === 1) host.dataset.focus = '1';
+    host.append(node);
+    at += len;
+    while (split && k < ends.length - 1 && at >= ends[k]) {
+      k++;
+      open();
     }
-    if (isTarget === 3 && blank) {
-      // the word again later in the passage: blanked too, without the hint
-      out.append(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))));
-      return;
-    }
-    if (front && (isTarget === 1 || isTarget === 3)) {
-      out.append(el('span', 'kp-target', text));
-      return;
-    }
-    const hasRuby = reading && KANJI.test(text);
-    let node;
-    if (hasRuby && (ruby === 'all' || (ruby === 'tap' && ui.shown.has(i)))) {
-      node = el('ruby', null, text, el('rt', null, reading));
-    } else if (hasRuby && ruby === 'tap') {
-      node = el('span', 'kp-tapword', text);
-      node.addEventListener('click', (e) => {
-        e.stopPropagation();
-        ui.shown.add(i);
-        paint();
-      });
-    } else {
-      node = document.createTextNode(text);
-    }
+  };
+  card.ruby.forEach(([text, reading, isTarget]) => {
+    const len = text.length;
+    if (isTarget === 1 && blank) return put(el('span', 'kp-blank', card.hint ? `〔${card.hint}〕` : '　'.repeat(Math.min(6, Math.max(2, [...text].length)))), 1, len);
+    // the word again later in the passage: blanked too, without the hint
+    if (isTarget === 3 && blank) return put(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))), 3, len);
+    const hasRuby = reading && KANJI.test(text) && ruby === 'all';
     if (isTarget) {
-      const wrap = el('span', 'kp-target');
-      wrap.append(node);
-      out.append(wrap);
-    } else out.append(node);
+      const wrap = el('span', 'kp-target', hasRuby ? el('ruby', null, text, el('rt', null, reading)) : text);
+      return put(wrap, isTarget, len);
+    }
+    if (hasRuby) return put(el('ruby', null, text, el('rt', null, reading)), 0, len);
+    // plain text may hold a sentence end: cut it there so each sentence keeps its own words
+    let rest = text;
+    while (split && rest && k < ends.length - 1 && at + rest.length > ends[k]) {
+      const cut = ends[k] - at;
+      put(document.createTextNode(rest.slice(0, cut)), 0, cut);
+      rest = rest.slice(cut);
+    }
+    if (rest) put(document.createTextNode(rest), 0, rest.length);
   });
   return out;
 }
@@ -219,6 +265,9 @@ function paint() {
     root.append(toast);
   }
   root.append((screens[ui.screen] || homeScreen)());
+  // on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card
+  const bar = root.querySelector('.kp-grades');
+  if (bar && getComputedStyle(bar).position === 'fixed') root.style.setProperty('--kp-bar-h', `${bar.offsetHeight + 16}px`);
 }
 
 function topBar(title, back) {
@@ -325,8 +374,8 @@ function startSession() {
 
 function resetCard() {
   ui.revealed = false;
+  ui.seen = false;
   ui.picked = null;
-  ui.shown = new Set();
 }
 
 /** pull learning steps that came due back into the sitting, right after the
@@ -376,30 +425,39 @@ function studyScreen() {
   box.append(top);
 
   const stored = ctx.state.cards[id];
+  // a passage card (MCD) is several sentences; only those get the 全文／焦点 zoom
+  const passage = !!card.type;
   const face = el('article', `kp-card kp-lv${card.lv} kp-topic kp-pos-${posKey(word.pos)}`);
   face.style.setProperty('--kp-topic', topicColour(word.group));
   face.id = 'kp-card';
-  face.append(
-    el(
-      'div',
-      'kp-chips',
-      ...(card.type
-        ? [el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'), el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'} · 文章${card.passage}`)]
-        : [el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`)]),
-      el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
-      el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
-    ),
+  face.dataset.card = id;
+  const chips = el(
+    'div',
+    'kp-chips',
+    ...(card.type
+      ? [el('span', `kp-chip kp-lvchip`, card.type === 'kanji' ? '字' : '語'), el('span', 'kp-chip', `${KIND_NAME[card.kind] || '例文'} · 文章${card.passage}`)]
+      : [el('span', `kp-chip kp-lvchip`, `${KIND_NAME[card.kind] || '例文'} ${card.lv}/${word.cards.length}`)]),
+    el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
+    el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
   );
-  face.append(sentenceNodes(card, { blank: !ui.revealed && mode !== 'read', ruby: ui.revealed ? 'all' : ctx.prefs.furigana === 'tap' ? 'tap' : 'none', front: !ui.revealed }));
+  face.append(chips);
+  if (ui.revealed && passage) {
+    const zoom = zoomFor();
+    face.dataset.zoom = zoom;
+    chips.append(zoomToggle(zoom));
+  }
+  // the front: no readings, no English, nothing to tap in the passage (CARD_CONTRACT_V2 §2)
+  face.append(sentenceNodes(card, { blank: !ui.revealed && mode !== 'read', ruby: ui.revealed ? 'all' : 'none', split: passage }));
 
   if (!ui.revealed) {
-    if (ctx.prefs.hint !== 'none' && mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', ctx.prefs.hint === 'ja' ? word.defJa : word.meaning));
+    if (ctx.prefs.hint !== 'none' && mode !== 'read' && card.type !== 'kanji') face.append(el('p', 'kp-hint', word.defJa));
     if (mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
         opts.append(
           btn('kp-choice', w.term, () => {
             ui.picked = w.id;
+            ui.seen = !!ctx.state.cards[id];
             ui.revealed = true;
             commit(w.id === word.id ? RATINGS.good : RATINGS.again, { stay: true });
           }, { 'data-choice': w.id }),
@@ -422,12 +480,14 @@ function studyScreen() {
       box.append(btn('kp-next', '次へ →', next, { id: 'kp-next' }));
     } else {
       box.append(gradeBar(id));
+      box.classList.add('has-bar');
     }
     attachSwipe(face);
   } else if (mode === 'choice') {
     box.append(
       btn('kp-reveal', 'わからない', () => {
         ui.picked = null;
+        ui.seen = !!ctx.state.cards[id];
         ui.revealed = true;
         commit(RATINGS.again, { stay: true });
       }, { id: 'kp-dunno' }),
@@ -452,7 +512,7 @@ const THEMES = [
 const VISUAL_TIPS = [
   '色＝品詞：答えの語の色は品詞で決まる（名詞・動詞・形容詞・副詞・表現・擬音語）。色ごと覚えると、文の中での働きも一緒に残る。',
   'カードの左端の色＝テーマ。お金は同じ色、ニュースは別の色。「あの色の札にあった言葉」と場所で思い出せる。',
-  '裏の「漢字の解剖」：一字ずつ、意味と部品と画数。部品で小さな絵や物語を作ると忘れにくい（財＝貝＋才 → 貝はお金）。',
+  '裏の「漢字の形と意味」（タップで開く）：一字ずつ、意味と部品と画数。部品で小さな絵や物語を作ると忘れにくい（財＝貝＋才 → 貝はお金）。',
   '思い出せなかった語は、文章の場面を頭の中で一枚の絵にしてから「もう一度」。次に会うとき、その絵が手がかりになる。',
   '色テーマは気分で変えてよい。ただし一つのデッキは同じテーマで続けると、色と記憶が結びつきやすい。',
   '答えを見る前に一秒、空所の形（字数・送り仮名）と前後の言葉を見る。形と場所で記憶が引き出される。',
@@ -465,6 +525,26 @@ function topicColour(groupId) {
   return `hsl(${Math.round((i * 360) / Math.max(1, ctx.deck.groups.length) + 200) % 360} 70% 58%)`;
 }
 
+/** 全文 (every sentence bright) or 焦点 (the sentences around the target dimmed). Unless the
+ * learner chose one for this deck, a card seen before opens in 焦点 and a new card in 全文 */
+function zoomFor() {
+  if (ctx.prefs.zoom === 'full' || ctx.prefs.zoom === 'focus') return ctx.prefs.zoom;
+  return ui.seen ? 'focus' : 'full';
+}
+function zoomToggle(zoom) {
+  const wrap = el('span', 'kp-zoom');
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', '文章の表示');
+  for (const [value, label] of [['full', '全文'], ['focus', '焦点']]) {
+    const b = btn('kp-zoom-btn', label, (e) => {
+      e.stopPropagation();
+      if (zoomFor() !== value) savePrefs({ ...ctx.prefs, zoom: value });
+    }, { id: `kp-zoom-${value}`, 'aria-pressed': String(zoom === value) });
+    wrap.append(b);
+  }
+  return wrap;
+}
+
 function kanjiAnatomy(word) {
   if (!word.kanji?.length) return null;
   const box = el('div', 'kp-kanji');
@@ -474,26 +554,72 @@ function kanjiAnatomy(word) {
   return box;
 }
 
+/** one tier-two fold: a native disclosure, closed unless open is set */
+function fold(cls, title, open, ...kids) {
+  const d = el('details', `kp-fold ${cls}`, el('summary', null, title), ...kids);
+  d.open = !!open;
+  d.addEventListener('click', (e) => e.stopPropagation());
+  return d;
+}
+
+const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言い換え', col: 'よく一緒に', thm: '関連' };
+
+/**
+ * The back (CARD_CONTRACT_V2 §3). Tier one, read on every pass, no English: the word with
+ * its reading and part of speech (pitch only when the deck has it), the passage above with
+ * a reading over every kanji, the Japanese definition, a Japanese usage note when there is
+ * one. Tier two, one tap each, in this order: 英語 (the gloss; open when 設定 says always),
+ * 英訳 of the target sentence only, 漢字の形と意味 (open on a 字 card), 類語 (only with
+ * entries, and only once the card is in review), the word's other passages (titles only),
+ * then the source line.
+ */
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
-  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), el('span', 'kp-posbadge', (POS[word.pos] || ['', ''])[1] || word.pos)));
-  const glossShown = ctx.prefs.gloss !== 'tap';
-  if (glossShown) a.append(el('p', 'kp-meaning kp-gloss', word.meaning));
-  const anatomy = kanjiAnatomy(word);
-  if (anatomy) a.append(anatomy);
+  const pos = (POS[word.pos] || ['', ''])[1] || word.pos;
+  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
   a.append(el('p', 'kp-def', word.defJa));
-  // the plain English meaning sits right under the word (設定 can move it behind the tap);
-  // the passage's full translation always waits behind 英語
-  const en = el('details', 'kp-endetails');
-  en.append(el('summary', null, glossShown ? '英訳' : '英語'));
-  if (!glossShown) en.append(el('p', 'kp-meaning', word.meaning));
-  if (card.en) en.append(el('p', 'kp-en', card.en));
-  en.addEventListener('click', (e) => e.stopPropagation());
-  if (en.childElementCount > 1) a.append(en);
+  // a usage note in Japanese stays in tier one; the deck's English notes go behind 英語
+  const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
+  if (jaNote) a.append(el('p', 'kp-note', word.tip));
+
+  const folds = el('div', 'kp-folds');
+  const gloss = fold('kp-f-gloss', '英語', ctx.prefs.gloss === 'show', el('p', 'kp-gloss', word.meaning));
+  gloss.lang = 'en';
+  if (word.tip && !jaNote) gloss.append(el('p', 'kp-tip', el('span', 'kp-tip-label', '注 '), word.tip));
+  folds.append(gloss);
+  // a passage translates only the sentence holding the target (enTarget, from build.py); a
+  // passage whose sentences could not be matched has no 英訳 at all, never the whole passage
+  const en = card.type ? card.enTarget : card.en;
+  if (en) {
+    const f = fold('kp-f-en', '英訳', false, el('p', 'kp-en', en));
+    f.lang = 'en';
+    folds.append(f);
+  }
+  const anatomy = kanjiAnatomy(word);
+  if (anatomy) folds.append(fold('kp-f-kanji', '漢字の形と意味', card.type === 'kanji', anatomy));
+  // synonyms interfere with a word still being learned (R13): only on a card in review state
+  if (word.sem?.length && ctx.state.cards[card.id]?.state === 2) {
+    const list = el('ul', 'kp-sem');
+    for (const e of word.sem) list.append(el('li', null, el('b', null, e.w), el('span', 'kp-sem-rel', SEM_REL[e.rel] || e.rel), e.note ? el('small', null, e.note) : null));
+    folds.append(fold('kp-f-sem', '類語', false, list));
+  }
+  const others = otherPassages(card, word);
+  if (others.length) {
+    const list = el('ul', 'kp-others');
+    for (const c of others) list.append(el('li', null, c.type ? `文章${c.passage}` : `例文${c.lv}`, el('span', null, ` · ${KIND_NAME[c.kind] || '例文'}${c.src?.site ? ` · ${c.src.site}` : ''}`)));
+    folds.append(fold('kp-f-others', `この語の他の文章（${others.length}）`, false, list));
+  }
+  a.append(folds);
   if (card.src) a.append(sourceLine(card));
-  if (word.tip) a.append(el('p', 'kp-tip', word.tip));
   return a;
+}
+
+/** the word's other passages, one per passage (a passage's 字 cards share it): titles only,
+ * never their text, so a sibling card is not answered here */
+function otherPassages(card, word) {
+  if (!card.type) return word.cards.filter((c) => c.id !== card.id);
+  return word.cards.filter((c) => c.type === 'word' && c.passage !== card.passage);
 }
 
 function sourceLine(card) {
@@ -510,26 +636,42 @@ function sourceLine(card) {
   return p;
 }
 
-/** もう一度／思い出せた by default; 設定 › 判定のボタン adds 難しい and 簡単 */
-const fourGrades = () => ctx.prefs.grades === 'four';
+/** もう一度／思い出せた, nothing else (CARD_CONTRACT_V2 §4: Hard and Easy are not shown).
+ * Under the bar, once per deck until dismissed or answered, the rule for choosing. */
+const RULE = '答えを見て理解が深まったなら もう一度';
 function gradeBar(id) {
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
-  const four = fourGrades();
-  const bar = el('div', four ? 'kp-grades is-four' : 'kp-grades');
+  const bar = el('div', 'kp-grades');
   const g = (name, label, cls, key) =>
     btn(`kp-grade ${cls}`, [el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
       id: `kp-grade-${name}`,
       'aria-keyshortcuts': key,
     });
-  bar.append(...[g('again', 'もう一度', 'kp-again', '1'), four && g('hard', '難しい', 'kp-hard', '2'), g('good', '思い出せた', 'kp-good', '3'), four && g('easy', '簡単', 'kp-easy', '4')].filter(Boolean));
+  bar.append(g('again', 'もう一度', 'kp-again', '1'), g('good', '思い出せた', 'kp-good', '3'));
   bar.append(el('p', 'kp-swipehint', '← もう一度　　スワイプ　　思い出せた →'));
+  if (!ctx.prefs.ruleSeen) {
+    const rule = el('p', 'kp-rule', el('span', null, RULE));
+    rule.id = 'kp-rule';
+    rule.append(btn('kp-rule-x', '×', () => savePrefs({ ...ctx.prefs, ruleSeen: true }), { id: 'kp-rule-dismiss', 'aria-label': 'このヒントを閉じる' }));
+    bar.append(rule);
+  }
   return bar;
 }
 
 function reveal() {
   if (ui.revealed) return;
   ui.revealed = true;
+  // read before any grade of this sitting: was this card answered on an earlier pass?
+  ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
   paint();
+}
+
+/** the rule under the grade bar is shown once: answering the card it sat under retires it.
+ * Not stored (storage full) only means it shows again. */
+function retireRule() {
+  if (ctx.prefs.ruleSeen) return;
+  const prefs = { ...ctx.prefs, ruleSeen: true };
+  if (writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) ctx.prefs = prefs;
 }
 
 function commit(rating, { stay = false } = {}) {
@@ -546,11 +688,12 @@ function commit(rating, { stay = false } = {}) {
     return;
   }
   askToKeepStorage();
+  if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
   ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
   ctx.state = nextState;
   ui.done++;
-  if (rating >= RATINGS.hard) ui.right++; // 難しい is still remembered (only shown with four buttons)
+  if (rating >= RATINGS.good) ui.right++;
   if (stay) {
     paint();
     return;
@@ -599,6 +742,7 @@ function undo() {
   ui.undo = null;
   resetCard();
   ui.revealed = cardMode() !== 'choice';
+  ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
   paint();
 }
 
@@ -734,12 +878,10 @@ function settingsScreen() {
   };
   box.append(seg('一日の新しいカード', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
-  box.append(seg('ヒント（穴埋め・4択）', 'hint', [['en', '英語'], ['ja', '日本語'], ['none', 'なし']]));
-  box.append(seg('英語の意味（答え）', 'gloss', [['show', 'すぐ表示'], ['tap', 'タップで']]));
-  box.append(seg('ふりがな（問題）', 'furigana', [['tap', 'タップで表示'], ['none', 'なし']]));
-  const grades = seg('判定のボタン', 'grades', [['two', 'もう一度・思い出せた'], ['four', '難しい・簡単も使う']]);
-  grades.append(el('p', 'kp-sub', 'ふだんは二つで十分です。迷ったら「もう一度」。'));
-  box.append(grades);
+  box.append(seg('ヒント（穴埋め・4択）', 'hint', [['ja', '日本語の説明'], ['none', 'なし']]));
+  const gloss = seg('英語の意味（答えの「英語」）', 'gloss', [['tap', 'タップで開く'], ['show', 'いつも開いておく']]);
+  gloss.append(el('p', 'kp-sub', '判定は「もう一度／思い出せた」の二つ。答えを見て理解が深まったなら「もう一度」。'));
+  box.append(gloss);
   const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
   const sw = el('div', 'kp-swatches');
   sw.setAttribute('role', 'radiogroup');
@@ -872,7 +1014,7 @@ function onKey(e) {
   if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
     if (mode !== 'choice') reveal();
-  } else if (ui.revealed && mode !== 'choice' && (fourGrades() ? ['1', '2', '3', '4'] : ['1', '3']).includes(e.key)) {
+  } else if (ui.revealed && mode !== 'choice' && (e.key === '1' || e.key === '3')) {
     e.preventDefault();
     commit(Number(e.key));
   } else if (ui.revealed && mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {

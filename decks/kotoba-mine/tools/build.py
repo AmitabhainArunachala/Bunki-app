@@ -90,17 +90,17 @@ TITLE_EN = "My mined words"
 SENTENCE_METHOD = [
     "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。",
     "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。",
-    "裏：ふりがな、意味、訳、出典。思い出せたら「思い出せた」、だめなら「もう一度」。",
+    "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「思い出せた」、だめなら「もう一度」。",
     "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。",
 ]
 # the two decks built from the same word list, side by side in 集中道場
 DECKS = {
     "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Real sentences · read and recall",
-                 "defaults": {"look": "dark", "mode": "read", "hint": "en"}, "method": SENTENCE_METHOD,
+                 "defaults": {"look": "dark", "mode": "read", "hint": "ja", "gloss": "tap"}, "method": SENTENCE_METHOD,
                  "anki": ("anki-sentence", "kotoba-mine-sentence-v3", "Kotoba Mine Sentence", "Read", "kotoba-mine-v3"),
                  "out": ("kotoba-mine.apkg", "kotoba-mine.tsv", "study.html")},
     "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Massive-context cloze · passages",
-            "defaults": {"look": "ai", "mode": "self", "hint": "ja"}, "unlockDays": 3,
+            "defaults": {"look": "ai", "mode": "self", "hint": "ja", "gloss": "tap"}, "unlockDays": 3,
             "anki": ("anki", "kotoba-mine-mcd-v4", "Kotoba Mine MCD", "Cloze", "kotoba-mine-v4"),
             "out": ("kotoba-mcd.apkg", "kotoba-mcd.tsv", "study-mcd.html")},
 }
@@ -382,6 +382,80 @@ def align(form: str, reading: str, _whole: bool = True) -> list[tuple[str, str]]
     return None  # a reading the table cannot split is never guessed (讃岐 is not 讃=さぬ)
 
 
+# ------------------------------------------------------------------ the target sentence
+# The back translates only the sentence that holds the target (CARD_CONTRACT_V2 §3.6). The
+# player's zoom (mount.js sentenceEnds) splits a passage with the same rule.
+JA_OPEN, JA_CLOSE, JA_END = "「『（(【〈《", "」』）)】〉》", "。！？!?"
+EN_ABBR = {"mr", "mrs", "ms", "dr", "st", "no", "vs", "etc", "e.g", "i.e", "u.s", "jr", "sr", "prof", "inc", "co", "ltd", "mt", "approx"}
+
+
+def sentence_ends(ja: str) -> list[int]:
+    """where each sentence of a passage ends: after 。！？ outside brackets, with any closing
+    marks that follow; the last sentence runs to the end of the passage"""
+    out, depth, i, n = [], 0, 0, len(ja)
+    while i < n:
+        ch = ja[i]
+        if ch in JA_OPEN:
+            depth += 1
+        elif ch in JA_CLOSE:
+            depth = max(0, depth - 1)
+        elif ch in JA_END and depth == 0:
+            j = i + 1
+            while j < n and (ja[j] in JA_END or ja[j] in JA_CLOSE):
+                j += 1
+            out.append(j)
+            i = j
+            continue
+        i += 1
+    if not out or out[-1] < n:
+        if ja[out[-1] if out else 0:].strip():
+            out.append(n)
+        else:
+            out[-1] = n
+    return out
+
+
+def en_sentences(en: str) -> list[str]:
+    """an English translation cut into sentences (not after Mr., U.S., initials …)"""
+    out, start = [], 0
+    for m in re.finditer(r'[.!?]+["”’)\]]*\s+(?=["“‘(\[]?[A-Z0-9])', en):
+        word = re.search(r'([\w.]+)[.!?]+["”’)\]]*\s+$', en[start:m.end()])
+        if m.group(0)[0] == "." and word and (word.group(1).lower().rstrip(".") in EN_ABBR or re.fullmatch(r"[A-Z]", word.group(1))):
+            continue
+        out.append(en[start:m.end()].strip())
+        start = m.end()
+    if en[start:].strip():
+        out.append(en[start:].strip())
+    return out
+
+
+def target_sentence_en(ja: str, en: str, at: int) -> str | None:
+    """the English of the sentence holding the target (at = its offset in ja): the whole
+    translation for a one-sentence passage; otherwise the matching English sentence when both
+    sides have the same number of sentences, else None (the back then offers no 英訳)"""
+    ends = sentence_ends(ja)
+    if len(ends) == 1:
+        return en
+    parts = en_sentences(en)
+    if len(parts) != len(ends):
+        return None
+    return parts[next(k for k, e in enumerate(ends) if at < e)]
+
+
+# ------------------------------------------------------------------ 類語 (sem.json)
+_SEM: dict | None = None
+
+
+def sem_for(term: str) -> list[dict]:
+    """dictionary cross-references for a word from the corridor's semantic table; the player
+    shows them only once the card is in review state (R13)"""
+    global _SEM
+    if _SEM is None:
+        path = CORRIDOR / "data" / "proprietary_safe" / "sem.json"
+        _SEM = json.loads(path.read_text("utf-8")).get("edges", {}) if path.exists() else {}
+    return [{"w": e["w"], "rel": e["rel"], **({"note": e["note"]} if e.get("note") else {})} for e in _SEM.get(term, [])]
+
+
 # 字 cards the build leaves out, reported at the end: [card id or key] and [(word, term, ids)]
 KANJI_VISIBLE: list[str] = []
 KANJI_UNALIGNED: list[tuple[str, str, list[str]]] = []
@@ -399,10 +473,13 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
         if "".join(seg[0] for seg in ruby) != p["ja"]:
             raise SystemExit(f"{wid} passage {pi}: ruby does not spell the passage")
         src = source(p)
+        ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
         base = {"ja": p["ja"], "form": p["form"], "en": p["en"], "kind": p["kind"], "src": src, "passage": pi}
+        en_target = target_sentence_en(p["ja"], p["en"], sum(len(seg[0]) for seg in ruby[:ti]))
+        if en_target is not None:
+            base["enTarget"] = en_target
         cards.append({**base, "type": "word", "ruby": ruby})
         keys.append(word_key(wid, p["ja"]))
-        ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
         parts = align(p["form"], ruby[ti][1])
         if pi == 1 and parts is None:
             known = ids.known("kotoba-mcd")
@@ -434,7 +511,7 @@ METHOD = [
     "「語」カード：単語まるごとが穴。下の日本語の説明と文脈から思い出す。",
     "「字」カード：単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
-    "裏：ふりがな付きの全文、読み、意味。英訳はタップで。出典つき。",
+    "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、出典はタップで開く。",
     "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。",
 ]
 
@@ -502,6 +579,8 @@ def build_deck(mods: list[dict], ids: IdManifest, kind: str = "mcd") -> dict:
             }
             if c.get("tip"):
                 word["tip"] = c["tip"]
+            if sem := sem_for(c["term"]):
+                word["sem"] = sem
             words.append(word)
     return {
         "format": "bunki-cloze-deck",
@@ -751,7 +830,8 @@ def note_rows(deck: dict) -> list[dict]:
                 "Source": html.escape(card.get("src", {}).get("site") or KIND_JA.get(card["kind"], "")),
                 "SourceURL": html.escape(card.get("src", {}).get("url", "")),
                 "SentenceFurigana": anki_furigana(card["ruby"]),
-                "SentenceEN": html.escape(card["en"]),
+                # a passage translates only its target sentence (none when it cannot be matched)
+                "SentenceEN": html.escape(card.get("enTarget", "") if card.get("type") else card["en"]),
                 "Tip": html.escape(w.get("tip", "")),
                 "POS": POS_KEY.get(w["pos"], "noun"),
                 "Kanji": "".join(

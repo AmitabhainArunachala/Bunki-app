@@ -252,6 +252,34 @@
       "surface": "甲賀",
       "right": "こうか",
       "wrong": "こうが"
+    },
+    {
+      "card": "km-149-m03",
+      "after": "斉藤愛",
+      "surface": "璃",
+      "right": "り",
+      "wrong": ""
+    },
+    {
+      "card": "km-298-m02",
+      "after": "鹹",
+      "surface": "豆",
+      "right": "とう",
+      "wrong": "まめ"
+    },
+    {
+      "card": "km-298-m02",
+      "after": "鹹豆",
+      "surface": "漿",
+      "right": "しょう",
+      "wrong": ""
+    },
+    {
+      "card": "km-298-m02",
+      "after": "（25",
+      "surface": "元",
+      "right": "げん",
+      "wrong": "もと"
     }
   ]
 }

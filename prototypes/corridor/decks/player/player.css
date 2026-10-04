@@ -115,7 +115,6 @@
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: 6px 6px 0 0; margin: 0 2px; line-height: 1.3; }
 .kp-target { color: var(--kp-cyan); font-weight: 700; }
 .kp-target rt { color: var(--kp-cyan); }
-.kp-tapword { border-bottom: 1px dotted var(--kp-mute); cursor: pointer; }
 .kp-hint { margin: 0; font-size: 16px; color: var(--kp-ink-2); }
 .kp-taphint { margin: 0; font-size: 12px; color: var(--kp-mute); letter-spacing: 0.08em; }
 
@@ -124,23 +123,50 @@
 .kp-term { font-size: 34px; font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
 .kp-reading { font-size: 18px; color: var(--kp-ink-2); }
 .kp-def { margin: 0; font-size: 17px; line-height: 1.6; }
-.kp-meaning { margin: 0; font-size: 15px; color: var(--kp-green); font-weight: 600; }
+.kp-note { margin: 0; font-size: 15px; line-height: 1.6; color: var(--kp-ink-2); }
+.kp-pitch { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); border: 1px solid var(--kp-line); border-radius: 6px; padding: 0 5px; }
 .kp-en { margin: 0; font-size: 14px; color: var(--kp-ink-2); line-height: 1.5; }
-.kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); border-left: 3px solid var(--kp-amber); padding-left: 10px; line-height: 1.5; }
+.kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); line-height: 1.5; }
+.kp-tip-label { color: var(--kp-mute); }
 .kp-src { margin: 2px 0 0; font-size: 12px; color: var(--kp-ink-2); letter-spacing: .02em; }
+
+/* the back's second tier: one tap each, the same order on every card */
+.kp-folds { display: grid; margin-top: 6px; border-top: 1px solid var(--kp-line); }
+.kp-fold { border-bottom: 1px solid var(--kp-line); }
+.kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--kp-ink-2); letter-spacing: .04em; }
+.kp-fold > summary::-webkit-details-marker { display: none; }
+.kp-fold > summary::before { content: '▸'; color: var(--kp-mute); font-size: 11px; width: 1em; }
+.kp-fold[open] > summary::before { content: '▾'; }
+.kp-fold > :not(summary) { margin-bottom: 10px; }
+.kp-gloss { margin: 0; font-size: 15px; line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
+.kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-sem b { color: var(--kp-ink); font-weight: 600; margin-right: 8px; }
+.kp-sem-rel { font-size: 12px; color: var(--kp-mute); margin-right: 8px; }
+.kp-sem small { display: block; font-size: 12px; color: var(--kp-mute); }
+
+/* zoom: 全文 or 焦点 (the sentences around the target dimmed, never removed) */
+.kp-zoom { margin-left: auto; display: inline-flex; border: 1px solid var(--kp-line); border-radius: 999px; overflow: hidden; }
+.kp-zoom-btn { border: 0; background: none; font-size: 12px; padding: 2px 10px; min-height: 28px; color: var(--kp-ink-2); }
+.kp-zoom-btn[aria-pressed='true'] { background: var(--kp-cyan-wash); color: var(--kp-cyan); font-weight: 700; }
+.kp-s { transition: opacity 0.16s cubic-bezier(0.2, 0, 0, 1); }
+.kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.38; }
 .kp-src a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 
 .kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: 16px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 17px; font-weight: 700; }
 .kp-grades { display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; position: sticky; bottom: 0; z-index: 2; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom); background: var(--kp-bg); }
-.kp-grades.is-four { grid-template-columns: 1fr 0.8fr 1.2fr 0.8fr; }
 .kp-grade { min-height: 64px; border-radius: 14px; border: 1px solid var(--kp-line); background: var(--kp-panel); display: grid; place-content: center; gap: 2px; }
 .kp-grade b { font-size: 15px; }
 .kp-grade small { font-family: var(--kp-num); font-size: 12px; color: var(--kp-ink-2); }
 .kp-again { border-color: var(--kp-red); } .kp-again b { color: var(--kp-red); }
-.kp-hard b { color: var(--kp-amber); }
 .kp-good { border-color: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); } .kp-good b { color: var(--kp-green); }
-.kp-easy b { color: var(--kp-violet); }
 .kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: 11px; color: var(--kp-mute); letter-spacing: 0.1em; }
+.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-rule-x { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+/* phones: the grade bar is pinned to the bottom of the screen, so a long passage never hides it */
+@media (max-width: 640px) {
+  .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
+  .kp-study.has-bar { padding-bottom: var(--kp-bar-h, 140px); }
+}
 .kp-undo { justify-self: center; background: none; border: 0; color: var(--kp-mute); font-size: 13px; padding: 8px; }
 .kp-verdict { margin: 0; text-align: center; font-size: 18px; font-weight: 700; }
 
@@ -180,13 +206,11 @@
   .kp-row .kp-dots { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .kp-card, .kp-progress i { transition: none; }
+  .kp-card, .kp-progress i, .kp-s { transition: none; }
 }
 .kp-method { margin: 16px 0 4px; border: 1px solid var(--kp-line, #26303b); border-radius: 14px; padding: 10px 14px; }
 .kp-method summary { cursor: pointer; font-weight: 700; color: var(--kp-cyan); }
 .kp-method p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
-.kp-endetails summary { cursor: pointer; font-size: 13px; color: var(--kp-ink-2); }
-.kp-endetails[open] summary { margin-bottom: 4px; }
 .kp-blank { color: var(--kp-cyan); }
 
 /* ---------------------------------------------------------------- themes
@@ -262,4 +286,3 @@
 .kp-pos-adv .kp-posbadge { color: var(--kp-adv); }
 .kp-pos-expr .kp-posbadge { color: var(--kp-expr); }
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
-.kp-gloss { font-size: 18px; margin-top: -4px; }
