@@ -83,10 +83,8 @@
   ],
   "60": [
     {
-      "ja": "彼は守備のかなめとしてチームを支えている。",
-      "form": "かなめ",
-      "en": "As the linchpin of the defense, he holds the team together.",
-      "original": true
+      "ja": "葛西のかなめとなるクリニックを開院いたしました。",
+      "en": "We have opened a clinic that we hope will become a cornerstone of the Kasai community."
     }
   ],
   "72": [
@@ -265,6 +263,10 @@
   ],
   "258": [
     {
+      "ja": "軍隊、帝室の費えがすべてこれで賄えるのか。",
+      "en": "Can this really cover all the expenses of the army and the imperial household?"
+    },
+    {
       "ja": "長引く工事は町にとって大きな費えとなった。",
       "form": "費え",
       "en": "The drawn-out construction turned into a heavy waste of money for the town.",
@@ -294,6 +296,10 @@
     }
   ],
   "291": [
+    {
+      "ja": "ぜんぜん狙っていない、巧まざる魅力、憧れます。",
+      "en": "That completely unforced, artless charm—I really admire it."
+    },
     {
       "ja": "その画家は巧まずして自然の美しさを描き出した。",
       "form": "巧まずして",

@@ -56,38 +56,38 @@
  ],
  "6": [
   {
-   "ja": "ブレスレットとの相乗効果で、きっと恋愛運もアップするはず！",
+   "ja": "仲間との協力によって得られる相乗効果は、目標達成やチームの成長に不可欠です。",
    "form": "相乗",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／Peachy",
-   "url": "http://news.livedoor.com/article/detail/4938749/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "The synergy gained from working with teammates is essential for reaching goals and growing as a team.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/k5fujiwara/n/nf855fff875b9",
+   "licence": "web quotation (personal study)"
   }
  ],
  "7": [
   {
+   "ja": "強風のため電線が数箇所で切断された。",
+   "form": "箇所",
+   "en": "Several sections of the power lines were cut by the strong winds.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
+  },
+  {
    "ja": "私はスキー中に２箇所も骨折した。",
    "form": "箇所",
-   "en": "I broke my leg in two places during a skiing mishap.",
+   "en": "I broke bones in two places while skiing.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "開会式は聖火台が2箇所、4つの会場で行われた。",
+   "ja": "投票は午前7時から午後8時まで県内934箇所で行われ、即日開票された。",
    "form": "箇所",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "6,000箇所の投票所が設けられ、厳戒態勢のなかで選挙が行われた。",
-   "form": "箇所",
-   "en": "",
+   "en": "Voting took place at 934 locations across the prefecture from 7 a.m. to 8 p.m., and the votes were counted the same day.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
@@ -116,20 +116,20 @@
  ],
  "9": [
   {
-   "ja": "いざという時に困らないようにしておきたい。",
+   "ja": "いざという時のために備えておかないとね。",
    "form": "いざという時",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／家電チャンネル",
-   "url": "http://news.livedoor.com/article/detail/6090262/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "We have to be prepared for when it really counts.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/11686336",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "10": [
   {
    "ja": "本物と偽物を見分けるのは困難だ。",
    "form": "見分ける",
-   "en": "It is hard to discern between the true and the false.",
+   "en": "It's hard to tell the real thing from a fake.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -140,29 +140,29 @@
   {
    "ja": "2013年2月15日、直径17mの小惑星が地球の大気圏に突入した。",
    "form": "突入",
-   "en": "",
+   "en": "On February 15, 2013, an asteroid 17 meters across entered Earth's atmosphere.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
   },
   {
-   "ja": "ゴールデンウィークに突入しましたが、みなさんいかがお過ごしでしょうか？",
+   "ja": "鉱山労働者が賃上げを要求してストに突入した。",
    "form": "突入",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6517982/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
-   "ja": "ソレノイドへの突入電流でノイズが発生します。",
-   "form": "突入",
-   "en": "Noise is produced by the sudden flow of current into a solenoid.",
+   "en": "The miners went on strike to demand a wage increase.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
+  },
+  {
+   "ja": "ゴールデンウィークに突入しましたが、みなさんいかがお過ごしでしょうか？",
+   "form": "突入",
+   "en": "Golden Week has begun; how is everyone spending it?",
+   "kind": "news",
+   "site": "livedoor ニュース／ITライフハック",
+   "url": "http://news.livedoor.com/article/detail/6517982/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "12": [
@@ -180,7 +180,7 @@
   {
    "ja": "素晴らしい考えがひらめいた。",
    "form": "ひらめい",
-   "en": "A wonderful idea just ran through my mind.",
+   "en": "A wonderful idea suddenly came to me.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -189,22 +189,22 @@
  ],
  "14": [
   {
-   "ja": "最善を尽くしなさい。そうすれば成功するでしょう。",
+   "ja": "たいへん困難な仕事だけれども、私は最善を尽くします。",
    "form": "最善",
-   "en": "Do your best, and you will succeed.",
+   "en": "It's a very difficult job, but I'll do my best.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/170400",
+   "url": "https://tatoeba.org/ja/sentences/show/203898",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "選手一人一人が最善を尽くした。",
+   "ja": "人は全員、最善を尽くしている。",
    "form": "最善",
-   "en": "Every player did his best.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Everyone is doing the best they can.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/chinobox/n/n4a8704ea50b1",
+   "licence": "web quotation (personal study)"
   }
  ],
  "15": [
@@ -269,13 +269,13 @@
  ],
  "18": [
   {
-   "ja": "女性の体についての素朴な疑問に医学的な見地から答えているわ。",
+   "ja": "物事を実際的な見地から見ようとしなければならない。",
    "form": "見地",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5525085/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "You should try to look at things from a practical standpoint.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/83750",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "19": [
@@ -335,49 +335,49 @@
  ],
  "24": [
   {
-   "ja": "正直なところ、それはいちかばちかだ。",
+   "ja": "正直な人なら、そんなことはしないだろう。",
    "form": "正直",
-   "en": "Honestly, it's all or nothing.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "An honest person wouldn't do something like that.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/142905",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "正直に言って、それは法律と法律の実務の問題です。",
+   "ja": "正直なところ、あの人とは仕事はしたくないわ。",
    "form": "正直",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "To be honest, I don't want to work with that person.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/11018034",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "正直いって独女にとってはやりきれない話である。",
+   "ja": "正直いって将来が不安になってきたんですよ。",
    "form": "正直",
-   "en": "",
+   "en": "Honestly, I've started to feel anxious about the future.",
    "kind": "news",
    "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/4880084/",
+   "url": "http://news.livedoor.com/article/detail/5212559/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "25": [
   {
-   "ja": "率直に言って、彼は間違っている。",
+   "ja": "率直に言って、君は間違っていると思う。",
    "form": "率直に言って",
-   "en": "Frankly speaking, he is wrong.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/1836389",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "en": "Frankly, I think you're wrong.",
+   "kind": "qa",
+   "site": "detail.chiebukuro.yahoo.co.jp",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q12234508152",
+   "licence": "web quotation (personal study)"
   }
  ],
  "26": [
   {
-   "ja": "私は愚かな迷信など信じない。",
+   "ja": "多くの迷信がまだ信じられている。",
    "form": "迷信",
-   "en": "I have no faith in a silly superstition.",
+   "en": "Many superstitions are still believed.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -408,35 +408,35 @@
  ],
  "29": [
   {
-   "ja": "断続的ですが、もう２、３ヶ月になります。",
+   "ja": "断続的に発生する規模の大きな地震の影響で、建造物にも深刻な被害が出ている。",
    "form": "断続的",
-   "en": "It's been intermittent for 2 or 3 months.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
+   "en": "Large earthquakes striking on and off have also caused serious damage to buildings.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 2.5"
   }
  ],
  "30": [
   {
-   "ja": "子供が壊れた家屋の下敷きになって、死亡したとの情報がある。",
+   "ja": "下敷きはどこで売っていますか？",
    "form": "下敷き",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "Where are pencil boards sold?",
+   "kind": "qa",
+   "site": "detail.chiebukuro.yahoo.co.jp",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1028791205",
+   "licence": "web quotation (personal study)"
   }
  ],
  "31": [
   {
-   "ja": "子供が壊れた家屋の下敷きになって、死亡したとの情報がある。",
+   "ja": "彼は倒れた木の下敷きになってうごけなかった。",
    "form": "下敷きになっ",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
+   "en": "He was pinned under a fallen tree and couldn't move.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.5"
+   "licence": "CC BY 4.0"
   }
  ],
  "32": [
@@ -536,42 +536,42 @@
  ],
  "39": [
   {
+   "ja": "端から見たら滑稽に見えるかもしれない。",
+   "form": "滑稽",
+   "en": "It might look ridiculous to people watching from the outside.",
+   "kind": "news",
+   "site": "livedoor ニュース／独女通信",
+   "url": "http://news.livedoor.com/article/detail/5716462/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
+  },
+  {
    "ja": "滑稽な話をしている真最中に彼に電話がかかってきたので話を中止した。",
    "form": "滑稽",
-   "en": "He was in the middle of a funny story when he stopped to answer the telephone.",
+   "en": "He was in the middle of telling a funny story when he got a phone call, so he stopped.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "滑稽に見えても、愛を見つける力は、私の方が上だわ！",
-   "form": "滑稽",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5374411/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "40": [
   {
-   "ja": "稽古場の真ん中の踊り子は今にも踊り始めようとしています。",
-   "form": "稽古場",
-   "en": "The dancer in the middle of the room is ready to begin.",
+   "ja": "彼らはけんかをしているのではなく、劇の稽古をしているところだ。",
+   "form": "稽古",
+   "en": "They aren't fighting; they're rehearsing a play.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "稽古が終わったばっかりで、今、ゴロゴロしてます。",
-   "form": "稽古",
-   "en": "I just got done with practice, and now I'm lying down.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/11049019",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "ja": "彼がとても滑稽な話をしたので、私たちはみんな笑った。",
+   "form": "滑稽",
+   "en": "He told such a funny story that we all laughed.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
   }
  ],
  "41": [
@@ -598,22 +598,22 @@
  ],
  "43": [
   {
-   "ja": "無拳流空手道の空手クラスとバランスよく格闘技を学ぶことができます。",
+   "ja": "ジョージは、最近３時間の格闘の末に釣った、重さ３０ポンドのバスの話をしていた。",
    "form": "格闘",
-   "en": "",
+   "en": "George was talking about a 30-pound bass he had recently caught after a three-hour fight.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
+  },
+  {
+   "ja": "武道や格闘技といわれれば、少し敷居の高さを感じてしまう方もいるでしょう。",
+   "form": "格闘",
+   "en": "When it comes to budo or martial arts, some people may find them a little intimidating.",
    "kind": "news",
    "site": "livedoor ニュース／livedoor HOMME",
    "url": "http://news.livedoor.com/article/detail/4702864/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
-   "ja": "反学園都市サイエンスガーディアンがバゲージシティで開催した異種格闘大会。",
-   "form": "格闘",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
-   "url": "",
-   "licence": "CC BY-SA 4.0"
   }
  ],
  "44": [
@@ -638,42 +638,42 @@
  ],
  "45": [
   {
-   "ja": "演習の時と違うのだから、いざ空襲という時などには、その指揮の責任は重大だ。",
+   "ja": "小学校の運動場に消防演習があった。",
    "form": "演習",
-   "en": "",
+   "en": "There was a fire drill on the elementary school playground.",
    "kind": "literature",
-   "site": "青空文庫『十二月八日』太宰治",
-   "url": "https://www.aozora.gr.jp/cards/000035/",
+   "site": "青空文庫『或る部落の五つの話』佐左木俊郎",
+   "url": "https://www.aozora.gr.jp/cards/000134/",
    "licence": "public domain (Aozora Bunko)"
   },
   {
-   "ja": "ひたすら演習確認したところでテスト解ける気がしないし、もう寝てもよかろうか。",
+   "ja": "今回の軍事演習に対して、日本や豪州などの世界各国から批判が相次いだ。",
    "form": "演習",
-   "en": "",
-   "kind": "social",
-   "site": "SNS投稿（WRIME）",
+   "en": "The military exercises drew a stream of criticism from countries around the world, including Japan and Australia.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY-NC-ND 4.0"
+   "licence": "CC BY 2.5"
   }
  ],
  "46": [
   {
-   "ja": "古代でも動物を兵器として利用する方法が模索されていた。",
+   "ja": "より簡単な解決策を模索している。",
    "form": "模索",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "I'm looking for a simpler solution.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/8642526",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "現状の打開策を暗中模索している。",
+   "ja": "年内再開が厳しい見通しで、代替生産の方法を模索する動きが広がっている。",
    "form": "模索",
-   "en": "We are groping for a way out of the present situation.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "With a restart this year looking unlikely, more companies are searching for ways to produce elsewhere.",
+   "kind": "news",
+   "site": "livedoor ニュース／家電チャンネル",
+   "url": "http://news.livedoor.com/article/detail/6003987/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "47": [
@@ -691,7 +691,7 @@
   {
    "ja": "少年たちはひそひそ話していた。何かをたくらんでいるのがわかった。",
    "form": "たくらん",
-   "en": "The boys were whispering; I knew they were up to something.",
+   "en": "The boys were whispering; I could tell they were up to something.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -773,33 +773,33 @@
  ],
  "54": [
   {
-   "ja": "子供は反抗的になる傾向がある。",
+   "ja": "反抗的な態度は１０代に特有なものである。",
    "form": "反抗的",
-   "en": "Children are inclined to be disobedient.",
+   "en": "A defiant attitude is typical of teenagers.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/168512",
+   "url": "https://tatoeba.org/ja/sentences/show/121245",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "55": [
   {
-   "ja": "口語英語に一層興味があります。",
-   "form": "一層",
-   "en": "I'm more interested in spoken English.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
-  },
-  {
    "ja": "結婚が決まってから母と娘の結びつきが一層強くなったそうだ。",
    "form": "一層",
-   "en": "",
+   "en": "I hear the bond between mother and daughter grew even stronger after the wedding was set.",
    "kind": "news",
    "site": "livedoor ニュース／独女通信",
    "url": "http://news.livedoor.com/article/detail/5127080/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
+  },
+  {
+   "ja": "みんなで食べるとより一層美味しいのです。",
+   "form": "一層",
+   "en": "Food tastes even better when everyone eats together.",
+   "kind": "blog",
+   "site": "ameblo.jp",
+   "url": "https://ameblo.jp/otonoumi55/entry-12878507343.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "56": [
@@ -855,33 +855,24 @@
  ],
  "59": [
   {
-   "ja": "薬剤をもって子女を惑わしたという罪に問おうとすれば、娘も最初から共謀である。",
+   "ja": "彼は五十万円を共謀者に渡した。",
    "form": "共謀",
-   "en": "",
+   "en": "He handed 500,000 yen to his co-conspirator.",
    "kind": "literature",
-   "site": "青空文庫『中国怪奇小説集』閲微草堂筆記（清）",
-   "url": "https://www.aozora.gr.jp/cards/000082/",
+   "site": "青空文庫『地獄の使者』海野十三",
+   "url": "https://www.aozora.gr.jp/cards/000160/",
    "licence": "public domain (Aozora Bunko)"
-  },
-  {
-   "ja": "時事通信によれば、7月に逮捕された同事務所部長・松尾俊一容疑者（47歳）らと共謀した上での犯行とされる。",
-   "form": "共謀",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
   }
  ],
  "60": [
   {
-   "ja": "彼は守備のかなめとしてチームを支えている。",
+   "ja": "葛西のかなめとなるクリニックを開院いたしました。",
    "form": "かなめ",
-   "en": "As the linchpin of the defense, he holds the team together.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original"
+   "en": "We have opened a clinic that we hope will become a cornerstone of the Kasai community.",
+   "kind": "company",
+   "site": "kaname-cl.jp",
+   "url": "https://kaname-cl.jp/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "61": [
@@ -897,145 +888,145 @@
  ],
  "62": [
   {
-   "ja": "帝国大学としては比較的新しく、開学当初は医学部と理学部のみで創設された。",
+   "ja": "私は私立大学の理学部物理学科を卒業しました。",
    "form": "理学",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "I graduated from the physics department of the science faculty at a private university.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/hiyoko299792458/n/nd0d7b58825b8",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "理学部を卒業した学生のほとんどが修士課程に進み、そのほぼ半数が博士課程に進む。",
+   "ja": "理学部は工学部に比べて進路の幅が狭い、と言われます。",
    "form": "理学",
-   "en": "Most graduates of the Department of Science proceed to a master's program, and roughly half of those continue on to their PhD.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/4154576",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "en": "It is said that a science faculty offers a narrower range of career paths than an engineering faculty.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/eduwave/n/n9d7c4d2837c7",
+   "licence": "web quotation (personal study)"
   }
  ],
  "63": [
   {
-   "ja": "もっともっとゴールを量産して、限界は決めないで。",
+   "ja": "いったん開発を終えてしまえば、集積回路の量産は容易である。",
    "form": "量産",
-   "en": "",
+   "en": "Once development is finished, mass-producing integrated circuits is easy.",
+   "kind": "literature",
+   "site": "青空文庫『パソコン創世記』富田倫生",
+   "url": "https://www.aozora.gr.jp/cards/000055/",
+   "licence": "public domain (Aozora Bunko)"
+  },
+  {
+   "ja": "薄い液晶パネルは3mm程度の厚みから量産されているが、さらに薄くすることも技術的には可能だ。",
+   "form": "量産",
+   "en": "Thin LCD panels are mass-produced at around 3 mm thick, but making them even thinner is technically possible.",
    "kind": "news",
-   "site": "livedoor ニュース／Sports Watch",
-   "url": "http://news.livedoor.com/article/detail/6463563/",
+   "site": "livedoor ニュース／ITライフハック",
+   "url": "http://news.livedoor.com/article/detail/6611729/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   },
   {
-   "ja": "BDドライブの薄型化とコスト低減に向け、2008年内に量産化を目指すとした。",
+   "ja": "安定した供給のための量産体制の構築が鍵を握ります。",
    "form": "量産",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  },
-  {
-   "ja": "2月に1機、3月に36機、4月に89機と、量産は急速に進んだ。",
-   "form": "量産",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "Building a mass-production system for a stable supply is the key.",
+   "kind": "company",
+   "site": "www.p2enesol.com",
+   "url": "https://www.p2enesol.com/stories/011/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "64": [
   {
    "ja": "財政赤字の削減が政府の大きな関心事である。",
    "form": "財政",
-   "en": "Reducing the budget deficit is a major concern of the government.",
+   "en": "Reducing the budget deficit is a major concern for the government.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "ユーロ導入国の財政赤字がユーロ相場や株式市場に悪影響を及ぼすのを回避する狙いがある。",
+   "ja": "多くの先進国が財政危機に直面している。",
    "form": "財政",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
+   "en": "Many developed countries are facing fiscal crises.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY-SA 4.0"
+   "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "財政は一般会計、医療施設会計、血液事業会計、社会福施設会計に分かれる。",
+   "ja": "財政を改善するには、歳出削減、増税、インフレの3つしか手段はない。",
    "form": "財政",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "There are only three ways to improve public finances: cutting spending, raising taxes, or inflation.",
+   "kind": "gov",
+   "site": "rieti.go.jp",
+   "url": "https://www.rieti.go.jp/jp/papers/contribution/kobayashi/21.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "65": [
   {
    "ja": "資金不足のためわれわれの計画は挫折した。",
    "form": "資金",
-   "en": "Our plan failed because of the shortage of funds.",
+   "en": "Our plan fell through because of a lack of funds.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "まず第一に、雑貨店を運営するには資金が不十分だ。",
+   "ja": "戦争の資金を調達するために公債が発行された。",
    "form": "資金",
-   "en": "To begin with, the funds are not sufficient for running a grocery.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/195573",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "en": "Government bonds were issued to raise funds for the war.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "資金のことを心配する必要はない。",
+   "ja": "資金のことを心配する必要はないよ。",
    "form": "資金",
-   "en": "There is no need to worry about funds.",
+   "en": "You don't have to worry about the funds.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/150999",
+   "url": "https://tatoeba.org/ja/sentences/show/151004",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "66": [
   {
-   "ja": "ユーザーは元本、利回り（金利）、期間をタップして入力するだけ。",
+   "ja": "その投資には６％の利回りが保証されている。",
    "form": "利回り",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6478741/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "The investment comes with a guaranteed 6% yield.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "67": [
   {
-   "ja": "奴隷の反乱によって妨害された中間航路。",
+   "ja": "1986年からフェロー諸島はシー・シェパードによる妨害活動を受けた。",
    "form": "妨害",
-   "en": "Slave revolts interfere with Middle Passage.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
+   "en": "From 1986, the Faroe Islands faced obstruction campaigns by Sea Shepherd.",
+   "kind": "wiki",
+   "site": "ja.wikipedia.org",
    "url": "",
-   "licence": "CC BY 4.0"
+   "licence": "CC BY-SA (Wikipedia)"
+  },
+  {
+   "ja": "武装勢力による妨害を防ぐために、地元の警察・軍・駐留中の外国軍部隊が監視に当たった。",
+   "form": "妨害",
+   "en": "Local police, the army and foreign troops stationed there kept watch to prevent interference by armed groups.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5 (Wikinews)"
   },
   {
    "ja": "警察当局は威力業務妨害容疑として捜査に当たっている。",
    "form": "妨害",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "同社は、威力業務妨害で被害届けを出すことも視野に入れて対応を検討している。",
-   "form": "妨害",
-   "en": "",
+   "en": "The police are investigating it as a case of forcible obstruction of business.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
@@ -1064,53 +1055,53 @@
  ],
  "69": [
   {
-   "ja": "記事の論調は一種の悲観論だった。",
+   "ja": "人生をそう悲観してはいけない。",
    "form": "悲観",
-   "en": "The article's tone was one of pessimism.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "You shouldn't be so pessimistic about life.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/143968",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "つい、悲観的に考えてしまっては、「1」の気持ちだから返事がないのでは？",
+   "ja": "トムってかなり悲観的だよね。",
    "form": "悲観",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／Peachy",
-   "url": "http://news.livedoor.com/article/detail/4595989/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Tom is pretty pessimistic, isn't he?",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/8751046",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "70": [
   {
-   "ja": "冷戦時代、各作品でのソ連などの共産圏の扱いは、「雪解けのバロメーター」とさえされた。",
+   "ja": "第二次世界大戦が終わると冷戦が始まった。",
    "form": "冷戦",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "The Cold War began when World War II ended.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/2261115",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "冷戦はソビエトの崩壊と共に終わった。",
+   "ja": "東西対立を象徴する「ベルリンの壁」が89年に崩壊し、冷戦は終結。",
    "form": "冷戦",
-   "en": "The Cold War ended when the Soviet Union collapsed.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "The Berlin Wall, a symbol of the East-West divide, fell in 1989, and the Cold War came to an end.",
+   "kind": "news",
+   "site": "nikkei.com",
+   "url": "https://www.nikkei.com/article/DGXZQOUE226CG0S2A220C2000000/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "71": [
   {
-   "ja": "セ・リーグも2005年度に続いて交流試合込みの146試合でリーグ戦の覇権を争う。",
+   "ja": "米中は覇権争いをしているのか？",
    "form": "覇権",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "Are the US and China locked in a struggle for global dominance?",
+   "kind": "other",
+   "site": "koken-publication.com",
+   "url": "https://koken-publication.com/archives/153",
+   "licence": "web quotation (personal study)"
   }
  ],
  "72": [
@@ -1155,22 +1146,22 @@
  ],
  "74": [
   {
-   "ja": "ポイント還元率の高い商品は購入の際に、ポイントを貯める。",
+   "ja": "キャッシュレス決済にはポイント還元以外にもたくさんのメリットがあります。",
    "form": "還元",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／家電チャンネル",
-   "url": "http://news.livedoor.com/article/detail/6468537/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Cashless payments have many advantages besides point rebates.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/sakamon/n/nd7d0123ce296",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "ゲイツ会長、広告収入をユーザーに還元する意向表明。",
+   "ja": "還元率を最大化する最もシンプルな方法は、できるだけ多くの経費を1枚のカードに集約することです。",
    "form": "還元",
-   "en": "Bill Gates announces intent to return advertising revenue to the users.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "The simplest way to maximize your rebate rate is to put as many expenses as possible on one card.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/royal_yak5583/n/nc825658e5768",
+   "licence": "web quotation (personal study)"
   }
  ],
  "75": [
@@ -1188,20 +1179,11 @@
   {
    "ja": "読売新聞が伝えた警察庁の分析によると、罰則強化が強い抑止力とのこと。",
    "form": "罰則",
-   "en": "",
+   "en": "According to a National Police Agency analysis reported by the Yomiuri Shimbun, tougher penalties are a strong deterrent.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "同年10月には、新設された罰則による初の書類送検事例が報道された。",
-   "form": "罰則",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
   }
  ],
  "77": [
@@ -1217,22 +1199,13 @@
  ],
  "78": [
   {
-   "ja": "EDAは半導体集積回路やプリント基板や電子回路の設計を支援する。",
+   "ja": "科学は単に事実と方法論の集積では決してない。",
    "form": "集積",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
+   "en": "Science is by no means just an accumulation of facts and methods.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  },
-  {
-   "ja": "集積回路が果たしてどこまで、どのように伸びていくものか、先行きは定かではなかった。",
-   "form": "集積",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『パソコン創世記』富田倫生",
-   "url": "https://www.aozora.gr.jp/cards/000055/",
-   "licence": "public domain (Aozora Bunko)"
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "79": [
@@ -1279,49 +1252,49 @@
  ],
  "82": [
   {
-   "ja": "親指、人差し指、中指の三指を覆う形状。",
+   "ja": "シートでガラスを覆うのはすごく簡単にできます。",
    "form": "覆う",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org（KFTT）",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "Covering the glass with a sheet is really easy to do.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/gajumarutei/n/n84e060688a56",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "電池カバーは、本体全体を覆うかたちで、はめ込み式です。",
+   "ja": "天体の表面を覆う液体の層のことを「海」と呼ぶこともある。",
    "form": "覆う",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／エスマックス",
-   "url": "http://news.livedoor.com/article/detail/6606062/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "A layer of liquid covering the surface of a celestial body is sometimes called a \"sea.\"",
+   "kind": "wiki",
+   "site": "ja.wikipedia.org",
+   "url": "",
+   "licence": "CC BY-SA (Wikipedia)"
   }
  ],
  "83": [
   {
+   "ja": "配線を間違えないように注意してキットを組み立てた。",
+   "form": "配線",
+   "en": "I assembled the kit, taking care not to get the wiring wrong.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
+  },
+  {
    "ja": "作業員は新しい家に配線工事をしている。",
    "form": "配線",
-   "en": "The workers are wiring the new house.",
+   "en": "The workers are doing the wiring in the new house.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "P5トラスの設置と電源配線の切り替えのために3回の船外活動が予定されている。",
-   "form": "配線",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
   }
  ],
  "84": [
   {
    "ja": "小学生以来久しぶりに地元に帰ってきたハヤトは、県立桃浜高校に編入する。",
    "form": "編入",
-   "en": "",
+   "en": "Hayato, back in his hometown for the first time since elementary school, transfers to Momohama Prefectural High School.",
    "kind": "news",
    "site": "livedoor ニュース／MOVIE ENTER",
    "url": "http://news.livedoor.com/article/detail/6241687/",
@@ -1363,22 +1336,22 @@
  ],
  "88": [
   {
-   "ja": "重さを軽減することを目的に無塗装で表面保護の塗膜だけで処理する場合もある。",
+   "ja": "作業負担を軽減するということは、骨格や筋肉に対する負荷を減らすことを意味します。",
    "form": "軽減",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "Reducing the workload means reducing the strain on bones and muscles.",
+   "kind": "company",
+   "site": "note.com",
+   "url": "https://note.com/smartsuit/n/na7a8d7c3d486",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "生理痛の軽減には、低用量ピルもいいわね。",
+   "ja": "2019年10月に消費税増税が実行され、それに伴い軽減税率制度も導入されました。",
    "form": "軽減",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5380252/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "The consumption tax was raised in October 2019, and a reduced tax rate system was introduced along with it.",
+   "kind": "company",
+   "site": "mirokukai.ne.jp",
+   "url": "https://www.mirokukai.ne.jp/channel/genre/series/post_87/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "89": [
@@ -1449,27 +1422,36 @@
  ],
  "95": [
   {
-   "ja": "A：隠蔽工作までしようとするなんて言語道断！",
+   "ja": "取引先との約束をメールでドタキャンするなど言語道断。",
    "form": "言語道断",
-   "en": "",
+   "en": "Canceling an appointment with a client at the last minute by email is outrageous.",
    "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/5769397/",
+   "site": "livedoor ニュース／独女通信",
+   "url": "http://news.livedoor.com/article/detail/4866257/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "96": [
   {
-   "ja": "値札を取りはずしていただけますか。",
+   "ja": "トムは値札を見て、お金が足りないことに気づいた。",
    "form": "値札",
-   "en": "Could you take off the price tag for me?",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Tom looked at the price tag and realized he didn't have enough money.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/8652613",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "97": [
+  {
+   "ja": "ほんとに暑さには耐えられない夏でした。",
+   "form": "耐え",
+   "en": "It was a summer when the heat was truly unbearable.",
+   "kind": "blog",
+   "site": "myconid.naturum.ne.jp",
+   "url": "https://myconid.naturum.ne.jp/e3257625.html",
+   "licence": "web quotation (personal study)"
+  },
   {
    "ja": "こんな侮辱には耐えられない。",
    "form": "耐え",
@@ -1478,26 +1460,26 @@
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "ある程度の寒さには耐えることができるが、寒冷地においては冬季は冬眠する。",
-   "form": "耐える",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
   }
  ],
  "98": [
   {
-   "ja": "オオカミが羊の群れに忍び寄った。",
-   "form": "忍び寄っ",
-   "en": "Wolves stalked the flock.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "ja": "甲賀（こうか）といえば隣接する伊賀（いが）とともに「忍びの里」として広く知られています。",
+   "form": "忍び",
+   "en": "Koka, together with neighbouring Iga, is widely known as a home of the ninja.",
+   "kind": "gov",
+   "site": "www.city.koka.lg.jp",
+   "url": "https://www.city.koka.lg.jp/10977.htm",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "お忍びで訪れるセレブリティも多いとか。",
+   "form": "忍び",
+   "en": "Apparently many celebrities visit incognito.",
+   "kind": "news",
+   "site": "livedoor ニュース／独女通信",
+   "url": "http://news.livedoor.com/article/detail/5858077/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "99": [
@@ -1524,44 +1506,44 @@
  ],
  "101": [
   {
+   "ja": "深い淵に潜む魚は、底の方でじっとしていて簡単には餌に反応しない傾向があります。",
+   "form": "淵",
+   "en": "Fish hiding in deep pools tend to stay still near the bottom and don't easily take bait.",
+   "kind": "blog",
+   "site": "sanshisuimei.jp",
+   "url": "https://sanshisuimei.jp/river/stream-fishing/1552/",
+   "licence": "web quotation (personal study)"
+  },
+  {
    "ja": "世界は破滅の淵に立たされている。",
    "form": "淵",
-   "en": "The world is on the edge of destruction.",
+   "en": "The world stands on the brink of destruction.",
    "kind": "tatoeba",
    "site": "Tatoeba",
    "url": "https://tatoeba.org/ja/sentences/show/8571361",
    "licence": "CC BY 2.0 FR (Tatoeba)"
-  },
-  {
-   "ja": "明徳義塾の馬淵史郎監督は、春夏の甲子園通算・50勝にあと1勝と迫った。",
-   "form": "馬淵史郎監督",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
   }
  ],
  "102": [
   {
-   "ja": "光は秒速186,000マイルで進む。",
+   "ja": "秒速15メートルの風ってどのくらいでしょうか？",
    "form": "秒速",
-   "en": "Light travels at a velocity of 186,000 miles per second.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "How strong is a wind of 15 meters per second?",
+   "kind": "qa",
+   "site": "detail.chiebukuro.yahoo.co.jp",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14328236784",
+   "licence": "web quotation (personal study)"
   }
  ],
  "103": [
   {
-   "ja": "あいつを見るとぞっとするよ。",
+   "ja": "ヘビのことを考えただけでもぞっとするよ。",
    "form": "ぞっと",
-   "en": "He gives me chills.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Just thinking about snakes makes me shudder.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/196731",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "104": [
@@ -1599,22 +1581,22 @@
  ],
  "107": [
   {
-   "ja": "ある日、借金返済のために秘密の運送屋（スマグラー）に放り込まれる。",
+   "ja": "父は高額な家のローンを返済している。",
    "form": "返済",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/5908168/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "My father is paying back a large loan on our house.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/1147515",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "出来るだけ早く借金は返済します。",
+   "ja": "奨学金の返済は最長20年と長期間続きます。",
    "form": "返済",
-   "en": "I will pay my debt as soon as possible.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Repaying a student loan goes on for a long time, up to 20 years.",
+   "kind": "company",
+   "site": "shogakukin.jp",
+   "url": "https://shogakukin.jp/32kuria/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "108": [
@@ -1628,40 +1610,40 @@
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "トークセッション：“外貨預金”ってイケてるの？",
+   "ja": "定期預金の引き出しはどのように行えばいいのでしょうか？",
    "form": "預金",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/6702284/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "How do I withdraw a fixed-term deposit?",
+   "kind": "qa",
+   "site": "detail.chiebukuro.yahoo.co.jp",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q13311723563",
+   "licence": "web quotation (personal study)"
   }
  ],
  "109": [
   {
    "ja": "金利が低下したので銀行貸し出しが増加している。",
    "form": "金利",
-   "en": "Bank lending is rising because of lower interest rates.",
+   "en": "Bank lending is rising because interest rates have fallen.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "たとえば、100万円を7.18％の金利で借りると、10年後には200万500円になる。",
+   "ja": "2024年3月のマイナス金利解除以降、住宅ローン金利は上昇傾向にあります。",
    "form": "金利",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6478741/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Since negative interest rates were lifted in March 2024, mortgage rates have been trending upward.",
+   "kind": "company",
+   "site": "resonabank.co.jp",
+   "url": "https://www.resonabank.co.jp/kojin/column/jutaku/column_0036.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "110": [
   {
    "ja": "利率は少しずつ上昇するだろう。",
    "form": "利率",
-   "en": "Gradually the interest rate will increase.",
+   "en": "Interest rates will gradually rise.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -1681,38 +1663,38 @@
  ],
  "112": [
   {
+   "ja": "資産運用って何から始めればいいの？",
+   "form": "運用",
+   "en": "Where should I start with investing my money?",
+   "kind": "blog",
+   "site": "www.fp-life.design",
+   "url": "https://www.fp-life.design/contents/blog/2724/",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "特別警報は2013年8月に運用が開始されている。",
+   "form": "運用",
+   "en": "The emergency warning system was put into operation in August 2013.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5 (Wikinews)"
+  },
+  {
    "ja": "もう少し諸規則の弾力的運用はできないか。",
    "form": "運用",
-   "en": "Can't you apply the rules a little more elastically?",
+   "en": "Can't the rules be applied a little more flexibly?",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "2010-2015年に運用を開始する予定。",
-   "form": "運用",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "運用試験が無い時間帯を使って観測する予定。",
-   "form": "運用",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
   }
  ],
  "113": [
   {
    "ja": "銀行は利息をとって金を貸してくれる。",
    "form": "利息",
-   "en": "A bank lends us money at interest.",
+   "en": "Banks lend money at interest.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -1754,69 +1736,60 @@
  ],
  "117": [
   {
-   "ja": "金の価格は日ごとに変動する。",
-   "form": "ごと",
-   "en": "The price of gold fluctuates daily.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "ja": "例のごとく、いろいろなパターンの写真を撮っていただきました。",
+   "form": "ごとく",
+   "en": "As usual, they took photos of me in all sorts of poses.",
+   "kind": "blog",
+   "site": "ameblo.jp",
+   "url": "https://ameblo.jp/aoyamashin2020/entry-12833985175.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "各選考委員はカテゴリごとに60点をもち、開催地を採点した。",
-   "form": "ごと",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "ja": "むやみに立ち向かうより、脱兎のごとく、早々に身をかわし、逃げてしまった方がよいのではないか。",
+   "form": "ごとく",
+   "en": "Rather than fighting back recklessly, isn't it better to dodge early and run off like a startled hare?",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/blue_ink/n/nbd438245f8a4",
+   "licence": "web quotation (personal study)"
   }
  ],
  "118": [
   {
-   "ja": "そんなことは余計なお世話だ。",
+   "ja": "東日本大震災から10年が経過しましたが、被災地の多くでは今もなお、復興が続けられています。",
    "form": "なお",
-   "en": "Mind your own business.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
+   "en": "Ten years have passed since the Great East Japan Earthquake, yet reconstruction is still going on in many of the affected areas.",
+   "kind": "other",
+   "site": "ggi.tohoku.ac.jp",
+   "url": "https://www.ggi.tohoku.ac.jp/fukushima.html",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "なお、明日の会議は午後3時からです。",
+   "form": "なお",
+   "en": "Note that tomorrow's meeting starts at 3 p.m.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
    "url": "",
-   "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "今日はとても残念なお知らせがあります。",
-   "form": "なお",
-   "en": "I have a very unfortunate announcement to make today.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/3164607",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
-  },
-  {
-   "ja": "私はこの本を買うのに十分なお金を持っている。",
-   "form": "なお",
-   "en": "I have enough money to buy this book.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/160764",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "licence": "Bunki original"
   }
  ],
  "119": [
   {
-   "ja": "「お前みてえなおかちめんこは初めて見た」と言ったら、「セクハラだ」と言われた。",
-   "form": "なおかち",
-   "en": "When I told her I'd never seen such a homely girl, she accused me of sexual harassment.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "ja": "おいしくて健康的でなおかつ安い日本のご飯は、世界一だと思っています。",
+   "form": "なおかつ",
+   "en": "I think Japanese food, which is tasty, healthy and cheap as well, is the best in the world.",
+   "kind": "blog",
+   "site": "jp.shokunin.com",
+   "url": "https://jp.shokunin.com/archives/52029477.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "120": [
   {
-   "ja": "５＋１０の足し算はやさしい。",
+   "ja": "子供達は、足し算と引き算を習っている。",
    "form": "足し算",
-   "en": "It is easy to add 5 to 10.",
+   "en": "The children are learning addition and subtraction.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -1847,33 +1820,24 @@
  ],
  "123": [
   {
-   "ja": "遠心力は、慣性系に対して回転している回転座標系において作用する慣性力の一つである。",
+   "ja": "遠心力を感じるシチュエーションといえば，カーブを曲がる車の中！",
    "form": "遠心力",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "A classic situation where you feel centrifugal force is inside a car going around a curve!",
+   "kind": "blog",
+   "site": "www.yukimura-physics.com",
+   "url": "https://www.yukimura-physics.com/entry/dyn15",
+   "licence": "web quotation (personal study)"
   }
  ],
  "124": [
   {
-   "ja": "寒帯から熱帯まで広く分布する。",
+   "ja": "根群の水平分布は樹冠と同等かそれよりも広がっている。",
    "form": "分布",
-   "en": "",
+   "en": "The horizontal spread of the roots is as wide as the tree's crown or wider.",
    "kind": "wiki",
-   "site": "ja.wikipedia.org（KFTT）",
+   "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
-  },
-  {
-   "ja": "中間外側核は胸髄のみにあり、側角に分布している。",
-   "form": "分布",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
-   "url": "",
-   "licence": "CC BY-SA 4.0"
   }
  ],
  "125": [
@@ -1971,13 +1935,13 @@
  ],
  "131": [
   {
-   "ja": "テーブルの上の電卓は私のです。",
+   "ja": "電卓は、そろばんよりも効率的だよ。",
    "form": "電卓",
-   "en": "the calculator on the table is mine .",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "A calculator is more efficient than an abacus.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/9741338",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "132": [
@@ -1993,53 +1957,53 @@
  ],
  "133": [
   {
-   "ja": "卓越した地質学者・生物学者で、種の形成理論を構築し進化生物学を発表した。",
+   "ja": "才能を隠すのにも卓越した才能がいる。",
    "form": "卓越",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "Even hiding your talent takes outstanding talent.",
+   "kind": "other",
+   "site": "fod.fujitv.co.jp",
+   "url": "https://fod.fujitv.co.jp/title/5560/5560120002/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "134": [
   {
-   "ja": "大型計算機センターに帰った石田は、ＵＮＩＸの環境をセンター内に整備したいと考えた。",
+   "ja": "計算機があれば計算ははるかに楽だ。",
    "form": "計算機",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『パソコン創世記』富田倫生",
-   "url": "https://www.aozora.gr.jp/cards/000055/",
-   "licence": "public domain (Aozora Bunko)"
+   "en": "Calculating is much easier if you have a calculator.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/176403",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "ビジネスマンが計算機を使って計算している。",
+   "ja": "コンピューターは単なる計算機だと考えられている。",
    "form": "計算機",
-   "en": "A businessman is working out some figures with a calculator.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Computers are thought of as mere calculating machines.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/217244",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "135": [
   {
    "ja": "ヘリコプターは垂直に離陸し、着陸することができる。",
    "form": "垂直",
-   "en": "A helicopter is able to take off and land straight up and down.",
+   "en": "A helicopter can take off and land vertically.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "垂直立ち上げに全力を注いでいる。",
+   "ja": "柱が垂直に立っているとは限らないんです。",
    "form": "垂直",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／エスマックス",
-   "url": "http://news.livedoor.com/article/detail/6604445/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "The pillars aren't necessarily standing perfectly vertical.",
+   "kind": "company",
+   "site": "www.assetfor.co.jp",
+   "url": "https://www.assetfor.co.jp/post-17465/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "136": [
@@ -2055,69 +2019,69 @@
  ],
  "137": [
   {
-   "ja": "殴られた主婦は全治一週間、被告人は傷害罪で追起訴される見込み。",
+   "ja": "無罪判決の場合、拘留されていた被告人は直ちに釈放されます。",
    "form": "被告人",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "If the verdict is not guilty, a defendant who has been in custody is released immediately.",
+   "kind": "company",
+   "site": "daiichi.gr.jp",
+   "url": "https://www.daiichi.gr.jp/services/criminal/p-9",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "「被告人」という言葉は法律用語である。",
+   "ja": "弁護人は裁判官に被告人たちの年齢を考慮するように求めた。",
    "form": "被告人",
-   "en": "\"The accused\" is a legal term.",
+   "en": "The lawyer asked the judge to take the defendants' ages into account.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/236161",
+   "url": "https://tatoeba.org/ja/sentences/show/83256",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "138": [
   {
-   "ja": "しらばっくれるな！君が万引きしたところを警備員が見ていたんだぞ。",
+   "ja": "メアリーは万引きをして捕まった。",
    "form": "万引き",
-   "en": "Stop playing dumb! The security guards saw you shoplifting!",
+   "en": "Mary was caught shoplifting.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/1102448",
+   "url": "https://tatoeba.org/ja/sentences/show/2499127",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "買い物に入った呉服屋で、万引きの疑惑をかけられた美しい武家の娘。",
+   "ja": "万引きは、店舗に損害を与えるだけでなく、地域の安全・安心にも影響する犯罪です。",
    "form": "万引き",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／Peachy",
-   "url": "http://news.livedoor.com/article/detail/5101860/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Shoplifting is a crime that not only causes losses for stores but also affects the safety and security of the community.",
+   "kind": "gov",
+   "site": "city.adachi.tokyo.jp",
+   "url": "https://www.city.adachi.tokyo.jp/kikikanri/bosai/bohan/manbikitaisaku.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "139": [
   {
+   "ja": "本を図書館に返却しないといけないんだ。",
+   "form": "返却",
+   "en": "I have to return some books to the library.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/10028499",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
    "ja": "レンタカーの返却場所は、どこですか。",
    "form": "返却",
-   "en": "Where do I return cars?",
+   "en": "Where do I return the rental car?",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "既に納付されていた罰金は、女性に返却されることになる。",
-   "form": "返却",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
   }
  ],
  "140": [
   {
    "ja": "警察が医療事故の立件に消極的だ。",
    "form": "立件",
-   "en": "The police are reluctant to pursue criminal charges in medical cases.",
+   "en": "The police are reluctant to build criminal cases over medical accidents.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -2126,31 +2090,13 @@
  ],
  "141": [
   {
-   "ja": "既存のパターマットを徹底的に研究した、床面にフラットなパターマット。",
+   "ja": "既存の顧客を囲い込み、契約を維持・継続することも重要です。",
    "form": "既存",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/4935703/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
-   "ja": "既存のテレビ局に対する「反逆」をキーワードとしていた。",
-   "form": "既存",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  },
-  {
-   "ja": "厚生労働省では既存添加物89番、E番号では着色料E175として分類される。",
-   "form": "既存",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "It is also important to keep existing customers and maintain their contracts.",
+   "kind": "company",
+   "site": "saleskyouka.jp",
+   "url": "https://saleskyouka.jp/blog/eigyoumarketing51/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "142": [
@@ -2175,42 +2121,42 @@
  ],
  "143": [
   {
-   "ja": "私はついにその問題の解答を見出した。",
+   "ja": "「誰に向けて書かれているか」を見出しに盛り込むことも有効な方法です。",
    "form": "見出し",
-   "en": "I finally found the solution to the problem.",
+   "en": "Putting who the piece is written for into the headline is also an effective approach.",
+   "kind": "company",
+   "site": "pr.toriaez.jp",
+   "url": "https://pr.toriaez.jp/navi/column/476.html",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "見出し語はアルファベット順に並んでいます。",
+   "form": "見出し",
+   "en": "The headwords are arranged in alphabetical order.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "例えば9月末のスポーツ新聞にこんな見出しの記事が掲載された。",
-   "form": "見出し",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5050253/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "144": [
   {
-   "ja": "毎日新聞によると、首長が部下の職員を訴えるのは異例のことであるという。",
+   "ja": "インフルエンザが異例の早さで流行している。",
    "form": "異例",
-   "en": "",
+   "en": "The flu is spreading unusually early.",
+   "kind": "news",
+   "site": "asahi.com",
+   "url": "https://www.asahi.com/sp/articles/ASV9B22KVV9BUTFL014M.html",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "最高裁判事を経ずに長官に就任するのは異例の人事である。",
+   "form": "異例",
+   "en": "Becoming chief justice without first serving as a Supreme Court justice is an unusual appointment.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "就任してから1年も経っていない首脳の受賞は極めて異例である。",
-   "form": "異例",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
   }
  ],
  "145": [
@@ -2235,24 +2181,24 @@
  ],
  "146": [
   {
-   "ja": "夕べ彼の家は泥棒に入られた。",
+   "ja": "夕べは徹夜して小説を読んだ。",
    "form": "夕べ",
-   "en": "His house was broken into last night.",
+   "en": "I stayed up all last night reading a novel.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/79128",
+   "url": "https://tatoeba.org/ja/sentences/show/79135",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "147": [
   {
-   "ja": "貧乏から脱出したいという気持ちと真剣に向き合えば、マネー美人への道が開けてくるはずですよ！",
+   "ja": "私はやっとのことで沈んでいく船から脱出した。",
    "form": "脱出",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6734725/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "I barely managed to escape from the sinking boat.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/158701",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
    "ja": "渋滞から脱出するのに3時間かかった。",
@@ -2266,7 +2212,7 @@
   {
    "ja": "本気で貧乏から脱出しようと知恵を絞り、できることから実際にアクションを起こしてみましょう。",
    "form": "脱出",
-   "en": "",
+   "en": "Let's seriously put our heads together to escape poverty and actually start doing what we can.",
    "kind": "news",
    "site": "livedoor ニュース／独女通信",
    "url": "http://news.livedoor.com/article/detail/6734725/",
@@ -2275,131 +2221,131 @@
  ],
  "148": [
   {
-   "ja": "陸上自衛隊は、残る4人の捜索を続けている。",
+   "ja": "犯罪捜査や行方不明者の捜索で活躍する嘱託警察犬の審査会が開かれました。",
    "form": "捜索",
-   "en": "",
+   "en": "A screening was held for contracted police dogs, which help in criminal investigations and searches for missing people.",
+   "kind": "news",
+   "site": "www.iat.co.jp",
+   "url": "https://www.iat.co.jp/news-iat/news-2298762/",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "県警は朝を待って、上空からの捜索を再開する予定。",
+   "form": "捜索",
+   "en": "The prefectural police plan to wait until morning and resume the search from the air.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "脱走者に対する捜索が始まっている。",
-   "form": "捜索",
-   "en": "A hunt is on for the runaway.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 2.5 (Wikinews)"
   }
  ],
  "149": [
   {
-   "ja": "神奈川県厚木市でも、銃弾が撃ち込まれた可能性のある事件が発生した。",
+   "ja": "昨日、神奈川県の海岸近くで観測された不思議な空が話題になっている。",
    "form": "神奈川県",
-   "en": "",
+   "en": "A strange sky seen near the coast of Kanagawa Prefecture yesterday has become a talking point.",
+   "kind": "news",
+   "site": "livedoor ニュース／ITライフハック",
+   "url": "http://news.livedoor.com/article/detail/6869015/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
+  },
+  {
+   "ja": "1月31日の夕方から深夜に掛けて、東京都、神奈川県でゴムの焼けこげた臭いがした。",
+   "form": "神奈川県",
+   "en": "From the evening of January 31 until late at night, a smell of burning rubber was noticed in Tokyo and Kanagawa Prefecture.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "神奈川県横浜市に所在するNPO法人。",
-   "form": "神奈川県",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
-   "url": "",
-   "licence": "CC BY-SA 4.0"
+   "licence": "CC BY 2.5 (Wikinews)"
   }
  ],
  "150": [
   {
+   "ja": "飼い猫が行方不明になってしまいました。",
+   "form": "行方不明",
+   "en": "Our pet cat has gone missing.",
+   "kind": "gov",
+   "site": "city.minato.tokyo.jp",
+   "url": "https://www.city.minato.tokyo.jp/seikatsueiseisoudan/kuse/kocho/faq/dobutsu/031.html",
+   "licence": "web quotation (personal study)"
+  },
+  {
    "ja": "行方不明だった漁船が無事帰港した。",
    "form": "行方不明",
-   "en": "The fishing boat that had been missing returned to its port safely.",
+   "en": "The fishing boat that had been missing returned safely to port.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
+  }
+ ],
+ "151": [
+  {
+   "ja": "たくさんの船が海上を走っている。",
+   "form": "海上",
+   "en": "Many boats are sailing on the sea.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
+  },
+  {
+   "ja": "海上保安庁では、全国各地にあらゆる船艇・航空機を配備し、日本の海を守っています。",
+   "form": "海上",
+   "en": "The Japan Coast Guard deploys ships and aircraft all over the country to protect Japan's seas.",
+   "kind": "gov",
+   "site": "kaiho.mlit.go.jp",
+   "url": "https://www.kaiho.mlit.go.jp/info/books/report2025/html/ninmu/ninmu25_01.html",
+   "licence": "web quotation (personal study)"
+  }
+ ],
+ "152": [
+  {
+   "ja": "気象庁によると、天気予報の精度は平成の間に約5%良くなったということです。",
+   "form": "気象庁",
+   "en": "According to the Japan Meteorological Agency, the accuracy of weather forecasts improved by about 5% during the Heisei era.",
+   "kind": "company",
+   "site": "ods.n-kishou.co.jp",
+   "url": "https://ods.n-kishou.co.jp/tech/blog/detail/1892",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "気象庁は、今後約1週間は震度5弱程度の余震に注意するよう、呼びかけている。",
+   "form": "気象庁",
+   "en": "The Japan Meteorological Agency is urging people to watch out for aftershocks of around lower 5 intensity for about the next week.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5"
+  }
+ ],
+ "153": [
+  {
+   "ja": "明日、いつもより１時間早く出勤することはできますか。",
+   "form": "出勤",
+   "en": "Could you come to work an hour earlier than usual tomorrow?",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "漁船は船体が真っ二つに割れて、これに乗っていた乗組員の漁師2名が行方不明となっている。",
-   "form": "行方不明",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  }
- ],
- "151": [
-  {
-   "ja": "第4管区海上保安本部が救助および捜査に当たっている。",
-   "form": "海上",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "海上保安庁法第25条の条文で、海上保安庁は軍隊ではないことが明確に規定されている。",
-   "form": "海上",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  }
- ],
- "152": [
-  {
-   "ja": "気象庁は、21日には再び強い寒気が流れ込むとしている。",
-   "form": "気象庁",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "気象庁による桜の開花日・満開日の観測地点は全国68ヶ所ある。",
-   "form": "気象庁",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org（KFTT）",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  }
- ],
- "153": [
-  {
-   "ja": "けさも朝から出勤して夕方に帰って来たが、留守のあいだに別に変ったことはなかった。",
-   "form": "出勤",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『穴』岡本綺堂",
-   "url": "https://www.aozora.gr.jp/cards/000082/",
-   "licence": "public domain (Aozora Bunko)"
-  },
-  {
    "ja": "9時に会社に出勤するため、ラッシュアワーのド真ん中である８時台の電車に乗って通勤している。",
    "form": "出勤",
-   "en": "",
+   "en": "To get to the office by nine, I commute on a train in the 8 o'clock hour, right in the middle of rush hour.",
    "kind": "news",
    "site": "livedoor ニュース／独女通信",
    "url": "http://news.livedoor.com/article/detail/5328273/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   },
   {
-   "ja": "朝食前に出勤するなんていかにも彼らしい。",
+   "ja": "4月に今の部署へ異動してから、休日に出勤できないかという連絡は珍しくない。",
    "form": "出勤",
-   "en": "It is characteristic of him to go to work before breakfast.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Since I moved to my current department in April, it's not unusual to be asked whether I can come in on my day off.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/clean_clam2182/n/nfbeea549011c",
+   "licence": "web quotation (personal study)"
   }
  ],
  "154": [
@@ -2424,22 +2370,22 @@
  ],
  "155": [
   {
-   "ja": "占いのほか、「潜在意識にある記憶の書き換え」も行ってトータル1時間の鑑定。",
+   "ja": "科学捜査研究所が液体を持ち帰って鑑定した結果、ただの「水」であることが判明した。",
    "form": "鑑定",
-   "en": "",
+   "en": "The forensic lab took the liquid back for testing and found it was just water.",
    "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5867961/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5 (Wikinews)"
   },
   {
-   "ja": "DNA鑑定によって彼の無罪が証明された。",
+   "ja": "精神鑑定の対象となるのは、裁判で責任能力の有無が争点になりそうな被疑者です。",
    "form": "鑑定",
-   "en": "A DNA test showed he was innocent.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/2255823",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "en": "Psychiatric evaluations are given to suspects whose criminal responsibility is likely to be disputed at trial.",
+   "kind": "other",
+   "site": "ajcp.media",
+   "url": "https://ajcp.media/archives/814",
+   "licence": "web quotation (personal study)"
   }
  ],
  "156": [
@@ -2464,62 +2410,62 @@
  ],
  "157": [
   {
-   "ja": "テレビの画像はぼやけて見えた。",
+   "ja": "画像のアップロードの仕方が分かりません。",
    "form": "画像",
-   "en": "The TV picture was blurred.",
+   "en": "I can't figure out how to upload an image.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "投稿の内容は、おもしろ画像や普段見せない変顔があると意外性があっていいですね。",
+   "ja": "メールに画像を添付する際に気を付けたいのがサイズだ。",
    "form": "画像",
-   "en": "",
+   "en": "When attaching an image to an email, the thing to watch out for is the size.",
    "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6510816/",
+   "site": "livedoor ニュース／ITライフハック",
+   "url": "http://news.livedoor.com/article/detail/6312412/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   },
   {
-   "ja": "画像の用途に応じた使い方をしてみよう。",
+   "ja": "テレビの画像はぼやけて見えた。",
    "form": "画像",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6295327/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "The TV picture looked blurry.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "158": [
   {
-   "ja": "今日の朝刊によればその死刑囚は自殺したようだ。",
+   "ja": "窓のない部屋はどんなに美しくてもそれは死刑囚の独房のような気がする。",
    "form": "死刑囚",
-   "en": "According to today's morning paper, the condemned criminal committed suicide.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "A room without windows, however beautiful, feels to me like a death-row inmate's cell.",
+   "kind": "literature",
+   "site": "青空文庫『破片』寺田寅彦",
+   "url": "https://www.aozora.gr.jp/cards/000042/",
+   "licence": "public domain (Aozora Bunko)"
   }
  ],
  "159": [
   {
-   "ja": "きっと無罪になるだけの決定的切り札を隠し持っているに違いない。",
+   "ja": "録音データは決定的な証拠となりづらい。",
    "form": "決定的",
-   "en": "I'm sure he has something up his sleeve.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Audio recordings rarely become conclusive evidence.",
+   "kind": "company",
+   "site": "ohj.jp",
+   "url": "https://ohj.jp/recording-evidence/",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "ここがアニメーションとの決定的な違いだよね。",
+   "ja": "私は決定的瞬間を写真に撮った。",
    "form": "決定的",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/6307444/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "I photographed the decisive moment.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/157337",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "160": [
@@ -2568,42 +2514,42 @@
  ],
  "164": [
   {
-   "ja": "あなたの迅速な返事が是非とも必要です。",
+   "ja": "警察は暴動に対処するため迅速な行動をとった。",
    "form": "迅速",
-   "en": "Your prompt reply is urgently required.",
+   "en": "The police took swift action to deal with the riot.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "1.ちゃんと迅速に対応して先方も納得してくれた。",
+   "ja": "いただいたご質問には迅速に回答させていただきます。",
    "form": "迅速",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/6076393/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "We will answer your questions promptly.",
+   "kind": "other",
+   "site": "ウェブ（UD Japanese GSD）",
+   "url": "",
+   "licence": "CC BY-SA 4.0"
   }
  ],
  "165": [
   {
-   "ja": "警視庁は、残り9着の購入者を探している。",
+   "ja": "警視庁は業務上過失致死傷などの疑いで捜査している。",
    "form": "警視庁",
-   "en": "",
+   "en": "The Metropolitan Police Department is investigating on suspicion of professional negligence resulting in death and injury.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5"
   },
   {
-   "ja": "警視庁は今後、役員らから事情を聴くなど、検査妨害の全容を解明する方針。",
+   "ja": "警視庁によると、公営の二輪車専用パーキングは日本全国初であるという。",
    "form": "警視庁",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
+   "en": "According to the Metropolitan Police Department, it is the first public motorcycle-only parking lot in Japan.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY-SA 4.0"
+   "licence": "CC BY 2.5"
   }
  ],
  "166": [
@@ -2619,33 +2565,33 @@
  ],
  "167": [
   {
+   "ja": "あの会社の社長は切り札を隠し持っています。",
+   "form": "切り札",
+   "en": "The president of that company has a trump card up her sleeve.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
+  },
+  {
    "ja": "切り札は最後まで見せるな。見せるなら、さらに奥の手を持て。",
    "form": "切り札",
-   "en": "Keep that ace up your sleeve. If you're going to show it, have another even further up.",
+   "en": "Don't show your trump card until the very end. If you do show it, have another ace up your sleeve.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "私の中でFW、切り札になるタイプっていうのを探していると思っていたので。",
-   "form": "切り札",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／Sports Watch",
-   "url": "http://news.livedoor.com/article/detail/6679399/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "168": [
   {
-   "ja": "センサーは小型化、省電力化されており、測定方式にはシリコン半導体方式を採用している。",
+   "ja": "導体の電気抵抗は長さに比例し、断面積に反比例します。",
    "form": "導体",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／エスマックス",
-   "url": "http://news.livedoor.com/article/detail/6615051/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "The electrical resistance of a conductor is proportional to its length and inversely proportional to its cross-sectional area.",
+   "kind": "company",
+   "site": "feps.co.jp",
+   "url": "https://www.feps.co.jp/_assets/dl/support/faq/02.pdf",
+   "licence": "web quotation (personal study)"
   }
  ],
  "169": [
@@ -2683,29 +2629,29 @@
  ],
  "172": [
   {
-   "ja": "＆という記号は、ａｎｄを指す。",
+   "ja": "元素記号Ｈは水素をあらわす。",
    "form": "記号",
-   "en": "The sign '&' stands for 'and'.",
+   "en": "The chemical symbol H stands for hydrogen.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "記号formula_8は床関数（切捨て）である。",
+   "ja": "最近では2002年に「博物館」と「図書館」の地図記号が追加された。",
    "form": "記号",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
+   "en": "Most recently, map symbols for \"museum\" and \"library\" were added in 2002.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "licence": "CC BY 2.5 (Wikinews)"
   }
  ],
  "173": [
   {
    "ja": "虫歯を侮ると命に係わる場合もあるのです。",
    "form": "侮る",
-   "en": "Making light of cavities can be a matter of life and death.",
+   "en": "Making light of cavities can sometimes be life-threatening.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -2714,22 +2660,13 @@
  ],
  "174": [
   {
-   "ja": "基礎を固めることは大切です。",
-   "form": "基礎",
-   "en": "It is important to strengthen the basis.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "支柱はコンクリートで固定されていたが、コンクリートの基礎部分ごとなくなっていた。",
-   "form": "基礎部分",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "ja": "宗教間の和解は、世界平和の礎である。",
+   "form": "礎",
+   "en": "Reconciliation among religions is the foundation of world peace.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/3475196",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "175": [
@@ -2747,20 +2684,20 @@
   {
    "ja": "辞書を編さんするには膨大な時間を要する。",
    "form": "膨大",
-   "en": "Compiling a dictionary demands an enormous amount of time.",
+   "en": "Compiling a dictionary takes an enormous amount of time.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "人によっては膨大に存在するチェックポイントの一つに、「マザコン度」がある。",
+   "ja": "光ファイバーケーブルは膨大な量の情報を搬送できる。",
    "form": "膨大",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6281676/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Fiber-optic cables can carry huge amounts of information.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "177": [
@@ -2785,27 +2722,27 @@
  ],
  "178": [
   {
-   "ja": "高度計の針はその時、二万五千メートルを示していた。",
+   "ja": "中小企業の技術者が高度な研修を受講する際の費用を助成します。",
    "form": "高度",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『超人間Ｘ号』海野十三",
-   "url": "https://www.aozora.gr.jp/cards/000160/",
-   "licence": "public domain (Aozora Bunko)"
+   "en": "We subsidize the cost of advanced training for engineers at small and medium-sized companies.",
+   "kind": "gov",
+   "site": "city.chuo.lg.jp",
+   "url": "https://www.city.chuo.lg.jp/a0016/shigoto/kigyoushien/hojokin/chuushoukigyou_koudokenshujosei.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "日本では稲作が高度に発達した。",
+   "ja": "飛行機は3000mの高度を飛んだ。",
    "form": "高度",
-   "en": "Rice farming has been developed to a high degree in Japan.",
+   "en": "The plane flew at an altitude of 3,000 meters.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "飛行機は3000mの高度を飛んだ。",
+   "ja": "日本では稲作が高度に発達した。",
    "form": "高度",
-   "en": "The plane flew at an altitude of 3,000 meters.",
+   "en": "Rice farming developed to a high degree in Japan.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -2825,21 +2762,21 @@
  ],
  "180": [
   {
-   "ja": "金属は冷やされると縮小する。",
+   "ja": "多くの会社が人員を最低限にまで縮小した。",
    "form": "縮小",
-   "en": "Metal contracts when cooled.",
+   "en": "Many companies cut their staff down to the bare minimum.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 4.0"
   },
   {
-   "ja": "各地のクリスマスイルミネーションも縮小気味らしい。",
+   "ja": "画像の拡大、縮小も2本の指で操作できる。",
    "form": "縮小",
-   "en": "",
+   "en": "You can also zoom images in and out with two fingers.",
    "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6040256/",
+   "site": "livedoor ニュース／家電チャンネル",
+   "url": "http://news.livedoor.com/article/detail/5831377/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
@@ -2847,7 +2784,7 @@
   {
    "ja": "真空管を使ったテレビは古臭いと考えられています。",
    "form": "真空管",
-   "en": "Televisions with vacuum tubes are regarded as being behind the times.",
+   "en": "Televisions that use vacuum tubes are considered old-fashioned.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -2856,13 +2793,13 @@
  ],
  "182": [
   {
-   "ja": "今にも両国間に貿易摩擦が生じそうだ。",
+   "ja": "米中貿易摩擦の激化で景気減速やエネルギー需要の減退を巡る懸念が高まった。",
    "form": "貿易摩擦",
-   "en": "Trade friction might arise between the two nations at any moment.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Growing US-China trade friction raised fears of an economic slowdown and weaker energy demand.",
+   "kind": "news",
+   "site": "reuters.com",
+   "url": "https://www.reuters.com/jp/markets/commodities/KQ7EOOVYXVMJLECO5Q5LP7WRPE-2025-10-20/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "183": [
@@ -2909,29 +2846,29 @@
  ],
  "186": [
   {
-   "ja": "協定が結ばれる可能性は極めて少ない。",
+   "ja": "首相が両国間の貿易協定に調印しました。",
    "form": "協定",
-   "en": "There is very little probability of an agreement being reached.",
+   "en": "The Prime Minister signed a trade agreement between the two countries.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
+  },
+  {
+   "ja": "協定が調印されれば、輸入規制が解除できる。",
+   "form": "協定",
+   "en": "Once the agreement is signed, the import restrictions can be lifted.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "農業産品にもこの協定は適応される。",
-   "form": "協定",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
   }
  ],
  "187": [
   {
    "ja": "電気自動車の性能はよくなっている。",
    "form": "性能",
-   "en": "The performance of electric cars has improved.",
+   "en": "The performance of electric cars is improving.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -2940,19 +2877,19 @@
   {
    "ja": "パソコンの性能がよくなれば仕事も早く進む。",
    "form": "性能",
-   "en": "",
+   "en": "If your computer performs better, your work goes faster too.",
    "kind": "news",
    "site": "livedoor ニュース／独女通信",
    "url": "http://news.livedoor.com/article/detail/5572979/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   },
   {
-   "ja": "マイクロ一眼と小さな一眼だが、性能が凄い。",
+   "ja": "デバイスの性能を最終的に決めるのはプロセッサだ。",
    "form": "性能",
-   "en": "",
+   "en": "What ultimately determines a device's performance is the processor.",
    "kind": "news",
    "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6327277/",
+   "url": "http://news.livedoor.com/article/detail/6344739/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
@@ -2969,45 +2906,36 @@
  ],
  "189": [
   {
-   "ja": "反逆者達は首都を制圧した。",
+   "ja": "軍隊は反乱を制圧した。",
    "form": "制圧",
-   "en": "The rebels took control of the capital.",
+   "en": "The army put down the rebellion.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "謎の侵略者・バット星人によって制圧されてしまった地球。",
+   "ja": "共同通信によれば、クーデター派が首都バンコクを制圧した。",
    "form": "制圧",
-   "en": "",
+   "en": "According to Kyodo News, the coup faction took control of the capital, Bangkok.",
    "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/6217048/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5"
   }
  ],
  "190": [
   {
-   "ja": "結果、日中和平交渉は決裂した。",
+   "ja": "交渉の決裂は戦争を引き起こすことになるだろう。",
    "form": "決裂",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
+   "en": "A breakdown in the negotiations would lead to war.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "191": [
-  {
-   "ja": "1958年に専務に就任して以降、会社経営の中枢を担うようになった。",
-   "form": "中枢",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5 (Wikinews)"
-  },
   {
    "ja": "東京は今や世界経済の中枢だ。",
    "form": "中枢",
@@ -3016,17 +2944,26 @@
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
+  },
+  {
+   "ja": "中枢神経は脳と脊髄で、情報の統合・判断・運動命令を担います。",
+   "form": "中枢",
+   "en": "The central nervous system consists of the brain and spinal cord, which integrate information, make judgments, and send motor commands.",
+   "kind": "company",
+   "site": "i-seishin.or.jp",
+   "url": "https://i-seishin.or.jp/archives/central-peripheral-nerve-difference/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "192": [
   {
-   "ja": "調査の内容は製造工程や消毒といった衛生管理の状態や伝票、保存中のサンプルの肉などである。",
+   "ja": "工程管理とは、製造工程を監視し、管理することです。",
    "form": "製造工程",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "Process control means monitoring and managing the manufacturing process.",
+   "kind": "company",
+   "site": "gdfindi.com",
+   "url": "https://gdfindi.com/jp/blog-production_process/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "193": [
@@ -3042,22 +2979,22 @@
  ],
  "194": [
   {
+   "ja": "ペンしか使わないんだけど、なんとなくリュックの中にはまだ鉛筆削りをいれてます。",
+   "form": "削り",
+   "en": "I only use pens, but for some reason I still keep a pencil sharpener in my backpack.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/11741549",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
    "ja": "洪水で家の土台が削り取られた。",
    "form": "削り取ら",
-   "en": "The house was undermined by the flood.",
+   "en": "The flood washed away the foundation of the house.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "木のシートを極限の薄さ80ミクロンに削りだし、ボビンに成型。",
-   "form": "削り",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/5842557/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "195": [
@@ -3126,9 +3063,9 @@
  ],
  "200": [
   {
-   "ja": "終盤ガンバに1点差に追い上げられるもそのまま逃げ切って勝利した。",
-   "form": "追い上げ",
-   "en": "",
+   "ja": "早稲田大学は1区のエース大迫傑選手が失速して10位となり、その後追い上げるも6位止まりとなった。",
+   "form": "追い上げる",
+   "en": "Waseda dropped to 10th when its first-leg ace Suguru Osako faded, and though it closed in afterward, it finished only sixth.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
@@ -3139,7 +3076,7 @@
   {
    "ja": "序盤は平氏が優勢であったが、やがて劣勢となっていく。",
    "form": "劣勢",
-   "en": "",
+   "en": "At first the Taira clan had the upper hand, but they gradually fell behind.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
@@ -3148,22 +3085,22 @@
  ],
  "202": [
   {
-   "ja": "今後業績に影響を与えることが判明した場合には、速やかに公表するとしている。",
+   "ja": "割り当てられた仕事は速やかにやらなければならない。",
    "form": "速やか",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6299008/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "You must carry out assigned work promptly.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/13266396",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "経口投与されると速やかに吸収されて作用を発現する。",
+   "ja": "申込み内容に変更が生じた場合は、速やかに申込み先までご連絡ください。",
    "form": "速やか",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "If anything in your application changes, please contact the office you applied to without delay.",
+   "kind": "other",
+   "site": "www.asahikawa-med.ac.jp",
+   "url": "https://www.asahikawa-med.ac.jp/hospital/nursing/info/pdf/260521seminar.pdf",
+   "licence": "web quotation (personal study)"
   }
  ],
  "203": [
@@ -3210,27 +3147,27 @@
  ],
  "206": [
   {
-   "ja": "一部は被災児童の教育資金として石碑を設置した自治体に寄付する。",
+   "ja": "彼は匿名で赤十字に多額のお金を寄付した。",
    "form": "寄付",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
+   "en": "He anonymously donated a large sum of money to the Red Cross.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY-SA 4.0"
+   "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "私は自分の古着をのみの市セールに寄付した。",
+   "ja": "自分の着なくなった服を教会ののみの市セールに寄付した。",
    "form": "寄付",
-   "en": "I gave my old clothes for the flea market sale.",
+   "en": "I donated clothes I no longer wear to the church flea market.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "彼は貧民救済に多額のお金を寄付した。",
+   "ja": "多額の寄付をありがとうございました。",
    "form": "寄付",
-   "en": "He contributed much money to relieving the poor.",
+   "en": "Thank you very much for your generous donation.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -3239,13 +3176,13 @@
  ],
  "207": [
   {
-   "ja": "国際郵便料金は宛先によって異なる。",
+   "ja": "宛先を間違えて送信してしまいました。",
    "form": "宛先",
-   "en": "International postal rates differ according to destination.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "I sent it to the wrong address.",
+   "kind": "news",
+   "site": "livedoor ニュース／独女通信",
+   "url": "http://news.livedoor.com/article/detail/5595521/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "208": [
@@ -3263,27 +3200,27 @@
   {
    "ja": "人は誰でも芸術家になれるわけではない。",
    "form": "芸術家",
-   "en": "Not everybody can be an artist.",
+   "en": "Not everyone can become an artist.",
    "kind": "tatoeba",
    "site": "Tatoeba",
    "url": "https://tatoeba.org/ja/sentences/show/144460",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "芸術家というものは、それくらいで結構なんだ。",
+   "ja": "後世に残るすばらしい作品を創った芸術家たちはどんな人だったのだろうか？",
    "form": "芸術家",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『鉄面皮』太宰治",
-   "url": "https://www.aozora.gr.jp/cards/000035/",
-   "licence": "public domain (Aozora Bunko)"
+   "en": "What kind of people were the artists who created great works that have lasted for generations?",
+   "kind": "news",
+   "site": "livedoor ニュース／独女通信",
+   "url": "http://news.livedoor.com/article/detail/6223811/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "210": [
   {
    "ja": "あなたはまるで幽霊でも見たような顔つきをしている。",
    "form": "顔つき",
-   "en": "You look as if you had seen a ghost.",
+   "en": "You look as if you'd seen a ghost.",
    "kind": "tatoeba",
    "site": "Tatoeba",
    "url": "https://tatoeba.org/ja/sentences/show/232389",
@@ -3294,40 +3231,40 @@
   {
    "ja": "試合は終始一点を争うシーソーゲームだった。",
    "form": "争う",
-   "en": "The game was one point back and forth the whole game.",
+   "en": "The game was a seesaw battle fought point by point from start to finish.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "セ・リーグも2005年度に続いて交流試合込みの146試合でリーグ戦の覇権を争う。",
+   "ja": "私は争うためにここにいるのではありません。",
    "form": "争う",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "I'm not here to fight.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/2137347",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "212": [
   {
-   "ja": "競泳とは、一定の距離を定められた泳法で泳ぎ、タイムを競う競技のこと。",
+   "ja": "スピードスケートは、1周400mのスケートリンクを周回し、ゴールタイムを競う競技。",
    "form": "競う",
-   "en": "",
+   "en": "Speed skating is a sport in which skaters circle a 400-meter rink and compete for the fastest finishing time.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
   },
   {
-   "ja": "重要なのは、暗記量を競うことではなく、経験の間にどのような接続を育てるかである。",
+   "ja": "制限時間内で何杯食べられるかを競う大会です。",
    "form": "競う",
-   "en": "",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "Bunki original"
+   "en": "It's a contest to see who can eat the most bowls within the time limit.",
+   "kind": "other",
+   "site": "www.kanko-hanamaki.ne.jp",
+   "url": "https://www.kanko-hanamaki.ne.jp/special/wankosoba/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "213": [
@@ -3354,60 +3291,60 @@
  ],
  "215": [
   {
-   "ja": "首相は明日記者会見をします。",
+   "ja": "首相は明日、記者会見を開きます。",
    "form": "首相",
-   "en": "The Prime Minister holds a press conference tomorrow.",
+   "en": "The Prime Minister will hold a press conference tomorrow.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/1068869",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "首相は国民の合意がなければ新税は導入しないと言明した。",
+   "form": "首相",
+   "en": "The Prime Minister stated that he would not introduce a new tax without public consensus.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "数千人の人がお別れのため首相公邸を訪れた。",
+   "ja": "高市早苗首相は2026年9月17日、第2次高市改造内閣を発足させました。",
    "form": "首相",
-   "en": "",
+   "en": "On September 17, 2026, Prime Minister Sanae Takaichi launched her second reshuffled cabinet.",
    "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "エハヌロフ首相は、内閣の三分の一は新しい顔ぶれになると語った。",
-   "form": "首相",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "site": "www.nikkei.com",
+   "url": "https://www.nikkei.com/article/DGXZQOUA270KO0X20C26A7000000/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "216": [
   {
-   "ja": "たとえば、国立国会図書館の2011年度の予算は約200億円だ。",
-   "form": "国会",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6435653/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
-   "ja": "国会図書館などが所蔵している。",
-   "form": "国会",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  },
-  {
    "ja": "国会は閉会して夏休みに入った。",
    "form": "国会",
-   "en": "The Diet rose for summer recess.",
+   "en": "The Diet adjourned for the summer recess.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
+  },
+  {
+   "ja": "国会で審議される法案には大きく分けて3つのランクがあります。",
+   "form": "国会",
+   "en": "Bills debated in the Diet fall broadly into three ranks.",
+   "kind": "other",
+   "site": "facebook.com",
+   "url": "https://www.facebook.com/akihisa.shiozaki/videos/%E5%9B%BD%E4%BC%9A%E3%81%A7%E5%AF%A9%E8%AD%B0%E3%81%95%E3%82%8C%E3%82%8B%E6%B3%95%E6%A1%88%E3%81%AB%E3%81%AF%E5%A4%A7%E3%81%8D%E3%81%8F%E5%88%86%E3%81%91%E3%81%A63%E3%81%A4%E3%81%AE%E3%83%A9%E3%83%B3%E3%82%AF%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E5%AF%A9%E8%AD%B0%E6%99%82%E9%96%93%E3%81%AE%E9%95%B7%E3%81%84%E9%A0%86%E3%81%AB%E9%87%8D%E8%A6%81%E5%BA%83%E7%AF%84%E8%AD%B0%E6%A1%88%E7%99%BB%E5%A3%87%E3%82%82%E3%81%AE%E3%81%9D%E3%81%97%E3%81%A6%E3%81%9D%E3%82%8C%E4%BB%A5%E5%A4%96%E3%81%AE%E9%80%9A%E5%B8%B8%E6%B3%95%E6%A1%88%E3%81%A8%E3%81%AA%E3%82%8A%E3%81%BE%E3%81%99%E4%BB%8A%E5%9B%BD%E4%BC%9A%E3%81%A7%E3%82%824%E6%9C%AC%E3%81%AE%E9%87%8D%E8%A6%81%E5%BE%8C%E5%8D%8A%E8%AD%B0%E6%A1%88%E3%81%8C/1275349504045869/",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "通常国会の冒頭で解散が行われる例は過去に4例しかなく、極めて異例の対応となる。",
+   "form": "国会",
+   "en": "Dissolving the Diet at the very start of an ordinary session has happened only four times before, making it a highly unusual move.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5"
   }
  ],
  "217": [
@@ -3423,51 +3360,51 @@
  ],
  "218": [
   {
-   "ja": "時折襲来するサイクロンにより動植物が被害を受けるものの、それらはすぐに回復する。",
+   "ja": "私は風邪から回復するのに１０日かかった。",
    "form": "回復",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
-  },
-  {
-   "ja": "私がほっとしたことに、彼は病気から回復した。",
-   "form": "回復",
-   "en": "To my relief, he recovered from his illness.",
+   "en": "It took me ten days to recover from my cold.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/167923",
+   "url": "https://tatoeba.org/ja/sentences/show/152963",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "ブランデーですぐに意識を回復した。",
+   "ja": "景気がすぐに回復するといいのですが。",
    "form": "回復",
-   "en": "The brandy brought him around in no time.",
+   "en": "I hope the economy recovers soon.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/196953",
+   "url": "https://tatoeba.org/ja/sentences/show/176527",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "乗客の一人が気を失ったが、客室乗務員が意識を回復させた。",
+   "form": "回復",
+   "en": "One of the passengers fainted, but a flight attendant brought him back to consciousness.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/1193508",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "219": [
   {
-   "ja": "不景気なのに依然物価は高い。",
+   "ja": "長い不況の後で景気はやっと上向きになっている。",
    "form": "景気",
-   "en": "In spite of the depression, the prices of commodities are still high.",
+   "en": "After a long recession, the economy is finally picking up.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 4.0"
   },
   {
-   "ja": "バブル景気の頃、今だったら考えられないようなモノを購入したという人も多い。",
+   "ja": "景気を支えるために金融緩和が必要と考えられている。",
    "form": "景気",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5196844/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Monetary easing is considered necessary to support the economy.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
   }
  ],
  "220": [
@@ -3481,29 +3418,29 @@
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "会社にしがみつくより、自分のやりたいこと優先で考える方が健全ではないでしょうか。",
+   "ja": "業界の健全な成長のために公正な競争が確保される必要がある。",
    "form": "健全",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/5564848/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Fair competition must be ensured for the healthy growth of the industry.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/180014",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "221": [
   {
-   "ja": "双方とも画像の圧縮率が高めだが解像度が違うことが一目瞭然となった。",
+   "ja": "双方の言い分を聞かないと真相は分からない。",
    "form": "双方",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／エスマックス",
-   "url": "http://news.livedoor.com/article/detail/6872644/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "You can't know the truth without hearing both sides of the story.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   },
   {
    "ja": "双方が互いに歩み寄らねばならなかった。",
    "form": "双方",
-   "en": "Both sides had to compromise with each other.",
+   "en": "Both sides had to meet each other halfway.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -3514,7 +3451,7 @@
   {
    "ja": "人生の無常をしみじみと感じる。",
    "form": "無常",
-   "en": "I feel the uncertainty of life.",
+   "en": "I keenly feel the impermanence of life.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -3525,7 +3462,7 @@
   {
    "ja": "あんなことを彼女に言うなんて非常識も甚だしい。",
    "form": "非常識",
-   "en": "It's quite absurd of you to tell her that sort of thing.",
+   "en": "Saying something like that to her is completely out of line.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -3534,7 +3471,7 @@
   {
    "ja": "無知ゆえの非常識は決して恥ずかしいことではない。",
    "form": "非常識",
-   "en": "",
+   "en": "Lacking common sense out of ignorance is nothing to be ashamed of.",
    "kind": "news",
    "site": "livedoor ニュース／独女通信",
    "url": "http://news.livedoor.com/article/detail/4866257/",
@@ -3543,42 +3480,42 @@
  ],
  "224": [
   {
-   "ja": "風にはためき続けるぼろぼろの旗。",
+   "ja": "今日は風が強くちょっと寒い。",
    "form": "風",
-   "en": "A tattered flag which continues to flutter in the wind.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "The wind is strong today, and it's a little cold.",
+   "kind": "blog",
+   "site": "ameblo.jp",
+   "url": "https://ameblo.jp/kazuyo160/entry-12845084709.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "母は、お風呂に入ろうとしている。",
-   "form": "風呂",
-   "en": "My mum is about to take a bath.",
+   "ja": "そんな風に言うものじゃない。",
+   "form": "風",
+   "en": "You shouldn't talk like that.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/83111",
+   "url": "https://tatoeba.org/ja/sentences/show/204040",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "225": [
   {
-   "ja": "率直に言って、君のヘアースタイルは好きじゃないよ。",
-   "form": "率直",
-   "en": "Frankly speaking, I don't like your haircut.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "ja": "若い世代の投票率が低いことがしばしば指摘されています。",
+   "form": "率",
+   "en": "It is often pointed out that voter turnout among young people is low.",
+   "kind": "other",
+   "site": "www.kyoto-su.ac.jp",
+   "url": "https://www.kyoto-su.ac.jp/faculty/ju/2021_0924ju_kyoin_txt/",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "打者として94安打、打率2割4分。",
-   "form": "打率",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "ja": "離職率が高い会社は、残業や休日出勤が多いなど労働環境の面で働きにくいという特徴があります。",
+   "form": "率",
+   "en": "Companies with high staff turnover tend to be hard places to work, with lots of overtime and weekend shifts.",
+   "kind": "company",
+   "site": "jobuddy.jp",
+   "url": "https://jobuddy.jp/contents/detail/a_company_with_a_low_turnover_rate",
+   "licence": "web quotation (personal study)"
   }
  ],
  "226": [
@@ -3594,47 +3531,47 @@
  ],
  "227": [
   {
-   "ja": "報告書に関するコメントを楽しみにしています。",
+   "ja": "あなたの報告書には少し間違いがあります。",
    "form": "報告",
-   "en": "I look forward to your comments on the report.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "明日この報告書を発送すること、言ってくださいね。",
-   "form": "報告",
-   "en": "Please remind me to mail the report tomorrow.",
+   "en": "There are a few mistakes in your report.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/9041268",
+   "url": "https://tatoeba.org/ja/sentences/show/233030",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "報告書は事実と完全に一致する。",
+   "ja": "報告書は月曜日に提出ですからね。",
    "form": "報告",
-   "en": "The report checks with the facts in every detail.",
+   "en": "Remember, the report is due on Monday.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/82748",
+   "url": "https://tatoeba.org/ja/sentences/show/10104899",
    "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "結婚式には、親族とたくさんの友人を招待して、感謝と結婚の報告を行なったそうだ。",
+   "form": "報告",
+   "en": "They invited their relatives and many friends to the wedding to thank them and announce their marriage.",
+   "kind": "news",
+   "site": "livedoor ニュース／独女通信",
+   "url": "http://news.livedoor.com/article/detail/5812819/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "228": [
   {
-   "ja": "正月飾りをし、正月行事を行ったり御節料理を食べたりして、盛大に祝う。",
+   "ja": "結婚式の後で盛大な披露宴が催された。",
    "form": "盛大",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
+   "en": "A grand reception was held after the wedding.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "licence": "CC BY 4.0"
   },
   {
-   "ja": "新年は盛大に食べたり飲んだりするのです。",
+   "ja": "聴衆は、その歌手に盛大な拍手を送った。",
    "form": "盛大",
-   "en": "New Year is the time for a lot of eating and drinking.",
+   "en": "The audience gave the singer a huge round of applause.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -3652,41 +3589,41 @@
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "「戻りたいのは中学2年の秋です」と話してくれたのはチエさん（独身／27歳・医療関連）。",
+   "ja": "乳幼児に対する医療がもっと必要である。",
    "form": "医療",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5134603/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Infants need more medical care.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "医療用の電子機器はきわめて高価だったが、自分で組めば桁外れに安いものができた。",
+   "ja": "警察が医療事故の立件に消極的だ。",
    "form": "医療",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『パソコン創世記』富田倫生",
-   "url": "https://www.aozora.gr.jp/cards/000055/",
-   "licence": "public domain (Aozora Bunko)"
+   "en": "The police are reluctant to bring charges in medical malpractice cases.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "230": [
   {
-   "ja": "幸運にも彼は前の結婚で式を挙げていなかったんですよ。",
+   "ja": "私は幸運にもよい仕事を見つけた。",
    "form": "幸運",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5110251/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
-   "ja": "私は幸運にも外国を旅することができた。",
-   "form": "幸運",
-   "en": "Luckily, I was able to travel abroad.",
+   "en": "I was lucky enough to find a good job.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/1015750",
+   "url": "https://tatoeba.org/ja/sentences/show/157158",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "幸運にも、天気は晴れになった。",
+   "form": "幸運",
+   "en": "Luckily, the weather turned out fine.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/173679",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
@@ -3712,60 +3649,60 @@
  ],
  "232": [
   {
-   "ja": "具体的には、AIクローラーによるアクセスに対して課金を要求する。",
-   "form": "具体的",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
    "ja": "十分に議論したあとで具体的な計画が進展した。",
    "form": "具体的",
-   "en": "A concrete plan evolved after much discussion.",
+   "en": "After much discussion, a concrete plan took shape.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
+  },
+  {
+   "ja": "だいたい1分くらいを目安に具体的に説明してみましょう。",
+   "form": "具体的",
+   "en": "Try explaining it specifically, taking about one minute.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/taku_voice/n/n0d173faadfce",
+   "licence": "web quotation (personal study)"
+  }
+ ],
+ "233": [
+  {
+   "ja": "便利な反面、デメリットもある。",
+   "form": "反面",
+   "en": "It's convenient, but on the other hand it has drawbacks.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/2tomman/n/n22032e20f911",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "昨年は輸出が好調の反面、輸入が落ち着いていたので貿易収支は改善した。",
+   "form": "反面",
+   "en": "Last year exports were strong while imports held steady, so the trade balance improved.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   }
  ],
- "233": [
-  {
-   "ja": "憂いの反面には喜びがあるものだ。",
-   "form": "反面",
-   "en": "Every cloud has a silver lining.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "反面教師にして、心に余裕を持って暮らしたい。",
-   "form": "反面",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5489562/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  }
- ],
  "234": [
   {
-   "ja": "つべこべ言わずに、出されたものを食べなさい。",
+   "ja": "つべこべ言わずに仕事に戻りなさい。",
    "form": "つべこべ",
-   "en": "Eat what you are served, no buts about it.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Stop complaining and get back to work.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/9795657",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "235": [
   {
-   "ja": "近所には一握りのいたずらっ子がいる。",
+   "ja": "ほんの一握りの男性しか育児休暇を取りたがらない。",
    "form": "一握り",
-   "en": "There are a handful of naughty boys in my neighborhood.",
+   "en": "Only a handful of men want to take childcare leave.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -3774,102 +3711,93 @@
  ],
  "236": [
   {
-   "ja": "国内の複数の死亡例について言及しており,情報面でも参考になります。",
-   "form": "言及",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
-   "url": "",
-   "licence": "CC BY-SA 4.0"
-  },
-  {
-   "ja": "パンダの指の本数や文化の成り立ちについても言及している。",
-   "form": "言及",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/6155535/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
    "ja": "スピーチの中で、彼は企業の強さについて言及した。",
    "form": "言及",
-   "en": "In the speech, he referred to the strength of the company.",
+   "en": "In his speech, he referred to the company's strengths.",
    "kind": "tatoeba",
    "site": "Tatoeba",
    "url": "https://tatoeba.org/ja/sentences/show/214539",
    "licence": "CC BY 2.0 FR (Tatoeba)"
-  }
- ],
- "237": [
+  },
   {
-   "ja": "仮に知っていれば私たちに話すだろう。",
-   "form": "仮に",
-   "en": "If he knew the truth, he would tell us.",
+   "ja": "自伝の中で彼はくりかえし不幸な少年時代に言及している。",
+   "form": "言及",
+   "en": "In his autobiography, he repeatedly refers to his unhappy childhood.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
+  }
+ ],
+ "237": [
+  {
+   "ja": "仮に生まれ変わるようなことがあれば、音楽家になりたい。",
+   "form": "仮に",
+   "en": "If I were ever born again, I'd want to be a musician.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
   },
   {
-   "ja": "仮に子供がいても、今の時代いくらでも方法はあると思うし。",
+   "ja": "仮に副業収入月5万円とすると、年間換算では60万円にもなる。",
    "form": "仮に",
-   "en": "",
+   "en": "Supposing you earn 50,000 yen a month from a side job, that comes to 600,000 yen a year.",
    "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6691317/",
+   "site": "livedoor ニュース／livedoor HOMME",
+   "url": "http://news.livedoor.com/article/detail/5692754/",
    "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "238": [
   {
-   "ja": "英語話者に通じなきゃ意味ないぞ。",
+   "ja": "ネイティヴの英語話者にとって、最も簡単に学習できる外国語はどれだと思いますか？",
    "form": "話者",
-   "en": "that means nothing if english speakers don 't understand it .",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Which foreign language do you think is the easiest for native English speakers to learn?",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/1080859",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "239": [
   {
-   "ja": "労働者とは、自己の労働力を提供し、その対価としての賃金や給料によって生活する者をいう。",
+   "ja": "賃金とは、労働の対価として会社が従業員に支払うすべての金銭を指します。",
    "form": "対価",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "Wages are all the money a company pays its employees in return for their labor.",
+   "kind": "company",
+   "site": "bakuraku.jp",
+   "url": "https://bakuraku.jp/knowledge/knowledge-attendance/wage/",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "許容するとすれば、その際、どの程度の対価を求めるのか。",
+   "ja": "仕事の対価はお金だと思うのですが、皆さんの意見を聞かせてください。",
    "form": "対価",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『パソコン創世記』富田倫生",
-   "url": "https://www.aozora.gr.jp/cards/000055/",
-   "licence": "public domain (Aozora Bunko)"
+   "en": "I think the reward for work is money, but I'd like to hear what everyone thinks.",
+   "kind": "qa",
+   "site": "detail.chiebukuro.yahoo.co.jp",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14325760709",
+   "licence": "web quotation (personal study)"
   }
  ],
  "240": [
   {
-   "ja": "短期間で英語を習得することはできない。",
+   "ja": "英語を習得するのは容易ではない。",
    "form": "習得",
-   "en": "You can not master English in a short time.",
+   "en": "It is not easy to master English.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/127368",
+   "url": "https://tatoeba.org/ja/sentences/show/189069",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "プレインイングリッシュは語学習得の近道です。",
+   "ja": "外国語を習得する一番よい方法は、それが話されている国へ行くことである。",
    "form": "習得",
-   "en": "Plain English is a shortcut to the goal of language learning.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "The best way to master a foreign language is to go to a country where it is spoken.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/184768",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "241": [
@@ -3947,87 +3875,78 @@
  ],
  "246": [
   {
-   "ja": "しおり要らずで、閉じた所からスタートできます。",
+   "ja": "トムは古いハガキをしおり代わりにした。",
    "form": "しおり",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6317735/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Tom used an old postcard as a bookmark.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/8859357",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "明日、しおり！明日、しおり！！早番だけどがんばる！！！",
+   "ja": "旅のしおりは理想を言えば、自分で編集するガイドブックである。",
    "form": "しおり",
-   "en": "",
-   "kind": "social",
-   "site": "SNS投稿（WRIME）",
-   "url": "",
-   "licence": "CC BY-NC-ND 4.0"
+   "en": "Ideally, a trip booklet is a guidebook you put together yourself.",
+   "kind": "blog",
+   "site": "itoutsukushi.hatenablog.com",
+   "url": "https://itoutsukushi.hatenablog.com/entry/2025/04/27/163158",
+   "licence": "web quotation (personal study)"
   }
  ],
  "247": [
   {
-   "ja": "若者は己の貪欲の犠牲になりがちである。",
-   "form": "がち",
-   "en": "Young men are apt to fall a victim to their own avarice.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "ja": "ガチで美味しいんですよ。",
+   "form": "ガチ",
+   "en": "It's seriously delicious.",
+   "kind": "blog",
+   "site": "b.houyhnhnm.jp",
+   "url": "https://b.houyhnhnm.jp/matsui_tomonori/2024/07/08/96860/",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "若い子なんかは特に神経が未発達だったりするから具合悪くなりがち。",
-   "form": "がち",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5455376/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
-   "ja": "私達はこのことを忘れがちである。",
-   "form": "がち",
-   "en": "We are apt to forget this fact.",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/151828",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
+   "ja": "プロゲーマーは、まさに「ガチ勢」の代表例です。",
+   "form": "ガチ",
+   "en": "Pro gamers are the very model of people who take it dead seriously.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/tsukamoto/n/nbcfa5eccc746",
+   "licence": "web quotation (personal study)"
   }
  ],
  "248": [
   {
-   "ja": "委員会はその議案を可決した。",
+   "ja": "議案は圧倒的多数で可決された。",
    "form": "可決",
-   "en": "The committee passed the bill.",
+   "en": "The bill was passed by an overwhelming majority.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 4.0"
   },
   {
-   "ja": "与党の自由民主党と公明党の賛成により、賛成多数で可決された。",
+   "ja": "本日の本会議で議案28件が可決されました。",
    "form": "可決",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5 (Wikinews)"
+   "en": "Twenty-eight bills were passed at today's plenary session.",
+   "kind": "gov",
+   "site": "www.city.yokohama.lg.jp",
+   "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/shikai/2026/0925kaketsu.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "249": [
   {
-   "ja": "結果、大半の豆から基準を越える残留農薬を検出していた。",
+   "ja": "第1審でセリエBへの降格とされたフィオレンティーナ、ラツィオの2クラブはセリエA残留となった。",
    "form": "残留",
-   "en": "",
+   "en": "Fiorentina and Lazio, which had been relegated to Serie B in the first ruling, ended up staying in Serie A.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5"
   },
   {
-   "ja": "10月2日のC大阪戦での勝利でリーグ戦6試合を残しJ1残留が確定。",
+   "ja": "ルーマニアには約600人の水兵が残留した。",
    "form": "残留",
-   "en": "",
+   "en": "About 600 sailors remained in Romania.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
@@ -4036,82 +3955,82 @@
  ],
  "250": [
   {
-   "ja": "長年かけてソルを探し出した彼は、なんとソルが唯一の皇族継承者だと告げ大騒動に。",
+   "ja": "皇族の養子縁組は現在は皇室典範で禁止されている。",
    "form": "皇族",
-   "en": "",
+   "en": "Adoption by members of the imperial family is currently prohibited by the Imperial House Law.",
    "kind": "news",
-   "site": "livedoor ニュース／Peachy",
-   "url": "http://news.livedoor.com/article/detail/5791190/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5"
   },
   {
-   "ja": "名誉副総裁には、代議員会の議決に基づき、各皇族が就任している。",
+   "ja": "皇室の構成員が16人と減少し、若い皇族が少ない現状から公務や皇位継承の維持が危ぶまれています。",
    "form": "皇族",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "With the imperial family down to 16 members and few young royals, there are fears for its official duties and the succession.",
+   "kind": "news",
+   "site": "diamondv.jp",
+   "url": "https://www.diamondv.jp/article/kP8NKMbnKqfBJfAx2TxYec",
+   "licence": "web quotation (personal study)"
   }
  ],
  "251": [
   {
-   "ja": "プロテスタント系の民兵UDAは、1999年の最初の対話以降、武装解除から離脱した。",
+   "ja": "2017年1月、アメリカ合衆国は、TPPから離脱した。",
    "form": "離脱",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
-   "ja": "結局、1975年にサルツマンはイオン・プロから離脱。",
-   "form": "離脱",
-   "en": "",
+   "en": "In January 2017, the United States withdrew from the TPP.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
   },
   {
-   "ja": "国民党は、簡潔に言うと、政治が崩壊する前に政府を離脱する必要があった。",
+   "ja": "ロートブラットさんはマンハッタン計画から離脱した唯一の物理学者となった。",
    "form": "離脱",
-   "en": "The People's party, to put it briefly, needed to leave the government before the government fell.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
+   "en": "Rotblat became the only physicist to leave the Manhattan Project.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 2.5"
+  },
+  {
+   "ja": "10月10日午後、公明党は連立政権からの「離脱」を決断した。",
+   "form": "離脱",
+   "en": "On the afternoon of October 10, Komeito decided to leave the coalition government.",
+   "kind": "news",
+   "site": "d3b.jp",
+   "url": "https://www.d3b.jp/npcolumn/21973",
+   "licence": "web quotation (personal study)"
   }
  ],
  "252": [
   {
-   "ja": "共同通信社と時事通信社によると、男児が生まれれば皇室で41年ぶり。",
+   "ja": "皇室にとって皇位継承の安定と皇族数確保は20年来、「喫緊の課題」であり続けた。",
    "form": "皇室",
-   "en": "",
+   "en": "For the imperial family, stable succession to the throne and keeping up the number of imperial family members have been an urgent issue for 20 years.",
    "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "site": "47news.jp",
+   "url": "https://www.47news.jp/14873883.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "「皇室典範とは、また、大きく出たじゃないか。」",
+   "ja": "最澄によって日本に伝えられた天台宗は、明治維新までは皇室の厚い尊崇を受けた。",
    "form": "皇室",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『一燈』太宰治",
-   "url": "https://www.aozora.gr.jp/cards/000035/",
-   "licence": "public domain (Aozora Bunko)"
-  }
- ],
- "253": [
-  {
-   "ja": "来客は船内装飾の豪華さに驚き、東洋汽船の今後の経営を危ぶむ者もいたほどであった。",
-   "form": "危ぶむ",
-   "en": "",
+   "en": "The Tendai school, brought to Japan by Saicho, was deeply revered by the imperial family until the Meiji Restoration.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
+  }
+ ],
+ "253": [
+  {
+   "ja": "私は彼の成功を危ぶむ。",
+   "form": "危ぶむ",
+   "en": "I have doubts about whether he will succeed.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
   }
  ],
  "254": [
@@ -4127,58 +4046,58 @@
  ],
  "255": [
   {
-   "ja": "私は彼の財産を相続するだろう。",
+   "ja": "長男がすべての財産を相続した。",
    "form": "相続",
-   "en": "I will inherit his estate.",
+   "en": "The eldest son inherited all the property.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "生涯のパートナーであったダニエル・デフェールが彼の遺産を相続した。",
+   "ja": "相続放棄をした人は、初めから相続人とならなかったものとみなされます。",
    "form": "相続",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "A person who renounces an inheritance is treated as never having been an heir.",
+   "kind": "company",
+   "site": "www.sgho.jp",
+   "url": "https://www.sgho.jp/blog/%E7%9B%B8%E7%B6%9Aqa/262",
+   "licence": "web quotation (personal study)"
   }
  ],
  "256": [
   {
-   "ja": "医者は彼女に厳しい規定食を勧めた。",
+   "ja": "志願者は女性に限ると規定されている。",
    "form": "規定",
-   "en": "The doctor ordered her to go on a strict diet.",
+   "en": "It is stipulated that applicants must be women.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "2レース規定により、完走扱い。",
+   "ja": "憲法の規定に従い衆院の議決が参院に優越する。",
    "form": "規定",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
+   "en": "Under the provisions of the Constitution, decisions of the House of Representatives take precedence over those of the House of Councillors.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.5"
+   "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "今回の住民投票は、CPAに盛り込まれた規定に沿う形で実施された。",
+   "ja": "小麦の輸入禁止が法律で規定された。",
    "form": "規定",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
+   "en": "A ban on wheat imports was laid down by law.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.5"
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "257": [
   {
    "ja": "仕事の難しい部分は彼がやる羽目になった。",
    "form": "羽目になっ",
-   "en": "He was left to do the difficult part of the work.",
+   "en": "He ended up having to do the hard part of the job.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -4186,6 +4105,15 @@
   }
  ],
  "258": [
+  {
+   "ja": "軍隊、帝室の費えがすべてこれで賄えるのか。",
+   "form": "費え",
+   "en": "Can this really cover all the expenses of the army and the imperial household?",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/tanahashi/n/n32fbb3d63509",
+   "licence": "web quotation (personal study)"
+  },
   {
    "ja": "長引く工事は町にとって大きな費えとなった。",
    "form": "費え",
@@ -4198,52 +4126,52 @@
  ],
  "259": [
   {
-   "ja": "君の行動に弁解の余地はない。",
-   "form": "余地",
-   "en": "Your behavior admits of no excuse.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "そんなものを買う余裕はないよ。",
+   "ja": "家を買いたいけど、買う余裕がない。",
    "form": "余裕",
-   "en": "I cannot afford to buy such a thing.",
+   "en": "I'd like to buy a house, but I can't afford it.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/204189",
+   "url": "https://tatoeba.org/ja/sentences/show/11026313",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "余計なことをして、すみません。",
+   "form": "余計",
+   "en": "Sorry for doing something unnecessary.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/74789",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "260": [
   {
-   "ja": "社の弁護士に暫定合意の内容を吟味してもらおう。",
+   "ja": "素材を吟味したきれいで美味しいお料理です。",
    "form": "吟味",
-   "en": "We'll have our firm's attorneys look through the provisional agreement.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "It's beautiful, delicious food made with carefully selected ingredients.",
+   "kind": "other",
+   "site": "tripadvisor.com",
+   "url": "https://www.tripadvisor.com/LocationPhotoDirectLink-g303160-d9690455-i245645023-Wa_Ryori_Hara-Kitakyushu_Fukuoka_Prefecture_Kyushu.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "261": [
   {
-   "ja": "少し時間を割いていただけないでしょうか。",
-   "form": "割い",
-   "en": "could you spare me a few minutes ?",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "年の割には、彼はとても元気そうである。",
+   "ja": "あなたは年の割に若く見える。",
    "form": "割",
-   "en": "He looks very vigorous, considering his age.",
+   "en": "You look young for your age.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/121847",
+   "url": "https://tatoeba.org/ja/sentences/show/231686",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "誰が窓を割ったの？本当のことを言いなさい。",
+   "form": "割っ",
+   "en": "Who broke the window? Tell me the truth.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/5845186",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
@@ -4260,40 +4188,40 @@
  ],
  "263": [
   {
-   "ja": "各選考委員はカテゴリごとに60点をもち、開催地を採点した。",
+   "ja": "私達の先生は試験の採点をしている。",
    "form": "採点",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "Our teacher is grading the tests.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/151944",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "素点形式で採点され60点以上で合格。",
+   "ja": "息子は自己採点をしていきました。",
    "form": "採点",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
-   "url": "",
-   "licence": "CC BY-SA 4.0"
+   "en": "My son went ahead and scored his own answers.",
+   "kind": "blog",
+   "site": "ameblo.jp",
+   "url": "https://ameblo.jp/kouchanmamasan/entry-12912290267.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "264": [
   {
-   "ja": "肌寒い気温を忘れてしまう様な熱い踊りで会場を温めた。",
+   "ja": "今日は日差しの割に肌寒い一日でした。",
    "form": "肌寒い",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/5958928/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Despite the sunshine, it was a chilly day today.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/2750113",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "265": [
   {
    "ja": "目が見えない人の聴力は鋭敏な場合が多い。",
    "form": "鋭敏",
-   "en": "A blind person's hearing is often very acute.",
+   "en": "Blind people often have very keen hearing.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -4302,22 +4230,22 @@
  ],
  "266": [
   {
-   "ja": "豪華キャスト、スタッフが集結した本作。",
+   "ja": "バンコクの官庁の建物付近に戦車が集結している。",
    "form": "集結",
-   "en": "",
+   "en": "Tanks are massing near government buildings in Bangkok.",
    "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/6004816/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5"
   },
   {
-   "ja": "将軍は兵士をパリに集結した。",
+   "ja": "政府への抗議活動が続く香港の国際空港近くに1日、大勢の若者らが集結し、抗議活動を展開した。",
    "form": "集結",
-   "en": "The general concentrated the soldiers in Paris.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "On the 1st, crowds of young people gathered near Hong Kong's international airport, where protests against the government continue, and staged a demonstration.",
+   "kind": "news",
+   "site": "video.mainichi.jp",
+   "url": "https://video.mainichi.jp/detail/video/6082298030001",
+   "licence": "web quotation (personal study)"
   }
  ],
  "267": [
@@ -4344,44 +4272,44 @@
  ],
  "269": [
   {
-   "ja": "RCクレインOPに所属しているプーカと中村陽樹のコンビが制覇した。",
+   "ja": "9年間で2度のリーグ制覇に大きく貢献した。",
    "form": "制覇",
-   "en": "",
+   "en": "He played a big part in winning two league titles in nine years.",
    "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5 (Wikinews)"
+   "site": "livedoor ニュース／Sports Watch",
+   "url": "http://news.livedoor.com/article/detail/6149027/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   },
   {
-   "ja": "「スーパーソニック」は世界制覇すると思うかい。",
+   "ja": "2006年12月に旅をスタートし、7年半を費やして一応全国制覇を達成しました。",
    "form": "制覇",
-   "en": "Do you think the Supersonics will go all the way to the world championships?",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "I started my journey in December 2006 and, after seven and a half years, more or less managed to cover the whole country.",
+   "kind": "blog",
+   "site": "ameblo.jp",
+   "url": "https://ameblo.jp/rs-trip/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "270": [
   {
-   "ja": "チェスの盤面はこの世に似ている。",
+   "ja": "オセロの盤面は真っ白になった。",
    "form": "盤面",
-   "en": "The chessboard is the world.",
+   "en": "The Othello board turned completely white.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/203019",
+   "url": "https://tatoeba.org/ja/sentences/show/10125518",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "271": [
   {
-   "ja": "かれは本当に神童である。",
+   "ja": "小学三年生の僕は、地元のそろばん塾で“神童”と呼ばれていた。",
    "form": "神童",
-   "en": "He truly is a prodigy.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "In third grade, I was called a \"child prodigy\" at the local abacus school.",
+   "kind": "literature",
+   "site": "kakuyomu.jp",
+   "url": "https://kakuyomu.jp/works/16818622171512681947/episodes/16818622171512943291",
+   "licence": "web quotation (personal study)"
   }
  ],
  "272": [
@@ -4428,9 +4356,9 @@
  ],
  "275": [
   {
-   "ja": "私は時間を持て余している。",
+   "ja": "彼女は暇を持て余しているらしい。",
    "form": "持て余し",
-   "en": "i 've got time on my hands .",
+   "en": "She seems to have more free time than she knows what to do with.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -4439,75 +4367,75 @@
  ],
  "276": [
   {
-   "ja": "いまだにインターネットの導入を検討している会社がある。",
+   "ja": "厚生労働省は対策を検討することにしている。",
    "form": "検討",
-   "en": "Some companies are still debating whether to get Internet access.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
-  },
-  {
-   "ja": "管財人は次のような計画案を持って再建させることを検討している。",
-   "form": "検討",
-   "en": "",
+   "en": "The Ministry of Health, Labour and Welfare plans to consider countermeasures.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5"
   },
   {
-   "ja": "当大学では身体障害者の受け入れを検討しているところだ。",
+   "ja": "現在、来年度に向けて作業着のリニューアルを検討しています。",
    "form": "検討",
-   "en": "Our university authorities are considering the admission of handicapped students.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
+   "en": "We are currently considering renewing our work uniforms for next fiscal year.",
+   "kind": "company",
+   "site": "www.kumagai-steel.co.jp",
+   "url": "https://www.kumagai-steel.co.jp/days/2022/5259/",
+   "licence": "web quotation (personal study)"
+  },
+  {
+   "ja": "動物園では、サル山に電流が流れる柵を設置することを検討するという。",
+   "form": "検討",
+   "en": "The zoo says it will consider installing an electric fence around the monkey mountain.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 2.5"
   }
  ],
  "277": [
   {
-   "ja": "第2試合で敗れた鹿児島工も初出場でベスト4という健闘を見せた。",
+   "ja": "ご健闘を祈っています。",
    "form": "健闘",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "I'm wishing you the best of luck.",
+   "kind": "company",
+   "site": "www.keicho.net",
+   "url": "https://www.keicho.net/bunrei/bunrei.php?cate_cd=74",
+   "licence": "web quotation (personal study)"
   }
  ],
  "278": [
   {
-   "ja": "競走馬は互角でトラックをまわった。",
+   "ja": "どちらが勝ってもおかしくない。両チームとも実力はほぼ互角だからね。",
    "form": "互角",
-   "en": "The horses are coming down the track and it's neck and neck.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Either side could win, since the two teams are about evenly matched.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/200797",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "279": [
   {
-   "ja": "永世名人が実力制になってから6人目の快挙である。",
+   "ja": "米大リーグ・ドジャースの大谷翔平投手が新たな快挙を成し遂げた。",
    "form": "快挙",
-   "en": "",
+   "en": "Shohei Ohtani of the Los Angeles Dodgers has pulled off another remarkable feat.",
    "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "site": "news.yahoo.co.jp",
+   "url": "https://news.yahoo.co.jp/articles/1e272ced3ff8218117319f9c155fa67d8f81049f",
+   "licence": "web quotation (personal study)"
   }
  ],
  "280": [
   {
-   "ja": "そうそう、「ちょっと不幸な私が好き」症候群の女、周囲を見渡せば結構出てきますよね。",
+   "ja": "授賞式にはそうそうたる顔ぶれがそろった。",
    "form": "そうそう",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6458290/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "A distinguished lineup gathered for the awards ceremony.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original"
   }
  ],
  "281": [
@@ -4554,38 +4482,38 @@
  ],
  "284": [
   {
-   "ja": "天才とは従来、先天的に絶大な努力をなし得る能力を備えた者との定義が下されてきた。",
+   "ja": "先天的な疾患（生まれつきの異常）が、10年か20年で急増するなど、ありえないことです。",
    "form": "先天的",
-   "en": "Genius has been defined as a supreme capacity for taking trouble.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "It is impossible for congenital disorders to suddenly surge within ten or twenty years.",
+   "kind": "company",
+   "site": "mental.or.jp",
+   "url": "https://mental.or.jp/%E7%99%BA%E9%81%94%E9%9A%9C%E5%AE%B3",
+   "licence": "web quotation (personal study)"
   }
  ],
  "285": [
   {
-   "ja": "毎日新聞は、従来からの関係を踏まえ、今後、業務提携がなされる可能性があると報じている。",
-   "form": "従来",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5 (Wikinews)"
-  },
-  {
    "ja": "プラスチックが従来の多くの材料に取って代わった。",
    "form": "従来",
-   "en": "Plastics have taken the place of many conventional materials.",
+   "en": "Plastics have replaced many conventional materials.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
+   "ja": "神田店につきましては従来通りの営業となります。",
+   "form": "従来",
+   "en": "The Kanda store will remain open as usual.",
+   "kind": "blog",
+   "site": "ameblo.jp",
+   "url": "https://ameblo.jp/gill-lureshop/entry-12837237637.html",
+   "licence": "web quotation (personal study)"
+  },
+  {
    "ja": "従来の常識を覆す発明というのは、普通とは違う現象に気づく能力と関係がある。",
    "form": "従来",
-   "en": "Innovation has something to do with the faculty to notice unusual phenomena.",
+   "en": "Inventions that overturn conventional wisdom come from the ability to notice unusual phenomena.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -4594,56 +4522,56 @@
  ],
  "286": [
   {
-   "ja": "同年11月議会を再開したが、強権的な政治手法はかわらず、反発もあった。",
+   "ja": "データ分析の手法は山のようにあります。",
    "form": "手法",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "There are tons of methods for data analysis.",
+   "kind": "blog",
+   "site": "data-viz-lab.com",
+   "url": "https://data-viz-lab.com/analyticalmethod-list",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "そもそも、利害が複雑に絡む規制の是非を短時間で判断する手法に限界があったとも言えよう。",
+   "ja": "ナノテクノロジーの手法は大きく2つにわけることができる。",
    "form": "手法",
-   "en": "",
-   "kind": "other",
-   "site": "ウェブ（UD Japanese GSD）",
-   "url": "",
-   "licence": "CC BY-SA 4.0"
-  },
-  {
-   "ja": "科学的手法と工学的手法にはオーバーラップする部分がある。",
-   "form": "手法",
-   "en": "",
+   "en": "The techniques of nanotechnology can be broadly divided into two types.",
    "kind": "wiki",
    "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
+  },
+  {
+   "ja": "テーマや手法を変えて、写真の記録性ということにこだわっていきたいです。",
+   "form": "手法",
+   "en": "I want to change my themes and techniques while staying committed to photography as a record.",
+   "kind": "news",
+   "site": "livedoor ニュース／ITライフハック",
+   "url": "http://news.livedoor.com/article/detail/6671362/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "287": [
   {
    "ja": "警察と消防は電気系統の異常で火が出たことを視野に、20日に現場検証を行い原因を調べている。",
    "form": "検証",
-   "en": "",
+   "en": "Police and firefighters, considering the possibility that an electrical fault started the fire, inspected the scene on the 20th to find the cause.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5"
   },
   {
-   "ja": "公正を正確にするため、データの再検証が必要である。",
+   "ja": "数字にならない価値と、検証されていない効果を区別すればよい。",
    "form": "検証",
-   "en": "Reexamination of the data is required to make the formula accurate.",
+   "en": "You just need to distinguish value that can't be put into numbers from effects that haven't been verified.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "Bunki original"
   },
   {
    "ja": "始発前に現場検証が終わったため、名松線は通常通り運行した。",
    "form": "検証",
-   "en": "",
+   "en": "The on-site inspection finished before the first train, so the Meisho Line ran as usual.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
@@ -4672,13 +4600,13 @@
  ],
  "289": [
   {
-   "ja": "ガラスを丹念に研磨する加工技術で強度を上げた「グラデーションエッジガラス」を採用。",
+   "ja": "ケイトは歴史の講義を丹念にノートにとった。",
    "form": "丹念",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／エスマックス",
-   "url": "http://news.livedoor.com/article/detail/6604610/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Kate took careful notes during the history lecture.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
   }
  ],
  "290": [
@@ -4694,6 +4622,15 @@
  ],
  "291": [
   {
+   "ja": "ぜんぜん狙っていない、巧まざる魅力、憧れます。",
+   "form": "巧まざる",
+   "en": "That completely unforced, artless charm—I really admire it.",
+   "kind": "blog",
+   "site": "shikanoie.com",
+   "url": "https://shikanoie.com/blog/posts/3380",
+   "licence": "web quotation (personal study)"
+  },
+  {
    "ja": "その画家は巧まずして自然の美しさを描き出した。",
    "form": "巧まずして",
    "en": "The painter captured the beauty of nature without any artifice.",
@@ -4705,13 +4642,13 @@
  ],
  "292": [
   {
-   "ja": "今までも何かあれば、自分から挑戦していくし、率先してやるタイプよ。",
+   "ja": "彼は率先して計画を実行した。",
    "form": "率先",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/6454001/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "He took the lead in carrying out the plan.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
   }
  ],
  "293": [
@@ -4738,20 +4675,20 @@
  ],
  "295": [
   {
-   "ja": "賞金1千万クローナは、IAEAとエルバラダイ事務局長が折半する。",
+   "ja": "生活費を折半しているカップル・夫婦に質問したいです。",
    "form": "折半",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "I have a question for couples who split their living expenses fifty-fifty.",
+   "kind": "qa",
+   "site": "detail.chiebukuro.yahoo.co.jp",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q13320620203",
+   "licence": "web quotation (personal study)"
   }
  ],
  "296": [
   {
    "ja": "あんなことを彼女に言うなんて非常識も甚だしい。",
    "form": "甚だしい",
-   "en": "It's quite absurd of you to tell her that sort of thing.",
+   "en": "Saying something like that to her is utterly thoughtless.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -4760,22 +4697,22 @@
  ],
  "297": [
   {
-   "ja": "経済は厳しい不況で縮小した。",
+   "ja": "長引く不況のために、多くの労働者が失業している。",
    "form": "不況",
-   "en": "The economy recorded a negative growth.",
+   "en": "Because of the prolonged recession, many workers are out of work.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "言いたくはないが、どこもかしこも“不況”の声がやまない2010年だった。",
+   "ja": "「出版不況だから売れない」と言い訳していた自分をものスゴく恥じた。",
    "form": "不況",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5180406/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "I felt deeply ashamed of having made the excuse that books weren't selling because of the publishing slump.",
+   "kind": "blog",
+   "site": "note.com",
+   "url": "https://note.com/shuppan_zenya/n/ne80f51b50e72",
+   "licence": "web quotation (personal study)"
   }
  ],
  "298": [
@@ -4791,67 +4728,67 @@
  ],
  "299": [
   {
-   "ja": "万が一に備えて、武器になるものを探した。",
+   "ja": "万が一の時のために、保険には入っておいたほうがいいよ。",
    "form": "万が一",
-   "en": "I looked around for a weapon just in case.",
+   "en": "You should get insurance, just in case.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/81204",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "万が一の場合に備えて貯金するのは賢明だ。",
+   "form": "万が一",
+   "en": "It's wise to save money in case the worst happens.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
-  },
-  {
-   "ja": "万一失敗したらどうなるだろうか。",
-   "form": "万一",
-   "en": "What if we should fail?",
-   "kind": "tatoeba",
-   "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/81152",
-   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "300": [
   {
-   "ja": "今後は発達しながら北上し、中国に上陸する可能性がある。",
-   "form": "北上",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
    "ja": "台風１１号は、毎時２０キロメートルの速さで北上中です。",
    "form": "北上",
-   "en": "Typhoon No.11 is moving up north at twenty kilometers per hour.",
+   "en": "Typhoon No. 11 is moving north at 20 kilometers per hour.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
+  },
+  {
+   "ja": "ようやく桜の便りが届き始め、桜前線が北上し始めました。",
+   "form": "北上",
+   "en": "News of cherry blossoms has finally started to arrive, and the cherry blossom front has begun moving north.",
+   "kind": "blog",
+   "site": "www.aichi-kyosai.or.jp",
+   "url": "https://www.aichi-kyosai.or.jp/service/culture/internet/language/english2/english2_1/post_1364.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "301": [
   {
+   "ja": "小泉が与党自民党の新総裁に選出された。",
+   "form": "自民党",
+   "en": "Koizumi was elected the new president of the ruling LDP.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 4.0"
+  },
+  {
    "ja": "自民党は増税の法案を提出したが、猛烈な反対にあって撤回した。",
    "form": "自民党",
-   "en": "The LDP brought out a bill to raise taxes, but they met with such violent opposition that they backed down.",
+   "en": "The LDP introduced a bill to raise taxes but withdrew it in the face of fierce opposition.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
    "licence": "CC BY 2.0 FR"
   },
   {
-   "ja": "毎日新聞によれば、自民党執行部は受理を見送っている。",
-   "form": "自民党",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
-  },
-  {
    "ja": "自民党は国民の審判を厳粛に受け止めて、必ず再生して政権を奪回する。",
    "form": "自民党",
-   "en": "",
+   "en": "The LDP will solemnly accept the people's verdict, rebuild itself, and win back power without fail.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
@@ -4860,69 +4797,69 @@
  ],
  "302": [
   {
-   "ja": "同時に2人の皇后が並立する事態がはじめて生じたのである。",
+   "ja": "イヌがオオカミから分岐した(イヌが人間によって最初に家畜化された)時期については、異なった見解が並立している。",
    "form": "並立",
-   "en": "",
+   "en": "Different views coexist on when dogs split off from wolves (when dogs were first domesticated by humans).",
    "kind": "wiki",
-   "site": "ja.wikipedia.org（KFTT）",
+   "site": "ja.wikipedia.org",
    "url": "",
    "licence": "CC BY-SA (Wikipedia)"
   }
  ],
  "303": [
   {
-   "ja": "部屋のコーナーに複数置くと、明かりが立体的に、やわらかくなるんです。",
+   "ja": "なぜ影を描くと立体的に見えるの？",
    "form": "立体的",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/6270754/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Why does drawing shadows make things look three-dimensional?",
+   "kind": "blog",
+   "site": "snabi.jp",
+   "url": "https://snabi.jp/facility/27276/blog_articles/702150",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "ともかくもここのながめは立体的である。",
+   "ja": "人物を球体で捉えて、顔と体を立体的に描く方法を見ていきましょう。",
    "form": "立体的",
-   "en": "",
-   "kind": "literature",
-   "site": "青空文庫『軽井沢』寺田寅彦",
-   "url": "https://www.aozora.gr.jp/cards/000042/",
-   "licence": "public domain (Aozora Bunko)"
+   "en": "Let's look at how to draw the face and body three-dimensionally by thinking of a figure as spheres.",
+   "kind": "company",
+   "site": "www.palmie.jp",
+   "url": "https://www.palmie.jp/lessons/292",
+   "licence": "web quotation (personal study)"
   }
  ],
  "304": [
   {
-   "ja": "訂正：この記事において、事実とは違う内容を報道していました。",
+   "ja": "私の言うことが間違っていたら訂正して下さい。",
    "form": "訂正",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "Please correct me if I'm wrong.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/163717",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "もし誤りがあれば訂正しなさい。",
+   "ja": "訂正印を押すことで、誰の修正かがわかり、改ざんされていないと証明できます。",
    "form": "訂正",
-   "en": "Correct errors, if any.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
+   "en": "Stamping a correction seal shows who made the change and proves it hasn't been tampered with.",
+   "kind": "company",
+   "site": "www.inkan-honpo.com",
+   "url": "https://www.inkan-honpo.com/information-inkan-kojinin-teiseiin.html",
+   "licence": "web quotation (personal study)"
   }
  ],
  "305": [
   {
-   "ja": "諮問機関には、横綱審議委員会、運営審議会の2つがある。",
+   "ja": "裁判員制度法案についての委員会審議が本日、始まった。",
    "form": "審議",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "Committee deliberations on the lay judge system bill began today.",
+   "kind": "other",
+   "site": "j-ba.or.jp",
+   "url": "https://j-ba.or.jp/stance/jba100591.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "評決は公平な審議の証拠である。",
+   "ja": "派閥内の抗争が審議に支障をきたしました。",
    "form": "審議",
-   "en": "The verdict is a tribute to their fairness.",
+   "en": "Factional infighting got in the way of the deliberations.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -4951,91 +4888,91 @@
  ],
  "307": [
   {
-   "ja": "得意分野は、建築では医療機関、土木ではLNGタンクの施工であるといわれている。",
+   "ja": "レンガ職人が壁を施工している。",
    "form": "施工",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "A bricklayer is building a wall.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/11510683",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "注目は、入居前の施工時に入居者自身で、内装や建具をカスタマイズできるという自由度の高さだ。",
+   "ja": "施工不良の原因としては、スケジュールの圧迫、材料の品質不足、作業員のスキル不足が挙げられます。",
    "form": "施工",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／livedoor HOMME",
-   "url": "http://news.livedoor.com/article/detail/6672680/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "Causes of poor workmanship include tight schedules, low-quality materials, and workers lacking skill.",
+   "kind": "company",
+   "site": "aippearcloud.com",
+   "url": "https://aippearcloud.com/sekohuryo/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "308": [
   {
-   "ja": "首相は昨日記者会見を行なった。",
+   "ja": "首相は明日、記者会見を開きます。",
    "form": "会見",
-   "en": "The Prime Minister held a press conference yesterday.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "The Prime Minister will hold a press conference tomorrow.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/1068869",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "気象庁と国土交通省は正午から記者会見を開き、次のように述べた。",
+   "ja": "フジモリ氏は、自身の講演会の後、記者会見を行い、大統領選挙に出馬すると明言した。",
    "form": "会見",
-   "en": "",
+   "en": "After his lecture, Mr. Fujimori held a press conference and declared he would run for president.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
-   "licence": "CC BY 2.5"
+   "licence": "CC BY 2.5 (Wikinews)"
   },
   {
-   "ja": "朝日によると、北側一雄国土交通大臣は記者会見で、違法改造が常態化していたと指摘。",
+   "ja": "今日遅くに大統領は記者会見を開く。",
    "form": "会見",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "The president will hold a press conference later today.",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/171427",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "309": [
   {
-   "ja": "Macは、ユーザーに対して「使いやすい」ことを徹底して意識して設計されている。",
-   "form": "設計",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／ITライフハック",
-   "url": "http://news.livedoor.com/article/detail/6305025/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
-  },
-  {
    "ja": "私の家は地震に堪えるように設計されている。",
    "form": "設計",
-   "en": "My house is designed so as to withstand an earthquake.",
+   "en": "My house is designed to withstand earthquakes.",
    "kind": "tatoeba",
    "site": "Tatoeba",
    "url": "https://tatoeba.org/ja/sentences/show/163953",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   },
   {
-   "ja": "実施設計とは基本設計で決まった計画を、工事ができる図面に書く作業です。",
+   "ja": "ホワイトハウスを設計したのは誰ですか。",
    "form": "設計",
-   "en": "Detailed design is the work of drawing up a diagram that is capable of being manufactured from the plan set in the baseline design.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Who designed the White House?",
+   "kind": "tatoeba",
+   "site": "Tatoeba",
+   "url": "https://tatoeba.org/ja/sentences/show/195929",
+   "licence": "CC BY 2.0 FR (Tatoeba)"
+  },
+  {
+   "ja": "Macは、ユーザーに対して「使いやすい」ことを徹底して意識して設計されている。",
+   "form": "設計",
+   "en": "Macs are designed with a thorough focus on being easy for users.",
+   "kind": "news",
+   "site": "livedoor ニュース／ITライフハック",
+   "url": "http://news.livedoor.com/article/detail/6305025/",
+   "licence": "CC BY-ND 2.1 JP (livedoor)"
   }
  ],
  "310": [
   {
-   "ja": "橋が崩落したり、人が死ぬ度に心拍数が急激に上がっている。",
+   "ja": "茨城県では北浦に架かる鹿行大橋の一部が崩落した。",
    "form": "崩落",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／MOVIE ENTER",
-   "url": "http://news.livedoor.com/article/detail/5913562/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "en": "In Ibaraki Prefecture, part of the Rokko Bridge over Lake Kitaura collapsed.",
+   "kind": "wiki",
+   "site": "ja.wikipedia.org",
+   "url": "",
+   "licence": "CC BY-SA (Wikipedia)"
   }
  ],
  "311": [
@@ -5064,7 +5001,7 @@
   {
    "ja": "条例改正案は11月の県議会に提案される見通し。",
    "form": "県議会",
-   "en": "",
+   "en": "The ordinance amendment is expected to be submitted to the prefectural assembly in November.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
@@ -5084,58 +5021,58 @@
  ],
  "315": [
   {
-   "ja": "最初のパラグラフでは、いわゆるサプライサイドの経済戦略というものの妥当性について疑問を呈する。",
+   "ja": "公表されている分析法の中には、妥当性が確認されている方法もあります。",
    "form": "妥当性",
-   "en": "In the opening paragraphs I query the validity of so-called supply-side economic strategies.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 2.0 FR"
+   "en": "Some of the published analytical methods have had their validity confirmed.",
+   "kind": "gov",
+   "site": "maff.go.jp",
+   "url": "https://www.maff.go.jp/j/syouan/seisaku/data_reliance/reliance.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "エメット理論の妥当性について再検討する必要があることを指摘しなければならない。",
+   "ja": "この議論の妥当性に関する疑問はデータを見れば雲散霧消する。",
    "form": "妥当性",
-   "en": "I should point out that it is necessary to re-examine the validity of Emmet's theory.",
+   "en": "Any doubts about the validity of this argument vanish once you look at the data.",
    "kind": "tatoeba",
    "site": "Tatoeba",
-   "url": "https://tatoeba.org/ja/sentences/show/227913",
+   "url": "https://tatoeba.org/ja/sentences/show/222393",
    "licence": "CC BY 2.0 FR (Tatoeba)"
   }
  ],
  "316": [
   {
-   "ja": "車を維持するのはとても経費がかかる。",
+   "ja": "旅行にかかった経費は払い戻しを請求できます。",
    "form": "経費",
-   "en": "Running a car is a great expense.",
+   "en": "You can claim reimbursement for your travel expenses.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
-   "licence": "CC BY 2.0 FR"
+   "licence": "CC BY 4.0"
   },
   {
-   "ja": "読売新聞によれば、経費の計上方法を巡る税務処理のミスとされる。",
+   "ja": "事業者の所得は、収入から経費を差し引くことで決まります。",
    "form": "経費",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "A business owner's income is determined by subtracting expenses from revenue.",
+   "kind": "company",
+   "site": "postas.co.jp",
+   "url": "https://www.postas.co.jp/knowledge/3308/",
+   "licence": "web quotation (personal study)"
   }
  ],
  "317": [
   {
-   "ja": "8月17日に開催した定例審議委員会での決定による。",
+   "ja": "定例会議はチームの現状を共有するなど、企業にとって大切です。",
    "form": "定例",
-   "en": "",
-   "kind": "news",
-   "site": "ja.wikinews.org",
-   "url": "",
-   "licence": "CC BY 2.5"
+   "en": "Regular meetings are important for a company, for example for sharing how the team is doing.",
+   "kind": "company",
+   "site": "slack.com",
+   "url": "https://slack.com/intl/ja-jp/blog/collaboration/the-intention-of-having-regular-meetings",
+   "licence": "web quotation (personal study)"
   },
   {
    "ja": "Zoomで定例会議やったけど、信頼関係があるから何の問題もないな。",
    "form": "定例",
-   "en": "",
+   "en": "We had our regular meeting on Zoom, but since we trust each other there were no problems at all.",
    "kind": "social",
    "site": "SNS投稿（WRIME）",
    "url": "",
@@ -5146,7 +5083,7 @@
   {
    "ja": "福島第一原子力発電所の事故以来、放射能の影響に対する関心が高まっている。",
    "form": "原子力発電所",
-   "en": "",
+   "en": "Since the accident at the Fukushima Daiichi Nuclear Power Plant, concern about the effects of radiation has grown.",
    "kind": "news",
    "site": "livedoor ニュース／家電チャンネル",
    "url": "http://news.livedoor.com/article/detail/6036401/",
@@ -5155,29 +5092,29 @@
  ],
  "319": [
   {
-   "ja": "言葉を交わすことはできないけれど、見ているだけでも心を安らかにさせてくれる動物たち。",
-   "form": "交わす",
-   "en": "",
-   "kind": "news",
-   "site": "livedoor ニュース／独女通信",
-   "url": "http://news.livedoor.com/article/detail/5592034/",
-   "licence": "CC BY-ND 2.1 JP (livedoor)"
+   "ja": "私たちはあいさつを交わし合った。",
+   "form": "交わし合っ",
+   "en": "We exchanged greetings.",
+   "kind": "example-bank",
+   "site": "例文集（Tanaka/SNOW）",
+   "url": "",
+   "licence": "CC BY 2.0 FR"
   }
  ],
  "320": [
   {
-   "ja": "顕著な例としては判検交流があり、裁判所との親密な関係を示すものとされている。",
+   "ja": "労働災害の増加傾向が顕著になっています。",
    "form": "顕著",
-   "en": "",
-   "kind": "wiki",
-   "site": "ja.wikipedia.org",
-   "url": "",
-   "licence": "CC BY-SA (Wikipedia)"
+   "en": "The upward trend in workplace accidents has become pronounced.",
+   "kind": "gov",
+   "site": "jsite.mhlw.go.jp",
+   "url": "https://jsite.mhlw.go.jp/fukui-roudoukyoku/newpage_01362.html",
+   "licence": "web quotation (personal study)"
   },
   {
-   "ja": "高熱がこの病気の顕著な症状だ。",
+   "ja": "禁煙による健康上の利点は、顕著であり、すぐに現れ、着実に増加していくのである。",
    "form": "顕著",
-   "en": "High fever is a prominent symptom of this disease.",
+   "en": "The health benefits of quitting smoking are marked, appear quickly, and steadily increase.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",
@@ -5186,29 +5123,29 @@
  ],
  "321": [
   {
-   "ja": "ソ連は最後の手段としてしかその国を空爆しないだろう。",
-   "form": "空爆",
-   "en": "The USSR will only use air strikes in the country as a last resort.",
-   "kind": "example-bank",
-   "site": "例文集（Tanaka/SNOW）",
-   "url": "",
-   "licence": "CC BY 4.0"
-  },
-  {
    "ja": "空爆の影響で、ガザ地区では広範囲に渡って電力の供給が止まっている。",
    "form": "空爆",
-   "en": "",
+   "en": "Because of the airstrikes, power supplies have been cut off across wide areas of the Gaza Strip.",
    "kind": "news",
    "site": "ja.wikinews.org",
    "url": "",
    "licence": "CC BY 2.5 (Wikinews)"
+  },
+  {
+   "ja": "アルジャジーラによると、イスラエル軍はベイルートなどを空爆している。",
+   "form": "空爆",
+   "en": "According to Al Jazeera, the Israeli military is carrying out airstrikes on Beirut and other places.",
+   "kind": "news",
+   "site": "ja.wikinews.org",
+   "url": "",
+   "licence": "CC BY 2.5"
   }
  ],
  "322": [
   {
    "ja": "火事の時は、火の粉をかぶらないように何か纏ったほうがいい。",
    "form": "纏っ",
-   "en": "When there's a fire, you should wrap yourself with something so that sparks don't land on you.",
+   "en": "In a fire, you should wrap yourself in something so sparks don't land on you.",
    "kind": "tatoeba",
    "site": "Tatoeba",
    "url": "https://tatoeba.org/ja/sentences/show/8210836",
@@ -5217,7 +5154,7 @@
   {
    "ja": "彼は日本の民話を教科書用に纏めた。",
    "form": "纏め",
-   "en": "He compiled a Japanese folklore anthology for use in schools.",
+   "en": "He compiled Japanese folk tales for use in textbooks.",
    "kind": "example-bank",
    "site": "例文集（Tanaka/SNOW）",
    "url": "",

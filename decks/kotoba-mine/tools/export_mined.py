@@ -42,6 +42,11 @@ def main() -> int:
     out = {}
     for n, v in ranked.items():
         pool = {p["ja"]: p for p in v["picked"] + v["alts"]}
+        # a reviewer may also take a line straight from the word's web results
+        web = DECK / "mining" / "web" / f"{n}.json"
+        if web.exists():
+            for c in json.loads(web.read_text("utf-8"))["candidates"]:
+                pool.setdefault(c["ja"], {**c, "licence": "web quotation (personal study)"})
         rows = []
         if n in review:
             for r in review[n]:
