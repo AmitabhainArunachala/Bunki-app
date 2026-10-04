@@ -74,13 +74,16 @@ function verifyDeck() {
   check('the deck is a bunki-cloze-deck v1 with 12 topics', deck.format === 'bunki-cloze-deck' && deck.version === 1 && deck.groups.length === 12);
   const cards = deck.words.flatMap((w) => w.cards.map((c) => ({ ...c, word: w })));
   check('323 words, each with one or more sentences, best first', deck.words.length === 323 && deck.words.every((w) => w.cards.length && w.cards.map((c) => c.lv).join() === w.cards.map((_, i) => i + 1).join()), `${deck.words.length} words · ${cards.length} cards`);
-  const real = cards.filter((c) => c.kind !== 'original');
-  check('every sentence names its source, and most are real Japanese mined from use', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / cards.length >= 0.8, `${real.length}/${cards.length} mined · ${cards.length - real.length} written for the deck`);
+  const passages = new Map(cards.map((c) => [`${c.word.id}:${c.ja}`, c]));
+  const real = [...passages.values()].filter((c) => c.kind !== 'original');
+  check('every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / passages.size >= 0.4, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
+  const mcd = cards.filter((c) => c.type);
+  check('MCD: one gap per card — 語 cards blank the word, 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
   const bad = [];
   for (const c of cards) {
     const target = c.ruby.filter((seg) => seg[2] === 1);
     if (c.ruby.map((seg) => seg[0]).join('') !== c.ja) bad.push(`${c.id}: ruby ≠ sentence`);
-    if (target.length !== 1 || target[0][0] !== c.form) bad.push(`${c.id}: target`);
+    if (target.length !== 1 || (c.type !== 'kanji' && target[0][0] !== c.form)) bad.push(`${c.id}: target`);
     else if (!/^[ぁ-ゖー]+$/.test(target[0][1])) bad.push(`${c.id}: reading ${target[0][1]}`);
     if (!c.en) bad.push(`${c.id}: no English`);
   }
@@ -127,12 +130,13 @@ async function main() {
 
     await page.click('[data-deck="kotoba-mine"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
+    check('the deck home explains the method (このデッキのしくみ)', (await page.locator('#kp-method').count()) === 1);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
 
     await page.click('#kp-start');
-    await page.waitForSelector('#kp-card .kp-target');
-    check('a card shows the real sentence with the word marked, and no readings, blank or English', (await page.locator('#kp-card .kp-target').count()) === 1 && (await page.locator('#kp-card .kp-blank, #kp-card rt, #kp-card .kp-hint').count()) === 0);
+    await page.waitForSelector('#kp-card .kp-blank');
+    check('a card is a passage with one gap and a Japanese hint — no readings, no English', (await page.locator('#kp-card .kp-blank').count()) === 1 && (await page.locator('#kp-card rt').count()) === 0 && (await page.locator('#kp-card .kp-endetails').count()) === 0);
     await page.click('#kp-reveal');
     await page.waitForSelector('#kp-grade-good');
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);

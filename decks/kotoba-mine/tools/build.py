@@ -185,7 +185,7 @@ def align(form: str, reading: str) -> list[tuple[str, str]] | None:
 
 def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]:
     """per passage: one card blanking the whole word (hint: its Japanese definition),
-    then one card per kanji of the word, blanked with its reading as the hint."""
+    then (first passage only) one card per kanji, blanked with its reading as the hint."""
     cards = []
     for pi, p in enumerate(passages, 1):
         ruby = _ordered_for({"ja": p["ja"], "form": p["form"]}, c, tagger, bc)
@@ -197,8 +197,8 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]
         ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
         parts = align(p["form"], ruby[ti][1])
         kanji_parts = [i for i, (t, _) in enumerate(parts or []) if KANJI.match(t)]
-        if len(kanji_parts) < 2 and not (parts and kanji_parts and len(parts) > 1):
-            continue  # a one-kanji word with no okurigana: the word card already asks for it
+        if pi > 1 or (len(kanji_parts) < 2 and not (parts and kanji_parts and len(parts) > 1)):
+            continue  # 字 cards come from the first passage only; a lone kanji is the word card
         for k in kanji_parts:
             segs = [[t, r, 1 if i == k else 2] for i, (t, r) in enumerate(parts)]
             cards.append({**base, "type": "kanji", "hint": parts[k][1], "ruby": ruby[:ti] + segs + ruby[ti + 1:]})
@@ -210,9 +210,9 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc) -> list[dict]
 
 METHOD = [
     "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）方式です。",
-    "表：ニュース・ウィキペディア・文学から取った本物の文章（2〜4文）。穴はひとつだけ。",
+    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜4文）。穴はひとつだけ。",
     "「語」カード：単語まるごとが穴。下の日本語の説明と文脈から思い出す。",
-    "「字」カード：単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す。",
+    "「字」カード：単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
     "裏：ふりがな付きの全文、読み、意味。英訳はタップで。出典つき。",
     "判定は「もう一度／覚えた」の二択で十分（FSRS-6）。迷ったら「もう一度」。",
@@ -325,12 +325,19 @@ KIND_JA = {"news": "ニュース", "blog": "ブログ", "qa": "Q&A", "company": 
 
 
 def blank_html(card: dict) -> str:
-    return "".join(
-        '<span class="blank">［　　］</span>' if len(seg) > 2 else html.escape(seg[0]) for seg in card["ruby"]
-    )
+    """the passage with its one gap (a 字 card's gap shows the kanji's reading)"""
+    out = []
+    for seg in card["ruby"]:
+        if len(seg) > 2 and seg[2] == 1:
+            out.append(f'<span class="blank">{"〔" + html.escape(card["hint"]) + "〕" if card.get("hint") else "［　　］"}</span>')
+        elif len(seg) > 2:
+            out.append(f"<b>{html.escape(seg[0])}</b>")
+        else:
+            out.append(html.escape(seg[0]))
+    return "".join(out)
 
 
-FIELDS = ["Key", "Sort", "Topic", "Level", "Kind", "Word", "Reading", "Meaning", "DefJA", "SentenceFront", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip", "Source", "SourceURL"]
+FIELDS = ["Key", "Sort", "Topic", "Level", "Type", "Hint", "Kind", "Word", "Reading", "Meaning", "DefJA", "SentenceFront", "SentenceBlank", "SentenceFurigana", "SentenceEN", "Tip", "Source", "SourceURL"]
 
 
 def note_rows(deck: dict) -> list[dict]:
@@ -342,13 +349,15 @@ def note_rows(deck: dict) -> list[dict]:
                 "Key": card["id"],
                 # every word's best sentence first (in mining order), then second sentences …:
                 # a word comes back in a new sentence weeks later, never twice at once
-                "Sort": f"{card['lv']}-{wi:04d}",
+                "Sort": f"{card['lv']:02d}-{wi:04d}",
                 "Topic": groups[w["group"]]["titleJa"],
                 "Level": str(card["lv"]),
                 "Word": html.escape(w["term"]),
                 "Reading": html.escape(w["reading"]),
                 "Meaning": html.escape(w["meaning"]),
                 "DefJA": html.escape(w["defJa"]),
+                "Type": "字" if card.get("type") == "kanji" else "語",
+                "Hint": "" if card.get("type") == "kanji" else html.escape(w["defJa"]),
                 "Kind": card["kind"],
                 "SentenceFront": front_html(card),
                 "SentenceBlank": blank_html(card),
@@ -372,11 +381,11 @@ def build_anki(deck: dict) -> None:
 
     tdir = HERE / "anki"
     model = genanki.Model(
-        stable_id("kotoba-mine-sentence-v3"),
-        "Kotoba Mine Sentence",
+        stable_id("kotoba-mine-mcd-v4"),
+        "Kotoba Mine MCD",
         fields=[{"name": f} for f in FIELDS],
         templates=[{
-            "name": "Read",
+            "name": "Cloze",
             "qfmt": (tdir / "front.html").read_text("utf-8"),
             "afmt": (tdir / "back.html").read_text("utf-8"),
         }],
@@ -392,7 +401,7 @@ def build_anki(deck: dict) -> None:
     root = f"{TITLE_JA} Kotoba Mine"
     decks = {}
     for g in deck["groups"]:
-        d = genanki.Deck(stable_id(f"kotoba-mine-v3-{g['id']}"), f"{root}::{g['titleJa']}")
+        d = genanki.Deck(stable_id(f"kotoba-mine-v4-{g['id']}"), f"{root}::{g['titleJa']}")
         d.description = html.escape(g["titleEn"])
         decks[g["id"]] = d
     for i, r in enumerate(note_rows(deck)):

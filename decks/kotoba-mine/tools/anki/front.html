@@ -1,6 +1,10 @@
 <div class="km kind-{{Kind}}">
   <div class="chips">
-    <span class="chip lvchip">{{Source}}</span><span class="chip">{{Topic}}</span>
+    <span class="chip lvchip">{{Type}}</span><span class="chip">{{Source}}</span
+    ><span class="chip">{{Topic}}</span>
   </div>
-  <div class="sentence">{{SentenceFront}}</div>
+  <div class="sentence">{{SentenceBlank}}</div>
+  {{#Hint}}
+  <div class="hint">{{Hint}}</div>
+  {{/Hint}}
 </div>
