@@ -35,13 +35,13 @@
   --kp-panel-2: #eef3f7;
   --kp-ink: #0b1520;
   --kp-ink-2: #32424f;
-  --kp-mute: #5d6c79;
+  --kp-mute: #5a6875;
   --kp-line: #d3dde6;
-  --kp-cyan: #0074b8;
-  --kp-cyan-wash: rgba(0, 116, 184, 0.1);
-  --kp-red: #d22f43;
-  --kp-amber: #b86e00;
-  --kp-green: #0e8f53;
+  --kp-cyan: #006aa9;
+  --kp-cyan-wash: rgba(0, 106, 169, 0.1);
+  --kp-red: #c32a3d;
+  --kp-amber: #955900;
+  --kp-green: #0b7544;
   --kp-violet: #6a4fd8;
   color-scheme: light;
 }
@@ -131,7 +131,8 @@
 .kp-src a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 
 .kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: 16px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 17px; font-weight: 700; }
-.kp-grades { display: grid; grid-template-columns: 1fr 0.8fr 1.2fr 0.8fr; gap: 8px; }
+.kp-grades { display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; position: sticky; bottom: 0; z-index: 2; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom); background: var(--kp-bg); }
+.kp-grades.is-four { grid-template-columns: 1fr 0.8fr 1.2fr 0.8fr; }
 .kp-grade { min-height: 64px; border-radius: 14px; border: 1px solid var(--kp-line); background: var(--kp-panel); display: grid; place-content: center; gap: 2px; }
 .kp-grade b { font-size: 15px; }
 .kp-grade small { font-family: var(--kp-num); font-size: 12px; color: var(--kp-ink-2); }
@@ -194,22 +195,22 @@
 .kp { --kp-on-accent: #00131d; --kp-tex: none; --kp-depth: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 30px rgba(0, 0, 0, 0.35);
   --kp-noun: var(--kp-cyan); --kp-verb: #ff8a5c; --kp-adj: #ffd24a; --kp-adv: #c59bff; --kp-expr: #5ee6b0; --kp-sound: #ff7ac8; }
 .kp[data-look='light'] { --kp-on-accent: #fff; --kp-depth: 0 1px 2px rgba(15, 30, 45, 0.08), 0 8px 24px rgba(15, 30, 45, 0.1);
-  --kp-verb: #c94a12; --kp-adj: #9a6a00; --kp-adv: #6a3fc8; --kp-expr: #0b8a5a; --kp-sound: #b8237a; }
+  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a; }
 .kp[data-look='ai'] { /* 藍 indigo night, gold accent */
   --kp-bg: #0b1030; --kp-panel: #121a46; --kp-panel-2: #1a2458; --kp-ink: #eef1ff; --kp-ink-2: #b9c1ea; --kp-mute: #8590c4; --kp-line: #2a3672;
   --kp-cyan: #f2c14e; --kp-cyan-wash: rgba(242, 193, 78, 0.16); --kp-on-accent: #1a1300; --kp-green: #59e0a6; --kp-violet: #9fb4ff;
   --kp-noun: #f2c14e; --kp-tex: radial-gradient(120% 80% at 0% 0%, rgba(120, 140, 255, 0.12), transparent 60%);
   color-scheme: dark; }
 .kp[data-look='washi'] { /* 和紙 warm paper with fibres */
-  --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #574a39; --kp-mute: #7d6d58; --kp-line: #dccfb5;
-  --kp-cyan: #b23a1e; --kp-cyan-wash: rgba(178, 58, 30, 0.1); --kp-on-accent: #fff; --kp-red: #c0283a; --kp-amber: #a35f00; --kp-green: #3d7a2a; --kp-violet: #6b4aa8;
-  --kp-noun: #b23a1e; --kp-verb: #1f5fa8; --kp-adj: #8a5a00; --kp-adv: #6b4aa8; --kp-expr: #2f7a4f; --kp-sound: #a8306e;
+  --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #574a39; --kp-mute: #685b49; --kp-line: #dccfb5;
+  --kp-cyan: #a7361c; --kp-cyan-wash: rgba(167, 54, 28, 0.1); --kp-on-accent: #fff; --kp-red: #b12536; --kp-amber: #874f00; --kp-green: #346924; --kp-violet: #6b4aa8;
+  --kp-noun: #a7361c; --kp-verb: #1e5da4; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.035) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.03) 0 1px, transparent 1px 11px);
   --kp-depth: 0 1px 1px rgba(80, 60, 30, 0.12), 0 10px 28px rgba(80, 60, 30, 0.14); color-scheme: light; }
 .kp[data-look='sakura'] { /* 桜 soft pink */
-  --kp-bg: #fbf1f3; --kp-panel: #ffffff; --kp-panel-2: #fde7ec; --kp-ink: #2b1a20; --kp-ink-2: #5d4049; --kp-mute: #8a6b74; --kp-line: #f1d3dc;
-  --kp-cyan: #d1416a; --kp-cyan-wash: rgba(209, 65, 106, 0.1); --kp-on-accent: #fff; --kp-red: #c62a3c; --kp-amber: #b26a00; --kp-green: #2f8a5a; --kp-violet: #7d4fc8;
-  --kp-noun: #d1416a; --kp-verb: #2a6fb8; --kp-adj: #a06800; --kp-adv: #7d4fc8; --kp-expr: #2f8a5a; --kp-sound: #c2489a;
+  --kp-bg: #fbf1f3; --kp-panel: #ffffff; --kp-panel-2: #fde7ec; --kp-ink: #2b1a20; --kp-ink-2: #5d4049; --kp-mute: #765c64; --kp-line: #f1d3dc;
+  --kp-cyan: #b82c54; --kp-cyan-wash: rgba(184, 44, 84, 0.1); --kp-on-accent: #fff; --kp-red: #bb2839; --kp-amber: #905600; --kp-green: #266f49; --kp-violet: #7747c6;
+  --kp-noun: #b82c54; --kp-verb: #2665a7; --kp-adj: #895900; --kp-adv: #7747c6; --kp-expr: #266f49; --kp-sound: #a73882;
   --kp-tex: radial-gradient(60% 40% at 100% 0%, rgba(255, 182, 200, 0.35), transparent 70%);
   --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light; }
 .kp[data-look='matcha'] { /* 抹茶 deep green */

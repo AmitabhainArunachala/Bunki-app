@@ -16,7 +16,8 @@
 // v4: the context deck (文脈札) joined the shell
 // v5: the shelf index grew the 言葉の鉱脈 deck passages — drop the cached index
 // v6: those passages left the shelf; the deck player joined the shell
-const VERSION = 'kairo-v10-gloss';
+// v11: the deck player's scheduler and its pin join the shell
+const VERSION = 'kairo-v11-closure';
 const SHELL = [
   '.',
   'index.html',
@@ -42,6 +43,10 @@ const SHELL = [
   'decks/player/engine.js',
   'decks/player/mount.js',
   'decks/player/player.css',
+  // …with what mount.js imports and fetches at load, so a first visit then
+  // offline still opens a deck
+  'vendor/ts-fsrs.mjs',
+  'data/fsrs-pin.json',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
   'decks/context-dense/mount.js',
@@ -64,7 +69,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      // only this app's own older caches: other apps on the same origin keep theirs
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k.startsWith('kairo-') && k !== VERSION).map((k) => caches.delete(k)),
+        ),
+      )
       .then(() => self.clients.claim()),
   );
 });

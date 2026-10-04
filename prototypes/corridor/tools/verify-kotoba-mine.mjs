@@ -33,6 +33,12 @@
  * replaces is kept under bunki-cloze:kotoba-mcd:before-restore. A stored
  * ledger the player cannot read is set aside before anything is saved.
  *
+ * Then answering: the 文 front never makes the marked word a tap target; the
+ * grade bar shows もう一度／思い出せた (all four after 難しい・簡単も使う); a
+ * cancelled or mostly vertical swipe never grades; 4択 never asks a 字 card;
+ * 設定 has labelled controls and radio groups (axe); the done screen keeps
+ * ↶ ひとつ戻す; every colour token in the light themes clears 4.5:1.
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -43,6 +49,7 @@ import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { AxeBuilder } from '@axe-core/playwright';
 import { chromium } from 'playwright-core';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
@@ -307,6 +314,146 @@ async function verifyRestore(browser, base) {
   }
 }
 
+/* -------------- delivery (F10, F34–F38, F40, F42, N05, N12; A04, A05) */
+/** a stored MCD ledger with one 字 card due, so the first card of a sitting is that 字 card */
+const DUE_KANJI = `(() => {
+  const id = 'km-064-m02';
+  localStorage.setItem('bunki-cloze:kotoba-mcd', JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: 'kotoba-mcd', groupsOff: [], log: [],
+    cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 1, difficulty: 5, state: 2, reps: 1, lapses: 0, elapsed_days: 1, scheduled_days: 1 } } }));
+  localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', JSON.stringify({ mode: 'choice', newPerDay: 0 }));
+})()`;
+/** WCAG relative-luminance contrast of every colour token on the surfaces it sits on, per light theme */
+const CONTRAST = `(() => {
+  const root = document.querySelector('.kp');
+  const probe = document.createElement('i');
+  root.append(probe);
+  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; return getComputedStyle(probe).color.match(/[\\d.]+/g).map(Number); };
+  const rgb = (v) => rgba(v).slice(0, 3);
+  const lum = (c) => { const [r, g, b] = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v * t + b[i] * (1 - t)));
+  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'];
+  const out = {};
+  const before = root.dataset.look;
+  for (const look of ['light', 'sakura', 'washi']) {
+    root.dataset.look = look;
+    const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
+    const wash = rgba('var(--kp-cyan-wash)');
+    // the card panel, the second panel (tiles, kanji boxes; also the darkest texture tint), the page,
+    // the tinted 思い出せた button (12% green over the panel) and the accent wash (答えを見る, chosen settings)
+    const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
+    let min = { ratio: 99 };
+    for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
+      const r = ratio(t[k], bg);
+      if (r < min.ratio) min = { ratio: Math.round(r * 100) / 100, pair: k + ' on ' + s };
+    }
+    out[look] = min;
+  }
+  root.dataset.look = before;
+  probe.remove();
+  return out;
+})()`;
+
+async function verifyDelivery(browser, base) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(SEEDED);
+  const page = await context.newPage();
+  const boot = async (q) => {
+    await page.goto(`${base}/index.html${q}`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+  };
+  const count = () => page.evaluate(`document.querySelector('.kp-count')?.textContent ?? null`);
+  const logLength = (deck) => page.evaluate(`(JSON.parse(localStorage.getItem('bunki-cloze:${deck}') || 'null')?.log ?? []).length`);
+  try {
+    // 文 front: the asked word is never a tap target before the answer (N05, A04)
+    await boot('?deck=kotoba');
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card .kp-target');
+    const front = await page.evaluate(`({ tapTarget: document.querySelectorAll('#kp-card .kp-target .kp-tapword').length, target: document.querySelectorAll('#kp-card .kp-target').length, otherTaps: document.querySelectorAll('#kp-card .kp-tapword').length, rt: document.querySelectorAll('#kp-card rt').length })`);
+    check('文 front: the marked word is plain text (no tap reading) before the answer; the other kanji words keep their tap', front.tapTarget === 0 && front.target >= 1 && front.rt === 0 && front.otherTaps > 0, JSON.stringify(front));
+
+    // two grade buttons by default; 2 and 4 do nothing then (F10, A05)
+    await page.click('#kp-reveal');
+    await page.waitForSelector('.kp-grade');
+    const two = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), hint: document.querySelector('.kp-swipehint')?.textContent, sticky: getComputedStyle(document.querySelector('.kp-grades')).position })`);
+    await page.keyboard.press('2');
+    await page.keyboard.press('4');
+    const keysIgnored = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
+    check('the grade bar shows もう一度 and 思い出せた only, stays on screen (sticky), and keys 2 and 4 do nothing', two.n === 2 && two.labels === 'もう一度/思い出せた' && two.hint.includes('思い出せた') && two.sticky === 'sticky' && keysIgnored, JSON.stringify({ ...two, keysIgnored }));
+
+    // swipes: a cancelled gesture or a mostly vertical one never grades; a sideways one does (F34)
+    const gesture = (moves, last) =>
+      page.evaluate(`(() => {
+        const n = document.querySelector('#kp-card');
+        const ev = (type, x, y) => n.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, pointerId: 7, bubbles: true }));
+        ev('pointerdown', 150, 100);
+        for (const [x, y] of ${JSON.stringify(moves)}) ev('pointermove', x, y);
+        ev(${JSON.stringify(last[0])}, ${last[1]}, ${last[2]});
+        return { transform: n.style.transform, swipe: n.dataset.swipe ?? '' };
+      })()`);
+    const cancelled = await gesture([[255, 400]], ['pointercancel', 255, 400]);
+    const afterCancel = { count: await count(), log: await logLength('kotoba-mine') };
+    const vertical = await gesture([[255, 400]], ['pointerup', 255, 400]);
+    const afterVertical = { count: await count(), log: await logLength('kotoba-mine') };
+    await gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]);
+    const afterSwipe = { count: await count(), log: await logLength('kotoba-mine') };
+    check(
+      'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 思い出せた',
+      afterCancel.count === '1/15' && afterCancel.log === 0 && cancelled.transform === '' && cancelled.swipe === '' && afterVertical.count === '1/15' && afterVertical.log === 0 && vertical.transform === '' && afterSwipe.log === 1 && afterSwipe.count !== '1/15',
+      JSON.stringify({ afterCancel, afterVertical, afterSwipe }),
+    );
+
+    // settings: a labelled backup box, radio groups, the storage line, no label or aria violations (F36, N12)
+    await page.click('#kp-quit');
+    await page.click('#kp-to-settings');
+    await page.waitForSelector('#kp-backup');
+    await page.waitForFunction(`document.getElementById('kp-persist')?.textContent.includes('：')`);
+    const settings = await page.evaluate(`({ label: document.querySelector('label[for="kp-backup"]')?.textContent, groups: document.querySelectorAll('.kp-settings [role="radiogroup"][aria-label]').length, checked: document.querySelectorAll('.kp-settings [role="radio"][aria-checked="true"]').length, persist: document.getElementById('kp-persist').textContent })`);
+    const axe = await new AxeBuilder({ page }).include('.kp').analyze();
+    const aria = axe.violations.filter((v) => v.id === 'label' || v.id.startsWith('aria-') || v.id === 'button-name').map((v) => v.id);
+    check('設定: the backup box has a label, each choice row is a radio group with one checked, the storage line shows, and axe finds no label or aria problems', settings.label === 'バックアップの文字列' && settings.groups === 7 && settings.checked === 7 && /^端末の保存領域：(確保済み|未確保|不明)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
+
+    // 難しい・簡単も使う shows all four; the done screen keeps ↶ ひとつ戻す (F37)
+    await page.click('[data-pref="grades:four"]');
+    await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ ...JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine')), newPerDay: 1 }))`);
+    await page.evaluate(`localStorage.removeItem('bunki-cloze:kotoba-mine')`);
+    await boot('?deck=kotoba');
+    await page.click('#kp-start');
+    await page.click('#kp-reveal');
+    await page.waitForSelector('.kp-grade');
+    const four = await page.evaluate(`[...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/')`);
+    check('after 難しい・簡単も使う the grade bar shows all four', four === 'もう一度/難しい/思い出せた/簡単', four);
+    await page.click('#kp-grade-easy');
+    await page.waitForSelector('.kp-done');
+    const done = await page.evaluate(`({ undo: document.querySelectorAll('#kp-undo').length, text: document.querySelector('.kp-done').innerText.replace(/\\s+/g, ' ') })`);
+    let back = null;
+    if (done.undo) {
+      await page.click('#kp-undo');
+      await page.waitForSelector('.kp-grade');
+      back = { count: await count(), log: await logLength('kotoba-mine') };
+    }
+    check('the done screen keeps ↶ ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('思い出せた割合') && back?.count === '1/1' && back.log === 0, JSON.stringify({ ...done, back }));
+
+    // 4択 never asks a 字 card: it is answered as 穴埋め (F38)
+    await page.evaluate(DUE_KANJI);
+    await boot('?deck=mcd');
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card');
+    const kanji = await page.evaluate(`({ chip: document.querySelector('#kp-card .kp-lvchip')?.textContent, choices: document.querySelectorAll('.kp-choice').length, reveal: !!document.getElementById('kp-reveal'), blank: document.querySelector('#kp-card .kp-blank')?.textContent })`);
+    await page.click('#kp-reveal');
+    await page.waitForSelector('.kp-grade');
+    const grades = await page.locator('.kp-grade').count();
+    check('in 4択 a 字 card shows no choices: hint, 答えを見る and the grade bar instead', kanji.chip === '字' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 2, JSON.stringify({ ...kanji, grades }));
+
+    // every colour token clears 4.5:1 on the surfaces it sits on, in the light themes (F35, A20)
+    const contrast = await page.evaluate(CONTRAST);
+    check('light themes: every text colour is at least 4.5:1 on the card, the second panel, the page, the 思い出せた button and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
+  } finally {
+    await context.close();
+  }
+}
+
 /* --------------------------------------------------- half two: the app */
 async function main() {
   console.log('— 言葉の鉱脈: the deck as data');
@@ -317,6 +464,8 @@ async function main() {
   verifyIds([deck, sentences]);
   verifyLeaks([deck, sentences]);
   verifyRuby([deck, sentences]);
+  const said = (d) => (d.method ?? []).join('');
+  check('the method text names the same two buttons the player shows (もう一度／思い出せた), never 覚えた', said(deck).includes('「もう一度／思い出せた」') && said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');
@@ -416,6 +565,9 @@ async function main() {
 
     console.log('\n— 復元 cannot erase progress');
     await verifyRestore(browser, base);
+
+    console.log('\n— answering: swipes, buttons, the 文 front, 設定, contrast');
+    await verifyDelivery(browser, base);
   } finally {
     await browser.close();
     server.close();
