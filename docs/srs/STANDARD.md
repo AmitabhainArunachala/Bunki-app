@@ -967,12 +967,13 @@ every SHELL path exists.
 the target exactly once and an English translation of as many sentences. Before it becomes a card
 it passes five independent checks, each by a judge other than the writer: naturalness, facts,
 level (the grammar ids it records occur in a form their cues match), one target (no other deck
-word), and context does work (with the target blanked, a reader names its sense). A failure is a
+word; `export_mcd.py` checks it mechanically, below), and context does work (with the target blanked, a reader names its sense). A failure is a
 rewrite, not a patch. Passages arrive in dated batch files (`source/mcd/<name>-YYYY-MM-DD.json`),
 read after the undated files, so a batch adds passages after a word's existing ones and passage 1,
 its 字 cards and every existing card id stay as they are. A source record may carry the optional
 fields `register`, `topic`, `tipJa` (one Japanese line, at most 80 characters, no Latin letters),
-`grammar` (grammar-v11 ids) and `sense`; `export_mcd.py` checks them and the length rules (any
+`grammar` (grammar-v11 ids) and `sense` (the dictionary sense the passage uses: one Japanese
+dictionary-style line of at most 40 characters, no Latin letters); `export_mcd.py` checks them and the length rules (any
 written passage at most 300 characters and 5 sentences; the earlier 2–4-sentence passages stay
 valid), and refuses empty or unknown values instead of guessing. `build.py` carries them onto
 the deck's cards (grammar labelled as `{id, p}`; an unknown id fails the build); a passage without
@@ -988,6 +989,16 @@ to the new card ids fix the tokeniser's readings in them (日本 にほん, 一�
 Why: contract §2 asks 180–300 characters; the 943 earlier passages have a median of 87 and the
 written ones at most 116.
 `tools/test_export_mcd.py` and verify-kotoba-mine's pilot checks hold the rules.
+Amended 2026-10-05 (the pilot critic's fixes before scaling): "`export_mcd.py` tokenises every
+contract-v2 written passage as `build.py` does (the corridor's fugashi + UniDic, then the compound
+joins, so 半導体 is not the deck word 導体) and refuses one in which a run of up to six tokens
+outside the target spells a deck term or one of its `rank.VARIANTS` spellings, by surface or with
+its last token in dictionary form (競っ → 競う), unless the passage lists the term in `allow` and
+says why in `allowReason` (already in review, or nothing else says it); an `allow` the passage does
+not need is refused, and neither field reaches a card." The scan found seven hits in five pilot passages
+(性能, 設計, 競う ×2, 財政, 正直, 割); all were swapped, the five passages rewritten (new ids, the old ones
+reserved), and three 講 passages added for 自ずと, 無常 and 牛耳る: 54 pilot passages, kotoba-mcd 1,535
+cards. Why: the critic found deck words the five-judge pass had let through.
 
 **A47 → S20, S49 (amends A44).** Replaces A44's "for any other word the sheet says so in
 Japanese" with: "For a word that is not the deck's own, the sheet shows a Japanese sense from the deck's

@@ -1,6 +1,6 @@
 # Sources: 言葉の鉱脈・MCD (kotoba-mcd)
 
-Built for sharing (public build; sources that may not be shared are left out). 22 passages come from the 9 sources below; 540 passages were written for this deck (書き下ろし) and are not listed.
+Built for sharing (public build; sources that may not be shared are left out). 22 passages come from the 9 sources below; 543 passages were written for this deck (書き下ろし) and are not listed.
 
 ## 青空文庫『パソコン創世記』富田倫生
 

@@ -313,7 +313,7 @@
       "wrong": "ご"
     },
     {
-      "card": "km-087-m06",
+      "card": "km-087-m09",
       "after": "",
       "surface": "何",
       "before": "か",
@@ -334,6 +334,37 @@
       "before": "の取り方",
       "right": "ま",
       "wrong": "あいだ"
+    },
+    {
+      "card": "km-027-m05",
+      "after": "",
+      "surface": "何",
+      "before": "不自由",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-060-m05",
+      "after": "心を",
+      "surface": "一",
+      "before": "点",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-204-m07",
+      "after": "メディチ",
+      "surface": "家",
+      "right": "け",
+      "wrong": "か"
+    },
+    {
+      "card": "km-222-m07",
+      "after": "",
+      "surface": "都",
+      "before": "を離れ",
+      "right": "みやこ",
+      "wrong": "と"
     }
   ]
 }

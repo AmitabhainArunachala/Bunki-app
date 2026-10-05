@@ -7,13 +7,18 @@ Run from anywhere: python3 decks/kotoba-mine/tools/test_export_mcd.py
 2. A contract-v2 passage (it has a register) must have 4–5 sentences of 180–300 characters, the
    target once, and as many English sentences as Japanese ones.
 3. The optional fields: register one of the six codes, topic one of the topics, tipJa one
-   Japanese line without Latin letters, grammar ids known to grammar-v11.json; empty values are
-   dropped, so an old record gets none of them.
+   Japanese line without Latin letters, grammar ids known to grammar-v11.json, sense one Japanese
+   dictionary-style line of at most 40 characters; empty values are dropped, so an old record gets
+   none of them.
 4. Dated batches (pilot-2026-10-04.json) are read after the undated files, so they add passages
    after a word's existing ones.
 5. build.passage_fields() carries register, topic, tipJa, sense and grammar (labelled) onto a
    card, and fails on a grammar id it does not know.
 6. The committed pilot batch passes every rule and every one of its passages is in mcd.json.
+7. Check 4 (one target), mechanised: other_terms() tokenises a passage as build.py does and finds
+   another deck word by surface (性能), by dictionary form (競っ → 競う), across tokens (生得+的),
+   never inside a longer word (半導体 is not 導体) and never in the target; a v2 passage that uses
+   one is refused unless `allow` names it with an `allowReason`, and an allow nothing uses is refused.
 """
 from __future__ import annotations
 
@@ -84,6 +89,10 @@ def main() -> int:
     ok("a tipJa with Latin letters is refused", "tipJa" in refused(ex.optional, "64", {**V2, "tipJa": "use with AI"}))
     ok("a two-line tipJa is refused", "tipJa" in refused(ex.optional, "64", {**V2, "tipJa": "一行目。\n二行目。"}))
     ok("a grammar id not in grammar-v11.json is refused", "grammar" in refused(ex.optional, "64", {**V2, "grammar": ["n2-no-such-point"]}))
+    ok("a Japanese sense of at most 40 characters is carried",
+       ex.optional("64", {**V2, "sense": "国や自治体のお金のやりくり。"}).get("sense") == "国や自治体のお金のやりくり。")
+    ok("an English sense is refused", "sense" in refused(ex.optional, "64", {**V2, "sense": "public finance"}))
+    ok("a sense over 40 characters is refused", "sense" in refused(ex.optional, "64", {**V2, "sense": "あ" * 41}))
 
     # 4. batch order
     names = sorted(["s2.json", "pilot-2026-10-04.json", "preview.json", "s1.json", "late-2026-11-01.json"], key=ex.batch_order)
@@ -91,10 +100,10 @@ def main() -> int:
        names == ["preview.json", "s1.json", "s2.json", "pilot-2026-10-04.json", "late-2026-11-01.json"], " ".join(names))
 
     # 5. build.py carries the fields onto cards
-    record = ex.written_record("64", {**v2, "sense": "the city's finances"})
+    record = ex.written_record("64", {**v2, "sense": "国や自治体のお金のやりくり。"})
     fields = build.passage_fields("km-064", 4, record)
     ok("build.passage_fields carries register, topic, tipJa, sense and labelled grammar",
-       fields == {"register": "報", "topic": "history", "tipJa": V2["tipJa"], "sense": "the city's finances",
+       fields == {"register": "報", "topic": "history", "tipJa": V2["tipJa"], "sense": "国や自治体のお金のやりくり。",
                   "grammar": [{"id": "n3-dewa-naku", "p": build._GRAMMAR["n3-dewa-naku"]["p"]}]}, json.dumps(fields, ensure_ascii=False))
     ok("build.passage_fields gives an old passage nothing", build.passage_fields("km-064", 1, {"ja": V1["ja"], "form": "財政"}) == {})
     ok("build.passage_fields fails on an unknown grammar id",
@@ -115,7 +124,22 @@ def main() -> int:
                 bad.append(f"{n}: displaced passage 1")
     total = sum(map(len, pilot.values()))
     ok(f"the pilot batch ({total} passages, {len(pilot)} words) passes every rule and sits after each word's earlier passages in mcd.json",
-       not bad and total == 51 and len(pilot) == 20, " | ".join(bad[:3]))
+       not bad and total == 54 and len(pilot) == 20, " | ".join(bad[:3]))
+
+    # 7. check 4, mechanised
+    ja = "各国は工場誘致を競っている。新しい半導体は性能が高く、生得的な差ではない。"
+    hits = ex.other_terms("64", ja, "工場")
+    ok("other_terms finds 性能 by surface, 競っ by its dictionary form 競う and 生得的 across tokens",
+       hits == {"競う": "競っ", "性能": "性能", "生得的": "生得的"}, json.dumps(hits, ensure_ascii=False))
+    ok("other_terms does not read 導体 (a deck word) inside 半導体", "導体" not in hits)
+    ok("other_terms skips the target itself", "競う" not in ex.other_terms("212", ja, "競っ"))
+    clash = {**v2, "ja": v2["ja"].replace("ごく普通の", "性能の", 1)}
+    ok("a contract-v2 passage that uses another deck word is refused", "性能" in refused(ex.written_record, "64", clash))
+    allowed = {**clash, "allow": ["性能"], "allowReason": "性能 is already in review"}
+    ok("the same passage with allow and an allowReason is accepted", refused(ex.written_record, "64", allowed) == "",
+       refused(ex.written_record, "64", allowed))
+    ok("allow without an allowReason is refused", "allowReason" in refused(ex.written_record, "64", {**clash, "allow": ["性能"]}))
+    ok("an allow the passage does not use is refused", "does not use" in refused(ex.written_record, "64", {**v2, "allow": ["性能"], "allowReason": "x"}))
 
     print("all export_mcd checks pass" if not FAILS else f"{len(FAILS)} check(s) failed")
     return 1 if FAILS else 0

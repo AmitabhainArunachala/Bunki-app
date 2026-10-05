@@ -65,6 +65,17 @@
   ],
   "23": [
     {
+      "ja": "今回は、習慣づくりについての本を要約していきます。著者がまず強調しているのは、やる気に頼るより、行動のきっかけを先に決めておくことです。たとえば、朝コーヒーをいれたら単語を五つ覚える、というふうに、すでにある習慣に新しい行動をくっつけるわけですね。これを毎日くり返していると、意識しなくても体が自ずと動くようになります。最初の数週間さえ乗り切れば、あとは仕組みが助けてくれる、というのがこの本の結論です。",
+      "form": "自ずと",
+      "en": "This time I'm going to summarize a book about building habits. What the author stresses first is deciding in advance what will trigger an action, rather than relying on motivation. For example, you attach a new action to a habit you already have: once you've made your morning coffee, you learn five words. If you repeat this every day, your body comes to move on its own without your thinking about it. The book's conclusion is that if you can just get through the first few weeks, the system will carry you from there.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「自ずと身につく」「自ずと動く」のように、意識しなくても自然にそうなる意味で使う。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "特に意識しなくても、自然にそうなるさま。"
+    },
+    {
       "ja": "半導体の工場が一つ動き出すと、その周りには部品や薬品を扱う企業、物流の拠点などが集まってくる。熊本県では、台湾の半導体大手TSMCが中心となって建てた工場をきっかけに、周辺の地価や人手不足が大きな話題になった。工場の誘致は雇用を生むものの、人や車が一気に増えれば、道路の渋滞や住宅不足、地下水の確保といった課題は、わざわざ探さなくても自ずと浮かび上がる。自治体には、企業を呼び込むだけでなく、暮らしの側の備えも求められている。",
       "form": "自ずと",
       "en": "When a single semiconductor plant starts running, companies handling parts and chemicals, logistics hubs and the like gather around it. In Kumamoto Prefecture, a plant built mainly by the Taiwanese chip giant TSMC set off widespread discussion of nearby land prices and labor shortages. Attracting a plant creates jobs, but once people and cars increase all at once, issues such as traffic congestion, housing shortages and securing groundwater come to the surface naturally, without anyone having to go looking for them. Local governments are being asked not only to bring in companies but also to prepare on the side of everyday life.",
@@ -105,7 +116,7 @@
       "topic": "india",
       "tipJa": "光の意味では「稲妻・刃・旗がひらめく」。考えの意味の「ひらめく」も、この一瞬の光から来ている。",
       "grammar": ["n3-dewa-naku"],
-      "sense": "光が一瞬光る（稲妻などがきらめく）"
+      "sense": "光が一瞬鋭く光る。稲妻などがきらめく。"
     },
     {
       "ja": "AIに相談しながら企画を考えてると、急にいいアイデアがひらめくことってあるじゃないですか。あれって、AIが答えをくれたっていうより、質問を言葉にした時点で、頭の中が整理されてるんだと思うんですよね。だから、相手は別に人間でもいいし、ノートでもいいっていう。逆に、AIの答えをそのまま使うだけだと、自分の考えはあんまり育たない気がします。まあ、結局は使い方次第なんじゃないですかね。",
@@ -141,6 +152,17 @@
     }
   ],
   "222": [
+    {
+      "ja": "今回は、鴨長明の『方丈記』を取り上げます。冒頭の「ゆく河の流れは絶えずして、しかももとの水にあらず」という一節は、教科書で読んだ人も多いと思います。長明は、大火や地震、飢饉が続いた時代を生き、立派な屋敷が一夜で焼けてしまう様子を目の当たりにしました。そうした体験から、世の中のすべては移り変わり、同じ姿でとどまるものはないという無常の考え方を、川の流れにたとえて描いたわけです。晩年の彼が都を離れ、山あいの小さな住まいで静かに暮らしたのも、そう考えると納得がいきますね。",
+      "form": "無常",
+      "en": "This time I'm taking up Kamo no Chōmei's Hōjōki. Many of you will have read its opening line, \"The flowing river never stops, and yet its water is never the same,\" in a school textbook. Chōmei lived through an age of great fires, earthquakes and famine, and saw with his own eyes fine mansions burn down in a single night. From those experiences, he described the idea of impermanence, that everything in the world changes and nothing stays in the same form, by likening it to the flow of a river. Seen that way, it makes sense that in his later years he left the capital and lived quietly in a small dwelling in the hills.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「無常を感じる」「世の無常」のように、すべては移り変わるという仏教の考え方を指す。",
+      "grammar": [],
+      "sense": "この世のものはすべて移り変わり、とどまることがないこと。"
+    },
     {
       "ja": "いや、AIの世界って、去年の常識が今年にはもう陳腐化してたりするじゃないですか。半年前にがんばって覚えたツールの使い方が、定着する前に通用しなくなってたりして。そういうのを見てると、無常ってたぶんこういうことなのかなって、ちょっと思うんですよね。だから、新しく出てくるものを全部追いかけるのは、まあ無理なんですよ。状況は常に流動的だって最初から割り切っておいたほうが、気が楽になるんじゃないかなと。",
       "form": "無常",
@@ -282,26 +304,26 @@
   ],
   "87": [
     {
-      "ja": "半導体の工場でいちばん大事な数字は何かというと、実は歩留まりなんです。一枚のウエハーから何百個ものチップを切り出しますが、そのすべてが正しく動くわけではありません。目に見えないほど小さなほこりが一つ付いただけで、そのチップは不良品になってしまいます。同じ設備で同じ枚数を作っても、良品の割合が九割の工場と五割の工場とでは、利益がまるで違ってきます。だからこそ、各社はクリーンルームの管理に莫大なお金をかけているんですね。",
+      "ja": "半導体の工場でいちばん大事な数字は何かというと、実は歩留まりなんです。一枚のウエハーから何百個ものチップを切り出しますが、そのすべてが正しく動くわけではありません。目に見えないほど小さなほこりが一つ付いただけで、そのチップは不良品になってしまいます。同じ設備で同じ枚数を作っても、良品の割合が九十パーセントの工場と五十パーセントの工場とでは、利益がまるで違ってきます。だからこそ、各社はクリーンルームの管理に莫大なお金をかけているんですね。",
       "form": "歩留まり",
-      "en": "If you ask what the single most important number in a semiconductor plant is, it's actually the yield. Hundreds of chips are cut from a single wafer, but that doesn't mean every one of them works properly. A single speck of dust too small to see is enough to turn a chip into a reject. Even with the same equipment making the same number of wafers, a plant where nine in ten chips are good and one where only half are good make completely different profits. That's exactly why companies spend enormous sums keeping their clean rooms in order.",
+      "en": "If you ask what the single most important number in a semiconductor plant is, it's actually the yield. Hundreds of chips are cut from a single wafer, but that doesn't mean every one of them works properly. A single speck of dust too small to see is enough to turn a chip into a reject. Even with the same equipment making the same number of wafers, a plant where 90 percent of the chips are good and one where 50 percent are make completely different profits. That's exactly why companies spend enormous sums keeping their clean rooms in order.",
       "original": true,
       "register": "講",
       "topic": "ai",
       "tipJa": "「歩留まりが高い／低い」「歩留まりを上げる」の形でよく使う。",
       "grammar": ["n3-wake-dewa-nai"],
-      "sense": "yield (share of good chips)"
+      "sense": "製造した品物のうち、良品として使えるものの割合。"
     },
     {
-      "ja": "先端半導体をめぐっては、各国が巨額の補助金を投じて国内への工場誘致を競っている。ただ、建物や装置はそろえられるものの、大量生産を軌道に乗せるのは容易ではない。新しい工場では当初、不良品が多く出て歩留まりが低い状態が続き、採算が合うまでに数年を要することも珍しくないという。専門家の間では、熟練した技術者をどれだけ確保できるかが成否を分けるとの見方が強い。工場の完成を伝える発表だけで、計画がうまくいったと判断するのは早計だと言えそうだ。",
+      "ja": "先端半導体をめぐっては、各国が巨額の補助金を投じて国内への工場誘致に力を入れている。ただ、建物や装置はそろえられるものの、大量生産を軌道に乗せるのは容易ではない。新しい工場では当初、不良品が多く出て歩留まりが低い状態が続き、採算が合うまでに数年を要することも珍しくないという。専門家の間では、熟練した技術者をどれだけ確保できるかが成否を分けるとの見方が強い。工場の完成を伝える発表だけで、計画がうまくいったと判断するのは早計だと言えそうだ。",
       "form": "歩留まり",
-      "en": "Countries are competing to attract advanced chip plants to their own soil by pouring in huge subsidies. Yet although buildings and equipment can be put in place, getting mass production on track is no easy matter. At a new plant, many defective chips come off the line at first and the yield stays low, and it is said to be not unusual for it to take several years before the plant turns a profit. Among experts, the prevailing view is that success or failure hinges on how many skilled engineers can be secured. It would seem premature, then, to judge that such a plan has succeeded from announcements that a plant has been completed.",
+      "en": "Countries are pouring in huge subsidies in a push to attract advanced chip plants to their own soil. Yet although buildings and equipment can be put in place, getting mass production on track is no easy matter. At a new plant, many defective chips come off the line at first and the yield stays low, and it is said to be not unusual for it to take several years before the plant turns a profit. Among experts, the prevailing view is that success or failure hinges on how many skilled engineers can be secured. It would seem premature, then, to judge that such a plan has succeeded from announcements that a plant has been completed.",
       "original": true,
       "register": "報",
-      "topic": "history",
+      "topic": "ai",
       "tipJa": "報道では「歩留まりの改善」「歩留まりが安定する」などの言い方が多い。",
       "grammar": ["n2-mono-no"],
-      "sense": "yield (share of good chips)"
+      "sense": "製造した品物のうち、良品として使えるものの割合。"
     },
     {
       "ja": "参考書を三冊読んだのに、試験で使えた知識はほんの少しだった、という経験はありませんか。読んだ量に対して、実際に身についた量の割合を考えてみると、案外低いものです。学習の歩留まりを上げたいなら、読む時間を削ってでも、思い出す練習に時間を回したほうが効果的だとされています。インプットを増やすのではなく、記憶から取り出す回数を増やすことが、忘れにくくする近道なのです。",
@@ -312,7 +334,7 @@
       "topic": "mind",
       "tipJa": "本来は製造の用語だが、「勉強の歩留まり」のように比喩でも使う。",
       "grammar": ["n3-dewa-naku"],
-      "sense": "yield (figurative: share of study that sticks)"
+      "sense": "費やした量のうち、実際に役立つ成果として残る割合。"
     }
   ],
   "130": [
@@ -325,7 +347,7 @@
       "topic": "ai",
       "tipJa": "ソフトでは「機能を実装する」、ハードでは「部品を基板に実装する」と使う。",
       "grammar": ["n3-dewa-naku"],
-      "sense": "implementing a feature"
+      "sense": "ソフトウェアなどに機能を組み込み、実際に動くようにすること。"
     },
     {
       "ja": "半導体の処理能力の向上は、これまで主に回路の微細化によって支えられてきた。しかし微細化のペースが鈍るにつれて、複数のチップを一つの基板の上にまとめて実装する技術に注目が集まっている。チップどうしをどう並べ、発生する熱をどう逃がすかが、製品全体の出来を左右するためだ。後工程と呼ばれるこの分野は、長く比較的地味な存在と見られてきた。ここにきて各国の政府や企業は、関連する投資を相次いで拡大している。",
@@ -336,18 +358,18 @@
       "topic": "ai",
       "tipJa": "半導体では、チップを基板に載せる「後工程」の文脈で使われる。",
       "grammar": ["n3-ni-tsurete"],
-      "sense": "mounting parts on a board"
+      "sense": "部品を基板などに取り付けて組み込むこと。"
     },
     {
-      "ja": "仏教の本はけっこう読んだんですけど、怒りを抑えるとか、執着を手放すとか、理屈としてはわかるじゃないですか。でも、それを自分の生活に実装できてるかっていうと、正直かなりあやしいんですよね。知識として蓄えておくだけじゃ意味がなくて、日々の些細な場面で実践を重ねることで、ようやく腑に落ちるんだと思います。満員電車で足を踏まれたとき、咄嗟にどう反応するか、とか。結局そういう瞬間に、本物かどうかが試されてる気がします。",
+      "ja": "仏教の本はけっこう読んだんですけど、怒りを抑えるとか、執着を手放すとか、理屈としてはわかるじゃないですか。でも、それを自分の生活に実装できてるかっていうと、ぶっちゃけかなりあやしいんですよね。知識として蓄えておくだけじゃ意味がなくて、日々の些細な場面で実践を重ねることで、ようやく腑に落ちるんだと思います。満員電車で足を踏まれたとき、咄嗟にどう反応するか、とか。結局そういう瞬間に、本物かどうかが試されてる気がします。",
       "form": "実装",
-      "en": "I've read quite a few books on Buddhism, and things like keeping your anger in check or letting go of attachment, you understand them in principle, right? But whether I've actually managed to implement that in my own life, honestly, that's pretty doubtful. I suspect just storing it up as knowledge is pointless, and it only truly clicks once you build up practice in the trivial moments of everyday life. Like how you react on the spot when someone steps on your foot on a packed train. In the end, I feel it's in moments like that that you're tested on whether it's real.",
+      "en": "I've read quite a few books on Buddhism, and things like keeping your anger in check or letting go of attachment, you understand them in principle, right? But whether I've actually managed to implement that in my own life, to be blunt, that's pretty doubtful. I suspect just storing it up as knowledge is pointless, and it only truly clicks once you build up practice in the trivial moments of everyday life. Like how you react on the spot when someone steps on your foot on a packed train. In the end, I feel it's in moments like that that you're tested on whether it's real.",
       "original": true,
       "register": "話",
       "topic": "india",
       "tipJa": "会話では「生活に実装する」のように、比喩的に「実際に取り入れる」意味でも使う。",
       "grammar": ["n3-koto-de"],
-      "sense": "implementing (figurative: putting into practice)"
+      "sense": "考えや方法を、実際の生活や仕組みに取り入れること。"
     }
   ],
   "178": [
@@ -360,18 +382,18 @@
       "topic": "ai",
       "tipJa": "「高度な技術」「高度な判断」のように、な形容詞的に使うことが多い。",
       "grammar": ["n4-you-ni-naru", "n4-teiku"],
-      "sense": "advanced (high degree)"
+      "sense": "程度が高く、進んでいること。"
     },
     {
-      "ja": "第二次世界大戦後、アメリカとソ連は、相手の国の様子を上空から写真に撮るため、特別な飛行機の開発を競った。撃ち落とされないためには、相手のミサイルが届かない高度を飛び続ける必要があった。空気の薄い上空でも安定して飛べるよう、設計にはさまざまな工夫が加えられた。しかしミサイルの性能が上がるにつれて、高く飛ぶだけでは安全とは言えなくなった。こうして、上空から情報を集める役目は、次第に人工衛星へと移った。",
+      "ja": "第二次世界大戦の後、偵察機は相手国の基地や港を上空から撮影し、軍事上の情報を集める役目を担った。地上から撃ち落とされないよう、機体には相手のミサイルや戦闘機が届かない高度を飛び続けることが求められた。ところが1960年、ソ連の上空を飛んでいた米国の偵察機が地対空ミサイルで撃墜され、操縦士が捕らえられる事件が起きた。高く飛ぶだけでは身を守れないことが明らかになったのである。その後、相手国の上空から情報を集める任務は、次第に人工衛星が担うようになった。",
       "form": "高度",
-      "en": "After the Second World War, the United States and the Soviet Union competed to develop special aircraft to photograph each other's territory from the sky. To avoid being shot down, these planes had to keep flying at an altitude beyond the reach of the other side's missiles. Various ingenious features went into their design so that they could fly steadily even in the thin air at those heights. But as missiles grew more capable, flying high was no longer enough to be safe. And so the job of gathering information from above gradually passed to satellites.",
+      "en": "After the Second World War, reconnaissance planes took on the job of photographing the other country's bases and ports from the air to gather military intelligence. To avoid being shot down from the ground, the aircraft had to keep flying at an altitude beyond the reach of the other side's missiles and fighters. In 1960, however, an American reconnaissance plane flying over the Soviet Union was brought down by a surface-to-air missile, and its pilot was captured. It had become clear that flying high was not enough to stay safe. After that, the task of gathering information from above the other country gradually passed to satellites.",
       "original": true,
       "register": "報",
       "topic": "history",
-      "tipJa": "高さの意味では「高度を上げる／下げる」「高度一万メートル」のように使う。",
-      "grammar": ["n3-ni-tsurete"],
-      "sense": "altitude"
+      "tipJa": "高さの意味では「高度を飛ぶ」「高度を上げる／下げる」のように使う。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "海面や地表から測った高さ。"
     },
     {
       "ja": "難しい教えを深く理解する力は、たしかに立派なものだが、高度な理屈を語れることと、目の前の怒りを手放せることとは、まったく別の話である。人は難しい言葉を覚えると、それだけで一段高いところに立ったような気になりやすい。仏教が日々の実践を大切にしてきたのは、頭で理解するだけでは人は変わらないと知っていたからだろう。知ることは道の入り口にすぎない。歩くのはあくまで自分の足なのである。",
@@ -382,7 +404,7 @@
       "topic": "india",
       "tipJa": "「高度な理屈」のように、ほめるだけでなく距離を置く言い方にもなる。",
       "grammar": ["n2-ni-suginai"],
-      "sense": "advanced (high degree)"
+      "sense": "程度が高く、進んでいること。"
     }
   ],
   "33": [
@@ -395,7 +417,7 @@
       "topic": "ai",
       "tipJa": "対になる語は「演繹的」。「帰納的に考える／導く」の形でよく使う。",
       "grammar": ["n3-dewa-naku", "n4-teiku"],
-      "sense": "inductive"
+      "sense": "個々の事例から、一般的な法則を導き出すさま。"
     },
     {
       "ja": "インドの論理学では、昔から「煙のあるところには火がある」という例がよく用いられてきた。かまどでも山火事でも、煙が立てば必ずそこに火があった。そうした経験を何度も重ねることで、人はそこから一つの法則を導き出す。だが、帰納的に得た結論は、どれほど確からしく見えても、次の一例によって覆されうる。確かさを求める心と、それを許さない世界とのあいだに、哲学は生まれるのかもしれない。",
@@ -406,7 +428,7 @@
       "topic": "india",
       "tipJa": "論理学や哲学の文章で使う硬めの語。話し言葉では「例から考えると」と言い換えやすい。",
       "grammar": ["n3-koto-de"],
-      "sense": "inductive"
+      "sense": "個々の事例から、一般的な法則を導き出すさま。"
     }
   ],
   "200": [
@@ -419,7 +441,7 @@
       "topic": "ai",
       "tipJa": "受け身「追い上げられる」は、先頭側が差を詰められて苦しい立場を表す。",
       "grammar": ["n2-zaru-o-enai"],
-      "sense": "to close in on"
+      "sense": "先を行く者との差を縮めて、すぐ後ろまで迫る。"
     },
     {
       "ja": "十九世紀の後半、産業革命の先頭を走っていたイギリスを、ドイツとアメリカが急速に追い上げた。両国は鉄鋼や化学、電気といった新しい分野に力を注ぎ、生産を大きく伸ばした。十九世紀の終わりまでには、工業生産の規模でアメリカがイギリスを上回っていた。先に工業化した国ほど古い設備を抱え、新しい技術への切り替えが遅れたとの指摘もある。後発の国が一気に差を詰める構図は、その後も形を変えて繰り返されている。",
@@ -430,7 +452,7 @@
       "topic": "history",
       "tipJa": "報道では、経済や選挙、スポーツで差を詰める動きを表すのによく使う。",
       "grammar": [],
-      "sense": "to close in on"
+      "sense": "先を行く者との差を縮めて、すぐ後ろまで迫る。"
     },
     {
       "ja": "模試の判定が悪くても、そこで諦める必要はまったくありません。受験生の成績は、秋以降に大きく伸びることも珍しくないからです。特に、基礎をしっかり固めてから応用問題に移った人は、終盤になって一気に追い上げてくることがよくあります。焦って難しい問題集に手を出すことなく、まずは間違えた問題を解き直すところから始めましょう。最後に笑うのは、地道な復習を積み重ねた人です。",
@@ -441,20 +463,20 @@
       "topic": "mind",
       "tipJa": "「追い上げてくる」「終盤に追い上げる」のように、後ろから迫る動きに使う。",
       "grammar": ["n2-koto-naku"],
-      "sense": "to close in on"
+      "sense": "先を行く者との差を縮めて、すぐ後ろまで迫る。"
     }
   ],
   "71": [
     {
-      "ja": "今回は、国際秩序の変遷を、覇権の交代という観点から整理します。ある時代に経済力と軍事力で他国を圧倒する国家が現れると、その国の通貨や制度が事実上の標準として定着します。十九世紀の英国、第二次世界大戦後の米国が典型的な例です。ただし、その地位が永続するわけではないという点が重要で、財政の負担や新興国の台頭によって、優位は次第に失われていきます。本日扱う書籍は、こうした交代が生じる条件を、豊富な史料から読み解いています。",
+      "ja": "今回は、国際秩序の変遷を、覇権の交代という観点から整理します。ある時代に経済力と軍事力で他国を圧倒する国家が現れると、その国の通貨や制度が事実上の標準として定着します。十九世紀の英国、第二次世界大戦後の米国が典型的な例です。ただし、その地位が永続するわけではないという点が重要で、戦費の負担や新興国の台頭によって、優位は次第に失われていきます。本日扱う書籍は、こうした交代が生じる条件を、豊富な史料から読み解いています。",
       "form": "覇権",
-      "en": "This time I'll organize the shifts in the international order from the angle of changes in hegemony. When, in a given era, a state appears that overwhelms others in economic and military power, its currency and institutions take root as the de facto standard. Nineteenth-century Britain and America after the Second World War are typical examples. The important point, however, is that this position does not last forever: through fiscal burdens and the rise of emerging powers, its advantage is gradually lost. The book we're looking at today reads, from a wealth of historical sources, the conditions under which such changes occur.",
+      "en": "This time I'll organize the shifts in the international order from the angle of changes in hegemony. When, in a given era, a state appears that overwhelms others in economic and military power, its currency and institutions take root as the de facto standard. Nineteenth-century Britain and America after the Second World War are typical examples. The important point, however, is that this position does not last forever: through the cost of wars and the rise of emerging powers, its advantage is gradually lost. The book we're looking at today reads, from a wealth of historical sources, the conditions under which such changes occur.",
       "original": true,
       "register": "講",
       "topic": "history",
       "tipJa": "「覇権を握る」「覇権争い」の形でよく使う。",
       "grammar": ["n4-teiku", "n3-wake-dewa-nai"],
-      "sense": "dominance, hegemony"
+      "sense": "ほかを抑えて頂点に立つ者が持つ、支配的な力。"
     },
     {
       "ja": "生成AIの普及を背景に、先端半導体をめぐる各国の動きが活発になっている。AI向けチップの開発では米国企業が強みを持つ一方、最先端の製造は台湾の企業に大きく依存しているのが現状だ。こうした中、日本や欧州も補助金を投じて、国内での生産拠点づくりを急いでいる。専門家の間では、技術の覇権を一国が握り続けるのは難しいとの見方もある。各国の政策に応じて、供給網の形は今後も変わっていきそうだ。",
@@ -465,7 +487,7 @@
       "topic": "ai",
       "tipJa": "ニュースでは「技術覇権」「覇権を握る」のように硬い文脈で使う。",
       "grammar": ["n2-ni-oujite", "n4-teiku"],
-      "sense": "dominance, hegemony"
+      "sense": "ほかを抑えて頂点に立つ者が持つ、支配的な力。"
     },
     {
       "ja": "インドの歴史をたどると、武力で広い地域をまとめた王は少なくない。アショーカ王もその一人だが、激しい戦争の後、仏教を深く信仰したと伝えられている。力だけで手に入れた覇権は、人の体を従わせても心までは従わせられない、一時の支配にすぎない。王が「法」による統治の大切さを記した文を岩や石の柱に刻ませ、各地に残したのは、そのことに気づいたからだろうか。戦に勝つことと国を長く保つことは、同じではないのである。",
@@ -476,7 +498,7 @@
       "topic": "india",
       "tipJa": "武力による支配を言うやや硬い語。精神的な支配には使いにくい。",
       "grammar": ["n2-ni-suginai"],
-      "sense": "dominance, hegemony"
+      "sense": "ほかを抑えて頂点に立つ者が持つ、支配的な力。"
     }
   ],
   "60": [
@@ -489,7 +511,7 @@
       "topic": "history",
       "tipJa": "「〜のかなめ」「かなめを握る」の形で、全体を左右する一点を指す。漢字では「要」。",
       "grammar": ["n2-ni-suginai"],
-      "sense": "the key point, linchpin"
+      "sense": "物事のいちばん大切なところ。"
     },
     {
       "ja": "扇は、根元のかなめ一本で何枚もの骨を束ねている。そこが緩めば、どれほど美しい絵が描かれていても、扇はたちまちばらばらになってしまう。仏教でいう戒も、案外これに似ているのかもしれない。一つ一つの決まりは細かく見えても、それらは散らばりやすい心を一点にまとめておくための留め具なのである。日々の暮らしが散らかって感じられるときは、自分を束ねている根元を確かめてみたい。",
@@ -500,10 +522,21 @@
       "topic": "india",
       "tipJa": "もとは扇の骨を留める釘のこと。そこから「大事な一点」の意味が生まれた。",
       "grammar": [],
-      "sense": "the pivot rivet of a folding fan (扇のかなめ)"
+      "sense": "扇の骨を根元でとじ合わせる留め具。"
     }
   ],
   "204": [
+    {
+      "ja": "今回は、十五世紀のイタリアで栄えたメディチ家の話です。もともとはフィレンツェの銀行家で、王でも貴族でもありませんでした。ところが、ヨーロッパ各地に支店を広げて富を築き、その財力で有力な家と手を結んでいきます。表向きは共和国の制度をそのまま残しながら、実際には一族が町の政治を裏から牛耳っていたわけです。お金の流れを握る者が権力も握る、という構図がよく見える例ですね。",
+      "form": "牛耳って",
+      "en": "This time the story is about the Medici, who flourished in fifteenth-century Italy. They were originally bankers in Florence, neither kings nor nobles. But they spread branches across Europe, built up a fortune, and used that wealth to ally themselves with powerful families. While the republic's institutions were outwardly left as they were, in reality the family was controlling the city's politics from behind the scenes. It's an example that shows clearly how whoever holds the flow of money also holds power.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「政治を牛耳る」「業界を牛耳る」のように、組織や集団を思いのままに動かす意味で使う。",
+      "grammar": ["n4-nagara", "n4-teiku"],
+      "sense": "集団や組織の中心に立ち、思いのままに動かす。"
+    },
     {
       "ja": "会議とか勉強会で発言力の強い人が一人いると、その人が議論を全部牛耳っちゃうこと、ありますよね。で、周りは黙り込むんですけど、別に意見がないわけじゃないんですよ。心理学でいう同調圧力ってやつで、集団の中だと空気を読んで遠慮しちゃう傾向が強いらしくて。だから僕は、最初に匿名で意見を書き出してもらう方式を提案してるんです。そうすると、意外と鋭い指摘が出てきたりするんですよね。",
       "form": "牛耳っちゃう",
@@ -513,7 +546,7 @@
       "topic": "mind",
       "tipJa": "話し言葉では「牛耳っちゃう」「牛耳ってる」のように崩しても使う。",
       "grammar": ["n3-wake-dewa-nai"],
-      "sense": "to control, to dominate"
+      "sense": "集団や組織の中心に立ち、思いのままに動かす。"
     }
   ],
   "183": [
@@ -526,7 +559,7 @@
       "topic": "history",
       "tipJa": "「由々しき事態」「由々しき問題」の形でほぼ決まって使う、硬い書き言葉。",
       "grammar": ["n4-teiku"],
-      "sense": "grave, serious"
+      "sense": "放っておけないほど重大で、よくない。"
     },
     {
       "ja": "生成AIを使って作られた偽の音声や動画が、インターネット上で急速に広がっている。実在の人物が言ってもいないことを話しているように見せる手口もあり、本物かどうかを判断するのは専門家でも容易ではない。選挙や災害の際にこうした情報が拡散すれば、社会の信頼を損なう由々しき問題になりかねない。各国では、AIで作った映像や音声に表示を義務づける動きも出ている。技術の進歩にルールづくりが追いつけるかが問われている。",
@@ -537,7 +570,7 @@
       "topic": "ai",
       "tipJa": "報道や公式の発言で、事の重大さを強調するときに使う。",
       "grammar": ["n3-you-ni"],
-      "sense": "grave, serious"
+      "sense": "放っておけないほど重大で、よくない。"
     },
     {
       "ja": "私たちは、他人の小さな過ちにはすぐ気づくのに、自分の心に起きている変化にはなかなか気づかない。仏教の教えには、怒りや欲そのものよりも、それに気づかないまま流されていく心のほうを、由々しきこととして見る面がある。火は小さなうちなら手で消せるが、燃え広がってからでは遅い。だからこそ、一日の終わりに静かに座り、今日の自分の心をそっと振り返る時間を持ちたい。それは特別な修行ではなく、誰にでもできる小さな手入れなのである。",
@@ -548,7 +581,7 @@
       "topic": "india",
       "tipJa": "連体形「由々しき」で名詞を修飾する文語の名残。「由々しい」より改まった響き。",
       "grammar": ["n3-dewa-naku", "n4-teiku"],
-      "sense": "grave, serious"
+      "sense": "放っておけないほど重大で、よくない。"
     }
   ],
   "185": [
@@ -561,7 +594,7 @@
       "topic": "history",
       "tipJa": "「凄まじい勢い」「凄まじいものがある」のように、程度の激しさを強調する。",
       "grammar": ["n4-teiku"],
-      "sense": "tremendous, fierce"
+      "sense": "勢いや程度が、恐ろしいほど激しい。"
     },
     {
       "ja": "生成AIの開発競争が続く中、データセンターの電力消費が急増している。大規模なAIモデルの学習には大量の半導体を長時間動かす必要があり、その電力需要の伸びは凄まじい。データセンターが集まる地域では、電力会社や各国政府が、発電所や送電網の整備を急いでいる。冷却に使う水の確保も、新たな課題として浮上している。省電力型のチップや新しい冷却技術の開発が、今後の鍵を握りそうだ。",
@@ -572,7 +605,7 @@
       "topic": "ai",
       "tipJa": "報道では「凄まじい勢いで」「伸びは凄まじい」など、数量の急変にも使う。",
       "grammar": [],
-      "sense": "tremendous, fierce"
+      "sense": "勢いや程度が、恐ろしいほど激しい。"
     }
   ]
 }
