@@ -94,11 +94,12 @@ function hostWriteFixture({paused = false} = {}) {
   const clone = value => JSON.parse(JSON.stringify(value));
   const state = {taken:[],lists:{},deepWords:{},srs:{original:true},revlog:[['original']],obslog:[]};
   let record = clone(state), allowed = true, visit = 1, writes = 0, queued = 0, release;
+  const failures = [];
   const barrier = paused ? new Promise(resolve => {release = resolve;}) : null;
   const commit = vm.runInNewContext(source.slice(start,end) + ';commitStorePatch', {
     S:state, personalHost:{allowed:() => allowed,captureAccess() {const own = visit; return () => own === visit && allowed;}}, recordEpoch:1,
     recordWritable:() => true, publishedRecord:clone(state), DEFAULT_LEARNER_RECORD:{},
-    canonicalRecordJson:JSON.stringify, safelySyncStoreAlert() {}, recordFailure() {},
+    canonicalRecordJson:JSON.stringify, safelySyncStoreAlert() {}, recordFailure(reason) {failures.push(reason);},
     recordApp:{async write(produce) {
       queued++;
       if (barrier) await barrier;
@@ -109,7 +110,7 @@ function hostWriteFixture({paused = false} = {}) {
       return {status:'active',replayUiEffects:true};
     }},
   });
-  return {commit,state,get record(){return record;},get writes(){return writes;},get queued(){return queued;},
+  return {commit,state,failures,get record(){return record;},get writes(){return writes;},get queued(){return queued;},
     revoke(){allowed = false;},reopen(){visit++; allowed = true;},resume(){release();},replaceRecord(value){record = clone(value);}};
 }
 
@@ -119,6 +120,7 @@ test('host final write boundary rejects stale capture and every assessment/histo
     assert.equal(await f.commit({taken:[{id:'本'}],[key]:{}}),false,`${key} cannot cross the personal host`);
   }
   assert.equal(f.writes,0);
+  assert.deepEqual(f.failures,Array(7).fill('personal-capture-not-allowed'),'A refused root in an open visit is a real save failure');
   assert.equal(await f.commit({taken:[{id:'本'}],lists:{test:[]},deepWords:{'本':{r:'ほん'}}}),true);
   assert.equal(f.writes,1);
   f.revoke();
@@ -139,6 +141,7 @@ test('host producers cannot smuggle assessment/history roots or archive appends'
   assert.equal(await f.commit({taken:[{id:'本'}]},[{role:'user',text:'private'}]),false);
   assert.equal(await f.commit(() => ({taken:[{id:'本'}]}),[{role:'user',text:'private'}]),false);
   assert.equal(f.writes,0);
+  assert.deepEqual(f.failures,Array(7).fill('personal-capture-not-allowed'),'Smuggled roots in an open visit report a real failure');
   assert.deepEqual(f.state.taken,[]);
   assert.deepEqual(f.state.srs,{original:true}); assert.deepEqual(f.state.revlog,[['original']]);
 });
@@ -152,6 +155,17 @@ test('queued personal capture rechecks access before evaluating its producer or 
   assert.equal(await pending,false);
   assert.equal(produced,0,'A stale answer must not evaluate its capture producer');
   assert.equal(f.writes,0); assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.failures,[],'Closing the visit cancels the capture without a storage alert');
+});
+
+test('a producer refusing after its visit closed is a cancellation, not a storage failure',async () => {
+  const f = hostWriteFixture();
+  assert.equal(await f.commit(latest => {f.revoke(); return {taken:[...latest.taken,{id:'本'}]};}),false);
+  assert.equal(f.writes,0); assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.failures,[],'An intended refusal must not raise the storage alert');
+  f.reopen();
+  assert.equal(await f.commit(latest => ({taken:[...latest.taken,{id:'本'}],srs:{}})),false);
+  assert.deepEqual(f.failures,['personal-capture-not-allowed'],'An invalid root in the reopened visit is still a real failure');
 });
 
 test('personal capture producers use the latest queued authority and publish after acknowledgment',async () => {
@@ -172,6 +186,7 @@ test('opening another personal overlay cannot revive a capture queued in an earl
   f.revoke(); f.reopen(); f.resume();
   assert.equal(await pending,false); assert.equal(produced,0); assert.equal(f.writes,0);
   assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.failures,[],'An earlier visit\'s capture ends silently in the next visit');
 });
 
 function suppressionFixture({holdAssessment = false,personal = true} = {}) {

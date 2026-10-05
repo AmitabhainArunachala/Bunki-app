@@ -35,6 +35,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium webkit
+      - name: Prepare the canonical runtime
+        run: |
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/personal-site" >> "$GITHUB_ENV"
+          echo "KAIRO_EVIDENCE_DIR=$RUNNER_TEMP/personal-evidence" >> "$GITHUB_ENV"
+          node scripts/build-corridor-site.mjs --out "$RUNNER_TEMP/personal-site"
       - run: node prototypes/corridor/tools/test-personal-collections.mjs
       - run: node --test prototypes/corridor/decks/personal/tests/host-bridge.test.mjs
       - run: node prototypes/corridor/tools/verify-personal-collections.mjs
@@ -48,5 +53,7 @@ jobs:
         if: always()
         with:
           name: personal-collections-browser-evidence
-          path: ${{ runner.temp }}/personal-collections
+          path: |
+            ${{ runner.temp }}/personal-collections
+            ${{ runner.temp }}/personal-evidence
           if-no-files-found: ignore
