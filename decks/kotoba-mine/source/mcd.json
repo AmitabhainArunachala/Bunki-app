@@ -1507,59 +1507,6 @@
    "url": "https://www.feps.co.jp/_assets/dl/support/faq/02.pdf",
    "licence": "web quotation (personal study)",
    "title": ""
-  },
-  {
-   "ja": "電気の通しやすさで物質を分けると、まず金属のように電気をよく通す導体があります。反対に、ゴムやガラスのように、ほとんど通さないものもありますね。面白いのはその中間にあるシリコンのような物質で、混ぜ物の量に応じて性質をがらりと変えられるんです。この「通したり止めたり」を細かく制御できることが、コンピュータの心臓部を作る上での出発点になっています。スマホもパソコンも、突き詰めればこの性質の上に成り立っているわけです。",
-   "form": "導体",
-   "en": "If you divide materials by how easily they conduct electricity, first there are conductors, like metals, that conduct it well. On the other side, there are things like rubber and glass that hardly conduct it at all. What's interesting are materials in between, like silicon, whose properties can be changed dramatically according to the amount of impurities added. Being able to finely control this 'letting it through or stopping it' is the starting point for making the heart of a computer. Smartphones and PCs alike, when you get down to it, are built on this property.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "ai",
-   "tipJa": "電気の通しやすさで物質を分けるときの語。金属が代表で、通しにくい物質と対にして使う。",
-   "grammar": [
-    "n2-ni-oujite",
-    "n2-ue-de",
-    "n5-teiru"
-   ],
-   "sense": "電気や熱をよく通す物質。"
-  },
-  {
-   "ja": "物理の電磁気で多くの受験生がつまずくのが、導体の性質です。ポイントは、電荷が自由に動ける物体の内部では、つり合った状態で電場がゼロになるという点に尽きます。これさえ押さえておけば、電荷が表面にしか集まらない理由も、雷のときに車の中が安全だと言われる理由も、まとめて説明できます。公式を丸暗記するのではなく、なぜそうなるかを一度自分の言葉で説明してみてください。",
-   "form": "導体",
-   "en": "In the electromagnetism part of physics, something many exam candidates stumble over is the properties of conductors. The key point comes down to this: inside an object where charges can move freely, the electric field is zero once things are in equilibrium. As long as you have this down, you can explain in one go both why charge gathers only on the surface and why it's said to be safe inside a car during lightning. Instead of memorising formulas by rote, try explaining in your own words why things turn out that way.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "学",
-   "topic": "mind",
-   "tipJa": "理科の学習では「導体の内部」「導体の表面」のように、物理の用語として使う。",
-   "grammar": [
-    "n3-dewa-naku"
-   ],
-   "sense": "電気や熱をよく通す物質。"
-  },
-  {
-   "ja": "生成AIの普及でデータセンターの建設が相次ぎ、電力を運ぶ導体として欠かせない銅の需要が伸びている。銅は電気をよく通すうえ、加工がしやすく、長く使っても傷みにくい。送電網や変圧器、冷却設備にも大量に使われるため、施設が一つ増えるごとに必要な量も膨らむ。市場では供給が追いつかないとの見方もあり、価格の動向に関心が集まっている。一部では、より軽くて安いアルミニウムへの置き換えを探る動きも出ている。",
-   "form": "導体",
-   "en": "With the spread of generative AI and one data centre after another being built, demand is growing for copper, which is indispensable as a conductor for carrying electric power. Copper conducts electricity well, and on top of that it is easy to work and does not deteriorate easily even with long use. Because large amounts are also used in power grids, transformers and cooling equipment, the quantity needed swells with each additional facility. In the market there is also a view that supply cannot keep up, and attention is focused on price trends. In some quarters, moves have also emerged to explore replacing it with lighter, cheaper aluminium.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "ai",
-   "tipJa": "「電力を運ぶ導体」のように、役割を添えて素材を説明する形が報道ではよく見られる。",
-   "grammar": [
-    "n5-teiru"
-   ],
-   "sense": "電気や熱をよく通す物質。"
   }
  ],
  "174": [
@@ -3299,56 +3246,6 @@
    "url": "http://news.livedoor.com/article/detail/5690890/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "【Office Scope vol.05】アイデアとワクワクが詰まった玉手箱！ “ザ・憧れのオフィス”（株式会社イデアインターナショナル）"
-  },
-  {
-   "ja": "スマホの中にあるチップを拡大してみると、実はトランジスタの上に何層もの配線が積み上がっています。最先端のチップでは、その層が十を超えることも珍しくなく、全部をつなげるとかなりの長さになるそうです。トランジスタをいくら小さくしても、それをつなぐ道が細くなるにつれて、電気は流れにくくなるんですね。つまり今の半導体開発では、部品そのものよりつなぎ方が勝負どころになってきている、というわけです。",
-   "form": "配線",
-   "en": "If you zoom in on the chip inside a smartphone, you'll find that many layers of wiring are actually stacked on top of the transistors. In the most advanced chips, it's not unusual for there to be more than ten of those layers, and apparently if you joined it all together it would come to quite a length. However small you make the transistors, electricity flows less easily as the paths connecting them get thinner. In other words, in today's chip development, how things are connected is becoming the deciding factor more than the components themselves.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "ai",
-   "tipJa": "「配線が積み上がる」「配線が細くなる」など、回路の中で部品どうしをつなぐ線を指す。",
-   "grammar": [
-    "n3-ni-tsurete",
-    "n5-teiru"
-   ],
-   "sense": "電気が流れるように線を張ってつなぐこと。また、その線。"
-  },
-  {
-   "ja": "よく「脳の配線が変わる」なんて言い方をしますが、これは比喩ではあるものの、まったくの誇張でもありません。何かを繰り返し練習すると、よく使われる神経のつながりは強まり、使われないつながりは弱まっていきます。ロンドンのタクシー運転手は、一般の人と比べて、記憶にかかわる海馬の一部が大きかったという研究が有名ですね。才能がないとあきらめる前に、まずは毎日少しずつ続けてみることです。",
-   "form": "配線",
-   "en": "People often say things like 'the wiring of the brain changes', and while this is a metaphor, it's not a complete exaggeration either. When you practise something repeatedly, the neural connections that get used a lot grow stronger, and the ones that don't get used grow weaker. There's a famous study finding that London taxi drivers, compared with ordinary people, had a larger part of the hippocampus, which is involved in memory. Before you give up thinking you have no talent, the thing to do is first to keep at it a little every day.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "学",
-   "topic": "mind",
-   "tipJa": "「脳の配線」は神経のつながりを電気の線にたとえた言い方。比喩として広く定着している。",
-   "grammar": [
-    "n2-mono-no",
-    "n4-teiku"
-   ],
-   "sense": "脳の神経のつながり方を電気の線にたとえた語。"
-  },
-  {
-   "ja": "ENIACっていう、1940年代のアメリカのでっかいコンピュータがあるじゃないですか。あれ、プログラムを変えるたびに、ケーブルを抜いたり挿したりして配線をやり直してたらしいんですよ。一つの計算の準備に何日もかかったりして。今みたいにソフトを書き換えればいい、っていう発想自体がまだなかったわけで。そう考えると、プログラムをメモリに入れておくって、めちゃくちゃ大きい発明だったんだなって思いますね。",
-   "form": "配線",
-   "en": "You know ENIAC, that huge American computer from the 1940s? Apparently, every time they changed the program, they redid the wiring by pulling cables out and plugging them back in. Setting up a single calculation could take days. The very idea of just rewriting the software, like we do now, didn't exist yet. When you think about it that way, storing the program in memory was a seriously huge invention.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "話",
-   "topic": "history",
-   "tipJa": "「配線をやり直す」「配線を組み替える」のように、つなぎ方を変える作業にもよく使う。",
-   "sense": "電気が流れるように線を張ってつなぐこと。また、その線。"
   }
  ],
  "89": [
@@ -4026,58 +3923,6 @@
    "url": "",
    "licence": "CC BY-SA (Wikipedia)",
    "title": "電話"
-  },
-  {
-   "ja": "19世紀の半ば、大西洋の海底に電信のケーブルを通すという大事業が行われました。ケーブルの中心には電気を運ぶ銅線があり、その周りを天然の樹脂で包んで海水から守っていたんです。1858年には一度つながったものの、数週間で通じなくなってしまいます。それでも改良を重ね、1866年にようやく安定した通信が実現しました。これで大陸どうしのやり取りが、船で何日もかかっていたものから、数分で済むようになったんです。",
-   "form": "銅線",
-   "en": "In the mid-nineteenth century, a great project was undertaken to lay a telegraph cable across the floor of the Atlantic. At the core of the cable was a copper wire that carried the electricity, and it was wrapped in a natural resin to protect it from seawater. In 1858 the line did connect once, but it stopped working after a few weeks. Even so, they kept making improvements, and in 1866 stable communication was finally achieved. With this, exchanges between the continents, which had taken many days by ship, could be done in a matter of minutes.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "history",
-   "tipJa": "ケーブルの芯として電気を運ぶ線を指す。「銅線を包む」「銅線を通す」などと組む。",
-   "grammar": [
-    "n2-mono-no",
-    "n4-you-ni-naru"
-   ],
-   "sense": "銅で作った細い線。電気を通す線として使う。"
-  },
-  {
-   "ja": "光回線って言っても、家の中までずっと光ファイバーってわけじゃないんですよ。マンションだと、建物の共用スペースまでは光で来てて、そこから先は昔からある電話用の銅線を使ってる、みたいなのも普通にあって。だから、プランの上では速いはずなのに、なんか遅いって感じてる人、けっこう多いと思うんですよね。契約の中身だけじゃなくて、建物の中がどういう線になってるかも、一度確かめたほうがいいって話です。",
-   "form": "銅線",
-   "en": "Even if it's called a fibre-optic connection, that doesn't mean it's fibre all the way into your home. In apartment buildings, it's pretty common for the fibre to come as far as the shared space in the building, and from there on to use the copper telephone wire that's been there for ages. So I think there are quite a lot of people who feel it's somehow slow even though their plan should be fast on paper. The point is you should check not just what's in your contract but also what kind of lines run inside the building.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "話",
-   "topic": "ai",
-   "tipJa": "話し言葉では光ファイバーとの対比で「電話用の銅線」のように、古い回線を指すことが多い。",
-   "grammar": [
-    "n3-wake-dewa-nai"
-   ],
-   "sense": "銅で作った細い線。電気を通す線として使う。"
-  },
-  {
-   "ja": "大量のGPUを高速でつなぐ必要があるAI向けのサーバーで、銅線の価値が改めて見直されている。光ファイバーは長い距離の通信に強い一方、信号を光に変える部品が必要で、その分だけ電力を多く使う。ラックの内部のような短い距離であれば、銅を使うほうが消費電力や費用を抑えやすいとされる。米エヌビディアの最新のシステムでも、数千本に及ぶケーブルがラックの中に張り巡らされている。",
-   "form": "銅線",
-   "en": "In servers for AI, which need to connect large numbers of GPUs at high speed, the value of copper wire is being reassessed. Optical fibre is strong for long-distance communication, but it needs components that convert signals into light, and it uses that much more power. Over short distances, such as inside a rack, using copper is said to make it easier to hold down power consumption and cost. Even in Nvidia's latest systems, thousands of cables are run throughout the inside of the rack.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "ai",
-   "tipJa": "「銅線が見直される」のように、光ファイバーと比べる文脈で報道によく出てくる。",
-   "grammar": [
-    "n5-teiru"
-   ],
-   "sense": "銅で作った細い線。電気を通す線として使う。"
   }
  ],
  "175": [
@@ -4206,54 +4051,6 @@
    "url": "https://www.aozora.gr.jp/cards/000082/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
-  },
-  {
-   "ja": "写真の歴史で地味に大きいのが、目に見えない像を薬で浮かび上がらせる、という発見です。最初期の写真は、光を何時間も当て続けないと像が写りませんでした。ところがその後、短い時間の撮影でも、見えない像が板の上にちゃんと残っていることが分かったんですね。それを薬品で処理して表に出すのが現像で、これによって撮影の時間はぐっと短くなりました。人の顔を写す肖像写真が広まったのも、ここからなんです。",
-   "form": "現像",
-   "en": "Something unglamorous but big in the history of photography is the discovery that an invisible image can be brought out with chemicals. The very earliest photographs wouldn't capture an image unless light was shone on them for hours. But later it was found that even with a short exposure, an invisible image was in fact left on the plate. Treating it with chemicals to bring it out is development, and thanks to this, exposure times became much shorter. It was from here that portrait photography, capturing people's faces, spread.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "history",
-   "tipJa": "撮影したあと、薬品で処理して像を見えるようにする工程。「フィルムを現像する」が典型。",
-   "grammar": [
-    "n5-teiru"
-   ],
-   "sense": "撮影したフィルムなどを薬品で処理し、像を表すこと。"
-  },
-  {
-   "ja": "最近のカメラって、RAWっていう生のデータで撮れるじゃないですか。それをパソコンで明るさとか色とか調整して仕上げるのを、今でも現像って呼ぶんですよ。フィルムなんか使ってないのに、言葉だけ残ってるのがちょっと面白くて。しかも最近はAIでノイズを消す機能まであって、暗い場所で撮ったやつも普通に救えちゃうんです。暗室で作業してた世代からしたら、たぶん信じられない話ですよね。",
-   "form": "現像",
-   "en": "Cameras these days can shoot in a raw data format called RAW, right? Adjusting things like brightness and colour on a computer to finish those files is still called 'developing'. It's kind of funny that only the word has survived even though no film is involved. On top of that, there are now AI features that remove noise, so even shots taken in dark places can be rescued just like that. For the generation that worked in darkrooms, it's probably an unbelievable story.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "話",
-   "topic": "ai",
-   "tipJa": "デジタル写真でも「データの現像」のように、撮ったデータを調整して仕上げる作業に使う。",
-   "sense": "撮影したデータを調整し、写真として仕上げること。"
-  },
-  {
-   "ja": "かつて、撮った写真をすぐに見ることはできなかった。フィルムを店に預け、現像が終わるまでの数日を待たなければならなかったのである。その間、私たちは撮った場面を何度も思い返し、あの一枚はどう写っているだろうかと想像した。待つ時間そのものが、記憶を深く刻み込んでいたのかもしれない。すぐに確かめられる今、私たちは見ることと引き換えに、思い出す機会を手放しているのではないだろうか。",
-   "form": "現像",
-   "en": "There was a time when you couldn't see the photos you had taken right away. You had to leave the film at a shop and wait the few days until the developing was finished. In the meantime, we recalled the scenes we had shot again and again and imagined how that one shot had come out. Perhaps the waiting itself was etching the memories deeply into us. Now that we can check at once, aren't we giving up chances to remember in exchange for being able to see?",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "論",
-   "topic": "mind",
-   "tipJa": "「現像が終わる」「現像に出す」のように、店などに頼む作業として語られることも多い。",
-   "grammar": [
-    "n5-teiru"
-   ],
-   "sense": "撮影したフィルムなどを薬品で処理し、像を表すこと。"
   }
  ],
  "199": [
@@ -6391,60 +6188,6 @@
    "url": "https://www.aozora.gr.jp/cards/000035/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
-  },
-  {
-   "ja": "今回は、江戸時代の前期に活躍した僧、円空を取り上げます。円空は各地を旅しながら、生涯に数えきれないほどの仏像を彫ったと伝えられています。その最大の特徴は、ノミや鉈の跡をあえて残した、荒々しい削りにあるんですね。表面をつるつるに整えるのではなく、木の節やゆがみまで、そのまま形の一部として生かしているんです。だからこそ、素朴なのに力強い、ほかの誰にも真似できない表情が生まれたというわけです。",
-   "form": "削り",
-   "en": "This time I'm taking up Enku, a monk active in the early Edo period. Enku is said to have carved countless Buddhist statues over his lifetime while travelling from place to place. Their greatest distinctive feature lies in the rough cutting, which deliberately leaves the marks of the chisel and hatchet. Rather than smoothing the surface, he made use of the wood's knots and warps just as they were, as part of the form. That's exactly why a simple yet powerful expression that no one else could imitate was born.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "history",
-   "tipJa": "「荒々しい削り」「削りの跡」のように、彫刻や木工で刃物で表面を取る仕事ぶりを指す。",
-   "grammar": [
-    "n4-nagara",
-    "n3-dewa-naku",
-    "n5-teiru"
-   ],
-   "sense": "刃物などで表面を少しずつそぎ取ること。"
-  },
-  {
-   "ja": "AI向け半導体の需要拡大に伴い、チップを何枚も積み重ねる技術の重要性が増している。積み重ねるためには、シリコンの板を髪の毛よりも薄くしなければならない。そこで欠かせないのが、表面をミクロン単位で整える削りと磨きの技術だ。わずかな傷やゆがみでも、重ねた後の不良につながるため、極めて高い精度が求められる。この分野では、国内の装置メーカーが世界で高いシェアを握っており、存在感を示している。",
-   "form": "削り",
-   "en": "As demand for semiconductors for AI expands, the technology of stacking chips one on top of another is growing in importance. To stack them, the silicon slices have to be made thinner than a human hair. What is indispensable there is the technology of grinding and polishing that evens out the surface at the micron level. Because even a tiny scratch or warp can lead to defects once the chips are stacked, extremely high precision is required. In this field, domestic equipment makers hold a large share of the world market and are making their presence felt.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "ai",
-   "tipJa": "工業の話では「削りと磨き」と対にして、表面を薄く整える加工を指すことが多い。",
-   "grammar": [
-    "n5-teiru"
-   ],
-   "sense": "表面を少しずつそぎ取って整える加工。"
-  },
-  {
-   "ja": "話し方でも文章でも、上達への近道は、言葉を足すことではなく引くことです。原稿を書いたら一度声に出して読み、なくても意味が通る言葉に、どんどん線を引いてみてください。「〜と思います」や「基本的に」「ちょっと」のような言葉は、たいてい消しても困りません。こうした削りの作業を何度か繰り返すと、話は見違えるほど短く、聞きやすくなります。そして最後には、聞き手に本当に届く言葉だけが残っていきます。",
-   "form": "削り",
-   "en": "Whether in speaking or writing, the shortcut to improvement is not adding words but subtracting them. Once you've written a draft, read it aloud once and keep drawing lines through any words whose absence wouldn't change the meaning. Words like 'I think', 'basically' and 'a bit' can usually be deleted without any trouble. If you repeat this kind of cutting several times, your talk becomes remarkably shorter and easier to listen to. And in the end, only the words that truly reach the listener remain.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "語",
-   "topic": "language",
-   "tipJa": "文章術では「削りの作業」のように、余分な言葉を取り除く推敲を指して使う。",
-   "grammar": [
-    "n3-dewa-naku",
-    "n4-teiku"
-   ],
-   "sense": "不要な部分を取り除くこと。文章の推敲などにいう。"
   }
  ],
  "200": [
@@ -8527,58 +8270,6 @@
    "url": "",
    "licence": "CC BY-SA (Wikipedia)",
    "title": "直流"
-  },
-  {
-   "ja": "トランジスタの中には、電気が流れる通り道のすぐそばに、ごく薄い絶縁体の膜があります。この膜が電気をせき止めているからこそ、スイッチのオンとオフを切り替えられるんですね。ところが微細化が進むにつれて、この膜は原子数個分の厚さにまで薄くなりました。そうなると電気が膜をすり抜けて漏れてしまうので、各社は材料ごと別のものに置き換えることになったんです。新しい材料なら膜を少し厚くしても同じ働きができるので、漏れを抑えられるというわけです。",
-   "form": "絶縁体",
-   "en": "Inside a transistor, right next to the path the electricity flows through, there is an extremely thin film of insulator. It's precisely because this film holds back the electricity that the switch can be flipped between on and off. But as miniaturisation advanced, this film grew thinner, down to the thickness of just a few atoms. At that point electricity slips through the film and leaks, so companies ended up replacing it with a different material altogether. With the new material the film can do the same job even when made a little thicker, so the leakage can be kept down.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "ai",
-   "tipJa": "「絶縁体の膜」のように、電気を通さない役目の部品や層を説明するときに使う。",
-   "grammar": [
-    "n3-ni-tsurete",
-    "n3-koto-ni-naru",
-    "n5-teiru"
-   ],
-   "sense": "電気や熱をほとんど通さない物質。"
-  },
-  {
-   "ja": "19世紀の半ば、海底に電信のケーブルを敷く試みが始まると、水の中でも電気を漏らさない素材が求められた。そこで注目されたのが、東南アジアの樹木からとれるガッタパーチャと呼ばれる天然の樹脂である。熱で柔らかくなり、冷えると固まるこの物質は、海水に強い絶縁体として重宝された。大西洋を横断するケーブルにも、この樹脂が使われた。需要の急増により、原料となる木が大量に切り倒される事態も起きた。",
-   "form": "絶縁体",
-   "en": "In the mid-nineteenth century, when attempts to lay telegraph cables on the seabed began, a material was sought that would not leak electricity even underwater. What drew attention was a natural resin called gutta-percha, taken from trees in Southeast Asia. This substance, which softens with heat and hardens when cooled, was prized as an insulator that could withstand seawater. This resin was also used in the cables that crossed the Atlantic. As demand surged, the trees that supplied it were cut down in huge numbers.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "history",
-   "tipJa": "「海水に強い絶縁体」のように、用途や条件を添えて素材を評価する文脈で使う。",
-   "sense": "電気や熱をほとんど通さない物質。"
-  },
-  {
-   "ja": "理科のテストでよく出るのが、静電気がたまりやすいのはどんな物か、という問題です。答えは、プラスチックの定規やセーターのような、電気を通しにくい物です。金属なら、生じた電気はすぐに逃げていきますが、絶縁体では電気がその場にとどまり続けるわけです。ここを「通さないから、たまる」とひとことで覚えておくと、関連する問題もまとめて解けるようになります。暗記ではなく、理由ごと覚えるのがコツですね。",
-   "form": "絶縁体",
-   "en": "A question that often comes up on science tests is what kinds of objects build up static electricity easily. The answer is objects that conduct electricity poorly, like plastic rulers and sweaters. With metal, any electricity produced escapes right away, but with an insulator, the electricity stays where it is. If you remember this in a phrase, 'it doesn't conduct, so it builds up', you'll be able to solve related questions all together. The trick is to remember the reason along with the fact, not just memorise.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "学",
-   "topic": "mind",
-   "tipJa": "学習の場面では金属と対比して「電気を通しにくい物」の代表として使う。",
-   "grammar": [
-    "n4-teiku",
-    "n4-you-ni-naru",
-    "n3-dewa-naku"
-   ],
-   "sense": "電気や熱をほとんど通さない物質。"
   }
  ],
  "177": [
@@ -8611,60 +8302,6 @@
    "url": "",
    "licence": "CC BY-SA (Wikipedia)",
    "title": "テクノロジー"
-  },
-  {
-   "ja": "今回は、ヨーロッパの人々が中国の磁器にどれほど憧れていたか、という話をします。17世紀の王侯貴族は、白くて薄い器を大金を払って買い集めていました。ところがその製法は誰にも分からず、各地で研究が重ねられたものの、失敗が続きます。18世紀の初めになって、ようやくドイツのザクセンで焼くことに成功し、マイセンに窯が開かれるんですね。ここからヨーロッパの焼き物の歴史が一気に動き出すことになります。",
-   "form": "製法",
-   "en": "This time I'll talk about how much Europeans longed for Chinese porcelain. Seventeenth-century royalty and nobles paid fortunes to collect those thin white vessels. But nobody knew how it was made, and although research was carried out in many places, failure followed failure. Only at the start of the eighteenth century did they finally succeed in firing it in Saxony in Germany, and a kiln was opened at Meissen. From here, the history of European ceramics suddenly starts to move.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "history",
-   "tipJa": "「製法が分からない」「製法を守る」のように、作り方の秘密や技術を指すときによく使う。",
-   "grammar": [
-    "n2-mono-no",
-    "n3-koto-ni-naru"
-   ],
-   "sense": "物を作る方法。材料や手順を含めた作り方。"
-  },
-  {
-   "ja": "半導体の微細化が物理的な限界に近づくなか、各社はトランジスタの製法そのものを見直し始めている。これまでは平面に近い構造が主流だったが、近年は電流の通り道を周囲から包み込む構造への移行が進む。新しい構造は加工の難度が高く、工程の増加に応じて費用もかさむ。それでも消費電力を抑えられる利点は大きく、大手各社が導入を急いでいる。国内でも、この構造を採用した先端品の生産を目指す動きが進んでいる。",
-   "form": "製法",
-   "en": "As the miniaturisation of semiconductors approaches its physical limits, companies have begun to rethink the very method of making transistors. Until now, nearly flat structures were the mainstream, but in recent years a shift has been under way to structures that wrap the current's path from all sides. The new structures are harder to process, and costs pile up in line with the growing number of steps. Even so, the advantage of curbing power consumption is large, and the major firms are hurrying to adopt them. In Japan too, moves are under way aiming to produce cutting-edge chips that use this structure.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "ai",
-   "tipJa": "報道では「製法を見直す」「新たな製法を確立する」の形が多い。工業製品の作り方全体を指す。",
-   "grammar": [
-    "n2-ni-oujite",
-    "n5-teiru"
-   ],
-   "sense": "物を作る方法。材料や手順を含めた作り方。"
-  },
-  {
-   "ja": "たとえば、ある老舗の味噌蔵が、何代にもわたって受け継いできた製法を、一つ残らず公開したとしよう。材料の配合も、仕込みの時期も、寝かせる期間も、すべて紙に書いて誰にでも渡すのである。それでも、同じ味を出せる者はおそらく一人も現れないだろう。手順は言葉にできても、蔵の柱や梁に住みついた菌や、職人の手が覚えている感覚までは書き写せないからだ。紙に書ける知識は、技のほんの一部にすぎないのである。",
-   "form": "製法",
-   "en": "Suppose, for example, that an old miso brewery made public, down to the last detail, the method handed down over many generations. The proportions of ingredients, the timing of the brewing and the length of maturing would all be written on paper and given to anyone. Even so, probably not a single person would appear who could produce the same taste. For although the steps can be put into words, the microbes living in the brewery's pillars and beams and the feel that the artisan's hands remember cannot be copied down. The knowledge that can be written on paper is no more than a small part of the craft.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "論",
-   "topic": "mind",
-   "tipJa": "「代々の製法」「秘伝の製法」のように、食品や工芸の受け継がれた作り方にも使う。",
-   "grammar": [
-    "n2-ni-suginai",
-    "n5-teiru"
-   ],
-   "sense": "食品や工芸品などの作り方。配合や手順。"
   }
  ],
  "183": [
@@ -10655,56 +10292,6 @@
    "url": "http://news.livedoor.com/article/detail/4716718/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "アンドロイド時代の幕開け docomo Xperia【新生活特集】"
-  },
-  {
-   "ja": "今回は、クリステンセンの『イノベーションのジレンマ』を取り上げます。ひとことで言うと、優れた大企業ほど新しい技術に足をすくわれる、という話です。大企業は既存の顧客の声に忠実で、今の製品を磨くことに力を注ぎます。だからこそ、最初は小さくて儲からない新技術を後回しにしてしまうんですね。本の中ではハードディスク業界がその典型として描かれていて、業界の主役が何度も入れ替わっていきます。",
-   "form": "既存",
-   "en": "This time I'm taking up Christensen's The Innovator's Dilemma. In a word, it's about how the more excellent a big company is, the more likely it is to be tripped up by a new technology. Big companies are faithful to the voices of their existing customers and pour their energy into polishing their current products. That's exactly why they put off new technologies that start out small and unprofitable. In the book, the hard disk industry is depicted as the classic case, with the industry's leading players changing over and over again.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "ai",
-   "tipJa": "「既存の顧客」「既存の事業」のように、名詞の前に「既存の」を置いて使う。",
-   "grammar": [
-    "n4-teiku"
-   ],
-   "sense": "以前からすでに存在していること。"
-  },
-  {
-   "ja": "新興国の経済力が増すにつれて、第二次世界大戦後に生まれた既存の国際機関のあり方が問われている。象徴的なのが国連の安全保障理事会で、拒否権をもつ常任理事国は設立以来ほぼ同じ顔ぶれのままだ。1965年に非常任理事国の数が増やされたことはあるものの、常任理事国の枠は一度も広げられていない。日本やドイツ、インド、ブラジルは、常任理事国の拡大を共同で訴えてきた。ただ、各国の利害が複雑に絡み合い、改革の議論は長年まとまっていない。",
-   "form": "既存",
-   "en": "As the economic power of emerging countries grows, the shape of the existing international bodies born after the Second World War is being called into question. Symbolic of this is the UN Security Council, whose permanent members holding the veto have remained almost the same line-up since its founding. Although the number of non-permanent members was increased in 1965, the permanent seats have never once been expanded. Japan, Germany, India and Brazil have jointly called for an expansion of the permanent membership. However, the interests of the various countries are intricately entangled, and the debate on reform has failed to come together for many years.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "history",
-   "tipJa": "「既存の秩序」「既存の制度」など、新しく現れたものと対比して古くからある仕組みを指す。",
-   "grammar": [
-    "n3-ni-tsurete",
-    "n5-teiru",
-    "n2-mono-no"
-   ],
-   "sense": "以前からすでに存在していること。"
-  },
-  {
-   "ja": "AI導入って言うと、なんかゼロから全部作り直すイメージあるじゃないですか。でも実際は、既存のシステムにちょっとつなげるだけ、みたいなケースがけっこう多いんですよね。で、そこで一番めんどくさいのが、昔の仕組みがどう動いてるのか、社内の誰も分かってないってことで。作った人がもう辞めちゃってて、資料も残ってないとか、普通にあるんで。だから、AIより先にまずそっちを何とかしないと、って話なんですよ。",
-   "form": "既存",
-   "en": "When people say 'bringing in AI', you kind of picture rebuilding everything from scratch, right? But in reality, quite a lot of cases are more like just hooking it up a bit to the existing system. And the most annoying part there is that nobody in the company understands how the old setup works. It's totally normal for the person who built it to have already quit and for there to be no documents left. So the point is, you first have to sort that out before you even get to the AI.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "話",
-   "topic": "ai",
-   "tipJa": "会話でも「既存のシステム」「既存のやつ」のように使う。新しく入れるものとの対比が基本。",
-   "sense": "以前からすでに存在していること。"
   }
  ],
  "148": [
@@ -12294,55 +11881,6 @@
    "url": "https://www.aozora.gr.jp/cards/000042/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
-  },
-  {
-   "ja": "今回は、印刷の歴史を大きく変えた発明を紹介します。18世紀の終わり、ドイツのゼネフェルダーという人物が、平らな石を使った新しい印刷を思いつきました。仕組みはシンプルで、油と水が混ざり合わない性質を利用するんです。油を含むクレヨンで描いた部分にだけインクがのり、それ以外の部分は水がはじいてくれるんですね。こうして生まれた石版によって、木や金属を彫らなくても、描いたままの絵を何枚も刷れるようになりました。",
-   "form": "石版",
-   "en": "This time I'll introduce an invention that greatly changed the history of printing. At the end of the eighteenth century, a man in Germany named Senefelder came up with a new kind of printing using flat stones. The mechanism is simple: it uses the fact that oil and water don't mix. Ink sticks only to the parts drawn with an oily crayon, and on the other parts, the water repels it. Thanks to the lithographic stone born this way, it became possible to print many copies of a picture just as it was drawn, without carving wood or metal.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "history",
-   "tipJa": "印刷の版として使う平らな石を指す。木版・銅版と並べると意味がつかみやすい。",
-   "grammar": [
-    "n4-you-ni-naru"
-   ],
-   "sense": "印刷の版として使う、平らに磨いた石。"
-  },
-  {
-   "ja": "ロートレックのポスターって、見たことあります？19世紀の終わりごろのパリで、キャバレーとかの宣伝に使われてたやつなんですけど。あれ、実は石版で刷られてるんですよ。画家が描いたタッチがそのまま紙に出るんで、手描きっぽい勢いがちゃんと残ってるんですよね。もともとは街の壁に貼られて、雨に打たれて捨てられる広告だったのに、今は美術館に大事に飾られてるって、なんか不思議な話だなって思います。",
-   "form": "石版",
-   "en": "Have you ever seen Toulouse-Lautrec's posters? They're the ones used to advertise cabarets and places like that in Paris around the end of the nineteenth century. Those were actually printed from lithographic stones. The painter's strokes come out on the paper just as they were drawn, so they really keep that hand-drawn energy. They were originally ads stuck on city walls, rained on and thrown away, but now they're carefully hung in art museums, which I find kind of a strange story.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "話",
-   "topic": "history",
-   "tipJa": "「石版で刷る」の形で、刷り方の種類を言うのに使う。作品は「石版画」とも言う。",
-   "sense": "石版を使って刷る印刷。石版刷り。"
-  },
-  {
-   "ja": "石版の面白さは、一度描いた絵を磨き落とせば、同じ石に何度でも新しい絵を描ける点にある。石そのものは変わらず、表面だけが入れ替わっていく。人の記憶も、これに似ているのかもしれない。古い出来事は日々の暮らしに少しずつ磨り減らされ、その表に新しい経験が描き込まれていく。それでも、石が使うたびに薄くなるように、消えたはずの過去は確かに私たちの形を変えているのである。",
-   "form": "石版",
-   "en": "What is interesting about the lithographic stone is that once you grind off a picture, you can draw a new one on the same stone again and again. The stone itself does not change; only its surface is replaced. Human memory may be similar. Old events are worn down little by little by daily life, and new experiences are drawn onto the surface. Even so, just as the stone grows thinner with each use, the past that should have vanished is surely changing our shape.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "論",
-   "topic": "mind",
-   "tipJa": "「同じ石版に描き直す」のように、消して使い直せる平らな石という性質に注目した用法。",
-   "grammar": [
-    "n4-teiku",
-    "n5-teiru"
-   ],
-   "sense": "印刷の版として使う、平らに磨いた石。"
   }
  ],
  "43": [
@@ -13093,55 +12631,6 @@
    "url": "http://www.japanblue.jp/trouble/trouble02.html",
    "licence": "web quotation (personal study)",
    "title": ""
-  },
-  {
-   "ja": "半導体工場の話でよく出てくるのが、最新の露光装置はとにかく高い、という問題です。一台で数百億円するとも言われていて、どの会社でも気軽に買えるものではありません。そこで各社が工夫しているのが、既存装置を使い回して、一枚のウェハーに何度も露光を重ねるやり方です。手間はかかりますが、新しい装置を待たずに回路を細かくできるんですね。お金を取るか時間を取るか、という経営判断でもあるわけです。",
-   "form": "既存装置",
-   "en": "Something that often comes up when talking about chip factories is the problem that the latest lithography machines are simply expensive. They're said to cost tens of billions of yen apiece, so they're not something any company can buy casually. So what companies are doing instead is reusing their existing equipment and layering exposure after exposure onto a single wafer. It takes more effort, but it lets them make circuits finer without waiting for new machines. It's also a management decision about whether to prioritise money or time.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "講",
-   "topic": "ai",
-   "tipJa": "新しい装置と対比して、工場や研究室にすでにある機械を指す。「既存装置を使い回す」が典型。",
-   "grammar": [
-    "n5-teiru"
-   ],
-   "sense": "以前から使っている機械や設備。"
-  },
-  {
-   "ja": "人手不足が深刻な中小の工場で、既存装置にセンサーを後付けし、稼働の状況をAIで分析する取り組みが広がっている。設備を丸ごと入れ替えるのに比べ、費用を大幅に抑えられるのが利点だ。国や自治体の補助金を活用して導入に踏み切る例もある。集めたデータをもとに、故障の兆しを早めに察知できるようになった工場も出てきた。一方で、古い機械ほど仕様書が残っておらず、取り付けに手間取るケースも少なくない。",
-   "form": "既存装置",
-   "en": "At small and medium-sized factories facing serious labour shortages, efforts are spreading to retrofit existing equipment with sensors and analyse its operating status with AI. The advantage is that costs can be kept far lower than replacing the facilities wholesale. There are also cases where firms take the plunge using subsidies from the national or local governments. Some factories have become able to detect signs of breakdowns early on the basis of the collected data. On the other hand, the older the machine, the less likely its specifications are to have survived, and there are many cases where fitting the sensors takes time.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "報",
-   "topic": "ai",
-   "tipJa": "報道では「既存装置に後付けする」「既存装置を活用する」の形で、設備投資の話に出てくる。",
-   "grammar": [
-    "n4-you-ni-naru",
-    "n5-teiru"
-   ],
-   "sense": "以前から使っている機械や設備。"
-  },
-  {
-   "ja": "半導体系の研究室あるあるなんですけど、新しい実験をやりたいってなっても、予算がないから既存装置でなんとかするしかないんですよ。で、歴代の先輩たちが改造に改造を重ねた、謎の機械とかが部屋の隅に残ってて。マニュアルもないし、このボタンを押したら何が起きるのか、もう誰も分かんない、みたいな。でも意外と、そういうのでいいデータが取れちゃったりするんで、バカにできないんですよね。",
-   "form": "既存装置",
-   "en": "This is a classic thing in semiconductor labs, but even when you want to do a new experiment, there's no budget, so you just have to make do with the existing equipment. And there are these mystery machines left in the corner of the room that generations of seniors have modified over and over. There's no manual, and nobody knows anymore what happens if you press this button, that kind of thing. But surprisingly you sometimes get good data out of stuff like that, so you can't look down on it.",
-   "kind": "original",
-   "site": "書き下ろし（このデッキ用）",
-   "url": "",
-   "licence": "Bunki original",
-   "title": "",
-   "register": "話",
-   "topic": "ai",
-   "tipJa": "話し言葉では「既存装置でなんとかする」のように、手元の設備でしのぐ場面でよく使う。",
-   "sense": "以前から使っている機械や設備。"
   }
  ],
  "149": [

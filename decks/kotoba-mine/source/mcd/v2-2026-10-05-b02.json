@@ -1,0 +1,340 @@
+{
+  "112": [
+    {
+      "ja": "今回は、十五世紀のフィレンツェで栄えたメディチ家の銀行を取り上げます。当時の教会は、お金を貸して利子を取ることを原則として禁じていました。そこで彼らが活用したのが、遠くの都市で別の通貨に替えて支払う為替手形という仕組みです。両替の差額という形で利益を出しながら、ヨーロッパ各地の支店でお金を運用していったわけですね。ルールの抜け道を見つける発想が、一族の繁栄を支えたと言えるでしょう。",
+      "form": "運用",
+      "en": "This time we're looking at the Medici bank, which flourished in fifteenth-century Florence. The Church of the day prohibited, as a rule, lending money and taking interest on it. What they made use of instead was the bill of exchange, a system for paying out in a different currency in a distant city. Making their profit in the form of exchange differences, they managed money through branches all over Europe. You could say that a knack for finding loopholes in the rules sustained the family's prosperity.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「資産を運用する」のように、お金を増やす目的で動かすときに使う。",
+      "grammar": ["n4-nagara"],
+      "sense": "お金を増やすために、投資などで動かして管理すること。"
+    },
+    {
+      "ja": "生成AIを業務に取り入れる企業が増える中、導入した後の運用をめぐる課題が浮かび上がっている。社内で利用の指針を定めたものの、現場で守られているかを確かめる仕組みが整っていない例も少なくないという。入力した情報が外部に漏れるおそれがあるとして、扱ってよいデータの範囲をはっきり決める動きも広がっている。専門家は、ツールを入れること自体ではなく、使い続ける体制づくりこそが重要だと指摘している。",
+      "form": "運用",
+      "en": "As more companies bring generative AI into their work, problems are emerging over how it is run after it has been introduced. There are said to be many cases where guidelines for its use have been set within a company, but no system is in place to check whether they are followed on the ground. Out of concern that information entered into it could leak outside, moves to clearly define which data may be handled are also spreading. Experts point out that what matters is not bringing in the tool itself but building a setup for keeping it in use.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「導入」は入れるまで、「運用」は入れた後に動かし続ける段階を指す。",
+      "grammar": ["n2-mono-no", "n3-dewa-naku"],
+      "sense": "制度や仕組みを、実際に動かして使っていくこと。"
+    },
+    {
+      "ja": "仏教の戒律は、初めから一つの体系として作られたわけではない。伝承によれば、修行者の間で問題が起きるたびに、ブッダがその都度きまりを定めていったという。だからこそ後の時代の僧たちは、条文の文字よりも、その背後にある意図を問わざるを得なかった。土地も気候も違う国へ教えが伝わるとき、きまりの運用には常に解釈の幅がつきまとったのである。規則は守るためにあるが、生かすためにもあるのだろう。",
+      "form": "運用",
+      "en": "The Buddhist monastic precepts were not created as a single system from the start. According to tradition, each time a problem arose among the practitioners, the Buddha laid down a rule then and there. That is precisely why monks of later ages could not help asking about the intent behind a rule rather than its letter. When the teaching travelled to lands with different terrain and climate, applying the rules always came with room for interpretation. Rules exist to be kept, but perhaps also to be brought to life.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「法律の運用」「制度の運用」のように、決まりを実際に当てはめる場面でも使う。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "制度や仕組みを、実際に動かして使っていくこと。"
+    }
+  ],
+  "113": [
+    {
+      "ja": "今回は、お金の貸し借りがどれほど古い歴史を持つのかを見ていきます。紀元前十八世紀ごろのバビロニアで作られたハンムラビ法典には、穀物や銀を貸したときの取り分について、上限を定めた条文があるんです。つまり、貸した側が受け取る利息は、すでにこの時代から法律で決められていたわけですね。借りた人が払いきれずに苦しむことが、社会の問題になっていたのでしょう。人間とお金の付き合い方は、四千年近くたっても案外変わっていないのかもしれません。",
+      "form": "利息",
+      "en": "This time we'll look at just how old the history of lending and borrowing money is. The Code of Hammurabi, made in Babylonia around the eighteenth century BC, contains provisions setting an upper limit on what a lender could take when lending grain or silver. In other words, the interest a lender received was already fixed by law in that era. Presumably borrowers who could not pay it all off and suffered for it had become a social problem. Perhaps the way humans deal with money has changed surprisingly little in nearly four thousand years.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「利子」とほぼ同じ意味。法律や契約の文書では「利息」がよく使われる。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "仏教の因果の考え方は、どこか利息の仕組みに似ている。小さな行いもそのまま消えることはなく、時を経て結果となって返ってくるという。しかも、怒りや欲から出た行いほど、まるで利子が利子を呼ぶように、思わぬ大きさになって自分の身に戻ってくるように見える。だから昔の僧は、大きな善行を誇るより、目の前の小さな選択こそ慎むよう説いたのだろう。借りを作らない生き方とは、案外そういうことなのかもしれない。",
+      "form": "利息",
+      "en": "The Buddhist idea of cause and effect somehow resembles the way interest works. Even a small act does not simply vanish; it is said to come back as a result over time. What's more, acts that spring from anger or greed seem to return to us grown to an unexpected size, as if interest were breeding interest. That is probably why monks of old taught us to take care with the small choices in front of us rather than boast of great good deeds. Perhaps a life without running up debts means something like that.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n3-you-ni"]
+    },
+    {
+      "ja": "AI向けのデータセンターの建設をめぐり、社債の発行や銀行からの借り入れでお金を集める動きが広がっている。建設には巨額の費用がかかる一方、AIの事業がいつ十分な利益を生むかは見通しにくいのが現状だ。利益が想定を下回れば、借りたお金に毎年かかる利息が経営を圧迫しかねないとして、市場の一部には警戒する声もある。専門家の間では、需要の伸びがこの負担を上回り続けられるかが焦点になるとの見方が出ている。",
+      "form": "利息",
+      "en": "Over the construction of data centers for AI, moves to raise money by issuing corporate bonds and borrowing from banks are spreading. While building them costs enormous sums, it is hard to foresee when the AI business will generate enough profit. Some in the market are wary that, if profits fall short of expectations, the interest owed each year on the borrowed money could put pressure on the companies' finances. Among experts, the view is emerging that the focus will be whether growth in demand can keep outpacing this burden.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「利息がかかる」「利息を払う」の形でよく使う。",
+      "grammar": []
+    }
+  ],
+  "114": [
+    {
+      "ja": "今回は、江戸時代の薩摩藩が抱えた巨額の借金の話です。十九世紀の前半、薩摩藩が大坂の商人たちから借りたお金は膨らみ続け、その額は五百万両にのぼったとされます。改革を任された調所広郷が商人たちに示したのは、利子を一切つけず、元金だけを二百五十年かけて少しずつ払うという案でした。事実上、借金の大半を踏み倒したようなものですね。乱暴なやり方ですが、藩はこれで立ち直り、のちに幕末の政治で大きな力を持つことになります。",
+      "form": "元金",
+      "en": "This time it's the story of the huge debt held by the Satsuma domain in the Edo period. In the first half of the nineteenth century, the money Satsuma had borrowed from Osaka merchants kept swelling, and the total is said to have reached five million ryō. What Zusho Hirosato, who was put in charge of reform, presented to the merchants was a plan to pay back only the principal, little by little over 250 years, with no interest at all. In effect, it was as good as defaulting on most of the debt. It was a rough way of doing things, but the domain recovered with it and would later come to hold great power in late-Edo politics.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "利子と対になる語。「元金だけを払う」は、利子分を払わないという意味になる。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "利子がつく前の、貸し借りしたもとのお金。"
+    },
+    {
+      "ja": "ローンの問題でよくあるミスが、毎月払う額の中身を分けて考えていないことです。払ったお金のうち、一部はその月の利子に充てられ、残りの分だけが元金を減らすのに使われます。最初のうちは利子の占める分が大きいので、払っても払っても借りた額がなかなか減らないわけです。表を作って、月ごとの残高を一行ずつ書き出してみると、仕組みが見えるようになります。計算が苦手な人ほど、式より先に表で確かめるのがおすすめです。",
+      "form": "元金",
+      "en": "A common mistake in loan problems is not thinking separately about what makes up each month's payment. Of the money you pay, part goes to that month's interest, and only the remainder is used to reduce the principal. At first the interest takes up a large share, so no matter how much you pay, the amount you borrowed barely goes down. If you make a table and write out the remaining balance month by month, one line at a time, you'll start to see how it works. The weaker you are at calculation, the more I recommend checking with a table before reaching for formulas.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「元本」もほぼ同じ意味。ローンの説明では「元金」がよく使われる。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "利子がつく前の、貸し借りしたもとのお金。"
+    },
+    {
+      "ja": "仏教では、人は数えきれないほどの恩を受けて生きていると説かれる。お金の貸し借りであれば、期日までに元金に利子を添えて返せば、それで帳尻は合う。だが、親や師から受けた恩には、返すべき額というものがそもそも存在しない。いくら返しても返しきれないと知ることが、かえって人を謙虚にするのだろう。返し終えることのない借りを抱えて生きるのは、案外、不幸なことではないのかもしれない。",
+      "form": "元金",
+      "en": "Buddhism teaches that we live having received more kindness than we can count. With lending and borrowing money, if you pay back the principal with interest added by the due date, the accounts balance. But for kindness received from parents and teachers, there is no amount owed in the first place. Perhaps it is knowing that no matter how much you return you can never repay it in full that makes a person humble. Living with a debt you will never finish repaying may not be such an unhappy thing after all.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": [],
+      "sense": "利子がつく前の、貸し借りしたもとのお金。"
+    }
+  ],
+  "115": [
+    {
+      "ja": "今回は、利子にさらに利子をつけてよいのか、という古くからある問題を取り上げます。六世紀に東ローマ帝国のユスティニアヌス帝がまとめさせた法典では、たまった利子を元のお金に組み入れて、そこにまた利子を生ませるやり方が禁じられていました。つまり、最初に貸した額にだけ利子をつける単利の計算こそが、公正なやり方だと考えられていたわけですね。借りた人が雪だるま式に追い詰められるのを防ぐ、という発想だったんです。",
+      "form": "単利",
+      "en": "This time we're taking up an old question: is it all right to charge interest on interest? The code compiled in the sixth century on the orders of the Eastern Roman emperor Justinian forbade adding accumulated interest to the original sum and having that generate more interest in turn. In other words, simple interest, charged only on the amount first lent, was regarded as the fair way of doing things. The idea was to prevent borrowers from being driven into a corner by a snowballing debt.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "対になる語は「複利」。利子にも利子がつくかどうかで区別する。",
+      "grammar": []
+    },
+    {
+      "ja": "試験でよく出るのが、同じ条件で単利と複利を比べる問題です。前者は毎年同じ額の利子が加わるだけなので、グラフにすると右上がりの一直線になります。一方の複利は、増えた分にもまた利子がつくため、年数がたつにつれて曲線が急に立ち上がっていきます。式をただ丸暗記するよりも、一年目、二年目と表に書き出して違いを確かめてみてください。仕組みさえわかれば、公式は自然と思い出せるはずです。",
+      "form": "単利",
+      "en": "A frequent exam question compares simple and compound interest under the same conditions. With the former, the same amount of interest is simply added each year, so on a graph it forms a straight line rising to the right. With compound interest, on the other hand, the interest earned also earns interest, so as the years go by the curve shoots upward. Rather than simply memorising formulas wholesale, try writing year one, year two and so on in a table and checking the difference. As long as you understand how it works, you should be able to recall the formulas naturally.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n3-ni-tsurete", "n4-teiku"]
+    },
+    {
+      "ja": "小さな習慣が雪だるま式に大きな成果を生む、という話を近ごろよく耳にする。だが禅の修行で求められるのは、成果を膨らませることではなく、今日の坐禅を今日のこととして終えることである。昨日の積み重ねに頼らず、毎日同じ分だけを足していく、いわば単利のような歩みと言えようか。増え方は地味でも、そこには見返りを数える心が入り込む隙がない。比べることをやめた歩みは、静かで、しかも強い。",
+      "form": "単利",
+      "en": "These days we often hear that small habits snowball into big results. But what Zen practice asks of us is not to inflate results; it is to finish today's sitting as today's affair. Not leaning on yesterday's accumulation, adding just the same amount each day: one might call it a pace like simple interest. The growth may be plain, but there is no gap for a mind that counts rewards to slip into. A pace that has stopped comparing is quiet, and strong besides.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n3-dewa-naku", "n4-teiku"]
+    }
+  ],
+  "116": [
+    {
+      "ja": "今回は、記憶の研究からわかった効率のいい復習の仕方を紹介します。同じ時間勉強するなら、一度にまとめてやるより、日を空けて何回かに分けたほうが長く覚えていられることが、数多くの実験で確かめられています。これは分散学習と呼ばれる方法です。試験の直前に詰め込んだ人とこまめに復習した人とで、一か月後に残っている量を比べると、その差は歴然です。地味に見えても、間を空けることそのものが記憶を強くしてくれるわけですね。",
+      "form": "歴然",
+      "en": "This time I'll introduce an efficient way of reviewing, drawn from memory research. Numerous experiments have confirmed that, for the same amount of study time, you remember things longer if you split it over several sessions on different days than if you do it all at once. This is a method called distributed practice. If you compare how much remains a month later between people who crammed right before the exam and people who reviewed regularly, the difference is obvious. It may look unglamorous, but leaving gaps is itself what strengthens memory.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「差は歴然だ」「歴然とした差」の形で、比べた結果の違いによく使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "太平洋戦争が始まった当時、日本とアメリカの国力の差は、数字の上ではすでに歴然としていた。鉄鋼や石油の生産量などで、アメリカは日本を大きく上回っていたとされる。開戦の前には政府の内部でも、戦いが長引けば勝ち目は薄いとする見通しが示されていたという。それでも開戦に踏み切った背景には、早い段階で有利な条件を引き出せるという期待があったと指摘されている。数字が示す現実と組織の判断とのずれは、今も研究者の関心を集めている。",
+      "form": "歴然",
+      "en": "When the Pacific War began, the gap in national strength between Japan and the United States was, in terms of numbers, already plain. The United States is said to have far exceeded Japan in output of steel and oil, among other things. Even within the government, it is said, an outlook had been presented before the war that the chances of victory would be slim if the fighting dragged on. It has been pointed out that behind the decision to go to war nonetheless lay an expectation of extracting favourable terms at an early stage. The gap between the reality the numbers showed and the organisation's judgement still draws researchers' interest.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「歴然としている」の形でも使う。だれの目にも明らかで、疑う余地がないこと。",
+      "grammar": []
+    },
+    {
+      "ja": "手元のパソコンでAIを動かしてみるとわかるんですけど、GPUがあるかないかで速さの違いが歴然なんですよね。CPUだけだと一文出すのに何十秒もかかるのに、GPUを積んだマシンだとほぼ一瞬で返ってくるっていう。AIの計算って、同じような掛け算を大量に並べてやるんで、そういうのが得意なチップのほうが向いてるんですよ。まあ、その分お値段もえげつないんで、気軽には買えないんですけど。",
+      "form": "歴然",
+      "en": "If you try running AI on your own computer you'll see that whether or not you have a GPU makes an obvious difference in speed. With just a CPU it takes tens of seconds to produce one sentence, but on a machine with a GPU the answer comes back almost instantly. AI calculations involve lining up huge numbers of similar multiplications at once, so chips that are good at that kind of thing are better suited. Mind you, the price is brutal to match, so it's not something you can buy casually.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "184": [
+    {
+      "ja": "今回は、AIが次の単語を選ぶときの仕組みを、ざっくり見ていきます。言語モデルは、候補になる単語の一つひとつに、まず点数のような値をつけます。ただ、この値はマイナスにもなるので、そのままでは確率として使えません。そこで一度、指数関数に通して全部をプラスの値に変え、合計が一になるように調整するわけです。こうすると、点数が少し高いだけの単語にも、確率の上ではぐっと大きな差がつくんですね。",
+      "form": "指数関数",
+      "en": "This time we'll take a rough look at how an AI chooses the next word. A language model first gives each candidate word a value, something like a score. But since these values can be negative, they can't be used as probabilities as they are. So they're first passed through an exponential function to turn them all positive, then adjusted so they add up to one. Doing this gives even a word whose score is only slightly higher a much larger lead in terms of probability.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n4-teiku", "n3-you-ni"],
+      "sense": "ある数を何回も掛け合わせる形で表される関数。"
+    },
+    {
+      "ja": "エビングハウスの忘却曲線は、覚えた内容が時間とともにどう失われるかを示したものとして有名です。この曲線は、指数関数を使った式で近似されることがよくあります。覚えた直後に一気に忘れ、その後はゆるやかに減っていく形です。つまり、復習は覚えたばかりの時期ほど効き目が大きいということになります。翌日に一回、一週間後にもう一回というように、間隔を広げていくのが定番のやり方です。",
+      "form": "指数関数",
+      "en": "Ebbinghaus's forgetting curve is famous for showing how what we've memorised is lost over time. This curve is often approximated by a formula using an exponential function. Its shape is one where you forget a great deal right after memorising, and the loss slows down after that. In other words, review is most effective in the period just after you've learned something. The standard approach is to widen the intervals, reviewing once the next day, then once more a week later, and so on.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n4-teiku", "n3-you-ni", "n3-koto-ni-naru"],
+      "sense": "ある数を何回も掛け合わせる形で表される関数。"
+    },
+    {
+      "ja": "十八世紀の終わり、イギリスの経済学者マルサスは、人口は倍々で増えていくのに対し、食料は一定の分ずつしか増えないと論じた。今の言葉で言えば、指数関数的な増え方と、そうでない増え方との衝突である。ところが実際には、農業技術の進歩によって、彼の予言した破局は多くの国で訪れなかった。人間の営みを一つの式に押し込めようとするとき、見落とされるのはいつも人間の工夫そのものなのである。",
+      "form": "指数関数",
+      "en": "At the end of the eighteenth century, the British economist Malthus argued that population increases by doubling, whereas food increases only by a fixed amount at a time. In today's terms, it is a collision between exponential growth and growth that is not. In reality, however, thanks to advances in farming technology, the catastrophe he predicted never arrived in many countries. When we try to squeeze human activity into a single formula, what gets overlooked is always human ingenuity itself.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「指数関数的に増える」は、増え方がどんどん速くなることのたとえにも使う。",
+      "grammar": ["n4-teiku"],
+      "sense": "（〜的に）増え方がどんどん加速していくようす。"
+    }
+  ],
+  "120": [
+    {
+      "ja": "今回は、ニューラルネットワークの中で何が起きているのかを、なるべくかみ砕いて説明します。一つひとつの人工ニューロンがやっているのは、実はとても地味な作業です。入ってきた数字にそれぞれ重みを掛けて合わせ、少し形を整えてから次へ渡します。つまり中身は、掛け算と足し算のくり返しにすぎないんです。この単純な作業を何十億回も積み重ねることで、文章を書いたり質問に答えたりできるようになるわけですね。",
+      "form": "足し算",
+      "en": "This time I'll explain, in as plain terms as I can, what's going on inside a neural network. What each individual artificial neuron does is actually very humble work. It multiplies each incoming number by a weight, combines them, tidies up the shape a little and passes the result on. In other words, at heart it is nothing more than repeated multiplication and addition. By piling up this simple work billions of times, it becomes able to write text and answer questions.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「掛け算」「引き算」「割り算」と並ぶ、四則計算の一つ。",
+      "grammar": ["n2-ni-suginai", "n3-koto-de", "n4-you-ni-naru"],
+      "sense": "二つ以上の数を合わせて、合計を求める計算。"
+    },
+    {
+      "ja": "文章を直すとき、多くの人はつい足し算で考えてしまいます。説明が足りない気がして言葉を書き加え、念のための一文を差し込み、気づけば最初の倍の長さになっている。けれども、読み手にとって読みやすいのは、たいてい何かを取り除いた後の文章です。書き終えたら、この一文がなくても意味は通じるかと、一つずつ問いかけてみてください。引くことを覚えると、伝えたい芯がくっきりと見えてくるはずです。",
+      "form": "足し算",
+      "en": "When revising their writing, many people end up thinking in terms of addition. Feeling the explanation falls short, they write in more words, slip in a sentence just in case, and before they know it the piece is twice its original length. Yet what readers find easy to read is usually writing after something has been taken out. When you've finished, try asking of each sentence in turn whether the meaning would still come across without it. Once you learn to subtract, the core of what you want to say should come into sharp view.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「足し算で考える」は、付け加えることで良くしようとする発想を指す。反対は「引き算」。",
+      "grammar": [],
+      "sense": "何かを付け加えていくことで、物事をよくしようとする考え方。"
+    },
+    {
+      "ja": "数学の歴史で外せないのが、ゼロを一つの数として扱うようになった出来事です。七世紀のインドの数学者ブラーマグプタは、ゼロを含む計算の決まりを書き残したことで知られています。ある数にゼロを足しても値は変わらない、という今では当たり前の足し算のルールも、そこで言葉にされたわけです。当たり前に思えることほど、誰かが最初に言葉にした瞬間があります。そう知っておくと、公式の暗記もぐっと面白くなるはずです。",
+      "form": "足し算",
+      "en": "One thing you can't leave out of the history of mathematics is the moment zero came to be treated as a number. The seventh-century Indian mathematician Brahmagupta is known for writing down rules for calculations involving zero. Even a rule of addition we now take for granted, that adding zero to a number leaves its value unchanged, was put into words there. The more obvious something seems, the more surely there was a moment when someone first put it into words. Knowing that should make memorising formulas much more interesting.",
+      "original": true,
+      "register": "学",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "二つ以上の数を合わせて、合計を求める計算。"
+    }
+  ],
+  "131": [
+    {
+      "ja": "今回は、いま私たちが使っているパソコンやスマホの頭脳が、どこから来たのかという話です。1960年代から70年代にかけて、日本では小さな計算用の機械をめぐって、メーカーどうしが激しい値下げ合戦をくり広げていました。そんな中、ビジコンという会社が、新しい電卓に使う部品の開発をアメリカのインテルに依頼します。そこから生まれたのが、計算の頭脳を一つのチップにまとめた、世界初の商用マイクロプロセッサ「4004」でした。小さな道具の注文が、思わぬ形で今のデジタル社会につながったわけですね。",
+      "form": "電卓",
+      "en": "This time it's about where the brains of the PCs and smartphones we use today came from. From the 1960s into the '70s, manufacturers in Japan were waging a fierce price war over small machines for calculation. In the middle of this, a company called Busicom asked America's Intel to develop parts for use in a new calculator. What came out of that was the 4004, the world's first commercial microprocessor, which packed the brains of calculation onto a single chip. An order for a small gadget connected, in an unexpected way, to today's digital society.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": []
+    },
+    {
+      "ja": "大学入学共通テストの数学では電卓が使えないので、ふだんから手で計算する習慣をつけておく必要があります。とはいえ、問題集を解くたびに細かい計算まですべて手でこなしていると、肝心の考え方を見直す時間が足りなくなります。おすすめは、本番と同じ条件で解く日と、道具に頼って解き方の流れだけを確かめる日とを分けるやり方です。目的に応じて使い分ければ、計算力と理解の両方を伸ばすことができます。",
+      "form": "電卓",
+      "en": "Calculators can't be used in the math sections of the Common Test for university admissions, so you need to build the habit of calculating by hand day to day. That said, if you grind through every detailed calculation by hand each time you work through a problem book, you won't have enough time to go back over the thinking that really matters. What I recommend is splitting your days into ones where you solve under the same conditions as the real test and ones where you lean on tools and just check the flow of the solution. If you use each according to its purpose, you can build both your calculation skills and your understanding.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n2-ni-oujite"]
+    },
+    {
+      "ja": "国内のメーカーが1964年に発売した初期の卓上型の電卓は、価格が五十万円を超え、当時の乗用車に並ぶほどだったとされる。その後、各社が相次いで小型化と値下げを進め、1972年には一万円台の個人向け製品が登場して大ヒットした。部品の進歩によって数年のうちに価格が大幅に下がり、計算の道具は会社の机から家庭や学生の手元へと広がった。この時期の開発競争は、日本の半導体産業が力をつけるきっかけの一つになったとも言われている。",
+      "form": "電卓",
+      "en": "An early desktop calculator released by a domestic manufacturer in 1964 is said to have cost over 500,000 yen, on a par with a passenger car of the time. Afterwards, companies one after another pushed ahead with making them smaller and cheaper, and in 1972 a product for individuals priced in the ten-thousand-yen range appeared and became a huge hit. Thanks to advances in components, prices fell sharply within a few years, and calculating tools spread from office desks into homes and students' hands. The development race of this period is also said to have been one of the things that helped Japan's semiconductor industry gain strength.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "132": [
+    {
+      "ja": "今回は、1803年のルイジアナ買収を取り上げます。アメリカはもともと、ミシシッピ川の河口にあるニューオーリンズの港を買い取るつもりで交渉に臨みました。ところがナポレオンは、ヨーロッパでの戦争に備えてお金を必要としており、広大な土地をまとめて売ると持ちかけたんです。遠い植民地を抱え続けるより、手放したほうが得だと電卓を叩いたわけですね。結果としてアメリカの領土はおよそ倍になり、大国への道が開かれることになりました。",
+      "form": "電卓を叩いた",
+      "en": "This time we're taking up the Louisiana Purchase of 1803. The United States originally went into negotiations intending to buy the port of New Orleans at the mouth of the Mississippi. But Napoleon, needing money to prepare for war in Europe, offered to sell the vast territory all together. He crunched the numbers and decided it was better to let it go than to keep holding on to a distant colony. As a result, America's territory roughly doubled, and the road to becoming a great power was opened.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "実際に電卓を使わなくても、損得を見積もる意味で使う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "損か得かを、細かく計算して見積もる。"
+    },
+    {
+      "ja": "誰かに何かを与えるとき、私たちは心のどこかで電卓を叩いてはいないだろうか。仏教には、与える者も、受け取る者も、与える物も、そのいずれにもこだわりを残さないのが本当の施しだという考え方がある。見返りを当てにして差し出したものは、施しではなく、形を変えた取引にすぎない。損か得かを測る癖は、善い行いの中にさえ、するりと入り込んでくるのである。だからこそ、与えたらすぐに忘れるくらいがちょうどよいのだろう。",
+      "form": "電卓を叩いて",
+      "en": "When we give something to someone, are we not, somewhere in our hearts, crunching the numbers? Buddhism has the idea that true giving leaves no attachment to any of the three: the giver, the receiver or the thing given. Something offered in expectation of a return is not giving but merely a trade in a different form. The habit of weighing loss and gain slips in even among our good deeds. That is surely why it is just right to forget a gift as soon as we have given it.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n3-dewa-naku", "n2-ni-suginai"],
+      "sense": "損か得かを、細かく計算して見積もる。"
+    },
+    {
+      "ja": "AIの普及で電力の需要が急増する中、データセンターをどこに建てるかをめぐる企業の判断が注目されている。各社は、電気代や土地の値段、通信網との近さ、災害の起きにくさなどを踏まえ、電卓を叩いて候補地を絞り込んでいる。都市部は利用者に近く通信の遅れも小さい一方で、電気や土地の確保が難しいという悩みがある。このため、再生可能エネルギーを得やすく、広い土地も確保しやすい地方に目を向ける動きも出ている。",
+      "form": "電卓を叩いて",
+      "en": "As the spread of AI drives a surge in electricity demand, attention is turning to companies' decisions over where to build data centers. Taking into account electricity costs, land prices, proximity to communication networks and how unlikely disasters are, companies are crunching the numbers to narrow down candidate sites. Urban areas are close to users and have short communication delays, but have the problem that securing electricity and land is difficult. For this reason, there are also moves to look toward regions where renewable energy is easier to obtain and large plots of land are easier to secure.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": [],
+      "sense": "損か得かを、細かく計算して見積もる。"
+    }
+  ],
+  "134": [
+    {
+      "ja": "今回は、機械に計算をさせるという発想の始まりを見ていきます。十七世紀のフランスで、まだ十代だったパスカルは、税金の仕事をしていた父親の苦労を見て、歯車で数を足していく機械を作りました。ある桁が十になると、隣の桁の歯車が一つ進む仕組みで、手で書くより速く正確に答えが出せたんです。ただ、値段が高く、一台ずつ手作りだったため、あまり広くは普及しなかったと言われています。それでも、この小さな計算機は、のちのコンピューターにつながる長い歴史の出発点の一つになったわけです。",
+      "form": "計算機",
+      "en": "This time we'll look at the beginnings of the idea of making a machine do calculations. In seventeenth-century France, Pascal, while still in his teens, saw how hard his father's tax work was and built a machine that added numbers with gears. It worked so that when one digit reached ten, the gear for the next digit along advanced by one, and answers came out faster and more accurately than writing by hand. However, it was expensive and each one was made by hand, so it is said not to have spread very widely. Even so, this little calculating machine became one of the starting points of a long history leading to the computer.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n4-teiku"],
+      "sense": "計算をするための機械。"
+    },
+    {
+      "ja": "量子計算機の実用化に向けた研究開発が、各国で加速している。今のコンピューターでは何万年もかかるとされる種類の計算を、短い時間で解ける可能性があるとして注目を集めている。ただ、計算の途中で生じる誤りをどう抑えるかという大きな課題が残っており、実際に役立つ規模になるまでには時間がかかるとの見方が多い。日本でも、国の研究機関や企業が国産機の開発を進めており、今後の成果が期待されている。",
+      "form": "計算機",
+      "en": "Research and development toward the practical use of quantum computers is accelerating in many countries. They are attracting attention for the possibility of solving, in a short time, kinds of calculations said to take today's computers tens of thousands of years. However, the major challenge remains of how to suppress the errors that arise mid-calculation, and many believe it will take time before they reach a scale that is actually useful. In Japan too, national research institutes and companies are pushing ahead with developing domestically made machines, and results are anticipated.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「量子計算機」のように、専門的な文脈ではコンピューターをこう呼ぶことが多い。",
+      "grammar": [],
+      "sense": "計算を行う機械。特に、コンピューターのこと。"
+    },
+    {
+      "ja": "人の心は一種の計算機である、と考える立場がある。外から入ってきた情報を一定の形に置きかえ、決まった手順で処理して答えを出す、というわけだ。この見方は、認知科学に多くの成果をもたらしてきた。だが、夕焼けを見て胸が詰まるとき、そこで何が計算されているのかと問われると、答えに窮せざるを得ない。心を道具にたとえるとき、私たちはたとえきれないものの存在に、かえって気づかされるのである。",
+      "form": "計算機",
+      "en": "There is a position that the human mind is a kind of computing machine. The idea is that it converts information coming in from outside into a fixed form, processes it by set procedures and produces answers. This view has brought many results to cognitive science. But when our chest tightens at the sight of a sunset and we are asked what is being computed there, we cannot help being at a loss for an answer. When we liken the mind to a tool, we are, on the contrary, made aware of what lies beyond the likeness.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n2-zaru-o-enai"],
+      "sense": "計算を行う機械。特に、コンピューターのこと。"
+    }
+  ]
+}
