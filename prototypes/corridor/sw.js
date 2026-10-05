@@ -21,7 +21,9 @@
 // v14: the deck player's host lexicon adapter (host.js) joins the shell; the decks name their tokens side file
 // v15: the deck player's tap-to-define (entry sheet, lookups) and the regenerated decks; tokens precached
 // v16: the passage pilot (51 contract-v2 passages, register/topic chips, tipJa) and Japanese senses in the tokens files
-const VERSION = 'kairo-v16-passage-pilot';
+// v12 (main): the personal deck's depth (enrichment, host bridge) and the shared dictionary data join the shell
+// v17: merge of main's personal depth into the passage pilot — a fresh cache name
+const VERSION = 'kairo-v17-merge-main';
 const SHELL = [
   '.',
   'index.html',
@@ -56,8 +58,21 @@ const SHELL = [
   'decks/personal/mount.mjs',
   'decks/personal/engine.mjs',
   'decks/personal/schema.mjs',
+  'decks/personal/enrichment.mjs',
+  'decks/personal/host-bridge.mjs',
   'decks/personal/store.mjs',
   'decks/personal/personal.css',
+  // The answer's shared dictionary and remember-list doors work on first
+  // offline use after installation. Full dictionary shards remain on demand.
+  'data/proprietary_safe/kanken.json',
+  'data/proprietary_safe/sem.json',
+  'data/share_alike/kanji.json',
+  'data/share_alike/words.json',
+  'data/share_alike/idioms.json',
+  'data/share_alike/dict.json',
+  'data/share_alike/strokes.json',
+  'data/share_alike/radicals214.json',
+  'data/original/grammar-v11.json',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
   // …and their tokens side files (deck.tokens), so the back's tap targets draw offline too
@@ -114,7 +129,10 @@ self.addEventListener('fetch', (event) => {
             }
             return res;
           }),
-      ),
+      ).catch(() => new Response('This file is not available offline.', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
+      })),
     );
     return;
   }

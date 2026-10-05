@@ -21,3 +21,31 @@ export async function fixture() {
   data.contentDigest = await digest({edition:data.id,lessons:data.lessons});
   return data;
 }
+
+export async function enrichmentFixture(data) {
+  const segments = [
+    ['町','まち'],['の'],['図書館','としょかん'],['では、'],['読者','どくしゃ'],['が'],
+    ['落ち着いて','おちついて','落ち着く'],['本','ほん'],['を'],['読める','よめる','読む'],['ように、'],
+    ['静かな','しずかな','静か'],['部屋','へや'],['を'],['用意','ようい'],['している。'],
+    ['新しい','あたらしい'],['本','ほん'],['を'],['選ぶ','えらぶ'],['にあたって'],['は、'],
+    ['表紙','ひょうし'],['だけで'],['判断','はんだん'],['せず、'],['目次','もくじ'],['や'],['最初','さいしょ'],
+    ['の'],['数','すう'],['ページにも'],['目','め'],['を'],['通す','とおす'],['ことが'],['大切','たいせつ'],['だ。'],
+    ['気','き'],['になった'],['言葉','ことば'],['を'],['一つ','ひとつ'],['だけ'],['手帳','てちょう'],['に'],
+    ['書いて','かいて','書く'],['おけば、'],['翌日','よくじつ'],['にその'],['言葉','ことば'],['の'],['意味','いみ'],
+    ['を'],['自分','じぶん'],['で'],['思い出す','おもいだす'],['練習','れんしゅう'],['ができる。'],
+  ].map(([text,reading,lemma])=>({text,...(reading?{reading}:{}),...(lemma?{lemma}:{})}));
+  const value = {
+    format:'bunki-personal-enrichment',version:1,collectionId:data.id,contentDigest:data.contentDigest,revision:1,
+    provenance:{authorshipJa:'検証用に書いた日本語の説明。辞書からの引用ではない。',readingMethodJa:'検証用の段落に読みを付け、原文と照合した。'},
+    lessons:data.lessons.map(l=>({id:l.id,contentHash:l.contentHash,
+      explanationJa:'本や資料を集め、読む人が利用できるようにした施設。本文では、静かに本を選んだり読んだりする場所として描かれている。',
+      grammarJa:'「動詞の辞書形＋にあたって」は、何かを始める場面を示す。ここでは、本を選ぶ際の注意を述べている。',
+      usageJa:'「図書館で本を読む」「図書館から本を借りる」のように使う。',
+      applicationJa:'表紙だけで決めず、目次や数ページを読んで、自分に合う本かどうかを確かめる。',
+      contrastJa:'「書店」は本を売る店。「図書館」は本や資料を利用するための施設で、役割が異なる。',
+      relations:[{term:'書店',reading:'しょてん',explanationJa:'本を売る店。図書館との違いは、主な役割が販売にあること。'}],segments,
+    })),
+  };
+  value.enrichmentHash=await digest(value);
+  return value;
+}
