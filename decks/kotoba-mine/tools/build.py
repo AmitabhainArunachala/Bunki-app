@@ -478,6 +478,23 @@ def level_for(term: str, reading: str) -> str | None:
     return f"N{next(iter(found))}" if len(found) == 1 else None
 
 
+# a passage's optional fields (export_mcd.py checks them; CARD_CONTRACT_V2 §3 item 4, §6, §7):
+# register (講 報 論 話 学 語), topic, tipJa (the tier-one usage note), sense, grammar. Absent or
+# empty on a passage, absent on its cards; they never enter a card key, so ids do not move.
+PASSAGE_FIELDS = ("register", "topic", "tipJa", "sense")
+
+
+def passage_fields(wid: str, pi: int, p: dict) -> dict:
+    out = {k: p[k] for k in PASSAGE_FIELDS if isinstance(p.get(k), str) and p[k]}
+    if p.get("grammar"):
+        refs = grammar_refs(p["grammar"])
+        unknown = sorted(set(p["grammar"]) - {g["id"] for g in refs})
+        if unknown:
+            raise SystemExit(f"{wid} passage {pi}: grammar ids not in grammar-v11.json: {', '.join(unknown)}")
+        out["grammar"] = refs
+    return out
+
+
 # 字 cards the build leaves out, reported at the end: [card id or key] and [(word, term, ids)]
 KANJI_VISIBLE: list[str] = []
 KANJI_UNALIGNED: list[tuple[str, str, list[str]]] = []
@@ -497,7 +514,8 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
             raise SystemExit(f"{wid} passage {pi}: ruby does not spell the passage")
         src = source(p)
         ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
-        base = {"ja": p["ja"], "form": p["form"], "en": p["en"], "kind": p["kind"], "src": src, "passage": pi}
+        base = {"ja": p["ja"], "form": p["form"], "en": p["en"], "kind": p["kind"], "src": src, "passage": pi,
+                **passage_fields(wid, pi, p)}
         en_target = target_sentence_en(p["ja"], p["en"], sum(len(seg[0]) for seg in ruby[:ti]))
         if en_target is not None:
             base["enTarget"] = en_target
@@ -530,7 +548,7 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
 
 METHOD = [
     "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）の文章でできています。ふだんは「読んで思い出す」で解きます。",
-    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜4文）。覚える言葉は色つき。読み・英語・ヒントは出ない。読んで、意味と読みを思い出してからタップ。",
+    "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜5文）。覚える言葉は色つき。読み・英語・ヒントは出ない。読んで、意味と読みを思い出してからタップ。",
     "設定 › 答え方 › 穴埋め にすると MCD の穴埋めになる。「語」カードは単語まるごとが穴（同じ言葉が二度出てくる文章では、両方とも空欄）。",
     "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
@@ -1214,13 +1232,17 @@ def note_rows(deck: dict) -> list[dict]:
                 "SentenceFurigana": anki_furigana(card["ruby"]),
                 # a passage translates only its target sentence (none when it cannot be matched)
                 "SentenceEN": html.escape(card.get("enTarget", "") if card.get("type") else card["en"]),
-                "Tip": html.escape(w.get("tip", "")),
+                # a passage's own usage note (tipJa) first, then the word's note; the model's fields
+                # and templates stay as they are (a new field would change the Anki note type)
+                "Tip": "<br>".join(html.escape(t) for t in (card.get("tipJa", ""), w.get("tip", "")) if t),
                 "POS": POS_KEY.get(w["pos"], "noun"),
                 "Kanji": "".join(
                     f'<div class="kj"><b>{k["c"]}</b><span>{html.escape(k["m"])}</span><small>{" ".join(k["parts"])}{" · " + str(k["st"]) + "画" if k.get("st") else ""}</small></div>'
                     for k in w.get("kanji", [])) + kanji_family_html(deck["words"], wi),
                 "_group": w["group"],
                 "_level": w.get("level", ""),
+                # contract-v2 passages: register and topic as tags (register::講, theme::ai)
+                "_tags": [f"{k}::{card[f]}" for k, f in (("register", "register"), ("theme", "topic")) if card.get(f)],
             })
     rows.sort(key=lambda r: r["Sort"])
     return rows
@@ -1260,7 +1282,7 @@ def build_anki(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
         d.description = html.escape(g["titleEn"])
         decks[g["id"]] = d
     for i, r in enumerate(note_rows(deck)):
-        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[deck["id"], f"card{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}", *([f"level::{r['_level']}"] if r["_level"] else [])], sort_field=r["Sort"], due=i)
+        note = Note(model=model, fields=[r[f] for f in FIELDS], tags=[deck["id"], f"card{r['Level']}", f"source::{r['Kind']}", f"topic::{r['_group']}", *([f"level::{r['_level']}"] if r["_level"] else []), *r["_tags"]], sort_field=r["Sort"], due=i)
         decks[r["_group"]].add_note(note)
     genanki.Package(list(decks.values())).write_to_file(str(out_dir / spec["out"][0]))
 
@@ -1268,7 +1290,8 @@ def build_anki(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
 def build_tsv(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
     lines = ["#separator:tab", "#html:true", f"#columns:{chr(9).join(FIELDS)}\tTags"]
     for r in note_rows(deck):
-        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{deck['id']} card{r['Level']} source::{r['Kind']}" + (f" level::{r['_level']}" if r["_level"] else "")]))
+        lines.append("\t".join([*(r[f].replace("\t", " ") for f in FIELDS), f"{deck['id']} card{r['Level']} source::{r['Kind']}" + (f" level::{r['_level']}" if r["_level"] else "")
+                                                                  + "".join(f" {t}" for t in r["_tags"])]))
     (out_dir / spec["out"][1]).write_text("\n".join(lines) + "\n", "utf-8")
 
 

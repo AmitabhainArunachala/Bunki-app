@@ -961,8 +961,52 @@ once a sitting starts, a request the shell would otherwise miss offline, and the
 the regenerated decks must not be served from a v14 cache. `tools/sw-shell.test.mjs` checks that
 every SHELL path exists.
 
+**A46 → S14, S18, S20, S39, S44 (the passage pipeline pilot; CARD_CONTRACT_V2 §2, §5–§7).** Adds:
+"A written passage to contract v2 is 4–5 sentences of 180–300 characters in one register (講 報
+論 話 学 語) on one topic (mind, india, ai, history, or language for Japanese about Japanese), with
+the target exactly once and an English translation of as many sentences. Before it becomes a card
+it passes five independent checks, each by a judge other than the writer: naturalness, facts,
+level (the grammar ids it records occur in a form their cues match), one target (no other deck
+word), and context does work (with the target blanked, a reader names its sense). A failure is a
+rewrite, not a patch. Passages arrive in dated batch files (`source/mcd/<name>-YYYY-MM-DD.json`),
+read after the undated files, so a batch adds passages after a word's existing ones and passage 1,
+its 字 cards and every existing card id stay as they are. A source record may carry the optional
+fields `register`, `topic`, `tipJa` (one Japanese line, at most 80 characters, no Latin letters),
+`grammar` (grammar-v11 ids) and `sense`; `export_mcd.py` checks them and the length rules (any
+written passage at most 300 characters and 5 sentences; the earlier 2–4-sentence passages stay
+valid), and refuses empty or unknown values instead of guessing. `build.py` carries them onto
+the deck's cards (grammar labelled as `{id, p}`; an unknown id fails the build); a passage without
+them gives its cards none, and none of them enters a card key. In the player `tipJa` is the
+card's tier-one usage note (contract §3 item 4) in place of the word's note; the register and topic
+are small text chips in the chip row, the passage's topic standing in for the word's group chip
+(kind · source · register · topic · level · state); the card's grammar joins the 文法 line. Anki's
+note type does not change: `tipJa` leads the existing Tip field and register and topic become tags
+(`register::講`, `theme::ai`)." The pilot (2026-10-04) wrote 60 passages for 20 words; 51 passed the
+five checks (dropped: naturalness 4, facts 0, level 3, one target 1, context 1) and became cards
+km-…-m04 to -m10 (51 new ids; the 1,481 earlier ids unchanged). Twelve deck reading rules scoped
+to the new card ids fix the tokeniser's readings in them (日本 にほん, 一国 いっこく, 間の取り方 ま …).
+Why: contract §2 asks 180–300 characters; the 943 earlier passages have a median of 87 and the
+written ones at most 116.
+`tools/test_export_mcd.py` and verify-kotoba-mine's pilot checks hold the rules.
+
+**A47 → S20, S49 (amends A44).** Replaces A44's "for any other word the sheet says so in
+Japanese" with: "For a word that is not the deck's own, the sheet shows a Japanese sense from the deck's
+sense table (`decks/kotoba-mine/source/gloss_ja.json`, one dictionary-style line of at most 40
+characters per lemma, written for the sense the passages use). `build.py` ships each sense a
+passage or definition uses in the tokens file's `defs`, keyed by the token's ref, else its lemma,
+else its surface (the order the player tries), beside the deck words' own definitions; a table key
+that is a deck word fails the build. The player reads it only when the host lexicon has no
+Japanese for the word; a word the table lacks still shows 「この語の日本語の語釈は、まだ辞書にあり
+ません」. The standalone pages and Anki are unchanged." The table holds 1,209 lemmas, every content
+lemma of the 51 pilot passages and the most frequent passage lemmas (about half the non-deck taps).
+Why: integration.md A2; the corridor's dictionary is JMdict, English only.
+
+**A48 → S52 (amends A45).** The service worker's `VERSION` is `kairo-v16-passage-pilot`: the
+player (chips, tier-one note, the sense fallback) and both decks' outputs changed.
+
 The Phase 2 run (2026-10-04) is recorded in A37–A45. Read default and the 字 skip: A37. Hint
 retirement: A26 and A37. Reset re-scoped to 削除 and 復元: A42. Source fold with its licence: A27.
 Bar reserve and the settling scroll: A39. 焦点 groups and the ⋯ gutter: A38. Tokens side file,
 compound joins, cue rules and the host adapter: A43. Tap to define as capture only, the `lookups`
 ledger field, the depth-2 cut-off and the standalone gloss-map fallback: A44. Service worker: A45.
+The passage pilot (2026-10-04): A46. The Japanese sense table: A47. Service worker: A48.

@@ -20,7 +20,8 @@
 // v13: the deck player moved to card contract v2 (passage card) — drop the cached player and decks
 // v14: the deck player's host lexicon adapter (host.js) joins the shell; the decks name their tokens side file
 // v15: the deck player's tap-to-define (entry sheet, lookups) and the regenerated decks; tokens precached
-const VERSION = 'kairo-v15-tap-define';
+// v16: the passage pilot (51 contract-v2 passages, register/topic chips, tipJa) and Japanese senses in the tokens files
+const VERSION = 'kairo-v16-passage-pilot';
 const SHELL = [
   '.',
   'index.html',

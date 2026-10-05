@@ -420,3 +420,5 @@
 .kp-pos-adv .kp-posbadge { color: var(--kp-adv); }
 .kp-pos-expr .kp-posbadge { color: var(--kp-expr); }
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
+/* a written passage's register and topic (CARD_CONTRACT_V2 §6): text chips, a size down, no hue */
+.kp-chip-sm { font-size: 11px; padding: 2px 6px; }

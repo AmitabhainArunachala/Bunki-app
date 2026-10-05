@@ -586,7 +586,8 @@ function studyScreen() {
     'kp-chips',
     el('span', 'kp-chip kp-kindchip', kindLabel),
     el('span', 'kp-chip', source),
-    el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
+    ...passageChips(card),
+    TOPIC[card.topic] ? null : el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
     word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
   );
@@ -679,6 +680,27 @@ function levelChip(level) {
   chip.setAttribute('aria-label', note);
   return chip;
 }
+/** a written passage's register (CARD_CONTRACT_V2 §6) and topic: [chip text, full name] */
+const REGISTER = { 講: ['講義', '講義・本の要約'], 報: ['報道', 'ニュース・解説'], 論: ['論説', 'エッセイ・思想'], 話: ['会話', '話し言葉'], 学: ['学び', '勉強法・学習の話'], 語: ['話し方', '話し方・書き方の話'] };
+const TOPIC = { mind: ['心と学び', '心と学び'], india: ['インド・仏教', 'インド哲学と仏教'], ai: ['AI・半導体', 'AI と半導体'], history: ['世界史', '世界史'], language: ['日本語', '日本語についての話'] };
+/** small text chips for the passage's register and topic (none on a card without them); the
+ * passage's topic takes the place of the word's group chip, so the row stays kind · source ·
+ * register · topic · level · state (aesthetics.md §4) */
+function passageChips(card) {
+  const out = [];
+  for (const [table, value, cls, what] of [
+    [REGISTER, card.register, 'kp-regchip', '文体'],
+    [TOPIC, card.topic, 'kp-topicchip', '話題'],
+  ]) {
+    const [text, full] = (typeof value === 'string' && table[value]) || [];
+    if (!text) continue;
+    const chip = el('span', `kp-chip kp-chip-sm ${cls}`, text);
+    chip.title = `${what}：${full}`;
+    chip.setAttribute('aria-label', `${what}：${full}`);
+    out.push(chip);
+  }
+  return out;
+}
 /** the progress rail: drawn at where it stood, then ticked to frac on the compositor */
 function rail(frac) {
   const bar = el('i');
@@ -760,9 +782,11 @@ function answerBlock(card, word) {
   a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
   // the definition's words are tap targets like the passage's (STANDARD A44)
   a.append(defLine(card, word));
-  // a usage note in Japanese stays in tier one; the deck's English notes go behind 英語
+  // a usage note in Japanese stays in tier one (§3 item 4): the passage's own note (tipJa) when it
+  // has one, else the word's; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
-  if (jaNote) a.append(el('p', 'kp-note', word.tip));
+  const note = (typeof card.tipJa === 'string' && card.tipJa) || (jaNote ? word.tip : '');
+  if (note) a.append(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`, note));
   // a leech's repair ladder (§4) sits after tier one and before the folds, so the word, its
   // reading and the definition stay pinned under the passage on every card (learning-design L1)
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
@@ -1102,8 +1126,36 @@ function frameOf(unit) {
   const word = unit.word || (tok ? deckWordOf(tok) : null);
   if (word) return { word, label: word.term, reading: word.reading, ja: word.defJa || '', en: word.meaning || '', key: `deck:${word.id}`, kind: '語', level: word.level || '', surface: tok?.s || word.term };
   const entry = safely(() => ctx.host?.lookup(tok) || null, null);
-  if (entry) return { entry, label: entry.label || entry.id, reading: entry.reading || '', ja: entry.ja || '', en: entry.en || entry.gloss || '', key: `${entry.t}:${entry.id}`, kind: ENTRY_KIND[entry.t] || '', level: entry.level || '', surface: tok.s };
-  return { label: tok?.b || tok?.s || '', reading: tok?.r || '', ja: '', en: '', key: '', kind: '', level: '', surface: tok?.s || '' };
+  // the host lexicon is English-only: a word that is not the deck's own takes its Japanese sense
+  // from the deck's tokens file (build.py, source/gloss_ja.json), keyed as the build keyed it
+  const ja = (entry?.ja || '') || lemmaSense(tok);
+  if (entry) return { entry, label: entry.label || entry.id, reading: entry.reading || '', ja, en: entry.en || entry.gloss || '', key: `${entry.t}:${entry.id}`, kind: ENTRY_KIND[entry.t] || '', level: entry.level || '', surface: tok.s };
+  return { label: tok?.b || tok?.s || '', reading: tok?.r || '', ja, en: '', key: '', kind: ja ? '語' : '', level: '', surface: tok?.s || '' };
+}
+
+/** a 語 token's Japanese sense from the tokens file's defs, tried by ref, lemma, then surface (the
+ * order build.py gloss_keys() keys them); deck word ids share that table and are never matched
+ * here, since a deck word never reaches this point. '' when the table has no row. */
+function lemmaSense(tok) {
+  const defs = ctx.tokenFile?.defs;
+  if (!tok || tok.k !== '語' || !defs || typeof defs !== 'object') return '';
+  const ids = deckIds();
+  for (const key of [tok.ref, tok.b, tok.s]) {
+    if (!key || ids.has(key) || !Object.hasOwn(defs, key)) continue;
+    const rows = defs[key];
+    if (!Array.isArray(rows)) return '';
+    return rows.map((r) => (Array.isArray(r) && typeof r[0] === 'string' ? r[0] : '')).join('');
+  }
+  return '';
+}
+const idSets = new WeakMap();
+function deckIds() {
+  let ids = idSets.get(ctx.deck);
+  if (!ids) {
+    ids = new Set(ctx.deck.words.map((w) => w.id));
+    idSets.set(ctx.deck, ids);
+  }
+  return ids;
 }
 
 /** one lookup row in the ledger (engine logLookup); the card's schedule is not touched. Not stored
