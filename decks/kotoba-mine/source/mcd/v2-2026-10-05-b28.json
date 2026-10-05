@@ -1,0 +1,352 @@
+{
+  "93": [
+    {
+      "ja": "今日は、意志の力について書かれた一冊を要約していきます。著者によると、甘いものやお酒を我慢しようと気合いを入れるほど、かえって失敗しやすくなるそうです。大事なのは根性ではなく、誘惑が目に入らないように環境を整えることだといいます。たとえば、お菓子を家に置かないだけで、節制はぐっと楽になります。意志に頼らない仕組みを作ることが、長く続けるコツだというわけです。",
+      "form": "節制",
+      "en": "Today I'm going to summarize a book about willpower. According to the author, the harder you psych yourself up to resist sweets and alcohol, the more likely you actually are to fail. What matters, he says, is not grit but arranging your surroundings so that temptations don't catch your eye. For example, just by not keeping snacks in the house, moderation becomes much easier. In other words, building systems that don't rely on willpower is the key to keeping it up for a long time.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「節制する」「食事の節制」のように、食べすぎや飲みすぎをおさえる場面で使う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku", "n3-you-ni"],
+      "sense": "飲み食いなどの欲を、ほどほどにおさえること。"
+    },
+    {
+      "ja": "インドでは近年、都市部を中心に糖尿病の患者が増え、国の大きな課題となっている。食生活の変化や運動不足が背景にあるとされ、揚げ物や甘い菓子を好む習慣の見直しを呼びかける動きが広がっている。伝統的な断食の文化を、健康のための節制として取り入れ直す人もいるという。政府も、ヨガを通じた健康づくりを後押ししている。ただ、専門家は、自己流の極端な食事制限はかえって体を壊しかねないとして、注意を促している。",
+      "form": "節制",
+      "en": "In India in recent years, the number of diabetes patients has been rising, mainly in cities, and it has become a major national challenge. Changes in diet and lack of exercise are said to be behind it, and calls to rethink the habit of favoring fried foods and sweet confections are spreading. Some people are reportedly taking up the traditional culture of fasting again as moderation for the sake of health. The government is also promoting health through yoga. Experts, however, are urging caution, saying that extreme self-made dietary restrictions could end up damaging the body.",
+      "original": true,
+      "register": "報",
+      "topic": "india",
+      "tipJa": "報道では「健康のための節制」「節制を心がける」のように、生活習慣の話題で使われる。",
+      "grammar": ["n5-teiru"],
+      "sense": "飲み食いなどの欲を、ほどほどにおさえること。"
+    },
+    {
+      "ja": "江戸時代には、健康に長生きするための心得を説いた書物が数多く読まれた。そこでは、食べすぎや飲みすぎを戒め、腹八分目でやめることが繰り返し勧められている。豊かな食べ物が手に入りにくい時代にあっても、人は欲に流される自らの弱さを自覚していたのである。節制とは、単なる我慢ではなく、自分の欲望とうまく付き合う技術だと言えよう。その知恵は、食べ物があふれる現代にこそ生きるはずである。",
+      "form": "節制",
+      "en": "In the Edo period, many books setting out the principles for living a long and healthy life were widely read. In them, eating and drinking too much is warned against, and stopping when the stomach is eight-tenths full is recommended again and again. Even in an age when rich food was hard to come by, people were aware of their own weakness for being swept along by desire. Moderation, one could say, is not mere endurance but the art of getting along well with one's own desires. That wisdom ought to come alive precisely in the present age, when food is overflowing.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「節制とは〜である」のように、生き方や心がけとして論じる文脈でも使われる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "飲み食いなどの欲を、ほどほどにおさえること。"
+    }
+  ],
+  "94": [
+    {
+      "ja": "今回は、常識を疑うことの難しさを描いた本を紹介します。十九世紀のウィーンで、ある医師が、出産のあとに亡くなる女性を減らすために、同僚たちに手を洗うよう訴えました。ところが当時はまだ細菌の存在が広く知られておらず、彼の主張は、同僚たちのせせら笑いで片づけられることになったのです。手洗いの大切さが広く認められたのは、彼の死後しばらくたってからでした。著者は、新しい考えほど最初は相手にされないものだと語っています。",
+      "form": "せせら笑い",
+      "en": "This time I'll introduce a book that depicts how hard it is to doubt common sense. In nineteenth-century Vienna, a doctor urged his colleagues to wash their hands in order to reduce the number of women who died after childbirth. But at the time the existence of germs was not yet widely known, and his claim ended up being brushed aside with his colleagues' sneers. It was only some time after his death that the importance of handwashing came to be widely recognized. The author says that the newer an idea is, the less seriously it tends to be taken at first.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「せせら笑いを浮かべる」「せせら笑いで片づける」のように、軽蔑をこめた笑いを表す。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"],
+      "sense": "相手を見下して、ばかにしたように笑うこと。"
+    },
+    {
+      "ja": "人工知能の研究には、長い冬の時代があったことが知られている。脳の仕組みをまねた計算の方法は、一時期、役に立たない古い発想として多くの研究者から遠ざけられた。それでも一部の研究者は、周囲のせせら笑いをよそに、地道な研究を続けた。その後、コンピューターの処理能力が高まり、大量のデータが使えるようになると、その方法は一気に主役に躍り出た。今の生成AIの多くも、その流れの上に成り立っている。",
+      "form": "せせら笑い",
+      "en": "It is known that artificial intelligence research went through a long winter. For a time, computing methods that imitated the workings of the brain were kept at arm's length by many researchers as an old, useless idea. Even so, some researchers carried on with steady research, paying no attention to the sneers around them. Later, as the processing power of computers grew and large amounts of data became available, those methods leapt into the leading role all at once. Much of today's generative AI also stands on that line of development.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「周囲のせせら笑いをよそに」は、ばかにされても気にせず進む様子を表す定番の言い方。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"],
+      "sense": "相手を見下して、ばかにしたように笑うこと。"
+    },
+    {
+      "ja": "他人の努力や夢をせせら笑いで片づける人は、実は自分の中の不安を隠しているのかもしれない。挑戦する者を見下していれば、挑戦しない自分を責めずに済むからである。しかし、そうした態度を続けるほど、人は失敗を恐れて新しいことに手を出せなくなっていく。笑う側に立つのは楽だが、そこからは何も生まれないのである。他人の失敗を見たときこそ、笑う前に、自分の心の動きに目を向けるべきであろう。",
+      "form": "せせら笑い",
+      "en": "People who dismiss others' efforts and dreams with a sneer may in fact be hiding the anxiety within themselves. That is because if they look down on those who take on challenges, they can avoid blaming themselves for not taking any on. But the longer they keep up that attitude, the more they fear failure and the less able they become to try anything new. Standing on the side of the one who laughs is easy, but nothing comes out of it. It is precisely when we see others fail that we should, before laughing, turn our eyes to the movements of our own minds.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "見下す気持ちがこもった笑いなので、相手の心理や態度を論じる文脈によく合う。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "相手を見下して、ばかにしたように笑うこと。"
+    }
+  ],
+  "97": [
+    {
+      "ja": "今回は、非暴力という考え方をテーマにした一冊を要約します。インド独立運動を率いたガンディーは、イギリスの支配に対して、武器を取ることなく抵抗する道を選びました。1930年の塩の行進では、多くの人々が逮捕や暴力に耐えながら、決してやり返しませんでした。その姿は世界中に報じられ、支配する側の正しさを揺るがすことになったのです。著者は、非暴力とは弱さではなく、強い意志の表れなのだと強調しています。",
+      "form": "耐え",
+      "en": "This time I'll summarize a book on the theme of the idea of nonviolence. Gandhi, who led the Indian independence movement, chose the path of resisting British rule without taking up arms. In the Salt March of 1930, many people endured arrest and violence while never striking back. Their conduct was reported around the world and ended up shaking the legitimacy of the ruling side. The author stresses that nonviolence is not weakness but an expression of strong will.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「痛みに耐える」「批判に耐える」のように、「〜に耐える」の形で苦しいものを受け止める。",
+      "grammar": ["n5-teiru", "n4-nagara", "n3-dewa-naku", "n3-koto-ni-naru", "n2-koto-naku"],
+      "sense": "苦しさやつらさを、じっとがまんする。"
+    },
+    {
+      "ja": "日本の五重塔は、地震で倒れた記録がほとんどないことで知られている。その理由の一つとされるのが、塔の中心を上から下まで貫く心柱と呼ばれる太い柱だ。各層が揺れに合わせて少しずつずれて動くことで力を逃がし、大きな揺れに耐える仕組みになっているという。この発想は、東京スカイツリーの揺れを抑える構造にも取り入れられた。千年以上前の職人の知恵が、時代を超えて現代の高い建物を支えているわけだ。",
+      "form": "耐える",
+      "en": "Japan's five-storied pagodas are known for having almost no record of collapsing in earthquakes. One of the reasons given is a thick pillar called the shinbashira that runs through the center of the tower from top to bottom. Each story shifts little by little in step with the shaking, which lets the force escape, so the structure is said to withstand strong tremors. This idea was also adopted in the structure that dampens the swaying of the Tokyo Skytree. The wisdom of craftsmen from more than a thousand years ago is, in effect, supporting today's tall buildings across the ages.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "この意味では「揺れに耐える」「高温に耐える」のように、物や建物が力に負けないことを表す。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "外から加わる力や熱などに負けずに持ちこたえる。"
+    },
+    {
+      "ja": "受験勉強というと、苦しさに耐える力が何より大切だと考える人は多いでしょう。しかし学習の研究では、ただ長い時間机に向かうより、短い休憩をはさんで集中を保つほうが、記憶に残りやすいことが分かっています。疲れた頭で無理に続けても、覚えた内容はあまり定着しないのです。根性に頼るのではなく、続けやすい仕組みを作ることが、合格への近道だと言えます。勉強の時間を細かく区切り、こまめに休む工夫から始めてみましょう。",
+      "form": "耐える",
+      "en": "When it comes to studying for entrance exams, many people probably think that the ability to endure hardship matters more than anything. But research on learning has found that keeping your focus with short breaks in between makes things stick in memory more easily than simply sitting at a desk for a long time. Even if you force yourself to keep going with a tired head, what you've learned doesn't really take hold. Rather than relying on grit, building a system that is easy to keep up can be called the shortcut to passing. Start by dividing your study time into small blocks and taking frequent breaks.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「〜に耐える力」は、がまんする力のこと。勉強や仕事の話でよく使われる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "苦しさやつらさを、じっとがまんする。"
+    }
+  ],
+  "98": [
+    {
+      "ja": "今回は、リーダーと現場の距離をテーマにした一冊を要約します。海外では、大企業の経営者が身分を隠し、新人として自社の現場で働くテレビ番組が人気を集めました。お忍びで働いてみると、社長室からは見えなかった無理な決まりや、社員の小さな工夫が次々に見えてくるのです。著者は、上に立つ人ほど現場の声が届きにくくなると指摘しています。だからこそ、自分の目で確かめに行く姿勢が欠かせないというわけです。",
+      "form": "忍び",
+      "en": "This time I'll summarize a book on the theme of the distance between leaders and the front line. Overseas, a TV show in which the heads of big companies hid their identity and worked at their own companies' sites as new hires became popular. When they worked incognito, unreasonable rules and small inventive touches by employees that couldn't be seen from the president's office came into view one after another. The author points out that the higher up people are, the harder it becomes for the voices from the front line to reach them. That is exactly why, he says, the attitude of going to check with your own eyes is indispensable.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "ふつう「お忍びで」の形で使い、身分の高い人が人目を避けて出かける場面を表す。",
+      "grammar": ["n5-teiru"],
+      "sense": "身分を隠して、人に知られないように出かけること。"
+    },
+    {
+      "ja": "有名人がお忍びで街を歩いても、すぐに居場所が知られてしまう時代になった。通行人がスマートフォンで撮った写真がSNSに投稿され、顔認識の技術を使えば、写っているのが誰なのかを簡単に特定できるからだ。帽子やマスクで顔の一部を隠しても、目元や輪郭だけから本人を言い当てる精度は年々高まっているとされる。こうした技術をめぐっては、私生活を守る権利との兼ね合いが議論になっている。",
+      "form": "忍び",
+      "en": "We have entered an age in which, even if a celebrity walks around town incognito, their whereabouts quickly become known. That's because photos taken by passersby on their smartphones are posted on social media, and with face recognition technology it is easy to identify who is in them. Even if part of the face is hidden with a hat or mask, the accuracy of identifying the person from just the eyes and the outline of the face is said to be rising year by year. Over such technology, the balance with the right to protect one's private life has become a subject of debate.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「お忍びで来日」「お忍びで訪れる」のように、有名人の私的な行動を伝えるときに使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "身分を隠して、人に知られないように出かけること。"
+    },
+    {
+      "ja": "インドの雑踏を歩いていると、自分が何者でもなくなっていくような感覚を覚える。言葉も習慣も違う人々の中では、日本での肩書きや評判は何の意味も持たないのである。地位のある人がしばしばお忍びで遠い国へ旅に出るのも、こうした解放感を求めてのことではないか。人は他人の目に映る役割を演じ続けるうちに、知らず知らず疲れていく。誰でもない一人に戻る時間は、心にとって欠かせない休息なのである。",
+      "form": "忍び",
+      "en": "Walking through the crowds of India, I feel as though I am becoming no one at all. Among people whose language and customs differ, the titles and reputation one has in Japan carry no meaning whatsoever. Perhaps people of high status often travel incognito to distant countries in search of exactly this sense of release. While people keep playing the roles that are reflected in others' eyes, they grow tired without realizing it. Time to return to being nobody in particular is a rest the mind cannot do without.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「お忍びの旅」は、身分を伏せて目立たないようにする旅。人目から逃れたい気持ちと結びつく。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "身分を隠して、人に知られないように出かけること。"
+    }
+  ],
+  "103": [
+    {
+      "ja": "今回は、AIと詐欺の関係を解説した本を要約します。最近は、SNSに投稿された動画などから取り出したわずか数秒の音声で、本人そっくりの声を作り出せる技術が登場しています。もし電話口で家族の声が助けを求めてきたら、多くの人は疑うことなく信じてしまうでしょう。そう考えると、ぞっとしますよね。著者は、家族の間だけで通じる合言葉を決めておくなど、今すぐにでも簡単にできる備えを勧めています。",
+      "form": "ぞっと",
+      "en": "This time I'll summarize a book that explains the connection between AI and fraud. Recently, technology has appeared that can create a voice identical to a person's own from just a few seconds of audio taken from things like videos posted on social media. If a family member's voice asked for help over the phone, most people would probably believe it without any doubt. When you think about that, it sends a chill down your spine, doesn't it? The author recommends simple precautions, such as deciding on a password known only within the family, that anyone can make right away.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「ぞっとする」の形で、怖さや不気味さで体が冷えるように感じることを表す。",
+      "grammar": ["n5-teiru", "n2-koto-naku"],
+      "sense": "怖さや寒さで、体が冷たく震えるように感じるようす。"
+    },
+    {
+      "ja": "ホラー映画って、見てる間ずっと怖いのに、なぜか終わるとまた次のを見たくなるじゃないですか。あれ、安全な場所で怖さを味わうと、終わったあとにほっとする感じが気持ちいいからなんですって。私も昨日、夜中に部屋を暗くして一人で見ちゃって、背中がぞっとする場面が何回もありました。で、見終わったあと、トイレに行くのが怖くて大変でしたよ。怖いのに目が離せないって、ほんと不思議ですよね。",
+      "form": "ぞっと",
+      "en": "Horror movies are scary the whole time you're watching, but for some reason when one ends you want to watch the next one, right? Apparently that's because when you taste fear in a safe place, the sense of relief after it's over feels good. I watched one alone with the lights off in the middle of the night yesterday too, and there were lots of scenes that sent a chill down my back. And after it ended, I was so scared to go to the bathroom, it was rough. It's really strange how you can't look away even though it's scary.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話では「背中がぞっとする」「思い出すだけでぞっとする」のように使う。",
+      "grammar": [],
+      "sense": "怖さや寒さで、体が冷たく震えるように感じるようす。"
+    },
+    {
+      "ja": "インドの村を歩いていたとき、足元の草むらから細い蛇がするりと出てきて、思わず背筋がぞっとした。毒があるかどうかも分からないのに、体が先に固まったのである。人間が蛇を見ると本能的に身構えるのは、長い進化の中で身についた反応だという説がある。頭で考えるより先に体が動くからこそ、祖先は生き延びてこられたのであろう。恐怖とは、命を守るために受け継がれてきた知恵なのかもしれない。",
+      "form": "ぞっと",
+      "en": "While I was walking through a village in India, a thin snake slid out of the grass at my feet, and a chill ran down my spine in spite of myself. I didn't even know whether it was venomous, yet my body froze first. There is a theory that humans instinctively brace themselves when they see a snake because it is a reaction acquired over a long evolution. It is precisely because the body moves before the head thinks that our ancestors were able to survive. Fear may be a wisdom passed down to protect life.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「背筋がぞっとする」は、恐怖が体の感覚として走ることを表す決まった言い方。",
+      "grammar": [],
+      "sense": "怖さや寒さで、体が冷たく震えるように感じるようす。"
+    }
+  ],
+  "104": [
+    {
+      "ja": "今回は、ヨーロッパの医学の歴史をたどる一冊を要約します。十九世紀ごろまで、病気の原因は体の中の液体の釣り合いが崩れることにあると考えられ、血を抜く治療が広く行われていました。今の感覚からすると、元気になるどころか、かえって弱ってしまいそうで、あまりぞっとしない話です。ただ著者は、当時の人々もその時代の知識の中で、精一杯筋道を立てて考えていたのだと指摘します。今の常識もいつか笑われるかもしれない、という視点が大切だというわけです。",
+      "form": "ぞっとしない",
+      "en": "This time I'll summarize a book that traces the history of medicine in Europe. Until around the nineteenth century, the cause of illness was thought to lie in the balance of fluids in the body being upset, and treatment by drawing blood was widely practiced. By today's standards, it seems that far from getting better you would only grow weaker, so it's not a very appealing story. Still, the author points out that the people of that time were also thinking as logically as they could within the knowledge of their era. The point is that it's important to keep in mind that today's common sense may also be laughed at someday.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「ぞっとする」の否定ではなく、あまり好ましくない、気が進まないという意味の決まった言い方。",
+      "grammar": ["n2-dokoroka"],
+      "sense": "あまり感心しない。気が進まない。"
+    },
+    {
+      "ja": "生成AIが考えた新しい料理のレシピを、実際に作って試す企画がネット上で話題になっている。中には、果物と魚を組み合わせるなど、聞いただけでは食欲のわかない、ぞっとしない組み合わせも少なくない。それでも、意外にもおいしいと評判になったレシピもあるという。投稿者の多くは、失敗も含めて楽しんでいるようだ。人間の思い込みにとらわれない発想が、料理の幅を広げる可能性もありそうだ。",
+      "form": "ぞっとしない",
+      "en": "Projects in which people actually cook and try new recipes devised by generative AI have become a topic of conversation online. Among them are quite a few unappealing combinations that don't whet the appetite just from hearing them, such as pairing fruit with fish. Even so, some recipes have reportedly gained a reputation for being surprisingly tasty. Many of those posting seem to be enjoying it, failures included. Ideas not bound by human assumptions may well broaden the range of cooking.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「あまりぞっとしない」「ぞっとしない話」のように、好ましくないものを控えめに評する。",
+      "grammar": ["n5-teiru"],
+      "sense": "あまり感心しない。気が進まない。"
+    },
+    {
+      "ja": "会社の飲み会のあと、なんとなくみんなでカラオケに行く流れになることあるじゃないですか。私、人前で一人で歌うのって、昔からあんまりぞっとしないんですよね。心理学だと、人って自分が思ってるほど他人に注目されてないらしいんですけど。そう言われても、やっぱりマイクを渡されると頭が真っ白になって固まっちゃうんですよ。だから最近は、盛り上げ役のタンバリン担当に自分から回ってます。",
+      "form": "ぞっとしない",
+      "en": "You know how after a company drinking party, things sometimes just drift toward everyone going to karaoke? For me, singing alone in front of people has never been very appealing. Apparently, according to psychology, people aren't paid attention to by others as much as they think. Even if I'm told that, my mind goes blank and I freeze up when they hand me the mic. So lately I volunteer myself as the tambourine person who livens things up.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話では「あんまりぞっとしない」の形で、気が進まないことをやわらかく言う。",
+      "grammar": [],
+      "sense": "あまり感心しない。気が進まない。"
+    }
+  ],
+  "118": [
+    {
+      "ja": "今日は、睡眠の大切さを科学的に解説した一冊を要約していきます。著者によると、睡眠不足が続くと集中力が落ちるだけでなく、感情のコントロールも難しくなるそうです。特に、寝る前にスマホを見る習慣は、眠りを浅くする原因になると指摘されています。まずは寝る一時間前に画面を閉じることから始めてみましょう。なお、本で紹介されているそのほかの習慣については、概要欄にまとめておきました。",
+      "form": "なお",
+      "en": "Today I'm going to summarize a book that explains the importance of sleep scientifically. According to the author, when lack of sleep continues, not only does your concentration drop, but controlling your emotions also becomes harder. In particular, the habit of looking at your phone before bed is pointed out as a cause of shallow sleep. First, let's start by closing the screen an hour before going to bed. Note that I've summarized the other habits introduced in the book in the description box.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "話の最後に「なお、〜」と補足を加える形。動画や講義の締めくくりでもよく使われる。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "前の内容に、あとから言い足すときに使う。"
+    },
+    {
+      "ja": "インドの首都ニューデリーでは、毎年冬になると大気汚染が深刻になり、学校が休みになることもある。農地で収穫後の作物を燃やす煙や、車の排気ガスなどが重なることが原因とされる。当局は車の通行を制限するなどの対策を取っているが、効果は限られているとの見方が多い。特に状態が悪い日には、住民に外出を控えるよう呼びかけることもある。なお、気温が下がる冬は、汚れた空気が地面の近くにたまりやすいことも知られている。",
+      "form": "なお",
+      "en": "In India's capital, New Delhi, air pollution becomes severe every winter, and schools are sometimes closed. The causes are said to be a combination of smoke from burning crop residue on farmland after harvest and vehicle exhaust, among other things. The authorities are taking measures such as restricting traffic, but many view their effect as limited. On particularly bad days, they sometimes call on residents to refrain from going outside. It is also known, it should be noted, that in winter, when temperatures fall, polluted air tends to collect near the ground.",
+      "original": true,
+      "register": "報",
+      "topic": "india",
+      "tipJa": "報道では段落の最後に「なお、〜」と置き、本筋とは別の補足情報を加える。",
+      "grammar": ["n5-teiru"],
+      "sense": "前の内容に、あとから言い足すときに使う。"
+    },
+    {
+      "ja": "『源氏物語』が書かれてから、およそ千年の月日が流れた。それでも、恋に悩み、老いを恐れ、人の死を悲しむ登場人物の心は、今を生きる私たちにもなお身近に感じられる。時代が変わっても、人間の心の動きそのものは、それほど変わらないのである。千年前の宮廷の暮らしは想像もつかないが、嫉妬や孤独の苦しさなら、誰もが一度は味わったことがある。古典を読む意味は、昔の知識を得ることではなく、時を超えて続く人間の姿に出会うことにあるのだろう。",
+      "form": "なお",
+      "en": "Roughly a thousand years have passed since The Tale of Genji was written. Even so, the hearts of its characters, who agonize over love, fear old age and grieve over death, still feel close to us who live today. Even as the times change, the movements of the human heart themselves do not change so much. Court life a thousand years ago is beyond our imagining, but the pain of jealousy or loneliness is something everyone has tasted at least once. The meaning of reading the classics lies not in gaining old knowledge but in encountering a human figure that continues across time.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "この意味では「今もなお」「なお身近だ」のように、時がたっても変わらず続く様子を表す。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "それでもまだ。今もやはり。"
+    }
+  ],
+  "119": [
+    {
+      "ja": "今回は、AIを仕事に生かすコツをまとめた本を紹介します。著者によれば、AIに頼むときは、目的をはっきり伝え、なおかつ欲しい答えの形を先に示すことが大切だそうです。たとえば「三行で」「表にして」と指定するだけで、返ってくる答えはぐっと使いやすくなります。逆に、ぼんやりした質問には、ぼんやりした答えしか返ってきません。AIを使いこなせるかどうかは、問いの立て方で決まるというわけです。",
+      "form": "なおかつ",
+      "en": "This time I'll introduce a book that collects tips for making use of AI at work. According to the author, when you ask AI for something, it's important to state your goal clearly and, on top of that, to show the shape of the answer you want in advance. For example, just by specifying things like \"in three lines\" or \"as a table,\" the answers that come back become much easier to use. Conversely, a vague question only gets a vague answer back. In other words, whether you can make full use of AI depends on how you frame your questions.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「〜し、なおかつ…する」のように、二つの条件を両方満たすことを強調して並べる。",
+      "grammar": [],
+      "sense": "その上さらに。それに加えて。"
+    },
+    {
+      "ja": "インドのIT産業は、英語を話せる技術者が多く、なおかつ人件費が比較的安いことから、欧米企業の業務を数多く引き受けてきた。近年は、単なる下請けにとどまらず、AIなどの先端分野で独自のサービスを生み出す企業も増えている。南部の都市ベンガルールは、こうした企業が集まる拠点として知られる。一方で、国内での人材の奪い合いが激しくなり、技術者の給料も上がっているという。",
+      "form": "なおかつ",
+      "en": "India's IT industry has taken on a great deal of work for Western companies because it has many English-speaking engineers and, on top of that, relatively low labor costs. In recent years, companies that go beyond mere subcontracting to create their own services in cutting-edge fields such as AI have also been increasing. The southern city of Bengaluru is known as a hub where such companies gather. On the other hand, competition for talent within the country has intensified, and engineers' salaries are reportedly rising too.",
+      "original": true,
+      "register": "報",
+      "topic": "india",
+      "tipJa": "報道では「〜であり、なおかつ…」のように、条件や強みを重ねて示す硬めの言い方。",
+      "grammar": ["n5-teiru"],
+      "sense": "その上さらに。それに加えて。"
+    },
+    {
+      "ja": "何度も失敗し、周囲から無理だと言われて、なおかつ挑み続ける人がいる。そうした粘り強さは、生まれつきの性格によるものだと思われることが多い。しかし心理学の研究によれば、失敗を自分の能力の限界ではなく、学びの機会だととらえる人ほど、あきらめにくいという。つまり、粘り強さは考え方しだいで育てられるものなのである。才能を嘆く前に、失敗の受け止め方を見直してみるべきであろう。",
+      "form": "なおかつ",
+      "en": "There are people who fail again and again, are told by those around them that it's impossible, and still keep on trying. Such perseverance is often thought of as coming from an inborn trait of character. But according to psychological research, the more people see failure not as the limit of their ability but as a chance to learn, the less likely they are to give up. In other words, perseverance is something that can be nurtured depending on how one thinks. Before lamenting one's lack of talent, one ought to reconsider how one takes failure.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "この意味では「〜て、なおかつ…」の形で、不利な条件があってもそれでも続くことを表す。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "それでもまだ。そうであっても。"
+    }
+  ],
+  "173": [
+    {
+      "ja": "今回は、タイタニック号の事故を通して、油断の怖さを考える一冊を紹介します。1912年、当時最大級の豪華客船だったタイタニック号は、最初の航海で氷山にぶつかり沈没しました。周辺の海に氷山があるという警告は届いていたものの、船は速度を大きく落とすことなく進んでいたとされています。また、救命ボートも乗っている全員の分はありませんでした。著者は、技術への過信が自然の力を侮ることにつながったと指摘しています。",
+      "form": "侮る",
+      "en": "This time I'll introduce a book that looks at the danger of carelessness through the Titanic disaster. In 1912, the Titanic, one of the largest luxury liners of its day, struck an iceberg on its maiden voyage and sank. Although warnings that there were icebergs in the surrounding sea had reached it, the ship is said to have been proceeding without greatly reducing its speed. Also, there were not enough lifeboats for everyone on board. The author points out that overconfidence in technology led to underestimating the power of nature.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「自然を侮る」「相手を侮る」のように、本当の力を低く見て油断することを表す。",
+      "grammar": ["n5-teiru", "n2-koto-naku", "n2-mono-no"],
+      "sense": "相手の力を低く見て、軽く扱う。"
+    },
+    {
+      "ja": "生成AIの普及で、本物そっくりの文面を使った詐欺メールが増えていると、専門家が注意を呼びかけている。以前は不自然な日本語や見慣れない差出人ですぐに気づけたが、今では本物との区別がほとんどつかないものも多い。自分だけはだまされないと手口を侮る人ほど、かえって被害にあいやすいという。専門家は、少しでも怪しいと感じたらメールのリンクは開かず、公式のサイトから確かめるよう勧めている。",
+      "form": "侮る",
+      "en": "Experts are warning that, with the spread of generative AI, fraudulent emails using text that looks just like the real thing are increasing. In the past you could notice them right away from their unnatural Japanese or unfamiliar senders, but now many are almost impossible to tell apart from the genuine ones. It is said that people who underestimate these tricks, thinking they alone won't be fooled, are actually more likely to fall victim. Experts recommend that if something feels even slightly suspicious, you not open links in the email and instead check from the official website.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「〜を侮る人ほど」のように、油断が失敗を招く文脈で報道にもよく使われる。",
+      "grammar": ["n5-teiru"],
+      "sense": "相手の力を低く見て、軽く扱う。"
+    },
+    {
+      "ja": "この前、友達に誘われて、初めて本格的な山登りに行ったんですけど、完全に山を侮ってたんですよ。普段ジムで走ってるし、体力には自信あるし、まあ大丈夫でしょって。そしたら半分も登らないうちに足が動かなくなって、景色を楽しむどころじゃなかったです。心理学だと、経験が少ない人ほど自分の力を実際より高く見積もっちゃうらしいんですよね。まさに私のことだなって、帰りの電車で笑っちゃいました。",
+      "form": "侮って",
+      "en": "The other day a friend invited me and I went on my first real mountain climb, and I totally underestimated the mountain. I run at the gym normally and I'm confident in my stamina, so I figured, eh, I'll be fine. Then before I'd even climbed halfway my legs stopped moving, and I was in no state to enjoy the view. Apparently in psychology, the less experience people have, the more they rate their own ability higher than it really is. On the train home I laughed, thinking that's exactly me.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話では「完全に侮ってた」「〜を侮っちゃいけない」のように、油断を反省する場面で使う。",
+      "grammar": [],
+      "sense": "相手の力を低く見て、軽く扱う。"
+    }
+  ],
+  "197": [
+    {
+      "ja": "今回は、インドの天才数学者ラマヌジャンの生涯を描いた本を紹介します。ほとんど独学で数学を身につけた彼は、1913年、イギリスの数学者ハーディに、自分が見つけた公式を書きつづった手紙を送りました。そこには専門家でも見たことのない式が並んでおり、ハーディはその内容に驚愕したといわれています。その後、ラマヌジャンはイギリスに招かれ、二人の共同研究は、数学の歴史に残る成果を生むことになりました。著者は、才能を見抜いた側の度量にも注目しています。",
+      "form": "驚愕",
+      "en": "This time I'll introduce a book that depicts the life of the Indian genius mathematician Ramanujan. Having learned mathematics almost entirely on his own, in 1913 he sent a letter to the British mathematician Hardy in which he wrote out formulas he had discovered. It contained formulas that even specialists had never seen, and Hardy is said to have been astonished by its contents. Later Ramanujan was invited to Britain, and the two men's joint research went on to produce results that remain in the history of mathematics. The author also focuses on the generosity of the side that recognized his talent.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜に驚愕する」「驚愕の事実」のように、ふつうの驚きよりずっと強い驚きを表す硬い語。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"],
+      "sense": "ひどくおどろくこと。"
+    },
+    {
+      "ja": "2016年、囲碁の世界トップ級の棋士と対戦したAIが四勝一敗で勝ち越し、囲碁界に驚愕が走った。囲碁は打ち手の数が非常に多く、コンピューターが人間に勝つのはまだ先だと考えられていたからだ。対局の中でAIが見せた一手は、当初は悪手と見られたものの、のちに勝負を決める好手だったと評価された。この出来事は、AIの可能性を広く知らしめるきっかけとなった。その後、AIは囲碁の研究にも使われ、プロの打ち方そのものを変えつつある。",
+      "form": "驚愕",
+      "en": "In 2016, an AI that played against one of the world's top Go professionals won four games to one, and shock ran through the Go world. That is because Go has an enormous number of possible moves, and it had been thought that it would be a while yet before computers could beat humans. One move the AI made during a game was at first seen as a bad move, but was later judged to have been a strong move that decided the game. This event became a trigger for widely making known the possibilities of AI. Since then, AI has also been used in Go study and is changing the very way professionals play.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜に驚愕が走る」「驚愕の結果」のように、世間が強く驚いた出来事を伝える。",
+      "grammar": ["n2-mono-no"],
+      "sense": "ひどくおどろくこと。"
+    },
+    {
+      "ja": "大地が動いているという考えは、かつて人々に驚愕をもたらした。自分たちの立つ地面こそ宇宙の中心だと、誰もが疑わなかったからである。だが、ひとたび受け入れられた新しい見方は、いつしか当たり前になり、かつての騒ぎは忘れられていく。現在の常識の多くも、もとは誰かの常識外れな主張だったのである。そう考えれば、受け入れがたい意見にこそ、耳を傾ける価値があるのかもしれない。",
+      "form": "驚愕",
+      "en": "The idea that the earth moves once brought astonishment to people. That is because everyone took it for granted that the ground they stood on was the very center of the universe. But a new view, once accepted, eventually becomes commonplace, and the former uproar is forgotten. Much of today's common sense, too, was originally someone's outlandish claim. Seen that way, it may be precisely the opinions that are hard to accept that are worth listening to.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「驚愕をもたらす」は、書き言葉で、出来事が人々に強い驚きを与えることを表す。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "ひどくおどろくこと。"
+    }
+  ]
+}
