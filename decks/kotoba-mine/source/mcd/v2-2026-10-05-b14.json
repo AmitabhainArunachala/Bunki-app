@@ -1,14 +1,14 @@
 {
   "68": [
     {
-      "ja": "今回は、職場の人間関係を扱った本を要約していきます。著者によれば、チームの中で自分の立ち位置がわからない人ほど、周りの顔色をうかがうことに力を使ってしまうそうです。そこで本が勧めているのが、自分の得意なことを一つだけ、はっきり周りに伝えておくというやり方です。「数字のチェックならあの人」と思われるだけで、周りとの関係は少しずつ落ち着いていくんですね。居場所は探すものではなく、自分で作っていくものだ、というのがこの本の主張です。",
+      "ja": "今回は、職場の人間関係に悩む人に向けた本を要約していきます。著者によれば、組織の中で自分の立ち位置が曖昧なままだと、人は周囲の評価を必要以上に気にして、本来の業務に注ぐべき力を消耗してしまうそうです。そこで本書が提案しているのが、自分の強みを一つに絞り、周囲にはっきり示しておくという方法です。「数字の確認ならあの人に任せればいい」と認識されるだけで、無用な衝突は徐々に減っていくんですね。居場所は誰かに与えられるものではなく、自らの役割を通じて築いていくものだ、というのが本書の主張です。",
       "form": "立ち位置",
-      "en": "This time I'm going to summarize a book about relationships at work. According to the author, the less people understand their position within a team, the more energy they spend reading the faces of those around them. So what the book recommends is clearly telling the people around you just one thing you're good at. Simply being thought of as \"the person to go to for checking numbers\" lets your relationships with others gradually settle down. The book's argument is that a place to belong is not something you search for but something you build yourself.",
+      "en": "This time I'm going to summarize a book for people troubled by relationships at work. According to the author, when your position within an organization stays vague, you worry more than necessary about how those around you rate you and use up the energy you should be putting into your actual work. So what the book proposes is narrowing your strengths down to one and showing it clearly to the people around you. Simply being recognized as \"the person to leave number-checking to\" gradually reduces needless friction. The book's argument is that a place to belong is not something someone gives you but something you build yourself through your role.",
       "original": true,
       "register": "講",
       "topic": "mind",
       "tipJa": "「チームの中での立ち位置」のように、集団の中で自分が占める役回りに使う。",
-      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "grammar": ["n4-teiku", "n3-dewa-naku", "n5-teiru"],
       "sense": "集団や周りとの関係の中で自分が占める位置や役割。"
     },
     {
@@ -58,14 +58,13 @@
       "sense": "建物などの工事を実際に行うこと。"
     },
     {
-      "ja": "インドのエローラ石窟には、一つの巨大な岩山を上から掘り下げて造られたカイラーサ寺院がある。石を積み上げるのではなく、不要な岩を取り除くことで、建物が姿を現したのである。私たちはつい、施工とは何かを付け加えていく営みだと考えてしまう。だがこの寺では、取り去ることそのものが建てることだった。足すことでしか前に進めないと思い込む心に、この寺は静かな問いを投げかけている。",
+      "ja": "インドのエローラ石窟にあるカイラーサ寺院は、一つの巨大な岩山を上から掘り下げて造られた。石を積み上げるのではなく、不要な岩を取り除きながら建物を彫り出すという、ふつうとは逆の順序で施工が進められたのである。私たちはつい、建てるとは何かを付け加えていくことだと考えてしまう。だがこの寺では、取り去ることそのものが建てることだった。足すことでしか前に進めないと思い込む心に、この寺は静かな問いを投げかけている。",
       "form": "施工",
-      "en": "At the Ellora Caves in India stands the Kailasa temple, made by digging down from above into a single enormous rock hill. Rather than piling up stones, the building emerged by removing the rock that was not needed. We can't help thinking that construction work is the act of adding something. But at this temple, taking away was itself the act of building. To a mind convinced that it can only move forward by adding, this temple quietly poses a question.",
+      "en": "At the Ellora Caves in India, the Kailasa temple was made by digging down from above into a single enormous rock hill. Rather than piling up stones, the construction work proceeded in the reverse of the usual order, carving the building out while removing the rock that was not needed. We can't help thinking that to build is to keep adding something. But at this temple, taking away was itself the act of building. To a mind convinced that it can only move forward by adding, this temple quietly poses a question.",
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
-      "grammar": ["n3-dewa-naku", "n3-koto-de", "n4-teiku", "n5-teiru"],
+      "grammar": ["n3-dewa-naku", "n4-nagara", "n4-teiku", "n3-koto-de", "n5-teiru"],
       "sense": "建物などの工事を実際に行うこと。"
     }
   ],
@@ -82,17 +81,6 @@
       "sense": "作る前に、形や仕組みを考えて決めること。"
     },
     {
-      "ja": "人は、何歳で家を持ち、いつ仕事から退くかといった人生の設計を、まるで図面のように細かく描こうとする。だが仏教は、あらゆるものは移ろい、同じ形にとどまることはないと説いてきた。そうであれば、計画とは守るべき約束ではなく、今日の歩き方を決めるための仮の地図にすぎないのだろう。地図どおりに進まなかったとき、それを失敗と呼ぶかどうかは、心の構え一つで変わる。予定から外れた道の上にこそ、学ぶべきものがあるのかもしれない。",
-      "form": "設計",
-      "en": "People try to draw the plan of their lives, such as at what age they will own a house and when they will retire from work, in fine detail as if it were a blueprint. But Buddhism has taught that all things pass and never stay in the same form. If so, a plan is not a promise to be kept but probably no more than a provisional map for deciding how to walk today. When things don't go according to the map, whether you call it a failure changes with nothing more than your frame of mind. Perhaps it is precisely on the road that strays from the schedule that there is something to learn.",
-      "original": true,
-      "register": "論",
-      "topic": "india",
-      "tipJa": "「人生の設計」「生活設計」のように、将来の暮らしの計画にも使う。",
-      "grammar": ["n3-dewa-naku", "n2-ni-suginai"],
-      "sense": "将来の暮らしなどを、前もって計画すること。"
-    },
-    {
       "ja": "長い文章を、思いつくままに書き始めていませんか。途中で話がそれて、結論が最初の主張とずれてしまうのは、たいてい準備が足りないからです。書き出す前に、言いたいことを一文にまとめ、それを支える理由を三つほど並べてみてください。こうして全体の設計ができていれば、あとは順番に肉付けしていくだけです。家を建てる前に図面を描くのと同じで、文章にもしっかりした骨組みが欠かせません。",
       "form": "設計",
       "en": "Do you start writing long texts just as things come to mind? When the text wanders off along the way and the conclusion drifts from your first claim, it's usually because you didn't prepare enough. Before you start writing, try summing up what you want to say in one sentence and lining up about three reasons that support it. Once the overall design is in place like this, all that's left is to flesh it out in order. Just as you draw plans before building a house, a piece of writing can't do without a solid framework.",
@@ -102,6 +90,16 @@
       "tipJa": "文章や話の組み立てにも「全体の設計」「構成を設計する」の形で使える。",
       "grammar": ["n4-teiku"],
       "sense": "作る前に、全体の形や組み立てを考えること。"
+    },
+    {
+      "ja": "東京スカイツリーの設計には、千年以上前から伝わる五重塔に通じる考え方が取り入れられている。塔の中心に鉄筋コンクリートの円筒を立て、まわりの鉄骨の塔と切り離すことで、地震の揺れを抑える仕組みだ。これは五重塔の中心を貫く柱にならったもので、「心柱制振」と呼ばれる。古い木造の塔が大きな地震でもほとんど倒れてこなかったことは、以前から研究者の関心を集めてきた。伝統の知恵を新しい技術にどう生かすかが、改めて注目されている。",
+      "form": "設計",
+      "en": "The design of Tokyo Skytree incorporates an idea that connects with the five-storey pagodas handed down from more than a thousand years ago. It is a system that dampens the shaking of earthquakes by erecting a reinforced-concrete cylinder at the centre of the tower and separating it from the surrounding steel tower. This follows the pillar that runs through the centre of a five-storey pagoda and is called \"shinbashira vibration control\". That old wooden pagodas have hardly ever fallen even in large earthquakes has long attracted researchers' interest. How to make use of traditional wisdom in new technology is drawing attention once again.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "作る前に、形や仕組みを考えて決めること。"
     }
   ],
   "310": [
@@ -169,7 +167,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n3-dewa-naku"],
       "sense": "建物の傷んだところを直すための費用。"
     }
@@ -204,7 +201,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n3-dewa-naku"],
       "sense": "細かいところまで、くわしく調べること。"
     }
@@ -309,16 +305,15 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n3-koto-de"],
       "sense": "言葉や数字などの間違いを、正しく直すこと。"
     }
   ],
   "306": [
     {
-      "ja": "今回は、南極点を目指した二つの探検隊の話です。1911年、ノルウェーのアムンセンとイギリスのスコットは、ほぼ同じ時期に南極点へ向けて出発しました。アムンセンはそれ以前に、北極圏でイヌイットの人々と暮らしながら、犬ぞりの扱いや寒さをしのぐ服装など、事前に必要な技術を身につけていたんです。その結果、彼の隊はスコットより五週間ほど早く南極点に着き、全員が無事に戻りました。一方、南極点に向かったスコットら五人は帰り道で全員が命を落とし、準備の差が明暗を分けたと言われています。",
+      "ja": "今回は、南極点を目指した二つの探検隊の話です。1911年、ノルウェーのアムンセンとイギリスのスコットは、ほぼ同じ時期に基地を出発しました。アムンセンは以前、北極圏でイヌイットの人々と暮らしながら、犬ぞりの扱い方や寒さをしのぐ服の工夫など、極地の旅に事前に必要な知恵を学んでいたんです。その結果、彼の隊はスコットより五週間ほど早く目的地に着き、全員が無事に戻りました。一方、スコットの隊は極点にたどり着いた五人が帰り道で全員命を落とし、準備の差が明暗を分けたと言われています。",
       "form": "事前に必要",
-      "en": "This time it's the story of two expeditions that aimed for the South Pole. In 1911, Amundsen of Norway and Scott of Britain set out for the South Pole at almost the same time. Before that, while living with the Inuit in the Arctic, Amundsen had acquired the skills required in advance, such as handling dog sleds and clothing that could withstand the cold. As a result, his team reached the South Pole about five weeks earlier than Scott and all returned safely. Meanwhile, Scott and the four others who went to the Pole all lost their lives on the way back, and it is said that the difference in preparation decided their fates.",
+      "en": "This time it's the story of two expeditions that aimed for the South Pole. In 1911, Amundsen of Norway and Scott of Britain set out from their bases at almost the same time. Earlier, while living with the Inuit in the Arctic, Amundsen had learned the know-how required in advance for polar travel, such as how to handle dog sleds and how to make clothing that keeps out the cold. As a result, his team reached the goal about five weeks before Scott and all returned safely. Meanwhile, on Scott's team, the five men who reached the Pole all lost their lives on the way back, and it is said that the difference in preparation decided their fates.",
       "original": true,
       "register": "講",
       "topic": "history",

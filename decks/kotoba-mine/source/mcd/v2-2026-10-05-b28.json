@@ -152,14 +152,14 @@
       "sense": "怖さや寒さで、体が冷たく震えるように感じるようす。"
     },
     {
-      "ja": "ホラー映画って、見てる間ずっと怖いのに、なぜか終わるとまた次のを見たくなるじゃないですか。あれ、安全な場所で怖さを味わうと、終わったあとにほっとする感じが気持ちいいからなんですって。私も昨日、夜中に部屋を暗くして一人で見ちゃって、背中がぞっとする場面が何回もありました。で、見終わったあと、トイレに行くのが怖くて大変でしたよ。怖いのに目が離せないって、ほんと不思議ですよね。",
+      "ja": "夜道を一人で歩いてると、後ろに誰かの気配を感じて、ぞっとすることってあるじゃないですか。でも振り返ると、だいたい誰もいないんですよね。あれって、脳がもともと危険に過敏にできてるからなんですって。物音を見逃して襲われるより、勘違いで身構えるほうが、生き延びる上では損が少ないってことらしいです。だから、気のせいだって分かってはいるものの、つい早足になっちゃうのは仕方ないんですよ。",
       "form": "ぞっと",
-      "en": "Horror movies are scary the whole time you're watching, but for some reason when one ends you want to watch the next one, right? Apparently that's because when you taste fear in a safe place, the sense of relief after it's over feels good. I watched one alone with the lights off in the middle of the night yesterday too, and there were lots of scenes that sent a chill down my back. And after it ended, I was so scared to go to the bathroom, it was rough. It's really strange how you can't look away even though it's scary.",
+      "en": "When you're walking alone on a road at night, you sometimes sense someone behind you and get a chill, right? But when you turn around, there's usually nobody there. Apparently that's because the brain is built to be oversensitive to danger to begin with. The idea seems to be that tensing up over a false alarm costs less, in terms of survival, than missing a sound and getting attacked. So even though I know it's just my imagination, I can't help speeding up my pace.",
       "original": true,
       "register": "話",
       "topic": "mind",
-      "tipJa": "会話では「背中がぞっとする」「思い出すだけでぞっとする」のように使う。",
-      "grammar": [],
+      "tipJa": "「気配を感じてぞっとする」のように、不気味さで背筋が冷える感じを表す。",
+      "grammar": ["n2-ue-de", "n2-mono-no"],
       "sense": "怖さや寒さで、体が冷たく震えるように感じるようす。"
     },
     {
@@ -170,7 +170,6 @@
       "register": "論",
       "topic": "india",
       "tipJa": "「背筋がぞっとする」は、恐怖が体の感覚として走ることを表す決まった言い方。",
-      "grammar": [],
       "sense": "怖さや寒さで、体が冷たく震えるように感じるようす。"
     }
   ],
@@ -187,9 +186,9 @@
       "sense": "あまり感心しない。気が進まない。"
     },
     {
-      "ja": "生成AIが考えた新しい料理のレシピを、実際に作って試す企画がネット上で話題になっている。中には、果物と魚を組み合わせるなど、聞いただけでは食欲のわかない、ぞっとしない組み合わせも少なくない。それでも、意外にもおいしいと評判になったレシピもあるという。投稿者の多くは、失敗も含めて楽しんでいるようだ。人間の思い込みにとらわれない発想が、料理の幅を広げる可能性もありそうだ。",
+      "ja": "生成AIが考案した料理のレシピを、実際に作って試す企画がネット上で話題になっている。中には、果物と魚を組み合わせるなど、聞いただけではあまりぞっとしない組み合わせも少なくない。それでも、作ってみると意外においしいと評判になったレシピもあるという。投稿者の多くは、失敗も含めて楽しんでいるようだ。人間の思い込みにとらわれない発想が、料理の幅を広げる可能性もありそうだ。",
       "form": "ぞっとしない",
-      "en": "Projects in which people actually cook and try new recipes devised by generative AI have become a topic of conversation online. Among them are quite a few unappealing combinations that don't whet the appetite just from hearing them, such as pairing fruit with fish. Even so, some recipes have reportedly gained a reputation for being surprisingly tasty. Many of those posting seem to be enjoying it, failures included. Ideas not bound by human assumptions may well broaden the range of cooking.",
+      "en": "Projects where people actually cook and test new recipes devised by generative AI have become a hot topic online. Among them are quite a few combinations, such as pairing fruit with fish, that hardly sound appealing when you just hear about them. Even so, some of the recipes have reportedly earned a reputation for being surprisingly tasty once actually made. Most of the posters seem to be enjoying it, failures included. Ideas unbound by human assumptions may well broaden the range of cooking.",
       "original": true,
       "register": "報",
       "topic": "ai",
@@ -205,7 +204,6 @@
       "register": "話",
       "topic": "mind",
       "tipJa": "会話では「あんまりぞっとしない」の形で、気が進まないことをやわらかく言う。",
-      "grammar": [],
       "sense": "あまり感心しない。気が進まない。"
     }
   ],
@@ -222,9 +220,9 @@
       "sense": "前の内容に、あとから言い足すときに使う。"
     },
     {
-      "ja": "インドの首都ニューデリーでは、毎年冬になると大気汚染が深刻になり、学校が休みになることもある。農地で収穫後の作物を燃やす煙や、車の排気ガスなどが重なることが原因とされる。当局は車の通行を制限するなどの対策を取っているが、効果は限られているとの見方が多い。特に状態が悪い日には、住民に外出を控えるよう呼びかけることもある。なお、気温が下がる冬は、汚れた空気が地面の近くにたまりやすいことも知られている。",
+      "ja": "インドの首都ニューデリーでは、毎年冬になると大気汚染が深刻になり、学校が休みになることもある。周辺の州で収穫を終えた田畑の稲わらを焼く煙や、車の排気ガスなどが重なることが原因とされる。当局は車の通行を制限するなどの対策を取っているが、効果は限られているとの見方が多い。特に状態が悪い日には、住民に外出を控えるよう呼びかけることもある。なお、気温が下がる冬は、汚れた空気が地面の近くにたまりやすいことも知られている。",
       "form": "なお",
-      "en": "In India's capital, New Delhi, air pollution becomes severe every winter, and schools are sometimes closed. The causes are said to be a combination of smoke from burning crop residue on farmland after harvest and vehicle exhaust, among other things. The authorities are taking measures such as restricting traffic, but many view their effect as limited. On particularly bad days, they sometimes call on residents to refrain from going outside. It is also known, it should be noted, that in winter, when temperatures fall, polluted air tends to collect near the ground.",
+      "en": "In India's capital, New Delhi, air pollution becomes severe every winter, and schools are sometimes closed. The cause is said to be a combination of smoke from rice straw burned on harvested fields in neighboring states, vehicle exhaust, and other sources. The authorities have taken measures such as restricting vehicle traffic, but many believe the effect has been limited. On days when conditions are especially bad, residents are sometimes urged to stay indoors. It is also known that in winter, when temperatures drop, polluted air tends to collect near the ground.",
       "original": true,
       "register": "報",
       "topic": "india",
@@ -253,7 +251,6 @@
       "register": "講",
       "topic": "ai",
       "tipJa": "「〜し、なおかつ…する」のように、二つの条件を両方満たすことを強調して並べる。",
-      "grammar": [],
       "sense": "その上さらに。それに加えて。"
     },
     {
@@ -310,7 +307,6 @@
       "register": "話",
       "topic": "mind",
       "tipJa": "会話では「完全に侮ってた」「〜を侮っちゃいけない」のように、油断を反省する場面で使う。",
-      "grammar": [],
       "sense": "相手の力を低く見て、軽く扱う。"
     }
   ],
@@ -327,13 +323,13 @@
       "sense": "ひどくおどろくこと。"
     },
     {
-      "ja": "2016年、囲碁の世界トップ級の棋士と対戦したAIが四勝一敗で勝ち越し、囲碁界に驚愕が走った。囲碁は打ち手の数が非常に多く、コンピューターが人間に勝つのはまだ先だと考えられていたからだ。対局の中でAIが見せた一手は、当初は悪手と見られたものの、のちに勝負を決める好手だったと評価された。この出来事は、AIの可能性を広く知らしめるきっかけとなった。その後、AIは囲碁の研究にも使われ、プロの打ち方そのものを変えつつある。",
+      "ja": "2016年、囲碁の世界トップ級の棋士と対戦したAIが四勝一敗で勝ち越し、囲碁界を驚愕させた。囲碁は打てる手の組み合わせが非常に多く、コンピューターが人間に勝つのはまだ先だと考えられていたからだ。対局の中でAIが見せた一手は、当初は悪手と見られたものの、のちに独創的な好手だったと評価された。この出来事は、AIの可能性を広く知らしめるきっかけとなった。その後、AIは囲碁の研究にも使われ、プロの打ち方そのものを変えつつある。",
       "form": "驚愕",
-      "en": "In 2016, an AI that played against one of the world's top Go professionals won four games to one, and shock ran through the Go world. That is because Go has an enormous number of possible moves, and it had been thought that it would be a while yet before computers could beat humans. One move the AI made during a game was at first seen as a bad move, but was later judged to have been a strong move that decided the game. This event became a trigger for widely making known the possibilities of AI. Since then, AI has also been used in Go study and is changing the very way professionals play.",
+      "en": "In 2016, an AI that played against one of the world's top Go players won the series four games to one, astounding the Go world. That was because Go has an enormous number of possible move combinations, and it had been thought that computers beating humans was still a long way off. One move the AI made during a game was at first seen as a mistake, but was later judged to have been an original, excellent move. The event became an occasion that made the potential of AI widely known. Since then, AI has also been used in Go research and is changing the very way professionals play.",
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "報道では「〜に驚愕が走る」「驚愕の結果」のように、世間が強く驚いた出来事を伝える。",
+      "tipJa": "報道では「〜を驚愕させる」「驚愕の結果」のように、世間が強く驚いた出来事を伝える。",
       "grammar": ["n2-mono-no"],
       "sense": "ひどくおどろくこと。"
     },

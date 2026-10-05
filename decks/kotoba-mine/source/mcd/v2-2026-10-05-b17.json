@@ -1,19 +1,9 @@
 {
   "274": [
     {
-      "ja": "今回は、幕末の長崎に置かれた海軍伝習所の話です。黒船の来航に危機感を抱いた幕府は、オランダから教官を招き、若い幕臣たちに航海術や砲術、数学を学ばせました。蒸気船を動かしたこともない彼らにとって、それは短い期間で一から叩き込まれる特訓そのものだったわけです。その中には、のちに咸臨丸で太平洋を渡ることになる勝海舟もいました。わずか数年でそこまでたどり着けたのは、学ぶ目的がはっきりしていたからだと言えるでしょう。",
+      "ja": "生成AIを業務に取り入れる動きが広がる中、社員の教育に力を入れる企業が増えている。中には、全社員を対象に、わずか数週間でAIへの指示の出し方やデータの扱い方を集中的にたたき込む特訓を行う企業もある。ただ、短期間で詰め込んでも、実際の仕事で使わなければ効果は長続きしないとの指摘も多い。専門家は、学んだ内容をすぐに日々の業務と結びつけることで、ようやく本当に定着するのだと話している。",
       "form": "特訓",
-      "en": "This time, the story is about the Naval Training Center set up in Nagasaki at the end of the Edo period. Alarmed by the arrival of the Black Ships, the shogunate invited instructors from the Netherlands and had young retainers study navigation, gunnery and mathematics. For men who had never even operated a steamship, it was nothing less than intensive training, drilled into them from scratch in a short time. Among them was Katsu Kaishu, who would later cross the Pacific aboard the Kanrin Maru. It is fair to say they got that far in just a few years because their reason for learning was so clear.",
-      "original": true,
-      "register": "講",
-      "topic": "history",
-      "tipJa": "「特訓を受ける」「特訓を重ねる」のように、短期間に集中して鍛える場面で使う。",
-      "grammar": ["n3-koto-ni-naru"]
-    },
-    {
-      "ja": "生成AIを業務に取り入れる動きが広がる中、社員の教育に力を入れる企業が増えている。中には、全社員を対象に、数週間でAIへの指示の出し方やデータの扱い方を身につけさせる特訓を行う企業もある。ただ、研修を終えても実際の仕事で使わなければ、効果は長続きしないとの指摘も多い。専門家は、学んだ内容をすぐに日々の業務と結びつけることで、ようやく本当に定着するのだと話している。",
-      "form": "特訓",
-      "en": "As moves to bring generative AI into everyday work spread, more and more companies are putting effort into training their staff. Some even run intensive training for all employees, teaching them within a few weeks how to give instructions to AI and how to handle data. However, many point out that unless people use it in their actual jobs after the course, the effect does not last. Experts say that what is learned only truly takes hold once it is tied to daily work right away.",
+      "en": "As moves to bring generative AI into everyday work spread, more and more companies are putting effort into training their staff. Some even run intensive training for all employees, drilling them in just a few weeks on how to give instructions to AI and how to handle data. However, many point out that even if people cram it in a short time, the effect does not last unless they use it in their actual jobs. Experts say that what is learned only truly takes hold once it is tied to daily work right away.",
       "original": true,
       "register": "報",
       "topic": "ai",
@@ -29,6 +19,16 @@
       "topic": "language",
       "tipJa": "会話では「特訓する」「特訓中」と動詞や状態の形でも気軽に使う。",
       "grammar": ["n3-koto-ni-naru", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "普段の練習とは別に、本番前の短い期間だけ集中して行う特訓は、確かに手応えを得やすいものです。ところが運動の学習に関する研究では、練習した動きは睡眠中に脳内で整理され、翌朝のほうが動作の精度が上がる場合があることが示されています。上達には練習の量だけでなく、その間に挟む休息も欠かせないということです。追い込みに意味がないわけではないものの、夜遅くまで詰め込むのではなく、数日に分けて毎晩十分に休むほうが技術は定着しやすいのです。",
+      "form": "特訓",
+      "en": "Intensive training done in a concentrated burst just before the real event, apart from your usual practice, certainly tends to feel productive. But research on motor learning has reported that practised movements are sorted out in the brain during sleep, so that their precision sometimes improves by the next morning. In other words, getting better depends not only on the amount of practice but also on the rest you take in between. A final push is not meaningless, but rather than cramming late into the night, splitting the work over several days and resting properly every night makes a skill stick more easily.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学習の文脈では「短期間の集中練習」を指す。長い計画的な学習は「積み重ね」と対比される。",
+      "grammar": ["n5-teiru", "n3-wake-dewa-nai", "n2-mono-no", "n3-dewa-naku"]
     }
   ],
   "275": [
@@ -88,9 +88,9 @@
       "grammar": ["n5-teiru", "n2-ue-de"]
     },
     {
-      "ja": "仏典には、さまざまな教えを説く者が次々に村を訪れ、どれを信じればよいのか迷う人々に、釈迦が答える場面がある。言い伝えだから、権威ある人が言ったから、という理由だけで、疑うことなく受け入れてはならない。自分でよく確かめ、それが苦しみを減らすかどうかを見極めよ、というのである。信仰を重んじる宗教の中で、自らの検討を求めるこの姿勢は意外に思えるかもしれない。だが、問いを許さない教えは、結局は人を縛るだけなのだろう。",
+      "ja": "仏典には、さまざまな教えを説く者が次々に村を訪れ、どれを信じればよいのか迷う人々に、釈迦が答える場面がある。言い伝えだから、権威ある人が言ったから、という理由だけで、疑うことなく受け入れてはならない。自分でよく確かめ、それが苦しみを減らすかどうかを見極めよ、というのである。信仰を重んじる宗教が、教えそのものを批判的に検討するよう人々に求めるというのは、意外に思えるかもしれない。だが、問いを許さない教えは、結局は人を縛るだけなのだろう。",
       "form": "検討",
-      "en": "The Buddhist scriptures contain a scene in which teachers of all kinds visit a village one after another, and the Buddha answers people who are unsure which of them to believe. One must not accept something without doubt merely because it is tradition or because an authority said it. Examine it well yourself and judge whether it lessens suffering: that is the teaching. Within a religion that values faith, this demand for one's own scrutiny may seem surprising. Yet a teaching that permits no questions probably ends up doing nothing but binding people.",
+      "en": "The Buddhist scriptures contain a scene in which teachers of all kinds visit a village one after another, and the Buddha answers people who are unsure which of them to believe. One must not accept something without doubt merely because it is tradition or because an authority said it. Examine it well yourself and judge whether it lessens suffering: that is the teaching. That a religion which values faith should ask people to examine its teachings critically may seem surprising. Yet a teaching that permits no questions probably ends up doing nothing but binding people.",
       "original": true,
       "register": "論",
       "topic": "india",
@@ -100,9 +100,9 @@
   ],
   "277": [
     {
-      "ja": "今回は、紀元前480年のテルモピュライの戦いを取り上げます。ギリシャに攻め込んだペルシャの大軍に対し、スパルタ王レオニダスは、わずかな兵を率いて狭い山道で迎え撃ちました。地形をうまく利用したことで、彼らは数日にわたって敵の進軍を食い止めたんですね。最後は裏道から回り込まれて全滅しますが、その健闘ぶりはのちの時代まで語り継がれることになりました。数で負けていても、地の利を生かせば大軍を苦しめられるという代表的な例です。",
+      "ja": "今回は、今から二千五百年ほど前に起きたテルモピュライの戦いを取り上げます。ペルシャの大軍がギリシャに攻めてきたとき、スパルタ王レオニダスは、わずかな兵とともに海と山にはさまれた狭い道で敵を待ち受けました。地形をうまく利用したことで、彼らは数日にわたって敵の前進を止め続けたんですね。最後は別の道から背後に回られて敗れますが、その健闘ぶりはのちの時代まで語られることになりました。数で負けていても、戦う場所をうまく選べば大きな相手を苦しめられるという例です。",
       "form": "健闘",
-      "en": "This time we look at the Battle of Thermopylae in 480 BC. Against the huge Persian army that had invaded Greece, the Spartan king Leonidas led a small force to meet them in a narrow mountain pass. By making clever use of the terrain, they held back the enemy's advance for several days. In the end they were outflanked by a back path and wiped out, but the way they fought so well came to be told for generations. It is a classic example of how, even when outnumbered, you can trouble a great army if you use the lie of the land.",
+      "en": "This time we take up the Battle of Thermopylae, which took place about 2,500 years ago. When a huge Persian army invaded Greece, the Spartan king Leonidas waited for the enemy with a small force in a narrow passage squeezed between the sea and the mountains. By making clever use of the terrain, they kept the enemy's advance stopped for several days. In the end they were taken from behind by way of another path and defeated, but the way they fought so well came to be told for generations. It is an example of how, even when outnumbered, you can trouble a far larger opponent if you choose your battleground well.",
       "original": true,
       "register": "講",
       "topic": "history",
@@ -126,8 +126,7 @@
       "original": true,
       "register": "話",
       "topic": "mind",
-      "tipJa": "会話では「健闘したね」「よく健闘した」と、結果より努力や粘りを認めるときに使う。",
-      "grammar": []
+      "tipJa": "会話では「健闘したね」「よく健闘した」と、結果より努力や粘りを認めるときに使う。"
     }
   ],
   "278": [
@@ -142,9 +141,9 @@
       "grammar": ["n4-you-ni-naru"]
     },
     {
-      "ja": "第一次世界大戦の西部戦線では、開戦からまもなく、両軍が長い塹壕を掘って向かい合う状態が続いた。機関銃や鉄条網によって、守る側が攻める側より圧倒的に有利になったためである。兵力がほぼ互角だったことも、戦線が動かなかった一因とされる。1916年のソンムの戦いでは、両軍合わせて100万人を超える死傷者が出たものの、前線は十キロほどしか動かなかった。戦況は、戦車の登場やアメリカの参戦によって、ようやく大きく動き出すことになる。",
+      "ja": "第一次世界大戦の西部戦線では、開戦からまもなく、両軍が長い塹壕を掘って向かい合う状態が続いた。機関銃などの新しい兵器によって、守る側が攻める側より圧倒的に有利になったためである。兵力がほぼ互角だったことも、戦線が動かなかった一因とされる。1916年のソンムの戦いでは、両軍合わせて100万人を超える死傷者が出たものの、前線は十キロほどしか動かなかった。状況は、戦車の本格的な投入やアメリカの参戦によって、ようやく大きく動き出すことになる。",
       "form": "互角",
-      "en": "On the Western Front in the First World War, soon after the war began, a situation set in where both armies dug long trenches and faced each other. This was because machine guns and barbed wire gave the defending side an overwhelming advantage over the attacking side. The fact that their forces were almost evenly matched is also considered one reason the front did not move. At the Battle of the Somme in 1916, over a million casualties were suffered by both armies combined, yet the front line moved only about ten kilometres. The course of the war would finally begin to shift significantly with the arrival of tanks and America's entry into the war.",
+      "en": "On the Western Front in the First World War, soon after the war began, a situation set in where both armies dug long trenches and faced each other. This was because new weapons such as machine guns gave the defending side an overwhelming advantage over the attacking side. The fact that their forces were almost evenly matched is also considered one reason the front did not move. At the Battle of the Somme in 1916, over a million casualties were suffered by both armies combined, yet the front line moved only about ten kilometres. The situation would finally begin to shift significantly with the large-scale use of tanks and America's entry into the war.",
       "original": true,
       "register": "報",
       "topic": "history",
@@ -184,9 +183,9 @@
       "grammar": ["n4-you-ni-naru"]
     },
     {
-      "ja": "七世紀、玄奘は国の許しを得ないまま長安を発ち、砂漠と山脈を越えてインドへ向かった。目的はただ一つ、仏典を原典で読み、教えの本当の意味を知ることであった。十数年後、彼は数多くの経典を携えて戻り、残りの生涯を翻訳に捧げた。後世の人々はそれを快挙とたたえるが、本人にとっては、問いを手放さなかった結果にすぎないのではないか。大きな成果とは、案外そうした執念の副産物なのかもしれない。",
+      "ja": "七世紀、玄奘は国の許しを得ないまま長安を出て、砂漠や高い山々を越えてインドへ向かった。目的はただ一つ、仏の教えをもとの言葉で読み、その本当の意味を知ることであった。十数年後、彼は数多くの経典を持ち帰り、残りの人生をその翻訳に注いだ。後の時代の人々はこれを快挙と呼ぶが、本人にとっては、一つの問いを手放さなかった結果にすぎないのではないか。大きな成果とは、案外そうした粘り強さから生まれるものなのかもしれない。",
       "form": "快挙",
-      "en": "In the seventh century, Xuanzang left Chang'an without the state's permission and set out for India across deserts and mountain ranges. His aim was singular: to read the Buddhist scriptures in the original and learn the true meaning of the teaching. More than ten years later he returned carrying a great many sutras and devoted the rest of his life to translating them. Later generations praise this as a remarkable feat, but for the man himself, was it not merely the result of never letting go of his question? Great achievements may, surprisingly, be by-products of that kind of tenacity.",
+      "en": "In the seventh century, Xuanzang left Chang'an without the state's permission and set out for India across deserts and high mountains. His aim was singular: to read the Buddha's teaching in its original language and learn its true meaning. More than ten years later he brought back a great many sutras and poured the rest of his life into translating them. People of later ages call this a remarkable feat, but for the man himself, was it not merely the result of never letting go of a single question? Great achievements may, surprisingly, grow out of that kind of persistence.",
       "original": true,
       "register": "論",
       "topic": "india",
@@ -223,7 +222,6 @@
       "register": "話",
       "topic": "mind",
       "tipJa": "「そうそう〜ない」と打ち消しを伴うと「それほど〜ない」の意味。名の知れた意味の「そうそうたる」とは別。",
-      "grammar": [],
       "sense": "（打ち消しを伴って）それほどたびたびは。そんなには。"
     }
   ],
@@ -249,9 +247,9 @@
       "grammar": ["n5-teiru", "n3-wake-dewa-nai"]
     },
     {
-      "ja": "新しい単語を覚えるとき、頭の中では似た言葉どうしが、思い出される順番を奪い合っていると考えられています。よく呼び出される言葉ほど出てきやすくなり、使われない言葉は次第に出てこなくなります。つまり、記憶の中で勝ち残るのは、覚えた回数の多い言葉ではなく、思い出した回数の多い言葉なのです。だからこそ、単語帳を眺めるより、何も見ずに意味を言ってみる練習が効果的です。思い出そうとする手間そのものが、記憶を強くしてくれるからです。",
+      "ja": "新しい単語を覚えるとき、頭の中では意味や発音の似た語どうしが、想起される機会を奪い合っていると考えられています。頻繁に呼び出される語ほど取り出しやすくなる一方、使われない語はほかの語の干渉を受け、次第に出てこなくなります。つまり、記憶の中で勝ち残るのは、繰り返し目にした語ではなく、自力で思い出した回数の多い語なのです。単語帳を眺めるより、何も見ずに意味を答える検索練習のほうが定着しやすいのは、このためです。",
       "form": "勝ち残る",
-      "en": "When you learn new words, similar words in your head are thought to be competing for their turn to be recalled. The more often a word is called up, the more easily it comes to mind, while words that go unused gradually stop coming out. In other words, what survives in memory is not the word you studied most often but the word you recalled most often. That is exactly why practising saying the meaning without looking is more effective than staring at a word list. The effort of trying to remember is itself what strengthens the memory.",
+      "en": "When you learn new words, words with similar meanings or sounds are thought to compete in your head for the chance to be recalled. The more frequently a word is called up, the easier it becomes to retrieve, while words that go unused suffer interference from other words and gradually stop coming out. In other words, what survives in memory is not the word you have seen over and over but the word you have recalled on your own most often. This is why retrieval practice, answering the meaning without looking, makes words stick better than staring at a word list.",
       "original": true,
       "register": "学",
       "topic": "mind",
@@ -297,16 +295,6 @@
   ],
   "212": [
     {
-      "ja": "今回は、米ソによる宇宙開発の歴史を見ていきます。1957年、ソ連が世界初の人工衛星を打ち上げると、アメリカには大きな衝撃が走りました。さらに1961年には、ガガーリンが人類で初めて宇宙を飛び、ソ連が一歩先を行く形になります。両国が威信をかけて技術を競う中、アメリカは月を目指す計画に巨額の予算を注ぎ込み、1969年にアポロ11号を月面に着陸させました。この激しい競争が、のちの通信衛星などの技術の土台にもなったわけです。",
-      "form": "競う",
-      "en": "This time we look at the history of the space race between the US and the Soviet Union. In 1957, when the Soviet Union launched the world's first artificial satellite, a great shock ran through America. Then in 1961 Gagarin became the first human to fly in space, putting the Soviet Union a step ahead. As the two countries competed in technology with their prestige at stake, America poured a huge budget into a programme aimed at the Moon and landed Apollo 11 on the lunar surface in 1969. This fierce competition also became the foundation for later technologies such as communications satellites.",
-      "original": true,
-      "register": "講",
-      "topic": "history",
-      "tipJa": "「技術を競う」「腕を競う」のように、力や技を比べ合う対象を「〜を」で示す。",
-      "grammar": ["n4-teiku"]
-    },
-    {
       "ja": "大手IT企業の間で、AIモデルの賢さを競う動きが一段と激しくなっている。各社は新しいモデルを発表するたびに、数学やプログラミングの試験での得点を公表し、他社との差を強調する。ただ、こうした試験の点数が、実際の業務での使いやすさをどこまで表しているかについては、疑問の声も上がっている。利用者の間では、点数よりも自分の仕事に合うかどうかで選ぶべきだとの意見も多い。",
       "form": "競う",
       "en": "Among major IT companies, the race to outdo each other in how smart their AI models are has become even more intense. Each time a company announces a new model, it publishes its scores on maths and programming tests and stresses the gap with its rivals. However, doubts have been raised about how far such test scores reflect ease of use in actual work. Among users, many also say models should be chosen by whether they suit one's own work rather than by their scores.",
@@ -325,6 +313,16 @@
       "topic": "mind",
       "tipJa": "「〜と競う」で相手、「〜を競う」で比べる中身を示す。勉強やスポーツの場面で頻出。",
       "grammar": ["n5-teiru", "n4-teiku"]
+    },
+    {
+      "ja": "平安時代の宮中では、歌合という催しが盛んに行われました。左右の組に分かれ、同じ題で詠んだ和歌を一首ずつ出し合い、その出来を競うのです。判者と呼ばれる審判役が勝ち負けを決め、その理由も言葉で説明しました。この判定の言葉が積み重なることで、どんな表現がよいとされるのかという基準が少しずつ形づくられていきました。勝負の場が、そのまま歌の批評を育てる場にもなっていたわけです。",
+      "form": "競う",
+      "en": "At the Heian court, events called uta-awase were held frequently. Participants split into left and right teams, each put forward a waka composed on the same theme one poem at a time, and they competed on the quality of the poems. A referee called the hanja decided the winner and also explained the reasons in words. As these judgments built up, a standard for what kind of expression was considered good gradually took shape. The arena of competition was, at the same time, the place that nurtured poetry criticism.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「出来・美しさを競う」のように、優劣を比べる中身を目的語にとる。勝負を表す硬めの語。",
+      "grammar": ["n3-koto-de", "n4-teiku"]
     }
   ]
 }

@@ -145,9 +145,9 @@
       "grammar": ["n5-teiru", "n4-you-ni-naru"]
     },
     {
-      "ja": "物理でよくある勘違いが、引き合う力は地球のような大きな天体だけが持つものだ、という思い込みです。実際には、質量を持つ物どうしなら、机の上の消しゴムと鉛筆の間にも、ごくわずかに引き合う力が働いています。ただ、その力は物の質量に応じて大きさが決まるので、身の回りの小さな物どうしでは、まったく感じられないだけなのです。万有引力の「万有」とは、すべての物が持っているという意味なので、名前そのものが答えになっていると覚えておけば、まず忘れません。",
+      "ja": "物理の授業で意外と多いのが、物を引き寄せる力は地球のような大きな天体だけにある、という誤解です。実際には、質量を持つ物どうしなら、机の上の消しゴムと鉛筆の間にも、ごくわずかに引き合う力が働いています。その大きさは質量に応じて決まるので、身の回りの小さな物どうしでは感じられないだけなのです。万有引力という名前に込められているのは、まさにこの点です。名前の意味を一度考えておくと、試験で問われても迷わずに済みますよ。",
       "form": "万有引力",
-      "en": "A common misconception in physics is the belief that the force of attraction belongs only to large celestial bodies like the Earth. In fact, between any objects that have mass, even between the eraser and the pencil on your desk, an extremely small attractive force is at work. It's just that the size of that force depends on the masses of the objects, so between the small things around us it can't be felt at all. The \"universal\" in universal gravitation means that every object has it, so if you remember that the name itself is the answer, you won't forget it.",
+      "en": "A surprisingly common misunderstanding in physics class is that the force that draws things together exists only in large celestial bodies like the Earth. In fact, between any objects that have mass, even between the eraser and the pencil on your desk, an extremely small attractive force is at work. Its size is determined according to the masses, so between the small things around us it simply can't be felt. That is exactly the point packed into the name universal gravitation. If you think once about what the name means, you won't hesitate when it comes up on a test.",
       "original": true,
       "register": "学",
       "topic": "mind",
@@ -234,14 +234,14 @@
   ],
   "127": [
     {
-      "ja": "今回は、AIと仕事の未来を論じた本を要約します。著者がまず指摘するのは、文章や絵を生み出すAIの登場で、ものを作る作業そのもののハードルが一気に下がったことです。かつては何年もかけて身につけた技術がなくても、言葉で指示するだけで、ある程度のものなら自由自在に作れてしまうんですね。だからこそ、これから価値を持つのは手を動かす力よりも、何を作るべきかを決める力だ、というのがこの本の主張です。",
+      "ja": "今回は、AIと仕事の未来を論じた本を要約します。著者がまず指摘するのは、文章や絵を生み出すAIの登場で、ものを作る作業そのもののハードルが一気に下がったことです。何年もかけて身につけた技術がなくても、文章なら明るい調子にも重い調子にも、絵ならやわらかな水彩にも重厚な油絵にも、言葉ひとつで自由自在に切り替えられるようになったんですね。だからこそ、これから価値を持つのは手を動かす力よりも、何を作るべきかを決める力だ、というのがこの本の主張です。",
       "form": "自由自在",
-      "en": "This time I'm summarizing a book that discusses AI and the future of work. What the author points out first is that with the arrival of AI that produces text and pictures, the hurdle for the very act of making things has dropped all at once. Even without skills that once took years to acquire, you can make things freely, up to a certain level, just by giving instructions in words. That's exactly why, the book argues, what will have value from now on is not the ability to work with your hands but the ability to decide what should be made.",
+      "en": "This time I'm summarizing a book that discusses AI and the future of work. What the author points out first is that with the arrival of AI that produces text and pictures, the hurdle for the very act of making things has dropped all at once. Even without skills that take years to acquire, you can now switch freely with a single instruction, writing in a bright tone or a heavy one, painting in soft watercolor or rich oils. That's exactly why, the book argues, what will have value from now on is not the ability to work with your hands but the ability to decide what should be made.",
       "original": true,
       "register": "講",
       "topic": "ai",
       "tipJa": "「自由自在に〜できる」の形で、思いどおりに何でもできるようすを表す。",
-      "grammar": []
+      "grammar": ["n4-you-ni-naru"]
     },
     {
       "ja": "心を自由自在に操れたら、と人は願う。だが仏教の瞑想が教えるのは、心を力ずくで押さえつけることではなく、浮かんでは消える思いをただ見つめることである。怒りや不安を消そうとすればするほど、それはかえって強くなる。思いに振り回されず、それが過ぎていくのを眺められるようになったとき、ようやく心は落ち着きを取り戻すのだろう。思い通りにしようとする手をゆるめることが、むしろ心を静める近道なのである。",
@@ -316,16 +316,6 @@
       "topic": "history",
       "tipJa": "「機能的な形」「機能的な美しさ」のように、装飾より使いやすさを重んじる文脈で使う。",
       "grammar": ["n5-teiru", "n3-koto-ni-naru"]
-    },
-    {
-      "ja": "仕事で書くメールや案内文に、凝った言い回しはいりません。読み手が知りたいのは、何が起きたのか、自分は何をすればいいのか、いつまでなのか、という点だけです。結論を最初に書き、必要な情報を箇条書きで並べれば、それだけで十分に機能的な文章になります。送る前に、相手がこの一通だけを読んで動けるかどうかを確かめてみてください。美しい文章を書く力は、こうした基本を押さえたうえで磨いても、決して遅くはないのです。",
-      "form": "機能的",
-      "en": "Emails and notices you write for work don't need elaborate phrasing. What the reader wants to know is only what happened, what they themselves should do, and by when. If you write the conclusion first and list the necessary information as bullet points, that alone makes for functional writing. Before sending, check whether the other person could act after reading just this one message. The ability to write beautiful prose is something it's never too late to polish after you've got these basics down.",
-      "original": true,
-      "register": "語",
-      "topic": "language",
-      "tipJa": "文章について「機能的な文章」と言うと、飾りより伝わりやすさを優先した文章を指す。",
-      "grammar": ["n2-ue-de"]
     }
   ]
 }

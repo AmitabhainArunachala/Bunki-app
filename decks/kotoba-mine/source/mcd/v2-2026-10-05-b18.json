@@ -11,9 +11,9 @@
       "grammar": ["n2-ue-de", "n4-teiku"]
     },
     {
-      "ja": "インドの古典『バガヴァッド・ギーター』には、行為の結果に執着せず、なすべきことをなせ、という教えがある。結果を気にするなと言われると、投げやりになれという意味に聞こえるかもしれない。だが、そうではない。手を抜くことなく最善を尽くし、そのうえで、どう転ぶかは自分の手の外にあると認めるのである。結果への執着を手放したとき、人はかえって目の前の仕事に深く打ち込めるのだろう。",
+      "ja": "インドの古典『バガヴァッド・ギーター』には、行為の結果に執着せず、なすべきことをなせ、という教えがある。結果を気にするなと言われると、投げやりになれという意味に聞こえるかもしれない。だが、そうではない。手を抜くことなく最善を尽くし、そのうえで、どう転ぶかは自分の手の及ばないところにあると認めるのである。結果への執着を手放したとき、人はかえって目の前の仕事に深く打ち込めるのだろう。",
       "form": "最善",
-      "en": "The Indian classic the Bhagavad Gita contains the teaching that one should do what must be done without clinging to the fruits of one's actions. Being told not to care about results may sound like being told to stop trying. But that is not it. It means doing one's very best without cutting corners, and then accepting that how things turn out lies beyond one's hands. Perhaps it is when we let go of our attachment to results that we can, on the contrary, throw ourselves deeply into the work in front of us.",
+      "en": "The Indian classic the Bhagavad Gita contains the teaching that one should do what must be done without clinging to the fruits of one's actions. Being told not to care about results may sound like being told to stop trying. But that is not it. It means doing one's very best without cutting corners, and then accepting that how things turn out lies beyond one's reach. Perhaps it is when we let go of our attachment to results that we can, on the contrary, throw ourselves deeply into the work in front of us.",
       "original": true,
       "register": "論",
       "topic": "india",
@@ -21,9 +21,9 @@
       "grammar": ["n2-koto-naku", "n2-ue-de"]
     },
     {
-      "ja": "参考書選びに何週間もかける受験生は、意外と多いものです。心理学の調査では、いつも一番いい選択肢を探し続けるタイプの人ほど、選んだあとの満足度が低い傾向があると示されています。比べれば比べるほど、選ばなかった本の長所が気になってしまうからです。勉強では、最善の一冊を探すより、「これで十分」と決めて早く始めるほうが、結局は伸びることが多いのです。迷ったら評判のいいものを一冊選び、それを三周するつもりで取りかかりましょう。",
+      "ja": "参考書選びに何週間もかける受験生は、意外と多いものです。心理学の調査では、選択肢を残らず比べてからでないと決められない人ほど、選んだあとの満足度が低い傾向にあることが示されています。比べれば比べるほど、選ばなかった本の長所が気になってしまうからです。勉強では、最善の一冊を探すより、「これで十分」と決めて早く始めるほうが、結局は伸びることが多いのです。迷ったら評判のいいものを一冊選び、それを三周するつもりで取りかかりましょう。",
       "form": "最善",
-      "en": "There are surprisingly many exam candidates who spend weeks choosing a study guide. Psychological surveys have shown that people of the type who always keep searching for the best possible option tend to be less satisfied after choosing. That's because the more you compare, the more the strengths of the books you didn't choose bother you. In studying, rather than hunting for the single best book, deciding \"this is good enough\" and starting early usually leads to more progress in the end. If you're unsure, pick one well-reviewed book and set to work intending to go through it three times.",
+      "en": "There are surprisingly many exam candidates who spend weeks choosing a study guide. Psychological surveys have shown that people who can't decide until they have compared every last option tend to be less satisfied after choosing. That's because the more you compare, the more the strengths of the books you didn't choose bother you. In studying, rather than hunting for the single best book, deciding \"this is good enough\" and starting early usually leads to more progress in the end. If you're unsure, pick one well-reviewed book and set to work intending to go through it three times.",
       "original": true,
       "register": "学",
       "topic": "mind",
@@ -49,8 +49,7 @@
       "original": true,
       "register": "話",
       "topic": "ai",
-      "tipJa": "話し言葉では「反射的に〜しちゃう」のように気軽に使える。",
-      "grammar": []
+      "tipJa": "話し言葉では「反射的に〜しちゃう」のように気軽に使える。"
     },
     {
       "ja": "人に責められたり、ばかにされたりすると、私たちはほとんど反射的に言い返してしまう。仏教の瞑想が鍛えようとするのは、その一瞬の自動的な反応に気づく力である。怒りが湧いたと気づけば、怒りはもう自分そのものではなく、眺めることのできる一つの出来事になる。そこに小さな隙間が生まれ、言い返すか黙るかを選ぶ余裕ができるのだ。修行とは、この隙間を少しずつ広げていくことなのかもしれない。",
@@ -65,9 +64,9 @@
   ],
   "50": [
     {
-      "ja": "今回は、細かい技術の話はいったん置いて、AIの七十年ほどの歴史をざっと俯瞰してみます。1950年代から60年代にかけては、コンピューターに推論や探索をさせる研究が盛り上がり、これが第一次ブームと呼ばれます。80年代には、専門家の知識をルールとして詰め込む方式で、第二次ブームが起きました。そして2010年代、大量のデータから学ぶディープラーニングで第三次ブームが始まります。どのブームのあとにも、期待が冷え込む「冬の時代」が来ている、というのが面白いところですね。",
+      "ja": "今回は、細かい技術の話はいったん置いて、AIの七十年ほどの歴史をざっと俯瞰してみます。1950年代から60年代にかけては、コンピューターに推論や探索をさせる研究が盛り上がり、これが第一次ブームと呼ばれます。80年代には、専門家の知識をルールとして詰め込む方式で、第二次ブームが起きました。そして2010年代、大量のデータから学ぶディープラーニングで第三次ブームが始まります。最初の二つのブームのあとには、どちらも期待が冷え込む「冬の時代」が来ている、というのが面白いところですね。",
       "form": "俯瞰",
-      "en": "This time, setting aside the fine technical details for now, let's take a quick bird's-eye view of the roughly seventy-year history of AI. From the 1950s into the 60s, research that had computers carry out reasoning and search took off, and this is called the first boom. In the 80s, a second boom arose from the approach of packing experts' knowledge into computers as rules. Then, in the 2010s, the third boom began with deep learning, which learns from huge amounts of data. What's interesting is that after every boom came a \"winter\" in which expectations cooled.",
+      "en": "This time, setting aside the fine technical details for now, let's take a quick bird's-eye view of the roughly seventy-year history of AI. From the 1950s into the 60s, research that had computers carry out reasoning and search took off, and this is called the first boom. In the 80s, a second boom arose from the approach of packing experts' knowledge into computers as rules. Then, in the 2010s, the third boom began with deep learning, which learns from huge amounts of data. What's interesting is that each of the first two booms was followed by a \"winter\" in which expectations cooled.",
       "original": true,
       "register": "講",
       "topic": "ai",
@@ -241,8 +240,7 @@
       "original": true,
       "register": "講",
       "topic": "ai",
-      "tipJa": "「秒速〇メートル」「秒速〇キロ」のように、数字と単位を続けて使う。",
-      "grammar": []
+      "tipJa": "「秒速〇メートル」「秒速〇キロ」のように、数字と単位を続けて使う。"
     },
     {
       "ja": "2010年6月、小惑星探査機「はやぶさ」が、7年にわたる旅を終えて地球に帰還した。本体から切り離されたカプセルは、秒速およそ12キロメートルという猛烈な速さで大気圏に飛び込み、オーストラリアの砂漠に着地した。本体は大気圏で燃え尽きたが、カプセルの中からは、小惑星イトカワの微粒子が見つかった。小惑星の表面から物質を持ち帰ったのは世界で初めてで、日本の宇宙開発の大きな成果として記憶されている。",
@@ -287,9 +285,9 @@
       "grammar": ["n4-you-ni-naru", "n5-teiru"]
     },
     {
-      "ja": "最近、メールの文面とか、ほぼ全部AIに書かせてるんですけど、ちょっと怖いなって思うことがあるんですよ。ふだんは便利なんですけど、AIが使えない場面って、たまに来るじゃないですか。面接とか、急な電話とか、スマホの電池が切れたときとか。そういう、いざという時に自分の言葉がすっと出てこなかったら、けっこうヤバいなっていう。だから最近は、下書きだけは自分で書くようにしてます。",
+      "ja": "最近、取引先へのメールの文面とか、ほぼ全部AIに任せちゃってるんですけど、ちょっと危機感を覚えることがあるんですよ。ふだんは手間が省けて助かるんですけど、AIに頼れない場面って、突然来るじゃないですか。面接での受け答えとか、クレームの電話の対応とか、端末の充電が切れたときとか。そういう、いざという時に自分の言葉がとっさに出てこなかったら、けっこう致命的だなっていう。だから最近は、文章の骨組みだけは自分で練るようにしてます。",
       "form": "いざという時",
-      "en": "Lately I've been having AI write nearly all my emails, but there's something about it that scares me a little. It's convenient most of the time, but every so often a situation comes up where you can't use AI, right? Like job interviews, or sudden phone calls, or when your phone battery dies. If my own words don't come out smoothly in a moment like that, when it really counts, that's pretty bad. So lately I've made a point of at least writing the first draft myself.",
+      "en": "Lately I've been leaving nearly all my emails to clients and such to AI, but sometimes I get a bit of a sense of alarm about it. Usually it's a big help because it saves me effort, but situations where you can't rely on AI come up out of nowhere, right? Like answering questions in a job interview, or handling a complaint call, or when your device's battery dies. If my own words don't come out on the spot in a moment like that, when it really counts, that could be pretty fatal. So lately I've made a point of at least working out the skeleton of my writing myself.",
       "original": true,
       "register": "話",
       "topic": "ai",

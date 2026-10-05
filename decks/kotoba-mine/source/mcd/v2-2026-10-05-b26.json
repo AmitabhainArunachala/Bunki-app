@@ -1,14 +1,14 @@
 {
   "31": [
     {
-      "ja": "今回は、災害の歴史から命を守る知恵を学ぶ一冊を紹介します。1995年の阪神・淡路大震災では、亡くなった人の多くが、倒れた家屋や家具の下敷きになったことが原因だったとされています。地震の揺れそのものではなく、古い木造住宅の倒壊が被害を大きくしたわけです。この教訓から、建物の耐震基準の見直しや、家具を壁に固定する呼びかけが進むことになりました。著者は、過去の災害を知ることが、次の災害へのいちばんの備えになると語っています。",
-      "form": "下敷きになった",
-      "en": "This time I'll introduce a book that teaches the wisdom of protecting lives from the history of disasters. In the 1995 Great Hanshin-Awaji Earthquake, it is said that many of those who died were killed by being pinned under collapsed houses and furniture. In other words, it was not the shaking of the earthquake itself but the collapse of old wooden houses that made the damage so great. From this lesson, revisions of building earthquake-resistance standards and calls to fasten furniture to walls came to move forward. The author says that knowing past disasters is the best preparation for the next one.",
+      "ja": "今回は、災害の歴史から命を守る知恵を学ぶ一冊を紹介します。1995年の阪神・淡路大震災では、亡くなった人の多くは、倒れた家屋や家具の下敷きになって命を落としたとされています。地震の揺れそのものではなく、古い木造住宅の倒壊が被害を大きくしたわけです。この教訓から、建物の耐震基準が見直され、家具を壁に固定するように呼びかける動きも広がっていきました。著者は、過去の災害を知ることこそが、次の災害へのいちばんの備えになると語っています。",
+      "form": "下敷きになって",
+      "en": "This time I'll introduce a book that teaches the wisdom of protecting lives from the history of disasters. In the 1995 Great Hanshin-Awaji Earthquake, it is said that many of those who died lost their lives pinned under collapsed houses and furniture. In other words, it was not the shaking of the earthquake itself but the collapse of old wooden houses that made the damage so great. From this lesson, building earthquake-resistance standards were revised, and a movement calling on people to fasten furniture to walls also spread. The author says that knowing past disasters is precisely the best preparation for the next one.",
       "original": true,
       "register": "講",
       "topic": "history",
       "tipJa": "「がれきの下敷きになる」のように、重い物に押しつぶされる場面で使う。",
-      "grammar": ["n3-dewa-naku", "n3-koto-ni-naru", "n5-teiru"],
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n3-you-ni", "n4-teiku"],
       "sense": "重い物の下に押さえつけられる。"
     },
     {
@@ -103,9 +103,9 @@
   ],
   "196": [
     {
-      "ja": "今回は、日本の女子教育の歩みをたどる本を紹介します。戦前の日本では、小学校を出ると男女は別々の学校に進むのが当たり前で、女子が学べる内容にも大きな差がありました。それが大きく変わったのは戦後のことで、1947年に定められた教育基本法には男女の共学がはっきりと書き込まれました。これをきっかけに、男女が同じ教室で同じ内容を学ぶ学校が全国に広がっていきます。今では当たり前の光景も、実は八十年ほどの歴史しかないわけですね。",
+      "ja": "今回は、日本の女子教育の歩みをたどる本を紹介します。戦前の日本では、小学校を出ると男女は別々の学校に進むのが当たり前で、女子が学べる内容にも大きな差がありました。それが大きく変わったのは戦後のことで、1947年に定められた教育基本法に、男女共学を認める条文が盛り込まれたのです。これをきっかけに、男女が同じ教室で同じ内容を学ぶ学校が全国に広がっていきます。今ではおなじみの光景も、実は八十年ほどの歴史しかないわけですね。",
       "form": "共学",
-      "en": "This time I'll introduce a book that traces the course of girls' education in Japan. In prewar Japan, it was taken for granted that after finishing elementary school boys and girls went on to separate schools, and there were also large differences in what girls could study. It was after the war that this changed greatly, and the Fundamental Law of Education enacted in 1947 clearly wrote in coeducation for boys and girls. With this as a turning point, schools where boys and girls learn the same content in the same classroom spread across the country. In other words, a scene we now take for granted actually has only about eighty years of history.",
+      "en": "This time I'll introduce a book that traces the course of girls' education in Japan. In prewar Japan, it was taken for granted that after finishing elementary school boys and girls went on to separate schools, and there were also large differences in what girls could study. It was after the war that this changed greatly: the Fundamental Law of Education enacted in 1947 included an article recognizing coeducation of boys and girls. With this as a turning point, schools where boys and girls learn the same content in the same classroom spread across the country. In other words, a scene that is familiar today actually has only about eighty years of history.",
       "original": true,
       "register": "講",
       "topic": "history",
@@ -123,21 +123,20 @@
       "grammar": ["n3-koto-de", "n5-teiru"]
     },
     {
-      "ja": "仏教の伝承によれば、ブッダははじめ女性の出家をためらったが、のちにそれを認め、尼僧の教団が生まれたという。身分や性別によって悟りへの道が閉ざされることはない、という考えがその根底にあったのだろう。二千年以上前の話ではあるが、学ぶ機会を誰にでも開くという点で、現代の共学の理念にも通じるところがある。もちろん、当時の教団にも男女の扱いの差は残っていた。理想とは、一度に実現されるものではなく、少しずつ近づいていくものなのである。",
+      "ja": "うちの親の地元って、公立高校がほとんど男子校と女子校に分かれてたらしいんですよ。今でもそういう地域ってちょっと残ってるじゃないですか。母は、高校は女子だけで気楽だったって言ってて、大学で初めて共学の環境になって、最初は男子と話すだけですごく緊張したらしいです。逆に父は、男子校のノリが大学でもずっと続くと思ってたみたいで。時代とか地域で、当たり前ってぜんぜん違うんですよね。",
       "form": "共学",
-      "en": "According to Buddhist tradition, the Buddha at first hesitated to let women become renunciants, but later allowed it, and an order of nuns was born. At its root, perhaps, was the idea that the path to awakening is not closed off by social status or sex. It is a story from more than two thousand years ago, but in opening the chance to learn to anyone, it has something in common with the ideal of modern coeducation. Of course, differences in the treatment of men and women remained in the order of that time as well. An ideal is not something realized all at once but something one approaches little by little.",
+      "en": "Apparently in my parents' hometown, the public high schools were mostly split into boys' schools and girls' schools. There are still a few areas like that left even now, right? My mom says high school was relaxed because it was only girls, and apparently when she was first in a coed environment at university, she got really nervous at first just talking to boys. My dad, on the other hand, seems to have thought the boys'-school vibe would go on forever, even at university. What's normal is totally different depending on the era and the region, isn't it?",
       "original": true,
-      "register": "論",
-      "topic": "india",
-      "tipJa": "男女が同じ場で学ぶこと。「共学の理念」のように考え方を指すこともある。",
-      "grammar": ["n3-dewa-naku", "n4-teiku"]
+      "register": "話",
+      "topic": "history",
+      "tipJa": "「共学になる」は、男女が同じ学校や教室で学ぶ環境に入ること。"
     }
   ],
   "209": [
     {
-      "ja": "今回は、アジアで初めてノーベル文学賞を受けた詩人、タゴールの生涯を描いた本を紹介します。詩人として知られるタゴールですが、晩年になってから絵を描き始め、数多くの作品を残したことはあまり知られていません。原稿の書き損じを消そうとして線を重ねるうちに、それが不思議な形になっていったとも言われています。詩だけでなく、歌を作り、学校を開いて教育にも力を注いだタゴールは、まさに生涯を通じた芸術家だったわけです。",
+      "ja": "今回は、アジアで初めてノーベル文学賞を受けた詩人、タゴールの生涯を描いた本を紹介します。詩人として知られるタゴールですが、晩年になってから絵を描き始め、数多くの作品を残したことはあまり知られていません。原稿の書き損じを消そうとして線を重ねるうちに、それが不思議な形になっていったとも言われています。詩を書き、たくさんの歌を作り、さらに絵筆まで握ったタゴールは、言葉という枠に収まらない、根っからの芸術家だったわけです。",
       "form": "芸術家",
-      "en": "This time I'll introduce a book depicting the life of Tagore, the poet who was the first in Asia to receive the Nobel Prize in Literature. Tagore is known as a poet, but it is not widely known that he began painting late in life and left a great many works. It is also said that as he layered lines trying to cross out mistakes in his manuscripts, those lines turned into strange shapes. Tagore, who not only wrote poems but also composed songs and founded a school, pouring his energy into education as well, was truly an artist throughout his whole life.",
+      "en": "This time I'll introduce a book depicting the life of Tagore, the poet who was the first in Asia to receive the Nobel Prize in Literature. Tagore is known as a poet, but it is not widely known that he began painting late in life and left a great many works. It is also said that as he layered lines trying to cross out mistakes in his manuscripts, those lines turned into strange shapes. Tagore, who wrote poems, composed many songs, and even took up the paintbrush, was in other words an artist to the core who could not be contained within the frame of words.",
       "original": true,
       "register": "講",
       "topic": "india",
@@ -183,8 +182,7 @@
       "original": true,
       "register": "話",
       "topic": "ai",
-      "tipJa": "「なぞかけを作る」のように使う。答えの理由を「その心は」で明かすのがお決まり。",
-      "grammar": []
+      "tipJa": "「なぞかけを作る」のように使う。答えの理由を「その心は」で明かすのがお決まり。"
     },
     {
       "ja": "禅の公案は、一見するとなぞかけに似ている。どちらも、ふつうの考え方では答えにたどり着けない問いを投げかけるからである。だが、一方には必ず気の利いた答えが用意されているのに対し、公案には、頭でひねり出した正解というものがない。理屈で解こうとする心そのものを手放したとき、はじめて何かが見えてくるのだという。言葉遊びと修行の違いは、答えをあらかじめ持っているかどうかにあるのかもしれない。",
@@ -219,14 +217,14 @@
       "grammar": ["n3-you-ni", "n2-ue-de", "n3-koto-de"]
     },
     {
-      "ja": "数字を言葉に置き換えて覚える工夫は、日本だけのものではありません。インドには古くから、サンスクリットの子音一つ一つに数字を当てはめ、数を単語や詩の形で表す仕組みがありました。南インドの天文学者たちは、この方法で長い数値を詩に織り込み、暗唱して伝えたといわれます。いわば、日本の語呂合わせを、さらに体系的にしたようなものです。数を覚えやすくするには、音とリズムのある言葉に乗せるのがいちばんだということは、昔も今も変わらないのです。",
+      "ja": "数字を言葉に置き換えて覚える工夫は、日本だけのものではない。インドには古くから、サンスクリットの子音一つ一つに数字を対応させ、数を単語や詩の形で表す仕組みがあった。南インドの天文学者たちは、この方法で長い数値を詩に織り込み、暗唱によって伝えたとされる。いわば日本の語呂合わせを、より体系的にしたものと言えよう。文字に頼らず知識を受け継いできた文化にとって、数とは書き留めるものではなく、口ずさむものだったのである。",
       "form": "語呂合わせ",
-      "en": "The device of replacing numbers with words to memorize them is not unique to Japan. In India, since long ago, there was a system that assigned a number to each Sanskrit consonant and expressed numbers in the form of words and verses. It is said that astronomers in southern India used this method to weave long numerical values into verses and pass them on by recitation. It is, so to speak, something like a more systematic version of Japan's number-word puns. That the best way to make numbers easy to remember is to put them into words with sound and rhythm has not changed, then or now.",
+      "en": "The device of replacing numbers with words to memorize them is not unique to Japan. In India, since long ago, there was a system that matched a number to each Sanskrit consonant and expressed numbers in the form of words and verses. Astronomers in southern India are said to have used this method to weave long numerical values into verses and pass them on by recitation. It could be called, so to speak, a more systematic version of Japan's number-word puns. For a culture that handed down knowledge without relying on writing, numbers were not something to write down but something to hum aloud.",
       "original": true,
-      "register": "語",
+      "register": "論",
       "topic": "india",
       "tipJa": "数字の音を言葉に置き換えて、覚えやすくする工夫。",
-      "grammar": []
+      "grammar": ["n3-dewa-naku"]
     }
   ],
   "4": [
@@ -241,16 +239,6 @@
       "grammar": ["n3-you-ni", "n5-teiru", "n3-dewa-naku", "n2-ue-de"]
     },
     {
-      "ja": "琉球王国の時代から受け継がれてきた沖縄の言葉が、存続の危機に立たされている。明治以降、学校で標準語が強く求められたこともあり、日常的に使いこなせる人は高齢の世代に限られつつある。ユネスコも、沖縄の言葉を消滅の危機にある言語の一つに挙げている。なんくるないのように県外でもよく知られた言い回しは残るものの、細かな意味合いまで伝えられる若い世代は少ないのが現状だ。県や地域では、学校で方言に触れる機会を増やすなど、次の世代へつなぐ取り組みが続いている。",
-      "form": "なんくるない",
-      "en": "The Okinawan language, handed down since the era of the Ryukyu Kingdom, is facing a crisis of survival. Partly because standard Japanese was strongly demanded in schools from the Meiji era onward, people who can use it fluently in daily life are becoming limited to the elderly generation. UNESCO, too, lists the Okinawan language as one of the languages in danger of disappearing. Although phrases well known even outside the prefecture, such as nankurunai, remain, the reality is that few in the younger generation can convey even fine shades of meaning. In the prefecture and local communities, efforts to pass it on to the next generation are continuing, such as increasing chances to encounter the dialect at school.",
-      "original": true,
-      "register": "報",
-      "topic": "history",
-      "tipJa": "沖縄の言葉で、心配しなくても物事はうまく運ぶという意味。",
-      "grammar": ["n3-you-ni", "n2-mono-no", "n5-teiru"]
-    },
-    {
       "ja": "仏教では、自分の思いどおりにならないものにしがみつくことが、苦しみの根になると考える。未来の結果もその一つであり、いくら心配しても、すべてを思うままに動かせるわけではない。沖縄のなんくるないという言葉には、この教えに通じる響きがあるように思う。それは投げやりな諦めではなく、今できることに心を注ぎ、あとは流れに任せる落ち着きである。結果への執着を手放したとき、人はかえって目の前のことに力を出せるのではないだろうか。",
       "form": "なんくるない",
       "en": "In Buddhism, clinging to what does not go as one wishes is thought to be the root of suffering. Future outcomes are one such thing, and however much we worry, it is not as though we can move everything as we please. I feel that the Okinawan word nankurunai has a ring that connects with this teaching. It is not reckless resignation, but a calm that pours the heart into what can be done now and leaves the rest to the flow of things. When we let go of attachment to results, might we not, on the contrary, be able to put our strength into what is before our eyes?",
@@ -259,6 +247,16 @@
       "topic": "india",
       "tipJa": "沖縄の言葉で、心配しなくても物事はうまく運ぶという意味。",
       "grammar": ["n3-wake-dewa-nai", "n3-you-ni", "n3-dewa-naku"]
+    },
+    {
+      "ja": "なんくるないって、翻訳アプリに通すと、大丈夫の一言で片付けられちゃうじゃないですか。でも沖縄出身の知り合いいわく、やるべきことを誠実にこなしていれば、物事はいずれ丸く収まるっていう含みがあるらしいんですよ。ただの楽観ではなく、もっと地に足のついた前向きさなんですって。AIの翻訳精度って格段に上がってますけど、土地に根付いた言葉の奥行きまでは、まだ拾いきれないんですよね。言葉の背景にある暮らしぶりを知らないと訳せないものってあるんだなって、痛感しました。",
+      "form": "なんくるない",
+      "en": "When you run nankurunai through a translation app, it gets brushed off as a single word like it's okay, right? But according to an acquaintance from Okinawa, it carries the nuance that if you diligently do what you should, things will work out in time. Apparently it's not mere optimism but a more down-to-earth kind of positivity. The accuracy of AI translation has gone up dramatically, but it still can't pick up the depth of words rooted in a place. It really hit me that there are things you can't translate unless you know the way of life behind the words.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "沖縄の言葉で、心配しなくても物事はうまく運ぶという意味。",
+      "grammar": ["n3-dewa-naku"]
     }
   ],
   "24": [
@@ -304,8 +302,7 @@
       "original": true,
       "register": "講",
       "topic": "ai",
-      "tipJa": "厳しい意見や本音の前に置く前置き。改まった場では「率直に申し上げて」とも言う。",
-      "grammar": []
+      "tipJa": "厳しい意見や本音の前に置く前置き。改まった場では「率直に申し上げて」とも言う。"
     },
     {
       "ja": "厳しい内容を伝える前に、率直に言って、と前置きを入れると、聞き手は本音の話が始まると心構えができます。ただ、多用すると、ほかの発言は本音ではないのかと思われかねません。相手が身構えすぎないよう、声の調子は落ち着いたままにするのも大切です。使うのは本当に大事な場面に絞り、そのあとは言い訳をはさまずに、短く結論を述べましょう。最後に相手への期待を一言添えると、厳しさが攻撃ではなく励ましとして伝わりやすくなります。",

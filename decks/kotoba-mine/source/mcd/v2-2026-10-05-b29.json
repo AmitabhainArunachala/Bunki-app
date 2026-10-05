@@ -18,19 +18,17 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "その時の気持ちが表れた顔のようす。"
     },
     {
-      "ja": "江戸時代の役者絵を見ると、同じ役者でも絵師によってまるで別人のような顔つきに描かれていることがある。写真のない時代、人々は絵を通じて役者の姿を思い描くしかなかった。そのため絵師は、本人に似せることよりも、役柄の気迫や色気が伝わることを重んじたのである。写実ではなく誇張こそが、見る者の心に役者を刻みつける手段だったといえる。似ていないことは、当時の観客にとって必ずしも欠点ではなかったのだろう。",
+      "ja": "仏像の顔つきは、作られた時代や地域によってかなり違っている。ガンダーラと呼ばれる地方で生まれた初期の仏像は、鼻が高く、ギリシャの神々の像によく似た特徴を持つ。この地域が、ギリシャ系の文化と盛んに交流していたためだと考えられている。一方、日本に伝わった仏像の顔は、時代が下るにつれて、より丸くやさしい形へと変わっていった。人々が理想とした仏の顔には、それぞれの土地の好みが映し出されているのである。",
       "form": "顔つき",
-      "en": "Looking at Edo-period prints of kabuki actors, the same actor is sometimes drawn with features so different, depending on the artist, that he looks like another person. In an age without photographs, people could only picture an actor's appearance through pictures. For that reason, artists valued conveying the intensity and allure of the role more than making the likeness resemble the man himself. It can be said that exaggeration, not realism, was the means of engraving an actor in the viewer's heart. Not looking alike was probably not necessarily a flaw for the audiences of the time.",
+      "en": "The facial features of Buddhist statues differ quite a lot depending on the period and region in which they were made. The early Buddhist statues born in the area known as Gandhara have high noses and features closely resembling statues of the Greek gods. This is thought to be because the region had lively exchange with Greek-derived culture. On the other hand, the faces of the Buddhist statues that reached Japan changed, as time went on, into rounder and gentler forms. In the Buddha's face that people idealized, the tastes of each land are reflected.",
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
-      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "grammar": ["n5-teiru", "n3-ni-tsurete"],
       "sense": "顔の形やつくりから受ける感じ。顔立ち。"
     }
   ],
@@ -42,7 +40,6 @@
       "original": true,
       "register": "講",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n4-nagara", "n5-teiru", "n3-dewa-naku", "n2-ni-suginai"],
       "sense": "世の中の当たり前の考えやマナーから外れていること。"
     },
@@ -53,7 +50,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n2-ue-de", "n3-dewa-naku", "n5-teiru"],
       "sense": "世の中の当たり前の考えやマナーから外れていること。"
     },
@@ -64,7 +60,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n2-ue-de"],
       "sense": "世の中の当たり前の考えやマナーから外れていること。"
     }
@@ -82,14 +77,13 @@
       "sense": "あれこれと文句や理屈を並べるようす。"
     },
     {
-      "ja": "子どものころ、宿題をやりたくないって言い訳ばっかりしてたら、母によく、つべこべ言わないの、って叱られたんですよ。でも今思うと、理屈をこねてる時間のほうが、宿題をやる時間より長かったじゃないですか。人って、やりたくないことほど、やらない理由を探すのがうまくなるんですよね。だから最近は、迷ったらとりあえず少しだけ手をつけてみる、って決めてるんです。始めちゃえば、意外と続くもんなんですよ。",
+      "ja": "気が進まない作業があると、つい頭の中で、やらなくていい理由を並べ始めちゃうんですよ。今日は集中できないとか、資料がそろってないとか、もっともらしい言い訳がいくらでも出てくるじゃないですか。でもそういう時は、自分に向かって、つべこべ言わずに五分だけやれ、って言い聞かせるようにしてるんです。不思議なもので、いったん手をつけると、さっきまでの抵抗感がうそみたいに薄れていくんですよね。結局、腰が重いのは作業そのものより、取りかかる前の迷いのほうなんだと思います。",
       "form": "つべこべ",
-      "en": "When I was a kid and kept making excuses about not wanting to do my homework, my mom often scolded me to stop arguing. But thinking about it now, the time I spent making up reasons was longer than the time it took to do the homework, right? People get better at finding reasons not to do something the less they want to do it. So lately I've decided that when I'm hesitating, I'll just start on it a little bit. Once you start, it's surprisingly easy to keep going.",
+      "en": "When there's a task I'm not in the mood for, I find myself starting to line up reasons in my head why I don't need to do it. Things like I can't concentrate today, or the materials aren't ready yet; plausible excuses just keep coming, right? But at times like that, I make a point of telling myself: stop grumbling and just do five minutes. Strangely enough, once I get started, the resistance I felt a moment ago fades away as if it had never been there. In the end, I think what makes me sluggish isn't the task itself but the hesitation before getting started.",
       "original": true,
       "register": "話",
       "topic": "mind",
-      "tipJa": "",
-      "grammar": ["n5-tai"],
+      "grammar": ["n3-you-ni", "n4-teiku"],
       "sense": "あれこれと文句や理屈を並べるようす。"
     },
     {
@@ -99,7 +93,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n4-teiku"],
       "sense": "あれこれと文句や理屈を並べるようす。"
     }
@@ -112,18 +105,16 @@
       "original": true,
       "register": "講",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n3-dewa-naku", "n3-koto-ni-naru"],
       "sense": "ごくわずかな数や量。"
     },
     {
-      "ja": "大規模なAIの開発には巨額の費用がかかるため、最先端のモデルを作れる企業は、世界でも一握りに限られている。開発に欠かせない専用の部品も、限られたメーカーからしか手に入りにくいのが現状だ。こうした状況に対し、各国では、技術や富が特定の企業に集中することへの懸念が強まっている。一方で、公開されたモデルを基に、小さな組織が独自のサービスを生み出す動きも広がっている。AIの恩恵を誰が受けるのかという問いは、今後ますます重みを増しそうだ。",
+      "ja": "大規模なAIの開発には巨額の費用がかかるため、最先端のモデルを作れる企業は、世界でも一握りに限られている。開発に欠かせない専用の部品も、数社のメーカーからしか手に入らないのが現状だ。こうした状況に対し、各国では、技術や富が特定の企業に集中することへの懸念が強まっている。一方で、公開されたモデルを基に、小さな組織が独自のサービスを生み出す動きも広がっている。AIの恩恵を誰が受けるのかという問いは、今後ますます重みを増しそうだ。",
       "form": "一握り",
-      "en": "Because developing large-scale AI costs enormous sums, the companies able to build cutting-edge models are limited to a handful worldwide. The specialized components essential to development are also currently hard to obtain except from a limited number of makers. In response to this situation, concern is growing in many countries about technology and wealth concentrating in particular companies. At the same time, there is also a growing movement of small organizations creating their own services based on publicly released models. The question of who will receive the benefits of AI looks set to carry more and more weight from now on.",
+      "en": "Because developing large-scale AI costs enormous sums, the companies able to build cutting-edge models are limited to a handful worldwide. The specialized components essential to development can also be obtained only from a few manufacturers. In response, concern is growing in many countries about technology and wealth concentrating in particular companies. On the other hand, there is also a spreading movement of small organizations creating their own services based on publicly released models. The question of who benefits from AI looks set to grow ever weightier.",
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "ごくわずかな数や量。"
     },
@@ -134,7 +125,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n2-ni-suginai", "n3-wake-dewa-nai", "n5-tai"],
       "sense": "ごくわずかな数や量。"
     }
@@ -147,7 +137,6 @@
       "original": true,
       "register": "講",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n5-teiru", "n3-koto-de"],
       "sense": "銀色に光って見える、白くなった髪。"
     },
@@ -158,7 +147,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n3-koto-de"],
       "sense": "銀色に光って見える、白くなった髪。"
     },
@@ -169,7 +157,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-dewa-naku"],
       "sense": "銀色に光って見える、白くなった髪。"
     }
@@ -193,8 +180,6 @@
       "original": true,
       "register": "語",
       "topic": "ai",
-      "tipJa": "",
-      "grammar": [],
       "sense": "古い木や金属がこすれて出る、きしむ音。"
     },
     {
@@ -204,7 +189,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n3-dewa-naku"],
       "sense": "古い木や金属がこすれて出る、きしむ音。"
     }
@@ -228,19 +212,17 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "わざとらしくなく、自然にふるまうようす。"
     },
     {
-      "ja": "茶の湯の世界では、客をもてなす工夫が、できるだけ目立たないように求められてきた。季節に合わせた花や、ちょうどよい温度の湯は、亭主の細やかな準備の結果である。しかし、それをさりげない形で差し出すことが、何より大切だとされた。苦労を見せびらかすもてなしは、かえって客に気をつかわせてしまうからである。見えない努力こそがもてなしの本質だという考えは、今の接客にも受け継がれているのではないか。",
+      "ja": "江戸時代には、幕府がたびたびぜいたくを禁じる命令を出し、町の人々の派手な服装を厳しく制限した。そこで豊かな商人たちは、表は地味な色の着物を着ながら、裏地に高価な布や美しい柄を使うようになったと言われる。見せたいものをあえて隠し、動いたときにちらりと見える程度にとどめたのである。こうしたさりげない工夫は、目立たないことこそ上品だという感覚を育てたと考えられる。禁止という不自由が、新しい美しさを生んだ例といえるだろう。",
       "form": "さりげない",
-      "en": "In the world of the tea ceremony, the effort put into hosting guests has been expected to be as inconspicuous as possible. Flowers suited to the season and water at just the right temperature are the result of the host's careful preparation. However, offering them in an unforced way was considered more important than anything. That is because hospitality that shows off its effort ends up making guests feel obliged instead. Is not the idea that invisible effort is the essence of hospitality still handed down in today's customer service?",
+      "en": "In the Edo period, the shogunate repeatedly issued orders banning luxury and strictly restricted townspeople's flashy clothing. So wealthy merchants, it is said, began wearing kimono in plain colors on the outside while using expensive fabrics and beautiful patterns for the lining. They deliberately hid what they wanted to show and kept it to a glimpse visible when they moved. Such understated touches are thought to have fostered the sense that not standing out is precisely what is refined. It may be called an example of the constraint of a ban giving birth to a new kind of beauty.",
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
-      "grammar": ["n3-you-ni", "n5-teiru"],
+      "grammar": ["n4-nagara", "n4-you-ni-naru"],
       "sense": "わざとらしくなく、自然にふるまうようす。"
     }
   ],
@@ -263,7 +245,6 @@
       "original": true,
       "register": "話",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-nagara", "n5-tai"],
       "sense": "本気であること。若者の話し言葉。"
     },
@@ -274,7 +255,6 @@
       "original": true,
       "register": "学",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n4-nagara", "n5-teiru"],
       "sense": "本気であること。若者の話し言葉。"
     }
@@ -298,19 +278,17 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n2-ue-de", "n5-teiru"],
       "sense": "思ってもいなかった困ったことをする事態になる。"
     },
     {
-      "ja": "1812年、ナポレオンは大軍を率いてロシアに遠征したが、焦土作戦と冬の寒さに苦しみ、多くの兵を失って退却する羽目になった。短期の決戦を見込んだ計画は、相手が戦わずに退くという選択肢を想定していなかったのである。歴史をひもとくと、勝利を確信した側ほど、相手の出方を読み違える例は少なくない。成功の経験が、自らの見通しを疑う力を奪うのであろう。引き返す決断が遅れやすいのは、今の組織も同じである。",
+      "ja": "初めてインドに行ったとき、駅からホテルまで、オートリキシャっていう三輪のタクシーを使ったんですよ。ガイドブックには、乗る前に運賃を交渉しておけって、しつこいくらい書いてあったのに、長旅でへとへとで、すっかり頭から抜けちゃって。着いてから相場の倍近い額をふっかけられて、結局しぶしぶ払う羽目になったんです。でもこれ、言い返す材料を持ってなかったこっちの落ち度じゃないですか。それ以来、配車アプリで目安の料金を確かめてから乗るようにしてます。",
       "form": "羽目になった",
-      "en": "In 1812, Napoleon led a great army on an expedition into Russia, but suffering from scorched-earth tactics and the winter cold, he lost many soldiers and ended up having to retreat. His plan, which counted on a short decisive battle, had not anticipated the option of the enemy withdrawing without fighting. Looking through history, there are not a few examples in which the side most certain of victory misreads how the other side will move. Experience of success probably robs one of the power to doubt one's own outlook. Being slow to decide to turn back is just as true of organizations today.",
+      "en": "The first time I went to India, I took an auto-rickshaw, a three-wheeled taxi, from the station to the hotel. The guidebook said again and again to negotiate the fare before getting in, but I was worn out from the long trip and it completely slipped my mind. After we arrived, the driver demanded almost double the going rate, and I ended up reluctantly paying it. But that was my own fault for not having anything to argue back with, right? Since then, I make sure to check the approximate fare on a ride-hailing app before getting in.",
       "original": true,
-      "register": "論",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": [],
+      "register": "話",
+      "topic": "india",
+      "grammar": ["n3-you-ni"],
       "sense": "思ってもいなかった困ったことをする事態になる。"
     }
   ],
@@ -333,7 +311,6 @@
       "original": true,
       "register": "語",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n2-mono-no", "n5-teiru", "n3-koto-ni-naru", "n3-dewa-naku", "n5-tai"],
       "sense": "工夫をこらして、うまく作りあげる。"
     },
@@ -344,7 +321,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n4-nagara", "n5-teiru", "n2-ue-de", "n5-tai"],
       "sense": "打ち消しの形で、わざと工夫しないのに自然にうまく。"
     }

@@ -1,0 +1,308 @@
+{
+  "281": [
+    {
+      "ja": "今回は、記憶の仕組みを扱った本を要約していきます。著者によれば、同じ教科書を同じ時間だけ読んでも、頭に残る中身は人によって千差万別だそうです。大きな理由の一つは、読む前から持っている知識の量と質にあります。新しい情報は、すでに知っていることと結びついたときに残りやすいんですね。だから、他人の勉強法をそのまま真似するより、自分の手持ちの知識から出発するのが近道だ、というのがこの本の主張です。",
+      "form": "千差万別",
+      "en": "This time I'm going to summarize a book about how memory works. According to the author, even if people read the same textbook for the same amount of time, what stays in their heads varies endlessly from person to person. One major reason lies in the amount and quality of the knowledge they already have before reading. New information sticks more easily when it connects with something you already know. So the book's argument is that rather than copying someone else's study method as is, the shortcut is to start from the knowledge you already have on hand.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「人によって千差万別」の形で、違いが大きく一つにまとめられないことを言う。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "生成AIを業務に取り入れる企業が増える中、その使い方は業種や部署によって千差万別だ。現場を取材すると、文書の下書きや会議記録の要約に使う例が目立つ一方、顧客対応の自動化にまで踏み込む企業はまだ限られている。社内の規則づくりが追いつかず、本格的な導入をひとまず見送るケースも少なくない。一律の正解を探すより、自社の業務に応じた使い道を一つずつ見極めることが求められそうだ。",
+      "form": "千差万別",
+      "en": "As more companies bring generative AI into their work, the ways they use it vary endlessly by industry and department. Reporting on the ground, one sees many cases of using it to draft documents or summarize meeting records, while companies that go as far as automating customer service are still limited. There are also quite a few cases where internal rule-making cannot keep up and full-scale adoption is put off. Rather than searching for a one-size-fits-all answer, what seems to be required is to pin down uses that fit one's own company's operations.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜によって千差万別だ」と、ばらつきの大きさを一言でまとめる。",
+      "grammar": ["n2-ni-oujite", "n5-teiru"]
+    },
+    {
+      "ja": "仏教では、同じ一つの教えを聞いても、その受け取り方は聞く者の心の状態によって千差万別であると考える。釈迦が相手の求めに応じて語り口を変えたと伝えられるのも、そのためであろう。悩みの深い者には深い言葉を、迷いの浅い者には短い言葉を選んだのである。教えが一つであることと、届き方が無数であることは、少しも矛盾しない。むしろその違いを認めるところから、他者への慈しみは始まるのではないか。",
+      "form": "千差万別",
+      "en": "Buddhism holds that even when people hear one and the same teaching, the way they take it in varies endlessly according to the state of the listener's mind. That, presumably, is why the Buddha is said to have changed his manner of speaking in response to what each person sought. To those whose suffering was deep he chose deep words, and to those whose confusion was shallow he chose short ones. That the teaching is one and that the ways it arrives are countless are in no way contradictory. Rather, isn't it from acknowledging those differences that compassion toward others begins?",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "論説では「〜は千差万別である」と述語に置き、多様さそのものを主題にすることが多い。",
+      "grammar": ["n2-ni-oujite"]
+    }
+  ],
+  "292": [
+    {
+      "ja": "今回は、集団の中で人が行動に踏み切る契機を扱った本を紹介します。目の前で誰かが窮地に陥っているのに、居合わせた人数が多いほど手を差し伸べる人が減るという『傍観者効果』を耳にしたことがある人も多いでしょう。著者によれば、この膠着状態を打ち破るのに最も有効なのは、誰か一人が率先して動くことだそうです。最初の一人が声をかけた途端、周囲の人々も『自分も関わっていいのだ』と認識するようになるんですね。勇気は伝染する、というのがこの本の核心です。",
+      "form": "率先",
+      "en": "This time I'm introducing a book about what prompts people to commit to action within a group. Many of you have probably heard of the bystander effect, in which, even though someone right in front of you is in a predicament, the more people are present, the fewer reach out to help. According to the author, the most effective way to break this deadlock is for one person to take the lead and act. The instant the first person speaks up, the people around them come to recognize that it's all right for them to get involved too. The heart of this book is that courage is contagious.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「率先して〜する」の形で、人より先に自分から行動する意味で使う。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "生成AIを窓口や文書作成の業務に試験的に取り入れる自治体が増えている。導入にあたっては、職員の中から希望者を募り、率先して使ってもらうことで、現場の不安を和らげる工夫も見られる。使ってみた職員が操作のこつを共有するにつれて、利用する部署は少しずつ広がっているという。一方で、個人情報をどこまで入力してよいかについては、より明確なルールを求める声も上がっている。",
+      "form": "率先",
+      "en": "A growing number of local governments are introducing generative AI on a trial basis into counter services and document preparation. In rolling it out, some take steps to ease anxiety on the ground by recruiting volunteers from among their staff and having them take the lead in using it. As staff who have tried it share tips on operating it, the departments using it are said to be gradually expanding. On the other hand, voices are also being raised calling for clearer rules on how much personal information may be entered.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「率先して取り組む」「率先して使う」の形が多い。",
+      "grammar": ["n3-koto-de", "n3-ni-tsurete", "n5-teiru"]
+    },
+    {
+      "ja": "禅寺の修行では、掃除や食事の支度といった日々の仕事も、坐禅と同じく修行とみなされる。そこで重んじられるのは、誰かに命じられるのを待つのではなく、気づいた者が率先して手を動かす姿勢である。庭の落ち葉を拾うのに、古くからいる者と新しく来た者の区別はない。自分を後回しにして場を整える行いの中にこそ、我執を離れる道があるのだろう。掃き清められた庭は、そのまま心の姿を映している。",
+      "form": "率先",
+      "en": "In Zen temple training, everyday work such as cleaning and preparing meals is regarded as practice just like seated meditation. What is valued there is not waiting to be ordered by someone but the attitude in which whoever notices takes the lead and sets their hands to work. In picking up fallen leaves in the garden, there is no distinction between those who have been there long and those who have newly arrived. It is perhaps precisely in the act of putting oneself last and setting the place in order that a path away from clinging to the self is found. A garden swept clean simply reflects the state of the mind.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「率先して」は、命令や順番を待たず自発的に動く姿勢をほめるときに使う。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    }
+  ],
+  "293": [
+    {
+      "ja": "今回は、半導体メーカーのエヌビディアを取り上げた本を要約していきます。創業当初、この会社の主力はゲーム向けのグラフィックス用チップでした。二〇〇六年には、そのチップを汎用的な計算に転用できる開発環境を打ち出し、のちのAIブームで一躍脚光を浴びます。著者が注目するのは、一九九三年の創業以来、共同創業者のジェンスン・フアンが一貫して経営の舵を取り続けている点です。目先の流行に振り回されず、長期的な構想を貫ける体制こそが躍進の土台だった、というのがこの本の見立てです。",
+      "form": "舵を取り",
+      "en": "This time I'm going to summarize a book about the chipmaker Nvidia. When it was founded, the company's main product was graphics chips for games. In 2006 it launched a development environment that let those chips be repurposed for general computation, and in the later AI boom it suddenly found itself in the spotlight. What the author focuses on is that since the company's founding in 1993, co-founder Jensen Huang has consistently remained at the helm of its management. The book's reading is that a structure able to see a long-term vision through, without being swept along by passing trends, was the foundation of its rise.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「経営の舵を取る」の形で、組織を率いて進む方向を決め続ける意味になる。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "組織や事業の進む方向を決めて導く。"
+    },
+    {
+      "ja": "若いころ、川を下る小舟に乗せてもらったことがある。船尾に座った船頭は、流れに逆らうことなく、岩の手前で手元の柄をわずかに傾けるだけで、舟の向きを変えていた。舵を取るとは、力で水をねじ伏せることではなく、流れを読んで小さく応じることなのだと、そのとき悟った。心の扱い方もまた同じであろう。湧き上がる感情を抑えつけるより、その流れを見極めながら少しずつ向きを整えるほうが、遠くまで進めるのである。",
+      "form": "舵を取る",
+      "en": "When I was young, I was once allowed to ride in a small boat going down a river. The boatman, seated at the stern, did not fight the current; just before a rock he would tilt the handle at his side ever so slightly and change the boat's direction. It was then that I realized that steering a boat is not overpowering the water by force but reading the current and responding in small ways. The way one handles the mind must be the same. Rather than suppressing the emotions that well up, one can go farther by discerning their flow and adjusting one's course little by little.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "もとは船を操る言葉。「舵を取るとは」と定義の形にして、比喩へ広げる書き方もある。",
+      "grammar": ["n2-koto-naku", "n3-dewa-naku", "n4-nagara"],
+      "sense": "船の進む向きを操ること（本来の意味）。"
+    },
+    {
+      "ja": "お釈迦さんが亡くなったあと、弟子たちがバラバラになりかけたって話があるんですよ。そこで教団の舵を取ったのが、マハーカーシャパっていう長老で、教えをみんなで確かめ合う集まりを開いたらしいんです。誰が何をどう聞いたかを一つずつ突き合わせて、覚え方を揃えていく作業だったんですって。お経が今まで残ってるのって、結局そういう地味なまとめ役がいたからなんですよね。カリスマのあとを継ぐ人って、派手じゃないほうがうまくいくのかもしれないです。",
+      "form": "舵を取った",
+      "en": "There's a story that after the Buddha died, his disciples were on the verge of scattering. The one who took the helm of the community then was an elder called Mahakashyapa, and apparently he held a gathering where everyone confirmed the teachings together. They say it was a process of checking, one by one, who had heard what and how, and making the way they memorized it consistent. The reason the sutras have survived to this day is, in the end, that there was that kind of unglamorous coordinator. Maybe the people who succeed a charismatic figure do better when they aren't flashy.",
+      "original": true,
+      "register": "話",
+      "topic": "india",
+      "tipJa": "話し言葉では「舵を取ったのが〜」のように、誰が集団を導いたかを言う形でよく使う。",
+      "grammar": ["n4-teiku"],
+      "sense": "集団の進む方向を決め、まとめて導く。"
+    }
+  ],
+  "290": [
+    {
+      "ja": "今回は、関ヶ原の戦いを扱った本を要約していきます。一六〇〇年、徳川家康の東軍と石田三成の西軍がぶつかったこの戦いは、わずか半日ほどで決着がついたと言われています。勝敗を分けたのは、西軍側にいた小早川秀秋が途中で東軍に加勢したことでした。著者が注目するのは、合戦の前から家康が各地の大名に手紙を送り、味方を増やしていた点です。戦場での強さより、始まる前の根回しが結果を決めた、というのがこの本の見立てです。",
+      "form": "加勢",
+      "en": "This time I'm going to summarize a book about the Battle of Sekigahara. In 1600, this battle, in which Tokugawa Ieyasu's Eastern Army clashed with Ishida Mitsunari's Western Army, is said to have been decided in only about half a day. What decided victory and defeat was that Kobayakawa Hideaki, who was on the Western side, joined in to back the Eastern Army partway through. What the author focuses on is that even before the battle, Ieyasu had been sending letters to daimyo in various regions and increasing his allies. The book's reading is that it was the groundwork laid before the fighting began, rather than strength on the battlefield, that decided the outcome.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜に加勢する」の形で、争いの一方に味方して力を貸す意味になる。",
+      "grammar": ["n4-teiku", "n5-teiru"]
+    },
+    {
+      "ja": "SNS上の対立が短時間で大きくなる背景には、当事者ではない多くの利用者が一方の側に加勢する構図がある。投稿が拡散されるにつれて、事情をよく知らない人までが片方を責める側に回り、反論しにくい空気が生まれる。人は、多数派に見える意見に引き寄せられやすい心理を持つとされる。こうした流れを和らげようと、投稿の前に内容を見直すよう促す機能を試すサービスも出てきている。",
+      "form": "加勢",
+      "en": "Behind the way conflicts on social media grow large in a short time is a pattern in which many users who are not themselves involved back one side. As posts spread, even people who don't know the circumstances well join the side blaming one party, and an atmosphere arises in which it is hard to argue back. People are said to have a psychological tendency to be drawn toward opinions that appear to be the majority view. To soften this kind of flow, some services have begun testing features that prompt users to review the content before posting.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "報道では「一方に加勢する」のように、争いの構図を説明する場面で使う。",
+      "grammar": ["n3-ni-tsurete", "n5-teiru"]
+    },
+    {
+      "ja": "『マハーバーラタ』の大戦を前に、クリシュナは両陣営の求めに応じて、一方には自らの軍勢を、もう一方には武器を取らない自分自身を差し出したと伝えられる。アルジュナの側は、兵の数ではなく、戦わぬ一人の御者を選んだのである。物語が示すのは、刃を振るうことだけが加勢ではない、ということであろう。迷う者の傍らに立ち、何のために戦うのかを問い続けることもまた、力を貸す一つの形なのである。",
+      "form": "加勢",
+      "en": "Before the great war of the Mahabharata, Krishna is said to have answered the requests of both camps by offering his own army to one side and himself, who would not take up arms, to the other. Arjuna's side chose not numbers of soldiers but a single charioteer who would not fight. What the story shows, perhaps, is that wielding a blade is not the only way of backing a side. Standing beside someone who is wavering and continuing to ask what they fight for is also one form of lending strength.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「加勢」は争いの一方に味方すること。武力に限らず、言葉や知恵で支える場合にも使える。",
+      "grammar": ["n2-ni-oujite", "n3-dewa-naku"]
+    }
+  ],
+  "43": [
+    {
+      "ja": "今回は、古代エジプトの文字が読めるようになるまでの歴史を扱った本を要約していきます。ロゼッタストーンが見つかったのは一七九九年ですが、すぐに読めたわけではありません。フランスのシャンポリオンは、並んで刻まれたギリシャ語の文章と、自らが学んだコプト語の知識とを手がかりに、何年もヒエログリフと格闘しました。そして一八二二年、絵のような文字の一部が音を表していることを突き止めます。天才の一瞬の思いつきより、地道な比較の積み重ねが描かれているのが、この本の面白いところです。",
+      "form": "格闘",
+      "en": "This time I'm going to summarize a book about the history leading up to the point where ancient Egyptian writing could be read. The Rosetta Stone was found in 1799, but it couldn't be read right away. The Frenchman Champollion wrestled with the hieroglyphs for years, using as clues the Greek text carved alongside them and the knowledge of Coptic he had acquired himself. Then in 1822 he established that some of the picture-like signs represented sounds. What makes this book interesting is that it depicts a steady accumulation of comparisons rather than a genius's flash of inspiration.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜と格闘する」の形で、難しい対象に長く取り組む比喩として使う。",
+      "grammar": ["n4-you-ni-naru", "n4-teiku", "n5-teiru"],
+      "sense": "難しい問題に粘り強く取り組むこと。"
+    },
+    {
+      "ja": "インドには、土を敷いた練習場で二人の競技者が素手で格闘する、クシュティという伝統競技がある。担い手たちはアカーラという道場で寝起きを共にし、師匠のもとで体を鍛えてきた。近年はマットの上で行う国際ルールのレスリングが急速に広がり、両方のトレーニングをこなす若手も多いという。五輪のレスリングでインド勢がメダルを取るようになったことも、関心を高めるきっかけになった。",
+      "form": "格闘",
+      "en": "India has a traditional sport called kushti, in which two competitors grapple bare-handed in a training ground spread with earth. Its practitioners have lived together in training halls known as akharas and built up their bodies under a master. In recent years, wrestling under international rules, done on mats, has spread rapidly, and many young wrestlers are said to handle training in both. The fact that Indian wrestlers have come to win medals in Olympic wrestling has also helped raise interest.",
+      "original": true,
+      "register": "報",
+      "topic": "india",
+      "tipJa": "「素手で格闘する」のように、実際に組み合って戦う意味でも使う。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "相手と組み合って戦うこと。"
+    },
+    {
+      "ja": "解法を教わる前に、まず自力で問題と格闘させると、のちに解説を聞いた際の理解が深まるという研究があります。『生産的失敗』と呼ばれる考え方です。正解にたどり着けなくても、試行錯誤を重ねる過程で、どこに難所があるのかが自分の中で明確になるためだと考えられています。ただし、何の手がかりも与えずに放置すればよいわけではない点には留意が必要です。行き詰まった学習者に、適切な時機でヒントを示せるよう備えておくことが肝心です。",
+      "form": "格闘",
+      "en": "There is research showing that if learners first wrestle with a problem on their own before being taught the method of solving it, their understanding deepens when they hear the explanation later. This is the idea called productive failure. It is thought that even if they don't reach the right answer, in the process of repeated trial and error it becomes clear to them where the hard parts lie. However, care is needed on the point that this does not mean you may simply leave them alone without giving any clues. What is essential is being prepared to offer hints at the right moment to learners who have hit a wall.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学習の文脈では「問題と格闘する」で、すぐに答えを見ずに粘る過程を指す。",
+      "grammar": ["n3-wake-dewa-nai", "n5-teiru"],
+      "sense": "難しい問題に粘り強く取り組むこと。"
+    }
+  ],
+  "44": [
+    {
+      "ja": "今回は、スポーツ心理学の本から、本番前の緊張との付き合い方を紹介します。著者が例に挙げるのは、リングに上がる直前の格闘家です。心臓が激しく打ち、手のひらに汗がにじむ、あの状態ですね。この本によれば、それを『怖がっている証拠』ではなく『体が戦う準備を整えたサイン』と捉え直すだけで、動きが良くなるそうです。緊張を消そうとするより、意味を書き換えるほうが早い、というわけです。",
+      "form": "格闘家",
+      "en": "This time, from a book on sports psychology, I'll introduce how to deal with nerves before the real thing. The example the author gives is a fighter just before stepping into the ring. You know the state: heart pounding hard, sweat seeping onto the palms. According to this book, simply reframing that not as 'proof that you're scared' but as 'a sign that your body has got ready to fight' makes your movements better. In other words, it's quicker to rewrite the meaning of the nerves than to try to make them disappear.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "戦う競技を職業にしている人を指す。ボクサーや柔道家などをまとめて呼ぶ言い方。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    },
+    {
+      "ja": "打撃や組み技を扱う競技の世界でも、AIを使った試合分析が広がりつつある。試合の映像から打撃の回数や当たった位置を自動で数え、選手の癖を数字で示すサービスが登場している。格闘家にとっては、自分では気づきにくい構えの崩れや疲れの出方を、客観的に確かめられる利点がある。一方で、相手との駆け引きや試合の流れといった、数字に表れにくい要素をどう扱うかは、まだ手探りの段階だ。",
+      "form": "格闘家",
+      "en": "In the world of sports involving strikes and grappling, too, match analysis using AI is spreading. Services have appeared that automatically count the number of strikes and where they landed from fight footage, showing an athlete's habits in numbers. For fighters, there is the advantage of being able to objectively check things they find hard to notice themselves, such as breakdowns in their stance or how fatigue shows. On the other hand, how to handle elements that hardly show up in numbers, such as the tactical back-and-forth with an opponent or the flow of a fight, is still at a trial-and-error stage.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「格闘家にとって」「プロの格闘家」のように、職業として戦う人を指す。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "古代オリンピックに、パンクラチオンっていうほぼ何でもありの競技があったんですよ。噛みつきと目つぶし以外は基本的に許されてたらしくて、今見てもかなり危ないやつです。で、そこで勝った格闘家って、故郷に帰ると英雄扱いで、像を建ててもらえることもあったんですって。逆に言うと、それくらい命がけだったってことなんですよね。スポーツの歴史って、こういう生々しい話のほうが記憶に残るんですよ。",
+      "form": "格闘家",
+      "en": "In the ancient Olympics there was an event called pankration where pretty much anything went. Apparently everything except biting and eye-gouging was basically allowed, so it's a pretty dangerous thing even looking at it now. And the fighters who won there were treated as heroes when they went back home, and sometimes even had statues put up for them. Put the other way around, it means it was that much of a life-or-death thing. With sports history, it's these kinds of raw stories that stick in your memory.",
+      "original": true,
+      "register": "話",
+      "topic": "history"
+    }
+  ],
+  "89": [
+    {
+      "ja": "今回は、モンゴル帝国の拡大を扱った本を要約していきます。チンギス・ハンの軍というと、屈強な騎馬兵が力で押し切ったイメージがありますよね。でも著者が強調するのは、むしろ情報と移動の仕組みです。帝国は駅伝制と呼ばれる中継の制度を整えることで、遠く離れた地域の様子が素早く届くようにしました。強さの正体は腕力ではなく、このネットワークにあった、というのがこの本の見立てです。",
+      "form": "屈強な",
+      "en": "This time I'm going to summarize a book about the expansion of the Mongol Empire. When people think of Genghis Khan's army, they tend to picture brawny horsemen pushing through by force, right? But what the author emphasizes is, if anything, the systems for information and movement. By setting up a relay system called the post-station system, the empire made sure news of conditions in distant regions arrived quickly. The book's reading is that the true source of its strength lay not in physical might but in this network.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「屈強な兵士」「屈強な男たち」のように、体が大きく力の強そうな人を形容する。",
+      "grammar": ["n4-teiku", "n3-koto-de", "n3-you-ni", "n3-dewa-naku"]
+    },
+    {
+      "ja": "物流倉庫では、重い荷物の積み下ろしを支えるロボットや、腰の負担を抑えるアシストスーツの導入が進んでいる。こうした力仕事は、これまで主に屈強な若手が担うものとされてきた。人手不足が深刻になる中、年齢や性別を問わず働ける環境づくりが急がれている。最近は、カメラとAIで荷物の形や重さの見当をつけ、つかみ方を自動で選ぶ機械も登場している。ただ、導入には費用がかかるため、中小の事業者にはまだ手が届きにくいのが実情だ。",
+      "form": "屈強な",
+      "en": "In logistics warehouses, the introduction of robots that support loading and unloading heavy cargo and assist suits that reduce strain on the lower back is advancing. Until now, this kind of heavy labor was considered something mainly handled by brawny young workers. As the labor shortage becomes severe, creating environments where people can work regardless of age or gender is becoming urgent. Recently, machines have also appeared that use cameras and AI to gauge the shape and weight of packages and automatically choose how to grip them. However, because introducing them is costly, the reality is that they are still hard for small and medium-sized businesses to afford.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「屈強な若手」のように、力仕事を担う体格のよい人を描く言い方。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "仏典には、多くの人を手にかけたアングリマーラという盗賊が登場する。屈強な彼がどれほど走っても、静かに歩む釈迦に追いつけなかったと伝えられる。釈迦は、自分はすでに止まっている、止まっていないのはお前のほうだと諭したという。追いつけなかったのは足が遅いからではなく、止まることのできない心が、彼自身を走らせ続けていたからである。強さとは走り続ける力ではなく、立ち止まる力なのかもしれない。",
+      "form": "屈強な",
+      "en": "In the Buddhist scriptures appears a bandit named Angulimala, who had killed many people. It is said that however hard the brawny man ran, he could not catch up with the Buddha, who walked quietly. The Buddha is said to have admonished him that he himself had already stopped, and that it was Angulimala who had not. He could not catch up not because he was slow, but because a mind unable to stop kept him running. Strength may be not the power to keep running but the power to stand still.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「屈強な彼が〜しても」のように、体の強さが通じない場面を際立たせる使い方もある。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    }
+  ],
+  "45": [
+    {
+      "ja": "今回は、機械学習の入門書を要約していきます。この本の特徴は、各章の終わりに、実際に手を動かす演習がついていることです。たとえば、部屋の広さや駅からの距離をもとに、家賃を予測する小さなモデルを自分で作ってみるわけですね。理論を読んだだけで分かった気になるのを防ぎ、つまずいた場所から理解を深めていく仕組みになっています。数式が苦手な人ほど、まず手を動かしてみてほしい、というのが著者の願いです。",
+      "form": "演習",
+      "en": "This time I'm going to summarize an introductory book on machine learning. What's distinctive about this book is that each chapter ends with exercises where you actually work things out with your own hands. For example, you try building a small model yourself that predicts rent based on things like the size of the room and its distance from the station. It's set up so that you avoid feeling you understand just from having read the theory, and you deepen your understanding from the places where you stumble. The author's hope is that especially people who are weak at math will first try working things out by hand.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「演習問題」「演習がつく」のように、学んだ内容を使ってみる練習を指す。",
+      "grammar": ["n4-teiku"],
+      "sense": "学んだことを身につけるための練習問題。"
+    },
+    {
+      "ja": "一九八三年秋、北大西洋条約機構が行った大規模な軍事演習を、ソ連の指導部の一部が本物の核攻撃の準備ではないかと疑ったとされる。当時は米ソの対立が深まっていた時期で、ソ連側は軍の警戒を強めたという。のちに公開された資料によって、事態が当初考えられていた以上に危うかったことが明らかになった。この出来事は、相手の意図を読み違えることの怖さを示す例として、今も研究者の間で議論が続いている。",
+      "form": "演習",
+      "en": "In the autumn of 1983, part of the Soviet leadership is said to have suspected that a large-scale military exercise held by the North Atlantic Treaty Organization was preparation for a real nuclear attack. It was a period when U.S.-Soviet confrontation was deepening, and the Soviet side reportedly heightened its military alert. Documents released later made clear that the situation had been more dangerous than initially thought. This incident is still debated among researchers as an example showing the danger of misreading an opponent's intentions.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「軍事演習」「合同演習」の形で、本番を想定した訓練を指すことが多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "本番を想定して大規模に行う訓練。"
+    },
+    {
+      "ja": "坐禅は、いつか訪れる悟りに備えた予行演習ではなく、坐ることそのものが悟りの姿である、と道元は説いた。来たるべき日に備えるだけの営みであれば、その日が来た時点で用済みになってしまうだろう。だが坐る一回一回がすでに目的そのものであるなら、そこに準備と実践の区別はない。日々の暮らしもまた、いつか始まる本当の人生のための下ごしらえなどではなかろう。今ここで箸を取り、湯を沸かし、器を洗うこと自体が、すでに修行なのである。",
+      "form": "演習",
+      "en": "Dogen taught that seated meditation is not a rehearsal for an enlightenment that will arrive someday; sitting itself is the form of enlightenment. If it were an activity merely preparing for a day to come, it would become useless once that day arrived. But if each and every sitting is already the goal itself, there is no distinction there between preparation and practice. Our daily lives, too, are surely not groundwork for some true life that will begin someday. Picking up chopsticks, boiling water and washing the bowls here and now is itself already practice.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「予行演習」の形で、本番の前に段取りを確かめる練習を指す。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "本番に備えて行う練習。"
+    }
+  ],
+  "46": [
+    {
+      "ja": "今回は、AI研究の歴史をたどった本を要約していきます。一九八〇年代には、専門家の知識をルールとして書き込むエキスパートシステムが大きな期待を集めました。ところが、現実の判断に必要なルールを書き尽くすのは難しく、研究者たちは別の道を模索することになります。そこで息を吹き返したのが、データから自ら学ぶニューラルネットワークでした。行き詰まりこそが次の発想を生んだ、というのがこの本の読みどころです。",
+      "form": "模索",
+      "en": "This time I'm going to summarize a book tracing the history of AI research. In the 1980s, expert systems, which wrote specialists' knowledge in as rules, attracted great expectations. However, it was difficult to write out all the rules needed for real-world judgment, and researchers would go on to search for a different path. What came back to life then was the neural network, which learns by itself from data. The highlight of this book is that it was the dead end itself that gave birth to the next idea.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「〜を模索する」「道を模索する」の形で、手探りで方法を探す意味になる。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "第二次世界大戦後、ヨーロッパでは二度と戦争を起こさないための仕組みが模索された。一九五二年に発足した欧州石炭鉄鋼共同体は、その答えの一つである。構想の出発点は、一九五〇年にフランスの外相シューマンが発表した提案だった。フランスや西ドイツなど六か国は、軍需産業の土台となる石炭と鉄鋼を共同で管理することで、互いに戦争の準備をしにくくしようとした。この枠組みは、のちに現在の欧州連合へとつながっていく。",
+      "form": "模索",
+      "en": "After World War II, Europe searched for a system to ensure war would never break out again. The European Coal and Steel Community, launched in 1952, was one of the answers. The plan's starting point was a proposal announced in 1950 by French Foreign Minister Schuman. The six countries, including France and West Germany, sought to make it harder for one another to prepare for war by jointly managing coal and steel, the foundation of the arms industry. This framework later led to today's European Union.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「〜が模索されている」のように受け身で使い、まだ答えが出ていない状況を表す。",
+      "grammar": ["n3-koto-de", "n4-teiku"]
+    },
+    {
+      "ja": "三十代で転職を考え始めると、正解が見えないまま、ひとまず動き出すしかないじゃないですか。で、多くの人は綿密な計画を練ってから踏み出そうとするんですけど、それだと結局一歩も前進しなかったりするんですよね。僕は、小規模に試してみて、しっくりこなければ撤退する、くらいの身軽さでいいと思ってて。模索してる期間って、傍から見ると迷走してるだけに映るんですけど、実は適性のない選択肢を一つずつ消去してる時間なんですよ。",
+      "form": "模索",
+      "en": "When you start thinking about changing jobs in your thirties, you've got no choice but to just get moving without being able to see the right answer, right? And most people try to work out a detailed plan before stepping forward, but then in the end they sometimes don't advance a single step. I think it's fine to have the lightness of trying things on a small scale and pulling out if they don't feel right. The period when you're searching for a way looks from the outside like you're just floundering, but actually it's time spent eliminating, one by one, the options you have no aptitude for.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話では「模索してる」「模索中」のように、まだ手探りの段階だと伝えるのに使う。"
+    }
+  ],
+  "286": [
+    {
+      "ja": "今回は、記憶術を扱った本を要約していきます。中でも詳しく紹介されているのが、覚えたいものを頭の中の部屋に一つずつ置いていく『記憶の宮殿』という手法です。たとえば、玄関に買い物リストの牛乳を、廊下に卵を置く、というふうに、よく知っている場所と結びつけるわけですね。起源は古代ギリシャの詩人シモニデスの逸話だとされています。場所の記憶は強い、という人間の性質をうまく使ったやり方なんです。",
+      "form": "手法",
+      "en": "This time I'm going to summarize a book about memory techniques. What it introduces in particular detail is the technique called the 'memory palace,' in which you place the things you want to remember one by one in rooms inside your head. For example, you link them to a place you know well, putting the milk from your shopping list at the front door and the eggs in the hallway. Its origin is said to be an anecdote about the ancient Greek poet Simonides. It's a method that makes good use of a human trait: memory for places is strong.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「〜という手法」「新しい手法を取り入れる」のように、物事を行うための技術ややり方を指す。",
+      "grammar": ["n4-teiku", "n5-teiru"]
+    }
+  ]
+}

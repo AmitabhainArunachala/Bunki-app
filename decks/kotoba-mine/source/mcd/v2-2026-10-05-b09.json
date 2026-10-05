@@ -104,15 +104,15 @@
   ],
   "148": [
     {
-      "ja": "今日は、ブッダのもとを訪れた若者たちのエピソードを紹介します。彼らは森で遊んでいたところ、連れてきた女性に持ち物を盗まれ、必死にその女性を追っていました。ブッダは事情を聞くと、その女性の捜索と自分自身を探し求めることと、どちらが大切かと問いかけたと伝えられています。外で失ったものを追いかける前に、まず自分の内側を見よ、というわけですね。若者たちはこの問いをきっかけに、教えを聞くことになったとされています。",
+      "ja": "今日は、チベット仏教に伝わる、ちょっと変わった後継者の選び方を紹介します。チベットでは、位の高い僧は亡くなったあと、まもなくどこかの子どもとして生まれ変わると信じられてきました。そこで弟子たちは、聖なる湖に浮かんだ光景などを手がかりに各地へ散らばり、その子どもの捜索に何年もかけることがあったんです。候補が見つかると、前の僧の遺品をほかの品と並べ、正しい物を選び取れるかどうかで確かめたとされています。つまり、後継者は選挙や血筋ではなく、生まれ変わりの見極めによって決まるわけですね。",
       "form": "捜索",
-      "en": "Today I'll introduce an episode about some young men who came to see the Buddha. While they were amusing themselves in a forest, a woman they had brought along stole their belongings, and they were desperately chasing after her. It is told that when the Buddha heard what had happened, he asked them which was more important, the search for that woman or seeking themselves. The point is that before chasing what you have lost outside, you should first look within. With this question as the trigger, the young men are said to have ended up listening to his teaching.",
+      "en": "Today I'd like to introduce a somewhat unusual way of choosing a successor that has been handed down in Tibetan Buddhism. In Tibet, it has long been believed that a high-ranking monk, after dying, is soon reborn as a child somewhere. So his disciples would fan out across the land, using clues such as a scene that appeared on a sacred lake, and sometimes spent years searching for that child. When a candidate was found, it is said they laid out the former monk's belongings alongside other items and checked whether the child could pick out the right ones. In other words, the successor is decided not by election or bloodline but by identifying the rebirth.",
       "original": true,
       "register": "講",
       "topic": "india",
-      "tipJa": "「捜索」は行方のわからない人や物を組織的に探すときの硬い語。日常の探し物には「探す」。",
-      "grammar": ["n5-teiru", "n3-koto-ni-naru"],
-      "sense": "いなくなった人や物を探すこと"
+      "tipJa": "「捜索」は手がかりをたどって組織的に探すときの硬い語。日常の探し物には「探す」。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "居場所のわからない人を手を尽くして探し出すこと"
     },
     {
       "ja": "半導体の技術情報を海外の企業に不正に渡したとして、警察は不正競争防止法違反の疑いで、元社員の自宅などを捜索した。警察によると、元社員は退職する前の数か月間に、大量の技術資料を私物の記録媒体にコピーしていた疑いがある。押収したパソコンなどを分析し、情報がどのような経路で渡ったのか詳しく調べる方針だ。技術の流出をめぐる摘発は近年相次いでおり、企業の側にも管理の見直しが求められている。",
@@ -285,9 +285,9 @@
       "grammar": ["n3-you-ni", "n5-teiru"]
     },
     {
-      "ja": "毎朝の出勤を、私たちは仕事が始まる前の、早く過ぎてほしい時間として扱っている。だが禅の寺では、掃除や畑仕事もまた修行とされ、何をするかより、どう向き合うかが問われる。そう考えれば、駅までの道のりも、電車の揺れも、ただ通り過ぎるための空白ではなく、それ自体がひとつの時間なのである。目的地にたどり着くことばかりを急げば、人生の大半は途中として捨てられてしまうだろう。",
+      "ja": "私たちはどこかで、出勤して仕事に取りかかった時点で、ようやくその日が本当に始まると思い込んでいる。だが禅の寺では、掃除や畑仕事もまた修行とされ、何をするかより、どう向き合うかが問われる。そう考えれば、駅までの道のりも、電車の揺れも、ただ通り過ぎるための空白ではなく、それ自体がひとつの時間なのである。目的地にたどり着くことばかりを急げば、人生の大半は途中として捨てられてしまうだろう。",
       "form": "出勤",
-      "en": "We treat our morning trip to work as time before work starts that we want to pass quickly. But in Zen temples, cleaning and fieldwork are also regarded as practice, and what matters is less what you do than how you engage with it. Seen that way, the walk to the station and the swaying of the train are not blank spaces just to pass through but a time in their own right. If we hurry only to reach our destination, most of life will be thrown away as merely being on the way.",
+      "en": "Somewhere in our minds we assume that the day only truly begins at the moment we arrive at work and get down to the job. But in Zen temples, cleaning and fieldwork are also regarded as practice, and what matters is less what you do than how you engage with it. Seen that way, the walk to the station and the swaying of the train are not blank spaces just to pass through but a time in their own right. If we hurry only to reach our destination, most of life will be thrown away as merely being on the way.",
       "original": true,
       "register": "論",
       "topic": "india",
@@ -296,9 +296,9 @@
   ],
   "154": [
     {
-      "ja": "今日は、片付けがなかなか終わらない人に共通する落とし穴についてお話しします。それは、物があふれて困ったとき、まず新しい収納家具を買ってしまうことです。入れる場所が増えると一時的には部屋がすっきりしますが、物の量そのものは変わらないので、しばらくすると元に戻ってしまいます。大事なのは、しまい方を工夫する前に、本当に必要な物を選び直すことなんですね。片付けとは、しまう技術ではなく、自分が何を大切にしたいかを決める作業だというわけです。",
+      "ja": "今日は、片付けがいつまでも終わらない人に共通する落とし穴についてお話しします。それは、物があふれて手に負えなくなったとき、真っ先に新しい収納家具を買い込んでしまうことです。しまう場所が増えれば一時的に部屋はすっきりしますが、持ち物の総量は変わらないので、しばらくすると元の散らかった状態に逆戻りしてしまいます。肝心なのは、しまい方を工夫する前に、本当に必要な物を見極めて手放す決断をすることなんですね。片付けとは、収める技術ではなく、自分が何を大切にしたいかを問い直す作業だというわけです。",
       "form": "収納家具",
-      "en": "Today I'll talk about a pitfall common to people who never seem to finish tidying up. It's that when things overflow and they're stuck, the first thing they do is buy new storage furniture. When there's more space to put things, the room looks neat for a while, but because the amount of stuff itself hasn't changed, before long it goes back to how it was. What matters is choosing again what you really need before getting clever about how you store it. In other words, tidying up is not a storage technique but the work of deciding what you want to treasure.",
+      "en": "Today I'll talk about a pitfall common to people whose tidying up never seems to end. It's that when things overflow and get out of hand, the very first thing they do is buy new storage furniture. With more places to put things, the room looks neat for a while, but because the total amount of belongings hasn't changed, before long it slides back into its old cluttered state. What matters is, before getting clever about how you store things, to identify what you really need and make the decision to let go of the rest. In other words, tidying up is not a technique for putting things away but the work of asking yourself again what you want to treasure.",
       "original": true,
       "register": "講",
       "topic": "mind",

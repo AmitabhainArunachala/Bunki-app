@@ -71,9 +71,9 @@
   ],
   "164": [
     {
-      "ja": "今回取り上げるのは、台湾のTSMCという会社が、なぜ半導体の受託製造で世界のトップに立てたのか、という話です。創業者のモリス・チャンが選んだのは、自社の製品を持たず、他社のチップを作ることに専念するというやり方でした。お客さんから見れば、自分たちのアイデアを盗まれる心配がないわけですね。そのうえで、注文の変更やトラブルにも迅速に応えることで、信頼を積み上げてきたと言われています。ライバルと張り合うのではなく、黒子に徹したことが最大の武器になったんです。",
+      "ja": "今回取り上げるのは、台湾のTSMCという会社が、なぜ半導体の受託製造で世界のトップに立てたのか、という話です。創業者のモリス・チャンが選んだのは、自社の製品を持たず、他社のチップを作ることに専念するというやり方でした。お客さんから見れば、自分たちのアイデアを盗まれる心配がないわけですね。そのうえで、注文の変更やトラブルが起きても、お客さんを何週間も待たせたりせずに迅速に応えることで、信頼を積み上げてきたと言われています。ライバルと張り合うのではなく、黒子に徹したことが最大の武器になったんです。",
       "form": "迅速",
-      "en": "What I'm taking up this time is why the Taiwanese company TSMC was able to reach the top of the world in contract chip manufacturing. What founder Morris Chang chose was a model of having no products of its own and devoting itself to making other companies' chips. From the customer's point of view, there's no worry about having their ideas stolen. On top of that, it is said to have built up trust by responding swiftly even to order changes and problems. Rather than going head to head with rivals, sticking to a behind-the-scenes role became its greatest weapon.",
+      "en": "What I'm taking up this time is why the Taiwanese company TSMC was able to reach the top of the world in contract chip manufacturing. What founder Morris Chang chose was a model of having no products of its own and devoting itself to making other companies' chips. From the customer's point of view, there's no worry about having their ideas stolen. On top of that, it is said to have built up trust by responding swiftly to order changes and problems, without keeping customers waiting for weeks. Rather than going head to head with rivals, sticking to a behind-the-scenes role became its greatest weapon.",
       "original": true,
       "register": "講",
       "topic": "ai",
@@ -266,9 +266,9 @@
   ],
   "248": [
     {
-      "ja": "今日は、アメリカの公民権法がどうやって成立したのか、という話です。人種による差別を禁じるこの法案に対し、上院の反対派は延々と演説を続けることで、採決を先延ばしにしました。議論は約2か月にわたって止まりましたが、賛成派は粘り強く票を集め、ついに引き延ばしを打ち切って法案は可決されます。そして1964年7月、ジョンソン大統領が署名して法律が成立しました。キング牧師たちの運動が世論を動かしていたことも、大きな後押しになったわけですね。",
+      "ja": "今日は、アメリカの公民権法がどうやって成立したのか、という話です。人種による差別を禁じるこの法案に対し、上院の反対派は延々と演説を続けることで、採決を先延ばしにしました。演説による引き延ばしは約2か月に及びましたが、賛成派は粘り強く票を集めてついに討論を打ち切り、法案は可決されます。そして1964年7月、ジョンソン大統領が署名して法律が成立しました。キング牧師たちの運動が世論を動かしていたことも、大きな後押しになったわけですね。",
       "form": "可決",
-      "en": "Today's topic is how the American Civil Rights Act came to pass. Opponents in the Senate put off the vote on this bill banning racial discrimination by making speeches that went on and on. The debate was stalled for about two months, but supporters patiently gathered votes, finally cut off the delaying tactics, and the bill was passed. Then in July 1964, President Johnson signed it and it became law. The way the movement of Dr. King and others had been swaying public opinion was also a big push, you see.",
+      "en": "Today's topic is how the American Civil Rights Act came to pass. Opponents in the Senate put off the vote on this bill banning racial discrimination by making speeches that went on and on. The stalling by speeches dragged on for about two months, but supporters patiently gathered votes, finally cut off debate, and the bill was passed. Then in July 1964, President Johnson signed it and it became law. The way the movement of Dr. King and others had been swaying public opinion was also a big push, you see.",
       "original": true,
       "register": "講",
       "topic": "history",
@@ -309,26 +309,25 @@
       "sense": "取り除くべき物質などが、そのまま残っていること"
     },
     {
-      "ja": "2016年6月、イギリスで欧州連合への加盟を続けるかどうかを問う国民投票が行われた。投票前の世論調査では、残留がわずかに上回るとの見方が多かった。しかし開票の結果、抜けるべきだとする票が約52パーセントを占め、市場には大きな動揺が広がった。投票を呼びかけた当時の政権トップ、キャメロン氏は、結果を受けて辞任を表明した。その後の交渉は難航し、正式に欧州連合を出たのは2020年1月末のことだった。",
+      "ja": "2016年6月、イギリスで欧州連合への加盟を続けるかどうかを問う国民投票が行われた。投票前の世論調査では、残留がわずかに上回るとの見方が多かった。しかし開票の結果、脱退を支持する票が約52パーセントを占め、市場には大きな動揺が広がった。国民投票の実施を公約に掲げていた保守党のキャメロン党首は、結果を受けて辞任を表明した。その後の交渉は難航し、イギリスが正式に欧州連合から脱退したのは2020年1月末のことだった。",
       "form": "残留",
-      "en": "In June 2016, Britain held a referendum asking whether to continue its membership of the European Union. In pre-vote opinion polls, many expected Remain to come out slightly ahead. But when the votes were counted, those saying the country should leave took about 52 percent, and great turmoil spread through the markets. Mr. Cameron, then head of the government, who had called the vote, announced his resignation in response to the result. The negotiations that followed were difficult, and Britain formally left the European Union at the end of January 2020.",
+      "en": "In June 2016, Britain held a referendum asking whether to continue its membership of the European Union. In pre-vote opinion polls, many expected Remain to come out slightly ahead. But when the votes were counted, ballots in favour of withdrawal took about 52 percent, and great turmoil spread through the markets. Conservative leader David Cameron, who had pledged to hold the referendum, announced his resignation in response to the result. The negotiations that followed were difficult, and it was at the end of January 2020 that Britain formally withdrew from the European Union.",
       "original": true,
       "register": "報",
       "topic": "history",
       "tipJa": "国民投票などでは「残留」と「離脱」が対になる。",
-      "grammar": [],
       "sense": "ほかが去ったあとも、その場にとどまること"
     },
     {
-      "ja": "仏教には、煩悩そのものを断ち切ったあとにも、その癖のようなものが心に染みつくという考え方がある。香を焚いた箱から香木を取り出しても、しばらく香りが消えないのと同じである。悟りを開いた弟子でさえ、長年の高慢な口癖が、ふとした言葉づかいに表れたという話も伝わっている。心に残留する癖は、決意一つで消えるものではないのだろう。だからこそ、毎日少しずつ水を替えるように、心を洗い続ける営みが必要になるのである。",
+      "ja": "ヒンドゥー教では古くから、ガンジス川で身を清めれば罪が洗い流されると信じられてきた。ところが現実のガンジス川は、流域の都市から出る下水や工場の排水を大量に受け止めている。有害な金属は水に溶けて流れ去るとは限らず、川底の泥に長く残留することがある。人の汚れを引き受けてきた川が、その汚れを自分では流しきれなくなっているのである。清めるという営みは、清める側の水を守ることから始めなければならないのだろう。",
       "form": "残留",
-      "en": "Buddhism has the idea that even after the defilements themselves have been cut off, something like their habits stays ingrained in the mind. It is just as when the scent does not fade for a while even after the fragrant wood is taken out of a box in which incense was burned. There is even a story that in a disciple who had attained enlightenment, a long-standing arrogant way of talking showed up in a casual choice of words. The habits that remain in the mind probably do not vanish with a single resolution. That is exactly why the practice of continuing to wash the mind, as if changing the water little by little every day, becomes necessary.",
+      "en": "In Hinduism it has long been believed that bathing in the Ganges washes away one's sins. Yet the real Ganges takes in huge amounts of sewage from the cities along its banks and wastewater from factories. Harmful metals do not necessarily dissolve and flow away; they can remain for a long time in the mud of the riverbed. A river that has taken on people's impurities is becoming unable to wash those impurities away by itself. The work of purifying must probably begin by protecting the water that does the purifying.",
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "「心に残留する」のように、取り除いたはずのものがあとまで残る比喩にも使える。",
-      "grammar": ["n3-you-ni", "n5-teiru"],
-      "sense": "取り除いたあとにも、その場に残り続けること"
+      "tipJa": "「川底に残留する」「残留農薬」のように、なくなるべき物質があとまで残るときに使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "取り除くべき物質などが、そのまま残っていること"
     }
   ]
 }

@@ -113,8 +113,7 @@
       "register": "講",
       "topic": "history",
       "tipJa": "国際政治学の用語。「覇権安定論によれば」「覇権安定論の立場から」の形で使うことが多い。",
-      "grammar": ["n4-teiku"],
-      "sense": ""
+      "grammar": ["n4-teiku"]
     },
     {
       "ja": "AIをめぐる国際的なルール作りが進まない背景を、覇権安定論から読み解く見方がある。戦後の自由貿易は、圧倒的な力を持つアメリカが仕組みを用意し、各国を引っ張ってきたことで支えられてきた、とする考え方だ。ところが先端技術の分野では、米中がそれぞれ独自の基準や輸出管理を打ち出し、ひとつの国が全体をまとめる構図は崩れつつある。共通の約束事を誰が用意し、誰が守らせるのかが見えないまま、各国の規制はばらばらに進んでいる。まとめ役の不在が議論を難しくしている、と指摘する専門家は少なくない。",
@@ -124,8 +123,7 @@
       "register": "報",
       "topic": "ai",
       "tipJa": "報道や解説では「覇権安定論から読み解く」「覇権安定論が示すように」の形で引かれる。",
-      "grammar": ["n3-koto-de", "n5-teiru"],
-      "sense": ""
+      "grammar": ["n3-koto-de", "n5-teiru"]
     },
     {
       "ja": "国際関係の授業で覇権安定論が出てきたら、定義を暗記するだけで終わらせないのがコツです。まず「一つの強い国が秩序を支えると世界経済は安定する」という主張を、自分の言葉で説明できるように短くまとめてみましょう。次に、その主張に当てはまらない例を自分で探してみてください。たとえば、大国の力が弱まっても、各国の協力の仕組みが残って秩序が保たれた例はないか、と考えるわけです。反例とセットで覚えた理論は、論述問題でも崩れにくい知識になります。",
@@ -135,8 +133,7 @@
       "register": "学",
       "topic": "mind",
       "tipJa": "学術用語は「覇権安定論とは何か」を自分の言葉で言い直し、反例とセットで押さえると定着する。",
-      "grammar": ["n3-you-ni"],
-      "sense": ""
+      "grammar": ["n3-you-ni"]
     }
   ],
   "182": [
@@ -148,8 +145,7 @@
       "register": "講",
       "topic": "history",
       "tipJa": "「日米貿易摩擦」「米中貿易摩擦」のように国名を前につけ、「貿易摩擦が激化する」とも言う。",
-      "grammar": ["n3-koto-ni-naru", "n4-teiku"],
-      "sense": ""
+      "grammar": ["n3-koto-ni-naru", "n4-teiku"]
     },
     {
       "ja": "AI向けの先端半導体をめぐり、米中の貿易摩擦が長期化している。アメリカは安全保障上の理由から、最先端の演算用チップや製造装置の対中輸出を規制し、同盟国にも同調を求めてきた。中国はこれに対し、半導体の材料に使われるガリウムなどの輸出管理を強めた。規制の応酬は両国だけでなく、部品や装置を供給する各国の企業の計画にも影響を及ぼしている。かつての日米の対立が自動車や鉄鋼といった完成品をめぐるものだったのに対し、今回は技術そのものが焦点になっている。",
@@ -159,8 +155,7 @@
       "register": "報",
       "topic": "ai",
       "tipJa": "報道では「貿易摩擦が長期化・激化する」「貿易摩擦をめぐり」の形が多い。",
-      "grammar": ["n5-teiru"],
-      "sense": ""
+      "grammar": ["n5-teiru"]
     },
     {
       "ja": "「貿易摩擦」って言葉、よく考えると面白くないですか。摩擦って、もともとは物と物がこすれ合って熱が出るとか、動きが止まるとか、物理の話じゃないですか。それが国と国の、輸出とか輸入をめぐるぎくしゃくした関係にも使われてるんですよね。たぶん、完全に決別してるわけじゃないけど、お互いに引っかかって熱くなってる感じを言いたいんだと思うんです。戦争って言っちゃうと大げさだけど、摩擦ならちょうどいい温度感なんですよ。",
@@ -170,21 +165,19 @@
       "register": "話",
       "topic": "language",
       "tipJa": "物理の「摩擦」を国どうしの関係に転用した語。全面的な対立ではない、ぎくしゃくした状態を指す。",
-      "grammar": ["n3-wake-dewa-nai"],
-      "sense": ""
+      "grammar": ["n3-wake-dewa-nai"]
     }
   ],
   "186": [
     {
-      "ja": "今回は、戦後の世界経済の土台になったブレトン・ウッズ協定を見ていきます。1944年、第二次世界大戦がまだ続く中、連合国の代表がアメリカのブレトン・ウッズという町に集まりました。そこで決まったのは、ドルを一定の価格で金と交換できるようにし、各国の通貨はドルに対する為替レートを固定する、という仕組みです。あわせて、国際通貨基金や世界銀行もこのとき作られることになったんですね。1971年にアメリカがドルと金の交換を停止したことで、この体制は大きく揺らいでいきます。",
+      "ja": "今回は、戦後の世界経済の土台になったブレトン・ウッズ協定を見ていきます。1944年、第二次世界大戦がまだ続く中、四十四か国の代表がアメリカの小さな町に集まり、通貨のルールを定めた文書に署名しました。その中身は、ドルを一定の価格で金と交換できるようにし、各国の通貨はドルに対する為替レートを固定する、というものです。あわせて、国際通貨基金や世界銀行もこのとき作られることになったんですね。1971年にアメリカがドルと金の交換を停止したことで、この仕組みは大きく揺らいでいきます。",
       "form": "協定",
-      "en": "This time we'll look at the Bretton Woods Agreement, which became the foundation of the postwar world economy. In 1944, while the Second World War was still going on, representatives of the Allies gathered in a town in America called Bretton Woods. What was decided there was a system in which the dollar could be exchanged for gold at a fixed price, and each country's currency had a fixed exchange rate against the dollar. Along with that, it was decided at this time to create the International Monetary Fund and the World Bank. When America suspended the exchange of dollars for gold in 1971, this system was badly shaken.",
+      "en": "This time we'll look at the Bretton Woods Agreement, which became the foundation of the postwar world economy. In 1944, while the Second World War was still going on, representatives of forty-four countries gathered in a small town in America and signed a document setting out the rules for currencies. Its content was that the dollar could be exchanged for gold at a fixed price, and each country's currency had a fixed exchange rate against the dollar. Along with that, it was decided at this time to create the International Monetary Fund and the World Bank. When America suspended the exchange of dollars for gold in 1971, this arrangement was badly shaken.",
       "original": true,
       "register": "講",
       "topic": "history",
       "tipJa": "「〜協定を結ぶ・締結する」のように、国どうしが話し合って決めた取り決めの名前によく使う。",
-      "grammar": ["n4-teiku", "n3-you-ni", "n3-koto-ni-naru", "n3-koto-de"],
-      "sense": ""
+      "grammar": ["n4-teiku", "n3-you-ni", "n3-koto-ni-naru", "n3-koto-de"]
     },
     {
       "ja": "1986年に結ばれた日米の半導体協定は、半導体をめぐる国際関係の転機として今も語られる。当時、日本の電機大手はメモリーの分野で急速に力をつけ、アメリカのメーカーは苦境に立たされていた。取り決めでは、日本製品の不当な安売りを防ぐことに加え、外国製の半導体が日本市場でもっと売れるようにすることも求められた。その後、日本勢の勢いは次第に衰え、韓国や台湾の企業が存在感を増していく。この取り決めの影響をどう評価するかは、今も専門家の間で意見が分かれている。",
@@ -194,8 +187,7 @@
       "register": "報",
       "topic": "ai",
       "tipJa": "「〜協定が結ばれる」のように、国家間の分野ごとの取り決めに使う。報道では受け身が多い。",
-      "grammar": ["n3-you-ni", "n4-teiku", "n5-teiru"],
-      "sense": ""
+      "grammar": ["n3-you-ni", "n4-teiku", "n5-teiru"]
     },
     {
       "ja": "記事を書くとき、国どうしの約束を表す言葉を同じつもりで使うと、読み手を混乱させることがあります。一般に、条約は国と国が文書で結び、議会の承認などの手続きを経る重い約束を指します。協定も法的にはほぼ同じ性質を持つことがありますが、特定の分野の実務的な取り決めの名前に使われることが多い言葉です。合意はさらに広く、文書にしていない話し合いの結果まで含みます。正式な名称があるときはそれに従い、迷ったら元の文書の呼び方を確かめるのがいちばん確実です。",
@@ -204,9 +196,7 @@
       "original": true,
       "register": "語",
       "topic": "language",
-      "tipJa": "「条約」「合意」との使い分けに注意。分野別の実務的な取り決めの名前に「協定」が多い。",
-      "grammar": [],
-      "sense": ""
+      "tipJa": "「条約」「合意」との使い分けに注意。分野別の実務的な取り決めの名前に「協定」が多い。"
     }
   ],
   "188": [
@@ -218,8 +208,7 @@
       "register": "講",
       "topic": "history",
       "tipJa": "「財閥解体」「〜財閥」のように、一族が多くの企業を支配した戦前の企業集団を指すことが多い。",
-      "grammar": ["n3-koto-ni-naru"],
-      "sense": ""
+      "grammar": ["n3-koto-ni-naru"]
     },
     {
       "ja": "韓国の半導体産業は、財閥系の大企業が引っ張ってきた。サムスン電子はメモリー半導体で世界最大手の地位を長く保ち、SKハイニックスも生成AI向けの高速メモリーで存在感を高めている。創業家が経営の大きな決定に関わる体制は、巨額の投資を素早く決められる強みになってきたとされる。一方で、富と影響力が一部の一族に集まることへの批判も根強く、経営の透明性を高めるように求める声が続いている。",
@@ -229,26 +218,24 @@
       "register": "報",
       "topic": "ai",
       "tipJa": "「財閥系企業」「財閥グループ」のように、他の語と組み合わせて使われることも多い。",
-      "grammar": ["n5-teiru", "n3-you-ni"],
-      "sense": ""
+      "grammar": ["n5-teiru", "n3-you-ni"]
     },
     {
-      "ja": "英語で韓国の大企業グループのことを「チェボル」って言うんですけど、これ、もとは日本語の「財閥」と同じ漢字なんですよ。漢字を韓国語で読んだ音が、そのまま英語に入ったんですよね。で、面白いのは、日本だとこの言葉、なんか教科書に出てくる昔の話っぽく聞こえるじゃないですか。でも韓国だと、今もニュースで毎日のように出てくる現役の言葉なんですよ。同じ漢字でも、国によって温度感が全然ちがうっていうのは、けっこう興味深いですよね。",
+      "ja": "インドのタタ・グループは、塩から鉄鋼、自動車、情報技術までを手がける巨大な企業集団である。創業家の一族が長く経営を担ってきたという点では、財閥の一つに数えられるだろう。だが、グループを束ねる持ち株会社の株の多くは慈善事業を行う信託が持っており、その利益は教育や研究にも回されてきた。稼いだ富を一族の手に留めず、社会へと流していく仕組みが、この集団に独特の性格を与えている。企業の大きさそのものより、その富がどこへ向かうのかこそ問われるべきなのかもしれない。",
       "form": "財閥",
-      "en": "In English, Korean big business groups are called chaebol, and that actually comes from the same kanji as the Japanese word zaibatsu. The Korean reading of those kanji went straight into English. And the interesting thing is, in Japan this word sounds kind of like old history from a textbook, right? But in Korea it's a live word that still shows up in the news practically every day. It's pretty fascinating that the same kanji can have a totally different temperature depending on the country.",
+      "en": "India's Tata Group is a huge business conglomerate that handles everything from salt to steel, cars and information technology. In that the founding family has long been in charge of running it, it could be counted as one of the zaibatsu-type groups. However, much of the stock in the holding company that ties the group together is owned by trusts that do charitable work, and their profits have also been channeled into education and research. A system that does not keep the wealth earned in the family's hands but lets it flow out into society gives this group its distinctive character. Perhaps what should be asked is not the size of a company itself but where its wealth goes.",
       "original": true,
-      "register": "話",
-      "topic": "language",
-      "tipJa": "日本語では主に戦前の企業集団を指す歴史的な響きの語。韓国の「チェボル」と同じ漢字。",
-      "grammar": ["n3-you-ni"],
-      "sense": ""
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「財閥の一つに数える」のように、一族支配の企業集団という性格に注目して他国の例にも使える。",
+      "grammar": ["n4-teiku"]
     }
   ],
   "189": [
     {
-      "ja": "今回は、モンゴル帝国がなぜあれほど短い期間に広い地域を手に入れられたのかを考えます。チンギス・ハンの軍は、ほぼ全員が馬に乗った騎兵で、移動の速さが他国の軍とは桁違いでした。さらに、攻める前に商人などを通じて相手の国の情報を集め、弱いところを正確に突いたと言われています。1219年に始まった中央アジアのホラズムへの遠征でも、こうした戦い方で大きな都市を次々に制圧していったんですね。強さの秘密は、馬の速さだけでなく、情報と組織にあったわけです。",
+      "ja": "今回は、モンゴル帝国がなぜあれほど短い期間に広い地域を手に入れられたのかを考えます。チンギス・ハンの軍は、ほぼ全員が騎兵で、移動の速さが他国の軍とは桁違いでした。さらに、攻める前に商人などを通じて相手の国の情報を集め、弱いところを正確に突いたと言われています。1219年に始まった中央アジアのホラズムへの遠征でも、こうした戦い方で大きな都市を次々に制圧していったんですね。強さの秘密は、馬の速さだけでなく、情報と組織にあったわけです。",
       "form": "制圧",
-      "en": "This time let's think about why the Mongol Empire was able to take over such a vast area in such a short time. Genghis Khan's army was made up almost entirely of mounted cavalry, and its speed of movement was in a different league from other countries' armies. What's more, it is said that before attacking they gathered information on the enemy country through merchants and others, and struck precisely at its weak points. In the campaign against Khwarazm in Central Asia that began in 1219, too, they brought one big city after another under control with this way of fighting. The secret of their strength lay not only in the speed of their horses but in information and organization.",
+      "en": "This time let's think about why the Mongol Empire was able to take over such a vast area in such a short time. Genghis Khan's army was made up almost entirely of cavalry, and its speed of movement was in a different league from other countries' armies. What's more, it is said that before attacking they gathered information on the enemy country through merchants and others, and struck precisely at its weak points. In the campaign against Khwarazm in Central Asia that began in 1219, too, they brought one big city after another under control with this way of fighting. The secret of their strength lay not only in the speed of their horses but in information and organization.",
       "original": true,
       "register": "講",
       "topic": "history",
@@ -288,19 +275,7 @@
       "register": "講",
       "topic": "history",
       "tipJa": "「交渉が決裂する」が最も典型的な組み合わせ。話し合いが物別れに終わる場面で使う。",
-      "grammar": ["n3-koto-ni-naru"],
-      "sense": ""
-    },
-    {
-      "ja": "2023年、ハリウッドの脚本家の労働組合と制作会社側の団体との交渉が決裂し、脚本家たちはおよそ五か月に及ぶストライキに入った。大きな焦点の一つは、生成AIの使い方だった。脚本家側は、AIが書いた文章が原作のように扱われ、自分たちの報酬や功績が減らされることを恐れていた。最終的な合意には、AIが書いたものを脚本家の作品として扱わないことや、脚本家にAIの使用を強制しないことなどが盛り込まれた。",
-      "form": "決裂",
-      "en": "In 2023, negotiations between Hollywood screenwriters' union and the body representing the production companies broke down, and the writers went on a strike that lasted about five months. One of the main points of contention was how generative AI would be used. The writers feared that text written by AI would be treated like source material and that their pay and credit would be cut. The final agreement included provisions such as not treating material written by AI as a writer's work and not forcing writers to use AI.",
-      "original": true,
-      "register": "報",
-      "topic": "ai",
-      "tipJa": "報道では「交渉が決裂し、〜に入った」のように、決裂の後の行動とセットで書かれることが多い。",
-      "grammar": ["n3-you-ni"],
-      "sense": ""
+      "grammar": ["n3-koto-ni-naru"]
     },
     {
       "ja": "交渉ごとって、決裂しそうになったときにどうするかで差がつくと思うんですよ。そこでムキになって条件をつり上げちゃう人、けっこういるじゃないですか。でも、いったん「今日はここまでにしましょう」って席を立つほうが、だいたいうまくいくんですよね。時間を置くことで、相手も自分も頭が冷えて、さっきまで見えてなかった落としどころが見えてきたりするんで。勝ち負けより、話を続けられる関係を残すほうが大事っていうか。",
@@ -310,8 +285,17 @@
       "register": "話",
       "topic": "mind",
       "tipJa": "「決裂しそうになる」「決裂寸前」のように、話し合いが物別れになる手前の場面でも使う。",
-      "grammar": ["n3-koto-de"],
-      "sense": ""
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "伝承によれば、釈迦が亡くなっておよそ百年後、戒律の解釈をめぐって教団の中で激しい議論が起きた。金銭の布施を受け取ってよいかどうかなど、細かな点で意見が合わず、話し合いは決裂して、教団は二つの流れに分かれたとされる。だが、分かれたことで仏教が衰えたわけではなく、それぞれの土地で新しい花を咲かせていった。分かれることは終わりではなく、始まりにもなりうるのである。",
+      "form": "決裂",
+      "en": "According to tradition, about a hundred years after the Buddha's death, a fierce debate broke out within the order over the interpretation of the monastic rules. It is said that opinions clashed on fine points, such as whether monks could accept donations of money, the talks broke down, and the order split into two streams. Yet the split did not make Buddhism decline; it went on to bloom anew in each land. Dividing is not an end, and it can also be a beginning.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「話し合いが決裂する」のように、意見がまとまらず物別れに終わることを言う。",
+      "grammar": ["n3-koto-de", "n3-dewa-naku"]
     }
   ],
   "191": [
@@ -338,9 +322,9 @@
       "sense": "神経系で、情報を処理して指令を出す中心の部分。"
     },
     {
-      "ja": "台湾は、世界の半導体供給網の中枢を担っている。受託生産の最大手TSMCを中心に、最先端の半導体の大半が台湾で作られており、AI向けの演算チップもその多くを頼っている。AI向けの需要が急増するなか、その重みは一段と増している。各国はこの集中を危うさとみて、アメリカや日本、ドイツなどでの工場建設を後押ししている。ただ、技術者の確保や費用の高さが壁となり、生産の分散には時間がかかるとの見方が多い。",
+      "ja": "台湾は、世界の半導体供給網の中枢を担っている。受託生産の最大手TSMCを中心に、最先端の半導体の大半が台湾で作られており、AIを開発する企業の多くも演算チップを台湾からの供給に頼っている。AI向けの需要が急増するなか、その重みは一段と増している。各国はこの集中をリスクとみて、アメリカや日本、ドイツなどでの工場建設を後押ししている。ただ、技術者の確保や費用の高さが壁となり、生産の分散には時間がかかるとの見方が多い。",
       "form": "中枢",
-      "en": "Taiwan sits at the core of the world's semiconductor supply chain. Centered on TSMC, the largest contract manufacturer, most of the most advanced chips are made in Taiwan, and computing chips for AI also largely depend on it. As demand for AI surges, that weight is growing even further. Countries see this concentration as a vulnerability and are backing factory construction in places such as the United States, Japan and Germany. However, many observers believe that securing engineers and high costs will stand in the way, and that spreading production out will take time.",
+      "en": "Taiwan sits at the core of the world's semiconductor supply chain. Centered on TSMC, the largest contract manufacturer, most of the most advanced chips are made in Taiwan, and many companies developing AI also rely on supply from Taiwan for their computing chips. As demand for AI surges, that weight is growing even further. Countries see this concentration as a risk and are backing factory construction in places such as the United States, Japan and Germany. However, many observers believe that securing engineers and high costs will stand in the way, and that spreading production out will take time.",
       "original": true,
       "register": "報",
       "topic": "ai",

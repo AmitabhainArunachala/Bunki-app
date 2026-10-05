@@ -23,14 +23,14 @@
       "sense": "制度や仕組みを、実際に動かして使っていくこと。"
     },
     {
-      "ja": "仏教の戒律は、初めから一つの体系として作られたわけではない。伝承によれば、修行者の間で問題が起きるたびに、ブッダがその都度きまりを定めていったという。だからこそ後の時代の僧たちは、条文の文字よりも、その背後にある意図を問わざるを得なかった。土地も気候も違う国へ教えが伝わるとき、きまりの運用には常に解釈の幅がつきまとったのである。規則は守るためにあるが、生かすためにもあるのだろう。",
+      "ja": "仏教の戒律は、初めから一つの体系として作られたわけではない。伝承によれば、修行者の間で問題が起きるたびに、ブッダがその都度きまりを定めていったという。だからこそ後の時代の僧たちは、条文の文字よりも、その背後にある意図を問わざるを得なかった。土地も気候も違う国へ教えが伝わるとき、戒律の運用には常に解釈の余地が残ったのである。規則は守るためにあるが、生かすためにもあるのだろう。",
       "form": "運用",
-      "en": "The Buddhist monastic precepts were not created as a single system from the start. According to tradition, each time a problem arose among the practitioners, the Buddha laid down a rule then and there. That is precisely why monks of later ages could not help asking about the intent behind a rule rather than its letter. When the teaching travelled to lands with different terrain and climate, applying the rules always came with room for interpretation. Rules exist to be kept, but perhaps also to be brought to life.",
+      "en": "The Buddhist monastic precepts were not created as a single system from the start. According to tradition, each time a problem arose among the practitioners, the Buddha laid down a rule then and there. That is precisely why monks of later ages could not help asking about the intent behind a rule rather than its letter. When the teaching travelled to lands with different terrain and climate, applying the precepts always left room for interpretation. Rules exist to be kept, but perhaps also to be brought to life.",
       "original": true,
       "register": "論",
       "topic": "india",
       "tipJa": "「法律の運用」「制度の運用」のように、決まりを実際に当てはめる場面でも使う。",
-      "grammar": ["n3-wake-dewa-nai"],
+      "grammar": ["n3-wake-dewa-nai", "n2-zaru-o-enai"],
       "sense": "制度や仕組みを、実際に動かして使っていくこと。"
     }
   ],
@@ -46,13 +46,12 @@
       "grammar": ["n4-teiku"]
     },
     {
-      "ja": "仏教の因果の考え方は、どこか利息の仕組みに似ている。小さな行いもそのまま消えることはなく、時を経て結果となって返ってくるという。しかも、怒りや欲から出た行いほど、まるで利子が利子を呼ぶように、思わぬ大きさになって自分の身に戻ってくるように見える。だから昔の僧は、大きな善行を誇るより、目の前の小さな選択こそ慎むよう説いたのだろう。借りを作らない生き方とは、案外そういうことなのかもしれない。",
+      "ja": "仏教の因果の考え方は、どこか利息の仕組みに似ている。小さな行いもそのまま消えることはなく、時を経て結果となって返ってくるという。しかも、怒りや欲から出た行いほど、年月とともに膨らみ、思わぬ大きさになって自分の身に戻ってくるように見える。だから昔の僧は、大きな善行を誇るより、目の前の小さな選択こそ慎むべきだと説いたのだろう。借りを作らない生き方とは、案外そういうことなのかもしれない。",
       "form": "利息",
-      "en": "The Buddhist idea of cause and effect somehow resembles the way interest works. Even a small act does not simply vanish; it is said to come back as a result over time. What's more, acts that spring from anger or greed seem to return to us grown to an unexpected size, as if interest were breeding interest. That is probably why monks of old taught us to take care with the small choices in front of us rather than boast of great good deeds. Perhaps a life without running up debts means something like that.",
+      "en": "The Buddhist idea of cause and effect somehow resembles the way interest works. Even a small act does not simply vanish; it is said to come back as a result over time. What's more, acts that spring from anger or greed seem to swell with the years and return to us grown to an unexpected size. That is probably why monks of old taught that we should take care with the small choices in front of us rather than boast of great good deeds. Perhaps a life without running up debts means something like that.",
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-you-ni"]
     },
     {
@@ -62,8 +61,7 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "「利息がかかる」「利息を払う」の形でよく使う。",
-      "grammar": []
+      "tipJa": "「利息がかかる」「利息を払う」の形でよく使う。"
     }
   ],
   "114": [
@@ -96,8 +94,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
-      "grammar": [],
       "sense": "利子がつく前の、貸し借りしたもとのお金。"
     }
   ],
@@ -109,8 +105,7 @@
       "original": true,
       "register": "講",
       "topic": "history",
-      "tipJa": "対になる語は「複利」。利子にも利子がつくかどうかで区別する。",
-      "grammar": []
+      "tipJa": "対になる語は「複利」。利子にも利子がつくかどうかで区別する。"
     },
     {
       "ja": "試験でよく出るのが、同じ条件で単利と複利を比べる問題です。前者は毎年同じ額の利子が加わるだけなので、グラフにすると右上がりの一直線になります。一方の複利は、増えた分にもまた利子がつくため、年数がたつにつれて曲線が急に立ち上がっていきます。式をただ丸暗記するよりも、一年目、二年目と表に書き出して違いを確かめてみてください。仕組みさえわかれば、公式は自然と思い出せるはずです。",
@@ -119,7 +114,6 @@
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n3-ni-tsurete", "n4-teiku"]
     },
     {
@@ -129,7 +123,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-dewa-naku", "n4-teiku"]
     }
   ],
@@ -151,8 +144,7 @@
       "original": true,
       "register": "報",
       "topic": "history",
-      "tipJa": "「歴然としている」の形でも使う。だれの目にも明らかで、疑う余地がないこと。",
-      "grammar": []
+      "tipJa": "「歴然としている」の形でも使う。だれの目にも明らかで、疑う余地がないこと。"
     },
     {
       "ja": "手元のパソコンでAIを動かしてみるとわかるんですけど、GPUがあるかないかで速さの違いが歴然なんですよね。CPUだけだと一文出すのに何十秒もかかるのに、GPUを積んだマシンだとほぼ一瞬で返ってくるっていう。AIの計算って、同じような掛け算を大量に並べてやるんで、そういうのが得意なチップのほうが向いてるんですよ。まあ、その分お値段もえげつないんで、気軽には買えないんですけど。",
@@ -160,9 +152,7 @@
       "en": "If you try running AI on your own computer you'll see that whether or not you have a GPU makes an obvious difference in speed. With just a CPU it takes tens of seconds to produce one sentence, but on a machine with a GPU the answer comes back almost instantly. AI calculations involve lining up huge numbers of similar multiplications at once, so chips that are good at that kind of thing are better suited. Mind you, the price is brutal to match, so it's not something you can buy casually.",
       "original": true,
       "register": "話",
-      "topic": "ai",
-      "tipJa": "",
-      "grammar": []
+      "topic": "ai"
     }
   ],
   "184": [
@@ -173,7 +163,6 @@
       "original": true,
       "register": "講",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n3-you-ni"],
       "sense": "ある数を何回も掛け合わせる形で表される関数。"
     },
@@ -184,7 +173,6 @@
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n3-you-ni", "n3-koto-ni-naru"],
       "sense": "ある数を何回も掛け合わせる形で表される関数。"
     },
@@ -213,25 +201,13 @@
       "sense": "二つ以上の数を合わせて、合計を求める計算。"
     },
     {
-      "ja": "文章を直すとき、多くの人はつい足し算で考えてしまいます。説明が足りない気がして言葉を書き加え、念のための一文を差し込み、気づけば最初の倍の長さになっている。けれども、読み手にとって読みやすいのは、たいてい何かを取り除いた後の文章です。書き終えたら、この一文がなくても意味は通じるかと、一つずつ問いかけてみてください。引くことを覚えると、伝えたい芯がくっきりと見えてくるはずです。",
+      "ja": "そろばんを習ってた人って、暗算するときに頭の中に玉が浮かぶらしいじゃないですか。あれって要するに、数字を言葉じゃなくて、絵として処理してるってことなんですよね。だから、しゃべりながらでも足し算がすらすらできたりするって聞いて、ちょっとびびりました。脳って、鍛え方しだいで、まったく別の通り道を作っちゃうんだなと思って。まあ、僕は小学生のころ、普通に指を折って数えてた側なんですけど。",
       "form": "足し算",
-      "en": "When revising their writing, many people end up thinking in terms of addition. Feeling the explanation falls short, they write in more words, slip in a sentence just in case, and before they know it the piece is twice its original length. Yet what readers find easy to read is usually writing after something has been taken out. When you've finished, try asking of each sentence in turn whether the meaning would still come across without it. Once you learn to subtract, the core of what you want to say should come into sharp view.",
+      "en": "People who learned the abacus apparently see beads float up in their heads when they do mental arithmetic, right? Basically, that means they're processing numbers not as words but as pictures. So when I heard they can do addition smoothly even while talking, it kind of freaked me out. It made me think the brain builds a completely different route depending on how you train it. Well, back in elementary school I was on the side that just counted on my fingers, though.",
       "original": true,
-      "register": "語",
-      "topic": "language",
-      "tipJa": "「足し算で考える」は、付け加えることで良くしようとする発想を指す。反対は「引き算」。",
-      "grammar": [],
-      "sense": "何かを付け加えていくことで、物事をよくしようとする考え方。"
-    },
-    {
-      "ja": "数学の歴史で外せないのが、ゼロを一つの数として扱うようになった出来事です。七世紀のインドの数学者ブラーマグプタは、ゼロを含む計算の決まりを書き残したことで知られています。ある数にゼロを足しても値は変わらない、という今では当たり前の足し算のルールも、そこで言葉にされたわけです。当たり前に思えることほど、誰かが最初に言葉にした瞬間があります。そう知っておくと、公式の暗記もぐっと面白くなるはずです。",
-      "form": "足し算",
-      "en": "One thing you can't leave out of the history of mathematics is the moment zero came to be treated as a number. The seventh-century Indian mathematician Brahmagupta is known for writing down rules for calculations involving zero. Even a rule of addition we now take for granted, that adding zero to a number leaves its value unchanged, was put into words there. The more obvious something seems, the more surely there was a moment when someone first put it into words. Knowing that should make memorising formulas much more interesting.",
-      "original": true,
-      "register": "学",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": ["n4-you-ni-naru"],
+      "register": "話",
+      "topic": "mind",
+      "grammar": ["n4-nagara", "n3-dewa-naku"],
       "sense": "二つ以上の数を合わせて、合計を求める計算。"
     }
   ],
@@ -242,9 +218,7 @@
       "en": "This time it's about where the brains of the PCs and smartphones we use today came from. From the 1960s into the '70s, manufacturers in Japan were waging a fierce price war over small machines for calculation. In the middle of this, a company called Busicom asked America's Intel to develop parts for use in a new calculator. What came out of that was the 4004, the world's first commercial microprocessor, which packed the brains of calculation onto a single chip. An order for a small gadget connected, in an unexpected way, to today's digital society.",
       "original": true,
       "register": "講",
-      "topic": "ai",
-      "tipJa": "",
-      "grammar": []
+      "topic": "ai"
     },
     {
       "ja": "大学入学共通テストの数学では電卓が使えないので、ふだんから手で計算する習慣をつけておく必要があります。とはいえ、問題集を解くたびに細かい計算まですべて手でこなしていると、肝心の考え方を見直す時間が足りなくなります。おすすめは、本番と同じ条件で解く日と、道具に頼って解き方の流れだけを確かめる日とを分けるやり方です。目的に応じて使い分ければ、計算力と理解の両方を伸ばすことができます。",
@@ -253,7 +227,6 @@
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n2-ni-oujite"]
     },
     {
@@ -262,9 +235,7 @@
       "en": "An early desktop calculator released by a domestic manufacturer in 1964 is said to have cost over 500,000 yen, on a par with a passenger car of the time. Afterwards, companies one after another pushed ahead with making them smaller and cheaper, and in 1972 a product for individuals priced in the ten-thousand-yen range appeared and became a huge hit. Thanks to advances in components, prices fell sharply within a few years, and calculating tools spread from office desks into homes and students' hands. The development race of this period is also said to have been one of the things that helped Japan's semiconductor industry gain strength.",
       "original": true,
       "register": "報",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": []
+      "topic": "history"
     }
   ],
   "132": [
@@ -286,7 +257,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-dewa-naku", "n2-ni-suginai"],
       "sense": "損か得かを、細かく計算して見積もる。"
     },
@@ -297,8 +267,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
-      "grammar": [],
       "sense": "損か得かを、細かく計算して見積もる。"
     }
   ],
@@ -310,7 +278,6 @@
       "original": true,
       "register": "講",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-teiku"],
       "sense": "計算をするための機械。"
     },
@@ -322,7 +289,6 @@
       "register": "報",
       "topic": "ai",
       "tipJa": "「量子計算機」のように、専門的な文脈ではコンピューターをこう呼ぶことが多い。",
-      "grammar": [],
       "sense": "計算を行う機械。特に、コンピューターのこと。"
     },
     {
@@ -332,7 +298,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n2-zaru-o-enai"],
       "sense": "計算を行う機械。特に、コンピューターのこと。"
     }

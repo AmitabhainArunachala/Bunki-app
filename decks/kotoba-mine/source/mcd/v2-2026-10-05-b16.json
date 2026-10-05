@@ -1,9 +1,9 @@
 {
   "179": [
     {
-      "ja": "今回は、江戸時代の「人別帳」について見ていきます。幕府はキリスト教を禁じたあと、村ごとに住民一人ひとりがどの寺の檀家なのかを帳面に書かせました。この帳面への登載は、いまの戸籍や住民票に近い役割を果たすことになります。逆に、何らかの理由で帳面から外された人は「無宿」と呼ばれ、まともな暮らしを送るのが難しくなりました。名前を書き込むという地味な作業が、人の居場所を決めていたわけですね。",
+      "ja": "今回は、江戸時代の「人別帳」について見ていきます。幕府はキリスト教を禁じたあと、村ごとに住民一人ひとりがどの寺の檀家なのかを帳面に書かせました。この帳面への登載は、いまでいえば戸籍に入るのに近い意味を持つことになります。逆に、何らかの理由で帳面から外された人は「無宿」と呼ばれ、まともな暮らしを送るのが難しくなりました。名前を書き込むという地味な作業が、人の居場所を決めていたわけですね。",
       "form": "登載",
-      "en": "This time we're going to look at the ninbetsuchō, the population registers of the Edo period. After banning Christianity, the shogunate had each village record in a register which temple every single resident belonged to. Entry in this register came to play a role close to today's family register and certificate of residence. Conversely, people who were struck off the register for some reason were called mushuku, the unregistered, and found it hard to lead a normal life. So the humble task of writing down names decided where a person belonged.",
+      "en": "This time we're going to look at the ninbetsuchō, the population registers of the Edo period. After banning Christianity, the shogunate had each village record in a register which temple every single resident belonged to. Entry in this register came to mean something close to what being entered in the family register means today. Conversely, people who were struck off the register for some reason were called mushuku, the unregistered, and found it hard to lead a normal life. So the humble task of writing down names decided where a person belonged.",
       "original": true,
       "register": "講",
       "topic": "history",
@@ -29,7 +29,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n2-ni-suginai"],
       "sense": "名簿や台帳に、名前などを書き入れること。"
     }
@@ -52,7 +51,6 @@
       "original": true,
       "register": "報",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n3-koto-de"]
     },
     {
@@ -62,8 +60,7 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "「検証にさらす」は、主張を他人が確かめられる場に出すこと。",
-      "grammar": []
+      "tipJa": "「検証にさらす」は、主張を他人が確かめられる場に出すこと。"
     }
   ],
   "288": [
@@ -84,7 +81,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru"]
     },
     {
@@ -116,7 +112,6 @@
       "original": true,
       "register": "報",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-teiku"]
     },
     {
@@ -126,7 +121,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n2-koto-naku"]
     }
   ],
@@ -147,19 +141,16 @@
       "en": "When you sit in a quiet room, the sound of the second hand of the clock hanging on the wall can come to seem strangely loud. It is a very small sound that we normally pay no attention to. Each time it ticks, the present moment passes away and never comes back. The Buddhist term setsuna, the instant, is perhaps a word for watching this moment-by-moment passing without looking away. When we stop chasing the sound, all that remains is ourselves, simply sitting here.",
       "original": true,
       "register": "論",
-      "topic": "india",
-      "tipJa": "",
-      "grammar": []
+      "topic": "india"
     },
     {
-      "ja": "寝る前に、時計のカチ、カチって音が一回気になりだすと、もうダメじゃないですか。普段は全然聞こえてないのに、意識した瞬間から、頭の中でずっと鳴ってる感じになって。あれ、脳が「気になる音」として勝手に拾い始めちゃうらしいんですよね。だから僕、寝室の目覚まし時計は、秒針が音を立てずにすーっと動くタイプに替えたんですよ。それだけで、寝つきがだいぶマシになった気がします。",
+      "ja": "試験の終盤って、教室の時計の秒針がやけに気になってくるじゃないですか。残り時間を確かめるたびに焦りが募って、問題文の中身が全然頭に入ってこなくなるっていう。で、ある先輩に聞いたら、時計を見るタイミングを大問ごとにあらかじめ決めておくといいらしいんですよ。それ以外のときは、あえて目線を上げないって決めちゃう。やってみたら、意外と時間配分が崩れなくて、ずいぶん冷静に解けるようになりました。",
       "form": "秒針",
-      "en": "Before going to sleep, once the tick, tick of the clock starts bothering you, it's game over, right? Normally you don't hear it at all, but from the moment you notice it once, it feels like it's ringing in your head the whole time. Apparently your brain starts picking it up on its own as a \"sound to worry about.\" So I swapped the alarm clock in my bedroom for the kind where the second hand glides along without making a sound. Just that seems to have made falling asleep a lot easier.",
+      "en": "Near the end of an exam, the second hand of the classroom clock starts to bother you like crazy, right? Every time you check how much time is left, the panic builds up and the questions just stop going into your head. So I asked an older student, and apparently it's good to decide in advance to look at the clock once per major section. The rest of the time, you just decide not to look up on purpose. When I tried it, my time allocation surprisingly didn't fall apart, and I got so I could work through the questions much more calmly.",
       "original": true,
       "register": "話",
       "topic": "mind",
-      "tipJa": "",
-      "grammar": []
+      "grammar": ["n4-you-ni-naru"]
     }
   ],
   "269": [
@@ -181,8 +172,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
-      "grammar": [],
       "sense": "競争や試合に勝ち抜いて、一番になること。"
     },
     {
@@ -209,13 +198,12 @@
       "grammar": ["n4-you-ni-naru", "n3-dewa-naku"]
     },
     {
-      "ja": "チェスの達人の記憶を調べた有名な実験があります。実際の対局から取った盤面を数秒だけ見せて再現させると、達人は初心者よりはるかに正確に駒を並べ直せました。ところが、駒をでたらめに置いた並びでは、両者の差はほとんど消えてしまったのです。つまり、達人の記憶力そのものが特別に優れているわけではないのです。彼らは意味のある配置をまとまりとして覚えていたことになり、勉強でも、知識を型としてつかむことが記憶の近道だと言えます。",
+      "ja": "チェスの達人と初心者に、実際の対局から取った盤面を数秒だけ見せて再現させる、有名な実験があります。達人ははるかに正確に駒を並べ直せましたが、駒をでたらめに置いた並びでは、両者の差はほとんど消えてしまいました。つまり、達人の記憶力そのものが特別に優れているわけではないのです。彼らは意味のある配置をまとまりとして覚えていたことになります。勉強でも、知識を型としてつかむことが記憶の近道だと言えます。",
       "form": "盤面",
-      "en": "There is a famous experiment that investigated the memory of chess masters. When shown a board position taken from a real game for just a few seconds and asked to reproduce it, masters could set the pieces back up far more accurately than beginners. However, with arrangements where the pieces had been placed at random, the difference between the two almost disappeared. In other words, it is not that the masters' memory as such is especially superior. It turns out they were remembering meaningful arrangements as chunks, and so in study too, grasping knowledge as patterns can be said to be a shortcut to memory.",
+      "en": "There is a famous experiment in which chess masters and beginners were shown a board position taken from a real game for just a few seconds and asked to reproduce it. The masters could set the pieces back up far more accurately, but with arrangements where the pieces had been placed at random, the difference between the two almost disappeared. In other words, it is not that the masters' memory as such is especially superior. It turns out they were remembering meaningful arrangements as chunks. In study too, grasping knowledge as patterns can be said to be a shortcut to memory.",
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n3-wake-dewa-nai", "n3-koto-ni-naru"]
     },
     {
@@ -224,9 +212,7 @@
       "en": "There are surprisingly many everyday words that were born from Go. Calling advance moves made with an eye to the future fuseki, and calling something useless dame, both originally come from Go terminology. Ichimoku oku, to acknowledge someone's strength, belongs to the same family. Okame hachimoku, the onlooker sees more, comes from the idea that someone watching from the side can read the state of the board position better than the player. Once you know the origins, the tension of the world of competition comes through in expressions you use without a second thought.",
       "original": true,
       "register": "語",
-      "topic": "language",
-      "tipJa": "",
-      "grammar": []
+      "topic": "language"
     }
   ],
   "271": [
@@ -237,8 +223,7 @@
       "original": true,
       "register": "講",
       "topic": "history",
-      "tipJa": "「神童と呼ばれる」「神童ともてはやされる」のように、周りの評判として使うことが多い。",
-      "grammar": []
+      "tipJa": "「神童と呼ばれる」「神童ともてはやされる」のように、周りの評判として使うことが多い。"
     },
     {
       "ja": "1920年代、アメリカの心理学者ターマンは、知能検査で非常に高い得点を取った子ども約千五百人を選び、その後の人生を長年にわたって追跡しました。いわば神童として選ばれた彼らの多くは、社会的に安定した成功を収めたものの、ノーベル賞を受けた人は一人もいませんでした。皮肉なことに、選考から漏れた子どもの中から、のちに受賞者が二人出ています。この結果は、検査で測れる力だけでは、人の伸び方を予測しきれないことを示しています。",
@@ -247,7 +232,6 @@
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n2-mono-no"]
     },
     {
@@ -292,7 +276,6 @@
       "register": "論",
       "topic": "india",
       "tipJa": "「肩を揺さぶる」のように、手で何度も強くゆらす具体的な動作にも使う。",
-      "grammar": [],
       "sense": "体や物をつかんで、強く何度もゆらす。"
     }
   ],
@@ -308,24 +291,21 @@
       "grammar": ["n4-teiku"]
     },
     {
-      "ja": "江戸時代後期の測量家、伊能忠敬は、五十代半ばから全国を歩いて測量し、精密な日本地図づくりに挑みました。測量の旅は十回、十七年に及び、歩いた距離は地球一周分に近いとされています。忠敬は完成を見ることなく亡くなりましたが、弟子たちが仕事を引き継ぎ、地図は1821年に幕府へ納められました。晩年に新しい道へ踏み出し、それをやり遂げたたぐいまれな根気は、生涯学習の手本としても注目されています。",
-      "form": "たぐいまれな",
-      "en": "Inō Tadataka, a surveyor of the late Edo period, set out in his mid-fifties to walk and survey the whole country, taking on the making of a precise map of Japan. His survey journeys numbered ten and spanned seventeen years, and the distance he walked is said to come close to once around the Earth. Tadataka died without seeing the work completed, but his disciples carried it on, and the map was presented to the shogunate in 1821. His exceptional perseverance, stepping onto a new path late in life and seeing it through, is also attracting attention as a model of lifelong learning.",
-      "original": true,
-      "register": "報",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": ["n2-koto-naku"]
-    },
-    {
       "ja": "記憶力の大会で上位に入る人たちの脳を調べた研究があります。2003年に発表されたこの研究では、彼らの知能や脳の構造に、一般の人と比べて目立った違いは見られませんでした。違っていたのは覚え方で、多くが、よく知っている道や部屋に情報を一つずつ置いていく「場所法」を使っていたのです。一見たぐいまれな才能に見えても、その中身は訓練で身につく技術だったことになります。暗記が苦手な人も、まずは一つ試してみる価値がありそうです。",
       "form": "たぐいまれな",
       "en": "There is a study that examined the brains of people who place high in memory competitions. In this study, published in 2003, no notable differences were found in their intelligence or brain structure compared with ordinary people. What differed was how they memorised: many used the \"method of loci,\" placing pieces of information one by one along a route or in a room they knew well. So what looks at first glance like an exceptional talent turns out to be a skill that can be acquired through training. Even people who are bad at memorising may find it worth trying one method first.",
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "何か国語もペラペラな人って、たぐいまれな語学センスがあるんだろうなって思っちゃうじゃないですか。でも話を聞いてみると、意外と、毎日少しずつ口に出す時間をとってるだけだったりするんですよ。知り合いにも、通勤中にずっと小声で英語の独り言を言ってる人がいて。あと、間違えるのを全然怖がってないっていうのが大きいですね。才能のせいにするとラクなんですけど、それって自分がやらない言い訳になってる気もするんですよね。",
+      "form": "たぐいまれな",
+      "en": "You tend to assume that people who are fluent in several languages must have some exceptional knack for languages, right? But when you actually hear them out, surprisingly often they're just taking a little time every day to say things out loud. There's someone I know who talks to himself in English under his breath the whole way to work. Also, a big part of it is that they're not afraid of making mistakes at all. Blaming it on talent is easy, but I feel like that's just becoming an excuse for not doing it yourself.",
+      "original": true,
+      "register": "話",
+      "topic": "language"
     }
   ]
 }

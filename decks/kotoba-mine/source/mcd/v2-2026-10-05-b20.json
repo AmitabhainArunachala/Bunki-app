@@ -21,13 +21,13 @@
       "grammar": ["n2-ni-oujite"]
     },
     {
-      "ja": "仏典に、目の見えない人々が一頭の象に触れ、その姿を言い合う話がある。頭に触れた者は壺のようだと言い、足に触れた者は柱のようだと言って、互いに譲らない。誰も嘘はついていないが、誰ひとり象の全体を知ってはいないのである。自分の見地もまた、象の体のほんの一部に触れているにすぎないと気づくとき、人はようやく、自分とは違う場所に立つ他人の言葉に耳を傾けられるのだろう。",
+      "ja": "仏典に、目の見えない人々が一頭の象に触れ、その姿を言い合う話がある。頭に触れた者は壺のようだと言い、足に触れた者は柱のようだと言って、互いに譲らない。誰も嘘はついていないが、それぞれが知っているのは象のほんの一部にすぎないのである。自分はどれほど広い見地に立っているつもりでも、実は足に触れただけの一人かもしれないと気づくとき、人はようやく、違う場所に立つ他人の言葉に耳を傾けられるのだろう。",
       "form": "見地",
-      "en": "In the Buddhist scriptures there is a story of blind people who touch an elephant and argue over what it looks like. The one who touched its head says it is like a pot, the one who touched its leg says it is like a pillar, and none of them will give way. None of them is lying, yet none of them knows the whole elephant. Perhaps it is only when we realize that our own standpoint, too, merely touches a tiny part of the elephant's body that we can finally listen to the words of others who stand in a different place from us.",
+      "en": "In the Buddhist scriptures there is a story of blind people who touch an elephant and argue over what it looks like. The one who touched its head says it is like a pot, the one who touched its leg says it is like a pillar, and none of them will give way. None of them is lying, yet what each of them knows is merely a tiny part of the elephant. Perhaps it is only when we realize that, however broad a standpoint we think we stand on, we may in fact be just one more person who touched only a leg, that we can finally listen to the words of others who stand in a different place.",
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "「自分の見地」は、物事を判断するときに自分が立っている場所。限られた立場だと自覚させる文脈で使われる。",
+      "tipJa": "「広い見地に立つ」は、物事を広く見渡して判断する立場にいること。",
       "grammar": ["n2-ni-suginai"]
     }
   ],
@@ -43,16 +43,6 @@
       "grammar": ["n4-you-ni-naru"]
     },
     {
-      "ja": "出生の統計には、迷信が人口を大きく動かした跡がはっきりと残っている。1966年は干支でいう丙午の年にあたり、この年に生まれた女性は気性が激しいという言い伝えが広く知られていた。その結果、この年の出生数は約136万人にとどまり、前年より約25パーセント少なくなった。翌年には出生数が再び大きく増えており、多くの夫婦が子どもをもうける時期をずらしたとみられている。",
-      "form": "迷信",
-      "en": "Birth statistics clearly bear the traces of a superstition that moved the population significantly. 1966 was a hinoe-uma year in the sexagenary cycle, and the folk belief that women born in that year were hot-tempered was widely known. As a result, births that year stopped at about 1.36 million, roughly 25 percent fewer than the year before. Births rose sharply again the following year, and it is thought that many couples shifted the timing of having children.",
-      "original": true,
-      "register": "報",
-      "topic": "history",
-      "tipJa": "「迷信が影響した」「迷信が広まる」のように、社会の行動を動かす要因として報道で使われる。",
-      "grammar": []
-    },
-    {
       "ja": "葬儀は友引の日を避けるという習わしがあるが、六曜はもともと仏教とは関わりのない暦の考え方である。友引に葬儀をすると友をあの世へ引き込むという話も、字の見た目からの連想にすぎない。それを迷信だと切り捨てるのはたやすいが、人がそれにすがるのは、死という分からないものを前にして、何か手がかりがほしいからだろう。仏の教えが本当に問うのは、日の良し悪しではなく、今日をどう生きるかなのである。",
       "form": "迷信",
       "en": "There is a custom of avoiding tomobiki days for funerals, but the six-day calendar cycle originally has nothing to do with Buddhism. The idea that holding a funeral on tomobiki draws one's friends into the next world is likewise merely an association drawn from how the characters look. It is easy to dismiss that as superstition, but people cling to it, I think, because in the face of something as unknowable as death they want some kind of foothold. What the Buddha's teaching really asks is not whether a day is lucky or unlucky but how we will live today.",
@@ -61,13 +51,23 @@
       "topic": "india",
       "tipJa": "「迷信だと切り捨てる」は、根拠がないとして退けること。信じる人の心に目を向ける文脈で使われる。",
       "grammar": ["n2-ni-suginai"]
+    },
+    {
+      "ja": "最近、AIに今日の運勢を聞く人っているじゃないですか。あれって、AIが星の動きをちゃんと計算してるわけじゃないんですよ。ネット上の占いっぽい文章を、それっぽくまねして並べてるだけなんですよね。でも、機械に言われると妙に信じちゃう人もけっこういて、新しい道具が出てきても古い迷信は形を変えて生き残るんだなって思います。まあ、遊びとして楽しむ分には全然いいと思いますけどね。",
+      "form": "迷信",
+      "en": "These days there are people who ask AI for today's fortune, right? With that, the AI isn't actually calculating the movements of the stars. It's just imitating fortune-telling-style text from the internet and stringing it together in a plausible way. But quite a few people find it oddly believable when a machine says it, and it makes me think that even when new tools come along, old superstitions survive by changing their form. Well, I think it's totally fine as long as you're just enjoying it for fun.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉でも「古い迷信」「ただの迷信」の形で使う。新しい技術と対比されることも多い。",
+      "grammar": ["n3-wake-dewa-nai"]
     }
   ],
   "284": [
     {
-      "ja": "今回は、才能は遺伝で決まるのか努力で決まるのか、という永遠のテーマに挑んだ本を要約していきます。著者はまず双子の研究を紹介し、性格や能力のある部分には遺伝が関わっていると認めます。ただ、先天的な差があるからといって、努力の意味がなくなるわけではない、というのが著者の立場です。遺伝の影響は、育つ環境によって出方が大きく変わるからなんですね。つまり、どんな環境に身を置くかが結局のカギになる、というのがこの本の結論です。",
+      "ja": "今回は、才能は遺伝で決まるのか努力で決まるのか、という永遠のテーマに挑んだ本を要約していきます。著者はまず双子の研究を紹介し、性格や能力のある部分には遺伝が関わっていると認めます。ただ、先天的な差があるからといって、努力の意味がなくなるわけではない、というのが著者の立場です。遺伝の影響は、育つ環境によって出方が大きく変わるからなんですね。つまり、どんな環境に身を置くかが最終的なカギになる、というのがこの本の結論です。",
       "form": "先天的",
-      "en": "This time I'm going to summarize a book that takes on the eternal question of whether talent is decided by genes or by effort. The author first introduces research on twins and acknowledges that genes are involved in some parts of personality and ability. However, the author's position is that having innate differences does not mean effort becomes meaningless. That's because the way genetic influence shows itself changes greatly depending on the environment a person grows up in. In other words, the book's conclusion is that what kind of environment you put yourself in is the key in the end.",
+      "en": "This time I'm going to summarize a book that takes on the eternal question of whether talent is decided by genes or by effort. The author first introduces research on twins and acknowledges that genes are involved in some parts of personality and ability. However, the author's position is that having innate differences does not mean effort becomes meaningless. That's because the way genetic influence shows itself changes greatly depending on the environment a person grows up in. In other words, the book's conclusion is that what kind of environment you put yourself in is the ultimate key.",
       "original": true,
       "register": "講",
       "topic": "mind",
@@ -94,7 +94,6 @@
       "register": "論",
       "topic": "india",
       "tipJa": "「先天的な資質」は本人が選べないもの。努力で得たものと対比して使われることが多い。",
-      "grammar": [],
       "sense": "経験によらず、もとから備わっているさま。"
     }
   ],
@@ -122,7 +121,7 @@
       "sense": "以前から今まで。これまで。"
     },
     {
-      "ja": "仏教が生まれたころのインドでは、祭りをつかさどるバラモンが社会の頂点に立ち、人の尊さは家柄で決まるとされていた。ブッダは、人の価値は生まれではなく行いによって決まると説き、従来の身分の考え方に正面から異を唱えた。それは制度を力で壊すことではなく、人を見る目そのものを改めることであった。当たり前とされてきたものを疑うには、声の大きさではなく、自らの行いという裏づけが必要なのだろう。",
+      "ja": "仏教が生まれたころのインドでは、祭祀をつかさどるバラモンが社会の頂点に立ち、人の尊さは家柄で決まるとされていた。ブッダは、人の価値は生まれではなく行いによって決まると説き、従来の身分の考え方に正面から異を唱えた。それは制度を力で壊すことではなく、人を見る目そのものを改めることであった。当たり前とされてきたものを疑うには、声の大きさではなく、自らの行いという裏づけが必要なのだろう。",
       "form": "従来",
       "en": "In India around the time Buddhism arose, the Brahmins who presided over rituals stood at the top of society, and a person's worth was held to be decided by family lineage. The Buddha taught that a person's value is decided not by birth but by conduct, and openly challenged the conventional idea of social rank. That was not a matter of breaking the system by force but of changing the very way we look at people. To question what has been taken for granted, what is needed is perhaps not a loud voice but the backing of one's own conduct.",
       "original": true,
@@ -193,8 +192,7 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "「定量的に表す」は数で示すこと。数にできない心の働きと対比されると意味がよく見える。",
-      "grammar": []
+      "tipJa": "「定量的に表す」は数で示すこと。数にできない心の働きと対比されると意味がよく見える。"
     }
   ],
   "29": [
@@ -210,9 +208,9 @@
       "sense": "戦いなどが、間を置きながら何度も起こるさま。"
     },
     {
-      "ja": "対話型のAIサービスでは、利用が集中する時間帯に、つながりにくい状態が断続的に起きることがある。AIが答えを返すには大量の計算が必要で、サーバーの処理が追いつかなくなるためだ。各社は計算に使う半導体の確保を急いでいるものの、最先端のチップを作れる企業は世界でも限られており、供給はすぐには増えない。データセンターを動かす電力の確保も、新たな課題として浮かび上がっている。",
+      "ja": "対話型のAIサービスでは、利用が集中する時間帯に、つながりにくい状態が断続的に起きることがある。数分ほど応答が止まっては再び動き出し、しばらくするとまた止まる、といった具合だ。背景には、AIが答えを返すのに大量の計算が必要で、利用者が増えるとサーバーの処理が追いつかなくなるという事情がある。各社は計算に使う半導体の確保を急いでいるものの、最先端のチップを作れる企業は世界でも限られており、供給はすぐには増えない。",
       "form": "断続的",
-      "en": "With conversational AI services, there are times when connections become difficult intermittently during periods of heavy use. That's because returning an answer requires a great deal of computation, and the servers' processing can't keep up. Companies are rushing to secure the semiconductors used for computation, but only a limited number of firms in the world can make cutting-edge chips, so supply won't increase right away. Securing the electricity to run data centers is also emerging as a new challenge.",
+      "en": "With conversational AI services, connections can become difficult intermittently during periods of heavy use. Responses stop for a few minutes, start moving again, and then stop once more after a while. Behind this is the fact that returning an answer requires a great deal of computation, and when users increase, the servers' processing can't keep up. Companies are rushing to secure the semiconductors used for computation, but only a limited number of firms in the world can make cutting-edge chips, so supply won't increase right away.",
       "original": true,
       "register": "報",
       "topic": "ai",
@@ -240,13 +238,12 @@
       "original": true,
       "register": "講",
       "topic": "mind",
-      "tipJa": "「失読症のある人」のように使う。知能の問題ではないことを添えて説明されることが多い。",
-      "grammar": []
+      "tipJa": "「失読症のある人」のように使う。知能の問題ではないことを添えて説明されることが多い。"
     },
     {
-      "ja": "文字を音声に変える技術が、失読症のある人の学び方を変えつつある。かつての読み上げソフトは機械的な発音で聞き取りにくかったが、AIの発達により、人の声に近い自然な読み上げができるようになった。カメラで写した紙の資料を、その場で読み上げるアプリも登場している。2024年4月からは民間の事業者にも合理的配慮の提供が義務づけられ、こうした道具を使える場面はさらに広がるとみられる。",
+      "ja": "文字を音声に変える技術が、失読症のある人の学び方を変えつつある。視力にも知能にも問題がないのに、文字を目で追って内容をつかむことに大きな苦労を抱える人にとって、耳から学べる利点は大きい。かつての読み上げソフトは機械的な発音で聞き取りにくかったが、AIの発達により、人の声に近い自然な読み上げができるようになった。2024年4月からは民間の事業者にも合理的配慮の提供が義務づけられ、こうした道具を使える場面はさらに広がるとみられる。",
       "form": "失読症",
-      "en": "Technology that turns text into speech is changing the way people with dyslexia learn. Earlier text-to-speech software had mechanical pronunciation that was hard to follow, but advances in AI have made natural reading aloud close to a human voice possible. Apps that read aloud paper documents captured with a camera on the spot have also appeared. From April 2024, private businesses have also been required to provide reasonable accommodation, and the situations in which such tools can be used are expected to expand further.",
+      "en": "Technology that turns text into speech is changing the way people with dyslexia learn. For people who have no problem with their eyesight or intelligence yet struggle greatly to follow written words with their eyes and grasp the content, being able to learn by ear is a big advantage. Earlier text-to-speech software had mechanical pronunciation that was hard to follow, but advances in AI have made natural reading aloud close to a human voice possible. From April 2024, private businesses have also been required to provide reasonable accommodation, and the situations in which such tools can be used are expected to expand further.",
       "original": true,
       "register": "報",
       "topic": "ai",
@@ -284,18 +281,17 @@
       "register": "報",
       "topic": "ai",
       "tipJa": "情報技術では「難読化」の形で、中身を解析されにくくするためにわざと読みにくくすることを指す。",
-      "grammar": [],
       "sense": "プログラムなどを読み解きにくくすること。「難読化」の形で。"
     },
     {
-      "ja": "般若や卒塔婆、南無といった仏教の言葉には、初めて目にすると読めないものが少なくない。これらは、インドの言葉の音を、意味ではなく響きで漢字に写し取ったものだからである。経典を訳した僧たちは、訳せば意味が狭まってしまう言葉や、尊すぎて訳しきれない言葉を、あえて音のまま残したとされる。難読の文字の向こうには、遠い国の言葉の重みを、自分たちの都合で損なうまいとした人々の慎みが隠れているのだろう。",
+      "ja": "漢字検定の上の級を目指すと、ふだん見かけない難読の熟語がぐっと増えてきます。こうした語は、読みをただ丸暗記しようとしても、なかなか頭に残りません。おすすめは、その字がなぜそう読まれるのかという由来と一緒に覚えることです。たとえば「海老」は、腰の曲がった姿を海の老人に見立てた書き方だと知れば、一回で記憶に結びつきます。理由をセットにすることで、思い出すための手がかりが増えるわけです。",
       "form": "難読",
-      "en": "Among Buddhist words such as hannya, sotoba and namu, there are many that cannot be read when you first see them. That is because they transcribe the sounds of Indian words into kanji by sound rather than by meaning. The monks who translated the sutras are said to have deliberately left in their original sound the words whose meaning would narrow if translated, or that were too sacred to translate fully. Behind the hard-to-read characters, there perhaps lies hidden the modesty of people who tried not to diminish, for their own convenience, the weight of words from a distant land.",
+      "en": "When you aim for the higher levels of the Kanji Proficiency Test, the number of hard-to-read compounds you rarely see in daily life jumps. Words like these don't stay in your head easily if you just try to memorize the readings by rote. What I recommend is learning them together with the origin of why the characters are read that way. For example, once you know that 海老 is a way of writing that likens the shrimp's bent back to an old man of the sea, it links to your memory in one go. By pairing each word with a reason, you increase the cues for recalling it.",
       "original": true,
-      "register": "論",
-      "topic": "india",
-      "tipJa": "「難読の文字・語」のように、読み方が難しいことを表す。仏教語には音を写した難読語が多い。",
-      "grammar": ["n3-dewa-naku"],
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「難読の熟語」のように使う。読みの由来とセットで覚えると定着しやすい。",
+      "grammar": ["n3-koto-de"],
       "sense": "漢字の読み方が難しく、正しく読める人が少ないこと。"
     }
   ],
@@ -319,18 +315,16 @@
       "register": "報",
       "topic": "history",
       "tipJa": "「最後の話者」は、その言語を母語とする人がいなくなる場面で報道によく出る言い方。",
-      "grammar": [],
       "sense": "ある言語を使って話す人。"
     },
     {
-      "ja": "話し方の講座でよくお伝えするのが、文末の小さな言葉が印象を大きく左右するということです。「明日は雨です」と言い切るのと、「明日は雨ですね」と添えるのとでは、聞き手の受け取り方がまるで違います。「ね」には、相手と気持ちを分かち合おうとする話者の姿勢が表れるからです。説明が一方的に聞こえると言われる人は、ところどころで「ね」を添えてみてください。それだけで語り口がぐっとやわらかくなります。",
+      "ja": "話し方の講座でよくお伝えするのが、文末の小さな言葉が印象を大きく左右するということです。「明日は雨です」と言い切るのと、「明日は雨ですね」と言うのとでは、聞き手の受け取り方がまるで違います。「ね」には、相手と気持ちを分かち合おうとする話者の姿勢が表れるからです。説明が一方的に聞こえると言われる人は、ところどころで「ね」を添えてみてください。それだけで語り口がぐっとやわらかくなります。",
       "form": "話者",
-      "en": "Something I often tell people in speaking courses is that the small words at the end of a sentence greatly affect the impression you give. Saying flatly \"It will rain tomorrow\" and adding \"It will rain tomorrow, won't it\" are received completely differently by the listener. That's because \"ne\" shows the speaker's attitude of trying to share feelings with the other person. If people say your explanations sound one-sided, try adding \"ne\" here and there. That alone makes your way of talking much softer.",
+      "en": "Something I often tell people in speaking courses is that the small words at the end of a sentence greatly affect the impression you give. Saying flatly \"It will rain tomorrow\" and saying \"It will rain tomorrow, won't it\" are received completely differently by the listener. That's because \"ne\" shows the speaker's attitude of trying to share feelings with the other person. If people say your explanations sound one-sided, try adding \"ne\" here and there. That alone makes your way of talking much softer.",
       "original": true,
       "register": "語",
       "topic": "language",
       "tipJa": "言語学では、発話する側を「話者」、受け取る側を「聞き手」と呼ぶ。",
-      "grammar": [],
       "sense": "その文や発話を口にしている人。"
     }
   ]
