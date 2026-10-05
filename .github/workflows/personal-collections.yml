@@ -7,8 +7,10 @@ on:
       - 'prototypes/corridor/tools/*personal*'
       - 'prototypes/corridor/corridor.js'
       - 'prototypes/corridor/sw.js'
+      - 'scripts/corridor-assets.mjs'
+      - 'scripts/build-corridor-site.mjs'
+      - 'scripts/resolve-corridor-site.mjs'
       - '.github/workflows/personal-collections.yml'
-      - '.github/workflows/pages-app.yml'
   push:
     branches: [main]
     paths:
@@ -16,6 +18,9 @@ on:
       - 'prototypes/corridor/tools/*personal*'
       - 'prototypes/corridor/corridor.js'
       - 'prototypes/corridor/sw.js'
+      - 'scripts/corridor-assets.mjs'
+      - 'scripts/build-corridor-site.mjs'
+      - 'scripts/resolve-corridor-site.mjs'
       - '.github/workflows/personal-collections.yml'
   workflow_dispatch:
 
