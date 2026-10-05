@@ -98,6 +98,15 @@
  *   7. the sentence deck says 「この語の他の文」; Anki says 形容動詞 and folds 出典; the 字 hue is
  *      at least ΔE_ok 10 from every other hue of its theme.
  *
+ * Then the passage pilot (STANDARD A46, CARD_CONTRACT_V2 §2, §3, §6, §7): every card written to
+ * contract v2 (it carries a register) is 4–5 sentences of 180–300 characters with the target once,
+ * written for the deck, with a register code, a topic, a Japanese usage note (tipJa) and the
+ * target sentence's English; a word's v2 passages differ in register; the MCD tokens file carries
+ * Japanese senses for words that are not the deck's own (source/gloss_ja.json). In the browser a
+ * pilot card's front shows its 4–5 sentences with the target marked once; its back puts tipJa in
+ * tier one and the register and topic as small chips in the chip row; and a tapped word that is
+ * not the deck's own shows a Japanese sense from that table in the entry sheet.
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -712,6 +721,128 @@ async function verifyHost(browser, base) {
     seen.every((x) => x.host === 'none' && x.tokens === 0) && html.every((t) => !t.includes('createHost') && !t.includes('bunki-cloze-tokens","version') && !/"tokens":"tokens/.test(t) && t.includes('function hostAdapter')),
     JSON.stringify(seen),
   );
+}
+
+/* ------------------------------------- the passage pilot (STANDARD A46, CARD_CONTRACT_V2 §2–§7) */
+const REGISTERS = { 講: '講義', 報: '報道', 論: '論説', 話: '会話', 学: '学び', 語: '話し方' };
+const TOPICS = { mind: '心と学び', india: 'インド・仏教', ai: 'AI・半導体', history: '世界史', language: '日本語' };
+const PILOT_CARD = 'km-240-m06'; // 習得, 講 / history: 『解体新書』の蘭学者たち
+
+function pilotCards(deck) {
+  return deck.words.flatMap((w) => w.cards.filter((c) => c.register).map((c) => ({ ...c, word: w })));
+}
+
+function verifyPilotData(deck) {
+  const cards = pilotCards(deck);
+  const bad = [];
+  for (const c of cards) {
+    const n = sentenceEnds(c.ja).length;
+    const marks = c.ruby.filter((seg) => seg.length > 2);
+    if (n < 4 || n > 5) bad.push(`${c.id}: ${n} sentences`);
+    if (c.ja.length < 180 || c.ja.length > 300) bad.push(`${c.id}: ${c.ja.length} characters`);
+    if (c.type !== 'word' || marks.length !== 1 || marks[0][2] !== 1 || c.ja.split(c.form).length !== 2) bad.push(`${c.id}: target not once`);
+    if (c.kind !== 'original' || c.src?.licence !== 'Bunki original') bad.push(`${c.id}: not written for the deck`);
+    if (!REGISTERS[c.register] || !TOPICS[c.topic]) bad.push(`${c.id}: register ${c.register} topic ${c.topic}`);
+    if (typeof c.tipJa !== 'string' || !c.tipJa || /[A-Za-z]/.test(c.tipJa)) bad.push(`${c.id}: tipJa`);
+    if (!c.enTarget || !c.en.includes(c.enTarget)) bad.push(`${c.id}: no target-sentence English`);
+    if (c.grammar && !c.grammar.every((g) => g.id && g.p)) bad.push(`${c.id}: grammar`);
+  }
+  const words = [...new Set(cards.map((c) => c.word.id))];
+  check(
+    'pilot: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note and its target sentence’s English',
+    cards.length >= 51 && bad.length === 0,
+    bad.slice(0, 4).join(' | ') || `${cards.length} cards · ${words.length} words · ${Object.keys(REGISTERS).map((r) => `${r}${cards.filter((c) => c.register === r).length}`).join(' ')}`,
+  );
+  const same = words.filter((wid) => {
+    const regs = cards.filter((c) => c.word.id === wid).map((c) => c.register);
+    return new Set(regs).size !== regs.length;
+  });
+  const after = deck.words.filter((w) => {
+    const v2 = w.cards.map((c, i) => (c.register ? i : -1)).filter((i) => i >= 0);
+    return v2.length && (v2[0] === 0 || v2.some((i, k) => k && i !== v2[k - 1] + 1));
+  });
+  check('pilot: a word’s v2 passages differ in register (§5) and follow its earlier passages, never displacing passage 1 (its 字 cards keep their ids)', same.length === 0 && after.length === 0, [...same, ...after.map((w) => w.id)].join(' ') || `${words.length} words`);
+  const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
+  const ids = new Set(deck.words.map((w) => w.id));
+  const lemmas = Object.keys(side.defs).filter((k) => !ids.has(k));
+  check('pilot: the MCD tokens file carries Japanese senses for words that are not the deck’s own (gloss_ja.json), beside one definition per deck word', lemmas.length > 500 && deck.words.every((w) => side.defs[w.id]), `${lemmas.length} lemma senses · ${ids.size} deck words`);
+}
+
+async function verifyPilot(browser, base) {
+  const deck = readJson(DECK_PATH);
+  const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
+  const card = pilotCards(deck).find((c) => c.id === PILOT_CARD);
+  if (!card) {
+    check(`pilot: ${PILOT_CARD} is in the deck`, false);
+    return;
+  }
+  // a word of this passage that is not the deck's own and has a sense in the table: keyed as the
+  // build keys it (ref, lemma, surface), its surface printed once in the passage
+  const ids = new Set(deck.words.map((w) => w.id));
+  const terms = new Set(deck.words.map((w) => w.term));
+  const rows = side.passages[side.cards[card.id]];
+  // in the target sentence, which stays open when 焦点 folds the others
+  const ends = sentenceEnds(card.ja);
+  const at = card.ja.indexOf(card.form);
+  const [from, to] = [ends.filter((e) => e <= at).at(-1) ?? 0, ends.find((e) => e > at)];
+  const pick = rows
+    .filter(([s, , , k]) => k === '語' && s !== card.form && card.ja.split(s).length === 2 && card.ja.indexOf(s) >= from && card.ja.indexOf(s) < to)
+    .map(([s, b = '', , , ref = '']) => ({ s, key: [ref, b, s].find((x) => x && (terms.has(x) || Object.hasOwn(side.defs, x))) }))
+    .find((t) => t.key && !terms.has(t.key) && !ids.has(t.key));
+  const sense = pick ? side.defs[pick.key].map((r) => r[0]).join('') : '';
+  const state = JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: 'kotoba-mcd', groupsOff: [], log: [], cards: { [card.id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(SEEDED);
+  await context.addInitScript(`try { if (!sessionStorage.getItem('__pilot_seeded')) { sessionStorage.setItem('__pilot_seeded', '1');
+    localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', ${JSON.stringify(JSON.stringify({ ruleSeen: true, newPerDay: 0 }))});
+    localStorage.setItem('bunki-cloze:kotoba-mcd', ${JSON.stringify(state)}); } } catch {}`);
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  try {
+    await page.goto(`${base}/index.html?deck=mcd`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForSelector('#kp-start', { timeout: 15000 });
+    await page.click('#kp-start');
+    await page.waitForSelector('#kp-card');
+    const front = await page.evaluate(`(() => { const f = document.getElementById('kp-card'); return { id: f.dataset.card, sentences: f.querySelectorAll('.kp-sentence .kp-s').length, target: [...f.querySelectorAll('.kp-sentence .kp-target')].map((n) => n.textContent), rt: f.querySelectorAll('rt').length, blank: f.querySelectorAll('.kp-blank').length, text: f.querySelector('.kp-sentence').textContent,
+      chips: [...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => n.textContent), reg: f.querySelector('.kp-chips .kp-regchip')?.getAttribute('aria-label') || '', rows: (() => { const tops = new Set([...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))); return tops.size; })() }; })()`);
+    check(
+      `pilot: ${card.id} (${card.word.term}, ${card.register}/${card.topic}) shows its ${sentenceEnds(card.ja).length} sentences with the target marked once, no readings, no gap`,
+      front.id === card.id && front.sentences === sentenceEnds(card.ja).length && front.sentences >= 4 && front.target.length === 1 && front.target[0] === card.form && front.rt === 0 && front.blank === 0 && front.text === card.ja,
+      JSON.stringify({ ...front, text: undefined }),
+    );
+    check(
+      'pilot: the register and topic sit as small text chips in the card’s chip row (labelled in full), the passage’s topic in place of the word’s group, one row on a phone',
+      front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && front.reg.includes('講義') && front.rows === 1,
+      JSON.stringify({ chips: front.chips, reg: front.reg, rows: front.rows }),
+    );
+    await page.click('#kp-reveal');
+    await page.waitForSelector('.kp-grade');
+    await page.waitForSelector('#kp-card .kp-sentence .kp-tok', { timeout: 15000 });
+    const back = await page.evaluate(`(() => { const a = document.querySelector('#kp-card .kp-answer'); const kids = [...a.children].map((n) => n.className.split(' ')[0]); const note = a.querySelector(':scope > .kp-note'); return { kids, note: note?.textContent || '', lang: note?.closest('[lang]')?.lang, beforeFolds: kids.indexOf('kp-note') >= 0 && kids.indexOf('kp-note') < kids.indexOf('kp-folds'), afterDef: kids.indexOf('kp-note') === kids.indexOf('kp-def') + 1, grammar: [...document.querySelectorAll('#kp-see [data-grammar]')].map((n) => n.dataset.grammar) }; })()`);
+    check(
+      'pilot: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese',
+      back.note === card.tipJa && back.afterDef && back.beforeFolds && back.lang === 'ja',
+      JSON.stringify(back),
+    );
+    check('pilot: the passage’s grammar points appear in the back’s 文法 line', (card.grammar || []).every((g) => back.grammar.includes(g.id)), JSON.stringify({ want: (card.grammar || []).map((g) => g.id), got: back.grammar }));
+    let sheet = null;
+    if (pick) {
+      const tok = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])').filter({ hasText: pick.s }).first();
+      await tok.click();
+      await page.waitForSelector('#kp-sheet');
+      sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { term: s.querySelector('.kp-sheet-term')?.textContent, def: s.querySelector('.kp-sheet-def')?.textContent || '', none: s.querySelector('.kp-sheet-none')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck') }; })()`);
+    }
+    check(
+      `pilot: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the entry sheet, not 「まだ辞書にありません」`,
+      !!pick && !!sense && sheet?.def === sense && !sheet.none && !sheet.inDeck,
+      JSON.stringify({ pick, sense, sheet }),
+    );
+    check('pilot: no page errors', errors.length === 0, errors.slice(0, 2).join(' | '));
+  } finally {
+    await context.close();
+  }
 }
 
 /* ------------------------------------- tap → define → 覚える (Phase 2 stage C, STANDARD A44) */
@@ -2118,6 +2249,7 @@ async function main() {
   verifyRuby([deck, sentences]);
   verifyBackData([deck, sentences]);
   verifyBackParity();
+  verifyPilotData(deck);
   const said = (d) => (d.method ?? []).join('');
   check('the method text names the same two buttons the player shows (もう一度／思い出せた), never 覚えた', said(deck).includes('「もう一度／思い出せた」') && said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
@@ -2236,6 +2368,9 @@ async function main() {
 
     console.log('\n— tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44)');
     await verifyTap(browser, base);
+
+    console.log('\n— the passage pilot (STANDARD A46): 4–5 sentences, tipJa in tier one, register and topic chips, Japanese senses');
+    await verifyPilot(browser, base);
 
     console.log('\n— the back hierarchy (CARD_CONTRACT_V2 §2–§4): front pin, tiers, folds, zoom, grade bar');
     await verifyBack(browser, base);

@@ -1,6 +1,6 @@
 # Sources: 言葉の鉱脈・MCD (kotoba-mcd)
 
-Built for the learner's own study (private build; some sources below may not be shared). 454 passages come from the 128 sources below; 489 passages were written for this deck (書き下ろし) and are not listed.
+Built for the learner's own study (private build; some sources below may not be shared). 454 passages come from the 128 sources below; 540 passages were written for this deck (書き下ろし) and are not listed.
 
 ## ja.wikipedia.org
 

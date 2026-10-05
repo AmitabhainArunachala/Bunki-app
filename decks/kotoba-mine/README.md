@@ -80,7 +80,7 @@ bundle the same player, and the Anki templates match it where Anki can.
 This follows Khatzumoto's AJATT **MCD (Massive-Context Cloze Deletion)** method: "instead
 of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 
-- **Front:** a real passage of 2–4 connected sentences with **one target** (one gap in 穴埋め). Readings stay
+- **Front:** a passage of 2–5 connected sentences with **one target** (one gap in 穴埋め). Readings stay
   hidden, and there's no English.
   - **語 card:** by default (読んで思い出す) the word is marked and you recall what it means
     and how it is read. In 穴埋め the whole word is blanked, with no hint, and you recall
@@ -92,7 +92,11 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
 - **Back:** the whole passage with furigana, the word with its reading, and the Japanese
   definition. Everything else is one tap deep (see **The player** above).
 - **Many passages per word.** Each word has 2–4 passages in different situations: news,
-  daily life, work, stories. When one card is settled (3 days' stability), the next opens,
+  daily life, work, stories. Twenty words also have the contract-v2 pilot passages
+  (`source/mcd/pilot-2026-10-04.json`, STANDARD A46): 4–5 sentences, 180–300 characters, each
+  written to a register (講 報 論 話 学 語) and a topic, with its own Japanese usage note
+  (`tipJa`, shown in tier one) and the grammar points it exercises; they come after the
+  word's earlier passages, so no existing card moves. When one card is settled (3 days' stability), the next opens,
   so the word keeps coming back in new surroundings.
 - **Passages:**
   - **Real:** mined from livedoor news, Japanese Wikinews, Wikipedia, Aozora Bunko, the web
@@ -146,7 +150,11 @@ the old record as `bunki-cloze:<deck>:before-restore`.
   - wrote 1–2 natural passages per word to the rules in `source/REVIEW_MCD.md`;
   - put the clearest passage first, and translated every passage.
 - The writers' choices are in `source/mcd/*.json`; `tools/export_mcd.py` merges them into
-  `source/mcd.json`, which `tools/build.py` turns into cards.
+  `source/mcd.json` (undated files first, then dated batches such as
+  `pilot-2026-10-04.json`, each adding passages after a word's existing ones), checking the
+  written-passage rules of `source/REVIEW_MCD.md` and the optional fields `register`, `topic`,
+  `tipJa`, `grammar`, `sense`; `tools/build.py` turns it into cards and carries those fields
+  onto them.
 
 **Single sentences** (fallback, and the earlier sentence deck):
 
@@ -216,6 +224,7 @@ python3 decks/kotoba-mine/tools/build.py --frozen                    # private (
 python3 decks/kotoba-mine/tools/build.py --frozen --profile public   # public
 python3 decks/kotoba-mine/tools/test_rights.py                       # licence checks
 python3 decks/kotoba-mine/tools/test_gloss_ja.py                     # Japanese sense table
+python3 decks/kotoba-mine/tools/test_export_mcd.py                   # passage rules and fields
 ```
 
 ## Files

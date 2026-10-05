@@ -107,6 +107,102 @@
       "before": "）",
       "cards": ["km-298-m02"],
       "note": "25元, the Taiwanese yuan, not もと"
+    },
+    {
+      "surface": "日本",
+      "reading": "にほん",
+      "after": "",
+      "before": "や欧州",
+      "cards": ["km-071-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 日本や欧州, the country in a news register (UniDic reads にっぽん)"
+    },
+    {
+      "surface": "一国",
+      "reading": "いっこく",
+      "after": "を",
+      "before": "が",
+      "cards": ["km-071-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 技術の覇権を一国が握り続ける: one country (UniDic splits 一 and 国 and reads いち こく)"
+    },
+    {
+      "surface": "私",
+      "reading": "わたし",
+      "after": "",
+      "before": "たち",
+      "cards": ["km-183-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 私たち in an essay, not the formal わたくし"
+    },
+    {
+      "surface": "口",
+      "reading": "ぐち",
+      "after": "出入り",
+      "before": "",
+      "cards": ["km-060-m04"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 出入り口 (でいりぐち), rendaku"
+    },
+    {
+      "surface": "一隻",
+      "reading": "いっせき",
+      "after": "を",
+      "before": "残らず",
+      "cards": ["km-060-m04"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 船を一隻残らず: one ship (UniDic reads いち せき)"
+    },
+    {
+      "surface": "一本",
+      "reading": "いっぽん",
+      "after": "かなめ",
+      "before": "で",
+      "cards": ["km-060-m05"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): かなめ一本で: one pivot (UniDic reads いち ぽん)"
+    },
+    {
+      "surface": "後",
+      "reading": "あと",
+      "after": "",
+      "before": "工程",
+      "cards": ["km-130-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 後工程 (あとこうてい), the back end of chip making"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "か",
+      "cards": ["km-017-m09", "km-283-m08", "km-087-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何か (something / what is it), not なん"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "を",
+      "cards": ["km-023-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何を知っていて、何を知らなかった"
+    },
+    {
+      "surface": "蓮",
+      "reading": "はす",
+      "after": "",
+      "before": "",
+      "cards": ["km-117-m04"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): the lotus flower (はす), not the Buddhist-name reading れん"
+    },
+    {
+      "surface": "方",
+      "reading": "かた",
+      "after": "思い浮かべる",
+      "before": "",
+      "cards": ["km-117-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 思い浮かべる方が多い: a polite word for people, not ほう"
+    },
+    {
+      "surface": "間",
+      "reading": "ま",
+      "after": "",
+      "before": "の取り方",
+      "cards": ["km-117-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 間の取り方 (pausing in speech), not あいだ"
     }
   ]
 }

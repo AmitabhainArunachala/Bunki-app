@@ -280,6 +280,60 @@
       "surface": "元",
       "right": "げん",
       "wrong": "もと"
+    },
+    {
+      "card": "km-071-m07",
+      "after": "",
+      "surface": "日本",
+      "before": "や欧州",
+      "right": "にほん",
+      "wrong": "にっぽん"
+    },
+    {
+      "card": "km-183-m07",
+      "after": "",
+      "surface": "私",
+      "before": "たち",
+      "right": "わたし",
+      "wrong": "わたくし"
+    },
+    {
+      "card": "km-060-m04",
+      "after": "出入り",
+      "surface": "口",
+      "right": "ぐち",
+      "wrong": "くち"
+    },
+    {
+      "card": "km-130-m07",
+      "after": "",
+      "surface": "後",
+      "before": "工程",
+      "right": "あと",
+      "wrong": "ご"
+    },
+    {
+      "card": "km-087-m06",
+      "after": "",
+      "surface": "何",
+      "before": "か",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-117-m04",
+      "after": "",
+      "surface": "蓮",
+      "right": "はす",
+      "wrong": "れん"
+    },
+    {
+      "card": "km-117-m06",
+      "after": "",
+      "surface": "間",
+      "before": "の取り方",
+      "right": "ま",
+      "wrong": "あいだ"
     }
   ]
 }
