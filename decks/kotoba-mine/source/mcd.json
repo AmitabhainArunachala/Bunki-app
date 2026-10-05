@@ -1285,6 +1285,57 @@
    "url": "https://www.aozora.gr.jp/cards/001066/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今回は、音が聞こえるまでに耳の中で起きていることを、順番に見ていきます。空気の振動が耳の穴を通って奥まで届くと、まず鼓膜が震えます。その震えは、体の中で最も小さい三つの骨によって大きくされ、さらに奥にあるかたつむりのような器官で電気の信号に変えられます。そして最後に、その信号を脳が受け取って、初めて音として感じられるわけです。つまり、耳は音を集めて伝える装置で、実際に聞いているのは脳だということですね。",
+   "form": "鼓膜",
+   "en": "This time we'll look, step by step, at what happens inside the ear before we hear a sound. When vibrations in the air travel through the ear canal and reach the far end, the eardrum vibrates first. Those vibrations are amplified by the three smallest bones in the body, and then turned into electrical signals by a snail-like organ further in. And finally, the brain receives those signals, and only then are they felt as sound. In other words, the ear is a device that collects and passes on sound, and what actually does the hearing is the brain.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「鼓膜が震える」「鼓膜が破れる」のように使う。太鼓の皮にたとえた名前と覚えるとよい。",
+   "grammar": [
+    "n4-teiku"
+   ],
+   "sense": "耳の奥にあり、音を受けて震えるうすい膜。"
+  },
+  {
+   "ja": "周囲の騒音を打ち消す機能を持つイヤホンが、通勤や在宅勤務の場面で広く使われている。耳元の小さなマイクが周りの音を拾い、内蔵のチップがそれと逆の波形の音を瞬時に作り出して打ち消す仕組みだ。騒音が鼓膜に届く前に弱められるため、音量を上げすぎずに済むという利点もある。最近ではAIで騒音の種類を判別し、人の声や駅の案内だけを通すといった機能を持つ製品も登場している。",
+   "form": "鼓膜",
+   "en": "Earphones with a function that cancels out surrounding noise are widely used when commuting and working from home. The system works by having a small microphone by the ear pick up the surrounding sound, while a built-in chip instantly generates a sound with the opposite waveform to cancel it out. Because the noise is weakened before it reaches the eardrum, there is also the advantage that you don't need to turn the volume up too high. Recently products have appeared that use AI to identify types of noise and let through only things like people's voices and station announcements.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "音が体に届く最後の入り口として言う。「鼓膜に届く」「鼓膜を守る」は報道でもよく見る形。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "耳の奥にあり、音を受けて震えるうすい膜。"
+  },
+  {
+   "ja": "鼓膜は、自分に届いた音を選ばない。鳥の澄んだ声にも、心ない陰口にも、ただ同じように震えるだけである。仏教が耳を六つの感覚の入り口の一つに数え、その清らかさを願ってきたのは、入り口そのものはどうしても閉じられないからだろう。耳に入ってくるものを、人は選ぶことができない。けれども、聞こえた言葉にいつまでも心を震わせ続けるかどうかは、聞く側に任されているのである。",
+   "form": "鼓膜",
+   "en": "The eardrum does not choose the sounds that reach it. It simply vibrates in just the same way for clear birdsong and for heartless gossip. Perhaps the reason Buddhism counted the ear among the six gateways of the senses and prayed for its purity is that the gateway itself can never be closed. People cannot choose what comes into their ears. But whether they let their hearts go on trembling at the words they heard is left up to the listener.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "体の部位の名前だが、随筆では外の刺激をそのまま受ける入り口として象徴的に使われる。",
+   "grammar": [
+    "n3-you-ni"
+   ],
+   "sense": "耳の奥にあり、音を受けて震えるうすい膜。"
   }
  ],
  "106": [
@@ -5275,6 +5326,54 @@
    "url": "https://www.aozora.gr.jp/cards/001492/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今回は、医学の父と呼ばれる古代ギリシャのヒポクラテスの話です。当時、病気は神々の怒りによって起こるものと広く信じられていました。ところがヒポクラテスの流れをくむ医師たちは、病気には食事や気候といった自然の原因があると考えました。彼らが大切にしたのは、患者を診るときに顔色や呼吸、熱の具合を丁寧に観察し、記録に残すことでした。祈るのではなく観察する、この姿勢の転換こそが、医学を学問にしたわけですね。",
+   "form": "診る",
+   "en": "This time the story is about Hippocrates of ancient Greece, who is called the father of medicine. At the time, illness was widely believed to be caused by the anger of the gods. But the doctors who followed in Hippocrates' tradition thought illness had natural causes such as diet and climate. What they valued was carefully observing the patient's complexion, breathing and fever when examining them, and keeping a record of it. Observing rather than praying: it was this change of attitude that turned medicine into a discipline.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "医者が患者の体の具合を調べるときだけ「診る」と書く。ふつうに目で見るのは「見る」。",
+   "grammar": [
+    "n3-dewa-naku"
+   ],
+   "sense": "医者が患者の体を調べて、具合を判断する。"
+  },
+  {
+   "ja": "医師が足りない山間部や離島で、ビデオ通話を使って患者を診るオンライン診療が広がっている。新型コロナウイルスの流行をきっかけに、初めての受診からの利用を認める制度の見直しが進んだことが背景にある。最近では、問診の内容をAIが整理して医師に伝える仕組みを組み合わせる自治体も出てきた。ただ、画面越しでは体に触れたり胸の音を聞いたりできないため、対面の診察とどう組み合わせるかが課題となっている。",
+   "form": "診る",
+   "en": "Online consultations, in which doctors examine patients over video calls, are spreading in mountain areas and remote islands where doctors are in short supply. Behind this is the review of the rules, prompted by the coronavirus pandemic, that allowed their use from a patient's very first visit. Recently some local governments have also begun combining it with a system in which AI organizes the content of the medical interview and passes it on to the doctor. However, since a doctor cannot touch the body or listen to the chest through a screen, how to combine it with in-person examinations remains an issue.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「患者を診る」の形が基本。医師が主語で、目的語は患者や病状になる。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "医者が患者の体を調べて、具合を判断する。"
+  },
+  {
+   "ja": "日本語の「みる」には、いくつもの漢字が当てられてきた。景色は見るものであり、芝居は観るものであり、病人は看るものである。そして医者が患者を診るとき、そこには目に映るものの奥にある原因を探ろうとする意志が込められている。同じ音の言葉を書き分けてきたのは、見るという行為に、それだけ多くの深さがあると昔の人が感じていたからだろう。漢字を選ぶことは、自分がどう向き合っているのかを問い直すことでもある。",
+   "form": "診る",
+   "en": "Several different kanji have been assigned to the Japanese word miru. Scenery is something you look at, a play is something you watch, and a sick person is someone you look after. And when a doctor examines a patient, the word carries the will to search for the cause that lies behind what meets the eye. People of the past probably wrote words with the same sound in different ways because they felt the act of seeing had that many depths. Choosing a kanji is also a way of asking yourself again how you are facing something.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "language",
+   "tipJa": "「看る」は世話をすること、「診る」は医者として調べること。書き分けで意味がはっきりする。",
+   "sense": "医者が患者の体を調べて、具合を判断する。"
   }
  ],
  "223": [
@@ -5339,6 +5438,59 @@
    "url": "http://news.livedoor.com/article/detail/5455376/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "ドクター圭子の知らなきゃケガするオトナの医学 vol.3〜Presented by ゆるっとcafe〜"
+  },
+  {
+   "ja": "今回は、ナイチンゲールを「優しい看護師」としてではなく、データの人として紹介します。クリミア戦争の野戦病院で彼女が気づいたのは、兵士の多くが戦いの傷ではなく、不衛生な環境による感染症で亡くなっているという事実でした。彼女は死者の数を原因ごとに集計し、ひと目でわかる図にまとめて政府に訴えました。この図をきっかけに病院の衛生が見直され、医療の現場で数字が重んじられるようになっていきます。思いやりを形にするには、まず事実を数えることが必要だったわけですね。",
+   "form": "医療",
+   "en": "This time I'll introduce Nightingale not as a gentle nurse but as a person of data. What she noticed at the field hospital in the Crimean War was the fact that many soldiers were dying not from battle wounds but from infections caused by unsanitary conditions. She tallied the number of deaths by cause, put them into a diagram that could be understood at a glance, and pressed her case to the government. This diagram led to a rethink of hospital hygiene, and numbers gradually came to be valued in medical practice. To give shape to compassion, she first had to count the facts.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「医療の現場」「医療制度」のように、治療とそれを支える仕組み全体を指す。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n4-teiku"
+   ],
+   "sense": "病気やけがを治すこと。また、それを行う仕組み。"
+  },
+  {
+   "ja": "病院の事務作業に生成AIを取り入れる動きが、国内でも広がりつつある。医師の時間外労働に2024年4月から上限が設けられたこともあり、診察の記録や紹介状の下書きをAIに任せ、負担を減らす狙いだ。ただ、AIはもっともらしい誤りを含む文章を作ることがあり、内容の確認は欠かせない。医療の現場では、AIはあくまで補助の道具にすぎないとして、最終的な判断は医師が担うべきだとの見方が強い。",
+   "form": "医療",
+   "en": "Moves to bring generative AI into hospital paperwork are spreading in Japan as well. Partly because a cap was placed on doctors' overtime from April 2024, the aim is to reduce the burden by leaving drafts of consultation records and referral letters to AI. However, AI sometimes produces text containing plausible-sounding errors, so checking the content is essential. In medical settings the prevailing view is that AI is only ever an auxiliary tool and that the final judgment should be made by doctors.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「医療の現場」「医療機関」「医療費」など、複合語や名詞句の形で多く現れる。",
+   "grammar": [
+    "n2-ni-suginai"
+   ],
+   "sense": "病気やけがを治すこと。また、それを行う仕組み。"
+  },
+  {
+   "ja": "仏教の四つの真理は、しばしば医者の仕事にたとえられてきた。病があると認め、その原因を突き止め、治った状態を思い描き、そこへ向かう薬を処方する。ブッダが「医王」とも呼ばれたのはそのためである。この見方に立てば、教えとは信じる対象ではなく、使って効き目を確かめる薬のようなものだろう。現代の医療が患者の納得を重んじるように、ブッダもまた、聞く者が自分で確かめることを求めたのである。",
+   "form": "医療",
+   "en": "The four truths of Buddhism have often been likened to a doctor's work. One admits there is an illness, pins down its cause, pictures the state of being cured, and prescribes the medicine that leads there. That is why the Buddha was also called the King of Physicians. From this point of view, the teaching is not something to believe in but something like a medicine whose effect you test by using it. Just as modern medicine values the patient's informed agreement, the Buddha too asked his listeners to check things for themselves.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "個々の治療よりも、社会の中の営みや制度としての面を言うときに選ぶ語。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n3-you-ni"
+   ],
+   "sense": "病気やけがを治すこと。また、それを行う仕組み。"
   }
  ],
  "235": [
@@ -8097,6 +8249,56 @@
    "url": "https://imotions.com/ja/blog/%E8%A6%96%E8%A6%9A%E7%9F%A5%E8%A6%9A%E5%85%A5%E9%96%80/",
    "licence": "web quotation (personal study)",
    "title": ""
+  },
+  {
+   "ja": "今回取り上げるのは、目の錯覚、いわゆる錯視の研究をまとめた本です。人はふだん、目がカメラのように外の世界をそのまま写していると考えています。ところが著者によれば、視覚系は届いた光をそのまま使うのではなく、過去の経験をもとに「たぶんこうだろう」と推測して形を組み立てているそうです。錯視は、この推測がたまたま外れたときに表に出てくるわけですね。つまり、目に見えているのは、脳が作ったいわば仮説だということです。",
+   "form": "視覚系",
+   "en": "What we're taking up this time is a book that pulls together research on optical illusions. People usually think their eyes record the outside world just as it is, like a camera. According to the author, though, the visual system does not use the light that reaches it as is, but builds up shapes by guessing, from past experience, that things are probably like this. An optical illusion is what surfaces when that guess happens to miss. In other words, what appears before our eyes is, so to speak, a hypothesis made by the brain.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "目から脳までをひとまとまりの仕組みとして言う語。「視覚系の働き」「視覚系が処理する」の形が多い。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku",
+    "n3-you-ni"
+   ],
+   "sense": "目と脳がつながって、見たものを処理するしくみ。"
+  },
+  {
+   "ja": "カメラの映像から人や物を認識するAIの分野で、人間の視覚系を手本にする研究が改めて注目されている。現在主流の深層学習も、もともとは脳が見たものを段階的に処理する仕組みから着想を得たものだ。ただ、人間が少ない例から学べるのに対し、AIは大量のデータと電力を必要とする点で大きな差がある。このため、目と脳がどの情報を選び、どれを捨てているのかを探る研究に、半導体メーカーも関心を寄せている。",
+   "form": "視覚系",
+   "en": "In the field of AI that recognizes people and objects in camera footage, research that takes the human visual system as its model is attracting renewed attention. Today's mainstream deep learning was itself originally inspired by the way the brain processes what it sees in stages. However, there is a large gap in that humans can learn from a few examples, while AI needs huge amounts of data and electricity. For this reason, semiconductor makers too are taking an interest in research into which information the eyes and brain pick out and which they discard.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道や解説では「人間の視覚系」「視覚系の仕組み」のように、機械と比べる文脈でよく使われる。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "目と脳がつながって、見たものを処理するしくみ。"
+  },
+  {
+   "ja": "仏教は、見るという働きを、目と外の物と心の三つが出会うところに初めて生まれるものと考えた。どれか一つが欠ければ、物がそこにあっても、見たことにはならない。現代の科学が明らかにした視覚系の仕組みも、光を受け取る目だけでなく、それに意味を与える脳の働きを抜きにしては語れない。器具も持たなかった古代の思想家たちが、そこまで見抜いていたことには、素直に驚かされる。見るとは受け身のようでいて、実は心が世界へ手を伸ばす営みなのである。",
+   "form": "視覚系",
+   "en": "Buddhism held that the act of seeing first arises where three things meet: the eye, the outer object and the mind. If any one of them is missing, the object may be there, but it does not count as having been seen. The workings of the visual system that modern science has revealed, too, cannot be explained without the brain that gives meaning to light as well as the eye that receives it. One cannot help being frankly amazed that ancient thinkers who had no instruments saw that far. Seeing looks passive, but it is in fact the mind reaching out toward the world.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "「系」は全体のまとまりを表す。目という器官だけでなく、脳の処理まで含めて言うときに選ぶ語。",
+   "sense": "目と脳がつながって、見たものを処理するしくみ。"
   }
  ],
  "248": [
@@ -9054,6 +9256,60 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、病院の検査でもおなじみの技術の、そもそもの出発点を紹介します。1946年、アメリカのブロッホとパーセルは、それぞれ独立に、強い磁場の中に置いた原子核が決まった周波数の電波にだけ反応することを確かめました。この現象が磁気共鳴で、二人はこの功績によって1952年にノーベル物理学賞を受けています。面白いのは、当時は誰も、これが体の中をのぞく道具になるとは思っていなかったことです。純粋な好奇心から始まった研究が、数十年後に病院の検査室に入ることになったわけですね。",
+   "form": "磁気共鳴",
+   "en": "This time I'll introduce the very starting point of a technology that is familiar from hospital checkups. In 1946, Bloch and Purcell in America each independently confirmed that atomic nuclei placed in a strong magnetic field respond only to radio waves of a set frequency. This phenomenon is magnetic resonance, and the two received the Nobel Prize in Physics for it in 1952. The interesting thing is that at the time nobody thought it would become a tool for looking inside the body. Research that started from pure curiosity ended up, decades later, in hospital examination rooms.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "物理の現象の名前。原子核が対象のときは「核磁気共鳴」とも言う。",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n5-teiru"
+   ],
+   "sense": "強い磁場の中の原子核が、決まった周波数の電波に反応する現象。"
+  },
+  {
+   "ja": "量子コンピューターの研究では、いまや超電導や光を使う方式が主流となっている。だが、その初期の実験を支えたのは、化学分析で長く使われてきた磁気共鳴の技術だった。2001年にはアメリカのIBMの研究チームが、液体の中の分子の原子核を量子ビットとして使い、15を3と5に分解する計算に成功している。この方式は規模を大きくするのが難しく、その後は別の方式に主役の座を譲ることになった。それでも、量子の状態を電波で操るという基本の考え方は、現在の研究にも引き継がれている。",
+   "form": "磁気共鳴",
+   "en": "In quantum computing research, approaches that use superconductors or light have now become the mainstream. But what supported the early experiments was magnetic resonance technology, long used in chemical analysis. In 2001 a research team at IBM in the US used the nuclei of molecules in a liquid as qubits and succeeded in a calculation that factored 15 into 3 and 5. This approach was hard to scale up, and it later ended up yielding the leading role to other approaches. Even so, the basic idea of controlling quantum states with radio waves has been carried over into today's research.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "「磁気共鳴の技術」「磁気共鳴を利用する」のように、分析や計測の原理として言うことが多い。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-ni-naru"
+   ],
+   "sense": "強い磁場の中の原子核が、決まった周波数の電波に反応する現象。"
+  },
+  {
+   "ja": "原子核は、決まった周波数の電波にだけ応え、それ以外の電波にはどれほど強くても反応しない。物理学で磁気共鳴と呼ばれるこの性質を知ったとき、ふとブッダの説法を思い出した。ブッダは、聞く人の悩みや理解の深さに応じて、同じ教えを違う言葉で説いたと伝えられている。どれほど正しい言葉も、相手の心の周波数に合わなければ素通りしていくからだろう。言葉を届けたいなら、声を張り上げるより先に、相手の周波数を探すべきなのである。",
+   "form": "磁気共鳴",
+   "en": "Atomic nuclei answer only radio waves of a set frequency, and do not react to any others, however strong. When I learned of this property, which physics calls magnetic resonance, I suddenly recalled the Buddha's way of preaching. The Buddha is said to have taught the same teaching in different words according to the listener's troubles and depth of understanding. Perhaps that is because even the most correct words pass straight by if they do not match the frequency of the other person's heart. If you want your words to reach someone, you should look for their frequency before raising your voice.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "本来は物理の用語。随筆では、合うものにだけ応えるという性質をたとえに借りることがある。",
+   "grammar": [
+    "n2-ni-oujite",
+    "n5-teiru"
+   ],
+   "sense": "強い磁場の中の原子核が、決まった周波数の電波に反応する現象。"
   }
  ],
  "41": [
@@ -10793,6 +11049,58 @@
    "url": "",
    "licence": "CC BY-SA (Wikipedia)",
    "title": "バラク・オバマ"
+  },
+  {
+   "ja": "今回は、目標を立てても続かない人のための本を紹介します。著者がまず指摘するのは、「英語を頑張る」のような目標には具体性が足りないという点です。そうではなく、「月曜と木曜の朝、駅に着いたら単語を十個覚える」のように、いつ、どこで、どれだけやるかまで決めておくのがコツだそうです。心理学では、こうした「もしこうなったら、これをする」という形の計画が、実行される見込みを大きく高めることが知られています。やる気に頼るのではなく、行動のきっかけを先に決めておくということですね。",
+   "form": "具体性",
+   "en": "This time I'll introduce a book for people who set goals but can't stick to them. The first thing the author points out is that a goal like work hard at English lacks specificity. Instead, the trick is apparently to decide on when, where and how much you'll do, like learn ten words on Monday and Thursday mornings when I get to the station. In psychology it is known that plans in this if this happens, I'll do that form greatly raise the chances of being carried out. In short, rather than relying on motivation, you decide on the trigger for the action in advance.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「具体性に欠ける」「具体性が足りない」のように、計画や話を評価するときに使う。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "計画や話の中身が、はっきりしていること。"
+  },
+  {
+   "ja": "生成AIの導入を経営方針に掲げる企業が、業種を問わず増えている。だが、どの業務にどう使うのかという計画の具体性に欠け、試しに使ってみる段階で止まっている例も少なくない。専門家は、まず効果を測りやすい業務に対象を絞り、短縮できる作業時間などの目標を数字で置くべきだと指摘する。導入そのものが目的になってしまえば、高額な契約を結んでも成果につながらないことになりかねない。",
+   "form": "具体性",
+   "en": "Across all industries, more and more companies are making the introduction of generative AI part of their management policy. But there are quite a few cases where the plans lack specifics about which tasks it will be used for and how, and things have stalled at the trial stage. Experts point out that companies should first narrow the target to tasks whose effects are easy to measure, and set goals in numbers, such as how much working time can be cut. If introducing it becomes an end in itself, a company may end up signing expensive contracts that lead to no results.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「計画の具体性」「具体性に欠ける」のように、物足りなさを指摘する文脈で多く使う。",
+   "grammar": [
+    "n3-koto-ni-naru"
+   ],
+   "sense": "計画や話の中身が、はっきりしていること。"
+  },
+  {
+   "ja": "小論文で評価が伸びない答案には、ある共通点があります。「環境を守ることは大切だ」「一人ひとりが意識を変えるべきだ」といった主張は立派でも、それを支える例が一つも書かれていないのです。主張のあとに、自分が見聞きした出来事や数字を一つ添えるだけで、文章の具体性は大きく変わります。試験官は、どれだけ立派なことを言ったかではなく、その考えにどれだけ根拠があるかを見ているからです。",
+   "form": "具体性",
+   "en": "Essay answers whose marks don't improve have one thing in common. Their claims, like protecting the environment is important or each of us should change our awareness, may be admirable, but not a single example is written to support them. Just adding one event you have seen or heard, or one figure, after the claim makes a big difference to how specific the writing is. That is because examiners look not at how admirable the things you said are, but at how much grounding your ideas have.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "学",
+   "topic": "language",
+   "tipJa": "作文の指導では「具体性を持たせる」「具体性を出す」の形でよく使う。",
+   "grammar": [
+    "n3-dewa-naku"
+   ],
+   "sense": "計画や話の中身が、はっきりしていること。"
   }
  ],
  "237": [
@@ -10825,6 +11133,52 @@
    "url": "http://news.livedoor.com/article/detail/6668528/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "Time-Lapse（微速度）撮影ができるカメラ！ COMPTEX TAIPEIで見つけたオモシロガジェット【デジ通】"
+  },
+  {
+   "ja": "今回は、計画の失敗を前もって防ぐための「死亡前死因分析」という方法を紹介します。心理学者のゲイリー・クラインが提案したもので、プロジェクトを始める前に、仮に一年後この計画が大失敗に終わっていたとしたら、その原因はどこにあったかを全員で書き出します。「うまくいくだろうか」と聞かれると、人はつい楽観的に答えてしまいます。でも、失敗したことを前提にすると、言いにくかった不安も口に出しやすくなるわけです。",
+   "form": "仮に",
+   "en": "This time I'll introduce a method called the premortem, for heading off a plan's failure in advance. It was proposed by the psychologist Gary Klein: before starting a project, everyone writes down where the cause would have lain, supposing that a year from now the plan had ended in a major failure. When asked whether something will go well, people tend to answer optimistically. But if you take failure as a given, it becomes easier to voice worries that were hard to bring up.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「仮に〜としたら」「仮に〜ても」と、仮定の表現と組み合わせて使うのが基本。",
+   "sense": "本当かどうかは別にして、そうだとすると。"
+  },
+  {
+   "ja": "理化学研究所のチームが合成に成功した113番元素は、正式な名前が決まるまで、ウンウントリウムと仮に呼ばれていた。これは数字の1、1、3を表すラテン語系の言葉を並べただけの名前で、新しい元素にはこうした呼び名が一律に付けられる。2016年、国際純正・応用化学連合は、国名にちなむニホニウムを正式な名称として認めた。アジアの研究機関が発見した元素に名前が付いたのは、これが初めてだった。",
+   "form": "仮に",
+   "en": "Element 113, which a RIKEN team succeeded in synthesizing, was provisionally called ununtrium until its official name was decided. This name simply strings together Latin-based words for the numbers one, one and three, and new elements are all given names of this kind. In 2016 the International Union of Pure and Applied Chemistry approved nihonium, named after the country, as its official name. It was the first time an element discovered by an Asian research institution had been given a name.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "この意味では「仮に呼ぶ」「仮に決めておく」のように、正式になるまでの一時的な扱いを表す。",
+   "sense": "正式に決まるまでの間に合わせとして。一時的に。"
+  },
+  {
+   "ja": "『ミリンダ王の問い』という古い経典で、僧ナーガセーナは王に、車とはいったいどういうものかと問いかける。車軸も車輪も、どれ一つとして車そのものではなく、部品が集まったところに車という名が与えられているにすぎない。人間もまた同じだと、彼は説く。仮に体と心をどこまで細かく分けていったとしても、「自分」という固い芯はどこにも見つからないのである。それでも名は残り、その名があるからこそ、我々はこの集まりを大切に扱うことができるのだろう。",
+   "form": "仮に",
+   "en": "In an old scripture called The Questions of King Milinda, the monk Nagasena asks the king what exactly a chariot is. Neither the axle nor the wheels nor any other part is the chariot itself, and the name chariot is merely given to the place where the parts come together. Human beings are the same, he teaches. Supposing we divided body and mind ever more finely, no solid core called the self would be found anywhere. Even so the name remains, and perhaps it is precisely because there is a name that we can treat this gathering with care.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "「仮に〜としても」は、極端な場合を持ち出して結論が変わらないことを示す論の運び方。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n2-ni-suginai"
+   ],
+   "sense": "本当かどうかは別にして、そうだとすると。"
   }
  ],
  "243": [
@@ -11936,6 +12290,56 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、脳科学の本を読むときに知っておきたい検査の話をします。磁気共鳴断層撮影は、もともと体の断面を写すための検査ですが、脳のどこで血液の流れが増えているかを調べる使い方もあります。本でよく見る「恋をすると脳のこの部分が光る」といった図は、たいていこの方法で作られています。ただ、光って見えるのは血液の流れの変化であって、心の動きそのものを写しているわけではありません。図の派手さに引っぱられることなく、どんな値を測った結果なのかを確かめるのが大切だということですね。",
+   "form": "磁気共鳴断層撮影",
+   "en": "This time I'll talk about a test worth knowing about when you read books on brain science. MRI is originally a test for picturing cross-sections of the body, but it can also be used to find where in the brain blood flow is increasing. The diagrams you often see in books, along the lines of this part of the brain lights up when you fall in love, are usually made with this method. However, what appears to light up is a change in blood flow, and it is not a picture of the workings of the mind itself. The point is that, without being swayed by how striking the diagram is, it matters to check what kind of value was measured to get the result.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "正式で長い言い方。会話ではふつう「エムアールアイ」と呼び、文章で正確に言うときに使う。",
+   "grammar": [
+    "n5-teiru",
+    "n2-koto-naku"
+   ],
+   "sense": "磁石と電波で、体の断面を写し出す検査。"
+  },
+  {
+   "ja": "体を切らずに内部を詳しく調べられる磁気共鳴断層撮影は、1970年代に基本となる原理が考え出された。アメリカのラウターバーとイギリスのマンスフィールドは、磁場の強さに場所ごとの差をつけることで、信号がどこから来たのかを突き止める方法を示した。二人はこの業績により、2003年にノーベル生理学・医学賞を受賞している。放射線を使わないため、同じ人を繰り返し検査しやすいという利点もある。今では脳や関節、内臓などの検査に欠かせない存在となっている。",
+   "form": "磁気共鳴断層撮影",
+   "en": "The basic principle of MRI, which can examine the inside of the body in detail without cutting it open, was worked out in the 1970s. Lauterbur of the United States and Mansfield of Britain showed a way to pin down where a signal came from by making the strength of the magnetic field differ from place to place. The two received the Nobel Prize in Physiology or Medicine in 2003 for this achievement. Because it uses no radiation, it also has the advantage that the same person can easily be examined again and again. Today it has become indispensable for examining the brain, joints, internal organs and more.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "報道や公式の文書で使う正式名。見出しなどでは短く「エムアールアイ検査」とされることが多い。",
+   "grammar": [
+    "n3-koto-de",
+    "n5-teiru"
+   ],
+   "sense": "磁石と電波で、体の断面を写し出す検査。"
+  },
+  {
+   "ja": "磁気共鳴断層撮影って、受けたことあります？あれ、狭い筒の中に入るんですけど、工事現場みたいなガンガンいう音がずっと鳴ってるんですよ。で、動かないでくださいって言われるじゃないですか。そうすると逆に、鼻がかゆいとか足がつりそうとか、余計なことばっかり気になってくるんですよね。人間って、じっとしろって言われた瞬間に、体のことを考えずにいられなくなる生き物なんだなって思いました。",
+   "form": "磁気共鳴断層撮影",
+   "en": "Have you ever had an MRI scan? You go inside a narrow tube, and there's this banging noise like a construction site going on the whole time. And then they tell you not to move, right? Then, if anything, you start noticing all sorts of pointless things, like your nose itching or your leg about to cramp. It made me think humans are creatures who, the moment they're told to keep still, can't stop thinking about their bodies.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "mind",
+   "tipJa": "会話ではかなり硬く長い言い方。ふだんは「エムアールアイ」と言い、改まった説明で使う。",
+   "sense": "磁石と電波で、体の断面を写し出す検査。"
   }
  ],
  "42": [
@@ -13732,6 +14136,60 @@
    "url": "http://news.livedoor.com/article/detail/4827888/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "今年の夏、女子はボーナスをどう使う？"
+  },
+  {
+   "ja": "今回は、学習科学の研究から、覚えたことを忘れにくくする方法を一つ紹介します。それは、抽象的な説明を読んだら、自分で具体的な例を考えてみることです。たとえば経済学の「機会費用」なら、休日に映画を見に行くとき、その時間に働けば得られたはずのお金だと置きかえてみるわけです。例と結びつけることで、言葉が自分の経験の中に居場所を持つようになります。ポイントは、本に載っている例をなぞるのではなく、自分の生活から引っぱってくることですね。",
+   "form": "具体的な",
+   "en": "This time I'll introduce one method from learning science research for making what you've learned harder to forget. It is to think up concrete examples of your own after reading an abstract explanation. For example, with opportunity cost from economics, you would recast it as the money you could have earned by working during the time you spend going to a film on your day off. By tying it to an example, the word comes to have a place within your own experience. The key is not to trace the examples in the book but to pull them from your own life.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「具体的な例」「具体的に説明する」のように、な形容詞として名詞や動詞にかかる。反対は「抽象的」。",
+   "grammar": [
+    "n3-koto-de",
+    "n4-you-ni-naru",
+    "n3-dewa-naku"
+   ],
+   "sense": "中身がはっきりしていて、実際の形でわかる様子。"
+  },
+  {
+   "ja": "欧州連合のAI法は、リスクの高さに応じて企業に課す義務を変える仕組みを採っている。採用の選考や融資の審査に使うAIなどは高リスクとされ、厳しい管理が求められる。法律は2024年に成立し、禁止される使い方に関する規則などから段階的に適用が始まっている。ただ、自社のシステムがどの区分に当たるのかを具体的にどう判断すればよいのか、企業からは戸惑いの声も聞かれる。欧州で事業を行う以上、域外の企業も対応を迫られることになる。",
+   "form": "具体的に",
+   "en": "The European Union's AI Act adopts a system that changes the obligations placed on companies according to the level of risk. AI used for things like screening job applicants and assessing loans is classed as high risk, and strict management is required. The law was enacted in 2024, and its application has begun in stages, starting with rules such as those on prohibited uses. However, voices of confusion can be heard from companies over how, in concrete terms, they should judge which category their own systems fall into. As long as they do business in Europe, companies from outside the EU will also be pressed to respond.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「具体的に示す」「具体的な対策」のように、方針の中身を問う場面で多く使う。",
+   "grammar": [
+    "n2-ni-oujite",
+    "n3-koto-ni-naru"
+   ],
+   "sense": "中身がはっきりしていて、実際の形でわかる様子。"
+  },
+  {
+   "ja": "AIに文章を頼むとき、「いい感じにまとめて」って書いちゃう人、けっこう多いじゃないですか。でもそれだと、AIのほうも平均的で無難な答えしか返せないんですよね。誰に読ませるのか、長さはどれくらいか、どんな口調か、そこまで具体的に書くと、出てくるものが全然変わるんですよ。これって結局、人に仕事を頼むときと同じで、頼む側がちゃんと考えているかどうかが試されてるってことなんですよね。",
+   "form": "具体的に",
+   "en": "When people ask AI to write something, quite a lot of them just type sum it up nicely, right? But then the AI can only give back an average, safe answer. If you write it out concretely, down to who will read it, how long it should be and what tone to use, what comes out changes completely. In the end it's the same as asking a person to do a job: what's being tested is whether the one asking has really thought it through.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "ai",
+   "tipJa": "会話では「具体的に言うと」「具体的には」の形がよく使われる。前置きとしても便利。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "中身がはっきりしていて、実際の形でわかる様子。"
   }
  ],
  "238": [
@@ -16659,6 +17117,58 @@
    "url": "http://news.livedoor.com/article/detail/5385396/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "男子が冷めてしまう女性とは!?"
+  },
+  {
+   "ja": "今回は、新しい技術と記憶をめぐる、二千年以上前の議論を紹介します。プラトンの対話篇には、文字の発明について、エジプトの王が意見を述べる場面が出てきます。文字は記録を残す便利な道具である反面、人々が自分の頭で覚えなくなるのではないかと、王は心配しているのです。面白いのは、まったく同じ心配が、印刷術やインターネット、そして今のAIに対しても繰り返されてきたことです。新しい道具が出るたびに、人は失うものと得るものを問い直してきたわけですね。",
+   "form": "反面",
+   "en": "This time I'll introduce a debate about new technology and memory from more than two thousand years ago. In one of Plato's dialogues there is a scene in which an Egyptian king gives his opinion on the invention of writing. The king worries that while writing is a handy tool for keeping records, on the other hand people may stop remembering things with their own heads. What's interesting is that exactly the same worry has been repeated about printing, the internet and now AI. Every time a new tool appears, people have asked themselves again what they lose and what they gain.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「〜である反面、…」の形で、よい面と逆の面を一文の中で並べる。後ろには反対の内容が来る。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "ある面とは逆の、もう一方の面。（〜反面の形で）"
+  },
+  {
+   "ja": "生成AIの急速な普及を受けて、AI向け半導体の需要が世界的に伸びている。メーカーにとっては大きな商機となる反面、計算を担うデータセンターの電力消費が急増し、送電網への負担が懸念されている。国際エネルギー機関は、データセンターが使う電力が今後数年で大きく増えるとの見通しを示している。このため各社は、同じ計算をより少ない電力でこなせるチップの開発に力を入れている。",
+   "form": "反面",
+   "en": "With the rapid spread of generative AI, demand for chips for AI is growing worldwide. While this is a big business opportunity for manufacturers, on the other hand the power consumption of the data centers that handle the computing is soaring, raising concerns about the strain on power grids. The International Energy Agency has projected that the electricity used by data centers will rise sharply over the next few years. For this reason, each company is putting effort into developing chips that can do the same computing with less power.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「〜となる反面」「その反面」の形で、利点のあとに課題を示す流れによく使う。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "ある面とは逆の、もう一方の面。（〜反面の形で）"
+  },
+  {
+   "ja": "人は欲しかったものを手に入れたその瞬間から、それを失う恐れを抱えることになる。仏教が執着を苦しみの根と見たのは、喜びそのものを否定するためではない。愛するものがあることは人生を豊かにする反面、その分だけ心を縛る綱にもなるからである。だから仏教は、愛を捨てることではなく、握りしめないことを求めるのだろう。手を開いたまま大切にすること、それが執着とは異なる愛し方なのである。",
+   "form": "反面",
+   "en": "From the very moment we obtain what we wanted, we come to carry the fear of losing it. Buddhism did not regard attachment as the root of suffering in order to deny joy itself. It is because having something to love enriches life, while on the other hand it also becomes, to the same degree, a rope that binds the heart. That is probably why Buddhism asks not that we give up love, but that we do not clutch. To cherish something with an open hand is a way of loving that differs from attachment.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "書き言葉では「〜する反面」と動詞の普通形に直接つける。対照をはっきり示したいときに使う。",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n3-dewa-naku"
+   ],
+   "sense": "ある面とは逆の、もう一方の面。（〜反面の形で）"
   }
  ],
  "239": [
