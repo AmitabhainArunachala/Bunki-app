@@ -704,7 +704,50 @@ def _encode(ja: str, tokens: list[dict], targets: list[tuple[int, int]]) -> list
     return out
 
 
-def tokens_file(deck: dict) -> dict:
+GLOSS_JA_PATH = SRC / "gloss_ja.json"
+GLOSS_JA_MAX = 40  # characters in one sense
+_GLOSS_JA: dict[str, str] | None = None
+
+
+def gloss_ja(path: Path | None = None) -> dict[str, str]:
+    """source/gloss_ja.json: {lemma: one-line Japanese sense} for words that are not this deck's
+    own (the host lexicon is English-only, so they have no Japanese sense otherwise). Keys are
+    the token keys the player tries (ref, lemma, surface); a malformed entry fails the build."""
+    global _GLOSS_JA
+    if path is None and _GLOSS_JA is not None:
+        return _GLOSS_JA
+    src = path or GLOSS_JA_PATH
+    table = json.loads(src.read_text("utf-8")) if src.exists() else {}
+    if not isinstance(table, dict):
+        raise SystemExit(f"{src.name}: expected an object {{lemma: sense}}")
+    bad = [k for k, v in table.items()
+           if not (isinstance(k, str) and k.strip() == k and k and isinstance(v, str) and v.strip() == v
+                   and 0 < len(v) <= GLOSS_JA_MAX and "\n" not in v and re.search(r"[ぁ-んァ-ヶ一-鿿]", v))]
+    if bad:
+        raise SystemExit(f"{src.name}: entries must be one Japanese line of 1–{GLOSS_JA_MAX} characters: {', '.join(bad[:10])}")
+    if path is None:
+        _GLOSS_JA = table
+    return table
+
+
+def gloss_keys(rows_list, table: dict[str, str], terms: set[str]) -> set[str]:
+    """the table's keys that some 語 token in these rows answers to: its ref, else its lemma, else
+    its surface, the order the player tries them. A deck word answers for itself (its defJa)."""
+    keys: set[str] = set()
+    for rows in rows_list:
+        for r in rows:
+            if len(r) < 4 or r[3] != "語":
+                continue
+            for key in (r[4] if len(r) > 4 else "", r[1], r[0]):
+                if key in terms:
+                    break
+                if key and key in table:
+                    keys.add(key)
+                    break
+    return keys
+
+
+def tokens_file(deck: dict, table: dict[str, str] | None = None) -> dict:
     """the deck's tokens: each distinct passage once, cards pointing at it by index"""
     passages: list[list] = []
     seen: dict[str, int] = {}
@@ -722,6 +765,17 @@ def tokens_file(deck: dict) -> dict:
     # each word's Japanese definition, tokenised the same way: the back's 定義 and the entry sheet
     # tap it (STANDARD A44)
     defs = {w["id"]: encode_text(w["defJa"]) for w in deck["words"] if w.get("defJa")}
+    # the Japanese sense of a word that is not the deck's own, keyed by lemma beside the word ids:
+    # source/gloss_ja.json first; a word the table does not hold keeps today's behaviour (the host
+    # lexicon, which has no Japanese sense). Only lemmas the passages or definitions use ship.
+    table = gloss_ja() if table is None else table
+    terms = {w["term"] for w in deck["words"]}
+    clash = sorted(set(table) & terms)
+    if clash:
+        raise SystemExit(f"gloss_ja.json: {', '.join(clash[:10])} are words of {deck['id']}; their sense is their defJa")
+    ids = set(defs)
+    for key in sorted(gloss_keys([*passages, *defs.values()], table, terms) - ids):
+        defs[key] = encode_text(table[key])
     for toks in defs.values():
         used.update(t[4] for t in toks if len(t) > 4 and t[3] == "文法")
     return {
@@ -777,7 +831,8 @@ def gloss_map(deck: dict, side: dict) -> dict:
             hit = spans(side["passages"][side["cards"][c["id"]]])
             if hit:
                 cards[c["id"]] = hit
-    defs = {wid: hit for wid, rows in side.get("defs", {}).items() if (hit := spans(rows))}
+    words = {w["id"] for w in deck["words"]}  # the lemma senses (gloss_ja.json) need a host lexicon
+    defs = {wid: hit for wid, rows in side.get("defs", {}).items() if wid in words and (hit := spans(rows))}
     return {"format": "bunki-cloze-gloss", "version": 1, "deck": deck["id"], "cards": cards, "defs": defs}
 
 

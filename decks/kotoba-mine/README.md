@@ -215,6 +215,7 @@ build is the learner's decision (question 1 in
 python3 decks/kotoba-mine/tools/build.py --frozen                    # private (default)
 python3 decks/kotoba-mine/tools/build.py --frozen --profile public   # public
 python3 decks/kotoba-mine/tools/test_rights.py                       # licence checks
+python3 decks/kotoba-mine/tools/test_gloss_ja.py                     # Japanese sense table
 ```
 
 ## Files
@@ -232,6 +233,9 @@ source/rights.json        the licence of record for every source (see above)
 source/ids.json           every card's id, keyed by word, passage text and card kind;
                           ids of cards no longer built stay reserved and are never reused
 source/readings.json      reading fixes applied after tokenising (人 → じん, 一日 → いちにち…)
+source/gloss_ja.json      {lemma: one-line Japanese sense} for words that are not the deck's
+                          own; build.py ships the ones the passages use in tokens.json defs
+                          beside the word ids (a deck word keeps its defJa)
 release/                  kotoba-mine.apkg · kotoba-mine.tsv · study.html ·
                           ATTRIBUTION-<id>.md (private build)
 release/public/           the public build and its ATTRIBUTION files

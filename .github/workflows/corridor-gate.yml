@@ -102,6 +102,8 @@ jobs:
           if [ -n "$untracked" ]; then
             echo "build.py wrote files that are not committed:"; echo "$untracked"; exit 1
           fi
+      - name: Japanese sense table (test_gloss_ja.py)
+        run: python3 decks/kotoba-mine/tools/test_gloss_ja.py
       - name: Verify the deck and player (verify-kotoba-mine.mjs)
         run: node prototypes/corridor/tools/verify-kotoba-mine.mjs
       - name: Deck and player unit tests
