@@ -15,6 +15,7 @@ on:
       - 'scripts/**'
       - 'package.json'
       - 'package-lock.json'
+      - 'tsconfig.base.json'
       - '.github/workflows/personal-collections.yml'
   push:
     branches: [main]
@@ -31,6 +32,7 @@ on:
       - 'scripts/**'
       - 'package.json'
       - 'package-lock.json'
+      - 'tsconfig.base.json'
       - '.github/workflows/personal-collections.yml'
   workflow_dispatch:
 

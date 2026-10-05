@@ -112,6 +112,7 @@ try {
  await page.locator('#sheet').press('Escape');await page.locator('#sheet').waitFor({state:'detached'});
  const finalProgress=await page.evaluate(async id=>{const {openStore}=await import('./decks/personal/store.mjs');const store=await openStore();try{return JSON.stringify((await store.get(id)).progress);}finally{store.close();}},data.id);
  assert.equal(finalProgress,before.progress,'word, grammar and list capture leave personal assessment history unchanged');
+ assert.equal(reqs.filter(r=>/\/data\/articles\/index\.json$/u.test(new URL(r.url).pathname)).length,0,'the private deck loads no article index');
  assert(reqs.every(r=>r.method==='GET'));assert(reqs.every(r=>r.url.startsWith(origin)||r.url.startsWith('data:')));assert.deepEqual(errors,[]);
  console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,addToListPointerToggle:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
 }finally{releaseDictionary();await browser.close();await new Promise(r=>server.close(r));}

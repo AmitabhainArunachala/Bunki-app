@@ -123,12 +123,10 @@ await test('private route and all module dependencies are packaged and precached
     URL,Request,Response,Headers,TextEncoder,TextDecoder,crypto:webcrypto});
   vm.runInContext(readFileSync(new URL('../sw.js',import.meta.url),'utf8'),worker);
   const precached=new Set(vm.runInContext('[...SHELL,...BOOT_DATA,...GUIDED_ROOM]',worker));
-  const corridor=readFileSync(new URL('../corridor.js',import.meta.url),'utf8');
   for(const path of [...['mount.mjs','engine.mjs','schema.mjs','store.mjs','enrichment.mjs','host-bridge.mjs','personal.css'].map(file=>`decks/personal/${file}`),'vendor/ts-fsrs.mjs','fonts.css']) {
     assert(CORRIDOR_REQUIRED_ROOTS.some(root=>path===root||path.startsWith(`${root}/`)),`${path} is a required release asset`);
     assert(assembled.has(path),`${path} is assembled into the release`);
     assert(precached.has(path),`${path} is precached by the service worker`);
   }
-  assert(corridor.indexOf("params.get('deck') === 'personal'") < corridor.indexOf('const loadArticleIndex'));
 });
 console.log(JSON.stringify({suite:'personal-collections',passed:checks.length,checks},null,2));

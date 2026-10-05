@@ -29,11 +29,14 @@ const documentPath = fragment ? resolve(temporary, 'fragment-host.html') : bundl
 if (fragment) writeFileSync(documentPath, `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${readFileSync(bundle, 'utf8')}</body></html>`);
 const documentURL = pathToFileURL(documentPath);
 documentURL.search = '?entry=shelf&ui=bi';
+const personalURL = new URL(documentURL);
+personalURL.searchParams.set('deck', 'personal');
 await context.route('**/*', route => {
   const request = route.request();
   // Open the actual handoff from disk. Sending a large HTML body through
   // route.fulfill base64-encodes it and can exceed Chromium's DevTools pipe limit.
-  if (request.isNavigationRequest() && request.frame() === page.mainFrame() && request.url() === documentURL.href)
+  if (request.isNavigationRequest() && request.frame() === page.mainFrame() &&
+      [documentURL.href, personalURL.href].includes(request.url()))
     return route.continue();
   if (!request.isNavigationRequest() && /^(blob|data):/u.test(request.url())) return route.continue();
   requests.push(request.url());
@@ -80,12 +83,23 @@ try {
   assert.equal(await page.locator('.skip-wheel-parts[data-role="left-parts"]').count(),1);
   assert.equal(requests.filter(u=>u.includes('skip')).length,0);
   assert.equal(requests.filter(u=>/editorial\.css|design\//u.test(u)).length,0,JSON.stringify(requests));
+  await page.click('#back');
+  await openShelfTools(page);
+  await page.locator('#decks-link').click();
+  await page.locator('.dojo-deck[data-deck="context"]').waitFor();
+  assert.equal(await page.locator('.dojo-deck[data-deck="personal"]').count(),0,'The handoff offers no personal-collections deck');
+  await page.goto(personalURL.href,{waitUntil:'domcontentloaded'});
+  await page.locator('#shelf-reading-results .shelf-item').first().waitFor();
+  assert.notEqual(await page.evaluate(() => document.body.dataset.view),'personaldeck','The personal route falls back to the shelf');
+  assert.equal(await page.locator('.pc').count(),0);
+  assert.equal(requests.filter(u=>u.includes('decks/personal')).length,0,JSON.stringify(requests));
   assert.equal(errors.length,0,JSON.stringify(errors));
   await page.screenshot({path:resolve(temporary,'skip-standalone.png')});
   writeFileSync(resolve(temporary,'result.json'),JSON.stringify({pass:true,mode:fragment?'fragment':'document',artifactSha256:identity.artifactSha256,browser:browser.version(),requests,errors,shelfLook,scope:'Silent Chromium standalone lookup mechanics and embedded editorial layer; no physical-device or full learner journey acceptance'},null,2)+'\n');
   console.log('PASS standalone: real SKIP grid, three code wheels and two independent filters with all subresource network blocked.');
   console.log('PASS no runtime exceptions or external SKIP data requests.');
   console.log(`PASS embedded editorial layer and shelf art: ${JSON.stringify(shelfLook)}`);
+  console.log('PASS no personal-collections deck row or route in the single file.');
 } finally {
   await browser.close();
 }
