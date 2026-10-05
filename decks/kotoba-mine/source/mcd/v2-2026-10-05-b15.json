@@ -29,7 +29,6 @@
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n2-zaru-o-enai", "n3-koto-ni-naru"],
       "sense": "建物の中で人が動く道すじを考えて、配置を決めること。"
     }
@@ -53,7 +52,6 @@
       "original": true,
       "register": "報",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n3-koto-ni-naru", "n5-teiru"],
       "sense": "高さや奥行きがあるようす。"
     },
@@ -88,7 +86,6 @@
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-teiku"],
       "sense": "水平な面に対して、まっすぐ縦の方向であること。"
     },
@@ -117,17 +114,6 @@
       "sense": "点の位置を数の組で表したもの。"
     },
     {
-      "ja": "大航海時代の船乗りにとって、海の上で自分の位置を正確に知ることは命に関わる問題だった。南北の位置は太陽や星の高さからある程度求められたものの、東西の位置を測る方法はなかなか見つからなかった。東西の位置を知るには出発地との時刻の差を知る必要があり、揺れる船の上でも狂わない時計が求められたためだ。十八世紀にイギリスの時計職人が精度の高い航海用の時計を完成させたことで、船は自らの座標をかなり正確につかめるようになった。この発明は、その後の遠洋航海の安全を大きく高めたとされる。",
-      "form": "座標",
-      "en": "For sailors in the Age of Discovery, knowing their exact position at sea was a matter of life and death. Although their north-south position could be worked out to some extent from the height of the sun and stars, a way to measure their east-west position was slow to be found. That was because finding the east-west position required knowing the time difference from the point of departure, which called for a clock that would keep time even on a rolling ship. When an English clockmaker completed a highly accurate marine timepiece in the eighteenth century, ships became able to pin down their own coordinates quite precisely. This invention is said to have greatly improved the safety of later ocean voyages.",
-      "original": true,
-      "register": "報",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": ["n2-mono-no", "n3-koto-de", "n4-you-ni-naru"],
-      "sense": "点の位置を数の組で表したもの。"
-    },
-    {
       "ja": "人は迷ったとき、自分がいまどこにいるのかを確かめたくなる生き物である。かつては家や村、信じる神が、その位置を示す目印の役目を果たしていた。だが多くのことを自分で選べるようになった今、人は頼るべき基準そのものを見失いやすい。他人と比べることで安心しようとしても、比べる相手が変わるたびに足場は揺れてしまう。人生の座標を定める軸は、結局、自分がなにを大切にしたいかという問いの中にしかないのだろう。",
       "form": "座標",
       "en": "Human beings are creatures who, when lost, want to check where they are now. Once, the household, the village and the gods people believed in served as landmarks showing that position. But now that we can choose so much for ourselves, people easily lose sight of the very standard they should rely on. Even if we try to reassure ourselves by comparing ourselves with others, our footing wobbles each time the people we compare ourselves with change. In the end, the axis that fixes the coordinates of a life probably lies nowhere but in the question of what we ourselves want to hold dear.",
@@ -137,6 +123,17 @@
       "tipJa": "「人生の座標」「思想の座標」のように、比喩で位置づけの基準を表す。",
       "grammar": ["n4-you-ni-naru", "n3-koto-de"],
       "sense": "物事の位置を確かめるための基準や枠組み。"
+    },
+    {
+      "ja": "関数のグラフの問題が苦手な人は、まず図の上に点を正確に打つ練習から始めてみましょう。点の位置は、横にいくつ、縦にいくつ進んだかという二つの数で決まります。交点の座標を求める問題なら、二つの式を連立させて解けば、その答えがそのまま点の位置になります。式と図を行き来しながら考えることで、計算ミスにも気づきやすくなります。面倒がらずに手を動かして確かめる習慣が、得点の安定につながります。",
+      "form": "座標",
+      "en": "If you find graph problems on functions difficult, start by practising plotting points accurately on the diagram. A point's position is determined by two numbers: how many steps across and how many steps up. In a problem asking for the coordinates of an intersection, if you solve the two equations simultaneously, the answer is exactly the point's position. Thinking while moving back and forth between the equations and the diagram also makes it easier to spot calculation slips. The habit of checking things by hand rather than cutting corners leads to steadier scores.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "数学では「交点の座標」「座標を求めよ」が定番の言い方。",
+      "grammar": ["n4-nagara", "n3-koto-de"],
+      "sense": "点の位置を数の組で表したもの。"
     }
   ],
   "129": [
@@ -158,7 +155,6 @@
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n3-koto-ni-naru", "n2-ni-oujite", "n3-you-ni"],
       "sense": "図形を式で表し、計算で性質を調べる数学の分野。"
     },
@@ -169,23 +165,10 @@
       "original": true,
       "register": "話",
       "topic": "ai",
-      "tipJa": "",
-      "grammar": [],
       "sense": "図形を式で表し、計算で性質を調べる数学の分野。"
     }
   ],
   "19": [
-    {
-      "ja": "スマートフォンの頭脳にあたるチップを、ざっくり分解して見ていきましょう。一枚の小さなチップの中に、計算を担当する部分、映像を描く部分、AIの処理に特化した部分などが詰め込まれているんです。ポイントは、作業の種類に応じて、得意な部分に仕事を振り分けているところですね。各部がばらばらに動くのではなく、全体で一つのチームのように連携しているからこそ、電池を長持ちさせながら速く動けるわけです。",
-      "form": "各部",
-      "en": "Let's roughly take apart the chip that serves as a smartphone's brain and look inside. Packed into one small chip are a part in charge of calculation, a part that draws graphics, a part specialised for AI processing and so on. The key point is that it hands work out to whichever part is good at it, according to the type of task. It is precisely because each part works together like a single team, rather than moving separately, that the phone can run fast while making the battery last.",
-      "original": true,
-      "register": "講",
-      "topic": "ai",
-      "tipJa": "「各部の名称」「各部を点検する」のように、機械や体の部分について使う。",
-      "grammar": ["n2-ni-oujite", "n3-dewa-naku", "n4-nagara"],
-      "sense": "全体を形づくっている、それぞれの部分。"
-    },
     {
       "ja": "古い木造建築の保存修理では、まず建物をいったん解体し、状態を細かく調べることが多い。柱や梁、屋根の板など各部の傷み具合を記録し、使える部材はできる限り元の場所に戻すのが基本だ。こうした作業は数十年に一度の機会となるため、残された記録そのものが後世への貴重な資料にもなる。近年は、職人の目による点検に加えて、三次元の計測データを残す試みも広がっている。一方で、伝統的な技術を受け継ぐ職人の高齢化が進んでおり、人材の確保が課題となっている。",
       "form": "各部",
@@ -193,7 +176,6 @@
       "original": true,
       "register": "報",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "全体を形づくっている、それぞれの部分。"
     },
@@ -204,7 +186,6 @@
       "original": true,
       "register": "学",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n3-wake-dewa-nai", "n4-nagara", "n5-teiru"],
       "sense": "全体を形づくっている、それぞれの部分。"
     }
@@ -233,15 +214,14 @@
       "sense": "値段などが上がったり下がったりすること。"
     },
     {
-      "ja": "古代インドの社会では、生まれた家によって人の身分がほぼ決まっていた。ところがブッダの開いた教団では、出家した者どうしの上下は、生まれではなく、出家してからの年数で決められたとされる。王族の出であっても、あとから入門すれば、先に出家した者に礼を尽くさねばならなかったのである。それは社会の秩序そのものを壊すことではなく、人の価値を測る物差しそのものを問い直す試みだった。基準を一つ取り替えるだけで、見える景色はこれほど変わるのである。",
+      "ja": "敬語って、相手との上下を言葉でいちいち確認する仕組みなのかなって思うんですよ。はじめて会う人だと、年齢とか役職がわかるまで、どの話し方でいくか決められないじゃないですか。だから飲み会で最初に年を聞き合うのも、失礼な詮索っていうより、話し方を決めるための情報集めなんですよね、たぶん。まあ、最近はフラットな職場も増えてるんで、全部が全部そうってわけじゃないですけど。それでも、ため口に切り替えるタイミングって、いまだに悩みません？",
       "form": "上下",
-      "en": "In ancient Indian society, a person's status was largely fixed by the family they were born into. In the order founded by the Buddha, however, rank among those who had left home is said to have been decided not by birth but by the number of years since they had been ordained. Even someone of royal birth, if they joined later, had to pay respect to those who had been ordained before them. This was not a matter of tearing down the social order itself, but an attempt to call into question the very yardstick by which a person's worth is measured. Simply by swapping one standard, the view before us changes this much.",
+      "en": "I kind of think honorific speech is a system for confirming, word by word, who's above and who's below in relation to the other person. When you meet someone for the first time, you can't decide how to talk until you know their age or job title, right? So asking each other's age at the start of a drinking party probably isn't nosy prying so much as gathering information to decide how to talk. Well, there are more flat workplaces these days, so it's not like that's true everywhere. Even so, don't you still agonise over when to switch to casual speech?",
       "original": true,
-      "register": "論",
-      "topic": "india",
-      "tipJa": "「上下関係」の形で、地位や年齢による序列を表すことが多い。",
-      "grammar": ["n3-dewa-naku"],
-      "sense": "地位や立場の上と下。"
+      "register": "話",
+      "topic": "language",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "地位や年齢などの上と下の関係。"
     }
   ],
   "82": [
@@ -257,26 +237,14 @@
       "sense": "上から全体にかぶさって、見えないようにする。"
     },
     {
-      "ja": "仏教には、人は誰でも本来、澄んだ心を持っているという考え方がある。月がいつも空にあるように、その明るさ自体は決して失われていないというのだ。ただ、怒りや欲、思い込みといった雲が厚く心を覆うと、人はその光に気づけなくなる。修行とは、新しいなにかを手に入れることではなく、その雲が晴れていくのを待つ営みなのかもしれない。探しているものは、はじめから自分の中にあったのである。",
-      "form": "覆う",
-      "en": "In Buddhism there is the idea that everyone originally has a clear mind. Just as the moon is always in the sky, its brightness itself is never lost, so it is said. But when clouds of anger, desire and fixed ideas thickly cover the mind, people can no longer notice that light. Perhaps spiritual practice is not about acquiring something new, but a way of life that waits for those clouds to clear. What we are looking for was within us from the very beginning.",
+      "ja": "生成AI向けの計算用チップでは、発熱をどう抑えるかが大きな課題となっている。消費電力の増加に伴い、空気で冷やすこれまでの方式では追いつかないケースが増えているためだ。そこで、サーバーを丸ごと特殊な液体に沈めたり、チップの表面を冷却用の部品で覆ったりする液冷の導入が進んでいる。設備の初期費用は高いものの、電力の削減につながるとして、採用を広げるデータセンターも多い。冷却技術の優劣がAI時代の競争力を左右するとの見方も出ている。",
+      "form": "覆ったり",
+      "en": "For computing chips aimed at generative AI, how to keep heat under control has become a major issue. This is because, as power consumption rises, there are more and more cases where conventional air cooling cannot keep up. In response, liquid cooling is being introduced, such as submerging entire servers in special liquids or covering the surface of chips with cooling components. Although the initial cost of the equipment is high, many data centres are widening its use on the grounds that it leads to lower power use. There is also a view that superiority in cooling technology will determine competitiveness in the AI era.",
       "original": true,
-      "register": "論",
-      "topic": "india",
-      "tipJa": "「雲が空を覆う」から転じて、迷いや感情が心を覆う、のように比喩でも使う。",
-      "grammar": ["n3-you-ni", "n3-dewa-naku", "n4-teiku"],
-      "sense": "心などを包み込んで、本来の姿を見えなくする。"
-    },
-    {
-      "ja": "自分の昔の動画とか見返すと、マジで目を覆いたくなるときあるじゃないですか。しゃべり方も変だし、言ってることも浅いし、なんでこれを人前に出したんだろうって。でもそれって、今の自分がちょっとは成長したっていう証拠でもあるんですよね。逆に、何年たっても過去の自分が全然恥ずかしくないとしたら、そっちのほうが心配かもしれないです。まあ、だからって見返したいわけじゃないんですけどね。",
-      "form": "覆いたく",
-      "en": "When you go back and watch your own old videos, there are times you seriously want to cover your eyes, right? The way you talk is weird, what you're saying is shallow, and you wonder why on earth you put it out in public. But that's also proof that you've grown at least a bit since then. Conversely, if after however many years your past self doesn't embarrass you at all, that might be more worrying. Well, that doesn't mean I want to watch them again, though.",
-      "original": true,
-      "register": "話",
-      "topic": "mind",
-      "tipJa": "「目を覆いたくなる」は、見ていられないほどひどい様子を表す決まった言い方。",
-      "grammar": ["n3-wake-dewa-nai"],
-      "sense": "見ていられず、手などで目をふさぐ。"
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n2-mono-no", "n5-teiru"],
+      "sense": "物の表面に、別の物をかぶせる。"
     }
   ],
   "84": [
@@ -292,26 +260,25 @@
       "sense": "あとから組織や領土の中に組み入れること。"
     },
     {
-      "ja": "仏教は、インドの古い神々を追い払うのではなく、自らの世界観の中に取り込んでいった。ヴェーダの神インドラは帝釈天として、ブラフマーは梵天として、ブッダの教えを守る役目を与えられたのである。かつての主役が脇役として編入されたわけだが、そこには対立するより包み込むことで広がろうとする知恵がうかがえる。こうした神々は、のちには東アジア各地の寺でも像として祀られるようになった。新しい教えは、古いものを否定するだけでは根づかないのだろう。",
+      "ja": "大学を途中で変えたいとき、一年生からやり直さずに済む方法があるのを知っていますか。短大や高専、別の大学で取った単位をある程度認めてもらい、三年次から新しい大学に編入するという道です。試験は英語と専門科目、面接が中心で、一般入試のような幅広い科目の勉強は求められないことが多いようです。ただし、認められる単位の数によっては卒業までの計画が狂うこともあるので、出願前に受け入れ先の条件をよく確かめておきましょう。募集人数も少ないため、志望先の過去問を早めに手に入れた上で対策を立てるのが近道です。",
       "form": "編入",
-      "en": "Buddhism did not drive away India's old gods, but took them into its own worldview. Indra, a god of the Vedas, became Taishakuten, and Brahma became Bonten, and they were given the role of protecting the Buddha's teaching. Former leading players were thus incorporated as supporting ones, and in this one can glimpse the wisdom of seeking to spread by embracing rather than confronting. These gods later came to be enshrined as statues in temples across East Asia as well. A new teaching, it seems, does not take root merely by rejecting the old.",
-      "original": true,
-      "register": "論",
-      "topic": "india",
-      "tipJa": "",
-      "grammar": ["n3-dewa-naku", "n3-koto-de", "n4-you-ni-naru"],
-      "sense": "別の体系の中に、あとから組み入れること。"
-    },
-    {
-      "ja": "大学の三年生から別の大学に入り直す編入という道は、意外と知られていません。一般の入試と違って、英語と専門科目、それに面接や小論文で選ぶところが多いのが特徴です。募集人数が少ないため狭き門ですが、出題範囲がはっきりしている分、的を絞った対策が立てやすいとも言えます。早めに志望先の過去問を手に入れた上で、どの科目にどれだけ時間をかけるかを決めておきましょう。それが合格へのいちばんの近道です。",
-      "form": "編入",
-      "en": "The route of re-entering a different university from the third year, as a transfer student, is surprisingly little known. Unlike ordinary entrance exams, a distinctive feature is that many schools select students by English and specialist subjects, plus an interview or a short essay. Because few places are offered it is a narrow gate, but since the scope of the questions is clear, you could also say it is easy to plan focused preparation. Get hold of past papers from the schools you're aiming for early, and then decide how much time to spend on which subjects. That is the surest shortcut to passing.",
+      "en": "Did you know there is a way to change universities partway through without having to start over from the first year? It is the route of having a certain number of credits earned at a junior college, technical college or another university recognised, and transferring into a new university from the third year. The exams centre on English, specialist subjects and an interview, and often don't require study across a wide range of subjects as general entrance exams do. However, depending on how many credits are recognised, your plan for graduating can go off course, so check the receiving school's conditions carefully before applying. Places are also few, so the shortcut is to get hold of past papers from your target schools early and then plan your preparation.",
       "original": true,
       "register": "学",
       "topic": "mind",
       "tipJa": "学校では「編入試験」「三年次に編入する」のように使う。",
-      "grammar": ["n2-ue-de"],
+      "grammar": ["n2-ue-de", "n5-teiru"],
       "sense": "途中の学年から、別の学校に入ること。"
+    },
+    {
+      "ja": "AI関連の人材をめぐっては、大手企業がスタートアップを丸ごと買収し、その技術者を自社の研究部門に編入する動きが相次いでいる。優秀な技術者を一人ずつ採用するより、チームごと迎え入れたほうが早いとの判断があるとみられる。一方で、小さな組織の自由な文化が大企業の中で失われ、主要な人材が数年のうちに離れてしまう例も少なくない。買収後の組織づくりこそが成否を分けるとの指摘も出ている。",
+      "form": "編入",
+      "en": "In the race for AI talent, there has been a string of moves by major companies to buy start-ups outright and incorporate their engineers into their own research divisions. Behind this is thought to be the judgement that bringing in a whole team is faster than hiring excellent engineers one by one. On the other hand, there are many cases where the freewheeling culture of a small organisation is lost inside a large company, and key people leave within a few years. Some also point out that it is the organisation-building after an acquisition that decides success or failure.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "人や組織を、あとから別の組織に組み入れること。"
     }
   ],
   "88": [
@@ -344,7 +311,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-koto-de", "n3-dewa-naku"],
       "sense": "苦しみなどを減らして軽くすること。"
     }

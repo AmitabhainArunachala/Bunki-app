@@ -18,18 +18,16 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n4-you-ni-naru", "n2-mono-no", "n2-ni-oujite"],
       "sense": "思わず笑いたくなるような、おかしさがあるようす。"
     },
     {
-      "ja": "インドの仏典に伝わる説話には、一見すると笑い話のようなものがある。井戸に映った月を本物だと思い込んだ猿たちが、手をつないで枝からぶら下がり、枝が折れて皆水に落ちるという話もその一つである。その姿は確かに滑稽だが、実体のないものを必死につかもうとしている点では、笑っている私たちも猿と大差ないのではないか。説話が笑いを入り口にするのは、聞き手が自分の姿に気づくまでの距離を縮めるためなのだろう。",
+      "ja": "インドの仏典に伝わる説話には、一見すると笑い話のようなものがある。井戸に映った月を本物だと思い込んだ猿たちが、手をつないで枝からぶら下がり、枝が折れてそろって水に落ちるという話もその一つである。その姿は確かに滑稽だが、実体のないものを必死につかもうとしている点では、笑っている私たちも猿と大差ないのではないか。説話が笑いを入り口にするのは、聞き手が自分の姿に気づくまでの距離を縮めるためなのだろう。",
       "form": "滑稽",
-      "en": "Among the parables handed down in Indian Buddhist scriptures, there are some that at first glance look like funny stories. One of them tells of monkeys who, convinced that the moon reflected in a well was real, joined hands and hung down from a branch, until the branch broke and they all fell into the water. Their figure is certainly comical, but in that we too desperately try to grasp things without substance, are we who laugh really so different from the monkeys? Parables probably use laughter as a way in, in order to shorten the distance before listeners notice themselves.",
+      "en": "Among the parables handed down in Indian Buddhist scriptures, there are some that at first glance look like funny stories. One of them tells of monkeys who, convinced that the moon reflected in a well was real, joined hands and hung down from a branch, until the branch broke and they fell into the water together. Their figure is certainly comical, but in that we too desperately try to grasp things without substance, are we who laugh really so different from the monkeys? Parables probably use laughter as a way in, in order to shorten the distance before listeners notice themselves.",
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "ばかばかしくて、思わず笑いたくなるようす。"
     }
@@ -53,7 +51,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n2-ni-oujite"],
       "sense": "よくないことを、ひそかに計画する。"
     },
@@ -64,7 +61,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n2-ni-suginai"],
       "sense": "よくないことを、ひそかに計画する。"
     }
@@ -88,7 +84,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "続かずに、何度も切れ切れになるようす。"
     },
@@ -99,7 +94,6 @@
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n2-ni-suginai", "n4-teiku"],
       "sense": "続かずに、何度も切れ切れになるようす。"
     }
@@ -123,7 +117,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n4-nagara", "n5-teiru"],
       "sense": "目上の人や決まりに、逆らおうとするようす。"
     },
@@ -134,7 +127,6 @@
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n3-koto-ni-naru", "n3-wake-dewa-nai"],
       "sense": "目上の人や決まりに、逆らおうとするようす。"
     }
@@ -158,7 +150,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru"],
       "sense": "程度が、前よりもさらに増すようす。"
     },
@@ -169,7 +160,6 @@
       "original": true,
       "register": "論",
       "topic": "mind",
-      "tipJa": "",
       "grammar": ["n3-wake-dewa-nai", "n3-dewa-naku", "n5-teiru"],
       "sense": "程度が、前よりもさらに増すようす。"
     }
@@ -193,7 +183,6 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n5-teiru", "n3-koto-de", "n4-you-ni-naru", "n3-dewa-naku"],
       "sense": "人からどう見られるかを、気にしすぎること。"
     },
@@ -204,8 +193,6 @@
       "original": true,
       "register": "話",
       "topic": "india",
-      "tipJa": "",
-      "grammar": [],
       "sense": "人からどう見られるかを、気にしすぎること。"
     }
   ],
@@ -228,8 +215,6 @@
       "original": true,
       "register": "話",
       "topic": "ai",
-      "tipJa": "",
-      "grammar": [],
       "sense": "周りの人に、やたらとえらそうな態度をとる。"
     },
     {
@@ -239,16 +224,15 @@
       "original": true,
       "register": "論",
       "topic": "history",
-      "tipJa": "",
       "grammar": ["n4-teiku", "n3-dewa-naku"],
       "sense": "周りの人に、やたらとえらそうな態度をとる。"
     }
   ],
   "86": [
     {
-      "ja": "今回は、人間関係の悩みを心理学から読み解く本を要約します。著者によれば、周りを見下して威張りくさった態度をとる人ほど、実は心の奥に強い不安を抱えていることが多いそうです。自分の価値に自信が持てないので、他人を下に置くことでしか安心できないんですね。職場や学校で、そういう人に振り回されて疲れている人も多いのではないでしょうか。そう考えると、そういう人の言葉をまともに受け止めて落ち込む必要はない、というのが著者のアドバイスです。",
+      "ja": "今回は、人間関係の悩みを心理学から読み解く本を要約します。著者によれば、周りを見下して威張りくさった態度をとる人ほど、実は心の奥に強い不安を抱えていることが多いそうです。自分の価値に自信が持てないので、他人を下に置くことでしか安心できないんですね。職場や学校で、そういう人に振り回されて疲れている人も多いのではないでしょうか。でも、その強気が不安の裏返しだと分かれば、相手の言葉をまともに受け止めて落ち込む必要はない、というのが著者のアドバイスです。",
       "form": "威張りくさった",
-      "en": "This time I'll summarize a book that interprets troubles in human relationships through psychology. According to the author, the more someone looks down on those around them and acts high and mighty, the more often they are actually carrying strong anxiety deep in their heart. Because they can't feel confident in their own worth, they can only feel at ease by putting others beneath them. Many of you are probably worn out from being pushed around by such people at work or school. Seen that way, the author's advice is that there is no need to take such people's words at face value and feel down.",
+      "en": "This time I'll summarize a book that interprets troubles in human relationships through psychology. According to the author, the more someone looks down on those around them and acts high and mighty, the more often they are actually carrying strong anxiety deep in their heart. Because they can't feel confident in their own worth, they can only feel at ease by putting others beneath them. Many of you are probably worn out from being pushed around by such people at work or school. But the author's advice is that once you see their bravado as the flip side of anxiety, there is no need to take their words at face value and feel down.",
       "original": true,
       "register": "講",
       "topic": "mind",
@@ -263,8 +247,6 @@
       "original": true,
       "register": "話",
       "topic": "history",
-      "tipJa": "",
-      "grammar": [],
       "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
     },
     {
@@ -274,7 +256,6 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n1-made-mo-nai", "n5-tai"],
       "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
     }
@@ -298,8 +279,6 @@
       "original": true,
       "register": "話",
       "topic": "india",
-      "tipJa": "",
-      "grammar": [],
       "sense": "刺激や感情などが、強く伝わってくるようす。"
     },
     {
@@ -309,7 +288,6 @@
       "original": true,
       "register": "語",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n2-mono-no", "n3-koto-de", "n5-teiru"],
       "sense": "刺激や感情などが、強く伝わってくるようす。"
     }
@@ -333,7 +311,6 @@
       "original": true,
       "register": "話",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n4-nagara"],
       "sense": "興奮などで、目や頭がひどくさえているようす。"
     },
@@ -344,7 +321,6 @@
       "original": true,
       "register": "語",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-dewa-naku"],
       "sense": "飲み物などが、とても冷たく冷えているようす。"
     }

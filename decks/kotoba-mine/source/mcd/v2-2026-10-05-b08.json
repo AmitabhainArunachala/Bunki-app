@@ -33,14 +33,14 @@
   ],
   "20": [
     {
-      "ja": "インドの神話には、乳海攪拌と呼ばれる有名な場面があります。神々と阿修羅たちが大蛇を綱にして大きな山に巻きつけ、両側から交互に引っ張って山を回し続けたというお話です。そうして乳の海が長いあいだ回され続けた結果、不死の霊薬をはじめ、さまざまな宝が生まれたとされています。この場面は、カンボジアのアンコール・ワットの回廊にも大きな浮き彫りとして残っているんですね。インドで生まれた物語が、東南アジアの石の壁にまで届いているわけです。",
+      "ja": "インドの神話には、乳海攪拌と呼ばれる有名な場面があります。神々と阿修羅たちが大蛇を綱にして大きな山に巻きつけ、両側から交互に引っ張って、海に立てた山をぐるぐると回し続けたというお話です。山が回るにつれて乳の海は大きな渦を巻き、その底から不死の霊薬をはじめ、さまざまな宝が次々と現れたとされています。この場面は、カンボジアのアンコール・ワットの回廊にも大きな浮き彫りとして残っているんですね。インドで生まれた物語が、東南アジアの石の壁にまで届いているわけです。",
       "form": "攪拌",
-      "en": "In Indian mythology there is a famous scene called the Churning of the Ocean of Milk. It's the story in which the gods and the asuras wrapped a giant serpent around a great mountain as a rope, and kept turning the mountain by pulling alternately from both sides. It's said that as a result of the ocean of milk being turned for a long time, various treasures were born, beginning with the elixir of immortality. This scene survives as a large relief in a gallery of Angkor Wat in Cambodia too. A story born in India has reached all the way to the stone walls of Southeast Asia.",
+      "en": "In Indian mythology there is a famous scene called the Churning of the Ocean of Milk. It's the story in which the gods and the asuras wrapped a giant serpent around a great mountain as a rope and, pulling alternately from both sides, kept spinning the mountain they had stood upright in the sea. It's said that as the mountain turned, the ocean of milk swirled into a great whirlpool, and from its depths various treasures appeared one after another, beginning with the elixir of immortality. This scene survives as a large relief in a gallery of Angkor Wat in Cambodia too. A story born in India has reached all the way to the stone walls of Southeast Asia.",
       "original": true,
       "register": "講",
       "topic": "india",
       "tipJa": "神話の名「乳海攪拌」は定訳として定着している。日常語なら「かき混ぜる」。",
-      "grammar": ["n5-teiru"]
+      "grammar": ["n3-ni-tsurete", "n5-teiru"]
     },
     {
       "ja": "溶解の問題でよく狙われるのが、攪拌によって何が変わり、何が変わらないのかという点です。液をぐるぐる回せば、固体の表面に新しい液が次々と触れるので、溶ける速さは上がります。ところが、一定量の水に最大どれだけ溶けるかという溶解度そのものは、温度が同じなら変わりません。速さと量を混同していると、選択肢の引っかけにそのままはまることになります。迷ったら、それが速さの話なのか量の話なのかを、まず問題文で確かめましょう。",
@@ -86,14 +86,14 @@
       "sense": "宋代に体系化された儒学の一派。朱子学など"
     },
     {
-      "ja": "AIの研究って、理学なのか工学なのか、けっこう微妙じゃないですか。動くものを作るって意味では完全に工学なんですけど、なんでうまくいくのかは、作った人もよく分かってなかったりするんですよね。最近の大きなモデルだと、中で何が起きてるのかを調べる研究が、わざわざ一つの分野になってるくらいで。そうなると、自分で作ったものを、あとから自然現象みたいに調べざるを得ないわけで。なんか順番が逆っていうか、ちょっと面白い状況だと思うんですよ。",
+      "ja": "明治十年、東京大学は法・理・文・医の四つの学部で発足した。このうち理学の分野では、当初は欧米から招かれた教師が、外国語で講義の多くを担っていた。留学から戻った日本人の研究者が育つにつれて、授業は次第に日本語で行われるようになった。専門の用語を一から日本語に置き換える作業も、同時に進められた。現在の日本の基礎研究は、こうした明治期の地道な積み重ねの上に成り立っている。",
       "form": "理学",
-      "en": "Whether AI research is natural science or engineering is pretty borderline, right? In the sense of building things that work it's totally engineering, but why it works well is something even the people who built it sometimes don't really understand. With today's big models, research into what is going on inside them has even become a field of its own. Then you have no choice but to study the thing you made yourself afterwards, like a natural phenomenon. The order is kind of backwards, and I think it's a pretty interesting situation.",
+      "en": "In 1877, the tenth year of Meiji, the University of Tokyo was founded with four faculties: law, science, letters and medicine. In the field of natural science, teachers invited from Europe and America at first carried much of the lecturing, in foreign languages. As Japanese researchers who had returned from study abroad developed, classes gradually came to be held in Japanese. The work of replacing specialist terms with Japanese from scratch also went ahead at the same time. Basic research in Japan today stands on this steady work built up in the Meiji era.",
       "original": true,
-      "register": "話",
-      "topic": "ai",
-      "tipJa": "話し言葉でも「理学系」「理学か工学か」のように、分野の区別として使える。",
-      "grammar": ["n2-zaru-o-enai"]
+      "register": "報",
+      "topic": "history",
+      "tipJa": "明治期の大学制度を語るときには、学部の名とともに分野名として出てくる。",
+      "grammar": ["n3-ni-tsurete", "n4-you-ni-naru", "n5-teiru"]
     }
   ],
   "57": [
@@ -131,7 +131,7 @@
   ],
   "137": [
     {
-      "ja": "399年、古代ギリシャの都市国家アテネで、一人の年老いた哲学者が裁判にかけられました。ソクラテスです。若者を堕落させ、国の神々を敬わないという罪で、市民たちに訴えられたんですね。被告人となった彼は、命ごいをするどころか、自分は正しいことをしてきたと法廷で堂々と主張しました。結果は死刑で、友人たちが逃亡の手はずを整えたのに、彼は法に従って毒杯を受け入れたと伝えられています。",
+      "ja": "紀元前399年、古代ギリシャの都市国家アテネで、一人の年老いた哲学者が裁判にかけられました。ソクラテスです。若者を堕落させ、国の神々を敬わないという罪で、市民たちに訴えられたんですね。被告人となった彼は、命ごいをするどころか、自分は正しいことをしてきたと法廷で堂々と主張しました。結果は死刑で、友人たちが逃亡の手はずを整えたのに、彼は法に従って毒杯を受け入れたと伝えられています。",
       "form": "被告人",
       "en": "In 399 BC, in the ancient Greek city-state of Athens, an aged philosopher was put on trial. It was Socrates. He was charged by fellow citizens with corrupting the young and not honouring the city's gods. Having become the defendant, far from begging for his life, he boldly argued in court that he had done what was right. The verdict was death, and it is said that although his friends had arranged an escape, he obeyed the law and accepted the cup of poison.",
       "original": true,
@@ -189,8 +189,7 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "小さな盗みの代表例として、日々の行いを語る文脈にも出てくる。",
-      "grammar": []
+      "tipJa": "小さな盗みの代表例として、日々の行いを語る文脈にも出てくる。"
     }
   ],
   "139": [

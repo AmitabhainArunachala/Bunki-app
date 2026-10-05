@@ -8,7 +8,6 @@
       "register": "講",
       "topic": "history",
       "tipJa": "「首脳の会見」「天皇とマッカーサーの会見」のように、改まって人と会う意味でも使う。",
-      "grammar": [],
       "sense": "身分の高い人などが、改まって人と会うこと。"
     },
     {
@@ -36,7 +35,7 @@
   ],
   "313": [
     {
-      "ja": "今回は、日本の地方議会がどう始まったのかを見ていきます。明治11年に府県会規則という法令ができて、各府県に選挙で選ばれた議員の集まりが置かれることになりました。ただし選挙権があったのは、一定以上の税を納める男性だけで、今の感覚からするとかなり限られた人たちです。それでも、地元の予算について住民の代表が意見を言える場ができたことは、大きな一歩でした。いまの県議会のルーツは、実はこの時代までさかのぼるわけですね。",
+      "ja": "今回は、日本の地方議会がどう始まったのかを見ていきます。明治11年に府県会規則という法令ができて、各府県に選挙で選ばれた議員の集まりが置かれることになりました。ただし選挙権があったのは、一定以上の税を納める男性だけで、今の感覚からするとかなり限られた人たちです。それでも、地元の予算について住民の代表が意見を言える場ができたことは、大きな一歩でした。今の県議会のルーツは、実はこの時代までさかのぼるわけですね。",
       "form": "県議会",
       "en": "This time, let's look at how local assemblies in Japan began. In 1878, a law called the Prefectural Assembly Regulations was enacted, and each prefecture came to have a body of members chosen by election. However, only men who paid more than a certain amount of tax had the right to vote, a rather limited group by today's standards. Even so, the creation of a place where residents' representatives could voice opinions on the local budget was a big step. The roots of today's prefectural assemblies actually go back to this period.",
       "original": true,
@@ -78,7 +77,6 @@
       "register": "講",
       "topic": "india",
       "tipJa": "「定例の〜」「定例会」「定例化する」の形で、決まった時期にくり返す行事に付く。",
-      "grammar": [],
       "sense": "いつも決まった時期に行うこと。また、そのならわし。"
     },
     {
@@ -106,20 +104,9 @@
   ],
   "221": [
     {
-      "ja": "今回は、記録に残る中で最も古い和平の条約と言われるものを紹介します。紀元前13世紀、エジプトとヒッタイトは、長い戦いの末に条約を結びました。面白いのは、この条約の文面が、エジプトの神殿の壁と、ヒッタイトの遺跡から出た粘土板に、それぞれ残っていることなんです。しかも、どちらの記録でも、和平を先に申し出たのは相手のほうだと書かれているんですね。双方が自分の顔を立てられる書き方をしたからこそ、約束が長く守られたのかもしれません。",
+      "ja": "半導体をめぐる米国と中国の対立は長期化し、収束の兆しは見えない。米国が先端品やその製造装置の輸出を制限すれば、中国はガリウムなどの鉱物の輸出管理で応じるなど、措置の応酬が続いている。双方とも相手への依存を減らそうとしているが、供給網を短期間で作り直すのは容易ではない。板挟みになった日本や韓国の企業は、どちらの市場も手放せないまま、生産拠点の見直しを迫られている。",
       "form": "双方",
-      "en": "This time I'll introduce what is said to be the oldest peace treaty on record. In the 13th century BC, Egypt and the Hittites concluded a treaty after a long war. What's interesting is that the text of this treaty survives both on the wall of an Egyptian temple and on clay tablets excavated from Hittite ruins. What's more, in each record it is written that it was the other side that first asked for peace. Perhaps it was precisely because both sides wrote it in a way that let each save face that the promise was kept for so long.",
-      "original": true,
-      "register": "講",
-      "topic": "history",
-      "tipJa": "「双方の主張」「双方が歩み寄る」のように、対立する二者をまとめて指す。",
-      "grammar": [],
-      "sense": "向かい合う二つの側の、どちらも。"
-    },
-    {
-      "ja": "半導体をめぐる米国と中国の対立が長引き、出口の見えない状態が続いている。米国が先端品やその製造装置の輸出を制限すれば、中国はガリウムなどの鉱物の輸出管理で応じるなど、措置の応酬が続いている。双方とも相手への依存を減らそうとしているが、供給網を短期間で作り直すことは難しい。板挟みになった日本や韓国の企業は、どちらの市場も手放せないまま、生産拠点の見直しなど難しい対応を迫られている。",
-      "form": "双方",
-      "en": "The confrontation between the United States and China over semiconductors is dragging on, with no way out in sight. When the US restricts exports of advanced chips and the equipment for making them, China responds with export controls on minerals such as gallium, and this exchange of measures continues. Both sides are trying to reduce their dependence on the other, but rebuilding supply chains in a short time is difficult. Caught in the middle, Japanese and South Korean companies are being forced into difficult responses such as reviewing their production bases, unable to let go of either market.",
+      "en": "The confrontation between the United States and China over semiconductors has become protracted, with no sign of it settling. When the US restricts exports of advanced chips and the equipment for making them, China responds with export controls on minerals such as gallium, and this exchange of measures continues. Both sides are trying to reduce their dependence on the other, but rebuilding supply chains in a short time is not easy. Caught in the middle, Japanese and South Korean companies are being forced to review their production bases, unable to let go of either market.",
       "original": true,
       "register": "報",
       "topic": "ai",
@@ -136,6 +123,17 @@
       "topic": "india",
       "tipJa": "「双方を経験する」のように、対になる二つのものをまとめて指すこともできる。",
       "grammar": ["n3-dewa-naku"],
+      "sense": "向かい合う二つの側の、どちらも。"
+    },
+    {
+      "ja": "ディベートの授業では、本当は賛成なのに反対の側を担当させられる、ということがよくあります。最初は戸惑いますが、相手の主張を本気で組み立てようとすることで、自分の考えの弱い点がはっきり見えてきます。反対の立場から考えてみる練習が、思い込みを和らげることを示した研究もあります。試験の小論文でも、双方の言い分を示した上で自分の結論を述べると、説得力がぐっと増します。",
+      "form": "双方",
+      "en": "In debate classes, it often happens that you are made to take the opposing side even though you actually agree. At first you're thrown, but by seriously trying to build the other side's argument, the weak points in your own thinking become clear. There is also research showing that practice in thinking from the opposite position softens preconceptions. In exam essays too, if you state your conclusion after presenting what both sides have to say, your argument becomes far more persuasive.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「双方の言い分」「双方の立場」は、議論や小論文で公平さを示すときの定番表現。",
+      "grammar": ["n3-koto-de", "n2-ue-de"],
       "sense": "向かい合う二つの側の、どちらも。"
     }
   ],
@@ -170,13 +168,12 @@
       "register": "話",
       "topic": "mind",
       "tipJa": "くだけた会話でも使えるが、少し理屈っぽく聞こえる。軽く言うなら「そりゃ」。",
-      "grammar": [],
       "sense": "言うまでもなく。当たり前のことだが。"
     }
   ],
   "236": [
     {
-      "ja": "今回は、日本の古代史を語るうえで欠かせない、ある中国の歴史書を取り上げます。三世紀の中国の歴史をまとめた『三国志』の中に、いわゆる「魏志倭人伝」と呼ばれる部分があります。ここには、倭の国々が卑弥呼という女王を立てて国の乱れをおさめた、という話が書かれているんですね。日本の側にまだ文字の記録がなかった時代なので、当時の列島の様子にここまで詳しく言及した資料はほかにありません。邪馬台国がどこにあったのかという長い論争も、すべてはこの短い記述から始まっているわけです。",
+      "ja": "今回は、日本の古代史を語るうえで欠かせない、ある中国の歴史書を取り上げます。三世紀の中国の歴史をまとめた『三国志』の中に、「魏志倭人伝」と呼ばれる部分があります。ここには、倭の国々が卑弥呼という女王を立てて国の乱れをおさめた、という話が書かれているんですね。日本の側にまだ文字の記録がなかった時代なので、当時の列島の様子にここまで詳しく言及した資料はほかにありません。邪馬台国がどこにあったのかという長い論争も、すべてはこの短い記述から始まっているわけです。",
       "form": "言及",
       "en": "This time, I'm taking up a certain Chinese history book that is indispensable in talking about Japan's ancient history. Within the Records of the Three Kingdoms, which compiled the history of third-century China, there is a section known as the \"Account of the Wa.\" It tells how the countries of Wa set up a queen named Himiko and brought an end to the turmoil in the land. Since this was an era when there were still no written records on the Japanese side, there is no other source that refers in such detail to conditions in the archipelago at the time. The long debate over where Yamatai was located all started from this short passage.",
       "original": true,
@@ -240,7 +237,6 @@
       "register": "論",
       "topic": "history",
       "tipJa": "仕事の連絡だけでなく、旅や調査で見聞きしたことを伝える記録にも使う。",
-      "grammar": [],
       "sense": "起きたことや調べたことを、人に知らせること。"
     }
   ],

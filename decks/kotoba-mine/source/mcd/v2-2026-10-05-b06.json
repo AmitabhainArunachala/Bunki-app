@@ -1,0 +1,340 @@
+{
+  "175": [
+    {
+      "ja": "今回は、古代ローマがなぜあれほど長く続いたのかを論じた、ある本を紹介します。よく挙げられるのは軍隊の強さですが、著者が注目しているのは、意外にも道路なんですね。ローマは征服した土地に石を敷いた道を次々と延ばし、兵士や物資、そして情報がすばやく行き来できるようにしました。この地道な道づくりこそが、数百年続く帝国の礎を築いたというわけです。派手な戦いの陰に地味なインフラがあった、という視点は面白いですよね。",
+      "form": "礎を築いた",
+      "en": "This time I'm introducing a book that discusses why ancient Rome lasted as long as it did. The thing usually cited is the strength of its army, but what the author focuses on is, surprisingly, roads. Rome kept extending stone-paved roads across the lands it conquered, so that soldiers, supplies and information could move back and forth quickly. It was this steady road-building, the argument goes, that laid the foundations of an empire that lasted several hundred years. It's an interesting perspective, isn't it, that behind the flashy battles there was unglamorous infrastructure.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜の礎を築く」の形で、国家や産業など長く続くものの始まりを語るときに使う。",
+      "grammar": ["n3-you-ni"],
+      "sense": "のちの発展を支える土台をつくること。"
+    },
+    {
+      "ja": "台湾が半導体の受託生産で世界の先頭に立つまでには、半世紀近い積み重ねがあった。1970年代、政府系の研究機関がアメリカの企業から技術を導入し、若い技術者を現地に送り込んで学ばせた。ここで育った人材が民間に移り、1987年には受託生産を専門とするTSMCが設立された。当時の研究者たちの地道な取り組みが、現在の産業の礎を築いたと評価されている。一方で、生産が特定の地域に偏ることへの懸念も、各国で強まっている。",
+      "form": "礎を築いた",
+      "en": "Behind Taiwan's rise to the top of the world in contract chip manufacturing lies nearly half a century of steady effort. In the 1970s, a government-affiliated research institute brought in technology from an American company and sent young engineers there to learn. The people trained there moved into the private sector, and in 1987 TSMC, a company dedicated to contract manufacturing, was founded. The steady work of the researchers of that time is credited with laying the foundations of the present industry. At the same time, concern is growing in many countries about production being concentrated in one particular region.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜が現在の産業の礎を築いた」と、過去の取り組みを評価する文脈で使われる。",
+      "grammar": ["n5-teiru"],
+      "sense": "のちの発展を支える土台をつくること。"
+    },
+    {
+      "ja": "仏教では、戒めを守ること、心を静めること、物事をありのままに見ることの三つを、修行の柱としてきた。この並びにも意味があり、暮らしを整えることが先頭に置かれている。嘘をつかない、人のものを盗まないといった小さな約束を守り続ける日々が、乱れない心の礎を築くのである。高い悟りばかりを追い求めて毎日の行いを省みなければ、心という建物は、いつか足もとから傾いていくだろう。",
+      "form": "礎を築く",
+      "en": "Buddhism has treated three things as the pillars of practice: keeping the precepts, calming the mind, and seeing things as they are. Their order has meaning too, with putting one's life in order placed first. It is days spent keeping small promises, such as not lying and not stealing what belongs to others, that lay the foundation for an unshaken mind. If we chase only lofty enlightenment and neglect our daily conduct, the building that is the mind will one day begin to tilt from its footing.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "建物の比喩とともに、心や人格のように目に見えないものの土台にも使える。",
+      "grammar": ["n4-teiku"],
+      "sense": "目に見えない心や人格の土台をつくること。"
+    }
+  ],
+  "176": [
+    {
+      "ja": "今回は、いまのAIがなぜここまで自然な文章を書けるのか、というお話です。仕組みの中心にあるのは、次に来る言葉を予測するという、意外とシンプルな作業なんですね。インターネット上の膨大な文章を読み込み、この予測と答え合わせを数えきれないほどくり返すことで、言葉のつながり方を少しずつ身につけていきます。つまり、AIは人間のように意味を理解しているというより、文章のパターンを統計的にとらえているわけです。ここを押さえておくと、AIがもっともらしい間違いを平気で言う理由も見えてきます。",
+      "form": "膨大な",
+      "en": "This time we're talking about why today's AI can write such natural text. At the heart of the mechanism is a surprisingly simple task: predicting the next word. By reading in an enormous amount of text from the internet and repeating this prediction and checking it against the answer countless times, it gradually picks up how words connect. In other words, rather than understanding meaning the way humans do, the AI is capturing the patterns of text statistically. Once you grasp this, you can also see why AI will casually state plausible-sounding mistakes.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「膨大な量・データ・時間」のように、数えきれないほど多いものに付く。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n3-you-ni"],
+      "sense": "数や量が非常に多いようす。"
+    },
+    {
+      "ja": "全国の寺や旧家には、江戸時代の村の記録や手紙などの古文書が今も眠っている。その量は膨大で、くずし字を読める専門家だけでは、とても目を通しきれないのが実情だ。このため近年は、インターネットを通じて一般の人が解読に参加する取り組みが各地で広がっている。参加者の中には、続けるにつれて読める文字が増えていくのを楽しみにしている人も多いという。地域の歴史を掘り起こす新たな担い手として、期待が寄せられている。",
+      "form": "膨大で",
+      "en": "In temples and old family homes across the country, old documents from the Edo period, such as village records and letters, still lie unread. Their volume is enormous, and the reality is that the specialists who can read cursive script could never get through them all on their own. For this reason, in recent years, projects in which members of the public take part in deciphering them over the internet have been spreading in many areas. Many participants are said to enjoy watching the number of characters they can read grow as they keep at it. Hopes are high for them as a new force in unearthing local history.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「その量は膨大で」のように、量を主語にして述べる形も報道でよく使われる。",
+      "grammar": ["n3-ni-tsurete", "n4-teiku", "n5-teiru"],
+      "sense": "数や量が非常に多いようす。"
+    },
+    {
+      "ja": "仏教の経典は、二千年以上にわたって書き継がれ、その量は膨大である。人の苦しみをどう扱うかという問いをめぐって、一生かけても読み終えられないほどの言葉が積み重ねられてきた。その一方で、禅の伝統は、文字に頼りすぎることへの戒めも語り継いできた。教えの言葉は月を指す指であり、指ばかり見ていては月を見失う、というたとえである。読むことを否定するのではなく、読んだことを自分の暮らしで確かめよ、ということなのだろう。",
+      "form": "膨大である",
+      "en": "The Buddhist scriptures have been written and added to over more than two thousand years, and their volume is enormous. Around the question of how to deal with human suffering, more words have piled up than one could finish reading in a lifetime. At the same time, the Zen tradition has also handed down a warning against relying too much on written words. It is the image of the teaching's words as a finger pointing at the moon: look only at the finger, and you lose sight of the moon. The point is probably not to reject reading, but to test what one has read in one's own life.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "書き言葉では「膨大である」と言い切る形も多い。対になる語は「わずか」。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "数や量が非常に多いようす。"
+    }
+  ],
+  "180": [
+    {
+      "ja": "今回は、明の時代の中国のお話です。十五世紀の初め、鄭和という人物が率いる大船団が、東南アジアからインド洋、さらにアフリカ東岸まで、七回にわたって航海しました。ところが、この遠征は三十年ほどで打ち切られ、その後の明は海外との関わりを大きく縮小していきます。背景には、北方の守りに多くの費用がかかったことなど、いくつかの理由が挙げられているんですね。同じころにヨーロッパが海へ乗り出していったことを考えると、歴史の大きな分かれ道だったと言えそうです。",
+      "form": "縮小",
+      "en": "This time the story is about China in the Ming period. In the early fifteenth century, a great fleet led by a man named Zheng He sailed seven times, from Southeast Asia across the Indian Ocean and as far as the east coast of Africa. However, these expeditions were called off after about thirty years, and afterwards the Ming sharply scaled back its dealings with the outside world. Several reasons are given for this, such as the heavy cost of defending the north. Considering that Europe was setting out to sea around the same time, you could say it was a major fork in the road of history.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「関わり・事業・規模を縮小する」のように、活動の範囲を小さくする意味で使う。対義語は「拡大」。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "規模や範囲を小さくすること。"
+    },
+    {
+      "ja": "AIの計算を支える半導体は、半世紀以上にわたって一つの考え方で進歩してきた。回路の線幅を縮小すれば、同じ面積により多くの素子を載せられ、消費電力も抑えられるというものだ。しかし、線幅が原子の大きさに近づくにつれて、電流の漏れなど物理的な壁が目立つようになった。このため各社は現在、素子を縦に積み重ねる構造や、複数のチップを組み合わせる技術に力を入れている。平面の中だけで工夫を重ねる時代は終わりつつある、との見方も出ている。",
+      "form": "縮小",
+      "en": "The semiconductors that power AI computation have advanced for more than half a century on a single idea. It is that shrinking the line width of circuits lets more elements fit in the same area and also keeps power consumption down. However, as line widths have approached the size of atoms, physical barriers such as current leakage have become prominent. Companies are therefore now focusing on structures that stack elements vertically and on technologies that combine multiple chips. Some observers say the era of refining things within a flat plane alone is coming to an end.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "物の大きさを小さくする意味でも使う。「縮小コピー」「縮小表示」もこの意味。",
+      "grammar": ["n3-ni-tsurete", "n4-you-ni-naru", "n5-teiru"],
+      "sense": "物の寸法を小さくすること。"
+    },
+    {
+      "ja": "古い仏教の出家者は、身にまとう衣と、食べ物を受ける鉢のほかは、ほとんど持たずに暮らしたと伝えられる。持ち物を減らすことは、それ自体が目的ではない。守るべきものが少なければ、失うことへの恐れもまた小さくなるのである。現代の私たちが暮らしの規模を縮小しようとするとき、それはしばしば我慢や後退として語られる。しかし、手放すことで初めて軽くなる心があることも、覚えておいてよいだろう。",
+      "form": "縮小",
+      "en": "Buddhist renunciants of old are said to have lived owning almost nothing besides the robes they wore and the bowls in which they received food. Reducing one's possessions is not an end in itself. When there is less to protect, the fear of losing it also grows smaller. When we today try to scale down our lives, it is often spoken of as self-denial or retreat. Yet it is worth remembering that there is a lightness of heart that comes only from letting go.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「暮らしの規模を縮小する」のように、生活や活動の大きさを抑える場面でも使える。",
+      "grammar": ["n3-koto-de"],
+      "sense": "規模や範囲を小さくすること。"
+    }
+  ],
+  "63": [
+    {
+      "ja": "今回は、戦国時代に鉄砲が一気に広まったお話です。1543年ごろ、種子島に流れ着いた船にポルトガルの商人が乗っていて、鉄砲を伝えたとされています。驚くのはそこからのスピードで、堺などの鍛冶職人が仕組みを研究し、数十年のうちに国内で量産できるまでになりました。その結果、戦い方そのものが大きく変わり、天下統一の流れにも影響を与えたと言われているんですね。新しい技術をまねて、自分たちのものにしてしまう力がすごかったわけです。",
+      "form": "量産",
+      "en": "This time it's the story of how firearms spread so rapidly during the Warring States period. Around 1543, Portuguese merchants were aboard a ship that drifted ashore on Tanegashima, and they are said to have introduced the gun. What's astonishing is the speed after that: blacksmiths in places like Sakai studied the mechanism, and within a few decades guns could be mass-produced in the country. As a result, the very way of fighting changed dramatically, and it's said to have affected the course toward the country's unification too. Their ability to imitate a new technology and make it their own was remarkable.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「量産できる」「量産体制」のように、試作の段階を越えて大量に作る段階を指す。",
+      "grammar": ["n5-teiru"],
+      "sense": "同じ製品を一度に大量に作ること。"
+    },
+    {
+      "ja": "北海道千歳市で建設が進む最先端の半導体工場について、運営するラピダスは、2027年に二ナノメートル世代の製品を量産する計画を掲げている。試作品を作ることと、同じ品質のものを安定して作り続けることには、まったく別の難しさがあるとされる。このため、不良品をどこまで減らせるかが、事業の成否を左右するとみられている。国は巨額の支援を続けているものの、民間からの出資をどう集めるかという課題も残る。",
+      "form": "量産",
+      "en": "Regarding the cutting-edge chip plant under construction in Chitose, Hokkaido, its operator Rapidus has set out a plan to mass-produce 2-nanometer-generation products in 2027. Making prototypes and continuing to make products of the same quality consistently are said to involve entirely different difficulties. For this reason, how far defects can be reduced is seen as deciding the success or failure of the business. Although the state continues to provide huge support, the challenge of how to attract investment from the private sector remains.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「量産を始める」「量産化にめどをつける」など、試作との対比でよく使われる。",
+      "grammar": ["n2-mono-no", "n5-teiru"],
+      "sense": "同じ製品を一度に大量に作ること。"
+    },
+    {
+      "ja": "人は、やりたくないことを前にすると、それらしい理由を驚くほど器用に量産する。時間がない、体調が今ひとつだ、今はまだその時期ではない。どれもまったくの嘘というわけではないから、かえって厄介なのである。理由を一つ思いつくたびに、心は少しずつ楽なほうへ傾いていく。言い訳が増えてきたと気づいたときこそ、本当に恐れているものは別にあるのではないかと問うべきなのだろう。",
+      "form": "量産",
+      "en": "Faced with something they don't want to do, people churn out plausible reasons with astonishing dexterity. There's no time, I'm not feeling quite right, now isn't the right moment yet. None of them is an outright lie, which is precisely what makes them troublesome. Each time we come up with a reason, the mind tilts a little further toward the easy path. It is precisely when we notice the excuses multiplying that we should ask whether what we really fear lies somewhere else.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "製品以外にも「言い訳を量産する」のように、似たものを次々に生み出す比喩で使う。やや皮肉な響き。",
+      "grammar": ["n3-wake-dewa-nai", "n4-teiku"],
+      "sense": "似たようなものを次々と大量に生み出すこと。"
+    }
+  ],
+  "58": [
+    {
+      "ja": "今回は、アダム・スミスの『国富論』を取り上げます。この本の冒頭で有名なのが、ピン工場の例です。針金を伸ばす人、切る人、先をとがらせる人というように作業を細かく分けると、一人で全部やるよりはるかに多くのピンが作れる、という話なんですね。スミスは、この分業こそが国を豊かにする大きな力だと考えました。ただ、彼は単純な作業ばかりくり返すことの弊害にも気づいていた、という点も押さえておきたいところです。",
+      "form": "分業",
+      "en": "This time I'm taking up Adam Smith's The Wealth of Nations. Famous from the opening of this book is the example of the pin factory. The idea is that if you divide the work finely, with one person drawing out the wire, another cutting it, and another sharpening the point, far more pins can be made than if one person did everything. Smith believed that this division of labor was a great force that makes a nation rich. However, I also want to note that he was aware of the harm of repeating nothing but simple tasks.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "経済学では「分業によって生産が増える」のように、効率を高める仕組みとして語られる。",
+      "grammar": ["n3-you-ni", "n5-tai"],
+      "sense": "仕事をいくつかに分け、それぞれが受け持つこと。"
+    },
+    {
+      "ja": "半導体業界では、1980年代後半から、チップの開発と製造を別々の企業が担う分業が広がった。自社で工場を持たない企業は、巨額の設備投資を避けながら、新しい製品づくりに集中できるようになった。一方、製造を請け負う企業は、多くの顧客から注文を集めることで、最先端の設備を持ち続けることが可能になった。ただ、生産が一部の地域に偏った結果、災害や国際情勢の影響を受けやすいという弱点も指摘されている。",
+      "form": "分業",
+      "en": "In the semiconductor industry, from the late 1980s onward, a division of labor spread in which separate companies handle the development and the manufacture of chips. Companies without factories of their own became able to concentrate on creating new products while avoiding huge investments in equipment. Meanwhile, the companies that take on manufacturing became able to keep owning the most advanced equipment by gathering orders from many customers. However, it has also been pointed out that, as production became concentrated in a few regions, the setup has the weakness of being vulnerable to disasters and international tensions.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「国際的な分業」「水平分業」のように、企業や国の役割分担を指すことが多い。",
+      "grammar": ["n4-nagara", "n4-you-ni-naru", "n3-koto-de", "n5-teiru"],
+      "sense": "企業や国が生産の段階を分けて受け持つこと。"
+    },
+    {
+      "ja": "私たちは歩くとき、足の運びをいちいち考えることなく、自然に前へ進んでいる。慣れた動作は意識の外に任され、意識はそのとき考えるべきことに向けられているのである。心の中にも、ある種の分業があると言ってよい。だとすれば、すべてを自分で決めているという感覚は、案外あてにならないのかもしれない。身についた習慣を信頼しつつ、ときどきその中身を見直すことが、自分とうまく付き合うこつなのだろう。",
+      "form": "分業",
+      "en": "When we walk, we move forward naturally without thinking about each step. Familiar movements are left to what lies outside awareness, and awareness is directed at whatever needs thinking about at the moment. One may say there is a kind of division of labor within the mind as well. If so, the feeling that we decide everything ourselves may be less reliable than we think. Trusting the habits we have acquired while reviewing their contents from time to time is probably the knack of getting along well with ourselves.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "人の集団だけでなく、心や体の働きの役割分担をたとえて言うこともできる。",
+      "grammar": ["n2-koto-naku", "n5-teiru"],
+      "sense": "働きを分けて受け持つしくみのたとえ。"
+    }
+  ],
+  "78": [
+    {
+      "ja": "今回は、シリコンバレーがどうやって生まれたのか、というテーマです。もともとこの一帯は、果樹園が広がるのどかな農業地帯でした。そこにスタンフォード大学の卒業生たちが会社を立ち上げ、さらにその会社から独立した人たちが、近くで次々と新しい会社を作っていきます。こうして技術者や投資家が同じ地域に根を下ろし、情報が自然に行き来する産業の集積が生まれたわけです。人が近くにいることの価値は、オンラインの時代になっても意外と大きいんですね。",
+      "form": "集積",
+      "en": "This time the theme is how Silicon Valley came into being. Originally this whole area was a peaceful farming region covered with orchards. Graduates of Stanford University started companies there, and then people who went independent from those companies set up new companies nearby, one after another. In this way engineers and investors put down roots in the same region, and a concentration of industry emerged in which information flowed back and forth naturally. The value of having people close by is surprisingly large even in the online age.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「産業の集積」「企業の集積地」のように、地域に企業や人が集まった状態を指す。",
+      "grammar": ["n4-teiku"],
+      "sense": "産業や人が一つの地域に集まること。"
+    },
+    {
+      "ja": "仏教では、今の自分のありようを、過去の行いが積み重なった結果として見る。生まれや才能のように動かせないものだけで、人が決まるわけではない。昨日の言葉、今朝の態度、さっきのため息まで含めて、今の自分は数えきれない小さな行いの集積なのである。だとすれば、変わるために大きな決意は必ずしもいらない。目の前の一つの行いを変えれば、その先の自分も少しずつ変わっていくのだろう。",
+      "form": "集積",
+      "en": "Buddhism sees the way we are now as the result of past actions piling up. A person is not determined solely by things that cannot be changed, such as birth or talent. Including yesterday's words, this morning's attitude, and even the sigh a moment ago, who we are now is an accumulation of countless small actions. If so, a great resolution is not necessarily needed in order to change. Change the one action in front of you, and the self beyond it will probably change little by little too.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「〜の集積である」は、小さなものが積み重なって全体ができていると述べる硬い言い方。",
+      "grammar": ["n3-wake-dewa-nai", "n4-teiku"],
+      "sense": "多くのものが積み重なってできたもの。"
+    },
+    {
+      "ja": "試験前に一晩で詰め込んだ知識は、試験が終わるとあっという間に抜けていきます。記憶は、日をおいてくり返し思い出すことで、少しずつ定着していくからです。一回に長く勉強するより、毎日十五分でも続けるほうが効果的なのはそのためです。地味に見える短い復習の集積こそが、本番での安定した得点につながります。量ではなく回数を意識して、まずは毎日欠かさず続けることを優先してください。",
+      "form": "集積",
+      "en": "Knowledge crammed in overnight before an exam drains away the moment the exam is over. That's because memories settle in little by little when you recall them repeatedly with days in between. This is why continuing for even fifteen minutes a day is more effective than studying for a long stretch at once. It is the accumulation of short reviews that look unglamorous that leads to steady scores on the day of the exam. Be conscious of the number of times rather than the amount, and put keeping it up every day without fail first.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「日々の努力の集積」のように、小さな積み重ねが成果になるという文脈で使える。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n3-dewa-naku"],
+      "sense": "多くのものが積み重なってできたもの。"
+    }
+  ],
+  "79": [
+    {
+      "ja": "今回は、現代の電子機器に欠かせない集積回路の誕生についてです。1950年代の終わり、テキサス・インスツルメンツのジャック・キルビーと、フェアチャイルドのロバート・ノイスが、ほぼ同じ時期によく似たアイデアにたどり着きました。それまでは、トランジスタなどの部品を一つずつ作り、線でつないで組み立てていたんですね。それを一枚の小さな板の上にまとめてしまおう、という発想が画期的だったわけです。キルビーは後にノーベル物理学賞を受けていて、この発明がどれほど大きかったかがよくわかります。",
+      "form": "集積回路",
+      "en": "This time it's about the birth of the integrated circuit, which is indispensable to today's electronics. At the end of the 1950s, Jack Kilby of Texas Instruments and Robert Noyce of Fairchild arrived at very similar ideas at almost the same time. Until then, components such as transistors were made one at a time and assembled by connecting them with wires. The idea of putting all of that together on a single small board was what made it groundbreaking. Kilby later received the Nobel Prize in Physics, which shows just how big this invention was.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "日常では「チップ」「半導体」と呼ばれることが多い。正式な説明や歴史の話で使う語。",
+      "sense": "多くの電子部品を小さな板にまとめた回路。"
+    },
+    {
+      "ja": "1960年代、アメリカの月探査計画は、生まれたばかりの集積回路の大口の買い手となった。宇宙船に載せる誘導用のコンピューターには、小さく軽く、しかも故障しにくい部品が求められたためだ。当時は高価だった部品も、大量の注文が続くことで値段が下がり、民間で広く使われるきっかけになったとされる。国の威信をかけた宇宙開発が、思わぬ形で、のちの巨大な電子産業を育てたことになる。",
+      "form": "集積回路",
+      "en": "In the 1960s, America's lunar exploration program became a major buyer of the newborn integrated circuit. This was because the guidance computer to be carried on the spacecraft needed parts that were small, light, and also unlikely to fail. Components that were expensive at the time fell in price as large orders kept coming, which is said to have opened the way for their wide use in the private sector. Space development, staked on national prestige, thus ended up nurturing what would later become a huge electronics industry, in an unexpected way.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道や歴史の記述では、略さずに「集積回路」と書き、あとで「チップ」と言い換えることが多い。",
+      "grammar": ["n3-koto-de", "n3-koto-ni-naru"],
+      "sense": "多くの電子部品を小さな板にまとめた回路。"
+    },
+    {
+      "ja": "脳はよくコンピューターにたとえられるが、その働き方はずいぶん異なる。精密に作られた集積回路には、同じ入力に対して毎回同じ答えを返すことが何より求められる。一方、脳の神経細胞のつながりは経験によって日々組み替わり、同じ問いにも昨日とは違う答えを出すことがある。こうした不確かさは、一見すると欠点にしか見えない。だが、そこにこそ人が学び、変わっていく力の源があるのだろう。",
+      "form": "集積回路",
+      "en": "The brain is often likened to a computer, but the way it works is quite different. Above all, a precisely made integrated circuit is required to return the same answer to the same input every time. The connections between neurons in the brain, on the other hand, are rewired day by day through experience, and may give a different answer to the same question than they did yesterday. At first glance, this kind of uncertainty looks like nothing but a flaw. Yet it is probably precisely there that the source of our power to learn and change lies.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "脳や生き物と対比して、正確で決まった動きをする機械の代表として持ち出されることがある。",
+      "grammar": ["n4-teiku"],
+      "sense": "多くの電子部品を小さな板にまとめた回路。"
+    }
+  ],
+  "181": [
+    {
+      "ja": "今回は、初期のコンピューターの話をしていきます。1946年に公開されたアメリカのENIACには、およそ一万八千個もの真空管が使われていました。これが電気の流れを切り替えるスイッチの役目を果たしていたんですが、熱を持ちやすく、しょっちゅう切れてしまうんですね。そのため技術者たちは、切れた管を探して交換する作業に追われていたそうです。こうした弱点を抱えた部品に代わるものとして、のちに注目されたのがトランジスタというわけです。",
+      "form": "真空管",
+      "en": "This time I'll talk about early computers. America's ENIAC, unveiled in 1946, used some eighteen thousand vacuum tubes. They served as switches that turned the flow of electricity on and off, but they ran hot easily and burned out all the time. Because of that, the engineers were reportedly kept busy hunting down the burned-out tubes and replacing them. And the thing that later drew attention as a replacement for parts with such weaknesses was the transistor.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "数えるときは「本」も「個」も使う。電球と同じく、使ううちに「切れる」ものとして語られる。",
+      "grammar": ["n4-teiku"],
+      "sense": "空気を抜いたガラス管で電気の流れを操る部品。"
+    },
+    {
+      "ja": "戦後まもないころ、家庭のラジオは真空管を使った大きな箱型のものが主流だった。電源を入れてから音が出るまでに時間がかかり、気軽に持ち運べるものでもなかった。1955年、東京の小さな電機メーカーがトランジスタを使った小型ラジオを発売し、のちに世界的な企業へと成長するきっかけをつかんだ。こうしてラジオは、一家に一台の家具から、一人ひとりが持ち歩く道具へと姿を変えていくことになる。",
+      "form": "真空管",
+      "en": "In the years just after the war, household radios were mostly big box-shaped sets that used vacuum tubes. They took time to produce sound after being switched on, and they were not something you could casually carry around. In 1955, a small electronics maker in Tokyo released a compact radio that used transistors, seizing the opportunity that would later let it grow into a global company. In this way, radios would go on to change from a piece of furniture, one to a household, into a device each person carried around.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「真空管ラジオ」「真空管式」のように、トランジスタ以前の古い方式を示すときに使う。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"],
+      "sense": "空気を抜いたガラス管で電気の流れを操る部品。"
+    },
+    {
+      "ja": "真空管を使ったアンプの音を、温かいと評する愛好家は今も多い。測定の数字だけを見れば、最新の機器のほうがずっと正確に音を再現している。それでも人が古い音にひかれるのは、わずかなゆがみや揺らぎに、どこか人間らしさを感じ取るからだろう。正確さと心地よさは、必ずしも同じ物差しで測れるわけではないのである。完全に正しいものより、少しだけ不完全なものに、心はかえって落ち着くことがある。",
+      "form": "真空管",
+      "en": "Many enthusiasts still describe the sound of amplifiers that use vacuum tubes as warm. Judging by the measured figures alone, the latest equipment reproduces sound far more accurately. That people are still drawn to the old sound is probably because they sense something human in its slight distortions and fluctuations. Accuracy and comfort cannot necessarily be measured with the same yardstick. The heart sometimes settles more easily with something slightly imperfect than with something completely correct.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "今では主に音響の趣味の世界で「真空管アンプ」として名前を聞く語。",
+      "grammar": ["n3-wake-dewa-nai", "n5-teiru"],
+      "sense": "空気を抜いたガラス管で電気の流れを操る部品。"
+    }
+  ],
+  "187": [
+    {
+      "ja": "今回は、ムーアの法則について解説していきます。インテルの創業者の一人であるゴードン・ムーアは、チップに載るトランジスタの数がおよそ二年ごとに倍になる、という見通しを示しました。この予測はその後、半世紀近くにわたっておおむね当たり続け、コンピューターの性能は驚くほどのペースで上がっていったんですね。ところが最近は、このペースが鈍ってきたとも言われています。そこで各社は、チップを積み重ねるなど、別の方法で進歩を続けようとしているわけです。",
+      "form": "性能",
+      "en": "This time I'll explain Moore's law. Gordon Moore, one of Intel's founders, put forward the outlook that the number of transistors on a chip would double roughly every two years. This prediction then held broadly true for nearly half a century, and the performance of computers rose at an astonishing pace. Recently, however, it's said that this pace has slowed. So companies are trying to keep progress going by other means, such as stacking chips.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「性能が上がる・高い・よい」と組み合わせる。人には普通「能力」を使う。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "機械などがどれだけよく働くかの程度。"
+    },
+    {
+      "ja": "よく、自分は頭の性能が悪いから勉強しても無駄、みたいに言う人いるじゃないですか。でも、だいたいの場合、問題は頭じゃなくて、勉強の効率とか睡眠不足なんですよね。睡眠時間を減らしてまで机に向かうのって、スマホを充電しないまま使い続けるようなもんなんで、集中力なんて続くわけないんですよ。まずはちゃんと寝て、それから覚え方をちょっと工夫してみる、そこからかなって思います。あと、記憶のコツって人によって相性があるんで、いろいろ試してみるのも大事ですね。",
+      "form": "性能",
+      "en": "You know how some people say stuff like their brain's performance is bad, so studying is pointless? But in most cases the problem isn't the brain, it's how efficiently they study or lack of sleep. Cutting back on sleep to sit at your desk is like using your phone without ever charging it, so there's no way your concentration will last. I think you have to start by sleeping properly and then trying to tweak how you memorize a little. Also, memory tricks suit some people better than others, so it's important to try out various ones too.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "「頭の性能」は人を機械にたとえた、くだけた言い方。改まった場では「能力」。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "人の能力を機械にたとえて言う言い方。"
+    }
+  ],
+  "192": [
+    {
+      "ja": "今回は、半導体チップがどうやって作られるのかを、ざっくり見ていきます。材料になるのは、砂に含まれるケイ素をとても高い純度まで精製して作った、ウエハーと呼ばれる薄い円盤です。この上に薄い膜を重ねては、光を使って回路の模様を写し取る、という作業を数十回もくり返すんですね。製造工程は全部で千を超えることもあり、完成までに数か月かかることも珍しくありません。ほんのわずかなチリでも不良品につながるので、工場の中は手術室よりもきれいに保たれているわけです。",
+      "form": "製造工程",
+      "en": "This time we'll take a rough look at how semiconductor chips are made. The material is a thin disk called a wafer, made by refining the silicon contained in sand to extremely high purity. On top of it, the work of laying down a thin film and then copying a circuit pattern onto it using light is repeated dozens of times. The manufacturing process can exceed a thousand steps in all, and it is not unusual for it to take several months to finish. Since even the tiniest speck of dust can lead to a defective product, the inside of the factory is kept cleaner than an operating room.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「製造工程が千を超える」のように、段階の数や順序を数えて語ることが多い。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "材料から完成品になるまでの作業の段階。"
+    },
+    {
+      "ja": "仏教は、あらゆるものが数えきれない縁によって成り立っていると説く。店先のシャツを一枚手に取っても、その製造工程を思い浮かべる人はほとんどいないだろう。綿を育てる人、糸を紡ぐ人、布を織り、縫い合わせる人の手を経て、それはようやく形になったものである。私たちはそれを値段だけで判断し、背後にある時間を見落としてしまう。物の向こうにいる人々を想像することは、感謝という心の働きの始まりなのかもしれない。",
+      "form": "製造工程",
+      "en": "Buddhism teaches that all things come into being through countless conditions. Even if you pick up a single shirt in a shop, hardly anyone would picture its manufacturing process. It has taken shape only after passing through the hands of people who grow cotton, people who spin thread, and people who weave the cloth and sew it together. We judge it by its price alone and overlook the time that lies behind it. Imagining the people on the other side of things may be the beginning of the mind's working we call gratitude.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "工業製品だけでなく、衣服や食品など身近な品物にも「製造工程」は使える。",
+      "grammar": ["n5-teiru"],
+      "sense": "材料から完成品になるまでの作業の段階。"
+    },
+    {
+      "ja": "工場のマニュアルのように製造工程を説明する文章では、一つの文に一つの作業だけを書くのが基本です。「〜して」をいくつも重ねて文を長くつなげると、読み手はどの段階の話なのかを見失ってしまいます。また、温める、冷ますといった動作には、温度や時間などの数字を必ず添えましょう。書き終えたら、その分野をまったく知らない人に読んでもらい、手が止まった部分を直していくと、より確実です。",
+      "form": "製造工程",
+      "en": "In writing that explains a manufacturing process, such as a factory manual, the basic rule is to write only one operation per sentence. If you stack up one clause after another and string sentences out long, the reader loses track of which stage is being discussed. Also, actions like heating or cooling should always come with figures such as temperature and time. When you've finished, have someone completely unfamiliar with the field read it and fix the places where they got stuck, and you can be sure of the result.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "手順書では「製造工程」の下に「工程一」「工程二」と段階を並べるのが定番。",
+      "grammar": ["n3-you-ni", "n4-teiku"],
+      "sense": "材料から完成品になるまでの作業の段階。"
+    }
+  ]
+}

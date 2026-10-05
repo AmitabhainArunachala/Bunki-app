@@ -1,0 +1,334 @@
+{
+  "296": [
+    {
+      "ja": "今日は、人が自分の力をどれくらい正しく評価できるのかを扱った心理学の本を要約していきます。著者が紹介するのは、ある分野に詳しくない人ほど、自分の実力を高く見積もりやすいという研究です。本人は自信満々なのに、周りから見ると甚だしい勘違い、という状態ですね。厄介なのは、知識が足りないと、自分の間違いに気づくための物差しまで欠けてしまうことなんです。だから著者は、詳しい人に意見を求める習慣をつけるよう勧めています。",
+      "form": "甚だしい",
+      "en": "Today I'm going to summarize a psychology book about how accurately people can assess their own abilities. The author introduces research showing that the less someone knows about a field, the more likely they are to overestimate their own skill. It's a state where the person is full of confidence, yet to those around them it looks like a gross misunderstanding. The tricky part is that when you lack knowledge, you also lack the very yardstick you need to notice your own mistakes. That's why the author recommends making a habit of asking knowledgeable people for their opinion.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「甚だしい勘違い」「誤解も甚だしい」のように、よくないことの程度に使う。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "よくないことの程度が、ふつうをはるかにこえて大きい。"
+    },
+    {
+      "ja": "顔写真から性別を判定する市販のAIについて、利用者の属性によって精度に大きな差があることが、2018年に米国の研究者の調査で明らかになった。肌の色が明るい男性ではほとんど誤りがなかった一方、肌の色が濃い女性では誤りが目立って多く、その差は甚だしいものだった。原因として、学習に使われたデータの偏りが指摘されている。この調査を受け、複数の企業がシステムの改善に乗り出した。専門家は、AIを導入する前に、どのような人に対して誤りやすいのかを確かめることが欠かせないと話している。",
+      "form": "甚だしい",
+      "en": "A 2018 study by researchers in the United States revealed that commercial AI systems that determine gender from face photos varied greatly in accuracy depending on the attributes of the person. While there were almost no errors for light-skinned men, errors were conspicuously frequent for dark-skinned women, and the gap was extreme. Bias in the data used for training has been pointed out as the cause. In response to the study, several companies set about improving their systems. Experts say that before introducing AI, it is essential to check which kinds of people it is prone to err on.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "よくないことの程度が、ふつうをはるかにこえて大きい。"
+    },
+    {
+      "ja": "仏教では、まだ得ていない悟りを得たと思い込む心を増上慢と呼び、強く戒めてきた。わずかな修行で、自分は他人より高い境地に達したと考えるのは、思い上がりも甚だしいというわけである。厄介なのは、こうした慢心が、真面目に努力してきた者ほど生まれやすい点だ。積み重ねた努力が、いつの間にか他人を見下す根拠に変わってしまうのである。修行の深まりとは、むしろ自分の未熟さがよく見えるようになることなのだろう。",
+      "form": "甚だしい",
+      "en": "Buddhism calls the mind that believes it has attained an awakening it has not yet attained \"overweening pride,\" and has warned strongly against it. To think, after only a little practice, that one has reached a higher state than others is the height of conceit. The troublesome thing is that this kind of pride arises most easily in those who have worked earnestly. The effort one has piled up quietly turns into grounds for looking down on others. The deepening of practice is, if anything, coming to see one's own immaturity clearly.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「〜も甚だしい」の形で、あきれるほどひどいと強く批判する。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "よくないことの程度が、ふつうをはるかにこえて大きい。"
+    }
+  ],
+  "299": [
+    {
+      "ja": "今日は、不安との付き合い方を扱った本を要約していきます。著者によると、心配性の人ほど、起こるかどうか分からない最悪の事態を、頭の中で何度も繰り返してしまうそうです。そこで勧められているのが、万が一そうなったら何をするかを、先に紙に書き出しておく方法です。対策が決まっていると、脳はその心配をいったん手放しやすくなるといいます。不安をゼロにするのではなく、備えに変えるという発想なんですね。",
+      "form": "万が一",
+      "en": "Today I'm going to summarize a book about how to live with anxiety. According to the author, the more of a worrier someone is, the more they replay in their head worst-case scenarios that may or may not happen. What the book recommends is writing down on paper in advance what you would do if, by some slim chance, that happened. It says that once a plan is in place, the brain finds it easier to let go of that worry for the time being. The idea is not to reduce anxiety to zero but to turn it into preparation.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「万が一〜したら」「万が一に備えて」の形で、めったにない悪い場合を想定する。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-dewa-naku"],
+      "sense": "めったにないが、もしかしたら起こるかもしれない場合。"
+    },
+    {
+      "ja": "自動運転の実用化に向けて、システムが万が一止まった場合にどう安全を確保するかが、大きな課題となっている。国内で始まった無人の移動サービスでは、離れた場所から係員が車両の状態を見守る仕組みが取り入れられている。異常を感知した車両には、自動的に路肩などに寄せて停止することが求められる。ただ、こうした備えにかかる費用は小さくなく、事業として成り立たせることとの両立が問われている。",
+      "form": "万が一",
+      "en": "As self-driving cars move toward practical use, how to ensure safety in the unlikely event that the system stops has become a major issue. In the driverless transport services that have started in Japan, a system has been adopted in which staff watch over the vehicles' condition from a remote location. A vehicle that detects an abnormality is required to pull over automatically to the shoulder or a similar place and stop. However, the cost of such safeguards is not small, and the question is how to balance them with making the service viable as a business.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "めったにないが、もしかしたら起こるかもしれない場合。"
+    },
+    {
+      "ja": "江戸の町は、昔からたびたび大きな火事に見舞われた。そのため裕福な商人たちは、分厚い土壁の蔵を建て、万が一に備えて帳簿や大切な品をしまっておいた。店が焼けても、蔵さえ残れば商売をやり直すことができたからである。目の前の損得だけでなく、起こってほしくない事態まで見越して手を打つ姿勢が、そこにはあった。備えとは、不安の表れではなく、未来に対する責任の取り方なのだろう。",
+      "form": "万が一",
+      "en": "The city of Edo had long been struck by major fires again and again. For that reason, wealthy merchants built storehouses with thick earthen walls and kept their account books and valuables there in case the worst should happen. That was because even if the shop burned down, they could start their business over as long as the storehouse survived. There was an attitude there of taking measures not only for immediate gain and loss but also in anticipation of situations no one wanted to happen. Preparation is perhaps not an expression of anxiety but a way of taking responsibility for the future.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "めったにないが、もしかしたら起こるかもしれない場合。"
+    }
+  ],
+  "319": [
+    {
+      "ja": "今日は、世界で最も古い平和条約の一つを扱った歴史の本を要約していきます。紀元前13世紀、長く戦ってきたエジプトとヒッタイトは、ついに和平の条約を交わしました。面白いのは、その内容がエジプト側では神殿の壁に、ヒッタイト側では粘土板に刻まれて、今も残っていることなんです。しかも読み比べると、どちらも相手のほうから和平を求めてきたように書いてあるそうです。自国のメンツを守りながら戦いを終わらせる工夫は、三千年以上前からあったわけですね。",
+      "form": "交わしました",
+      "en": "Today I'm going to summarize a history book about one of the oldest peace treaties in the world. In the 13th century BCE, Egypt and the Hittites, who had fought for a long time, finally concluded a peace treaty. What's interesting is that its text survives to this day, carved on temple walls on the Egyptian side and on clay tablets on the Hittite side. What's more, if you compare them, each reportedly says it was the other side that asked for peace. So the trick of ending a war while saving face existed more than three thousand years ago.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「条約を交わす」「契約を交わす」のように、双方が取り決めをする場面でも使う。",
+      "grammar": ["n5-teiru", "n4-nagara", "n4-teiku", "n3-you-ni"],
+      "sense": "言葉や約束などを、おたがいにやりとりする。"
+    },
+    {
+      "ja": "生成AIの開発をめぐり、大手の報道機関とAI企業が、記事の利用について契約を交わす動きが広がっている。AIの学習や回答に記事を使う代わりに、企業側が使用料を支払う仕組みだ。一方で、無断で記事を学習に使われたとして、AI企業を訴える新聞社も出ている。記事という情報の価値を、誰がどう評価するのかが問われている。専門家は、個別の取り決めだけでなく、業界全体のルールづくりが必要だと指摘している。",
+      "form": "交わす",
+      "en": "Over the development of generative AI, a trend is spreading in which major news organizations and AI companies sign contracts on the use of their articles. Under this arrangement, the companies pay a usage fee in exchange for using articles to train AI and in its answers. On the other hand, some newspapers have sued AI companies, claiming their articles were used for training without permission. The question being asked is who should value the information in articles, and how. Experts point out that rules for the whole industry are needed, not just individual agreements.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "言葉や約束などを、おたがいにやりとりする。"
+    },
+    {
+      "ja": "毎朝、近所の人と短い挨拶を交わすだけでも、人の心は思いのほか支えられている。深い付き合いのない相手とのささやかな触れ合いが、孤独感を和らげるという研究もある。大切なのは言葉の中身よりも、自分がここにいると誰かに認められている感覚なのだろう。名前も知らない店員との一言にも、同じ働きがあるのかもしれない。人とのつながりは、太い一本の綱ではなく、細い糸を何本もより合わせたものなのである。",
+      "form": "交わす",
+      "en": "Just exchanging brief greetings with neighbors every morning supports a person's mind more than one might expect. There is also research suggesting that small moments of contact with people we are not close to ease feelings of loneliness. What matters is perhaps less the content of the words than the sense that someone acknowledges that we are here. A single word with a shop clerk whose name we do not even know may serve the same purpose. Our connections with people are not one thick rope but many thin threads twisted together.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "言葉や約束などを、おたがいにやりとりする。"
+    }
+  ],
+  "320": [
+    {
+      "ja": "今日は、半導体の歴史を扱った本を要約していきます。1965年、のちにインテルを共同で創業するゴードン・ムーアは、一枚のチップに載せられる部品の数が、およそ毎年倍になっていると指摘しました。この予測は1975年に二年ごとへと修正されましたが、その後も長く業界の目標であり続けたんです。部品が小さくなるほど、速くて電気を食わないチップが安く作れるようになり、その効果は特にコンピューターの値下がりに顕著に表れました。今、手のひらのスマホで動画が見られるのも、この流れの延長線上にあるわけですね。",
+      "form": "顕著",
+      "en": "Today I'm going to summarize a book on the history of semiconductors. In 1965, Gordon Moore, who would later co-found Intel, pointed out that the number of components that could be placed on a single chip was roughly doubling every year. This prediction was revised to every two years in 1975, but it remained the industry's target for a long time afterward. The smaller the components became, the more cheaply fast, power-efficient chips could be made, and the effect showed up most strikingly in falling computer prices. The fact that we can watch videos on the smartphone in our hand today lies on the extension of this trend.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「顕著に表れる」「顕著な傾向」のように、変化や差がはっきり見える時に使う。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru", "n4-teiku"],
+      "sense": "はっきりと目立っていて、だれにでもよく分かるようす。"
+    },
+    {
+      "ja": "勉強法の研究でよく知られているのが、思い出す練習の効果です。教科書を何度も読み返すより、本を閉じて内容を思い出そうとするほうが、記憶に残りやすいことが分かっています。ある実験では、学習の直後のテストでは、むしろ読み返したグループのほうが少し成績がよかったのに、一週間後には結果が逆転し、その差は顕著でした。つまり、覚えたかどうか不安なときこそ、本を閉じて思い出してみるべきなんです。",
+      "form": "顕著",
+      "en": "One well-known finding in research on study methods is the effect of practicing recall. It has been shown that trying to recall the content with the book closed makes things stick in memory better than rereading the textbook many times. In one experiment, the group that reread actually scored slightly better on a test right after studying, but a week later the results were reversed, and the difference was striking. In other words, it's precisely when you're unsure whether you've memorized something that you should close the book and try to recall it.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "grammar": ["n5-teiru"],
+      "sense": "はっきりと目立っていて、だれにでもよく分かるようす。"
+    },
+    {
+      "ja": "古代インドの思想に目を向けると、時間を一本の直線ではなく、めぐる円として捉える傾向が顕著である。生と死を繰り返す輪廻の考え方も、宇宙が生まれては消えることを繰り返すという世界観も、その表れだといえる。始まりから終わりへと進む歴史観に慣れた者には、これは奇妙に映るかもしれない。しかし、季節がめぐり、命が受け継がれていく様子を見れば、円の時間もまた、人間の実感に根ざしたものなのである。",
+      "form": "顕著",
+      "en": "Turning to the thought of ancient India, there is a marked tendency to see time not as a single straight line but as a circle that comes round again. Both the idea of rebirth, the repetition of birth and death, and the worldview in which the universe repeatedly comes into being and passes away can be called expressions of it. To those accustomed to a view of history that proceeds from a beginning to an end, this may seem strange. Yet when we watch the seasons come round and life being handed down, circular time too turns out to be rooted in human experience.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "sense": "はっきりと目立っていて、だれにでもよく分かるようす。"
+    }
+  ],
+  "56": [
+    {
+      "ja": "今日は、ブッダの生涯をたどった本を要約していきます。王子として恵まれた環境で育ったシッダールタは、城の外で老いや病、死を目にして、深く悩むようになります。二十九歳で出家し、厳しい苦行を何年も続けましたが、体を痛めつけるだけでは答えは見えなかったといいます。そこで苦行をやめ、菩提樹の下で静かに瞑想を続けるうちに、やがて悟りを開いたとされています。極端を避ける中道という考え方は、この経験から生まれたんです。",
+      "form": "やがて",
+      "en": "Today I'm going to summarize a book that traces the life of the Buddha. Siddhartha, who grew up as a prince in privileged surroundings, saw old age, sickness and death outside the palace and began to agonize deeply. He renounced the world at twenty-nine and kept up harsh austerities for years, but it is said that tormenting his body alone did not reveal the answer. So he gave up the austerities, and while he continued meditating quietly under the bodhi tree, he is said to have eventually attained awakening. The idea of the Middle Way, which avoids extremes, was born from this experience.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "物語の流れの中で、時間がたって次の段階に至ることを表す。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru", "n4-teiku"],
+      "sense": "それほど時間がたたないうちに。いずれそのうちに。"
+    },
+    {
+      "ja": "スマートフォンにAI専用の回路を載せる動きが、当たり前になりつつある。大手各社は、端末の中で動くAIの開発に力を入れている。現在はデータセンターで動かしている大規模なAIも、やがて手元の端末だけで動かせるようになるとの見方がある。通信を介さずに処理できれば、反応が速くなるうえ、個人の情報を外に出さずに済む利点もある。一方で、端末の電池の消費や発熱をどう抑えるかが課題となっている。",
+      "form": "やがて",
+      "en": "Putting dedicated AI circuits in smartphones is becoming the norm. Major manufacturers are putting effort into developing AI that runs inside the device. There is a view that large-scale AI, which currently runs in data centers, will before long be able to run on handheld devices alone. If processing can be done without going through a network, responses become faster, and there is also the advantage that personal information need not leave the device. On the other hand, how to hold down battery drain and heat on the devices remains a challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"],
+      "sense": "それほど時間がたたないうちに。いずれそのうちに。"
+    },
+    {
+      "ja": "怒りは、その場では抑えきれないほど大きく感じられても、やがて静まっていく。それなのに人は、怒りに任せて口にした一言を、あとで何度も悔やむものだ。感情の波そのものは長くは続かず、それを長引かせるのは、出来事を頭の中で何度も思い返す癖だとも言われる。だからこそ、波が引くのを待つあいだは、言葉や行動で応じないほうがよい。感情に名前をつけ、少し距離を置いて眺めることが、自分を守る知恵なのである。",
+      "form": "やがて",
+      "en": "Anger, however overwhelming it may feel in the moment, before long subsides. And yet people often regret, again and again, a word they said in the heat of anger. It is also said that the wave of emotion itself does not last long, and what prolongs it is the habit of replaying the event in one's head again and again. That is precisely why, while waiting for the wave to recede, it is better not to respond with words or actions. Naming the emotion and looking at it from a little distance is the wisdom that protects us.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n4-teiku"],
+      "sense": "それほど時間がたたないうちに。いずれそのうちに。"
+    }
+  ],
+  "40": [
+    {
+      "ja": "今日は、一流の人がどう練習しているかを扱った本を要約していきます。著者によると、上達する人とそうでない人の差は、練習の量だけではなく、その中身にあるそうです。できることを繰り返すのではなく、少しだけ難しい課題に挑み、指導者からすぐに指摘を受けるのがポイントなんです。日本の武道や芸事の稽古で、師匠が弟子の動きを一つ一つ直していくのも、まさにこの考え方ですね。ただ時間をかけるのではなく、毎回の練習に狙いを持つことが大切だというわけです。",
+      "form": "稽古",
+      "en": "Today I'm going to summarize a book about how top performers practice. According to the author, the difference between people who improve and those who don't lies not only in the amount of practice but in its content. The key is not to repeat what you can already do but to take on tasks that are just a little difficult and get feedback from a coach right away. In the training of Japanese martial arts and traditional arts, a master corrects a pupil's movements one by one, and that is exactly this idea. In other words, what matters is not just putting in time but having an aim for each session.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「稽古をつける」「稽古に励む」のように、武道や芸事の練習に使う。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-dewa-naku"],
+      "sense": "武道や芸事などを習い、くり返し練習すること。"
+    },
+    {
+      "ja": "稽古という言葉は、もともと昔のことを考え、学ぶことを意味していた。古事記の序文にも、古いことを考えて今に照らすという趣旨の一節がある。つまり、それは単に体を動かす練習ではなく、先人の積み重ねをたどる営みだったのである。茶道や武道で型を何度もなぞるのも、その名残と見ることができる。型の中には、言葉では伝えきれない先人の工夫や考えが、ぎっしりと込められているのだろう。",
+      "form": "稽古",
+      "en": "The word keiko originally meant thinking about and learning from the past. The preface of the Kojiki also contains a passage to the effect of considering the old in order to shed light on the present. In other words, it was not merely physical practice but an endeavor to retrace what earlier generations had built up. The repeated tracing of set forms in the tea ceremony and martial arts can be seen as a remnant of this. Within those forms, it seems, is packed the ingenuity and thought of predecessors that words alone cannot fully convey.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "稽の字は「考える」の意味で、稽古は本来「古を考える」こと。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "もとの意味。昔のことを考え、学ぶこと。"
+    },
+    {
+      "ja": "生成AIが、存在しない論文や判例をもっともらしく示す現象が問題となっている。米国では2023年、AIが作った架空の判例をそのまま裁判所に提出した弁護士が、制裁を受けた。明らかに荒唐無稽な答えなら誰でも気づくが、もっともらしい誤りは見抜きにくい。こうした誤りは、AIが事実を調べるのではなく、ありそうな言葉の並びを作り出す仕組みに由来している。専門家は、AIの回答は必ず元の資料にあたって確かめるよう呼びかけている。",
+      "form": "荒唐無稽",
+      "en": "The phenomenon of generative AI plausibly presenting papers and court precedents that do not exist has become a problem. In the United States in 2023, lawyers who submitted fictitious precedents created by AI directly to a court were sanctioned. Anyone would notice an obviously absurd answer, but plausible errors are hard to spot. Such errors stem from the way AI works, generating likely sequences of words rather than looking up facts. Experts are urging people to always check AI answers against the original sources.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "別の意味。荒唐無稽の形で、でたらめで根拠のないこと。"
+    }
+  ],
+  "101": [
+    {
+      "ja": "今日は、精神科医のフランクルが、強制収容所での体験をもとに書いた『夜と霧』を要約していきます。食べ物も自由も奪われ、明日の命さえ分からない、まさに絶望の淵にいるような日々でした。そんな中で彼が気づいたのは、待っている家族や、やり残した仕事を心に持ち続けた人ほど、持ちこたえる力を失わなかったということです。生きる意味は与えられるものではなく、自分で見つけるものだというのが、この本の中心にある考え方なんです。",
+      "form": "淵",
+      "en": "Today I'm going to summarize Man's Search for Meaning, which the psychiatrist Frankl wrote based on his experience in the concentration camps. Those were days of being stripped of food and freedom, not even knowing if one would be alive tomorrow, truly as if in the depths of despair. What he noticed amid all that was that the people who kept in their hearts a family waiting for them or work left unfinished were the ones who did not lose the strength to hold out. The idea at the center of this book is that meaning in life is not something given to us but something we find for ourselves.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「絶望の淵」「死の淵」のように、抜け出しにくい苦しい状態にたとえる。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-dewa-naku"],
+      "sense": "抜け出しにくい、深く苦しい状態。"
+    },
+    {
+      "ja": "AI向け半導体で世界の市場をけん引する米エヌビディアは、創業間もない1990年代半ばに、倒産の淵に立たされていた。最初に売り出した製品が業界の主流の規格と合わず、思うように売れなかったためだ。同社は社員を大きく減らし、次の製品にすべてを賭けた。1997年に発売したその製品がヒットし、会社は危機を脱した。一度は消えかけた企業が業界の中心に立つまでの歩みは、技術の世界の浮き沈みの激しさを物語っている。",
+      "form": "淵",
+      "en": "Nvidia of the United States, which leads the global market for AI semiconductors, was on the brink of bankruptcy in the mid-1990s, shortly after its founding. That was because the first product it put on the market did not fit the industry's mainstream standard and did not sell as hoped. The company cut its staff substantially and bet everything on its next product. That product, released in 1997, became a hit, and the company escaped the crisis. The path of a company that once nearly vanished to the center of the industry speaks to the sharp ups and downs of the technology world.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru", "n3-you-ni"],
+      "sense": "抜け出しにくい、深く苦しい状態。"
+    },
+    {
+      "ja": "我が子を亡くし、悲しみの淵に沈んだ母親キサー・ゴータミーは、子を生き返らせる薬を求めてブッダのもとを訪れたという。ブッダは、一人も死者を出したことのない家から芥子の種をもらってくるよう告げた。彼女は家々を回るうちに、身内を失ったことのない家など、どこにもないことを知る。悲しみが消えたわけではないが、それが自分一人のものではないと知ったとき、彼女は再び歩き出すことができたのである。",
+      "form": "淵",
+      "en": "It is said that Kisa Gotami, a mother who had lost her child and sunk into the depths of grief, went to the Buddha seeking medicine to bring her child back to life. The Buddha told her to fetch mustard seeds from a house that had never had a death. As she went from house to house, she learned that there was no house anywhere that had never lost a family member. Her grief did not disappear, but when she learned that it was not hers alone, she was able to walk on again.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "抜け出しにくい、深く苦しい状態。"
+    }
+  ],
+  "224": [
+    {
+      "ja": "今日は、インド洋の交易の歴史を扱った本を要約していきます。この海では、夏は南西から、冬は北東から、季節によって向きが逆になる風が吹くんです。昔の商人たちはこの性質を知り尽くしていて、行きと帰りで時期を選んで船を出していました。おかげで、アラビアやインド、東南アジアを結ぶ長い航路が、エンジンのない時代に成り立っていたわけですね。自然のリズムに合わせることが、そのまま商売の知恵だったというのが、この本のポイントです。",
+      "form": "風",
+      "en": "Today I'm going to summarize a book on the history of trade in the Indian Ocean. On this sea, the wind reverses direction with the season, blowing from the southwest in summer and from the northeast in winter. Merchants of old knew this property inside out and chose when to set sail for the outbound and return voyages. Thanks to that, long sea routes linking Arabia, India and Southeast Asia worked in an age without engines. The book's key point is that adapting to the rhythms of nature was itself the wisdom of commerce.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「風が吹く」「風を受ける」のように、空気の流れそのものを表す。",
+      "grammar": ["n4-teiku"],
+      "sense": "空気が流れ動くこと。また、その流れ。"
+    },
+    {
+      "ja": "風は目に見えないが、木々の揺れや雲の流れによって、その存在を知ることができる。嵐の日には枝が大きくしなり、穏やかな日には葉がかすかに震えるだけだ。人の心もまた、直接のぞくことはできない。けれども、言葉の選び方や沈黙の長さ、ふとした表情の変化には、確かにその動きが映っている。他人を理解しようとするとき、私たちに求められているのは、見えないものを、見えるものの揺らぎから読み取る注意深さなのである。",
+      "form": "風",
+      "en": "The wind cannot be seen, but we can know it is there from the swaying of trees and the movement of clouds. On a stormy day the branches bend deeply, and on a calm day the leaves merely tremble faintly. Likewise, the human mind cannot be looked into directly. Yet its movements are surely reflected in the choice of words, the length of a silence, and a sudden change of expression. When we try to understand others, what is asked of us is the attentiveness to read what is invisible from the trembling of what is visible.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n5-teiru"],
+      "sense": "空気が流れ動くこと。また、その流れ。"
+    },
+    {
+      "ja": "生成AIの普及でデータセンターの電力消費が増えるなか、沖合で吹く風を利用した発電に注目が集まっている。大手IT企業の間では、こうした再生可能エネルギーの電力を長期にわたって買い取る契約を結ぶ動きが広がっている。発電の際に二酸化炭素を出さないため、企業にとっては環境目標の達成にもつながる。ただ、天候によって発電量が変わるため、安定して電力を届ける仕組みづくりが課題となっている。",
+      "form": "風",
+      "en": "As the spread of generative AI increases the power consumption of data centers, attention is turning to power generation using the wind that blows offshore. Among major tech companies, a trend is spreading of signing contracts to buy electricity from such renewable sources over the long term. Because it emits no carbon dioxide during generation, it also helps companies meet their environmental targets. However, because output changes with the weather, building a system to deliver power stably remains a challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "空気が流れ動くこと。また、その流れ。"
+    }
+  ],
+  "225": [
+    {
+      "ja": "今日は、生成AIの仕組みをやさしく解説した本を要約していきます。著者によると、AIは文章の意味を人間のように理解しているわけではないそうです。やっていることは、それまでの言葉の並びから、次にどの言葉が来るかの確率を計算して、ありそうなものを選ぶ作業の繰り返しなんです。だからこそ、もっともらしいのに事実と違う答えが出てくることがあるわけですね。仕組みを知っておくと、AIとの付き合い方も変わってくる、というのがこの本のメッセージです。",
+      "form": "確率",
+      "en": "Today I'm going to summarize a book that gently explains how generative AI works. According to the author, AI does not understand the meaning of text the way humans do. What it does is repeat the task of calculating, from the sequence of words so far, the probability of which word will come next and choosing a likely one. That's precisely why it sometimes produces answers that sound plausible but differ from the facts. The book's message is that knowing how it works changes the way you deal with AI.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "割合の意味ではリツと読み、確率・効率・出生率などの語をつくる。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-wake-dewa-nai"],
+      "sense": "全体に対して、ある物事が占める割合。"
+    },
+    {
+      "ja": "インドの合計特殊出生率は、国の調査で2.0となり、人口を保つのに必要とされる水準を下回った。背景には、女性の教育水準の向上や、都市部での結婚の遅れがあるとみられている。ただ、州ごとの差は大きく、北部の一部の州では依然として高い水準が続いている。インドは2023年に中国を抜き、世界で最も人口の多い国になったとされる。若い世代が多い今の人口構成を、どう経済の成長につなげるかが問われている。",
+      "form": "出生率",
+      "en": "India's total fertility rate fell to 2.0 in a national survey, below the level considered necessary to maintain the population. Behind this are thought to be rising education levels among women and later marriage in urban areas. However, the differences between states are large, and in some northern states the level remains high. India is said to have overtaken China in 2023 to become the most populous country in the world. The question is how to turn the current population structure, with its many young people, into economic growth.",
+      "original": true,
+      "register": "報",
+      "topic": "india",
+      "grammar": ["n5-teiru"],
+      "sense": "全体に対して、ある物事が占める割合。"
+    },
+    {
+      "ja": "模試の結果が返ってきたら、点数より先に見てほしいのが、問題ごとの正答率です。みんなが解けているのに自分だけ落とした問題は、いちばん伸びしろのある場所なんです。逆に、ほとんどの受験生が解けなかった難問に時間をかけても、点数にはなかなか結びつきません。限られた時間をどこに使うかを決めることこそが、受験勉強の大事な戦略なんですね。模試は点数を見て一喜一憂するためのものではなく、次に何をするかを決めるための地図だと思ってください。",
+      "form": "正答率",
+      "en": "When your mock exam results come back, what I want you to look at before your score is the percentage of correct answers for each question. The questions that everyone else got right but you missed are where you have the most room to grow. Conversely, spending time on hard questions that almost no test-taker could solve rarely translates into points. Deciding where to spend your limited time is exactly what makes up an important strategy in exam study. Think of a mock exam not as something for getting excited or upset over your score, but as a map for deciding what to do next.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "全体に対して、ある物事が占める割合。"
+    }
+  ],
+  "259": [
+    {
+      "ja": "今日は、時間やお金が足りない状態が、人の判断にどう影響するかを扱った本を要約していきます。著者たちによると、締め切りに追われていると、目の前のことで頭がいっぱいになり、先を見通す力が落ちてしまうそうです。だから、予定をぎっしり詰め込むのではなく、あえて余裕を残しておくことが大切だというんですね。空いた時間はむだに見えますが、トラブルが起きたときに対応できるのは、まさにその空きがあるからなんです。忙しい人ほど、まず予定表に何もない時間を書き込んでみてください。",
+      "form": "余裕",
+      "en": "Today I'm going to summarize a book about how a lack of time or money affects people's judgment. According to the authors, when you're chased by deadlines, your head fills up with what's right in front of you, and your ability to look ahead declines. That's why, rather than cramming your schedule full, it's important to deliberately leave some slack. Free time may look wasteful, but it's precisely because of that gap that you can respond when trouble arises. The busier you are, the more you should first try writing some empty time into your calendar.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「余裕を残す」「余裕がない」のように、時間や気持ちのゆとりに使う。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-dewa-naku"],
+      "sense": "必要な分をこえて、まだ残りがあること。"
+    },
+    {
+      "ja": "仏教が説く苦しみの多くは、すでに足りているのに、さらに求める心から生まれる。必要な分を超えて手に入れたものは、守る手間や失う不安という余計な重荷となって、かえって心を縛る。托鉢でその日の食を得ていた出家者たちが、持ち物を最小限にとどめたのも、そのためである。足ることを知るとは、我慢することではなく、すでにあるものに気づくことなのだろう。物があふれる現代にこそ、この教えは響くのかもしれない。",
+      "form": "余計",
+      "en": "Much of the suffering that Buddhism speaks of arises from a mind that seeks more even though it already has enough. What we acquire beyond what we need becomes an extra burden, the trouble of protecting it and the fear of losing it, and binds the mind instead. That is also why monastics, who obtained each day's food through alms rounds, kept their possessions to a minimum. Knowing contentment is perhaps not about enduring deprivation but about noticing what is already there. It may be precisely in our age, overflowing with things, that this teaching resonates.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "必要な分をこえて、まだ残りがあること。"
+    },
+    {
+      "ja": "文章が上手な人ほど、全部を説明しようとはしません。江戸時代の俳人、松尾芭蕉の句が今も読み継がれているのは、わずか十七音で情景を示し、あとは読み手に委ねたからだといわれます。説明を足せば足すほど、読み手が自分で想像する余地はなくなってしまいます。スピーチでも、最後の一言をあえて言い切らずに終えると、聞き手の心に長く残るものです。伝えたいことを絞り、あとは相手を信じて任せる勇気を持ちましょう。",
+      "form": "余地",
+      "en": "The better someone is at writing, the less they try to explain everything. It is said that the haiku of Matsuo Basho, the Edo-period poet, are still read today because he showed a scene in just seventeen syllables and left the rest to the reader. The more explanation you add, the less room there is for readers to imagine for themselves. In a speech, too, if you deliberately end without spelling out your final words, they stay with the listener for a long time. Narrow down what you want to convey, and have the courage to trust the other person with the rest.",
+      "original": true,
+      "register": "語",
+      "topic": "history",
+      "grammar": ["n5-teiru", "n5-tai"],
+      "sense": "必要な分をこえて、まだ残りがあること。"
+    }
+  ]
+}

@@ -30,7 +30,6 @@
       "register": "論",
       "topic": "india",
       "tipJa": "「系」は全体のまとまりを表す。目という器官だけでなく、脳の処理まで含めて言うときに選ぶ語。",
-      "grammar": [],
       "sense": "目と脳がつながって、見たものを処理するしくみ。"
     }
   ],
@@ -93,14 +92,13 @@
       "sense": "磁石と電波で、体の断面を写し出す検査。"
     },
     {
-      "ja": "磁気共鳴断層撮影って、受けたことあります？あれ、狭い筒の中に入るんですけど、工事現場みたいなガンガンいう音がずっと鳴ってるんですよ。で、動かないでくださいって言われるじゃないですか。そうすると逆に、鼻がかゆいとか足がつりそうとか、余計なことばっかり気になってくるんですよね。人間って、じっとしろって言われた瞬間に、体のことを考えずにいられなくなる生き物なんだなって思いました。",
+      "ja": "この前、病院でもらった予約票に「磁気共鳴断層撮影」って書いてあって、名前がいかつすぎてビビったんですよ。でも説明を読んだら、強い磁石と電波を使って体を輪切りにしたような写真を撮る検査で、放射線は使わないらしいんですよね。で、当日は狭い筒の中に入るんですけど、工事現場みたいなガンガンいう音がずっと鳴ってるじゃないですか。そこで動かないでくださいって言われると、逆に鼻がかゆいとか、余計なことばっかり気になってくるんですよ。",
       "form": "磁気共鳴断層撮影",
-      "en": "Have you ever had an MRI scan? You go inside a narrow tube, and there's this banging noise like a construction site going on the whole time. And then they tell you not to move, right? Then, if anything, you start noticing all sorts of pointless things, like your nose itching or your leg about to cramp. It made me think humans are creatures who, the moment they're told to keep still, can't stop thinking about their bodies.",
+      "en": "The other day the appointment slip I got at the hospital said magnetic resonance imaging, and the name was so intimidating it freaked me out. But when I read the explanation, it turned out to be a test that uses a strong magnet and radio waves to take pictures that look like your body sliced into rounds, and apparently it doesn't use radiation. Then on the day you go inside a narrow tube, and there's this banging noise like a construction site going the whole time, right? And when they tell you not to move right then, if anything you start noticing all sorts of pointless things, like your nose itching.",
       "original": true,
       "register": "話",
       "topic": "mind",
-      "tipJa": "会話ではかなり硬く長い言い方。ふだんは「エムアールアイ」と言い、改まった説明で使う。",
-      "grammar": [],
+      "tipJa": "会話ではまず口にしない硬い正式名。書類や説明に書かれた名前として出会うことが多い。",
       "sense": "磁石と電波で、体の断面を写し出す検査。"
     }
   ],
@@ -117,14 +115,14 @@
       "sense": "耳の奥にあり、音を受けて震えるうすい膜。"
     },
     {
-      "ja": "周囲の騒音を打ち消す機能を持つイヤホンが、通勤や在宅勤務の場面で広く使われている。耳元の小さなマイクが周りの音を拾い、内蔵のチップがそれと逆の波形の音を瞬時に作り出して打ち消す仕組みだ。騒音が鼓膜に届く前に弱められるため、音量を上げすぎずに済むという利点もある。最近ではAIで騒音の種類を判別し、人の声や駅の案内だけを通すといった機能を持つ製品も登場している。",
+      "ja": "周囲の騒音を打ち消す機能を持つイヤホンが、通勤や在宅勤務の場面で広く使われている。耳元の小さなマイクが周りの音を拾い、内蔵のチップがそれと逆の波形の音を瞬時に作り出して打ち消す仕組みだ。音は空気の震えとして耳の穴を奥へ進み、突き当たりに薄く張った鼓膜を揺らしてから内側へ伝わっていく。騒音をその手前で弱めておけば、音量を上げすぎずに済むという利点もある。最近ではAIで騒音の種類を判別し、人の声や駅の案内だけを通す製品も登場している。",
       "form": "鼓膜",
-      "en": "Earphones with a function that cancels out surrounding noise are widely used when commuting and working from home. The system works by having a small microphone by the ear pick up the surrounding sound, while a built-in chip instantly generates a sound with the opposite waveform to cancel it out. Because the noise is weakened before it reaches the eardrum, there is also the advantage that you don't need to turn the volume up too high. Recently products have appeared that use AI to identify types of noise and let through only things like people's voices and station announcements.",
+      "en": "Earphones with a function that cancels out surrounding noise are widely used when commuting and working from home. The system works by having a small microphone by the ear pick up the surrounding sound, while a built-in chip instantly generates a sound with the opposite waveform to cancel it out. Sound travels deep into the ear canal as a trembling of the air, shakes the eardrum stretched thin across the far end, and is then passed further in. If the noise is weakened before that point, there is also the advantage that you don't need to turn the volume up too high. Recently products have appeared that use AI to identify types of noise and let through only things like people's voices and station announcements.",
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "音が体に届く最後の入り口として言う。「鼓膜に届く」「鼓膜を守る」は報道でもよく見る形。",
-      "grammar": ["n5-teiru"],
+      "tipJa": "「鼓膜を揺らす」「鼓膜が震える」のように、音を受けて動く膜として報道や解説でも使う。",
+      "grammar": ["n5-teiru", "n4-teiku"],
       "sense": "耳の奥にあり、音を受けて震えるうすい膜。"
     },
     {
@@ -187,9 +185,9 @@
       "sense": "医者が患者の体を調べて、具合を判断する。"
     },
     {
-      "ja": "医師が足りない山間部や離島で、ビデオ通話を使って患者を診るオンライン診療が広がっている。新型コロナウイルスの流行をきっかけに、初めての受診からの利用を認める制度の見直しが進んだことが背景にある。最近では、問診の内容をAIが整理して医師に伝える仕組みを組み合わせる自治体も出てきた。ただ、画面越しでは体に触れたり胸の音を聞いたりできないため、対面の診察とどう組み合わせるかが課題となっている。",
+      "ja": "医師が足りない山間部や離島で、ビデオ通話を使って自宅にいる患者を診る取り組みが広がっている。新型コロナウイルスの流行をきっかけに、通院しなくても医師の判断を受けられる範囲を広げる制度の見直しが進んだことが背景にある。最近では、患者があらかじめ入力した症状をAIが整理して医師に伝える仕組みを組み合わせる自治体も出てきた。ただ、画面越しでは体に触れたり胸の音を聞いたりできないため、通院して直接向き合う機会とどう使い分けるかが課題となっている。",
       "form": "診る",
-      "en": "Online consultations, in which doctors examine patients over video calls, are spreading in mountain areas and remote islands where doctors are in short supply. Behind this is the review of the rules, prompted by the coronavirus pandemic, that allowed their use from a patient's very first visit. Recently some local governments have also begun combining it with a system in which AI organizes the content of the medical interview and passes it on to the doctor. However, since a doctor cannot touch the body or listen to the chest through a screen, how to combine it with in-person examinations remains an issue.",
+      "en": "Efforts in which doctors examine patients at home over video calls are spreading in mountain areas and remote islands where doctors are in short supply. Behind this is the review of the rules, prompted by the coronavirus pandemic, that widened the range of cases in which patients can get a doctor's judgment without going to a clinic. Recently some local governments have also begun combining this with a system in which AI organizes the symptoms patients have entered in advance and passes them on to the doctor. However, since a doctor cannot touch the body or listen to the chest through a screen, how to divide roles with occasions when patients visit and meet the doctor face to face remains an issue.",
       "original": true,
       "register": "報",
       "topic": "ai",
@@ -205,7 +203,6 @@
       "register": "論",
       "topic": "language",
       "tipJa": "「看る」は世話をすること、「診る」は医者として調べること。書き分けで意味がはっきりする。",
-      "grammar": [],
       "sense": "医者が患者の体を調べて、具合を判断する。"
     }
   ],
@@ -323,7 +320,6 @@
       "register": "講",
       "topic": "mind",
       "tipJa": "「仮に〜としたら」「仮に〜ても」と、仮定の表現と組み合わせて使うのが基本。",
-      "grammar": [],
       "sense": "本当かどうかは別にして、そうだとすると。"
     },
     {
@@ -334,7 +330,6 @@
       "register": "報",
       "topic": "history",
       "tipJa": "この意味では「仮に呼ぶ」「仮に決めておく」のように、正式になるまでの一時的な扱いを表す。",
-      "grammar": [],
       "sense": "正式に決まるまでの間に合わせとして。一時的に。"
     },
     {

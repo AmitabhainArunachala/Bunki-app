@@ -1,0 +1,340 @@
+{
+  "64": [
+    {
+      "ja": "今回は、フランス革命がなぜ起きたのかを、お金の面から見ていきます。ルイ十六世の時代、フランスはたび重なる戦争、特にアメリカ独立戦争への支援で、国の借金がふくらんでいました。財政を立て直すには、それまで税を免れていた聖職者や貴族にも負担してもらうしかありません。そこで国王は1789年、長く開かれていなかった三部会を招集することになりました。ところが、この会議こそが、王政を揺るがす大きなうねりの出発点になったわけです。",
+      "form": "財政",
+      "en": "This time, let's look at why the French Revolution happened from the money side. In the reign of Louis XVI, France's national debt had swollen through repeated wars, especially its support for the American War of Independence. To rebuild the public finances, there was no choice but to have the clergy and nobility, who had until then been exempt from taxes, bear part of the burden. So in 1789 the king ended up convening the Estates-General, which had not met for a long time. But it was this very assembly that became the starting point of a great surge that shook the monarchy.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「財政を立て直す」「財政が苦しい」の形でよく使う。国や自治体のお金の話に使う語。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"],
+      "sense": "国や自治体が税などを集めて使う、お金のやりくり。"
+    },
+    {
+      "ja": "先端半導体の国内生産をめざし、各国の政府が工場の建設に巨額の補助金を投じている。供給を他国に頼らない体制を整えることが、経済安全保障を考えるうえで欠かせないとの判断だ。ただ、一つの工場に数千億円規模の支援が必要になる例もあり、財政への負担を懸念する声も上がっている。補助金はあくまで呼び水であり、投じたお金に見合うだけの産業が国内に根づくのかどうか、今後の行方が注目される。",
+      "form": "財政",
+      "en": "Aiming at domestic production of advanced semiconductors, governments in various countries are pouring huge subsidies into building plants. The judgment is that putting in place a system that does not depend on other countries for supply is indispensable when it comes to economic security. However, there are cases where a single plant needs support on the scale of hundreds of billions of yen, and voices of concern about the burden on public finances are also being raised. Subsidies are only a primer, and whether an industry worth the money invested will take root at home is something to watch going forward.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「財政への負担」「財政赤字」「財政が悪化する」などの形が多い。",
+      "grammar": ["n2-ue-de"],
+      "sense": "国や自治体が税などを集めて使う、お金のやりくり。"
+    },
+    {
+      "ja": "寺というものは、祈りの場であると同時に、建物を守り、人を養う一つの暮らしでもある。江戸時代の寺の多くは、檀家と呼ばれる家々に支えられ、その仕組みの中で葬儀や供養を担ってきた。檀家が減れば、寺の財政はたちまち細っていく。けれども、教えを伝える営みを、お金の勘定だけで測ってよいわけではないだろう。支える人と支えられる寺との結びつきそのものが、本来の財産なのかもしれない。",
+      "form": "財政",
+      "en": "A temple is a place of prayer, but at the same time it is also a way of life that maintains buildings and supports people. Many temples in the Edo period were supported by households called danka, and within that system they took charge of funerals and memorial rites. When the danka households decrease, a temple's finances quickly dwindle. Yet that surely does not mean the work of passing on the teaching may be measured only by counting money. Perhaps the bond between the people who support and the temple that is supported is itself the true asset.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "国だけでなく、寺や学校、団体のお金のやりくりにも「財政」を使う。",
+      "grammar": ["n4-teiku", "n3-wake-dewa-nai"],
+      "sense": "寺や団体などの、お金の出入りとやりくり。"
+    }
+  ],
+  "65": [
+    {
+      "ja": "今日は、コロンブスの航海を、スポンサー探しの物語として見てみましょう。西へ進めばアジアに着けると考えた彼は、まずポルトガルの王に計画を持ちかけますが、あっさり断られてしまいます。それでも諦めることなく各地で売り込みを続け、最終的にスペインの女王イサベルから資金を引き出すことに成功しました。1492年の航海は、冒険であると同時に、何年もかけた営業の成果でもあったわけです。",
+      "form": "資金",
+      "en": "Today, let's look at Columbus's voyage as a story of hunting for sponsors. Believing he could reach Asia by heading west, he first pitched his plan to the king of Portugal, but was flatly turned down. Even so, without giving up he kept pitching in various places, and in the end succeeded in drawing funds from Queen Isabella of Spain. The 1492 voyage was an adventure, but at the same time it was the fruit of years of salesmanship.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「資金を集める」「資金を出す」「資金を引き出す」の形が多い。目的のために用意するお金。",
+      "grammar": ["n2-koto-naku"]
+    },
+    {
+      "ja": "生成AIを開発する新興企業への投資が、世界的に過熱している。調達した資金の多くは、学習に使う高価な半導体やデータセンターの確保に回されているとみられる。一方、売り上げが投資の規模に見合うほど伸びていない企業も多く、市場の一部ではバブルを警戒する見方も出始めた。技術への期待ばかりが先行するなか、各社がいつまでに、どのような形で収益の道筋を示せるのかが問われている。",
+      "form": "資金",
+      "en": "Investment in start-ups developing generative AI is overheating worldwide. Much of the funding they have raised appears to be going toward securing expensive chips for training and data centers. Meanwhile, many companies have sales that are not growing in line with the scale of investment, and in parts of the market a view wary of a bubble has begun to emerge. With expectations of the technology alone running ahead, the question is by when, and in what form, each company can show a path to profit.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「資金を調達する」「資金調達」の形がよく使われる。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "留学したいって人、けっこういるじゃないですか。でも、だいたい最初にぶつかるのが資金の問題なんですよね。授業料に家賃に生活費って、一年だけでもけっこうな額になっちゃうんで。ただ、奨学金とか大学の支援制度って、調べてみると意外といろいろあるんですよ。給付型っていう返さなくていいタイプもあるんで、お金がないから無理って決めつける前に、とりあえず条件だけでも見てみたらいいと思います。",
+      "form": "資金",
+      "en": "There are quite a lot of people who want to study abroad, right? But the first thing they usually run into is the problem of funds. Tuition, rent, living costs: even one year alone adds up to quite a sum. But if you look into scholarships and universities' support schemes, there are surprisingly many of them. There's even a grant type that doesn't need to be paid back, so before you decide it's impossible because you don't have the money, I think you should at least take a look at the conditions.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "話し言葉でも「留学の資金」「資金を貯める」のように、目的とセットで使う。",
+      "grammar": ["n5-tai"]
+    }
+  ],
+  "66": [
+    {
+      "ja": "今回は、債券の値段と利回りの関係を、十八世紀のイギリスの国債を例に見ていきます。当時発行された国債の中には、満期がなく、毎年一定の額を支払い続けるというものがありました。たとえば毎年三ポンドもらえる債券を百ポンドで買えば、もうけの割合は年三パーセントです。ところが、手放す人が相次いで価格が五十ポンドまで下落すると、同じ三ポンドでも六パーセント分のもうけになります。つまり、債券の値段が下がるほど、新たに買う人にとっての魅力は増すわけです。",
+      "form": "利回り",
+      "en": "This time, let's look at the relationship between a bond's price and its yield, using eighteenth-century British government bonds as an example. Among the government bonds issued back then were ones with no maturity date, which kept paying a fixed sum every year. For example, if you buy a bond that pays three pounds a year for a hundred pounds, your rate of return is three percent a year. But if holders sell one after another and the price drops to fifty pounds, the same three pounds becomes a six percent return. In other words, the lower a bond's price falls, the greater the appeal for someone newly buying it.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「利回りが高い／低い」「利回りが上がる」の形でよく使う。債券では値段と逆に動く。",
+      "grammar": ["n4-teiku"],
+      "sense": "投資したお金に対する、一年あたりのもうけの割合。"
+    },
+    {
+      "ja": "2009年、ギリシャで政権が交代すると、政府の赤字が公表されていた数字を大きく上回っていたことが明らかになった。これを受けて同国の国債は、世界の投資家から一斉に売られた。買い手が減って国債の価格が下がれば、その分、利回りは上昇する仕組みだ。新たにお金を借りるコストが跳ね上がったギリシャは、翌年、欧州連合と国際通貨基金による支援に頼る事態となった。国債の値動きがその国への信用を映す鏡であることを、改めて示した出来事として記憶されている。",
+      "form": "利回り",
+      "en": "In 2009, when the government changed in Greece, it came to light that the government's deficit had far exceeded the figures that had been published. In response, the country's government bonds were sold all at once by investors around the world. The mechanism is that if buyers decrease and bond prices fall, the yield rises accordingly. With the cost of new borrowing soaring, Greece the following year came to rely on support from the European Union and the International Monetary Fund. It is remembered as an event that showed once again that government bond price movements are a mirror reflecting trust in a country.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「国債の利回りが上昇（低下）する」の形で、市場の動きを伝えるのによく使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "投資したお金に対する、一年あたりのもうけの割合。"
+    },
+    {
+      "ja": "勉強に使う時間を一種の投資だと考えると、方法によって見返りの大きさがかなり違うことに気づきます。たとえば、ノートをきれいに書き写す作業は、時間がかかる一方で、記憶への定着はあまり期待できません。それに対して、自分で問題を解いて記憶を引き出す練習は、短い時間でも効率よく身につくとされています。限られた時間で結果を出したいなら、かけた時間の長さよりも勉強の利回りを意識して、やり方を選ぶことが大切です。",
+      "form": "利回り",
+      "en": "If you think of the time you spend studying as a kind of investment, you notice that the size of the return varies a great deal depending on the method. For example, neatly copying out notes takes time, yet you can't expect it to stick in memory much. By contrast, practice in which you solve problems yourself and pull things out of memory is said to be learned efficiently even in a short time. If you want results within limited time, it's important to choose your approach with an eye on the yield of your studying rather than on how long you put in.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "本来は投資の用語だが、「勉強の利回り」のように、労力に対する見返りのたとえにも使う。",
+      "grammar": ["n5-teiru", "n5-tai"],
+      "sense": "かけた時間や労力に対する、見返りの度合い（比喩）。"
+    }
+  ],
+  "105": [
+    {
+      "ja": "インドに伝わるとされる、チェスの発明者とご褒美の話を紹介します。王に望みを聞かれた発明者は、最初のマスに米を一粒、次のマスに二粒と、一マスごとに倍に増やしていく形で、全部のマスの分の米が欲しいと答えました。王は欲のない願いだと笑いましたが、六十四マス目にもなると、世界中の米を集めても到底足りない量になります。このように、前の数に毎回同じ数を掛けて増えていく並びの合計を、数学では等比級数と呼びます。はじめは小さく見えても、ある時点から一気に手に負えなくなるわけですね。",
+      "form": "等比",
+      "en": "Let me introduce the story, said to be handed down in India, of the inventor of chess and his reward. Asked by the king what he wished for, the inventor replied that he wanted rice for all the squares, placing one grain on the first square and two on the next, doubling with each square. The king laughed that it was a modest wish, but by the sixty-fourth square it becomes an amount that all the rice in the world would come nowhere near. In mathematics, the total of a row of numbers that grows by multiplying the previous number by the same number each time is called a geometric series. It may look small at first, but from some point on it suddenly becomes unmanageable.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "数学では「等比数列」「等比級数」の形で使う。差が一定なら「等差」。",
+      "grammar": ["n4-teiku"],
+      "sense": "となり合う数の比が、いつも同じであること。"
+    },
+    {
+      "ja": "半導体チップに載るトランジスタの数は、およそ二年ごとに倍になるという経験則が、半世紀以上にわたって業界の指針とされてきた。ムーアの法則と呼ばれるこの見通しに従えば、トランジスタの数は等比級数的に増えていくことになる。しかし、回路の微細化が原子の大きさに近づくにつれて、このペースを保つことは年々難しくなっている。各社は、チップを縦に積み重ねる技術などによって、伸びの鈍化を補おうとしている。",
+      "form": "等比",
+      "en": "The rule of thumb that the number of transistors on a semiconductor chip doubles roughly every two years has served as the industry's guideline for more than half a century. According to this outlook, known as Moore's law, the number of transistors will increase geometrically. However, as the miniaturization of circuits approaches the size of atoms, maintaining this pace is becoming harder year by year. Companies are trying to make up for the slowdown with technologies such as stacking chips vertically.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「等比級数的に増える」は、一定の倍率で増え続けることを硬く言う表現。",
+      "grammar": ["n3-ni-tsurete", "n3-koto-ni-naru", "n4-teiku"],
+      "sense": "となり合う数の比が、いつも同じであること。"
+    },
+    {
+      "ja": "並んだ数の決まりを見抜くコツは、まず差を取るか比を取るかの二択から始めることです。2、6、18、54のように、どの数も前の数の三倍になっていれば、比が一定、つまり等比だとわかります。ところが試験本番では、焦って差ばかり取り続け、時間を失ってしまう人が少なくありません。差を見ても決まりが見えないときは比に切り替える、という手順を体に覚えさせておくと、慌てることなく対応できます。",
+      "form": "等比",
+      "en": "The trick to spotting the rule behind a row of numbers is to start with a two-way choice: take the differences or take the ratios. If every number is three times the one before, as in 2, 6, 18, 54, you can tell that the ratio is constant, in other words that it is geometric. In the actual exam, though, quite a few people panic, keep taking only differences, and lose time. If you drill into your body the procedure of switching to ratios when the differences show no rule, you can deal with it without panicking.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "差が一定なら「等差」、比が一定なら「等比」。対で覚えると混同しにくい。",
+      "grammar": ["n2-koto-naku"],
+      "sense": "となり合う数の比が、いつも同じであること。"
+    }
+  ],
+  "106": [
+    {
+      "ja": "フィボナッチ数列と聞くと、イタリアの数学者の名前を思い浮かべる人が多いと思います。ところが実は、この並びは古代インドの学者たちにもすでに知られていたとされています。きっかけは詩の韻律で、長い音節と短い音節を組み合わせて一定の長さの句を作るとき、何通りの作り方があるかを数えていくと、ちょうどこの並びが現れるんです。つまり、ヨーロッパに伝わるずっと前から、インドでは言葉のリズムの研究の中でこの数が扱われていたわけですね。数学が、詩や言葉の探究から生まれることもあるという、面白い例です。",
+      "form": "数列",
+      "en": "When people hear 'the Fibonacci sequence,' I think many picture the name of an Italian mathematician. But in fact this series is said to have already been known to scholars in ancient India. The trigger was poetic meter: when you count how many ways there are to combine long and short syllables into a phrase of a set length, exactly this series appears. In other words, long before it reached Europe, these numbers were being handled in India in the study of the rhythm of language. It's an interesting example showing that mathematics can also be born from the exploration of poetry and language.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「フィボナッチ数列」「数列の規則」のように、決まりに従って並んだ数を指す。",
+      "grammar": ["n5-teiru", "n4-teiku"]
+    },
+    {
+      "ja": "昔のAIって、簡単な計算とか、数列の次の数を当てるような問題を、平気で間違えてたじゃないですか。あれは、数字を一つずつの数として見てるんじゃなくて、文字のかたまりとして読んでたのが原因の一つって言われてるんですよ。最近は自分で計算用のプログラムを書いて確かめたりするんで、だいぶマシになりました。でも、それっぽい答えを自信満々に出してくるのは相変わらずなんで、最後は人間がチェックしたほうがいいと思います。",
+      "form": "数列",
+      "en": "Older AI used to casually get things wrong, like simple calculations or questions about guessing the next number in a sequence, right? That's said to be partly because it wasn't seeing digits as individual numbers but reading them as chunks of characters. These days it writes its own programs for calculating and checks things, so it's gotten a lot better. But it still confidently puts out plausible-looking answers, so I think a human should check at the end.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉でも「数列の次の数」のように、そのまま使う。",
+      "grammar": ["n3-dewa-naku"]
+    },
+    {
+      "ja": "今日の自分は、昨日の自分に何かを少し足したり引いたりしたものである。数学でいえば、前の項から次の項が決まる数列のようなものだろう。一つひとつの差はわずかでも、同じ規則が何百回と繰り返されれば、行き着く先は大きく隔たってしまう。だから大切なのは、今日の値の大小ではなく、自分がどんな規則で日々を更新しているかである。その規則を少しずつ書き換えていくことが、学ぶということなのかもしれない。",
+      "form": "数列",
+      "en": "Today's self is yesterday's self with something added or taken away. In mathematical terms, it is probably like a sequence in which each term is determined by the one before. Even if each difference is slight, when the same rule is repeated hundreds of times, where one ends up diverges greatly. So what matters is not whether today's value is large or small, but by what rule one is updating one's days. Perhaps rewriting that rule little by little is what it means to learn.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "前の項から次の項が決まる数列（漸化式）は、積み重ねのたとえによく使われる。",
+      "grammar": ["n3-dewa-naku", "n4-teiku", "n5-teiru"]
+    }
+  ],
+  "107": [
+    {
+      "ja": "第二次世界大戦が終わったあと、戦争で疲れ切ったイギリスは、アメリカやカナダから多額のお金を借りて経済を立て直そうとしました。この借金は五十年かけて少しずつ返していく約束で、イギリスは途中で何度か支払いを先延ばししながらも、律儀に払い続けます。そして最後の返済が終わったのは、なんと2006年の年末のことでした。戦争の傷あとは、街の再建が済んだあとも、帳簿の上ではずっと残っていたわけです。",
+      "form": "返済",
+      "en": "After the Second World War ended, Britain, exhausted by the war, tried to rebuild its economy by borrowing large sums from the United States and Canada. The deal was to pay this debt back little by little over fifty years, and Britain kept paying faithfully, even while postponing payments several times along the way. And the final repayment was completed, remarkably, at the end of 2006. The scars of war remained on the books long after the rebuilding of the cities was done.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「借金の返済」「返済が終わる」「返済を先延ばしする」の形でよく使う。",
+      "grammar": ["n4-nagara", "n4-teiku"],
+      "sense": "借りたお金を返すこと。"
+    },
+    {
+      "ja": "大学などで借りた奨学金の返済が、若い世代の暮らしに重くのしかかっている。卒業後の収入が思うように伸びず、結婚や住宅の購入をためらう人も少なくないという。こうした状況を受けて、国は収入に応じて毎月の支払額が変わる制度を設けたり、企業が社員に代わって支払う仕組みを後押ししたりしている。学びの機会を広げるための制度が、かえって若者を縛ることのないよう、さらなる見直しを求める声も出ている。",
+      "form": "返済",
+      "en": "Repayment of scholarship loans borrowed for university and the like is weighing heavily on the lives of the younger generation. It is said that not a few people, their income after graduation not growing as hoped, hesitate over marriage or buying a home. In response to this situation, the government has set up a system in which the monthly payment changes according to income, and is backing schemes in which companies pay on behalf of their employees. There are also calls for further review so that a system meant to widen opportunities to learn does not instead tie young people down.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "報道では「奨学金の返済」「返済の負担」「返済に苦しむ」などの形が多い。",
+      "grammar": ["n2-ni-oujite", "n5-teiru"],
+      "sense": "借りたお金を返すこと。"
+    },
+    {
+      "ja": "古代インドには、人は生まれた時点で、すでにいくつかの借りを背負っているという考え方があった。神々への借り、教えを残した聖者たちへの借り、そして祖先への借りである。人はそれを、儀式を行い、学びを受け継ぎ、子を育てることで返していくとされた。そう考えると、生きることそのものが、長い時間をかけた返済のようにも見えてくる。だがそれは重荷というより、自分が多くのものを受け取ってきた証なのかもしれない。",
+      "form": "返済",
+      "en": "In ancient India there was a view that a person, from the moment of birth, already bears several debts. A debt to the gods, a debt to the sages who left their teachings, and a debt to the ancestors. People were said to pay them back by performing rites, carrying on learning, and raising children. Seen that way, living itself begins to look like a repayment carried out over a long time. But rather than a burden, perhaps it is proof that one has received a great deal.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "お金以外にも、受けた恩や借りを返すことのたとえとして使われることがある。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n5-teiru"],
+      "sense": "受けた恩や借りを、時間をかけて返すこと（比喩）。"
+    }
+  ],
+  "108": [
+    {
+      "ja": "1927年の日本で起きた昭和金融恐慌は、議会での大臣の失言がきっかけだったと言われています。まだ営業していたある銀行について、破綻したかのように受け取れる発言をしてしまったんですね。これを聞いた人々は不安に駆られて銀行に押し寄せ、自分の預金を一斉に引き出そうとしました。お金は銀行の金庫に眠っているわけではなく、貸し出しに回っているので、全員が一度に来ればどんな銀行も持ちこたえられません。銀行を支えているのは、結局のところ人々の信用なんだということがよくわかる出来事です。",
+      "form": "預金",
+      "en": "The Shōwa financial crisis that struck Japan in 1927 is said to have been triggered by a minister's slip of the tongue in the Diet. He made a remark about a bank that was still operating that could be taken to mean it had failed. Hearing this, people were seized by anxiety, rushed to the banks, and all tried at once to withdraw their deposits. Money doesn't sit sleeping in a bank's vault; it is lent out, so if everyone comes at once, no bank can hold out. It's an episode that shows clearly that what supports a bank is, in the end, people's trust.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「預金を引き出す」「預金を下ろす」「定期預金」の形でよく使う。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"],
+      "sense": "銀行などに預けてあるお金。"
+    },
+    {
+      "ja": "仏典の中には、在家の人々に向けて、暮らしの中でのお金の扱い方を説いた教えもある。稼いだものを四つに分け、一つは日々の生活に、二つは仕事に充て、残る一つは困ったときのために取っておくように、という内容である。今の言葉でいえば、最後の一つは預金に当たるのだろう。出家者には持たないことを求めながら、家を持つ人には備えることを勧めたところに、教えのしなやかさが見える。欲を捨てることと、明日を案じて備えることとは、必ずしも矛盾しないのである。",
+      "form": "預金",
+      "en": "Among the Buddhist scriptures there is also teaching addressed to lay people that explains how to handle money in daily life. Its content is that one should divide what one earns into four, using one part for everyday living and two for one's work, and keeping the remaining one for times of trouble. In today's terms, that last part would probably correspond to a bank deposit. The flexibility of the teaching shows in the way that, while asking renunciants to own nothing, it encouraged householders to prepare. Casting off greed and preparing out of concern for tomorrow are not necessarily contradictory.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「預金」は銀行に預けたお金。手元で貯めるお金なら「貯金」とも言う。",
+      "grammar": ["n3-you-ni", "n4-nagara"],
+      "sense": "銀行などに預けてあるお金。"
+    },
+    {
+      "ja": "スティーブン・コヴィーの『7つの習慣』には、人間関係を銀行の口座にたとえる考え方が出てきます。約束を守る、話をきちんと聞くといった小さな行動が、相手の心の口座への預金になるという発想です。逆に、約束を破ったり陰で悪口を言ったりすると、そのたびに残高が減っていきます。信頼は一度の大きな行動ではなく、こうした小さな積み重ねで決まるというのが、この考え方のポイントです。",
+      "form": "預金",
+      "en": "Stephen Covey's The 7 Habits of Highly Effective People contains the idea of likening human relationships to a bank account. It's the notion that small actions, such as keeping promises and listening properly, become deposits into the other person's emotional account. Conversely, every time you break a promise or speak ill of someone behind their back, the balance goes down. The key point of this idea is that trust is decided not by one big action but by this kind of small accumulation.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "『7つの習慣』の比喩では、信頼を増やす行いを「預金」、減らす行いを「引き出し」と呼ぶ。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "sense": "信頼を得るために積み重ねる行い（比喩）。"
+    }
+  ],
+  "109": [
+    {
+      "ja": "1970年代のアメリカは、物価が毎年のように大きく上がる、激しいインフレに苦しんでいました。そこで1979年にアメリカの中央銀行のトップに就いたポール・ボルカーは、思い切った手を打ちます。お金を借りにくくして物価の上昇を抑えるため、金利を一時は二十パーセント近くまで引き上げたんです。当然、企業も家庭も悲鳴を上げ、失業者も大きく増えました。それでも彼が方針を曲げなかったことで、インフレはようやく収まったと言われています。",
+      "form": "金利",
+      "en": "In the 1970s, America suffered from severe inflation, with prices rising sharply almost every year. So Paul Volcker, who took the top post at America's central bank in 1979, made a bold move. To make money harder to borrow and hold down rising prices, he raised interest rates at one point to nearly twenty percent. Naturally, businesses and households alike cried out, and the number of unemployed rose sharply. Even so, it's said that because he didn't bend his policy, inflation finally subsided.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「金利を引き上げる／引き下げる」「金利が上がる」の形でよく使う。",
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "中央銀行が金利を引き上げる局面では、半導体やAI関連の銘柄が大きく売られることが多い。こうした企業の価値は、今の利益よりも、何年も先に見込まれる成長への期待に支えられているためだ。お金を借りるコストが上がると、遠い将来のもうけほど、今の時点での価値は小さく見積もられる。このため市場の関心は、技術の進み具合だけでなく、各国の中央銀行が次にどう動くかにも向けられている。",
+      "form": "金利",
+      "en": "In phases when central banks raise interest rates, semiconductor and AI-related stocks are often sold off heavily. This is because the value of such companies is supported more by expectations of growth anticipated many years ahead than by current profits. When the cost of borrowing money rises, the further off the future profits are, the smaller their value is estimated to be at present. For this reason the market's attention is directed not only at the progress of the technology but also at what each country's central bank will do next.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「金利の上昇」「金利が高止まりする」などの形が多い。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "人はなぜ、今日の一万円を、一年後の一万円より高く見積もるのだろうか。明日は何が起こるかわからない。だから待つことには不安が伴い、その不安への埋め合わせとして、上乗せされる分が生まれる。そう考えると、金利とは、待つことに人がつけた値段なのかもしれない。目先の小さな報酬に飛びつかないように自分を律し、先の大きな実りを待てるかどうかは、お金に限らず、学びや修行においても問われることである。",
+      "form": "金利",
+      "en": "Why do people value ten thousand yen today more highly than ten thousand yen a year from now? No one knows what will happen tomorrow. So waiting carries anxiety, and as compensation for that anxiety, an added portion comes into being. Seen that way, an interest rate may be the price people have put on waiting. Whether one can discipline oneself so as not to grab at small, immediate rewards and wait for a larger harvest later is a question asked not only of money but also of learning and spiritual practice.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「金利」はお金の貸し借りにつく割合。待つことの値段と考えると意味がつかみやすい。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "110": [
+    {
+      "ja": "今から三千七百年以上前、古代バビロニアのハンムラビ法典には、お金や穀物の貸し借りに関する決まりがいくつも定められていました。その中には、貸し手が取ってよい利子の上限まで書かれていたとされています。つまり、借りた側が際限なく搾り取られないように、国が利率に枠をはめていたわけです。お金の貸し借りとトラブルは、それほど昔から切っても切れない関係だったということですね。",
+      "form": "利率",
+      "en": "More than 3,700 years ago, the Code of Hammurabi in ancient Babylonia laid down a number of rules concerning the lending and borrowing of money and grain. Among them, it's said, was even an upper limit on the interest a lender was allowed to take. In other words, the state was putting a cap on interest rates so that borrowers wouldn't be squeezed without limit. It shows that lending money and trouble have been inseparable since that long ago.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「利率が高い／低い」「年利率」のように、元のお金に対する割合を言う硬めの語。",
+      "grammar": ["n3-you-ni"],
+      "sense": "貸したお金に対してつく利子の割合。"
+    },
+    {
+      "ja": "この前、住宅ローンをどこで組むか迷ってて、AIに比べてもらったんですよ。そしたら、各銀行の利率とか手数料とかを一瞬で表にまとめてくれて、めっちゃ便利だったんです。ただ、よく見たら一部の数字が古い情報のままで、公式サイトと違ってたんですよね。だから、AIには比べる観点を整理してもらうだけにして、最後の確認は自分でやるようにしてます。お金が絡む話ほど、丸投げしないほうがいいと思いますね。",
+      "form": "利率",
+      "en": "The other day I was torn over where to take out a home loan, so I had AI compare them for me. And it put each bank's interest rates and fees into a table in an instant, which was super handy. But when I looked closely, some of the figures were outdated and differed from the official websites. So I only have AI sort out the points of comparison, and make a point of doing the final check myself. The more money is involved, the less you should hand everything over, I think.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "ローンや預け入れの比較では「利率」「手数料」が並ぶ。会話でもそのまま使う。",
+      "grammar": ["n3-you-ni"],
+      "sense": "貸したお金に対してつく利子の割合。"
+    },
+    {
+      "ja": "お金の計算で覚えておくと便利なのが、『72の法則』です。72を年の利率で割ると、預けたお金がおよそ何年で二倍になるかがわかる、という目安です。たとえば年3パーセントなら約24年、6パーセントなら約12年となり、わずかな差が大きな違いを生むことがわかります。紙とペンがなくても頭の中でざっと見積もれるので、数字に苦手意識がある人ほど、こうした目安を一つ持っておくことで、判断がずっと速くなります。",
+      "form": "利率",
+      "en": "Something handy to remember for money calculations is the rule of 72. It's a rule of thumb: divide 72 by the annual interest rate and you can tell roughly how many years it will take for the money you deposited to double. For example, at 3 percent a year it comes to about 24 years and at 6 percent about 12 years, which shows that a small difference produces a big gap. You can roughly estimate it in your head without pen and paper, so especially for people who feel weak with numbers, having one rule of thumb like this makes their judgments much faster.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「年の利率」「利率で割る」のように、計算の場面でもよく使う。",
+      "grammar": ["n3-koto-de"],
+      "sense": "貸したお金に対してつく利子の割合。"
+    }
+  ],
+  "111": [
+    {
+      "ja": "数学者ガウスの子ども時代には、有名な逸話があります。先生が時間つぶしに、1から100までの数をすべて足すように命じたところ、ガウス少年はあっという間に答えを出したと伝えられています。彼は、初項の1と末項の100、2と99というように、両端から組にすると、どの組も合計が101になることに気づいたんですね。それが50組あるので、答えは5050になるわけです。この組にして足すという発想は、今でも教科書で和の公式を説明するときによく使われています。",
+      "form": "初項",
+      "en": "There's a famous anecdote from the childhood of the mathematician Gauss. It's said that when his teacher, to kill time, told the class to add up all the numbers from 1 to 100, the young Gauss produced the answer in no time. He noticed that if you pair numbers from both ends, such as the first term 1 with the last term 100, and 2 with 99, every pair adds up to 101. There are 50 such pairs, so the answer comes to 5050. This idea of pairing and adding is still often used in textbooks today to explain the formula for the sum.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「初項と公差」「初項と公比」のように、並んだ数の決まりを表すときに使う。",
+      "grammar": ["n3-you-ni", "n5-teiru"]
+    },
+    {
+      "ja": "和から一般項を求める問題では、ある落とし穴に注意が必要です。前の項までの和との差を取る方法は、2番目以降の項にしか使えないため、初項だけは和の式に1を入れて別に求めなければなりません。ここを確かめることなく一つの式にまとめてしまい、点を落とす受験生は毎年少なくないそうです。解き終えたら、最初の一つだけでも元の条件に当てはめてみる、という習慣をつけておくと安心です。",
+      "form": "初項",
+      "en": "In problems where you find the general term from the sum, you need to watch out for a certain pitfall. The method of taking the difference from the sum up to the previous term can only be used for the second term onward, so the first term alone has to be found separately by putting 1 into the formula for the sum. Apparently quite a few exam-takers every year lose points by combining everything into a single formula without checking this. Once you've finished solving, it's reassuring to make a habit of plugging at least the first one back into the original conditions.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "試験では「初項だけ別に求める」「初項を確かめる」の形で注意点として出てくる。",
+      "grammar": ["n2-koto-naku"]
+    },
+    {
+      "ja": "数学の用語は、漢字を分解してみると意味がつかみやすくなります。たとえば項という字は、項目や条項にも使われるように、全体を区切った一つひとつのまとまりを表します。ですから、並んだ数のうちいちばん初めのものが初項と呼ばれるのは、とても自然なことです。同じ考え方で、最後のものは末項、隣り合う二つの差は公差と呼ばれます。丸暗記に頼る前に、まず字の意味から入ってみるのがおすすめです。",
+      "form": "初項",
+      "en": "Mathematical terms become easier to grasp when you break down their kanji. For example, the character for 'term', as used in words for 'item' and 'clause', represents each of the units into which a whole is divided. So it's entirely natural that the very first of a row of numbers is called the first term. By the same logic, the last one is called the last term, and the difference between two neighbours is called the common difference. Before relying on rote memorisation, I recommend starting from the meaning of the characters.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「初項・末項・公差」は、漢字の意味から覚えると混同しにくい。",
+      "grammar": ["n3-you-ni"]
+    }
+  ]
+}

@@ -78,24 +78,23 @@
       "grammar": ["n2-ni-suginai", "n4-you-ni-naru", "n3-dewa-naku"]
     },
     {
-      "ja": "心理学では、言葉だけで覚えるより、絵を添えたほうが記憶に残りやすいことが知られています。言葉とイメージという二つの経路で覚えるため、思い出す手がかりが増えるからだと考えられています。ただし、どんな画像でも添えればいいというものではありません。内容と関係のない飾りの写真は、かえって注意をそらしてしまうことがあります。単語カードに絵を付けるなら、意味と直接つながるものを選ぶようにしましょう。",
-      "form": "画像",
-      "en": "In psychology, it is known that things stick in memory better when a picture accompanies them than when they are learned through words alone. This is thought to be because learning through two routes, words and imagery, increases the cues for recalling them. That said, it is not as if any image at all will do. Decorative photos unrelated to the content can actually end up distracting attention. If you put pictures on your vocabulary cards, make sure to choose ones directly connected to the meaning.",
-      "original": true,
-      "register": "学",
-      "topic": "mind",
-      "tipJa": "学習の話では「画像を添える」「画像付きの教材」の形でよく使う。",
-      "grammar": ["n5-teiru", "n3-you-ni"]
-    },
-    {
       "ja": "スマートフォンの画面に映る一枚の画像は、近づいて見れば小さな光の点の集まりにすぎない。それでも私たちは、そこに友人の笑顔を見て、懐かしさまで感じてしまう。インドの唯識の思想は、外の世界そのものよりも、心が描き出す像のほうに目を向けた。私たちが見ていると思っているものも、実は心が組み立てた姿なのだという。そう考えると、画面の中の笑顔と目の前の笑顔の違いは、思ったほど大きくないのかもしれない。",
       "form": "画像",
       "en": "A single image on a smartphone screen is, seen up close, nothing more than a cluster of tiny points of light. Even so, we see a friend's smile there and even feel a pang of nostalgia. India's Yogacara, or consciousness-only, thought turned its attention less to the outside world itself than to the images the mind draws. It holds that even what we think we are seeing is in fact a form the mind has assembled. Thought of that way, the difference between the smile on the screen and the smile in front of us may not be as great as we imagine.",
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n2-ni-suginai", "n5-teiru"]
+    },
+    {
+      "ja": "ウェブの記事に画像を載せるとき、目の見えない人のために添える説明文を『代替テキスト』と言います。うまく書くこつは、写っているものを全部並べるのではなく、その写真が記事の中でどんな役目を持つのかを短く示すことです。たとえば『犬』とだけ書くより、『雨の中で飼い主を待つ柴犬』と書けば、場面がぐっと伝わります。ただ、長すぎると、読み上げを聞く側が疲れてしまいます。要点だけを手渡すつもりで書くと、ちょうどいい長さに収まります。",
+      "form": "画像",
+      "en": "When you put an image in a web article, the description you add for people who cannot see it is called alt text. The trick to writing it well is not to list everything in the picture, but to show briefly what role that photo plays in the article. For example, rather than writing just \"dog\", writing \"a Shiba Inu waiting for its owner in the rain\" gets the scene across far better. But if it's too long, the person listening to it read aloud gets tired. If you write with the idea of handing over only the main point, it will settle at just the right length.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "文章の話では「画像を載せる」「画像に説明を添える」の形が自然。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
     }
   ],
   "158": [
@@ -116,18 +115,16 @@
       "original": true,
       "register": "論",
       "topic": "india",
-      "tipJa": "",
       "grammar": ["n3-you-ni"]
     },
     {
-      "ja": "1983年、熊本県で戦後まもなく起きた強盗殺人事件の再審で、無罪の判決が言い渡された。裁かれていた男性は、一度は確定した判決のもとで、三十年以上にわたって身柄を拘束されていた。死刑囚が再審で無罪となったのは、日本ではこれが初めてだった。その後も同じような判決が続き、1980年代のうちに計四件を数えた。これらの事件は、自白を重く見る捜査のあり方を見直す議論のきっかけとなった。",
+      "ja": "1983年、熊本県で戦後まもなく起きた強盗殺人事件の再審で、無罪の判決が言い渡された。男性は一度は死刑が確定し、いつ刑が執行されるか分からないまま、三十年以上にわたって身柄を拘束されていた。死刑囚が再審で無罪となったのは、日本ではこれが初めてだった。その後も同じような判決が続き、1980年代のうちに計四件を数えた。これらの事件は、自白を重く見る捜査のあり方を見直す議論のきっかけとなった。",
       "form": "死刑囚",
-      "en": "In 1983, at the retrial of a robbery-murder that took place in Kumamoto Prefecture shortly after the war, a verdict of not guilty was handed down. The man who had been on trial had been held in custody for more than thirty years under a judgment that had once been made final. It was the first time in Japan that a death-row inmate had been acquitted at retrial. Similar verdicts followed, numbering four in all within the 1980s. These cases prompted debate on rethinking investigative practice that places heavy weight on confessions.",
+      "en": "In 1983, at the retrial of a robbery-murder that took place in Kumamoto Prefecture shortly after the war, a verdict of not guilty was handed down. The man's death sentence had once been made final, and he had been held in custody for more than thirty years, never knowing when it would be carried out. It was the first time in Japan that a death-row inmate had been acquitted at retrial. Similar verdicts followed, numbering four in all within the 1980s. These cases prompted debate on rethinking investigative practice that places heavy weight on confessions.",
       "original": true,
       "register": "報",
       "topic": "history",
-      "tipJa": "報道では「死刑囚の再審」「確定死刑囚」などの形で使われる。",
-      "grammar": []
+      "tipJa": "報道では「死刑囚の再審」「確定死刑囚」などの形で使われる。"
     }
   ],
   "159": [
@@ -183,8 +180,7 @@
       "original": true,
       "register": "語",
       "topic": "language",
-      "tipJa": "訳語としては、外国の首都の警察を「ロンドン警視庁」のように呼ぶ例もある。",
-      "grammar": []
+      "tipJa": "訳語としては、外国の首都の警察を「ロンドン警視庁」のように呼ぶ例もある。"
     },
     {
       "ja": "三億円事件って知ってます？1968年に東京の府中で、白バイの警官になりすました男が、ボーナスの現金を積んだ車をまるごと持っていっちゃった事件なんですけど。警視庁はものすごい数の捜査員を動員して、容疑者のモンタージュ写真もあちこちに貼られたんですよ。それでも結局、誰がやったのか分からないまま、1975年に時効を迎えちゃいました。けがをした人が一人もいなかったっていうのも、この事件がやたら語られる理由の一つなのかなと思います。",
@@ -192,9 +188,7 @@
       "en": "Do you know the 300 million yen robbery? It's the case where, in Fuchu, Tokyo, in 1968, a man disguised as a police motorcycle officer drove off with an entire car loaded with cash for bonuses. The Tokyo police mobilised a huge number of investigators, and composite photos of the suspect were put up all over the place. Even so, in the end, the statute of limitations ran out in 1975 without anyone knowing who did it. I think the fact that not a single person was hurt is also one reason this case gets talked about so much.",
       "original": true,
       "register": "話",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": []
+      "topic": "history"
     }
   ],
   "59": [
@@ -209,9 +203,9 @@
       "grammar": ["n5-tai", "n5-teiru"]
     },
     {
-      "ja": "紀元前44年3月15日、ローマの元老院の会合の場で、終身の独裁官となっていたカエサルが刺殺された。中心となったブルートゥスやカッシウスをはじめ、計画に加わった議員は数十人にのぼったとされる。彼らは、一人の人物に権力が集まることを恐れ、共和政を守るためだと主張した。しかし共謀の成果は長くは続かず、カエサルの死後には再び内戦が起きた。結果として共和政の終わりはかえって早まり、その後は帝政の時代が始まることになった。",
+      "ja": "紀元前44年3月15日、ローマの元老院の会合の場で、終身の独裁官となっていたカエサルが刺殺された。中心となったブルートゥスやカッシウスをはじめ、計画に加わった議員は数十人にのぼったとされる。彼らは、一人の人物に権力が集まることを恐れ、共和政を守るためだと主張した。しかし、共謀して成し遂げた暗殺の効果は長くは続かず、カエサルの死後には再び内戦が起きた。結果として共和政の終わりはかえって早まり、その後は帝政の時代が始まることになった。",
       "form": "共謀",
-      "en": "On 15 March 44 BC, at a meeting of the Roman Senate, Caesar, who had become dictator for life, was stabbed to death. Counting the leading figures Brutus and Cassius, the senators who took part in the plan are said to have numbered several dozen. Fearing that power would be concentrated in a single man, they claimed to be acting to protect the Republic. But the fruits of the conspiracy did not last long, and after Caesar's death civil war broke out again. As a result the end of the Republic only came sooner, and after that the age of the emperors began.",
+      "en": "On 15 March 44 BC, at a meeting of the Roman Senate, Caesar, who had become dictator for life, was stabbed to death. Counting the leading figures Brutus and Cassius, the senators who took part in the plan are said to have numbered several dozen. Fearing that power would be concentrated in a single man, they claimed to be acting to protect the Republic. But the effect of the assassination they had conspired to carry out did not last long, and after Caesar's death civil war broke out again. As a result the end of the Republic only came sooner, and after that the age of the emperors began.",
       "original": true,
       "register": "報",
       "topic": "history",
@@ -225,7 +219,6 @@
       "original": true,
       "register": "話",
       "topic": "ai",
-      "tipJa": "",
       "grammar": ["n3-koto-ni-naru"]
     }
   ],
@@ -246,9 +239,7 @@
       "en": "Among the Buddhist precepts is one that says not to take what has not been given. The depth of this precept lies in its being phrased this way rather than simply saying \"do not steal\". What the law sets out to protect is property with a definite owner. But the Buddhist precept turns our eyes even to things without form, such as other people's time or the credit someone else has built up. Practice begins with asking, whenever we come to hold something, whether it was truly given to us.",
       "original": true,
       "register": "論",
-      "topic": "india",
-      "tipJa": "",
-      "grammar": []
+      "topic": "india"
     },
     {
       "ja": "ちょっと意外なんですけど、会社のデータをこっそり自分のUSBメモリにコピーして持ち出しても、日本だと窃盗罪にはならないって言われてるんですよ。窃盗の対象は財物、つまり基本的に形のある物なんで、情報そのものは当てはまらないんですね。会社の紙に印刷して、その紙ごと持っていったら話は別なんですけど。だからデータを守るためには、別の法律がいろいろ作られてきたって流れらしいです。AIの学習データみたいなものが値打ちを持つ時代に、物を中心にした考え方がどこまで通用するのか、けっこう気になりますよね。",
@@ -256,9 +247,7 @@
       "en": "This is a bit surprising, but it's said that in Japan, even if you secretly copy your company's data onto your own memory stick and walk out with it, it isn't theft. The object of theft is property, meaning basically something with physical form, so information itself doesn't qualify. It's a different story if you print it on the company's paper and take the paper with it. So apparently that's why various other laws have been made to protect data. In an age when things like AI training data have value, I'm pretty curious how far a way of thinking centred on physical things will hold up.",
       "original": true,
       "register": "話",
-      "topic": "ai",
-      "tipJa": "",
-      "grammar": []
+      "topic": "ai"
     }
   ],
   "76": [
@@ -279,8 +268,7 @@
       "original": true,
       "register": "報",
       "topic": "ai",
-      "tipJa": "報道では「罰則付きの規制」「罰則を強化する」などの形がよく出る。",
-      "grammar": []
+      "tipJa": "報道では「罰則付きの規制」「罰則を強化する」などの形がよく出る。"
     },
     {
       "ja": "シンガポールって、チューインガムの販売が禁止されてるの、知ってます？1992年からなんですけど、捨てられたガムが地下鉄のドアにくっついて、電車が止まったりしたのがきっかけって言われてるんですよ。しかも罰則がけっこう重くて、売ったりすると高い罰金を取られるらしいです。日本の感覚だとやりすぎに見えるじゃないですか。でも、狭い国土に人がぎゅっと住んでると、街をきれいに保つにはこれくらいのルールが必要なのかもしれないですね。",
@@ -288,9 +276,7 @@
       "en": "Did you know that selling chewing gum is banned in Singapore? It's been that way since 1992, and they say what set it off was discarded gum sticking to subway doors and stopping trains. What's more, the penalties are apparently pretty heavy, and if you sell it you get hit with a big fine. By Japanese standards it looks like overkill, right? But when people live packed into a small country, maybe you really do need rules like this to keep the streets clean.",
       "original": true,
       "register": "話",
-      "topic": "history",
-      "tipJa": "",
-      "grammar": []
+      "topic": "history"
     }
   ],
   "67": [

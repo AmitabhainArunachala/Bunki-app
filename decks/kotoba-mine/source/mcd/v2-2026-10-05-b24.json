@@ -1,0 +1,313 @@
+{
+  "96": [
+    {
+      "ja": "今回は、江戸の呉服店・越後屋が始めた商売の工夫を見ていきます。当時の呉服は、客ごとに値段を交渉して決めるのが普通で、しかも支払いは盆と暮れのツケ払いでした。そこで越後屋は「現金掛け値なし」を掲げ、誰に対しても同じ値段で、その場の現金で売ることにしたわけです。店先で値段がはっきり示されるようになり、今の値札につながる考え方が広まっていきました。客にとっては、駆け引きをしなくても安心して買えるという点が大きかったんですね。",
+      "form": "値札",
+      "en": "This time we're looking at a business innovation started by Echigoya, a kimono-fabric shop in Edo. At the time, kimono fabric was normally priced by haggling with each customer, and payment was on credit, settled at Obon and at year's end. So Echigoya put up the motto \"cash, no inflated prices\" and decided to sell at the same price to everyone, for cash on the spot. Prices came to be shown clearly at the shopfront, and the idea that leads to today's price tags gradually spread. For customers, the big thing was being able to buy with peace of mind without any bargaining.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「値札をつける」「値札を見る」「値札どおり」の形でよく使う。値段そのものではなく、値段を書いた札。",
+      "grammar": ["n4-teiku", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "国内のスーパーなどで、商品棚の価格表示を小型の電子ペーパーに切り替える動きが広がっている。本部のシステムから一斉に数字を書き換えられるため、閉店後に店員が紙の値札を一枚ずつ差し替える手間がなくなる。一部の企業は、AIで売れ行きや天気を分析し、時間帯に応じて価格を変える試みも始めた。ただ、同じ商品の値段が日に何度も変わることに、消費者が戸惑うのではないかという声もある。",
+      "form": "値札",
+      "en": "At supermarkets and other stores in Japan, a move to switch shelf price displays to small electronic-paper screens is spreading. Because the figures can be rewritten all at once from the head-office system, staff no longer have the chore of replacing paper price tags one by one after closing. Some companies have also begun trying to analyse sales and weather with AI and change prices according to the time of day. Still, some voice concern that consumers may be confused when the price of the same product changes several times a day.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「紙の値札」「値札を差し替える」のように、物としての札を指す。",
+      "grammar": ["n2-ni-oujite"]
+    },
+    {
+      "ja": "行動経済学でよく例に出されるのが、アンカリングと呼ばれる効果です。最初に目にした数字が基準となって、その後の判断が引っ張られる現象のことを指します。たとえば、元の価格に線を引いて安い価格を並べた値札を見ると、人は実際の価値を考えるより先に「得をした」と感じやすくなります。試験でこの用語を説明するときは、数字そのものではなく、比べる基準が判断をゆがめるという点を押さえておくといいでしょう。",
+      "form": "値札",
+      "en": "An effect often cited in behavioural economics is the one called anchoring. It refers to the phenomenon in which the first number you see becomes a reference point that pulls your later judgments along. For example, when people see a price tag with the original price struck through and a cheaper price beside it, they tend to feel they got a bargain before thinking about the actual value. When you explain this term in an exam, it is good to keep in mind that it is not the number itself but the reference used for comparison that distorts judgment.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "値札は「値段の示し方」の話題で心理学にもよく出る。「二重価格の値札」などと言う。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "162": [
+    {
+      "ja": "国内で最初の鉄道が開業したのは、明治5年、西暦でいうと1872年のことです。区間は新橋から横浜までのおよそ29キロで、イギリスから技師を招いて建設が進められました。歩けば何時間もかかった道のりが、汽車ならわずか一時間足らずで済むようになったんですね。ここで注目したいのは、時刻表に合わせて人が動くという習慣がこの時から少しずつ広まっていき、人々の暮らしのリズムまで変わったという点です。鉄道は、移動の速さだけでなく、時間の感覚そのものを新しくしたわけです。",
+      "form": "開業",
+      "en": "The country's first railway opened in Meiji 5, which is 1872 in the Western calendar. The line ran about 29 kilometres from Shimbashi to Yokohama, and construction went ahead with engineers invited from Britain. A journey that took many hours on foot could now be done by steam train in under an hour. What I want to draw attention to is that the habit of people moving according to a timetable gradually spread from this time, changing even the rhythm of people's daily lives. The railway renewed not just the speed of travel but the very sense of time.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "鉄道・路線・新駅にも「開業」を使う。店や医院の場合と同じく「〜が開業する」の形。",
+      "grammar": ["n4-you-ni-naru", "n4-teiku"],
+      "sense": "鉄道などの路線が営業を始めること"
+    },
+    {
+      "ja": "最近、AIに相談しながら一人で開業する人って、けっこういるじゃないですか。事業計画のたたき台とか、ホームページの文章とか、昔なら人に頼んでたものが、ひと晩でできちゃうんですよね。でも、それで商売がうまくいくかっていうと、別にそういうわけじゃないと思うんですよ。お客さんが本当に困ってることは、結局、自分で話を聞かないとわからないので。道具がタダ同然になったぶん、差がつくのはそっちなんじゃないかなと。",
+      "form": "開業",
+      "en": "These days there are quite a few people who start a business on their own while consulting AI, right? Things like a first draft of a business plan or the text for a website, stuff you'd have asked someone else to do in the past, can get done in one night. But I don't think that means the business will go well. Because in the end you can't know what customers are really struggling with unless you listen to them yourself. Now that the tools are practically free, I think that's where the difference will show.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "個人で店や事務所を始めるときにも使う。手続きの「開業届」もよく聞く。",
+      "grammar": ["n4-nagara", "n3-wake-dewa-nai"]
+    },
+    {
+      "ja": "心理学には、楽観バイアスという考え方があります。人は自分の将来について、平均よりもうまくいくと見積もりやすい、という傾向のことです。開業を考える人に成功の見込みを尋ねると、同じ業種の平均よりかなり高く答える、という調査結果も知られています。ただ、この傾向は悪いことばかりではなく、楽観があるからこそ人は新しい挑戦に踏み出せるとも言えます。テストでは、根拠のない自信と挑戦する力の両面から説明できると強いですね。",
+      "form": "開業",
+      "en": "In psychology there is a concept called optimism bias. It is the tendency for people to estimate that their own future will go better than average. There is also a well-known survey finding that when people thinking of opening a business are asked about their chances of success, they answer considerably higher than the average for the same type of business. However, this tendency is not all bad, and you could also say that it is because of optimism that people can take on new challenges. In a test, you are in a strong position if you can explain it from both sides: groundless confidence and the power to take on challenges.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「開業する」「開業資金」「開業医」など、事業を始める場面の語。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"]
+    }
+  ],
+  "163": [
+    {
+      "ja": "江戸の町では、新しい店の創開を知らせるために、引札と呼ばれる刷り物が配られていました。今でいうチラシのようなもので、店の名前や扱う品、場所などが刷り込まれていたんです。目を引く絵を添えることで、通りがかりの人の足を止めようとしたわけですね。人気の絵師や文人が文案を手がけることもあって、それ自体が一種の作品として楽しまれました。広告というものは、かなり早い段階から町の文化の一部になっていたんです。",
+      "form": "創開",
+      "en": "In the towns of Edo, printed sheets called hikifuda were handed out to announce the founding of a new shop. They were something like today's flyers, printed with the shop's name, the goods it dealt in, its location and so on. By adding eye-catching pictures, they tried to make passers-by stop in their tracks. Popular artists and men of letters sometimes wrote the copy, so the sheets themselves were enjoyed as works of a kind. Advertising had become part of town culture from quite an early stage.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "ごく珍しい語で、辞書にない場合もある。読みは「そうかい」。普段は別の語を使うのが無難。",
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "江戸時代から続く老舗の記念誌や石碑には、ふだんは見かけない硬い漢語がよく使われています。「店を始めた日」と書けば済むところを、あえて「創開の日」と記すことで、文章に改まった重みが出るわけです。ただ、こうした語には、読み手に意味が伝わりにくいという弱点もあります。ですから、自分で記念の文章を書くときは、その語が初めて出てくるところに読みをそっと添えておくと親切です。",
+      "form": "創開",
+      "en": "In the commemorative books and stone monuments of long-established shops dating back to the Edo period, stiff Sino-Japanese words you rarely see in everyday life are often used. Where writing \"the day the shop started\" would do, deliberately writing \"the day of its founding\" gives the text a formal weight. However, words like this have the weakness that their meaning is hard to get across to readers. So when you write a commemorative text yourself, it is considerate to quietly add the reading where the word first appears.",
+      "original": true,
+      "register": "語",
+      "topic": "history",
+      "tipJa": "ごく珍しい語で、読みは「そうかい」。記念の文など、改まった書き言葉でだけ使う。",
+      "grammar": ["n5-teiru", "n3-koto-de"]
+    },
+    {
+      "ja": "一つの店の創開は、店主一人の決断によって成り立つように見える。だが実際には、田畑で作物を育てた農家、建物を建てた職人、通りを毎日行き来する人々、そしてその町に暮らしてきた数えきれない人の営みがなければ、扉が開くことはない。仏教の説く縁起とは、あらゆる物事がこうした関係の網の中でのみ生じるという見方である。そう考えると、一つの始まりは、無数の縁への応答でもあるのだろう。",
+      "form": "創開",
+      "en": "The founding of a single shop seems to rest on the decision of the owner alone. In reality, though, the doors would never open without the work of the farmers who grew the crops in their fields, the craftsmen who put up the building, the people who come and go along the street every day, and the countless people who have lived in that town. The dependent origination that Buddhism teaches is the view that all things arise only within such a web of relations. Seen this way, a single beginning is perhaps also a response to countless connections.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「創」は「はじめてつくる」の意。店などの始まりを改まって言う珍しい語。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "207": [
+    {
+      "ja": "インターネットでデータを送るとき、中身はパケットと呼ばれる小さな単位に分けられます。それぞれのパケットには、手紙の封筒と同じように、送り主と宛先のアドレスが書き込まれているんです。途中にあるルーターという機械は、中身を開けずにその番地だけを読み、次にどこへ渡すかを決めていきます。つまり、ネットの通信というのは、無数の郵便局が瞬時に手紙をリレーしているようなものなんですね。",
+      "form": "宛先",
+      "en": "When you send data over the internet, the contents are split into small units called packets. Just like a letter's envelope, each packet has the sender's and the destination's addresses written on it. The machines along the way, called routers, read only that address without opening the contents and decide where to pass it next. In other words, internet communication is like countless post offices relaying letters in an instant.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "通信やメールでも「宛先」を使う。「宛先アドレス」「宛先を入力する」など。",
+      "grammar": ["n3-you-ni", "n5-teiru", "n4-teiku"],
+      "sense": "通信で、データを届ける先のアドレス"
+    },
+    {
+      "ja": "国内で郵便番号の制度が始まったのは1968年のことで、当時の番号は三けたか五けただった。手書きの数字を機械が読み取り、郵便物を地域ごとに自動で区分する装置の導入と合わせて進められた。それまで郵便局の職員は、宛先の住所を一つずつ目で読んで分けており、年賀状の時期には大量の人手が必要だった。その後、1998年には七けたに改められ、町名の単位まで番号で示せるようになった。",
+      "form": "宛先",
+      "en": "Postcodes began in the country in 1968, and the numbers at the time had three or five digits. The system was introduced together with machines that read handwritten numbers and automatically sorted mail by area. Until then, post office staff read the destination address on each item by eye and sorted it, and the New Year's card season required a huge number of hands. Later, in 1998, the codes were changed to seven digits, so that areas down to the level of neighbourhood names could be shown by number.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "郵便では「宛先」と「差出人」が対になる。封筒の表に書くのが宛先。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "メールの誤送信って、だいたい「絶対やらないぞ」って思ってるときに限ってやっちゃうじゃないですか。あれ、注意力が足りないっていうより、宛先の欄に何文字か打つと候補が出てくる、あの便利な機能のせいもあると思うんですよね。頭は「いつもの相手」を予測して動いてるんで、似た名前があると、確認したつもりでも目が素通りしちゃうんですよ。だから、うっかりを防げるように、送信してから数十秒は取り消せる設定にしておくのが、いちばん現実的なんじゃないかなと。",
+      "form": "宛先",
+      "en": "Sending an email to the wrong person is something you tend to do exactly when you're thinking \"I'll never do that,\" right? I think it's not so much a lack of attention as partly the fault of that handy feature where candidates pop up once you type a few letters in the recipient field. Your brain is working on a prediction of \"the usual person,\" so if there's a similar name, your eyes slide right over it even when you think you checked. So I think the most realistic thing is to set it up so you can undo a send for a few dozen seconds, to guard against slip-ups.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "メールでは送信画面の「宛先」欄のように、受け取る相手を入れる欄も指す。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "208": [
+    {
+      "ja": "ネット通販の荷物は、注文を受けた瞬間から、倉庫の棚、トラック、配達員のルートまで、ほとんどがシステムで組み立てられています。ここで面白いのが、発送後に客があて先変更を申し込んだときの動きです。AIは、その荷物が今どの拠点にあるかを確かめ、新しい住所に向かう配送ルートを数秒で組み直します。人が地図を見比べて決めていた作業が、データが増えるにつれて、ほぼ自動で回るようになったわけです。",
+      "form": "あて先変更",
+      "en": "From the moment an order is received, a parcel from online shopping is almost entirely planned by the system, from the warehouse shelf and the truck to the delivery driver's route. What's interesting here is what happens when the customer applies for a change of delivery address after shipping. The AI checks which depot the parcel is at right now and rebuilds a delivery route to the new address within seconds. Work that people used to decide by comparing maps has, as the data has grown, come to run almost automatically.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「あて先変更を申し込む」「あて先変更の手続き」の形が多い。表記は「宛先変更」も。",
+      "grammar": ["n5-teiru", "n3-ni-tsurete", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "引っ越しの後で、あて先変更の手続きを忘れて大事な書類が旧住所に届いてしまう、という失敗はよく聞きます。心理学では、未来のある時点で予定した行動をとることを覚えておく記憶を、展望記憶と呼んで区別しています。展望記憶はきっかけがないと思い出しにくいのが特徴で、意志の強さとはあまり関係がありません。対策としては、頭で覚えようとするのではなく、転居の当日に必ず目に入る場所へメモを貼るなど、きっかけを外に置くことが有効だとされています。",
+      "form": "あて先変更",
+      "en": "You often hear of the mistake of forgetting the change-of-address procedure after moving house, so that important documents end up at the old address. In psychology, the memory for carrying out a planned action at a certain point in the future is distinguished under the name prospective memory. Prospective memory is characterised by being hard to recall without a cue, and has little to do with strength of will. As a countermeasure, rather than trying to remember it in your head, putting the cue outside yourself, such as sticking a note somewhere you are sure to see on moving day, is said to be effective.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "郵便では転居の届け出をすると、旧住所あての郵便物が新住所に届くようになる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "死とは、魂という手紙のあて先変更のようなものだ、と考える人もいるだろう。肉体という住所が失われても、中身はそのまま新しい場所へ届けられる、というわけである。だが仏教は、変わらずに移り住む「中身」そのものを認めない。無我の教えによれば、輪廻とは不変の実体が運ばれることではなく、炎がある蝋燭から別の蝋燭へ移るように、原因と結果が受け継がれていく流れにすぎないのである。",
+      "form": "あて先変更",
+      "en": "Some may think of death as something like a change of address for the letter called the soul. The idea is that even if the address called the body is lost, the contents are delivered intact to a new place. But Buddhism does not accept any such \"contents\" that move on unchanged. According to the teaching of non-self, rebirth is not the carrying of some unchanging entity but merely a stream in which causes and effects are passed on, as a flame passes from one candle to another.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "比喩でも使えるが、本来は郵便や配送の事務的な語。",
+      "grammar": ["n3-dewa-naku", "n3-you-ni", "n4-teiku", "n2-ni-suginai"]
+    }
+  ],
+  "206": [
+    {
+      "ja": "仏教の歴史で、寄付の話として必ず出てくるのが祇園精舎です。伝説によれば、スダッタという裕福な商人が、ブッダの修行の場をつくろうと、ある王子の持つ森を買い取ろうとしました。王子は冗談半分に、地面を金貨で敷き詰めるなら売ってもいいと答えたのですが、スダッタは本当に金貨を運び込み始めたと伝えられています。その熱意に打たれた王子も森の木々を差し出すことになり、こうして二人の名を冠した精舎が生まれたわけです。",
+      "form": "寄付",
+      "en": "The story that always comes up as a tale of donation in Buddhist history is that of the Jetavana monastery. According to legend, a wealthy merchant named Sudatta wanted to create a place of practice for the Buddha and tried to buy a forest owned by a certain prince. Half joking, the prince replied that he would sell it if the ground were covered in gold coins, but it is said that Sudatta actually began carrying in the gold. The prince, moved by his zeal, ended up offering the forest's trees as well, and so the monastery bearing both their names was born.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「寄付する」「寄付を募る」「寄付金」の形でよく使う。物にも使える。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "大きな災害が起きるたびに、被災地への寄付を装った偽のサイトや投稿が出回り、警察などが注意を促している。最近は、生成AIで作られた被災地の写真や、実在の団体をまねた文章が使われる例も指摘されている。専門家は、お金を送る前に、募集している団体の名前や連絡先を、公的な窓口で確かめるよう勧めている。善意につけ込む手口だけに、だまされたことに気づきにくく、被害が表に出にくいという。",
+      "form": "寄付",
+      "en": "Every time a major disaster occurs, fake websites and posts posing as donations to the affected areas circulate, and the police and others are urging caution. Recently, cases using photos of disaster areas made with generative AI and text imitating real organisations have also been pointed out. Experts advise checking the name and contact details of the organisation doing the fundraising through an official channel before sending money. Because the scam preys on goodwill, it is said that people find it hard to realise they have been deceived, and the damage rarely comes to light.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "ニュースでは「寄付を呼びかける」「寄付を装う」などの言い方がよく出る。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "援助の心理を学ぶうえで欠かせないのが、身元のわかる被害者効果です。ある実験では、一人の少女の名前と写真を示した場合のほうが、何百万人もの飢えを伝える統計を示した場合よりも、集まる寄付が多かったという結果が出ています。さらに、統計を少女の話に添えると、かえって額が減ったという点も見逃せません。人の心は、数の大きさではなく、目の前の一人の物語に動かされやすいわけです。",
+      "form": "寄付",
+      "en": "Something you can't skip when studying the psychology of helping is the identifiable victim effect. In one experiment, showing the name and photo of a single girl brought in more donations than showing statistics about the hunger of millions of people. It is also worth noting that adding the statistics to the girl's story actually reduced the amount. The human heart is more easily moved not by the size of numbers but by the story of the one person in front of it.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「寄付」は見返りを求めない提供。「募金」は寄付を集める行為を指すことが多い。",
+      "grammar": ["n2-ue-de", "n5-teiru", "n3-dewa-naku"]
+    }
+  ],
+  "264": [
+    {
+      "ja": "仏教の僧が身につける衣は、基本的に三枚までとされてきました。律の文献には、その数がどう決まったかを語る話が残っています。冬のある晩、ブッダは屋外で過ごし、夜が更けて肌寒くなるたびに、衣を一枚ずつ重ねながら、何枚あれば足りるかを確かめた、というのです。ここで注目したいのは、決まりがただ上から押しつけられたのではなく、体の実感をもとに組み立てられているという点です。",
+      "form": "肌寒く",
+      "en": "The robes that Buddhist monks wear have basically been limited to three. In the texts of the monastic code, a story survives about how that number was decided. On a certain winter night, the Buddha stayed outdoors, and each time it grew chilly as the night deepened, he put on one more robe, checking how many were enough. What I want to draw attention to is that the rule was not simply imposed from above but was built on bodily experience.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「肌寒い朝」「肌寒くなる」のように、軽い寒さに使う。厳しい寒さには「凍える」など。",
+      "grammar": ["n4-nagara", "n3-dewa-naku", "n5-teiru"]
+    },
+    {
+      "ja": "AIを使った天気予報の研究が進み、スーパーコンピューターによる計算と並ぶ精度を示す例も出てきた。民間の気象会社の中には、気温だけでなく湿度や日差しも加味して、利用者が実際にどう感じるかを予測し、体感に応じた服装の目安を示すところもある。たとえば数字の上では平年並みでも、曇って湿った朝は肌寒いと感じる人が多いという。企業側は、店舗の仕入れなどにも役立てたいとしている。",
+      "form": "肌寒い",
+      "en": "Research on weather forecasting using AI is advancing, and examples showing accuracy on a par with supercomputer calculations have appeared. Some private weather companies take into account not only temperature but also humidity and sunshine to predict how users will actually feel, and show guidelines for clothing according to how it feels. For example, even when the figures are around the seasonal average, many people are said to feel chilly on a cloudy, damp morning. The companies say they also want to put this to use in things like stores' purchasing.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "天気の話で「肌寒い一日」「朝晩は肌寒い」はよく使う定番の言い方。",
+      "grammar": ["n2-ni-oujite"]
+    },
+    {
+      "ja": "温度の感じ方は、温度計の数字だけで決まるわけではないんです。2008年に発表された研究では、仲間外れにされた体験を思い出した人は、部屋の温度を低めに見積もったという結果が出ています。孤独を感じると肌寒いと思いやすい、というわけです。ただし、この種の研究には、別の研究者が同じ結果を得られなかった例もあり、試験で取り上げるなら再現性の問題とセットで覚えておくのが安全です。",
+      "form": "肌寒い",
+      "en": "How we feel temperature is not decided by the thermometer reading alone. In a study published in 2008, people who recalled an experience of being left out estimated the room's temperature as lower. In other words, when you feel lonely you are more likely to feel chilly. However, in this kind of research there are also cases where other researchers could not get the same result, so if you bring it up in an exam it is safest to remember it together with the problem of replicability.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "体で感じるかすかな寒さを言う語。気持ちの寂しさを重ねる文学的な使い方もある。",
+      "grammar": ["n3-wake-dewa-nai", "n5-teiru"]
+    }
+  ],
+  "228": [
+    {
+      "ja": "台湾の半導体大手が熊本県に建設した新工場の開所式が2024年2月、盛大に開かれた。式典には政府関係者や取引先の幹部らが出席し、地元では雇用や経済効果への期待が高まっている。半導体の供給網を国内に取り戻したい国にとっても、象徴的な案件と位置づけられている。一方、工場周辺では交通渋滞や地価の上昇に加え、大量の地下水を使うことへの懸念も出ている。地域との共生を進めるうえで、企業の情報公開のあり方が問われることになりそうだ。",
+      "form": "盛大",
+      "en": "In February 2024, the opening ceremony for a new factory built in Kumamoto Prefecture by a major Taiwanese semiconductor company was held with great fanfare. Government officials and executives from business partners attended the ceremony, and expectations of jobs and an economic boost are rising locally. For the state, which wants to bring semiconductor supply chains back home, it is also positioned as a symbolic project. Meanwhile, around the plant, along with traffic congestion and rising land prices, concerns have also emerged about the use of large amounts of groundwater. The company's approach to disclosing information looks set to be called into question as it works toward coexistence with the region.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜が盛大に開かれた」「盛大に執り行われた」が定型。",
+      "grammar": ["n5-teiru", "n2-ue-de", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "こないだ、カフェでコーヒーを盛大にこぼしちゃって、周りの全員に見られてる気がしたんですよ。でも心理学だと、スポットライト効果っていって、人は自分が注目されてる度合いを、実際よりかなり大きく見積もっちゃうらしいんですよね。目立つ服を着せて部屋に入らせる実験でも、本人が思ってたほど周りは気づいてなかったっていう。だから、やらかしたときほど、意外と誰も覚えてないって思っといたほうが楽ですよ。",
+      "form": "盛大",
+      "en": "The other day I spilled my coffee spectacularly at a café, and it felt like everyone around me was watching. But in psychology there's this thing called the spotlight effect: apparently people estimate how much attention they're getting as much bigger than it actually is. Even in an experiment where people were made to wear conspicuous clothes and walk into a room, the people around them hadn't noticed as much as the wearers thought. So when you mess up, you're better off assuming that, surprisingly, nobody remembers.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "くだけた会話では「盛大に転ぶ」「盛大にこぼす」のように、派手な失敗にも使う。",
+      "sense": "程度が大きく派手なようす(くだけた言い方)"
+    }
+  ],
+  "230": [
+    {
+      "ja": "イギリスの心理学者リチャード・ワイズマンは、自分はついていると思う人と、ついていないと思う人を集めて、ある実験をしました。新聞に載った写真の数を数えてもらったのですが、途中のページには、答えそのものを大きく書いた広告が載せてあったんです。ついていると考える人ほどその広告に気づき、そうでない人ほど数えることに没頭して見逃す傾向がありました。彼の結論は、幸運とは空から降ってくるものではなく、周りに目を向けている人が拾い上げるものだ、ということなんですね。",
+      "form": "幸運",
+      "en": "The British psychologist Richard Wiseman gathered people who considered themselves lucky and people who considered themselves unlucky, and ran an experiment. He had them count the number of photos in a newspaper, but partway through there was a big advertisement that stated the answer itself. The more people thought themselves lucky, the more they noticed the ad, and the less so, the more they tended to be absorbed in counting and miss it. His conclusion was that good luck is not something that falls from the sky, but something picked up by people who keep their eyes on what is around them.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「幸運にも〜」「幸運を祈る」のように使う。会話では「ラッキー」「ついている」も多い。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    },
+    {
+      "ja": "思いがけず良いことが起きると、人はそれを幸運と呼ぶ。だが仏教の因果の立場から見れば、偶然に見える出来事も、数えきれない原因と条件が重なり合った結果にすぎない。くじに当たった人も、その一枚を買うまでに、いくつもの小さな選択と出会いを経ているのである。そう考えると、喜ぶべきなのは自分が選ばれたことではなく、それを支えてきた無数のつながりのほうだろう。感謝とは、たまたま手にしたものを自分の手柄にしない心の構えなのかもしれない。",
+      "form": "幸運",
+      "en": "When something good happens unexpectedly, people call it good luck. But from the Buddhist standpoint of cause and effect, even events that seem accidental are merely the result of countless causes and conditions coming together. Even a person who wins a lottery has passed through many small choices and encounters before buying that one ticket. Seen this way, what we ought to rejoice in is not that we were chosen, but rather the countless connections that have supported it. Gratitude may be the frame of mind that does not take credit for what happened to come into one's hands.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「幸運」はめぐり合わせのよさ。努力の結果には「成果」を使い分ける。",
+      "grammar": ["n2-ni-suginai", "n3-dewa-naku", "n5-teiru"]
+    },
+    {
+      "ja": "ペニシリンの発見って、偶然の話として有名じゃないですか。1928年に、フレミングが夏の休暇から研究室に戻ったら、片付けずに置いてったシャーレにカビが生えてて、そのまわりだけ細菌が育ってなかったっていう。ただ、これをただの幸運で片付けるのは、ちょっと違うと思うんですよね。普通の人なら「失敗した」って捨てちゃうところを、なんでだろって面白がれたのが、たぶん一番大きいので。",
+      "form": "幸運",
+      "en": "The discovery of penicillin is famous as a story of chance, right? In 1928, when Fleming got back to his lab from his summer holiday, mould had grown in a dish he'd left without clearing up, and only around it had the bacteria not grown. But I think writing this off as mere good luck isn't quite right. Because where an ordinary person would have thrown it out as a failure, the fact that he could find it interesting and wonder why is probably the biggest thing.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "「ただの幸運」「幸運だった」のように、話し言葉でも使える。"
+    }
+  ],
+  "198": [
+    {
+      "ja": "イギリス南西部の町バースには、古代ローマ時代の浴場の遺跡が今も残っています。ここでは地下深くで温められた湯の湧出が絶えることなく続き、ローマの人々はその上に神殿と大浴場を建てました。浴場は単に体を洗う場所ではなく、人々が集まって商談をしたり、うわさ話をしたりする社交の場でもあったんですね。帝国が退いた後、施設は長く忘れられていましたが、18世紀には保養地として再び上流階級でにぎわうようになりました。",
+      "form": "湧出",
+      "en": "In the town of Bath in south-west England, the remains of baths from the ancient Roman era still survive today. Here, water heated deep underground wells up without ever stopping, and the Romans built a temple and a great bath on top of it. The baths were not just a place to wash the body but also a social space where people gathered to talk business and gossip. After the empire withdrew, the facilities were forgotten for a long time, but in the eighteenth century the place once again bustled with the upper classes as a resort.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「温泉が湧出する」「湧出量」のように、温泉・地下水・石油などに使う硬い語。",
+      "grammar": ["n5-teiru", "n2-koto-naku", "n3-dewa-naku", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "半導体工場の進出が相次ぐ熊本県で、地下水への影響を見守る調査が続いている。半導体の製造には、基板の洗浄などに大量の水が使われる。熊本市は水道水のほぼすべてを地下水でまかなっており、県などは市内の泉の湧出量や地下水位の変化を定期的に測っている。企業側は、くみ上げた量に見合う水を田んぼから地下に戻す取り組みを進めているという。ただ、地下水は一度減ると元に戻るまでに長い年月がかかるため、慎重な監視を求める声は根強い。",
+      "form": "湧出",
+      "en": "In Kumamoto Prefecture, where semiconductor factories are moving in one after another, surveys to monitor the impact on groundwater are ongoing. Large amounts of water are used in semiconductor manufacturing, for things like washing the substrates. Kumamoto City supplies almost all of its tap water from groundwater, and the prefecture and others regularly measure the flow from springs in the city and changes in the groundwater level. The companies are said to be working to return water to the ground via rice paddies to match the amount they pump up. However, because groundwater takes many years to recover once it has fallen, calls for careful monitoring remain strong.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道や行政では「湧出量」の形でよく出る。「〜量を測る」「〜量が減る」など。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "泉の湧出を、人の力で早めることはできない。雨が地にしみ込み、長い年月をかけて岩のすき間を通り抜けて、ようやく水は地表に現れる。悟りについても、似たことが言えるのではないか。仏典には、修行を急ぐあまり、弦を張りすぎた琴のようになった弟子を、ブッダがたしなめた話がある。智慧もまた、外からこじ開けるものではなく、条件が整ったときに内側から静かに満ちてくるものなのだろう。",
+      "form": "湧出",
+      "en": "The welling up of a spring cannot be hurried by human effort. Rain soaks into the ground, passes through cracks in the rock over long years, and only then does the water appear at the surface. Can't something similar be said of awakening? In the Buddhist scriptures there is a story of the Buddha admonishing a disciple who, in his haste to practise, had become like a lute whose strings were strung too tight. Wisdom, too, is perhaps not something to be prised open from outside, but something that quietly fills up from within when the conditions are in place.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "本来は水や湯の語。比喩で使うなら「わき出る」のほうがやわらかい。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ]
+}
