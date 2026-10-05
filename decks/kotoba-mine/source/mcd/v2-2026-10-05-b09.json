@@ -1,0 +1,327 @@
+{
+  "145": [
+    {
+      "ja": "今日は、古代ローマにあった「記憶の断罪」という習慣を紹介します。皇帝カラカラは弟のゲタを殺害した後、碑文や肖像からゲタの名前と顔を削らせました。つまり、相手の命だけではなく、その人がいたという記録まで抹殺しようとしたわけです。ところが面白いことに、削られた跡はかえって目立ち、今では「ここに誰かがいた」という証拠になっています。消そうとすること自体が、記憶を残してしまうんですね。",
+      "form": "抹殺",
+      "en": "Today I'd like to introduce a custom from ancient Rome known as the \"condemnation of memory.\" After the emperor Caracalla killed his brother Geta, he had Geta's name and face scraped off inscriptions and portraits. In other words, he tried to wipe out not just his rival's life but even the record that the man had existed. The interesting thing, though, is that the scraped marks actually stand out, and today they serve as evidence that someone was there. The very attempt to erase someone ends up preserving the memory.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "記録や存在を「抹殺する」は、ただ消すより強く、意図して跡形もなくする響きがある。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"],
+      "sense": "存在や記録をすっかり消し去ること"
+    },
+    {
+      "ja": "生成AIの普及により、写真に写った人物を消す加工が、誰でも数秒でできるようになった。ただ、写真から人を消す行為そのものは新しいものではない。1930年代のソ連では、失脚した幹部の姿が公式の写真から次々と消され、その存在が抹殺された例が知られている。当時は熟練の職人が手作業で修整していたが、今は手間がほとんどかからない。このため、写真の出どころを確かめる仕組みづくりが急がれている。",
+      "form": "抹殺",
+      "en": "With the spread of generative AI, anyone can now remove a person from a photo in a few seconds. Removing people from photos is not new in itself, however. In the Soviet Union of the 1930s, there are known cases in which purged officials were removed one after another from official photographs and their existence was erased. At the time skilled craftsmen retouched the images by hand, but now it takes almost no effort. For this reason, there is a pressing need to build systems that verify where a photo came from.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「存在を抹殺する」「歴史から抹殺される」の形が多い。主に権力による組織的な消去に使う。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru"],
+      "sense": "存在や記録をすっかり消し去ること"
+    },
+    {
+      "ja": "仏教の無我という教えは、ときに、自分というものを否定せよという命令のように受け取られる。だが、欲や怒りを力ずくで押さえつけ、自己を抹殺しようとすれば、かえって苦しみは深まるばかりである。説かれているのは、固定した「私」がどこにも見つからないと気づくことにすぎない。なくそうとしていた相手は、もともと実体を持たないのである。そう知ったとき、戦う相手は静かに姿を消していく。",
+      "form": "抹殺",
+      "en": "The Buddhist teaching of non-self is sometimes taken as a command to deny one's own self. But if you forcibly suppress desire and anger and try to annihilate the self, suffering only deepens. What is taught is merely the realisation that a fixed \"I\" is nowhere to be found. The thing you were trying to get rid of never had any substance to begin with. When you know that, the opponent you were fighting quietly disappears.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n5-teiru", "n2-ni-suginai", "n4-teiku"],
+      "sense": "存在や記録をすっかり消し去ること"
+    }
+  ],
+  "146": [
+    {
+      "ja": "今日は、睡眠と記憶の関係についてお話しします。寝ているあいだは脳も休んでいると考えている人が多いのですが、実はそうではありません。眠っているあいだに、脳はその日に覚えた情報を整理し、必要なものを長く残す作業をしているとされています。夕べ一生懸命覚えた単語が、朝になると意外にすっと出てくるのは、この働きのおかげかもしれません。つまり、徹夜で詰め込むより、覚えてから寝るほうが理にかなっているわけです。",
+      "form": "夕べ",
+      "en": "Today I'll talk about the relationship between sleep and memory. Many people think that while we sleep the brain is resting too, but in fact that is not the case. While we are asleep, the brain is said to sort through the information learned that day and do the work of keeping what is needed for the long term. The words you studied hard last night coming out surprisingly smoothly in the morning may be thanks to this process. In other words, studying and then sleeping makes more sense than cramming all night.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「夕べ」は「昨夜」のやわらかい言い方で、会話では「昨日の夜」と同じ意味で使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "きのうの夜。昨夜"
+    },
+    {
+      "ja": "市内の能楽堂で週末、琵琶の弾き語りで『平家物語』を味わう夕べが開かれ、約二百人が来場した。平家物語は、もともと琵琶法師が語り聞かせることで広まったとされ、文字で読むのとは違う味わいがある。演奏者は、合戦の場面では力強く弦を打ち、一人の武将の最期では声を落とすなど、場面に応じて語り口を変えていた。来場者からは、意味のわからない言葉があっても情景が伝わってきたという声が聞かれた。",
+      "form": "夕べ",
+      "en": "Over the weekend, an evening of enjoying The Tale of the Heike sung to the biwa was held at a Noh theatre in the city, attracting about two hundred people. The Tale of the Heike is said to have spread originally through blind biwa minstrels reciting it, and it has a flavour different from reading it on the page. The performer changed his delivery to suit each scene, striking the strings forcefully in the battle scenes and lowering his voice at the death of a single warrior. Visitors said that even when there were words they did not understand, the scenes still came across.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「〜の夕べ」は夕方から夜に開く催しの名前に使う。「音楽の夕べ」「朗読の夕べ」など。",
+      "grammar": ["n3-koto-de", "n2-ni-oujite"],
+      "sense": "夕方から夜に開かれる催し"
+    },
+    {
+      "ja": "多くの寺では、朝と夕べにお経を読む勤めが、休むことなく続けられてきた。朝に始まり、日が沈むころに閉じる、その小さな区切りがあるからこそ、修行の日々は流れに飲まれずにすむのだろう。現代の私たちの暮らしには、こうした区切りがほとんどない。仕事は夜中まで画面の中で続き、寝る直前まで何かを眺め、終わりの合図がないまま眠りにつく。せめて日の終わりに数分だけ手を止めることは、それだけで心を整える小さな勤めになるはずである。",
+      "form": "夕べ",
+      "en": "At many temples, the practice of reciting sutras in the morning and the evening has continued without a break. It is probably because of that small division, beginning in the morning and closing around sunset, that the days of practice are not swept away by the current. Our lives today have almost no such divisions. Work continues on a screen until the middle of the night, we gaze at something right up until bedtime, and we fall asleep without any signal that the day is over. Simply stopping for a few minutes at the end of the day should, by itself, become a small practice that settles the mind.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「朝に夕べに」のように「朝」と対にすると、夕方の意味になる。書き言葉らしい言い方。",
+      "grammar": ["n2-koto-naku"],
+      "sense": "日が暮れるころ。夕方"
+    }
+  ],
+  "147": [
+    {
+      "ja": "今日はインド哲学の大きなテーマである、生まれ変わりの問題を取り上げます。古代インドでは、生き物は死んでもまた別の姿で生まれ、それが果てしなく繰り返されると考えられていました。この繰り返しを輪廻といいますが、これは楽しい永遠ではなく、苦しみが終わらない状態だと捉えられていたんです。だから修行者たちは、その輪からの脱出を人生の最終目標にしたわけですね。仏教もこの問題意識を受け継いだうえで、独自の答えを出していきます。",
+      "form": "脱出",
+      "en": "Today I'll take up one of the big themes of Indian philosophy, the problem of rebirth. In ancient India, it was believed that living beings, even after death, are born again in another form, and that this repeats endlessly. This repetition is called samsara, but it was seen not as a pleasant eternity but as a state in which suffering never ends. That is why ascetics made escape from that cycle the ultimate goal of life. Buddhism, too, inherited this concern and then went on to give its own answer.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜からの脱出」の形で、苦しい状態や悪い流れから抜け出す比喩にもよく使う。",
+      "grammar": ["n3-dewa-naku", "n2-ue-de", "n4-teiku"],
+      "sense": "苦しい状態から抜け出すこと"
+    },
+    {
+      "ja": "1940年5月、フランス北部の港町ダンケルクで、ドイツ軍に追い詰められた英仏の兵士らがイギリス本土への脱出を図った。作戦には軍艦だけでなく、漁船や遊覧船など民間の小型船も数多く加わった。空からの攻撃を受けながらの撤収は、困難を極めた。およそ十日間で、三十万人を超える兵士が対岸へ運ばれたとされる。戦いには敗れたものの、多くの命を救ったこの出来事は、今も語り継がれている。",
+      "form": "脱出",
+      "en": "In May 1940, at the port town of Dunkirk in northern France, British and French soldiers cornered by the German army attempted to escape to the British mainland. Not only warships but also many small civilian boats, such as fishing boats and pleasure craft, took part in the operation. The withdrawal, carried out under attack from the air, was extremely difficult. Over roughly ten days, more than three hundred thousand soldiers are said to have been carried to the opposite shore. Although the battle was lost, this event, which saved many lives, is still told today.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「脱出を図る」は危険な場所から逃れようと試みること。報道で多い組み合わせ。",
+      "grammar": ["n2-mono-no", "n4-nagara", "n5-teiru"],
+      "sense": "危険な場所から抜け出すこと"
+    },
+    {
+      "ja": "悪い習慣からの脱出を、人はしばしば意志の強さの問題だと考える。しかし、意志の力で押さえ込もうとするほど、意識はかえってその習慣のほうへ向かってしまう。禁じられたものほど気になるのが、心というものの性質なのである。必要なのは、正面から戦うことではなく、別の道を少しずつ用意していくことだろう。出口は、壁を打ち破った先ではなく、案外すぐ横に開いているのかもしれない。",
+      "form": "脱出",
+      "en": "People often think of escaping a bad habit as a matter of willpower. But the harder we try to suppress it by force of will, the more our attention turns toward that very habit. It is the nature of the mind to be most drawn to what is forbidden. What is needed is probably not to fight head-on but to prepare another path little by little. The exit may lie not beyond a wall you break through but, unexpectedly, wide open right beside you.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n4-teiku"],
+      "sense": "好ましくない状態から抜け出すこと"
+    }
+  ],
+  "148": [
+    {
+      "ja": "今日は、ブッダのもとを訪れた若者たちのエピソードを紹介します。彼らは森で遊んでいたところ、連れてきた女性に持ち物を盗まれ、必死にその女性を追っていました。ブッダは事情を聞くと、その女性の捜索と自分自身を探し求めることと、どちらが大切かと問いかけたと伝えられています。外で失ったものを追いかける前に、まず自分の内側を見よ、というわけですね。若者たちはこの問いをきっかけに、教えを聞くことになったとされています。",
+      "form": "捜索",
+      "en": "Today I'll introduce an episode about some young men who came to see the Buddha. While they were amusing themselves in a forest, a woman they had brought along stole their belongings, and they were desperately chasing after her. It is told that when the Buddha heard what had happened, he asked them which was more important, the search for that woman or seeking themselves. The point is that before chasing what you have lost outside, you should first look within. With this question as the trigger, the young men are said to have ended up listening to his teaching.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「捜索」は行方のわからない人や物を組織的に探すときの硬い語。日常の探し物には「探す」。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"],
+      "sense": "いなくなった人や物を探すこと"
+    },
+    {
+      "ja": "半導体の技術情報を海外の企業に不正に渡したとして、警察は不正競争防止法違反の疑いで、元社員の自宅などを捜索した。警察によると、元社員は退職する前の数か月間に、大量の技術資料を私物の記録媒体にコピーしていた疑いがある。押収したパソコンなどを分析し、情報がどのような経路で渡ったのか詳しく調べる方針だ。技術の流出をめぐる摘発は近年相次いでおり、企業の側にも管理の見直しが求められている。",
+      "form": "捜索",
+      "en": "On suspicion of violating the Unfair Competition Prevention Act by illegally passing semiconductor technical information to an overseas company, police searched the home and other premises of a former employee. According to police, the former employee is suspected of copying a large amount of technical documents onto a personal storage device in the months before leaving the company. Police plan to analyse the seized computers and other items and look in detail at the route by which the information was passed on. Crackdowns over technology leaks have been occurring one after another in recent years, and companies too are being urged to review their controls.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "警察が証拠を求めて家や会社を調べることも「捜索」と言う。「家宅捜索」「捜索に入る」の形が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "警察が証拠を求めて家などを調べること"
+    },
+    {
+      "ja": "失くした鍵の捜索ほど、人の心のくせをよく映し出すものはない。私たちは、ありそうな場所を何度も見返しながら、まったく別の場所を思い浮かべようとはしない。探しているのは鍵ではなく、ここにあるはずだという自分の思い込みなのである。だから、いったん手を止め、最後に鍵を握った瞬間を思い出すほうが、部屋をかき回すより早いことが多い。見つからないものは、たいてい、見ようとしなかった場所にある。",
+      "form": "捜索",
+      "en": "Nothing reflects the habits of the human mind as well as the search for lost keys. We look over the likely places again and again, while never trying to picture a completely different place. What we are looking for is not the keys but our own assumption that they must be here. So stopping for a moment and recalling the instant we last held the keys is often faster than turning the room upside down. What we cannot find is usually in the place we did not try to look.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "日常の探し物に「捜索」を使うと、大げさで少しおかしみのある言い方になる。",
+      "grammar": ["n4-nagara", "n3-dewa-naku", "n5-teiru"],
+      "sense": "いなくなった人や物を探すこと"
+    }
+  ],
+  "149": [
+    {
+      "ja": "今回は、源頼朝がなぜ鎌倉を拠点に選んだのかを考えてみます。鎌倉は今の神奈川県の南東部にあり、周りを山と海に囲まれた土地です。攻め込まれにくい地形は、まだ不安定だった武士の政権にとって大きな安心材料だったわけですね。さらに、頼朝の祖先とゆかりの深い土地だったことも、理由の一つとされています。つまり、守りやすさと正統性の両方を、場所選びで手に入れたということです。",
+      "form": "神奈川県",
+      "en": "This time, let's think about why Minamoto no Yoritomo chose Kamakura as his base. Kamakura is in the southeast of present-day Kanagawa Prefecture, a place surrounded by mountains and sea. Terrain that was hard to attack was a big source of reassurance for a warrior government that was still unstable. In addition, the fact that it was a place closely tied to Yoritomo's ancestors is also considered one of the reasons. In other words, through his choice of location he gained both defensibility and legitimacy.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「神奈川県」の県庁は横浜市にある。鎌倉や箱根も県内の地名。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "1853年、ペリーが率いるアメリカの艦隊が浦賀の沖に現れた。浦賀は、現在の神奈川県横須賀市にあたる。翌年、幕府は横浜で日米和親条約を結び、長く続いた対外政策は大きく転換した。さらに1859年に横浜が開港すると、小さな村だった土地は、外国との貿易の窓口として急速に発展していくことになった。黒船の来航は、国の方針だけでなく、地域の姿そのものを変える出来事でもあった。",
+      "form": "神奈川県",
+      "en": "In 1853, an American fleet led by Perry appeared off Uraga. Uraga corresponds to present-day Yokosuka City in Kanagawa Prefecture. The following year, the shogunate concluded the Japan-US Treaty of Peace and Amity at Yokohama, and its long-standing foreign policy changed course dramatically. Then, when Yokohama opened as a port in 1859, what had been a small village went on to develop rapidly as a gateway for trade with foreign countries. The arrival of the Black Ships was an event that changed not only national policy but the very shape of the region.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "歴史の記述では「現在の神奈川県」のように、昔の地名を今の県名で言い直すことが多い。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "神奈川県の鎌倉には、屋根の下ではなく、空の下に坐る大仏がある。かつては大きな建物に納められていたが、それが失われてからは、長い年月を雨や雪にさらされてきたという。守るはずの建物が先に消え、守られるはずの像のほうが残ったのである。形あるものは、どれほど堅固に見えても、いつかは崩れていく。それでも静かに坐り続けるその姿は、失うことを恐れずに在ることの手本のようにも見える。",
+      "form": "神奈川県",
+      "en": "In Kamakura, Kanagawa Prefecture, there is a Great Buddha that sits not under a roof but under the sky. It was once housed in a large building, but since that was lost it is said to have been exposed to rain and snow for many long years. The building that was meant to protect it vanished first, and the statue that was meant to be protected is what remained. Things that have form, however solid they look, crumble away someday. Even so, its figure sitting quietly on looks like an example of being without fear of loss.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n3-dewa-naku", "n4-teiku"]
+    }
+  ],
+  "150": [
+    {
+      "ja": "今回は、十九世紀のイギリスで組まれたフランクリン探検隊の話をします。1845年、北極の海を抜ける航路を探すため、二隻の船が百人以上の乗組員を乗せて出発しました。ところが、船はそのまま行方不明になり、何十年にもわたって手がかりが探され続けたんです。沈んだ船が見つかったのは、なんと2014年と2016年のことでした。極地の厳しさと、人間の楽観の危うさを教えてくれる出来事だと言えます。",
+      "form": "行方不明",
+      "en": "This time I'll talk about the Franklin expedition, which was put together in nineteenth-century Britain. In 1845, two ships set out with more than a hundred crew members to find a route through the Arctic seas. However, the ships went missing just like that, and for decades people kept searching for clues. The sunken ships were found, amazingly, in 2014 and 2016. It is an event that teaches us about the harshness of the polar regions and the danger of human optimism.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「行方不明になる」の形で、人や船などがどこにいるのかわからなくなることを言う。",
+      "sense": "どこにいるのかわからないこと"
+    },
+    {
+      "ja": "認知症が原因で行方不明になったとして警察に届け出があった人は、年間一万人を超えている。その数は、ここ十年ほどで大きく増えた。多くは数日以内に見つかるものの、発見が遅れて命に関わる例もある。専門家は、本人を責めるのではなく、歩き回る背景にある不安や混乱に目を向けることが大切だと指摘する。地域では、道に迷っている様子の人に住民が声をかける練習をする取り組みも広がっている。",
+      "form": "行方不明",
+      "en": "The number of people reported to police as missing because of dementia exceeds ten thousand a year. That number has risen sharply over roughly the past decade. Although most are found within a few days, there are also cases where a delay in finding them puts their lives at risk. Experts point out that rather than blaming the person, it is important to pay attention to the anxiety and confusion behind their wandering. In local communities, efforts in which residents practise speaking to people who seem to have lost their way are also spreading.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "報道では「行方不明者」「行方不明になった〜さん」のように人に使うのが基本。",
+      "grammar": ["n2-mono-no", "n3-dewa-naku", "n5-teiru"],
+      "sense": "どこにいるのかわからないこと"
+    },
+    {
+      "ja": "坐って呼吸を数えはじめると、ほどなく心は行方不明になる。気がつけば、明日の予定や昔の失敗のあいだを、あてもなくさまよっているのである。しかも、心がいなくなったことに、本人はしばらく気づきさえしない。瞑想とは、さまよう心を叱りつけることではなく、いなくなったと気づいた瞬間にそっと呼吸へ連れ戻す、その繰り返しにすぎない。気づいたということそのものが、すでに戻ってきた証なのである。",
+      "form": "行方不明",
+      "en": "When you sit and begin counting your breaths, before long your mind goes missing. Before you know it, it is wandering aimlessly among tomorrow's plans and past failures. What is more, for a while you do not even notice that your mind has gone. Meditation is not scolding the wandering mind but nothing more than the repetition of gently bringing it back to the breath the moment you notice it has gone. The very fact of noticing is already proof that it has come back.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "心や物に使うと、どこへ行ったかわからなくなるという比喩になる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n2-ni-suginai"],
+      "sense": "比喩的に、どこへ行ったかわからなくなること"
+    }
+  ],
+  "151": [
+    {
+      "ja": "仏教がアジアに広まった道というと、シルクロードを思い浮かべる人が多いと思います。でも実は、インドから東南アジアへは、海上の交易路も大きな役割を果たしていたと考えられています。商人の船には僧侶も乗り込み、港町に寺が建てられていきました。季節によって向きが変わるモンスーンをうまく使えば、船は決まった時期に行き来できたんです。つまり、教えは商品と一緒に海を渡ったわけですね。",
+      "form": "海上",
+      "en": "When it comes to the routes by which Buddhism spread across Asia, I think many people picture the Silk Road. But in fact, from India to Southeast Asia, maritime trade routes are also thought to have played a big role. Monks boarded merchants' ships too, and temples were built in the port towns. If they made good use of the monsoon, whose direction changes with the season, ships could come and go at set times of year. In other words, the teaching crossed the sea together with the merchandise.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「海上の交易路」「海上輸送」のように、陸上と対になる言葉として使う。",
+      "grammar": ["n5-teiru", "n4-teiku"]
+    },
+    {
+      "ja": "紅海を通る商船への攻撃が相次いだことを受け、2023年末以降、多くの海運会社がアフリカ南端の喜望峰を回る航路に切り替えた。迂回によって航海の日数は十日から二週間ほど延び、燃料費や保険料の上昇が物価にも影響を与えている。海上輸送は世界の貿易量の八十パーセント以上を担っているとされ、一つの海峡の混乱が、遠く離れた国の暮らしにまで及ぶことになる。物流の急所をどう守るかが、改めて問われている。",
+      "form": "海上",
+      "en": "Following a series of attacks on merchant ships passing through the Red Sea, many shipping companies have switched since the end of 2023 to routes around the Cape of Good Hope at the southern tip of Africa. The detour lengthens voyages by about ten days to two weeks, and rising fuel costs and insurance premiums are also affecting prices. Maritime transport is said to carry more than eighty percent of world trade by volume, so turmoil in a single strait reaches all the way to people's lives in far-off countries. How to protect the weak points of logistics is once again being called into question.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「海上輸送」「海上保安」のように、硬い複合語の頭に付くことが多い。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "夜の海上に出ると、陸では気づかなかった自分の小ささが、急に身にしみる。足もとは絶えず揺れ、頼りにしていた地面というものが、どれほどありがたいものだったかを知るのである。だが、揺れに逆らって体を固くするほど、船酔いはひどくなる。波に合わせて力を抜いたとき、はじめて揺れは敵ではなくなる。心の動揺もまた、力ずくで押さえ込むものではなく、うまく乗りこなすものなのかもしれない。",
+      "form": "海上",
+      "en": "When you go out on the sea at night, your own smallness, which you never noticed on land, suddenly sinks in. The deck sways constantly, and you learn how precious the ground you used to rely on really was. But the more you stiffen your body against the swaying, the worse the seasickness gets. Only when you relax and move with the waves does the swaying stop being your enemy. Perhaps the agitation of the mind, too, is something not to be held down by force but to be ridden skilfully.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "152": [
+    {
+      "ja": "今日は、天気予報がいつから始まったのかというお話です。日本で最初の天気予報が出されたのは、明治時代の1884年のことでした。当時は全国の天気をごく短い文で伝える程度で、交番などに紙を貼り出して知らせていたといわれています。その観測を担っていた中央気象台が、戦後の1956年に格上げされて生まれたのが、今の気象庁です。つまり、私たちが毎朝何気なく見ている予報には、百四十年以上の積み重ねがあるわけです。",
+      "form": "気象庁",
+      "en": "Today's talk is about when weather forecasting began. The first weather forecast in Japan was issued in 1884, in the Meiji era. At the time it amounted to conveying the weather for the whole country in a very short sentence, and it is said that people were informed by notices posted at police boxes and similar places. The Central Meteorological Observatory, which handled those observations, was upgraded in 1956 after the war, and that is how today's Japan Meteorological Agency came into being. In other words, the forecasts we glance at every morning rest on more than one hundred and forty years of accumulated work.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「気象庁」は天気だけでなく、地震や津波、火山の情報も出す国の機関。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "近年、AIを使った天気予報の研究が世界各地で急速に進んでいる。過去の観測データを大量に学ばせることで、物理法則に基づく計算より短い時間で予測を出せる例も出てきた。気象庁もAIを予報に生かす研究を進めているが、まれにしか起きない極端な大雨をどこまで捉えられるかが課題となっている。専門家の間では、AIが計算に取って代わるのではなく、両者を組み合わせて使うことになるとの見方が多い。",
+      "form": "気象庁",
+      "en": "In recent years, research on weather forecasting using AI has been advancing rapidly around the world. By training it on large amounts of past observation data, cases have emerged in which forecasts can be produced in less time than calculations based on the laws of physics. The Japan Meteorological Agency is also pursuing research into using AI for forecasting, but how well it can capture extreme heavy rain that occurs only rarely remains a challenge. Among experts, the prevailing view is that AI will not replace the calculations, but that the two will end up being used in combination.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "ニュースでは「気象庁によると」「気象庁は〜を発表した」の形でよく出てくる。",
+      "grammar": ["n5-teiru", "n3-koto-de", "n3-dewa-naku", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "気象庁が出す降水確率は、ふしぎな数字である。三十パーセントと聞けば、多くの人は傘を持たずに出かけるが、同じ予報が十回出れば三回は雨が降るという意味なのだから、決して小さな値ではない。人は確率を、起きるか起きないかの二択に置き換えて、安心したがる生き物なのだ。だが、未来とはもともと、濃淡のある霧のようなものではないだろうか。その曖昧さを抱えたまま前へ進むことこそ、生きるということなのかもしれない。",
+      "form": "気象庁",
+      "en": "The probability of precipitation issued by the Japan Meteorological Agency is a curious number. Hearing thirty percent, many people go out without an umbrella, but since it means that if the same forecast were issued ten times it would rain three times, it is by no means a small value. Humans are creatures who want to feel safe by turning probabilities into a binary choice between happening and not happening. But isn't the future by its nature something like a fog with lighter and darker patches? Perhaps moving forward while holding that ambiguity is precisely what living means.",
+      "original": true,
+      "register": "論",
+      "topic": "mind"
+    }
+  ],
+  "153": [
+    {
+      "ja": "今日は、八時間労働がどのように広まったのかを見ていきます。1914年、アメリカのフォード社は、工場の労働時間を八時間に短くし、賃金を大きく引き上げました。目的の一つは、きつい仕事に嫌気がさして辞めていく人を減らし、毎朝きちんと出勤してくれる人を確保することだったとされています。結果として辞める人は大きく減り、ほかの企業もこの流れに続くことになりました。働く時間の長さは、昔から生産性と人の心の両方に関わる問題だったわけです。",
+      "form": "出勤",
+      "en": "Today let's look at how the eight-hour working day spread. In 1914, the Ford company in the United States shortened working hours in its factories to eight hours and raised wages substantially. One of the aims is said to have been to reduce the number of people who got fed up with the hard work and quit, and to secure people who would reliably come in to work every morning. As a result, the number of people quitting fell sharply, and other companies came to follow this trend. The length of working hours has long been an issue that bears on both productivity and the human mind.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「出勤する」は勤め先へ行くこと。家から職場への移動そのものは「通勤」、帰るのは「退勤」。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "半導体の工場は、生産ラインを止めないように、二十四時間体制で動いているところが多い。そのため従業員はいくつかの班に分かれた交代制で勤務し、深夜や早朝に出勤する人も少なくない。近年は人手不足を背景に、AIを使って設備の異常を早めに見つけ、夜間の人員を減らす取り組みも広がっている。ただ、機械に任せられる範囲には限りがあり、現場で培われた経験をどう引き継ぐかが課題となっている。",
+      "form": "出勤",
+      "en": "Many semiconductor factories operate around the clock so that production lines do not stop. For this reason employees work in shifts divided into several crews, and quite a few come in to work late at night or early in the morning. In recent years, against the backdrop of labour shortages, efforts to use AI to detect equipment faults early and reduce night-time staffing have also been spreading. However, there are limits to what can be left to machines, and how to pass on the experience built up on the shop floor remains a challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「早朝出勤」「休日出勤」のように、時間や日を表す語と組み合わせることが多い。",
+      "grammar": ["n3-you-ni", "n5-teiru"]
+    },
+    {
+      "ja": "毎朝の出勤を、私たちは仕事が始まる前の、早く過ぎてほしい時間として扱っている。だが禅の寺では、掃除や畑仕事もまた修行とされ、何をするかより、どう向き合うかが問われる。そう考えれば、駅までの道のりも、電車の揺れも、ただ通り過ぎるための空白ではなく、それ自体がひとつの時間なのである。目的地にたどり着くことばかりを急げば、人生の大半は途中として捨てられてしまうだろう。",
+      "form": "出勤",
+      "en": "We treat our morning trip to work as time before work starts that we want to pass quickly. But in Zen temples, cleaning and fieldwork are also regarded as practice, and what matters is less what you do than how you engage with it. Seen that way, the walk to the station and the swaying of the train are not blank spaces just to pass through but a time in their own right. If we hurry only to reach our destination, most of life will be thrown away as merely being on the way.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n5-teiru", "n3-dewa-naku"]
+    }
+  ],
+  "154": [
+    {
+      "ja": "今日は、片付けがなかなか終わらない人に共通する落とし穴についてお話しします。それは、物があふれて困ったとき、まず新しい収納家具を買ってしまうことです。入れる場所が増えると一時的には部屋がすっきりしますが、物の量そのものは変わらないので、しばらくすると元に戻ってしまいます。大事なのは、しまい方を工夫する前に、本当に必要な物を選び直すことなんですね。片付けとは、しまう技術ではなく、自分が何を大切にしたいかを決める作業だというわけです。",
+      "form": "収納家具",
+      "en": "Today I'll talk about a pitfall common to people who never seem to finish tidying up. It's that when things overflow and they're stuck, the first thing they do is buy new storage furniture. When there's more space to put things, the room looks neat for a while, but because the amount of stuff itself hasn't changed, before long it goes back to how it was. What matters is choosing again what you really need before getting clever about how you store it. In other words, tidying up is not a storage technique but the work of deciding what you want to treasure.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "棚・たんす・チェストなど、物をしまう家具をまとめて「収納家具」と言う。",
+      "grammar": ["n3-dewa-naku"]
+    },
+    {
+      "ja": "江戸時代から昭和にかけての収納家具を集めた企画展が、市内の博物館で開かれている。会場には、衣類をしまう箪笥のほか、船の中で貴重品を守るために作られた頑丈な船箪笥などが並ぶ。船箪笥は、船が沈んでも水に浮いて流れ着くように、すき間なく作られていたとも伝えられる。学芸員によると、箪笥が庶民の家にも広まったのは江戸時代の中ごろ以降で、持ち物が増えていく暮らしの変化を映しているという。来場者は、細かな金具の飾りに熱心に見入っていた。",
+      "form": "収納家具",
+      "en": "An exhibition bringing together storage furniture from the Edo period through the Showa era is being held at a museum in the city. On display are chests of drawers for storing clothes, as well as sturdy ship's chests made to protect valuables aboard ships. Ship's chests are also said to have been built without gaps so that, even if the ship sank, they would float and wash ashore. According to the curator, it was from around the middle of the Edo period onward that chests of drawers spread into ordinary people's homes too, reflecting changes in a way of life in which possessions kept increasing. Visitors gazed intently at the fine metal fittings.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "grammar": ["n5-teiru", "n3-you-ni", "n4-teiku"]
+    },
+    {
+      "ja": "家が狭くなったと感じるとき、私たちはまず収納家具を買い足すことを考える。だが、しまう場所を増やすことは、持ち物を手放さずにすませるための工夫にすぎない場合もある。仏教が執着を苦しみの原因と見たのは、物そのものを悪としたからではない。いつか使うかもしれないという不安が、心の中にも見えない棚を作り、そこに重荷を積み上げていくからである。部屋を軽くすることは、心を軽くする練習でもあるのだろう。",
+      "form": "収納家具",
+      "en": "When we feel our home has become cramped, the first thing we think of is buying more storage furniture. But adding places to put things away is sometimes nothing more than a device for avoiding letting go of our belongings. Buddhism saw attachment as the cause of suffering not because it held things themselves to be evil. It is because the anxiety that we might use something someday builds invisible shelves in the mind too, and piles burdens onto them. Lightening a room is probably also practice for lightening the mind.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n2-ni-suginai", "n4-teiku"]
+    }
+  ]
+}
