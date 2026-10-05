@@ -1481,7 +1481,6 @@
     "km-322|kanji|bcb88915d1d7|0": "km-322-m02",
     "km-322|word|a7f9ec72c32d": "km-322-m03",
     "km-322|word|f2961465d872": "km-322-m04",
-    "km-071|word|6f48f8c7b281": "km-071-m06",
     "km-071|word|cfc9ba359bde": "km-071-m07",
     "km-071|word|2c89d6fbe5a0": "km-071-m08",
     "km-183|word|6fbcf228fffc": "km-183-m05",
@@ -1495,15 +1494,11 @@
     "km-185|word|4bef1616642c": "km-185-m06",
     "km-060|word|f818e490177d": "km-060-m04",
     "km-060|word|11085bdea6a8": "km-060-m05",
-    "km-087|word|ad85f9ddd6c9": "km-087-m06",
-    "km-087|word|6a1ff4dece08": "km-087-m07",
     "km-087|word|8236dc34967a": "km-087-m08",
     "km-178|word|fa18d3fb0255": "km-178-m06",
-    "km-178|word|45bc7c6d16b0": "km-178-m07",
     "km-178|word|493a0a50bd9d": "km-178-m08",
     "km-130|word|584d59b21889": "km-130-m06",
     "km-130|word|aa89cb54e46d": "km-130-m07",
-    "km-130|word|716bd252270f": "km-130-m08",
     "km-013|word|f9c73572342b": "km-013-m04",
     "km-013|word|b97f7fc6fa61": "km-013-m05",
     "km-013|word|7ccb0061749a": "km-013-m06",
@@ -1531,7 +1526,15 @@
     "km-199|word|c93cfed97f8d": "km-199-m08",
     "km-027|word|37187f5cf009": "km-027-m05",
     "km-027|word|c87b5c503ca6": "km-027-m06",
-    "km-027|word|67922a67113d": "km-027-m07"
+    "km-027|word|67922a67113d": "km-027-m07",
+    "km-071|word|b29994fdda0d": "km-071-m09",
+    "km-204|word|c0798bd19cd6": "km-204-m07",
+    "km-087|word|67e59bfd76b3": "km-087-m09",
+    "km-087|word|ea45fccbce9f": "km-087-m10",
+    "km-178|word|c3c0c824d446": "km-178-m09",
+    "km-130|word|87c04484ab94": "km-130-m09",
+    "km-023|word|5ee7bc263a07": "km-023-m07",
+    "km-222|word|76d8bcc3707c": "km-222-m07"
   },
   "kotoba-mine": {
     "km-064|sentence|a070f013618f": "km-064-1",
@@ -2503,6 +2506,26 @@
       {
         "key": "km-197|kanji|899c8cd3e8da|1",
         "id": "km-197-m03"
+      },
+      {
+        "key": "km-071|word|6f48f8c7b281",
+        "id": "km-071-m06"
+      },
+      {
+        "key": "km-087|word|ad85f9ddd6c9",
+        "id": "km-087-m06"
+      },
+      {
+        "key": "km-087|word|6a1ff4dece08",
+        "id": "km-087-m07"
+      },
+      {
+        "key": "km-178|word|45bc7c6d16b0",
+        "id": "km-178-m07"
+      },
+      {
+        "key": "km-130|word|716bd252270f",
+        "id": "km-130-m08"
       }
     ],
     "kotoba-mine": []

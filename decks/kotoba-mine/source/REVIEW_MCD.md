@@ -72,7 +72,10 @@ before it is added. A failure means a rewrite, not a patch:
    `docs/srs/n2n1/`. Each `grammar` id must be one of
    `prototypes/corridor/data/original/grammar-v11.json` and must actually occur in a form its
    cues match (咲かせることにもなります does not match ことになる).
-4. **One target**: the target once; no other deck word.
+4. **One target**: the target once; no other deck word. `export_mcd.py` checks this mechanically
+   (below): it tokenises the passage as `build.py` does and refuses any of the 323 deck terms it
+   finds, so a word such as 性能, 設計, 競う (競っている), 財政, 正直 or 割 (九割) has to be swapped
+   (戦費の負担, ぶっちゃけ, 力を入れている, 九十パーセント).
 5. **Context does work**: shown the passage with the target blanked, a reader names its sense.
    A blank that 短絡的に or すぐ fills just as well fails.
 
@@ -98,7 +101,7 @@ sentences as the Japanese**, so the back can show the target sentence's 英訳 (
       "topic": "history",
       "tipJa": "「技術・言語を習得する」のように、時間をかけて身につける技能に使う。",
       "grammar": ["n3-koto-ni-naru", "n3-dewa-naku"],
-      "sense": ""
+      "sense": "技術や知識を学んで、自分のものにすること。"
     }
   ]
 }
@@ -110,8 +113,13 @@ sentences as the Japanese**, so the back can show the target sentence's 英訳 (
   is shown in tier one of the back (contract §3 item 4), so it says what this passage shows
   about the word: its partners, its register, the sense.
 - `grammar`: the grammar-v11 ids the passage exercises (may be empty).
-- `sense`: which sense the passage uses, for words with more than one (光が一瞬光る for
-  ひらめく as lightning); empty otherwise.
+- `sense`: the dictionary sense the passage uses (contract §3 item 3), one Japanese
+  dictionary-style line of at most 40 characters, no Latin letters (海面や地表から測った高さ。 for
+  高度 as altitude; 光が一瞬鋭く光る。稲妻などがきらめく。 for ひらめく as lightning). Write it for a
+  word with more than one sense; it may be empty otherwise. Never English.
+- `allow` and `allowReason` (rare): when another deck word is unavoidable (it is already in
+  review, or no other word says it), list it in `allow` (`["性能"]`) and say why in `allowReason`.
+  An allow the passage does not need is refused. Neither field reaches the cards.
 
 A real (mined) passage takes the same optional fields and no `original`.
 
@@ -127,8 +135,13 @@ python3 decks/kotoba-mine/tools/build.py               # once, not frozen: mints
 `export_mcd.py` stops on a real passage that is not a candidate, a written passage with a
 space, a `form` not in its `ja`, a written passage over 300 characters or 5 sentences, a v2
 passage (one with a `register`) outside 4–5 sentences and 180–300 characters, a target that does
-not appear exactly once, an English translation with a different sentence count, or an optional
-field that breaks its rule. Then check the furigana of every new passage and add the fixes to
+not appear exactly once, an English translation with a different sentence count, an optional
+field that breaks its rule (a `sense` in English or over 40 characters), or another deck word in a
+v2 passage (check 4). For check 4 it tokenises the passage with the corridor's tokeniser
+(fugashi + UniDic) and joins compounds as `build.py` does, so 半導体 is one word and not 半 + the
+deck word 導体; a run of up to six tokens outside the target matches a deck term (or a spelling in
+`tools/rank.py` `VARIANTS`) by its surface (kana words, compounds such as 生得的) or by its
+dictionary form (競っ → 競う, ひらめい → ひらめく). Then check the furigana of every new passage and add the fixes to
 `source/readings.json` (scoped to the new card ids), add the passages' lemmas to
 `source/gloss_ja.json`, and run the gates (`docs/srs/HANDOFF_2026-10-04.md`, "Passage pilot
 landed").

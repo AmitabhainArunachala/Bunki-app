@@ -746,11 +746,12 @@ function verifyPilotData(deck) {
     if (typeof c.tipJa !== 'string' || !c.tipJa || /[A-Za-z]/.test(c.tipJa)) bad.push(`${c.id}: tipJa`);
     if (!c.enTarget || !c.en.includes(c.enTarget)) bad.push(`${c.id}: no target-sentence English`);
     if (c.grammar && !c.grammar.every((g) => g.id && g.p)) bad.push(`${c.id}: grammar`);
+    if (c.sense != null && (typeof c.sense !== 'string' || !c.sense || c.sense.length > 40 || /[A-Za-z]/.test(c.sense))) bad.push(`${c.id}: sense`);
   }
   const words = [...new Set(cards.map((c) => c.word.id))];
   check(
-    'pilot: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note and its target sentence’s English',
-    cards.length >= 51 && bad.length === 0,
+    'pilot: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note, a Japanese sense where it names one, and its target sentence’s English',
+    cards.length >= 54 && bad.length === 0,
     bad.slice(0, 4).join(' | ') || `${cards.length} cards · ${words.length} words · ${Object.keys(REGISTERS).map((r) => `${r}${cards.filter((c) => c.register === r).length}`).join(' ')}`,
   );
   const same = words.filter((wid) => {

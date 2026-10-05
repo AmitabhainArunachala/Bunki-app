@@ -22,7 +22,8 @@ are dropped, so old records need none of them:
   topic     one of TOPICS (§6's four topics, plus 言語 for Japanese about Japanese)
   tipJa     one Japanese line, the passage's usage note (tier one, §3 item 4)
   grammar   grammar-v11.json ids the passage exercises (§7 check 3); an unknown id fails
-  sense     the sense the passage uses, for words with more than one (§5)"""
+  sense     the sense the passage uses (§3 item 3, §5): one Japanese dictionary-style line of at
+            most SENSE_MAX characters, no Latin letters"""
 import glob
 import json
 import re
@@ -35,7 +36,7 @@ SRC = DECK / "source"
 
 sys.path.insert(0, str(DECK / "tools"))
 from rank import VARIANTS  # noqa: E402
-from build import en_sentences, sentence_ends  # noqa: E402
+from build import _merge_compounds, en_sentences, sentence_ends  # noqa: E402
 from rights import UNVERIFIED  # noqa: E402
 
 REGISTERS = ("講", "報", "論", "話", "学", "語")
@@ -46,8 +47,15 @@ SENTENCES_MAX = 5
 V2_MIN = 180
 V2_SENTENCES = (4, 5)
 TIP_MAX = 80
+SENSE_MAX = 40  # the sense line on the back (CARD_CONTRACT_V2 §3 item 3), the same ceiling as gloss_ja.json
 GRAMMAR = {e["id"] for e in json.loads((DECK.parents[1] / "prototypes" / "corridor" / "data" / "original" / "grammar-v11.json")
                                        .read_text("utf-8"))["entries"]}
+
+
+def japanese_line(text, limit: int) -> bool:
+    """one trimmed line of at most `limit` characters, with Japanese in it and no Latin letters"""
+    return (isinstance(text, str) and text.strip() == text and "\n" not in text and len(text) <= limit
+            and not re.search(r"[A-Za-z]", text) and bool(re.search(r"[ぁ-んァ-ヶ一-鿿]", text)))
 
 
 def optional(n: str, r: dict) -> dict:
@@ -59,8 +67,7 @@ def optional(n: str, r: dict) -> dict:
     if "topic" in got and got["topic"] not in TOPICS:
         raise SystemExit(f"{where} topic {got['topic']!r} is not one of {', '.join(TOPICS)}")
     tip = got.get("tipJa")
-    if tip is not None and not (isinstance(tip, str) and tip.strip() == tip and "\n" not in tip and len(tip) <= TIP_MAX
-                                and not re.search(r"[A-Za-z]", tip) and re.search(r"[ぁ-んァ-ヶ一-鿿]", tip)):
+    if tip is not None and not japanese_line(tip, TIP_MAX):
         raise SystemExit(f"{where} tipJa must be one Japanese line of at most {TIP_MAX} characters, no Latin letters")
     if "grammar" in got:
         g = got["grammar"]
@@ -68,8 +75,10 @@ def optional(n: str, r: dict) -> dict:
         if unknown:
             raise SystemExit(f"{where} grammar ids not in grammar-v11.json: {', '.join(map(str, unknown))}")
         got["grammar"] = list(dict.fromkeys(g))
-    if "sense" in got and not isinstance(got["sense"], str):
-        raise SystemExit(f"{where} sense must be a string")
+    sense = got.get("sense")
+    if sense is not None and not japanese_line(sense, SENSE_MAX):
+        raise SystemExit(f"{where} sense must be one Japanese dictionary-style line of at most {SENSE_MAX} characters, "
+                         "no Latin letters")
     return got
 
 
@@ -95,6 +104,72 @@ def check_written(n: str, r: dict) -> None:
             raise SystemExit(f"{where} the English has {e} sentences, the Japanese {k}: they must match")
 
 
+TERM_SPAN = 6  # tokens a deck term may span: 下敷き+に+なる, 磁気+共鳴+断層+撮影
+_TAGGER = None
+_TERMS: dict[str, tuple[str, set[str]]] | None = None
+
+
+def deck_terms() -> dict[str, tuple[str, set[str]]]:
+    """entry number → (the deck term, its spellings with rank.VARIANTS): all 323 words of the list"""
+    global _TERMS
+    if _TERMS is None:
+        _TERMS = {str(e["n"]): (e["term"], {e["term"], *VARIANTS.get(e["term"], [])})
+                  for e in json.loads((SRC / "entries.json").read_text("utf-8"))}
+    return _TERMS
+
+
+def other_terms(n: str, ja: str, form: str) -> dict[str, str]:
+    """the other deck words a passage uses (CARD_CONTRACT_V2 §7 check 4), as {term: surface}.
+    The passage is tokenised as build.py tokenises it (the corridor's fugashi + UniDic, then
+    build._merge_compounds, so 半導体 is one word and not 半 + the deck word 導体); a run of up
+    to TERM_SPAN tokens outside the target matches a term when its surface spells the term (kana
+    words, uninflected words, compounds such as 生得+的) or its surface up to the last token plus
+    that token's dictionary form does (inflected words: 競っ → 競う, ひらめい → ひらめく)."""
+    global _TAGGER
+    import build_corridor as bc
+
+    if _TAGGER is None:
+        from corpus.grading._mecab import get_tagger
+
+        _TAGGER = get_tagger()
+    a = ja.index(form)
+    b = a + len(form)
+    tokens = _merge_compounds(bc.tokenise(ja, _TAGGER), [(a, b)])
+    spans, pos = [], 0
+    for t in tokens:
+        i = ja.find(t["s"], pos)
+        spans.append((i, i + len(t["s"])))
+        pos = i + len(t["s"])
+    own = deck_terms()[n][1]
+    by_spelling = {k: term for m, (term, ks) in deck_terms().items() if m != n for k in ks if k not in own}
+    hits: dict[str, str] = {}
+    for i in range(len(tokens)):
+        for j in range(i, min(i + TERM_SPAN, len(tokens))):
+            if spans[j][1] > a and spans[i][0] < b:
+                break  # the run reaches the target
+            surface = "".join(t["s"] for t in tokens[i:j + 1])
+            lemma = "".join(t["s"] for t in tokens[i:j]) + (tokens[j].get("b") or tokens[j]["s"])
+            for k in (surface, lemma):
+                if k in by_spelling:
+                    hits.setdefault(by_spelling[k], surface)
+    return hits
+
+
+def check_one_target(n: str, r: dict) -> None:
+    """§7 check 4: a contract-v2 written passage uses no other deck word, unless it lists the word
+    in `allow` and says why in `allowReason` (the word is already in review, or nothing else fits)"""
+    where = f"{n}: {r['ja'][:24]}…"
+    allow = r.get("allow", [])
+    reason = r.get("allowReason", "")
+    if not isinstance(allow, list) or (allow and not (isinstance(reason, str) and reason.strip())):
+        raise SystemExit(f"{where} allow must be a list of deck terms with an allowReason")
+    hits = other_terms(n, r["ja"], r["form"])
+    if bad := [f"{t}（{s}）" for t, s in hits.items() if t not in allow]:
+        raise SystemExit(f"{where} uses other deck words: {'、'.join(bad)}; swap them, or list them in allow with an allowReason")
+    if stale := [t for t in allow if t not in hits]:
+        raise SystemExit(f"{where} allow lists {'、'.join(map(str, stale))}, which the passage does not use")
+
+
 def batch_order(path: str) -> tuple[str, str]:
     """undated files first, then dated batches by date"""
     m = re.search(r"\d{4}-\d{2}-\d{2}", Path(path).name)
@@ -105,6 +180,8 @@ def written_record(n: str, r: dict) -> dict:
     """a written passage as mcd.json holds it, after its checks"""
     extra = optional(n, r)
     check_written(n, r)
+    if r.get("register"):
+        check_one_target(n, r)
     return {"ja": r["ja"], "form": r["form"], "en": r["en"], "kind": "original",
             "site": "書き下ろし（このデッキ用）", "url": "", "licence": "Bunki original", "title": "", **extra}
 

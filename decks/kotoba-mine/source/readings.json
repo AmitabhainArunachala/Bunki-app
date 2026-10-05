@@ -169,7 +169,7 @@
       "reading": "なに",
       "after": "",
       "before": "か",
-      "cards": ["km-017-m09", "km-283-m08", "km-087-m06"],
+      "cards": ["km-017-m09", "km-283-m08", "km-087-m09"],
       "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何か (something / what is it), not なん"
     },
     {
@@ -203,6 +203,38 @@
       "before": "の取り方",
       "cards": ["km-117-m06"],
       "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 間の取り方 (pausing in speech), not あいだ"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "不自由",
+      "cards": ["km-027-m05"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何不自由ない暮らし (なにふじゆう), not なん"
+    },
+    {
+      "surface": "一点",
+      "reading": "いってん",
+      "after": "を",
+      "before": "に",
+      "cards": ["km-060-m05"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 心を一点にまとめる: one point (UniDic splits 一 and 点 and reads いち てん)"
+    },
+    {
+      "surface": "家",
+      "reading": "け",
+      "after": "メディチ",
+      "before": "",
+      "cards": ["km-204-m07"],
+      "note": "refill passage (source/mcd/pilot-2026-10-04.json): メディチ家, a family name + 家 (け), not the か of 銀行家"
+    },
+    {
+      "surface": "都",
+      "reading": "みやこ",
+      "after": "",
+      "before": "を離れ",
+      "cards": ["km-222-m07"],
+      "note": "refill passage (source/mcd/pilot-2026-10-04.json): 都を離れ, the capital (みやこ), not the と of 東京都"
     }
   ]
 }
