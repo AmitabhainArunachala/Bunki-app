@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as api from '../vendor/ts-fsrs.mjs';
 import {createEngine} from '../decks/personal/engine.mjs';
-import {validateCollection,parseImport,backup,digest,safeURL} from '../decks/personal/schema.mjs';
-import {fixture} from './personal-fixture.mjs';
+import {validateCollection,validateEnrichment,parseImport,backup,digest,safeURL} from '../decks/personal/schema.mjs';
+import {mergeEnrichment} from '../decks/personal/enrichment.mjs';
+import {fixture,enrichmentFixture} from './personal-fixture.mjs';
 
 const data = await fixture(), engine = createEngine(data,api), checks=[];
 const test = async (name,fn) => { await fn(); checks.push(name); };
@@ -14,6 +15,36 @@ const one=engine.grade(fresh(),first.id,3,id(),1000,now);
 await test('original collection and exported bundle validate',async()=>{
   assert.equal((await validateCollection(data)).id,data.id);
   assert.equal((await parseImport(backup({collection:data,progress:one}))).progress.events.length,1);
+});
+await test('answer enrichment binds to original text without changing assessment IDs, hashes or history',async()=>{
+  const enrichment=await enrichmentFixture(data), original=JSON.stringify(data);
+  assert.equal((await validateEnrichment(enrichment,data)).lessons.length,8);
+  const enriched={...data,enrichment};await validateCollection(enriched);
+  assert.equal(enriched.contentDigest,data.contentDigest);
+  assert.equal(JSON.stringify(data),original);
+  assert.deepEqual(createEngine(enriched,api).cards.map(c=>c.id),engine.cards.map(c=>c.id));
+  const restored=await parseImport(backup({collection:data,progress:one,enrichment}));
+  assert.deepEqual(restored.progress.events,one.events);assert.deepEqual(restored.enrichment,enrichment);
+  assert.deepEqual((await parseImport(enrichment)).enrichment,enrichment);
+});
+await test('bad readings, changed text, missing kanji coverage and incorrect edition bindings reject atomically',async()=>{
+  const enrichment=await enrichmentFixture(data);
+  for(const mutate of [e=>e.collectionId='foreign',e=>e.contentDigest='a'.repeat(64),e=>e.lessons[0].contentHash='b'.repeat(64),e=>e.lessons[0].segments[0].text='村',e=>delete e.lessons[0].segments[0].reading,e=>e.lessons[0].segments[0].reading='not kana',e=>e.lessons[1].id=e.lessons[0].id]) {
+    const bad=structuredClone(enrichment);mutate(bad);
+    const {enrichmentHash,...content}=bad;bad.enrichmentHash=await digest(content);
+    await assert.rejects(()=>validateEnrichment(bad,data));
+  }
+  const changed=structuredClone(enrichment);changed.lessons[0].explanationJa+='別の説明。';
+  await assert.rejects(()=>validateEnrichment(changed,data),/integrity/);
+});
+await test('answer revisions cannot downgrade or silently replace conflicting saved explanations',async()=>{
+  const current=await enrichmentFixture(data);
+  assert.deepEqual(mergeEnrichment(current,undefined),current);
+  assert.deepEqual(mergeEnrichment(current,structuredClone(current)),current);
+  assert.throws(()=>mergeEnrichment(current,{...current,enrichmentHash:'a'.repeat(64)}),/older or conflicts/);
+  const next={...current,revision:2,enrichmentHash:'b'.repeat(64)};
+  assert.equal(mergeEnrichment(current,next).revision,2);
+  assert.throws(()=>mergeEnrichment(next,current),/older or conflicts/);
 });
 await test('reject malformed input, tampering, duplicate identities, unsafe sources and foreign references',async()=>{
   for (const value of [{},null,[],{...data,version:2}]) await assert.rejects(()=>parseImport(value));
@@ -87,7 +118,7 @@ await test('private route and all module dependencies are packaged and precached
   const pipeline=readFileSync(new URL('../../../scripts/corridor-assets.mjs',import.meta.url),'utf8');
   const smoke=readFileSync(new URL('../../../.github/workflows/ci.yml',import.meta.url),'utf8');
   const corridor=readFileSync(new URL('../corridor.js',import.meta.url),'utf8');
-  for(const file of ['mount.mjs','engine.mjs','schema.mjs','store.mjs','personal.css']) {
+  for(const file of ['mount.mjs','engine.mjs','schema.mjs','store.mjs','enrichment.mjs','host-bridge.mjs','personal.css']) {
     assert(sw.includes(`decks/personal/${file}`)); assert(pipeline.includes(`decks/personal/${file}`)); assert(smoke.includes(`decks/personal/${file}`));
   }
   assert(sw.includes('vendor/ts-fsrs.mjs')); assert(sw.includes('fonts.css'));

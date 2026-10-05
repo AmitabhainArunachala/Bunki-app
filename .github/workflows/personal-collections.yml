@@ -36,9 +36,14 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium webkit
       - run: node prototypes/corridor/tools/test-personal-collections.mjs
+      - run: node --test prototypes/corridor/decks/personal/tests/host-bridge.test.mjs
       - run: node prototypes/corridor/tools/verify-personal-collections.mjs
         env:
           PERSONAL_QA_OUT: ${{ runner.temp }}/personal-collections
+      - run: node prototypes/corridor/tools/verify-personal-host.mjs
+      - run: node prototypes/corridor/tools/verify-personal-host.mjs
+        env:
+          PERSONAL_HOST_BROWSER: webkit
       - uses: actions/upload-artifact@v4
         if: always()
         with:
