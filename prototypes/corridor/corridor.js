@@ -4112,7 +4112,7 @@ async function boot() {
   setKairoTheme(themeId());
   // A private collection boots from the cached app shell alone. Its content
   // arrives through the learner's file picker, never a public repository URL.
-  if (params.get('deck') === 'personal') {
+  if (params.get('deck') === 'personal' && window.__CORRIDOR_STANDALONE__ !== true) {
     S.view = 'personaldeck';
     document.body.dataset.view = 'personaldeck';
     window.__DRIFT__?.hide();
@@ -21774,11 +21774,13 @@ function renderDojoDecks(main) {
     b.addEventListener('click', onClick);
     list.append(b);
   };
-  row('personal', '私の文脈', tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
-    const url = new URL(location.href);
-    url.searchParams.set('deck', 'personal');
-    location.assign(url);
-  });
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    row('personal', '私の文脈', tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
+      const url = new URL(location.href);
+      url.searchParams.set('deck', 'personal');
+      location.assign(url);
+    });
+  }
   for (const d of DOJO_DECKS) {
     const sum = deckSummaries[d.id];
     if (!sum && window.__CORRIDOR_STANDALONE__ !== true) {
