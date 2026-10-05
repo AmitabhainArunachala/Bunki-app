@@ -2958,6 +2958,9 @@ window.addEventListener('storage', (e) => {
  * Patch values must be constructed off-side; mutating a live nested value
  * before this call would defeat the write-before-publish boundary. */
 async function commitStorePatch(patch, appendArchive = []) {
+  // Private lookup can capture canonical entries, but cannot grade or rewrite learning evidence.
+  const host = typeof personalHost === 'undefined' ? null : personalHost;
+  if (host && (!host.allowed() || appendArchive.length)) return false;
   const epoch = recordEpoch;
   if (!recordWritable(epoch) || !recordApp) { safelySyncStoreAlert(); return false; }
   // An older object-style caller may only replace roots it actually saw.
@@ -2967,11 +2970,15 @@ async function commitStorePatch(patch, appendArchive = []) {
     const proposed = typeof patch === 'function' ? patch : JSON.parse(JSON.stringify(patch));
     const outcome = await recordApp.write((record, snapshot) => {
       if (!recordWritable(epoch)) throw new Error('record-owner-changed');
+      if (host && !host.allowed()) throw new Error('personal-capture-not-allowed');
       if (typeof proposed !== 'function') for (const key of Object.keys(proposed)) {
         if (canonicalRecordJson(record[key]) !== canonicalRecordJson(baseline[key]))
           throw Object.assign(new Error('stale-ui-patch'), { code: 'stale-ui-patch' });
       }
-      return { patch: typeof proposed === 'function' ? proposed({ ...DEFAULT_LEARNER_RECORD, ...record }, snapshot) : proposed,
+      const nextPatch = typeof proposed === 'function' ? proposed({ ...DEFAULT_LEARNER_RECORD, ...record }, snapshot) : proposed;
+      if (host && (!host.allowed() || Object.keys(nextPatch).some(key => !['taken', 'lists', 'deepWords'].includes(key))))
+        throw new Error('personal-capture-not-allowed');
+      return { patch: nextPatch,
         ...(appendArchive.length ? { appendArchive } : {}) };
     });
     if (outcome.status !== 'active') { recordFailure(outcome.reason, true); return false; }
@@ -3281,6 +3288,142 @@ function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
 }
 
 const D = {};
+let personalHost = null;
+
+/** The private collection keeps its mounted DOM through all host rerenders.
+ * Shared dictionary sheets and the real learner store live in a sibling layer. */
+async function personalDictionaryBridge(container) {
+  const { createHostBridge } = await import('./decks/personal/host-bridge.mjs');
+  const overlay = el('div', 'personal-host-overlay');
+  overlay.id = 'personal-host-overlay';
+  let access = null, finish = null, invoker = null, scroll = 0;
+  const allowed = () => typeof access === 'function' && access() === true;
+  const close = () => {
+    if (!finish) return;
+    const roomOwnsHistory = S.strokes?.historyToken && history.state?.bunkiStrokeRoom?.token === S.strokes.historyToken;
+    if (S.strokes) { cancelStrokeAnimation(); stopInkRoom(); S.strokes = null; }
+    S.stack = []; S.listMenuFor = null; S.sheetListMaker = false;
+    closeVocabularyListPopover(); hideReaderToast();
+    S.dialogInvoker = null; S.sheetFocus = null; S.sheetReturnFocus = null; S.sheetScrollRestore = null;
+    overlay.replaceChildren();
+    for (const child of container.children) {
+      if (child === overlay) continue;
+      child.inert = false; child.removeAttribute('aria-hidden');
+    }
+    access = null;
+    const resolve = finish; finish = null;
+    window.scrollTo(0, scroll);
+    if (invoker?.isConnected) invoker.focus({ preventScroll: true });
+    invoker = null;
+    if (roomOwnsHistory) {
+      walkConsuming = true;
+      history.go(walkArmed ? -2 : -1);
+    } else syncWalkSentinel();
+    resolve?.();
+  };
+  const paint = () => {
+    if (!S.stack.length || !allowed()) { if (finish) close(); return; }
+    if (vocabularyListNode && vocabularyListNode !== S.stack.at(-1)) closeVocabularyListPopover();
+    const popoverFocus = document.getElementById('vocabulary-list-popover')?.contains(document.activeElement) ? document.activeElement : null;
+    const currentY = window.scrollY;
+    overlay.replaceChildren();
+    renderSheet(overlay); renderStrokePage(overlay);
+    const sheet = overlay.querySelector('#sheet');
+    if (sheet) {
+      const candidates = [...sheet.querySelectorAll('.senses, .gloss, .hero-mean, .example-en, .grammar-note, .sem-note, .sense-pos')];
+      const meanings = candidates.filter(node => !candidates.some(parent => parent !== node && parent.contains(node)));
+      if (meanings.length) {
+        const entry = S.stack.at(-1);
+        const disclosure = el('details', 'personal-dictionary-meaning');
+        disclosure.append(el('summary', null, '意味・英訳を見る / Show meaning & English'));
+        disclosure.open = !!entry.dictionaryMeaningOpen;
+        disclosure.addEventListener('toggle', () => { if (disclosure.isConnected) entry.dictionaryMeaningOpen = disclosure.open; });
+        disclosure.append(...meanings);
+        sheet.insertBefore(disclosure, sheet.children[2] || null);
+      }
+    }
+    for (const child of container.children) {
+      if (child === overlay) continue;
+      child.inert = true; child.setAttribute('aria-hidden', 'true');
+    }
+    for (const child of overlay.children) {
+      const live = S.strokes ? child.id === 'stroke-page' : child.id === 'sheet' || child.classList.contains('scrim');
+      child.inert = !live;
+      if (!live) child.setAttribute('aria-hidden', 'true');
+    }
+    // Search is a host-page navigation, so keep lookup recursive inside the
+    // entry stack here. It must never replace the private collection surface.
+    overlay.querySelector('#sheet-search')?.remove();
+    overlay.querySelectorAll('[data-reference-door]').forEach(door => door.remove());
+    if (vocabularyListNode) {
+      vocabularyListInvoker = overlay.querySelector('#personal-add-list');
+      vocabularyListInvoker?.setAttribute('aria-expanded', 'true');
+      queueMicrotask(() => { if (popoverFocus?.isConnected) popoverFocus.focus({ preventScroll: true }); });
+    }
+    window.scrollTo(0, currentY);
+    safelySyncStoreAlert();
+    syncWalkSentinel();
+  };
+  const stale = event => {
+    if (allowed()) return;
+    event.preventDefault(); event.stopImmediatePropagation(); close();
+  };
+  overlay.addEventListener('click', stale, true);
+  overlay.addEventListener('keydown', stale, true);
+  personalHost = { allowed, paint, close };
+  let loaded = null, forms = null;
+  async function load() {
+    if (loaded) return loaded;
+    const asset = async (pool, name) => {
+      const bundled = window.__CORRIDOR_BUNDLE__?.[`${pool}/${name}`];
+      if (bundled) return bundled;
+      const response = await fetch(new URL(`data/${pool}/${name}.json`, document.baseURI));
+      if (!response.ok) throw new Error('The packaged dictionary is not available offline yet. Reconnect once to load it.');
+      return response.json();
+    };
+    loaded = Promise.all([
+      asset('proprietary_safe', 'kanken'), asset('proprietary_safe', 'sem'),
+      ...DATA.sa.map(name => asset('share_alike', name)), asset('original', 'grammar-v11'),
+    ]).then(([kanken, sem, kanji, words, idioms, dict, strokes, radicals, grammar]) => {
+      Object.assign(D, {
+        passages: [], kanken: kanken.levels, sem: sem.edges, kanji: kanji.kanji,
+        radicals: kanji.radicals, words: words.words, dict: dict.words,
+        strokes: strokes.strokes, kmeta: strokes.meta, radInfo: radicals,
+        idioms: Object.fromEntries(idioms.idioms.map(i => [i.w, i])), idiomsByKanji: idioms.byKanji,
+        grammar: mergeGrammar(grammar.entries), kanjiWords: {}, wordCap: 24,
+        dictionaryState: 'core', dictionaryMode: 'core', dictionaryShards: new Map(), dictionaryDetails: new Map(),
+        dictionaryBySeq: new Map(), dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(),
+        dictionarySearchCache: new Map(), dictionarySearchPending: new Map(), dictionarySearchErrors: new Map(),
+        radByGlyph: {},
+      });
+      for (const radical of Object.values(radicals)) {
+        D.radByGlyph[radical.c] = radical;
+        if (radical.var) D.radByGlyph[radical.var] = radical;
+      }
+      forms = new Map();
+      for (const [word, record] of Object.entries(D.dict)) {
+        for (const c of record.k || [...word].filter(c => D.kanji[c])) (D.kanjiWords[c] ||= []).push(word);
+        for (const [, , form] of conjugations(word, record.p) || []) {
+          if (!forms.has(form)) forms.set(form, word);
+          if (form.endsWith('ます')) for (const suffix of ['ました', 'ません', 'ませんでした']) forms.set(form.slice(0, -2) + suffix, word);
+        }
+      }
+    }).catch(error => { loaded = null; throw error; });
+    return loaded;
+  }
+  return createHostBridge({
+    load, lookup, grammars: GRAMMARS, particles: () => PARTICLES,
+    kanji: c => !!D.kanji?.[c], baseFor: word => D.dict?.[word] ? word : forms?.get(word),
+    open(node, options) {
+      if (finish) close();
+      if (options.canInteract() !== true) return Promise.reject(new Error('Reveal the answer before opening the dictionary.'));
+      access = options.canInteract; invoker = options.invoker || document.activeElement; scroll = window.scrollY;
+      if (!overlay.isConnected) container.append(overlay);
+      S.view = 'personaldeck'; S.stack = [node];
+      return new Promise(resolve => { finish = resolve; paint(); });
+    }, close,
+  });
+}
 let fsrsApi = null;
 let scheduler = null;
 /** The exact generator parameters the scheduler was built with — kept so the
@@ -3374,6 +3517,8 @@ async function startDictionaryWorker() {
     else request.reject(new Error(message.error || `dictionary worker ${request.type} failed`));
   });
   dictionaryWorker.addEventListener('error', (event) => {
+    // Reject pending requests into the entry's retry UI instead of bubbling an uncaught worker error.
+    event.preventDefault();
     stopDictionaryWorker(new Error(event.message || 'dictionary worker failed'));
   });
   return dictionaryWorker;
@@ -3960,10 +4105,13 @@ async function boot() {
   // A private collection boots from the cached app shell alone. Its content
   // arrives through the learner's file picker, never a public repository URL.
   if (params.get('deck') === 'personal') {
+    S.view = 'personaldeck';
     document.body.dataset.view = 'personaldeck';
     window.__DRIFT__?.hide();
     const personal = await import('./decks/personal/mount.mjs');
+    const bridge = await personalDictionaryBridge($('#app'));
     await personal.mount($('#app'), {
+      bridge,
       themes: PUBLIC_THEME_IDS.map((id) => THEME_UI.find((t) => t.id === id)),
       currentTheme: themeId(),
       onTheme: setKairoTheme,
@@ -4480,6 +4628,7 @@ function returnFromNavigation() {
 }
 
 function go(node, { invoker = null } = {}) {
+  if (personalHost && !personalHost.allowed()) return;
   const sourceContext = node.sourceContext || S.stack.at(-1)?.sourceContext ||
     (S.view === 'search' ? S.navSourceContext : null);
   if (sourceContext && !node.from?.passage) node = { ...node, sourceContext };
@@ -4788,6 +4937,7 @@ let walkConsuming = false;
 /** Whether the app's own back() would still move — the mirror of the chrome's
  * atHome test, plus the layers back() itself handles first. */
 function canWalkBack() {
+  if (typeof personalHost !== 'undefined' && personalHost) return !!(S.strokes || S.stack.length);
   // the chrome overlays are walkable layers too — the sentinel must stay
   // armed while one is open, or Back would leave the app instead of it
   if (worldPickerEls || S.captureOpen || S.navOpen) return true;
@@ -7881,6 +8031,7 @@ function refreshWordSaveControls(node, label) {
   for (const word of document.querySelectorAll('[data-word]')) {
     if (node.t === 'word' && word.dataset.word === node.id) word.classList.toggle('tok-learning', taken);
   }
+  if (personalHost) personalHost.paint();
   const mini = document.getElementById('mini');
   const seal = mini?.querySelector('#mini-take');
   if (seal && !seal.disabled && mini.querySelector('.mini-word')?.textContent === label) {
@@ -7959,7 +8110,7 @@ function showReaderToast(message, action = null) {
  * short sheet at the foot of the screen): one checkbox per list and an inline field for a new one. Ticking
  * a list saves the word first when it is not saved yet, by the same capture as Save; unticking takes the
  * word off that list only. Closing never removes a saved card. It replaced the big list window. */
-let vocabularyListInvoker = null;
+let vocabularyListInvoker = null, vocabularyListNode = null;
 function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   const pop = document.getElementById('vocabulary-list-popover');
   if (!pop) return true;
@@ -7972,7 +8123,7 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   }
   pop.remove();
   const invoker = vocabularyListInvoker;
-  vocabularyListInvoker = null;
+  vocabularyListInvoker = null; vocabularyListNode = null;
   invoker?.setAttribute('aria-expanded', 'false');
   if (restoreFocus && invoker?.isConnected) invoker.focus({ preventScroll: true });
   return true;
@@ -8108,7 +8259,7 @@ function openVocabularyListPopover(node, label, invoker) {
   });
   pop.append(title, choices, form, notice);
   paint();
-  vocabularyListInvoker = invoker;
+  vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
   document.body.append(pop);
   const anchor = invoker?.getBoundingClientRect();
@@ -19092,6 +19243,8 @@ function takeButton(node, label) {
   );
   btn.type = 'button';
   btn.id = 'take';
+  if (personalHost) paintWordSave(btn, already);
+  if (personalHost && node.t === 'word' && !lookup(node.id, node.seq, node.reading)) btn.disabled = true;
   btn.setAttribute('aria-pressed', String(already));
   if (!already && node.t === 'kanji') {
     const answer = retainedKanjiRecord(node.id) || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -19107,6 +19260,7 @@ function takeButton(node, label) {
   }
   btn.addEventListener('click', async () => {
     if (btn.disabled) return;
+    if (personalHost) { await toggleWordSave(node, label); return; }
     const epoch = recordEpoch, currentSurface = retainActionSurface(btn);
     btn.disabled = true;
     const saved = await toggleTaken(node, label);
@@ -19289,6 +19443,17 @@ function renderContextPicker(sheet, node, { currentSurface = recordPickerSurface
 }
 
 function renderListPicker(sheet, node, label) {
+  if (personalHost) {
+    const add = biLabel('button', 'chip btn-secondary', 'リストに追加…', 'Add to list…');
+    add.type = 'button'; add.id = 'personal-add-list';
+    add.setAttribute('aria-haspopup', 'dialog'); add.setAttribute('aria-expanded', 'false');
+    add.disabled = !personalHost.allowed() || !recordWritable() ||
+      ['conflict', 'unavailable'].includes(wordCaptureState(node)) ||
+      (node.t === 'word' && !lookup(node.id, node.seq, node.reading));
+    add.addEventListener('click', () => openVocabularyListPopover(node, label, add));
+    sheet.append(add);
+    return;
+  }
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item) return;
   if (node.t === 'word' && wordCaptureState(node) !== 'taken') return;
@@ -22165,6 +22330,7 @@ function renderSchedule(container) {
  * then — when a context sentence exists — the card-variant preview. Only
  * what is actually recorded is shown; nothing is invented. */
 function renderStudyFold(sheet, node, variantTarget) {
+  if (personalHost) return;
   const key = srsKey(node.t, node.id);
   const open = S.studyOpen === key;
   const srs = S.srs[key];
@@ -24512,11 +24678,11 @@ function renderWordNode(sheet, node) {
     sheet.append(meta);
   }
   renderConjugation(sheet, node.id, rec?.p);
-  renderAiTutor(sheet, node, rec);
+  if (!personalHost) renderAiTutor(sheet, node, rec);
 
   // EXAMPLES — real sentences, shelf first, the bank behind them; every
   // token carries the reader's ladder (ふりがな → gloss → full entry)
-  if (!D.exampleBank?.has(node.id) && window.__CORRIDOR_STANDALONE__ !== true) {
+  if (!personalHost && !D.exampleBank?.has(node.id) && window.__CORRIDOR_STANDALONE__ !== true) {
     ensureBankExamples(node.id).then((entries) => {
       if (!entries.length) return;
       refreshWordSheet(node);
@@ -24548,7 +24714,7 @@ function renderWordNode(sheet, node) {
       sheet.append(line);
     }
   }
-  renderAiExamples(sheet, node, rec);
+  if (!personalHost) renderAiExamples(sheet, node, rec);
 
   // the semantic neighbourhood — the single most important surface here.
   // When nothing is written yet the section says NOTHING: the old empty
@@ -26643,6 +26809,7 @@ function renderSheet(root) {
     const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', '覚');
     capture.type = 'button';
     capture.id = 'sheet-take';
+    if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
     capture.setAttribute('aria-pressed', String(takenNow));
     capture.setAttribute(
       'aria-label',
@@ -26655,6 +26822,7 @@ function renderSheet(root) {
     );
     capture.addEventListener('click', async () => {
       if (capture.disabled) return;
+      if (personalHost) { await toggleWordSave(capNode, nodeTitle(capNode)); return; }
       const epoch = recordEpoch, currentSurface = retainActionSurface(capture);
       capture.disabled = true;
       const saved = await toggleTaken(capNode, nodeTitle(capNode));
@@ -26715,6 +26883,10 @@ function renderSheet(root) {
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
   else if (node.t === 'reference') renderReferenceNode(sheet, node);
+  if (personalHost && ['grammar', 'particle'].includes(node.t)) {
+    sheet.append(takeButton(node, nodeTitle(node)));
+    renderListPicker(sheet, node, nodeTitle(node));
+  }
   if (node.t !== 'reference' && node.referenceEntry?.levelSources?.length) {
     const notes = el('details', 'reference-entry-provenance');
     const summary = el('summary', null, tx('この項目の資料・級タグ', 'Sources & level tags for this entry'));
@@ -28082,6 +28254,7 @@ function renderRoomError(main, view, error) {
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
   syncSheetActionVisit();
+  if (personalHost) { personalHost.paint(); return; }
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.

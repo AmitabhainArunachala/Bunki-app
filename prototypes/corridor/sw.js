@@ -98,8 +98,21 @@ const SHELL = [
   'decks/personal/mount.mjs',
   'decks/personal/engine.mjs',
   'decks/personal/schema.mjs',
+  'decks/personal/enrichment.mjs',
+  'decks/personal/host-bridge.mjs',
   'decks/personal/store.mjs',
   'decks/personal/personal.css',
+  // The answer's shared dictionary and remember-list doors work on first
+  // offline use after installation. Full dictionary shards remain on demand.
+  'data/proprietary_safe/kanken.json',
+  'data/proprietary_safe/sem.json',
+  'data/share_alike/kanji.json',
+  'data/share_alike/words.json',
+  'data/share_alike/idioms.json',
+  'data/share_alike/dict.json',
+  'data/share_alike/strokes.json',
+  'data/share_alike/radicals214.json',
+  'data/original/grammar-v11.json',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
   'decks/context-dense/mount.js',
@@ -437,9 +450,9 @@ self.addEventListener('fetch', (event) => {
     if (cacheFirst && hit) return { response: hit };
     try {
       return await fetchAndStore(request, cache);
-    } catch (error) {
+    } catch {
       if (hit) return { response: hit };
-      throw error;
+      return { response: updateNeeded() };
     }
   })();
   event.respondWith(task.then(({ response }) => response));

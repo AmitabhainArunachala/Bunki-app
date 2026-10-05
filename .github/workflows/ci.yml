@@ -158,6 +158,8 @@ jobs:
                       'decks/personal/engine.mjs' \
                       'decks/personal/mount.mjs' \
                       'decks/personal/schema.mjs' \
+                      'decks/personal/host-bridge.mjs' \
+                      'decks/personal/enrichment.mjs' \
                       'decks/personal/store.mjs' \
                       'decks/personal/personal.css' \
                       'decks/kotoba-mine/deck.json' \
