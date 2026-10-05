@@ -1,0 +1,328 @@
+{
+  "155": [
+    {
+      "ja": "今回取り上げるのは、インドで見つかった『バクシャーリー写本』という古い数学の書物です。この写本には、ゼロを表す小さな点が何度も出てきます。ただ、いつ書かれたのかは文字の形などから推測するしかなく、学者の間でも見方が分かれていました。そこで2017年、所蔵するオックスフォード大学の図書館が放射性炭素による年代の鑑定を行ったところ、一部は三世紀から四世紀ごろのものだという結果が出たんです。ゼロの歴史を考えるうえで、大きな手がかりになったわけですね。",
+      "form": "鑑定",
+      "en": "What we're taking up this time is an old mathematical text found in India, the Bakhshali manuscript. In this manuscript, a small dot standing for zero appears again and again. However, when it was written could only be guessed from things like the shapes of the letters, and scholars were divided in their views. Then in 2017, when the Oxford University library that holds it had its age appraised by radiocarbon dating, the result was that parts of it date from around the third to fourth century. In thinking about the history of zero, it became a major clue.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「年代鑑定」「筆跡鑑定」のように、調べる対象を前に付けた形でよく使う。",
+      "grammar": ["n2-ue-de"],
+      "sense": "専門家が調べて、本物かどうかや年代・価値を判定すること。"
+    },
+    {
+      "ja": "1983年、西ドイツの有力週刊誌が、ヒトラーの未公開の日記を入手したとして大々的に発表した。しかし、連邦公文書館などが紙や製本の材料を調べたところ、戦後になって作られた成分が含まれていることが分かった。日記は偽物だと判明し、雑誌の編集長らは辞任に追い込まれた。筆跡の鑑定だけを頼りに、紙やインクの分析を後回しにしたことが、裏目に出た形だ。スクープを狙う報道機関にとって、今も教訓として語り継がれている。",
+      "form": "鑑定",
+      "en": "In 1983, a leading West German weekly magazine announced with great fanfare that it had obtained Hitler's unpublished diaries. However, when the Federal Archives and others examined the paper and the binding materials, they found that these contained substances made only after the war. The diaries were exposed as fakes, and the magazine's editors-in-chief were forced to resign. Relying only on handwriting appraisals and putting off analysis of the paper and ink is what backfired. It is still handed down as a lesson for news organisations chasing scoops.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「鑑定を依頼する」「鑑定の結果」など、専門家の判断を指す言い方が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "専門家が調べて、本物かどうかや年代・価値を判定すること。"
+    },
+    {
+      "ja": "罪に問われた人が、その瞬間、自分の行いの意味を分かっていたのかどうか。裁判ではこの問いに答えるため、精神科医による鑑定が行われることがある。だが、すでに過ぎ去った一瞬の心の中を、後から他人が確かめることなど、本当にできるのだろうか。医師が示すのはあくまで一つの見立てであり、最後に判断を下すのは裁判所である。人の心を測るという営みの難しさが、ここにはよく表れている。",
+      "form": "鑑定",
+      "en": "Whether a person accused of a crime understood, at that moment, the meaning of what they were doing. In court, an evaluation by a psychiatrist is sometimes carried out to answer this question. But can another person really confirm, after the fact, what was going on inside someone's mind during a moment that has passed? What the doctor offers is only ever one assessment, and it is the court that makes the final judgment. Here the difficulty of the endeavour of measuring a human mind shows itself plainly.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "裁判では「精神鑑定」の形で、責任能力を調べる手続きを指すことが多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "裁判のために、専門家が人の精神状態を調べて判断すること。"
+    }
+  ],
+  "156": [
+    {
+      "ja": "今回は、記憶がいかに書き換わりやすいかを示した有名な実験を紹介します。1974年、アメリカの心理学者ロフタスらは、車の事故の映像を学生に見せ、そのあとで車の速さを尋ねました。このとき『激突したとき』と聞かれたグループは、『ぶつかったとき』と聞かれたグループより、速度を高く見積もったんです。さらに一週間後には、実際にはなかったガラスの破片を見たと答える人が、『激突』と聞かれた側で多かったそうです。たった一語の違いで記憶がゆがむなら、目撃証言をそのまま信じるのは危ないということになりますね。",
+      "form": "目撃証言",
+      "en": "This time I'm introducing a famous experiment that showed just how easily memory gets rewritten. In 1974, the American psychologist Loftus and her colleagues showed students film of a car accident and afterwards asked them how fast the cars were going. The group asked about the moment the cars \"smashed\" estimated the speed higher than the group asked about the moment they \"hit\". What's more, a week later, more people in the \"smashed\" group answered that they had seen broken glass that had not actually been there. If a single word's difference can distort memory, it follows that taking eyewitness testimony at face value is risky.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「目撃証言の信用性」「目撃証言に頼る」のように、裁判や捜査の話でよく使う。",
+      "grammar": ["n3-koto-ni-naru"]
+    },
+    {
+      "ja": "アメリカでは1990年代以降、DNAの検査技術が進んだことで、有罪とされた人の無実が後から明らかになる例が相次いだ。冤罪の救済に取り組む団体によると、こうした誤判の原因として特に多いのは、誤った目撃証言だという。法廷で『この人です』と言い切った人の多くは、うそをついていたわけではなく、本当にそう記憶していたとみられる。このため各地の警察では、容疑者が誰かを知らない担当者が写真を見せるなど、確認の手順を改める動きが広がっている。自信に満ちた言葉ほど、慎重に扱う必要がありそうだ。",
+      "form": "目撃証言",
+      "en": "In the United States, since the 1990s, advances in DNA testing have led to case after case in which the innocence of people found guilty later came to light. According to groups working to help the wrongly convicted, a particularly common cause of such miscarriages of justice is mistaken eyewitness testimony. Most of the people who declared in court \"It's this person\" were not lying, and apparently genuinely remembered it that way. For this reason, police in various places are increasingly revising their identification procedures, for example by having officers who do not know which one is the suspect show the photos. The more confident the words, it seems, the more carefully they need to be handled.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「目撃証言が食い違う」「目撃証言を集める」などの形が多い。",
+      "grammar": ["n3-koto-de", "n3-dewa-naku"]
+    },
+    {
+      "ja": "相手から正確な話を引き出したいなら、質問の形にこそ気を配るべきです。たとえば『赤い車でしたよね』と聞けば、相手はつい『はい』と答えてしまいます。そこで捜査の現場では、『見たことを順番に、思い出せるだけ話してください』と、まず自由に語ってもらう聞き方が取り入れられてきました。聞き手が余計な言葉を足さないことが、目撃証言をゆがめないための何よりの工夫なのです。取材やインタビューでも、相手が自分の言葉で話せるように、この順番を意識してみてください。",
+      "form": "目撃証言",
+      "en": "If you want to draw an accurate account out of someone, the form of your questions is exactly what you should pay attention to. For example, if you ask \"It was a red car, wasn't it?\", the other person will tend to answer \"Yes\" without thinking. That is why investigators have adopted a way of asking in which the witness is first allowed to talk freely: \"Tell me what you saw, in order, as much as you can remember.\" The listener not adding unnecessary words is the best safeguard against distorting eyewitness testimony. In reporting and interviews too, try keeping this order in mind so the other person can speak in their own words.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "話し方の文脈では、聞き手の質問が目撃証言を変えてしまう点に注目して使う。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "157": [
+    {
+      "ja": "AIが写真に何が写っているかをどう判断しているのか、ざっくり説明します。コンピューターにとって画像は、色の明るさを表す数字が縦と横にずらりと並んだものにすぎないんですね。2012年、大量の写真を学ばせたニューラルネットワークが、写っている物を当てるコンテストで、二位以下に大差をつけて優勝しました。これをきっかけに、深層学習が一気に注目されるようになったんです。ポイントは、人間が特徴を教えるのではなく、数字の並びからパターンを自分で見つけさせた点にあります。",
+      "form": "画像",
+      "en": "Let me roughly explain how AI judges what is in a photo. To a computer, an image is nothing more than numbers representing the brightness of colours, lined up in rows and columns. In 2012, a neural network trained on a huge number of photos won a contest in guessing the objects pictured, beating the runners-up by a wide margin. That was what made deep learning suddenly attract attention. The key point is that rather than humans teaching it the features, it was made to find the patterns in the rows of numbers by itself.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「画像を読み込む」「画像認識」のように、デジタルで扱う絵や写真に使う。",
+      "grammar": ["n2-ni-suginai", "n4-you-ni-naru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "心理学では、言葉だけで覚えるより、絵を添えたほうが記憶に残りやすいことが知られています。言葉とイメージという二つの経路で覚えるため、思い出す手がかりが増えるからだと考えられています。ただし、どんな画像でも添えればいいというものではありません。内容と関係のない飾りの写真は、かえって注意をそらしてしまうことがあります。単語カードに絵を付けるなら、意味と直接つながるものを選ぶようにしましょう。",
+      "form": "画像",
+      "en": "In psychology, it is known that things stick in memory better when a picture accompanies them than when they are learned through words alone. This is thought to be because learning through two routes, words and imagery, increases the cues for recalling them. That said, it is not as if any image at all will do. Decorative photos unrelated to the content can actually end up distracting attention. If you put pictures on your vocabulary cards, make sure to choose ones directly connected to the meaning.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学習の話では「画像を添える」「画像付きの教材」の形でよく使う。",
+      "grammar": ["n5-teiru", "n3-you-ni"]
+    },
+    {
+      "ja": "スマートフォンの画面に映る一枚の画像は、近づいて見れば小さな光の点の集まりにすぎない。それでも私たちは、そこに友人の笑顔を見て、懐かしさまで感じてしまう。インドの唯識の思想は、外の世界そのものよりも、心が描き出す像のほうに目を向けた。私たちが見ていると思っているものも、実は心が組み立てた姿なのだという。そう考えると、画面の中の笑顔と目の前の笑顔の違いは、思ったほど大きくないのかもしれない。",
+      "form": "画像",
+      "en": "A single image on a smartphone screen is, seen up close, nothing more than a cluster of tiny points of light. Even so, we see a friend's smile there and even feel a pang of nostalgia. India's Yogacara, or consciousness-only, thought turned its attention less to the outside world itself than to the images the mind draws. It holds that even what we think we are seeing is in fact a form the mind has assembled. Thought of that way, the difference between the smile on the screen and the smile in front of us may not be as great as we imagine.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n2-ni-suginai", "n5-teiru"]
+    }
+  ],
+  "158": [
+    {
+      "ja": "今回は、ロシアの作家ドストエフスキーの若い頃の体験から話を始めます。1849年、彼は禁じられた文書を読み合う会に加わっていたとして捕らえられ、仲間とともに銃殺刑を言い渡されました。ところが刑場で銃殺の直前になって、皇帝による減刑が伝えられ、シベリアへ送られることになったんです。実はこの減刑は、初めから決まっていた筋書きだったと言われています。死刑囚として最後の数分間を味わったこの経験は、のちに彼の作品の中で語られることになります。",
+      "form": "死刑囚",
+      "en": "This time I'll start with an experience from the Russian writer Dostoevsky's youth. In 1849 he was arrested for having joined a circle that read banned writings together, and along with his comrades he was sentenced to death by firing squad. But at the execution ground, just before the shooting, a commutation from the Tsar was announced, and he ended up being sent to Siberia. In fact, it is said this commutation had been a script decided from the start. This experience of living through his last few minutes as a man condemned to death would later be told in his works.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「死刑囚」は判決が確定し、執行を待つ人を指す。歴史や文学の話でもよく出る。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "古代インドのアショーカ王は、石柱に刻ませた言葉の中で、命を奪う刑を言い渡された者に三日間の猶予を与えると述べている。その間に親族が命乞いをすることも、本人が来世のために施しや断食をすることもできるように、という配慮であった。刑を待つ死刑囚にとって、三日という時間はあまりに短い。しかし、裁く側が相手を最後まで一人の人間として扱おうとした跡として読むと、この一文の重みは変わってくる。罰の中にも慈悲を残そうとした王の姿が、そこには見えるのである。",
+      "form": "死刑囚",
+      "en": "In words he had carved on stone pillars, the ancient Indian king Ashoka states that those sentenced to a punishment that takes their life are to be given a respite of three days. It was a consideration meant to let relatives plead for their lives during that time, and to let the condemned themselves give alms or fast for the sake of the next life. For a death-row prisoner awaiting punishment, three days is far too short a time. But read as a trace of those who judge trying to treat the other as a human being to the very end, the weight of this single sentence changes. In it we can see a king who tried to leave room for mercy even within punishment.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n3-you-ni"]
+    },
+    {
+      "ja": "1983年、熊本県で戦後まもなく起きた強盗殺人事件の再審で、無罪の判決が言い渡された。裁かれていた男性は、一度は確定した判決のもとで、三十年以上にわたって身柄を拘束されていた。死刑囚が再審で無罪となったのは、日本ではこれが初めてだった。その後も同じような判決が続き、1980年代のうちに計四件を数えた。これらの事件は、自白を重く見る捜査のあり方を見直す議論のきっかけとなった。",
+      "form": "死刑囚",
+      "en": "In 1983, at the retrial of a robbery-murder that took place in Kumamoto Prefecture shortly after the war, a verdict of not guilty was handed down. The man who had been on trial had been held in custody for more than thirty years under a judgment that had once been made final. It was the first time in Japan that a death-row inmate had been acquitted at retrial. Similar verdicts followed, numbering four in all within the 1980s. These cases prompted debate on rethinking investigative practice that places heavy weight on confessions.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「死刑囚の再審」「確定死刑囚」などの形で使われる。",
+      "grammar": []
+    }
+  ],
+  "159": [
+    {
+      "ja": "今回は、ブッダが悟りを開くまでの道のりを見ていきます。出家したブッダは、まず何年ものあいだ、食事を極端に減らすなど、体を痛めつける苦行に打ち込みました。しかし、やせ細るばかりで心の迷いは消えず、ついに苦行をやめて、村の娘スジャータが差し出した乳がゆを口にします。共に修行していた仲間たちは堕落したと見て去っていきましたが、実はこの選択こそが決定的な転機でした。体を痛めつけも甘やかしもしない『中道』という考え方は、ここから生まれたんです。",
+      "form": "決定的",
+      "en": "This time we'll follow the path the Buddha took until his awakening. After leaving home, the Buddha first threw himself for many years into ascetic practices that punished the body, such as cutting his food to the extreme. But he only grew thinner and the mind's confusion did not go away, so at last he gave up the austerities and accepted the milk porridge offered by a village girl, Sujata. The companions who had practised with him saw this as a fall and left, but in fact this very choice was the decisive turning point. The idea of the Middle Way, which neither punishes the body nor indulges it, was born from here.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「決定的な転機」「決定的な役割」のように、名詞の前に付けて使うことが多い。",
+      "grammar": ["n4-teiku"],
+      "sense": "物事の結果や流れを決めてしまうほど重要なさま。"
+    },
+    {
+      "ja": "最先端の半導体の開発で、決定的な役割を担っているのが、極端紫外線を使う露光装置だ。回路を極めて細かく描くのに欠かせないが、この装置を供給できるのは現在、オランダのASML一社に限られている。1台あたりの価格は数百億円にのぼるとされ、導入できる企業もごく少ない。オランダ政府は安全保障上の理由から、この装置の輸出を厳しく管理している。たった一つの機械が、国家間の力関係を左右する時代になったと言えそうだ。",
+      "form": "決定的",
+      "en": "In the development of cutting-edge semiconductors, what plays the decisive role is lithography equipment that uses extreme ultraviolet light. It is indispensable for drawing circuits extremely finely, yet the only company currently able to supply these machines is the Dutch firm ASML. The price of a single unit is said to run to tens of billions of yen, and very few companies can install them. The Dutch government tightly controls exports of the equipment for security reasons. It seems fair to say we have entered an era in which a single machine can sway the balance of power between nations.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「決定的な役割」「決定的な差」など、結果を左右する要素を強調するときに使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "物事の結果や流れを決めてしまうほど重要なさま。"
+    },
+    {
+      "ja": "同じ三時間の勉強でも、どう配分するかで記憶への残り方は大きく変わります。一晩でまとめて詰め込むより、日を空けて何度か復習したほうが長く覚えていられることが、多くの研究で示されています。これは『分散学習』と呼ばれる考え方です。成績に決定的な差を生むのは、勉強した時間の長さではなく、復習のタイミングだと言ってもいいくらいです。忘れかけたころにもう一度思い出せるように、計画を立ててみましょう。",
+      "form": "決定的",
+      "en": "Even with the same three hours of study, how much stays in memory varies greatly depending on how you spread them out. Many studies have shown that you can remember things longer if you review several times with days in between than if you cram everything in one night. This idea is called distributed practice. It is almost fair to say that what produces a decisive difference in results is not the length of time studied but the timing of review. Try making a plan so that you recall things once more just as you are starting to forget them.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学習の話では「決定的な差」「決定的な要因」の形でよく使う。",
+      "grammar": ["n3-dewa-naku", "n3-you-ni", "n5-teiru"],
+      "sense": "物事の結果や流れを決めてしまうほど重要なさま。"
+    }
+  ],
+  "165": [
+    {
+      "ja": "今回は、東京の警察がどのように生まれたのかを見ていきます。明治維新のあと、新しい政府は西洋に倣った近代的な警察を作ろうと、人をヨーロッパに送って制度を調べさせました。特に参考にされたのが、首都の治安を一手に担うフランスの仕組みだったと言われています。こうして1874年、東京の治安を受け持つ組織として警視庁が置かれたんです。その後、何度か形を変えながらも、名前は今に至るまで受け継がれています。",
+      "form": "警視庁",
+      "en": "This time we'll look at how Tokyo's police came into being. After the Meiji Restoration, the new government, aiming to build a modern police force modelled on the West, sent people to Europe to study its systems. What was drawn on above all, it is said, was the French arrangement in which a single body took charge of public order in the capital. And so in 1874, the Metropolitan Police Department was set up as the organisation responsible for keeping order in Tokyo. Although it has changed form several times since, the name has been handed down to the present day.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「警視庁」は東京都の警察本部の名前。国の機関である「警察庁」とは別。",
+      "grammar": ["n4-teiku", "n4-nagara", "n1-ni-itaru-made", "n5-teiru"]
+    },
+    {
+      "ja": "外国の組織名を訳すとき、直訳にこだわると、かえって読み手に伝わらないことがあります。たとえばロンドンの首都警察は、日本語ではよく『ロンドン警視庁』と訳されてきました。東京の警察本部と同じような存在だと、日本の読者に一目で分かるからです。英語でよく使われる『スコットランド・ヤード』という呼び名も、もとは最初の本部の裏手にあった通りの名前に由来します。読み手の頭にすでにある言葉を借りるのも、立派な訳し方の一つなのです。",
+      "form": "警視庁",
+      "en": "When translating the names of foreign organisations, sticking to a literal translation can sometimes mean the reader doesn't get it. For example, London's Metropolitan Police has often been rendered in Japanese as the \"London Metropolitan Police Department\". That is because Japanese readers can tell at a glance that it is the same sort of body as Tokyo's police headquarters. The name \"Scotland Yard\", often used in English, also originally comes from the name of the street at the back of the first headquarters. Borrowing a word already in the reader's head is one perfectly respectable way of translating.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "訳語としては、外国の首都の警察を「ロンドン警視庁」のように呼ぶ例もある。",
+      "grammar": []
+    },
+    {
+      "ja": "三億円事件って知ってます？1968年に東京の府中で、白バイの警官になりすました男が、ボーナスの現金を積んだ車をまるごと持っていっちゃった事件なんですけど。警視庁はものすごい数の捜査員を動員して、容疑者のモンタージュ写真もあちこちに貼られたんですよ。それでも結局、誰がやったのか分からないまま、1975年に時効を迎えちゃいました。けがをした人が一人もいなかったっていうのも、この事件がやたら語られる理由の一つなのかなと思います。",
+      "form": "警視庁",
+      "en": "Do you know the 300 million yen robbery? It's the case where, in Fuchu, Tokyo, in 1968, a man disguised as a police motorcycle officer drove off with an entire car loaded with cash for bonuses. The Tokyo police mobilised a huge number of investigators, and composite photos of the suspect were put up all over the place. Even so, in the end, the statute of limitations ran out in 1975 without anyone knowing who did it. I think the fact that not a single person was hurt is also one reason this case gets talked about so much.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "59": [
+    {
+      "ja": "今回は、ブッダの教団を揺るがした、ある裏切りの物語を取り上げます。ブッダのいとこにあたるデーヴァダッタは、自分が教団を率いたいと考え、マガダ国の王子アジャータシャトルに近づきました。経典によれば、二人は共謀して、王子は父親である王を、デーヴァダッタはブッダを亡き者にしようとしたとされています。王子は父を幽閉して王位を奪いましたが、ブッダを狙った企ては失敗に終わります。のちに王子は自分の行いを深く悔い、ブッダのもとを訪ねたと伝えられています。",
+      "form": "共謀",
+      "en": "This time I'm taking up a story of betrayal that shook the Buddha's community. Devadatta, the Buddha's cousin, wanted to lead the community himself, and approached Ajatashatru, the prince of the kingdom of Magadha. According to the scriptures, the two conspired, with the prince to do away with his father the king, and Devadatta with the Buddha. The prince imprisoned his father and seized the throne, but the plot against the Buddha ended in failure. It is said that the prince later deeply regretted what he had done and went to visit the Buddha.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「共謀して〜する」の形で、悪事を二人以上でたくらむ意味に使う。",
+      "grammar": ["n5-tai", "n5-teiru"]
+    },
+    {
+      "ja": "紀元前44年3月15日、ローマの元老院の会合の場で、終身の独裁官となっていたカエサルが刺殺された。中心となったブルートゥスやカッシウスをはじめ、計画に加わった議員は数十人にのぼったとされる。彼らは、一人の人物に権力が集まることを恐れ、共和政を守るためだと主張した。しかし共謀の成果は長くは続かず、カエサルの死後には再び内戦が起きた。結果として共和政の終わりはかえって早まり、その後は帝政の時代が始まることになった。",
+      "form": "共謀",
+      "en": "On 15 March 44 BC, at a meeting of the Roman Senate, Caesar, who had become dictator for life, was stabbed to death. Counting the leading figures Brutus and Cassius, the senators who took part in the plan are said to have numbered several dozen. Fearing that power would be concentrated in a single man, they claimed to be acting to protect the Republic. But the fruits of the conspiracy did not last long, and after Caesar's death civil war broke out again. As a result the end of the Republic only came sooner, and after that the age of the emperors began.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "歴史の記事では「共謀者」「共謀して暗殺する」などの形で使う。",
+      "grammar": ["n3-koto-ni-naru"]
+    },
+    {
+      "ja": "最近ちょっと面白いなと思ってるのが、AIが勝手に値段をそろえちゃう問題なんですよ。ライバル同士の会社が、それぞれ値段を決めるAIを使ってたら、誰も相談してないのに、気づいたらお互い高い値段で落ち着いてた、みたいなことがあり得るらしいんです。人間同士なら、裏で話し合ってたら共謀ってことになるじゃないですか。でもAI同士は何も話し合ってないので、法律上どう扱うかが今けっこう議論されてるみたいです。責任を問う相手が誰なのか分かりにくいのも、厄介なところですよね。",
+      "form": "共謀",
+      "en": "Something I find kind of interesting lately is the problem of AIs lining up prices on their own. Apparently, if rival companies each use an AI to set their prices, it's possible that, even though nobody consulted anyone, before you know it they've both settled on high prices. Between humans, if they'd talked it over behind the scenes, that would count as conspiring, right? But the AIs haven't discussed anything with each other, so how to deal with it legally seems to be a pretty hot debate right now. The fact that it's hard to tell who should be held responsible is another tricky part.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n3-koto-ni-naru"]
+    }
+  ],
+  "75": [
+    {
+      "ja": "今回は、明治時代に『電気は盗めるのか』が問われた裁判の話をします。窃盗の対象は、基本的に形のある物だと考えられています。ところが当時、電気会社に無断で電線から電気を引いて使った人が罪に問われ、電気は形がないのだから盗みにはならないと主張したんです。1903年、当時の最高裁にあたる大審院は、電気も人が管理したり持ち運んだりできる以上、盗みの対象になると判断しました。この流れを受けて、今の刑法には、電気を財物として扱うという一文がわざわざ置かれているわけですね。",
+      "form": "財物",
+      "en": "This time I'll talk about a Meiji-era trial in which the question was whether electricity can be stolen. The object of theft is basically thought to be something with physical form. But back then, a person who had tapped electricity from the power lines and used it without the power company's permission was charged, and he argued that since electricity has no form, it couldn't count as stealing. In 1903, the Great Court of Cassation, the equivalent of the Supreme Court at the time, ruled that since electricity too can be managed and carried by people, it can be the object of theft. Following that, the current Penal Code deliberately includes a sentence saying electricity is to be treated as property.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "法律の言葉で、盗みなどの対象になる値打ちのある物を指す。日常会話ではあまり使わない。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "仏教の戒めの一つに、与えられていないものを取らない、というものがある。盗むな、と言い切らずにこう言い表すところに、この戒めの奥行きがある。法律が守ろうとするのは、持ち主の決まった財物である。だが仏教の戒めは、他人の時間や、相手が積み上げた手柄のような、形のないものにまで目を向けさせる。何かを手にしたとき、それが本当に自分に与えられたものなのかを問うことから、修行は始まるのである。",
+      "form": "財物",
+      "en": "Among the Buddhist precepts is one that says not to take what has not been given. The depth of this precept lies in its being phrased this way rather than simply saying \"do not steal\". What the law sets out to protect is property with a definite owner. But the Buddhist precept turns our eyes even to things without form, such as other people's time or the credit someone else has built up. Practice begins with asking, whenever we come to hold something, whether it was truly given to us.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": []
+    },
+    {
+      "ja": "ちょっと意外なんですけど、会社のデータをこっそり自分のUSBメモリにコピーして持ち出しても、日本だと窃盗罪にはならないって言われてるんですよ。窃盗の対象は財物、つまり基本的に形のある物なんで、情報そのものは当てはまらないんですね。会社の紙に印刷して、その紙ごと持っていったら話は別なんですけど。だからデータを守るためには、別の法律がいろいろ作られてきたって流れらしいです。AIの学習データみたいなものが値打ちを持つ時代に、物を中心にした考え方がどこまで通用するのか、けっこう気になりますよね。",
+      "form": "財物",
+      "en": "This is a bit surprising, but it's said that in Japan, even if you secretly copy your company's data onto your own memory stick and walk out with it, it isn't theft. The object of theft is property, meaning basically something with physical form, so information itself doesn't qualify. It's a different story if you print it on the company's paper and take the paper with it. So apparently that's why various other laws have been made to protect data. In an age when things like AI training data have value, I'm pretty curious how far a way of thinking centred on physical things will hold up.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "76": [
+    {
+      "ja": "今回は、仏教の教団のルールブックともいえる『律』を取り上げます。面白いのは、ブッダが最初から細かい決まりを作っておいたわけではないという点です。弟子の誰かが問題を起こすたびに、その出来事をきっかけに一つずつ決まりが加えられていったと伝えられています。それぞれの決まりには重さに応じた罰則があり、最も重いものを破ると教団から追放されました。一方で、仲間の前で過ちを打ち明ければ済む軽いものまで、段階が細かく分かれていたんです。",
+      "form": "罰則",
+      "en": "This time I'm taking up the Vinaya, which you could call the rulebook of the Buddhist monastic community. What's interesting is that the Buddha did not lay down detailed rules from the very start. It is said that each time one of his disciples caused a problem, rules were added one at a time, prompted by that incident. Each rule carried a penalty matched to its gravity, and breaking the most serious ones meant expulsion from the community. At the same time, the levels were finely graded, down to light ones that were settled simply by confessing the fault in front of one's fellows.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「罰則がある」「罰則を設ける」のように、規則に付いた罰を指して使う。",
+      "grammar": ["n3-wake-dewa-nai", "n2-ni-oujite"]
+    },
+    {
+      "ja": "欧州連合で、AIの利用を幅広く対象とする初の包括的な法律が、2024年に成立した。人の弱みにつけ込んで行動を操るシステムなど、禁止された使い方をした企業には、最大で3500万ユーロ、または世界全体の売上高の7パーセントのうち高いほうという重い罰則が科される。域内でサービスを提供すれば、海外の企業も対象となるため、日本企業も対応を迫られている。一方で、ルールが厳しすぎると技術の発展を妨げかねないとの懸念も出ている。",
+      "form": "罰則",
+      "en": "In the European Union, the first comprehensive law broadly covering the use of AI was passed in 2024. Companies that use AI in prohibited ways, such as systems that exploit people's vulnerabilities to manipulate their behaviour, face heavy penalties of up to 35 million euros or 7 percent of worldwide turnover, whichever is higher. Because foreign companies are also covered if they offer services within the bloc, Japanese companies too are being pressed to respond. Meanwhile, concerns have also been raised that overly strict rules could hamper the development of the technology.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「罰則付きの規制」「罰則を強化する」などの形がよく出る。",
+      "grammar": []
+    },
+    {
+      "ja": "シンガポールって、チューインガムの販売が禁止されてるの、知ってます？1992年からなんですけど、捨てられたガムが地下鉄のドアにくっついて、電車が止まったりしたのがきっかけって言われてるんですよ。しかも罰則がけっこう重くて、売ったりすると高い罰金を取られるらしいです。日本の感覚だとやりすぎに見えるじゃないですか。でも、狭い国土に人がぎゅっと住んでると、街をきれいに保つにはこれくらいのルールが必要なのかもしれないですね。",
+      "form": "罰則",
+      "en": "Did you know that selling chewing gum is banned in Singapore? It's been that way since 1992, and they say what set it off was discarded gum sticking to subway doors and stopping trains. What's more, the penalties are apparently pretty heavy, and if you sell it you get hit with a big fine. By Japanese standards it looks like overkill, right? But when people live packed into a small country, maybe you really do need rules like this to keep the streets clean.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "67": [
+    {
+      "ja": "今回は、ブッダが悟りを開く直前の場面を見ていきます。菩提樹の下で瞑想に入ったブッダの前に、悪魔マーラが現れました。マーラは、恐ろしい軍勢をけしかけたり、美しい娘たちを送り込んだりと、あの手この手でブッダの修行を妨害しようとします。それでもブッダは心を乱すことなく、静かに座り続けたと伝えられています。この悪魔は、外から来る敵というより、心の中に生まれる欲や恐れを描いたものだと読むこともできるんですね。",
+      "form": "妨害",
+      "en": "This time we'll look at the scene just before the Buddha's awakening. As the Buddha entered meditation beneath the bodhi tree, the demon Mara appeared before him. Mara tried every trick to obstruct the Buddha's practice, from setting a terrifying army on him to sending in his beautiful daughters. Even so, it is said that the Buddha sat on quietly without his mind being disturbed. You can also read this demon not as an enemy coming from outside but as a depiction of the desire and fear that arise within the mind.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜を妨害する」「妨害を受ける」の形で、わざとじゃまをする意味に使う。",
+      "grammar": ["n4-teiku", "n2-koto-naku", "n5-teiru"]
+    },
+    {
+      "ja": "バルト海の周辺で、衛星を使った位置情報の電波が乱される事例が相次いでいる。フィンランドの航空会社は2024年、エストニアの空港への便を一時取りやめた。周辺国は、何者かによる意図的な妨害の可能性が高いとみて、警戒を強めている。航空機は地上の設備なども頼りに運航を続けているが、乗員の負担は小さくない。目に見えない形で安全を脅かす行為として、新たな安全保障上の課題となりつつある。",
+      "form": "妨害",
+      "en": "Around the Baltic Sea, cases of satellite positioning signals being disrupted keep occurring. In 2024, a Finnish airline temporarily suspended flights to an Estonian airport. Neighbouring countries believe deliberate interference by someone is highly likely and are stepping up their vigilance. Aircraft continue to operate by relying on ground facilities and other means, but the burden on crews is not small. As an act that threatens safety in an invisible way, it is becoming a new security challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「電波妨害」「業務妨害」のように、ほかの名詞と組み合わせた形が多い。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "似た内容を続けて学ぶと、記憶どうしがぶつかって思い出しにくくなることがあります。心理学では、後から覚えた情報が前の記憶を引き出すのを妨害する現象を『逆向抑制』と呼んでいます。たとえばスペイン語の単語を覚えた直後にイタリア語の単語を覚えると、両方が混ざりやすくなります。似た科目を続けるより、間にまったく違う科目をはさむと、こうした混乱を減らせます。まとめて学ぶ日は、似ていない科目どうしを組み合わせるのがおすすめです。",
+      "form": "妨害",
+      "en": "When you study similar material back to back, memories can collide and become harder to recall. In psychology, the phenomenon in which information learned later obstructs the retrieval of earlier memories is called retroactive inhibition. For example, if you learn Italian words right after learning Spanish words, the two become easy to mix up. Rather than continuing with similar subjects, slipping a completely different subject in between can reduce this kind of confusion. On days when you study a lot at once, it's best to combine subjects that are not alike.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "心理学の説明では「想起を妨害する」のように、記憶のはたらきについても使う。",
+      "grammar": ["n5-teiru"]
+    }
+  ]
+}
