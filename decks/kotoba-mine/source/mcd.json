@@ -178,6 +178,60 @@
    "url": "https://www.aozora.gr.jp/cards/000042/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今日は、古代ローマにあった「記憶の断罪」という習慣を紹介します。皇帝カラカラは弟のゲタを殺害した後、碑文や肖像からゲタの名前と顔を削らせました。つまり、相手の命だけではなく、その人がいたという記録まで抹殺しようとしたわけです。ところが面白いことに、削られた跡はかえって目立ち、今では「ここに誰かがいた」という証拠になっています。消そうとすること自体が、記憶を残してしまうんですね。",
+   "form": "抹殺",
+   "en": "Today I'd like to introduce a custom from ancient Rome known as the \"condemnation of memory.\" After the emperor Caracalla killed his brother Geta, he had Geta's name and face scraped off inscriptions and portraits. In other words, he tried to wipe out not just his rival's life but even the record that the man had existed. The interesting thing, though, is that the scraped marks actually stand out, and today they serve as evidence that someone was there. The very attempt to erase someone ends up preserving the memory.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "記録や存在を「抹殺する」は、ただ消すより強く、意図して跡形もなくする響きがある。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "存在や記録をすっかり消し去ること"
+  },
+  {
+   "ja": "生成AIの普及により、写真に写った人物を消す加工が、誰でも数秒でできるようになった。ただ、写真から人を消す行為そのものは新しいものではない。1930年代のソ連では、失脚した幹部の姿が公式の写真から次々と消され、その存在が抹殺された例が知られている。当時は熟練の職人が手作業で修整していたが、今は手間がほとんどかからない。このため、写真の出どころを確かめる仕組みづくりが急がれている。",
+   "form": "抹殺",
+   "en": "With the spread of generative AI, anyone can now remove a person from a photo in a few seconds. Removing people from photos is not new in itself, however. In the Soviet Union of the 1930s, there are known cases in which purged officials were removed one after another from official photographs and their existence was erased. At the time skilled craftsmen retouched the images by hand, but now it takes almost no effort. For this reason, there is a pressing need to build systems that verify where a photo came from.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「存在を抹殺する」「歴史から抹殺される」の形が多い。主に権力による組織的な消去に使う。",
+   "grammar": [
+    "n4-you-ni-naru",
+    "n5-teiru"
+   ],
+   "sense": "存在や記録をすっかり消し去ること"
+  },
+  {
+   "ja": "仏教の無我という教えは、ときに、自分というものを否定せよという命令のように受け取られる。だが、欲や怒りを力ずくで押さえつけ、自己を抹殺しようとすれば、かえって苦しみは深まるばかりである。説かれているのは、固定した「私」がどこにも見つからないと気づくことにすぎない。なくそうとしていた相手は、もともと実体を持たないのである。そう知ったとき、戦う相手は静かに姿を消していく。",
+   "form": "抹殺",
+   "en": "The Buddhist teaching of non-self is sometimes taken as a command to deny one's own self. But if you forcibly suppress desire and anger and try to annihilate the self, suffering only deepens. What is taught is merely the realisation that a fixed \"I\" is nowhere to be found. The thing you were trying to get rid of never had any substance to begin with. When you know that, the opponent you were fighting quietly disappears.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n5-teiru",
+    "n2-ni-suginai",
+    "n4-teiku"
+   ],
+   "sense": "存在や記録をすっかり消し去ること"
   }
  ],
  "29": [
@@ -1623,6 +1677,58 @@
    "url": "",
    "licence": "CC BY 2.5 (Wikinews)",
    "title": ""
+  },
+  {
+   "ja": "今回は、十九世紀のイギリスで組まれたフランクリン探検隊の話をします。1845年、北極の海を抜ける航路を探すため、二隻の船が百人以上の乗組員を乗せて出発しました。ところが、船はそのまま行方不明になり、何十年にもわたって手がかりが探され続けたんです。沈んだ船が見つかったのは、なんと2014年と2016年のことでした。極地の厳しさと、人間の楽観の危うさを教えてくれる出来事だと言えます。",
+   "form": "行方不明",
+   "en": "This time I'll talk about the Franklin expedition, which was put together in nineteenth-century Britain. In 1845, two ships set out with more than a hundred crew members to find a route through the Arctic seas. However, the ships went missing just like that, and for decades people kept searching for clues. The sunken ships were found, amazingly, in 2014 and 2016. It is an event that teaches us about the harshness of the polar regions and the danger of human optimism.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「行方不明になる」の形で、人や船などがどこにいるのかわからなくなることを言う。",
+   "sense": "どこにいるのかわからないこと"
+  },
+  {
+   "ja": "認知症が原因で行方不明になったとして警察に届け出があった人は、年間一万人を超えている。その数は、ここ十年ほどで大きく増えた。多くは数日以内に見つかるものの、発見が遅れて命に関わる例もある。専門家は、本人を責めるのではなく、歩き回る背景にある不安や混乱に目を向けることが大切だと指摘する。地域では、道に迷っている様子の人に住民が声をかける練習をする取り組みも広がっている。",
+   "form": "行方不明",
+   "en": "The number of people reported to police as missing because of dementia exceeds ten thousand a year. That number has risen sharply over roughly the past decade. Although most are found within a few days, there are also cases where a delay in finding them puts their lives at risk. Experts point out that rather than blaming the person, it is important to pay attention to the anxiety and confusion behind their wandering. In local communities, efforts in which residents practise speaking to people who seem to have lost their way are also spreading.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "mind",
+   "tipJa": "報道では「行方不明者」「行方不明になった〜さん」のように人に使うのが基本。",
+   "grammar": [
+    "n2-mono-no",
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "どこにいるのかわからないこと"
+  },
+  {
+   "ja": "坐って呼吸を数えはじめると、ほどなく心は行方不明になる。気がつけば、明日の予定や昔の失敗のあいだを、あてもなくさまよっているのである。しかも、心がいなくなったことに、本人はしばらく気づきさえしない。瞑想とは、さまよう心を叱りつけることではなく、いなくなったと気づいた瞬間にそっと呼吸へ連れ戻す、その繰り返しにすぎない。気づいたということそのものが、すでに戻ってきた証なのである。",
+   "form": "行方不明",
+   "en": "When you sit and begin counting your breaths, before long your mind goes missing. Before you know it, it is wandering aimlessly among tomorrow's plans and past failures. What is more, for a while you do not even notice that your mind has gone. Meditation is not scolding the wandering mind but nothing more than the repetition of gently bringing it back to the breath the moment you notice it has gone. The very fact of noticing is already proof that it has come back.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "心や物に使うと、どこへ行ったかわからなくなるという比喩になる。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku",
+    "n2-ni-suginai"
+   ],
+   "sense": "比喩的に、どこへ行ったかわからなくなること"
   }
  ],
  "156": [
@@ -3236,6 +3342,59 @@
    "url": "http://news.livedoor.com/article/detail/6494894/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "タブレットより断然快適！一度使ったらやめられないUltrabookとDropbox【新スタイル活用術】"
+  },
+  {
+   "ja": "今日は、人が笑うしくみを扱った本を要約していきます。著者によると、私たちが何かを滑稽だと感じるのは、本人がまじめにふるまっているのに、結果がずれてしまったときなんだそうです。たとえば、かっこよく決めようとした人が段差でつまずくと、つい笑ってしまいますよね。ポイントは、本人が笑わせようとしていないところにあるわけです。わざと狙った笑いより、意図とのずれから生まれる笑いのほうが強い、というのがこの本の主張なんです。",
+   "form": "滑稽",
+   "en": "Today I'm going to summarize a book about how laughter works. According to the author, we find something comical when a person is behaving seriously but the result goes off track. For example, when someone trying to look cool trips on a step, we can't help laughing, right? The key point is that the person isn't trying to make anyone laugh. The book's argument is that laughter born from a gap with someone's intention is stronger than laughter aimed for on purpose.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「滑稽な姿」「滑稽に見える」の形が多い。笑われる側を少し見下す響きがある。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru"
+   ],
+   "sense": "思わず笑いたくなるような、おかしさがあるようす。"
+  },
+  {
+   "ja": "対話型AIに冗談を言わせる研究が各地で進んでいる。言葉遊びや決まった型のジョークは作れるようになったものの、その場の空気に応じた笑いを生むのはまだ難しいとされる。人がある状況を滑稽だと感じるには、期待と現実のずれを一瞬で読み取る必要があるためだ。専門家の間では、笑いの理解こそが言葉の理解の到達点の一つだという見方もある。研究者らは、笑いが生まれる仕組みを調べることが、人の心の働きを知る手がかりにもなると期待している。",
+   "form": "滑稽",
+   "en": "Research into getting conversational AI to tell jokes is advancing in various places. Although it has become able to produce wordplay and jokes of a set pattern, creating laughter that suits the mood of the moment is said to still be difficult. That is because, for a person to find a situation comical, they must read the gap between expectation and reality in an instant. Among experts there is also the view that understanding humor is one of the high points of understanding language. Researchers hope that studying how laughter arises will also offer clues to how the human mind works.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru",
+    "n4-you-ni-naru",
+    "n2-mono-no",
+    "n2-ni-oujite"
+   ],
+   "sense": "思わず笑いたくなるような、おかしさがあるようす。"
+  },
+  {
+   "ja": "インドの仏典に伝わる説話には、一見すると笑い話のようなものがある。井戸に映った月を本物だと思い込んだ猿たちが、手をつないで枝からぶら下がり、枝が折れて皆水に落ちるという話もその一つである。その姿は確かに滑稽だが、実体のないものを必死につかもうとしている点では、笑っている私たちも猿と大差ないのではないか。説話が笑いを入り口にするのは、聞き手が自分の姿に気づくまでの距離を縮めるためなのだろう。",
+   "form": "滑稽",
+   "en": "Among the parables handed down in Indian Buddhist scriptures, there are some that at first glance look like funny stories. One of them tells of monkeys who, convinced that the moon reflected in a well was real, joined hands and hung down from a branch, until the branch broke and they all fell into the water. Their figure is certainly comical, but in that we too desperately try to grasp things without substance, are we who laugh really so different from the monkeys? Parables probably use laughter as a way in, in order to shorten the distance before listeners notice themselves.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "ばかばかしくて、思わず笑いたくなるようす。"
   }
  ],
  "45": [
@@ -4142,6 +4301,55 @@
    "url": "",
    "licence": "CC BY 2.5 (Wikinews)",
    "title": ""
+  },
+  {
+   "ja": "仏教がアジアに広まった道というと、シルクロードを思い浮かべる人が多いと思います。でも実は、インドから東南アジアへは、海上の交易路も大きな役割を果たしていたと考えられています。商人の船には僧侶も乗り込み、港町に寺が建てられていきました。季節によって向きが変わるモンスーンをうまく使えば、船は決まった時期に行き来できたんです。つまり、教えは商品と一緒に海を渡ったわけですね。",
+   "form": "海上",
+   "en": "When it comes to the routes by which Buddhism spread across Asia, I think many people picture the Silk Road. But in fact, from India to Southeast Asia, maritime trade routes are also thought to have played a big role. Monks boarded merchants' ships too, and temples were built in the port towns. If they made good use of the monsoon, whose direction changes with the season, ships could come and go at set times of year. In other words, the teaching crossed the sea together with the merchandise.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "india",
+   "tipJa": "「海上の交易路」「海上輸送」のように、陸上と対になる言葉として使う。",
+   "grammar": [
+    "n5-teiru",
+    "n4-teiku"
+   ]
+  },
+  {
+   "ja": "紅海を通る商船への攻撃が相次いだことを受け、2023年末以降、多くの海運会社がアフリカ南端の喜望峰を回る航路に切り替えた。迂回によって航海の日数は十日から二週間ほど延び、燃料費や保険料の上昇が物価にも影響を与えている。海上輸送は世界の貿易量の八十パーセント以上を担っているとされ、一つの海峡の混乱が、遠く離れた国の暮らしにまで及ぶことになる。物流の急所をどう守るかが、改めて問われている。",
+   "form": "海上",
+   "en": "Following a series of attacks on merchant ships passing through the Red Sea, many shipping companies have switched since the end of 2023 to routes around the Cape of Good Hope at the southern tip of Africa. The detour lengthens voyages by about ten days to two weeks, and rising fuel costs and insurance premiums are also affecting prices. Maritime transport is said to carry more than eighty percent of world trade by volume, so turmoil in a single strait reaches all the way to people's lives in far-off countries. How to protect the weak points of logistics is once again being called into question.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "「海上輸送」「海上保安」のように、硬い複合語の頭に付くことが多い。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "夜の海上に出ると、陸では気づかなかった自分の小ささが、急に身にしみる。足もとは絶えず揺れ、頼りにしていた地面というものが、どれほどありがたいものだったかを知るのである。だが、揺れに逆らって体を固くするほど、船酔いはひどくなる。波に合わせて力を抜いたとき、はじめて揺れは敵ではなくなる。心の動揺もまた、力ずくで押さえ込むものではなく、うまく乗りこなすものなのかもしれない。",
+   "form": "海上",
+   "en": "When you go out on the sea at night, your own smallness, which you never noticed on land, suddenly sinks in. The deck sways constantly, and you learn how precious the ground you used to rely on really was. But the more you stiffen your body against the swaying, the worse the seasickness gets. Only when you relax and move with the waves does the swaying stop being your enemy. Perhaps the agitation of the mind, too, is something not to be held down by force but to be ridden skilfully.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n3-dewa-naku"
+   ]
   }
  ],
  "157": [
@@ -5920,6 +6128,55 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、人前で緊張しやすい人に向けた本を要約します。キーワードはスポットライト効果で、自分が思っているほど周りの人は自分を見ていない、という心理のことです。ある実験では、目立つシャツを着て教室に入った学生が、それに気づいた人の数を実際よりかなり多く見積もったそうです。寝ぐせや小さな言い間違いを一日中気にしてしまうのは、ちょっと自意識過剰なのかもしれません。他人はみんな、自分のことで手一杯なんですね。",
+   "form": "自意識過剰",
+   "en": "This time I'll summarize a book for people who get nervous in front of others. The keyword is the spotlight effect, the psychology whereby the people around you aren't looking at you nearly as much as you think. In one experiment, students who walked into a classroom wearing a conspicuous shirt reportedly estimated the number of people who noticed it as considerably higher than it really was. Fretting all day over bedhead or a small slip of the tongue may be a bit overly self-conscious. Everyone else has their hands full with their own business.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「自意識過剰だ」「自意識過剰になる」の形で、少し責めるように使う。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "人からどう見られるかを、気にしすぎること。"
+  },
+  {
+   "ja": "AIで顔を自動で整える加工アプリの普及が、若い世代の外見への不安を強めているとの指摘がある。加工した自分の顔を見慣れることで、鏡に映る素顔が以前より気になるようになるためだという。専門家は、こうした悩みを単なる自意識過剰として片付けるのではなく、周囲がまず話を聞く姿勢が大切だと話している。一方で、広告などで写真の加工の有無を表示するよう求める動きも、海外を中心に出ている。",
+   "form": "自意識過剰",
+   "en": "It has been pointed out that the spread of editing apps that use AI to touch up faces automatically is heightening the younger generation's anxiety about their looks. This is said to be because, by getting used to seeing their edited faces, people become more bothered than before by their bare faces in the mirror. Experts say it is important that those around them not dismiss such worries as mere self-consciousness, but first be willing to listen. Meanwhile, there are also moves, mainly overseas, to require that ads and the like show whether their photos have been edited.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-de",
+    "n4-you-ni-naru",
+    "n3-dewa-naku"
+   ],
+   "sense": "人からどう見られるかを、気にしすぎること。"
+  },
+  {
+   "ja": "初めてインドに行ったとき、街を歩いてるだけで、みんなにじろじろ見られてる気がしたんですよ。外国人って、やっぱり目立つじゃないですか。それで最初の日はずっと縮こまってたんですけど、次の日にふと周りを見たら、みんな値段の交渉とか自分の用事で忙しそうで。なんだ、ただの自意識過剰だったのかって、急に肩の力が抜けました。向こうからしたら、こっちのことなんて誰も気にしてなかったと思います。",
+   "form": "自意識過剰",
+   "en": "When I first went to India, I felt like everyone was staring at me just because I was walking down the street. Foreigners stand out, after all, right? So I spent the whole first day shrinking into myself, but the next day, when I happened to look around, everyone seemed busy haggling over prices and with their own errands. I went, oh, I was just being overly self-conscious, and suddenly I relaxed. From their side, I don't think anyone was paying me any attention at all.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "india",
+   "sense": "人からどう見られるかを、気にしすぎること。"
   }
  ],
  "84": [
@@ -6026,6 +6283,55 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、感情が人から人へうつるしくみを扱った本を要約します。面接やスピーチの前に、緊張している人のそばにいると、こちらまでその緊張がビンビン伝わってくること、ありますよね。著者によれば、これは情動伝染と呼ばれる現象で、人は相手の表情や姿勢を無意識にまねることで、同じ気持ちを味わうそうです。だから、大事な場面ほど、まず自分がゆったり構えることが、相手を落ち着かせる近道になるんですね。",
+   "form": "ビンビン",
+   "en": "This time I'll summarize a book about how emotions pass from person to person. Before an interview or a speech, when you're near someone who is nervous, their nervousness comes across to you intensely too, doesn't it? According to the author, this is a phenomenon called emotional contagion, in which people unconsciously mimic the other person's facial expressions and posture and thereby experience the same feelings. So the more important the occasion, the more staying relaxed yourself first becomes a shortcut to calming the other person down.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「ビンビン伝わる」「ビンビン感じる」の形でよく使う。くだけた話し言葉。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-de"
+   ],
+   "sense": "刺激や感情などが、強く伝わってくるようす。"
+  },
+  {
+   "ja": "この前、インドのムンバイでガネーシャのお祭りの行列を見たんですよ。象の頭をした神様の大きな像を、みんなで飾り付けた車に載せて、街じゅうを練り歩くんです。太鼓の音って、すぐ近くで聞くと体に直接響くじゃないですか。もうお腹の底までビンビン来て、気づいたら知らない人たちと一緒に踊ってました。言葉は全然分からないんですけど、あのお祭りの熱気だけは一瞬で伝わってくるんですよね。",
+   "form": "ビンビン",
+   "en": "The other day I saw a procession for the Ganesha festival in Mumbai, India. Everyone loads a big statue of the elephant-headed god onto a decorated vehicle and parades it all through the town. Drums, when you hear them right up close, resonate directly through your body, right? It hit me so hard, right down to the pit of my stomach, and before I knew it I was dancing along with people I didn't know. I didn't understand the language at all, but the fervor of that festival alone came across in an instant.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "india",
+   "sense": "刺激や感情などが、強く伝わってくるようす。"
+  },
+  {
+   "ja": "AIが書いた文章は、文法の間違いは少ないものの、どこか書き手の体温が感じられないことがあります。一方で、多少荒削りでも、書き手の思いがビンビン伝わってくる文章もありますよね。その差を生むのは、書き手が実際に見たり聞いたりした場面が書かれているかどうかです。AIに下書きを頼むのはかまいませんが、最後に自分だけの小さな体験を一つ足すことで、文章は見違えるほど生きてきます。",
+   "form": "ビンビン",
+   "en": "Writing produced by AI has few grammatical mistakes, but sometimes you can't feel a writer's body warmth in it. On the other hand, there's also writing where, even if it's a bit rough, the writer's feelings come across intensely. What makes the difference is whether scenes the writer actually saw or heard are written into it. It's fine to ask AI for a draft, but by adding one small experience that's yours alone at the end, the writing comes alive beyond recognition.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "語",
+   "topic": "ai",
+   "grammar": [
+    "n2-mono-no",
+    "n3-koto-de",
+    "n5-teiru"
+   ],
+   "sense": "刺激や感情などが、強く伝わってくるようす。"
   }
  ],
  "96": [
@@ -6399,6 +6705,58 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、睡眠と記憶の関係についてお話しします。寝ているあいだは脳も休んでいると考えている人が多いのですが、実はそうではありません。眠っているあいだに、脳はその日に覚えた情報を整理し、必要なものを長く残す作業をしているとされています。夕べ一生懸命覚えた単語が、朝になると意外にすっと出てくるのは、この働きのおかげかもしれません。つまり、徹夜で詰め込むより、覚えてから寝るほうが理にかなっているわけです。",
+   "form": "夕べ",
+   "en": "Today I'll talk about the relationship between sleep and memory. Many people think that while we sleep the brain is resting too, but in fact that is not the case. While we are asleep, the brain is said to sort through the information learned that day and do the work of keeping what is needed for the long term. The words you studied hard last night coming out surprisingly smoothly in the morning may be thanks to this process. In other words, studying and then sleeping makes more sense than cramming all night.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「夕べ」は「昨夜」のやわらかい言い方で、会話では「昨日の夜」と同じ意味で使う。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "きのうの夜。昨夜"
+  },
+  {
+   "ja": "市内の能楽堂で週末、琵琶の弾き語りで『平家物語』を味わう夕べが開かれ、約二百人が来場した。平家物語は、もともと琵琶法師が語り聞かせることで広まったとされ、文字で読むのとは違う味わいがある。演奏者は、合戦の場面では力強く弦を打ち、一人の武将の最期では声を落とすなど、場面に応じて語り口を変えていた。来場者からは、意味のわからない言葉があっても情景が伝わってきたという声が聞かれた。",
+   "form": "夕べ",
+   "en": "Over the weekend, an evening of enjoying The Tale of the Heike sung to the biwa was held at a Noh theatre in the city, attracting about two hundred people. The Tale of the Heike is said to have spread originally through blind biwa minstrels reciting it, and it has a flavour different from reading it on the page. The performer changed his delivery to suit each scene, striking the strings forcefully in the battle scenes and lowering his voice at the death of a single warrior. Visitors said that even when there were words they did not understand, the scenes still came across.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "「〜の夕べ」は夕方から夜に開く催しの名前に使う。「音楽の夕べ」「朗読の夕べ」など。",
+   "grammar": [
+    "n3-koto-de",
+    "n2-ni-oujite"
+   ],
+   "sense": "夕方から夜に開かれる催し"
+  },
+  {
+   "ja": "多くの寺では、朝と夕べにお経を読む勤めが、休むことなく続けられてきた。朝に始まり、日が沈むころに閉じる、その小さな区切りがあるからこそ、修行の日々は流れに飲まれずにすむのだろう。現代の私たちの暮らしには、こうした区切りがほとんどない。仕事は夜中まで画面の中で続き、寝る直前まで何かを眺め、終わりの合図がないまま眠りにつく。せめて日の終わりに数分だけ手を止めることは、それだけで心を整える小さな勤めになるはずである。",
+   "form": "夕べ",
+   "en": "At many temples, the practice of reciting sutras in the morning and the evening has continued without a break. It is probably because of that small division, beginning in the morning and closing around sunset, that the days of practice are not swept away by the current. Our lives today have almost no such divisions. Work continues on a screen until the middle of the night, we gaze at something right up until bedtime, and we fall asleep without any signal that the day is over. Simply stopping for a few minutes at the end of the day should, by itself, become a small practice that settles the mind.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "「朝に夕べに」のように「朝」と対にすると、夕方の意味になる。書き言葉らしい言い方。",
+   "grammar": [
+    "n2-koto-naku"
+   ],
+   "sense": "日が暮れるころ。夕方"
   }
  ],
  "152": [
@@ -6431,6 +6789,53 @@
    "url": "http://news.livedoor.com/article/detail/6625026/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "【終了しました】夏の紫外線からカラーリングした髪をケアする「カラーコンサーブ デイリー カラー プロテクト」を3名様にプレゼント！"
+  },
+  {
+   "ja": "今日は、天気予報がいつから始まったのかというお話です。日本で最初の天気予報が出されたのは、明治時代の1884年のことでした。当時は全国の天気をごく短い文で伝える程度で、交番などに紙を貼り出して知らせていたといわれています。その観測を担っていた中央気象台が、戦後の1956年に格上げされて生まれたのが、今の気象庁です。つまり、私たちが毎朝何気なく見ている予報には、百四十年以上の積み重ねがあるわけです。",
+   "form": "気象庁",
+   "en": "Today's talk is about when weather forecasting began. The first weather forecast in Japan was issued in 1884, in the Meiji era. At the time it amounted to conveying the weather for the whole country in a very short sentence, and it is said that people were informed by notices posted at police boxes and similar places. The Central Meteorological Observatory, which handled those observations, was upgraded in 1956 after the war, and that is how today's Japan Meteorological Agency came into being. In other words, the forecasts we glance at every morning rest on more than one hundred and forty years of accumulated work.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「気象庁」は天気だけでなく、地震や津波、火山の情報も出す国の機関。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "近年、AIを使った天気予報の研究が世界各地で急速に進んでいる。過去の観測データを大量に学ばせることで、物理法則に基づく計算より短い時間で予測を出せる例も出てきた。気象庁もAIを予報に生かす研究を進めているが、まれにしか起きない極端な大雨をどこまで捉えられるかが課題となっている。専門家の間では、AIが計算に取って代わるのではなく、両者を組み合わせて使うことになるとの見方が多い。",
+   "form": "気象庁",
+   "en": "In recent years, research on weather forecasting using AI has been advancing rapidly around the world. By training it on large amounts of past observation data, cases have emerged in which forecasts can be produced in less time than calculations based on the laws of physics. The Japan Meteorological Agency is also pursuing research into using AI for forecasting, but how well it can capture extreme heavy rain that occurs only rarely remains a challenge. Among experts, the prevailing view is that AI will not replace the calculations, but that the two will end up being used in combination.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "ニュースでは「気象庁によると」「気象庁は〜を発表した」の形でよく出てくる。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-de",
+    "n3-dewa-naku",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "気象庁が出す降水確率は、ふしぎな数字である。三十パーセントと聞けば、多くの人は傘を持たずに出かけるが、同じ予報が十回出れば三回は雨が降るという意味なのだから、決して小さな値ではない。人は確率を、起きるか起きないかの二択に置き換えて、安心したがる生き物なのだ。だが、未来とはもともと、濃淡のある霧のようなものではないだろうか。その曖昧さを抱えたまま前へ進むことこそ、生きるということなのかもしれない。",
+   "form": "気象庁",
+   "en": "The probability of precipitation issued by the Japan Meteorological Agency is a curious number. Hearing thirty percent, many people go out without an umbrella, but since it means that if the same forecast were issued ten times it would rain three times, it is by no means a small value. Humans are creatures who want to feel safe by turning probabilities into a binary choice between happening and not happening. But isn't the future by its nature something like a fog with lighter and darker patches? Perhaps moving forward while holding that ambiguity is precisely what living means.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind"
   }
  ],
  "158": [
@@ -8300,6 +8705,54 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、権力が人をどう変えるかを扱ったビジネス書を要約します。昇進したとたんに部下に威張り散らすようになる人、職場で見かけたことはありませんか。著者によれば、力を持つと他人の気持ちを想像する働きが弱まりやすいことが、心理学の研究で示されているそうです。つまり、もとから性格が悪かったというより、立場が人を変えてしまう面があるんですね。だからこそ、上に立つ人ほど、耳の痛い意見をあえて聞く仕組みを周りに作っておくべきだと著者は説いています。",
+   "form": "威張り散らす",
+   "en": "This time I'll summarize a business book about how power changes people. Have you ever seen someone at work who starts bossing their subordinates around the moment they're promoted? According to the author, psychological research has shown that having power tends to weaken our ability to imagine other people's feelings. In other words, it's not so much that they had a bad character to begin with; there's a side to it where position changes people. That's exactly why, the author argues, the higher someone stands, the more they should set up ways around themselves to deliberately hear unwelcome opinions.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「部下に威張り散らす」のように「〜に」で相手を示す。周り中に向ける感じがある。",
+   "grammar": [
+    "n4-you-ni-naru",
+    "n5-teiru"
+   ],
+   "sense": "周りの人に、やたらとえらそうな態度をとる。"
+  },
+  {
+   "ja": "最近、AIにすごい命令口調で話しかけてる人、いるじゃないですか。早くしろとか、使えないなとか、平気で言っちゃって。相手は機械だから別にいいんですけど、なんか見てると、ふだんも後輩に威張り散らしてるのかなって想像しちゃうんですよね。人って、相手が言い返せないときに本性が出るって言うじゃないですか。逆に、AIにもちゃんとお礼を言う人って、それだけでちょっと信用できる気がします。",
+   "form": "威張り散らし",
+   "en": "Lately there are people who talk to AI in a really bossy, commanding tone, right? Saying stuff like hurry up, or you're useless, without a second thought. It's a machine, so it doesn't really matter, but somehow when I watch it, I can't help imagining they boss their juniors around the rest of the time too. They say people show their true nature when the other side can't talk back, right? On the other hand, people who properly say thank you even to AI, I feel like I can trust them a bit just for that.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "ai",
+   "sense": "周りの人に、やたらとえらそうな態度をとる。"
+  },
+  {
+   "ja": "歴史をひもとくと、地位を得たとたんに周りに威張り散らした者が、長く権力を保てた例は多くない。力で押さえつけられた家臣や民は、表向きは従っていても、心の中では離れていくからである。恐れによる服従は、権力の後ろ盾が傾いた瞬間にもろく崩れ去る。反対に、身分の低い者の声にも耳を傾けた支配者は、危機の際にも支えを得やすかった。人の上に立つ者の器は、命令する力ではなく、従う者の信頼によって測られるのだろう。",
+   "form": "威張り散らし",
+   "en": "Looking through history, there are not many cases in which those who bossed everyone around as soon as they gained status managed to hold on to power for long. That is because retainers and common people held down by force drift away in their hearts, even if they obey on the surface. Obedience born of fear crumbles easily the moment the backing of power begins to tilt. Conversely, rulers who listened even to the voices of those of low rank found it easier to win support in times of crisis. The caliber of one who stands above others is probably measured not by the power to command, but by the trust of those who follow.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "grammar": [
+    "n4-teiku",
+    "n3-dewa-naku"
+   ],
+   "sense": "周りの人に、やたらとえらそうな態度をとる。"
   }
  ],
  "91": [
@@ -8322,6 +8775,55 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、睡眠の質を高めるための本を要約します。夜遅くまでスマホを見ていると、体は疲れているのに、布団に入っても目がギンギンで眠れない、ということがありますよね。著者によれば、画面の光や刺激の強い情報が、脳を昼間のような興奮状態にしてしまうことが原因の一つだそうです。寝る一時間前には画面から離れ、照明も少し暗くしておく。それだけで、寝つきはずいぶん変わってくると著者は言います。",
+   "form": "ギンギン",
+   "en": "This time I'll summarize a book on improving the quality of your sleep. When you look at your phone until late at night, sometimes your body is tired but even in bed your eyes are wide open and you can't sleep, right? According to the author, one cause is that the light of the screen and highly stimulating information put the brain into an excited state as if it were daytime. Step away from screens an hour before bed, and make the lighting a little dimmer. The author says that alone will change how easily you fall asleep quite a lot.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「目がギンギン」は眠れないほどさえた状態。「ギンギンに冷えた」は冷たさを強める言い方。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "興奮などで、目や頭がひどくさえているようす。"
+  },
+  {
+   "ja": "新しいAIのモデルが発表された日って、つい夜中までずっと触っちゃうじゃないですか。あれもできる、これもできるって夢中で試してるうちに、気づいたら目がギンギンになってて。結局、布団に入ったあとも、朝まで一睡もできなかったんですよ。次の日の会議では、資料を見るふりをしながら、ずっとあくびをこらえてました。もういい年なんだから、ほどほどにしなきゃとは毎回思ってるんですけどね。",
+   "form": "ギンギン",
+   "en": "On the day a new AI model is announced, you end up playing with it all the way till the middle of the night, right? While I was eagerly trying out how it can do this and it can do that, before I knew it I was totally wired. In the end, even after getting into bed, I couldn't get a wink of sleep until morning. At the meeting the next day, I was stifling yawns the whole time while pretending to look at the documents. I'm not that young anymore, so every time I do think I need to keep it in moderation, though.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "ai",
+   "grammar": [
+    "n4-nagara"
+   ],
+   "sense": "興奮などで、目や頭がひどくさえているようす。"
+  },
+  {
+   "ja": "旅の文章を書くときは、温度や音を表す言葉を一つ入れるだけで、場面がぐっと身近になります。たとえば、真夏のデリーで飲んだラッシーを、ただ冷たかったと書くのではなく、ギンギンに冷えていたと書いてみてください。それだけで、照りつける日差しと、のどを通る冷たさの落差が読み手に伝わります。ただし、くだけた言い方なので、硬い文章の中で使うと浮いてしまう点には注意しましょう。",
+   "form": "ギンギン",
+   "en": "When you write about travel, just adding one word for temperature or sound makes a scene feel much closer. For example, instead of simply writing that the lassi you drank in Delhi in midsummer was cold, try writing that it was ice-cold. That alone conveys to the reader the contrast between the blazing sun and the coldness going down your throat. However, since it's a casual expression, be careful that it will stick out if you use it in formal writing.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "語",
+   "topic": "india",
+   "grammar": [
+    "n3-dewa-naku"
+   ],
+   "sense": "飲み物などが、とても冷たく冷えているようす。"
   }
  ],
  "97": [
@@ -8781,6 +9283,62 @@
    "url": "http://news.livedoor.com/article/detail/6091405/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "ヴァンパイアから逃げ切れるのか、『フライトナイト』本編クリップ映像を公開"
+  },
+  {
+   "ja": "今日はインド哲学の大きなテーマである、生まれ変わりの問題を取り上げます。古代インドでは、生き物は死んでもまた別の姿で生まれ、それが果てしなく繰り返されると考えられていました。この繰り返しを輪廻といいますが、これは楽しい永遠ではなく、苦しみが終わらない状態だと捉えられていたんです。だから修行者たちは、その輪からの脱出を人生の最終目標にしたわけですね。仏教もこの問題意識を受け継いだうえで、独自の答えを出していきます。",
+   "form": "脱出",
+   "en": "Today I'll take up one of the big themes of Indian philosophy, the problem of rebirth. In ancient India, it was believed that living beings, even after death, are born again in another form, and that this repeats endlessly. This repetition is called samsara, but it was seen not as a pleasant eternity but as a state in which suffering never ends. That is why ascetics made escape from that cycle the ultimate goal of life. Buddhism, too, inherited this concern and then went on to give its own answer.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "india",
+   "tipJa": "「〜からの脱出」の形で、苦しい状態や悪い流れから抜け出す比喩にもよく使う。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n2-ue-de",
+    "n4-teiku"
+   ],
+   "sense": "苦しい状態から抜け出すこと"
+  },
+  {
+   "ja": "1940年5月、フランス北部の港町ダンケルクで、ドイツ軍に追い詰められた英仏の兵士らがイギリス本土への脱出を図った。作戦には軍艦だけでなく、漁船や遊覧船など民間の小型船も数多く加わった。空からの攻撃を受けながらの撤収は、困難を極めた。およそ十日間で、三十万人を超える兵士が対岸へ運ばれたとされる。戦いには敗れたものの、多くの命を救ったこの出来事は、今も語り継がれている。",
+   "form": "脱出",
+   "en": "In May 1940, at the port town of Dunkirk in northern France, British and French soldiers cornered by the German army attempted to escape to the British mainland. Not only warships but also many small civilian boats, such as fishing boats and pleasure craft, took part in the operation. The withdrawal, carried out under attack from the air, was extremely difficult. Over roughly ten days, more than three hundred thousand soldiers are said to have been carried to the opposite shore. Although the battle was lost, this event, which saved many lives, is still told today.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "「脱出を図る」は危険な場所から逃れようと試みること。報道で多い組み合わせ。",
+   "grammar": [
+    "n2-mono-no",
+    "n4-nagara",
+    "n5-teiru"
+   ],
+   "sense": "危険な場所から抜け出すこと"
+  },
+  {
+   "ja": "悪い習慣からの脱出を、人はしばしば意志の強さの問題だと考える。しかし、意志の力で押さえ込もうとするほど、意識はかえってその習慣のほうへ向かってしまう。禁じられたものほど気になるのが、心というものの性質なのである。必要なのは、正面から戦うことではなく、別の道を少しずつ用意していくことだろう。出口は、壁を打ち破った先ではなく、案外すぐ横に開いているのかもしれない。",
+   "form": "脱出",
+   "en": "People often think of escaping a bad habit as a matter of willpower. But the harder we try to suppress it by force of will, the more our attention turns toward that very habit. It is the nature of the mind to be most drawn to what is forbidden. What is needed is probably not to fight head-on but to prepare another path little by little. The exit may lie not beyond a wall you break through but, unexpectedly, wide open right beside you.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku",
+    "n4-teiku"
+   ],
+   "sense": "好ましくない状態から抜け出すこと"
   }
  ],
  "153": [
@@ -8803,6 +9361,57 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、八時間労働がどのように広まったのかを見ていきます。1914年、アメリカのフォード社は、工場の労働時間を八時間に短くし、賃金を大きく引き上げました。目的の一つは、きつい仕事に嫌気がさして辞めていく人を減らし、毎朝きちんと出勤してくれる人を確保することだったとされています。結果として辞める人は大きく減り、ほかの企業もこの流れに続くことになりました。働く時間の長さは、昔から生産性と人の心の両方に関わる問題だったわけです。",
+   "form": "出勤",
+   "en": "Today let's look at how the eight-hour working day spread. In 1914, the Ford company in the United States shortened working hours in its factories to eight hours and raised wages substantially. One of the aims is said to have been to reduce the number of people who got fed up with the hard work and quit, and to secure people who would reliably come in to work every morning. As a result, the number of people quitting fell sharply, and other companies came to follow this trend. The length of working hours has long been an issue that bears on both productivity and the human mind.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「出勤する」は勤め先へ行くこと。家から職場への移動そのものは「通勤」、帰るのは「退勤」。",
+   "grammar": [
+    "n5-teiru",
+    "n4-teiku",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "半導体の工場は、生産ラインを止めないように、二十四時間体制で動いているところが多い。そのため従業員はいくつかの班に分かれた交代制で勤務し、深夜や早朝に出勤する人も少なくない。近年は人手不足を背景に、AIを使って設備の異常を早めに見つけ、夜間の人員を減らす取り組みも広がっている。ただ、機械に任せられる範囲には限りがあり、現場で培われた経験をどう引き継ぐかが課題となっている。",
+   "form": "出勤",
+   "en": "Many semiconductor factories operate around the clock so that production lines do not stop. For this reason employees work in shifts divided into several crews, and quite a few come in to work late at night or early in the morning. In recent years, against the backdrop of labour shortages, efforts to use AI to detect equipment faults early and reduce night-time staffing have also been spreading. However, there are limits to what can be left to machines, and how to pass on the experience built up on the shop floor remains a challenge.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "「早朝出勤」「休日出勤」のように、時間や日を表す語と組み合わせることが多い。",
+   "grammar": [
+    "n3-you-ni",
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "毎朝の出勤を、私たちは仕事が始まる前の、早く過ぎてほしい時間として扱っている。だが禅の寺では、掃除や畑仕事もまた修行とされ、何をするかより、どう向き合うかが問われる。そう考えれば、駅までの道のりも、電車の揺れも、ただ通り過ぎるための空白ではなく、それ自体がひとつの時間なのである。目的地にたどり着くことばかりを急げば、人生の大半は途中として捨てられてしまうだろう。",
+   "form": "出勤",
+   "en": "We treat our morning trip to work as time before work starts that we want to pass quickly. But in Zen temples, cleaning and fieldwork are also regarded as practice, and what matters is less what you do than how you engage with it. Seen that way, the walk to the station and the swaying of the train are not blank spaces just to pass through but a time in their own right. If we hurry only to reach our destination, most of life will be thrown away as merely being on the way.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku"
+   ]
   }
  ],
  "159": [
@@ -10476,6 +11085,58 @@
    "url": "http://news.livedoor.com/article/detail/6521604/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "ホラー映画界に“革命”を起こす、キューバ初のゾンビ映画が世界の映画祭を席巻中"
+  },
+  {
+   "ja": "今回は、本能寺の変をめぐる謎を整理した本を要約します。明智光秀が主君の織田信長を討ったこの事件は、動機がいまだにはっきりしていません。そのため、光秀をそそのかして信長を倒そうとたくらんだ人物が別にいたのではないかという説が、昔から数多く唱えられてきました。著者は、こうした黒幕説の多くが、確かな史料ではなく後の時代の推測に頼っていると指摘しています。歴史の謎は、面白さよりも根拠の確かさで見ていこう、というのが本書のメッセージです。",
+   "form": "たくらんだ",
+   "en": "This time I'll summarize a book that sorts out the mysteries surrounding the Honnoji Incident. In this incident, in which Akechi Mitsuhide struck down his lord Oda Nobunaga, the motive is still unclear today. For that reason, theories that there was someone else who schemed to bring Nobunaga down by egging Mitsuhide on have been put forward in great numbers for a long time. The author points out that many of these mastermind theories rely not on reliable historical sources but on guesses from later eras. The book's message is: let's look at historical mysteries by how solid the evidence is rather than by how interesting they are.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「悪事をたくらむ」のように、悪い計画に使う。ひらがなで書くことが多い。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "よくないことを、ひそかに計画する。"
+  },
+  {
+   "ja": "生成AIで家族の声をまねる詐欺が、各国で問題になっている。よからぬことをたくらむ者にとって、声や文章を本物らしく作れる技術は都合のよい道具になりかねない。子や孫を名乗る電話を信じて、まとまったお金を送ってしまう被害も報じられている。警察などは、電話でお金の話が出たら一度切って、本人に直接確かめるよう呼びかけている。技術の進歩に応じて、受け手の側にも新しい用心が求められている。",
+   "form": "たくらむ",
+   "en": "Scams that imitate family members' voices with generative AI have become a problem in various countries. For those scheming something sinister, technology that can make voices and writing look genuine could become a convenient tool. Cases have also been reported of people who believed calls from someone claiming to be a child or grandchild and sent a large sum of money. The police and others are urging people to hang up once if money comes up on a call, and to check directly with the person in question. As technology advances, new caution is being demanded of those on the receiving end too.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru",
+    "n2-ni-oujite"
+   ],
+   "sense": "よくないことを、ひそかに計画する。"
+  },
+  {
+   "ja": "人は、他人の何気ない言動の裏に、悪意を読み取ってしまうことがある。同僚の小声の会話を耳にすれば、自分を外そうとたくらんでいるのではないかと思えてくる。しかし実際には、相手はただ昼食の店の相談をしていたにすぎないことのほうが多い。不安が強いときほど、心は分からない部分を最悪の筋書きで埋めようとするのである。疑いが頭をもたげたら、まず確かな事実だけを並べてみることだ。",
+   "form": "たくらんで",
+   "en": "People sometimes read malice behind others' casual words and actions. When you overhear coworkers' hushed conversation, you start to think they might be scheming to push you out. In reality, however, it is more often the case that they were merely discussing where to have lunch. The stronger one's anxiety, the more the mind tries to fill what it doesn't know with the worst possible scenario. When suspicion raises its head, the thing to do is first to line up only the facts that are certain.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n5-teiru",
+    "n2-ni-suginai"
+   ],
+   "sense": "よくないことを、ひそかに計画する。"
   }
  ],
  "54": [
@@ -10508,6 +11169,59 @@
    "url": "https://www.aozora.gr.jp/cards/000246/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今回は、思春期の脳について書かれた本を要約します。十代の子どもが親に反抗的な態度をとるのは、性格の問題だけではなく、脳が育つ順番も関係しているそうです。感情を生み出す部分が先に成熟するのに対して、それを抑える前頭前野はゆっくり時間をかけて育っていくんですね。親としては、口答えや無視をいちいち正面から受け止めて叱らず、成長の一段階として見守るのがよいと著者は言います。",
+   "form": "反抗的",
+   "en": "This time I'll summarize a book written about the adolescent brain. When teenagers take a defiant attitude toward their parents, it apparently isn't only a matter of personality; the order in which the brain develops is also involved. The parts that generate emotion mature first, whereas the prefrontal cortex that holds them in check develops slowly, taking its time. The author says that, as a parent, it is best not to meet every bit of talking back or ignoring head-on with a scolding, but to watch over it as one stage of growth.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「反抗的な態度をとる」の形が多い。子どもや部下など、下の立場の人について言う。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n4-teiku",
+    "n5-teiru"
+   ],
+   "sense": "目上の人や決まりに、逆らおうとするようす。"
+  },
+  {
+   "ja": "対話型AIの応答が、利用者から反抗的だと受け止められることがある。危険な依頼を断ったり、利用者の思い違いを指摘したりすると、口答えをされたように感じる人がいるためだ。開発各社は、安全のための判断を保ちながら、相手を不快にさせない言い回しの工夫を重ねている。専門家の間では、何でも言いなりになるAIのほうがかえって危ういという指摘もある。どこまで利用者に合わせ、どこで断るかの線引きをめぐっては、今も手探りが続いている。",
+   "form": "反抗的",
+   "en": "Responses from conversational AI are sometimes perceived by users as defiant. This is because when it declines dangerous requests or points out a user's misunderstanding, some people feel as though they have been talked back to. Developers keep refining their wording so as not to offend people, while keeping the judgments they make for safety. Among experts there is also the point that an AI that goes along with anything is actually the more dangerous one. Where to draw the line between going along with users and refusing is still being worked out by trial and error.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n4-nagara",
+    "n5-teiru"
+   ],
+   "sense": "目上の人や決まりに、逆らおうとするようす。"
+  },
+  {
+   "ja": "いつの時代も、権力の側から見て反抗的な者は、秩序を乱す存在として扱われてきた。しかし後の世から振り返ると、彼らの訴えが新しい制度の出発点になっていたことも少なくない。異論を唱える声を早くから力で封じてしまえば、社会は自らの誤りに気づく機会を失うことになる。もちろん、ただ従わないこと自体に何か価値があるわけではない。問われるべきは、その声が誰の何に向けられていたかである。",
+   "form": "反抗的",
+   "en": "In every era, those who were defiant in the eyes of those in power have been treated as people who disturb order. But looking back from later ages, it is not rare that their demands had become the starting point of new institutions. If a society silences dissenting voices early by force, it ends up losing the chance to notice its own mistakes. Of course, merely refusing to obey has no particular value in itself. What should be asked is at whom, and at what, those voices were directed.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n3-wake-dewa-nai"
+   ],
+   "sense": "目上の人や決まりに、逆らおうとするようす。"
   }
  ],
  "60": [
@@ -10749,6 +11463,54 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、人間関係の悩みを心理学から読み解く本を要約します。著者によれば、周りを見下して威張りくさった態度をとる人ほど、実は心の奥に強い不安を抱えていることが多いそうです。自分の価値に自信が持てないので、他人を下に置くことでしか安心できないんですね。職場や学校で、そういう人に振り回されて疲れている人も多いのではないでしょうか。そう考えると、そういう人の言葉をまともに受け止めて落ち込む必要はない、というのが著者のアドバイスです。",
+   "form": "威張りくさった",
+   "en": "This time I'll summarize a book that interprets troubles in human relationships through psychology. According to the author, the more someone looks down on those around them and acts high and mighty, the more often they are actually carrying strong anxiety deep in their heart. Because they can't feel confident in their own worth, they can only feel at ease by putting others beneath them. Many of you are probably worn out from being pushed around by such people at work or school. Seen that way, the author's advice is that there is no need to take such people's words at face value and feel down.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「くさる」は相手の態度をののしる言い方。「威張りくさって」の形で、話し言葉で使う。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-de"
+   ],
+   "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
+  },
+  {
+   "ja": "時代劇の悪代官って、だいたい威張りくさってるじゃないですか。でも実際の代官って、幕府から任されて、少ない人数で広い土地を治めなきゃいけなくて、けっこう大変な仕事だったらしいんですよ。年貢を集めたり、もめ事を収めたり、村の人たちとうまくやらないと回らなかったみたいで。テレビのイメージだけで決めつけちゃうと、ちょっとかわいそうかもしれないですね。もちろん、中には本当にひどい人もいたんでしょうけど。",
+   "form": "威張りくさってる",
+   "en": "The evil magistrates in period dramas are usually acting all high and mighty, right? But apparently real magistrates, entrusted by the shogunate, had to govern large areas of land with only a few people, and it was a pretty tough job. It seems things didn't run unless they collected the annual rice tax, settled disputes, and got along well with the villagers. If you judge them only by the image on TV, it might be a bit unfair to them. Of course, there were probably some who really were awful.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "history",
+   "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
+  },
+  {
+   "ja": "インドで生まれた仏教では、他人と比べて自分を高く置こうとする心を慢と呼び、心を曇らせる煩悩の一つに数える。地位や知識を盾にして威張りくさる人が、その典型であることは言うまでもない。だが、そうした人に腹を立てるとき、自分の中にも、あの人よりはましだという同じ心が動いてはいないだろうか。慢は、他人を見下す形だけでなく、他人を裁く形でも現れるのである。相手の態度を責める前に、自分の心の動きにも目を向けておきたい。",
+   "form": "威張りくさる",
+   "en": "In Buddhism, which was born in India, the mind that tries to place oneself high by comparing oneself with others is called conceit, and it is counted among the defilements that cloud the mind. It goes without saying that people who act high and mighty, using their status or knowledge as a shield, are a typical example. But when we get angry at such people, isn't the same mind, the thought that we are better than that person, at work within us too? Conceit appears not only in the form of looking down on others, but also in the form of judging them. Before blaming the other person's attitude, I would like to turn my eyes to the movements of my own mind as well.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n1-made-mo-nai",
+    "n5-tai"
+   ],
+   "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
   }
  ],
  "92": [
@@ -11262,6 +12024,60 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、ブッダのもとを訪れた若者たちのエピソードを紹介します。彼らは森で遊んでいたところ、連れてきた女性に持ち物を盗まれ、必死にその女性を追っていました。ブッダは事情を聞くと、その女性の捜索と自分自身を探し求めることと、どちらが大切かと問いかけたと伝えられています。外で失ったものを追いかける前に、まず自分の内側を見よ、というわけですね。若者たちはこの問いをきっかけに、教えを聞くことになったとされています。",
+   "form": "捜索",
+   "en": "Today I'll introduce an episode about some young men who came to see the Buddha. While they were amusing themselves in a forest, a woman they had brought along stole their belongings, and they were desperately chasing after her. It is told that when the Buddha heard what had happened, he asked them which was more important, the search for that woman or seeking themselves. The point is that before chasing what you have lost outside, you should first look within. With this question as the trigger, the young men are said to have ended up listening to his teaching.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "india",
+   "tipJa": "「捜索」は行方のわからない人や物を組織的に探すときの硬い語。日常の探し物には「探す」。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-ni-naru"
+   ],
+   "sense": "いなくなった人や物を探すこと"
+  },
+  {
+   "ja": "半導体の技術情報を海外の企業に不正に渡したとして、警察は不正競争防止法違反の疑いで、元社員の自宅などを捜索した。警察によると、元社員は退職する前の数か月間に、大量の技術資料を私物の記録媒体にコピーしていた疑いがある。押収したパソコンなどを分析し、情報がどのような経路で渡ったのか詳しく調べる方針だ。技術の流出をめぐる摘発は近年相次いでおり、企業の側にも管理の見直しが求められている。",
+   "form": "捜索",
+   "en": "On suspicion of violating the Unfair Competition Prevention Act by illegally passing semiconductor technical information to an overseas company, police searched the home and other premises of a former employee. According to police, the former employee is suspected of copying a large amount of technical documents onto a personal storage device in the months before leaving the company. Police plan to analyse the seized computers and other items and look in detail at the route by which the information was passed on. Crackdowns over technology leaks have been occurring one after another in recent years, and companies too are being urged to review their controls.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "警察が証拠を求めて家や会社を調べることも「捜索」と言う。「家宅捜索」「捜索に入る」の形が多い。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "警察が証拠を求めて家などを調べること"
+  },
+  {
+   "ja": "失くした鍵の捜索ほど、人の心のくせをよく映し出すものはない。私たちは、ありそうな場所を何度も見返しながら、まったく別の場所を思い浮かべようとはしない。探しているのは鍵ではなく、ここにあるはずだという自分の思い込みなのである。だから、いったん手を止め、最後に鍵を握った瞬間を思い出すほうが、部屋をかき回すより早いことが多い。見つからないものは、たいてい、見ようとしなかった場所にある。",
+   "form": "捜索",
+   "en": "Nothing reflects the habits of the human mind as well as the search for lost keys. We look over the likely places again and again, while never trying to picture a completely different place. What we are looking for is not the keys but our own assumption that they must be here. So stopping for a moment and recalling the instant we last held the keys is often faster than turning the room upside down. What we cannot find is usually in the place we did not try to look.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "tipJa": "日常の探し物に「捜索」を使うと、大げさで少しおかしみのある言い方になる。",
+   "grammar": [
+    "n4-nagara",
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "いなくなった人や物を探すこと"
   }
  ],
  "154": [
@@ -11294,6 +12110,55 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、片付けがなかなか終わらない人に共通する落とし穴についてお話しします。それは、物があふれて困ったとき、まず新しい収納家具を買ってしまうことです。入れる場所が増えると一時的には部屋がすっきりしますが、物の量そのものは変わらないので、しばらくすると元に戻ってしまいます。大事なのは、しまい方を工夫する前に、本当に必要な物を選び直すことなんですね。片付けとは、しまう技術ではなく、自分が何を大切にしたいかを決める作業だというわけです。",
+   "form": "収納家具",
+   "en": "Today I'll talk about a pitfall common to people who never seem to finish tidying up. It's that when things overflow and they're stuck, the first thing they do is buy new storage furniture. When there's more space to put things, the room looks neat for a while, but because the amount of stuff itself hasn't changed, before long it goes back to how it was. What matters is choosing again what you really need before getting clever about how you store it. In other words, tidying up is not a storage technique but the work of deciding what you want to treasure.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "棚・たんす・チェストなど、物をしまう家具をまとめて「収納家具」と言う。",
+   "grammar": [
+    "n3-dewa-naku"
+   ]
+  },
+  {
+   "ja": "江戸時代から昭和にかけての収納家具を集めた企画展が、市内の博物館で開かれている。会場には、衣類をしまう箪笥のほか、船の中で貴重品を守るために作られた頑丈な船箪笥などが並ぶ。船箪笥は、船が沈んでも水に浮いて流れ着くように、すき間なく作られていたとも伝えられる。学芸員によると、箪笥が庶民の家にも広まったのは江戸時代の中ごろ以降で、持ち物が増えていく暮らしの変化を映しているという。来場者は、細かな金具の飾りに熱心に見入っていた。",
+   "form": "収納家具",
+   "en": "An exhibition bringing together storage furniture from the Edo period through the Showa era is being held at a museum in the city. On display are chests of drawers for storing clothes, as well as sturdy ship's chests made to protect valuables aboard ships. Ship's chests are also said to have been built without gaps so that, even if the ship sank, they would float and wash ashore. According to the curator, it was from around the middle of the Edo period onward that chests of drawers spread into ordinary people's homes too, reflecting changes in a way of life in which possessions kept increasing. Visitors gazed intently at the fine metal fittings.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "grammar": [
+    "n5-teiru",
+    "n3-you-ni",
+    "n4-teiku"
+   ]
+  },
+  {
+   "ja": "家が狭くなったと感じるとき、私たちはまず収納家具を買い足すことを考える。だが、しまう場所を増やすことは、持ち物を手放さずにすませるための工夫にすぎない場合もある。仏教が執着を苦しみの原因と見たのは、物そのものを悪としたからではない。いつか使うかもしれないという不安が、心の中にも見えない棚を作り、そこに重荷を積み上げていくからである。部屋を軽くすることは、心を軽くする練習でもあるのだろう。",
+   "form": "収納家具",
+   "en": "When we feel our home has become cramped, the first thing we think of is buying more storage furniture. But adding places to put things away is sometimes nothing more than a device for avoiding letting go of our belongings. Buddhism saw attachment as the cause of suffering not because it held things themselves to be evil. It is because the anxiety that we might use something someday builds invisible shelves in the mind too, and piles burdens onto them. Lightening a room is probably also practice for lightening the mind.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n2-ni-suginai",
+    "n4-teiku"
+   ]
   }
  ],
  "160": [
@@ -12932,6 +13797,57 @@
    "url": "https://www.aozora.gr.jp/cards/000246/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今回は、記憶のしくみを解説した本から、思い出すという行為について要約します。昔の旅行のことを思い出そうとしても、場面が途切れ途切れにしか浮かんでこないこと、誰にでもありますよね。著者によれば、脳は出来事をビデオのように丸ごと保存しているわけではないそうです。残った断片をもとに、その都度話をつなぎ直しているので、思い出すたびに中身が少しずつ変わることもあるんですね。",
+   "form": "途切れ途切れ",
+   "en": "This time, from a book explaining how memory works, I'll summarize the act of remembering. Even when you try to recall a trip from long ago, the scenes only come to mind in broken bits; that happens to everyone, right? According to the author, the brain doesn't store events whole like a video. Because it reconnects the story each time based on the fragments that remain, what you remember can change little by little each time you recall it.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「途切れ途切れに聞こえる」「途切れ途切れの記憶」のように、声や記憶によく使う。",
+   "grammar": [
+    "n3-wake-dewa-nai",
+    "n5-teiru"
+   ],
+   "sense": "続かずに、何度も切れ切れになるようす。"
+  },
+  {
+   "ja": "通信が不安定な環境でのオンライン会議では、相手の声が途切れ途切れになることが少なくない。こうした問題に対し、AIで欠けた音声を補う技術の開発が進んでいる。直前の声の特徴をもとに、聞こえなかった部分をそれらしく埋める仕組みだ。ただ、実際には言っていない言葉まで補ってしまうおそれもあり、使い方には注意が必要だとされる。それでも、聞き取れなかった発言を何度も聞き返す手間が減るとして、期待する声は大きい。",
+   "form": "途切れ途切れ",
+   "en": "In online meetings over unstable connections, it is not rare for the other person's voice to come through in broken bits. To deal with this problem, development of technology that fills in missing audio with AI is advancing. It is a system that, based on the features of the voice just before, plausibly fills in the parts that could not be heard. However, there is also a risk that it will fill in words that were never actually said, so care is said to be needed in how it is used. Even so, expectations are high, since it would cut down on the trouble of asking again and again about remarks that could not be heard.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "続かずに、何度も切れ切れになるようす。"
+  },
+  {
+   "ja": "古代の記録は、そのほとんどが完全な形では残っていない。焼けた木簡や欠けた石碑から読み取れるのは、意味の通らない途切れ途切れの文字にすぎないことも多い。研究者はその隙間を、ほかの資料や当時の制度の知識で慎重に補っていく。だが、埋めた部分はあくまで推定であり、確かな事実とは区別しておかなければならない。歴史とは、残された断片と失われた空白の両方と向き合う営みなのである。",
+   "form": "途切れ途切れ",
+   "en": "Most ancient records do not survive in complete form. What can be read from burned wooden tablets and chipped stone monuments is often nothing more than broken fragments of writing that make no sense. Researchers carefully fill those gaps using other materials and knowledge of the institutions of the time. But the filled-in parts are only estimates, and must be kept distinct from established facts. History is the work of facing both the fragments that remain and the blanks that have been lost.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "grammar": [
+    "n2-ni-suginai",
+    "n4-teiku"
+   ],
+   "sense": "続かずに、何度も切れ切れになるようす。"
   }
  ],
  "55": [
@@ -12964,6 +13880,59 @@
    "url": "http://news.livedoor.com/article/detail/6731674/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "痩せたら本当に幸せなの？　独女がダイエットを諦めたくなる時"
+  },
+  {
+   "ja": "今回は、インドのヨーガの古典をやさしく解説した本を要約します。著者がまず強調するのは、ヨーガがもともと体を柔らかくするための体操ではなく、心の動きを静めるための修行だったという点です。呼吸に意識を向ける練習を続けていくと、散らばっていた注意がまとまり、集中する力が一層高まると説明されています。ポーズの完成度より、呼吸の質に目を向けてほしいというのが、著者からのメッセージなんですね。",
+   "form": "一層",
+   "en": "This time I'll summarize a book that explains a classic of Indian yoga in plain terms. What the author stresses first is that yoga was originally not exercise for making the body flexible, but a discipline for calming the movements of the mind. The book explains that as you keep practicing turning your awareness to your breath, your scattered attention comes together and your ability to concentrate rises even further. The author's message is that we should pay attention to the quality of our breathing rather than how perfect our poses are.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "india",
+   "tipJa": "「一層高まる」「より一層」の形が多い。改まった文章やあいさつでよく使う。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n4-teiku",
+    "n5-teiru"
+   ],
+   "sense": "程度が、前よりもさらに増すようす。"
+  },
+  {
+   "ja": "生成AIの普及に伴い、データセンターの電力需要が急速に伸びている。大規模なAIモデルの学習や利用には大量の計算が必要で、今後も一層の増加が見込まれる。各地では発電所や送電網の整備が追いつかず、新たな施設の建設が遅れる例も出ている。データセンターを、電源を確保しやすい地域に分散させる案も議論されている。省エネ型の半導体や冷却技術の開発が、業界にとって大きな課題となっている。",
+   "form": "一層",
+   "en": "With the spread of generative AI, electricity demand from data centers is growing rapidly. Training and using large AI models requires an enormous amount of computation, and demand is expected to increase even further from here. In various places, building power plants and transmission grids has failed to keep up, and there are even cases where construction of new facilities is delayed. Proposals to spread data centers out to regions where power is easier to secure are also being discussed. Developing energy-saving chips and cooling technology has become a major challenge for the industry.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "程度が、前よりもさらに増すようす。"
+  },
+  {
+   "ja": "孤独は、ひとりきりの部屋よりも、人混みの中でこそ一層深く感じられるものである。周りに大勢の人がいるのに、誰とも心が通っていないという事実が、かえって際立つからだ。逆に、ひとりで過ごす時間がいつも寂しいわけではない。人が恐れているのは、物理的にひとりであることではなく、誰ともつながっていないという感覚なのだろう。孤独を和らげるのは、人の数ではなく、関係の深さなのである。",
+   "form": "一層",
+   "en": "Loneliness is something felt even more deeply in a crowd than in a room where one is all alone. That is because the fact that one's heart connects with no one, despite the many people around, stands out all the more. Conversely, time spent alone is not always lonely. What people fear is probably not being physically alone, but the sense of being connected to no one. What eases loneliness is not the number of people but the depth of one's relationships.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n3-wake-dewa-nai",
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "程度が、前よりもさらに増すようす。"
   }
  ],
  "61": [
@@ -13699,6 +14668,55 @@
    "url": "http://news.livedoor.com/article/detail/6295722/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "レノボ、プロゴルファーの斉藤愛璃選手とオフィシャル・スポンサーシップ契約を締結"
+  },
+  {
+   "ja": "今回は、源頼朝がなぜ鎌倉を拠点に選んだのかを考えてみます。鎌倉は今の神奈川県の南東部にあり、周りを山と海に囲まれた土地です。攻め込まれにくい地形は、まだ不安定だった武士の政権にとって大きな安心材料だったわけですね。さらに、頼朝の祖先とゆかりの深い土地だったことも、理由の一つとされています。つまり、守りやすさと正統性の両方を、場所選びで手に入れたということです。",
+   "form": "神奈川県",
+   "en": "This time, let's think about why Minamoto no Yoritomo chose Kamakura as his base. Kamakura is in the southeast of present-day Kanagawa Prefecture, a place surrounded by mountains and sea. Terrain that was hard to attack was a big source of reassurance for a warrior government that was still unstable. In addition, the fact that it was a place closely tied to Yoritomo's ancestors is also considered one of the reasons. In other words, through his choice of location he gained both defensibility and legitimacy.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「神奈川県」の県庁は横浜市にある。鎌倉や箱根も県内の地名。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "1853年、ペリーが率いるアメリカの艦隊が浦賀の沖に現れた。浦賀は、現在の神奈川県横須賀市にあたる。翌年、幕府は横浜で日米和親条約を結び、長く続いた対外政策は大きく転換した。さらに1859年に横浜が開港すると、小さな村だった土地は、外国との貿易の窓口として急速に発展していくことになった。黒船の来航は、国の方針だけでなく、地域の姿そのものを変える出来事でもあった。",
+   "form": "神奈川県",
+   "en": "In 1853, an American fleet led by Perry appeared off Uraga. Uraga corresponds to present-day Yokosuka City in Kanagawa Prefecture. The following year, the shogunate concluded the Japan-US Treaty of Peace and Amity at Yokohama, and its long-standing foreign policy changed course dramatically. Then, when Yokohama opened as a port in 1859, what had been a small village went on to develop rapidly as a gateway for trade with foreign countries. The arrival of the Black Ships was an event that changed not only national policy but the very shape of the region.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "歴史の記述では「現在の神奈川県」のように、昔の地名を今の県名で言い直すことが多い。",
+   "grammar": [
+    "n4-teiku",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "神奈川県の鎌倉には、屋根の下ではなく、空の下に坐る大仏がある。かつては大きな建物に納められていたが、それが失われてからは、長い年月を雨や雪にさらされてきたという。守るはずの建物が先に消え、守られるはずの像のほうが残ったのである。形あるものは、どれほど堅固に見えても、いつかは崩れていく。それでも静かに坐り続けるその姿は、失うことを恐れずに在ることの手本のようにも見える。",
+   "form": "神奈川県",
+   "en": "In Kamakura, Kanagawa Prefecture, there is a Great Buddha that sits not under a roof but under the sky. It was once housed in a large building, but since that was lost it is said to have been exposed to rain and snow for many long years. The building that was meant to protect it vanished first, and the statue that was meant to be protected is what remained. Things that have form, however solid they look, crumble away someday. Even so, its figure sitting quietly on looks like an example of being without fear of loss.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n3-dewa-naku",
+    "n4-teiku"
+   ]
   }
  ],
  "155": [
