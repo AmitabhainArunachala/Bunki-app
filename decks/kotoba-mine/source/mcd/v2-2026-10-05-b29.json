@@ -1,0 +1,352 @@
+{
+  "210": [
+    {
+      "ja": "今日は、顔と感情の関係を扱った心理学の本を要約していきます。この本のポイントは、気持ちが顔に出るだけではなく、顔の動きのほうが気持ちに影響することもある、という点なんです。たとえば、口角を上げた状態をしばらく保つと、少し気分が軽くなったと感じる人がいるそうです。ただ、この効果の大きさについては研究者の間でも意見が分かれていて、まだ結論は出ていません。それでも、朝から険しい顔つきのまま過ごしていないか、一度鏡で確かめてみる価値はありそうです。",
+      "form": "顔つき",
+      "en": "Today I'm going to summarize a psychology book about the relationship between the face and emotions. The book's key point is that feelings don't just show on the face; the movements of the face can also affect our feelings. For example, some people say they feel a little lighter after keeping the corners of their mouth raised for a while. However, researchers disagree about how large this effect is, and no conclusion has been reached yet. Even so, it seems worth checking in the mirror once whether you are spending your mornings with a stern look on your face.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「険しい顔つき」「不安そうな顔つき」のように、様子を表す言葉と組むことが多い。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "sense": "その時の気持ちが表れた顔のようす。"
+    },
+    {
+      "ja": "顔写真から人の気持ちを読み取るとうたうAIが、採用面接などで使われ始めている。しかし、同じ顔つきでも、文化や場面によって意味が大きく異なることが、これまでの研究で指摘されてきた。緊張して口元がこわばっているだけの応募者が、不機嫌だと判定される恐れもある。こうした懸念を受け、欧州連合は職場での感情認識AIの利用を原則として禁じる規則を定めた。専門家は、機械の判定をそのまま人の評価に結びつけることには慎重であるべきだと話している。",
+      "form": "顔つき",
+      "en": "AI that claims to read people's feelings from photos of their faces has begun to be used in settings such as job interviews. However, research so far has pointed out that the same facial expression can mean very different things depending on culture and situation. There is also a risk that an applicant whose mouth is merely stiff with nerves will be judged to be in a bad mood. In response to such concerns, the European Union has adopted rules that in principle ban the use of emotion-recognition AI in the workplace. Experts say one should be cautious about tying a machine's judgment directly to the evaluation of a person.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n5-teiru"],
+      "sense": "その時の気持ちが表れた顔のようす。"
+    },
+    {
+      "ja": "江戸時代の役者絵を見ると、同じ役者でも絵師によってまるで別人のような顔つきに描かれていることがある。写真のない時代、人々は絵を通じて役者の姿を思い描くしかなかった。そのため絵師は、本人に似せることよりも、役柄の気迫や色気が伝わることを重んじたのである。写実ではなく誇張こそが、見る者の心に役者を刻みつける手段だったといえる。似ていないことは、当時の観客にとって必ずしも欠点ではなかったのだろう。",
+      "form": "顔つき",
+      "en": "Looking at Edo-period prints of kabuki actors, the same actor is sometimes drawn with features so different, depending on the artist, that he looks like another person. In an age without photographs, people could only picture an actor's appearance through pictures. For that reason, artists valued conveying the intensity and allure of the role more than making the likeness resemble the man himself. It can be said that exaggeration, not realism, was the means of engraving an actor in the viewer's heart. Not looking alike was probably not necessarily a flaw for the audiences of the time.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "顔の形やつくりから受ける感じ。顔立ち。"
+    }
+  ],
+  "223": [
+    {
+      "ja": "今日は、時代によってマナーがどう変わってきたかを扱った本を要約していきます。著者によると、今では当たり前のことが、昔は非常識とされていた例は意外と多いそうです。たとえば、明治の初めには、洋服姿で街を歩く人に眉をひそめる人もいたといいます。反対に、昔は普通だった歩きながらのたばこは、今では多くの街で禁止されています。つまり、マナーは決まったルールではなく、その時代の合意にすぎないというのがこの本の結論なんです。",
+      "form": "非常識",
+      "en": "Today I'm going to summarize a book about how manners have changed over time. According to the author, there are surprisingly many examples of things that are normal now but were once considered improper. For example, in the early Meiji era, some people reportedly frowned at those walking through town in Western clothes. Conversely, smoking while walking, which used to be ordinary, is now banned in many towns. In short, the book concludes that manners are not fixed rules but merely the agreement of each era.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n4-teiku", "n4-nagara", "n5-teiru", "n3-dewa-naku", "n2-ni-suginai"],
+      "sense": "世の中の当たり前の考えやマナーから外れていること。"
+    },
+    {
+      "ja": "生成AIで作った文章を、そのまま自分の作品として提出する学生が増えており、大学などで対応が分かれている。ある大学の教員は、出典を示さずに使うのは研究の世界では非常識だとして、厳しく対処する考えを示した。一方で、使い方の指針を作った上で、授業に積極的に取り入れる大学もある。背景には、AIの扱いをめぐる常識がまだ定まっていないという事情がある。専門家は、禁止か容認かの二択ではなく、使った事実を明らかにするルールづくりが急がれると指摘している。",
+      "form": "非常識",
+      "en": "Students submitting text made with generative AI as their own work are increasing, and universities are divided in how they respond. One university lecturer said that using it without citing the source is out of line in the world of research and indicated an intention to deal with it strictly. On the other hand, some universities actively bring it into classes after drawing up guidelines for its use. Behind this lies the fact that the common sense around handling AI has not yet settled. Experts point out that rather than a choice between banning and allowing it, rules that make clear when it was used are urgently needed.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n2-ue-de", "n3-dewa-naku", "n5-teiru"],
+      "sense": "世の中の当たり前の考えやマナーから外れていること。"
+    },
+    {
+      "ja": "他人の振る舞いを非常識だと感じるとき、私たちは自分の常識を物差しにしている。ところが、その物差しは、育った家庭や地域、世代によって驚くほど異なるものである。連絡なしに電話をかけてよいか、食事中にスマートフォンを見てよいか、といった問いにも、人によって答えは違う。相手を責める前に、自分の基準がどこから来たのかを振り返ることは、無用な衝突を避ける上で役に立つだろう。常識とは、思っているほど共有されていないものなのである。",
+      "form": "非常識",
+      "en": "When we feel someone else's behavior is out of line, we are using our own common sense as a yardstick. Yet that yardstick differs surprisingly depending on the family, region, and generation we grew up in. Even on questions like whether it is all right to call without warning, or to look at a smartphone during a meal, the answer varies from person to person. Before blaming the other person, reflecting on where our own standard came from will help in avoiding needless conflict. Common sense is something far less shared than we think.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n5-teiru", "n2-ue-de"],
+      "sense": "世の中の当たり前の考えやマナーから外れていること。"
+    }
+  ],
+  "234": [
+    {
+      "ja": "今日は、新しい技術に人がどう反応するかを扱った本を要約していきます。著者によると、生成AIのような新しい道具が出てくると、多くの人はまず使えない理由を探し始めるそうです。そこでこの本は、つべこべ言わずに、まず一週間使ってみようと提案しています。実際に触ってみると、心配していた点の半分くらいは大したことがなかったと気づくことが多いからです。もちろん、使った上で合わないと判断するのは自由だ、というバランスのよさもこの本の魅力なんです。",
+      "form": "つべこべ",
+      "en": "Today I'm going to summarize a book about how people react to new technology. According to the author, when a new tool like generative AI comes out, most people first start looking for reasons it can't be used. So this book proposes that you stop grumbling and just try using it for a week first. That's because once you actually get your hands on it, you often realize that about half of what you were worried about was no big deal. Of course, the book's balance, saying you're free to decide it doesn't suit you after using it, is also part of its appeal.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「つべこべ言う」「つべこべ言わずに」の形で、相手をたしなめるときに使う。",
+      "grammar": ["n4-teiku", "n5-teiru", "n2-ue-de"],
+      "sense": "あれこれと文句や理屈を並べるようす。"
+    },
+    {
+      "ja": "子どものころ、宿題をやりたくないって言い訳ばっかりしてたら、母によく、つべこべ言わないの、って叱られたんですよ。でも今思うと、理屈をこねてる時間のほうが、宿題をやる時間より長かったじゃないですか。人って、やりたくないことほど、やらない理由を探すのがうまくなるんですよね。だから最近は、迷ったらとりあえず少しだけ手をつけてみる、って決めてるんです。始めちゃえば、意外と続くもんなんですよ。",
+      "form": "つべこべ",
+      "en": "When I was a kid and kept making excuses about not wanting to do my homework, my mom often scolded me to stop arguing. But thinking about it now, the time I spent making up reasons was longer than the time it took to do the homework, right? People get better at finding reasons not to do something the less they want to do it. So lately I've decided that when I'm hesitating, I'll just start on it a little bit. Once you start, it's surprisingly easy to keep going.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n5-tai"],
+      "sense": "あれこれと文句や理屈を並べるようす。"
+    },
+    {
+      "ja": "ウパニシャッドと呼ばれる古代インドの文献には、師と弟子の対話の形をとるものがある。弟子は疑問を遠慮なくぶつけ、師はそれに一つずつ答えていく。そこでは、問いを発すること自体が学びの一部とされていたのである。一方、現代の組織では、つべこべ言わずに従うことが美徳とされる場面も少なくない。しかし、問いを封じた集団からは、深い理解も新しい考えも生まれにくいのではないか。",
+      "form": "つべこべ",
+      "en": "Among the ancient Indian texts known as the Upanishads, some take the form of a dialogue between teacher and disciple. The disciple puts questions bluntly, and the teacher answers them one by one. There, raising questions was itself regarded as part of learning. In modern organizations, by contrast, there are not a few situations in which obeying without a word of complaint is treated as a virtue. But is it not hard for either deep understanding or new ideas to arise from a group that has shut down questions?",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n4-teiku"],
+      "sense": "あれこれと文句や理屈を並べるようす。"
+    }
+  ],
+  "235": [
+    {
+      "ja": "今日は、産業革命がなぜイギリスで始まったのかを扱った本を要約していきます。著者が注目するのは、最初に機械を作り、工場を動かしたのが、ごく一握りの職人や商人だったという点です。彼らの多くは、大学で学んだ学者ではなく、現場で試行錯誤を重ねた人たちでした。その小さな集団の工夫が、最終的に国全体の産業の形を変えることになったわけです。歴史を動かすのは、必ずしも大勢の力ではない、というのがこの本のメッセージなんです。",
+      "form": "一握り",
+      "en": "Today I'm going to summarize a book about why the Industrial Revolution began in Britain. What the author focuses on is the fact that those who first built machines and ran factories were a tiny handful of craftsmen and merchants. Many of them were not scholars who had studied at university, but people who went through trial and error on the shop floor. The ingenuity of that small group eventually ended up changing the shape of the whole country's industry. The book's message is that what moves history is not necessarily the strength of the many.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n4-teiku", "n3-dewa-naku", "n3-koto-ni-naru"],
+      "sense": "ごくわずかな数や量。"
+    },
+    {
+      "ja": "大規模なAIの開発には巨額の費用がかかるため、最先端のモデルを作れる企業は、世界でも一握りに限られている。開発に欠かせない専用の部品も、限られたメーカーからしか手に入りにくいのが現状だ。こうした状況に対し、各国では、技術や富が特定の企業に集中することへの懸念が強まっている。一方で、公開されたモデルを基に、小さな組織が独自のサービスを生み出す動きも広がっている。AIの恩恵を誰が受けるのかという問いは、今後ますます重みを増しそうだ。",
+      "form": "一握り",
+      "en": "Because developing large-scale AI costs enormous sums, the companies able to build cutting-edge models are limited to a handful worldwide. The specialized components essential to development are also currently hard to obtain except from a limited number of makers. In response to this situation, concern is growing in many countries about technology and wealth concentrating in particular companies. At the same time, there is also a growing movement of small organizations creating their own services based on publicly released models. The question of who will receive the benefits of AI looks set to carry more and more weight from now on.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n5-teiru"],
+      "sense": "ごくわずかな数や量。"
+    },
+    {
+      "ja": "成功した人の話を聞くと、努力すれば誰でも報われると思いたくなる。しかし、目立つ成功例は、同じように挑んだ大勢の中の一握りにすぎないことが多い。失敗した人々の声は記録に残りにくく、私たちの目に届かないのである。統計や心理学の分野では、こうした偏りを生存者バイアスと呼ぶ。努力の価値を否定するわけではないが、成功の物語だけから教訓を引き出すことには慎重でありたい。",
+      "form": "一握り",
+      "en": "When we hear the stories of successful people, we are tempted to think that anyone who works hard will be rewarded. However, conspicuous success stories are often merely a handful among the many who tried in the same way. The voices of those who failed are rarely recorded and do not reach our eyes. In statistics and psychology, this kind of bias is called survivorship bias. This is not to deny the value of effort, but I want to be cautious about drawing lessons from success stories alone.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n2-ni-suginai", "n3-wake-dewa-nai", "n5-tai"],
+      "sense": "ごくわずかな数や量。"
+    }
+  ],
+  "241": [
+    {
+      "ja": "今日は、年齢と見た目の関係を扱った本を要約していきます。著者によると、髪を染めるのをやめる人が、ここ数年で増えてきているそうです。かつては隠すものだった白い髪を、銀髪として前向きにとらえ直す動きが広がっているわけです。この本が面白いのは、見た目を受け入れることで、年を取ることへの不安が和らぐ人もいると指摘している点です。もちろん染めるのも自由で、大事なのは自分で選んでいるという感覚だ、というのがこの本の結論なんです。",
+      "form": "銀髪",
+      "en": "Today I'm going to summarize a book about the relationship between age and appearance. According to the author, the number of people who stop dyeing their hair has been increasing over the past few years. In other words, a movement to see white hair, once something to hide, positively as silver hair is spreading. What makes this book interesting is that it points out that, by accepting how they look, some people find their anxiety about getting older eases. Of course, dyeing is also a free choice, and the book concludes that what matters is the sense that you are choosing for yourself.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n4-teiku", "n5-teiru", "n3-koto-de"],
+      "sense": "銀色に光って見える、白くなった髪。"
+    },
+    {
+      "ja": "自分の顔写真から、年を重ねた姿をAIで予測するアプリが、若者の間で人気を集めている。写真を読み込むと、しわの増えた肌や銀髪になった数十年後の自分が、数秒で表示される仕組みだ。海外の研究では、年を取った自分の姿を目にすることで、老後に備えて貯蓄を増やす傾向が見られたという。一方、顔写真が開発会社に保存される場合もあり、個人情報の扱いを心配する声も上がっている。",
+      "form": "銀髪",
+      "en": "Apps that use AI to predict how you will look as you age, based on a photo of your face, are gaining popularity among young people. When you upload a photo, the app shows you yourself decades later, with more wrinkled skin and silver hair, in a few seconds. Research overseas reportedly found that seeing an older image of oneself was associated with a tendency to save more for retirement. On the other hand, face photos are sometimes stored by the developers, and concerns about how personal data is handled are also being raised.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "銀色に光って見える、白くなった髪。"
+    },
+    {
+      "ja": "古代インドには、人生を四つの時期に分ける考え方がある。家族を養う務めを終えた者は、森に入り、自分の内面と向き合う時期を迎えるとされた。現代の私たちは、年を取ることを衰えとしてしか見ない傾向にある。しかし、この考え方に照らせば、銀髪は役目を終えたしるしではなく、新しい学びの段階に入った証とも読めるのである。老いをどう名づけるかによって、残りの人生の景色は大きく変わるだろう。",
+      "form": "銀髪",
+      "en": "In ancient India there is a way of thinking that divides life into four stages. It was held that someone who had finished the duty of supporting a family would enter the forest and reach a stage of facing their inner self. We today tend to see aging only as decline. But in light of this way of thinking, silver hair can be read not as a sign that one's role is over, but as proof of having entered a new stage of learning. How we name old age will probably greatly change the landscape of the rest of our lives.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "銀色に光って見える、白くなった髪。"
+    }
+  ],
+  "243": [
+    {
+      "ja": "今日は、日本の古い建物にまつわる本を要約していきます。京都の二条城や知恩院には、歩くと鳥の鳴き声のような音が出る、うぐいす張りと呼ばれる廊下があります。古い家の床がぎいぎいときしむのと原理は同じで、床板を留める金具がこすれて鳴っているんです。侵入者に気づくための仕掛けだという説も有名ですが、最初から狙って作られたのかどうかは、はっきりしていないそうです。それでも、ただの雑音に美しい名前をつけた感性は、なかなか面白いですよね。",
+      "form": "ぎいぎい",
+      "en": "Today I'm going to summarize a book about old Japanese buildings. At Nijo Castle and Chion-in in Kyoto, there are corridors called nightingale floors, which make a sound like birdsong when you walk on them. The principle is the same as an old house's floor creaking, and the sound comes from the metal fittings that hold the floorboards rubbing together. The theory that it was a device for noticing intruders is also well known, but apparently it isn't clear whether it was built that way on purpose from the start. Even so, the sensibility of giving a beautiful name to mere noise is quite interesting, isn't it?",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「ぎいぎい鳴る」「ぎいぎいときしむ」の形が多い。重く、耳ざわりな響き。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "古い木や金属がこすれて出る、きしむ音。"
+    },
+    {
+      "ja": "日本語の擬音語は、機械翻訳にとって手ごわい相手だ。古い木の扉がぎいぎいと鳴る、という文を英語に訳すと、たいていは、きしむという意味の動詞一つに置き換えられてしまう。そのとき、ゆっくり何度も繰り返される音の感じは、ほとんど失われる。AIの翻訳を下書きに使う場合も、こうした音の言葉だけは、人の耳で確かめ直したほうがいい。音をどう文字に写すかは、今も書き手の腕の見せどころなのである。",
+      "form": "ぎいぎい",
+      "en": "Japanese onomatopoeia is a tough opponent for machine translation. When you translate a sentence saying an old wooden door creaks open into English, it is usually replaced by a single verb meaning to creak. At that point, the sense of a sound repeating slowly over and over is almost entirely lost. Even when using AI translation as a draft, it is better to recheck these sound words, at least, with human ears. How to put a sound into writing is still where a writer shows their skill.",
+      "original": true,
+      "register": "語",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": [],
+      "sense": "古い木や金属がこすれて出る、きしむ音。"
+    },
+    {
+      "ja": "古い家の階段がぎいぎいと鳴る音を、懐かしく感じる人もいれば、落ち着かないと感じる人もいる。同じ音でも、それをどんな記憶と結びつけているかによって、受け取り方はまるで変わる。祖父母の家で過ごした夏を思い出す人にとっては、その音は安心のしるしである。一方、夜中にひとりで聞いた経験を持つ人には、不安をかき立てる合図になる。音そのものではなく、音に重ねた物語が、私たちの感情を動かしているのである。",
+      "form": "ぎいぎい",
+      "en": "Some people find the creaking of the stairs in an old house nostalgic, while others find it unsettling. Even with the same sound, how it is received changes completely depending on what memories it is tied to. For someone who is reminded of summers spent at their grandparents' house, that sound is a sign of safety. On the other hand, for someone who once heard it alone in the middle of the night, it becomes a signal that stirs up anxiety. It is not the sound itself but the story laid over the sound that moves our emotions.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "古い木や金属がこすれて出る、きしむ音。"
+    }
+  ],
+  "244": [
+    {
+      "ja": "今日は、人に好かれる人の習慣を扱った本を要約していきます。著者によると、好かれる人に共通しているのは、相手に負担を感じさせない気づかいだそうです。たとえば、重い荷物を持っている人のために、何も言わずにドアを押さえておくといった、さりげない行動です。逆に、親切をアピールしすぎると、相手は借りを作ったような気持ちになってしまうんです。つまり、恩を着せないことこそが本当の思いやりだ、というのがこの本の主張なわけです。",
+      "form": "さりげない",
+      "en": "Today I'm going to summarize a book about the habits of people who are well liked. According to the author, what well-liked people have in common is consideration that doesn't make others feel burdened. For example, it's unforced actions like holding a door without saying anything for someone carrying heavy luggage. Conversely, if you show off your kindness too much, the other person ends up feeling as though they owe you. In short, the book argues that not making people feel indebted is what true thoughtfulness is.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「さりげない気づかい」「さりげなく伝える」の形でよく使う。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "わざとらしくなく、自然にふるまうようす。"
+    },
+    {
+      "ja": "対話型AIを提供する各社が、利用者の心の健康に配慮した機能の導入を進めている。長時間の利用が続くと、会話の流れを止めずに、さりげなく休憩を勧める仕組みもその一つだ。背景には、AIとの会話に長時間のめり込み、睡眠や人付き合いの時間が減ることへの懸念がある。一方で、利用者の行動を機械が見守ることに違和感を覚える人もいる。どこまで踏み込むべきか、各社は手探りで線を引いている。",
+      "form": "さりげなく",
+      "en": "Companies offering conversational AI are introducing features that take users' mental health into account. One of them is a mechanism that, when use goes on for a long time, gently suggests a break without interrupting the flow of the conversation. Behind this is concern about people getting absorbed in conversations with AI for long hours and losing time for sleep and socializing. On the other hand, some people feel uneasy about a machine watching over users' behavior. Each company is feeling its way as it draws the line on how far to step in.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n5-teiru"],
+      "sense": "わざとらしくなく、自然にふるまうようす。"
+    },
+    {
+      "ja": "茶の湯の世界では、客をもてなす工夫が、できるだけ目立たないように求められてきた。季節に合わせた花や、ちょうどよい温度の湯は、亭主の細やかな準備の結果である。しかし、それをさりげない形で差し出すことが、何より大切だとされた。苦労を見せびらかすもてなしは、かえって客に気をつかわせてしまうからである。見えない努力こそがもてなしの本質だという考えは、今の接客にも受け継がれているのではないか。",
+      "form": "さりげない",
+      "en": "In the world of the tea ceremony, the effort put into hosting guests has been expected to be as inconspicuous as possible. Flowers suited to the season and water at just the right temperature are the result of the host's careful preparation. However, offering them in an unforced way was considered more important than anything. That is because hospitality that shows off its effort ends up making guests feel obliged instead. Is not the idea that invisible effort is the essence of hospitality still handed down in today's customer service?",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n3-you-ni", "n5-teiru"],
+      "sense": "わざとらしくなく、自然にふるまうようす。"
+    }
+  ],
+  "247": [
+    {
+      "ja": "今日は、AIと一緒に勉強する方法を扱った本を要約していきます。著者によると、AIに答えを聞くだけの使い方では、ほとんど力がつかないそうです。おすすめは、自分の説明をAIに聞かせて、間違いを指摘してもらうやり方です。自分で考えてから確かめるという順番を守るだけで、記憶への残り方がまるで違ってくるんです。資格試験にガチで受かりたい人ほど、この順番を意識してほしい、というのがこの本のメッセージなんです。",
+      "form": "ガチ",
+      "en": "Today I'm going to summarize a book about how to study together with AI. According to the author, just asking AI for answers builds almost no ability. What the book recommends is having the AI listen to your own explanation and point out mistakes. Just keeping to the order of thinking for yourself first and then checking makes a huge difference in how well things stay in memory. The book's message is that the more seriously you want to pass a qualification exam, the more you should keep this order in mind.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "くだけた話し言葉。「ガチで」の形で副詞として使うことが多い。",
+      "grammar": ["n4-teiku", "n5-tai"],
+      "sense": "本気であること。若者の話し言葉。"
+    },
+    {
+      "ja": "この前、お城めぐりが好きな友だちに誘われて、兵庫の姫路城に行ってきたんですよ。天守の中の階段がめちゃくちゃ急で、手すりにつかまらないと上れないくらいで、ガチできつかったです。でも、ああいう造りって、攻めてきた敵を簡単に上らせないためでもあるらしいじゃないですか。そう思うと、息を切らしながらも、昔の人の工夫にちょっと感心しちゃいました。次は、もっと小さいお城にも行ってみたいですね。",
+      "form": "ガチ",
+      "en": "The other day a friend who loves touring castles invited me, and I went to Himeji Castle in Hyogo. The stairs inside the keep were so steep you couldn't climb without holding the handrail, and it was seriously tough. But apparently that kind of structure was also meant to keep attacking enemies from climbing up easily, right? Thinking of that, even while out of breath, I was a little impressed by the ingenuity of people back then. Next time I'd like to go to a smaller castle too.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n4-nagara", "n5-tai"],
+      "sense": "本気であること。若者の話し言葉。"
+    },
+    {
+      "ja": "インド北西部のコータという町には、工科大学の入試に向けて、親元を離れて下宿しながら勉強する高校生が全国から集まってきます。朝から晩まで授業と模試が続く、まさにガチの受験生活です。ただ、学習の研究では、睡眠時間を減らして詰め込むやり方は、記憶の定着を妨げることがわかっています。長く机に向かうことと、内容が身につくことは、必ずしも同じではないんです。合格を目指すなら、勉強の量だけでなく、休み方まで計画に入れることが大切なんです。",
+      "form": "ガチ",
+      "en": "In a town called Kota in northwestern India, high school students gather from all over the country to study for engineering college entrance exams while living away from their parents in lodgings. With classes and mock exams going on from morning till night, it is truly hardcore exam life. However, learning research has found that cramming by cutting sleep hours interferes with memory consolidation. Sitting at your desk for a long time and actually absorbing the material are not necessarily the same thing. If you are aiming to pass, it is important to plan not only the amount of study but even how you rest.",
+      "original": true,
+      "register": "学",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n4-nagara", "n5-teiru"],
+      "sense": "本気であること。若者の話し言葉。"
+    }
+  ],
+  "257": [
+    {
+      "ja": "今日は、計画の錯誤と呼ばれる心のくせを扱った本を要約していきます。人は、作業にかかる時間を、多くの場合かなり短く見積もってしまうそうです。過去に同じような仕事で遅れた経験があっても、今回はうまくいくと考えてしまうんですね。その結果、締め切りの前夜に徹夜する羽目になったという経験は、誰にでもあるはずです。著者のおすすめは、自分の感覚ではなく、過去に実際にかかった時間を基準に予定を立てることなんです。",
+      "form": "羽目になった",
+      "en": "Today I'm going to summarize a book about a mental habit called the planning fallacy. Apparently, people in many cases estimate the time a task will take as much shorter than it is. Even if they have been late with similar work in the past, they think it will go well this time. As a result, everyone must have had the experience of ending up pulling an all-nighter the night before a deadline. The author recommends planning your schedule based not on your gut feeling but on how long things actually took in the past.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「〜する羽目になる」の形で、望まない結果になったことを言う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "sense": "思ってもいなかった困ったことをする事態になる。"
+    },
+    {
+      "ja": "カナダの航空会社が、自社サイトのチャットボットの誤った案内をめぐり、乗客に賠償金を支払う羽目になった。チャットボットは、家族を亡くした人向けの特別運賃について、実際の規則と異なる説明をしていた。航空会社側は、チャットボットの発言に会社は責任を負わないと主張したが、認められなかった。この判断は、AIによる案内も企業自身の説明とみなされることを示したものとして、注目を集めた。企業がAIを窓口に置く上で、責任の所在をはっきりさせる必要性が浮き彫りになっている。",
+      "form": "羽目になった",
+      "en": "A Canadian airline ended up having to pay damages to a passenger over incorrect guidance from the chatbot on its own website. The chatbot had given an explanation of special fares for bereaved travelers that differed from the actual rules. The airline argued that the company was not responsible for what the chatbot said, but this was not accepted. The decision drew attention as showing that guidance given by AI is also regarded as the company's own explanation. The need to make clear where responsibility lies when companies put AI at their front desk is being brought into relief.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "思ってもいなかった困ったことをする事態になる。"
+    },
+    {
+      "ja": "1812年、ナポレオンは大軍を率いてロシアに遠征したが、焦土作戦と冬の寒さに苦しみ、多くの兵を失って退却する羽目になった。短期の決戦を見込んだ計画は、相手が戦わずに退くという選択肢を想定していなかったのである。歴史をひもとくと、勝利を確信した側ほど、相手の出方を読み違える例は少なくない。成功の経験が、自らの見通しを疑う力を奪うのであろう。引き返す決断が遅れやすいのは、今の組織も同じである。",
+      "form": "羽目になった",
+      "en": "In 1812, Napoleon led a great army on an expedition into Russia, but suffering from scorched-earth tactics and the winter cold, he lost many soldiers and ended up having to retreat. His plan, which counted on a short decisive battle, had not anticipated the option of the enemy withdrawing without fighting. Looking through history, there are not a few examples in which the side most certain of victory misreads how the other side will move. Experience of success probably robs one of the power to doubt one's own outlook. Being slow to decide to turn back is just as true of organizations today.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": [],
+      "sense": "思ってもいなかった困ったことをする事態になる。"
+    }
+  ],
+  "291": [
+    {
+      "ja": "今日は、江戸時代の俳人、小林一茶の句を読み解いた本を要約していきます。一茶は、やせた蛙や雀の子など、小さな生き物に語りかけるような句をたくさん残しました。著者によると、その句を読むと思わず笑ってしまうのは、一茶が笑わせようとしていないからなんだそうです。弱いものに寄り添う素直な気持ちが、巧まざるおかしみを生んでいるわけです。うまく見せようとするより、心のままに書いたほうが人に届くこともある、というのがこの本の結論なんです。",
+      "form": "巧まざる",
+      "en": "Today I'm going to summarize a book that interprets the haiku of Kobayashi Issa, a poet of the Edo period. Issa left many poems that seem to speak to small creatures, such as a skinny frog or a baby sparrow. According to the author, the reason we can't help laughing when we read those poems is that Issa isn't trying to make us laugh. In other words, his honest feeling of sympathy for weak things produces an unaffected humor. The book concludes that writing from the heart sometimes reaches people better than trying to look clever.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「巧まざる」「巧まずして」の打ち消しの形で使われることが多い。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "打ち消しの形で、わざと工夫しないのに自然にうまく。"
+    },
+    {
+      "ja": "AIに書かせた文章は、文法の誤りこそ少ないものの、読み進めるうちに、どこか息苦しさが残ることがある。比喩や印象的な締めの言葉が、段落ごとに律儀に置かれているせいだろう。巧んだ表現も、並びすぎると、読者に手の内を見せることになる。人が書く文章の味わいは、ときに混じる不ぞろいなリズムにあるのかもしれない。AIの下書きを直すときは、飾りを足すのではなく、あえて減らすことから始めたい。",
+      "form": "巧んだ",
+      "en": "Text written by AI may have few grammatical errors, but as you read on, a certain stuffiness often lingers. That is probably because metaphors and striking closing lines are dutifully placed in every paragraph. Even artfully contrived expressions, when lined up too densely, end up showing the reader your hand. The charm of writing by people may lie in the uneven rhythm that sometimes mixes in. When revising an AI draft, I want to start not by adding ornament but by deliberately taking it away.",
+      "original": true,
+      "register": "語",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n2-mono-no", "n5-teiru", "n3-koto-ni-naru", "n3-dewa-naku", "n5-tai"],
+      "sense": "工夫をこらして、うまく作りあげる。"
+    },
+    {
+      "ja": "人の心を動かすのは、必ずしも計算された言葉ではない。緊張で声を震わせながらも、懸命に思いを伝えようとする姿に、聞き手は強く引きつけられることがある。そこでは、話し手の誠実さが、巧まずして聞き手に届いているのである。反対に、拍手や笑いといった効果を狙いすぎた話には、聞く側がどこか身構えてしまうものだ。説得の技術を学ぶ上でも、まずは伝えたい中身を持つことが先なのだろう。",
+      "form": "巧まずして",
+      "en": "What moves people's hearts is not necessarily calculated words. Listeners are sometimes strongly drawn to a speaker who, voice trembling with nerves, still tries hard to convey their feelings. There, the speaker's sincerity reaches the listeners without any artifice. Conversely, with talks that aim too hard for effects like applause or laughter, listeners somehow end up on their guard. Even in learning the techniques of persuasion, having something you want to convey probably comes first.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n4-nagara", "n5-teiru", "n2-ue-de", "n5-tai"],
+      "sense": "打ち消しの形で、わざと工夫しないのに自然にうまく。"
+    }
+  ]
+}

@@ -2431,6 +2431,57 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、顔と感情の関係を扱った心理学の本を要約していきます。この本のポイントは、気持ちが顔に出るだけではなく、顔の動きのほうが気持ちに影響することもある、という点なんです。たとえば、口角を上げた状態をしばらく保つと、少し気分が軽くなったと感じる人がいるそうです。ただ、この効果の大きさについては研究者の間でも意見が分かれていて、まだ結論は出ていません。それでも、朝から険しい顔つきのまま過ごしていないか、一度鏡で確かめてみる価値はありそうです。",
+   "form": "顔つき",
+   "en": "Today I'm going to summarize a psychology book about the relationship between the face and emotions. The book's key point is that feelings don't just show on the face; the movements of the face can also affect our feelings. For example, some people say they feel a little lighter after keeping the corners of their mouth raised for a while. However, researchers disagree about how large this effect is, and no conclusion has been reached yet. Even so, it seems worth checking in the mirror once whether you are spending your mornings with a stern look on your face.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「険しい顔つき」「不安そうな顔つき」のように、様子を表す言葉と組むことが多い。",
+   "grammar": [
+    "n4-teiku",
+    "n3-dewa-naku"
+   ],
+   "sense": "その時の気持ちが表れた顔のようす。"
+  },
+  {
+   "ja": "顔写真から人の気持ちを読み取るとうたうAIが、採用面接などで使われ始めている。しかし、同じ顔つきでも、文化や場面によって意味が大きく異なることが、これまでの研究で指摘されてきた。緊張して口元がこわばっているだけの応募者が、不機嫌だと判定される恐れもある。こうした懸念を受け、欧州連合は職場での感情認識AIの利用を原則として禁じる規則を定めた。専門家は、機械の判定をそのまま人の評価に結びつけることには慎重であるべきだと話している。",
+   "form": "顔つき",
+   "en": "AI that claims to read people's feelings from photos of their faces has begun to be used in settings such as job interviews. However, research so far has pointed out that the same facial expression can mean very different things depending on culture and situation. There is also a risk that an applicant whose mouth is merely stiff with nerves will be judged to be in a bad mood. In response to such concerns, the European Union has adopted rules that in principle ban the use of emotion-recognition AI in the workplace. Experts say one should be cautious about tying a machine's judgment directly to the evaluation of a person.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "その時の気持ちが表れた顔のようす。"
+  },
+  {
+   "ja": "江戸時代の役者絵を見ると、同じ役者でも絵師によってまるで別人のような顔つきに描かれていることがある。写真のない時代、人々は絵を通じて役者の姿を思い描くしかなかった。そのため絵師は、本人に似せることよりも、役柄の気迫や色気が伝わることを重んじたのである。写実ではなく誇張こそが、見る者の心に役者を刻みつける手段だったといえる。似ていないことは、当時の観客にとって必ずしも欠点ではなかったのだろう。",
+   "form": "顔つき",
+   "en": "Looking at Edo-period prints of kabuki actors, the same actor is sometimes drawn with features so different, depending on the artist, that he looks like another person. In an age without photographs, people could only picture an actor's appearance through pictures. For that reason, artists valued conveying the intensity and allure of the role more than making the likeness resemble the man himself. It can be said that exaggeration, not realism, was the means of engraving an actor in the viewer's heart. Not looking alike was probably not necessarily a flaw for the audiences of the time.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku"
+   ],
+   "sense": "顔の形やつくりから受ける感じ。顔立ち。"
   }
  ],
  "216": [
@@ -2463,6 +2514,60 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、明治の日本で、選挙で選ばれた代表が政治に加わるようになるまでの流れを押さえていきましょう。明治の初め、政府の中心にいたのは、薩摩や長州など一部の藩の出身者でした。これに対して板垣退助らは、国民の声を政治に届ける場を作るように求め、各地で自由民権運動が広がっていきます。勢いに押された政府は1881年、1890年までに国会を開くと約束し、それまでに憲法を整えることになりました。こうして1889年に憲法が発布され、翌年には最初の選挙が行われたわけです。",
+   "form": "国会",
+   "en": "This time, let's go over the path by which, in Meiji Japan, representatives chosen in elections came to take part in politics. At the start of the Meiji era, the people at the center of government came from a handful of domains such as Satsuma and Chōshū. In response, Itagaki Taisuke and others demanded the creation of a place to carry the people's voices into politics, and the Freedom and People's Rights Movement spread across the country. Pushed by its momentum, in 1881 the government promised to open a national assembly by 1890, and it was decided that a constitution would be put in place before then. And so the constitution was promulgated in 1889, and the first election was held the following year.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "日本の議会は「国会」、外国の議会は「議会」と呼ぶのがふつう。",
+   "grammar": [
+    "n4-you-ni-naru",
+    "n4-teiku",
+    "n3-you-ni",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "日本で初めてAIに特化した法律が、2025年5月、国会で成立した。法律は研究開発と活用の後押しを主な目的としており、違反した企業を罰する仕組みは盛り込まれていない。その代わり、AIを使った悪質な事例があれば国が調査し、事業者に指導などを行えるとしている。欧州連合が厳しいルールで利用を縛る方向に進んだのとは対照的で、産業の育成を優先した形だ。今後は、偽の映像や音声による被害にどこまで対応できるかが問われることになる。",
+   "form": "国会",
+   "en": "Japan's first law specifically focused on AI was enacted by the Diet in May 2025. The law's main aim is to promote research, development and use, and it contains no mechanism for punishing companies that violate it. Instead, it provides that if there are malicious cases involving AI, the state can investigate and give guidance and the like to businesses. It stands in contrast to the European Union, which moved toward restricting use with strict rules, and gives priority to fostering the industry. Going forward, the question will be how far it can deal with harm from fake video and audio.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "「国会で成立する」「国会に提出する」のように、法律が決まる場として使う。",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "国会の中継を眺めていると、言葉が理解し合うためではなく、相手を言い負かすために使われているように見えることがある。だが、これは政治の世界に限った話ではないだろう。家庭でも職場でも、私たちは議論に勝つことと、よい結論にたどり着くことを、しばしば取り違えてしまう。言い負かされた相手は、たいてい何も納得していないものである。勝ち負けの手前に、まず聞くという仕事があるのだろう。",
+   "form": "国会",
+   "en": "Watching broadcasts of the Diet, it can sometimes look as though words are being used not to understand one another but to argue the other side down. Yet this is probably not a story limited to the world of politics. At home and at work alike, we often confuse winning an argument with arriving at a good conclusion. A person who has been argued down has usually not been convinced of anything. Before winning and losing, there is probably first the work of listening.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "tipJa": "「国会の中継」「国会での議論」のように、日本の議会そのものを指す。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n3-you-ni",
+    "n5-teiru"
+   ]
   }
  ],
  "222": [
@@ -2586,6 +2691,57 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、新しい技術に人がどう反応するかを扱った本を要約していきます。著者によると、生成AIのような新しい道具が出てくると、多くの人はまず使えない理由を探し始めるそうです。そこでこの本は、つべこべ言わずに、まず一週間使ってみようと提案しています。実際に触ってみると、心配していた点の半分くらいは大したことがなかったと気づくことが多いからです。もちろん、使った上で合わないと判断するのは自由だ、というバランスのよさもこの本の魅力なんです。",
+   "form": "つべこべ",
+   "en": "Today I'm going to summarize a book about how people react to new technology. According to the author, when a new tool like generative AI comes out, most people first start looking for reasons it can't be used. So this book proposes that you stop grumbling and just try using it for a week first. That's because once you actually get your hands on it, you often realize that about half of what you were worried about was no big deal. Of course, the book's balance, saying you're free to decide it doesn't suit you after using it, is also part of its appeal.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "ai",
+   "tipJa": "「つべこべ言う」「つべこべ言わずに」の形で、相手をたしなめるときに使う。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru",
+    "n2-ue-de"
+   ],
+   "sense": "あれこれと文句や理屈を並べるようす。"
+  },
+  {
+   "ja": "子どものころ、宿題をやりたくないって言い訳ばっかりしてたら、母によく、つべこべ言わないの、って叱られたんですよ。でも今思うと、理屈をこねてる時間のほうが、宿題をやる時間より長かったじゃないですか。人って、やりたくないことほど、やらない理由を探すのがうまくなるんですよね。だから最近は、迷ったらとりあえず少しだけ手をつけてみる、って決めてるんです。始めちゃえば、意外と続くもんなんですよ。",
+   "form": "つべこべ",
+   "en": "When I was a kid and kept making excuses about not wanting to do my homework, my mom often scolded me to stop arguing. But thinking about it now, the time I spent making up reasons was longer than the time it took to do the homework, right? People get better at finding reasons not to do something the less they want to do it. So lately I've decided that when I'm hesitating, I'll just start on it a little bit. Once you start, it's surprisingly easy to keep going.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "mind",
+   "grammar": [
+    "n5-tai"
+   ],
+   "sense": "あれこれと文句や理屈を並べるようす。"
+  },
+  {
+   "ja": "ウパニシャッドと呼ばれる古代インドの文献には、師と弟子の対話の形をとるものがある。弟子は疑問を遠慮なくぶつけ、師はそれに一つずつ答えていく。そこでは、問いを発すること自体が学びの一部とされていたのである。一方、現代の組織では、つべこべ言わずに従うことが美徳とされる場面も少なくない。しかし、問いを封じた集団からは、深い理解も新しい考えも生まれにくいのではないか。",
+   "form": "つべこべ",
+   "en": "Among the ancient Indian texts known as the Upanishads, some take the form of a dialogue between teacher and disciple. The disciple puts questions bluntly, and the teacher answers them one by one. There, raising questions was itself regarded as part of learning. In modern organizations, by contrast, there are not a few situations in which obeying without a word of complaint is treated as a virtue. But is it not hard for either deep understanding or new ideas to arise from a group that has shut down questions?",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n4-teiku"
+   ],
+   "sense": "あれこれと文句や理屈を並べるようす。"
   }
  ],
  "240": [
@@ -2956,6 +3112,56 @@
    "url": "http://news.livedoor.com/article/detail/5872103/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "digi2　スマートフォン特集"
+  },
+  {
+   "ja": "今回は、1962年のキューバ危機を取り上げます。ソ連がキューバにミサイルを配備していると知ったケネディ大統領は、側近を集めて、どう対応するかを連日話し合いました。軍事攻撃から外交交渉まで、あらゆる選択肢を一つずつ検討した末に選ばれたのが、船の出入りを止める封鎖という手でした。いきなり攻撃するのではなく、相手に考える時間を与える道を選んだわけです。結果として、核戦争の寸前で危機は収まりました。",
+   "form": "検討",
+   "en": "This time we take up the Cuban Missile Crisis of 1962. On learning that the Soviet Union was deploying missiles in Cuba, President Kennedy gathered his advisers and discussed day after day how to respond. After examining every option one by one, from military strikes to diplomatic negotiation, the course they chose was a blockade that stopped ships from going in and out. Rather than attacking straight away, they chose a path that gave the other side time to think. In the end, the crisis was defused on the brink of nuclear war.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「〜を検討する」「検討を重ねる」のように、複数の案を比べて慎重に考える場面で使う。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku"
+   ]
+  },
+  {
+   "ja": "国内の自治体の間で、生成AIを窓口業務や文書の作成に活用する動きが広がっている。一方で、個人情報の扱いや、誤った回答に対する責任をどう考えるかなど、課題も少なくない。このため多くの自治体は、まず一部の部署で試しに使ってみたうえで、本格的な導入を検討する方針だ。専門家は、効率だけを求めるのではなく、住民の信頼を損なわないためのルールづくりが欠かせないと指摘している。",
+   "form": "検討",
+   "en": "Among local governments in Japan, moves to use generative AI for counter services and document preparation are spreading. On the other hand, there are many challenges, such as how to handle personal information and who is responsible for wrong answers. For this reason, many local governments plan to first try it out in some departments and then consider full-scale adoption. Experts point out that rather than pursuing efficiency alone, it is essential to draw up rules that do not damage residents' trust.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「導入を検討する」「検討に入る」「前向きに検討」が定番。結論が出る前の段階を示す。",
+   "grammar": [
+    "n5-teiru",
+    "n2-ue-de"
+   ]
+  },
+  {
+   "ja": "仏典には、さまざまな教えを説く者が次々に村を訪れ、どれを信じればよいのか迷う人々に、釈迦が答える場面がある。言い伝えだから、権威ある人が言ったから、という理由だけで、疑うことなく受け入れてはならない。自分でよく確かめ、それが苦しみを減らすかどうかを見極めよ、というのである。信仰を重んじる宗教の中で、自らの検討を求めるこの姿勢は意外に思えるかもしれない。だが、問いを許さない教えは、結局は人を縛るだけなのだろう。",
+   "form": "検討",
+   "en": "The Buddhist scriptures contain a scene in which teachers of all kinds visit a village one after another, and the Buddha answers people who are unsure which of them to believe. One must not accept something without doubt merely because it is tradition or because an authority said it. Examine it well yourself and judge whether it lessens suffering: that is the teaching. Within a religion that values faith, this demand for one's own scrutiny may seem surprising. Yet a teaching that permits no questions probably ends up doing nothing but binding people.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "論説では「批判的な検討」「検討を加える」のように、内容を吟味する硬い意味で使う。",
+   "grammar": [
+    "n2-koto-naku"
+   ]
   }
  ],
  "282": [
@@ -4254,6 +4460,58 @@
    "url": "http://news.livedoor.com/article/detail/5718943/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "愛と節約　Presented by ゆるっとcafe"
+  },
+  {
+   "ja": "今回紹介するのは、脳科学者の中野信子さんの『人は、なぜ他人を許せないのか？』という本です。キーワードは「正義中毒」で、人は他人の間違いを責めるとき、脳が快感を覚えてしまうというんですね。ネットで誰かの失言が見つかると、「言語道断だ」という怒りのコメントが一気に集まるのも、この仕組みで説明できるわけです。ただ、その怒りは相手を正すためではなく、自分が気持ちよくなるためのものかもしれません。叩きたくなったときこそ、一度立ち止まってみる価値がありそうです。",
+   "form": "言語道断",
+   "en": "The book I'm introducing this time is Why Can't People Forgive Others? by the neuroscientist Nobuko Nakano. The keyword is \"justice addiction\": when people condemn someone else's mistake, the brain ends up feeling pleasure. That is how we can explain why, when someone's gaffe is found online, angry comments calling it outrageous pile up all at once. But that anger may be less about correcting the other person and more about making ourselves feel good. It seems worth stopping for a moment precisely when we feel the urge to pile on.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「言語道断だ」「言語道断の行為」のように、許しがたい行いを強く非難するときに使う。",
+   "grammar": [
+    "n3-dewa-naku"
+   ],
+   "sense": "あまりにひどくて、言葉にならないこと"
+  },
+  {
+   "ja": "生成AIで本人そっくりの声を作り、家族や上司になりすまして金をだまし取る詐欺が、各国で問題になっている。わずか数秒の録音があれば声を再現できるとされ、被害に気づくのが遅れるケースも多い。開発企業の間でも、こうした悪用は言語道断だとして、音声に識別用の電子透かしを埋め込む取り組みが広がっている。一方で、透かしを消す方法もすでに出回っており、いたちごっこが続いている。専門家は、電話で急に送金を求められたら、一度切ってかけ直すように呼びかけている。",
+   "form": "言語道断",
+   "en": "Scams in which generative AI is used to create a voice identical to a real person's, impersonating a family member or boss to swindle money, have become a problem in many countries. It is said that a voice can be reproduced from a recording just a few seconds long, and in many cases victims are slow to notice. Among the companies developing the technology too, efforts are spreading to embed identifying digital watermarks in audio, on the grounds that such misuse is outrageous. Meanwhile, ways of removing the watermarks are already circulating, and the cat-and-mouse game continues. Experts urge people who are suddenly asked over the phone to send money to hang up once and call back.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「〜は言語道断だとして」の形で、非難の理由を示すことが多い。",
+   "grammar": [
+    "n3-you-ni",
+    "n5-teiru"
+   ],
+   "sense": "あまりにひどくて、言葉にならないこと"
+  },
+  {
+   "ja": "仏教では古くから、最も深い真理は言葉では言い尽くせないと考えられてきた。言葉は物事を切り分けて名前を付ける道具だが、悟りの境地はその切り分けの手前にあるからである。禅僧が問いに言葉で答えるのではなく、ただ黙ったり棒で打ったりしたという話が多く残るのも、そのためだろう。言葉の道が断たれたところという意味で、その境地はかつて言語道断とも呼ばれた。もってのほかという現代の使い方からは、なかなか想像しにくい由来である。",
+   "form": "言語道断",
+   "en": "In Buddhism it has long been thought that the deepest truth cannot be fully expressed in words. That is because words are tools for dividing things up and naming them, while the state of enlightenment lies before that dividing. That is probably also why so many stories remain of Zen monks who, instead of answering a question with words, simply stayed silent or struck with a stick. In the sense of a place where the road of words is cut off, that state was once also called gongo-dōdan. It is an origin that is hard to imagine from the modern use meaning outrageous.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "もとは仏教語。現代では「もってのほか」の意味でしか使わないので注意。",
+   "grammar": [
+    "n3-dewa-naku"
+   ],
+   "sense": "仏教で、深い真理は言葉では言い表せないこと"
   }
  ],
  "101": [
@@ -5396,6 +5654,59 @@
    "url": "http://news.livedoor.com/article/detail/6870825/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "実力と美貌で、ヤングなでしこを支える3人のスター候補"
+  },
+  {
+   "ja": "今回は、14世紀から15世紀にかけてイングランドとフランスの間で続いた百年戦争です。きっかけは、母親を通じてフランス王家の血を引くイングランド王エドワード3世が、フランスの王位を主張したことでした。つまり、一つの王位を二つの国の王が争う形になったわけです。戦いは何度も休戦をはさみながら、実に百年以上続きました。終盤にはジャンヌ・ダルクが現れ、最終的にフランスがほぼ全土からイングランドの勢力を追い出しています。",
+   "form": "争う",
+   "en": "This time it's the Hundred Years' War, fought between England and France from the fourteenth to the fifteenth century. It began when the English king Edward III, who had French royal blood through his mother, laid claim to the French throne. In other words, it became a situation in which the kings of two countries contended for a single crown. The fighting, interrupted by truces again and again, went on for over a hundred years. Towards the end Joan of Arc appeared, and in the end France drove English power out of almost all its territory.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「王位を争う」「優勝を争う」のように、「〜を争う」で奪い合う対象を示す。",
+   "grammar": [
+    "n4-nagara",
+    "n5-teiru"
+   ],
+   "sense": "ある物を得ようとして、互いに張り合う。"
+  },
+  {
+   "ja": "先端半導体の供給をめぐり、各国が主導権を争っている。AIの開発に欠かせない最先端のチップは、ごく限られた工場でしか作れないためだ。台湾に生産が集中していることへの警戒も、各国の動きを後押ししている。米国は国内に生産拠点を増やそうと巨額の補助金を出し、日本や欧州も工場の誘致を進めている。ただ、特定の地域に生産が偏る状態は当面続くとみられ、供給網の安定が大きな課題となっている。",
+   "form": "争っている",
+   "en": "Countries are vying for the upper hand over the supply of advanced semiconductors. This is because the cutting-edge chips essential to AI development can only be made in a very small number of factories. Wariness about production being concentrated in Taiwan is also spurring countries into action. The United States is paying huge subsidies to increase production sites at home, and Japan and Europe are also working to attract factories. However, the concentration of production in particular regions is expected to continue for the time being, and stabilising supply chains has become a major challenge.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「主導権を争う」「首位を争う」のように、立場や順位の奪い合いを表す。",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "優位な立場を得ようとして張り合う。"
+  },
+  {
+   "ja": "人はなぜ、取るに足らないことで争うのだろうか。仏教は、その根に自分というものへの強いこだわりを見る。自分の考えこそ正しい、自分の持ち物は守らねばならない、という思いが強いほど、他人とのぶつかり合いは避けられなくなる。だから釈迦は、相手を言い負かすことではなく、自らのこだわりに気づくことを説いたのである。勝ち負けへの執着を手放したとき、ぶつかる理由そのものが消えていく。",
+   "form": "争う",
+   "en": "Why do people quarrel over trivial things? Buddhism sees strong attachment to the self at the root of it. The stronger the feeling that one's own ideas are right and one's own possessions must be protected, the more unavoidable clashes with others become. That is why the Buddha taught not how to defeat others in argument but how to notice one's own attachments. When we let go of our attachment to winning and losing, the very reason for clashing fades away.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "けんかの意味では「〜と争う」「言い争う」の形をとる。「争いごと」は名詞の形。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n4-teiku"
+   ],
+   "sense": "互いに言い張って、けんかをする。"
   }
  ],
  "217": [
@@ -5508,6 +5819,61 @@
    "url": "https://www.aozora.gr.jp/cards/000083/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今日は、時代によってマナーがどう変わってきたかを扱った本を要約していきます。著者によると、今では当たり前のことが、昔は非常識とされていた例は意外と多いそうです。たとえば、明治の初めには、洋服姿で街を歩く人に眉をひそめる人もいたといいます。反対に、昔は普通だった歩きながらのたばこは、今では多くの街で禁止されています。つまり、マナーは決まったルールではなく、その時代の合意にすぎないというのがこの本の結論なんです。",
+   "form": "非常識",
+   "en": "Today I'm going to summarize a book about how manners have changed over time. According to the author, there are surprisingly many examples of things that are normal now but were once considered improper. For example, in the early Meiji era, some people reportedly frowned at those walking through town in Western clothes. Conversely, smoking while walking, which used to be ordinary, is now banned in many towns. In short, the book concludes that manners are not fixed rules but merely the agreement of each era.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "grammar": [
+    "n4-teiku",
+    "n4-nagara",
+    "n5-teiru",
+    "n3-dewa-naku",
+    "n2-ni-suginai"
+   ],
+   "sense": "世の中の当たり前の考えやマナーから外れていること。"
+  },
+  {
+   "ja": "生成AIで作った文章を、そのまま自分の作品として提出する学生が増えており、大学などで対応が分かれている。ある大学の教員は、出典を示さずに使うのは研究の世界では非常識だとして、厳しく対処する考えを示した。一方で、使い方の指針を作った上で、授業に積極的に取り入れる大学もある。背景には、AIの扱いをめぐる常識がまだ定まっていないという事情がある。専門家は、禁止か容認かの二択ではなく、使った事実を明らかにするルールづくりが急がれると指摘している。",
+   "form": "非常識",
+   "en": "Students submitting text made with generative AI as their own work are increasing, and universities are divided in how they respond. One university lecturer said that using it without citing the source is out of line in the world of research and indicated an intention to deal with it strictly. On the other hand, some universities actively bring it into classes after drawing up guidelines for its use. Behind this lies the fact that the common sense around handling AI has not yet settled. Experts point out that rather than a choice between banning and allowing it, rules that make clear when it was used are urgently needed.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n2-ue-de",
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "世の中の当たり前の考えやマナーから外れていること。"
+  },
+  {
+   "ja": "他人の振る舞いを非常識だと感じるとき、私たちは自分の常識を物差しにしている。ところが、その物差しは、育った家庭や地域、世代によって驚くほど異なるものである。連絡なしに電話をかけてよいか、食事中にスマートフォンを見てよいか、といった問いにも、人によって答えは違う。相手を責める前に、自分の基準がどこから来たのかを振り返ることは、無用な衝突を避ける上で役に立つだろう。常識とは、思っているほど共有されていないものなのである。",
+   "form": "非常識",
+   "en": "When we feel someone else's behavior is out of line, we are using our own common sense as a yardstick. Yet that yardstick differs surprisingly depending on the family, region, and generation we grew up in. Even on questions like whether it is all right to call without warning, or to look at a smartphone during a meal, the answer varies from person to person. Before blaming the other person, reflecting on where our own standard came from will help in avoiding needless conflict. Common sense is something far less shared than we think.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n5-teiru",
+    "n2-ue-de"
+   ],
+   "sense": "世の中の当たり前の考えやマナーから外れていること。"
   }
  ],
  "229": [
@@ -5625,6 +5991,58 @@
    "url": "https://www.aozora.gr.jp/cards/000042/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今日は、産業革命がなぜイギリスで始まったのかを扱った本を要約していきます。著者が注目するのは、最初に機械を作り、工場を動かしたのが、ごく一握りの職人や商人だったという点です。彼らの多くは、大学で学んだ学者ではなく、現場で試行錯誤を重ねた人たちでした。その小さな集団の工夫が、最終的に国全体の産業の形を変えることになったわけです。歴史を動かすのは、必ずしも大勢の力ではない、というのがこの本のメッセージなんです。",
+   "form": "一握り",
+   "en": "Today I'm going to summarize a book about why the Industrial Revolution began in Britain. What the author focuses on is the fact that those who first built machines and ran factories were a tiny handful of craftsmen and merchants. Many of them were not scholars who had studied at university, but people who went through trial and error on the shop floor. The ingenuity of that small group eventually ended up changing the shape of the whole country's industry. The book's message is that what moves history is not necessarily the strength of the many.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "grammar": [
+    "n4-teiku",
+    "n3-dewa-naku",
+    "n3-koto-ni-naru"
+   ],
+   "sense": "ごくわずかな数や量。"
+  },
+  {
+   "ja": "大規模なAIの開発には巨額の費用がかかるため、最先端のモデルを作れる企業は、世界でも一握りに限られている。開発に欠かせない専用の部品も、限られたメーカーからしか手に入りにくいのが現状だ。こうした状況に対し、各国では、技術や富が特定の企業に集中することへの懸念が強まっている。一方で、公開されたモデルを基に、小さな組織が独自のサービスを生み出す動きも広がっている。AIの恩恵を誰が受けるのかという問いは、今後ますます重みを増しそうだ。",
+   "form": "一握り",
+   "en": "Because developing large-scale AI costs enormous sums, the companies able to build cutting-edge models are limited to a handful worldwide. The specialized components essential to development are also currently hard to obtain except from a limited number of makers. In response to this situation, concern is growing in many countries about technology and wealth concentrating in particular companies. At the same time, there is also a growing movement of small organizations creating their own services based on publicly released models. The question of who will receive the benefits of AI looks set to carry more and more weight from now on.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "ごくわずかな数や量。"
+  },
+  {
+   "ja": "成功した人の話を聞くと、努力すれば誰でも報われると思いたくなる。しかし、目立つ成功例は、同じように挑んだ大勢の中の一握りにすぎないことが多い。失敗した人々の声は記録に残りにくく、私たちの目に届かないのである。統計や心理学の分野では、こうした偏りを生存者バイアスと呼ぶ。努力の価値を否定するわけではないが、成功の物語だけから教訓を引き出すことには慎重でありたい。",
+   "form": "一握り",
+   "en": "When we hear the stories of successful people, we are tempted to think that anyone who works hard will be rewarded. However, conspicuous success stories are often merely a handful among the many who tried in the same way. The voices of those who failed are rarely recorded and do not reach our eyes. In statistics and psychology, this kind of bias is called survivorship bias. This is not to deny the value of effort, but I want to be cautious about drawing lessons from success stories alone.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n2-ni-suginai",
+    "n3-wake-dewa-nai",
+    "n5-tai"
+   ],
+   "sense": "ごくわずかな数や量。"
   }
  ],
  "241": [
@@ -5657,6 +6075,57 @@
    "url": "https://www.aozora.gr.jp/cards/001569/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今日は、年齢と見た目の関係を扱った本を要約していきます。著者によると、髪を染めるのをやめる人が、ここ数年で増えてきているそうです。かつては隠すものだった白い髪を、銀髪として前向きにとらえ直す動きが広がっているわけです。この本が面白いのは、見た目を受け入れることで、年を取ることへの不安が和らぐ人もいると指摘している点です。もちろん染めるのも自由で、大事なのは自分で選んでいるという感覚だ、というのがこの本の結論なんです。",
+   "form": "銀髪",
+   "en": "Today I'm going to summarize a book about the relationship between age and appearance. According to the author, the number of people who stop dyeing their hair has been increasing over the past few years. In other words, a movement to see white hair, once something to hide, positively as silver hair is spreading. What makes this book interesting is that it points out that, by accepting how they look, some people find their anxiety about getting older eases. Of course, dyeing is also a free choice, and the book concludes that what matters is the sense that you are choosing for yourself.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru",
+    "n3-koto-de"
+   ],
+   "sense": "銀色に光って見える、白くなった髪。"
+  },
+  {
+   "ja": "自分の顔写真から、年を重ねた姿をAIで予測するアプリが、若者の間で人気を集めている。写真を読み込むと、しわの増えた肌や銀髪になった数十年後の自分が、数秒で表示される仕組みだ。海外の研究では、年を取った自分の姿を目にすることで、老後に備えて貯蓄を増やす傾向が見られたという。一方、顔写真が開発会社に保存される場合もあり、個人情報の扱いを心配する声も上がっている。",
+   "form": "銀髪",
+   "en": "Apps that use AI to predict how you will look as you age, based on a photo of your face, are gaining popularity among young people. When you upload a photo, the app shows you yourself decades later, with more wrinkled skin and silver hair, in a few seconds. Research overseas reportedly found that seeing an older image of oneself was associated with a tendency to save more for retirement. On the other hand, face photos are sometimes stored by the developers, and concerns about how personal data is handled are also being raised.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-de"
+   ],
+   "sense": "銀色に光って見える、白くなった髪。"
+  },
+  {
+   "ja": "古代インドには、人生を四つの時期に分ける考え方がある。家族を養う務めを終えた者は、森に入り、自分の内面と向き合う時期を迎えるとされた。現代の私たちは、年を取ることを衰えとしてしか見ない傾向にある。しかし、この考え方に照らせば、銀髪は役目を終えたしるしではなく、新しい学びの段階に入った証とも読めるのである。老いをどう名づけるかによって、残りの人生の景色は大きく変わるだろう。",
+   "form": "銀髪",
+   "en": "In ancient India there is a way of thinking that divides life into four stages. It was held that someone who had finished the duty of supporting a family would enter the forest and reach a stage of facing their inner self. We today tend to see aging only as decline. But in light of this way of thinking, silver hair can be read not as a sign that one's role is over, but as proof of having entered a new stage of learning. How we name old age will probably greatly change the landscape of the rest of our lives.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "grammar": [
+    "n3-dewa-naku"
+   ],
+   "sense": "銀色に光って見える、白くなった髪。"
   }
  ],
  "247": [
@@ -5689,6 +6158,58 @@
    "url": "https://b.houyhnhnm.jp/matsui_tomonori/2024/07/08/96860/",
    "licence": "web quotation (personal study)",
    "title": ""
+  },
+  {
+   "ja": "今日は、AIと一緒に勉強する方法を扱った本を要約していきます。著者によると、AIに答えを聞くだけの使い方では、ほとんど力がつかないそうです。おすすめは、自分の説明をAIに聞かせて、間違いを指摘してもらうやり方です。自分で考えてから確かめるという順番を守るだけで、記憶への残り方がまるで違ってくるんです。資格試験にガチで受かりたい人ほど、この順番を意識してほしい、というのがこの本のメッセージなんです。",
+   "form": "ガチ",
+   "en": "Today I'm going to summarize a book about how to study together with AI. According to the author, just asking AI for answers builds almost no ability. What the book recommends is having the AI listen to your own explanation and point out mistakes. Just keeping to the order of thinking for yourself first and then checking makes a huge difference in how well things stay in memory. The book's message is that the more seriously you want to pass a qualification exam, the more you should keep this order in mind.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "ai",
+   "tipJa": "くだけた話し言葉。「ガチで」の形で副詞として使うことが多い。",
+   "grammar": [
+    "n4-teiku",
+    "n5-tai"
+   ],
+   "sense": "本気であること。若者の話し言葉。"
+  },
+  {
+   "ja": "この前、お城めぐりが好きな友だちに誘われて、兵庫の姫路城に行ってきたんですよ。天守の中の階段がめちゃくちゃ急で、手すりにつかまらないと上れないくらいで、ガチできつかったです。でも、ああいう造りって、攻めてきた敵を簡単に上らせないためでもあるらしいじゃないですか。そう思うと、息を切らしながらも、昔の人の工夫にちょっと感心しちゃいました。次は、もっと小さいお城にも行ってみたいですね。",
+   "form": "ガチ",
+   "en": "The other day a friend who loves touring castles invited me, and I went to Himeji Castle in Hyogo. The stairs inside the keep were so steep you couldn't climb without holding the handrail, and it was seriously tough. But apparently that kind of structure was also meant to keep attacking enemies from climbing up easily, right? Thinking of that, even while out of breath, I was a little impressed by the ingenuity of people back then. Next time I'd like to go to a smaller castle too.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "history",
+   "grammar": [
+    "n4-nagara",
+    "n5-tai"
+   ],
+   "sense": "本気であること。若者の話し言葉。"
+  },
+  {
+   "ja": "インド北西部のコータという町には、工科大学の入試に向けて、親元を離れて下宿しながら勉強する高校生が全国から集まってきます。朝から晩まで授業と模試が続く、まさにガチの受験生活です。ただ、学習の研究では、睡眠時間を減らして詰め込むやり方は、記憶の定着を妨げることがわかっています。長く机に向かうことと、内容が身につくことは、必ずしも同じではないんです。合格を目指すなら、勉強の量だけでなく、休み方まで計画に入れることが大切なんです。",
+   "form": "ガチ",
+   "en": "In a town called Kota in northwestern India, high school students gather from all over the country to study for engineering college entrance exams while living away from their parents in lodgings. With classes and mock exams going on from morning till night, it is truly hardcore exam life. However, learning research has found that cramming by cutting sleep hours interferes with memory consolidation. Sitting at your desk for a long time and actually absorbing the material are not necessarily the same thing. If you are aiming to pass, it is important to plan not only the amount of study but even how you rest.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "学",
+   "topic": "india",
+   "grammar": [
+    "n4-nagara",
+    "n5-teiru"
+   ],
+   "sense": "本気であること。若者の話し言葉。"
   }
  ],
  "253": [
@@ -5894,6 +6415,55 @@
    "url": "http://news.livedoor.com/article/detail/6221152/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "錦織の敗戦に「立派」「力の差あった」など様々な反応"
+  },
+  {
+   "ja": "今回は、紀元前480年のテルモピュライの戦いを取り上げます。ギリシャに攻め込んだペルシャの大軍に対し、スパルタ王レオニダスは、わずかな兵を率いて狭い山道で迎え撃ちました。地形をうまく利用したことで、彼らは数日にわたって敵の進軍を食い止めたんですね。最後は裏道から回り込まれて全滅しますが、その健闘ぶりはのちの時代まで語り継がれることになりました。数で負けていても、地の利を生かせば大軍を苦しめられるという代表的な例です。",
+   "form": "健闘",
+   "en": "This time we look at the Battle of Thermopylae in 480 BC. Against the huge Persian army that had invaded Greece, the Spartan king Leonidas led a small force to meet them in a narrow mountain pass. By making clever use of the terrain, they held back the enemy's advance for several days. In the end they were outflanked by a back path and wiped out, but the way they fought so well came to be told for generations. It is a classic example of how, even when outnumbered, you can trouble a great army if you use the lie of the land.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「健闘ぶり」「健闘むなしく」のように、強い相手によく戦ったことをたたえる語。結果は負けでも使える。",
+   "grammar": [
+    "n3-koto-de",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "日本語に強い国産の小型AIモデルが、海外の巨大モデルを相手に健闘する例が出てきている。学習に使うデータの量では大きく見劣りするものの、日本語の文書を重点的に学ばせることで、特定の分野では肩を並べる結果も出ている。背景には、限られた計算資源の中で、地道に工夫を重ねてきた開発者たちの存在がある。今後は、こうしたモデルを用途に応じて巨大モデルと使い分ける企業が増えるとみられる。",
+   "form": "健闘",
+   "en": "Cases are emerging of small domestic AI models that are strong in Japanese putting up a good fight against huge overseas models. Although they fall far short in the amount of training data, by concentrating on Japanese documents they have produced results that stand alongside the giants in certain fields. Behind this are developers who have steadily kept refining their methods within limited computing resources. Going forward, more companies are expected to use such models alongside the giant ones, choosing according to the purpose.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「〜を相手に健闘する」「健闘が光る」の形で、格上に食い下がる様子を伝える。",
+   "grammar": [
+    "n5-teiru",
+    "n2-mono-no",
+    "n3-koto-de",
+    "n2-ni-oujite"
+   ]
+  },
+  {
+   "ja": "友達が第一志望の大学に、ほんとにあと数点で落ちちゃったんですよ。本人はかなり落ち込んでたんですけど、模試では夏までずっと一番下の判定だったんですよね。そこから合格ラインの目の前まで来たって、普通にすごい健闘じゃないですか。結果だけ見たら不合格なんですけど、そこまで伸ばした経験って、たぶん次にも生きてくると思うんですよ。だから、とりあえず焼肉おごって、よくやったって言っときました。",
+   "form": "健闘",
+   "en": "A friend of mine missed getting into their first-choice university by literally a few points. They were pretty down about it, but on the mock exams they'd had the lowest grade all the way until summer. Getting from there to right in front of the pass line is honestly a great effort, isn't it? If you only look at the result it's a fail, but I think the experience of improving that much will probably pay off next time too. So for now I treated them to yakiniku and told them they did well.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "mind",
+   "tipJa": "会話では「健闘したね」「よく健闘した」と、結果より努力や粘りを認めるときに使う。"
   }
  ],
  "283": [
@@ -6504,6 +7074,61 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回紹介するのは、マイクロソフトのトップを務めるサティア・ナデラの『ヒット・リフレッシュ』です。彼が2014年にトップに就いたとき、社内では部署どうしの足の引っ張り合いが当たり前になっていたといいます。そこでナデラは新体制の柱として、すべてを知っている人ではなく、学び続ける人であれという文化づくりを掲げました。そのもとになったのは、心理学者キャロル・ドゥエックが唱えた成長マインドセットという考え方です。人を入れ替えるだけでなく、社員一人ひとりの考え方まで変えようとしたのがポイントなんですね。",
+   "form": "新体制",
+   "en": "The book I'm introducing this time is Hit Refresh by Satya Nadella, who heads Microsoft. When he took the top job in 2014, infighting between departments had reportedly become the norm inside the company. So, as a pillar of the new leadership, Nadella set out to build a culture of being someone who keeps learning rather than someone who knows everything. The basis for this was the idea of the growth mindset put forward by the psychologist Carol Dweck. The key point is that he tried not just to swap people out but to change the way each employee thinks.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「新体制の柱」「新体制のもとで」のように、組織が仕切り直したあとの形を指す。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n5-teiru"
+   ],
+   "sense": "組織などの、新しくなった仕組みや顔ぶれ"
+  },
+  {
+   "ja": "2023年11月、対話型AIの開発で知られる米オープンAIで、取締役会がサム・アルトマン氏を突然解任した。社員の大半が抗議の署名に加わるなど混乱が広がり、同氏はわずか数日後に復帰することで合意した。これに伴って取締役会の顔ぶれは大きく入れ替わり、会社は新体制のもとで再出発することになった。この騒動は、安全性を重んじる立場と事業の拡大を急ぐ立場の間の緊張を浮き彫りにしたとも指摘されている。AI企業の統治のあり方をめぐる議論は、その後も続いている。",
+   "form": "新体制",
+   "en": "In November 2023, at the US company OpenAI, known for developing conversational AI, the board suddenly dismissed Sam Altman. Turmoil spread, with most employees joining a protest petition, and just a few days later an agreement was reached for him to return. Along with this, the board's membership changed substantially, and the company made a fresh start under a new setup. It has also been pointed out that the uproar laid bare the tension between those who prioritize safety and those in a hurry to expand the business. Debate over how AI companies should be governed has continued since.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「新体制のもとで再出発」「新体制が発足」の形でよく使う。",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n5-teiru"
+   ],
+   "sense": "組織などの、新しくなった仕組みや顔ぶれ"
+  },
+  {
+   "ja": "日本史で狙われやすいのが、1940年に近衛文麿が中心となって進めた新体制運動です。ナチス・ドイツの一党体制なども意識しながら、国民を一つにまとめる強い組織を作ろうとした動きでした。その流れの中で、既成の政党は次々と自ら解散し、同じ年の秋に大政翼賛会が発足します。ここで押さえたいのは、もとは強力な政党を作る構想だったものの、最終的には政府の方針を上から伝える組織になったという点です。用語だけを覚えるのではなく、なぜそうなったのかという流れで覚えるのがコツです。",
+   "form": "新体制",
+   "en": "A frequent target in Japanese history exams is the New Order Movement promoted in 1940 with Fumimaro Konoe at its center. It was a move to build a strong organization uniting the people, with an eye on things like Nazi Germany's one-party system. In that flow, the existing political parties dissolved themselves one after another, and in the autumn of the same year the Imperial Rule Assistance Association was launched. What you should grasp here is that although it began as a plan to create a powerful party, it ended up as an organization that passed government policy down from above. The trick is not to memorize just the terms but to remember them through the flow of why things turned out that way.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "学",
+   "topic": "history",
+   "tipJa": "日本史用語の「新体制運動」は1940年の近衛文麿の運動を指す。",
+   "grammar": [
+    "n4-nagara",
+    "n2-mono-no",
+    "n3-dewa-naku"
+   ],
+   "sense": "一九四〇年、近衛文麿らが進めた挙国一致の政治体制"
   }
  ],
  "21": [
@@ -7726,6 +8351,57 @@
    "url": "http://news.livedoor.com/article/detail/5921231/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "チェルノブイリ再来か、福島で恐れていた事態が遂に…"
+  },
+  {
+   "ja": "今回取り上げるのは、台湾のTSMCという会社が、なぜ半導体の受託製造で世界のトップに立てたのか、という話です。創業者のモリス・チャンが選んだのは、自社の製品を持たず、他社のチップを作ることに専念するというやり方でした。お客さんから見れば、自分たちのアイデアを盗まれる心配がないわけですね。そのうえで、注文の変更やトラブルにも迅速に応えることで、信頼を積み上げてきたと言われています。ライバルと張り合うのではなく、黒子に徹したことが最大の武器になったんです。",
+   "form": "迅速",
+   "en": "What I'm taking up this time is why the Taiwanese company TSMC was able to reach the top of the world in contract chip manufacturing. What founder Morris Chang chose was a model of having no products of its own and devoting itself to making other companies' chips. From the customer's point of view, there's no worry about having their ideas stolen. On top of that, it is said to have built up trust by responding swiftly even to order changes and problems. Rather than going head to head with rivals, sticking to a behind-the-scenes role became its greatest weapon.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "ai",
+   "tipJa": "「迅速に応える」「迅速な対応」のように、組織の対応の速さをほめるときに使う。",
+   "grammar": [
+    "n3-koto-de",
+    "n3-dewa-naku"
+   ]
+  },
+  {
+   "ja": "1948年6月、ソ連は西ベルリンへの陸路と水路を封鎖し、200万人を超える住民が孤立した。これに対し、アメリカとイギリスは飛行機で食料や燃料を運び込む作戦を迅速に立ち上げた。輸送は約1年にわたって続き、最も多い日には、ほぼ1分おきに輸送機が着陸したとされる。運ばれる物資の量は日を追うごとに増え、ソ連は翌年5月に封鎖を解いた。この出来事は、東西の対立が深まっていく中で起きた最初の大きな危機の一つとされている。",
+   "form": "迅速",
+   "en": "In June 1948, the Soviet Union blockaded the land and water routes into West Berlin, leaving more than two million residents cut off. In response, the United States and Britain swiftly launched an operation to fly in food and fuel. The airlift continued for about a year, and on the busiest day transport planes are said to have landed almost once a minute. The volume of supplies delivered grew day by day, and the Soviet Union lifted the blockade in May of the following year. The episode is regarded as one of the first major crises to occur as the confrontation between East and West deepened.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "報道では「迅速に〜を立ち上げた」「迅速な支援」のように、公的な動きの速さに使う。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "現代の職場では、何事も迅速に片付けることが美徳とされている。メールにはすぐ返事をし、決まったことは翌日には動き出すのが当たり前になった。だが仏教の瞑想は、反対に、一つの呼吸を急がずに見つめることから始まる。速さそのものが悪いのではなく、急ぐあまり自分が何をしているのかを見失うことが問題なのだろう。手を動かすのが速い人ほど、ときどき立ち止まる時間が必要なのかもしれない。",
+   "form": "迅速",
+   "en": "In today's workplace, getting everything done swiftly is treated as a virtue. Replying to emails right away and getting decisions moving by the next day have become the norm. Buddhist meditation, by contrast, begins with watching a single breath without hurrying. It is probably not speed itself that is bad, but losing sight of what one is doing in one's haste. Perhaps the faster someone's hands move, the more they need time to stop now and then.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "「迅速に片付ける」のように仕事の処理の速さに使う。日常会話では「すばやく」「すぐ」が自然。",
+   "grammar": [
+    "n3-dewa-naku",
+    "n5-teiru"
+   ]
   }
  ],
  "170": [
@@ -8138,6 +8814,55 @@
    "url": "",
    "licence": "CC BY-SA (Wikipedia)",
    "title": ""
+  },
+  {
+   "ja": "今回は、米ソによる宇宙開発の歴史を見ていきます。1957年、ソ連が世界初の人工衛星を打ち上げると、アメリカには大きな衝撃が走りました。さらに1961年には、ガガーリンが人類で初めて宇宙を飛び、ソ連が一歩先を行く形になります。両国が威信をかけて技術を競う中、アメリカは月を目指す計画に巨額の予算を注ぎ込み、1969年にアポロ11号を月面に着陸させました。この激しい競争が、のちの通信衛星などの技術の土台にもなったわけです。",
+   "form": "競う",
+   "en": "This time we look at the history of the space race between the US and the Soviet Union. In 1957, when the Soviet Union launched the world's first artificial satellite, a great shock ran through America. Then in 1961 Gagarin became the first human to fly in space, putting the Soviet Union a step ahead. As the two countries competed in technology with their prestige at stake, America poured a huge budget into a programme aimed at the Moon and landed Apollo 11 on the lunar surface in 1969. This fierce competition also became the foundation for later technologies such as communications satellites.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「技術を競う」「腕を競う」のように、力や技を比べ合う対象を「〜を」で示す。",
+   "grammar": [
+    "n4-teiku"
+   ]
+  },
+  {
+   "ja": "大手IT企業の間で、AIモデルの賢さを競う動きが一段と激しくなっている。各社は新しいモデルを発表するたびに、数学やプログラミングの試験での得点を公表し、他社との差を強調する。ただ、こうした試験の点数が、実際の業務での使いやすさをどこまで表しているかについては、疑問の声も上がっている。利用者の間では、点数よりも自分の仕事に合うかどうかで選ぶべきだとの意見も多い。",
+   "form": "競う",
+   "en": "Among major IT companies, the race to outdo each other in how smart their AI models are has become even more intense. Each time a company announces a new model, it publishes its scores on maths and programming tests and stresses the gap with its rivals. However, doubts have been raised about how far such test scores reflect ease of use in actual work. Among users, many also say models should be chosen by whether they suit one's own work rather than by their scores.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「〜を競う」「〜を競い合う」で、各社や各国が優劣を張り合う様子を伝える。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "クラスメートと点数を競うと、やる気が出るという人は少なくありません。確かに、短い期間で見れば、他人との比較は強い刺激になります。ただ、心理学の研究では、人に勝つことだけを目標にすると、負けが続いたときに意欲が一気に落ちやすいことが分かっています。おすすめは、昨日の自分を相手にすることです。先週より一問多く解けた、という小さな前進を記録していくと、学ぶこと自体が楽しくなっていきます。",
+   "form": "競う",
+   "en": "Quite a few people say that competing with classmates for scores motivates them. Certainly, in the short term, comparing yourself with others is a strong stimulus. But psychological research has found that if beating others is your only goal, your motivation tends to plunge when you keep losing. What I recommend is taking on yesterday's version of yourself. If you keep recording small steps forward, like solving one more problem than last week, learning itself becomes enjoyable.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "学",
+   "topic": "mind",
+   "tipJa": "「〜と競う」で相手、「〜を競う」で比べる中身を示す。勉強やスポーツの場面で頻出。",
+   "grammar": [
+    "n5-teiru",
+    "n4-teiku"
+   ]
   }
  ],
  "218": [
@@ -8433,6 +9158,54 @@
    "url": "",
    "licence": "CC BY 2.5 (Wikinews)",
    "title": ""
+  },
+  {
+   "ja": "今日は、アメリカの公民権法がどうやって成立したのか、という話です。人種による差別を禁じるこの法案に対し、上院の反対派は延々と演説を続けることで、採決を先延ばしにしました。議論は約2か月にわたって止まりましたが、賛成派は粘り強く票を集め、ついに引き延ばしを打ち切って法案は可決されます。そして1964年7月、ジョンソン大統領が署名して法律が成立しました。キング牧師たちの運動が世論を動かしていたことも、大きな後押しになったわけですね。",
+   "form": "可決",
+   "en": "Today's topic is how the American Civil Rights Act came to pass. Opponents in the Senate put off the vote on this bill banning racial discrimination by making speeches that went on and on. The debate was stalled for about two months, but supporters patiently gathered votes, finally cut off the delaying tactics, and the bill was passed. Then in July 1964, President Johnson signed it and it became law. The way the movement of Dr. King and others had been swaying public opinion was also a big push, you see.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「法案が可決される」「賛成多数で可決」のように、議案が認められる場面に使う。反対は「否決」。",
+   "grammar": [
+    "n3-koto-de"
+   ]
+  },
+  {
+   "ja": "欧州議会は2024年3月、AIの利用をリスクの高さに応じて規制する法案を、賛成多数で可決した。顔認識などを使った一部の監視や、人の弱みにつけ込んで行動を操るようなAIは、原則として禁止される。違反した企業には、世界全体の売上高に応じた多額の制裁金が科される可能性がある。AIを包括的に規制する法律は世界でも初めてとされ、各国のルールづくりにも影響を与えるとみられる。一方、厳しい規制が域内の技術開発を妨げるとの懸念も根強い。",
+   "form": "可決",
+   "en": "In March 2024, the European Parliament passed by a majority a bill that regulates the use of AI according to its level of risk. Some forms of surveillance using facial recognition and the like, and AI that manipulates people's behavior by exploiting their weaknesses, will in principle be banned. Companies that violate it could face large fines in proportion to their worldwide sales. It is said to be the world's first law to regulate AI comprehensively, and it is expected to influence rule-making in other countries. On the other hand, concerns also persist that strict regulation will hamper technological development within the region.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「賛成多数で可決した」が定番の言い方。",
+   "grammar": [
+    "n2-ni-oujite"
+   ]
+  },
+  {
+   "ja": "紀元前五世紀のアテネで、反乱を起こした同盟都市の男たちをすべて処刑するという案が、市民の集会で可決されたことがある。ところが翌日になると、多くの市民が怒りに任せた決定を悔やみ、集会が開き直された。議論の末に決定はわずかな差でひっくり返り、取り消しを伝える船は、処刑が始まる直前に着いたと伝えられる。多数の賛成は、その瞬間の空気を映したものにすぎない。だからこそ、一晩おいて考え直す仕組みを持てるかどうかが、集団の知恵を左右するのだろう。",
+   "form": "可決",
+   "en": "In fifth-century BC Athens, a proposal to execute all the men of an allied city that had revolted was once passed at the citizens' assembly. But the next day many citizens regretted a decision made in anger, and the assembly was convened again. After debate the decision was overturned by a narrow margin, and the ship carrying the cancellation is said to have arrived just before the executions were to begin. A majority in favor merely reflects the mood of that moment. That is exactly why whether a group can have a mechanism for sleeping on it and reconsidering probably decides its collective wisdom.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "tipJa": "「案が可決される」のように、議案が賛成を得て決まることに使う。",
+   "grammar": [
+    "n2-ni-suginai"
+   ]
   }
  ],
  "254": [
@@ -8529,6 +9302,56 @@
    "url": "http://news.livedoor.com/article/detail/6785653/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "【オトナ女子映画部】アラサーアイドルがヒーローに！安っぽさやくだらなさを楽しむ『エイトレンジャー』"
+  },
+  {
+   "ja": "今日は、ブッダの教えがどうやって今に伝わったのか、という話をします。ブッダが亡くなったあと、教えが散らばってしまうことを心配した弟子たちが、王舎城という町に集結しました。そこで、ブッダのそばに長く仕えたアーナンダが、聞いた教えを一つずつ唱えていきます。ほかの弟子たちはそれを聞き、内容に間違いがないかを全員で確かめたわけです。この時点では文字ではなく、すべて口で伝えて覚えたというのが面白いところなんですね。",
+   "form": "集結",
+   "en": "Today I'll talk about how the Buddha's teachings were handed down to the present. After the Buddha died, his disciples, worried that the teachings would scatter, gathered in a town called Rajagriha. There, Ananda, who had long served at the Buddha's side, recited one by one the teachings he had heard. The other disciples listened and checked together whether there were any errors in the content. The interesting part is that at this point it was all passed on and memorized by word of mouth, not in writing.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "india",
+   "tipJa": "「〜に集結する」の形で、多くの人が目的をもって一か所に集まるときに使う。",
+   "grammar": [
+    "n4-teiku",
+    "n3-dewa-naku"
+   ]
+  },
+  {
+   "ja": "1944年6月6日、連合国軍はフランス北部のノルマンディー海岸に上陸する作戦を始めた。作戦に先立ち、イギリス南部には兵士や戦車、船が大規模に集結し、兵士の数は200万人を超えたとされる。ドイツ側に上陸地点を悟らせないため、連合国は別の海岸を狙うと見せかける偽の部隊まで用意した。天候の悪化で決行は当初の予定から延期されたが、上陸は成功し、西ヨーロッパの戦局は大きく転換することになった。この作戦は、史上最大級の上陸作戦として知られている。",
+   "form": "集結",
+   "en": "On June 6, 1944, Allied forces began an operation to land on the Normandy coast of northern France. Ahead of the operation, soldiers, tanks and ships massed on a large scale in southern England, with the number of soldiers said to have exceeded two million. To keep the German side from guessing the landing site, the Allies even prepared a fake army that made it look as if they were aiming at a different coast. Because of worsening weather the launch was postponed from the original schedule, but the landing succeeded and the war in Western Europe took a major turn. The operation is known as one of the largest amphibious landings in history.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "軍事の報道では「部隊が国境付近に集結する」のように、大勢が一か所に集まる意味で使う。",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "AIの研究って、毎年十二月ごろにめちゃくちゃでかい国際学会があるんですよ。そこに世界中の研究者とか企業の人が一万人以上集結するんで、もはやお祭りみたいな感じなんですよね。で、面白いのが、論文の発表より廊下での立ち話のほうが大事だって言う人が結構いることで。ネットで何でも読める時代でも、結局人が会う場所にいい話も仕事も転がってくるっていう。そう考えると、オンラインで全部済むってわけじゃないんだなと思います。",
+   "form": "集結",
+   "en": "In AI research, there's this ridiculously huge international conference every year around December. Over ten thousand researchers and industry people from all over the world gather there, so it's basically like a festival. And the funny thing is that quite a few people say the hallway chats matter more than the paper presentations. Even in an age when you can read anything online, the good leads and the jobs end up rolling in at the places where people meet. When you think about it that way, it's not like everything can be done online.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "ai",
+   "tipJa": "「集結」は本来かたい語。会話で使うと、大げさで少しおどけた響きになる。",
+   "grammar": [
+    "n3-wake-dewa-nai"
+   ]
   }
  ],
  "272": [
@@ -8641,6 +9464,57 @@
    "url": "",
    "licence": "CC BY 2.5 (Wikinews)",
    "title": ""
+  },
+  {
+   "ja": "今回は、2016年に行われた囲碁AIとトップ棋士の五番勝負を振り返ります。囲碁はチェスや将棋に比べて打てる手の数がけた違いに多く、AIがプロと互角に戦えるようになるのは、まだ十年は先だと言われていました。ところが、グーグル傘下の企業が開発したアルファ碁は、韓国のイ・セドル九段に四勝一敗で勝ったんです。注目したいのは、人間が思いつかなかった手をAIが次々に打ち、プロたちが逆にそこから学び始めたという点です。負けた側が教わる側に回ったわけですね。",
+   "form": "互角",
+   "en": "This time we look back on the five-game match held in 2016 between a Go AI and a top professional player. Compared with chess or shogi, Go has an incomparably larger number of possible moves, and it was said that AI being able to fight professionals as an equal was still at least ten years away. But AlphaGo, developed by a company under Google, beat Korea's Lee Sedol, a ninth-dan player, four games to one. What I want to highlight is that the AI played one move after another that humans had never thought of, and professionals in turn began to learn from them. The side that lost ended up becoming the side that was taught.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "ai",
+   "tipJa": "「互角に戦う」「互角の勝負」の形が基本。力の差がない状態を表す。",
+   "grammar": [
+    "n4-you-ni-naru"
+   ]
+  },
+  {
+   "ja": "第一次世界大戦の西部戦線では、開戦からまもなく、両軍が長い塹壕を掘って向かい合う状態が続いた。機関銃や鉄条網によって、守る側が攻める側より圧倒的に有利になったためである。兵力がほぼ互角だったことも、戦線が動かなかった一因とされる。1916年のソンムの戦いでは、両軍合わせて100万人を超える死傷者が出たものの、前線は十キロほどしか動かなかった。戦況は、戦車の登場やアメリカの参戦によって、ようやく大きく動き出すことになる。",
+   "form": "互角",
+   "en": "On the Western Front in the First World War, soon after the war began, a situation set in where both armies dug long trenches and faced each other. This was because machine guns and barbed wire gave the defending side an overwhelming advantage over the attacking side. The fact that their forces were almost evenly matched is also considered one reason the front did not move. At the Battle of the Somme in 1916, over a million casualties were suffered by both armies combined, yet the front line moved only about ten kilometres. The course of the war would finally begin to shift significantly with the arrival of tanks and America's entry into the war.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "分析記事では「戦力が互角」「互角の展開」のように、決着がつかない背景を説明する。",
+   "grammar": [
+    "n2-mono-no",
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "手書きでノートを取るのと、パソコンで打ち込むのと、どちらが記憶に残りやすいのでしょうか。手書きのほうが有利だとする研究が話題になりましたが、その後の追試では、両者の成績がほぼ互角になった例も出ています。結局のところ、差を生むのは道具ではなく、聞いた内容を自分の言葉でまとめ直しているかどうかのようです。パソコンでも、先生の話をそのまま写すのではなく、要約しながら打てば十分に効果があります。",
+   "form": "互角",
+   "en": "Which sticks in memory better: taking notes by hand, or typing them on a computer? A study claiming handwriting has the edge attracted attention, but in later replications there have also been cases where the two came out about even. In the end, what makes the difference seems to be not the tool but whether you are restating what you heard in your own words. Even on a computer, if you summarise as you type instead of copying the teacher's words verbatim, it is quite effective.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "学",
+   "topic": "mind",
+   "tipJa": "研究の比較では「ほぼ互角」「互角の結果」と、差がほとんどないことを示すのに使う。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku",
+    "n4-nagara"
+   ]
   }
  ],
  "284": [
@@ -11416,6 +12290,54 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今日は、日本の古い建物にまつわる本を要約していきます。京都の二条城や知恩院には、歩くと鳥の鳴き声のような音が出る、うぐいす張りと呼ばれる廊下があります。古い家の床がぎいぎいときしむのと原理は同じで、床板を留める金具がこすれて鳴っているんです。侵入者に気づくための仕掛けだという説も有名ですが、最初から狙って作られたのかどうかは、はっきりしていないそうです。それでも、ただの雑音に美しい名前をつけた感性は、なかなか面白いですよね。",
+   "form": "ぎいぎい",
+   "en": "Today I'm going to summarize a book about old Japanese buildings. At Nijo Castle and Chion-in in Kyoto, there are corridors called nightingale floors, which make a sound like birdsong when you walk on them. The principle is the same as an old house's floor creaking, and the sound comes from the metal fittings that hold the floorboards rubbing together. The theory that it was a device for noticing intruders is also well known, but apparently it isn't clear whether it was built that way on purpose from the start. Even so, the sensibility of giving a beautiful name to mere noise is quite interesting, isn't it?",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「ぎいぎい鳴る」「ぎいぎいときしむ」の形が多い。重く、耳ざわりな響き。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru"
+   ],
+   "sense": "古い木や金属がこすれて出る、きしむ音。"
+  },
+  {
+   "ja": "日本語の擬音語は、機械翻訳にとって手ごわい相手だ。古い木の扉がぎいぎいと鳴る、という文を英語に訳すと、たいていは、きしむという意味の動詞一つに置き換えられてしまう。そのとき、ゆっくり何度も繰り返される音の感じは、ほとんど失われる。AIの翻訳を下書きに使う場合も、こうした音の言葉だけは、人の耳で確かめ直したほうがいい。音をどう文字に写すかは、今も書き手の腕の見せどころなのである。",
+   "form": "ぎいぎい",
+   "en": "Japanese onomatopoeia is a tough opponent for machine translation. When you translate a sentence saying an old wooden door creaks open into English, it is usually replaced by a single verb meaning to creak. At that point, the sense of a sound repeating slowly over and over is almost entirely lost. Even when using AI translation as a draft, it is better to recheck these sound words, at least, with human ears. How to put a sound into writing is still where a writer shows their skill.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "語",
+   "topic": "ai",
+   "sense": "古い木や金属がこすれて出る、きしむ音。"
+  },
+  {
+   "ja": "古い家の階段がぎいぎいと鳴る音を、懐かしく感じる人もいれば、落ち着かないと感じる人もいる。同じ音でも、それをどんな記憶と結びつけているかによって、受け取り方はまるで変わる。祖父母の家で過ごした夏を思い出す人にとっては、その音は安心のしるしである。一方、夜中にひとりで聞いた経験を持つ人には、不安をかき立てる合図になる。音そのものではなく、音に重ねた物語が、私たちの感情を動かしているのである。",
+   "form": "ぎいぎい",
+   "en": "Some people find the creaking of the stairs in an old house nostalgic, while others find it unsettling. Even with the same sound, how it is received changes completely depending on what memories it is tied to. For someone who is reminded of summers spent at their grandparents' house, that sound is a sign of safety. On the other hand, for someone who once heard it alone in the middle of the night, it becomes a signal that stirs up anxiety. It is not the sound itself but the story laid over the sound that moves our emotions.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku"
+   ],
+   "sense": "古い木や金属がこすれて出る、きしむ音。"
   }
  ],
  "249": [
@@ -11448,6 +12370,56 @@
    "url": "",
    "licence": "CC BY-SA (Wikipedia)",
    "title": "ベトナム"
+  },
+  {
+   "ja": "今回は、半導体の工場がなぜあれほど水を使うのか、という話をします。チップを作る途中では、薬品で表面を処理するたびに、ウエハーをきれいに洗い流す工程が何度も入ります。ここでほんのわずかでも薬品や微粒子が残留すると、回路がショートして、そのチップは使い物になりません。そのため工場では、不純物を極限まで取り除いた超純水を大量に使っているわけです。工場の建設地を選ぶうえで、水を確保できるかどうかが大きな条件になるのは、こうした理由からなんですね。",
+   "form": "残留",
+   "en": "This time I'll talk about why semiconductor factories use so much water. In the course of making chips, every time the surface is treated with chemicals, a step that washes the wafer clean is inserted, many times over. If even the tiniest amount of chemical or particles remains here, the circuit shorts and that chip is useless. That's why factories use huge amounts of ultrapure water from which impurities have been removed to the limit. This is the reason why, in choosing where to build a factory, whether water can be secured becomes a major condition.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "ai",
+   "tipJa": "「薬品が残留する」「残留農薬」のように、取り除くべき物質があとに残る意味でも使う。",
+   "grammar": [
+    "n2-ue-de",
+    "n5-teiru"
+   ],
+   "sense": "取り除くべき物質などが、そのまま残っていること"
+  },
+  {
+   "ja": "2016年6月、イギリスで欧州連合への加盟を続けるかどうかを問う国民投票が行われた。投票前の世論調査では、残留がわずかに上回るとの見方が多かった。しかし開票の結果、抜けるべきだとする票が約52パーセントを占め、市場には大きな動揺が広がった。投票を呼びかけた当時の政権トップ、キャメロン氏は、結果を受けて辞任を表明した。その後の交渉は難航し、正式に欧州連合を出たのは2020年1月末のことだった。",
+   "form": "残留",
+   "en": "In June 2016, Britain held a referendum asking whether to continue its membership of the European Union. In pre-vote opinion polls, many expected Remain to come out slightly ahead. But when the votes were counted, those saying the country should leave took about 52 percent, and great turmoil spread through the markets. Mr. Cameron, then head of the government, who had called the vote, announced his resignation in response to the result. The negotiations that followed were difficult, and Britain formally left the European Union at the end of January 2020.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "国民投票などでは「残留」と「離脱」が対になる。",
+   "sense": "ほかが去ったあとも、その場にとどまること"
+  },
+  {
+   "ja": "仏教には、煩悩そのものを断ち切ったあとにも、その癖のようなものが心に染みつくという考え方がある。香を焚いた箱から香木を取り出しても、しばらく香りが消えないのと同じである。悟りを開いた弟子でさえ、長年の高慢な口癖が、ふとした言葉づかいに表れたという話も伝わっている。心に残留する癖は、決意一つで消えるものではないのだろう。だからこそ、毎日少しずつ水を替えるように、心を洗い続ける営みが必要になるのである。",
+   "form": "残留",
+   "en": "Buddhism has the idea that even after the defilements themselves have been cut off, something like their habits stays ingrained in the mind. It is just as when the scent does not fade for a while even after the fragrant wood is taken out of a box in which incense was burned. There is even a story that in a disciple who had attained enlightenment, a long-standing arrogant way of talking showed up in a casual choice of words. The habits that remain in the mind probably do not vanish with a single resolution. That is exactly why the practice of continuing to wash the mind, as if changing the water little by little every day, becomes necessary.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "「心に残留する」のように、取り除いたはずのものがあとまで残る比喩にも使える。",
+   "grammar": [
+    "n3-you-ni",
+    "n5-teiru"
+   ],
+   "sense": "取り除いたあとにも、その場に残り続けること"
   }
  ],
  "255": [
@@ -11681,6 +12653,54 @@
    "url": "http://news.livedoor.com/article/detail/6172041/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "『ロード・オブ・ザ・リング』の過去を描く『ホビット』予告映像が公開"
+  },
+  {
+   "ja": "今回は、江戸時代に全国を歩いて測量した伊能忠敬を取り上げます。彼が本格的に測量を始めたのは、商人としての仕事を息子に譲ったあとの、五十代半ばのことでした。そこから十七年にわたって各地を歩き、その距離は地球一周分に近いとも言われています。彼の死後に弟子たちが完成させた地図は、驚くほど正確なものでした。当時の道具と技術を考えれば、まさに快挙と呼ぶにふさわしい仕事だったわけです。",
+   "form": "快挙",
+   "en": "This time we take up Ino Tadataka, who walked the whole country surveying it in the Edo period. He began surveying in earnest in his mid-fifties, after handing over his merchant business to his son. From then on he walked all over the land for seventeen years, and the distance is said to come close to once around the Earth. The map his disciples completed after his death was astonishingly accurate. Considering the tools and techniques of the day, it was work truly worthy of being called a remarkable achievement.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「快挙を成し遂げる」「〜という快挙」の形で、周りも喜ぶ見事な成果に使う。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "2024年のノーベル化学賞は、タンパク質の立体構造をAIで予測する技術を開発した研究者らに贈られた。タンパク質の形を実験で突き止めるには、一つにつき何年もかかることが珍しくなかった。AIが予測した構造のデータはその後無料で公開され、世界中の研究者が使えるようになった。AIを使った研究がこの賞を受けたことは、研究者の間で快挙として受け止められている。一方で、予測の精度をどう確かめるかなど、課題も残るとの声もある。",
+   "form": "快挙",
+   "en": "The 2024 Nobel Prize in Chemistry was awarded to researchers including those who developed a technique for predicting the three-dimensional structure of proteins with AI. Pinning down the shape of a protein through experiments often took years for each one. The structure data predicted by the AI was later released free of charge, so researchers around the world became able to use it. That research using AI won this prize is seen among researchers as a remarkable achievement. On the other hand, some say challenges remain, such as how to confirm the accuracy of the predictions.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「〜の快挙」「快挙を達成」と、初めての達成や記録的な成果を伝えるときの定番の語。",
+   "grammar": [
+    "n4-you-ni-naru"
+   ]
+  },
+  {
+   "ja": "七世紀、玄奘は国の許しを得ないまま長安を発ち、砂漠と山脈を越えてインドへ向かった。目的はただ一つ、仏典を原典で読み、教えの本当の意味を知ることであった。十数年後、彼は数多くの経典を携えて戻り、残りの生涯を翻訳に捧げた。後世の人々はそれを快挙とたたえるが、本人にとっては、問いを手放さなかった結果にすぎないのではないか。大きな成果とは、案外そうした執念の副産物なのかもしれない。",
+   "form": "快挙",
+   "en": "In the seventh century, Xuanzang left Chang'an without the state's permission and set out for India across deserts and mountain ranges. His aim was singular: to read the Buddhist scriptures in the original and learn the true meaning of the teaching. More than ten years later he returned carrying a great many sutras and devoted the rest of his life to translating them. Later generations praise this as a remarkable feat, but for the man himself, was it not merely the result of never letting go of his question? Great achievements may, surprisingly, be by-products of that kind of tenacity.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "論説では「快挙とたたえる」のように、他人や後世の評価として語られることが多い。",
+   "grammar": [
+    "n2-ni-suginai"
+   ]
   }
  ],
  "285": [
@@ -11796,6 +12816,63 @@
    "url": "https://www.aozora.gr.jp/cards/000082/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今日は、江戸時代の俳人、小林一茶の句を読み解いた本を要約していきます。一茶は、やせた蛙や雀の子など、小さな生き物に語りかけるような句をたくさん残しました。著者によると、その句を読むと思わず笑ってしまうのは、一茶が笑わせようとしていないからなんだそうです。弱いものに寄り添う素直な気持ちが、巧まざるおかしみを生んでいるわけです。うまく見せようとするより、心のままに書いたほうが人に届くこともある、というのがこの本の結論なんです。",
+   "form": "巧まざる",
+   "en": "Today I'm going to summarize a book that interprets the haiku of Kobayashi Issa, a poet of the Edo period. Issa left many poems that seem to speak to small creatures, such as a skinny frog or a baby sparrow. According to the author, the reason we can't help laughing when we read those poems is that Issa isn't trying to make us laugh. In other words, his honest feeling of sympathy for weak things produces an unaffected humor. The book concludes that writing from the heart sometimes reaches people better than trying to look clever.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「巧まざる」「巧まずして」の打ち消しの形で使われることが多い。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru"
+   ],
+   "sense": "打ち消しの形で、わざと工夫しないのに自然にうまく。"
+  },
+  {
+   "ja": "AIに書かせた文章は、文法の誤りこそ少ないものの、読み進めるうちに、どこか息苦しさが残ることがある。比喩や印象的な締めの言葉が、段落ごとに律儀に置かれているせいだろう。巧んだ表現も、並びすぎると、読者に手の内を見せることになる。人が書く文章の味わいは、ときに混じる不ぞろいなリズムにあるのかもしれない。AIの下書きを直すときは、飾りを足すのではなく、あえて減らすことから始めたい。",
+   "form": "巧んだ",
+   "en": "Text written by AI may have few grammatical errors, but as you read on, a certain stuffiness often lingers. That is probably because metaphors and striking closing lines are dutifully placed in every paragraph. Even artfully contrived expressions, when lined up too densely, end up showing the reader your hand. The charm of writing by people may lie in the uneven rhythm that sometimes mixes in. When revising an AI draft, I want to start not by adding ornament but by deliberately taking it away.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "語",
+   "topic": "ai",
+   "grammar": [
+    "n2-mono-no",
+    "n5-teiru",
+    "n3-koto-ni-naru",
+    "n3-dewa-naku",
+    "n5-tai"
+   ],
+   "sense": "工夫をこらして、うまく作りあげる。"
+  },
+  {
+   "ja": "人の心を動かすのは、必ずしも計算された言葉ではない。緊張で声を震わせながらも、懸命に思いを伝えようとする姿に、聞き手は強く引きつけられることがある。そこでは、話し手の誠実さが、巧まずして聞き手に届いているのである。反対に、拍手や笑いといった効果を狙いすぎた話には、聞く側がどこか身構えてしまうものだ。説得の技術を学ぶ上でも、まずは伝えたい中身を持つことが先なのだろう。",
+   "form": "巧まずして",
+   "en": "What moves people's hearts is not necessarily calculated words. Listeners are sometimes strongly drawn to a speaker who, voice trembling with nerves, still tries hard to convey their feelings. There, the speaker's sincerity reaches the listeners without any artifice. Conversely, with talks that aim too hard for effects like applause or laughter, listeners somehow end up on their guard. Even in learning the techniques of persuasion, having something you want to convey probably comes first.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "mind",
+   "grammar": [
+    "n4-nagara",
+    "n5-teiru",
+    "n2-ue-de",
+    "n5-tai"
+   ],
+   "sense": "打ち消しの形で、わざと工夫しないのに自然にうまく。"
   }
  ],
  "297": [
@@ -12273,6 +13350,61 @@
    "url": "http://news.livedoor.com/article/detail/5910270/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "恋人に会うために脱獄した、一途な“天才犯罪者”"
+  },
+  {
+   "ja": "今日のテーマは、AIブームで半導体の世界がどう変わったかです。対話型のAIが話題になってから、大量の計算をこなせるGPUの注文が世界中から殺到しました。その結果、一部のメーカーの株価は数年で何倍にも跳ね上がり、業界は本格的な奪い合いの時代に突入したわけです。この流れを理解する上で押さえておきたいのは、最先端のチップを作れる工場が世界でもごく限られているという点です。だからこそ、各国の政府まで工場の誘致に乗り出しているんですね。",
+   "form": "突入",
+   "en": "Today's theme is how the AI boom changed the world of semiconductors. After conversational AI became the talk of the town, orders for GPUs that can handle huge amounts of computation poured in from all over the world. As a result, some manufacturers' share prices shot up several times over in a few years, and the industry entered an era of all-out scramble. What I want you to grasp in order to understand this trend is that the factories able to make cutting-edge chips are very limited even worldwide. That's exactly why even national governments are setting out to attract factories.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "ai",
+   "tipJa": "「〜の時代に突入する」「新たな局面に突入」のように、新しい段階に入るときに使う。",
+   "grammar": [
+    "n2-ue-de",
+    "n5-teiru"
+   ],
+   "sense": "新しい段階や状態に入ること"
+  },
+  {
+   "ja": "1972年2月、長野県軽井沢町の山荘に武装したグループが立てこもり、管理人の妻を人質に取った。警察は説得を続けたが、にらみ合いは10日間にわたり、最終的に機動隊が建物に突入して人質を救出した。この間の様子はテレビで長時間生中継され、多くの人が画面にくぎ付けになったとされる。一方、作戦では警察官2人が殉職するなど、大きな犠牲も出た。事件は、報道のあり方や人質事件への対応を考える上で、今も繰り返し取り上げられている。",
+   "form": "突入",
+   "en": "In February 1972, an armed group barricaded itself in a mountain lodge in Karuizawa, Nagano Prefecture, and took the manager's wife hostage. The police kept trying to persuade them, but the standoff lasted ten days, and in the end the riot police stormed the building and rescued the hostage. The scenes during that time were broadcast live on television for hours, and many people are said to have been glued to their screens. On the other hand, the operation came at a heavy cost, with two police officers killed in the line of duty. The incident is still taken up again and again when considering how news should be reported and how hostage cases should be handled.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "「建物に突入する」のように、勢いよく中へ入る意味。警察や部隊の行動によく使う。",
+   "grammar": [
+    "n2-ue-de",
+    "n5-teiru"
+   ],
+   "sense": "勢いよく中へ入り込むこと"
+  },
+  {
+   "ja": "古代インドには、人生を四つの時期に分ける考え方があった。学びの時期、家庭を持って働く時期を経て、人は森に退いて静かに暮らし、最後はすべてを手放して旅に出るとされる。現代の私たちは、受験から就職、子育てへと、息つく間もなく次の段階に突入していくように見える。けれども、一つの時期を終えることは、何かを失うことではなく、次の生き方へ向けた準備でもあるのだろう。年を重ねることを、少し違う目で眺めてみたくなる。",
+   "form": "突入",
+   "en": "In ancient India there was a way of thinking that divided life into four stages. After a stage of learning and a stage of having a family and working, a person was to withdraw to the forest and live quietly, and finally let go of everything and set out on a journey. We moderns seem to plunge into the next stage, from exams to employment to child-rearing, without time to catch our breath. Yet ending one stage is not losing something; it may also be preparation for the next way of living. It makes me want to look at growing older with slightly different eyes.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "人生の段階に使うと、心の準備もないまま勢いで入っていく感じが出る。",
+   "grammar": [
+    "n4-teiku",
+    "n3-you-ni",
+    "n3-dewa-naku"
+   ],
+   "sense": "新しい段階や状態に入ること"
   }
  ],
  "17": [
@@ -14281,6 +15413,56 @@
    "url": "http://news.livedoor.com/article/detail/4831159/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "高所得転職者の入社前調査　〜その知られざる実態〜　第4話"
+  },
+  {
+   "ja": "今回は、ダニエル・カーネマンの『ファスト＆スロー』を要約していきます。この本の柱は、人間の頭には二つの考え方のモードがあるという話です。一つ目は、相手の顔を見て機嫌を察するように、努力なしで速やかに働く直感のモードです。二つ目は、複雑な掛け算を解くときのような、時間と集中を必要とするじっくりモードです。私たちの判断ミスの多くは、本来じっくり考えるべき場面を直感に任せてしまうことで起きる、というわけですね。",
+   "form": "速やか",
+   "en": "This time I'm going to summarize Daniel Kahneman's Thinking, Fast and Slow. The pillar of this book is the idea that the human mind has two modes of thinking. The first is the intuitive mode, which works promptly and without effort, as when you look at someone's face and sense their mood. The second is the slow mode, which demands time and concentration, as when you work out a complicated multiplication. Many of our errors of judgment, the book says, happen because we leave to intuition situations we really ought to think through carefully.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「速やかに働く」「速やかに対処する」のように、間を置かずに起こる動きに使う。",
+   "grammar": [
+    "n4-teiku",
+    "n3-you-ni",
+    "n3-koto-de"
+   ]
+  },
+  {
+   "ja": "生成AIを使ったサービスが広がるなか、利用者が入力した情報が外部に漏れる事故への備えが課題となっている。日本の法律では、一定の個人情報が漏えいした場合、企業は国の委員会に届け出るとともに、本人にも知らせることが義務づけられている。届け出は事態を把握してから速やかに行う必要があり、目安はおおむね3日から5日以内とされる。一方、AIの学習データに何が含まれているかを、企業自身が把握しきれていない例もある。専門家は、導入の段階から情報の扱いを決めておくべきだと指摘している。",
+   "form": "速やか",
+   "en": "As services using generative AI spread, preparing for incidents in which information entered by users leaks outside has become an issue. Under Japanese law, when certain personal information is leaked, companies are obliged to notify a national commission and also to inform the people concerned. The notification must be made promptly after the company grasps the situation, with a rough guideline of within three to five days. On the other hand, there are cases where companies themselves cannot fully grasp what their AI training data contains. Experts point out that how information is handled should be decided from the stage of adoption.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "法令や通知では「速やかに〜する」の形で、すぐに行う義務を表すことが多い。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "古代中国の兵法書『孫子』は、戦いを長引かせることの害を繰り返し説いている。兵を遠くに送り続ければ、国の蓄えはやせ細り、民は疲れ果てるからである。だから戦うのであれば、多少不格好でも速やかに終えるほうがよいとされた。勝ち方の美しさにこだわるより、終わらせ方を先に考えよということだろう。戦は始めるより終えるほうがはるかに難しいという知恵は、二千年以上を経た今も古びていない。",
+   "form": "速やか",
+   "en": "The ancient Chinese military treatise The Art of War repeatedly warns of the harm of dragging out a war. For if troops keep being sent far away, the nation's reserves waste away and the people are exhausted. So if one is to fight, it was held better to finish promptly, even if somewhat clumsily. It is probably saying: think first about how to end it, rather than fixating on the beauty of how to win. The wisdom that a war is far harder to end than to begin has not grown old even after more than two thousand years.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "tipJa": "「速やかに終える」のように、ぐずぐずせずに片をつける意味で使う。",
+   "grammar": [
+    "n5-teiru"
+   ]
   }
  ],
  "208": [
@@ -14604,6 +15786,57 @@
    "url": "http://news.livedoor.com/article/detail/6832754/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "どうやっても貯められない30代女子の貯金改革!! Vol.8「男子の金銭感覚はココを見る！」Presented by ゆるっとcafe"
+  },
+  {
+   "ja": "今日は、人に好かれる人の習慣を扱った本を要約していきます。著者によると、好かれる人に共通しているのは、相手に負担を感じさせない気づかいだそうです。たとえば、重い荷物を持っている人のために、何も言わずにドアを押さえておくといった、さりげない行動です。逆に、親切をアピールしすぎると、相手は借りを作ったような気持ちになってしまうんです。つまり、恩を着せないことこそが本当の思いやりだ、というのがこの本の主張なわけです。",
+   "form": "さりげない",
+   "en": "Today I'm going to summarize a book about the habits of people who are well liked. According to the author, what well-liked people have in common is consideration that doesn't make others feel burdened. For example, it's unforced actions like holding a door without saying anything for someone carrying heavy luggage. Conversely, if you show off your kindness too much, the other person ends up feeling as though they owe you. In short, the book argues that not making people feel indebted is what true thoughtfulness is.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「さりげない気づかい」「さりげなく伝える」の形でよく使う。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru"
+   ],
+   "sense": "わざとらしくなく、自然にふるまうようす。"
+  },
+  {
+   "ja": "対話型AIを提供する各社が、利用者の心の健康に配慮した機能の導入を進めている。長時間の利用が続くと、会話の流れを止めずに、さりげなく休憩を勧める仕組みもその一つだ。背景には、AIとの会話に長時間のめり込み、睡眠や人付き合いの時間が減ることへの懸念がある。一方で、利用者の行動を機械が見守ることに違和感を覚える人もいる。どこまで踏み込むべきか、各社は手探りで線を引いている。",
+   "form": "さりげなく",
+   "en": "Companies offering conversational AI are introducing features that take users' mental health into account. One of them is a mechanism that, when use goes on for a long time, gently suggests a break without interrupting the flow of the conversation. Behind this is concern about people getting absorbed in conversations with AI for long hours and losing time for sleep and socializing. On the other hand, some people feel uneasy about a machine watching over users' behavior. Each company is feeling its way as it draws the line on how far to step in.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n5-teiru"
+   ],
+   "sense": "わざとらしくなく、自然にふるまうようす。"
+  },
+  {
+   "ja": "茶の湯の世界では、客をもてなす工夫が、できるだけ目立たないように求められてきた。季節に合わせた花や、ちょうどよい温度の湯は、亭主の細やかな準備の結果である。しかし、それをさりげない形で差し出すことが、何より大切だとされた。苦労を見せびらかすもてなしは、かえって客に気をつかわせてしまうからである。見えない努力こそがもてなしの本質だという考えは、今の接客にも受け継がれているのではないか。",
+   "form": "さりげない",
+   "en": "In the world of the tea ceremony, the effort put into hosting guests has been expected to be as inconspicuous as possible. Flowers suited to the season and water at just the right temperature are the result of the host's careful preparation. However, offering them in an unforced way was considered more important than anything. That is because hospitality that shows off its effort ends up making guests feel obliged instead. Is not the idea that invisible effort is the essence of hospitality still handed down in today's customer service?",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "grammar": [
+    "n3-you-ni",
+    "n5-teiru"
+   ],
+   "sense": "わざとらしくなく、自然にふるまうようす。"
   }
  ],
  "250": [
@@ -14858,6 +16091,56 @@
    "url": "http://news.livedoor.com/article/detail/6856744/",
    "licence": "CC BY-ND 2.1 JP (livedoor)",
    "title": "非常識？ 余計なお世話？ 辻希美のブログに賛否両論"
+  },
+  {
+   "ja": "今回は、幕末の長崎に置かれた海軍伝習所の話です。黒船の来航に危機感を抱いた幕府は、オランダから教官を招き、若い幕臣たちに航海術や砲術、数学を学ばせました。蒸気船を動かしたこともない彼らにとって、それは短い期間で一から叩き込まれる特訓そのものだったわけです。その中には、のちに咸臨丸で太平洋を渡ることになる勝海舟もいました。わずか数年でそこまでたどり着けたのは、学ぶ目的がはっきりしていたからだと言えるでしょう。",
+   "form": "特訓",
+   "en": "This time, the story is about the Naval Training Center set up in Nagasaki at the end of the Edo period. Alarmed by the arrival of the Black Ships, the shogunate invited instructors from the Netherlands and had young retainers study navigation, gunnery and mathematics. For men who had never even operated a steamship, it was nothing less than intensive training, drilled into them from scratch in a short time. Among them was Katsu Kaishu, who would later cross the Pacific aboard the Kanrin Maru. It is fair to say they got that far in just a few years because their reason for learning was so clear.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「特訓を受ける」「特訓を重ねる」のように、短期間に集中して鍛える場面で使う。",
+   "grammar": [
+    "n3-koto-ni-naru"
+   ]
+  },
+  {
+   "ja": "生成AIを業務に取り入れる動きが広がる中、社員の教育に力を入れる企業が増えている。中には、全社員を対象に、数週間でAIへの指示の出し方やデータの扱い方を身につけさせる特訓を行う企業もある。ただ、研修を終えても実際の仕事で使わなければ、効果は長続きしないとの指摘も多い。専門家は、学んだ内容をすぐに日々の業務と結びつけることで、ようやく本当に定着するのだと話している。",
+   "form": "特訓",
+   "en": "As moves to bring generative AI into everyday work spread, more and more companies are putting effort into training their staff. Some even run intensive training for all employees, teaching them within a few weeks how to give instructions to AI and how to handle data. However, many point out that unless people use it in their actual jobs after the course, the effect does not last. Experts say that what is learned only truly takes hold once it is tied to daily work right away.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「〜の特訓を行う」「特訓を実施する」の形が多い。長期の教育には「研修」「育成」を使う。",
+   "grammar": [
+    "n5-teiru",
+    "n3-koto-de"
+   ]
+  },
+  {
+   "ja": "来月ドイツに出張することになったんで、いま必死にドイツ語の特訓してるんですよ。いや、三週間でぺらぺらしゃべれるようになるとは、さすがに思ってないです。でも、あいさつとか数字とか、レストランで注文するくらいは何とかしたいじゃないですか。で、朝はアプリで三十分、夜はオンラインの先生と会話の練習、っていうのを毎日続けてて。聞き取れる単語が増えてくると、意外と楽しくなってくるんですよね。",
+   "form": "特訓",
+   "en": "I'm going on a business trip to Germany next month, so right now I'm desperately doing intensive German training. No, I don't seriously think I'll be speaking fluently in three weeks. But you want to at least manage greetings, numbers and ordering at a restaurant, right? So every day I've been doing thirty minutes on an app in the morning and conversation practice with an online teacher at night. Once the number of words you can catch starts going up, it gets surprisingly fun.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "language",
+   "tipJa": "会話では「特訓する」「特訓中」と動詞や状態の形でも気軽に使う。",
+   "grammar": [
+    "n3-koto-ni-naru",
+    "n4-you-ni-naru"
+   ]
   }
  ],
  "280": [
@@ -14890,6 +16173,53 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、1927年にベルギーのブリュッセルで開かれた第5回ソルベー会議の話です。このときの集合写真には、アインシュタイン、ボーア、キュリー夫人、プランクなど、そうそうたる科学者が並んでいます。テーマは、生まれたばかりの量子力学をどう理解するかでした。会議の場でも食事の席でも、アインシュタインとボーアは議論を重ね、決着はつきませんでした。一流の頭脳が答えの出ない問いを真剣にぶつけ合った場として、今も語り継がれているんですね。",
+   "form": "そうそうたる",
+   "en": "This time the story is about the fifth Solvay Conference, held in Brussels, Belgium, in 1927. The group photo from that time shows a line-up of eminent scientists such as Einstein, Bohr, Marie Curie and Planck. The theme was how to understand the newly born quantum mechanics. Both in the sessions and at meals, Einstein and Bohr argued again and again, and no conclusion was reached. It is still told today as a place where first-rate minds earnestly clashed over a question with no answer.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「そうそうたる顔ぶれ・メンバー」のように、「〜たる」の形で名詞を修飾して使う。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "2023年に英国で開かれたAIの安全性をめぐる国際会議には、各国の政府代表や大手企業のトップなど、そうそうたる顔ぶれが集まった。会議では、最先端のAIがもたらし得る危険について、国の枠を超えて話し合う必要があることが確認された。その後も同様の会議が、開催地を変えながら各国で開かれている。ただ、各国の思惑は必ずしも一致しておらず、実際のルールづくりはこれからだとの見方が多い。",
+   "form": "そうそうたる",
+   "en": "The international conference on AI safety held in Britain in 2023 brought together an illustrious line-up, including government representatives from various countries and the heads of major companies. At the conference, it was confirmed that the dangers cutting-edge AI could bring need to be discussed across national boundaries. Similar conferences have since been held in various countries, with the venue changing each time. However, the countries' intentions do not necessarily coincide, and many take the view that the actual rule-making is still to come.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「そうそうたる顔ぶれが集まる・並ぶ」が定番。会議や式典の出席者を紹介するときに使う。",
+   "grammar": [
+    "n5-teiru",
+    "n4-nagara"
+   ]
+  },
+  {
+   "ja": "集中力って、そうそう長くは続かないじゃないですか。僕なんか、本気で勉強できるのってせいぜい四十分くらいで、それを過ぎるとスマホ触っちゃうんですよ。で、最近は二十五分やって五分休むっていうのをひたすら繰り返してて、これが意外と合ってるっぽいんですよね。ポモドーロ・テクニックとかいうらしいんですけど。無理に長くやろうとするより、短く区切ったほうが結果的にちゃんと進むっていう。",
+   "form": "そうそう",
+   "en": "Concentration doesn't last all that long, right? For me, the time I can really study is forty minutes at most, and after that I end up touching my phone. So lately I've been endlessly repeating twenty-five minutes of work and five minutes of rest, and it seems to suit me surprisingly well. Apparently it's called the Pomodoro Technique or something. It's like, rather than forcing yourself to go long, breaking it up into short chunks actually gets things properly done in the end.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "mind",
+   "tipJa": "「そうそう〜ない」と打ち消しを伴うと「それほど〜ない」の意味。名の知れた意味の「そうそうたる」とは別。",
+   "sense": "（打ち消しを伴って）それほどたびたびは。そんなには。"
   }
  ],
  "286": [
@@ -15382,6 +16712,59 @@
    "url": "https://roboccia.com/rcs2026-2/",
    "licence": "web quotation (personal study)",
    "title": ""
+  },
+  {
+   "ja": "今回は、戦国時代の最後に天下を手にした徳川家康の生き方を見ていきます。彼は幼いころから人質として暮らし、若いころには武田信玄に大敗するなど、何度も苦い経験をしています。それでも家康は、無理な戦いを避けて力を蓄え、豊臣秀吉が世を去ったあとに勝負に出ました。華々しく勝ち続けた武将ではなく、生き延びて最後に勝ち残ったのが家康だったわけです。長く続けることそのものが強さになる、という教訓が読み取れますね。",
+   "form": "勝ち残った",
+   "en": "This time we look at the life of Tokugawa Ieyasu, who took control of the realm at the end of the Warring States period. From childhood he lived as a hostage, and as a young man he suffered bitter experiences many times, such as a crushing defeat by Takeda Shingen. Even so, Ieyasu avoided reckless battles, built up his strength, and made his move after Toyotomi Hideyoshi passed away. It was not a general who won brilliantly again and again but Ieyasu, who survived and was the last one standing. You can read in this the lesson that simply lasting a long time can itself become strength.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「最後まで勝ち残る」「勝ち残った者」の形で、競争の末に残った側を表す。",
+   "grammar": [
+    "n4-teiku",
+    "n5-teiru",
+    "n3-dewa-naku"
+   ]
+  },
+  {
+   "ja": "生成AI向けの半導体をめぐっては、ここ数年で新興企業が相次いで市場に参入している。ただ、開発には巨額の投資が必要なうえ、最先端のチップを作れる工場も限られている。このため業界では、最終的に勝ち残るのはごく一部の企業にとどまるとの見方が強い。一方で、特定の用途に絞った製品で存在感を示す企業も出ており、すべてが大手にのみ込まれるわけではないとの声もある。大手との提携や買収の動きも目立ち始めており、市場の再編は今後さらに進むとみられる。",
+   "form": "勝ち残る",
+   "en": "In the field of chips for generative AI, start-ups have entered the market one after another in recent years. However, development requires huge investment, and the factories able to make cutting-edge chips are limited. For this reason, the prevailing view in the industry is that only a small number of companies will win out in the end. On the other hand, some companies are making their presence felt with products focused on specific uses, and some say not everything will be swallowed up by the big players. Tie-ups with and acquisitions by major firms are also becoming conspicuous, and the market is expected to reorganise further.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "tipJa": "報道では「市場で勝ち残る」「勝ち残りをかける」のように、淘汰の中で残る意味で使う。",
+   "grammar": [
+    "n5-teiru",
+    "n3-wake-dewa-nai"
+   ]
+  },
+  {
+   "ja": "新しい単語を覚えるとき、頭の中では似た言葉どうしが、思い出される順番を奪い合っていると考えられています。よく呼び出される言葉ほど出てきやすくなり、使われない言葉は次第に出てこなくなります。つまり、記憶の中で勝ち残るのは、覚えた回数の多い言葉ではなく、思い出した回数の多い言葉なのです。だからこそ、単語帳を眺めるより、何も見ずに意味を言ってみる練習が効果的です。思い出そうとする手間そのものが、記憶を強くしてくれるからです。",
+   "form": "勝ち残る",
+   "en": "When you learn new words, similar words in your head are thought to be competing for their turn to be recalled. The more often a word is called up, the more easily it comes to mind, while words that go unused gradually stop coming out. In other words, what survives in memory is not the word you studied most often but the word you recalled most often. That is exactly why practising saying the meaning without looking is more effective than staring at a word list. The effort of trying to remember is itself what strengthens the memory.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "学",
+   "topic": "mind",
+   "tipJa": "比喩的に「記憶の中で勝ち残る」のように、競い合いの末に残るものにも使える。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku"
+   ],
+   "sense": "最後まで残る。生き残る。"
   }
  ],
  "18": [
@@ -17436,6 +18819,57 @@
    "url": "",
    "licence": "CC BY 2.5 (Wikinews)",
    "title": ""
+  },
+  {
+   "ja": "今日は、第二次世界大戦の初め、イギリスがどうやって踏みとどまったのかという話です。1940年5月、ドイツ軍が西ヨーロッパへの攻撃を始めたまさにその日に、チャーチルが首相に就任しました。当時の政府内には、ドイツとの和平の道を探るべきだという声も根強くあったとされています。それでもチャーチルは戦い続けることを選び、ラジオの演説で国民を励まし続けたんですね。その判断が正しかったかどうかは、結果を知る私たちだからこそ言えることなのかもしれません。",
+   "form": "首相",
+   "en": "Today's topic is how Britain held its ground at the start of the Second World War. In May 1940, on the very day the German army began its attack on Western Europe, Churchill became prime minister. Within the government at the time, there were reportedly also strong voices saying that a path to peace with Germany should be explored. Even so, Churchill chose to keep fighting and kept encouraging the nation with his radio speeches. Whether that decision was right may be something only we, who know the outcome, can say.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "history",
+   "tipJa": "「首相に就任する」「〜首相」のように使う。日本では「総理大臣」とも言う。",
+   "grammar": [
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "インドで2024年に行われた総選挙は、有権者がおよそ9億7000万人にのぼり、投票は6週間あまりにわたって行われた。開票の結果、モディ首相が率いる与党は単独での過半数を失ったものの、連立を組む政党と合わせて過半数を確保した。これにより、モディ氏は3期連続で政権を担うことになった。今後は、連立相手の意向にも配慮しながら政策を進める必要があるとみられている。世界最多の人口を抱える国の政治の行方に、各国の関心が集まっている。",
+   "form": "首相",
+   "en": "India's 2024 general election had roughly 970 million eligible voters, and voting took place over a little more than six weeks. When the votes were counted, the ruling party led by Prime Minister Modi had lost its majority on its own, but secured a majority together with its coalition partners. As a result, Mr. Modi will lead the government for a third consecutive term. Going forward, it is thought he will need to advance his policies while also taking the wishes of his coalition partners into account. Countries around the world are watching where politics in the nation with the world's largest population is headed.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "history",
+   "tipJa": "報道では「モディ首相」のように名前のあとに付け、二度目からは「〜氏」とすることが多い。",
+   "grammar": [
+    "n2-mono-no",
+    "n3-koto-ni-naru",
+    "n4-nagara",
+    "n5-teiru"
+   ]
+  },
+  {
+   "ja": "首相の演説には専門のスタッフが関わり、言葉の一つひとつが時間をかけて練られるのが普通です。聞き手の大半は原稿を見ずに耳だけで受け取るため、一文を短く切り、大事な言葉を何度か繰り返すといった工夫が欠かせません。数字を並べるより、一人の国民の暮らしに置き換えて語るほうが、ずっと心に届きやすくなります。これは、朝礼のあいさつや結婚式のスピーチでもそのまま使える考え方です。長さではなく、聞き手が覚えて帰れる一言があるかどうかで勝負が決まります。",
+   "form": "首相",
+   "en": "Professional staff are usually involved in a prime minister's speeches, and each word is polished over time. Because most listeners take it in by ear alone without seeing the script, devices such as cutting sentences short and repeating key words several times are essential. Rather than lining up figures, talking in terms of one citizen's daily life reaches people's hearts far more easily. This is a way of thinking you can use as is in a morning-assembly greeting or a wedding speech. Success depends not on length but on whether there is one phrase the listeners can remember and take home.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "語",
+   "topic": "language",
+   "tipJa": "「首相の演説」「首相が表明する」のように、国の代表としての発言によく使う。",
+   "grammar": [
+    "n3-dewa-naku"
+   ]
   }
  ],
  "221": [
@@ -17863,6 +19297,54 @@
    "url": "https://www.aozora.gr.jp/cards/001224/",
    "licence": "public domain (Aozora Bunko)",
    "title": ""
+  },
+  {
+   "ja": "今日は、計画の錯誤と呼ばれる心のくせを扱った本を要約していきます。人は、作業にかかる時間を、多くの場合かなり短く見積もってしまうそうです。過去に同じような仕事で遅れた経験があっても、今回はうまくいくと考えてしまうんですね。その結果、締め切りの前夜に徹夜する羽目になったという経験は、誰にでもあるはずです。著者のおすすめは、自分の感覚ではなく、過去に実際にかかった時間を基準に予定を立てることなんです。",
+   "form": "羽目になった",
+   "en": "Today I'm going to summarize a book about a mental habit called the planning fallacy. Apparently, people in many cases estimate the time a task will take as much shorter than it is. Even if they have been late with similar work in the past, they think it will go well this time. As a result, everyone must have had the experience of ending up pulling an all-nighter the night before a deadline. The author recommends planning your schedule based not on your gut feeling but on how long things actually took in the past.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「〜する羽目になる」の形で、望まない結果になったことを言う。",
+   "grammar": [
+    "n4-teiku",
+    "n3-dewa-naku"
+   ],
+   "sense": "思ってもいなかった困ったことをする事態になる。"
+  },
+  {
+   "ja": "カナダの航空会社が、自社サイトのチャットボットの誤った案内をめぐり、乗客に賠償金を支払う羽目になった。チャットボットは、家族を亡くした人向けの特別運賃について、実際の規則と異なる説明をしていた。航空会社側は、チャットボットの発言に会社は責任を負わないと主張したが、認められなかった。この判断は、AIによる案内も企業自身の説明とみなされることを示したものとして、注目を集めた。企業がAIを窓口に置く上で、責任の所在をはっきりさせる必要性が浮き彫りになっている。",
+   "form": "羽目になった",
+   "en": "A Canadian airline ended up having to pay damages to a passenger over incorrect guidance from the chatbot on its own website. The chatbot had given an explanation of special fares for bereaved travelers that differed from the actual rules. The airline argued that the company was not responsible for what the chatbot said, but this was not accepted. The decision drew attention as showing that guidance given by AI is also regarded as the company's own explanation. The need to make clear where responsibility lies when companies put AI at their front desk is being brought into relief.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "報",
+   "topic": "ai",
+   "grammar": [
+    "n2-ue-de",
+    "n5-teiru"
+   ],
+   "sense": "思ってもいなかった困ったことをする事態になる。"
+  },
+  {
+   "ja": "1812年、ナポレオンは大軍を率いてロシアに遠征したが、焦土作戦と冬の寒さに苦しみ、多くの兵を失って退却する羽目になった。短期の決戦を見込んだ計画は、相手が戦わずに退くという選択肢を想定していなかったのである。歴史をひもとくと、勝利を確信した側ほど、相手の出方を読み違える例は少なくない。成功の経験が、自らの見通しを疑う力を奪うのであろう。引き返す決断が遅れやすいのは、今の組織も同じである。",
+   "form": "羽目になった",
+   "en": "In 1812, Napoleon led a great army on an expedition into Russia, but suffering from scorched-earth tactics and the winter cold, he lost many soldiers and ended up having to retreat. His plan, which counted on a short decisive battle, had not anticipated the option of the enemy withdrawing without fighting. Looking through history, there are not a few examples in which the side most certain of victory misreads how the other side will move. Experience of success probably robs one of the power to doubt one's own outlook. Being slow to decide to turn back is just as true of organizations today.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "history",
+   "sense": "思ってもいなかった困ったことをする事態になる。"
   }
  ],
  "263": [
@@ -18046,6 +19528,60 @@
    "url": "",
    "licence": "Bunki original",
    "title": ""
+  },
+  {
+   "ja": "今回は、退職後の暮らし方を扱った本の要点を紹介します。現役のころは時間さえあればと思っていた人ほど、実際に毎日が休みになると、その時間を持て余してしまうというんですね。そこで著者が勧めているのは、働いているうちから、損得と関係なく夢中になれることを一つ持っておくことです。やりたいことがはっきりしていれば、時間がいくら多くても重荷にはなりません。問題は時間の長さではなく、その中身だというわけです。",
+   "form": "持て余して",
+   "en": "This time I'll introduce the main points of a book about how to live after retirement. The idea is that the more people thought during their working years that they only needed time, the more they end up not knowing what to do with it once every day becomes a holiday. So what the author recommends is having one thing you can lose yourself in, regardless of profit or loss, while you are still working. If you are clear about what you want to do, no amount of time becomes a burden. In other words, the problem is not the length of the time but what fills it.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "講",
+   "topic": "mind",
+   "tipJa": "「時間・暇を持て余す」は定番の組み合わせ。量が多すぎて使い切れない困り方を表す。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku"
+   ],
+   "sense": "時間や暇が多すぎて、使い道に困る。"
+  },
+  {
+   "ja": "仏典には、一瞬たりとも落ち着かずに動き回る心を、枝から枝へ飛び移る猿にたとえる話がある。人は外の敵よりも、むしろ自分の心を持て余している生き物なのかもしれない。怒りや不安を力ずくで押さえつけようとすれば、心はかえって激しく暴れ出すものだ。だから瞑想では、浮かんでくる思いを追い払うのではなく、ただ眺めることから始めるのである。手なずけるとは、まず相手をよく知ることなのだろう。",
+   "form": "持て余して",
+   "en": "The Buddhist scriptures contain a passage that likens the mind, which roams about without settling for even a moment, to a monkey leaping from branch to branch. Perhaps human beings are creatures who find their own minds harder to handle than any outside enemy. If you try to suppress anger or anxiety by force, the mind only runs all the wilder. That is why meditation begins not by driving away the thoughts that arise but simply by watching them. To tame something is, perhaps, first of all to know it well.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "論",
+   "topic": "india",
+   "tipJa": "「自分を持て余す」「感情を持て余す」のように、手に負えないものにも使える。",
+   "grammar": [
+    "n5-teiru",
+    "n3-dewa-naku",
+    "n1-tari-tomo"
+   ],
+   "sense": "自分の手に負えず、扱いに困る。"
+  },
+  {
+   "ja": "AIに資料づくりを任せるようになったら、午後の時間がまるっと空いちゃったんですよ。最初はラッキーって思ってたんですけど、一週間もすると暇を持て余しちゃって。で、気づいたんですけど、作業が減ったぶん、何を考えるべきかを決める仕事だけが残ってるわけじゃないですか。それって実は一番しんどいところで、人間に残る仕事ってたぶんそこなんですよね。まあ、まだ答えは出てないんですけど。",
+   "form": "持て余し",
+   "en": "Once I started leaving document-making to AI, my afternoons became completely free. At first I thought I'd got lucky, but after a week or so I didn't know what to do with all the free time. And then I realised that, with less busywork, the only job left is deciding what to think about, right? That's actually the hardest part, and that's probably where the work left for humans lies. Well, I haven't found the answer yet, though.",
+   "kind": "original",
+   "site": "書き下ろし（このデッキ用）",
+   "url": "",
+   "licence": "Bunki original",
+   "title": "",
+   "register": "話",
+   "topic": "ai",
+   "tipJa": "くだけた会話では「暇を持て余しちゃう」「持て余してる」の形がよく出る。",
+   "grammar": [
+    "n4-you-ni-naru"
+   ],
+   "sense": "時間や暇が多すぎて、使い道に困る。"
   }
  ],
  "281": [
