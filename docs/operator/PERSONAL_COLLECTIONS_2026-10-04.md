@@ -6,6 +6,29 @@ picker, then study, read, search, or follow its connections inside Bunki.
 The public build contains the player and synthetic test fixtures. It contains
 no learner collection, personal passages, or conversation history.
 
+## Japanese-first answer guides
+
+The October 4 depth update adds a locked front and a layered Japanese answer.
+Before reveal there are no furigana, token actions or answer explanations.
+After reveal, an imported answer guide supplies contextual furigana throughout
+the paragraph, Japanese definitions and grammar explanations, usage, contrasts
+and related expressions. English is available through an explicit reveal.
+Phones show the answer immediately; wide screens pair it with the paragraph.
+
+Tap a revealed word, kanji or grammar expression to open Bunki's actual shared
+dictionary. **覚える** uses the existing list chooser, including named-list
+creation. Close the sheet to return to the same card. Capturing an item creates
+no scheduled review and changes no personal assessment history.
+
+Import the enriched collection JSON again to add these guides to an existing
+collection. The original paragraph hashes, card IDs, settings and review
+history remain unchanged. Complete backups now include the answer guide.
+Older collections still open; the player does not invent Japanese definitions
+or furigana when the guide is absent.
+
+See [implementation and remaining work](../srs/PERSONAL_DEPTH_IMPLEMENTATION_2026-10-04.md)
+and the [research synthesis](../srs/research/PERSONAL_CARD_DEPTH_2026-10-04.md).
+
 ## iPhone and Mac
 
 Install the app first, then import inside that installed app:
@@ -81,7 +104,11 @@ URLs are validated before storage. Input is limited to 30 MB. Only HTTPS
 source links are accepted; all imported text is escaped before rendering.
 No imported HTML, JavaScript, remote assets, or code is executed.
 
-A content-only import preserves existing progress. A changed content digest
+A content-only import preserves existing progress. Answer guides are separate,
+revisioned `bunki-personal-enrichment` records bound to the original hashes.
+Their reading segments must reconstruct the original text exactly and cover
+all kanji. Identical guides reimport safely; conflicting or older revisions
+cannot overwrite newer guides. A changed content digest
 cannot silently replace the edition attached to existing evidence. Explicit
 content migration and conflict resolution remain future work.
 
