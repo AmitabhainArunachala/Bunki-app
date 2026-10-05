@@ -3,24 +3,34 @@ name: Personal collections
 on:
   pull_request:
     paths:
-      - 'prototypes/corridor/decks/personal/**'
-      - 'prototypes/corridor/tools/*personal*'
-      - 'prototypes/corridor/corridor.js'
-      - 'prototypes/corridor/sw.js'
-      - 'scripts/corridor-assets.mjs'
-      - 'scripts/build-corridor-site.mjs'
-      - 'scripts/resolve-corridor-site.mjs'
+      - 'prototypes/corridor/**'
+      - 'prototypes/bunki-desktop/lib/artifact.cjs'
+      - 'packages/ai/**'
+      - 'packages/assessment/**'
+      - 'packages/domain/**'
+      - 'packages/feed/**'
+      - 'packages/persistence/**'
+      - 'packages/reading/**'
+      - 'packages/sync/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/personal-collections.yml'
   push:
     branches: [main]
     paths:
-      - 'prototypes/corridor/decks/personal/**'
-      - 'prototypes/corridor/tools/*personal*'
-      - 'prototypes/corridor/corridor.js'
-      - 'prototypes/corridor/sw.js'
-      - 'scripts/corridor-assets.mjs'
-      - 'scripts/build-corridor-site.mjs'
-      - 'scripts/resolve-corridor-site.mjs'
+      - 'prototypes/corridor/**'
+      - 'prototypes/bunki-desktop/lib/artifact.cjs'
+      - 'packages/ai/**'
+      - 'packages/assessment/**'
+      - 'packages/domain/**'
+      - 'packages/feed/**'
+      - 'packages/persistence/**'
+      - 'packages/reading/**'
+      - 'packages/sync/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/personal-collections.yml'
   workflow_dispatch:
 
