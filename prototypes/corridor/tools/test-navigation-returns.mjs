@@ -21,7 +21,7 @@ function app() {
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, personalHost: null,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
     requestAnimationFrame() {}, passage: () => null,
