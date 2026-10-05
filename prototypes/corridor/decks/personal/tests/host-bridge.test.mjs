@@ -93,10 +93,10 @@ function hostWriteFixture({paused = false} = {}) {
   const end = source.indexOf('\n}\n',start) + 2;
   const clone = value => JSON.parse(JSON.stringify(value));
   const state = {taken:[],lists:{},deepWords:{},srs:{original:true},revlog:[['original']],obslog:[]};
-  let record = clone(state), allowed = true, writes = 0, queued = 0, release;
+  let record = clone(state), allowed = true, visit = 1, writes = 0, queued = 0, release;
   const barrier = paused ? new Promise(resolve => {release = resolve;}) : null;
   const commit = vm.runInNewContext(source.slice(start,end) + ';commitStorePatch', {
-    S:state, personalHost:{allowed:() => allowed}, recordEpoch:1,
+    S:state, personalHost:{allowed:() => allowed,captureAccess() {const own = visit; return () => own === visit && allowed;}}, recordEpoch:1,
     recordWritable:() => true, publishedRecord:clone(state), DEFAULT_LEARNER_RECORD:{},
     canonicalRecordJson:JSON.stringify, safelySyncStoreAlert() {}, recordFailure() {},
     recordApp:{async write(produce) {
@@ -110,7 +110,7 @@ function hostWriteFixture({paused = false} = {}) {
     }},
   });
   return {commit,state,get record(){return record;},get writes(){return writes;},get queued(){return queued;},
-    revoke(){allowed = false;},resume(){release();},replaceRecord(value){record = clone(value);}};
+    revoke(){allowed = false;},reopen(){visit++; allowed = true;},resume(){release();},replaceRecord(value){record = clone(value);}};
 }
 
 test('host final write boundary rejects stale capture and every assessment/history patch',async () => {
@@ -163,6 +163,98 @@ test('personal capture producers use the latest queued authority and publish aft
   assert.equal(await pending,true); assert.equal(f.writes,1);
   assert.deepEqual(f.state.taken,[{id:'海'},{id:'本'}]);
   assert.deepEqual(f.state.lists,{existing:[{id:'海'}],saved:[]});
+});
+
+test('opening another personal overlay cannot revive a capture queued in an earlier visit',async () => {
+  const f = hostWriteFixture({paused:true});
+  let produced = 0;
+  const pending = f.commit(latest => {produced++; return {taken:[...latest.taken,{id:'本'}]};});
+  f.revoke(); f.reopen(); f.resume();
+  assert.equal(await pending,false); assert.equal(produced,0); assert.equal(f.writes,0);
+  assert.deepEqual(f.state.taken,[]);
+});
+
+function suppressionFixture({holdAssessment = false,personal = true} = {}) {
+  const source = readFileSync(new URL('../../../corridor.js',import.meta.url),'utf8');
+  const definitions = ['toggleTaken','suppressAssessmentCards','performAssessmentSuppression','queueAssessmentWork'].map(name => {
+    const match = new RegExp(`(?:async )?function ${name}\\(`).exec(source);
+    assert.ok(match,`Missing host function ${name}`);
+    return source.slice(match.index,source.indexOf('\n}\n',match.index) + 2);
+  });
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const state = {taken:[{t:'kanji',id:'本'}],assessmentLearning:{followups:[],suppressions:[]},
+    srs:{'kanji:本':{reps:5}},revlog:[[1,'kanji:本',3]]};
+  let allowed = true, visit = 1, release;
+  const queued = [], commands = [], retries = new Map();
+  const context = vm.createContext({S:state,recordEpoch:1,recordWritable:() => true,
+    personalHost:personal ? {allowed:() => allowed,captureAccess() {const own = visit; return () => own === visit && allowed;}} : null,
+    capturePending:new Set(),assessmentSuppressionRetries:retries,
+    assessmentActionTail:holdAssessment ? new Promise(resolve => {release = resolve;}) : Promise.resolve(),
+    srsKey:(type,id) => `${type}:${id}`,practiceIdentity:() => 'synthetic-suppression',recordFailure() {},
+    commitStorePatch() {assert.fail('Removal with an assessment root must retain the shared suppression transaction');},
+    recordApp:{suppressAssessmentLearning(meta,input) {
+      return new Promise((resolve,reject) => queued.push({meta,input,resolve,reject}));
+    }},
+  });
+  vm.runInContext(definitions.join('\n'),context);
+  return {state,queued,commands,retries,
+    remove:() => context.toggleTaken({t:'kanji',id:'本'},'本'),
+    undo:() => context.suppressAssessmentCards({kind:'undo',followupId:'synthetic-followup'}),
+    revoke(){allowed = false;},reopen(){visit++; allowed = true;},resumeAssessment(){release();},
+    async queuedWrite(){await Promise.resolve(); await Promise.resolve(); assert.equal(queued.length,1);},
+    settle({fail = false} = {}) {
+      const next = queued.shift(); assert.ok(next,'A shared suppression command must be queued');
+      try {
+        const input = typeof next.input === 'function' ? next.input({revision:7,identity:{accountId:'synthetic',learnerId:'synthetic'},record:clone(state)}) : next.input;
+        commands.push({meta:clone(next.meta),input:clone(input)});
+        if (fail) next.reject(new Error('synthetic-uncertain-result'));
+        else next.resolve({status:'active',learningSuppression:{remaining:0}});
+      } catch(error) {next.reject(error);}
+    },
+  };
+}
+
+test('personal removal with assessment learning uses the shared suppression command and rejects assessment undo',async () => {
+  const f = suppressionFixture(), before = JSON.stringify({srs:f.state.srs,revlog:f.state.revlog});
+  assert.equal(await f.undo(),false); assert.equal(f.queued.length,0);
+  const pending = f.remove(); await f.queuedWrite(); f.settle();
+  assert.equal(await pending,true);
+  assert.deepEqual(f.commands[0].input,{expectedRevision:7,scope:{accountId:'synthetic',learnerId:'synthetic'},kind:'remove',key:'kanji:本'});
+  assert.equal(JSON.stringify({srs:f.state.srs,revlog:f.state.revlog}),before,'The UI command never mutates scheduling/history before acknowledgment');
+  f.revoke(); assert.equal(await f.remove(),false); assert.equal(f.queued.length,0);
+});
+
+test('personal suppression cannot survive closing its visit while waiting in either queue',async () => {
+  const assessment = suppressionFixture({holdAssessment:true});
+  const waiting = assessment.remove();
+  assessment.revoke(); assessment.reopen(); assessment.resumeAssessment();
+  assert.equal(await waiting,false); assert.equal(assessment.queued.length,0); assert.equal(assessment.commands.length,0);
+  const record = suppressionFixture();
+  const queued = record.remove(); await record.queuedWrite();
+  record.revoke(); record.reopen(); record.settle();
+  assert.equal(await queued,false); assert.equal(record.commands.length,0);
+});
+
+test('personal suppression retries recheck visit access and preserve the exact retained command',async () => {
+  const f = suppressionFixture();
+  let pending = f.remove(); await f.queuedWrite(); f.settle({fail:true});
+  assert.equal(await pending,false); assert.equal(f.retries.size,1);
+  const original = f.commands[0];
+  pending = f.remove(); await f.queuedWrite();
+  assert.equal(typeof f.queued[0].input,'function','A retained command still crosses the queued permission guard');
+  f.revoke(); f.reopen(); f.settle();
+  assert.equal(await pending,false); assert.equal(f.commands.length,1); assert.equal(f.retries.size,1);
+  pending = f.remove(); await f.queuedWrite(); f.settle();
+  assert.equal(await pending,true); assert.deepEqual(f.commands[1],original,'Retry metadata and input remain byte-equivalent');
+  assert.equal(f.retries.size,0);
+});
+
+test('ordinary assessment removal retains its original retry path',async () => {
+  const f = suppressionFixture({personal:false});
+  let pending = f.remove(); await f.queuedWrite(); f.settle({fail:true}); assert.equal(await pending,false);
+  pending = f.remove(); await f.queuedWrite();
+  assert.equal(typeof f.queued[0].input,'object','Nonpersonal retained retries keep their existing exact input path');
+  f.settle(); assert.equal(await pending,true); assert.deepEqual(f.commands[1],f.commands[0]);
 });
 
 test('dictionary worker error is canceled while pending requests reject and the worker resets',async () => {

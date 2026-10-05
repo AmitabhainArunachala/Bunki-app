@@ -85,7 +85,7 @@ function defineRows() {
   const rowOf = new Map(entries.map((row) => [String(row[0]), row]));
 
   const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-  const NAMES = ['plainRecord', 'owns', 'nonEmptyString', 'safeJsonValue', 'finiteNumber', 'srsKey', 'NODE_KIND',
+  const NAMES = ['personalHost', 'plainRecord', 'owns', 'nonEmptyString', 'safeJsonValue', 'finiteNumber', 'srsKey', 'NODE_KIND',
     'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD', 'dayKey',
     'lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'dictionaryGlossSummary', 'dictionaryReadingSupportsForm',
     'dictionarySummaryFor', 'validDictionaryRow', 'cacheDictionaryRow', 'cacheDictionaryFormRows', 'dictionaryRowBySeq',

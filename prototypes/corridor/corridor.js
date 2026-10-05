@@ -2960,7 +2960,8 @@ window.addEventListener('storage', (e) => {
 async function commitStorePatch(patch, appendArchive = []) {
   // Private lookup can capture canonical entries, but cannot grade or rewrite learning evidence.
   const host = typeof personalHost === 'undefined' ? null : personalHost;
-  if (host && (!host.allowed() || appendArchive.length)) return false;
+  const allowed = host?.captureAccess?.() || (() => !host || host.allowed());
+  if (!allowed() || (host && appendArchive.length)) return false;
   const epoch = recordEpoch;
   if (!recordWritable(epoch) || !recordApp) { safelySyncStoreAlert(); return false; }
   // An older object-style caller may only replace roots it actually saw.
@@ -2970,13 +2971,13 @@ async function commitStorePatch(patch, appendArchive = []) {
     const proposed = typeof patch === 'function' ? patch : JSON.parse(JSON.stringify(patch));
     const outcome = await recordApp.write((record, snapshot) => {
       if (!recordWritable(epoch)) throw new Error('record-owner-changed');
-      if (host && !host.allowed()) throw new Error('personal-capture-not-allowed');
+      if (!allowed()) throw new Error('personal-capture-not-allowed');
       if (typeof proposed !== 'function') for (const key of Object.keys(proposed)) {
         if (canonicalRecordJson(record[key]) !== canonicalRecordJson(baseline[key]))
           throw Object.assign(new Error('stale-ui-patch'), { code: 'stale-ui-patch' });
       }
       const nextPatch = typeof proposed === 'function' ? proposed({ ...DEFAULT_LEARNER_RECORD, ...record }, snapshot) : proposed;
-      if (host && (!host.allowed() || Object.keys(nextPatch).some(key => !['taken', 'lists', 'deepWords'].includes(key))))
+      if (host && (!allowed() || Object.keys(nextPatch).some(key => !['taken', 'lists', 'deepWords'].includes(key))))
         throw new Error('personal-capture-not-allowed');
       return { patch: nextPatch,
         ...(appendArchive.length ? { appendArchive } : {}) };
@@ -3296,7 +3297,7 @@ async function personalDictionaryBridge(container) {
   const { createHostBridge } = await import('./decks/personal/host-bridge.mjs');
   const overlay = el('div', 'personal-host-overlay');
   overlay.id = 'personal-host-overlay';
-  let access = null, finish = null, invoker = null, scroll = 0;
+  let access = null, finish = null, invoker = null, scroll = 0, visit = 0;
   const allowed = () => typeof access === 'function' && access() === true;
   const close = () => {
     if (!finish) return;
@@ -3370,7 +3371,10 @@ async function personalDictionaryBridge(container) {
   };
   overlay.addEventListener('click', stale, true);
   overlay.addEventListener('keydown', stale, true);
-  personalHost = { allowed, paint, close };
+  personalHost = { allowed, paint, close, captureAccess() {
+    const captured = visit;
+    return () => captured === visit && allowed();
+  } };
   let loaded = null, forms = null;
   async function load() {
     if (loaded) return loaded;
@@ -3417,6 +3421,7 @@ async function personalDictionaryBridge(container) {
     open(node, options) {
       if (finish) close();
       if (options.canInteract() !== true) return Promise.reject(new Error('Reveal the answer before opening the dictionary.'));
+      visit += 1;
       access = options.canInteract; invoker = options.invoker || document.activeElement; scroll = window.scrollY;
       if (!overlay.isConnected) container.append(overlay);
       S.view = 'personaldeck'; S.stack = [node];
@@ -8040,6 +8045,8 @@ function refreshWordSaveControls(node, label) {
 }
 
 async function toggleWordSave(node, label) {
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!allowed()) return false;
   if (capturePending.has(srsKey(node.t, node.id))) return false;
   if (!recordWritable()) {
     showReaderToast(tx('記録の準備ができていません。少し待ってから、もう一度試してください。', 'Your record is not ready yet. Please try again in a moment.'));
@@ -8051,14 +8058,16 @@ async function toggleWordSave(node, label) {
     return false;
   }
   const taking = state !== 'taken';
-  if (!(await toggleTaken(node, label))) {
+  const saved = await toggleTaken(node, label);
+  if (!allowed()) return saved;
+  if (!saved) {
     showReaderToast(taking ? tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.')
       : tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'));
     return false;
   }
   refreshWordSaveControls(node, label);
   showReaderToast(taking ? tx('復習に保存しました', 'Saved to review') : tx('復習から外しました', 'Removed from review'),
-    [tx('元に戻す', 'Undo'), () => toggleWordSave(node, label)]);
+    [tx('元に戻す', 'Undo'), () => allowed() && toggleWordSave(node, label)]);
   return true;
 }
 
@@ -8130,6 +8139,8 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
 }
 
 function openVocabularyListPopover(node, label, invoker) {
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!allowed()) return;
   if (document.getElementById('vocabulary-list-popover')) {
     const same = vocabularyListInvoker === invoker;
     if (!closeVocabularyListPopover({ restoreFocus: same }) || same) return;
@@ -8197,7 +8208,7 @@ function openVocabularyListPopover(node, label, invoker) {
         'Your record is protected. The list name is kept here. Reload before retrying.');
   };
   const setMembership = async (listName, on, typed = false) => {
-    if (busy) return;
+    if (busy || !allowed()) return;
     if (!recordWritable()) {
       notice.textContent = tx('記録を読み込んでから、もう一度試してください。', 'Your record is not ready to save. Please try again once it is available.');
       paint();
@@ -8212,10 +8223,13 @@ function openVocabularyListPopover(node, label, invoker) {
     paint();
     try {
       if (on && !S.taken.some(row => row.t === node.t && row.id === node.id)) {
-        if (!(await toggleTaken(node, label))) { failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return; }
+        const captured = await toggleTaken(node, label);
+        if (!allowed()) return;
+        if (!captured) { failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return; }
         refreshWordSaveControls(node, label);
       }
       const saved = await commitStorePatch(latest => {
+        if (!allowed()) throw new Error('personal-capture-not-allowed');
         const lists = { ...latest.lists };
         const members = owns(lists, listName) ? lists[listName] : [];
         if (!on) {
@@ -12374,25 +12388,34 @@ async function performAssessmentEnrichment() {
 }
 const assessmentSuppressionRetries = new Map();
 function suppressAssessmentCards(command, guard = null) {
-  return queueAssessmentWork(() => performAssessmentSuppression(command, guard));
+  const host = typeof personalHost === 'undefined' ? null : personalHost;
+  const access = host ? host.captureAccess?.() || (() => host.allowed()) : null;
+  // A personal dictionary can remove this capture, never undo an assessment's additions.
+  if (host && (command.kind !== 'remove' || !access())) return Promise.resolve(false);
+  return queueAssessmentWork(() => performAssessmentSuppression(command, guard, access));
 }
 /** guard (D23): an optional check of the latest learner record, run in the producer before any
  * suppression input exists; a throw writes nothing (a word door that no longer names the card). */
-async function performAssessmentSuppression(command, guard = null) {
+async function performAssessmentSuppression(command, guard = null, access = null) {
   const retryKey = JSON.stringify(command);
   const epoch = recordEpoch;
-  if (!recordWritable(epoch)) return false;
+  const allowed = () => !access || access();
+  if (!recordWritable(epoch) || !allowed()) return false;
   try {
     let remaining;
     do {
+      if (!recordWritable(epoch) || !allowed()) return false;
       const retained = assessmentSuppressionRetries.get(retryKey);
       const request = retained?.epoch === epoch ? retained : {
         epoch,
         meta: { changeId: practiceIdentity('assessment-suppress'), occurredAt: new Date().toISOString() },
         input: null,
       };
-      const outcome = await recordApp.suppressAssessmentLearning(request.meta, request.input || (snapshot => {
+      const outcome = await recordApp.suppressAssessmentLearning(request.meta, !access && request.input ? request.input : (snapshot => {
         if (!recordWritable(epoch)) throw new Error('record-owner-changed');
+        if (!allowed()) throw new Error('personal-capture-not-allowed');
+        // Retries keep their exact command identity while rechecking this overlay visit.
+        if (request.input) return request.input;
         guard?.(snapshot.record || {});
         request.input = { expectedRevision: snapshot.revision, scope: snapshot.identity, ...command };
         assessmentSuppressionRetries.set(retryKey, request);
@@ -12401,8 +12424,8 @@ async function performAssessmentSuppression(command, guard = null) {
       if (outcome.status !== 'active') { recordFailure(outcome.reason, true); return false; }
       assessmentSuppressionRetries.delete(retryKey);
       remaining = outcome.learningSuppression.remaining;
-    } while (remaining > 0 && recordWritable(epoch));
-    return recordWritable(epoch) && remaining === 0;
+    } while (remaining > 0 && recordWritable(epoch) && allowed());
+    return recordWritable(epoch) && allowed() && remaining === 0;
   } catch { return false; }
 }
 function createAssessmentRoom() {
