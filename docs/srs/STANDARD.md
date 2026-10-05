@@ -1015,9 +1015,50 @@ Why: integration.md A2; the corridor's dictionary is JMdict, English only.
 **A48 → S52 (amends A45).** The service worker's `VERSION` is `kairo-v16-passage-pilot`: the
 player (chips, tier-one note, the sense fallback) and both decks' outputs changed.
 
+**A49 → S14, S18, S39 (amends A46; the learner's decision, 2026-10-05).** Replaces A46's "a batch
+adds passages after a word's existing ones and passage 1, its 字 cards and every existing card id
+stay as they are" with: "Each word's contract-v2 passages (those with a `register`) come first, in
+batch order, and its earlier passages follow in theirs (`export_mcd.py` `v2_first`); `passage` and
+`lv` follow that order. Card ids do not move: `build.py` takes them from `source/ids.json` by
+passage text, so a 語 card keeps its id wherever its passage stands. The 字 cards stay bound to the
+passage they were made from, the word's origin passage (its first passage without a register,
+passage 1 before the reorder; `build.py` `origin_passage`): they are not regenerated from the new
+first passage, and no contract-v2 passage has a 字 card. A word whose passages were all contract v2
+would have none." Held by `tools/test_export_mcd.py` (every word in `mcd.json` opens on its v2
+passages), `tools/kotoba-deck-ids.test.mjs` (first passage v2, lv and passage renumbered, every 字
+card on its origin passage with the id ids.json gave it, the old order rebuilt moves only lv and
+passage) and verify-kotoba-mine. Why: the learner wants a word met first in a full contract-v2
+passage, not after two or three short ones; moving the 字 cards would have retired their ids and
+their review history.
+
+**A50 → S14, S18, S20 (the full passage run, 2026-10-05; amends A46's judging, A47's counts).** The
+run wrote 1,212 contract-v2 passages for the 303 words outside the pilot and judged each in two
+lanes, each by judges other than the writer: an editor lane (naturalness, one target, context does
+work) and a facts lane (facts, topic, level, grammar ids); `export_mcd.py`'s mechanical checks
+(check 4 included) run after both. A passage failing a lane was rewritten once and rechecked by the
+lane(s) it failed; one still failing was dropped. 206 failed a lane on the first pass (editor 133,
+facts 81); 65 were dropped (editor 47, facts 15, both 3); of the rest at most three per word were
+kept (講 first, then in written order), leaving 247 out: 900 passages in
+`source/mcd/v2-2026-10-05-b01…b31.json`. Registers 講 296, 報 219, 論 189, 学 82, 話 78, 語 36;
+topics ai 241, history 231, mind 220, india 165, language 43. With the pilot: 954 contract-v2
+passages; 309 words have three, 13 two (足し算, 牛耳る, 凄まじい, かなめ, 性能, 各部, 覆う, 身体性,
+無常, 帰納的, 機能的, 素泊り, 盛大) and 手法 one; seven words have no 講 (悲観, 双方, 各部, 特訓, 競う,
+盛大, 殴り書き). kotoba-mcd is 2,435 cards (1,897 語 over 1,897 passages, 538 字), up from 1,535:
+900 new ids, nothing changed or removed (ids.json against f5643d72); the public build keeps 2,003.
+`tipJa` is optional on a contract-v2 passage (contract §3 item 4: only where the passage needs a
+note; 833 of the 954 carry one, 598 a `sense`). The sense table (A47) holds 7,033 lemmas, covering the content lemmas of the new passages; 65
+reading rules scoped to the new card ids (each with a fixture in
+`tools/kotoba-deck-ruby.fixtures.json`) fix the tokeniser in them (何 なに/なん, 一 + counter, 日本
+にほん, 私 わたし, 月 がつ, 分 ぶん/ぷん, 家 け, 都 みやこ, 間 ま/あいだ, 生 なま …). The service worker is
+unchanged: only deck outputs changed, and `decks/` is served network-first (A48). Why: CARD_CONTRACT_V2
+§5 asks three to four passages per word across registers; two lanes kept the five checks
+independent at 1,212 passages.
+
 The Phase 2 run (2026-10-04) is recorded in A37–A45. Read default and the 字 skip: A37. Hint
 retirement: A26 and A37. Reset re-scoped to 削除 and 復元: A42. Source fold with its licence: A27.
 Bar reserve and the settling scroll: A39. 焦点 groups and the ⋯ gutter: A38. Tokens side file,
 compound joins, cue rules and the host adapter: A43. Tap to define as capture only, the `lookups`
 ledger field, the depth-2 cut-off and the standalone gloss-map fallback: A44. Service worker: A45.
 The passage pilot (2026-10-04): A46. The Japanese sense table: A47. Service worker: A48.
+Contract-v2 passages first, 字 cards on their origin passage: A49. The full passage run and its two
+judging lanes (2026-10-05): A50.
