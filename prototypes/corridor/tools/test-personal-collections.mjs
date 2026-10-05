@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {webcrypto} from 'node:crypto';
+import {relative,sep} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import vm from 'node:vm';
+import {CORRIDOR_REQUIRED_ROOTS,corridorAssetFiles} from '../../../scripts/corridor-assets.mjs';
 import * as api from '../vendor/ts-fsrs.mjs';
 import {createEngine} from '../decks/personal/engine.mjs';
 import {validateCollection,validateEnrichment,parseImport,backup,digest,safeURL} from '../decks/personal/schema.mjs';
@@ -111,17 +116,19 @@ await test('long history is never truncated and export replay is deterministic',
   assert.deepEqual(engine.derive(imported).states,engine.derive(one).states);
 });
 await test('private route and all module dependencies are packaged and precached',()=>{
-  const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
-  // Packaging lives in the release builder's required asset roots (round-1
-  // architecture: ci.yml builds the artifact through build-corridor-site.mjs;
-  // pages-app.yml only deploys it).
-  const pipeline=readFileSync(new URL('../../../scripts/corridor-assets.mjs',import.meta.url),'utf8');
-  const smoke=readFileSync(new URL('../../../.github/workflows/ci.yml',import.meta.url),'utf8');
+  const corridorDir=fileURLToPath(new URL('..',import.meta.url));
+  const assembled=new Set(corridorAssetFiles(corridorDir).map(file=>relative(corridorDir,file).split(sep).join('/')));
+  const scope='https://example.invalid/bunki/';
+  const worker=vm.createContext({self:{registration:{scope},location:{origin:new URL(scope).origin},addEventListener(){}},
+    URL,Request,Response,Headers,TextEncoder,TextDecoder,crypto:webcrypto});
+  vm.runInContext(readFileSync(new URL('../sw.js',import.meta.url),'utf8'),worker);
+  const precached=new Set(vm.runInContext('[...SHELL,...BOOT_DATA,...GUIDED_ROOM]',worker));
   const corridor=readFileSync(new URL('../corridor.js',import.meta.url),'utf8');
-  for(const file of ['mount.mjs','engine.mjs','schema.mjs','store.mjs','enrichment.mjs','host-bridge.mjs','personal.css']) {
-    assert(sw.includes(`decks/personal/${file}`)); assert(pipeline.includes(`decks/personal/${file}`)); assert(smoke.includes(`decks/personal/${file}`));
+  for(const path of [...['mount.mjs','engine.mjs','schema.mjs','store.mjs','enrichment.mjs','host-bridge.mjs','personal.css'].map(file=>`decks/personal/${file}`),'vendor/ts-fsrs.mjs','fonts.css']) {
+    assert(CORRIDOR_REQUIRED_ROOTS.some(root=>path===root||path.startsWith(`${root}/`)),`${path} is a required release asset`);
+    assert(assembled.has(path),`${path} is assembled into the release`);
+    assert(precached.has(path),`${path} is precached by the service worker`);
   }
-  assert(sw.includes('vendor/ts-fsrs.mjs')); assert(sw.includes('fonts.css'));
   assert(corridor.indexOf("params.get('deck') === 'personal'") < corridor.indexOf('const loadArticleIndex'));
 });
 console.log(JSON.stringify({suite:'personal-collections',passed:checks.length,checks},null,2));

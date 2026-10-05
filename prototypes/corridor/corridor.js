@@ -2987,7 +2987,10 @@ async function commitStorePatch(patch, appendArchive = []) {
     S.storeError = null;
     safelySyncStoreAlert();
     return true;
-  } catch (error) { recordFailure(error?.code || error?.message); return false; }
+  } catch (error) {
+    if (error?.message !== 'personal-capture-not-allowed' || allowed()) recordFailure(error?.code || error?.message);
+    return false;
+  }
 }
 
 /* ------------------------------------------------ the observation log
@@ -7805,7 +7808,7 @@ document.addEventListener(
     const target = ev.target;
     if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
     const pop = document.getElementById('vocabulary-list-popover');
-    if (pop && !pop.contains(target) && !target.closest?.('#mini-lists')) closeVocabularyListPopover();
+    if (pop && !pop.contains(target) && !target.closest?.('#mini-lists, #personal-add-list')) closeVocabularyListPopover();
     const mini = document.getElementById('mini');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
       if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) miniClosedOnAnchor = miniAnchor;

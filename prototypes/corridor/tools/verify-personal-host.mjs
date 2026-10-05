@@ -103,9 +103,15 @@ try {
  assert(grammarSaved.lists['Synthetic host list'].some(t=>t.t==='grammar'&&t.id===grammarId));
  assert.deepEqual(grammarSaved.srs,{});assert.deepEqual(grammarSaved.revlog,[]);
  await page.locator('#vocabulary-list-name').press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ await page.setViewportSize({width:1440,height:900});
+ await page.locator('#personal-add-list').click();await page.locator('#vocabulary-list-popover').waitFor();
+ await page.locator('#personal-add-list').click();
+ assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'pressing Add to list again dismisses its own popover');
+ assert.equal(await page.locator('#personal-add-list').getAttribute('aria-expanded'),'false');
+ await page.setViewportSize({width:390,height:844});
  await page.locator('#sheet').press('Escape');await page.locator('#sheet').waitFor({state:'detached'});
  const finalProgress=await page.evaluate(async id=>{const {openStore}=await import('./decks/personal/store.mjs');const store=await openStore();try{return JSON.stringify((await store.get(id)).progress);}finally{store.close();}},data.id);
  assert.equal(finalProgress,before.progress,'word, grammar and list capture leave personal assessment history unchanged');
  assert(reqs.every(r=>r.method==='GET'));assert(reqs.every(r=>r.url.startsWith(origin)||r.url.startsWith('data:')));assert.deepEqual(errors,[]);
- console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
+ console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,addToListPointerToggle:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
 }finally{releaseDictionary();await browser.close();await new Promise(r=>server.close(r));}
