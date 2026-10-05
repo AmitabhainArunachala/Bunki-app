@@ -500,14 +500,23 @@ KANJI_VISIBLE: list[str] = []
 KANJI_UNALIGNED: list[tuple[str, str, list[str]]] = []
 
 
+def origin_passage(passages: list[dict]) -> int | None:
+    """the passage (1-based) a word's 字 cards are made from: its first passage without a register.
+    Contract-v2 passages (a register) come first since 2026-10-05 and never carry 字 cards, so the
+    字 cards stay on the passage they were made from, the word's passage 1 before the reorder
+    (STANDARD A49). None when every passage is contract v2: such a word gets no 字 card."""
+    return next((i for i, p in enumerate(passages, 1) if not p.get("register")), None)
+
+
 def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManifest) -> list[dict]:
     """per passage: one card asking the whole word (marked in 読んで思い出す, blanked in 穴埋め;
-    no front hint, CARD_CONTRACT_V2 §2), then (first passage only) one card per kanji, blanked
-    with its reading as the hint (the player queues these in the blank presets only).
-    A 字 card is left out when its kanji can be read elsewhere in the passage, and no 字
+    no front hint, CARD_CONTRACT_V2 §2), then (the origin passage only, origin_passage()) one card
+    per kanji, blanked with its reading as the hint (the player queues these in the blank presets
+    only). A 字 card is left out when its kanji can be read elsewhere in the passage, and no 字
     card is made when the kanji table cannot split the word's reading.
     Ids come from the manifest by key; lv is the card's position (display order only)."""
     cards, keys = [], []
+    origin = origin_passage(passages)
     for pi, p in enumerate(passages, 1):
         ruby = _ordered_for({"ja": p["ja"], "form": p["form"]}, c, tagger, bc)
         if "".join(seg[0] for seg in ruby) != p["ja"]:
@@ -522,14 +531,14 @@ def mcd_cards(wid: str, c: dict, passages: list[dict], tagger, bc, ids: IdManife
         cards.append({**base, "type": "word", "ruby": ruby})
         keys.append(word_key(wid, p["ja"]))
         parts = align(p["form"], ruby[ti][1])
-        if pi == 1 and parts is None:
+        if pi == origin and parts is None:
             known = ids.known("kotoba-mcd")
             lost = [v for k, v in known.items() if k.startswith(f"{wid}|kanji|{passage_hash(p['ja'])}|")]
             if lost:
                 KANJI_UNALIGNED.append((wid, c["term"], sorted(lost)))
         kanji_parts = [i for i, (t, _) in enumerate(parts or []) if KANJI.match(t)]
-        if pi > 1 or (len(kanji_parts) < 2 and not (parts and kanji_parts and len(parts) > 1)):
-            continue  # 字 cards come from the first passage only; a lone kanji is the word card
+        if pi != origin or (len(kanji_parts) < 2 and not (parts and kanji_parts and len(parts) > 1)):
+            continue  # 字 cards come from the origin passage only; a lone kanji is the word card
         start = sum(len(seg[0]) for seg in ruby[:ti])
         for k in kanji_parts:
             at = start + k
@@ -550,7 +559,7 @@ METHOD = [
     "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）の文章でできています。ふだんは「読んで思い出す」で解きます。",
     "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜5文）。覚える言葉は色つき。読み・英語・ヒントは出ない。読んで、意味と読みを思い出してからタップ。",
     "設定 › 答え方 › 穴埋め にすると MCD の穴埋めになる。「語」カードは単語まるごとが穴（同じ言葉が二度出てくる文章では、両方とも空欄）。",
-    "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（最初の文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。",
+    "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（語ごとに一つの文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。",
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
     "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。",
     "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。",
