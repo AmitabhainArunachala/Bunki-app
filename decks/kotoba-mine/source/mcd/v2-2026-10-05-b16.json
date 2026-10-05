@@ -1,0 +1,331 @@
+{
+  "179": [
+    {
+      "ja": "今回は、江戸時代の「人別帳」について見ていきます。幕府はキリスト教を禁じたあと、村ごとに住民一人ひとりがどの寺の檀家なのかを帳面に書かせました。この帳面への登載は、いまの戸籍や住民票に近い役割を果たすことになります。逆に、何らかの理由で帳面から外された人は「無宿」と呼ばれ、まともな暮らしを送るのが難しくなりました。名前を書き込むという地味な作業が、人の居場所を決めていたわけですね。",
+      "form": "登載",
+      "en": "This time we're going to look at the ninbetsuchō, the population registers of the Edo period. After banning Christianity, the shogunate had each village record in a register which temple every single resident belonged to. Entry in this register came to play a role close to today's family register and certificate of residence. Conversely, people who were struck off the register for some reason were called mushuku, the unregistered, and found it hard to lead a normal life. So the humble task of writing down names decided where a person belonged.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「名簿に登載する」「台帳への登載」のように、公の記録に名を載せる場面で使う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "名簿や台帳に、名前などを書き入れること。"
+    },
+    {
+      "ja": "欧州連合（EU）で成立したAI規則は、人の安全や権利に大きく関わるAIを「高リスク」に分類しています。こうしたシステムを市場に出す事業者には、EUが管理する公開データベースへの登載が求められます。どの企業がどのような用途のAIを提供しているのかを、外部からも確かめられるようにするのがねらいです。EU域内で製品を販売する日本企業も、対応せざるを得ないとみられています。",
+      "form": "登載",
+      "en": "The AI Act adopted by the European Union (EU) classifies AI that has a major bearing on people's safety or rights as \"high-risk.\" Businesses that bring such systems to market are required to enter them in a public database managed by the EU. The aim is to let outsiders, too, check which companies are offering AI for what purposes. Japanese companies that sell products within the EU are also expected to have no choice but to comply.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道や行政の文章では「データベースへの登載」のように、名簿以外の公的な一覧にも使う。",
+      "grammar": ["n3-you-ni", "n2-zaru-o-enai"],
+      "sense": "名簿や台帳に、名前などを書き入れること。"
+    },
+    {
+      "ja": "寺には、過去帳と呼ばれる帳面がある。亡くなった檀家の俗名と戒名、そして命日を、代々の住職が一人ずつ丁寧に書き継いできたものである。その人の生涯には喜びも悲しみも数えきれないほどあったはずだが、帳面に残るのはわずか一行にすぎない。それでも過去帳への登載は、この人を忘れないという、寺と遺族との約束なのだろう。命日が巡ってくるたびに、その一行を開いて静かに手を合わせる人がいるのである。",
+      "form": "登載",
+      "en": "Temples keep a book called a kakochō, a register of the dead. In it, one head priest after another down the generations has carefully written, person by person, the lay names, posthumous Buddhist names and death dates of deceased parishioners. A person's life must have held countless joys and sorrows, yet what remains in the book is no more than a single line. Even so, being entered in the kakochō is perhaps a promise between the temple and the bereaved family not to forget this person. Each time the anniversary of a death comes round, there is someone who opens to that one line and quietly puts their hands together.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n2-ni-suginai"],
+      "sense": "名簿や台帳に、名前などを書き入れること。"
+    }
+  ],
+  "287": [
+    {
+      "ja": "今回は、生成AIとの付き合い方についてお話しします。AIはとても自然な文章を書きますが、存在しない論文や間違った数字を、もっともらしく並べてしまうことがあります。これは「ハルシネーション」と呼ばれる現象で、今の技術では完全には防げません。だからこそ大事なのは、答えをうのみにすることなく、出典を一つひとつ当たって検証する姿勢です。AIを使いこなせる人とは、AIを疑える人のことなんですね。",
+      "form": "検証",
+      "en": "This time I'm going to talk about how to deal with generative AI. AI writes very natural text, but it sometimes lines up papers that don't exist or wrong figures in a plausible-looking way. This is a phenomenon called \"hallucination,\" and current technology can't prevent it completely. That's exactly why what matters is the attitude of not swallowing answers whole but checking the sources one by one to verify them. The people who can make full use of AI are the people who can doubt it.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「事実を検証する」「検証が必要だ」のように、正しさを確かめる作業に使う。",
+      "grammar": ["n2-koto-naku"]
+    },
+    {
+      "ja": "心理学の分野で、過去の研究結果を見直す動きが広がっています。2015年に発表された国際的な共同研究では、有名な学術誌に載った心理学の実験百件をやり直したところ、元と同じ結果が得られたのは半数にも届きませんでした。これをきっかけに、データや分析の手順をあらかじめ公開する取り組みが進んでいます。第三者による検証を前提にすることで、研究の信頼性を高めるねらいがあります。",
+      "form": "検証",
+      "en": "In the field of psychology, a movement to re-examine past research findings is spreading. In an international collaborative study published in 2015, a hundred psychology experiments that had appeared in well-known journals were redone, and fewer than half produced the same results as the originals. Prompted by this, efforts to make data and analysis procedures public in advance are moving forward. The aim is to raise the reliability of research by assuming verification by third parties from the start.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "ブッダは、昔からの言い伝えだから、聖典に書いてあるから、尊敬する師が言ったから、という理由だけで教えを信じてはならない、と説いたと伝えられる。自分で確かめ、それが苦しみを減らすと分かったときにはじめて受け入れよ、というのである。宗教の開祖が自らの言葉を疑えと言うのは、思えば不思議なことだ。しかし、教えを検証にさらすこの態度こそ、仏教を二千年以上も生かしてきた力なのかもしれない。",
+      "form": "検証",
+      "en": "The Buddha is said to have taught that one must not believe a teaching merely because it is an old tradition, because it is written in scripture, or because a respected teacher said it. Test it yourself, and accept it only when you find that it lessens suffering: that is the point. When you think about it, it is strange for the founder of a religion to tell people to doubt his own words. Yet perhaps it is this very attitude of exposing the teaching to verification that has kept Buddhism alive for more than two thousand years.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「検証にさらす」は、主張を他人が確かめられる場に出すこと。",
+      "grammar": []
+    }
+  ],
+  "288": [
+    {
+      "ja": "ライト兄弟といえば1903年の初飛行が有名ですが、今回注目したいのはその前の準備です。二人は手作りの装置で空気の流れを起こし、形の違う小さな翼の模型を何百種類も試しました。当時の学者が出していたデータをうのみにすることなく、自分たちの手で検証試験を重ねたわけです。その結果、広く信じられていた数値にずれがあることを突き止めます。空を飛ぶという大きな夢は、こうした地道な確認作業に支えられていたんですね。",
+      "form": "検証試験",
+      "en": "When people think of the Wright brothers, it's the first flight of 1903 that's famous, but what I want to focus on this time is the preparation before it. The two of them generated airflow with a homemade device and tried out hundreds of small model wings of different shapes. Rather than swallowing the data published by scholars of the time, they ran verification test after verification test with their own hands. As a result, they pinned down that figures widely believed at the time were off. The great dream of flight was supported by this kind of patient checking work.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「検証試験を行う」「検証試験に合格する」のように、本番前に実際に試して確かめる場面で使う。",
+      "grammar": ["n2-koto-naku"]
+    },
+    {
+      "ja": "運転手不足が深刻な地方を中心に、自動運転バスを公道で走らせる検証試験が各地で行われています。多くの場合、決まったルートを低い速度で走らせ、歩行者や自転車をきちんと避けられるかを確かめています。車内には係員が乗り込み、緊急時にはすぐに手動の運転に切り替えられる体制をとっています。実用化に向けては、費用の負担や事故が起きた際の責任の所在など、技術以外の課題も残されています。",
+      "form": "検証試験",
+      "en": "Centred on regional areas where the driver shortage is serious, verification tests running self-driving buses on public roads are being carried out in many places. In most cases the buses are run at low speed along fixed routes, to check whether they can properly avoid pedestrians and bicycles. A staff member rides on board, and arrangements are in place to switch immediately to manual driving in an emergency. On the way to practical use, issues beyond the technology also remain, such as who bears the costs and where responsibility lies when an accident occurs.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "うちの会社で、翻訳AIを社内の文書に使おうって話になったんですよ。で、いきなり全部切り替えるのは怖いんで、まず一か月だけ検証試験をやったんです。そしたら、普通の文章はかなりいけるんですけど、業界の専門用語とか社内の略語になると、平気で間違えるんですよね。結局、用語集を読み込ませた上で、最後は人がチェックするって形に落ち着きました。いきなり本番に入れなくて、ほんとよかったなと思います。",
+      "form": "検証試験",
+      "en": "At my company, there was talk of using translation AI for internal documents. Since switching everything over at once was scary, we first ran a verification test for just one month. It turned out it handled ordinary text pretty well, but when it came to industry jargon or in-house abbreviations, it got them wrong without batting an eye. In the end we settled on feeding it a glossary and then having a person check the final output. I'm really glad we didn't put it straight into production.",
+      "original": true,
+      "register": "話",
+      "topic": "language",
+      "tipJa": "話し言葉では「試しにやってみた」くらいの軽い場面でも、少し固めに言うときに使う。",
+      "grammar": ["n2-ue-de"]
+    }
+  ],
+  "267": [
+    {
+      "ja": "2016年、囲碁AIの「アルファ碁」が、世界トップ級の棋士に四勝一敗で勝ちました。中でも語り継がれているのが、第二局の三十七手目です。解説者たちは最初、ただの悪手だと思ったそうですが、対局が進むにつれて、その一手が全体を支えていたことが見えてきました。人間が長い年月をかけて積み上げてきた常識の外に、まだ手つかずの可能性があったわけです。盤上で起きたこの出来事は、AIが人間の「直感」の領域に踏み込んだ瞬間として記憶されています。",
+      "form": "盤上",
+      "en": "In 2016, the Go AI AlphaGo beat a world-class professional four games to one. The move still told of most is the thirty-seventh move of the second game. The commentators reportedly thought at first that it was simply a bad move, but as the game went on, it became clear that this one move was holding the whole position together. Outside the common sense humans had built up over long years, there were still untouched possibilities. This event on the board is remembered as the moment AI stepped into the realm of human \"intuition.\"",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「盤上の戦い」「盤上で起きたこと」のように、対局そのものを指すときにも使う。",
+      "grammar": ["n3-ni-tsurete"]
+    },
+    {
+      "ja": "11月17日は「将棋の日」です。江戸時代、名人たちが将軍の前で対局する「御城将棋」が、毎年この日に行われていたことにちなんでいます。当時の将棋は幕府の保護を受け、家元の制度のもとで技が代々受け継がれていきました。御城将棋は、勝ち負けよりも、盤上で磨き上げた技を披露する儀式としての意味合いが強かったとされています。現在も、この日の前後には各地で記念の催しが開かれています。",
+      "form": "盤上",
+      "en": "November 17 is \"Shogi Day.\" It is named after the Oshiro Shogi, in which master players played before the shogun, held on this day every year in the Edo period. Shogi at the time enjoyed the shogunate's protection, and skills were handed down from generation to generation under a system of hereditary houses. Oshiro Shogi is said to have had a strong character as a ceremony for displaying skills polished on the board, more than as a contest of winning and losing. Even now, commemorative events are held in various places around this date.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "将棋やチェスの遠い祖先は、古代インドのチャトランガという遊びだと言われる。歩兵、騎兵、象、戦車という軍の四つの部隊を、そのまま駒にしたものである。人が死ぬことなく、盤上だけで戦が終わるのなら、それは一つの知恵だったのかもしれない。けれども、駒を取ることに夢中になっている自分の姿は、案外、戦場の将とそれほど変わらない。勝ちたいという心の動きは、盤の外にまで続いているのである。",
+      "form": "盤上",
+      "en": "The distant ancestor of shogi and chess is said to be a game from ancient India called chaturanga. It turned the four divisions of an army, infantry, cavalry, elephants and chariots, directly into pieces. If a war could end on the board alone without anyone dying, perhaps that was a kind of wisdom. Yet the sight of ourselves absorbed in taking pieces is, surprisingly, not so different from a general on the battlefield. The urge to win continues even beyond the edge of the board.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": ["n2-koto-naku"]
+    }
+  ],
+  "268": [
+    {
+      "ja": "今回は、身近なクオーツ時計の仕組みを見ていきます。中には小さな水晶のかけらが入っていて、電圧をかけると一秒間に三万二千七百六十八回という、とても正確な速さで震えます。この振動を電子回路が数え、一秒分になるたびに信号を送って、秒針を一つ進めるわけです。世界初のクオーツ腕時計は、1969年に日本のメーカーが発売しました。半導体の技術が、腕の上の時間まで変えたということですね。",
+      "form": "秒針",
+      "en": "This time we're going to look at how the familiar quartz clock works. Inside there's a small piece of quartz crystal, and when a voltage is applied it vibrates at an extremely precise rate of 32,768 times per second. An electronic circuit counts these vibrations, and each time a second's worth has built up it sends a signal and moves the second hand forward one step. The world's first quartz wristwatch was released by a Japanese maker in 1969. In other words, semiconductor technology changed even the time on our wrists.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「秒針が進む」「秒針の音」のように使う。分を示すのは「長針」、時は「短針」。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "静かな部屋で坐っていると、壁に掛けた時計の秒針の音が、やけに大きく聞こえてくることがある。普段は気にも留めない、ごく小さな音である。それが一つ刻まれるたびに、今という時は過ぎ去り、二度と戻ってはこない。仏教でいう「刹那」とは、こうした一瞬一瞬の移ろいを、目をそらさずに見つめるための言葉なのだろう。音を追いかけるのをやめたとき、ただここに坐っている自分だけが残るのである。",
+      "form": "秒針",
+      "en": "When you sit in a quiet room, the sound of the second hand of the clock hanging on the wall can come to seem strangely loud. It is a very small sound that we normally pay no attention to. Each time it ticks, the present moment passes away and never comes back. The Buddhist term setsuna, the instant, is perhaps a word for watching this moment-by-moment passing without looking away. When we stop chasing the sound, all that remains is ourselves, simply sitting here.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "",
+      "grammar": []
+    },
+    {
+      "ja": "寝る前に、時計のカチ、カチって音が一回気になりだすと、もうダメじゃないですか。普段は全然聞こえてないのに、意識した瞬間から、頭の中でずっと鳴ってる感じになって。あれ、脳が「気になる音」として勝手に拾い始めちゃうらしいんですよね。だから僕、寝室の目覚まし時計は、秒針が音を立てずにすーっと動くタイプに替えたんですよ。それだけで、寝つきがだいぶマシになった気がします。",
+      "form": "秒針",
+      "en": "Before going to sleep, once the tick, tick of the clock starts bothering you, it's game over, right? Normally you don't hear it at all, but from the moment you notice it once, it feels like it's ringing in your head the whole time. Apparently your brain starts picking it up on its own as a \"sound to worry about.\" So I swapped the alarm clock in my bedroom for the kind where the second hand glides along without making a sound. Just that seems to have made falling asleep a lot easier.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "269": [
+    {
+      "ja": "2017年に発表された「アルファゼロ」は、AI研究の大きな転換点になりました。このAIに与えられたのは、ゲームのルールだけです。人間の棋譜を一切見ることなく、自分自身と何千万回も対局を重ねて強くなっていきました。そして、チェス、将棋、囲碁のそれぞれで最強とされていたプログラムを破り、三つのゲームを制覇してしまいます。一つの仕組みでいくつものゲームを極められる、という点が衝撃だったわけですね。",
+      "form": "制覇",
+      "en": "AlphaZero, announced in 2017, became a major turning point in AI research. All this AI was given was the rules of the games. Without looking at a single human game record, it grew stronger by playing tens of millions of games against itself. Then it beat the programs considered strongest in chess, shogi and Go respectively, and conquered all three games. What was shocking was that a single system could master several different games.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「大会を制覇する」「三連覇」のように、勝ち抜いて頂点に立つ意味で使う。",
+      "grammar": ["n2-koto-naku", "n4-teiku"],
+      "sense": "競争や試合に勝ち抜いて、一番になること。"
+    },
+    {
+      "ja": "理化学研究所と富士通が開発したスーパーコンピューター「富岳」は、2020年6月、計算の速さなどを比べる四つの世界ランキングで、そろって首位に立ちました。一つのマシンが四部門を同時に制覇したのは、史上初めてとされています。富岳は同じ年の11月にも四部門の首位を守り、新型コロナウイルスの飛沫の広がり方の解析などにも使われました。一方で、首位の座はその後、海外の新しいマシンに譲っています。",
+      "form": "制覇",
+      "en": "In June 2020, the supercomputer Fugaku, developed by RIKEN and Fujitsu, took first place in all four world rankings that compare computing speed and other measures. It is said to have been the first time in history that a single machine had won all four categories at once. Fugaku held on to first place in all four categories in November of the same year as well, and it was also used for things such as analysing how droplets carrying the novel coronavirus spread. On the other hand, it has since given up the top spot to newer machines overseas.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "",
+      "grammar": [],
+      "sense": "競争や試合に勝ち抜いて、一番になること。"
+    },
+    {
+      "ja": "紀元前三世紀、インドのマウリヤ朝は、南端を除く亜大陸のほぼ全域を武力で制覇した。その仕上げとなったのが、アショーカ王によるカリンガ国との戦いである。王自身が岩に刻ませた言葉には、そこで失われた無数の命への深い悔いが記されている。以後、王は仏教に帰依し、武力ではなくダルマ（法）による統治を掲げた。勝利を恥じたところから、本当の意味での王の道が始まったのかもしれない。",
+      "form": "制覇",
+      "en": "In the third century BCE, India's Maurya dynasty brought almost the whole of the subcontinent except its southern tip under its rule by force. The finishing touch was King Ashoka's war against the land of Kalinga. The words the king himself had carved into rock record his deep remorse over the countless lives lost there. From then on, the king took refuge in Buddhism and proclaimed rule not by force but by dharma, the law. Perhaps it was from the point where he felt shame at victory that the true way of a king began.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「世界制覇」「天下制覇」のように、武力で広く支配する意味もある。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "武力などで他を抑え、広い地域を支配すること。"
+    }
+  ],
+  "270": [
+    {
+      "ja": "最近の将棋中継では、画面の端に「評価値」という数字が出ていますよね。これはAIが、いまの盤面がどちらにどれくらい有利なのかを数字で示したものです。おかげで、ルールしか知らない人でも、形勢の移り変わりを追えるようになりました。一方でプロ棋士の間では、AIの示す手をそのまま真似するのではなく、なぜその手がよいのかを自分の言葉で説明できるかが問われています。数字が見えるようになったからこそ、人間の考える力が試されているわけですね。",
+      "form": "盤面",
+      "en": "In shogi broadcasts these days, a number called the \"evaluation value\" appears at the edge of the screen, doesn't it? This is the AI showing in numbers which side the current board position favours and by how much. Thanks to it, even people who only know the rules have become able to follow how the balance shifts. Meanwhile, among professional players, the question being asked is not whether they simply copy the moves the AI suggests, but whether they can explain in their own words why a move is good. It's precisely because the numbers have become visible that human thinking is being put to the test.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「盤面を読む」「盤面全体を見る」のように、駒や石の配置としての局面を指す。",
+      "grammar": ["n4-you-ni-naru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "チェスの達人の記憶を調べた有名な実験があります。実際の対局から取った盤面を数秒だけ見せて再現させると、達人は初心者よりはるかに正確に駒を並べ直せました。ところが、駒をでたらめに置いた並びでは、両者の差はほとんど消えてしまったのです。つまり、達人の記憶力そのものが特別に優れているわけではないのです。彼らは意味のある配置をまとまりとして覚えていたことになり、勉強でも、知識を型としてつかむことが記憶の近道だと言えます。",
+      "form": "盤面",
+      "en": "There is a famous experiment that investigated the memory of chess masters. When shown a board position taken from a real game for just a few seconds and asked to reproduce it, masters could set the pieces back up far more accurately than beginners. However, with arrangements where the pieces had been placed at random, the difference between the two almost disappeared. In other words, it is not that the masters' memory as such is especially superior. It turns out they were remembering meaningful arrangements as chunks, and so in study too, grasping knowledge as patterns can be said to be a shortcut to memory.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n3-wake-dewa-nai", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "囲碁から生まれた日常の言葉は、意外に多い。将来を見越してあらかじめ手を打っておくことを「布石」と言い、役に立たないことを「駄目」と言うのも、もとは碁の用語である。相手の力を認める「一目置く」も、同じ仲間だ。「岡目八目」は、打っている本人より横で見ている人のほうが盤面の形勢をよく読める、というところから来ている。由来を知ると、何気なく使っている表現から、勝負の世界の緊張感が伝わってくる。",
+      "form": "盤面",
+      "en": "There are surprisingly many everyday words that were born from Go. Calling advance moves made with an eye to the future fuseki, and calling something useless dame, both originally come from Go terminology. Ichimoku oku, to acknowledge someone's strength, belongs to the same family. Okame hachimoku, the onlooker sees more, comes from the idea that someone watching from the side can read the state of the board position better than the player. Once you know the origins, the tension of the world of competition comes through in expressions you use without a second thought.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "",
+      "grammar": []
+    }
+  ],
+  "271": [
+    {
+      "ja": "今回はモーツァルトの子ども時代を取り上げます。彼は五歳ごろには小さな曲を作り、六歳になると父に連れられてヨーロッパ各地の宮廷を回りました。鍵盤に布をかけたまま弾くといった芸も披露し、人々から神童ともてはやされたわけです。ただ注目したいのは、父レオポルトが幼いころから徹底して音楽を教え込んでいたという点です。才能と環境、その両方がそろってはじめて、あの天才が生まれたんですね。",
+      "form": "神童",
+      "en": "This time we're taking up Mozart's childhood. By around the age of five he was composing small pieces, and from the age of six he was taken by his father around royal courts all over Europe. He showed off tricks such as playing with the keyboard covered by a cloth, and people made a great fuss of him as a child prodigy. But what I want to highlight is that his father Leopold had drilled music into him thoroughly from an early age. It was only when talent and environment both came together that that genius was born.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「神童と呼ばれる」「神童ともてはやされる」のように、周りの評判として使うことが多い。",
+      "grammar": []
+    },
+    {
+      "ja": "1920年代、アメリカの心理学者ターマンは、知能検査で非常に高い得点を取った子ども約千五百人を選び、その後の人生を長年にわたって追跡しました。いわば神童として選ばれた彼らの多くは、社会的に安定した成功を収めたものの、ノーベル賞を受けた人は一人もいませんでした。皮肉なことに、選考から漏れた子どもの中から、のちに受賞者が二人出ています。この結果は、検査で測れる力だけでは、人の伸び方を予測しきれないことを示しています。",
+      "form": "神童",
+      "en": "In the 1920s, the American psychologist Terman selected about 1,500 children who had scored extremely high on intelligence tests and followed their later lives over many years. Most of these children, chosen as child prodigies so to speak, achieved stable success in society, but not one of them received a Nobel Prize. Ironically, two later laureates emerged from among the children who had not been selected. This result shows that the abilities a test can measure are not enough to fully predict how a person will develop.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n2-mono-no"]
+    },
+    {
+      "ja": "「十で神童、十五で才子、二十過ぎればただの人」ということわざがある。幼いころ周りを驚かせた子も、成長するにつれて平凡になっていく、という意味だ。早く咲いた才能がそのまま大きく伸びるとは限らない、という世間の冷めた見方が表れている。十、十五、二十と年齢を重ねて調子をつくり、最後に「ただの人」と落とす組み立てが、耳に残る理由だろう。ただし皮肉の効いた言葉なので、相手の子どもの話をしているときに持ち出すと角が立つ。",
+      "form": "神童",
+      "en": "There is a proverb that goes, \"A child prodigy at ten, a talent at fifteen, and past twenty, just an ordinary person.\" It means that even a child who amazed those around them when young becomes ordinary as they grow up. It reflects the world's cool view that a talent that blooms early does not necessarily go on to grow large. The way it builds a rhythm by stacking up the ages ten, fifteen and twenty and then drops to \"just an ordinary person\" at the end is probably why it sticks in the ear. However, because it is a barbed saying, bringing it up while someone is talking about their own child will cause offence.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "このことわざは人をほめる場面では使わない。昔の評判を皮肉るときの言い方。",
+      "grammar": ["n3-ni-tsurete", "n4-teiku"]
+    }
+  ],
+  "272": [
+    {
+      "ja": "今回紹介するのは、精神科医フランクルの『夜と霧』です。第二次世界大戦中に強制収容所へ送られた著者が、その体験をもとに、極限に置かれた人間の心を描いた一冊です。読んでいて胸を揺さぶられるのは、すべてを奪われた中でも、自分の態度だけは選ぶことができた、という観察です。生きる意味は人生に問うものではなく、人生の側から問われているものだ、という視点の転換は、今も多くの読者を支えています。悩みの中にいる人にこそ、手に取ってほしい本ですね。",
+      "form": "揺さぶられる",
+      "en": "The book I'm introducing this time is Man's Search for Meaning by the psychiatrist Frankl. It's a book in which the author, who was sent to concentration camps during the Second World War, draws on that experience to portray the human mind pushed to the limit. What shakes you as you read is his observation that even with everything taken away, one could still choose one's own attitude. His shift in perspective, that the meaning of life is not something we ask of life but something life asks of us, still sustains many readers today. It's a book I'd especially like people in the midst of their troubles to pick up.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「心を揺さぶる」「胸を揺さぶられる」のように、感情が強く動く場面でよく使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "人の心を大きく動かす。"
+    },
+    {
+      "ja": "1973年秋、第四次中東戦争をきっかけに、産油国が原油の価格を大幅に引き上げました。第一次石油危機です。石油の多くを輸入に頼っていた日本では物価が急に上がり、トイレットペーパーなどを買い求める人が店に殺到しました。翌年には経済成長が戦後初めてマイナスとなり、右肩上がりの時代は終わりを迎えることになります。この危機は日本経済を根底から揺さぶり、省エネルギー技術が進むきっかけにもなりました。",
+      "form": "揺さぶり",
+      "en": "In the autumn of 1973, triggered by the Fourth Arab-Israeli War, oil-producing countries raised the price of crude oil sharply. This was the first oil crisis. In Japan, which relied on imports for most of its oil, prices shot up, and people rushed to shops to buy things like toilet paper. The following year, economic growth turned negative for the first time since the war, and the era of ever-rising growth came to an end. The crisis shook the Japanese economy to its foundations and also became a spur for the advance of energy-saving technology.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「経済を揺さぶる」「政権を揺さぶる」のように、安定した仕組みを不安定にする意味でも使う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "安定していたものを大きく動かし、ぐらつかせる。"
+    },
+    {
+      "ja": "ブッダという言葉は、もともと古代インドの言葉で「目覚めた人」を意味する。その教えは、心地よい夢の中でまどろむ者にとって、あまりありがたいものではないのかもしれない。眠り込んでいる者の肩をつかみ、何度も強く揺さぶって起こすようなものだからである。人は、ものがいつまでも変わらずにあるという夢を、できるだけ長く見ていたい。だが目を覚ましたとき、はじめて見える朝の光もあるのだろう。",
+      "form": "揺さぶって",
+      "en": "The word Buddha originally means, in an ancient Indian language, \"one who has awakened.\" To those dozing inside a pleasant dream, perhaps that teaching is not so very welcome. For it is like grabbing a sound sleeper by the shoulders and shaking them hard again and again to wake them. People want to keep dreaming, as long as they can, the dream that things will stay unchanged forever. Yet there must be a morning light that can be seen only once we wake.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「肩を揺さぶる」のように、手で何度も強くゆらす具体的な動作にも使う。",
+      "grammar": [],
+      "sense": "体や物をつかんで、強く何度もゆらす。"
+    }
+  ],
+  "273": [
+    {
+      "ja": "今回は、平安時代の僧・空海を取り上げます。三十代の初めに遣唐使の船で唐に渡ると、都の長安で密教の高僧・恵果に出会いました。そして、わずか数か月のうちに、その教えをすべて受け継いだと伝えられています。現地の言葉はもちろん、インドの文字まで短い期間で身につけたというのですから、まさにたぐいまれな才能の持ち主だったわけです。帰国後は高野山を開き、日本の真言密教の土台を築いていきます。",
+      "form": "たぐいまれな",
+      "en": "This time we're taking up Kūkai, a monk of the Heian period. When he crossed to Tang China on an envoy ship in his early thirties, he met the eminent esoteric Buddhist master Huiguo in the capital, Chang'an. And it is said that within just a few months he inherited all of his teachings. Since he reportedly picked up not only the local language but even the Indian script in a short time, he truly was a man of exceptional talent. After returning to Japan he founded Mount Kōya and went on to lay the groundwork for Shingon esoteric Buddhism in Japan.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「たぐいまれな才能」「たぐいまれな記憶力」のように、ほめる意味で名詞の前に置く。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "江戸時代後期の測量家、伊能忠敬は、五十代半ばから全国を歩いて測量し、精密な日本地図づくりに挑みました。測量の旅は十回、十七年に及び、歩いた距離は地球一周分に近いとされています。忠敬は完成を見ることなく亡くなりましたが、弟子たちが仕事を引き継ぎ、地図は1821年に幕府へ納められました。晩年に新しい道へ踏み出し、それをやり遂げたたぐいまれな根気は、生涯学習の手本としても注目されています。",
+      "form": "たぐいまれな",
+      "en": "Inō Tadataka, a surveyor of the late Edo period, set out in his mid-fifties to walk and survey the whole country, taking on the making of a precise map of Japan. His survey journeys numbered ten and spanned seventeen years, and the distance he walked is said to come close to once around the Earth. Tadataka died without seeing the work completed, but his disciples carried it on, and the map was presented to the shogunate in 1821. His exceptional perseverance, stepping onto a new path late in life and seeing it through, is also attracting attention as a model of lifelong learning.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "",
+      "grammar": ["n2-koto-naku"]
+    },
+    {
+      "ja": "記憶力の大会で上位に入る人たちの脳を調べた研究があります。2003年に発表されたこの研究では、彼らの知能や脳の構造に、一般の人と比べて目立った違いは見られませんでした。違っていたのは覚え方で、多くが、よく知っている道や部屋に情報を一つずつ置いていく「場所法」を使っていたのです。一見たぐいまれな才能に見えても、その中身は訓練で身につく技術だったことになります。暗記が苦手な人も、まずは一つ試してみる価値がありそうです。",
+      "form": "たぐいまれな",
+      "en": "There is a study that examined the brains of people who place high in memory competitions. In this study, published in 2003, no notable differences were found in their intelligence or brain structure compared with ordinary people. What differed was how they memorised: many used the \"method of loci,\" placing pieces of information one by one along a route or in a room they knew well. So what looks at first glance like an exceptional talent turns out to be a skill that can be acquired through training. Even people who are bad at memorising may find it worth trying one method first.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"]
+    }
+  ]
+}
