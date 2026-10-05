@@ -10,11 +10,13 @@ Run from anywhere: python3 decks/kotoba-mine/tools/test_export_mcd.py
    Japanese line without Latin letters, grammar ids known to grammar-v11.json, sense one Japanese
    dictionary-style line of at most 40 characters; empty values are dropped, so an old record gets
    none of them.
-4. Dated batches (pilot-2026-10-04.json) are read after the undated files, so they add passages
-   after a word's existing ones.
+4. Dated batches (pilot-2026-10-04.json) are read after the undated files; then each word's
+   contract-v2 passages (a register) are put first, each group in the order read (v2_first).
 5. build.passage_fields() carries register, topic, tipJa, sense and grammar (labelled) onto a
    card, and fails on a grammar id it does not know.
-6. The committed pilot batch passes every rule and every one of its passages is in mcd.json.
+6. The committed contract-v2 batches (the pilot and the 31 full-run batches) pass every rule,
+   every one of their passages is in mcd.json, and in mcd.json every word's passages start with
+   its v2 passages, in batch order, before its earlier ones.
 7. Check 4 (one target), mechanised: other_terms() tokenises a passage as build.py does and finds
    another deck word by surface (性能), by dictionary form (競っ → 競う), across tokens (生得+的),
    never inside a longer word (半導体 is not 導体) and never in the target; a v2 passage that uses
@@ -98,6 +100,9 @@ def main() -> int:
     names = sorted(["s2.json", "pilot-2026-10-04.json", "preview.json", "s1.json", "late-2026-11-01.json"], key=ex.batch_order)
     ok("undated files come first in name order, then dated batches by date",
        names == ["preview.json", "s1.json", "s2.json", "pilot-2026-10-04.json", "late-2026-11-01.json"], " ".join(names))
+    rows = [{"ja": "a"}, {"ja": "b", "register": "講"}, {"ja": "c"}, {"ja": "d", "register": "報"}]
+    ok("v2_first puts a word's contract-v2 passages first, each group in the order read",
+       [r["ja"] for r in ex.v2_first(rows)] == ["b", "d", "a", "c"], " ".join(r["ja"] for r in ex.v2_first(rows)))
 
     # 5. build.py carries the fields onto cards
     record = ex.written_record("64", {**v2, "sense": "国や自治体のお金のやりくり。"})
@@ -109,22 +114,26 @@ def main() -> int:
     ok("build.passage_fields fails on an unknown grammar id",
        "grammar" in refused(build.passage_fields, "km-064", 4, {**record, "grammar": ["n2-no-such-point"]}))
 
-    # 6. the committed pilot batch
-    pilot = json.loads((ex.SRC / "mcd" / "pilot-2026-10-04.json").read_text("utf-8"))
+    # 6. the committed contract-v2 batches: the pilot, then the full run (v2-2026-10-05-b01…b31)
     mcd = json.loads((ex.SRC / "mcd.json").read_text("utf-8"))
+    batches = sorted((f for f in (ex.SRC / "mcd").glob("*.json") if f.name.startswith(("pilot-", "v2-"))), key=lambda f: ex.batch_order(str(f)))
+    want: dict[str, list[str]] = {}
     bad = []
-    for n, rows in pilot.items():
-        for r in rows:
-            msg = refused(ex.written_record, n, r)
-            if msg or not r.get("register"):
-                bad.append(msg or f"{n}: no register")
-            elif not any(x["ja"] == r["ja"] and x.get("register") == r["register"] for x in mcd[n]):
-                bad.append(f"{n}: not in mcd.json")
-            elif mcd[n][0]["ja"] == r["ja"]:
-                bad.append(f"{n}: displaced passage 1")
-    total = sum(map(len, pilot.values()))
-    ok(f"the pilot batch ({total} passages, {len(pilot)} words) passes every rule and sits after each word's earlier passages in mcd.json",
-       not bad and total == 54 and len(pilot) == 20, " | ".join(bad[:3]))
+    for f in batches:
+        for n, rows in json.loads(f.read_text("utf-8")).items():
+            for r in rows:
+                msg = refused(ex.written_record, n, r)
+                if msg or not r.get("register"):
+                    bad.append(msg or f"{n}: no register")
+                want.setdefault(n, []).append(r["ja"])
+    pilot = json.loads((ex.SRC / "mcd" / "pilot-2026-10-04.json").read_text("utf-8"))
+    total = sum(map(len, want.values()))
+    ok(f"the v2 batches ({len(batches)} files, {total} passages, {len(want)} words) pass every rule; the pilot is 54 passages for 20 words",
+       not bad and len(batches) == 32 and sum(map(len, pilot.values())) == 54 and len(pilot) == 20, " | ".join(bad[:3]))
+    order = [n for n, rows in mcd.items() if [r["ja"] for r in rows[:len(want.get(n, []))]] != want.get(n, [])
+             or any(r.get("register") for r in rows[len(want.get(n, [])):])]
+    ok(f"in mcd.json every word ({len(mcd)}) starts with its v2 passages, in batch order, then its earlier ones (none of which has a register)",
+       not order and set(want) == set(mcd) and all(mcd[n][0].get("register") for n in mcd), " ".join(order[:5]))
 
     # 7. check 4, mechanised
     ja = "各国は工場誘致を競っている。新しい半導体は性能が高く、生得的な差ではない。"

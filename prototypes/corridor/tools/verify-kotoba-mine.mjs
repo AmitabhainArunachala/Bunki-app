@@ -2,9 +2,10 @@
  * 言葉の鉱脈 deck + 覚える save-chooser verifier. Done = this is green.
  *
  * Half one reads the shipped deck as DATA: 323 words, each with one or more
- * sentences (mostly mined from real Japanese, each naming its source), every
- * card's ruby spells its sentence with exactly one marked word, and the
- * marked word carries a kana reading.
+ * passages (written for the deck to contract v2 first, then mined from real
+ * Japanese or written earlier, each naming its source), every card's ruby
+ * spells its passage with exactly one marked word, and the marked word carries
+ * a kana reading.
  *
  * Half two drives the corridor in real Chromium:
  *   · 集中道場 › デッキ lists the deck; opening it shows the deck home;
@@ -107,6 +108,13 @@
  * tier one and the register and topic as small chips in the chip row; and a tapped word that is
  * not the deck's own shows a Japanese sense from that table in the entry sheet.
  *
+ * Then the full passage run (STANDARD A49, A50): 323 words, 2435 cards (1897 語, 538 字) over 1897
+ * passages, 954 of them contract v2 (54 pilot, 900 full run) and 454 mined; every word opens on a
+ * contract-v2 passage and its v2 passages run unbroken from passage 1; every 字 card points at its
+ * origin passage (the word's first older passage, the one its id was minted on) and no v2 passage
+ * has one; a usage note, where a v2 passage has one, is one Japanese line. In the browser a
+ * full-run card (論, 話) shows its 4–5 sentences, and its back puts tipJa in tier one.
+ *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
@@ -128,6 +136,7 @@ const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
 const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mcd/deck.json');
 const SENTENCE_DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
 const IDS_PATH = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/source/ids.json');
+const PILOT_PATH = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/source/mcd/pilot-2026-10-04.json');
 const RUBY_FIXTURES_PATH = resolve(CORRIDOR_DIR, '../../tools/kotoba-deck-ruby.fixtures.json');
 
 const MIME = {
@@ -175,7 +184,7 @@ function verifyDeck() {
   check('323 words, each with one or more sentences, best first', deck.words.length === 323 && deck.words.every((w) => w.cards.length && w.cards.map((c) => c.lv).join() === w.cards.map((_, i) => i + 1).join()), `${deck.words.length} words · ${cards.length} cards`);
   const passages = new Map(cards.map((c) => [`${c.word.id}:${c.ja}`, c]));
   const real = [...passages.values()].filter((c) => c.kind !== 'original');
-  check('every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length / passages.size >= 0.4, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
+  check('every passage names its source; real mined passages and passages written for the deck', cards.every((c) => c.kind && c.src && (c.src.url || c.src.site)) && real.length > 0 && real.length < passages.size, `${passages.size} passages · ${real.length} mined · ${passages.size - real.length} written`);
   const mcd = cards.filter((c) => c.type);
   check('MCD: one word asked per card — 語 cards blank the word (and any repeat of it), 字 cards one kanji with its reading as the hint', mcd.length === cards.length && mcd.every((c) => c.type === 'word' || (c.type === 'kanji' && c.hint)) && !!deck.method?.length, `${cards.filter((c) => c.type === 'word').length} 語 · ${cards.filter((c) => c.type === 'kanji').length} 字`);
   const bad = [];
@@ -725,8 +734,12 @@ async function verifyHost(browser, base) {
 
 /* ------------------------------------- the passage pilot (STANDARD A46, CARD_CONTRACT_V2 §2–§7) */
 const REGISTERS = { 講: '講義', 報: '報道', 論: '論説', 話: '会話', 学: '学び', 語: '話し方' };
+// the register chip's full name (its title and aria-label, mount.js REGISTER)
+const REGISTER_NAMES = { 講: '講義・本の要約', 報: 'ニュース・解説', 論: 'エッセイ・思想', 話: '話し言葉', 学: '勉強法・学習の話', 語: '話し方・書き方の話' };
 const TOPICS = { mind: '心と学び', india: 'インド・仏教', ai: 'AI・半導体', history: '世界史', language: '日本語' };
 const PILOT_CARD = 'km-240-m06'; // 習得, 講 / history: 『解体新書』の蘭学者たち
+// two full-run cards (source/mcd/v2-2026-10-05-b*.json), other registers than the pilot card's
+const FULL_RUN_CARDS = ['km-064-m08', 'km-110-m07']; // 財政, 論 / india: 寺の財政 · 利率, 話 / ai: ローンの比較
 
 function pilotCards(deck) {
   return deck.words.flatMap((w) => w.cards.filter((c) => c.register).map((c) => ({ ...c, word: w })));
@@ -743,38 +756,70 @@ function verifyPilotData(deck) {
     if (c.type !== 'word' || marks.length !== 1 || marks[0][2] !== 1 || c.ja.split(c.form).length !== 2) bad.push(`${c.id}: target not once`);
     if (c.kind !== 'original' || c.src?.licence !== 'Bunki original') bad.push(`${c.id}: not written for the deck`);
     if (!REGISTERS[c.register] || !TOPICS[c.topic]) bad.push(`${c.id}: register ${c.register} topic ${c.topic}`);
-    if (typeof c.tipJa !== 'string' || !c.tipJa || /[A-Za-z]/.test(c.tipJa)) bad.push(`${c.id}: tipJa`);
+    // a usage note only when the passage needs one (contract §3 item 4): one Japanese line where present
+    if (c.tipJa != null && (typeof c.tipJa !== 'string' || !c.tipJa || c.tipJa.length > 80 || /[A-Za-z\n]/.test(c.tipJa))) bad.push(`${c.id}: tipJa`);
     if (!c.enTarget || !c.en.includes(c.enTarget)) bad.push(`${c.id}: no target-sentence English`);
     if (c.grammar && !c.grammar.every((g) => g.id && g.p)) bad.push(`${c.id}: grammar`);
     if (c.sense != null && (typeof c.sense !== 'string' || !c.sense || c.sense.length > 40 || /[A-Za-z]/.test(c.sense))) bad.push(`${c.id}: sense`);
   }
   const words = [...new Set(cards.map((c) => c.word.id))];
   check(
-    'pilot: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note, a Japanese sense where it names one, and its target sentence’s English',
+    'pilot and full run: every contract-v2 card is 4–5 sentences of 180–300 characters, the target once, written for the deck, with a register, a topic, a Japanese usage note and a Japanese sense where it names them, and its target sentence’s English',
     cards.length >= 54 && bad.length === 0,
-    bad.slice(0, 4).join(' | ') || `${cards.length} cards · ${words.length} words · ${Object.keys(REGISTERS).map((r) => `${r}${cards.filter((c) => c.register === r).length}`).join(' ')}`,
+    bad.slice(0, 4).join(' | ') || `${cards.length} cards · ${words.length} words · ${Object.keys(REGISTERS).map((r) => `${r}${cards.filter((c) => c.register === r).length}`).join(' ')} · tipJa ${cards.filter((c) => c.tipJa).length} · sense ${cards.filter((c) => c.sense).length}`,
   );
   const same = words.filter((wid) => {
     const regs = cards.filter((c) => c.word.id === wid).map((c) => c.register);
     return new Set(regs).size !== regs.length;
   });
+  // A49: a word's contract-v2 passages come first, in one unbroken run from its first card
   const after = deck.words.filter((w) => {
     const v2 = w.cards.map((c, i) => (c.register ? i : -1)).filter((i) => i >= 0);
-    return v2.length && (v2[0] === 0 || v2.some((i, k) => k && i !== v2[k - 1] + 1));
+    return v2.length && v2.some((i, k) => i !== k);
   });
-  check('pilot: a word’s v2 passages differ in register (§5) and follow its earlier passages, never displacing passage 1 (its 字 cards keep their ids)', same.length === 0 && after.length === 0, [...same, ...after.map((w) => w.id)].join(' ') || `${words.length} words`);
+  check('pilot and full run: a word’s v2 passages differ in register (§5) and come first, unbroken from its first card (A49)', same.length === 0 && after.length === 0, [...same, ...after.map((w) => w.id)].join(' ') || `${words.length} words`);
   const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
   const ids = new Set(deck.words.map((w) => w.id));
   const lemmas = Object.keys(side.defs).filter((k) => !ids.has(k));
   check('pilot: the MCD tokens file carries Japanese senses for words that are not the deck’s own (gloss_ja.json), beside one definition per deck word', lemmas.length > 500 && deck.words.every((w) => side.defs[w.id]), `${lemmas.length} lemma senses · ${ids.size} deck words`);
 }
 
-async function verifyPilot(browser, base) {
+/* ------------------------------------- the full passage run (STANDARD A49, A50) */
+function verifyFullRunData(deck) {
+  const cards = deck.words.flatMap((w) => w.cards.map((c) => ({ ...c, word: w })));
+  const words = cards.filter((c) => c.type === 'word');
+  const kanji = cards.filter((c) => c.type === 'kanji');
+  const v2 = words.filter((c) => c.register);
+  const mined = words.filter((c) => c.kind !== 'original');
+  const pilot = new Set(Object.keys(readJson(PILOT_PATH)).map((n) => `km-${n.padStart(3, '0')}`));
+  const run = v2.filter((c) => !pilot.has(c.word.id));
+  check(
+    'full run (A50): 323 words, 2435 cards — 1897 語 (one per passage) and 538 字 — over 1897 passages: 954 contract v2 (54 pilot, 900 full run over 303 words), 454 mined',
+    deck.words.length === 323 && cards.length === 2435 && words.length === 1897 && kanji.length === 538 && new Set(words.map((c) => `${c.word.id}:${c.ja}`)).size === 1897 && v2.length === 954 && run.length === 900 && new Set(run.map((c) => c.word.id)).size === 303 && mined.length === 454,
+    `${deck.words.length} words · ${cards.length} cards · ${words.length} 語 · ${kanji.length} 字 · ${v2.length} v2 (${v2.length - run.length} pilot, ${run.length} full run, ${new Set(run.map((c) => c.word.id)).size} words) · ${mined.length} mined`,
+  );
+  const late = deck.words.filter((w) => !(w.cards[0].type === 'word' && w.cards[0].register && w.cards[0].passage === 1 && w.cards[0].lv === 1));
+  check('full run (A49): every word’s first passage is contract v2 — its first card is a 語 card with a register, passage 1, lv 1', late.length === 0, late.map((w) => w.id).join(' ') || `${deck.words.length}/${deck.words.length} words`);
+  // A49: the 字 cards stay on the passage they were made from (their ids were minted there): the
+  // word's first passage without a register; a v2 passage never has one
+  const strays = kanji.filter((c) => {
+    const origin = c.word.cards.find((x) => x.type === 'word' && !x.register);
+    return !origin || c.ja !== origin.ja || c.passage !== origin.passage || c.src?.site !== origin.src?.site;
+  });
+  const onV2 = kanji.filter((c) => v2.some((x) => x.word === c.word && x.ja === c.ja));
+  check(
+    'full run (A49): every 字 card points at its origin passage — the word’s first passage without a register, the one its id was minted on — and no contract-v2 passage has a 字 card',
+    strays.length === 0 && onV2.length === 0,
+    [...strays, ...onV2].slice(0, 4).map((c) => `${c.id} (passage ${c.passage})`).join(' | ') || `${kanji.length} 字 cards on ${new Set(kanji.map((c) => `${c.word.id}:${c.passage}`)).size} origin passages`,
+  );
+}
+
+async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') {
   const deck = readJson(DECK_PATH);
   const side = readJson(resolve(dirname(DECK_PATH), deck.tokens));
-  const card = pilotCards(deck).find((c) => c.id === PILOT_CARD);
+  const card = pilotCards(deck).find((c) => c.id === cardId);
   if (!card) {
-    check(`pilot: ${PILOT_CARD} is in the deck`, false);
+    check(`${label}: ${cardId} is in the deck`, false);
     return;
   }
   // a word of this passage that is not the deck's own and has a sense in the table: keyed as the
@@ -809,13 +854,16 @@ async function verifyPilot(browser, base) {
     const front = await page.evaluate(`(() => { const f = document.getElementById('kp-card'); return { id: f.dataset.card, sentences: f.querySelectorAll('.kp-sentence .kp-s').length, target: [...f.querySelectorAll('.kp-sentence .kp-target')].map((n) => n.textContent), rt: f.querySelectorAll('rt').length, blank: f.querySelectorAll('.kp-blank').length, text: f.querySelector('.kp-sentence').textContent,
       chips: [...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => n.textContent), reg: f.querySelector('.kp-chips .kp-regchip')?.getAttribute('aria-label') || '', rows: (() => { const tops = new Set([...f.querySelectorAll('.kp-chips .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))); return tops.size; })() }; })()`);
     check(
-      `pilot: ${card.id} (${card.word.term}, ${card.register}/${card.topic}) shows its ${sentenceEnds(card.ja).length} sentences with the target marked once, no readings, no gap`,
+      `${label}: ${card.id} (${card.word.term}, ${card.register}/${card.topic}) shows its ${sentenceEnds(card.ja).length} sentences with the target marked once, no readings, no gap`,
       front.id === card.id && front.sentences === sentenceEnds(card.ja).length && front.sentences >= 4 && front.target.length === 1 && front.target[0] === card.form && front.rt === 0 && front.blank === 0 && front.text === card.ja,
       JSON.stringify({ ...front, text: undefined }),
     );
+    // the pilot card's row (講, 世界史) fits one line at 390px; with a long topic chip (インド・仏教,
+    // AI・半導体, 心と学び) beside a level chip the row wraps once (flex-wrap; HANDOFF, what remains)
+    const rows = label === 'pilot' ? 1 : 2;
     check(
-      'pilot: the register and topic sit as small text chips in the card’s chip row (labelled in full), the passage’s topic in place of the word’s group, one row on a phone',
-      front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && front.reg.includes('講義') && front.rows === 1,
+      `${label}: the register and topic sit as small text chips in the card’s chip row (labelled in full), the passage’s topic in place of the word’s group, ${rows === 1 ? 'one row' : 'at most two rows'} on a phone`,
+      front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && front.reg === `文体：${REGISTER_NAMES[card.register]}` && front.rows <= rows,
       JSON.stringify({ chips: front.chips, reg: front.reg, rows: front.rows }),
     );
     await page.click('#kp-reveal');
@@ -823,24 +871,28 @@ async function verifyPilot(browser, base) {
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok', { timeout: 15000 });
     const back = await page.evaluate(`(() => { const a = document.querySelector('#kp-card .kp-answer'); const kids = [...a.children].map((n) => n.className.split(' ')[0]); const note = a.querySelector(':scope > .kp-note'); return { kids, note: note?.textContent || '', lang: note?.closest('[lang]')?.lang, beforeFolds: kids.indexOf('kp-note') >= 0 && kids.indexOf('kp-note') < kids.indexOf('kp-folds'), afterDef: kids.indexOf('kp-note') === kids.indexOf('kp-def') + 1, grammar: [...document.querySelectorAll('#kp-see [data-grammar]')].map((n) => n.dataset.grammar) }; })()`);
     check(
-      'pilot: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese',
+      `${label}: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese`,
       back.note === card.tipJa && back.afterDef && back.beforeFolds && back.lang === 'ja',
       JSON.stringify(back),
     );
-    check('pilot: the passage’s grammar points appear in the back’s 文法 line', (card.grammar || []).every((g) => back.grammar.includes(g.id)), JSON.stringify({ want: (card.grammar || []).map((g) => g.id), got: back.grammar }));
+    check(`${label}: the passage’s grammar points appear in the back’s 文法 line`, (card.grammar || []).every((g) => back.grammar.includes(g.id)), JSON.stringify({ want: (card.grammar || []).map((g) => g.id), got: back.grammar }));
     let sheet = null;
     if (pick) {
-      const tok = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])').filter({ hasText: pick.s }).first();
-      await tok.click();
+      // the token whose text (its readings left out) is the picked surface: a ruby'd token's
+      // textContent carries its <rt>, so a text filter would miss 減れ in 減<rt>へ</rt>れ
+      await page.evaluate(`(() => { for (const n of document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])')) {
+        const c = n.cloneNode(true); c.querySelectorAll('rt, rp').forEach((r) => r.remove());
+        if (c.textContent === ${JSON.stringify(pick.s)}) { n.dataset.verifyPick = '1'; return; } } })()`);
+      await page.locator('#kp-card [data-verify-pick]').first().click();
       await page.waitForSelector('#kp-sheet');
       sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { term: s.querySelector('.kp-sheet-term')?.textContent, def: s.querySelector('.kp-sheet-def')?.textContent || '', none: s.querySelector('.kp-sheet-none')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck') }; })()`);
     }
     check(
-      `pilot: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the entry sheet, not 「まだ辞書にありません」`,
+      `${label}: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the entry sheet, not 「まだ辞書にありません」`,
       !!pick && !!sense && sheet?.def === sense && !sheet.none && !sheet.inDeck,
       JSON.stringify({ pick, sense, sheet }),
     );
-    check('pilot: no page errors', errors.length === 0, errors.slice(0, 2).join(' | '));
+    check(`${label}: no page errors`, errors.length === 0, errors.slice(0, 2).join(' | '));
   } finally {
     await context.close();
   }
@@ -1193,7 +1245,7 @@ async function verifyBack(browser, base) {
     const tier1 = b.order.slice(0, b.order.indexOf('kp-folds'));
     check(
       'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English',
-      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k)) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null,
+      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null,
       JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare }),
     );
     const sibs = w.cards.filter((x) => x.type === 'word' && x.passage !== c.passage);
@@ -1400,36 +1452,43 @@ async function verifyBack(browser, base) {
   }
 
   // 5, A39) the standalone study pages have no host header: the settling scroll never slides the
-  // study top bar (× n/N 削除) under the top edge of the screen, and tier one still sits above the bar
+  // study top bar (× n/N 削除) under the top edge of the screen when the target sentence, word and
+  // definition fit under it, and tier one still sits above the bar. A word's first passage is a
+  // long contract-v2 one since A49: there the word and definition win the scroll (A39), so the
+  // top bar may leave the screen; a short passage (km-064-m01, due) keeps it.
   {
     const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
     const seen = [];
     try {
-      for (const [page, deck] of [
-        ['study-mcd.html', 'kotoba-mcd'],
-        ['study.html', 'kotoba-mine'],
+      for (const [page, deck, state, short] of [
+        ['study-mcd.html', 'kotoba-mcd', ledger('kotoba-mcd', 'km-064-m01'), true],
+        ['study-mcd.html', 'kotoba-mcd', null, false],
+        ['study.html', 'kotoba-mine', null, true],
       ]) {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-        await context.addInitScript(`try { localStorage.setItem('bunki-cloze:prefs:v3:${deck}', '{"look":"ai"}'); } catch {}`);
+        const prefs = JSON.stringify(state ? { look: 'ai', newPerDay: 0 } : { look: 'ai' });
+        await context.addInitScript(`try { localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(prefs)});
+          ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } catch {}`);
         const p = await context.newPage();
         await p.goto(`${release.base}/${page}`, { waitUntil: 'load' });
         await p.waitForSelector('#kp-start', { timeout: 30000 });
         await p.click('#kp-start');
         await p.waitForSelector('#kp-card');
+        const card = await p.evaluate(`document.getElementById('kp-card').dataset.card`);
         await p.click('#kp-reveal');
         await p.waitForSelector('.kp-grade');
         await p.evaluate(RESTING);
         const rest = await p.evaluate(AT_REST);
         const head = await p.evaluate(`Math.round(document.querySelector('.kp-top-study').getBoundingClientRect().top)`);
-        seen.push({ page, head, ...rest });
+        seen.push({ page, card, short, head, ...rest });
         await context.close();
       }
     } finally {
       release.server.close();
     }
     check(
-      '5, A39) standalone study pages (no host header): at rest after the reveal the study top bar is still on screen (its top ≥ 0) and the word and definition sit above the pinned bar',
-      seen.length === 2 && seen.every((x) => x.head >= 0 && x.term <= x.bar && x.def <= x.bar),
+      '5, A39) standalone study pages (no host header): at rest after the reveal the word and definition sit above the pinned bar, and the study top bar is still on screen (its top ≥ 0) on a short passage; on a long contract-v2 first passage the word and definition win the scroll',
+      seen.length === 3 && seen.every((x) => (!x.short || x.head >= 0) && x.term <= x.bar && x.def <= x.bar) && seen[0].card === 'km-064-m01' && index.get(seen[1].card)?.c.register,
       JSON.stringify(seen),
     );
   }
@@ -1554,8 +1613,9 @@ async function verifyBack(browser, base) {
     const [fresh, learning, review, none] = seen;
     check(
       'c) 類語 appears only when the word has entries and the card is in review state (closed, after 漢字), never on a new or learning card; a card in review opens 焦点',
-      seen.every((x) => x.id === 'km-064-m01' && x.order) && !fresh.sem && !learning.sem && review.sem && review.closed && review.text.includes('家計') && !none.sem && fresh.zoom === 'full' && review.zoom === 'focus',
-      JSON.stringify(seen.map(({ label, sem, zoom }) => ({ label, sem, zoom }))),
+      // the new card is the word's first passage (a contract-v2 one since A49), the others km-064-m01
+      seen.every((x) => x.id === (x === fresh ? index.get(x.id)?.w.cards[0].id : 'km-064-m01') && x.order) && index.get(fresh.id)?.w.id === 'km-064' && !fresh.sem && !learning.sem && review.sem && review.closed && review.text.includes('家計') && !none.sem && fresh.zoom === 'full' && review.zoom === 'focus',
+      JSON.stringify(seen.map(({ label, id, sem, zoom }) => ({ label, id, sem, zoom }))),
     );
   }
 }
@@ -1581,10 +1641,19 @@ async function verifyReviewData(decks) {
     const culled = (d, ids) => ({ ...emptyState(d.id), suspended: Object.fromEntries(ids.map((id) => [id, { at: now.toISOString(), by: 'delete' }])) });
     const freshOf = (d, wordId, ids) => buildQueue({ ...d, words: d.words.filter((w) => w.id === wordId) }, culled(d, ids), now, 5).fresh;
     const [mcd, mine] = decks;
-    const got = { mcd: freshOf(mcd, 'km-064', ['km-064-m01']), mcdKanji: freshOf(mcd, 'km-064', ['km-064-m02']), mine: freshOf(mine, 'km-064', ['km-064-1']) };
+    // km-064 opens on its three contract-v2 passages (m06–m08, A49); m01 is the first older one,
+    // with the 字 cards m02 and m03, then m04
+    const v2 = ['km-064-m06', 'km-064-m07', 'km-064-m08'];
+    const got = {
+      mcd: freshOf(mcd, 'km-064', ['km-064-m06']),
+      mcdOrigin: freshOf(mcd, 'km-064', [...v2, 'km-064-m01']),
+      mcdKanji: freshOf(mcd, 'km-064', ['km-064-m02']),
+      mine: freshOf(mine, 'km-064', ['km-064-1']),
+    };
     check(
       'a) 削除 on a card never shown does not hold the word: the next passage (not that passage\'s 字 cards) becomes its first; deleting a 字 card leaves its passage first',
-      got.mcd.join() === 'km-064-m04' && got.mcdKanji.join() === 'km-064-m01' && got.mine.join() === 'km-064-2',
+      mcd.words.find((w) => w.id === 'km-064').cards.slice(0, 4).map((c) => c.id).join() === [...v2, 'km-064-m01'].join() &&
+        got.mcd.join() === 'km-064-m07' && got.mcdOrigin.join() === 'km-064-m04' && got.mcdKanji.join() === 'km-064-m06' && got.mine.join() === 'km-064-2',
       JSON.stringify(got),
     );
   }
@@ -1654,6 +1723,13 @@ async function verifyReviewData(decks) {
 
 async function verifyReview(browser, base) {
   const mcdDeck = readJson(DECK_PATH);
+  // the card 別の文に替える puts in a leech's place (engine swapTarget): the word's first 語 card of
+  // another passage that was never shown — for km-064-m01, its first contract-v2 passage (A49)
+  const swapOf = (id) => {
+    const w = mcdDeck.words.find((x) => x.cards.some((c) => c.id === id));
+    const from = w.cards.find((c) => c.id === id);
+    return w.cards.find((c) => c.id !== id && c.type === from.type && c.passage !== from.passage);
+  };
   const card = (id, { state = 2, lapses = 0, due = '2020-01-01T00:00:00.000Z' } = {}) => ({ [id]: { due, stability: state === 2 ? 20 : 1, difficulty: 5, state, reps: 6, lapses, elapsed_days: 1, scheduled_days: 1, last_review: '2026-09-01T00:00:00.000Z' } });
   const ledger = (deck, cards, extra = {}) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: Object.assign({}, ...cards), ...extra });
   const LATER = '2099-01-01T00:00:00.000Z';
@@ -1771,7 +1847,7 @@ async function verifyReview(browser, base) {
       const noLadder = await o.page.locator('#kp-ladder').count();
       check(
         'b) a card with 5 lapses shows the repair ladder after tier one (the definition or usage note) and before the folds, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
-        ladder && ladder.head === 'この文で5回つまずいています' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith('文章2へ') && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
+        ladder && ladder.head === 'この文で5回つまずいています' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith(`文章${swapOf('km-064-m01').passage}へ`) && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
         JSON.stringify({ ladder, second: second.id, noLadder }),
       );
       check(
@@ -1823,7 +1899,7 @@ async function verifyReview(browser, base) {
       await o.boot();
       await start(o.page);
       const reloaded = await onScreen(o.page);
-      const target = mcdDeck.words.find((w) => w.id === 'km-064').cards.find((c) => c.type === 'word' && c.passage === 2);
+      const target = swapOf('km-064-m01');
       check(
         'b) 別の文に替える: one tap suspends the leech (record and the word\'s other progress kept), logs the swap, and puts the word\'s next unseen passage on screen, due at once — still first after a reload',
         now.id === target.id && !now.revealed && now.count === '1/1' && /別の文に替えました/.test(now.toast) && now.undo && l.suspended['km-064-m01']?.by === 'swap' && l.repairs['km-064-m01']?.swap === target.id && JSON.stringify(l.cards['km-064-m01']) === JSON.stringify(before.cards['km-064-m01']) && !l.cards[target.id] && l.repairLog.at(-1).join('|').startsWith(`km-064-m01|swap|`) && l.repairLog.at(-1)[3] === target.id && reloaded.id === target.id && reloaded.count === '1/1',
@@ -2251,6 +2327,7 @@ async function main() {
   verifyBackData([deck, sentences]);
   verifyBackParity();
   verifyPilotData(deck);
+  verifyFullRunData(deck);
   const said = (d) => (d.method ?? []).join('');
   check('the method text names the same two buttons the player shows (もう一度／思い出せた), never 覚えた', said(deck).includes('「もう一度／思い出せた」') && said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
@@ -2372,6 +2449,9 @@ async function main() {
 
     console.log('\n— the passage pilot (STANDARD A46): 4–5 sentences, tipJa in tier one, register and topic chips, Japanese senses');
     await verifyPilot(browser, base);
+
+    console.log('\n— the full passage run (STANDARD A49, A50): a full-run passage on the card, tipJa in tier one');
+    for (const id of FULL_RUN_CARDS) await verifyPilot(browser, base, id, 'full run');
 
     console.log('\n— the back hierarchy (CARD_CONTRACT_V2 §2–§4): front pin, tiers, folds, zoom, grade bar');
     await verifyBack(browser, base);

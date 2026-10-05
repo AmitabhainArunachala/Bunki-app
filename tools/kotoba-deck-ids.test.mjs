@@ -8,6 +8,11 @@
  *   MCD 字  `${wid}|kanji|${sha1(ja)[:12]}|${k}`  (k: the kanji's index in the word's parts)
  *   文      `${wid}|sentence|${sha1(ja)[:12]}`
  *
+ * Since 2026-10-05 (STANDARD A49) each word's contract-v2 passages (they carry a register) come
+ * first and its earlier passages follow; the 字 cards stay on the word's origin passage (its first
+ * passage without a register, passage 1 before the reorder), so no id moves and no v2 passage
+ * has a 字 card.
+ *
  * The data checks always run. The build checks run decks/kotoba-mine/tools/build.py
  * and are skipped, saying why, when python3 with fugashi and unidic-lite is missing.
  */
@@ -77,6 +82,70 @@ describe('the shipped decks take their card ids from ids.json', () => {
   }
 });
 
+/** a word's passages in deck order: [passage number, its 語 card] */
+const passagesOf = (w) => w.cards.filter((c) => c.type === 'word').map((c) => [c.passage, c]);
+/** the word's origin passage: its first passage without a register (build.py origin_passage) */
+const originOf = (w) => passagesOf(w).find(([, c]) => !c.register)?.[1] ?? null;
+
+describe('kotoba-mcd: contract-v2 passages first, 字 cards on their origin passage (A49)', () => {
+  const deck = shippedDeck('kotoba-mcd');
+  const ids = manifest['kotoba-mcd'];
+
+  it('every word starts with a contract-v2 passage, and its v2 passages all come before its earlier ones', () => {
+    const wrong = deck.words
+      .filter((w) => {
+        const v2 = passagesOf(w).map(([, c]) => !!c.register);
+        return !v2[0] || v2.some((x, i) => i > 0 && x && !v2[i - 1]);
+      })
+      .map((w) => w.id);
+    expect(wrong).toEqual([]);
+    expect(deck.words.length).toBe(323);
+  });
+
+  it('passage numbers and lv follow the new order (1…n, with the 字 cards right after their passage)', () => {
+    const wrong = deck.words
+      .filter(
+        (w) =>
+          w.cards.map((c) => c.lv).join() !== w.cards.map((_, i) => i + 1).join() ||
+          passagesOf(w)
+            .map(([n]) => n)
+            .join() !==
+            passagesOf(w)
+              .map((_, i) => i + 1)
+              .join(),
+      )
+      .map((w) => w.id);
+    expect(wrong).toEqual([]);
+  });
+
+  it('every 字 card still points at its origin passage: the same passage text and number as the word’s first passage without a register, and the id ids.json gave that key', () => {
+    const wrong = [];
+    let n = 0;
+    for (const w of deck.words) {
+      const origin = originOf(w);
+      for (const c of w.cards.filter((x) => x.type === 'kanji')) {
+        n += 1;
+        if (
+          !origin ||
+          c.ja !== origin.ja ||
+          c.passage !== origin.passage ||
+          c.register ||
+          ids[cardKey(w.id, c)] !== c.id
+        )
+          wrong.push(c.id);
+      }
+    }
+    expect(wrong).toEqual([]);
+    expect(n).toBe(538);
+    // and every 字 key in the manifest names the origin passage's text
+    const origins = new Map(deck.words.map((w) => [w.id, sha12(originOf(w)?.ja ?? '')]));
+    const stray = Object.keys(ids)
+      .filter((key) => key.split('|')[1] === 'kanji')
+      .filter((key) => key.split('|')[2] !== origins.get(key.split('|')[0]));
+    expect(stray).toEqual([]);
+  });
+});
+
 const probe = spawnSync('python3', ['-c', 'import fugashi, unidic_lite'], { encoding: 'utf8' });
 const noPython =
   probe.error || probe.status !== 0
@@ -90,9 +159,9 @@ describe.skipIf(!!noPython)(
     const tmp = mkdtempSync(join(tmpdir(), 'kotoba-ids-'));
     afterAll(() => rmSync(tmp, { recursive: true, force: true }));
     const mcd = readJson(resolve(SRC, 'mcd.json'));
-    // passages 2 and 3, not 1: 字 cards are made from the first passage only, so
-    // moving passage 1 changes which cards exist, not just their order
-    const n = Object.keys(mcd).find((key) => mcd[key].length >= 3);
+    // passages 2 and 3 (both contract v2): 字 cards are made from the origin passage (the first
+    // without a register), so moving that one changes which cards exist, not just their order
+    const n = Object.keys(mcd).find((key) => mcd[key].length >= 3 && mcd[key][2].register);
     const wid = `km-${n.padStart(3, '0')}`;
 
     const build = (name, source, ...flags) => {
@@ -125,6 +194,27 @@ describe.skipIf(!!noPython)(
       const old = shippedDeck('kotoba-mcd').words.find((w) => w.id === wid).cards;
       expect(moved.map((c) => c.id)).not.toEqual(old.map((c) => c.id));
       expect(moved.map((c) => c.lv)).toEqual(old.map((c) => c.lv));
+    });
+
+    it('the v2 passages put back after the older ones (the order before A49): only lv and passage move; same ids, same 字 cards on the same passage', () => {
+      const old = Object.fromEntries(
+        Object.entries(mcd).map(([key, rows]) => [
+          key,
+          [...rows.filter((p) => !p.register), ...rows.filter((p) => p.register)],
+        ]),
+      );
+      const { run, deck } = build('v2-last', old, '--frozen');
+      expect(run.status, run.stderr).toBe(0);
+      const before = byKey(shippedDeck('kotoba-mcd'));
+      const after = byKey(deck('kotoba-mcd'));
+      const ids = (m) => Object.fromEntries([...m].map(([key, c]) => [key, c.id]));
+      expect(ids(after)).toEqual(ids(before));
+      for (const [key, c] of after)
+        expect(without(c, 'lv', 'passage'), key).toEqual(without(before.get(key), 'lv', 'passage'));
+      // in the old order the origin passage is passage 1 again, its 字 cards with it
+      const w = deck('kotoba-mcd').words.find((x) => x.id === wid);
+      expect(w.cards[0].register).toBeUndefined();
+      expect(w.cards.filter((c) => c.type === 'kanji').every((c) => c.passage === 1)).toBe(true);
     });
 
     it('a changed passage fails under --frozen, naming its key', () => {

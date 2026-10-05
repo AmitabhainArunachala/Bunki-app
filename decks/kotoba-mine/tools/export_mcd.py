@@ -4,9 +4,12 @@ passage's source taken from the mined candidates.
 
 Undated files (s1–s6, preview.json) are read first, in name order, then dated batches
 (<name>-YYYY-MM-DD.json, such as pilot-2026-10-04.json) by date; a word's passages are
-concatenated across files in that order, so a later batch adds passages after a word's
-existing ones and never replaces or reorders them: the first passage, which carries the 字
-cards, and every existing card id stay as they are.
+gathered across files in that order (a later batch never replaces a word's passages). Then
+each word's contract-v2 passages (those with a `register`) are put first, in that order, and
+its earlier passages follow in theirs (the learner's call, 2026-10-05: a word is met first in a
+contract-v2 passage). Card ids do not move: build.py takes them from source/ids.json by passage
+text, and keeps the 字 cards on the word's origin passage, its first passage without a
+register (passage 1 before the reorder), so no 字 card is made from a v2 passage.
 
 Written passages (original: true) are checked here (REVIEW_MCD.md):
   - no whitespace; `form` occurs in `ja`;
@@ -170,6 +173,11 @@ def check_one_target(n: str, r: dict) -> None:
         raise SystemExit(f"{where} allow lists {'、'.join(map(str, stale))}, which the passage does not use")
 
 
+def v2_first(rows: list[dict]) -> list[dict]:
+    """a word's passages with the contract-v2 ones (a `register`) first, each group in the order read"""
+    return [r for r in rows if r.get("register")] + [r for r in rows if not r.get("register")]
+
+
 def batch_order(path: str) -> tuple[str, str]:
     """undated files first, then dated batches by date"""
     m = re.search(r"\d{4}-\d{2}-\d{2}", Path(path).name)
@@ -217,6 +225,8 @@ def main() -> int:
                 res.append({"ja": r["ja"], "form": form, "en": r["en"], "kind": p.get("kind", "other"), "site": p.get("site", ""),
                             "url": p.get("url", ""), "licence": p.get("licence") or UNVERIFIED, "title": p.get("title", ""),
                             **{k: p[k] for k in ("author", "translator") if p.get(k)}, **extra})
+    for n, rows in out.items():
+        out[n] = v2_first(rows)
     (SRC / "mcd.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", "utf-8")
     orig = sum(1 for rows in out.values() for r in rows if r["kind"] == "original")
     v2 = sum(1 for rows in out.values() for r in rows if r.get("register"))
