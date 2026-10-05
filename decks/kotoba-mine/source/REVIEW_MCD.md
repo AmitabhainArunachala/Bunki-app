@@ -84,6 +84,13 @@ before it is added. A failure means a rewrite, not a patch:
 Give every passage one faithful, natural English translation **with the same number of
 sentences as the Japanese**, so the back can show the target sentence's 英訳 (contract §3 item 6;
 `export_mcd.py` refuses a mismatch). Inside a batch, order a word's passages 講 first.
+`export_mcd.py` puts every word's contract-v2 passages before its earlier ones (STANDARD A49), so
+the first passage in the batch is the one the learner meets first.
+
+The full run (STANDARD A50) ran the five checks as two judging lanes per passage: an editor lane
+(naturalness, one target, context does work) and a facts lane (facts, topic, level, grammar ids).
+A passage failing either lane is rewritten once and rechecked by the lane(s) it failed; one still
+failing is dropped. Keep the judges' verdict journals until the batch is committed and verified.
 
 ## Output
 

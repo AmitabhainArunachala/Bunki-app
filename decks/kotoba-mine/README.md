@@ -10,7 +10,7 @@ Each has its own progress and its own colour theme.
 
 | Deck                | What it is                                                               | Theme     | Open with      | Offline file     | Anki               |
 | ------------------- | ------------------------------------------------------------------------ | --------- | -------------- | ---------------- | ------------------ |
-| **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (1,481 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
+| **言葉の鉱脈・MCD** | massive-context cloze: passages, one gap per card (2,435 cards)          | 藍 (Ai)   | `?deck=mcd`    | `study-mcd.html` | `kotoba-mcd.apkg`  |
 | **言葉の鉱脈・文**  | one real sentence per card, the word marked, read and recall (503 cards) | 墨 (Sumi) | `?deck=kotoba` | `study.html`     | `kotoba-mine.apkg` |
 
 ## The player: what a card looks like
@@ -86,24 +86,26 @@ of having 1 card with 9 unknowns, you have 9 cards with 1 unknown each."
     and how it is read. In 穴埋め the whole word is blanked, with no hint, and you recall
     it from its context; if the word appears twice in the passage, both are blanked.
   - **字 card** (穴埋め and 4択 only; 読んで思い出す leaves them out, records kept): one
-    kanji of the word is blanked, with its reading in the gap (〔ざい〕政難…). Recall the character in context. These come from the word's first
-    passage, one card per kanji. There is no 字 card when that kanji also appears
+    kanji of the word is blanked, with its reading in the gap (〔ざい〕政難…). Recall the character in context. These come from the word's origin
+    passage (its first passage before the contract-v2 ones were put first), one card per kanji. There is no 字 card when that kanji also appears
     elsewhere in the passage, or when the kanji table has no reading for it.
 - **Back:** the whole passage with furigana, the word with its reading, and the Japanese
   definition. Everything else is one tap deep (see **The player** above).
-- **Many passages per word.** Each word has 2–4 passages in different situations: news,
-  daily life, work, stories. Twenty words also have the contract-v2 pilot passages
-  (`source/mcd/pilot-2026-10-04.json`, STANDARD A46): 4–5 sentences, 180–300 characters, each
-  written to a register (講 報 論 話 学 語) and a topic, with its own Japanese usage note
-  (`tipJa`, shown in tier one) and the grammar points it exercises; they come after the
-  word's earlier passages, so no existing card moves. When one card is settled (3 days' stability), the next opens,
+- **Many passages per word.** Every word opens on its contract-v2 passages
+  (`source/mcd/pilot-2026-10-04.json` and `v2-2026-10-05-b01…b31.json`, STANDARD A46, A49, A50):
+  4–5 sentences, 180–300 characters, each written to a register (講 報 論 話 学 語) and a topic,
+  with its own Japanese usage note (`tipJa`, shown in tier one where it has one) and the grammar
+  points it exercises; 309 words have three, 13 two and one (手法) one. The word's earlier, shorter
+  passages (2–4 in news, daily life, work, stories) follow; their card ids never moved, only
+  their position. When one card is settled (3 days' stability), the next opens,
   so the word keeps coming back in new surroundings.
 - **Passages:**
   - **Real:** mined from livedoor news, Japanese Wikinews, Wikipedia, Aozora Bunko, the web
     and Tatoeba.
   - **Written for the deck:** natural, dense passages labelled 書き下ろし, built around the
     word's typical partners (財政が悪化する, 金利を引き上げる).
-  - Today the split is 454 real and 489 written, across 943 passages and 1,481 cards.
+  - Today the split is 454 real and 1,443 written (954 of them to contract v2), across 1,897
+    passages and 2,435 cards (1,897 語, 538 字).
 - **Grading:** もう一度／思い出せた (Again/Good) is all FSRS needs. Swipe left or right.
 - **On screen:** 設定 explains all this under **このデッキのしくみ**.
 
@@ -151,7 +153,7 @@ the old record as `bunki-cloze:<deck>:before-restore`.
   - put the clearest passage first, and translated every passage.
 - The writers' choices are in `source/mcd/*.json`; `tools/export_mcd.py` merges them into
   `source/mcd.json` (undated files first, then dated batches such as
-  `pilot-2026-10-04.json`, each adding passages after a word's existing ones), checking the
+  `pilot-2026-10-04.json`; then each word's contract-v2 passages are put first), checking the
   written-passage rules of `source/REVIEW_MCD.md` and the optional fields `register`, `topic`,
   `tipJa`, `grammar`, `sense`; `tools/build.py` turns it into cards and carries those fields
   onto them.
