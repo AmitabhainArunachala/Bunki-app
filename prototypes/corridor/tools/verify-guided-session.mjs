@@ -30,6 +30,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import AxeBuilder from '@axe-core/playwright';
+import { observeGuidedMomentPhases } from './guided-moment-observation.mjs';
 import {
   resolveCorridorEvidence,
   resolveCorridorSite,
@@ -196,6 +197,7 @@ async function journey(browser, browserName, viewport) {
   });
   const page = await context.newPage();
   const errors = [];
+  let momentObservation;
   watchErrors(page, errors);
   const overflowAt = [];
   const noOverflow = async (stage) => {
@@ -260,6 +262,7 @@ async function journey(browser, browserName, viewport) {
 
     // M · the samurai on a wrong answer (check-samurai)
     const before = await stored(page);
+    if (MOMENTS) momentObservation = await page.evaluateHandle(observeGuidedMomentPhases);
     await answer(page, 1);
     const t0 = Date.now();
     if (MOMENTS) {
@@ -275,14 +278,18 @@ async function journey(browser, browserName, viewport) {
       for (const ms of [650, 1350, 1950]) {
         await page.waitForTimeout(Math.max(0, ms - (Date.now() - t0)));
         await page.screenshot({ path: join(dir, `04-samurai-${ms}.png`) });
-        if (ms === 1350) {
-          check(
-            'M3 impact and paper break-up phases occur',
-            (await page.locator('.samurai-effect--impact.samurai-effect--resolve').count()) === 1,
-          );
-        }
       }
       await page.locator('.samurai-effect').waitFor({ state: 'detached', timeout: 5_000 });
+      const phases = await momentObservation.evaluate((observation) => observation.finish());
+      const phaseDetail = {
+        matched: phases.matched, ended: phases.ended, invalid: phases.invalid,
+        // Compact enough to retain all transitions in check()'s bounded detail field.
+        columns: 'ms,connected,count,impact,resolve',
+        timeline: phases.transitions.map((row) => [row.ms, +row.connected, row.overlays, +row.impact, +row.resolve]),
+      };
+      check('M3 impact and paper break-up phases occur', phases.pass, JSON.stringify(phaseDetail));
+      await momentObservation.dispose();
+      momentObservation = null;
     } else {
       await page.waitForTimeout(400);
       check(
@@ -754,6 +761,10 @@ async function journey(browser, browserName, viewport) {
     check('journey completed without an exception', false, error.message);
     await page.screenshot({ path: join(dir, 'zz-failure.png') }).catch(() => {});
   } finally {
+    if (momentObservation) {
+      await momentObservation.evaluate((observation) => observation.dispose()).catch(() => {});
+      await momentObservation.dispose();
+    }
     check('X3 no page errors', errors.length === 0, errors.join(' | '));
     problems.push(...errors.map((error) => `${current}: ${error}`));
     await context.close();

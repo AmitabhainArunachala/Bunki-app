@@ -250,23 +250,49 @@ async function ui(page, target) {
     };
   }, target);
 }
-async function pick(page, selector = '.word', allowed = null, required = true) {
-  const id = String(++targetSequence);
-  const found = await page.evaluate(({ id, selector, allowed }) => {
-    const candidates = [...document.querySelectorAll(`#drift-layer ${selector}`)].map((el) => {
-      const box = el.getBoundingClientRect();
-      const label = el.querySelector('.base,.g,.pch')?.textContent;
-      const x = box.x + box.width / 2, y = box.y + box.height / 2;
-      const hit = document.elementFromPoint(x, y)?.closest('.word,.glyph,.part');
-      return { el, label, x, y, hit, opacity: Number(el.style.opacity) };
-    }).filter((c) => c.hit === c.el && c.el.style.pointerEvents !== 'none' && c.opacity > (allowed ? 0.05 : 0.3) && c.x > 110 && c.x < innerWidth - 110 && c.y > 150 && c.y < innerHeight - 190 && (!allowed || allowed.includes(c.label)));
-    candidates.sort((a, b) => b.opacity - a.opacity);
-    const chosen = candidates[0];
-    if (!chosen) return null;
-    chosen.el.dataset.driftProbe = id;
-    return { id, label: chosen.label, x: chosen.x, y: chosen.y };
-  }, { id, selector, allowed });
-  if (required) assert(found, `A visible, hit-tested ${selector} must be reachable`);
+function reachableTarget({ id, selector, allowed, targetId = null, locked = false }) {
+  const candidates = [...document.querySelectorAll(`#drift-layer ${selector}`)].map((el) => {
+    const box = el.getBoundingClientRect();
+    const label = el.querySelector('.base,.g,.pch')?.textContent;
+    const x = box.x + box.width / 2, y = box.y + box.height / 2;
+    const hit = document.elementFromPoint(x, y)?.closest('.word,.glyph,.part');
+    return { el, label, x, y, hit, opacity: Number(el.style.opacity) };
+  }).filter((c) => c.hit === c.el && c.el.style.pointerEvents !== 'none' && c.opacity > (allowed ? 0.05 : 0.3) && c.x > 110 && c.x < innerWidth - 110 && c.y > 150 && c.y < innerHeight - 190 && (!allowed || allowed.includes(c.label)));
+  candidates.sort((a, b) => b.opacity - a.opacity);
+  const chosen = candidates.find((c) => (!targetId || c.el.dataset.driftProbe === targetId) && (!locked || (c.el.classList.contains('bctr') && Math.abs(c.x - innerWidth / 2) < 4 && Math.abs(c.y - innerHeight / 2) < 4)));
+  if (!chosen) return null;
+  chosen.el.dataset.driftProbe = id;
+  return { id, label: chosen.label, x: chosen.x, y: chosen.y };
+}
+async function targetDiagnostics(page, selector, allowed, targetId) {
+  return page.evaluate(({ selector, allowed, targetId }) => ({
+    viewport: { width: innerWidth, height: innerHeight }, selector, allowed, targetId,
+    candidates: [...document.querySelectorAll(`#drift-layer ${selector}`)].filter((el) => !allowed || allowed.includes(el.querySelector('.base,.g,.pch')?.textContent)).map((el) => {
+      const r = el.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
+      const hit = document.elementFromPoint(x, y), owner = hit?.closest('.word,.glyph,.part');
+      const style = getComputedStyle(el);
+      return { label: el.querySelector('.base,.g,.pch')?.textContent, probe: el.dataset.driftProbe ?? null, connected: el.isConnected, classes: el.className,
+        box: { x: r.x, y: r.y, width: r.width, height: r.height }, center: { x, y },
+        opacity: { inline: el.style.opacity, computed: style.opacity }, pointerEvents: { inline: el.style.pointerEvents, computed: style.pointerEvents },
+        ownsHit: owner === el, hitOwner: owner ? { label: owner.querySelector('.base,.g,.pch')?.textContent, classes: owner.className } : null,
+        hitElement: hit ? { tag: hit.tagName, id: hit.id, classes: hit.className } : null };
+    }),
+  }), { selector, allowed, targetId }).catch((error) => ({ diagnosticError: error.message }));
+}
+async function pick(page, selector = '.word', allowed = null, required = true, { timeoutMs = 0, targetId = null, locked = false } = {}) {
+  const id = targetId || String(++targetSequence);
+  const args = { id, selector, allowed, targetId, locked };
+  let found, waitError;
+  if (timeoutMs) {
+    try {
+      const handle = await page.waitForFunction(reachableTarget, args, { timeout: timeoutMs });
+      try { found = await handle.jsonValue(); } finally { await handle.dispose(); }
+    } catch (error) { waitError = error; }
+  } else found = await page.evaluate(reachableTarget, args);
+  if (required && !found) {
+    const diagnostics = await targetDiagnostics(page, selector, allowed, targetId);
+    assert(found, `A visible, hit-tested ${selector} must be reachable; readiness=${JSON.stringify({ locked, timeoutMs, waitError: waitError?.message, ...diagnostics })}`);
+  }
   return found;
 }
 async function aim(page, target) {
@@ -328,7 +354,10 @@ const cases = [
     // The existing fixture entry brings the exact failing lexical subject
     // into view. All release, placement, and bloom actions use real pointers.
     assert.equal(await page.evaluate(() => window.__lockWord('順')), true);
-    await page.waitForTimeout(1500);
+    // The real camera advances per rendered frame: elapsed wall time is not readiness.
+    // Retain the exact lexical subject and hit predicate; require the locked center
+    // to arrive within the existing four-pixel placement precision before release.
+    const lockedWord = await pick(page, '.word', ['順'], true, { timeoutMs: 30_000, locked: true });
     const water = await page.evaluate(() => {
       const bodies = [...document.querySelectorAll('#drift-layer .word.bctr, #drift-layer .word.bsat, #drift-layer .glyph')].map((el) => {
         const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
@@ -343,7 +372,7 @@ const cases = [
     assert(water, 'The staged lock needs a real open-water release');
     await page.mouse.click(water.x, water.y);
     await page.waitForFunction(() => !document.querySelector('#drift-layer .bctr'));
-    const word = await pick(page, '.word', ['順']);
+    const word = await pick(page, '.word', ['順'], true, { timeoutMs: 5000, targetId: lockedWord.id });
     const panFrom = await page.evaluate(() => {
       for (let y = 180; y <= 440; y += 20) for (let x = 180; x <= 320; x += 20) {
         if (!document.elementFromPoint(x, y)?.closest('.word,.glyph,.part,#lvl,#theme,#fixture-nav')) return { x, y };
