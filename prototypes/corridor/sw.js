@@ -13,7 +13,7 @@
 // The release builder prepends the SHA-256 of its sorted source asset paths
 // and digests. Every packaged change then gets a distinct atomic boot cache.
 // Unstaged development installs retain an explicit manually bumped fallback.
-const DEVELOPMENT_VERSION = 'kairo-v10-dev';
+const DEVELOPMENT_VERSION = 'kairo-v11-dev';
 const assetVersion = self.KAIRO_ASSET_VERSION;
 if (
   assetVersion !== undefined &&
@@ -118,9 +118,9 @@ const SHELL = [
   'data/original/grammar-v11.json',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
-  // …and their tokens side files (deck.tokens), so the back's tap targets draw offline too
-  'decks/kotoba-mine/tokens.json',
-  'decks/kotoba-mcd/tokens.json',
+  // Their tokens side files (deck.tokens, ~6.5 MB) are NOT precached: the fetch handler verifies
+  // and caches them on first use, so the back's tap targets work offline after one sitting while
+  // the install stays light (A52).
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

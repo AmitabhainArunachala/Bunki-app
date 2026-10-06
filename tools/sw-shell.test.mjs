@@ -100,13 +100,10 @@ describe('sw.js shell', () => {
     expect(outside).toEqual([]);
   });
 
-  it('precaches the deck player’s host adapter and both decks’ tokens files', () => {
-    for (const path of [
-      'decks/player/host.js',
-      'decks/kotoba-mine/tokens.json',
-      'decks/kotoba-mcd/tokens.json',
-    ]) {
-      expect(shell, path).toContain(path);
+  it('precaches the deck player’s host adapter but not the decks’ tokens files (A52)', () => {
+    expect(shell).toContain('decks/player/host.js');
+    for (const path of ['decks/kotoba-mine/tokens.json', 'decks/kotoba-mcd/tokens.json']) {
+      expect(shell, path).not.toContain(path);
     }
   });
 

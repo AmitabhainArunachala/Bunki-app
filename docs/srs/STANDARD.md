@@ -1082,3 +1082,13 @@ ledger field, the depth-2 cut-off and the standalone gloss-map fallback: A44. Se
 The passage pilot (2026-10-04): A46. The Japanese sense table: A47. Service worker: A48.
 Contract-v2 passages first, 字 cards on their origin passage: A49. The full passage run and its two
 judging lanes (2026-10-05): A50.
+
+**A52 (amends A45/S52).** The decks' tokens side files (`decks/kotoba-mine/tokens.json`,
+`decks/kotoba-mcd/tokens.json`, about 6.5 MB together) leave the worker's install-time SHELL.
+They stay shipped release files (`scripts/corridor-assets.mjs`), and the stamped fetch handler
+verifies each against the release digest and caches it on first use, so the back's tap targets
+work offline after one online sitting; a deck still opens offline on a first visit because
+`deck.json`, the player and `host.js` stay precached. Why: install fetches and checksums every
+SHELL file before a new release can activate, and the release verifier
+(`verify-later-encounters.mjs`) gives that install 30 seconds; the extra weight put WebKit runners
+at risk of missing it.
