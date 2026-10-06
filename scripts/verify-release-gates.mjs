@@ -3972,6 +3972,55 @@ export async function verifyWorkflows(root = ROOT) {
   };
   const needs = (job, expected, message) =>
     assert.deepEqual([...job.needs].sort(), [...expected].sort(), message);
+  for (const name of ['plan', 'fast-retry-plan', 'fast-signal', 'retry-plan', 'required']) {
+    const checkout = find(
+      ci.jobs[name],
+      (step) => step.uses === 'actions/checkout@v4',
+      `${name} requires one exact candidate checkout`,
+    );
+    assert.equal(
+      checkout.with?.['fetch-depth'],
+      name === 'plan' ? 2 : 1,
+      `${name} must fetch only its required candidate history`,
+    );
+    assert.equal(checkout.with?.['fetch-tags'], false, `${name} must not fetch unrelated tags`);
+    assert(
+      !Object.hasOwn(checkout, 'if') && !checkout['continue-on-error'],
+      `${name} candidate checkout cannot be skipped or swallowed`,
+    );
+  }
+  const parityStep = find(
+    ci.jobs.plan,
+    (step) =>
+      workflowShellCommands(step.run || '').some(
+        (argv) => argv[0] === 'node' && argv[1] === 'scripts/ci/parity.mjs',
+      ),
+    'Plan requires original gate parity',
+  );
+  const parityCommands = workflowShellCommands(parityStep.run);
+  const pinnedFetch = ['git', 'fetch', '--no-tags', '--depth=1', 'origin', '$base'];
+  assert(
+    parityCommands.some((argv) => isDeepStrictEqual(argv, pinnedFetch)),
+    'Parity must fetch the exact pinned original commit without unrelated histories',
+  );
+  assert(
+    parityCommands.some((argv) =>
+      isDeepStrictEqual(
+        argv,
+        node('scripts/ci/parity.mjs', '--base', '$base', '--out', '$RUNNER_TEMP/parity.json'),
+      ),
+    ),
+    'Parity must execute its original comparison after the pinned fetch',
+  );
+  assert(
+    parityCommands.findIndex((argv) => isDeepStrictEqual(argv, pinnedFetch)) <
+      parityCommands.findIndex((argv) => argv[1] === 'scripts/ci/parity.mjs'),
+    'Original commit must be available before parity',
+  );
+  assert(
+    !Object.hasOwn(parityStep, 'if') && !parityStep['continue-on-error'],
+    'Original gate parity cannot be skipped or swallowed',
+  );
   assert.equal(
     pages.concurrency.group,
     "${{ github.ref == 'refs/heads/main' && 'kairo-pages' || format('kairo-pages-test-{0}', github.ref) }}",
@@ -4618,6 +4667,157 @@ export async function verifyWorkflows(root = ROOT) {
   ];
 }
 
+/** Execute the actual plan commands against a depth-two synthetic PR merge. */
+export async function verifyWorkflowGitHistory(out, root = ROOT) {
+  const { parseDocument } = await import('yaml');
+  const { classifyPaths } = await import(pathToFileURL(join(root, 'scripts/ci/battery.mjs')).href);
+  const ci = parseDocument(readFileSync(join(root, '.github/workflows/ci.yml'), 'utf8')).toJS();
+  const fixture = join(out, 'workflow-git-history');
+  const origin = join(fixture, 'origin'),
+    checkout = join(fixture, 'checkout');
+  mkdirSync(join(origin, 'scripts/ci'), { recursive: true });
+  mkdirSync(join(origin, 'docs/operator'), { recursive: true });
+  const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const commit = (message) => {
+    git(origin, 'add', 'scripts', 'docs');
+    git(
+      origin,
+      '-c',
+      'user.name=Codex',
+      '-c',
+      'user.email=codex@openai.com',
+      'commit',
+      '-m',
+      message,
+    );
+    return git(origin, 'rev-parse', 'HEAD');
+  };
+  git(origin, 'init', '--initial-branch=base');
+  const baseline = JSON.parse(readFileSync(join(root, 'scripts/ci/gate-baseline.json'), 'utf8'));
+  writeFileSync(
+    join(origin, 'scripts/verify-release-gates.mjs'),
+    execFileSync('git', ['show', `${baseline.baseSha}:scripts/verify-release-gates.mjs`], {
+      cwd: root,
+      maxBuffer: 4 * 1024 * 1024,
+    }),
+  );
+  for (const file of [
+    'scripts/build-reading-module.mjs',
+    'scripts/corridor-assets.mjs',
+    'scripts/ci/parity.mjs',
+  ])
+    writeFileSync(join(origin, file), readFileSync(join(root, file)));
+  const pinned = commit('Original required gates');
+  writeFileSync(
+    join(origin, 'scripts/verify-release-gates.mjs'),
+    readFileSync(join(root, 'scripts/verify-release-gates.mjs')),
+  );
+  writeJson(join(origin, 'scripts/ci/gate-baseline.json'), { baseSha: pinned });
+  commit('Candidate policy with pinned original parity');
+  writeFileSync(join(origin, 'docs/base.md'), 'base\n');
+  commit('Shared ancestry');
+  git(origin, 'checkout', '-b', 'topic');
+  writeFileSync(join(origin, 'docs/operator/topic.md'), 'complete candidate change\n');
+  const topic = commit('Documentation candidate');
+  git(origin, 'checkout', 'base');
+  writeFileSync(join(origin, 'docs/base.md'), 'advanced base\n');
+  const base = commit('Base advanced after topic fork');
+  git(
+    origin,
+    '-c',
+    'user.name=Codex',
+    '-c',
+    'user.email=codex@openai.com',
+    'merge',
+    '--no-ff',
+    'topic',
+    '-m',
+    'Synthetic PR merge',
+  );
+  git(
+    fixture,
+    'clone',
+    '--no-tags',
+    '--depth=2',
+    '--branch=base',
+    pathToFileURL(origin).href,
+    checkout,
+  );
+  symlinkSync(join(root, 'node_modules'), join(checkout, 'node_modules'), 'dir');
+  symlinkSync(join(root, 'prototypes'), join(checkout, 'prototypes'), 'dir');
+  assert.equal(git(checkout, 'rev-parse', '--is-shallow-repository'), 'true');
+  assert.notEqual(
+    spawnSync('git', ['cat-file', '-e', `${pinned}^{commit}`], { cwd: checkout }).status,
+    0,
+    'Depth two must omit the historical parity commit',
+  );
+  const parityStep = ci.jobs.plan.steps.find((step) =>
+    workflowShellCommands(step.run || '').some((argv) => argv[1] === 'scripts/ci/parity.mjs'),
+  );
+  execFileSync('bash', ['-eo', 'pipefail', '-c', parityStep.run], {
+    cwd: checkout,
+    env: { ...process.env, RUNNER_TEMP: fixture },
+    maxBuffer: 4 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const parity = JSON.parse(readFileSync(join(fixture, 'parity.json'), 'utf8'));
+  assert.equal(parity.baseSha, pinned);
+  assert.deepEqual(parity.missing, []);
+  assert(parity.before.length > 100, 'Original parity must evaluate the real required gates');
+  assert.equal(git(checkout, 'rev-parse', '--is-shallow-repository'), 'true');
+  const diff = ci.jobs.plan.steps.find((step) => step.env?.BASE_SHA);
+  const cases = [
+    ['synthetic-merge', 'pull_request', base, ['docs/operator/topic.md'], 'docs'],
+    ['raced-base', 'pull_request', topic, [], 'full'],
+    ['missing-base', 'pull_request', 'f'.repeat(40), [], 'full'],
+    ['invalid-base', 'pull_request', 'not-a-sha', [], 'full'],
+    ['dispatch', 'workflow_dispatch', base, [], 'full'],
+  ];
+  const results = [];
+  for (const [name, event, sha, expected, scope] of cases) {
+    const directory = join(fixture, name);
+    mkdirSync(directory);
+    execFileSync('bash', ['-eo', 'pipefail', '-c', diff.run], {
+      cwd: checkout,
+      env: { ...process.env, RUNNER_TEMP: directory, GITHUB_EVENT_NAME: event, BASE_SHA: sha },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    const paths = JSON.parse(readFileSync(join(directory, 'paths.json'), 'utf8'));
+    assert.deepEqual(
+      paths,
+      expected,
+      `${name} must classify the complete candidate conservatively`,
+    );
+    assert.equal(classifyPaths(paths), scope);
+    results.push({ name, paths, scope });
+  }
+  for (const [name, sha] of [
+    ['unavailable-parity-commit', 'f'.repeat(40)],
+    ['invalid-parity-commit', 'main'],
+  ]) {
+    const directory = join(fixture, name);
+    mkdirSync(directory);
+    writeJson(join(checkout, 'scripts/ci/gate-baseline.json'), { baseSha: sha });
+    const result = spawnSync('bash', ['-eo', 'pipefail', '-c', parityStep.run], {
+      cwd: checkout,
+      env: { ...process.env, RUNNER_TEMP: directory },
+      encoding: 'utf8',
+    });
+    assert.notEqual(result.status, 0, `${name} must fail before parity admission`);
+    assert(!existsSync(join(directory, 'parity.json')), `${name} cannot report gate parity`);
+    results.push({ name, rejected: true });
+  }
+  writeJson(join(out, 'workflow-git-history.json'), {
+    depth: 2,
+    originalGateCount: parity.before.length,
+    missingOriginalGates: parity.missing,
+    results,
+  });
+  return [
+    'shallow synthetic PR merge retains complete diff, defaults full on races and fetches original parity',
+  ];
+}
+
 /** Mutated YAML is parsed by the same workflow validator used for release. */
 export async function verifyWorkflowFailures(out, root = ROOT) {
   const { parseDocument, stringify } = await import('yaml');
@@ -4645,6 +4845,57 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
     apple(ci).steps = apple(ci).steps.filter((step) => !predicate(step));
   };
   const cases = [
+    [
+      'unbounded-plan-checkout',
+      (ci) => {
+        ci.jobs.plan.steps[0].with['fetch-depth'] = 0;
+      },
+      /required candidate history/,
+    ],
+    [
+      'too-shallow-plan-checkout',
+      (ci) => {
+        ci.jobs.plan.steps[0].with['fetch-depth'] = 1;
+      },
+      /required candidate history/,
+    ],
+    [
+      'unbounded-admission-checkout',
+      (ci) => {
+        ci.jobs['fast-signal'].steps[0].with['fetch-depth'] = 0;
+      },
+      /required candidate history/,
+    ],
+    [
+      'unrelated-plan-tags',
+      (ci) => {
+        ci.jobs.plan.steps[0].with['fetch-tags'] = true;
+      },
+      /unrelated tags/,
+    ],
+    [
+      'commented-pinned-fetch',
+      (ci) => {
+        const step = ci.jobs.plan.steps.find((step) => step.run?.includes('git fetch --no-tags'));
+        step.run = step.run.replace('git fetch --no-tags', '# git fetch --no-tags');
+      },
+      /exact pinned original commit/,
+    ],
+    [
+      'wrong-pinned-fetch',
+      (ci) => {
+        const step = ci.jobs.plan.steps.find((step) => step.run?.includes('git fetch --no-tags'));
+        step.run = step.run.replace('origin "$base"', 'origin main');
+      },
+      /exact pinned original commit/,
+    ],
+    [
+      'conditional-parity-fetch',
+      (ci) => {
+        ci.jobs.plan.steps.find((step) => step.run?.includes('git fetch --no-tags')).if = false;
+      },
+      /parity cannot be skipped/,
+    ],
     [
       'missing-rpc-step',
       (ci) => remove(ci, (step) => step.id === 'native-rpc'),
@@ -5329,6 +5580,7 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
   });
   return [
     'workflow admission preserves all native controls and rejects incomplete DAGs, partial matrices, skipped assertions, unverified artifact transfer and weakened promotion',
+    ...(await verifyWorkflowGitHistory(out, root)),
   ];
 }
 
