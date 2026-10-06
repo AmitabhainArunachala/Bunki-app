@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {createHash,webcrypto} from 'node:crypto';
 import vm from 'node:vm';
 import {createHostBridge} from '../host-bridge.mjs';
 
@@ -85,26 +86,190 @@ test('a missing packaged dictionary can be retried after reconnecting',async () 
   assert.equal(attempts,2);
 });
 
-test('host final write boundary rejects stale capture and every assessment/history patch',() => {
+function hostWriteFixture({paused = false} = {}) {
   const source = readFileSync(new URL('../../../corridor.js',import.meta.url),'utf8');
-  const start = source.indexOf('function commitStorePatch(patch) {');
+  const start = source.indexOf('async function commitStorePatch(');
+  assert.notEqual(start,-1,'The shared host must use the current asynchronous record writer');
   const end = source.indexOf('\n}\n',start) + 2;
-  const state = {taken:[],lists:{},deepWords:{},srs:{original:true},revlog:[['original']]};
-  let allowed = true, writes = 0;
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const state = {taken:[],lists:{},deepWords:{},srs:{original:true},revlog:[['original']],obslog:[]};
+  let record = clone(state), allowed = true, visit = 1, writes = 0, queued = 0, release;
+  const failures = [];
+  const barrier = paused ? new Promise(resolve => {release = resolve;}) : null;
   const commit = vm.runInNewContext(source.slice(start,end) + ';commitStorePatch', {
-    S:state, personalHost:{allowed:() => allowed}, writeStore:() => {writes++;return true;},
+    S:state, personalHost:{allowed:() => allowed,captureAccess() {const own = visit; return () => own === visit && allowed;}}, recordEpoch:1,
+    recordWritable:() => true, publishedRecord:clone(state), DEFAULT_LEARNER_RECORD:{},
+    canonicalRecordJson:JSON.stringify, safelySyncStoreAlert() {}, recordFailure(reason) {failures.push(reason);},
+    recordApp:{async write(produce) {
+      queued++;
+      if (barrier) await barrier;
+      const result = produce(clone(record),{revision:queued});
+      record = {...record,...clone(result.patch)};
+      Object.assign(state,clone(record));
+      writes++;
+      return {status:'active',replayUiEffects:true};
+    }},
   });
-  assert.equal(commit({srs:{}}),false);
-  assert.equal(commit({revlog:[]}),false);
-  assert.equal(commit({taken:[{id:'本'}],obslog:[]}),false);
-  assert.equal(writes,0);
-  assert.equal(commit({taken:[{id:'本'}],lists:{test:[]}}),true);
-  assert.equal(writes,1);
-  allowed = false;
-  assert.equal(commit({taken:[]}),false);
-  assert.equal(writes,1);
-  assert.deepEqual(state.srs,{original:true}); assert.deepEqual(state.revlog,[['original']]);
-  assert.deepEqual(state.taken,[{id:'本'}]);
+  return {commit,state,failures,get record(){return record;},get writes(){return writes;},get queued(){return queued;},
+    revoke(){allowed = false;},reopen(){visit++; allowed = true;},resume(){release();},replaceRecord(value){record = clone(value);}};
+}
+
+test('host final write boundary rejects stale capture and every assessment/history patch',async () => {
+  const f = hostWriteFixture();
+  for (const key of ['srs','revlog','obslog','assessmentLibraryV2','lessonsDone','stats','aiChat']) {
+    assert.equal(await f.commit({taken:[{id:'本'}],[key]:{}}),false,`${key} cannot cross the personal host`);
+  }
+  assert.equal(f.writes,0);
+  assert.deepEqual(f.failures,Array(7).fill('personal-capture-not-allowed'),'A refused root in an open visit is a real save failure');
+  assert.equal(await f.commit({taken:[{id:'本'}],lists:{test:[]},deepWords:{'本':{r:'ほん'}}}),true);
+  assert.equal(f.writes,1);
+  f.revoke();
+  const queued = f.queued;
+  assert.equal(await f.commit({taken:[]}),false);
+  assert.equal(f.queued,queued,'A closed personal answer must not queue a write');
+  assert.equal(f.writes,1);
+  assert.deepEqual(f.state.srs,{original:true}); assert.deepEqual(f.state.revlog,[['original']]);
+  assert.deepEqual(f.state.taken,[{id:'本'}]);
+});
+
+test('host producers cannot smuggle assessment/history roots or archive appends',async () => {
+  const f = hostWriteFixture();
+  for (const key of ['srs','revlog','obslog','assessmentLibraryV2','lessonsDone','stats','aiChat']) {
+    assert.equal(await f.commit(latest => ({taken:[...latest.taken,{id:'本'}],[key]:{}})),false,
+      `The resolved producer patch must reject ${key}`);
+  }
+  assert.equal(await f.commit({taken:[{id:'本'}]},[{role:'user',text:'private'}]),false);
+  assert.equal(await f.commit(() => ({taken:[{id:'本'}]}),[{role:'user',text:'private'}]),false);
+  assert.equal(f.writes,0);
+  assert.deepEqual(f.failures,Array(7).fill('personal-capture-not-allowed'),'Smuggled roots in an open visit report a real failure');
+  assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.state.srs,{original:true}); assert.deepEqual(f.state.revlog,[['original']]);
+});
+
+test('queued personal capture rechecks access before evaluating its producer or writing',async () => {
+  const f = hostWriteFixture({paused:true});
+  let produced = 0;
+  const pending = f.commit(latest => {produced++; return {taken:[...latest.taken,{id:'本'}]};});
+  assert.equal(f.queued,1); assert.equal(f.writes,0); assert.equal(produced,0);
+  f.revoke(); f.resume();
+  assert.equal(await pending,false);
+  assert.equal(produced,0,'A stale answer must not evaluate its capture producer');
+  assert.equal(f.writes,0); assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.failures,[],'Closing the visit cancels the capture without a storage alert');
+});
+
+test('a producer refusing after its visit closed is a cancellation, not a storage failure',async () => {
+  const f = hostWriteFixture();
+  assert.equal(await f.commit(latest => {f.revoke(); return {taken:[...latest.taken,{id:'本'}]};}),false);
+  assert.equal(f.writes,0); assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.failures,[],'An intended refusal must not raise the storage alert');
+  f.reopen();
+  assert.equal(await f.commit(latest => ({taken:[...latest.taken,{id:'本'}],srs:{}})),false);
+  assert.deepEqual(f.failures,['personal-capture-not-allowed'],'An invalid root in the reopened visit is still a real failure');
+});
+
+test('personal capture producers use the latest queued authority and publish after acknowledgment',async () => {
+  const f = hostWriteFixture({paused:true});
+  const pending = f.commit(latest => ({taken:[...latest.taken,{id:'本'}],lists:{...latest.lists,saved:[]}}));
+  assert.deepEqual(f.state.taken,[]); assert.equal(f.writes,0);
+  f.replaceRecord({...f.record,taken:[{id:'海'}],lists:{existing:[{id:'海'}]}});
+  f.resume();
+  assert.equal(await pending,true); assert.equal(f.writes,1);
+  assert.deepEqual(f.state.taken,[{id:'海'},{id:'本'}]);
+  assert.deepEqual(f.state.lists,{existing:[{id:'海'}],saved:[]});
+});
+
+test('opening another personal overlay cannot revive a capture queued in an earlier visit',async () => {
+  const f = hostWriteFixture({paused:true});
+  let produced = 0;
+  const pending = f.commit(latest => {produced++; return {taken:[...latest.taken,{id:'本'}]};});
+  f.revoke(); f.reopen(); f.resume();
+  assert.equal(await pending,false); assert.equal(produced,0); assert.equal(f.writes,0);
+  assert.deepEqual(f.state.taken,[]);
+  assert.deepEqual(f.failures,[],'An earlier visit\'s capture ends silently in the next visit');
+});
+
+function suppressionFixture({holdAssessment = false,personal = true} = {}) {
+  const source = readFileSync(new URL('../../../corridor.js',import.meta.url),'utf8');
+  const definitions = ['toggleTaken','suppressAssessmentCards','performAssessmentSuppression','queueAssessmentWork'].map(name => {
+    const match = new RegExp(`(?:async )?function ${name}\\(`).exec(source);
+    assert.ok(match,`Missing host function ${name}`);
+    return source.slice(match.index,source.indexOf('\n}\n',match.index) + 2);
+  });
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const state = {taken:[{t:'kanji',id:'本'}],assessmentLearning:{followups:[],suppressions:[]},
+    srs:{'kanji:本':{reps:5}},revlog:[[1,'kanji:本',3]]};
+  let allowed = true, visit = 1, release;
+  const queued = [], commands = [], retries = new Map();
+  const context = vm.createContext({S:state,recordEpoch:1,recordWritable:() => true,
+    personalHost:personal ? {allowed:() => allowed,captureAccess() {const own = visit; return () => own === visit && allowed;}} : null,
+    capturePending:new Set(),assessmentSuppressionRetries:retries,
+    assessmentActionTail:holdAssessment ? new Promise(resolve => {release = resolve;}) : Promise.resolve(),
+    srsKey:(type,id) => `${type}:${id}`,practiceIdentity:() => 'synthetic-suppression',recordFailure() {},
+    commitStorePatch() {assert.fail('Removal with an assessment root must retain the shared suppression transaction');},
+    recordApp:{suppressAssessmentLearning(meta,input) {
+      return new Promise((resolve,reject) => queued.push({meta,input,resolve,reject}));
+    }},
+  });
+  vm.runInContext(definitions.join('\n'),context);
+  return {state,queued,commands,retries,
+    remove:() => context.toggleTaken({t:'kanji',id:'本'},'本'),
+    undo:() => context.suppressAssessmentCards({kind:'undo',followupId:'synthetic-followup'}),
+    revoke(){allowed = false;},reopen(){visit++; allowed = true;},resumeAssessment(){release();},
+    async queuedWrite(){await Promise.resolve(); await Promise.resolve(); assert.equal(queued.length,1);},
+    settle({fail = false} = {}) {
+      const next = queued.shift(); assert.ok(next,'A shared suppression command must be queued');
+      try {
+        const input = typeof next.input === 'function' ? next.input({revision:7,identity:{accountId:'synthetic',learnerId:'synthetic'},record:clone(state)}) : next.input;
+        commands.push({meta:clone(next.meta),input:clone(input)});
+        if (fail) next.reject(new Error('synthetic-uncertain-result'));
+        else next.resolve({status:'active',learningSuppression:{remaining:0}});
+      } catch(error) {next.reject(error);}
+    },
+  };
+}
+
+test('personal removal with assessment learning uses the shared suppression command and rejects assessment undo',async () => {
+  const f = suppressionFixture(), before = JSON.stringify({srs:f.state.srs,revlog:f.state.revlog});
+  assert.equal(await f.undo(),false); assert.equal(f.queued.length,0);
+  const pending = f.remove(); await f.queuedWrite(); f.settle();
+  assert.equal(await pending,true);
+  assert.deepEqual(f.commands[0].input,{expectedRevision:7,scope:{accountId:'synthetic',learnerId:'synthetic'},kind:'remove',key:'kanji:本'});
+  assert.equal(JSON.stringify({srs:f.state.srs,revlog:f.state.revlog}),before,'The UI command never mutates scheduling/history before acknowledgment');
+  f.revoke(); assert.equal(await f.remove(),false); assert.equal(f.queued.length,0);
+});
+
+test('personal suppression cannot survive closing its visit while waiting in either queue',async () => {
+  const assessment = suppressionFixture({holdAssessment:true});
+  const waiting = assessment.remove();
+  assessment.revoke(); assessment.reopen(); assessment.resumeAssessment();
+  assert.equal(await waiting,false); assert.equal(assessment.queued.length,0); assert.equal(assessment.commands.length,0);
+  const record = suppressionFixture();
+  const queued = record.remove(); await record.queuedWrite();
+  record.revoke(); record.reopen(); record.settle();
+  assert.equal(await queued,false); assert.equal(record.commands.length,0);
+});
+
+test('personal suppression retries recheck visit access and preserve the exact retained command',async () => {
+  const f = suppressionFixture();
+  let pending = f.remove(); await f.queuedWrite(); f.settle({fail:true});
+  assert.equal(await pending,false); assert.equal(f.retries.size,1);
+  const original = f.commands[0];
+  pending = f.remove(); await f.queuedWrite();
+  assert.equal(typeof f.queued[0].input,'function','A retained command still crosses the queued permission guard');
+  f.revoke(); f.reopen(); f.settle();
+  assert.equal(await pending,false); assert.equal(f.commands.length,1); assert.equal(f.retries.size,1);
+  pending = f.remove(); await f.queuedWrite(); f.settle();
+  assert.equal(await pending,true); assert.deepEqual(f.commands[1],original,'Retry metadata and input remain byte-equivalent');
+  assert.equal(f.retries.size,0);
+});
+
+test('ordinary assessment removal retains its original retry path',async () => {
+  const f = suppressionFixture({personal:false});
+  let pending = f.remove(); await f.queuedWrite(); f.settle({fail:true}); assert.equal(await pending,false);
+  pending = f.remove(); await f.queuedWrite();
+  assert.equal(typeof f.queued[0].input,'object','Nonpersonal retained retries keep their existing exact input path');
+  f.settle(); assert.equal(await pending,true); assert.deepEqual(f.commands[1],f.commands[0]);
 });
 
 test('dictionary worker error is canceled while pending requests reject and the worker resets',async () => {
@@ -154,47 +319,75 @@ test('dictionary worker error is canceled while pending requests reject and the 
   assert.equal(retryWorker.terminated,false);
 });
 
-test('service worker returns an uncached 503 for missing offline content and serves cached core without network',async () => {
+test('stamped service worker returns an uncached 503 for missing offline content and serves cached core without network',async () => {
   const source = readFileSync(new URL('../../../sw.js',import.meta.url),'utf8');
+  const scope = 'https://example.invalid/bunki/';
   const handlers = new Map();
-  let cacheHit, networkRequests = 0;
-  vm.runInNewContext(source,{
-    self:{
-      location:{origin:'https://example.invalid'},
-      addEventListener(type,handler) { handlers.set(type,handler); },
-    },
-    URL, Response,
-    caches:{
-      async match() { return cacheHit; },
-      async open() { assert.fail('An unavailable shard must not be cached'); },
-    },
-    async fetch() { networkRequests++; throw new TypeError('Load failed'); },
+  const context = vm.createContext({
+    self:{registration:{scope},location:{origin:new URL(scope).origin},
+      addEventListener(type,handler) { handlers.set(type,handler); }},
+    URL,Request,Response,Headers,TextEncoder,TextDecoder,crypto:webcrypto,
   });
+  // Derive a valid small installed generation from the actual worker's boot
+  // contract. Its identity and stamped worker are validated unchanged at fetch.
+  vm.runInContext(source,context);
+  const required = vm.runInContext('[...new Set([...SHELL,...BOOT_DATA,...GUIDED_ROOM].filter(path => path !== "."))]',context);
+  const files = new Map(required.map(path => [path,Buffer.from('fixture')]));
+  const core = 'data/share_alike/dict.json', shard = 'data/share_alike/dict-v2/index.json';
+  files.set(core,Buffer.from(JSON.stringify({words:{'本':{r:'ほん',m:['book']}}})));
+  files.set(shard,Buffer.from('{"shards":[]}'));
+  files.set('sw.js',Buffer.from(source));
+  files.set('404.html',files.get('index.html'));
+  const hash = value => createHash('sha256').update(value).digest('hex');
+  const inputs = [...files].filter(([path]) => path !== '404.html')
+    .map(([path,bytes]) => ({path,sha256:hash(bytes)}))
+    .sort((a,b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+  const stamp = hash(JSON.stringify(inputs));
+  const worker = `self.KAIRO_ASSET_VERSION = "${stamp}";\n${source}`;
+  files.set('sw.js',Buffer.from(worker));
+  const entries = [...files].map(([path,bytes]) => ({path,bytes:bytes.length,sha256:hash(bytes)}));
+  const manifest = {schemaVersion:1,product:'KAIRO',sourceAssetSha256:stamp,
+    artifactSha256:hash(JSON.stringify(entries)),files:entries};
+  const cached = new Map([
+    [new URL('build-identity.json',scope).href,new Response(JSON.stringify(manifest))],
+    [new URL('sw.js',scope).href,new Response(worker)],
+    [new URL(core,scope).href,new Response(files.get(core),{headers:{'Content-Type':'application/json'}})],
+  ]);
+  let networkRequests = 0, cacheWrites = 0;
+  const installedContext = {
+    ...context,
+    self:{registration:{scope},location:{origin:new URL(scope).origin},
+      addEventListener(type,handler) { handlers.set(type,handler); }},
+    caches:{async open(name) {
+      assert.equal(name,`kairo:${scope}:kairo-${stamp}`,'Read only the installed generation cache');
+      return {async match(url) {return cached.get(typeof url === 'string' ? url : url.url)?.clone();},
+        async put() {cacheWrites++;}};
+    }},
+    async fetch() {networkRequests++; throw new TypeError('Load failed');},
+  };
+  vm.runInNewContext(worker,installedContext);
   const fetchHandler = handlers.get('fetch');
   assert.equal(typeof fetchHandler,'function');
-  const requestContent = url => {
-    let responsePromise;
-    fetchHandler({
-      request:new Request(url),
-      respondWith(response) { responsePromise = response; },
+  const requestContent = async path => {
+    let responsePromise, lifetime;
+    fetchHandler({request:new Request(new URL(path,scope)),
+      respondWith(response) {responsePromise = response;},
+      waitUntil(promise) {lifetime = promise;},
     });
     assert.ok(responsePromise,'The actual service worker must handle same-origin content');
-    return responsePromise;
+    const response = await responsePromise;
+    await lifetime;
+    return response;
   };
-  // A missing optional index is explicitly unsuccessful. A 503 lets the
-  // consumer show its retry UI without WebKit reporting a SW response error.
-  const unavailable = await requestContent('https://example.invalid/data/share_alike/dict-v2/index.json');
-  assert.equal(unavailable.status,503);
-  assert.equal(unavailable.ok,false);
+  const unavailable = await requestContent(shard);
+  assert.equal(unavailable.status,503); assert.equal(unavailable.ok,false);
   assert.equal(unavailable.headers.get('Cache-Control'),'no-store');
-  assert.match(await unavailable.text(),/not available offline/);
-  assert.equal(networkRequests,1);
-  cacheHit = new Response(JSON.stringify({words:{'本':{r:'ほん',m:['book']}}}),{
-    headers:{'Content-Type':'application/json'},
-  });
-  const cached = await requestContent('https://example.invalid/data/share_alike/dict.json');
-  assert.equal(cached,cacheHit);
-  assert.equal(cached.status,200);
-  assert.deepEqual(await cached.json(),{words:{'本':{r:'ほん',m:['book']}}});
+  assert.equal(unavailable.headers.get('x-kairo-update-needed'),'1');
+  assert.match(await unavailable.text(),/unavailable.*installed KAIRO version/);
+  assert.equal(networkRequests,1); assert.equal(cacheWrites,0);
+  const response = await requestContent(core);
+  assert.equal(response.status,200);
+  assert.deepEqual(await response.json(),{words:{'本':{r:'ほん',m:['book']}}});
   assert.equal(networkRequests,1,'A cached core dictionary must not attempt another fetch');
+  assert.equal(cacheWrites,0,'An unavailable shard must not be cached');
 });

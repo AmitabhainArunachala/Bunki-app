@@ -1,0 +1,380 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N5",
+  "number": 5,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "はじめての　料理\n　きのう、わたしは　はじめて　ひとりで　ばんごはんを　つくりました。カレーです。\n　まず、スーパーで　にくと　やさいを　かいました。うちに　かえって、やさいを　きりました。（１）、にくと　やさいを　なべに　いれて、三十ぷん　にました。\n　カレーは　すこし　あまかったですが、おいしかったです。ちちも　ははも「おいしいね」と　いいました。とても　うれしかったです。\n　こんどは　ケーキを　つくって　（２）。",
+    "s1": "やまもと病院の　じかん\n　月曜日～金曜日　あさ　九時～十二時、ごご　三時～六時\n　土曜日　あさ　九時～十二時\n　日曜日は　やすみです。",
+    "s2": "ほんやの　おしらせ\n　この　みせの　カードを　もって　いる　人は、ざっしを　かうと、ボールペンを　もらう　ことが　できます。カードは　レジで　つくる　ことが　できます。",
+    "s3": "　わたしは　あさ　たまごやきを　つくります。たまごを　二つ　つかいます。さとうを　すこし　いれると、あまくて　おいしいです。",
+    "m1": "かぜ\n　せんしゅう、わたしは　かぜを　ひきました。ねつが　あって、あたまも　いたかったです。\n　あさ、ははと　いっしょに　ちかくの　病院へ　いきました。病院には　人が　たくさん　いて、一じかん　まちました。おいしゃさんは「三日ぐらい　がっこうを　やすんで、うちで　ねて　いて　ください」と　いいました。\n　わたしは　三日間　がっこうを　やすみました。ともだちの　ハナさんが　まいにち　でんわを　くれて、じゅぎょうの　ことを　おしえて　くれました。\n　いまは　もう　げんきです。ハナさんに「ありがとう」と　いいました。",
+    "info": "さくら　ほんやの　じかん\n　月曜日　　　　　　やすみ\n　火曜日～金曜日　　あさ　１０時～よる　８時\n　土曜日　　　　　　あさ　１０時～よる　９時\n　日曜日　　　　　　あさ　１１時～よる　６時\n※　８月１３日～１５日は　やすみです。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nあたまが　いたいので、【病院】へ　いきます。",
+      "options": [
+        "びょういん",
+        "ぴょういん",
+        "びょうい",
+        "びよういん"
+      ],
+      "answer": 0,
+      "rationale": "「病院」は「びょういん」と読む。「びよういん」は「美容院」だ。\nThe word 病院 is read byouin and means hospital.",
+      "target": "病院"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nははの　【料理】は　とても　おいしいです。",
+      "options": [
+        "りょうり",
+        "りょり",
+        "りようり",
+        "りゅうり"
+      ],
+      "answer": 0,
+      "rationale": "「料理」は「りょうり」と読む。\nThe word 料理 is read ryouri and means cooking or a dish.",
+      "target": "料理"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　【薬】を　一日に　三かい　のんで　ください。",
+      "options": [
+        "くずり",
+        "くすり",
+        "すくり",
+        "くさり"
+      ],
+      "answer": 1,
+      "rationale": "「薬」は「くすり」と読む。\nThe word 薬 is read kusuri and means medicine.",
+      "target": "薬"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nえきの　ちかくの　ほんやで　【ほん】を　二さつ　かいました。",
+      "options": [
+        "本",
+        "木",
+        "休",
+        "体"
+      ],
+      "answer": 0,
+      "rationale": "「ほん」は「本」と書く。「木」「休」「体」はちがう字だ。\nThe word hon (book) is written 本.",
+      "target": "本"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nばんごはんに　【さかな】を　やきました。",
+      "options": [
+        "魚",
+        "黒",
+        "鳥",
+        "馬"
+      ],
+      "answer": 0,
+      "rationale": "「さかな」は「魚」と書く。「鳥」は「とり」、「馬」は「うま」だ。\nThe word sakana (fish) is written 魚.",
+      "target": "魚"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nひるごはんに　【さらだ】を　たべました。",
+      "options": [
+        "サラグ",
+        "ヤラダ",
+        "サウダ",
+        "サラダ"
+      ],
+      "answer": 3,
+      "rationale": "「さらだ」はカタカナで「サラダ」と書く。\nThe word sarada (salad) is written サラダ in katakana.",
+      "target": "サラダ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nほんやで　（　）を　かいました。",
+      "options": [
+        "さかな",
+        "やさい",
+        "じしょ",
+        "くつ"
+      ],
+      "answer": 2,
+      "rationale": "ほんやでうっているのは「じしょ」だ。\nJisho means dictionary, which is sold at a bookstore.",
+      "target": "辞書"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nこの　スープは　すこし　（　）です。しおを　いれすぎました。",
+      "options": [
+        "つめたい",
+        "あまい",
+        "からい",
+        "ひくい"
+      ],
+      "answer": 2,
+      "rationale": "しおをいれすぎると「からい」あじになる。\nKarai here means salty, because too much salt was added.",
+      "target": "辛い"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nあには　【病気】です。",
+      "options": [
+        "あには　ひまです。",
+        "あには　いそがしいです。",
+        "あには　げんきじゃ　ありません。",
+        "あには　げんきです。"
+      ],
+      "answer": 2,
+      "rationale": "「病気」は「げんきじゃない」と同じ意味だ。\nByouki means sick, so he is not well.",
+      "target": "病気"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nこの　くつは　【ちょっと】　大きいです。",
+      "options": [
+        "この　くつは　いちばん　大きいです。",
+        "この　くつは　ぜんぜん　大きく　ないです。",
+        "この　くつは　とても　大きいです。",
+        "この　くつは　すこし　大きいです。"
+      ],
+      "answer": 3,
+      "rationale": "「ちょっと」は「すこし」と同じ意味だ。\nChotto means a little, the same as sukoshi.",
+      "target": "ちょっと"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nまいにち　七時（　）　おきます。",
+      "options": [
+        "で",
+        "に",
+        "が",
+        "を"
+      ],
+      "answer": 1,
+      "rationale": "じかんには「に」をつかう。\nNi marks a specific time: I get up at seven.",
+      "subject": "particle:ni"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nこれは　だれの　ほんです（　）。",
+      "options": [
+        "よ",
+        "ね",
+        "を",
+        "か"
+      ],
+      "answer": 3,
+      "rationale": "しつもんのおわりには「か」をつかう。\nKa ends a question: whose book is this?",
+      "subject": "particle:ka"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nわたしの　いえは　あの　大きい　ビル（　）　となりです。",
+      "options": [
+        "が",
+        "の",
+        "を",
+        "に"
+      ],
+      "answer": 1,
+      "rationale": "「AのとなりのB」で、ばしょを言う。\nNo links the two nouns: next to that big building.",
+      "subject": "particle:no"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nおもそうですね。にもつを　もち（　）。",
+      "options": [
+        "たいです",
+        "ませんか",
+        "ましょうか",
+        "ました"
+      ],
+      "answer": 2,
+      "rationale": "あいてのためにすることを言うときは「〜ましょうか」をつかう。\nMashou ka offers help: shall I carry your bag?",
+      "subject": "grammar:mashou"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nスーパーで　たまご（　）　ぎゅうにゅうを　かいました。",
+      "options": [
+        "が",
+        "に",
+        "で",
+        "や"
+      ],
+      "answer": 3,
+      "rationale": "ものをならべて言うときは「や」をつかう。\nYa lists examples: eggs, milk and so on.",
+      "subject": "particle:ya"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nくだものの　＿＿＿　＿＿＿　＿★＿　＿＿＿　です。",
+      "options": [
+        "いちばん",
+        "りんご",
+        "なかで",
+        "すきなのは"
+      ],
+      "answer": 3,
+      "rationale": "ただしいじゅんばんは「なかで　いちばん　すきなのは　りんご　です」で、★には「すきなのは」が入る。\nThe order is なかで いちばん すきなのは りんご です, so すきなのは fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nこの　ほんやは　＿＿＿　＿＿＿　＿★＿　＿＿＿　あいて　います。",
+      "options": [
+        "よる",
+        "十時まで",
+        "あさ",
+        "九時から"
+      ],
+      "answer": 0,
+      "rationale": "ただしいじゅんばんは「あさ　九時から　よる　十時まで　あいて　います」で、★には「よる」が入る。\nThe order is あさ 九時から よる 十時まで あいて います, so よる fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "それから",
+        "でも",
+        "では",
+        "だから"
+      ],
+      "answer": 0,
+      "rationale": "やさいをきったあとにしたことなので「それから」が入る。\nSore kara (then) shows the next step in cooking.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "しまいました",
+        "みたいです",
+        "みました",
+        "いきました"
+      ],
+      "answer": 1,
+      "rationale": "「こんどは」とこれからのことを言うので「つくってみたいです」がいい。\nTsukutte mitai desu expresses a wish for next time.",
+      "passage": "tg",
+      "subject": "grammar:tai"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　病院に　いつ　いけますか。",
+      "options": [
+        "土曜日の　ごご　二時",
+        "日曜日の　あさ　十時",
+        "水曜日の　ごご　四時",
+        "金曜日の　よる　七時"
+      ],
+      "answer": 2,
+      "rationale": "月曜日から金曜日はごご三時から六時まであいているので、水曜日のごご四時はいける。\nOn weekdays the hospital is open from three to six in the afternoon.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "ボールペンを　もらいたい　人は　どう　しますか。",
+      "options": [
+        "レジで　ボールペンを　かう",
+        "カードを　もって、ざっしを　かう",
+        "カードを　みせに　かえす",
+        "みせで　ざっしを　よむ"
+      ],
+      "answer": 1,
+      "rationale": "カードをもっている人がざっしをかうと、ボールペンをもらえる。\nPeople with the store card get a ballpoint pen when they buy a magazine.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人は　たまごやきに　なにを　いれますか。",
+      "options": [
+        "みず",
+        "さとう",
+        "しょうゆ",
+        "しお"
+      ],
+      "answer": 1,
+      "rationale": "「さとうを　すこし　いれると、あまくて　おいしい」とある。\nThe writer adds a little sugar to the rolled omelet.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "おいしゃさんは　なんと　いいましたか。",
+      "options": [
+        "すぐ　がっこうへ　いって　ください",
+        "ハナさんに　でんわして　ください",
+        "まいにち　病院へ　きて　ください",
+        "三日ぐらい　うちで　ねて　いて　ください"
+      ],
+      "answer": 3,
+      "rationale": "おいしゃさんは「三日ぐらい…うちで　ねて　いて　ください」と言った。\nThe doctor said to stay home in bed for about three days.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "ハナさんは　なにを　しましたか。",
+      "options": [
+        "まいにち　でんわで　じゅぎょうの　ことを　おしえた",
+        "おいしゃさんと　はなした",
+        "この　人の　うちへ　きた",
+        "いっしょに　病院へ　いった"
+      ],
+      "answer": 0,
+      "rationale": "ハナさんはまいにちでんわをくれて、じゅぎょうのことをおしえてくれた。\nHana phoned every day and told the writer about the lessons.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "よる　八時半に　ほんやへ　いきたいです。なんようびなら　いけますか。",
+      "options": [
+        "月曜日",
+        "水曜日",
+        "土曜日",
+        "日曜日"
+      ],
+      "answer": 2,
+      "rationale": "よる８時半にあいているのは、よる９時までの土曜日だけだ。\nOnly on Saturday is the bookstore open until nine in the evening.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "８月１４日の　火曜日、ほんやは　あいて　いますか。",
+      "options": [
+        "あさ　１０時から　あいて　いる",
+        "あいて　いない",
+        "よる　８時まで　あいて　いる",
+        "あさ　１１時から　あいて　いる"
+      ],
+      "answer": 1,
+      "rationale": "８月１３日から１５日はやすみなので、１４日はあいていない。\nThe store is closed from August 13 to 15, so it is closed on the 14th.",
+      "passage": "info"
+    }
+  ]
+}

@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
 import {chromium,webkit} from 'playwright-core';
 import {fixture,enrichmentFixture} from './personal-fixture.mjs';
+import {resolveCorridorSite,resolveCorridorEvidence} from '../../../scripts/resolve-corridor-site.mjs';
 
-const root=fileURLToPath(new URL('../',import.meta.url));
-const out=process.env.PERSONAL_QA_OUT || '/tmp/bunki-personal-qa';
+// The battery's law: drive the built artifact. The service worker's install
+// pins the release manifest (build-identity.json), which only a build carries.
+const root=resolveCorridorSite();
+const out=process.env.PERSONAL_QA_OUT || resolveCorridorEvidence();
 const selected=(process.env.PERSONAL_BROWSERS || 'chromium,webkit').split(',');
 assert(selected.length && selected.every(x=>['chromium','webkit'].includes(x)), 'Unknown browser selection');
 await mkdir(out,{recursive:true});

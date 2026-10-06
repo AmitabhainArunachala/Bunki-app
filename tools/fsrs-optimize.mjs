@@ -16,6 +16,7 @@
  *   optimizer's parameter-scale L2 regularization.
  */
 
+import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import { open, readFile, realpath, stat, unlink } from 'node:fs/promises';
 import { basename, dirname, resolve, sep } from 'node:path';
@@ -204,24 +205,78 @@ function validateRevocationRow(row, index) {
   );
 }
 
-/** Parse the exact v1 local-store JSON emitted by corridor's 書き出す button. */
+const jsonObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const canonicalJson = (value) => {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (jsonObject(value))
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+      .join(',')}}`;
+  return JSON.stringify(value);
+};
+const backupDigest = (value) => createHash('sha256').update(canonicalJson(value)).digest('hex');
+
+/** Accept the legacy v1 record and the full backup emitted by 書き出す.
+ * Archive/chat completeness is preserved by the backup but does not turn
+ * teaching or exposure into recall evidence: only record.revlog is fitted.
+ * This is an optimizer input check, not the app's complete restore validator.
+ */
 export function parseExportedStore(raw) {
+  assert(jsonObject(raw), 'INVALID_EXPORT', 'Expected the exported corridor JSON object');
+  let record = raw;
+  if (Object.hasOwn(raw, 'format')) {
+    assert(
+      raw.format === 'kairo-backup' && raw.version === 1,
+      'UNSUPPORTED_EXPORT_VERSION',
+      'Expected kairo-backup version 1',
+    );
+    record = raw.record;
+    assert(
+      jsonObject(record) &&
+        jsonObject(raw.archive) &&
+        raw.archive.version === 1 &&
+        Array.isArray(raw.archive.turns) &&
+        jsonObject(raw.counts) &&
+        jsonObject(raw.sha256),
+      'INVALID_EXPORT',
+      'The backup is missing its record, archive, counts, or digests',
+    );
+    assert(
+      (!Object.hasOwn(record, 'aiEvidenceIncomplete') ||
+        typeof record.aiEvidenceIncomplete === 'boolean') &&
+        raw.completeness === (record.aiEvidenceIncomplete ? 'incomplete' : 'complete'),
+      'INVALID_EXPORT',
+      'The backup completeness declaration disagrees with its record',
+    );
+    assert(
+      raw.counts.archiveTurns === raw.archive.turns.length &&
+        raw.counts.chatTurns === (record.aiChat?.length || 0) &&
+        raw.counts.readingVersions ===
+          (record.aiReadings?.length || 0) + (record.aiReading ? 1 : 0) &&
+        raw.sha256.record === backupDigest(record) &&
+        raw.sha256.archive === backupDigest(raw.archive),
+      'INVALID_EXPORT',
+      'The backup contents disagree with its counts or digests',
+    );
+  } else {
+    assert(
+      !Object.hasOwn(raw, 'archive'),
+      'INVALID_EXPORT',
+      'A backup archive requires its versioned envelope',
+    );
+  }
   assert(
-    raw && typeof raw === 'object' && !Array.isArray(raw),
-    'INVALID_EXPORT',
-    'Expected the exported corridor JSON object',
-  );
-  assert(
-    raw.v === 1,
+    record.v === 1,
     'UNSUPPORTED_EXPORT_VERSION',
-    `Expected corridor store version 1; received ${JSON.stringify(raw.v)}`,
+    `Expected corridor store version 1; received ${JSON.stringify(record.v)}`,
   );
   assert(
-    Array.isArray(raw.revlog),
+    Array.isArray(record.revlog),
     'INVALID_EXPORT',
     'The exported corridor record has no revlog array',
   );
-  return raw;
+  return record;
 }
 
 /**

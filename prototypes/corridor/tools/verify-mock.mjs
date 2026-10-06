@@ -1,15 +1,15 @@
 /**
- * 模試の間's verifier. Done = this is green.
+ * Bounded verification of the shipped short-practice data and browser room.
  *
  * Two halves. The first reads every shipped paper as DATA and proves the
- * schema, the rights strings, and the fail-closed subject law hold on all of
- * them — 25 papers is too many to eyeball, and a bad item that ships teaches
- * something false. The second drives the room in real Chromium and proves
+ * schema, attribution fields and dictionary subjects. This is not editorial
+ * review of Japanese correctness, a licence grant, or full-exam acceptance.
+ * The second drives the room in real Chromium and checks
  * the four laws of the room itself:
  *
- *   · a sat paper writes typed [t,'mock',key,g,setId] rows and NOTHING else
- *     — no FSRS state, no deck row, no revlog row, no moved due date;
- *   · the rows survive the envelope validator across a reload (no quarantine);
+ *   · full answers are saved against the exact question version without
+ *     measured legacy grades, FSRS state, deck rows or review rows;
+ *   · completed history remains accessible after Done and reload;
  *   · 取り上げる mints only on the learner's explicit press, and only words
  *     the dictionary confirms;
  *   · no string the room can render ever claims a JLPT pass.
@@ -17,18 +17,23 @@
  * Usage: node verify-mock.mjs
  */
 
+import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { extname, resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
-const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+const CORRIDOR_DIR = resolveCorridorSite();
 const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
 const MOCK_DIR = resolve(DATA_DIR, 'mock');
+const EVIDENCE = resolveCorridorEvidence();
+const { selectPractice } = await import(pathToFileURL(resolve(CORRIDOR_DIR, 'assessment-controller.mjs')).href);
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -63,7 +68,7 @@ function startServer(rootDir = CORRIDOR_DIR) {
 const results = [];
 let failures = 0;
 function check(name, pass, detail = '') {
-  results.push({ name, pass: !!pass });
+  results.push({ name, pass: !!pass, detail });
   if (!pass) failures += 1;
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
 }
@@ -92,7 +97,7 @@ const PASS_CLAIMS = [
   /(likely to|should|will) pass\b/iu,
   /(?<!whether )you would pass/iu,
 ];
-const DISCLAIMS = [/ここでは分からない/u, /not knowable from here/iu];
+const DISCLAIMS = [/ここでは分からない/u, /not knowable from here/iu, /cannot predict a N[1-5] result/iu, /合否や習熟度の判定には使わない/u, /use this as practice rather than a N[1-5] readiness score/iu];
 
 function verifyPapers() {
   const index = readJson(resolve(MOCK_DIR, 'index.json'));
@@ -171,20 +176,11 @@ function verifyPapers() {
     if (count !== cat?.items) problems.push(`${where}: catalog item count ${cat?.items} ≠ ${count}`);
     if (count < 12) problems.push(`${where}: only ${count} items`);
   }
-  check('every paper validates: schema, four distinct options, one right answer, rights carried', problems.length === 0, problems.slice(0, 4).join(' | ') || `${items} items`);
+  check('each short set has its expected schema, four distinct options, an indexed answer and attribution fields', problems.length === 0, problems.slice(0, 4).join(' | ') || `${items} items; editorial and rights review remains separate`);
   check('no paper tests vocabulary above its own level (review round 7: the graded list numbers N5 as 5, so a raw comparison reads backwards)', overLevel.length === 0, overLevel.slice(0, 4).join(' | ') || 'every subject within one rank of its paper');
   check('every item subject resolves in the pinned dictionary — the fail-closed law holds in the data', problems.every((p) => !p.includes('resolves in no dictionary')));
   check('most items carry a subject, so a sitting leaves real evidence', withSubject / items > 0.8, `${withSubject}/${items}`);
   check('no shipped string predicts a pass', claims.length === 0, claims.slice(0, 3).join(' | ') || 'clean');
-  const source = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
-  check(
-    'the room writes mock rows and nothing else at grading time, each naming its question kind',
-    source.includes("'mock',") &&
-      source.includes('`${set.setId}#${f.item.type}`') &&
-      source.includes('if (rows.length) patch.obslog'),
-    'the one commit is score + typed rows carrying setId#type',
-  );
-  check('the room speaks the honesty constraint aloud', /受かるかどうかは、ここでは分からない/u.test(source) && /not knowable from here/u.test(source));
   return items;
 }
 
@@ -220,23 +216,31 @@ async function main() {
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
 
   // the door stands on the shelf, beside the lessons
-  await page.waitForSelector('#mock-link', { timeout: 8000 });
-  await page.click('#mock-link');
+  await page.waitForSelector('#mock-link', { state: 'attached', timeout: 8000 });
+  await openShelfDoor(page, '#mock-link');
+  await page.waitForSelector('.assessment-room #exam-legacy');
+  await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
+  // since the 2026-10-01 polish pass 未確認 is said once for the page (every set is unchecked),
+  // not on each of the 25 rows; a row still wears it when the list mixes checked and unchecked
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
-    return { rows: rows.length, pending: document.querySelectorAll('.mock-pending').length };
+    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === '未確認');
+    const marked = rows.filter((r) => chips(r).length);
+    const page = chips(document.querySelector('#app main')).filter((c) => !c.closest('[data-mock-set]')).length;
+    return { rows: rows.length, rowMarks: marked.length, pageMarks: page };
   })()`);
-  check('the room lists all 25 papers, each marked 検収前', listing.rows === 25 && listing.pending === 25, JSON.stringify(listing));
+  check('earlier exercises retain all 25 papers, and 未確認 is said once for the page, not on every row',
+    listing.rows === 25 && listing.pageMarks === 1 && listing.rowMarks === 0, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time
   await page.click('[data-mock-set="n5-01"]');
   await page.waitForSelector('#mock-next', { timeout: 15000 });
-  const midRun = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    return { hasRun: !!s.mockRun, ix: s.mockRun?.ix, hasQuestions: JSON.stringify(s.mockRun || {}).length };
-  })()`);
-  check('the run persists the learner’s place, not the questions', midRun.hasRun === true && midRun.ix === 0 && midRun.hasQuestions < 400, JSON.stringify(midRun));
+  const midRecord = await readAppRecord(page);
+  const selected = selectPractice(midRecord.assessmentLibrary);
+  const midRun = { hasRun: !!selected, ix: selected?.run.ix, questions: selected?.flat.length,
+    formRevisionId: selected?.formRevisionId, savedRevisionId: midRecord.assessmentLibrary?.forms[0]?.form.revisionId };
+  check('the run persists the learner’s place with its complete pinned question version', midRun.hasRun === true && midRun.ix === 0 && midRun.questions === 18 && midRun.formRevisionId === midRun.savedRevisionId, JSON.stringify(midRun));
 
   // the paper does not judge mid-sitting
   await page.click('[data-mock-opt="0"]');
@@ -248,48 +252,89 @@ async function main() {
   // a reload mid-paper costs nothing: the view is session state and returns
   // home, but the paper waits, and its own door leads straight back in
   await page.click('#mock-next');
+  await waitForAppRecord(page, (record) => selectPractice(record.assessmentLibrary)?.run.ix === 1,
+    { description: 'first saved practice question transition' });
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await page.click('#mock-link');
+  await openShelfDoor(page, '#mock-link');
   await page.waitForSelector('#mock-next', { timeout: 15000 });
-  const noList = await page.evaluate(`document.querySelectorAll('[data-mock-set]').length`);
-  check('the door re-enters the open paper, not the list', noList === 0);
-  const resumed = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  // The running paper also carries data-mock-set for identity; only buttons are catalog doors.
+  const reentry = await page.evaluate(() => {
+    const inspect = (node) => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return {
+        tag: node.tagName, id: node.id, className: node.className,
+        setId: node.getAttribute('data-mock-set'),
+        visible: rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.visibility !== 'collapse',
+      };
+    };
+    return {
+      matches: [...document.querySelectorAll('[data-mock-set]')].map(inspect),
+      catalogButtons: [...document.querySelectorAll('#app > main button[data-mock-set]')].map(inspect),
+      activeMains: [...document.querySelectorAll('#app > main[data-mock-set]')].map(inspect),
+    };
+  });
+  reentry.expectedSetId = selected?.run.setId;
+  reentry.nextVisible = await page.locator('#app > main #mock-next').isVisible();
+  check('the door re-enters the open paper, not the list',
+    reentry.expectedSetId === 'n5-01' && reentry.catalogButtons.length === 0 &&
+      reentry.activeMains.length === 1 && reentry.activeMains[0].setId === reentry.expectedSetId &&
+      reentry.activeMains[0].visible && reentry.nextVisible,
+    JSON.stringify(reentry));
+  const resumedSelection = selectPractice((await readAppRecord(page)).assessmentLibrary);
+  const quarantined = () => page.evaluate(() => {
     const alert = document.getElementById('store-alert');
-    return { ix: s.mockRun?.ix, quarantined: !!(alert && !alert.hidden && alert.textContent) };
-  })()`);
-  check('a reload mid-paper resumes at the same question, unquarantined', resumed.ix === 1 && resumed.quarantined === false, JSON.stringify(resumed));
+    return !!(alert && !alert.hidden && alert.textContent);
+  });
+  const resumed = {
+    ix: resumedSelection?.run.ix, setId: resumedSelection?.run.setId,
+    attemptId: resumedSelection?.attemptId, formRevisionId: resumedSelection?.formRevisionId,
+    itemId: resumedSelection?.flat[resumedSelection.run.ix]?.itemId,
+    itemVersionId: resumedSelection?.flat[resumedSelection.run.ix]?.itemVersionId,
+    firstAnswer: resumedSelection?.run.answers[0],
+    clockStatus: resumedSelection?.clockStatus, quarantined: await quarantined(),
+  };
+  check('a reload resumes at the same pinned question with unknown process downtime',
+    resumed.ix === 1 && resumed.setId === 'n5-01' && resumed.attemptId === selected?.attemptId &&
+      resumed.formRevisionId === selected?.formRevisionId && resumed.itemId === selected?.flat[1]?.itemId &&
+      resumed.itemVersionId === selected?.flat[1]?.itemVersionId && resumed.firstAnswer === 0 &&
+      resumed.clockStatus === 'unverified' && resumed.quarantined === false,
+    JSON.stringify(resumed));
 
-  const before = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    return { taken: (s.taken || []).length, srs: Object.keys(s.srs || {}).length, revlog: (s.revlog || []).length };
-  })()`);
+  const beforeRecord = await readAppRecord(page);
+  const before = { taken: (beforeRecord.taken || []).length, srs: Object.keys(beforeRecord.srs || {}).length, revlog: (beforeRecord.revlog || []).length };
 
   for (let guard = 0; guard < 60; guard += 1) {
     const done = await page.evaluate(`!!document.getElementById('mock-done')`);
     if (done) break;
+    const current = selectPractice((await readAppRecord(page)).assessmentLibrary);
     await page.click('[data-mock-opt="0"]');
+    await waitForAppRecord(page, (record) => selectPractice(record.assessmentLibrary)?.run.answers[current.run.ix] === 0,
+      { description: 'saved practice answer' });
     await page.click('#mock-next');
-    await page.waitForTimeout(60);
+    await waitForAppRecord(page, (record) => selectPractice(record.assessmentLibrary)?.run.ix === current.run.ix + 1,
+      { description: 'saved next practice question' });
   }
   await page.waitForSelector('#mock-done', { timeout: 15000 });
 
-  const graded = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+  const graded = await page.evaluate((text) => {
+    const s = JSON.parse(text);
     const rows = (s.obslog || []).filter((r) => r[1] === 'mock');
+    const attempt = s.assessmentLibrary?.attempts[0];
     return {
       rows: rows.length,
-      shaped: rows.every((r) => r.length === 5 && typeof r[2] === 'string' && r[2].includes(':') && [1, 3].includes(r[3]) && String(r[4]).startsWith('n5-01#')),
-      done: s.mockDone?.['n5-01'] || null,
+      responses: attempt?.facts.filter((fact) => fact.kind === 'response').length,
+      answered: attempt?.answers.filter((answer) => answer.response.kind === 'selected').length,
+      status: attempt?.status,
       taken: (s.taken || []).length,
       srs: Object.keys(s.srs || {}).length,
       revlog: (s.revlog || []).length,
       text: document.querySelector('main')?.textContent || '',
     };
-  })()`);
-  check('a sat paper writes typed mock rows naming the paper AND the kind of question', graded.rows >= 10 && graded.shaped === true, `${graded.rows} rows`);
-  check('the score is kept, and it is the score of THIS paper', !!graded.done && graded.done.total >= 12, JSON.stringify(graded.done));
+  }, JSON.stringify(await readAppRecord(page)));
+  check('unreviewed practice keeps full response facts without inventing measured obslog grades', graded.rows === 0 && graded.responses === 18, `${graded.responses} response facts; ${graded.rows} legacy grades`);
+  check('submission retains every selected answer for this exact question version', graded.status === 'submitted' && graded.answered === 18, JSON.stringify({ status: graded.status, answered: graded.answered }));
   check('sitting a paper moves NO schedule: no deck row, no FSRS card, no review row', graded.taken === before.taken && graded.srs === before.srs && graded.revlog === before.revlog, `${JSON.stringify(before)} → taken ${graded.taken} srs ${graded.srs} revlog ${graded.revlog}`);
   check(
     'the result screen refuses to predict a pass — and says so in as many words',
@@ -305,28 +350,39 @@ async function main() {
   check('the missed words are offered, never taken', adopt.offered === true, adopt.label);
   if (adopt.offered) {
     await page.click('#mock-enroll-all');
-    await page.waitForTimeout(200);
+    await waitForAppRecord(page, (record) => record.taken?.length > before.taken,
+      { description: 'explicitly adopted missed words' });
   }
-  const adopted = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    return { taken: (s.taken || []).length, started: (s.taken || []).every((t) => !!t.started), srs: Object.keys(s.srs || {}).length };
-  })()`);
+  const adoptedRecord = await readAppRecord(page);
+  const adopted = { taken: (adoptedRecord.taken || []).length, started: (adoptedRecord.taken || []).every((t) => !!t.started), srs: Object.keys(adoptedRecord.srs || {}).length };
   check('one press mints the missed words as ordinary started cards — and only then', adopted.taken > before.taken && adopted.started === true, `${before.taken} → ${adopted.taken}`);
   check('even adoption schedules nothing itself — FSRS stays the only scheduler', adopted.srs === before.srs);
 
   // the envelope validator accepts everything the room wrote
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  const survived = await page.evaluate(`(() => {
-    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
-    const alert = document.getElementById('store-alert');
-    return {
-      rows: (s.obslog || []).filter((r) => r[1] === 'mock').length,
-      done: !!s.mockDone?.['n5-01'],
-      quarantined: !!(alert && !alert.hidden && alert.textContent),
-    };
-  })()`);
-  check('mock rows and scores cross a reload whole — the validator admits them', survived.rows >= 10 && survived.done === true && survived.quarantined === false, JSON.stringify(survived));
+  const survivedRecord = await readAppRecord(page);
+  const survived = {
+    rows: (survivedRecord.obslog || []).filter((r) => r[1] === 'mock').length,
+    done: survivedRecord.assessmentLibrary?.attempts[0]?.status === 'submitted',
+    responses: survivedRecord.assessmentLibrary?.attempts[0]?.facts.filter((fact) => fact.kind === 'response').length,
+    quarantined: await quarantined(),
+  };
+  check('full submitted answers cross a reload whole without measured legacy grades', survived.rows === 0 && survived.responses === 18 && survived.done === true && survived.quarantined === false, JSON.stringify(survived));
+  await openShelfDoor(page, '#mock-link');
+  await page.click('#mock-done');
+  await page.click('#exam-legacy');
+  await page.waitForSelector('[data-mock-history]');
+  const historyRecord = await waitForAppRecord(page, (record) => record.assessmentLibrary?.activeAttemptId === null,
+    { description: 'cleared practice pointer with retained history' });
+  const library = historyRecord.assessmentLibrary;
+  const history = { active: library.activeAttemptId, attempts: library.attempts.length,
+    answers: library.attempts[0].answers.length,
+    visible: await page.locator('[data-mock-history]').count() };
+  check('Done clears the active pointer and keeps complete history accessible', history.active === null && history.attempts === 1 && history.answers === 18 && history.visible === 1, JSON.stringify(history));
+  await page.locator('[data-mock-history]').click();
+  await page.waitForSelector('.mock-review-row');
+  check('opening completed history renders every pinned question for review', await page.locator('.mock-review-row').count() === 18 && await page.locator('#mock-done').isVisible());
 
   // review round 7: a failure that re-fires on sight is a loop, not a retry.
   // With the catalog unreachable the room must ask ONCE, settle, and wait for
@@ -341,7 +397,8 @@ async function main() {
   const lonely = await offline.newPage();
   await lonely.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await lonely.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-  await lonely.click('#mock-link');
+  await openShelfDoor(lonely, '#mock-link');
+  await lonely.click('#exam-legacy');
   await lonely.waitForSelector('#mock-retry', { timeout: 10000 });
   const settledAt = attempts;
   await lonely.waitForTimeout(1500);
@@ -359,10 +416,20 @@ async function main() {
   return failures === 0 ? 0 : 1;
 }
 
+function receipt(error = null) {
+  const hash = (path) => createHash('sha256').update(readFileSync(path)).digest('hex');
+  writeFileSync(resolve(EVIDENCE, 'mock-report.json'), JSON.stringify({
+    schemaVersion: 1,
+    artifact: { path: CORRIDOR_DIR, sha256: readJson(resolve(CORRIDOR_DIR, 'build-identity.json')).artifactSha256 },
+    sources: { verifier: hash(fileURLToPath(import.meta.url)), nativeRecordHelper: hash(fileURLToPath(new URL('./record-test-support.mjs', import.meta.url))) },
+    results, failed: failures, error, pass: failures === 0 && !error,
+  }, null, 2) + '\n');
+}
 main().then(
-  (code) => process.exit(code),
+  (code) => { receipt(); process.exit(code); },
   (err) => {
     console.error(err);
+    receipt(err.stack || String(err));
     process.exit(2);
   },
 );

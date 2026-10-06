@@ -14,10 +14,9 @@
  * operator's budget on every page view (OD-08) and would make "the app asked a
  * model about this" something that happened without anyone deciding it.
  *
- * **Unmounting cancels.** The abort signal is wired to the effect's cleanup, so
- * navigating away aborts the in-flight call rather than leaving it to finish
- * into a component that is gone. The store is never written after unmount
- * either — a late resolution finds `active.current` false and drops.
+ * **Leaving cancels.** Unmount and web `pagehide` invalidate the request before
+ * aborting it. The runtime can resolve cancellation as a labelled fallback;
+ * that result belongs to the abandoned request and must not enter the store.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -61,28 +60,50 @@ export function useCandidate(options: UseCandidateOptions): UseCandidateResult {
   const [failure, setFailure] = useState<{ message: string; detail: string } | null>(null);
 
   const active = useRef(true);
-  const abort = useRef<(() => void) | null>(null);
+  const pending = useRef<AbortController | null>(null);
 
   useEffect(() => {
     active.current = true;
-    return () => {
+    setBusy(false);
+    const leave = () => {
       active.current = false;
-      abort.current?.();
+      const controller = pending.current;
+      pending.current = null;
+      controller?.abort();
     };
-  }, []);
+    const resume = () => {
+      if (active.current) return;
+      active.current = true;
+      setBusy(false);
+    };
+    // React cleanup does not run when the browser tears down a document.
+    // pagehide also covers a page entering the back/forward cache; pageshow
+    // makes that same mounted panel usable again without reviving its request.
+    const page = typeof window === 'undefined' ? null : window;
+    page?.addEventListener?.('pagehide', leave);
+    page?.addEventListener?.('pageshow', resume);
+    return () => {
+      page?.removeEventListener?.('pagehide', leave);
+      page?.removeEventListener?.('pageshow', resume);
+      leave();
+    };
+  }, [runtime, store, threadId]);
 
   const request = useCallback(() => {
-    if (busy || threadId === null || context === null) return;
+    if (!active.current || pending.current !== null || threadId === null || context === null)
+      return;
     setBusy(true);
     setFailure(null);
 
     const controller = new AbortController();
-    abort.current = () => controller.abort();
+    pending.current = controller;
+    const isCurrent = () =>
+      active.current && pending.current === controller && !controller.signal.aborted;
 
     void runtime
       .requestCandidate({ context, signal: controller.signal })
       .then((outcome) => {
-        if (!active.current) return;
+        if (!isCurrent()) return;
         store.execute({
           kind: 'attachCandidate',
           threadId,
@@ -98,17 +119,19 @@ export function useCandidate(options: UseCandidateOptions): UseCandidateResult {
         // The runtime resolves for every runtime condition, so reaching here
         // means a caller bug — a context this build cannot form a request from.
         // Say so rather than presenting it as an unavailable network.
-        if (!active.current) return;
+        if (!isCurrent()) return;
         setFailure({
           message: 'This note could not be requested.',
           detail: error instanceof Error ? error.message : 'The request could not be built.',
         });
       })
       .finally(() => {
+        // An old completion must not clear a request started after pageshow.
+        if (pending.current !== controller) return;
+        pending.current = null;
         if (active.current) setBusy(false);
-        abort.current = null;
       });
-  }, [busy, context, runtime, store, threadId]);
+  }, [context, runtime, store, threadId]);
 
   const accept = useCallback(() => {
     if (existing === null || existing.status === 'accepted') return;
