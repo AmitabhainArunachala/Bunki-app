@@ -228,6 +228,76 @@ def apply_reading_overrides(tokens: list[dict]) -> list[dict]:
     return tokens
 
 
+# The segment-override lexicon: in kana-only text UniDic sometimes picks the
+# wrong word, so a tap opens the wrong entry (こうばん → こう + 晩, まどの →
+# ま + どの, ぶちょう → 不調, 相変わらずなんで → the pronoun 何). The reading
+# lexicon above cannot help (its splits stay UniDic's), so this one re-splits:
+# each entry matches adjacent tokens (surface, optionally POS or base, and an
+# optional guard on the token before) and puts its own tokens in their place,
+# spelling the same text. Applied before the reading lexicon, in tokenise().
+SEGMENT_OVERRIDES_PATH = REPO / "docs/content/segment-overrides.json"
+_SEGMENT_OVERRIDES: list[dict] | None = None
+
+
+def load_segment_overrides() -> list[dict]:
+    """Override entries, longest match first (deterministic)."""
+    global _SEGMENT_OVERRIDES
+    if _SEGMENT_OVERRIDES is None:
+        entries = list(json.loads(SEGMENT_OVERRIDES_PATH.read_text("utf-8"))["entries"])
+        for entry in entries:
+            spelled = "".join(m["s"] for m in entry["match"])
+            if "".join(t["s"] for t in entry["tokens"]) != spelled:
+                raise SystemExit(
+                    f"segment-overrides entry {entry.get('word')!r}: "
+                    f"its tokens must spell {spelled!r}"
+                )
+        _SEGMENT_OVERRIDES = sorted(entries, key=lambda e: -len(e["match"]))
+    return _SEGMENT_OVERRIDES
+
+
+def _token_fits(tok: dict, want: dict) -> bool:
+    return all(tok.get(k) == want[k] for k in ("s", "p", "b") if k in want)
+
+
+def apply_segment_overrides(tokens: list[dict]) -> list[dict]:
+    """Replace each matched run of tokens with the entry's tokens, greedy
+    left to right, longest entry first; replaced tokens are marked
+    rs:"segment"."""
+    entries = load_segment_overrides()
+    out: list[dict] = []
+    i = 0
+    while i < len(tokens):
+        matched = None
+        for entry in entries:
+            want = entry["match"]
+            after = entry.get("after")
+            if (
+                i + len(want) <= len(tokens)
+                and all(_token_fits(tokens[i + j], want[j]) for j in range(len(want)))
+                and (after is None or (out and _token_fits(out[-1], after)))
+            ):
+                matched = entry
+                break
+        if matched is None:
+            out.append(tokens[i])
+            i += 1
+            continue
+        for t in matched["tokens"]:
+            out.append(
+                {
+                    "s": t["s"],
+                    "b": t["b"],
+                    "p": t["p"],
+                    "r": t["r"],
+                    "f": furigana_pairs(t["s"], t["r"]),
+                    "c": t["c"],
+                    "rs": "segment",
+                }
+            )
+        i += len(matched["match"])
+    return out
+
+
 def tokenise(text: str, tagger) -> list[dict]:
     from corpus.grading._mecab import is_content, is_punct
 
@@ -246,7 +316,7 @@ def tokenise(text: str, tagger) -> list[dict]:
                 "c": bool(is_content(tok)) and not is_punct(tok),
             }
         )
-    return apply_reading_overrides(tokens)
+    return apply_reading_overrides(apply_segment_overrides(tokens))
 
 
 def ruby_spans(markup: str) -> tuple[str, list[tuple[int, int, str]]]:

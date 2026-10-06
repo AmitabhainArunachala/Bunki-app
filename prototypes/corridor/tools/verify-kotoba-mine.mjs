@@ -868,17 +868,19 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
       front.id === card.id && front.sentences === sentenceEnds(card.ja).length && front.sentences >= 4 && front.target.length === 1 && front.target[0] === card.form && front.rt === 0 && front.blank === 0 && front.text === card.ja,
       JSON.stringify({ ...front, text: undefined }),
     );
-    // the pilot card's row (講, 世界史) fits one line at 390px; with a long topic chip (インド・仏教,
-    // AI・半導体, 心と学び) beside a level chip the row wraps once (flex-wrap; HANDOFF, what remains)
-    const rows = label === 'pilot' ? 1 : 2;
+    // one line at 390px, even with the longest topic chip (インド・仏教) beside a level chip
+    // (km-064-m08): the register chip stands in for the source chip and names the source
     check(
-      `${label}: the register and topic sit as small text chips in the card’s chip row (labelled in full), the passage’s topic in place of the word’s group, ${rows === 1 ? 'one row' : 'at most two rows'} on a phone`,
-      front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && front.reg === `文体：${REGISTER_NAMES[card.register]}` && front.rows <= rows,
+      `${label}: the register and topic sit as small text chips in the card’s chip row (labelled in full, the register’s label naming the source), the passage’s topic in place of the word’s group and its register in place of the source chip, one row on a phone`,
+      front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && !front.chips.includes('書き下ろし') && front.reg === `文体：${REGISTER_NAMES[card.register]}（書き下ろし）` && front.rows === 1,
       JSON.stringify({ chips: front.chips, reg: front.reg, rows: front.rows }),
     );
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok', { timeout: 15000 });
+    // on the back the 全文／焦点 toggle may take a line of its own; the chips keep theirs
+    const backRows = await page.evaluate(`new Set([...document.querySelectorAll('#kp-card .kp-chips > .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))).size`);
+    check(`${label}: on the back the chips still sit on one row`, backRows === 1, JSON.stringify({ backRows }));
     const back = await page.evaluate(`(() => { const a = document.querySelector('#kp-card .kp-answer'); const kids = [...a.children].map((n) => n.className.split(' ')[0]); const note = a.querySelector(':scope > .kp-note'); return { kids, note: note?.textContent || '', lang: note?.closest('[lang]')?.lang, beforeFolds: kids.indexOf('kp-note') >= 0 && kids.indexOf('kp-note') < kids.indexOf('kp-folds'), afterDef: kids.indexOf('kp-note') === kids.indexOf('kp-def') + 1, grammar: [...document.querySelectorAll('#kp-see [data-grammar]')].map((n) => n.dataset.grammar) }; })()`);
     check(
       `${label}: the back puts the passage’s own usage note (tipJa) in tier one, right after the definition and before the folds, in Japanese`,
@@ -1470,11 +1472,9 @@ async function verifyBack(browser, base) {
     );
   }
 
-  // 5, A39) the standalone study pages have no host header: the settling scroll never slides the
-  // study top bar (× n/N 削除) under the top edge of the screen when the target sentence, word and
-  // definition fit under it, and tier one still sits above the bar. A word's first passage is a
-  // long contract-v2 one since A49: there the word and definition win the scroll (A39), so the
-  // top bar may leave the screen; a short passage (km-064-m01, due) keeps it.
+  // 5, A39) the standalone study pages have no host header, so the study top bar (× n/N 削除)
+  // pins itself: after the reveal it stays on screen on a short passage (km-064-m01, due) and on a
+  // word's long contract-v2 first passage (A49) alike, and tier one rests between it and the bar.
   {
     const release = await startServer(resolve(REPO_DIR, 'decks/kotoba-mine/release'));
     const seen = [];
@@ -1498,16 +1498,16 @@ async function verifyBack(browser, base) {
         await p.waitForSelector('.kp-grade');
         await p.evaluate(RESTING);
         const rest = await p.evaluate(AT_REST);
-        const head = await p.evaluate(`Math.round(document.querySelector('.kp-top-study').getBoundingClientRect().top)`);
-        seen.push({ page, card, short, head, ...rest });
+        const top = await p.evaluate(`(() => { const h = document.querySelector('.kp-top-study').getBoundingClientRect(); return { head: Math.round(h.top), headBottom: Math.round(h.bottom), termTop: Math.round(document.querySelector('#kp-card .kp-term').getBoundingClientRect().top) }; })()`);
+        seen.push({ page, card, short, ...top, ...rest });
         await context.close();
       }
     } finally {
       release.server.close();
     }
     check(
-      '5, A39) standalone study pages (no host header): at rest after the reveal the word and definition sit above the pinned bar, and the study top bar is still on screen (its top ≥ 0) on a short passage; on a long contract-v2 first passage the word and definition win the scroll',
-      seen.length === 3 && seen.every((x) => (!x.short || x.head >= 0) && x.term <= x.bar && x.def <= x.bar) && seen[0].card === 'km-064-m01' && index.get(seen[1].card)?.c.register,
+      '5, A39) standalone study pages (no host header): the study top bar pins itself, so at rest after the reveal it is on screen (its top ≥ 0) on a short passage and on a long contract-v2 first passage alike, and the word and definition sit between it and the pinned grade bar',
+      seen.length === 3 && seen.every((x) => x.head >= 0 && x.termTop >= x.headBottom && x.term <= x.bar && x.def <= x.bar) && seen[0].card === 'km-064-m01' && index.get(seen[1].card)?.c.register,
       JSON.stringify(seen),
     );
   }

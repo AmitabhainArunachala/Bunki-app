@@ -108,6 +108,8 @@ jobs:
         run: python3 decks/kotoba-mine/tools/test_gloss_ja.py
       - name: Passage rules and fields (test_export_mcd.py)
         run: python3 decks/kotoba-mine/tools/test_export_mcd.py
+      - name: Segment lexicon (test_segment_overrides.py)
+        run: python3 prototypes/corridor/tools/test_segment_overrides.py
       - name: Verify the deck and player (verify-kotoba-mine.mjs)
         run: node prototypes/corridor/tools/verify-kotoba-mine.mjs
       - name: Deck and player unit tests
