@@ -3,15 +3,17 @@
  *
  * The corridor builds it from closures over its own lexicon and 覚える store; here the
  * closures are fakes, so the adapter's own rules are pinned: which token kinds resolve to
- * which entry, that a particle resolves to nothing, that take() always lands in 覚えるの札
- * and adds a named list only on top of it, and that open() hands the corridor its own node.
+ * which entry, that a particle resolves to nothing, that take() is the corridor's one-tap save
+ * into 覚えるの札 (no chooser, no list argument, never a second write for a saved row), that
+ * addToList() hands a saved item to the corridor's list popover, and that open() hands the
+ * corridor its own node.
  */
 import { describe, expect, it } from 'vitest';
 
-import { TAKEN_LIST, createHost } from '../prototypes/corridor/decks/player/host.js';
+import { createHost } from '../prototypes/corridor/decks/player/host.js';
 
 function fakeCorridor() {
-  const store = { taken: [], lists: { 経済: [] } };
+  const store = { taken: [], captures: 0, popovers: [] };
   const opened = [];
   const dict = {
     減る: { head: '減る', r: 'へる', m: ['to decrease'], jlpt: 3 },
@@ -26,16 +28,13 @@ function fakeCorridor() {
       grammar.find((g) => g.id === id) || grammar.find((g) => p && norm(g.p) === norm(p)) || null,
     open: (node) => opened.push(node),
     taken: () => store.taken,
-    named: () => store.lists,
-    capture(node, label, lists) {
+    async capture(node, label) {
+      store.captures += 1;
       store.taken = [...store.taken, { t: node.t, id: node.id, label }];
-      for (const n of lists)
-        store.lists[n] = [...(store.lists[n] || []), { t: node.t, id: node.id }];
       return true;
     },
-    addToList(node, label, name) {
-      store.lists[name] = [...(store.lists[name] || []), { t: node.t, id: node.id }];
-      return true;
+    addToList(node, label, invoker) {
+      store.popovers.push({ t: node.t, id: node.id, label, invoker });
     },
   };
   return { host: createHost(deps), store, opened };
@@ -96,19 +95,21 @@ describe('host adapter', () => {
     expect(host.lookup(null)).toBeNull();
   });
 
-  it('take: 覚えるの札 always, a named list on top; isTaken follows; a second take only adds the list', () => {
+  it('take: one tap through the corridor save into 覚えるの札; isTaken follows; a saved row is not written again', async () => {
     const { host, store } = fakeCorridor();
     const word = host.lookup(tok('人口', '', 'じんこう', '語', '人口'));
-    expect(host.lists()[0]).toEqual({ id: TAKEN_LIST, label: '覚えるの札', size: 0, always: true });
+    expect(host.lists).toBeUndefined();
     expect(host.isTaken(word)).toBe(false);
-    expect(host.take(word)).toBe(true);
+    host.addToList(word, 'invoker');
+    expect(store.popovers).toEqual([]);
+    await expect(host.take(word)).resolves.toBe(true);
     expect(host.isTaken(word)).toBe(true);
-    expect(store.lists.経済).toEqual([]);
-    expect(host.take(word, '経済')).toBe(true);
-    expect(store.taken).toHaveLength(1);
-    expect(store.lists.経済).toEqual([{ t: 'word', id: '人口' }]);
-    expect(host.lists().map((l) => `${l.id}=${l.size}`)).toEqual([`${TAKEN_LIST}=1`, '経済=1']);
-    expect(host.take(null)).toBe(false);
+    await expect(host.take(word)).resolves.toBe(true);
+    expect(store.captures).toBe(1);
+    expect(store.taken).toEqual([{ t: 'word', id: '人口', label: '人口' }]);
+    host.addToList(word, 'invoker');
+    expect(store.popovers).toEqual([{ t: 'word', id: '人口', label: '人口', invoker: 'invoker' }]);
+    await expect(host.take(null)).resolves.toBe(false);
   });
 
   it('open: hands the corridor its own node — the word with its reading, the grammar point under the corridor id', () => {

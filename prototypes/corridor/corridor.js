@@ -28837,7 +28837,7 @@ window.addEventListener('DOMContentLoaded', () => {
  * (decks/player/host.js; learning-design §3). Kept below the storage-ledger
  * line pins on purpose (residual-storage-callers.json): the two call sites
  * above changed in place, so no pinned line moved. The adapter is closures
- * over this module's own lexicon, entry sheets and 覚える store: a tap on a
+ * over this module's own lexicon, entry sheets and one-tap save: a tap on a
  * deck card is capture, never evidence, so nothing here writes the
  * observation log or any schedule, and taking a word never enrols it in the
  * deck. The single-file build cannot import it and mounts no deck anyway. */
@@ -28862,17 +28862,11 @@ function deckHost() {
         GRAMMARS().find((g) => g.id === id) || (pattern ? GRAMMARS().find((g) => norm(g.p) === norm(pattern)) : null) || null,
       open: (node) => go(node),
       taken: () => S.taken,
-      named: () => S.lists || {},
-      capture: (node, label, lists) => commitCapture(node, label, Date.now(), lists),
-      addToList(node, label, name) {
-        const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
-        const rows = owns(S.lists, name) ? S.lists[name] : [];
-        if (!item || !name) return false;
-        if (rows.some((x) => x.t === node.t && x.id === node.id)) return true;
-        const next = { ...S.lists };
-        setOwnRecordValue(next, name, [...rows, { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts }]);
-        return commitStorePatch({ lists: next });
-      },
+      // 覚える from a deck card is the corridor's one save path (STANDARD A51): the same one-tap
+      // save, Saved toast and 元に戻す as the reader's dictionary visit, into the shared review
+      // pool; no chooser. A row already held for this identity is left as it is, never toggled off.
+      capture: (node, label) => (wordCaptureState(node) === 'taken' ? true : toggleWordSave(node, label)),
+      addToList: (node, label, invoker) => openVocabularyListPopover(node, label, invoker),
     });
   }
   return deckHostAdapter;

@@ -8,7 +8,7 @@
  * openEntry({ t: 'grammar', id }) is optional: a host that can show a grammar entry passes it,
  * and the back's 文法 links call it; without it they are plain labels.
  * host is optional too: the host lexicon adapter (decks/player/host.js, built by the corridor)
- * { name, lookup(token), open(entry), isTaken(entry), take(entry, listId), lists() }. The
+ * { name, lookup(token), open(entry), isTaken(entry), take(entry), addToList?(entry, invoker) }. The
  * corridor passes one; the standalone study pages have none (null), and nothing here pretends
  * to a dictionary it does not have. With a host and no openEntry, 文法 links open through it.
  */
@@ -89,7 +89,7 @@ export async function tokensFor(deckId, cardId) {
   return cardTokens(hit.card, await loadTokens(deckId, deck));
 }
 
-const HOST_METHODS = ['lookup', 'open', 'isTaken', 'take', 'lists'];
+const HOST_METHODS = ['lookup', 'open', 'isTaken', 'take'];
 /** the host adapter as given, or null when it is missing or lacks a method */
 function hostOf(host) {
   return host && HOST_METHODS.every((m) => typeof host[m] === 'function') ? host : null;
@@ -941,8 +941,8 @@ function seeAlsoLine(card, word) {
  * After the reveal only, every word of the passage and of the Japanese definition is a tap
  * target (a word, a kanji, a grammar cue as one, and any word of this deck; particles, endings
  * and punctuation are not words and stay plain). With a host lexicon (the corridor) a tap opens
- * the entry sheet: the reading, the Japanese sense, English behind 英語, and the reader's 覚える
- * chooser; a word of this deck says 「このデッキにあります」 and offers no chooser (A17). A word in
+ * the entry sheet: the reading, the Japanese sense, English behind 英語, and the corridor's one-tap
+ * 覚える (A51); a word of this deck says 「このデッキにあります」 and offers no 覚える (A17). A word in
  * the sheet's definition opens one more sheet, and that second one says 「ここで止めよう」 and offers
  * no further tap (Khatz's cut-off). Without a host (the standalone study pages) only this deck's
  * own words are tappable, from the page's built-in gloss map, and a tap shows a small popover with
@@ -1192,7 +1192,7 @@ function englishLine(cls, text) {
 function openSheet(frame, node, depth) {
   const prior = ui.sheet;
   const stack = depth > 1 && prior ? [...prior.stack.slice(0, depth - 1), frame] : [frame];
-  ui.sheet = { stack, pick: null, note: '', returnTo: depth > 1 && prior ? prior.returnTo : node };
+  ui.sheet = { stack, note: '', returnTo: depth > 1 && prior ? prior.returnTo : node };
   drawSheet();
 }
 function closeSheet() {
@@ -1233,7 +1233,7 @@ function sheetNode() {
   const top = el('div', 'kp-sheet-top');
   if (depth > 1) {
     top.append(btn('kp-icon kp-sheet-back', '←', () => {
-      ui.sheet = { ...ui.sheet, stack: stack.slice(0, -1), pick: null, note: '' };
+      ui.sheet = { ...ui.sheet, stack: stack.slice(0, -1), note: '' };
       drawSheet();
     }, { id: 'kp-sheet-back', 'aria-label': '前の語に戻る' }));
   }
@@ -1267,86 +1267,40 @@ function sheetNode() {
   return wrap;
 }
 
-/** 覚える, as the reader asks it: one tap opens どこに保存しますか？ — 覚えるの札 always, any named
- * lists, a new list — and nothing is saved until 保存する */
+/** 覚える is the corridor's one save path (STANDARD A51): one tap writes the word to 覚えるの札
+ * through the host, the corridor shows its Saved toast with 元に戻す, and nothing is asked first.
+ * Once saved, リストに追加… opens the corridor's own list popover; a list is optional. */
 function takeBlock(f) {
   const box = el('div', 'kp-take-box');
+  if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
   if (safely(() => !!ctx.host.isTaken(f.entry), false)) {
     box.append(el('p', 'kp-sheet-taken', '✓ 覚えるの札にあります'));
-    return box;
-  }
-  if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
-  const pick = ui.sheet.pick;
-  if (!pick) {
-    box.append(btn('kp-take', '覚える', () => {
-      ui.sheet.pick = { lists: [] };
-      ui.sheet.note = '';
-      drawSheet({ focus: false });
-      ctx.root.querySelector('#kp-chooser')?.scrollIntoView({ block: 'nearest' });
-    }, { id: 'kp-take', 'aria-expanded': 'false' }));
-    return box;
-  }
-  const ch = el('div', 'kp-chooser');
-  ch.id = 'kp-chooser';
-  ch.append(el('p', 'kp-chooser-q', 'どこに保存しますか？'));
-  const chips = el('div', 'kp-chooser-chips');
-  const always = el('button', 'kp-pick is-on', el('b', null, '✓ 覚えるの札'), el('small', null, '毎日の復習'));
-  always.type = 'button';
-  always.disabled = true;
-  chips.append(always);
-  const lists = safely(() => ctx.host.lists() || [], []);
-  const names = [...new Set([...lists.filter((l) => !l.always).map((l) => l.id), ...pick.lists])];
-  for (const name of names) {
-    const on = pick.lists.includes(name);
-    const size = lists.find((l) => l.id === name)?.size;
-    chips.append(btn(`kp-pick${on ? ' is-on' : ''}`, [el('b', null, `${on ? '✓ ' : ''}${name}`), el('small', null, size != null ? String(size) : '新規')], () => {
-      pick.lists = on ? pick.lists.filter((n) => n !== name) : [...pick.lists, name];
-      drawSheet({ focus: false });
-    }, { 'data-pick-list': name, 'aria-pressed': String(on) }));
-  }
-  const field = el('input', 'kp-chooser-field');
-  field.type = 'text';
-  field.id = 'kp-new-list';
-  field.placeholder = '＋ 新しいリストの名前';
-  field.setAttribute('aria-label', '新しいリストの名前');
-  const addNew = () => {
-    const name = field.value.trim();
-    if (!name) return;
-    if (!pick.lists.includes(name)) pick.lists = [...pick.lists, name];
-    drawSheet({ focus: false });
-  };
-  field.addEventListener('keydown', (e) => {
-    e.stopPropagation();
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addNew();
+    if (typeof ctx.host.addToList === 'function') {
+      const add = btn('kp-link kp-take-list', 'リストに追加…', () => {
+        safely(() => ctx.host.addToList(f.entry, add), null);
+      }, { id: 'kp-take-list', 'aria-haspopup': 'dialog' });
+      box.append(add);
     }
-  });
-  chips.append(el('div', 'kp-chooser-new', field, btn('kp-pick kp-chooser-add', '追加', addNew, { id: 'kp-new-list-add' })));
-  ch.append(chips, el('p', 'kp-chooser-note', TAKE_NOTE));
-  const saveBtn = btn('kp-take kp-take-save', pick.lists.length ? `保存する — 覚えるの札＋${pick.lists.length}` : '保存する', () => {
-    const typed = field.value.trim();
-    const chosen = typed && !pick.lists.includes(typed) ? [...pick.lists, typed] : pick.lists;
-    const ok = takeEntry(f.entry, chosen);
-    ui.sheet.pick = null;
+    return box;
+  }
+  const take = btn('kp-take', '覚える', async () => {
+    if (ui.sheet?.busy) return;
+    const sheetNow = ui.sheet;
+    sheetNow.busy = true;
+    take.disabled = true;
+    const ok = await takeEntry(f.entry);
+    sheetNow.busy = false;
+    if (ui.sheet !== sheetNow) return; // the sheet closed or moved on while the corridor saved
     ui.sheet.note = ok ? '' : '保存できませんでした';
     drawSheet({ focus: false });
-  }, { id: 'kp-take-save' });
-  const cancel = btn('kp-pick kp-take-cancel', 'やめる', () => {
-    ui.sheet.pick = null;
-    drawSheet({ focus: false });
-  }, { id: 'kp-take-cancel' });
-  ch.append(el('div', 'kp-chooser-actions', saveBtn, cancel));
-  box.append(ch);
+  }, { id: 'kp-take' });
+  box.append(take, el('p', 'kp-take-note', TAKE_NOTE));
   return box;
 }
-/** 覚えるの札, then each chosen list, through the host (the corridor's guarded commit) */
-function takeEntry(entry, names) {
+/** 覚えるの札, through the host (the corridor's guarded one-tap save) */
+async function takeEntry(entry) {
   try {
-    if (!names.length) return !!ctx.host.take(entry);
-    let ok = true;
-    for (const name of names) ok = !!ctx.host.take(entry, name) && ok;
-    return ok;
+    return !!(await ctx.host.take(entry));
   } catch {
     return false;
   }

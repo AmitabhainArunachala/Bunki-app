@@ -10,8 +10,11 @@
  *   host.lookup(token)        → entry | null    a decoded card token (engine cardTokens)
  *   host.open(entry)          → void            the corridor's own entry sheet
  *   host.isTaken(entry)       → boolean         already in 覚えるの札
- *   host.take(entry, listId)  → boolean         覚えるの札 (TAKEN_LIST) or a named list; false when not saved
- *   host.lists()              → [{ id, label, size, always? }]
+ *   host.take(entry)          → Promise<boolean> the corridor's one-tap save into 覚えるの札 (no chooser;
+ *                                                the corridor shows its Saved toast with 元に戻す); false
+ *                                                when not saved
+ *   host.addToList(entry, invoker) → void       the corridor's optional リストに追加… popover, for a
+ *                                                word already saved
  *
  * An entry is { t: 'word' | 'kanji' | 'grammar', id, label, reading, gloss, ja, en, level?, seq?, token }:
  * t and id are the corridor's node, so open() and take() address the same row its reader does.
@@ -26,16 +29,13 @@
  *   grammar(id, pattern)  a grammar entry by id, else by pattern
  *   open(node)            push an entry sheet
  *   taken()               the 覚えるの札 rows
- *   named()               the named lists, { name: rows }
- *   capture(node, label, lists)   the guarded commit 保存する runs (always 覚えるの札, plus lists)
- *   addToList(node, label, name)  put an already-taken item on a named list
+ *   capture(node, label)  the corridor's one-tap save (toggleWordSave, bound to the dictionary
+ *                         visit and the shared review pool); resolves true when the row is written
+ *   addToList(node, label, invoker)  open the corridor's list popover for a saved item
  *
  * A tap here is capture, never evidence: nothing in this adapter writes the observation log or
  * any schedule, and take() never enrols the word in the deck the card belongs to.
  */
-
-/** the id lists() gives 覚えるの札, which every take() writes to */
-export const TAKEN_LIST = '@taken';
 
 const KANA_ONLY = /^[぀-ヿー]+$/;
 const kataToHira = (s) => String(s || '').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
@@ -106,18 +106,14 @@ export function createHost(deps) {
       if (entry?.t && entry.id) deps.open(nodeOf(entry, deps));
     },
     isTaken: taken,
-    take(entry, listId = TAKEN_LIST) {
+    async take(entry) {
       if (!entry?.t || !entry.id) return false;
-      const lists = listId && listId !== TAKEN_LIST ? [String(listId)] : [];
-      if (!taken(entry)) return !!deps.capture(nodeOf(entry, deps), entry.label || entry.id, lists);
-      return lists.length ? !!deps.addToList(nodeOf(entry, deps), entry.label || entry.id, lists[0]) : true;
+      if (taken(entry)) return true;
+      return !!(await deps.capture(nodeOf(entry, deps), entry.label || entry.id));
     },
-    lists() {
-      const named = deps.named() || {};
-      return [
-        { id: TAKEN_LIST, label: '覚えるの札', size: (deps.taken() || []).length, always: true },
-        ...Object.keys(named).map((name) => ({ id: name, label: name, size: (named[name] || []).length })),
-      ];
+    addToList(entry, invoker) {
+      if (!entry?.t || !entry.id || !taken(entry) || typeof deps.addToList !== 'function') return;
+      deps.addToList(nodeOf(entry, deps), entry.label || entry.id, invoker);
     },
   };
 }

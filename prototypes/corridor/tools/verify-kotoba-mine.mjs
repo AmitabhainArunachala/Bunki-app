@@ -656,6 +656,7 @@ async function verifyHost(browser, base) {
     await page.waitForSelector('#kp-start', { timeout: 15000 });
     const before = fetched.filter((p) => p.endsWith('/tokens.json')).length;
     const ledgerBefore = await page.evaluate(`localStorage.getItem('bunki-cloze:kotoba-mcd')`);
+    const recordBefore = await readAppRecord(page);
     const o = await page.evaluate(`(async () => {
       const m = await import(new URL('decks/player/mount.js', location.href).href);
       const h = m.hostAdapter();
@@ -663,32 +664,34 @@ async function verifyHost(browser, base) {
       const pick = (k) => toks.find((t) => t.k === k && t.ref);
       const word = h.lookup(pick('語')), kanji = h.lookup(pick('字')), grammar = h.lookup(pick('文法'));
       const other = h.lookup(toks.find((t) => t.k === 'other'));
-      const env = () => JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
-      const obsBefore = (env().obslog || []).length;
-      const lists0 = h.lists();
       const takenBefore = h.isTaken(word);
-      const took = h.take(word);
-      const listed = h.take(kanji, 'デッキで見た字');
-      const after = env();
+      const took = await h.take(word);
+      const again = await h.take(word);
+      const kanjiTook = await h.take(kanji);
       return {
         host: document.querySelector('.kp')?.dataset.host,
-        methods: ['lookup', 'open', 'isTaken', 'take', 'lists'].filter((k) => typeof h?.[k] === 'function').length,
+        methods: ['lookup', 'open', 'isTaken', 'take', 'addToList'].filter((k) => typeof h?.[k] === 'function').length,
+        lists: typeof h?.lists,
         tokens: toks.length, spells: toks.map((t) => t.s).join('').length,
         word, kanji: kanji && { t: kanji.t, id: kanji.id, gloss: kanji.gloss }, grammar: grammar && { t: grammar.t, id: grammar.id, label: grammar.label },
         other,
-        lists0: lists0.map((l) => l.id), takenBefore, took, listed,
+        takenBefore, took, again, kanjiTook,
         takenAfter: h.isTaken(word), kanjiTaken: h.isTaken(kanji),
-        rows: after.taken.filter((t) => t.id === word.id || t.id === kanji.id).map((t) => t.t + ':' + t.id),
-        list: (after.lists?.['デッキで見た字'] || []).map((x) => x.t + ':' + x.id),
-        lists1: h.lists().map((l) => l.id + '=' + l.size),
-        obs: (after.obslog || []).length - obsBefore,
+        toast: document.getElementById('reader-toast')?.textContent || '',
+        undo: !!document.getElementById('reader-toast-action'),
+        chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #take-chooser, .take-chooser').length,
       };
     })()`);
+    const wordId = o.word?.id, kanjiId = o.kanji?.id;
+    const recordAfter = await waitForAppRecord(page, (r) => r.taken.some((t) => t.id === wordId) && r.taken.some((t) => t.id === kanjiId), { description: 'deck host captures' });
+    o.rows = recordAfter.taken.filter((t) => t.id === wordId || t.id === kanjiId).map((t) => t.t + ':' + t.id);
+    o.obs = (recordAfter.obslog || []).length - (recordBefore.obslog || []).length;
+    o.srsSame = JSON.stringify(recordAfter.srs || {}) === JSON.stringify(recordBefore.srs || {});
     const loaded = fetched.filter((p) => p.endsWith('/tokens.json')).length - before;
     const ledgerAfter = await page.evaluate(`localStorage.getItem('bunki-cloze:kotoba-mcd')`);
     check(
-      'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, lists); the tokens side file loads only when asked',
-      o.host === 'corridor' && o.methods === 5 && before === 0 && loaded === 1,
+      'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, addToList; no lists() chooser feed); the tokens side file loads only when asked',
+      o.host === 'corridor' && o.methods === 5 && o.lists === 'undefined' && before === 0 && loaded === 1,
       JSON.stringify({ host: o.host, methods: o.methods, tokensFetchedAtStart: before, onAsk: loaded }),
     );
     check(
@@ -697,9 +700,9 @@ async function verifyHost(browser, base) {
       JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other }),
     );
     check(
-      'host: take() writes 覚えるの札 (and a named list) through the corridor store, isTaken() then says so; the deck ledger and the observation log are untouched',
-      o.lists0[0] === '@taken' && !o.takenBefore && o.took && o.listed && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && o.list.length === 1 && o.lists1.includes('デッキで見た字=1') && o.obs === 0 && ledgerAfter === ledgerBefore,
-      JSON.stringify({ lists0: o.lists0, rows: o.rows, list: o.list, lists1: o.lists1, obs: o.obs, ledgerSame: ledgerAfter === ledgerBefore }),
+      'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
+      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && /復習に保存しました|Saved to review/.test(o.toast) && o.undo && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
+      JSON.stringify({ rows: o.rows, toast: o.toast, undo: o.undo, chooser: o.chooser, obs: o.obs, srsSame: o.srsSame, ledgerSame: ledgerAfter === ledgerBefore }),
     );
     await page.evaluate(`(async () => {
       const m = await import(new URL('decks/player/mount.js', location.href).href);
@@ -943,7 +946,10 @@ async function verifyTap(browser, base) {
     await page.waitForSelector('#kp-card');
     return { context, page, errors };
   };
-  const env = (page) => page.evaluate(`(() => { const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}'); return { taken: (e.taken || []).map((t) => t.t + ':' + t.id), lists: e.lists || {}, obs: (e.obslog || []).length, srs: JSON.stringify(e.srs || {}) }; })()`);
+  const env = async (page) => {
+    const e = await readAppRecord(page);
+    return { taken: (e.taken || []).map((t) => t.t + ':' + t.id), lists: e.lists || {}, obs: (e.obslog || []).length, srs: JSON.stringify(e.srs || {}) };
+  };
   const KEY = 'bunki-cloze:kotoba-mcd';
 
   // 1. the corridor: a new card of 財政 (km-064-m01), then a due card of 金利 (km-109-m01), whose definition names 利息
@@ -1015,21 +1021,27 @@ async function verifyTap(browser, base) {
       JSON.stringify(sheet),
     );
     await page.click('#kp-take');
-    await page.waitForSelector('#kp-chooser');
-    const chooser = await page.evaluate(`({ q: document.querySelector('#kp-chooser .kp-chooser-q')?.textContent, always: document.querySelector('#kp-chooser .kp-pick:disabled')?.textContent, note: document.querySelector('.kp-chooser-note')?.textContent })`);
-    const pending = await env(page);
-    await page.fill('#kp-new-list', 'デッキで見た語');
-    await page.keyboard.press('Enter');
-    await page.waitForSelector('[data-pick-list="デッキで見た語"][aria-pressed="true"]');
-    await page.click('#kp-take-save');
-    await page.waitForSelector('.kp-sheet-taken');
-    const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     const id = sheet.key.replace(/^\w+:/, '');
+    await waitForAppRecord(page, (r) => r.taken.some((t) => `${t.t}:${t.id}` === sheet.key), { description: 'one-tap deck capture' });
+    await page.waitForSelector('#kp-sheet .kp-sheet-taken');
+    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list').length, toast: document.getElementById('reader-toast')?.textContent || '', undo: !!document.getElementById('reader-toast-action'), list: !!document.getElementById('kp-take-list'), sheet: document.getElementById('kp-sheet')?.dataset.key })`);
+    const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     check(
-      'tap: 覚える asks 「どこに保存しますか？」 as the reader does (覚えるの札 always, a new list), writes nothing until 保存する, then the word is in 覚えるの札 and the list, and the sheet says so',
-      chooser.q === 'どこに保存しますか？' && /覚えるの札/.test(chooser.always || '') && pending.taken.length === before.env.taken.length && after.env.taken.includes(sheet.key) && (after.env.lists['デッキで見た語'] || []).some((x) => x.id === id),
-      JSON.stringify({ chooser, taken: after.env.taken, list: (after.env.lists['デッキで見た語'] || []).map((x) => x.id) }),
+      'tap: 覚える is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the corridor shows 復習に保存しました with 元に戻す; the sheet says so and offers リストに追加…',
+      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /復習に保存しました|Saved to review/.test(saved.toast) && saved.undo && saved.list && saved.sheet === sheet.key,
+      JSON.stringify({ ...saved, taken: after.env.taken }),
     );
+    // the optional list: the corridor's own popover, over the deck sheet, writes the same guarded commit
+    await page.click('#kp-take-list');
+    await page.waitForSelector('#vocabulary-list-popover', { timeout: 5000 });
+    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const r = p.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; })()`);
+    check(
+      'tap: リストに追加… opens the corridor’s list popover for the saved word, on top of the deck sheet and inside the screen',
+      pop.title.includes(sheet.term || id) && pop.onTop && pop.inside,
+      JSON.stringify(pop),
+    );
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5000 }).catch(() => {});
     check(
       'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the tap is one lookups[] row',
       before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 1 && ledger1[0][1] === front.card && ledger1[0][2] === 'p' && ledger1[0][4] === sheet.key && ledger1[0][5] === 1,
@@ -1056,7 +1068,7 @@ async function verifyTap(browser, base) {
     await page.waitForSelector('#kp-sheet');
     const self = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, indeck: s.querySelector('.kp-sheet-indeck')?.textContent, take: s.querySelectorAll('#kp-take, #kp-chooser, .kp-take').length, full: !!s.querySelector('#kp-sheet-full'), defToks: [...s.querySelectorAll('.kp-sheet-def .kp-tok')].map((n) => n.textContent), stop: !!s.querySelector('.kp-sheet-stop') }; })()`);
     check(
-      'tap: the card’s own word (a word enrolled in this deck) shows 「このデッキにあります」 and no 覚える chooser',
+      'tap: the card’s own word (a word enrolled in this deck) shows 「このデッキにあります」 and no 覚える',
       self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'このデッキにあります' && self.take === 0 && !self.full && !self.stop && self.defToks.includes('利息'),
       JSON.stringify(self),
     );
