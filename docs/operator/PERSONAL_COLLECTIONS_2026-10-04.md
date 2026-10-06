@@ -130,7 +130,7 @@ The new browser suite uses synthetic public content and real IndexedDB. It
 covers 320/390/1440 px layouts, failed saves, reload, sibling burial, append-only
 undo, invalid restore, independent windows racing, a full backup transfer,
 the ten existing palettes, and cold offline navigation followed by grading.
-It runs Chromium and WebKit in the dedicated **Personal collections** workflow.
+CI runs it in Chromium and WebKit as the `personal-collections-browser` gate.
 Screenshots contain only synthetic test material. This does not substitute
 for a physical iPhone acceptance run or prove native installation behavior.
 

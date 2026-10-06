@@ -158,8 +158,10 @@ The committed `docs/ci/flakes.jsonl` starts with observed evidence only. After t
 workflow lands on the default branch, `CI flake ledger` automatically appends new
 observations to that path on the fixed data branch `ci/flake-ledger`. The producer
 CI token remains read-only; the trusted consumer has contents-write and
-actions-read. It never writes main or the tested candidate. The feature branch
-contains the controlled-experiment seed; the data branch becomes the ongoing ledger.
+actions-read. It never writes main or the tested candidate. The feature branch's
+copy stays empty until the hosted fail-once experiment adds the controlled-experiment
+seed; the data branch starts from the default branch's copy and becomes the ongoing
+ledger.
 
 The consumer observes exactly three same-repository producers of the one CI
 pipeline: `ci.yml` (pull request or dispatch), `pages-app.yml` (push to main or
