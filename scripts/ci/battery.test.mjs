@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { runGates } from '../verify-release-gates.mjs';
+import { batteryGates, runGates } from '../verify-release-gates.mjs';
+import { EventEmitter } from 'node:events';
 import { importFlakes, validateFlake } from './import-flakes.mjs';
 import {
   aggregate,
@@ -12,6 +13,8 @@ import {
   createRetryPlan,
   digest,
   failureSummary,
+  gateForShard,
+  withRunnerSignals,
   loadReceipts,
   summary,
   validatePlan,
@@ -496,4 +499,138 @@ test('fast first failure is red until exactly one fresh fast retry passes and re
   const signal = aggregate(input);
   assert.equal(signal.kind, 'bunki-fast-signal');
   assert.equal(signal.gates.find((g) => g.name === 'lint').status, 'flaky');
+});
+
+test('reading-facets installs corpus dependencies even when timing places it away from corpus-pytest', () => {
+  const plan = createPlan({
+    identity,
+    timings: {
+      gates: [
+        { name: 'reading-facets', maxSeconds: 1000 },
+        { name: 'corpus-pytest', maxSeconds: 1000 },
+      ],
+    },
+  });
+  const reading = plan.shards.find((s) => s.gates.includes('reading-facets'));
+  const corpus = plan.shards.find((s) => s.gates.includes('corpus-pytest'));
+  assert.notEqual(reading.id, corpus.id);
+  for (const shard of [reading, corpus]) {
+    assert.equal(shard.corpus, true);
+    assert.equal(shard.python, true);
+  }
+  assert.equal(plan.shards.find((s) => s.id === 'fast-decks').python, true);
+});
+test('only dedicated history gates extend timeout while every other command/report/timeout remains canonical', () => {
+  const gates = batteryGates('/unused', {});
+  const plan = createPlan({ identity });
+  for (const gate of gates) {
+    const shard = plan.shards.find((s) => s.gates.includes(gate.name));
+    const actual = gateForShard(gate, shard, {});
+    if (['practice-history', 'practice-history-webkit'].includes(gate.name))
+      assert.equal(actual.timeoutMs, 40 * 60 * 1000);
+    else assert.equal(actual.timeoutMs, gate.timeoutMs);
+    assert.deepEqual(actual.command, gate.command);
+    assert.deepEqual(actual.args, gate.args);
+    assert.deepEqual(actual.report, gate.report);
+  }
+  const specific = { name: 'specific-gate', command: process.execPath, args: [], timeoutMs: 1234 };
+  assert.equal(
+    gateForShard(specific, { id: 'balanced-01', gates: ['specific-gate'] }, {}).timeoutMs,
+    1234,
+  );
+  const defaultGate = { name: 'default-gate', command: process.execPath, args: [] };
+  assert.equal(
+    Object.hasOwn(
+      gateForShard(defaultGate, { id: 'balanced-01', gates: ['default-gate'] }, {}),
+      'timeoutMs',
+    ),
+    false,
+  );
+  const history = gates.find((g) => g.name === 'practice-history');
+  assert.equal(
+    gateForShard(history, { id: 'balanced-01', gates: [history.name] }, {}).timeoutMs,
+    history.timeoutMs,
+  );
+});
+test('official content guard owns one fast home in both scopes with original assertions intact', () => {
+  for (const scope of ['full', 'docs']) {
+    const plan = createPlan({ scope, identity });
+    assert(plan.requiredNames.includes('official-content-guard'));
+    const homes = plan.shards.filter((s) => s.gates.includes('official-content-guard'));
+    assert.equal(homes.length, 1);
+    assert.equal(homes[0].kind, 'fast');
+    const original = batteryGates('/unused', {}).find((g) => g.name === 'official-content-guard');
+    assert.deepEqual(gateForShard(original, homes[0], {}), original);
+  }
+});
+test('SIGINT and SIGTERM abort real runGates, retain interrupted terminal evidence, and clean signal listeners', async () => {
+  for (const kind of ['SIGINT', 'SIGTERM']) {
+    const emitter = new EventEmitter();
+    const out = fresh();
+    const result = await withRunnerSignals(async (signal) => {
+      const pending = runGates({
+        gates: [
+          {
+            name: 'signal-cleanup',
+            command: process.execPath,
+            args: ['-e', 'setInterval(()=>{},1000)'],
+            timeoutMs: 5000,
+          },
+          { name: 'must-not-run', command: process.execPath, args: ['-e', 'process.exit(0)'] },
+        ],
+        root: out,
+        out,
+        signal,
+      });
+      emitter.emit(kind);
+      return pending;
+    }, emitter);
+    assert.equal(result.status, 'interrupted');
+    assert.equal(result.exitCode, 130);
+    assert.equal(result.gates[0].status, 'interrupted');
+    assert.equal(result.gates[1].status, 'pending');
+    assert.equal(emitter.listenerCount('SIGINT'), 0);
+    assert.equal(emitter.listenerCount('SIGTERM'), 0);
+  }
+  const emitter = new EventEmitter();
+  await assert.rejects(
+    withRunnerSignals(async () => {
+      throw new Error('fixture failed');
+    }, emitter),
+    /fixture failed/,
+  );
+  assert.equal(emitter.listenerCount('SIGINT'), 0);
+  assert.equal(emitter.listenerCount('SIGTERM'), 0);
+  await withRunnerSignals(async (signal) => assert.equal(signal.aborted, false), emitter);
+  assert.equal(emitter.listenerCount('SIGTERM'), 0);
+});
+test('cancelled receipt is never retried or promoted even with counterfeit successful job metadata', () => {
+  const f = fixture();
+  const one = f.receipts[0];
+  one.status = 'interrupted';
+  one.exitCode = 130;
+  one.gates[0].status = 'interrupted';
+  one.gates[0].exitCode = 130;
+  assert.throws(() => refreshRetryPlans(f), /Shard did not complete/);
+  assert.throws(() => aggregate(f), /Shard did not complete/);
+});
+
+test('measured healthy canonical gate durations stay below half their selected timeout', () => {
+  const plan = createPlan({ identity });
+  const timings = JSON.parse(
+    readFileSync(new globalThis.URL('../../docs/ci/gate-timings.json', import.meta.url), 'utf8'),
+  );
+  for (const original of batteryGates('/unused', {})) {
+    const measured = timings.gates.find((g) => g.name === original.name);
+    assert(measured, `Missing scheduling measurement for ${original.name}`);
+    const selected = gateForShard(
+      original,
+      plan.shards.find((s) => s.gates.includes(original.name)),
+      {},
+    );
+    assert(
+      measured.maxSeconds * 1000 < selected.timeoutMs / 2,
+      `${original.name} healthy duration approaches timeout`,
+    );
+  }
 });

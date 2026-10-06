@@ -8,7 +8,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: kairo-pages
+  group: ${{ github.ref == 'refs/heads/main' && 'kairo-pages' || format('kairo-pages-test-{0}', github.ref) }}
   cancel-in-progress: false
 jobs:
   lookup:

@@ -15,7 +15,12 @@ export function supplementalGates(out) {
     {
       name: 'ci-contracts',
       command: process.execPath,
-      args: ['--test', 'scripts/ci/battery.test.mjs', 'scripts/ci/receipts.test.mjs'],
+      args: [
+        '--test',
+        'scripts/ci/battery.test.mjs',
+        'scripts/ci/receipts.test.mjs',
+        'scripts/ci/ledger.test.mjs',
+      ],
       requiredPath: 'scripts/ci/receipts.test.mjs',
     },
     node('deck-frozen-build', 'scripts/ci/deck-frozen.mjs'),

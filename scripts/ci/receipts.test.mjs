@@ -173,7 +173,10 @@ for (const [name, mutate] of Object.entries(rejections))
   });
 
 test('site archive extracts bytes and refuses traversal, links, duplicate paths and unexpected files', () => {
-  const base = join(homedir(), '.dharma/bunki_review/2026-10-06/ci/receipt-tests');
+  const base =
+    process.env.CI && process.env.RUNNER_TEMP
+      ? join(process.env.RUNNER_TEMP, 'ci-receipt-tests')
+      : join(homedir(), '.dharma/bunki_review/2026-10-06/ci/receipt-tests');
   mkdirSync(base, { recursive: true });
   const out = mkdtempSync(join(base, 'archive-'));
   for (const kind of ['safe', 'traversal', 'symlink', 'duplicate', 'extra']) {

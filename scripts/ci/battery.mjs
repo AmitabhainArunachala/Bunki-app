@@ -40,6 +40,7 @@ const exact = (a, b, message) => {
 };
 const FAST = new Set([
   'format-check',
+  'official-content-guard',
   'lint',
   'corridor-lint',
   'typecheck',
@@ -155,7 +156,7 @@ export function createPlan({
               ? ['webkit']
               : ['chromium', 'webkit'],
       e2e: items.some((g) => g.name === 'e2e'),
-      corpus: items.some((g) => g.name === 'corpus-pytest'),
+      corpus: items.some((g) => ['corpus-pytest', 'reading-facets'].includes(g.name)),
       python: items.some(
         (g) => DECKS.has(g.name) || ['corpus-pytest', 'reading-facets', 'vitest'].includes(g.name),
       ),
@@ -386,6 +387,33 @@ export function e2eBuildIdentity() {
   assert(files.length > 0);
   return { sha256: digest(files), files: files.length };
 }
+export function gateForShard(gate, shard, artifactEnv) {
+  const dedicatedHistory =
+    ['practice-history', 'practice-history-webkit'].includes(gate.name) &&
+    shard.id === gate.name &&
+    shard.gates.length === 1 &&
+    shard.gates[0] === gate.name;
+  return {
+    ...gate,
+    ...(dedicatedHistory
+      ? { timeoutMs: Math.max(gate.timeoutMs || 20 * 60 * 1000, 40 * 60 * 1000) }
+      : {}),
+    env: { ...gate.env, ...artifactEnv },
+  };
+}
+export async function withRunnerSignals(run, emitter = process) {
+  const controller = new globalThis.AbortController();
+  const terminate = () => controller.abort(new Error('Runner received SIGTERM'));
+  const interrupt = () => controller.abort(new Error('Runner received SIGINT'));
+  emitter.on('SIGTERM', terminate);
+  emitter.on('SIGINT', interrupt);
+  try {
+    return await run(controller.signal);
+  } finally {
+    emitter.removeListener('SIGTERM', terminate);
+    emitter.removeListener('SIGINT', interrupt);
+  }
+}
 export async function executeShard({
   plan,
   shardId,
@@ -393,6 +421,7 @@ export async function executeShard({
   artifact,
   out,
   retryPlan,
+  signal,
   env = process.env,
 }) {
   validatePlan(plan);
@@ -432,6 +461,7 @@ export async function executeShard({
   const persist = () => write(join(out, 'shard.json'), record);
   persist();
   try {
+    if (signal?.aborted) throw signal.reason || new Error('Runner interrupted');
     cleanSource(false);
     if (retryShard?.dependencies?.e2eBuild) {
       equal(
@@ -455,15 +485,12 @@ export async function executeShard({
     const selected = requested.map((name) => {
       const gate = descriptors.find((g) => g.name === name);
       assert(gate, 'Unknown gate');
-      return {
-        ...gate,
-        timeoutMs: Math.max(gate.timeoutMs || 0, 40 * 60 * 1000),
-        env: { ...gate.env, ...artifactEnv },
-      };
+      return gateForShard(gate, shard, artifactEnv);
     });
     for (const gate of selected) mkdirSync(gate.env.KAIRO_EVIDENCE_DIR, { recursive: true });
     const battery = await runGates({
       gates: selected,
+      signal,
       root: ROOT,
       out,
       source: {
@@ -489,7 +516,7 @@ export async function executeShard({
     if (env.GITHUB_STEP_SUMMARY) appendFileSync(env.GITHUB_STEP_SUMMARY, shardSummary);
     for (const gate of battery.gates.filter((g) => g.status !== 'passed'))
       console.log(
-        `::error title=Gate ${gate.name} failed::${gate.name} -> ${gate.status}; attempt ${attempt}${attempt === 1 ? '; one fresh-job retry pending' : ''}`,
+        `::error title=Gate ${gate.name} failed::${gate.name} -> ${gate.status}; attempt ${attempt}${battery.status !== 'interrupted' && attempt === 1 ? '; one fresh-job retry pending' : ''}`,
       );
     if (battery.gates.some((g) => g.name === 'e2e-build' && g.status === 'passed'))
       record.dependencies.e2eBuild = e2eBuildIdentity();
@@ -497,13 +524,14 @@ export async function executeShard({
       equal(e2eBuildIdentity(), retryShard.dependencies.e2eBuild, 'E2E build changed during retry');
     cleanSource(shard.gates.includes('deck-frozen-build'));
     record.after = artifactIdentity(site, artifact);
-    record.status = battery.status;
+    record.status = signal?.aborted ? 'interrupted' : battery.status;
+    if (signal?.aborted) record.exitCode = 130;
     record.completedAt = NOW();
     persist();
     return record;
   } catch (error) {
-    record.status = 'infrastructure-failed';
-    record.exitCode = 1;
+    record.status = signal?.aborted ? 'interrupted' : 'infrastructure-failed';
+    record.exitCode = signal?.aborted ? 130 : 1;
     record.error = error.message;
     console.log(
       `::error title=Shard ${shard.id} infrastructure failed::${String(error.message).replaceAll('\n', ' ')}`,
@@ -519,7 +547,7 @@ export async function executeShard({
   }
 }
 const terminal = new Set(['passed', 'failed', 'missing', 'timed-out', 'incomplete']);
-function admitReceipt(plan, receipt, shard, attempt, artifact, expected = shard.gates) {
+export function admitReceipt(plan, receipt, shard, attempt, artifact, expected = shard.gates) {
   assert.equal(receipt.schemaVersion, 1);
   assert.equal(receipt.kind, 'bunki-ci-shard');
   equal(receipt.identity, plan.identity, 'Receipt provenance mismatch');
@@ -955,14 +983,17 @@ export async function main(args = process.argv.slice(2)) {
     return;
   }
   if (command === 'run') {
-    const receipt = await executeShard({
-      plan: read(o.plan),
-      shardId: o.shard,
-      site: o.site,
-      artifact: read(o.artifact),
-      out: o.out,
-      retryPlan: o['retry-plan'] ? read(o['retry-plan']) : undefined,
-    });
+    const receipt = await withRunnerSignals((signal) =>
+      executeShard({
+        signal,
+        plan: read(o.plan),
+        shardId: o.shard,
+        site: o.site,
+        artifact: read(o.artifact),
+        out: o.out,
+        retryPlan: o['retry-plan'] ? read(o['retry-plan']) : undefined,
+      }),
+    );
     process.exitCode = receipt.exitCode;
     return;
   }

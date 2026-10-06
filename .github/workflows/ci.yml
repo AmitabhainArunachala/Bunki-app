@@ -56,7 +56,7 @@ jobs:
       - id: plan
         run: node scripts/ci/battery.mjs plan --paths "$RUNNER_TEMP/paths.json" --out "$RUNNER_TEMP/plan.json"
       - id: tree
-        run: echo "tree=$(git rev-parse HEAD^{tree})" >> "$GITHUB_OUTPUT"
+        run: echo "tree=$(git rev-parse 'HEAD^{tree}')" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
@@ -187,7 +187,6 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
-      KAIRO_CI_GATE_ATTEMPT: 1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -229,15 +228,6 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
         run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --out "$RUNNER_TEMP/evidence"
-      - name: Retain the built app for an exact failed-e2e retry
-        if: always() && matrix.e2e
-        uses: actions/upload-artifact@v4
-        with:
-          name: bunki-e2e-${{ github.run_id }}-${{ github.run_attempt }}
-          path: apps/app/dist/
-          include-hidden-files: true
-          retention-days: 14
-          if-no-files-found: warn
       - name: Compress evidence before upload
         if: always()
         run: |
@@ -315,7 +305,6 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
-      KAIRO_CI_GATE_ATTEMPT: 2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -471,7 +460,6 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
-      KAIRO_CI_GATE_ATTEMPT: 1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -599,7 +587,6 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
-      KAIRO_CI_GATE_ATTEMPT: 2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -759,9 +746,11 @@ jobs:
         env:
           CI_SCOPE: ${{ needs.plan.outputs.scope }}
         run: |
-          retry_args=()
-          if [ "$CI_SCOPE" = full ]; then retry_args=(--retry-plan "$RUNNER_TEMP/inputs/retry-plan.json"); fi
-          node scripts/ci/battery.mjs aggregate --phase all --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --fast-retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" "${retry_args[@]}" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+          if [ "$CI_SCOPE" = full ]; then
+            node scripts/ci/battery.mjs aggregate --phase all --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --fast-retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --retry-plan "$RUNNER_TEMP/inputs/retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+          else
+            node scripts/ci/battery.mjs aggregate --phase all --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --fast-retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+          fi
       - name: Retain infrastructure summary even when setup or evidence was unavailable
         if: always() && steps.aggregate.outcome != 'success'
         env:

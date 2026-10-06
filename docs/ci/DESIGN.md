@@ -39,7 +39,7 @@ flowchart LR
   A --> R[Full proof receipt]
 ```
 
-The fast lane owns format, lint, Corridor lint, typecheck, unit tests, short
+The fast lane owns format, lint, Corridor lint, official-content guard, typecheck, unit tests, short
 contract verifiers, and the frozen deck no-diff checks. These gates are removed
 from the slower matrix, not repeated. The deck check retains private and public
 profiles, frozen IDs, tracked-output and untracked-output checks, the existing
@@ -144,11 +144,28 @@ Retain both durations, runner identities, logs, and result details. A retry rece
 must contain exactly the planned failures. Extra retries, retried successes,
 duplicate rows, and different artifact/run/plan identities fail admission.
 
-The committed `docs/ci/flakes.jsonl` starts with observed evidence only. CI emits
-new JSONL entries plus an appendable patch; a validated append helper imports
-them into that ledger during authorized repository work. This design does not
-give a PR token permission to push to main. Automated ledger commits would change
-the candidate tree and require a separate, explicit lifecycle decision.
+The committed `docs/ci/flakes.jsonl` starts with observed evidence only. After this
+workflow lands on the default branch, `CI flake ledger` automatically appends new
+observations to that path on the fixed data branch `ci/flake-ledger`. The producer
+CI token remains read-only; the trusted consumer has contents-write and
+actions-read. It never writes main or the tested candidate. The feature branch
+contains the controlled-experiment seed; the data branch becomes the ongoing ledger.
+
+The consumer reads immutable shard artifacts, so a passing retry is recorded even
+when another gate makes the run red. It verifies the producer repository/workflow,
+attempt, actual Git policy blobs against its default-branch policy, archive digest,
+complete reports, server job/runner identities and execution times. Downloaded
+programs never run. These rows record observed producer reports and cannot issue
+deployment proof. Policy-changing PR evidence waits until the trusted policy matches.
+
+Writes use an isolated Git index, a fixed two-file data tree (ledger and processed-run
+index), and ordinary fast-forward pushes. Existing ledger bytes are preserved;
+identical observations do nothing and conflicts fail. Serialized workflow-run
+consumers and hourly reconciliation inspect the retained 13-day window, processing
+up to 20 attempts per invocation. Rejections are retried, oldest-attempted first,
+after an hour or immediately when trusted code changes. Missing/expired evidence
+produces warnings, never invented rows. This recovery is bounded by artifact
+retention and consumer capacity; its rejected-run index makes those limits visible.
 
 The always-reporting `bunki / required` job independently computes expected jobs,
 shards, and gate names from the selected scope. It rejects missing, cancelled,
@@ -183,7 +200,8 @@ Rewire nightly to the
 same reusable full pipeline and remove its stale branch-push trigger; retain the
 schedule pending John's decision. Keep historical Sites v11 verification and
 manual preview separate because they exercise a different product. Keep
-`pages-app` as the only workflow with Pages write authority.
+`pages-app` as the only workflow with Pages write authority. Its main concurrency
+group remains `kairo-pages`; non-main proof-transfer experiments use separate groups.
 
 Cache npm by lockfile, Playwright downloads by OS/architecture and package lock,
 and pip by Python version plus dependency specifications. Browser system libraries
@@ -211,8 +229,7 @@ docs scope, and an intentional fail-once gate. Synthetic tests supplement those
 runs; they do not substitute for them. Production runs remain untouched.
 
 Questions for John, with safe defaults: enable branch protection requiring
-`bunki / required` after evidence is green; keep the nightly full run; keep ledger
-updates reviewable rather than enabling an autonomous main-branch writer. The
+`bunki / required` after evidence is green; keep the nightly full run. The
 external rerun bot is investigated and documented, not disabled.
 
 GitHub semantics: [job dependencies and conditional execution](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax),
