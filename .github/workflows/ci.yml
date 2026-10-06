@@ -29,7 +29,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+          fetch-tags: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -38,6 +39,8 @@ jobs:
       - name: Print and compare original and candidate required gates
         run: |
           base=$(node --input-type=module -e "import fs from 'node:fs'; console.log(JSON.parse(fs.readFileSync('scripts/ci/gate-baseline.json')).baseSha)")
+          [[ "$base" =~ ^[a-f0-9]{40}$ ]]
+          git fetch --no-tags --depth=1 origin "$base"
           node scripts/ci/parity.mjs --base "$base" --out "$RUNNER_TEMP/parity.json"
       - name: Classify the complete candidate diff conservatively
         env:
@@ -48,7 +51,13 @@ jobs:
           import { writeFileSync } from 'node:fs';
           let paths = [];
           if (process.env.GITHUB_EVENT_NAME === 'pull_request' && /^[a-f0-9]{40}$/.test(process.env.BASE_SHA || '')) {
-            try { paths = execFileSync('git', ['diff', '--name-only', '-z', '--no-renames', `${process.env.BASE_SHA}...HEAD`], { encoding: 'utf8' }).split('\0').filter(Boolean); }
+            try {
+              const base = process.env.BASE_SHA;
+              const firstParent = execFileSync('git', ['rev-parse', 'HEAD^1'], { encoding: 'utf8' }).trim();
+              const mergeBase = execFileSync('git', ['merge-base', base, 'HEAD'], { encoding: 'utf8' }).trim();
+              if (firstParent === base && mergeBase === base)
+                paths = execFileSync('git', ['diff', '--name-only', '-z', '--no-renames', `${base}...HEAD`], { encoding: 'utf8' }).split('\0').filter(Boolean);
+            }
             catch { paths = []; }
           }
           writeFileSync(`${process.env.RUNNER_TEMP}/paths.json`, JSON.stringify(paths));
@@ -261,6 +270,9 @@ jobs:
       has-retries: ${{ steps.retry.outputs.has-retries }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -381,7 +393,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -550,6 +563,9 @@ jobs:
       has-retries: ${{ steps.retry.outputs.has-retries }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -697,7 +713,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

@@ -136,6 +136,20 @@ export function createPlan({
   unique(gates, 'Duplicate canonical gate');
   unique([...gates, ...supplemental], 'Supplemental gate collision');
   const weights = new Map(timings.gates.map((g) => [g.name, g.maxSeconds]));
+  if (timings.planningObservations) {
+    assert.equal(timings.planningObservations.schemaVersion, 1);
+    assert(
+      Array.isArray(timings.planningObservations.gates),
+      'Planning observations require gates',
+    );
+    for (const row of timings.planningObservations.gates) {
+      assert(
+        typeof row.name === 'string' && Number.isFinite(row.maxSeconds) && row.maxSeconds > 0,
+        'Invalid observed planning weight',
+      );
+      weights.set(row.name, Math.max(weights.get(row.name) || 0, row.maxSeconds));
+    }
+  }
   const weight = (name) => {
     const value = weights.get(name);
     return Number.isFinite(value) && value > 0 ? value : DECKS.has(name) ? 120 : 180;
@@ -163,28 +177,20 @@ export function createPlan({
       ),
     });
   const fast = all.filter((g) => FAST.has(g.name) && !DECKS.has(g.name));
-  // Early lanes: frozen deck checks retain their order, while lightweight
-  // contracts are balanced into <=4 minute predicted execution bins.
-  let bins = [[]],
-    loads = [0];
+  // Keep the existing three resource slots and balance longest measured work
+  // first. Opening bins only after a threshold colocates vitest and typecheck.
+  const bins = Array.from({ length: Math.min(3, fast.length) }, () => []),
+    loads = bins.map(() => 0);
   for (const g of fast.sort(
     (a, b) => weight(b.name) - weight(a.name) || a.name.localeCompare(b.name),
   )) {
-    let i = loads.indexOf(Math.min(...loads));
-    if (loads[i] + weight(g.name) > 240) {
-      i = bins.length;
-      bins.push([]);
-      loads.push(0);
-    }
+    const i = loads.indexOf(Math.min(...loads));
     bins[i].push(g);
     loads[i] += weight(g.name);
   }
   bins.forEach((bin, i) => add(`fast-${i + 1}`, 'fast', bin));
-  add(
-    'fast-decks',
-    'fast',
-    all.filter((g) => DECKS.has(g.name)),
-  );
+  const decks = all.filter((g) => DECKS.has(g.name));
+  if (decks.length) add('fast-decks', 'fast', decks);
   if (scope === 'full') {
     for (const name of ['practice-history', 'practice-history-webkit'])
       add(

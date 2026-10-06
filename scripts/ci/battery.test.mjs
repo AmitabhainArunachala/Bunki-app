@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { URL } from 'node:url';
 import test from 'node:test';
 import { batteryGates, runGates } from '../verify-release-gates.mjs';
 import { EventEmitter } from 'node:events';
@@ -162,6 +163,77 @@ test('measured deterministic partition covers every original and supplemental ga
   const e = f.plan.shards.find((s) => s.gates.includes('e2e'));
   assert(e.gates.includes('e2e-build'));
   assert(e.gates.indexOf('e2e-build') < e.gates.indexOf('e2e'));
+});
+test('hosted measured fast workload separates heavy gates within the existing four resources', () => {
+  const timings = JSON.parse(
+    readFileSync(new URL('../../docs/ci/gate-timings.json', import.meta.url)),
+  );
+  for (const row of timings.planningObservations.gates) {
+    assert.equal(row.sampleCount, row.samples.length);
+    assert.equal(row.maxSeconds, Math.max(...row.samples.map((sample) => sample.seconds)));
+    for (const sample of row.samples) {
+      assert.equal(
+        sample.seconds,
+        (Date.parse(sample.completedAt) - Date.parse(sample.startedAt)) / 1000,
+      );
+      const source = timings.planningObservations.sources[sample.sourceIndex];
+      assert(source && source.runId > 0 && source.jobId > 0 && source.receiptArtifactId > 0);
+      assert.match(source.receiptArtifactDigest, /^sha256:[a-f0-9]{64}$/);
+      assert.match(source.receiptSha256, /^[a-f0-9]{64}$/);
+    }
+  }
+  const full = createPlan({ identity, timings }),
+    docs = createPlan({ identity, timings, scope: 'docs' });
+  for (const plan of [full, docs]) {
+    const lanes = plan.shards.filter((s) => s.kind === 'fast');
+    assert.equal(lanes.length, 4);
+    assert.equal(new Set(lanes.flatMap((s) => s.gates)).size, 31);
+    const vitest = lanes.find((s) => s.gates.includes('vitest'));
+    const typecheck = lanes.find((s) => s.gates.includes('typecheck'));
+    assert.notEqual(vitest.id, typecheck.id, 'Measured heavy gates must run concurrently');
+    assert.deepEqual(vitest.browsers, ['chromium', 'webkit']);
+    assert.deepEqual(typecheck.browsers, []);
+    assert(
+      Math.max(...lanes.map((s) => s.predictedSeconds)) < 130,
+      'Observed workload must fit the measured execution bound without additional lanes',
+    );
+    const actual = new Map(timings.planningObservations.gates.map((g) => [g.name, g.maxSeconds]));
+    assert(
+      Math.max(...lanes.map((s) => s.gates.reduce((sum, name) => sum + actual.get(name), 0))) < 130,
+    );
+  }
+  assert.equal(full.shards.filter((s) => s.kind === 'battery').length, 12);
+  assert.equal(full.requiredNames.length, 149);
+  assert.equal(docs.requiredNames.length, 31);
+});
+test('planning observations never lower historical maxima and invalid weights reject', () => {
+  const timings = {
+    gates: [
+      { name: 'vitest', maxSeconds: 125 },
+      { name: 'typecheck', maxSeconds: 53 },
+    ],
+    planningObservations: { schemaVersion: 1, gates: [{ name: 'vitest', maxSeconds: 1 }] },
+  };
+  const options = {
+    scope: 'docs',
+    identity,
+    supplemental: [],
+    gates: [{ name: 'vitest' }, { name: 'typecheck' }],
+    timings,
+  };
+  const plan = createPlan(options);
+  assert.equal(plan.shards.find((s) => s.gates.includes('vitest')).predictedSeconds, 125);
+  timings.planningObservations.gates[0].maxSeconds = -1;
+  assert.throws(() => createPlan(options), /Invalid observed planning weight/);
+});
+test('small generic fast inputs emit no empty lanes and absent work fails safely', () => {
+  const options = { scope: 'docs', identity, supplemental: [], timings: { gates: [] } };
+  for (const name of ['vitest', 'deck-frozen-build']) {
+    const plan = createPlan({ ...options, gates: [{ name }] });
+    assert.equal(plan.shards.length, 1);
+    assert.deepEqual(plan.shards[0].gates, [name]);
+  }
+  assert.throws(() => createPlan({ ...options, gates: [] }), assert.AssertionError);
 });
 test('partition rejects deletion even with recomputed digest', () => {
   const f = fixture();

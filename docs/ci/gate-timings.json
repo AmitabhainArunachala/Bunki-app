@@ -6321,5 +6321,504 @@
         }
       ]
     }
-  ]
+  ],
+  "planningObservations": {
+    "schemaVersion": 1,
+    "measurement": "CompletedAt minus startedAt from actual first-attempt hosted shard.json gate rows; seconds. Scheduling uses max(historical maxSeconds, observed maxSeconds), leaving the original five-battery dataset unchanged.",
+    "limitations": [
+      "Run 37496611523 overall failed later; all 31 fast gate rows in these four initial shards passed.",
+      "Single new observation per gate is a scheduling input, not a future upper bound; cold setup, checkout, artifact transfer and queue times are excluded.",
+      "ci-contracts was measured before later integration tests. Separate negative-control run 37504356024 reported 8.899 seconds for its hosted test suite and 9.478 seconds for the enclosing gate. These are context, not spliced into this coherent dataset. A future full hosted run must measure the revised policy."
+    ],
+    "sources": [
+      {
+        "runId": 37496611523,
+        "runAttempt": 1,
+        "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37496611523",
+        "headSha": "edf5b4dc2b7491ae739b03dbf65e1b672404164e",
+        "producerSha": "b37b57cc94186284736738feb79ce6c4560c6de1",
+        "jobId": 112383341567,
+        "shardId": "fast-1",
+        "receiptArtifactId": 11427259689,
+        "receiptArtifactDigest": "sha256:d810ebc8ae473d0793e32b4f7031847656c83ea5848491bcdad81bb636e78219",
+        "receiptSha256": "e5f511ccae5c033fc9e868e6672968cc6a9ddf622868cfbb44c6bd8510e66dc8",
+        "status": "passed"
+      },
+      {
+        "runId": 37496611523,
+        "runAttempt": 1,
+        "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37496611523",
+        "headSha": "edf5b4dc2b7491ae739b03dbf65e1b672404164e",
+        "producerSha": "b37b57cc94186284736738feb79ce6c4560c6de1",
+        "jobId": 112383341602,
+        "shardId": "fast-2",
+        "receiptArtifactId": 11428425414,
+        "receiptArtifactDigest": "sha256:583b9ae6eaf334421d02ebeb38fba107ad0c3b32035e30f730a54c4b87f3cab4",
+        "receiptSha256": "d62c12df1d067ce9bfb2efe781f640b6c8487fa85adf4ad5b31085aa6f056bbb",
+        "status": "passed"
+      },
+      {
+        "runId": 37496611523,
+        "runAttempt": 1,
+        "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37496611523",
+        "headSha": "edf5b4dc2b7491ae739b03dbf65e1b672404164e",
+        "producerSha": "b37b57cc94186284736738feb79ce6c4560c6de1",
+        "jobId": 112383341780,
+        "shardId": "fast-3",
+        "receiptArtifactId": 11428630639,
+        "receiptArtifactDigest": "sha256:0baafb0dfd1aeef57e20f11612871ef334273e9a6cac747c2e0143805fa33add",
+        "receiptSha256": "856bc076b76cdbf2a1d2fdfc47d5141fec1484cdaf9f22eed2b4b21b169c953a",
+        "status": "passed"
+      },
+      {
+        "runId": 37496611523,
+        "runAttempt": 1,
+        "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37496611523",
+        "headSha": "edf5b4dc2b7491ae739b03dbf65e1b672404164e",
+        "producerSha": "b37b57cc94186284736738feb79ce6c4560c6de1",
+        "jobId": 112383341575,
+        "shardId": "fast-decks",
+        "receiptArtifactId": 11427608885,
+        "receiptArtifactDigest": "sha256:03f9cce318be0b6e67a4caaafb374ec9a1a80c2f1c05ce831274ffd701f26d08",
+        "receiptSha256": "f8dd6ee535ba294a5b4ee2d97e557bdbab75f8fa340f28e436ad5aaa83324f54",
+        "status": "passed"
+      }
+    ],
+    "gates": [
+      {
+        "name": "browser-audio-silence-contract",
+        "maxSeconds": 0.056,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 0.056,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:24.961Z",
+            "completedAt": "2026-10-06T16:40:25.017Z"
+          }
+        ]
+      },
+      {
+        "name": "bundled-listening-catalog",
+        "maxSeconds": 0.164,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.164,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:32.987Z",
+            "completedAt": "2026-10-06T16:36:33.151Z"
+          }
+        ]
+      },
+      {
+        "name": "ci-contracts",
+        "maxSeconds": 2.011,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 2.011,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:05.686Z",
+            "completedAt": "2026-10-06T16:36:07.697Z"
+          }
+        ]
+      },
+      {
+        "name": "corridor-lint",
+        "maxSeconds": 6.762,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 6.762,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:27.406Z",
+            "completedAt": "2026-10-06T16:36:34.168Z"
+          }
+        ]
+      },
+      {
+        "name": "deck-export-mcd",
+        "maxSeconds": 7.505,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 3,
+            "seconds": 7.505,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:37:22.309Z",
+            "completedAt": "2026-10-06T16:37:29.814Z"
+          }
+        ]
+      },
+      {
+        "name": "deck-frozen-build",
+        "maxSeconds": 42.794,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 3,
+            "seconds": 42.794,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:39.181Z",
+            "completedAt": "2026-10-06T16:37:21.975Z"
+          }
+        ]
+      },
+      {
+        "name": "deck-gloss-ja",
+        "maxSeconds": 0.331,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 3,
+            "seconds": 0.331,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:37:21.977Z",
+            "completedAt": "2026-10-06T16:37:22.308Z"
+          }
+        ]
+      },
+      {
+        "name": "export",
+        "maxSeconds": 1.165,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 1.165,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:34.172Z",
+            "completedAt": "2026-10-06T16:36:35.337Z"
+          }
+        ]
+      },
+      {
+        "name": "format-check",
+        "maxSeconds": 19.706,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 19.706,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:07.698Z",
+            "completedAt": "2026-10-06T16:36:27.404Z"
+          }
+        ]
+      },
+      {
+        "name": "guided-session-contract",
+        "maxSeconds": 0.173,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 0.173,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:36.539Z",
+            "completedAt": "2026-10-06T16:36:36.712Z"
+          }
+        ]
+      },
+      {
+        "name": "kanji-capture",
+        "maxSeconds": 0.522,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 0.522,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:24.354Z",
+            "completedAt": "2026-10-06T16:40:24.876Z"
+          }
+        ]
+      },
+      {
+        "name": "later-encounters-contracts",
+        "maxSeconds": 0.67,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.67,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:32.316Z",
+            "completedAt": "2026-10-06T16:36:32.986Z"
+          }
+        ]
+      },
+      {
+        "name": "lint",
+        "maxSeconds": 7.325,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 7.325,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:19.367Z",
+            "completedAt": "2026-10-06T16:36:26.692Z"
+          }
+        ]
+      },
+      {
+        "name": "navigation-returns",
+        "maxSeconds": 0.082,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 0.082,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:24.877Z",
+            "completedAt": "2026-10-06T16:40:24.959Z"
+          }
+        ]
+      },
+      {
+        "name": "official-content-guard",
+        "maxSeconds": 9.257,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 9.257,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:09.815Z",
+            "completedAt": "2026-10-06T16:40:19.072Z"
+          }
+        ]
+      },
+      {
+        "name": "reading-position-contract",
+        "maxSeconds": 0.996,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 0.996,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:22.245Z",
+            "completedAt": "2026-10-06T16:40:23.241Z"
+          }
+        ]
+      },
+      {
+        "name": "reference-core",
+        "maxSeconds": 8.371,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 8.371,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:10.986Z",
+            "completedAt": "2026-10-06T16:36:19.357Z"
+          }
+        ]
+      },
+      {
+        "name": "reference-data",
+        "maxSeconds": 1.111,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 1.111,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:23.242Z",
+            "completedAt": "2026-10-06T16:40:24.353Z"
+          }
+        ]
+      },
+      {
+        "name": "reference-ui-contracts",
+        "maxSeconds": 0.045,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.045,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:33.406Z",
+            "completedAt": "2026-10-06T16:36:33.451Z"
+          }
+        ]
+      },
+      {
+        "name": "replay",
+        "maxSeconds": 0.811,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.811,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:31.486Z",
+            "completedAt": "2026-10-06T16:36:32.297Z"
+          }
+        ]
+      },
+      {
+        "name": "runtime-syntax",
+        "maxSeconds": 0.142,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.142,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:10.836Z",
+            "completedAt": "2026-10-06T16:36:10.978Z"
+          }
+        ]
+      },
+      {
+        "name": "sentence-drafts-contract",
+        "maxSeconds": 1.768,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 1.768,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:19.073Z",
+            "completedAt": "2026-10-06T16:40:20.841Z"
+          }
+        ]
+      },
+      {
+        "name": "skip-core",
+        "maxSeconds": 4.791,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 4.791,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:26.693Z",
+            "completedAt": "2026-10-06T16:36:31.484Z"
+          }
+        ]
+      },
+      {
+        "name": "skip-ui-contracts",
+        "maxSeconds": 0.074,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 0.074,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:36.713Z",
+            "completedAt": "2026-10-06T16:36:36.787Z"
+          }
+        ]
+      },
+      {
+        "name": "source-inbox-contract",
+        "maxSeconds": 1.402,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 1.402,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:40:20.842Z",
+            "completedAt": "2026-10-06T16:40:22.244Z"
+          }
+        ]
+      },
+      {
+        "name": "source-kanji-practice-contract",
+        "maxSeconds": 0.881,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 0.881,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:35.338Z",
+            "completedAt": "2026-10-06T16:36:36.219Z"
+          }
+        ]
+      },
+      {
+        "name": "source-processing-contract",
+        "maxSeconds": 0.107,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.107,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:33.298Z",
+            "completedAt": "2026-10-06T16:36:33.405Z"
+          }
+        ]
+      },
+      {
+        "name": "teacher-context-contract",
+        "maxSeconds": 0.317,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 0,
+            "seconds": 0.317,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:36.220Z",
+            "completedAt": "2026-10-06T16:36:36.537Z"
+          }
+        ]
+      },
+      {
+        "name": "teacher-drafts-contract",
+        "maxSeconds": 0.145,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 1,
+            "seconds": 0.145,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:36:33.152Z",
+            "completedAt": "2026-10-06T16:36:33.297Z"
+          }
+        ]
+      },
+      {
+        "name": "typecheck",
+        "maxSeconds": 53.055,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 53.055,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:39:16.759Z",
+            "completedAt": "2026-10-06T16:40:09.814Z"
+          }
+        ]
+      },
+      {
+        "name": "vitest",
+        "maxSeconds": 125.866,
+        "sampleCount": 1,
+        "samples": [
+          {
+            "sourceIndex": 2,
+            "seconds": 125.866,
+            "status": "passed",
+            "startedAt": "2026-10-06T16:37:10.891Z",
+            "completedAt": "2026-10-06T16:39:16.757Z"
+          }
+        ]
+      }
+    ]
+  }
 }
