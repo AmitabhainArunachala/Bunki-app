@@ -387,6 +387,66 @@ test('a completed retry without its report stays transient, and a malformed pair
   assert.throws(() => malformed.observe(), assert.AssertionError);
 });
 
+const incomplete = {
+  'SIGINT-interrupted': { status: 'interrupted', exitCode: 130 },
+  'infrastructure-failed': { status: 'infrastructure-failed', exitCode: 1 },
+  'still running': { status: 'running', exitCode: null, gates: [], completedAt: null },
+};
+const endRetryB = (s, receipt) => {
+  s.retryB.conclusion = 'failure';
+  s.retryB.steps[0].conclusion = 'failure';
+  Object.assign(s.receipts[`bunki-shard-${s.b}-2-42-1`], receipt);
+};
+
+for (const [name, receipt] of Object.entries(incomplete))
+  test(`a ${name} sibling retry report does not discard another shard's flake`, () => {
+    const s = siblingShards();
+    endRetryB(s, receipt);
+    const rows = s.observe();
+    assert.deepEqual(
+      rows.map((r) => r.gate),
+      [s.first.gates[0].name],
+    );
+    assert.deepEqual(rows[0].jobIds, ['123', '456']);
+  });
+
+for (const [name, mutate] of Object.entries({
+  'foreign identity': (r) => {
+    r.identity = { ...r.identity, runId: '43' };
+  },
+  'foreign plan': (r) => {
+    r.planDigest = '0'.repeat(64);
+  },
+  'another shard': (r, s) => {
+    r.shardId = s.first.shardId;
+  },
+  'first attempt': (r) => {
+    r.attempt = 1;
+  },
+  'artifact mismatch': (r) => {
+    r.artifact = { ...r.artifact, digest: `sha256:${'9'.repeat(64)}` };
+  },
+  'wrong kind': (r) => {
+    r.kind = 'bunki-fast-signal';
+  },
+  'unknown status': (r) => {
+    r.status = 'skipped';
+  },
+}))
+  test(`an incomplete sibling retry report with ${name} rejects the attempt`, () => {
+    const s = siblingShards();
+    endRetryB(s, incomplete['SIGINT-interrupted']);
+    mutate(s.receipts[`bunki-shard-${s.b}-2-42-1`], s);
+    assert.throws(() => s.observe(), assert.AssertionError);
+  });
+
+test('an incomplete retry report cannot come from a successful gate step', () => {
+  const s = siblingShards();
+  endRetryB(s, incomplete['SIGINT-interrupted']);
+  s.retryB.steps[0].conclusion = 'success';
+  assert.throws(() => s.observe(), /successful step/);
+});
+
 test('first continue-on-error conclusion is accepted only for a complete report', () => {
   const f = fixture();
   f.jobs[0].steps[0].conclusion = 'success';

@@ -182,8 +182,9 @@ identical observations do nothing and conflicts fail. Serialized workflow-run
 consumers and hourly reconciliation inspect the retained 13-day window, processing
 up to 20 attempts per invocation: the triggering attempt first, then never-tried
 and least recently tried attempts. A retry job that was cancelled or failed before
-its gate step has no report to pair, so only that shard is skipped; every other
-pair is still admitted in full. An attempt with no retry that reached its gates
+its gate step has no report to pair, and neither does a bound retry report left
+`running`, `interrupted` or `infrastructure-failed`; only that shard is skipped and
+every other pair is still admitted in full. An attempt with no retry that reached its gates
 has nothing to observe and is closed after reading its job list.
 
 Each outcome is classified once. Observed attempts are final. An assertion about

@@ -303,26 +303,45 @@ const ranGates = (job, run) => {
   );
 };
 
+const INCOMPLETE = new Set(['running', 'interrupted', 'infrastructure-failed']);
+
+/** A bound runner report that never completed its gates has no pass to pair. */
+function incompleteRetry({ plan, artifact, shard, receipt, job }) {
+  if (!INCOMPLETE.has(receipt.status)) return false;
+  assert.equal(receipt.schemaVersion, 1);
+  assert.equal(receipt.kind, 'bunki-ci-shard');
+  assert.deepEqual(receipt.identity, plan.identity, 'Receipt provenance mismatch');
+  assert.equal(receipt.planDigest, plan.planDigest);
+  assert.equal(receipt.shardId, shard.id);
+  assert.equal(receipt.attempt, 2);
+  assert.deepEqual(receipt.artifact, artifact, 'Artifact provenance mismatch');
+  assert.equal(
+    job.steps.find((s) => s.name === stepName(2)).conclusion,
+    'failure',
+    'Incomplete retry report from a successful step',
+  );
+  return true;
+}
+
 /** Pairs every retry that reached its gates; a cancelled or setup-failed retry has no report. */
 export function observeShards({ plan, artifact, run, jobs, artifacts, workflows }, read) {
   const { prefix } = admitRun(run, workflows);
   const evidence = { run, jobs, artifacts, prefix };
   const suffix = `${run.id}-${run.run_attempt}`;
-  return plan.shards
-    .filter((shard) =>
-      jobs.some((j) => j.name === `${prefix}retry / ${shard.id}` && ranGates(j, run)),
-    )
-    .flatMap((shard) => {
-      const [first, second] = [
-        ['battery', 1],
-        ['retry', 2],
-      ].map(([job, attempt]) =>
-        read(
-          locate(evidence, `${job} / ${shard.id}`, `bunki-shard-${shard.id}-${attempt}-${suffix}`),
-        ),
-      );
-      return observePair({ plan, artifact, first, second, jobs, run, workflows });
-    });
+  return plan.shards.flatMap((shard) => {
+    const job = jobs.find((j) => j.name === `${prefix}retry / ${shard.id}` && ranGates(j, run));
+    if (!job) return [];
+    const [first, second] = [
+      ['battery', 1],
+      ['retry', 2],
+    ].map(([name, attempt]) =>
+      read(
+        locate(evidence, `${name} / ${shard.id}`, `bunki-shard-${shard.id}-${attempt}-${suffix}`),
+      ),
+    );
+    if (incompleteRetry({ plan, artifact, shard, receipt: second, job })) return [];
+    return observePair({ plan, artifact, first, second, jobs, run, workflows });
+  });
 }
 
 /** ZIP is digest-checked; only one bounded JSON member is read, never extracted. */
