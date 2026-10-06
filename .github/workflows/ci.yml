@@ -461,7 +461,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 65
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     env:
       GH_TOKEN: ${{ github.token }}
@@ -470,6 +470,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # Temporary hosted cancellation control; remove after the experiment.
+      # A failing setup must cancel actual sibling jobs before they emit receipts.
+      - name: Cancel slow siblings through a deliberate setup failure
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          if [ "$SHARD" = practice-history ]; then
+            sleep 90
+            exit 23
+          fi
+          sleep 180
       - uses: ./.github/actions/ci-setup
         with:
           python: ${{ matrix.python }}
