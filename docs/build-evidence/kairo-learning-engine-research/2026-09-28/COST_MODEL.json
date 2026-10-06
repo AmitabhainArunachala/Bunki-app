@@ -1,0 +1,85 @@
+{
+  "status": "CALCULATED estimates, not observed usage; cloud paths conditional on export-file workflow or explicit law change",
+  "as_of": "2026-09-28",
+  "currency": "USD",
+  "rate_source": {
+    "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "publication_date": "undated",
+    "accessed": "2026-09-28"
+  },
+  "assumptions": {
+    "days": 30,
+    "prefix_tokens": 6000,
+    "fresh_input_tokens_per_turn": 1000,
+    "billed_output_tokens_per_turn": 600,
+    "nightly_input_tokens": 12000,
+    "nightly_output_tokens": 1200,
+    "nightly_haiku_batch_input_per_million": ".50",
+    "nightly_haiku_batch_output_per_million": "2.50",
+    "nightly_per_month": ".27"
+  },
+  "sonnet5_rates_per_million": {
+    "input": "2",
+    "output": "10",
+    "write5m": "2.5",
+    "write1h": "4",
+    "hit": "0.2"
+  },
+  "monthly_text_and_nightly": [
+    {
+      "turns_per_day": 30,
+      "uncached": "18.27",
+      "one_fill": "8.964",
+      "four_fills": "10.206",
+      "all_cache_misses": "20.97"
+    },
+    {
+      "turns_per_day": 40,
+      "uncached": "24.27",
+      "one_fill": "11.724",
+      "four_fills": "12.966",
+      "all_cache_misses": "27.87"
+    },
+    {
+      "turns_per_day": 60,
+      "uncached": "36.27",
+      "one_fill": "17.244",
+      "four_fills": "18.486",
+      "all_cache_misses": "41.67"
+    }
+  ],
+  "context_only_40_turns_per_day": {
+    "uncached": "0.48",
+    "one_5m_write_39hits": "0.0618",
+    "one_1h_write_39hits": "0.0708"
+  },
+  "voice_scenario": {
+    "assumptions": {
+      "learner_audio_minutes": ".5",
+      "output_characters": 150,
+      "sonnet_calls_per_wall_minute": 1
+    },
+    "price_sources": [
+      "https://deepgram.com/pricing",
+      "https://cloud.google.com/text-to-speech/pricing"
+    ],
+    "source_dates": "undated; accessed 2026-09-28",
+    "warm_promo_usd_per_minute": "0.01610",
+    "warm_regular_asr_usd_per_minute": "0.01755",
+    "cold_promo_usd_per_minute": "0.0299",
+    "20min_day_30days_warm_promo": "9.6600"
+  },
+  "excludes": [
+    "extra tools/verifications",
+    "thinking beyond output assumption",
+    "retries",
+    "transport/hosting",
+    "storage",
+    "support",
+    "tax/FX",
+    "store/payment fees",
+    "content/editorial labor",
+    "local hardware/energy"
+  ],
+  "warning": "Voice scenario includes its tutor call. Do not add it twice to text totals. Cache writes with zero hits exceed uncached input cost."
+}

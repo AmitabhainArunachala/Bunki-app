@@ -1,0 +1,930 @@
+{
+ "wikinews:1403": {
+  "src": "articles/pictures/wikinews-1403.webp",
+  "small": "articles/pictures/wikinews-1403-600.webp",
+  "alt": "Snow-dusted forested mountains of the Shiretoko Peninsula rising above a sea scattered with drift ice.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F4A5C"
+ },
+ "wikinews:6460": {
+  "src": "articles/pictures/wikinews-6460.webp",
+  "small": "articles/pictures/wikinews-6460-600.webp",
+  "alt": "A baseball flying over the green outfield of a floodlit major-league ballpark at dusk.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2E5A3A"
+ },
+ "wikinews:12024": {
+  "src": "articles/pictures/wikinews-12024.webp",
+  "small": "articles/pictures/wikinews-12024-600.webp",
+  "alt": "A silver commuter train on a new elevated railway line above the rooftops of eastern Osaka.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A5568"
+ },
+ "wikinews:20090": {
+  "src": "articles/pictures/wikinews-20090.webp",
+  "small": "articles/pictures/wikinews-20090-600.webp",
+  "alt": "A small one-car train on a single-track line through wooded hills under a grey sky.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#46504F"
+ },
+ "wikinews:45227": {
+  "src": "articles/pictures/wikinews-45227.webp",
+  "small": "articles/pictures/wikinews-45227-600.webp",
+  "alt": "A laptop showing a dimmed web page on a desk at night beside a stack of printed news pages.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3B4252"
+ },
+ "aozora:051034": {
+  "src": "articles/pictures/aozora-051034.webp",
+  "small": "articles/pictures/aozora-051034-600.webp",
+  "alt": "An old soldier and a young soldier sitting by a stone marker on a mountain pass next to a blooming wild rose.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#7A3E4F"
+ },
+ "aozora:000628": {
+  "src": "articles/pictures/aozora-000628.webp",
+  "small": "articles/pictures/aozora-000628-600.webp",
+  "alt": "A small fox hiding in wet autumn grass, watching a man fishing with a net in a muddy stream.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#8A4520"
+ },
+ "aozora:046605": {
+  "src": "articles/pictures/aozora-046605.webp",
+  "small": "articles/pictures/aozora-046605-600.webp",
+  "alt": "Two small crabs on the bed of a clear stream with bubbles rising and sunlight rippling on the stones.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#1F5A63"
+ },
+ "bunki-graded-n5-morning": {
+  "src": "articles/pictures/bunki-graded-n5-morning.webp",
+  "small": "articles/pictures/bunki-graded-n5-morning-600.webp",
+  "alt": "A bread roll and an open notebook on a park bench on a clear morning.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2E5D86"
+ },
+ "bunki-graded-n4-bookshop": {
+  "src": "articles/pictures/bunki-graded-n4-bookshop.webp",
+  "small": "articles/pictures/bunki-graded-n4-bookshop-600.webp",
+  "alt": "The inside of a small second-hand bookshop on a rainy day, with an old travel book open on the counter.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A4632"
+ },
+ "bunki-graded-n3-town": {
+  "src": "articles/pictures/bunki-graded-n3-town.webp",
+  "small": "articles/pictures/bunki-graded-n3-town-600.webp",
+  "alt": "Mossy stone steps climbing a wooded hillside towards a small shrine.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4B5B34"
+ },
+ "bunki-essay-n2-mountain": {
+  "src": "articles/pictures/bunki-essay-n2-mountain.webp",
+  "small": "articles/pictures/bunki-essay-n2-mountain-600.webp",
+  "alt": "A hiker walking alone on a misty forest trail among tall cedars.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#34503F"
+ },
+ "bunki-essay-n1-ai": {
+  "src": "articles/pictures/bunki-essay-n1-ai.webp",
+  "small": "articles/pictures/bunki-essay-n1-ai-600.webp",
+  "alt": "A desk with an open paper dictionary, a laptop and a handwritten notebook under a lamp.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4660"
+ },
+ "real-gokajo": {
+  "src": "articles/pictures/real-gokajo.webp",
+  "small": "articles/pictures/real-gokajo-600.webp",
+  "alt": "A rolled scroll on a lacquered stand in a formal tatami hall with gilded screens.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6B2E22"
+ },
+ "real-hojoki": {
+  "src": "articles/pictures/real-hojoki.webp",
+  "small": "articles/pictures/real-hojoki-600.webp",
+  "alt": "A clear river flowing over stones, with bubbles in an eddy and wooden houses on the far bank.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2D5560"
+ },
+ "real-tsurezure": {
+  "src": "articles/pictures/real-tsurezure.webp",
+  "small": "articles/pictures/real-tsurezure-600.webp",
+  "alt": "An inkstone, a brush and blank paper on a low desk by a window in an old Japanese room.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A3530"
+ },
+ "bunki-graded-n5-station": {
+  "src": "articles/pictures/bunki-graded-n5-station.webp",
+  "small": "articles/pictures/bunki-graded-n5-station-600.webp",
+  "alt": "Commuters and students waiting on a station platform as a morning train arrives.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5873"
+ },
+ "bunki-graded-n5-kitchen": {
+  "src": "articles/pictures/bunki-graded-n5-kitchen.webp",
+  "small": "articles/pictures/bunki-graded-n5-kitchen-600.webp",
+  "alt": "A woman cooking in a warm kitchen at night beside a table set with fish, vegetables and rice.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6A3F25"
+ },
+ "bunki-graded-n5-neighbour": {
+  "src": "articles/pictures/bunki-graded-n5-neighbour.webp",
+  "small": "articles/pictures/bunki-graded-n5-neighbour-600.webp",
+  "alt": "An elderly man and a young neighbour at their doors in an apartment corridor at dawn.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E4A5A"
+ },
+ "bunki-graded-n4-letter": {
+  "src": "articles/pictures/bunki-graded-n4-letter.webp",
+  "small": "articles/pictures/bunki-graded-n4-letter-600.webp",
+  "alt": "An old envelope and folded letter in an open desk drawer in a room full of moving boxes.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6E4B3A"
+ },
+ "bunki-graded-n4-market": {
+  "src": "articles/pictures/bunki-graded-n4-market.webp",
+  "small": "articles/pictures/bunki-graded-n4-market-600.webp",
+  "alt": "Vegetable stalls and a fish counter at a small morning market.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A6230"
+ },
+ "bunki-graded-n4-bicycle": {
+  "src": "articles/pictures/bunki-graded-n4-bicycle.webp",
+  "small": "articles/pictures/bunki-graded-n4-bicycle-600.webp",
+  "alt": "A row of parked bicycles outside a station with one empty space, a small police box across the street.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3C4F6B"
+ },
+ "bunki-graded-n3-river": {
+  "src": "articles/pictures/bunki-graded-n3-river.webp",
+  "small": "articles/pictures/bunki-graded-n3-river-600.webp",
+  "alt": "A person walking along a grassy riverside path towards a low bridge in the morning.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5B57"
+ },
+ "bunki-graded-n3-radio": {
+  "src": "articles/pictures/bunki-graded-n3-radio.webp",
+  "small": "articles/pictures/bunki-graded-n3-radio-600.webp",
+  "alt": "A small radio with a glowing dial on a bedside table in a dark bedroom.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2C2F4A"
+ },
+ "bunki-essay-n2-handwriting": {
+  "src": "articles/pictures/bunki-essay-n2-handwriting.webp",
+  "small": "articles/pictures/bunki-essay-n2-handwriting-600.webp",
+  "alt": "A hand holding a pencil over an empty squared practice notebook.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A4036"
+ },
+ "bunki-essay-n2-notebook": {
+  "src": "articles/pictures/bunki-essay-n2-notebook.webp",
+  "small": "articles/pictures/bunki-essay-n2-notebook-600.webp",
+  "alt": "An open notebook with a few short lines and wide empty margins on a café table.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3D4A3E"
+ },
+ "bunki-essay-n2-rain": {
+  "src": "articles/pictures/bunki-essay-n2-rain.webp",
+  "small": "articles/pictures/bunki-essay-n2-rain-600.webp",
+  "alt": "An open book on a café table by a rain-streaked window overlooking people with umbrellas at a crossing.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#34495E"
+ },
+ "bunki-essay-n2-translation": {
+  "src": "articles/pictures/bunki-essay-n2-translation.webp",
+  "small": "articles/pictures/bunki-essay-n2-translation-600.webp",
+  "alt": "Two colleagues nodding goodbye to each other in an office at dusk.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4B3F5C"
+ },
+ "bunki-essay-n1-memory": {
+  "src": "articles/pictures/bunki-essay-n1-memory.webp",
+  "small": "articles/pictures/bunki-essay-n1-memory-600.webp",
+  "alt": "A stack of flashcards, some face down, beside a desk calendar with circled days.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3B4A6B"
+ },
+ "bunki-essay-n1-city": {
+  "src": "articles/pictures/bunki-essay-n1-city.webp",
+  "small": "articles/pictures/bunki-essay-n1-city-600.webp",
+  "alt": "A traveller at a row of ticket machines in a crowded station concourse.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A3F4E"
+ },
+ "bunki-graded-n3-zoka-sanjin-morning": {
+  "src": "articles/pictures/bunki-graded-n3-zoka-sanjin-morning.webp",
+  "small": "articles/pictures/bunki-graded-n3-zoka-sanjin-morning-600.webp",
+  "alt": "An old book open on a library desk in morning sunlight.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A4A2E"
+ },
+ "bunki-graded-n3-nakaima-diary": {
+  "src": "articles/pictures/bunki-graded-n3-nakaima-diary.webp",
+  "small": "articles/pictures/bunki-graded-n3-nakaima-diary-600.webp",
+  "alt": "A steaming cup of green tea next to a face-down phone on a kitchen counter in the morning.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F5A3A"
+ },
+ "bunki-graded-n3-world-beginning": {
+  "src": "articles/pictures/bunki-graded-n3-world-beginning.webp",
+  "small": "articles/pictures/bunki-graded-n3-world-beginning-600.webp",
+  "alt": "Young reed shoots rising from still water in a misty marsh at dawn.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E5A4C"
+ },
+ "bunki-graded-n3-hidden-deity": {
+  "src": "articles/pictures/bunki-graded-n3-hidden-deity.webp",
+  "small": "articles/pictures/bunki-graded-n3-hidden-deity-600.webp",
+  "alt": "A teacher and a student talking over an open book in an empty classroom in the afternoon.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A5868"
+ },
+ "bunki-graded-n3-kojiki-book": {
+  "src": "articles/pictures/bunki-graded-n3-kojiki-book.webp",
+  "small": "articles/pictures/bunki-graded-n3-kojiki-book-600.webp",
+  "alt": "Three old thread-bound manuscript volumes in a museum display case.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5B3E2E"
+ },
+ "bunki-graded-n3-hashira-counter": {
+  "src": "articles/pictures/bunki-graded-n3-hashira-counter.webp",
+  "small": "articles/pictures/bunki-graded-n3-hashira-counter-600.webp",
+  "alt": "Plain wooden pillars supporting the roof of a shrine hall.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6B4A2B"
+ },
+ "bunki-graded-n3-feel-jingu-forest": {
+  "src": "articles/pictures/bunki-graded-n3-feel-jingu-forest.webp",
+  "small": "articles/pictures/bunki-graded-n3-feel-jingu-forest-600.webp",
+  "alt": "A wide gravel path through a forest of huge cedar trees with light falling through.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F4A35"
+ },
+ "bunki-graded-n3-musubi-visual": {
+  "src": "articles/pictures/bunki-graded-n3-musubi-visual.webp",
+  "small": "articles/pictures/bunki-graded-n3-musubi-visual-600.webp",
+  "alt": "A clear river flowing over smooth stones under tall trees.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2B5560"
+ },
+ "bunki-graded-n3-gratitude-week": {
+  "src": "articles/pictures/bunki-graded-n3-gratitude-week.webp",
+  "small": "articles/pictures/bunki-graded-n3-gratitude-week-600.webp",
+  "alt": "An open diary, a pen, a train pass and a wallet on a desk under a lamp.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A3F5E"
+ },
+ "bunki-graded-n3-thanks-before-help": {
+  "src": "articles/pictures/bunki-graded-n3-thanks-before-help.webp",
+  "small": "articles/pictures/bunki-graded-n3-thanks-before-help-600.webp",
+  "alt": "Two students talking over iced tea at a café table.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6A4A35"
+ },
+ "bunki-essay-n2-zoka-as-one": {
+  "src": "articles/pictures/bunki-essay-n2-zoka-as-one.webp",
+  "small": "articles/pictures/bunki-essay-n2-zoka-as-one-600.webp",
+  "alt": "Three overlapping sheets of tracing paper on a desk beside a pencil and an open book.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#44506A"
+ },
+ "bunki-essay-n2-nakaima-time": {
+  "src": "articles/pictures/bunki-essay-n2-nakaima-time.webp",
+  "small": "articles/pictures/bunki-essay-n2-nakaima-time-600.webp",
+  "alt": "A person looking at a phone while a meal of rice and soup sits untouched on the table.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A4030"
+ },
+ "bunki-essay-n2-creator-god": {
+  "src": "articles/pictures/bunki-essay-n2-creator-god.webp",
+  "small": "articles/pictures/bunki-essay-n2-creator-god-600.webp",
+  "alt": "A Japanese book and an English book open side by side on a desk with a pencil.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3D3F5C"
+ },
+ "bunki-essay-n2-silent-amenominakanushi": {
+  "src": "articles/pictures/bunki-essay-n2-silent-amenominakanushi.webp",
+  "small": "articles/pictures/bunki-essay-n2-silent-amenominakanushi-600.webp",
+  "alt": "A small wooden shrine with one lit lantern on a wooded hill at dusk.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A3448"
+ },
+ "bunki-essay-n2-kojiki-myth-history": {
+  "src": "articles/pictures/bunki-essay-n2-kojiki-myth-history.webp",
+  "small": "articles/pictures/bunki-essay-n2-kojiki-myth-history-600.webp",
+  "alt": "An old manuscript book beside pottery shards and a bronze mirror on a museum table.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5C4630"
+ },
+ "bunki-essay-n2-myth-to-book": {
+  "src": "articles/pictures/bunki-essay-n2-myth-to-book.webp",
+  "small": "articles/pictures/bunki-essay-n2-myth-to-book-600.webp",
+  "alt": "A brush, an inkstone and blank paper on a low desk lit by an oil lamp.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A3A2A"
+ },
+ "bunki-essay-n2-feel-jingu-musubi": {
+  "src": "articles/pictures/bunki-essay-n2-feel-jingu-musubi.webp",
+  "small": "articles/pictures/bunki-essay-n2-feel-jingu-musubi-600.webp",
+  "alt": "A craftsman's hands planing a block of pale wood, shavings curling off.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6B4F2E"
+ },
+ "bunki-essay-n2-prayer-on-screen": {
+  "src": "articles/pictures/bunki-essay-n2-prayer-on-screen.webp",
+  "small": "articles/pictures/bunki-essay-n2-prayer-on-screen-600.webp",
+  "alt": "A priest in white robes walking along a gravel path through a forest shrine at dawn.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F4A3A"
+ },
+ "bunki-essay-n2-thanks-first": {
+  "src": "articles/pictures/bunki-essay-n2-thanks-first.webp",
+  "small": "articles/pictures/bunki-essay-n2-thanks-first-600.webp",
+  "alt": "A shop clerk wrapping a small box while a customer waits at the counter.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6A3E3E"
+ },
+ "bunki-essay-n2-testimony-literacy": {
+  "src": "articles/pictures/bunki-essay-n2-testimony-literacy.webp",
+  "small": "articles/pictures/bunki-essay-n2-testimony-literacy-600.webp",
+  "alt": "One person talking and another listening at a kitchen table in the evening.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4E4A3A"
+ },
+ "bunki-essay-n1-cosmic-analogy": {
+  "src": "articles/pictures/bunki-essay-n1-cosmic-analogy.webp",
+  "small": "articles/pictures/bunki-essay-n1-cosmic-analogy-600.webp",
+  "alt": "The Milky Way above the dark roof of a small shrine in the mountains.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#1E2A44"
+ },
+ "bunki-essay-n1-nakaima-time-theory": {
+  "src": "articles/pictures/bunki-essay-n1-nakaima-time-theory.webp",
+  "small": "articles/pictures/bunki-essay-n1-nakaima-time-theory-600.webp",
+  "alt": "A hand holding a steaming teacup on a wooden table next to a clock.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4D3F33"
+ },
+ "bunki-essay-n1-first-versus-supreme": {
+  "src": "articles/pictures/bunki-essay-n1-first-versus-supreme.webp",
+  "small": "articles/pictures/bunki-essay-n1-first-versus-supreme-600.webp",
+  "alt": "A hand tracing a hand-drawn family-tree diagram on a table among open books.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F3A55"
+ },
+ "bunki-essay-n1-silent-god-theology": {
+  "src": "articles/pictures/bunki-essay-n1-silent-god-theology.webp",
+  "small": "articles/pictures/bunki-essay-n1-silent-god-theology-600.webp",
+  "alt": "An empty shrine prayer hall with its doors open at dawn.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F3440"
+ },
+ "bunki-essay-n1-kojiki-power": {
+  "src": "articles/pictures/bunki-essay-n1-kojiki-power.webp",
+  "small": "articles/pictures/bunki-essay-n1-kojiki-power-600.webp",
+  "alt": "A large red-pillared palace hall on a wide gravel plain under a clear sky.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#7A2E26"
+ },
+ "bunki-essay-n1-beyond-fact-fiction": {
+  "src": "articles/pictures/bunki-essay-n1-beyond-fact-fiction.webp",
+  "small": "articles/pictures/bunki-essay-n1-beyond-fact-fiction-600.webp",
+  "alt": "Students discussing around a seminar table covered with books and papers.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E4C5E"
+ },
+ "bunki-essay-n1-sacred-media": {
+  "src": "articles/pictures/bunki-essay-n1-sacred-media.webp",
+  "small": "articles/pictures/bunki-essay-n1-sacred-media-600.webp",
+  "alt": "Plain wooden shrine buildings deep in a green forest, seen from above.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2E4634"
+ },
+ "bunki-essay-n1-ise-time": {
+  "src": "articles/pictures/bunki-essay-n1-ise-time.webp",
+  "small": "articles/pictures/bunki-essay-n1-ise-time-600.webp",
+  "alt": "A new shrine building of pale wood beside an empty gravel plot in a forest.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A4B2E"
+ },
+ "bunki-essay-n1-miracle-testimony": {
+  "src": "articles/pictures/bunki-essay-n1-miracle-testimony.webp",
+  "small": "articles/pictures/bunki-essay-n1-miracle-testimony-600.webp",
+  "alt": "A small group sitting in a circle of chairs in a community hall, one person speaking.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A3B4F"
+ },
+ "bunki-essay-n1-prayer-reality": {
+  "src": "articles/pictures/bunki-essay-n1-prayer-reality.webp",
+  "small": "articles/pictures/bunki-essay-n1-prayer-reality-600.webp",
+  "alt": "Three people at a small table with a sheet of paper and mugs of tea.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F4B5A"
+ },
+ "wikinews:44381": {
+  "src": "articles/pictures/wikinews-44381.webp",
+  "small": "articles/pictures/wikinews-44381-600.webp",
+  "alt": "An empty floodlit football stadium at dusk.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#1F3F7A"
+ },
+ "wikinews:45208": {
+  "src": "articles/pictures/wikinews-45208.webp",
+  "small": "articles/pictures/wikinews-45208-600.webp",
+  "alt": "A white car ferry leaving port on a hazy morning with gulls following.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2C4F6E"
+ },
+ "wikinews:45095": {
+  "src": "articles/pictures/wikinews-45095.webp",
+  "small": "articles/pictures/wikinews-45095-600.webp",
+  "alt": "Four microphone stands on a softly lit concert stage with glow sticks in the dark crowd.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6A2E55"
+ },
+ "wikinews:45098": {
+  "src": "articles/pictures/wikinews-45098.webp",
+  "small": "articles/pictures/wikinews-45098-600.webp",
+  "alt": "The National Diet Building in Tokyo under a clear winter sky.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4A5E"
+ },
+ "wikinews:44384": {
+  "src": "articles/pictures/wikinews-44384.webp",
+  "small": "articles/pictures/wikinews-44384-600.webp",
+  "alt": "A referee's hand holding up a red card under stadium floodlights.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#8A1F24"
+ },
+ "wikinews:45089": {
+  "src": "articles/pictures/wikinews-45089.webp",
+  "small": "articles/pictures/wikinews-45089-600.webp",
+  "alt": "A ballot box at the front of a meeting room set with rows of empty chairs.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E4A5C"
+ },
+ "wikinews:42478": {
+  "src": "articles/pictures/wikinews-42478.webp",
+  "small": "articles/pictures/wikinews-42478-600.webp",
+  "alt": "A runner's foot and hand sliding into second base in a spray of dirt.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#34506B"
+ },
+ "govonline:article-202609-radio-3739": {
+  "src": "articles/pictures/govonline-article-202609-radio-3739.webp",
+  "small": "articles/pictures/govonline-article-202609-radio-3739-600.webp",
+  "alt": "The empty UN General Assembly hall with rows of desks facing the podium.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2B4C7E"
+ },
+ "env:press-press_05463": {
+  "src": "articles/pictures/env-press-press-05463.webp",
+  "small": "articles/pictures/env-press-press-05463-600.webp",
+  "alt": "Rows of young shrubs planted in straw grids on dry, sandy Mongolian steppe.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6E5228"
+ },
+ "env:press-press_05585": {
+  "src": "articles/pictures/env-press-press-05585.webp",
+  "small": "articles/pictures/env-press-press-05585-600.webp",
+  "alt": "Visitors in hard hats watching a recycling conveyor belt from a walkway.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F5A4A"
+ },
+ "kantei:jp-105-actions-202609-15hyousyou": {
+  "src": "articles/pictures/kantei-jp-105-actions-202609-15hyousyou.webp",
+  "small": "articles/pictures/kantei-jp-105-actions-202609-15hyousyou-600.webp",
+  "alt": "Volunteer firefighters carrying a stretcher during a neighbourhood disaster drill.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2E3F5C"
+ },
+ "env:press-press_05575": {
+  "src": "articles/pictures/env-press-press-05575.webp",
+  "small": "articles/pictures/env-press-press-05575-600.webp",
+  "alt": "A home-energy report with a bar chart and an electricity bill on a kitchen table.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5A4A"
+ },
+ "env:press-press_04591": {
+  "src": "articles/pictures/env-press-press-04591.webp",
+  "small": "articles/pictures/env-press-press-04591-600.webp",
+  "alt": "Scientists on a small boat lowering a water-sampling bottle into the sea.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2A4A5E"
+ },
+ "env:press-press_05584": {
+  "src": "articles/pictures/env-press-press-05584.webp",
+  "small": "articles/pictures/env-press-press-05584-600.webp",
+  "alt": "Children in hard hats watching a bulldozer at a landfill among green hills.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A5A3A"
+ },
+ "env:press-press_05589": {
+  "src": "articles/pictures/env-press-press-05589.webp",
+  "small": "articles/pictures/env-press-press-05589-600.webp",
+  "alt": "Stacked bales of compressed bottles, cans and cardboard at a recycling centre.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3B5B47"
+ },
+ "govonline:article-202609-tv-6623": {
+  "src": "articles/pictures/govonline-article-202609-tv-6623.webp",
+  "small": "articles/pictures/govonline-article-202609-tv-6623-600.webp",
+  "alt": "A teenager in a dark room looking at a glowing smartphone.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2C2A45"
+ },
+ "env:press-press_05582": {
+  "src": "articles/pictures/env-press-press-05582.webp",
+  "small": "articles/pictures/env-press-press-05582-600.webp",
+  "alt": "A technician holding up a water sample beside the basins of a water treatment plant.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#23566A"
+ },
+ "kantei:jp-105-actions-202609-18fukudaijin": {
+  "src": "articles/pictures/kantei-jp-105-actions-202609-18fukudaijin.webp",
+  "small": "articles/pictures/kantei-jp-105-actions-202609-18fukudaijin-600.webp",
+  "alt": "An empty red-carpeted staircase inside the Prime Minister's Office.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6B2A2A"
+ },
+ "kantei:jp-105-actions-202609-19seimukan": {
+  "src": "articles/pictures/kantei-jp-105-actions-202609-19seimukan.webp",
+  "small": "articles/pictures/kantei-jp-105-actions-202609-19seimukan-600.webp",
+  "alt": "A long meeting table with chairs and microphones in a government room at night.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#34404F"
+ },
+ "mhlw:stf-newpage_76100": {
+  "src": "articles/pictures/mhlw-stf-newpage-76100.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76100-600.webp",
+  "alt": "Two inspectors with clipboards walking along a hospital corridor.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2E5A66"
+ },
+ "mhlw:stf-newpage_76233": {
+  "src": "articles/pictures/mhlw-stf-newpage-76233.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76233-600.webp",
+  "alt": "People walking into a convention hall in Toyama with mountains in the distance.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F5266"
+ },
+ "mhlw:stf-newpage_76330": {
+  "src": "articles/pictures/mhlw-stf-newpage-76330.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76330-600.webp",
+  "alt": "A hospital building with diagonal steel earthquake braces on its outside walls.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4A5A"
+ },
+ "sports:sports-b_menu-houdou-31-09-1421070_00039": {
+  "src": "articles/pictures/sports-sports-b-menu-houdou-31-09-1421070-00039.webp",
+  "small": "articles/pictures/sports-sports-b-menu-houdou-31-09-1421070-00039-600.webp",
+  "alt": "A volunteer in a tracksuit leading residents of all ages in exercises in a school gym.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5D50"
+ },
+ "govonline:article-202609-radio-3741": {
+  "src": "articles/pictures/govonline-article-202609-radio-3741.webp",
+  "small": "articles/pictures/govonline-article-202609-radio-3741-600.webp",
+  "alt": "A sign-language interpreter signing beside a concert stage under a spotlight.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4B2E6B"
+ },
+ "kantei:jp-105-discourse-20260923message": {
+  "src": "articles/pictures/kantei-jp-105-discourse-20260923message.webp",
+  "small": "articles/pictures/kantei-jp-105-discourse-20260923message-600.webp",
+  "alt": "A reception table of wagyu, sashimi, scallops, melon and sake bottles.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6B3A2A"
+ },
+ "env:press-press_05569": {
+  "src": "articles/pictures/env-press-press-05569.webp",
+  "small": "articles/pictures/env-press-press-05569-600.webp",
+  "alt": "Volunteers in waders planting seagrass on a tidal flat at low tide.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2B5A5C"
+ },
+ "env:press-press_05603": {
+  "src": "articles/pictures/env-press-press-05603.webp",
+  "small": "articles/pictures/env-press-press-05603-600.webp",
+  "alt": "Two pens on closed document folders on a signing table, the city beyond the window.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F4A5A"
+ },
+ "govonline:article-202609-tv-6628": {
+  "src": "articles/pictures/govonline-article-202609-tv-6628.webp",
+  "small": "articles/pictures/govonline-article-202609-tv-6628-600.webp",
+  "alt": "Haul trucks on the terraces of a red-earth open-pit mine under a blue sky.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#7E3A1E"
+ },
+ "mext:b_menu-houdou-mext_01683": {
+  "src": "articles/pictures/mext-b-menu-houdou-mext-01683.webp",
+  "small": "articles/pictures/mext-b-menu-houdou-mext-01683-600.webp",
+  "alt": "Students steering a home-made robot across a competition course in an arena.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4F7A"
+ },
+ "env:press-press_05614": {
+  "src": "articles/pictures/env-press-press-05614.webp",
+  "small": "articles/pictures/env-press-press-05614-600.webp",
+  "alt": "A factory with solar panels on its roofs and a belt of young trees around it, seen from above.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3D5A3A"
+ },
+ "env:press-press_05616": {
+  "src": "articles/pictures/env-press-press-05616.webp",
+  "small": "articles/pictures/env-press-press-05616-600.webp",
+  "alt": "A technician lifting the lid of a septic tank beside a house.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E5560"
+ },
+ "env:press-press_05643": {
+  "src": "articles/pictures/env-press-press-05643.webp",
+  "small": "articles/pictures/env-press-press-05643-600.webp",
+  "alt": "A close-up of golden-yellow ants on sandy soil beside a container yard.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#6B4A1E"
+ },
+ "kantei:jp-105-actions-202609-25startup": {
+  "src": "articles/pictures/kantei-jp-105-actions-202609-25startup.webp",
+  "small": "articles/pictures/kantei-jp-105-actions-202609-25startup-600.webp",
+  "alt": "A robot arm stacking mixed cardboard boxes onto a pallet in a warehouse.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#34406A"
+ },
+ "mhlw:stf-houdou-newpage_75698": {
+  "src": "articles/pictures/mhlw-stf-houdou-newpage-75698.webp",
+  "small": "articles/pictures/mhlw-stf-houdou-newpage-75698-600.webp",
+  "alt": "A person at a laptop looking at a map of nearby clinics, an insurance card on the table.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5A6E"
+ },
+ "mhlw:stf-newpage_76360": {
+  "src": "articles/pictures/mhlw-stf-newpage-76360.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76360-600.webp",
+  "alt": "A chest X-ray on a lit viewing screen in a quiet clinic room.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2E4F63"
+ },
+ "jawiki:3492442": {
+  "src": "articles/pictures/jawiki-3492442.webp",
+  "small": "articles/pictures/jawiki-3492442-600.webp",
+  "alt": "An empty athletics stadium with a red track under evening floodlights.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#7A2E35"
+ },
+ "jawiki:5238864-s63": {
+  "src": "articles/pictures/jawiki-5238864-s63.webp",
+  "small": "articles/pictures/jawiki-5238864-s63-600.webp",
+  "alt": "A satellite view of a large typhoon spiral south of Japan.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3B4A5A"
+ },
+ "jawiki:5294446": {
+  "src": "articles/pictures/jawiki-5294446.webp",
+  "small": "articles/pictures/jawiki-5294446-600.webp",
+  "alt": "The Prime Minister's Office in Tokyo, with its bamboo garden and cars at the entrance.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4D44"
+ },
+ "govonline:article-202609-radio-3743": {
+  "src": "articles/pictures/govonline-article-202609-radio-3743.webp",
+  "small": "articles/pictures/govonline-article-202609-radio-3743-600.webp",
+  "alt": "An old wooden bathhouse with a curved tiled roof, now a café.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A3A2A"
+ },
+ "env:press-press_05591": {
+  "src": "articles/pictures/env-press-press-05591.webp",
+  "small": "articles/pictures/env-press-press-05591-600.webp",
+  "alt": "A small group with a guide walking along a riverbank among autumn hills.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3D5A45"
+ },
+ "mhlw:stf-newpage_76340": {
+  "src": "articles/pictures/mhlw-stf-newpage-76340.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76340-600.webp",
+  "alt": "A pharmacist handing a bag of medicines to a patient across the counter.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5E5A"
+ },
+ "jawiki-news:2026-09-14": {
+  "src": "articles/pictures/jawiki-news-2026-09-14.webp",
+  "small": "articles/pictures/jawiki-news-2026-09-14-600.webp",
+  "alt": "The stone front of the Bank of Japan building in Tokyo in the morning.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#4A4A3A"
+ },
+ "sports:sports-b_menu-houdou-jsa_00246": {
+  "src": "articles/pictures/sports-sports-b-menu-houdou-jsa-00246.webp",
+  "small": "articles/pictures/sports-sports-b-menu-houdou-jsa-00246-600.webp",
+  "alt": "A new arena with a curved roof near the harbour, mountains in the distance.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F5070"
+ },
+ "global-voices:2026-09-28-65726": {
+  "src": "articles/pictures/global-voices-2026-09-28-65726.webp",
+  "small": "articles/pictures/global-voices-2026-09-28-65726-600.webp",
+  "alt": "Syrian volunteers planting rows of seeds in a small green field at the edge of a town of flat-roofed houses.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E5A2E"
+ },
+ "jawiki-news:2026-09-21": {
+  "src": "articles/pictures/jawiki-news-2026-09-21.webp",
+  "small": "articles/pictures/jawiki-news-2026-09-21-600.webp",
+  "alt": "Swimmers racing breaststroke in an indoor pool.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#1F5A7A"
+ },
+ "adapt-n3:govonline:article-202609-radio-3741": {
+  "src": "articles/pictures/govonline-article-202609-radio-3741.webp",
+  "small": "articles/pictures/govonline-article-202609-radio-3741-600.webp",
+  "alt": "A sign-language interpreter signing beside a concert stage under a spotlight.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A3A6B"
+ },
+ "adapt-n3:govonline:article-202609-tv-6628": {
+  "src": "articles/pictures/govonline-article-202609-tv-6628.webp",
+  "small": "articles/pictures/govonline-article-202609-tv-6628-600.webp",
+  "alt": "Haul trucks on the terraces of a red-earth open-pit mine under a blue sky.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4A5E"
+ },
+ "adapt-n3:env:press-press_05643": {
+  "src": "articles/pictures/env-press-press-05643.webp",
+  "small": "articles/pictures/env-press-press-05643-600.webp",
+  "alt": "A close-up of golden-yellow ants on sandy soil beside a container yard.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3D4F5A"
+ },
+ "adapt-n3:jawiki:3492442": {
+  "src": "articles/pictures/jawiki-3492442.webp",
+  "small": "articles/pictures/jawiki-3492442-600.webp",
+  "alt": "An empty athletics stadium with a red track under evening floodlights.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A3F6A"
+ },
+ "adapt-n3:jawiki:5238864-s63": {
+  "src": "articles/pictures/jawiki-5238864-s63.webp",
+  "small": "articles/pictures/jawiki-5238864-s63-600.webp",
+  "alt": "A satellite view of a large typhoon spiral south of Japan.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3A4550"
+ },
+ "adapt-n3:global-voices:2026-09-28-65726": {
+  "src": "articles/pictures/global-voices-2026-09-28-65726.webp",
+  "small": "articles/pictures/global-voices-2026-09-28-65726-600.webp",
+  "alt": "Syrian volunteers planting rows of seeds in a small green field at the edge of a town of flat-roofed houses.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A4626"
+ },
+ "mhlw:stf-newpage_76095": {
+  "src": "articles/pictures/mhlw-stf-newpage-76095.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76095-600.webp",
+  "alt": "An inspector checking the safety guard of a factory machine while a worker watches.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E4A52"
+ },
+ "mhlw:stf-newpage_76126": {
+  "src": "articles/pictures/mhlw-stf-newpage-76126.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76126-600.webp",
+  "alt": "An older worker showing a younger colleague a task at a workbench.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#5A4A3A"
+ },
+ "mhlw:stf-newpage_76152": {
+  "src": "articles/pictures/mhlw-stf-newpage-76152.webp",
+  "small": "articles/pictures/mhlw-stf-newpage-76152-600.webp",
+  "alt": "A workshop owner and an employee going over papers at a desk.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3E4E5E"
+ },
+ "sports:sports-b_menu-houdou-31-09-1420919_00007": {
+  "src": "articles/pictures/sports-sports-b-menu-houdou-31-09-1420919-00007.webp",
+  "small": "articles/pictures/sports-sports-b-menu-houdou-31-09-1420919-00007-600.webp",
+  "alt": "Older residents playing ground golf on a riverside field.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#3F5F3A"
+ },
+ "mext:b_menu-houdou-2025-mext_00009": {
+  "src": "articles/pictures/mext-b-menu-houdou-2025-mext-00009.webp",
+  "small": "articles/pictures/mext-b-menu-houdou-2025-mext-00009-600.webp",
+  "alt": "Small wheeled robots carrying crates between warehouse shelves.",
+  "w": 1200,
+  "h": 800,
+  "accent": "#2F4A6A"
+ }
+}
