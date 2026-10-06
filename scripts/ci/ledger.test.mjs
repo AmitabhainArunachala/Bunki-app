@@ -204,6 +204,12 @@ test('consumer triggers on exactly the canonical callers, whose job prefixes it 
     PRODUCERS.map((p) => load(p.path).name).sort(),
   );
   assert.deepEqual(consumer.on.workflow_run.types, ['completed']);
+  // GitHub keeps up to 100 pending runs with queue: max; the default replaces all but one.
+  assert.deepEqual(consumer.concurrency, {
+    group: 'bunki-flake-ledger',
+    'cancel-in-progress': false,
+    queue: 'max',
+  });
   assert.deepEqual(consumer.permissions, { contents: 'read' });
   assert.deepEqual(consumer.jobs.record.permissions, { contents: 'write', actions: 'read' });
   for (const producer of PRODUCERS) {
@@ -691,4 +697,109 @@ test('an old-created run with a new triggered attempt is prioritized outside the
   });
   assert.equal(pending.length, 20);
   assert.deepEqual(pending[0], { id: 1, attempt: 7, key: '1/7', startedAt, triggered: true });
+});
+
+test('an old-created attempt that failed transiently on its trigger recovers on schedule', () => {
+  const recent = [run(100)];
+  const keys = (pending) => pending.map((c) => c.key);
+  const trigger = { id: 1, run_attempt: 2, run_started_at: startedAt };
+  assert.deepEqual(keys(pendingAttempts(recent, {}, 'p1', NOW, trigger)), ['1/2', '100/1']);
+  let now = NOW;
+  let state = nextRuns(
+    {},
+    {
+      '1/2': settle(new Error('gh: HTTP 502'), undefined, { policy: 'p1', startedAt, now }),
+      '100/1': { result: 'observed', startedAt },
+    },
+    now,
+  );
+  // Scheduled reconciliation carries no trigger, and run 1 predates the creation lookback.
+  for (const [index, error] of [new Error('fetch failed'), new Error('gh: HTTP 504')].entries()) {
+    const backoff = 2 ** index * HOUR;
+    assert.deepEqual(pendingAttempts(recent, state, 'p1', now + backoff - 1), []);
+    now += backoff;
+    assert.deepEqual(pendingAttempts(recent, state, 'p1', now), [
+      { id: 1, attempt: 2, key: '1/2', startedAt },
+    ]);
+    const entry = settle(error, state['1/2'], { policy: 'p1', startedAt, now });
+    state = nextRuns(state, { '1/2': entry }, now);
+    assert.equal(state['1/2'].failures, index + 2);
+  }
+  now += 4 * HOUR;
+  assert.deepEqual(keys(pendingAttempts(recent, state, 'p1', now)), ['1/2']);
+  state = nextRuns(state, { '1/2': { result: 'observed', startedAt } }, now);
+  assert.deepEqual(pendingAttempts(recent, state, 'p1', now + 24 * HOUR), []);
+});
+
+test('old-created state is reconsidered under a new trusted policy only until artifacts expire', () => {
+  const state = {
+    '1/2': { result: 'rejected', policy: 'p1', startedAt, reason: 'policy differs' },
+    '2/3': {
+      result: 'retry',
+      policy: 'p1',
+      startedAt,
+      failures: 30,
+      attemptedAt: new Date(NOW).toISOString(),
+      reason: 'HTTP 502',
+    },
+    '3/2': { result: 'observed', startedAt },
+  };
+  const keys = (policy, now) => pendingAttempts([], state, policy, now).map((c) => c.key);
+  assert.deepEqual(keys('p1', NOW + HOUR), []);
+  assert.deepEqual(keys('p2', NOW + HOUR), ['1/2', '2/3']);
+  const expiry = Date.parse(startedAt) + 15 * 24 * HOUR;
+  assert.deepEqual(keys('p2', expiry), ['1/2', '2/3']);
+  assert.deepEqual(keys('p2', expiry + 1), []);
+});
+
+test('persisted state merges without duplicates and keeps fairness and the cap', () => {
+  const retry = {
+    result: 'retry',
+    policy: 'p1',
+    startedAt,
+    failures: 1,
+    attemptedAt: new Date(NOW).toISOString(),
+    reason: 'HTTP 502',
+  };
+  const recent = Array.from({ length: 25 }, (_, i) => run(i + 100));
+  const state = { '1/2': retry, '100/1': retry };
+  const triggered = pendingAttempts(recent, state, 'p1', NOW + HOUR, {
+    id: 1,
+    run_attempt: 2,
+    run_started_at: startedAt,
+  });
+  assert.equal(triggered.length, 20);
+  assert.equal(new Set(triggered.map((c) => c.key)).size, 20);
+  assert.deepEqual(triggered[0], { id: 1, attempt: 2, key: '1/2', startedAt, triggered: true });
+  const scheduled = pendingAttempts(recent, state, 'p1', NOW + HOUR).map((c) => c.key);
+  assert.deepEqual(
+    scheduled,
+    recent.slice(1, 21).map((r) => `${r.id}/1`),
+  );
+  const observed = Object.fromEntries(
+    scheduled.map((key) => [key, { result: 'observed', startedAt }]),
+  );
+  assert.deepEqual(
+    pendingAttempts(recent, { ...state, ...observed }, 'p1', NOW + HOUR).map((c) => c.key),
+    ['121/1', '122/1', '123/1', '124/1', '1/2', '100/1'],
+  );
+});
+
+test('persisted scheduling keys must name a positive numeric run attempt', () => {
+  const entry = { result: 'rejected', policy: 'p1', startedAt, reason: 'fork' };
+  for (const key of [
+    '1',
+    '0/1',
+    '1/0',
+    '01/1',
+    'x/1',
+    '1/2/3',
+    '../1',
+    '1/1?per_page=1',
+    '9007199254740993/1',
+  ])
+    assert.throws(
+      () => pendingAttempts([], { [key]: entry }, 'p1', NOW),
+      /Malformed scheduling key/,
+    );
 });

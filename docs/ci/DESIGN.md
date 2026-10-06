@@ -180,10 +180,17 @@ deployment proof. Policy-changing PR evidence waits until the trusted policy mat
 
 Writes use an isolated Git index, a fixed two-file data tree (ledger and processed-run
 index), and ordinary fast-forward pushes. Existing ledger bytes are preserved;
-identical observations do nothing and conflicts fail. Serialized workflow-run
-consumers and hourly reconciliation inspect the retained 13-day window, processing
-up to 20 attempts per invocation: the triggering attempt first, then never-tried
-and least recently tried attempts. A retry job that was cancelled or failed before
+identical observations do nothing and conflicts fail. Consumers are serialized in
+one concurrency group with `queue: max`, which holds up to 100 pending runs
+(GitHub's limit) instead of replacing all but one. Each workflow-run or hourly
+invocation considers the triggering attempt, every attempt of runs created in the
+last 13 days, and every unexpired scheduling entry. A malformed entry key fails the
+consumer. A fresh attempt of an older run is therefore retried from its own entry
+after a transient failure. Each invocation processes up to 20 attempts: the
+triggering attempt first, then never-tried and least recently tried attempts. When
+GitHub cancels a trigger past the 100-run queue, hourly reconciliation still finds
+runs created within 13 days, but not a fresh attempt of an older run that no
+invocation has recorded yet. A retry job that was cancelled or failed before
 its gate step has no report to pair, and neither does a bound retry report left
 `running`, `interrupted` or `infrastructure-failed`; only that shard is skipped and
 every other pair is still admitted in full. An attempt with no retry that reached its gates

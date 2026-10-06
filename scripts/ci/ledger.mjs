@@ -227,27 +227,32 @@ export function isDue(entry, policy, now) {
 }
 
 export function pendingAttempts(recent, state, policy, now = Date.now(), trigger) {
-  const requested = trigger
-    ? {
-        id: trigger.id,
-        attempt: trigger.run_attempt,
-        key: `${trigger.id}/${trigger.run_attempt}`,
-        startedAt: trigger.run_started_at,
-        triggered: true,
-      }
-    : null;
-  const candidates = recent
-    .flatMap((run) =>
-      Array.from({ length: run.run_attempt }, (_, i) => ({
-        id: run.id,
-        attempt: i + 1,
-        key: `${run.id}/${i + 1}`,
-        startedAt: run.run_started_at,
-      })),
-    )
-    .filter(({ key }) => key !== requested?.key);
-  if (requested) candidates.unshift(requested);
-  return candidates
+  const candidates = new Map();
+  const add = (candidate) => {
+    if (!candidates.has(candidate.key)) candidates.set(candidate.key, candidate);
+  };
+  if (trigger)
+    add({
+      id: trigger.id,
+      attempt: trigger.run_attempt,
+      key: `${trigger.id}/${trigger.run_attempt}`,
+      startedAt: trigger.run_started_at,
+      triggered: true,
+    });
+  for (const run of recent)
+    for (let attempt = 1; attempt <= run.run_attempt; attempt++)
+      add({ id: run.id, attempt, key: `${run.id}/${attempt}`, startedAt: run.run_started_at });
+  // A fresh attempt of a run created before the lookback is found only through its own state.
+  for (const [key, entry] of Object.entries(state)) {
+    const [id, attempt] = (/^([1-9]\d*)\/([1-9]\d*)$/.exec(key) ?? []).slice(1).map(Number);
+    assert(
+      Number.isSafeInteger(id) && Number.isSafeInteger(attempt),
+      `Malformed scheduling key: ${key}`,
+    );
+    if (now - Date.parse(entry.startedAt) <= SCHEDULE_RETENTION)
+      add({ id, attempt, key, startedAt: entry.startedAt });
+  }
+  return [...candidates.values()]
     .filter(
       ({ key, triggered }) =>
         state[key]?.result !== 'observed' && (triggered || isDue(state[key], policy, now)),
@@ -524,7 +529,7 @@ async function main() {
   );
   const now = Date.now();
   const since = new Date(now - 13 * 24 * HOUR).toISOString();
-  // Reconcile retained evidence even when GitHub replaces a pending consumer run.
+  // Reconcile retained evidence even when GitHub cancels a trigger past the full queue.
   const recent = Object.values(workflows).flatMap((id) =>
     pages(
       endpoint(
