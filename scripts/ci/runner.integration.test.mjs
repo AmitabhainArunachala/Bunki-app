@@ -40,6 +40,7 @@ test(
     delete env.GITHUB_STEP_SUMMARY;
     const identity = candidateIdentity(env);
     const artifact = validateArtifact(JSON.parse(readFileSync(metadata, 'utf8')), identity);
+    env.KAIRO_VERIFIED_ARTIFACT_SHA256 = artifact.artifactSha256;
     const plan = createPlan({ scope: 'full', identity });
     const phase = 'battery';
     const selected = phaseShards(plan, phase);
