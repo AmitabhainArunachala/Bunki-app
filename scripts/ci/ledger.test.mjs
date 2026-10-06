@@ -13,6 +13,7 @@ import {
   locate,
   nextRuns,
   observePair,
+  observeShards,
   persist,
   pendingAttempts,
   PRODUCERS,
@@ -284,6 +285,107 @@ for (const [name, mutate] of Object.entries({
     mutate(f);
     assert.throws(() => observePair(f));
   });
+
+function siblingShards() {
+  const f = fixture(callers.pages);
+  const a = f.first.shardId;
+  const b = f.plan.shards.find((s) => s.id !== a);
+  const gateB = (name, status) => ({
+    ...clone(f.first.gates[0]),
+    name,
+    status,
+    exitCode: status === 'passed' ? 0 : 1,
+  });
+  const firstB = {
+    ...clone(f.first),
+    shardId: b.id,
+    jobId: '789',
+    runner: 'runner-three',
+    gates: b.gates.map((name, i) => gateB(name, i === 0 ? 'failed' : 'passed')),
+  };
+  const secondB = {
+    ...clone(firstB),
+    attempt: 2,
+    jobId: '790',
+    runner: 'runner-four',
+    status: 'passed',
+    exitCode: 0,
+    gates: [gateB(b.gates[0], 'passed')],
+  };
+  const jobB = (record, conclusion) => ({
+    ...clone(f.jobs[record.attempt - 1]),
+    id: Number(record.jobId),
+    runner_name: record.runner,
+    name: `verify / ${record.attempt === 1 ? 'battery' : 'retry'} / ${b.id}`,
+    conclusion,
+  });
+  const retryB = jobB(secondB, 'success');
+  retryB.steps[0].conclusion = 'success';
+  f.jobs.push(jobB(firstB, 'success'), retryB);
+  const receipts = {
+    [`bunki-shard-${a}-1-42-1`]: f.first,
+    [`bunki-shard-${a}-2-42-1`]: f.second,
+    [`bunki-shard-${b.id}-1-42-1`]: firstB,
+    [`bunki-shard-${b.id}-2-42-1`]: secondB,
+  };
+  return {
+    ...f,
+    b: b.id,
+    retryB,
+    secondB,
+    receipts,
+    observe() {
+      const artifacts = Object.keys(receipts).map((name) => ({ name }));
+      return observeShards({ ...f, artifacts }, (found) => clone(receipts[found.name]));
+    },
+  };
+}
+
+test('every fully admitted sibling pair is observed', () => {
+  const s = siblingShards();
+  assert.deepEqual(
+    s
+      .observe()
+      .map((r) => r.gate)
+      .sort(),
+    [s.first.gates[0].name, s.secondB.gates[0].name].sort(),
+  );
+});
+
+for (const [name, interrupt] of Object.entries({
+  'cancelled sibling retry': (s) => {
+    s.retryB.conclusion = 'cancelled';
+    s.retryB.steps[0].conclusion = 'cancelled';
+  },
+  'sibling retry that failed in setup': (s) => {
+    s.retryB.conclusion = 'failure';
+    s.retryB.steps[0].conclusion = 'skipped';
+  },
+}))
+  test(`a ${name} does not discard another shard's flake`, () => {
+    const s = siblingShards();
+    interrupt(s);
+    delete s.receipts[`bunki-shard-${s.b}-2-42-1`];
+    const rows = s.observe();
+    assert.deepEqual(
+      rows.map((r) => r.gate),
+      [s.first.gates[0].name],
+    );
+    assert.deepEqual(rows[0].jobIds, ['123', '456']);
+  });
+
+test('a completed retry without its report stays transient, and a malformed pair is rejected', () => {
+  const late = siblingShards();
+  delete late.receipts[`bunki-shard-${late.b}-2-42-1`];
+  assert.throws(
+    () => late.observe(),
+    (error) => !(error instanceof assert.AssertionError) && /not yet available/.test(error.message),
+  );
+  const malformed = siblingShards();
+  malformed.secondB.runner = 'runner-three';
+  malformed.retryB.runner_name = 'runner-three';
+  assert.throws(() => malformed.observe(), assert.AssertionError);
+});
 
 test('first continue-on-error conclusion is accepted only for a complete report', () => {
   const f = fixture();

@@ -293,6 +293,38 @@ export function locate({ run, jobs, artifacts, prefix }, job, name) {
   return found[0];
 }
 
+const ranGates = (job, run) => {
+  const step = job.steps?.find((s) => s.name === stepName(2));
+  return (
+    job.run_attempt === run.run_attempt &&
+    ['success', 'failure'].includes(job.conclusion) &&
+    step?.status === 'completed' &&
+    ['success', 'failure'].includes(step.conclusion)
+  );
+};
+
+/** Pairs every retry that reached its gates; a cancelled or setup-failed retry has no report. */
+export function observeShards({ plan, artifact, run, jobs, artifacts, workflows }, read) {
+  const { prefix } = admitRun(run, workflows);
+  const evidence = { run, jobs, artifacts, prefix };
+  const suffix = `${run.id}-${run.run_attempt}`;
+  return plan.shards
+    .filter((shard) =>
+      jobs.some((j) => j.name === `${prefix}retry / ${shard.id}` && ranGates(j, run)),
+    )
+    .flatMap((shard) => {
+      const [first, second] = [
+        ['battery', 1],
+        ['retry', 2],
+      ].map(([job, attempt]) =>
+        read(
+          locate(evidence, `${job} / ${shard.id}`, `bunki-shard-${shard.id}-${attempt}-${suffix}`),
+        ),
+      );
+      return observePair({ plan, artifact, first, second, jobs, run, workflows });
+    });
+}
+
 /** ZIP is digest-checked; only one bounded JSON member is read, never extracted. */
 export function readArtifact(artifact, runId, member, temp) {
   assertArtifactMetadata(artifact, { runId });
@@ -333,8 +365,7 @@ function observeRun(run, workflows, temp) {
     'jobs',
   );
   // Only an executed retry can pair a failure with a fresh-runner pass.
-  if (!jobs.some((j) => j.name.startsWith(`${prefix}retry / `) && j.conclusion !== 'skipped'))
-    return [];
+  if (!jobs.some((j) => j.name.startsWith(`${prefix}retry / `) && ranGates(j, run))) return [];
   const artifacts = pages(endpoint(`actions/runs/${run.id}/artifacts?per_page=100`), 'artifacts');
   const evidence = { run, jobs, artifacts, prefix };
   const suffix = `${run.id}-${run.run_attempt}`;
@@ -376,23 +407,9 @@ function observeRun(run, workflows, temp) {
     name: artifact.name,
     digest: artifact.digest,
   });
-  const rows = [];
-  for (const shard of plan.shards) {
-    if (!jobs.some((j) => j.name === `${prefix}retry / ${shard.id}`)) continue;
-    const [first, second] = [
-      ['battery', 1],
-      ['retry', 2],
-    ].map(([job, attempt]) =>
-      readArtifact(
-        locate(evidence, `${job} / ${shard.id}`, `bunki-shard-${shard.id}-${attempt}-${suffix}`),
-        run.id,
-        'shard.json',
-        temp,
-      ),
-    );
-    rows.push(...observePair({ plan, artifact, first, second, jobs, run, workflows }));
-  }
-  return rows;
+  return observeShards({ plan, artifact, run, jobs, artifacts, workflows }, (found) =>
+    readArtifact(found, run.id, 'shard.json', temp),
+  );
 }
 
 function readState() {

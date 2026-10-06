@@ -181,15 +181,17 @@ index), and ordinary fast-forward pushes. Existing ledger bytes are preserved;
 identical observations do nothing and conflicts fail. Serialized workflow-run
 consumers and hourly reconciliation inspect the retained 13-day window, processing
 up to 20 attempts per invocation: the triggering attempt first, then never-tried
-and least recently tried attempts. An attempt in which no retry job ran has nothing
-to observe and is closed after reading its job list.
+and least recently tried attempts. A retry job that was cancelled or failed before
+its gate step has no report to pair, so only that shard is skipped; every other
+pair is still admitted in full. An attempt with no retry that reached its gates
+has nothing to observe and is closed after reading its job list.
 
 Each outcome is classified once. Observed attempts are final. An assertion about
 immutable evidence (fork, wrong workflow or event, malformed or inconsistent
-reports, policy mismatch, or a "Re-run failed jobs" attempt) is a rejection recorded
+reports, policy mismatch, or evidence from another attempt) is a rejection recorded
 against the trusted policy digest that judged it. It carries no timestamp and is
 reconsidered only when that digest changes. Anything else (API, download or fetch
-failures, or an artifact not yet listed for a completed job) is retried with
+failures, or a report not yet listed for a completed gate step) is retried with
 backoff doubling from one hour to a 24-hour cap, and never becomes an empty
 observation. Missing or expired evidence produces warnings, never invented rows.
 Scheduling entries are pruned 15 days after their attempt started, beyond the
