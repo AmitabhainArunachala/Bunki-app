@@ -9,6 +9,11 @@ import { rewriteUbuntuArchive } from './ubuntu-archive.mjs';
 
 const host = 'azure.archive.ubuntu.com';
 const archive = 'archive.ubuntu.com';
+// Exact bytes from runner-images tag ubuntu24/20260927.320 configure-apt-sources.sh.
+const observedMirrors =
+  'http://azure.archive.ubuntu.com/ubuntu/\tpriority:1\n' +
+  'https://archive.ubuntu.com/ubuntu/\tpriority:2\n' +
+  'https://security.ubuntu.com/ubuntu/\tpriority:3\n';
 const deb822 = `# Archive: http://${host}/ubuntu is the measured source
 Types: deb deb-src
 URIs: http://${host}/ubuntu/
@@ -32,6 +37,58 @@ Signed-By:
  synthetic-http://${host}/ubuntu
  -----END PGP PUBLIC KEY BLOCK-----
 `;
+
+test('pinned observed mirror file changes only the Azure URI and preserves priorities and fallbacks', () => {
+  assert.equal(Buffer.byteLength(observedMirrors), 144);
+  const result = rewriteUbuntuArchive(observedMirrors, 'mirrors');
+  assert.deepEqual(result, {
+    text: observedMirrors.replace(host, archive),
+    replacements: 1,
+    unsupported: 0,
+  });
+  assert.deepEqual(rewriteUbuntuArchive(result.text, 'mirrors'), {
+    text: result.text,
+    replacements: 0,
+    unsupported: 0,
+  });
+});
+
+test('mirror-file adversarial entries and indirection retain every non-target byte', () => {
+  const unchanged =
+    `# http://${host}/ubuntu/\tpriority:1\r\n` +
+    `https://security.ubuntu.com/ubuntu/\tpriority:3\r\n` +
+    `https://${archive}/ubuntu/\tpriority:2\r\n` +
+    `https://vendor.example.invalid/ubuntu/\tpriority:4 # http://${host}/ubuntu/\r\n` +
+    `http://${host}.example.invalid/ubuntu/\tpriority:5\r\n` +
+    `http://user@${host}/ubuntu/\tpriority:6\r\n` +
+    `http://${host}:80/ubuntu/\tpriority:7\r\n` +
+    `http://${host}/ubuntu/private\tpriority:8\r\n` +
+    `http://${host}/ubuntu?source=other\tpriority:9\r\n` +
+    `mirror+file:/etc/apt/mirrors/ubuntu.list\r\n` +
+    `unknown http://${host}/ubuntu/\r\n`;
+  assert.deepEqual(rewriteUbuntuArchive(unchanged, 'mirrors'), {
+    text: unchanged,
+    replacements: 0,
+    unsupported: 0,
+  });
+  const active = `\t https://${host}/ubuntu\tpriority:17 # keep metadata`;
+  assert.deepEqual(rewriteUbuntuArchive(unchanged + active, 'mirrors'), {
+    text: unchanged + active.replace(host, archive),
+    replacements: 1,
+    unsupported: 0,
+  });
+  const source =
+    'Types: deb\nURIs: mirror+file:/etc/apt/apt-mirrors.txt\nSuites: noble\nComponents: main\nSigned-By: /fixed/key.gpg\n';
+  assert.equal(rewriteUbuntuArchive(source, 'sources').text, source);
+  for (const suffix of ['', '\tpriority:bad', '\tpriority:1 unknown:metadata']) {
+    const fixture = `http://${host}/ubuntu/${suffix}\r\n`;
+    assert.deepEqual(rewriteUbuntuArchive(fixture, 'mirrors'), {
+      text: fixture,
+      replacements: 0,
+      unsupported: 1,
+    });
+  }
+});
 
 test('Deb822 rewrites only the active exact archive URI and preserves security, suites and keys', () => {
   const result = rewriteUbuntuArchive(deb822, 'sources');

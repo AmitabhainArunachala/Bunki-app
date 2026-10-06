@@ -16,7 +16,20 @@ export function rewriteUbuntuArchive(text, format) {
     if (next !== uri) replacements++;
     return next;
   };
-  if (format === 'list') {
+  if (format === 'mirrors') {
+    text = text.replace(/[^\n]+/g, (line) => {
+      // The pinned image's apt-mirrors.txt has one URI then untouched priority metadata.
+      if (/^\s*#/.test(line)) return line;
+      const entry = line.match(
+        /^([ \t]*)(\S+)([ \t]+priority:[0-9]+(?:[ \t]+#[^\r\n]*)?[ \t]*\r?)$/,
+      );
+      if (!entry) {
+        if (azure.test(line.trim().split(/\s+/)[0])) unsupported++;
+        return line;
+      }
+      return entry[1] + replace(entry[2]) + entry[3];
+    });
+  } else if (format === 'list') {
     text = text.replace(/[^\n]+/g, (line) => {
       if (/^\s*#/.test(line) || !line.includes('azure.archive.ubuntu.com')) return line;
       const entry = line.match(
@@ -92,34 +105,32 @@ function main() {
   assert(/^ID=(?:ubuntu|"ubuntu")\r?$/m.test(readFileSync('/etc/os-release', 'utf8')));
   const directory = '/etc/apt/sources.list.d';
   const files = [
-    '/etc/apt/sources.list',
+    ['/etc/apt/sources.list', 'list'],
     ...(existsSync(directory)
       ? readdirSync(directory)
           .filter((file) => /\.(?:sources|list)$/.test(file))
           .sort()
-          .map((file) => join(directory, file))
+          .map((file) => [join(directory, file), file.endsWith('.sources') ? 'sources' : 'list'])
       : []),
+    ['/etc/apt/apt-mirrors.txt', 'mirrors'],
   ];
-  let replacements = 0;
-  for (const file of files) {
+  const counts = { literalSource: 0, mirrorFile: 0 };
+  for (const [file, format] of files) {
     if (!existsSync(file)) continue;
     if (!lstatSync(file).isFile()) {
       console.log(`::notice::APT source layout retained without rewrite: ${file}`);
       continue;
     }
     const original = readFileSync(file, 'utf8');
-    const rewritten = rewriteUbuntuArchive(
-      original,
-      file.endsWith('.sources') ? 'sources' : 'list',
-    );
+    const rewritten = rewriteUbuntuArchive(original, format);
     if (rewritten.text !== original) writeFileSync(file, rewritten.text);
-    replacements += rewritten.replacements;
+    counts[format === 'mirrors' ? 'mirrorFile' : 'literalSource'] += rewritten.replacements;
     if (rewritten.unsupported)
       console.log(`::notice::Unsupported APT entries retained unchanged: ${file}`);
   }
-  console.log(
-    `Ubuntu archive URI substitutions: ${replacements}; normal APT installation follows.`,
-  );
+  console.log(`Ubuntu literal-source URI substitutions: ${counts.literalSource}`);
+  console.log(`Ubuntu mirror-file URI substitutions: ${counts.mirrorFile}`);
+  console.log('Normal APT update/install and signature checks follow unchanged.');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
