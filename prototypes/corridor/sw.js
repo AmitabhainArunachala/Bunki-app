@@ -13,7 +13,7 @@
 // The release builder prepends the SHA-256 of its sorted source asset paths
 // and digests. Every packaged change then gets a distinct atomic boot cache.
 // Unstaged development installs retain an explicit manually bumped fallback.
-const DEVELOPMENT_VERSION = 'kairo-v9-dev';
+const DEVELOPMENT_VERSION = 'kairo-v10-dev';
 const assetVersion = self.KAIRO_ASSET_VERSION;
 if (
   assetVersion !== undefined &&
